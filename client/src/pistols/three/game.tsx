@@ -109,7 +109,7 @@ export function dispose() {
   _scene = null
 }
 
-export async function init(canvas, width, height, guiEnabled) {
+export async function init(canvas, width, height, guiEnabled, statsEnabled = false) {
 
   if (_scene) return;
 
@@ -150,12 +150,12 @@ export async function init(canvas, width, height, guiEnabled) {
   _camera.position.set(0, 0, _eyeZ)
   _camera.lookAt(0, -SIZE, _eyeZ);
 
-  TEXTURE_PATHS.forEach(path => {
-    const tex = new THREE.TextureLoader().load(path);
-    tex.magFilter = THREE.NearestFilter;
-    tex.minFilter = THREE.NearestFilter;
-    _textures.push(tex);
-  })
+  // TEXTURE_PATHS.forEach(path => {
+  //   const tex = new THREE.TextureLoader().load(path);
+  //   tex.magFilter = THREE.NearestFilter;
+  //   tex.minFilter = THREE.NearestFilter;
+  //   _textures.push(tex);
+  // })
 
   setupRenderTarget();
   setupPost();
@@ -182,9 +182,12 @@ export async function init(canvas, width, height, guiEnabled) {
     } else {
       _gui.close();
     }
+
     // framerate
-    _stats = new Stats();
-    document.body.appendChild(_stats.dom);
+    if (statsEnabled) {
+      _stats = new Stats();
+      document.body.appendChild(_stats.dom);
+    }
   }
 
   // await loadAssets();
@@ -302,7 +305,7 @@ export function animate(time) {
   _renderer.setRenderTarget(null);
   _renderer.render(_postScene, _postCamera);
 
-  if (_stats) _stats.update();
+  _stats?.update();
 }
 
 
@@ -311,6 +314,9 @@ export function animate(time) {
 //
 
 function setupScene() {
+  _scene = new THREE.Scene();
+
+  // _scene.add(_background)
 
 }
 

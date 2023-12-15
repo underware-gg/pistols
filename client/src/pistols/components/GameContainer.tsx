@@ -6,7 +6,7 @@ import { ActionButton } from '@/pistols/components/ui/Buttons'
 import GameView from '@/pistols/components/GameView'
 import GameUI from '@/pistols/components/GameUI'
 
-function Pistols({
+function GameContainer({
   isPlaying,
   duelId,
 }) {
@@ -19,7 +19,7 @@ function Pistols({
   }, [duelId])
 
   return (
-    <div className={`GameContainer UIBorder ${isPlaying?'':'Hidden'}`}>
+    <div className={`GameContainer UIBorder ${isPlaying ? '' : 'Hidden'}`}>
       <GameView />
       <GameUI />
       <GameStartOverlay />
@@ -63,4 +63,4 @@ function GameStartOverlay({
   )
 }
 
-export default Pistols
+export default GameContainer

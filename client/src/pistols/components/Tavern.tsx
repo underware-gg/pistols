@@ -1,6 +1,6 @@
 import React from 'react'
 import { Container, Grid, Image } from 'semantic-ui-react'
-import AccountCurrent from './AccountCurrent'
+import AccountHeader from './account/AccountHeader'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -17,7 +17,7 @@ function Tavern() {
       <br />
 
       <Container text className='Faded Padded'>
-        <AccountCurrent />
+        <AccountHeader />
       </Container>
       <br />
 

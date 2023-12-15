@@ -31,7 +31,7 @@ export function createSystemCalls(
   }
   return {
     register_duelist,
- }
+  }
 }
 
 export function getReceiptStatus(receipt: any): boolean {

@@ -4,11 +4,11 @@ $color-important: #f00;
 $color-bg: #f5f5f5;
 $color-panel: #b4b4b4;
 $color-text: #000;
-$color-active: #ff5f5f;
+$color-active: #e00000;
 $color-inactive: #712727;
 $ui-border: 6px ridge $color-active;
 $ui-outline: 0.5px solid #444444;
-$text-shadow: 0.05em 0.05em 1px #8008;
+$text-shadow: 0.05em 0.05em 1px #0008;
 
 $game-width: 960px;
 $game-height: 540px;
@@ -372,6 +372,6 @@ canvas {
 // semantic-ui
 //
 .ui.input>input {
-  background: #aff2;
+  background: rgb(255, 255, 255);
   color: $color-text;
 }

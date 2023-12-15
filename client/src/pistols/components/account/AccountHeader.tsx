@@ -10,7 +10,7 @@ import { AccountShort } from '@/pistols/components/ui/Account'
 const Row = Grid.Row
 const Col = Grid.Column
 
-export default function AccountCurrent({
+export default function AccountHeader({
 }) {
   const router = useRouter()
   const { account: { account, isMasterAccount } } = useDojo()

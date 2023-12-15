@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import AppDojo from '@/pistols/components/AppDojo'
 import Gate from '@/pistols/components/Gate'
 import Tavern from '@/pistols/components/Tavern'
-import Pistols from '@/pistols/components/Pistols'
+import GameContainer from '@/pistols/components/GameContainer'
 
 export default function MainPage() {
   const router = useRouter()
@@ -62,11 +62,10 @@ export default function MainPage() {
     <AppDojo title={title} backgroundImage={backgroundImage}>
       {_atGate && <Gate />}
       {_atTavern && <Tavern />}
-      <Pistols
+      <GameContainer
         isPlaying={false}
         duelId={duelId}
       />
     </AppDojo>
   );
 }
-

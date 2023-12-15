@@ -14,7 +14,7 @@ const GameView = () => {
   const { gameImpl, isPlaying } = useGameplayContext()
   // const { chamberExists, yonder } = useChamber(chamberId)
   // const { tilemap, gameTilemap } = useChamberMap(chamberId, 777)
-  
+
   // console.log(`GameView`, chamberId, chamberExists, gameTilemap)
 
   // Load map, set player start
@@ -27,7 +27,7 @@ const GameView = () => {
 
   return (
     <div className='Relative GameView'>
-      <GameCanvas guiEnabled={false} />
+      <GameCanvas guiEnabled={null} />
       <GameLoop />
       <GameAudios />
     </div>
@@ -59,7 +59,7 @@ const GameLoop = ({
   //       return;
   //     }
   //   }
-    
+
   //   //
   //   // Messages
   //   //
@@ -130,12 +130,12 @@ const GameLoop = ({
   //   }
   // }, [gameState])
 
-  return  <></>
+  return <></>
 }
 
 
 const GameAudios = () => {
-  const { musicEnabled, sfxEnabled} = useSettingsContext()
+  const { musicEnabled, sfxEnabled } = useSettingsContext()
   const { gameImpl, gameState, isPlaying } = useGameplayContext()
 
   useEffect(() => {
