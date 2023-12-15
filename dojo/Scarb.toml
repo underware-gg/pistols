@@ -1,0 +1,38 @@
+[tool.dojo.world]
+name = "Pistols at 10 Blocks"
+description = "An on-chain pistol duelling game of honour and betrayal."
+icon_uri = "https://pistols.lootunder.world/images/logo.png"
+cover_uri = "https://pistols.lootunder.world/images/splash.png"
+website = "https://pistols.lootunder.world"
+socials.x = "https://twitter.com/lootunderworld"
+
+[package]
+cairo-version = "2.3.1"
+name = "pistols"
+version = "0.1.0"
+
+[cairo]
+sierra-replace-ids = true
+
+[dependencies]
+# dojo = { git = "https://github.com/dojoengine/dojo.git", rev = "47c0cbcfa4ebd4d4b504ec959fdbcfd3e4271e8a" }
+dojo = { git = "https://github.com/dojoengine/dojo.git", tag = "v0.3.15" }
+
+
+[[target.dojo]]
+
+[tool.dojo]
+initializer_class_hash = "0xbeef"
+
+[tool.dojo.env]
+world_address = "0x6891ca2cbf53d48a99f535b94ef5503ec67d2f455b2fb222b5f6a40576866cb"
+
+# Development
+rpc_url = "http://localhost:5050/"
+account_address = "0x517ececd29116499f4a1b64b094da79ba08dfd54a3edaa316134c41f8160973"
+private_key = "0x1800000000300000180000000000030000000000003006001800006600"
+
+# SLOT
+# rpc_url = "https://api.cartridge.gg/x/underdark/katana"
+# account_address = "0x35d0cdaf12e6816f4a1a5c074befbddd08abf61bbea87765342289b48b4bc16"
+# private_key = "0x3cfcc4c504dcb4f1bf790ba53d95aaa167ff4297ce63b4891473314905375e6"

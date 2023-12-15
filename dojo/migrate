@@ -1,0 +1,19 @@
+#!/bin/bash
+set -e
+
+export WORLD_ADDRESS="0x6891ca2cbf53d48a99f535b94ef5503ec67d2f455b2fb222b5f6a40576866cb"
+export RPC_URL="http://localhost:5050/"
+
+
+#sozo --offline build
+sozo migrate
+
+scripts/default_auth.sh
+
+cp target/dev/manifest.json ../client/src/
+
+cd ../client
+npm run codegen
+npm run create-components $RPC_URL $WORLD_ADDRESS
+
+echo "--- DONE! 👍"

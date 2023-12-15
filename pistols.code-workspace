@@ -1,0 +1,43 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/build": true,
+      "**/.github": true,
+      "**/.vscode": true,
+      "**/.next": true,
+      "**/_bak": true,
+      "**/*.tsbuildinfo": true,
+      // "**/.env*": true,
+    },
+    "search.exclude": {
+      "**/*-lock.json": true,
+      "**/*.lock": true,
+      "**/artifacts/**/*.json": true,
+      "**/contracts/**/*.json": true,
+      "**/yarn*.json": true,
+      "**/dist": true,
+      "**/.gitignore": true,
+      "**/.gitmodules": true,
+      "**/database.json": true,
+      "**/generated/*": true,
+      "**/manifest.json": true,
+    },
+    "typescript.validate.enable": true,
+    "editor.detectIndentation": false,
+    "editor.formatOnPaste": true,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "[cairo]": {
+      "editor.tabSize": 4,
+    },
+    "cairo1.languageServerPath": "/Users/roger/.dojo/bin/dojo-language-server",
+    "cairo1.enableLanguageServer": true,
+    "cairo1.enableScarb": false
+  }
+}

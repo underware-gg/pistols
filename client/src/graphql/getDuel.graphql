@@ -1,0 +1,16 @@
+query getDuel($duelId: String!) {
+  entities(keys: [$duelId], first: 100) {
+    edges {
+      node {
+        keys
+        id
+        models {
+          __typename
+          ... on Duel {
+            duelId, challenger, challenged, pass_code
+          }
+        }
+      }
+    }
+  }
+}

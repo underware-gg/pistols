@@ -1,0 +1,377 @@
+
+$font-family: Menlo, monospace, Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+$color-important: #f00;
+$color-bg: #f5f5f5;
+$color-panel: #b4b4b4;
+$color-text: #000;
+$color-active: #ff5f5f;
+$color-inactive: #712727;
+$ui-border: 6px ridge $color-active;
+$ui-outline: 0.5px solid #444444;
+$text-shadow: 0.05em 0.05em 1px #8008;
+
+$game-width: 960px;
+$game-height: 540px;
+$ui-height: 180px;
+$ui-compass-width: 360px;
+$ui-column: 60px;
+$ui-row: 40px;
+
+html {
+	overflow: scroll;
+	// scroll-behavior: smooth;
+}
+
+html, body {
+  font-family: $font-family;
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+
+  background-color: $color-bg;
+  color: $color-text;
+  text-shadow: $text-shadow;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  transition: border-color 0.25s;
+}
+
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+a {
+  color: $color-important;
+  text-decoration: inherit;
+  font-weight: 600;
+}
+
+a:hover {
+  color: $color-important;
+  text-decoration: underline;
+}
+
+h1 {
+  font-size: 2.2em;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: $font-family;
+  text-shadow: $text-shadow;
+  line-height: 1.2em;
+  margin: 0.2em 0;
+}
+
+hr {
+  color: #444;
+  border: 0.5px solid;
+}
+
+button {
+  background-color: $color-active;
+  color: $color-bg;
+  text-shadow: $text-shadow;
+  border-radius: 2px;
+  border: 1px solid transparent;
+  padding: 0.5em 1.0em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+button:hover {
+  border-color: #646cff;
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+canvas {
+  display: block;
+}
+
+/* GENERIC */
+
+.AlignLeft { text-align: left; }
+.AlignCenter { text-align: center; }
+.AlignRight { text-align: right; }
+.AlignTop { vertical-align: top; }
+.AlignMiddle { vertical-align: middle; }
+.AlignBottom { vertical-align: bottom; }
+
+.NoPadding { padding: 0!important; }
+.Padded { padding: 0.5em!important; }
+.NoMargin { margin: 0!important }
+.NoBorder { border: 0!important }
+.Block { display: inline-block; }
+
+.NoMouse { pointer-events: none; }
+.YesMouse { pointer-events: auto; }
+
+.Code {
+  font-family: monospace;
+}
+
+.Smaller {
+  font-size: 10px;
+}
+
+.Faded {
+  background-color: #0002;
+}
+
+.Anchor {
+  cursor: pointer;
+}
+
+.Spacer20 {
+  width: '100%';
+  min-height: 20px;
+}
+.Spacer50 {
+  width: '100%';
+  min-height: 50px;
+}
+
+.Hidden {
+  display: none!important;
+}
+
+.Relative {
+  position: relative;
+}
+
+.App {
+	// font-family: $ec-font-titles;
+	min-width: 100vw;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.FillParent {
+  width: 100%;
+  height: 100%;
+  min-width: 100%;
+  min-height: 100%;
+  vertical-align: middle;
+  align-items: center;
+}
+
+.CenteredContainer {
+	height: 100%;
+  min-height: 100%;
+	width: 100%;
+	display: flex !important;
+	justify-content: center;
+	align-items: center;
+	// text-align: center;
+}
+
+/* UNDERDARK  GENERIC */
+
+.Logo {
+  width: 256px;
+  height: 256px;
+}
+
+.ManorImage {
+  width: 256px;
+  height: 256px;
+  display: inline-block !important; // center
+}
+
+.DirectionButton {
+  /* margin: 0.25em; */
+  font-size: 24px;
+  text-align: center;
+  border: 0;
+  padding: 0;
+}
+
+.SmallButton {
+  margin: 0 0.1em;
+  padding: 0.1em 0.4em;
+}
+
+.LargeButton {
+  margin: 0 0.1em;
+  padding: 1em 2em;
+}
+
+.Locked {
+  background-color: $color-inactive;
+}
+.Unlocked {
+  background-color: $color-active;
+}
+
+/* GAME CANVAS */
+
+.GameContainer {
+  width: $game-width;
+  height: $game-height;
+  position: relative;
+}
+
+.GameView {
+  @extend .GameContainer;
+  position: absolute;
+  top: 0;
+  left: 0;
+  // outline: 0.5px solid #444;
+}
+
+.GameCanvas {
+  width: $game-width;
+  height: $game-height;
+  display: block;
+  background-color: #0000;
+}
+
+.Overlay {
+  background: linear-gradient(#0104, #010d);
+}
+
+
+/* GAME UI */
+
+.UI {
+  vertical-align: middle;
+  text-align: center;
+  margin: auto;
+  padding: 0;
+  margin: 0;
+}
+
+.UIBorder {
+  outline: $ui-border;
+}
+
+.GameUITop {
+  @extend .UI;
+  // display: block;
+  width: $game-width;
+  height: $ui-height;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 0;
+  // outline: 0.5px solid #444;
+}
+
+.GameUIBottom {
+  @extend .GameUITop;
+  top: unset;
+  bottom: 0;
+}
+
+.MapView {
+  width: 100%;
+  height: calc($ui-height - $ui-row);
+  // background-color: $color-panel;
+}
+
+.RoomPanel {
+  @extend .MapView;
+  height: calc($ui-height - $ui-row - $ui-row);
+}
+
+.InfoPanel {
+  width: $ui-compass-width;
+  height: calc($ui-height - $ui-row);
+  // background-color: $color-panel;
+}
+
+.CompassUI {
+  background-color: $color-inactive;
+  width: $ui-compass-width;
+  height: $ui-row;
+  font-size: 2.25em;
+  padding: 0.2em 0 0 0;
+  text-align: center;
+}
+
+.RowUI{
+  width: 100%;
+  height: $ui-row;
+  max-height: $ui-row;
+}
+.ColUI{
+  width: $ui-column;
+  max-width: $ui-column;
+  height: 100%;
+  vertical-align: bottom;
+  margin: auto;
+  position: relative;
+}
+.ColUIContents {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+.ColUISlider {
+  background-color: rgba($color-important, 0.5);
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ButtonUI{
+  font-size: 18px;
+}
+
+.InfoTop {
+  width: 100%;
+  height: $ui-row;
+  padding: 1em 0 0 0;
+  margin: auto;
+}
+.InfoBottom {
+  @extend .AlignMiddle;
+  // height: calc($ui-height - $ui-row);
+  width: 80%;
+  margin: auto;
+}
+
+
+/* TO BE REMOVED... */
+
+.ProofView {
+  position: absolute;
+  top: calc(100vw - 250px);
+  left: calc(100vh - 100px);
+  width: 500px;
+  height: 200px;
+  background-color: $color-bg;
+}
+
+
+//-----------------------------
+// semantic-ui
+//
+.ui.input>input {
+  background: #aff2;
+  color: $color-text;
+}

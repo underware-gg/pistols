@@ -1,0 +1,12 @@
+// tsconfig.json or jsconfig.json
+// https://nextjs.org/docs/advanced-features/module-path-aliases
+{
+	"compilerOptions": {
+		// allows VSCode to prompt for path rename when files are moved/renamed
+		"baseUrl": ".",
+		// import path shortcuts
+		"paths": {
+			"@/*": ["src/*"]
+		}
+	}
+}
