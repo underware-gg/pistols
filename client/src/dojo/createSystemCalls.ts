@@ -1,7 +1,7 @@
 import { getEvents, setComponentsFromEvents, decodeComponent } from '@dojoengine/utils'
-import { Account } from 'starknet'
 import { SetupNetworkResult } from './setupNetwork'
-import { shortString } from 'starknet'
+import { stringToFelt } from '@/pistols/utils/utils';
+import { Account } from 'starknet'
 
 export type SystemCalls = ReturnType<typeof createSystemCalls>;
 
@@ -13,7 +13,8 @@ export function createSystemCalls(
   const register_duelist = async (signer: Account, name: string): Promise<boolean> => {
     let success = false
     try {
-      const args = [shortString.encodeShortString(name)]
+      const args = [stringToFelt(name)]
+      // console.log(`args:`, args)
 
       const tx = await execute(signer, 'actions', 'register_duelist', args)
       console.log(`register_duelist tx:`, tx)

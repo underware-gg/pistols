@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useCookies } from 'react-cookie'
-import { Container, Grid, Radio, Input } from 'semantic-ui-react'
-import { useDojo } from '@/dojo/DojoContext'
+import { Grid, Radio, Input } from 'semantic-ui-react'
+import { useDojo, useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { AccountShort } from '@/pistols/components/ui/Account'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { accountNameCookieName } from '@/pistols/hooks/useAccountName'
+import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
+import { useAllDuelistIds, useDuelist } from '@/pistols/hooks/useDuelist'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -15,8 +15,7 @@ export function AccountsList() {
   const {
     account: { create, list, get, select, clear, account, isMasterAccount, isDeploying }
   } = useDojo()
-  // console.log(`LIST`, account.address)
-
+  
   const rows = useMemo(() => {
     let result = []
     const burners = list()
@@ -37,7 +36,8 @@ export function AccountsList() {
     return result
   }, [account?.address, isDeploying])
 
-  const canEnter = useMemo(() => (!isMasterAccount && !isDeploying), [isMasterAccount, isDeploying])
+  const { isRegistered } = useDuelist(account.address)
+  const canEnter = useMemo(() => (!isMasterAccount && !isDeploying && isRegistered), [isMasterAccount, isDeploying, isRegistered])
 
   return (
     <>
@@ -53,7 +53,7 @@ export function AccountsList() {
         </Row>
       </Grid>
       <br />
-      <ActionButton large disabled={!canEnter} onClick={() => router.push('/manor')} label='ENTER THE TAVERN' />
+      <ActionButton large disabled={!canEnter} onClick={() => router.push('/tavern')} label='ENTER THE TAVERN' />
     </>
   )
 }
@@ -65,6 +65,34 @@ function AccountItem({
   isSelected,
   select,
 }) {
+  const { register_duelist } = useDojoSystemCalls()
+  const { account } = useDojoAccount()
+
+  // current name from Dojo
+  const { name, isRegistered } = useDuelist(address)
+
+  const defaultAccountName = useMemo(() => (`ACCOUNT-${index + 1}`), [index])
+  const [inputValue, setInputValue] = useState(null)
+  const inputIsValid = useMemo(() => (inputValue?.length >= 3), [inputValue])
+  const isUpdated = useMemo(() => (name == inputValue), [name, inputValue])
+  const canRegister = useMemo(() => (isSelected && account && address), [isSelected, address])
+
+  // initialize
+  useEffectOnce(() => {
+    if (inputValue == null) {
+      setInputValue(name ?? defaultAccountName)
+    } else if (inputValue != name) {
+      setInputValue(name)
+    }
+  }, [name, inputValue])
+
+  const _register = () => {
+    if (canRegister) {
+      console.log(`REGISTER...`, account, inputValue)
+      register_duelist(account, inputValue)
+    }
+  }
+
   return (
     <Row>
       <Col width={1} textAlign='center'>
@@ -74,46 +102,24 @@ function AccountItem({
         <AccountShort address={address} />
       </Col>
       <Col width={9}>
-        <AccountName address={address} index={index} select={select} />
+        <Input inverted fluid
+          // icon='edit'
+          label='burner'
+          maxLength={30}
+          placeholder={'UNREGISTER'}
+          value={inputValue ?? ''}
+          onChange={(e) => setInputValue(e.target.value)}
+        // onFocus={() => select(address)}
+        />
       </Col>
       <Col width={3}>
-        <ActionButton disabled={true} onClick={() => { }} label='REGISTER' />
+        {!isRegistered
+          ? <ActionButton fill disabled={!canRegister || !inputIsValid} onClick={() => _register()} label='REGISTER' />
+          : inputValue
+            ? <ActionButton fill disabled={!canRegister || isUpdated || !inputIsValid} onClick={() => _register()} label={isUpdated ? 'OK' : 'UPDATE'} />
+            : <ActionButton fill disabled={!canRegister || isUpdated} onClick={() => _register()} label='UNREGISTER' />
+        }
       </Col>
     </Row>
-  )
-}
-
-function AccountName({
-  address,
-  index,
-  select,
-}) {
-  const defaultAccountName = useMemo(() => (`ACCOUNT-${index + 1}`), [index])
-  const cookieName = useMemo(() => accountNameCookieName(address), [address])
-
-  const [cookies, setCookie] = useCookies([cookieName])
-
-  const [inputValue, setInputValue] = useState(null)
-
-  // initialize
-  useEffect(() => {
-    if (inputValue == null) {
-      setInputValue(cookies[cookieName] ?? defaultAccountName)
-    }
-  }, [cookies[cookieName]])
-
-  useEffect(() => {
-    if (inputValue && cookies[cookieName] != inputValue) {
-      setCookie(cookieName, inputValue)
-    }
-  }, [inputValue])
-
-  return (
-    <Input inverted fluid icon='edit' maxLength={30}
-      placeholder={defaultAccountName}
-      value={inputValue ?? ''}
-      onChange={(e) => setInputValue(e.target.value)}
-      // onFocus={() => select(address)}
-    />
   )
 }

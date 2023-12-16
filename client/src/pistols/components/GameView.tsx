@@ -5,7 +5,6 @@ import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import GameCanvas from '@/pistols/components/GameCanvas'
 import { AudioName } from '@/pistols/data/assets'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
-import { useAccountName } from '../hooks/useAccountName'
 
 
 const GameView = () => {
@@ -114,7 +113,7 @@ const GameLoop = ({
   // //
   // const { finish_level } = useDojoSystemCalls()
   // const { account } = useDojoAccount()
-  // const { accountName } = useAccountName(account?.address)
+  // const { name } = useDuelist(account?.address)
   // useEffect(() => {
   //   const proofLostGames = (process.env.PROOF_LOST_GAMES && (gameState == GameState.NoHealth || gameState == GameState.Slendered))
   //   if (gameState == GameState.Verifying || proofLostGames) {
@@ -123,7 +122,7 @@ const GameLoop = ({
   //       proof |= (BigInt(step.dir) << BigInt(index * 4))
   //     });
   //     console.log(`PROOF:`, bigintToHex(proof))
-  //     const success = finish_level(account, chamberId, proof, steps.length, accountName)
+  //     const success = finish_level(account, chamberId, proof, steps.length, name)
   //     if (success && gameState == GameState.Verifying) {
   //       dispatchGameState(success ? GameState.Verified : GameState.NotVerified)
   //     }

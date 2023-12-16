@@ -25,7 +25,7 @@ mod actions {
     #[external(v0)]
     impl ActionsImpl of IActions<ContractState> {
         fn register_duelist(self: @ContractState,
-        name: felt252,
+            name: felt252,
         ) {
             let world: IWorldDispatcher = self.world_dispatcher.read();
             let caller: ContractAddress = starknet::get_caller_address();
@@ -33,7 +33,7 @@ mod actions {
             set!(world, (
                 Duelist { 
                     address: caller,
-                    name,
+                    name: 'OKIOKI',
                 }
             ));
 

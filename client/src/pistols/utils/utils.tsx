@@ -1,7 +1,6 @@
+import { getEntityIdFromKeys } from '@dojoengine/utils'
 import { Entity } from '@dojoengine/recs'
-
-export const bigintToHex = (n: bigint) => `0x${n.toString(16)}`
-export const bigintToEntity = (n: bigint): Entity => (`0x${n.toString(16)}` as Entity)
+import { shortString } from 'starknet'
 
 export const abs = (v: number): number => (v < 0 ? -v : v)
 export const min = (v1: number, v2: number): number => (v1 < v2 ? v1 : v2)
@@ -17,3 +16,22 @@ export const fmod = (a: number, b: number): number => Number((a - (Math.floor(a 
 const DEGREES_PER_RADIANS = (180 / Math.PI);
 export const toDegrees = (r) => (r * DEGREES_PER_RADIANS)
 export const toRadians = (d) => (d / DEGREES_PER_RADIANS)
+
+
+export const bigintToHex = (value: bigint | string) => `0x${BigInt(value).toString(16)}`
+
+export const bigintToEntity = (value: bigint | string): Entity => {
+  return getEntityIdFromKeys([BigInt(value)]) as Entity;
+}
+
+export const keysToEntity = (keys: any[]): Entity => {
+  return getEntityIdFromKeys(keys) as Entity;
+}
+
+export const stringToFelt = (value: string): string => {
+  return (value ? shortString.encodeShortString(value) : '0x0')
+}
+
+export const feltToString = (hexValue: string): string => {
+  return (BigInt(hexValue) > 0n ? shortString.decodeShortString(hexValue) : '')
+}

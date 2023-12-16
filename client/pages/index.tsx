@@ -15,12 +15,6 @@ export default function IndexPage() {
 
       {/* <SplashArt /> */}
 
-      {/* <div className='Spacer20' /> */}
-      {/* <h2><button onClick={() => { location.href = '/manor' }}>Enter The Manor at Kurnkunor</button></h2> */}
-
-      {/* <div className='Spacer20' /> */}
-      {/* <h2><button onClick={() => { location.href = '/editor/' }}>BITMAP EDITOR</button></h2> */}
-
 
       <div className='Spacer20' />
 

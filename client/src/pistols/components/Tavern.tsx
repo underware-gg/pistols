@@ -10,9 +10,8 @@ function Tavern() {
     <Container>
 
       <div className='AlignCenter'>
-        {/* <Image className='ManorImage' src='/images/manor.jpg' /> */}
         <h1>The Tavern</h1>
-        {/* <h2>The Lair of the Slender Duck!</h2> */}
+        <h2>Where honorable gentlement meet</h2>
       </div>
       <br />
 

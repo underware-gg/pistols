@@ -1,10 +1,8 @@
-import { useEffect, useMemo, useState } from "react"
+import { useMemo } from "react"
 import { Entity, HasValue, Has, getComponentValue } from '@dojoengine/recs'
 import { useComponentValue, useEntityQuery } from "@dojoengine/react"
-import { getEntityIdFromKeys } from "@dojoengine/utils"
-import { useDojoComponents, useDojoSystemCalls } from '@/dojo/DojoContext'
+import { useDojoComponents } from '@/dojo/DojoContext'
 import { bigintToEntity } from "../utils/utils"
-import { Account, shortString } from 'starknet'
 
 
 //------------------
@@ -25,13 +23,11 @@ export const useAllDuelIds = () => {
 // Single Duel
 //
 
-export const useDuel = (duelId: bigint) => {
+export const useDuel = (duelId: bigint | string) => {
   const { Duel } = useDojoComponents()
-
   const duel: any = useComponentValue(Duel, bigintToEntity(duelId))
   const challenger = useMemo(() => BigInt(duel?.challenger ?? 0), [duel])
   const challenged = useMemo(() => BigInt(duel?.challenged ?? 0), [duel])
-
   return {
     challenger,
     challenged,
