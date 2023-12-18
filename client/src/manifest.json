@@ -1086,21 +1086,41 @@
   ],
   "models": [
     {
-      "name": "Duel",
+      "name": "Challenge",
       "members": [
         {
-          "name": "duelId",
+          "name": "duel_id",
           "type": "felt252",
           "key": true
         },
         {
-          "name": "challenger",
+          "name": "state",
+          "type": "ChallengeState",
+          "key": false
+        },
+        {
+          "name": "duelist_a",
           "type": "ContractAddress",
           "key": false
         },
         {
-          "name": "challenged",
+          "name": "duelist_b",
           "type": "ContractAddress",
+          "key": false
+        },
+        {
+          "name": "timestamp_challenge",
+          "type": "u32",
+          "key": false
+        },
+        {
+          "name": "timestamp_deadline",
+          "type": "u32",
+          "key": false
+        },
+        {
+          "name": "message",
+          "type": "felt252",
           "key": false
         },
         {
@@ -1109,7 +1129,199 @@
           "key": false
         }
       ],
-      "class_hash": "0x603c6de71b419dc9cf8ac96d80e76bfd8575c8dc685318b11fe92ff36bba3a2",
+      "class_hash": "0x1c4adb941ce6f551850a1f3ffb3154767fbde9465d5b9e66da1000d688772d1",
+      "abi": [
+        {
+          "type": "function",
+          "name": "name",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::felt252"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "unpacked_size",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::integer::u32"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "packed_size",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::integer::u32"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::integer::u8>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::integer::u8>"
+            }
+          ]
+        },
+        {
+          "type": "function",
+          "name": "layout",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::array::Span::<core::integer::u8>"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::felt252>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::felt252>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::array::Span::<core::felt252>>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::Struct",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "children",
+              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<(core::felt252, core::array::Span::<core::felt252>)>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::Enum",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "children",
+              "type": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "dojo::database::introspect::Ty",
+          "variants": [
+            {
+              "name": "Primitive",
+              "type": "core::felt252"
+            },
+            {
+              "name": "Struct",
+              "type": "dojo::database::introspect::Struct"
+            },
+            {
+              "name": "Enum",
+              "type": "dojo::database::introspect::Enum"
+            },
+            {
+              "name": "Tuple",
+              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+            }
+          ]
+        },
+        {
+          "type": "function",
+          "name": "schema",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "dojo::database::introspect::Ty"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "event",
+          "name": "pistols::models::models::challenge::Event",
+          "kind": "enum",
+          "variants": []
+        }
+      ]
+    },
+    {
+      "name": "Duel",
+      "members": [
+        {
+          "name": "duel_id",
+          "type": "felt252",
+          "key": true
+        },
+        {
+          "name": "timestamp_start",
+          "type": "u32",
+          "key": false
+        },
+        {
+          "name": "timestamp_end",
+          "type": "u32",
+          "key": false
+        },
+        {
+          "name": "pace",
+          "type": "u8",
+          "key": false
+        },
+        {
+          "name": "winner",
+          "type": "ContractAddress",
+          "key": false
+        }
+      ],
+      "class_hash": "0x4a6b6fb753973a393e34942b2fcd7ec0a07473fe0cbd28dc97973ed93e7946",
       "abi": [
         {
           "type": "function",

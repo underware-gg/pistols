@@ -33,7 +33,7 @@ mod actions {
             set!(world, (
                 Duelist { 
                     address: caller,
-                    name: 'OKIOKI',
+                    name,
                 }
             ));
 

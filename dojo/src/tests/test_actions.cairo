@@ -15,7 +15,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_generate_level() {
+    fn test_register_duelist() {
         let (world, system) = setup_world();
         let caller = starknet::get_caller_address();
 

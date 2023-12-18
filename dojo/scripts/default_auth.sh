@@ -15,7 +15,7 @@ echo "RPC     : $RPC_URL"
 echo "---------------------------------------------------------------------------"
 
 # enable system -> component authorizations
-COMPONENTS=("Duelist" "Duel")
+COMPONENTS=("Duelist" "Challenge" "Duel")
 
 for component in ${COMPONENTS[@]}; do
     sozo auth writer $component $ACTIONS_ADDRESS --world $WORLD_ADDRESS --rpc-url $RPC_URL

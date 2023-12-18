@@ -4,14 +4,27 @@ import { defineComponent, Type as RecsType, World } from "@dojoengine/recs";
 
 export function defineContractComponents(world: World) {
   return {
+	  Challenge: (() => {
+	    return defineComponent(
+	      world,
+	      { duel_id: RecsType.BigInt, state: RecsType.Number, duelist_a: RecsType.BigInt, duelist_b: RecsType.BigInt, timestamp_challenge: RecsType.Number, timestamp_deadline: RecsType.Number, message: RecsType.BigInt, pass_code: RecsType.BigInt },
+	      {
+	        metadata: {
+	          name: "Challenge",
+	          types: ["felt252","enum","contractaddress","contractaddress","u32","u32","felt252","felt252"],
+	          customTypes: ["ChallengeState"],
+	        },
+	      }
+	    );
+	  })(),
 	  Duel: (() => {
 	    return defineComponent(
 	      world,
-	      { duelId: RecsType.BigInt, challenger: RecsType.BigInt, challenged: RecsType.BigInt, pass_code: RecsType.BigInt },
+	      { duel_id: RecsType.BigInt, timestamp_start: RecsType.Number, timestamp_end: RecsType.Number, pace: RecsType.Number, winner: RecsType.BigInt },
 	      {
 	        metadata: {
 	          name: "Duel",
-	          types: ["felt252","contractaddress","contractaddress","felt252"],
+	          types: ["felt252","u32","u32","u8","contractaddress"],
 	          customTypes: [],
 	        },
 	      }
