@@ -12,11 +12,11 @@ mod utils {
     use pistols::models::models::{
         Duelist, duelist,
         Challenge, challenge,
-        Duel, duel,
+        Round, round,
     };
 
     fn setup_world() -> (IWorldDispatcher, IActionsDispatcher) {
-        let mut models = array![duelist::TEST_CLASS_HASH, challenge::TEST_CLASS_HASH, duel::TEST_CLASS_HASH];
+        let mut models = array![duelist::TEST_CLASS_HASH, challenge::TEST_CLASS_HASH, round::TEST_CLASS_HASH];
         let world: IWorldDispatcher = spawn_test_world(models);
         let contract_address = world.deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         (world, IActionsDispatcher { contract_address })
@@ -24,6 +24,13 @@ mod utils {
 
     fn execute_register_duelist(world: IWorldDispatcher, system: IActionsDispatcher, name: felt252) {
         system.register_duelist(name);
+    }
+
+    fn execute_register_challenged(world: IWorldDispatcher, system: IActionsDispatcher, name: felt252, challenged_address: ContractAddress) {
+        let last_executor = world.executor();
+        world.set_executor(challenged_address);
+        system.register_duelist(name);
+        world.set_executor(last_executor);
     }
 
     fn execute_create_challenge(world: IWorldDispatcher, system: IActionsDispatcher,

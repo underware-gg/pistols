@@ -15,18 +15,26 @@ struct Challenge {
     state: ChallengeState,
     duelist_a: ContractAddress, // Challenger
     duelist_b: ContractAddress, // Challenged
-    timestamp: u64,             // Unix time, created
-    timestamp_expire: u64,      // Unix time
     message: felt252,           // message to challenged
     pass_code: felt252,
+    // progress and results
+    round: u8,
+    winner: ContractAddress,
+    // times
+    timestamp: u64,             // Unix time, created
+    timestamp_expire: u64,      // Unix time, challenge expiration
+    timestamp_start: u64,       // Unix time, started
+    timestamp_end: u64,         // Unix time, ended
 }
 
 #[derive(Model, Copy, Drop, Serde)]
-struct Duel {
+struct Round {
     #[key]
     duel_id: u128,
-    timestamp_start: u64,       // Unix time, started
-    timestamp_end: u64,         // Unix time
-    pace: u8,
-    winner: ContractAddress,
+    #[key]
+    round: u8,
+    move_a: u8,     // Challenger move
+    move_b: u8,     // Challenged move
+    health_a: u8,   // Challenger final health
+    health_b: u8,   // Challenged final health
 }

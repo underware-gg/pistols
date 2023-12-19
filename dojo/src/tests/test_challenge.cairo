@@ -6,18 +6,25 @@ mod tests {
 
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
-    use pistols::models::models::{Duelist, Duel};
+    use pistols::models::models::{Duelist, Round};
+    use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
+    use pistols::systems::utils::{zero_address};
     use pistols::utils::timestamp::{days_to_timestamp};
     use pistols::tests::utils::utils::{
         setup_world,
         execute_register_duelist,
+        execute_register_challenged,
         execute_create_challenge,
         get_world_Challenge,
     };
 
     const PLAYER_NAME: felt252 = 'Sensei';
+    const CHALLENGED_NAME: felt252 = 'Senpai';
     const PASS_CODE_1: felt252 = 'Ohayo';
     const MESSAGE_1: felt252 = 'Challenge yaa for a duuel!!';
+    fn challenged_address() -> ContractAddress {
+        (starknet::contract_address_const::<0x111>())
+    }
 
     #[test]
     #[available_gas(1_000_000_000)]
@@ -25,7 +32,7 @@ mod tests {
     fn test_invalid_challenger() {
         let (world, system) = setup_world();
         let caller = starknet::get_caller_address();
-        let challenged_1 = starknet::contract_address_const::<0x111>();
+        let challenged_1 = challenged_address();
         let duel_id: u128 = execute_create_challenge(world, system, challenged_1, PASS_CODE_1, MESSAGE_1, 0);
     }
 
@@ -37,7 +44,7 @@ mod tests {
         let (world, system) = setup_world();
         let caller = starknet::get_caller_address();
         execute_register_duelist(world, system, PLAYER_NAME);
-        let challenged_1 = starknet::contract_address_const::<0x0>();
+        let challenged_1 = zero_address();
         let duel_id: u128 = execute_create_challenge(world, system, challenged_1, 0, MESSAGE_1, 0);
     }
 
@@ -48,7 +55,7 @@ mod tests {
         let (world, system) = setup_world();
         let caller = starknet::get_caller_address();
         execute_register_duelist(world, system, PLAYER_NAME);
-        let challenged_1 = starknet::contract_address_const::<0x111>();
+        let challenged_1 = challenged_address();
         let duel_id: u128 = execute_create_challenge(world, system, challenged_1, PASS_CODE_1, MESSAGE_1, 100);
     }
 
@@ -59,11 +66,12 @@ mod tests {
         let caller = starknet::get_caller_address();
         execute_register_duelist(world, system, PLAYER_NAME);
 
-        let challenged: ContractAddress = starknet::contract_address_const::<0x111>();
+        let challenged = challenged_address();
         let duel_id: u128 = execute_create_challenge(world, system, challenged, 0, MESSAGE_1, 0);
         assert(duel_id > 0, 'duel_id');
 
         let ch = get_world_Challenge(world, duel_id);
+        assert(ch.state == ChallengeState::Awaiting, 'state');
         assert(ch.pass_code == 0, 'pass_code');
         assert(ch.duelist_a == caller, 'challenged');
         assert(ch.duelist_b == challenged, 'challenged');
@@ -79,11 +87,12 @@ mod tests {
         let caller = starknet::get_caller_address();
         execute_register_duelist(world, system, PLAYER_NAME);
 
-        let challenged: ContractAddress = starknet::contract_address_const::<0x0>();
+        let challenged = zero_address();
         let duel_id: u128 = execute_create_challenge(world, system, challenged, PASS_CODE_1, MESSAGE_1, 0);
         assert(duel_id > 0, 'duel_id');
 
         let ch = get_world_Challenge(world, duel_id);
+        assert(ch.state == ChallengeState::Awaiting, 'state');
         assert(ch.pass_code == PASS_CODE_1, 'pass_code');
         assert(ch.duelist_a == caller, 'challenged');
         assert(ch.duelist_b == challenged, 'challenged');
@@ -100,7 +109,7 @@ mod tests {
         let caller = starknet::get_caller_address();
         execute_register_duelist(world, system, PLAYER_NAME);
 
-        let challenged: ContractAddress = starknet::contract_address_const::<0x111>();
+        let challenged = challenged_address();
         let expire_seconds: u64 = 24 * 60 *60 + 1;
         let duel_id: u128 = execute_create_challenge(world, system, challenged, PASS_CODE_1, MESSAGE_1, expire_seconds);
         assert(duel_id > 0, 'duel_id');
