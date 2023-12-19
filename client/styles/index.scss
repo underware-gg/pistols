@@ -362,6 +362,17 @@ canvas {
 }
 
 
+//--------------------
+// Unity canvas
+//
+// #react-unity-webgl-canvas-3 {
+// canvas[id^='react-unity-webgl-canvas'] {
+.UnityCanvas {
+  width: 900px;
+  height: 450px;
+}
+
+
 //-----------------------------
 // semantic-ui
 //
