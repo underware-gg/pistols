@@ -10,32 +10,48 @@ export function createSystemCalls(
   // { Duelist, Duel }: ClientComponents,
 ) {
 
-  const register_duelist = async (signer: Account, name: string): Promise<boolean> => {
+  const _executeTransaction = async (signer: Account, system: string, args: any[]): Promise<boolean> => {
     let success = false
     try {
-      const args = [stringToFelt(name)]
-      // console.log(`args:`, args)
-
-      const tx = await execute(signer, 'actions', 'register_duelist', args)
-      console.log(`register_duelist tx:`, tx)
+      // console.log(`${system} args:`, args)
+      const tx = await execute(signer, 'actions', system, args)
+      console.log(`${system}(${args.length}) tx:`, tx)
 
       const receipt = await signer.waitForTransaction(tx.transaction_hash, { retryInterval: 200 })
-      console.log(`register_duelist receipt:`, success, receipt)
       success = getReceiptStatus(receipt)
+      console.log(`${system}(${args.length}) success:`, success, 'receipt:', receipt)
 
       setComponentsFromEvents(contractComponents, getEvents(receipt));
     } catch (e) {
-      console.warn(`register_duelist(${name}) exception:`, e)
+      console.warn(`${system}(${args.length}) exception:`, e)
     } finally {
     }
     return success
   }
+
+  const register_duelist = async (signer: Account, name: string, profile_pic: number): Promise<boolean> => {
+    const args = [stringToFelt(name), profile_pic]
+    return await _executeTransaction(signer, 'register_duelist', args)
+  }
+
+  const create_challenge = async (signer: Account, challenged: bigint, pass_code: string, message: string, expire_seconds: number): Promise<boolean> => {
+    const args = [challenged, stringToFelt(pass_code), stringToFelt(message), expire_seconds]
+    return await _executeTransaction(signer, 'create_challenge', args)
+  }
+
+  const reply_challenge = async (signer: Account, duel_id: bigint, accepted: boolean): Promise<boolean> => {
+    const args = [duel_id, accepted]
+    return await _executeTransaction(signer, 'reply_challenge', args)
+  }
+
   return {
     register_duelist,
+    create_challenge,
+    reply_challenge,
   }
 }
 
-export function getReceiptStatus(receipt: any): boolean {
+function getReceiptStatus(receipt: any): boolean {
   if (receipt.execution_status == 'REVERTED') {
     console.error(`Transaction reverted:`, receipt.revert_reason)
     return false

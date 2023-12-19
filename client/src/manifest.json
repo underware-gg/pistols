@@ -949,7 +949,7 @@
     {
       "name": "actions",
       "address": "0x2a28ee1fc9b24d22735795e3ba77608659b1c35b6acb2c0d85a1606b3784886",
-      "class_hash": "0x35332c4ad114ffcf0936ff829949d73b406b5a12888e853be537465bf92287b",
+      "class_hash": "0x5ef0d1c1b9459676ed7e08f238b57e484f8414869a4ac2446c85b31b5824c93",
       "abi": [
         {
           "type": "impl",
@@ -989,6 +989,58 @@
           "interface_name": "pistols::systems::actions::IActions"
         },
         {
+          "type": "enum",
+          "name": "core::bool",
+          "variants": [
+            {
+              "name": "False",
+              "type": "()"
+            },
+            {
+              "name": "True",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::types::challenge::ChallengeState",
+          "variants": [
+            {
+              "name": "Null",
+              "type": "()"
+            },
+            {
+              "name": "Awaiting",
+              "type": "()"
+            },
+            {
+              "name": "Canceled",
+              "type": "()"
+            },
+            {
+              "name": "Refused",
+              "type": "()"
+            },
+            {
+              "name": "Expired",
+              "type": "()"
+            },
+            {
+              "name": "InProgress",
+              "type": "()"
+            },
+            {
+              "name": "Resolved",
+              "type": "()"
+            },
+            {
+              "name": "Draw",
+              "type": "()"
+            }
+          ]
+        },
+        {
           "type": "interface",
           "name": "pistols::systems::actions::IActions",
           "items": [
@@ -999,9 +1051,61 @@
                 {
                   "name": "name",
                   "type": "core::felt252"
+                },
+                {
+                  "name": "profile_pic",
+                  "type": "core::integer::u8"
                 }
               ],
               "outputs": [],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "create_challenge",
+              "inputs": [
+                {
+                  "name": "challenged",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "pass_code",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "message",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "expire_seconds",
+                  "type": "core::integer::u64"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "reply_challenge",
+              "inputs": [
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "accepted",
+                  "type": "core::bool"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "pistols::types::challenge::ChallengeState"
+                }
+              ],
               "state_mutability": "view"
             }
           ]
@@ -1077,9 +1181,13 @@
           ]
         }
       ],
-      "reads": [],
+      "reads": [
+        "Challenge"
+      ],
       "writes": [
-        "Duelist"
+        "Challenge",
+        "Duelist",
+        "Round"
       ],
       "computed": []
     }
@@ -1090,7 +1198,7 @@
       "members": [
         {
           "name": "duel_id",
-          "type": "felt252",
+          "type": "u128",
           "key": true
         },
         {
@@ -1109,16 +1217,6 @@
           "key": false
         },
         {
-          "name": "timestamp_challenge",
-          "type": "u32",
-          "key": false
-        },
-        {
-          "name": "timestamp_deadline",
-          "type": "u32",
-          "key": false
-        },
-        {
           "name": "message",
           "type": "felt252",
           "key": false
@@ -1127,9 +1225,39 @@
           "name": "pass_code",
           "type": "felt252",
           "key": false
+        },
+        {
+          "name": "round",
+          "type": "u8",
+          "key": false
+        },
+        {
+          "name": "winner",
+          "type": "ContractAddress",
+          "key": false
+        },
+        {
+          "name": "timestamp",
+          "type": "u64",
+          "key": false
+        },
+        {
+          "name": "timestamp_expire",
+          "type": "u64",
+          "key": false
+        },
+        {
+          "name": "timestamp_start",
+          "type": "u64",
+          "key": false
+        },
+        {
+          "name": "timestamp_end",
+          "type": "u64",
+          "key": false
         }
       ],
-      "class_hash": "0x1c4adb941ce6f551850a1f3ffb3154767fbde9465d5b9e66da1000d688772d1",
+      "class_hash": "0x2cb2e21a7c14a93e0f873cc070e83ceb60229f3ee2d2c9ef17c60e2a7b148c",
       "abi": [
         {
           "type": "function",
@@ -1293,198 +1421,6 @@
       ]
     },
     {
-      "name": "Duel",
-      "members": [
-        {
-          "name": "duel_id",
-          "type": "felt252",
-          "key": true
-        },
-        {
-          "name": "timestamp_start",
-          "type": "u32",
-          "key": false
-        },
-        {
-          "name": "timestamp_end",
-          "type": "u32",
-          "key": false
-        },
-        {
-          "name": "pace",
-          "type": "u8",
-          "key": false
-        },
-        {
-          "name": "winner",
-          "type": "ContractAddress",
-          "key": false
-        }
-      ],
-      "class_hash": "0x4a6b6fb753973a393e34942b2fcd7ec0a07473fe0cbd28dc97973ed93e7946",
-      "abi": [
-        {
-          "type": "function",
-          "name": "name",
-          "inputs": [],
-          "outputs": [
-            {
-              "type": "core::felt252"
-            }
-          ],
-          "state_mutability": "view"
-        },
-        {
-          "type": "function",
-          "name": "unpacked_size",
-          "inputs": [],
-          "outputs": [
-            {
-              "type": "core::integer::u32"
-            }
-          ],
-          "state_mutability": "view"
-        },
-        {
-          "type": "function",
-          "name": "packed_size",
-          "inputs": [],
-          "outputs": [
-            {
-              "type": "core::integer::u32"
-            }
-          ],
-          "state_mutability": "view"
-        },
-        {
-          "type": "struct",
-          "name": "core::array::Span::<core::integer::u8>",
-          "members": [
-            {
-              "name": "snapshot",
-              "type": "@core::array::Array::<core::integer::u8>"
-            }
-          ]
-        },
-        {
-          "type": "function",
-          "name": "layout",
-          "inputs": [],
-          "outputs": [
-            {
-              "type": "core::array::Span::<core::integer::u8>"
-            }
-          ],
-          "state_mutability": "view"
-        },
-        {
-          "type": "struct",
-          "name": "core::array::Span::<core::felt252>",
-          "members": [
-            {
-              "name": "snapshot",
-              "type": "@core::array::Array::<core::felt252>"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "core::array::Span::<core::array::Span::<core::felt252>>",
-          "members": [
-            {
-              "name": "snapshot",
-              "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "dojo::database::introspect::Struct",
-          "members": [
-            {
-              "name": "name",
-              "type": "core::felt252"
-            },
-            {
-              "name": "attrs",
-              "type": "core::array::Span::<core::felt252>"
-            },
-            {
-              "name": "children",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>",
-          "members": [
-            {
-              "name": "snapshot",
-              "type": "@core::array::Array::<(core::felt252, core::array::Span::<core::felt252>)>"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "dojo::database::introspect::Enum",
-          "members": [
-            {
-              "name": "name",
-              "type": "core::felt252"
-            },
-            {
-              "name": "attrs",
-              "type": "core::array::Span::<core::felt252>"
-            },
-            {
-              "name": "children",
-              "type": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>"
-            }
-          ]
-        },
-        {
-          "type": "enum",
-          "name": "dojo::database::introspect::Ty",
-          "variants": [
-            {
-              "name": "Primitive",
-              "type": "core::felt252"
-            },
-            {
-              "name": "Struct",
-              "type": "dojo::database::introspect::Struct"
-            },
-            {
-              "name": "Enum",
-              "type": "dojo::database::introspect::Enum"
-            },
-            {
-              "name": "Tuple",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
-            }
-          ]
-        },
-        {
-          "type": "function",
-          "name": "schema",
-          "inputs": [],
-          "outputs": [
-            {
-              "type": "dojo::database::introspect::Ty"
-            }
-          ],
-          "state_mutability": "view"
-        },
-        {
-          "type": "event",
-          "name": "pistols::models::models::duel::Event",
-          "kind": "enum",
-          "variants": []
-        }
-      ]
-    },
-    {
       "name": "Duelist",
       "members": [
         {
@@ -1496,9 +1432,14 @@
           "name": "name",
           "type": "felt252",
           "key": false
+        },
+        {
+          "name": "profile_pic",
+          "type": "u8",
+          "key": false
         }
       ],
-      "class_hash": "0x72868aa17e5887f65581e79eee0cca4242be3e2b8f8cb36b78e5215420d9391",
+      "class_hash": "0xf939eab3229677655fc1c5396e29cc547b447d631ef3d2326665319f7fb086",
       "abi": [
         {
           "type": "function",
@@ -1656,6 +1597,203 @@
         {
           "type": "event",
           "name": "pistols::models::models::duelist::Event",
+          "kind": "enum",
+          "variants": []
+        }
+      ]
+    },
+    {
+      "name": "Round",
+      "members": [
+        {
+          "name": "duel_id",
+          "type": "u128",
+          "key": true
+        },
+        {
+          "name": "round",
+          "type": "u8",
+          "key": true
+        },
+        {
+          "name": "move_a",
+          "type": "u8",
+          "key": false
+        },
+        {
+          "name": "move_b",
+          "type": "u8",
+          "key": false
+        },
+        {
+          "name": "health_a",
+          "type": "u8",
+          "key": false
+        },
+        {
+          "name": "health_b",
+          "type": "u8",
+          "key": false
+        }
+      ],
+      "class_hash": "0x623c151409f6403fbed73cfb9830737ebc675dc0bf9d8712b08c617ee7e1391",
+      "abi": [
+        {
+          "type": "function",
+          "name": "name",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::felt252"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "unpacked_size",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::integer::u32"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "packed_size",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::integer::u32"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::integer::u8>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::integer::u8>"
+            }
+          ]
+        },
+        {
+          "type": "function",
+          "name": "layout",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::array::Span::<core::integer::u8>"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::felt252>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::felt252>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::array::Span::<core::felt252>>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::Struct",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "children",
+              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<(core::felt252, core::array::Span::<core::felt252>)>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::Enum",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "children",
+              "type": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "dojo::database::introspect::Ty",
+          "variants": [
+            {
+              "name": "Primitive",
+              "type": "core::felt252"
+            },
+            {
+              "name": "Struct",
+              "type": "dojo::database::introspect::Struct"
+            },
+            {
+              "name": "Enum",
+              "type": "dojo::database::introspect::Enum"
+            },
+            {
+              "name": "Tuple",
+              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+            }
+          ]
+        },
+        {
+          "type": "function",
+          "name": "schema",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "dojo::database::introspect::Ty"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "event",
+          "name": "pistols::models::models::round::Event",
           "kind": "enum",
           "variants": []
         }

@@ -7,25 +7,12 @@ export function defineContractComponents(world: World) {
 	  Challenge: (() => {
 	    return defineComponent(
 	      world,
-	      { duel_id: RecsType.BigInt, state: RecsType.Number, duelist_a: RecsType.BigInt, duelist_b: RecsType.BigInt, timestamp_challenge: RecsType.Number, timestamp_deadline: RecsType.Number, message: RecsType.BigInt, pass_code: RecsType.BigInt },
+	      { duel_id: RecsType.BigInt, state: RecsType.Number, duelist_a: RecsType.BigInt, duelist_b: RecsType.BigInt, message: RecsType.BigInt, pass_code: RecsType.BigInt, round: RecsType.Number, winner: RecsType.BigInt, timestamp: RecsType.Number, timestamp_expire: RecsType.Number, timestamp_start: RecsType.Number, timestamp_end: RecsType.Number },
 	      {
 	        metadata: {
 	          name: "Challenge",
-	          types: ["felt252","enum","contractaddress","contractaddress","u32","u32","felt252","felt252"],
+	          types: ["u128","enum","contractaddress","contractaddress","felt252","felt252","u8","contractaddress","u64","u64","u64","u64"],
 	          customTypes: ["ChallengeState"],
-	        },
-	      }
-	    );
-	  })(),
-	  Duel: (() => {
-	    return defineComponent(
-	      world,
-	      { duel_id: RecsType.BigInt, timestamp_start: RecsType.Number, timestamp_end: RecsType.Number, pace: RecsType.Number, winner: RecsType.BigInt },
-	      {
-	        metadata: {
-	          name: "Duel",
-	          types: ["felt252","u32","u32","u8","contractaddress"],
-	          customTypes: [],
 	        },
 	      }
 	    );
@@ -33,11 +20,24 @@ export function defineContractComponents(world: World) {
 	  Duelist: (() => {
 	    return defineComponent(
 	      world,
-	      { address: RecsType.BigInt, name: RecsType.BigInt },
+	      { address: RecsType.BigInt, name: RecsType.BigInt, profile_pic: RecsType.Number },
 	      {
 	        metadata: {
 	          name: "Duelist",
-	          types: ["contractaddress","felt252"],
+	          types: ["contractaddress","felt252","u8"],
+	          customTypes: [],
+	        },
+	      }
+	    );
+	  })(),
+	  Round: (() => {
+	    return defineComponent(
+	      world,
+	      { duel_id: RecsType.BigInt, round: RecsType.Number, move_a: RecsType.Number, move_b: RecsType.Number, health_a: RecsType.Number, health_b: RecsType.Number },
+	      {
+	        metadata: {
+	          name: "Round",
+	          types: ["u128","u8","u8","u8","u8","u8"],
 	          customTypes: [],
 	        },
 	      }

@@ -77,6 +77,8 @@ function AccountItem({
   const isUpdated = useMemo(() => (name == inputValue), [name, inputValue])
   const canRegister = useMemo(() => (isSelected && account && address), [isSelected, address])
 
+  const [profilePic, setProfilePic] = useState(0)
+
   // initialize
   useEffectOnce(() => {
     if (inputValue == null) {
@@ -88,8 +90,7 @@ function AccountItem({
 
   const _register = () => {
     if (canRegister) {
-      console.log(`REGISTER...`, account, inputValue)
-      register_duelist(account, inputValue)
+      register_duelist(account, inputValue, profilePic)
     }
   }
 

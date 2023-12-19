@@ -23,20 +23,25 @@ export type Scalars = {
   Enum: { input: any; output: any; }
   felt252: { input: any; output: any; }
   u8: { input: any; output: any; }
-  u32: { input: any; output: any; }
+  u64: { input: any; output: any; }
+  u128: { input: any; output: any; }
 };
 
 export type Challenge = {
   __typename?: 'Challenge';
-  duel_id?: Maybe<Scalars['felt252']['output']>;
+  duel_id?: Maybe<Scalars['u128']['output']>;
   duelist_a?: Maybe<Scalars['ContractAddress']['output']>;
   duelist_b?: Maybe<Scalars['ContractAddress']['output']>;
   entity?: Maybe<World__Entity>;
   message?: Maybe<Scalars['felt252']['output']>;
   pass_code?: Maybe<Scalars['felt252']['output']>;
+  round?: Maybe<Scalars['u8']['output']>;
   state?: Maybe<Scalars['Enum']['output']>;
-  timestamp_challenge?: Maybe<Scalars['u32']['output']>;
-  timestamp_deadline?: Maybe<Scalars['u32']['output']>;
+  timestamp?: Maybe<Scalars['u64']['output']>;
+  timestamp_end?: Maybe<Scalars['u64']['output']>;
+  timestamp_expire?: Maybe<Scalars['u64']['output']>;
+  timestamp_start?: Maybe<Scalars['u64']['output']>;
+  winner?: Maybe<Scalars['ContractAddress']['output']>;
 };
 
 export type ChallengeConnection = {
@@ -63,19 +68,23 @@ export enum ChallengeOrderField {
   DuelId = 'DUEL_ID',
   Message = 'MESSAGE',
   PassCode = 'PASS_CODE',
+  Round = 'ROUND',
   State = 'STATE',
-  TimestampChallenge = 'TIMESTAMP_CHALLENGE',
-  TimestampDeadline = 'TIMESTAMP_DEADLINE'
+  Timestamp = 'TIMESTAMP',
+  TimestampEnd = 'TIMESTAMP_END',
+  TimestampExpire = 'TIMESTAMP_EXPIRE',
+  TimestampStart = 'TIMESTAMP_START',
+  Winner = 'WINNER'
 }
 
 export type ChallengeWhereInput = {
-  duel_id?: InputMaybe<Scalars['felt252']['input']>;
-  duel_idEQ?: InputMaybe<Scalars['felt252']['input']>;
-  duel_idGT?: InputMaybe<Scalars['felt252']['input']>;
-  duel_idGTE?: InputMaybe<Scalars['felt252']['input']>;
-  duel_idLT?: InputMaybe<Scalars['felt252']['input']>;
-  duel_idLTE?: InputMaybe<Scalars['felt252']['input']>;
-  duel_idNEQ?: InputMaybe<Scalars['felt252']['input']>;
+  duel_id?: InputMaybe<Scalars['u128']['input']>;
+  duel_idEQ?: InputMaybe<Scalars['u128']['input']>;
+  duel_idGT?: InputMaybe<Scalars['u128']['input']>;
+  duel_idGTE?: InputMaybe<Scalars['u128']['input']>;
+  duel_idLT?: InputMaybe<Scalars['u128']['input']>;
+  duel_idLTE?: InputMaybe<Scalars['u128']['input']>;
+  duel_idNEQ?: InputMaybe<Scalars['u128']['input']>;
   duelist_a?: InputMaybe<Scalars['ContractAddress']['input']>;
   duelist_aEQ?: InputMaybe<Scalars['ContractAddress']['input']>;
   duelist_aGT?: InputMaybe<Scalars['ContractAddress']['input']>;
@@ -104,88 +113,42 @@ export type ChallengeWhereInput = {
   pass_codeLT?: InputMaybe<Scalars['felt252']['input']>;
   pass_codeLTE?: InputMaybe<Scalars['felt252']['input']>;
   pass_codeNEQ?: InputMaybe<Scalars['felt252']['input']>;
+  round?: InputMaybe<Scalars['u8']['input']>;
+  roundEQ?: InputMaybe<Scalars['u8']['input']>;
+  roundGT?: InputMaybe<Scalars['u8']['input']>;
+  roundGTE?: InputMaybe<Scalars['u8']['input']>;
+  roundLT?: InputMaybe<Scalars['u8']['input']>;
+  roundLTE?: InputMaybe<Scalars['u8']['input']>;
+  roundNEQ?: InputMaybe<Scalars['u8']['input']>;
   state?: InputMaybe<Scalars['Enum']['input']>;
-  timestamp_challenge?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_challengeEQ?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_challengeGT?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_challengeGTE?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_challengeLT?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_challengeLTE?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_challengeNEQ?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_deadline?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_deadlineEQ?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_deadlineGT?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_deadlineGTE?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_deadlineLT?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_deadlineLTE?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_deadlineNEQ?: InputMaybe<Scalars['u32']['input']>;
-};
-
-export type Duel = {
-  __typename?: 'Duel';
-  duel_id?: Maybe<Scalars['felt252']['output']>;
-  entity?: Maybe<World__Entity>;
-  pace?: Maybe<Scalars['u8']['output']>;
-  timestamp_end?: Maybe<Scalars['u32']['output']>;
-  timestamp_start?: Maybe<Scalars['u32']['output']>;
-  winner?: Maybe<Scalars['ContractAddress']['output']>;
-};
-
-export type DuelConnection = {
-  __typename?: 'DuelConnection';
-  edges?: Maybe<Array<Maybe<DuelEdge>>>;
-  page_info: World__PageInfo;
-  total_count: Scalars['Int']['output'];
-};
-
-export type DuelEdge = {
-  __typename?: 'DuelEdge';
-  cursor?: Maybe<Scalars['Cursor']['output']>;
-  node?: Maybe<Duel>;
-};
-
-export type DuelOrder = {
-  direction: OrderDirection;
-  field: DuelOrderField;
-};
-
-export enum DuelOrderField {
-  DuelId = 'DUEL_ID',
-  Pace = 'PACE',
-  TimestampEnd = 'TIMESTAMP_END',
-  TimestampStart = 'TIMESTAMP_START',
-  Winner = 'WINNER'
-}
-
-export type DuelWhereInput = {
-  duel_id?: InputMaybe<Scalars['felt252']['input']>;
-  duel_idEQ?: InputMaybe<Scalars['felt252']['input']>;
-  duel_idGT?: InputMaybe<Scalars['felt252']['input']>;
-  duel_idGTE?: InputMaybe<Scalars['felt252']['input']>;
-  duel_idLT?: InputMaybe<Scalars['felt252']['input']>;
-  duel_idLTE?: InputMaybe<Scalars['felt252']['input']>;
-  duel_idNEQ?: InputMaybe<Scalars['felt252']['input']>;
-  pace?: InputMaybe<Scalars['u8']['input']>;
-  paceEQ?: InputMaybe<Scalars['u8']['input']>;
-  paceGT?: InputMaybe<Scalars['u8']['input']>;
-  paceGTE?: InputMaybe<Scalars['u8']['input']>;
-  paceLT?: InputMaybe<Scalars['u8']['input']>;
-  paceLTE?: InputMaybe<Scalars['u8']['input']>;
-  paceNEQ?: InputMaybe<Scalars['u8']['input']>;
-  timestamp_end?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_endEQ?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_endGT?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_endGTE?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_endLT?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_endLTE?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_endNEQ?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_start?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_startEQ?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_startGT?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_startGTE?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_startLT?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_startLTE?: InputMaybe<Scalars['u32']['input']>;
-  timestamp_startNEQ?: InputMaybe<Scalars['u32']['input']>;
+  timestamp?: InputMaybe<Scalars['u64']['input']>;
+  timestampEQ?: InputMaybe<Scalars['u64']['input']>;
+  timestampGT?: InputMaybe<Scalars['u64']['input']>;
+  timestampGTE?: InputMaybe<Scalars['u64']['input']>;
+  timestampLT?: InputMaybe<Scalars['u64']['input']>;
+  timestampLTE?: InputMaybe<Scalars['u64']['input']>;
+  timestampNEQ?: InputMaybe<Scalars['u64']['input']>;
+  timestamp_end?: InputMaybe<Scalars['u64']['input']>;
+  timestamp_endEQ?: InputMaybe<Scalars['u64']['input']>;
+  timestamp_endGT?: InputMaybe<Scalars['u64']['input']>;
+  timestamp_endGTE?: InputMaybe<Scalars['u64']['input']>;
+  timestamp_endLT?: InputMaybe<Scalars['u64']['input']>;
+  timestamp_endLTE?: InputMaybe<Scalars['u64']['input']>;
+  timestamp_endNEQ?: InputMaybe<Scalars['u64']['input']>;
+  timestamp_expire?: InputMaybe<Scalars['u64']['input']>;
+  timestamp_expireEQ?: InputMaybe<Scalars['u64']['input']>;
+  timestamp_expireGT?: InputMaybe<Scalars['u64']['input']>;
+  timestamp_expireGTE?: InputMaybe<Scalars['u64']['input']>;
+  timestamp_expireLT?: InputMaybe<Scalars['u64']['input']>;
+  timestamp_expireLTE?: InputMaybe<Scalars['u64']['input']>;
+  timestamp_expireNEQ?: InputMaybe<Scalars['u64']['input']>;
+  timestamp_start?: InputMaybe<Scalars['u64']['input']>;
+  timestamp_startEQ?: InputMaybe<Scalars['u64']['input']>;
+  timestamp_startGT?: InputMaybe<Scalars['u64']['input']>;
+  timestamp_startGTE?: InputMaybe<Scalars['u64']['input']>;
+  timestamp_startLT?: InputMaybe<Scalars['u64']['input']>;
+  timestamp_startLTE?: InputMaybe<Scalars['u64']['input']>;
+  timestamp_startNEQ?: InputMaybe<Scalars['u64']['input']>;
   winner?: InputMaybe<Scalars['ContractAddress']['input']>;
   winnerEQ?: InputMaybe<Scalars['ContractAddress']['input']>;
   winnerGT?: InputMaybe<Scalars['ContractAddress']['input']>;
@@ -200,6 +163,7 @@ export type Duelist = {
   address?: Maybe<Scalars['ContractAddress']['output']>;
   entity?: Maybe<World__Entity>;
   name?: Maybe<Scalars['felt252']['output']>;
+  profile_pic?: Maybe<Scalars['u8']['output']>;
 };
 
 export type DuelistConnection = {
@@ -222,7 +186,8 @@ export type DuelistOrder = {
 
 export enum DuelistOrderField {
   Address = 'ADDRESS',
-  Name = 'NAME'
+  Name = 'NAME',
+  ProfilePic = 'PROFILE_PIC'
 }
 
 export type DuelistWhereInput = {
@@ -240,14 +205,104 @@ export type DuelistWhereInput = {
   nameLT?: InputMaybe<Scalars['felt252']['input']>;
   nameLTE?: InputMaybe<Scalars['felt252']['input']>;
   nameNEQ?: InputMaybe<Scalars['felt252']['input']>;
+  profile_pic?: InputMaybe<Scalars['u8']['input']>;
+  profile_picEQ?: InputMaybe<Scalars['u8']['input']>;
+  profile_picGT?: InputMaybe<Scalars['u8']['input']>;
+  profile_picGTE?: InputMaybe<Scalars['u8']['input']>;
+  profile_picLT?: InputMaybe<Scalars['u8']['input']>;
+  profile_picLTE?: InputMaybe<Scalars['u8']['input']>;
+  profile_picNEQ?: InputMaybe<Scalars['u8']['input']>;
 };
 
-export type ModelUnion = Challenge | Duel | Duelist;
+export type ModelUnion = Challenge | Duelist | Round;
 
 export enum OrderDirection {
   Asc = 'ASC',
   Desc = 'DESC'
 }
+
+export type Round = {
+  __typename?: 'Round';
+  duel_id?: Maybe<Scalars['u128']['output']>;
+  entity?: Maybe<World__Entity>;
+  health_a?: Maybe<Scalars['u8']['output']>;
+  health_b?: Maybe<Scalars['u8']['output']>;
+  move_a?: Maybe<Scalars['u8']['output']>;
+  move_b?: Maybe<Scalars['u8']['output']>;
+  round?: Maybe<Scalars['u8']['output']>;
+};
+
+export type RoundConnection = {
+  __typename?: 'RoundConnection';
+  edges?: Maybe<Array<Maybe<RoundEdge>>>;
+  page_info: World__PageInfo;
+  total_count: Scalars['Int']['output'];
+};
+
+export type RoundEdge = {
+  __typename?: 'RoundEdge';
+  cursor?: Maybe<Scalars['Cursor']['output']>;
+  node?: Maybe<Round>;
+};
+
+export type RoundOrder = {
+  direction: OrderDirection;
+  field: RoundOrderField;
+};
+
+export enum RoundOrderField {
+  DuelId = 'DUEL_ID',
+  HealthA = 'HEALTH_A',
+  HealthB = 'HEALTH_B',
+  MoveA = 'MOVE_A',
+  MoveB = 'MOVE_B',
+  Round = 'ROUND'
+}
+
+export type RoundWhereInput = {
+  duel_id?: InputMaybe<Scalars['u128']['input']>;
+  duel_idEQ?: InputMaybe<Scalars['u128']['input']>;
+  duel_idGT?: InputMaybe<Scalars['u128']['input']>;
+  duel_idGTE?: InputMaybe<Scalars['u128']['input']>;
+  duel_idLT?: InputMaybe<Scalars['u128']['input']>;
+  duel_idLTE?: InputMaybe<Scalars['u128']['input']>;
+  duel_idNEQ?: InputMaybe<Scalars['u128']['input']>;
+  health_a?: InputMaybe<Scalars['u8']['input']>;
+  health_aEQ?: InputMaybe<Scalars['u8']['input']>;
+  health_aGT?: InputMaybe<Scalars['u8']['input']>;
+  health_aGTE?: InputMaybe<Scalars['u8']['input']>;
+  health_aLT?: InputMaybe<Scalars['u8']['input']>;
+  health_aLTE?: InputMaybe<Scalars['u8']['input']>;
+  health_aNEQ?: InputMaybe<Scalars['u8']['input']>;
+  health_b?: InputMaybe<Scalars['u8']['input']>;
+  health_bEQ?: InputMaybe<Scalars['u8']['input']>;
+  health_bGT?: InputMaybe<Scalars['u8']['input']>;
+  health_bGTE?: InputMaybe<Scalars['u8']['input']>;
+  health_bLT?: InputMaybe<Scalars['u8']['input']>;
+  health_bLTE?: InputMaybe<Scalars['u8']['input']>;
+  health_bNEQ?: InputMaybe<Scalars['u8']['input']>;
+  move_a?: InputMaybe<Scalars['u8']['input']>;
+  move_aEQ?: InputMaybe<Scalars['u8']['input']>;
+  move_aGT?: InputMaybe<Scalars['u8']['input']>;
+  move_aGTE?: InputMaybe<Scalars['u8']['input']>;
+  move_aLT?: InputMaybe<Scalars['u8']['input']>;
+  move_aLTE?: InputMaybe<Scalars['u8']['input']>;
+  move_aNEQ?: InputMaybe<Scalars['u8']['input']>;
+  move_b?: InputMaybe<Scalars['u8']['input']>;
+  move_bEQ?: InputMaybe<Scalars['u8']['input']>;
+  move_bGT?: InputMaybe<Scalars['u8']['input']>;
+  move_bGTE?: InputMaybe<Scalars['u8']['input']>;
+  move_bLT?: InputMaybe<Scalars['u8']['input']>;
+  move_bLTE?: InputMaybe<Scalars['u8']['input']>;
+  move_bNEQ?: InputMaybe<Scalars['u8']['input']>;
+  round?: InputMaybe<Scalars['u8']['input']>;
+  roundEQ?: InputMaybe<Scalars['u8']['input']>;
+  roundGT?: InputMaybe<Scalars['u8']['input']>;
+  roundGTE?: InputMaybe<Scalars['u8']['input']>;
+  roundLT?: InputMaybe<Scalars['u8']['input']>;
+  roundLTE?: InputMaybe<Scalars['u8']['input']>;
+  roundNEQ?: InputMaybe<Scalars['u8']['input']>;
+};
 
 export type World__Content = {
   __typename?: 'World__Content';
@@ -361,7 +416,6 @@ export type World__PageInfo = {
 export type World__Query = {
   __typename?: 'World__Query';
   challengeModels?: Maybe<ChallengeConnection>;
-  duelModels?: Maybe<DuelConnection>;
   duelistModels?: Maybe<DuelistConnection>;
   entities?: Maybe<World__EntityConnection>;
   entity: World__Entity;
@@ -369,6 +423,7 @@ export type World__Query = {
   metadatas?: Maybe<World__MetadataConnection>;
   model: World__Model;
   models?: Maybe<World__ModelConnection>;
+  roundModels?: Maybe<RoundConnection>;
   transaction: World__Transaction;
   transactions?: Maybe<World__TransactionConnection>;
 };
@@ -383,18 +438,6 @@ export type World__QueryChallengeModelsArgs = {
   offset?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<ChallengeOrder>;
   where?: InputMaybe<ChallengeWhereInput>;
-};
-
-
-export type World__QueryDuelModelsArgs = {
-  after?: InputMaybe<Scalars['Cursor']['input']>;
-  before?: InputMaybe<Scalars['Cursor']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  order?: InputMaybe<DuelOrder>;
-  where?: InputMaybe<DuelWhereInput>;
 };
 
 
@@ -459,6 +502,18 @@ export type World__QueryModelsArgs = {
   last?: InputMaybe<Scalars['Int']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type World__QueryRoundModelsArgs = {
+  after?: InputMaybe<Scalars['Cursor']['input']>;
+  before?: InputMaybe<Scalars['Cursor']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<RoundOrder>;
+  where?: InputMaybe<RoundWhereInput>;
 };
 
 
@@ -534,7 +589,7 @@ export type GetDuelistQueryVariables = Exact<{
 }>;
 
 
-export type GetDuelistQuery = { __typename?: 'World__Query', entities?: { __typename?: 'World__EntityConnection', edges?: Array<{ __typename?: 'World__EntityEdge', node?: { __typename?: 'World__Entity', keys?: Array<string | null> | null, id?: string | null, models?: Array<{ __typename: 'Challenge' } | { __typename: 'Duel' } | { __typename: 'Duelist', address?: any | null, name?: any | null } | null> | null } | null } | null> | null } | null };
+export type GetDuelistQuery = { __typename?: 'World__Query', entities?: { __typename?: 'World__EntityConnection', edges?: Array<{ __typename?: 'World__EntityEdge', node?: { __typename?: 'World__Entity', keys?: Array<string | null> | null, id?: string | null, models?: Array<{ __typename: 'Challenge' } | { __typename: 'Duelist', address?: any | null, name?: any | null } | { __typename: 'Round' } | null> | null } | null } | null> | null } | null };
 
 
 export const GetDuelistDocument = gql`
