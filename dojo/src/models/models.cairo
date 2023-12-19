@@ -6,6 +6,7 @@ struct Duelist {
     #[key]
     address: ContractAddress,
     name: felt252,
+    profile_pic: u8,
 }
 
 #[derive(Model, Copy, Drop, Serde)]

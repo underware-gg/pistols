@@ -9,6 +9,7 @@ trait IActions<TContractState> {
     // Duelists
     fn register_duelist(self: @TContractState,
         name: felt252,
+        profile_pic: u8,
     );
 
     //
@@ -52,6 +53,7 @@ mod actions {
         //
         fn register_duelist(self: @ContractState,
             name: felt252,
+            profile_pic: u8,
         ) {
             let world: IWorldDispatcher = self.world_dispatcher.read();
             let caller: ContractAddress = starknet::get_caller_address();
@@ -59,6 +61,7 @@ mod actions {
                 Duelist {
                     address: caller,
                     name,
+                    profile_pic,
                 }
             ));
             return ();

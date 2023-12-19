@@ -57,9 +57,9 @@ mod utils {
         (block_info.block_timestamp)
     }
 
-    fn execute_register_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252) {
+    fn execute_register_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic: u8) {
         testing::set_contract_address(sender);
-        system.register_duelist(name);
+        system.register_duelist(name, profile_pic);
         _next_block();
     }
 
