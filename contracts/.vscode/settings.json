@@ -1,0 +1,5 @@
+{
+  "editor.rulers": [80],
+  "solidity.packageDefaultDependenciesContractsDirectory": "src",
+  "solidity.packageDefaultDependenciesDirectory": "lib"
+}
