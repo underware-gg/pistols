@@ -46,8 +46,10 @@ contract Pistols {
     uint256 constant STATE_CHALLENGE = 1;
     uint256 constant STATE_SHOOT_STEP_COMMITMENTS = 2;
     uint256 constant STATE_SHOOT_STEP_REVEALS = 3;
-    uint256 constant STATE_BATTLE_CHOICE_COMMITMENTS = 4;
-    uint256 constant STATE_BATTLE_CHOICE_REVEALS = 5;
+    uint256 constant STATE_SHOOT = 4;
+    uint256 constant STATE_BATTLE_CHOICE_COMMITMENTS = 5;
+    uint256 constant STATE_BATTLE_CHOICE_REVEALS = 6;
+    uint256 constant STATE_BATTLE = 7;
 
     uint256 constant UNSET = type(uint256).max;
 
@@ -112,6 +114,8 @@ contract Pistols {
                 game.player1.shootStep,
                 game.player2.shootStep
             );
+        } else if (game.state == STATE_SHOOT) {
+            winner = 0;
         } else if (game.state == STATE_BATTLE_CHOICE_COMMITMENTS) {
             winner = calculateWinner(
                 uint256(game.player1.battleChoiceCommitment),
@@ -122,6 +126,8 @@ contract Pistols {
                 game.player1.battleChoice,
                 game.player2.battleChoice
             );
+        } else if (game.state == STATE_BATTLE) {
+            winner = 0;
         } else {
             revert("Unexpected state");
         }
