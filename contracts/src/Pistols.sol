@@ -24,10 +24,7 @@ struct Game {
 
 contract Pistols {
     address public owner;
-    ERC20 public token;
-
-    uint256 public feeNumerator;
-    uint256 public constant FEE_DENOMINATOR = 10_000;
+    ERC20 public lordsToken;
 
     uint256 public timeout;
 
@@ -42,6 +39,7 @@ contract Pistols {
     event GameUpdated(uint256 gameId);
     event AssertionFailed(string message);
 
+    uint256 constant public MIN_STAKE = 25_000_000_000_000_000_000;
     uint256 constant public FULL_STEP_COUNT = 10;
 
     uint256 constant STATE_EMPTY = 0;
@@ -57,18 +55,17 @@ contract Pistols {
 
     constructor(
         address _owner,
-        ERC20 _token,
-        uint256 _feeNumerator,
+        ERC20 _lordsToken,
         uint256 _timeout
     ) {
         owner = _owner;
-        token = _token;
-        feeNumerator = _feeNumerator;
+        lordsToken = _lordsToken;
         timeout = _timeout;
     }
 
     function challenge(uint256 stake, address challengee) external {
-        token.transferFrom(msg.sender, address(this), stake);
+        require(stake >= MIN_STAKE, "Stake is too low");
+        lordsToken.transferFrom(msg.sender, address(this), stake);
 
         uint256 gameId = nextGameId;
         nextGameId++;
@@ -139,12 +136,12 @@ contract Pistols {
         if (winner == 0) {
             uint256 p2Stake = game.stake / 2; // P2 is rounded down
             uint256 p1Stake = game.stake - p2Stake;
-            token.transfer(game.player1.addr, p1Stake);
-            token.transfer(game.player2.addr, p2Stake);
+            lordsToken.transfer(game.player1.addr, p1Stake);
+            lordsToken.transfer(game.player2.addr, p2Stake);
         } else if (winner == 1) {
-            token.transfer(game.player1.addr, game.stake);
+            lordsToken.transfer(game.player1.addr, game.stake);
         } else if (winner == 2) {
-            token.transfer(game.player2.addr, game.stake);
+            lordsToken.transfer(game.player2.addr, game.stake);
         }
 
         delete games[gameId];
@@ -184,11 +181,11 @@ contract Pistols {
             "Only challengee can accept challenge"
         );
 
-        token.transferFrom(msg.sender, address(this), game.stake);
+        lordsToken.transferFrom(msg.sender, address(this), game.stake);
         game.stake += game.stake;
 
-        uint256 fee = feeNumerator * (game.stake  / FEE_DENOMINATOR);
-        token.transfer(owner, fee);
+        uint256 fee = max(MIN_STAKE, game.stake / 100);
+        lordsToken.transfer(owner, fee);
         game.stake -= fee;
 
         game.state = STATE_SHOOT_STEP_COMMITMENTS;
@@ -304,5 +301,9 @@ contract Pistols {
             block.timestamp >= game.activityDeadline,
             "Game has not timed out"
         );
+    }
+
+    function max(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a > b ? a : b;
     }
 }
