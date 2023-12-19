@@ -3,3 +3,4 @@ mod bitwise;
 mod hash;
 mod math;
 mod string;
+mod timestamp;

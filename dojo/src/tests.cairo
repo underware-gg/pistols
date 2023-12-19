@@ -1,2 +1,3 @@
 mod utils;
-mod test_actions;
+mod test_duelist;
+mod test_challenge;

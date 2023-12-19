@@ -4,7 +4,7 @@ mod tests {
     use array::ArrayTrait;
     use debug::PrintTrait;
 
-    use dojo::world::{IWorldDispatcherTrait, IWorldDispatcher};
+    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     use pistols::models::models::{Duelist, Duel};
     use pistols::tests::utils::utils::{
@@ -15,7 +15,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_register_duelist() {
+    fn test_register_duellist() {
         let (world, system) = setup_world();
         let caller = starknet::get_caller_address();
 
