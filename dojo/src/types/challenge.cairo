@@ -83,8 +83,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_challenge_exists() {
-        let (world, system) = setup_world();
-        let caller = starknet::get_caller_address();
+        let (world, system, owner, other) = setup_world();
         // get some random inexisting challenge
         let ch: Challenge = get_world_Challenge(world, 0x682137812638127638127);
         assert(ch.state == ChallengeState::Null, 'ChallengeState::Null');
