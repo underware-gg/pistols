@@ -113,74 +113,6 @@ contract Pistols {
         emit GameCreated(gameId, msg.sender, challengee);
     }
 
-    function finishTimedOutGame(uint256 gameId) external {
-        Game storage game = games[gameId];
-        requireTimedOut(game);
-
-        require(game.state != STATE_EMPTY, "Game does not exist");
-
-        uint256 winner = 0;
-
-        if (game.state == STATE_CHALLENGE) {
-            winner = 1;
-        } else if (game.state == STATE_SHOOT_STEP_COMMITMENTS) {
-            winner = calculateWinner(
-                uint256(game.player1.shootStepCommitment),
-                uint256(game.player2.shootStepCommitment)
-            );
-        } else if (game.state == STATE_SHOOT_STEP_REVEALS) {
-            winner = calculateWinner(
-                game.player1.shootStep,
-                game.player2.shootStep
-            );
-        } else if (game.state == STATE_SHOOT) {
-            winner = 0;
-        } else if (game.state == STATE_BATTLE_CHOICE_COMMITMENTS) {
-            winner = calculateWinner(
-                uint256(game.player1.battleChoiceCommitment),
-                uint256(game.player2.battleChoiceCommitment)
-            );
-        } else if (game.state == STATE_BATTLE_CHOICE_REVEALS) {
-            winner = calculateWinner(
-                game.player1.battleChoice,
-                game.player2.battleChoice
-            );
-        } else if (game.state == STATE_BATTLE) {
-            winner = 0;
-        } else {
-            revert("Unexpected state");
-        }
-
-        if (winner == 1) {
-            emit Dishonor(gameId, game.player2.addr);
-        } else if (winner == 2) {
-            emit Dishonor(gameId, game.player1.addr);
-        }
-
-        finishGame(gameId, game, winner);
-    }
-
-    function calculateWinner(
-        uint256 p1Value,
-        uint256 p2Value
-    ) internal returns (uint256) {
-        if (p1Value == UNSET && p2Value == UNSET) {
-            return 0;
-        }
-
-        if (p1Value == UNSET) {
-            return 2;
-        }
-
-        if (p2Value == UNSET) {
-            return 1;
-        }
-
-        emit AssertionFailed("State should have progressed");
-
-        return 0;
-    }
-
     function acceptChallenge(uint256 gameId) external {
         Game storage game = games[gameId];
         requireNotTimedOut(game);
@@ -412,6 +344,74 @@ contract Pistols {
 
         delete games[gameId];
         emit GameUpdated(gameId);
+    }
+
+    function finishTimedOutGame(uint256 gameId) external {
+        Game storage game = games[gameId];
+        requireTimedOut(game);
+
+        require(game.state != STATE_EMPTY, "Game does not exist");
+
+        uint256 winner = 0;
+
+        if (game.state == STATE_CHALLENGE) {
+            winner = 1;
+        } else if (game.state == STATE_SHOOT_STEP_COMMITMENTS) {
+            winner = calculateWinner(
+                uint256(game.player1.shootStepCommitment),
+                uint256(game.player2.shootStepCommitment)
+            );
+        } else if (game.state == STATE_SHOOT_STEP_REVEALS) {
+            winner = calculateWinner(
+                game.player1.shootStep,
+                game.player2.shootStep
+            );
+        } else if (game.state == STATE_SHOOT) {
+            winner = 0;
+        } else if (game.state == STATE_BATTLE_CHOICE_COMMITMENTS) {
+            winner = calculateWinner(
+                uint256(game.player1.battleChoiceCommitment),
+                uint256(game.player2.battleChoiceCommitment)
+            );
+        } else if (game.state == STATE_BATTLE_CHOICE_REVEALS) {
+            winner = calculateWinner(
+                game.player1.battleChoice,
+                game.player2.battleChoice
+            );
+        } else if (game.state == STATE_BATTLE) {
+            winner = 0;
+        } else {
+            revert("Unexpected state");
+        }
+
+        if (winner == 1) {
+            emit Dishonor(gameId, game.player2.addr);
+        } else if (winner == 2) {
+            emit Dishonor(gameId, game.player1.addr);
+        }
+
+        finishGame(gameId, game, winner);
+    }
+
+    function calculateWinner(
+        uint256 p1Value,
+        uint256 p2Value
+    ) internal returns (uint256) {
+        if (p1Value == UNSET && p2Value == UNSET) {
+            return 0;
+        }
+
+        if (p1Value == UNSET) {
+            return 2;
+        }
+
+        if (p2Value == UNSET) {
+            return 1;
+        }
+
+        emit AssertionFailed("State should have progressed");
+
+        return 0;
     }
 
     function requireNotTimedOut(Game storage game) internal view {
