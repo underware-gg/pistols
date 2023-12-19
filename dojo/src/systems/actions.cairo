@@ -148,6 +148,12 @@ mod actions {
                 }
             }
 
+            // TEMPORARY RESOLUTION
+            // TODO: REMOVE THIS
+            if (challenge.state == ChallengeState::InProgress) {
+                solve_random(ref challenge);
+            }
+
             // update challenge state
             set!(world, (challenge));
 
