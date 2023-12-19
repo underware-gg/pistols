@@ -1,5 +1,6 @@
 use starknet::{ContractAddress};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+use pistols::types::challenge::{ChallengeState};
 
 // define the interface
 #[starknet::interface]
@@ -21,7 +22,7 @@ trait IActions<TContractState> {
     fn reply_challenge(self: @TContractState,
         duel_id: u128,
         accepted: bool,
-    );
+    ) -> ChallengeState;
 
     // read-only calls
     // fn can_play_level(self: @TContractState,
@@ -35,11 +36,12 @@ mod actions {
     use super::IActions;
     use traits::{Into, TryInto};
     use core::option::OptionTrait;
-    use starknet::{ContractAddress, ClassHash, get_block_timestamp, get_block_info};
+    use starknet::{ContractAddress, get_block_timestamp, get_block_info};
     use pistols::models::models::{Duelist, Challenge, Round};
     use pistols::systems::seeder::{make_seed};
+    use pistols::systems::solver::{solve_random};
     use pistols::systems::utils::{zero_address, duelist_exist};
-    use pistols::utils::timestamp::{days_to_timestamp};
+    use pistols::utils::timestamp::{timestamp};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 
     // impl: implement functions specified in trait
@@ -63,7 +65,7 @@ mod actions {
         }
 
         //------------------------
-        // Challenge
+        // NEW Challenge
         //
         fn create_challenge(self: @ContractState,
             challenged: ContractAddress,
@@ -76,9 +78,9 @@ mod actions {
 
             // assert(challenged != zero_address() || pass_code != 0, 'Challenge a player or pass_code');
             assert(challenged != zero_address() || pass_code != 0, 'Missing challenged address');
-            assert(expire_seconds == 0 || expire_seconds > days_to_timestamp(1), 'Invalid expire_seconds');
+            assert(expire_seconds == 0 || expire_seconds >= timestamp::from_days(1), 'Invalid expire_seconds');
 
-            assert(duelist_exist(world, caller), 'Challenger is not registered');
+            assert(duelist_exist(world, caller), 'Challenger not registered');
             // if (challenged != zero_address()) {
             //     assert(duelist_exist(world, caller), 'Challenged is not registered');
             // }
@@ -111,11 +113,12 @@ mod actions {
         }
 
         //------------------------
+        // REPLY Challenge
         //
         fn reply_challenge(self: @ContractState,
             duel_id: u128,
             accepted: bool,
-        ) {
+        ) -> ChallengeState {
             let world: IWorldDispatcher = self.world_dispatcher.read();
             let caller: ContractAddress = starknet::get_caller_address();
 
@@ -127,12 +130,14 @@ mod actions {
 
             if (challenge.timestamp_expire > 0 && timestamp > challenge.timestamp_expire) {
                 challenge.state = ChallengeState::Expired;
+                challenge.timestamp_end = timestamp;
             } else if (caller == challenge.duelist_a) {
                 assert(accepted == false, 'Cannot accept own challenge');
                 challenge.state = ChallengeState::Canceled;
                 challenge.timestamp_end = timestamp;
             } else {
                 assert(caller == challenge.duelist_b, 'Not the Challenged');
+                assert(duelist_exist(world, caller), 'Challenged not registered');
                 if (!accepted) {
                     challenge.state = ChallengeState::Refused;
                     challenge.timestamp_end = timestamp;
@@ -147,7 +152,7 @@ mod actions {
             set!(world, (challenge));
 
             // Create 1st round
-            if (accepted) {
+            if (challenge.state == ChallengeState::InProgress) {
                 set!(world, (
                     Round {
                         duel_id,
@@ -160,7 +165,7 @@ mod actions {
                 ));
             }
 
-            ()
+            (challenge.state)
         }
 
         //

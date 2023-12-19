@@ -9,6 +9,7 @@ mod utils {
     use dojo::test_utils::{spawn_test_world, deploy_contract};
 
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
+    use pistols::types::challenge::{ChallengeState};
     use pistols::models::models::{
         Duelist, duelist,
         Challenge, challenge,
@@ -33,10 +34,17 @@ mod utils {
         (world, IActionsDispatcher { contract_address }, owner, other)
     }
 
-    fn _next_block() {
+    fn _next_block() -> (u64, u64) {
+        elapse_timestamp(0x10)
+    }
+
+    fn elapse_timestamp(delta: u64) -> (u64, u64) {
         let block_info = starknet::get_block_info().unbox();
-        testing::set_block_number(block_info.block_number + 1);
-        testing::set_block_timestamp(block_info.block_timestamp + 0x10);
+        let new_block_number = block_info.block_number + 1;
+        let new_block_timestamp = block_info.block_timestamp + delta;
+        testing::set_block_number(new_block_number);
+        testing::set_block_timestamp(new_block_timestamp);
+        (new_block_number, new_block_timestamp)
     }
 
     fn get_block_number() -> u64 {
@@ -65,6 +73,16 @@ mod utils {
         let duel_id: u128 = system.create_challenge(challenged, pass_code, message, expire_seconds);
         _next_block();
         (duel_id)
+    }
+
+    fn execute_reply_challenge(system: IActionsDispatcher, sender: ContractAddress,
+        duel_id: u128,
+        accepted: bool,
+    ) -> ChallengeState {
+        testing::set_contract_address(sender);
+        let new_state: ChallengeState = system.reply_challenge(duel_id, accepted);
+        _next_block();
+        (new_state)
     }
 
     fn get_Duelist(world: IWorldDispatcher, address: ContractAddress) -> Duelist {
