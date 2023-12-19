@@ -134,6 +134,8 @@ contract Pistols {
             revert("Unexpected state");
         }
 
+        // TODO: Dishonor the player(s) who timed out
+
         if (winner == 0) {
             uint256 p2Stake = game.stake / 2; // P2 is rounded down
             uint256 p1Stake = game.stake - p2Stake;
