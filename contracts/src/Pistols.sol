@@ -192,10 +192,7 @@ contract Pistols {
         emit GameUpdated(gameId);
     }
 
-    function submitShootStepCommitment(
-        uint256 gameId,
-        bytes32 commitment
-    ) external {
+    function commitShootStep(uint256 gameId, bytes32 commitment) external {
         Game storage game = games[gameId];
         requireNotTimedOut(game);
 
@@ -209,8 +206,18 @@ contract Pistols {
         );
 
         if (msg.sender == game.player1.addr) {
+            require(
+                game.player1.shootStepCommitment != bytes32(UNSET),
+                "Player 1 has already committed"
+            );
+
             game.player1.shootStepCommitment = commitment;
         } else if (msg.sender == game.player2.addr) {
+            require(
+                game.player2.shootStepCommitment != bytes32(UNSET),
+                "Player 2 has already committed"
+            );
+
             game.player2.shootStepCommitment = commitment;
         } else {
             revert("Only players can submit shoot step commitments");
