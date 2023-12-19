@@ -12,7 +12,7 @@ struct PlayerGameData {
     bytes32 battleChoiceCommitment;
     uint256 battleChoice;
 
-    bool injured;
+    int256 health;
 }
 
 struct Game {
@@ -70,6 +70,14 @@ contract Pistols {
     uint256 constant KILLED = 1 << 1;
     uint256 constant DISHONORED = 1 << 2;
 
+    uint256 constant BATTLE_CHOICE_LIGHT_HIT = 1;
+    uint256 constant BATTLE_CHOICE_HEAVY_HIT = 2;
+    uint256 constant BATTLE_CHOICE_BLOCK = 3;
+
+    uint256 constant OUTCOME_DRAW = 0;
+    uint256 constant OUTCOME_P1_WIN = 1;
+    uint256 constant OUTCOME_P2_WIN = 2;
+
     constructor(
         address _owner,
         ERC20 _lordsToken,
@@ -98,7 +106,7 @@ contract Pistols {
                 shootStep: UNSET,
                 battleChoiceCommitment: bytes32(UNSET),
                 battleChoice: UNSET,
-                injured: false
+                health: 2
             }),
             player2: PlayerGameData({
                 addr: challengee,
@@ -106,7 +114,7 @@ contract Pistols {
                 shootStep: UNSET,
                 battleChoiceCommitment: bytes32(UNSET),
                 battleChoice: UNSET,
-                injured: false
+                health: 2
             })
         });
 
@@ -277,17 +285,17 @@ contract Pistols {
             bool p1Killed = chance(1, 2, game.rand, "p2 shot");
             
             if (p1Killed && p2Killed) {
-                finishGame(gameId, game, 0);
+                finishGame(gameId, game, OUTCOME_DRAW);
                 return;
             }
             
             if (p1Killed) {
-                finishGame(gameId, game, 2);
+                finishGame(gameId, game, OUTCOME_P2_WIN);
                 return;
             }
             
             if (p2Killed) {
-                finishGame(gameId, game, 1);
+                finishGame(gameId, game, OUTCOME_P1_WIN);
                 return;
             }
         } else {
@@ -297,7 +305,7 @@ contract Pistols {
             ) {
                 emit Dishonor(gameId, game.player1.addr);
                 allPlayerStats[game.player1.addr].dishonors++;
-                game.player2.injured = true;
+                game.player2.health--;
             }
 
             if (
@@ -306,7 +314,7 @@ contract Pistols {
             ) {
                 emit Dishonor(gameId, game.player2.addr);
                 allPlayerStats[game.player2.addr].dishonors++;
-                game.player1.injured = true;
+                game.player1.health--;
             }
         }
 
@@ -316,12 +324,177 @@ contract Pistols {
         emit GameUpdated(gameId);
     }
 
+    function commitBattleChoice(uint256 gameId, bytes32 commitment) external {
+        Game storage game = games[gameId];
+        requireNotTimedOut(game);
+
+        require(
+            game.state == STATE_BATTLE_CHOICE_COMMITMENTS,
+            "Game is not in battle choice commitments state"
+        );
+        require(
+            commitment != bytes32(UNSET),
+            "Commitment cannot be UNSET"
+        );
+
+        if (msg.sender == game.player1.addr) {
+            require(
+                game.player1.battleChoiceCommitment != bytes32(UNSET),
+                "Player 1 has already committed"
+            );
+
+            game.player1.battleChoiceCommitment = commitment;
+        } else if (msg.sender == game.player2.addr) {
+            require(
+                game.player2.battleChoiceCommitment != bytes32(UNSET),
+                "Player 2 has already committed"
+            );
+
+            game.player2.battleChoiceCommitment = commitment;
+        } else {
+            revert("Only players can submit battle choice commitments");
+        }
+
+        if (
+            game.player1.battleChoiceCommitment != bytes32(UNSET) &&
+            game.player2.battleChoiceCommitment != bytes32(UNSET)
+        ) {
+            game.state = STATE_BATTLE_CHOICE_REVEALS;
+        }
+
+        game.activityDeadline = block.timestamp + timeout;
+        emit GameUpdated(gameId);
+    }
+
+    function revealBattleChoice(
+        uint256 gameId,
+        bytes32 salt,
+        uint256 battleChoice
+    ) external {
+        Game storage game = games[gameId];
+        requireNotTimedOut(game);
+
+        require(
+            game.state == STATE_BATTLE_CHOICE_REVEALS,
+            "Game is not in battle choice reveals state"
+        );
+        require(
+            battleChoice == BATTLE_CHOICE_LIGHT_HIT ||
+            battleChoice == BATTLE_CHOICE_HEAVY_HIT ||
+            battleChoice == BATTLE_CHOICE_BLOCK,
+            "battleChoice must be a valid choice"
+        );
+
+        if (msg.sender == game.player1.addr) {
+            require(
+                game.player1.battleChoice != UNSET,
+                "Player 1 has already revealed"
+            );
+
+            require(
+                keccak256(abi.encodePacked(salt, battleChoice))
+                    == game.player1.battleChoiceCommitment,
+                "Battle choice does not match commitment"
+            );
+
+            game.player1.battleChoice = battleChoice;
+        } else if (msg.sender == game.player2.addr) {
+            require(
+                game.player2.battleChoice != UNSET,
+                "Player 2 has already revealed"
+            );
+
+            require(
+                keccak256(abi.encodePacked(salt, battleChoice))
+                    == game.player2.battleChoiceCommitment,
+                "Battle choice does not match commitment"
+            );
+
+            game.player2.battleChoice = battleChoice;
+        } else {
+            revert("Only players can submit battle choice reveals");
+        }
+
+        if (
+            game.player1.battleChoice != UNSET &&
+            game.player2.battleChoice != UNSET
+        ) {
+            game.state = STATE_BATTLE;
+        }
+
+        game.activityDeadline = block.timestamp + timeout;
+        emit GameUpdated(gameId);
+    }
+
+    function battle(uint256 gameId) external {
+        Game storage game = games[gameId];
+        requireNotTimedOut(game);
+
+        require(
+            game.state == STATE_BATTLE,
+            "Game is not in battle state"
+        );
+
+        uint256 p1BattleChoice = game.player1.battleChoice;
+        uint256 p2BattleChoice = game.player2.battleChoice;
+
+        if (p1BattleChoice == BATTLE_CHOICE_LIGHT_HIT) {
+            if (p2BattleChoice == BATTLE_CHOICE_LIGHT_HIT) {
+                PlayerGameData storage injuredPlayer = (
+                    chance(1, 2, game.rand, "battle")
+                        ? game.player1
+                        : game.player2
+                );
+
+                injuredPlayer.health--;
+            } else if (p2BattleChoice == BATTLE_CHOICE_HEAVY_HIT) {
+                game.player2.health--;
+            } else if (p2BattleChoice == BATTLE_CHOICE_BLOCK) {
+                // Nothing (successful block)
+            }
+        } else if (p1BattleChoice == BATTLE_CHOICE_HEAVY_HIT) {
+            if (p2BattleChoice == BATTLE_CHOICE_LIGHT_HIT) {
+                game.player1.health--;
+            } else if (p2BattleChoice == BATTLE_CHOICE_HEAVY_HIT) {
+                if (chance(1, 2, game.rand, "battle")) {
+                    game.player1.health -= 2;
+                } else {
+                    game.player2.health -= 2;
+                }
+            } else if (p2BattleChoice == BATTLE_CHOICE_BLOCK) {
+                game.player2.health -= 2;
+            }
+        } else if (p1BattleChoice == BATTLE_CHOICE_BLOCK) {
+            if (p2BattleChoice == BATTLE_CHOICE_LIGHT_HIT) {
+                // Nothing (successful block)
+            } else if (p2BattleChoice == BATTLE_CHOICE_HEAVY_HIT) {
+                game.player1.health -= 2;
+            } else if (p2BattleChoice == BATTLE_CHOICE_BLOCK) {
+                // Nothing
+            }
+        }
+
+        uint256 outcome;
+
+        if (game.player1.health <= 0 && game.player2.health <= 0) {
+            outcome = OUTCOME_DRAW;
+        } else if (game.player1.health <= 0) {
+            outcome = OUTCOME_P2_WIN;
+        } else if (game.player2.health <= 0) {
+            outcome = OUTCOME_P1_WIN;
+        } else {
+            outcome = OUTCOME_DRAW;
+        }
+
+        finishGame(gameId, game, outcome);
+    }
+
     function finishGame(
         uint256 gameId,
         Game storage game,
-        uint256 winner
+        uint256 outcome
     ) internal {
-        if (winner == 0) {
+        if (outcome == OUTCOME_DRAW) {
             uint256 p2Stake = game.stake / 2; // P2 is rounded down
             uint256 p1Stake = game.stake - p2Stake;
 
@@ -330,12 +503,12 @@ contract Pistols {
 
             allPlayerStats[game.player1.addr].draws++;
             allPlayerStats[game.player2.addr].draws++;
-        } else if (winner == 1) {
+        } else if (outcome == OUTCOME_P1_WIN) {
             lordsToken.transfer(game.player1.addr, game.stake);
 
             allPlayerStats[game.player1.addr].wins++;
             allPlayerStats[game.player2.addr].losses++;
-        } else if (winner == 2) {
+        } else if (outcome == OUTCOME_P2_WIN) {
             lordsToken.transfer(game.player2.addr, game.stake);
 
             allPlayerStats[game.player2.addr].wins++;
@@ -352,66 +525,66 @@ contract Pistols {
 
         require(game.state != STATE_EMPTY, "Game does not exist");
 
-        uint256 winner = 0;
+        uint256 outcome;
 
         if (game.state == STATE_CHALLENGE) {
-            winner = 1;
+            outcome = OUTCOME_P1_WIN;
         } else if (game.state == STATE_SHOOT_STEP_COMMITMENTS) {
-            winner = calculateWinner(
+            outcome = calculateOutcome(
                 uint256(game.player1.shootStepCommitment),
                 uint256(game.player2.shootStepCommitment)
             );
         } else if (game.state == STATE_SHOOT_STEP_REVEALS) {
-            winner = calculateWinner(
+            outcome = calculateOutcome(
                 game.player1.shootStep,
                 game.player2.shootStep
             );
         } else if (game.state == STATE_SHOOT) {
-            winner = 0;
+            outcome = OUTCOME_DRAW;
         } else if (game.state == STATE_BATTLE_CHOICE_COMMITMENTS) {
-            winner = calculateWinner(
+            outcome = calculateOutcome(
                 uint256(game.player1.battleChoiceCommitment),
                 uint256(game.player2.battleChoiceCommitment)
             );
         } else if (game.state == STATE_BATTLE_CHOICE_REVEALS) {
-            winner = calculateWinner(
+            outcome = calculateOutcome(
                 game.player1.battleChoice,
                 game.player2.battleChoice
             );
         } else if (game.state == STATE_BATTLE) {
-            winner = 0;
+            outcome = OUTCOME_DRAW;
         } else {
             revert("Unexpected state");
         }
 
-        if (winner == 1) {
+        if (outcome == 1) {
             emit Dishonor(gameId, game.player2.addr);
-        } else if (winner == 2) {
+        } else if (outcome == 2) {
             emit Dishonor(gameId, game.player1.addr);
         }
 
-        finishGame(gameId, game, winner);
+        finishGame(gameId, game, outcome);
     }
 
-    function calculateWinner(
+    function calculateOutcome(
         uint256 p1Value,
         uint256 p2Value
     ) internal returns (uint256) {
         if (p1Value == UNSET && p2Value == UNSET) {
-            return 0;
+            return OUTCOME_DRAW;
         }
 
         if (p1Value == UNSET) {
-            return 2;
+            return OUTCOME_P2_WIN;
         }
 
         if (p2Value == UNSET) {
-            return 1;
+            return OUTCOME_P1_WIN;
         }
 
         emit AssertionFailed("State should have progressed");
 
-        return 0;
+        return OUTCOME_DRAW;
     }
 
     function requireNotTimedOut(Game storage game) internal view {
