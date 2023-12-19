@@ -31,7 +31,8 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Challenge a player or pass_code','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('Missing challenged address','ENTRYPOINT_FAILED'))]
+    // #[should_panic(expected:('Challenge a player or pass_code','ENTRYPOINT_FAILED'))]
     fn test_invalid_code() {
         let (world, system) = setup_world();
         let caller = starknet::get_caller_address();

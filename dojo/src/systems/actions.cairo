@@ -68,7 +68,8 @@ mod actions {
             let world: IWorldDispatcher = self.world_dispatcher.read();
             let caller: ContractAddress = starknet::get_caller_address();
 
-            assert(challenged != zero_address() || pass_code != 0, 'Challenge a player or pass_code');
+            // assert(challenged != zero_address() || pass_code != 0, 'Challenge a player or pass_code');
+            assert(challenged != zero_address() || pass_code != 0, 'Missing challenged address');
             assert(expire_seconds == 0 || expire_seconds > days_to_timestamp(1), 'Invalid expire_seconds');
 
             assert(duelist_exist(world, caller), 'Challenger is not registered');
