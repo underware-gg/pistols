@@ -94,12 +94,9 @@ contract Pistols {
 
     function cleanUpTimedOutGame(uint256 gameId) external {
         Game storage game = games[gameId];
+        requireTimedOut(game);
 
         require(game.state != STATE_EMPTY, "Game does not exist");
-        require(
-            game.activityDeadline < block.timestamp,
-            "Game has not timed out"
-        );
 
         uint256 winner = 0;
 
@@ -166,11 +163,8 @@ contract Pistols {
 
     function acceptChallenge(uint256 gameId) external {
         Game storage game = games[gameId];
+        requireNotTimedOut(game);
 
-        require(
-            game.activityDeadline < block.timestamp,
-            "Game has timed out"
-        );
         require(
             game.state == STATE_CHALLENGE,
             "Game is not in challenge state"
@@ -197,11 +191,8 @@ contract Pistols {
         bytes32 commitment
     ) external {
         Game storage game = games[gameId];
+        requireNotTimedOut(game);
 
-        require(
-            game.activityDeadline < block.timestamp,
-            "Game has timed out"
-        );
         require(
             game.state == STATE_SHOOT_STEP_COMMITMENTS,
             "Game is not in shoot step commitments state"
@@ -228,5 +219,19 @@ contract Pistols {
 
         game.activityDeadline = block.timestamp + timeout;
         emit GameUpdated(gameId);
+    }
+
+    function requireNotTimedOut(Game storage game) internal view {
+        require(
+            block.timestamp < game.activityDeadline,
+            "Game has timed out"
+        );
+    }
+
+    function requireTimedOut(Game storage game) internal view {
+        require(
+            block.timestamp >= game.activityDeadline,
+            "Game has not timed out"
+        );
     }
 }
