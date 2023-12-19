@@ -75,17 +75,14 @@ mod tests {
 
     use pistols::models::models::{Challenge};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
-    use pistols::tests::utils::utils::{
-        setup_world,
-        get_world_Challenge,
-    };
+    use pistols::tests::utils::{utils};
 
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_challenge_exists() {
-        let (world, system, owner, other) = setup_world();
+        let (world, system, owner, other) = utils::setup_world();
         // get some random inexisting challenge
-        let ch: Challenge = get_world_Challenge(world, 0x682137812638127638127);
+        let ch: Challenge = utils::get_Challenge(world, 0x682137812638127638127);
         assert(ch.state == ChallengeState::Null, 'ChallengeState::Null');
         assert(ch.state.exists() == false, 'exists()');
     }

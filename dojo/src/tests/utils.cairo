@@ -15,20 +15,44 @@ mod utils {
         Round, round,
     };
 
+    //
+    // starknet testing cheats
+    // https://github.com/starkware-libs/cairo/blob/main/corelib/src/starknet/testing.cairo
+    //
+
     fn setup_world() -> (IWorldDispatcher, IActionsDispatcher, ContractAddress, ContractAddress) {
         let mut models = array![duelist::TEST_CLASS_HASH, challenge::TEST_CLASS_HASH, round::TEST_CLASS_HASH];
         let world: IWorldDispatcher = spawn_test_world(models);
         let contract_address = world.deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let owner: ContractAddress = starknet::contract_address_const::<0x111111>();
         let other: ContractAddress = starknet::contract_address_const::<0x222>();
+        // testing::set_caller_address(owner);   // not used??
         testing::set_contract_address(owner); // this is the CALLER!!
-        // testing::set_caller_address(owner);   // this is just a backup
+        testing::set_block_number(1);
+        testing::set_block_timestamp(0x100000000);
         (world, IActionsDispatcher { contract_address }, owner, other)
+    }
+
+    fn _next_block() {
+        let block_info = starknet::get_block_info().unbox();
+        testing::set_block_number(block_info.block_number + 1);
+        testing::set_block_timestamp(block_info.block_timestamp + 0x10);
+    }
+
+    fn get_block_number() -> u64 {
+        let block_info = starknet::get_block_info().unbox();
+        (block_info.block_number)
+    }
+
+    fn get_block_timestamp() -> u64 {
+        let block_info = starknet::get_block_info().unbox();
+        (block_info.block_timestamp)
     }
 
     fn execute_register_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252) {
         testing::set_contract_address(sender);
         system.register_duelist(name);
+        _next_block();
     }
 
     fn execute_create_challenge(system: IActionsDispatcher, sender: ContractAddress,
@@ -39,15 +63,16 @@ mod utils {
     ) -> u128 {
         testing::set_contract_address(sender);
         let duel_id: u128 = system.create_challenge(challenged, pass_code, message, expire_seconds);
+        _next_block();
         (duel_id)
     }
 
-    fn get_world_Duelist(world: IWorldDispatcher, address: ContractAddress) -> Duelist {
+    fn get_Duelist(world: IWorldDispatcher, address: ContractAddress) -> Duelist {
         let result: Duelist = get!(world, address, Duelist);
         (result)
     }
 
-    fn get_world_Challenge(world: IWorldDispatcher, duel_id: u128) -> Challenge {
+    fn get_Challenge(world: IWorldDispatcher, duel_id: u128) -> Challenge {
         let result: Challenge = get!(world, duel_id, Challenge);
         (result)
     }

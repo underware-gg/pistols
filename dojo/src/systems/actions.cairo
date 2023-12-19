@@ -88,12 +88,6 @@ mod actions {
             let timestamp: u64 = get_block_timestamp();
             let timestamp_expire: u64 = if (expire_seconds == 0) { 0 } else { timestamp + expire_seconds };
 
-
-// get_block_timestamp().print();
-//     let block_info = get_block_info().unbox();
-// block_info.block_timestamp.print();
-// block_info.block_number.print();
-
             set!(world, (
                 Challenge {
                     duel_id,
@@ -131,10 +125,9 @@ mod actions {
 
             let timestamp: u64 = get_block_timestamp();
 
-            // if (timestamp > challenge.timestamp_expire) {
-            //     challenge.state = ChallengeState::Expired;
-            // } else
-            if (caller == challenge.duelist_a) {
+            if (challenge.timestamp_expire > 0 && timestamp > challenge.timestamp_expire) {
+                challenge.state = ChallengeState::Expired;
+            } else if (caller == challenge.duelist_a) {
                 assert(accepted == false, 'Cannot accept own challenge');
                 challenge.state = ChallengeState::Canceled;
                 challenge.timestamp_end = timestamp;
