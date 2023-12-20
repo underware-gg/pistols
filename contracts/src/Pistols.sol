@@ -31,7 +31,7 @@ struct PlayerStats {
     uint256 wins;
     uint256 losses;
     uint256 draws;
-    uint256 dishonors;
+    uint256 honor;
 }
 
 contract Pistols {
@@ -249,6 +249,9 @@ contract Pistols {
         uint256 p1ShootStep = game.player1.shootStep;
         uint256 p2ShootStep = game.player2.shootStep;
 
+        allPlayerStats[game.player1.addr].honor += p1ShootStep;
+        allPlayerStats[game.player2.addr].honor += p2ShootStep;
+
         if (
             p1ShootStep == Lib.FULL_STEP_COUNT &&
             p2ShootStep == Lib.FULL_STEP_COUNT
@@ -276,7 +279,6 @@ contract Pistols {
                 chance(p1ShootStep, 10, game.rand, "p1 shot")
             ) {
                 emit Dishonor(gameId, game.player1.addr);
-                allPlayerStats[game.player1.addr].dishonors++;
                 game.player2.health--;
             }
 
@@ -285,7 +287,6 @@ contract Pistols {
                 chance(p2ShootStep, 10, game.rand, "p2 shot")
             ) {
                 emit Dishonor(gameId, game.player2.addr);
-                allPlayerStats[game.player2.addr].dishonors++;
                 game.player1.health--;
             }
         }

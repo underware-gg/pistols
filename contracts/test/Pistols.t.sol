@@ -122,6 +122,7 @@ contract PistolsTest is Test {
         );
 
         // Both players died, so the pot was split
+        // Both players are down 12.5 tokens due to the fee
         require(lordsToken.balanceOf(user1) == 987_500 * (ONE_TOKEN / 1000));
         require(lordsToken.balanceOf(user2) == 987_500 * (ONE_TOKEN / 1000));
 
@@ -129,6 +130,9 @@ contract PistolsTest is Test {
         PlayerStats memory p2Stats = pistols.getPlayerStats(user2);
 
         require(p1Stats.draws == 1);
+        require(p1Stats.honor == 10);
+
         require(p2Stats.draws == 1);
+        require(p2Stats.honor == 10);
     }
 }
