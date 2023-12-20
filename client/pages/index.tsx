@@ -7,11 +7,11 @@ import App from '@/pistols/components/App'
 export default function IndexPage() {
 
   return (
-    <App>
+    <App backgroundImage={'/images/bg_duellists_1.jpg'} className='BackgroundFit'>
 
-      <Link href='/gate'>
+      {/* <Link href='/gate'>
         <Image className='Logo' src='/images/logo.png' />
-      </Link>
+      </Link> */}
 
       {/* <SplashArt /> */}
 
@@ -19,9 +19,13 @@ export default function IndexPage() {
       <div className='Spacer20' />
 
       <div className='AlignCenter'>
-        <h3>
-          <a href='https://lootunder.world/pistols'>Pistols at 10 Blocks</a>
-        </h3>
+
+        <Link href='/gate'>
+          <h1>Pistols at 10 Blocks</h1>
+        </Link>
+
+        <br />
+        <hr />
         
         by <a href='https://lootunder.world'>Team Underworld</a>
         <br />

@@ -4,6 +4,7 @@ import AppHeader from '@/pistols/components/AppHeader'
 export default function App({
   title = null,
   backgroundImage = null,
+  className = '',
   children
 }) {
   const style = useMemo(() => (backgroundImage ? {
@@ -11,7 +12,7 @@ export default function App({
     backgroundSize: `cover`,
   } : {}), [backgroundImage])
   return (
-    <div className='App' style={style}>
+    <div className={`App ${className}`} style={style}>
       <AppHeader title={title} />
       {children}
     </div>

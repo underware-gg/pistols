@@ -195,6 +195,12 @@ canvas {
   height: 256px;
 }
 
+.BackgroundFit {
+  background-size: contain!important;
+  background-repeat: no-repeat;
+  background-position-y: center;
+}
+
 .DirectionButton {
   /* margin: 0.25em; */
   font-size: 24px;
