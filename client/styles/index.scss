@@ -4,6 +4,7 @@ $color-important: #f00;
 $color-bg: #f5f5f5;
 $color-panel: #b4b4b4;
 $color-text: #000;
+$color-info: #444;
 $color-active: #e00000;
 $color-inactive: #712727;
 $ui-border: 6px ridge $color-active;
@@ -430,6 +431,38 @@ $box-h: calc((100vh - $aspect-h) / 2);
   // height: calc($ui-height - $ui-row);
   width: 80%;
   margin: auto;
+}
+
+
+.Tooltip {
+	cursor: default; //help;
+}
+.Icon {
+	width: initial !important; // remove width to be able to spin
+	margin: 0 !important;
+	text-shadow: 0.1em 0 $color-panel;
+	color: $color-info;
+}
+.InfoIcon {
+	@extend .Icon;
+	// color: $color-info;
+}
+// Icon click feedback
+.IconClick:active {
+	animation-name: IconClickAnimation;
+	animation-duration: 0.2s;
+	animation-iteration-count: 1;
+	animation-timing-function: ease-out;
+	animation-fill-mode: forwards;
+	-webkit-animation-name: IconClickAnimation;
+	-webkit-animation-duration: 0.2s;
+	-webkit-animation-iteration-count: 1;
+	-webkit-animation-timing-function: ease-out;
+	-webkit-animation-fill-mode: forwards;
+}
+@keyframes IconClickAnimation {
+	from { -webkit-transform: scale(0.7); }
+	to { -webkit-transform: scale(1); }
 }
 
 
