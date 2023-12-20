@@ -28,7 +28,6 @@ struct Game {
 }
 
 struct PlayerStats {
-    bool init;
     uint256 wins;
     uint256 losses;
     uint256 draws;
@@ -130,29 +129,6 @@ contract Pistols {
         uint256 fee = max(Lib.MIN_STAKE, game.stake / 100);
         lordsToken.transfer(owner, fee);
         game.stake -= fee;
-
-        // TODO: Initialization may not be necessary (zeros are automatic).
-        // Check this.
-
-        if (!allPlayerStats[game.player1.addr].init) {
-            allPlayerStats[game.player1.addr] = PlayerStats({
-                init: true,
-                wins: 0,
-                losses: 0,
-                draws: 0,
-                dishonors: 0
-            });
-        }
-
-        if (!allPlayerStats[game.player2.addr].init) {
-            allPlayerStats[game.player2.addr] = PlayerStats({
-                init: true,
-                wins: 0,
-                losses: 0,
-                draws: 0,
-                dishonors: 0
-            });
-        }
 
         game.state = Lib.STATE_SHOOT_STEP_COMMITMENTS;
         game.activityDeadline = block.timestamp + timeout;
