@@ -4,6 +4,7 @@ pragma solidity ^0.8.13;
 import {ERC20} from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import {PistolsLib as Lib} from "./PistolsLib.sol";
 
+// TODO: Move structs to lib
 struct PlayerGameData {
     address addr;
 
@@ -65,6 +66,12 @@ contract Pistols {
 
     function getGame(uint256 gameId) external view returns (Game memory) {
         return games[gameId];
+    }
+
+    function getPlayerStats(
+        address player
+    ) external view returns (PlayerStats memory) {
+        return allPlayerStats[player];
     }
 
     function challenge(
