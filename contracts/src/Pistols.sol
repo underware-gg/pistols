@@ -270,19 +270,19 @@ contract Pistols {
             p1ShootStep == Lib.FULL_STEP_COUNT &&
             p2ShootStep == Lib.FULL_STEP_COUNT
         ) {
-            bool p2Killed = chance(1, 2, game.rand, "p1 shot");
-            bool p1Killed = chance(1, 2, game.rand, "p2 shot");
-            
+            bool p2Killed = chance(20, 100, game.rand, "p1 shot");
+            bool p1Killed = chance(20, 100, game.rand, "p2 shot");
+
             if (p1Killed && p2Killed) {
                 finishGame(gameId, game, Lib.OUTCOME_DRAW);
                 return;
             }
-            
+
             if (p1Killed) {
                 finishGame(gameId, game, Lib.OUTCOME_P2_WIN);
                 return;
             }
-            
+
             if (p2Killed) {
                 finishGame(gameId, game, Lib.OUTCOME_P1_WIN);
                 return;
