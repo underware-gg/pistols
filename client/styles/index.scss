@@ -108,7 +108,10 @@ canvas {
   display: block;
 }
 
-/* GENERIC */
+
+//------------------------
+// GENERIC
+//
 
 .AlignLeft { text-align: left; }
 .AlignCenter { text-align: center; }
@@ -128,6 +131,7 @@ canvas {
 
 .Code {
   font-family: monospace;
+  font-size: 12px;
 }
 
 .Smaller {
@@ -170,16 +174,6 @@ canvas {
   -webkit-filter: grayscale(1); /* Old WebKit */
 }
 
-.App {
-	// font-family: $ec-font-titles;
-	min-width: 100vw;
-	min-height: 100vh;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-}
-
 .FillParent {
   width: 100%;
   height: 100%;
@@ -199,7 +193,70 @@ canvas {
 	// text-align: center;
 }
 
-/* UNDERDARK  GENERIC */
+
+
+//------------------------
+// ASPECT RATIO
+//
+$aspect: 1.7777;
+$aspect-w: min(100vw,100vh*$aspect);
+$aspect-h: min(100vw/$aspect,100vh);
+$box-w: calc((100vw - $aspect-w) / 2);
+$box-h: calc((100vh - $aspect-h) / 2);
+.AspectContent {
+	// background-color: #f004;
+	position: absolute;
+	top: $box-h !important;		// center frame to offset box
+	left: $box-w !important;	// center frame to offset box
+	width: $aspect-w;
+	height: $aspect-h;
+  border: #0001 1px solid;
+}
+.AspectLeft, .AspectRight, .AspectTop, .AspectBottom {
+	// background-color: #f0f8;
+	position: absolute;
+	z-index: 100;
+}
+.AspectLeft, .AspectRight {
+	width: $box-w;
+	min-width: 0px;
+	min-height: 100vh;
+	top: 0;
+}
+.AspectLeft {
+	left: 0;
+}
+.AspectRight {
+	right: 0;
+}
+.AspectTop, .AspectBottom {
+	height: $box-h;
+	min-height: 0px;
+	min-width: 100vw;
+	left: 0;
+}
+.AspectTop {
+	top: 0;
+}
+.AspectBottom {
+	bottom: 0;
+}
+
+
+//------------------------
+// GAME
+//
+
+.App {
+	// font-family: $ec-font-titles;
+	min-width: 100vw;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+  position: relative;
+}
 
 .Logo {
   width: 256px;
@@ -214,6 +271,11 @@ canvas {
 
 .ProfilePic {
   pointer-events: none;
+}
+.ProfilePicSquare {
+  @extend .ProfilePic;
+  width: 35px;
+  height: 35px;
 }
 
 .DirectionButton {
@@ -401,3 +463,10 @@ canvas {
   background: rgb(255, 255, 255);
   color: $color-text;
 }
+.ui.grid>.row {
+  padding: 0.25rem 0; // original: 1.0rem 0
+}
+.ui.grid>.row>.column {
+  padding: 0 0.25rem; // original: 1.0rem 0
+}
+

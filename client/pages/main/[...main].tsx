@@ -4,6 +4,7 @@ import AppDojo from '@/pistols/components/AppDojo'
 import Gate from '@/pistols/components/Gate'
 import Tavern from '@/pistols/components/Tavern'
 import GameContainer from '@/pistols/components/GameContainer'
+import Background from '@/pistols/components/Background'
 
 export default function MainPage() {
   const router = useRouter()
@@ -60,8 +61,10 @@ export default function MainPage() {
 
   return (
     <AppDojo title={title} backgroundImage={backgroundImage}>
-      {_atGate && <Gate />}
-      {_atTavern && <Tavern />}
+      <Background>
+        {_atGate && <Gate />}
+        {_atTavern && <Tavern />}
+      </Background>
       <GameContainer
         isPlaying={false}
         duelId={duelId}

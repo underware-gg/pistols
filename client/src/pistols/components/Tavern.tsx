@@ -12,7 +12,7 @@ function Tavern() {
 
       <div className='AlignCenter'>
         <h1>The Tavern</h1>
-        <h2>Where honorable gentlement meet</h2>
+        <h2>Where honorable gentlemen meet</h2>
       </div>
       <br />
 

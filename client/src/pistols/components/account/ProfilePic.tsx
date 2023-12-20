@@ -10,7 +10,7 @@ export function ProfilePicSquare({
   profilePic,
 }) {
   const url = useMemo(() => _makeUrl(profilePic, 'sq'), [profilePic])
-  return profilePic ? <Image src={url} className='ProfilePic' /> : <></>
+  return profilePic ? <Image src={url} className='ProfilePicSquare' /> : <></>
 }
 
 export function ProfilePicButton({
@@ -25,5 +25,5 @@ export function ProfilePicButton({
     const nextProfilePic = profilePic < profilePicCount ? profilePic + 1 : 1
     onSelect(nextProfilePic)
   }
-  return profilePic ? <Image src={url} className={`ProfilePic ${!disabled ? `Anchor` : 'Grayscale'}`} onClick={() => _click()} /> : <></>
+  return profilePic ? <Image src={url} className={`ProfilePicSquare ${!disabled ? `Anchor` : 'Grayscale'}`} onClick={() => _click()} /> : <></>
 }

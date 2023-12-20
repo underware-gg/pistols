@@ -7,7 +7,7 @@ const Col = Grid.Column
 
 export default function Gate() {
   return (
-    <>
+    <div>
       <div className='AlignCenter'>
         <h1>Identify yourself!</h1>
       </div>
@@ -17,7 +17,6 @@ export default function Gate() {
         <AccountsList />
         <br />
       </Container>
-      <br />
-    </>
+    </div>
   )
 }
