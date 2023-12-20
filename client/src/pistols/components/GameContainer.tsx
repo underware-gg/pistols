@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { useGameplayContext } from '../hooks/GameplayContext'
+import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { loadAudioAssets, isAudioAssetsLoaded } from '@/pistols/data/assets'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import GameView from '@/pistols/components/GameView'

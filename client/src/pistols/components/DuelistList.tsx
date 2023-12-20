@@ -5,13 +5,13 @@ import { useDojoAccount } from '@/dojo/DojoContext'
 import { useChallengesByDuelist } from '@/pistols/hooks/useChallenge'
 import { useAllDuelistIds, useDuelist } from '@/pistols/hooks/useDuelist'
 import { AccountShort } from '@/pistols/components/ui/Account'
-import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { ProfilePicSquare } from './account/ProfilePic'
-import { usePistolsContext } from '../hooks/PistolsContext'
+import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
+import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 
 const Row = Grid.Row
 const Col = Grid.Column
-const Cell = Table.HeaderCell
+const Cell = Table.Cell
+const HeaderCell = Table.HeaderCell
 
 export default function DuelistList() {
   const { account } = useDojoAccount()
@@ -30,14 +30,14 @@ export default function DuelistList() {
     <Table selectable className='Faded' color='red'>
       <Table.Header>
         <Table.Row textAlign='center' verticalAlign='middle'>
-          <Cell width={3}></Cell>
-          <Cell width={1}></Cell>
-          <Cell textAlign='left'>Duelist</Cell>
-          <Cell width={2}>Honor</Cell>
-          <Cell width={1}>Wins</Cell>
-          <Cell width={1}>Losses</Cell>
-          <Cell width={1}>Draws</Cell>
-          <Cell width={1}>Total</Cell>
+          <HeaderCell width={3}></HeaderCell>
+          <HeaderCell width={1}></HeaderCell>
+          <HeaderCell textAlign='left'>Duelist</HeaderCell>
+          <HeaderCell width={2}>Honor</HeaderCell>
+          <HeaderCell width={1}>Wins</HeaderCell>
+          <HeaderCell width={1}>Losses</HeaderCell>
+          <HeaderCell width={1}>Draws</HeaderCell>
+          <HeaderCell width={1}>Total</HeaderCell>
         </Table.Row>
       </Table.Header>
 
@@ -70,37 +70,37 @@ function DuelistItem({
 
   return (
     <Table.Row textAlign='center' verticalAlign='middle' onClick={() => dispatchSetDuelist(address)}>
-      <Table.Cell>
+      <Cell>
         <AccountShort address={address} />
-      </Table.Cell>
+      </Cell>
       
-      <Table.Cell>
+      <Cell>
         <ProfilePicSquare profilePic={profilePic} />
-      </Table.Cell>
+      </Cell>
 
-      <Table.Cell textAlign='left'>
+      <Cell textAlign='left'>
         {name}
-      </Table.Cell>
+      </Cell>
 
-      <Table.Cell>
+      <Cell>
         10.0
-      </Table.Cell>
+      </Cell>
 
-      <Table.Cell>
+      <Cell>
         {winCount}
-      </Table.Cell>
+      </Cell>
 
-      <Table.Cell>
+      <Cell>
         {loseCount}
-      </Table.Cell>
+      </Cell>
 
-      <Table.Cell>
+      <Cell>
         {drawCount}
-      </Table.Cell>
+      </Cell>
 
-      <Table.Cell>
+      <Cell>
         {challengeCount}
-      </Table.Cell>
+      </Cell>
     </Table.Row>
   )
 }

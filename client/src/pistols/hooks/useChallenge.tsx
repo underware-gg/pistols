@@ -2,7 +2,7 @@ import { useMemo } from "react"
 import { Entity, HasValue, Has, getComponentValue } from '@dojoengine/recs'
 import { useComponentValue, useEntityQuery } from "@dojoengine/react"
 import { useDojoComponents } from '@/dojo/DojoContext'
-import { bigintToEntity, feltToString } from "../utils/utils"
+import { bigintToEntity, bigintToHex, feltToString } from "../utils/utils"
 import { ChallengeState } from "../utils/pistols"
 
 //-----------------------------
@@ -26,6 +26,7 @@ export const useAllChallengeIds = () => {
 export const useChallenge = (duelId: bigint | string) => {
   const { Challenge } = useDojoComponents()
   const challenge: any = useComponentValue(Challenge, bigintToEntity(duelId))
+  console.log(bigintToHex(duelId), challenge)
 
   const state = useMemo(() => (challenge?.state ?? null), [challenge])
   const duelistA = useMemo(() => BigInt(challenge?.duelist_a ?? 0), [challenge])

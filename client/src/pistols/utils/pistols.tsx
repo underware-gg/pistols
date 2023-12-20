@@ -1,6 +1,7 @@
 
 //
 // must be in sync with challenge.cairo
+// (CHALLENGE_STATE)
 //
 export enum ChallengeState {
   Null,

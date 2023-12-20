@@ -6,8 +6,8 @@ import { useChallengesByDuelist } from '@/pistols/hooks/useChallenge'
 import { useAllDuelistIds, useDuelist } from '@/pistols/hooks/useDuelist'
 import { AccountShort } from '@/pistols/components/ui/Account'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { ProfilePic } from './account/ProfilePic'
-import { usePistolsContext } from '../hooks/PistolsContext'
+import { ProfilePic } from '@/pistols/components/account/ProfilePic'
+import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 
 const Row = Grid.Row
 const Col = Grid.Column

@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { CopyIcon } from './Icons'
+import { CopyIcon } from '@/pistols/components/ui/Icons'
 import { bigintToHex } from '@/pistols/utils/utils'
 
 const shortAddress = (address) => (!address ? '?' : `${address.slice(0, 6)}…${address.slice(-4)}`)

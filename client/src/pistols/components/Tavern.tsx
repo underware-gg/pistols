@@ -1,9 +1,10 @@
 import React, { useMemo, useState } from 'react'
 import { Container, Grid, Menu } from 'semantic-ui-react'
-import { usePistolsContext, menuItems } from '../hooks/PistolsContext'
-import AccountHeader from './account/AccountHeader'
-import DuelistList from './DuelistList'
-import DuelistModal from './DuelistModal'
+import { usePistolsContext, menuItems } from '@/pistols/hooks/PistolsContext'
+import AccountHeader from '@/pistols/components/account/AccountHeader'
+import DuelistList from '@/pistols/components/DuelistList'
+import DuelistModal from '@/pistols/components/DuelistModal'
+import DuelList from '@/pistols/components/DuelList'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -22,6 +23,7 @@ export default function Tavern() {
       </div>
 
       <Container text className=''>
+        {atDuels && <DuelList />}
         {atDuelists && <DuelistList />}
         <DuelistModal />
       </Container>

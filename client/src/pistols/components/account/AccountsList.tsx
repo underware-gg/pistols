@@ -7,7 +7,7 @@ import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
 import { useAllDuelistIds, useDuelist } from '@/pistols/hooks/useDuelist'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
-import { ProfilePicButton } from './ProfilePic'
+import { ProfilePicButton } from '@/pistols/components/account/ProfilePic'
 
 const Row = Grid.Row
 const Col = Grid.Column

@@ -511,7 +511,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 .ui.secondary.menu .active.item {
   background-color: rgba($color-bg, 0.5);
   color: $color-important;
-  font-family: $font-family;
+  // font-family: $font-family;
   // font-size: 16px;
   // font-weight: 600;
 }
