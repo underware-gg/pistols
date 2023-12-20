@@ -411,6 +411,8 @@ contract Pistols {
             revert("Only players can submit battle choice reveals");
         }
 
+        game.rand |= salt;
+
         if (
             game.player1.battleChoice != UNSET &&
             game.player2.battleChoice != UNSET
@@ -436,27 +438,27 @@ contract Pistols {
 
         if (p1BattleChoice == BATTLE_CHOICE_LIGHT_HIT) {
             if (p2BattleChoice == BATTLE_CHOICE_LIGHT_HIT) {
-                PlayerGameData storage injuredPlayer = (
-                    chance(1, 2, game.rand, "battle")
-                        ? game.player1
-                        : game.player2
-                );
-
-                injuredPlayer.health--;
+                game.player1.health--;
+                game.player2.health--;
             } else if (p2BattleChoice == BATTLE_CHOICE_HEAVY_HIT) {
                 game.player2.health--;
+
+                if (game.player2.health > 0) {
+                    game.player1.health -= 2;
+                }
             } else if (p2BattleChoice == BATTLE_CHOICE_BLOCK) {
                 // Nothing (successful block)
             }
         } else if (p1BattleChoice == BATTLE_CHOICE_HEAVY_HIT) {
             if (p2BattleChoice == BATTLE_CHOICE_LIGHT_HIT) {
                 game.player1.health--;
-            } else if (p2BattleChoice == BATTLE_CHOICE_HEAVY_HIT) {
-                if (chance(1, 2, game.rand, "battle")) {
-                    game.player1.health -= 2;
-                } else {
+
+                if (game.player1.health > 0) {
                     game.player2.health -= 2;
                 }
+            } else if (p2BattleChoice == BATTLE_CHOICE_HEAVY_HIT) {
+                game.player1.health -= 2;
+                game.player2.health -= 2;
             } else if (p2BattleChoice == BATTLE_CHOICE_BLOCK) {
                 game.player2.health -= 2;
             }
