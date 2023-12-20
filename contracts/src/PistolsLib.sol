@@ -24,4 +24,33 @@ library PistolsLib {
     uint256 constant OUTCOME_DRAW = 0;
     uint256 constant OUTCOME_P1_WIN = 1;
     uint256 constant OUTCOME_P2_WIN = 2;
+
+    struct PlayerGameData {
+        address addr;
+
+        bytes32 shootStepCommitment;
+        uint256 shootStep;
+
+        bytes32 battleChoiceCommitment;
+        uint256 battleChoice;
+
+        int256 health;
+    }
+
+    struct Game {
+        uint256 state;
+        uint256 stake;
+        uint256 activityDeadline;
+        bytes32 rand;
+
+        PlayerGameData player1;
+        PlayerGameData player2;
+    }
+
+    struct PlayerStats {
+        uint256 wins;
+        uint256 losses;
+        uint256 draws;
+        uint256 honor;
+    }
 }

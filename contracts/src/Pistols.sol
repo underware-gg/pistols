@@ -4,36 +4,6 @@ pragma solidity ^0.8.13;
 import {ERC20} from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import {PistolsLib as Lib} from "./PistolsLib.sol";
 
-// TODO: Move structs to lib
-struct PlayerGameData {
-    address addr;
-
-    bytes32 shootStepCommitment;
-    uint256 shootStep;
-
-    bytes32 battleChoiceCommitment;
-    uint256 battleChoice;
-
-    int256 health;
-}
-
-struct Game {
-    uint256 state;
-    uint256 stake;
-    uint256 activityDeadline;
-    bytes32 rand;
-
-    PlayerGameData player1;
-    PlayerGameData player2;
-}
-
-struct PlayerStats {
-    uint256 wins;
-    uint256 losses;
-    uint256 draws;
-    uint256 honor;
-}
-
 contract Pistols {
     address public owner;
     ERC20 public lordsToken;
@@ -41,8 +11,8 @@ contract Pistols {
     uint256 public timeout;
 
     uint256 public nextGameId = 0;
-    mapping(uint256 => Game) games;
-    mapping(address => PlayerStats) public allPlayerStats;
+    mapping(uint256 => Lib.Game) games;
+    mapping(address => Lib.PlayerStats) public allPlayerStats;
 
     event GameCreated(
         uint256 gameId,
@@ -63,13 +33,13 @@ contract Pistols {
         timeout = _timeout;
     }
 
-    function getGame(uint256 gameId) external view returns (Game memory) {
+    function getGame(uint256 gameId) external view returns (Lib.Game memory) {
         return games[gameId];
     }
 
     function getPlayerStats(
         address player
-    ) external view returns (PlayerStats memory) {
+    ) external view returns (Lib.PlayerStats memory) {
         return allPlayerStats[player];
     }
 
@@ -83,12 +53,12 @@ contract Pistols {
         uint256 gameId = nextGameId;
         nextGameId++;
 
-        games[gameId] = Game({
+        games[gameId] = Lib.Game({
             state: Lib.STATE_CHALLENGE,
             activityDeadline: block.timestamp + timeout,
             stake: stake,
             rand: 0,
-            player1: PlayerGameData({
+            player1: Lib.PlayerGameData({
                 addr: msg.sender,
                 shootStepCommitment: bytes32(Lib.UNSET),
                 shootStep: Lib.UNSET,
@@ -96,7 +66,7 @@ contract Pistols {
                 battleChoice: Lib.UNSET,
                 health: 2
             }),
-            player2: PlayerGameData({
+            player2: Lib.PlayerGameData({
                 addr: challengee,
                 shootStepCommitment: bytes32(Lib.UNSET),
                 shootStep: Lib.UNSET,
@@ -111,7 +81,7 @@ contract Pistols {
     }
 
     function acceptChallenge(uint256 gameId) external {
-        Game storage game = games[gameId];
+        Lib.Game storage game = games[gameId];
         requireNotTimedOut(game);
 
         require(
@@ -136,7 +106,7 @@ contract Pistols {
     }
 
     function commitShootStep(uint256 gameId, bytes32 commitment) external {
-        Game storage game = games[gameId];
+        Lib.Game storage game = games[gameId];
         requireNotTimedOut(game);
 
         require(
@@ -182,7 +152,7 @@ contract Pistols {
         bytes32 salt,
         uint256 shootStep
     ) external {
-        Game storage game = games[gameId];
+        Lib.Game storage game = games[gameId];
         requireNotTimedOut(game);
 
         require(
@@ -238,7 +208,7 @@ contract Pistols {
     }
 
     function shootout(uint256 gameId) external {
-        Game storage game = games[gameId];
+        Lib.Game storage game = games[gameId];
         requireNotTimedOut(game);
 
         require(
@@ -298,7 +268,7 @@ contract Pistols {
     }
 
     function commitBattleChoice(uint256 gameId, bytes32 commitment) external {
-        Game storage game = games[gameId];
+        Lib.Game storage game = games[gameId];
         requireNotTimedOut(game);
 
         require(
@@ -344,7 +314,7 @@ contract Pistols {
         bytes32 salt,
         uint256 battleChoice
     ) external {
-        Game storage game = games[gameId];
+        Lib.Game storage game = games[gameId];
         requireNotTimedOut(game);
 
         require(
@@ -402,7 +372,7 @@ contract Pistols {
     }
 
     function battle(uint256 gameId) external {
-        Game storage game = games[gameId];
+        Lib.Game storage game = games[gameId];
         requireNotTimedOut(game);
 
         require(
@@ -466,7 +436,7 @@ contract Pistols {
 
     function finishGame(
         uint256 gameId,
-        Game storage game,
+        Lib.Game storage game,
         uint256 outcome
     ) internal {
         if (outcome == Lib.OUTCOME_DRAW) {
@@ -495,7 +465,7 @@ contract Pistols {
     }
 
     function finishTimedOutGame(uint256 gameId) external {
-        Game storage game = games[gameId];
+        Lib.Game storage game = games[gameId];
         requireTimedOut(game);
 
         require(game.state != Lib.STATE_EMPTY, "Game does not exist");
@@ -562,14 +532,14 @@ contract Pistols {
         return Lib.OUTCOME_DRAW;
     }
 
-    function requireNotTimedOut(Game storage game) internal view {
+    function requireNotTimedOut(Lib.Game storage game) internal view {
         require(
             block.timestamp < game.activityDeadline,
             "Game has timed out"
         );
     }
 
-    function requireTimedOut(Game storage game) internal view {
+    function requireTimedOut(Lib.Game storage game) internal view {
         require(
             block.timestamp >= game.activityDeadline,
             "Game has not timed out"
