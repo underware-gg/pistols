@@ -4,6 +4,13 @@ pragma solidity ^0.8.13;
 import {ERC20} from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import {PistolsLib as Lib} from "./PistolsLib.sol";
 
+// TODOs
+// - Chance of kill when firing early (increase with each pace)
+// - Chance of injury when firing early should be higher when earlier
+// - If not killed by early fire, should still fire back
+// - Early shooter has option to flee (draw but dishonor)
+// - Proceeding with blades (battle) should not be mandatory
+
 contract Pistols {
     address public owner;
     ERC20 public lordsToken;
