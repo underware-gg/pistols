@@ -27,10 +27,8 @@ export default function AccountHeader({
     <div className='AccountHeader'>
       <Grid>
         <Row textAlign='center' verticalAlign='middle'>
-          <Col width={12} textAlign='right'>
+          <Col width={15} textAlign='right'>
             <h3>{isMasterAccount ? 'MASTER ACCOUNT' : name}</h3>
-          </Col>
-          <Col width={3}>
             <AccountShort address={account?.address} />
           </Col>
           <Col width={1}>

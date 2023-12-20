@@ -45,15 +45,15 @@ export function AccountsList() {
         {rows}
         <Row textAlign='center' columns={'equal'}>
           <Col>
-            <ActionButton disabled={isDeploying} onClick={() => create()} label='CREATE ACCOUNT' />
+            <ActionButton fill disabled={isDeploying} onClick={() => create()} label='CREATE ACCOUNT' />
           </Col>
           <Col>
-            <ActionButton disabled={isDeploying} onClick={() => clear()} label='DELETE ALL ACCOUNTS (+refresh)' />
+            <ActionButton fill disabled={isDeploying} onClick={() => clear()} label='DELETE ALL ACCOUNTS (+refresh)' />
           </Col>
         </Row>
       </Grid>
       <br />
-      <ActionButton large disabled={!canEnter} onClick={() => router.push('/tavern')} label='ENTER THE TAVERN' />
+      <ActionButton fill large disabled={!canEnter} onClick={() => router.push('/tavern')} label='ENTER THE TAVERN' />
     </>
   )
 }
@@ -124,7 +124,7 @@ function AccountItem({
           // icon='edit'
           label='burner'
           labelPosition='right'
-          maxLength={30}
+          maxLength={31}
           placeholder={'PLAYER NAME'}
           value={inputValue ?? ''}
           onChange={(e) => setInputValue(e.target.value)}

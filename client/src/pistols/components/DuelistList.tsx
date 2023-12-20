@@ -1,17 +1,19 @@
 import React, { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { Grid, Radio, Input } from 'semantic-ui-react'
+import { Grid, Table } from 'semantic-ui-react'
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { useChallengesByDuelist } from '@/pistols/hooks/useChallenge'
 import { useAllDuelistIds, useDuelist } from '@/pistols/hooks/useDuelist'
 import { AccountShort } from '@/pistols/components/ui/Account'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ProfilePicSquare } from './account/ProfilePic'
+import { usePistolsContext } from '../hooks/PistolsContext'
 
 const Row = Grid.Row
 const Col = Grid.Column
+const Cell = Table.HeaderCell
 
-export function DuelistList() {
+export default function DuelistList() {
   const { account } = useDojoAccount()
   const { duelistIds } = useAllDuelistIds()
 
@@ -21,47 +23,38 @@ export function DuelistList() {
       const isYou = (duelistId == BigInt(account.address))
       result.push(<DuelistItem key={duelistId} address={duelistId} index={index} isYou={isYou} />)
     })
-    if (result.length == 0) {
-      result.push(
-        <Row key='empty' textAlign='center' columns={'equal'}>
-          <Col>no duelists to see</Col>
-        </Row>
-      )
-    }
     return result
   }, [duelistIds])
 
   return (
-    <>
-      <Grid className='Faded'>
-        <Row textAlign='center' verticalAlign='middle' color='red'>
-          <Col width={3}>
-            <b>Account</b>
-          </Col>
-          <Col width={1}>
-          </Col>
-          <Col width={6}>
-            <b>Name</b>
-          </Col>
-          <Col width={2}>
-            <b>Honor</b>
-          </Col>
-          <Col width={1}>
-            <b>Wins</b>
-          </Col>
-          <Col width={1}>
-            <b>Losses</b>
-          </Col>
-          <Col width={1}>
-            <b>Draws</b>
-          </Col>
-          <Col width={1}>
-            <b>Total</b>
-          </Col>
-        </Row>
-        {rows}
-      </Grid>
-    </>
+    <Table selectable className='Faded' color='red'>
+      <Table.Header>
+        <Table.Row textAlign='center' verticalAlign='middle'>
+          <Cell width={3}></Cell>
+          <Cell width={1}></Cell>
+          <Cell textAlign='left'>Duelist</Cell>
+          <Cell width={2}>Honor</Cell>
+          <Cell width={1}>Wins</Cell>
+          <Cell width={1}>Losses</Cell>
+          <Cell width={1}>Draws</Cell>
+          <Cell width={1}>Total</Cell>
+        </Table.Row>
+      </Table.Header>
+
+      {rows.length > 0 ?
+        <Table.Body>
+          {rows}
+        </Table.Body>
+        :
+        <Table.Footer fullWidth>
+          <Table.Row>
+            <Cell colSpan='100%' textAlign='center'>
+              no duelists here
+            </Cell>
+          </Table.Row>
+        </Table.Footer>
+      }
+    </Table>
   )
 }
 
@@ -73,34 +66,42 @@ function DuelistItem({
 }) {
   const { name, profilePic } = useDuelist(address)
   const { challengeCount, drawCount, winCount, loseCount } = useChallengesByDuelist(address)
+  const { dispatchSetDuelist } = usePistolsContext()
 
   return (
-    <Row textAlign='center' verticalAlign='middle'>
-      <Col width={3}>
+    <Table.Row textAlign='center' verticalAlign='middle' onClick={() => dispatchSetDuelist(address)}>
+      <Table.Cell>
         <AccountShort address={address} />
-      </Col>
-      <Col width={1} className='NoPadding'>
+      </Table.Cell>
+      
+      <Table.Cell>
         <ProfilePicSquare profilePic={profilePic} />
-      </Col>
-      <Col width={6} textAlign='left'>
+      </Table.Cell>
+
+      <Table.Cell textAlign='left'>
         {name}
-      </Col>
-      <Col width={2}>
-        100%
-      </Col>
-      <Col width={1}>
+      </Table.Cell>
+
+      <Table.Cell>
+        10.0
+      </Table.Cell>
+
+      <Table.Cell>
         {winCount}
-      </Col>
-      <Col width={1}>
+      </Table.Cell>
+
+      <Table.Cell>
         {loseCount}
-      </Col>
-      <Col width={1}>
+      </Table.Cell>
+
+      <Table.Cell>
         {drawCount}
-      </Col>
-      <Col width={1}>
+      </Table.Cell>
+
+      <Table.Cell>
         {challengeCount}
-      </Col>
-    </Row>
+      </Table.Cell>
+    </Table.Row>
   )
 }
 

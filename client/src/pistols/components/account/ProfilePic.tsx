@@ -6,6 +6,13 @@ const _makeUrl = (profilePic, suffix) => {
   return `/profiles/${('00' + profilePic).slice(-2)}_${suffix}.jpg`
 }
 
+export function ProfilePic({
+  profilePic,
+}) {
+  const url = useMemo(() => _makeUrl(profilePic, 'a'), [profilePic])
+  return profilePic ? <Image src={url} className='ProfilePic' /> : <></>
+}
+
 export function ProfilePicSquare({
   profilePic,
 }) {

@@ -27,6 +27,7 @@
       "**/database.json": true,
       "**/generated/*": true,
       "**/manifest.json": true,
+      "/client/public/**": true,
     },
     "typescript.validate.enable": true,
     "editor.detectIndentation": false,

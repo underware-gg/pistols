@@ -1,14 +1,15 @@
 import React, { useMemo, useState } from 'react'
 import { Container, Grid, Menu } from 'semantic-ui-react'
+import { usePistolsContext, menuItems } from '../hooks/PistolsContext'
 import AccountHeader from './account/AccountHeader'
-import { DuelistList } from './DuelistList'
-import { menuItems, usePistolsContext } from '../hooks/PistolsContext'
+import DuelistList from './DuelistList'
+import DuelistModal from './DuelistModal'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export default function Tavern() {
-  const { menuItem } = usePistolsContext()
+  const { menuItem, atDuels, atDuelists } = usePistolsContext()
 
   return (
     <>
@@ -20,12 +21,9 @@ export default function Tavern() {
         <h2>of Honorable Lords 👑</h2>
       </div>
 
-      <Container>
-
-        <Container text className=''>
-          <DuelistList />
-        </Container>
-
+      <Container text className=''>
+        {atDuelists && <DuelistList />}
+        <DuelistModal />
       </Container>
     </>
   )
@@ -38,7 +36,7 @@ function TavernMenu({
 
   const items = useMemo(() => {
     let result = []
-    menuItems.forEach(item => {
+    Object.values(menuItems).forEach(item => {
       result.push(
         <Menu.Item
           key={item}

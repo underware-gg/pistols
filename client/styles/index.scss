@@ -125,7 +125,9 @@ canvas {
 .Padded { padding: 0.5em!important; }
 .NoMargin { margin: 0!important }
 .NoBorder { border: 0!important }
+
 .Block { display: inline-block; }
+.Flex { display: flex; }
 
 .NoMouse { pointer-events: none; }
 .YesMouse { pointer-events: auto; }
@@ -274,6 +276,8 @@ $box-h: calc((100vh - $aspect-h) / 2);
 
 .ProfilePic {
   pointer-events: none;
+  width: calc(439px / 2);
+  height: calc(768px / 2);
 }
 .ProfilePicSquare {
   @extend .ProfilePic;
@@ -507,4 +511,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 .ui.secondary.menu .active.item {
   background-color: rgba($color-bg, 0.5);
   color: $color-important;
+  font-family: $font-family;
+  // font-size: 16px;
+  // font-weight: 600;
 }

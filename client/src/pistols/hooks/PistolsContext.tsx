@@ -9,18 +9,20 @@ import React, { ReactNode, createContext, useReducer, useContext } from 'react'
 // Constants
 //
 
-export const menuItems = [
-  'Duels',
-  'Duelists',
-  'Scoreboard',
-]
+export const menuItems = {
+  Duels: 'Duels',
+  Duelists: 'Duelists',
+  Scoreboard: 'Scoreboard',
+}
 
 export const initialState = {
+  duelistAddress: 0n,
   duelId: 0n,
-  menuItem: menuItems[0],
+  menuItem: menuItems.Duels,
 }
 
 const PistolsActions = {
+  SET_DUELIST: 'SET_DUELIST',
   SET_DUEL: 'SET_DUEL',
   SET_MENU_ITEM: 'SET_MENU_ITEM',
 }
@@ -30,11 +32,13 @@ const PistolsActions = {
 // Types
 //
 type PistolsContextStateType = {
+  duelistAddress: bigint
   duelId: bigint
   menuItem: string
 }
 
 type ActionType =
+  | { type: 'SET_DUELIST', payload: bigint }
   | { type: 'SET_DUEL', payload: bigint }
   | { type: 'SET_MENU_ITEM', payload: string }
 
@@ -63,12 +67,18 @@ const PistolsProvider = ({
   const [state, dispatch] = useReducer((state: PistolsContextStateType, action: ActionType) => {
     let newState = { ...state }
     switch (action.type) {
+      case PistolsActions.SET_DUELIST: {
+        newState.duelistAddress = action.payload as bigint
+        break
+      }
       case PistolsActions.SET_DUEL: {
         newState.duelId = action.payload as bigint
         break
       }
       case PistolsActions.SET_MENU_ITEM: {
         newState.menuItem = action.payload as string
+        newState.duelistAddress = 0n
+        newState.duelId = 0n
         break
       }
       default:
@@ -94,6 +104,12 @@ export { PistolsProvider, PistolsContext, PistolsActions }
 
 export const usePistolsContext = () => {
   const { state, dispatch } = useContext(PistolsContext)
+  const dispatchSetDuelist = (address) => {
+    dispatch({
+      type: PistolsActions.SET_DUELIST,
+      payload: address,
+    })
+  }
   const dispatchSetDuel = (duelId) => {
     dispatch({
       type: PistolsActions.SET_DUEL,
@@ -108,10 +124,16 @@ export const usePistolsContext = () => {
   }
   return {
     ...state,
+    atDuelists: (state.menuItem == menuItems.Duelists),
+    atDuels: (state.menuItem == menuItems.Duels),
+    atScoreboard: (state.menuItem == menuItems.Scoreboard),
     // PistolsActions,
     // dispatch,
+    dispatchSetDuelist,
     dispatchSetDuel,
     dispatchSetMenuItem,
+    dispatchSetMenuDuels: () => dispatchSetMenuItem(menuItems.Duels),
+    dispatchSetMenuDuelists: () => dispatchSetMenuItem(menuItems.Duelists),
   }
 }
 
