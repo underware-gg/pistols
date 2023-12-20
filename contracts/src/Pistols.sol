@@ -14,15 +14,6 @@ contract Pistols {
     mapping(uint256 => Lib.Game) games;
     mapping(address => Lib.PlayerStats) public allPlayerStats;
 
-    event GameCreated(
-        uint256 gameId,
-        address indexed challenger,
-        address indexed challengee
-    );
-    event GameUpdated(uint256 gameId);
-    event AssertionFailed(string message);
-    event Dishonor(uint256 gameId, address indexed player);
-
     constructor(
         address _owner,
         ERC20 _lordsToken,
@@ -76,7 +67,7 @@ contract Pistols {
             })
         });
 
-        emit GameCreated(gameId, msg.sender, challengee);
+        emit Lib.GameCreated(gameId, msg.sender, challengee);
         return gameId;
     }
 
@@ -102,7 +93,7 @@ contract Pistols {
 
         game.state = Lib.STATE_SHOOT_STEP_COMMITMENTS;
         game.activityDeadline = block.timestamp + timeout;
-        emit GameUpdated(gameId);
+        emit Lib.GameUpdated(gameId);
     }
 
     function commitShootStep(uint256 gameId, bytes32 commitment) external {
@@ -144,7 +135,7 @@ contract Pistols {
         }
 
         game.activityDeadline = block.timestamp + timeout;
-        emit GameUpdated(gameId);
+        emit Lib.GameUpdated(gameId);
     }
 
     function revealShootStep(
@@ -204,7 +195,7 @@ contract Pistols {
         }
 
         game.activityDeadline = block.timestamp + timeout;
-        emit GameUpdated(gameId);
+        emit Lib.GameUpdated(gameId);
     }
 
     function shootout(uint256 gameId) external {
@@ -248,7 +239,7 @@ contract Pistols {
                 p1ShootStep <= p2ShootStep &&
                 chance(p1ShootStep, 10, game.rand, "p1 shot")
             ) {
-                emit Dishonor(gameId, game.player1.addr);
+                emit Lib.Dishonor(gameId, game.player1.addr);
                 game.player2.health--;
             }
 
@@ -256,7 +247,7 @@ contract Pistols {
                 p2ShootStep <= p1ShootStep &&
                 chance(p2ShootStep, 10, game.rand, "p2 shot")
             ) {
-                emit Dishonor(gameId, game.player2.addr);
+                emit Lib.Dishonor(gameId, game.player2.addr);
                 game.player1.health--;
             }
         }
@@ -264,7 +255,7 @@ contract Pistols {
         game.state = Lib.STATE_BATTLE_CHOICE_COMMITMENTS;
 
         game.activityDeadline = block.timestamp + timeout;
-        emit GameUpdated(gameId);
+        emit Lib.GameUpdated(gameId);
     }
 
     function commitBattleChoice(uint256 gameId, bytes32 commitment) external {
@@ -306,7 +297,7 @@ contract Pistols {
         }
 
         game.activityDeadline = block.timestamp + timeout;
-        emit GameUpdated(gameId);
+        emit Lib.GameUpdated(gameId);
     }
 
     function revealBattleChoice(
@@ -368,7 +359,7 @@ contract Pistols {
         }
 
         game.activityDeadline = block.timestamp + timeout;
-        emit GameUpdated(gameId);
+        emit Lib.GameUpdated(gameId);
     }
 
     function battle(uint256 gameId) external {
@@ -461,7 +452,7 @@ contract Pistols {
         }
 
         delete games[gameId];
-        emit GameUpdated(gameId);
+        emit Lib.GameUpdated(gameId);
     }
 
     function finishTimedOutGame(uint256 gameId) external {
@@ -503,9 +494,9 @@ contract Pistols {
         }
 
         if (outcome == 1) {
-            emit Dishonor(gameId, game.player2.addr);
+            emit Lib.Dishonor(gameId, game.player2.addr);
         } else if (outcome == 2) {
-            emit Dishonor(gameId, game.player1.addr);
+            emit Lib.Dishonor(gameId, game.player1.addr);
         }
 
         finishGame(gameId, game, outcome);
@@ -527,7 +518,7 @@ contract Pistols {
             return Lib.OUTCOME_P1_WIN;
         }
 
-        emit AssertionFailed("State should have progressed");
+        emit Lib.AssertionFailed("State should have progressed");
 
         return Lib.OUTCOME_DRAW;
     }

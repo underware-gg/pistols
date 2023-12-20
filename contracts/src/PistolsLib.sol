@@ -25,6 +25,15 @@ library PistolsLib {
     uint256 constant OUTCOME_P1_WIN = 1;
     uint256 constant OUTCOME_P2_WIN = 2;
 
+    event GameCreated(
+        uint256 gameId,
+        address indexed challenger,
+        address indexed challengee
+    );
+    event GameUpdated(uint256 gameId);
+    event AssertionFailed(string message);
+    event Dishonor(uint256 gameId, address indexed player);
+
     struct PlayerGameData {
         address addr;
 
