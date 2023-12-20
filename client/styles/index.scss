@@ -140,6 +140,7 @@ canvas {
 
 .Anchor {
   cursor: pointer;
+  pointer-events: all!important;
 }
 
 .Spacer20 {
@@ -157,6 +158,16 @@ canvas {
 
 .Relative {
   position: relative;
+}
+
+.Grayscale {
+  filter: grayscale(100%); /* Current draft standard */
+  -webkit-filter: grayscale(100%); /* New WebKit */
+  -moz-filter: grayscale(100%);
+  -ms-filter: grayscale(100%); 
+  -o-filter: grayscale(100%); /* Not yet supported in Gecko, Opera or IE */ 
+  filter: gray; /* IE */
+  -webkit-filter: grayscale(1); /* Old WebKit */
 }
 
 .App {
@@ -199,6 +210,10 @@ canvas {
   background-size: contain!important;
   background-repeat: no-repeat;
   background-position-y: center;
+}
+
+.ProfilePic {
+  pointer-events: none;
 }
 
 .DirectionButton {

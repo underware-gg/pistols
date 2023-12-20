@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid, Radio, Input } from 'semantic-ui-react'
 import { useDojo, useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
@@ -6,6 +6,8 @@ import { AccountShort } from '@/pistols/components/ui/Account'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
 import { useAllDuelistIds, useDuelist } from '@/pistols/hooks/useDuelist'
+import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
+import { ProfilePicButton } from './ProfilePic'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -65,20 +67,31 @@ function AccountItem({
 }) {
   const { register_duelist } = useDojoSystemCalls()
   const { account } = useDojoAccount()
+  const inputRef = useRef(null)
 
   // current name from Dojo
-  const { name, isRegistered } = useDuelist(address)
+  const { name, profilePic, isRegistered } = useDuelist(address)
+
+  const { profilePicCount } = useSettingsContext()
+  const [selectedProfilePic, setSelectedProfilePic] = useState(0)
+
+  const _profilePic = useMemo(() => {
+    return (
+      selectedProfilePic ? selectedProfilePic
+        : profilePic ? profilePic
+          : (Number(BigInt(address) % BigInt(profilePicCount)) + 1)
+    )
+  }, [selectedProfilePic, profilePic])
 
   const defaultAccountName = useMemo(() => (`ACCOUNT-${index + 1}`), [index])
   const [inputValue, setInputValue] = useState(null)
   const inputIsValid = useMemo(() => (inputValue?.length >= 3), [inputValue])
-  const isUpdated = useMemo(() => (name == inputValue), [name, inputValue])
+  const isUpdated = useMemo(() => (name == inputValue && profilePic == _profilePic), [name, inputValue, profilePic, _profilePic])
   const canRegister = useMemo(() => (isSelected && account && address), [isSelected, address])
-
-  const [profilePic, setProfilePic] = useState(0)
+  // console.log(isUpdated, name, inputValue, profilePic, selectedProfilePic, _profilePic)
 
   // initialize
-  useEffectOnce(() => {
+  useEffect(() => {
     if (inputValue == null) {
       setInputValue(name ?? defaultAccountName)
     } else if (inputValue != name) {
@@ -88,27 +101,37 @@ function AccountItem({
 
   const _register = () => {
     if (canRegister) {
-      register_duelist(account, inputValue, profilePic)
+      register_duelist(account, inputValue, _profilePic)
     }
   }
 
   return (
-    <Row>
-      <Col width={1} textAlign='center'>
+    <Row textAlign='center' verticalAlign='middle'>
+      <Col width={1}>
         <Radio checked={isSelected} onClick={() => select(address)} />
       </Col>
-      <Col width={3} textAlign='center'>
+      <Col width={3}>
         <AccountShort address={address} />
       </Col>
-      <Col width={9}>
+      <Col width={1} className='NoPadding'>
+        <ProfilePicButton
+          profilePic={_profilePic}
+          onSelect={setSelectedProfilePic}
+          profilePicCount={profilePicCount}
+          disabled={!isSelected}
+        />
+      </Col>
+      <Col width={8}>
         <Input inverted fluid
           // icon='edit'
           label='burner'
+          labelPosition='right'
           maxLength={30}
           placeholder={'PLAYER NAME'}
           value={inputValue ?? ''}
           onChange={(e) => setInputValue(e.target.value)}
-        // onFocus={() => select(address)}
+          disabled={!isSelected}
+          ref={inputRef}
         />
       </Col>
       <Col width={3}>

@@ -8,6 +8,7 @@ import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
 export const initialState = {
   musicEnabled: true,
   sfxEnabled: true,
+  profilePicCount: 6,
 }
 
 const SettingsActions = {
@@ -21,6 +22,7 @@ const SettingsActions = {
 type SettingsStateType = {
   musicEnabled: boolean,
   sfxEnabled: boolean,
+  profilePicCount: number,
 }
 
 type ActionType =

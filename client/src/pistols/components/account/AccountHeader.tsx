@@ -5,6 +5,7 @@ import { useDojo } from '@/dojo/DojoContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { AccountShort } from '@/pistols/components/ui/Account'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { ProfilePicSquare } from './ProfilePic'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -14,7 +15,7 @@ export default function AccountHeader({
   const router = useRouter()
   const { account: { account, isMasterAccount } } = useDojo()
 
-  const { name } = useDuelist(account?.address)
+  const { name, profilePic } = useDuelist(account?.address)
 
   useEffect(() => {
     if (isMasterAccount) {
@@ -24,11 +25,14 @@ export default function AccountHeader({
 
   return (
     <Grid>
-      <Row textAlign='center'>
-        <Col width={4}>
+      <Row textAlign='center' verticalAlign='middle'>
+        <Col width={3}>
           <AccountShort address={account?.address} />
         </Col>
-        <Col width={8}>
+        <Col width={1} className='NoPadding'>
+          <ProfilePicSquare profilePic={profilePic} />
+        </Col>
+        <Col width={8} textAlign='left'>
           <h3>{isMasterAccount ? 'MASTER ACCOUNT' : name}</h3>
         </Col>
         <Col width={4}>

@@ -6,6 +6,7 @@ import { useChallengesByDuelist } from '@/pistols/hooks/useChallenge'
 import { useAllDuelistIds, useDuelist } from '@/pistols/hooks/useDuelist'
 import { AccountShort } from '@/pistols/components/ui/Account'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
+import { ProfilePicSquare } from './account/ProfilePic'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -33,11 +34,13 @@ export function DuelistList() {
   return (
     <>
       <Grid className='Faded'>
-        <Row textAlign='center' color='red'>
+        <Row textAlign='center' verticalAlign='middle' color='red'>
           <Col width={3}>
             <b>Account</b>
           </Col>
-          <Col width={7}>
+          <Col width={1}>
+          </Col>
+          <Col width={6}>
             <b>Name</b>
           </Col>
           <Col width={2}>
@@ -72,11 +75,14 @@ function DuelistItem({
   const { challengeCount, drawCount, winCount, loseCount } = useChallengesByDuelist(address)
 
   return (
-    <Row textAlign='center'>
+    <Row textAlign='center' verticalAlign='middle'>
       <Col width={3}>
         <AccountShort address={address} />
       </Col>
-      <Col width={7}>
+      <Col width={1} className='NoPadding'>
+        <ProfilePicSquare profilePic={profilePic} />
+      </Col>
+      <Col width={6} textAlign='left'>
         {name}
       </Col>
       <Col width={2}>
