@@ -137,6 +137,9 @@ contract Pistols {
         lordsToken.transfer(owner, fee);
         game.stake -= fee;
 
+        // TODO: Initialization may not be necessary (zeros are automatic).
+        // Check this.
+
         if (!allPlayerStats[game.player1.addr].init) {
             allPlayerStats[game.player1.addr] = PlayerStats({
                 init: true,
