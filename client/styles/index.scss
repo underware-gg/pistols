@@ -212,6 +212,8 @@ $box-h: calc((100vh - $aspect-h) / 2);
 	width: $aspect-w;
 	height: $aspect-h;
   border: #0001 1px solid;
+  background-image: url('/images/bg_tavern_1.jpg');
+  background-size: cover;
 }
 .AspectLeft, .AspectRight, .AspectTop, .AspectBottom {
 	// background-color: #f0f8;

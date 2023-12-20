@@ -1,7 +1,8 @@
 import React from 'react'
 
 const Background = ({
-  children = null
+  children = null,
+  className=null,
 }) => {
   return (
     <React.Fragment>
@@ -10,7 +11,7 @@ const Background = ({
       <div className='AspectTop'></div>
       <div className='AspectBottom'></div>
       <div className='AspectContent'>
-        <div className='FillParent Relative CenteredContainer'>
+        <div className={`FillParent Relative CenteredContainer ${className}`}>
           {children}
         </div>
       </div>
