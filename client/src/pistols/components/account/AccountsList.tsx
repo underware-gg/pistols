@@ -27,9 +27,7 @@ export function AccountsList() {
     if (result.length == 0) {
       result.push(
         <Row key='empty' textAlign='center' columns={'equal'}>
-          <Col>
-            no accounts created
-          </Col>
+          <Col>no accounts created</Col>
         </Row>
       )
     }
@@ -107,7 +105,7 @@ function AccountItem({
           // icon='edit'
           label='burner'
           maxLength={30}
-          placeholder={'UNREGISTER'}
+          placeholder={'PLAYER NAME'}
           value={inputValue ?? ''}
           onChange={(e) => setInputValue(e.target.value)}
         // onFocus={() => select(address)}

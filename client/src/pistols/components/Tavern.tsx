@@ -1,6 +1,7 @@
 import React from 'react'
 import { Container, Grid, Image } from 'semantic-ui-react'
 import AccountHeader from './account/AccountHeader'
+import { DuelistList } from './DuelistList'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -20,8 +21,8 @@ function Tavern() {
       </Container>
       <br />
 
-      <Container text className='Faded'>
-        <p>Challenge other players</p>
+      <Container text className=''>
+        <DuelistList />
       </Container>
 
     </Container>
