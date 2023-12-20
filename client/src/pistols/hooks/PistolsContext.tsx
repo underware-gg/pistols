@@ -8,12 +8,21 @@ import React, { ReactNode, createContext, useReducer, useContext } from 'react'
 //--------------------------------
 // Constants
 //
+
+export const menuItems = [
+  'Duels',
+  'Duelists',
+  'Scoreboard',
+]
+
 export const initialState = {
   duelId: 0n,
+  menuItem: menuItems[0],
 }
 
 const PistolsActions = {
   SET_DUEL: 'SET_DUEL',
+  SET_MENU_ITEM: 'SET_MENU_ITEM',
 }
 
 
@@ -22,10 +31,12 @@ const PistolsActions = {
 //
 type PistolsContextStateType = {
   duelId: bigint
+  menuItem: string
 }
 
 type ActionType =
   | { type: 'SET_DUEL', payload: bigint }
+  | { type: 'SET_MENU_ITEM', payload: string }
 
 
 
@@ -54,6 +65,10 @@ const PistolsProvider = ({
     switch (action.type) {
       case PistolsActions.SET_DUEL: {
         newState.duelId = action.payload as bigint
+        break
+      }
+      case PistolsActions.SET_MENU_ITEM: {
+        newState.menuItem = action.payload as string
         break
       }
       default:
@@ -85,11 +100,18 @@ export const usePistolsContext = () => {
       payload: duelId,
     })
   }
+  const dispatchSetMenuItem = (menuItem) => {
+    dispatch({
+      type: PistolsActions.SET_MENU_ITEM,
+      payload: menuItem,
+    })
+  }
   return {
     ...state,
-    dispatch,
-    PistolsActions,
+    // PistolsActions,
+    // dispatch,
     dispatchSetDuel,
+    dispatchSetMenuItem,
   }
 }
 

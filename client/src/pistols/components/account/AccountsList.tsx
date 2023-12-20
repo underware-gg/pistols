@@ -48,7 +48,7 @@ export function AccountsList() {
             <ActionButton disabled={isDeploying} onClick={() => create()} label='CREATE ACCOUNT' />
           </Col>
           <Col>
-            <ActionButton disabled={isDeploying} onClick={() => clear()} label='DELETE ALL ACCOUNTS (refresh)' />
+            <ActionButton disabled={isDeploying} onClick={() => clear()} label='DELETE ALL ACCOUNTS (+refresh)' />
           </Col>
         </Row>
       </Grid>
@@ -72,14 +72,13 @@ function AccountItem({
   // current name from Dojo
   const { name, profilePic, isRegistered } = useDuelist(address)
 
-  const { profilePicCount } = useSettingsContext()
   const [selectedProfilePic, setSelectedProfilePic] = useState(0)
 
   const _profilePic = useMemo(() => {
     return (
       selectedProfilePic ? selectedProfilePic
         : profilePic ? profilePic
-          : (Number(BigInt(address) % BigInt(profilePicCount)) + 1)
+          : (Number(BigInt(address) % BigInt(process.env.PROFILE_PIC_COUNT)) + 1)
     )
   }, [selectedProfilePic, profilePic])
 
@@ -91,7 +90,7 @@ function AccountItem({
   // console.log(isUpdated, name, inputValue, profilePic, selectedProfilePic, _profilePic)
 
   // initialize
-  useEffect(() => {
+  useEffectOnce(() => {
     if (inputValue == null) {
       setInputValue(name ?? defaultAccountName)
     } else if (inputValue != name) {
@@ -117,7 +116,6 @@ function AccountItem({
         <ProfilePicButton
           profilePic={_profilePic}
           onSelect={setSelectedProfilePic}
-          profilePicCount={profilePicCount}
           disabled={!isSelected}
         />
       </Col>

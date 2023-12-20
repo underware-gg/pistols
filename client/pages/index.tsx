@@ -7,7 +7,7 @@ import App from '@/pistols/components/App'
 export default function IndexPage() {
 
   return (
-    <App backgroundImage={'/images/bg_duellists_1.jpg'} className='BackgroundFit'>
+    <App backgroundImage={'/images/bg_duellists_1.jpg'} className='AppBackgroundFit'>
 
       {/* <Link href='/gate'>
         <Image className='Logo' src='/images/logo.png' />
