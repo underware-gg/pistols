@@ -66,10 +66,6 @@ contract Pistols {
 
     uint256 constant UNSET = type(uint256).max;
 
-    uint256 constant INJURED = 1 << 0;
-    uint256 constant KILLED = 1 << 1;
-    uint256 constant DISHONORED = 1 << 2;
-
     uint256 constant BATTLE_CHOICE_LIGHT_HIT = 1;
     uint256 constant BATTLE_CHOICE_HEAVY_HIT = 2;
     uint256 constant BATTLE_CHOICE_BLOCK = 3;
