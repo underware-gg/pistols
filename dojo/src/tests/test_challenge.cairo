@@ -183,7 +183,7 @@ mod tests {
         let ch = utils::get_Challenge(world, duel_id);
         let (block_number, timestamp) = utils::elapse_timestamp(timestamp::from_days(1));
         let new_state: ChallengeState = utils::execute_reply_challenge(system, owner, duel_id, false);
-        assert(new_state == ChallengeState::Canceled, 'canceled');
+        assert(new_state == ChallengeState::Withdrawn, 'canceled');
 
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');

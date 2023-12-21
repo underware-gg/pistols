@@ -6,7 +6,7 @@
 export enum ChallengeState {
   Null,
   Awaiting,
-  Canceled,
+  Withdrawn,
   Refused,
   Expired,
   InProgress,
@@ -17,7 +17,7 @@ export enum ChallengeState {
 export const ChallengeStateNames = {
   [ChallengeState.Null]: 'Null',
   [ChallengeState.Awaiting]: 'Awaiting',
-  [ChallengeState.Canceled]: 'Canceled',
+  [ChallengeState.Withdrawn]: 'Withdrawn',
   [ChallengeState.Refused]: 'Refused',
   [ChallengeState.Expired]: 'Expired',
   [ChallengeState.InProgress]: 'InProgress',

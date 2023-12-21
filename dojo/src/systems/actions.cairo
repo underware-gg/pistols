@@ -137,7 +137,7 @@ mod actions {
                 challenge.timestamp_end = timestamp;
             } else if (caller == challenge.duelist_a) {
                 assert(accepted == false, 'Cannot accept own challenge');
-                challenge.state = ChallengeState::Canceled.into();
+                challenge.state = ChallengeState::Withdrawn.into();
                 challenge.timestamp_end = timestamp;
             } else {
                 assert(caller == challenge.duelist_b, 'Not the Challenged');

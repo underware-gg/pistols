@@ -5,7 +5,7 @@ use debug::PrintTrait;
 enum ChallengeState {
     Null,
     Awaiting,
-    Canceled,
+    Withdrawn,
     Refused,
     Expired,
     InProgress,
@@ -34,7 +34,7 @@ impl ChallengeStateTraitImpl of ChallengeStateTrait {
         match self {
             ChallengeState::Null => false,
             ChallengeState::Awaiting => true,
-            ChallengeState::Canceled => true,
+            ChallengeState::Withdrawn => true,
             ChallengeState::Refused => true,
             ChallengeState::Expired => true,
             ChallengeState::InProgress => true,
@@ -46,7 +46,7 @@ impl ChallengeStateTraitImpl of ChallengeStateTrait {
         match self {
             ChallengeState::Null => true,
             ChallengeState::Awaiting => false,
-            ChallengeState::Canceled => true,
+            ChallengeState::Withdrawn => true,
             ChallengeState::Refused => true,
             ChallengeState::Expired => true,
             ChallengeState::InProgress => false,
@@ -61,7 +61,7 @@ impl ChallengeStateIntoU8 of Into<ChallengeState, u8> {
         match self {
             ChallengeState::Null =>       CHALLENGE_STATE::NULL,
             ChallengeState::Awaiting =>   CHALLENGE_STATE::AWAITING,
-            ChallengeState::Canceled =>   CHALLENGE_STATE::CANCELED,
+            ChallengeState::Withdrawn =>   CHALLENGE_STATE::CANCELED,
             ChallengeState::Refused =>    CHALLENGE_STATE::REFUSED,
             ChallengeState::Expired =>    CHALLENGE_STATE::EXPIRED,
             ChallengeState::InProgress => CHALLENGE_STATE::IN_PROGRESS,
@@ -75,7 +75,7 @@ impl TryU8IntoChallengeState of TryInto<u8, ChallengeState> {
     fn try_into(self: u8) -> Option<ChallengeState> {
         if self == CHALLENGE_STATE::NULL             { Option::Some(ChallengeState::Null) }
         else if self == CHALLENGE_STATE::AWAITING    { Option::Some(ChallengeState::Awaiting) }
-        else if self == CHALLENGE_STATE::CANCELED    { Option::Some(ChallengeState::Canceled) }
+        else if self == CHALLENGE_STATE::CANCELED    { Option::Some(ChallengeState::Withdrawn) }
         else if self == CHALLENGE_STATE::REFUSED     { Option::Some(ChallengeState::Refused) }
         else if self == CHALLENGE_STATE::EXPIRED     { Option::Some(ChallengeState::Expired) }
         else if self == CHALLENGE_STATE::IN_PROGRESS { Option::Some(ChallengeState::InProgress) }
@@ -90,7 +90,7 @@ impl ChallengeStateIntoFelt252 of Into<ChallengeState, felt252> {
         match self {
             ChallengeState::Null =>       0,
             ChallengeState::Awaiting =>   'Awaiting',
-            ChallengeState::Canceled =>   'Canceled',
+            ChallengeState::Withdrawn =>   'Withdrawn',
             ChallengeState::Refused =>    'Refused',
             ChallengeState::Expired =>    'Expired',
             ChallengeState::InProgress => 'InProgress',
@@ -104,7 +104,7 @@ impl TryFelt252IntoChallengeState of TryInto<felt252, ChallengeState> {
     fn try_into(self: felt252) -> Option<ChallengeState> {
         if self == 'Null'            { Option::Some(ChallengeState::Null) }
         else if self == 'Awaiting'   { Option::Some(ChallengeState::Awaiting) }
-        else if self == 'Canceled'   { Option::Some(ChallengeState::Canceled) }
+        else if self == 'Withdrawn'   { Option::Some(ChallengeState::Withdrawn) }
         else if self == 'Refused'    { Option::Some(ChallengeState::Refused) }
         else if self == 'Expired'    { Option::Some(ChallengeState::Expired) }
         else if self == 'InProgress' { Option::Some(ChallengeState::InProgress) }
