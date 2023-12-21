@@ -8,13 +8,12 @@ import { AccountShort } from '@/pistols/components/ui/Account'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { DuelListByDuelist } from './DuelList'
 
 const Row = Grid.Row
 const Col = Grid.Column
 const Cell = Table.HeaderCell
 
-export default function DuelistModal() {
+export default function DuelModal() {
   const { create_challenge } = useDojoSystemCalls()
   const { account } = useDojoAccount()
 
@@ -34,7 +33,7 @@ export default function DuelistModal() {
   
   return (
     <Modal
-      // size='small'
+      // size='large'
       dimmer='inverted'
       onClose={() => _close()}
       onOpen={() => setIsChallenging(false)}
@@ -43,16 +42,15 @@ export default function DuelistModal() {
       <Modal.Header>Duelist</Modal.Header>
       <Modal.Content image>
         <ProfilePic profilePic={profilePic} />
-        <Modal.Description>
+        <Modal.Description style={{ width: '550px' }}>
           <div>
             <h1>{name}</h1>
             <AccountShort address={duelistAddress} />
-            <h3 className='Important'>Honor: 10.0</h3>
+            <h3>Honor: 10.0</h3>
+            <Divider />
           </div>
           <br />
-          {/* <p>We've found the following gravatar image associated with your e-mail address.</p> */}
-
-          {!isChallenging && <ChallengesList duelistAddress={duelistAddress}/>}
+          {!isChallenging && <ChallengesList />}
           {isChallenging && <CreateChallenge setChallengeArgs={setChallengeArgs}/>}
         </Modal.Description>
       </Modal.Content>
@@ -74,12 +72,10 @@ export default function DuelistModal() {
   )
 }
 
-function ChallengesList({
-  duelistAddress
-}) {
+function ChallengesList() {
   return (
-    <div style={{ width: '550px' }}>
-      <DuelListByDuelist address={duelistAddress} />
+    <div>
+      <h1>Duels</h1>
     </div>
   )
 }
@@ -115,8 +111,6 @@ function CreateChallenge({
 
   return (
     <div>
-      <Divider />
-
       <h1>Create New Challenge</h1>
 
       <Form>

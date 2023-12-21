@@ -4,7 +4,8 @@ import { usePistolsContext, menuItems } from '@/pistols/hooks/PistolsContext'
 import AccountHeader from '@/pistols/components/account/AccountHeader'
 import DuelistList from '@/pistols/components/DuelistList'
 import DuelistModal from '@/pistols/components/DuelistModal'
-import DuelList from '@/pistols/components/DuelList'
+import { DuelList } from '@/pistols/components/DuelList'
+import DuelModal from '@/pistols/components/DuelModal'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -26,6 +27,7 @@ export default function Tavern() {
         {atDuels && <DuelList />}
         {atDuelists && <DuelistList />}
         <DuelistModal />
+        {/* <DuelModal /> */}
       </Container>
     </>
   )

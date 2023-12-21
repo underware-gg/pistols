@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { Grid, Table } from 'semantic-ui-react'
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { useAllChallengeIds, useChallenge } from '@/pistols/hooks/useChallenge'
+import { useAllChallengeIds, useChallenge, useChallengeIdsByDuelist } from '@/pistols/hooks/useChallenge'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ChallengeState, ChallengeStateNames } from '@/pistols/utils/pistols'
@@ -12,10 +12,22 @@ const Col = Grid.Column
 const Cell = Table.Cell
 const HeaderCell = Table.HeaderCell
 
-export default function DuelList() {
-  const { account } = useDojoAccount()
+export function DuelList({
+}) {
   const { challengeIds } = useAllChallengeIds()
+  return <DuelListByIds challengeIds={challengeIds} />
+}
 
+export function DuelListByDuelist({
+  address = null,
+}) {
+  const { challengeIds } = useChallengeIdsByDuelist(address)
+  return <DuelListByIds challengeIds={challengeIds} />
+}
+
+export function DuelListByIds({
+  challengeIds,
+}) {
   const rows = useMemo(() => {
     let result = []
     challengeIds.forEach((duelId, index) => {

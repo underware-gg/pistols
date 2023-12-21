@@ -26,7 +26,7 @@ export const useAllChallengeIds = () => {
 export const useChallenge = (duelId: bigint | string) => {
   const { Challenge } = useDojoComponents()
   const challenge: any = useComponentValue(Challenge, bigintToEntity(duelId))
-  console.log(bigintToHex(duelId), challenge)
+  // console.log(bigintToHex(duelId), challenge)
 
   const state = useMemo(() => (challenge?.state ?? null), [challenge])
   const duelistA = useMemo(() => BigInt(challenge?.duelist_a ?? 0), [challenge])
@@ -65,26 +65,28 @@ export const useChallenge = (duelId: bigint | string) => {
 // Challenges by Duelist
 //
 
+export const useChallengeIdsByDuelist = (address: bigint) => {
+  const { Challenge } = useDojoComponents()
+  const challengerIds: Entity[] = useEntityQuery([HasValue(Challenge, { duelist_a: BigInt(address) })])
+  const challengedIds: Entity[] = useEntityQuery([HasValue(Challenge, { duelist_b: BigInt(address) })])
+  const challengeIds: Entity[] = useMemo(() => ([...challengerIds, ...challengedIds]), [challengerIds, challengedIds])
+  return {
+    challengeIds,
+  }
+}
+
 export const useChallengesByDuelist = (address: bigint) => {
   const { Challenge } = useDojoComponents()
+  
+  const { challengeIds } = useChallengeIdsByDuelist(address)
 
-  const challengerIds: Entity[] = useEntityQuery([HasValue(Challenge, { duelist_a: address })])
-  const challengedIds: Entity[] = useEntityQuery([HasValue(Challenge, { duelist_b: address })])
-
-  const challenger: any[] = useMemo(() => (challengerIds ?? []).map((challengeId) => getComponentValue(Challenge, challengeId)), [challengerIds])
-  const challenged: any[] = useMemo(() => (challengedIds ?? []).map((challengeId) => getComponentValue(Challenge, challengeId)), [challengedIds])
-
-  const challenges: any[] = useMemo(() => {
-    let result = [...challenger, ...challenged]
-    result.sort((a, b) => (a.timestamp - b.timestamp))
-    return result
-  }, [challenger, challenged])
+  const challenges: any[] = useMemo(() => (challengeIds ?? []).map((challengeId) => getComponentValue(Challenge, challengeId)).sort((a, b) => (a.timestamp - b.timestamp)), [challengeIds])
 
   const stats: any = useMemo(() => {
     let result = {
       challengeCount: challenges.length,
       drawCount: challenges.reduce((acc, ch) => {
-        if(ch.state == ChallengeState.Draw) acc++;
+        if (ch.state == ChallengeState.Draw) acc++;
         return acc;
       }, 0),
       winCount: challenges.reduce((acc, ch) => {
@@ -100,9 +102,9 @@ export const useChallengesByDuelist = (address: bigint) => {
   }, [challenges])
 
   return {
+    challengeIds,
     challenges,
     ...stats
   }
 }
-
 

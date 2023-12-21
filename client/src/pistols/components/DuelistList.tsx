@@ -82,7 +82,7 @@ function DuelistItem({
         {name}
       </Cell>
 
-      <Cell>
+      <Cell className='Important'>
         10.0
       </Cell>
 
