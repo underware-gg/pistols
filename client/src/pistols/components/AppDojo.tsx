@@ -3,7 +3,6 @@ import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
 import { DojoProvider } from '@/dojo/DojoContext'
 import { setup } from '@/dojo/setup.ts'
 import { GameplayProvider } from '@/pistols/hooks/GameplayContext'
-import { useSyncWorld } from '@/pistols/hooks/useSyncWorld'
 import App from '@/pistols/components/App'
 
 
@@ -44,24 +43,9 @@ function DojoSetup({ children }) {
 
   return (
     <DojoProvider value={setupResult}>
-      <DojoSync>
+      <GameplayProvider>
         {children}
-      </DojoSync>
+      </GameplayProvider>
     </DojoProvider>
   );
-}
-
-
-function DojoSync({ children }) {
-  const { loading } = useSyncWorld()
-
-  if (loading) {
-    return <h1>syncing...</h1>
-  }
-
-  return (
-    <GameplayProvider>
-      {children}
-    </GameplayProvider>
-  )
 }

@@ -1,8 +1,8 @@
 {
   "world": {
-    "name": "world",
-    "address": "0x6891ca2cbf53d48a99f535b94ef5503ec67d2f455b2fb222b5f6a40576866cb",
-    "class_hash": "0x99b08b2ff33750916e36b5e241b5d4a63e8d48862bf90a68fec2ff58a8de6",
+    "name": "dojo::world::world",
+    "address": "0x269c58e5fa1e7f6fe3756f1de88ecdfab7d03ba67e79ba0365b4ef1e81155be",
+    "class_hash": "0x5ac623f0c96059936bd2d0904bdd31799e430fe08a0caff7a5f497260b16497",
     "abi": [
       {
         "type": "impl",
@@ -783,9 +783,9 @@
     "computed": []
   },
   "executor": {
-    "name": "executor",
+    "name": "dojo::executor::executor",
     "address": null,
-    "class_hash": "0x54ee9d99457d82d53e21030920f7e6f43509b98ea62282b5c2520050264a28c",
+    "class_hash": "0x585507fa2818fe78e66da6ea4c5915376739f4abf509d41153f60a16cb1f68d",
     "abi": [
       {
         "type": "impl",
@@ -844,8 +844,8 @@
     "computed": []
   },
   "base": {
-    "name": "base",
-    "class_hash": "0x77638e9a645209ac1e32e143bfdbfe9caf723c4f7645fcf465c38967545ea2f",
+    "name": "dojo::base::base",
+    "class_hash": "0x6c458453d35753703ad25632deec20a29faf8531942ec109e6eb0650316a2bc",
     "abi": [
       {
         "type": "impl",
@@ -947,9 +947,9 @@
   },
   "contracts": [
     {
-      "name": "actions",
-      "address": "0x2a28ee1fc9b24d22735795e3ba77608659b1c35b6acb2c0d85a1606b3784886",
-      "class_hash": "0x7b84f7a52ad59296c6f42b15522f507a0a49a9e6b5802202dc69cd0def23eb4",
+      "name": "pistols::systems::actions::actions",
+      "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
+      "class_hash": "0x52b9b559a4bdaeb610b3ccfd869ed448d942fdb93efcc0a69b6d3eff9f80217",
       "abi": [
         {
           "type": "impl",
@@ -1181,20 +1181,14 @@
           ]
         }
       ],
-      "reads": [
-        "Challenge"
-      ],
-      "writes": [
-        "Challenge",
-        "Duelist",
-        "Round"
-      ],
+      "reads": [],
+      "writes": [],
       "computed": []
     }
   ],
   "models": [
     {
-      "name": "Challenge",
+      "name": "pistols::models::models::challenge",
       "members": [
         {
           "name": "duel_id",
@@ -1257,7 +1251,7 @@
           "key": false
         }
       ],
-      "class_hash": "0x2cb2e21a7c14a93e0f873cc070e83ceb60229f3ee2d2c9ef17c60e2a7b148c",
+      "class_hash": "0x5749c4b3c47a844798e172945ce2cb78a4adf8c26b08d317fe539f21ed61264",
       "abi": [
         {
           "type": "function",
@@ -1421,7 +1415,7 @@
       ]
     },
     {
-      "name": "Duelist",
+      "name": "pistols::models::models::duelist",
       "members": [
         {
           "name": "address",
@@ -1439,7 +1433,7 @@
           "key": false
         }
       ],
-      "class_hash": "0xf939eab3229677655fc1c5396e29cc547b447d631ef3d2326665319f7fb086",
+      "class_hash": "0x262821ccbab485a42bfe87401a38770440e8e6f2c7057f3ea6e2c3ed4e0b0c2",
       "abi": [
         {
           "type": "function",
@@ -1603,7 +1597,7 @@
       ]
     },
     {
-      "name": "Round",
+      "name": "pistols::models::models::round",
       "members": [
         {
           "name": "duel_id",
@@ -1636,7 +1630,7 @@
           "key": false
         }
       ],
-      "class_hash": "0x623c151409f6403fbed73cfb9830737ebc675dc0bf9d8712b08c617ee7e1391",
+      "class_hash": "0x67ddd9ad89327155c84573173c2091e8309acdc5de5c71a6c63efa5ad3bb3be",
       "abi": [
         {
           "type": "function",
