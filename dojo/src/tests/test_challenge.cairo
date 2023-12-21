@@ -27,6 +27,15 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
+    #[should_panic(expected:('Challenging thyself, you fool!','ENTRYPOINT_FAILED'))]
+    fn test_challenge_thyself() {
+        let (world, system, owner, other) = utils::setup_world();
+        utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, owner, PASS_CODE_1, MESSAGE_1, 0);
+    }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Missing challenged address','ENTRYPOINT_FAILED'))]
     // #[should_panic(expected:('Challenge a player or pass_code','ENTRYPOINT_FAILED'))]
     fn test_invalid_code() {

@@ -89,6 +89,7 @@ mod actions {
             assert(expire_seconds == 0 || expire_seconds >= timestamp::from_hours(1), 'Invalid expire_seconds');
 
             assert(duelist_exist(world, caller), 'Challenger not registered');
+            assert(caller != challenged, 'Challenging thyself, you fool!');
             // if (challenged != zero_address()) {
             //     assert(duelist_exist(world, caller), 'Challenged is not registered');
             // }
