@@ -26,9 +26,7 @@ trait IActions<TContractState> {
     ) -> ChallengeState;
 
     // read-only calls
-    // fn can_play_level(self: @TContractState,
-    //     location_id: u128,
-    // ) -> bool;
+    fn get_timestamp(self: @TContractState) -> u64;
 }
 
 #[dojo::contract]
@@ -188,12 +186,9 @@ mod actions {
         // read-only calls
         //
 
-        // fn can_play_level(self: @ContractState,
-        //     location_id: u128,
-        // ) -> bool {
-        //     let world: IWorldDispatcher = self.world_dispatcher.read();
-        //     (can_generate_chamber(world, caller, location_id))
-        // }
+        fn get_timestamp(self: @ContractState) -> u64 {
+            (get_block_timestamp())
+        }
 
     }
 }

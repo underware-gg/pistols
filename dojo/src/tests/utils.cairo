@@ -21,6 +21,9 @@ mod utils {
     // https://github.com/starkware-libs/cairo/blob/main/corelib/src/starknet/testing.cairo
     //
 
+    const INITIAL_TIMESTAMP: u64 = 0x100000000;
+    const INITIAL_STEP: u64 = 0x10;
+
     fn setup_world() -> (IWorldDispatcher, IActionsDispatcher, ContractAddress, ContractAddress) {
         let mut models = array![duelist::TEST_CLASS_HASH, challenge::TEST_CLASS_HASH, round::TEST_CLASS_HASH];
         let world: IWorldDispatcher = spawn_test_world(models);
@@ -30,12 +33,12 @@ mod utils {
         // testing::set_caller_address(owner);   // not used??
         testing::set_contract_address(owner); // this is the CALLER!!
         testing::set_block_number(1);
-        testing::set_block_timestamp(0x100000000);
+        testing::set_block_timestamp(INITIAL_TIMESTAMP);
         (world, IActionsDispatcher { contract_address }, owner, other)
     }
 
     fn _next_block() -> (u64, u64) {
-        elapse_timestamp(0x10)
+        elapse_timestamp(INITIAL_STEP)
     }
 
     fn elapse_timestamp(delta: u64) -> (u64, u64) {
@@ -83,6 +86,11 @@ mod utils {
         let new_state: ChallengeState = system.reply_challenge(duel_id, accepted);
         _next_block();
         (new_state)
+    }
+
+    fn execute_get_timestamp(system: IActionsDispatcher) -> u64 {
+        let timestamp: u64 = system.get_timestamp();
+        (timestamp)
     }
 
     fn get_Duelist(world: IWorldDispatcher, address: ContractAddress) -> Duelist {

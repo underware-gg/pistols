@@ -60,6 +60,7 @@ mod tests {
     fn test_challenge_address() {
         let (world, system, owner, other) = utils::setup_world();
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
+        let timestamp: u128 = utils::execute_create_challenge(system, owner, other, 0, MESSAGE_1, 0);
 
         let duel_id: u128 = utils::execute_create_challenge(system, owner, other, 0, MESSAGE_1, 0);
         let ch = utils::get_Challenge(world, duel_id);
