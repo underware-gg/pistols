@@ -6,6 +6,11 @@ import Tavern from '@/pistols/components/Tavern'
 import GameContainer from '@/pistols/components/GameContainer'
 import Background from '@/pistols/components/Background'
 
+// enable wasm in build
+// export const config = {
+//   runtime: 'experimental-edge'
+// }
+
 export default function MainPage() {
   const router = useRouter()
 
