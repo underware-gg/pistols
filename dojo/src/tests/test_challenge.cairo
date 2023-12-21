@@ -54,7 +54,7 @@ mod tests {
 
         let duel_id: u128 = utils::execute_create_challenge(system, owner, other, 0, MESSAGE_1, 0);
         let ch = utils::get_Challenge(world, duel_id);
-        assert(ch.state == ChallengeState::Awaiting, 'state');
+        assert(ch.state == ChallengeState::Awaiting.into(), 'state');
         assert(ch.pass_code == 0, 'pass_code');
         assert(ch.duelist_a == owner, 'challenged');
         assert(ch.duelist_b == other, 'challenged');
@@ -74,7 +74,7 @@ mod tests {
         let challenged = zero_address();
         let duel_id: u128 = utils::execute_create_challenge(system, owner, challenged, PASS_CODE_1, MESSAGE_1, 0);
         let ch = utils::get_Challenge(world, duel_id);
-        assert(ch.state == ChallengeState::Awaiting, 'state');
+        assert(ch.state == ChallengeState::Awaiting.into(), 'state');
         assert(ch.pass_code == PASS_CODE_1, 'pass_code');
         assert(ch.duelist_a == owner, 'challenged');
         assert(ch.duelist_b == challenged, 'challenged');
@@ -150,7 +150,7 @@ mod tests {
         assert(new_state == ChallengeState::Expired, 'expired');
 
         let ch = utils::get_Challenge(world, duel_id);
-        assert(ch.state == new_state, 'state');
+        assert(ch.state == new_state.into(), 'state');
         assert(ch.round == 0, 'round');
         assert(ch.winner == zero_address(), 'winner');
         assert(ch.timestamp_start == 0, 'timestamp_start');
@@ -186,7 +186,7 @@ mod tests {
         assert(new_state == ChallengeState::Canceled, 'canceled');
 
         let ch = utils::get_Challenge(world, duel_id);
-        assert(ch.state == new_state, 'state');
+        assert(ch.state == new_state.into(), 'state');
         assert(ch.round == 0, 'round');
         assert(ch.winner == zero_address(), 'winner');
         assert(ch.timestamp_start == 0, 'timestamp_start');
@@ -238,7 +238,7 @@ mod tests {
         assert(new_state == ChallengeState::Refused, 'refused');
 
         let ch = utils::get_Challenge(world, duel_id);
-        assert(ch.state == new_state, 'state');
+        assert(ch.state == new_state.into(), 'state');
         assert(ch.round == 0, 'round');
         assert(ch.winner == zero_address(), 'winner');
         assert(ch.timestamp_start == 0, 'timestamp_start');
@@ -291,7 +291,7 @@ mod tests {
         assert(new_state == ChallengeState::Resolved || new_state == ChallengeState::Draw, 'resolved');
 
         let ch = utils::get_Challenge(world, duel_id);
-        assert(ch.state == new_state, 'state');
+        assert(ch.state == new_state.into(), 'state');
         assert(ch.round == 1, 'round');
         assert(ch.timestamp_start == timestamp, 'timestamp_start');
         assert(ch.timestamp_end == timestamp, 'timestamp_end');

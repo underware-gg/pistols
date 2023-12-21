@@ -13,7 +13,7 @@ struct Duelist {
 struct Challenge {
     #[key]
     duel_id: u128,
-    state: ChallengeState,
+    state: u8,
     duelist_a: ContractAddress, // Challenger
     duelist_b: ContractAddress, // Challenged
     message: felt252,           // message to challenged

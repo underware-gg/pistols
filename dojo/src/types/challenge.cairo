@@ -145,7 +145,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         // get some random inexisting challenge
         let ch: Challenge = utils::get_Challenge(world, 0x682137812638127638127);
-        assert(ch.state == ChallengeState::Null, 'ChallengeState::Null');
-        assert(ch.state.exists() == false, 'exists()');
+        let state: ChallengeState = ch.state.try_into().unwrap();
+        assert(state == ChallengeState::Null, 'ChallengeState::Null');
+        assert(state.exists() == false, 'exists()');
     }
 }

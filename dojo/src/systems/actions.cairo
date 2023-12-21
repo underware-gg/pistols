@@ -96,7 +96,7 @@ mod actions {
             set!(world, (
                 Challenge {
                     duel_id,
-                    state: ChallengeState::Awaiting,
+                    state: ChallengeState::Awaiting.into(),
                     duelist_a: caller,
                     duelist_b: challenged,
                     message,
@@ -126,26 +126,27 @@ mod actions {
             let caller: ContractAddress = starknet::get_caller_address();
 
             let mut challenge: Challenge = get!(world, duel_id, Challenge);
-            assert(challenge.state.exists(), 'Challenge do not exist');
-            assert(challenge.state == ChallengeState::Awaiting, 'Challenge is not Awaiting');
+            let state: ChallengeState = challenge.state.try_into().unwrap();
+            assert(state.exists(), 'Challenge do not exist');
+            assert(state == ChallengeState::Awaiting, 'Challenge is not Awaiting');
 
             let timestamp: u64 = get_block_timestamp();
 
             if (challenge.timestamp_expire > 0 && timestamp > challenge.timestamp_expire) {
-                challenge.state = ChallengeState::Expired;
+                challenge.state = ChallengeState::Expired.into();
                 challenge.timestamp_end = timestamp;
             } else if (caller == challenge.duelist_a) {
                 assert(accepted == false, 'Cannot accept own challenge');
-                challenge.state = ChallengeState::Canceled;
+                challenge.state = ChallengeState::Canceled.into();
                 challenge.timestamp_end = timestamp;
             } else {
                 assert(caller == challenge.duelist_b, 'Not the Challenged');
                 assert(duelist_exist(world, caller), 'Challenged not registered');
                 if (!accepted) {
-                    challenge.state = ChallengeState::Refused;
+                    challenge.state = ChallengeState::Refused.into();
                     challenge.timestamp_end = timestamp;
                 } else {
-                    challenge.state = ChallengeState::InProgress;
+                    challenge.state = ChallengeState::InProgress.into();
                     challenge.round = 1;
                     challenge.timestamp_start = timestamp;
                 }
@@ -153,7 +154,7 @@ mod actions {
 
             // TEMPORARY RESOLUTION
             // TODO: REMOVE THIS
-            if (challenge.state == ChallengeState::InProgress) {
+            if (challenge.state == ChallengeState::InProgress.into()) {
                 solve_random(ref challenge);
             }
 
@@ -161,7 +162,7 @@ mod actions {
             set!(world, (challenge));
 
             // Create 1st round
-            if (challenge.state == ChallengeState::InProgress) {
+            if (challenge.state == ChallengeState::InProgress.into()) {
                 set!(world, (
                     Round {
                         duel_id,
@@ -174,7 +175,7 @@ mod actions {
                 ));
             }
 
-            (challenge.state)
+            (challenge.state.try_into().unwrap())
         }
 
         //

@@ -11,8 +11,8 @@ export function defineContractComponents(world: World) {
 	      {
 	        metadata: {
 	          name: "Challenge",
-	          types: ["u128","enum","contractaddress","contractaddress","felt252","felt252","u8","contractaddress","u64","u64","u64","u64"],
-	          customTypes: ["ChallengeState"],
+	          types: ["u128","u8","contractaddress","contractaddress","felt252","felt252","u8","contractaddress","u64","u64","u64","u64"],
+	          customTypes: [],
 	        },
 	      }
 	    );

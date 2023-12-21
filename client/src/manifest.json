@@ -949,7 +949,7 @@
     {
       "name": "pistols::systems::actions::actions",
       "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
-      "class_hash": "0x52b9b559a4bdaeb610b3ccfd869ed448d942fdb93efcc0a69b6d3eff9f80217",
+      "class_hash": "0x3eff032656d2f0e6117e2c49a50bb4f78966ae7c9ccc263a2c82c23e5dba603",
       "abi": [
         {
           "type": "impl",
@@ -1197,7 +1197,7 @@
         },
         {
           "name": "state",
-          "type": "ChallengeState",
+          "type": "u8",
           "key": false
         },
         {
@@ -1251,7 +1251,7 @@
           "key": false
         }
       ],
-      "class_hash": "0x5749c4b3c47a844798e172945ce2cb78a4adf8c26b08d317fe539f21ed61264",
+      "class_hash": "0x82b53da75758eae83961a4e2220c5a47169bd64b8adaddc3a9f1cf7897eac3",
       "abi": [
         {
           "type": "function",
