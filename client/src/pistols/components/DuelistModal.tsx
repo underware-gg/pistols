@@ -6,7 +6,7 @@ import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
-import { ChallengeListByDuelist } from '@/pistols/components/ChallengeList'
+import { ChallengeTableByDuelist } from '@/pistols/components/ChallengeTable'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ChallengeMessages } from '@/pistols/utils/pistols'
 import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
@@ -55,7 +55,7 @@ export default function DuelistModal() {
           <br />
           {/* <p>We've found the following gravatar image associated with your e-mail address.</p> */}
 
-          {!isChallenging && <ChallengesList duelistAddress={duelistAddress}/>}
+          {!isChallenging && <div className='TableModal'><ChallengesList duelistAddress={duelistAddress} /></div>}
           {isChallenging && <CreateChallenge setChallengeArgs={setChallengeArgs}/>}
         </Modal.Description>
       </Modal.Content>
@@ -82,7 +82,7 @@ function ChallengesList({
 }) {
   return (
     <div style={{ width: '550px' }}>
-      <ChallengeListByDuelist address={duelistAddress} />
+      <ChallengeTableByDuelist address={duelistAddress} />
     </div>
   )
 }

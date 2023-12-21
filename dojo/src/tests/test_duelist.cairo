@@ -12,7 +12,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_register_ChallengeList() {
+    fn test_register_ChallengeTable() {
         let (world, system, owner, other) = utils::setup_world();
 
         let name: felt252 = 'DuelistName';

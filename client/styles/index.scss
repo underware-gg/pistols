@@ -287,6 +287,27 @@ $box-h: calc((100vh - $aspect-h) / 2);
   background-position-y: center;
 }
 
+.TableMain {
+  position: relative;
+  margin-top: 100px;
+  max-height: 500px;
+  scrollbar-width: thin;
+  overflow-y: scroll;
+  // border: 0.5px solid #0001;
+}
+.TableModal {
+  @extend .TableMain;
+  max-height: 290px;
+  margin: 0;
+}
+// .TableHeader {
+//   position: absolute;
+//   top: 0;
+// }
+// .TableBody {
+//   margin-top: 100px;
+// }
+
 .ProfilePic {
   pointer-events: none;
   width: calc(439px / 2);

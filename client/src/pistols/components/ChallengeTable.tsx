@@ -12,21 +12,25 @@ const Col = Grid.Column
 const Cell = Table.Cell
 const HeaderCell = Table.HeaderCell
 
-export function ChallengeList({
+export function ChallengeTableMain({
 }) {
   const { challengeIds } = useAllChallengeIds()
-  return <ChallengeListByIds challengeIds={challengeIds} />
+  return (
+    <div className='TableMain'>
+      <ChallengeTableByIds challengeIds={challengeIds} />
+    </div>
+  )
 }
 
-export function ChallengeListByDuelist({
+export function ChallengeTableByDuelist({
   address = null,
 }) {
   const { challengeIds } = useChallengeIdsByDuelist(address)
-  return <ChallengeListByIds challengeIds={challengeIds} />
+  return <ChallengeTableByIds challengeIds={challengeIds} />
 }
 
 
-export function ChallengeListByIds({
+export function ChallengeTableByIds({
   challengeIds,
 }) {
   const [order, setOrder] = useState({})
@@ -46,19 +50,19 @@ export function ChallengeListByIds({
 
   return (
     <Table sortable selectable className='Faded' color='red'>
-      <Table.Header>
+      <Table.Header className='TableHeader'>
         <Table.Row textAlign='left' verticalAlign='middle'>
           <HeaderCell width={1}></HeaderCell>
           <HeaderCell>Challenger</HeaderCell>
           <HeaderCell width={1}></HeaderCell>
           <HeaderCell>Challenged</HeaderCell>
-          <HeaderCell textAlign='center'>State</HeaderCell>
-          <HeaderCell textAlign='center'>Date</HeaderCell>
+          <HeaderCell width={2} textAlign='center'>State</HeaderCell>
+          <HeaderCell width={4} textAlign='center'>Date</HeaderCell>
         </Table.Row>
       </Table.Header>
 
       {sortedRows.length > 0 ?
-        <Table.Body>
+        <Table.Body className='TableBody'>
           {sortedRows}
         </Table.Body>
         :

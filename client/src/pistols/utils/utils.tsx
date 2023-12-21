@@ -41,5 +41,5 @@ export const formatTimestampDelta = (start: number, end: number): string => {
   const [date, iso2] = iso.split('T')
   const [time, iso3] = iso2.split('.')
   const [hour, minutes, seconds] = time.split(':')
-  return `1 day, ${hour}:${minutes}:${seconds}`
+  return `⏱️ 1d ${hour}h ${minutes}m ${seconds}s`
 }
