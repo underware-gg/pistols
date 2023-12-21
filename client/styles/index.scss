@@ -529,14 +529,14 @@ $box-h: calc((100vh - $aspect-h) / 2);
   // font-weight: 600;
 }
 .ui.table td.positive, .ui.table tr.positive {
-  background: #cfffd4 !important;
+  background: #dafadd !important;
   // color: #2c662d !important;
 }
 .ui.table td.negative, .ui.table tr.negative {
-  background: #ffcfcf!important;
+  background: #fbdbdb!important;
   // color: #9f3a38!important;
 }
 .ui.table td.warning, .ui.table tr.warning {
-  background: #ffe5bd !important;
+  background: #f9e9d0 !important;
   // color: #573a08 !important;
 }

@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { Grid, Table, Modal, Form, Divider, Dropdown, Header } from 'semantic-ui-react'
+import { Grid, Table, Modal, Divider, Header } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useChallenge } from '@/pistols/hooks/useChallenge'
@@ -9,6 +9,7 @@ import { ProfileDescription } from '@/pistols/components/account/ProfileDescript
 import { ProfilePicButton } from '@/pistols/components/account/ProfilePic'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ChallengeState, ChallengeStateDescriptions } from '@/pistols/utils/pistols'
+import { AccountShort } from './ui/Account'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -20,7 +21,7 @@ export default function ChallengeModal() {
 
   const { atDuels, duelId, dispatchSetDuel, dispatchSetDuelist } = usePistolsContext()
 
-  const { state, message, duelistA, duelistB, winner } = useChallenge(duelId)
+  const { state, message, duelistA, duelistB, winner, lords } = useChallenge(duelId)
 
   const { name: nameA, profilePic: profilePicA } = useDuelist(duelistA)
   const { name: nameB, profilePic: profilePicB } = useDuelist(duelistB)
@@ -48,7 +49,7 @@ export default function ChallengeModal() {
       onOpen={() => {}}
       open={atDuels && duelId > 0}
     >
-      <Modal.Header>Challenge</Modal.Header>
+      <Modal.Header>Challenge&nbsp;&nbsp;&nbsp;<AccountShort address={duelId} suffix='' /></Modal.Header>
       <Modal.Content image>
         <ProfilePicButton profilePic={profilePicA} onClick={() => dispatchSetDuelist(duelistA)} />
         <Modal.Description style={{ width: '550px' }}>
@@ -61,7 +62,7 @@ export default function ChallengeModal() {
             <Row columns='equal' textAlign='right'>
               <Col>
                 <Divider horizontal>
-                  <Header as='h4'>challenges</Header>
+                  <Header as='h4'>challenged</Header>
                 </Divider>
               </Col>
             </Row>
@@ -84,7 +85,11 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <Divider />
+                {lords == 0 ? <Divider /> :
+                  <Divider horizontal>
+                    <Header as='h4'>for <span className='Code Important'>{lords}</span> $LORDS each</Header>
+                  </Divider>
+                }
               </Col>
             </Row>
             <Row columns='equal' textAlign='center'>
