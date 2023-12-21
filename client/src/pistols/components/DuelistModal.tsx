@@ -8,7 +8,7 @@ import { AccountShort } from '@/pistols/components/ui/Account'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { DuelListByDuelist } from './DuelList'
+import { ChallengeListByDuelist } from './ChallengeList'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -79,7 +79,7 @@ function ChallengesList({
 }) {
   return (
     <div style={{ width: '550px' }}>
-      <DuelListByDuelist address={duelistAddress} />
+      <ChallengeListByDuelist address={duelistAddress} />
     </div>
   )
 }

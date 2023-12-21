@@ -13,7 +13,7 @@ const Row = Grid.Row
 const Col = Grid.Column
 const Cell = Table.HeaderCell
 
-export default function DuelModal() {
+export default function ChallengeModal() {
   const { create_challenge } = useDojoSystemCalls()
   const { account } = useDojoAccount()
 

@@ -12,20 +12,20 @@ const Col = Grid.Column
 const Cell = Table.Cell
 const HeaderCell = Table.HeaderCell
 
-export function DuelList({
+export function ChallengeList({
 }) {
   const { challengeIds } = useAllChallengeIds()
-  return <DuelListByIds challengeIds={challengeIds} />
+  return <ChallengeListByIds challengeIds={challengeIds} />
 }
 
-export function DuelListByDuelist({
+export function ChallengeListByDuelist({
   address = null,
 }) {
   const { challengeIds } = useChallengeIdsByDuelist(address)
-  return <DuelListByIds challengeIds={challengeIds} />
+  return <ChallengeListByIds challengeIds={challengeIds} />
 }
 
-export function DuelListByIds({
+export function ChallengeListByIds({
   challengeIds,
 }) {
   const rows = useMemo(() => {
