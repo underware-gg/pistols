@@ -5,7 +5,7 @@ import { useDojo } from '@/dojo/DojoContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { AccountShort } from '@/pistols/components/ui/Account'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { ProfilePicButton } from '@/pistols/components/account/ProfilePic'
+import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -32,7 +32,7 @@ export default function AccountHeader({
             <AccountShort address={account?.address} />
           </Col>
           <Col width={1}>
-            <ProfilePicButton profilePic={profilePic} onSelect={() => { router.push('/gate') }} />
+            <ProfilePicSquareButton profilePic={profilePic} onClick={() => { router.push('/gate') }} />
           </Col>
         </Row>
       </Grid>

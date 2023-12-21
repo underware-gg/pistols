@@ -528,3 +528,15 @@ $box-h: calc((100vh - $aspect-h) / 2);
   // font-size: 16px;
   // font-weight: 600;
 }
+.ui.table td.positive, .ui.table tr.positive {
+  background: #cfffd4 !important;
+  // color: #2c662d !important;
+}
+.ui.table td.negative, .ui.table tr.negative {
+  background: #ffcfcf!important;
+  // color: #9f3a38!important;
+}
+.ui.table td.warning, .ui.table tr.warning {
+  background: #ffe5bd !important;
+  // color: #573a08 !important;
+}

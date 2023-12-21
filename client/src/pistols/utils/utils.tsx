@@ -14,9 +14,10 @@ export const modf = (v: number, m: number): number => (v - m * Math.floor(v / m)
 export const fmod = (a: number, b: number): number => Number((a - (Math.floor(a / b) * b)).toPrecision(8)) // TODO: TEST THIS!!!
 
 const DEGREES_PER_RADIANS = (180 / Math.PI);
-export const toDegrees = (r) => (r * DEGREES_PER_RADIANS)
-export const toRadians = (d) => (d / DEGREES_PER_RADIANS)
+export const toDegrees = (r: number) => (r * DEGREES_PER_RADIANS)
+export const toRadians = (d: number) => (d / DEGREES_PER_RADIANS)
 
+export const randomArrayElement = (array: any[]) => (array.length > 0 ? array[Math.floor(Math.random() * array.length)] : null)
 
 export const bigintToHex = (value: bigint | string) => `0x${BigInt(value).toString(16)}`
 
@@ -26,6 +27,10 @@ export const bigintToEntity = (value: bigint | string): Entity => {
 
 export const keysToEntity = (keys: any[]): Entity => {
   return getEntityIdFromKeys(keys) as Entity;
+}
+
+export const validateCairoString = (value: string): string => {
+  return (value ? value.slice(0, 31) : '')
 }
 
 export const stringToFelt = (value: string): string => {

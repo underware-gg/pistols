@@ -7,7 +7,7 @@ import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
 import { useAllDuelistIds, useDuelist } from '@/pistols/hooks/useDuelist'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
-import { ProfilePicButton } from '@/pistols/components/account/ProfilePic'
+import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -113,9 +113,9 @@ function AccountItem({
         <AccountShort address={address} />
       </Col>
       <Col width={1} className='NoPadding'>
-        <ProfilePicButton
+        <ProfilePicSquareButton
           profilePic={_profilePic}
-          onSelect={setSelectedProfilePic}
+          onClick={() => setSelectedProfilePic(_profilePic < parseInt(process.env.PROFILE_PIC_COUNT) ? _profilePic + 1 : 1)}
           disabled={!isSelected}
         />
       </Col>

@@ -6,7 +6,7 @@ import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useChallenge } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
-import { ProfilePic } from '@/pistols/components/account/ProfilePic'
+import { ProfilePicButton } from '@/pistols/components/account/ProfilePic'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ChallengeState, ChallengeStateDescriptions } from '@/pistols/utils/pistols'
 
@@ -18,7 +18,7 @@ export default function ChallengeModal() {
   const { reply_challenge } = useDojoSystemCalls()
   const { account } = useDojoAccount()
 
-  const { atDuels, duelId, dispatchSetDuel } = usePistolsContext()
+  const { atDuels, duelId, dispatchSetDuel, dispatchSetDuelist } = usePistolsContext()
 
   const { state, message, duelistA, duelistB, winner } = useChallenge(duelId)
 
@@ -50,7 +50,7 @@ export default function ChallengeModal() {
     >
       <Modal.Header>Challenge</Modal.Header>
       <Modal.Content image>
-        <ProfilePic profilePic={profilePicA} />
+        <ProfilePicButton profilePic={profilePicA} onClick={() => dispatchSetDuelist(duelistA)} />
         <Modal.Description style={{ width: '550px' }}>
           <Grid style={{ width: '350px' }}>
             <Row columns='equal' textAlign='left'>
@@ -94,7 +94,7 @@ export default function ChallengeModal() {
             </Row>
           </Grid>
         </Modal.Description>
-        <ProfilePic profilePic={profilePicB} />
+        <ProfilePicButton profilePic={profilePicB} onClick={() => dispatchSetDuelist(duelistB)} />
       </Modal.Content>
       <Modal.Actions>
         <Grid className='FillParent Padded' textAlign='center'>
@@ -103,6 +103,11 @@ export default function ChallengeModal() {
               <ActionButton fill label='Close' onClick={() => _close()} />
             </Col>
             {(state == ChallengeState.Awaiting && isChallenger) &&
+              <Col>
+                <ActionButton fill label='Cowardly withdraw' onClick={() => _reply(false)} />
+              </Col>
+            }
+            {(state == ChallengeState.Awaiting && isChallenged) &&
               <Col>
                 <ActionButton fill label='Cowardly refuse' onClick={() => _reply(false)} />
               </Col>
