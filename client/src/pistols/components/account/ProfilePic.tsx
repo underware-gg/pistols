@@ -8,9 +8,10 @@ const _makeUrl = (profilePic, suffix) => {
 
 export function ProfilePic({
   profilePic,
+  floated = null,
 }) {
   const url = useMemo(() => _makeUrl(profilePic, 'a'), [profilePic])
-  return profilePic ? <Image src={url} className='ProfilePic' /> : <></>
+  return profilePic ? <Image src={url} className='ProfilePic' floated={floated} /> : <></>
 }
 
 export function ProfilePicSquare({

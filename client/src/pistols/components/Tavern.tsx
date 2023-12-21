@@ -27,7 +27,7 @@ export default function Tavern() {
         {atDuels && <ChallengeList />}
         {atDuelists && <DuelistList />}
         <DuelistModal />
-        {/* <ChallengeModal /> */}
+        <ChallengeModal />
       </Container>
     </>
   )

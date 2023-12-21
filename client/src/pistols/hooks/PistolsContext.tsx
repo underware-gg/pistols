@@ -68,11 +68,15 @@ const PistolsProvider = ({
     let newState = { ...state }
     switch (action.type) {
       case PistolsActions.SET_DUELIST: {
+        newState.menuItem = menuItems.Duelists
         newState.duelistAddress = action.payload as bigint
+        newState.duelId = 0n
         break
       }
       case PistolsActions.SET_DUEL: {
+        newState.menuItem = menuItems.Challenges
         newState.duelId = action.payload as bigint
+        newState.duelistAddress = 0n
         break
       }
       case PistolsActions.SET_MENU_ITEM: {

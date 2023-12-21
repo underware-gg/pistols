@@ -1,14 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Grid, Table, Modal, Form, Select, Divider, Dropdown } from 'semantic-ui-react'
+import { Grid, Table, Modal, Form, Divider, Dropdown } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
-import { useChallengesByDuelist } from '@/pistols/hooks/useChallenge'
-import { useAllDuelistIds, useDuelist } from '@/pistols/hooks/useDuelist'
-import { AccountShort } from '@/pistols/components/ui/Account'
-import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
+import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ChallengeListByDuelist } from './ChallengeList'
+import { ActionButton } from '@/pistols/components/ui/Buttons'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -49,11 +48,7 @@ export default function DuelistModal() {
       <Modal.Content image>
         <ProfilePic profilePic={profilePic} />
         <Modal.Description>
-          <div>
-            <h1>{name}</h1>
-            <AccountShort address={duelistAddress} />
-            <h3 className='Important'>Honor: 10.0</h3>
-          </div>
+          <ProfileDescription address={duelistAddress} />
           <br />
           {/* <p>We've found the following gravatar image associated with your e-mail address.</p> */}
 
