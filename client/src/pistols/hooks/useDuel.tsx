@@ -3,6 +3,7 @@ import { Entity, HasValue, Has, getComponentValue } from '@dojoengine/recs'
 import { useComponentValue, useEntityQuery } from "@dojoengine/react"
 import { useDojoComponents } from '@/dojo/DojoContext'
 import { bigintToEntity } from "../utils/utils"
+import { useEntityKeys } from '@/pistols/hooks/useEntityKeysQuery'
 
 
 //------------------
@@ -11,8 +12,7 @@ import { bigintToEntity } from "../utils/utils"
 
 export const useAllDuelIds = () => {
   const { Duel } = useDojoComponents()
-  const entityIds: Entity[] = useEntityQuery([Has(Duel)])
-  const duelIds: bigint[] = useMemo(() => (entityIds ?? []).map((entityId) => BigInt(entityId)), [entityIds])
+  const duelIds: bigint[] = useEntityKeys(Duel, 'duel_id')
   return {
     duelIds,
   }

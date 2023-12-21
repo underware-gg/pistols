@@ -3,7 +3,9 @@ import { Entity, HasValue, Has, getComponentValue } from '@dojoengine/recs'
 import { useComponentValue, useEntityQuery } from "@dojoengine/react"
 import { useDojoComponents } from '@/dojo/DojoContext'
 import { bigintToEntity, bigintToHex, feltToString } from "../utils/utils"
-import { ChallengeState } from "../utils/pistols"
+import { ChallengeState } from "@/pistols/utils/pistols"
+import { useEntityKeys, useEntityKeysQuery } from '@/pistols/hooks/useEntityKeysQuery'
+
 
 //-----------------------------
 // All Challenges
@@ -11,8 +13,7 @@ import { ChallengeState } from "../utils/pistols"
 
 export const useAllChallengeIds = () => {
   const { Challenge } = useDojoComponents()
-  const entityIds: Entity[] = useEntityQuery([Has(Challenge)])
-  const challengeIds: bigint[] = useMemo(() => (entityIds ?? []).map((entityId) => BigInt(entityId)), [entityIds])
+  const challengeIds: bigint[] = useEntityKeys(Challenge, 'duel_id')
   return {
     challengeIds,
   }
@@ -67,9 +68,10 @@ export const useChallenge = (duelId: bigint | string) => {
 
 export const useChallengeIdsByDuelist = (address: bigint) => {
   const { Challenge } = useDojoComponents()
-  const challengerIds: Entity[] = useEntityQuery([HasValue(Challenge, { duelist_a: BigInt(address) })])
-  const challengedIds: Entity[] = useEntityQuery([HasValue(Challenge, { duelist_b: BigInt(address) })])
+  const challengerIds: bigint[] = useEntityKeysQuery(Challenge, [HasValue(Challenge, { duelist_a: BigInt(address) })], 'duel_id')
+  const challengedIds: bigint[] = useEntityKeysQuery(Challenge, [HasValue(Challenge, { duelist_b: BigInt(address) })], 'duel_id')
   const challengeIds: Entity[] = useMemo(() => ([...challengerIds, ...challengedIds]), [challengerIds, challengedIds])
+  // console.log(address, challengeIds)
   return {
     challengeIds,
   }
@@ -77,11 +79,10 @@ export const useChallengeIdsByDuelist = (address: bigint) => {
 
 export const useChallengesByDuelist = (address: bigint) => {
   const { Challenge } = useDojoComponents()
-  
   const { challengeIds } = useChallengeIdsByDuelist(address)
 
-  const challenges: any[] = useMemo(() => (challengeIds ?? []).map((challengeId) => getComponentValue(Challenge, challengeId)).sort((a, b) => (a.timestamp - b.timestamp)), [challengeIds])
-
+  const challenges: any[] = useMemo(() => challengeIds.map((challengeId) => getComponentValue(Challenge, bigintToEntity(challengeId))).sort((a, b) => (a.timestamp - b.timestamp)), [challengeIds])
+  // console.log(challenges)
   const stats: any = useMemo(() => {
     let result = {
       challengeCount: challenges.length,

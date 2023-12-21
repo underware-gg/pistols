@@ -24,6 +24,11 @@ export default function DuelistModal() {
   const [challengeArgs, setChallengeArgs] = useState(null)
 
   const isYou = useMemo(() => (duelistAddress == BigInt(account.address)), [duelistAddress, account])
+  const isOpen = useMemo(() => (atDuelists && duelistAddress > 0), [atDuelists, duelistAddress])
+
+  useEffect(() => {
+    setIsChallenging(false)
+  }, [isOpen])
 
   const _close = () => { dispatchSetDuelist(0n) }
   const _challenge = () => {
@@ -37,8 +42,8 @@ export default function DuelistModal() {
       // size='small'
       dimmer='inverted'
       onClose={() => _close()}
-      onOpen={() => setIsChallenging(false)}
-      open={atDuelists && duelistAddress > 0}
+      // onOpen={() => setIsChallenging(false)}
+      open={isOpen}
     >
       <Modal.Header>Duelist</Modal.Header>
       <Modal.Content image>
