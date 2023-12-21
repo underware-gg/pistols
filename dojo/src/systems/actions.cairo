@@ -86,7 +86,7 @@ mod actions {
 
             // assert(challenged != zero_address() || pass_code != 0, 'Challenge a player or pass_code');
             assert(challenged != zero_address() || pass_code != 0, 'Missing challenged address');
-            assert(expire_seconds == 0 || expire_seconds >= timestamp::from_days(1), 'Invalid expire_seconds');
+            assert(expire_seconds == 0 || expire_seconds >= timestamp::from_hours(1), 'Invalid expire_seconds');
 
             assert(duelist_exist(world, caller), 'Challenger not registered');
             // if (challenged != zero_address()) {

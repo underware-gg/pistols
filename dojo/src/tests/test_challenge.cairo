@@ -42,7 +42,7 @@ mod tests {
     fn test_invalid_expire() {
         let (world, system, owner, other) = utils::setup_world();
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
-        let expire_seconds: u64 = 24 * 60 * 60 - 1;
+        let expire_seconds: u64 = 60 * 60 - 1;
         let duel_id: u128 = utils::execute_create_challenge(system, owner, other, PASS_CODE_1, MESSAGE_1, expire_seconds);
     }
 
