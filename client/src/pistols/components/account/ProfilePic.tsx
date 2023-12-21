@@ -29,7 +29,7 @@ export function ProfilePicButton({
   const url = useMemo(() => _makeUrl(profilePic, 'sq'), [profilePic])
   const _click = () => {
     if (disabled) return
-    const nextProfilePic = profilePic < process.env.PROFILE_PIC_COUNT ? profilePic + 1 : 1
+    const nextProfilePic = profilePic < parseInt(process.env.PROFILE_PIC_COUNT) ? profilePic + 1 : 1
     onSelect(nextProfilePic)
   }
   return profilePic ? <Image src={url} className={`ProfilePicSquare ${!disabled ? `Anchor` : 'Grayscale'}`} onClick={() => _click()} /> : <></>

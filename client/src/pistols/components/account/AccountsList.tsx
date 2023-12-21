@@ -78,7 +78,7 @@ function AccountItem({
     return (
       selectedProfilePic ? selectedProfilePic
         : profilePic ? profilePic
-          : (Number(BigInt(address) % BigInt(process.env.PROFILE_PIC_COUNT)) + 1)
+          : (Number(BigInt(address) % BigInt(parseInt(process.env.PROFILE_PIC_COUNT))) + 1)
     )
   }, [selectedProfilePic, profilePic])
 
