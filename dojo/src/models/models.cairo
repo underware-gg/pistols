@@ -5,8 +5,14 @@ use pistols::types::challenge::{ChallengeState};
 struct Duelist {
     #[key]
     address: ContractAddress,
+    timestamp: u64,   // Unix time, 1st registered
     name: felt252,
     profile_pic: u8,
+    total_duels: u32,
+    total_wins: u32,
+    total_losses: u32,
+    total_draws: u32,
+    honor: u8,
 }
 
 #[derive(Model, Copy, Drop, Serde)]

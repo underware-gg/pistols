@@ -21,6 +21,8 @@ mod tests {
         let duelist: Duelist = utils::get_Duelist(world, owner);
         assert(duelist.name == name, 'duelist name');
         assert(duelist.profile_pic == 1, 'duelist name');
+        assert(duelist.timestamp > 0, 'duelist name');
+        assert(duelist.honor == 100, 'duelist name');
     }
 
     #[test]

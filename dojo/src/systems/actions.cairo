@@ -57,13 +57,18 @@ mod actions {
         ) {
             let world: IWorldDispatcher = self.world_dispatcher.read();
             let caller: ContractAddress = starknet::get_caller_address();
-            set!(world, (
-                Duelist {
-                    address: caller,
-                    name,
-                    profile_pic,
-                }
-            ));
+
+            let mut duelist: Duelist = get!(world, caller, Duelist);
+            // 1st time setup
+            if (duelist.timestamp == 0) {
+                duelist.timestamp = get_block_timestamp();
+                duelist.honor = 100;
+            }
+            // update
+            duelist.name = name;
+            duelist.profile_pic = profile_pic;
+
+            set!(world, (duelist));
             return ();
         }
 
