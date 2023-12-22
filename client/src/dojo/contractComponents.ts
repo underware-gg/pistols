@@ -20,11 +20,24 @@ export function defineContractComponents(world: World) {
 	  Duelist: (() => {
 	    return defineComponent(
 	      world,
-	      { address: RecsType.BigInt, name: RecsType.BigInt, profile_pic: RecsType.Number },
+	      { address: RecsType.BigInt, timestamp: RecsType.Number, name: RecsType.BigInt, profile_pic: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, honor: RecsType.Number },
 	      {
 	        metadata: {
 	          name: "Duelist",
-	          types: ["contractaddress","felt252","u8"],
+	          types: ["contractaddress","u64","felt252","u8","u32","u32","u32","u32","u8"],
+	          customTypes: [],
+	        },
+	      }
+	    );
+	  })(),
+	  Pact: (() => {
+	    return defineComponent(
+	      world,
+	      { pair: RecsType.BigInt, duel_id: RecsType.BigInt },
+	      {
+	        metadata: {
+	          name: "Pact",
+	          types: ["u128","u128"],
 	          customTypes: [],
 	        },
 	      }
