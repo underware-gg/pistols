@@ -35,6 +35,13 @@ struct Challenge {
 }
 
 #[derive(Model, Copy, Drop, Serde)]
+struct Pact {
+    #[key]
+    pair: u128,
+    duel_id: u128,
+}
+
+#[derive(Model, Copy, Drop, Serde)]
 struct Round {
     #[key]
     duel_id: u128,

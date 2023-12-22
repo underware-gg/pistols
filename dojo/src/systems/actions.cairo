@@ -27,6 +27,14 @@ trait IActions<TContractState> {
 
     // read-only calls
     fn get_timestamp(self: @TContractState) -> u64;
+    fn get_pact(self: @TContractState,
+        duelist_a: ContractAddress,
+        duelist_b: ContractAddress,
+    ) -> u128;
+    fn has_pact(self: @TContractState,
+        duelist_a: ContractAddress,
+        duelist_b: ContractAddress,
+    ) -> bool;
 }
 
 #[dojo::contract]
@@ -36,12 +44,13 @@ mod actions {
     use traits::{Into, TryInto};
     use core::option::OptionTrait;
     use starknet::{ContractAddress, get_block_timestamp, get_block_info};
-    use pistols::models::models::{Duelist, Challenge, Round};
+
+    use pistols::models::models::{Duelist, Challenge, Pact, Round};
+    use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
+    use pistols::utils::timestamp::{timestamp};
     use pistols::systems::seeder::{make_seed};
     use pistols::systems::solver::{solve_random};
-    use pistols::systems::utils::{zero_address, duelist_exist};
-    use pistols::utils::timestamp::{timestamp};
-    use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
+    use pistols::systems::{utils};
 
     // impl: implement functions specified in trait
     #[external(v0)]
@@ -82,14 +91,14 @@ mod actions {
             let world: IWorldDispatcher = self.world_dispatcher.read();
             let caller: ContractAddress = starknet::get_caller_address();
 
-            // assert(challenged != zero_address() || pass_code != 0, 'Challenge a player or pass_code');
-            assert(challenged != zero_address() || pass_code != 0, 'Missing challenged address');
+            // assert(challenged != utils::zero_address() || pass_code != 0, 'Challenge a player or pass_code');
+            assert(challenged != utils::zero_address() || pass_code != 0, 'Missing challenged address');
             assert(expire_seconds == 0 || expire_seconds >= timestamp::from_hours(1), 'Invalid expire_seconds');
 
-            assert(duelist_exist(world, caller), 'Challenger not registered');
+            assert(utils::duelist_exist(world, caller), 'Challenger not registered');
             assert(caller != challenged, 'Challenging thyself, you fool!');
-            // if (challenged != zero_address()) {
-            //     assert(duelist_exist(world, caller), 'Challenged is not registered');
+            // if (challenged != utils::zero_address()) {
+            //     assert(utils::duelist_exist(world, caller), 'Challenged is not registered');
             // }
 
             // let duel_id: u32 = world.uuid();
@@ -97,24 +106,24 @@ mod actions {
             let timestamp: u64 = get_block_timestamp();
             let timestamp_expire: u64 = if (expire_seconds == 0) { 0 } else { timestamp + expire_seconds };
 
-            set!(world, (
-                Challenge {
-                    duel_id,
-                    state: ChallengeState::Awaiting.into(),
-                    duelist_a: caller,
-                    duelist_b: challenged,
-                    message,
-                    pass_code,
-                    // progress
-                    round: 0,
-                    winner: zero_address(),
-                    // times
-                    timestamp,
-                    timestamp_expire,
-                    timestamp_start: 0,
-                    timestamp_end: 0,
-                }
-            ));
+            let challenge = Challenge {
+                duel_id,
+                state: ChallengeState::Awaiting.into(),
+                duelist_a: caller,
+                duelist_b: challenged,
+                message,
+                pass_code,
+                // progress
+                round: 0,
+                winner: utils::zero_address(),
+                // times
+                timestamp,
+                timestamp_expire,
+                timestamp_start: 0,
+                timestamp_end: 0,
+            };
+
+            utils::set_challenge(world, challenge);
 
             (duel_id)
         }
@@ -145,7 +154,7 @@ mod actions {
                 challenge.timestamp_end = timestamp;
             } else {
                 assert(caller == challenge.duelist_b, 'Not the Challenged');
-                assert(duelist_exist(world, caller), 'Challenged not registered');
+                assert(utils::duelist_exist(world, caller), 'Challenged not registered');
                 if (!accepted) {
                     challenge.state = ChallengeState::Refused.into();
                     challenge.timestamp_end = timestamp;
@@ -163,7 +172,7 @@ mod actions {
             }
 
             // update challenge state
-            set!(world, (challenge));
+            utils::set_challenge(world, challenge);
 
             // Create 1st round
             if (challenge.state == ChallengeState::InProgress.into()) {
@@ -188,6 +197,22 @@ mod actions {
 
         fn get_timestamp(self: @ContractState) -> u64 {
             (get_block_timestamp())
+        }
+
+        fn get_pact(self: @ContractState,
+            duelist_a: ContractAddress,
+            duelist_b: ContractAddress,
+        ) -> u128 {
+            let world: IWorldDispatcher = self.world_dispatcher.read();
+            let pair: u128 = utils::make_pact_pair(duelist_a, duelist_b);
+            (get!(world, pair, Pact).duel_id)
+        }
+
+        fn has_pact(self: @ContractState,
+            duelist_a: ContractAddress,
+            duelist_b: ContractAddress,
+        ) -> bool {
+            (self.get_pact(duelist_a, duelist_b) != 0)
         }
 
     }
