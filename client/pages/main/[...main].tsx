@@ -6,7 +6,7 @@ import Tavern from '@/pistols/components/Tavern'
 import GameContainer from '@/pistols/components/GameContainer'
 import Background from '@/pistols/components/Background'
 
-// enable wasm in build
+// enable wasm in build (this is for api routes)
 // export const config = {
 //   runtime: 'experimental-edge'
 // }
