@@ -92,7 +92,7 @@ export const useDojo = () => {
 
 
 //
-// Underdark
+// pistols
 //
 
 export const useDojoAccount = () => {

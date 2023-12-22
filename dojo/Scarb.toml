@@ -33,6 +33,6 @@ account_address = "0x517ececd29116499f4a1b64b094da79ba08dfd54a3edaa316134c41f816
 private_key = "0x1800000000300000180000000000030000000000003006001800006600"
 
 # SLOT
-# rpc_url = "https://api.cartridge.gg/x/underdark/katana"
+# rpc_url = "https://api.cartridge.gg/x/pistols/katana"
 # account_address = "0x35d0cdaf12e6816f4a1a5c074befbddd08abf61bbea87765342289b48b4bc16"
 # private_key = "0x3cfcc4c504dcb4f1bf790ba53d95aaa167ff4297ce63b4891473314905375e6"
