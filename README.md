@@ -1,5 +1,6 @@
-# pistols
-Pistols at 10 Blocks | Made with love for the Dojo Game Jam #3, 15th Dec 2023 - 2nd Jan 2024.
+# Pistols at 10 Blocks
+
+Made with love for the Dojo Game Jam #3, 15th Dec 2023 - 2nd Jan 2024.
 
 ```
                                           ~~^             ^J~                                                           
@@ -51,3 +52,111 @@ Pistols at 10 Blocks is an onchain game, in which you face off against another L
 * Amaro -- Art & Design
 * Mononoke -- Art & Design
 * Jubilee -- 3D Art & Effects
+
+
+
+
+
+## Development notes
+
+### Environment Setup
+
+> [Dojo Book](https://book.dojoengine.org/getting-started/setup.html)
+
+Install Rust + Cargo + others
+
+```
+# Install Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# open new terminal
+rustup override set stable
+rustup update
+
+# Install Cargo
+curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh
+
+# other stuff you might need
+brew install protobuf
+```
+
+Install the [Cairo 1.0](https://marketplace.visualstudio.com/items?itemName=starkware.cairo1) extension for Visual Studio Code
+
+
+### Install Dojo 
+
+> [Dojo Book](https://book.dojoengine.org/getting-started/quick-start.html)
+
+Using Dojo 0.4.2
+
+```console
+curl -L https://install.dojoengine.org | bash
+# open new terminal to update PATH
+dojoup -v 0.4.2
+
+# test dojo
+cd dojo
+sozo build
+sozo test
+
+# install packages
+cd ../client
+npm install
+```
+
+
+## Launch Dojo
+
+#### Terminal 1: Katana (local node)
+
+```console
+cd dojo
+katana --disable-fee --invoke-max-steps 10000000
+
+# or just...
+cd dojo
+./run_katana
+```
+
+#### Terminal 2: Torii (indexer)
+
+Uncomment the `world_address` parameter in `dojo/Scarb.toml` then:
+
+```console
+cd dojo
+torii --world 0x2d6bcc12cbb460243b73a4c937faf00ad2d071d899f40dfc9182843712f9c77
+
+# or just...
+cd dojo
+./run_torii
+```
+
+#### Terminal 3: Client
+
+```console
+cd client
+npm install && npm dev
+
+# or just...
+cd dojo
+./run_client
+```
+
+#### Terminal 4: Sozo commands
+
+```console
+# build world and systems
+cd dojo
+sozo build
+
+# migrate to local Katana
+cd dojo
+./migrate
+```
+
+
+#### Open the game on a browser
+
+* [http://localhost:5173/](http://localhost:5173/)
+
+
