@@ -40,3 +40,27 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         duel_id,
     });
 }
+
+
+
+
+#[cfg(test)]
+mod tests {
+    use core::traits::{Into, TryInto};
+    use debug::PrintTrait;
+    use starknet::{ContractAddress};
+
+    use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
+    use pistols::systems::{utils};
+
+    #[test]
+    #[available_gas(1_000_000)]
+    fn test_pact_pair() {
+        let a: ContractAddress = starknet::contract_address_const::<0x269c58e5fa1e7f6fe3756f1de88ecdfab7d03ba67e79ba0365b4ef1e81155be>();
+        let b: ContractAddress = starknet::contract_address_const::<0x517ececd29116499f4a1b64b094da79ba08dfd54a3edaa316134c41f8160973>();
+        let p_a = utils::make_pact_pair(a, b);
+        let p_b = utils::make_pact_pair(b, a);
+        assert(p_a == p_b, 'test_pact_pair');
+    }
+
+}

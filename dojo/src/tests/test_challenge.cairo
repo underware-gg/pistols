@@ -47,6 +47,28 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
+    #[should_panic(expected:('Duplicated challenge','ENTRYPOINT_FAILED'))]
+    fn test_duplicated_challenge() {
+        let (world, system, owner, other) = utils::setup_world();
+        utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
+        utils::execute_register_duelist(system, other, OTHER_NAME, 1);
+        utils::execute_create_challenge(system, owner, other, 0, MESSAGE_1, 0);
+        utils::execute_create_challenge(system, owner, other, 0, MESSAGE_1, 0);
+    }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    #[should_panic(expected:('Duplicated challenge','ENTRYPOINT_FAILED'))]
+    fn test_duplicated_challenge_from_challenged() {
+        let (world, system, owner, other) = utils::setup_world();
+        utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
+        utils::execute_register_duelist(system, other, OTHER_NAME, 1);
+        utils::execute_create_challenge(system, owner, other, 0, MESSAGE_1, 0);
+        utils::execute_create_challenge(system, other, owner, 0, MESSAGE_1, 0);
+    }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Invalid expire_seconds','ENTRYPOINT_FAILED'))]
     fn test_invalid_expire() {
         let (world, system, owner, other) = utils::setup_world();
@@ -60,8 +82,6 @@ mod tests {
     fn test_challenge_address() {
         let (world, system, owner, other) = utils::setup_world();
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
-        let timestamp: u128 = utils::execute_create_challenge(system, owner, other, 0, MESSAGE_1, 0);
-
         let duel_id: u128 = utils::execute_create_challenge(system, owner, other, 0, MESSAGE_1, 0);
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'state');
@@ -80,7 +100,6 @@ mod tests {
     fn test_challenge_pass_code() {
         let (world, system, owner, other) = utils::setup_world();
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
-
         let challenged = zero_address();
         let duel_id: u128 = utils::execute_create_challenge(system, owner, challenged, PASS_CODE_1, MESSAGE_1, 0);
         let ch = utils::get_Challenge(world, duel_id);
@@ -100,7 +119,6 @@ mod tests {
     fn test_challenge_expire_ok() {
         let (world, system, owner, other) = utils::setup_world();
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
-
         let expire_seconds: u64 = 24 * 60 * 60;
         let duel_id: u128 = utils::execute_create_challenge(system, owner, other, PASS_CODE_1, MESSAGE_1, expire_seconds);
         let ch = utils::get_Challenge(world, duel_id);
@@ -108,6 +126,22 @@ mod tests {
         assert(ch.timestamp_expire == ch.timestamp + expire_seconds, 'timestamp_expire');
         assert(ch.timestamp_start == 0, 'timestamp_start');
         assert(ch.timestamp_end == 0, 'timestamp_end');
+    }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_challenge_address_pact() {
+        let (world, system, owner, other) = utils::setup_world();
+        utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
+        assert(utils::execute_get_pact(system, owner, other) == 0, 'get_pact_0_1');
+        assert(utils::execute_get_pact(system, other, owner) == 0, 'get_pact_0_2');
+        assert(utils::execute_has_pact(system, owner, other) == false, 'has_pact_0_1');
+        assert(utils::execute_has_pact(system, other, owner) == false, 'has_pact_0_2');
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, 0, MESSAGE_1, 0);
+        assert(utils::execute_get_pact(system, owner, other) == duel_id, 'get_pact_1_1');
+        assert(utils::execute_get_pact(system, other, owner) == duel_id, 'get_pact_1_2');
+        assert(utils::execute_has_pact(system, owner, other) == true, 'has_pact_1_1');
+        assert(utils::execute_has_pact(system, other, owner) == true, 'has_pact_1_2');
     }
 
 
@@ -155,9 +189,11 @@ mod tests {
         let duel_id: u128 = utils::execute_create_challenge(system, owner, other, PASS_CODE_1, MESSAGE_1, expire_seconds);
         let ch = utils::get_Challenge(world, duel_id);
 
+        assert(utils::execute_has_pact(system, other, owner) == true, 'has_pact_yes');
         let (block_number, timestamp) = utils::elapse_timestamp(timestamp::from_date(1, 0, 1));
         let new_state: ChallengeState = utils::execute_reply_challenge(system, owner, duel_id, true);
         assert(new_state == ChallengeState::Expired, 'expired');
+        assert(utils::execute_has_pact(system, other, owner) == false, 'has_pact_no');
 
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');
@@ -192,8 +228,11 @@ mod tests {
         let duel_id: u128 = utils::execute_create_challenge(system, owner, other, PASS_CODE_1, MESSAGE_1, expire_seconds);
         let ch = utils::get_Challenge(world, duel_id);
         let (block_number, timestamp) = utils::elapse_timestamp(timestamp::from_days(1));
+
+        assert(utils::execute_has_pact(system, other, owner) == true, 'has_pact_yes');
         let new_state: ChallengeState = utils::execute_reply_challenge(system, owner, duel_id, false);
         assert(new_state == ChallengeState::Withdrawn, 'canceled');
+        assert(utils::execute_has_pact(system, owner, other) == false, 'has_pact_no');
 
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');
@@ -242,10 +281,12 @@ mod tests {
 
         let expire_seconds: u64 = timestamp::from_days(2);
         let duel_id: u128 = utils::execute_create_challenge(system, owner, other, PASS_CODE_1, MESSAGE_1, expire_seconds);
-        let ch = utils::get_Challenge(world, duel_id);
+
+        assert(utils::execute_has_pact(system, other, owner) == true, 'has_pact_yes');
         let (block_number, timestamp) = utils::elapse_timestamp(timestamp::from_days(1));
         let new_state: ChallengeState = utils::execute_reply_challenge(system, other, duel_id, false);
         assert(new_state == ChallengeState::Refused, 'refused');
+        assert(utils::execute_has_pact(system, other, owner) == false, 'has_pact_no');
 
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');

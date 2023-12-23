@@ -97,6 +97,7 @@ mod actions {
 
             assert(utils::duelist_exist(world, caller), 'Challenger not registered');
             assert(caller != challenged, 'Challenging thyself, you fool!');
+            assert(!self.has_pact(caller, challenged), 'Duplicated challenge');
             // if (challenged != utils::zero_address()) {
             //     assert(utils::duelist_exist(world, caller), 'Challenged is not registered');
             // }
