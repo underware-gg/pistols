@@ -16,6 +16,7 @@
     "@dojoengine/create-burner": "^0.2.9",
     "@dojoengine/react": "^0.2.9",
     "@dojoengine/recs": "^0.1.35",
+    "@dojoengine/torii-client": "^0.2.9",
     "@dojoengine/utils": "^0.2.9",
     "@tweenjs/tween.js": "^21.0.0",
     "next": "^13.5.6",
