@@ -81,4 +81,12 @@ mod tests {
 
     }
 
+
+
+
+    // TODO...
+    // - test invalid moves
+    // - test totals
+    // - test honor
+
 }

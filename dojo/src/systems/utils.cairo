@@ -42,12 +42,12 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         duel_id,
     });
 
-    // Create 1st round
-    if (challenge.state == ChallengeState::InProgress.into()) {
+    // Start Round
+    if (state == ChallengeState::InProgress) {
         set!(world, (
             Round {
                 duel_id,
-                round_number: 1,
+                round_number: challenge.round_number,
                 state: RoundState::Commit.into(),
                 duelist_a: Move {
                     hash: 0,
@@ -65,6 +65,27 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
                 },
             }
         ));
+    }
+
+    // Update totals
+    if (state == ChallengeState::Draw || state == ChallengeState::Resolved) {
+        let mut duelist_a: Duelist = get!(world, challenge.duelist_a, Duelist);
+        let mut duelist_b: Duelist = get!(world, challenge.duelist_b, Duelist);
+        duelist_a.total_duels += 1;
+        duelist_b.total_duels += 1;
+        if (state == ChallengeState::Draw) {
+            duelist_a.total_draws += 1;
+            duelist_b.total_draws += 1;
+        } else if (challenge.duelist_a == challenge.winner) {
+            duelist_a.total_wins += 1;
+            duelist_b.total_losses += 1;
+        } else if (challenge.duelist_b == challenge.winner) {
+            duelist_a.total_losses += 1;
+            duelist_b.total_wins += 1;
+        } else {
+            // should never get here!
+        }
+        set!(world, (duelist_a, duelist_b));
     }
 }
 

@@ -143,10 +143,20 @@ mod tests {
     fn test_pedersen_hash() {
         let a: felt252 = 0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7;
         let b: felt252 = 0x4d07e40e93398ed3c76981e72dd1fd22557a78ce36c0515f679e27f0bb5bc5f;
-        let p_a = pedersen(a, b);
-        let p_b = pedersen(b, a);
-        // pederses hashes are DIFFERENT for (a,b) and (b,a)
-        assert(p_a != p_b, 'pedersen');
+        let a_b = pedersen(a, b);
+        let b_a = pedersen(b, a);
+        // pedersen hashes are DIFFERENT for (a,b) and (b,a)
+        assert(a_b != b_a, 'pedersen');
+    }
+
+    #[test]
+    #[available_gas(1_000_000)]
+    fn test_pedersen_hash_from_zero() {
+        let a: felt252 = 0;
+        let b: felt252 = 0x4d07e40e93398ed3c76981e72dd1fd22557a78ce36c0515f679e27f0bb5bc5f;
+        let a_b = pedersen(a, b);
+        // pedersen hashes are DIFFERENT if (a == zero)
+        assert(a_b != b, 'pedersen');
     }
 
     #[test]
@@ -156,9 +166,9 @@ mod tests {
         let b: felt252 = 0x4d07e40e93398ed3c76981e72dd1fd22557a78ce36c0515f679e27f0bb5bc5f;
         let aa: u256 = a.into();
         let bb: u256 = b.into();
-        let p_a = aa ^ bb;
-        let p_b = bb ^ aa;
+        let a_b = aa ^ bb;
+        let b_a = bb ^ aa;
         // xor hashes are EQUAL for (a,b) and (b,a)
-        assert(p_a == p_b, 'felt_to_u128');
+        assert(a_b == b_a, 'felt_to_u128');
     }
 }

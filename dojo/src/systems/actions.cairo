@@ -25,6 +25,21 @@ trait IActions<TContractState> {
         accepted: bool,
     ) -> ChallengeState;
 
+    //
+    // Duel
+    fn commit_move(self: @TContractState,
+        duel_id: u128,
+        round_number: u8,
+        hash: u64,
+    );
+    fn reveal_move(self: @TContractState,
+        duel_id: u128,
+        round_number: u8,
+        salt: u64,
+        move: u8,
+    );
+
+    //
     // read-only calls
     fn get_timestamp(self: @TContractState) -> u64;
     fn get_pact(self: @TContractState,
@@ -50,12 +65,14 @@ mod actions {
     use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::utils::timestamp::{timestamp};
     use pistols::systems::seeder::{make_seed};
+    use pistols::systems::shooter::{shooter};
     use pistols::systems::{utils};
     use pistols::types::constants::{constants};
 
     // impl: implement functions specified in trait
     #[external(v0)]
     impl ActionsImpl of IActions<ContractState> {
+
         //------------------------
         // Duelists
         //
@@ -172,7 +189,33 @@ mod actions {
             (challenge.state.try_into().unwrap())
         }
 
+
+        //------------------------
+        // COMMIT Duel move
         //
+
+        fn commit_move(self: @ContractState,
+            duel_id: u128,
+            round_number: u8,
+            hash: u64,
+        ) {
+            let world: IWorldDispatcher = self.world_dispatcher.read();
+            shooter::commit_move(world, duel_id, round_number, hash);
+        }
+
+        fn reveal_move(self: @ContractState,
+            duel_id: u128,
+            round_number: u8,
+            salt: u64,
+            move: u8,
+        ) {
+            let world: IWorldDispatcher = self.world_dispatcher.read();
+            shooter::reveal_move(world, duel_id, round_number, salt, move);
+        }
+
+
+
+        //------------------------------------
         // read-only calls
         //
 
