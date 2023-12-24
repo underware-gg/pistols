@@ -11,6 +11,7 @@ import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ChallengeMessages } from '@/pistols/utils/pistols'
 import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
 import { randomArrayElement, validateCairoString } from '@/pistols/utils/utils'
+import { usePact } from '@/pistols/hooks/usePact'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -20,8 +21,9 @@ export default function DuelistModal() {
   const { create_challenge } = useDojoSystemCalls()
   const { account } = useDojoAccount()
 
-  const { atDuelists, duelistAddress, dispatchSetDuelist } = usePistolsContext()
+  const { atDuelists, duelistAddress, dispatchSetDuelist, dispatchSetDuel } = usePistolsContext()
   const { name, profilePic } = useDuelist(duelistAddress)
+  const { hasPact, pactDuelId } = usePact(account.address, duelistAddress)
   const [isChallenging, setIsChallenging] = useState(false)
   const [challengeArgs, setChallengeArgs] = useState(null)
 
@@ -66,10 +68,15 @@ export default function DuelistModal() {
               {!isChallenging && <ActionButton fill label='Close' onClick={() => _close()} />}
               {isChallenging && <ActionButton fill label='Cancel Challenge' onClick={() => setIsChallenging(false)} />}
             </Col>
-            <Col>
-              {!isChallenging && <ActionButton fill disabled={isYou} label='Challenge for a Duel!' onClick={() => setIsChallenging(true)} />}
-              {isChallenging && <ActionButton fill disabled={isYou || !challengeArgs} label='Submit Challenge!' onClick={() => _challenge()}/>}
-            </Col>
+            {!isYou &&
+              <Col>
+                {
+                  hasPact ? <ActionButton fill label='Go to Challenge' onClick={() => dispatchSetDuel(pactDuelId)} />
+                    : isChallenging ? <ActionButton fill disabled={!challengeArgs} label='Submit Challenge!' onClick={() => _challenge()} />
+                      : <ActionButton fill label='Challenge for a Duel!' onClick={() => setIsChallenging(true)} />
+                }
+              </Col>
+            }
           </Row>
         </Grid>
       </Modal.Actions>
