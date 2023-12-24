@@ -8,6 +8,7 @@ mod tests {
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     use pistols::models::models::{Duelist};
+    use pistols::types::constants::{constants};
     use pistols::tests::utils::{utils};
 
     #[test]
@@ -22,7 +23,7 @@ mod tests {
         assert(duelist.name == name, 'duelist name');
         assert(duelist.profile_pic == 1, 'duelist name');
         assert(duelist.timestamp > 0, 'duelist name');
-        assert(duelist.honor == 100, 'duelist name');
+        assert(duelist.honor == constants::MAX_HONOR, 'duelist name');
     }
 
     #[test]

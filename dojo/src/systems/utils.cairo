@@ -5,6 +5,7 @@ use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::models::models::{Duelist, Challenge, Pact, Round, Move};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round::{RoundState, RoundStateTrait};
+use pistols::types::constants::{constants};
 
 // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
 extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
@@ -53,14 +54,14 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
                     salt: 0,
                     move: 0,
                     hit: 0,
-                    health: 100,
+                    health: constants::MAX_HEALTH,
                 },
                 duelist_b: Move {
                     hash: 0,
                     salt: 0,
                     move: 0,
                     hit: 0,
-                    health: 100,
+                    health: constants::MAX_HEALTH,
                 },
             }
         ));

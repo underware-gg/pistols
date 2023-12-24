@@ -51,6 +51,7 @@ mod actions {
     use pistols::utils::timestamp::{timestamp};
     use pistols::systems::seeder::{make_seed};
     use pistols::systems::{utils};
+    use pistols::types::constants::{constants};
 
     // impl: implement functions specified in trait
     #[external(v0)]
@@ -69,7 +70,7 @@ mod actions {
             // 1st time setup
             if (duelist.timestamp == 0) {
                 duelist.timestamp = get_block_timestamp();
-                duelist.honor = 100;
+                duelist.honor = constants::MAX_HONOR;
             }
             // update
             duelist.name = name;
