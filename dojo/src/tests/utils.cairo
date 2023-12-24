@@ -111,13 +111,15 @@ mod utils {
     //
 
     fn get_Duelist(world: IWorldDispatcher, address: ContractAddress) -> Duelist {
-        let result: Duelist = get!(world, address, Duelist);
-        (result)
+        (get!(world, address, Duelist))
     }
 
     fn get_Challenge(world: IWorldDispatcher, duel_id: u128) -> Challenge {
-        let result: Challenge = get!(world, duel_id, Challenge);
-        (result)
+        (get!(world, duel_id, Challenge))
+    }
+
+    fn get_Round(world: IWorldDispatcher, duel_id: u128, round_number: u8) -> Round {
+        (get!(world, (duel_id, round_number), Round))
     }
 }
 

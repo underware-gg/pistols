@@ -19,14 +19,14 @@ struct Duelist {
 struct Challenge {
     #[key]
     duel_id: u128,
-    state: u8,
+    state: u8,                  // ChallengeState
     duelist_a: ContractAddress, // Challenger
     duelist_b: ContractAddress, // Challenged
     message: felt252,           // message to challenged
     pass_code: felt252,
     // progress and results
-    round: u8,
-    winner: ContractAddress,
+    round_number: u8,           // current or final
+    winner: ContractAddress,    // if (state == ChallengeState.Resolved)
     // times
     timestamp: u64,             // Unix time, created
     timestamp_expire: u64,      // Unix time, challenge expiration
@@ -37,8 +37,8 @@ struct Challenge {
 #[derive(Model, Copy, Drop, Serde)]
 struct Pact {
     #[key]
-    pair: u128,
-    duel_id: u128,
+    pair: u128,     // xor'd duelists
+    duel_id: u128,  // current Challenge, or 0x0
 }
 
 #[derive(Model, Copy, Drop, Serde)]
@@ -46,9 +46,16 @@ struct Round {
     #[key]
     duel_id: u128,
     #[key]
-    round: u8,
-    move_a: u8,     // Challenger move
-    move_b: u8,     // Challenged move
-    health_a: u8,   // Challenger final health
-    health_b: u8,   // Challenged final health
+    round_number: u8,
+    // duelist_a
+    hash_a: u64,    // hashed move (salt+move)
+    salt_a: u64,    // the salt
+    move_a: u8,     // the move
+    health_a: u8,   // final health
+    // duelist_b
+    hash_b: u64,    // hashed move (salt+move)
+    salt_b: u64,    // the salt
+    move_b: u8,     // the move
+    health_b: u8,   // final health
+    // result?
 }

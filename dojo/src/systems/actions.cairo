@@ -49,7 +49,6 @@ mod actions {
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::utils::timestamp::{timestamp};
     use pistols::systems::seeder::{make_seed};
-    use pistols::systems::solver::{solve_random};
     use pistols::systems::{utils};
 
     // impl: implement functions specified in trait
@@ -115,7 +114,7 @@ mod actions {
                 message,
                 pass_code,
                 // progress
-                round: 0,
+                round_number: 0,
                 winner: utils::zero_address(),
                 // times
                 timestamp,
@@ -161,17 +160,10 @@ mod actions {
                     challenge.timestamp_end = timestamp;
                 } else {
                     challenge.state = ChallengeState::InProgress.into();
-                    challenge.round = 1;
+                    challenge.round_number = 1;
                     challenge.timestamp_start = timestamp;
                 }
             }
-
-            // TEMPORARY RESOLUTION
-            // TODO: REMOVE THIS
-            if (challenge.state == ChallengeState::InProgress.into()) {
-                solve_random(ref challenge);
-            }
-
             // update challenge state
             utils::set_challenge(world, challenge);
 
@@ -180,7 +172,11 @@ mod actions {
                 set!(world, (
                     Round {
                         duel_id,
-                        round: 1,
+                        round_number: 1,
+                        hash_a: 0,
+                        hash_b: 0,
+                        salt_a: 0,
+                        salt_b: 0,
                         move_a: 0,
                         move_b: 0,
                         health_a: 100,
