@@ -1,6 +1,8 @@
 use starknet::ContractAddress;
 use pistols::types::challenge::{ChallengeState};
 
+//
+// Players need to register as a Duelist to play
 #[derive(Model, Copy, Drop, Serde)]
 struct Duelist {
     #[key]
@@ -15,11 +17,13 @@ struct Duelist {
     honor: u8,
 }
 
+//
+// Challenge lifecycle
 #[derive(Model, Copy, Drop, Serde)]
 struct Challenge {
     #[key]
     duel_id: u128,
-    state: u8,                  // ChallengeState
+    state: u8,                  // actually a ChallengeState
     duelist_a: ContractAddress, // Challenger
     duelist_b: ContractAddress, // Challenged
     message: felt252,           // message to challenged
@@ -34,6 +38,8 @@ struct Challenge {
     timestamp_end: u64,         // Unix time, ended
 }
 
+//
+// Current challenge from one Duelist to another
 #[derive(Model, Copy, Drop, Serde)]
 struct Pact {
     #[key]
@@ -41,21 +47,26 @@ struct Pact {
     duel_id: u128,  // current Challenge, or 0x0
 }
 
+//
+// The move of each player on a Round
+#[derive(Copy, Drop, Serde, Introspect)]
+struct Move {
+    hash: u64,      // hashed move (salt+move)
+    salt: u64,      // the salt
+    move: u8,       // the move
+    hit: u8,        // amount of health taken
+    health: u8,     // final health
+}
+
+//
+// Each duel round
 #[derive(Model, Copy, Drop, Serde)]
 struct Round {
     #[key]
     duel_id: u128,
     #[key]
     round_number: u8,
-    // duelist_a
-    hash_a: u64,    // hashed move (salt+move)
-    salt_a: u64,    // the salt
-    move_a: u8,     // the move
-    health_a: u8,   // final health
-    // duelist_b
-    hash_b: u64,    // hashed move (salt+move)
-    salt_b: u64,    // the salt
-    move_b: u8,     // the move
-    health_b: u8,   // final health
-    // result?
+    state: u8,          // actually a RoundState
+    duelist_a: Move,    // duelist_a move
+    duelist_b: Move,    // duelist_b move
 }

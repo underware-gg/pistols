@@ -45,8 +45,9 @@ mod actions {
     use core::option::OptionTrait;
     use starknet::{ContractAddress, get_block_timestamp, get_block_info};
 
-    use pistols::models::models::{Duelist, Challenge, Pact, Round};
+    use pistols::models::models::{Duelist, Challenge, Pact, Round, Move};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
+    use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::utils::timestamp::{timestamp};
     use pistols::systems::seeder::{make_seed};
     use pistols::systems::{utils};
@@ -166,24 +167,6 @@ mod actions {
             }
             // update challenge state
             utils::set_challenge(world, challenge);
-
-            // Create 1st round
-            if (challenge.state == ChallengeState::InProgress.into()) {
-                set!(world, (
-                    Round {
-                        duel_id,
-                        round_number: 1,
-                        hash_a: 0,
-                        hash_b: 0,
-                        salt_a: 0,
-                        salt_b: 0,
-                        move_a: 0,
-                        move_b: 0,
-                        health_a: 100,
-                        health_b: 100,
-                    }
-                ));
-            }
 
             (challenge.state.try_into().unwrap())
         }

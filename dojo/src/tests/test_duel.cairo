@@ -10,6 +10,7 @@ mod tests {
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::models::models::{Duelist, Challenge, Round};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
+    use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::systems::utils::{zero_address};
     use pistols::utils::timestamp::{timestamp};
     use pistols::tests::utils::{utils};
@@ -25,15 +26,18 @@ mod tests {
     const SALT_2_a: u64 = 0x03f8a7e99d723c82;
     const SALT_2_b: u64 = 0x45299a98d9f8ce03;
     
-    fn _start_new_challenge(world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress) -> u128 {
+    fn _start_new_challenge(world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress) -> (Challenge, Round) {
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         utils::execute_register_duelist(system, other, OTHER_NAME, 2);
         let expire_seconds: u64 = timestamp::from_days(2);
         let duel_id: u128 = utils::execute_create_challenge(system, owner, other, PASS_CODE_1, MESSAGE_1, expire_seconds);
-        let (block_number, timestamp) = utils::elapse_timestamp(timestamp::from_days(1));
-        let new_state: ChallengeState = utils::execute_reply_challenge(system, other, duel_id, true);
-        assert(new_state == ChallengeState::InProgress, 'in_progress');
-        (duel_id)
+        utils::elapse_timestamp(timestamp::from_days(1));
+        utils::execute_reply_challenge(system, other, duel_id, true);
+        let ch = utils::get_Challenge(world, duel_id);
+        let round: Round = utils::get_Round(world, duel_id, 1);
+        assert(ch.state == ChallengeState::InProgress.into(), 'in_progress');
+        assert(round.state == RoundState::Commit.into(), 'in_progress');
+        (ch, round)
     }
 
     //-----------------------------------------
@@ -63,17 +67,16 @@ mod tests {
         assert(ch.timestamp_end == 0, 'timestamp_end');
         
         let round: Round = utils::get_Round(world, duel_id, 1);
-        assert(ch.duel_id == duel_id, 'round.duel_id');
-        assert(ch.round_number == 1, 'round.round_number');
-        
+        assert(round.duel_id == duel_id, 'round.duel_id');
+        assert(round.round_number == 1, 'round.round_number');
+        assert(round.state == RoundState::Commit.into(), 'round.state');
     }
 
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_challenge_other_accept() {
         let (world, system, owner, other) = utils::setup_world();
-        
-        let duel_id: u128 = _start_new_challenge(world, system, owner, other);
+        let (challenge, round) = _start_new_challenge(world, system, owner, other);
 
 
     }

@@ -1,9 +1,10 @@
 use core::option::OptionTrait;
-use traits::{Into, TryInto, BitXor};
+use traits::{Into, TryInto};
 use starknet::{ContractAddress};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-use pistols::models::models::{Duelist, Challenge, Pact};
+use pistols::models::models::{Duelist, Challenge, Pact, Round, Move};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
+use pistols::types::round::{RoundState, RoundStateTrait};
 
 // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
 extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
@@ -39,6 +40,31 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         pair,
         duel_id,
     });
+
+    // Create 1st round
+    if (challenge.state == ChallengeState::InProgress.into()) {
+        set!(world, (
+            Round {
+                duel_id,
+                round_number: 1,
+                state: RoundState::Commit.into(),
+                duelist_a: Move {
+                    hash: 0,
+                    salt: 0,
+                    move: 0,
+                    hit: 0,
+                    health: 100,
+                },
+                duelist_b: Move {
+                    hash: 0,
+                    salt: 0,
+                    move: 0,
+                    hit: 0,
+                    health: 100,
+                },
+            }
+        ));
+    }
 }
 
 
