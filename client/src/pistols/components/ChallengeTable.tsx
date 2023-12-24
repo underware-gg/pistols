@@ -6,6 +6,7 @@ import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ChallengeState, ChallengeStateNames } from '@/pistols/utils/pistols'
 import { formatTimestamp, formatTimestampDelta } from '@/pistols/utils/utils'
+import { useTimestampCountdown } from '../hooks/useTimestamp'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -87,7 +88,9 @@ function DuelItem({
   const { duelistA, duelistB, state, winner, timestamp, timestamp_expire, timestamp_start, timestamp_end } = useChallenge(duelId)
   const { name: nameA, profilePic: profilePicA } = useDuelist(duelistA)
   const { name: nameB, profilePic: profilePicB } = useDuelist(duelistB)
-
+  const timestamp_system = useTimestampCountdown()
+  // console.log(timestamp, timestamp_expire, `>`, timestamp_system)
+  
   useEffect(() => {
     if (timestamp) timestampCallback(duelId, timestamp)
   }, [timestamp])
@@ -100,7 +103,7 @@ function DuelItem({
   const isDraw = useMemo(() => [ChallengeState.Draw].includes(state), [state])
 
   const date = useMemo(() => {
-    if (isAwaiting) return /*'⏱️ ' +*/ formatTimestampDelta(timestamp, timestamp_expire)
+    if (isAwaiting) return '⏱️ ' + formatTimestampDelta(timestamp_system, timestamp_expire)
     if (isInProgress || winnerIsA || winnerIsB) return /*'⚔️ ' +*/ formatTimestamp(timestamp_start)
     if (isCanceled) return /*'🚫 ' +*/ formatTimestamp(timestamp_end)
     if (isDraw) return /*'🤝 ' +*/ formatTimestamp(timestamp_end)
