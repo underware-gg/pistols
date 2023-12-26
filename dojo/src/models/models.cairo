@@ -54,7 +54,7 @@ struct Move {
     hash: u64,      // hashed move (salt+move)
     salt: u64,      // the salt
     move: u8,       // the move
-    hit: u8,        // amount of health taken
+    damage: u8,     // amount of health taken
     health: u8,     // final health
 }
 

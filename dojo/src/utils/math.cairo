@@ -2,6 +2,7 @@
 trait MathTrait<T> {
     fn min(v1: T, v2: T) -> T;
     fn max(v1: T, v2: T) -> T;
+    fn map(v: T, in_min: T, in_max: T, out_min: T, out_max: T) -> T;
     fn pow(base: T, exp: T) -> T;
     fn squaredDistance(x1: T, y1: T, x2: T, y2: T) -> T;
 }
@@ -12,6 +13,14 @@ impl MathU8 of MathTrait<u8> {
     }
     fn max(v1: u8, v2: u8) -> u8 {
         if (v1 > v2) { (v1) } else { (v2) }
+    }
+
+    fn map(v: u8, in_min: u8, in_max: u8, out_min: u8, out_max: u8) -> u8 {
+        if (out_min > out_max) { 
+            (out_min - MathU8::map(v, in_min, in_max, 0, out_min - out_max))
+        } else {
+            (out_min + (((out_max - out_min) / (in_max - in_min)) * (v - in_min)))
+        }
     }
 
     fn pow(base: u8, exp: u8) -> u8 {
@@ -36,6 +45,14 @@ impl MathU16 of MathTrait<u16> {
         if (v1 > v2) { (v1) } else { (v2) }
     }
 
+    fn map(v: u16, in_min: u16, in_max: u16, out_min: u16, out_max: u16) -> u16 {
+        if (out_min > out_max) { 
+            (out_min - MathU16::map(v, in_min, in_max, 0, out_min - out_max))
+        } else {
+            (out_min + (((out_max - out_min) / (in_max - in_min)) * (v - in_min)))
+        }
+    }
+
     fn pow(base: u16, exp: u16) -> u16 {
         if exp == 0 { 1 }
         else if exp == 1 { base }
@@ -56,6 +73,14 @@ impl MathU32 of MathTrait<u32> {
     }
     fn max(v1: u32, v2: u32) -> u32 {
         if (v1 > v2) { (v1) } else { (v2) }
+    }
+
+    fn map(v: u32, in_min: u32, in_max: u32, out_min: u32, out_max: u32) -> u32 {
+        if (out_min > out_max) { 
+            (out_min - MathU32::map(v, in_min, in_max, 0, out_min - out_max))
+        } else {
+            (out_min + (((out_max - out_min) / (in_max - in_min)) * (v - in_min)))
+        }
     }
 
     fn pow(base: u32, exp: u32) -> u32 {
@@ -80,6 +105,14 @@ impl MathU64 of MathTrait<u64> {
         if (v1 > v2) { (v1) } else { (v2) }
     }
 
+    fn map(v: u64, in_min: u64, in_max: u64, out_min: u64, out_max: u64) -> u64 {
+        if (out_min > out_max) { 
+            (out_min - MathU64::map(v, in_min, in_max, 0, out_min - out_max))
+        } else {
+            (out_min + (((out_max - out_min) / (in_max - in_min)) * (v - in_min)))
+        }
+    }
+
     fn pow(base: u64, exp: u64) -> u64 {
         if exp == 0 { 1 }
         else if exp == 1 { base }
@@ -100,6 +133,14 @@ impl MathU128 of MathTrait<u128> {
     }
     fn max(v1: u128, v2: u128) -> u128 {
         if (v1 > v2) { (v1) } else { (v2) }
+    }
+
+    fn map(v: u128, in_min: u128, in_max: u128, out_min: u128, out_max: u128) -> u128 {
+        if (out_min > out_max) { 
+            (out_min - MathU128::map(v, in_min, in_max, 0, out_min - out_max))
+        } else {
+            (out_min + (((out_max - out_min) / (in_max - in_min)) * (v - in_min)))
+        }
     }
 
     /// Raise a number to a power.
@@ -130,6 +171,14 @@ impl MathU256 of MathTrait<u256> {
         if (v1 > v2) { (v1) } else { (v2) }
     }
 
+    fn map(v: u256, in_min: u256, in_max: u256, out_min: u256, out_max: u256) -> u256 {
+        if (out_min > out_max) { 
+            (out_min - MathU256::map(v, in_min, in_max, 0, out_min - out_max))
+        } else {
+            (out_min + (((out_max - out_min) / (in_max - in_min)) * (v - in_min)))
+        }
+    }
+
     fn pow(base: u256, exp: u256) -> u256 {
         if exp == 0 { 1 }
         else if exp == 1 { base }
@@ -150,8 +199,9 @@ impl MathU256 of MathTrait<u256> {
 //
 #[cfg(test)]
 mod tests {
+    use debug::PrintTrait;
     use pistols::utils::string::{String};
-    use pistols::utils::math::{MathU128};
+    use pistols::utils::math::{MathU8,MathU128};
 
     #[test]
     #[available_gas(100_000_000)]
@@ -188,5 +238,21 @@ mod tests {
         assert(MathU128::pow(10,1) == 10, String::concat('test_math_pow', '10,1`'));
         assert(MathU128::pow(10,2) == 100, String::concat('test_math_pow', '10,2'));
         assert(MathU128::pow(10,8) == 100_000_000, String::concat('test_math_pow', '10,8'));
+    }
+
+    #[test]
+    #[available_gas(100_000_000)]
+    fn test_math_map() {
+        assert(MathU8::map(1, 1, 5, 20, 40) == 20, String::concat('map', '1'));
+        assert(MathU8::map(2, 1, 5, 20, 40) == 25, String::concat('map', '2'));
+        assert(MathU8::map(3, 1, 5, 20, 40) == 30, String::concat('map', '3'));
+        assert(MathU8::map(4, 1, 5, 20, 40) == 35, String::concat('map', '4'));
+        assert(MathU8::map(5, 1, 5, 20, 40) == 40, String::concat('map', '5'));
+        // output values can be inverted
+        assert(MathU8::map(1, 1, 5, 40, 20) == 40, String::concat('map', 'i_1'));
+        assert(MathU8::map(2, 1, 5, 40, 20) == 35, String::concat('map', 'i_2'));
+        assert(MathU8::map(3, 1, 5, 40, 20) == 30, String::concat('map', 'i_3'));
+        assert(MathU8::map(4, 1, 5, 40, 20) == 25, String::concat('map', 'i_4'));
+        assert(MathU8::map(5, 1, 5, 40, 20) == 20, String::concat('map', 'i_5'));
     }
 }

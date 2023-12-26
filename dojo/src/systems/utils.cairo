@@ -53,14 +53,14 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
                     hash: 0,
                     salt: 0,
                     move: 0,
-                    hit: 0,
+                    damage: 0,
                     health: constants::MAX_HEALTH,
                 },
                 duelist_b: Move {
                     hash: 0,
                     salt: 0,
                     move: 0,
-                    hit: 0,
+                    damage: 0,
                     health: constants::MAX_HEALTH,
                 },
             }
@@ -89,6 +89,11 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
     }
 }
 
+fn throw_dice(salt: felt252, seed: felt252, limit: u128, faces: u128) -> bool {
+    let hash: felt252 = pedersen(salt, seed);
+    let double: u256 = hash.into();
+    ((double.low % faces) < limit)
+}
 
 
 
@@ -109,6 +114,33 @@ mod tests {
         let p_a = utils::make_pact_pair(a, b);
         let p_b = utils::make_pact_pair(b, a);
         assert(p_a == p_b, 'test_pact_pair');
+    }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_throw_dice() {
+        // lower limit
+        let mut counter: u8 = 0;
+        let mut n: felt252 = 0;
+        loop {
+            if (n == 100) { break; }
+            if (utils::throw_dice('salt_1', 'seed_1' + n, 25, 100)) {
+                counter += 1;
+            }
+            n += 1;
+        };
+        assert(counter > 10 && counter < 40, 'dices_25');
+        // higher limit
+        let mut counter: u8 = 0;
+        let mut n: felt252 = 0;
+        loop {
+            if (n == 100) { break; }
+            if (utils::throw_dice('salt_2', 'seed_2' + n, 75, 100)) {
+                counter += 1;
+            }
+            n += 1;
+        };
+        assert(counter > 60 && counter < 90, 'dices_75');
     }
 
 }

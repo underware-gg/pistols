@@ -122,20 +122,20 @@ use starknet::{ContractAddress};
     fn finish_round(ref challenge: Challenge, ref round: Round) {
         let mut winner = utils::zero_address();
 
-        // get hit for each player
+        // get damage for each player
         if (round.round_number == 1) {
-            let (a, b) = pistols_shootout(ref round);
-            round.duelist_a.hit = a;
-            round.duelist_b.hit = b;
+            let (a, b) = pistols_shootout(round);
+            round.duelist_a.damage = a;
+            round.duelist_b.damage = b;
         } else if (round.round_number == 2) {
-            let (a, b) = blades_clash(ref round);
-            round.duelist_a.hit = a;
-            round.duelist_b.hit = b;
+            let (a, b) = blades_clash(round);
+            round.duelist_a.damage = a;
+            round.duelist_b.damage = b;
         }
 
-        // apply hit
-        round.duelist_a.health -= MathU8::min(round.duelist_a.hit, round.duelist_a.health);
-        round.duelist_b.health -= MathU8::min(round.duelist_b.hit, round.duelist_b.health);
+        // apply damage
+        round.duelist_a.health -= MathU8::min(round.duelist_a.damage, round.duelist_a.health);
+        round.duelist_b.health -= MathU8::min(round.duelist_b.damage, round.duelist_b.health);
 
         // decide results
         if (round.duelist_a.health == 0 && round.duelist_b.health == 0) {
@@ -167,17 +167,69 @@ use starknet::{ContractAddress};
     //-----------------------------------
     // Pistols duel
     //
-    fn pistols_shootout(ref round: Round) -> (u8, u8) {
+    fn pistols_shootout(round: Round) -> (u8, u8) {
+        let mut damage_a: u8 = 0;
+        let mut damage_b: u8 = 0;
 
-        (0, 0)
+        let steps_a: u8 = round.duelist_a.move;
+        let steps_b: u8 = round.duelist_b.move;
+
+        if (steps_a == steps_b) {
+            // both duelists shoot together
+            damage_a = shoot_damage(round, 'shoot_b', steps_b);
+            damage_b = shoot_damage(round, 'shoot_a', steps_a);
+        } else if (steps_a < steps_b) {
+            // A shoots first
+            damage_b = shoot_damage(round, 'shoot_a', steps_a);
+            // if not dead, B can shoot
+            if (damage_b < constants::MAX_HEALTH) {
+                damage_a = shoot_damage(round, 'shoot_b', steps_a);
+            }
+        } else {
+            // B shoots first
+            damage_a = shoot_damage(round, 'shoot_b', steps_b);
+            // if not dead, A can shoot
+            if (damage_a < constants::MAX_HEALTH) {
+                damage_b = shoot_damage(round, 'shoot_a', steps_b);
+            }
+        }
+
+        (damage_a, damage_b)
     }
+
+    fn shoot_damage(round: Round, seed: felt252, steps: u8) -> u8 {
+        // dice 1: did the bullet hit the other player?
+        // at step 1: HIT chance is 20%
+        // at step 10: HIT chance is 80%
+        let percentage: u128 = MathU8::map(steps, 1, 10, constants::CHANCE_HIT_STEP_1, constants::CHANCE_HIT_STEP_10).into();
+        if (!throw_dice(round, seed, percentage, 100)) {
+            return 0;
+        }
+        // dice 2: if the bullet HIT the other player, what's the damage?
+        // at step 1: KILL chance is 80%
+        // at step 10: KILL chance is 20%
+        let percentage: u128 = MathU8::map(steps, 1, 10, constants::CHANCE_KILL_STEP_1, constants::CHANCE_KILL_STEP_10).into();
+        let killed = throw_dice(round, seed * 2, percentage, 100);
+        (if (killed) { constants::MAX_HEALTH } else { constants::HALF_HEALTH })
+    }
+
 
     //-----------------------------------
     // Blades duel
     //
-    fn blades_clash(ref round: Round) -> (u8, u8) {
+    fn blades_clash(round: Round) -> (u8, u8) {
+        let mut damage_a: u8 = 0;
+        let mut damage_b: u8 = 0;
 
-        (0, 0)
+        (damage_a, damage_b)
+    }
+
+    //-----------------------------------
+    // Randomizer
+    //
+    fn throw_dice(round: Round, seed: felt252, limit: u128, faces: u128) -> bool {
+        let salt: u64 = (round.duelist_a.salt ^ round.duelist_b.salt);
+        (utils::throw_dice(salt.into(), seed, limit, faces))
     }
 
 }
