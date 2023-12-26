@@ -85,6 +85,16 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         } else {
             // should never get here!
         }
+
+        // compute honour from 1st round steps
+        let first_round: Round = get!(world, (duel_id, 1), Round);
+        duelist_a.total_honour += first_round.duelist_a.move.into();
+        duelist_b.total_honour += first_round.duelist_b.move.into();
+        // average honour has an extra decimal, eg: 100 = 10.0
+        duelist_a.honour = ((duelist_a.total_honour * 10) / duelist_a.total_duels).try_into().unwrap();
+        duelist_b.honour = ((duelist_b.total_honour * 10) / duelist_b.total_duels).try_into().unwrap();
+        
+        // save Duelists
         set!(world, (duelist_a, duelist_b));
     }
 }

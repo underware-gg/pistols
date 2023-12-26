@@ -14,8 +14,8 @@ struct Duelist {
     total_wins: u32,
     total_losses: u32,
     total_draws: u32,
-    total_honour: u32,
-    honour: u8,
+    total_honour: u32,  // sum of al duels Honour
+    honour: u8,         // +1 decimal, eg: 100 = 10.0
 }
 
 //
