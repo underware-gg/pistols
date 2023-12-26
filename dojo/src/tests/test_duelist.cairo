@@ -23,7 +23,7 @@ mod tests {
         assert(duelist.name == name, 'duelist name');
         assert(duelist.profile_pic == 1, 'duelist name');
         assert(duelist.timestamp > 0, 'duelist name');
-        assert(duelist.honor == constants::MAX_HONOR, 'duelist name');
+        assert(duelist.honor == constants::FULL_HONOR, 'duelist name');
     }
 
     #[test]

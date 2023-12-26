@@ -4,10 +4,10 @@ mod constants {
     const ROUND_COUNT: u8 = 2;
     
     // max/initial honor of a player
-    const MAX_HONOR: u8 = 100;
+    const FULL_HONOR: u8 = 100;
     
     // initial health of a player on a duel
-    const MAX_HEALTH: u8 = 100;
+    const FULL_HEALTH: u8 = 100;
 
     // damage taken when player is not killed
     const HALF_HEALTH: u8 = 50;

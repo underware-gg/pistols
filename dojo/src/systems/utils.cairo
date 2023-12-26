@@ -54,14 +54,14 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
                     salt: 0,
                     move: 0,
                     damage: 0,
-                    health: constants::MAX_HEALTH,
+                    health: constants::FULL_HEALTH,
                 },
                 duelist_b: Move {
                     hash: 0,
                     salt: 0,
                     move: 0,
                     damage: 0,
-                    health: constants::MAX_HEALTH,
+                    health: constants::FULL_HEALTH,
                 },
             }
         ));

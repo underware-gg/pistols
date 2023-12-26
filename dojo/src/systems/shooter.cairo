@@ -182,14 +182,14 @@ use starknet::{ContractAddress};
             // A shoots first
             damage_b = shoot_damage(round, 'shoot_a', steps_a);
             // if not dead, B can shoot
-            if (damage_b < constants::MAX_HEALTH) {
+            if (damage_b < constants::FULL_HEALTH) {
                 damage_a = shoot_damage(round, 'shoot_b', steps_a);
             }
         } else {
             // B shoots first
             damage_a = shoot_damage(round, 'shoot_b', steps_b);
             // if not dead, A can shoot
-            if (damage_a < constants::MAX_HEALTH) {
+            if (damage_a < constants::FULL_HEALTH) {
                 damage_b = shoot_damage(round, 'shoot_a', steps_b);
             }
         }
@@ -210,19 +210,71 @@ use starknet::{ContractAddress};
         // at step 10: KILL chance is 20%
         let percentage: u128 = MathU8::map(steps, 1, 10, constants::CHANCE_KILL_STEP_1, constants::CHANCE_KILL_STEP_10).into();
         let killed = throw_dice(round, seed * 2, percentage, 100);
-        (if (killed) { constants::MAX_HEALTH } else { constants::HALF_HEALTH })
+        (if (killed) { constants::FULL_HEALTH } else { constants::HALF_HEALTH })
     }
 
 
     //-----------------------------------
     // Blades duel
     //
+    // Light - hits for half damage, early
+    // Heavy - hits for full damge, late
+    // Block - blocks light but not heavy, does no damage
+    //
+    // So...
+    // light vs light = both players take 1 damage
+    // Heavy vs heavy = both players die
+    // Block vs block = nothing
+    // Light vs block = nothing
+    // Light vs heavy = light hits first, if heavy lord survives, heavy hits second (and kills the other lord)
+    // Heavy vs block = blocking lord dies
+    //
     fn blades_clash(round: Round) -> (u8, u8) {
         let mut damage_a: u8 = 0;
         let mut damage_b: u8 = 0;
 
+        let blades_a: Blades = round.duelist_a.move.try_into().unwrap();
+        let blades_b: Blades = round.duelist_b.move.try_into().unwrap();
+
+        if (blades_a == Blades::Light) {
+            if (blades_b == Blades::Light) {
+                damage_a = constants::HALF_HEALTH;
+                damage_b = constants::HALF_HEALTH;
+            } else if (blades_b == Blades::Heavy) {
+                damage_b = constants::HALF_HEALTH;
+                // if B survives, A is hit
+                if (damage_b < round.duelist_b.health) {
+                    damage_a = constants::FULL_HEALTH;
+                }
+            } else if (blades_b == Blades::Block) {
+                // Nothing (successful block)
+            }
+        } else if (blades_a == Blades::Heavy) {
+            if (blades_b == Blades::Heavy) {
+                damage_a = constants::FULL_HEALTH;
+                damage_b = constants::FULL_HEALTH;
+            } else if (blades_b == Blades::Light) {
+                damage_a = constants::HALF_HEALTH;
+                // if A survives, B is hit
+                if (damage_a < round.duelist_a.health) {
+                    damage_b = constants::FULL_HEALTH;
+                }
+            } else if (blades_b == Blades::Block) {
+                damage_b = constants::FULL_HEALTH;
+            }
+        } else if (blades_a == Blades::Block) {
+            if (blades_b == Blades::Block) {
+                // Nothing (successful block)
+            } else if (blades_b == Blades::Light) {
+                // Nothing (successful block)
+            } else if (blades_b == Blades::Heavy) {
+                damage_a = constants::FULL_HEALTH;
+            }
+        }
+
         (damage_a, damage_b)
     }
+
 
     //-----------------------------------
     // Randomizer
