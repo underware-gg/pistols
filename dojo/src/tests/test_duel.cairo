@@ -11,8 +11,10 @@ mod tests {
     use pistols::models::models::{Duelist, Challenge, Round};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
+    use pistols::types::constants::{constants};
     use pistols::systems::utils::{zero_address};
     use pistols::utils::timestamp::{timestamp};
+    use pistols::utils::math::{MathU8};
     use pistols::tests::utils::{utils};
 
 
@@ -84,9 +86,30 @@ mod tests {
 
 
 
+
+
+
     // TODO...
     // - test invalid moves
     // - test totals
     // - test honor
 
+
+
+
+
+
+
+    //-----------------------------------------
+    // Probabilities
+    //
+
+    #[test]
+    #[available_gas(100_000_000)]
+    fn test_hit_kill_maps() {
+        assert(MathU8::map(1, 1, 10, constants::CHANCE_HIT_STEP_1, constants::CHANCE_HIT_STEP_10) == constants::CHANCE_HIT_STEP_1, 'CHANCE_HIT_STEP_1');
+        assert(MathU8::map(10, 1, 10, constants::CHANCE_HIT_STEP_1, constants::CHANCE_HIT_STEP_10) == constants::CHANCE_HIT_STEP_10, 'CHANCE_HIT_STEP_10');
+        assert(MathU8::map(1, 1, 10, constants::CHANCE_KILL_STEP_1, constants::CHANCE_KILL_STEP_10) == constants::CHANCE_KILL_STEP_1, 'CHANCE_KILL_STEP_1');
+        assert(MathU8::map(10, 1, 10, constants::CHANCE_KILL_STEP_1, constants::CHANCE_KILL_STEP_10) == constants::CHANCE_KILL_STEP_10, 'CHANCE_KILL_STEP_10');
+    }
 }

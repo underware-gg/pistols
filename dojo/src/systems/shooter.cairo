@@ -199,15 +199,15 @@ use starknet::{ContractAddress};
 
     fn shoot_damage(round: Round, seed: felt252, steps: u8) -> u8 {
         // dice 1: did the bullet hit the other player?
-        // at step 1: HIT chance is 20%
-        // at step 10: HIT chance is 80%
+        // at step 1: HIT chance is 80%
+        // at step 10: HIT chance is 20%
         let percentage: u128 = MathU8::map(steps, 1, 10, constants::CHANCE_HIT_STEP_1, constants::CHANCE_HIT_STEP_10).into();
         if (!throw_dice(round, seed, percentage, 100)) {
             return 0;
         }
         // dice 2: if the bullet HIT the other player, what's the damage?
-        // at step 1: KILL chance is 80%
-        // at step 10: KILL chance is 20%
+        // at step 1: KILL chance is 10%
+        // at step 10: KILL chance is 100%
         let percentage: u128 = MathU8::map(steps, 1, 10, constants::CHANCE_KILL_STEP_1, constants::CHANCE_KILL_STEP_10).into();
         let killed = throw_dice(round, seed * 2, percentage, 100);
         (if (killed) { constants::FULL_HEALTH } else { constants::HALF_HEALTH })
