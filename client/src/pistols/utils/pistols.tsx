@@ -48,4 +48,5 @@ export const ChallengeMessages = [
   "We meet at sunrise!",
   "Prepare to die!",
   "How dare you?",
+  "For honor!",
 ]

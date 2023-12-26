@@ -74,7 +74,7 @@ export default function ChallengeModal() {
             <Row columns='equal' textAlign='right'>
               <Col>
                 <Divider horizontal>
-                  <Header as='h4'>yelling</Header>
+                  <Header as='h4'>for a duel</Header>
                 </Divider>
               </Col>
             </Row>
