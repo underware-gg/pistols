@@ -10,7 +10,7 @@ export function ProfileDescription({
     <div>
       <h1>{name}</h1>
       <AccountShort address={address} />
-      <h3 className='Important'>Honor: 10.0</h3>
+      <h3 className='Important'>Honour: 10.0</h3>
     </div>
   )
 }

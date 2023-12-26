@@ -20,7 +20,7 @@ export default function Tavern() {
 
       <div className='TavernTitle AlignCenter'>
         <h1>The Tavern</h1>
-        <h2>of Honorable Lords 👑</h2>
+        <h2>of Honourable Lords 👑</h2>
       </div>
 
       <Container text className=''>

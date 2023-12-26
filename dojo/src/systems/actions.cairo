@@ -87,7 +87,6 @@ mod actions {
             // 1st time setup
             if (duelist.timestamp == 0) {
                 duelist.timestamp = get_block_timestamp();
-                duelist.honor = constants::FULL_HONOR;
             }
             // update
             duelist.name = name;

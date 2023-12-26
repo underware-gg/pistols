@@ -43,7 +43,7 @@ export default function DuelistTable() {
           <HeaderCell width={3}></HeaderCell>
           <HeaderCell width={1}></HeaderCell>
           <HeaderCell textAlign='left'>Duelist</HeaderCell>
-          <HeaderCell width={2}>Honor</HeaderCell>
+          <HeaderCell width={2}>Honour</HeaderCell>
           <HeaderCell width={1}>Wins</HeaderCell>
           <HeaderCell width={1}>Losses</HeaderCell>
           <HeaderCell width={1}>Draws</HeaderCell>

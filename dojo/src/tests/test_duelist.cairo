@@ -21,9 +21,11 @@ mod tests {
 
         let duelist: Duelist = utils::get_Duelist(world, owner);
         assert(duelist.name == name, 'duelist name');
-        assert(duelist.profile_pic == 1, 'duelist name');
-        assert(duelist.timestamp > 0, 'duelist name');
-        assert(duelist.honor == constants::FULL_HONOR, 'duelist name');
+        assert(duelist.profile_pic == 1, 'duelist profile_pic');
+        assert(duelist.timestamp > 0, 'duelist timestamp');
+        assert(duelist.total_duels == 0, 'duelist total_duels');
+        assert(duelist.total_honour == 0, 'duelist total_honour');
+        assert(duelist.honour == 0, 'duelist honour');
     }
 
     #[test]

@@ -32,15 +32,15 @@ export const ChallengeStateDescriptions = {
   [ChallengeState.Refused]: "Cowardly refused by Challenged",
   [ChallengeState.Expired]: "Challenge expired",
   [ChallengeState.InProgress]: "Challenge in progress!",
-  [ChallengeState.Resolved]: "Honor has been satisfied",
-  [ChallengeState.Draw]: "Honor has not been satisfied",
+  [ChallengeState.Resolved]: "Honour has been satisfied",
+  [ChallengeState.Draw]: "Honour has not been satisfied",
 }
 
 export const ChallengeMessages = [
   //34567890123456789012345678901| << max cairo string size (31 bytes)
   "I challenge ya for a duel!",
   "I demand satisfaction!",
-  "You are no honorable Lord!",
+  "You are no honourable Lord!",
   "Let's settle this on pistols!",
   "Your time has come, punk!",
   "Pistols clash at dawn!",
@@ -48,5 +48,5 @@ export const ChallengeMessages = [
   "We meet at sunrise!",
   "Prepare to die!",
   "How dare you?",
-  "For honor!",
+  "For honour!",
 ]

@@ -3,8 +3,8 @@ mod constants {
     // number of rounds per duel (pistols + blades)
     const ROUND_COUNT: u8 = 2;
     
-    // max/initial honor of a player
-    const FULL_HONOR: u8 = 100;
+    // max honour of a player
+    const FULL_HONOUR: u8 = 100;
     
     // initial health of a player on a duel
     const FULL_HEALTH: u8 = 100;
