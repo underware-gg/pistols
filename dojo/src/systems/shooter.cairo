@@ -1,8 +1,8 @@
 
 mod shooter {
     use core::option::OptionTrait;
-use core::traits::TryInto;
-use starknet::{ContractAddress};
+    use core::traits::TryInto;
+    use starknet::{ContractAddress};
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     use pistols::systems::{utils};
@@ -14,9 +14,6 @@ use starknet::{ContractAddress};
     use pistols::types::blades::{Blades};
     use pistols::utils::math::{MathU8};
 
-    // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
-    extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
-
     fn _assert_challenge(world: IWorldDispatcher, caller: ContractAddress, duel_id: u128, round_number: u8) -> (Challenge, felt252) {
         let challenge: Challenge = get!(world, duel_id, Challenge);
 
@@ -26,16 +23,26 @@ use starknet::{ContractAddress};
 
         // Correct Challenge state
         assert(challenge.state == ChallengeState::InProgress.into(), 'Challenge is not In Progress');
-        assert(challenge.round_number == round_number, 'Wrong Round number');
+        assert(challenge.round_number == round_number, 'Bad Round number');
         
         (challenge, duelist)
     }
 
-    fn _make_move_hash(salt: u64, move: u8) -> u64 {
-        (pedersen(salt.into(), move.into()).try_into().unwrap())
+    fn _assert_round_move(round_number: u8, move: u8) {
+        if (round_number == 1) {
+            let steps: Option<Steps> = move.try_into();
+            assert(steps != Option::None, 'Bad step move');
+        } else if (round_number == 2) {
+            let blade: Option<Blades> = move.try_into();
+            assert(blade != Option::None, 'Bad blade move');
+        }
     }
 
-    fn commit_move(world: IWorldDispatcher, duel_id: u128, round_number: u8, hash: u64) {
+
+    //-----------------------------------
+    // Commit
+    //
+    fn commit_move(world: IWorldDispatcher, duel_id: u128, round_number: u8, hash: felt252) {
         let caller: ContractAddress = starknet::get_caller_address();
 
         // Assert correct Challenge
@@ -57,13 +64,16 @@ use starknet::{ContractAddress};
         }
 
         // Finished commit
-        if (round.duelist_a.hash > 0 && round.duelist_b.hash > 0) {
+        if (round.duelist_a.hash != 0 && round.duelist_b.hash != 0) {
             round.state = RoundState::Reveal.into();
         }
 
         set!(world, (round));
     }
 
+    //-----------------------------------
+    // Reveal
+    //
     fn reveal_move(world: IWorldDispatcher, duel_id: u128, round_number: u8, salt: u64, move: u8) {
         let caller: ContractAddress = starknet::get_caller_address();
 
@@ -75,12 +85,12 @@ use starknet::{ContractAddress};
         assert(round.state == RoundState::Reveal.into(), 'Round not in Reveal');
 
         // Validate move hash
-        let hash: u64 = _make_move_hash(salt, move);
+        let hash: felt252 = utils::make_move_hash(salt, move);
 
         // validate move
         assert(move > 0, 'Invalid move zero');
         // will panic if invalid move
-        validate_round_move(round_number, move);
+        _assert_round_move(round_number, move);
 
         // Store move
         if (duelist == 'a') {
@@ -98,21 +108,13 @@ use starknet::{ContractAddress};
         // Finished round
         if (round.duelist_a.move > 0 && round.duelist_b.move > 0) {
             finish_round(ref challenge, ref round);
-        }
-
-        set!(world, (challenge, round));
-
-        utils::set_challenge(world, challenge);
-    }
-
-    //-----------------------------------
-    // Validate if single move is valid
-    //
-    fn validate_round_move(round_number: u8, move: u8) {
-        if (round_number == 1) {
-            let step_count: Steps = move.try_into().unwrap();
-        } else if (round_number == 2) {
-            let blade: Blades = move.try_into().unwrap();
+            // update Round first, Challenge may need it
+            set!(world, (round));
+            // update Challenge
+            utils::set_challenge(world, challenge);
+        } else {
+            // update Round only
+            set!(world, (round));
         }
     }
 

@@ -9,7 +9,7 @@ enum Blades {
     Block,
 }
 
-mod ROUND_STATE {
+mod BLADES {
     const NULL: u8 = 0;
     const LIGHT: u8 = 1;
     const HEAVY: u8 = 2;
@@ -19,20 +19,20 @@ mod ROUND_STATE {
 impl BladesIntoU8 of Into<Blades, u8> {
     fn into(self: Blades) -> u8 {
         match self {
-            Blades::Null =>     ROUND_STATE::NULL,
-            Blades::Light =>    ROUND_STATE::LIGHT,
-            Blades::Heavy =>    ROUND_STATE::HEAVY,
-            Blades::Block =>    ROUND_STATE::BLOCK,
+            Blades::Null =>     BLADES::NULL,
+            Blades::Light =>    BLADES::LIGHT,
+            Blades::Heavy =>    BLADES::HEAVY,
+            Blades::Block =>    BLADES::BLOCK,
         }
     }
 }
 
 impl TryU8IntoBlades of TryInto<u8, Blades> {
     fn try_into(self: u8) -> Option<Blades> {
-        if self == ROUND_STATE::NULL        { Option::Some(Blades::Null) }
-        else if self == ROUND_STATE::LIGHT  { Option::Some(Blades::Light) }
-        else if self == ROUND_STATE::HEAVY  { Option::Some(Blades::Heavy) }
-        else if self == ROUND_STATE::BLOCK  { Option::Some(Blades::Block) }
+        if self == BLADES::NULL        { Option::Some(Blades::Null) }
+        else if self == BLADES::LIGHT  { Option::Some(Blades::Light) }
+        else if self == BLADES::HEAVY  { Option::Some(Blades::Heavy) }
+        else if self == BLADES::BLOCK  { Option::Some(Blades::Block) }
         else { Option::None }
     }
 }

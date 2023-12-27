@@ -30,7 +30,7 @@ trait IActions<TContractState> {
     fn commit_move(self: @TContractState,
         duel_id: u128,
         round_number: u8,
-        hash: u64,
+        hash: felt252,
     );
     fn reveal_move(self: @TContractState,
         duel_id: u128,
@@ -196,7 +196,7 @@ mod actions {
         fn commit_move(self: @ContractState,
             duel_id: u128,
             round_number: u8,
-            hash: u64,
+            hash: felt252,
         ) {
             let world: IWorldDispatcher = self.world_dispatcher.read();
             shooter::commit_move(world, duel_id, round_number, hash);

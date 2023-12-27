@@ -52,7 +52,7 @@ struct Pact {
 // The move of each player on a Round
 #[derive(Copy, Drop, Serde, Introspect)]
 struct Move {
-    hash: u64,      // hashed move (salt+move)
+    hash: felt252,  // hashed move (salt+move)
     salt: u64,      // the salt
     move: u8,       // the move
     damage: u8,     // amount of health taken

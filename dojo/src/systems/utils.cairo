@@ -1,3 +1,4 @@
+// use debug::PrintTrait;
 use core::option::OptionTrait;
 use traits::{Into, TryInto};
 use starknet::{ContractAddress};
@@ -32,21 +33,21 @@ fn make_pact_pair(duelist_a: ContractAddress, duelist_b: ContractAddress) -> u12
 fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
     set!(world, (challenge));
 
+    let state: ChallengeState = challenge.state.try_into().unwrap();
+
     // Set pact between Duelists to avoid duplicated challenges
     let pair: u128 = make_pact_pair(challenge.duelist_a, challenge.duelist_b);
-    let state: ChallengeState = challenge.state.try_into().unwrap();
-    let duel_id: u128 = if (state.finished()) { 0 } else { challenge.duel_id };
-
+    let pact_duel_id: u128 = if (state.finished()) { 0 } else { challenge.duel_id };
     set!(world, Pact {
         pair,
-        duel_id,
+        duel_id: pact_duel_id,
     });
 
     // Start Round
     if (state == ChallengeState::InProgress) {
         set!(world, (
             Round {
-                duel_id,
+                duel_id: challenge.duel_id,
                 round_number: challenge.round_number,
                 state: RoundState::Commit.into(),
                 duelist_a: Move {
@@ -87,7 +88,7 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         }
 
         // compute honour from 1st round steps
-        let first_round: Round = get!(world, (duel_id, 1), Round);
+        let first_round: Round = get!(world, (challenge.duel_id, 1), Round);
         duelist_a.total_honour += first_round.duelist_a.move.into();
         duelist_b.total_honour += first_round.duelist_b.move.into();
         // average honour has an extra decimal, eg: 100 = 10.0
@@ -97,6 +98,10 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         // save Duelists
         set!(world, (duelist_a, duelist_b));
     }
+}
+
+fn make_move_hash(salt: u64, move: u8) -> felt252 {
+    (pedersen(salt.into(), move.into()))
 }
 
 fn throw_dice(salt: felt252, seed: felt252, limit: u128, faces: u128) -> bool {

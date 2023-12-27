@@ -16,6 +16,9 @@ mod utils {
         Round, round,
     };
 
+    // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
+    extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
+
     //
     // starknet testing cheats
     // https://github.com/starkware-libs/cairo/blob/main/corelib/src/starknet/testing.cairo
@@ -88,8 +91,29 @@ mod utils {
         (new_state)
     }
 
+    fn execute_commit_move(system: IActionsDispatcher, sender: ContractAddress,
+        duel_id: u128,
+        round_number: u8,
+        hash: felt252,
+    ) {
+        testing::set_contract_address(sender);
+        system.commit_move(duel_id, round_number, hash);
+        _next_block();
+    }
+
+    fn execute_reveal_move(system: IActionsDispatcher, sender: ContractAddress,
+        duel_id: u128,
+        round_number: u8,
+        salt: u64,
+        move: u8,
+    ) {
+        testing::set_contract_address(sender);
+        system.reveal_move(duel_id, round_number, salt, move);
+        _next_block();
+    }
+
     //
-    // resd-only calls
+    // read-only calls
     //
 
     fn execute_get_timestamp(system: IActionsDispatcher) -> u64 {
@@ -120,6 +144,12 @@ mod utils {
 
     fn get_Round(world: IWorldDispatcher, duel_id: u128, round_number: u8) -> Round {
         (get!(world, (duel_id, round_number), Round))
+    }
+
+    fn get_Challenge_Round(world: IWorldDispatcher, duel_id: u128) -> (Challenge, Round) {
+        let challenge = get!(world, duel_id, Challenge);
+        let round = get!(world, (duel_id, challenge.round_number), Round);
+        (challenge, round)
     }
 }
 
