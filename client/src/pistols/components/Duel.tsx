@@ -28,11 +28,17 @@ export default function Duel({
         <h1>A Duel!</h1>
       </div>
 
-      <div className='DuelDuelistA'>
-        <DuelDuelist duelId={duelId} floated='left' address={duelistA} isPlaying={BigInt(account?.address) == duelistA} />
+      <div className='DuelSideA'>
+        <div className='DuelProfileA' >
+          <DuelDuelist duelId={duelId} floated='left' address={duelistA} />
+        </div>
+        <DuelProgress duelId={duelId} isPlaying={BigInt(account?.address) == duelistA} address={duelistA} floated='left' />
       </div>
-      <div className='DuelDuelistB'>
-        <DuelDuelist duelId={duelId} floated='right' address={duelistB} isPlaying={BigInt(account?.address) == duelistB}/>
+      <div className='DuelSideB'>
+        <div className='DuelProfileB' >
+          <DuelDuelist duelId={duelId} floated='right' address={duelistB} />
+        </div>
+        <DuelProgress duelId={duelId} isPlaying={BigInt(account?.address) == duelistB} address={duelistB} floated='right' />
       </div>
     </>
   )
@@ -40,45 +46,27 @@ export default function Duel({
 
 function DuelDuelist({
   duelId,
-  isPlaying,
   address,
   floated,
-  className = null,
 }) {
   const { name, profilePic } = useDuelist(address)
 
   return (
-    <div className={className}>
-      <Grid>
-        <Row>
-          {floated == 'left' &&
-            <Col width={4}>
-              <Segment compact>
-                <ProfilePic duel profilePic={profilePic} />
-              </Segment>
-            </Col>
-          }
-          <Col width={12}>
-            <Segment compact floated={floated} className='NoMargin'>
-              <ProfileDescription address={address} />
-            </Segment>
-          </Col>
-          {floated == 'right' &&
-            <Col width={4}>
-              <Segment compact>
-                <ProfilePic duel profilePic={profilePic} />
-              </Segment>
-            </Col>
-          }
-        </Row>
-
-        <Row columns={'equal'}>
-          <Col>
-            <DuelProgress duelId={duelId} isPlaying={isPlaying} address={address} floated={floated}/>
-          </Col>
-        </Row>
-      </Grid>
-    </div>
+    <>
+      {floated == 'left' &&
+        <Segment compact className='NoMargin'>
+          <ProfilePic duel profilePic={profilePic} />
+        </Segment>
+      }
+      <Segment compact floated={floated} className='NoMargin'>
+        <ProfileDescription address={address} />
+      </Segment>
+      {floated == 'right' &&
+        <Segment compact className='NoMargin'>
+          <ProfilePic duel profilePic={profilePic} />
+        </Segment>
+      }
+    </>
   )
 }
 
@@ -178,7 +166,7 @@ function ProgressItem({
         <Step.Title>{title}</Step.Title>
         <Step.Description>{description}</Step.Description>
       </Step.Content>
-      {right && icon && <Icon name={icon} />}
+      {right && icon && <Icon name={icon} style={{margin: '0 0 0 1rem'}} />}
     </Step>
   )
 }

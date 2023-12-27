@@ -115,9 +115,9 @@ canvas {
 // GENERIC
 //
 
-.AlignLeft { text-align: left; }
-.AlignCenter { text-align: center; }
-.AlignRight { text-align: right; }
+.AlignLeft { text-align: left!important; justify-content: left!important; }
+.AlignCenter { text-align: center!important; justify-content: center!important; }
+.AlignRight { text-align: right!important; justify-content: right!important; }
 .AlignTop { vertical-align: top; }
 .AlignMiddle { vertical-align: middle; }
 .AlignBottom { vertical-align: bottom; }
@@ -215,6 +215,8 @@ canvas {
 //------------------------
 // ASPECT RATIO
 //
+// $reference-w: 1200;
+// $reference-h: 675;
 $aspect: 1.7777;
 $aspect-w: min(100vw,100vh*$aspect);
 $aspect-h: min(100vw/$aspect,100vh);
@@ -454,7 +456,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
   padding: 15px;
 }
 
-.DuelDuelistA {
+.DuelSideA {
   height: 100%;
   width: 50%;
   position: absolute;
@@ -464,12 +466,25 @@ $box-h: calc((100vh - $aspect-h) / 2);
   text-align: left;
   align-items: left;
 }
-.DuelDuelistB {
-  @extend .DuelDuelistA;
+.DuelSideB {
+  @extend .DuelSideA;
   left: unset;
   right: 0;
   text-align: right;
   align-items: right;
+}
+
+.DuelProfileA {
+  display: flex;
+  align-items: flex-start;
+  align-content: flex-start;
+  text-align: left;
+  width: 100%;
+}
+.DuelProfileB {
+  @extend .DuelProfileA;
+  text-align: right;
+  justify-content: right;
 }
 
 .DuelProgress {
