@@ -28,11 +28,11 @@ initializer_class_hash = "0xbeef"
 world_address = "0x269c58e5fa1e7f6fe3756f1de88ecdfab7d03ba67e79ba0365b4ef1e81155be"
 
 # Development
-# rpc_url = "http://localhost:5050/"
-# account_address = "0x517ececd29116499f4a1b64b094da79ba08dfd54a3edaa316134c41f8160973"
-# private_key = "0x1800000000300000180000000000030000000000003006001800006600"
+rpc_url = "http://localhost:5050/"
+account_address = "0x517ececd29116499f4a1b64b094da79ba08dfd54a3edaa316134c41f8160973"
+private_key = "0x1800000000300000180000000000030000000000003006001800006600"
 
 # SLOT
-rpc_url = "https://api.cartridge.gg/x/pistols/katana"
-account_address = "0x355df606ef197ceacb60212996047efbef81828f918c8490ac950802dd602b5"
-private_key = "0x5ceca4e52514d4d97217ba3f70d654fff7d6a688c2add4cc7769fbdb17b1aff"
+# rpc_url = "https://api.cartridge.gg/x/pistols/katana"
+# account_address = "0x355df606ef197ceacb60212996047efbef81828f918c8490ac950802dd602b5"
+# private_key = "0x5ceca4e52514d4d97217ba3f70d654fff7d6a688c2add4cc7769fbdb17b1aff"
