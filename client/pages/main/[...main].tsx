@@ -14,11 +14,11 @@ import Background from '@/pistols/components/Background'
 export default function MainPage() {
   const router = useRouter()
 
-  const { page, title, duelId, backgroundImage } = useMemo(() => {
+  const { page, title, duelId, className } = useMemo(() => {
     let page = null
     let title = null
     let duelId = null
-    let backgroundImage = null
+    let className = 'BackgroundSplash'
 
     // parse page
     if (router.isReady && router.query.main) {
@@ -27,11 +27,11 @@ export default function MainPage() {
       if (_page == 'gate') {
         page = _page
         title = 'Pistols - The Gate'
-        // backgroundImage = '/images/gate_bg.png'
+        className = 'BackgroundWeapons'
       } else if (_page == 'tavern') {
         page = _page
         title = 'Pistols - The Tavern'
-        // backgroundImage = '/images/gate_bg.png'
+        className = 'BackgroundWeapons'
       } else if (_page == 'duel') {
         // '/room/[duel]'
         // '/room/[duel]/[levelNumber]'
@@ -43,13 +43,14 @@ export default function MainPage() {
           page = 'gate'
           router.push('/gate')
         }
+        className = 'BackgroundDuel'
       }
     }
     return {
       page,
       title,
       duelId,
-      backgroundImage,
+      className,
     }
   }, [router.isReady, router.query])
 
@@ -65,8 +66,8 @@ export default function MainPage() {
   const _atTavern = (page == 'tavern')
 
   return (
-    <AppDojo title={title} backgroundImage={backgroundImage}>
-      <Background>
+    <AppDojo title={title} backgroundImage={null}>
+      <Background className={className}>
         {_atGate && <Gate />}
         {_atTavern && <Tavern />}
       </Background>

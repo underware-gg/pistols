@@ -227,12 +227,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 	width: $aspect-w;
 	height: $aspect-h;
   border: #0001 1px solid;
-  background-image: url('/images/bg_tavern_2.jpg');
   background-size: cover;
-}
-.LightenBackground {
-  background-color: #fffb;
-  background-blend-mode:lighten;
 }
 .AspectLeft, .AspectRight, .AspectTop, .AspectBottom {
 	// background-color: #f0f8;
@@ -264,6 +259,23 @@ $box-h: calc((100vh - $aspect-h) / 2);
 	bottom: 0;
 }
 
+//
+// Backgrounds
+//
+.LightenBackground {
+  background-color: #fffb;
+  background-blend-mode:lighten;
+}
+.BackgroundSplash {
+  background-image: url('/images/bg_duel.jpg');
+}
+.BackgroundWeapons {
+  @extend .LightenBackground;
+  background-image: url('/images/bg_weapons_1.jpg');
+}
+.BackgroundSplash {
+  background-image: url('/images/bg_duel.jpg');
+}
 
 //------------------------
 // GAME
