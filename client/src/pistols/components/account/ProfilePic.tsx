@@ -6,7 +6,7 @@ const _makeUrl = (profilePic: number, suffix: string) => {
   return `/profiles/${('00' + profilePic).slice(-2)}_${suffix}.jpg`
 }
 const _className = (square: boolean) => (square ? 'ProfilePicSquare' : 'ProfilePic')
-const _suffix = (square: boolean) => (square ? 'sq' : 'a')
+const _suffix = (square: boolean) => (square ? 'sq' : 'b')
 
 //---------------
 // Portraits
