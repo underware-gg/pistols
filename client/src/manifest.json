@@ -949,7 +949,7 @@
     {
       "name": "pistols::systems::actions::actions",
       "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
-      "class_hash": "0x60839c2c906830c37736ee0c6f35fa9711e4aa059f0aa2586d3b83f0cd46c66",
+      "class_hash": "0x71238e85b102dfcb4228c2c76f5761b3082ebe10312db49c7495531cffc3280",
       "abi": [
         {
           "type": "impl",
@@ -1106,6 +1106,50 @@
                   "type": "pistols::types::challenge::ChallengeState"
                 }
               ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "commit_move",
+              "inputs": [
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "round_number",
+                  "type": "core::integer::u8"
+                },
+                {
+                  "name": "hash",
+                  "type": "core::felt252"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "reveal_move",
+              "inputs": [
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "round_number",
+                  "type": "core::integer::u8"
+                },
+                {
+                  "name": "salt",
+                  "type": "core::integer::u64"
+                },
+                {
+                  "name": "move",
+                  "type": "core::integer::u8"
+                }
+              ],
+              "outputs": [],
               "state_mutability": "view"
             },
             {
@@ -1272,7 +1316,7 @@
           "key": false
         },
         {
-          "name": "round",
+          "name": "round_number",
           "type": "u8",
           "key": false
         },
@@ -1302,7 +1346,7 @@
           "key": false
         }
       ],
-      "class_hash": "0x82b53da75758eae83961a4e2220c5a47169bd64b8adaddc3a9f1cf7897eac3",
+      "class_hash": "0x1ff32bf2f1df02ee314273c9781374c28db29c374c3a9d3314e8748b2d08b31",
       "abi": [
         {
           "type": "function",
@@ -1509,12 +1553,17 @@
           "key": false
         },
         {
-          "name": "honor",
+          "name": "total_honour",
+          "type": "u32",
+          "key": false
+        },
+        {
+          "name": "honour",
           "type": "u8",
           "key": false
         }
       ],
-      "class_hash": "0x7061388e0eedfcc443ed046fb7864955f6ab29ca20a9948f8eab87992b9e595",
+      "class_hash": "0x6954b115c013cabe450c65d668bb7a6537430a633dcdd90b31565f0c3ca903a",
       "abi": [
         {
           "type": "function",
@@ -1863,32 +1912,27 @@
           "key": true
         },
         {
-          "name": "round",
+          "name": "round_number",
           "type": "u8",
           "key": true
         },
         {
-          "name": "move_a",
+          "name": "state",
           "type": "u8",
           "key": false
         },
         {
-          "name": "move_b",
-          "type": "u8",
+          "name": "duelist_a",
+          "type": "Move",
           "key": false
         },
         {
-          "name": "health_a",
-          "type": "u8",
-          "key": false
-        },
-        {
-          "name": "health_b",
-          "type": "u8",
+          "name": "duelist_b",
+          "type": "Move",
           "key": false
         }
       ],
-      "class_hash": "0x67ddd9ad89327155c84573173c2091e8309acdc5de5c71a6c63efa5ad3bb3be",
+      "class_hash": "0xf901cef60c98794f5cd2c196cf5f965db1533f9dead2761a7e6c201f592880",
       "abi": [
         {
           "type": "function",
