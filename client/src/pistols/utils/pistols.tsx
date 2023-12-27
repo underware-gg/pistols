@@ -1,7 +1,8 @@
+import { bigintToHex } from "./utils"
 
 //
-// must be in sync with challenge.cairo
-// (CHALLENGE_STATE)
+// must be in sync with CHALLENGE_STATE
+// (challenge.cairo)
 //
 export enum ChallengeState {
   Null,
@@ -50,3 +51,5 @@ export const ChallengeMessages = [
   "How dare you?",
   "For honour!",
 ]
+
+export const makeDuelUrl = (duelId: bigint) => (`/duel/${bigintToHex(duelId)}`)

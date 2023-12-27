@@ -11,6 +11,7 @@ type ActionButtonProps = {
   large?: boolean
   fill?: boolean
   dimmed?: boolean
+  className?: string
   onClick: () => void
 };
 
@@ -20,12 +21,14 @@ const ActionButton = ({
   large = false,
   fill = false,
   dimmed = false,
+  className = null,
   onClick,
 }: ActionButtonProps) => {
   let classNames = []
   if (fill) classNames.push('FillParent')
   if (large) classNames.push('LargeButton')
   classNames.push((disabled || dimmed) ? 'Locked' : 'Unlocked')
+  if (className) classNames.push(className)
   const _button = <button className={classNames.join(' ')} disabled={disabled} onClick={() => onClick()}>{label}</button>
   if (large) {
     return <h3>{_button}</h3>

@@ -1,12 +1,13 @@
 
 $font-family: Menlo, monospace, Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-$color-important: #f00;
+$color-important: #e00000;
 $color-bg: #f5f5f5;
 $color-panel: #b4b4b4;
 $color-text: #000;
 $color-info: #444;
-$color-active: #e00000;
 $color-inactive: #712727;
+$color-active: #e00000;
+$color-attention: #22b600;
 $ui-border: 6px ridge $color-active;
 $ui-outline: 0.5px solid #444444;
 $text-shadow: 0.05em 0.05em 1px #0008;
@@ -273,7 +274,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
   @extend .LightenBackground;
   background-image: url('/images/bg_weapons_1.jpg');
 }
-.BackgroundSplash {
+.BackgroundDuel {
   background-image: url('/images/bg_duel.jpg');
 }
 
@@ -358,6 +359,9 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 .Unlocked {
   background-color: $color-active;
+}
+.Attention {
+  background-color: $color-attention;
 }
 
 /* GAME CANVAS */

@@ -18,7 +18,6 @@ export function AccountsList() {
   const {
     account: { create, list, get, select, clear, account, isMasterAccount, isDeploying }
   } = useDojo()
-  console.log(burners)
   
   const rows = useMemo(() => {
     let result = []

@@ -12,7 +12,7 @@ import React, { ReactNode, createContext, useReducer, useContext } from 'react'
 export const menuItems = {
   Challenges: 'Challenges',
   Duelists: 'Duelists',
-  Scoreboard: 'Scoreboard',
+  // Scoreboard: 'Scoreboard',
 }
 
 export const initialState = {
@@ -130,7 +130,7 @@ export const usePistolsContext = () => {
     ...state,
     atDuelists: (state.menuItem == menuItems.Duelists),
     atDuels: (state.menuItem == menuItems.Challenges),
-    atScoreboard: (state.menuItem == menuItems.Scoreboard),
+    // atScoreboard: (state.menuItem == menuItems.Scoreboard),
     // PistolsActions,
     // dispatch,
     dispatchSetDuelist,

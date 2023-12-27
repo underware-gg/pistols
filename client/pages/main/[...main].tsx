@@ -33,15 +33,15 @@ export default function MainPage() {
         title = 'Pistols - The Tavern'
         className = 'BackgroundWeapons'
       } else if (_page == 'duel') {
-        // '/room/[duel]'
-        // '/room/[duel]/[levelNumber]'
+        // '/room/[duel_id]'
         if (_slugs.length > 0) {
           page = _page
           duelId = parseInt(_slugs[0])
-          title = 'Pistols - The Duel!'
+          title = 'Pistols - A Duel!'
+          className = 'BackgroundDuel'
         } else {
-          page = 'gate'
-          router.push('/gate')
+          page = 'tavern'
+          router.push('/tavern')
         }
         className = 'BackgroundDuel'
       }

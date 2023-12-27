@@ -8,7 +8,7 @@ import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePicButton } from '@/pistols/components/account/ProfilePic'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { ChallengeState, ChallengeStateDescriptions } from '@/pistols/utils/pistols'
+import { ChallengeState, ChallengeStateDescriptions, makeDuelUrl } from '@/pistols/utils/pistols'
 import { AccountShort } from './ui/Account'
 
 const Row = Grid.Row
@@ -16,6 +16,7 @@ const Col = Grid.Column
 const Cell = Table.HeaderCell
 
 export default function ChallengeModal() {
+  const router = useRouter()
   const { reply_challenge } = useDojoSystemCalls()
   const { account } = useDojoAccount()
 
@@ -39,6 +40,9 @@ export default function ChallengeModal() {
   const _close = () => { dispatchSetDuel(0n) }
   const _reply = (accepted: boolean) => {
     reply_challenge(account, duelId, accepted)
+  }
+  const _watch = () => {
+    router.push(makeDuelUrl(duelId))
   }
   
   return (
@@ -120,6 +124,11 @@ export default function ChallengeModal() {
             {(state == ChallengeState.Awaiting && isChallenged) &&
               <Col>
                 <ActionButton fill label='Accept Challenge!' onClick={() => _reply(true)} />
+              </Col>
+            }
+            {(state == ChallengeState.InProgress) &&
+              <Col>
+                <ActionButton fill label='Watch Duel!' className='Attention' onClick={() => _watch()} />
               </Col>
             }
           </Row>
