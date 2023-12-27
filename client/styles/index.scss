@@ -330,6 +330,11 @@ $box-h: calc((100vh - $aspect-h) / 2);
   width: calc(439px / 2);
   height: calc(768px / 2);
 }
+.ProfilePicDuel {
+  @extend .ProfilePic;
+  width: calc(439px / 3);
+  height: calc(768px / 3);
+}
 .ProfilePicSquare {
   @extend .ProfilePic;
   width: 35px;
@@ -438,6 +443,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
   top: 0;
   width: 100%;
   padding: 15px;
+  text-align: center;
 }
 
 .AccountHeader {
@@ -448,6 +454,27 @@ $box-h: calc((100vh - $aspect-h) / 2);
   padding: 15px;
 }
 
+.DuelDuelistA {
+  height: 100%;
+  width: 50%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 15px;
+  text-align: left;
+  align-items: left;
+}
+.DuelDuelistB {
+  @extend .DuelDuelistA;
+  left: unset;
+  right: 0;
+  text-align: right;
+  align-items: right;
+}
+
+.DuelProgress {
+  margin-top: 20px;
+}
 
 // <IconXXX>
 

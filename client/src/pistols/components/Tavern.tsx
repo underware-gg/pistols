@@ -18,7 +18,7 @@ export default function Tavern() {
       <TavernMenu selectedItem={menuItem} />
       {/* <AccountHeader /> */}
 
-      <div className='TavernTitle AlignCenter'>
+      <div className='TavernTitle'>
         <h1>The Tavern</h1>
         <h2>of Honourable Lords 👑</h2>
       </div>

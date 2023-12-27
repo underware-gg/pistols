@@ -5,6 +5,7 @@ import Gate from '@/pistols/components/Gate'
 import Tavern from '@/pistols/components/Tavern'
 import GameContainer from '@/pistols/components/GameContainer'
 import Background from '@/pistols/components/Background'
+import Duel from '@/pistols/components/Duel'
 
 // enable wasm in build (this is for api routes)
 // export const config = {
@@ -36,7 +37,7 @@ export default function MainPage() {
         // '/room/[duel_id]'
         if (_slugs.length > 0) {
           page = _page
-          duelId = parseInt(_slugs[0])
+          duelId = BigInt(_slugs[0])
           title = 'Pistols - A Duel!'
           className = 'BackgroundDuel'
         } else {
@@ -64,12 +65,14 @@ export default function MainPage() {
 
   const _atGate = (page == 'gate')
   const _atTavern = (page == 'tavern')
+  const _atDuel = (page == 'duel')
 
   return (
     <AppDojo title={title} backgroundImage={null}>
       <Background className={className}>
         {_atGate && <Gate />}
         {_atTavern && <Tavern />}
+        {_atDuel && <Duel duelId={duelId}/>}
       </Background>
       <GameContainer
         isPlaying={false}

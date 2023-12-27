@@ -115,7 +115,7 @@ function CreateChallenge({
       lords,
     } : null)
   }, [message, days, hours, lords])
-  console.log(canSubmit, days, hours, lords, message)
+  // console.log(canSubmit, days, hours, lords, message)
 
   const [customMessage, setCustomMessage] = useState('')
   const messageOptions: any[] = useMemo(() =>
