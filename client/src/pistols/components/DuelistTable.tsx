@@ -74,8 +74,8 @@ function DuelistItem({
   index,
   isYou,
 }) {
-  const { name, profilePic } = useDuelist(address)
-  const { challengeCount, drawCount, winCount, loseCount } = useChallengesByDuelist(address)
+  const { name, profilePic, total_wins, total_losses, total_draws, total_duels, honourDisplay } = useDuelist(address)
+  // const { challengeCount, drawCount, winCount, loseCount } = useChallengesByDuelist(address)
   const { dispatchSetDuelist } = usePistolsContext()
 
   return (
@@ -93,23 +93,23 @@ function DuelistItem({
       </Cell>
 
       <Cell className='Important'>
-        10.0
+        {honourDisplay}
       </Cell>
 
       <Cell>
-        {winCount}
+        {total_wins}
       </Cell>
 
       <Cell>
-        {loseCount}
+        {total_losses}
       </Cell>
 
       <Cell>
-        {drawCount}
+        {total_draws}
       </Cell>
 
       <Cell>
-        {challengeCount}
+        {total_duels}
       </Cell>
     </Table.Row>
   )
