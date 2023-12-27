@@ -4,7 +4,6 @@ import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { loadAudioAssets, isAudioAssetsLoaded } from '@/pistols/data/assets'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import GameView from '@/pistols/components/GameView'
-import GameUI from '@/pistols/components/GameUI'
 
 function GameContainer({
   isPlaying,
@@ -21,7 +20,6 @@ function GameContainer({
   return (
     <div className={`GameContainer UIBorder ${isPlaying ? '' : 'Hidden'}`}>
       <GameView />
-      <GameUI />
       <GameStartOverlay />
     </div>
   )

@@ -449,49 +449,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 
-.RowUI{
-  width: 100%;
-  height: $ui-row;
-  max-height: $ui-row;
-}
-.ColUI{
-  width: $ui-column;
-  max-width: $ui-column;
-  height: 100%;
-  vertical-align: bottom;
-  margin: auto;
-  position: relative;
-}
-.ColUIContents {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-}
-.ColUISlider {
-  background-color: rgba($color-important, 0.5);
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.ButtonUI{
-  font-size: 18px;
-}
-
-.InfoTop {
-  width: 100%;
-  height: $ui-row;
-  padding: 1em 0 0 0;
-  margin: auto;
-}
-.InfoBottom {
-  @extend .AlignMiddle;
-  // height: calc($ui-height - $ui-row);
-  width: 80%;
-  margin: auto;
-}
-
+// <IconXXX>
 
 .Tooltip {
 	cursor: default; //help;
