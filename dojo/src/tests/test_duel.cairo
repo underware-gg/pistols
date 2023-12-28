@@ -449,6 +449,32 @@ mod tests {
         utils::execute_reveal_move(system, owner, duel_id, 1, 0x111, 11);
     }
 
+    #[test]
+    #[available_gas(1_000_000_000)]
+    #[should_panic(expected:('Bad step move','ENTRYPOINT_FAILED'))]
+    fn test_register_keep_scores() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let hash_a: felt252 = make_move_hash(0x111, 11);
+        let hash_b: felt252 = make_move_hash(0x222, 1);
+        utils::execute_commit_move(system, owner, duel_id, 1, hash_a);
+        utils::execute_commit_move(system, other, duel_id, 1, hash_b);
+        utils::execute_reveal_move(system, owner, duel_id, 1, 0x111, 11);
+        let duelist_a_before = utils::get_Duelist(world, owner);
+        utils::execute_register_duelist(system, owner, 'dssadsa', 3);
+        let duelist_a_after = utils::get_Duelist(world, owner);
+        assert(duelist_a_before.address == duelist_a_after.address, 'address');
+        assert(duelist_a_before.name != duelist_a_after.name, 'name');
+        assert(duelist_a_before.profile_pic != duelist_a_after.profile_pic, 'profile_pic');
+        assert(duelist_a_before.timestamp == duelist_a_after.timestamp, 'timestamp');
+        assert(duelist_a_before.total_duels == duelist_a_after.total_duels, 'total_duels');
+        assert(duelist_a_before.total_wins == duelist_a_after.total_wins, 'total_wins');
+        assert(duelist_a_before.total_losses == duelist_a_after.total_losses, 'total_losses');
+        assert(duelist_a_before.total_draws == duelist_a_after.total_draws, 'total_draws');
+        assert(duelist_a_before.total_honour == duelist_a_after.total_honour, 'total_honour');
+        assert(duelist_a_before.honour == duelist_a_after.honour, 'honour');
+    }
+
 
 
     //-----------------------------------------
