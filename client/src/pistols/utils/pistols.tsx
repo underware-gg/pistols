@@ -76,6 +76,24 @@ export enum RoundState {
 }
 
 
+//------------------------------------------
+// must be in sync with BLADES
+// (blades.cairo)
+//
+export enum Blades {
+  Null,
+  Light,
+  Heavy,
+  Block,
+}
+
+export const BladesNames = {
+  [Blades.Null]: 'Null',
+  [Blades.Light]: 'Light',
+  [Blades.Heavy]: 'Heavy',
+  [Blades.Block]: 'Block',
+}
+
 //-------------------------
 // client stuff
 //

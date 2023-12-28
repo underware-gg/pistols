@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Divider, Grid, Modal, Pagination } from 'semantic-ui-react'
+import { Button, Divider, Grid, Modal, Pagination } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { useMakeCommitMove } from '@/pistols/hooks/useCommitReveal'
 import { pedersen } from '../utils/utils'
+import { Blades, BladesNames } from '../utils/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -80,7 +81,27 @@ export default function CommitModal({
           }
           {roundNumber == 2 &&
             <div>
-              BLADES
+              <p>
+                You survived the pistols! Now choose your blades!
+              </p>
+              <p>
+                <b>Light</b> hits for half damage, but strikes first.
+              </p>
+              <p>
+                <b>Heavy</b> hits for full damge, but strikes late.
+              </p>
+              <p>
+                <b>Block</b> blocks light but not heavy, does no damage.
+              </p>
+              <p>
+                Choose wisely. 👑
+              </p>
+              <Divider hidden />
+              <Button.Group size='large'>
+                <Button toggle active={selectedMove == Blades.Light} onClick={() => setSelectedMove(Blades.Light)}>{BladesNames[Blades.Light]}</Button>
+                <Button toggle active={selectedMove == Blades.Heavy} onClick={() => setSelectedMove(Blades.Heavy)}>{BladesNames[Blades.Heavy]}</Button>
+                <Button toggle active={selectedMove == Blades.Block} onClick={() => setSelectedMove(Blades.Block)}>{BladesNames[Blades.Block]}</Button>
+              </Button.Group>
             </div>
           }
         </Modal.Description>

@@ -39,7 +39,7 @@ export const useDuelist = (address: bigint | string) => {
   const total_draws = useMemo(() => (duelist?.total_draws ?? 0), [duelist])
   const total_honour = useMemo(() => (duelist?.total_honour ?? 0), [duelist])
   const honour = useMemo(() => (duelist?.honour ?? 0), [duelist])
-  const honourDisplay = useMemo(() => (total_duels > 0 && honour > 0 ? (duelist.honour / 10.0).toString(2) : '—'), [honour, total_duels])
+  const honourDisplay = useMemo(() => (total_duels > 0 && honour > 0 ? (parseFloat(duelist.honour) / 10.0).toFixed(1) : '—'), [honour, total_duels])
 
   return {
     address,

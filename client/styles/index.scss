@@ -599,7 +599,13 @@ $color-warning: #f9e9d0;
 }
 
 .ui.pagination.menu .active.item {
-  background-color: $color-positive;
-  color: $color-important;
-  font-weight: 800;
+  background-color: $color-important;
+  color: #fff;
+  // font-weight: 800;
+}
+
+.ui.button.toggle.active,
+.ui.buttons .button.toggle.active,
+.ui.toggle.buttons .active.button {
+  background-color: $color-important!important;
 }

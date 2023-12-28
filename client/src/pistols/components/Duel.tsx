@@ -9,7 +9,7 @@ import { useDuel } from '@/pistols/hooks/useDuel'
 import { useCommitMove } from '@/pistols/hooks/useCommitReveal'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
-import { FULL_HEALTH, RoundState } from '@/pistols/utils/pistols'
+import { BladesNames, FULL_HEALTH, RoundState } from '@/pistols/utils/pistols'
 import CommitModal from '@/pistols/components/CommitModal'
 
 const Row = Grid.Row
@@ -94,9 +94,9 @@ function DuelProgress({
 }) {
   const { name } = useDuelist(isA ? duelistA : duelistB)
   const { challenge, round1, round2 } = useDuel(duelId)
-  console.log(`Challenge:`, challenge)
-  console.log(`Round 1:`, round1)
-  console.log(`Round 2:`, round2)
+  // console.log(`Challenge:`, challenge)
+  // console.log(`Round 1:`, round1)
+  // console.log(`Round 2:`, round2)
 
   //-------------------------
   // Duel progression
@@ -142,8 +142,9 @@ function DuelProgress({
 
   const bladesResult = useMemo(() => {
     if(round2?.state == RoundState.Finished) {
+      const blade = isA ? round2.duelist_a.move : round2.duelist_b.move
       const health = _healthResult(round2)
-      return <span>{name} is {health}</span>
+      return <span>{name} clashes with {BladesNames[blade]}<br />and is {health}</span>
     }
     return null
   }, [round2])
