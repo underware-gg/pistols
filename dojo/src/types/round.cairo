@@ -13,7 +13,7 @@ mod ROUND_STATE {
     const NULL: u8 = 0;
     const COMMIT: u8 = 1;
     const REVEAL: u8 = 2;
-    const FINISHED: u8 = 6;
+    const FINISHED: u8 = 3;
 }
 
 trait RoundStateTrait {

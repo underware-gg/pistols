@@ -13,7 +13,7 @@ mod BLADES {
     const NULL: u8 = 0;
     const LIGHT: u8 = 1;
     const HEAVY: u8 = 2;
-    const BLOCK: u8 = 6;
+    const BLOCK: u8 = 3;
 }
 
 impl BladesIntoU8 of Into<Blades, u8> {
