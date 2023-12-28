@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import { Entity, HasValue, Has, getComponentValue } from '@dojoengine/recs'
+import { Entity, HasValue, Has, getComponentValue, Component } from '@dojoengine/recs'
 import { useComponentValue, useEntityQuery } from "@dojoengine/react"
 import { useDojoComponents } from '@/dojo/DojoContext'
 import { bigintToEntity, bigintToHex, feltToString } from "../utils/utils"
@@ -18,6 +18,47 @@ export const useAllChallengeIds = () => {
     challengeIds,
   }
 }
+
+export const useChallengeIdsByState = (state: ChallengeState) => {
+  const { Challenge } = useDojoComponents()
+  const challengeIds: bigint[] = useEntityKeysQuery(Challenge, [HasValue(Challenge, { state: state })], 'duel_id')
+  return {
+    challengeIds,
+  }
+}
+
+const _filterComponentsByValue = (component: Component, entityIds: bigint[], keyName: string, values: any[], include: boolean): bigint[] => (
+  entityIds.reduce((acc: bigint[], id: bigint) => {
+    const componentValue = getComponentValue(component, bigintToEntity(id))
+    if (values.includes(componentValue[keyName]) == include) {
+      acc.push(id)
+    }
+    return acc
+  }, [] as bigint[])
+)
+
+export const useLiveChallengeIds = () => {
+  const { Challenge } = useDojoComponents()
+  const { challengeIds: allChallengeIds } = useAllChallengeIds()
+  const challengeIds = useMemo(() => (
+    _filterComponentsByValue(Challenge, allChallengeIds, 'state', [ChallengeState.Awaiting, ChallengeState.InProgress], true)
+  ), [allChallengeIds])
+  return {
+    challengeIds,
+  }
+}
+
+export const usePastChallengeIds = () => {
+  const { Challenge } = useDojoComponents()
+  const { challengeIds: allChallengeIds } = useAllChallengeIds()
+  const challengeIds = useMemo(() => (
+    _filterComponentsByValue(Challenge, allChallengeIds, 'state', [ChallengeState.Awaiting, ChallengeState.InProgress], false)
+  ), [allChallengeIds])
+  return {
+    challengeIds,
+  }
+}
+
 
 
 //-----------------------------
@@ -45,6 +86,7 @@ export const useChallenge = (duelId: bigint | string) => {
   return {
     challengeExists: (challenge != null),
     state,
+    isLive: (state == ChallengeState.Awaiting || state == ChallengeState.InProgress),
     duelistA,
     duelistB,
     challenger: duelistA,
@@ -72,7 +114,9 @@ export const useChallengeIdsByDuelist = (address: bigint) => {
   const { Challenge } = useDojoComponents()
   const challengerIds: bigint[] = useEntityKeysQuery(Challenge, [HasValue(Challenge, { duelist_a: BigInt(address) })], 'duel_id')
   const challengedIds: bigint[] = useEntityKeysQuery(Challenge, [HasValue(Challenge, { duelist_b: BigInt(address) })], 'duel_id')
-  const challengeIds: bigint[] = useMemo(() => ([...challengerIds, ...challengedIds]), [challengerIds, challengedIds])
+  const challengeIds: bigint[] = useMemo(() => (
+    [...challengerIds, ...challengedIds]
+  ), [challengerIds, challengedIds])
   // console.log(address, challengeIds)
   return {
     challengeIds,

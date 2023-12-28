@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Grid, Table } from 'semantic-ui-react'
+import { Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { useAllChallengeIds, useChallenge, useChallengeIdsByDuelist } from '@/pistols/hooks/useChallenge'
+import { useAllChallengeIds, useChallenge, useChallengeIdsByDuelist, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { MenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ChallengeState, ChallengeStateNames } from '@/pistols/utils/pistols'
 import { formatTimestamp, formatTimestampDelta } from '@/pistols/utils/utils'
 import { useTimestampCountdown } from '../hooks/useTimestamp'
@@ -13,14 +13,19 @@ const Col = Grid.Column
 const Cell = Table.Cell
 const HeaderCell = Table.HeaderCell
 
-export function ChallengeTableMain({
-}) {
+export function ChallengeTableAll() {
   const { challengeIds } = useAllChallengeIds()
-  return (
-    <div className='TableMain'>
-      <ChallengeTableByIds challengeIds={challengeIds} />
-    </div>
-  )
+  return <ChallengeTableByIds challengeIds={challengeIds} />
+}
+
+export function ChallengeTableLive() {
+  const { challengeIds } = useLiveChallengeIds()
+  return <ChallengeTableByIds challengeIds={challengeIds} color='green' />
+}
+
+export function ChallengeTablePast() {
+  const { challengeIds } = usePastChallengeIds()
+  return <ChallengeTableByIds challengeIds={challengeIds} color='red' />
 }
 
 export function ChallengeTableByDuelist({
@@ -31,26 +36,35 @@ export function ChallengeTableByDuelist({
 }
 
 
-export function ChallengeTableByIds({
+function ChallengeTableByIds({
   challengeIds,
+  color = 'orange'
 }) {
   const [order, setOrder] = useState({})
-  const _timestampCallback = (id, t) => {
-    setOrder(o => ({ ...o, [id]: t }))
+  const _sortCallback = (id, state, timestamp) => {
+    setOrder(o => ({ ...o, [id]: { state, timestamp } }))
   }
 
   const rows = useMemo(() => {
     let result = []
     challengeIds.forEach((duelId, index) => {
-      result.push(<DuelItem key={duelId} duelId={duelId} timestampCallback={_timestampCallback} />)
+      result.push(<DuelItem key={duelId} duelId={duelId} sortCallback={_sortCallback} />)
     })
     return result
   }, [challengeIds])
 
-  const sortedRows = useMemo(() => rows.sort((a, b) => (order[b.key] ?? 0) - (order[a.key] ?? 0)), [rows, order])
+  const sortedRows = useMemo(() => rows.sort((a, b) => {
+    if (order[a.key]?.state != order[b.key]?.state) {
+      if (order[a.key]?.state == ChallengeState.InProgress) return -1
+      if (order[b.key]?.state == ChallengeState.InProgress) return 1
+      if (order[a.key]?.state == ChallengeState.Awaiting) return -1
+      if (order[b.key]?.state == ChallengeState.Awaiting) return 1
+    }
+    return (order[b.key]?.timestamp ?? 0) - (order[a.key]?.timestamp ?? 0)
+  }), [rows, order])
 
   return (
-    <Table sortable selectable className='Faded' color='red'>
+    <Table sortable selectable className='Faded' color={color as SemanticCOLORS}>
       <Table.Header className='TableHeader'>
         <Table.Row textAlign='left' verticalAlign='middle'>
           <HeaderCell width={1}></HeaderCell>
@@ -82,18 +96,18 @@ export function ChallengeTableByIds({
 
 function DuelItem({
   duelId,
-  timestampCallback,
+  sortCallback,
 }) {
-  const { dispatchSetDuel } = usePistolsContext()
-  const { duelistA, duelistB, state, winner, timestamp, timestamp_expire, timestamp_start, timestamp_end } = useChallenge(duelId)
+  const { dispatchSetDuel, dispatchSetMenu } = usePistolsContext()
+  const { duelistA, duelistB, state, isLive, winner, timestamp, timestamp_expire, timestamp_start, timestamp_end } = useChallenge(duelId)
   const { name: nameA, profilePic: profilePicA } = useDuelist(duelistA)
   const { name: nameB, profilePic: profilePicB } = useDuelist(duelistB)
   const timestamp_system = useTimestampCountdown()
   // console.log(timestamp, timestamp_expire, `>`, timestamp_system)
   
   useEffect(() => {
-    if (timestamp) timestampCallback(duelId, timestamp)
-  }, [timestamp])
+    sortCallback(duelId, state, timestamp)
+  }, [state, timestamp])
 
   const winnerIsA = useMemo(() => (duelistA == winner), [duelistA, winner])
   const winnerIsB = useMemo(() => (duelistB == winner), [duelistB, winner])
@@ -110,8 +124,13 @@ function DuelItem({
     return formatTimestamp(timestamp)
   }, [state, timestamp, timestamp_expire, timestamp_start, timestamp_end])
 
+  const _gotoChallenge = () => {
+    dispatchSetMenu(isLive ? MenuKey.LiveDuels : MenuKey.PastDuels)
+    dispatchSetDuel(duelId)
+  }
+
   return (
-    <Table.Row warning={isDraw || isCanceled} positive={isInProgress || winnerIsA || winnerIsB} textAlign='left' verticalAlign='middle' onClick={() => dispatchSetDuel(duelId)}>
+    <Table.Row warning={isAwaiting} negative={isDraw || isCanceled} positive={isInProgress || winnerIsA || winnerIsB} textAlign='left' verticalAlign='middle' onClick={() => _gotoChallenge()}>
       <Cell positive={winnerIsA} negative={winnerIsB}>
         <ProfilePicSquare profilePic={profilePicA} />
       </Cell>

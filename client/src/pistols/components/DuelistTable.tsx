@@ -13,17 +13,7 @@ const Col = Grid.Column
 const Cell = Table.Cell
 const HeaderCell = Table.HeaderCell
 
-
-export function DuelistTableMain({
-}) {
-  return (
-    <div className='TableMain'>
-      <DuelistTable />
-    </div>
-  )
-}
-
-export default function DuelistTable() {
+export function DuelistTable() {
   const { account } = useDojoAccount()
   const { duelistIds } = useAllDuelistIds()
 
@@ -37,7 +27,7 @@ export default function DuelistTable() {
   }, [duelistIds])
 
   return (
-    <Table selectable className='Faded' color='red'>
+    <Table selectable className='Faded' color='orange'>
       <Table.Header className='TableHeader'>
         <Table.Row textAlign='center' verticalAlign='middle'>
           <HeaderCell width={3}></HeaderCell>

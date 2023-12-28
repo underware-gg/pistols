@@ -178,7 +178,7 @@ function CreateChallenge({
           </Grid>
         </Form.Field>
         <Form.Field>
-          <label>$LORDS deposit</label>
+          <label>$LORDS deposit (disabled)</label>
           <input placeholder={'$LORDS'} value={lords} maxLength={6} onChange={(e) => {
             const _lords = parseInt(e.target.value as string)
             if(!isNaN(_lords)) {

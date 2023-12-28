@@ -1,12 +1,13 @@
 
 $font-family: Menlo, monospace, Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-$color-important: #e00000;
 $color-bg: #f5f5f5;
-$color-panel: #b4b4b4;
+$color-white: #f5f5f5;
+$color-shadow: #b4b4b4;
 $color-text: #000;
-$color-info: #444;
-$color-inactive: #712727;
+$color-icon: #444;
+$color-important: #e00000;
 $color-active: #e00000;
+$color-inactive: #712727;
 $color-attention: #22b600;
 $ui-border: 6px ridge $color-active;
 $ui-outline: 0.5px solid #444444;
@@ -500,12 +501,12 @@ $box-h: calc((100vh - $aspect-h) / 2);
 .Icon {
 	width: initial !important; // remove width to be able to spin
 	margin: 0 !important;
-	text-shadow: 0.1em 0 $color-panel;
-	color: $color-info;
+	text-shadow: 0.1em 0 $color-shadow;
+	color: $color-icon;
 }
 .InfoIcon {
 	@extend .Icon;
-	// color: $color-info;
+	// color: $color-icon;
 }
 // Icon click feedback
 .IconClick:active {
@@ -555,24 +556,53 @@ $box-h: calc((100vh - $aspect-h) / 2);
 $color-positive: #dafadd;
 $color-negative: #fbdbdb;
 $color-warning: #f9e9d0;
+// 
+// <Input>
 .ui.input>input {
   background: rgb(255, 255, 255);
   color: $color-text;
 }
+//
+// <Grid>
 .ui.grid>.row {
   padding: 0.25rem 0; // original: 1.0rem 0
 }
 .ui.grid>.row>.column {
   padding: 0 0.25rem; // original: 1.0rem 0
 }
+//
+// <Button>
+.ui.button.toggle.active,
+.ui.buttons .button.toggle.active,
+.ui.toggle.buttons .active.button {
+  background-color: $color-important!important;
+}
+//
+// <Menu> buttons
+.ui.menu .item {
+  color: $color-text;
+}
 .ui.menu .item,
-.ui.secondary.menu .active.item {
-  background-color: rgba($color-bg, 0.5);
-  color: $color-important;
+.ui.secondary.menu .active.item,
+.ui.secondary.menu .active.item:hover {
+  background-color: $color-important;
+  color: $color-white;
   // font-family: $font-family;
   // font-size: 16px;
   // font-weight: 600;
 }
+.ui.secondary.menu .item {
+  background-color: rgba($color-shadow, 0.4);
+  color: $color-important;
+}
+.ui.secondary.menu .dropdown.item:hover,
+.ui.secondary.menu .link.item:hover,
+.ui.secondary.menu a.item:hover {
+  background-color: rgba($color-bg, 0.5);
+  color: $color-important;
+}
+//
+// <Table>
 .ui.table td.positive, .ui.table tr.positive {
   background: $color-positive !important;
 }
@@ -582,7 +612,15 @@ $color-warning: #f9e9d0;
 .ui.table td.warning, .ui.table tr.warning {
   background: $color-warning !important;
 }
-
+//
+// Pagination
+.ui.pagination.menu .active.item {
+  background-color: $color-important;
+  color: $color-white;
+  // font-weight: 800;
+}
+//
+// <Step>
 .ui.steps .step.active .title {
   color: $color-important;
 }
@@ -594,18 +632,3 @@ $color-warning: #f9e9d0;
 //   background-color: $color-positive;
 // }
 
-.ui.menu .item {
-  color: $color-text;
-}
-
-.ui.pagination.menu .active.item {
-  background-color: $color-important;
-  color: #fff;
-  // font-weight: 800;
-}
-
-.ui.button.toggle.active,
-.ui.buttons .button.toggle.active,
-.ui.toggle.buttons .active.button {
-  background-color: $color-important!important;
-}

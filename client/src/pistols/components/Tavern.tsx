@@ -1,21 +1,23 @@
 import React, { useMemo, useState } from 'react'
-import { Container, Grid, Menu } from 'semantic-ui-react'
-import { usePistolsContext, menuItems } from '@/pistols/hooks/PistolsContext'
+import { Container, Grid, Label, Menu } from 'semantic-ui-react'
+import { MenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import AccountHeader from '@/pistols/components/account/AccountHeader'
-import { ChallengeTableMain } from '@/pistols/components/ChallengeTable'
-import { DuelistTableMain } from '@/pistols/components/DuelistTable'
+import { ChallengeTableAll, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
+import { DuelistTable } from '@/pistols/components/DuelistTable'
 import ChallengeModal from '@/pistols/components/ChallengeModal'
 import DuelistModal from '@/pistols/components/DuelistModal'
+import { useChallengeIdsByState } from '../hooks/useChallenge'
+import { ChallengeState } from '../utils/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export default function Tavern() {
-  const { menuItem, atDuels, atDuelists } = usePistolsContext()
+  const { atDuelists, atLiveDuels, atPastDuels } = usePistolsContext()
 
   return (
     <>
-      <TavernMenu selectedItem={menuItem} />
+      <TavernMenu />
       {/* <AccountHeader /> */}
 
       <div className='TavernTitle'>
@@ -24,8 +26,11 @@ export default function Tavern() {
       </div>
 
       <Container text className=''>
-        {atDuels && <ChallengeTableMain />}
-        {atDuelists && <DuelistTableMain />}
+        <div className='TableMain'>
+          {atDuelists && <DuelistTable />}
+          {atLiveDuels && <ChallengeTableLive />}
+          {atPastDuels && <ChallengeTablePast />}
+        </div>
         <DuelistModal />
         <ChallengeModal />
       </Container>
@@ -34,24 +39,44 @@ export default function Tavern() {
 }
 
 function TavernMenu({
-  selectedItem,
 }) {
-  const { dispatchSetMenuItem } = usePistolsContext()
+  const { menuKey, tavernMenuItems, dispatchSetMenu } = usePistolsContext()
 
+  const { challengeIds: awaitingChallengeIds } = useChallengeIdsByState(ChallengeState.Awaiting)
+  const { challengeIds: liveChallengeIds } = useChallengeIdsByState(ChallengeState.InProgress)
+
+  const liveDuelsBubble = useMemo(() => {
+    const count = awaitingChallengeIds.length + liveChallengeIds.length
+    if (count > 0) {
+      return (
+        <Label color={liveChallengeIds.length > 0 ? 'green' : 'orange'} floating>
+          {count}
+        </Label>
+      )
+    }
+    return null
+  }, [awaitingChallengeIds, liveChallengeIds])
+  
   const items = useMemo(() => {
     let result = []
-    Object.values(menuItems).forEach(item => {
+    Object.keys(tavernMenuItems).forEach(k => {
+      const key = parseInt(k)
+      const label = tavernMenuItems[key]
+      const bubble = (key == MenuKey.LiveDuels) ? liveDuelsBubble : null
       result.push(
         <Menu.Item
-          key={item}
-          name={item}
-          active={selectedItem === item}
-          onClick={() => dispatchSetMenuItem(item)}
-        />
+          key={key}
+          active={menuKey === key}
+          onClick={() => dispatchSetMenu(key)}
+        >
+          {label}
+          {bubble}
+        </Menu.Item>
+
       )
     })
     return result
-  }, [selectedItem])
+  }, [menuKey, awaitingChallengeIds, liveChallengeIds])
 
   return (
     <Menu secondary className='TavernMenu' size='huge'>
