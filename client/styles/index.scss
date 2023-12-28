@@ -551,6 +551,9 @@ $box-h: calc((100vh - $aspect-h) / 2);
 //-----------------------------
 // semantic-ui
 //
+$color-positive: #dafadd;
+$color-negative: #fbdbdb;
+$color-warning: #f9e9d0;
 .ui.input>input {
   background: rgb(255, 255, 255);
   color: $color-text;
@@ -570,14 +573,21 @@ $box-h: calc((100vh - $aspect-h) / 2);
   // font-weight: 600;
 }
 .ui.table td.positive, .ui.table tr.positive {
-  background: #dafadd !important;
-  // color: #2c662d !important;
+  background: $color-positive !important;
 }
 .ui.table td.negative, .ui.table tr.negative {
-  background: #fbdbdb!important;
-  // color: #9f3a38!important;
+  background: $color-negative!important;
 }
 .ui.table td.warning, .ui.table tr.warning {
-  background: #f9e9d0 !important;
-  // color: #573a08 !important;
+  background: $color-warning !important;
 }
+
+.ui.steps .step.active .title {
+  color: $color-important;
+}
+.ui.vertical.steps .active.step:after {
+  display: none;
+}
+// .ui.steps .step.active {
+//   background-color: $color-positive;
+// }

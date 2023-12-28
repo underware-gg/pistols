@@ -84,7 +84,7 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='center'>
               <Col>
-                <h3 className='Quote'>{`"${message}"`}</h3>
+                <h3 className='Quote'>{`“${message}”`}</h3>
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>

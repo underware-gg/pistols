@@ -22,29 +22,32 @@ export default function Duel({
 
   useEffect(() => dispatchSetDuel(duelId), [duelId])
 
+  const isDuelistA = useMemo(() => (BigInt(account?.address) == duelistA), [account, duelistA])
+  const isDuelistB = useMemo(() => (BigInt(account?.address) == duelistB), [account, duelistB])
+
   return (
     <>
-      <div className='TavernTitle'>
-        <h1>A Duel!</h1>
+      <div className='TavernTitle' style={{maxWidth: '250px'}}>
+        <h1 className='Quote'>{`“${message}”`}</h1>
       </div>
 
       <div className='DuelSideA'>
         <div className='DuelProfileA' >
-          <DuelDuelist duelId={duelId} floated='left' address={duelistA} />
+          <DuelProfile duelId={duelId} floated='left' address={duelistA} />
         </div>
-        <DuelProgress duelId={duelId} isPlaying={BigInt(account?.address) == duelistA} address={duelistA} floated='left' />
+        <DuelProgress duelId={duelId} isDuelistA={isDuelistA} floated='left' />
       </div>
       <div className='DuelSideB'>
         <div className='DuelProfileB' >
-          <DuelDuelist duelId={duelId} floated='right' address={duelistB} />
+          <DuelProfile duelId={duelId} floated='right' address={duelistB} />
         </div>
-        <DuelProgress duelId={duelId} isPlaying={BigInt(account?.address) == duelistB} address={duelistB} floated='right' />
+        <DuelProgress duelId={duelId} isDuelistB={isDuelistB} floated='right' />
       </div>
     </>
   )
 }
 
-function DuelDuelist({
+function DuelProfile({
   duelId,
   address,
   floated,
@@ -71,102 +74,167 @@ function DuelDuelist({
 }
 
 enum DuelStage {
-  Disabled,
-  Active,
+  Null,
+  StepsCommit,
+  StepsReveal,
+  PistolsShootout,
+  BladesCommit,
+  BladesReveal,
+  BladesClash,
   Finished,
 }
 
 function DuelProgress({
   duelId,
-  isPlaying,
-  address,
+  isDuelistA = null,
+  isDuelistB = null,
   floated,
 }) {
   const { challenge, round1, round2 } = useDuel(duelId)
 
-  const pistolsCommitComplete = useMemo(() => (false), [round1])
-  const pistolsRevealComplete = useMemo(() => (false), [round1])
+  const _commitSteps = () => _commit(1)
+  const _commitBlades = () => _commit(2)
+  const _commit = (round_number:number) => {
+    console.log(`COMMIT`, round_number)
+  }
 
-  const states = useMemo(() => {
-    let result: any = {
-      pistols: round1?.state ?? RoundState.Null,
-      blades: round2?.state ?? RoundState.Null,
-    }
-    return result
+  const _revealSteps = () => _reveal(1)
+  const _revealBlades = () => _reveal(2)
+  const _reveal = (round_number: number) => {
+    console.log(`REVEAL`, round_number)
+  }
+
+  const currentStage = useMemo(() => {
+    if (!round1 || round1.state == RoundState.Null) return DuelStage.Null
+    if (round1.state == RoundState.Commit) return DuelStage.StepsCommit
+    if (round1.state == RoundState.Reveal) return DuelStage.StepsReveal
+    if (!round2 || round2.state == RoundState.Null) return DuelStage.PistolsShootout
+    if (round2.state == RoundState.Commit) return DuelStage.BladesCommit
+    if (round2.state == RoundState.Reveal) return DuelStage.BladesReveal
+    return DuelStage.BladesClash
   }, [round1, round2])
 
-  const left = useMemo(() => (floated == 'left'), [floated])
-  const right = useMemo(() => (floated == 'right'), [floated])
+  const [completed, onClick] = useMemo(() => {
+    if (currentStage == DuelStage.StepsCommit) {
+      if (isDuelistA) return round1.duelist_a.hash ? [true, null] : [false, _commitSteps]
+      if (isDuelistB) return round1.duelist_b.hash ? [true, null] : [false, _commitSteps]
+    }
+    if (currentStage == DuelStage.StepsReveal) {
+      if (isDuelistA) return round1.duelist_a.move ? [true, null] : [false, _revealSteps]
+      if (isDuelistB) return round1.duelist_b.move ? [true, null] : [false, _revealSteps]
+    }
+    if (currentStage == DuelStage.BladesCommit) {
+      if (isDuelistA) return round2.duelist_a.hash ? [true, null] : [false, _commitBlades]
+      if (isDuelistB) return round2.duelist_b.hash ? [true, null] : [false, _commitBlades]
+    }
+    if (currentStage == DuelStage.BladesReveal) {
+      if (isDuelistA) return round2.duelist_a.move ? [true, null] : [false, _revealBlades]
+      if (isDuelistB) return round2.duelist_b.move ? [true, null] : [false, _revealBlades]
+    }
+    return [false, null]
+  }, [currentStage, round1, round2])
 
   return (
     <Step.Group vertical size='small'>
       <ProgressItem
-        completed={pistolsCommitComplete}
+        stage={DuelStage.StepsCommit}
+        currentStage={currentStage}
+        completed={completed}
         title='Commit Steps'
         description=''
         icon='street view'
         floated={floated}
+        onClick={onClick}
       />
       <ProgressItem
-        completed={pistolsRevealComplete}
+        stage={DuelStage.StepsReveal}
+        currentStage={currentStage}
+        completed={completed}
         title='Reveal Steps'
         description=''
         icon='eye'
         floated={floated}
+        onClick={onClick}
       />
       <ProgressItem
-        completed={pistolsRevealComplete}
-        title='Pistols Round'
+        stage={DuelStage.PistolsShootout}
+        currentStage={currentStage}
+        completed={completed}
+        title='Pistols shootout!'
         description=''
         icon='target'
         floated={floated}
+        onClick={onClick}
       />
 
       <ProgressItem
-        completed={pistolsRevealComplete}
+        stage={DuelStage.BladesCommit}
+        currentStage={currentStage}
+        completed={completed}
         title='Commit Blades'
         description=''
         icon='shield'
         floated={floated}
+        onClick={onClick}
       />
       <ProgressItem
-        completed={pistolsRevealComplete}
+        stage={DuelStage.BladesReveal}
+        currentStage={currentStage}
+        completed={completed}
         title='Reveal Blades'
         description=''
         icon='eye'
         floated={floated}
+        onClick={onClick}
       />
       <ProgressItem
-        completed={pistolsRevealComplete}
-        title='Blades Round'
+        stage={DuelStage.BladesClash}
+        currentStage={currentStage}
+        completed={completed}
+        title='Blades clash!'
         description=''
         icon='target'
         floated={floated}
+        onClick={onClick}
       />
     </Step.Group>
   )
 }
 
 function ProgressItem({
+  stage,
+  currentStage,
+  completed = false,
   title,
   description,
-  active = false,
-  completed = false,
-  disabled = false,
   icon = null,
   floated,
+  onClick = null,
 }) {
-  const left = useMemo(() => (floated == 'left'), [floated])
-  const right = useMemo(() => (floated == 'right'), [floated])
-
+  const _completed = (currentStage > stage) || completed
+  const _active = (currentStage == stage)
+  const _disabled = (currentStage < stage)
+  const _left = (floated == 'left')
+  const _right = (floated == 'right')
+  const _link = (onClick && _active && !completed)
+  let classNames = []
+  if (_right) classNames.push('AlignRight')
+  if (!_link) classNames.push('NoMouse')
   return (
-    <Step completed={completed} active={active} disabled={disabled} className={right ? 'AlignRight' : ''}>
-      {left && icon && <Icon name={icon} />}
+    <Step
+      className={classNames.join(' ')}
+      completed={_completed}
+      active={_active}
+      disabled={_disabled}
+      link={_link}
+      onClick={_link ? onClick : null}
+    >
+      {_left && icon && <Icon name={icon} />}
       <Step.Content>
         <Step.Title>{title}</Step.Title>
         <Step.Description>{description}</Step.Description>
       </Step.Content>
-      {right && icon && <Icon name={icon} style={{margin: '0 0 0 1rem'}} />}
+      {_right && icon && <Icon name={icon} style={{margin: '0 0 0 1rem'}} />}
     </Step>
   )
 }
