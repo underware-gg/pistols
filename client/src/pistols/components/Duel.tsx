@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid, Segment, Icon, Step } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
 import { useChallenge } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useDuel } from '@/pistols/hooks/useDuel'
@@ -19,10 +19,10 @@ export default function Duel({
   duelId
 }) {
   const { dispatchSetDuel } = usePistolsContext()
-  const { state, message, duelistA, duelistB, winner, lords } = useChallenge(duelId)
+  const { state, isLive, message, duelistA, duelistB, winner, lords } = useChallenge(duelId)
   const { account } = useDojoAccount()
 
-  useEffect(() => dispatchSetDuel(duelId), [duelId])
+  useEffect(() => dispatchSetDuel(duelId, isLive ? MenuKey.LiveDuels : MenuKey.PastDuels), [duelId, isLive])
 
   return (
     <>

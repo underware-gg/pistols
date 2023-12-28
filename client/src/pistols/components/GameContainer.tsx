@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { loadAudioAssets, isAudioAssetsLoaded } from '@/pistols/data/assets'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
@@ -13,7 +13,7 @@ function GameContainer({
 
   useEffect(() => {
     if (duelId) {
-      dispatchSetDuel(duelId)
+      dispatchSetDuel(duelId, MenuKey.YourDuels)
     }
   }, [duelId])
 

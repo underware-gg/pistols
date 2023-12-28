@@ -20,7 +20,7 @@ export default function ChallengeModal() {
   const { reply_challenge } = useDojoSystemCalls()
   const { account } = useDojoAccount()
 
-  const { atLiveDuels, atPastDuels, duelId, dispatchSetDuel, dispatchSetDuelist } = usePistolsContext()
+  const { atYourDuels, atLiveDuels, atPastDuels, duelId, dispatchSetDuel, dispatchSetDuelist } = usePistolsContext()
 
   const { state, message, duelistA, duelistB, winner, lords } = useChallenge(duelId)
 
@@ -51,7 +51,7 @@ export default function ChallengeModal() {
       dimmer='inverted'
       onClose={() => _close()}
       onOpen={() => {}}
-      open={(atLiveDuels || atPastDuels) && duelId > 0}
+      open={(atYourDuels || atLiveDuels || atPastDuels) && duelId > 0}
     >
       <Modal.Header>Challenge&nbsp;&nbsp;&nbsp;<AccountShort address={duelId} suffix='' /></Modal.Header>
       <Modal.Content image>

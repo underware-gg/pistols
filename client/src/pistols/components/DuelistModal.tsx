@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid, Table, Modal, Form, Divider, Dropdown } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { MenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
@@ -71,7 +71,7 @@ export default function DuelistModal() {
             {!isYou &&
               <Col>
                 {
-                  hasPact ? <ActionButton fill label='Go to Challenge' onClick={() => dispatchSetDuel(pactDuelId)} />
+                  hasPact ? <ActionButton fill label='Go to Challenge' onClick={() => dispatchSetDuel(pactDuelId, MenuKey.YourDuels)} />
                     : isChallenging ? <ActionButton fill disabled={!challengeArgs} label='Submit Challenge!' onClick={() => _challenge()} />
                       : <ActionButton fill label='Challenge for a Duel!' onClick={() => setIsChallenging(true)} />
                 }

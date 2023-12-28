@@ -1,19 +1,20 @@
 import React, { useMemo, useState } from 'react'
 import { Container, Grid, Label, Menu } from 'semantic-ui-react'
 import { MenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import AccountHeader from '@/pistols/components/account/AccountHeader'
-import { ChallengeTableAll, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
+import { useChallengeIdsByState, useChallengesByDuelist } from '@/pistols/hooks/useChallenge'
+import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
 import { DuelistTable } from '@/pistols/components/DuelistTable'
+import AccountHeader from '@/pistols/components/account/AccountHeader'
 import ChallengeModal from '@/pistols/components/ChallengeModal'
 import DuelistModal from '@/pistols/components/DuelistModal'
-import { useChallengeIdsByState } from '../hooks/useChallenge'
-import { ChallengeState } from '../utils/pistols'
+import { ChallengeState } from '@/pistols/utils/pistols'
+import { useDojoAccount } from '@/dojo/DojoContext'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export default function Tavern() {
-  const { atDuelists, atLiveDuels, atPastDuels } = usePistolsContext()
+  const { atDuelists, atYourDuels, atLiveDuels, atPastDuels } = usePistolsContext()
 
   return (
     <>
@@ -28,6 +29,7 @@ export default function Tavern() {
       <Container text className=''>
         <div className='TableMain'>
           {atDuelists && <DuelistTable />}
+          {atYourDuels && <ChallengeTableYour />}
           {atLiveDuels && <ChallengeTableLive />}
           {atPastDuels && <ChallengeTablePast />}
         </div>
@@ -38,31 +40,36 @@ export default function Tavern() {
   )
 }
 
+const _makeBubble = (awaitingCount, inProgressCount) => {
+  const count = awaitingCount + inProgressCount
+  if (count > 0) {
+    return (
+      <Label color={inProgressCount > 0 ? 'green' : 'orange'} floating>
+        {count}
+      </Label>
+    )
+  }
+  return null
+}
+
 function TavernMenu({
 }) {
+  const { account } = useDojoAccount()
   const { menuKey, tavernMenuItems, dispatchSetMenu } = usePistolsContext()
 
+  const { awaitingCount, inProgressCount } = useChallengesByDuelist(BigInt(account.address))
   const { challengeIds: awaitingChallengeIds } = useChallengeIdsByState(ChallengeState.Awaiting)
-  const { challengeIds: liveChallengeIds } = useChallengeIdsByState(ChallengeState.InProgress)
+  const { challengeIds: inProgressChallengeIds } = useChallengeIdsByState(ChallengeState.InProgress)
 
-  const liveDuelsBubble = useMemo(() => {
-    const count = awaitingChallengeIds.length + liveChallengeIds.length
-    if (count > 0) {
-      return (
-        <Label color={liveChallengeIds.length > 0 ? 'green' : 'orange'} floating>
-          {count}
-        </Label>
-      )
-    }
-    return null
-  }, [awaitingChallengeIds, liveChallengeIds])
+  const yourDuelsBubble = useMemo(() => _makeBubble(awaitingCount, inProgressCount), [awaitingCount, inProgressCount])
+  const liveDuelsBubble = useMemo(() => _makeBubble(awaitingChallengeIds.length, inProgressChallengeIds.length), [awaitingChallengeIds, inProgressChallengeIds])
   
   const items = useMemo(() => {
     let result = []
     Object.keys(tavernMenuItems).forEach(k => {
       const key = parseInt(k)
       const label = tavernMenuItems[key]
-      const bubble = (key == MenuKey.LiveDuels) ? liveDuelsBubble : null
+      const bubble = (key == MenuKey.YourDuels) ? yourDuelsBubble : (key == MenuKey.LiveDuels) ? liveDuelsBubble : null
       result.push(
         <Menu.Item
           key={key}
@@ -76,7 +83,7 @@ function TavernMenu({
       )
     })
     return result
-  }, [menuKey, awaitingChallengeIds, liveChallengeIds])
+  }, [menuKey, yourDuelsBubble, liveDuelsBubble])
 
   return (
     <Menu secondary className='TavernMenu' size='huge'>

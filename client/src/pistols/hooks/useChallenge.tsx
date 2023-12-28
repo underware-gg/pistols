@@ -132,6 +132,14 @@ export const useChallengesByDuelist = (address: bigint) => {
   const stats: any = useMemo(() => {
     let result = {
       challengeCount: challenges.length,
+      awaitingCount: challenges.reduce((acc, ch) => {
+        if (ch.state == ChallengeState.Awaiting) acc++;
+        return acc;
+      }, 0),
+      inProgressCount: challenges.reduce((acc, ch) => {
+        if (ch.state == ChallengeState.InProgress) acc++;
+        return acc;
+      }, 0),
       drawCount: challenges.reduce((acc, ch) => {
         if (ch.state == ChallengeState.Draw) acc++;
         return acc;

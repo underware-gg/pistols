@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useAllChallengeIds, useChallenge, useChallengeIdsByDuelist, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
+import { useDojoAccount } from '@/dojo/DojoContext'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { MenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ChallengeState, ChallengeStateNames } from '@/pistols/utils/pistols'
@@ -34,6 +35,12 @@ export function ChallengeTableByDuelist({
   const { challengeIds } = useChallengeIdsByDuelist(address)
   return <ChallengeTableByIds challengeIds={challengeIds} />
 }
+
+export function ChallengeTableYour() {
+  const { account } = useDojoAccount()
+  return <ChallengeTableByDuelist address={account.address} />
+}
+
 
 
 function ChallengeTableByIds({
@@ -98,7 +105,8 @@ function DuelItem({
   duelId,
   sortCallback,
 }) {
-  const { dispatchSetDuel, dispatchSetMenu } = usePistolsContext()
+  const { account } = useDojoAccount()
+  const { dispatchSetDuel } = usePistolsContext()
   const { duelistA, duelistB, state, isLive, winner, timestamp, timestamp_expire, timestamp_start, timestamp_end } = useChallenge(duelId)
   const { name: nameA, profilePic: profilePicA } = useDuelist(duelistA)
   const { name: nameB, profilePic: profilePicB } = useDuelist(duelistB)
@@ -109,6 +117,7 @@ function DuelItem({
     sortCallback(duelId, state, timestamp)
   }, [state, timestamp])
 
+  const isYours = useMemo(() => (BigInt(account.address) == duelistA || BigInt(account.address) == duelistB), [account, duelistA, duelistB])
   const winnerIsA = useMemo(() => (duelistA == winner), [duelistA, winner])
   const winnerIsB = useMemo(() => (duelistB == winner), [duelistB, winner])
   const isAwaiting = useMemo(() => [ChallengeState.Awaiting].includes(state), [state])
@@ -125,8 +134,7 @@ function DuelItem({
   }, [state, timestamp, timestamp_expire, timestamp_start, timestamp_end])
 
   const _gotoChallenge = () => {
-    dispatchSetMenu(isLive ? MenuKey.LiveDuels : MenuKey.PastDuels)
-    dispatchSetDuel(duelId)
+    dispatchSetDuel(duelId, isYours ? MenuKey.YourDuels : isLive ? MenuKey.LiveDuels : MenuKey.PastDuels)
   }
 
   return (

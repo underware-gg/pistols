@@ -11,6 +11,7 @@ import React, { ReactNode, createContext, useReducer, useContext } from 'react'
 
 export enum MenuKey {
   Duelists,
+  YourDuels,
   LiveDuels,
   PastDuels,
   // Scoreboard,
@@ -18,6 +19,7 @@ export enum MenuKey {
 
 const tavernMenuItems = {
   [MenuKey.Duelists]: 'Duelists',
+  [MenuKey.YourDuels]: 'Your Duels',
   [MenuKey.LiveDuels]: 'Live Duels',
   [MenuKey.PastDuels]: 'Past Duels',
   // [MenuKey.Scoreboard]: 'Scoreboard',
@@ -26,7 +28,7 @@ const tavernMenuItems = {
 export const initialState = {
   duelistAddress: 0n,
   duelId: 0n,
-  menuKey: MenuKey.Duelists,
+  menuKey: MenuKey.YourDuels,
 }
 
 const PistolsActions = {
@@ -77,20 +79,24 @@ const PistolsProvider = ({
     switch (action.type) {
       case PistolsActions.SET_DUELIST: {
         newState.menuKey = MenuKey.Duelists
-        newState.duelistAddress = action.payload as bigint
+        newState.duelistAddress = BigInt(action.payload)
         newState.duelId = 0n
         break
       }
       case PistolsActions.SET_DUEL: {
         // newState.menuKey = MenuKey.LiveDuels
-        newState.duelId = action.payload as bigint
+        newState.duelId = BigInt(action.payload)
         newState.duelistAddress = 0n
         break
       }
       case PistolsActions.SET_MENU_KEY: {
         newState.menuKey = action.payload as MenuKey
-        newState.duelistAddress = 0n
-        newState.duelId = 0n
+        if (newState.menuKey == MenuKey.Duelists) {
+          newState.duelId = 0n
+        }
+        else {
+          newState.duelistAddress = 0n
+        }        
         break
       }
       default:
@@ -122,22 +128,26 @@ export const usePistolsContext = () => {
       payload: address,
     })
   }
-  const dispatchSetDuel = (duelId: bigint) => {
-    dispatch({
-      type: PistolsActions.SET_DUEL,
-      payload: duelId,
-    })
-  }
   const dispatchSetMenu = (menuKey: MenuKey) => {
     dispatch({
       type: PistolsActions.SET_MENU_KEY,
       payload: menuKey,
     })
   }
+  const dispatchSetDuel = (duelId: bigint, menuKey: MenuKey | null = null) => {
+    dispatch({
+      type: PistolsActions.SET_DUEL,
+      payload: duelId,
+    })
+    if (menuKey !== null && state.menuKey == MenuKey.Duelists) {
+      dispatchSetMenu(menuKey)
+    }
+  }
   return {
     ...state,
     tavernMenuItems,
     atDuelists: (state.menuKey == MenuKey.Duelists),
+    atYourDuels: (state.menuKey == MenuKey.YourDuels),
     atLiveDuels: (state.menuKey == MenuKey.LiveDuels),
     atPastDuels: (state.menuKey == MenuKey.PastDuels),
     // atScoreboard: (state.menuKey == MenuKey.Scoreboard),

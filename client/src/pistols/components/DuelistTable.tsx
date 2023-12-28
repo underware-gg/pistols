@@ -2,7 +2,6 @@ import React, { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid, Table } from 'semantic-ui-react'
 import { useDojoAccount } from '@/dojo/DojoContext'
-import { useChallengesByDuelist } from '@/pistols/hooks/useChallenge'
 import { useAllDuelistIds, useDuelist } from '@/pistols/hooks/useDuelist'
 import { AccountShort } from '@/pistols/components/ui/Account'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
@@ -65,7 +64,6 @@ function DuelistItem({
   isYou,
 }) {
   const { name, profilePic, total_wins, total_losses, total_draws, total_duels, honourDisplay } = useDuelist(address)
-  // const { challengeCount, drawCount, winCount, loseCount } = useChallengesByDuelist(address)
   const { dispatchSetDuelist } = usePistolsContext()
 
   return (
