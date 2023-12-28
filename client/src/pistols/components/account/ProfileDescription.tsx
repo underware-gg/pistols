@@ -5,12 +5,12 @@ import { useDuelist } from '@/pistols/hooks/useDuelist'
 export function ProfileDescription({
   address,
 }) {
-  const { name } = useDuelist(address)
+  const { name, honourDisplay } = useDuelist(address)
   return (
     <div>
       <h1>{name}</h1>
       <AccountShort address={address} />
-      <h3 className='Important'>Honor: 10.0</h3>
+      <h3 className='Important'>Honour: {honourDisplay}</h3>
     </div>
   )
 }

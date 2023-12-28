@@ -16,6 +16,9 @@ mod utils {
         Round, round,
     };
 
+    // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
+    extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
+
     //
     // starknet testing cheats
     // https://github.com/starkware-libs/cairo/blob/main/corelib/src/starknet/testing.cairo
@@ -88,8 +91,29 @@ mod utils {
         (new_state)
     }
 
+    fn execute_commit_move(system: IActionsDispatcher, sender: ContractAddress,
+        duel_id: u128,
+        round_number: u8,
+        hash: felt252,
+    ) {
+        testing::set_contract_address(sender);
+        system.commit_move(duel_id, round_number, hash);
+        _next_block();
+    }
+
+    fn execute_reveal_move(system: IActionsDispatcher, sender: ContractAddress,
+        duel_id: u128,
+        round_number: u8,
+        salt: u64,
+        move: u8,
+    ) {
+        testing::set_contract_address(sender);
+        system.reveal_move(duel_id, round_number, salt, move);
+        _next_block();
+    }
+
     //
-    // resd-only calls
+    // read-only calls
     //
 
     fn execute_get_timestamp(system: IActionsDispatcher) -> u64 {
@@ -111,13 +135,21 @@ mod utils {
     //
 
     fn get_Duelist(world: IWorldDispatcher, address: ContractAddress) -> Duelist {
-        let result: Duelist = get!(world, address, Duelist);
-        (result)
+        (get!(world, address, Duelist))
     }
 
     fn get_Challenge(world: IWorldDispatcher, duel_id: u128) -> Challenge {
-        let result: Challenge = get!(world, duel_id, Challenge);
-        (result)
+        (get!(world, duel_id, Challenge))
+    }
+
+    fn get_Round(world: IWorldDispatcher, duel_id: u128, round_number: u8) -> Round {
+        (get!(world, (duel_id, round_number), Round))
+    }
+
+    fn get_Challenge_Round(world: IWorldDispatcher, duel_id: u128) -> (Challenge, Round) {
+        let challenge = get!(world, duel_id, Challenge);
+        let round = get!(world, (duel_id, challenge.round_number), Round);
+        (challenge, round)
     }
 }
 
@@ -141,10 +173,20 @@ mod tests {
     fn test_pedersen_hash() {
         let a: felt252 = 0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7;
         let b: felt252 = 0x4d07e40e93398ed3c76981e72dd1fd22557a78ce36c0515f679e27f0bb5bc5f;
-        let p_a = pedersen(a, b);
-        let p_b = pedersen(b, a);
-        // pederses hashes are DIFFERENT for (a,b) and (b,a)
-        assert(p_a != p_b, 'pedersen');
+        let a_b = pedersen(a, b);
+        let b_a = pedersen(b, a);
+        // pedersen hashes are DIFFERENT for (a,b) and (b,a)
+        assert(a_b != b_a, 'pedersen');
+    }
+
+    #[test]
+    #[available_gas(1_000_000)]
+    fn test_pedersen_hash_from_zero() {
+        let a: felt252 = 0;
+        let b: felt252 = 0x4d07e40e93398ed3c76981e72dd1fd22557a78ce36c0515f679e27f0bb5bc5f;
+        let a_b = pedersen(a, b);
+        // pedersen hashes are DIFFERENT if (a == zero)
+        assert(a_b != b, 'pedersen');
     }
 
     #[test]
@@ -154,9 +196,9 @@ mod tests {
         let b: felt252 = 0x4d07e40e93398ed3c76981e72dd1fd22557a78ce36c0515f679e27f0bb5bc5f;
         let aa: u256 = a.into();
         let bb: u256 = b.into();
-        let p_a = aa ^ bb;
-        let p_b = bb ^ aa;
+        let a_b = aa ^ bb;
+        let b_a = bb ^ aa;
         // xor hashes are EQUAL for (a,b) and (b,a)
-        assert(p_a == p_b, 'felt_to_u128');
+        assert(a_b == b_a, 'felt_to_u128');
     }
 }

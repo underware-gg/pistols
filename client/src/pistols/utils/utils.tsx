@@ -1,6 +1,6 @@
 import { getEntityIdFromKeys } from '@dojoengine/utils'
 import { Entity } from '@dojoengine/recs'
-import { shortString } from 'starknet'
+import { shortString, ec } from 'starknet'
 
 export const abs = (v: number): number => (v < 0 ? -v : v)
 export const min = (v1: number, v2: number): number => (v1 < v2 ? v1 : v2)
@@ -17,8 +17,6 @@ const DEGREES_PER_RADIANS = (180 / Math.PI);
 export const toDegrees = (r: number) => (r * DEGREES_PER_RADIANS)
 export const toRadians = (d: number) => (d / DEGREES_PER_RADIANS)
 
-export const randomArrayElement = (array: any[]): any => (array.length > 0 ? array[Math.floor(Math.random() * array.length)] : null)
-
 export const bigintToHex = (v: bigint | string): string => (`0x${BigInt(v).toString(16)}`)
 export const bigintToEntity = (v: bigint | string): Entity => (getEntityIdFromKeys([BigInt(v)]) as Entity)
 export const keysToEntity = (keys: any[]): Entity => (getEntityIdFromKeys(keys) as Entity)
@@ -26,6 +24,7 @@ export const keysToEntity = (keys: any[]): Entity => (getEntityIdFromKeys(keys) 
 export const validateCairoString = (v: string): string => (v ? v.slice(0, 31) : '')
 export const stringToFelt = (v: string): string => (v ? shortString.encodeShortString(v) : '0x0')
 export const feltToString = (hex: string): string => (BigInt(hex) > 0n ? shortString.decodeShortString(hex) : '')
+export const pedersen = (a: bigint | string | number, b: bigint | string | number): bigint => (BigInt(ec.starkCurve.pedersen(BigInt(a), BigInt(b))))
 
 export const formatTimestamp = (t: number): string => {
   const iso = (new Date(t * 1000).toISOString())
@@ -43,4 +42,16 @@ export const formatTimestampDelta = (start: number, end: number): string => {
   const [hour, minutes, seconds] = time.split(':')
   const days = '?'
   return `${days}d ${hour}h ${minutes}m ${seconds}s`
+}
+
+export const makeRandomInt = (maxNonInclusive: number) => (Math.floor(Math.random() * maxNonInclusive))
+export const randomArrayElement = (array: any[]): any => (array.length > 0 ? array[makeRandomInt(array.length)] : null)
+
+export const makeRandomHash = (hashSize = 32, prefix = '0x') => {
+  const hexChars = '0123456789abcdef';
+  let result = prefix ?? '';
+  for (let i = 0; i < hashSize; ++i) {
+    result += hexChars[makeRandomInt(hexChars.length)]
+  }
+  return result
 }

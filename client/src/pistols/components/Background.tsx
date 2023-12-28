@@ -10,8 +10,8 @@ const Background = ({
       <div className='AspectRight'></div>
       <div className='AspectTop'></div>
       <div className='AspectBottom'></div>
-      <div className='AspectContent'>
-        <div className={`FillParent Relative CenteredContainer ${className}`}>
+      <div className={`AspectContent ${className}`}>
+        <div className={`FillParent Relative CenteredContainer`}>
           {children}
         </div>
       </div>

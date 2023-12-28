@@ -5,6 +5,7 @@ import Gate from '@/pistols/components/Gate'
 import Tavern from '@/pistols/components/Tavern'
 import GameContainer from '@/pistols/components/GameContainer'
 import Background from '@/pistols/components/Background'
+import Duel from '@/pistols/components/Duel'
 
 // enable wasm in build (this is for api routes)
 // export const config = {
@@ -14,11 +15,11 @@ import Background from '@/pistols/components/Background'
 export default function MainPage() {
   const router = useRouter()
 
-  const { page, title, duelId, backgroundImage } = useMemo(() => {
+  const { page, title, duelId, className } = useMemo(() => {
     let page = null
     let title = null
     let duelId = null
-    let backgroundImage = null
+    let className = 'BackgroundSplash'
 
     // parse page
     if (router.isReady && router.query.main) {
@@ -27,29 +28,30 @@ export default function MainPage() {
       if (_page == 'gate') {
         page = _page
         title = 'Pistols - The Gate'
-        // backgroundImage = '/images/gate_bg.png'
+        className = 'BackgroundWeapons'
       } else if (_page == 'tavern') {
         page = _page
         title = 'Pistols - The Tavern'
-        // backgroundImage = '/images/gate_bg.png'
+        className = 'BackgroundWeapons'
       } else if (_page == 'duel') {
-        // '/room/[duel]'
-        // '/room/[duel]/[levelNumber]'
+        // '/room/[duel_id]'
         if (_slugs.length > 0) {
           page = _page
-          duelId = parseInt(_slugs[0])
-          title = 'Pistols - The Duel!'
+          duelId = BigInt(_slugs[0])
+          title = 'Pistols - Duel!'
+          className = 'BackgroundDuel'
         } else {
-          page = 'gate'
-          router.push('/gate')
+          page = 'tavern'
+          router.push('/tavern')
         }
+        className = 'BackgroundDuel'
       }
     }
     return {
       page,
       title,
       duelId,
-      backgroundImage,
+      className,
     }
   }, [router.isReady, router.query])
 
@@ -63,12 +65,14 @@ export default function MainPage() {
 
   const _atGate = (page == 'gate')
   const _atTavern = (page == 'tavern')
+  const _atDuel = (page == 'duel')
 
   return (
-    <AppDojo title={title} backgroundImage={backgroundImage}>
-      <Background>
+    <AppDojo title={title} backgroundImage={null}>
+      <Background className={className}>
         {_atGate && <Gate />}
         {_atTavern && <Tavern />}
+        {_atDuel && <Duel duelId={duelId}/>}
       </Background>
       <GameContainer
         isPlaying={false}

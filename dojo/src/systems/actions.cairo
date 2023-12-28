@@ -25,6 +25,21 @@ trait IActions<TContractState> {
         accepted: bool,
     ) -> ChallengeState;
 
+    //
+    // Duel
+    fn commit_move(self: @TContractState,
+        duel_id: u128,
+        round_number: u8,
+        hash: felt252,
+    );
+    fn reveal_move(self: @TContractState,
+        duel_id: u128,
+        round_number: u8,
+        salt: u64,
+        move: u8,
+    );
+
+    //
     // read-only calls
     fn get_timestamp(self: @TContractState) -> u64;
     fn get_pact(self: @TContractState,
@@ -45,16 +60,19 @@ mod actions {
     use core::option::OptionTrait;
     use starknet::{ContractAddress, get_block_timestamp, get_block_info};
 
-    use pistols::models::models::{Duelist, Challenge, Pact, Round};
+    use pistols::models::models::{Duelist, Challenge, Pact, Round, Move};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
+    use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::utils::timestamp::{timestamp};
     use pistols::systems::seeder::{make_seed};
-    use pistols::systems::solver::{solve_random};
+    use pistols::systems::shooter::{shooter};
     use pistols::systems::{utils};
+    use pistols::types::constants::{constants};
 
     // impl: implement functions specified in trait
     #[external(v0)]
     impl ActionsImpl of IActions<ContractState> {
+
         //------------------------
         // Duelists
         //
@@ -69,7 +87,6 @@ mod actions {
             // 1st time setup
             if (duelist.timestamp == 0) {
                 duelist.timestamp = get_block_timestamp();
-                duelist.honor = 100;
             }
             // update
             duelist.name = name;
@@ -115,7 +132,7 @@ mod actions {
                 message,
                 pass_code,
                 // progress
-                round: 0,
+                round_number: 0,
                 winner: utils::zero_address(),
                 // times
                 timestamp,
@@ -161,38 +178,43 @@ mod actions {
                     challenge.timestamp_end = timestamp;
                 } else {
                     challenge.state = ChallengeState::InProgress.into();
-                    challenge.round = 1;
+                    challenge.round_number = 1;
                     challenge.timestamp_start = timestamp;
                 }
             }
-
-            // TEMPORARY RESOLUTION
-            // TODO: REMOVE THIS
-            if (challenge.state == ChallengeState::InProgress.into()) {
-                solve_random(ref challenge);
-            }
-
             // update challenge state
             utils::set_challenge(world, challenge);
-
-            // Create 1st round
-            if (challenge.state == ChallengeState::InProgress.into()) {
-                set!(world, (
-                    Round {
-                        duel_id,
-                        round: 1,
-                        move_a: 0,
-                        move_b: 0,
-                        health_a: 100,
-                        health_b: 100,
-                    }
-                ));
-            }
 
             (challenge.state.try_into().unwrap())
         }
 
+
+        //------------------------
+        // COMMIT Duel move
         //
+
+        fn commit_move(self: @ContractState,
+            duel_id: u128,
+            round_number: u8,
+            hash: felt252,
+        ) {
+            let world: IWorldDispatcher = self.world_dispatcher.read();
+            shooter::commit_move(world, duel_id, round_number, hash);
+        }
+
+        fn reveal_move(self: @ContractState,
+            duel_id: u128,
+            round_number: u8,
+            salt: u64,
+            move: u8,
+        ) {
+            let world: IWorldDispatcher = self.world_dispatcher.read();
+            shooter::reveal_move(world, duel_id, round_number, salt, move);
+        }
+
+
+
+        //------------------------------------
         // read-only calls
         //
 

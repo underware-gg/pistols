@@ -1,12 +1,14 @@
 
 $font-family: Menlo, monospace, Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-$color-important: #f00;
 $color-bg: #f5f5f5;
-$color-panel: #b4b4b4;
+$color-white: #f5f5f5;
+$color-shadow: #b4b4b4;
 $color-text: #000;
-$color-info: #444;
+$color-icon: #444;
+$color-important: #e00000;
 $color-active: #e00000;
 $color-inactive: #712727;
+$color-attention: #22b600;
 $ui-border: 6px ridge $color-active;
 $ui-outline: 0.5px solid #444444;
 $text-shadow: 0.05em 0.05em 1px #0008;
@@ -114,9 +116,9 @@ canvas {
 // GENERIC
 //
 
-.AlignLeft { text-align: left; }
-.AlignCenter { text-align: center; }
-.AlignRight { text-align: right; }
+.AlignLeft { text-align: left!important; justify-content: left!important; }
+.AlignCenter { text-align: center!important; justify-content: center!important; }
+.AlignRight { text-align: right!important; justify-content: right!important; }
 .AlignTop { vertical-align: top; }
 .AlignMiddle { vertical-align: middle; }
 .AlignBottom { vertical-align: bottom; }
@@ -125,6 +127,7 @@ canvas {
 .Padded { padding: 0.5em!important; }
 .NoMargin { margin: 0!important }
 .NoBorder { border: 0!important }
+.AutoMargin { margin: auto!important }
 
 .Block { display: inline-block; }
 .Flex { display: flex; }
@@ -214,6 +217,8 @@ canvas {
 //------------------------
 // ASPECT RATIO
 //
+// $reference-w: 1200;
+// $reference-h: 675;
 $aspect: 1.7777;
 $aspect-w: min(100vw,100vh*$aspect);
 $aspect-h: min(100vw/$aspect,100vh);
@@ -227,7 +232,6 @@ $box-h: calc((100vh - $aspect-h) / 2);
 	width: $aspect-w;
 	height: $aspect-h;
   border: #0001 1px solid;
-  background-image: url('/images/bg_tavern_1.jpg');
   background-size: cover;
 }
 .AspectLeft, .AspectRight, .AspectTop, .AspectBottom {
@@ -260,6 +264,23 @@ $box-h: calc((100vh - $aspect-h) / 2);
 	bottom: 0;
 }
 
+//
+// Backgrounds
+//
+.LightenBackground {
+  background-color: #fffb;
+  background-blend-mode:lighten;
+}
+.BackgroundSplash {
+  background-image: url('/images/bg_duel.jpg');
+}
+.BackgroundWeapons {
+  @extend .LightenBackground;
+  background-image: url('/images/bg_weapons_1.jpg');
+}
+.BackgroundDuel {
+  background-image: url('/images/bg_duel.jpg');
+}
 
 //------------------------
 // GAME
@@ -313,6 +334,11 @@ $box-h: calc((100vh - $aspect-h) / 2);
   width: calc(439px / 2);
   height: calc(768px / 2);
 }
+.ProfilePicDuel {
+  @extend .ProfilePic;
+  width: calc(439px / 3);
+  height: calc(768px / 3);
+}
 .ProfilePicSquare {
   @extend .ProfilePic;
   width: 35px;
@@ -342,6 +368,9 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 .Unlocked {
   background-color: $color-active;
+}
+.Attention {
+  background-color: $color-attention;
 }
 
 /* GAME CANVAS */
@@ -418,6 +447,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
   top: 0;
   width: 100%;
   padding: 15px;
+  text-align: center;
 }
 
 .AccountHeader {
@@ -428,50 +458,42 @@ $box-h: calc((100vh - $aspect-h) / 2);
   padding: 15px;
 }
 
-
-.RowUI{
-  width: 100%;
-  height: $ui-row;
-  max-height: $ui-row;
-}
-.ColUI{
-  width: $ui-column;
-  max-width: $ui-column;
+.DuelSideA {
   height: 100%;
-  vertical-align: bottom;
-  margin: auto;
-  position: relative;
-}
-.ColUIContents {
+  width: 50%;
   position: absolute;
-  bottom: 0;
-  width: 100%;
+  top: 0;
+  left: 0;
+  padding: 15px;
+  text-align: left;
+  align-items: left;
 }
-.ColUISlider {
-  background-color: rgba($color-important, 0.5);
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.ButtonUI{
-  font-size: 18px;
-}
-
-.InfoTop {
-  width: 100%;
-  height: $ui-row;
-  padding: 1em 0 0 0;
-  margin: auto;
-}
-.InfoBottom {
-  @extend .AlignMiddle;
-  // height: calc($ui-height - $ui-row);
-  width: 80%;
-  margin: auto;
+.DuelSideB {
+  @extend .DuelSideA;
+  left: unset;
+  right: 0;
+  text-align: right;
+  align-items: right;
 }
 
+.DuelProfileA {
+  display: flex;
+  align-items: flex-start;
+  align-content: flex-start;
+  text-align: left;
+  width: 100%;
+}
+.DuelProfileB {
+  @extend .DuelProfileA;
+  text-align: right;
+  justify-content: right;
+}
+
+.DuelProgress {
+  margin-top: 20px;
+}
+
+// <IconXXX>
 
 .Tooltip {
 	cursor: default; //help;
@@ -479,12 +501,12 @@ $box-h: calc((100vh - $aspect-h) / 2);
 .Icon {
 	width: initial !important; // remove width to be able to spin
 	margin: 0 !important;
-	text-shadow: 0.1em 0 $color-panel;
-	color: $color-info;
+	text-shadow: 0.1em 0 $color-shadow;
+	color: $color-icon;
 }
 .InfoIcon {
 	@extend .Icon;
-	// color: $color-info;
+	// color: $color-icon;
 }
 // Icon click feedback
 .IconClick:active {
@@ -531,33 +553,82 @@ $box-h: calc((100vh - $aspect-h) / 2);
 //-----------------------------
 // semantic-ui
 //
+$color-positive: #dafadd;
+$color-negative: #fbdbdb;
+$color-warning: #f9e9d0;
+// 
+// <Input>
 .ui.input>input {
   background: rgb(255, 255, 255);
   color: $color-text;
 }
+//
+// <Grid>
 .ui.grid>.row {
   padding: 0.25rem 0; // original: 1.0rem 0
 }
 .ui.grid>.row>.column {
   padding: 0 0.25rem; // original: 1.0rem 0
 }
-.ui.menu .item,
-.ui.secondary.menu .active.item {
-  background-color: rgba($color-bg, 0.5);
-  color: $color-important;
+//
+// <Button>
+.ui.button.toggle.active,
+.ui.buttons .button.toggle.active,
+.ui.toggle.buttons .active.button {
+  background-color: $color-important!important;
+}
+//
+// <Menu> buttons
+.ui.menu .item {
+  color: $color-text;
+}
+// .ui.menu .item,
+.ui.secondary.menu .active.item,
+.ui.secondary.menu .active.item:hover {
+  background-color: $color-important;
+  color: $color-white;
   // font-family: $font-family;
   // font-size: 16px;
   // font-weight: 600;
 }
+.ui.secondary.menu .item {
+  background-color: rgba($color-shadow, 0.4);
+  color: $color-important;
+}
+.ui.secondary.menu .dropdown.item:hover,
+.ui.secondary.menu .link.item:hover,
+.ui.secondary.menu a.item:hover {
+  background-color: rgba($color-bg, 0.5);
+  color: $color-important;
+}
+//
+// <Table>
 .ui.table td.positive, .ui.table tr.positive {
-  background: #dafadd !important;
-  // color: #2c662d !important;
+  background: $color-positive !important;
 }
 .ui.table td.negative, .ui.table tr.negative {
-  background: #fbdbdb!important;
-  // color: #9f3a38!important;
+  background: $color-negative!important;
 }
 .ui.table td.warning, .ui.table tr.warning {
-  background: #f9e9d0 !important;
-  // color: #573a08 !important;
+  background: $color-warning !important;
 }
+//
+// Pagination
+.ui.pagination.menu .active.item {
+  background-color: $color-important;
+  color: $color-white;
+  // font-weight: 800;
+}
+//
+// <Step>
+.ui.steps .step.active .title {
+  color: $color-important;
+}
+.ui.vertical.steps .active.step:after,
+.ui.vertical.steps .active.step:last-child:after {
+  display: none;
+}
+// .ui.steps .step.active {
+//   background-color: $color-positive;
+// }
+

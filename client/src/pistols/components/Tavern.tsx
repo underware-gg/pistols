@@ -1,31 +1,38 @@
 import React, { useMemo, useState } from 'react'
-import { Container, Grid, Menu } from 'semantic-ui-react'
-import { usePistolsContext, menuItems } from '@/pistols/hooks/PistolsContext'
+import { Container, Grid, Label, Menu } from 'semantic-ui-react'
+import { MenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { useChallengeIdsByState, useChallengesByDuelist } from '@/pistols/hooks/useChallenge'
+import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
+import { DuelistTable } from '@/pistols/components/DuelistTable'
 import AccountHeader from '@/pistols/components/account/AccountHeader'
-import { ChallengeTableMain } from '@/pistols/components/ChallengeTable'
-import { DuelistTableMain } from '@/pistols/components/DuelistTable'
 import ChallengeModal from '@/pistols/components/ChallengeModal'
 import DuelistModal from '@/pistols/components/DuelistModal'
+import { ChallengeState } from '@/pistols/utils/pistols'
+import { useDojoAccount } from '@/dojo/DojoContext'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export default function Tavern() {
-  const { menuItem, atDuels, atDuelists } = usePistolsContext()
+  const { atDuelists, atYourDuels, atLiveDuels, atPastDuels } = usePistolsContext()
 
   return (
     <>
-      <TavernMenu selectedItem={menuItem} />
+      <TavernMenu />
       {/* <AccountHeader /> */}
 
-      <div className='TavernTitle AlignCenter'>
+      <div className='TavernTitle'>
         <h1>The Tavern</h1>
-        <h2>of Honorable Lords 👑</h2>
+        <h2>of Honourable Lords 👑</h2>
       </div>
 
       <Container text className=''>
-        {atDuels && <ChallengeTableMain />}
-        {atDuelists && <DuelistTableMain />}
+        <div className='TableMain'>
+          {atDuelists && <DuelistTable />}
+          {atYourDuels && <ChallengeTableYour />}
+          {atLiveDuels && <ChallengeTableLive />}
+          {atPastDuels && <ChallengeTablePast />}
+        </div>
         <DuelistModal />
         <ChallengeModal />
       </Container>
@@ -33,25 +40,50 @@ export default function Tavern() {
   )
 }
 
-function TavernMenu({
-  selectedItem,
-}) {
-  const { dispatchSetMenuItem } = usePistolsContext()
+const _makeBubble = (awaitingCount, inProgressCount) => {
+  const count = awaitingCount + inProgressCount
+  if (count > 0) {
+    return (
+      <Label color={inProgressCount > 0 ? 'green' : 'orange'} floating>
+        {count}
+      </Label>
+    )
+  }
+  return null
+}
 
+function TavernMenu({
+}) {
+  const { account } = useDojoAccount()
+  const { menuKey, tavernMenuItems, dispatchSetMenu } = usePistolsContext()
+
+  const { awaitingCount, inProgressCount } = useChallengesByDuelist(BigInt(account.address))
+  const { challengeIds: awaitingChallengeIds } = useChallengeIdsByState(ChallengeState.Awaiting)
+  const { challengeIds: inProgressChallengeIds } = useChallengeIdsByState(ChallengeState.InProgress)
+
+  const yourDuelsBubble = useMemo(() => _makeBubble(awaitingCount, inProgressCount), [awaitingCount, inProgressCount])
+  const liveDuelsBubble = useMemo(() => _makeBubble(awaitingChallengeIds.length, inProgressChallengeIds.length), [awaitingChallengeIds, inProgressChallengeIds])
+  
   const items = useMemo(() => {
     let result = []
-    Object.values(menuItems).forEach(item => {
+    Object.keys(tavernMenuItems).forEach(k => {
+      const key = parseInt(k)
+      const label = tavernMenuItems[key]
+      const bubble = (key == MenuKey.YourDuels) ? yourDuelsBubble : (key == MenuKey.LiveDuels) ? liveDuelsBubble : null
       result.push(
         <Menu.Item
-          key={item}
-          name={item}
-          active={selectedItem === item}
-          onClick={() => dispatchSetMenuItem(item)}
-        />
+          key={key}
+          active={menuKey === key}
+          onClick={() => dispatchSetMenu(key)}
+        >
+          {label}
+          {bubble}
+        </Menu.Item>
+
       )
     })
     return result
-  }, [selectedItem])
+  }, [menuKey, yourDuelsBubble, liveDuelsBubble])
 
   return (
     <Menu secondary className='TavernMenu' size='huge'>

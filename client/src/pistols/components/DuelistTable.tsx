@@ -2,7 +2,6 @@ import React, { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid, Table } from 'semantic-ui-react'
 import { useDojoAccount } from '@/dojo/DojoContext'
-import { useChallengesByDuelist } from '@/pistols/hooks/useChallenge'
 import { useAllDuelistIds, useDuelist } from '@/pistols/hooks/useDuelist'
 import { AccountShort } from '@/pistols/components/ui/Account'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
@@ -13,17 +12,7 @@ const Col = Grid.Column
 const Cell = Table.Cell
 const HeaderCell = Table.HeaderCell
 
-
-export function DuelistTableMain({
-}) {
-  return (
-    <div className='TableMain'>
-      <DuelistTable />
-    </div>
-  )
-}
-
-export default function DuelistTable() {
+export function DuelistTable() {
   const { account } = useDojoAccount()
   const { duelistIds } = useAllDuelistIds()
 
@@ -37,13 +26,13 @@ export default function DuelistTable() {
   }, [duelistIds])
 
   return (
-    <Table selectable className='Faded' color='red'>
+    <Table selectable className='Faded' color='orange'>
       <Table.Header className='TableHeader'>
         <Table.Row textAlign='center' verticalAlign='middle'>
           <HeaderCell width={3}></HeaderCell>
           <HeaderCell width={1}></HeaderCell>
           <HeaderCell textAlign='left'>Duelist</HeaderCell>
-          <HeaderCell width={2}>Honor</HeaderCell>
+          <HeaderCell width={2}>Honour</HeaderCell>
           <HeaderCell width={1}>Wins</HeaderCell>
           <HeaderCell width={1}>Losses</HeaderCell>
           <HeaderCell width={1}>Draws</HeaderCell>
@@ -74,8 +63,7 @@ function DuelistItem({
   index,
   isYou,
 }) {
-  const { name, profilePic } = useDuelist(address)
-  const { challengeCount, drawCount, winCount, loseCount } = useChallengesByDuelist(address)
+  const { name, profilePic, total_wins, total_losses, total_draws, total_duels, honourDisplay } = useDuelist(address)
   const { dispatchSetDuelist } = usePistolsContext()
 
   return (
@@ -93,23 +81,23 @@ function DuelistItem({
       </Cell>
 
       <Cell className='Important'>
-        10.0
+        {honourDisplay}
       </Cell>
 
       <Cell>
-        {winCount}
+        {total_wins}
       </Cell>
 
       <Cell>
-        {loseCount}
+        {total_losses}
       </Cell>
 
       <Cell>
-        {drawCount}
+        {total_draws}
       </Cell>
 
       <Cell>
-        {challengeCount}
+        {total_duels}
       </Cell>
     </Table.Row>
   )

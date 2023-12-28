@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { loadAudioAssets, isAudioAssetsLoaded } from '@/pistols/data/assets'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import GameView from '@/pistols/components/GameView'
-import GameUI from '@/pistols/components/GameUI'
 
 function GameContainer({
   isPlaying,
@@ -14,14 +13,13 @@ function GameContainer({
 
   useEffect(() => {
     if (duelId) {
-      dispatchSetDuel(duelId)
+      dispatchSetDuel(duelId, MenuKey.YourDuels)
     }
   }, [duelId])
 
   return (
     <div className={`GameContainer UIBorder ${isPlaying ? '' : 'Hidden'}`}>
       <GameView />
-      <GameUI />
       <GameStartOverlay />
     </div>
   )

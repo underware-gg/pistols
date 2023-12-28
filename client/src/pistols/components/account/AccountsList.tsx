@@ -1,19 +1,20 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid, Radio, Input } from 'semantic-ui-react'
 import { useDojo, useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { AccountShort } from '@/pistols/components/ui/Account'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
-import { useAllDuelistIds, useDuelist } from '@/pistols/hooks/useDuelist'
-import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
+import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
+import useLocalStorageState from 'use-local-storage-state'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export function AccountsList() {
   const router = useRouter()
+  const [burners] = useLocalStorageState('burners')
   const {
     account: { create, list, get, select, clear, account, isMasterAccount, isDeploying }
   } = useDojo()
@@ -34,7 +35,7 @@ export function AccountsList() {
       )
     }
     return result
-  }, [account?.address, isDeploying])
+  }, [account?.address, isDeploying, burners])
 
   const { isRegistered } = useDuelist(account.address)
   const canEnter = useMemo(() => (!isMasterAccount && !isDeploying && isRegistered), [isMasterAccount, isDeploying, isRegistered])

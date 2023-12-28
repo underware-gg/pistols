@@ -197,7 +197,7 @@ mod tests {
 
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');
-        assert(ch.round == 0, 'round');
+        assert(ch.round_number == 0, 'round_number');
         assert(ch.winner == zero_address(), 'winner');
         assert(ch.timestamp_start == 0, 'timestamp_start');
         assert(ch.timestamp_end == timestamp, 'timestamp_end');
@@ -236,7 +236,7 @@ mod tests {
 
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');
-        assert(ch.round == 0, 'round');
+        assert(ch.round_number == 0, 'round_number');
         assert(ch.winner == zero_address(), 'winner');
         assert(ch.timestamp_start == 0, 'timestamp_start');
         assert(ch.timestamp_end == timestamp, 'timestamp_end');
@@ -290,69 +290,15 @@ mod tests {
 
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');
-        assert(ch.round == 0, 'round');
+        assert(ch.round_number == 0, 'round_number');
         assert(ch.winner == zero_address(), 'winner');
         assert(ch.timestamp_start == 0, 'timestamp_start');
         assert(ch.timestamp_end == timestamp, 'timestamp_end');
     }
 
     //-----------------------------------------
-    // ACCEPTED
+    // ACCEPT CHALLENGE
     //
-
-    // TODO: RE-ENABLE THIS...
-
-    // #[test]
-    // #[available_gas(1_000_000_000)]
-    // fn test_challenge_other_accept() {
-    //     let (world, system, owner, other) = utils::setup_world();
-    //     utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
-    //     utils::execute_register_duelist(system, other, OTHER_NAME, 2);
-
-    //     let expire_seconds: u64 = timestamp::from_days(2);
-    //     let duel_id: u128 = utils::execute_create_challenge(system, owner, other, PASS_CODE_1, MESSAGE_1, expire_seconds);
-    //     let ch = utils::get_Challenge(world, duel_id);
-    //     let (block_number, timestamp) = utils::elapse_timestamp(timestamp::from_days(1));
-    //     let new_state: ChallengeState = utils::execute_reply_challenge(system, other, duel_id, true);
-    //     assert(new_state == ChallengeState::InProgress, 'in_progress');
-
-    //     let ch = utils::get_Challenge(world, duel_id);
-    //     assert(ch.state == new_state, 'state');
-    //     assert(ch.round == 1, 'round');
-    //     assert(ch.timestamp_start == timestamp, 'timestamp_start');
-    //     assert(ch.timestamp_end == 0, 'timestamp_end');
-
-    //     <<< test get_Round(1)
-    // }
-
-
-    // TODO: REMODE THIS...
-    #[test]
-    #[available_gas(1_000_000_000)]
-    fn test_challenge_other_accept_solve_TEMPORARY() {
-        let (world, system, owner, other) = utils::setup_world();
-        utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
-        utils::execute_register_duelist(system, other, OTHER_NAME, 2);
-
-        let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, PASS_CODE_1, MESSAGE_1, expire_seconds);
-        let ch = utils::get_Challenge(world, duel_id);
-        let (block_number, timestamp) = utils::elapse_timestamp(timestamp::from_days(1));
-        let new_state: ChallengeState = utils::execute_reply_challenge(system, other, duel_id, true);
-        assert(new_state == ChallengeState::Resolved || new_state == ChallengeState::Draw, 'resolved');
-
-        let ch = utils::get_Challenge(world, duel_id);
-        assert(ch.state == new_state.into(), 'state');
-        assert(ch.round == 1, 'round');
-        assert(ch.timestamp_start == timestamp, 'timestamp_start');
-        assert(ch.timestamp_end == timestamp, 'timestamp_end');
-
-        if (new_state == ChallengeState::Resolved) {
-            assert(ch.winner == owner || ch.winner == other, 'winner');
-        } else if (new_state == ChallengeState::Draw) {
-            assert(ch.winner == zero_address(), 'draw');
-        }
-    }
-
-
+    // at test_duel.cairo
+    //
 }

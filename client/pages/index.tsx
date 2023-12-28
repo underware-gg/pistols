@@ -1,37 +1,39 @@
 import React from 'react'
 import Link from 'next/link'
-import { Image } from 'semantic-ui-react'
 import App from '@/pistols/components/App'
+import Background from '@/pistols/components/Background';
 // import SplashArt from '@/components/SplashArt';
 
 export default function IndexPage() {
 
   return (
-    <App backgroundImage={'/images/bg_duellists_1.jpg'} className='AppBackgroundFit'>
+    // <App backgroundImage={'/images/bg_duellists_1.jpg'} className='AppBackgroundFit'>
+    <App>
+      <Background className='BackgroundSplash'>
 
-      {/* <Link href='/gate'>
-        <Image className='Logo' src='/images/logo.png' />
-      </Link> */}
+        <div className='AlignCenter'>
 
-      {/* <SplashArt /> */}
+          <Link href='/gate'>
+            <h1>Pistols at 10 Blocks</h1>
+          </Link>
 
+          <hr />
 
-      <div className='Spacer20' />
+          by <a href='https://lootunder.world'>Team Underworld</a>
+          <br />
+          <a href='https://x.com/LootUnderworld'>@LootUnderworld</a>
 
-      <div className='AlignCenter'>
+          <div className='Spacer20' />
+          <div className='Spacer20' />
+          <div className='Spacer20' />
+          <div className='Spacer20' />
+          <div className='Spacer20' />
+          <div className='Spacer20' />
+          <div className='Spacer20' />
 
-        <Link href='/gate'>
-          <h1>Pistols at 10 Blocks</h1>
-        </Link>
+        </div>
 
-        <br />
-        <hr />
-        
-        by <a href='https://lootunder.world'>Team Underworld</a>
-        <br />
-        <a href='https://x.com/LootUnderworld'>@LootUnderworld</a>
-      </div>
-
+      </Background>
     </App>
   );
 }

@@ -8,7 +8,7 @@ import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePicButton } from '@/pistols/components/account/ProfilePic'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { ChallengeState, ChallengeStateDescriptions } from '@/pistols/utils/pistols'
+import { ChallengeState, ChallengeStateDescriptions, makeDuelUrl } from '@/pistols/utils/pistols'
 import { AccountShort } from './ui/Account'
 
 const Row = Grid.Row
@@ -16,10 +16,11 @@ const Col = Grid.Column
 const Cell = Table.HeaderCell
 
 export default function ChallengeModal() {
+  const router = useRouter()
   const { reply_challenge } = useDojoSystemCalls()
   const { account } = useDojoAccount()
 
-  const { atDuels, duelId, dispatchSetDuel, dispatchSetDuelist } = usePistolsContext()
+  const { atYourDuels, atLiveDuels, atPastDuels, duelId, dispatchSetDuel, dispatchSetDuelist } = usePistolsContext()
 
   const { state, message, duelistA, duelistB, winner, lords } = useChallenge(duelId)
 
@@ -40,6 +41,9 @@ export default function ChallengeModal() {
   const _reply = (accepted: boolean) => {
     reply_challenge(account, duelId, accepted)
   }
+  const _watch = () => {
+    router.push(makeDuelUrl(duelId))
+  }
   
   return (
     <Modal
@@ -47,7 +51,7 @@ export default function ChallengeModal() {
       dimmer='inverted'
       onClose={() => _close()}
       onOpen={() => {}}
-      open={atDuels && duelId > 0}
+      open={(atYourDuels || atLiveDuels || atPastDuels) && duelId > 0}
     >
       <Modal.Header>Challenge&nbsp;&nbsp;&nbsp;<AccountShort address={duelId} suffix='' /></Modal.Header>
       <Modal.Content image>
@@ -74,13 +78,13 @@ export default function ChallengeModal() {
             <Row columns='equal' textAlign='right'>
               <Col>
                 <Divider horizontal>
-                  <Header as='h4'>yelling</Header>
+                  <Header as='h4'>for a duel</Header>
                 </Divider>
               </Col>
             </Row>
             <Row columns='equal' textAlign='center'>
               <Col>
-                <h3 className='Quote'>{`"${message}"`}</h3>
+                <h3 className='Quote'>{`“${message}”`}</h3>
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -120,6 +124,11 @@ export default function ChallengeModal() {
             {(state == ChallengeState.Awaiting && isChallenged) &&
               <Col>
                 <ActionButton fill label='Accept Challenge!' onClick={() => _reply(true)} />
+              </Col>
+            }
+            {(state == ChallengeState.InProgress) &&
+              <Col>
+                <ActionButton fill attention label='Watch Duel!' onClick={() => _watch()} />
               </Col>
             }
           </Row>
