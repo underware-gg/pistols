@@ -1,5 +1,16 @@
 import { bigintToHex } from "./utils"
 
+
+//------------------------------------------
+// must be in sync with CONSTANTS
+// (constants.cairo)
+//
+export const ROUND_COUNT = 2
+export const FULL_HONOUR = 100
+export const FULL_HEALTH = 100
+export const HALF_HEALTH = 50
+
+
 //------------------------------------------
 // must be in sync with CHALLENGE_STATE
 // (challenge.cairo)

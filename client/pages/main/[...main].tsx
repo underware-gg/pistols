@@ -38,7 +38,7 @@ export default function MainPage() {
         if (_slugs.length > 0) {
           page = _page
           duelId = BigInt(_slugs[0])
-          title = 'Pistols - A Duel!'
+          title = 'Pistols - Duel!'
           className = 'BackgroundDuel'
         } else {
           page = 'tavern'

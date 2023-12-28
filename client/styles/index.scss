@@ -126,6 +126,7 @@ canvas {
 .Padded { padding: 0.5em!important; }
 .NoMargin { margin: 0!important }
 .NoBorder { border: 0!important }
+.AutoMargin { margin: auto!important }
 
 .Block { display: inline-block; }
 .Flex { display: flex; }
@@ -585,9 +586,20 @@ $color-warning: #f9e9d0;
 .ui.steps .step.active .title {
   color: $color-important;
 }
-.ui.vertical.steps .active.step:after {
+.ui.vertical.steps .active.step:after,
+.ui.vertical.steps .active.step:last-child:after {
   display: none;
 }
 // .ui.steps .step.active {
 //   background-color: $color-positive;
 // }
+
+.ui.menu .item {
+  color: $color-text;
+}
+
+.ui.pagination.menu .active.item {
+  background-color: $color-positive;
+  color: $color-important;
+  font-weight: 800;
+}

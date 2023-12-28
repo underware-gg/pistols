@@ -11,6 +11,7 @@ type ActionButtonProps = {
   large?: boolean
   fill?: boolean
   dimmed?: boolean
+  attention?: boolean
   className?: string
   onClick: () => void
 };
@@ -21,10 +22,12 @@ const ActionButton = ({
   large = false,
   fill = false,
   dimmed = false,
+  attention = false,
   className = null,
   onClick,
 }: ActionButtonProps) => {
   let classNames = []
+  if (attention && !disabled) classNames.push('Attention')
   if (fill) classNames.push('FillParent')
   if (large) classNames.push('LargeButton')
   classNames.push((disabled || dimmed) ? 'Locked' : 'Unlocked')

@@ -18,8 +18,8 @@ export function createSystemCalls(
       console.log(`execute ${system}(${args.length}) tx:`, tx)
 
       const receipt = await signer.waitForTransaction(tx.transaction_hash, { retryInterval: 200 })
-      success = getReceiptStatus(receipt)
-      console.log(`execute ${system}(${args.length}) success:`, success, 'receipt:', receipt)
+      success = getReceiptStatus(receipt);
+      (success ? console.log : console.warn)(`execute ${system}(${args.length}) success:`, success, 'receipt:', receipt)
 
       setComponentsFromEvents(contractComponents, getEvents(receipt));
     } catch (e) {
@@ -59,6 +59,18 @@ export function createSystemCalls(
     return await _executeTransaction(signer, 'reply_challenge', args)
   }
 
+  const commit_move = async (signer: Account, duel_id: bigint, round_number: number, hash: bigint): Promise<boolean> => {
+    const args = [duel_id, round_number, hash]
+    return await _executeTransaction(signer, 'commit_move', args)
+  }
+
+  const reveal_move = async (signer: Account, duel_id: bigint, round_number: number, salt: number, move: number): Promise<boolean> => {
+    const args = [duel_id, round_number, salt, move]
+    return await _executeTransaction(signer, 'reveal_move', args)
+  }
+
+  // read-only calls
+
   const get_timestamp = async (): Promise<number | null> => {
     const args = []
     const result = await _executeCall('get_timestamp', args)
@@ -75,6 +87,8 @@ export function createSystemCalls(
     register_duelist,
     create_challenge,
     reply_challenge,
+    commit_move,
+    reveal_move,
     // read-only calls
     get_timestamp,
     get_pact,
