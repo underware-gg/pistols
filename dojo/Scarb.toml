@@ -9,7 +9,7 @@ socials.x = "https://twitter.com/lootunderworld"
 [package]
 cairo-version = "2.3.1"
 name = "pistols"
-version = "0.1.0"
+version = "0.2.0"
 
 [cairo]
 sierra-replace-ids = true
@@ -28,11 +28,11 @@ initializer_class_hash = "0xbeef"
 world_address = "0x269c58e5fa1e7f6fe3756f1de88ecdfab7d03ba67e79ba0365b4ef1e81155be"
 
 # Development
-rpc_url = "http://localhost:5050/"
-account_address = "0x517ececd29116499f4a1b64b094da79ba08dfd54a3edaa316134c41f8160973"
-private_key = "0x1800000000300000180000000000030000000000003006001800006600"
+# rpc_url = "http://localhost:5050/"
+# account_address = "0x517ececd29116499f4a1b64b094da79ba08dfd54a3edaa316134c41f8160973"
+# private_key = "0x1800000000300000180000000000030000000000003006001800006600"
 
 # SLOT
-# rpc_url = "https://api.cartridge.gg/x/pistols/katana"
-# account_address = "0x355df606ef197ceacb60212996047efbef81828f918c8490ac950802dd602b5"
-# private_key = "0x5ceca4e52514d4d97217ba3f70d654fff7d6a688c2add4cc7769fbdb17b1aff"
+rpc_url = "https://api.cartridge.gg/x/pistols/katana"
+account_address = "0x3de8cead289fe145cfea143ac58ced6c83e518a758469df850e5c37445c95ae"
+private_key = "0x2cbd34ec84e50d1616c3d0b17799a5f2fd7448f2039e4652eb950586f06ad60"
