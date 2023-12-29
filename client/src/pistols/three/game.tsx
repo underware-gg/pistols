@@ -6,6 +6,7 @@ import Stats from 'three/addons/libs/stats.module.js'
 import { AudioName, AUDIO_ASSETS, TEXTURES, SPRITESHEETS } from '@/pistols/data/assets'
 import { map } from '../utils/utils'
 import { SpriteSheet, Actor } from './SpriteSheetMaker'
+import { FULL_HEALTH } from '../utils/pistols'
 
 const PI = Math.PI
 const HALF_PI = Math.PI * 0.5
@@ -13,10 +14,8 @@ const ONE_HALF_PI = Math.PI * 1.5
 const TWO_PI = Math.PI * 2
 const R_TO_D = (180 / Math.PI)
 
-//
-// Depth render based on:
-// https://threejs.org/examples/#webgl_depth_texture
-// https://github.com/mrdoob/three.js/blob/master/examples/webgl_depth_texture.html
+//---------------------------
+// CONSTANTS
 //
 
 const WIDTH = 1920//1200
@@ -24,9 +23,20 @@ const HEIGHT = 1080//675
 const ASPECT = (WIDTH / HEIGHT)
 const FOV = 45
 
+const ACTOR_WIDTH = 140
 const PACES_Y = -50
 const PACES_X_0 = 40
-const PACES_X_10 = 500
+const PACES_X_STEP = 45
+
+const zoomedCameraPos = {
+  x: 0,
+  y: PACES_Y,
+  z: -HEIGHT,
+}
+
+//-------------------------------------------
+// Setup
+//
 
 let _textures: any = {}
 let _spriteSheets: any = {}
@@ -39,9 +49,6 @@ let _scene: THREE.Scene
 let _supportsExtension: boolean = true
 let _stats
 
-//-------------------------------------------
-// Setup
-//
 
 export function dispose() {
   if (_animationRequest) cancelAnimationFrame(_animationRequest)
@@ -175,8 +182,8 @@ function setupScene() {
   _scene.add(bg_duel)
 
 
-  _actors.FEMALE_A = new Actor(_spriteSheets.FEMALE, 70, 70, true)
-  _actors.FEMALE_B = new Actor(_spriteSheets.FEMALE, 70, 70, false)
+  _actors.FEMALE_A = new Actor(_spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_WIDTH, true)
+  _actors.FEMALE_B = new Actor(_spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_WIDTH, false)
 
   _actors.FEMALE_A.mesh.position.set(-PACES_X_0, PACES_Y, 1)
   _actors.FEMALE_B.mesh.position.set(PACES_X_0, PACES_Y, 1)
@@ -190,10 +197,14 @@ function setupScene() {
 
 }
 
+export function resetScene() {
+  onWindowResize()
+  zoomCameraToPaces(0, 5)
+}
+
 export function getCameraRig() {
   return _cameraRig
 }
-
 
 export function switchActor(actorId, newActorName) {
   let position = null
@@ -206,42 +217,187 @@ export function switchActor(actorId, newActorName) {
   if (position) _actor[actorId].position = position
 }
 
-export function playActorAnimation(actorId, key) {
+
+export function playActorAnimation(actorId: string, key: string, callback: Function = null) {
   _actor[actorId].setAnimation(key)
-  _actor[actorId].playOnce()
+  _actor[actorId].playOnce(callback)
 }
 
-export function resetScene() {
-  // reset camera
-  onWindowResize()
 
-  zoomToPaces(0, 5)
+
+//----------------
+// Animation triggers
+//
+const _tweens = {
+  cameraPos: null,
+  actorPosA: null,
+  actorPosB: null,
 }
 
-// Camera zoom
-let _tweenCameraPos = null
-export function zoomToPaces(targetPaces, seconds) {
-  const zeroCameraPos = {
-    x: 0,
+export function zoomCameraToPaces(paceCount, seconds) {
+  const targetPos = {
+    x: map(paceCount, 0, 10, zoomedCameraPos.x, 0),
+    y: map(paceCount, 0, 10, zoomedCameraPos.y, 0),
+    z: map(paceCount, 0, 10, zoomedCameraPos.z, 0),
+  }
+  if (_tweens.cameraPos) TWEEN.remove(_tweens.cameraPos)
+  if (seconds == 0) {
+    // just set
+    _cameraRig.position.set(targetPos.x, targetPos.y, targetPos.z)
+  } else {
+    // animate
+    _tweens.cameraPos = new TWEEN.Tween(_cameraRig.position)
+      .to(targetPos, seconds * 1000)
+      .easing(TWEEN.Easing.Cubic.Out)
+      .onUpdate(() => {
+        // emitter.emit('movedTo', { x: _cameraRig.position.x, y: _cameraRig.position.y, z: _cameraRig.position.z })
+      })
+      .start()
+  }
+}
+
+export function animateActorPaces(actorId, paceCount, seconds) {
+  const tweenKey = `actorPos${actorId}`
+  const direction = actorId == 'A' ? -1 : 1
+  const start = PACES_X_0 * direction
+  const targetPos = {
+    x: map(paceCount, 0, 10, start, start + (PACES_X_STEP * paceCount * direction)),
     y: PACES_Y,
-    z: -HEIGHT,
+    z: 10,
   }
-
-  const targetCameraPos = {
-    x: map(targetPaces, 0, 10, zeroCameraPos.x, 0),
-    y: map(targetPaces, 0, 10, zeroCameraPos.y, 0),
-    z: map(targetPaces, 0, 10, zeroCameraPos.z, 0),
+  if (_tweens[tweenKey]) TWEEN.remove(_tweens[tweenKey])
+  if (seconds == 0) {
+    // just set
+    _actor[actorId].mesh.position.set(targetPos.x, targetPos.y, targetPos.z)
+  } else {
+    // animate
+    _tweens[tweenKey] = new TWEEN.Tween(_actor[actorId].mesh.position)
+      .to(targetPos, seconds * 1000)
+      // .easing(TWEEN.Easing.Cubic.Out)
+      .start()
   }
-
-  if (_tweenCameraPos) TWEEN.remove(_tweenCameraPos)
-  _tweenCameraPos = new TWEEN.Tween(_cameraRig.position)
-    .to(targetCameraPos, seconds * 1000)
-    .easing(TWEEN.Easing.Cubic.Out)
-    .onUpdate(() => {
-      // emitter.emit('movedTo', { x: _cameraRig.position.x, y: _cameraRig.position.y, z: _cameraRig.position.z })
-    })
-    .start()
 }
+
+export function animateShootout(paceCountA, paceCountB, healthA, healthB) {
+  const paceCount = Math.min(paceCountA, paceCountB)
+
+  // animate camera
+  zoomCameraToPaces(0, 0)
+  zoomCameraToPaces(paceCount, paceCount)
+
+  animateActorPaces('A', 0, 0)
+  animateActorPaces('B', 0, 0)
+  animateActorPaces('A', paceCount, paceCount)
+  animateActorPaces('B', paceCount, paceCount)
+
+  // animate sprites
+  playActorAnimation('A', 'STEP_1')
+  playActorAnimation('B', 'STEP_1')
+  for(let i = 1 ; i < paceCount ; ++i) {
+    const key = i % 2 == 1 ? 'STEP_2' : 'STEP_1'
+    setTimeout(() => {
+      playActorAnimation('A', key)
+      playActorAnimation('B', key)
+    }, i * 1000)
+  }
+
+  // SHOOT!
+  setTimeout(() => {
+    //
+    // Both fire at same time
+    if (paceCountA == paceCountB) {
+      playActorAnimation('A', 'SHOOT', () => {
+        if (healthA == 0) {
+          playActorAnimation('A', 'SHOT_DEAD_FRONT')
+        } else if (healthA < FULL_HEALTH) {
+          playActorAnimation('A', 'SHOT_INJURED_FRONT')
+        }
+      })
+      playActorAnimation('B', 'SHOOT', () => {
+        if (healthB == 0) {
+          playActorAnimation('B', 'SHOT_DEAD_FRONT')
+        } else if (healthB < FULL_HEALTH) {
+          playActorAnimation('B', 'SHOT_INJURED_FRONT')
+        }
+      })
+    }
+    //
+    // A fires first
+    if (paceCountA < paceCountB) {
+      const _chance = () => {
+        playActorAnimation('B', 'SHOOT', () => {
+          if (healthA == 0) {
+            playActorAnimation('A', 'SHOT_DEAD_FRONT')
+          } else if (healthA < FULL_HEALTH) {
+            playActorAnimation('A', 'SHOT_INJURED_FRONT')
+          }
+        })
+      }
+      playActorAnimation('A', 'SHOOT', () => {
+        if (healthB == 0) {
+          playActorAnimation('B', 'SHOT_DEAD_BACK')
+        } else if (healthB < FULL_HEALTH) {
+          playActorAnimation('B', 'SHOT_INJURED_BACK', () => _chance())
+        } else {
+          _chance()
+        }
+      })
+    }
+    //
+    // B fires first
+    if (paceCountB < paceCountA) {
+      const _chance = () => {
+        playActorAnimation('A', 'SHOOT', () => {
+          if (healthB == 0) {
+            playActorAnimation('B', 'SHOT_DEAD_FRONT')
+          } else if (healthB < FULL_HEALTH) {
+            playActorAnimation('B', 'SHOT_INJURED_FRONT')
+          }
+        })
+      }
+      playActorAnimation('B', 'SHOOT', () => {
+        if (healthA == 0) {
+          playActorAnimation('A', 'SHOT_DEAD_BACK')
+        } else if (healthA < FULL_HEALTH) {
+          playActorAnimation('A', 'SHOT_INJURED_BACK', () => _chance())
+        } else {
+          _chance()
+        }
+      })
+    }
+  }, paceCount * 1000)
+
+}
+
+export function animateBlades(bladeA, bladeB, healthA, healthB) {
+
+  // Rewind camera and
+  zoomCameraToPaces(0, 0)
+  animateActorPaces('A', 0, 0)
+  animateActorPaces('B', 0, 0)
+
+  // animate sprites
+  playActorAnimation('A', 'STRIKE', () => {
+    if (healthB == 0) {
+      playActorAnimation('B', 'STRUCK_DEAD')
+    } else if (healthB < FULL_HEALTH) {
+      playActorAnimation('B', 'STRUCK_INJURED')
+    }
+    if (healthA == 0) {
+      playActorAnimation('A', 'STRUCK_DEAD')
+    } else if (healthA < FULL_HEALTH) {
+      playActorAnimation('A', 'STRUCK_INJURED')
+    }
+  })
+  playActorAnimation('B', 'STRIKE', () => {
+  })
+
+}
+
+
+
+
+
 
 
 

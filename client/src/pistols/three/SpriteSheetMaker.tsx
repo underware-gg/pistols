@@ -54,7 +54,7 @@ export class Actor {
     this.material = this.currentSheet.makeMaterial()
 
     this.mesh = new THREE.Mesh(geometry, this.material)
-    this.mesh.position.set(0, 0, 1)
+    this.mesh.position.set(0, 0, 10)
     if (flipped) {
       this.mesh.rotation.set(0, Math.PI, 0)
     }
@@ -131,6 +131,8 @@ export class Actor {
           if (this.controls.hideWhenFinished == true) {
             this.controls.visible = false;
           }
+
+          this.controls.callback?.()
 
           this.callFinishedListeners()
         }

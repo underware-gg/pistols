@@ -58,17 +58,17 @@ const SPRITESHEETS = {
     },
     STRIKE: {
       path: '/textures/animations/Female Duelist/Strike',
-      frameCount: 18,
+      frameCount: 13,
       frameRate: 8,
     },
     STRUCK_INJURED: {
       path: '/textures/animations/Female Duelist/Struck and Injured',
-      frameCount: 12,
+      frameCount: 6,
       frameRate: 8,
     },
     STRUCK_DEAD: {
       path: '/textures/animations/Female Duelist/Struck Dead',
-      frameCount: 9,
+      frameCount: 6,
       frameRate: 8,
     },
   },
