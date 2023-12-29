@@ -5,6 +5,7 @@ import Stats from 'three/addons/libs/stats.module.js'
 
 import { AudioName, AUDIO_ASSETS } from '@/pistols/data/assets'
 import { map } from '../utils/utils'
+import { SpriteSheet, Actor } from './SpriteSheetMaker'
 
 const PI = Math.PI
 const HALF_PI = Math.PI * 0.5
@@ -23,13 +24,20 @@ const HEIGHT = 1080//675
 const ASPECT = (WIDTH / HEIGHT)
 const FOV = 45
 
-const PACES_Y = -40
+const PACES_Y = -50
+const PACES_X_0 = 40
+const PACES_X_10 = 500
 
-const TEXTURE_PATHS = {
+const TEXTURES = {
   TESTCARD: { path: '/textures/testcard.jpg' },
   BG_DUEL: { path: '/textures/bg_duel.png' },
 }
+const SPRITESHEETS = {
+  FEMALE_TWO_STEPS: { path: '/textures/animations/Female Duelist/Two Steps', frameCount: 16 },
+}
 let _textures: any = {
+}
+let _spriteSheets: any = {
 }
 
 let _animationRequest = null
@@ -58,12 +66,15 @@ export async function init(canvas, width, height, statsEnabled = false) {
 
   console.log(`THREE.init()`)
 
-  Object.keys(TEXTURE_PATHS).forEach(key => {
-    const TEX = TEXTURE_PATHS[key]
+  Object.keys(TEXTURES).forEach(key => {
+    const TEX = TEXTURES[key]
     const tex = new THREE.TextureLoader().load(TEX.path)
     // tex.magFilter = THREE.NearestFilter
     // tex.minFilter = THREE.NearestFilter
     _textures[key] = tex
+  })
+  Object.keys(SPRITESHEETS).forEach(key => {
+    _spriteSheets[key] = new SpriteSheet(SPRITESHEETS[key])
   })
 
   _renderer = new THREE.WebGLRenderer({
@@ -142,6 +153,8 @@ export function animate(time) {
 //
 
 let _fullScreenGeom: THREE.PlaneGeometry = null
+let _actorA: Actor = null
+let _actorB: Actor = null
 
 function setupScene() {
   _scene = new THREE.Scene()
@@ -164,16 +177,24 @@ function setupScene() {
   _scene.add(bg_duel)
 
 
+  _actorA = new Actor(_spriteSheets.FEMALE_TWO_STEPS, 70, 70, true)
+  _actorA.mesh.position.set(-PACES_X_0, PACES_Y, 1)
+  _scene.add(_actorA.mesh)
+
+  _actorB = new Actor(_spriteSheets.FEMALE_TWO_STEPS, 70, 70, false)
+  _actorB.mesh.position.set(PACES_X_0, PACES_Y, 1)
+  _scene.add(_actorB.mesh)
+
 
   // const mat_blue = new THREE.MeshBasicMaterial({ color: 'blue' })
-  const mat_red = new THREE.MeshBasicMaterial({ color: 'red' })
   // const quad1 = new THREE.Mesh(_fullScreenGeom, mat_blue)
   // quad1.position.set(0, 0, 1)
   // _scene.add(quad1)
-  const quad2_geometry = new THREE.PlaneGeometry(WIDTH / 2, HEIGHT / 2)
-  const quad2 = new THREE.Mesh(quad2_geometry, mat_red)
-  quad2.position.set(-WIDTH / 2, -HEIGHT / 2, 1)
-  _scene.add(quad2)
+  // const mat_red = new THREE.MeshBasicMaterial({ color: 'red' })
+  // const quad2_geometry = new THREE.PlaneGeometry(WIDTH / 2, HEIGHT / 2)
+  // const quad2 = new THREE.Mesh(quad2_geometry, mat_red)
+  // quad2.position.set(-WIDTH / 2, -HEIGHT / 2, 1)
+  // _scene.add(quad2)
 
 }
 
