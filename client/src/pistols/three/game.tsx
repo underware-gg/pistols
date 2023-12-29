@@ -4,6 +4,7 @@ import TWEEN from '@tweenjs/tween.js'
 import Stats from 'three/addons/libs/stats.module.js'
 
 import { AudioName, AUDIO_ASSETS } from '@/pistols/data/assets'
+import { map } from '../utils/utils'
 
 const PI = Math.PI
 const HALF_PI = Math.PI * 0.5
@@ -21,6 +22,8 @@ const WIDTH = 1920//1200
 const HEIGHT = 1080//675
 const ASPECT = (WIDTH / HEIGHT)
 const FOV = 45
+
+const PACES_Y = -40
 
 const TEXTURE_PATHS = {
   TESTCARD: { path: '/textures/testcard.jpg' },
@@ -71,11 +74,8 @@ export async function init(canvas, width, height, statsEnabled = false) {
   _renderer.setSize(WIDTH, HEIGHT)
   _renderer.outputColorSpace = THREE.LinearSRGBColorSpace // fix bright textures
 
-  setupScene()
-
   _cameraRig = new THREE.Object3D()
   _cameraRig.position.set(0, 0, 0)
-  _scene.add(_cameraRig)
 
   _camera = new THREE.PerspectiveCamera(
     FOV,        // fov
@@ -85,9 +85,10 @@ export async function init(canvas, width, height, statsEnabled = false) {
   )
   _cameraRig.add(_camera)
 
-  onWindowResize()
-
   window.addEventListener('resize', onWindowResize)
+
+  setupScene()
+  resetScene()
 
   // framerate
   if (statsEnabled) {
@@ -144,6 +145,7 @@ let _fullScreenGeom: THREE.PlaneGeometry = null
 
 function setupScene() {
   _scene = new THREE.Scene()
+  _scene.add(_cameraRig)
 
   // const light = new THREE.AmbientLight(0x404040) // soft white light
   // _scene.add(light)
@@ -164,14 +166,14 @@ function setupScene() {
 
 
   // const mat_blue = new THREE.MeshBasicMaterial({ color: 'blue' })
-  // const mat_red = new THREE.MeshBasicMaterial({ color: 'red' })
+  const mat_red = new THREE.MeshBasicMaterial({ color: 'red' })
   // const quad1 = new THREE.Mesh(_fullScreenGeom, mat_blue)
   // quad1.position.set(0, 0, 1)
   // _scene.add(quad1)
-  // const quad2_geometry = new THREE.PlaneGeometry(WIDTH / 2, HEIGHT / 2)
-  // const quad2 = new THREE.Mesh(quad2_geometry, mat_red)
-  // quad2.position.set(WIDTH / 2, HEIGHT / 2, 1)
-  // _scene.add(quad2)
+  const quad2_geometry = new THREE.PlaneGeometry(WIDTH / 2, HEIGHT / 2)
+  const quad2 = new THREE.Mesh(quad2_geometry, mat_red)
+  quad2.position.set(-WIDTH / 2, -HEIGHT / 2, 1)
+  _scene.add(quad2)
 
 }
 
@@ -179,7 +181,37 @@ export function getCameraRig() {
   return _cameraRig
 }
 
+export function resetScene() {
+  // reset camera
+  onWindowResize()
 
+  zoomToPaces(0, 5)
+}
+
+// Camera zoom
+let _tweenCameraPos = null
+export function zoomToPaces(targetPaces, seconds) {
+  const zeroCameraPos = {
+    x: 0,
+    y: PACES_Y,
+    z: -HEIGHT,
+  }
+
+  const targetCameraPos = {
+    x: map(targetPaces, 0, 10, zeroCameraPos.x, 0),
+    y: map(targetPaces, 0, 10, zeroCameraPos.y, 0),
+    z: map(targetPaces, 0, 10, zeroCameraPos.z, 0),
+  }
+
+  if (_tweenCameraPos) TWEEN.remove(_tweenCameraPos)
+  _tweenCameraPos = new TWEEN.Tween(_cameraRig.position)
+    .to(targetCameraPos, seconds * 1000)
+    .easing(TWEEN.Easing.Cubic.Out)
+    .onUpdate(() => {
+      // emitter.emit('movedTo', { x: _cameraRig.position.x, y: _cameraRig.position.y, z: _cameraRig.position.z })
+    })
+    .start()
+}
 
 
 
