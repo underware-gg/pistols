@@ -2,12 +2,8 @@ import * as THREE from 'three'
 import TWEEN from '@tweenjs/tween.js'
 //@ts-ignore
 import Stats from 'three/addons/libs/stats.module.js'
-//@ts-ignore
-import { GUI } from 'three/addons/libs/lil-gui.module.min.js'
 
 import { AudioName, AUDIO_ASSETS } from '@/pistols/data/assets'
-import { DepthPostShader } from '@/pistols/three/DepthPostShader'
-import { toRadians } from '@/pistols/utils/utils'
 
 const PI = Math.PI
 const HALF_PI = Math.PI * 0.5
@@ -21,81 +17,25 @@ const R_TO_D = (180 / Math.PI)
 // https://github.com/mrdoob/three.js/blob/master/examples/webgl_depth_texture.html
 //
 
-const SIZE = 1;
-const CAM_FOV = 70;
-const CAM_FAR = 5; // 1.3 .. 5
-const TILT = 1;
-const GAMMA = 1.25;
-const COLOR_COUNT = 0; //16;
-const DITHER = 0;
-const DITHER_SIZE = 4;
-const BAYER = 0;//4;
-const PALETTE = 0;//1;
+const WIDTH = 1920//1200
+const HEIGHT = 1080//675
+const ASPECT = (WIDTH / HEIGHT)
+const FOV = 45
 
-const TEXTURE_PATHS = [
-  '/colors/gameboy.png',
-  '/colors/blue.png',
-  '/colors/pink.png',
-  '/colors/purple.png',
-  '/colors/earth.png',
-  '/colors/hot.png',
-  '/colors/spectrum.png',
-  // '/colors/greeny.png',
-]
-
-let _width: number;
-let _height: number;
-let _aspect: number;
-let _eyeZ: number;
-let _textures = [];
+const TEXTURE_PATHS = {
+  TESTCARD: { path: '/textures/testcard.jpg' },
+  BG_DUEL: { path: '/textures/bg_duel.png' },
+}
+let _textures: any = {
+}
 
 let _animationRequest = null
-let _renderer: THREE.WebGLRenderer;
-let _camera: THREE.PerspectiveCamera;
-let _cameraRig: THREE.Object3D;
+let _renderer: THREE.WebGLRenderer
+let _camera: THREE.PerspectiveCamera
+let _cameraRig: THREE.Object3D
 let _scene: THREE.Scene
-let _target, _postScene, _postCamera, _postMaterial;
-let _supportsExtension: boolean = true;
-let _gui
-let _stats;
-
-
-const defaultParams = {
-  fov: CAM_FOV,
-  far: CAM_FAR,
-  tilt: TILT,
-  gamma: GAMMA,
-  colorCount: COLOR_COUNT,
-  dither: DITHER,
-  ditherSize: DITHER_SIZE,
-  bayer: BAYER,
-  palette: PALETTE,
-  lightness: false,
-  noiseAmount: 0.01,
-  noiseSize: 10.0,
-  ceilingHeight: 1.0,
-};
-let params = { ...defaultParams };
-
-
-export function resetGameParams(newParams: any = {}) {
-  // console.log(`resetGameParams() + `, newParams)
-  Object.keys(defaultParams).forEach(key => {
-    params[key] = newParams?.[key] ?? defaultParams[key]
-  })
-  _gui?.controllersRecursive().forEach(c => c.updateDisplay())
-  paramsUpdated()
-}
-
-export function setGameParams(newParams: any) {
-  // console.log(`setGameParams()`, newParams)
-  Object.keys(newParams).forEach(key => {
-    params[key] = newParams[key]
-  })
-  _gui?.controllersRecursive().forEach(c => c.updateDisplay())
-  paramsUpdated()
-}
-
+let _supportsExtension: boolean = true
+let _stats
 
 //-------------------------------------------
 // Setup
@@ -109,175 +49,73 @@ export function dispose() {
   _scene = null
 }
 
-export async function init(canvas, width, height, guiEnabled, statsEnabled = false) {
+export async function init(canvas, width, height, statsEnabled = false) {
 
-  if (_scene) return;
+  if (_scene) return
 
-  _width = width;
-  _height = height;
-  _aspect = (width / height);
-  _eyeZ = SIZE / 2;
+  console.log(`THREE.init()`)
+
+  Object.keys(TEXTURE_PATHS).forEach(key => {
+    const TEX = TEXTURE_PATHS[key]
+    const tex = new THREE.TextureLoader().load(TEX.path)
+    // tex.magFilter = THREE.NearestFilter
+    // tex.minFilter = THREE.NearestFilter
+    _textures[key] = tex
+  })
 
   _renderer = new THREE.WebGLRenderer({
     antialias: true,
     alpha: false,
     canvas,
-  });
+  })
+  _renderer.setSize(WIDTH, HEIGHT)
+  _renderer.outputColorSpace = THREE.LinearSRGBColorSpace // fix bright textures
 
-  if (_renderer.capabilities.isWebGL2 === false && _renderer.extensions.has('WEBGL_depth_texture') === false) {
-    _supportsExtension = false;
-    console.error(`WEBGL_depth_texture not supported!`)
-    return;
-  }
+  setupScene()
 
-  _renderer.setPixelRatio(window.devicePixelRatio);
-  _renderer.setSize(_width, _height);
-
-  setupScene();
-
-  _cameraRig = new THREE.Object3D();
-  _cameraRig.position.set(0, 0, 0);
+  _cameraRig = new THREE.Object3D()
+  _cameraRig.position.set(0, 0, 0)
   _scene.add(_cameraRig)
 
   _camera = new THREE.PerspectiveCamera(
-    CAM_FOV,  // fov
-    _aspect,  // aspect
-    0.01,     // near
-    CAM_FAR,  // far
-  );
+    FOV,        // fov
+    ASPECT,     // aspect
+    0.01,       // near
+    WIDTH * 2,  // far
+  )
   _cameraRig.add(_camera)
-  _camera.up.set(0, 0, 1);
-  _camera.position.set(0, 0, _eyeZ)
-  _camera.lookAt(0, -SIZE, _eyeZ);
 
-  // TEXTURE_PATHS.forEach(path => {
-  //   const tex = new THREE.TextureLoader().load(path);
-  //   tex.magFilter = THREE.NearestFilter;
-  //   tex.minFilter = THREE.NearestFilter;
-  //   _textures.push(tex);
-  // })
+  onWindowResize()
 
-  setupRenderTarget();
-  setupPost();
+  window.addEventListener('resize', onWindowResize)
 
-  onWindowResize();
-  window.addEventListener('resize', onWindowResize);
-
-  if (guiEnabled !== null) {
-    _gui = new GUI({ width: 300 });
-    _gui.add(params, 'fov', 30, 90, 1).onChange(guiUpdated);
-    _gui.add(params, 'far', 1, 20, 0.1).onChange(guiUpdated);
-    _gui.add(params, 'tilt', 0, 15, 0.1).onChange(guiUpdated);
-    _gui.add(params, 'gamma', 0, 2, 0.01).onChange(guiUpdated);
-    _gui.add(params, 'colorCount', 0, 16, 1).onChange(guiUpdated);
-    _gui.add(params, 'dither', 0, 0.5, 0.01).onChange(guiUpdated);
-    _gui.add(params, 'ditherSize', 2, 5, 1).onChange(guiUpdated);
-    _gui.add(params, 'bayer', 0, 4, 1).onChange(guiUpdated);
-    _gui.add(params, 'lightness', true).onChange(guiUpdated);
-    _gui.add(params, 'noiseAmount', 0, 1, 0.001).onChange(guiUpdated);
-    _gui.add(params, 'noiseSize', 1, 100, 1).onChange(guiUpdated);
-    // _gui.add(params, 'ceilingHeight', 1, 5, 0.25).onChange(guiUpdated);
-    if (guiEnabled) {
-      _gui.open();
-    } else {
-      _gui.close();
-    }
-
-    // framerate
-    if (statsEnabled) {
-      _stats = new Stats();
-      document.body.appendChild(_stats.dom);
-    }
+  // framerate
+  if (statsEnabled) {
+    _stats = new Stats()
+    document.body.appendChild(_stats.dom)
   }
-
-  // await loadAssets();
-}
-
-export function getCameraRig() {
-  return _cameraRig
-}
-
-function guiUpdated() {
-  paramsUpdated()
-}
-
-function paramsUpdated() {
-  // Camera
-  _camera.fov = params.fov;
-  _camera.far = params.far;
-  _camera.updateProjectionMatrix();
-  _postMaterial.uniforms.uCameraNear.value = _camera.near;
-  _postMaterial.uniforms.uCameraFar.value = _camera.far;
-  _postMaterial.uniforms.uCameraFov.value = toRadians(_camera.fov);
-  // Shader
-  _postMaterial.uniforms.uGamma.value = params.gamma;
-  _postMaterial.uniforms.uColorCount.value = params.colorCount;
-  _postMaterial.uniforms.uDither.value = params.dither;
-  _postMaterial.uniforms.uDitherSize.value = params.ditherSize;
-  _postMaterial.uniforms.uBayer.value = params.bayer;
-  _postMaterial.uniforms.uPalette.value = 0;
-  _postMaterial.uniforms.tPalette.value = null;
-  _postMaterial.uniforms.uLightness.value = params.lightness;
-  _postMaterial.uniforms.uNoiseAmount.value = params.noiseAmount;
-  _postMaterial.uniforms.uNoiseSize.value = params.noiseSize;
-}
-
-// Create a render target with depth texture
-// const formats = { DepthFormat: THREE.DepthFormat, DepthStencilFormat: THREE.DepthStencilFormat };
-// const types = { UnsignedShortType: THREE.UnsignedShortType, UnsignedIntType: THREE.UnsignedIntType, UnsignedInt248Type: THREE.UnsignedInt248Type };
-function setupRenderTarget() {
-  if (_target) _target.dispose();
-  const format = THREE.DepthFormat;
-  const type = THREE.UnsignedShortType;
-  _target = new THREE.WebGLRenderTarget(_width, _height);
-  _target.texture.minFilter = THREE.NearestFilter;
-  _target.texture.magFilter = THREE.NearestFilter;
-  // _target.stencilBuffer = (format === THREE.DepthStencilFormat) ? true : false;
-  //@ts-ignore
-  _target.depthTexture = new THREE.DepthTexture();
-  _target.depthTexture.format = format;
-  _target.depthTexture.type = type;
-}
-
-function setupPost() {
-  _postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-  _postMaterial = new THREE.ShaderMaterial({
-    vertexShader: DepthPostShader.vertexShader,
-    fragmentShader: DepthPostShader.fragmentShader,
-    uniforms: {
-      uCameraNear: { value: _camera.near },
-      uCameraFar: { value: _camera.far },
-      uCameraFov: { value: _camera.fov },
-      uGamma: { value: GAMMA },
-      uColorCount: { value: COLOR_COUNT },
-      uDither: { value: DITHER },
-      uDitherSize: { value: DITHER_SIZE },
-      uBayer: { value: BAYER },
-      uPalette: { value: params.palette },
-      uLightness: { value: params.lightness },
-      uNoiseAmount: { value: params.noiseAmount },
-      uNoiseSize: { value: params.noiseSize },
-      uTime: { value: 0.0 },
-      tPalette: { value: null },
-      tDiffuse: { value: null },
-      tDepth: { value: null }
-    }
-  });
-  guiUpdated();
-  const postPlane = new THREE.PlaneGeometry(2, 2);
-  const postQuad = new THREE.Mesh(postPlane, _postMaterial);
-  _postScene = new THREE.Scene();
-  _postScene.add(postQuad);
-  postQuad.scale.set(-1, 1, 1);
 }
 
 function onWindowResize() {
-  // const aspect = window.innerWidth / window.innerHeight;
-  // camera.aspect = aspect;
-  // camera.updateProjectionMatrix();
-  // const dpr = renderer.getPixelRatio();
-  // target.setSize(window.innerWidth * dpr, window.innerHeight * dpr);
-  // renderer.setSize(window.innerWidth, window.innerHeight);
+  // calc canvas size
+  const dpr = window.devicePixelRatio
+  const winWidth = window.innerWidth
+  const winHeight = window.innerHeight
+  const aspect = winWidth / winHeight
+  const canvasWidth = aspect > ASPECT ? winHeight * ASPECT : winWidth
+  const canvasHeight = aspect > ASPECT ? winHeight : winWidth / ASPECT
+  _renderer.setPixelRatio(dpr)
+  _renderer.setSize(canvasWidth, canvasHeight)
+  // calc cam height so I can work with (WIDTH, HEIGHT)
+  const h_z_ratio = Math.tan(FOV / 2.0 * Math.PI / 180.0) * 2.0
+  const scale = WIDTH / canvasWidth
+  const camHeight = (canvasHeight * scale) / h_z_ratio
+  console.log(canvasWidth, canvasHeight, h_z_ratio, camHeight)
+  // setup cam
+  _camera.up.set(0, 1, 0)
+  _camera.position.set(0, 0, camHeight)
+  _camera.lookAt(0, 0, 0)
+  _camera.updateProjectionMatrix()
 }
 
 
@@ -286,26 +124,15 @@ function onWindowResize() {
 //
 
 export function animate(time) {
-  if (!_supportsExtension || !_scene || !_renderer) return;
+  if (!_supportsExtension || !_scene || !_renderer) return
 
-  _animationRequest = requestAnimationFrame(animate);
+  _animationRequest = requestAnimationFrame(animate)
 
-  _postMaterial.uniforms.uTime.value = time / 1000.0;
+  TWEEN.update()
 
-  TWEEN.update();
+  _renderer.render(_scene, _camera)
 
-  // render scene into target
-  _renderer.setRenderTarget(_target);
-  _renderer.render(_scene, _camera);
-
-  // render post FX
-  _postMaterial.uniforms.tDiffuse.value = _target.texture;
-  _postMaterial.uniforms.tDepth.value = _target.depthTexture;
-
-  _renderer.setRenderTarget(null);
-  _renderer.render(_postScene, _postCamera);
-
-  _stats?.update();
+  _stats?.update()
 }
 
 
@@ -313,13 +140,44 @@ export function animate(time) {
 // Scene hook
 //
 
-function setupScene() {
-  _scene = new THREE.Scene();
+let _fullScreenGeom: THREE.PlaneGeometry = null
 
-  // _scene.add(_background)
+function setupScene() {
+  _scene = new THREE.Scene()
+
+  // const light = new THREE.AmbientLight(0x404040) // soft white light
+  // _scene.add(light)
+
+  _fullScreenGeom = new THREE.PlaneGeometry(WIDTH, HEIGHT)
+
+  // const testcard_mat = new THREE.MeshBasicMaterial({ color: 0xffffff, map: _textures.TESTCARD })
+  // const testcard = new THREE.Mesh(_fullScreenGeom, testcard_mat)
+  // testcard.position.set(0, 0, 0)
+  // _scene.add(testcard)
+
+  // BG
+  const bg_duel_mat = new THREE.MeshBasicMaterial({ map: _textures.BG_DUEL })
+  const bg_duel = new THREE.Mesh(_fullScreenGeom, bg_duel_mat)
+  bg_duel.position.set(0, 0, 0)
+  _scene.add(bg_duel)
+
+
+
+  // const mat_blue = new THREE.MeshBasicMaterial({ color: 'blue' })
+  // const mat_red = new THREE.MeshBasicMaterial({ color: 'red' })
+  // const quad1 = new THREE.Mesh(_fullScreenGeom, mat_blue)
+  // quad1.position.set(0, 0, 1)
+  // _scene.add(quad1)
+  // const quad2_geometry = new THREE.PlaneGeometry(WIDTH / 2, HEIGHT / 2)
+  // const quad2 = new THREE.Mesh(quad2_geometry, mat_red)
+  // quad2.position.set(WIDTH / 2, HEIGHT / 2, 1)
+  // _scene.add(quad2)
 
 }
 
+export function getCameraRig() {
+  return _cameraRig
+}
 
 
 

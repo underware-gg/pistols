@@ -19,7 +19,7 @@ export default function MainPage() {
     let page = null
     let title = null
     let duelId = null
-    let className = 'BackgroundSplash'
+    let className = null
 
     // parse page
     if (router.isReady && router.query.main) {
@@ -39,12 +39,11 @@ export default function MainPage() {
           page = _page
           duelId = BigInt(_slugs[0])
           title = 'Pistols - Duel!'
-          className = 'BackgroundDuel'
         } else {
           page = 'tavern'
           router.push('/tavern')
         }
-        className = 'BackgroundDuel'
+        // className = 'BackgroundDuel'
       }
     }
     return {
@@ -70,14 +69,14 @@ export default function MainPage() {
   return (
     <AppDojo title={title} backgroundImage={null}>
       <Background className={className}>
+        <GameContainer
+          isPlaying={_atDuel}
+          duelId={duelId}
+        />
         {_atGate && <Gate />}
         {_atTavern && <Tavern />}
         {_atDuel && <Duel duelId={duelId}/>}
       </Background>
-      <GameContainer
-        isPlaying={false}
-        duelId={duelId}
-      />
     </AppDojo>
   );
 }

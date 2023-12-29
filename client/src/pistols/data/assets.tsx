@@ -6,7 +6,7 @@ import * as THREE from 'three'
 //
 enum AudioName {
   AMBIENT = 'AMBIENT',
-  SHOT = 'SHOT',
+  // SHOT = 'SHOT',
 }
 
 interface AudioAsset {
@@ -27,10 +27,10 @@ let AUDIO_ASSETS: AudioAssets = {
     volume: 0.5,
     loop: true,
   },
-  SHOT: {
-    path: '/audio/sfx/shot.m4a',
-    loop: true,
-  },
+  // SHOT: {
+  //   path: '/audio/sfx/shot.m4a',
+  //   loop: true,
+  // },
 }
 
 

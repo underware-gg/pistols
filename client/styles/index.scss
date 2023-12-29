@@ -156,6 +156,10 @@ canvas {
   background-color: #0002;
 }
 
+.AboveAll {
+  z-index: 1000;
+}
+
 .Anchor {
   cursor: pointer;
   pointer-events: all!important;
@@ -373,11 +377,13 @@ $box-h: calc((100vh - $aspect-h) / 2);
   background-color: $color-attention;
 }
 
-/* GAME CANVAS */
+// GAME CANVAS
 
 .GameContainer {
-  width: $game-width;
-  height: $game-height;
+  // width: $game-width;
+  // height: $game-height;
+  width: 100%;
+  height: 100%;
   position: relative;
 }
 
@@ -390,8 +396,10 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 .GameCanvas {
-  width: $game-width;
-  height: $game-height;
+  // width: $game-width;
+  // height: $game-height;
+  width: 100%;
+  height: 100%;
   display: block;
   background-color: #0000;
 }
@@ -401,37 +409,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 
-/* GAME UI */
-
-.UI {
-  vertical-align: middle;
-  text-align: center;
-  margin: auto;
-  padding: 0;
-  margin: 0;
-}
-
-.UIBorder {
-  outline: $ui-border;
-}
-
-.GameUITop {
-  @extend .UI;
-  // display: block;
-  width: $game-width;
-  height: $ui-height;
-  position: absolute;
-  top: 0;
-  left: 0;
-  border: 0;
-  // outline: 0.5px solid #444;
-}
-
-.GameUIBottom {
-  @extend .GameUITop;
-  top: unset;
-  bottom: 0;
-}
+// Pistols
 
 .MenuTavern {
   width: 100%;

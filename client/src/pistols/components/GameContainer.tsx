@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
-import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
+import { GameState, useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { loadAudioAssets, isAudioAssetsLoaded } from '@/pistols/data/assets'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import GameView from '@/pistols/components/GameView'
@@ -18,7 +18,7 @@ function GameContainer({
   }, [duelId])
 
   return (
-    <div className={`GameContainer UIBorder ${isPlaying ? '' : 'Hidden'}`}>
+    <div className={`GameContainer ${isPlaying ? '' : 'Hidden'}`}>
       <GameView />
       <GameStartOverlay />
     </div>
@@ -27,13 +27,21 @@ function GameContainer({
 
 
 //------------------------------------------------
-// Overlay to load audio ssets
+// Overlay to load audio assets
 // Asks for interaction if necessary
 //
 function GameStartOverlay({
 }) {
-  const { gameImpl, hasInteracted, isReady, dispatchInteracted } = useGameplayContext()
+  const { gameImpl, hasInteracted, isReady, dispatchGameState, dispatchInteracted } = useGameplayContext()
   const [audioAssetsLoaded, setAudioAssetsLoaded] = useState(undefined)
+  // console.log(isReady, hasInteracted, gameImpl)
+
+  // gameImpl loaded by GameCanvas
+  useEffect(() => {
+    if(gameImpl) {
+      dispatchGameState(GameState.Ready)
+    }
+  }, [gameImpl])
 
   const _startGame = async () => {
     setAudioAssetsLoaded(false)
@@ -54,7 +62,7 @@ function GameStartOverlay({
   }
 
   return (
-    <div className={`GameView Overlay CenteredContainer`}>
+    <div className={`GameView Overlay CenteredContainer AboveAll`}>
       {audioAssetsLoaded === undefined && <ActionButton large label='START GAME' onClick={() => dispatchInteracted()} />}
       {audioAssetsLoaded === false && <h1>loading assets...</h1>}
     </div>
