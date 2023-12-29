@@ -1,12 +1,13 @@
 import * as THREE from 'three'
 
 export class SpriteSheet {
+  key = null
   frameCount = 1
   textures = []
-  material = null
   frameRate = 8
 
-  constructor(SHEET) {
+  constructor(key, SHEET) {
+    this.key = key
     this.frameCount = SHEET.frameCount
     for (let f = 1; f <= this.frameCount; ++f) {
       const frameNumber = ('000' + f.toString()).slice(-2)
@@ -15,7 +16,9 @@ export class SpriteSheet {
       const tex = new THREE.TextureLoader().load(path)
       this.textures.push(tex)
     }
-    this.material = this.makeMaterial()
+    if (SHEET.frameRate) {
+      this.frameRate = SHEET.frameRate
+    }
   }
 
   makeMaterial() {
@@ -28,54 +31,79 @@ export class SpriteSheet {
 }
 
 export class Actor {
-  sheet: SpriteSheet = null
+  sheets: any = {}
   material: THREE.MeshBasicMaterial = null
   mesh: THREE.Mesh = null
+  currentSheet: SpriteSheet = null
   controls: any = {}
   ready: boolean = false
 
-  constructor(spriteSheet: SpriteSheet, width: number, height: number, flipped: boolean) {
-    this.sheet = spriteSheet
-
+  constructor(spriteSheets: any, width: number, height: number, flipped: boolean) {
     const geometry = new THREE.PlaneGeometry(width, height)
-    this.material = this.sheet.makeMaterial()
+
+    Object.keys(spriteSheets).forEach((key, index) => {
+      const sheet = spriteSheets[key]
+      this.sheets[key] = sheet
+
+      if(index == 0) {
+        this.currentSheet = sheet
+        this.setAnimation(key)
+      }
+    })
+
+    this.material = this.currentSheet.makeMaterial()
 
     this.mesh = new THREE.Mesh(geometry, this.material)
     this.mesh.position.set(0, 0, 1)
-
     if (flipped) {
       this.mesh.rotation.set(0, Math.PI, 0)
     }
 
-    this.controls.tileDisplayDuration = (1000 / this.sheet.frameRate)
     this.controls.lastDisplayTime = 0
     this.controls.currentTile = 0
     this.controls.paused = true
-    this.controls.mustLoop = false
+    this.controls.loopCount = 0;
     this.controls.visible = true
-    this.controls.clampWhenFinished = true
+    this.controls.rewindWhenFinished = false
     this.controls.hideWhenFinished = false
+    this.controls.callback = null
 
     this.ready = true
+  }
+
+  setAnimation(key) {
+    this.currentSheet = this.sheets[key]
+    this.controls.tileDisplayDuration = (1000 / this.currentSheet.frameRate)
+    this.controls.frameCount = this.currentSheet.frameCount
+  }
+
+  updateMaterialWithCurrentTile() {
+    this.material.map = this.currentSheet.textures[this.controls.currentTile]
   }
 
 
   update(time) {
     if (!this.ready || !time) return
 
+    if (this.controls.paused) return
+
     while (time - this.controls.lastDisplayTime >= this.controls.tileDisplayDuration) {
 
       this.controls.lastDisplayTime = time;
 
-      this.controls.currentTile = (this.controls.currentTile + 1);
+      this.controls.currentTile++
 
-      // Restarts the animation if the last frame was reached at last call.
-      if (this.controls.currentTile >= this.sheet.frameCount) {
+      // Last frame...
+      if (this.controls.currentTile >= this.controls.frameCount) {
 
-        this.controls.currentTile = 0;
+        this.controls.loopCount--;
 
-        // Call the user callbacks on the event 'loop'
-        if (this.controls.mustLoop == true) {
+        if (this.controls.loopCount > 0) {
+          //
+          // Loop!
+          //
+          // back to first frame
+          this.controls.currentTile = 0;
 
           // listeners.forEach((listener) => {
           //   if (listener.eventName == 'loop') {
@@ -83,43 +111,35 @@ export class Actor {
           //       type: 'loop',
           //       action: action
           //     });
-          //   };
+          //   }
           // });
 
-        } else { // action must not loop
-
+        } else {
+          //
+          // Finished playing
+          //
           this.controls.paused = true;
 
-          if (this.controls.clampWhenFinished == true) {
+          if (this.controls.rewindWhenFinished == true) {
+            // back to first frame?
+            this.controls.currentTile = 0
+          } else {
+            // stay at last frame
+            this.controls.currentTile--
+          }
 
-            if (this.controls.hideWhenFinished == true) {
-              this.controls.visible = false;
-            };
+          if (this.controls.hideWhenFinished == true) {
+            this.controls.visible = false;
+          }
 
-            this.callFinishedListeners();
+          this.callFinishedListeners()
+        }
+      }
 
-          } else { // must restart the animation before to stop
+      this.updateMaterialWithCurrentTile()
+    }
 
-            if (this.controls.hideWhenFinished == true) {
-              this.controls.visible = false;
-            };
-
-            // Call updateAction() a last time after a frame duration,
-            // even if the action is actually paused before, in order to restart
-            // the animation.
-            // setTimeout(() => {
-            //   updateAction(action, this.controls.tileDisplayDuration);
-            //   this.callFinishedListeners();
-            // }, this.controls.tileDisplayDuration);
-
-          };
-        };
-      };
-
-      this.offsetTexture();
-    };
-
-  };
+  }
 
   // Call the user callbacks on the event 'finished'.
   callFinishedListeners() {
@@ -129,50 +149,55 @@ export class Actor {
     //       type: 'finished',
     //       action: action
     //     });
-    //   };
+    //   }
     // }, this.action.tileDisplayDuration);
-  };
-
+  }
 
   // reveal the sprite and play the action only once
-  playOnce() {
-    this.controls.mustLoop = false;
+  playOnce(callback: Function = null) {
+    this.playRepeat(1, callback)
+  }
+
+  playRepeat(loopCount: number, callback: Function = null) {
+    this.controls.callback = callback;
+    this.controls.loopCount = loopCount;
     this.controls.currentTile = 0;
-    this.offsetTexture();
+    this.updateMaterialWithCurrentTile()
     this.controls.paused = false;
     this.controls.visible = true;
-  };
+  }
 
   // resume the action if it was paused
   resume() {
     // this is in case setFrame was used to set a frame outside of the
     // animation range, which would lead to bugs.
-    if (this.controls.currentTile > 0 && this.controls.currentTile < this.sheet.frameCount) {
+    if (this.controls.currentTile > 0 && this.controls.currentTile < this.controls.frameCount) {
       this.controls.currentTile = 0;
-    };
+    }
     this.controls.paused = false;
     this.controls.visible = true;
-  };
+  }
 
   // reveal the sprite and play it in a loop
-  playLoop() {
-    this.controls.mustLoop = true;
+  playLoop(callback: Function = null) {
+    this.controls.callback = callback;
+    this.controls.loopCount = Number.MAX_SAFE_INTEGER;
     this.controls.currentAction = this;
     this.controls.currentTile = 0;
-    this.offsetTexture();
+    this.updateMaterialWithCurrentTile()
     this.controls.paused = false;
     this.controls.visible = true;
-  };
+  }
 
   // pause the action when it reach the last frame
   pauseNextEnd() {
-    this.controls.mustLoop = false;
-  };
+    this.controls.loopCount = 1;
+  }
 
   // pause the action on the current frame
   pause() {
     this.controls.paused = true;
-  };
+  }
 
   // pause and reset the action
   stop() {
@@ -181,20 +206,17 @@ export class Actor {
     this.controls.paused = true;
     if (this.controls.hideWhenFinished) {
       this.controls.visible = false;
-    };
-    this.offsetTexture();
-  };
+    }
+    this.updateMaterialWithCurrentTile()
+  }
 
   // Set manually a frame of the animation. Frame indexing starts at 0.
   setFrame(frameID) {
     this.controls.paused = true;
     this.controls.currentTile = frameID;
-    this.offsetTexture();
-  };
+    this.updateMaterialWithCurrentTile()
+  }
 
-  offsetTexture() {
-    this.material.map = this.sheet.textures[this.controls.currentTile]
-  };
 
 
 }

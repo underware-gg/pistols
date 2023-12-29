@@ -6,6 +6,8 @@ import { useChallengeIdsByState, useChallengesByDuelist } from '@/pistols/hooks/
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { ChallengeState } from '@/pistols/utils/pistols'
 import AccountHeader from '@/pistols/components/account/AccountHeader'
+import { SPRITESHEETS } from '../data/assets'
+import { useGameplayContext } from '../hooks/GameplayContext'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -76,6 +78,39 @@ export function MenuDuel({
         <Menu.Item onClick={() => router.push('/tavern')}>
           Back to Tavern
         </Menu.Item>
+      </Menu>
+    </div>
+  )
+}
+
+
+
+export function MenuDebugActors({
+  actorId
+}) {
+  const { gameImpl } = useGameplayContext()
+  
+  const _play = (key) => {
+    gameImpl?.playActorAnimation(actorId, key)
+  }
+
+  const items = useMemo(() => {
+    if (!gameImpl) return
+    let result = []
+    Object.keys(SPRITESHEETS.FEMALE).forEach(key => {
+      result.push(
+        <Menu.Item key={key} onClick={() => _play(key)}>
+          {actorId}:{key}
+        </Menu.Item>
+      )
+    })
+    return result
+  }, [gameImpl])
+
+  return (
+    <div className='MenuDuel AlignCenter' style={{ bottom: actorId == 'B' ? '50px' : '80px' }}>
+      <Menu secondary compact size='small'>
+        {items}
       </Menu>
     </div>
   )

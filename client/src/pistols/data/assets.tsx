@@ -2,6 +2,81 @@ import * as THREE from 'three'
 
 
 //----------------------------
+// Texture Assets
+//
+
+const TEXTURES = {
+  TESTCARD: { path: '/textures/testcard.jpg' },
+  BG_DUEL: { path: '/textures/bg_duel.png' },
+}
+const SPRITESHEETS = {
+  FEMALE: {
+    STILL: {
+      path: '/textures/animations/Female Duelist/Still',
+      frameCount: 1,
+      frameRate: 8,
+    },
+    STEP_1: {
+      path: '/textures/animations/Female Duelist/Step 1',
+      frameCount: 8,
+      frameRate: 8,
+    },
+    STEP_2: {
+      path: '/textures/animations/Female Duelist/Step 2',
+      frameCount: 8,
+      frameRate: 8,
+    },
+    TWO_STEPS: {
+      path: '/textures/animations/Female Duelist/Two Steps',
+      frameCount: 16,
+      frameRate: 8,
+    },
+    SHOOT: {
+      path: '/textures/animations/Female Duelist/Shoot',
+      frameCount: 16,
+      frameRate: 8,
+    },
+    SHOT_INJURED_BACK: {
+      path: '/textures/animations/Female Duelist/Shot and Injured Back',
+      frameCount: 15,
+      frameRate: 8,
+    },
+    SHOT_INJURED_FRONT: {
+      path: '/textures/animations/Female Duelist/Shot and Injured Front',
+      frameCount: 15,
+      frameRate: 8,
+    },
+    SHOT_DEAD_BACK: {
+      path: '/textures/animations/Female Duelist/Shot Dead Back',
+      frameCount: 11,
+      frameRate: 8,
+    },
+    SHOT_DEAD_FRONT: {
+      path: '/textures/animations/Female Duelist/Shot Dead Front',
+      frameCount: 11,
+      frameRate: 8,
+    },
+    STRIKE: {
+      path: '/textures/animations/Female Duelist/Strike',
+      frameCount: 18,
+      frameRate: 8,
+    },
+    STRUCK_INJURED: {
+      path: '/textures/animations/Female Duelist/Struck and Injured',
+      frameCount: 12,
+      frameRate: 8,
+    },
+    STRUCK_DEAD: {
+      path: '/textures/animations/Female Duelist/Struck Dead',
+      frameCount: 9,
+      frameRate: 8,
+    },
+  },
+}
+
+
+
+//----------------------------
 // Audio Assets
 //
 enum AudioName {
@@ -106,6 +181,8 @@ const isAudioAssetsLoaded = () => {
 
 
 export {
+  TEXTURES,
+  SPRITESHEETS,
   loadAudioAssets,
   isAudioAssetsLoaded,
   AudioName,

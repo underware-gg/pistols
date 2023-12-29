@@ -3,7 +3,7 @@ import TWEEN from '@tweenjs/tween.js'
 //@ts-ignore
 import Stats from 'three/addons/libs/stats.module.js'
 
-import { AudioName, AUDIO_ASSETS } from '@/pistols/data/assets'
+import { AudioName, AUDIO_ASSETS, TEXTURES, SPRITESHEETS } from '@/pistols/data/assets'
 import { map } from '../utils/utils'
 import { SpriteSheet, Actor } from './SpriteSheetMaker'
 
@@ -28,17 +28,8 @@ const PACES_Y = -50
 const PACES_X_0 = 40
 const PACES_X_10 = 500
 
-const TEXTURES = {
-  TESTCARD: { path: '/textures/testcard.jpg' },
-  BG_DUEL: { path: '/textures/bg_duel.png' },
-}
-const SPRITESHEETS = {
-  FEMALE_TWO_STEPS: { path: '/textures/animations/Female Duelist/Two Steps', frameCount: 16 },
-}
-let _textures: any = {
-}
-let _spriteSheets: any = {
-}
+let _textures: any = {}
+let _spriteSheets: any = {}
 
 let _animationRequest = null
 let _renderer: THREE.WebGLRenderer
@@ -73,8 +64,11 @@ export async function init(canvas, width, height, statsEnabled = false) {
     // tex.minFilter = THREE.NearestFilter
     _textures[key] = tex
   })
-  Object.keys(SPRITESHEETS).forEach(key => {
-    _spriteSheets[key] = new SpriteSheet(SPRITESHEETS[key])
+  Object.keys(SPRITESHEETS).forEach(actorName => {
+    _spriteSheets[actorName] = {}
+    Object.keys(SPRITESHEETS[actorName]).forEach(key => {
+      _spriteSheets[actorName][key] = new SpriteSheet(key, SPRITESHEETS[actorName][key])
+    })
   })
 
   _renderer = new THREE.WebGLRenderer({
@@ -143,8 +137,8 @@ export function animate(time) {
 
   TWEEN.update()
 
-  _actorA.update(time)
-  _actorB.update(time)
+  _actor.A.update(time)
+  _actor.B.update(time)
 
   _renderer.render(_scene, _camera)
 
@@ -157,8 +151,8 @@ export function animate(time) {
 //
 
 let _fullScreenGeom: THREE.PlaneGeometry = null
-let _actorA: Actor = null
-let _actorB: Actor = null
+let _actors: any = {}
+let _actor: any = {}
 
 function setupScene() {
   _scene = new THREE.Scene()
@@ -181,31 +175,40 @@ function setupScene() {
   _scene.add(bg_duel)
 
 
-  _actorA = new Actor(_spriteSheets.FEMALE_TWO_STEPS, 70, 70, true)
-  _actorA.mesh.position.set(-PACES_X_0, PACES_Y, 1)
-  _scene.add(_actorA.mesh)
-  _actorA.playLoop()
+  _actors.FEMALE_A = new Actor(_spriteSheets.FEMALE, 70, 70, true)
+  _actors.FEMALE_B = new Actor(_spriteSheets.FEMALE, 70, 70, false)
 
-  _actorB = new Actor(_spriteSheets.FEMALE_TWO_STEPS, 70, 70, false)
-  _actorB.mesh.position.set(PACES_X_0, PACES_Y, 1)
-  _scene.add(_actorB.mesh)
-  _actorB.playLoop()
+  _actors.FEMALE_A.mesh.position.set(-PACES_X_0, PACES_Y, 1)
+  _actors.FEMALE_B.mesh.position.set(PACES_X_0, PACES_Y, 1)
 
+  // current Actors
+  switchActor('A', 'FEMALE_A')
+  switchActor('B', 'FEMALE_B')
 
-  // const mat_blue = new THREE.MeshBasicMaterial({ color: 'blue' })
-  // const quad1 = new THREE.Mesh(_fullScreenGeom, mat_blue)
-  // quad1.position.set(0, 0, 1)
-  // _scene.add(quad1)
-  // const mat_red = new THREE.MeshBasicMaterial({ color: 'red' })
-  // const quad2_geometry = new THREE.PlaneGeometry(WIDTH / 2, HEIGHT / 2)
-  // const quad2 = new THREE.Mesh(quad2_geometry, mat_red)
-  // quad2.position.set(-WIDTH / 2, -HEIGHT / 2, 1)
-  // _scene.add(quad2)
+  playActorAnimation('A', 'STILL')
+  playActorAnimation('B', 'STILL')
 
 }
 
 export function getCameraRig() {
   return _cameraRig
+}
+
+
+export function switchActor(actorId, newActorName) {
+  let position = null
+  if (_actor[actorId]) {
+    position = _actor[actorId].position
+    _scene.remove(_actor[actorId].mesh)
+  }
+  _actor[actorId] = _actors[newActorName]
+  _scene.add(_actor[actorId].mesh)
+  if (position) _actor[actorId].position = position
+}
+
+export function playActorAnimation(actorId, key) {
+  _actor[actorId].setAnimation(key)
+  _actor[actorId].playOnce()
 }
 
 export function resetScene() {
