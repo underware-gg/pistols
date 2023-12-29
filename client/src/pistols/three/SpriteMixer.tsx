@@ -4,6 +4,11 @@
 // Based on Lee Stemkoski's work who coded the core texture offsetting part :
 // http://stemkoski.github.io/Three.js/Texture-Animation.html
 
+//
+// https://github.com/felixmariotto/three-SpriteMixer/blob/master/public/build/SpriteMixer.js
+// example: https://github.com/felixmariotto/three-SpriteMixer/blob/master/examples/from_indexed_texture.html
+//
+
 function SpriteMixer() {
 
   var actionSprites = []; // Will store every new actionSprite.

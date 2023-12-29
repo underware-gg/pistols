@@ -106,6 +106,8 @@ export async function init(canvas, width, height, statsEnabled = false) {
     _stats = new Stats()
     document.body.appendChild(_stats.dom)
   }
+
+  console.log(`THREE.init() done 👍`)
 }
 
 function onWindowResize() {
@@ -122,7 +124,6 @@ function onWindowResize() {
   const h_z_ratio = Math.tan(FOV / 2.0 * Math.PI / 180.0) * 2.0
   const scale = WIDTH / canvasWidth
   const camHeight = (canvasHeight * scale) / h_z_ratio
-  console.log(canvasWidth, canvasHeight, h_z_ratio, camHeight)
   // setup cam
   _camera.up.set(0, 1, 0)
   _camera.position.set(0, 0, camHeight)
@@ -141,6 +142,9 @@ export function animate(time) {
   _animationRequest = requestAnimationFrame(animate)
 
   TWEEN.update()
+
+  _actorA.update(time)
+  _actorB.update(time)
 
   _renderer.render(_scene, _camera)
 
@@ -180,10 +184,12 @@ function setupScene() {
   _actorA = new Actor(_spriteSheets.FEMALE_TWO_STEPS, 70, 70, true)
   _actorA.mesh.position.set(-PACES_X_0, PACES_Y, 1)
   _scene.add(_actorA.mesh)
+  _actorA.playLoop()
 
   _actorB = new Actor(_spriteSheets.FEMALE_TWO_STEPS, 70, 70, false)
   _actorB.mesh.position.set(PACES_X_0, PACES_Y, 1)
   _scene.add(_actorB.mesh)
+  _actorB.playLoop()
 
 
   // const mat_blue = new THREE.MeshBasicMaterial({ color: 'blue' })
