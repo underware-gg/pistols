@@ -139,8 +139,8 @@ export const usePistolsContext = () => {
       type: PistolsActions.SET_DUEL,
       payload: duelId,
     })
-    if (menuKey !== null && state.menuKey == MenuKey.Duelists) {
-      dispatchSetMenu(menuKey)
+    if (state.menuKey == MenuKey.Duelists) {
+      dispatchSetMenu(menuKey ?? MenuKey.YourDuels)
     }
   }
   return {

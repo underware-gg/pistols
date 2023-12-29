@@ -11,6 +11,7 @@ import { ProfileDescription } from '@/pistols/components/account/ProfileDescript
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { BladesNames, FULL_HEALTH, RoundState } from '@/pistols/utils/pistols'
 import CommitModal from '@/pistols/components/CommitModal'
+import { MenuDuel } from './Menus'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -42,6 +43,8 @@ export default function Duel({
         </div>
         <DuelProgress isB account={account} duelId={duelId} duelistB={duelistB} floated='right' />
       </div>
+
+      <MenuDuel />
     </>
   )
 }

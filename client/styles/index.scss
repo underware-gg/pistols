@@ -433,12 +433,17 @@ $box-h: calc((100vh - $aspect-h) / 2);
   bottom: 0;
 }
 
-.TavernMenu {
+.MenuTavern {
   width: 100%;
   position: absolute;
   top: 0;
   left: 0;
   padding: 15px;
+}
+.MenuDuel {
+  @extend .MenuTavern;
+  top: unset;
+  bottom: 0;
 }
 
 .TavernTitle {
