@@ -34,7 +34,7 @@ const GameView = () => {
     <div className='Relative GameView'>
       <GameCanvas guiEnabled={null} />
       <GameLoop />
-      <GameAudios />
+      {/* <GameAudios /> */}
     </div>
   )
 }

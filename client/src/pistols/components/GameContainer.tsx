@@ -20,7 +20,7 @@ function GameContainer({
   return (
     <div className={`GameContainer ${isPlaying ? '' : 'Hidden'}`}>
       <GameView />
-      <GameStartOverlay />
+      {/* <GameStartOverlay /> */}
     </div>
   )
 }
