@@ -18,6 +18,7 @@ export const initialState = {
   hasInteracted: false,
   message: null,
   health: 100,
+  animated: null, // from three.js
 }
 
 type GameplayStateType = {
@@ -26,6 +27,7 @@ type GameplayStateType = {
   hasInteracted: boolean
   message: string
   health: number,
+  animated: number,
 }
 
 //--------------------------------
@@ -37,6 +39,7 @@ const GameplayActions = {
   SET_INTERACTED: 'SET_INTERACTED',
   SET_STATE: 'SET_STATE',
   SET_MESSAGE: 'SET_MESSAGE',
+  SET_ANIMATED: 'SET_ANIMATED',
 }
 
 type ActionType =
@@ -44,6 +47,7 @@ type ActionType =
   | { type: 'SET_INTERACTED', payload: boolean }
   | { type: 'SET_STATE', payload: GameState }
   | { type: 'SET_MESSAGE', payload: string }
+  | { type: 'SET_ANIMATED', payload: number }
 
 
 
@@ -91,6 +95,10 @@ const GameplayProvider = ({
         newState.message = action.payload as string
         break
       }
+      case GameplayActions.SET_ANIMATED: {
+        newState.animated = action.payload as number
+        break
+      }
       default:
         console.warn(`GameplayProvider: Unknown action [${action.type}]`)
         return state
@@ -136,6 +144,10 @@ export const useGameplayContext = () => {
     }
   }
 
+  const dispatchAnimated = (animated) => {
+    dispatch({ type: GameplayActions.SET_ANIMATED, payload: animated })
+  }
+
   return {
     state,
     ...state,
@@ -145,6 +157,7 @@ export const useGameplayContext = () => {
     dispatchInteracted,
     dispatchMessage,
     dispatchGameState,
+    dispatchAnimated,
   }
 }
 

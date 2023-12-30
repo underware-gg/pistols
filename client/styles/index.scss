@@ -13,6 +13,10 @@ $ui-border: 6px ridge $color-active;
 $ui-outline: 0.5px solid #444444;
 $text-shadow: 0.05em 0.05em 1px #0008;
 
+$color-positive: #dafadd;
+$color-negative: #fbdbdb;
+$color-warning: #f9e9d0;
+
 $game-width: 960px;
 $game-height: 540px;
 $ui-height: 180px;
@@ -137,6 +141,16 @@ canvas {
 
 .Important {
   color: $color-important;
+}
+
+.Positive {
+  background-color: $color-positive!important;
+}
+.Negative {
+  background-color: $color-negative!important;
+}
+.Warning {
+  background-color: $color-warning!important;
 }
 
 .Code {
@@ -536,9 +550,6 @@ $box-h: calc((100vh - $aspect-h) / 2);
 //-----------------------------
 // semantic-ui
 //
-$color-positive: #dafadd;
-$color-negative: #fbdbdb;
-$color-warning: #f9e9d0;
 // 
 // <Input>
 .ui.input>input {

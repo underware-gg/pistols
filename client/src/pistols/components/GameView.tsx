@@ -1,16 +1,22 @@
-import React, { useEffect, useMemo } from 'react'
-import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
+import React, { useEffect } from 'react'
 import { useGameplayContext, GameState } from '@/pistols/hooks/GameplayContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
+import { useGameEvent } from '@/pistols/hooks/useGameEvent'
 import GameCanvas from '@/pistols/components/GameCanvas'
 import { AudioName } from '@/pistols/data/assets'
-import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 
 
 const GameView = () => {
-
   const { duelId } = usePistolsContext()
-  const { gameImpl, isPlaying } = useGameplayContext()
+  const { gameImpl, isPlaying, dispatchAnimated} = useGameplayContext()
+
+  const animated = useGameEvent('animated', -1)
+  useEffect(() => {
+    console.log(`animated:`, animated)
+    dispatchAnimated(animated)
+  }, [animated])
+
   // const { chamberExists, yonder } = useChamber(chamberId)
   // const { tilemap, gameTilemap } = useChamberMap(chamberId, 777)
 
