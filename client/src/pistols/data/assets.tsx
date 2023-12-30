@@ -38,7 +38,7 @@ const SPRITESHEETS = {
     },
     SHOT_INJURED_BACK: {
       path: '/textures/animations/Female Duelist/Shot and Injured Back',
-      frameCount: 15,
+      frameCount: 11,
       frameRate: 8,
     },
     SHOT_INJURED_FRONT: {
@@ -48,7 +48,7 @@ const SPRITESHEETS = {
     },
     SHOT_DEAD_BACK: {
       path: '/textures/animations/Female Duelist/Shot Dead Back',
-      frameCount: 11,
+      frameCount: 7,
       frameRate: 8,
     },
     SHOT_DEAD_FRONT: {
