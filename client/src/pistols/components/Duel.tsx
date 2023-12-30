@@ -164,14 +164,14 @@ function DuelProgress({
 
   const _healthResult = (round: any) => {
     const health = isA ? round.duelist_a.health : round.duelist_b.health
-    return (health == 0 ? 'DEAD!' : health < FULL_HEALTH ? 'INJURED!' : 'ALIVE!')
+    return (health == 0 ? 'is DEAD!' : health < FULL_HEALTH ? 'got INJURED!' : 'gets out ALIVE!')
   }
 
   const pistolsResult = useMemo(() => {
     if (round1?.state == RoundState.Finished && !isAnimatingPistols) {
       const steps = isA ? round1.duelist_a.move : round1.duelist_b.move
       const health = _healthResult(round1)
-      return <span>{name} walks {steps} steps<br />and is {health}</span>
+      return <span>{name} walks {steps} steps<br />and {health}</span>
     }
     return null
   }, [round1, isAnimatingPistols])
@@ -180,7 +180,7 @@ function DuelProgress({
     if (round2?.state == RoundState.Finished && !isAnimatingBlades) {
       const blade = isA ? round2.duelist_a.move : round2.duelist_b.move
       const health = _healthResult(round2)
-      return <span>{name} clashes with {BladesNames[blade]}<br />and is {health}</span>
+      return <span>{name} clashes with {BladesNames[blade]}<br />and {health}</span>
     }
     return null
   }, [round2, isAnimatingBlades])

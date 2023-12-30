@@ -128,7 +128,12 @@ export default function ChallengeModal() {
             }
             {(state == ChallengeState.InProgress) &&
               <Col>
-                <ActionButton fill attention label='Watch Duel!' onClick={() => _watch()} />
+                <ActionButton fill attention label='Go to Live Duel!' onClick={() => _watch()} />
+              </Col>
+            }
+            {(state > ChallengeState.InProgress) &&
+              <Col>
+                <ActionButton fill attention label='Replay Duel!' onClick={() => _watch()} />
               </Col>
             }
           </Row>
