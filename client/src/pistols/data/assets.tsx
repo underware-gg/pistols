@@ -98,7 +98,7 @@ type AudioAssets = {
 
 let AUDIO_ASSETS: AudioAssets = {
   AMBIENT: {
-    path: '/audio/music-ambient.m4a',
+    path: '/audio/biodecay-song6.mp3',
     volume: 0.5,
     loop: true,
   },
