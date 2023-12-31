@@ -47,15 +47,19 @@ Pistols at 10 Blocks is an onchain game, in which you face off against another L
 
 ## Team
 
-* Recipromancer -- Lead, Renaissance Chaos Mode
-* Mataleone -- Engineering
-* Amaro -- Art & Design
-* Mononoke -- Art & Design
-* Jubilee -- 3D Art & Effects
+* Recipromancer — Lead, Renaissance Chaos Mode
+* Mataleone — Engineering
+* Voltrevo — Engineering, Hidden information mechanism
+* Amaro — Art, Design & Animations
+* Mononoke — Logo & Art
 
+## Assets
 
-
-
+* biodecay-song6.mp3 - Original music by Recipromancer
+* sfx/pistol-shot.mp3 — https://freesound.org/people/nioczkus/sounds/395789/
+* sfx/grunt-man.mp3 — https://freesound.org/people/MrFossy/sounds/547198/
+* sfx/grunt-female.mp3 — https://freesound.org/people/SkyRaeVoicing/sounds/368843/
+* sfx/body-fall.mp3 — https://freesound.org/people/leonelmail/sounds/504626/
 
 ## Development notes
 
