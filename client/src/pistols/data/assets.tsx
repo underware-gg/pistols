@@ -102,10 +102,10 @@ let AUDIO_ASSETS: AudioAssets = {
     volume: 0.5,
     loop: true,
   },
-  // SHOT: {
-  //   path: '/audio/sfx/shot.m4a',
-  //   loop: true,
-  // },
+  SHOT: {
+    path: '/audio/sfx/pistol-shot.mp3',
+    loop: false,
+  },
 }
 
 
