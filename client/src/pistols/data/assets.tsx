@@ -81,7 +81,10 @@ const SPRITESHEETS = {
 //
 enum AudioName {
   AMBIENT = 'AMBIENT',
-  // SHOT = 'SHOT',
+  SHOT = 'SHOT',
+  BODY_FALL = 'BODY_FALL',
+  GRUNT_FEMALE = 'GRUNT_FEMALE',
+  GRUNT_MALE = 'GRUNT_MALE',
 }
 
 interface AudioAsset {
@@ -104,6 +107,18 @@ let AUDIO_ASSETS: AudioAssets = {
   },
   SHOT: {
     path: '/audio/sfx/pistol-shot.mp3',
+    loop: false,
+  },
+  BODY_FALL: {
+    path: '/audio/sfx/body-fall.mp3',
+    loop: false,
+  },
+  GRUNT_FEMALE: {
+    path: '/audio/sfx/grunt-female.mp3',
+    loop: false,
+  },
+  GRUNT_MALE: {
+    path: '/audio/sfx/grunt-man.mp3',
     loop: false,
   },
 }
