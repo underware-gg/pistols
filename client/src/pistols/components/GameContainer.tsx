@@ -6,7 +6,7 @@ import { ActionButton } from '@/pistols/components/ui/Buttons'
 import GameView from '@/pistols/components/GameView'
 
 function GameContainer({
-  isPlaying,
+  isVisible,
   duelId,
 }) {
   const { dispatchSetDuel } = usePistolsContext()
@@ -18,9 +18,9 @@ function GameContainer({
   }, [duelId])
 
   return (
-    <div className={`GameContainer ${isPlaying ? '' : 'Hidden'}`}>
+    <div className={`GameContainer ${isVisible ? '' : 'Hidden'}`}>
       <GameView />
-      {/* <GameStartOverlay /> */}
+      <GameStartOverlay isVisible={isVisible} />
     </div>
   )
 }
@@ -31,6 +31,7 @@ function GameContainer({
 // Asks for interaction if necessary
 //
 function GameStartOverlay({
+  isVisible
 }) {
   const { gameImpl, hasInteracted, isReady, dispatchGameState, dispatchInteracted } = useGameplayContext()
   const [audioAssetsLoaded, setAudioAssetsLoaded] = useState(undefined)
@@ -43,17 +44,25 @@ function GameStartOverlay({
     }
   }, [gameImpl])
 
-  const _startGame = async () => {
-    setAudioAssetsLoaded(false)
-    await loadAudioAssets(gameImpl?.getCameraRig())
-    setAudioAssetsLoaded(true)
-    // dispatchReset(null, true)
-  }
-
   useEffect(() => {
+    const hasBeenActive = navigator?.userActivation?.hasBeenActive
+    if (isVisible && hasBeenActive && !hasInteracted) {
+      dispatchInteracted()
+    }
+  }, [isVisible])
+
+  //
+  // Load audio assets
+  useEffect(() => {
+    const _preloadAudio = async () => {
+      setAudioAssetsLoaded(false)
+      await loadAudioAssets(gameImpl?.getCameraRig())
+      setAudioAssetsLoaded(true)
+      // dispatchReset(null, true)
+    }
     setAudioAssetsLoaded(isAudioAssetsLoaded())
     if (isReady && hasInteracted) {
-      _startGame()
+      _preloadAudio()
     }
   }, [isReady, hasInteracted])
 
@@ -63,7 +72,7 @@ function GameStartOverlay({
 
   return (
     <div className={`GameView Overlay CenteredContainer AboveAll`}>
-      {audioAssetsLoaded === undefined && <ActionButton large label='START GAME' onClick={() => dispatchInteracted()} />}
+      {audioAssetsLoaded === undefined && <ActionButton large label='READY!' onClick={() => dispatchInteracted()} />}
       {audioAssetsLoaded === false && <h1>loading assets...</h1>}
     </div>
   )

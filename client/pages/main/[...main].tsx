@@ -70,7 +70,7 @@ export default function MainPage() {
     <AppDojo title={title} backgroundImage={null}>
       <Background className={className}>
         <GameContainer
-          isPlaying={_atDuel}
+          isVisible={_atDuel}
           duelId={duelId}
         />
         {_atGate && <Gate />}

@@ -419,7 +419,8 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 .Overlay {
-  background: linear-gradient(#0104, #010d);
+  // background: linear-gradient(#0004, #000d);
+  background: #fffd;
 }
 
 
