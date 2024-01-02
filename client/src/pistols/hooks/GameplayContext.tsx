@@ -16,6 +16,7 @@ export const initialState = {
   gameImpl: null,
   gameState: GameState.Lobby,
   hasInteracted: false,
+  hasLoadedAudioAssets: undefined,
   message: null,
   health: 100,
   animated: null, // from three.js
@@ -25,6 +26,7 @@ type GameplayStateType = {
   gameImpl: ThreeJsGame
   gameState: GameState
   hasInteracted: boolean
+  hasLoadedAudioAssets: boolean
   message: string
   health: number,
   animated: number,
@@ -37,6 +39,7 @@ type GameplayStateType = {
 const GameplayActions = {
   SET_GAME_IMPL: 'SET_GAME_IMPL',
   SET_INTERACTED: 'SET_INTERACTED',
+  SET_LOADED_AUDIO_ASSETS: 'SET_LOADED_AUDIO_ASSETS',
   SET_STATE: 'SET_STATE',
   SET_MESSAGE: 'SET_MESSAGE',
   SET_ANIMATED: 'SET_ANIMATED',
@@ -45,6 +48,7 @@ const GameplayActions = {
 type ActionType =
   | { type: 'SET_GAME_IMPL', payload: ThreeJsGame }
   | { type: 'SET_INTERACTED', payload: boolean }
+  | { type: 'SET_LOADED_AUDIO_ASSETS', payload: boolean }
   | { type: 'SET_STATE', payload: GameState }
   | { type: 'SET_MESSAGE', payload: string }
   | { type: 'SET_ANIMATED', payload: number }
@@ -84,6 +88,10 @@ const GameplayProvider = ({
       }
       case GameplayActions.SET_INTERACTED: {
         newState.hasInteracted = action.payload as boolean
+        break
+      }
+      case GameplayActions.SET_LOADED_AUDIO_ASSETS: {
+        newState.hasLoadedAudioAssets = action.payload as boolean
         break
       }
       case GameplayActions.SET_STATE: {
@@ -131,6 +139,10 @@ export const useGameplayContext = () => {
     dispatch({ type: GameplayActions.SET_INTERACTED, payload: true })
   }
 
+  const dispatchLoadedAudioAssets = (loaded: boolean) => {
+    dispatch({ type: GameplayActions.SET_LOADED_AUDIO_ASSETS, payload: loaded })
+  }
+
   const dispatchMessage = (msg: string | null) => {
     if (msg !== null) {
       dispatch({ type: GameplayActions.SET_MESSAGE, payload: msg })
@@ -155,6 +167,7 @@ export const useGameplayContext = () => {
     isPlaying: (state.gameState == GameState.Playing),
     dispatchGameImpl,
     dispatchInteracted,
+    dispatchLoadedAudioAssets,
     dispatchMessage,
     dispatchGameState,
     dispatchAnimated,

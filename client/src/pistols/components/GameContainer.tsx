@@ -34,8 +34,11 @@ function GameContainer({
 function GameStartOverlay({
   isVisible
 }) {
-  const { gameImpl, hasInteracted, isReady, dispatchGameState, dispatchInteracted } = useGameplayContext()
-  const [audioAssetsLoaded, setAudioAssetsLoaded] = useState(undefined)
+  const {
+    gameImpl, isReady,
+    hasInteracted, hasLoadedAudioAssets,
+    dispatchGameState, dispatchInteracted, dispatchLoadedAudioAssets,
+  } = useGameplayContext()
   // console.log(isReady, hasInteracted, gameImpl)
 
   // gameImpl loaded by GameCanvas
@@ -56,26 +59,25 @@ function GameStartOverlay({
   // Load audio assets
   useEffect(() => {
     const _preloadAudio = async () => {
-      setAudioAssetsLoaded(false)
+      dispatchLoadedAudioAssets(false)
       await loadAudioAssets(gameImpl?.getCameraRig())
-      setAudioAssetsLoaded(true)
-      // dispatchReset(null, true)
+      dispatchLoadedAudioAssets(true)
     }
-    setAudioAssetsLoaded(isAudioAssetsLoaded())
-    if (isReady && hasInteracted) {
+    if (isAudioAssetsLoaded()) {
+      dispatchLoadedAudioAssets(true)
+    } else if (isReady && hasInteracted) {
       _preloadAudio()
     }
   }, [isReady, hasInteracted])
 
-  if (audioAssetsLoaded === true) {
-    return <></>
+  if (hasLoadedAudioAssets === true) {
+    return <GameAudios />
   }
 
   return (
     <div className={`GameView Overlay CenteredContainer AboveAll`}>
-      {audioAssetsLoaded === undefined && <ActionButton large label='READY!' onClick={() => dispatchInteracted()} />}
-      {audioAssetsLoaded === false && <h1>loading assets...</h1>}
-      {audioAssetsLoaded === true &&  <GameAudios />}
+      {hasLoadedAudioAssets === undefined && <ActionButton large label='READY!' onClick={() => dispatchInteracted()} />}
+      {hasLoadedAudioAssets === false && <h1>loading assets...</h1>}
     </div>
   )
 }

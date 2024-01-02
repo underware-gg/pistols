@@ -112,7 +112,7 @@ function DuelProgress({
   // console.log(`Round 1:`, round1)
   // console.log(`Round 2:`, round2)
 
-  const { gameImpl, animated } = useGameplayContext()
+  const { gameImpl, animated, hasLoadedAudioAssets } = useGameplayContext()
 
   //-------------------------
   // Duel progression
@@ -134,11 +134,11 @@ function DuelProgress({
   // if (isA) console.log(`stage, animated`, currentStage, animated, isAnimatingPistols, isAnimatingBlades)
 
   useEffect(() => {
-    if (isA && gameImpl && isAnimatingPistols) {
+    if (isA && gameImpl && isAnimatingPistols && hasLoadedAudioAssets) {
       console.log(`TRIGGER animateShootout()`)
       gameImpl.animateShootout(round1.duelist_a.move, round1.duelist_b.move, round1.duelist_a.health, round1.duelist_b.health)
     }
-  }, [gameImpl, isAnimatingPistols])
+  }, [gameImpl, isAnimatingPistols, hasLoadedAudioAssets])
 
   useEffect(() => {
     if (isA && gameImpl && isAnimatingBlades) {
