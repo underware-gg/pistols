@@ -3,12 +3,12 @@ import { useRouter } from 'next/navigation'
 import { Grid, Table, Modal, Divider, Header } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { useChallenge } from '@/pistols/hooks/useChallenge'
+import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePicButton } from '@/pistols/components/account/ProfilePic'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { ChallengeState, ChallengeStateDescriptions, makeDuelUrl } from '@/pistols/utils/pistols'
+import { ChallengeState, makeDuelUrl } from '@/pistols/utils/pistols'
 import { AccountShort } from './ui/Account'
 
 const Row = Grid.Row
@@ -22,17 +22,12 @@ export default function ChallengeModal() {
 
   const { atYourDuels, atLiveDuels, atPastDuels, duelId, dispatchSetDuel, dispatchSetDuelist } = usePistolsContext()
 
-  const { state, message, duelistA, duelistB, winner, lords } = useChallenge(duelId)
+  const { state, message, duelistA, duelistB, lords } = useChallenge(duelId)
 
-  const { name: nameA, profilePic: profilePicA } = useDuelist(duelistA)
-  const { name: nameB, profilePic: profilePicB } = useDuelist(duelistB)
+  const { challengeDescription } = useChallengeDescription(duelId)
 
-  const _state = useMemo(() => {
-    let result = ChallengeStateDescriptions[state]
-    if (winner == duelistA) result += ' in favor of Challenger'
-    if (winner == duelistB) result += ' in favor of Challenged'
-    return result.replace('Challenger', nameA).replace('Challenged', nameB)
-  }, [state, winner, duelistA, duelistB, nameA, nameB])
+  const { profilePic: profilePicA } = useDuelist(duelistA)
+  const { profilePic: profilePicB } = useDuelist(duelistB)
 
   const isChallenger = useMemo(() => (duelistA == BigInt(account.address)), [duelistA, account])
   const isChallenged = useMemo(() => (duelistB == BigInt(account.address)), [duelistB, account])
@@ -98,7 +93,7 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='center'>
               <Col>
-                <h3>{_state}</h3>
+                <h3>{challengeDescription}</h3>
               </Col>
             </Row>
           </Grid>

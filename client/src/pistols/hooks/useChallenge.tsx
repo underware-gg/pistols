@@ -3,8 +3,9 @@ import { Entity, HasValue, Has, getComponentValue, Component } from '@dojoengine
 import { useComponentValue, useEntityQuery } from "@dojoengine/react"
 import { useDojoComponents } from '@/dojo/DojoContext'
 import { bigintToEntity, bigintToHex, feltToString } from "../utils/utils"
-import { ChallengeState } from "@/pistols/utils/pistols"
+import { ChallengeState, ChallengeStateDescriptions } from "@/pistols/utils/pistols"
 import { useEntityKeys, useEntityKeysQuery } from '@/pistols/hooks/useEntityKeysQuery'
+import { useDuelist } from "./useDuelist"
 
 
 //-----------------------------
@@ -87,6 +88,7 @@ export const useChallenge = (duelId: bigint | string) => {
     challengeExists: (challenge != null),
     state,
     isLive: (state == ChallengeState.Awaiting || state == ChallengeState.InProgress),
+    isFinished: (state == ChallengeState.Resolved || state == ChallengeState.Draw),
     duelistA,
     duelistB,
     challenger: duelistA,
@@ -104,6 +106,24 @@ export const useChallenge = (duelId: bigint | string) => {
     timestamp_end,
   }
 }
+
+export const useChallengeDescription = (duelId: bigint) => {
+  const { state, duelistA, duelistB, winner } = useChallenge(duelId)
+  const { name: nameA } = useDuelist(duelistA)
+  const { name: nameB } = useDuelist(duelistB)
+
+  const challengeDescription = useMemo(() => {
+    let result = ChallengeStateDescriptions[state]
+    if (winner == duelistA) result += ' in favor of Challenger'
+    if (winner == duelistB) result += ' in favor of Challenged'
+    return result.replace('Challenger', nameA).replace('Challenged', nameB)
+  }, [state, winner, duelistA, duelistB, nameA, nameB])
+
+  return {
+    challengeDescription,
+  }
+}
+
 
 
 //-----------------------------

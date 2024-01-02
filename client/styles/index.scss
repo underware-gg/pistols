@@ -491,6 +491,14 @@ $box-h: calc((100vh - $aspect-h) / 2);
   margin-top: 20px;
 }
 
+.DuelResults {
+  position: absolute;
+  top: 25%;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+
 // <IconXXX>
 
 .Tooltip {

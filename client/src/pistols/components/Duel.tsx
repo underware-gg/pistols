@@ -3,7 +3,7 @@ import { Grid, Segment, Icon, Step } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
-import { useChallenge } from '@/pistols/hooks/useChallenge'
+import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import { useCommitMove } from '@/pistols/hooks/useCommitReveal'
@@ -21,10 +21,12 @@ const Col = Grid.Column
 export default function Duel({
   duelId
 }) {
-  const { dispatchSetDuel } = usePistolsContext()
-  const { state, isLive, message, duelistA, duelistB, winner, lords } = useChallenge(duelId)
   const { account } = useDojoAccount()
-  const { gameImpl } = useGameplayContext()
+  const { gameImpl, animated } = useGameplayContext()
+  const { dispatchSetDuel } = usePistolsContext()
+
+  const { isLive, isFinished, message, duelistA, duelistB } = useChallenge(duelId)
+  const { challengeDescription } = useChallengeDescription(duelId)
 
   useEffectOnce(() => {
     gameImpl?.resetScene()
@@ -36,6 +38,11 @@ export default function Duel({
     <>
       <div className='TavernTitle' style={{ maxWidth: '250px' }}>
         <h1 className='Quote'>{`“${message}”`}</h1>
+        {(isFinished && animated == AnimationState.Finished) &&
+          <Segment>
+            {challengeDescription}
+          </Segment>
+        }
       </div>
 
       <div className='DuelSideA'>
@@ -112,7 +119,7 @@ function DuelProgress({
   // console.log(`Round 1:`, round1)
   // console.log(`Round 2:`, round2)
 
-  const { gameImpl, animated, hasLoadedAudioAssets } = useGameplayContext()
+  const { gameImpl, animated, hasLoadedAudioAssets, dispatchAnimated } = useGameplayContext()
 
   //-------------------------
   // Duel progression
@@ -131,7 +138,11 @@ function DuelProgress({
 
   const isAnimatingPistols = useMemo(() => (currentStage == DuelStage.PistolsShootout), [currentStage])
   const isAnimatingBlades = useMemo(() => (currentStage == DuelStage.BladesClash), [currentStage])
-  // if (isA) console.log(`stage, animated`, currentStage, animated, isAnimatingPistols, isAnimatingBlades)
+  useEffect(() => {
+    if (currentStage == DuelStage.Finished) {
+      dispatchAnimated(AnimationState.Finished)
+    }
+  }, [currentStage])
 
   useEffect(() => {
     if (isA && gameImpl && isAnimatingPistols && hasLoadedAudioAssets) {

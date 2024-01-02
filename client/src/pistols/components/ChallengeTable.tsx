@@ -138,7 +138,7 @@ function DuelItem({
   }
 
   return (
-    <Table.Row warning={isAwaiting} negative={isDraw || isCanceled} positive={isInProgress || winnerIsA || winnerIsB} textAlign='left' verticalAlign='middle' onClick={() => _gotoChallenge()}>
+    <Table.Row warning={isDraw} negative={isCanceled} positive={isInProgress || winnerIsA || winnerIsB} textAlign='left' verticalAlign='middle' onClick={() => _gotoChallenge()}>
       <Cell positive={winnerIsA} negative={winnerIsB}>
         <ProfilePicSquare profilePic={profilePicA} />
       </Cell>

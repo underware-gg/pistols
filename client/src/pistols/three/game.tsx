@@ -43,6 +43,7 @@ export enum AnimationState {
   None,
   Pistols,
   Blades,
+  Finished,
 }
 
 //-------------------------------------------
