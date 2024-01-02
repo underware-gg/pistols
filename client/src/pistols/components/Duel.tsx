@@ -171,7 +171,7 @@ function DuelProgress({
     if (round1?.state == RoundState.Finished && !isAnimatingPistols) {
       const steps = isA ? round1.duelist_a.move : round1.duelist_b.move
       const health = _healthResult(round1)
-      return <span>{name} walks {steps} steps<br />and {health}</span>
+      return <span>{name} walks <span className='Important'>{steps} steps</span><br />and {health}</span>
     }
     return null
   }, [round1, isAnimatingPistols])
@@ -180,7 +180,7 @@ function DuelProgress({
     if (round2?.state == RoundState.Finished && !isAnimatingBlades) {
       const blade = isA ? round2.duelist_a.move : round2.duelist_b.move
       const health = _healthResult(round2)
-      return <span>{name} clashes with {BladesNames[blade]}<br />and {health}</span>
+      return <span>{name} clashes with <span className='Important'>{BladesNames[blade]}</span><br />and {health}</span>
     }
     return null
   }, [round2, isAnimatingBlades])

@@ -4,7 +4,6 @@ import * as THREE from 'three'
 //----------------------------
 // Texture Assets
 //
-
 const TEXTURES = {
   TESTCARD: { path: '/textures/testcard.jpg' },
   BG_DUEL: { path: '/textures/bg_duel.png' },
@@ -56,7 +55,17 @@ const SPRITESHEETS = {
       frameCount: 11,
       frameRate: 8,
     },
-    STRIKE: {
+    STRIKE_LIGHT: {
+      path: '/textures/animations/Female Duelist/Strike',
+      frameCount: 13,
+      frameRate: 8,
+    },
+    STRIKE_HEAVY: {
+      path: '/textures/animations/Female Duelist/Strike',
+      frameCount: 13,
+      frameRate: 8,
+    },
+    STRIKE_BLOCK: {
       path: '/textures/animations/Female Duelist/Strike',
       frameCount: 13,
       frameRate: 8,
@@ -85,6 +94,9 @@ enum AudioName {
   BODY_FALL = 'BODY_FALL',
   GRUNT_FEMALE = 'GRUNT_FEMALE',
   GRUNT_MALE = 'GRUNT_MALE',
+  STRIKE_LIGHT = 'STRIKE_LIGHT',
+  STRIKE_HEAVY = 'STRIKE_HEAVY',
+  STRIKE_BLOCK = 'STRIKE_BLOCK',
 }
 
 interface AudioAsset {
@@ -125,6 +137,21 @@ let AUDIO_ASSETS: AudioAssets = {
     path: '/audio/sfx/grunt-man.mp3',
     loop: false,
     delaySeconds: 0.6,
+  },
+  STRIKE_LIGHT: {
+    path: '/audio/sfx/strike-light.mp3',
+    loop: false,
+    delaySeconds: 0.8,
+  },
+  STRIKE_HEAVY: {
+    path: '/audio/sfx/strike-heavy.mp3',
+    loop: false,
+    delaySeconds: 0.85,
+  },
+  STRIKE_BLOCK: {
+    path: '/audio/sfx/strike-block.mp3',
+    loop: false,
+    delaySeconds: 0.9,
   },
 }
 

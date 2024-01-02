@@ -11,7 +11,7 @@ export var emitter = ee()
 import { AudioName, AUDIO_ASSETS, TEXTURES, SPRITESHEETS } from '@/pistols/data/assets'
 import { map } from '../utils/utils'
 import { SpriteSheet, Actor } from './SpriteSheetMaker'
-import { FULL_HEALTH } from '../utils/pistols'
+import { Blades, FULL_HEALTH } from '../utils/pistols'
 
 const PI = Math.PI
 const HALF_PI = Math.PI * 0.5
@@ -246,6 +246,15 @@ export function playActorAnimation(actorId: string, key: string, callback: Funct
   if (['SHOT_INJURED_FRONT', 'SHOT_INJURED_BACK', 'STRUCK_INJURED'].includes(key)) {
     playAudio(AudioName.GRUNT_FEMALE)
   }
+  if (key == 'STRIKE_LIGHT') {
+    playAudio(AudioName.STRIKE_LIGHT)
+  }
+  if (key == 'STRIKE_HEAVY') {
+    playAudio(AudioName.STRIKE_HEAVY)
+  }
+  if (key == 'STRIKE_BLOCK') {
+    playAudio(AudioName.STRIKE_BLOCK)
+  }
 }
 
 
@@ -407,6 +416,8 @@ export function animateShootout(paceCountA, paceCountB, healthA, healthB) {
 
 }
 
+const _getBladeAnimName = (blade) => (blade == Blades.Light ? 'STRIKE_LIGHT' : blade == Blades.Heavy ? 'STRIKE_HEAVY' : 'STRIKE_BLOCK')
+
 export function animateBlades(bladeA, bladeB, healthA, healthB) {
 
   // Rewind camera and
@@ -415,7 +426,7 @@ export function animateBlades(bladeA, bladeB, healthA, healthB) {
   animateActorPaces('B', 0, 0)
 
   // animate sprites
-  playActorAnimation('A', 'STRIKE', () => {
+  playActorAnimation('A', _getBladeAnimName(bladeA), () => {
     let survived = 0
     if (healthB == 0) {
       playActorAnimation('B', 'STRUCK_DEAD', () => emitter.emit('animated', AnimationState.Blades))
@@ -434,7 +445,7 @@ export function animateBlades(bladeA, bladeB, healthA, healthB) {
     if (survived == 2) emitter.emit('animated', AnimationState.Blades)
   })
 
-  playActorAnimation('B', 'STRIKE', () => {
+  playActorAnimation('B', _getBladeAnimName(bladeB), () => {
     // only A need to animate
   })
 
