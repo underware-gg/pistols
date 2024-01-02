@@ -2,6 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import App from '@/pistols/components/App'
 import Background from '@/pistols/components/Background';
+import { Image } from 'semantic-ui-react';
 // import SplashArt from '@/components/SplashArt';
 
 export default function IndexPage() {
@@ -10,8 +11,13 @@ export default function IndexPage() {
     // <App backgroundImage={'/images/bg_duellists_1.jpg'} className='AppBackgroundFit'>
     <App>
       <Background className='BackgroundSplash'>
-
         <div className='AlignCenter'>
+
+          <Link href='/gate'>
+            <Image src='/images/logo.png' width={100} height={100} centered />
+          </Link>
+
+          <div className='Spacer20' />
 
           <Link href='/gate'>
             <h1>Pistols at 10 Blocks</h1>
@@ -30,9 +36,12 @@ export default function IndexPage() {
           <div className='Spacer20' />
           <div className='Spacer20' />
           <div className='Spacer20' />
+          <div className='Spacer20' />
+          <div className='Spacer20' />
+          <div className='Spacer20' />
+          <div className='Spacer20' />
 
         </div>
-
       </Background>
     </App>
   );
