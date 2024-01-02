@@ -8,74 +8,106 @@ const TEXTURES = {
   TESTCARD: { path: '/textures/testcard.jpg' },
   BG_DUEL: { path: '/textures/bg_duel.png' },
 }
-const SPRITESHEETS = {
+
+enum CharacterType {
+  FEMALE = 'FEMALE',
+  // MALE = 'MALE',
+}
+export enum AnimName {
+  STILL = 'STILL',
+  STEP_1 = 'STEP_1',
+  STEP_2 = 'STEP_2',
+  TWO_STEPS = 'TWO_STEPS',
+  SHOOT = 'SHOOT',
+  SHOT_INJURED_BACK = 'SHOT_INJURED_BACK',
+  SHOT_INJURED_FRONT = 'SHOT_INJURED_FRONT',
+  SHOT_DEAD_BACK = 'SHOT_DEAD_BACK',
+  SHOT_DEAD_FRONT = 'SHOT_DEAD_FRONT',
+  STRIKE_LIGHT = 'STRIKE_LIGHT',
+  STRIKE_HEAVY = 'STRIKE_HEAVY',
+  STRIKE_BLOCK = 'STRIKE_BLOCK',
+  STRUCK_INJURED = 'STRUCK_INJURED',
+  STRUCK_DEAD = 'STRUCK_DEAD',
+}
+interface AnimationAsset {
+  path: string
+  frameCount: number
+  frameRate: number
+}
+type Spritesheets = {
+  [key in CharacterType]: Animations
+}
+type Animations = {
+  [key in AnimName]: AnimationAsset
+}
+const SPRITESHEETS: Spritesheets = {
   FEMALE: {
-    STILL: {
+    [AnimName.STILL]: {
       path: '/textures/animations/Female Duelist/Still',
       frameCount: 1,
       frameRate: 8,
     },
-    STEP_1: {
+    [AnimName.STEP_1]: {
       path: '/textures/animations/Female Duelist/Step 1',
       frameCount: 8,
       frameRate: 8,
     },
-    STEP_2: {
+    [AnimName.STEP_2]: {
       path: '/textures/animations/Female Duelist/Step 2',
       frameCount: 8,
       frameRate: 8,
     },
-    TWO_STEPS: {
+    [AnimName.TWO_STEPS]: {
       path: '/textures/animations/Female Duelist/Two Steps',
       frameCount: 16,
       frameRate: 8,
     },
-    SHOOT: {
+    [AnimName.SHOOT]: {
       path: '/textures/animations/Female Duelist/Shoot',
       frameCount: 16,
       frameRate: 8,
     },
-    SHOT_INJURED_BACK: {
+    [AnimName.SHOT_INJURED_BACK]: {
       path: '/textures/animations/Female Duelist/Shot and Injured Back',
       frameCount: 11,
       frameRate: 8,
     },
-    SHOT_INJURED_FRONT: {
+    [AnimName.SHOT_INJURED_FRONT]: {
       path: '/textures/animations/Female Duelist/Shot and Injured Front',
       frameCount: 15,
       frameRate: 8,
     },
-    SHOT_DEAD_BACK: {
+    [AnimName.SHOT_DEAD_BACK]: {
       path: '/textures/animations/Female Duelist/Shot Dead Back',
       frameCount: 7,
       frameRate: 8,
     },
-    SHOT_DEAD_FRONT: {
+    [AnimName.SHOT_DEAD_FRONT]: {
       path: '/textures/animations/Female Duelist/Shot Dead Front',
       frameCount: 11,
       frameRate: 8,
     },
-    STRIKE_LIGHT: {
+    [AnimName.STRIKE_LIGHT]: {
       path: '/textures/animations/Female Duelist/Strike',
       frameCount: 13,
       frameRate: 8,
     },
-    STRIKE_HEAVY: {
+    [AnimName.STRIKE_HEAVY]: {
       path: '/textures/animations/Female Duelist/Strike',
       frameCount: 13,
       frameRate: 8,
     },
-    STRIKE_BLOCK: {
+    [AnimName.STRIKE_BLOCK]: {
       path: '/textures/animations/Female Duelist/Strike',
       frameCount: 13,
       frameRate: 8,
     },
-    STRUCK_INJURED: {
+    [AnimName.STRUCK_INJURED]: {
       path: '/textures/animations/Female Duelist/Struck and Injured',
       frameCount: 6,
       frameRate: 8,
     },
-    STRUCK_DEAD: {
+    [AnimName.STRUCK_DEAD]: {
       path: '/textures/animations/Female Duelist/Struck Dead',
       frameCount: 6,
       frameRate: 8,
