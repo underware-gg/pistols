@@ -131,6 +131,7 @@ dist
 
 # misc
 .DS_Store
+*.zip
 
 # Cairo
 Scarb.lock
