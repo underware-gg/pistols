@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
 import { GameState, useGameplayContext } from '@/pistols/hooks/GameplayContext'
-import { loadAudioAssets, isAudioAssetsLoaded } from '@/pistols/data/assets'
+import { loadAudioAssets, isAudioAssetsLoaded, AudioName } from '@/pistols/data/assets'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import GameView from '@/pistols/components/GameView'
 import { useSettingsContext } from '../hooks/SettingsContext'
@@ -71,7 +71,7 @@ function GameStartOverlay({
   }, [isReady, hasInteracted])
 
   if (hasLoadedAudioAssets === true) {
-    return <GameAudios />
+    return <GameAudios isVisible={isVisible}/>
   }
 
   return (
@@ -82,14 +82,26 @@ function GameStartOverlay({
   )
 }
 
-const GameAudios = () => {
+const GameAudios = ({
+  isVisible
+}) => {
   const { musicEnabled, sfxEnabled } = useSettingsContext()
-  const { gameImpl, gameState, isPlaying } = useGameplayContext()
+  const { gameImpl } = useGameplayContext()
 
   useEffect(() => {
-    const _play = (musicEnabled)
-    // gameImpl?.playAudio(AudioName.AMBIENT, _play)
-  }, [musicEnabled])
+    const _play = (musicEnabled && isVisible)
+    gameImpl?.playAudio(AudioName.AMBIENT, _play)
+  }, [musicEnabled, isVisible])
+
+  useEffect(() => {
+    if (!isVisible) {
+      gameImpl?.stopAudio(AudioName.AMBIENT)
+    }
+  }, [isVisible])
+
+  useEffect(() => {
+    gameImpl?.setSfxEnabled(sfxEnabled)
+  }, [sfxEnabled])
 
   return <></>
 }

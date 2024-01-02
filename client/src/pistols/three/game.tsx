@@ -61,6 +61,8 @@ let _scene: THREE.Scene
 let _supportsExtension: boolean = true
 let _stats
 
+let _sfxEnabled = true
+
 
 export function dispose() {
   if (_animationRequest) cancelAnimationFrame(_animationRequest)
@@ -239,22 +241,22 @@ export function playActorAnimation(actorId: string, key: AnimName, callback: Fun
   _actor[actorId].setAnimation(key)
   _actor[actorId].playOnce(callback)
   if (key == AnimName.SHOOT) {
-    playAudio(AudioName.SHOOT)
+    playAudio(AudioName.SHOOT, _sfxEnabled)
   }
   if ([AnimName.SHOT_DEAD_FRONT, AnimName.SHOT_DEAD_BACK, AnimName.STRUCK_DEAD].includes(key)) {
-    playAudio(AudioName.BODY_FALL)
+    playAudio(AudioName.BODY_FALL, _sfxEnabled)
   }
   if ([AnimName.SHOT_INJURED_FRONT, AnimName.SHOT_INJURED_BACK, AnimName.STRUCK_INJURED].includes(key)) {
-    playAudio(AudioName.GRUNT_FEMALE)
+    playAudio(AudioName.GRUNT_FEMALE, _sfxEnabled)
   }
   if (key == AnimName.STRIKE_LIGHT) {
-    playAudio(AudioName.STRIKE_LIGHT)
+    playAudio(AudioName.STRIKE_LIGHT, _sfxEnabled)
   }
   if (key == AnimName.STRIKE_HEAVY) {
-    playAudio(AudioName.STRIKE_HEAVY)
+    playAudio(AudioName.STRIKE_HEAVY, _sfxEnabled)
   }
   if (key == AnimName.STRIKE_BLOCK) {
-    playAudio(AudioName.STRIKE_BLOCK)
+    playAudio(AudioName.STRIKE_BLOCK, _sfxEnabled)
   }
 }
 
@@ -482,4 +484,8 @@ export function pauseAudio(name: AudioName) {
 export function stopAudio(name: AudioName) {
   const asset = AUDIO_ASSETS[name]
   asset?.object?.stop()
+}
+
+export function setSfxEnabled(enabled: boolean) {
+  _sfxEnabled = enabled
 }

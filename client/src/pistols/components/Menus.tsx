@@ -8,6 +8,7 @@ import { ChallengeState } from '@/pistols/utils/pistols'
 import AccountHeader from '@/pistols/components/account/AccountHeader'
 import { SPRITESHEETS } from '../data/assets'
 import { useGameplayContext } from '../hooks/GameplayContext'
+import { useSettingsContext } from '../hooks/SettingsContext'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -72,11 +73,26 @@ export function MenuTavern({
 export function MenuDuel({
 }) {
   const router = useRouter()
+
+  const { settings, SettingsActions, dispatch } = useSettingsContext()
+  const _switch = (type, payload) => {
+    dispatch({
+      type,
+      payload,
+    })
+  }
+
   return (
     <div className='MenuDuel AlignCenter NoMouse'>
       <Menu secondary compact className='YesMouse' size='huge'>
         <Menu.Item onClick={() => router.push('/tavern')}>
           Back to Tavern
+        </Menu.Item>
+        <Menu.Item onClick={() => _switch(SettingsActions.MUSIC_ENABLED, !settings.musicEnabled)}>
+          Music {settings.musicEnabled ? 'ON' : 'OFF'}
+        </Menu.Item>
+        <Menu.Item onClick={() => _switch(SettingsActions.SFX_ENABLED, !settings.sfxEnabled)}>
+          SFX {settings.sfxEnabled ? 'ON' : 'OFF'}
         </Menu.Item>
       </Menu>
     </div>

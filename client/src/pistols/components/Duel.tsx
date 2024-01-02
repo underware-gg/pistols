@@ -40,7 +40,7 @@ export default function Duel({
         <h1 className='Quote'>{`“${message}”`}</h1>
         {(isFinished && animated == AnimationState.Finished) &&
           <Segment>
-            {challengeDescription}
+            <h3 className='Important'>{challengeDescription}</h3>
           </Segment>
         }
       </div>
