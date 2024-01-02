@@ -5,7 +5,7 @@
 const nextConfig = {
   env: {
     SERVER_URL: process.env.SERVER_URL ?? '',
-    PROFILE_PIC_COUNT: '6',
+    PROFILE_PIC_COUNT: '7',
   },
   reactStrictMode: true,
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
