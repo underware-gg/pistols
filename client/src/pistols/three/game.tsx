@@ -237,6 +237,15 @@ export function switchActor(actorId, newActorName) {
 export function playActorAnimation(actorId: string, key: string, callback: Function = null) {
   _actor[actorId].setAnimation(key)
   _actor[actorId].playOnce(callback)
+  if (key == 'SHOOT') {
+    playAudio(AudioName.SHOOT)
+  }
+  if (['SHOT_DEAD_FRONT', 'SHOT_DEAD_BACK', 'STRUCK_DEAD'].includes(key)) {
+    playAudio(AudioName.BODY_FALL)
+  }
+  if (['SHOT_INJURED_FRONT', 'SHOT_INJURED_BACK', 'STRUCK_INJURED'].includes(key)) {
+    playAudio(AudioName.GRUNT_FEMALE)
+  }
 }
 
 
@@ -433,23 +442,20 @@ export function animateBlades(bladeA, bladeB, healthA, healthB) {
 
 
 
-
-
-
-
-
 //-------------------------------
 // Audio
 //
 export function playAudio(name: AudioName, enabled: boolean = true) {
   const asset = AUDIO_ASSETS[name]
   if (asset?.object) {
-    if (asset.object.isPlaying) {
-      asset.object.stop()
-    }
-    if (enabled) {
-      asset.object.play()
-    }
+    setTimeout(() => {
+      if (asset.object.isPlaying) {
+        asset.object.stop()
+      }
+      if (enabled) {
+        asset.object.play()
+      }
+    }, (asset.delaySeconds ?? 0) * 1000)
   }
 }
 
@@ -462,4 +468,3 @@ export function stopAudio(name: AudioName) {
   const asset = AUDIO_ASSETS[name]
   asset?.object?.stop()
 }
-

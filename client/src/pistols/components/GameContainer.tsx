@@ -4,6 +4,7 @@ import { GameState, useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { loadAudioAssets, isAudioAssetsLoaded } from '@/pistols/data/assets'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import GameView from '@/pistols/components/GameView'
+import { useSettingsContext } from '../hooks/SettingsContext'
 
 function GameContainer({
   isVisible,
@@ -74,8 +75,22 @@ function GameStartOverlay({
     <div className={`GameView Overlay CenteredContainer AboveAll`}>
       {audioAssetsLoaded === undefined && <ActionButton large label='READY!' onClick={() => dispatchInteracted()} />}
       {audioAssetsLoaded === false && <h1>loading assets...</h1>}
+      {audioAssetsLoaded === true &&  <GameAudios />}
     </div>
   )
 }
+
+const GameAudios = () => {
+  const { musicEnabled, sfxEnabled } = useSettingsContext()
+  const { gameImpl, gameState, isPlaying } = useGameplayContext()
+
+  useEffect(() => {
+    const _play = (musicEnabled)
+    // gameImpl?.playAudio(AudioName.AMBIENT, _play)
+  }, [musicEnabled])
+
+  return <></>
+}
+
 
 export default GameContainer

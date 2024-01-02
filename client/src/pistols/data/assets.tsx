@@ -81,7 +81,7 @@ const SPRITESHEETS = {
 //
 enum AudioName {
   AMBIENT = 'AMBIENT',
-  SHOT = 'SHOT',
+  SHOOT = 'SHOOT',
   BODY_FALL = 'BODY_FALL',
   GRUNT_FEMALE = 'GRUNT_FEMALE',
   GRUNT_MALE = 'GRUNT_MALE',
@@ -93,6 +93,7 @@ interface AudioAsset {
   volume?: number
   object?: any
   loaded?: boolean
+  delaySeconds?: number   // we can delay playback to match animation frame
 }
 type AudioAssets = {
   [key in AudioName]: AudioAsset
@@ -105,21 +106,25 @@ let AUDIO_ASSETS: AudioAssets = {
     volume: 0.5,
     loop: true,
   },
-  SHOT: {
+  SHOOT: {
     path: '/audio/sfx/pistol-shot.mp3',
     loop: false,
+    delaySeconds: 1.2,
   },
   BODY_FALL: {
     path: '/audio/sfx/body-fall.mp3',
     loop: false,
+    delaySeconds: 0.4,
   },
   GRUNT_FEMALE: {
     path: '/audio/sfx/grunt-female.mp3',
     loop: false,
+    delaySeconds: 0.6,
   },
   GRUNT_MALE: {
     path: '/audio/sfx/grunt-man.mp3',
     loop: false,
+    delaySeconds: 0.6,
   },
 }
 
