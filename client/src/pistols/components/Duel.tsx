@@ -11,7 +11,7 @@ import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { BladesNames, FULL_HEALTH, HALF_HEALTH, RoundState } from '@/pistols/utils/pistols'
-import { MenuDuel, MenuDebugAnimations } from './Menus'
+import { MenuDuel, MenuDebugAnimations } from '@/pistols/components/Menus'
 import CommitModal from '@/pistols/components/CommitModal'
 import { AnimationState } from '@/pistols/three/game'
 

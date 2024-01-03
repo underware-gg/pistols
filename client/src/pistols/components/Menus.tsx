@@ -6,9 +6,10 @@ import { useChallengeIdsByState, useChallengesByDuelist } from '@/pistols/hooks/
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { ChallengeState } from '@/pistols/utils/pistols'
 import AccountHeader from '@/pistols/components/account/AccountHeader'
-import { SPRITESHEETS } from '../data/assets'
-import { useGameplayContext } from '../hooks/GameplayContext'
-import { useSettingsContext } from '../hooks/SettingsContext'
+import { SPRITESHEETS } from '@/pistols/data/assets'
+import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
+import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
+import { SettingsMenuItem } from '@/pistols/components/ui/Buttons'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -73,27 +74,15 @@ export function MenuTavern({
 export function MenuDuel({
 }) {
   const router = useRouter()
-
-  const { settings, SettingsActions, dispatch } = useSettingsContext()
-  const _switch = (type, payload) => {
-    dispatch({
-      type,
-      payload,
-    })
-  }
-
+  const { settings, SettingsActions } = useSettingsContext()
   return (
     <div className='MenuDuel AlignCenter NoMouse'>
       <Menu secondary compact className='YesMouse' size='huge'>
         <Menu.Item onClick={() => router.push('/tavern')}>
           Back to Tavern
         </Menu.Item>
-        <Menu.Item onClick={() => _switch(SettingsActions.MUSIC_ENABLED, !settings.musicEnabled)}>
-          Music {settings.musicEnabled ? 'ON' : 'OFF'}
-        </Menu.Item>
-        <Menu.Item onClick={() => _switch(SettingsActions.SFX_ENABLED, !settings.sfxEnabled)}>
-          SFX {settings.sfxEnabled ? 'ON' : 'OFF'}
-        </Menu.Item>
+        <SettingsMenuItem prefix='Music' settingsKey={SettingsActions.MUSIC_ENABLED} currentValue={settings.musicEnabled} />
+        <SettingsMenuItem prefix='SFX' settingsKey={SettingsActions.SFX_ENABLED} currentValue={settings.sfxEnabled} />
       </Menu>
     </div>
   )

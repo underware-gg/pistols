@@ -7,7 +7,7 @@ import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { MenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ChallengeState, ChallengeStateNames } from '@/pistols/utils/pistols'
 import { formatTimestamp, formatTimestampDelta } from '@/pistols/utils/utils'
-import { useTimestampCountdown } from '../hooks/useTimestamp'
+import { useTimestampCountdown } from '@/pistols/hooks/useTimestamp'
 
 const Row = Grid.Row
 const Col = Grid.Column

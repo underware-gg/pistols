@@ -9,7 +9,7 @@ import { ProfileDescription } from '@/pistols/components/account/ProfileDescript
 import { ProfilePicButton } from '@/pistols/components/account/ProfilePic'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ChallengeState, makeDuelUrl } from '@/pistols/utils/pistols'
-import { AccountShort } from './ui/Account'
+import { AccountShort } from '@/pistols/components/ui/Account'
 
 const Row = Grid.Row
 const Col = Grid.Column
