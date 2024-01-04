@@ -78,7 +78,7 @@ export const useChallenge = (duelId: bigint | string) => {
   const message = useMemo(() => feltToString(challenge?.message ?? 0n), [challenge])
   const passCode = useMemo(() => feltToString(challenge?.pass_code ?? 0n), [challenge])
   const lords = useMemo(() => (challenge?.lords ?? 0), [challenge])
-  const round = useMemo(() => (challenge?.round_number ?? 0), [challenge])
+  const roundNumber = useMemo(() => (challenge?.round_number ?? 0), [challenge])
   const timestamp = useMemo(() => (challenge?.timestamp ?? 0), [challenge])
   const timestamp_expire = useMemo(() => (challenge?.timestamp_expire ?? 0), [challenge])
   const timestamp_start = useMemo(() => (challenge?.timestamp_start ?? 0), [challenge])
@@ -87,8 +87,6 @@ export const useChallenge = (duelId: bigint | string) => {
   return {
     challengeExists: (challenge != null),
     state,
-    isLive: (state == ChallengeState.Awaiting || state == ChallengeState.InProgress),
-    isFinished: (state == ChallengeState.Resolved || state == ChallengeState.Draw),
     duelistA,
     duelistB,
     challenger: duelistA,
@@ -97,8 +95,10 @@ export const useChallenge = (duelId: bigint | string) => {
     passCode,
     lords,
     // progress and results
-    round,
+    roundNumber,
     winner,
+    isLive: (state == ChallengeState.Awaiting || state == ChallengeState.InProgress),
+    isFinished: (state == ChallengeState.Resolved || state == ChallengeState.Draw),
     // times
     timestamp,
     timestamp_expire,

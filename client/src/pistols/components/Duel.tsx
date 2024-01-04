@@ -5,7 +5,7 @@ import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { useDuel } from '@/pistols/hooks/useDuel'
+import { DuelStage, useDuel } from '@/pistols/hooks/useDuel'
 import { useCommitMove } from '@/pistols/hooks/useCommitReveal'
 import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
@@ -93,16 +93,6 @@ function DuelProfile({
   )
 }
 
-enum DuelStage {
-  Null,             // 0
-  StepsCommit,      // 1
-  StepsReveal,      // 2
-  PistolsShootout,  // 3
-  BladesCommit,     // 4
-  BladesReveal,     // 5
-  BladesClash,      // 6
-  Finished,         // 7
-}
 
 function DuelProgress({
   account,
@@ -114,28 +104,24 @@ function DuelProgress({
   floated,
 }) {
   const { name } = useDuelist(isA ? duelistA : duelistB)
-  const { challenge, round1, round2 } = useDuel(duelId)
-  // console.log(`Challenge:`, challenge)
-  // console.log(`Round 1:`, round1)
-  // console.log(`Round 2:`, round2)
+  const { challenge, round1, round2, roundNumber, duelStage } = useDuel(duelId)
+  console.log(`Challenge:`, challenge)
+  console.log(`Round 1:`, round1)
+  console.log(`Round 2:`, round2)
+
 
   const { gameImpl, animated, hasLoadedAudioAssets, dispatchAnimated } = useGameplayContext()
 
   //-------------------------
   // Duel progression
   //
-  const currentStage = useMemo(() => {
-    if (!round1 || round1.state == RoundState.Null) return DuelStage.Null
-    if (round1.state == RoundState.Commit) return DuelStage.StepsCommit
-    if (round1.state == RoundState.Reveal) return DuelStage.StepsReveal
-    if (animated < AnimationState.Pistols) return DuelStage.PistolsShootout
-    if (!round2) return DuelStage.Finished // finished on pistols
-    if (round2.state == RoundState.Commit) return DuelStage.BladesCommit
-    if (round2.state == RoundState.Reveal) return DuelStage.BladesReveal
-    if (animated < AnimationState.Blades) return DuelStage.BladesClash
-    return DuelStage.Finished
-  }, [round1, round2, animated])
 
+  const currentStage = useMemo(() => {
+    if (duelStage > DuelStage.PistolsShootout && animated < AnimationState.Pistols) return DuelStage.PistolsShootout
+    if (round2 && duelStage > DuelStage.BladesClash && animated < AnimationState.Blades) return DuelStage.BladesClash
+    return duelStage
+  }, [duelStage, animated])
+ 
   const isAnimatingPistols = useMemo(() => (currentStage == DuelStage.PistolsShootout), [currentStage])
   const isAnimatingBlades = useMemo(() => (currentStage == DuelStage.BladesClash), [currentStage])
   useEffect(() => {
@@ -157,12 +143,6 @@ function DuelProgress({
       gameImpl.animateBlades(round2.duelist_a.move, round2.duelist_b.move, round2.duelist_a.health, round2.duelist_b.health)
     }
   }, [gameImpl, isAnimatingBlades])
-
-  const roundNumber = useMemo(() => {
-    if (currentStage == DuelStage.StepsCommit || currentStage == DuelStage.StepsReveal) return 1
-    if (currentStage == DuelStage.BladesCommit || currentStage == DuelStage.BladesReveal) return 2
-    return 0
-  }, [currentStage])
 
   const completedStages = useMemo(() => {
     return {
