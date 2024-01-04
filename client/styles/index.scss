@@ -426,15 +426,15 @@ $box-h: calc((100vh - $aspect-h) / 2);
 
 // Pistols
 
-.MenuTavern {
+.MenuTop {
   width: 100%;
   position: absolute;
   top: 0;
   left: 0;
   padding: 15px;
 }
-.MenuDuel {
-  @extend .MenuTavern;
+.MenuBottom {
+  @extend .MenuTop;
   top: unset;
   bottom: 0;
 }
@@ -595,13 +595,13 @@ $box-h: calc((100vh - $aspect-h) / 2);
   // font-weight: 600;
 }
 .ui.secondary.menu .item {
-  background-color: rgba($color-shadow, 0.4);
+  background-color: rgba($color-bg, 0.5);
   color: $color-important;
 }
 .ui.secondary.menu .dropdown.item:hover,
 .ui.secondary.menu .link.item:hover,
 .ui.secondary.menu a.item:hover {
-  background-color: rgba($color-bg, 0.5);
+  background-color: rgba($color-bg, 0.7);
   color: $color-important;
 }
 //

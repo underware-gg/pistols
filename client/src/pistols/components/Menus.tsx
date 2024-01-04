@@ -60,7 +60,7 @@ export function MenuTavern({
   }, [menuKey, yourDuelsBubble, liveDuelsBubble])
 
   return (
-    <Menu secondary className='MenuTavern' size='huge'>
+    <Menu secondary className='MenuTop' size='huge'>
       {items}
 
       <Menu.Menu position='right'>
@@ -71,17 +71,33 @@ export function MenuTavern({
   )
 }
 
+export function MenuSettings({
+}) {
+  const router = useRouter()
+  const { settings, SettingsActions } = useSettingsContext()
+  const { hasLoadedAudioAssets } = useGameplayContext()
+  if (!hasLoadedAudioAssets) return <></>
+  return (
+    <div className='MenuBottom'>
+      <Menu secondary compact className='YesMouse' size='huge'>
+        <SettingsMenuItem prefix='Music' settingsKey={SettingsActions.MUSIC_ENABLED} currentValue={settings.musicEnabled} />
+      </Menu>
+    </div>
+  )
+}
+
+
 export function MenuDuel({
 }) {
   const router = useRouter()
   const { settings, SettingsActions } = useSettingsContext()
   return (
-    <div className='MenuDuel AlignCenter NoMouse'>
+    <div className='MenuBottom AlignCenter NoMouse'>
       <Menu secondary compact className='YesMouse' size='huge'>
         <Menu.Item onClick={() => router.push('/tavern')}>
           Back to Tavern
         </Menu.Item>
-        <SettingsMenuItem prefix='Music' settingsKey={SettingsActions.MUSIC_ENABLED} currentValue={settings.musicEnabled} />
+        {/* <SettingsMenuItem prefix='Music' settingsKey={SettingsActions.MUSIC_ENABLED} currentValue={settings.musicEnabled} /> */}
         <SettingsMenuItem prefix='SFX' settingsKey={SettingsActions.SFX_ENABLED} currentValue={settings.sfxEnabled} />
       </Menu>
     </div>
@@ -112,7 +128,7 @@ function MenuDebugTriggers() {
 
   return (
     <>
-      <div className='MenuDuel AlignCenter' style={{ bottom: '120px' }}>
+      <div className='MenuBottom AlignCenter' style={{ bottom: '120px' }}>
         <Menu secondary compact>
           <Menu.Item className='NoPadding' onClick={() => _paces(1, 1, 0, 0)}>
             1_1:DD
@@ -177,7 +193,7 @@ function MenuDebugTriggers() {
         </Menu>
       </div>
 
-      <div className='MenuDuel AlignCenter' style={{ bottom: '150px' }}>
+      <div className='MenuBottom AlignCenter' style={{ bottom: '150px' }}>
         <Menu secondary compact>
           <Menu.Item className='NoPadding' onClick={() => _blades(1, 1, 100, 100)}>
             H_H:AA
@@ -235,7 +251,7 @@ function MenuDebugActors({
   }, [gameImpl])
 
   return (
-    <div className='MenuDuel AlignCenter' style={{ bottom: actorId == 'B' ? '50px' : '80px' }}>
+    <div className='MenuBottom AlignCenter' style={{ bottom: actorId == 'B' ? '50px' : '80px' }}>
       <Menu secondary compact size='small'>
         {items}
       </Menu>

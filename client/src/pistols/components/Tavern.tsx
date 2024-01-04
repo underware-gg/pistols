@@ -2,10 +2,11 @@ import React from 'react'
 import { Container, Grid } from 'semantic-ui-react'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
+import { MenuSettings, MenuTavern } from '@/pistols/components/Menus'
 import { DuelistTable } from '@/pistols/components/DuelistTable'
+import { TavernAudios } from '@/pistols/components/GameContainer'
 import ChallengeModal from '@/pistols/components/ChallengeModal'
 import DuelistModal from '@/pistols/components/DuelistModal'
-import { MenuTavern } from '@/pistols/components/Menus'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -15,6 +16,7 @@ export default function Tavern() {
   return (
     <>
       <MenuTavern />
+      <MenuSettings />
       {/* <AccountHeader /> */}
 
       <div className='TavernTitle'>
@@ -31,6 +33,7 @@ export default function Tavern() {
         </div>
         <DuelistModal />
         <ChallengeModal />
+        <TavernAudios />
       </Container>
     </>
   )
