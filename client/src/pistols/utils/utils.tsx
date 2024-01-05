@@ -27,7 +27,10 @@ export const feltToString = (hex: string): string => (BigInt(hex) > 0n ? shortSt
 export const pedersen = (a: bigint | string | number, b: bigint | string | number): bigint => (BigInt(ec.starkCurve.pedersen(BigInt(a), BigInt(b))))
 
 export const formatTimestamp = (t: number): string => {
-  const iso = (new Date(t * 1000).toISOString())
+  const timeUTC = new Date(t * 1000).getTime()
+  const tzoffset = (new Date(0)).getTimezoneOffset() * 60000 // local timezone offset in milliseconds
+  const localDate = new Date(timeUTC - tzoffset)
+  const iso = localDate.toISOString()
   const [date, iso2] = iso.split('T')
   const [time, iso3] = iso2.split('.')
   const [hour, minutes, seconds] = time.split(':')
