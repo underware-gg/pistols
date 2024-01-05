@@ -11,6 +11,28 @@ import { Blades } from '@/pistols/utils/pistols'
 // re-export semantic ui Icon for convenience
 export { Icon }
 
+const _downSize = (size) => {
+  return (
+    size == 'small' ? 'tiny'
+      : size == null ? 'small'
+        : size == 'large' ? null
+          : size == 'big' ? 'large'
+            : size == 'huge' ? 'big'
+              : null
+  )
+}
+
+const _upSize = (size) => {
+  return (
+    size == 'tiny' ? 'small' 
+      : size == 'small' ? null
+        : size == null ? 'large'
+          : size == 'large' ? 'big'
+            : size == 'big' ? 'huge'
+              : null
+  )
+}
+
 //---------------------------------
 // Popup Tooltip
 // wrap content in <span> so it will apeear on disabled buttons
@@ -173,7 +195,7 @@ export function EmojiIcon({
   rotated = null,
 }: EmojiIconProps) {
   return (
-    <i className={`icon ${size} ${rotated && `${rotated} rotated`} ${disabled && `disabled`} ${flipped && `${flipped} flipped`} ${className}`} style={style}>
+    <i className={`${className} icon ${size} ${rotated && `${rotated} rotated`} ${disabled && `disabled`} ${flipped && `${flipped} flipped`}`} style={style}>
       {emoji}
     </i>
   )
@@ -189,17 +211,17 @@ interface StepsIconProps {
 }
 export function StepsIcon({
   stepCount,
-  size = null,
+  size = 'large',
 }: StepsIconProps) {
   if (stepCount < 1 || stepCount > 10) {
     return <Icon name='question circle' size={size} />
   }
-  const emoji = stepCount == 10 ? '10' : '1234567890'[stepCount - 1]
+  const steps = stepCount == 10 ? '10' : '1234567890'[stepCount - 1]
   return (
     // <EmojiIcon emoji={emoji} size={size} className='StepsIconRound' />
-    <IconGroup size='large'>
+    <IconGroup size={_downSize(size)}>
       <EmojiIcon emoji={'🥾'} size={size} disabled />
-      <EmojiIcon emoji={emoji} size={size} className='StepsIcon' />
+      <EmojiIcon emoji={steps} size={size} className={`StepsIcon`} />
     </IconGroup>
   )
 }
@@ -234,19 +256,17 @@ export function BladesIcon({
 interface CompletedIconProps {
   completed: boolean
   size?: IconSizeProp
-  tickSize?: IconSizeProp
   children: any
 }
 export function CompletedIcon({
   completed,
   size = null,
-  tickSize = 'large',
   children,
 }: CompletedIconProps) {
   return (
-    <IconGroup size={size}>
+    <IconGroup size={_upSize(size)}>
       {children}
-      {completed && <Icon size={tickSize} name='checkmark' color='green' style={{ margin: '-4px 0 0 0' }} />}
+      {completed && <Icon size={size} name='checkmark' color='green' style={{ margin: '-4px 0 0 0' }} />}
     </IconGroup>
   )
 }

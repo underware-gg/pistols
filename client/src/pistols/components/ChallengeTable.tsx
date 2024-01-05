@@ -1,15 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Grid, Icon, SemanticCOLORS, Table } from 'semantic-ui-react'
+import { Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
 import { useDojoAccount } from '@/dojo/DojoContext'
-import { useAllChallengeIds, useChallengeIdsByDuelist, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
+import { useAllChallengeIds, useChallenge, useChallengeIdsByDuelist, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { DuelStage, useDuel } from '@/pistols/hooks/useDuel'
 import { useTimestampCountdown } from '@/pistols/hooks/useTimestamp'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { MenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { Blades, ChallengeState, ChallengeStateNames } from '@/pistols/utils/pistols'
+import { ChallengeState, ChallengeStateNames } from '@/pistols/utils/pistols'
 import { formatTimestamp, formatTimestampDelta } from '@/pistols/utils/utils'
-import { BladesIcon, CompletedIcon, EmojiIcon, StepsIcon } from '@/pistols/components/ui/Icons'
+import { DuelIcons } from '@/pistols/components/DuelIcons'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -113,9 +112,8 @@ function DuelItem({
   const { account } = useDojoAccount()
   const { dispatchSetDuel } = usePistolsContext()
   const {
-    challenge: { duelistA, duelistB, state, isLive, isFinished, winner, timestamp, timestamp_expire, timestamp_start, timestamp_end },
-    round1, round2, duelStage, completedStagesA, completedStagesB,
-  } = useDuel(duelId)
+    duelistA, duelistB, state, isLive, isFinished, winner, timestamp, timestamp_expire, timestamp_start, timestamp_end,
+  }= useChallenge(duelId)
   const { name: nameA, profilePic: profilePicA } = useDuelist(duelistA)
   const { name: nameB, profilePic: profilePicB } = useDuelist(duelistB)
   const timestamp_system = useTimestampCountdown()
@@ -145,42 +143,6 @@ function DuelItem({
     dispatchSetDuel(duelId, isYours ? MenuKey.YourDuels : isLive ? MenuKey.LiveDuels : MenuKey.PastDuels)
   }
 
-  const _duelistIcons = (movesRound1, movesRound2, completedStages) => {
-    if (isInProgress) {
-      return (<>
-        {movesRound1 && duelStage >= DuelStage.StepsCommit &&
-          <CompletedIcon completed={completedStages[DuelStage.StepsCommit]}>
-            <EmojiIcon emoji='🥾' size='large' />
-          </CompletedIcon>
-        }
-        {movesRound1 && duelStage == DuelStage.StepsReveal &&
-          <CompletedIcon completed={completedStages[DuelStage.StepsReveal]}>
-            <Icon name='eye' size='large' />
-          </CompletedIcon>
-        }
-        {movesRound2 && duelStage >= DuelStage.BladesCommit &&
-          <CompletedIcon completed={completedStages[DuelStage.BladesCommit]}>
-            <EmojiIcon emoji='🗡️' size='large' />
-          </CompletedIcon>
-        }
-        {movesRound2 && duelStage == DuelStage.BladesReveal &&
-          <CompletedIcon completed={completedStages[DuelStage.BladesReveal]}>
-            <Icon name='eye' size='large' />
-          </CompletedIcon>
-        }
-      </>)
-    }
-    if (isFinished) {
-      return (<>
-        {movesRound1 && <StepsIcon stepCount={parseInt(movesRound1.move)} />}
-        {movesRound2 && <BladesIcon blades={parseInt(movesRound2.move) as Blades} />}
-      </>)
-    }
-    return <></>
-  }
-  const iconsA = useMemo(() => _duelistIcons(round1?.duelist_a, round2?.duelist_a, completedStagesA), [isInProgress, isFinished, round1, round2, completedStagesA])
-  const iconsB = useMemo(() => _duelistIcons(round1?.duelist_b, round2?.duelist_b, completedStagesB), [isInProgress, isFinished, round1, round2, completedStagesB])
-
   return (
     <Table.Row warning={isDraw || isCanceled} negative={false} positive={isInProgress || winnerIsA || winnerIsB} textAlign='left' verticalAlign='middle' onClick={() => _gotoChallenge()}>
       <Cell positive={winnerIsA} negative={winnerIsB}>
@@ -190,7 +152,7 @@ function DuelItem({
       <Cell positive={winnerIsA} negative={winnerIsB}>
         {nameA}
         {compact ? <br /> : ' '}
-        {iconsA}
+        <DuelIcons duelId={duelId} account={duelistA} size={compact ? null : 'large'} />
       </Cell>
 
       <Cell positive={winnerIsB} negative={winnerIsA}>
@@ -200,7 +162,7 @@ function DuelItem({
       <Cell positive={winnerIsB} negative={winnerIsA}>
         {nameB}
         {compact ? <br /> : ' '}
-        {iconsB}
+        <DuelIcons duelId={duelId} account={duelistB} size={compact ? null : 'large'} />
       </Cell>
 
       <Cell textAlign='center'>

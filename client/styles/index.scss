@@ -133,6 +133,8 @@ canvas {
 .NoBorder { border: 0!important }
 .AutoMargin { margin: auto!important }
 
+.Margin6 { margin: 6px!important }
+
 .Block { display: inline-block; }
 .Flex { display: flex; }
 
@@ -194,6 +196,16 @@ canvas {
 
 .Relative {
   position: relative;
+}
+.AbsoluteLeft {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.AbsoluteRight {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 .Grayscale {
@@ -520,9 +532,19 @@ $box-h: calc((100vh - $aspect-h) / 2);
   font-size: 16px!important;
   font-weight: 600!important;
   color: $color-bg;
-  text-shadow: $text-shadow;
+  text-shadow: 0 0 2px #000;
   margin: -2px 0 0 -2px!important;
 }
+.StepsIcon.small {
+  font-size: 14px!important;
+}
+.StepsIcon.large {
+  font-size: 20px!important;
+}
+.StepsIcon.big {
+  font-size: 24px!important;
+}
+
 .StepsIconRound {
   font-family: monospace!important;
   font-size: 16px!important;
