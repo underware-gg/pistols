@@ -51,11 +51,9 @@ export default function DuelistModal() {
       <Modal.Header>Duelist</Modal.Header>
       <Modal.Content image>
         <ProfilePic profilePic={profilePic} />
-        <Modal.Description>
+        <Modal.Description className='FillParent'>
           <ProfileDescription address={duelistAddress} displayStats />
-          <br />
-          {/* <p>We've found the following gravatar image associated with your e-mail address.</p> */}
-
+          <Divider />
           {!isChallenging && <div className='TableModal'><ChallengesList duelistAddress={duelistAddress} /></div>}
           {isChallenging && <CreateChallenge setChallengeArgs={setChallengeArgs} />}
         </Modal.Description>
@@ -135,10 +133,8 @@ function CreateChallenge({
   })), [])
 
   return (
-    <div>
-      <Divider />
-
-      <h1>Issue a Challenge</h1>
+    <div style={{width: '350px'}}>
+      <h1>New Challenge!</h1>
       <br />
 
       <Form>
@@ -168,7 +164,7 @@ function CreateChallenge({
           <Grid className='NoMargin' columns={'equal'}>
             <Row>
               <Col>
-                <Dropdown defaultValue='1' placeholder='Days' selection options={daysOptions} onChange={(e, { value }) => setDays(parseInt(value as string))} />
+                <Dropdown defaultValue='7' placeholder='Days' selection options={daysOptions} onChange={(e, { value }) => setDays(parseInt(value as string))} />
               </Col>
               <Col>
                 <Dropdown defaultValue='0' placeholder='Hours' selection options={hoursOptions} onChange={(e, { value }) => setHours(parseInt(value as string))} />
@@ -177,7 +173,7 @@ function CreateChallenge({
           </Grid>
         </Form.Field>
         <Form.Field>
-          <label>$LORDS deposit (disabled)</label>
+          <label>Bet $LORDS (disabled)</label>
           <input placeholder={'$LORDS'} value={lords} maxLength={6} onChange={(e) => {
             const _lords = parseInt(e.target.value as string)
             if (!isNaN(_lords)) {
