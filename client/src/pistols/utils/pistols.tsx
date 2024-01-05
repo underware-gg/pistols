@@ -82,9 +82,10 @@ export enum RoundState {
 //
 export enum Blades {
   Null,
-  Light,
-  Heavy,
-  Block,
+  Light,  // 1
+  Heavy,  // 2
+  Block,  // 3
+  Count,
 }
 
 export const BladesNames = {

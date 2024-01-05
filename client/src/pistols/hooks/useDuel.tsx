@@ -1,6 +1,5 @@
 import { useEffect, useMemo } from "react"
-import { Entity, HasValue, Has, getComponentValue } from '@dojoengine/recs'
-import { useComponentValue, useEntityQuery } from "@dojoengine/react"
+import { useComponentValue } from "@dojoengine/react"
 import { useDojoComponents } from '@/dojo/DojoContext'
 import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
 import { useChallenge } from "@/pistols/hooks/useChallenge"
@@ -45,7 +44,7 @@ export const useDuel = (duelId: bigint | string) => {
     return {
       [DuelStage.StepsCommit]: Boolean(round1?.duelist_a.hash),
       [DuelStage.StepsReveal]: Boolean(round1?.duelist_a.move),
-      [DuelStage.BladesCommit]: Boolean(round2?.duelist_a.has),
+      [DuelStage.BladesCommit]: Boolean(round2?.duelist_a.hash),
       [DuelStage.BladesReveal]: Boolean(round2?.duelist_a.move),
     }
   }, [round1, round2])

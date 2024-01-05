@@ -330,6 +330,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
   position: relative;
   margin-top: 100px;
   max-height: 500px;
+  width: 800px;
   scrollbar-width: thin;
   overflow-y: scroll;
   // border: 0.5px solid #0001;
@@ -514,11 +515,20 @@ $box-h: calc((100vh - $aspect-h) / 2);
 	@extend .Icon;
 	// color: $color-icon;
 }
-
-.CustomIcon {
-	width: 1.5em;
-	height: 1.5em;
-	border: 0;
+.StepsIcon {
+  font-family: monospace!important;
+  font-size: 16px!important;
+  font-weight: 600!important;
+  color: $color-bg;
+  text-shadow: $text-shadow;
+  margin: -2px 0 0 -2px!important;
+}
+.StepsIconRound {
+  font-family: monospace!important;
+  font-size: 16px!important;
+  // circle
+  border-radius: 50%;
+  background: rgba($color-bg, 0.8);
 }
 
 

@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import Link from 'next/link'
-import { Icon, Popup, PopupContent, PopupHeader, SemanticICONS } from 'semantic-ui-react'
+import { Icon, IconGroup, Popup, PopupContent, PopupHeader, SemanticICONS } from 'semantic-ui-react'
 import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
+import { Blades } from '@/pistols/utils/pistols'
 
 // Semantic UI Icons
 // https://react.semantic-ui.com/elements/icon/
@@ -157,21 +158,95 @@ interface EmojiIconProps {
   emoji: string
   size?: IconSizeProp
   style?: any
+  className?: string
+  disabled?: boolean
   flipped?: 'horizontally' | 'vertically'
   rotated?: 'clockwise' | 'counterclockwise'
 }
 export function EmojiIcon({
   emoji,
-  size = 'small',
+  size = null,
   style = {},
+  className = null,
+  disabled = false,
   flipped = null,
   rotated = null,
 }: EmojiIconProps) {
   return (
-    <i className={`icon ${size} ${rotated && `${rotated} rotated`} ${flipped && `${flipped} flipped`}`} style={style}>
-      <div className={``}>
-        {emoji}
-      </div>
+    <i className={`icon ${size} ${rotated && `${rotated} rotated`} ${disabled && `disabled`} ${flipped && `${flipped} flipped`} ${className}`} style={style}>
+      {emoji}
     </i>
+  )
+}
+
+
+//---------------------------------
+// Duel Icons
+//
+interface StepsIconProps {
+  stepCount: number
+  size?: IconSizeProp
+}
+export function StepsIcon({
+  stepCount,
+  size = null,
+}: StepsIconProps) {
+  if (stepCount < 1 || stepCount > 10) {
+    return <Icon name='question circle' size={size} />
+  }
+  const emoji = stepCount == 10 ? '10' : '1234567890'[stepCount - 1]
+  return (
+    // <EmojiIcon emoji={emoji} size={size} className='StepsIconRound' />
+    <IconGroup size='large'>
+      <EmojiIcon emoji={'🥾'} size={size} disabled />
+      <EmojiIcon emoji={emoji} size={size} className='StepsIcon' />
+    </IconGroup>
+  )
+}
+interface BladesIconProps {
+  blades: Blades
+  size?: IconSizeProp
+}
+export function BladesIcon({
+  blades,
+  size = 'large',
+}: BladesIconProps) {
+  if (blades <= Blades.Null || blades >= Blades.Count) {
+    return <Icon name='question circle' size={size} />
+  }
+  const emoji =
+    blades == Blades.Light ? '🔪'
+      : blades == Blades.Heavy ? '🗡️'
+        : blades == Blades.Block ? '🛡️'
+          : '?'
+  return (
+    // <IconGroup size='large'>
+    // <Icon size={size} name='circle outline' />
+    <EmojiIcon emoji={emoji} size={size} className='' />
+    // </IconGroup>
+  )
+}
+
+
+//---------------------------------
+// Ticked Icons
+//
+interface CompletedIconProps {
+  completed: boolean
+  size?: IconSizeProp
+  tickSize?: IconSizeProp
+  children: any
+}
+export function CompletedIcon({
+  completed,
+  size = null,
+  tickSize = 'large',
+  children,
+}: CompletedIconProps) {
+  return (
+    <IconGroup size={size}>
+      {children}
+      {completed && <Icon size={tickSize} name='checkmark' color='green' style={{ margin: '-4px 0 0 0' }} />}
+    </IconGroup>
   )
 }

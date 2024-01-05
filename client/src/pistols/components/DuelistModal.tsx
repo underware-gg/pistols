@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { Grid, Table, Modal, Form, Divider, Dropdown } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { MenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
@@ -40,7 +39,7 @@ export default function DuelistModal() {
       create_challenge(account, duelistAddress, '', challengeArgs.message, challengeArgs.expire_seconds)
     }
   }
-  
+
   return (
     <Modal
       // size='small'
@@ -58,7 +57,7 @@ export default function DuelistModal() {
           {/* <p>We've found the following gravatar image associated with your e-mail address.</p> */}
 
           {!isChallenging && <div className='TableModal'><ChallengesList duelistAddress={duelistAddress} /></div>}
-          {isChallenging && <CreateChallenge setChallengeArgs={setChallengeArgs}/>}
+          {isChallenging && <CreateChallenge setChallengeArgs={setChallengeArgs} />}
         </Modal.Description>
       </Modal.Content>
       <Modal.Actions>
@@ -89,7 +88,7 @@ function ChallengesList({
 }) {
   return (
     <div style={{ width: '550px' }}>
-      <ChallengeTableByDuelist address={duelistAddress} />
+      <ChallengeTableByDuelist address={duelistAddress} compact />
     </div>
   )
 }
@@ -98,7 +97,7 @@ function CreateChallenge({
   setChallengeArgs
 }) {
   const [message, setMessage] = useState('')
-  const [days, setDays] = useState(1)
+  const [days, setDays] = useState(7)
   const [hours, setHours] = useState(0)
   const [lords, setLords] = useState(0)
 
@@ -181,7 +180,7 @@ function CreateChallenge({
           <label>$LORDS deposit (disabled)</label>
           <input placeholder={'$LORDS'} value={lords} maxLength={6} onChange={(e) => {
             const _lords = parseInt(e.target.value as string)
-            if(!isNaN(_lords)) {
+            if (!isNaN(_lords)) {
               setLords(_lords)
             }
           }} />
