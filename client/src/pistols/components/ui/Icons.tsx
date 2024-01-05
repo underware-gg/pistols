@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import { Icon, Popup } from 'semantic-ui-react'
+import { Icon, Popup, PopupContent, PopupHeader, SemanticICONS } from 'semantic-ui-react'
 import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
 
 // Semantic UI Icons
@@ -14,47 +14,58 @@ export { Icon }
 // Popup Tooltip
 // wrap content in <span> so it will apeear on disabled buttons
 //
-export function Tooltip(props) {
-	const trigger = props.disabledTooltip ?
-		<span>{props.children}</span>
-		: props.children
-	const content = Array.isArray(props.content)
-		? props.content.map((v, i) => <span key={`e${i}`}>{v}<br /></span>)
-		: props.content
-	const style = props.cursor ? { cursor: props.cursor } : {}
-	return (
-		<span className='Tooltip' style={style}>
-			<Popup
-				size='small'
-				header={props.header}
-				content={content}
-				trigger={trigger}
-			/>
-		</span>
-	)
+interface TooltipProps {
+  content: string | typeof PopupContent
+  header: typeof PopupHeader
+  disabledTooltip?: boolean
+  cursor?: string
+  children: any
 }
-Tooltip.defaultProps = {
-	header: null,
-	content: 'gabba bagga hey',
-	disabledTooltip: false,
-	cursor: null,
+export function Tooltip({
+  header = null,
+  content = 'gabba bagga hey',
+  disabledTooltip = false,
+  cursor = null,
+  children = null,
+}: TooltipProps) {
+  const _trigger = disabledTooltip ?
+    <span>{children}</span>
+    : children
+  const _content = Array.isArray(content)
+    ? content.map((v, i) => <span key={`e${i}`}>{v}<br /></span>)
+    : content
+  const _style = cursor ? { cursor: cursor } : {}
+  return (
+    <span className='Tooltip' style={_style}>
+      <Popup
+        size='small'
+        header={header}
+        content={_content}
+        trigger={_trigger}
+      />
+    </span>
+  )
 }
 
 
 //---------------------------------
 // Info icon + Tooltip
 //
-export function InfoIcon(props) {
-	return (
-		<Tooltip header={props.header} content={props.content}>
-			<Icon name='info circle' size={props.size} className='InfoIcon' />
-		</Tooltip>
-	)
+interface InfoIconProps {
+  size?: IconSizeProp
+  content: string | typeof PopupContent
+  header: typeof PopupHeader
 }
-InfoIcon.defaultProps = {
-	size: null, // normal size
-	header: null,
-	content: 'gabba bagga hey',
+export function InfoIcon({
+  size = null, // normal size
+  header = null,
+  content = 'gabba bagga hey',
+}: InfoIconProps) {
+  return (
+    <Tooltip header={header} content={content}>
+      <Icon name='info circle' size={size} className='InfoIcon' />
+    </Tooltip>
+  )
 }
 
 
@@ -62,13 +73,17 @@ InfoIcon.defaultProps = {
 //---------------------------------
 // Semantic Ui icon
 //
-export function IconIcon(props) {
-	return <Icon name={props.name} size={props.size} className={`Icon ${props.className}`} />
+interface IconIconProps {
+  name: SemanticICONS
+  size?: IconSizeProp
+  className: string
 }
-IconIcon.defaultProps = {
-	name: 'smile outline',
-	className: '',
-	size: null, // normal size
+export function IconIcon({
+  name = 'smile outline',
+  className = '',
+  size = null, // normal size
+}: IconIconProps) {
+  return <Icon name={name} size={size} className={`Icon ${className}`} />
 }
 
 
@@ -76,53 +91,61 @@ IconIcon.defaultProps = {
 //---------------------------------
 // Hyperlink icon
 //
-export function AnchorLinkIcon(props) {
-	return (
-		<Link href={props.url} passHref>
-			<a>
-				<Icon className='Anchor InfoIcon' name='linkify' size={props.size} />
-			</a>
-		</Link>
-	)
+interface AnchorLinkIconProps {
+  size?: IconSizeProp
+  url: string
 }
-AnchorLinkIcon.defaultProps = {
-	size: null, // normal size
-	url: '#',
+export function AnchorLinkIcon({
+  size = null, // normal size
+  url = '#',
+}: AnchorLinkIconProps) {
+  return (
+    <Link href={url} passHref>
+      <a>
+        <Icon className='Anchor InfoIcon' name='linkify' size={size} />
+      </a>
+    </Link>
+  )
 }
 
 
 //---------------------------------
 // Copy to clipboard icon
 //
-export function CopyIcon(props) {
-	function _copy() {
-		navigator?.clipboard?.writeText(props.content)
-	}
-	return (
-		<Icon className='Anchor InfoIcon IconClick' name='copy' size={props.size} onClick={() => _copy()} />
-	)
+interface CopyIconProps {
+  size?: IconSizeProp
+  content: string
 }
-CopyIcon.defaultProps = {
-	size: null, // normal size
-	content: null, // content to copy
+export function CopyIcon({
+  size = null, // normal size
+  content = null, // content to copy
+}: CopyIconProps) {
+  function _copy() {
+    navigator?.clipboard?.writeText(content)
+  }
+  return (
+    <Icon className='Anchor InfoIcon IconClick' name='copy' size={size} onClick={() => _copy()} />
+  )
 }
 
 
 //---------------------------------
 // Sync spinner
 //
-export function LoadingIcon(props) {
-	return (
-		<Icon
-			className='ViewCentered NoPadding'
-			loading
-			// name='sync'
-			name='compass outline'
-			size={props.size}
-		/>)
+interface LoadingIconProps {
+  size?: IconSizeProp
 }
-LoadingIcon.defaultProps = {
-	size: 'small',
+export function LoadingIcon({
+  size = 'small',
+}: LoadingIconProps) {
+  return (
+    <Icon
+      className='ViewCentered NoPadding'
+      loading
+      // name='sync'
+      name='compass outline'
+      size={size}
+    />)
 }
 
 

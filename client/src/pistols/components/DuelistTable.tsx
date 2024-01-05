@@ -130,7 +130,7 @@ function DuelistItem({
   return (
     <Table.Row textAlign='center' verticalAlign='middle' onClick={() => dispatchSetDuelist(address)}>
       <Cell>
-        <AccountShort address={address} />
+        <AccountShort address={address} copyLink={false} />
       </Cell>
       
       <Cell>
