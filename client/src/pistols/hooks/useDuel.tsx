@@ -25,6 +25,8 @@ export const useDuel = (duelId: bigint | string) => {
   const round1: any = useComponentValue(Round, keysToEntity([duelId, 1n]))
   const round2: any = useComponentValue(Round, keysToEntity([duelId, 2n]))
 
+  //
+  // The actual stage of this duel
   const duelStage = useMemo(() => {
     if (!round1 || round1.state == RoundState.Null) return DuelStage.Null
     if (round1.state == RoundState.Commit) return DuelStage.StepsCommit
@@ -37,12 +39,36 @@ export const useDuel = (duelId: bigint | string) => {
     return DuelStage.Finished
   }, [round1, round2])
 
+  //
+  // Actions completed by Duelist A
+  const completedStagesA = useMemo(() => {
+    return {
+      [DuelStage.StepsCommit]: Boolean(round1?.duelist_a.hash),
+      [DuelStage.StepsReveal]: Boolean(round1?.duelist_a.move),
+      [DuelStage.BladesCommit]: Boolean(round2?.duelist_a.has),
+      [DuelStage.BladesReveal]: Boolean(round2?.duelist_a.move),
+    }
+  }, [round1, round2])
+
+  //
+  // Actions completed by Duelist B
+  const completedStagesB = useMemo(() => {
+    return {
+      [DuelStage.StepsCommit]: Boolean(round1?.duelist_b.hash),
+      [DuelStage.StepsReveal]: Boolean(round1?.duelist_b.move),
+      [DuelStage.BladesCommit]: Boolean(round2?.duelist_b.hash),
+      [DuelStage.BladesReveal]: Boolean(round2?.duelist_b.move),
+    }
+  }, [round1, round2])
+
   return {
     challenge,
     roundNumber: challenge.roundNumber,
     round1,
     round2,
     duelStage,
+    completedStagesA,
+    completedStagesB,
   }
 }
 

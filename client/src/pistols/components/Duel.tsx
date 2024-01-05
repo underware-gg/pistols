@@ -28,7 +28,7 @@ export default function Duel({
   const { isLive, isFinished, message, duelistA, duelistB } = useChallenge(duelId)
   const { challengeDescription } = useChallengeDescription(duelId)
 
-  const { round1, round2, duelStage } = useAnimatedDuel(duelId)
+  const { duelStage, completedStagesA, completedStagesB } = useAnimatedDuel(duelId)
   // console.log(`Round 1:`, round1)
   // console.log(`Round 2:`, round2)
 
@@ -59,6 +59,7 @@ export default function Duel({
           duelStage={duelStage}
           account={account}
           duelistAccount={duelistA}
+          completedStages={completedStagesA}
         />
       </div>
       <div className='DuelSideB'>
@@ -71,6 +72,7 @@ export default function Duel({
           duelStage={duelStage}
           account={account}
           duelistAccount={duelistB}
+          completedStages={completedStagesB}
         />
       </div>
 
@@ -116,23 +118,15 @@ function DuelProgress({
   duelStage,
   account,
   duelistAccount,
+  completedStages,
   floated,
 }) {
-  const { name } = useDuelist(duelistAccount)
   const { round1, round2, roundNumber } = useDuel(duelId)
+  const { name } = useDuelist(duelistAccount)
 
   //-------------------------
   // Duel progression
   //
-
-  const completedStages = useMemo(() => {
-    return {
-      [DuelStage.StepsCommit]: (isA && Boolean(round1?.duelist_a.hash)) || (isB && Boolean(round1?.duelist_b.hash)),
-      [DuelStage.StepsReveal]: (isA && Boolean(round1?.duelist_a.move)) || (isB && Boolean(round1?.duelist_b.move)),
-      [DuelStage.BladesCommit]: (isA && Boolean(round2?.duelist_a.hash)) || (isB && Boolean(round2?.duelist_b.hash)),
-      [DuelStage.BladesReveal]: (isA && Boolean(round2?.duelist_a.move)) || (isB && Boolean(round2?.duelist_b.move)),
-    }
-  }, [isA, isB, round1, round2])
 
   const _healthResult = (round: any) => {
     const health = isA ? round.duelist_a.health : round.duelist_b.health
@@ -157,9 +151,16 @@ function DuelProgress({
     return null
   }, [round2, duelStage])
 
+  const _resultBackground = (round) => {
+    const health = isA ? round.duelist_a.health : round.duelist_b.health
+    return health == FULL_HEALTH ? 'Positive' : health == HALF_HEALTH ? 'Warning' : 'Negative'
+  }
+
+
   //------------------------------
   // Duelist interaction
   //
+  const isYou = useMemo(() => (BigInt(account?.address) == duelistAccount), [account, duelistAccount])
 
   // Commit modal control
   const [commitStepsIsOpen, setCommitStepsIsOpen] = useState(false)
@@ -178,9 +179,8 @@ function DuelProgress({
   }
 
   // onClick
-  const isYou = useMemo(() => (BigInt(account?.address) == duelistAccount), [account, duelistAccount])
   const onClick = useMemo(() => {
-    if (!completedStages[duelStage] && isYou) {
+    if (isYou && !completedStages[duelStage]) {
       if (duelStage == DuelStage.StepsCommit || duelStage == DuelStage.BladesCommit) {
         return _commit
       }
@@ -191,10 +191,6 @@ function DuelProgress({
     return null
   }, [completedStages, duelStage, isYou])
 
-  const _resultBackground = (round) => {
-    const health = isA ? round.duelist_a.health : round.duelist_b.health
-    return health == FULL_HEALTH ? 'Positive' : health == HALF_HEALTH ? 'Warning' : 'Negative'
-  }
 
   //------------------------------
   return (
