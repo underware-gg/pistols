@@ -160,6 +160,7 @@ mod tests {
         assert(challenge.state == ChallengeState::Resolved.into(), '4_challenge.state');
         assert(challenge.winner != zero_address(), '4_challenge.winner');
         assert(challenge.round_number == 1, '4_challenge.round_number');
+        assert(challenge.timestamp_end > 0, '4_challenge.timestamp_end');
         assert(round.round_number == 1, '4__round.round_number');
         assert(round.state == RoundState::Finished.into(), '4__state');
         assert(round.duelist_a.hash == hash_1_a, '43__hash');
@@ -213,6 +214,7 @@ mod tests {
         assert(challenge.state == ChallengeState::Resolved.into(), '4_challenge.state');
         assert(challenge.winner != zero_address(), '4_challenge.winner');
         assert(challenge.round_number == 1, '4_challenge.round_number');
+        assert(challenge.timestamp_end > 0, '4_challenge.timestamp_end');
         assert(round.round_number == 1, '4__round.round_number');
         assert(round.state == RoundState::Finished.into(), '4__state');
         let duelist_a = utils::get_Duelist(world, owner);
@@ -515,6 +517,7 @@ mod tests {
         let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
         assert(challenge.state == ChallengeState::Draw.into(), '2__challenge.state');
         assert(challenge.round_number == 2, '2__challenge.round_number');
+        assert(challenge.timestamp_end > 0, '2__challenge.timestamp_end');
         assert(round.round_number == 2, '2__round.round_number');
         assert(round.state == RoundState::Finished.into(), '2__round.state');
         assert(round.duelist_a.hash == hash_1_a, '2__hash_a');
@@ -607,6 +610,7 @@ mod tests {
         let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
         assert(challenge.state == ChallengeState::Resolved.into(), '2__challenge.state');
         assert(challenge.round_number == 2, '2__challenge.round_number');
+        assert(challenge.timestamp_end > 0, '2__challenge.timestamp_end');
         assert(round.round_number == 2, '2__round.round_number');
         assert(round.state == RoundState::Finished.into(), '2__round.state');
         assert(round.duelist_a.hash == hash_1_a, '2__hash_a');
