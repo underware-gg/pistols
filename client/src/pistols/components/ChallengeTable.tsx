@@ -3,12 +3,12 @@ import { Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { useAllChallengeIds, useChallenge, useChallengeIdsByDuelist, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { useTimestampCountdown } from '@/pistols/hooks/useTimestamp'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { MenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ChallengeState, ChallengeStateNames } from '@/pistols/utils/pistols'
 import { formatTimestamp, formatTimestampDelta } from '@/pistols/utils/utils'
 import { DuelIcons } from '@/pistols/components/DuelIcons'
+import { useClientTimestamp } from '../hooks/useTimestamp'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -58,7 +58,7 @@ function ChallengeTableByIds({
   const rows = useMemo(() => {
     let result = []
     challengeIds.forEach((duelId, index) => {
-      result.push(<DuelItem key={duelId} duelId={duelId} sortCallback={_sortCallback} compact={compact} />)
+      result.push(<DuelItem key={duelId} duelId={duelId} sortCallback={_sortCallback} compact={compact}/>)
     })
     return result
   }, [challengeIds])
@@ -116,8 +116,6 @@ function DuelItem({
   }= useChallenge(duelId)
   const { name: nameA, profilePic: profilePicA } = useDuelist(duelistA)
   const { name: nameB, profilePic: profilePicB } = useDuelist(duelistB)
-  const timestamp_system = useTimestampCountdown()
-  // console.log(timestamp, timestamp_expire, `>`, timestamp_system)
 
   useEffect(() => {
     sortCallback(duelId, state, timestamp)
@@ -131,13 +129,15 @@ function DuelItem({
   const isCanceled = useMemo(() => [ChallengeState.Withdrawn, ChallengeState.Refused].includes(state), [state])
   const isDraw = useMemo(() => [ChallengeState.Draw].includes(state), [state])
 
+  const { clientTimestamp } = useClientTimestamp(isAwaiting)
+
   const date = useMemo(() => {
-    if (isAwaiting) return '⏱️ ' + formatTimestampDelta(timestamp_system, timestamp_expire)
+    if (isAwaiting) return '⏱️ ' + formatTimestampDelta(clientTimestamp, timestamp_expire)
     if (isInProgress || winnerIsA || winnerIsB) return /*'⚔️ ' +*/ formatTimestamp(timestamp_start)
     if (isCanceled) return /*'🚫 ' +*/ formatTimestamp(timestamp_end)
     if (isDraw) return /*'🤝 ' +*/ formatTimestamp(timestamp_end)
     return formatTimestamp(timestamp)
-  }, [state, timestamp, timestamp_expire, timestamp_start, timestamp_end])
+  }, [state, timestamp, timestamp_expire, timestamp_start, timestamp_end, clientTimestamp])
 
   const _gotoChallenge = () => {
     dispatchSetDuel(duelId, isYours ? MenuKey.YourDuels : isLive ? MenuKey.LiveDuels : MenuKey.PastDuels)
