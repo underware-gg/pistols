@@ -10,10 +10,11 @@ import { useCommitMove } from '@/pistols/hooks/useCommitReveal'
 import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
-import { BladesNames, FULL_HEALTH, HALF_HEALTH, RoundState } from '@/pistols/utils/pistols'
+import { BladesNames, FULL_HEALTH, HALF_HEALTH } from '@/pistols/utils/pistols'
 import { MenuDuel, MenuDebugAnimations } from '@/pistols/components/Menus'
-import CommitModal from '@/pistols/components/CommitModal'
 import { AnimationState } from '@/pistols/three/game'
+import { EmojiIcon } from '@/pistols/components/ui/Icons'
+import CommitModal from '@/pistols/components/CommitModal'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -53,7 +54,7 @@ export default function Duel({
         <div className='DuelProfileA' >
           <DuelProfile floated='left' address={duelistA} />
         </div>
-        <DuelProgress floated='left' 
+        <DuelProgress floated='left'
           isA
           duelId={duelId}
           duelStage={duelStage}
@@ -205,6 +206,8 @@ function DuelProgress({
           title='Choose Steps'
           description=''
           icon='street view'
+          emoji='👣'
+          // emoji='🥾'
           floated={floated}
           onClick={onClick}
         />
@@ -234,17 +237,20 @@ function DuelProgress({
           <>
             <ProgressItem
               stage={DuelStage.BladesCommit}
-            duelStage={duelStage}
+              duelStage={duelStage}
               completedStages={completedStages}
               title='Choose Blades'
               description=''
               icon='shield'
+              emoji='🗡️'
+              // emojiFlipped='horizontally'
+              // emojiRotated='clockwise'
               floated={floated}
               onClick={onClick}
             />
             <ProgressItem
               stage={DuelStage.BladesReveal}
-            duelStage={duelStage}
+              duelStage={duelStage}
               completedStages={completedStages}
               title='Reveal Blades'
               description=''
@@ -254,7 +260,7 @@ function DuelProgress({
             />
             <ProgressItem
               stage={DuelStage.BladesClash}
-            duelStage={duelStage}
+              duelStage={duelStage}
               completedStages={completedStages}
               title={bladesResult ?? 'Blades clash!'}
               description=''
@@ -277,6 +283,9 @@ function ProgressItem({
   title,
   description,
   icon = null,
+  emoji = null,
+  emojiFlipped = null,
+  emojiRotated = null,
   floated,
   onClick = null,
   className = null,
@@ -288,6 +297,14 @@ function ProgressItem({
   const _right = (floated == 'right')
   const _link = (onClick && _active && !_completed)
   let classNames = className ? [className] : []
+
+  let _icon = useMemo(() => {
+    const style = _right ? { margin: '0 0 0 1rem' } : {}
+    if (emoji && icon && !_completed) return <EmojiIcon emoji={emoji} style={style} flipped={emojiFlipped} rotated={emojiRotated}/>
+    if (icon) return <Icon name={icon} style={style} />
+    return <></>
+  }, [icon, emoji, _completed, _right])
+
   if (_right) classNames.push('AlignRight')
   if (!_link) classNames.push('NoMouse')
   return (
@@ -299,12 +316,12 @@ function ProgressItem({
       link={_link}
       onClick={_link ? onClick : null}
     >
-      {_left && icon && <Icon name={icon} />}
+      {_left && _icon}
       <Step.Content className='AutoMargin'>
         <Step.Title>{title}</Step.Title>
         <Step.Description>{description}</Step.Description>
       </Step.Content>
-      {_right && icon && <Icon name={icon} style={{ margin: '0 0 0 1rem' }} />}
+      {_right && _icon}
     </Step>
   )
 }

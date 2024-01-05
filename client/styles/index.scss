@@ -514,6 +514,14 @@ $box-h: calc((100vh - $aspect-h) / 2);
 	@extend .Icon;
 	// color: $color-icon;
 }
+
+.CustomIcon {
+	width: 1.5em;
+	height: 1.5em;
+	border: 0;
+}
+
+
 // Icon click feedback
 .IconClick:active {
 	animation-name: IconClickAnimation;

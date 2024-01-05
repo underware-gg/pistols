@@ -1,6 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { Icon, Popup } from 'semantic-ui-react'
+import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
 
 // Semantic UI Icons
 // https://react.semantic-ui.com/elements/icon/
@@ -122,4 +123,32 @@ export function LoadingIcon(props) {
 }
 LoadingIcon.defaultProps = {
 	size: 'small',
+}
+
+
+
+//---------------------------------
+// Emoji Icon
+//
+interface EmojiIconProps {
+  emoji: string
+  size?: IconSizeProp
+  style?: any
+  flipped?: 'horizontally' | 'vertically'
+  rotated?: 'clockwise' | 'counterclockwise'
+}
+export function EmojiIcon({
+  emoji,
+  size = 'small',
+  style = {},
+  flipped = null,
+  rotated = null,
+}: EmojiIconProps) {
+  return (
+    <i className={`icon ${size} ${rotated && `${rotated} rotated`} ${flipped && `${flipped} flipped`}`} style={style}>
+      <div className={``}>
+        {emoji}
+      </div>
+    </i>
+  )
 }
