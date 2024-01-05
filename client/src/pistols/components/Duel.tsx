@@ -5,7 +5,7 @@ import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { DuelStage, useDuel } from '@/pistols/hooks/useDuel'
+import { DuelStage, useAnimatedDuel, useDuel } from '@/pistols/hooks/useDuel'
 import { useCommitMove } from '@/pistols/hooks/useCommitReveal'
 import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
@@ -28,6 +28,10 @@ export default function Duel({
   const { isLive, isFinished, message, duelistA, duelistB } = useChallenge(duelId)
   const { challengeDescription } = useChallengeDescription(duelId)
 
+  const { round1, round2, duelStage } = useAnimatedDuel(duelId)
+  // console.log(`Round 1:`, round1)
+  // console.log(`Round 2:`, round2)
+
   useEffectOnce(() => {
     gameImpl?.resetScene()
   }, [])
@@ -47,15 +51,27 @@ export default function Duel({
 
       <div className='DuelSideA'>
         <div className='DuelProfileA' >
-          <DuelProfile duelId={duelId} floated='left' address={duelistA} />
+          <DuelProfile floated='left' address={duelistA} />
         </div>
-        <DuelProgress isA account={account} duelId={duelId} duelistA={duelistA} floated='left' />
+        <DuelProgress floated='left' 
+          isA
+          duelId={duelId}
+          duelStage={duelStage}
+          account={account}
+          duelistAccount={duelistA}
+        />
       </div>
       <div className='DuelSideB'>
         <div className='DuelProfileB' >
-          <DuelProfile duelId={duelId} floated='right' address={duelistB} />
+          <DuelProfile floated='right' address={duelistB} />
         </div>
-        <DuelProgress isB account={account} duelId={duelId} duelistB={duelistB} floated='right' />
+        <DuelProgress floated='right'
+          isB
+          duelId={duelId}
+          duelStage={duelStage}
+          account={account}
+          duelistAccount={duelistB}
+        />
       </div>
 
       <MenuDuel />
@@ -68,7 +84,6 @@ export default function Duel({
 }
 
 function DuelProfile({
-  duelId,
   address,
   floated,
 }) {
@@ -95,54 +110,20 @@ function DuelProfile({
 
 
 function DuelProgress({
-  account,
-  duelId,
   isA = false,
   isB = false,
-  duelistA = null,
-  duelistB = null,
+  duelId,
+  duelStage,
+  account,
+  duelistAccount,
   floated,
 }) {
-  const { name } = useDuelist(isA ? duelistA : duelistB)
-  const { challenge, round1, round2, roundNumber, duelStage } = useDuel(duelId)
-  console.log(`Challenge:`, challenge)
-  console.log(`Round 1:`, round1)
-  console.log(`Round 2:`, round2)
-
-
-  const { gameImpl, animated, hasLoadedAudioAssets, dispatchAnimated } = useGameplayContext()
+  const { name } = useDuelist(duelistAccount)
+  const { round1, round2, roundNumber } = useDuel(duelId)
 
   //-------------------------
   // Duel progression
   //
-
-  const currentStage = useMemo(() => {
-    if (duelStage > DuelStage.PistolsShootout && animated < AnimationState.Pistols) return DuelStage.PistolsShootout
-    if (round2 && duelStage > DuelStage.BladesClash && animated < AnimationState.Blades) return DuelStage.BladesClash
-    return duelStage
-  }, [duelStage, animated])
- 
-  const isAnimatingPistols = useMemo(() => (currentStage == DuelStage.PistolsShootout), [currentStage])
-  const isAnimatingBlades = useMemo(() => (currentStage == DuelStage.BladesClash), [currentStage])
-  useEffect(() => {
-    if (currentStage == DuelStage.Finished) {
-      dispatchAnimated(AnimationState.Finished)
-    }
-  }, [currentStage])
-
-  useEffect(() => {
-    if (isA && gameImpl && isAnimatingPistols && hasLoadedAudioAssets) {
-      console.log(`TRIGGER animateShootout()`)
-      gameImpl.animateShootout(round1.duelist_a.move, round1.duelist_b.move, round1.duelist_a.health, round1.duelist_b.health)
-    }
-  }, [gameImpl, isAnimatingPistols, hasLoadedAudioAssets])
-
-  useEffect(() => {
-    if (isA && gameImpl && isAnimatingBlades) {
-      console.log(`TRIGGER animateBlades()`)
-      gameImpl.animateBlades(round2.duelist_a.move, round2.duelist_b.move, round2.duelist_a.health, round2.duelist_b.health)
-    }
-  }, [gameImpl, isAnimatingBlades])
 
   const completedStages = useMemo(() => {
     return {
@@ -155,26 +136,26 @@ function DuelProgress({
 
   const _healthResult = (round: any) => {
     const health = isA ? round.duelist_a.health : round.duelist_b.health
-    return (health == 0 ? 'is DEAD!' : health < FULL_HEALTH ? 'got INJURED!' : 'gets out ALIVE!')
+    return (health == 0 ? 'is DEAD!' : health < FULL_HEALTH ? 'gets out INJURED!' : 'gets out ALIVE!')
   }
 
   const pistolsResult = useMemo(() => {
-    if (round1?.state == RoundState.Finished && !isAnimatingPistols) {
+    if (duelStage > DuelStage.PistolsShootout) {
       const steps = isA ? round1.duelist_a.move : round1.duelist_b.move
       const health = _healthResult(round1)
       return <span>{name} walks <span className='Important'>{steps} steps</span><br />and {health}</span>
     }
     return null
-  }, [round1, isAnimatingPistols])
+  }, [round1, duelStage])
 
   const bladesResult = useMemo(() => {
-    if (round2?.state == RoundState.Finished && !isAnimatingBlades) {
+    if (round2 && duelStage > DuelStage.BladesClash) {
       const blade = isA ? round2.duelist_a.move : round2.duelist_b.move
       const health = _healthResult(round2)
       return <span>{name} clashes with <span className='Important'>{BladesNames[blade]}</span><br />and {health}</span>
     }
     return null
-  }, [round2, isAnimatingBlades])
+  }, [round2, duelStage])
 
   //------------------------------
   // Duelist interaction
@@ -197,19 +178,18 @@ function DuelProgress({
   }
 
   // onClick
-  const isDuelistA = useMemo(() => (BigInt(account?.address) == duelistA), [account, duelistA])
-  const isDuelistB = useMemo(() => (BigInt(account?.address) == duelistB), [account, duelistB])
+  const isYou = useMemo(() => (BigInt(account?.address) == duelistAccount), [account, duelistAccount])
   const onClick = useMemo(() => {
-    if (!completedStages[currentStage] && (isDuelistA || isDuelistB)) {
-      if (currentStage == DuelStage.StepsCommit || currentStage == DuelStage.BladesCommit) {
+    if (!completedStages[duelStage] && isYou) {
+      if (duelStage == DuelStage.StepsCommit || duelStage == DuelStage.BladesCommit) {
         return _commit
       }
-      if (currentStage == DuelStage.StepsReveal || currentStage == DuelStage.BladesReveal) {
+      if (duelStage == DuelStage.StepsReveal || duelStage == DuelStage.BladesReveal) {
         return _reveal
       }
     }
     return null
-  }, [completedStages, currentStage, isDuelistA, isDuelistB])
+  }, [completedStages, duelStage, isYou])
 
   const _resultBackground = (round) => {
     const health = isA ? round.duelist_a.health : round.duelist_b.health
@@ -224,7 +204,7 @@ function DuelProgress({
       <Step.Group vertical size='small'>
         <ProgressItem
           stage={DuelStage.StepsCommit}
-          currentStage={currentStage}
+          duelStage={duelStage}
           completedStages={completedStages}
           title='Choose Steps'
           description=''
@@ -234,7 +214,7 @@ function DuelProgress({
         />
         <ProgressItem
           stage={DuelStage.StepsReveal}
-          currentStage={currentStage}
+          duelStage={duelStage}
           completedStages={completedStages}
           title='Reveal Steps'
           description=''
@@ -244,7 +224,7 @@ function DuelProgress({
         />
         <ProgressItem
           stage={DuelStage.PistolsShootout}
-          currentStage={currentStage}
+          duelStage={duelStage}
           completedStages={completedStages}
           title={pistolsResult ?? 'Pistols shootout!'}
           description=''
@@ -254,11 +234,11 @@ function DuelProgress({
           className={pistolsResult ? _resultBackground(round1) : null}
         />
 
-        {(round2 && currentStage >= DuelStage.BladesCommit) &&
+        {(round2 && duelStage >= DuelStage.BladesCommit) &&
           <>
             <ProgressItem
               stage={DuelStage.BladesCommit}
-              currentStage={currentStage}
+            duelStage={duelStage}
               completedStages={completedStages}
               title='Choose Blades'
               description=''
@@ -268,7 +248,7 @@ function DuelProgress({
             />
             <ProgressItem
               stage={DuelStage.BladesReveal}
-              currentStage={currentStage}
+            duelStage={duelStage}
               completedStages={completedStages}
               title='Reveal Blades'
               description=''
@@ -278,7 +258,7 @@ function DuelProgress({
             />
             <ProgressItem
               stage={DuelStage.BladesClash}
-              currentStage={currentStage}
+            duelStage={duelStage}
               completedStages={completedStages}
               title={bladesResult ?? 'Blades clash!'}
               description=''
@@ -296,7 +276,7 @@ function DuelProgress({
 
 function ProgressItem({
   stage,
-  currentStage,
+  duelStage,
   completedStages = {},
   title,
   description,
@@ -305,9 +285,9 @@ function ProgressItem({
   onClick = null,
   className = null,
 }) {
-  const _completed = (stage < currentStage) || (stage == currentStage && completedStages[stage] === true)
-  const _active = (currentStage == stage)
-  const _disabled = (currentStage < stage)
+  const _completed = (stage < duelStage) || (stage == duelStage && completedStages[stage] === true)
+  const _active = (duelStage == stage)
+  const _disabled = (duelStage < stage)
   const _left = (floated == 'left')
   const _right = (floated == 'right')
   const _link = (onClick && _active && !_completed)
