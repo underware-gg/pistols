@@ -3,12 +3,13 @@ import { Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { useAllChallengeIds, useChallenge, useChallengeIdsByDuelist, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { useClientTimestamp } from '@/pistols/hooks/useTimestamp'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { MenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ChallengeState, ChallengeStateNames } from '@/pistols/utils/pistols'
 import { formatTimestamp, formatTimestampDelta } from '@/pistols/utils/utils'
+import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { DuelIcons } from '@/pistols/components/DuelIcons'
-import { useClientTimestamp } from '../hooks/useTimestamp'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -112,7 +113,7 @@ function DuelItem({
   const { account } = useDojoAccount()
   const { dispatchSetDuel } = usePistolsContext()
   const {
-    duelistA, duelistB, state, isLive, isFinished, winner, timestamp, timestamp_expire, timestamp_start, timestamp_end,
+    duelistA, duelistB, state, isLive, isCanceled, isInProgress, isFinished, isDraw, winner, timestamp, timestamp_expire, timestamp_start, timestamp_end,
   }= useChallenge(duelId)
   const { name: nameA, profilePic: profilePicA } = useDuelist(duelistA)
   const { name: nameB, profilePic: profilePicB } = useDuelist(duelistB)
@@ -124,27 +125,13 @@ function DuelItem({
   const isYours = useMemo(() => (BigInt(account.address) == duelistA || BigInt(account.address) == duelistB), [account, duelistA, duelistB])
   const winnerIsA = useMemo(() => (duelistA == winner), [duelistA, winner])
   const winnerIsB = useMemo(() => (duelistB == winner), [duelistB, winner])
-  const isAwaiting = useMemo(() => [ChallengeState.Awaiting].includes(state), [state])
-  const isInProgress = useMemo(() => [ChallengeState.InProgress].includes(state), [state])
-  const isCanceled = useMemo(() => [ChallengeState.Withdrawn, ChallengeState.Refused].includes(state), [state])
-  const isDraw = useMemo(() => [ChallengeState.Draw].includes(state), [state])
-
-  const { clientTimestamp } = useClientTimestamp(isAwaiting)
-
-  const date = useMemo(() => {
-    if (isAwaiting) return '⏱️ ' + formatTimestampDelta(clientTimestamp, timestamp_expire)
-    if (isInProgress || winnerIsA || winnerIsB) return /*'⚔️ ' +*/ formatTimestamp(timestamp_start)
-    if (isCanceled) return /*'🚫 ' +*/ formatTimestamp(timestamp_end)
-    if (isDraw) return /*'🤝 ' +*/ formatTimestamp(timestamp_end)
-    return formatTimestamp(timestamp)
-  }, [state, timestamp, timestamp_expire, timestamp_start, timestamp_end, clientTimestamp])
 
   const _gotoChallenge = () => {
     dispatchSetDuel(duelId, isYours ? MenuKey.YourDuels : isLive ? MenuKey.LiveDuels : MenuKey.PastDuels)
   }
 
   return (
-    <Table.Row warning={isDraw || isCanceled} negative={false} positive={isInProgress || winnerIsA || winnerIsB} textAlign='left' verticalAlign='middle' onClick={() => _gotoChallenge()}>
+    <Table.Row warning={isDraw || isCanceled} negative={false} positive={isInProgress || isFinished} textAlign='left' verticalAlign='middle' onClick={() => _gotoChallenge()}>
       <Cell positive={winnerIsA} negative={winnerIsB}>
         <ProfilePicSquare profilePic={profilePicA} />
       </Cell>
@@ -170,7 +157,7 @@ function DuelItem({
       </Cell>
 
       <Cell textAlign='center'>
-        {date}
+        <ChallengeTime duelId={duelId} />
       </Cell>
     </Table.Row>
   )

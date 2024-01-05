@@ -98,7 +98,12 @@ export const useChallenge = (duelId: bigint | string) => {
     roundNumber,
     winner,
     isLive: (state == ChallengeState.Awaiting || state == ChallengeState.InProgress),
+    isAwaiting: (state == ChallengeState.Awaiting),
+    isInProgress: (state == ChallengeState.InProgress),
     isFinished: (state == ChallengeState.Resolved || state == ChallengeState.Draw),
+    isResolved: (state == ChallengeState.Resolved),
+    isDraw: (state == ChallengeState.Draw),
+    isCanceled: (state == ChallengeState.Withdrawn || state == ChallengeState.Refused),
     // times
     timestamp,
     timestamp_expire,

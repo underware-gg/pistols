@@ -133,8 +133,8 @@ function CreateChallenge({
   })), [])
 
   return (
-    <div style={{width: '350px'}}>
-      <h1>New Challenge!</h1>
+    <div style={{width: '400px'}}>
+      <h1>New Challenge Conditions</h1>
       <br />
 
       <Form>
@@ -173,7 +173,7 @@ function CreateChallenge({
           </Grid>
         </Form.Field>
         <Form.Field>
-          <label>Bet $LORDS (disabled)</label>
+          <label>Stake $LORDS (disabled)</label>
           <input placeholder={'$LORDS'} value={lords} maxLength={6} onChange={(e) => {
             const _lords = parseInt(e.target.value as string)
             if (!isNaN(_lords)) {

@@ -11,6 +11,7 @@ import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ChallengeState, makeDuelUrl } from '@/pistols/utils/pistols'
 import { AccountShort } from '@/pistols/components/ui/Account'
 import { DuelIcons } from '@/pistols/components/DuelIcons'
+import { ChallengeTime } from './ChallengeTime'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -23,7 +24,7 @@ export default function ChallengeModal() {
 
   const { atYourDuels, atLiveDuels, atPastDuels, duelId, dispatchSetDuel, dispatchSetDuelist } = usePistolsContext()
 
-  const { state, message, duelistA, duelistB, lords, isLive, isFinished } = useChallenge(duelId)
+  const { state, message, duelistA, duelistB, lords, isLive, isFinished, isAwaiting } = useChallenge(duelId)
 
   const { challengeDescription } = useChallengeDescription(duelId)
 
@@ -49,7 +50,19 @@ export default function ChallengeModal() {
       onOpen={() => {}}
       open={(atYourDuels || atLiveDuels || atPastDuels) && duelId > 0}
     >
-      <Modal.Header>Challenge&nbsp;&nbsp;&nbsp;<AccountShort address={duelId} suffix='' /></Modal.Header>
+      <Modal.Header>
+        <Grid className='PaddedLeft PaddedRight'>
+          <Row columns='equal'>
+            <Col textAlign='left'>
+              Challenge&nbsp;&nbsp;&nbsp;
+              <AccountShort address={duelId} suffix='' />
+            </Col>
+            <Col textAlign='right'>
+              <span className='Code'><ChallengeTime duelId={duelId} prefixed /></span>
+            </Col>
+          </Row>
+        </Grid>
+      </Modal.Header>
       <Modal.Content image>
         <ProfilePicButton profilePic={profilePicA} onClick={() => dispatchSetDuelist(duelistA)} />
         <Modal.Description style={{ width: '550px' }}>
@@ -114,7 +127,7 @@ export default function ChallengeModal() {
                     vs
                   </Col>
                   <Col width={7} textAlign='left'>
-                  <DuelIcons duelId={duelId} account={duelistB} size='big' />
+                    <DuelIcons duelId={duelId} account={duelistB} size='big' />
                   </Col>
                 </Row>
               </>

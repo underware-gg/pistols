@@ -14,17 +14,17 @@ export function ProfileDescription({
       <h1>{preName} {name} {postName}</h1>
       <AccountShort address={address} />
       <h3 className='Important'>Honour: {honourDisplay}</h3>
-      {displayStats &&
+      {displayStats && total_duels > 0 &&
         <div className='AbsoluteRight AlignRight PaddedRight'>
-          Total Duels: <span className='Bold'>{total_duels}</span>
+          Duels: <span className='Bold'>{total_duels}</span>
           <br />
-          Total Wins: <span className='Bold'>{total_wins}</span>
+          Wins: <span className='Bold'>{total_wins}</span>
           <br />
-          Total Losses: <span className='Bold'>{total_losses}</span>
+          Losses: <span className='Bold'>{total_losses}</span>
           <br />
-          Total Draws: <span className='Bold'>{total_draws}</span>
+          Draws: <span className='Bold'>{total_draws}</span>
           <br />
-          Total Honour: <span className='Bold'>{total_honour}</span>
+          Accumulated Honour: <span className='Bold'>{total_honour}</span>
         </div>
       }
     </div>
