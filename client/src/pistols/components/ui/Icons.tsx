@@ -264,9 +264,9 @@ export function CompletedIcon({
   children,
 }: CompletedIconProps) {
   return (
-    <IconGroup size={_upSize(size)}>
+    <IconGroup size={(size)}>
       {children}
-      {completed && <Icon size={size} name='checkmark' color='green' style={{ margin: '-4px 0 0 0' }} />}
+      {completed && <Icon size={_upSize(size)} name='checkmark' color='green' style={{ margin: '-4px 0 0 0' }} />}
     </IconGroup>
   )
 }

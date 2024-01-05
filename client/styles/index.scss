@@ -128,10 +128,15 @@ canvas {
 .AlignBottom { vertical-align: bottom; }
 
 .NoPadding { padding: 0!important; }
-.Padded { padding: 0.5em!important; }
 .NoMargin { margin: 0!important }
 .NoBorder { border: 0!important }
 .AutoMargin { margin: auto!important }
+
+.Padded { padding: 0.5em!important; }
+.PaddedLeft { padding-left: 0.5em!important; }
+.PaddedRight { padding-right: 0.5em!important; }
+.PaddedTop { padding-top: 0.5em!important; }
+.PaddedBottom { padding-bottom: 0.5em!important; }
 
 .Margin6 { margin: 6px!important }
 
@@ -143,6 +148,9 @@ canvas {
 
 .Important {
   color: $color-important;
+}
+.Bold {
+  font-weight: 600;
 }
 
 .Positive {
@@ -352,9 +360,14 @@ $box-h: calc((100vh - $aspect-h) / 2);
   max-height: 290px;
   margin: 0;
 }
+.TableValue {
+  font-size: 14px;
+  font-weight: 600;
+}
+
 // .TableHeader {
-//   position: absolute;
-//   top: 0;
+//   height: 30px!important;
+//   max-height: 30px!important;
 // }
 // .TableBody {
 //   margin-top: 100px;

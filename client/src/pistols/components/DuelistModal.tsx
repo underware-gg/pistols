@@ -52,7 +52,7 @@ export default function DuelistModal() {
       <Modal.Content image>
         <ProfilePic profilePic={profilePic} />
         <Modal.Description>
-          <ProfileDescription address={duelistAddress} />
+          <ProfileDescription address={duelistAddress} displayStats />
           <br />
           {/* <p>We've found the following gravatar image associated with your e-mail address.</p> */}
 
@@ -70,7 +70,7 @@ export default function DuelistModal() {
             {!isYou &&
               <Col>
                 {
-                  hasPact ? <ActionButton fill label='Go to Challenge' onClick={() => dispatchSetDuel(pactDuelId, MenuKey.YourDuels)} />
+                  hasPact ? <ActionButton fill attention label='Existing Challenge!' onClick={() => dispatchSetDuel(pactDuelId, MenuKey.YourDuels)} />
                     : isChallenging ? <ActionButton fill disabled={!challengeArgs} label='Submit Challenge!' onClick={() => _challenge()} />
                       : <ActionButton fill label='Challenge for a Duel!' onClick={() => setIsChallenging(true)} />
                 }
@@ -87,7 +87,7 @@ function ChallengesList({
   duelistAddress
 }) {
   return (
-    <div style={{ width: '550px' }}>
+    <div style={{ width: '570px' }}>
       <ChallengeTableByDuelist address={duelistAddress} compact />
     </div>
   )

@@ -28,12 +28,12 @@ export function DuelIcons({
     return (<>
       {isA &&
         <CompletedIcon completed={true}>
-          <EmojiIcon emoji='🤝' size={size as IconSizeProp} />
+          <EmojiIcon emoji='🤝' size={_size} />
         </CompletedIcon>
       }
       {isB &&
         <CompletedIcon completed={false}>
-          <EmojiIcon emoji='🤝' size={size as IconSizeProp} />
+          <EmojiIcon emoji='🤝' size={_size} />
         </CompletedIcon>
       }
     </>)

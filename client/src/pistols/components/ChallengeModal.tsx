@@ -114,7 +114,7 @@ export default function ChallengeModal() {
                     vs
                   </Col>
                   <Col width={7} textAlign='left'>
-                    <DuelIcons duelId={duelId} account={duelistB} size='big' />
+                  <DuelIcons duelId={duelId} account={duelistB} size='big' />
                   </Col>
                 </Row>
               </>
