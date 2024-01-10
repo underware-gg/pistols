@@ -4,7 +4,7 @@ import { useComponentValue, useEntityQuery } from "@dojoengine/react"
 import { useDojoComponents } from '@/dojo/DojoContext'
 import { bigintToEntity, bigintToHex, feltToString } from "../utils/utils"
 import { ChallengeState, ChallengeStateDescriptions } from "@/pistols/utils/pistols"
-import { useEntityKeys, useEntityKeysQuery } from '@/pistols/hooks/useEntityKeysQuery'
+import { useEntityKeys, useEntityKeysQuery } from '@/pistols/hooks/useEntityKeys'
 import { useDuelist } from "./useDuelist"
 
 
@@ -22,7 +22,7 @@ export const useAllChallengeIds = () => {
 
 export const useChallengeIdsByState = (state: ChallengeState) => {
   const { Challenge } = useDojoComponents()
-  const challengeIds: bigint[] = useEntityKeysQuery(Challenge, [HasValue(Challenge, { state: state })], 'duel_id')
+  const challengeIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { state: state })])
   return {
     challengeIds,
   }
@@ -137,8 +137,8 @@ export const useChallengeDescription = (duelId: bigint) => {
 
 export const useChallengeIdsByDuelist = (address: bigint) => {
   const { Challenge } = useDojoComponents()
-  const challengerIds: bigint[] = useEntityKeysQuery(Challenge, [HasValue(Challenge, { duelist_a: BigInt(address) })], 'duel_id')
-  const challengedIds: bigint[] = useEntityKeysQuery(Challenge, [HasValue(Challenge, { duelist_b: BigInt(address) })], 'duel_id')
+  const challengerIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { duelist_a: BigInt(address) })])
+  const challengedIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { duelist_b: BigInt(address) })])
   const challengeIds: bigint[] = useMemo(() => (
     [...challengerIds, ...challengedIds]
   ), [challengerIds, challengedIds])

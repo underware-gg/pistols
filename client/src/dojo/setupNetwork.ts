@@ -1,9 +1,9 @@
+import { Account, num } from 'starknet'
+import { DojoProvider, } from '@dojoengine/core'
+import * as torii from '@dojoengine/torii-client'
 import { defineContractComponents } from './contractComponents'
 import { world } from './world'
-import { DojoProvider, } from '@dojoengine/core'
-import { Account, num } from 'starknet'
 import manifest from '@/manifest.json'
-import * as torii from '@dojoengine/torii-client'
 
 export type SetupNetworkResult = Awaited<ReturnType<typeof setupNetwork>>
 

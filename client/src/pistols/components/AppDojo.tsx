@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
 import { DojoProvider } from '@/dojo/DojoContext'
-import { setup } from '@/dojo/setup.ts'
+import { setup } from '@/dojo/setup'
 import { GameplayProvider } from '@/pistols/hooks/GameplayContext'
 import App from '@/pistols/components/App'
 

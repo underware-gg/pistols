@@ -3,7 +3,7 @@ import { Entity, HasValue, Has, getComponentValue } from '@dojoengine/recs'
 import { useComponentValue, useEntityQuery } from '@dojoengine/react'
 import { useDojoComponents } from '@/dojo/DojoContext'
 import { bigintToEntity, feltToString } from '@/pistols/utils/utils'
-import { useEntityKeys } from '@/pistols/hooks/useEntityKeysQuery'
+import { useEntityKeys } from '@/pistols/hooks/useEntityKeys'
 
 
 //------------------
