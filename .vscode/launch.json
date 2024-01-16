@@ -8,16 +8,8 @@
       "type": "chrome",
       "request": "launch",
       "name": "Launch Chrome against localhost",
-      "url": "http://localhost:5173/",
-      "webRoot": "/Users/roger/Dev/Blockchain/Realms/lootunderworld/client/src/dojo",
-      // "webRoot": "${workspaceFolder}",
-      "sourceMapPathOverrides": {
-        "webpack:/*": "${webRoot}/*",
-        "/./*": "${webRoot}/*",
-        "/src/*": "${webRoot}/*",
-        "/*": "*",
-        "/./~/*": "${webRoot}/node_modules/*"
-      },
+      "url": "http://localhost:3000/",
+      "webRoot": "${workspaceRoot}/client",
     }
   ]
 }

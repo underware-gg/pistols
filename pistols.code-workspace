@@ -9,10 +9,10 @@
       "**/node_modules": true,
       "**/build": true,
       "**/.github": true,
-      "**/.vscode": true,
       "**/.next": true,
       "**/_bak": true,
       "**/*.tsbuildinfo": true,
+      // "**/.vscode": true,
       // "**/.env*": true,
     },
     "search.exclude": {
