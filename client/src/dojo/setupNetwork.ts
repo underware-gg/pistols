@@ -14,7 +14,7 @@ export async function setupNetwork() {
   if (!process.env.NEXT_PUBLIC_TORII) throw (`NEXT_PUBLIC_TORII is null`)
 
   // Create a new DojoProvider instance.
-  const provider = new DojoProvider(process.env.NEXT_PUBLIC_WORLD_ADDRESS, manifest, process.env.NEXT_PUBLIC_NODE_URL)
+  const provider = new DojoProvider(manifest, process.env.NEXT_PUBLIC_NODE_URL)
 
   const toriiClient = await torii.createClient([], {
     rpcUrl: process.env.NEXT_PUBLIC_NODE_URL,

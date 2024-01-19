@@ -542,20 +542,20 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 .StepsIcon {
   font-family: monospace!important;
-  font-size: 16px!important;
+  font-size: 12px!important;
   font-weight: 600!important;
   color: $color-bg;
   text-shadow: 0 0 2px #000;
   margin: -2px 0 0 -2px!important;
 }
 .StepsIcon.small {
-  font-size: 14px!important;
+  font-size: 12px!important;
 }
 .StepsIcon.large {
-  font-size: 20px!important;
+  font-size: 16px!important;
 }
 .StepsIcon.big {
-  font-size: 24px!important;
+  font-size: 20px!important;
 }
 
 .StepsIconRound {

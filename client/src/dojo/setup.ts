@@ -1,7 +1,7 @@
 import { createClientComponents } from './createClientComponents'
 import { createSystemCalls } from './createSystemCalls'
 import { setupNetwork } from './setupNetwork'
-import { getSyncEntities } from '@dojoengine/react'
+import { getSyncEntities } from '@dojoengine/state'
 
 export type SetupResult = Awaited<ReturnType<typeof setup>>
 
