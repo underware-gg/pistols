@@ -92,7 +92,7 @@ export const useDojo = () => {
 
 
 //
-// pistols
+// NEW
 //
 
 export const useDojoAccount = () => {

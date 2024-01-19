@@ -3,8 +3,8 @@ import { Button, Divider, Grid, Modal, Pagination } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { useMakeCommitMove } from '@/pistols/hooks/useCommitReveal'
-import { pedersen } from '../utils/utils'
-import { Blades, BladesNames } from '../utils/pistols'
+import { pedersen } from '@/pistols/utils/utils'
+import { Blades, BladesNames } from '@/pistols/utils/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column

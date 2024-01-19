@@ -9,9 +9,9 @@ import ee from 'event-emitter'
 export var emitter = ee()
 
 import { AudioName, AUDIO_ASSETS, TEXTURES, SPRITESHEETS, AnimName } from '@/pistols/data/assets'
-import { map } from '../utils/utils'
+import { map } from '@/pistols/utils/utils'
 import { SpriteSheet, Actor } from './SpriteSheetMaker'
-import { Blades, FULL_HEALTH } from '../utils/pistols'
+import { Blades, FULL_HEALTH } from '@/pistols/utils/pistols'
 
 const PI = Math.PI
 const HALF_PI = Math.PI * 0.5

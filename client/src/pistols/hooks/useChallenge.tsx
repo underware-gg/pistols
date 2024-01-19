@@ -4,7 +4,7 @@ import { useComponentValue, useEntityQuery } from "@dojoengine/react"
 import { useDojoComponents } from '@/dojo/DojoContext'
 import { bigintToEntity, bigintToHex, feltToString } from "../utils/utils"
 import { ChallengeState, ChallengeStateDescriptions } from "@/pistols/utils/pistols"
-import { useEntityKeys, useEntityKeysQuery } from '@/pistols/hooks/useEntityKeysQuery'
+import { useEntityKeys, useEntityKeysQuery } from '@/pistols/hooks/useEntityKeys'
 import { useDuelist } from "./useDuelist"
 
 
@@ -22,7 +22,7 @@ export const useAllChallengeIds = () => {
 
 export const useChallengeIdsByState = (state: ChallengeState) => {
   const { Challenge } = useDojoComponents()
-  const challengeIds: bigint[] = useEntityKeysQuery(Challenge, [HasValue(Challenge, { state: state })], 'duel_id')
+  const challengeIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { state: state })])
   return {
     challengeIds,
   }
@@ -78,7 +78,7 @@ export const useChallenge = (duelId: bigint | string) => {
   const message = useMemo(() => feltToString(challenge?.message ?? 0n), [challenge])
   const passCode = useMemo(() => feltToString(challenge?.pass_code ?? 0n), [challenge])
   const lords = useMemo(() => (challenge?.lords ?? 0), [challenge])
-  const round = useMemo(() => (challenge?.round_number ?? 0), [challenge])
+  const roundNumber = useMemo(() => (challenge?.round_number ?? 0), [challenge])
   const timestamp = useMemo(() => (challenge?.timestamp ?? 0), [challenge])
   const timestamp_expire = useMemo(() => (challenge?.timestamp_expire ?? 0), [challenge])
   const timestamp_start = useMemo(() => (challenge?.timestamp_start ?? 0), [challenge])
@@ -87,8 +87,6 @@ export const useChallenge = (duelId: bigint | string) => {
   return {
     challengeExists: (challenge != null),
     state,
-    isLive: (state == ChallengeState.Awaiting || state == ChallengeState.InProgress),
-    isFinished: (state == ChallengeState.Resolved || state == ChallengeState.Draw),
     duelistA,
     duelistB,
     challenger: duelistA,
@@ -97,8 +95,15 @@ export const useChallenge = (duelId: bigint | string) => {
     passCode,
     lords,
     // progress and results
-    round,
+    roundNumber,
     winner,
+    isLive: (state == ChallengeState.Awaiting || state == ChallengeState.InProgress),
+    isAwaiting: (state == ChallengeState.Awaiting),
+    isInProgress: (state == ChallengeState.InProgress),
+    isFinished: (state == ChallengeState.Resolved || state == ChallengeState.Draw),
+    isResolved: (state == ChallengeState.Resolved),
+    isDraw: (state == ChallengeState.Draw),
+    isCanceled: (state == ChallengeState.Withdrawn || state == ChallengeState.Refused),
     // times
     timestamp,
     timestamp_expire,
@@ -132,8 +137,8 @@ export const useChallengeDescription = (duelId: bigint) => {
 
 export const useChallengeIdsByDuelist = (address: bigint) => {
   const { Challenge } = useDojoComponents()
-  const challengerIds: bigint[] = useEntityKeysQuery(Challenge, [HasValue(Challenge, { duelist_a: BigInt(address) })], 'duel_id')
-  const challengedIds: bigint[] = useEntityKeysQuery(Challenge, [HasValue(Challenge, { duelist_b: BigInt(address) })], 'duel_id')
+  const challengerIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { duelist_a: BigInt(address) })])
+  const challengedIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { duelist_b: BigInt(address) })])
   const challengeIds: bigint[] = useMemo(() => (
     [...challengerIds, ...challengedIds]
   ), [challengerIds, challengedIds])

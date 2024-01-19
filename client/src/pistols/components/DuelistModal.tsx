@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { Grid, Table, Modal, Form, Divider, Dropdown } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { MenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
@@ -40,7 +39,7 @@ export default function DuelistModal() {
       create_challenge(account, duelistAddress, '', challengeArgs.message, challengeArgs.expire_seconds)
     }
   }
-  
+
   return (
     <Modal
       // size='small'
@@ -52,13 +51,11 @@ export default function DuelistModal() {
       <Modal.Header>Duelist</Modal.Header>
       <Modal.Content image>
         <ProfilePic profilePic={profilePic} />
-        <Modal.Description>
-          <ProfileDescription address={duelistAddress} />
-          <br />
-          {/* <p>We've found the following gravatar image associated with your e-mail address.</p> */}
-
+        <Modal.Description className='FillParent'>
+          <ProfileDescription address={duelistAddress} displayStats />
+          <Divider />
           {!isChallenging && <div className='TableModal'><ChallengesList duelistAddress={duelistAddress} /></div>}
-          {isChallenging && <CreateChallenge setChallengeArgs={setChallengeArgs}/>}
+          {isChallenging && <CreateChallenge setChallengeArgs={setChallengeArgs} />}
         </Modal.Description>
       </Modal.Content>
       <Modal.Actions>
@@ -71,7 +68,7 @@ export default function DuelistModal() {
             {!isYou &&
               <Col>
                 {
-                  hasPact ? <ActionButton fill label='Go to Challenge' onClick={() => dispatchSetDuel(pactDuelId, MenuKey.YourDuels)} />
+                  hasPact ? <ActionButton fill attention label='Existing Challenge!' onClick={() => dispatchSetDuel(pactDuelId, MenuKey.YourDuels)} />
                     : isChallenging ? <ActionButton fill disabled={!challengeArgs} label='Submit Challenge!' onClick={() => _challenge()} />
                       : <ActionButton fill label='Challenge for a Duel!' onClick={() => setIsChallenging(true)} />
                 }
@@ -88,8 +85,8 @@ function ChallengesList({
   duelistAddress
 }) {
   return (
-    <div style={{ width: '550px' }}>
-      <ChallengeTableByDuelist address={duelistAddress} />
+    <div style={{ width: '570px' }}>
+      <ChallengeTableByDuelist address={duelistAddress} compact />
     </div>
   )
 }
@@ -98,7 +95,7 @@ function CreateChallenge({
   setChallengeArgs
 }) {
   const [message, setMessage] = useState('')
-  const [days, setDays] = useState(1)
+  const [days, setDays] = useState(7)
   const [hours, setHours] = useState(0)
   const [lords, setLords] = useState(0)
 
@@ -136,10 +133,8 @@ function CreateChallenge({
   })), [])
 
   return (
-    <div>
-      <Divider />
-
-      <h1>Issue a Challenge</h1>
+    <div style={{width: '400px'}}>
+      <h1>New Challenge Conditions</h1>
       <br />
 
       <Form>
@@ -169,7 +164,7 @@ function CreateChallenge({
           <Grid className='NoMargin' columns={'equal'}>
             <Row>
               <Col>
-                <Dropdown defaultValue='1' placeholder='Days' selection options={daysOptions} onChange={(e, { value }) => setDays(parseInt(value as string))} />
+                <Dropdown defaultValue='7' placeholder='Days' selection options={daysOptions} onChange={(e, { value }) => setDays(parseInt(value as string))} />
               </Col>
               <Col>
                 <Dropdown defaultValue='0' placeholder='Hours' selection options={hoursOptions} onChange={(e, { value }) => setHours(parseInt(value as string))} />
@@ -178,10 +173,10 @@ function CreateChallenge({
           </Grid>
         </Form.Field>
         <Form.Field>
-          <label>$LORDS deposit (disabled)</label>
+          <label>Stake $LORDS (disabled)</label>
           <input placeholder={'$LORDS'} value={lords} maxLength={6} onChange={(e) => {
             const _lords = parseInt(e.target.value as string)
-            if(!isNaN(_lords)) {
+            if (!isNaN(_lords)) {
               setLords(_lords)
             }
           }} />

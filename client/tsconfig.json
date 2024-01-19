@@ -41,7 +41,9 @@
         "src/*"
       ]
     },
-    "strict": false
+    "strict": false,
+    // vscode debugger
+    "sourceMap": true
   },
   "include": [
     "./src",

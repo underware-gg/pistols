@@ -81,6 +81,7 @@ rustup update
 curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh
 
 # other stuff you might need
+cargo install toml-cli
 brew install protobuf
 ```
 

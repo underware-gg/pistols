@@ -3,7 +3,7 @@ import { Entity, HasValue, Has, getComponentValue } from '@dojoengine/recs'
 import { useComponentValue, useEntityQuery } from '@dojoengine/react'
 import { useDojoComponents } from '@/dojo/DojoContext'
 import { bigintToEntity, feltToString } from '@/pistols/utils/utils'
-import { useEntityKeys } from '@/pistols/hooks/useEntityKeysQuery'
+import { useEntityKeys } from '@/pistols/hooks/useEntityKeys'
 
 
 //------------------
@@ -38,8 +38,8 @@ export const useDuelist = (address: bigint | string) => {
   const total_losses = useMemo(() => (duelist?.total_losses ?? 0), [duelist])
   const total_draws = useMemo(() => (duelist?.total_draws ?? 0), [duelist])
   const total_honour = useMemo(() => (duelist?.total_honour ?? 0), [duelist])
-  const honour = useMemo(() => (duelist?.honour ?? 0), [duelist])
-  const honourDisplay = useMemo(() => (total_duels > 0 && honour > 0 ? (parseFloat(duelist.honour) / 10.0).toFixed(1) : '—'), [honour, total_duels])
+  const honour = useMemo(() => (parseFloat((duelist?.honour ?? 0)) / 10.0), [duelist, total_duels])
+  const honourDisplay = useMemo(() => (total_duels > 0 && honour > 0 ? honour.toFixed(1) : '—'), [honour, total_duels])
 
   return {
     address,

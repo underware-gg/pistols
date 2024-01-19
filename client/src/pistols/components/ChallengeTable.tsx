@@ -1,13 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
-import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { useAllChallengeIds, useChallenge, useChallengeIdsByDuelist, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
 import { useDojoAccount } from '@/dojo/DojoContext'
+import { useAllChallengeIds, useChallenge, useChallengeIdsByDuelist, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
+import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { useClientTimestamp } from '@/pistols/hooks/useTimestamp'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { MenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ChallengeState, ChallengeStateNames } from '@/pistols/utils/pistols'
 import { formatTimestamp, formatTimestampDelta } from '@/pistols/utils/utils'
-import { useTimestampCountdown } from '../hooks/useTimestamp'
+import { ChallengeTime } from '@/pistols/components/ChallengeTime'
+import { DuelIcons } from '@/pistols/components/DuelIcons'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -31,9 +33,10 @@ export function ChallengeTablePast() {
 
 export function ChallengeTableByDuelist({
   address = null,
+  compact = false,
 }) {
   const { challengeIds } = useChallengeIdsByDuelist(address)
-  return <ChallengeTableByIds challengeIds={challengeIds} />
+  return <ChallengeTableByIds challengeIds={challengeIds} compact={compact} />
 }
 
 export function ChallengeTableYour() {
@@ -45,7 +48,8 @@ export function ChallengeTableYour() {
 
 function ChallengeTableByIds({
   challengeIds,
-  color = 'orange'
+  color = 'orange',
+  compact = false,
 }) {
   const [order, setOrder] = useState({})
   const _sortCallback = (id, state, timestamp) => {
@@ -55,7 +59,7 @@ function ChallengeTableByIds({
   const rows = useMemo(() => {
     let result = []
     challengeIds.forEach((duelId, index) => {
-      result.push(<DuelItem key={duelId} duelId={duelId} sortCallback={_sortCallback} />)
+      result.push(<DuelItem key={duelId} duelId={duelId} sortCallback={_sortCallback} compact={compact}/>)
     })
     return result
   }, [challengeIds])
@@ -104,15 +108,16 @@ function ChallengeTableByIds({
 function DuelItem({
   duelId,
   sortCallback,
+  compact = false,
 }) {
   const { account } = useDojoAccount()
   const { dispatchSetDuel } = usePistolsContext()
-  const { duelistA, duelistB, state, isLive, winner, timestamp, timestamp_expire, timestamp_start, timestamp_end } = useChallenge(duelId)
+  const {
+    duelistA, duelistB, state, isLive, isCanceled, isInProgress, isFinished, isDraw, winner, timestamp, timestamp_expire, timestamp_start, timestamp_end,
+  }= useChallenge(duelId)
   const { name: nameA, profilePic: profilePicA } = useDuelist(duelistA)
   const { name: nameB, profilePic: profilePicB } = useDuelist(duelistB)
-  const timestamp_system = useTimestampCountdown()
-  // console.log(timestamp, timestamp_expire, `>`, timestamp_system)
-  
+
   useEffect(() => {
     sortCallback(duelId, state, timestamp)
   }, [state, timestamp])
@@ -120,31 +125,21 @@ function DuelItem({
   const isYours = useMemo(() => (BigInt(account.address) == duelistA || BigInt(account.address) == duelistB), [account, duelistA, duelistB])
   const winnerIsA = useMemo(() => (duelistA == winner), [duelistA, winner])
   const winnerIsB = useMemo(() => (duelistB == winner), [duelistB, winner])
-  const isAwaiting = useMemo(() => [ChallengeState.Awaiting].includes(state), [state])
-  const isInProgress = useMemo(() => [ChallengeState.InProgress].includes(state), [state])
-  const isCanceled = useMemo(() => [ChallengeState.Withdrawn, ChallengeState.Refused].includes(state), [state])
-  const isDraw = useMemo(() => [ChallengeState.Draw].includes(state), [state])
-
-  const date = useMemo(() => {
-    if (isAwaiting) return '⏱️ ' + formatTimestampDelta(timestamp_system, timestamp_expire)
-    if (isInProgress || winnerIsA || winnerIsB) return /*'⚔️ ' +*/ formatTimestamp(timestamp_start)
-    if (isCanceled) return /*'🚫 ' +*/ formatTimestamp(timestamp_end)
-    if (isDraw) return /*'🤝 ' +*/ formatTimestamp(timestamp_end)
-    return formatTimestamp(timestamp)
-  }, [state, timestamp, timestamp_expire, timestamp_start, timestamp_end])
 
   const _gotoChallenge = () => {
     dispatchSetDuel(duelId, isYours ? MenuKey.YourDuels : isLive ? MenuKey.LiveDuels : MenuKey.PastDuels)
   }
 
   return (
-    <Table.Row warning={isDraw} negative={isCanceled} positive={isInProgress || winnerIsA || winnerIsB} textAlign='left' verticalAlign='middle' onClick={() => _gotoChallenge()}>
+    <Table.Row warning={isDraw || isCanceled} negative={false} positive={isInProgress || isFinished} textAlign='left' verticalAlign='middle' onClick={() => _gotoChallenge()}>
       <Cell positive={winnerIsA} negative={winnerIsB}>
         <ProfilePicSquare profilePic={profilePicA} />
       </Cell>
 
       <Cell positive={winnerIsA} negative={winnerIsB}>
         {nameA}
+        {compact ? <br /> : ' '}
+        <DuelIcons duelId={duelId} account={duelistA} size={compact ? null : 'large'} />
       </Cell>
 
       <Cell positive={winnerIsB} negative={winnerIsA}>
@@ -153,6 +148,8 @@ function DuelItem({
 
       <Cell positive={winnerIsB} negative={winnerIsA}>
         {nameB}
+        {compact ? <br /> : ' '}
+        <DuelIcons duelId={duelId} account={duelistB} size={compact ? null : 'large'} />
       </Cell>
 
       <Cell textAlign='center'>
@@ -160,7 +157,7 @@ function DuelItem({
       </Cell>
 
       <Cell textAlign='center'>
-        {date}
+        <ChallengeTime duelId={duelId} />
       </Cell>
     </Table.Row>
   )

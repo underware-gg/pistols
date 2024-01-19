@@ -4,7 +4,8 @@ import { GameState, useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { loadAudioAssets, isAudioAssetsLoaded, AudioName } from '@/pistols/data/assets'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import GameView from '@/pistols/components/GameView'
-import { useSettingsContext } from '../hooks/SettingsContext'
+import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
+import { useEffectOnce } from '../hooks/useEffectOnce'
 
 function GameContainer({
   isVisible,
@@ -82,6 +83,9 @@ function GameStartOverlay({
   )
 }
 
+//-------------------------------------------------
+// Displayed only when the three.js game is visible
+//
 const GameAudios = ({
   isVisible
 }) => {
@@ -90,12 +94,12 @@ const GameAudios = ({
 
   useEffect(() => {
     const _play = (musicEnabled && isVisible)
-    gameImpl?.playAudio(AudioName.AMBIENT, _play)
+    gameImpl?.playAudio(AudioName.MUSIC_INGAME, _play)
   }, [musicEnabled, isVisible])
 
   useEffect(() => {
     if (!isVisible) {
-      gameImpl?.stopAudio(AudioName.AMBIENT)
+      gameImpl?.stopAudio(AudioName.MUSIC_INGAME)
     }
   }, [isVisible])
 
@@ -105,6 +109,33 @@ const GameAudios = ({
 
   return <></>
 }
+
+//-----------------------------------------------------
+// Displayed only when the three.js game is NOT visible
+// Will disable MUSIC settings if not interacted yet
+//
+export const TavernAudios = () => {
+  const { musicEnabled } = useSettingsContext()
+  const { gameImpl } = useGameplayContext()
+
+  useEffect(() => {
+    // const hasBeenActive = navigator?.userActivation?.hasBeenActive
+    // if (musicEnabled && !hasBeenActive) {
+    //   dispatchSettings(MUSIC, false)
+    // }
+
+    return () => {
+      gameImpl?.stopAudio(AudioName.MUSIC_MENUS)
+    }
+  }, [])
+
+  useEffect(() => {
+    gameImpl?.playAudio(AudioName.MUSIC_MENUS, musicEnabled)
+  }, [musicEnabled])
+
+  return <></>
+}
+
 
 
 export default GameContainer

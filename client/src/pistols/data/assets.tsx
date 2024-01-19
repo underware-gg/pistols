@@ -121,7 +121,8 @@ const SPRITESHEETS: Spritesheets = {
 // Audio Assets
 //
 enum AudioName {
-  AMBIENT = 'AMBIENT',
+  MUSIC_MENUS = 'MUSIC_MENUS',
+  MUSIC_INGAME = 'MUSIC_INGAME',
   SHOOT = 'SHOOT',
   BODY_FALL = 'BODY_FALL',
   GRUNT_FEMALE = 'GRUNT_FEMALE',
@@ -135,9 +136,11 @@ interface AudioAsset {
   path: string
   loop?: boolean
   volume?: number
+  disabled?: boolean
+  delaySeconds?: number   // we can delay playback to match animation frame
+  // loader
   object?: any
   loaded?: boolean
-  delaySeconds?: number   // we can delay playback to match animation frame
 }
 type AudioAssets = {
   [key in AudioName]: AudioAsset
@@ -145,10 +148,16 @@ type AudioAssets = {
 
 
 let AUDIO_ASSETS: AudioAssets = {
-  AMBIENT: {
+  MUSIC_MENUS: {
     path: '/audio/biodecay-song6.mp3',
     volume: 0.5,
     loop: true,
+  },
+  MUSIC_INGAME: {
+    path: '/audio/biodecay-song6.mp3',
+    volume: 0.5,
+    loop: true,
+    disabled: true,
   },
   SHOOT: {
     path: '/audio/sfx/pistol-shot.mp3',
@@ -193,11 +202,11 @@ let AUDIO_ASSETS: AudioAssets = {
 // Loaders
 //
 // Generic loader
-const _loader = async (ASSETS, onLoading) => {
+const _loader = async (ASSETS: any, onLoading: Function) => {
   return new Promise<void>((resolve, reject) => {
     let assetsToLoad = Object.keys(ASSETS).length
     Object.keys(ASSETS).forEach((name) => {
-      onLoading(name, (object) => {
+      onLoading(name, (object: any) => {
         ASSETS[name].object = object
         if (--assetsToLoad == 0) {
           resolve()
@@ -210,10 +219,14 @@ const _loader = async (ASSETS, onLoading) => {
 //-----------------
 // Audios
 //
-const _loadAudios = async (listener) => {
+const _loadAudios = async (listener: THREE.AudioListener) => {
   const loader = new THREE.AudioLoader()
-  return _loader(AUDIO_ASSETS, (name, resolve) => {
+  return _loader(AUDIO_ASSETS, (name: string, resolve: Function) => {
     const asset = AUDIO_ASSETS[name]
+    if (asset.disabled) {
+      resolve(null)
+      return
+    }
     try {
       loader.load(asset.path, function (buffer) {
         // load asset...

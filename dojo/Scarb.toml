@@ -7,16 +7,16 @@ website = "https://pistols.lootunder.world"
 socials.x = "https://twitter.com/lootunderworld"
 
 [package]
-cairo-version = "2.3.1"
+cairo-version = "2.4.0"
 name = "pistols"
-version = "0.2.0"
+version = "0.3.0"
 
 [cairo]
 sierra-replace-ids = true
 
 [dependencies]
 # dojo = { git = "https://github.com/dojoengine/dojo.git", rev = "01eab985a3f5056e47cc7b4753ca24f64d3a078a" }
-dojo = { git = "https://github.com/dojoengine/dojo.git", tag = "v0.4.3" }
+dojo = { git = "https://github.com/dojoengine/dojo.git", tag = "v0.4.4" }
 
 
 [[target.dojo]]
@@ -34,5 +34,5 @@ world_address = "0x269c58e5fa1e7f6fe3756f1de88ecdfab7d03ba67e79ba0365b4ef1e81155
 
 # SLOT
 rpc_url = "https://api.cartridge.gg/x/pistols/katana"
-account_address = "0x3de8cead289fe145cfea143ac58ced6c83e518a758469df850e5c37445c95ae"
-private_key = "0x2cbd34ec84e50d1616c3d0b17799a5f2fd7448f2039e4652eb950586f06ad60"
+account_address = "0x2e0e12a0275b03172bb09aafac8e288599678032493fef65adc1af87771bdaa"
+private_key = "0x3cfcac8524dd04d352479c89b5685b9f3b4e788e226305e1df18712154afd76"

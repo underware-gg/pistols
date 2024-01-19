@@ -2,7 +2,7 @@
 mod shooter {
     use core::option::OptionTrait;
     use core::traits::TryInto;
-    use starknet::{ContractAddress};
+    use starknet::{ContractAddress, get_block_timestamp};
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     use pistols::systems::{utils};
@@ -143,19 +143,23 @@ mod shooter {
         if (round.duelist_a.health == 0 && round.duelist_b.health == 0) {
             // both dead!
             challenge.state = ChallengeState::Draw.into();
+            challenge.timestamp_end = get_block_timestamp();
         } else if (round.duelist_a.health == 0) {
             // A is dead!
             challenge.state = ChallengeState::Resolved.into();
             challenge.winner = challenge.duelist_b;
+            challenge.timestamp_end = get_block_timestamp();
         } else if (round.duelist_b.health == 0) {
             // B is dead!
             challenge.state = ChallengeState::Resolved.into();
             challenge.winner = challenge.duelist_a;
+            challenge.timestamp_end = get_block_timestamp();
         } else {
             // both alive!
             if (challenge.round_number == constants::ROUND_COUNT) {
                 // end in a Draw
                 challenge.state = ChallengeState::Draw.into();
+                challenge.timestamp_end = get_block_timestamp();
             } else {
                 // next round
                 challenge.round_number += 1;

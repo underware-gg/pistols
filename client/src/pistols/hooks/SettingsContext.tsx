@@ -102,11 +102,19 @@ export { SettingsProvider, SettingsContext, SettingsActions }
 
 export const useSettingsContext = () => {
   const { state, dispatch } = useContext(SettingsContext)
+
+  const dispatchSetting = (key: string, value: any) => {
+    dispatch({
+      type: key,
+      payload: value,
+    })
+  }
+
   return {
     ...state,   // expose individual settings values
     settings: { ...state },  // expose settings as object {}
-    dispatch,
     SettingsActions,
+    dispatchSetting,
   }
 }
 
