@@ -1,18 +1,25 @@
 #!/bin/bash
 set -e
 
+#-----------------
+# migrate
+#
+sozo migrate
+
+#-----------------
+# auth write
+#
+scripts/default_auth.sh
+
+#-----------------
+# client setup
+#
 export WORLD_ADDRESS="0x269c58e5fa1e7f6fe3756f1de88ecdfab7d03ba67e79ba0365b4ef1e81155be"
 export RPC_URL="http://localhost:5050/"
 
-
-#sozo --offline build
-sozo migrate
-
-scripts/default_auth.sh
-
 cp target/dev/manifest.json ../client/src/
-
 cd ../client
 npm run create-components $RPC_URL $WORLD_ADDRESS
 
+#-----------------
 echo "--- DONE! 👍"
