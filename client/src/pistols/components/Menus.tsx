@@ -10,6 +10,7 @@ import { SPRITESHEETS } from '@/pistols/data/assets'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { SettingsMenuItem } from '@/pistols/components/ui/Buttons'
+import { DuelStage } from '../hooks/useDuel'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -88,15 +89,24 @@ export function MenuSettings({
 
 
 export function MenuDuel({
+  duelStage,
 }) {
   const router = useRouter()
   const { settings, SettingsActions } = useSettingsContext()
+
+  const _skipAnimation = () => {
+
+  }
+  const canSkip = duelStage == DuelStage.PistolsShootout || duelStage == DuelStage.BladesClash
   return (
     <div className='MenuBottom AlignCenter NoMouse'>
       <Menu secondary compact className='YesMouse' size='huge'>
         <Menu.Item onClick={() => router.push('/tavern')}>
           Back to Tavern
         </Menu.Item>
+        {/* <Menu.Item disabled={!canSkip} onClick={() => _skipAnimation()}>
+          Skip animation
+        </Menu.Item> */}
         {/* <SettingsMenuItem prefix='Music' settingsKey={SettingsActions.MUSIC_ENABLED} currentValue={settings.musicEnabled} /> */}
         <SettingsMenuItem prefix='SFX' settingsKey={SettingsActions.SFX_ENABLED} currentValue={settings.sfxEnabled} />
       </Menu>

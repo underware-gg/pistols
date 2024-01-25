@@ -78,7 +78,7 @@ export default function Duel({
         />
       </div>
 
-      <MenuDuel />
+      <MenuDuel duelStage={duelStage} />
 
       {/* {process.env.NEXT_PUBLIC_DEBUG &&
         <MenuDebugAnimations />
