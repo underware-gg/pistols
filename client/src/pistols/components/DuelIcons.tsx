@@ -2,8 +2,9 @@ import React from 'react'
 import { Icon } from 'semantic-ui-react'
 import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
 import { DuelStage, useDuel } from '@/pistols/hooks/useDuel'
-import { Blades, ChallengeState } from '@/pistols/utils/pistols'
+import { Blades, ChallengeState, HALF_HEALTH } from '@/pistols/utils/pistols'
 import { BladesIcon, CompletedIcon, EmojiIcon, StepsIcon } from '@/pistols/components/ui/Icons'
+import { MESSAGES } from '../data/messages'
 
 
 export function DuelIcons({
@@ -21,6 +22,9 @@ export function DuelIcons({
   const movesRound1 = isA ? (round1?.duelist_a ?? null) : isB ? (round1?.duelist_b ?? null) : null
   const movesRound2 = isA ? (round2?.duelist_a ?? null) : isB ? (round2?.duelist_b ?? null) : null
   const completedStages = isA ? (completedStagesA) : isB ? (completedStagesB) : null
+
+  const healthRound1 = movesRound1?.health == 0 ? MESSAGES.DEAD_EMOJI : movesRound1?.health == HALF_HEALTH ? MESSAGES.INJURED_EMOJI : null
+  const healthRound2 = movesRound2?.health == 0 ? MESSAGES.DEAD_EMOJI : (movesRound2?.health == HALF_HEALTH && !healthRound1) ? MESSAGES.INJURED_EMOJI : null
 
   const _size = size as IconSizeProp
 
@@ -51,6 +55,7 @@ export function DuelIcons({
           <Icon name='eye' size={_size} />
         </CompletedIcon>
       }
+      {healthRound1 && <EmojiIcon emoji={healthRound1} size={_size} />}
       {movesRound2 && duelStage >= DuelStage.BladesCommit &&
         <CompletedIcon completed={completedStages[DuelStage.BladesCommit]}>
           <EmojiIcon emoji='🗡️' size={_size} />
@@ -61,13 +66,16 @@ export function DuelIcons({
           <Icon name='eye' size={_size} />
         </CompletedIcon>
       }
+      {healthRound2 && <EmojiIcon emoji={healthRound2} size={_size} />}
     </>)
   }
 
   if (isFinished) {
     return (<>
       {movesRound1 && <StepsIcon stepCount={parseInt(movesRound1.move)} size={_size} />}
+      {healthRound1 && <EmojiIcon emoji={healthRound1} size={_size} />}
       {movesRound2 && <BladesIcon blades={parseInt(movesRound2.move) as Blades} size={_size} />}
+      {healthRound2 && <EmojiIcon emoji={healthRound2} size={_size} />}
     </>)
   }
 

@@ -195,7 +195,7 @@ export function EmojiIcon({
   rotated = null,
 }: EmojiIconProps) {
   return (
-    <i className={`${className} icon ${size} ${rotated && `${rotated} rotated`} ${disabled && `disabled`} ${flipped && `${flipped} flipped`}`} style={style}>
+    <i className={`${className} icon ${size} ${rotated && `${rotated} rotated`} ${disabled && `disabled`} ${flipped && `${flipped} flipped`} NoMargin`} style={style}>
       {emoji}
     </i>
   )

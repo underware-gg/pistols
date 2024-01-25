@@ -15,6 +15,7 @@ import { MenuDuel, MenuDebugAnimations } from '@/pistols/components/Menus'
 import { AnimationState } from '@/pistols/three/game'
 import { EmojiIcon } from '@/pistols/components/ui/Icons'
 import CommitModal from '@/pistols/components/CommitModal'
+import { MESSAGES } from '../data/messages'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -131,14 +132,14 @@ function DuelProgress({
 
   const _healthResult = (round: any) => {
     const health = isA ? round.duelist_a.health : round.duelist_b.health
-    return (health == 0 ? 'is DEAD!' : health < FULL_HEALTH ? 'gets out INJURED!' : 'gets out ALIVE!')
+    return (health == 0 ? 'is DEAD!' : health < FULL_HEALTH ? 'is INJURED!' : 'is ALIVE!')
   }
 
   const pistolsResult = useMemo(() => {
     if (duelStage > DuelStage.PistolsShootout) {
       const steps = isA ? round1.duelist_a.move : round1.duelist_b.move
       const health = _healthResult(round1)
-      return <span>{name} walks <span className='Important'>{steps} steps</span><br />and {health}</span>
+      return <span>Walks <span className='Important'>{steps} steps</span><br />and {health}</span>
     }
     return null
   }, [round1, duelStage])
@@ -147,7 +148,7 @@ function DuelProgress({
     if (round2 && duelStage > DuelStage.BladesClash) {
       const blade = isA ? round2.duelist_a.move : round2.duelist_b.move
       const health = _healthResult(round2)
-      return <span>{name} clashes with <span className='Important'>{BladesNames[blade]}</span><br />and {health}</span>
+      return <span>Clashes with <span className='Important'>{BladesNames[blade]}</span><br />and {health}</span>
     }
     return null
   }, [round2, duelStage])
@@ -155,6 +156,10 @@ function DuelProgress({
   const _resultBackground = (round) => {
     const health = isA ? round.duelist_a.health : round.duelist_b.health
     return health == FULL_HEALTH ? 'Positive' : health == HALF_HEALTH ? 'Warning' : 'Negative'
+  }
+  const _resultEmoji = (round) => {
+    const health = isA ? round.duelist_a.health : round.duelist_b.health
+    return health == FULL_HEALTH ? MESSAGES.ALIVE_EMOJI : health == HALF_HEALTH ? MESSAGES.INJURED_EMOJI : MESSAGES.DEAD_EMOJI
   }
 
 
@@ -228,6 +233,7 @@ function DuelProgress({
           title={pistolsResult ?? 'Pistols shootout!'}
           description=''
           icon={pistolsResult ? null : 'target'}
+          emoji={pistolsResult ? _resultEmoji(round1) : null}
           floated={floated}
           onClick={onClick}
           className={pistolsResult ? _resultBackground(round1) : null}
@@ -265,6 +271,7 @@ function DuelProgress({
               title={bladesResult ?? 'Blades clash!'}
               description=''
               icon={bladesResult ? null : 'target'}
+              emoji={bladesResult ? _resultEmoji(round2) : null}
               floated={floated}
               onClick={onClick}
               className={bladesResult ? _resultBackground(round2) : null}
@@ -290,7 +297,9 @@ function ProgressItem({
   onClick = null,
   className = null,
 }) {
-  const _completed = (stage < duelStage) || (stage == duelStage && completedStages[stage] === true)
+  const _completed =
+    ((stage < duelStage) || (stage == duelStage && completedStages[stage] === true))
+     && stage != DuelStage.PistolsShootout && stage != DuelStage.BladesClash
   const _active = (duelStage == stage)
   const _disabled = (duelStage < stage)
   const _left = (floated == 'left')
@@ -300,12 +309,13 @@ function ProgressItem({
 
   let _icon = useMemo(() => {
     const style = _right ? { margin: '0 0 0 1rem' } : {}
-    if (emoji && icon && !_completed) return <EmojiIcon emoji={emoji} style={style} flipped={emojiFlipped} rotated={emojiRotated}/>
     if (icon) return <Icon name={icon} style={style} />
+    if (emoji) return <EmojiIcon emoji={emoji} style={style} flipped={emojiFlipped} rotated={emojiRotated} />
     return <></>
   }, [icon, emoji, _completed, _right])
 
-  if (_right) classNames.push('AlignRight')
+  // if (_right) classNames.push('AlignRight')
+  classNames.push('AlignCenter')
   if (!_link) classNames.push('NoMouse')
   return (
     <Step

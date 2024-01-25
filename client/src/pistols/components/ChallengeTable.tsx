@@ -53,6 +53,7 @@ function ChallengeTableByIds({
 }) {
   const [order, setOrder] = useState({})
   const _sortCallback = (id, state, timestamp) => {
+    // this pattern can handle simultaneous state set
     setOrder(o => ({ ...o, [id]: { state, timestamp } }))
   }
 

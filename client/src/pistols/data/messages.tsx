@@ -10,4 +10,7 @@ export const MESSAGES: any = {
   FOUND_EXIT: 'You found the exit!\n(verifying on-chain...)',
   VERIFIED: 'You found the exit!\n(verified)',
   NOT_VERIFIED: 'You found the exit!\n(failed verifying)',
+  ALIVE_EMOJI: '❤️',
+  INJURED_EMOJI: '🩸',
+  DEAD_EMOJI: '☠️',
 }
