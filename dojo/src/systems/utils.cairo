@@ -104,7 +104,12 @@ fn make_move_hash(salt: u64, move: u8) -> felt252 {
     (pedersen(salt.into(), move.into()))
 }
 
-fn throw_dice(salt: felt252, seed: felt252, limit: u128, faces: u128) -> bool {
+// throw a dice and return a positive result
+// limit: how many faces gives a positive result?
+// faces: the number of faces on the dice (ex: 6, or 100%)
+// edge case: limit 0 is always negative
+// edge case: limit=faces is always positive
+fn throw_dice(seed: felt252, salt: felt252, limit: u128, faces: u128) -> bool {
     let hash: felt252 = pedersen(salt, seed);
     let double: u256 = hash.into();
     ((double.low % faces) < limit)
@@ -133,13 +138,14 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_throw_dice() {
+    fn test_throw_dice_average() {
         // lower limit
         let mut counter: u8 = 0;
         let mut n: felt252 = 0;
         loop {
             if (n == 100) { break; }
-            if (utils::throw_dice('salt_1', 'seed_1' + n, 25, 100)) {
+            let seed: felt252 = 'seed_1' + n;
+            if (utils::throw_dice(seed, 'salt_1', 25, 100)) {
                 counter += 1;
             }
             n += 1;
@@ -150,12 +156,28 @@ mod tests {
         let mut n: felt252 = 0;
         loop {
             if (n == 100) { break; }
-            if (utils::throw_dice('salt_2', 'seed_2' + n, 75, 100)) {
+            let seed: felt252 = 'seed_2' + n;
+            if (utils::throw_dice(seed, 'salt_2', 75, 100)) {
                 counter += 1;
             }
             n += 1;
         };
         assert(counter > 60 && counter < 90, 'dices_75');
+    }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_throw_dice_edge() {
+        let mut n: felt252 = 0;
+        loop {
+            if (n == 100) { break; }
+            let seed: felt252 = 'seed' + n;
+            let bottom: bool = utils::throw_dice(seed, 'salt', 0, 10);
+            assert(bottom == false, 'bottom');
+            let upper: bool = utils::throw_dice(seed, 'salt', 10, 10);
+            assert(upper == true, 'bottom');
+            n += 1;
+        };
     }
 
 }

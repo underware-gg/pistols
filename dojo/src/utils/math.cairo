@@ -249,6 +249,7 @@ mod tests {
     use debug::PrintTrait;
     use pistols::utils::string::{String};
     use pistols::utils::math::{MathU8,MathU128};
+    use pistols::types::constants::{constants};
 
     #[test]
     #[available_gas(100_000_000)]
@@ -315,5 +316,17 @@ mod tests {
         assert(MathU8::map(3, 1, 5, 40, 20) == 30, String::concat('map', 'i_3'));
         assert(MathU8::map(4, 1, 5, 40, 20) == 25, String::concat('map', 'i_4'));
         assert(MathU8::map(5, 1, 5, 40, 20) == 20, String::concat('map', 'i_5'));
+    }
+
+    #[test]
+    #[available_gas(100_000_000)]
+    fn test_map_pistols() {
+        let mut i: u8 = 1;
+        loop {
+            let chance: u8 = MathU8::map(i, 1, 10, constants::CHANCE_KILL_STEP_1, constants::CHANCE_KILL_STEP_10);
+            assert(chance == i * 10, String::concat('bad chance', chance.into()));
+            if(i == 10) { break; }
+            i += 1;
+        };
     }
 }

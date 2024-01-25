@@ -182,40 +182,40 @@ mod shooter {
 
         if (steps_a == steps_b) {
             // both duelists shoot together
-            damage_a = shoot_damage(round, 'shoot_b', steps_b);
-            damage_b = shoot_damage(round, 'shoot_a', steps_a);
+            damage_a = shoot_damage('shoot_b', round, steps_b);
+            damage_b = shoot_damage('shoot_a', round, steps_a);
         } else if (steps_a < steps_b) {
             // A shoots first
-            damage_b = shoot_damage(round, 'shoot_a', steps_a);
+            damage_b = shoot_damage('shoot_a', round, steps_a);
             // if not dead, B can shoot
             if (damage_b < constants::FULL_HEALTH) {
-                damage_a = shoot_damage(round, 'shoot_b', steps_a);
+                damage_a = shoot_damage('shoot_b', round, steps_a);
             }
         } else {
             // B shoots first
-            damage_a = shoot_damage(round, 'shoot_b', steps_b);
+            damage_a = shoot_damage('shoot_b', round, steps_b);
             // if not dead, A can shoot
             if (damage_a < constants::FULL_HEALTH) {
-                damage_b = shoot_damage(round, 'shoot_a', steps_b);
+                damage_b = shoot_damage('shoot_a', round, steps_b);
             }
         }
 
         (damage_a, damage_b)
     }
 
-    fn shoot_damage(round: Round, seed: felt252, steps: u8) -> u8 {
+    fn shoot_damage(seed: felt252, round: Round, steps: u8) -> u8 {
         // dice 1: did the bullet hit the other player?
         // at step 1: HIT chance is 80%
         // at step 10: HIT chance is 20%
         let percentage: u128 = MathU8::map(steps, 1, 10, constants::CHANCE_HIT_STEP_1, constants::CHANCE_HIT_STEP_10).into();
-        if (!throw_dice(round, seed, percentage, 100)) {
+        if (!throw_dice(seed, round, percentage, 100)) {
             return 0;
         }
         // dice 2: if the bullet HIT the other player, what's the damage?
         // at step 1: KILL chance is 10%
         // at step 10: KILL chance is 100%
         let percentage: u128 = MathU8::map(steps, 1, 10, constants::CHANCE_KILL_STEP_1, constants::CHANCE_KILL_STEP_10).into();
-        let killed = throw_dice(round, seed * 2, percentage, 100);
+        let killed = throw_dice(seed * 2, round, percentage, 100);
         (if (killed) { constants::FULL_HEALTH } else { constants::HALF_HEALTH })
     }
 
@@ -285,9 +285,9 @@ mod shooter {
     //-----------------------------------
     // Randomizer
     //
-    fn throw_dice(round: Round, seed: felt252, limit: u128, faces: u128) -> bool {
+    fn throw_dice(seed: felt252, round: Round, limit: u128, faces: u128) -> bool {
         let salt: u64 = (round.duelist_a.salt ^ round.duelist_b.salt);
-        (utils::throw_dice(salt.into(), seed, limit, faces))
+        (utils::throw_dice(seed, salt.into(), limit, faces))
     }
 
 }
