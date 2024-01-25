@@ -37,6 +37,11 @@ export const formatTimestamp = (t: number): string => {
   return `${date} ${hour}:${minutes}`
 }
 
+export const formatTimestampElapsed = (start: number): string => {
+  const now = Math.floor(new Date().getTime() / 1000)
+  return formatTimestampDelta(start, now)
+}
+
 export const formatTimestampCountdown = (end: number): string => {
   const now = Math.floor(new Date().getTime() / 1000)
   return formatTimestampDelta(now, end)
