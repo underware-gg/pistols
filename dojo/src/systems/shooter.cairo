@@ -189,14 +189,14 @@ mod shooter {
             damage_b = shoot_damage('shoot_a', round, steps_a);
             // if not dead, B can shoot
             if (damage_b < constants::FULL_HEALTH) {
-                damage_a = shoot_damage('shoot_b', round, steps_a);
+                damage_a = shoot_damage('shoot_b', round, steps_b);
             }
         } else {
             // B shoots first
             damage_a = shoot_damage('shoot_b', round, steps_b);
             // if not dead, A can shoot
             if (damage_a < constants::FULL_HEALTH) {
-                damage_b = shoot_damage('shoot_a', round, steps_b);
+                damage_b = shoot_damage('shoot_a', round, steps_a);
             }
         }
 
@@ -208,14 +208,15 @@ mod shooter {
         // at step 1: HIT chance is 80%
         // at step 10: HIT chance is 20%
         let percentage: u128 = MathU8::map(steps, 1, 10, constants::CHANCE_HIT_STEP_1, constants::CHANCE_HIT_STEP_10).into();
-        if (!throw_dice(seed, round, percentage, 100)) {
+        let hit: bool = throw_dice(seed, round, percentage, 100);
+        if (!hit) {
             return 0;
         }
         // dice 2: if the bullet HIT the other player, what's the damage?
         // at step 1: KILL chance is 10%
         // at step 10: KILL chance is 100%
         let percentage: u128 = MathU8::map(steps, 1, 10, constants::CHANCE_KILL_STEP_1, constants::CHANCE_KILL_STEP_10).into();
-        let killed = throw_dice(seed * 2, round, percentage, 100);
+        let killed: bool = throw_dice(seed * 2, round, percentage, 100);
         (if (killed) { constants::FULL_HEALTH } else { constants::HALF_HEALTH })
     }
 
