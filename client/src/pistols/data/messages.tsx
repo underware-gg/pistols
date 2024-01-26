@@ -10,7 +10,20 @@ export const MESSAGES: any = {
   FOUND_EXIT: 'You found the exit!\n(verifying on-chain...)',
   VERIFIED: 'You found the exit!\n(verified)',
   NOT_VERIFIED: 'You found the exit!\n(failed verifying)',
-  ALIVE_EMOJI: '❤️',
-  INJURED_EMOJI: '🩸',
-  DEAD_EMOJI: '☠️',
+}
+
+export const EMOJI: any = {
+  AGREEMENT: '🤝',
+  AWAITING: '⏱️',
+  IN_PROGRESS: '🔫',
+  STEP: '🥾',
+  BLADES: '⚔️',
+  // STEP: '👣',
+  ALIVE: '❤️',
+  INJURED: '🩸',
+  DEAD: '☠️',
+  LIGHT: '🔪',
+  HEAVY: '🗡️',
+  BLOCK: '🛡️',
+  UNKNOWN: '?',
 }

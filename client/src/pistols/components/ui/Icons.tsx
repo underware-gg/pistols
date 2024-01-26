@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Icon, IconGroup, Popup, PopupContent, PopupHeader, SemanticICONS } from 'semantic-ui-react'
 import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
 import { Blades } from '@/pistols/utils/pistols'
+import { EMOJI } from '@/pistols/data/messages'
 
 // Semantic UI Icons
 // https://react.semantic-ui.com/elements/icon/
@@ -24,7 +25,7 @@ const _downSize = (size) => {
 
 const _upSize = (size) => {
   return (
-    size == 'tiny' ? 'small' 
+    size == 'tiny' ? 'small'
       : size == 'small' ? null
         : size == null ? 'large'
           : size == 'large' ? 'big'
@@ -220,7 +221,7 @@ export function StepsIcon({
   return (
     // <EmojiIcon emoji={emoji} size={size} className='StepsIconRound' />
     <IconGroup size={_downSize(size)}>
-      <EmojiIcon emoji={'🥾'} size={size} disabled />
+      <EmojiIcon emoji={EMOJI.STEP} size={size} />
       <EmojiIcon emoji={steps} size={size} className={`StepsIcon`} />
     </IconGroup>
   )
@@ -237,10 +238,10 @@ export function BladesIcon({
     return <Icon name='question circle' size={size} />
   }
   const emoji =
-    blades == Blades.Light ? '🔪'
-      : blades == Blades.Heavy ? '🗡️'
-        : blades == Blades.Block ? '🛡️'
-          : '?'
+    blades == Blades.Light ? EMOJI.LIGHT
+      : blades == Blades.Heavy ? EMOJI.HEAVY
+        : blades == Blades.Block ? EMOJI.BLOCK
+          : EMOJI.UNKNOWN
   return (
     // <IconGroup size='large'>
     // <Icon size={size} name='circle outline' />

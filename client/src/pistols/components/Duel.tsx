@@ -15,7 +15,7 @@ import { MenuDuel, MenuDebugAnimations } from '@/pistols/components/Menus'
 import { AnimationState } from '@/pistols/three/game'
 import { EmojiIcon } from '@/pistols/components/ui/Icons'
 import CommitModal from '@/pistols/components/CommitModal'
-import { MESSAGES } from '../data/messages'
+import { EMOJI } from '@/pistols/data/messages'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -159,7 +159,7 @@ function DuelProgress({
   }
   const _resultEmoji = (round) => {
     const health = isA ? round.duelist_a.health : round.duelist_b.health
-    return health == FULL_HEALTH ? MESSAGES.ALIVE_EMOJI : health == HALF_HEALTH ? MESSAGES.INJURED_EMOJI : MESSAGES.DEAD_EMOJI
+    return health == FULL_HEALTH ? EMOJI.ALIVE : health == HALF_HEALTH ? EMOJI.INJURED : EMOJI.DEAD
   }
 
 
@@ -211,8 +211,7 @@ function DuelProgress({
           title='Choose Steps'
           description=''
           icon='street view'
-          emoji='👣'
-          // emoji='🥾'
+          // emoji=EMOJI.STEP
           floated={floated}
           onClick={onClick}
         />
@@ -248,7 +247,7 @@ function DuelProgress({
               title='Choose Blades'
               description=''
               icon='shield'
-              emoji='🗡️'
+              emoji={EMOJI.BLADES}
               // emojiFlipped='horizontally'
               // emojiRotated='clockwise'
               floated={floated}
@@ -299,7 +298,7 @@ function ProgressItem({
 }) {
   const _completed =
     ((stage < duelStage) || (stage == duelStage && completedStages[stage] === true))
-     && stage != DuelStage.PistolsShootout && stage != DuelStage.BladesClash
+    && stage != DuelStage.PistolsShootout && stage != DuelStage.BladesClash
   const _active = (duelStage == stage)
   const _disabled = (duelStage < stage)
   const _left = (floated == 'left')
