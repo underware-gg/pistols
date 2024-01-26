@@ -2,20 +2,20 @@
 set -e
 
 #-----------------
+# env setup
+#
+export WORLD_ADDRESS="0x269c58e5fa1e7f6fe3756f1de88ecdfab7d03ba67e79ba0365b4ef1e81155be"
+export RPC_URL="http://localhost:5050/"
+
+#-----------------
 # migrate
 #
-sozo migrate
+sozo migrate --world $WORLD_ADDRESS
 
 #-----------------
 # auth write
 #
 scripts/default_auth.sh
-
-#-----------------
-# client setup
-#
-export WORLD_ADDRESS="0x269c58e5fa1e7f6fe3756f1de88ecdfab7d03ba67e79ba0365b4ef1e81155be"
-export RPC_URL="http://localhost:5050/"
 
 cp target/dev/manifest.json ../client/src/
 cd ../client

@@ -11,7 +11,7 @@ mod tests {
     use pistols::models::models::{Duelist, Challenge, Round};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
-    use pistols::types::blades::{BLADES};
+    use pistols::types::blades::{Blades, BLADES};
     use pistols::types::constants::{constants};
     use pistols::systems::utils::{zero_address, make_move_hash};
     use pistols::utils::timestamp::{timestamp};
@@ -694,6 +694,201 @@ mod tests {
     }
 
 
+
+
+    //-----------------------------------------
+    // Blades
+    //
+
+    fn _execute_round_ready_with_blades(
+        world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress,
+        health_a: u8, blades_a: u8,
+        health_b: u8, blades_b: u8,
+    ) -> (Challenge, Round) {
+        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        // random 1st round...
+        let (salt_1_a, salt_1_b, move_1_a, move_1_b, hash_1_a, hash_1_b) = _get_moves_round_1_continue();
+        utils::execute_commit_move(system, owner, duel_id, 1, hash_1_a);
+        utils::execute_commit_move(system, other, duel_id, 1, hash_1_b);
+        utils::execute_reveal_move(system, owner, duel_id, 1, salt_1_a, move_1_a);
+        utils::execute_reveal_move(system, other, duel_id, 1, salt_1_b, move_1_b);
+        let (challenge, mut round) = utils::get_Challenge_Round(world, duel_id);
+        assert(challenge.round_number == 2, 'C: needs 2 rounds');
+        assert(round.round_number == 2, 'R: needs 2 rounds');
+        // change round 1 results
+        round.duelist_a.health = health_a;
+        round.duelist_b.health = health_b;
+        set!(world, (round));
+        // run 2nd round
+        let hash_a: felt252 = make_move_hash(0x111, blades_a);
+        let hash_b: felt252 = make_move_hash(0x222, blades_b);
+        utils::execute_commit_move(system, owner, duel_id, 2, hash_a);
+        utils::execute_commit_move(system, other, duel_id, 2, hash_b);
+        utils::execute_reveal_move(system, owner, duel_id, 2, 0x111, blades_a);
+        utils::execute_reveal_move(system, other, duel_id, 2, 0x222, blades_b);
+        // return results
+        let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
+        (challenge, round)
+    }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_blade_light_vs_light_draw() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_round_ready_with_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, BLADES::LIGHT, // duelist_a
+            constants::FULL_HEALTH, BLADES::LIGHT, // duelist_b
+        );
+        assert(challenge.winner == zero_address(), 'bad winner');
+        assert(round.duelist_a.health == constants::HALF_HEALTH, 'bad health_a');
+        assert(round.duelist_b.health == constants::HALF_HEALTH, 'bad health_b');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_blade_light_vs_light_a() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_round_ready_with_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, BLADES::LIGHT, // duelist_a
+            constants::HALF_HEALTH, BLADES::LIGHT, // duelist_b
+        );
+        assert(challenge.winner == challenge.duelist_a, 'bad winner');
+        assert(round.duelist_a.health == constants::HALF_HEALTH, 'bad health_a');
+        assert(round.duelist_b.health == 0, 'bad health_b');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_blade_light_vs_light_b() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_round_ready_with_blades(
+            world, system, owner, other,
+            constants::HALF_HEALTH, BLADES::LIGHT, // duelist_a
+            constants::FULL_HEALTH, BLADES::LIGHT, // duelist_b
+        );
+        assert(challenge.winner == challenge.duelist_b, 'bad winner');
+        assert(round.duelist_a.health == 0, 'bad health_a');
+        assert(round.duelist_b.health == constants::HALF_HEALTH, 'bad health_b');
+    }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_blade_light_vs_block_a() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_round_ready_with_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, BLADES::LIGHT,
+            constants::HALF_HEALTH, BLADES::BLOCK,
+        );
+        assert(challenge.winner == zero_address(), 'wrong winner');
+        assert(round.duelist_a.health == constants::FULL_HEALTH, 'bad health_a');
+        assert(round.duelist_b.health == constants::HALF_HEALTH, 'bad health_b');
+    }
+    fn test_blade_light_vs_block_b() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_round_ready_with_blades(
+            world, system, owner, other,
+            constants::HALF_HEALTH, BLADES::BLOCK,
+            constants::FULL_HEALTH, BLADES::LIGHT,
+        );
+        assert(challenge.winner == zero_address(), 'wrong winner');
+        assert(round.duelist_a.health == constants::HALF_HEALTH, 'bad health_a');
+        assert(round.duelist_b.health == constants::FULL_HEALTH, 'bad health_b');
+    }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_blade_light_vs_heavy_a_a() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_round_ready_with_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, BLADES::LIGHT,
+            constants::HALF_HEALTH, BLADES::HEAVY,
+        );
+        assert(challenge.winner == challenge.duelist_a, 'wrong winner');
+        assert(round.duelist_a.health == constants::FULL_HEALTH, 'bad health_a');
+        assert(round.duelist_b.health == 0, 'bad health_b');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_blade_light_vs_heavy_a_b() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_round_ready_with_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, BLADES::LIGHT,
+            constants::FULL_HEALTH, BLADES::HEAVY,
+        );
+        assert(challenge.winner == challenge.duelist_b, 'wrong winner');
+        assert(round.duelist_a.health == 0, 'bad health_a');
+        assert(round.duelist_b.health == constants::HALF_HEALTH, 'bad health_b');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_blade_light_vs_heavy_b_a() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_round_ready_with_blades(
+            world, system, owner, other,
+            constants::HALF_HEALTH, BLADES::HEAVY,
+            constants::FULL_HEALTH, BLADES::LIGHT,
+        );
+        assert(challenge.winner == challenge.duelist_b, 'wrong winner');
+        assert(round.duelist_a.health == 0, 'bad health_a');
+        assert(round.duelist_b.health == constants::FULL_HEALTH, 'bad health_b');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_blade_light_vs_heavy_b_b() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_round_ready_with_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, BLADES::HEAVY,
+            constants::FULL_HEALTH, BLADES::LIGHT,
+        );
+        assert(challenge.winner == challenge.duelist_a, 'wrong winner');
+        assert(round.duelist_a.health == constants::HALF_HEALTH, 'bad health_a');
+        assert(round.duelist_b.health == 0, 'bad health_b');
+    }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_blade_heavy_vs_heavy() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_round_ready_with_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, BLADES::HEAVY,
+            constants::FULL_HEALTH, BLADES::HEAVY,
+        );
+        assert(challenge.winner == zero_address(), 'wrong winner');
+        assert(round.duelist_a.health == 0, 'bad health_a');
+        assert(round.duelist_b.health == 0, 'bad health_b');
+    }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_blade_heavy_vs_block_a() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_round_ready_with_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, BLADES::HEAVY,
+            constants::FULL_HEALTH, BLADES::BLOCK,
+        );
+        assert(challenge.winner == challenge.duelist_a, 'wrong winner');
+        assert(round.duelist_a.health == constants::FULL_HEALTH, 'bad health_a');
+        assert(round.duelist_b.health == 0, 'bad health_b');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_blade_heavy_vs_block_b() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_round_ready_with_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, BLADES::BLOCK,
+            constants::FULL_HEALTH, BLADES::HEAVY,
+        );
+        assert(challenge.winner == challenge.duelist_b, 'wrong winner');
+        assert(round.duelist_a.health == 0, 'bad health_a');
+        assert(round.duelist_b.health == constants::FULL_HEALTH, 'bad health_b');
+    }
 
 
 

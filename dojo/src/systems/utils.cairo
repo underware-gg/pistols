@@ -45,6 +45,16 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
 
     // Start Round
     if (state == ChallengeState::InProgress) {
+        // Round 1 starts with full health
+        let mut health_a: u8 = constants::FULL_HEALTH;
+        let mut health_b: u8 = constants::FULL_HEALTH;
+        // Round 2+ need to copy previous Round's healths
+        if (challenge.round_number > 1) {
+            let prev_round: Round = get!(world, (challenge.duel_id, challenge.round_number - 1), Round);
+            health_a = prev_round.duelist_a.health;
+            health_b = prev_round.duelist_b.health;
+        }
+
         set!(world, (
             Round {
                 duel_id: challenge.duel_id,
@@ -55,14 +65,14 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
                     salt: 0,
                     move: 0,
                     damage: 0,
-                    health: constants::FULL_HEALTH,
+                    health: health_a,
                 },
                 duelist_b: Move {
                     hash: 0,
                     salt: 0,
                     move: 0,
                     damage: 0,
-                    health: constants::FULL_HEALTH,
+                    health: health_b,
                 },
             }
         ));

@@ -105,7 +105,7 @@ mod shooter {
             round.duelist_b.move = move;
         }
 
-        // Finished round
+        // Finishes round if both moves are revealed
         if (round.duelist_a.move > 0 && round.duelist_b.move > 0) {
             finish_round(ref challenge, ref round);
             // update Round first, Challenge may need it
