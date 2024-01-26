@@ -1,6 +1,8 @@
 # Pistols at 10 Blocks
 
-Made with love for the Dojo Game Jam #3, 15th Dec 2023 - 2nd Jan 2024.
+A fully on-chain game, made with love with Dojo
+
+[Winner of the Dojo Game Jam #3](https://twitter.com/ohayo_dojo/status/1747626446720258059)
 
 ```
                                           ~~^             ^J~                                                           
