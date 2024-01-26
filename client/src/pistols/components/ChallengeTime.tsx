@@ -13,7 +13,7 @@ export function ChallengeTime({
     timestamp, timestamp_expire, timestamp_start, timestamp_end,
   } = useChallenge(duelId)
 
-  const { clientTimestamp } = useClientTimestamp(isAwaiting)
+  const { clientTimestamp } = useClientTimestamp(isAwaiting || isLive)
 
   const date = useMemo(() => {
     if (isAwaiting) return EMOJI.AWAITING + ' ' + formatTimestampDelta(clientTimestamp, timestamp_expire)
