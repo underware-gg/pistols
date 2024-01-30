@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from 'react'
 import { useRouter } from 'next/router'
+import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
 import AppDojo from '@/pistols/components/AppDojo'
 import Gate from '@/pistols/components/Gate'
 import Tavern from '@/pistols/components/Tavern'
@@ -12,14 +13,22 @@ import Duel from '@/pistols/components/Duel'
 //   runtime: 'experimental-edge'
 // }
 
+const bgsTavern: Record<MenuKey, string> = {
+  [MenuKey.Duelists]: 'BackgroundDuelists',
+  [MenuKey.YourDuels]: 'BackgroundDuelsYour',
+  [MenuKey.LiveDuels]: 'BackgroundDuelsLive',
+  [MenuKey.PastDuels]: 'BackgroundDuelsPast',
+}
+
 export default function MainPage() {
   const router = useRouter()
+  const { menuKey } = usePistolsContext()
 
-  const { page, title, duelId, className } = useMemo(() => {
+  const { page, title, duelId, bgClassName } = useMemo(() => {
     let page = null
     let title = null
     let duelId = null
-    let className = null
+    let bgClassName = null
 
     // parse page
     if (router.isReady && router.query.main) {
@@ -28,11 +37,11 @@ export default function MainPage() {
       if (_page == 'gate') {
         page = _page
         title = 'Pistols - The Gate'
-        className = 'BackgroundWeapons'
+        bgClassName = 'BackgroundGate'
       } else if (_page == 'tavern') {
         page = _page
         title = 'Pistols - The Tavern'
-        className = 'BackgroundWeapons'
+        bgClassName = menuKey ? bgsTavern[menuKey] : 'BackgroundDuelists'
       } else if (_page == 'duel') {
         // '/room/[duel_id]'
         if (_slugs.length > 0) {
@@ -43,16 +52,16 @@ export default function MainPage() {
           page = 'tavern'
           router.push('/tavern')
         }
-        // className = 'BackgroundDuel'
+        bgClassName = 'BackgroundDuel'
       }
     }
     return {
       page,
       title,
       duelId,
-      className,
+      bgClassName,
     }
-  }, [router.isReady, router.query])
+  }, [router.isReady, router.query, menuKey])
 
   if (!page) {
     if (router.isReady) {
@@ -68,7 +77,7 @@ export default function MainPage() {
 
   return (
     <AppDojo title={title} backgroundImage={null}>
-      <Background className={className}>
+      <Background className={bgClassName}>
         <GameContainer
           isVisible={_atDuel}
           duelId={duelId}

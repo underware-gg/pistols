@@ -2,18 +2,27 @@
 $font-family: 'EB Garamond', serif;
 $font-family-mono: 'Courier Prime', monospace;
 
-$color-bg: #f5f5f5;
-$color-white: #f5f5f5;
-$color-shadow: #b4b4b4;
-$color-text: #000;
-$color-icon: #444;
-$color-important: #e00000;
-$color-active: #e00000;
+// Figma colors
+// https://www.figma.com/file/eseZA1jRIoX6IYNtoHgz30/Pistols-at-Ten-Blocks
+$color-bg: #1e1e1e;
+$color-darkest: #201a18;
+$color-dark: #584f49;
+$color-medium: #cb824d;
+$color-bright: #c8b6a8;
+$color-brightest: #efe1d7;
+$color-border: #8d603f;
+
+$color-white: $color-brightest;
+$color-shadow: $color-dark;
+$color-text: $color-brightest;
+$color-icon: $color-bright;
+$color-important: $color-medium;
+$color-active: $color-medium;
 $color-inactive: #712727;
 $color-attention: #22b600;
 $ui-border: 6px ridge $color-active;
-$ui-outline: 0.5px solid #444444;
-$text-shadow: 0.05em 0.05em 1px #0008;
+$ui-outline: 0.5px solid $color-border;
+$text-shadow: 0.04em 0.04em 2px $color-dark;
 
 $color-positive: #dffcd9;
 $color-negative: #ffe3e3;
@@ -72,6 +81,7 @@ a {
 a:hover {
   color: $color-important;
   text-decoration: underline;
+  text-decoration-thickness: 1px;
 }
 
 h1 {
@@ -271,7 +281,6 @@ $box-h: calc((100vh - $aspect-h) / 2);
 	left: $box-w !important;	// center frame to offset box
 	width: $aspect-w;
 	height: $aspect-h;
-  border: #0001 1px solid;
   background-size: cover;
 }
 .AspectLeft, .AspectRight, .AspectTop, .AspectBottom {
@@ -314,13 +323,25 @@ $box-h: calc((100vh - $aspect-h) / 2);
 .BackgroundSplash {
   background-image: url('/images/bg_duel.jpg');
 }
-.BackgroundWeapons {
-  @extend .LightenBackground;
-  background-image: url('/images/bg_weapons_1.jpg');
-}
 .BackgroundDuel {
   background-image: url('/images/bg_duel.jpg');
 }
+.BackgroundGate {
+  background-image: url('/images/bg_gate.jpg');
+}
+.BackgroundDuelists {
+  background-image: url('/images/bg_duelists.jpg');
+}
+.BackgroundDuelsYour {
+  background-image: url('/images/bg_duels_yours.jpg');
+}
+.BackgroundDuelsLive {
+  background-image: url('/images/bg_duels_live.jpg');
+}
+.BackgroundDuelsPast {
+  background-image: url('/images/bg_duels_past.jpg');
+}
+
 
 //------------------------
 // GAME
