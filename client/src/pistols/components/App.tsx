@@ -15,6 +15,7 @@ export default function App({
     <div className={`App ${className}`} style={style}>
       <AppHeader title={title} />
       {children}
+      {/* <button className='DebuggerButton' onClick={() => setTimeout(() => { debugger; }, 2000)}>debugger</button> */}
     </div>
   );
 }

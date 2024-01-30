@@ -313,6 +313,13 @@ $box-h: calc((100vh - $aspect-h) / 2);
 	bottom: 0;
 }
 
+.DebuggerButton {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
 //
 // Backgrounds
 //
