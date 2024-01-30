@@ -1,22 +1,46 @@
 import React from 'react'
-import { Container, Grid } from 'semantic-ui-react'
+import { Container, Divider, Grid } from 'semantic-ui-react'
 import { AccountsList } from '@/pistols/components/account/AccountsList'
+import Logo from './Logo'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export default function Gate() {
   return (
-    <div>
-      <div className='AlignCenter'>
-        <h1>Identify yourself!</h1>
-      </div>
+    <div className='UIContainer'>
+
+      <Grid>
+        <Row colums='equal'>
+          <Col>
+            <Logo />
+          </Col>
+        </Row>
+
+        <Row colums='equal' textAlign='center' className='TitleCase'>
+          <Col>
+            <h1>Pistols at Ten Blocks</h1>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col>
+            <hr />
+          </Col>
+        </Row>
+
+        <Row colums='equal' className='Title'>
+          <Col>
+            Identify yourself
+          </Col>
+        </Row>
+      </Grid>
+
       <br />
-      <Container text>
-        <br />
-        <AccountsList />
-        <br />
-      </Container>
+      <br />
+
+      <AccountsList />
+      
     </div>
   )
 }

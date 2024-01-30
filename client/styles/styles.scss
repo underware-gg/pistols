@@ -15,6 +15,7 @@ $color-border: #8d603f;
 $color-white: $color-brightest;
 $color-shadow: $color-dark;
 $color-text: $color-brightest;
+$color-text-disabled: rgba($color-brightest, 0.3);
 $color-icon: $color-bright;
 $color-important: $color-medium;
 $color-active: $color-medium;
@@ -84,9 +85,11 @@ a:hover {
   text-decoration-thickness: 1px;
 }
 
-h1 {
-  font-size: 2.2em;
-}
+h1 { font-size: 2.2em; }
+h2 { font-size: 1.8em; }
+h3 { font-size: 1.6em; }
+h4 { font-size: 1.4em; }
+h5 { font-size: 1.2em; }
 
 h1, h2, h3, h4, h5 {
   font-family: $font-family;
@@ -96,7 +99,7 @@ h1, h2, h3, h4, h5 {
 }
 
 hr {
-  color: #444;
+  color: rgba($color-text, 0.8);
   border: 0.5px solid;
 }
 
@@ -161,6 +164,9 @@ canvas {
 .Important {
   color: $color-important;
 }
+.Black {
+  color: #444;
+}
 .Bold {
   font-weight: 600;
 }
@@ -201,6 +207,14 @@ canvas {
   pointer-events: all!important;
 }
 
+.Spacer5 {
+  width: '100%';
+  min-height: 5px;
+}
+.Spacer10 {
+  width: '100%';
+  min-height: 10px;
+}
 .Spacer20 {
   width: '100%';
   min-height: 20px;
@@ -407,6 +421,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
   pointer-events: none;
   width: calc(439px / 2);
   height: calc(768px / 2);
+  border-radius: 10px;
 }
 .ProfilePicDuel {
   @extend .ProfilePic;
@@ -415,8 +430,9 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 .ProfilePicSquare {
   @extend .ProfilePic;
-  width: 35px;
-  height: 35px;
+  width: 70px;
+  height: 70px;
+  margin: auto;
 }
 
 .DirectionButton {
@@ -480,7 +496,29 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 
+//
 // Pistols
+//
+
+.UIContainer {
+  // background-color: #f008;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 500px;
+  height: 100%;
+  padding: 20px;
+}
+
+.TitleCase {
+  text-transform: uppercase;
+  // font-variant-caps: small-caps;
+}
+
+.Title {
+  @extend .TitleCase;
+  font-size: 2em;
+}
 
 .MenuTop {
   width: 100%;
@@ -493,15 +531,6 @@ $box-h: calc((100vh - $aspect-h) / 2);
   @extend .MenuTop;
   top: unset;
   bottom: 0;
-}
-
-.TavernTitle {
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  padding: 15px;
-  text-align: center;
 }
 
 .AccountHeader {
@@ -616,17 +645,6 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 
-/* TO BE REMOVED... */
-
-.ProofView {
-  position: absolute;
-  top: calc(100vw - 250px);
-  left: calc(100vh - 100px);
-  width: 500px;
-  height: 200px;
-  background-color: $color-bg;
-}
-
 
 //--------------------
 // Unity canvas
@@ -642,11 +660,41 @@ $box-h: calc((100vh - $aspect-h) / 2);
 //-----------------------------
 // semantic-ui
 //
+.round_border {
+  border: 1px solid $color-bright;
+  border-radius: 0.5em;
+}
+.round_border_active {
+  border: 1px solid $color-brightest;
+  border-radius: 0.5em;
+}
+.round_border_inactive {
+  border: 1px solid rgba($color-bright, 0.5);
+  border-radius: 0.5em;
+}
 // 
 // <Input>
+input::placeholder {
+  color: $color-text-disabled!important;
+}
 .ui.input>input {
-  background: rgb(255, 255, 255);
+  @extend .round_border;
+  background-color: $color-dark;
+  color: rgba($color-text, 0.5);
+  font-style: italic;
+}
+.ui.input>input:active,
+.ui.input>input:focus {
+  @extend .round_border_active;
+  background-color: $color-dark;
   color: $color-text;
+}
+.ui.label {
+  @extend .round_border;
+  font-family: $font-family;
+  background-color: $color-bright;
+  color: $color-dark;
+  text-shadow: none;
 }
 //
 // <Grid>
@@ -658,6 +706,33 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 //
 // <Button>
+.ui.button {
+  @extend .round_border, .TitleCase;
+  font-family: $font-family;
+  background-color: rgba($color-dark, 0.6);
+  color: $color-text;
+  font-size: 1.2rem; // semantic: 1rem;
+  padding: 0.5em 1.5em;// semantic: 0.78571429em 1.5em 0.78571429em;
+  margin: 0.15em 0;
+}
+.ui.button:focus {
+  @extend .round_border_active;
+  background-color: $color-dark;
+  color: $color-text;
+}
+.ui.button:hover {
+  background-color: $color-bright;
+  color: $color-dark;
+}
+.ui.button:active {
+  background-color: $color-brightest;
+  color: $color-dark;
+}
+.ui.button:disabled {
+  @extend .round_border_inactive;
+  color: $color-text-disabled;
+  opacity: 1!important;
+}
 .ui.button.toggle.active,
 .ui.buttons .button.toggle.active,
 .ui.toggle.buttons .active.button {

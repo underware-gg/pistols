@@ -30,7 +30,9 @@ export function AccountsList() {
     if (result.length == 0) {
       result.push(
         <Row key='empty' textAlign='center' columns={'equal'}>
-          <Col>no accounts created</Col>
+          <Col>
+            <h4>No accounts created</h4>
+          </Col>
         </Row>
       )
     }
@@ -43,18 +45,23 @@ export function AccountsList() {
   return (
     <>
       <Grid className='Faded'>
-        {rows}
         <Row textAlign='center' columns={'equal'}>
           <Col>
-            <ActionButton fill disabled={isDeploying} onClick={() => create()} label='CREATE ACCOUNT' />
+            <ActionButton fill disabled={isDeploying} onClick={() => create()} label='Create Account' />
           </Col>
           <Col>
-            <ActionButton fill disabled={isDeploying} onClick={() => clear()} label='DELETE ALL ACCOUNTS (+refresh)' />
+            <ActionButton fill disabled={isDeploying} onClick={() => clear()} label='Delete All Accounts' />
+          </Col>
+        </Row>
+
+        {rows}
+
+        <Row textAlign='center' columns={'equal'}>
+          <Col>
+            <ActionButton fill large disabled={!canEnter} onClick={() => router.push('/tavern')} label='Enter The TAVERN' />
           </Col>
         </Row>
       </Grid>
-      <br />
-      <ActionButton fill large disabled={!canEnter} onClick={() => router.push('/tavern')} label='ENTER THE TAVERN' />
     </>
   )
 }
@@ -110,18 +117,17 @@ function AccountItem({
       <Col width={1}>
         <Radio checked={isSelected} onClick={() => select(address)} />
       </Col>
-      <Col width={3}>
-        <AccountShort address={address} />
-      </Col>
-      <Col width={1} className='NoPadding'>
+      <Col width={3} className='NoPadding'>
+        <AccountShort address={address} copyLink={false} />
         <ProfilePicSquareButton
           profilePic={_profilePic}
           onClick={() => setSelectedProfilePic(_profilePic < parseInt(process.env.PROFILE_PIC_COUNT) ? _profilePic + 1 : 1)}
           disabled={!isSelected}
         />
       </Col>
-      <Col width={8}>
-        <Input inverted fluid
+      <Col width={12} textAlign='left'>
+        Duelist Name
+        <Input fluid
           // icon='edit'
           label='burner'
           labelPosition='right'
@@ -132,12 +138,11 @@ function AccountItem({
           disabled={!isSelected}
           ref={inputRef}
         />
-      </Col>
-      <Col width={3}>
+        <div className='Spacer5' />
         {!isRegistered
           ? <ActionButton fill disabled={!canRegister || !inputIsValid} onClick={() => _register()} label='REGISTER' />
           : inputValue
-            ? <ActionButton fill disabled={!canRegister || isUpdated || !inputIsValid} onClick={() => _register()} label={isUpdated ? 'OK' : 'UPDATE'} />
+            ? <ActionButton fill disabled={!canRegister || isUpdated || !inputIsValid} onClick={() => _register()} label={isUpdated ? 'REGISTERED' : 'UPDATE'} />
             : <ActionButton fill disabled={!canRegister || isUpdated} onClick={() => _register()} label='UNREGISTER' />
         }
       </Col>

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Menu } from 'semantic-ui-react'
+import { Menu, Button } from 'semantic-ui-react'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 
 //-----------------
@@ -33,11 +33,7 @@ export const ActionButton = ({
   if (large) classNames.push('LargeButton')
   classNames.push((disabled || dimmed) ? 'Locked' : 'Unlocked')
   if (className) classNames.push(className)
-  const _button = <button className={classNames.join(' ')} disabled={disabled} onClick={() => onClick()}>{label}</button>
-  if (large) {
-    return <h3>{_button}</h3>
-  }
-  return <h4>{_button}</h4>
+  return <Button className={classNames.join(' ')} disabled={disabled} onClick={() => onClick()}>{label}</Button>
 }
 
 

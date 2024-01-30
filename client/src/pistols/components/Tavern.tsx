@@ -19,11 +19,6 @@ export default function Tavern() {
       <MenuSettings />
       {/* <AccountHeader /> */}
 
-      <div className='TavernTitle'>
-        <h1>The Tavern</h1>
-        <h2>of Honourable Lords 👑</h2>
-      </div>
-
       <div className='TableMain'>
         {atDuelists && <DuelistTable />}
         {atYourDuels && <ChallengeTableYour />}
