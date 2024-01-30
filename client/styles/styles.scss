@@ -1,5 +1,7 @@
 
-$font-family: Menlo, monospace, Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+$font-family: 'EB Garamond', serif;
+$font-family-mono: 'Courier Prime', monospace;
+
 $color-bg: #f5f5f5;
 $color-white: #f5f5f5;
 $color-shadow: #b4b4b4;
@@ -13,9 +15,9 @@ $ui-border: 6px ridge $color-active;
 $ui-outline: 0.5px solid #444444;
 $text-shadow: 0.05em 0.05em 1px #0008;
 
-$color-positive: #dafadd;
-$color-negative: #fbdbdb;
-$color-warning: #f9e9d0;
+$color-positive: #dffcd9;
+$color-negative: #ffe3e3;
+$color-warning: #faf7d9;
 
 $game-width: 960px;
 $game-height: 540px;
@@ -164,7 +166,7 @@ canvas {
 }
 
 .Code {
-  font-family: monospace;
+  font-family: $font-family-mono;
   font-size: 12px;
 }
 
@@ -541,7 +543,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 	// color: $color-icon;
 }
 .StepsIcon {
-  font-family: monospace!important;
+  font-family: $font-family-mono!important;
   font-size: 12px!important;
   font-weight: 600!important;
   color: $color-bg;
@@ -559,7 +561,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 .StepsIconRound {
-  font-family: monospace!important;
+  font-family: $font-family-mono!important;
   font-size: 16px!important;
   // circle
   border-radius: 50%;
