@@ -32,7 +32,9 @@ struct Challenge {
     // progress and results
     round_number: u8,           // current or final
     winner: ContractAddress,    // if (state == ChallengeState.Resolved)
-    // times
+    // timestamps in unix epoch
+    // a 32-bit timestamp will last 82 more years
+    // Sunday, February 7, 2106 6:28:15 AM
     timestamp: u64,             // Unix time, created
     timestamp_expire: u64,      // Unix time, challenge expiration
     timestamp_start: u64,       // Unix time, started
