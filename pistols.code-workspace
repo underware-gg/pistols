@@ -34,6 +34,9 @@
     "editor.formatOnPaste": true,
     "editor.insertSpaces": true,
     "editor.tabSize": 2,
+    "[css][scss]": {
+      "editor.formatOnPaste": false
+    },
     "[cairo]": {
       "editor.tabSize": 4,
     },
