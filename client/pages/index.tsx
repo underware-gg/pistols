@@ -17,7 +17,7 @@ export default function IndexPage() {
           <div className='Spacer20' />
 
           <Link href='/gate'>
-            <h1 className='Title'>Pistols at 10 Blocks</h1>
+            <h1 className='TitleCase'>Pistols at 10 Blocks</h1>
           </Link>
 
           <hr />

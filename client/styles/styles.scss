@@ -85,10 +85,10 @@ a:hover {
   text-decoration-thickness: 1px;
 }
 
-h1 { font-size: 2.2em; }
-h2 { font-size: 1.8em; }
-h3 { font-size: 1.6em; }
-h4 { font-size: 1.4em; }
+h1 { font-size: 2.6em; }
+h2 { font-size: 2.2em; }
+h3 { font-size: 1.8em; }
+h4 { font-size: 1.5em; }
 h5 { font-size: 1.2em; }
 
 h1, h2, h3, h4, h5 {
@@ -341,26 +341,36 @@ $box-h: calc((100vh - $aspect-h) / 2);
   background-color: #fffb;
   background-blend-mode:lighten;
 }
-.BackgroundSplash {
-  background-image: url('/images/bg_duel.jpg');
+.Background {
+    background-color: #1c130c;
 }
-.BackgroundDuel {
+.BackgroundSplash {
+  @extend .Background;
   background-image: url('/images/bg_duel.jpg');
 }
 .BackgroundGate {
+  @extend .Background;
   background-image: url('/images/bg_gate.jpg');
 }
 .BackgroundDuelists {
+  @extend .Background;
   background-image: url('/images/bg_duelists.jpg');
 }
 .BackgroundDuelsYour {
+  @extend .Background;
   background-image: url('/images/bg_duels_yours.jpg');
 }
 .BackgroundDuelsLive {
+  @extend .Background;
   background-image: url('/images/bg_duels_live.jpg');
 }
 .BackgroundDuelsPast {
+  @extend .Background;
   background-image: url('/images/bg_duels_past.jpg');
+}
+.BackgroundDuel {
+  @extend .Background;
+  background-image: url('/images/bg_duel.jpg');
 }
 
 
@@ -502,17 +512,18 @@ $box-h: calc((100vh - $aspect-h) / 2);
 
 .UIContainer {
   // background-color: #f008;
-  position: absolute;
-  top: 0;
-  left: 0;
+  min-width: 500px;
   width: 500px;
   height: 100%;
+  position: absolute;
+  top: 10px;
+  left: 10px;
   padding: 20px;
 }
 
 .TitleCase {
-  text-transform: uppercase;
-  // font-variant-caps: small-caps;
+  // text-transform: uppercase;
+  font-variant-caps: small-caps;
 }
 
 .Title {
@@ -680,7 +691,7 @@ input::placeholder {
 .ui.input>input {
   @extend .round_border;
   background-color: $color-dark;
-  color: rgba($color-text, 0.5);
+  color: rgba($color-text, 0.75);
   font-style: italic;
 }
 .ui.input>input:active,

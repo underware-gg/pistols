@@ -38,7 +38,7 @@ function DojoSetup({ children }) {
   }, [])
 
   if (!setupResult) {
-    return <h1>setup...</h1>
+    return <h1>setting up...</h1>
   }
 
   return (

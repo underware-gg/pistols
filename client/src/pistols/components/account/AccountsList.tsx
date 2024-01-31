@@ -58,7 +58,7 @@ export function AccountsList() {
 
         <Row textAlign='center' columns={'equal'}>
           <Col>
-            <ActionButton fill large disabled={!canEnter} onClick={() => router.push('/tavern')} label='Enter The TAVERN' />
+            <ActionButton fill large disabled={!canEnter} onClick={() => router.push('/tavern')} label='Enter The Tavern' />
           </Col>
         </Row>
       </Grid>
@@ -140,10 +140,10 @@ function AccountItem({
         />
         <div className='Spacer5' />
         {!isRegistered
-          ? <ActionButton fill disabled={!canRegister || !inputIsValid} onClick={() => _register()} label='REGISTER' />
+          ? <ActionButton fill disabled={!canRegister || !inputIsValid} onClick={() => _register()} label='Register' />
           : inputValue
-            ? <ActionButton fill disabled={!canRegister || isUpdated || !inputIsValid} onClick={() => _register()} label={isUpdated ? 'REGISTERED' : 'UPDATE'} />
-            : <ActionButton fill disabled={!canRegister || isUpdated} onClick={() => _register()} label='UNREGISTER' />
+            ? <ActionButton fill disabled={!canRegister || isUpdated || !inputIsValid} onClick={() => _register()} label={isUpdated ? 'Registered' : 'Update'} />
+            : <ActionButton fill disabled={!canRegister || isUpdated} onClick={() => _register()} label='Unregister' />
         }
       </Col>
     </Row>
