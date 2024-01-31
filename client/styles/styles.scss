@@ -4,7 +4,7 @@ $font-family-mono: 'Courier Prime', monospace;
 
 // Figma colors
 // https://www.figma.com/file/eseZA1jRIoX6IYNtoHgz30/Pistols-at-Ten-Blocks
-$color-bg: #1e1e1e;
+$color-bg: #000; //#1e1e1e;
 $color-darkest: #201a18;
 $color-dark: #584f49;
 $color-medium: #cb824d;
@@ -428,29 +428,6 @@ $box-h: calc((100vh - $aspect-h) / 2);
 //   margin-top: 100px;
 // }
 
-.ProfilePic {
-  pointer-events: none;
-  width: calc(439px / 2);
-  height: calc(768px / 2);
-  border-radius: 10px;
-}
-.ProfilePicDuel {
-  @extend .ProfilePic;
-  width: calc(439px / 3);
-  height: calc(768px / 3);
-}
-.ProfilePicSquare {
-  @extend .ProfilePic;
-  width: 70px;
-  height: 70px;
-  margin: auto;
-  top: 10px;
-}
-.ProfilePicHeight {
-  height: 70px;
-  min-height: 70px!important;
-}
-
 .DirectionButton {
   /* margin: 0.25em; */
   font-size: 24px;
@@ -515,6 +492,8 @@ $box-h: calc((100vh - $aspect-h) / 2);
 //
 // Pistols
 //
+$profile-pic-width: 70px;
+$ui-container-gap: 1em;
 
 .UIContainer {
   // background-color: #f008;
@@ -526,11 +505,18 @@ $box-h: calc((100vh - $aspect-h) / 2);
   position: absolute;
   top: 0px;
   left: 0px;
-  padding: 20px;
+  padding: $ui-container-gap;
 }
 .UIContainerTavern {
   @extend .UIContainer;
-  width: 600px;
+  width: 620px;
+}
+.UIContainerScroller {
+  width: 100%;
+  height: calc($aspect-h - $profile-pic-width - 1em * 4);
+  scrollbar-width: thin;
+  overflow-y: scroll;
+  // border: 0.5px solid #0001;
 }
 
 .TitleCase {
@@ -543,6 +529,30 @@ $box-h: calc((100vh - $aspect-h) / 2);
   text-shadow: $title-shadow;
   font-size: 2em;
 }
+
+.ProfilePic {
+  pointer-events: none;
+  width: calc(439px / 2);
+  height: calc(768px / 2);
+  border-radius: 10px;
+}
+.ProfilePicDuel {
+  @extend .ProfilePic;
+  width: calc(439px / 3);
+  height: calc(768px / 3);
+}
+.ProfilePicSquare {
+  @extend .ProfilePic;
+  width: $profile-pic-width;
+  height: $profile-pic-width;
+  margin: auto;
+  top: 10px;
+}
+.ProfilePicHeight {
+  height: $profile-pic-width;
+  min-height: $profile-pic-width!important;
+}
+
 
 .MenuTop {
   width: 100%;
@@ -796,7 +806,7 @@ input::placeholder {
   border: 0;
 }
 .ui.secondary.pointing.menu .item {
-  padding: 0.5em 1em; // semantic: 0.85714286em 1.14285714em;
+  padding: 0.5em 3em 0.5em 1em; // semantic: 0.85714286em 1.14285714em;
   background-color: transparent;
   color: $color-bright;
   text-shadow: $title-shadow;

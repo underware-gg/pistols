@@ -60,10 +60,12 @@ export function MenuTavern({
         ),
         render: () => (
           <TabPane attached={true}>
-            {key == MenuKey.Duelists && <DuelistTable />}
-            {key == MenuKey.YourDuels && <ChallengeTableYour />}
-            {key == MenuKey.LiveDuels && <ChallengeTableLive />}
-            {key == MenuKey.PastDuels && <ChallengeTablePast />}
+            <div className='UIContainerScroller'>
+              {key == MenuKey.Duelists && <DuelistTable />}
+              {key == MenuKey.YourDuels && <ChallengeTableYour />}
+              {key == MenuKey.LiveDuels && <ChallengeTableLive />}
+              {key == MenuKey.PastDuels && <ChallengeTablePast />}
+            </div>
           </TabPane>
         )
       })
