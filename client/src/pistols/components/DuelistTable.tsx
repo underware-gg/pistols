@@ -71,7 +71,7 @@ export function DuelistTable() {
     }
     const _sortTotals = (a, b) => (!isAscending ? (b - a) : (a && !b) ? -1 : (!a && b) ? 1 : (a - b))
     if (sortColumn == DuelistColumn.Honour) return _sortTotals(dataA.honour, dataB.honour)
-    if (sortColumn == DuelistColumn.TotalHonour) return _sortTotals(dataA.honour, dataB.total_honour)
+    if (sortColumn == DuelistColumn.TotalHonour) return _sortTotals(dataA.total_honour, dataB.total_honour)
     if (sortColumn == DuelistColumn.Wins) return _sortTotals(dataA.total_wins, dataB.total_wins)
     if (sortColumn == DuelistColumn.Losses) return _sortTotals(dataA.total_losses, dataB.total_losses)
     if (sortColumn == DuelistColumn.Draws) return _sortTotals(dataA.total_draws, dataB.total_draws)
