@@ -671,15 +671,15 @@ $box-h: calc((100vh - $aspect-h) / 2);
 //-----------------------------
 // semantic-ui
 //
-.round_border {
+._round_border {
   border: 1px solid $color-bright;
   border-radius: 0.5em;
 }
-.round_border_active {
+._round_border_active {
   border: 1px solid $color-brightest;
   border-radius: 0.5em;
 }
-.round_border_inactive {
+._round_border_inactive {
   border: 1px solid rgba($color-bright, 0.5);
   border-radius: 0.5em;
 }
@@ -689,19 +689,19 @@ input::placeholder {
   color: $color-text-disabled!important;
 }
 .ui.input>input {
-  @extend .round_border;
+  @extend ._round_border;
   background-color: $color-dark;
   color: rgba($color-text, 0.75);
   font-style: italic;
 }
 .ui.input>input:active,
 .ui.input>input:focus {
-  @extend .round_border_active;
+  @extend ._round_border_active;
   background-color: $color-dark;
   color: $color-text;
 }
 .ui.label {
-  @extend .round_border;
+  @extend ._round_border;
   font-family: $font-family;
   background-color: $color-bright;
   color: $color-dark;
@@ -717,33 +717,38 @@ input::placeholder {
 }
 //
 // <Button>
-.ui.button {
-  @extend .round_border, .TitleCase;
+._button {
+  @extend ._round_border, .TitleCase;
   font-family: $font-family;
   background-color: rgba($color-dark, 0.6);
   color: $color-text;
   font-size: 1.2rem; // semantic: 1rem;
-  padding: 0.5em 1.5em;// semantic: 0.78571429em 1.5em 0.78571429em;
+  padding: 0.5em 1em;// semantic: 0.78571429em 1.5em 0.78571429em;
   margin: 0.15em 0;
 }
-.ui.button:focus {
-  @extend .round_border_active;
-  background-color: $color-dark;
-  color: $color-text;
-}
-.ui.button:hover {
+._button_hover {
   background-color: $color-bright;
   color: $color-dark;
 }
-.ui.button:active {
+._button_focus {
+  @extend ._round_border_active;
+  background-color: $color-dark;
+  color: $color-text;
+}
+._button_active {
   background-color: $color-brightest;
   color: $color-dark;
 }
-.ui.button:disabled {
-  @extend .round_border_inactive;
+._button_disabled {
+  @extend ._round_border_inactive;
   color: $color-text-disabled;
-  opacity: 1!important;
+  opacity: 1!important;  
 }
+.ui.button { @extend ._button; }
+.ui.button:hover { @extend ._button_hover; }
+.ui.button:focus { @extend ._button_focus; }
+.ui.button:active { @extend ._button_active; }
+.ui.button:disabled { @extend ._button_disabled; }
 .ui.button.toggle.active,
 .ui.buttons .button.toggle.active,
 .ui.toggle.buttons .active.button {
@@ -751,27 +756,30 @@ input::placeholder {
 }
 //
 // <Menu> buttons
-.ui.menu .item {
-  color: $color-text;
+.ui.menu .item,
+.ui.secondary.menu .item {
+  @extend ._button;
+  margin: 0 0.15em;
 }
-// .ui.menu .item,
 .ui.secondary.menu .active.item,
 .ui.secondary.menu .active.item:hover {
-  background-color: $color-important;
-  color: $color-white;
-  // font-family: $font-family;
-  // font-size: 16px;
-  // font-weight: 600;
-}
-.ui.secondary.menu .item {
-  background-color: rgba($color-bg, 0.5);
-  color: $color-important;
+  @extend ._button_active;
 }
 .ui.secondary.menu .dropdown.item:hover,
 .ui.secondary.menu .link.item:hover,
 .ui.secondary.menu a.item:hover {
-  background-color: rgba($color-bg, 0.7);
-  color: $color-important;
+  @extend ._button_hover;
+}
+.ui.secondary.menu .dropdown.item:active,
+.ui.secondary.menu .link.item:active,
+.ui.secondary.menu a.item:active {
+  @extend ._button_active;
+}
+// floating label
+.ui.menu .item>.floating.label {
+  font-family: $font-family-mono;
+  font-weight: 600;
+  padding: 0.3em 0.5em 0.1em 0.5em;
 }
 //
 // <Table>
