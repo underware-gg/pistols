@@ -24,6 +24,7 @@ $color-attention: #22b600;
 $ui-border: 6px ridge $color-active;
 $ui-outline: 0.5px solid $color-border;
 $text-shadow: 0.04em 0.04em 2px $color-dark;
+$title-shadow: 0.1em 0.1em 1px $color-darkest;
 
 $color-positive: #dffcd9;
 $color-negative: #ffe3e3;
@@ -46,7 +47,7 @@ html, body {
   font-size: 12px;
   line-height: 1.2;
   font-weight: 400;
-
+  
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -443,6 +444,11 @@ $box-h: calc((100vh - $aspect-h) / 2);
   width: 70px;
   height: 70px;
   margin: auto;
+  top: 10px;
+}
+.ProfilePicHeight {
+  height: 70px;
+  min-height: 70px!important;
 }
 
 .DirectionButton {
@@ -512,13 +518,19 @@ $box-h: calc((100vh - $aspect-h) / 2);
 
 .UIContainer {
   // background-color: #f008;
+  background-color: #0004; // For browsers that do not support gradients
+  background-image: linear-gradient(to right, #000c, transparent);
   min-width: 500px;
   width: 500px;
   height: 100%;
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 0px;
+  left: 0px;
   padding: 20px;
+}
+.UIContainerTavern {
+  @extend .UIContainer;
+  width: 600px;
 }
 
 .TitleCase {
@@ -528,6 +540,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 
 .Title {
   @extend .TitleCase;
+  text-shadow: $title-shadow;
   font-size: 2em;
 }
 
@@ -542,14 +555,6 @@ $box-h: calc((100vh - $aspect-h) / 2);
   @extend .MenuTop;
   top: unset;
   bottom: 0;
-}
-
-.AccountHeader {
-  width: 600px;
-  // position: absolute;
-  top: 0;
-  right: 0;
-  padding: 15px;
 }
 
 .DuelSideA {
@@ -775,11 +780,42 @@ input::placeholder {
 .ui.secondary.menu a.item:active {
   @extend ._button_active;
 }
+//
 // floating label
 .ui.menu .item>.floating.label {
+  background-color: $color-important!important;
+  text-shadow: $text-shadow;
   font-family: $font-family-mono;
   font-weight: 600;
   padding: 0.3em 0.5em 0.1em 0.5em;
+  border: 0;
+}
+//
+// <Tab> <TabPane>
+.ui.attached.menu:not(.tabular) {
+  border: 0;
+}
+.ui.secondary.pointing.menu .item {
+  padding: 0.5em 1em; // semantic: 0.85714286em 1.14285714em;
+  background-color: transparent;
+  color: $color-bright;
+  text-shadow: $title-shadow;
+  border: 0;
+}
+.ui.secondary.pointing.menu .active.item,
+.ui.secondary.pointing.menu .active.item:hover,
+.ui.secondary.pointing.menu a.item:hover,
+.ui.secondary.pointing.menu a.item:active {
+  border-bottom: 2px solid $color-brightest;
+  color: $color-brightest;
+}
+// Tab contents
+.ui.tab.active {
+  background-color: transparent;
+  border: 0;
+  border-top: 0.5px solid $color-brightest!important;
+  margin: 1px 0 0 0;
+  padding: 1em 0;
 }
 //
 // <Table>

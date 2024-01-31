@@ -13,7 +13,7 @@ function AccountShort({
   const display = useMemo(() => (_address ? shortAddress(_address) : '0x?'), [_address])
   return (
     <span className='Code'>
-      {suffix}{display} {copyLink && <CopyIcon content={bigintToHex(address)} />}
+      {copyLink && <CopyIcon content={bigintToHex(address)} />} {suffix}{display} 
     </span>
   )
 }

@@ -1,16 +1,18 @@
 import React, { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { Grid, Menu, Label } from 'semantic-ui-react'
-import { MenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { Grid, Menu, Label, Tab, TabPane, MenuItem } from 'semantic-ui-react'
+import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
 import { useChallengeIdsByState, useChallengesByDuelist } from '@/pistols/hooks/useChallenge'
-import { useDojoAccount } from '@/dojo/DojoContext'
-import { ChallengeState } from '@/pistols/utils/pistols'
-import AccountHeader from '@/pistols/components/account/AccountHeader'
-import { SPRITESHEETS } from '@/pistols/data/assets'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
+import { useDojoAccount } from '@/dojo/DojoContext'
+import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
 import { SettingsMenuItem } from '@/pistols/components/ui/Buttons'
-import { DuelStage } from '../hooks/useDuel'
+import { ChallengeState } from '@/pistols/utils/pistols'
+import { DuelistTable } from '@/pistols/components/DuelistTable'
+import { DuelStage } from '@/pistols/hooks/useDuel'
+import { SPRITESHEETS } from '@/pistols/data/assets'
+import AccountHeader from '@/pistols/components/account/AccountHeader'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -31,6 +33,7 @@ export function MenuTavern({
 }) {
   const { account } = useDojoAccount()
   const { menuKey, tavernMenuItems, dispatchSetMenu } = usePistolsContext()
+  const { atDuelists, atYourDuels, atLiveDuels, atPastDuels } = usePistolsContext()
 
   const { awaitingCount, inProgressCount } = useChallengesByDuelist(BigInt(account.address))
   const { challengeIds: awaitingChallengeIds } = useChallengeIdsByState(ChallengeState.Awaiting)
@@ -39,36 +42,50 @@ export function MenuTavern({
   const yourDuelsBubble = useMemo(() => _makeBubble(awaitingCount, inProgressCount), [awaitingCount, inProgressCount])
   const liveDuelsBubble = useMemo(() => _makeBubble(awaitingChallengeIds.length, inProgressChallengeIds.length), [awaitingChallengeIds, inProgressChallengeIds])
 
-  const items = useMemo(() => {
+  const panes = useMemo(() => {
     let result = []
     Object.keys(tavernMenuItems).forEach(k => {
       const key = parseInt(k)
       const label = tavernMenuItems[key]
       const bubble = (key == MenuKey.YourDuels) ? yourDuelsBubble : (key == MenuKey.LiveDuels) ? liveDuelsBubble : null
-      result.push(
-        <Menu.Item
-          key={key}
-          active={menuKey === key}
-          onClick={() => dispatchSetMenu(key)}
-        >
-          {label}
-          {bubble}
-        </Menu.Item>
-
-      )
+      result.push({
+        menuItem: (
+          <Menu.Item
+            active={menuKey === key}
+            onClick={() => dispatchSetMenu(key)}
+          >
+            {label}
+            {bubble}
+          </Menu.Item>
+        ),
+        render: () => (
+          <TabPane attached={true}>
+            {key == MenuKey.Duelists && <DuelistTable />}
+            {key == MenuKey.YourDuels && <ChallengeTableYour />}
+            {key == MenuKey.LiveDuels && <ChallengeTableLive />}
+            {key == MenuKey.PastDuels && <ChallengeTablePast />}
+          </TabPane>
+        )
+      })
     })
     return result
   }, [menuKey, yourDuelsBubble, liveDuelsBubble])
 
   return (
-    <Menu secondary className='MenuTop' size='huge'>
-      {items}
-
-      <Menu.Menu position='right'>
-        <AccountHeader />
-      </Menu.Menu>
-
-    </Menu>
+    <>
+      <Grid>
+        <Row className='ProfilePicHeight'>
+          <Col width={5} verticalAlign='middle' className='Title'>
+            &nbsp;&nbsp;&nbsp;
+            The Tavern
+          </Col>
+          <Col width={11} textAlign='right'>
+            <AccountHeader />
+          </Col>
+        </Row>
+      </Grid>
+      <Tab menu={{ secondary: true, pointing: true, attached: true }} panes={panes} />
+    </>
   )
 }
 

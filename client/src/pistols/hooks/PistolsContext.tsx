@@ -14,7 +14,6 @@ export enum MenuKey {
   YourDuels,
   LiveDuels,
   PastDuels,
-  // Scoreboard,
 }
 
 const tavernMenuItems = {
@@ -22,7 +21,6 @@ const tavernMenuItems = {
   [MenuKey.YourDuels]: 'Your Duels',
   [MenuKey.LiveDuels]: 'Live Duels',
   [MenuKey.PastDuels]: 'Past Duels',
-  // [MenuKey.Scoreboard]: 'Scoreboard',
 }
 
 export const initialState = {
@@ -150,7 +148,6 @@ export const usePistolsContext = () => {
     atYourDuels: (state.menuKey == MenuKey.YourDuels),
     atLiveDuels: (state.menuKey == MenuKey.LiveDuels),
     atPastDuels: (state.menuKey == MenuKey.PastDuels),
-    // atScoreboard: (state.menuKey == MenuKey.Scoreboard),
     // PistolsActions,
     // dispatch,
     dispatchSetDuelist,

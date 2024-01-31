@@ -24,19 +24,17 @@ export default function AccountHeader({
   }, [isMasterAccount])
 
   return (
-    <div className='AccountHeader'>
-      <Grid>
-        <Row textAlign='center' verticalAlign='middle'>
-          <Col width={15} textAlign='right'>
-            <h3>{isMasterAccount ? 'MASTER ACCOUNT' : name}</h3>
-            <AccountShort address={account?.address} />
-          </Col>
-          <Col width={1}>
-            <ProfilePicSquareButton profilePic={profilePic} onClick={() => { router.push('/gate') }} />
-          </Col>
-        </Row>
-      </Grid>
-    </div>
+    <Grid>
+      <Row className='ProfilePicHeight' textAlign='center' verticalAlign='middle'>
+        <Col width={12} textAlign='right'>
+          <h3>{isMasterAccount ? 'MASTER ACCOUNT' : name}</h3>
+          <AccountShort address={account?.address} />
+        </Col>
+        <Col width={4}>
+          <ProfilePicSquareButton profilePic={profilePic} onClick={() => { router.push('/gate') }} />
+        </Col>
+      </Row>
+    </Grid>
   );
 }
 
