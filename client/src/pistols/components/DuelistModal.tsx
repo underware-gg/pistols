@@ -43,7 +43,7 @@ export default function DuelistModal() {
   return (
     <Modal
       // size='small'
-      dimmer='inverted'
+      // dimmer='inverted'
       onClose={() => _close()}
       // onOpen={() => setIsChallenging(false)}
       open={isOpen}

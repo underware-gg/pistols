@@ -38,7 +38,7 @@ export default function CommitModal({
   return (
     <Modal
       size='small'
-      dimmer='inverted'
+      // dimmer='inverted'
       onClose={() => setIsOpen(false)}
       open={isOpen}
     >

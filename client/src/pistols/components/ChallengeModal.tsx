@@ -45,7 +45,7 @@ export default function ChallengeModal() {
   return (
     <Modal
       // size='large'
-      dimmer='inverted'
+      // dimmer='inverted'
       onClose={() => _close()}
       onOpen={() => {}}
       open={(atYourDuels || atLiveDuels || atPastDuels) && duelId > 0}

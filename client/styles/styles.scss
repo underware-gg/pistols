@@ -836,6 +836,22 @@ input::placeholder {
   // font-weight: 800;
 }
 //
+// <Modal>
+.ui.modal {
+  @extend ._round_border_inactive;
+}
+.ui.modal>.header:not(.ui) {
+  @extend .Title;
+  font-family: $font-family;
+  color: $color-text;
+}
+.ui.modal,
+.ui.modal>.header,
+.ui.modal>.content,
+.ui.modal>.actions {
+  background-color: $color-darkest;
+}
+//
 // <Step>
 .ui.steps .step.active .title {
   color: $color-important;
