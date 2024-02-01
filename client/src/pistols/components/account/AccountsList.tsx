@@ -44,7 +44,7 @@ export function AccountsList() {
 
   return (
     <>
-      <Grid className='Faded'>
+      <Grid className='Faded FillWidth'>
         <Row textAlign='center' columns={'equal'}>
           <Col>
             <ActionButton fill disabled={isDeploying} onClick={() => create()} label='Create Account' />

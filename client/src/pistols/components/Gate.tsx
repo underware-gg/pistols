@@ -10,7 +10,7 @@ export default function Gate() {
   return (
     <div className='UIContainer'>
 
-      <Grid>
+      <Grid className='FillWidth'>
         <Row colums='equal'>
           <Col>
             <Logo />

@@ -65,7 +65,7 @@ export default function ChallengeModal() {
       </Modal.Header>
       <Modal.Content image>
         <ProfilePicButton profilePic={profilePicA} onClick={() => dispatchSetDuelist(duelistA)} />
-        <Modal.Description style={{ width: '550px' }}>
+        <Modal.Description className='Padded' style={{ width: '550px' }}>
           <Grid style={{ width: '350px' }}>
             <Row columns='equal' textAlign='left'>
               <Col>

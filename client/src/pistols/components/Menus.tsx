@@ -77,7 +77,7 @@ export function MenuTavern({
     <>
       <Grid>
         <Row className='ProfilePicHeight'>
-          <Col width={5} verticalAlign='middle' className='Title'>
+          <Col width={5} className='Title'>
             &nbsp;&nbsp;&nbsp;
             The Tavern
           </Col>

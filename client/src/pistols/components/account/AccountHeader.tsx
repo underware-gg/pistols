@@ -30,7 +30,7 @@ export default function AccountHeader({
           <h3>{isMasterAccount ? 'MASTER ACCOUNT' : name}</h3>
           <AccountShort address={account?.address} />
         </Col>
-        <Col width={4}>
+        <Col width={4} verticalAlign='middle'>
           <ProfilePicSquareButton profilePic={profilePic} onClick={() => { router.push('/gate') }} />
         </Col>
       </Row>

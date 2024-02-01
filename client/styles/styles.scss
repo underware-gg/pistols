@@ -10,21 +10,24 @@ $color-dark: #584f49;
 $color-medium: #cb824d;
 $color-bright: #c8b6a8;
 $color-brightest: #efe1d7;
-$color-border: #8d603f;
 
 $color-white: $color-brightest;
 $color-shadow: $color-dark;
-$color-text: $color-brightest;
+$color-text: $color-bright;
 $color-text-disabled: rgba($color-brightest, 0.3);
 $color-icon: $color-bright;
 $color-important: $color-medium;
 $color-active: $color-medium;
 $color-inactive: #712727;
 $color-attention: #22b600;
-$ui-border: 6px ridge $color-active;
-$ui-outline: 0.5px solid $color-border;
 $text-shadow: 0.04em 0.04em 2px $color-dark;
 $title-shadow: 0.1em 0.1em 1px $color-darkest;
+$ui-border: 6px ridge $color-active;
+
+$border-hr: solid 0.5px rgba($color-bright, 0.5);
+$border-button: 1px solid $color-bright;
+$border-button-active: 1px solid $color-brightest;
+$border-button-inactive: 1px solid rgba($color-bright, 0.5);
 
 $color-positive: #dffcd9;
 $color-negative: #ffe3e3;
@@ -47,6 +50,7 @@ html, body {
   font-size: 12px;
   line-height: 1.2;
   font-weight: 400;
+  box-sizing: border-box;
   
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -97,11 +101,11 @@ h1, h2, h3, h4, h5 {
   text-shadow: $text-shadow;
   line-height: 1.2em;
   margin: 0.2em 0;
+  color: $color-brightest;
 }
 
 hr {
-  color: rgba($color-text, 0.8);
-  border: 0.5px solid;
+  border: $border-hr;
 }
 
 button {
@@ -513,7 +517,7 @@ $ui-container-gap: 1em;
 }
 .UIContainerScroller {
   width: 100%;
-  height: calc($aspect-h - $profile-pic-width - 1em * 4);
+  height: calc($aspect-h - $profile-pic-width - 1em * 6);
   scrollbar-width: thin;
   overflow-y: scroll;
   // border: 0.5px solid #0001;
@@ -527,26 +531,33 @@ $ui-container-gap: 1em;
 .Title {
   @extend .TitleCase;
   text-shadow: $title-shadow;
-  font-size: 2em;
+  font-size: 2em!important;
 }
 
 .ProfilePic {
-  pointer-events: none;
   width: calc(439px / 2);
   height: calc(768px / 2);
   border-radius: 10px;
+  border: $border-button;
 }
 .ProfilePicDuel {
   @extend .ProfilePic;
   width: calc(439px / 3);
   height: calc(768px / 3);
+  border: $border-button;
 }
 .ProfilePicSquare {
-  @extend .ProfilePic;
   width: $profile-pic-width;
   height: $profile-pic-width;
+  pointer-events: none;
   margin: auto;
   top: 10px;
+}
+.ProfilePicSmall {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  pointer-events: none;
 }
 .ProfilePicHeight {
   height: $profile-pic-width;
@@ -565,6 +576,15 @@ $ui-container-gap: 1em;
   @extend .MenuTop;
   top: unset;
   bottom: 0;
+}
+
+.TavernTitle {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  padding: 15px;
+  text-align: center;
 }
 
 .DuelSideA {
@@ -629,8 +649,8 @@ $ui-container-gap: 1em;
   font-family: $font-family-mono!important;
   font-size: 12px!important;
   font-weight: 600!important;
-  color: $color-bg;
-  text-shadow: 0 0 2px #000;
+  color: $color-brightest;
+  text-shadow: 0.1em 0.1em 2px #000;
   margin: -2px 0 0 -2px!important;
 }
 .StepsIcon.small {
@@ -687,15 +707,15 @@ $ui-container-gap: 1em;
 // semantic-ui
 //
 ._round_border {
-  border: 1px solid $color-bright;
+  border: $border-button;
   border-radius: 0.5em;
 }
 ._round_border_active {
-  border: 1px solid $color-brightest;
+  border: $border-button-active;
   border-radius: 0.5em;
 }
 ._round_border_inactive {
-  border: 1px solid rgba($color-bright, 0.5);
+  border: $border-button-inactive;
   border-radius: 0.5em;
 }
 // 
@@ -724,6 +744,9 @@ input::placeholder {
 }
 //
 // <Grid>
+.ui.grid {
+  margin: auto;
+}
 .ui.grid>.row {
   padding: 0.25rem 0; // original: 1.0rem 0
 }
@@ -829,14 +852,40 @@ input::placeholder {
 }
 //
 // <Table>
+.ui.table {
+  background-color: rgba($color-darkest, 0.6);
+  color: $color-text;
+  border: 0;
+}
+.ui.table thead th {
+  @extend .TitleCase;
+  background-color: rgba($color-darkest, 1);
+  color: $color-brightest!important;
+}
+.ui.sortable.table thead th.sorted,
+.ui.sortable.table thead th:hover {
+  background-color: rgba($color-medium, 1);
+}
+td {
+  // border: 1px 0 0 0 solid $color-brightest!important;
+  // border: 0!important;
+  border: $border-hr;
+  border-style: none none solid none;
+}
 .ui.table td.positive, .ui.table tr.positive {
   background: $color-positive !important;
+  // color: $color-text!important;
 }
 .ui.table td.negative, .ui.table tr.negative {
   background: $color-negative!important;
+  // color: $color-text!important;
 }
 .ui.table td.warning, .ui.table tr.warning {
   background: $color-warning !important;
+  // color: $color-text!important;
+}
+.ui.selectable.table tbody tr:hover {
+  color: $color-text!important;
 }
 //
 // Pagination
@@ -850,16 +899,23 @@ input::placeholder {
 .ui.modal {
   @extend ._round_border_inactive;
 }
-.ui.modal>.header:not(.ui) {
+.ui.modal>.header {
   @extend .Title;
   font-family: $font-family;
   color: $color-text;
+  border-bottom: $border-hr;
+}
+.ui.modal>.actions {
+  border-top: $border-hr;
 }
 .ui.modal,
 .ui.modal>.header,
 .ui.modal>.content,
 .ui.modal>.actions {
   background-color: $color-darkest;
+}
+.ui.header {
+  color: $color-text;
 }
 //
 // <Step>

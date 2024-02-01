@@ -132,7 +132,7 @@ function DuelItem({
   return (
     <Table.Row warning={isDraw || isCanceled} negative={false} positive={isInProgress || isFinished} textAlign='left' verticalAlign='middle' onClick={() => _gotoChallenge()}>
       <Cell positive={winnerIsA} negative={winnerIsB}>
-        <ProfilePicSquare profilePic={profilePicA} />
+        <ProfilePicSquare profilePic={profilePicA} small />
       </Cell>
 
       <Cell positive={winnerIsA} negative={winnerIsB}>
@@ -142,7 +142,7 @@ function DuelItem({
       </Cell>
 
       <Cell positive={winnerIsB} negative={winnerIsA}>
-        <ProfilePicSquare profilePic={profilePicB} />
+        <ProfilePicSquare profilePic={profilePicB} small />
       </Cell>
 
       <Cell positive={winnerIsB} negative={winnerIsA}>

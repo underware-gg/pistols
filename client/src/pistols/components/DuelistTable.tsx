@@ -85,9 +85,8 @@ export function DuelistTable() {
     <Table selectable sortable={!isEmpty} className='Faded' color='orange'>
       <Table.Header className='TableHeader'>
         <Table.Row textAlign='center' verticalAlign='middle'>
-          <HeaderCell width={3}></HeaderCell>
           <HeaderCell width={1}></HeaderCell>
-          <HeaderCell textAlign='left' sorted={sortColumn == DuelistColumn.Name ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Name)}>Duelist</HeaderCell>
+          <HeaderCell width={9} textAlign='left' sorted={sortColumn == DuelistColumn.Name ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Name)}>Duelist</HeaderCell>
           <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Honour ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Honour)}>Honour</HeaderCell>
           <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Wins ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Wins)}>Total<br />Wins</HeaderCell>
           <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Losses ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Losses)}>Total<br />Losses</HeaderCell>
@@ -135,15 +134,12 @@ function DuelistItem({
   return (
     <Table.Row textAlign='center' verticalAlign='middle' onClick={() => dispatchSetDuelist(address)}>
       <Cell>
-        <AccountShort address={address} copyLink={false} />
-      </Cell>
-      
-      <Cell>
-        <ProfilePicSquare profilePic={profilePic} />
+        <ProfilePicSquare profilePic={profilePic} small />
       </Cell>
 
       <Cell textAlign='left'>
-        {name}
+        <h4>{name}</h4>
+        <AccountShort address={address} copyLink={false} />
       </Cell>
 
       <Cell className='Important'>

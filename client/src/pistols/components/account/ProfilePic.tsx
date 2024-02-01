@@ -5,7 +5,7 @@ import { Image } from 'semantic-ui-react'
 const _makeUrl = (profilePic: number, suffix: string) => {
   return `/profiles/${('00' + profilePic).slice(-2)}_${suffix}.jpg`
 }
-const _className = (square: boolean, duel: boolean) => (square ? 'ProfilePicSquare' : duel ? 'ProfilePicDuel' : 'ProfilePic')
+const _className = (small: boolean, square: boolean, duel: boolean) => (small ? 'ProfilePicSmall' : square ? 'ProfilePicSquare' : duel ? 'ProfilePicDuel' : 'ProfilePic')
 const _suffix = (square: boolean) => (square ? 'sq' : 'a')
 
 //---------------
@@ -14,11 +14,12 @@ const _suffix = (square: boolean) => (square ? 'sq' : 'a')
 
 export function ProfilePic({
   profilePic,
+  small = false,
   square = false,
   duel = false,
   floated = null,
 }) {
-  const className = useMemo(() => _className(square, duel), [square])
+  const className = useMemo(() => _className(small, square, duel), [square])
   const suffix = useMemo(() => _suffix(square), [square])
   const url = useMemo(() => _makeUrl(profilePic, suffix), [profilePic, suffix])
   if (!profilePic) return <></>
@@ -28,11 +29,12 @@ export function ProfilePic({
 export function ProfilePicButton({
   profilePic,
   onClick,
+  small = false,
   square = false,
   duel = false,
   disabled = false,
 }) {
-  const className = useMemo(() => _className(square, duel), [square])
+  const className = useMemo(() => _className(small, square, duel), [square])
   const suffix = useMemo(() => _suffix(square), [square])
   const url = useMemo(() => _makeUrl(profilePic, suffix), [profilePic, suffix])
   const _click = () => {
@@ -48,14 +50,16 @@ export function ProfilePicButton({
 
 export function ProfilePicSquare({
   profilePic,
+  small = false,
 }) {
-  return <ProfilePic profilePic={profilePic} square={true} />
+  return <ProfilePic profilePic={profilePic} small={small} square={true} />
 }
 
 export function ProfilePicSquareButton({
   profilePic,
-  onClick,
+  small = false,
   disabled = false,
+  onClick,
 }) {
-  return <ProfilePicButton profilePic={profilePic} onClick={onClick} disabled={disabled} square={true} />
+  return <ProfilePicButton profilePic={profilePic} onClick={onClick} disabled={disabled} small={small} square={true} />
 }
