@@ -1,5 +1,5 @@
 import React from 'react'
-import { Menu, Button } from 'semantic-ui-react'
+import { Menu, Button, Icon, SemanticICONS } from 'semantic-ui-react'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 
 //-----------------
@@ -41,6 +41,30 @@ export const ActionButton = ({
 // Settings
 //
 
+interface SettingsIconProps {
+  iconOn?: SemanticICONS
+  iconOff?: SemanticICONS
+  name: string
+  value: boolean
+}
+
+export function SettingsIcon({
+  iconOn = 'toggle on',
+  iconOff = 'toggle off',
+  name,
+  value,
+}: SettingsIconProps) {
+  const { dispatchSetting } = useSettingsContext()
+  const _switch = () => {
+    dispatchSetting(name, !value)
+  }
+  return (
+    <div onClick={() => _switch()}>
+      {value ? <Icon name={iconOn} /> : <Icon name={iconOff} />}
+    </div>
+  )
+}
+
 interface SettingsButtonProps {
   prefix: string
   name: string
@@ -58,7 +82,6 @@ export function SettingsButton({
   }
   return <ActionButton fill dimmed={!value} label={`${prefix} ${value ? 'ON' : 'OFF'}`} onClick={() => _switch()} />
 }
-
 
 export function SettingsMenuItem({
   prefix,

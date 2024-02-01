@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Grid, Radio, Input } from 'semantic-ui-react'
+import { Grid, Radio, Input, Divider } from 'semantic-ui-react'
 import { useDojo, useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { AccountShort } from '@/pistols/components/ui/Account'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
@@ -29,7 +29,7 @@ export function AccountsList() {
     })
     if (result.length == 0) {
       result.push(
-        <Row key='empty' textAlign='center' columns={'equal'}>
+        <Row key='empty' columns={'equal'} textAlign='center'>
           <Col>
             <h4>No accounts created</h4>
           </Col>
@@ -45,7 +45,7 @@ export function AccountsList() {
   return (
     <>
       <Grid className='Faded FillWidth'>
-        <Row textAlign='center' columns={'equal'}>
+        <Row columns={'equal'} textAlign='center'>
           <Col>
             <ActionButton fill disabled={isDeploying} onClick={() => create()} label='Create Account' />
           </Col>
@@ -54,9 +54,17 @@ export function AccountsList() {
           </Col>
         </Row>
 
+        <Row columns={'equal'} className='Spacer10'>
+          <Col></Col>
+        </Row>
+
         {rows}
 
-        <Row textAlign='center' columns={'equal'}>
+        <Row columns={'equal'} className='Spacer10'>
+          <Col></Col>
+        </Row>
+
+        <Row columns={'equal'} textAlign='center'>
           <Col>
             <ActionButton fill large disabled={!canEnter} onClick={() => router.push('/tavern')} label='Enter The Tavern' />
           </Col>
@@ -127,6 +135,7 @@ function AccountItem({
       </Col>
       <Col width={12} textAlign='left'>
         Duelist Name
+        <div className='Spacer5'/>
         <Input fluid
           // icon='edit'
           label='burner'

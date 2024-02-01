@@ -1,6 +1,6 @@
 import React from 'react'
 import { Grid } from 'semantic-ui-react'
-import { MenuSettings, MenuTavern } from '@/pistols/components/Menus'
+import { MenuTavern } from '@/pistols/components/Menus'
 import { TavernAudios } from '@/pistols/components/GameContainer'
 import ChallengeModal from '@/pistols/components/ChallengeModal'
 import DuelistModal from '@/pistols/components/DuelistModal'
@@ -15,9 +15,6 @@ export default function Tavern() {
       <div className='UIContainerTavern'>
         <MenuTavern />
       </div>
-
-      <MenuSettings />
-      {/* <AccountHeader /> */}
 
       <DuelistModal />
       <ChallengeModal />

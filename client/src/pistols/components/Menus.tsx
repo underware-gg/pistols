@@ -1,13 +1,13 @@
 import React, { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { Grid, Menu, Label, Tab, TabPane, MenuItem } from 'semantic-ui-react'
+import { Grid, Menu, Label, Tab, TabPane } from 'semantic-ui-react'
 import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
 import { useChallengeIdsByState, useChallengesByDuelist } from '@/pistols/hooks/useChallenge'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
-import { SettingsMenuItem } from '@/pistols/components/ui/Buttons'
+import { SettingsIcon, SettingsMenuItem } from '@/pistols/components/ui/Buttons'
 import { ChallengeState } from '@/pistols/utils/pistols'
 import { DuelistTable } from '@/pistols/components/DuelistTable'
 import { DuelStage } from '@/pistols/hooks/useDuel'
@@ -33,7 +33,6 @@ export function MenuTavern({
 }) {
   const { account } = useDojoAccount()
   const { menuKey, tavernMenuItems, dispatchSetMenu } = usePistolsContext()
-  const { atDuelists, atYourDuels, atLiveDuels, atPastDuels } = usePistolsContext()
 
   const { awaitingCount, inProgressCount } = useChallengesByDuelist(BigInt(account.address))
   const { challengeIds: awaitingChallengeIds } = useChallengeIdsByState(ChallengeState.Awaiting)
@@ -51,6 +50,7 @@ export function MenuTavern({
       result.push({
         menuItem: (
           <Menu.Item
+            key={label}
             active={menuKey === key}
             onClick={() => dispatchSetMenu(key)}
           >
@@ -76,12 +76,15 @@ export function MenuTavern({
   return (
     <>
       <Grid>
-        <Row className='ProfilePicHeight'>
+        <Row className='ProfilePicHeight' verticalAlign='middle'>
           <Col width={5} className='Title'>
             &nbsp;&nbsp;&nbsp;
             The Tavern
           </Col>
-          <Col width={11} textAlign='right'>
+          <Col width={1} className='Title' textAlign='left'>
+            <MusicToggle />
+          </Col>
+          <Col width={10} textAlign='right'>
             <AccountHeader />
           </Col>
         </Row>
@@ -91,19 +94,12 @@ export function MenuTavern({
   )
 }
 
-export function MenuSettings({
+export function MusicToggle({
 }) {
-  const router = useRouter()
   const { settings, SettingsActions } = useSettingsContext()
   const { hasLoadedAudioAssets } = useGameplayContext()
   if (!hasLoadedAudioAssets) return <></>
-  return (
-    <div className='MenuBottom'>
-      <Menu secondary compact className='YesMouse' size='huge'>
-        <SettingsMenuItem prefix='Music' settingsKey={SettingsActions.MUSIC_ENABLED} currentValue={settings.musicEnabled} />
-      </Menu>
-    </div>
-  )
+  return <SettingsIcon name={SettingsActions.MUSIC_ENABLED} value={settings.musicEnabled} iconOn='volume up' iconOff='volume off'/>
 }
 
 

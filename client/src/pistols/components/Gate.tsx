@@ -36,9 +36,6 @@ export default function Gate() {
         </Row>
       </Grid>
 
-      <br />
-      <br />
-
       <AccountsList />
       
     </div>
