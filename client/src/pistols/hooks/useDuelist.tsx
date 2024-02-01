@@ -15,6 +15,7 @@ export const useAllDuelistIds = () => {
   const duelistIds: bigint[] = useEntityKeys(Duelist, 'address')
   return {
     duelistIds,
+    duelistCount: duelistIds.length,
   }
 }
 
