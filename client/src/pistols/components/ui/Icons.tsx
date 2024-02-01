@@ -271,3 +271,82 @@ export function CompletedIcon({
     </IconGroup>
   )
 }
+
+
+//---------------------------------
+// Custom SVG icons
+//
+interface CustomIconProps {
+  svgUrl?: string,			// optional
+  icon?: boolean,			  // if the svg is on /icons/
+  logo?: boolean,			  // if the svg is on /logos/
+  name: SemanticICONS | string,   // name of icon, logo, or Icon
+  className?: string,
+  centered?: boolean,
+  size?: IconSizeProp,	// if <Icon>
+  color?: string,        // css color
+  tooltip?: string,
+  onClick?: Function,
+}
+export function CustomIcon({
+  svgUrl,
+  icon,
+  logo,
+  name = 'chess board',
+  className,
+  centered = true,
+  size = null,
+  color = '#cb824d', // $color-medium
+  tooltip = null,
+  onClick = null,
+}: CustomIconProps) {
+  const component = useMemo(() => {
+    const _url = svgUrl ?? (logo ? `/logos/logo_${name}.svg` : icon ? `/icons/icon_${name}.svg` : null)
+    let result = null
+    if (_url) {
+      let _style = {
+        WebkitMaskImage: `url(${_url})`,
+        MaskImage: `url(${_url})`,
+        backgroundColor: null,
+      }
+      let classNames = ['CustomIcon']
+      if (className) classNames.push(className)
+      if (onClick) {
+        classNames.push('IconLink')
+      } else {
+        _style.backgroundColor = color
+      }
+      result = (
+        <div className={`CustomIconWrapper${centered ? 'Centered' : ''}`} onClick={() => (onClick?.() ?? {})}>
+          <div className={classNames.join(' ')} style={_style} />
+        </div>
+      )
+    } else {
+      result = <Icon name={name as SemanticICONS} className={className} size={size} />
+    }
+
+    // result = _linkfy(result, props.linkUrl)
+
+    // TODO: breaks something, need to debug!
+    // if(props.tooltip) {
+    // 	content = <Tooltip content={props.tooltip}>{content}</Tooltip>	
+    // }
+
+    return result
+  }, [svgUrl, icon, logo, name, className, centered, size, color, tooltip, onClick])
+  return component
+}
+
+// export function LogoIcon(props) {
+//   return <CustomIcon logo name={props.name} linkUrl={props.linkUrl} className={props.className} color={props.color} tooltip={props.tooltip} />
+// }
+// export function OpenSeaIcon(props) {
+//   return <CustomIcon logo name='opensea' linkUrl={props.linkUrl} className={props.className} color={props.color} tooltip={props.tooltip} />
+// }
+// export function EtherscanIcon(props) {
+//   return <CustomIcon logo name='etherscan' linkUrl={props.linkUrl} className={props.className} color={props.color} tooltip={props.tooltip} />
+// }
+// export function DoorIcon(props) {
+//   return <CustomIcon icon name='door' linkUrl={props.linkUrl} className={props.className} color={props.color} tooltip={props.tooltip} />
+// }
+

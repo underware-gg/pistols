@@ -15,11 +15,11 @@ $color-white: $color-brightest;
 $color-shadow: $color-dark;
 $color-text: $color-bright;
 $color-text-disabled: rgba($color-brightest, 0.3);
-$color-icon: $color-bright;
+$color-link: $color-medium;
 $color-important: $color-medium;
 $color-active: $color-medium;
 $color-inactive: #712727;
-$color-attention: #22b600;
+$color-attention: $color-medium;
 $text-shadow: 0.04em 0.04em 2px $color-dark;
 $title-shadow: 0.1em 0.1em 1px $color-darkest;
 $ui-border: 6px ridge $color-active;
@@ -80,13 +80,13 @@ body {
 }
 
 a {
-  color: $color-important;
+  color: $color-link;
   text-decoration: inherit;
   font-weight: 600;
 }
 
 a:hover {
-  color: $color-important;
+  color: $color-link;
   text-decoration: underline;
   text-decoration-thickness: 1px;
 }
@@ -134,6 +134,28 @@ button:focus-visible {
 
 canvas {
   display: block;
+}
+
+
+//-----------------------------------
+// scss mixins
+// https: //sass-lang.com/documentation/at-rules/mixin
+@mixin make-box-shadow($values_) {
+	-webkit-box-shadow: $values_;
+	-moz-box-shadow: $values_;
+	box-shadow: $values_;
+}
+@mixin make-animation($duration_, $ease_, $count_, $name_) {
+	animation-duration: $duration_;
+	animation-timing-function: $ease_;
+	animation-iteration-count: $count_;
+	animation-fill-mode: forwards;
+	animation-name: $name_;
+	-webkit-animation-duration: $duration_;
+	-webkit-animation-timing-function: $ease_;
+	-webkit-animation-iteration-count: $count_;
+	-webkit-animation-fill-mode: forwards;
+	-webkit-animation-name: $name_;
 }
 
 
@@ -292,10 +314,15 @@ canvas {
 }
 
 TextArea {
+  font-family: $font-family-mono;
   background-color: $color-dark;
   color: $color-text;
   width: 100%;
   height: 400px;
+}
+TextArea::selection {
+  background-color: $color-brightest;
+  color: $color-dark;
 }
 
 
@@ -400,7 +427,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 //
 
 .App {
-	// font-family: $ec-font-titles;
+	// font-family: $font-family;
 	min-width: 100vw;
 	min-height: 100vh;
 	display: flex;
@@ -474,7 +501,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
   background-color: $color-active;
 }
 .Attention {
-  background-color: $color-attention;
+  color: $color-attention!important;
 }
 
 // GAME CANVAS
@@ -554,26 +581,24 @@ $ui-container-gap: 1em;
 .ProfilePic {
   width: calc(439px / 2);
   height: calc(768px / 2);
-  border-radius: 10px;
+  border-radius: 8px;
   border: $border-button;
 }
 .ProfilePicDuel {
   @extend .ProfilePic;
   width: calc(439px / 3);
   height: calc(768px / 3);
-  border: $border-button;
 }
 .ProfilePicSquare {
   width: $profile-pic-width;
   height: $profile-pic-width;
-  pointer-events: none;
+  border-radius: 4px;
   margin: auto;
 }
 .ProfilePicSmall {
+  @extend .ProfilePicSquare;
   width: 40px;
   height: 40px;
-  border-radius: 4px;
-  pointer-events: none;
 }
 .ProfilePicHeight {
   height: $profile-pic-width;
@@ -660,11 +685,11 @@ $ui-container-gap: 1em;
 	width: initial !important; // remove width to be able to spin
 	margin: 0 !important;
 	text-shadow: 0.1em 0 $color-shadow;
-	color: $color-icon;
+	color: $color-text;
 }
 .InfoIcon {
 	@extend .Icon;
-	// color: $color-icon;
+	// color: $color-text;
 }
 .StepsIcon {
   font-family: $font-family-mono!important;
@@ -690,6 +715,40 @@ $ui-container-gap: 1em;
   // circle
   border-radius: 50%;
   background: rgba($color-bg, 0.8);
+}
+
+// <CustomIcon>
+$logo-url: '/logos/logo_avante.svg';
+.CustomIconWrapper, .CustomIconWrapperCentered {
+	width: 1.5em;
+	height: 1.5em;
+	border: 0;
+}
+.CustomIconWrapperCentered {
+	margin: auto !important;
+}
+.CustomIcon {
+	width: 100%;
+	height: 100%;
+  pointer-events: none;
+	cursor: default;
+	-webkit-mask-image: url($logo-url);
+  -webkit-mask-size: contain; /* OR cover OR fixed values */
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+	mask-image: url($logo-url);
+  mask-size: contain; /* OR cover OR fixed values */
+  mask-position: center;
+  mask-repeat: no-repeat;
+	@include make-box-shadow(0.1em 0 $color-dark);
+}
+.IconLink {
+  background-color: $color-link;
+  pointer-events: auto;
+  cursor: pointer;
+}
+.IconLink:hover, .IconLink:active {
+  background-color: $color-brightest;
 }
 
 

@@ -76,13 +76,14 @@ export function MenuTavern({
   return (
     <>
       <Grid>
-        <Row className='ProfilePicHeight' verticalAlign='middle'>
-          <Col width={7} className='Title'>
+        <Row className='ProfilePicHeight'>
+          <Col width={7} className='Title' verticalAlign='middle'>
             &nbsp;&nbsp;&nbsp;<b>Pistols at 10 Blocks</b>
             <br />
             &nbsp;&nbsp;&nbsp;The Tavern
           </Col>
-          <Col width={1} className='Title' textAlign='left'>
+          <Col width={1} textAlign='left' verticalAlign='top'>
+            <br />
             <MusicToggle />
           </Col>
           <Col width={8} textAlign='right'>
@@ -100,7 +101,7 @@ export function MusicToggle({
   const { settings, SettingsActions } = useSettingsContext()
   const { hasLoadedAudioAssets } = useGameplayContext()
   if (!hasLoadedAudioAssets) return <></>
-  return <SettingsIcon name={SettingsActions.MUSIC_ENABLED} value={settings.musicEnabled} iconOn='volume up' iconOff='volume off'/>
+  return <SettingsIcon settingsKey={SettingsActions.MUSIC_ENABLED} value={settings.musicEnabled} nameOn='volume-on' nameOff='volume-off' icon/>
 }
 
 
