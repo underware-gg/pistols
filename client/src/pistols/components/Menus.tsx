@@ -21,7 +21,7 @@ const _makeBubble = (awaitingCount, inProgressCount) => {
   const count = awaitingCount + inProgressCount
   if (count > 0) {
     return (
-      <Label color={inProgressCount > 0 ? 'green' : 'orange'} floating>
+      <Label floating>
         {count}
       </Label>
     )
@@ -77,14 +77,15 @@ export function MenuTavern({
     <>
       <Grid>
         <Row className='ProfilePicHeight' verticalAlign='middle'>
-          <Col width={5} className='Title'>
-            &nbsp;&nbsp;&nbsp;
-            The Tavern
+          <Col width={7} className='Title'>
+            &nbsp;&nbsp;&nbsp;<b>Pistols at 10 Blocks</b>
+            <br />
+            &nbsp;&nbsp;&nbsp;The Tavern
           </Col>
           <Col width={1} className='Title' textAlign='left'>
             <MusicToggle />
           </Col>
-          <Col width={10} textAlign='right'>
+          <Col width={8} textAlign='right'>
             <AccountHeader />
           </Col>
         </Row>

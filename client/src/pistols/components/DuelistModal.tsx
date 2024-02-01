@@ -85,7 +85,7 @@ function ChallengesList({
   duelistAddress
 }) {
   return (
-    <div style={{ width: '570px' }}>
+    <div style={{ width: '620px' }}>
       <ChallengeTableByDuelist address={duelistAddress} compact />
     </div>
   )
@@ -134,12 +134,12 @@ function CreateChallenge({
 
   return (
     <div style={{width: '400px'}}>
-      <h1>New Challenge Conditions</h1>
+      <h1>Challenge Conditions</h1>
       <br />
 
       <Form>
         <Form.Field>
-          <label>What do you have to say?</label>
+          <span className='FormLabel'>What do you have to say?</span>
           {/* <input placeholder={_defaultMessage} value={message} maxLength={31} onChange={(e) => setMessage(e.target.value)} /> */}
           <Dropdown
             options={messageOptions}
@@ -160,7 +160,7 @@ function CreateChallenge({
           />
         </Form.Field>
         <Form.Field>
-          <label>Expiry</label>
+          <span className='FormLabel'>Expiry</span>
           <Grid className='NoMargin' columns={'equal'}>
             <Row>
               <Col>
@@ -173,7 +173,7 @@ function CreateChallenge({
           </Grid>
         </Form.Field>
         <Form.Field>
-          <label>Stake $LORDS (disabled)</label>
+          <span className='FormLabel'>Stake $LORDS (disabled)</span>
           <input placeholder={'$LORDS'} value={lords} maxLength={6} onChange={(e) => {
             const _lords = parseInt(e.target.value as string)
             if (!isNaN(_lords)) {

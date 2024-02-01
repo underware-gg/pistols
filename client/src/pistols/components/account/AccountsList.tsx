@@ -134,7 +134,7 @@ function AccountItem({
         />
       </Col>
       <Col width={12} textAlign='left'>
-        Duelist Name
+        <span className='FormLabel'>Duelist Name</span>
         <div className='Spacer5'/>
         <Input fluid
           // icon='edit'

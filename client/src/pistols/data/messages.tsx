@@ -15,7 +15,7 @@ export const MESSAGES: any = {
 export const EMOJI: any = {
   AGREEMENT: '🤝',
   AWAITING: '⏱️',
-  IN_PROGRESS: '🔫',
+  IN_PROGRESS: '⚔️',
   STEP: '🥾',
   BLADES: '⚔️',
   // STEP: '👣',

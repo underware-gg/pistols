@@ -48,6 +48,18 @@ export const ChallengeStateDescriptions = {
   [ChallengeState.Draw]: "Honour has not been satisfied",
 }
 
+export const ChallengeStateClasses = {
+  [ChallengeState.Null]: '',
+  [ChallengeState.Awaiting]: '',
+  [ChallengeState.Withdrawn]: 'Canceled',
+  [ChallengeState.Refused]: 'Canceled',
+  [ChallengeState.Expired]: 'Canceled',
+  [ChallengeState.InProgress]: 'Positive',
+  [ChallengeState.Resolved]: '',
+  [ChallengeState.Draw]: 'Warning',
+}
+
+
 export const ChallengeMessages = [
   //34567890123456789012345678901| << max cairo string size (31 bytes)
   "I challenge ya for a duel!",

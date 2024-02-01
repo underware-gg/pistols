@@ -5,7 +5,7 @@ import { useAllChallengeIds, useChallenge, useChallengeIdsByDuelist, useLiveChal
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { MenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { ChallengeState, ChallengeStateNames } from '@/pistols/utils/pistols'
+import { ChallengeState, ChallengeStateClasses, ChallengeStateNames } from '@/pistols/utils/pistols'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { DuelIcons } from '@/pistols/components/DuelIcons'
 
@@ -58,7 +58,7 @@ function ChallengeTableByIds({
   const rows = useMemo(() => {
     let result = []
     challengeIds.forEach((duelId, index) => {
-      result.push(<DuelItem key={duelId} duelId={duelId} sortCallback={_sortCallback} compact={compact}/>)
+      result.push(<DuelItem key={duelId} duelId={duelId} sortCallback={_sortCallback} compact={compact} />)
     })
     return result
   }, [challengeIds])
@@ -113,7 +113,7 @@ function DuelItem({
   const { dispatchSetDuel } = usePistolsContext()
   const {
     duelistA, duelistB, state, isLive, isCanceled, isInProgress, isFinished, isDraw, winner, timestamp, timestamp_expire, timestamp_start, timestamp_end,
-  }= useChallenge(duelId)
+  } = useChallenge(duelId)
   const { name: nameA, profilePic: profilePicA } = useDuelist(duelistA)
   const { name: nameB, profilePic: profilePicB } = useDuelist(duelistB)
 
@@ -130,35 +130,66 @@ function DuelItem({
   }
 
   return (
-    <Table.Row warning={isDraw || isCanceled} negative={false} positive={isInProgress || isFinished} textAlign='left' verticalAlign='middle' onClick={() => _gotoChallenge()}>
-      <Cell positive={winnerIsA} negative={winnerIsB}>
+    // <Table.Row warning={isDraw || isCanceled} negative={false} positive={isInProgress || isFinished} textAlign='left' verticalAlign='middle' onClick={() => _gotoChallenge()}>
+    <Table.Row textAlign='left' verticalAlign='middle' onClick={() => _gotoChallenge()}>
+      <Cell>
         <ProfilePicSquare profilePic={profilePicA} small />
       </Cell>
 
-      <Cell positive={winnerIsA} negative={winnerIsB}>
-        {nameA}
-        {compact ? <br /> : ' '}
+      <Cell >
+        <h5>
+          <PositiveResult positive={winnerIsA} negative={winnerIsB && false} warning={isDraw}>
+            {nameA}
+          </PositiveResult>
+        </h5>
         <DuelIcons duelId={duelId} account={duelistA} size={compact ? null : 'large'} />
       </Cell>
 
-      <Cell positive={winnerIsB} negative={winnerIsA}>
+      <Cell>
         <ProfilePicSquare profilePic={profilePicB} small />
       </Cell>
 
-      <Cell positive={winnerIsB} negative={winnerIsA}>
-        {nameB}
-        {compact ? <br /> : ' '}
+      <Cell>
+        <h5>
+          <PositiveResult positive={winnerIsB} negative={winnerIsA && false} warning={isDraw}>
+            {nameB}
+          </PositiveResult>
+        </h5>
         <DuelIcons duelId={duelId} account={duelistB} size={compact ? null : 'large'} />
       </Cell>
 
-      <Cell textAlign='center'>
-        {ChallengeStateNames[state]}
+      <Cell textAlign='center' className='Result'>
+        <h5>
+          {/* <PositiveResult warning={isDraw || isCanceled} negative={false} positive={isInProgress || isFinished} > */}
+          <span className={ChallengeStateClasses[state]}>
+            {ChallengeStateNames[state]}
+          </span>
+        </h5>
       </Cell>
 
       <Cell textAlign='center'>
-        <ChallengeTime duelId={duelId} />
+        <h5>
+          <PositiveResult warning={isDraw}>
+            <ChallengeTime duelId={duelId} />
+          </PositiveResult>
+        </h5>
       </Cell>
     </Table.Row>
   )
 }
 
+function PositiveResult({
+  positive = false,
+  negative = false,
+  warning = false,
+  children,
+}) {
+  const _className =
+    positive ? 'Positive'
+      : negative ? 'Negative'
+        : warning ? 'Warning'
+          : ''
+  return (
+    <span className={_className}>{children}</span>
+  )
+}

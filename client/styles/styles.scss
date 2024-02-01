@@ -29,9 +29,10 @@ $border-button: 1px solid $color-bright;
 $border-button-active: 1px solid $color-brightest;
 $border-button-inactive: 1px solid rgba($color-bright, 0.5);
 
-$color-positive: #dffcd9;
-$color-negative: #ffe3e3;
-$color-warning: #faf7d9;
+$color-positive: #4dcb51; // from $color-medium
+$color-negative: #cb4d4d; // from $color-medium
+$color-warning: $color-medium;
+$color-blue: #4dcbc9; // from $color-medium
 
 $game-width: 960px;
 $game-height: 540px;
@@ -173,17 +174,26 @@ canvas {
   color: #444;
 }
 .Bold {
+  color: $color-brightest;
   font-weight: 600;
 }
 
 .Positive {
-  background-color: $color-positive!important;
+  background-color: inherit!important;
+  color: $color-positive!important;
+  // color: inherit!important;
 }
 .Negative {
-  background-color: $color-negative!important;
+  background-color: inherit!important;
+  color: $color-negative!important;
 }
 .Warning {
-  background-color: $color-warning!important;
+  background-color: inherit!important;
+  color: $color-warning!important;
+}
+.Canceled {
+  background-color: inherit!important;
+  color: $color-dark!important;
 }
 
 .Code {
@@ -420,7 +430,8 @@ $box-h: calc((100vh - $aspect-h) / 2);
   margin: 0;
 }
 .TableValue {
-  font-size: 14px;
+  // color: $color-brightest;
+  font-size: 16px;
   font-weight: 600;
 }
 
@@ -502,7 +513,7 @@ $ui-container-gap: 1em;
 .UIContainer {
   // background-color: #f008;
   background-color: #0004; // For browsers that do not support gradients
-  background-image: linear-gradient(to right, #000c, transparent);
+  background-image: linear-gradient(to right, #000, transparent);
   min-width: 500px;
   width: 500px;
   height: 100%;
@@ -563,6 +574,11 @@ $ui-container-gap: 1em;
   min-height: $profile-pic-width!important;
 }
 
+.ProfileStats {
+  top: 0.3em;
+  font-size: 1.3em;
+  line-height: 1.1em;
+}
 
 .MenuTop {
   width: 100%;
@@ -706,33 +722,37 @@ $ui-container-gap: 1em;
 // semantic-ui
 //
 ._round_border {
-  border: $border-button;
-  border-radius: 0.5em;
+  border: $border-button!important;
+  border-radius: 0.5em!important;
 }
 ._round_border_active {
-  border: $border-button-active;
-  border-radius: 0.5em;
+  border: $border-button-active!important;
+  border-radius: 0.5em!important;
 }
 ._round_border_inactive {
-  border: $border-button-inactive;
-  border-radius: 0.5em;
+  border: $border-button-inactive!important;
+  border-radius: 0.5em!important;
 }
 // 
 // <Input>
 input::placeholder {
   color: $color-text-disabled!important;
 }
-.ui.input>input {
+.ui.input>input,
+.ui.form input:not([type]),
+.ui.selection.dropdown {
   @extend ._round_border;
-  background-color: $color-dark;
-  color: rgba($color-text, 0.75);
-  font-style: italic;
+  background-color: $color-dark!important;
+  // color: rgba($color-text, 0.75)!important;
+  color: $color-text!important;
+  font-style: italic!important;
 }
 .ui.input>input:active,
-.ui.input>input:focus {
+.ui.input>input:focus,
+.ui.form input:not([type]):focus {
   @extend ._round_border_active;
   background-color: $color-dark;
-  color: $color-text;
+  color: $color-brightest!important;
 }
 .ui.label {
   @extend ._round_border;
@@ -740,6 +760,29 @@ input::placeholder {
   background-color: $color-bright;
   color: $color-dark;
   text-shadow: none;
+}
+.ui.dropdown .menu,
+.ui.selection.visible.dropdown>.text:not(.default),
+.ui.active.search.dropdown input.search:focus+.text,
+.ui.dropdown .menu .selected.item  {
+  background-color: $color-dark!important;
+  color: $color-brightest!important;
+  font-weight: 600;
+}
+.ui.selection.dropdown .menu>.item {
+  background-color: $color-dark!important;
+  color: $color-text!important;
+  border-top: $border-hr;
+}
+// forms
+.FormLabel {
+  color: $color-text;
+  font-size: 1.25em;
+  line-height: 1.2em;
+}
+.ui.form .field>label {
+  font-family: $font-family;
+  color: $color-bright;
 }
 //
 // <Grid>
@@ -815,12 +858,24 @@ input::placeholder {
 //
 // floating label
 .ui.menu .item>.floating.label {
-  background-color: $color-important!important;
-  text-shadow: $text-shadow;
+  // background-color: $color-important!important;
+  // color: $color-brightest!important;
+  background-color: transparent!important;
+  color: $color-brightest!important;
+  text-shadow: $text-shadow!important;
   font-family: $font-family-mono;
   font-weight: 600;
   padding: 0.3em 0.5em 0.1em 0.5em;
-  border: 0;
+  border: 0.5px solid $color-important!important;
+}
+.ui.floating.label {
+  // top: -1em; // semantic
+  // left: 100%; // semantic
+  // margin: 0 0 0 -1.5em!important; // semantic
+  top: 0.5em;
+  left: unset;
+  right: 1em;
+  margin: 0 0 0 -1.5em!important;
 }
 //
 // <Tab> <TabPane>
@@ -832,13 +887,14 @@ input::placeholder {
   background-color: transparent;
   color: $color-bright;
   text-shadow: $title-shadow;
-  border: 0;
+  border: 0!important;
+  border-radius: 0!important;
 }
 .ui.secondary.pointing.menu .active.item,
 .ui.secondary.pointing.menu .active.item:hover,
 .ui.secondary.pointing.menu a.item:hover,
 .ui.secondary.pointing.menu a.item:active {
-  border-bottom: 2px solid $color-brightest;
+  border-bottom: 2px solid $color-brightest!important;;
   color: $color-brightest;
 }
 // Tab contents
@@ -856,6 +912,9 @@ input::placeholder {
   color: $color-text;
   border: 0;
 }
+.ui.table.selectable {
+  cursor: pointer;
+}
 .ui.table thead th {
   @extend .TitleCase;
   background-color: rgba($color-darkest, 1);
@@ -872,19 +931,20 @@ td {
   border-style: none none solid none;
 }
 .ui.table td.positive, .ui.table tr.positive {
-  background: $color-positive !important;
-  // color: $color-text!important;
+  @extend .Positive;
 }
 .ui.table td.negative, .ui.table tr.negative {
-  background: $color-negative!important;
-  // color: $color-text!important;
+  @extend .Negative;
 }
 .ui.table td.warning, .ui.table tr.warning {
-  background: $color-warning !important;
-  // color: $color-text!important;
+  @extend .Warning;
 }
 .ui.selectable.table tbody tr:hover {
   color: $color-text!important;
+}
+// row hover
+.ui.selectable.table tbody tr:hover {
+  background: $color-dark!important;
 }
 //
 // Pagination

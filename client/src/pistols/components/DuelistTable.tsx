@@ -30,22 +30,6 @@ export function DuelistTable() {
   const { account } = useDojoAccount()
   const { duelistIds } = useAllDuelistIds()
 
-  // callback to store each Duelist data for sorting
-  const [duelistsData, setDuelistsData] = useState({})
-  const _dataCallback = (address:bigint, data:any) => {
-    // this pattern can handle simultaneous state set
-    setDuelistsData(o => ({ ...o, [address.toString()]: data }))
-  }
-
-  const rows = useMemo(() => {
-    let result = []
-    duelistIds.forEach((duelistId, index) => {
-      const isYou = (duelistId == BigInt(account.address))
-      result.push(<DuelistItem key={duelistId} address={duelistId} index={index} isYou={isYou} dataCallback={_dataCallback}/>)
-    })
-    return result
-  }, [duelistIds])
-
   // Sort
   const [sortColumn, setSortColumn] = useState(DuelistColumn.Honour)
   const [sortDirection, setSortDirection] = useState(SortDirection.Descending)
@@ -57,6 +41,22 @@ export function DuelistTable() {
       setSortDirection(column == DuelistColumn.Name ? SortDirection.Ascending : SortDirection.Descending)
     }
   }
+  
+  // callback to store each Duelist data for sorting
+  const [duelistsData, setDuelistsData] = useState({})
+  const _dataCallback = (address:bigint, data:any) => {
+    // this pattern can handle simultaneous state set
+    setDuelistsData(o => ({ ...o, [address.toString()]: data }))
+  }
+
+  const rows = useMemo(() => {
+    let result = []
+    duelistIds.forEach((duelistId, index) => {
+      const isYou = (duelistId == BigInt(account.address))
+      result.push(<DuelistItem key={duelistId} address={duelistId} index={index} isYou={isYou} sortColumn={sortColumn} dataCallback={_dataCallback}/>)
+    })
+    return result
+  }, [duelistIds, sortColumn])
 
   // Sort rows
   const sortedRows = useMemo(() => rows.sort((a, b) => {
@@ -118,6 +118,7 @@ function DuelistItem({
   address,
   index,
   isYou,
+  sortColumn,
   dataCallback,
 }) {
   const duelistData = useDuelist(address)
@@ -128,6 +129,8 @@ function DuelistItem({
     // console.log(duelistData)
     dataCallback(address, duelistData)
   }, [duelistData])
+
+  const _colClass = (col: DuelistColumn) => (sortColumn == col ? 'Important' : null)
 
   const isRookie = (total_duels == 0)
 
@@ -142,27 +145,27 @@ function DuelistItem({
         <AccountShort address={address} copyLink={false} />
       </Cell>
 
-      <Cell className='Important'>
+      <Cell className={_colClass(DuelistColumn.Honour)}>
         {isRookie ? '-' : <span className='TableValue'>{honourDisplay}</span>}
       </Cell>
 
-      <Cell>
+      <Cell className={_colClass(DuelistColumn.Wins)}>
         {isRookie ? '-' : <span className='TableValue'>{total_wins}</span>}
       </Cell>
 
-      <Cell>
+      <Cell className={_colClass(DuelistColumn.Losses)}>
         {isRookie ? '-' : <span className='TableValue'>{total_losses}</span>}
       </Cell>
 
-      <Cell>
+      <Cell className={_colClass(DuelistColumn.Draws)}>
         {isRookie ? '-' : <span className='TableValue'>{total_draws}</span>}
       </Cell>
 
-      <Cell>
+      <Cell className={_colClass(DuelistColumn.TotalHonour)}>
         {isRookie ? '-' : <span className='TableValue'>{total_honour}</span>}
       </Cell>
 
-      <Cell>
+      <Cell className={_colClass(DuelistColumn.Total)}>
         {isRookie ? '-' : <span className='TableValue'>{total_duels}</span>}
       </Cell>
     </Table.Row>
