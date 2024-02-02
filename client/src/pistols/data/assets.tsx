@@ -6,7 +6,7 @@ import * as THREE from 'three'
 //
 const TEXTURES = {
   TESTCARD: { path: '/textures/testcard.jpg' },
-  BG_DUEL: { path: '/textures/bg_duel.png' },
+  BG_DUEL: { path: '/images/bg_duel.jpg' },
 }
 
 enum CharacterType {

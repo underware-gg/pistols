@@ -29,17 +29,7 @@ export default function IndexPage() {
             <a href='https://x.com/LootUnderworld'>@LootUnderworld</a>
           </h5>
 
-          <div className='Spacer20' />
-          <div className='Spacer20' />
-          <div className='Spacer20' />
-          <div className='Spacer20' />
-          <div className='Spacer20' />
-          <div className='Spacer20' />
-          <div className='Spacer20' />
-          <div className='Spacer20' />
-          <div className='Spacer20' />
-          <div className='Spacer20' />
-          <div className='Spacer20' />
+          <div style={{ height: '5vh' }}>&nbsp;</div>
 
         </div>
       </Background>
