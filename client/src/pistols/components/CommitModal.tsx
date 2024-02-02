@@ -44,7 +44,7 @@ export default function CommitModal({
     >
       <Modal.Header className='AlignCenter'><h2>{_title}</h2></Modal.Header>
       <Modal.Content>
-        <Modal.Description className='AlignCenter'>
+        <Modal.Description className='AlignCenter ModalText'>
           {roundNumber == 1 &&
             <div>
               <p>

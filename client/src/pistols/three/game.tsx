@@ -153,7 +153,10 @@ function onWindowResize() {
 export function animate(time) {
   if (!_supportsExtension || !_scene || !_renderer) return
 
-  _animationRequest = requestAnimationFrame(animate)
+  // limit framerate
+  setTimeout(function () {
+    _animationRequest = requestAnimationFrame(animate)
+  }, 1000 / 24)
 
   TWEEN.update()
 

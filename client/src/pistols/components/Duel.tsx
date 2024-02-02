@@ -96,17 +96,13 @@ function DuelProfile({
   return (
     <>
       {floated == 'left' &&
-        <Segment compact className='NoMargin'>
-          <ProfilePic duel profilePic={profilePic} />
-        </Segment>
+        <ProfilePic duel profilePic={profilePic} />
       }
-      <Segment compact floated={floated} className='NoMargin'>
+      <Segment compact floated={floated} className='ProfileDescription'>
         <ProfileDescription address={address} />
       </Segment>
       {floated == 'right' &&
-        <Segment compact className='NoMargin'>
-          <ProfilePic duel profilePic={profilePic} />
-        </Segment>
+        <ProfilePic duel profilePic={profilePic} />
       }
     </>
   )

@@ -13,7 +13,6 @@ export function Snapshots() {
 
   const _update = (newData: any[]) => {
     setData(JSON.stringify(newData, null, '  '))
-    console.log(`newData.length=`, newData.length)
   }
 
   return (

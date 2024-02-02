@@ -14,11 +14,10 @@ $color-brightest: #efe1d7;
 $color-white: $color-brightest;
 $color-shadow: $color-dark;
 $color-text: $color-bright;
-$color-text-disabled: rgba($color-brightest, 0.3);
 $color-link: $color-medium;
 $color-important: $color-medium;
 $color-active: $color-medium;
-$color-inactive: #712727;
+$color-inactive: rgba($color-brightest, 0.35);
 $color-attention: $color-medium;
 $text-shadow: 0.04em 0.04em 2px $color-dark;
 $title-shadow: 0.1em 0.1em 1px $color-darkest;
@@ -30,7 +29,7 @@ $border-button-active: 1px solid $color-brightest;
 $border-button-inactive: 1px solid rgba($color-bright, 0.5);
 
 $color-positive: #4dcb51; // from $color-medium
-$color-negative: #cb4d4d; // from $color-medium
+$color-negative: #e73e3e; // from $color-medium
 $color-warning: $color-medium;
 $color-blue: #4dcbc9; // from $color-medium
 
@@ -201,21 +200,21 @@ canvas {
 }
 
 .Positive {
-  background-color: inherit!important;
+  // background-color: inherit!important;
   color: $color-positive!important;
   // color: inherit!important;
 }
 .Negative {
-  background-color: inherit!important;
+  // background-color: inherit!important;
   color: $color-negative!important;
 }
 .Warning {
-  background-color: inherit!important;
+  // background-color: inherit!important;
   color: $color-warning!important;
 }
 .Canceled {
-  background-color: inherit!important;
-  color: $color-dark!important;
+  // background-color: inherit!important;
+  color: $color-inactive!important;
 }
 
 .Code {
@@ -457,15 +456,14 @@ $box-h: calc((100vh - $aspect-h) / 2);
   overflow-y: scroll;
   // border: 0.5px solid #0001;
 }
-.TableModal {
-  @extend .TableMain;
-  max-height: 290px;
-  margin: 0;
-}
 .TableValue {
   // color: $color-brightest;
   font-size: 16px;
   font-weight: 600;
+}
+
+.ModalText {
+  font-size: 16px;
 }
 
 // .TableHeader {
@@ -586,8 +584,8 @@ $ui-container-gap: 1em;
 }
 .ProfilePicDuel {
   @extend .ProfilePic;
-  width: calc(439px / 3);
-  height: calc(768px / 3);
+  width: calc(439px / 2.5);
+  height: calc(768px / 2.5);
 }
 .ProfilePicSquare {
   width: $profile-pic-width;
@@ -642,6 +640,7 @@ $ui-container-gap: 1em;
   padding: 15px;
   text-align: left;
   align-items: left;
+  background-image: linear-gradient(to right, rgba($color-darkest, 0.8), transparent 30%);
 }
 .DuelSideB {
   @extend .DuelSideA;
@@ -649,6 +648,7 @@ $ui-container-gap: 1em;
   right: 0;
   text-align: right;
   align-items: right;
+  background-image: linear-gradient(to left, rgba($color-darkest, 0.8), transparent 30%);
 }
 
 .DuelProfileA {
@@ -662,6 +662,10 @@ $ui-container-gap: 1em;
   @extend .DuelProfileA;
   text-align: right;
   justify-content: right;
+}
+
+.ProfileDescription {
+  margin: 0 1.5em!important;
 }
 
 .DuelProgress {
@@ -693,20 +697,20 @@ $ui-container-gap: 1em;
 }
 .StepsIcon {
   font-family: $font-family-mono!important;
-  font-size: 12px!important;
+  font-size: 1.2em!important;
   font-weight: 600!important;
   color: $color-brightest;
   text-shadow: 0.1em 0.1em 2px #000;
   margin: -2px 0 0 -2px!important;
 }
 .StepsIcon.small {
-  font-size: 12px!important;
+  font-size: 1.2em!important;
 }
 .StepsIcon.large {
-  font-size: 16px!important;
+  font-size: 1.5em!important;
 }
 .StepsIcon.big {
-  font-size: 20px!important;
+  font-size: 1.5em!important;
 }
 
 .StepsIconRound {
@@ -801,7 +805,7 @@ $logo-url: '/logos/logo_avante.svg';
 // 
 // <Input>
 input::placeholder {
-  color: $color-text-disabled!important;
+  color: $color-inactive!important;
 }
 .ui.input>input,
 .ui.form input:not([type]),
@@ -886,7 +890,7 @@ input::placeholder {
 }
 ._button_disabled {
   @extend ._round_border_inactive;
-  color: $color-text-disabled;
+  color: $color-inactive;
   opacity: 1!important;  
 }
 .ui.button { @extend ._button; }
@@ -972,8 +976,9 @@ input::placeholder {
 }
 //
 // <Table>
+$table-bg-color: rgba($color-darkest, 0.6);
 .ui.table {
-  background-color: rgba($color-darkest, 0.6);
+  background-color: $table-bg-color;
   color: $color-text;
   border: 0;
 }
@@ -1041,16 +1046,56 @@ td {
 .ui.header {
   color: $color-text;
 }
+.ui.modal>.content {
+  // font-size: 16px;
+}
 //
 // <Step>
+.ui.steps {
+  @extend ._round_border;
+}
+.ui.steps .step,
+.ui.steps .disabled.step {
+  background-color: $table-bg-color;
+  color: $color-text;
+}
+.ui.steps .disabled.step .icon,
+.ui.steps .disabled.step .title {
+  color: $color-inactive;
+}
+.ui.vertical.steps .step {
+  border-bottom: $border-hr;
+}
+.ui.steps .step.active {
+  background-color: $color-important;
+  // background-color: $table-bg-color;
+  color: $color-text;
+}
+.ui.steps .active.step .icon,
 .ui.steps .step.active .title {
-  color: $color-important;
+  color: $color-brightest;
+}
+a.active.step:hover,
+.ui.steps .link.active.step:hover {
+  background-color: $color-dark;
+  // background-color: $table-bg-color;
+  // color: $color-brightest!important;
+  text-decoration: none;
 }
 .ui.vertical.steps .active.step:after,
 .ui.vertical.steps .active.step:last-child:after {
   display: none;
 }
+//
+// <Segment>
+.ui.segment {
+  @extend ._round_border;
+  background-color: $color-dark;
+}
 // .ui.steps .step.active {
 //   background-color: $color-positive;
 // }
 
+// .green {
+//   color: $color-positive;
+// }
