@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { useCookies } from 'react-cookie'
-import { bigintToHex, makeRandomHash, pedersen } from '@/pistols/utils/utils'
+import { bigintToHex, makeRandomHash } from '@/pistols/utils/utils'
+import { pedersen } from '@/pistols/utils/starknet'
 
 export const useCommitMove = (duelId: bigint, roundNumber: number) => {
   const key = bigintToHex(duelId)

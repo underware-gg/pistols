@@ -9,7 +9,8 @@ import { ChallengeTableByDuelist } from '@/pistols/components/ChallengeTable'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ChallengeMessages } from '@/pistols/utils/pistols'
 import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
-import { randomArrayElement, validateCairoString } from '@/pistols/utils/utils'
+import { randomArrayElement } from '@/pistols/utils/utils'
+import { validateCairoString } from '@/pistols/utils/starknet'
 import { usePact } from '@/pistols/hooks/usePact'
 
 const Row = Grid.Row

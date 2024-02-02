@@ -3,7 +3,7 @@ import { useComponentValue } from "@dojoengine/react"
 import { useDojoComponents } from '@/dojo/DojoContext'
 import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
 import { useChallenge } from "@/pistols/hooks/useChallenge"
-import { keysToEntity } from "@/pistols/utils/utils"
+import { keysToEntity } from '@/pistols/utils/utils'
 import { RoundState } from "@/pistols/utils/pistols"
 import { AnimationState } from "@/pistols/three/game"
 

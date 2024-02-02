@@ -1,6 +1,6 @@
 import { getEvents, setComponentsFromEvents, decodeComponent } from '@dojoengine/utils'
 import { SetupNetworkResult } from './setupNetwork'
-import { stringToFelt } from '@/pistols/utils/utils';
+import { stringToFelt } from '@/pistols/utils/starknet'
 import { Account } from 'starknet'
 
 export type SystemCalls = ReturnType<typeof createSystemCalls>;
