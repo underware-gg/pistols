@@ -119,7 +119,7 @@ function DuelProgress({
   completedStages,
   floated,
 }) {
-  const { round1, round2, roundNumber } = useDuel(duelId)
+  const { round1, round2, roundNumber, turnA, turnB, } = useDuel(duelId)
   const { name } = useDuelist(duelistAccount)
 
   //-------------------------
@@ -163,6 +163,7 @@ function DuelProgress({
   // Duelist interaction
   //
   const isYou = useMemo(() => (BigInt(account?.address) == duelistAccount), [account, duelistAccount])
+  const isTurn = useMemo(() => ((isA && turnA) || (isB && turnB)), [isA, isB, turnA, turnB])
 
   // Commit modal control
   const [commitStepsIsOpen, setCommitStepsIsOpen] = useState(false)
@@ -191,7 +192,7 @@ function DuelProgress({
       }
     }
     return null
-  }, [completedStages, duelStage, isYou])
+  }, [isYou, duelStage, completedStages])
 
 
   //------------------------------
@@ -292,14 +293,17 @@ function ProgressItem({
   onClick = null,
   className = null,
 }) {
+  const _currentStage = (duelStage == stage)
   const _completed =
-    ((stage < duelStage) || (stage == duelStage && completedStages[stage] === true))
-    && stage != DuelStage.PistolsShootout && stage != DuelStage.BladesClash
-  const _active = (duelStage == stage)
+    stage != DuelStage.PistolsShootout && stage != DuelStage.BladesClash // animations do not complete
+    && (
+      (stage < duelStage) // past stage
+      || (_currentStage && completedStages[stage] === true
+      ))
+  const _onClick = (_currentStage && !_completed ? onClick : null)
   const _disabled = (duelStage < stage)
   const _left = (floated == 'left')
   const _right = (floated == 'right')
-  const _link = (onClick && _active && !_completed)
   let classNames = className ? [className] : []
 
   let _icon = useMemo(() => {
@@ -311,15 +315,15 @@ function ProgressItem({
 
   // if (_right) classNames.push('AlignRight')
   classNames.push('AlignCenter')
-  if (!_link) classNames.push('NoMouse')
+  if (!_onClick) classNames.push('NoMouse')
   return (
     <Step
       className={classNames.join(' ')}
       completed={_completed}
-      active={_active}
+      active={_currentStage}
       disabled={_disabled}
-      link={_link}
-      onClick={_link ? onClick : null}
+      link={_onClick != null}
+      onClick={_onClick}
     >
       {_left && _icon}
       <Step.Content className='AutoMargin'>

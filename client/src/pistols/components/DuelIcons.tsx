@@ -14,7 +14,7 @@ export function DuelIcons({
 }) {
   const {
     challenge: { duelistA, duelistB, state, isFinished },
-    round1, round2, duelStage, completedStagesA, completedStagesB,
+    round1, round2, duelStage, completedStagesA, completedStagesB, turnA, turnB,
   } = useDuel(duelId)
 
   const isA = account == duelistA
@@ -22,6 +22,7 @@ export function DuelIcons({
   const movesRound1 = isA ? (round1?.duelist_a ?? null) : isB ? (round1?.duelist_b ?? null) : null
   const movesRound2 = isA ? (round2?.duelist_a ?? null) : isB ? (round2?.duelist_b ?? null) : null
   const completedStages = isA ? (completedStagesA) : isB ? (completedStagesB) : null
+  const isTurn = isA ? turnA : isB ? turnB : false
 
   const healthRound1 = movesRound1?.health == 0 ? EMOJI.DEAD : movesRound1?.health == HALF_HEALTH ? EMOJI.INJURED : null
   const healthRound2 = movesRound2?.health == 0 ? EMOJI.DEAD : (movesRound2?.health == HALF_HEALTH && !healthRound1) ? EMOJI.INJURED : null
@@ -36,9 +37,12 @@ export function DuelIcons({
         </CompletedIcon>
       }
       {isB &&
-        <CompletedIcon completed={false}>
-          <EmojiIcon emoji={EMOJI.AGREEMENT} size={_size} />
-        </CompletedIcon>
+        <>
+          <CompletedIcon completed={false}>
+            <EmojiIcon emoji={EMOJI.AGREEMENT} size={_size} />
+          </CompletedIcon>
+          <span className='Important'> <Icon name='spinner' loading size={_size} /></span>
+        </>
       }
     </>)
   }
@@ -67,6 +71,7 @@ export function DuelIcons({
         </CompletedIcon>
       }
       {healthRound2 && <EmojiIcon emoji={healthRound2} size={_size} />}
+      {isTurn && <span className='Important'> <Icon name='spinner' loading size={_size} /></span>}
     </>)
   }
 

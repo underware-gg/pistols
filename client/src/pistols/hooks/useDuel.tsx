@@ -60,6 +60,11 @@ export const useDuel = (duelId: bigint | string) => {
     }
   }, [round1, round2])
 
+  //
+  // Players turns, need action
+  const turnA = useMemo(() => (completedStagesA[duelStage] === false), [duelStage, completedStagesA])
+  const turnB = useMemo(() => (completedStagesB[duelStage] === false), [duelStage, completedStagesB])
+
   return {
     challenge,
     roundNumber: challenge.roundNumber,
@@ -68,6 +73,8 @@ export const useDuel = (duelId: bigint | string) => {
     duelStage,
     completedStagesA,
     completedStagesB,
+    turnA,
+    turnB,
   }
 }
 

@@ -229,6 +229,9 @@ canvas {
 .Smaller {
   font-size: 10px;
 }
+.Larger {
+  font-size: 1.5em!important;
+}
 
 .Faded {
   background-color: #0002;
@@ -910,6 +913,9 @@ input::placeholder {
 }
 //
 // <Menu> buttons
+.ui.menu {
+  background-color: transparent;
+}
 .ui.menu .item,
 .ui.secondary.menu .item {
   @extend ._button;
@@ -1028,12 +1034,21 @@ td {
   display: block;
 }
 //
-// Pagination
+// <Pagination>
+.ui.pagination.menu .item,
+.ui.pagination.menu .active.item {
+  font-size: 1.5em;
+  min-width: 2em;
+  padding: 0 0 0.2em 0.6em;
+}
 .ui.pagination.menu .active.item {
   background-color: $color-important;
   color: $color-white;
-  // font-weight: 800;
 }
+.ui.menu a.item:hover {
+  background-color: $color-bright;
+}
+
 //
 // <Modal>
 .ui.modal {

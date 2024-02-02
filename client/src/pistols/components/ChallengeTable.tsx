@@ -109,7 +109,6 @@ function DuelItem({
   sortCallback,
   compact = false,
 }) {
-  const { dispatchSelectDuel } = usePistolsContext()
   const {
     duelistA, duelistB, state, isLive, isCanceled, isExpired, isDraw, winner, timestamp,
   } = useChallenge(duelId)
@@ -123,6 +122,8 @@ function DuelItem({
   const winnerIsA = useMemo(() => (duelistA == winner), [duelistA, winner])
   const winnerIsB = useMemo(() => (duelistB == winner), [duelistB, winner])
 
+  const { dispatchSelectDuel } = usePistolsContext()
+
   const _gotoChallenge = () => {
     dispatchSelectDuel(duelId)
   }
@@ -134,7 +135,7 @@ function DuelItem({
         <ProfilePicSquare profilePic={profilePicA} small />
       </Cell>
 
-      <Cell >
+      <Cell>
         <h5>
           <PositiveResult positive={winnerIsA} negative={winnerIsB && false} warning={isDraw} canceled={isCanceled || isExpired}>
             {nameA}
