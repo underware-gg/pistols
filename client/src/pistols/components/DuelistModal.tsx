@@ -18,7 +18,7 @@ const Cell = Table.HeaderCell
 
 export default function DuelistModal() {
   const { create_challenge } = useDojoSystemCalls()
-  const { account } = useDojoAccount()
+  const { account, isMasterAccount } = useDojoAccount()
 
   const { atDuelists, duelistAddress, dispatchSelectDuelist, dispatchSelectDuel } = usePistolsContext()
   const { name, profilePic } = useDuelist(duelistAddress)
@@ -70,7 +70,7 @@ export default function DuelistModal() {
                 {
                   hasPact ? <ActionButton fill attention label='Existing Challenge!' onClick={() => dispatchSelectDuel(pactDuelId)} />
                     : isChallenging ? <ActionButton fill disabled={!challengeArgs} label='Submit Challenge!' onClick={() => _challenge()} />
-                      : <ActionButton fill label='Challenge for a Duel!' onClick={() => setIsChallenging(true)} />
+                      : <ActionButton fill disabled={isMasterAccount} label='Challenge for a Duel!' onClick={() => setIsChallenging(true)} />
                 }
               </Col>
             }

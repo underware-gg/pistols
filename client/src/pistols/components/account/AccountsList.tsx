@@ -2,6 +2,7 @@ import React, { useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid, Radio, Input, Divider } from 'semantic-ui-react'
 import { useDojo, useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
+import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
 import { AccountShort } from '@/pistols/components/ui/Account'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
@@ -16,8 +17,12 @@ export function AccountsList() {
   const router = useRouter()
   const [burners] = useLocalStorageState('burners')
   const {
-    account: { create, list, get, select, clear, account, isMasterAccount, isDeploying }
+    account: {
+      create, list, get, select, clear, applyFromClipboard,
+      account, isMasterAccount, masterAccount, isDeploying,
+    }
   } = useDojo()
+  const { dispatchSetMenu } = usePistolsContext()
 
   const rows = useMemo(() => {
     let result = []
@@ -39,6 +44,15 @@ export function AccountsList() {
     return result
   }, [account?.address, isDeploying, burners])
 
+  const _enter = (menuKey = MenuKey.YourDuels) => {
+    dispatchSetMenu(menuKey)
+    router.push('/tavern')
+  }
+  const _enterAsGuest = () => {
+    // select(masterAccount.address)
+    _enter(MenuKey.LiveDuels)
+  }
+
   const { isRegistered } = useDuelist(account.address)
   const canEnter = useMemo(() => (!isMasterAccount && !isDeploying && isRegistered), [isMasterAccount, isDeploying, isRegistered])
 
@@ -52,6 +66,9 @@ export function AccountsList() {
           <Col>
             <ActionButton fill disabled={isDeploying} onClick={() => clear()} label='Delete All Accounts' />
           </Col>
+          {/* <Col>
+            <ActionButton fill disabled={isDeploying} onClick={() => applyFromClipboard()} label='Restore' />
+          </Col> */}
         </Row>
 
         <Row columns={'equal'} className='Spacer10'>
@@ -66,7 +83,17 @@ export function AccountsList() {
 
         <Row columns={'equal'} textAlign='center'>
           <Col>
-            <ActionButton fill large disabled={!canEnter} onClick={() => router.push('/tavern')} label='Enter The Tavern' />
+            <ActionButton fill large disabled={!canEnter} onClick={() => _enter()} label='Enter The Tavern' />
+          </Col>
+        </Row>
+
+        <Row columns={'equal'} className='Spacer10'>
+          <Col></Col>
+        </Row>
+
+        <Row columns={'equal'} textAlign='center'>
+          <Col>
+            <ActionButton fill large disabled={!isMasterAccount} onClick={() => _enterAsGuest()} label='Enter As Guest' />
           </Col>
         </Row>
       </Grid>

@@ -27,7 +27,7 @@ export default function AccountHeader({
     <Grid>
       <Row className='ProfilePicHeight' textAlign='center' verticalAlign='middle'>
         <Col width={12} textAlign='right'>
-          <h3>{isMasterAccount ? 'MASTER ACCOUNT' : name}</h3>
+          <h3>{isMasterAccount ? 'Guest' : name}</h3>
           <AccountShort address={account?.address} />
         </Col>
         <Col width={4} verticalAlign='middle'>

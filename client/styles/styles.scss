@@ -598,6 +598,7 @@ $ui-container-gap: 1em;
 .ProfilePicSquare {
   width: $profile-pic-width;
   height: $profile-pic-width;
+  // border: $border-button-inactive;
   border-radius: 4px;
   margin: auto;
 }
@@ -605,6 +606,7 @@ $ui-container-gap: 1em;
   @extend .ProfilePicSquare;
   width: 40px;
   height: 40px;
+  border: none;
 }
 .ProfilePicHeight {
   height: $profile-pic-width;
