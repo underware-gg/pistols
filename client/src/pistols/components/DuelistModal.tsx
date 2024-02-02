@@ -54,7 +54,7 @@ export default function DuelistModal() {
         <Modal.Description className='FillParent'>
           <ProfileDescription address={duelistAddress} displayStats />
           <Divider />
-          {!isChallenging && <div className='TableModal'><ChallengesList duelistAddress={duelistAddress} /></div>}
+          {!isChallenging && <div className='TableInModal'><ChallengesList duelistAddress={duelistAddress} /></div>}
           {isChallenging && <CreateChallenge setChallengeArgs={setChallengeArgs} />}
         </Modal.Description>
       </Modal.Content>

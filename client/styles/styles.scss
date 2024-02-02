@@ -461,6 +461,11 @@ $box-h: calc((100vh - $aspect-h) / 2);
   font-size: 16px;
   font-weight: 600;
 }
+.TableInModal {
+  max-height: 400px;
+  scrollbar-width: thin;
+  overflow-y: scroll;
+}
 
 .ModalText {
   font-size: 16px;
