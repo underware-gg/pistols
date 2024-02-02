@@ -18,7 +18,7 @@ export function AccountsList() {
   const {
     account: { create, list, get, select, clear, account, isMasterAccount, isDeploying }
   } = useDojo()
-  
+
   const rows = useMemo(() => {
     let result = []
     const burners = list()
@@ -90,11 +90,12 @@ function AccountItem({
 
   const [selectedProfilePic, setSelectedProfilePic] = useState(0)
 
+  const _profilePicCount = parseInt(process.env.PROFILE_PIC_COUNT)
   const _profilePic = useMemo(() => {
     return (
       selectedProfilePic ? selectedProfilePic
         : profilePic ? profilePic
-          : (Number(BigInt(address) % BigInt(parseInt(process.env.PROFILE_PIC_COUNT))) + 1)
+          : (Number(BigInt(address) % BigInt(_profilePicCount)) + 1)
     )
   }, [selectedProfilePic, profilePic])
 
@@ -127,15 +128,24 @@ function AccountItem({
       </Col>
       <Col width={3} className='NoPadding'>
         <AccountShort address={address} copyLink={false} />
-        <ProfilePicSquareButton
-          profilePic={_profilePic}
-          onClick={() => setSelectedProfilePic(_profilePic < parseInt(process.env.PROFILE_PIC_COUNT) ? _profilePic + 1 : 1)}
-          disabled={!isSelected}
-        />
+        <div className='Relative'>
+          <ProfilePicSquareButton
+            profilePic={_profilePic}
+            // onClick={() => setSelectedProfilePic(_profilePic < _profilePicCount ? _profilePic + 1 : 1)}
+            onClick={() => {}}
+            disabled={!isSelected}
+          />
+          <div className='ProfilePicLeftButton'
+            onClick={() => setSelectedProfilePic(_profilePic > 1 ? _profilePic - 1 : _profilePicCount)}
+          >◀</div>
+          <div className='ProfilePicRightButton'
+            onClick={() => setSelectedProfilePic(_profilePic < _profilePicCount ? _profilePic + 1 : 1)}
+          >▶</div>
+        </div>
       </Col>
       <Col width={12} textAlign='left'>
         <span className='FormLabel'>Duelist Name</span>
-        <div className='Spacer5'/>
+        <div className='Spacer5' />
         <Input fluid
           // icon='edit'
           label='burner'

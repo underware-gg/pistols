@@ -611,6 +611,27 @@ $ui-container-gap: 1em;
   min-height: $profile-pic-width!important;
 }
 
+.ProfilePicSelectButton {
+  color: $color-bright;
+  text-shadow: $text-shadow;
+  font-size: 1.5em;
+  width: 50%;
+  height: 100%;
+  cursor: pointer;
+  user-select: none;
+  padding-top: calc(50%);
+  margin: auto;
+}
+.ProfilePicSelectButton:hover {
+  color: $color-brightest;
+}
+.ProfilePicLeftButton {
+  @extend .AbsoluteLeft, .ProfilePicSelectButton;
+}
+.ProfilePicRightButton {
+  @extend .AbsoluteRight, .ProfilePicSelectButton;
+}
+
 .ProfileStats {
   top: 0.3em;
   font-size: 1.3em;
