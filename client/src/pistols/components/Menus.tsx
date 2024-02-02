@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid, Menu, Label, Tab, TabPane } from 'semantic-ui-react'
 import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
-import { useChallengeIdsByState, useChallengesByDuelist } from '@/pistols/hooks/useChallenge'
+import { useChallengeIdsByState, useChallengesByDuelist, useLiveChallengeIds } from '@/pistols/hooks/useChallenge'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useDojoAccount } from '@/dojo/DojoContext'
@@ -17,8 +17,7 @@ import AccountHeader from '@/pistols/components/account/AccountHeader'
 const Row = Grid.Row
 const Col = Grid.Column
 
-const _makeBubble = (awaitingCount, inProgressCount) => {
-  const count = awaitingCount + inProgressCount
+const _makeBubble = (count) => {
   if (count > 0) {
     return (
       <Label floating>
@@ -35,11 +34,10 @@ export function MenuTavern({
   const { menuKey, tavernMenuItems, dispatchSetMenu } = usePistolsContext()
 
   const { awaitingCount, inProgressCount } = useChallengesByDuelist(BigInt(account.address))
-  const { challengeIds: awaitingChallengeIds } = useChallengeIdsByState(ChallengeState.Awaiting)
-  const { challengeIds: inProgressChallengeIds } = useChallengeIdsByState(ChallengeState.InProgress)
+  const { challengeIds: liveChallengeIds } = useLiveChallengeIds()
 
-  const yourDuelsBubble = useMemo(() => _makeBubble(awaitingCount, inProgressCount), [awaitingCount, inProgressCount])
-  const liveDuelsBubble = useMemo(() => _makeBubble(awaitingChallengeIds.length, inProgressChallengeIds.length), [awaitingChallengeIds, inProgressChallengeIds])
+  const yourDuelsBubble = useMemo(() => _makeBubble(awaitingCount + inProgressCount), [awaitingCount, inProgressCount])
+  const liveDuelsBubble = useMemo(() => _makeBubble(liveChallengeIds.length), [liveChallengeIds])
 
   const panes = useMemo(() => {
     let result = []

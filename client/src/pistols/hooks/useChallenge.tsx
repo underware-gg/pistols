@@ -1,11 +1,12 @@
 import { useMemo } from "react"
-import { Entity, HasValue, Has, getComponentValue, Component } from '@dojoengine/recs'
-import { useComponentValue, useEntityQuery } from "@dojoengine/react"
+import { HasValue, getComponentValue, Component } from '@dojoengine/recs'
+import { useComponentValue } from "@dojoengine/react"
 import { useDojoComponents } from '@/dojo/DojoContext'
-import { bigintToEntity, bigintToHex, feltToString } from "../utils/utils"
+import { bigintToEntity, feltToString } from "../utils/utils"
 import { ChallengeState, ChallengeStateDescriptions } from "@/pistols/utils/pistols"
 import { useEntityKeys, useEntityKeysQuery } from '@/pistols/hooks/useEntityKeys'
-import { useDuelist } from "./useDuelist"
+import { useClientTimestamp } from "@/pistols/hooks/useTimestamp"
+import { useDuelist } from "@/pistols/hooks/useDuelist"
 
 
 //-----------------------------
@@ -28,21 +29,28 @@ export const useChallengeIdsByState = (state: ChallengeState) => {
   }
 }
 
-const _filterComponentsByValue = (component: Component, entityIds: bigint[], keyName: string, values: any[], include: boolean): bigint[] => (
+const _filterComponentsByValue = (component: Component, entityIds: bigint[], keyName: string, values: any[], include: boolean, also: Function = null): bigint[] => (
   entityIds.reduce((acc: bigint[], id: bigint) => {
     const componentValue = getComponentValue(component, bigintToEntity(id))
-    if (values.includes(componentValue[keyName]) == include) {
+    if (values.includes(componentValue[keyName]) == include && (also == null || also(componentValue))) {
       acc.push(id)
     }
     return acc
   }, [] as bigint[])
 )
 
-export const useLiveChallengeIds = () => {
+export const useLiveChallengeIds = (includeExpired = false) => {
   const { Challenge } = useDojoComponents()
   const { challengeIds: allChallengeIds } = useAllChallengeIds()
+  const { clientTimestamp } = useClientTimestamp(false)
+  const _check_expired = (componentValue: any) => {
+    if (!includeExpired && (componentValue.state == ChallengeState.Awaiting && componentValue.timestamp_expire < clientTimestamp)) {
+      return false
+    }
+    return true
+  }
   const challengeIds = useMemo(() => (
-    _filterComponentsByValue(Challenge, allChallengeIds, 'state', [ChallengeState.Awaiting, ChallengeState.InProgress], true)
+    _filterComponentsByValue(Challenge, allChallengeIds, 'state', [ChallengeState.Awaiting, ChallengeState.InProgress], true, _check_expired)
   ), [allChallengeIds])
   return {
     challengeIds,
@@ -71,7 +79,7 @@ export const useChallenge = (duelId: bigint | string) => {
   const challenge: any = useComponentValue(Challenge, bigintToEntity(duelId))
   // console.log(bigintToHex(duelId), challenge)
 
-  const state = useMemo(() => (challenge?.state ?? null), [challenge])
+  let state = useMemo(() => (challenge?.state ?? null), [challenge])
   const duelistA = useMemo(() => BigInt(challenge?.duelist_a ?? 0), [challenge])
   const duelistB = useMemo(() => BigInt(challenge?.duelist_b ?? 0), [challenge])
   const winner = useMemo(() => BigInt(challenge?.winner ?? 0), [challenge])
@@ -83,6 +91,12 @@ export const useChallenge = (duelId: bigint | string) => {
   const timestamp_expire = useMemo(() => (challenge?.timestamp_expire ?? 0), [challenge])
   const timestamp_start = useMemo(() => (challenge?.timestamp_start ?? 0), [challenge])
   const timestamp_end = useMemo(() => (challenge?.timestamp_end ?? 0), [challenge])
+
+  // const isExpired = (state == ChallengeState.Expired || (state == ChallengeState.Awaiting && timestamp_expire < clientTimestamp))
+  const { clientTimestamp } = useClientTimestamp(false)
+  if (state == ChallengeState.Awaiting && (timestamp_expire < clientTimestamp)) {
+    state = ChallengeState.Expired
+  }
 
   return {
     challengeExists: (challenge != null),
@@ -104,6 +118,7 @@ export const useChallenge = (duelId: bigint | string) => {
     isResolved: (state == ChallengeState.Resolved),
     isDraw: (state == ChallengeState.Draw),
     isCanceled: (state == ChallengeState.Withdrawn || state == ChallengeState.Refused),
+    isExpired: (state == ChallengeState.Expired),
     // times
     timestamp,
     timestamp_expire,

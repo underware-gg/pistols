@@ -112,7 +112,7 @@ function DuelItem({
   const { account } = useDojoAccount()
   const { dispatchSetDuel } = usePistolsContext()
   const {
-    duelistA, duelistB, state, isLive, isCanceled, isInProgress, isFinished, isDraw, winner, timestamp, timestamp_expire, timestamp_start, timestamp_end,
+    duelistA, duelistB, state, isLive, isCanceled, isExpired, isDraw, winner, timestamp,
   } = useChallenge(duelId)
   const { name: nameA, profilePic: profilePicA } = useDuelist(duelistA)
   const { name: nameB, profilePic: profilePicB } = useDuelist(duelistB)
@@ -138,7 +138,7 @@ function DuelItem({
 
       <Cell >
         <h5>
-          <PositiveResult positive={winnerIsA} negative={winnerIsB && false} warning={isDraw}>
+          <PositiveResult positive={winnerIsA} negative={winnerIsB && false} warning={isDraw} canceled={isCanceled || isExpired}>
             {nameA}
           </PositiveResult>
         </h5>
@@ -151,7 +151,7 @@ function DuelItem({
 
       <Cell>
         <h5>
-          <PositiveResult positive={winnerIsB} negative={winnerIsA && false} warning={isDraw}>
+          <PositiveResult positive={winnerIsB} negative={winnerIsA && false} warning={isDraw} canceled={isCanceled || isExpired}>
             {nameB}
           </PositiveResult>
         </h5>
@@ -169,7 +169,7 @@ function DuelItem({
 
       <Cell textAlign='center'>
         <h5>
-          <PositiveResult warning={isDraw}>
+          <PositiveResult warning={isDraw} canceled={isCanceled || isExpired}>
             <ChallengeTime duelId={duelId} />
           </PositiveResult>
         </h5>
@@ -182,13 +182,15 @@ function PositiveResult({
   positive = false,
   negative = false,
   warning = false,
+  canceled = false,
   children,
 }) {
   const _className =
     positive ? 'Positive'
       : negative ? 'Negative'
         : warning ? 'Warning'
-          : ''
+          : canceled ? 'Canceled'
+            : ''
   return (
     <span className={_className}>{children}</span>
   )
