@@ -2,13 +2,12 @@ import React, { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid, Menu, Label, Tab, TabPane } from 'semantic-ui-react'
 import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
-import { useChallengeIdsByState, useChallengesByDuelist, useLiveChallengeIds } from '@/pistols/hooks/useChallenge'
+import { useChallengesByDuelist, useLiveChallengeIds } from '@/pistols/hooks/useChallenge'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
 import { SettingsIcon, SettingsMenuItem } from '@/pistols/components/ui/Buttons'
-import { ChallengeState } from '@/pistols/utils/pistols'
 import { DuelistTable } from '@/pistols/components/DuelistTable'
 import { DuelStage } from '@/pistols/hooks/useDuel'
 import { SPRITESHEETS } from '@/pistols/data/assets'
@@ -36,20 +35,19 @@ export function MenuTavern({
   const { awaitingCount, inProgressCount } = useChallengesByDuelist(BigInt(account.address))
   const { challengeIds: liveChallengeIds } = useLiveChallengeIds()
 
-  const yourDuelsBubble = useMemo(() => _makeBubble(awaitingCount + inProgressCount), [awaitingCount, inProgressCount])
-  const liveDuelsBubble = useMemo(() => _makeBubble(liveChallengeIds.length), [liveChallengeIds])
+  const yourDuelsCount = useMemo(() => (awaitingCount + inProgressCount), [awaitingCount, inProgressCount])
+  const liveDuelsCount = useMemo(() => (liveChallengeIds.length), [liveChallengeIds])
 
   const panes = useMemo(() => {
     let result = []
     Object.keys(tavernMenuItems).forEach(k => {
       const key = parseInt(k)
       const label = tavernMenuItems[key]
-      const bubble = (key == MenuKey.YourDuels) ? yourDuelsBubble : (key == MenuKey.LiveDuels) ? liveDuelsBubble : null
+      const bubble = (key == MenuKey.YourDuels) ? _makeBubble(yourDuelsCount) : (key == MenuKey.LiveDuels) ? _makeBubble(liveDuelsCount) : null
       result.push({
         menuItem: (
           <Menu.Item
             key={label}
-            active={menuKey === key}
             onClick={() => dispatchSetMenu(key)}
           >
             {label}
@@ -59,17 +57,17 @@ export function MenuTavern({
         render: () => (
           <TabPane attached={true}>
             <div className='UIContainerScroller'>
-              {key == MenuKey.Duelists && <DuelistTable />}
-              {key == MenuKey.YourDuels && <ChallengeTableYour />}
-              {key == MenuKey.LiveDuels && <ChallengeTableLive />}
-              {key == MenuKey.PastDuels && <ChallengeTablePast />}
+              {key === MenuKey.Duelists && <DuelistTable />}
+              {key === MenuKey.YourDuels && <ChallengeTableYour />}
+              {key === MenuKey.LiveDuels && <ChallengeTableLive />}
+              {key === MenuKey.PastDuels && <ChallengeTablePast />}
             </div>
           </TabPane>
         )
       })
     })
     return result
-  }, [menuKey, yourDuelsBubble, liveDuelsBubble])
+  }, [tavernMenuItems, yourDuelsCount, liveDuelsCount])
 
   return (
     <>
@@ -89,7 +87,7 @@ export function MenuTavern({
           </Col>
         </Row>
       </Grid>
-      <Tab menu={{ secondary: true, pointing: true, attached: true }} panes={panes} />
+      <Tab activeIndex={menuKey} menu={{ secondary: true, pointing: true, attached: true }} panes={panes} />
     </>
   )
 }

@@ -39,11 +39,7 @@ const PistolsActions = {
 //--------------------------------
 // Types
 //
-type PistolsContextStateType = {
-  duelistAddress: bigint
-  duelId: bigint
-  menuKey: MenuKey
-}
+type PistolsContextStateType = typeof initialState
 
 type ActionType =
   | { type: 'SET_DUELIST', payload: bigint }
