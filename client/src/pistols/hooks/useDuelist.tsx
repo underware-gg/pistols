@@ -41,6 +41,7 @@ export const useDuelist = (address: bigint | string) => {
   const total_honour = useMemo(() => (duelist?.total_honour ?? 0), [duelist])
   const honour = useMemo(() => (parseFloat((duelist?.honour ?? 0)) / 10.0), [duelist, total_duels])
   const honourDisplay = useMemo(() => (total_duels > 0 && honour > 0 ? honour.toFixed(1) : '—'), [honour, total_duels])
+  const winRatio = useMemo(() => (total_duels > 0 ? (total_wins / total_duels) : null), [total_wins, total_duels])
 
   return {
     address,
@@ -55,6 +56,7 @@ export const useDuelist = (address: bigint | string) => {
     total_honour,
     honour,
     honourDisplay,
+    winRatio,
   }
 }
 

@@ -985,6 +985,7 @@ $table-bg-color: rgba($color-darkest, 0.6);
 .ui.table {
   background-color: $table-bg-color;
   color: $color-text;
+  // font-size: 0.8em;
   border: 0;
 }
 .ui.table.selectable {
@@ -994,6 +995,7 @@ $table-bg-color: rgba($color-darkest, 0.6);
   @extend .TitleCase;
   background-color: rgba($color-darkest, 1);
   color: $color-brightest!important;
+  font-size: 0.9em!important;
 }
 .ui.sortable.table thead th.sorted,
 .ui.sortable.table thead th:hover {
@@ -1020,6 +1022,10 @@ td {
 // row hover
 .ui.selectable.table tbody tr:hover {
   background: $color-dark!important;
+}
+// sort arrow below text
+.ui.sortable.table thead th.sorted:after {
+  display: block;
 }
 //
 // Pagination

@@ -20,6 +20,7 @@ enum DuelistColumn {
   Losses = 'Losses',
   Draws = 'Draws',
   Total = 'Total',
+  WinRatio = 'WinRatio',
 }
 enum SortDirection {
   Ascending = 'ascending',
@@ -76,6 +77,7 @@ export function DuelistTable() {
     if (sortColumn == DuelistColumn.Losses) return _sortTotals(dataA.total_losses, dataB.total_losses)
     if (sortColumn == DuelistColumn.Draws) return _sortTotals(dataA.total_draws, dataB.total_draws)
     if (sortColumn == DuelistColumn.Total) return _sortTotals(dataA.total_duels, dataB.total_duels)
+    if (sortColumn == DuelistColumn.WinRatio) return _sortTotals(dataA.winRatio, dataB.winRatio)
     return 0
   }), [rows, duelistsData, sortColumn, sortDirection])
 
@@ -93,6 +95,7 @@ export function DuelistTable() {
           <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Draws ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Draws)}>Total<br />Draws</HeaderCell>
           <HeaderCell width={1} sorted={sortColumn == DuelistColumn.TotalHonour ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.TotalHonour)}>Total<br />Honour</HeaderCell>
           <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Total ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Total)}>Total<br />Duels</HeaderCell>
+          <HeaderCell width={1} sorted={sortColumn == DuelistColumn.WinRatio ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.WinRatio)}>Win<br />Ratio</HeaderCell>
         </Table.Row>
       </Table.Header>
 
@@ -122,7 +125,7 @@ function DuelistItem({
   dataCallback,
 }) {
   const duelistData = useDuelist(address)
-  const { name, profilePic, total_wins, total_losses, total_draws, total_duels, total_honour, honourDisplay } = duelistData
+  const { name, profilePic, total_wins, total_losses, total_draws, total_duels, total_honour, honourDisplay, winRatio } = duelistData
   const { dispatchSelectDuelist } = usePistolsContext()
 
   useEffect(() => {
@@ -167,6 +170,10 @@ function DuelistItem({
 
       <Cell className={_colClass(DuelistColumn.Total)}>
         {isRookie ? '-' : <span className='TableValue'>{total_duels}</span>}
+      </Cell>
+
+      <Cell className={_colClass(DuelistColumn.WinRatio)}>
+        {winRatio === null ? '-' : <span className='TableValue'>{Math.floor(winRatio * 100)}%</span>}
       </Cell>
     </Table.Row>
   )
