@@ -4,7 +4,7 @@ import { useDojoAccount } from '@/dojo/DojoContext'
 import { useAllChallengeIds, useChallenge, useChallengeIdsByDuelist, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
-import { MenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ChallengeState, ChallengeStateClasses, ChallengeStateNames } from '@/pistols/utils/pistols'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { DuelIcons } from '@/pistols/components/DuelIcons'
@@ -109,8 +109,7 @@ function DuelItem({
   sortCallback,
   compact = false,
 }) {
-  const { account } = useDojoAccount()
-  const { dispatchSetDuel } = usePistolsContext()
+  const { dispatchSelectDuel } = usePistolsContext()
   const {
     duelistA, duelistB, state, isLive, isCanceled, isExpired, isDraw, winner, timestamp,
   } = useChallenge(duelId)
@@ -121,12 +120,11 @@ function DuelItem({
     sortCallback(duelId, state, timestamp)
   }, [state, timestamp])
 
-  const isYours = useMemo(() => (BigInt(account.address) == duelistA || BigInt(account.address) == duelistB), [account, duelistA, duelistB])
   const winnerIsA = useMemo(() => (duelistA == winner), [duelistA, winner])
   const winnerIsB = useMemo(() => (duelistB == winner), [duelistB, winner])
 
   const _gotoChallenge = () => {
-    dispatchSetDuel(duelId, isYours ? MenuKey.YourDuels : isLive ? MenuKey.LiveDuels : MenuKey.PastDuels)
+    dispatchSelectDuel(duelId)
   }
 
   return (

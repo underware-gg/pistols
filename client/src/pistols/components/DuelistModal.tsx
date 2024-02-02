@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Table, Modal, Form, Divider, Dropdown } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
-import { MenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
@@ -20,20 +20,20 @@ export default function DuelistModal() {
   const { create_challenge } = useDojoSystemCalls()
   const { account } = useDojoAccount()
 
-  const { atDuelists, duelistAddress, dispatchSetDuelist, dispatchSetDuel } = usePistolsContext()
+  const { atDuelists, duelistAddress, dispatchSelectDuelist, dispatchSelectDuel } = usePistolsContext()
   const { name, profilePic } = useDuelist(duelistAddress)
   const { hasPact, pactDuelId } = usePact(account.address, duelistAddress)
   const [isChallenging, setIsChallenging] = useState(false)
   const [challengeArgs, setChallengeArgs] = useState(null)
 
   const isYou = useMemo(() => (duelistAddress == BigInt(account.address)), [duelistAddress, account])
-  const isOpen = useMemo(() => (atDuelists && duelistAddress > 0), [atDuelists, duelistAddress])
+  const isOpen = useMemo(() => (duelistAddress > 0), [duelistAddress])
 
   useEffect(() => {
     setIsChallenging(false)
   }, [isOpen])
 
-  const _close = () => { dispatchSetDuelist(0n) }
+  const _close = () => { dispatchSelectDuelist(0n) }
   const _challenge = () => {
     if (challengeArgs) {
       create_challenge(account, duelistAddress, '', challengeArgs.message, challengeArgs.expire_seconds)
@@ -68,7 +68,7 @@ export default function DuelistModal() {
             {!isYou &&
               <Col>
                 {
-                  hasPact ? <ActionButton fill attention label='Existing Challenge!' onClick={() => dispatchSetDuel(pactDuelId, MenuKey.YourDuels)} />
+                  hasPact ? <ActionButton fill attention label='Existing Challenge!' onClick={() => dispatchSelectDuel(pactDuelId)} />
                     : isChallenging ? <ActionButton fill disabled={!challengeArgs} label='Submit Challenge!' onClick={() => _challenge()} />
                       : <ActionButton fill label='Challenge for a Duel!' onClick={() => setIsChallenging(true)} />
                 }

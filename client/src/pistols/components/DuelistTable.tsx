@@ -123,7 +123,7 @@ function DuelistItem({
 }) {
   const duelistData = useDuelist(address)
   const { name, profilePic, total_wins, total_losses, total_draws, total_duels, total_honour, honourDisplay } = duelistData
-  const { dispatchSetDuelist } = usePistolsContext()
+  const { dispatchSelectDuelist } = usePistolsContext()
 
   useEffect(() => {
     // console.log(duelistData)
@@ -135,7 +135,7 @@ function DuelistItem({
   const isRookie = (total_duels == 0)
 
   return (
-    <Table.Row textAlign='center' verticalAlign='middle' onClick={() => dispatchSetDuelist(address)}>
+    <Table.Row textAlign='center' verticalAlign='middle' onClick={() => dispatchSelectDuelist(address)}>
       <Cell>
         <ProfilePicSquare profilePic={profilePic} small />
       </Cell>

@@ -30,8 +30,8 @@ export const initialState = {
 }
 
 const PistolsActions = {
-  SET_DUELIST: 'SET_DUELIST',
-  SET_DUEL: 'SET_DUEL',
+  SELECT_DUELIST: 'SELECT_DUELIST',
+  SELECT_DUEL: 'SELECT_DUEL',
   SET_MENU_KEY: 'SET_MENU_KEY',
 }
 
@@ -42,8 +42,8 @@ const PistolsActions = {
 type PistolsContextStateType = typeof initialState
 
 type ActionType =
-  | { type: 'SET_DUELIST', payload: bigint }
-  | { type: 'SET_DUEL', payload: bigint }
+  | { type: 'SELECT_DUELIST', payload: bigint }
+  | { type: 'SELECT_DUEL', payload: bigint }
   | { type: 'SET_MENU_KEY', payload: MenuKey }
 
 
@@ -71,26 +71,18 @@ const PistolsProvider = ({
   const [state, dispatch] = useReducer((state: PistolsContextStateType, action: ActionType) => {
     let newState = { ...state }
     switch (action.type) {
-      case PistolsActions.SET_DUELIST: {
-        newState.menuKey = MenuKey.Duelists
+      case PistolsActions.SELECT_DUELIST: {
         newState.duelistAddress = BigInt(action.payload)
         newState.duelId = 0n
         break
       }
-      case PistolsActions.SET_DUEL: {
-        // newState.menuKey = MenuKey.LiveDuels
+      case PistolsActions.SELECT_DUEL: {
         newState.duelId = BigInt(action.payload)
         newState.duelistAddress = 0n
         break
       }
       case PistolsActions.SET_MENU_KEY: {
         newState.menuKey = action.payload as MenuKey
-        if (newState.menuKey == MenuKey.Duelists) {
-          newState.duelId = 0n
-        }
-        else {
-          newState.duelistAddress = 0n
-        }        
         break
       }
       default:
@@ -116,9 +108,9 @@ export { PistolsProvider, PistolsContext, PistolsActions }
 
 export const usePistolsContext = () => {
   const { state, dispatch } = useContext(PistolsContext)
-  const dispatchSetDuelist = (address: bigint) => {
+  const dispatchSelectDuelist = (address: bigint) => {
     dispatch({
-      type: PistolsActions.SET_DUELIST,
+      type: PistolsActions.SELECT_DUELIST,
       payload: address,
     })
   }
@@ -128,13 +120,13 @@ export const usePistolsContext = () => {
       payload: menuKey,
     })
   }
-  const dispatchSetDuel = (duelId: bigint, menuKey: MenuKey | null = null) => {
+  const dispatchSelectDuel = (duelId: bigint, menuKey: MenuKey | null = null) => {
     dispatch({
-      type: PistolsActions.SET_DUEL,
+      type: PistolsActions.SELECT_DUEL,
       payload: duelId,
     })
-    if (state.menuKey == MenuKey.Duelists) {
-      dispatchSetMenu(menuKey ?? MenuKey.YourDuels)
+    if (menuKey != null) {
+      dispatchSetMenu(menuKey)
     }
   }
   return {
@@ -146,8 +138,8 @@ export const usePistolsContext = () => {
     atPastDuels: (state.menuKey == MenuKey.PastDuels),
     // PistolsActions,
     // dispatch,
-    dispatchSetDuelist,
-    dispatchSetDuel,
+    dispatchSelectDuelist,
+    dispatchSelectDuel,
     dispatchSetMenu,
   }
 }

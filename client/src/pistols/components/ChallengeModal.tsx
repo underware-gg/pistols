@@ -22,7 +22,7 @@ export default function ChallengeModal() {
   const { reply_challenge } = useDojoSystemCalls()
   const { account } = useDojoAccount()
 
-  const { atYourDuels, atLiveDuels, atPastDuels, duelId, dispatchSetDuel, dispatchSetDuelist } = usePistolsContext()
+  const { duelId, dispatchSelectDuel, dispatchSelectDuelist } = usePistolsContext()
 
   const { state, message, duelistA, duelistB, lords, isLive, isFinished, isAwaiting } = useChallenge(duelId)
 
@@ -31,24 +31,26 @@ export default function ChallengeModal() {
   const { profilePic: profilePicA } = useDuelist(duelistA)
   const { profilePic: profilePicB } = useDuelist(duelistB)
 
+  const isOpen = useMemo(() => (duelId > 0), [duelId])
+
   const isChallenger = useMemo(() => (duelistA == BigInt(account.address)), [duelistA, account])
   const isChallenged = useMemo(() => (duelistB == BigInt(account.address)), [duelistB, account])
 
-  const _close = () => { dispatchSetDuel(0n) }
+  const _close = () => { dispatchSelectDuel(0n) }
   const _reply = (accepted: boolean) => {
     reply_challenge(account, duelId, accepted)
   }
   const _watch = () => {
     router.push(makeDuelUrl(duelId))
   }
-  
+
   return (
     <Modal
       // size='large'
       // dimmer='inverted'
       onClose={() => _close()}
       onOpen={() => {}}
-      open={(atYourDuels || atLiveDuels || atPastDuels) && duelId > 0}
+      open={isOpen}
     >
       <Modal.Header>
         <Grid className='PaddedLeft PaddedRight'>
@@ -64,7 +66,7 @@ export default function ChallengeModal() {
         </Grid>
       </Modal.Header>
       <Modal.Content image>
-        <ProfilePicButton profilePic={profilePicA} onClick={() => dispatchSetDuelist(duelistA)} />
+        <ProfilePicButton profilePic={profilePicA} onClick={() => dispatchSelectDuelist(duelistA)} />
         <Modal.Description className='Padded' style={{ width: '550px' }}>
           <Grid style={{ width: '350px' }}>
             <Row columns='equal' textAlign='left'>
@@ -134,7 +136,7 @@ export default function ChallengeModal() {
             }
           </Grid>
         </Modal.Description>
-        <ProfilePicButton profilePic={profilePicB} onClick={() => dispatchSetDuelist(duelistB)} />
+        <ProfilePicButton profilePic={profilePicB} onClick={() => dispatchSelectDuelist(duelistB)} />
       </Modal.Content>
       <Modal.Actions>
         <Grid className='FillParent Padded' textAlign='center'>

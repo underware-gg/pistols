@@ -11,11 +11,11 @@ function GameContainer({
   isVisible,
   duelId,
 }) {
-  const { dispatchSetDuel } = usePistolsContext()
+  const { dispatchSelectDuel } = usePistolsContext()
 
   useEffect(() => {
     if (duelId) {
-      dispatchSetDuel(duelId, MenuKey.YourDuels)
+      dispatchSelectDuel(duelId)
     }
   }, [duelId])
 

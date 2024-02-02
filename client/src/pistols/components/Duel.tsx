@@ -25,7 +25,7 @@ export default function Duel({
 }) {
   const { account } = useDojoAccount()
   const { gameImpl, animated } = useGameplayContext()
-  const { dispatchSetDuel } = usePistolsContext()
+  const { dispatchSelectDuel } = usePistolsContext()
 
   const { isLive, isFinished, message, duelistA, duelistB } = useChallenge(duelId)
   const { challengeDescription } = useChallengeDescription(duelId)
@@ -38,7 +38,7 @@ export default function Duel({
     gameImpl?.resetScene()
   }, [])
 
-  useEffect(() => dispatchSetDuel(duelId, isLive ? MenuKey.LiveDuels : MenuKey.PastDuels), [duelId, isLive])
+  useEffect(() => dispatchSelectDuel(duelId, isLive ? MenuKey.LiveDuels : MenuKey.PastDuels), [duelId, isLive])
 
   return (
     <>
