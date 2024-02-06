@@ -4,6 +4,7 @@ import { DojoProvider } from '@/dojo/DojoContext'
 import { setup } from '@/dojo/setup'
 import { GameplayProvider } from '@/pistols/hooks/GameplayContext'
 import App from '@/pistols/components/App'
+import { DojoStatus } from './account/DojoStatus'
 
 
 export default function AppDojo({
@@ -38,7 +39,12 @@ function DojoSetup({ children }) {
   }, [])
 
   if (!setupResult) {
-    return <h1>setting up...</h1>
+    return (
+      <>
+        <h1 className='TitleCase'>loading up...</h1>
+        <h5><DojoStatus /></h5>
+      </>
+    )
   }
 
   return (
