@@ -862,7 +862,20 @@ input::placeholder {
   background-color: $color-dark!important;
   // color: rgba($color-text, 0.75)!important;
   color: $color-text!important;
-  font-style: italic!important;
+  // font-style: italic!important;
+  font-size: 1.25em;
+  line-height: 1em;
+  padding: 0.5em 1em;
+  min-height: 35px;
+}
+.ui.selection.dropdown {
+  color: $color-brightest!important;
+}
+.ui.form input[type=text],
+.ui.form input[type=text]:focus {
+  font-family: $font-family;
+  color: $color-brightest;
+  padding: 0.5em 1em;
 }
 .ui.input>input:active,
 .ui.input>input:focus,

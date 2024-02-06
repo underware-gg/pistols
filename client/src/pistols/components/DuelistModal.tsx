@@ -34,6 +34,12 @@ export default function DuelistModal() {
     setIsChallenging(false)
   }, [isOpen])
 
+  useEffect(() => {
+    if (hasPact) {
+      dispatchSelectDuel(pactDuelId)
+    }
+  }, [hasPact])
+
   const _close = () => { dispatchSelectDuelist(0n) }
   const _challenge = () => {
     if (challengeArgs) {
@@ -64,7 +70,7 @@ export default function DuelistModal() {
           <Row columns='equal'>
             <Col>
               {!isChallenging && <ActionButton fill label='Close' onClick={() => _close()} />}
-              {isChallenging && <ActionButton fill label='Cancel Challenge' onClick={() => setIsChallenging(false)} />}
+              {isChallenging && <ActionButton fill label='Back Out' onClick={() => setIsChallenging(false)} />}
             </Col>
             {!isYou &&
               <Col>
@@ -134,7 +140,7 @@ function CreateChallenge({
   })), [])
 
   return (
-    <div style={{width: '400px'}}>
+    <div style={{width: '430px'}}>
       <h1>Challenge Conditions</h1>
       <br />
 
