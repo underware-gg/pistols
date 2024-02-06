@@ -1,63 +1,41 @@
-import { BurnerProvider, useBurner } from "@dojoengine/create-burner";
+import { BurnerAccount, useBurnerManager } from "@dojoengine/create-burner";
 import { ReactNode, createContext, useContext, useMemo } from "react";
-import { Account, RpcProvider } from "starknet";
+import { Account } from "starknet";
 import { SetupResult } from "./setup";
 
 interface DojoContextType extends SetupResult {
   masterAccount: Account;
+  account: BurnerAccount;
 }
 
-const DojoContext = createContext<DojoContextType | null>(null);
+export const DojoContext = createContext<DojoContextType | null>(null);
 
-if (!process.env.NEXT_PUBLIC_MASTER_ADDRESS) throw (`NEXT_PUBLIC_MASTER_ADDRESS is not set`)
-if (!process.env.NEXT_PUBLIC_MASTER_PRIVATE_KEY) throw (`NEXT_PUBLIC_MASTER_PRIVATE_KEY is not set`)
-if (!process.env.NEXT_PUBLIC_ACCOUNT_CLASS_HASH) throw (`NEXT_PUBLIC_ACCOUNT_CLASS_HASH is not set`)
-// if (!process.env.NEXT_PUBLIC_NODE_URL) throw (`NEXT_PUBLIC_NODE_URL is not set`)
-
-type DojoProviderProps = {
+export const DojoProvider = ({
+  children,
+  value,
+}: {
   children: ReactNode;
   value: SetupResult;
-};
-
-export const DojoProvider = ({ children, value }: DojoProviderProps) => {
+}) => {
   const currentValue = useContext(DojoContext);
   if (currentValue) throw new Error("DojoProvider can only be used once");
 
-  const rpcProvider = useMemo(
-    () =>
-      new RpcProvider({
-        nodeUrl:
-          process.env.NEXT_PUBLIC_NODE_URL ||
-          "http://localhost:5050",
-      }),
-    []
-  );
+  const {
+    config: { masterAddress, masterPrivateKey },
+    burnerManager,
+    dojoProvider,
+  } = value;
 
-  const masterAddress = process.env.NEXT_PUBLIC_MASTER_ADDRESS;
-  const privateKey = process.env.NEXT_PUBLIC_MASTER_PRIVATE_KEY;
-  const accountClassHash = process.env.NEXT_PUBLIC_ACCOUNT_CLASS_HASH;
   const masterAccount = useMemo(
-    () => new Account(rpcProvider, masterAddress, privateKey),
-    [rpcProvider, masterAddress, privateKey]
+    () =>
+      new Account(
+        dojoProvider.provider,
+        masterAddress,
+        masterPrivateKey,
+        "1"
+      ),
+    [masterAddress, masterPrivateKey, dojoProvider.provider]
   );
-
-  return (
-    <BurnerProvider
-      initOptions={{ masterAccount, accountClassHash, rpcProvider }}
-    >
-      <DojoContext.Provider value={{ ...value, masterAccount }}>
-        {children}
-      </DojoContext.Provider>
-    </BurnerProvider>
-  );
-};
-
-export const useDojo = () => {
-  const contextValue = useContext(DojoContext);
-  if (!contextValue)
-    throw new Error(
-      "The `useDojo` hook must be used within a `DojoProvider`"
-    );
 
   const {
     create,
@@ -69,26 +47,45 @@ export const useDojo = () => {
     clear,
     copyToClipboard,
     applyFromClipboard,
-  } = useBurner();
+  } = useBurnerManager({
+    burnerManager,
+  });
+
+  return (
+    <DojoContext.Provider
+      value={{
+        ...value,
+        masterAccount,
+        account: {
+          create,
+          list,
+          get,
+          select,
+          clear,
+          account: account ?? masterAccount,
+          isDeploying,
+          copyToClipboard,
+          applyFromClipboard,
+        },
+      }}
+    >
+      {children}
+    </DojoContext.Provider>
+  );
+};
+
+
+
+export const useDojo = () => {
+  const context = useContext(DojoContext);
+  if (!context)
+    throw new Error("The `useDojo` hook must be used within a `DojoProvider`");
 
   return {
-    setup: contextValue,
-    account: {
-      create,
-      list,
-      get,
-      select,
-      clear,
-      account: account ?? contextValue.masterAccount,
-      masterAccount: contextValue.masterAccount,
-      isMasterAccount: (!account),
-      isDeploying,
-      copyToClipboard,
-      applyFromClipboard,
-    },
+    setup: context,
+    account: context.account,
   };
-}; 
-
+};
 
 
 //
@@ -96,10 +93,12 @@ export const useDojo = () => {
 //
 
 export const useDojoAccount = () => {
-  const { account } = useDojo()
+  const { setup, account } = useDojo()
   // account: { create, list, select, account, isDeploying }
   return {
     ...account,
+    masterAccount: setup.masterAccount,
+    isMasterAccount: (setup.masterAccount == account.account),
   }
 }
 
