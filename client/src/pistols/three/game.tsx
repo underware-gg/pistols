@@ -8,10 +8,11 @@ import Stats from 'three/addons/libs/stats.module.js'
 import ee from 'event-emitter'
 export var emitter = ee()
 
-import { AudioName, AUDIO_ASSETS, TEXTURES, SPRITESHEETS, AnimName } from '@/pistols/data/assets'
+import { AudioName, AUDIO_ASSETS, TEXTURES, SPRITESHEETS, AnimName, sceneBackgrounds, TextureName } from '@/pistols/data/assets'
+import { Blades, FULL_HEALTH } from '@/pistols/utils/pistols'
+import { SceneName } from '@/pistols/hooks/PistolsContext'
 import { map } from '@/pistols/utils/utils'
 import { SpriteSheet, Actor } from './SpriteSheetMaker'
-import { Blades, FULL_HEALTH } from '@/pistols/utils/pistols'
 
 const PI = Math.PI
 const HALF_PI = Math.PI * 0.5
@@ -55,11 +56,16 @@ let _spriteSheets: any = {}
 
 let _animationRequest = null
 let _renderer: THREE.WebGLRenderer
-let _camera: THREE.PerspectiveCamera
-let _cameraRig: THREE.Object3D
-let _scene: THREE.Scene
+let _staticCamera: THREE.OrthographicCamera
+let _duelCamera: THREE.PerspectiveCamera
+let _duelCameraRig: THREE.Object3D
+let _fullScreenGeom: THREE.PlaneGeometry = null
 let _supportsExtension: boolean = true
 let _stats
+
+let _currentScene: THREE.Scene = null
+let _scenes: Partial<Record<SceneName, THREE.Scene>> = {}
+let _sceneName: SceneName
 
 let _sfxEnabled = true
 
@@ -69,20 +75,22 @@ export function dispose() {
   _animationRequest = null
   _renderer?.dispose()
   _renderer = null
-  _scene = null
+  _currentScene = null
+  _scenes = {}
 }
 
 export async function init(canvas, width, height, statsEnabled = false) {
 
-  if (_scene) return
+  if (Object.keys(_scenes).length > 0) {
+    return
+  }
 
   console.log(`THREE.init()`)
 
   Object.keys(TEXTURES).forEach(key => {
     const TEX = TEXTURES[key]
     const tex = new THREE.TextureLoader().load(TEX.path)
-    // tex.magFilter = THREE.NearestFilter
-    // tex.minFilter = THREE.NearestFilter
+    // tex.colorSpace = THREE.LinearSRGBColorSpace
     _textures[key] = tex
   })
   Object.keys(SPRITESHEETS).forEach(actorName => {
@@ -92,6 +100,10 @@ export async function init(canvas, width, height, statsEnabled = false) {
     })
   })
 
+  // color space migration
+  // https://discourse.threejs.org/t/updates-to-color-management-in-three-js-r152/50791
+  // THREE.ColorManagement.enabled = false
+
   _renderer = new THREE.WebGLRenderer({
     antialias: true,
     alpha: false,
@@ -100,20 +112,30 @@ export async function init(canvas, width, height, statsEnabled = false) {
   _renderer.setSize(WIDTH, HEIGHT)
   _renderer.outputColorSpace = THREE.LinearSRGBColorSpace // fix bright textures
 
-  _cameraRig = new THREE.Object3D()
-  _cameraRig.position.set(0, 0, 0)
+  _staticCamera = new THREE.OrthographicCamera(
+    -WIDTH / 2,
+    WIDTH / 2,
+    HEIGHT / 2,
+    -HEIGHT / 2,
+    1, 10000)
+  _staticCamera.position.set(0, 0, HEIGHT)
 
-  _camera = new THREE.PerspectiveCamera(
+  _duelCameraRig = new THREE.Object3D()
+  _duelCameraRig.position.set(0, 0, 0)
+
+  _duelCamera = new THREE.PerspectiveCamera(
     FOV,        // fov
     ASPECT,     // aspect
     0.01,       // near
     WIDTH * 2,  // far
   )
-  _cameraRig.add(_camera)
+  _duelCameraRig.add(_duelCamera)
+
+  _fullScreenGeom = new THREE.PlaneGeometry(WIDTH, HEIGHT)
 
   window.addEventListener('resize', onWindowResize)
 
-  setupScene()
+  setupScenes()
 
   // framerate
   if (statsEnabled) {
@@ -139,10 +161,10 @@ function onWindowResize() {
   const scale = WIDTH / canvasWidth
   const camHeight = (canvasHeight * scale) / h_z_ratio
   // setup cam
-  _camera.up.set(0, 1, 0)
-  _camera.position.set(0, 0, camHeight)
-  _camera.lookAt(0, 0, 0)
-  _camera.updateProjectionMatrix()
+  _duelCamera.up.set(0, 1, 0)
+  _duelCamera.position.set(0, 0, camHeight)
+  _duelCamera.lookAt(0, 0, 0)
+  _duelCamera.updateProjectionMatrix()
 }
 
 
@@ -151,21 +173,25 @@ function onWindowResize() {
 //
 
 export function animate(time) {
-  if (!_supportsExtension || !_scene || !_renderer) return
+  if (!_supportsExtension || !_renderer) return
 
   // limit framerate
   setTimeout(function () {
     _animationRequest = requestAnimationFrame(animate)
   }, 1000 / 24)
 
-  TWEEN.update()
+  if (_currentScene) {
+    TWEEN.update()
 
-  _actor.A.update(time)
-  _actor.B.update(time)
-
-  _renderer.render(_scene, _camera)
-
-  _stats?.update()
+    if (_sceneName == SceneName.Duel) {
+      _actor.A.update(time)
+      _actor.B.update(time)
+      _renderer.render(_currentScene, _duelCamera)
+      _stats?.update()
+    } else {
+      _renderer.render(_currentScene, _staticCamera)
+    }
+  }
 }
 
 
@@ -173,29 +199,57 @@ export function animate(time) {
 // Scene hook
 //
 
-let _fullScreenGeom: THREE.PlaneGeometry = null
 let _actors: any = {}
 let _actor: any = {}
 
-function setupScene() {
-  _scene = new THREE.Scene()
-  _scene.add(_cameraRig)
+function setupScenes() {
+  _scenes = {}
+  Object.keys(sceneBackgrounds).forEach((sceneName) => {
+    if (sceneName == SceneName.Duel) {
+      _scenes[sceneName] = setupDuelScene()
+    } else {
+      _scenes[sceneName] = setupStaticScene(sceneName)
+    }
+  })
+  // switchScene(SceneName.Splash)
+}
+
+function setupStaticScene(sceneName) {
+  const scene = new THREE.Scene()
+
+  const textureName: TextureName = sceneBackgrounds[sceneName]
+  const bg_mat = new THREE.MeshBasicMaterial({
+    map: _textures[textureName],
+    color: 'white',
+  })
+
+  const bg = new THREE.Mesh(_fullScreenGeom, bg_mat)
+  bg.position.set(0, 0, 0)
+  scene.add(bg)
+
+  // const light = new THREE.AmbientLight(0x404040); // soft white light
+  // scene.add(light);
+
+  return scene
+}
+
+function setupDuelScene() {
+  const scene = new THREE.Scene()
+  scene.add(_duelCameraRig)
 
   // const light = new THREE.AmbientLight(0x404040) // soft white light
-  // _scene.add(light)
+  // scene.add(light)
 
-  _fullScreenGeom = new THREE.PlaneGeometry(WIDTH, HEIGHT)
-
-  // const testcard_mat = new THREE.MeshBasicMaterial({ color: 0xffffff, map: _textures.TESTCARD })
+  // const testcard_mat = new THREE.MeshBasicMaterial({ color: 0xffffff, map: _textures.Testcard })
   // const testcard = new THREE.Mesh(_fullScreenGeom, testcard_mat)
   // testcard.position.set(0, 0, -1)
-  // _scene.add(testcard)
+  // scene.add(testcard)
 
   // BG
-  const bg_duel_mat = new THREE.MeshBasicMaterial({ map: _textures.BG_DUEL })
+  const bg_duel_mat = new THREE.MeshBasicMaterial({ map: _textures.bg_duel })
   const bg_duel = new THREE.Mesh(_fullScreenGeom, bg_duel_mat)
   bg_duel.position.set(0, 0, 0)
-  _scene.add(bg_duel)
+  scene.add(bg_duel)
 
 
   _actors.FEMALE_A = new Actor(_spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_WIDTH, true)
@@ -206,16 +260,16 @@ function setupScene() {
 
   onWindowResize()
 
+  return scene
+}
+
+export function resetDuelScene() {
+  emitter.emit('animated', AnimationState.None)
+
   switchActor('A', 'FEMALE_A')
   switchActor('B', 'FEMALE_B')
 
-  resetScene()
-
-}
-
-export function resetScene() {
-  emitter.emit('animated', AnimationState.None)
-
+  zoomCameraToPaces(10, 0)
   zoomCameraToPaces(0, 5)
 
   animateActorPaces('A', 0, 0)
@@ -224,18 +278,33 @@ export function resetScene() {
   playActorAnimation('B', AnimName.STILL)
 }
 
+
+
+
+//-------------------------------------------
+// Game Interface
+//
+
+export function switchScene(sceneName) {
+  _sceneName = sceneName
+  _currentScene = _scenes[sceneName]
+  if (sceneName == SceneName.Duel) {
+    resetDuelScene()
+  }
+}
+
 export function getCameraRig() {
-  return _cameraRig
+  return _duelCameraRig
 }
 
 export function switchActor(actorId, newActorName) {
   let position = null
   if (_actor[actorId]) {
     position = _actor[actorId].position
-    _scene.remove(_actor[actorId].mesh)
+    _currentScene.remove(_actor[actorId].mesh)
   }
   _actor[actorId] = _actors[newActorName]
-  _scene.add(_actor[actorId].mesh)
+  _currentScene.add(_actor[actorId].mesh)
   if (position) _actor[actorId].position = position
 }
 
@@ -284,19 +353,19 @@ export function zoomCameraToPaces(paceCount, seconds) {
   if (seconds == 0) {
     // just set
     // console.log(`CAMS SET`, targetPos)
-    _cameraRig.position.set(targetPos.x, targetPos.y, targetPos.z)
+    _duelCameraRig.position.set(targetPos.x, targetPos.y, targetPos.z)
   } else {
     // console.log(`CAM ANIM`, targetPos)
     // animate
-    _tweens.cameraPos = new TWEEN.Tween(_cameraRig.position)
+    _tweens.cameraPos = new TWEEN.Tween(_duelCameraRig.position)
       .to(targetPos, seconds * 1000)
       .easing(TWEEN.Easing.Cubic.Out)
       .onUpdate(() => {
-        // emitter.emit('movedTo', { x: _cameraRig.position.x, y: _cameraRig.position.y, z: _cameraRig.position.z })
+        // emitter.emit('movedTo', { x: _duelCameraRig.position.x, y: _duelCameraRig.position.y, z: _duelCameraRig.position.z })
       })
       .start()
       .onComplete(() => {
-        // console.log(`CAM ===`, _camera.position, _cameraRig.position)
+        // console.log(`CAM ===`, _duelCamera.position, _duelCameraRig.position)
       })
   }
 }
@@ -338,7 +407,7 @@ export function animateShootout(paceCountA, paceCountB, healthA, healthB) {
   // animate sprites
   playActorAnimation('A', AnimName.STEP_1)
   playActorAnimation('B', AnimName.STEP_1)
-  for(let i = 1 ; i < paceCount ; ++i) {
+  for (let i = 1; i < paceCount; ++i) {
     const key: AnimName = i % 2 == 1 ? AnimName.STEP_2 : AnimName.STEP_1
     setTimeout(() => {
       playActorAnimation('A', key)

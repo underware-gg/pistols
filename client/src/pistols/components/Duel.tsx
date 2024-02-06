@@ -35,7 +35,7 @@ export default function Duel({
   // console.log(`Round 2:`, round2)
 
   useEffectOnce(() => {
-    gameImpl?.resetScene()
+    gameImpl?.resetDuelScene()
   }, [])
 
   useEffect(() => dispatchSelectDuel(duelId), [duelId])
@@ -120,7 +120,6 @@ function DuelProgress({
   floated,
 }) {
   const { round1, round2, roundNumber, turnA, turnB, } = useDuel(duelId)
-  const { name } = useDuelist(duelistAccount)
 
   //-------------------------
   // Duel progression

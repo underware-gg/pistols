@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react'
 import { useRouter } from 'next/router'
-import { usePistolsContext, MenuKey, Scene } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, MenuKey, SceneName } from '@/pistols/hooks/PistolsContext'
 import AppDojo from '@/pistols/components/AppDojo'
 import Gate from '@/pistols/components/Gate'
 import Tavern from '@/pistols/components/Tavern'
@@ -22,7 +22,7 @@ import Duel from '@/pistols/components/Duel'
 
 export default function MainPage() {
   const router = useRouter()
-  const { menuKey, scene: currentScene, atGate, atTavern, atDuel, dispatchSetScene } = usePistolsContext()
+  const { menuKey, atGate, atTavern, atDuel, dispatchSetScene } = usePistolsContext()
 
   const { scene, title, duelId, bgClassName } = useMemo(() => {
     let scene = undefined
@@ -35,21 +35,21 @@ export default function MainPage() {
       const _page = router.query.main[0]
       const _slugs = router.query.main.slice(1)
       if (_page == 'gate') {
-        scene = Scene.Gate
+        scene = SceneName.Gate
         title = 'Pistols - The Gate'
         // bgClassName = 'BackgroundGate'
       } else if (_page == 'tavern') {
-        scene = Scene.Tavern
+        scene = SceneName.Tavern
         title = 'Pistols - The Tavern'
         // bgClassName = menuKey ? bgsTavern[menuKey] : 'BackgroundDuelists'
       } else if (_page == 'duel') {
         // '/room/[duel_id]'
         if (_slugs.length > 0) {
-          scene = Scene.Duel
+          scene = SceneName.Duel
           duelId = BigInt(_slugs[0])
           title = 'Pistols - Duel!'
         } else {
-          scene = Scene.Tavern
+          scene = SceneName.Tavern
           router.push('/tavern')
         }
         // bgClassName = 'BackgroundDuel'
@@ -79,7 +79,9 @@ export default function MainPage() {
     <AppDojo title={title} backgroundImage={null}>
       <Background className={bgClassName}>
         <GameContainer
-          isVisible={atDuel && duelId}
+          isVisible={true}
+          isPlaying={atDuel && duelId}
+          duelId={duelId}
         />
         {atGate && <Gate />}
         {atTavern && <Tavern />}

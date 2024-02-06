@@ -17,14 +17,15 @@ export const ThreeJsCanvas = ({
     let _mounted = true
     const _initialize = async () => {
       await gameImpl.init(canvasRef.current, width, height, guiEnabled)
-      if (!_mounted) return
-      gameImpl.animate()
-      // game.resetGameParams(gameParams)
-      setIsLoading(false)
-      setIsRunning(true)
-      dispatchGameImpl(gameImpl)
-      //@ts-ignore
-      canvasRef.current?.focus()
+      if (_mounted) {
+        gameImpl.animate()
+        // game.resetGameParams(gameParams)
+        setIsLoading(false)
+        setIsRunning(true)
+        dispatchGameImpl(gameImpl)
+        //@ts-ignore
+        canvasRef.current?.focus()
+      }
     }
 
     if (canvasRef.current && !isLoading && !isRunning) {
@@ -50,7 +51,7 @@ export const ThreeJsCanvas = ({
       width={width * 2}
       height={height * 2}
     >
-      Canvas not supported by your browser.
+      Canvas not supported by your browser! 😱
     </canvas>
   )
 }

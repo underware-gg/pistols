@@ -9,7 +9,7 @@ import React, { ReactNode, createContext, useReducer, useContext } from 'react'
 // Constants
 //
 
-export enum Scene {
+export enum SceneName {
   Splash = 'Splash',
   Gate = 'Gate',
   Duelists = 'Duelists',
@@ -21,10 +21,10 @@ export enum Scene {
 }
 
 export enum MenuKey {
-  Duelists = Scene.Duelists,
-  YourDuels = Scene.YourDuels,
-  LiveDuels = Scene.LiveDuels,
-  PastDuels = Scene.PastDuels,
+  Duelists = SceneName.Duelists,
+  YourDuels = SceneName.YourDuels,
+  LiveDuels = SceneName.LiveDuels,
+  PastDuels = SceneName.PastDuels,
 }
 
 const tavernMenuItems: MenuKey[] = [
@@ -38,7 +38,7 @@ export const initialState = {
   duelistAddress: 0n,
   duelId: 0n,
   menuKey: MenuKey.YourDuels,
-  scene: Scene.Splash,
+  sceneName: SceneName.Splash,
 }
 
 const PistolsActions = {
@@ -55,7 +55,7 @@ const PistolsActions = {
 type PistolsContextStateType = typeof initialState
 
 type ActionType =
-  | { type: 'SET_SCENE', payload: Scene }
+  | { type: 'SET_SCENE', payload: SceneName }
   | { type: 'SET_MENU_KEY', payload: MenuKey }
   | { type: 'SELECT_DUELIST', payload: bigint }
   | { type: 'SELECT_DUEL', payload: bigint }
@@ -86,12 +86,12 @@ const PistolsProvider = ({
     let newState = { ...state }
     switch (action.type) {
       case PistolsActions.SET_SCENE: {
-        newState.scene = action.payload as Scene
+        newState.sceneName = action.payload as SceneName
         break
       }
       case PistolsActions.SET_MENU_KEY: {
         newState.menuKey = action.payload as MenuKey
-        newState.scene = action.payload as Scene
+        newState.sceneName = action.payload as SceneName
         break
       }
       case PistolsActions.SELECT_DUELIST: {
@@ -127,10 +127,10 @@ export { PistolsProvider, PistolsContext, PistolsActions }
 
 export const usePistolsContext = () => {
   const { state, dispatch } = useContext(PistolsContext)
-  const dispatchSetScene = (scene: Scene | null) => {
+  const dispatchSetScene = (scene: SceneName | null) => {
     dispatch({
       type: PistolsActions.SET_SCENE,
-      payload: scene != Scene.Tavern ? scene : state.menuKey,
+      payload: scene != SceneName.Tavern ? scene : state.menuKey,
     })
   }
   const dispatchSetMenu = (menuKey: MenuKey) => {
@@ -154,14 +154,14 @@ export const usePistolsContext = () => {
   return {
     ...state,
     tavernMenuItems,
-    atSplash: (state.scene == Scene.Splash),
-    atGate: (state.scene == Scene.Gate),
-    atTavern: (state.scene as string == state.menuKey as string),
-    atDuelists: (state.scene == Scene.Duelists),
-    atYourDuels: (state.scene == Scene.YourDuels),
-    atLiveDuels: (state.scene == Scene.LiveDuels),
-    atPastDuels: (state.scene == Scene.PastDuels),
-    atDuel: (state.scene == Scene.Duel),
+    atSplash: (state.sceneName == SceneName.Splash),
+    atGate: (state.sceneName == SceneName.Gate),
+    atTavern: (state.sceneName as string == state.menuKey as string),
+    atDuelists: (state.sceneName == SceneName.Duelists),
+    atYourDuels: (state.sceneName == SceneName.YourDuels),
+    atLiveDuels: (state.sceneName == SceneName.LiveDuels),
+    atPastDuels: (state.sceneName == SceneName.PastDuels),
+    atDuel: (state.sceneName == SceneName.Duel),
     // PistolsActions,
     // dispatch,
     dispatchSetScene,

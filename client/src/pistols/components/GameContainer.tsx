@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react'
-import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
+import React, { useEffect } from 'react'
+import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { GameState, useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { loadAudioAssets, isAudioAssetsLoaded, AudioName } from '@/pistols/data/assets'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import GameView from '@/pistols/components/GameView'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
-import { useEffectOnce } from '../hooks/useEffectOnce'
 
 function GameContainer({
   isVisible,
+  isPlaying,
   duelId,
 }) {
   const { dispatchSelectDuel } = usePistolsContext()
@@ -22,7 +22,7 @@ function GameContainer({
   return (
     <div className={`GameContainer ${isVisible ? '' : 'Hidden'}`}>
       <GameView />
-      <GameStartOverlay isVisible={isVisible} />
+      <GameStartOverlay isVisible={isPlaying} />
     </div>
   )
 }
@@ -44,7 +44,7 @@ function GameStartOverlay({
 
   // gameImpl loaded by GameCanvas
   useEffect(() => {
-    if(gameImpl) {
+    if (gameImpl) {
       dispatchGameState(GameState.Ready)
     }
   }, [gameImpl])
@@ -72,7 +72,7 @@ function GameStartOverlay({
   }, [isReady, hasInteracted])
 
   if (hasLoadedAudioAssets === true) {
-    return <GameAudios isVisible={isVisible}/>
+    return <GameAudios isVisible={isVisible} />
   }
 
   return (

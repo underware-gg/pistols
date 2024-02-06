@@ -89,7 +89,7 @@ export function AccountsList() {
 
         <Row columns={'equal'} textAlign='center'>
           <Col>
-            <ActionButton fill large disabled={!canEnter} onClick={() => _enter()} label={!isRegistered ?'Check In to Enter':'Enter The Tavern'} />
+            <ActionButton fill large attention={isRegistered} disabled={!canEnter} onClick={() => _enter()} label={!isRegistered ?'Check In to Enter':'Enter The Tavern'} />
           </Col>
         </Row>
 
