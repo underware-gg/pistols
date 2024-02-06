@@ -27,7 +27,7 @@ export function DojoStatus({
   return (
     <>
       {/* {isConnected && <span className='Important TitleCase'>connected</span>} */}
-      {isError && <span className='Negative TitleCase'>down, refresh later</span>}
+      {isError && <span className='Negative TitleCase'>under maintenance</span>}
     </>
   )
 }
