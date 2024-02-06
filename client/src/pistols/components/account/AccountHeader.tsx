@@ -26,11 +26,11 @@ export default function AccountHeader({
   return (
     <Grid>
       <Row className='ProfilePicHeight' textAlign='center' verticalAlign='middle'>
-        <Col width={12} textAlign='right'>
+        <Col width={11} textAlign='right'>
           <h3>{isMasterAccount ? 'Guest' : name}</h3>
           <AccountShort address={account?.address} />
         </Col>
-        <Col width={4} verticalAlign='middle'>
+        <Col width={5} verticalAlign='middle'>
           <ProfilePicSquareButton profilePic={profilePic} onClick={() => { router.push('/gate') }} />
         </Col>
       </Row>

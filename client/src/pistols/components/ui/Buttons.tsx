@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactElement } from 'react'
 import { Menu, Button, Icon, SemanticICONS } from 'semantic-ui-react'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { CustomIcon } from './Icons'
@@ -8,7 +8,7 @@ import { CustomIcon } from './Icons'
 //
 
 type ActionButtonProps = {
-  label: string
+  label: string | ReactElement
   disabled?: boolean
   large?: boolean
   fill?: boolean

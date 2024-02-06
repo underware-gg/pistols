@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Grid, Radio, Input, Divider } from 'semantic-ui-react'
+import { Grid, Radio, Input, Divider, Button, Icon } from 'semantic-ui-react'
 import { useDojo, useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
 import { AccountShort } from '@/pistols/components/ui/Account'
@@ -64,7 +64,10 @@ export function AccountsList() {
             <ActionButton fill disabled={isDeploying} onClick={() => create()} label='Create Account' />
           </Col>
           <Col>
-            <ActionButton fill disabled={isDeploying} onClick={() => clear()} label='Delete All Accounts' />
+            <ActionButton fill disabled={isDeploying} onClick={() => applyFromClipboard()} label={<>Import&nbsp;&nbsp;<Icon name='paste' size='small'/></>} />
+          </Col>
+          <Col>
+            <ActionButton fill disabled={isDeploying} onClick={() => clear()} label='Delete All' />
           </Col>
           {/* <Col>
             <ActionButton fill disabled={isDeploying} onClick={() => applyFromClipboard()} label='Restore' />
@@ -83,7 +86,7 @@ export function AccountsList() {
 
         <Row columns={'equal'} textAlign='center'>
           <Col>
-            <ActionButton fill large disabled={!canEnter} onClick={() => _enter()} label='Enter The Tavern' />
+            <ActionButton fill large disabled={!canEnter} onClick={() => _enter()} label={!isRegistered ?'Check In to Enter':'Enter The Tavern'} />
           </Col>
         </Row>
 
@@ -91,11 +94,13 @@ export function AccountsList() {
           <Col></Col>
         </Row>
 
-        <Row columns={'equal'} textAlign='center'>
-          <Col>
-            <ActionButton fill large disabled={!isMasterAccount} onClick={() => _enterAsGuest()} label='Enter As Guest' />
-          </Col>
-        </Row>
+        {isMasterAccount &&
+          <Row columns={'equal'} textAlign='center'>
+            <Col>
+              <ActionButton fill large disabled={!isMasterAccount} onClick={() => _enterAsGuest()} label='Enter As Guest' />
+            </Col>
+          </Row>
+        }
       </Grid>
     </>
   )
@@ -109,7 +114,7 @@ function AccountItem({
   select,
 }) {
   const { register_duelist } = useDojoSystemCalls()
-  const { account } = useDojoAccount()
+  const { account, copyToClipboard } = useDojoAccount()
   const inputRef = useRef(null)
 
   // current name from Dojo
@@ -148,6 +153,12 @@ function AccountItem({
     }
   }
 
+  const _export = () => {
+    if (isSelected) {
+      copyToClipboard()
+    }
+  }
+
   return (
     <Row textAlign='center' verticalAlign='middle'>
       <Col width={1}>
@@ -159,36 +170,39 @@ function AccountItem({
           <ProfilePicSquareButton
             profilePic={_profilePic}
             // onClick={() => setSelectedProfilePic(_profilePic < _profilePicCount ? _profilePic + 1 : 1)}
-            onClick={() => {}}
+            onClick={() => { }}
             disabled={!isSelected}
           />
-          <div className='ProfilePicLeftButton'
-            onClick={() => setSelectedProfilePic(_profilePic > 1 ? _profilePic - 1 : _profilePicCount)}
-          >◀</div>
-          <div className='ProfilePicRightButton'
-            onClick={() => setSelectedProfilePic(_profilePic < _profilePicCount ? _profilePic + 1 : 1)}
-          >▶</div>
+          {isSelected && <>
+            <div className='ProfilePicLeftButton'
+              onClick={() => setSelectedProfilePic(_profilePic > 1 ? _profilePic - 1 : _profilePicCount)}
+            >◀</div>
+            <div className='ProfilePicRightButton'
+              onClick={() => setSelectedProfilePic(_profilePic < _profilePicCount ? _profilePic + 1 : 1)}
+            >▶</div>
+          </>}
         </div>
       </Col>
       <Col width={12} textAlign='left'>
-        <span className='FormLabel'>Duelist Name</span>
+        <span className='FormLabel TitleCase'>Duelist Name</span>
         <div className='Spacer5' />
         <Input fluid
-          // icon='edit'
-          label='burner'
-          labelPosition='right'
           maxLength={31}
-          placeholder={'PLAYER NAME'}
+          placeholder={'Duelist Name'}
           value={inputValue ?? ''}
           onChange={(e) => setInputValue(e.target.value)}
           disabled={!isSelected}
           ref={inputRef}
-        />
+        >
+          <input />
+          &nbsp;&nbsp;&nbsp;
+          <Button type='submit' disabled={!isSelected} className='FillHeight' onClick={() => _export()}>Export&nbsp;&nbsp;<Icon name='copy' size='small' /></Button>
+        </Input>
         <div className='Spacer5' />
         {!isRegistered
-          ? <ActionButton fill disabled={!canRegister || !inputIsValid} onClick={() => _register()} label='Register' />
+          ? <ActionButton fill disabled={!canRegister || !inputIsValid} onClick={() => _register()} label='Check In' />
           : inputValue
-            ? <ActionButton fill disabled={!canRegister || isUpdated || !inputIsValid} onClick={() => _register()} label={isUpdated ? 'Registered' : 'Update'} />
+            ? <ActionButton fill disabled={!canRegister || isUpdated || !inputIsValid} onClick={() => _register()} label={isUpdated ? 'Checked In' : 'Update'} />
             : <ActionButton fill disabled={!canRegister || isUpdated} onClick={() => _register()} label='Unregister' />
         }
       </Col>

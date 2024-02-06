@@ -39,7 +39,7 @@ export function ProfilePicButton({
   const _click = () => {
     if (!disabled) onClick(profilePic)
   }
-  return <Image src={url} className={`${className} ${!disabled ? `Anchor` : 'Grayscale'}`} onClick={() => _click()} />
+  return <Image src={url} className={`${className} ${!disabled ? `Anchor` : 'ProfilePicDisabled'}`} onClick={() => _click()} />
 }
 
 //-----------------

@@ -291,6 +291,16 @@ canvas {
   -webkit-filter: grayscale(1); /* Old WebKit */
 }
 
+.Sepia {
+  filter: sepia(100%); /* Current draft standard */
+  -webkit-filter: sepia(100%); /* New WebKit */
+  -moz-filter: sepia(100%);
+  -ms-filter: sepia(100%); 
+  -o-filter: sepia(100%); /* Not yet supported in Gecko, Opera or IE */ 
+  filter: rgb(185, 176, 117); /* IE */
+  -webkit-filter: sepia(1); /* Old WebKit */
+}
+
 .FillWidth {
   width: 100%!important;
   min-width: 100%;
@@ -546,7 +556,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 //
 // Pistols
 //
-$profile-pic-width: 70px;
+$profile-pic-width: 80px;
 $ui-container-gap: 1em;
 
 .UIContainer {
@@ -632,6 +642,10 @@ $ui-container-gap: 1em;
 }
 .ProfilePicRightButton {
   @extend .AbsoluteRight, .ProfilePicSelectButton;
+}
+.ProfilePicDisabled {
+  // @extend .Grayscale;
+  @extend .Sepia;
 }
 
 .ProfileStats {
@@ -836,7 +850,10 @@ $logo-url: '/logos/logo_avante.svg';
 // 
 // <Input>
 input::placeholder {
+  @extend .TitleCase;
+  font-family: $font-family;
   color: $color-inactive!important;
+  font-style: normal;
 }
 .ui.input>input,
 .ui.form input:not([type]),

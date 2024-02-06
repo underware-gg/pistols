@@ -31,7 +31,7 @@ export default function Gate() {
 
         <Row colums='equal' className='Title'>
           <Col>
-            Identify yourself
+            Who wants in?
           </Col>
         </Row>
       </Grid>
