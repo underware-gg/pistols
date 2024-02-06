@@ -38,7 +38,7 @@ export default function Duel({
     gameImpl?.resetScene()
   }, [])
 
-  useEffect(() => dispatchSelectDuel(duelId, isLive ? MenuKey.LiveDuels : MenuKey.PastDuels), [duelId, isLive])
+  useEffect(() => dispatchSelectDuel(duelId), [duelId])
 
   return (
     <>

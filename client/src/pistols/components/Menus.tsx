@@ -40,17 +40,15 @@ export function MenuTavern({
 
   const panes = useMemo(() => {
     let result = []
-    Object.keys(tavernMenuItems).forEach(k => {
-      const key = parseInt(k)
-      const label = tavernMenuItems[key]
+    tavernMenuItems.forEach(key => {
       const bubble = (key == MenuKey.YourDuels) ? _makeBubble(yourDuelsCount) : (key == MenuKey.LiveDuels) ? _makeBubble(liveDuelsCount) : null
       result.push({
         menuItem: (
           <Menu.Item
-            key={label}
-            onClick={() => dispatchSetMenu(key)}
+            key={key}
+            onClick={() => dispatchSetMenu(key as MenuKey)}
           >
-            {label}
+            {key}
             {bubble}
           </Menu.Item>
         ),
@@ -68,6 +66,8 @@ export function MenuTavern({
     })
     return result
   }, [tavernMenuItems, yourDuelsCount, liveDuelsCount])
+
+  const menuIndex = tavernMenuItems.findIndex(k => (k == menuKey))
 
   return (
     <>
@@ -87,7 +87,7 @@ export function MenuTavern({
           </Col>
         </Row>
       </Grid>
-      <Tab activeIndex={menuKey} menu={{ secondary: true, pointing: true, attached: true }} panes={panes} />
+      <Tab activeIndex={menuIndex} menu={{ secondary: true, pointing: true, attached: true }} panes={panes} />
     </>
   )
 }

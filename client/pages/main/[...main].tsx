@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react'
 import { useRouter } from 'next/router'
-import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, MenuKey, Scene } from '@/pistols/hooks/PistolsContext'
 import AppDojo from '@/pistols/components/AppDojo'
 import Gate from '@/pistols/components/Gate'
 import Tavern from '@/pistols/components/Tavern'
@@ -13,19 +13,19 @@ import Duel from '@/pistols/components/Duel'
 //   runtime: 'experimental-edge'
 // }
 
-const bgsTavern: Record<MenuKey, string> = {
-  [MenuKey.Duelists]: 'BackgroundDuelists',
-  [MenuKey.YourDuels]: 'BackgroundDuelsYour',
-  [MenuKey.LiveDuels]: 'BackgroundDuelsLive',
-  [MenuKey.PastDuels]: 'BackgroundDuelsPast',
-}
+// const bgsTavern: Record<MenuKey, string | null> = {
+//   [MenuKey.Duelists]: null,//'BackgroundDuelists',
+//   [MenuKey.YourDuels]: null,//'BackgroundDuelsYour',
+//   [MenuKey.LiveDuels]: null,//'BackgroundDuelsLive',
+//   [MenuKey.PastDuels]: null,//'BackgroundDuelsPast',
+// }
 
 export default function MainPage() {
   const router = useRouter()
-  const { menuKey } = usePistolsContext()
+  const { menuKey, scene: currentScene, atGate, atTavern, atDuel, dispatchSetScene } = usePistolsContext()
 
-  const { page, title, duelId, bgClassName } = useMemo(() => {
-    let page = null
+  const { scene, title, duelId, bgClassName } = useMemo(() => {
+    let scene = undefined
     let title = null
     let duelId = null
     let bgClassName = null
@@ -35,56 +35,55 @@ export default function MainPage() {
       const _page = router.query.main[0]
       const _slugs = router.query.main.slice(1)
       if (_page == 'gate') {
-        page = _page
+        scene = Scene.Gate
         title = 'Pistols - The Gate'
-        bgClassName = 'BackgroundGate'
+        // bgClassName = 'BackgroundGate'
       } else if (_page == 'tavern') {
-        page = _page
+        scene = Scene.Tavern
         title = 'Pistols - The Tavern'
-        bgClassName = menuKey ? bgsTavern[menuKey] : 'BackgroundDuelists'
+        // bgClassName = menuKey ? bgsTavern[menuKey] : 'BackgroundDuelists'
       } else if (_page == 'duel') {
         // '/room/[duel_id]'
         if (_slugs.length > 0) {
-          page = _page
+          scene = Scene.Duel
           duelId = BigInt(_slugs[0])
           title = 'Pistols - Duel!'
         } else {
-          page = 'tavern'
+          scene = Scene.Tavern
           router.push('/tavern')
         }
-        bgClassName = 'BackgroundDuel'
+        // bgClassName = 'BackgroundDuel'
       }
     }
     return {
-      page,
+      scene,
       title,
       duelId,
       bgClassName,
     }
   }, [router.isReady, router.query, menuKey])
 
-  if (!page) {
-    if (router.isReady) {
+  useEffect(() => {
+    if (scene !== undefined) {
+      dispatchSetScene(scene)
+    }
+    else if (router.isReady) {
       // invalid route
       router.push('/')
     }
-    // return <></> // causes hydration error
-  }
+  }, [scene, router.isReady])
 
-  const _atGate = (page == 'gate')
-  const _atTavern = (page == 'tavern')
-  const _atDuel = (page == 'duel')
+  // console.log(`AT scene [${currentScene}] menu [${menuKey}]`, atTavern, atDuel, duelId, router.query.main)
 
   return (
     <AppDojo title={title} backgroundImage={null}>
       <Background className={bgClassName}>
         <GameContainer
-          isVisible={_atDuel}
-          duelId={duelId}
+          isVisible={atDuel && duelId}
         />
-        {_atGate && <Gate />}
-        {_atTavern && <Tavern />}
-        {_atDuel && <Duel duelId={duelId}/>}
+        {atGate && <Gate />}
+        {atTavern && <Tavern />}
+        {atDuel && duelId && <Duel duelId={duelId} />}
       </Background>
     </AppDojo>
   );

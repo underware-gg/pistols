@@ -21,7 +21,7 @@ export default function DuelistModal() {
   const { create_challenge } = useDojoSystemCalls()
   const { account, isMasterAccount } = useDojoAccount()
 
-  const { atDuelists, duelistAddress, dispatchSelectDuelist, dispatchSelectDuel } = usePistolsContext()
+  const { duelistAddress, dispatchSelectDuelist, dispatchSelectDuel } = usePistolsContext()
   const { name, profilePic } = useDuelist(duelistAddress)
   const { hasPact, pactDuelId } = usePact(account.address, duelistAddress)
   const [isChallenging, setIsChallenging] = useState(false)
