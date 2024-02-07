@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from 'react'
 import { useDojoSystemCalls } from '@/dojo/DojoContext'
 import { useEffectOnce } from "@/pistols/hooks/useEffectOnce"
 

@@ -1,14 +1,13 @@
 import { useState, useRef } from 'react'
 import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
-import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
+import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 
 export const ThreeJsCanvas = ({
-  width = 200,
-  height = 200,
+  width = 960,
+  height = 540,
   guiEnabled = false,
-  gameImpl,
 }) => {
-  const { dispatchGameImpl } = useGameplayContext()
+  const { game, dispatchGameImpl } = useThreeJsContext()
   const [isLoading, setIsLoading] = useState(false)
   const [isRunning, setIsRunning] = useState(false)
   const canvasRef = useRef()
@@ -16,13 +15,13 @@ export const ThreeJsCanvas = ({
   useEffectOnce(() => {
     let _mounted = true
     const _initialize = async () => {
-      await gameImpl.init(canvasRef.current, width, height, guiEnabled)
+      await game.init(canvasRef.current, width, height, guiEnabled)
       if (_mounted) {
-        gameImpl.animate()
+        game.animate(0)
         // game.resetGameParams(gameParams)
         setIsLoading(false)
         setIsRunning(true)
-        dispatchGameImpl(gameImpl)
+        dispatchGameImpl(game)
         //@ts-ignore
         canvasRef.current?.focus()
       }
@@ -35,8 +34,8 @@ export const ThreeJsCanvas = ({
 
     return () => {
       _mounted = false
-      if (isRunning && gameImpl) {
-        gameImpl.dispose()
+      if (isRunning && game) {
+        game.dispose()
         dispatchGameImpl(null)
       }
     }

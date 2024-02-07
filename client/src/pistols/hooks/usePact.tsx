@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from 'react'
 import { useComponentValue } from "@dojoengine/react"
 import { useDojoComponents, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { bigintToEntity, keysToEntity } from "../utils/utils"

@@ -3,6 +3,7 @@ import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
 import { DojoConfig, createDojoConfig } from '@dojoengine/core'
 import { DojoProvider } from '@/dojo/DojoContext'
 import { setup } from '@/dojo/setup'
+import { ThreeJsProvider } from '@/pistols/hooks/ThreeJsContext'
 import { GameplayProvider } from '@/pistols/hooks/GameplayContext'
 import { DojoStatus } from '@/pistols/components/account/DojoStatus'
 import App from '@/pistols/components/App'
@@ -64,9 +65,11 @@ function DojoSetup({ children }) {
 
   return (
     <DojoProvider value={setupResult}>
-      <GameplayProvider>
-        {children}
-      </GameplayProvider>
+      <ThreeJsProvider>
+        <GameplayProvider>
+          {children}
+        </GameplayProvider>
+      </ThreeJsProvider>
     </DojoProvider>
   );
 }

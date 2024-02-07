@@ -1,5 +1,5 @@
 import { BurnerAccount, useBurnerManager } from "@dojoengine/create-burner";
-import { ReactNode, createContext, useContext, useMemo } from "react";
+import { ReactNode, createContext, useContext, useMemo } from 'react'
 import { Account } from "starknet";
 import { SetupResult } from "./setup";
 

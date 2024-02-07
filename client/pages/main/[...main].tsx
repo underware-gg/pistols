@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react'
 import { useRouter } from 'next/router'
 import { usePistolsContext, SceneName } from '@/pistols/hooks/PistolsContext'
-import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
+import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import AppDojo from '@/pistols/components/AppDojo'
 import GameContainer from '@/pistols/components/GameContainer'
 import Background from '@/pistols/components/Background'
@@ -92,7 +92,7 @@ export default function MainPage() {
 function MainUI({
   duelId
 }) {
-  const { gameImpl } = useGameplayContext()
+  const { gameImpl } = useThreeJsContext()
   const { atGate, atTavern, atDuel } = usePistolsContext()
 
   if (gameImpl) {

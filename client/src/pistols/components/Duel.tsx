@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Segment, Icon, Step } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
-import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { useThreeJsContext } from '../hooks/ThreeJsContext'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
@@ -11,7 +12,7 @@ import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { BladesNames, FULL_HEALTH, HALF_HEALTH } from '@/pistols/utils/pistols'
-import { MenuDuel, MenuDebugAnimations } from '@/pistols/components/Menus'
+import { MenuDuel } from '@/pistols/components/Menus'
 import { AnimationState } from '@/pistols/three/game'
 import { EmojiIcon } from '@/pistols/components/ui/Icons'
 import CommitModal from '@/pistols/components/CommitModal'
@@ -24,7 +25,8 @@ export default function Duel({
   duelId
 }) {
   const { account } = useDojoAccount()
-  const { gameImpl, animated } = useGameplayContext()
+  const { gameImpl } = useThreeJsContext()
+  const { animated } = useGameplayContext()
   const { dispatchSelectDuel } = usePistolsContext()
 
   const { isLive, isFinished, message, duelistA, duelistB } = useChallenge(duelId)

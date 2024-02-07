@@ -530,7 +530,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
   position: relative;
 }
 
-.GameView {
+.GameCanvas {
   @extend .GameContainer;
   position: absolute;
   top: 0;
@@ -548,7 +548,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 .Overlay {
-  @extend .GameView, .CenteredContainer, .AboveAll, .TitleCase;
+  @extend .GameCanvas, .CenteredContainer, .AboveAll, .TitleCase;
   background: #000d;
 }
 

@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation'
 import { Grid, Menu, Label, Tab, TabPane } from 'semantic-ui-react'
 import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
 import { useChallengesByDuelist, useLiveChallengeIds } from '@/pistols/hooks/useChallenge'
-import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
+import { useThreeJsContext } from '../hooks/ThreeJsContext'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
@@ -95,8 +95,8 @@ export function MenuTavern({
 export function MusicToggle({
 }) {
   const { settings, SettingsActions } = useSettingsContext()
-  const { hasLoadedAudioAssets } = useGameplayContext()
-  if (!hasLoadedAudioAssets) return <></>
+  const { audioLoaded } = useThreeJsContext()
+  if (!audioLoaded) return <></>
   return <SettingsIcon settingsKey={SettingsActions.MUSIC_ENABLED} value={settings.musicEnabled} nameOn='volume-on' nameOff='volume-off' icon/>
 }
 
@@ -139,7 +139,7 @@ export function MenuDebugAnimations() {
 }
 
 function MenuDebugTriggers() {
-  const { gameImpl } = useGameplayContext()
+  const { gameImpl } = useThreeJsContext()
 
   const _paces = (pacesCountA, paceCountB, healthA, healthB) => {
     gameImpl?.animateShootout(pacesCountA, paceCountB, healthA, healthB)
@@ -254,7 +254,7 @@ function MenuDebugTriggers() {
 function MenuDebugActors({
   actorId
 }) {
-  const { gameImpl } = useGameplayContext()
+  const { gameImpl } = useThreeJsContext()
 
   const _play = (key) => {
     gameImpl?.playActorAnimation(actorId, key)
