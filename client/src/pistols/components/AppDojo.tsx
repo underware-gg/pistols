@@ -56,7 +56,7 @@ function DojoSetup({ children }) {
   if (!setupResult) {
     return (
       <>
-        <h1 className='TitleCase'>loading up...</h1>
+        <h1 className='TitleCase'>Loading Up...</h1>
         <h5><DojoStatus /></h5>
       </>
     )

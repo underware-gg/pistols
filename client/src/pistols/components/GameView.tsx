@@ -5,7 +5,7 @@ import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import GameCanvas from '@/pistols/components/GameCanvas'
 
 const GameView = () => {
-  const { gameImpl, dispatchAnimated} = useGameplayContext()
+  const { gameImpl, dispatchAnimated } = useGameplayContext()
   const { sceneName } = usePistolsContext()
 
   const animated = useGameEvent('animated', -1)

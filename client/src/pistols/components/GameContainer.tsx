@@ -1,17 +1,18 @@
 import React, { useEffect } from 'react'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { GameState, useGameplayContext } from '@/pistols/hooks/GameplayContext'
+import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { loadAudioAssets, isAudioAssetsLoaded, AudioName } from '@/pistols/data/assets'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import GameView from '@/pistols/components/GameView'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
+import { useUserHasInteracted } from '@/pistols/hooks/useUserHasInteracted'
 
 function GameContainer({
   isVisible,
-  isPlaying,
   duelId,
 }) {
   const { dispatchSelectDuel } = usePistolsContext()
+  const { hasLoadedAudioAssets } = useGameplayContext()
 
   useEffect(() => {
     if (duelId) {
@@ -22,7 +23,8 @@ function GameContainer({
   return (
     <div className={`GameContainer ${isVisible ? '' : 'Hidden'}`}>
       <GameView />
-      <GameStartOverlay isVisible={isPlaying} />
+      {!hasLoadedAudioAssets && <GameAudioLoader />}
+      {hasLoadedAudioAssets && <GameAudios isVisible={isVisible} />}
     </div>
   )
 }
@@ -32,29 +34,15 @@ function GameContainer({
 // Overlay to load audio assets
 // Asks for interaction if necessary
 //
-function GameStartOverlay({
-  isVisible
-}) {
+function GameAudioLoader() {
+  const { atDuel } = usePistolsContext()
   const {
-    gameImpl, isReady,
-    hasInteracted, hasLoadedAudioAssets,
-    dispatchGameState, dispatchInteracted, dispatchLoadedAudioAssets,
+    gameImpl,
+    hasLoadedAudioAssets,
+    dispatchLoadedAudioAssets,
   } = useGameplayContext()
-  // console.log(isReady, hasInteracted, gameImpl)
 
-  // gameImpl loaded by GameCanvas
-  useEffect(() => {
-    if (gameImpl) {
-      dispatchGameState(GameState.Ready)
-    }
-  }, [gameImpl])
-
-  useEffect(() => {
-    const hasBeenActive = navigator?.userActivation?.hasBeenActive
-    if (isVisible && hasBeenActive && !hasInteracted) {
-      dispatchInteracted()
-    }
-  }, [isVisible])
+  const { userHasInteracted } = useUserHasInteracted()
 
   //
   // Load audio assets
@@ -66,21 +54,29 @@ function GameStartOverlay({
     }
     if (isAudioAssetsLoaded()) {
       dispatchLoadedAudioAssets(true)
-    } else if (isReady && hasInteracted) {
+    } else if (gameImpl && userHasInteracted) {
       _preloadAudio()
     }
-  }, [isReady, hasInteracted])
+  }, [gameImpl, userHasInteracted])
 
-  if (hasLoadedAudioAssets === true) {
-    return <GameAudios isVisible={isVisible} />
+  if (!gameImpl) {
+    return (
+      <div className='Overlay'>
+        <h1>Starting Renderer...</h1>
+      </div>
+    )
   }
 
-  return (
-    <div className={`GameView Overlay CenteredContainer AboveAll`}>
-      {hasLoadedAudioAssets === undefined && <ActionButton large label='READY!' onClick={() => dispatchInteracted()} />}
-      {hasLoadedAudioAssets === false && <h1>loading assets...</h1>}
-    </div>
-  )
+  if (gameImpl && atDuel) {
+    return (
+      <div className='Overlay'>
+        {hasLoadedAudioAssets === undefined && <ActionButton large label='Ready!' onClick={() => console.log(`interacted`)} />}
+        {hasLoadedAudioAssets === false && <h1>Loading Audio...</h1>}
+      </div>
+    )
+  }
+
+  return <></>
 }
 
 //-------------------------------------------------
@@ -90,12 +86,12 @@ const GameAudios = ({
   isVisible
 }) => {
   const { musicEnabled, sfxEnabled } = useSettingsContext()
-  const { gameImpl } = useGameplayContext()
+  const { gameImpl, hasLoadedAudioAssets } = useGameplayContext()
 
   useEffect(() => {
-    const _play = (musicEnabled && isVisible)
+    const _play = (musicEnabled && isVisible && hasLoadedAudioAssets)
     gameImpl?.playAudio(AudioName.MUSIC_INGAME, _play)
-  }, [musicEnabled, isVisible])
+  }, [musicEnabled, isVisible, hasLoadedAudioAssets])
 
   useEffect(() => {
     if (!isVisible) {
@@ -116,26 +112,19 @@ const GameAudios = ({
 //
 export const TavernAudios = () => {
   const { musicEnabled } = useSettingsContext()
-  const { gameImpl } = useGameplayContext()
+  const { gameImpl, hasLoadedAudioAssets } = useGameplayContext()
 
   useEffect(() => {
-    // const hasBeenActive = navigator?.userActivation?.hasBeenActive
-    // if (musicEnabled && !hasBeenActive) {
-    //   dispatchSettings(MUSIC, false)
-    // }
-
     return () => {
       gameImpl?.stopAudio(AudioName.MUSIC_MENUS)
     }
   }, [])
 
   useEffect(() => {
-    gameImpl?.playAudio(AudioName.MUSIC_MENUS, musicEnabled)
-  }, [musicEnabled])
+    gameImpl?.playAudio(AudioName.MUSIC_MENUS, musicEnabled && hasLoadedAudioAssets)
+  }, [gameImpl, musicEnabled, hasLoadedAudioAssets])
 
   return <></>
 }
-
-
 
 export default GameContainer

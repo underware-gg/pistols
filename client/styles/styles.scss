@@ -548,7 +548,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 .Overlay {
-  // background: linear-gradient(#0004, #000d);
+  @extend .GameView, .CenteredContainer, .AboveAll, .TitleCase;
   background: #000d;
 }
 

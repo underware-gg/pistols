@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo } from 'react'
 import { useRouter } from 'next/router'
-import { usePistolsContext, MenuKey, SceneName } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, SceneName } from '@/pistols/hooks/PistolsContext'
+import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import AppDojo from '@/pistols/components/AppDojo'
-import Gate from '@/pistols/components/Gate'
-import Tavern from '@/pistols/components/Tavern'
 import GameContainer from '@/pistols/components/GameContainer'
 import Background from '@/pistols/components/Background'
+import Gate from '@/pistols/components/Gate'
+import Tavern from '@/pistols/components/Tavern'
 import Duel from '@/pistols/components/Duel'
 
 // enable wasm in build (this is for api routes)
@@ -22,7 +23,7 @@ import Duel from '@/pistols/components/Duel'
 
 export default function MainPage() {
   const router = useRouter()
-  const { menuKey, atGate, atTavern, atDuel, dispatchSetScene } = usePistolsContext()
+  const { menuKey, dispatchSetScene } = usePistolsContext()
 
   const { scene, title, duelId, bgClassName } = useMemo(() => {
     let scene = undefined
@@ -73,20 +74,32 @@ export default function MainPage() {
     }
   }, [scene, router.isReady])
 
-  // console.log(`AT scene [${currentScene}] menu [${menuKey}]`, atTavern, atDuel, duelId, router.query.main)
+  // console.log(`AT scene [${scene}] menu [${menuKey}]`, atTavern, atDuel, duelId, gameImpl)
 
   return (
     <AppDojo title={title} backgroundImage={null}>
       <Background className={bgClassName}>
         <GameContainer
           isVisible={true}
-          isPlaying={atDuel && duelId}
           duelId={duelId}
         />
-        {atGate && <Gate />}
-        {atTavern && <Tavern />}
-        {atDuel && duelId && <Duel duelId={duelId} />}
+        <MainUI duelId={duelId} />
       </Background>
     </AppDojo>
   );
+}
+
+function MainUI({
+  duelId
+}) {
+  const { gameImpl } = useGameplayContext()
+  const { atGate, atTavern, atDuel } = usePistolsContext()
+
+  if (gameImpl) {
+    if (atGate) return <Gate />
+    if (atTavern) return <Tavern />
+    if (atDuel && duelId) return <Duel duelId={duelId} />
+  }
+
+  return <></>
 }

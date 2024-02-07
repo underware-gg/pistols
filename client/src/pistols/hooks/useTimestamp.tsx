@@ -9,12 +9,12 @@ export const useClientTimestamp = (autoUpdate: boolean = false) => {
 
   useEffect(() => {
     let _mounted = true
-    let _timeout = null
+    let _interval = null
     // initialize
     setClientTimestamp(_getTimestamp())
     // auto updates
     if (autoUpdate) {
-      _timeout = setInterval(() => {
+      _interval = setInterval(() => {
         if (_mounted) {
           setClientTimestamp(_getTimestamp())
         }
@@ -22,7 +22,7 @@ export const useClientTimestamp = (autoUpdate: boolean = false) => {
     }
     return () => {
       _mounted = false
-      clearTimeout(_timeout)
+      clearInterval(_interval)
     }
   }, [])
 
