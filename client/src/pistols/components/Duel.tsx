@@ -1,13 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Segment, Icon, Step } from 'semantic-ui-react'
-import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
+import { useDojoAccount } from '@/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '../hooks/ThreeJsContext'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { DuelStage, useAnimatedDuel, useDuel } from '@/pistols/hooks/useDuel'
-import { useCommitMove } from '@/pistols/hooks/useCommitReveal'
 import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
@@ -16,6 +15,7 @@ import { MenuDuel } from '@/pistols/components/Menus'
 import { AnimationState } from '@/pistols/three/game'
 import { EmojiIcon } from '@/pistols/components/ui/Icons'
 import CommitModal from '@/pistols/components/CommitModal'
+import RevealModal from '@/pistols/components/RevealModal'
 import { EMOJI } from '@/pistols/data/messages'
 
 const Row = Grid.Row
@@ -122,20 +122,22 @@ function DuelProgress({
   floated,
 }) {
   const { round1, round2, roundNumber, turnA, turnB, } = useDuel(duelId)
+  const round1Move = useMemo(() => (isA ? round1?.duelist_a : round1?.duelist_b), [isA, round1])
+  const round2Move = useMemo(() => (isA ? round2?.duelist_a : round2?.duelist_b), [isA, round2])
+  const currentRoundMove = useMemo(() => (roundNumber == 1 ? round1Move : round2Move), [roundNumber, round1Move, round2Move])
 
   //-------------------------
   // Duel progression
   //
 
-  const _healthResult = (round: any) => {
-    const health = isA ? round.duelist_a.health : round.duelist_b.health
+  const _healthResult = (health: number) => {
     return (health == 0 ? 'is DEAD!' : health < FULL_HEALTH ? 'is INJURED!' : 'is ALIVE!')
   }
 
   const pistolsResult = useMemo(() => {
     if (duelStage > DuelStage.PistolsShootout) {
-      const steps = isA ? round1.duelist_a.move : round1.duelist_b.move
-      const health = _healthResult(round1)
+      const steps = round1Move.move
+      const health = _healthResult(round1Move.health)
       return <span>Walks <span className='Important'>{steps} steps</span><br />and {health}</span>
     }
     return null
@@ -143,19 +145,17 @@ function DuelProgress({
 
   const bladesResult = useMemo(() => {
     if (round2 && duelStage > DuelStage.BladesClash) {
-      const blade = isA ? round2.duelist_a.move : round2.duelist_b.move
-      const health = _healthResult(round2)
+      const blade = round2Move.move
+      const health = _healthResult(round2Move.health)
       return <span>Clashes with <span className='Important'>{BladesNames[blade]}</span><br />and {health}</span>
     }
     return null
   }, [round2, duelStage])
 
-  const _resultBackground = (round) => {
-    const health = isA ? round.duelist_a.health : round.duelist_b.health
+  const _resultBackground = (health: number) => {
     return health == FULL_HEALTH ? 'Positive' : health == HALF_HEALTH ? 'Warning' : 'Negative'
   }
-  const _resultEmoji = (round) => {
-    const health = isA ? round.duelist_a.health : round.duelist_b.health
+  const _resultEmoji = (health: number) => {
     return health == FULL_HEALTH ? EMOJI.ALIVE : health == HALF_HEALTH ? EMOJI.INJURED : EMOJI.DEAD
   }
 
@@ -164,22 +164,16 @@ function DuelProgress({
   // Duelist interaction
   //
   const isYou = useMemo(() => (BigInt(account?.address) == duelistAccount), [account, duelistAccount])
-  const isTurn = useMemo(() => ((isA && turnA) || (isB && turnB)), [isA, isB, turnA, turnB])
+  // const isTurn = useMemo(() => ((isA && turnA) || (isB && turnB)), [isA, isB, turnA, turnB])
 
   // Commit modal control
-  const [commitStepsIsOpen, setCommitStepsIsOpen] = useState(false)
-  const [commitBladesIsOpen, setCommitBladesIsOpen] = useState(false)
+  const [commitModalIsOpen, setCommitModalIsOpen] = useState(false)
+  const [revealModalIsOpen, setRevealModalIsOpen] = useState(false)
   const _commit = () => {
-    if (roundNumber == 1) setCommitStepsIsOpen(true)
-    if (roundNumber == 2) setCommitBladesIsOpen(true)
+    setCommitModalIsOpen(true)
   }
-
-  // Reveal
-  const { reveal_move } = useDojoSystemCalls()
-  const { hash, salt, move } = useCommitMove(duelId, roundNumber)
   const _reveal = () => {
-    // console.log(`REVEAL`, duelId, roundNumber, hash, salt, move, pedersen(salt, move).toString(16))
-    reveal_move(account, duelId, roundNumber, salt, move)
+    setRevealModalIsOpen(true)
   }
 
   // onClick
@@ -199,8 +193,8 @@ function DuelProgress({
   //------------------------------
   return (
     <>
-      <CommitModal duelId={duelId} roundNumber={1} isOpen={commitStepsIsOpen} setIsOpen={setCommitStepsIsOpen} />
-      <CommitModal duelId={duelId} roundNumber={2} isOpen={commitBladesIsOpen} setIsOpen={setCommitBladesIsOpen} />
+      <CommitModal duelId={duelId} roundNumber={roundNumber} isOpen={commitModalIsOpen} setIsOpen={setCommitModalIsOpen} />
+      <RevealModal duelId={duelId} roundNumber={roundNumber} isOpen={revealModalIsOpen} hash={currentRoundMove?.hash} setIsOpen={setRevealModalIsOpen} />
       <Step.Group vertical size='small'>
         <ProgressItem
           stage={DuelStage.StepsCommit}
@@ -230,10 +224,10 @@ function DuelProgress({
           title={pistolsResult ?? 'Pistols shootout!'}
           description=''
           icon={pistolsResult ? null : 'target'}
-          emoji={pistolsResult ? _resultEmoji(round1) : null}
+          emoji={pistolsResult ? _resultEmoji(round1Move.health) : null}
           floated={floated}
           onClick={onClick}
-          className={pistolsResult ? _resultBackground(round1) : null}
+          className={pistolsResult ? _resultBackground(round1Move.health) : null}
         />
 
         {(round2 && duelStage >= DuelStage.BladesCommit) &&
@@ -268,10 +262,10 @@ function DuelProgress({
               title={bladesResult ?? 'Blades clash!'}
               description=''
               icon={bladesResult ? null : 'target'}
-              emoji={bladesResult ? _resultEmoji(round2) : null}
+              emoji={bladesResult ? _resultEmoji(round2Move.health) : null}
               floated={floated}
               onClick={onClick}
-              className={bladesResult ? _resultBackground(round2) : null}
+              className={bladesResult ? _resultBackground(round2Move.health) : null}
             />
           </>
         }

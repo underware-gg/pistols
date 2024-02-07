@@ -3,8 +3,8 @@ import {
   shortString,
   Account,
   BigNumberish,
-  TypedData, typedData,
-  Signature,
+  TypedData,
+  WeierstrassSignatureType,
 } from 'starknet'
 
 export const validateCairoString = (v: string): string => (v ? v.slice(0, 31) : '')
@@ -14,11 +14,11 @@ export const pedersen = (a: BigNumberish, b: BigNumberish): bigint => (BigInt(ec
 export const poseidon = (values: BigNumberish[]): bigint => (BigInt(ec.starkCurve.poseidonHashMany(values.map(v => BigInt(v)))))
 
 // https://github.com/starknet-io/starknet.js/blob/develop/www/docs/guides/signature.md
-export const signMessages = async (account: Account, messages: BigNumberish[]): Promise<Signature> => {
+export const signMessages = async (account: Account, messages: BigNumberish[]): Promise<WeierstrassSignatureType> => {
   const typedMessage = createTypedMessage(messages)
-  return account.signMessage(typedMessage)
+  return account.signMessage(typedMessage) as Promise<WeierstrassSignatureType>
 }
-export const verifyMessages = async (account: Account, messages: BigNumberish[], signature: Signature): Promise<boolean> => {
+export const verifyMessages = async (account: Account, messages: BigNumberish[], signature: WeierstrassSignatureType): Promise<boolean> => {
   const typedMessage = createTypedMessage(messages)
   return account.verifyMessage(typedMessage, signature)
 }

@@ -34,7 +34,7 @@ export function AccountsList() {
       result.push(
         <Row key='empty' columns={'equal'} textAlign='center'>
           <Col>
-            <h4>No accounts created</h4>
+            <h4 className='TitleCase Important'>Create an Account to Play</h4>
           </Col>
         </Row>
       )
@@ -42,7 +42,7 @@ export function AccountsList() {
     return result
   }, [account?.address, isDeploying, burners])
 
-  const _enter = (menuKey = MenuKey.YourDuels) => {
+  const _enter = (menuKey = MenuKey.Duelists) => {
     dispatchSetMenu(menuKey)
     router.push('/tavern')
   }
@@ -67,7 +67,7 @@ export function AccountsList() {
             <ActionButton fill disabled={isDeploying} onClick={() => create()} label='Create Account' />
           </Col>
           <Col>
-            <ActionButton fill disabled={isDeploying} onClick={() => applyFromClipboard()} label={<>Import&nbsp;&nbsp;<Icon name='paste' size='small'/></>} />
+            <ActionButton fill disabled={isDeploying} onClick={() => applyFromClipboard()} label={<>Import&nbsp;&nbsp;<Icon name='paste' size='small' /></>} />
           </Col>
           <Col>
             <ActionButton fill disabled={isDeploying} onClick={() => _clear()} label='Delete All' />
@@ -89,7 +89,7 @@ export function AccountsList() {
 
         <Row columns={'equal'} textAlign='center'>
           <Col>
-            <ActionButton fill large attention={isRegistered} disabled={!canEnter} onClick={() => _enter()} label={!isRegistered ?'Check In to Enter':'Enter The Tavern'} />
+            <ActionButton fill large attention={isRegistered} disabled={!canEnter} onClick={() => _enter()} label={!isRegistered ? 'Check In to Enter' : 'Enter The Tavern'} />
           </Col>
         </Row>
 

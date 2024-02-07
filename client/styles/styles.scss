@@ -577,7 +577,7 @@ $ui-container-gap: 1em;
 }
 .UIContainerScroller {
   width: 100%;
-  height: calc($aspect-h - $profile-pic-width - 1em * 6);
+  height: calc($aspect-h - $profile-pic-width - 1em * 6 - 1px);
   scrollbar-width: thin;
   overflow-y: scroll;
   // border: 0.5px solid #0001;
