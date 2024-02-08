@@ -28,7 +28,6 @@ struct Challenge {
     duelist_a: ContractAddress, // Challenger
     duelist_b: ContractAddress, // Challenged
     message: felt252,           // message to challenged
-    pass_code: felt252,
     // progress and results
     round_number: u8,           // current or final
     winner: ContractAddress,    // if (state == ChallengeState.Resolved)

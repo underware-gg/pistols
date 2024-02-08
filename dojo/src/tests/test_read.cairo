@@ -27,7 +27,7 @@ mod tests {
         assert(timestamp2 > timestamp1, 'timestamp2 >');
         assert(timestamp2 == timestamp1 + utils::INITIAL_STEP, 'timestamp2 =');
 
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, 0, MESSAGE_1, 0);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, 0);
         // timestamp +2
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.timestamp == timestamp2, 'timestamp');

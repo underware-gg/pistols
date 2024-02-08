@@ -16,7 +16,6 @@ trait IActions<TContractState> {
     // Challenge
     fn create_challenge(self: @TContractState,
         challenged: ContractAddress,
-        pass_code: felt252,
         message: felt252,
         expire_seconds: u64,
     ) -> u128;
@@ -101,15 +100,13 @@ mod actions {
         //
         fn create_challenge(self: @ContractState,
             challenged: ContractAddress,
-            pass_code: felt252,
             message: felt252,
             expire_seconds: u64,
         ) -> u128 {
             let world: IWorldDispatcher = self.world_dispatcher.read();
             let caller: ContractAddress = starknet::get_caller_address();
 
-            // assert(challenged != utils::zero_address() || pass_code != 0, 'Challenge a player or pass_code');
-            assert(challenged != utils::zero_address() || pass_code != 0, 'Missing challenged address');
+            assert(challenged != utils::zero_address(), 'Missing challenged address');
             assert(expire_seconds == 0 || expire_seconds >= timestamp::from_hours(1), 'Invalid expire_seconds');
 
             assert(utils::duelist_exist(world, caller), 'Challenger not registered');
@@ -130,7 +127,6 @@ mod actions {
                 duelist_a: caller,
                 duelist_b: challenged,
                 message,
-                pass_code,
                 // progress
                 round_number: 0,
                 winner: utils::zero_address(),

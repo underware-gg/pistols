@@ -49,8 +49,8 @@ export function createSystemCalls(
     return await _executeTransaction(signer, 'register_duelist', args)
   }
 
-  const create_challenge = async (signer: Account, challenged: bigint, pass_code: string, message: string, expire_seconds: number): Promise<boolean> => {
-    const args = [challenged, stringToFelt(pass_code), stringToFelt(message), expire_seconds]
+  const create_challenge = async (signer: Account, challenged: bigint, message: string, expire_seconds: number): Promise<boolean> => {
+    const args = [challenged, stringToFelt(message), expire_seconds]
     return await _executeTransaction(signer, 'create_challenge', args)
   }
 
