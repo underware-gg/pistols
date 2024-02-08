@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import TWEEN from '@tweenjs/tween.js'
 //@ts-ignore
 import Stats from 'three/addons/libs/stats.module.js'
+import { Rain } from './Rain'
 
 // event emitter
 // var ee = require('event-emitter');
@@ -197,6 +198,8 @@ export function animate(time) {
       _renderer.render(_currentScene, _duelCamera)
       _stats?.update()
     } else {
+      //@ts-ignore
+      _currentScene.children.forEach(c => c.animate?.())
       _renderer.render(_currentScene, _staticCamera)
     }
   }
@@ -222,25 +225,9 @@ function setupScenes() {
   // switchScene(SceneName.Splash)
 }
 
-function setupStaticScene(sceneName) {
-  const scene = new THREE.Scene()
-
-  const textureName: TextureName = sceneBackgrounds[sceneName]
-  const bg_mat = new THREE.MeshBasicMaterial({
-    map: _textures[textureName],
-    color: 'white',
-  })
-
-  const bg = new THREE.Mesh(_fullScreenGeom, bg_mat)
-  bg.position.set(0, 0, 0)
-  scene.add(bg)
-
-  // const light = new THREE.AmbientLight(0x404040); // soft white light
-  // scene.add(light);
-
-  return scene
-}
-
+//
+// SceneName.Duel
+//
 function setupDuelScene() {
   const scene = new THREE.Scene()
   scene.add(_duelCameraRig)
@@ -286,10 +273,36 @@ export function resetDuelScene() {
   playActorAnimation('B', AnimName.STILL)
 }
 
+//
+// Static Scenes
+//
+function setupStaticScene(sceneName) {
+  const scene = new THREE.Scene()
+
+  const textureName: TextureName = sceneBackgrounds[sceneName]
+  const bg_mat = new THREE.MeshBasicMaterial({
+    map: _textures[textureName],
+    color: 'white',
+  })
+
+  const bg = new THREE.Mesh(_fullScreenGeom, bg_mat)
+  bg.name = 'bg'
+  bg.position.set(0, 0, 0)
+  scene.add(bg)
+
+  if (sceneName == SceneName.Gate) {
+    const rain = new Rain()
+    scene.add(rain)
+  }
+
+  return scene
+}
+
 export function resetStaticScene() {
   if (_tweens.staticZoom) TWEEN.remove(_tweens.staticZoom)
   if (_tweens.staticFade) TWEEN.remove(_tweens.staticFade)
-  let bg = _currentScene.children[0] as THREE.Mesh
+  let bg = _currentScene.getObjectByName('bg') as THREE.Mesh
+  
   // zoom out
   let from = 1.1
   bg.scale.set(from, from, from)
@@ -297,13 +310,17 @@ export function resetStaticScene() {
     .to({ x: 1, y: 1, z: 1 }, 60_000)
     .easing(TWEEN.Easing.Cubic.Out)
     .start()
-  // fade in
+  
+    // fade in
   let mat = bg.material as THREE.MeshBasicMaterial
   mat.color = new THREE.Color(0.25, 0.25, 0.25)
   _tweens.staticFade = new TWEEN.Tween(mat.color)
     .to({ r: 1, g: 1, b: 1 }, 2_000)
     .easing(TWEEN.Easing.Cubic.Out)
-    .start()
+    .start();
+
+  //@ts-ignore
+  _currentScene.children.forEach(c => c.reset?.())
 }
 
 
