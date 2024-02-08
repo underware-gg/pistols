@@ -119,8 +119,8 @@ function DuelItem({
     sortCallback(duelId, state, timestamp)
   }, [state, timestamp])
 
-  const winnerIsA = useMemo(() => (duelistA == winner), [duelistA, winner])
-  const winnerIsB = useMemo(() => (duelistB == winner), [duelistB, winner])
+  const winnerIsA = useMemo(() => (winner == 1), [winner])
+  const winnerIsB = useMemo(() => (winner == 2), [winner])
 
   const { dispatchSelectDuel } = usePistolsContext()
 

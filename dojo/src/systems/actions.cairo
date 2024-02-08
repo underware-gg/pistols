@@ -129,7 +129,7 @@ mod actions {
                 message,
                 // progress
                 round_number: 0,
-                winner: utils::zero_address(),
+                winner: 0,
                 // times
                 timestamp,
                 timestamp_expire,

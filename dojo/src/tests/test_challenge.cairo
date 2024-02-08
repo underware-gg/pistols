@@ -177,7 +177,7 @@ mod tests {
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');
         assert(ch.round_number == 0, 'round_number');
-        assert(ch.winner == zero_address(), 'winner');
+        assert(ch.winner == 0, 'winner');
         assert(ch.timestamp_start == 0, 'timestamp_start');
         assert(ch.timestamp_end == timestamp, 'timestamp_end');
     }
@@ -216,7 +216,7 @@ mod tests {
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');
         assert(ch.round_number == 0, 'round_number');
-        assert(ch.winner == zero_address(), 'winner');
+        assert(ch.winner == 0, 'winner');
         assert(ch.timestamp_start == 0, 'timestamp_start');
         assert(ch.timestamp_end == timestamp, 'timestamp_end');
     }
@@ -270,7 +270,7 @@ mod tests {
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');
         assert(ch.round_number == 0, 'round_number');
-        assert(ch.winner == zero_address(), 'winner');
+        assert(ch.winner == 0, 'winner');
         assert(ch.timestamp_start == 0, 'timestamp_start');
         assert(ch.timestamp_end == timestamp, 'timestamp_end');
     }

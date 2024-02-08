@@ -83,7 +83,7 @@ export const useChallenge = (duelId: bigint | string) => {
   let state = useMemo(() => (challenge?.state ?? null), [challenge])
   const duelistA = useMemo(() => BigInt(challenge?.duelist_a ?? 0), [challenge])
   const duelistB = useMemo(() => BigInt(challenge?.duelist_b ?? 0), [challenge])
-  const winner = useMemo(() => BigInt(challenge?.winner ?? 0), [challenge])
+  const winner = useMemo(() => (challenge?.winner ?? 0), [challenge])
   const message = useMemo(() => feltToString(challenge?.message ?? 0n), [challenge])
   const lords = useMemo(() => (challenge?.lords ?? 0), [challenge])
   const roundNumber = useMemo(() => (challenge?.round_number ?? 0), [challenge])
@@ -110,6 +110,7 @@ export const useChallenge = (duelId: bigint | string) => {
     // progress and results
     roundNumber,
     winner,
+    winnerDuelist: (winner == 1 ? duelistA : winner == 2 ? duelistB : 0n),
     isLive: (state == ChallengeState.Awaiting || state == ChallengeState.InProgress),
     isAwaiting: (state == ChallengeState.Awaiting),
     isInProgress: (state == ChallengeState.InProgress),
@@ -127,16 +128,16 @@ export const useChallenge = (duelId: bigint | string) => {
 }
 
 export const useChallengeDescription = (duelId: bigint) => {
-  const { state, duelistA, duelistB, winner } = useChallenge(duelId)
+  const { state, duelistA, duelistB, winnerDuelist } = useChallenge(duelId)
   const { name: nameA } = useDuelist(duelistA)
   const { name: nameB } = useDuelist(duelistB)
 
   const challengeDescription = useMemo(() => {
     let result = ChallengeStateDescriptions[state]
-    if (winner == duelistA) result += ' in favor of Challenger'
-    if (winner == duelistB) result += ' in favor of Challenged'
+    if (winnerDuelist == duelistA) result += ' in favor of Challenger'
+    if (winnerDuelist == duelistB) result += ' in favor of Challenged'
     return result.replace('Challenger', nameA).replace('Challenged', nameB)
-  }, [state, winner, duelistA, duelistB, nameA, nameB])
+  }, [state, winnerDuelist, duelistA, duelistB, nameA, nameB])
 
   return {
     challengeDescription,
@@ -184,11 +185,13 @@ export const useChallengesByDuelist = (address: bigint) => {
         return acc;
       }, 0),
       winCount: challenges.reduce((acc, ch) => {
-        if (ch.state == ChallengeState.Resolved && ch.winner == address) acc++;
+        let winnerDuelist = (ch.winner == 1 ? ch.duelistA : ch.winner == 2 ? ch.duelistB : 0n)
+        if (ch.state == ChallengeState.Resolved && winnerDuelist == address) acc++;
         return acc;
       }, 0),
       loseCount: challenges.reduce((acc, ch) => {
-        if (ch.state == ChallengeState.Resolved && ch.winner != address) acc++;
+        let winnerDuelist = (ch.winner == 1 ? ch.duelistA : ch.winner == 2 ? ch.duelistB : 0n)
+        if (ch.state == ChallengeState.Resolved && winnerDuelist != address) acc++;
         return acc;
       }, 0),
     }

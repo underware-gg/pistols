@@ -30,7 +30,7 @@ struct Challenge {
     message: felt252,           // message to challenged
     // progress and results
     round_number: u8,           // current or final
-    winner: ContractAddress,    // if (state == ChallengeState.Resolved)
+    winner: u8,                 // 0: no winner, 1: Duelist A, 2: Duelist B
     // timestamps in unix epoch
     // a 32-bit timestamp will last 82 more years
     // Sunday, February 7, 2106 6:28:15 AM

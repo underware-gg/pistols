@@ -122,8 +122,6 @@ mod shooter {
     // Decide who wins a round
     //
     fn finish_round(ref challenge: Challenge, ref round: Round) {
-        let mut winner = utils::zero_address();
-
         // get damage for each player
         if (round.round_number == 1) {
             let (a, b) = pistols_shootout(round);
@@ -147,12 +145,12 @@ mod shooter {
         } else if (round.duelist_a.health == 0) {
             // A is dead!
             challenge.state = ChallengeState::Resolved.into();
-            challenge.winner = challenge.duelist_b;
+            challenge.winner = 2;
             challenge.timestamp_end = get_block_timestamp();
         } else if (round.duelist_b.health == 0) {
             // B is dead!
             challenge.state = ChallengeState::Resolved.into();
-            challenge.winner = challenge.duelist_a;
+            challenge.winner = 1;
             challenge.timestamp_end = get_block_timestamp();
         } else {
             // both alive!

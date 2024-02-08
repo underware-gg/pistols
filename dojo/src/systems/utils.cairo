@@ -87,10 +87,10 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         if (state == ChallengeState::Draw) {
             duelist_a.total_draws += 1;
             duelist_b.total_draws += 1;
-        } else if (challenge.duelist_a == challenge.winner) {
+        } else if (challenge.winner == 1) {
             duelist_a.total_wins += 1;
             duelist_b.total_losses += 1;
-        } else if (challenge.duelist_b == challenge.winner) {
+        } else if (challenge.winner == 2) {
             duelist_a.total_losses += 1;
             duelist_b.total_wins += 1;
         } else {

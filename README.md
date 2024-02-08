@@ -2,7 +2,7 @@
 
 A fully on-chain game, made with love with Dojo
 
-[Winner of the Dojo Game Jam #3](https://twitter.com/ohayo_dojo/status/1747626446720258059)
+Winner of the [Dojo Game Jam #3](https://twitter.com/ohayo_dojo/status/1747626446720258059)
 
 ```
                                           ~~^             ^J~                                                           

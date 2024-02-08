@@ -157,7 +157,7 @@ mod tests {
         utils::execute_reveal_move(system, other, duel_id, 1, salt_1_b, move_1_b);
         let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
         assert(challenge.state == ChallengeState::Resolved.into(), '4_challenge.state');
-        assert(challenge.winner != zero_address(), '4_challenge.winner');
+        assert(challenge.winner != 0, '4_challenge.winner');
         assert(challenge.round_number == 1, '4_challenge.round_number');
         assert(challenge.timestamp_end > 0, '4_challenge.timestamp_end');
         assert(round.round_number == 1, '4__round.round_number');
@@ -180,7 +180,7 @@ mod tests {
         assert(duelist_a.honour == (move_1_a * 10).into(), 'duelist_a.honour');
         assert(duelist_b.honour == (move_1_b * 10).into(), 'duelist_b.honour');
 
-        if (challenge.winner == owner) {
+        if (challenge.winner == 1) {
             assert(duelist_a.total_wins == 1, 'a_win_duelist_a.total_wins');
             assert(duelist_b.total_wins == 0, 'a_win_duelist_b.total_wins');
             assert(duelist_a.total_losses == 0, 'a_win_duelist_a.total_losses');
@@ -189,7 +189,7 @@ mod tests {
             assert(round.duelist_a.health > 0, 'a_win_health_a');
             assert(round.duelist_b.damage == constants::FULL_HEALTH, 'a_win_damage_b');
             assert(round.duelist_b.health == 0, 'a_win_health_b');
-        } else if (challenge.winner == other) {
+        } else if (challenge.winner == 2) {
             assert(duelist_a.total_wins == 0, 'b_win_duelist_a.total_wins');
             assert(duelist_b.total_wins == 1, 'b_win_duelist_b.total_wins');
             assert(duelist_a.total_losses == 1, 'b_win_duelist_a.total_losses');
@@ -211,7 +211,7 @@ mod tests {
         utils::execute_reveal_move(system, owner, duel_id, 1, salt_1_a, move_1_a);
         let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
         assert(challenge.state == ChallengeState::Resolved.into(), '4_challenge.state');
-        assert(challenge.winner != zero_address(), '4_challenge.winner');
+        assert(challenge.winner != 0, '4_challenge.winner');
         assert(challenge.round_number == 1, '4_challenge.round_number');
         assert(challenge.timestamp_end > 0, '4_challenge.timestamp_end');
         assert(round.round_number == 1, '4__round.round_number');
@@ -227,12 +227,12 @@ mod tests {
         assert(duelist_a.honour == (move_1_a * 10).into(), '__duelist_a.honour');
         assert(duelist_b.honour == (move_1_b * 10).into(), '__duelist_b.honour');
 
-        if (challenge.winner == owner) {
+        if (challenge.winner == 1) {
             assert(duelist_a.total_wins == 2, '__a_win_duelist_a.total_wins');
             assert(duelist_b.total_wins == 0, '__a_win_duelist_b.total_wins');
             assert(duelist_a.total_losses == 0, '__a_win_duelist_a.total_losses');
             assert(duelist_b.total_losses == 2, '__a_win_duelist_b.total_losses');
-        } else if (challenge.winner == other) {
+        } else if (challenge.winner == 2) {
             assert(duelist_a.total_wins == 0, '__b_win_duelist_a.total_wins');
             assert(duelist_b.total_wins == 2, '__b_win_duelist_b.total_wins');
             assert(duelist_a.total_losses == 2, '__b_win_duelist_a.total_losses');
@@ -630,7 +630,7 @@ mod tests {
         assert(duelist_a.honour == (steps_a * 10).into(), 'duelist_a.honour');
         assert(duelist_b.honour == (steps_b * 10).into(), 'duelist_b.honour');
 
-        if (challenge.winner == owner) {
+        if (challenge.winner == 1) {
             assert(duelist_a.total_wins == 1, 'a_win_duelist_a.total_wins');
             assert(duelist_b.total_wins == 0, 'a_win_duelist_b.total_wins');
             assert(duelist_a.total_losses == 0, 'a_win_duelist_a.total_losses');
@@ -639,7 +639,7 @@ mod tests {
             assert(round.duelist_a.health > 0, 'a_win_health_a');
             assert(round.duelist_b.damage == constants::FULL_HEALTH, 'a_win_damage_b');
             assert(round.duelist_b.health == 0, 'a_win_health_b');
-        } else if (challenge.winner == other) {
+        } else if (challenge.winner == 2) {
             assert(duelist_a.total_wins == 0, 'b_win_duelist_a.total_wins');
             assert(duelist_b.total_wins == 1, 'b_win_duelist_b.total_wins');
             assert(duelist_a.total_losses == 1, 'b_win_duelist_a.total_losses');
@@ -739,7 +739,7 @@ mod tests {
             constants::FULL_HEALTH, BLADES::LIGHT, // duelist_a
             constants::FULL_HEALTH, BLADES::LIGHT, // duelist_b
         );
-        assert(challenge.winner == zero_address(), 'bad winner');
+        assert(challenge.winner == 0, 'bad winner');
         assert(round.duelist_a.health == constants::HALF_HEALTH, 'bad health_a');
         assert(round.duelist_b.health == constants::HALF_HEALTH, 'bad health_b');
     }
@@ -752,7 +752,7 @@ mod tests {
             constants::FULL_HEALTH, BLADES::LIGHT, // duelist_a
             constants::HALF_HEALTH, BLADES::LIGHT, // duelist_b
         );
-        assert(challenge.winner == challenge.duelist_a, 'bad winner');
+        assert(challenge.winner == 1, 'bad winner');
         assert(round.duelist_a.health == constants::HALF_HEALTH, 'bad health_a');
         assert(round.duelist_b.health == 0, 'bad health_b');
     }
@@ -765,7 +765,7 @@ mod tests {
             constants::HALF_HEALTH, BLADES::LIGHT, // duelist_a
             constants::FULL_HEALTH, BLADES::LIGHT, // duelist_b
         );
-        assert(challenge.winner == challenge.duelist_b, 'bad winner');
+        assert(challenge.winner == 2, 'bad winner');
         assert(round.duelist_a.health == 0, 'bad health_a');
         assert(round.duelist_b.health == constants::HALF_HEALTH, 'bad health_b');
     }
@@ -779,7 +779,7 @@ mod tests {
             constants::FULL_HEALTH, BLADES::LIGHT,
             constants::HALF_HEALTH, BLADES::BLOCK,
         );
-        assert(challenge.winner == zero_address(), 'wrong winner');
+        assert(challenge.winner == 0, 'wrong winner');
         assert(round.duelist_a.health == constants::FULL_HEALTH, 'bad health_a');
         assert(round.duelist_b.health == constants::HALF_HEALTH, 'bad health_b');
     }
@@ -790,7 +790,7 @@ mod tests {
             constants::HALF_HEALTH, BLADES::BLOCK,
             constants::FULL_HEALTH, BLADES::LIGHT,
         );
-        assert(challenge.winner == zero_address(), 'wrong winner');
+        assert(challenge.winner == 0, 'wrong winner');
         assert(round.duelist_a.health == constants::HALF_HEALTH, 'bad health_a');
         assert(round.duelist_b.health == constants::FULL_HEALTH, 'bad health_b');
     }
@@ -804,7 +804,7 @@ mod tests {
             constants::FULL_HEALTH, BLADES::LIGHT,
             constants::HALF_HEALTH, BLADES::HEAVY,
         );
-        assert(challenge.winner == challenge.duelist_a, 'wrong winner');
+        assert(challenge.winner == 1, 'wrong winner');
         assert(round.duelist_a.health == constants::FULL_HEALTH, 'bad health_a');
         assert(round.duelist_b.health == 0, 'bad health_b');
     }
@@ -817,7 +817,7 @@ mod tests {
             constants::FULL_HEALTH, BLADES::LIGHT,
             constants::FULL_HEALTH, BLADES::HEAVY,
         );
-        assert(challenge.winner == challenge.duelist_b, 'wrong winner');
+        assert(challenge.winner == 2, 'wrong winner');
         assert(round.duelist_a.health == 0, 'bad health_a');
         assert(round.duelist_b.health == constants::HALF_HEALTH, 'bad health_b');
     }
@@ -830,7 +830,7 @@ mod tests {
             constants::HALF_HEALTH, BLADES::HEAVY,
             constants::FULL_HEALTH, BLADES::LIGHT,
         );
-        assert(challenge.winner == challenge.duelist_b, 'wrong winner');
+        assert(challenge.winner == 2, 'wrong winner');
         assert(round.duelist_a.health == 0, 'bad health_a');
         assert(round.duelist_b.health == constants::FULL_HEALTH, 'bad health_b');
     }
@@ -843,7 +843,7 @@ mod tests {
             constants::FULL_HEALTH, BLADES::HEAVY,
             constants::FULL_HEALTH, BLADES::LIGHT,
         );
-        assert(challenge.winner == challenge.duelist_a, 'wrong winner');
+        assert(challenge.winner == 1, 'wrong winner');
         assert(round.duelist_a.health == constants::HALF_HEALTH, 'bad health_a');
         assert(round.duelist_b.health == 0, 'bad health_b');
     }
@@ -857,7 +857,7 @@ mod tests {
             constants::FULL_HEALTH, BLADES::HEAVY,
             constants::FULL_HEALTH, BLADES::HEAVY,
         );
-        assert(challenge.winner == zero_address(), 'wrong winner');
+        assert(challenge.winner == 0, 'wrong winner');
         assert(round.duelist_a.health == 0, 'bad health_a');
         assert(round.duelist_b.health == 0, 'bad health_b');
     }
@@ -871,7 +871,7 @@ mod tests {
             constants::FULL_HEALTH, BLADES::HEAVY,
             constants::FULL_HEALTH, BLADES::BLOCK,
         );
-        assert(challenge.winner == challenge.duelist_a, 'wrong winner');
+        assert(challenge.winner == 1, 'wrong winner');
         assert(round.duelist_a.health == constants::FULL_HEALTH, 'bad health_a');
         assert(round.duelist_b.health == 0, 'bad health_b');
     }
@@ -884,7 +884,7 @@ mod tests {
             constants::FULL_HEALTH, BLADES::BLOCK,
             constants::FULL_HEALTH, BLADES::HEAVY,
         );
-        assert(challenge.winner == challenge.duelist_b, 'wrong winner');
+        assert(challenge.winner == 2, 'wrong winner');
         assert(round.duelist_a.health == 0, 'bad health_a');
         assert(round.duelist_b.health == constants::FULL_HEALTH, 'bad health_b');
     }
