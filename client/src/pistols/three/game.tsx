@@ -69,6 +69,14 @@ let _sceneName: SceneName
 
 let _sfxEnabled = true
 
+const _tweens = {
+  cameraPos: null,
+  actorPosA: null,
+  actorPosB: null,
+  staticZoom: null,
+  staticFade: null,
+}
+
 
 export function dispose() {
   if (_animationRequest) cancelAnimationFrame(_animationRequest)
@@ -278,6 +286,25 @@ export function resetDuelScene() {
   playActorAnimation('B', AnimName.STILL)
 }
 
+export function resetStaticScene() {
+  if (_tweens.staticZoom) TWEEN.remove(_tweens.staticZoom)
+  if (_tweens.staticFade) TWEEN.remove(_tweens.staticFade)
+  let bg = _currentScene.children[0] as THREE.Mesh
+  // zoom out
+  let from = 1.1
+  bg.scale.set(from, from, from)
+  _tweens.staticZoom = new TWEEN.Tween(bg.scale)
+    .to({ x: 1, y: 1, z: 1 }, 60_000)
+    .easing(TWEEN.Easing.Cubic.Out)
+    .start()
+  // fade in
+  let mat = bg.material as THREE.MeshBasicMaterial
+  mat.color = new THREE.Color(0.25, 0.25, 0.25)
+  _tweens.staticFade = new TWEEN.Tween(mat.color)
+    .to({ r: 1, g: 1, b: 1 }, 2_000)
+    .easing(TWEEN.Easing.Cubic.Out)
+    .start()
+}
 
 
 
@@ -290,6 +317,8 @@ export function switchScene(sceneName) {
   _currentScene = _scenes[sceneName]
   if (sceneName == SceneName.Duel) {
     resetDuelScene()
+  } else {
+    resetStaticScene()
   }
 }
 
@@ -337,11 +366,6 @@ export function playActorAnimation(actorId: string, key: AnimName, callback: Fun
 //----------------
 // Animation triggers
 //
-const _tweens = {
-  cameraPos: null,
-  actorPosA: null,
-  actorPosB: null,
-}
 
 export function zoomCameraToPaces(paceCount, seconds) {
   const targetPos = {
