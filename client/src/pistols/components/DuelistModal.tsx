@@ -43,7 +43,7 @@ export default function DuelistModal() {
   const _close = () => { dispatchSelectDuelist(0n) }
   const _challenge = () => {
     if (challengeArgs) {
-      create_challenge(account, duelistAddress, '', challengeArgs.message, challengeArgs.expire_seconds)
+      create_challenge(account, duelistAddress, challengeArgs.message, challengeArgs.expire_seconds)
     }
   }
 

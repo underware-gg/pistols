@@ -71,12 +71,6 @@ export function createSystemCalls(
 
   // read-only calls
 
-  const get_timestamp = async (): Promise<number | null> => {
-    const args = []
-    const result = await _executeCall('get_timestamp', args)
-    return result ? Number(result) : null
-  }
-
   const get_pact = async (duelist_a: bigint, duelist_b: bigint): Promise<bigint | null> => {
     const args = [duelist_a, duelist_b]
     const result = await _executeCall('get_pact', args)
@@ -90,7 +84,6 @@ export function createSystemCalls(
     commit_move,
     reveal_move,
     // read-only calls
-    get_timestamp,
     get_pact,
   }
 }

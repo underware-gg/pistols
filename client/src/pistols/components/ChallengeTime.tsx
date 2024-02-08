@@ -10,17 +10,17 @@ export function ChallengeTime({
 }) {
   const {
     isAwaiting, isLive, isFinished, isCanceled,
-    timestamp, timestamp_expire, timestamp_start, timestamp_end,
+    timestamp_start, timestamp_end,
   } = useChallenge(duelId)
 
   const { clientTimestamp } = useClientTimestamp(isAwaiting || isLive)
 
   const date = useMemo(() => {
-    if (isAwaiting) return EMOJI.AWAITING + ' ' + formatTimestampDelta(clientTimestamp, timestamp_expire)
+    if (isAwaiting) return EMOJI.AWAITING + ' ' + formatTimestampDelta(clientTimestamp, timestamp_end)
     if (isLive) return EMOJI.IN_PROGRESS + ' ' + formatTimestampDelta(timestamp_start, clientTimestamp)
     if (isCanceled || isFinished) return (prefixed ? 'Finished at ' : '') + formatTimestamp(timestamp_end)
-    return formatTimestamp(timestamp)
-  }, [isAwaiting, isCanceled, isLive, isFinished, timestamp, timestamp_expire, timestamp_start, timestamp_end, clientTimestamp])
+    return formatTimestamp(timestamp_start)
+  }, [isAwaiting, isCanceled, isLive, isFinished, timestamp_start, timestamp_end, clientTimestamp])
 
   return <span>{date}</span>
 }

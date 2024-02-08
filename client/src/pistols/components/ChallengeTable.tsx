@@ -110,14 +110,14 @@ function DuelItem({
   compact = false,
 }) {
   const {
-    duelistA, duelistB, state, isLive, isCanceled, isExpired, isDraw, winner, timestamp,
+    duelistA, duelistB, state, isLive, isCanceled, isExpired, isDraw, winner, timestamp_start,
   } = useChallenge(duelId)
   const { name: nameA, profilePic: profilePicA } = useDuelist(duelistA)
   const { name: nameB, profilePic: profilePicB } = useDuelist(duelistB)
 
   useEffect(() => {
-    sortCallback(duelId, state, timestamp)
-  }, [state, timestamp])
+    sortCallback(duelId, state, timestamp_start)
+  }, [state, timestamp_start])
 
   const winnerIsA = useMemo(() => (winner == 1), [winner])
   const winnerIsB = useMemo(() => (winner == 2), [winner])

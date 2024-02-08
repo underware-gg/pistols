@@ -7,7 +7,6 @@ use pistols::types::challenge::{ChallengeState};
 struct Duelist {
     #[key]
     address: ContractAddress,
-    timestamp: u64,   // Unix time, 1st registered
     name: felt252,
     profile_pic: u8,
     total_duels: u32,
@@ -16,6 +15,7 @@ struct Duelist {
     total_draws: u32,
     total_honour: u32,  // sum of al duels Honour
     honour: u8,         // +1 decimal, eg: 100 = 10.0
+    timestamp: u64,     // Unix time, 1st registered
 }
 
 //
@@ -24,18 +24,16 @@ struct Duelist {
 struct Challenge {
     #[key]
     duel_id: u128,
-    state: u8,                  // actually a ChallengeState
     duelist_a: ContractAddress, // Challenger
     duelist_b: ContractAddress, // Challenged
     message: felt252,           // message to challenged
     // progress and results
+    state: u8,                  // actually a ChallengeState
     round_number: u8,           // current or final
-    winner: u8,                 // 0: no winner, 1: Duelist A, 2: Duelist B
+    winner: u8,                 // 0:draw, 1:duelist_a, 2:duelist_b
     // timestamps in unix epoch
     // a 32-bit timestamp will last 82 more years
     // Sunday, February 7, 2106 6:28:15 AM
-    timestamp: u64,             // Unix time, created
-    timestamp_expire: u64,      // Unix time, challenge expiration
     timestamp_start: u64,       // Unix time, started
     timestamp_end: u64,         // Unix time, ended
 }

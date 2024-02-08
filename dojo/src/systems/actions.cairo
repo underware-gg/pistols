@@ -40,7 +40,6 @@ trait IActions<TContractState> {
 
     //
     // read-only calls
-    fn get_timestamp(self: @TContractState) -> u64;
     fn get_pact(self: @TContractState,
         duelist_a: ContractAddress,
         duelist_b: ContractAddress,
@@ -118,23 +117,21 @@ mod actions {
 
             // let duel_id: u32 = world.uuid();
             let duel_id: u128 = make_seed(caller);
-            let timestamp: u64 = get_block_timestamp();
-            let timestamp_expire: u64 = if (expire_seconds == 0) { 0 } else { timestamp + expire_seconds };
+            let timestamp_start: u64 = get_block_timestamp();
+            let timestamp_end: u64 = if (expire_seconds == 0) { 0 } else { timestamp_start + expire_seconds };
 
             let challenge = Challenge {
                 duel_id,
-                state: ChallengeState::Awaiting.into(),
                 duelist_a: caller,
                 duelist_b: challenged,
                 message,
                 // progress
+                state: ChallengeState::Awaiting.into(),
                 round_number: 0,
                 winner: 0,
                 // times
-                timestamp,
-                timestamp_expire,
-                timestamp_start: 0,
-                timestamp_end: 0,
+                timestamp_start,   // chalenge issued
+                timestamp_end,     // expire
             };
 
             utils::set_challenge(world, challenge);
@@ -159,7 +156,7 @@ mod actions {
 
             let timestamp: u64 = get_block_timestamp();
 
-            if (challenge.timestamp_expire > 0 && timestamp > challenge.timestamp_expire) {
+            if (challenge.timestamp_end > 0 && timestamp > challenge.timestamp_end) {
                 challenge.state = ChallengeState::Expired.into();
                 challenge.timestamp_end = timestamp;
             } else if (caller == challenge.duelist_a) {
@@ -176,6 +173,7 @@ mod actions {
                     challenge.state = ChallengeState::InProgress.into();
                     challenge.round_number = 1;
                     challenge.timestamp_start = timestamp;
+                    challenge.timestamp_end = 0;
                 }
             }
             // update challenge state
@@ -213,10 +211,6 @@ mod actions {
         //------------------------------------
         // read-only calls
         //
-
-        fn get_timestamp(self: @ContractState) -> u64 {
-            (get_block_timestamp())
-        }
 
         fn get_pact(self: @ContractState,
             duelist_a: ContractAddress,

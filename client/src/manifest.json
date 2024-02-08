@@ -949,7 +949,7 @@
     {
       "name": "pistols::systems::actions::actions",
       "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
-      "class_hash": "0x95a6c0093c22f3906f641bab93ca95158dd0ef570d0c72f1816a2c4c320dc3",
+      "class_hash": "0x65c3b50ac90469b3eb4f1196a01113911d35d0c07e26a50e803a6a71664c8f7",
       "abi": [
         {
           "type": "impl",
@@ -1091,10 +1091,6 @@
                   "type": "core::starknet::contract_address::ContractAddress"
                 },
                 {
-                  "name": "pass_code",
-                  "type": "core::felt252"
-                },
-                {
                   "name": "message",
                   "type": "core::felt252"
                 },
@@ -1172,17 +1168,6 @@
                 }
               ],
               "outputs": [],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_timestamp",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::integer::u64"
-                }
-              ],
               "state_mutability": "view"
             },
             {
@@ -1302,11 +1287,6 @@
           "key": true
         },
         {
-          "name": "state",
-          "type": "u8",
-          "key": false
-        },
-        {
           "name": "duelist_a",
           "type": "ContractAddress",
           "key": false
@@ -1322,8 +1302,8 @@
           "key": false
         },
         {
-          "name": "pass_code",
-          "type": "felt252",
+          "name": "state",
+          "type": "u8",
           "key": false
         },
         {
@@ -1333,17 +1313,7 @@
         },
         {
           "name": "winner",
-          "type": "ContractAddress",
-          "key": false
-        },
-        {
-          "name": "timestamp",
-          "type": "u64",
-          "key": false
-        },
-        {
-          "name": "timestamp_expire",
-          "type": "u64",
+          "type": "u8",
           "key": false
         },
         {
@@ -1357,7 +1327,7 @@
           "key": false
         }
       ],
-      "class_hash": "0x6cf024095980d4b91b7bf3fccb548785f991a209fe574aa3d2caa0016135577",
+      "class_hash": "0x55dbc146cb3e3458130f0f9ab6ebd917df73ee93eb3087de9b5b898a8b7b60f",
       "abi": [
         {
           "type": "impl",
@@ -1537,10 +1507,6 @@
               "type": "core::integer::u128"
             },
             {
-              "name": "state",
-              "type": "core::integer::u8"
-            },
-            {
               "name": "duelist_a",
               "type": "core::starknet::contract_address::ContractAddress"
             },
@@ -1553,8 +1519,8 @@
               "type": "core::felt252"
             },
             {
-              "name": "pass_code",
-              "type": "core::felt252"
+              "name": "state",
+              "type": "core::integer::u8"
             },
             {
               "name": "round_number",
@@ -1562,15 +1528,7 @@
             },
             {
               "name": "winner",
-              "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
-              "name": "timestamp",
-              "type": "core::integer::u64"
-            },
-            {
-              "name": "timestamp_expire",
-              "type": "core::integer::u64"
+              "type": "core::integer::u8"
             },
             {
               "name": "timestamp_start",
@@ -1617,11 +1575,6 @@
           "key": true
         },
         {
-          "name": "timestamp",
-          "type": "u64",
-          "key": false
-        },
-        {
           "name": "name",
           "type": "felt252",
           "key": false
@@ -1660,9 +1613,14 @@
           "name": "honour",
           "type": "u8",
           "key": false
+        },
+        {
+          "name": "timestamp",
+          "type": "u64",
+          "key": false
         }
       ],
-      "class_hash": "0x7051ceee1637f5823025dbf02b41fc3a24ef09f404de91687aa52aaf608198c",
+      "class_hash": "0x21958df4d9afa327235b94d5bc69b18b8ad161c0d311795c0c1628c8ceca444",
       "abi": [
         {
           "type": "impl",
@@ -1842,10 +1800,6 @@
               "type": "core::starknet::contract_address::ContractAddress"
             },
             {
-              "name": "timestamp",
-              "type": "core::integer::u64"
-            },
-            {
               "name": "name",
               "type": "core::felt252"
             },
@@ -1876,6 +1830,10 @@
             {
               "name": "honour",
               "type": "core::integer::u8"
+            },
+            {
+              "name": "timestamp",
+              "type": "core::integer::u64"
             }
           ]
         },

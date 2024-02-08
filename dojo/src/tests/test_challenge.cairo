@@ -81,15 +81,14 @@ mod tests {
     fn test_challenge_address() {
         let (world, system, owner, other) = utils::setup_world();
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
+        let timestamp = utils::get_block_timestamp();
         let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, 0);
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'state');
         assert(ch.duelist_a == owner, 'challenged');
         assert(ch.duelist_b == other, 'challenged');
         assert(ch.message == MESSAGE_1, 'message');
-        assert(ch.timestamp > 0, 'timestamp');
-        assert(ch.timestamp_expire == 0, 'timestamp_expire');
-        assert(ch.timestamp_start == 0, 'timestamp_start');
+        assert(ch.timestamp_start == timestamp, 'timestamp_start');
         assert(ch.timestamp_end == 0, 'timestamp_end');
     }
 
@@ -99,12 +98,11 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         let expire_seconds: u64 = 24 * 60 * 60;
+        let timestamp = utils::get_block_timestamp();
         let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, expire_seconds);
         let ch = utils::get_Challenge(world, duel_id);
-        assert(ch.timestamp > 0, 'timestamp');
-        assert(ch.timestamp_expire == ch.timestamp + expire_seconds, 'timestamp_expire');
-        assert(ch.timestamp_start == 0, 'timestamp_start');
-        assert(ch.timestamp_end == 0, 'timestamp_end');
+        assert(ch.timestamp_start == timestamp, 'timestamp_start');
+        assert(ch.timestamp_end == ch.timestamp_start + expire_seconds, 'timestamp_end');
     }
 
     #[test]
@@ -178,7 +176,7 @@ mod tests {
         assert(ch.state == new_state.into(), 'state');
         assert(ch.round_number == 0, 'round_number');
         assert(ch.winner == 0, 'winner');
-        assert(ch.timestamp_start == 0, 'timestamp_start');
+        assert(ch.timestamp_start > 0, 'timestamp_start');
         assert(ch.timestamp_end == timestamp, 'timestamp_end');
     }
 
@@ -217,7 +215,7 @@ mod tests {
         assert(ch.state == new_state.into(), 'state');
         assert(ch.round_number == 0, 'round_number');
         assert(ch.winner == 0, 'winner');
-        assert(ch.timestamp_start == 0, 'timestamp_start');
+        assert(ch.timestamp_start < timestamp, 'timestamp_start');
         assert(ch.timestamp_end == timestamp, 'timestamp_end');
     }
 
@@ -271,7 +269,7 @@ mod tests {
         assert(ch.state == new_state.into(), 'state');
         assert(ch.round_number == 0, 'round_number');
         assert(ch.winner == 0, 'winner');
-        assert(ch.timestamp_start == 0, 'timestamp_start');
+        assert(ch.timestamp_start < timestamp, 'timestamp_start');
         assert(ch.timestamp_end == timestamp, 'timestamp_end');
     }
 

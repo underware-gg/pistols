@@ -45,7 +45,7 @@ export const useLiveChallengeIds = (includeExpired = false) => {
   const { challengeIds: allChallengeIds } = useAllChallengeIds()
   const { clientTimestamp } = useClientTimestamp(false)
   const _check_expired = (componentValue: any) => {
-    if (!includeExpired && (componentValue.state == ChallengeState.Awaiting && componentValue.timestamp_expire < clientTimestamp)) {
+    if (!includeExpired && (componentValue.state == ChallengeState.Awaiting && componentValue.timestamp_end < clientTimestamp)) {
       return false
     }
     return true
@@ -87,14 +87,12 @@ export const useChallenge = (duelId: bigint | string) => {
   const message = useMemo(() => feltToString(challenge?.message ?? 0n), [challenge])
   const lords = useMemo(() => (challenge?.lords ?? 0), [challenge])
   const roundNumber = useMemo(() => (challenge?.round_number ?? 0), [challenge])
-  const timestamp = useMemo(() => (challenge?.timestamp ?? 0), [challenge])
-  const timestamp_expire = useMemo(() => (challenge?.timestamp_expire ?? 0), [challenge])
   const timestamp_start = useMemo(() => (challenge?.timestamp_start ?? 0), [challenge])
   const timestamp_end = useMemo(() => (challenge?.timestamp_end ?? 0), [challenge])
 
-  // const isExpired = (state == ChallengeState.Expired || (state == ChallengeState.Awaiting && timestamp_expire < clientTimestamp))
+  // const isExpired = (state == ChallengeState.Expired || (state == ChallengeState.Awaiting && timestamp_end < clientTimestamp))
   const { clientTimestamp } = useClientTimestamp(false)
-  if (state == ChallengeState.Awaiting && (timestamp_expire < clientTimestamp)) {
+  if (state == ChallengeState.Awaiting && (timestamp_end < clientTimestamp)) {
     state = ChallengeState.Expired
   }
 
@@ -120,8 +118,6 @@ export const useChallenge = (duelId: bigint | string) => {
     isCanceled: (state == ChallengeState.Withdrawn || state == ChallengeState.Refused),
     isExpired: (state == ChallengeState.Expired),
     // times
-    timestamp,
-    timestamp_expire,
     timestamp_start,
     timestamp_end,
   }

@@ -7,11 +7,11 @@ export function defineContractComponents(world: World) {
 	  Challenge: (() => {
 	    return defineComponent(
 	      world,
-	      { duel_id: RecsType.BigInt, state: RecsType.Number, duelist_a: RecsType.BigInt, duelist_b: RecsType.BigInt, message: RecsType.BigInt, pass_code: RecsType.BigInt, round_number: RecsType.Number, winner: RecsType.BigInt, timestamp: RecsType.Number, timestamp_expire: RecsType.Number, timestamp_start: RecsType.Number, timestamp_end: RecsType.Number },
+	      { duel_id: RecsType.BigInt, duelist_a: RecsType.BigInt, duelist_b: RecsType.BigInt, message: RecsType.BigInt, state: RecsType.Number, round_number: RecsType.Number, winner: RecsType.Number, timestamp_start: RecsType.Number, timestamp_end: RecsType.Number },
 	      {
 	        metadata: {
 	          name: "Challenge",
-	          types: ["u128","u8","contractaddress","contractaddress","felt252","felt252","u8","contractaddress","u64","u64","u64","u64"],
+	          types: ["u128","contractaddress","contractaddress","felt252","u8","u8","u8","u64","u64"],
 	          customTypes: [],
 	        },
 	      }
@@ -20,11 +20,11 @@ export function defineContractComponents(world: World) {
 	  Duelist: (() => {
 	    return defineComponent(
 	      world,
-	      { address: RecsType.BigInt, timestamp: RecsType.Number, name: RecsType.BigInt, profile_pic: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, total_honour: RecsType.Number, honour: RecsType.Number },
+	      { address: RecsType.BigInt, name: RecsType.BigInt, profile_pic: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, total_honour: RecsType.Number, honour: RecsType.Number, timestamp: RecsType.Number },
 	      {
 	        metadata: {
 	          name: "Duelist",
-	          types: ["contractaddress","u64","felt252","u8","u32","u32","u32","u32","u32","u8"],
+	          types: ["contractaddress","felt252","u8","u32","u32","u32","u32","u32","u8","u64"],
 	          customTypes: [],
 	        },
 	      }

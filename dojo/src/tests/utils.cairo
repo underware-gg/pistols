@@ -115,11 +115,6 @@ mod utils {
     // read-only calls
     //
 
-    fn execute_get_timestamp(system: IActionsDispatcher) -> u64 {
-        let result: u64 = system.get_timestamp();
-        (result)
-    }
-
     fn execute_get_pact(system: IActionsDispatcher, a: ContractAddress, b: ContractAddress) -> u128 {
         let result: u128 = system.get_pact(a, b);
         (result)
