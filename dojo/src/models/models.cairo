@@ -9,10 +9,10 @@ struct Duelist {
     address: ContractAddress,
     name: felt252,
     profile_pic: u8,
-    total_duels: u32,
-    total_wins: u32,
-    total_losses: u32,
-    total_draws: u32,
+    total_duels: u16,
+    total_wins: u16,
+    total_losses: u16,
+    total_draws: u16,
     total_honour: u32,  // sum of al duels Honour
     honour: u8,         // +1 decimal, eg: 100 = 10.0
     timestamp: u64,     // Unix time, 1st registered

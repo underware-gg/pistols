@@ -24,7 +24,7 @@ export function defineContractComponents(world: World) {
 	      {
 	        metadata: {
 	          name: "Duelist",
-	          types: ["contractaddress","felt252","u8","u32","u32","u32","u32","u32","u8","u64"],
+	          types: ["contractaddress","felt252","u8","u16","u16","u16","u16","u32","u8","u64"],
 	          customTypes: [],
 	        },
 	      }
