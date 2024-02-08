@@ -1,14 +1,13 @@
 import { useState, useRef } from 'react'
 import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
-import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
+import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 
 export const ThreeJsCanvas = ({
-  width = 200,
-  height = 200,
+  width = 960,
+  height = 540,
   guiEnabled = false,
-  gameImpl,
 }) => {
-  const { dispatchGameImpl } = useGameplayContext()
+  const { game, dispatchGameImpl } = useThreeJsContext()
   const [isLoading, setIsLoading] = useState(false)
   const [isRunning, setIsRunning] = useState(false)
   const canvasRef = useRef()
@@ -16,15 +15,16 @@ export const ThreeJsCanvas = ({
   useEffectOnce(() => {
     let _mounted = true
     const _initialize = async () => {
-      await gameImpl.init(canvasRef.current, width, height, guiEnabled)
-      if (!_mounted) return
-      gameImpl.animate()
-      // game.resetGameParams(gameParams)
-      setIsLoading(false)
-      setIsRunning(true)
-      dispatchGameImpl(gameImpl)
-      //@ts-ignore
-      canvasRef.current?.focus()
+      await game.init(canvasRef.current, width, height, guiEnabled)
+      if (_mounted) {
+        game.animate(0)
+        // game.resetGameParams(gameParams)
+        setIsLoading(false)
+        setIsRunning(true)
+        dispatchGameImpl(game)
+        //@ts-ignore
+        canvasRef.current?.focus()
+      }
     }
 
     if (canvasRef.current && !isLoading && !isRunning) {
@@ -34,8 +34,8 @@ export const ThreeJsCanvas = ({
 
     return () => {
       _mounted = false
-      if (isRunning && gameImpl) {
-        gameImpl.dispose()
+      if (isRunning && game) {
+        game.dispose()
         dispatchGameImpl(null)
       }
     }
@@ -50,7 +50,7 @@ export const ThreeJsCanvas = ({
       width={width * 2}
       height={height * 2}
     >
-      Canvas not supported by your browser.
+      Canvas not supported by your browser! 😱
     </canvas>
   )
 }

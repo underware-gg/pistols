@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Divider, Grid, Modal, Pagination } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { useMakeCommitMove } from '@/pistols/hooks/useCommitReveal'
 import { Blades, BladesNames } from '@/pistols/utils/pistols'
+import { signAndGenerateMoveHash } from '../utils/salt'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -13,22 +13,31 @@ export default function CommitModal({
   setIsOpen,
   duelId,
   roundNumber,
+}: {
+  isOpen: boolean
+  setIsOpen: Function
+  duelId: bigint
+  roundNumber: number
 }) {
   const { commit_move } = useDojoSystemCalls()
   const { account } = useDojoAccount()
 
-  const [selectedMove, setSelectedMove] = useState<number|string>(0)
-  const { hash, salt, move } = useMakeCommitMove(duelId, roundNumber, selectedMove)
+  const [selectedMove, setSelectedMove] = useState<number | string>(0)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     setSelectedMove(null)
   }, [isOpen])
 
-  const _submit = () => {
-    if (hash && salt && move) {
-      // console.log(`COMMIT`, duelId, roundNumber, hash, salt, move, pedersen(salt, move).toString(16))
-      commit_move(account, duelId, roundNumber, hash)
-      setIsOpen(false)
+  const _submit = async () => {
+    if (selectedMove) {
+      setIsSubmitting(true)
+      const hash = await signAndGenerateMoveHash(account, duelId, roundNumber, selectedMove)
+      if (hash) {
+        await commit_move(account, duelId, roundNumber, hash)
+        setIsOpen(false)
+      }
+      setIsSubmitting(false)
     }
   }
 
@@ -112,7 +121,7 @@ export default function CommitModal({
               <ActionButton fill label='Close' onClick={() => setIsOpen(false)} />
             </Col>
             <Col>
-              <ActionButton fill attention label='Commit!' disabled={!selectedMove} onClick={() => _submit()} />
+              <ActionButton fill attention label='Commit...' disabled={!selectedMove || isSubmitting} onClick={() => _submit()} />
             </Col>
           </Row>
         </Grid>

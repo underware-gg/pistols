@@ -1,14 +1,16 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
+import { DojoConfig, createDojoConfig } from '@dojoengine/core'
 import { DojoProvider } from '@/dojo/DojoContext'
 import { setup } from '@/dojo/setup'
+import { ThreeJsProvider } from '@/pistols/hooks/ThreeJsContext'
 import { GameplayProvider } from '@/pistols/hooks/GameplayContext'
+import { DojoStatus } from '@/pistols/components/account/DojoStatus'
 import App from '@/pistols/components/App'
-import { DojoStatus } from './account/DojoStatus'
-
+import manifest from '../../manifest.json'
 
 export default function AppDojo({
-  title=null,
+  title = null,
   backgroundImage = null,
   children,
 }) {
@@ -24,10 +26,26 @@ export default function AppDojo({
 function DojoSetup({ children }) {
   const [setupResult, setSetupResult] = useState(null)
 
+  const config: DojoConfig = useMemo(() => {
+    if (!process.env.NEXT_PUBLIC_NODE_URL) throw (`NEXT_PUBLIC_NODE_URL is null`)
+    if (!process.env.NEXT_PUBLIC_TORII) throw (`NEXT_PUBLIC_TORII is null`)
+    if (!process.env.NEXT_PUBLIC_MASTER_ADDRESS) throw (`NEXT_PUBLIC_MASTER_ADDRESS is not set`)
+    if (!process.env.NEXT_PUBLIC_MASTER_PRIVATE_KEY) throw (`NEXT_PUBLIC_MASTER_PRIVATE_KEY is not set`)
+    const result = {
+      ...createDojoConfig({ manifest }),
+      rpcUrl: process.env.NEXT_PUBLIC_NODE_URL,
+      toriiUrl: process.env.NEXT_PUBLIC_TORII,
+      masterAddress: process.env.NEXT_PUBLIC_MASTER_ADDRESS,
+      masterPrivateKey: process.env.NEXT_PUBLIC_MASTER_PRIVATE_KEY,
+    }
+    console.log(`DojoConfig:`, result)
+    return result
+  }, [])
+
   useEffectOnce(() => {
     let _mounted = true
     const _setup = async () => {
-      const result = await setup()
+      const result = await setup(config)
       if (_mounted) {
         setSetupResult(result)
       }
@@ -41,7 +59,7 @@ function DojoSetup({ children }) {
   if (!setupResult) {
     return (
       <>
-        <h1 className='TitleCase'>loading up...</h1>
+        <h1 className='TitleCase'>Loading Up...</h1>
         <h5><DojoStatus /></h5>
       </>
     )
@@ -49,9 +67,11 @@ function DojoSetup({ children }) {
 
   return (
     <DojoProvider value={setupResult}>
-      <GameplayProvider>
-        {children}
-      </GameplayProvider>
+      <ThreeJsProvider>
+        <GameplayProvider>
+          {children}
+        </GameplayProvider>
+      </ThreeJsProvider>
     </DojoProvider>
   );
 }

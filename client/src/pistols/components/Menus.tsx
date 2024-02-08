@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation'
 import { Grid, Menu, Label, Tab, TabPane } from 'semantic-ui-react'
 import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
 import { useChallengesByDuelist, useLiveChallengeIds } from '@/pistols/hooks/useChallenge'
-import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
+import { useThreeJsContext } from '../hooks/ThreeJsContext'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
@@ -40,17 +40,15 @@ export function MenuTavern({
 
   const panes = useMemo(() => {
     let result = []
-    Object.keys(tavernMenuItems).forEach(k => {
-      const key = parseInt(k)
-      const label = tavernMenuItems[key]
+    tavernMenuItems.forEach(key => {
       const bubble = (key == MenuKey.YourDuels) ? _makeBubble(yourDuelsCount) : (key == MenuKey.LiveDuels) ? _makeBubble(liveDuelsCount) : null
       result.push({
         menuItem: (
           <Menu.Item
-            key={label}
-            onClick={() => dispatchSetMenu(key)}
+            key={key}
+            onClick={() => dispatchSetMenu(key as MenuKey)}
           >
-            {label}
+            {key}
             {bubble}
           </Menu.Item>
         ),
@@ -68,6 +66,8 @@ export function MenuTavern({
     })
     return result
   }, [tavernMenuItems, yourDuelsCount, liveDuelsCount])
+
+  const menuIndex = tavernMenuItems.findIndex(k => (k == menuKey))
 
   return (
     <>
@@ -87,7 +87,7 @@ export function MenuTavern({
           </Col>
         </Row>
       </Grid>
-      <Tab activeIndex={menuKey} menu={{ secondary: true, pointing: true, attached: true }} panes={panes} />
+      <Tab activeIndex={menuIndex} menu={{ secondary: true, pointing: true, attached: true }} panes={panes} />
     </>
   )
 }
@@ -95,8 +95,8 @@ export function MenuTavern({
 export function MusicToggle({
 }) {
   const { settings, SettingsActions } = useSettingsContext()
-  const { hasLoadedAudioAssets } = useGameplayContext()
-  if (!hasLoadedAudioAssets) return <></>
+  const { audioLoaded } = useThreeJsContext()
+  if (!audioLoaded) return <></>
   return <SettingsIcon settingsKey={SettingsActions.MUSIC_ENABLED} value={settings.musicEnabled} nameOn='volume-on' nameOff='volume-off' icon/>
 }
 
@@ -139,7 +139,7 @@ export function MenuDebugAnimations() {
 }
 
 function MenuDebugTriggers() {
-  const { gameImpl } = useGameplayContext()
+  const { gameImpl } = useThreeJsContext()
 
   const _paces = (pacesCountA, paceCountB, healthA, healthB) => {
     gameImpl?.animateShootout(pacesCountA, paceCountB, healthA, healthB)
@@ -254,7 +254,7 @@ function MenuDebugTriggers() {
 function MenuDebugActors({
   actorId
 }) {
-  const { gameImpl } = useGameplayContext()
+  const { gameImpl } = useThreeJsContext()
 
   const _play = (key) => {
     gameImpl?.playActorAnimation(actorId, key)

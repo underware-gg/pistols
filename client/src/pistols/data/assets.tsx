@@ -1,12 +1,37 @@
 import * as THREE from 'three'
-
+import { SceneName } from '@/pistols/hooks/PistolsContext'
 
 //----------------------------
 // Texture Assets
 //
-const TEXTURES = {
-  TESTCARD: { path: '/textures/testcard.jpg' },
-  BG_DUEL: { path: '/images/bg_duel.jpg' },
+export enum TextureName {
+  Testcard = 'Testcard',
+  bg_gate = 'bg_gate',
+  bg_duelists = 'bg_duelists',
+  bg_duels_yours = 'bg_duels_yours',
+  bg_duels_live = 'BG_DUEL',
+  bg_duels_past = 'BG_bg_duels_pastDUEL',
+  bg_duel = 'bg_duel',
+}
+const TEXTURES: Record<TextureName, { path: string }> = {
+  [TextureName.Testcard]: { path: '/textures/testcard.jpg' },
+  [TextureName.bg_gate]: { path: '/images/bg_gate.jpg' },
+  [TextureName.bg_duelists]: { path: '/images/bg_duelists.jpg' },
+  [TextureName.bg_duels_yours]: { path: '/images/bg_duels_yours.jpg' },
+  [TextureName.bg_duels_live]: { path: '/images/bg_duels_live.jpg' },
+  [TextureName.bg_duels_past]: { path: '/images/bg_duels_past.jpg' },
+  [TextureName.bg_duel]: { path: '/images/bg_duel.jpg' },
+}
+
+export const sceneBackgrounds: Record<SceneName, TextureName> = {
+  [SceneName.Splash]: TextureName.bg_duel,
+  [SceneName.Gate]: TextureName.bg_gate,
+  [SceneName.Tavern]: TextureName.bg_duelists,
+  [SceneName.Duelists]: TextureName.bg_duelists,
+  [SceneName.YourDuels]: TextureName.bg_duels_yours,
+  [SceneName.LiveDuels]: TextureName.bg_duels_live,
+  [SceneName.PastDuels]: TextureName.bg_duels_past,
+  [SceneName.Duel]: TextureName.bg_duel,
 }
 
 enum CharacterType {

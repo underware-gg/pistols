@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Grid, Radio, Input, Divider, Button, Icon } from 'semantic-ui-react'
-import { useDojo, useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
+import { Grid, Radio, Input, Button, Icon } from 'semantic-ui-react'
+import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
 import { AccountShort } from '@/pistols/components/ui/Account'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
@@ -17,11 +17,9 @@ export function AccountsList() {
   const router = useRouter()
   const [burners] = useLocalStorageState('burners')
   const {
-    account: {
-      create, list, get, select, clear, applyFromClipboard,
-      account, isMasterAccount, masterAccount, isDeploying,
-    }
-  } = useDojo()
+    create, list, get, select, clear, applyFromClipboard,
+    account, isMasterAccount, masterAccount, isDeploying,
+  } = useDojoAccount()
   const { dispatchSetMenu } = usePistolsContext()
 
   const rows = useMemo(() => {
@@ -36,7 +34,7 @@ export function AccountsList() {
       result.push(
         <Row key='empty' columns={'equal'} textAlign='center'>
           <Col>
-            <h4>No accounts created</h4>
+            <h4 className='TitleCase Important'>Create an Account to Play</h4>
           </Col>
         </Row>
       )
@@ -44,13 +42,18 @@ export function AccountsList() {
     return result
   }, [account?.address, isDeploying, burners])
 
-  const _enter = (menuKey = MenuKey.YourDuels) => {
+  const _enter = (menuKey = MenuKey.Duelists) => {
     dispatchSetMenu(menuKey)
     router.push('/tavern')
   }
   const _enterAsGuest = () => {
     // select(masterAccount.address)
     _enter(MenuKey.LiveDuels)
+  }
+
+  const _clear = () => {
+    clear()
+    location.reload()
   }
 
   const { isRegistered } = useDuelist(account.address)
@@ -64,10 +67,10 @@ export function AccountsList() {
             <ActionButton fill disabled={isDeploying} onClick={() => create()} label='Create Account' />
           </Col>
           <Col>
-            <ActionButton fill disabled={isDeploying} onClick={() => applyFromClipboard()} label={<>Import&nbsp;&nbsp;<Icon name='paste' size='small'/></>} />
+            <ActionButton fill disabled={isDeploying} onClick={() => applyFromClipboard()} label={<>Import&nbsp;&nbsp;<Icon name='paste' size='small' /></>} />
           </Col>
           <Col>
-            <ActionButton fill disabled={isDeploying} onClick={() => clear()} label='Delete All' />
+            <ActionButton fill disabled={isDeploying} onClick={() => _clear()} label='Delete All' />
           </Col>
           {/* <Col>
             <ActionButton fill disabled={isDeploying} onClick={() => applyFromClipboard()} label='Restore' />
@@ -86,7 +89,7 @@ export function AccountsList() {
 
         <Row columns={'equal'} textAlign='center'>
           <Col>
-            <ActionButton fill large disabled={!canEnter} onClick={() => _enter()} label={!isRegistered ?'Check In to Enter':'Enter The Tavern'} />
+            <ActionButton fill large attention={isRegistered} disabled={!canEnter} onClick={() => _enter()} label={!isRegistered ? 'Check In to Enter' : 'Enter The Tavern'} />
           </Col>
         </Row>
 

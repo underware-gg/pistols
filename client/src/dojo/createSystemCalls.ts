@@ -6,7 +6,7 @@ import { Account } from 'starknet'
 export type SystemCalls = ReturnType<typeof createSystemCalls>;
 
 export function createSystemCalls(
-  { execute, call, provider, contractComponents }: SetupNetworkResult,
+  { execute, call, contractComponents }: SetupNetworkResult,
   // { Duelist, Duel }: ClientComponents,
 ) {
 
@@ -64,7 +64,7 @@ export function createSystemCalls(
     return await _executeTransaction(signer, 'commit_move', args)
   }
 
-  const reveal_move = async (signer: Account, duel_id: bigint, round_number: number, salt: number, move: number): Promise<boolean> => {
+  const reveal_move = async (signer: Account, duel_id: bigint, round_number: number, salt: bigint, move: number): Promise<boolean> => {
     const args = [duel_id, round_number, salt, move]
     return await _executeTransaction(signer, 'reveal_move', args)
   }

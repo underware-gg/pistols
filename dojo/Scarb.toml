@@ -4,19 +4,24 @@ description = "An on-chain pistol duelling game of honour and betrayal."
 icon_uri = "https://pistols.lootunder.world/images/logo.png"
 cover_uri = "https://pistols.lootunder.world/images/splash.png"
 website = "https://pistols.lootunder.world"
-socials.x = "https://twitter.com/lootunderworld"
+
+[tool.dojo.world.socials]
+x = "https://x.com/lootunderworld"
+github = "https://github.com/funDAOmental/pistols"
+# discord = "https://discord.gg/FB2wR6uF"
+# telegram = "https://t.me/dojoengine"
 
 [package]
-cairo-version = "2.4.0"
 name = "pistols"
-version = "0.3.2"
+version = "0.4.0"
+cairo-version = "2.4.0"
 
 [cairo]
 sierra-replace-ids = true
 
 [dependencies]
 # dojo = { git = "https://github.com/dojoengine/dojo.git", rev = "01eab985a3f5056e47cc7b4753ca24f64d3a078a" }
-dojo = { git = "https://github.com/dojoengine/dojo.git", tag = "v0.4.4" }
+dojo = { git = "https://github.com/dojoengine/dojo.git", tag = "v0.5.1" }
 
 
 [[target.dojo]]
@@ -29,10 +34,10 @@ world_address = "0x269c58e5fa1e7f6fe3756f1de88ecdfab7d03ba67e79ba0365b4ef1e81155
 
 # Development
 # rpc_url = "http://localhost:5050/"
-# account_address = "0x517ececd29116499f4a1b64b094da79ba08dfd54a3edaa316134c41f8160973"
-# private_key = "0x1800000000300000180000000000030000000000003006001800006600"
+# account_address = "0xb3ff441a68610b30fd5e2abbf3a1548eb6ba6f3559f2862bf2dc757e5828ca"
+# private_key = "0x2bbf4f9fd0bbb2e60b0316c1fe0b76cf7a4d0198bd493ced9b8df2a3a24d68a"
 
 # SLOT
-rpc_url = "https://api2.cartridge.gg/x/pistols/katana"
-account_address = "0x2e0e12a0275b03172bb09aafac8e288599678032493fef65adc1af87771bdaa"
-private_key = "0x3cfcac8524dd04d352479c89b5685b9f3b4e788e226305e1df18712154afd76"
+rpc_url = "https://api.cartridge.gg/x/pistols/katana"
+account_address = "0x4302ba4c41ba9715e9636adea320cfb53e9dacdfe0ffc3c1e86c0ef94e0dd0"
+private_key = "0x44b41835cb26e6e94c0f2b11b3de923f1b22910c062e61d44e797b8099cfaf5"

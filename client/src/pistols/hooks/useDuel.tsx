@@ -1,6 +1,7 @@
-import { useEffect, useMemo } from "react"
-import { useComponentValue } from "@dojoengine/react"
+import { useEffect, useMemo } from 'react'
+import { useComponentValue } from '@dojoengine/react'
 import { useDojoComponents } from '@/dojo/DojoContext'
+import { useThreeJsContext } from "./ThreeJsContext"
 import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
 import { useChallenge } from "@/pistols/hooks/useChallenge"
 import { keysToEntity } from '@/pistols/utils/utils'
@@ -87,7 +88,8 @@ export const useAnimatedDuel = (duelId: bigint | string) => {
   const result = useDuel(duelId)
   const { round1, round2, duelStage } = result
 
-  const { gameImpl, animated, hasLoadedAudioAssets, dispatchAnimated } = useGameplayContext()
+  const { gameImpl, audioLoaded } = useThreeJsContext()
+  const { animated, dispatchAnimated } = useGameplayContext()
 
   //-------------------------------------
   // Add intermediate animation DuelStage
@@ -110,11 +112,11 @@ export const useAnimatedDuel = (duelId: bigint | string) => {
   }, [currentStage])
 
   useEffect(() => {
-    if (gameImpl && isAnimatingPistols && hasLoadedAudioAssets) {
+    if (gameImpl && isAnimatingPistols && audioLoaded) {
       console.log(`TRIGGER animateShootout()`)
       gameImpl.animateShootout(round1.duelist_a.move, round1.duelist_b.move, round1.duelist_a.health, round1.duelist_b.health)
     }
-  }, [gameImpl, isAnimatingPistols, hasLoadedAudioAssets])
+  }, [gameImpl, isAnimatingPistols, audioLoaded])
 
   useEffect(() => {
     if (gameImpl && isAnimatingBlades) {
