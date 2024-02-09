@@ -481,7 +481,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 .ModalText {
-  font-size: 16px;
+  font-size: 20px;
 }
 
 // .TableHeader {
@@ -819,6 +819,10 @@ $logo-url: '/logos/logo_avante.svg';
 	to { -webkit-transform: scale(1); }
 }
 
+.ChancesBar {
+  width: 450px;
+  margin: auto!important;
+}
 
 
 //--------------------
@@ -1170,10 +1174,20 @@ a.active.step:hover,
   @extend ._round_border;
   background-color: $color-dark;
 }
-// .ui.steps .step.active {
-//   background-color: $color-positive;
+//
+// <ProgressBar>
+.ui.progress .bar {
+  background-color: $color-important;
+}
+// .ui.disaled.progress .bar {
+//   background-color: $color-inactive;
 // }
-
-// .green {
-//   color: $color-positive;
-// }
+.ui.progress .bar>.progress {
+  @extend .TitleCase;
+  font-family: $font-family;
+  font-weight: 600;
+  font-size: 1.25em;
+  color: $color-brightest;
+  margin-top: -0.65em;
+  margin-right: -0.2em;
+}

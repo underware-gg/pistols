@@ -14,7 +14,8 @@ import { BladesNames, FULL_HEALTH, HALF_HEALTH } from '@/pistols/utils/pistols'
 import { MenuDuel } from '@/pistols/components/Menus'
 import { AnimationState } from '@/pistols/three/game'
 import { EmojiIcon } from '@/pistols/components/ui/Icons'
-import CommitModal from '@/pistols/components/CommitModal'
+import CommitStepsModal from '@/pistols/components/CommitStepsModal'
+import CommitBladesModal from '@/pistols/components/CommitBladesModal'
 import RevealModal from '@/pistols/components/RevealModal'
 import { EMOJI } from '@/pistols/data/messages'
 
@@ -193,7 +194,8 @@ function DuelProgress({
   //------------------------------
   return (
     <>
-      <CommitModal duelId={duelId} roundNumber={roundNumber} isOpen={commitModalIsOpen} setIsOpen={setCommitModalIsOpen} />
+      <CommitStepsModal duelId={duelId} isOpen={roundNumber == 1 && commitModalIsOpen} setIsOpen={setCommitModalIsOpen} />
+      <CommitBladesModal duelId={duelId} isOpen={roundNumber == 2 && commitModalIsOpen} setIsOpen={setCommitModalIsOpen} />
       <RevealModal duelId={duelId} roundNumber={roundNumber} isOpen={revealModalIsOpen} hash={currentRoundMove?.hash} setIsOpen={setRevealModalIsOpen} />
       <Step.Group vertical size='small'>
         <ProgressItem

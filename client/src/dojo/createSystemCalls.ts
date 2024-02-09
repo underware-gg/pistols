@@ -1,7 +1,7 @@
 import { getEvents, setComponentsFromEvents, decodeComponent } from '@dojoengine/utils'
 import { SetupNetworkResult } from './setupNetwork'
 import { stringToFelt } from '@/pistols/utils/starknet'
-import { Account } from 'starknet'
+import { Account, num } from 'starknet'
 
 export type SystemCalls = ReturnType<typeof createSystemCalls>;
 
@@ -29,7 +29,7 @@ export function createSystemCalls(
     return success
   }
 
-  const _executeCall = async (system: string, args: any[]): Promise<bigint | null> => {
+  const _executeCall = async (system: string, args: any[]): Promise<any | null> => {
     let result = null
     try {
       const eventData = await call('actions', system, args)
@@ -73,8 +73,26 @@ export function createSystemCalls(
 
   const get_pact = async (duelist_a: bigint, duelist_b: bigint): Promise<bigint | null> => {
     const args = [duelist_a, duelist_b]
-    const result = await _executeCall('get_pact', args)
+    const result = await _executeCall('get_pact', args) as bigint
     return result ?? null
+  }
+
+  const has_pact = async (duelist_a: bigint, duelist_b: bigint): Promise<boolean | null> => {
+    const args = [duelist_a, duelist_b]
+    const result = await _executeCall('has_pact', args) as boolean
+    return result ?? null
+  }
+
+  const get_shoot_hit_chance = async (duelist: bigint, steps: number): Promise<number | null> => {
+    const args = [duelist, steps]
+    const result = await _executeCall('get_shoot_hit_chance', args) as number
+    return result ? Number(result) : null
+  }
+
+  const get_shoot_kill_chance = async (duelist: bigint, steps: number): Promise<number | null> => {
+    const args = [duelist, steps]
+    const result = await _executeCall('get_shoot_kill_chance', args) as number
+    return result ? Number(result) : null
   }
 
   return {
@@ -85,6 +103,9 @@ export function createSystemCalls(
     reveal_move,
     // read-only calls
     get_pact,
+    has_pact,
+    get_shoot_hit_chance,
+    get_shoot_kill_chance,
   }
 }
 
