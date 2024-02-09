@@ -28,13 +28,17 @@ export function AccountsList() {
     burners.forEach((burner, index) => {
       const isSelected = (burner.address == account.address)
       const key = `${burner.address}_${isSelected ? 1 : 0}`
-      result.push(<AccountItem key={key} address={burner.address} index={index} isSelected={isSelected} select={select} />)
+      result.push(<AccountItem key={key}
+        address={burner.address}
+        index={index}
+        isSelected={isSelected}
+      />)
     })
     if (result.length == 0) {
       result.push(
         <Row key='empty' columns={'equal'} textAlign='center'>
           <Col>
-            <h4 className='TitleCase Important'>Create an Account to Play</h4>
+            <h4 className='TitleCase Important'>Create a Duelist to Play</h4>
           </Col>
         </Row>
       )
@@ -114,11 +118,23 @@ function AccountItem({
   address,
   index,
   isSelected,
-  select,
 }) {
   const { register_duelist } = useDojoSystemCalls()
-  const { account, copyToClipboard } = useDojoAccount()
+  const { account, copyToClipboard, select, get } = useDojoAccount()
   const inputRef = useRef(null)
+
+  const exists = true
+  // const exists = useMemo(() => {
+  //   try {
+  //     const account = get(address)
+  //     console.log(account, true)
+  //   } catch {
+  //     console.log(address, false)
+  //     return false
+  //   }
+  //   console.log(address, true)
+  //   return true
+  // }, [address])
 
   // current name from Dojo
   const { name, profilePic, isRegistered } = useDuelist(address)
@@ -138,7 +154,8 @@ function AccountItem({
   const [inputValue, setInputValue] = useState(null)
   const inputIsValid = useMemo(() => (inputValue?.length >= 3), [inputValue])
   const isUpdated = useMemo(() => (name == inputValue && profilePic == _profilePic), [name, inputValue, profilePic, _profilePic])
-  const canRegister = useMemo(() => (isSelected && account && address), [isSelected, address])
+  const canEdit = useMemo(() => (exists && isSelected), [exists, isSelected])
+  const canRegister = useMemo(() => (canEdit && account && address), [canEdit, account, address])
   // console.log(isUpdated, name, inputValue, profilePic, selectedProfilePic, _profilePic)
 
   // initialize
@@ -174,9 +191,9 @@ function AccountItem({
             profilePic={_profilePic}
             // onClick={() => setSelectedProfilePic(_profilePic < _profilePicCount ? _profilePic + 1 : 1)}
             onClick={() => { }}
-            disabled={!isSelected}
+            disabled={!canEdit}
           />
-          {isSelected && <>
+          {canEdit && <>
             <div className='ProfilePicLeftButton'
               onClick={() => setSelectedProfilePic(_profilePic > 1 ? _profilePic - 1 : _profilePicCount)}
             >◀</div>
@@ -194,16 +211,16 @@ function AccountItem({
           placeholder={'Duelist Name'}
           value={inputValue ?? ''}
           onChange={(e) => setInputValue(e.target.value)}
-          disabled={!isSelected}
+          disabled={!canEdit}
           ref={inputRef}
         >
           <input />
           &nbsp;&nbsp;&nbsp;
-          <Button type='submit' disabled={!isSelected} className='FillHeight' onClick={() => _export()}>Export&nbsp;&nbsp;<Icon name='copy' size='small' /></Button>
+          <Button type='submit' disabled={!canEdit} className='FillHeight' onClick={() => _export()}>Export&nbsp;&nbsp;<Icon name='copy' size='small' /></Button>
         </Input>
         <div className='Spacer5' />
         {!isRegistered
-          ? <ActionButton fill disabled={!canRegister || !inputIsValid} onClick={() => _register()} label='Check In' />
+          ? <ActionButton fill disabled={!canRegister || !inputIsValid} onClick={() => _register()} label={exists?'Check In':'Duelist not Found'} />
           : inputValue
             ? <ActionButton fill disabled={!canRegister || isUpdated || !inputIsValid} onClick={() => _register()} label={isUpdated ? 'Checked In' : 'Update'} />
             : <ActionButton fill disabled={!canRegister || isUpdated} onClick={() => _register()} label='Unregister' />

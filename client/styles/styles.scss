@@ -1123,10 +1123,9 @@ td {
   background-color: $color-darkest;
 }
 .ui.header {
+  @extend .TitleCase;
+  font-family: $font-family;
   color: $color-text;
-}
-.ui.modal>.content {
-  // font-size: 16px;
 }
 //
 // <Step>

@@ -47,6 +47,7 @@ export const DojoProvider = ({
     clear,
     copyToClipboard,
     applyFromClipboard,
+    listConnectors,
   } = useBurnerManager({
     burnerManager,
   });
