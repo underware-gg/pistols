@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import TWEEN from '@tweenjs/tween.js'
+import { WIDTH, HEIGHT, _makeStaticCamera, _renderer, _fullScreenGeom } from './game';
 
 
 
@@ -8,177 +9,186 @@ import TWEEN from '@tweenjs/tween.js'
 // and etudes
 // https://boytchev.github.io/etudes/threejs/ghosts-in-the-rain.html
 
-const N = 3000; // number of snowflakes
-const G = THREE.MathUtils.randInt(5, 11); // number of ghosts
-const R = 50; // radius of ghost
-const R2 = R * R;
-var M = 0; // actual number of snowflakes
+const N = 10000 // number of snowflakes
+const G = THREE.MathUtils.randInt(5, 11) // number of ghosts
+const R = 50 // radius of ghost
+const R2 = R * R
+const OFF = 40
+var M = 0 // actual number of snowflakes
 
 
 export class Rain extends THREE.Object3D {
-  constructor() {
+
+  needToClear = true
+  fbo: THREE.WebGLRenderTarget
+  renderer: THREE.WebGLRenderer
+  camera: THREE.OrthographicCamera
+  scene: THREE.Scene
+  snowflakes: THREE.BufferGeometry
+  speeds = []
+  ghosts = []
+  ghostsEyes = []
+
+  constructor(parent) {
     super()
 
-    // generate snowflake texture
-    var canvas = document.createElement('canvas');
-    canvas.width = 32;
-    canvas.height = 32;
-    var context = canvas.getContext('2d');
-    var gradient = context.createRadialGradient(15, 15, 2, 15, 15, 15);
-    gradient.addColorStop(0, 'white');
-    gradient.addColorStop(1, 'rgba(255,255,255,0)');
-    context.fillStyle = gradient;
-    context.fillRect(0, 0, 32, 32);
-    var snowflakeTexture = new THREE.CanvasTexture(canvas);
+    // FBO
+    this.fbo = new THREE.WebGLRenderTarget(WIDTH, HEIGHT, {
+      format: THREE.RGBAFormat,
+    })
+    const spriteMaterial = new THREE.SpriteMaterial({
+      map: this.fbo.texture,
+      transparent: true,
+      blending: THREE.AdditiveBlending
+    })
+    const cover = new THREE.Sprite(spriteMaterial)
+    cover.scale.set(WIDTH, HEIGHT, 1)
+    parent.add(cover)
 
-    var snowflakes = new THREE.BufferGeometry();
-    var speeds = [];
+    //
+    // Scene
+    this.scene = new THREE.Scene()
+    this.camera = _makeStaticCamera(0, 0, HEIGHT / 2)
+
+
+
+    //------------------------------------------
+    // generate snowflake texture
+    //
+    var canvas = document.createElement('canvas')
+    canvas.width = 32
+    canvas.height = 32
+    var context = canvas.getContext('2d')
+    var gradient = context.createRadialGradient(15, 15, 2, 15, 15, 15)
+    gradient.addColorStop(0, 'white')
+    gradient.addColorStop(1, 'rgba(255,255,255,0)')
+    context.fillStyle = gradient
+    context.fillRect(0, 0, 32, 32)
+    var snowflakeTexture = new THREE.CanvasTexture(canvas)
+
+    // Snowflakes
+    this.snowflakes = new THREE.BufferGeometry()
     var vertices = []
     for (var i = 0; i < N; i++) {
-      // snowflakes.vertices.push(new THREE.Vector3(THREE.MathUtils.randFloatSpread(150), -0.6 * window.innerHeight, 0));
-      vertices.push(THREE.MathUtils.randFloatSpread(150));
-      vertices.push(-0.6 * window.innerHeight);
-      vertices.push(0);
-      speeds.push(new THREE.Vector3(THREE.MathUtils.randFloat(-20, 20), -100, 0));
+      vertices.push(THREE.MathUtils.randFloatSpread(WIDTH))
+      vertices.push(-0.6 * HEIGHT)
+      vertices.push(0)
+      this.speeds.push(new THREE.Vector3(THREE.MathUtils.randFloat(-OFF, OFF), -100, 0))
     }
-
+    this.snowflakes.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3))
+    // snow material
     var material = new THREE.PointsMaterial({
-      color: 0xa0a0ff,
-      size: 4,
+      color: '#e4fdfe',
+      size: 1.5,
       map: snowflakeTexture,
       transparent: true,
-      opacity: 0.3,
+      opacity: 0.5,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
-    });
+    })
+    var snow = new THREE.Points(this.snowflakes, material)
+    this.scene.add(snow)
 
-    var snow = new THREE.Points(snowflakes, material);
-    this.add(snow);
+    // create ghosts
+    var white = new THREE.MeshBasicMaterial({ color: 0x303060 })
+    var eye = new THREE.CircleGeometry(8, 32)
+    for (var i = 0; i < G; i++) {
+      var eye1 = new THREE.Mesh(eye, white)
+      var eye2 = new THREE.Mesh(eye, white)
+      eye1.position.x = 14
+      eye2.position.x = -14
+      var ghost = new THREE.Group()
+      ghost.add(eye1, eye2)
+      ghost.position.set(THREE.MathUtils.randFloatSpread(0.8 * WIDTH), THREE.MathUtils.randFloatSpread(0.7 * HEIGHT),0)
+      this.ghostsEyes.push(ghost)
+      this.ghosts.push(ghost.position)
+      this.scene.add(ghost)
+    }
 
+    // clear material
+    const clearMat = new THREE.MeshBasicMaterial({
+      color: 'black',
+      transparent: true,
+      opacity: 0.05,
+    })
+    const clear = new THREE.Mesh(_fullScreenGeom, clearMat)
+    clear.position.set(0, 0, 0)
+    this.scene.add(clear)
 
   }
 
   reset() {
+    this.needToClear = true
   }
 
-  animate(time) {
-  }
-}
+  animate(clock) {
+    var dTime = clock.getDelta()
+    var time = clock.getElapsedTime()
+    if (M < N) M += 5
+    const positions = this.snowflakes.getAttribute('position')
+    var v = new THREE.Vector3()
+    // move each snowflake
+    for (var i = 0; i < M; i++) {
+      // move down a snowflake
+      let pos = new THREE.Vector3(
+        positions.getX(i),
+        positions.getY(i),
+        positions.getZ(i),
+      )
+      pos.addScaledVector(this.speeds[i], dTime)
+      // acceleration
+      if (this.speeds[i].y > -600 - (i % 600)) this.speeds[i].y -= 5
+      //this.speeds[i].x -= THREE.MathUtils.randFloat(-0.1,0.1)
 
-/*
+      // recycle 
+      if (pos.y < -HEIGHT / 2) {
+        pos.x = THREE.MathUtils.randFloatSpread(WIDTH)
+        pos.y = HEIGHT / 2 + THREE.MathUtils.randFloat(0, 100)
+        this.speeds[i].set(THREE.MathUtils.randFloat(-OFF, OFF), -400, 0)
+      }
 
-// construct and setup the scene
+      // check for ghosts collission
+      for (var g = 0; g < G; g++)
+        if (pos.x < this.ghosts[g].x + R)
+          if (pos.x > this.ghosts[g].x - R)
+            if (pos.y > this.ghosts[g].y)
+              if (pos.y < this.ghosts[g].y + R)
+                if (pos.distanceToSquared(this.ghosts[g]) < R2) {
+                  v.subVectors(pos, this.ghosts[g]).setLength(R).add(this.ghosts[g])
+                  this.speeds[i].x = THREE.MathUtils.randFloat(-100, 100) + 50 * Math.sign(v.x)
+                  this.speeds[i].y = THREE.MathUtils.randFloat(10, 160)
+                  pos.set(v.x, v.y, v.z)
+                  v.subVectors(pos, this.ghosts[g])
+                }
 
-// var renderer = new THREE.WebGLRenderer({ alpha: true, premultipliedAlpha: false, antialias: true, preserveDrawingBuffer: true });
-// renderer.setClearColor(0, 1);
-// renderer.autoClear = false;
-// renderer.autoClearColor = false;
-// renderer.setAnimationLoop(animate);
-// document.body.appendChild(renderer.domElement);
-// document.body.style.margin = 0;
-// document.body.style.overflow = 'hidden';
-
-// var scene = new THREE.Scene();
-//				scene.background = new THREE.Color( 'black' );
-
-// var camera = new THREE.OrthographicCamera(-window.innerWidth / 2, window.innerWidth / 2, window.innerHeight / 2, -window.innerHeight / 2, -1000, 1000);
-// camera.position.set(0, 0, 100);
-// camera.lookAt(scene.position);
-
-var clock = new THREE.Clock(true);
-
-
-// construct a ground and snowflakes
-
-
-
-// create ghosts
-
-var ghosts = [];
-var ghostsEyes = [];
-var white = new THREE.MeshBasicMaterial({ color: 0x303060 }),
-  eye = new THREE.CircleGeometry(8, 32);
-
-for (var i = 0; i < G; i++) {
-  var eye1 = new THREE.Mesh(eye, white),
-    eye2 = new THREE.Mesh(eye, white);
-
-  eye1.position.x = 14;
-  eye2.position.x = -14;
-
-  var ghost = new THREE.Group();
-  ghost.add(eye1, eye2);
-  ghost.position.set(
-    THREE.MathUtils.randFloatSpread(0.8 * window.innerWidth),
-    THREE.MathUtils.randFloatSpread(0.7 * window.innerHeight),
-    0);
-  ghost.rand1 = Math.random() * 100;
-  ghost.rand2 = Math.random() * 100;
-
-  ghostsEyes.push(ghost);
-  ghosts.push(ghost.position);
-
-  this.add(ghost);
-}
-
-
-var plane = new THREE.Mesh(new THREE.PlaneGeometry(10000, 10000), new THREE.MeshBasicMaterial({ color: 0, transparent: true, opacity: 0.1, depthWrite: false }));
-
-
-
-// animation loop
-var v = new THREE.Vector3();
-
-renderer.clearColor();
-
-function animate() {
-  var dTime = clock.getDelta(),
-    time = clock.getElapsedTime();
-
-  if (M < N) M += 5;
-
-  // move each snowflake
-  for (var i = 0; i < M; i++) {
-    // move down a snowflake
-    var pos = snowflakes.vertices[i];
-    pos.addScaledVector(speeds[i], dTime);
-
-    // acceleration
-    if (speeds[i].y > -600 - (i % 600)) speeds[i].y -= 5;
-    //speeds[i].x -= THREE.MathUtils.randFloat(-0.1,0.1);
-
-    // recycle 
-    if (pos.y < -window.innerHeight / 2) {
-      pos.y = window.innerHeight / 2 + THREE.MathUtils.randFloat(0, 100);
-      pos.x = (THREE.MathUtils.randFloatSpread(window.innerWidth) + THREE.MathUtils.randFloatSpread(window.innerWidth) + THREE.MathUtils.randFloatSpread(window.innerWidth)) / 3;
-      speeds[i].set(THREE.MathUtils.randFloat(-20, 20), -400, 0);
+      positions.setXYZ(i, pos.x, pos.y, pos.z)
+    }
+    positions.needsUpdate = true
+    // animate ghosts
+    for (var g = 0; g < G; g++) {
+      this.ghostsEyes[g].visible = Math.sin(g / 2 + 3 * time) > -0.8
+      this.ghostsEyes[g].position.y += THREE.MathUtils.randFloat(-1, 1)
     }
 
-    // check for ghosts collission
-    for (var g = 0; g < G; g++)
-      if (pos.x < ghosts[g].x + R)
-        if (pos.x > ghosts[g].x - R)
-          if (pos.y > ghosts[g].y)
-            if (pos.y < ghosts[g].y + R)
-              if (pos.distanceToSquared(ghosts[g]) < R2) {
-                v.subVectors(pos, ghosts[g]).setLength(R).add(ghosts[g]);
-                speeds[i].x = THREE.MathUtils.randFloat(-100, 100) + 50 * Math.sign(v.x);
-                speeds[i].y = THREE.MathUtils.randFloat(10, 160);
-                pos.set(v.x, v.y, v.z);
-                v.subVectors(pos, ghosts[g]);
-
-              }
+    // RENDER
+    _renderer.setRenderTarget(this.fbo)
+    if (this.needToClear) {
+      // _renderer.clearColor()
+      _renderer.clear()
+      this.needToClear = false
+    }
+    _renderer.render(this.scene, this.camera)
+    _renderer.setRenderTarget(null)
   }
-
-  snowflakes.verticesNeedUpdate = true;
-
-  for (var g = 0; g < G; g++) {
-    ghostsEyes[g].visible = Math.sin(g / 2 + 3 * time) > -0.8;
-    ghostsEyes[g].position.y += THREE.MathUtils.randFloat(-1, 1);
-  }
-
-  renderer.render(plane, camera);
-  renderer.render(scene, camera);
 }
 
-*/
+
+// var plane = new THREE.Mesh(new THREE.PlaneGeometry(10000, 10000), new THREE.MeshBasicMaterial({ color: 0, transparent: true, opacity: 0.1, depthWrite: false }));
+
+// renderer.clearColor();
+
+// function animate() {
+//   renderer.render(plane, camera);
+//   renderer.render(scene, camera);
+// }
+

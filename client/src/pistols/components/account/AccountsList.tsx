@@ -64,7 +64,7 @@ export function AccountsList() {
       <Grid className='Faded FillWidth'>
         <Row columns={'equal'} textAlign='center'>
           <Col>
-            <ActionButton fill disabled={isDeploying} onClick={() => create()} label='Create Account' />
+            <ActionButton fill disabled={isDeploying} onClick={() => create()} label='Create Duelist' />
           </Col>
           <Col>
             <ActionButton fill disabled={isDeploying} onClick={() => applyFromClipboard()} label={<>Import&nbsp;&nbsp;<Icon name='paste' size='small' /></>} />

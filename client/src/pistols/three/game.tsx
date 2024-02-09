@@ -25,9 +25,9 @@ const R_TO_D = (180 / Math.PI)
 // CONSTANTS
 //
 
-const WIDTH = 1920//1200
-const HEIGHT = 1080//675
-const ASPECT = (WIDTH / HEIGHT)
+export const WIDTH = 1920//1200
+export const HEIGHT = 1080//675
+export const ASPECT = (WIDTH / HEIGHT)
 const FOV = 45
 
 const ACTOR_WIDTH = 140
@@ -55,13 +55,14 @@ export enum AnimationState {
 let _textures: any = {}
 let _spriteSheets: any = {}
 
+export let _renderer: THREE.WebGLRenderer
+export let _fullScreenGeom: THREE.PlaneGeometry = null
+
 let _animationRequest = null
 let _clock: THREE.Clock
-let _renderer: THREE.WebGLRenderer
 let _staticCamera: THREE.OrthographicCamera
 let _duelCamera: THREE.PerspectiveCamera
 let _duelCameraRig: THREE.Object3D
-let _fullScreenGeom: THREE.PlaneGeometry = null
 let _supportsExtension: boolean = true
 let _stats
 
@@ -79,6 +80,16 @@ const _tweens = {
   staticFade: null,
 }
 
+export const _makeStaticCamera = (x, y, z) => {
+  let result = new THREE.OrthographicCamera(
+    -WIDTH / 2,
+    WIDTH / 2,
+    HEIGHT / 2,
+    -HEIGHT / 2,
+    1, 10000)
+  result.position.set(x, y, z)
+  return result
+}
 
 export function dispose() {
   if (_animationRequest) cancelAnimationFrame(_animationRequest)
@@ -116,19 +127,16 @@ export async function init(canvas, width, height, statsEnabled = false) {
 
   _renderer = new THREE.WebGLRenderer({
     antialias: true,
-    alpha: false,
+    alpha: true,
     canvas,
   })
   _renderer.setSize(WIDTH, HEIGHT)
+  // _renderer.setClearColor(0, 1)
   _renderer.outputColorSpace = THREE.LinearSRGBColorSpace // fix bright textures
+  _renderer.autoClear = false
+  _renderer.autoClearColor = false
 
-  _staticCamera = new THREE.OrthographicCamera(
-    -WIDTH / 2,
-    WIDTH / 2,
-    HEIGHT / 2,
-    -HEIGHT / 2,
-    1, 10000)
-  _staticCamera.position.set(0, 0, HEIGHT)
+  _staticCamera = _makeStaticCamera(0, 0, HEIGHT)
 
   _duelCameraRig = new THREE.Object3D()
   _duelCameraRig.position.set(0, 0, 0)
@@ -190,10 +198,12 @@ export function animate() {
   // limit framerate
   setTimeout(function () {
     _animationRequest = requestAnimationFrame(animate)
-  }, 1000 / 24)
+  }, 1000 / 60)
 
   if (_currentScene) {
     TWEEN.update()
+
+    _renderer.clear()
 
     if (_sceneName == SceneName.Duel) {
       _actor.A.update(_clock)
@@ -294,8 +304,8 @@ function setupStaticScene(sceneName) {
   scene.add(bg)
 
   if (sceneName == SceneName.Gate) {
-    const rain = new Rain()
-    scene.add(rain)
+    // const rain = new Rain(bg)
+    // scene.add(rain)
   }
 
   return scene
