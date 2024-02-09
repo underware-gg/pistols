@@ -56,6 +56,7 @@ let _textures: any = {}
 let _spriteSheets: any = {}
 
 let _animationRequest = null
+let _clock: THREE.Clock
 let _renderer: THREE.WebGLRenderer
 let _staticCamera: THREE.OrthographicCamera
 let _duelCamera: THREE.PerspectiveCamera
@@ -152,6 +153,8 @@ export async function init(canvas, width, height, statsEnabled = false) {
     document.body.appendChild(_stats.dom)
   }
 
+  _clock = new THREE.Clock(true)
+
   console.log(`THREE.init() done 👍`)
 }
 
@@ -181,7 +184,7 @@ function onWindowResize() {
 // Game Loop
 //
 
-export function animate(time) {
+export function animate() {
   if (!_supportsExtension || !_renderer) return
 
   // limit framerate
@@ -193,13 +196,13 @@ export function animate(time) {
     TWEEN.update()
 
     if (_sceneName == SceneName.Duel) {
-      _actor.A.update(time)
-      _actor.B.update(time)
+      _actor.A.update(_clock)
+      _actor.B.update(_clock)
       _renderer.render(_currentScene, _duelCamera)
       _stats?.update()
     } else {
       //@ts-ignore
-      _currentScene.children.forEach(c => c.animate?.())
+      _currentScene.children.forEach(c => c.animate?.(_clock))
       _renderer.render(_currentScene, _staticCamera)
     }
   }

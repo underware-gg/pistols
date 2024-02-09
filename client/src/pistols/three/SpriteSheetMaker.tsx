@@ -73,7 +73,7 @@ export class Actor {
 
   setAnimation(key) {
     this.currentSheet = this.sheets[key]
-    this.controls.tileDisplayDuration = (1000 / this.currentSheet.frameRate)
+    this.controls.tileDisplaySeconds = (1 / this.currentSheet.frameRate)
     this.controls.frameCount = this.currentSheet.frameCount
   }
 
@@ -82,14 +82,16 @@ export class Actor {
   }
 
 
-  update(time) {
-    if (!this.ready || !time) return
+  update(clock: THREE.Clock) {
+    const seconds = clock.getElapsedTime()
+
+    if (!this.ready || !seconds) return
 
     if (this.controls.paused) return
 
-    while (time - this.controls.lastDisplayTime >= this.controls.tileDisplayDuration) {
+    while (seconds - this.controls.lastDisplayTime >= this.controls.tileDisplaySeconds) {
 
-      this.controls.lastDisplayTime = time;
+      this.controls.lastDisplayTime = seconds;
 
       this.controls.currentTile++
 
@@ -152,7 +154,7 @@ export class Actor {
     //       action: action
     //     });
     //   }
-    // }, this.action.tileDisplayDuration);
+    // }, this.action.tileDisplaySeconds);
   }
 
   // reveal the sprite and play the action only once
