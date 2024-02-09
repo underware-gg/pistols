@@ -949,7 +949,7 @@
     {
       "name": "pistols::systems::actions::actions",
       "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
-      "class_hash": "0x717203a34ac86afcd761e4dd6f13795573e695b1ebedb3e3de62aec66724de7",
+      "class_hash": "0x6d97855c0b2c6000f452894e7e8e42bde27542f8ded4836f71a4b0b610d64dd",
       "abi": [
         {
           "type": "impl",
@@ -1206,6 +1206,46 @@
               "outputs": [
                 {
                   "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_shoot_hit_chance",
+              "inputs": [
+                {
+                  "name": "duelist",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "steps",
+                  "type": "core::integer::u8"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u8"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_shoot_kill_chance",
+              "inputs": [
+                {
+                  "name": "duelist",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "steps",
+                  "type": "core::integer::u8"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u8"
                 }
               ],
               "state_mutability": "view"
@@ -2117,7 +2157,7 @@
           "key": false
         }
       ],
-      "class_hash": "0x181d66c331431baebd2e9411b3412e115d4d9035298a94af1f535dfe28fe85e",
+      "class_hash": "0x7dcf67af64818350f90710872dca0e8549d3c08c6610879a76d4ac7c7c0930c",
       "abi": [
         {
           "type": "impl",
@@ -2305,7 +2345,19 @@
               "type": "core::integer::u8"
             },
             {
+              "name": "dice1",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "dice2",
+              "type": "core::integer::u8"
+            },
+            {
               "name": "damage",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "block",
               "type": "core::integer::u8"
             },
             {

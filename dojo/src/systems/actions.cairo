@@ -48,6 +48,14 @@ trait IActions<TContractState> {
         duelist_a: ContractAddress,
         duelist_b: ContractAddress,
     ) -> bool;
+    fn get_shoot_hit_chance(self: @TContractState,
+        duelist: ContractAddress,
+        steps: u8,
+    ) -> u8;
+    fn get_shoot_kill_chance(self: @TContractState,
+        duelist: ContractAddress,
+        steps: u8,
+    ) -> u8;
 }
 
 #[dojo::contract]
@@ -226,6 +234,19 @@ mod actions {
             duelist_b: ContractAddress,
         ) -> bool {
             (self.get_pact(duelist_a, duelist_b) != 0)
+        }
+
+        fn get_shoot_hit_chance(self: @ContractState,
+            duelist: ContractAddress,
+            steps: u8,
+        ) -> u8 {
+            (utils::get_shoot_hit_chance(duelist, steps))
+        }
+        fn get_shoot_kill_chance(self: @ContractState,
+            duelist: ContractAddress,
+            steps: u8,
+        ) -> u8 {
+            (utils::get_shoot_kill_chance(duelist, steps))
         }
 
     }

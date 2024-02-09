@@ -124,7 +124,7 @@ mod shooter {
     fn process_round(ref challenge: Challenge, ref round: Round) {
         // get damage for each player
         if (round.round_number == 1) {
-            pistols_shootout(ref round);
+            pistols_shootout(challenge, ref round);
         } else {
             let (damage_a, damage_b) = blades_clash(round);
             round.duelist_a.damage = damage_a;
@@ -169,44 +169,44 @@ mod shooter {
     //-----------------------------------
     // Pistols duel
     //
-    fn pistols_shootout(ref round: Round) {
+    fn pistols_shootout(challenge: Challenge, ref round: Round) {
         let steps_a: u8 = round.duelist_a.move;
         let steps_b: u8 = round.duelist_b.move;
 
         if (steps_a == steps_b) {
             // both shoot together
-            shoot_apply_damage('shoot_a', round, ref round.duelist_a, ref round.duelist_b);
-            shoot_apply_damage('shoot_b', round, ref round.duelist_b, ref round.duelist_a);
+            shoot_apply_damage('shoot_a', round, challenge.duelist_a, ref round.duelist_a, ref round.duelist_b);
+            shoot_apply_damage('shoot_b', round, challenge.duelist_b, ref round.duelist_b, ref round.duelist_a);
         } else if (steps_a < steps_b) {
             // A shoots first
-            shoot_apply_damage('shoot_a', round, ref round.duelist_a, ref round.duelist_b);
+            shoot_apply_damage('shoot_a', round, challenge.duelist_a, ref round.duelist_a, ref round.duelist_b);
             // if B not dead, shoot
             if (round.duelist_b.health > 0) {
-                shoot_apply_damage('shoot_b', round, ref round.duelist_b, ref round.duelist_a);
+                shoot_apply_damage('shoot_b', round, challenge.duelist_b, ref round.duelist_b, ref round.duelist_a);
             }
         } else {
             // B shoots first
-            shoot_apply_damage('shoot_b', round, ref round.duelist_b, ref round.duelist_a);
+            shoot_apply_damage('shoot_b', round, challenge.duelist_b, ref round.duelist_b, ref round.duelist_a);
             // if A not dead, shoot
             if (round.duelist_a.health > 0) {
-                shoot_apply_damage('shoot_a', round, ref round.duelist_a, ref round.duelist_b);
+                shoot_apply_damage('shoot_a', round, challenge.duelist_a, ref round.duelist_a, ref round.duelist_b);
             }
         }
     }
 
-    fn shoot_apply_damage(seed: felt252, round: Round, ref attacker: Move, ref defender: Move) {
+    fn shoot_apply_damage(seed: felt252, round: Round, duelist: ContractAddress, ref attacker: Move, ref defender: Move) {
         let steps: u8 = attacker.move;
         // dice 1: did the bullet hit the other player?
         // at step 1: HIT chance is 80%
         // at step 10: HIT chance is 20%
         attacker.dice1 = throw_dice(seed, round, 100);
-        let chances: u8 = MathU8::map(steps, 1, 10, constants::CHANCE_HIT_STEP_1, constants::CHANCE_HIT_STEP_10);
+        let chances: u8 = utils::get_shoot_hit_chance(duelist, steps);
         if (attacker.dice1 <= chances) {
             // dice 2: if the bullet HIT the other player, what's the damage?
             // at step 1: KILL chance is 10%
             // at step 10: KILL chance is 100%
             attacker.dice2 = throw_dice(seed * 2, round, 100);
-            let chances: u8 = MathU8::map(steps, 1, 10, constants::CHANCE_KILL_STEP_1, constants::CHANCE_KILL_STEP_10);
+            let chances: u8 = utils::get_shoot_kill_chance(duelist, steps);
             if (attacker.dice2 <= chances) {
                 defender.damage = constants::FULL_HEALTH;
             } else {

@@ -46,11 +46,11 @@ export function defineContractComponents(world: World) {
 	  Round: (() => {
 	    return defineComponent(
 	      world,
-	      { duel_id: RecsType.BigInt, round_number: RecsType.Number, state: RecsType.Number, duelist_a: { hash: RecsType.BigInt, salt: RecsType.Number, move: RecsType.Number, damage: RecsType.Number, health: RecsType.Number }, duelist_b: { hash: RecsType.BigInt, salt: RecsType.Number, move: RecsType.Number, damage: RecsType.Number, health: RecsType.Number } },
+	      { duel_id: RecsType.BigInt, round_number: RecsType.Number, state: RecsType.Number, duelist_a: { hash: RecsType.BigInt, salt: RecsType.Number, move: RecsType.Number, dice1: RecsType.Number, dice2: RecsType.Number, damage: RecsType.Number, block: RecsType.Number, health: RecsType.Number }, duelist_b: { hash: RecsType.BigInt, salt: RecsType.Number, move: RecsType.Number, dice1: RecsType.Number, dice2: RecsType.Number, damage: RecsType.Number, block: RecsType.Number, health: RecsType.Number } },
 	      {
 	        metadata: {
 	          name: "Round",
-	          types: ["u128","u8","u8","felt252","u64","u8","u8","u8","felt252","u64","u8","u8","u8"],
+	          types: ["u128","u8","u8","felt252","u64","u8","u8","u8","u8","u8","u8","felt252","u64","u8","u8","u8","u8","u8","u8"],
 	          customTypes: ["Move","Move"],
 	        },
 	      }

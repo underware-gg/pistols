@@ -7,6 +7,7 @@ use pistols::models::models::{Duelist, Challenge, Pact, Round, Move};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round::{RoundState, RoundStateTrait};
 use pistols::types::constants::{constants};
+use pistols::utils::math::{MathU8};
 
 // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
 extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
@@ -114,6 +115,15 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         // save Duelists
         set!(world, (duelist_a, duelist_b));
     }
+}
+
+fn get_shoot_hit_chance(duelist: ContractAddress, steps: u8 ) -> u8 {
+    // TODO: apply bonus, clamp()
+    (MathU8::map(steps, 1, 10, constants::CHANCE_HIT_STEP_1, constants::CHANCE_HIT_STEP_10))
+}
+fn get_shoot_kill_chance(duelist: ContractAddress, steps: u8 ) -> u8 {
+    // TODO: apply bonus, clamp()
+    (MathU8::map(steps, 1, 10, constants::CHANCE_KILL_STEP_1, constants::CHANCE_KILL_STEP_10))
 }
 
 fn make_move_hash(salt: u64, move: u8) -> felt252 {
