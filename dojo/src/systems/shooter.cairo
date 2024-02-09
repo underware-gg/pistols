@@ -14,18 +14,18 @@ mod shooter {
     use pistols::types::blades::{Blades};
     use pistols::utils::math::{MathU8};
 
-    fn _assert_challenge(world: IWorldDispatcher, caller: ContractAddress, duel_id: u128, round_number: u8) -> (Challenge, felt252) {
+    fn _assert_challenge(world: IWorldDispatcher, caller: ContractAddress, duel_id: u128, round_number: u8) -> (Challenge, u8) {
         let challenge: Challenge = get!(world, duel_id, Challenge);
 
         // Assert Duelist is in the challenge
-        let duelist: felt252 = if (challenge.duelist_a == caller) { 'a' } else if (challenge.duelist_b == caller) { 'b' } else { 0 };
-        assert(duelist == 'a' || duelist == 'b', 'Not your Challenge!');
+        let duelist_number: u8 = if (challenge.duelist_a == caller) { 1 } else if (challenge.duelist_b == caller) { 2 } else { 0 };
+        assert(duelist_number == 1 || duelist_number == 2, 'Not your Challenge!');
 
         // Correct Challenge state
         assert(challenge.state == ChallengeState::InProgress.into(), 'Challenge is not In Progress');
         assert(challenge.round_number == round_number, 'Bad Round number');
         
-        (challenge, duelist)
+        (challenge, duelist_number)
     }
 
     fn _assert_round_move(round_number: u8, move: u8) {
@@ -46,7 +46,7 @@ mod shooter {
         let caller: ContractAddress = starknet::get_caller_address();
 
         // Assert correct Challenge
-        let (challenge, duelist) = _assert_challenge(world, caller, duel_id, round_number);
+        let (challenge, duelist_number) = _assert_challenge(world, caller, duel_id, round_number);
 
         // Assert correct Round
         let mut round: Round = get!(world, (duel_id, round_number), Round);
@@ -55,10 +55,10 @@ mod shooter {
         // Validate move hash
 
         // Store hash
-        if (duelist == 'a') {
+        if (duelist_number == 1) {
             assert(round.duelist_a.hash == 0, 'Already committed');
             round.duelist_a.hash = hash;
-        } else if (duelist == 'b') {
+        } else if (duelist_number == 2) {
             assert(round.duelist_b.hash == 0, 'Already committed');
             round.duelist_b.hash = hash;
         }
@@ -78,7 +78,7 @@ mod shooter {
         let caller: ContractAddress = starknet::get_caller_address();
 
         // Assert correct Challenge
-        let (mut challenge, duelist) = _assert_challenge(world, caller, duel_id, round_number);
+        let (mut challenge, duelist_number) = _assert_challenge(world, caller, duel_id, round_number);
 
         // Assert correct Round
         let mut round: Round = get!(world, (duel_id, round_number), Round);
@@ -93,12 +93,12 @@ mod shooter {
         _assert_round_move(round_number, move);
 
         // Store move
-        if (duelist == 'a') {
+        if (duelist_number == 1) {
             assert(round.duelist_a.move == 0, 'Already revealed');
             assert(round.duelist_a.hash == hash, 'Move does not match commitment');
             round.duelist_a.salt = salt;
             round.duelist_a.move = move;
-        } else if (duelist == 'b') {
+        } else if (duelist_number == 2) {
             assert(round.duelist_b.move == 0, 'Already revealed');
             assert(round.duelist_b.hash == hash, 'Move does not match commitment');
             round.duelist_b.salt = salt;
@@ -107,7 +107,7 @@ mod shooter {
 
         // Finishes round if both moves are revealed
         if (round.duelist_a.move > 0 && round.duelist_b.move > 0) {
-            finish_round(ref challenge, ref round);
+            process_round(ref challenge, ref round);
             // update Round first, Challenge may need it
             set!(world, (round));
             // update Challenge
@@ -118,24 +118,24 @@ mod shooter {
         }
     }
 
-    //-----------------------------------
-    // Decide who wins a round
+    //---------------------------------------
+    // Decide who wins a round, or go to next
     //
-    fn finish_round(ref challenge: Challenge, ref round: Round) {
+    fn process_round(ref challenge: Challenge, ref round: Round) {
         // get damage for each player
         if (round.round_number == 1) {
-            let (a, b) = pistols_shootout(round);
-            round.duelist_a.damage = a;
-            round.duelist_b.damage = b;
-        } else if (round.round_number == 2) {
-            let (a, b) = blades_clash(round);
-            round.duelist_a.damage = a;
-            round.duelist_b.damage = b;
+            let (damage_a, damage_b) = pistols_shootout(round);
+            round.duelist_a.damage = damage_a;
+            round.duelist_b.damage = damage_b;
+        } else {
+            let (damage_a, damage_b) = blades_clash(round);
+            round.duelist_a.damage = damage_a;
+            round.duelist_b.damage = damage_b;
         }
 
         // apply damage
-        round.duelist_a.health -= MathU8::min(round.duelist_a.damage, round.duelist_a.health);
-        round.duelist_b.health -= MathU8::min(round.duelist_b.damage, round.duelist_b.health);
+        round.duelist_a.health = MathU8::sub(round.duelist_a.health, round.duelist_a.damage);
+        round.duelist_b.health = MathU8::sub(round.duelist_b.health, round.duelist_b.damage);
 
         // decide results
         if (round.duelist_a.health == 0 && round.duelist_b.health == 0) {
@@ -206,7 +206,7 @@ mod shooter {
         // at step 1: HIT chance is 80%
         // at step 10: HIT chance is 20%
         let percentage: u128 = MathU8::map(steps, 1, 10, constants::CHANCE_HIT_STEP_1, constants::CHANCE_HIT_STEP_10).into();
-        let hit: bool = throw_dice(seed, round, percentage, 100);
+        let hit: bool = check_dice(seed, round, 100, percentage);
         if (!hit) {
             return 0;
         }
@@ -214,7 +214,7 @@ mod shooter {
         // at step 1: KILL chance is 10%
         // at step 10: KILL chance is 100%
         let percentage: u128 = MathU8::map(steps, 1, 10, constants::CHANCE_KILL_STEP_1, constants::CHANCE_KILL_STEP_10).into();
-        let killed: bool = throw_dice(seed * 2, round, percentage, 100);
+        let killed: bool = check_dice(seed * 2, round, 100, percentage);
         (if (killed) { constants::FULL_HEALTH } else { constants::HALF_HEALTH })
     }
 
@@ -284,9 +284,9 @@ mod shooter {
     //-----------------------------------
     // Randomizer
     //
-    fn throw_dice(seed: felt252, round: Round, limit: u128, faces: u128) -> bool {
-        let salt: u64 = (round.duelist_a.salt ^ round.duelist_b.salt);
-        (utils::throw_dice(seed, salt.into(), limit, faces))
+    fn check_dice(seed: felt252, round: Round, faces: u128, limit: u128) -> bool {
+        let salt: u64 = utils::make_round_salt(round);
+        (utils::check_dice(seed, salt.into(), faces, limit))
     }
 
 }

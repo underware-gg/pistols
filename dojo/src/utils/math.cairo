@@ -1,11 +1,19 @@
 // use debug::PrintTrait;
 
 trait MathTrait<T> {
+    // returns minimum value
     fn min(a: T, b: T) -> T;
+    // returns maximum value
     fn max(a: T, b: T) -> T;
+    // safe subtraction
+    fn sub(a: T, b: T) -> T;
+    // returns GDC of two numbers
     fn gdc(a: T, b: T) -> T;
+    // map a value form one range to another
     fn map(v: T, in_min: T, in_max: T, out_min: T, out_max: T) -> T;
+    // power
     fn pow(base: T, exp: T) -> T;
+    // quared distance in 2D space
     fn squaredDistance(x1: T, y1: T, x2: T, y2: T) -> T;
 }
 
@@ -15,6 +23,10 @@ impl MathU8 of MathTrait<u8> {
     }
     fn max(a: u8, b: u8) -> u8 {
         if (a > b) { (a) } else { (b) }
+    }
+
+    fn sub(a: u8, b: u8) -> u8 {
+        if (b >= a) { (0) } else { (a - b) }
     }
 
     fn gdc(mut a: u8, mut b: u8) -> u8 {
@@ -71,6 +83,10 @@ impl MathU16 of MathTrait<u16> {
         if (a > b) { (a) } else { (b) }
     }
 
+    fn sub(a: u16, b: u16) -> u16 {
+        if (b >= a) { (0) } else { (a - b) }
+    }
+
     fn gdc(a: u16, b: u16) -> u16 {
         // recursive (not fastest)
         if (b == 0) { (a) } else { (MathU16::gdc(b, a % b)) }
@@ -104,6 +120,10 @@ impl MathU32 of MathTrait<u32> {
     }
     fn max(a: u32, b: u32) -> u32 {
         if (a > b) { (a) } else { (b) }
+    }
+
+    fn sub(a: u32, b: u32) -> u32 {
+        if (b >= a) { (0) } else { (a - b) }
     }
 
     fn gdc(a: u32, b: u32) -> u32 {
@@ -140,6 +160,10 @@ impl MathU64 of MathTrait<u64> {
         if (a > b) { (a) } else { (b) }
     }
 
+    fn sub(a: u64, b: u64) -> u64 {
+        if (b >= a) { (0) } else { (a - b) }
+    }
+
     fn gdc(a: u64, b: u64) -> u64 {
         if (b == 0) { (a) } else { (MathU64::gdc(b, a % b)) }
     }
@@ -172,6 +196,10 @@ impl MathU128 of MathTrait<u128> {
     }
     fn max(a: u128, b: u128) -> u128 {
         if (a > b) { (a) } else { (b) }
+    }
+
+    fn sub(a: u128, b: u128) -> u128 {
+        if (b >= a) { (0) } else { (a - b) }
     }
 
     fn gdc(a: u128, b: u128) -> u128 {
@@ -212,6 +240,10 @@ impl MathU256 of MathTrait<u256> {
     }
     fn max(a: u256, b: u256) -> u256 {
         if (a > b) { (a) } else { (b) }
+    }
+
+    fn sub(a: u256, b: u256) -> u256 {
+        if (b >= a) { (0) } else { (a - b) }
     }
 
     fn gdc(a: u256, b: u256) -> u256 {
@@ -269,6 +301,31 @@ mod tests {
 
     #[test]
     #[available_gas(100_000_000)]
+    fn test_sub() {
+        assert(MathU8::sub(10, 0) == 10, 'sub_10_0');
+        assert(MathU8::sub(10, 2) == 8, 'sub_10_2');
+        assert(MathU8::sub(10, 9) == 1, 'sub_10_9');
+        assert(MathU8::sub(10, 10) == 0, 'sub_10_10');
+        assert(MathU8::sub(10, 11) == 0, 'sub_10_11');
+        assert(MathU8::sub(10, 255) == 0, 'sub_10_155');
+    }
+
+    #[test]
+    #[available_gas(100_000_000)]
+    fn test_gdc() {
+        assert(MathU8::gdc(4, 4) == 4, 'gdc_4_4');
+        assert(MathU8::gdc(4, 2) == 2, 'gdc_4_2');
+        assert(MathU8::gdc(2, 4) == 2, 'gdc_2_4');
+        assert(MathU8::gdc(4, 1) == 1, 'gdc_4_1');
+        assert(MathU8::gdc(1, 4) == 1, 'gdc_1_4');
+        assert(MathU8::gdc(6, 3) == 3, 'gdc_6_3');
+        assert(MathU8::gdc(40, 2) == 2, 'gdc_40_2');
+        assert(MathU8::gdc(40, 16) == 8, 'gdc_40_16');
+        assert(MathU8::gdc(24, 36) == 12, 'gdc_24_36');
+    }
+
+    #[test]
+    #[available_gas(100_000_000)]
     fn test_pow() {
         assert(MathU128::pow(0,0) == 1, String::concat('test_math_pow', '0,0'));
         assert(MathU128::pow(0,1) == 0, String::concat('test_math_pow', '0,1'));
@@ -286,20 +343,6 @@ mod tests {
         assert(MathU128::pow(10,1) == 10, String::concat('test_math_pow', '10,1`'));
         assert(MathU128::pow(10,2) == 100, String::concat('test_math_pow', '10,2'));
         assert(MathU128::pow(10,8) == 100_000_000, String::concat('test_math_pow', '10,8'));
-    }
-
-    #[test]
-    #[available_gas(100_000_000)]
-    fn test_gdc() {
-        assert(MathU8::gdc(4, 4) == 4, 'gdc_4_4');
-        assert(MathU8::gdc(4, 2) == 2, 'gdc_4_2');
-        assert(MathU8::gdc(2, 4) == 2, 'gdc_2_4');
-        assert(MathU8::gdc(4, 1) == 1, 'gdc_4_1');
-        assert(MathU8::gdc(1, 4) == 1, 'gdc_1_4');
-        assert(MathU8::gdc(6, 3) == 3, 'gdc_6_3');
-        assert(MathU8::gdc(40, 2) == 2, 'gdc_40_2');
-        assert(MathU8::gdc(40, 16) == 8, 'gdc_40_16');
-        assert(MathU8::gdc(24, 36) == 12, 'gdc_24_36');
     }
 
     #[test]

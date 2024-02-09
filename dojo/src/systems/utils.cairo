@@ -114,15 +114,26 @@ fn make_move_hash(salt: u64, move: u8) -> felt252 {
     (pedersen(salt.into(), move.into()))
 }
 
-// throw a dice and return a positive result
-// limit: how many faces gives a positive result?
+fn make_round_salt(round: Round) -> u64 {
+    (round.duelist_a.salt ^ round.duelist_b.salt)
+}
+
+// throw a dice and return the resulting face
 // faces: the number of faces on the dice (ex: 6, or 100%)
-// edge case: limit 0 is always negative
-// edge case: limit=faces is always positive
-fn throw_dice(seed: felt252, salt: felt252, limit: u128, faces: u128) -> bool {
+// returns a number between 1 and faces
+fn throw_dice(seed: felt252, salt: felt252, faces: u128) -> u128 {
     let hash: felt252 = pedersen(salt, seed);
     let double: u256 = hash.into();
-    ((double.low % faces) < limit)
+    ((double.low % faces) + 1)
+}
+
+// throw a dice and return a positive result
+// faces: the number of faces on the dice (ex: 6, or 100%)
+// limit: how many faces gives a positive result?
+// edge case: limit <= 1, always negative
+// edge case: limit == faces, always positive
+fn check_dice(seed: felt252, salt: felt252, faces: u128, limit: u128) -> bool {
+    (throw_dice(seed, salt, faces) <= limit)
 }
 
 
@@ -148,14 +159,14 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_throw_dice_average() {
+    fn test_check_dice_average() {
         // lower limit
         let mut counter: u8 = 0;
         let mut n: felt252 = 0;
         loop {
             if (n == 100) { break; }
             let seed: felt252 = 'seed_1' + n;
-            if (utils::throw_dice(seed, 'salt_1', 25, 100)) {
+            if (utils::check_dice(seed, 'salt_1', 100, 25)) {
                 counter += 1;
             }
             n += 1;
@@ -167,7 +178,7 @@ mod tests {
         loop {
             if (n == 100) { break; }
             let seed: felt252 = 'seed_2' + n;
-            if (utils::throw_dice(seed, 'salt_2', 75, 100)) {
+            if (utils::check_dice(seed, 'salt_2', 100, 75)) {
                 counter += 1;
             }
             n += 1;
@@ -177,14 +188,14 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_throw_dice_edge() {
+    fn test_check_dice_edge() {
         let mut n: felt252 = 0;
         loop {
             if (n == 100) { break; }
             let seed: felt252 = 'seed' + n;
-            let bottom: bool = utils::throw_dice(seed, 'salt', 0, 10);
+            let bottom: bool = utils::check_dice(seed, 'salt', 10, 0);
             assert(bottom == false, 'bottom');
-            let upper: bool = utils::throw_dice(seed, 'salt', 10, 10);
+            let upper: bool = utils::check_dice(seed, 'salt', 10, 10);
             assert(upper == true, 'bottom');
             n += 1;
         };
