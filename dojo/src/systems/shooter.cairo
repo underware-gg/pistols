@@ -124,18 +124,16 @@ mod shooter {
     fn process_round(ref challenge: Challenge, ref round: Round) {
         // get damage for each player
         if (round.round_number == 1) {
-            let (damage_a, damage_b) = pistols_shootout(round);
-            round.duelist_a.damage = damage_a;
-            round.duelist_b.damage = damage_b;
+            pistols_shootout(ref round);
         } else {
             let (damage_a, damage_b) = blades_clash(round);
             round.duelist_a.damage = damage_a;
             round.duelist_b.damage = damage_b;
+            // apply damage
+            // TODO: move to blades_clash()
+            apply_damage(ref round.duelist_a);
+            apply_damage(ref round.duelist_b);
         }
-
-        // apply damage
-        round.duelist_a.health = MathU8::sub(round.duelist_a.health, round.duelist_a.damage);
-        round.duelist_b.health = MathU8::sub(round.duelist_b.health, round.duelist_b.damage);
 
         // decide results
         if (round.duelist_a.health == 0 && round.duelist_b.health == 0) {
@@ -171,51 +169,55 @@ mod shooter {
     //-----------------------------------
     // Pistols duel
     //
-    fn pistols_shootout(round: Round) -> (u8, u8) {
-        let mut damage_a: u8 = 0;
-        let mut damage_b: u8 = 0;
-
+    fn pistols_shootout(ref round: Round) {
         let steps_a: u8 = round.duelist_a.move;
         let steps_b: u8 = round.duelist_b.move;
 
         if (steps_a == steps_b) {
-            // both duelists shoot together
-            damage_a = shoot_damage('shoot_b', round, steps_b);
-            damage_b = shoot_damage('shoot_a', round, steps_a);
+            // both shoot together
+            shoot_apply_damage('shoot_a', round, ref round.duelist_a, ref round.duelist_b);
+            shoot_apply_damage('shoot_b', round, ref round.duelist_b, ref round.duelist_a);
         } else if (steps_a < steps_b) {
             // A shoots first
-            damage_b = shoot_damage('shoot_a', round, steps_a);
-            // if not dead, B can shoot
-            if (damage_b < constants::FULL_HEALTH) {
-                damage_a = shoot_damage('shoot_b', round, steps_b);
+            shoot_apply_damage('shoot_a', round, ref round.duelist_a, ref round.duelist_b);
+            // if B not dead, shoot
+            if (round.duelist_b.health > 0) {
+                shoot_apply_damage('shoot_b', round, ref round.duelist_b, ref round.duelist_a);
             }
         } else {
             // B shoots first
-            damage_a = shoot_damage('shoot_b', round, steps_b);
-            // if not dead, A can shoot
-            if (damage_a < constants::FULL_HEALTH) {
-                damage_b = shoot_damage('shoot_a', round, steps_a);
+            shoot_apply_damage('shoot_b', round, ref round.duelist_b, ref round.duelist_a);
+            // if A not dead, shoot
+            if (round.duelist_a.health > 0) {
+                shoot_apply_damage('shoot_a', round, ref round.duelist_a, ref round.duelist_b);
             }
         }
-
-        (damage_a, damage_b)
     }
 
-    fn shoot_damage(seed: felt252, round: Round, steps: u8) -> u8 {
+    fn shoot_apply_damage(seed: felt252, round: Round, ref attacker: Move, ref defender: Move) {
+        let steps: u8 = attacker.move;
         // dice 1: did the bullet hit the other player?
         // at step 1: HIT chance is 80%
         // at step 10: HIT chance is 20%
-        let percentage: u128 = MathU8::map(steps, 1, 10, constants::CHANCE_HIT_STEP_1, constants::CHANCE_HIT_STEP_10).into();
-        let hit: bool = check_dice(seed, round, 100, percentage);
-        if (!hit) {
-            return 0;
+        attacker.dice1 = throw_dice(seed, round, 100);
+        let chances: u8 = MathU8::map(steps, 1, 10, constants::CHANCE_HIT_STEP_1, constants::CHANCE_HIT_STEP_10);
+        if (attacker.dice1 <= chances) {
+            // dice 2: if the bullet HIT the other player, what's the damage?
+            // at step 1: KILL chance is 10%
+            // at step 10: KILL chance is 100%
+            attacker.dice2 = throw_dice(seed * 2, round, 100);
+            let chances: u8 = MathU8::map(steps, 1, 10, constants::CHANCE_KILL_STEP_1, constants::CHANCE_KILL_STEP_10);
+            if (attacker.dice2 <= chances) {
+                defender.damage = constants::FULL_HEALTH;
+            } else {
+                defender.damage = constants::HALF_HEALTH;
+            }
+            apply_damage(ref defender);
         }
-        // dice 2: if the bullet HIT the other player, what's the damage?
-        // at step 1: KILL chance is 10%
-        // at step 10: KILL chance is 100%
-        let percentage: u128 = MathU8::map(steps, 1, 10, constants::CHANCE_KILL_STEP_1, constants::CHANCE_KILL_STEP_10).into();
-        let killed: bool = check_dice(seed * 2, round, 100, percentage);
-        (if (killed) { constants::FULL_HEALTH } else { constants::HALF_HEALTH })
+    }
+
+    fn apply_damage(ref move: Move) {
+        move.health = MathU8::sub(move.health, MathU8::sub(move.damage, move.block));
     }
 
 
@@ -284,6 +286,10 @@ mod shooter {
     //-----------------------------------
     // Randomizer
     //
+    fn throw_dice(seed: felt252, round: Round, faces: u128) -> u8 {
+        let salt: u64 = utils::make_round_salt(round);
+        (utils::throw_dice(seed, salt.into(), faces).try_into().unwrap())
+    }
     fn check_dice(seed: felt252, round: Round, faces: u128, limit: u128) -> bool {
         let salt: u64 = utils::make_round_salt(round);
         (utils::check_dice(seed, salt.into(), faces, limit))

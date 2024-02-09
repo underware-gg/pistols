@@ -16,7 +16,7 @@ struct Duelist {
     total_honour: u32,  // sum of al duels Honour
     honour: u8,         // +1 decimal, eg: 100 = 10.0
     timestamp: u64,     // Unix time, 1st registered
-}
+} // f + 176 bits
 
 //
 // Challenge lifecycle
@@ -36,7 +36,7 @@ struct Challenge {
     // Sunday, February 7, 2106 6:28:15 AM
     timestamp_start: u64,       // Unix time, started
     timestamp_end: u64,         // Unix time, ended
-}
+} // f + f + f + 152 bits
 
 //
 // Current challenge from one Duelist to another
@@ -45,7 +45,7 @@ struct Pact {
     #[key]
     pair: u128,     // xor'd duelists
     duel_id: u128,  // current Challenge, or 0x0
-}
+} // 128 bits
 
 //
 // The move of each player on a Round
@@ -54,9 +54,12 @@ struct Move {
     hash: felt252,  // hashed move (salt+move)
     salt: u64,      // the salt
     move: u8,       // the move
+    dice1: u8,      // dice roll result (0..99)
+    dice2: u8,      // dice roll result (0..99)
     damage: u8,     // amount of health taken
+    block: u8,      // amount of damage blocked
     health: u8,     // final health
-}
+} // f + 112 bits
 
 //
 // Each duel round
@@ -69,4 +72,4 @@ struct Round {
     state: u8,          // actually a RoundState
     duelist_a: Move,    // duelist_a move
     duelist_b: Move,    // duelist_b move
-}
+} // f + f + 240 bits
