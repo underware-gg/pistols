@@ -62,7 +62,7 @@ export function DuelIcons({
       {healthRound1 && <EmojiIcon emoji={healthRound1} size={_size} />}
       {movesRound2 && duelStage >= DuelStage.BladesCommit &&
         <CompletedIcon completed={completedStages[DuelStage.BladesCommit]}>
-          <EmojiIcon emoji={EMOJI.HEAVY} size={_size} />
+          <EmojiIcon emoji={EMOJI.BLADES} size={_size} />
         </CompletedIcon>
       }
       {movesRound2 && duelStage == DuelStage.BladesReveal &&

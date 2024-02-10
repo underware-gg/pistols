@@ -35,10 +35,10 @@ export default function DuelistModal() {
   }, [isOpen])
 
   useEffect(() => {
-    if (hasPact) {
+    if (isChallenging && hasPact) {
       dispatchSelectDuel(pactDuelId)
     }
-  }, [hasPact])
+  }, [isChallenging, hasPact])
 
   const _close = () => { dispatchSelectDuelist(0n) }
   const _challenge = () => {
