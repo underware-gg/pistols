@@ -1,6 +1,6 @@
 # Pistols at 10 Blocks
 
-A fully on-chain game, made with love with Dojo
+A fully on-chain game, made with love, by Loot Underworld, with Dojo, for Realms, on Starknet.
 
 Winner of the [Dojo Game Jam #3](https://twitter.com/ohayo_dojo/status/1747626446720258059)
 
