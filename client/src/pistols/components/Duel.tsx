@@ -33,7 +33,7 @@ export default function Duel({
   const { isLive, isFinished, message, duelistA, duelistB } = useChallenge(duelId)
   const { challengeDescription } = useChallengeDescription(duelId)
 
-  const { duelStage, completedStagesA, completedStagesB } = useAnimatedDuel(duelId)
+  const { duelStage, completedStagesA, completedStagesB, canAutoRevealA, canAutoRevealB } = useAnimatedDuel(duelId)
   // console.log(`Round 1:`, round1)
   // console.log(`Round 2:`, round2)
 
@@ -65,6 +65,7 @@ export default function Duel({
           account={account}
           duelistAccount={duelistA}
           completedStages={completedStagesA}
+          canAutoReveal={canAutoRevealA}
         />
       </div>
       <div className='DuelSideB'>
@@ -78,6 +79,7 @@ export default function Duel({
           account={account}
           duelistAccount={duelistB}
           completedStages={completedStagesB}
+          canAutoReveal={canAutoRevealB}
         />
       </div>
 
@@ -121,6 +123,7 @@ function DuelProgress({
   duelistAccount,
   completedStages,
   floated,
+  canAutoReveal = false
 }) {
   const { round1, round2, roundNumber, turnA, turnB, } = useDuel(duelId)
   const round1Move = useMemo(() => (isA ? round1?.duelist_a : round1?.duelist_b), [isA, round1])
@@ -190,6 +193,12 @@ function DuelProgress({
     return null
   }, [isYou, duelStage, completedStages])
 
+  // auto-reveal
+  useEffect(() => {
+    if (onClick && canAutoReveal) {
+      onClick()
+    }
+  }, [onClick, canAutoReveal])
 
   //------------------------------
   return (

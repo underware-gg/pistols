@@ -128,6 +128,7 @@ export const useAnimatedDuel = (duelId: bigint | string) => {
   return {
     ...result,
     duelStage: currentStage,
+    canAutoRevealA: (result.turnA && (currentStage == DuelStage.StepsReveal || currentStage == DuelStage.BladesReveal)),
+    canAutoRevealB: (result.turnB && (currentStage == DuelStage.StepsReveal || currentStage == DuelStage.BladesReveal)),
   }
 }
-
