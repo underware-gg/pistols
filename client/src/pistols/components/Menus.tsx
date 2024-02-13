@@ -7,9 +7,9 @@ import { useThreeJsContext } from '../hooks/ThreeJsContext'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
-import { SettingsIcon, SettingsMenuItem } from '@/pistols/components/ui/Buttons'
 import { DuelistTable } from '@/pistols/components/DuelistTable'
 import { DuelStage } from '@/pistols/hooks/useDuel'
+import { MusicToggle, SfxToggle } from '@/pistols/components/ui/Buttons'
 import { SPRITESHEETS } from '@/pistols/data/assets'
 import AccountHeader from '@/pistols/components/account/AccountHeader'
 
@@ -92,14 +92,6 @@ export function MenuTavern({
   )
 }
 
-export function MusicToggle({
-}) {
-  const { settings, SettingsActions } = useSettingsContext()
-  const { audioLoaded } = useThreeJsContext()
-  if (!audioLoaded) return <></>
-  return <SettingsIcon settingsKey={SettingsActions.MUSIC_ENABLED} value={settings.musicEnabled} nameOn='volume-on' nameOff='volume-off' icon/>
-}
-
 
 export function MenuDuel({
   duelStage,
@@ -123,11 +115,17 @@ export function MenuDuel({
         <Menu.Item onClick={() => _backToTavern()}>
           Back to Tavern
         </Menu.Item>
+
         {/* <Menu.Item disabled={!canSkip} onClick={() => _skipAnimation()}>
           Skip animation
         </Menu.Item> */}
-        {/* <SettingsMenuItem prefix='Music' settingsKey={SettingsActions.MUSIC_ENABLED} currentValue={settings.musicEnabled} /> */}
-        <SettingsMenuItem prefix='SFX' settingsKey={SettingsActions.SFX_ENABLED} currentValue={settings.sfxEnabled} />
+
+        {/* <SettingsMenuItem prefix='SFX' settingsKey={SettingsActions.SFX_ENABLED} currentValue={settings.sfxEnabled} /> */}
+
+        <Menu.Item >
+          <SfxToggle />
+        </Menu.Item>
+
       </Menu>
     </div>
   )
