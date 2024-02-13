@@ -30,7 +30,7 @@ export const useDuelist = (address: bigint | string) => {
   // console.log(`Duelist`, address, bigintToEntity(address), duelist)
 
   const name = useMemo(() => feltToString(duelist?.name ?? 0n), [duelist])
-  const profilePic = useMemo(() => (duelist?.profile_pic ?? 0), [duelist])
+  const profilePic = useMemo(() => (duelist?.profile_pic ?? null), [duelist])
   const isRegistered = useMemo(() => (name.length > 0), [name])
 
   const timestamp = useMemo(() => (duelist?.timestamp ?? 0), [duelist])

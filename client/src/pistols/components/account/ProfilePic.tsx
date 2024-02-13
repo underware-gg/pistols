@@ -2,7 +2,8 @@ import React, { useMemo } from 'react'
 import { Image } from 'semantic-ui-react'
 
 
-const _makeUrl = (profilePic: number, suffix: string) => {
+const _makeUrl = (profilePic: number | null, suffix: string) => {
+  if (profilePic === null) return null
   return `/profiles/${('00' + profilePic).slice(-2)}_${suffix}.jpg`
 }
 const _className = (small: boolean, square: boolean, duel: boolean) => (small ? 'ProfilePicSmall' : square ? 'ProfilePicSquare' : duel ? 'ProfilePicDuel' : 'ProfilePic')
