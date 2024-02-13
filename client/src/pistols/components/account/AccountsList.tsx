@@ -2,7 +2,7 @@ import React, { useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid, Radio, Input, Button, Icon } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
-import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, MenuKey, initialState } from '@/pistols/hooks/PistolsContext'
 import { AccountShort } from '@/pistols/components/ui/Account'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
@@ -46,7 +46,7 @@ export function AccountsList() {
     return result
   }, [account?.address, isDeploying, burners])
 
-  const _enter = (menuKey = MenuKey.Duelists) => {
+  const _enter = (menuKey = initialState.menuKey) => {
     dispatchSetMenu(menuKey)
     router.push('/tavern')
   }
