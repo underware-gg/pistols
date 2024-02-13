@@ -106,15 +106,21 @@ export function MenuDuel({
 }) {
   const router = useRouter()
   const { settings, SettingsActions } = useSettingsContext()
+  const { dispatchSelectDuel } = usePistolsContext()
+
+  const _backToTavern = () => {
+    dispatchSelectDuel(0n)
+    router.push('/tavern')
+  }
 
   const _skipAnimation = () => {
-
   }
+
   const canSkip = duelStage == DuelStage.PistolsShootout || duelStage == DuelStage.BladesClash
   return (
     <div className='MenuBottom AlignCenter NoMouse'>
       <Menu secondary compact className='YesMouse' size='huge'>
-        <Menu.Item onClick={() => router.push('/tavern')}>
+        <Menu.Item onClick={() => _backToTavern()}>
           Back to Tavern
         </Menu.Item>
         {/* <Menu.Item disabled={!canSkip} onClick={() => _skipAnimation()}>
