@@ -189,9 +189,9 @@ function AccountItem({
         <div className='Relative'>
           <ProfilePicSquareButton
             profilePic={_profilePic}
-            // onClick={() => setSelectedProfilePic(_profilePic < _profilePicCount ? _profilePic + 1 : 1)}
-            onClick={() => { }}
-            disabled={!canEdit}
+            onClick={() => select(address)}
+            // disabled={!canEdit}
+            dimmed={!canEdit}
           />
           {canEdit && <>
             <div className='ProfilePicLeftButton'
