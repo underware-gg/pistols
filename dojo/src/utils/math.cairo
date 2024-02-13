@@ -5,6 +5,8 @@ trait MathTrait<T> {
     fn min(a: T, b: T) -> T;
     // returns maximum value
     fn max(a: T, b: T) -> T;
+    // returns a value clamped between min and max
+    fn clamp(v: T, min: T, max: T) -> T;
     // safe subtraction
     fn sub(a: T, b: T) -> T;
     // returns GDC of two numbers
@@ -23,6 +25,9 @@ impl MathU8 of MathTrait<u8> {
     }
     fn max(a: u8, b: u8) -> u8 {
         if (a > b) { (a) } else { (b) }
+    }
+    fn clamp(v: u8, min: u8, max: u8) -> u8 {
+        if (v < min) { (min) } else if (v > max) { (max) } else { (v) }
     }
 
     fn sub(a: u8, b: u8) -> u8 {
@@ -82,6 +87,9 @@ impl MathU16 of MathTrait<u16> {
     fn max(a: u16, b: u16) -> u16 {
         if (a > b) { (a) } else { (b) }
     }
+    fn clamp(v: u16, min: u16, max: u16) -> u16 {
+        if (v < min) { (min) } else if (v > max) { (max) } else { (v) }
+    }
 
     fn sub(a: u16, b: u16) -> u16 {
         if (b >= a) { (0) } else { (a - b) }
@@ -121,6 +129,9 @@ impl MathU32 of MathTrait<u32> {
     fn max(a: u32, b: u32) -> u32 {
         if (a > b) { (a) } else { (b) }
     }
+    fn clamp(v: u32, min: u32, max: u32) -> u32 {
+        if (v < min) { (min) } else if (v > max) { (max) } else { (v) }
+    }
 
     fn sub(a: u32, b: u32) -> u32 {
         if (b >= a) { (0) } else { (a - b) }
@@ -159,6 +170,9 @@ impl MathU64 of MathTrait<u64> {
     fn max(a: u64, b: u64) -> u64 {
         if (a > b) { (a) } else { (b) }
     }
+    fn clamp(v: u64, min: u64, max: u64) -> u64 {
+        if (v < min) { (min) } else if (v > max) { (max) } else { (v) }
+    }
 
     fn sub(a: u64, b: u64) -> u64 {
         if (b >= a) { (0) } else { (a - b) }
@@ -196,6 +210,9 @@ impl MathU128 of MathTrait<u128> {
     }
     fn max(a: u128, b: u128) -> u128 {
         if (a > b) { (a) } else { (b) }
+    }
+    fn clamp(v: u128, min: u128, max: u128) -> u128 {
+        if (v < min) { (min) } else if (v > max) { (max) } else { (v) }
     }
 
     fn sub(a: u128, b: u128) -> u128 {
@@ -240,6 +257,9 @@ impl MathU256 of MathTrait<u256> {
     }
     fn max(a: u256, b: u256) -> u256 {
         if (a > b) { (a) } else { (b) }
+    }
+    fn clamp(v: u256, min: u256, max: u256) -> u256 {
+        if (v < min) { (min) } else if (v > max) { (max) } else { (v) }
     }
 
     fn sub(a: u256, b: u256) -> u256 {
@@ -286,17 +306,27 @@ mod tests {
     #[test]
     #[available_gas(100_000_000)]
     fn test_min_max() {
-        assert(MathU128::min(0,0) == 0, String::concat('min', '0,0'));
-        assert(MathU128::min(0,1) == 0, String::concat('min', '0,1'));
-        assert(MathU128::min(1,0) == 0, String::concat('min', '1,0'));
-        assert(MathU128::min(1,2) == 1, String::concat('min', '1,2'));
-        assert(MathU128::min(2,1) == 1, String::concat('min', '2,1'));
+        assert(MathU128::min(0,0) == 0, 'min_0,0');
+        assert(MathU128::min(0,1) == 0, 'min_0,1');
+        assert(MathU128::min(1,0) == 0, 'min_1,0');
+        assert(MathU128::min(1,2) == 1, 'min_1,2');
+        assert(MathU128::min(2,1) == 1, 'min_2,1');
 
-        assert(MathU128::max(0,0) == 0, String::concat('max', '0,0'));
-        assert(MathU128::max(0,1) == 1, String::concat('max', '0,1'));
-        assert(MathU128::max(1,0) == 1, String::concat('max', '1,0'));
-        assert(MathU128::max(1,2) == 2, String::concat('max', '1,2'));
-        assert(MathU128::max(2,1) == 2, String::concat('max', '2,1'));
+        assert(MathU128::max(0,0) == 0, 'max_0,0');
+        assert(MathU128::max(0,1) == 1, 'max_0,1');
+        assert(MathU128::max(1,0) == 1, 'max_1,0');
+        assert(MathU128::max(1,2) == 2, 'max_1,2');
+        assert(MathU128::max(2,1) == 2, 'max_2,1');
+    }
+
+    #[test]
+    #[available_gas(100_000_000)]
+    fn test_clamp() {
+        assert(MathU128::clamp(0, 10, 100) == 10, 'clamp_0');
+        assert(MathU128::clamp(10, 10, 100) == 10, 'clamp_10');
+        assert(MathU128::clamp(50, 10, 100) == 50, 'clamp_50');
+        assert(MathU128::clamp(100, 10, 100) == 100, 'clamp_100');
+        assert(MathU128::clamp(101, 10, 100) == 100, 'clamp_101');
     }
 
     #[test]
@@ -327,38 +357,38 @@ mod tests {
     #[test]
     #[available_gas(100_000_000)]
     fn test_pow() {
-        assert(MathU128::pow(0,0) == 1, String::concat('test_math_pow', '0,0'));
-        assert(MathU128::pow(0,1) == 0, String::concat('test_math_pow', '0,1'));
-        assert(MathU128::pow(0,2) == 0, String::concat('test_math_pow', '0,2'));
-        assert(MathU128::pow(0,8) == 0, String::concat('test_math_pow', '0,8'));
-        assert(MathU128::pow(1,0) == 1, String::concat('test_math_pow', '1,0'));
-        assert(MathU128::pow(1,1) == 1, String::concat('test_math_pow', '1,1'));
-        assert(MathU128::pow(1,2) == 1, String::concat('test_math_pow', '1,2'));
-        assert(MathU128::pow(1,8) == 1, String::concat('test_math_pow', '1,8'));
-        assert(MathU128::pow(2,0) == 1, String::concat('test_math_pow', '2,0'));
-        assert(MathU128::pow(2,1) == 2, String::concat('test_math_pow', '2,1`'));
-        assert(MathU128::pow(2,2) == 4, String::concat('test_math_pow', '2,2'));
-        assert(MathU128::pow(2,8) == 256, String::concat('test_math_pow', '2,8'));
-        assert(MathU128::pow(10,0) == 1, String::concat('test_math_pow', '10,0'));
-        assert(MathU128::pow(10,1) == 10, String::concat('test_math_pow', '10,1`'));
-        assert(MathU128::pow(10,2) == 100, String::concat('test_math_pow', '10,2'));
-        assert(MathU128::pow(10,8) == 100_000_000, String::concat('test_math_pow', '10,8'));
+        assert(MathU128::pow(0,0) == 1, 'test_math_pow_0,0');
+        assert(MathU128::pow(0,1) == 0, 'test_math_pow_0,1');
+        assert(MathU128::pow(0,2) == 0, 'test_math_pow_0,2');
+        assert(MathU128::pow(0,8) == 0, 'test_math_pow_0,8');
+        assert(MathU128::pow(1,0) == 1, 'test_math_pow_1,0');
+        assert(MathU128::pow(1,1) == 1, 'test_math_pow_1,1');
+        assert(MathU128::pow(1,2) == 1, 'test_math_pow_1,2');
+        assert(MathU128::pow(1,8) == 1, 'test_math_pow_1,8');
+        assert(MathU128::pow(2,0) == 1, 'test_math_pow_2,0');
+        assert(MathU128::pow(2,1) == 2, 'test_math_pow_2,1`');
+        assert(MathU128::pow(2,2) == 4, 'test_math_pow_2,2');
+        assert(MathU128::pow(2,8) == 256, 'test_math_pow_2,8');
+        assert(MathU128::pow(10,0) == 1, 'test_math_pow_10,0');
+        assert(MathU128::pow(10,1) == 10, 'test_math_pow_10,1`');
+        assert(MathU128::pow(10,2) == 100, 'test_math_pow_10,2');
+        assert(MathU128::pow(10,8) == 100_000_000, 'test_math_pow_10,8');
     }
 
     #[test]
     #[available_gas(100_000_000)]
     fn test_map() {
-        assert(MathU8::map(1, 1, 5, 20, 40) == 20, String::concat('map', '1'));
-        assert(MathU8::map(2, 1, 5, 20, 40) == 25, String::concat('map', '2'));
-        assert(MathU8::map(3, 1, 5, 20, 40) == 30, String::concat('map', '3'));
-        assert(MathU8::map(4, 1, 5, 20, 40) == 35, String::concat('map', '4'));
-        assert(MathU8::map(5, 1, 5, 20, 40) == 40, String::concat('map', '5'));
+        assert(MathU8::map(1, 1, 5, 20, 40) == 20, 'map_1');
+        assert(MathU8::map(2, 1, 5, 20, 40) == 25, 'map_2');
+        assert(MathU8::map(3, 1, 5, 20, 40) == 30, 'map_3');
+        assert(MathU8::map(4, 1, 5, 20, 40) == 35, 'map_4');
+        assert(MathU8::map(5, 1, 5, 20, 40) == 40, 'map_5');
         // output values can be inverted
-        assert(MathU8::map(1, 1, 5, 40, 20) == 40, String::concat('map', 'i_1'));
-        assert(MathU8::map(2, 1, 5, 40, 20) == 35, String::concat('map', 'i_2'));
-        assert(MathU8::map(3, 1, 5, 40, 20) == 30, String::concat('map', 'i_3'));
-        assert(MathU8::map(4, 1, 5, 40, 20) == 25, String::concat('map', 'i_4'));
-        assert(MathU8::map(5, 1, 5, 40, 20) == 20, String::concat('map', 'i_5'));
+        assert(MathU8::map(1, 1, 5, 40, 20) == 40, 'map_i_1');
+        assert(MathU8::map(2, 1, 5, 40, 20) == 35, 'map_i_2');
+        assert(MathU8::map(3, 1, 5, 40, 20) == 30, 'map_i_3');
+        assert(MathU8::map(4, 1, 5, 40, 20) == 25, 'map_i_4');
+        assert(MathU8::map(5, 1, 5, 40, 20) == 20, 'map_i_5');
     }
 
     #[test]

@@ -73,26 +73,32 @@ export function createSystemCalls(
 
   const get_pact = async (duelist_a: bigint, duelist_b: bigint): Promise<bigint | null> => {
     const args = [duelist_a, duelist_b]
-    const result = await _executeCall('get_pact', args) as bigint
-    return result ?? null
+    const result = await _executeCall('get_pact', args)
+    return result !== null ? BigInt(result) : null
   }
 
   const has_pact = async (duelist_a: bigint, duelist_b: bigint): Promise<boolean | null> => {
     const args = [duelist_a, duelist_b]
-    const result = await _executeCall('has_pact', args) as boolean
-    return result ?? null
+    const result = await _executeCall('has_pact', args)
+    return result !== null ? Boolean(result) : null
   }
 
-  const get_shoot_hit_chance = async (duelist: bigint, steps: number): Promise<number | null> => {
-    const args = [duelist, steps]
-    const result = await _executeCall('get_shoot_hit_chance', args) as number
-    return result ? Number(result) : null
+  const get_pistols_bonus = async (duelist: bigint): Promise<number | null> => {
+    const args = [duelist]
+    const result = await _executeCall('get_pistols_bonus', args)
+    return result !== null ? Number(result) : null
   }
 
-  const get_shoot_kill_chance = async (duelist: bigint, steps: number): Promise<number | null> => {
+  const get_pistols_hit_chance = async (duelist: bigint, steps: number): Promise<number | null> => {
     const args = [duelist, steps]
-    const result = await _executeCall('get_shoot_kill_chance', args) as number
-    return result ? Number(result) : null
+    const result = await _executeCall('get_pistols_hit_chance', args)
+    return result !== null ? Number(result) : null
+  }
+
+  const get_pistols_kill_chance = async (duelist: bigint, steps: number): Promise<number | null> => {
+    const args = [duelist, steps]
+    const result = await _executeCall('get_pistols_kill_chance', args)
+    return result !== null ? Number(result) : null
   }
 
   return {
@@ -104,8 +110,9 @@ export function createSystemCalls(
     // read-only calls
     get_pact,
     has_pact,
-    get_shoot_hit_chance,
-    get_shoot_kill_chance,
+    get_pistols_bonus,
+    get_pistols_hit_chance,
+    get_pistols_kill_chance,
   }
 }
 

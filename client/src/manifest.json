@@ -949,7 +949,7 @@
     {
       "name": "pistols::systems::actions::actions",
       "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
-      "class_hash": "0x6d97855c0b2c6000f452894e7e8e42bde27542f8ded4836f71a4b0b610d64dd",
+      "class_hash": "0x7b00c61f3be6a36325ceccfb4dffa10f8fd6b9718ada8627223afbcaa29286b",
       "abi": [
         {
           "type": "impl",
@@ -1212,10 +1212,26 @@
             },
             {
               "type": "function",
-              "name": "get_shoot_hit_chance",
+              "name": "get_pistols_bonus",
               "inputs": [
                 {
-                  "name": "duelist",
+                  "name": "duelist_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u8"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_pistols_hit_chance",
+              "inputs": [
+                {
+                  "name": "duelist_address",
                   "type": "core::starknet::contract_address::ContractAddress"
                 },
                 {
@@ -1232,10 +1248,10 @@
             },
             {
               "type": "function",
-              "name": "get_shoot_kill_chance",
+              "name": "get_pistols_kill_chance",
               "inputs": [
                 {
-                  "name": "duelist",
+                  "name": "duelist_address",
                   "type": "core::starknet::contract_address::ContractAddress"
                 },
                 {

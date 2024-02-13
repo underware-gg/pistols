@@ -19,10 +19,11 @@ export default function CommitStepsModal({
   duelId: bigint
   roundNumber?: number
 }) {
-  const { commit_move, get_shoot_hit_chance, get_shoot_kill_chance } = useDojoSystemCalls()
+  const { commit_move, get_pistols_bonus, get_pistols_hit_chance, get_pistols_kill_chance } = useDojoSystemCalls()
   const { account } = useDojoAccount()
 
   const [steps, setSteps] = useState(0)
+  const [bonus, setBonus] = useState(null)
   const [chanceToHit, setChanceToHit] = useState(0)
   const [chanceToKill, setChanceToKill] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -33,17 +34,27 @@ export default function CommitStepsModal({
 
   useEffect(() => {
     let _mounted = true
+    const _getBonus = async () => {
+      const value = await get_pistols_bonus(BigInt(account.address))
+      console.log(`BNUS:`, value)
+      if (_mounted) setBonus(value)
+    }
     const _getHit = async () => {
-      const value = await get_shoot_hit_chance(BigInt(account.address), steps)
+      const value = await get_pistols_hit_chance(BigInt(account.address), steps)
       if (_mounted) setChanceToHit(value)
     }
     const _getKill = async () => {
-      const value = await get_shoot_kill_chance(BigInt(account.address), steps)
+      const value = await get_pistols_kill_chance(BigInt(account.address), steps)
       if (_mounted) setChanceToKill(value)
     }
     if (steps) {
+      _getBonus()
       _getHit()
       _getKill()
+    } else {
+      setBonus(null)
+      setChanceToHit(0)
+      setChanceToKill(0)
     }
     return () => {
       _mounted = false
@@ -99,6 +110,11 @@ export default function CommitStepsModal({
           <ProgressBar disabled={!steps} label='Chances to Hit:' percent={chanceToHit} className='ChancesBar'/>
           <ProgressBar disabled={!steps} label='Chances to Kill:' percent={chanceToKill} className='ChancesBar' />
           <ProgressBar disabled={!steps} label='Honour:' value={steps ?? 0} total={10} className='ChancesBar' />
+
+          <p className='ModalText'>&nbsp;
+            {bonus > 0 && <>(Includes <b>{bonus}%</b> Honour bonus)</>}
+            {bonus === 0 && <>Keep your Honour <b>{'>'} 9.0</b> for a bonus</>}
+          </p>
 
         </Modal.Description>
       </Modal.Content>

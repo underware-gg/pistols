@@ -1178,6 +1178,7 @@ a.active.step:hover,
 // <ProgressBar>
 .ui.progress .bar {
   background-color: $color-important;
+  min-width: 4em;
 }
 // .ui.disaled.progress .bar {
 //   background-color: $color-inactive;
@@ -1186,7 +1187,7 @@ a.active.step:hover,
   @extend .TitleCase;
   font-family: $font-family;
   font-weight: 600;
-  font-size: 1.25em;
+  font-size: 1.5em;
   color: $color-brightest;
   margin-top: -0.65em;
   margin-right: -0.2em;

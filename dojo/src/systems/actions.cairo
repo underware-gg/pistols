@@ -48,12 +48,15 @@ trait IActions<TContractState> {
         duelist_a: ContractAddress,
         duelist_b: ContractAddress,
     ) -> bool;
-    fn get_shoot_hit_chance(self: @TContractState,
-        duelist: ContractAddress,
+    fn get_pistols_bonus(self: @TContractState,
+        duelist_address: ContractAddress,
+    ) -> u8;
+    fn get_pistols_hit_chance(self: @TContractState,
+        duelist_address: ContractAddress,
         steps: u8,
     ) -> u8;
-    fn get_shoot_kill_chance(self: @TContractState,
-        duelist: ContractAddress,
+    fn get_pistols_kill_chance(self: @TContractState,
+        duelist_address: ContractAddress,
         steps: u8,
     ) -> u8;
 }
@@ -236,17 +239,25 @@ mod actions {
             (self.get_pact(duelist_a, duelist_b) != 0)
         }
 
-        fn get_shoot_hit_chance(self: @ContractState,
-            duelist: ContractAddress,
-            steps: u8,
+        fn get_pistols_bonus(self: @ContractState,
+            duelist_address: ContractAddress,
         ) -> u8 {
-            (utils::get_shoot_hit_chance(duelist, steps))
+            let world: IWorldDispatcher = self.world_dispatcher.read();
+            (utils::get_pistols_bonus(world, duelist_address))
         }
-        fn get_shoot_kill_chance(self: @ContractState,
-            duelist: ContractAddress,
+        fn get_pistols_hit_chance(self: @ContractState,
+            duelist_address: ContractAddress,
             steps: u8,
         ) -> u8 {
-            (utils::get_shoot_kill_chance(duelist, steps))
+            let world: IWorldDispatcher = self.world_dispatcher.read();
+            (utils::get_pistols_hit_chance(world, duelist_address, steps))
+        }
+        fn get_pistols_kill_chance(self: @ContractState,
+            duelist_address: ContractAddress,
+            steps: u8,
+        ) -> u8 {
+            let world: IWorldDispatcher = self.world_dispatcher.read();
+            (utils::get_pistols_kill_chance(world, duelist_address, steps))
         }
 
     }

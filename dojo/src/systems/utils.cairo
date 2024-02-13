@@ -117,13 +117,19 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
     }
 }
 
-fn get_shoot_hit_chance(duelist: ContractAddress, steps: u8 ) -> u8 {
-    // TODO: apply bonus, clamp()
-    (MathU8::map(steps, 1, 10, constants::CHANCE_HIT_STEP_1, constants::CHANCE_HIT_STEP_10))
+fn get_pistols_bonus(world: IWorldDispatcher, duelist_address: ContractAddress ) -> u8 {
+    let duelist: Duelist = get!(world, duelist_address, Duelist);
+    (MathU8::sub(duelist.honour, 90))
 }
-fn get_shoot_kill_chance(duelist: ContractAddress, steps: u8 ) -> u8 {
-    // TODO: apply bonus, clamp()
-    (MathU8::map(steps, 1, 10, constants::CHANCE_KILL_STEP_1, constants::CHANCE_KILL_STEP_10))
+fn get_pistols_hit_chance(world: IWorldDispatcher, duelist_address: ContractAddress, steps: u8 ) -> u8 {
+    let bonus: u8 = get_pistols_bonus(world, duelist_address);
+    let chance: u8 = MathU8::map(steps, 1, 10, constants::CHANCE_HIT_STEP_1, constants::CHANCE_HIT_STEP_10);
+    (MathU8::clamp(chance + bonus, 0, 100))
+}
+fn get_pistols_kill_chance(world: IWorldDispatcher, duelist_address: ContractAddress, steps: u8 ) -> u8 {
+    let bonus: u8 = get_pistols_bonus(world, duelist_address);
+    let chance: u8 = MathU8::map(steps, 1, 10, constants::CHANCE_KILL_STEP_1, constants::CHANCE_KILL_STEP_10);
+    (MathU8::clamp(chance + bonus, 0, 100))
 }
 
 fn make_move_hash(salt: u64, move: u8) -> felt252 {
