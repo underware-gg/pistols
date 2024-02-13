@@ -1,7 +1,6 @@
-import React, { useState } from 'react'
-import { Grid, Modal } from 'semantic-ui-react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Grid } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
-import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { Blades } from '@/pistols/utils/pistols'
 import { signAndRestoreMoveFromHash } from '../utils/salt'
 
@@ -36,35 +35,16 @@ export default function RevealModal({
     setIsSubmitting(false)
   }
 
-  const canReveal = (duelId && roundNumber && hash && !isSubmitting)
+  const canReveal = useMemo(() => (isOpen && duelId && roundNumber && hash && !isSubmitting), [isOpen, duelId,roundNumber, hash, isSubmitting])
 
-  return (
-    <Modal
-      size='tiny'
-      // dimmer='inverted'
-      onClose={() => setIsOpen(false)}
-      open={isOpen}
-    >
-      {/* <Modal.Header className='AlignCenter'></Modal.Header> */}
-      <Modal.Content>
-        <Modal.Description className='AlignCenter ModalText'>
-          <p>
-            Reveal your move...
-          </p>
-        </Modal.Description>
-      </Modal.Content>
-      <Modal.Actions>
-        <Grid className='FillParent Padded' textAlign='center'>
-          <Row columns='equal'>
-            <Col>
-              <ActionButton fill label='Close' onClick={() => setIsOpen(false)} />
-            </Col>
-            <Col>
-              <ActionButton fill attention label='Reveal...' disabled={!canReveal} onClick={() => _reveal()} />
-            </Col>
-          </Row>
-        </Grid>
-      </Modal.Actions>
-    </Modal>
-  )
+  //
+  // auto-reveal (no modal)
+  //
+  useEffect(() => {
+    if (canReveal) {
+      _reveal()
+    }
+  }, [canReveal])
+
+  return <></>
 }
