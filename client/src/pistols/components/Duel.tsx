@@ -10,7 +10,7 @@ import { DuelStage, useAnimatedDuel, useDuel } from '@/pistols/hooks/useDuel'
 import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
-import { BladesNames, FULL_HEALTH, HALF_HEALTH } from '@/pistols/utils/pistols'
+import { BladesNames, FULL_HEALTH, SINGLE_DAMAGE } from '@/pistols/utils/pistols'
 import { MenuDuel } from '@/pistols/components/Menus'
 import { AnimationState } from '@/pistols/three/game'
 import { EmojiIcon } from '@/pistols/components/ui/Icons'
@@ -157,10 +157,10 @@ function DuelProgress({
   }, [round2, duelStage])
 
   const _resultBackground = (health: number) => {
-    return health == FULL_HEALTH ? 'Positive' : health == HALF_HEALTH ? 'Warning' : 'Negative'
+    return health == FULL_HEALTH ? 'Positive' : health == SINGLE_DAMAGE ? 'Warning' : 'Negative'
   }
   const _resultEmoji = (health: number) => {
-    return health == FULL_HEALTH ? EMOJI.ALIVE : health == HALF_HEALTH ? EMOJI.INJURED : EMOJI.DEAD
+    return health == FULL_HEALTH ? EMOJI.ALIVE : health == SINGLE_DAMAGE ? EMOJI.INJURED : EMOJI.DEAD
   }
 
 

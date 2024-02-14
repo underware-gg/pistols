@@ -210,7 +210,7 @@ mod shooter {
             if (attacker.dice2 <= chances) {
                 defender.damage = constants::FULL_HEALTH;
             } else {
-                defender.damage = constants::HALF_HEALTH;
+                defender.damage = constants::SINGLE_DAMAGE;
             }
             apply_damage(ref defender);
         }
@@ -245,10 +245,10 @@ mod shooter {
 
         if (blades_a == Blades::Light) {
             if (blades_b == Blades::Light) {
-                damage_a = constants::HALF_HEALTH;
-                damage_b = constants::HALF_HEALTH;
+                damage_a = constants::SINGLE_DAMAGE;
+                damage_b = constants::SINGLE_DAMAGE;
             } else if (blades_b == Blades::Heavy) {
-                damage_b = constants::HALF_HEALTH;
+                damage_b = constants::SINGLE_DAMAGE;
                 // if B survives, A is hit
                 if (damage_b < round.duelist_b.health) {
                     damage_a = constants::FULL_HEALTH;
@@ -261,7 +261,7 @@ mod shooter {
                 damage_a = constants::FULL_HEALTH;
                 damage_b = constants::FULL_HEALTH;
             } else if (blades_b == Blades::Light) {
-                damage_a = constants::HALF_HEALTH;
+                damage_a = constants::SINGLE_DAMAGE;
                 // if A survives, B is hit
                 if (damage_a < round.duelist_a.health) {
                     damage_b = constants::FULL_HEALTH;

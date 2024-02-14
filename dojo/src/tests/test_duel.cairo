@@ -740,8 +740,8 @@ mod tests {
             constants::FULL_HEALTH, BLADES::LIGHT, // duelist_b
         );
         assert(challenge.winner == 0, 'bad winner');
-        assert(round.duelist_a.health == constants::HALF_HEALTH, 'bad health_a');
-        assert(round.duelist_b.health == constants::HALF_HEALTH, 'bad health_b');
+        assert(round.duelist_a.health == constants::SINGLE_DAMAGE, 'bad health_a');
+        assert(round.duelist_b.health == constants::SINGLE_DAMAGE, 'bad health_b');
     }
     #[test]
     #[available_gas(1_000_000_000)]
@@ -750,10 +750,10 @@ mod tests {
         let (challenge, round) = _execute_round_ready_with_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, BLADES::LIGHT, // duelist_a
-            constants::HALF_HEALTH, BLADES::LIGHT, // duelist_b
+            constants::SINGLE_DAMAGE, BLADES::LIGHT, // duelist_b
         );
         assert(challenge.winner == 1, 'bad winner');
-        assert(round.duelist_a.health == constants::HALF_HEALTH, 'bad health_a');
+        assert(round.duelist_a.health == constants::SINGLE_DAMAGE, 'bad health_a');
         assert(round.duelist_b.health == 0, 'bad health_b');
     }
     #[test]
@@ -762,12 +762,12 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_round_ready_with_blades(
             world, system, owner, other,
-            constants::HALF_HEALTH, BLADES::LIGHT, // duelist_a
+            constants::SINGLE_DAMAGE, BLADES::LIGHT, // duelist_a
             constants::FULL_HEALTH, BLADES::LIGHT, // duelist_b
         );
         assert(challenge.winner == 2, 'bad winner');
         assert(round.duelist_a.health == 0, 'bad health_a');
-        assert(round.duelist_b.health == constants::HALF_HEALTH, 'bad health_b');
+        assert(round.duelist_b.health == constants::SINGLE_DAMAGE, 'bad health_b');
     }
 
     #[test]
@@ -777,21 +777,21 @@ mod tests {
         let (challenge, round) = _execute_round_ready_with_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, BLADES::LIGHT,
-            constants::HALF_HEALTH, BLADES::BLOCK,
+            constants::SINGLE_DAMAGE, BLADES::BLOCK,
         );
         assert(challenge.winner == 0, 'wrong winner');
         assert(round.duelist_a.health == constants::FULL_HEALTH, 'bad health_a');
-        assert(round.duelist_b.health == constants::HALF_HEALTH, 'bad health_b');
+        assert(round.duelist_b.health == constants::SINGLE_DAMAGE, 'bad health_b');
     }
     fn test_blade_light_vs_block_b() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_round_ready_with_blades(
             world, system, owner, other,
-            constants::HALF_HEALTH, BLADES::BLOCK,
+            constants::SINGLE_DAMAGE, BLADES::BLOCK,
             constants::FULL_HEALTH, BLADES::LIGHT,
         );
         assert(challenge.winner == 0, 'wrong winner');
-        assert(round.duelist_a.health == constants::HALF_HEALTH, 'bad health_a');
+        assert(round.duelist_a.health == constants::SINGLE_DAMAGE, 'bad health_a');
         assert(round.duelist_b.health == constants::FULL_HEALTH, 'bad health_b');
     }
 
@@ -802,7 +802,7 @@ mod tests {
         let (challenge, round) = _execute_round_ready_with_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, BLADES::LIGHT,
-            constants::HALF_HEALTH, BLADES::HEAVY,
+            constants::SINGLE_DAMAGE, BLADES::HEAVY,
         );
         assert(challenge.winner == 1, 'wrong winner');
         assert(round.duelist_a.health == constants::FULL_HEALTH, 'bad health_a');
@@ -819,7 +819,7 @@ mod tests {
         );
         assert(challenge.winner == 2, 'wrong winner');
         assert(round.duelist_a.health == 0, 'bad health_a');
-        assert(round.duelist_b.health == constants::HALF_HEALTH, 'bad health_b');
+        assert(round.duelist_b.health == constants::SINGLE_DAMAGE, 'bad health_b');
     }
     #[test]
     #[available_gas(1_000_000_000)]
@@ -827,7 +827,7 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_round_ready_with_blades(
             world, system, owner, other,
-            constants::HALF_HEALTH, BLADES::HEAVY,
+            constants::SINGLE_DAMAGE, BLADES::HEAVY,
             constants::FULL_HEALTH, BLADES::LIGHT,
         );
         assert(challenge.winner == 2, 'wrong winner');
@@ -844,7 +844,7 @@ mod tests {
             constants::FULL_HEALTH, BLADES::LIGHT,
         );
         assert(challenge.winner == 1, 'wrong winner');
-        assert(round.duelist_a.health == constants::HALF_HEALTH, 'bad health_a');
+        assert(round.duelist_a.health == constants::SINGLE_DAMAGE, 'bad health_a');
         assert(round.duelist_b.health == 0, 'bad health_b');
     }
 

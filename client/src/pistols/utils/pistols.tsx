@@ -7,8 +7,8 @@ import { bigintToHex } from "./utils"
 //
 export const ROUND_COUNT = 2
 export const FULL_HONOUR = 100
-export const FULL_HEALTH = 100
-export const HALF_HEALTH = 50
+export const FULL_HEALTH = 2
+export const SINGLE_DAMAGE = 1
 
 
 //------------------------------------------
