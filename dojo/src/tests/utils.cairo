@@ -127,6 +127,14 @@ mod utils {
         let result: u8 = system.get_pistols_bonus(duelist_address);
         (result)
     }
+    fn get_pistols_hit_chance(system: IActionsDispatcher, duelist_address: ContractAddress, steps: u8) -> u8 {
+        let result: u8 = system.get_pistols_hit_chance(duelist_address, steps);
+        (result)
+    }
+    fn get_pistols_kill_chance(system: IActionsDispatcher, duelist_address: ContractAddress, steps: u8) -> u8 {
+        let result: u8 = system.get_pistols_kill_chance(duelist_address, steps);
+        (result)
+    }
 
     //
     // getters

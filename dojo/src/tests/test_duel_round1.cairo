@@ -97,37 +97,42 @@ mod tests {
     fn test_single_round_resolved() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
-        let (salt_1_a, salt_1_b, move_1_a, move_1_b, hash_1_a, hash_1_b) = _get_moves_round_1_resolved();
+        let (salt_a, salt_b, move_a, move_b, hash_a, hash_b) = _get_moves_round_1_resolved();
+
+        let hit_chance_a = utils::get_pistols_hit_chance(system, owner, move_a);
+        let hit_chance_b = utils::get_pistols_hit_chance(system, owner, move_b);
+        let kill_chance_a = utils::get_pistols_kill_chance(system, owner, move_a);
+        let kill_chance_b = utils::get_pistols_kill_chance(system, owner, move_b);
 
         // 1st commit
-        utils::execute_commit_move(system, owner, duel_id, 1, hash_1_a);
+        utils::execute_commit_move(system, owner, duel_id, 1, hash_a);
         let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
         assert(challenge.round_number == 1, '1__challenge.round_number');
         assert(round.round_number == 1, '1__round.round_number');
         assert(round.state == RoundState::Commit.into(), '1__state');
-        assert(round.duelist_a.hash == hash_1_a, '1__hash');
+        assert(round.duelist_a.hash == hash_a, '1__hash');
 
         // 2nd commit > Reveal
-        utils::execute_commit_move(system, other, duel_id, 1, hash_1_b);
+        utils::execute_commit_move(system, other, duel_id, 1, hash_b);
         let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
         assert(challenge.round_number == 1, '2__challenge.round_number');
         assert(round.round_number == 1, '2__round.round_number');
         assert(round.state == RoundState::Reveal.into(), '2__state');
-        assert(round.duelist_a.hash == hash_1_a, '21__hash');
-        assert(round.duelist_b.hash == hash_1_b, '2__hash');
+        assert(round.duelist_a.hash == hash_a, '21__hash');
+        assert(round.duelist_b.hash == hash_b, '2__hash');
 
         // 1st reveal
-        utils::execute_reveal_move(system, owner, duel_id, 1, salt_1_a, move_1_a);
+        utils::execute_reveal_move(system, owner, duel_id, 1, salt_a, move_a);
         let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
         assert(challenge.round_number == 1, '3_challenge.round_number');
         assert(round.round_number == 1, '3__round.round_number');
         assert(round.state == RoundState::Reveal.into(), '3__state');
-        assert(round.duelist_a.hash == hash_1_a, '3__hash');
-        assert(round.duelist_a.salt == salt_1_a, '3__salt');
-        assert(round.duelist_a.move == move_1_a, '3__move');
+        assert(round.duelist_a.hash == hash_a, '3__hash');
+        assert(round.duelist_a.salt == salt_a, '3__salt');
+        assert(round.duelist_a.move == move_a, '3__move');
 
         // 2nd reveal > Finished
-        utils::execute_reveal_move(system, other, duel_id, 1, salt_1_b, move_1_b);
+        utils::execute_reveal_move(system, other, duel_id, 1, salt_b, move_b);
         let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
         assert(challenge.state == ChallengeState::Resolved.into(), '4_challenge.state');
         assert(challenge.winner != 0, '4_challenge.winner');
@@ -135,12 +140,12 @@ mod tests {
         assert(challenge.timestamp_end > 0, '4_challenge.timestamp_end');
         assert(round.round_number == 1, '4__round.round_number');
         assert(round.state == RoundState::Finished.into(), '4__state');
-        assert(round.duelist_a.hash == hash_1_a, '43__hash');
-        assert(round.duelist_a.salt == salt_1_a, '43__salt');
-        assert(round.duelist_a.move == move_1_a, '43__move');
-        assert(round.duelist_b.hash == hash_1_b, '4__hash');
-        assert(round.duelist_b.salt == salt_1_b, '4__salt');
-        assert(round.duelist_b.move == move_1_b, '4__move');
+        assert(round.duelist_a.hash == hash_a, '43__hash');
+        assert(round.duelist_a.salt == salt_a, '43__salt');
+        assert(round.duelist_a.move == move_a, '43__move');
+        assert(round.duelist_b.hash == hash_b, '4__hash');
+        assert(round.duelist_b.salt == salt_b, '4__salt');
+        assert(round.duelist_b.move == move_b, '4__move');
 
         let duelist_a = utils::get_Duelist(world, owner);
         let duelist_b = utils::get_Duelist(world, other);
@@ -148,10 +153,10 @@ mod tests {
         assert(duelist_b.total_duels == 1, 'duelist_b.total_duels');
         assert(duelist_a.total_draws == 0, 'duelist_a.total_draws');
         assert(duelist_b.total_draws == 0, 'duelist_b.total_draws');
-        assert(duelist_a.total_honour == move_1_a.into(), 'duelist_a.total_honour');
-        assert(duelist_b.total_honour == move_1_b.into(), 'duelist_b.total_honour');
-        assert(duelist_a.honour == (move_1_a * 10).into(), 'duelist_a.honour');
-        assert(duelist_b.honour == (move_1_b * 10).into(), 'duelist_b.honour');
+        assert(duelist_a.total_honour == move_a.into(), 'duelist_a.total_honour');
+        assert(duelist_b.total_honour == move_b.into(), 'duelist_b.total_honour');
+        assert(duelist_a.honour == (move_a * 10).into(), 'duelist_a.honour');
+        assert(duelist_b.honour == (move_b * 10).into(), 'duelist_b.honour');
 
         if (challenge.winner == 1) {
             assert(duelist_a.total_wins == 1, 'a_win_duelist_a.total_wins');
@@ -160,6 +165,8 @@ mod tests {
             assert(duelist_b.total_losses == 1, 'a_win_duelist_b.total_losses');
             assert(round.duelist_a.damage < constants::FULL_HEALTH, 'a_win_damage_a');
             assert(round.duelist_a.health > 0, 'a_win_health_a');
+            assert(round.duelist_a.dice1 > 0 && round.duelist_a.dice1 <= hit_chance_a, 'hit_chance_a');
+            assert(round.duelist_a.dice2 > 0 && round.duelist_a.dice2 <= kill_chance_a, 'kill_chance_a');
             assert(round.duelist_b.damage == constants::FULL_HEALTH, 'a_win_damage_b');
             assert(round.duelist_b.health == 0, 'a_win_health_b');
         } else if (challenge.winner == 2) {
@@ -169,6 +176,8 @@ mod tests {
             assert(duelist_b.total_losses == 0, 'b_win_duelist_b.total_losses');
             assert(round.duelist_b.damage < constants::FULL_HEALTH, 'b_win_damage_b');
             assert(round.duelist_b.health > 0, 'b_win_health_b');
+            assert(round.duelist_b.dice1 > 0 && round.duelist_b.dice1 <= hit_chance_b, 'hit_chance_b');
+            assert(round.duelist_b.dice2 > 0 && round.duelist_b.dice2 <= kill_chance_b, 'kill_chance_b');
             assert(round.duelist_a.damage == constants::FULL_HEALTH, 'b_win_damage_a');
             assert(round.duelist_a.health == 0, 'b_win_health_a');
         } else {
@@ -178,10 +187,10 @@ mod tests {
         // Run same challenge to compute totals
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
         // invert player order just for fun, expect same results!
-        utils::execute_commit_move(system, other, duel_id, 1, hash_1_b);
-        utils::execute_commit_move(system, owner, duel_id, 1, hash_1_a);
-        utils::execute_reveal_move(system, other, duel_id, 1, salt_1_b, move_1_b);
-        utils::execute_reveal_move(system, owner, duel_id, 1, salt_1_a, move_1_a);
+        utils::execute_commit_move(system, other, duel_id, 1, hash_b);
+        utils::execute_commit_move(system, owner, duel_id, 1, hash_a);
+        utils::execute_reveal_move(system, other, duel_id, 1, salt_b, move_b);
+        utils::execute_reveal_move(system, owner, duel_id, 1, salt_a, move_a);
         let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
         assert(challenge.state == ChallengeState::Resolved.into(), '4_challenge.state');
         assert(challenge.winner != 0, '4_challenge.winner');
@@ -195,10 +204,10 @@ mod tests {
         assert(duelist_b.total_duels == 2, '__duelist_b.total_duels');
         assert(duelist_a.total_draws == 0, '__duelist_a.total_draws');
         assert(duelist_b.total_draws == 0, '__duelist_b.total_draws');
-        assert(duelist_a.total_honour == (move_1_a * 2).into(), '__duelist_a.total_honour');
-        assert(duelist_b.total_honour == (move_1_b * 2).into(), '__duelist_b.total_honour');
-        assert(duelist_a.honour == (move_1_a * 10).into(), '__duelist_a.honour');
-        assert(duelist_b.honour == (move_1_b * 10).into(), '__duelist_b.honour');
+        assert(duelist_a.total_honour == (move_a * 2).into(), '__duelist_a.total_honour');
+        assert(duelist_b.total_honour == (move_b * 2).into(), '__duelist_b.total_honour');
+        assert(duelist_a.honour == (move_a * 10).into(), '__duelist_a.honour');
+        assert(duelist_b.honour == (move_b * 10).into(), '__duelist_b.honour');
 
         if (challenge.winner == 1) {
             assert(duelist_a.total_wins == 2, '__a_win_duelist_a.total_wins');
@@ -243,9 +252,9 @@ mod tests {
     fn test_already_commit_a() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
-        let (salt_1_a, salt_1_b, move_1_a, move_1_b, hash_1_a, hash_1_b) = _get_moves_round_1_resolved();
-        utils::execute_commit_move(system, owner, duel_id, 1, hash_1_a);
-        utils::execute_commit_move(system, owner, duel_id, 1, hash_1_a);
+        let (salt_a, salt_b, move_a, move_b, hash_a, hash_b) = _get_moves_round_1_resolved();
+        utils::execute_commit_move(system, owner, duel_id, 1, hash_a);
+        utils::execute_commit_move(system, owner, duel_id, 1, hash_a);
     }
     #[test]
     #[available_gas(1_000_000_000)]
@@ -253,9 +262,9 @@ mod tests {
     fn test_already_commit_b() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
-        let (salt_1_a, salt_1_b, move_1_a, move_1_b, hash_1_a, hash_1_b) = _get_moves_round_1_resolved();
-        utils::execute_commit_move(system, other, duel_id, 1, hash_1_b);
-        utils::execute_commit_move(system, other, duel_id, 1, hash_1_b);
+        let (salt_a, salt_b, move_a, move_b, hash_a, hash_b) = _get_moves_round_1_resolved();
+        utils::execute_commit_move(system, other, duel_id, 1, hash_b);
+        utils::execute_commit_move(system, other, duel_id, 1, hash_b);
     }
 
     #[test]
@@ -264,11 +273,11 @@ mod tests {
     fn test_already_revealed_a() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
-        let (salt_1_a, salt_1_b, move_1_a, move_1_b, hash_1_a, hash_1_b) = _get_moves_round_1_resolved();
-        utils::execute_commit_move(system, owner, duel_id, 1, hash_1_a);
-        utils::execute_commit_move(system, other, duel_id, 1, hash_1_b);
-        utils::execute_reveal_move(system, owner, duel_id, 1, salt_1_a, move_1_a);
-        utils::execute_reveal_move(system, owner, duel_id, 1, salt_1_a, move_1_a);
+        let (salt_a, salt_b, move_a, move_b, hash_a, hash_b) = _get_moves_round_1_resolved();
+        utils::execute_commit_move(system, owner, duel_id, 1, hash_a);
+        utils::execute_commit_move(system, other, duel_id, 1, hash_b);
+        utils::execute_reveal_move(system, owner, duel_id, 1, salt_a, move_a);
+        utils::execute_reveal_move(system, owner, duel_id, 1, salt_a, move_a);
     }
     #[test]
     #[available_gas(1_000_000_000)]
@@ -276,11 +285,11 @@ mod tests {
     fn test_already_revealed_b() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
-        let (salt_1_a, salt_1_b, move_1_a, move_1_b, hash_1_a, hash_1_b) = _get_moves_round_1_resolved();
-        utils::execute_commit_move(system, owner, duel_id, 1, hash_1_a);
-        utils::execute_commit_move(system, other, duel_id, 1, hash_1_b);
-        utils::execute_reveal_move(system, other, duel_id, 1, salt_1_b, move_1_b);
-        utils::execute_reveal_move(system, other, duel_id, 1, salt_1_b, move_1_b);
+        let (salt_a, salt_b, move_a, move_b, hash_a, hash_b) = _get_moves_round_1_resolved();
+        utils::execute_commit_move(system, owner, duel_id, 1, hash_a);
+        utils::execute_commit_move(system, other, duel_id, 1, hash_b);
+        utils::execute_reveal_move(system, other, duel_id, 1, salt_b, move_b);
+        utils::execute_reveal_move(system, other, duel_id, 1, salt_b, move_b);
     }
 
     #[test]
@@ -289,10 +298,10 @@ mod tests {
     fn test_not_in_commit() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
-        let (salt_1_a, salt_1_b, move_1_a, move_1_b, hash_1_a, hash_1_b) = _get_moves_round_1_resolved();
-        utils::execute_commit_move(system, owner, duel_id, 1, hash_1_a);
-        utils::execute_commit_move(system, other, duel_id, 1, hash_1_b);
-        utils::execute_commit_move(system, owner, duel_id, 1, hash_1_a);
+        let (salt_a, salt_b, move_a, move_b, hash_a, hash_b) = _get_moves_round_1_resolved();
+        utils::execute_commit_move(system, owner, duel_id, 1, hash_a);
+        utils::execute_commit_move(system, other, duel_id, 1, hash_b);
+        utils::execute_commit_move(system, owner, duel_id, 1, hash_a);
     }
 
     #[test]
@@ -301,9 +310,9 @@ mod tests {
     fn test_not_in_reveal() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
-        let (salt_1_a, salt_1_b, move_1_a, move_1_b, hash_1_a, hash_1_b) = _get_moves_round_1_resolved();
-        utils::execute_commit_move(system, other, duel_id, 1, hash_1_b);
-        utils::execute_reveal_move(system, other, duel_id, 1, salt_1_b, move_1_b);
+        let (salt_a, salt_b, move_a, move_b, hash_a, hash_b) = _get_moves_round_1_resolved();
+        utils::execute_commit_move(system, other, duel_id, 1, hash_b);
+        utils::execute_reveal_move(system, other, duel_id, 1, salt_b, move_b);
     }
 
     #[test]
@@ -315,8 +324,8 @@ mod tests {
         utils::execute_register_duelist(system, other, OTHER_NAME, 2);
         let expire_seconds: u64 = timestamp::from_days(2);
         let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, expire_seconds);
-        let (salt_1_a, salt_1_b, move_1_a, move_1_b, hash_1_a, hash_1_b) = _get_moves_round_1_resolved();
-        utils::execute_commit_move(system, other, duel_id, 1, hash_1_b);
+        let (salt_a, salt_b, move_a, move_b, hash_a, hash_b) = _get_moves_round_1_resolved();
+        utils::execute_commit_move(system, other, duel_id, 1, hash_b);
     }
 
     #[test]
@@ -325,12 +334,12 @@ mod tests {
     fn test_challenge_finished_commit() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
-        let (salt_1_a, salt_1_b, move_1_a, move_1_b, hash_1_a, hash_1_b) = _get_moves_round_1_resolved();
-        utils::execute_commit_move(system, other, duel_id, 1, hash_1_b);
-        utils::execute_commit_move(system, owner, duel_id, 1, hash_1_a);
-        utils::execute_reveal_move(system, other, duel_id, 1, salt_1_b, move_1_b);
-        utils::execute_reveal_move(system, owner, duel_id, 1, salt_1_a, move_1_a);
-        utils::execute_commit_move(system, owner, duel_id, 1, hash_1_a);
+        let (salt_a, salt_b, move_a, move_b, hash_a, hash_b) = _get_moves_round_1_resolved();
+        utils::execute_commit_move(system, other, duel_id, 1, hash_b);
+        utils::execute_commit_move(system, owner, duel_id, 1, hash_a);
+        utils::execute_reveal_move(system, other, duel_id, 1, salt_b, move_b);
+        utils::execute_reveal_move(system, owner, duel_id, 1, salt_a, move_a);
+        utils::execute_commit_move(system, owner, duel_id, 1, hash_a);
     }
 
     #[test]
@@ -339,12 +348,12 @@ mod tests {
     fn test_challenge_finished_reveal() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
-        let (salt_1_a, salt_1_b, move_1_a, move_1_b, hash_1_a, hash_1_b) = _get_moves_round_1_resolved();
-        utils::execute_commit_move(system, other, duel_id, 1, hash_1_b);
-        utils::execute_commit_move(system, owner, duel_id, 1, hash_1_a);
-        utils::execute_reveal_move(system, other, duel_id, 1, salt_1_b, move_1_b);
-        utils::execute_reveal_move(system, owner, duel_id, 1, salt_1_a, move_1_a);
-        utils::execute_reveal_move(system, owner, duel_id, 1, salt_1_a, move_1_a);
+        let (salt_a, salt_b, move_a, move_b, hash_a, hash_b) = _get_moves_round_1_resolved();
+        utils::execute_commit_move(system, other, duel_id, 1, hash_b);
+        utils::execute_commit_move(system, owner, duel_id, 1, hash_a);
+        utils::execute_reveal_move(system, other, duel_id, 1, salt_b, move_b);
+        utils::execute_reveal_move(system, owner, duel_id, 1, salt_a, move_a);
+        utils::execute_reveal_move(system, owner, duel_id, 1, salt_a, move_a);
     }
 
     #[test]
