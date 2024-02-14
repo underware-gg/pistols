@@ -259,46 +259,6 @@ mod tests {
         }
     }
 
-    #[test]
-    #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Bad blade move','ENTRYPOINT_FAILED'))]
-    fn test_bad_blade_move_a() {
-        let (world, system, owner, other) = utils::setup_world();
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
-
-        let (salt_1_a, salt_1_b, move_1_a, move_1_b, hash_1_a, hash_1_b) = _get_moves_round_1_continue();
-        utils::execute_commit_move(system, owner, duel_id, 1, hash_1_a);
-        utils::execute_commit_move(system, other, duel_id, 1, hash_1_b);
-        utils::execute_reveal_move(system, owner, duel_id, 1, salt_1_a, move_1_a);
-        utils::execute_reveal_move(system, other, duel_id, 1, salt_1_b, move_1_b);
-
-        let hash_a: felt252 = make_move_hash(0x111, 4);
-        let hash_b: felt252 = make_move_hash(0x222, 1);
-        utils::execute_commit_move(system, owner, duel_id, 2, hash_a);
-        utils::execute_commit_move(system, other, duel_id, 2, hash_b);
-        utils::execute_reveal_move(system, owner, duel_id, 2, 0x111, 4);
-    }
-    #[test]
-    #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Bad blade move','ENTRYPOINT_FAILED'))]
-    fn test_bad_blade_move_b() {
-        let (world, system, owner, other) = utils::setup_world();
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
-
-        let (salt_1_a, salt_1_b, move_1_a, move_1_b, hash_1_a, hash_1_b) = _get_moves_round_1_continue();
-        utils::execute_commit_move(system, owner, duel_id, 1, hash_1_a);
-        utils::execute_commit_move(system, other, duel_id, 1, hash_1_b);
-        utils::execute_reveal_move(system, owner, duel_id, 1, salt_1_a, move_1_a);
-        utils::execute_reveal_move(system, other, duel_id, 1, salt_1_b, move_1_b);
-
-        let hash_a: felt252 = make_move_hash(0x111, 1);
-        let hash_b: felt252 = make_move_hash(0x222, 4);
-        utils::execute_commit_move(system, owner, duel_id, 2, hash_a);
-        utils::execute_commit_move(system, other, duel_id, 2, hash_b);
-        utils::execute_reveal_move(system, other, duel_id, 2, 0x222, 4);
-    }
-
-
 
 
     //-----------------------------------------

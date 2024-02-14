@@ -399,41 +399,30 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Invalid move zero','ENTRYPOINT_FAILED'))]
-    fn test_invalid_move_zero() {
+    fn test_clamp_steps() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
         let hash_a: felt252 = make_move_hash(0x111, 0);
-        let hash_b: felt252 = make_move_hash(0x222, 1);
+        let hash_b: felt252 = make_move_hash(0x222, 11);
         utils::execute_commit_move(system, owner, duel_id, 1, hash_a);
         utils::execute_commit_move(system, other, duel_id, 1, hash_b);
         utils::execute_reveal_move(system, owner, duel_id, 1, 0x111, 0);
+        utils::execute_reveal_move(system, other, duel_id, 1, 0x222, 11);
+        let round: Round = utils::get_Round(world, duel_id, 1);
+        assert(round.duelist_a.move == 1, 'move_0');
+        assert(round.duelist_b.move == 10, 'move_11');
     }
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Bad step move','ENTRYPOINT_FAILED'))]
-    fn test_invalid_move() {
-        let (world, system, owner, other) = utils::setup_world();
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
-        let hash_a: felt252 = make_move_hash(0x111, 11);
-        let hash_b: felt252 = make_move_hash(0x222, 1);
-        utils::execute_commit_move(system, owner, duel_id, 1, hash_a);
-        utils::execute_commit_move(system, other, duel_id, 1, hash_b);
-        utils::execute_reveal_move(system, owner, duel_id, 1, 0x111, 11);
-    }
-
-    #[test]
-    #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Bad step move','ENTRYPOINT_FAILED'))]
     fn test_register_keep_scores() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
-        let hash_a: felt252 = make_move_hash(0x111, 11);
+        let hash_a: felt252 = make_move_hash(0x111, 10);
         let hash_b: felt252 = make_move_hash(0x222, 1);
         utils::execute_commit_move(system, owner, duel_id, 1, hash_a);
         utils::execute_commit_move(system, other, duel_id, 1, hash_b);
-        utils::execute_reveal_move(system, owner, duel_id, 1, 0x111, 11);
+        utils::execute_reveal_move(system, owner, duel_id, 1, 0x111, 10);
         let duelist_a_before = utils::get_Duelist(world, owner);
         utils::execute_register_duelist(system, owner, 'dssadsa', 3);
         let duelist_a_after = utils::get_Duelist(world, owner);

@@ -11,7 +11,7 @@ mod shooter {
     use pistols::types::challenge::{ChallengeState};
     use pistols::types::round::{RoundState};
     use pistols::types::steps::{Steps};
-    use pistols::types::blades::{Blades};
+    use pistols::types::blades::{Blades, BLADES};
     use pistols::utils::math::{MathU8};
 
     fn _assert_challenge(world: IWorldDispatcher, caller: ContractAddress, duel_id: u128, round_number: u8) -> (Challenge, u8) {
@@ -26,16 +26,6 @@ mod shooter {
         assert(challenge.round_number == round_number, 'Bad Round number');
         
         (challenge, duelist_number)
-    }
-
-    fn _assert_round_move(round_number: u8, move: u8) {
-        if (round_number == 1) {
-            let steps: Option<Steps> = move.try_into();
-            assert(steps != Option::None, 'Bad step move');
-        } else if (round_number == 2) {
-            let blade: Option<Blades> = move.try_into();
-            assert(blade != Option::None, 'Bad blade move');
-        }
     }
 
 
@@ -74,7 +64,7 @@ mod shooter {
     //-----------------------------------
     // Reveal
     //
-    fn reveal_move(world: IWorldDispatcher, duel_id: u128, round_number: u8, salt: u64, move: u8) {
+    fn reveal_move(world: IWorldDispatcher, duel_id: u128, round_number: u8, salt: u64, mut move: u8) {
         let caller: ContractAddress = starknet::get_caller_address();
 
         // Assert correct Challenge
@@ -88,9 +78,8 @@ mod shooter {
         let hash: felt252 = utils::make_move_hash(salt, move);
 
         // validate move
-        assert(move > 0, 'Invalid move zero');
-        // will panic if invalid move
-        _assert_round_move(round_number, move);
+        // if invalid, set as 0 (idle, will skip round)
+        move = validated_move(round_number, move);
 
         // Store move
         if (duelist_number == 1) {
@@ -106,7 +95,7 @@ mod shooter {
         }
 
         // Finishes round if both moves are revealed
-        if (round.duelist_a.move > 0 && round.duelist_b.move > 0) {
+        if (round.duelist_a.salt > 0 && round.duelist_b.salt > 0) {
             process_round(world, ref challenge, ref round);
             // update Round first, Challenge may need it
             set!(world, (round));
@@ -116,6 +105,18 @@ mod shooter {
             // update Round only
             set!(world, (round));
         }
+    }
+
+    fn validated_move(round_number: u8, move: u8) -> u8 {
+        if (round_number == 1) {
+            return MathU8::clamp(move, 1, 10);
+        } else if (round_number == 2) {
+            let blade: Option<Blades> = move.try_into();
+            if (blade == Option::None) {
+                return (BLADES::IDLE);
+            }
+        }
+        (move)
     }
 
     //---------------------------------------
