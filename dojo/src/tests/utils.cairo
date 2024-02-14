@@ -123,6 +123,10 @@ mod utils {
         let result: bool = system.has_pact(a, b);
         (result)
     }
+    fn get_pistols_bonus(system: IActionsDispatcher, duelist_address: ContractAddress) -> u8 {
+        let result: u8 = system.get_pistols_bonus(duelist_address);
+        (result)
+    }
 
     //
     // getters

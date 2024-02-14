@@ -117,9 +117,11 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
     }
 }
 
+// Pistols chance bonus = (duelist.honour - 90), capped at duelis.total_duels
 fn get_pistols_bonus(world: IWorldDispatcher, duelist_address: ContractAddress ) -> u8 {
     let duelist: Duelist = get!(world, duelist_address, Duelist);
-    (MathU8::sub(duelist.honour, 90))
+    let bonus: u8 = MathU8::sub(duelist.honour, 90);
+    if (duelist.total_duels < bonus.into()) { (duelist.total_duels.try_into().unwrap()) } else { (bonus) }
 }
 fn get_pistols_hit_chance(world: IWorldDispatcher, duelist_address: ContractAddress, steps: u8 ) -> u8 {
     let bonus: u8 = get_pistols_bonus(world, duelist_address);
