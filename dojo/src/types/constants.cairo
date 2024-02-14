@@ -7,10 +7,10 @@ mod constants {
     const FULL_HONOUR: u8 = 100;
     
     // initial health of a player on a duel
-    const FULL_HEALTH: u8 = 2;
-
-    // damage taken when player is not killed
+    const FULL_HEALTH: u8 = 3;
+    // damage taken
     const SINGLE_DAMAGE: u8 = 1;
+    const DOUBLE_DAMAGE: u8 = 2;
 
     // hit chance (percentage) at steps
     const CHANCE_HIT_STEP_1: u8 = 80;
