@@ -14,7 +14,7 @@ mod tests {
 
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
-    const MESSAGE_1: felt252 = 'Challenge yaa for a duuel!!';
+    const MESSAGE_1: felt252 = 'For honour!!!';
 
     #[test]
     #[available_gas(1_000_000_000)]
