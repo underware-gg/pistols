@@ -76,8 +76,8 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
                     hash: 0,
                     salt: 0,
                     move: 0,
-                    dice1: 0,
-                    dice2: 0,
+                    dice_crit: 0,
+                    dice_hit: 0,
                     damage: 0,
                     block: 0,
                     health: health_a,
@@ -86,8 +86,8 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
                     hash: 0,
                     salt: 0,
                     move: 0,
-                    dice1: 0,
-                    dice2: 0,
+                    dice_crit: 0,
+                    dice_hit: 0,
                     damage: 0,
                     block: 0,
                     health: health_b,
@@ -127,6 +127,7 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         set!(world, (duelist_a, duelist_b));
     }
 }
+
 
 //------------------------
 // Pistols chances
@@ -196,6 +197,13 @@ fn check_dice(seed: felt252, salt: felt252, faces: u128, limit: u128) -> bool {
 
 
 
+
+
+
+
+//------------------------------------------------------
+// Unit tests
+//
 #[cfg(test)]
 mod tests {
     use core::traits::{Into, TryInto};

@@ -54,8 +54,8 @@ struct Move {
     hash: felt252,  // hashed move (salt+move)
     salt: u64,      // the salt
     move: u8,       // the move
-    dice1: u8,      // dice roll result (0..99)
-    dice2: u8,      // dice roll result (0..99)
+    dice_crit: u8,  // dice roll result (1..100) - kill / double damage
+    dice_hit: u8,   // dice roll result (1..100) - hit / normal damage
     damage: u8,     // amount of health taken
     block: u8,      // amount of damage blocked
     health: u8,     // final health

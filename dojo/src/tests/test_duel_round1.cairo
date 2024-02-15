@@ -165,8 +165,8 @@ mod tests {
             assert(duelist_b.total_losses == 1, 'a_win_duelist_b.total_losses');
             assert(round.duelist_a.damage < constants::FULL_HEALTH, 'a_win_damage_a');
             assert(round.duelist_a.health > 0, 'a_win_health_a');
-            assert(round.duelist_a.dice1 > 0 && round.duelist_a.dice1 <= hit_chance_a, 'hit_chance_a');
-            assert(round.duelist_a.dice2 > 0 && round.duelist_a.dice2 <= kill_chance_a, 'kill_chance_a');
+            assert(round.duelist_a.dice_hit > 0 && round.duelist_a.dice_hit <= hit_chance_a, 'hit_chance_a');
+            assert(round.duelist_a.dice_crit > 0 && round.duelist_a.dice_crit <= kill_chance_a, 'kill_chance_a');
             assert(round.duelist_b.damage == constants::FULL_HEALTH, 'a_win_damage_b');
             assert(round.duelist_b.health == 0, 'a_win_health_b');
         } else if (challenge.winner == 2) {
@@ -176,8 +176,8 @@ mod tests {
             assert(duelist_b.total_losses == 0, 'b_win_duelist_b.total_losses');
             assert(round.duelist_b.damage < constants::FULL_HEALTH, 'b_win_damage_b');
             assert(round.duelist_b.health > 0, 'b_win_health_b');
-            assert(round.duelist_b.dice1 > 0 && round.duelist_b.dice1 <= hit_chance_b, 'hit_chance_b');
-            assert(round.duelist_b.dice2 > 0 && round.duelist_b.dice2 <= kill_chance_b, 'kill_chance_b');
+            assert(round.duelist_b.dice_hit > 0 && round.duelist_b.dice_hit <= hit_chance_b, 'hit_chance_b');
+            assert(round.duelist_b.dice_crit > 0 && round.duelist_b.dice_crit <= kill_chance_b, 'kill_chance_b');
             assert(round.duelist_a.damage == constants::FULL_HEALTH, 'b_win_damage_a');
             assert(round.duelist_a.health == 0, 'b_win_health_a');
         } else {

@@ -107,16 +107,19 @@ mod shooter {
         }
     }
 
+    // Validates a move and returns it
+    // Pistols: if invalid, clamps between 1 and 10
+    // Blades: if invalid, returns Blades::Idle
     fn validated_move(round_number: u8, move: u8) -> u8 {
         if (round_number == 1) {
-            return MathU8::clamp(move, 1, 10);
+            return MathU8::clamp(move, 1, 10); // valid or not, clamp in steps
         } else if (round_number == 2) {
             let blade: Option<Blades> = move.try_into();
-            if (blade == Option::None) {
-                return (BLADES::IDLE);
+            if (blade != Option::None) {
+                return (move); // valid move
             }
         }
-        (move)
+        (0) // invalid move
     }
 
     //---------------------------------------
@@ -128,10 +131,6 @@ mod shooter {
             pistols_shootout(world, challenge, ref round);
         } else {
             blades_clash(world, challenge, ref round);
-            // apply damage
-            // TODO: move to blades_clash()
-            apply_damage(ref round.duelist_a);
-            apply_damage(ref round.duelist_b);
         }
 
         // decide results
@@ -198,15 +197,15 @@ mod shooter {
         // dice 1: did the bullet hit the other player?
         // at step 1: HIT chance is 80%
         // at step 10: HIT chance is 20%
-        attack.dice1 = throw_dice(seed, round, 100);
+        attack.dice_hit = throw_dice(seed, round, 100);
         let chances: u8 = utils::get_pistols_hit_chance(world, duelist, steps);
-        if (attack.dice1 <= chances) {
+        if (attack.dice_hit <= chances) {
             // dice 2: if the bullet HIT the other player, what's the damage?
             // at step 1: KILL chance is 10%
             // at step 10: KILL chance is 100%
-            attack.dice2 = throw_dice(seed * 2, round, 100);
+            attack.dice_crit = throw_dice(seed * 2, round, 100);
             let chances: u8 = utils::get_pistols_kill_chance(world, duelist, steps);
-            if (attack.dice2 <= chances) {
+            if (attack.dice_crit <= chances) {
                 defense.damage = constants::FULL_HEALTH;
             } else {
                 defense.damage = constants::SINGLE_DAMAGE;
@@ -268,14 +267,14 @@ mod shooter {
     fn thow_blades_dices(world: IWorldDispatcher, seed: felt252, duelist: ContractAddress, round: Round, ref attack: Move, ref defense: Move) {
         let blade: Blades = attack.move.try_into().unwrap();
         if (blade != Blades::Idle) {
-            attack.dice1 = throw_dice(seed, round, 100);
+            attack.dice_hit = throw_dice(seed, round, 100);
             let chances: u8 = utils::get_blades_hit_chance(world, duelist, attack.health, blade);
             // hit!
-            if(attack.dice1 <= chances) {
+            if(attack.dice_hit <= chances) {
                 if (blade == Blades::Heavy) {
-                    attack.dice2 = throw_dice(seed * 2, round, 100);
+                    attack.dice_crit = throw_dice(seed * 2, round, 100);
                     let chances: u8 = utils::get_blades_kill_chance(world, duelist, attack.health, blade);
-                    if (attack.dice2 <= chances) {
+                    if (attack.dice_crit <= chances) {
                         defense.damage = constants::FULL_HEALTH;
                     } else {
                         defense.damage = constants::DOUBLE_DAMAGE;
@@ -302,4 +301,94 @@ mod shooter {
         (utils::check_dice(seed, salt.into(), faces, limit))
     }
 
+}
+
+
+
+
+
+
+//------------------------------------------------------
+// Unit tests
+//
+#[cfg(test)]
+mod tests {
+    use debug::PrintTrait;
+    use core::traits::{Into, TryInto};
+
+    use pistols::systems::shooter::{shooter};
+    use pistols::models::models::{Move};
+    use pistols::types::blades::{Blades, BLADES};
+
+    #[test]
+    #[available_gas(1_000_000)]
+    fn test_validated_move() {
+        assert(shooter::validated_move(1, 0) == 1, '1_0');
+        assert(shooter::validated_move(1, 1) == 1, '1_1');
+        assert(shooter::validated_move(1, 10) == 10, '1_10');
+        assert(shooter::validated_move(1, 11) == 10, '1_11');
+        assert(shooter::validated_move(2, BLADES::IDLE) == BLADES::IDLE, '2_IDLE');
+        assert(shooter::validated_move(2, BLADES::HEAVY) == BLADES::HEAVY, '2_HEAVY');
+        assert(shooter::validated_move(2, BLADES::LIGHT) == BLADES::LIGHT, '2_LIGHT');
+        assert(shooter::validated_move(2, BLADES::BLOCK) == BLADES::BLOCK, '2_BLOCK');
+        assert(shooter::validated_move(2, 10) == BLADES::IDLE, '2_10');
+        assert(shooter::validated_move(3, BLADES::HEAVY) == BLADES::IDLE, '3_HEAVY');
+    }
+
+    #[test]
+    #[available_gas(1_000_000)]
+    fn test_apply_damage() {
+        let mut move = Move {
+            hash: 0,
+            salt: 0,
+            move: 0,
+            dice_crit: 0,
+            dice_hit: 0,
+            damage: 0,
+            block: 0,
+            health: 0,
+        };
+        // damages
+        move.health = 3;
+        move.damage = 1;
+        shooter::apply_damage(ref move);
+        assert(move.health == 2, '3-1');
+        shooter::apply_damage(ref move);
+        assert(move.health == 1, '2-1');
+        shooter::apply_damage(ref move);
+        assert(move.health == 0, '1-1');
+        shooter::apply_damage(ref move);
+        assert(move.health == 0, '0-1');
+        // overflow
+        move.health = 1;
+        move.damage = 3;
+        shooter::apply_damage(ref move);
+        assert(move.health == 0, '1-3');
+        // blocks
+        move.health = 1;
+        move.damage = 0;
+        move.block = 1;
+        shooter::apply_damage(ref move);
+        assert(move.health == 1, '1-0+1');
+        move.health = 1;
+        move.damage = 1;
+        move.block = 1;
+        shooter::apply_damage(ref move);
+        assert(move.health == 1, '1-1+1');
+        move.health = 1;
+        move.damage = 2;
+        move.block = 1;
+        shooter::apply_damage(ref move);
+        assert(move.health == 0, '1-2+1');
+        move.health = 2;
+        move.damage = 4;
+        move.block = 1;
+        shooter::apply_damage(ref move);
+        assert(move.health == 0, '2-4+1');
+        move.health = 1;
+        move.damage = 2;
+        move.block = 5;
+        shooter::apply_damage(ref move);
+        assert(move.health == 1, '1-2+5');
+    }
 }
