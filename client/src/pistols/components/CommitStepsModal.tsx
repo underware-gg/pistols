@@ -107,13 +107,13 @@ export default function CommitStepsModal({
 
           <Divider hidden />
           
-          <ProgressBar disabled={!steps} label='Chances to Hit:' percent={chanceToHit} className='ChancesBar'/>
-          <ProgressBar disabled={!steps} label='Chances to Kill:' percent={chanceToKill} className='ChancesBar' />
+          <ProgressBar disabled={!steps} label='Execution Chance:' percent={chanceToKill} className='ChancesBar' />
+          <ProgressBar disabled={!steps} label='Hit Chance:' percent={chanceToHit} className='ChancesBar'/>
           <ProgressBar disabled={!steps} label='Honour:' value={steps ?? 0} total={10} className='ChancesBar' />
 
           <p className='ModalText'>&nbsp;
-            {bonus > 0 && <>(Includes <b>{bonus}%</b> Honour bonus)</>}
-            {bonus === 0 && <>Keep your Honour <b>{'>'} 9.0</b> for a bonus</>}
+            {bonus > 0 && <>(Includes Honourable <b>{bonus}%</b> hit bonus)</>}
+            {bonus === 0 && <>Keep your Honour <b>{'>'} 9.0</b> for a hit bonus</>}
           </p>
 
         </Modal.Description>

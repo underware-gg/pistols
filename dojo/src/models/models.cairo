@@ -7,6 +7,7 @@ use pistols::types::challenge::{ChallengeState};
 struct Duelist {
     #[key]
     address: ContractAddress,
+    //-----------------------
     name: felt252,
     profile_pic: u8,
     total_duels: u16,
@@ -24,6 +25,7 @@ struct Duelist {
 struct Challenge {
     #[key]
     duel_id: u128,
+    //-------------------------
     duelist_a: ContractAddress, // Challenger
     duelist_b: ContractAddress, // Challenged
     message: felt252,           // message to challenged
@@ -44,6 +46,7 @@ struct Challenge {
 struct Pact {
     #[key]
     pair: u128,     // xor'd duelists
+    //------------
     duel_id: u128,  // current Challenge, or 0x0
 } // 128 bits
 
@@ -69,7 +72,8 @@ struct Round {
     duel_id: u128,
     #[key]
     round_number: u8,
+    //---------------
     state: u8,          // actually a RoundState
     duelist_a: Move,    // duelist_a move
     duelist_b: Move,    // duelist_b move
-} // f + f + 224 bits
+} // f + f + (8 + 112 + 112) 232 bits

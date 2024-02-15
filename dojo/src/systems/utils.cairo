@@ -168,12 +168,9 @@ fn get_blades_hit_chance(world: IWorldDispatcher, duelist_address: ContractAddre
     (MathU8::sub(constants::BLADES_HIT_CHANCE + bonus, penalty))
 }
 fn get_blades_kill_chance(world: IWorldDispatcher, duelist_address: ContractAddress, health: u8, blade: Blades) -> u8 {
-    if (blade == Blades::Heavy) {
-        let (bonus, penalty): (u8, u8) = get_blades_bonus_penalty(world, duelist_address, health);
-        (MathU8::sub(constants::BLADES_HEAVY_KILL_CHANCE + bonus, penalty))
-    } else {
-        (0)
-    }
+    // let (bonus, penalty): (u8, u8) = get_blades_bonus_penalty(world, duelist_address, health);
+    // (MathU8::sub(constants::BLADES_KILL_CHANCE + bonus, penalty))
+    (constants::BLADES_KILL_CHANCE)
 }
 
 
