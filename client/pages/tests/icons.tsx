@@ -17,9 +17,9 @@ export default function IndexPage() {
         <Grid>
           <Row>
             <Col><StepsIcon stepCount={10} /></Col>
-            <Col><BladesIcon blades={Blades.Heavy} /></Col>
-            <Col><BladesIcon blades={Blades.Light} /></Col>
-            <Col><BladesIcon blades={Blades.Block} /></Col>
+            <Col><BladesIcon blade={Blades.Heavy} /></Col>
+            <Col><BladesIcon blade={Blades.Light} /></Col>
+            <Col><BladesIcon blade={Blades.Block} /></Col>
             <Col><EmojiIcon emoji={'😛'} /></Col>
           </Row>
           <Row>

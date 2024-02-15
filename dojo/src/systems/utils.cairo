@@ -6,6 +6,7 @@ use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::models::models::{Duelist, Challenge, Pact, Round, Move};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round::{RoundState, RoundStateTrait};
+use pistols::types::blades::{Blades};
 use pistols::types::constants::{constants};
 use pistols::utils::math::{MathU8};
 
@@ -21,6 +22,16 @@ fn zero_address() -> ContractAddress {
 fn duelist_exist(world: IWorldDispatcher, address: ContractAddress) -> bool {
     let duelist: Duelist = get!(world, address, Duelist);
     (duelist.name != 0)
+}
+
+#[inline(always)]
+fn make_move_hash(salt: u64, move: u8) -> felt252 {
+    (pedersen(salt.into(), move.into()))
+}
+
+#[inline(always)]
+fn make_round_salt(round: Round) -> u64 {
+    (round.duelist_a.salt ^ round.duelist_b.salt)
 }
 
 fn make_pact_pair(duelist_a: ContractAddress, duelist_b: ContractAddress) -> u128 {
@@ -117,30 +128,53 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
     }
 }
 
-// Pistols chance bonus = (duelist.honour - 90), capped at duelis.total_duels
-fn get_pistols_bonus(world: IWorldDispatcher, duelist_address: ContractAddress ) -> u8 {
+//------------------------
+// Pistols chances
+//
+// bonus = (duelist.honour - 90), capped at duelis.total_duels
+fn get_pistols_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> u8 {
     let duelist: Duelist = get!(world, duelist_address, Duelist);
     let bonus: u8 = MathU8::sub(duelist.honour, 90);
     if (duelist.total_duels < bonus.into()) { (duelist.total_duels.try_into().unwrap()) } else { (bonus) }
 }
-fn get_pistols_hit_chance(world: IWorldDispatcher, duelist_address: ContractAddress, steps: u8 ) -> u8 {
+fn get_pistols_hit_chance(world: IWorldDispatcher, duelist_address: ContractAddress, steps: u8) -> u8 {
     let bonus: u8 = get_pistols_bonus(world, duelist_address);
-    let chance: u8 = MathU8::map(steps, 1, 10, constants::CHANCE_HIT_STEP_1, constants::CHANCE_HIT_STEP_10);
+    let chance: u8 = MathU8::map(steps, 1, 10, constants::PISTOLS_HIT_CHANCE_AT_STEP_1, constants::PISTOLS_HIT_CHANCE_AT_STEP_10);
     (MathU8::clamp(chance + bonus, 0, 100))
 }
-fn get_pistols_kill_chance(world: IWorldDispatcher, duelist_address: ContractAddress, steps: u8 ) -> u8 {
+fn get_pistols_kill_chance(world: IWorldDispatcher, duelist_address: ContractAddress, steps: u8) -> u8 {
     let bonus: u8 = get_pistols_bonus(world, duelist_address);
-    let chance: u8 = MathU8::map(steps, 1, 10, constants::CHANCE_KILL_STEP_1, constants::CHANCE_KILL_STEP_10);
+    let chance: u8 = MathU8::map(steps, 1, 10, constants::PISTOLS_KILL_CHANCE_AT_STEP_1, constants::PISTOLS_KILL_CHANCE_AT_STEP_10);
     (MathU8::clamp(chance + bonus, 0, 100))
 }
 
-fn make_move_hash(salt: u64, move: u8) -> felt252 {
-    (pedersen(salt.into(), move.into()))
+
+//------------------------
+// Blades chances
+//
+// bonus = ...
+fn get_blades_bonus_penalty(world: IWorldDispatcher, duelist_address: ContractAddress, health: u8) -> (u8, u8) {
+    let duelist: Duelist = get!(world, duelist_address, Duelist);
+    let mut bonus: u8 = MathU8::sub(duelist.honour, 90);
+    if (duelist.total_duels < bonus.into()) {
+        bonus = duelist.total_duels.try_into().unwrap()
+    }
+    let penalty = if (health < constants::FULL_HEALTH) { (20) } else { (0) };
+    (bonus, penalty)
+}
+fn get_blades_hit_chance(world: IWorldDispatcher, duelist_address: ContractAddress, health: u8, blade: Blades) -> u8 {
+    let (bonus, penalty): (u8, u8) = get_blades_bonus_penalty(world, duelist_address, health);
+    (MathU8::sub(constants::BLADES_HIT_CHANCE + bonus, penalty))
+}
+fn get_blades_kill_chance(world: IWorldDispatcher, duelist_address: ContractAddress, health: u8, blade: Blades) -> u8 {
+    if (blade == Blades::Heavy) {
+        let (bonus, penalty): (u8, u8) = get_blades_bonus_penalty(world, duelist_address, health);
+        (MathU8::sub(constants::BLADES_HEAVY_KILL_CHANCE + bonus, penalty))
+    } else {
+        (0)
+    }
 }
 
-fn make_round_salt(round: Round) -> u64 {
-    (round.duelist_a.salt ^ round.duelist_b.salt)
-}
 
 // throw a dice and return the resulting face
 // faces: the number of faces on the dice (ex: 6, or 100%)
@@ -230,9 +264,9 @@ mod tests {
     #[test]
     #[available_gas(100_000_000)]
     fn test_hit_kill_maps() {
-        assert(MathU8::map(1, 1, 10, constants::CHANCE_HIT_STEP_1, constants::CHANCE_HIT_STEP_10) == constants::CHANCE_HIT_STEP_1, 'CHANCE_HIT_STEP_1');
-        assert(MathU8::map(10, 1, 10, constants::CHANCE_HIT_STEP_1, constants::CHANCE_HIT_STEP_10) == constants::CHANCE_HIT_STEP_10, 'CHANCE_HIT_STEP_10');
-        assert(MathU8::map(1, 1, 10, constants::CHANCE_KILL_STEP_1, constants::CHANCE_KILL_STEP_10) == constants::CHANCE_KILL_STEP_1, 'CHANCE_KILL_STEP_1');
-        assert(MathU8::map(10, 1, 10, constants::CHANCE_KILL_STEP_1, constants::CHANCE_KILL_STEP_10) == constants::CHANCE_KILL_STEP_10, 'CHANCE_KILL_STEP_10');
+        assert(MathU8::map(1, 1, 10, constants::PISTOLS_HIT_CHANCE_AT_STEP_1, constants::PISTOLS_HIT_CHANCE_AT_STEP_10) == constants::PISTOLS_HIT_CHANCE_AT_STEP_1, 'PISTOLS_HIT_CHANCE_AT_STEP_1');
+        assert(MathU8::map(10, 1, 10, constants::PISTOLS_HIT_CHANCE_AT_STEP_1, constants::PISTOLS_HIT_CHANCE_AT_STEP_10) == constants::PISTOLS_HIT_CHANCE_AT_STEP_10, 'PISTOLS_HIT_CHANCE_AT_STEP_10');
+        assert(MathU8::map(1, 1, 10, constants::PISTOLS_KILL_CHANCE_AT_STEP_1, constants::PISTOLS_KILL_CHANCE_AT_STEP_10) == constants::PISTOLS_KILL_CHANCE_AT_STEP_1, 'PISTOLS_KILL_CHANCE_AT_STEP_1');
+        assert(MathU8::map(10, 1, 10, constants::PISTOLS_KILL_CHANCE_AT_STEP_1, constants::PISTOLS_KILL_CHANCE_AT_STEP_10) == constants::PISTOLS_KILL_CHANCE_AT_STEP_10, 'PISTOLS_KILL_CHANCE_AT_STEP_10');
     }
 }

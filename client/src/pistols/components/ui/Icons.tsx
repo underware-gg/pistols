@@ -227,20 +227,20 @@ export function StepsIcon({
   )
 }
 interface BladesIconProps {
-  blades: Blades
+  blade: Blades
   size?: IconSizeProp
 }
 export function BladesIcon({
-  blades,
+  blade,
   size = 'large',
 }: BladesIconProps) {
-  if (blades <= Blades.Null || blades >= Blades.Count) {
+  if (blade <= Blades.Null || blade >= Blades.Count) {
     return <Icon name='question circle' size={size} />
   }
   const emoji =
-    blades == Blades.Light ? EMOJI.LIGHT
-      : blades == Blades.Heavy ? EMOJI.HEAVY
-        : blades == Blades.Block ? EMOJI.BLOCK
+    blade == Blades.Light ? EMOJI.LIGHT
+      : blade == Blades.Heavy ? EMOJI.HEAVY
+        : blade == Blades.Block ? EMOJI.BLOCK
           : EMOJI.UNKNOWN
   return (
     // <IconGroup size='large'>

@@ -127,9 +127,7 @@ mod shooter {
         if (round.round_number == 1) {
             pistols_shootout(world, challenge, ref round);
         } else {
-            let (damage_a, damage_b) = blades_clash(round);
-            round.duelist_a.damage = damage_a;
-            round.duelist_b.damage = damage_b;
+            blades_clash(world, challenge, ref round);
             // apply damage
             // TODO: move to blades_clash()
             apply_damage(ref round.duelist_a);
@@ -176,44 +174,44 @@ mod shooter {
 
         if (steps_a == steps_b) {
             // both shoot together
-            shoot_apply_damage(world, 'shoot_a', round, challenge.duelist_a, ref round.duelist_a, ref round.duelist_b);
-            shoot_apply_damage(world, 'shoot_b', round, challenge.duelist_b, ref round.duelist_b, ref round.duelist_a);
+            shoot_apply_damage(world, 'shoot_a', challenge.duelist_a, round, ref round.duelist_a, ref round.duelist_b);
+            shoot_apply_damage(world, 'shoot_b', challenge.duelist_b, round, ref round.duelist_b, ref round.duelist_a);
         } else if (steps_a < steps_b) {
             // A shoots first
-            shoot_apply_damage(world, 'shoot_a', round, challenge.duelist_a, ref round.duelist_a, ref round.duelist_b);
+            shoot_apply_damage(world, 'shoot_a', challenge.duelist_a, round, ref round.duelist_a, ref round.duelist_b);
             // if B not dead, shoot
             if (round.duelist_b.health > 0) {
-                shoot_apply_damage(world, 'shoot_b', round, challenge.duelist_b, ref round.duelist_b, ref round.duelist_a);
+                shoot_apply_damage(world, 'shoot_b', challenge.duelist_b, round, ref round.duelist_b, ref round.duelist_a);
             }
         } else {
             // B shoots first
-            shoot_apply_damage(world, 'shoot_b', round, challenge.duelist_b, ref round.duelist_b, ref round.duelist_a);
+            shoot_apply_damage(world, 'shoot_b', challenge.duelist_b, round, ref round.duelist_b, ref round.duelist_a);
             // if A not dead, shoot
             if (round.duelist_a.health > 0) {
-                shoot_apply_damage(world, 'shoot_a', round, challenge.duelist_a, ref round.duelist_a, ref round.duelist_b);
+                shoot_apply_damage(world, 'shoot_a', challenge.duelist_a, round, ref round.duelist_a, ref round.duelist_b);
             }
         }
     }
 
-    fn shoot_apply_damage(world: IWorldDispatcher, seed: felt252, round: Round, duelist: ContractAddress, ref attacker: Move, ref defender: Move) {
-        let steps: u8 = attacker.move;
+    fn shoot_apply_damage(world: IWorldDispatcher, seed: felt252, duelist: ContractAddress, round: Round, ref attack: Move, ref defense: Move) {
+        let steps: u8 = attack.move;
         // dice 1: did the bullet hit the other player?
         // at step 1: HIT chance is 80%
         // at step 10: HIT chance is 20%
-        attacker.dice1 = throw_dice(seed, round, 100);
+        attack.dice1 = throw_dice(seed, round, 100);
         let chances: u8 = utils::get_pistols_hit_chance(world, duelist, steps);
-        if (attacker.dice1 <= chances) {
+        if (attack.dice1 <= chances) {
             // dice 2: if the bullet HIT the other player, what's the damage?
             // at step 1: KILL chance is 10%
             // at step 10: KILL chance is 100%
-            attacker.dice2 = throw_dice(seed * 2, round, 100);
+            attack.dice2 = throw_dice(seed * 2, round, 100);
             let chances: u8 = utils::get_pistols_kill_chance(world, duelist, steps);
-            if (attacker.dice2 <= chances) {
-                defender.damage = constants::FULL_HEALTH;
+            if (attack.dice2 <= chances) {
+                defense.damage = constants::FULL_HEALTH;
             } else {
-                defender.damage = constants::SINGLE_DAMAGE;
+                defense.damage = constants::SINGLE_DAMAGE;
             }
-            apply_damage(ref defender);
+            apply_damage(ref defense);
         }
     }
 
@@ -225,62 +223,70 @@ mod shooter {
     //-----------------------------------
     // Blades duel
     //
-    // Light - hits for half damage, early
-    // Heavy - hits for full damge, late
-    // Block - blocks light but not heavy, does no damage
+    // Heavy - Execute with 3 damage or inclict 2 damage
+    // Light - hits 1 damage, early
+    // Block - blocks 1 damage
     //
-    // So...
-    // light vs light = both players take 1 damage
-    // Heavy vs heavy = both players die
-    // Block vs block = nothing
-    // Light vs block = nothing
-    // Light vs heavy = light hits first, if heavy lord survives, heavy hits second (and kills the other lord)
-    // Heavy vs block = blocking lord dies
-    //
-    fn blades_clash(round: Round) -> (u8, u8) {
-        let mut damage_a: u8 = 0;
-        let mut damage_b: u8 = 0;
+    fn blades_clash(world: IWorldDispatcher, challenge: Challenge, ref round: Round) {
 
-        let blades_a: Blades = round.duelist_a.move.try_into().unwrap();
-        let blades_b: Blades = round.duelist_b.move.try_into().unwrap();
+        thow_blades_dices(world, 'blade_a', challenge.duelist_a, round, ref round.duelist_a, ref round.duelist_b);
+        thow_blades_dices(world, 'blade_b', challenge.duelist_b, round, ref round.duelist_b, ref round.duelist_a);
 
-        if (blades_a == Blades::Light) {
-            if (blades_b == Blades::Light) {
-                damage_a = constants::SINGLE_DAMAGE;
-                damage_b = constants::SINGLE_DAMAGE;
-            } else if (blades_b == Blades::Heavy) {
-                damage_b = constants::SINGLE_DAMAGE;
-                // if B survives, A is hit
-                if (damage_b < round.duelist_b.health) {
-                    damage_a = constants::FULL_HEALTH;
-                }
-            } else if (blades_b == Blades::Block) {
-                // Nothing (successful block)
+        // Execution always execute (Heavy)
+        if (round.duelist_a.damage == constants::FULL_HEALTH || round.duelist_b.damage == constants::FULL_HEALTH) {
+            if (round.duelist_a.damage == constants::FULL_HEALTH) {
+                round.duelist_a.block = 0; // execution ignores block
+                apply_damage(ref round.duelist_a);
             }
-        } else if (blades_a == Blades::Heavy) {
-            if (blades_b == Blades::Heavy) {
-                damage_a = constants::FULL_HEALTH;
-                damage_b = constants::FULL_HEALTH;
-            } else if (blades_b == Blades::Light) {
-                damage_a = constants::SINGLE_DAMAGE;
-                // if A survives, B is hit
-                if (damage_a < round.duelist_a.health) {
-                    damage_b = constants::FULL_HEALTH;
-                }
-            } else if (blades_b == Blades::Block) {
-                damage_b = constants::FULL_HEALTH;
+            if (round.duelist_b.damage == constants::FULL_HEALTH) {
+                round.duelist_b.block = 0; // execution ignores block
+                apply_damage(ref round.duelist_b);
             }
-        } else if (blades_a == Blades::Block) {
-            if (blades_b == Blades::Block) {
-                // Nothing (successful block)
-            } else if (blades_b == Blades::Light) {
-                // Nothing (successful block)
-            } else if (blades_b == Blades::Heavy) {
-                damage_a = constants::FULL_HEALTH;
-            }
+            return ();
         }
 
-        (damage_a, damage_b)
+        let blade_a: Blades = round.duelist_a.move.try_into().unwrap();
+        let blade_b: Blades = round.duelist_b.move.try_into().unwrap();
+
+        // Light always strikes first
+        if (blade_a == Blades::Light) {
+            apply_damage(ref round.duelist_b);
+            if (round.duelist_b.health > 0) {
+                apply_damage(ref round.duelist_a);
+            }
+        } else if (blade_b == Blades::Light) {
+            apply_damage(ref round.duelist_a);
+            if (round.duelist_a.health > 0) {
+                apply_damage(ref round.duelist_b);
+            }
+        } else {
+            apply_damage(ref round.duelist_a);
+            apply_damage(ref round.duelist_b);
+        }
+    }
+
+    fn thow_blades_dices(world: IWorldDispatcher, seed: felt252, duelist: ContractAddress, round: Round, ref attack: Move, ref defense: Move) {
+        let blade: Blades = attack.move.try_into().unwrap();
+        if (blade != Blades::Idle) {
+            attack.dice1 = throw_dice(seed, round, 100);
+            let chances: u8 = utils::get_blades_hit_chance(world, duelist, attack.health, blade);
+            // hit!
+            if(attack.dice1 <= chances) {
+                if (blade == Blades::Heavy) {
+                    attack.dice2 = throw_dice(seed * 2, round, 100);
+                    let chances: u8 = utils::get_blades_kill_chance(world, duelist, attack.health, blade);
+                    if (attack.dice2 <= chances) {
+                        defense.damage = constants::FULL_HEALTH;
+                    } else {
+                        defense.damage = constants::DOUBLE_DAMAGE;
+                    }
+                } else if (blade == Blades::Light) {
+                    defense.damage = constants::SINGLE_DAMAGE;
+                } else if (blade == Blades::Block) {
+                    attack.block = constants::SINGLE_DAMAGE;
+                }
+            }
+        }
     }
 
 

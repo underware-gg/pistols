@@ -72,4 +72,4 @@ struct Round {
     state: u8,          // actually a RoundState
     duelist_a: Move,    // duelist_a move
     duelist_b: Move,    // duelist_b move
-} // f + f + 240 bits
+} // f + f + 224 bits

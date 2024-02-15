@@ -396,7 +396,7 @@ mod tests {
     fn test_map_pistols() {
         let mut i: u8 = 1;
         loop {
-            let chance: u8 = MathU8::map(i, 1, 10, constants::CHANCE_KILL_STEP_1, constants::CHANCE_KILL_STEP_10);
+            let chance: u8 = MathU8::map(i, 1, 10, constants::PISTOLS_KILL_CHANCE_AT_STEP_1, constants::PISTOLS_KILL_CHANCE_AT_STEP_10);
             assert(chance == i * 10, String::concat('bad chance', chance.into()));
             if(i == 10) { break; }
             i += 1;

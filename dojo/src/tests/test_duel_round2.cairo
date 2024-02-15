@@ -267,8 +267,8 @@ mod tests {
 
     fn _execute_round_ready_with_blades(
         world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress,
-        health_a: u8, blades_a: u8,
-        health_b: u8, blades_b: u8,
+        health_a: u8, blade_a: u8,
+        health_b: u8, blade_b: u8,
     ) -> (Challenge, Round) {
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
         // random 1st round...
@@ -285,12 +285,12 @@ mod tests {
         round.duelist_b.health = health_b;
         set!(world, (round));
         // run 2nd round
-        let hash_a: felt252 = make_move_hash(0x111, blades_a);
-        let hash_b: felt252 = make_move_hash(0x222, blades_b);
+        let hash_a: felt252 = make_move_hash(0x111, blade_a);
+        let hash_b: felt252 = make_move_hash(0x222, blade_b);
         utils::execute_commit_move(system, owner, duel_id, 2, hash_a);
         utils::execute_commit_move(system, other, duel_id, 2, hash_b);
-        utils::execute_reveal_move(system, owner, duel_id, 2, 0x111, blades_a);
-        utils::execute_reveal_move(system, other, duel_id, 2, 0x222, blades_b);
+        utils::execute_reveal_move(system, owner, duel_id, 2, 0x111, blade_a);
+        utils::execute_reveal_move(system, other, duel_id, 2, 0x222, blade_b);
         // return results
         let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
         (challenge, round)
@@ -464,9 +464,9 @@ mod tests {
     #[test]
     #[available_gas(100_000_000)]
     fn test_hit_kill_maps() {
-        assert(MathU8::map(1, 1, 10, constants::CHANCE_HIT_STEP_1, constants::CHANCE_HIT_STEP_10) == constants::CHANCE_HIT_STEP_1, 'CHANCE_HIT_STEP_1');
-        assert(MathU8::map(10, 1, 10, constants::CHANCE_HIT_STEP_1, constants::CHANCE_HIT_STEP_10) == constants::CHANCE_HIT_STEP_10, 'CHANCE_HIT_STEP_10');
-        assert(MathU8::map(1, 1, 10, constants::CHANCE_KILL_STEP_1, constants::CHANCE_KILL_STEP_10) == constants::CHANCE_KILL_STEP_1, 'CHANCE_KILL_STEP_1');
-        assert(MathU8::map(10, 1, 10, constants::CHANCE_KILL_STEP_1, constants::CHANCE_KILL_STEP_10) == constants::CHANCE_KILL_STEP_10, 'CHANCE_KILL_STEP_10');
+        assert(MathU8::map(1, 1, 10, constants::PISTOLS_HIT_CHANCE_AT_STEP_1, constants::PISTOLS_HIT_CHANCE_AT_STEP_10) == constants::PISTOLS_HIT_CHANCE_AT_STEP_1, 'PISTOLS_HIT_CHANCE_AT_STEP_1');
+        assert(MathU8::map(10, 1, 10, constants::PISTOLS_HIT_CHANCE_AT_STEP_1, constants::PISTOLS_HIT_CHANCE_AT_STEP_10) == constants::PISTOLS_HIT_CHANCE_AT_STEP_10, 'PISTOLS_HIT_CHANCE_AT_STEP_10');
+        assert(MathU8::map(1, 1, 10, constants::PISTOLS_KILL_CHANCE_AT_STEP_1, constants::PISTOLS_KILL_CHANCE_AT_STEP_10) == constants::PISTOLS_KILL_CHANCE_AT_STEP_1, 'PISTOLS_KILL_CHANCE_AT_STEP_1');
+        assert(MathU8::map(10, 1, 10, constants::PISTOLS_KILL_CHANCE_AT_STEP_1, constants::PISTOLS_KILL_CHANCE_AT_STEP_10) == constants::PISTOLS_KILL_CHANCE_AT_STEP_10, 'PISTOLS_KILL_CHANCE_AT_STEP_10');
     }
 }
