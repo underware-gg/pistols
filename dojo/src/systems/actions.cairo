@@ -41,41 +41,15 @@ trait IActions<TContractState> {
 
     //
     // read-only calls
-    fn get_pact(self: @TContractState,
-        duelist_a: ContractAddress,
-        duelist_b: ContractAddress,
-    ) -> u128;
-    fn has_pact(self: @TContractState,
-        duelist_a: ContractAddress,
-        duelist_b: ContractAddress,
-    ) -> bool;
+    fn get_pact(self: @TContractState, duelist_a: ContractAddress, duelist_b: ContractAddress) -> u128;
+    fn has_pact(self: @TContractState, duelist_a: ContractAddress, duelist_b: ContractAddress) -> bool;
 
-    fn get_pistols_bonus(self: @TContractState,
-        duelist_address: ContractAddress,
-    ) -> u8;
-    fn get_pistols_hit_chance(self: @TContractState,
-        duelist_address: ContractAddress,
-        steps: u8,
-    ) -> u8;
-    fn get_pistols_kill_chance(self: @TContractState,
-        duelist_address: ContractAddress,
-        steps: u8,
-    ) -> u8;
-
-    fn get_blades_bonus_penalty(self: @TContractState,
-        duelist_address: ContractAddress,
-        health: u8,
-    ) -> (u8, u8);
-    fn get_blades_hit_chance(self: @TContractState,
-        duelist_address: ContractAddress,
-        health: u8,
-        blade: Blades,
-    ) -> u8;
-    fn get_blades_kill_chance(self: @TContractState,
-        duelist_address: ContractAddress,
-        health: u8,
-        blade: Blades,
-    ) -> u8;
+    fn calc_hit_bonus(self: @TContractState, duelist_address: ContractAddress) -> u8;
+    fn calc_hit_penalty(self: @TContractState, health: u8) -> u8;
+    fn get_pistols_hit_chance(self: @TContractState, duelist_address: ContractAddress, health: u8, steps: u8) -> u8;
+    fn get_pistols_kill_chance(self: @TContractState, duelist_address: ContractAddress, health: u8, steps: u8) -> u8;
+    fn get_blades_hit_chance(self: @TContractState, duelist_address: ContractAddress, health: u8, blade: Blades) -> u8;
+    fn get_blades_kill_chance(self: @TContractState, duelist_address: ContractAddress, health: u8, blade: Blades) -> u8;
 }
 
 #[dojo::contract]
@@ -139,7 +113,7 @@ mod actions {
 
             assert(utils::duelist_exist(world, caller), 'Challenger not registered');
             assert(caller != challenged, 'Challenging thyself, you fool!');
-            assert(!self.has_pact(caller, challenged), 'Duplicated challenge');
+            assert(self.has_pact(caller, challenged) == false, 'Duplicated challenge');
             // if (challenged != utils::zero_address()) {
             //     assert(utils::duelist_exist(world, caller), 'Challenged is not registered');
             // }
@@ -241,63 +215,37 @@ mod actions {
         // read-only calls
         //
 
-        fn get_pact(self: @ContractState,
-            duelist_a: ContractAddress,
-            duelist_b: ContractAddress,
-        ) -> u128 {
+        fn get_pact(self: @ContractState, duelist_a: ContractAddress, duelist_b: ContractAddress) -> u128 {
             let world: IWorldDispatcher = self.world_dispatcher.read();
             let pair: u128 = utils::make_pact_pair(duelist_a, duelist_b);
             (get!(world, pair, Pact).duel_id)
         }
 
-        fn has_pact(self: @ContractState,
-            duelist_a: ContractAddress,
-            duelist_b: ContractAddress,
-        ) -> bool {
+        fn has_pact(self: @ContractState, duelist_a: ContractAddress, duelist_b: ContractAddress) -> bool {
             (self.get_pact(duelist_a, duelist_b) != 0)
         }
 
-        fn get_pistols_bonus(self: @ContractState,
-            duelist_address: ContractAddress,
-        ) -> u8 {
+        fn calc_hit_bonus(self: @ContractState, duelist_address: ContractAddress) -> u8 {
             let world: IWorldDispatcher = self.world_dispatcher.read();
-            (utils::get_pistols_bonus(world, duelist_address))
+            (utils::calc_hit_bonus(world, duelist_address))
         }
-        fn get_pistols_hit_chance(self: @ContractState,
-            duelist_address: ContractAddress,
-            steps: u8,
-        ) -> u8 {
+        fn calc_hit_penalty(self: @ContractState, health: u8) -> u8 {
             let world: IWorldDispatcher = self.world_dispatcher.read();
-            (utils::get_pistols_hit_chance(world, duelist_address, steps))
+            (utils::calc_hit_penalty(world, health))
         }
-        fn get_pistols_kill_chance(self: @ContractState,
-            duelist_address: ContractAddress,
-            steps: u8,
-        ) -> u8 {
+        fn get_pistols_hit_chance(self: @ContractState, duelist_address: ContractAddress, health: u8, steps: u8) -> u8 {
             let world: IWorldDispatcher = self.world_dispatcher.read();
-            (utils::get_pistols_kill_chance(world, duelist_address, steps))
+            (utils::get_pistols_hit_chance(world, duelist_address, health, steps))
         }
-
-        fn get_blades_bonus_penalty(self: @ContractState,
-            duelist_address: ContractAddress,
-            health: u8,
-        ) -> (u8, u8) {
+        fn get_pistols_kill_chance(self: @ContractState, duelist_address: ContractAddress, health: u8, steps: u8) -> u8 {
             let world: IWorldDispatcher = self.world_dispatcher.read();
-            (utils::get_blades_bonus_penalty(world, duelist_address, health))
+            (utils::get_pistols_kill_chance(world, duelist_address, health, steps))
         }
-        fn get_blades_hit_chance(self: @ContractState,
-            duelist_address: ContractAddress,
-            health: u8,
-            blade: Blades,
-        ) -> u8 {
+        fn get_blades_hit_chance(self: @ContractState, duelist_address: ContractAddress, health: u8, blade: Blades) -> u8 {
             let world: IWorldDispatcher = self.world_dispatcher.read();
             (utils::get_blades_hit_chance(world, duelist_address, health, blade))
         }
-        fn get_blades_kill_chance(self: @ContractState,
-            duelist_address: ContractAddress,
-            health: u8,
-            blade: Blades,
-        ) -> u8 {
+        fn get_blades_kill_chance(self: @ContractState, duelist_address: ContractAddress, health: u8, blade: Blades) -> u8 {
             let world: IWorldDispatcher = self.world_dispatcher.read();
             (utils::get_blades_kill_chance(world, duelist_address, health, blade))
         }

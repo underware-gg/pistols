@@ -10,6 +10,7 @@ mod utils {
 
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::types::challenge::{ChallengeState};
+    use pistols::types::blades::{Blades};
     use pistols::models::models::{
         Duelist, duelist,
         Challenge, challenge,
@@ -123,16 +124,28 @@ mod utils {
         let result: bool = system.has_pact(a, b);
         (result)
     }
-    fn get_pistols_bonus(system: IActionsDispatcher, duelist_address: ContractAddress) -> u8 {
-        let result: u8 = system.get_pistols_bonus(duelist_address);
+    fn calc_hit_bonus(system: IActionsDispatcher, duelist_address: ContractAddress) -> u8 {
+        let result: u8 = system.calc_hit_bonus(duelist_address);
         (result)
     }
-    fn get_pistols_hit_chance(system: IActionsDispatcher, duelist_address: ContractAddress, steps: u8) -> u8 {
-        let result: u8 = system.get_pistols_hit_chance(duelist_address, steps);
+    fn calc_hit_penalty(system: IActionsDispatcher, health: u8) -> u8 {
+        let result: u8 = system.calc_hit_penalty(health);
         (result)
     }
-    fn get_pistols_kill_chance(system: IActionsDispatcher, duelist_address: ContractAddress, steps: u8) -> u8 {
-        let result: u8 = system.get_pistols_kill_chance(duelist_address, steps);
+    fn get_pistols_hit_chance(system: IActionsDispatcher, duelist_address: ContractAddress, health: u8, steps: u8) -> u8 {
+        let result: u8 = system.get_pistols_hit_chance(duelist_address, health, steps);
+        (result)
+    }
+    fn get_pistols_kill_chance(system: IActionsDispatcher, duelist_address: ContractAddress, health: u8, steps: u8) -> u8 {
+        let result: u8 = system.get_pistols_kill_chance(duelist_address, health, steps);
+        (result)
+    }
+    fn get_blades_hit_chance(system: IActionsDispatcher, duelist_address: ContractAddress, health: u8, blade: Blades) -> u8 {
+        let result: u8 = system.get_blades_hit_chance(duelist_address, health, blade);
+        (result)
+    }
+    fn get_blades_kill_chance(system: IActionsDispatcher, duelist_address: ContractAddress, health: u8, blade: Blades) -> u8 {
+        let result: u8 = system.get_blades_kill_chance(duelist_address, health, blade);
         (result)
     }
 

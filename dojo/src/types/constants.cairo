@@ -21,4 +21,7 @@ mod constants {
     // Blades chances (percentage)
     const BLADES_KILL_CHANCE: u8 = 15;
     const BLADES_HIT_CHANCE: u8 = 65;
+
+    // Hit penalty per damage taken
+    const HIT_PENALTY_PER_DAMAGE: u8 = 10;
 }

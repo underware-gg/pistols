@@ -194,21 +194,22 @@ mod shooter {
 
     fn shoot_apply_damage(world: IWorldDispatcher, seed: felt252, duelist: ContractAddress, round: Round, ref attack: Move, ref defense: Move) {
         let steps: u8 = attack.move;
-        // dice 1: execution!
-        attack.dice_crit = throw_dice(seed, round, 100);
-        let kill_chance: u8 = utils::get_pistols_kill_chance(world, duelist, steps);
-        if (attack.dice_crit <= kill_chance) {
-            defense.damage = constants::FULL_HEALTH;
-            apply_damage(ref defense);
-        } else {
-            // dice 2: miss or hit + damage
-            // ex: chance 60%: 1..30 = double, 31..60 = single, 61..100 = miss
-            attack.dice_hit = throw_dice(seed * 2, round, 100);
-            let hit_chance: u8 = utils::get_pistols_hit_chance(world, duelist, steps);
-            if (attack.dice_hit <= hit_chance) {
-                defense.damage = if (attack.dice_hit <= hit_chance/2) { (constants::DOUBLE_DAMAGE) } else { (constants::SINGLE_DAMAGE) };
-                apply_damage(ref defense);
+        // dice 1: miss or hit + damage
+        // ex: chance 60%: 1..30 = double, 31..60 = single, 61..100 = miss
+        attack.dice_hit = throw_dice(seed, round, 100);
+        let hit_chance: u8 = utils::get_pistols_hit_chance(world, duelist, attack.health, steps);
+        if (attack.dice_hit <= hit_chance) {
+            // dice 1: execution!
+            attack.dice_crit = throw_dice(seed * 2, round, 100);
+            let kill_chance: u8 = utils::get_pistols_kill_chance(world, duelist, attack.health, steps);
+            if (attack.dice_crit <= kill_chance) {
+                defense.damage = constants::FULL_HEALTH;
+            } else if (attack.dice_hit <= hit_chance/2) {
+                defense.damage = constants::DOUBLE_DAMAGE;
+            } else {
+                defense.damage = constants::SINGLE_DAMAGE;
             }
+            apply_damage(ref defense);
         }
     }
 
