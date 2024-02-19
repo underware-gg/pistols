@@ -10,10 +10,11 @@ import ee from 'event-emitter'
 export var emitter = ee()
 
 import { AudioName, AUDIO_ASSETS, TEXTURES, SPRITESHEETS, AnimName, sceneBackgrounds, TextureName } from '@/pistols/data/assets'
-import { Blades, FULL_HEALTH } from '@/pistols/utils/pistols'
 import { SceneName } from '@/pistols/hooks/PistolsContext'
 import { map } from '@/pistols/utils/utils'
 import { SpriteSheet, Actor } from './SpriteSheetMaker'
+import { Blades } from '@/pistols/utils/pistols'
+import constants from '@/pistols/utils/constants'
 
 const PI = Math.PI
 const HALF_PI = Math.PI * 0.5
@@ -477,7 +478,7 @@ export function animateShootout(paceCountA, paceCountB, healthA, healthB) {
       playActorAnimation('A', AnimName.SHOOT, () => {
         if (healthA == 0) {
           playActorAnimation('A', AnimName.SHOT_DEAD_FRONT, () => emitter.emit('animated', AnimationState.Pistols))
-        } else if (healthA < FULL_HEALTH) {
+        } else if (healthA < constants.FULL_HEALTH) {
           playActorAnimation('A', AnimName.SHOT_INJURED_FRONT, () => emitter.emit('animated', AnimationState.Pistols))
         } else {
           emitter.emit('animated', AnimationState.Pistols)
@@ -486,7 +487,7 @@ export function animateShootout(paceCountA, paceCountB, healthA, healthB) {
       playActorAnimation('B', AnimName.SHOOT, () => {
         if (healthB == 0) {
           playActorAnimation('B', AnimName.SHOT_DEAD_FRONT, () => emitter.emit('animated', AnimationState.Pistols))
-        } else if (healthB < FULL_HEALTH) {
+        } else if (healthB < constants.FULL_HEALTH) {
           playActorAnimation('B', AnimName.SHOT_INJURED_FRONT, () => emitter.emit('animated', AnimationState.Pistols))
         } else {
           emitter.emit('animated', AnimationState.Pistols)
@@ -500,7 +501,7 @@ export function animateShootout(paceCountA, paceCountB, healthA, healthB) {
         playActorAnimation('B', AnimName.SHOOT, () => {
           if (healthA == 0) {
             playActorAnimation('A', AnimName.SHOT_DEAD_FRONT, () => emitter.emit('animated', AnimationState.Pistols))
-          } else if (healthA < FULL_HEALTH) {
+          } else if (healthA < constants.FULL_HEALTH) {
             playActorAnimation('A', AnimName.SHOT_INJURED_FRONT, () => emitter.emit('animated', AnimationState.Pistols))
           } else {
             emitter.emit('animated', AnimationState.Pistols)
@@ -510,7 +511,7 @@ export function animateShootout(paceCountA, paceCountB, healthA, healthB) {
       playActorAnimation('A', AnimName.SHOOT, () => {
         if (healthB == 0) {
           playActorAnimation('B', AnimName.SHOT_DEAD_BACK, () => emitter.emit('animated', AnimationState.Pistols))
-        } else if (healthB < FULL_HEALTH) {
+        } else if (healthB < constants.FULL_HEALTH) {
           playActorAnimation('B', AnimName.SHOT_INJURED_BACK, () => _chance())
         } else {
           _chance()
@@ -524,7 +525,7 @@ export function animateShootout(paceCountA, paceCountB, healthA, healthB) {
         playActorAnimation('A', AnimName.SHOOT, () => {
           if (healthB == 0) {
             playActorAnimation('B', AnimName.SHOT_DEAD_FRONT, () => emitter.emit('animated', AnimationState.Pistols))
-          } else if (healthB < FULL_HEALTH) {
+          } else if (healthB < constants.FULL_HEALTH) {
             playActorAnimation('B', AnimName.SHOT_INJURED_FRONT, () => emitter.emit('animated', AnimationState.Pistols))
           } else {
             emitter.emit('animated', AnimationState.Pistols)
@@ -534,7 +535,7 @@ export function animateShootout(paceCountA, paceCountB, healthA, healthB) {
       playActorAnimation('B', AnimName.SHOOT, () => {
         if (healthA == 0) {
           playActorAnimation('A', AnimName.SHOT_DEAD_BACK, () => emitter.emit('animated', AnimationState.Pistols))
-        } else if (healthA < FULL_HEALTH) {
+        } else if (healthA < constants.FULL_HEALTH) {
           playActorAnimation('A', AnimName.SHOT_INJURED_BACK, () => _chance())
         } else {
           _chance()
@@ -562,14 +563,14 @@ export function animateBlades(bladeA, bladeB, healthA, healthB) {
     let survived = 0
     if (healthB == 0) {
       playActorAnimation('B', AnimName.STRUCK_DEAD, () => emitter.emit('animated', AnimationState.Blades))
-    } else if (healthB < FULL_HEALTH) {
+    } else if (healthB < constants.FULL_HEALTH) {
       playActorAnimation('B', AnimName.STRUCK_INJURED, () => emitter.emit('animated', AnimationState.Blades))
     } else {
       survived++
     }
     if (healthA == 0) {
       playActorAnimation('A', AnimName.STRUCK_DEAD, () => emitter.emit('animated', AnimationState.Blades))
-    } else if (healthA < FULL_HEALTH) {
+    } else if (healthA < constants.FULL_HEALTH) {
       playActorAnimation('A', AnimName.STRUCK_INJURED, () => emitter.emit('animated', AnimationState.Blades))
     } else {
       survived++

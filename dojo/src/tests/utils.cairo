@@ -94,7 +94,7 @@ mod utils {
     fn execute_commit_action(system: IActionsDispatcher, sender: ContractAddress,
         duel_id: u128,
         round_number: u8,
-        hash: felt252,
+        hash: u64,
     ) {
         testing::set_contract_address(sender);
         system.commit_action(duel_id, round_number, hash);

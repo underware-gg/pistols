@@ -32,7 +32,7 @@ mod shooter {
     //-----------------------------------
     // Commit
     //
-    fn commit_action(world: IWorldDispatcher, duel_id: u128, round_number: u8, hash: felt252) {
+    fn commit_action(world: IWorldDispatcher, duel_id: u128, round_number: u8, hash: u64) {
         let caller: ContractAddress = starknet::get_caller_address();
 
         // Assert correct Challenge
@@ -75,7 +75,7 @@ mod shooter {
         assert(round.state == RoundState::Reveal.into(), 'Round not in Reveal');
 
         // Validate action hash
-        let hash: felt252 = utils::make_action_hash(salt, action);
+        let hash: u64 = utils::make_action_hash(salt, action);
 
         // validate action
         // if invalid, set as 0 (idle, will skip round)

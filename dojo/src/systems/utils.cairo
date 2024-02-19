@@ -25,8 +25,9 @@ fn duelist_exist(world: IWorldDispatcher, address: ContractAddress) -> bool {
 }
 
 #[inline(always)]
-fn make_action_hash(salt: u64, action: u8) -> felt252 {
-    (pedersen(salt.into(), action.into()))
+fn make_action_hash(salt: u64, action: u8) -> u64 {
+    let hash: u256 = pedersen(salt.into(), action.into()).into() & constants::HASH_SALT_MASK;
+    (hash.try_into().unwrap())
 }
 
 #[inline(always)]

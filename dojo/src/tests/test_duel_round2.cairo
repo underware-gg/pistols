@@ -43,7 +43,7 @@ mod tests {
         (ch, round, duel_id)
     }
 
-    fn _get_actions_round_1_resolved() -> (u64, u64, u8, u8, felt252, felt252) {
+    fn _get_actions_round_1_resolved() -> (u64, u64, u8, u8, u64, u64) {
         let salt_a: u64 = SALT_1_a;
         let salt_b: u64 = SALT_1_b;
         let action_a: u8 = 5;
@@ -51,7 +51,7 @@ mod tests {
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
     }
 
-    fn _get_actions_round_1_draw() -> (u64, u64, u8, u8, felt252, felt252) {
+    fn _get_actions_round_1_draw() -> (u64, u64, u8, u8, u64, u64) {
         let salt_a: u64 = SALT_1_a + 8;
         let salt_b: u64 = SALT_1_b + 8;
         let action_a: u8 = 5;
@@ -59,7 +59,7 @@ mod tests {
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
     }
 
-    fn _get_actions_round_1_continue() -> (u64, u64, u8, u8, felt252, felt252) {
+    fn _get_actions_round_1_continue() -> (u64, u64, u8, u8, u64, u64) {
         let salt_a: u64 = SALT_1_a;
         let salt_b: u64 = SALT_1_b;
         let action_a: u8 = 10;
@@ -67,7 +67,7 @@ mod tests {
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
     }
 
-    fn _get_actions_round_2_resolved() -> (u64, u64, u8, u8, felt252, felt252) {
+    fn _get_actions_round_2_resolved() -> (u64, u64, u8, u8, u64, u64) {
         let salt_a: u64 = SALT_1_a;
         let salt_b: u64 = SALT_1_b;
         let action_a: u8 = BLADES::HEAVY;
@@ -75,7 +75,7 @@ mod tests {
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
     }
 
-    fn _get_actions_round_2_draw() -> (u64, u64, u8, u8, felt252, felt252) {
+    fn _get_actions_round_2_draw() -> (u64, u64, u8, u8, u64, u64) {
         let salt_a: u64 = SALT_1_a + 1;
         let salt_b: u64 = SALT_1_b + 1;
         let action_a: u8 = BLADES::HEAVY;
@@ -285,8 +285,8 @@ mod tests {
         round.shot_b.health = health_b;
         set!(world, (round));
         // run 2nd round
-        let hash_a: felt252 = make_action_hash(0x111, blade_a);
-        let hash_b: felt252 = make_action_hash(0x222, blade_b);
+        let hash_a: u64 = make_action_hash(0x111, blade_a);
+        let hash_b: u64 = make_action_hash(0x222, blade_b);
         utils::execute_commit_action(system, owner, duel_id, 2, hash_a);
         utils::execute_commit_action(system, other, duel_id, 2, hash_b);
         utils::execute_reveal_action(system, owner, duel_id, 2, 0x111, blade_a);

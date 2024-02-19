@@ -40,7 +40,7 @@ mod tests {
         (ch, round, duel_id)
     }
 
-    fn _get_actions_round_1_resolved() -> (u64, u64, u8, u8, felt252, felt252) {
+    fn _get_actions_round_1_resolved() -> (u64, u64, u8, u8, u64, u64) {
         let salt_a: u64 = SALT_1_a;
         let salt_b: u64 = SALT_1_b;
         let action_a: u8 = 5;
@@ -48,7 +48,7 @@ mod tests {
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
     }
 
-    fn _get_actions_round_1_draw() -> (u64, u64, u8, u8, felt252, felt252) {
+    fn _get_actions_round_1_draw() -> (u64, u64, u8, u8, u64, u64) {
         let salt_a: u64 = SALT_1_a + 8;
         let salt_b: u64 = SALT_1_b + 8;
         let action_a: u8 = 5;
@@ -232,7 +232,7 @@ mod tests {
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
         // try to commmit with another account
         let someone_else: ContractAddress = starknet::contract_address_const::<0x999>();
-        let hash: felt252 = make_action_hash(0x12121, 0x1);
+        let hash: u64 = make_action_hash(0x12121, 0x1);
         utils::execute_commit_action(system, someone_else, duel_id, 1, hash);
     }
 
@@ -242,7 +242,7 @@ mod tests {
     fn test_wrong_round_number() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
-        let hash: felt252 = make_action_hash(0x12121, 0x1);
+        let hash: u64 = make_action_hash(0x12121, 0x1);
         utils::execute_commit_action(system, owner, duel_id, 2, hash);
     }
 
@@ -362,8 +362,8 @@ mod tests {
     fn test_invalid_hash_action_a() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
-        let hash_a: felt252 = make_action_hash(0x111, 1);
-        let hash_b: felt252 = make_action_hash(0x222, 1);
+        let hash_a: u64 = make_action_hash(0x111, 1);
+        let hash_b: u64 = make_action_hash(0x222, 1);
         utils::execute_commit_action(system, other, duel_id, 1, hash_a);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_b);
         utils::execute_reveal_action(system, owner, duel_id, 1, 0x111, 2);
@@ -374,8 +374,8 @@ mod tests {
     fn test_invalid_hash_salt_a() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
-        let hash_a: felt252 = make_action_hash(0x111, 1);
-        let hash_b: felt252 = make_action_hash(0x222, 1);
+        let hash_a: u64 = make_action_hash(0x111, 1);
+        let hash_b: u64 = make_action_hash(0x222, 1);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_b);
         utils::execute_commit_action(system, other, duel_id, 1, hash_a);
         utils::execute_reveal_action(system, owner, duel_id, 1, 0x1111, 1);
@@ -387,8 +387,8 @@ mod tests {
     fn test_invalid_hash_action_b() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
-        let hash_a: felt252 = make_action_hash(0x111, 1);
-        let hash_b: felt252 = make_action_hash(0x222, 1);
+        let hash_a: u64 = make_action_hash(0x111, 1);
+        let hash_b: u64 = make_action_hash(0x222, 1);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_b);
         utils::execute_commit_action(system, other, duel_id, 1, hash_a);
         utils::execute_reveal_action(system, other, duel_id, 1, 0x222, 2);
@@ -399,8 +399,8 @@ mod tests {
     fn test_invalid_hash_salt_b() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
-        let hash_a: felt252 = make_action_hash(0x111, 1);
-        let hash_b: felt252 = make_action_hash(0x222, 1);
+        let hash_a: u64 = make_action_hash(0x111, 1);
+        let hash_b: u64 = make_action_hash(0x222, 1);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_b);
         utils::execute_commit_action(system, other, duel_id, 1, hash_a);
         utils::execute_reveal_action(system, other, duel_id, 1, 0x2222, 1);
@@ -411,8 +411,8 @@ mod tests {
     fn test_clamp_steps() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
-        let hash_a: felt252 = make_action_hash(0x111, 0);
-        let hash_b: felt252 = make_action_hash(0x222, 11);
+        let hash_a: u64 = make_action_hash(0x111, 0);
+        let hash_b: u64 = make_action_hash(0x222, 11);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
         utils::execute_reveal_action(system, owner, duel_id, 1, 0x111, 0);
@@ -427,8 +427,8 @@ mod tests {
     fn test_register_keep_scores() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
-        let hash_a: felt252 = make_action_hash(0x111, 10);
-        let hash_b: felt252 = make_action_hash(0x222, 1);
+        let hash_a: u64 = make_action_hash(0x111, 10);
+        let hash_b: u64 = make_action_hash(0x222, 1);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
         utils::execute_reveal_action(system, owner, duel_id, 1, 0x111, 10);

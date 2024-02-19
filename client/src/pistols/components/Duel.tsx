@@ -10,7 +10,6 @@ import { DuelStage, useAnimatedDuel, useDuel } from '@/pistols/hooks/useDuel'
 import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
-import { BladesNames, FULL_HEALTH, SINGLE_DAMAGE } from '@/pistols/utils/pistols'
 import { MenuDuel } from '@/pistols/components/Menus'
 import { AnimationState } from '@/pistols/three/game'
 import { EmojiIcon } from '@/pistols/components/ui/Icons'
@@ -18,6 +17,8 @@ import CommitStepsModal from '@/pistols/components/CommitStepsModal'
 import CommitBladesModal from '@/pistols/components/CommitBladesModal'
 import RevealModal from '@/pistols/components/RevealModal'
 import { EMOJI } from '@/pistols/data/messages'
+import { BladesNames } from '@/pistols/utils/pistols'
+import constants from '@/pistols/utils/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -135,7 +136,7 @@ function DuelProgress({
   //
 
   const _healthResult = (health: number) => {
-    return (health == 0 ? 'is DEAD!' : health < FULL_HEALTH ? 'is INJURED!' : 'is ALIVE!')
+    return (health == 0 ? 'is DEAD!' : health < constants.FULL_HEALTH ? 'is INJURED!' : 'is ALIVE!')
   }
 
   const pistolsResult = useMemo(() => {
@@ -157,10 +158,10 @@ function DuelProgress({
   }, [round2, duelStage])
 
   const _resultBackground = (health: number) => {
-    return health == FULL_HEALTH ? 'Positive' : health == SINGLE_DAMAGE ? 'Warning' : 'Negative'
+    return health == constants.FULL_HEALTH ? 'Positive' : health == constants.SINGLE_DAMAGE ? 'Warning' : 'Negative'
   }
   const _resultEmoji = (health: number) => {
-    return health == FULL_HEALTH ? EMOJI.ALIVE : health == SINGLE_DAMAGE ? EMOJI.INJURED : EMOJI.DEAD
+    return health == constants.FULL_HEALTH ? EMOJI.ALIVE : health == constants.SINGLE_DAMAGE ? EMOJI.INJURED : EMOJI.DEAD
   }
 
 
