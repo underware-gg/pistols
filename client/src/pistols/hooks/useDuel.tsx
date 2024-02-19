@@ -43,10 +43,10 @@ export const useDuel = (duelId: bigint | string) => {
   // Actions completed by Duelist A
   const completedStagesA = useMemo(() => {
     return {
-      [DuelStage.StepsCommit]: Boolean(round1?.duelist_a.hash),
-      [DuelStage.StepsReveal]: Boolean(round1?.duelist_a.move),
-      [DuelStage.BladesCommit]: Boolean(round2?.duelist_a.hash),
-      [DuelStage.BladesReveal]: Boolean(round2?.duelist_a.move),
+      [DuelStage.StepsCommit]: Boolean(round1?.shot_a.hash),
+      [DuelStage.StepsReveal]: Boolean(round1?.shot_a.action),
+      [DuelStage.BladesCommit]: Boolean(round2?.shot_a.hash),
+      [DuelStage.BladesReveal]: Boolean(round2?.shot_a.action),
     }
   }, [round1, round2])
 
@@ -54,10 +54,10 @@ export const useDuel = (duelId: bigint | string) => {
   // Actions completed by Duelist B
   const completedStagesB = useMemo(() => {
     return {
-      [DuelStage.StepsCommit]: Boolean(round1?.duelist_b.hash),
-      [DuelStage.StepsReveal]: Boolean(round1?.duelist_b.move),
-      [DuelStage.BladesCommit]: Boolean(round2?.duelist_b.hash),
-      [DuelStage.BladesReveal]: Boolean(round2?.duelist_b.move),
+      [DuelStage.StepsCommit]: Boolean(round1?.shot_b.hash),
+      [DuelStage.StepsReveal]: Boolean(round1?.shot_b.action),
+      [DuelStage.BladesCommit]: Boolean(round2?.shot_b.hash),
+      [DuelStage.BladesReveal]: Boolean(round2?.shot_b.action),
     }
   }, [round1, round2])
 
@@ -114,14 +114,14 @@ export const useAnimatedDuel = (duelId: bigint | string) => {
   useEffect(() => {
     if (gameImpl && isAnimatingPistols && audioLoaded) {
       console.log(`TRIGGER animateShootout()`)
-      gameImpl.animateShootout(round1.duelist_a.move, round1.duelist_b.move, round1.duelist_a.health, round1.duelist_b.health)
+      gameImpl.animateShootout(round1.shot_a.action, round1.shot_b.action, round1.shot_a.health, round1.shot_b.health)
     }
   }, [gameImpl, isAnimatingPistols, audioLoaded])
 
   useEffect(() => {
     if (gameImpl && isAnimatingBlades) {
       console.log(`TRIGGER animateBlades()`)
-      gameImpl.animateBlades(round2.duelist_a.move, round2.duelist_b.move, round2.duelist_a.health, round2.duelist_b.health)
+      gameImpl.animateBlades(round2.shot_a.action, round2.shot_b.action, round2.shot_a.health, round2.shot_b.health)
     }
   }, [gameImpl, isAnimatingBlades])
 

@@ -3,7 +3,7 @@ import { Button, Divider, Grid, Modal } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { Blades, BladesNames } from '@/pistols/utils/pistols'
-import { signAndGenerateMoveHash } from '../utils/salt'
+import { signAndGenerateActionHash } from '../utils/salt'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -19,22 +19,22 @@ export default function CommitBladesModal({
   duelId: bigint
   roundNumber?: number
 }) {
-  const { commit_move } = useDojoSystemCalls()
+  const { commit_action } = useDojoSystemCalls()
   const { account } = useDojoAccount()
 
-  const [selectedMove, setSelectedMove] = useState<number | string>(0)
+  const [selectedAction, setSelectedAction] = useState<number | string>(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
-    setSelectedMove(null)
+    setSelectedAction(null)
   }, [isOpen])
 
   const _submit = async () => {
-    if (selectedMove) {
+    if (selectedAction) {
       setIsSubmitting(true)
-      const hash = await signAndGenerateMoveHash(account, duelId, roundNumber, selectedMove)
+      const hash = await signAndGenerateActionHash(account, duelId, roundNumber, selectedAction)
       if (hash) {
-        await commit_move(account, duelId, roundNumber, hash)
+        await commit_action(account, duelId, roundNumber, hash)
         setIsOpen(false)
       }
       setIsSubmitting(false)
@@ -68,9 +68,9 @@ export default function CommitBladesModal({
           </p>
           <Divider hidden />
           <Button.Group size='large'>
-            <Button toggle active={selectedMove == Blades.Light} onClick={() => setSelectedMove(Blades.Light)}>{BladesNames[Blades.Light]}</Button>
-            <Button toggle active={selectedMove == Blades.Heavy} onClick={() => setSelectedMove(Blades.Heavy)}>{BladesNames[Blades.Heavy]}</Button>
-            <Button toggle active={selectedMove == Blades.Block} onClick={() => setSelectedMove(Blades.Block)}>{BladesNames[Blades.Block]}</Button>
+            <Button toggle active={selectedAction == Blades.Light} onClick={() => setSelectedAction(Blades.Light)}>{BladesNames[Blades.Light]}</Button>
+            <Button toggle active={selectedAction == Blades.Heavy} onClick={() => setSelectedAction(Blades.Heavy)}>{BladesNames[Blades.Heavy]}</Button>
+            <Button toggle active={selectedAction == Blades.Block} onClick={() => setSelectedAction(Blades.Block)}>{BladesNames[Blades.Block]}</Button>
           </Button.Group>
         </Modal.Description>
       </Modal.Content>
@@ -81,7 +81,7 @@ export default function CommitBladesModal({
               <ActionButton fill label='Close' onClick={() => setIsOpen(false)} />
             </Col>
             <Col>
-              <ActionButton fill attention label='Commit...' disabled={!selectedMove || isSubmitting} onClick={() => _submit()} />
+              <ActionButton fill attention label='Commit...' disabled={!selectedAction || isSubmitting} onClick={() => _submit()} />
             </Col>
           </Row>
         </Grid>

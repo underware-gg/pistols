@@ -91,24 +91,24 @@ mod utils {
         (new_state)
     }
 
-    fn execute_commit_move(system: IActionsDispatcher, sender: ContractAddress,
+    fn execute_commit_action(system: IActionsDispatcher, sender: ContractAddress,
         duel_id: u128,
         round_number: u8,
         hash: felt252,
     ) {
         testing::set_contract_address(sender);
-        system.commit_move(duel_id, round_number, hash);
+        system.commit_action(duel_id, round_number, hash);
         _next_block();
     }
 
-    fn execute_reveal_move(system: IActionsDispatcher, sender: ContractAddress,
+    fn execute_reveal_action(system: IActionsDispatcher, sender: ContractAddress,
         duel_id: u128,
         round_number: u8,
         salt: u64,
-        move: u8,
+        action: u8,
     ) {
         testing::set_contract_address(sender);
-        system.reveal_move(duel_id, round_number, salt, move);
+        system.reveal_action(duel_id, round_number, salt, action);
         _next_block();
     }
 

@@ -23,30 +23,30 @@ export const signAndGenerateSalt = async (account: Account, duelId: bigint, roun
   return result
 }
 
-/** @returns the felt252 hash for a move, or 0 if fail */
-export const signAndGenerateMoveHash = async (account: Account, duelId: bigint, roundNumber: number, move: BigNumberish): Promise<bigint> => {
+/** @returns the felt252 hash for an action, or 0 if fail */
+export const signAndGenerateActionHash = async (account: Account, duelId: bigint, roundNumber: number, action: BigNumberish): Promise<bigint> => {
   const salt = await signAndGenerateSalt(account, duelId, roundNumber)
-  const hash = pedersen(salt, BigInt(move))
-  // console.log(`SALT_HASH`, duelId, roundNumber, move, salt, hash)
+  const hash = pedersen(salt, BigInt(action))
+  // console.log(`SALT_HASH`, duelId, roundNumber, action, salt, hash)
   return hash
 }
 
-/** @returns the original move from a move hash, or 0 if fail */
-export const signAndRestoreMoveFromHash = async (account: Account, duelId: bigint, roundNumber: number, hash: bigint, possibleMoves: BigNumberish[]): Promise<{ salt: bigint, move: number }> => {
+/** @returns the original action from an action hash, or 0 if fail */
+export const signAndRestoreActionFromHash = async (account: Account, duelId: bigint, roundNumber: number, hash: bigint, possibleActions: BigNumberish[]): Promise<{ salt: bigint, action: number }> => {
   const salt = await signAndGenerateSalt(account, duelId, roundNumber)
-  let move = 0
-  for (let i = 0; i < possibleMoves.length; ++i) {
-    const m = possibleMoves[i]
+  let action = 0
+  for (let i = 0; i < possibleActions.length; ++i) {
+    const m = possibleActions[i]
     const h = pedersen(salt, BigInt(m))
     // console.log(`___RESTORE_HASH`, duelId, roundNumber, salt, hash, m)
     if (h == hash) {
       // console.log(`___RESTORE_HASH FOUND MOVE:`, m)
-      move = Number(m)
+      action = Number(m)
       break
     }
   }
   return {
     salt,
-    move
+    action,
   }
 }

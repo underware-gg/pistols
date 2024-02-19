@@ -27,16 +27,16 @@ trait IActions<TContractState> {
 
     //
     // Duel
-    fn commit_move(self: @TContractState,
+    fn commit_action(self: @TContractState,
         duel_id: u128,
         round_number: u8,
         hash: felt252,
     );
-    fn reveal_move(self: @TContractState,
+    fn reveal_action(self: @TContractState,
         duel_id: u128,
         round_number: u8,
         salt: u64,
-        move: u8,
+        action: u8,
     );
 
     //
@@ -60,7 +60,7 @@ mod actions {
     use core::option::OptionTrait;
     use starknet::{ContractAddress, get_block_timestamp, get_block_info};
 
-    use pistols::models::models::{Duelist, Challenge, Pact, Round, Move};
+    use pistols::models::models::{Duelist, Challenge, Pact, Round, Shot};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::utils::timestamp::{timestamp};
@@ -187,26 +187,26 @@ mod actions {
 
 
         //------------------------
-        // COMMIT Duel move
+        // COMMIT Duel action
         //
 
-        fn commit_move(self: @ContractState,
+        fn commit_action(self: @ContractState,
             duel_id: u128,
             round_number: u8,
             hash: felt252,
         ) {
             let world: IWorldDispatcher = self.world_dispatcher.read();
-            shooter::commit_move(world, duel_id, round_number, hash);
+            shooter::commit_action(world, duel_id, round_number, hash);
         }
 
-        fn reveal_move(self: @ContractState,
+        fn reveal_action(self: @ContractState,
             duel_id: u128,
             round_number: u8,
             salt: u64,
-            move: u8,
+            action: u8,
         ) {
             let world: IWorldDispatcher = self.world_dispatcher.read();
-            shooter::reveal_move(world, duel_id, round_number, salt, move);
+            shooter::reveal_action(world, duel_id, round_number, salt, action);
         }
 
 

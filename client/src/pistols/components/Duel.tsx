@@ -126,9 +126,9 @@ function DuelProgress({
   canAutoReveal = false
 }) {
   const { round1, round2, roundNumber, turnA, turnB, } = useDuel(duelId)
-  const round1Move = useMemo(() => (isA ? round1?.duelist_a : round1?.duelist_b), [isA, round1])
-  const round2Move = useMemo(() => (isA ? round2?.duelist_a : round2?.duelist_b), [isA, round2])
-  const currentRoundMove = useMemo(() => (roundNumber == 1 ? round1Move : round2Move), [roundNumber, round1Move, round2Move])
+  const round1Action = useMemo(() => (isA ? round1?.shot_a : round1?.shot_b), [isA, round1])
+  const round2Action = useMemo(() => (isA ? round2?.shot_a : round2?.shot_b), [isA, round2])
+  const currentRoundAction = useMemo(() => (roundNumber == 1 ? round1Action : round2Action), [roundNumber, round1Action, round2Action])
 
   //-------------------------
   // Duel progression
@@ -140,8 +140,8 @@ function DuelProgress({
 
   const pistolsResult = useMemo(() => {
     if (duelStage > DuelStage.PistolsShootout) {
-      const steps = round1Move.move
-      const health = _healthResult(round1Move.health)
+      const steps = round1Action.action
+      const health = _healthResult(round1Action.health)
       return <span>Walks <span className='Important'>{steps} steps</span><br />and {health}</span>
     }
     return null
@@ -149,8 +149,8 @@ function DuelProgress({
 
   const bladesResult = useMemo(() => {
     if (round2 && duelStage > DuelStage.BladesClash) {
-      const blade = round2Move.move
-      const health = _healthResult(round2Move.health)
+      const blade = round2Action.action
+      const health = _healthResult(round2Action.health)
       return <span>Clashes with <span className='Important'>{BladesNames[blade]}</span><br />and {health}</span>
     }
     return null
@@ -205,7 +205,7 @@ function DuelProgress({
     <>
       <CommitStepsModal duelId={duelId} isOpen={roundNumber == 1 && commitModalIsOpen} setIsOpen={setCommitModalIsOpen} />
       <CommitBladesModal duelId={duelId} isOpen={roundNumber == 2 && commitModalIsOpen} setIsOpen={setCommitModalIsOpen} />
-      <RevealModal duelId={duelId} roundNumber={roundNumber} isOpen={revealModalIsOpen} hash={currentRoundMove?.hash} setIsOpen={setRevealModalIsOpen} />
+      <RevealModal duelId={duelId} roundNumber={roundNumber} isOpen={revealModalIsOpen} hash={currentRoundAction?.hash} setIsOpen={setRevealModalIsOpen} />
       <Step.Group vertical size='small'>
         <ProgressItem
           stage={DuelStage.StepsCommit}
@@ -235,10 +235,10 @@ function DuelProgress({
           title={pistolsResult ?? 'Pistols shootout!'}
           description=''
           icon={pistolsResult ? null : 'target'}
-          emoji={pistolsResult ? _resultEmoji(round1Move.health) : null}
+          emoji={pistolsResult ? _resultEmoji(round1Action.health) : null}
           floated={floated}
           onClick={onClick}
-          className={pistolsResult ? _resultBackground(round1Move.health) : null}
+          className={pistolsResult ? _resultBackground(round1Action.health) : null}
         />
 
         {(round2 && duelStage >= DuelStage.BladesCommit) &&
@@ -273,10 +273,10 @@ function DuelProgress({
               title={bladesResult ?? 'Blades clash!'}
               description=''
               icon={bladesResult ? null : 'target'}
-              emoji={bladesResult ? _resultEmoji(round2Move.health) : null}
+              emoji={bladesResult ? _resultEmoji(round2Action.health) : null}
               floated={floated}
               onClick={onClick}
-              className={bladesResult ? _resultBackground(round2Move.health) : null}
+              className={bladesResult ? _resultBackground(round2Action.health) : null}
             />
           </>
         }

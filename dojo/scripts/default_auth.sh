@@ -12,7 +12,7 @@ export ACCOUNT_ADDRESS=$(toml get Scarb.toml --raw tool.dojo.env.account_address
 export ACTIONS_ADDRESS=$(cat ./target/dev/manifest.json | jq -r '.contracts[] | select(.name == "pistols::systems::actions::actions" ).address')
 export WORLD_ADDRESS=$(toml get Scarb.toml --raw tool.dojo.env.world_address)
 
-export COMPONENTS=("Duelist" "Challenge" "Pact" "Move" "Round")
+export COMPONENTS=("Duelist" "Challenge" "Pact" "Shot" "Round")
 
 echo "---------------------------------------------------------------------------"
 echo "sozo auth writer"

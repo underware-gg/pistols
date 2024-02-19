@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { Blades } from '@/pistols/utils/pistols'
-import { signAndRestoreMoveFromHash } from '../utils/salt'
+import { signAndRestoreActionFromHash } from '../utils/salt'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -20,16 +20,16 @@ export default function RevealModal({
   roundNumber: number
   hash: bigint
 }) {
-  const { reveal_move } = useDojoSystemCalls()
+  const { reveal_action } = useDojoSystemCalls()
   const { account } = useDojoAccount()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const _reveal = async () => {
-    const possibleMoves = roundNumber == 1 ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] : roundNumber == 2 ? [Blades.Light, Blades.Heavy, Blades.Block] : []
+    const possibleActions = roundNumber == 1 ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] : roundNumber == 2 ? [Blades.Light, Blades.Heavy, Blades.Block] : []
     setIsSubmitting(true)
-    const { salt, move } = await signAndRestoreMoveFromHash(account, duelId, roundNumber, hash, possibleMoves)
-    if (move) {
-      await reveal_move(account, duelId, roundNumber, salt, move)
+    const { salt, action } = await signAndRestoreActionFromHash(account, duelId, roundNumber, hash, possibleActions)
+    if (action) {
+      await reveal_action(account, duelId, roundNumber, salt, action)
       setIsOpen(false)
     }
     setIsSubmitting(false)

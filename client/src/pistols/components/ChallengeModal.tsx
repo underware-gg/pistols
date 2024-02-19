@@ -117,7 +117,7 @@ export default function ChallengeModal() {
                 <Row columns='equal' textAlign='right'>
                   <Col>
                     <Divider horizontal className='Margin6'>
-                      <Header as='h4'>moves</Header>
+                      <Header as='h4'>actions</Header>
                     </Divider>
                   </Col>
                 </Row>

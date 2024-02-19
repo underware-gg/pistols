@@ -45,18 +45,18 @@ struct Challenge {
 #[derive(Model, Copy, Drop, Serde)]
 struct Pact {
     #[key]
-    pair: u128,     // xor'd duelists
+    pair: u128,     // xor'd duelists u256(address).low
     //------------
     duel_id: u128,  // current Challenge, or 0x0
 } // 128 bits
 
 //
-// The move of each player on a Round
+// The shot of each player on a Round
 #[derive(Copy, Drop, Serde, Introspect)]
-struct Move {
-    hash: felt252,  // hashed move (salt+move)
-    salt: u64,      // the salt
-    move: u8,       // the move
+struct Shot {
+    hash: felt252,  // hashed action (salt + action)
+    salt: u64,      // the player's secret salt
+    action: u8,     // the player's chosen action (paces, weapon, ...)
     dice_crit: u8,  // dice roll result (1..100) - kill / double damage
     dice_hit: u8,   // dice roll result (1..100) - hit / normal damage
     damage: u8,     // amount of health taken
@@ -73,7 +73,7 @@ struct Round {
     #[key]
     round_number: u8,
     //---------------
-    state: u8,          // actually a RoundState
-    duelist_a: Move,    // duelist_a move
-    duelist_b: Move,    // duelist_b move
+    state: u8,      // actually a RoundState
+    shot_a: Shot,   // duelist_a shot
+    shot_b: Shot,   // duelist_b shot
 } // f + f + (8 + 112 + 112) 232 bits

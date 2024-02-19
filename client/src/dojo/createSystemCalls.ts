@@ -59,14 +59,14 @@ export function createSystemCalls(
     return await _executeTransaction(signer, 'reply_challenge', args)
   }
 
-  const commit_move = async (signer: Account, duel_id: bigint, round_number: number, hash: bigint): Promise<boolean> => {
+  const commit_action = async (signer: Account, duel_id: bigint, round_number: number, hash: bigint): Promise<boolean> => {
     const args = [duel_id, round_number, hash]
-    return await _executeTransaction(signer, 'commit_move', args)
+    return await _executeTransaction(signer, 'commit_action', args)
   }
 
-  const reveal_move = async (signer: Account, duel_id: bigint, round_number: number, salt: bigint, move: number): Promise<boolean> => {
-    const args = [duel_id, round_number, salt, move]
-    return await _executeTransaction(signer, 'reveal_move', args)
+  const reveal_action = async (signer: Account, duel_id: bigint, round_number: number, salt: bigint, action: number): Promise<boolean> => {
+    const args = [duel_id, round_number, salt, action]
+    return await _executeTransaction(signer, 'reveal_action', args)
   }
 
   // read-only calls
@@ -105,8 +105,8 @@ export function createSystemCalls(
     register_duelist,
     create_challenge,
     reply_challenge,
-    commit_move,
-    reveal_move,
+    commit_action,
+    reveal_action,
     // read-only calls
     get_pact,
     has_pact,

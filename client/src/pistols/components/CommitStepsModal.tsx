@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Divider, Grid, Modal, Pagination } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { signAndGenerateMoveHash } from '@/pistols/utils/salt'
+import { signAndGenerateActionHash } from '@/pistols/utils/salt'
 import ProgressBar from '@/pistols/components/ui/ProgressBar'
 
 const Row = Grid.Row
@@ -19,7 +19,7 @@ export default function CommitStepsModal({
   duelId: bigint
   roundNumber?: number
 }) {
-  const { commit_move, get_pistols_bonus, get_pistols_hit_chance, get_pistols_kill_chance } = useDojoSystemCalls()
+  const { commit_action, get_pistols_bonus, get_pistols_hit_chance, get_pistols_kill_chance } = useDojoSystemCalls()
   const { account } = useDojoAccount()
 
   const [steps, setSteps] = useState(0)
@@ -65,9 +65,9 @@ export default function CommitStepsModal({
   const _submit = async () => {
     if (steps) {
       setIsSubmitting(true)
-      const hash = await signAndGenerateMoveHash(account, duelId, roundNumber, steps)
+      const hash = await signAndGenerateActionHash(account, duelId, roundNumber, steps)
       if (hash) {
-        await commit_move(account, duelId, roundNumber, hash)
+        await commit_action(account, duelId, roundNumber, hash)
         setIsOpen(false)
       }
       setIsSubmitting(false)

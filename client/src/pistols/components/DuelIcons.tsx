@@ -19,13 +19,13 @@ export function DuelIcons({
 
   const isA = account == duelistA
   const isB = account == duelistB
-  const movesRound1 = isA ? (round1?.duelist_a ?? null) : isB ? (round1?.duelist_b ?? null) : null
-  const movesRound2 = isA ? (round2?.duelist_a ?? null) : isB ? (round2?.duelist_b ?? null) : null
+  const shotRound1 = isA ? (round1?.shot_a ?? null) : isB ? (round1?.shot_b ?? null) : null
+  const shotRound2 = isA ? (round2?.shot_a ?? null) : isB ? (round2?.shot_b ?? null) : null
   const completedStages = isA ? (completedStagesA) : isB ? (completedStagesB) : null
   const isTurn = isA ? turnA : isB ? turnB : false
 
-  const healthRound1 = movesRound1?.health == 0 ? EMOJI.DEAD : movesRound1?.health == SINGLE_DAMAGE ? EMOJI.INJURED : null
-  const healthRound2 = movesRound2?.health == 0 ? EMOJI.DEAD : (movesRound2?.health == SINGLE_DAMAGE && !healthRound1) ? EMOJI.INJURED : null
+  const healthRound1 = shotRound1?.health == 0 ? EMOJI.DEAD : shotRound1?.health == SINGLE_DAMAGE ? EMOJI.INJURED : null
+  const healthRound2 = shotRound2?.health == 0 ? EMOJI.DEAD : (shotRound2?.health == SINGLE_DAMAGE && !healthRound1) ? EMOJI.INJURED : null
 
   const _size = size as IconSizeProp
 
@@ -49,23 +49,23 @@ export function DuelIcons({
 
   if (state == ChallengeState.InProgress) {
     return (<>
-      {movesRound1 && duelStage >= DuelStage.StepsCommit &&
+      {shotRound1 && duelStage >= DuelStage.StepsCommit &&
         <CompletedIcon completed={completedStages[DuelStage.StepsCommit]}>
           <EmojiIcon emoji={EMOJI.STEP} size={_size} />
         </CompletedIcon>
       }
-      {movesRound1 && duelStage == DuelStage.StepsReveal &&
+      {shotRound1 && duelStage == DuelStage.StepsReveal &&
         <CompletedIcon completed={completedStages[DuelStage.StepsReveal]}>
           <Icon name='eye' size={_size} />
         </CompletedIcon>
       }
       {healthRound1 && <EmojiIcon emoji={healthRound1} size={_size} />}
-      {movesRound2 && duelStage >= DuelStage.BladesCommit &&
+      {shotRound2 && duelStage >= DuelStage.BladesCommit &&
         <CompletedIcon completed={completedStages[DuelStage.BladesCommit]}>
           <EmojiIcon emoji={EMOJI.BLADES} size={_size} />
         </CompletedIcon>
       }
-      {movesRound2 && duelStage == DuelStage.BladesReveal &&
+      {shotRound2 && duelStage == DuelStage.BladesReveal &&
         <CompletedIcon completed={completedStages[DuelStage.BladesReveal]}>
           <Icon name='eye' size={_size} />
         </CompletedIcon>
@@ -77,9 +77,9 @@ export function DuelIcons({
 
   if (isFinished) {
     return (<>
-      {movesRound1 && <StepsIcon stepCount={parseInt(movesRound1.move)} size={_size} />}
+      {shotRound1 && <StepsIcon stepCount={parseInt(shotRound1.move)} size={_size} />}
       {healthRound1 && <EmojiIcon emoji={healthRound1} size={_size} />}
-      {movesRound2 && <BladesIcon blades={parseInt(movesRound2.move) as Blades} size={_size} />}
+      {shotRound2 && <BladesIcon blade={parseInt(shotRound2.move) as Blades} size={_size} />}
       {healthRound2 && <EmojiIcon emoji={healthRound2} size={_size} />}
     </>)
   }

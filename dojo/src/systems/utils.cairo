@@ -3,7 +3,7 @@ use core::option::OptionTrait;
 use traits::{Into, TryInto};
 use starknet::{ContractAddress};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-use pistols::models::models::{Duelist, Challenge, Pact, Round, Move};
+use pistols::models::models::{Duelist, Challenge, Pact, Round, Shot};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round::{RoundState, RoundStateTrait};
 use pistols::types::blades::{Blades};
@@ -25,13 +25,13 @@ fn duelist_exist(world: IWorldDispatcher, address: ContractAddress) -> bool {
 }
 
 #[inline(always)]
-fn make_move_hash(salt: u64, move: u8) -> felt252 {
-    (pedersen(salt.into(), move.into()))
+fn make_action_hash(salt: u64, action: u8) -> felt252 {
+    (pedersen(salt.into(), action.into()))
 }
 
 #[inline(always)]
 fn make_round_salt(round: Round) -> u64 {
-    (round.duelist_a.salt ^ round.duelist_b.salt)
+    (round.shot_a.salt ^ round.shot_b.salt)
 }
 
 fn make_pact_pair(duelist_a: ContractAddress, duelist_b: ContractAddress) -> u128 {
@@ -63,8 +63,8 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         // Round 2+ need to copy previous Round's healths
         if (challenge.round_number > 1) {
             let prev_round: Round = get!(world, (challenge.duel_id, challenge.round_number - 1), Round);
-            health_a = prev_round.duelist_a.health;
-            health_b = prev_round.duelist_b.health;
+            health_a = prev_round.shot_a.health;
+            health_b = prev_round.shot_b.health;
         }
 
         set!(world, (
@@ -72,20 +72,20 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
                 duel_id: challenge.duel_id,
                 round_number: challenge.round_number,
                 state: RoundState::Commit.into(),
-                duelist_a: Move {
+                shot_a: Shot {
                     hash: 0,
                     salt: 0,
-                    move: 0,
+                    action: 0,
                     dice_crit: 0,
                     dice_hit: 0,
                     damage: 0,
                     block: 0,
                     health: health_a,
                 },
-                duelist_b: Move {
+                shot_b: Shot {
                     hash: 0,
                     salt: 0,
-                    move: 0,
+                    action: 0,
                     dice_crit: 0,
                     dice_hit: 0,
                     damage: 0,
@@ -117,8 +117,8 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
 
         // compute honour from 1st round steps
         let first_round: Round = get!(world, (challenge.duel_id, 1), Round);
-        duelist_a.total_honour += first_round.duelist_a.move.into();
-        duelist_b.total_honour += first_round.duelist_b.move.into();
+        duelist_a.total_honour += first_round.shot_a.action.into();
+        duelist_b.total_honour += first_round.shot_b.action.into();
         // average honour has an extra decimal, eg: 100 = 10.0
         duelist_a.honour = ((duelist_a.total_honour * 10) / duelist_a.total_duels.into()).try_into().unwrap();
         duelist_b.honour = ((duelist_b.total_honour * 10) / duelist_b.total_duels.into()).try_into().unwrap();
