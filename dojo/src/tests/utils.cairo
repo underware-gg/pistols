@@ -105,7 +105,7 @@ mod utils {
         duel_id: u128,
         round_number: u8,
         salt: u64,
-        action: u8,
+        action: u16,
     ) {
         testing::set_contract_address(sender);
         system.reveal_action(duel_id, round_number, salt, action);
@@ -132,11 +132,11 @@ mod utils {
         let result: u8 = system.calc_hit_penalty(health);
         (result)
     }
-    fn get_pistols_hit_chance(system: IActionsDispatcher, duelist_address: ContractAddress, health: u8, steps: u8) -> u8 {
+    fn get_pistols_hit_chance(system: IActionsDispatcher, duelist_address: ContractAddress, health: u8, steps: u16) -> u8 {
         let result: u8 = system.get_pistols_hit_chance(duelist_address, health, steps);
         (result)
     }
-    fn get_pistols_kill_chance(system: IActionsDispatcher, duelist_address: ContractAddress, health: u8, steps: u8) -> u8 {
+    fn get_pistols_kill_chance(system: IActionsDispatcher, duelist_address: ContractAddress, health: u8, steps: u16) -> u8 {
         let result: u8 = system.get_pistols_kill_chance(duelist_address, health, steps);
         (result)
     }

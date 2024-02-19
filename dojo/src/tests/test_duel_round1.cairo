@@ -40,19 +40,19 @@ mod tests {
         (ch, round, duel_id)
     }
 
-    fn _get_actions_round_1_resolved() -> (u64, u64, u8, u8, u64, u64) {
+    fn _get_actions_round_1_resolved() -> (u64, u64, u16, u16, u64, u64) {
         let salt_a: u64 = SALT_1_a;
         let salt_b: u64 = SALT_1_b;
-        let action_a: u8 = 5;
-        let action_b: u8 = 6;
+        let action_a: u16 = 5;
+        let action_b: u16 = 6;
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
     }
 
-    fn _get_actions_round_1_draw() -> (u64, u64, u8, u8, u64, u64) {
+    fn _get_actions_round_1_draw() -> (u64, u64, u16, u16, u64, u64) {
         let salt_a: u64 = SALT_1_a + 8;
         let salt_b: u64 = SALT_1_b + 8;
-        let action_a: u8 = 5;
-        let action_b: u8 = 5;
+        let action_a: u16 = 5;
+        let action_b: u16 = 5;
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
     }
 
@@ -100,7 +100,7 @@ mod tests {
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
 
         let hit_chance_a = utils::get_pistols_hit_chance(system, owner, constants::FULL_HEALTH, action_a);
-        let hit_chance_b = utils::get_pistols_hit_chance(system, owner, constants::FULL_HEALTH,action_b);
+        let hit_chance_b = utils::get_pistols_hit_chance(system, owner, constants::FULL_HEALTH, action_b);
         let kill_chance_a = utils::get_pistols_kill_chance(system, owner,constants::FULL_HEALTH, action_a);
         let kill_chance_b = utils::get_pistols_kill_chance(system, owner, constants::FULL_HEALTH,action_b);
 
@@ -155,8 +155,8 @@ mod tests {
         assert(duelist_b.total_draws == 0, 'duelist_b.total_draws');
         assert(duelist_a.total_honour == action_a.into(), 'duelist_a.total_honour');
         assert(duelist_b.total_honour == action_b.into(), 'duelist_b.total_honour');
-        assert(duelist_a.honour == (action_a * 10).into(), 'duelist_a.honour');
-        assert(duelist_b.honour == (action_b * 10).into(), 'duelist_b.honour');
+        assert(duelist_a.honour == (action_a * 10).try_into().unwrap(), 'duelist_a.honour');
+        assert(duelist_b.honour == (action_b * 10).try_into().unwrap(), 'duelist_b.honour');
 
         if (challenge.winner == 1) {
             assert(duelist_a.total_wins == 1, 'a_win_duelist_a.total_wins');
@@ -206,8 +206,8 @@ mod tests {
         assert(duelist_b.total_draws == 0, '__duelist_b.total_draws');
         assert(duelist_a.total_honour == (action_a * 2).into(), '__duelist_a.total_honour');
         assert(duelist_b.total_honour == (action_b * 2).into(), '__duelist_b.total_honour');
-        assert(duelist_a.honour == (action_a * 10).into(), '__duelist_a.honour');
-        assert(duelist_b.honour == (action_b * 10).into(), '__duelist_b.honour');
+        assert(duelist_a.honour == (action_a * 10).try_into().unwrap(), '__duelist_a.honour');
+        assert(duelist_b.honour == (action_b * 10).try_into().unwrap(), '__duelist_b.honour');
 
         if (challenge.winner == 1) {
             assert(duelist_a.total_wins == 2, '__a_win_duelist_a.total_wins');

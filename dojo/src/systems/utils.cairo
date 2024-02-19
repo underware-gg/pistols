@@ -25,7 +25,7 @@ fn duelist_exist(world: IWorldDispatcher, address: ContractAddress) -> bool {
 }
 
 #[inline(always)]
-fn make_action_hash(salt: u64, action: u8) -> u64 {
+fn make_action_hash(salt: u64, action: u16) -> u64 {
     let hash: u256 = pedersen(salt.into(), action.into()).into() & constants::HASH_SALT_MASK;
     (hash.try_into().unwrap())
 }
@@ -147,14 +147,14 @@ fn apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
 //------------------------
 // Pistols chances
 //
-fn get_pistols_hit_chance(world: IWorldDispatcher, duelist_address: ContractAddress, health: u8, steps: u8) -> u8 {
+fn get_pistols_hit_chance(world: IWorldDispatcher, duelist_address: ContractAddress, health: u8, steps: u16) -> u8 {
     let bonus: u8 = calc_hit_bonus(world, duelist_address);
     let penalty: u8 = calc_hit_penalty(world, health);
-    let chance: u8 = MathU8::map(steps, 1, 10, constants::PISTOLS_HIT_CHANCE_AT_STEP_1, constants::PISTOLS_HIT_CHANCE_AT_STEP_10);
+    let chance: u8 = MathU8::map(steps.try_into().unwrap(), 1, 10, constants::PISTOLS_HIT_CHANCE_AT_STEP_1, constants::PISTOLS_HIT_CHANCE_AT_STEP_10);
     (apply_chance_bonus_penalty(chance, bonus, penalty))
 }
-fn get_pistols_kill_chance(world: IWorldDispatcher, duelist_address: ContractAddress, health: u8, steps: u8) -> u8 {
-    let chance: u8 = MathU8::map(steps, 1, 10, constants::PISTOLS_KILL_CHANCE_AT_STEP_1, constants::PISTOLS_KILL_CHANCE_AT_STEP_10);
+fn get_pistols_kill_chance(world: IWorldDispatcher, duelist_address: ContractAddress, health: u8, steps: u16) -> u8 {
+    let chance: u8 = MathU8::map(steps.try_into().unwrap(), 1, 10, constants::PISTOLS_KILL_CHANCE_AT_STEP_1, constants::PISTOLS_KILL_CHANCE_AT_STEP_10);
     (chance)
 }
 

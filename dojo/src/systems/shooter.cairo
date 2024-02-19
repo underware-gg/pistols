@@ -12,7 +12,7 @@ mod shooter {
     use pistols::types::round::{RoundState};
     use pistols::types::steps::{Steps};
     use pistols::types::blades::{Blades, BLADES};
-    use pistols::utils::math::{MathU8};
+    use pistols::utils::math::{MathU8, MathU16};
 
     fn _assert_challenge(world: IWorldDispatcher, caller: ContractAddress, duel_id: u128, round_number: u8) -> (Challenge, u8) {
         let challenge: Challenge = get!(world, duel_id, Challenge);
@@ -64,7 +64,7 @@ mod shooter {
     //-----------------------------------
     // Reveal
     //
-    fn reveal_action(world: IWorldDispatcher, duel_id: u128, round_number: u8, salt: u64, mut action: u8) {
+    fn reveal_action(world: IWorldDispatcher, duel_id: u128, round_number: u8, salt: u64, mut action: u16) {
         let caller: ContractAddress = starknet::get_caller_address();
 
         // Assert correct Challenge
@@ -110,9 +110,9 @@ mod shooter {
     // Validates a action and returns it
     // Pistols: if invalid, clamps between 1 and 10
     // Blades: if invalid, returns Blades::Idle
-    fn validated_action(round_number: u8, action: u8) -> u8 {
+    fn validated_action(round_number: u8, action: u16) -> u16 {
         if (round_number == 1) {
-            return MathU8::clamp(action, 1, 10); // valid or not, clamp in steps
+            return MathU16::clamp(action, 1, 10); // valid or not, clamp in steps
         } else if (round_number == 2) {
             let blade: Option<Blades> = action.try_into();
             if (blade != Option::None) {
@@ -168,8 +168,8 @@ mod shooter {
     // Pistols duel
     //
     fn pistols_shootout(world: IWorldDispatcher, challenge: Challenge, ref round: Round) {
-        let steps_a: u8 = round.shot_a.action;
-        let steps_b: u8 = round.shot_b.action;
+        let steps_a: u16 = round.shot_a.action;
+        let steps_b: u16 = round.shot_b.action;
 
         if (steps_a == steps_b) {
             // both shoot together
@@ -193,7 +193,7 @@ mod shooter {
     }
 
     fn shoot_apply_damage(world: IWorldDispatcher, seed: felt252, duelist: ContractAddress, round: Round, ref attack: Shot, ref defense: Shot) {
-        let steps: u8 = attack.action;
+        let steps: u16 = attack.action;
         // dice 1: miss or hit + damage
         // ex: chance 60%: 1..30 = double, 31..60 = single, 61..100 = miss
         attack.dice_hit = throw_dice(seed, round, 100);

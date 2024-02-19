@@ -949,7 +949,7 @@
     {
       "name": "pistols::systems::actions::actions",
       "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
-      "class_hash": "0x230a87bc555dfce0241456d180d78d6152e8bd3b44c69c98a3325d5fc09882b",
+      "class_hash": "0x64e2a6bf9718a3235736bfa9d71ad844ea2cdbb862cc156a00c85d67eaeaaa6",
       "abi": [
         {
           "type": "impl",
@@ -1162,7 +1162,7 @@
                 },
                 {
                   "name": "hash",
-                  "type": "core::felt252"
+                  "type": "core::integer::u64"
                 }
               ],
               "outputs": [],
@@ -1186,7 +1186,7 @@
                 },
                 {
                   "name": "action",
-                  "type": "core::integer::u8"
+                  "type": "core::integer::u16"
                 }
               ],
               "outputs": [],
@@ -1278,7 +1278,7 @@
                 },
                 {
                   "name": "steps",
-                  "type": "core::integer::u8"
+                  "type": "core::integer::u16"
                 }
               ],
               "outputs": [
@@ -1302,7 +1302,7 @@
                 },
                 {
                   "name": "steps",
-                  "type": "core::integer::u8"
+                  "type": "core::integer::u16"
                 }
               ],
               "outputs": [
@@ -2267,7 +2267,7 @@
           "key": false
         }
       ],
-      "class_hash": "0x54c6eef595e0e095cc1fcaf9dfc96d7a9ce0507af64c837e6ef89d9d474dc2e",
+      "class_hash": "0x6caab1c7abee202d139a82e1d56771a27a0fdbdb6415ffe7e6570c919f822e9",
       "abi": [
         {
           "type": "impl",
@@ -2444,7 +2444,7 @@
           "members": [
             {
               "name": "hash",
-              "type": "core::felt252"
+              "type": "core::integer::u64"
             },
             {
               "name": "salt",
@@ -2452,7 +2452,7 @@
             },
             {
               "name": "action",
-              "type": "core::integer::u8"
+              "type": "core::integer::u16"
             },
             {
               "name": "dice_crit",

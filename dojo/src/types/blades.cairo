@@ -10,14 +10,14 @@ enum Blades {
 }
 
 mod BLADES {
-    const IDLE: u8 = 0;
-    const LIGHT: u8 = 1;
-    const HEAVY: u8 = 2;
-    const BLOCK: u8 = 3;
+    const IDLE: u16 = 0;
+    const LIGHT: u16 = 1;
+    const HEAVY: u16 = 2;
+    const BLOCK: u16 = 3;
 }
 
-impl BladesIntoU8 of Into<Blades, u8> {
-    fn into(self: Blades) -> u8 {
+impl BladesIntoU8 of Into<Blades, u16> {
+    fn into(self: Blades) -> u16 {
         match self {
             Blades::Idle =>     BLADES::IDLE,
             Blades::Light =>    BLADES::LIGHT,
@@ -27,8 +27,8 @@ impl BladesIntoU8 of Into<Blades, u8> {
     }
 }
 
-impl TryU8IntoBlades of TryInto<u8, Blades> {
-    fn try_into(self: u8) -> Option<Blades> {
+impl TryU8IntoBlades of TryInto<u16, Blades> {
+    fn try_into(self: u16) -> Option<Blades> {
         if self == BLADES::IDLE         { Option::Some(Blades::Idle) }
         else if self == BLADES::LIGHT   { Option::Some(Blades::Light) }
         else if self == BLADES::HEAVY   { Option::Some(Blades::Heavy) }

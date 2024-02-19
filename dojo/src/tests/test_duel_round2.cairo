@@ -43,43 +43,43 @@ mod tests {
         (ch, round, duel_id)
     }
 
-    fn _get_actions_round_1_resolved() -> (u64, u64, u8, u8, u64, u64) {
+    fn _get_actions_round_1_resolved() -> (u64, u64, u16, u16, u64, u64) {
         let salt_a: u64 = SALT_1_a;
         let salt_b: u64 = SALT_1_b;
-        let action_a: u8 = 5;
-        let action_b: u8 = 6;
+        let action_a: u16 = 5;
+        let action_b: u16 = 6;
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
     }
 
-    fn _get_actions_round_1_draw() -> (u64, u64, u8, u8, u64, u64) {
+    fn _get_actions_round_1_draw() -> (u64, u64, u16, u16, u64, u64) {
         let salt_a: u64 = SALT_1_a + 8;
         let salt_b: u64 = SALT_1_b + 8;
-        let action_a: u8 = 5;
-        let action_b: u8 = 5;
+        let action_a: u16 = 5;
+        let action_b: u16 = 5;
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
     }
 
-    fn _get_actions_round_1_continue() -> (u64, u64, u8, u8, u64, u64) {
+    fn _get_actions_round_1_continue() -> (u64, u64, u16, u16, u64, u64) {
         let salt_a: u64 = SALT_1_a;
         let salt_b: u64 = SALT_1_b;
-        let action_a: u8 = 10;
-        let action_b: u8 = 10;
+        let action_a: u16 = 10;
+        let action_b: u16 = 10;
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
     }
 
-    fn _get_actions_round_2_resolved() -> (u64, u64, u8, u8, u64, u64) {
+    fn _get_actions_round_2_resolved() -> (u64, u64, u16, u16, u64, u64) {
         let salt_a: u64 = SALT_1_a;
         let salt_b: u64 = SALT_1_b;
-        let action_a: u8 = BLADES::HEAVY;
-        let action_b: u8 = BLADES::BLOCK;
+        let action_a: u16 = BLADES::HEAVY;
+        let action_b: u16 = BLADES::BLOCK;
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
     }
 
-    fn _get_actions_round_2_draw() -> (u64, u64, u8, u8, u64, u64) {
+    fn _get_actions_round_2_draw() -> (u64, u64, u16, u16, u64, u64) {
         let salt_a: u64 = SALT_1_a + 1;
         let salt_b: u64 = SALT_1_b + 1;
-        let action_a: u8 = BLADES::HEAVY;
-        let action_b: u8 = BLADES::HEAVY;
+        let action_a: u16 = BLADES::HEAVY;
+        let action_b: u16 = BLADES::HEAVY;
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
     }
 
@@ -144,8 +144,8 @@ mod tests {
         assert(duelist_b.total_losses == 0, 'duelist_b.total_losses');
         assert(duelist_a.total_honour == (steps_a).into(), '__duelist_a.total_honour');
         assert(duelist_b.total_honour == (steps_b).into(), '__duelist_b.total_honour');
-        assert(duelist_a.honour == (steps_a * 10).into(), '__duelist_a.honour');
-        assert(duelist_b.honour == (steps_b * 10).into(), '__duelist_b.honour');
+        assert(duelist_a.honour == (steps_a * 10).try_into().unwrap(), '__duelist_a.honour');
+        assert(duelist_b.honour == (steps_b * 10).try_into().unwrap(), '__duelist_b.honour');
 
         // Run same challenge to compute totals
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
@@ -175,8 +175,8 @@ mod tests {
         assert(duelist_b.total_losses == 0, '2_duelist_b.total_losses');
         assert(duelist_a.total_honour == (steps_a * 2).into(), '2__duelist_a.total_honour');
         assert(duelist_b.total_honour == (steps_b * 2).into(), '2__duelist_b.total_honour');
-        assert(duelist_a.honour == (steps_a * 10).into(), '2__duelist_a.honour');
-        assert(duelist_b.honour == (steps_b * 10).into(), '2__duelist_b.honour');
+        assert(duelist_a.honour == (steps_a * 10).try_into().unwrap(), '2__duelist_a.honour');
+        assert(duelist_b.honour == (steps_b * 10).try_into().unwrap(), '2__duelist_b.honour');
     }
 
 
@@ -233,8 +233,8 @@ mod tests {
         assert(duelist_b.total_draws == 0, 'duelist_b.total_draws');
         assert(duelist_a.total_honour == steps_a.into(), 'duelist_a.total_honour');
         assert(duelist_b.total_honour == steps_b.into(), 'duelist_b.total_honour');
-        assert(duelist_a.honour == (steps_a * 10).into(), 'duelist_a.honour');
-        assert(duelist_b.honour == (steps_b * 10).into(), 'duelist_b.honour');
+        assert(duelist_a.honour == (steps_a * 10).try_into().unwrap(), 'duelist_a.honour');
+        assert(duelist_b.honour == (steps_b * 10).try_into().unwrap(), 'duelist_b.honour');
 
         if (challenge.winner == 1) {
             assert(duelist_a.total_wins == 1, 'a_win_duelist_a.total_wins');
@@ -267,8 +267,8 @@ mod tests {
 
     fn _execute_round_ready_with_blades(
         world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress,
-        health_a: u8, blade_a: u8,
-        health_b: u8, blade_b: u8,
+        health_a: u8, blade_a: u16,
+        health_b: u8, blade_b: u16,
     ) -> (Challenge, Round) {
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
         // random 1st round...
