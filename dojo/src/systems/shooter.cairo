@@ -196,11 +196,11 @@ mod shooter {
             // dice 1: miss or hit + damage
             // ex: chance 60%: 1..30 = double, 31..60 = single, 61..100 = miss
             attack.dice_hit = throw_dice(seed, round, 100);
-            let hit_chance: u8 = utils::get_duelist_hit_chance(world, duelist, attack.health, paces);
+            let hit_chance: u8 = utils::get_duelist_hit_chance(world, duelist, paces, attack.health);
             if (attack.dice_hit <= hit_chance) {
                 // dice 1: execution!
                 attack.dice_crit = throw_dice(seed * 2, round, 100);
-                let kill_chance: u8 = utils::get_duelist_crit_chance(world, duelist, attack.health, paces);
+                let kill_chance: u8 = utils::get_duelist_crit_chance(world, duelist, paces, attack.health);
                 if (attack.dice_crit <= kill_chance) {
                     defense.damage = constants::FULL_HEALTH;
                 } else if (attack.dice_hit <= hit_chance/2) {
@@ -275,7 +275,7 @@ mod shooter {
         if (action != Action::Idle) {
             // dice 1: execution or double damage/block
             attack.dice_crit = throw_dice(seed, round, 100);
-            let kill_chance: u8 = utils::get_duelist_crit_chance(world, duelist, attack.health, action);
+            let kill_chance: u8 = utils::get_duelist_crit_chance(world, duelist, action, attack.health);
             if (attack.dice_hit <= kill_chance) {
                 if (action == Action::SlowBlade) {
                     defense.damage = constants::FULL_HEALTH;
@@ -287,7 +287,7 @@ mod shooter {
             } else {
                 // dice 2: miss or normal damage
                 attack.dice_hit = throw_dice(seed * 2, round, 100);
-                let hit_chance: u8 = utils::get_duelist_hit_chance(world, duelist, attack.health, action);
+                let hit_chance: u8 = utils::get_duelist_hit_chance(world, duelist, action, attack.health);
                 if (attack.dice_hit <= hit_chance) {
                     if (action == Action::SlowBlade) {
                         defense.damage = constants::DOUBLE_DAMAGE;

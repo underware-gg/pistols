@@ -45,8 +45,9 @@ trait IActions<TContractState> {
 
     fn calc_hit_bonus(self: @TContractState, duelist_address: ContractAddress) -> u8;
     fn calc_hit_penalty(self: @TContractState, health: u8) -> u8;
-    fn get_duelist_hit_chance(self: @TContractState, duelist_address: ContractAddress, health: u8, action: u16) -> u8;
-    fn get_duelist_crit_chance(self: @TContractState, duelist_address: ContractAddress, health: u8, action: u16) -> u8;
+    fn get_duelist_hit_chance(self: @TContractState, duelist_address: ContractAddress, action: u16, health: u8) -> u8;
+    fn get_duelist_crit_chance(self: @TContractState, duelist_address: ContractAddress, action: u16, health: u8) -> u8;
+    fn get_action_honour(self: @TContractState, duelist_address: ContractAddress, action: u16) -> (u8, u8);
 }
 
 #[dojo::contract]
@@ -228,13 +229,17 @@ mod actions {
             let world: IWorldDispatcher = self.world_dispatcher.read();
             (utils::calc_hit_penalty(world, health))
         }
-        fn get_duelist_hit_chance(self: @ContractState, duelist_address: ContractAddress, health: u8, action: u16) -> u8 {
+        fn get_duelist_hit_chance(self: @ContractState, duelist_address: ContractAddress, action: u16, health: u8) -> u8 {
             let world: IWorldDispatcher = self.world_dispatcher.read();
-            (utils::get_duelist_hit_chance(world, duelist_address, health, action.into()))
+            (utils::get_duelist_hit_chance(world, duelist_address, action.into(), health))
         }
-        fn get_duelist_crit_chance(self: @ContractState, duelist_address: ContractAddress, health: u8, action: u16) -> u8 {
+        fn get_duelist_crit_chance(self: @ContractState, duelist_address: ContractAddress, action: u16, health: u8) -> u8 {
             let world: IWorldDispatcher = self.world_dispatcher.read();
-            (utils::get_duelist_crit_chance(world, duelist_address, health, action.into()))
+            (utils::get_duelist_crit_chance(world, duelist_address, action.into(), health))
+        }
+        fn get_action_honour(self: @ContractState, duelist_address: ContractAddress, action: u16) -> (u8, u8) {
+            let world: IWorldDispatcher = self.world_dispatcher.read();
+            (utils::get_action_honour(world, duelist_address, action.into()))
         }
     }
 }

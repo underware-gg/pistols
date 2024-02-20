@@ -120,6 +120,9 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         duelist_a.total_honour += first_round.shot_a.action.into();
         duelist_b.total_honour += first_round.shot_b.action.into();
         // average honour has an extra decimal, eg: 100 = 10.0
+        //
+        // TODO: use calc_final_honour()
+        //
         duelist_a.honour = ((duelist_a.total_honour * 10) / duelist_a.total_duels.into()).try_into().unwrap();
         duelist_b.honour = ((duelist_b.total_honour * 10) / duelist_b.total_duels.into()).try_into().unwrap();
         
@@ -133,15 +136,21 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
 // Chances
 //
 
-fn get_duelist_hit_chance(world: IWorldDispatcher, duelist_address: ContractAddress, health: u8, action: Action) -> u8 {
+fn get_duelist_hit_chance(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
     let chances: u8 = action.hit_chance();
     let penalty: u8 = calc_hit_penalty(world, health);
     (apply_chance_bonus_penalty(chances, 0, penalty))
 }
-fn get_duelist_crit_chance(world: IWorldDispatcher, duelist_address: ContractAddress, health: u8, action: Action) -> u8 {
+fn get_duelist_crit_chance(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
     let chances: u8 = action.crit_chance();
     let bonus: u8 = calc_hit_bonus(world, duelist_address);
     (apply_chance_bonus_penalty(chances, bonus, 0))
+}
+fn get_action_honour(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action) -> (u8, u8) {
+    let duelist: Duelist = get!(world, duelist_address, Duelist);
+    let duel_honour: u8 = action.honour();
+    let final_honour: u8 = calc_final_honour(duelist, duel_honour);
+    (duel_honour, final_honour)
 }
 
 fn calc_hit_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> u8 {
@@ -155,6 +164,12 @@ fn calc_hit_penalty(world: IWorldDispatcher, health: u8) -> u8 {
 fn apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
     let mut result: u8 = MathU8::sub(chance + bonus, penalty);
     (MathU8::clamp(result, chance / 2, 100))
+}
+
+fn calc_final_honour(duelist: Duelist, honour: u8) -> u8 {
+    // average honour has an extra decimal, eg: 100 = 10.0
+    let final_honour: u8 = ((duelist.total_honour * 10) / duelist.total_duels.into()).try_into().unwrap();
+    (final_honour)
 }
 
 

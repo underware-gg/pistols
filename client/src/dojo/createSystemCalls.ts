@@ -83,21 +83,33 @@ export function createSystemCalls(
     return result !== null ? Boolean(result) : null
   }
 
-  const get_pistols_bonus = async (duelist: bigint): Promise<number | null> => {
+  const calc_hit_bonus = async (duelist: bigint): Promise<number | null> => {
     const args = [duelist]
-    const result = await _executeCall('get_pistols_bonus', args)
+    const result = await _executeCall('calc_hit_bonus', args)
     return result !== null ? Number(result) : null
   }
 
-  const get_duelist_hit_chance = async (duelist: bigint, action: number): Promise<number | null> => {
-    const args = [duelist, action]
+  const calc_hit_penalty = async (health: number): Promise<number | null> => {
+    const args = [health]
+    const result = await _executeCall('calc_hit_penalty', args)
+    return result !== null ? Number(result) : null
+  }
+
+  const get_duelist_hit_chance = async (duelist: bigint, action: number, health: number): Promise<number | null> => {
+    const args = [duelist, action, health]
     const result = await _executeCall('get_duelist_hit_chance', args)
     return result !== null ? Number(result) : null
   }
 
-  const get_duelist_crit_chance = async (duelist: bigint, action: number): Promise<number | null> => {
-    const args = [duelist, action]
+  const get_duelist_crit_chance = async (duelist: bigint, action: number, health: number): Promise<number | null> => {
+    const args = [duelist, action, health]
     const result = await _executeCall('get_duelist_crit_chance', args)
+    return result !== null ? Number(result) : null
+  }
+
+  const get_action_honour = async (duelist: bigint, action: number): Promise<number | null> => {
+    const args = [duelist, action]
+    const result = await _executeCall('get_action_honour', args)
     return result !== null ? Number(result) : null
   }
 
@@ -110,9 +122,11 @@ export function createSystemCalls(
     // read-only calls
     get_pact,
     has_pact,
-    get_pistols_bonus,
+    calc_hit_bonus,
+    calc_hit_penalty,
     get_duelist_hit_chance,
     get_duelist_crit_chance,
+    get_action_honour,
   }
 }
 

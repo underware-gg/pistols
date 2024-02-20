@@ -60,6 +60,7 @@ trait ActionTrait {
     fn as_paces(self: Action) -> u8;
     fn crit_chance(self: Action) -> u8;
     fn hit_chance(self: Action) -> u8;
+    fn honour(self: Action) -> u8;
 }
 
 impl ActionTraitImpl of ActionTrait {
@@ -122,6 +123,28 @@ impl ActionTraitImpl of ActionTrait {
             (constants::BLADES_KILL_CHANCE)
         } else {
             (0)
+        }
+    }
+
+    //-----------------
+    // Honour value
+    //
+    fn honour(self: Action) -> u8 {
+        match self {
+            Action::Idle =>         0, // do not affect honour
+            Action::Paces1 =>       self.into(),
+            Action::Paces2 =>       self.into(),
+            Action::Paces3 =>       self.into(),
+            Action::Paces4 =>       self.into(),
+            Action::Paces5 =>       self.into(),
+            Action::Paces6 =>       self.into(),
+            Action::Paces7 =>       self.into(),
+            Action::Paces8 =>       self.into(),
+            Action::Paces9 =>       self.into(),
+            Action::Paces10 =>      self.into(),
+            Action::FastBlade =>    0, // do not affect honour
+            Action::SlowBlade =>    0, // do not affect honour
+            Action::Block =>        0, // do not affect honour
         }
     }
 }

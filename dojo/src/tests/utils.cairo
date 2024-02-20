@@ -132,12 +132,12 @@ mod utils {
         let result: u8 = system.calc_hit_penalty(health);
         (result)
     }
-    fn get_duelist_hit_chance(system: IActionsDispatcher, duelist_address: ContractAddress, health: u8, action: u16) -> u8 {
-        let result: u8 = system.get_duelist_hit_chance(duelist_address, health, action);
+    fn get_duelist_hit_chance(system: IActionsDispatcher, duelist_address: ContractAddress, action: u16, health: u8) -> u8 {
+        let result: u8 = system.get_duelist_hit_chance(duelist_address, action, health);
         (result)
     }
-    fn get_duelist_crit_chance(system: IActionsDispatcher, duelist_address: ContractAddress, health: u8, action: u16) -> u8 {
-        let result: u8 = system.get_duelist_crit_chance(duelist_address, health, action);
+    fn get_duelist_crit_chance(system: IActionsDispatcher, duelist_address: ContractAddress, action: u16, health: u8) -> u8 {
+        let result: u8 = system.get_duelist_crit_chance(duelist_address, action, health);
         (result)
     }
 
