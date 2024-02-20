@@ -10,7 +10,7 @@ mod utils {
 
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::types::challenge::{ChallengeState};
-    use pistols::types::blades::{Blades};
+    use pistols::types::action::{Action};
     use pistols::models::models::{
         Duelist, duelist,
         Challenge, challenge,
@@ -140,12 +140,12 @@ mod utils {
         let result: u8 = system.get_pistols_kill_chance(duelist_address, health, steps);
         (result)
     }
-    fn get_blades_hit_chance(system: IActionsDispatcher, duelist_address: ContractAddress, health: u8, blade: Blades) -> u8 {
-        let result: u8 = system.get_blades_hit_chance(duelist_address, health, blade);
+    fn get_blades_hit_chance(system: IActionsDispatcher, duelist_address: ContractAddress, health: u8, action: u16) -> u8 {
+        let result: u8 = system.get_blades_hit_chance(duelist_address, health, action);
         (result)
     }
-    fn get_blades_kill_chance(system: IActionsDispatcher, duelist_address: ContractAddress, health: u8, blade: Blades) -> u8 {
-        let result: u8 = system.get_blades_kill_chance(duelist_address, health, blade);
+    fn get_blades_kill_chance(system: IActionsDispatcher, duelist_address: ContractAddress, health: u8, action: u16) -> u8 {
+        let result: u8 = system.get_blades_kill_chance(duelist_address, health, action);
         (result)
     }
 
@@ -210,7 +210,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000)]
-    fn test_hor_hash() {
+    fn test_xor_hash() {
         let a: felt252 = 0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7;
         let b: felt252 = 0x4d07e40e93398ed3c76981e72dd1fd22557a78ce36c0515f679e27f0bb5bc5f;
         let aa: u256 = a.into();

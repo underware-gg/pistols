@@ -1,7 +1,6 @@
 #[cfg(test)]
 mod tests {
     use debug::PrintTrait;
-    use core::option::OptionTrait;
     use core::traits::{TryInto, Into};
     use starknet::{ContractAddress};
 
@@ -11,7 +10,7 @@ mod tests {
     use pistols::models::models::{Duelist, Challenge, Round};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
-    use pistols::types::blades::{Blades, BLADES};
+    use pistols::types::action::{Action, ACTION};
     use pistols::types::constants::{constants};
     use pistols::systems::utils::{zero_address, make_action_hash};
     use pistols::utils::timestamp::{timestamp};
@@ -70,16 +69,16 @@ mod tests {
     fn _get_actions_round_2_resolved() -> (u64, u64, u16, u16, u64, u64) {
         let salt_a: u64 = SALT_1_a;
         let salt_b: u64 = SALT_1_b;
-        let action_a: u16 = BLADES::HEAVY;
-        let action_b: u16 = BLADES::BLOCK;
+        let action_a: u16 = ACTION::SLOW_BLADE;
+        let action_b: u16 = ACTION::BLOCK;
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
     }
 
     fn _get_actions_round_2_draw() -> (u64, u64, u16, u16, u64, u64) {
         let salt_a: u64 = SALT_1_a + 1;
         let salt_b: u64 = SALT_1_b + 1;
-        let action_a: u16 = BLADES::HEAVY;
-        let action_b: u16 = BLADES::HEAVY;
+        let action_a: u16 = ACTION::SLOW_BLADE;
+        let action_b: u16 = ACTION::SLOW_BLADE;
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
     }
 
@@ -302,8 +301,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_round_ready_with_blades(
             world, system, owner, other,
-            constants::FULL_HEALTH, BLADES::LIGHT, // duelist_a
-            constants::FULL_HEALTH, BLADES::LIGHT, // duelist_b
+            constants::FULL_HEALTH, ACTION::FAST_BLADE, // duelist_a
+            constants::FULL_HEALTH, ACTION::FAST_BLADE, // duelist_b
         );
         assert(challenge.winner == 0, 'bad winner');
         assert(round.shot_a.health == constants::SINGLE_DAMAGE, 'bad health_a');
@@ -315,8 +314,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_round_ready_with_blades(
             world, system, owner, other,
-            constants::FULL_HEALTH, BLADES::LIGHT, // duelist_a
-            constants::SINGLE_DAMAGE, BLADES::LIGHT, // duelist_b
+            constants::FULL_HEALTH, ACTION::FAST_BLADE, // duelist_a
+            constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, // duelist_b
         );
         assert(challenge.winner == 1, 'bad winner');
         assert(round.shot_a.health == constants::SINGLE_DAMAGE, 'bad health_a');
@@ -328,8 +327,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_round_ready_with_blades(
             world, system, owner, other,
-            constants::SINGLE_DAMAGE, BLADES::LIGHT, // duelist_a
-            constants::FULL_HEALTH, BLADES::LIGHT, // duelist_b
+            constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, // duelist_a
+            constants::FULL_HEALTH, ACTION::FAST_BLADE, // duelist_b
         );
         assert(challenge.winner == 2, 'bad winner');
         assert(round.shot_a.health == 0, 'bad health_a');
@@ -342,8 +341,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_round_ready_with_blades(
             world, system, owner, other,
-            constants::FULL_HEALTH, BLADES::LIGHT,
-            constants::SINGLE_DAMAGE, BLADES::BLOCK,
+            constants::FULL_HEALTH, ACTION::FAST_BLADE,
+            constants::SINGLE_DAMAGE, ACTION::BLOCK,
         );
         assert(challenge.winner == 0, 'wrong winner');
         assert(round.shot_a.health == constants::FULL_HEALTH, 'bad health_a');
@@ -353,8 +352,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_round_ready_with_blades(
             world, system, owner, other,
-            constants::SINGLE_DAMAGE, BLADES::BLOCK,
-            constants::FULL_HEALTH, BLADES::LIGHT,
+            constants::SINGLE_DAMAGE, ACTION::BLOCK,
+            constants::FULL_HEALTH, ACTION::FAST_BLADE,
         );
         assert(challenge.winner == 0, 'wrong winner');
         assert(round.shot_a.health == constants::SINGLE_DAMAGE, 'bad health_a');
@@ -367,8 +366,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_round_ready_with_blades(
             world, system, owner, other,
-            constants::FULL_HEALTH, BLADES::LIGHT,
-            constants::SINGLE_DAMAGE, BLADES::HEAVY,
+            constants::FULL_HEALTH, ACTION::FAST_BLADE,
+            constants::SINGLE_DAMAGE, ACTION::SLOW_BLADE,
         );
         assert(challenge.winner == 1, 'wrong winner');
         assert(round.shot_a.health == constants::FULL_HEALTH, 'bad health_a');
@@ -380,8 +379,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_round_ready_with_blades(
             world, system, owner, other,
-            constants::FULL_HEALTH, BLADES::LIGHT,
-            constants::FULL_HEALTH, BLADES::HEAVY,
+            constants::FULL_HEALTH, ACTION::FAST_BLADE,
+            constants::FULL_HEALTH, ACTION::SLOW_BLADE,
         );
         assert(challenge.winner == 2, 'wrong winner');
         assert(round.shot_a.health == 0, 'bad health_a');
@@ -393,8 +392,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_round_ready_with_blades(
             world, system, owner, other,
-            constants::SINGLE_DAMAGE, BLADES::HEAVY,
-            constants::FULL_HEALTH, BLADES::LIGHT,
+            constants::SINGLE_DAMAGE, ACTION::SLOW_BLADE,
+            constants::FULL_HEALTH, ACTION::FAST_BLADE,
         );
         assert(challenge.winner == 2, 'wrong winner');
         assert(round.shot_a.health == 0, 'bad health_a');
@@ -406,8 +405,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_round_ready_with_blades(
             world, system, owner, other,
-            constants::FULL_HEALTH, BLADES::HEAVY,
-            constants::FULL_HEALTH, BLADES::LIGHT,
+            constants::FULL_HEALTH, ACTION::SLOW_BLADE,
+            constants::FULL_HEALTH, ACTION::FAST_BLADE,
         );
         assert(challenge.winner == 1, 'wrong winner');
         assert(round.shot_a.health == constants::SINGLE_DAMAGE, 'bad health_a');
@@ -420,8 +419,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_round_ready_with_blades(
             world, system, owner, other,
-            constants::FULL_HEALTH, BLADES::HEAVY,
-            constants::FULL_HEALTH, BLADES::HEAVY,
+            constants::FULL_HEALTH, ACTION::SLOW_BLADE,
+            constants::FULL_HEALTH, ACTION::SLOW_BLADE,
         );
         assert(challenge.winner == 0, 'wrong winner');
         assert(round.shot_a.health == 0, 'bad health_a');
@@ -434,8 +433,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_round_ready_with_blades(
             world, system, owner, other,
-            constants::FULL_HEALTH, BLADES::HEAVY,
-            constants::FULL_HEALTH, BLADES::BLOCK,
+            constants::FULL_HEALTH, ACTION::SLOW_BLADE,
+            constants::FULL_HEALTH, ACTION::BLOCK,
         );
         assert(challenge.winner == 1, 'wrong winner');
         assert(round.shot_a.health == constants::FULL_HEALTH, 'bad health_a');
@@ -447,8 +446,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_round_ready_with_blades(
             world, system, owner, other,
-            constants::FULL_HEALTH, BLADES::BLOCK,
-            constants::FULL_HEALTH, BLADES::HEAVY,
+            constants::FULL_HEALTH, ACTION::BLOCK,
+            constants::FULL_HEALTH, ACTION::SLOW_BLADE,
         );
         assert(challenge.winner == 2, 'wrong winner');
         assert(round.shot_a.health == 0, 'bad health_a');

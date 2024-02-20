@@ -1,7 +1,6 @@
 #[cfg(test)]
 mod tests {
     use debug::PrintTrait;
-    use core::option::OptionTrait;
     use core::traits::{TryInto, Into};
     use starknet::{ContractAddress};
 
@@ -11,7 +10,6 @@ mod tests {
     use pistols::models::models::{Duelist, Challenge, Round};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
-    use pistols::types::blades::{Blades, BLADES};
     use pistols::types::constants::{constants};
     use pistols::systems::utils::{zero_address, make_action_hash};
     use pistols::utils::timestamp::{timestamp};
@@ -408,7 +406,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_clamp_steps() {
+    fn test_clamp_invalid_idle_steps() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
         let hash_a: u64 = make_action_hash(0x111, 0);
@@ -418,8 +416,12 @@ mod tests {
         utils::execute_reveal_action(system, owner, duel_id, 1, 0x111, 0);
         utils::execute_reveal_action(system, other, duel_id, 1, 0x222, 11);
         let round: Round = utils::get_Round(world, duel_id, 1);
-        assert(round.shot_a.action == 1, 'action_0');
-        assert(round.shot_b.action == 10, 'action_11');
+        assert(round.shot_a.action == 0, 'action_0');
+        assert(round.shot_b.action == 0, 'action_11');
+        assert(round.shot_a.dice_crit == 0, 'a_dice_crit');
+        assert(round.shot_b.dice_crit == 0, 'b_dice_crit');
+        assert(round.shot_a.dice_hit == 0, 'a_dice_hit');
+        assert(round.shot_b.dice_hit == 0, 'b_dice_hit');
     }
 
     #[test]

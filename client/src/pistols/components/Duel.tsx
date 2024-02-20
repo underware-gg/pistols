@@ -152,7 +152,7 @@ function DuelProgress({
     if (round2 && duelStage > DuelStage.BladesClash) {
       const blade = round2Action.action
       const health = _healthResult(round2Action.health)
-      return <span>Clashes with <span className='Important'>{BladesNames[blade]}</span><br />and {health}</span>
+      return <span>Clashes with <span className='Important'>{BladesNames[blade] ?? '?'}</span><br />and {health}</span>
     }
     return null
   }, [round2, duelStage])

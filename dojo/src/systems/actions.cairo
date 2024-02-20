@@ -1,7 +1,6 @@
 use starknet::{ContractAddress};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::types::challenge::{ChallengeState};
-use pistols::types::blades::{Blades};
 
 // define the interface
 #[starknet::interface]
@@ -48,8 +47,8 @@ trait IActions<TContractState> {
     fn calc_hit_penalty(self: @TContractState, health: u8) -> u8;
     fn get_pistols_hit_chance(self: @TContractState, duelist_address: ContractAddress, health: u8, steps: u16) -> u8;
     fn get_pistols_kill_chance(self: @TContractState, duelist_address: ContractAddress, health: u8, steps: u16) -> u8;
-    fn get_blades_hit_chance(self: @TContractState, duelist_address: ContractAddress, health: u8, blade: Blades) -> u8;
-    fn get_blades_kill_chance(self: @TContractState, duelist_address: ContractAddress, health: u8, blade: Blades) -> u8;
+    fn get_blades_hit_chance(self: @TContractState, duelist_address: ContractAddress, health: u8, action: u16) -> u8;
+    fn get_blades_kill_chance(self: @TContractState, duelist_address: ContractAddress, health: u8, action: u16) -> u8;
 }
 
 #[dojo::contract]
@@ -57,7 +56,6 @@ mod actions {
     use debug::PrintTrait;
     use super::IActions;
     use traits::{Into, TryInto};
-    use core::option::OptionTrait;
     use starknet::{ContractAddress, get_block_timestamp, get_block_info};
 
     use pistols::models::models::{Duelist, Challenge, Pact, Round, Shot};
@@ -67,7 +65,6 @@ mod actions {
     use pistols::systems::seeder::{make_seed};
     use pistols::systems::shooter::{shooter};
     use pistols::systems::{utils};
-    use pistols::types::blades::{Blades};
     use pistols::types::constants::{constants};
 
     // impl: implement functions specified in trait
@@ -241,13 +238,13 @@ mod actions {
             let world: IWorldDispatcher = self.world_dispatcher.read();
             (utils::get_pistols_kill_chance(world, duelist_address, health, steps))
         }
-        fn get_blades_hit_chance(self: @ContractState, duelist_address: ContractAddress, health: u8, blade: Blades) -> u8 {
+        fn get_blades_hit_chance(self: @ContractState, duelist_address: ContractAddress, health: u8, action: u16) -> u8 {
             let world: IWorldDispatcher = self.world_dispatcher.read();
-            (utils::get_blades_hit_chance(world, duelist_address, health, blade))
+            (utils::get_blades_hit_chance(world, duelist_address, health, action))
         }
-        fn get_blades_kill_chance(self: @ContractState, duelist_address: ContractAddress, health: u8, blade: Blades) -> u8 {
+        fn get_blades_kill_chance(self: @ContractState, duelist_address: ContractAddress, health: u8, action: u16) -> u8 {
             let world: IWorldDispatcher = self.world_dispatcher.read();
-            (utils::get_blades_kill_chance(world, duelist_address, health, blade))
+            (utils::get_blades_kill_chance(world, duelist_address, health, action))
         }
     }
 }

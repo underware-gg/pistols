@@ -1,12 +1,11 @@
 // use debug::PrintTrait;
-use core::option::OptionTrait;
 use traits::{Into, TryInto};
 use starknet::{ContractAddress};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::models::models::{Duelist, Challenge, Pact, Round, Shot};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round::{RoundState, RoundStateTrait};
-use pistols::types::blades::{Blades};
+use pistols::types::action::{Action};
 use pistols::types::constants::{constants};
 use pistols::utils::math::{MathU8, MathU16};
 
@@ -163,12 +162,12 @@ fn get_pistols_kill_chance(world: IWorldDispatcher, duelist_address: ContractAdd
 // Blades chances
 //
 // bonus = ...
-fn get_blades_hit_chance(world: IWorldDispatcher, duelist_address: ContractAddress, health: u8, blade: Blades) -> u8 {
+fn get_blades_hit_chance(world: IWorldDispatcher, duelist_address: ContractAddress, health: u8, action: u16) -> u8 {
     // let bonus: u8 = calc_hit_bonus(world, duelist_address);
     let penalty: u8 = calc_hit_penalty(world, health);
     (apply_chance_bonus_penalty(constants::BLADES_HIT_CHANCE, 0, penalty))
 }
-fn get_blades_kill_chance(world: IWorldDispatcher, duelist_address: ContractAddress, health: u8, blade: Blades) -> u8 {
+fn get_blades_kill_chance(world: IWorldDispatcher, duelist_address: ContractAddress, health: u8, action: u16) -> u8 {
     let bonus: u8 = calc_hit_bonus(world, duelist_address);
     (apply_chance_bonus_penalty(constants::BLADES_KILL_CHANCE, bonus, 0))
 }
