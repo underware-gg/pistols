@@ -19,7 +19,7 @@ export default function CommitStepsModal({
   duelId: bigint
   roundNumber?: number
 }) {
-  const { commit_action, get_pistols_bonus, get_pistols_hit_chance, get_pistols_kill_chance } = useDojoSystemCalls()
+  const { commit_action, get_pistols_bonus, get_duelist_hit_chance, get_duelist_crit_chance } = useDojoSystemCalls()
   const { account } = useDojoAccount()
 
   const [steps, setSteps] = useState(0)
@@ -40,11 +40,11 @@ export default function CommitStepsModal({
       if (_mounted) setBonus(value)
     }
     const _getHit = async () => {
-      const value = await get_pistols_hit_chance(BigInt(account.address), steps)
+      const value = await get_duelist_hit_chance(BigInt(account.address), steps)
       if (_mounted) setChanceToHit(value)
     }
     const _getKill = async () => {
-      const value = await get_pistols_kill_chance(BigInt(account.address), steps)
+      const value = await get_duelist_crit_chance(BigInt(account.address), steps)
       if (_mounted) setChanceToKill(value)
     }
     if (steps) {

@@ -69,16 +69,16 @@ mod tests {
     fn _get_actions_round_2_resolved() -> (u64, u64, u16, u16, u64, u64) {
         let salt_a: u64 = SALT_1_a;
         let salt_b: u64 = SALT_1_b;
-        let action_a: u16 = ACTION::SLOW_BLADE;
-        let action_b: u16 = ACTION::BLOCK;
+        let action_a: u16 = ACTION::SLOW_BLADE.into();
+        let action_b: u16 = ACTION::BLOCK.into();
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
     }
 
     fn _get_actions_round_2_draw() -> (u64, u64, u16, u16, u64, u64) {
         let salt_a: u64 = SALT_1_a + 1;
         let salt_b: u64 = SALT_1_b + 1;
-        let action_a: u16 = ACTION::SLOW_BLADE;
-        let action_b: u16 = ACTION::SLOW_BLADE;
+        let action_a: u16 = ACTION::SLOW_BLADE.into();
+        let action_b: u16 = ACTION::SLOW_BLADE.into();
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
     }
 
@@ -266,8 +266,8 @@ mod tests {
 
     fn _execute_round_ready_with_blades(
         world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress,
-        health_a: u8, blade_a: u16,
-        health_b: u8, blade_b: u16,
+        health_a: u8, blade_a: u8,
+        health_b: u8, blade_b: u8,
     ) -> (Challenge, Round) {
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
         // random 1st round...
@@ -284,12 +284,12 @@ mod tests {
         round.shot_b.health = health_b;
         set!(world, (round));
         // run 2nd round
-        let hash_a: u64 = make_action_hash(0x111, blade_a);
-        let hash_b: u64 = make_action_hash(0x222, blade_b);
+        let hash_a: u64 = make_action_hash(0x111, blade_a.into());
+        let hash_b: u64 = make_action_hash(0x222, blade_b.into());
         utils::execute_commit_action(system, owner, duel_id, 2, hash_a);
         utils::execute_commit_action(system, other, duel_id, 2, hash_b);
-        utils::execute_reveal_action(system, owner, duel_id, 2, 0x111, blade_a);
-        utils::execute_reveal_action(system, other, duel_id, 2, 0x222, blade_b);
+        utils::execute_reveal_action(system, owner, duel_id, 2, 0x111, blade_a.into());
+        utils::execute_reveal_action(system, other, duel_id, 2, 0x222, blade_b.into());
         // return results
         let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
         (challenge, round)

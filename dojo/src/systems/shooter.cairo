@@ -109,20 +109,15 @@ mod shooter {
     // Pistols: if invalid, clamps between 1 and 10
     // Blades: if invalid, returns Blades::Idle
     fn validated_action(round_number: u8, maybe_action: u16) -> u16 {
-        if (round_number > constants::ROUND_COUNT) {
-            return (0); // invalid
+        if (round_number <= constants::ROUND_COUNT) {
+            let action: Action = maybe_action.into();
+            if (round_number == 1) {
+                if (action.is_paces()) { return (maybe_action); }
+            } else {
+                if (action.is_blades()) { return (maybe_action); }
+            }
         }
-        let option_action: Option<Action> = maybe_action.try_into();
-        if (option_action == Option::None) {
-            return (0); // invalid
-        }
-        let action: Action = option_action.unwrap();
-        if (round_number == 1) {
-            if (!action.is_paces()) { return (0); }
-        } else {
-            if (!action.is_blades()) { return (0); }
-        }
-        (maybe_action)
+        (0) // invalid
     }
 
     //---------------------------------------
@@ -196,16 +191,16 @@ mod shooter {
     }
 
     fn shoot_apply_damage(world: IWorldDispatcher, seed: felt252, duelist: ContractAddress, round: Round, ref attack: Shot, ref defense: Shot) {
-        let steps: u16 = attack.action;
-        if (steps > 0) {
+        let paces: Action = attack.action.into();
+        if (paces.is_paces()) {
             // dice 1: miss or hit + damage
             // ex: chance 60%: 1..30 = double, 31..60 = single, 61..100 = miss
             attack.dice_hit = throw_dice(seed, round, 100);
-            let hit_chance: u8 = utils::get_pistols_hit_chance(world, duelist, attack.health, steps);
+            let hit_chance: u8 = utils::get_duelist_hit_chance(world, duelist, attack.health, paces);
             if (attack.dice_hit <= hit_chance) {
                 // dice 1: execution!
                 attack.dice_crit = throw_dice(seed * 2, round, 100);
-                let kill_chance: u8 = utils::get_pistols_kill_chance(world, duelist, attack.health, steps);
+                let kill_chance: u8 = utils::get_duelist_crit_chance(world, duelist, attack.health, paces);
                 if (attack.dice_crit <= kill_chance) {
                     defense.damage = constants::FULL_HEALTH;
                 } else if (attack.dice_hit <= hit_chance/2) {
@@ -248,13 +243,13 @@ mod shooter {
             return ();
         }
 
-        let action_a: u16 = round.shot_a.action;
-        let action_b: u16 = round.shot_b.action;
+        let action_a: Action = round.shot_a.action.into();
+        let action_b: Action = round.shot_b.action.into();
 
         // Light strikes before Heavy
-        if (action_a == ACTION::FAST_BLADE && action_b == ACTION::SLOW_BLADE) {
+        if (action_a == Action::FastBlade && action_b == Action::SlowBlade) {
             light_vs_heavy_apply_damage(ref round.shot_a, ref round.shot_b)
-        } else if (action_b == ACTION::FAST_BLADE && action_a == ACTION::SLOW_BLADE) {
+        } else if (action_b == Action::FastBlade && action_a == Action::SlowBlade) {
             light_vs_heavy_apply_damage(ref round.shot_b, ref round.shot_a)
         } else {
             // clash at same time
@@ -276,29 +271,29 @@ mod shooter {
     }
 
     fn thow_blades_dices(world: IWorldDispatcher, seed: felt252, duelist: ContractAddress, round: Round, ref attack: Shot, ref defense: Shot) {
-        let action: u16 = attack.action;
-        if (action != ACTION::IDLE) {
+        let action: Action = attack.action.into();
+        if (action != Action::Idle) {
             // dice 1: execution or double damage/block
             attack.dice_crit = throw_dice(seed, round, 100);
-            let kill_chance: u8 = utils::get_blades_kill_chance(world, duelist, attack.health, action);
+            let kill_chance: u8 = utils::get_duelist_crit_chance(world, duelist, attack.health, action);
             if (attack.dice_hit <= kill_chance) {
-                if (action == ACTION::SLOW_BLADE) {
+                if (action == Action::SlowBlade) {
                     defense.damage = constants::FULL_HEALTH;
-                } else if (action == ACTION::FAST_BLADE) {
+                } else if (action == Action::FastBlade) {
                     defense.damage = constants::DOUBLE_DAMAGE;
-                } else if (action == ACTION::BLOCK) {
+                } else if (action == Action::Block) {
                     attack.block = constants::DOUBLE_DAMAGE;
                 }
             } else {
                 // dice 2: miss or normal damage
                 attack.dice_hit = throw_dice(seed * 2, round, 100);
-                let hit_chance: u8 = utils::get_blades_hit_chance(world, duelist, attack.health, action);
+                let hit_chance: u8 = utils::get_duelist_hit_chance(world, duelist, attack.health, action);
                 if (attack.dice_hit <= hit_chance) {
-                    if (action == ACTION::SLOW_BLADE) {
+                    if (action == Action::SlowBlade) {
                         defense.damage = constants::DOUBLE_DAMAGE;
-                    } else if (action == ACTION::FAST_BLADE) {
+                    } else if (action == Action::FastBlade) {
                         defense.damage = constants::SINGLE_DAMAGE;
-                    } else if (action == ACTION::BLOCK) {
+                    } else if (action == Action::Block) {
                         attack.block = constants::SINGLE_DAMAGE;
                     }
                 }
@@ -349,17 +344,17 @@ mod tests {
         let mut round: u8 = 2;
         loop {
             // invalids
-            assert(shooter::validated_action(round, ACTION::IDLE) == ACTION::IDLE, '2_IDLE');
-            assert(shooter::validated_action(round, 10) == ACTION::IDLE, '2_10');
+            assert(shooter::validated_action(round, ACTION::IDLE.into()) == ACTION::IDLE.into(), '2_IDLE');
+            assert(shooter::validated_action(round, 10) == ACTION::IDLE.into(), '2_10');
             // valids
             if (round <= constants::ROUND_COUNT) {
-                assert(shooter::validated_action(round, ACTION::SLOW_BLADE) == ACTION::SLOW_BLADE, '2_HEAVY');
-                assert(shooter::validated_action(round, ACTION::FAST_BLADE) == ACTION::FAST_BLADE, '2_LIGHT');
-                assert(shooter::validated_action(round, ACTION::BLOCK) == ACTION::BLOCK, '2_BLOCK');
+                assert(shooter::validated_action(round, ACTION::SLOW_BLADE.into()) == ACTION::SLOW_BLADE.into(), '2_HEAVY');
+                assert(shooter::validated_action(round, ACTION::FAST_BLADE.into()) == ACTION::FAST_BLADE.into(), '2_LIGHT');
+                assert(shooter::validated_action(round, ACTION::BLOCK.into()) == ACTION::BLOCK.into(), '2_BLOCK');
             } else {
-                assert(shooter::validated_action(round, ACTION::SLOW_BLADE) == ACTION::IDLE, '2_HEAVY+IDLE');
-                assert(shooter::validated_action(round, ACTION::FAST_BLADE) == ACTION::IDLE, '2_LIGHT+IDLE');
-                assert(shooter::validated_action(round, ACTION::BLOCK) == ACTION::IDLE, '2_BLOCK+IDLE');
+                assert(shooter::validated_action(round, ACTION::SLOW_BLADE.into()) == ACTION::IDLE.into(), '2_HEAVY+IDLE');
+                assert(shooter::validated_action(round, ACTION::FAST_BLADE.into()) == ACTION::IDLE.into(), '2_LIGHT+IDLE');
+                assert(shooter::validated_action(round, ACTION::BLOCK.into()) == ACTION::IDLE.into(), '2_BLOCK+IDLE');
             }
             if(round > constants::ROUND_COUNT) { break; }
             round += 1;

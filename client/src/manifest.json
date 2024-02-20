@@ -949,7 +949,7 @@
     {
       "name": "pistols::systems::actions::actions",
       "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
-      "class_hash": "0x64e2a6bf9718a3235736bfa9d71ad844ea2cdbb862cc156a00c85d67eaeaaa6",
+      "class_hash": "0x676a5510b583dbb38b79524e1b92946c11266ff273d24aee4a01786c358548",
       "abi": [
         {
           "type": "impl",
@@ -1058,28 +1058,6 @@
             },
             {
               "name": "Draw",
-              "type": "()"
-            }
-          ]
-        },
-        {
-          "type": "enum",
-          "name": "pistols::types::blades::Blades",
-          "variants": [
-            {
-              "name": "Idle",
-              "type": "()"
-            },
-            {
-              "name": "Light",
-              "type": "()"
-            },
-            {
-              "name": "Heavy",
-              "type": "()"
-            },
-            {
-              "name": "Block",
               "type": "()"
             }
           ]
@@ -1266,7 +1244,7 @@
             },
             {
               "type": "function",
-              "name": "get_pistols_hit_chance",
+              "name": "get_duelist_hit_chance",
               "inputs": [
                 {
                   "name": "duelist_address",
@@ -1277,7 +1255,7 @@
                   "type": "core::integer::u8"
                 },
                 {
-                  "name": "steps",
+                  "name": "action",
                   "type": "core::integer::u16"
                 }
               ],
@@ -1290,7 +1268,7 @@
             },
             {
               "type": "function",
-              "name": "get_pistols_kill_chance",
+              "name": "get_duelist_crit_chance",
               "inputs": [
                 {
                   "name": "duelist_address",
@@ -1301,56 +1279,8 @@
                   "type": "core::integer::u8"
                 },
                 {
-                  "name": "steps",
+                  "name": "action",
                   "type": "core::integer::u16"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::integer::u8"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_blades_hit_chance",
-              "inputs": [
-                {
-                  "name": "duelist_address",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "health",
-                  "type": "core::integer::u8"
-                },
-                {
-                  "name": "blade",
-                  "type": "pistols::types::blades::Blades"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::integer::u8"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_blades_kill_chance",
-              "inputs": [
-                {
-                  "name": "duelist_address",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "health",
-                  "type": "core::integer::u8"
-                },
-                {
-                  "name": "blade",
-                  "type": "pistols::types::blades::Blades"
                 }
               ],
               "outputs": [

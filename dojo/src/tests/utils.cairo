@@ -132,20 +132,12 @@ mod utils {
         let result: u8 = system.calc_hit_penalty(health);
         (result)
     }
-    fn get_pistols_hit_chance(system: IActionsDispatcher, duelist_address: ContractAddress, health: u8, steps: u16) -> u8 {
-        let result: u8 = system.get_pistols_hit_chance(duelist_address, health, steps);
+    fn get_duelist_hit_chance(system: IActionsDispatcher, duelist_address: ContractAddress, health: u8, action: u16) -> u8 {
+        let result: u8 = system.get_duelist_hit_chance(duelist_address, health, action);
         (result)
     }
-    fn get_pistols_kill_chance(system: IActionsDispatcher, duelist_address: ContractAddress, health: u8, steps: u16) -> u8 {
-        let result: u8 = system.get_pistols_kill_chance(duelist_address, health, steps);
-        (result)
-    }
-    fn get_blades_hit_chance(system: IActionsDispatcher, duelist_address: ContractAddress, health: u8, action: u16) -> u8 {
-        let result: u8 = system.get_blades_hit_chance(duelist_address, health, action);
-        (result)
-    }
-    fn get_blades_kill_chance(system: IActionsDispatcher, duelist_address: ContractAddress, health: u8, action: u16) -> u8 {
-        let result: u8 = system.get_blades_kill_chance(duelist_address, health, action);
+    fn get_duelist_crit_chance(system: IActionsDispatcher, duelist_address: ContractAddress, health: u8, action: u16) -> u8 {
+        let result: u8 = system.get_duelist_crit_chance(duelist_address, health, action);
         (result)
     }
 

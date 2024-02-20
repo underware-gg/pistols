@@ -5,7 +5,7 @@ use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::models::models::{Duelist, Challenge, Pact, Round, Shot};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round::{RoundState, RoundStateTrait};
-use pistols::types::action::{Action};
+use pistols::types::action::{Action, ActionTrait};
 use pistols::types::constants::{constants};
 use pistols::utils::math::{MathU8, MathU16};
 
@@ -129,7 +129,21 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
 }
 
 
-// bonus = (duelist.honour - 90), capped at duelis.total_duels
+//------------------------
+// Chances
+//
+
+fn get_duelist_hit_chance(world: IWorldDispatcher, duelist_address: ContractAddress, health: u8, action: Action) -> u8 {
+    let chances: u8 = action.hit_chance();
+    let penalty: u8 = calc_hit_penalty(world, health);
+    (apply_chance_bonus_penalty(chances, 0, penalty))
+}
+fn get_duelist_crit_chance(world: IWorldDispatcher, duelist_address: ContractAddress, health: u8, action: Action) -> u8 {
+    let chances: u8 = action.crit_chance();
+    let bonus: u8 = calc_hit_bonus(world, duelist_address);
+    (apply_chance_bonus_penalty(chances, bonus, 0))
+}
+
 fn calc_hit_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> u8 {
     let duelist: Duelist = get!(world, duelist_address, Duelist);
     let bonus: u8 = MathU8::sub(duelist.honour, 90);
@@ -141,35 +155,6 @@ fn calc_hit_penalty(world: IWorldDispatcher, health: u8) -> u8 {
 fn apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
     let mut result: u8 = MathU8::sub(chance + bonus, penalty);
     (MathU8::clamp(result, chance / 2, 100))
-}
-
-//------------------------
-// Pistols chances
-//
-fn get_pistols_hit_chance(world: IWorldDispatcher, duelist_address: ContractAddress, health: u8, steps: u16) -> u8 {
-    let bonus: u8 = calc_hit_bonus(world, duelist_address);
-    let penalty: u8 = calc_hit_penalty(world, health);
-    let chance: u8 = MathU8::map(steps.try_into().unwrap(), 1, 10, constants::PISTOLS_HIT_CHANCE_AT_STEP_1, constants::PISTOLS_HIT_CHANCE_AT_STEP_10);
-    (apply_chance_bonus_penalty(chance, bonus, penalty))
-}
-fn get_pistols_kill_chance(world: IWorldDispatcher, duelist_address: ContractAddress, health: u8, steps: u16) -> u8 {
-    let chance: u8 = MathU8::map(steps.try_into().unwrap(), 1, 10, constants::PISTOLS_KILL_CHANCE_AT_STEP_1, constants::PISTOLS_KILL_CHANCE_AT_STEP_10);
-    (chance)
-}
-
-
-//------------------------
-// Blades chances
-//
-// bonus = ...
-fn get_blades_hit_chance(world: IWorldDispatcher, duelist_address: ContractAddress, health: u8, action: u16) -> u8 {
-    // let bonus: u8 = calc_hit_bonus(world, duelist_address);
-    let penalty: u8 = calc_hit_penalty(world, health);
-    (apply_chance_bonus_penalty(constants::BLADES_HIT_CHANCE, 0, penalty))
-}
-fn get_blades_kill_chance(world: IWorldDispatcher, duelist_address: ContractAddress, health: u8, action: u16) -> u8 {
-    let bonus: u8 = calc_hit_bonus(world, duelist_address);
-    (apply_chance_bonus_penalty(constants::BLADES_KILL_CHANCE, bonus, 0))
 }
 
 

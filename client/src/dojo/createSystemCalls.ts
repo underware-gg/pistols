@@ -89,15 +89,15 @@ export function createSystemCalls(
     return result !== null ? Number(result) : null
   }
 
-  const get_pistols_hit_chance = async (duelist: bigint, steps: number): Promise<number | null> => {
-    const args = [duelist, steps]
-    const result = await _executeCall('get_pistols_hit_chance', args)
+  const get_duelist_hit_chance = async (duelist: bigint, action: number): Promise<number | null> => {
+    const args = [duelist, action]
+    const result = await _executeCall('get_duelist_hit_chance', args)
     return result !== null ? Number(result) : null
   }
 
-  const get_pistols_kill_chance = async (duelist: bigint, steps: number): Promise<number | null> => {
-    const args = [duelist, steps]
-    const result = await _executeCall('get_pistols_kill_chance', args)
+  const get_duelist_crit_chance = async (duelist: bigint, action: number): Promise<number | null> => {
+    const args = [duelist, action]
+    const result = await _executeCall('get_duelist_crit_chance', args)
     return result !== null ? Number(result) : null
   }
 
@@ -111,8 +111,8 @@ export function createSystemCalls(
     get_pact,
     has_pact,
     get_pistols_bonus,
-    get_pistols_hit_chance,
-    get_pistols_kill_chance,
+    get_duelist_hit_chance,
+    get_duelist_crit_chance,
   }
 }
 

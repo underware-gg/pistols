@@ -97,10 +97,10 @@ mod tests {
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
 
-        let hit_chance_a = utils::get_pistols_hit_chance(system, owner, constants::FULL_HEALTH, action_a);
-        let hit_chance_b = utils::get_pistols_hit_chance(system, owner, constants::FULL_HEALTH, action_b);
-        let kill_chance_a = utils::get_pistols_kill_chance(system, owner,constants::FULL_HEALTH, action_a);
-        let kill_chance_b = utils::get_pistols_kill_chance(system, owner, constants::FULL_HEALTH,action_b);
+        let hit_chance_a = utils::get_duelist_hit_chance(system, owner, constants::FULL_HEALTH, action_a);
+        let hit_chance_b = utils::get_duelist_hit_chance(system, owner, constants::FULL_HEALTH, action_b);
+        let kill_chance_a = utils::get_duelist_crit_chance(system, owner,constants::FULL_HEALTH, action_a);
+        let kill_chance_b = utils::get_duelist_crit_chance(system, owner, constants::FULL_HEALTH,action_b);
 
         // 1st commit
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
