@@ -1,25 +1,35 @@
-use traits::Into;
+use traits::{Into, PartialOrd};
 use debug::PrintTrait;
 
+use pistols::models::models::{Shot};
 use pistols::types::constants::{constants};
 use pistols::utils::math::{MathU8};
 
+//------------------------
 // constants
+//
+// Actions
 mod ACTION {
-    const IDLE: u8 = 0;
-    const PACES_MASK: u8 = 0x0f;
+    // paces and blades each use half byte
+    // makes it easier to distinguish but not in use, can be removed if we need more than 16 blades
+    const PACES_MASK: u8  = 0x0f;
     const BLADES_MASK: u8 = 0xf0;
+    //
+    // Inaction / Invalid (skip round)
+    const IDLE: u8 = 0x00;
+    //
     // Paces
-    const PACES_1: u8 = 1;
-    const PACES_2: u8 = 2;
-    const PACES_3: u8 = 3;
-    const PACES_4: u8 = 4;
-    const PACES_5: u8 = 5;
-    const PACES_6: u8 = 6;
-    const PACES_7: u8 = 7;
-    const PACES_8: u8 = 8;
-    const PACES_9: u8 = 9;
-    const PACES_10: u8 = 10;
+    const PACES_1: u8 = 0x01;
+    const PACES_2: u8 = 0x02;
+    const PACES_3: u8 = 0x03;
+    const PACES_4: u8 = 0x04;
+    const PACES_5: u8 = 0x05;
+    const PACES_6: u8 = 0x06;
+    const PACES_7: u8 = 0x07;
+    const PACES_8: u8 = 0x08;
+    const PACES_9: u8 = 0x09;
+    const PACES_10: u8 = 0x0a;
+    //
     // Blades
     const FAST_BLADE: u8 = 0x10;
     const SLOW_BLADE: u8 = 0x20;
@@ -29,6 +39,12 @@ mod ACTION {
     // const SEPPUKU: u8 = 0x60;
 }
 
+
+
+
+//--------------------------------
+// Action types
+//
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 enum Action {
     Idle,
@@ -60,7 +76,11 @@ trait ActionTrait {
     fn as_paces(self: Action) -> u8;
     fn crit_chance(self: Action) -> u8;
     fn hit_chance(self: Action) -> u8;
+    fn full_chance(self: Action) -> u8;
     fn honour(self: Action) -> u8;
+    fn roll_priority(self: Action, other: Action) -> i8;
+    fn execute_crit(self: Action, ref attack: Shot, ref defense: Shot);
+    fn execute_hit(self: Action, ref attack: Shot, ref defense: Shot);
 }
 
 impl ActionTraitImpl of ActionTrait {
@@ -108,26 +128,38 @@ impl ActionTraitImpl of ActionTrait {
     // Flat chances
     //
     fn crit_chance(self: Action) -> u8 {
-        if (self.is_paces()) {
-            (MathU8::map(self.as_paces(), 1, 10, constants::PISTOLS_KILL_CHANCE_AT_STEP_1, constants::PISTOLS_KILL_CHANCE_AT_STEP_10))
-        } else if (self.is_blades()) {
-            (constants::BLADES_HIT_CHANCE)
-        } else {
-            (0)
-        }
-    }
-    fn hit_chance(self: Action) -> u8 {
-        if (self.is_paces()) {
-            (MathU8::map(self.as_paces(), 1, 10, constants::PISTOLS_HIT_CHANCE_AT_STEP_1, constants::PISTOLS_HIT_CHANCE_AT_STEP_10))
+        let paces: u8 = self.as_paces();
+        if (paces > 0) {
+            (MathU8::map(paces, 1, 10, constants::PISTOLS_KILL_CHANCE_AT_STEP_1, constants::PISTOLS_KILL_CHANCE_AT_STEP_10))
         } else if (self.is_blades()) {
             (constants::BLADES_KILL_CHANCE)
         } else {
             (0)
         }
     }
+    fn hit_chance(self: Action) -> u8 {
+        let paces: u8 = self.as_paces();
+        if (paces > 0) {
+            (MathU8::map(paces, 1, 10, constants::PISTOLS_HIT_CHANCE_AT_STEP_1, constants::PISTOLS_HIT_CHANCE_AT_STEP_10))
+        } else if (self.is_blades()) {
+            (constants::BLADES_HIT_CHANCE)
+        } else {
+            (0)
+        }
+    }
+    fn full_chance(self: Action) -> u8 {
+        let paces: u8 = self.as_paces();
+        if (paces > 0) {
+            (MathU8::map(paces, 1, 10, constants::PISTOLS_FULL_CHANCE_AT_STEP_1, constants::PISTOLS_FULL_CHANCE_AT_STEP_10))
+        } else if (self.is_blades()) {
+            (100)
+        } else {
+            (0)
+        }
+    }
 
-    //-----------------
-    // Honour value
+    //------------------
+    // Honour per Action
     //
     fn honour(self: Action) -> u8 {
         match self {
@@ -147,15 +179,65 @@ impl ActionTraitImpl of ActionTrait {
             Action::Block =>        0, // do not affect honour
         }
     }
+
+    //----------------------------
+    // Roll priority
+    //
+    // returns
+    // <0: self rolls first
+    //  0: in sync / simultaneous
+    // >0: other rolls first
+    //
+    // TODO: Dojo 0.6.0: Use match
+    fn roll_priority(self: Action, other: Action) -> i8 {
+        // Lowest paces shoot first
+        let paces_a: i8 = self.as_paces().try_into().unwrap();
+        let paces_b: i8 = other.as_paces().try_into().unwrap();
+        if (paces_a != 0 && paces_b != 0) {
+            return (paces_a - paces_b);
+        }
+
+        // TODO: Blades
+
+        (0) // default in sync
+    }
+
+    // TODO: Dojo 0.6.0: Use match
+    fn execute_crit(self: Action, ref attack: Shot, ref defense: Shot) {
+        // Lowest paces shoot first
+        let paces: u8 = self.as_paces();
+        if (paces != 0) {
+            // pistols crit is execution
+            defense.damage = constants::FULL_HEALTH;
+        } else {
+
+        }
+    }
+
+    // TODO: Dojo 0.6.0: Use match
+    fn execute_hit(self: Action, ref attack: Shot, ref defense: Shot) {
+        // Lowest paces shoot first
+        let paces: u8 = self.as_paces();
+        if (paces != 0) {
+            let full_chance: u8 = self.full_chance();
+            let chance: u8 = MathU8::map(full_chance, 1, 100, 1, attack.chance_hit);
+            if (attack.dice_hit <= chance) {
+                defense.damage = constants::DOUBLE_DAMAGE;
+            } else {
+                defense.damage = constants::SINGLE_DAMAGE;
+            }
+        } else {
+
+        }
+    }
+
 }
 
 
 
-
 //--------------------------------------
-// Into / TryInto
+// core Traits
 //
-
 impl ActionIntoU8 of Into<Action, u8> {
     fn into(self: Action) -> u8 {
         match self {
@@ -178,14 +260,12 @@ impl ActionIntoU8 of Into<Action, u8> {
         }
     }
 }
-
 impl ActionIntoU16 of Into<Action, u16> {
     fn into(self: Action) -> u16 {
         let action: u8 = self.into();
         return action.into();
     }
 }
-
 impl U8IntoAction of Into<u8, Action> {
     fn into(self: u8) -> Action {
         if self == ACTION::IDLE             { Action::Idle }
@@ -208,19 +288,12 @@ impl U8IntoAction of Into<u8, Action> {
         else { Action::Idle }
     }
 }
-
 impl U16IntoAction of Into<u16, Action> {
     fn into(self: u16) -> Action {
         let action: u8 = self.try_into().unwrap();
         return action.into();
     }
 }
-
-
-//--------------------------------------
-// PrintTrait
-//
-
 impl ActionIntoFelt252 of Into<Action, felt252> {
     fn into(self: Action) -> felt252 {
         match self {
@@ -243,7 +316,6 @@ impl ActionIntoFelt252 of Into<Action, felt252> {
         }
     }
 }
-
 impl PrintAction of PrintTrait<Action> {
     fn print(self: Action) {
         let num: felt252 = self.into();
@@ -338,4 +410,33 @@ mod tests {
             n += 1;
         }
     }
-}
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_paces_priority() {
+        let mut a: u8 = 0;
+        loop {
+            if (a > 10) { break; }
+            let action_a: Action = a.into();
+
+            let mut b: u8 = 0;
+            loop {
+                if (b > 10) { break; }
+                let action_b: Action = b.into();
+                let priority: i8 = action_a.roll_priority(action_b);
+                if (a == 0) {
+                    assert(priority == 0, 'a_0')
+                } else if (b == 0) {
+                    assert(priority == 0, 'b_0')
+                } else if (a < b) {
+                    assert(priority < 0, 'a<b')
+                } else if (a > b) {
+                    assert(priority > 0, 'a>b')
+                } else {
+                    assert(priority == 0, 'a==b')
+                }
+                b += 1;
+            };
+            a += 1;
+        }
+    }}

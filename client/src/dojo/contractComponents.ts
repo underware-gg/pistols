@@ -46,11 +46,11 @@ export function defineContractComponents(world: World) {
 	  Round: (() => {
 	    return defineComponent(
 	      world,
-	      { duel_id: RecsType.BigInt, round_number: RecsType.Number, state: RecsType.Number, shot_a: { hash: RecsType.Number, salt: RecsType.Number, action: RecsType.Number, dice_crit: RecsType.Number, dice_hit: RecsType.Number, damage: RecsType.Number, block: RecsType.Number, health: RecsType.Number, honour: RecsType.Number }, shot_b: { hash: RecsType.Number, salt: RecsType.Number, action: RecsType.Number, dice_crit: RecsType.Number, dice_hit: RecsType.Number, damage: RecsType.Number, block: RecsType.Number, health: RecsType.Number, honour: RecsType.Number } },
+	      { duel_id: RecsType.BigInt, round_number: RecsType.Number, state: RecsType.Number, shot_a: { hash: RecsType.Number, salt: RecsType.Number, action: RecsType.Number, chance_crit: RecsType.Number, chance_hit: RecsType.Number, dice_crit: RecsType.Number, dice_hit: RecsType.Number, damage: RecsType.Number, block: RecsType.Number, health: RecsType.Number, honour: RecsType.Number }, shot_b: { hash: RecsType.Number, salt: RecsType.Number, action: RecsType.Number, chance_crit: RecsType.Number, chance_hit: RecsType.Number, dice_crit: RecsType.Number, dice_hit: RecsType.Number, damage: RecsType.Number, block: RecsType.Number, health: RecsType.Number, honour: RecsType.Number } },
 	      {
 	        metadata: {
 	          name: "Round",
-	          types: ["u128","u8","u8","u64","u64","u16","u8","u8","u8","u8","u8","u8","u64","u64","u16","u8","u8","u8","u8","u8","u8"],
+	          types: ["u128","u8","u8","u64","u64","u16","u8","u8","u8","u8","u8","u8","u8","u8","u64","u64","u16","u8","u8","u8","u8","u8","u8","u8","u8"],
 	          customTypes: ["Shot","Shot"],
 	        },
 	      }

@@ -13,10 +13,12 @@ mod constants {
     const SINGLE_DAMAGE: u8 = 1;
 
     // Pistols chances (percentage) at X steps
-    const PISTOLS_KILL_CHANCE_AT_STEP_1: u8 = 10;
-    const PISTOLS_KILL_CHANCE_AT_STEP_10: u8 = 100;
-    const PISTOLS_HIT_CHANCE_AT_STEP_1: u8 = 80;
+    const PISTOLS_KILL_CHANCE_AT_STEP_1: u8 = 5;
+    const PISTOLS_KILL_CHANCE_AT_STEP_10: u8 = 20;
+    const PISTOLS_HIT_CHANCE_AT_STEP_1: u8 = 100;
     const PISTOLS_HIT_CHANCE_AT_STEP_10: u8 = 20;
+    const PISTOLS_FULL_CHANCE_AT_STEP_1: u8 = 80;
+    const PISTOLS_FULL_CHANCE_AT_STEP_10: u8 = 5;
 
     // Blades chances (percentage)
     const BLADES_KILL_CHANCE: u8 = 15;

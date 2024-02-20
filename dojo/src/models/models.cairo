@@ -55,18 +55,20 @@ struct Pact {
 #[derive(Copy, Drop, Serde, Introspect)]
 struct Shot {
     // player input
-    hash: u64,      // hashed action (salt + action)
-    salt: u64,      // the player's secret salt
-    action: u16,    // the player's chosen action (paces, weapon, ...)
+    hash: u64,          // hashed action (salt + action)
+    salt: u64,          // the player's secret salt
+    action: u16,        // the player's chosen action (paces, weapon, ...)
     // shot results
-    dice_crit: u8,  // dice roll result (1..100) - kill / double damage
-    dice_hit: u8,   // dice roll result (1..100) - hit / normal damage
-    damage: u8,     // amount of health taken
-    block: u8,      // amount of damage blocked
+    chance_crit: u8,    // computed chances (1..100) - kill / double damage
+    chance_hit: u8,     // computed chances (1..100) - hit / normal damage
+    dice_crit: u8,      // dice roll result (1..100) - kill / double damage
+    dice_hit: u8,       // dice roll result (1..100) - hit / normal damage
+    damage: u8,         // amount of health taken
+    block: u8,          // amount of damage blocked
     // player state
-    health: u8,     // final health
-    honour: u8,     // honour granted
-} // 192 bits
+    health: u8,         // final health
+    honour: u8,         // honour granted
+} // 208 bits
 
 //
 // Each duel round
@@ -80,4 +82,4 @@ struct Round {
     state: u8,      // actually a RoundState
     shot_a: Shot,   // duelist_a shot
     shot_b: Shot,   // duelist_b shot
-} // (8 + 192 + 192) = 392 bits ~ 2 felts (max 504)
+} // (8 + 208 + 208) = 424 bits ~ 2 felts (max 504)

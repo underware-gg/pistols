@@ -165,54 +165,60 @@ mod shooter {
     //-----------------------------------
     // Pistols duel
     //
+
+    // decides attack order
     fn pistols_shootout(world: IWorldDispatcher, challenge: Challenge, ref round: Round) {
-        let steps_a: u16 = round.shot_a.action;
-        let steps_b: u16 = round.shot_b.action;
-
-        let action_a: Action = steps_a.into();
-        let action_b: Action = steps_b.into();
-        round.shot_a.honour = action_a.honour();
-        round.shot_b.honour = action_b.honour();
-
-        if (steps_a == steps_b) {
-            // both shoot together
-            shoot_apply_damage(world, 'shoot_a', challenge.duelist_a, round, ref round.shot_a, ref round.shot_b);
-            shoot_apply_damage(world, 'shoot_b', challenge.duelist_b, round, ref round.shot_b, ref round.shot_a);
-        } else if (steps_a < steps_b) {
-            // A shoots first
-            shoot_apply_damage(world, 'shoot_a', challenge.duelist_a, round, ref round.shot_a, ref round.shot_b);
-            // if B not dead, shoot
-            if (round.shot_b.health > 0) {
-                shoot_apply_damage(world, 'shoot_b', challenge.duelist_b, round, ref round.shot_b, ref round.shot_a);
-            }
+        let action_a: Action = apply_action_honour(ref round.shot_a);
+        let action_b: Action = apply_action_honour(ref round.shot_b);
+        
+        let priority: i8 = action_a.roll_priority(action_b);
+        if (priority < 0) {
+            // A attacks first
+            shoot(world, challenge.duelist_a, challenge.duelist_b, round, ref round.shot_a, ref round.shot_b, false);
+        } else if (priority > 0) {
+            // B attacks first
+            shoot(world, challenge.duelist_b, challenge.duelist_a, round, ref round.shot_b, ref round.shot_a, false);
         } else {
-            // B shoots first
-            shoot_apply_damage(world, 'shoot_b', challenge.duelist_b, round, ref round.shot_b, ref round.shot_a);
-            // if A not dead, shoot
-            if (round.shot_a.health > 0) {
-                shoot_apply_damage(world, 'shoot_a', challenge.duelist_a, round, ref round.shot_a, ref round.shot_b);
-            }
+            // same time
+            shoot(world, challenge.duelist_a, challenge.duelist_b, round, ref round.shot_a, ref round.shot_b, true);
         }
     }
 
+    fn apply_action_honour(ref shot: Shot) -> Action {
+        let action: Action = shot.action.into();
+        let honour: u8 = action.honour();
+        if (honour > 0) {
+            shot.honour = honour;
+        }
+        (action)
+    }
+
+    // execute attacks in order
+    fn shoot(world: IWorldDispatcher, attacker: ContractAddress, defender: ContractAddress, round: Round, ref attack: Shot, ref defense: Shot, sync: bool) {
+        shoot_apply_damage(world, 'shoot_a', attacker, round, ref attack, ref defense);
+        if (sync || defense.health > 0) {
+            shoot_apply_damage(world, 'shoot_b', defender, round, ref defense, ref attack);
+        }
+    }
+
+    // execute single attack
     fn shoot_apply_damage(world: IWorldDispatcher, seed: felt252, duelist: ContractAddress, round: Round, ref attack: Shot, ref defense: Shot) {
-        let paces: Action = attack.action.into();
-        if (paces.is_paces()) {
-            // dice 1: miss or hit + damage
-            // ex: chance 60%: 1..30 = double, 31..60 = single, 61..100 = miss
-            attack.dice_hit = throw_dice(seed, round, 100);
-            let hit_chance: u8 = utils::get_duelist_hit_chance(world, duelist, paces, attack.health);
-            if (attack.dice_hit <= hit_chance) {
-                // dice 1: execution!
-                attack.dice_crit = throw_dice(seed * 2, round, 100);
-                let kill_chance: u8 = utils::get_duelist_crit_chance(world, duelist, paces, attack.health);
-                if (attack.dice_crit <= kill_chance) {
-                    defense.damage = constants::FULL_HEALTH;
-                } else if (attack.dice_hit <= hit_chance/2) {
-                    defense.damage = constants::DOUBLE_DAMAGE;
-                } else {
-                    defense.damage = constants::SINGLE_DAMAGE;
-                }
+        let action: Action = attack.action.into();
+        if (action == Action::Idle) {
+            return;
+        }
+        // dice 1: crit (execution, double damage, goal)
+        attack.chance_crit = utils::get_duelist_crit_chance(world, duelist, action, attack.health);
+        attack.dice_crit = throw_dice(seed, round, 100);
+        if (attack.dice_crit <= attack.chance_crit) {
+            action.execute_crit(ref attack, ref defense);
+            apply_damage(ref defense);
+        } else {
+            // dice 2: miss or hit
+            attack.chance_hit = utils::get_duelist_hit_chance(world, duelist, action, attack.health);
+            attack.dice_hit = throw_dice(seed * 2, round, 100);
+            if (attack.dice_hit <= attack.chance_hit) {
+                action.execute_hit(ref attack, ref defense);
                 apply_damage(ref defense);
             }
         }
@@ -279,9 +285,9 @@ mod shooter {
         let action: Action = attack.action.into();
         if (action != Action::Idle) {
             // dice 1: execution or double damage/block
+            attack.chance_crit = utils::get_duelist_crit_chance(world, duelist, action, attack.health);
             attack.dice_crit = throw_dice(seed, round, 100);
-            let kill_chance: u8 = utils::get_duelist_crit_chance(world, duelist, action, attack.health);
-            if (attack.dice_hit <= kill_chance) {
+            if (attack.dice_hit <= attack.chance_crit) {
                 if (action == Action::SlowBlade) {
                     defense.damage = constants::FULL_HEALTH;
                 } else if (action == Action::FastBlade) {
@@ -291,9 +297,9 @@ mod shooter {
                 }
             } else {
                 // dice 2: miss or normal damage
+                attack.chance_hit = utils::get_duelist_hit_chance(world, duelist, action, attack.health);
                 attack.dice_hit = throw_dice(seed * 2, round, 100);
-                let hit_chance: u8 = utils::get_duelist_hit_chance(world, duelist, action, attack.health);
-                if (attack.dice_hit <= hit_chance) {
+                if (attack.dice_hit <= attack.chance_hit) {
                     if (action == Action::SlowBlade) {
                         defense.damage = constants::DOUBLE_DAMAGE;
                     } else if (action == Action::FastBlade) {
@@ -373,6 +379,8 @@ mod tests {
             hash: 0,
             salt: 0,
             action: 0,
+            chance_crit: 0,
+            chance_hit: 0,
             dice_crit: 0,
             dice_hit: 0,
             damage: 0,

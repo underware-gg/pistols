@@ -949,7 +949,7 @@
     {
       "name": "pistols::systems::actions::actions",
       "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
-      "class_hash": "0x304418ba6a4c6ebd0d122e942c4c2e5c656138bb8e34fde46c65dc546d99a53",
+      "class_hash": "0x24621320223b5a9fb5302225d95c6508cf9a6d12bfc13f106dc934dc94d1af5",
       "abi": [
         {
           "type": "impl",
@@ -2217,7 +2217,7 @@
           "key": false
         }
       ],
-      "class_hash": "0x1ba8d6500e32ac7e79960b4158e6ea32e8a8581a7ccf500632a29e63965826b",
+      "class_hash": "0x41af7975d8177dd0b665dcfc27c560e3be11b726c6c1e7228901dbbdb0c8fad",
       "abi": [
         {
           "type": "impl",
@@ -2403,6 +2403,14 @@
             {
               "name": "action",
               "type": "core::integer::u16"
+            },
+            {
+              "name": "chance_crit",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "chance_hit",
+              "type": "core::integer::u8"
             },
             {
               "name": "dice_crit",
