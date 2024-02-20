@@ -47,7 +47,7 @@ trait IActions<TContractState> {
     fn calc_hit_penalty(self: @TContractState, health: u8) -> u8;
     fn get_duelist_hit_chance(self: @TContractState, duelist_address: ContractAddress, action: u16, health: u8) -> u8;
     fn get_duelist_crit_chance(self: @TContractState, duelist_address: ContractAddress, action: u16, health: u8) -> u8;
-    fn get_action_honour(self: @TContractState, duelist_address: ContractAddress, action: u16) -> (u8, u8);
+    fn get_duelist_action_honour(self: @TContractState, duelist_address: ContractAddress, action: u16) -> (u8, u8);
 }
 
 #[dojo::contract]
@@ -237,9 +237,9 @@ mod actions {
             let world: IWorldDispatcher = self.world_dispatcher.read();
             (utils::get_duelist_crit_chance(world, duelist_address, action.into(), health))
         }
-        fn get_action_honour(self: @ContractState, duelist_address: ContractAddress, action: u16) -> (u8, u8) {
+        fn get_duelist_action_honour(self: @ContractState, duelist_address: ContractAddress, action: u16) -> (u8, u8) {
             let world: IWorldDispatcher = self.world_dispatcher.read();
-            (utils::get_action_honour(world, duelist_address, action.into()))
+            (utils::get_duelist_action_honour(world, duelist_address, action.into()))
         }
     }
 }

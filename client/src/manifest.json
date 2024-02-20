@@ -949,7 +949,7 @@
     {
       "name": "pistols::systems::actions::actions",
       "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
-      "class_hash": "0x676a5510b583dbb38b79524e1b92946c11266ff273d24aee4a01786c358548",
+      "class_hash": "0x304418ba6a4c6ebd0d122e942c4c2e5c656138bb8e34fde46c65dc546d99a53",
       "abi": [
         {
           "type": "impl",
@@ -1251,12 +1251,12 @@
                   "type": "core::starknet::contract_address::ContractAddress"
                 },
                 {
-                  "name": "health",
-                  "type": "core::integer::u8"
-                },
-                {
                   "name": "action",
                   "type": "core::integer::u16"
+                },
+                {
+                  "name": "health",
+                  "type": "core::integer::u8"
                 }
               ],
               "outputs": [
@@ -1275,8 +1275,28 @@
                   "type": "core::starknet::contract_address::ContractAddress"
                 },
                 {
+                  "name": "action",
+                  "type": "core::integer::u16"
+                },
+                {
                   "name": "health",
                   "type": "core::integer::u8"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u8"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_duelist_action_honour",
+              "inputs": [
+                {
+                  "name": "duelist_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
                 },
                 {
                   "name": "action",
@@ -1285,7 +1305,7 @@
               ],
               "outputs": [
                 {
-                  "type": "core::integer::u8"
+                  "type": "(core::integer::u8, core::integer::u8)"
                 }
               ],
               "state_mutability": "view"
@@ -2197,7 +2217,7 @@
           "key": false
         }
       ],
-      "class_hash": "0x6caab1c7abee202d139a82e1d56771a27a0fdbdb6415ffe7e6570c919f822e9",
+      "class_hash": "0x1ba8d6500e32ac7e79960b4158e6ea32e8a8581a7ccf500632a29e63965826b",
       "abi": [
         {
           "type": "impl",
@@ -2402,6 +2422,10 @@
             },
             {
               "name": "health",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "honour",
               "type": "core::integer::u8"
             }
           ]

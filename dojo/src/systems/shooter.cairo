@@ -169,6 +169,11 @@ mod shooter {
         let steps_a: u16 = round.shot_a.action;
         let steps_b: u16 = round.shot_b.action;
 
+        let action_a: Action = steps_a.into();
+        let action_b: Action = steps_b.into();
+        round.shot_a.honour = action_a.honour();
+        round.shot_b.honour = action_b.honour();
+
         if (steps_a == steps_b) {
             // both shoot together
             shoot_apply_damage(world, 'shoot_a', challenge.duelist_a, round, ref round.shot_a, ref round.shot_b);
@@ -373,6 +378,7 @@ mod tests {
             damage: 0,
             block: 0,
             health: 0,
+            honour: 0,
         };
         // damages
         shot.health = 3;

@@ -57,14 +57,40 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
 
     // Start Round
     if (state == ChallengeState::InProgress) {
-        // Round 1 starts with full health
-        let mut health_a: u8 = constants::FULL_HEALTH;
-        let mut health_b: u8 = constants::FULL_HEALTH;
-        // Round 2+ need to copy previous Round's healths
-        if (challenge.round_number > 1) {
+        let mut shot_a = Shot {
+            hash: 0,
+            salt: 0,
+            action: 0,
+            dice_crit: 0,
+            dice_hit: 0,
+            damage: 0,
+            block: 0,
+            health: 0,
+            honour: 0,
+        };
+        let mut shot_b = Shot {
+            hash: 0,
+            salt: 0,
+            action: 0,
+            dice_crit: 0,
+            dice_hit: 0,
+            damage: 0,
+            block: 0,
+            health: 0,
+            honour: 0,
+        };
+
+        if (challenge.round_number == 1) {
+            // Round 1 starts with full health
+            shot_a.health = constants::FULL_HEALTH;
+            shot_b.health = constants::FULL_HEALTH;
+        } else {
+            // Round 2+ need to copy previous Round's state
             let prev_round: Round = get!(world, (challenge.duel_id, challenge.round_number - 1), Round);
-            health_a = prev_round.shot_a.health;
-            health_b = prev_round.shot_b.health;
+            shot_a.health = prev_round.shot_a.health;
+            shot_b.health = prev_round.shot_b.health;
+            shot_a.honour = prev_round.shot_a.honour;
+            shot_b.honour = prev_round.shot_b.honour;
         }
 
         set!(world, (
@@ -72,36 +98,16 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
                 duel_id: challenge.duel_id,
                 round_number: challenge.round_number,
                 state: RoundState::Commit.into(),
-                shot_a: Shot {
-                    hash: 0,
-                    salt: 0,
-                    action: 0,
-                    dice_crit: 0,
-                    dice_hit: 0,
-                    damage: 0,
-                    block: 0,
-                    health: health_a,
-                },
-                shot_b: Shot {
-                    hash: 0,
-                    salt: 0,
-                    action: 0,
-                    dice_crit: 0,
-                    dice_hit: 0,
-                    damage: 0,
-                    block: 0,
-                    health: health_b,
-                },
+                shot_a,
+                shot_b,
             }
         ));
-    }
-
-    // Update totals
-    if (state == ChallengeState::Draw || state == ChallengeState::Resolved) {
+    } else if (state == ChallengeState::Draw || state == ChallengeState::Resolved) {
+        // End Duel!
         let mut duelist_a: Duelist = get!(world, challenge.duelist_a, Duelist);
         let mut duelist_b: Duelist = get!(world, challenge.duelist_b, Duelist);
-        duelist_a.total_duels += 1;
-        duelist_b.total_duels += 1;
+        
+        // update totals, total_duels is updated in update_duelist_honour()
         if (state == ChallengeState::Draw) {
             duelist_a.total_draws += 1;
             duelist_b.total_draws += 1;
@@ -115,20 +121,21 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
             // should never get here!
         }
 
-        // compute honour from 1st round steps
-        let first_round: Round = get!(world, (challenge.duel_id, 1), Round);
-        duelist_a.total_honour += first_round.shot_a.action.into();
-        duelist_b.total_honour += first_round.shot_b.action.into();
-        // average honour has an extra decimal, eg: 100 = 10.0
-        //
-        // TODO: use calc_final_honour()
-        //
-        duelist_a.honour = ((duelist_a.total_honour * 10) / duelist_a.total_duels.into()).try_into().unwrap();
-        duelist_b.honour = ((duelist_b.total_honour * 10) / duelist_b.total_duels.into()).try_into().unwrap();
+        // compute honour from final round
+        let final_round: Round = get!(world, (challenge.duel_id, challenge.round_number), Round);
+        update_duelist_honour(ref duelist_a, final_round.shot_a.honour);
+        update_duelist_honour(ref duelist_b, final_round.shot_b.honour);
         
         // save Duelists
         set!(world, (duelist_a, duelist_b));
     }
+}
+
+// average honour has an extra decimal, eg: 100 = 10.0
+fn update_duelist_honour(ref duelist: Duelist, duel_honour: u8) {
+    duelist.total_duels += 1;
+    duelist.total_honour += duel_honour.into();
+    duelist.honour = ((duelist.total_honour * 10) / duelist.total_duels.into()).try_into().unwrap();
 }
 
 
@@ -146,11 +153,11 @@ fn get_duelist_crit_chance(world: IWorldDispatcher, duelist_address: ContractAdd
     let bonus: u8 = calc_hit_bonus(world, duelist_address);
     (apply_chance_bonus_penalty(chances, bonus, 0))
 }
-fn get_action_honour(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action) -> (u8, u8) {
-    let duelist: Duelist = get!(world, duelist_address, Duelist);
+fn get_duelist_action_honour(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action) -> (u8, u8) {
+    let mut duelist: Duelist = get!(world, duelist_address, Duelist);
     let duel_honour: u8 = action.honour();
-    let final_honour: u8 = calc_final_honour(duelist, duel_honour);
-    (duel_honour, final_honour)
+    update_duelist_honour(ref duelist, duel_honour);
+    (duel_honour, duelist.honour)
 }
 
 fn calc_hit_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> u8 {
@@ -164,12 +171,6 @@ fn calc_hit_penalty(world: IWorldDispatcher, health: u8) -> u8 {
 fn apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
     let mut result: u8 = MathU8::sub(chance + bonus, penalty);
     (MathU8::clamp(result, chance / 2, 100))
-}
-
-fn calc_final_honour(duelist: Duelist, honour: u8) -> u8 {
-    // average honour has an extra decimal, eg: 100 = 10.0
-    let final_honour: u8 = ((duelist.total_honour * 10) / duelist.total_duels.into()).try_into().unwrap();
-    (final_honour)
 }
 
 

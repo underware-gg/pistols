@@ -107,9 +107,9 @@ export function createSystemCalls(
     return result !== null ? Number(result) : null
   }
 
-  const get_action_honour = async (duelist: bigint, action: number): Promise<number | null> => {
+  const get_duelist_action_honour = async (duelist: bigint, action: number): Promise<number | null> => {
     const args = [duelist, action]
-    const result = await _executeCall('get_action_honour', args)
+    const result = await _executeCall('get_duelist_action_honour', args)
     return result !== null ? Number(result) : null
   }
 
@@ -126,7 +126,7 @@ export function createSystemCalls(
     calc_hit_penalty,
     get_duelist_hit_chance,
     get_duelist_crit_chance,
-    get_action_honour,
+    get_duelist_action_honour,
   }
 }
 
