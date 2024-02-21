@@ -62,7 +62,7 @@ mod shooter {
     //-----------------------------------
     // Reveal
     //
-    fn reveal_action(world: IWorldDispatcher, duel_id: u128, round_number: u8, salt: u64, mut action: u16) {
+    fn reveal_action(world: IWorldDispatcher, duel_id: u128, round_number: u8, salt: u64, mut packed: u16) {
         let caller: ContractAddress = starknet::get_caller_address();
 
         // Assert correct Challenge
@@ -73,23 +73,23 @@ mod shooter {
         assert(round.state == RoundState::Reveal.into(), 'Round not in Reveal');
 
         // Validate action hash
-        let hash: u64 = utils::make_action_hash(salt, action);
+        let hash: u64 = utils::make_action_hash(salt, packed);
 
         // validate action
         // if invalid, set as 0 (idle, will skip round)
-        action = validated_action(round_number, action);
+        packed = validated_action(round_number, packed);
 
         // Store action
         if (duelist_number == 1) {
             assert(round.shot_a.action == 0, 'Already revealed');
             assert(round.shot_a.hash == hash, 'Action does not match hash');
             round.shot_a.salt = salt;
-            round.shot_a.action = action;
+            round.shot_a.action = packed;
         } else if (duelist_number == 2) {
             assert(round.shot_b.action == 0, 'Already revealed');
             assert(round.shot_b.hash == hash, 'Action does not match hash');
             round.shot_b.salt = salt;
-            round.shot_b.action = action;
+            round.shot_b.action = packed;
         }
 
         // Finishes round if both actions are revealed
@@ -106,13 +106,19 @@ mod shooter {
     }
 
     // Validates a action and returns it
-    fn validated_action(round_number: u8, maybe_action: u16) -> u16 {
+    fn validated_action(round_number: u8, packed: u16) -> u16 {
+        // too expensive?
+        // if (utils::validate_packed_actions(round_number, packed)) {
+        //     (packed)
+        // } else {
+        //     (ACTION::IDLE.into()) // invalid
+        // }
         if (round_number <= constants::ROUND_COUNT) {
-            let action: Action = maybe_action.into();
+            let action: Action = packed.into();
             if (round_number == 1) {
-                if (action.is_paces()) { return (maybe_action); }
+                if (action.is_paces()) { return (packed); }
             } else {
-                if (action.is_blades()) { return (maybe_action); }
+                if (action.is_blades()) { return (packed); }
             }
         }
         (ACTION::IDLE.into()) // invalid
@@ -254,9 +260,10 @@ mod tests {
     use pistols::models::models::{init, Shot};
     use pistols::types::action::{Action, ACTION};
     use pistols::types::constants::{constants};
+    use pistols::systems::{utils};
 
     #[test]
-    #[available_gas(1_000_000)]
+    #[available_gas(1_000_000_000)]
     fn test_validated_action() {
         assert(shooter::validated_action(1, 0) == 0, '1_0');
         assert(shooter::validated_action(1, 1) == 1, '1_1');
@@ -280,6 +287,27 @@ mod tests {
             if(round > constants::ROUND_COUNT) { break; }
             round += 1;
         }
+    }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_validate_validated_action() {
+        let mut round_number: u8 = 1;
+        loop {
+            if (round_number > constants::ROUND_COUNT) { break; }
+            //---
+            let valid_actions = utils::get_valid_packed_actions(round_number);
+            let mut len: usize = valid_actions.len();
+            let mut n: usize = 0;
+            loop {
+                if (n == len) { break; }
+                let action: u16 = *valid_actions.at(n);
+                assert(shooter::validated_action(round_number, action) == action, '_validated?');
+                n += 1;
+            };
+            //---
+            round_number += 1;
+        };
     }
 
     #[test]

@@ -5,7 +5,7 @@ use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::models::models::{init, Duelist, Challenge, Pact, Round, Shot};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round::{RoundState, RoundStateTrait};
-use pistols::types::action::{Action, ActionTrait};
+use pistols::types::action::{Action, ActionTrait, ACTION};
 use pistols::types::constants::{constants, chances};
 use pistols::utils::math::{MathU8, MathU16};
 
@@ -24,8 +24,8 @@ fn duelist_exist(world: IWorldDispatcher, address: ContractAddress) -> bool {
 }
 
 #[inline(always)]
-fn make_action_hash(salt: u64, action: u16) -> u64 {
-    let hash: u256 = pedersen(salt.into(), action.into()).into() & constants::HASH_SALT_MASK;
+fn make_action_hash(salt: u64, packed: u16) -> u64 {
+    let hash: u256 = pedersen(salt.into(), packed.into()).into() & constants::HASH_SALT_MASK;
     (hash.try_into().unwrap())
 }
 
@@ -41,6 +41,67 @@ fn make_pact_pair(duelist_a: ContractAddress, duelist_b: ContractAddress) -> u12
     let bb: u256 = b.into();
     (aa.low ^ bb.low)
 }
+
+fn get_valid_packed_actions(round_number: u8) -> Array<u16> {
+    if (round_number == 1) {
+        (array![
+            (ACTION::PACES_1).into(),
+            (ACTION::PACES_2).into(),
+            (ACTION::PACES_3).into(),
+            (ACTION::PACES_4).into(),
+            (ACTION::PACES_5).into(),
+            (ACTION::PACES_6).into(),
+            (ACTION::PACES_7).into(),
+            (ACTION::PACES_8).into(),
+            (ACTION::PACES_9).into(),
+            (ACTION::PACES_10).into(),
+        ])
+    } else if (round_number == 2) {
+        (array![
+            // 2 slots
+            pack_action_slots(ACTION::IDLE, ACTION::SLOW_BLADE),
+            pack_action_slots(ACTION::FAST_BLADE, ACTION::FAST_BLADE),
+            pack_action_slots(ACTION::FAST_BLADE, ACTION::BLOCK),
+            pack_action_slots(ACTION::BLOCK, ACTION::FAST_BLADE),
+            pack_action_slots(ACTION::BLOCK, ACTION::BLOCK),
+            // 1 slot
+            pack_action_slots(ACTION::SLOW_BLADE, ACTION::IDLE),
+            pack_action_slots(ACTION::FAST_BLADE, ACTION::IDLE),
+            pack_action_slots(ACTION::BLOCK, ACTION::IDLE),
+            pack_action_slots(ACTION::IDLE, ACTION::FAST_BLADE),
+            pack_action_slots(ACTION::IDLE, ACTION::BLOCK),
+            // Zero slots (stand still)
+            0,
+        ])
+    } else {
+        (array![])
+    }
+}
+fn validate_packed_actions(round_number: u8, packed: u16) -> bool {
+    let valid_actions = get_valid_packed_actions(round_number);
+    let mut len: usize = valid_actions.len();
+    let mut n: usize = 0;
+    loop {
+        if (n == len || packed == *valid_actions.at(n)) {
+            break;
+        }
+        n += 1;
+    };
+    (n < len)
+}
+fn pack_action_slots(slot1: u8, slot2: u8) -> u16 {
+    ((slot2.into() * 0x100) | slot1.into())
+}
+fn unpack_action_slotss(packed: u16) -> (u8, u8) {
+    let slot1: u8 = (packed & 0xff).try_into().unwrap();
+    let slot2: u8 = ((packed & 0xff00) / 0x100).try_into().unwrap();
+    (slot1, slot2)
+}
+
+
+//------------------------
+// Challenge setter
+//
 
 fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
     set!(world, (challenge));
@@ -190,6 +251,7 @@ mod tests {
     use pistols::systems::{utils};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::constants::{constants, chances};
+    use pistols::types::action::{ACTION};
     use pistols::utils::math::{MathU8};
 
     #[test]
@@ -248,10 +310,32 @@ mod tests {
 
     #[test]
     #[available_gas(100_000_000)]
-    fn test_hit_kill_maps() {
-        assert(MathU8::map(1, 1, 10, chances::PISTOLS_HIT_AT_STEP_1, chances::PISTOLS_HIT_AT_STEP_10) == chances::PISTOLS_HIT_AT_STEP_1, 'PISTOLS_HIT_AT_STEP_1');
-        assert(MathU8::map(10, 1, 10, chances::PISTOLS_HIT_AT_STEP_1, chances::PISTOLS_HIT_AT_STEP_10) == chances::PISTOLS_HIT_AT_STEP_10, 'PISTOLS_HIT_AT_STEP_10');
-        assert(MathU8::map(1, 1, 10, chances::PISTOLS_KILL_AT_STEP_1, chances::PISTOLS_KILL_AT_STEP_10) == chances::PISTOLS_KILL_AT_STEP_1, 'PISTOLS_KILL_AT_STEP_1');
-        assert(MathU8::map(10, 1, 10, chances::PISTOLS_KILL_AT_STEP_1, chances::PISTOLS_KILL_AT_STEP_10) == chances::PISTOLS_KILL_AT_STEP_10, 'PISTOLS_KILL_AT_STEP_10');
+    fn test_validate_packed_actions() {
+        assert(utils::validate_packed_actions(1, ACTION::PACES_1.into()) == true, '1_Paces1');
+        assert(utils::validate_packed_actions(1, ACTION::PACES_1.into()) == true, '1_Paces1');
+        assert(utils::validate_packed_actions(2, ACTION::PACES_10.into()) == false, '2_Paces10');
+        assert(utils::validate_packed_actions(2, ACTION::PACES_10.into()) == false, '2_Paces10');
+        let action = utils::pack_action_slots(ACTION::FAST_BLADE, ACTION::FAST_BLADE);
+        assert(utils::validate_packed_actions(1, action) == false, '1_bladess');
+        assert(utils::validate_packed_actions(2, action) == true, '2_blades');
+        let action = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::SLOW_BLADE);
+        assert(utils::validate_packed_actions(1, action) == false, '1_invalid');
+        assert(utils::validate_packed_actions(2, action) == false, '2_invalid');
+        let action = utils::pack_action_slots(ACTION::PACES_1, ACTION::PACES_1);
+        assert(utils::validate_packed_actions(1, action) == false, '1_dual_paces');
+        assert(utils::validate_packed_actions(2, action) == false, '2_dual_paces');
+        // inaction is valid on round 2
+        assert(utils::validate_packed_actions(1, 0) == false, '1_zero');
+        assert(utils::validate_packed_actions(2, 0) == true, '2_zero');
     }
+
+    #[test]
+    #[available_gas(100_000_000)]
+    fn test_slot_packing() {
+        let packed = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::FAST_BLADE);
+        let (slot1, slot2) = utils::unpack_action_slotss(packed);
+        assert(slot1 == ACTION::SLOW_BLADE, 'slot1');
+        assert(slot2 == ACTION::FAST_BLADE, 'slot2');
+    }
+
 }

@@ -949,7 +949,7 @@
     {
       "name": "pistols::systems::actions::actions",
       "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
-      "class_hash": "0x20e24b45a36761f78425526a297c5ef4579febed8bcaebaf95cacdedf7a2b17",
+      "class_hash": "0x5d6882985873426f45d49d45d32888379ba0235aed9223cb2363848b54d8c7f",
       "abi": [
         {
           "type": "impl",
@@ -1163,8 +1163,12 @@
                   "type": "core::integer::u64"
                 },
                 {
-                  "name": "action",
-                  "type": "core::integer::u16"
+                  "name": "action_slot1",
+                  "type": "core::integer::u8"
+                },
+                {
+                  "name": "action_slot2",
+                  "type": "core::integer::u8"
                 }
               ],
               "outputs": [],
@@ -1252,7 +1256,7 @@
                 },
                 {
                   "name": "action",
-                  "type": "core::integer::u16"
+                  "type": "core::integer::u8"
                 },
                 {
                   "name": "health",
@@ -1276,7 +1280,7 @@
                 },
                 {
                   "name": "action",
-                  "type": "core::integer::u16"
+                  "type": "core::integer::u8"
                 },
                 {
                   "name": "health",
@@ -1300,6 +1304,58 @@
                 },
                 {
                   "name": "action",
+                  "type": "core::integer::u8"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "(core::integer::u8, core::integer::u8)"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_valid_packed_actions",
+              "inputs": [
+                {
+                  "name": "round_number",
+                  "type": "core::integer::u8"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::array::Array::<core::integer::u16>"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "pack_action_slots",
+              "inputs": [
+                {
+                  "name": "slot1",
+                  "type": "core::integer::u8"
+                },
+                {
+                  "name": "slot2",
+                  "type": "core::integer::u8"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u16"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "unpack_action_slotss",
+              "inputs": [
+                {
+                  "name": "packed",
                   "type": "core::integer::u16"
                 }
               ],

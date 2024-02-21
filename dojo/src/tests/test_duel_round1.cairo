@@ -38,20 +38,20 @@ mod tests {
         (ch, round, duel_id)
     }
 
-    fn _get_actions_round_1_resolved() -> (u64, u64, u16, u16, u64, u64) {
+    fn _get_actions_round_1_resolved() -> (u64, u64, u8, u8, u64, u64) {
         let salt_a: u64 = SALT_1_a + 2;
         let salt_b: u64 = SALT_1_b;
-        let action_a: u16 = 10;
-        let action_b: u16 = 6;
-        (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
+        let action_a: u8 = 10;
+        let action_b: u8 = 6;
+        (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a.into()), make_action_hash(salt_b, action_b.into()))
     }
 
-    fn _get_actions_round_1_draw() -> (u64, u64, u16, u16, u64, u64) {
+    fn _get_actions_round_1_draw() -> (u64, u64, u8, u8, u64, u64) {
         let salt_a: u64 = SALT_1_a + 52;
         let salt_b: u64 = SALT_1_b + 52;
-        let action_a: u16 = 10;
-        let action_b: u16 = 10;
-        (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
+        let action_a: u8 = 10;
+        let action_b: u8 = 10;
+        (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a.into()), make_action_hash(salt_b, action_b.into()))
     }
 
     //-----------------------------------------
@@ -127,7 +127,7 @@ mod tests {
         assert(round.state == RoundState::Reveal.into(), '3__state');
         assert(round.shot_a.hash == hash_a, '3__hash');
         assert(round.shot_a.salt == salt_a, '3__salt');
-        assert(round.shot_a.action == action_a, '3__action');
+        assert(round.shot_a.action == action_a.into(), '3__action');
 
         // 2nd reveal > Finished
         utils::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b);
@@ -143,10 +143,10 @@ mod tests {
         assert(round.state == RoundState::Finished.into(), '4__state');
         assert(round.shot_a.hash == hash_a, '43__hash');
         assert(round.shot_a.salt == salt_a, '43__salt');
-        assert(round.shot_a.action == action_a, '43__action');
+        assert(round.shot_a.action == action_a.into(), '43__action');
         assert(round.shot_b.hash == hash_b, '4__hash');
         assert(round.shot_b.salt == salt_b, '4__salt');
-        assert(round.shot_b.action == action_b, '4__action');
+        assert(round.shot_b.action == action_b.into(), '4__action');
 
         let duelist_a = utils::get_Duelist(world, owner);
         let duelist_b = utils::get_Duelist(world, other);

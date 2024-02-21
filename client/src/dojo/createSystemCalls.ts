@@ -1,7 +1,7 @@
 import { getEvents, setComponentsFromEvents, decodeComponent } from '@dojoengine/utils'
 import { SetupNetworkResult } from './setupNetwork'
 import { stringToFelt } from '@/pistols/utils/starknet'
-import { Account, num } from 'starknet'
+import { Account, BigNumberish } from 'starknet'
 
 export type SystemCalls = ReturnType<typeof createSystemCalls>;
 
@@ -64,8 +64,8 @@ export function createSystemCalls(
     return await _executeTransaction(signer, 'commit_action', args)
   }
 
-  const reveal_action = async (signer: Account, duel_id: bigint, round_number: number, salt: bigint, action: number): Promise<boolean> => {
-    const args = [duel_id, round_number, salt, action]
+  const reveal_action = async (signer: Account, duel_id: bigint, round_number: number, salt: bigint, action1: number, action2: number): Promise<boolean> => {
+    const args = [duel_id, round_number, salt, action1, action2]
     return await _executeTransaction(signer, 'reveal_action', args)
   }
 
@@ -113,6 +113,22 @@ export function createSystemCalls(
     return result !== null ? Number(result) : null
   }
 
+  const get_valid_packed_actions = async (round_number: number): Promise<number[] | null> => {
+    const args = [round_number]
+    const result = await _executeCall('get_valid_packed_actions', args)
+    return result !== null ? result.map((v: BigNumberish) => Number(v)) : null
+  }
+  const pack_action_slots = async (slot1: number, slot2: number): Promise<number | null> => {
+    const args = [slot1, slot2]
+    const result = await _executeCall('pack_action_slots', args)
+    return result !== null ? Number(result) : null
+  }
+  const unpack_action_slotss = async (packed: number): Promise<number[] | null> => {
+    const args = [packed]
+    const result = await _executeCall('unpack_action_slotss', args)
+    return result !== null ? result.map((v: BigNumberish) => Number(v)) : null
+  }
+
   return {
     register_duelist,
     create_challenge,
@@ -127,6 +143,9 @@ export function createSystemCalls(
     get_duelist_hit_chance,
     get_duelist_crit_chance,
     get_duelist_action_honour,
+    get_valid_packed_actions,
+    pack_action_slots,
+    unpack_action_slotss,
   }
 }
 

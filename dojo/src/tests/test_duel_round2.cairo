@@ -43,29 +43,29 @@ mod tests {
     }
 
     // both full health
-    fn _get_actions_round_1_continue() -> (u64, u64, u16, u16, u64, u64) {
+    fn _get_actions_round_1_continue() -> (u64, u64, u8, u8, u64, u64) {
         let salt_a: u64 = SALT_1_a + 1;
         let salt_b: u64 = SALT_1_b + 1;
-        let action_a: u16 = 10;
-        let action_b: u16 = 10;
-        (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
+        let action_a: u8 = 10;
+        let action_b: u8 = 10;
+        (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a.into()), make_action_hash(salt_b, action_b.into()))
     }
 
     // got a winner
-    fn _get_actions_round_2_resolved() -> (u64, u64, u16, u16, u64, u64) {
+    fn _get_actions_round_2_resolved() -> (u64, u64, u8, u8, u64, u64) {
         let salt_a: u64 = SALT_1_a + 2;
         let salt_b: u64 = SALT_1_b;
-        let action_a: u16 = ACTION::SLOW_BLADE.into();
-        let action_b: u16 = ACTION::BLOCK.into();
-        (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
+        let action_a: u8 = ACTION::SLOW_BLADE.into();
+        let action_b: u8 = ACTION::BLOCK.into();
+        (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a.into()), make_action_hash(salt_b, action_b.into()))
     }
 
-    fn _get_actions_round_2_draw() -> (u64, u64, u16, u16, u64, u64) {
+    fn _get_actions_round_2_draw() -> (u64, u64, u8, u8, u64, u64) {
         let salt_a: u64 = SALT_1_a + 1;
         let salt_b: u64 = SALT_1_b + 1;
-        let action_a: u16 = ACTION::SLOW_BLADE.into();
-        let action_b: u16 = ACTION::SLOW_BLADE.into();
-        (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
+        let action_a: u8 = ACTION::SLOW_BLADE.into();
+        let action_b: u8 = ACTION::SLOW_BLADE.into();
+        (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a.into()), make_action_hash(salt_b, action_b.into()))
     }
 
 
@@ -112,10 +112,10 @@ mod tests {
         assert(round.state == RoundState::Finished.into(), '2__round.state');
         assert(round.shot_a.hash == hash_1_a, '2__hash_a');
         assert(round.shot_a.salt == salt_1_a, '2__salt_a');
-        assert(round.shot_a.action == action_1_a, '2__action_a');
+        assert(round.shot_a.action == action_1_a.into(), '2__action_a');
         assert(round.shot_b.hash == hash_1_b, '2__hash_b');
         assert(round.shot_b.salt == salt_1_b, '2__salt_b');
-        assert(round.shot_b.action == action_1_b, '2__action_b');
+        assert(round.shot_b.action == action_1_b.into(), '2__action_b');
 
         let duelist_a = utils::get_Duelist(world, owner);
         let duelist_b = utils::get_Duelist(world, other);
@@ -213,10 +213,10 @@ mod tests {
         assert(round.state == RoundState::Finished.into(), '2__round.state');
         assert(round.shot_a.hash == hash_1_a, '2__hash_a');
         assert(round.shot_a.salt == salt_1_a, '2__salt_a');
-        assert(round.shot_a.action == action_1_a, '2__action_a');
+        assert(round.shot_a.action == action_1_a.into(), '2__action_a');
         assert(round.shot_b.hash == hash_1_b, '2__hash_b');
         assert(round.shot_b.salt == salt_1_b, '2__salt_b');
-        assert(round.shot_b.action == action_1_b, '2__action_b');
+        assert(round.shot_b.action == action_1_b.into(), '2__action_b');
 
         let duelist_a = utils::get_Duelist(world, owner);
         let duelist_b = utils::get_Duelist(world, other);

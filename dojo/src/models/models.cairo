@@ -57,7 +57,7 @@ struct Shot {
     // player input
     hash: u64,          // hashed action (salt + action)
     salt: u64,          // the player's secret salt
-    action: u16,        // the player's chosen action (paces, weapon, ...)
+    action: u16,        // the player's chosen action(s) (paces, weapon, ...)
     // shot results
     chance_crit: u8,    // computed chances (1..100) - kill / double damage
     chance_hit: u8,     // computed chances (1..100) - hit / normal damage
