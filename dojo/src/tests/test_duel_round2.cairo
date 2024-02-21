@@ -455,17 +455,4 @@ mod tests {
     }
 
 
-
-    //-----------------------------------------
-    // Probabilities
-    //
-
-    #[test]
-    #[available_gas(100_000_000)]
-    fn test_hit_kill_maps() {
-        assert(MathU8::map(1, 1, 10, constants::PISTOLS_HIT_CHANCE_AT_STEP_1, constants::PISTOLS_HIT_CHANCE_AT_STEP_10) == constants::PISTOLS_HIT_CHANCE_AT_STEP_1, 'PISTOLS_HIT_CHANCE_AT_STEP_1');
-        assert(MathU8::map(10, 1, 10, constants::PISTOLS_HIT_CHANCE_AT_STEP_1, constants::PISTOLS_HIT_CHANCE_AT_STEP_10) == constants::PISTOLS_HIT_CHANCE_AT_STEP_10, 'PISTOLS_HIT_CHANCE_AT_STEP_10');
-        assert(MathU8::map(1, 1, 10, constants::PISTOLS_KILL_CHANCE_AT_STEP_1, constants::PISTOLS_KILL_CHANCE_AT_STEP_10) == constants::PISTOLS_KILL_CHANCE_AT_STEP_1, 'PISTOLS_KILL_CHANCE_AT_STEP_1');
-        assert(MathU8::map(10, 1, 10, constants::PISTOLS_KILL_CHANCE_AT_STEP_1, constants::PISTOLS_KILL_CHANCE_AT_STEP_10) == constants::PISTOLS_KILL_CHANCE_AT_STEP_10, 'PISTOLS_KILL_CHANCE_AT_STEP_10');
-    }
 }

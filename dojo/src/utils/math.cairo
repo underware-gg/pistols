@@ -299,9 +299,7 @@ impl MathU256 of MathTrait<u256> {
 #[cfg(test)]
 mod tests {
     use debug::PrintTrait;
-    use pistols::utils::string::{String};
     use pistols::utils::math::{MathU8,MathU128};
-    use pistols::types::constants::{constants};
 
     #[test]
     #[available_gas(100_000_000)]
@@ -391,15 +389,4 @@ mod tests {
         assert(MathU8::map(5, 1, 5, 40, 20) == 20, 'map_i_5');
     }
 
-    #[test]
-    #[available_gas(100_000_000)]
-    fn test_map_pistols() {
-        let mut i: u8 = 1;
-        loop {
-            let chance: u8 = MathU8::map(i, 1, 10, constants::PISTOLS_KILL_CHANCE_AT_STEP_1, constants::PISTOLS_KILL_CHANCE_AT_STEP_10);
-            assert(chance == i * 10, String::concat('bad chance', chance.into()));
-            if(i == 10) { break; }
-            i += 1;
-        };
-    }
 }

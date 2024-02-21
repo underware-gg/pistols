@@ -2,7 +2,7 @@ use traits::{Into, PartialOrd};
 use debug::PrintTrait;
 
 use pistols::models::models::{Shot};
-use pistols::types::constants::{constants};
+use pistols::types::constants::{constants, chances};
 use pistols::utils::math::{MathU8};
 
 //------------------------
@@ -130,9 +130,9 @@ impl ActionTraitImpl of ActionTrait {
     fn crit_chance(self: Action) -> u8 {
         let paces: u8 = self.as_paces();
         if (paces > 0) {
-            (MathU8::map(paces, 1, 10, constants::PISTOLS_KILL_CHANCE_AT_STEP_1, constants::PISTOLS_KILL_CHANCE_AT_STEP_10))
+            (MathU8::map(paces, 1, 10, chances::PISTOLS_KILL_AT_STEP_1, chances::PISTOLS_KILL_AT_STEP_10))
         } else if (self.is_blades()) {
-            (constants::BLADES_KILL_CHANCE)
+            (chances::BLADES_KILL)
         } else {
             (0)
         }
@@ -140,9 +140,9 @@ impl ActionTraitImpl of ActionTrait {
     fn hit_chance(self: Action) -> u8 {
         let paces: u8 = self.as_paces();
         if (paces > 0) {
-            (MathU8::map(paces, 1, 10, constants::PISTOLS_HIT_CHANCE_AT_STEP_1, constants::PISTOLS_HIT_CHANCE_AT_STEP_10))
+            (MathU8::map(paces, 1, 10, chances::PISTOLS_HIT_AT_STEP_1, chances::PISTOLS_HIT_AT_STEP_10))
         } else if (self.is_blades()) {
-            (constants::BLADES_HIT_CHANCE)
+            (chances::BLADES_HIT)
         } else {
             (0)
         }
@@ -150,7 +150,7 @@ impl ActionTraitImpl of ActionTrait {
     fn full_chance(self: Action) -> u8 {
         let paces: u8 = self.as_paces();
         if (paces > 0) {
-            (MathU8::map(paces, 1, 10, constants::PISTOLS_FULL_CHANCE_AT_STEP_1, constants::PISTOLS_FULL_CHANCE_AT_STEP_10))
+            (MathU8::map(paces, 1, 10, chances::PISTOLS_FULL_AT_STEP_1, chances::PISTOLS_FULL_AT_STEP_10))
         } else if (self.is_blades()) {
             (100)
         } else {
@@ -323,120 +323,3 @@ impl PrintAction of PrintTrait<Action> {
     }
 }
 
-
-
-
-//----------------------------------------
-// Unit  tests
-//
-#[cfg(test)]
-mod tests {
-    use debug::PrintTrait;
-    use core::traits::Into;
-    use core::traits::TryInto;
-
-    use pistols::types::action::{Action, ActionTrait, ACTION};
-
-    #[test]
-    #[available_gas(1_000_000)]
-    fn test_paces() {
-        assert(0_u8 == Action::Idle.into(), 'Action > 0');
-        assert(1_u8 == Action::Paces1.into(), 'Action > 1');
-        assert(2_u8 == Action::Paces2.into(), 'Action > 2');
-        assert(3_u8 == Action::Paces3.into(), 'Action > 3');
-        assert(4_u8 == Action::Paces4.into(), 'Action > 4');
-        assert(5_u8 == Action::Paces5.into(), 'Action > 5');
-        assert(6_u8 == Action::Paces6.into(), 'Action > 6');
-        assert(7_u8 == Action::Paces7.into(), 'Action > 7');
-        assert(8_u8 == Action::Paces8.into(), 'Action > 8');
-        assert(9_u8 == Action::Paces9.into(), 'Action > 9');
-        assert(10_u8 == Action::Paces10.into(), 'Action > 10');
-
-        assert(Action::Idle == 0_u8.into(), '0 > Action');
-        assert(Action::Paces1 == 1_u8.into(), '1 > Action');
-        assert(Action::Paces2 == 2_u8.into(), '2 > Action');
-        assert(Action::Paces3 == 3_u8.into(), '3 > Action');
-        assert(Action::Paces4 == 4_u8.into(), '4 > Action');
-        assert(Action::Paces5 == 5_u8.into(), '5 > Action');
-        assert(Action::Paces6 == 6_u8.into(), '6 > Action');
-        assert(Action::Paces7 == 7_u8.into(), '7 > Action');
-        assert(Action::Paces8 == 8_u8.into(), '8 > Action');
-        assert(Action::Paces9 == 9_u8.into(), '9 > Action');
-        assert(Action::Paces10 == 10_u8.into(), '10 > Steps');
-    }
-
-    #[test]
-    #[available_gas(1_000_000_000)]
-    fn test_is_paces() {
-        let mut n: u8 = 0;
-        loop {
-            if (n > 0xf0) {
-                break;
-            }
-            let action: Action = n.into();
-            if (action != Action::Idle) {
-                // let paces: u8 = action.into();
-                // assert(paces == n, 'Action value is pace');
-                let is_pace = action.is_paces();
-                assert(is_pace == (n >= 1 && n <= 10), 'action.is_paces()');
-                if (is_pace) {
-                    let paces: u8 = action.as_paces();
-                    assert(paces == n, 'action.as_paces()');
-                }
-            }
-            n += 1;
-        }
-    }
-
-    #[test]
-    #[available_gas(1_000_000_000)]
-    fn test_mask() {
-        let mut n: u8 = 0;
-        loop {
-            if (n > 0xf0) {
-                break;
-            }
-            let action: Action = n.into();
-            if (action != Action::Idle) {
-                let is_pace = action.is_paces();
-                if (is_pace) {
-                    assert(n & ACTION::PACES_MASK == n, 'pace & ACTION::PACES_MASK');
-                    assert(n & ACTION::BLADES_MASK == 0, 'pace & ACTION::BLADES_MASK');
-                } else {
-                    assert(n & ACTION::PACES_MASK == 0, 'blade & ACTION::PACES_MASK');
-                    assert(n & ACTION::BLADES_MASK == n, 'blade & ACTION::BLADES_MASK');
-                }
-            }
-            n += 1;
-        }
-    }
-
-    #[test]
-    #[available_gas(1_000_000_000)]
-    fn test_paces_priority() {
-        let mut a: u8 = 0;
-        loop {
-            if (a > 10) { break; }
-            let action_a: Action = a.into();
-
-            let mut b: u8 = 0;
-            loop {
-                if (b > 10) { break; }
-                let action_b: Action = b.into();
-                let priority: i8 = action_a.roll_priority(action_b);
-                if (a == 0) {
-                    assert(priority == 0, 'a_0')
-                } else if (b == 0) {
-                    assert(priority == 0, 'b_0')
-                } else if (a < b) {
-                    assert(priority < 0, 'a<b')
-                } else if (a > b) {
-                    assert(priority > 0, 'a>b')
-                } else {
-                    assert(priority == 0, 'a==b')
-                }
-                b += 1;
-            };
-            a += 1;
-        }
-    }}

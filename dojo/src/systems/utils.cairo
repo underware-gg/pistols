@@ -6,7 +6,7 @@ use pistols::models::models::{Duelist, Challenge, Pact, Round, Shot};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round::{RoundState, RoundStateTrait};
 use pistols::types::action::{Action, ActionTrait};
-use pistols::types::constants::{constants};
+use pistols::types::constants::{constants, chances};
 use pistols::utils::math::{MathU8, MathU16};
 
 // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
@@ -213,7 +213,7 @@ mod tests {
 
     use pistols::systems::{utils};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
-    use pistols::types::constants::{constants};
+    use pistols::types::constants::{constants, chances};
     use pistols::utils::math::{MathU8};
 
     #[test]
@@ -273,9 +273,9 @@ mod tests {
     #[test]
     #[available_gas(100_000_000)]
     fn test_hit_kill_maps() {
-        assert(MathU8::map(1, 1, 10, constants::PISTOLS_HIT_CHANCE_AT_STEP_1, constants::PISTOLS_HIT_CHANCE_AT_STEP_10) == constants::PISTOLS_HIT_CHANCE_AT_STEP_1, 'PISTOLS_HIT_CHANCE_AT_STEP_1');
-        assert(MathU8::map(10, 1, 10, constants::PISTOLS_HIT_CHANCE_AT_STEP_1, constants::PISTOLS_HIT_CHANCE_AT_STEP_10) == constants::PISTOLS_HIT_CHANCE_AT_STEP_10, 'PISTOLS_HIT_CHANCE_AT_STEP_10');
-        assert(MathU8::map(1, 1, 10, constants::PISTOLS_KILL_CHANCE_AT_STEP_1, constants::PISTOLS_KILL_CHANCE_AT_STEP_10) == constants::PISTOLS_KILL_CHANCE_AT_STEP_1, 'PISTOLS_KILL_CHANCE_AT_STEP_1');
-        assert(MathU8::map(10, 1, 10, constants::PISTOLS_KILL_CHANCE_AT_STEP_1, constants::PISTOLS_KILL_CHANCE_AT_STEP_10) == constants::PISTOLS_KILL_CHANCE_AT_STEP_10, 'PISTOLS_KILL_CHANCE_AT_STEP_10');
+        assert(MathU8::map(1, 1, 10, chances::PISTOLS_HIT_AT_STEP_1, chances::PISTOLS_HIT_AT_STEP_10) == chances::PISTOLS_HIT_AT_STEP_1, 'PISTOLS_HIT_AT_STEP_1');
+        assert(MathU8::map(10, 1, 10, chances::PISTOLS_HIT_AT_STEP_1, chances::PISTOLS_HIT_AT_STEP_10) == chances::PISTOLS_HIT_AT_STEP_10, 'PISTOLS_HIT_AT_STEP_10');
+        assert(MathU8::map(1, 1, 10, chances::PISTOLS_KILL_AT_STEP_1, chances::PISTOLS_KILL_AT_STEP_10) == chances::PISTOLS_KILL_AT_STEP_1, 'PISTOLS_KILL_AT_STEP_1');
+        assert(MathU8::map(10, 1, 10, chances::PISTOLS_KILL_AT_STEP_1, chances::PISTOLS_KILL_AT_STEP_10) == chances::PISTOLS_KILL_AT_STEP_10, 'PISTOLS_KILL_AT_STEP_10');
     }
 }
