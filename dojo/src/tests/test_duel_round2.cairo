@@ -42,22 +42,6 @@ mod tests {
         (ch, round, duel_id)
     }
 
-    fn _get_actions_round_1_resolved() -> (u64, u64, u16, u16, u64, u64) {
-        let salt_a: u64 = SALT_1_a;
-        let salt_b: u64 = SALT_1_b;
-        let action_a: u16 = 5;
-        let action_b: u16 = 6;
-        (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
-    }
-
-    fn _get_actions_round_1_draw() -> (u64, u64, u16, u16, u64, u64) {
-        let salt_a: u64 = SALT_1_a + 8;
-        let salt_b: u64 = SALT_1_b + 8;
-        let action_a: u16 = 5;
-        let action_b: u16 = 5;
-        (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
-    }
-
     fn _get_actions_round_1_continue() -> (u64, u64, u16, u16, u64, u64) {
         let salt_a: u64 = SALT_1_a;
         let salt_b: u64 = SALT_1_b;

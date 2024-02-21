@@ -39,18 +39,18 @@ mod tests {
     }
 
     fn _get_actions_round_1_resolved() -> (u64, u64, u16, u16, u64, u64) {
-        let salt_a: u64 = SALT_1_a;
+        let salt_a: u64 = SALT_1_a + 2;
         let salt_b: u64 = SALT_1_b;
-        let action_a: u16 = 5;
+        let action_a: u16 = 10;
         let action_b: u16 = 6;
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
     }
 
     fn _get_actions_round_1_draw() -> (u64, u64, u16, u16, u64, u64) {
-        let salt_a: u64 = SALT_1_a + 8;
-        let salt_b: u64 = SALT_1_b + 8;
-        let action_a: u16 = 5;
-        let action_b: u16 = 5;
+        let salt_a: u64 = SALT_1_a + 52;
+        let salt_b: u64 = SALT_1_b + 52;
+        let action_a: u16 = 10;
+        let action_b: u16 = 10;
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a), make_action_hash(salt_b, action_b))
     }
 
@@ -132,6 +132,9 @@ mod tests {
         // 2nd reveal > Finished
         utils::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b);
         let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
+// round.shot_a.health.print();
+// round.shot_b.health.print();
+// challenge.state.print();
         assert(challenge.state == ChallengeState::Resolved.into(), '4_challenge.state');
         assert(challenge.winner != 0, '4_challenge.winner');
         assert(challenge.round_number == 1, '4_challenge.round_number');
@@ -163,8 +166,9 @@ mod tests {
             assert(duelist_b.total_losses == 1, 'a_win_duelist_b.total_losses');
             assert(round.shot_a.damage < constants::FULL_HEALTH, 'a_win_damage_a');
             assert(round.shot_a.health > 0, 'a_win_health_a');
-            assert(round.shot_a.dice_hit > 0 && round.shot_a.dice_hit <= hit_chance_a, 'hit_chance_a');
             assert(round.shot_a.dice_crit > 0 && round.shot_a.dice_crit <= kill_chance_a, 'kill_chance_a');
+            assert(round.shot_a.dice_crit <= round.shot_a.chance_crit, 'dice_crit_a <= chance_crit_a');
+            assert(round.shot_a.dice_hit == 0 && round.shot_a.dice_hit == 0, 'hit_a');
             assert(round.shot_b.damage == constants::FULL_HEALTH, 'a_win_damage_b');
             assert(round.shot_b.health == 0, 'a_win_health_b');
         } else if (challenge.winner == 2) {
@@ -174,8 +178,9 @@ mod tests {
             assert(duelist_b.total_losses == 0, 'b_win_duelist_b.total_losses');
             assert(round.shot_b.damage < constants::FULL_HEALTH, 'b_win_damage_b');
             assert(round.shot_b.health > 0, 'b_win_health_b');
-            assert(round.shot_b.dice_hit > 0 && round.shot_b.dice_hit <= hit_chance_b, 'hit_chance_b');
             assert(round.shot_b.dice_crit > 0 && round.shot_b.dice_crit <= kill_chance_b, 'kill_chance_b');
+            assert(round.shot_b.dice_crit <= round.shot_b.chance_crit, 'dice_crit_b <= chance_crit_b');
+            assert(round.shot_b.dice_hit == 0 && round.shot_b.chance_hit == 0, 'hit_b');
             assert(round.shot_a.damage == constants::FULL_HEALTH, 'b_win_damage_a');
             assert(round.shot_a.health == 0, 'b_win_health_a');
         } else {
@@ -221,6 +226,54 @@ mod tests {
             assert(false, 'bad winner')
         }
     }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_single_round_draw() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_draw();
+
+        let hit_chance_a = utils::get_duelist_hit_chance(system, owner, action_a, constants::FULL_HEALTH);
+        let hit_chance_b = utils::get_duelist_hit_chance(system, owner, action_b, constants::FULL_HEALTH);
+        let kill_chance_a = utils::get_duelist_crit_chance(system, owner, action_a, constants::FULL_HEALTH);
+        let kill_chance_b = utils::get_duelist_crit_chance(system, owner, action_b, constants::FULL_HEALTH);
+
+        utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
+        utils::execute_commit_action(system, other, duel_id, 1, hash_b);
+        utils::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a);
+        utils::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b);
+        let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
+// round.shot_a.health.print();
+// round.shot_b.health.print();
+// challenge.state.print();
+        assert(challenge.state == ChallengeState::Draw.into(), 'challenge.state');
+        assert(challenge.winner == 0, 'challenge.winner');
+        assert(challenge.round_number == 1, 'challenge.round_number');
+        assert(round.round_number == 1, 'round.round_number');
+        assert(round.state == RoundState::Finished.into(), 'round.state');
+        assert(round.shot_a.health == 0, 'round.shot_a.health');
+        assert(round.shot_b.health == 0, 'round.shot_b.health');
+
+        let duelist_a = utils::get_Duelist(world, owner);
+        let duelist_b = utils::get_Duelist(world, other);
+        assert(duelist_a.total_duels == 1, 'duelist_a.total_duels');
+        assert(duelist_b.total_duels == 1, 'duelist_b.total_duels');
+        assert(duelist_a.total_draws == 1, 'duelist_a.total_draws');
+        assert(duelist_b.total_draws == 1, 'duelist_b.total_draws');
+        assert(duelist_a.total_wins == 0, 'duelist_a.total_wins');
+        assert(duelist_b.total_wins == 0, 'duelist_b.total_wins');
+        assert(duelist_a.total_losses == 0, 'duelist_a.total_losses');
+        assert(duelist_b.total_losses == 0, 'duelist_b.total_losses');
+        assert(duelist_a.total_honour == action_a.into(), 'duelist_a.total_honour');
+        assert(duelist_b.total_honour == action_b.into(), 'duelist_b.total_honour');
+        assert(duelist_a.honour == (action_a * 10).try_into().unwrap(), 'duelist_a.honour');
+        assert(duelist_b.honour == (action_b * 10).try_into().unwrap(), 'duelist_b.honour');
+    }
+
+    //-------------------------------
+    // Fails
+    //
 
     #[test]
     #[available_gas(1_000_000_000)]
