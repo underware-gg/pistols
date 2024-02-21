@@ -949,7 +949,7 @@
     {
       "name": "pistols::systems::actions::actions",
       "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
-      "class_hash": "0x24621320223b5a9fb5302225d95c6508cf9a6d12bfc13f106dc934dc94d1af5",
+      "class_hash": "0x20e24b45a36761f78425526a297c5ef4579febed8bcaebaf95cacdedf7a2b17",
       "abi": [
         {
           "type": "impl",
