@@ -50,20 +50,24 @@ impl MathU8 of MathTrait<u8> {
     }
 
     fn map(v: u8, in_min: u8, in_max: u8, out_min: u8, out_max: u8) -> u8 {
-        if (out_min > out_max) { 
-            (out_min - MathU8::map(v, in_min, in_max, 0, out_min - out_max))
-        } else {
-            let mut d = (in_max - in_min);
-            let mut c = (v - in_min);
-            let gdc = MathU8::gdc(d, c);
-            if (gdc > 1) {
-                d /= gdc;
-                c /= gdc;
-            }
-            let x = ((out_max - out_min) / d) * c;
-            (out_min + x)
-            // (out_min + (((out_max - out_min) / (in_max - in_min)) * (v - in_min)))
-        }
+        if (v == in_min) { return out_min; }
+        if (v == in_max) { return out_max; }
+        let result: u32 = MathU32::map(v.into(), in_min.into(), in_max.into(), out_min.into() * 1000, out_max.into() * 1000) / 1000;
+        (result.try_into().unwrap())
+        // if (out_min > out_max) { 
+        //     (out_min - MathU8::map(v, in_min, in_max, 0, out_min - out_max))
+        // } else {
+        //     let mut d = (in_max - in_min);
+        //     let mut c = (v - in_min);
+        //     let gdc = MathU8::gdc(d, c);
+        //     if (gdc > 1) {
+        //         d /= gdc;
+        //         c /= gdc;
+        //     }
+        //     let x = ((out_max - out_min) / d) * c;
+        //     (out_min + x)
+        //     // (out_min + (((out_max - out_min) / (in_max - in_min)) * (v - in_min)))
+        // }
     }
 
     fn pow(base: u8, exp: u8) -> u8 {
@@ -299,7 +303,7 @@ impl MathU256 of MathTrait<u256> {
 #[cfg(test)]
 mod tests {
     use debug::PrintTrait;
-    use pistols::utils::math::{MathU8,MathU128};
+    use pistols::utils::math::{MathU8,MathU16,MathU32,MathU128};
 
     #[test]
     #[available_gas(100_000_000)]
@@ -387,6 +391,18 @@ mod tests {
         assert(MathU8::map(3, 1, 5, 40, 20) == 30, 'map_i_3');
         assert(MathU8::map(4, 1, 5, 40, 20) == 25, 'map_i_4');
         assert(MathU8::map(5, 1, 5, 40, 20) == 20, 'map_i_5');
+        // compressed output
+        assert(MathU8::map(10, 10, 50, 1, 5) == 1, 'map___1');
+        assert(MathU8::map(20, 10, 50, 1, 5) == 2, 'map___2');
+        assert(MathU8::map(30, 10, 50, 1, 5) == 3, 'map___3');
+        assert(MathU8::map(40, 10, 50, 1, 5) == 4, 'map___4');
+        assert(MathU8::map(50, 10, 50, 1, 5) == 5, 'map___5');
+        // bad case
+        assert(MathU8::map(1, 1, 100, 1, 50) == 1, 'map_bad_1');
+        assert(MathU8::map(20, 1, 100, 1, 50) == 10, 'map_bad_20');
+        assert(MathU8::map(40, 1, 100, 1, 50) == 20, 'map_bad_40');
+        assert(MathU8::map(60, 1, 100, 1, 50) == 30, 'map_bad_60');
+        assert(MathU8::map(80, 1, 100, 1, 50) == 40, 'map_bad_80');
+        assert(MathU8::map(100, 1, 100, 1, 50) == 50, 'map_bad_100');
     }
-
 }

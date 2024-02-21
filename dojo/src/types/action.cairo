@@ -220,8 +220,7 @@ impl ActionTraitImpl of ActionTrait {
         let paces: u8 = self.as_paces();
         if (paces != 0) {
             let full_chance: u8 = self.full_chance();
-            let chance: u8 = MathU8::map(full_chance, 1, 100, 1, attack.chance_hit);
-            if (attack.dice_hit <= chance) {
+            if (attack.dice_hit <= full_chance) {
                 defense.damage = constants::DOUBLE_DAMAGE;
             } else {
                 defense.damage = constants::SINGLE_DAMAGE;
