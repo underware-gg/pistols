@@ -2,7 +2,7 @@
 use traits::{Into, TryInto};
 use starknet::{ContractAddress};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-use pistols::models::models::{Duelist, Challenge, Pact, Round, Shot};
+use pistols::models::models::{init, Duelist, Challenge, Pact, Round, Shot};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round::{RoundState, RoundStateTrait};
 use pistols::types::action::{Action, ActionTrait};
@@ -57,32 +57,8 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
 
     // Start Round
     if (state == ChallengeState::InProgress) {
-        let mut shot_a = Shot {
-            hash: 0,
-            salt: 0,
-            action: 0,
-            chance_crit: 0,
-            chance_hit: 0,
-            dice_crit: 0,
-            dice_hit: 0,
-            damage: 0,
-            block: 0,
-            health: 0,
-            honour: 0,
-        };
-        let mut shot_b = Shot {
-            hash: 0,
-            salt: 0,
-            action: 0,
-            chance_crit: 0,
-            chance_hit: 0,
-            dice_crit: 0,
-            dice_hit: 0,
-            damage: 0,
-            block: 0,
-            health: 0,
-            honour: 0,
-        };
+        let mut shot_a = init::Shot();
+        let mut shot_b = init::Shot();
 
         if (challenge.round_number == 1) {
             // Round 1 starts with full health

@@ -341,7 +341,7 @@ mod tests {
     use core::traits::{Into, TryInto};
 
     use pistols::systems::shooter::{shooter};
-    use pistols::models::models::{Shot};
+    use pistols::models::models::{init, Shot};
     use pistols::types::action::{Action, ACTION};
     use pistols::types::constants::{constants};
 
@@ -375,19 +375,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000)]
     fn test_apply_damage() {
-        let mut shot = Shot {
-            hash: 0,
-            salt: 0,
-            action: 0,
-            chance_crit: 0,
-            chance_hit: 0,
-            dice_crit: 0,
-            dice_hit: 0,
-            damage: 0,
-            block: 0,
-            health: 0,
-            honour: 0,
-        };
+        let mut shot = init::Shot();
         // damages
         shot.health = 3;
         shot.damage = 1;

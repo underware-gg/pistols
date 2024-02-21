@@ -83,3 +83,30 @@ struct Round {
     shot_a: Shot,   // duelist_a shot
     shot_b: Shot,   // duelist_b shot
 } // (8 + 208 + 208) = 424 bits ~ 2 felts (max 504)
+
+
+
+
+//-------------------------------------
+// Model initializers
+//
+mod init {
+    use pistols::models::{models};
+
+    fn Shot() -> models::Shot {
+        (models::Shot {
+            hash: 0,
+            salt: 0,
+            action: 0,
+            chance_crit: 0,
+            chance_hit: 0,
+            dice_crit: 0,
+            dice_hit: 0,
+            damage: 0,
+            block: 0,
+            health: 0,
+            honour: 0,
+        })
+    }
+
+}
