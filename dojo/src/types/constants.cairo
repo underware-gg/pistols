@@ -31,4 +31,5 @@ mod chances {
     // Blades chances (percentage)
     const BLADES_KILL: u8 = 15;
     const BLADES_HIT: u8 = 65;
+    const BLADES_FULL: u8 = 100;
 }

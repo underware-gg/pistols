@@ -106,8 +106,6 @@ mod shooter {
     }
 
     // Validates a action and returns it
-    // Pistols: if invalid, clamps between 1 and 10
-    // Blades: if invalid, returns Blades::Idle
     fn validated_action(round_number: u8, maybe_action: u16) -> u16 {
         if (round_number <= constants::ROUND_COUNT) {
             let action: Action = maybe_action.into();
@@ -117,41 +115,43 @@ mod shooter {
                 if (action.is_blades()) { return (maybe_action); }
             }
         }
-        (0) // invalid
+        (ACTION::IDLE.into()) // invalid
     }
 
     //---------------------------------------
     // Decide who wins a round, or go to next
     //
     fn process_round(world: IWorldDispatcher, ref challenge: Challenge, ref round: Round) {
-        // get damage for each player
-        if (round.round_number == 1) {
-            pistols_shootout(world, challenge, ref round);
+        let action_a: Action = apply_action_honour(ref round.shot_a);
+        let action_b: Action = apply_action_honour(ref round.shot_b);
+        
+        let priority: i8 = action_a.roll_priority(action_b);
+        if (priority < 0) {
+            // A attacks first
+            attack_sync(world, challenge.duelist_a, challenge.duelist_b, round, ref round.shot_a, ref round.shot_b, false);
+        } else if (priority > 0) {
+            // B attacks first
+            attack_sync(world, challenge.duelist_b, challenge.duelist_a, round, ref round.shot_b, ref round.shot_a, false);
         } else {
-            blades_clash(world, challenge, ref round);
+            // same time
+            attack_sync(world, challenge.duelist_a, challenge.duelist_b, round, ref round.shot_a, ref round.shot_b, true);
         }
 
         // decide results
         if (round.shot_a.health == 0 && round.shot_b.health == 0) {
             // both dead!
-            challenge.state = ChallengeState::Draw.into();
-            challenge.timestamp_end = get_block_timestamp();
+            end_challenge(ref challenge, ChallengeState::Draw, 0);
         } else if (round.shot_a.health == 0) {
             // A is dead!
-            challenge.state = ChallengeState::Resolved.into();
-            challenge.winner = 2;
-            challenge.timestamp_end = get_block_timestamp();
+            end_challenge(ref challenge, ChallengeState::Resolved, 2);
         } else if (round.shot_b.health == 0) {
             // B is dead!
-            challenge.state = ChallengeState::Resolved.into();
-            challenge.winner = 1;
-            challenge.timestamp_end = get_block_timestamp();
+            end_challenge(ref challenge, ChallengeState::Resolved, 1);
         } else {
             // both alive!
             if (challenge.round_number == constants::ROUND_COUNT) {
                 // end in a Draw
-                challenge.state = ChallengeState::Draw.into();
-                challenge.timestamp_end = get_block_timestamp();
+                end_challenge(ref challenge, ChallengeState::Draw, 0);
             } else {
                 // next round
                 challenge.round_number += 1;
@@ -160,28 +160,6 @@ mod shooter {
 
         // Finish round
         round.state = RoundState::Finished.into();
-    }
-
-    //-----------------------------------
-    // Pistols duel
-    //
-
-    // decides attack order
-    fn pistols_shootout(world: IWorldDispatcher, challenge: Challenge, ref round: Round) {
-        let action_a: Action = apply_action_honour(ref round.shot_a);
-        let action_b: Action = apply_action_honour(ref round.shot_b);
-        
-        let priority: i8 = action_a.roll_priority(action_b);
-        if (priority < 0) {
-            // A attacks first
-            shoot(world, challenge.duelist_a, challenge.duelist_b, round, ref round.shot_a, ref round.shot_b, false);
-        } else if (priority > 0) {
-            // B attacks first
-            shoot(world, challenge.duelist_b, challenge.duelist_a, round, ref round.shot_b, ref round.shot_a, false);
-        } else {
-            // same time
-            shoot(world, challenge.duelist_a, challenge.duelist_b, round, ref round.shot_a, ref round.shot_b, true);
-        }
     }
 
     fn apply_action_honour(ref shot: Shot) -> Action {
@@ -193,123 +171,55 @@ mod shooter {
         (action)
     }
 
-    // execute attacks in order
-    fn shoot(world: IWorldDispatcher, attacker: ContractAddress, defender: ContractAddress, round: Round, ref attack: Shot, ref defense: Shot, sync: bool) {
-        shoot_apply_damage(world, 'shoot_a', attacker, round, ref attack, ref defense);
-        if (sync || defense.health > 0) {
-            shoot_apply_damage(world, 'shoot_b', defender, round, ref defense, ref attack);
-        }
+    fn end_challenge(ref challenge: Challenge, state: ChallengeState, winner: u8) {
+        challenge.state = state.into();
+        challenge.winner = winner;
+        challenge.timestamp_end = get_block_timestamp();
     }
 
-    // execute single attack
-    fn shoot_apply_damage(world: IWorldDispatcher, seed: felt252, duelist: ContractAddress, round: Round, ref attack: Shot, ref defense: Shot) {
-        let action: Action = attack.action.into();
-        if (action == Action::Idle) {
-            return;
-        }
-        // dice 1: crit (execution, double damage, goal)
-        attack.chance_crit = utils::get_duelist_crit_chance(world, duelist, action, attack.health);
-        attack.dice_crit = throw_dice(seed, round, 100);
-        if (attack.dice_crit <= attack.chance_crit) {
-            action.execute_crit(ref attack, ref defense);
-            apply_damage(ref defense);
-        } else {
-            // dice 2: miss or hit
-            attack.chance_hit = utils::get_duelist_hit_chance(world, duelist, action, attack.health);
-            attack.dice_hit = throw_dice(seed * 2, round, 100);
-            if (attack.dice_hit <= attack.chance_hit) {
-                action.execute_hit(ref attack, ref defense);
-                apply_damage(ref defense);
+    //-------------------------
+    // Attacks
+    //
+
+    // execute attacks in sync or async
+    fn attack_sync(world: IWorldDispatcher, attacker: ContractAddress, defender: ContractAddress, round: Round, ref attack: Shot, ref defense: Shot, sync: bool) {
+        // attack first, if survives defense can attack
+        let executed: bool = attack(world, 'shoot_a', attacker, round, ref attack, ref defense);
+        if (sync || !executed) {
+            let executed: bool = attack(world, 'shoot_b', defender, round, ref defense, ref attack);
+            if (executed) {
+                attack.block = 0; // execution cancels any block
             }
         }
+        apply_damage(ref defense);
+        apply_damage(ref attack);
     }
 
     fn apply_damage(ref shot: Shot) {
         shot.health = MathU8::sub(shot.health, MathU8::sub(shot.damage, shot.block));
     }
 
-
-    //-----------------------------------
-    // Blades duel
-    //
-    // Heavy - Execute with 3 damage or inclict 2 damage
-    // Light - hits 1 damage, early
-    // Block - blocks 1 damage
-    //
-    fn blades_clash(world: IWorldDispatcher, challenge: Challenge, ref round: Round) {
-
-        thow_blades_dices(world, 'clash_a', challenge.duelist_a, round, ref round.shot_a, ref round.shot_b);
-        thow_blades_dices(world, 'clash_b', challenge.duelist_b, round, ref round.shot_b, ref round.shot_a);
-
-        // Execution executes first (Heavy)
-        if (round.shot_a.damage == constants::FULL_HEALTH || round.shot_b.damage == constants::FULL_HEALTH) {
-            if (round.shot_a.damage == constants::FULL_HEALTH) {
-                round.shot_a.block = 0; // execution overrides block
-                apply_damage(ref round.shot_a);
-            }
-            if (round.shot_b.damage == constants::FULL_HEALTH) {
-                round.shot_b.block = 0; // execution overrides block
-                apply_damage(ref round.shot_b);
-            }
-            return ();
-        }
-
-        let action_a: Action = round.shot_a.action.into();
-        let action_b: Action = round.shot_b.action.into();
-
-        // Light strikes before Heavy
-        if (action_a == Action::FastBlade && action_b == Action::SlowBlade) {
-            light_vs_heavy_apply_damage(ref round.shot_a, ref round.shot_b)
-        } else if (action_b == Action::FastBlade && action_a == Action::SlowBlade) {
-            light_vs_heavy_apply_damage(ref round.shot_b, ref round.shot_a)
-        } else {
-            // clash at same time
-            apply_damage(ref round.shot_a);
-            apply_damage(ref round.shot_b);
-        }
-    }
-
-    fn light_vs_heavy_apply_damage(ref attack: Shot, ref defense: Shot) {
-        // attack!
-        apply_damage(ref defense);
-        if (defense.health == 0) {
-            // defender is dead! no damage to attacker
-            attack.damage = 0;
-        } else {
-            // defender is alive! strike attacker...
-            apply_damage(ref attack);
-        }
-    }
-
-    fn thow_blades_dices(world: IWorldDispatcher, seed: felt252, duelist: ContractAddress, round: Round, ref attack: Shot, ref defense: Shot) {
+    // executes single attack
+    // returns true if ended in execution
+    fn attack(world: IWorldDispatcher, seed: felt252, attacker: ContractAddress, round: Round, ref attack: Shot, ref defense: Shot) -> bool {
         let action: Action = attack.action.into();
-        if (action != Action::Idle) {
-            // dice 1: execution or double damage/block
-            attack.chance_crit = utils::get_duelist_crit_chance(world, duelist, action, attack.health);
-            attack.dice_crit = throw_dice(seed, round, 100);
-            if (attack.dice_hit <= attack.chance_crit) {
-                if (action == Action::SlowBlade) {
-                    defense.damage = constants::FULL_HEALTH;
-                } else if (action == Action::FastBlade) {
-                    defense.damage = constants::DOUBLE_DAMAGE;
-                } else if (action == Action::Block) {
-                    attack.block = constants::DOUBLE_DAMAGE;
-                }
-            } else {
-                // dice 2: miss or normal damage
-                attack.chance_hit = utils::get_duelist_hit_chance(world, duelist, action, attack.health);
-                attack.dice_hit = throw_dice(seed * 2, round, 100);
-                if (attack.dice_hit <= attack.chance_hit) {
-                    if (action == Action::SlowBlade) {
-                        defense.damage = constants::DOUBLE_DAMAGE;
-                    } else if (action == Action::FastBlade) {
-                        defense.damage = constants::SINGLE_DAMAGE;
-                    } else if (action == Action::Block) {
-                        attack.block = constants::SINGLE_DAMAGE;
-                    }
-                }
+        if (action == Action::Idle) {
+            return (false);
+        }
+        // dice 1: crit (execution, double damage, goal)
+        attack.chance_crit = utils::get_duelist_crit_chance(world, attacker, action, attack.health);
+        attack.dice_crit = throw_dice(seed, round, 100);
+        if (attack.dice_crit <= attack.chance_crit) {
+            return (action.execute_crit(ref attack, ref defense));
+        } else {
+            // dice 2: miss or hit
+            attack.chance_hit = utils::get_duelist_hit_chance(world, attacker, action, attack.health);
+            attack.dice_hit = throw_dice(seed * 2, round, 100);
+            if (attack.dice_hit <= attack.chance_hit) {
+                action.execute_hit(ref attack, ref defense);
             }
         }
+        (false)
     }
 
 

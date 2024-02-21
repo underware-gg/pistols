@@ -197,51 +197,69 @@ mod tests {
     #[test]
     #[available_gas(100_000_000)]
     fn test_execute_crit() {
-        let mut attack: Shot = init::Shot();
+        let mut attack = init::Shot();
         // Paces1
-        let mut defend: Shot = init::Shot();
+        let mut defend = init::Shot();
         Action::Paces1.execute_crit(ref attack, ref defend);
         assert(defend.damage == constants::FULL_HEALTH, 'Paces1.crit');
         // Paces10
-        let mut defend: Shot = init::Shot();
+        let mut defend = init::Shot();
         Action::Paces10.execute_crit(ref attack, ref defend);
         assert(defend.damage == constants::FULL_HEALTH, 'Paces10.crit');
-    }
-    #[test]
-    fn test_execute_crit_BLADES() {
-        assert(false, 'TODO_BLADES');
+        //
+        // Blades
+        let mut attack = init::Shot();
+        let mut defend = init::Shot();
+        Action::SlowBlade.execute_crit(ref attack, ref defend);
+        assert(defend.damage == constants::FULL_HEALTH, 'SlowBlade');
+        let mut defend = init::Shot();
+        Action::FastBlade.execute_crit(ref attack, ref defend);
+        assert(defend.damage == constants::DOUBLE_DAMAGE, 'FastBlade');
+        let mut defend = init::Shot();
+        Action::Block.execute_crit(ref attack, ref defend);
+        assert(defend.damage == 0, 'Block.damage');
+        assert(attack.block == constants::DOUBLE_DAMAGE, 'Block.block');
     }
 
     #[test]
     #[available_gas(100_000_000)]
     fn test_execute_hit() {
-        let mut attack: Shot = init::Shot();
+        let mut attack = init::Shot();
         //
         // Paces1: 80% of 100%
         attack.chance_hit = chances::PISTOLS_HIT_AT_STEP_1;
         attack.dice_hit = chances::PISTOLS_FULL_AT_STEP_1;
-        let mut defend: Shot = init::Shot();
+        let mut defend = init::Shot();
         Action::Paces1.execute_hit(ref attack, ref defend);
         assert(defend.damage == constants::DOUBLE_DAMAGE, 'Paces1.hit_double');
         attack.dice_hit += 1;
-        let mut defend: Shot = init::Shot();
+        let mut defend = init::Shot();
         Action::Paces1.execute_hit(ref attack, ref defend);
         assert(defend.damage == constants::SINGLE_DAMAGE, 'Paces1.hit_single');
         //
         // Paces10: 10% of 20%
         attack.chance_hit = chances::PISTOLS_HIT_AT_STEP_10;
         attack.dice_hit = chances::PISTOLS_FULL_AT_STEP_10;
-        let mut defend: Shot = init::Shot();
+        let mut defend = init::Shot();
         Action::Paces10.execute_hit(ref attack, ref defend);
         assert(defend.damage == constants::DOUBLE_DAMAGE, 'Paces10.hit_double');
         attack.dice_hit += 1;
-        let mut defend: Shot = init::Shot();
+        let mut defend = init::Shot();
         Action::Paces10.execute_hit(ref attack, ref defend);
         assert(defend.damage == constants::SINGLE_DAMAGE, 'Paces10.hit_single');
-    }
-    #[test]
-    fn test_execute_hit_BLADES() {
-        assert(false, 'TODO_BLADES');
+        //
+        // Blades
+        let mut attack = init::Shot();
+        let mut defend = init::Shot();
+        Action::SlowBlade.execute_hit(ref attack, ref defend);
+        assert(defend.damage == constants::DOUBLE_DAMAGE, 'SlowBlade');
+        let mut defend = init::Shot();
+        Action::FastBlade.execute_hit(ref attack, ref defend);
+        assert(defend.damage == constants::SINGLE_DAMAGE, 'FastBlade');
+        let mut defend = init::Shot();
+        Action::Block.execute_hit(ref attack, ref defend);
+        assert(defend.damage == 0, 'Block.damage');
+        assert(attack.block == constants::SINGLE_DAMAGE, 'Block.block');
     }
 
 

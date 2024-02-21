@@ -79,7 +79,7 @@ trait ActionTrait {
     fn full_chance(self: Action) -> u8;
     fn honour(self: Action) -> u8;
     fn roll_priority(self: Action, other: Action) -> i8;
-    fn execute_crit(self: Action, ref attack: Shot, ref defense: Shot);
+    fn execute_crit(self: Action, ref attack: Shot, ref defense: Shot) -> bool;
     fn execute_hit(self: Action, ref attack: Shot, ref defense: Shot);
 }
 
@@ -152,7 +152,7 @@ impl ActionTraitImpl of ActionTrait {
         if (paces > 0) {
             (MathU8::map(paces, 1, 10, chances::PISTOLS_FULL_AT_STEP_1, chances::PISTOLS_FULL_AT_STEP_10))
         } else if (self.is_blades()) {
-            (100)
+            (chances::BLADES_FULL)
         } else {
             (0)
         }
@@ -191,27 +191,49 @@ impl ActionTraitImpl of ActionTrait {
     // TODO: Dojo 0.6.0: Use match
     fn roll_priority(self: Action, other: Action) -> i8 {
         // Lowest paces shoot first
-        let paces_a: i8 = self.as_paces().try_into().unwrap();
-        let paces_b: i8 = other.as_paces().try_into().unwrap();
-        if (paces_a != 0 && paces_b != 0) {
+        let is_paces_a: bool = self.is_paces();
+        let is_paces_b: bool = other.is_paces();
+        if (is_paces_a && is_paces_b) {
+            // Paces vs Paces
+            // Lowest pace shoots first
+            let paces_a: i8 = self.into();
+            let paces_b: i8 = other.into();
             return (paces_a - paces_b);
+        } else if (!is_paces_a && !is_paces_b) {
+            // Blades vs Blades
+            if (self == Action::SlowBlade && other != Action::SlowBlade) {
+                // Slow attacks first for a chance of Execution!
+                return (-1);
+            }
+            if (other == Action::SlowBlade && self != Action::SlowBlade) {
+                // Slow attacks first for a chance of Execution!
+                return (1);
+            }
+        } else {
+            // Paces vs Blades (Flee)
         }
-
-        // TODO: Blades
 
         (0) // default in sync
     }
 
+    // returns true if ended in execution
     // TODO: Dojo 0.6.0: Use match
-    fn execute_crit(self: Action, ref attack: Shot, ref defense: Shot) {
+    fn execute_crit(self: Action, ref attack: Shot, ref defense: Shot) -> bool {
         // Lowest paces shoot first
         let paces: u8 = self.as_paces();
         if (paces != 0) {
             // pistols crit is execution
             defense.damage = constants::FULL_HEALTH;
-        } else {
-
+            return (true);
+        } else if (self == Action::SlowBlade) {
+            defense.damage = constants::FULL_HEALTH;
+            return (true);
+        } else if (self == Action::FastBlade) {
+            defense.damage = constants::DOUBLE_DAMAGE;
+        } else if (self == Action::Block) {
+            attack.block = constants::DOUBLE_DAMAGE;
         }
+        (false)
     }
 
     // TODO: Dojo 0.6.0: Use match
@@ -225,8 +247,12 @@ impl ActionTraitImpl of ActionTrait {
             } else {
                 defense.damage = constants::SINGLE_DAMAGE;
             }
-        } else {
-
+        } else if (self == Action::SlowBlade) {
+            defense.damage = constants::DOUBLE_DAMAGE;
+        } else if (self == Action::FastBlade) {
+            defense.damage = constants::SINGLE_DAMAGE;
+        } else if (self == Action::Block) {
+            attack.block = constants::SINGLE_DAMAGE;
         }
     }
 
@@ -257,6 +283,12 @@ impl ActionIntoU8 of Into<Action, u8> {
             Action::SlowBlade =>    ACTION::SLOW_BLADE,
             Action::Block =>        ACTION::BLOCK,
         }
+    }
+}
+impl ActionIntoI16 of Into<Action, i8> {
+    fn into(self: Action) -> i8 {
+        let action: u8 = self.into();
+        return action.try_into().unwrap();
     }
 }
 impl ActionIntoU16 of Into<Action, u16> {
@@ -293,6 +325,9 @@ impl U16IntoAction of Into<u16, Action> {
         return action.into();
     }
 }
+//
+// Print Trait
+//
 impl ActionIntoFelt252 of Into<Action, felt252> {
     fn into(self: Action) -> felt252 {
         match self {
