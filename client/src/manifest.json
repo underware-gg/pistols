@@ -949,7 +949,7 @@
     {
       "name": "pistols::systems::actions::actions",
       "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
-      "class_hash": "0x5d6882985873426f45d49d45d32888379ba0235aed9223cb2363848b54d8c7f",
+      "class_hash": "0x4992746fc4911de63f73e251308bd5e2a501e7a164d0d73a9df73209c7b2c3e",
       "abi": [
         {
           "type": "impl",
@@ -1352,7 +1352,7 @@
             },
             {
               "type": "function",
-              "name": "unpack_action_slotss",
+              "name": "unpack_action_slots",
               "inputs": [
                 {
                   "name": "packed",

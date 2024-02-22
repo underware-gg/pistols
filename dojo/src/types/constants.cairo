@@ -1,7 +1,7 @@
 
 mod constants {
     // number of rounds per duel
-    const ROUND_COUNT: u8 = 2;
+    const ROUND_COUNT: u8 = 3;
     
     // max honour of a player
     const FULL_HONOUR: u8 = 100;

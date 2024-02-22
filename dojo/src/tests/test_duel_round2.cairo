@@ -12,7 +12,7 @@ mod tests {
     use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::types::action::{Action, ACTION};
     use pistols::types::constants::{constants};
-    use pistols::systems::utils::{zero_address, make_action_hash};
+    use pistols::systems::utils::{zero_address, make_action_hash, pack_action_slots, unpack_action_slots};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::math::{MathU8};
     use pistols::tests::utils::{utils};
@@ -55,16 +55,16 @@ mod tests {
     fn _get_actions_round_2_resolved() -> (u64, u64, u8, u8, u64, u64) {
         let salt_a: u64 = SALT_1_a + 2;
         let salt_b: u64 = SALT_1_b;
-        let action_a: u8 = ACTION::SLOW_BLADE.into();
-        let action_b: u8 = ACTION::BLOCK.into();
+        let action_a: u8 = ACTION::FAST_BLADE.into();
+        let action_b: u8 = ACTION::IDLE.into();
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a.into()), make_action_hash(salt_b, action_b.into()))
     }
 
     fn _get_actions_round_2_draw() -> (u64, u64, u8, u8, u64, u64) {
         let salt_a: u64 = SALT_1_a + 1;
         let salt_b: u64 = SALT_1_b + 1;
-        let action_a: u8 = ACTION::SLOW_BLADE.into();
-        let action_b: u8 = ACTION::SLOW_BLADE.into();
+        let action_a: u8 = ACTION::FAST_BLADE.into();
+        let action_b: u8 = ACTION::FAST_BLADE.into();
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a.into()), make_action_hash(salt_b, action_b.into()))
     }
 
@@ -75,7 +75,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_dual_round_draw() {
+    fn test_blades_round_draw() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
 
@@ -84,8 +84,8 @@ mod tests {
         let steps_b = action_1_b;
         utils::execute_commit_action(system, owner, duel_id, 1, hash_1_a);
         utils::execute_commit_action(system, other, duel_id, 1, hash_1_b);
-        utils::execute_reveal_action(system, owner, duel_id, 1, salt_1_a, action_1_a);
-        utils::execute_reveal_action(system, other, duel_id, 1, salt_1_b, action_1_b);
+        utils::execute_reveal_action(system, owner, duel_id, 1, salt_1_a, action_1_a, 0);
+        utils::execute_reveal_action(system, other, duel_id, 1, salt_1_b, action_1_b, 0);
         let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
         assert(challenge.state == ChallengeState::InProgress.into(), '__challenge.state');
         assert(challenge.round_number == 2, '__challenge.round_number');
@@ -102,8 +102,8 @@ mod tests {
 
         utils::execute_commit_action(system, owner, duel_id, 2, hash_1_a);
         utils::execute_commit_action(system, other, duel_id, 2, hash_1_b);
-        utils::execute_reveal_action(system, owner, duel_id, 2, salt_1_a, action_1_a);
-        utils::execute_reveal_action(system, other, duel_id, 2, salt_1_b, action_1_b);
+        utils::execute_reveal_action(system, owner, duel_id, 2, salt_1_a, action_1_a, 0);
+        utils::execute_reveal_action(system, other, duel_id, 2, salt_1_b, action_1_b, 0);
         let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
         assert(challenge.state == ChallengeState::Draw.into(), '2__challenge.state');
         assert(challenge.round_number == 2, '2__challenge.round_number');
@@ -137,14 +137,14 @@ mod tests {
         let (salt_1_a, salt_1_b, action_1_a, action_1_b, hash_1_a, hash_1_b) = _get_actions_round_1_continue();
         utils::execute_commit_action(system, owner, duel_id, 1, hash_1_a);
         utils::execute_commit_action(system, other, duel_id, 1, hash_1_b);
-        utils::execute_reveal_action(system, owner, duel_id, 1, salt_1_a, action_1_a);
-        utils::execute_reveal_action(system, other, duel_id, 1, salt_1_b, action_1_b);
+        utils::execute_reveal_action(system, owner, duel_id, 1, salt_1_a, action_1_a, 0);
+        utils::execute_reveal_action(system, other, duel_id, 1, salt_1_b, action_1_b, 0);
 
         let (salt_1_a, salt_1_b, action_1_a, action_1_b, hash_1_a, hash_1_b) = _get_actions_round_2_draw();
         utils::execute_commit_action(system, owner, duel_id, 2, hash_1_a);
         utils::execute_commit_action(system, other, duel_id, 2, hash_1_b);
-        utils::execute_reveal_action(system, owner, duel_id, 2, salt_1_a, action_1_a);
-        utils::execute_reveal_action(system, other, duel_id, 2, salt_1_b, action_1_b);
+        utils::execute_reveal_action(system, owner, duel_id, 2, salt_1_a, action_1_a, 0);
+        utils::execute_reveal_action(system, other, duel_id, 2, salt_1_b, action_1_b, 0);
         let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
         assert(challenge.state == ChallengeState::Draw.into(), '2__challenge.state');
 
@@ -167,7 +167,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_dual_round_resolved() {
+    fn test_blades_round_resolved() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
 
@@ -177,9 +177,13 @@ mod tests {
 
         utils::execute_commit_action(system, owner, duel_id, 1, hash_1_a);
         utils::execute_commit_action(system, other, duel_id, 1, hash_1_b);
-        utils::execute_reveal_action(system, owner, duel_id, 1, salt_1_a, action_1_a);
-        utils::execute_reveal_action(system, other, duel_id, 1, salt_1_b, action_1_b);
-        let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
+        utils::execute_reveal_action(system, owner, duel_id, 1, salt_1_a, action_1_a, 0);
+        utils::execute_reveal_action(system, other, duel_id, 1, salt_1_b, action_1_b, 0);
+        let (challenge, mut round) = utils::get_Challenge_Round(world, duel_id);
+        // change round 1 results
+        round.shot_a.health = constants::SINGLE_DAMAGE;
+        round.shot_b.health = constants::SINGLE_DAMAGE;
+        set!(world, (round));
 // 'round_1'.print();
 // round.shot_a.health.print();
 // round.shot_b.health.print();
@@ -199,8 +203,8 @@ mod tests {
 
         utils::execute_commit_action(system, owner, duel_id, 2, hash_1_a);
         utils::execute_commit_action(system, other, duel_id, 2, hash_1_b);
-        utils::execute_reveal_action(system, owner, duel_id, 2, salt_1_a, action_1_a);
-        utils::execute_reveal_action(system, other, duel_id, 2, salt_1_b, action_1_b);
+        utils::execute_reveal_action(system, owner, duel_id, 2, salt_1_a, action_1_a, 0);
+        utils::execute_reveal_action(system, other, duel_id, 2, salt_1_b, action_1_b, 0);
         let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
 // 'round_2'.print();
 // round.shot_a.health.print();
@@ -234,18 +238,18 @@ mod tests {
             assert(duelist_b.total_wins == 0, 'a_win_duelist_b.total_wins');
             assert(duelist_a.total_losses == 0, 'a_win_duelist_a.total_losses');
             assert(duelist_b.total_losses == 1, 'a_win_duelist_b.total_losses');
-            assert(round.shot_a.damage < constants::FULL_HEALTH, 'a_win_damage_a');
+            assert(round.shot_a.damage == 0, 'a_win_damage_a');
             assert(round.shot_a.health > 0, 'a_win_health_a');
-            assert(round.shot_b.damage == constants::FULL_HEALTH, 'a_win_damage_b');
+            assert(round.shot_b.damage > 0, 'a_win_damage_b');
             assert(round.shot_b.health == 0, 'a_win_health_b');
         } else if (challenge.winner == 2) {
             assert(duelist_a.total_wins == 0, 'b_win_duelist_a.total_wins');
             assert(duelist_b.total_wins == 1, 'b_win_duelist_b.total_wins');
             assert(duelist_a.total_losses == 1, 'b_win_duelist_a.total_losses');
             assert(duelist_b.total_losses == 0, 'b_win_duelist_b.total_losses');
-            assert(round.shot_b.damage < constants::FULL_HEALTH, 'b_win_damage_b');
+            assert(round.shot_b.damage == 0, 'b_win_damage_b');
             assert(round.shot_b.health > 0, 'b_win_health_b');
-            assert(round.shot_a.damage == constants::FULL_HEALTH, 'b_win_damage_a');
+            assert(round.shot_a.damage > 0, 'b_win_damage_a');
             assert(round.shot_a.health == 0, 'b_win_health_a');
         } else {
             assert(false, 'bad winner')
@@ -269,8 +273,8 @@ mod tests {
 
     fn _execute_blades(
         world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress,
-        health_a: u8, blade_a: u8,
-        health_b: u8, blade_b: u8,
+        health_a: u8, slot1_a: u8, slot2_a: u8,
+        health_b: u8, slot1_b: u8, slot2_b: u8,
         blades_salt: u64,
     ) -> (Challenge, Round) {
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
@@ -278,8 +282,8 @@ mod tests {
         let (salt_1_a, salt_1_b, action_1_a, action_1_b, hash_1_a, hash_1_b) = _get_actions_round_1_continue();
         utils::execute_commit_action(system, owner, duel_id, 1, hash_1_a);
         utils::execute_commit_action(system, other, duel_id, 1, hash_1_b);
-        utils::execute_reveal_action(system, owner, duel_id, 1, salt_1_a, action_1_a);
-        utils::execute_reveal_action(system, other, duel_id, 1, salt_1_b, action_1_b);
+        utils::execute_reveal_action(system, owner, duel_id, 1, salt_1_a, action_1_a, 0);
+        utils::execute_reveal_action(system, other, duel_id, 1, salt_1_b, action_1_b, 0);
         let (challenge, mut round) = utils::get_Challenge_Round(world, duel_id);
         assert(challenge.round_number == 2, 'C: needs 2 rounds');
         assert(round.round_number == 2, 'R: needs 2 rounds');
@@ -290,12 +294,12 @@ mod tests {
         // run 2nd round
         let salt_a: u64 = blades_salt;
         let salt_b: u64 = SALT_1_b;
-        let hash_a: u64 = make_action_hash(salt_a, blade_a.into());
-        let hash_b: u64 = make_action_hash(salt_b, blade_b.into());
+        let hash_a: u64 = make_action_hash(salt_a, pack_action_slots(slot1_a, slot2_a));
+        let hash_b: u64 = make_action_hash(salt_b, pack_action_slots(slot1_b, slot2_b));
         utils::execute_commit_action(system, owner, duel_id, 2, hash_a);
         utils::execute_commit_action(system, other, duel_id, 2, hash_b);
-        utils::execute_reveal_action(system, owner, duel_id, 2, salt_a, blade_a.into());
-        utils::execute_reveal_action(system, other, duel_id, 2, salt_b, blade_b.into());
+        utils::execute_reveal_action(system, owner, duel_id, 2, salt_a, slot1_a, slot2_a);
+        utils::execute_reveal_action(system, other, duel_id, 2, salt_b, slot1_b, slot2_b);
         // return results
         let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
 // salt_a.print();
@@ -312,8 +316,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
-            constants::FULL_HEALTH, ACTION::SLOW_BLADE,
-            constants::FULL_HEALTH, ACTION::SLOW_BLADE,
+            constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
+            constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
             SALT_DUAL_HIT,
         );
         assert(challenge.state == ChallengeState::Draw.into(), 'wrong sate');
@@ -348,8 +352,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
-            constants::DOUBLE_DAMAGE, ACTION::SLOW_BLADE,
-            constants::DOUBLE_DAMAGE, ACTION::SLOW_BLADE,
+            constants::DOUBLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
+            constants::DOUBLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
             SALT_DUAL_HIT,
         );
         assert(challenge.winner == 0, 'wrong winner');
@@ -366,8 +370,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
-            constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, // duelist_a
-            constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, // duelist_b
+            constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
+            constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
             SALT_DUAL_HIT,
         );
         assert(challenge.winner == 0, 'bad winner');
@@ -383,8 +387,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
-            constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, // duelist_a
-            constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, // duelist_b
+            constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
+            constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
             SALT_HIT_MISS,
         );
         assert(challenge.winner == 1, 'bad winner');
@@ -398,8 +402,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
-            constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, // duelist_a
-            constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, // duelist_b
+            constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
+            constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
             SALT_CRIT_MISS,
         );
         assert(challenge.winner == 1, 'bad winner');
@@ -413,8 +417,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
-            constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, // duelist_a
-            constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, // duelist_b
+            constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
+            constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
             SALT_MISS_HIT,
         );
         assert(challenge.winner == 2, 'bad winner');
@@ -428,8 +432,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
-            constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, // duelist_a
-            constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, // duelist_b
+            constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
+            constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
             SALT_MISS_CRIT,
         );
         assert(challenge.winner == 2, 'bad winner');
@@ -444,8 +448,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
-            constants::SINGLE_DAMAGE, ACTION::FAST_BLADE,
-            constants::SINGLE_DAMAGE, ACTION::BLOCK,
+            constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
+            constants::SINGLE_DAMAGE, ACTION::BLOCK, ACTION::IDLE,
             SALT_DUAL_HIT,
         );
         assert(challenge.winner == 0, 'wrong winner');
@@ -457,8 +461,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
-            constants::SINGLE_DAMAGE, ACTION::BLOCK,
-            constants::SINGLE_DAMAGE, ACTION::FAST_BLADE,
+            constants::SINGLE_DAMAGE, ACTION::BLOCK, ACTION::IDLE,
+            constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
             SALT_DUAL_HIT,
         );
         assert(challenge.winner == 0, 'wrong winner');
@@ -473,8 +477,8 @@ mod tests {
     //     let (world, system, owner, other) = utils::setup_world();
     //     let (challenge, round) = _execute_blades(
     //         world, system, owner, other,
-    //         constants::FULL_HEALTH, ACTION::FAST_BLADE,
-    //         constants::SINGLE_DAMAGE, ACTION::SLOW_BLADE,
+    //         constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
+    //         constants::SINGLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
     //     );
     //     assert(challenge.winner == 1, 'wrong winner');
     //     assert(round.shot_a.health == constants::FULL_HEALTH, 'bad health_a');
@@ -486,8 +490,8 @@ mod tests {
     //     let (world, system, owner, other) = utils::setup_world();
     //     let (challenge, round) = _execute_blades(
     //         world, system, owner, other,
-    //         constants::FULL_HEALTH, ACTION::FAST_BLADE,
-    //         constants::FULL_HEALTH, ACTION::SLOW_BLADE,
+    //         constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
+    //         constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
     //     );
     //     assert(challenge.winner == 2, 'wrong winner');
     //     assert(round.shot_a.health == 0, 'bad health_a');
@@ -499,8 +503,8 @@ mod tests {
     //     let (world, system, owner, other) = utils::setup_world();
     //     let (challenge, round) = _execute_blades(
     //         world, system, owner, other,
-    //         constants::SINGLE_DAMAGE, ACTION::SLOW_BLADE,
-    //         constants::FULL_HEALTH, ACTION::FAST_BLADE,
+    //         constants::SINGLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
+    //         constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
     //     );
     //     assert(challenge.winner == 2, 'wrong winner');
     //     assert(round.shot_a.health == 0, 'bad health_a');
@@ -512,8 +516,8 @@ mod tests {
     //     let (world, system, owner, other) = utils::setup_world();
     //     let (challenge, round) = _execute_blades(
     //         world, system, owner, other,
-    //         constants::FULL_HEALTH, ACTION::SLOW_BLADE,
-    //         constants::FULL_HEALTH, ACTION::FAST_BLADE,
+    //         constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
+    //         constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
     //     );
     //     assert(challenge.winner == 1, 'wrong winner');
     //     assert(round.shot_a.health == constants::SINGLE_DAMAGE, 'bad health_a');
@@ -526,8 +530,8 @@ mod tests {
     //     let (world, system, owner, other) = utils::setup_world();
     //     let (challenge, round) = _execute_blades(
     //         world, system, owner, other,
-    //         constants::FULL_HEALTH, ACTION::SLOW_BLADE,
-    //         constants::FULL_HEALTH, ACTION::BLOCK,
+    //         constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
+    //         constants::FULL_HEALTH, ACTION::IDLE, ACTION::BLOCK,
     //     );
     //     assert(challenge.winner == 1, 'wrong winner');
     //     assert(round.shot_a.health == constants::FULL_HEALTH, 'bad health_a');
@@ -539,8 +543,8 @@ mod tests {
     //     let (world, system, owner, other) = utils::setup_world();
     //     let (challenge, round) = _execute_blades(
     //         world, system, owner, other,
-    //         constants::FULL_HEALTH, ACTION::BLOCK,
-    //         constants::FULL_HEALTH, ACTION::SLOW_BLADE,
+    //         constants::FULL_HEALTH, ACTION::IDLE, ACTION::BLOCK,
+    //         constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
     //     );
     //     assert(challenge.winner == 2, 'wrong winner');
     //     assert(round.shot_a.health == 0, 'bad health_a');

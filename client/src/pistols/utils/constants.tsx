@@ -3,7 +3,7 @@
 //
 
 const constants = {
-  ROUND_COUNT: 2,
+  ROUND_COUNT: 3,
   FULL_HONOUR: 100,
   FULL_HEALTH: 3,
   DOUBLE_DAMAGE: 2,

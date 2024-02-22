@@ -5,7 +5,7 @@ mod shooter {
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     use pistols::systems::{utils};
-    use pistols::models::models::{Challenge, Round, Shot};
+    use pistols::models::models::{init, Challenge, Round, Shot};
     use pistols::types::constants::{constants};
     use pistols::types::challenge::{ChallengeState};
     use pistols::types::round::{RoundState};
@@ -75,9 +75,17 @@ mod shooter {
         // Validate action hash
         let hash: u64 = utils::make_action_hash(salt, packed);
 
-        // validate action
-        // if invalid, set as 0 (idle, will skip round)
-        packed = validated_action(round_number, packed);
+        // validate stored actions
+        if (!utils::validate_packed_actions(round_number, packed)) {
+            // since the hash is validated, we cant throw an error and go back
+            packed = if (round_number == 1) {
+                // do 10 paces
+                (ACTION::PACES_10.into())
+            } else {
+                // set as Idle, player will stand still and hopefully die
+                (ACTION::IDLE.into())
+            }
+        }
 
         // Store action
         if (duelist_number == 1) {
@@ -92,42 +100,68 @@ mod shooter {
             round.shot_b.action = packed;
         }
 
-        // Finishes round if both actions are revealed
-        if (round.shot_a.salt > 0 && round.shot_b.salt > 0) {
-            process_round(world, ref challenge, ref round);
-            // update Round first, Challenge may need it
+        // incomplete Round, update only
+        if (round.shot_a.salt == 0 || round.shot_b.salt == 0) {
             set!(world, (round));
-            // update Challenge
-            utils::set_challenge(world, challenge);
-        } else {
-            // update Round only
-            set!(world, (round));
+            return;
         }
-    }
 
-    // Validates a action and returns it
-    fn validated_action(round_number: u8, packed: u16) -> u16 {
-        // too expensive?
-        // if (utils::validate_packed_actions(round_number, packed)) {
-        //     (packed)
-        // } else {
-        //     (ACTION::IDLE.into()) // invalid
-        // }
-        if (round_number <= constants::ROUND_COUNT) {
-            let action: Action = packed.into();
-            if (round_number == 1) {
-                if (action.is_paces()) { return (packed); }
-            } else {
-                if (action.is_blades()) { return (packed); }
+        // Process round when both actions are revealed
+        if (round_number == 1) {
+            process_round(world, ref challenge, ref round, false);
+        } else {
+            // split packed action slots
+            let (slot1_a, slot1_b, slot2_a, slot2_b): (u8, u8, u8, u8) = utils::unpack_round_slots(round);
+            round.shot_a.action = slot1_a.into();
+            round.shot_b.action = slot1_b.into();
+            let is_last_round: bool = (slot2_a == 0 && slot2_b == 0);
+            process_round(world, ref challenge, ref round, is_last_round);
+            // open Round 3 if not over
+            if (challenge.state == ChallengeState::InProgress.into()) {
+                // TODO: move this to init::
+                let mut round3 = Round {
+                    duel_id: challenge.duel_id,
+                    round_number: challenge.round_number,
+                    state: RoundState::Reveal.into(),
+                    shot_a: Shot {
+                        hash: 0,
+                        salt: (round.shot_a.salt ^round.shot_a.hash),
+                        action: slot2_a.into(),
+                        chance_crit: 0,
+                        chance_hit: 0,
+                        dice_crit: 0,
+                        dice_hit: 0,
+                        damage: 0,
+                        block: 0,
+                        health: round.shot_a.health,
+                        honour: round.shot_a.honour,
+                    },
+                    shot_b: Shot {
+                        hash: 0,
+                        salt: (round.shot_b.salt ^round.shot_b.hash),
+                        action: slot2_b.into(),
+                        chance_crit: 0,
+                        chance_hit: 0,
+                        dice_crit: 0,
+                        dice_hit: 0,
+                        damage: 0,
+                        block: 0,
+                        health: round.shot_b.health,
+                        honour: round.shot_b.honour,
+                    },
+                };
+                process_round(world, ref challenge, ref round, true);
             }
         }
-        (ACTION::IDLE.into()) // invalid
+        
+        // update Challenge
+        utils::set_challenge(world, challenge);
     }
 
     //---------------------------------------
     // Decide who wins a round, or go to next
     //
-    fn process_round(world: IWorldDispatcher, ref challenge: Challenge, ref round: Round) {
+    fn process_round(world: IWorldDispatcher, ref challenge: Challenge, ref round: Round, is_last_round: bool) {
         let action_a: Action = apply_action_honour(ref round.shot_a);
         let action_b: Action = apply_action_honour(ref round.shot_b);
         
@@ -155,7 +189,7 @@ mod shooter {
             end_challenge(ref challenge, ChallengeState::Resolved, 1);
         } else {
             // both alive!
-            if (challenge.round_number == constants::ROUND_COUNT) {
+            if (challenge.round_number == constants::ROUND_COUNT || is_last_round) {
                 // end in a Draw
                 end_challenge(ref challenge, ChallengeState::Draw, 0);
             } else {
@@ -166,6 +200,7 @@ mod shooter {
 
         // Finish round
         round.state = RoundState::Finished.into();
+        set!(world, (round));
     }
 
     fn apply_action_honour(ref shot: Shot) -> Action {
@@ -261,54 +296,6 @@ mod tests {
     use pistols::types::action::{Action, ACTION};
     use pistols::types::constants::{constants};
     use pistols::systems::{utils};
-
-    #[test]
-    #[available_gas(1_000_000_000)]
-    fn test_validated_action() {
-        assert(shooter::validated_action(1, 0) == 0, '1_0');
-        assert(shooter::validated_action(1, 1) == 1, '1_1');
-        assert(shooter::validated_action(1, 10) == 10, '1_10');
-        assert(shooter::validated_action(1, 11) == 0, '1_11');
-        let mut round: u8 = 2;
-        loop {
-            // invalids
-            assert(shooter::validated_action(round, ACTION::IDLE.into()) == ACTION::IDLE.into(), '2_IDLE');
-            assert(shooter::validated_action(round, 10) == ACTION::IDLE.into(), '2_10');
-            // valids
-            if (round <= constants::ROUND_COUNT) {
-                assert(shooter::validated_action(round, ACTION::SLOW_BLADE.into()) == ACTION::SLOW_BLADE.into(), '2_HEAVY');
-                assert(shooter::validated_action(round, ACTION::FAST_BLADE.into()) == ACTION::FAST_BLADE.into(), '2_LIGHT');
-                assert(shooter::validated_action(round, ACTION::BLOCK.into()) == ACTION::BLOCK.into(), '2_BLOCK');
-            } else {
-                assert(shooter::validated_action(round, ACTION::SLOW_BLADE.into()) == ACTION::IDLE.into(), '2_HEAVY+IDLE');
-                assert(shooter::validated_action(round, ACTION::FAST_BLADE.into()) == ACTION::IDLE.into(), '2_LIGHT+IDLE');
-                assert(shooter::validated_action(round, ACTION::BLOCK.into()) == ACTION::IDLE.into(), '2_BLOCK+IDLE');
-            }
-            if(round > constants::ROUND_COUNT) { break; }
-            round += 1;
-        }
-    }
-
-    #[test]
-    #[available_gas(1_000_000_000)]
-    fn test_validate_validated_action() {
-        let mut round_number: u8 = 1;
-        loop {
-            if (round_number > constants::ROUND_COUNT) { break; }
-            //---
-            let valid_actions = utils::get_valid_packed_actions(round_number);
-            let mut len: usize = valid_actions.len();
-            let mut n: usize = 0;
-            loop {
-                if (n == len) { break; }
-                let action: u16 = *valid_actions.at(n);
-                assert(shooter::validated_action(round_number, action) == action, '_validated?');
-                n += 1;
-            };
-            //---
-            round_number += 1;
-        };
-    }
 
     #[test]
     #[available_gas(1_000_000)]

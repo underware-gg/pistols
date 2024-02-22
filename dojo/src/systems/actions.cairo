@@ -52,7 +52,7 @@ trait IActions<TContractState> {
 
     fn get_valid_packed_actions(self: @TContractState, round_number: u8) -> Array<u16>;
     fn pack_action_slots(self: @TContractState, slot1: u8, slot2: u8) -> u16;
-    fn unpack_action_slotss(self: @TContractState, packed: u16) -> (u8, u8);
+    fn unpack_action_slots(self: @TContractState, packed: u16) -> (u8, u8);
 }
 
 #[dojo::contract]
@@ -254,8 +254,8 @@ mod actions {
         fn pack_action_slots(self: @ContractState, slot1: u8, slot2: u8) -> u16 {
             (utils::pack_action_slots(slot1, slot2))
         }
-        fn unpack_action_slotss(self: @ContractState, packed: u16) -> (u8, u8) {
-            (utils::unpack_action_slotss(packed))
+        fn unpack_action_slots(self: @ContractState, packed: u16) -> (u8, u8) {
+            (utils::unpack_action_slots(packed))
         }
     }
 }

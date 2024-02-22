@@ -42,6 +42,11 @@ fn make_pact_pair(duelist_a: ContractAddress, duelist_b: ContractAddress) -> u12
     (aa.low ^ bb.low)
 }
 
+
+//------------------------
+// Action validators
+//
+
 fn get_valid_packed_actions(round_number: u8) -> Array<u16> {
     if (round_number == 1) {
         (array![
@@ -59,18 +64,18 @@ fn get_valid_packed_actions(round_number: u8) -> Array<u16> {
     } else if (round_number == 2) {
         (array![
             // 2 slots
-            pack_action_slots(ACTION::IDLE, ACTION::SLOW_BLADE),
             pack_action_slots(ACTION::FAST_BLADE, ACTION::FAST_BLADE),
             pack_action_slots(ACTION::FAST_BLADE, ACTION::BLOCK),
             pack_action_slots(ACTION::BLOCK, ACTION::FAST_BLADE),
             pack_action_slots(ACTION::BLOCK, ACTION::BLOCK),
-            // 1 slot
-            pack_action_slots(ACTION::SLOW_BLADE, ACTION::IDLE),
-            pack_action_slots(ACTION::FAST_BLADE, ACTION::IDLE),
-            pack_action_slots(ACTION::BLOCK, ACTION::IDLE),
+            // slot 2 only
+            pack_action_slots(ACTION::IDLE, ACTION::SLOW_BLADE),
             pack_action_slots(ACTION::IDLE, ACTION::FAST_BLADE),
             pack_action_slots(ACTION::IDLE, ACTION::BLOCK),
-            // Zero slots (stand still)
+            // slot 1 only
+            pack_action_slots(ACTION::FAST_BLADE, ACTION::IDLE),
+            pack_action_slots(ACTION::BLOCK, ACTION::IDLE),
+            // no action (stand still and wait to die)
             0,
         ])
     } else {
@@ -92,10 +97,20 @@ fn validate_packed_actions(round_number: u8, packed: u16) -> bool {
 fn pack_action_slots(slot1: u8, slot2: u8) -> u16 {
     ((slot2.into() * 0x100) | slot1.into())
 }
-fn unpack_action_slotss(packed: u16) -> (u8, u8) {
+fn unpack_action_slots(packed: u16) -> (u8, u8) {
     let slot1: u8 = (packed & 0xff).try_into().unwrap();
     let slot2: u8 = ((packed & 0xff00) / 0x100).try_into().unwrap();
     (slot1, slot2)
+}
+fn unpack_round_slots(round: Round) -> (u8, u8, u8, u8) {
+    let (slot1_a, slot2_a): (u8, u8) = unpack_action_slots(round.shot_a.action);
+    let (slot1_b, slot2_b): (u8, u8) = unpack_action_slots(round.shot_b.action);
+    if (slot1_a == 0 && slot1_b == 0) {
+        // if slot 1 is empty, use only slot 2
+        (slot2_a, slot2_b, 0, 0)
+    } else {
+        (slot1_a, slot1_b, slot2_a, slot2_b)
+    }
 }
 
 
@@ -249,6 +264,7 @@ mod tests {
     use starknet::{ContractAddress};
 
     use pistols::systems::{utils};
+    use pistols::models::models::{init, Round, Shot};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::constants::{constants, chances};
     use pistols::types::action::{ACTION};
@@ -331,11 +347,50 @@ mod tests {
 
     #[test]
     #[available_gas(100_000_000)]
-    fn test_slot_packing() {
+    fn test_slot_packing_actions() {
         let packed = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::FAST_BLADE);
-        let (slot1, slot2) = utils::unpack_action_slotss(packed);
+        let (slot1, slot2) = utils::unpack_action_slots(packed);
         assert(slot1 == ACTION::SLOW_BLADE, 'slot1');
         assert(slot2 == ACTION::FAST_BLADE, 'slot2');
+    }
+
+    #[test]
+    #[available_gas(100_000_000)]
+    fn test_slot_packing_round() {
+        let mut round = Round {
+            duel_id: 1,
+            round_number: 1,
+            state: 1,
+            shot_a: init::Shot(),
+            shot_b: init::Shot(),
+        };
+        // full
+        round.shot_a.action = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::BLOCK);
+        round.shot_b.action = utils::pack_action_slots(ACTION::FAST_BLADE, ACTION::PACES_1);
+        let packed = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::FAST_BLADE);
+        let (slot1_a, slot1_b, slot2_a, slot2_b): (u8, u8, u8, u8) = utils::unpack_round_slots(round);
+        assert(slot1_a == ACTION::SLOW_BLADE, 'slot1_a');
+        assert(slot1_b == ACTION::FAST_BLADE, 'slot1_b');
+        assert(slot2_a == ACTION::BLOCK, 'slot2_a');
+        assert(slot2_b == ACTION::PACES_1, 'slot2_b');
+        // slot 1 only
+        round.shot_a.action = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::IDLE);
+        round.shot_b.action = utils::pack_action_slots(ACTION::FAST_BLADE, ACTION::IDLE);
+        let packed = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::FAST_BLADE);
+        let (slot1_a, slot1_b, slot2_a, slot2_b): (u8, u8, u8, u8) = utils::unpack_round_slots(round);
+        assert(slot1_a == ACTION::SLOW_BLADE, 'slot1_a');
+        assert(slot1_b == ACTION::FAST_BLADE, 'slot1_b');
+        assert(slot2_a == ACTION::IDLE, 'slot2_a');
+        assert(slot2_b == ACTION::IDLE, 'slot2_b');
+        // slot 2 only
+        round.shot_a.action = utils::pack_action_slots(ACTION::IDLE, ACTION::SLOW_BLADE);
+        round.shot_b.action = utils::pack_action_slots(ACTION::IDLE, ACTION::FAST_BLADE);
+        let packed = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::FAST_BLADE);
+        let (slot1_a, slot1_b, slot2_a, slot2_b): (u8, u8, u8, u8) = utils::unpack_round_slots(round);
+        assert(slot1_a == ACTION::SLOW_BLADE, 'slot1_a');
+        assert(slot1_b == ACTION::FAST_BLADE, 'slot1_b');
+        assert(slot2_a == ACTION::IDLE, 'slot2_a');
+        assert(slot2_b == ACTION::IDLE, 'slot2_b');
     }
 
 }

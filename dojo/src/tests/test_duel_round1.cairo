@@ -120,7 +120,7 @@ mod tests {
         assert(round.shot_b.hash == hash_b, '2__hash');
 
         // 1st reveal
-        utils::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a);
+        utils::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a, 0);
         let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
         assert(challenge.round_number == 1, '3_challenge.round_number');
         assert(round.round_number == 1, '3__round.round_number');
@@ -130,7 +130,7 @@ mod tests {
         assert(round.shot_a.action == action_a.into(), '3__action');
 
         // 2nd reveal > Finished
-        utils::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b);
+        utils::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b, 0);
         let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
 // round.shot_a.health.print();
 // round.shot_b.health.print();
@@ -192,8 +192,8 @@ mod tests {
         // invert player order just for fun, expect same results!
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
-        utils::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b);
-        utils::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a);
+        utils::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b, 0);
+        utils::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a, 0);
         let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
         assert(challenge.state == ChallengeState::Resolved.into(), '4_challenge.state');
         assert(challenge.winner != 0, '4_challenge.winner');
@@ -241,8 +241,8 @@ mod tests {
 
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
-        utils::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a);
-        utils::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b);
+        utils::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a, 0);
+        utils::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b, 0);
         let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
 // round.shot_a.health.print();
 // round.shot_b.health.print();
@@ -327,8 +327,8 @@ mod tests {
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
-        utils::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a);
-        utils::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a);
+        utils::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a, 0);
+        utils::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a, 0);
     }
     #[test]
     #[available_gas(1_000_000_000)]
@@ -339,8 +339,8 @@ mod tests {
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
-        utils::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b);
-        utils::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b);
+        utils::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b, 0);
+        utils::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b, 0);
     }
 
     #[test]
@@ -363,7 +363,7 @@ mod tests {
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
-        utils::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b);
+        utils::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b, 0);
     }
 
     #[test]
@@ -388,8 +388,8 @@ mod tests {
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
-        utils::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b);
-        utils::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a);
+        utils::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b, 0);
+        utils::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a, 0);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
     }
 
@@ -402,9 +402,9 @@ mod tests {
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
-        utils::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b);
-        utils::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a);
-        utils::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a);
+        utils::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b, 0);
+        utils::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a, 0);
+        utils::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a, 0);
     }
 
     #[test]
@@ -417,7 +417,7 @@ mod tests {
         let hash_b: u64 = make_action_hash(0x222, 1);
         utils::execute_commit_action(system, other, duel_id, 1, hash_a);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_b);
-        utils::execute_reveal_action(system, owner, duel_id, 1, 0x111, 2);
+        utils::execute_reveal_action(system, owner, duel_id, 1, 0x111, 2, 0);
     }
     #[test]
     #[available_gas(1_000_000_000)]
@@ -429,7 +429,7 @@ mod tests {
         let hash_b: u64 = make_action_hash(0x222, 1);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_b);
         utils::execute_commit_action(system, other, duel_id, 1, hash_a);
-        utils::execute_reveal_action(system, owner, duel_id, 1, 0x1111, 1);
+        utils::execute_reveal_action(system, owner, duel_id, 1, 0x1111, 1, 0);
     }
 
     #[test]
@@ -442,7 +442,7 @@ mod tests {
         let hash_b: u64 = make_action_hash(0x222, 1);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_b);
         utils::execute_commit_action(system, other, duel_id, 1, hash_a);
-        utils::execute_reveal_action(system, other, duel_id, 1, 0x222, 2);
+        utils::execute_reveal_action(system, other, duel_id, 1, 0x222, 2, 0);
     }
     #[test]
     #[available_gas(1_000_000_000)]
@@ -454,7 +454,7 @@ mod tests {
         let hash_b: u64 = make_action_hash(0x222, 1);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_b);
         utils::execute_commit_action(system, other, duel_id, 1, hash_a);
-        utils::execute_reveal_action(system, other, duel_id, 1, 0x2222, 1);
+        utils::execute_reveal_action(system, other, duel_id, 1, 0x2222, 1, 0);
     }
 
     #[test]
@@ -466,15 +466,15 @@ mod tests {
         let hash_b: u64 = make_action_hash(0x222, 11);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
-        utils::execute_reveal_action(system, owner, duel_id, 1, 0x111, 0);
-        utils::execute_reveal_action(system, other, duel_id, 1, 0x222, 11);
+        utils::execute_reveal_action(system, owner, duel_id, 1, 0x111, 0, 0);
+        utils::execute_reveal_action(system, other, duel_id, 1, 0x222, 11, 0);
         let round: Round = utils::get_Round(world, duel_id, 1);
-        assert(round.shot_a.action == 0, 'action_0');
-        assert(round.shot_b.action == 0, 'action_11');
-        assert(round.shot_a.dice_crit == 0, 'a_dice_crit');
-        assert(round.shot_b.dice_crit == 0, 'b_dice_crit');
-        assert(round.shot_a.dice_hit == 0, 'a_dice_hit');
-        assert(round.shot_b.dice_hit == 0, 'b_dice_hit');
+        assert(round.shot_a.action == 10, 'action_0');
+        assert(round.shot_b.action == 10, 'action_11');
+        assert(round.shot_a.chance_crit > 0, 'a_dice_hit');
+        assert(round.shot_b.chance_crit > 0, 'b_dice_hit');
+        assert(round.shot_a.dice_crit > 0, 'a_dice_crit');
+        assert(round.shot_b.dice_crit > 0, 'b_dice_crit');
     }
 
     #[test]
@@ -486,7 +486,7 @@ mod tests {
         let hash_b: u64 = make_action_hash(0x222, 1);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
-        utils::execute_reveal_action(system, owner, duel_id, 1, 0x111, 10);
+        utils::execute_reveal_action(system, owner, duel_id, 1, 0x111, 10, 0);
         let duelist_a_before = utils::get_Duelist(world, owner);
         utils::execute_register_duelist(system, owner, 'dssadsa', 3);
         let duelist_a_after = utils::get_Duelist(world, owner);

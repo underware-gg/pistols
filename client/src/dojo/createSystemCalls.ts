@@ -123,9 +123,9 @@ export function createSystemCalls(
     const result = await _executeCall('pack_action_slots', args)
     return result !== null ? Number(result) : null
   }
-  const unpack_action_slotss = async (packed: number): Promise<number[] | null> => {
+  const unpack_action_slots = async (packed: number): Promise<number[] | null> => {
     const args = [packed]
-    const result = await _executeCall('unpack_action_slotss', args)
+    const result = await _executeCall('unpack_action_slots', args)
     return result !== null ? result.map((v: BigNumberish) => Number(v)) : null
   }
 
@@ -145,7 +145,7 @@ export function createSystemCalls(
     get_duelist_action_honour,
     get_valid_packed_actions,
     pack_action_slots,
-    unpack_action_slotss,
+    unpack_action_slots,
   }
 }
 

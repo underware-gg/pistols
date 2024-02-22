@@ -105,10 +105,11 @@ mod utils {
         duel_id: u128,
         round_number: u8,
         salt: u64,
-        action: u8,
+        slot1: u8,
+        slot2: u8,
     ) {
         testing::set_contract_address(sender);
-        system.reveal_action(duel_id, round_number, salt, action, 0);
+        system.reveal_action(duel_id, round_number, salt, slot1, slot2);
         _next_block();
     }
 
