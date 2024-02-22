@@ -60,7 +60,7 @@ mod tests {
     const SALT_CRIT_MISS: u64 = 0xdfdfdf; // 3,0
     const SALT_MISS_CRIT: u64 = 0xaaaaa; // 0,3
     const SALT_CRIT_HIT: u64 = 0x1111; // 1,0
-// const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
+const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
 
     fn _execute_blades(
         world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress,
@@ -102,6 +102,39 @@ mod tests {
     }
 
 
+    //-----------------------------------------
+    // New dices per round
+    //
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_dices() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
+            constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
+            SALT_DUAL_MISS,
+        );
+        assert(challenge.winner == 0, 'wrong winner');
+        assert(challenge.round_number == 3, 'ends on round 3');
+        let round2: Round = utils::get_Round(world, challenge.duel_id, 2);
+        let round3: Round = utils::get_Round(world, challenge.duel_id, 3);
+        // crit
+        assert(round2.shot_a.dice_crit > 0, 'round2.shot_a.dice_crit');
+        assert(round3.shot_a.dice_crit > 0, 'round3.shot_a.dice_crit');
+        assert(round3.shot_a.dice_crit != round2.shot_a.dice_crit, 'shot_a.dice_crit !=');
+        assert(round2.shot_b.dice_crit > 0, 'round2.shot_b.dice_crit');
+        assert(round3.shot_b.dice_crit > 0, 'round3.shot_b.dice_crit');
+        assert(round3.shot_b.dice_crit != round2.shot_b.dice_crit, 'shot_b.dice_crit !=');
+        // hit
+        assert(round2.shot_a.dice_hit > 0, 'round2.shot_a.dice_hit');
+        assert(round3.shot_a.dice_hit > 0, 'round3.shot_a.dice_hit');
+        assert(round3.shot_a.dice_hit != round2.shot_a.dice_hit, 'shot_a.dice_hit !=');
+        assert(round2.shot_b.dice_hit > 0, 'round2.shot_b.dice_hit');
+        assert(round3.shot_b.dice_hit > 0, 'round3.shot_b.dice_hit');
+        assert(round3.shot_b.dice_hit != round2.shot_b.dice_hit, 'shot_b.dice_hit !=');
+    }
 
     //-----------------------------------------
     // Blades Combinations
@@ -109,7 +142,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_blade_heavy_vs_heavy_draw() {
+    fn test_slow_vs_slow_draw() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
@@ -119,6 +152,8 @@ mod tests {
         );
         assert(challenge.state == ChallengeState::Draw.into(), 'wrong sate');
         assert(challenge.winner == 0, 'wrong winner');
+        assert(challenge.round_number == 2, 'ends on round 2');
+        assert(round.round_number == 2, 'ends on round 2');
         assert(round.shot_a.damage == constants::DOUBLE_DAMAGE, 'bad shot_a.damage');
         assert(round.shot_a.health == constants::SINGLE_DAMAGE, 'bad health_a');
         assert(round.shot_b.damage == constants::DOUBLE_DAMAGE, 'bad shot_b.damage');
@@ -127,13 +162,13 @@ mod tests {
 
     // #[test]
     // #[available_gas(1_000_000_000)]
-    // fn test_blade_heavy_vs_heavy_suicide_pact() {
+    // fn test_slow_vs_slow_suicide_pact() {
     //     let (world, system, owner, other) = utils::setup_world();
     //     let (challenge, round) = _execute_blades(
     //         world, system, owner, other,
     //         constants::FULL_HEALTH, ACTION::SLOW_BLADE,
     //         constants::FULL_HEALTH, ACTION::SLOW_BLADE,
-    //         SALT_DUAL_CRIT,
+    //         SALT_DUAL_CRIT, // NEED THIS!!!!
     //     );
     //     assert(challenge.winner == 0, 'wrong winner');
     //     assert(challenge.state == ChallengeState::Draw.into(), 'wrong sate');
@@ -145,7 +180,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_blade_heavy_vs_heavy_suicide_pact() {
+    fn test_slow_vs_slow_suicide_pact() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
@@ -163,7 +198,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_blade_light_vs_light_draw() {
+    fn test_fast_vs_fast_draw() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
@@ -180,7 +215,7 @@ mod tests {
     }
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_blade_light_vs_light_hit_a() {
+    fn test_fast_vs_fast_hit_a() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
@@ -195,7 +230,7 @@ mod tests {
     }
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_blade_light_vs_light_crit_a() {
+    fn test_fast_vs_fast_crit_a() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
@@ -210,7 +245,7 @@ mod tests {
     }
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_blade_light_vs_light_hit_b() {
+    fn test_fast_vs_fast_hit_b() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
@@ -225,7 +260,7 @@ mod tests {
     }
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_blade_light_vs_light_crit_b() {
+    fn test_fast_vs_fast_crit_b() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
@@ -241,7 +276,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_blade_light_vs_block_a() {
+    fn test_fast_vs_block_a() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
@@ -254,7 +289,7 @@ mod tests {
         assert(round.shot_a.health == constants::SINGLE_DAMAGE, 'bad health_a');
         assert(round.shot_b.health == constants::SINGLE_DAMAGE, 'bad health_b');
     }
-    fn test_blade_light_vs_block_b() {
+    fn test_block_vs_fast_b() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
@@ -268,85 +303,112 @@ mod tests {
         assert(round.shot_b.health == constants::SINGLE_DAMAGE, 'bad health_b');
     }
 
-    // #[test]
-    // #[available_gas(1_000_000_000)]
-    // fn test_blade_light_vs_heavy_a_a() {
-    //     let (world, system, owner, other) = utils::setup_world();
-    //     let (challenge, round) = _execute_blades(
-    //         world, system, owner, other,
-    //         constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
-    //         constants::SINGLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
-    //     );
-    //     assert(challenge.winner == 1, 'wrong winner');
-    //     assert(round.shot_a.health == constants::FULL_HEALTH, 'bad health_a');
-    //     assert(round.shot_b.health == 0, 'bad health_b');
-    // }
-    // #[test]
-    // #[available_gas(1_000_000_000)]
-    // fn test_blade_light_vs_heavy_a_b() {
-    //     let (world, system, owner, other) = utils::setup_world();
-    //     let (challenge, round) = _execute_blades(
-    //         world, system, owner, other,
-    //         constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
-    //         constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
-    //     );
-    //     assert(challenge.winner == 2, 'wrong winner');
-    //     assert(round.shot_a.health == 0, 'bad health_a');
-    //     assert(round.shot_b.health == constants::SINGLE_DAMAGE, 'bad health_b');
-    // }
-    // #[test]
-    // #[available_gas(1_000_000_000)]
-    // fn test_blade_light_vs_heavy_b_a() {
-    //     let (world, system, owner, other) = utils::setup_world();
-    //     let (challenge, round) = _execute_blades(
-    //         world, system, owner, other,
-    //         constants::SINGLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
-    //         constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
-    //     );
-    //     assert(challenge.winner == 2, 'wrong winner');
-    //     assert(round.shot_a.health == 0, 'bad health_a');
-    //     assert(round.shot_b.health == constants::FULL_HEALTH, 'bad health_b');
-    // }
-    // #[test]
-    // #[available_gas(1_000_000_000)]
-    // fn test_blade_light_vs_heavy_b_b() {
-    //     let (world, system, owner, other) = utils::setup_world();
-    //     let (challenge, round) = _execute_blades(
-    //         world, system, owner, other,
-    //         constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
-    //         constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
-    //     );
-    //     assert(challenge.winner == 1, 'wrong winner');
-    //     assert(round.shot_a.health == constants::SINGLE_DAMAGE, 'bad health_a');
-    //     assert(round.shot_b.health == 0, 'bad health_b');
-    // }
+    //----------------------
+    // Fast vs Slow
+    //
 
-    // #[test]
-    // #[available_gas(1_000_000_000)]
-    // fn test_blade_heavy_vs_block_a() {
-    //     let (world, system, owner, other) = utils::setup_world();
-    //     let (challenge, round) = _execute_blades(
-    //         world, system, owner, other,
-    //         constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
-    //         constants::FULL_HEALTH, ACTION::IDLE, ACTION::BLOCK,
-    //     );
-    //     assert(challenge.winner == 1, 'wrong winner');
-    //     assert(round.shot_a.health == constants::FULL_HEALTH, 'bad health_a');
-    //     assert(round.shot_b.health == 0, 'bad health_b');
-    // }
-    // #[test]
-    // #[available_gas(1_000_000_000)]
-    // fn test_blade_heavy_vs_block_b() {
-    //     let (world, system, owner, other) = utils::setup_world();
-    //     let (challenge, round) = _execute_blades(
-    //         world, system, owner, other,
-    //         constants::FULL_HEALTH, ACTION::IDLE, ACTION::BLOCK,
-    //         constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
-    //     );
-    //     assert(challenge.winner == 2, 'wrong winner');
-    //     assert(round.shot_a.health == 0, 'bad health_a');
-    //     assert(round.shot_b.health == constants::FULL_HEALTH, 'bad health_b');
-    // }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_fast_vs_slow_a() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
+            constants::SINGLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
+            SALT_DUAL_HIT,
+        );
+        assert(challenge.winner == 1, 'wrong winner');
+        assert(challenge.round_number == 2, 'ends on round 2');
+        assert(round.round_number == 2, 'ends on round 2');
+        assert(round.shot_a.health == constants::SINGLE_DAMAGE, 'bad health_a');
+        assert(round.shot_b.health == 0, 'bad health_b');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_fast_vs_slow_b() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
+            constants::DOUBLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
+            SALT_DUAL_HIT,
+        );
+        assert(challenge.winner == 2, 'wrong winner');
+        assert(challenge.round_number == 3, 'ends on round 3');
+        assert(round.round_number == 3, 'ends on round 3');
+        assert(round.shot_a.health == 0, 'bad health_a');
+        assert(round.shot_b.health == constants::SINGLE_DAMAGE, 'bad health_b');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_slow_vs_fast_b() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::SINGLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
+            constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
+            SALT_DUAL_HIT,
+        );
+        assert(challenge.winner == 2, 'wrong winner');
+        assert(challenge.round_number == 2, 'ends on round 2');
+        assert(round.round_number == 2, 'ends on round 2');
+        assert(round.shot_a.health == 0, 'bad health_a');
+        assert(round.shot_b.health == constants::SINGLE_DAMAGE, 'bad health_b');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_slow_vs_fast_a() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::DOUBLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
+            constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
+            SALT_MISS_HIT,
+        );
+        assert(challenge.winner == 1, 'wrong winner');
+        assert(challenge.round_number == 3, 'ends on round 3');
+        assert(round.round_number == 3, 'ends on round 3');
+        assert(round.shot_a.health == constants::SINGLE_DAMAGE, 'bad health_a');
+        assert(round.shot_b.health == 0, 'bad health_b');
+    }
 
+    //----------------------
+    // Slow vs Block
+    //
+    
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_slow_vs_block_crit_a() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
+            constants::FULL_HEALTH, ACTION::IDLE, ACTION::BLOCK,
+            SALT_CRIT_HIT,
+        );
+        assert(challenge.winner == 1, 'wrong winner');
+        assert(challenge.round_number == 2, 'ends on round 2');
+        assert(round.round_number == 2, 'ends on round 2');
+        assert(round.shot_a.health == constants::FULL_HEALTH, 'bad health_a');
+        assert(round.shot_b.health == 0, 'bad health_b');
+        assert(round.shot_b.damage == constants::FULL_HEALTH, 'bad damage_b');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_block_vs_slow_crit_b() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::IDLE, ACTION::BLOCK,
+            constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
+            SALT_HIT_CRIT,
+        );
+        assert(challenge.winner == 2, 'wrong winner');
+        assert(challenge.round_number == 2, 'ends on round 2');
+        assert(round.round_number == 2, 'ends on round 2');
+        assert(round.shot_a.health == 0, 'bad health_a');
+        assert(round.shot_b.health == constants::FULL_HEALTH, 'bad health_b');
+        assert(round.shot_a.damage == constants::FULL_HEALTH, 'bad damage_a');
+    }
 
 }

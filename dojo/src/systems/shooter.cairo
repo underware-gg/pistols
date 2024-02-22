@@ -150,7 +150,7 @@ mod shooter {
                         honour: round.shot_b.honour,
                     },
                 };
-                process_round(world, ref challenge, ref round, true);
+                process_round(world, ref challenge, ref round3, true);
             }
         }
         
