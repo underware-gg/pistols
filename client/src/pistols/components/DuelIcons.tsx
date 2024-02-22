@@ -2,9 +2,10 @@ import React from 'react'
 import { Icon } from 'semantic-ui-react'
 import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
 import { DuelStage, useDuel } from '@/pistols/hooks/useDuel'
-import { Blades, ChallengeState, SINGLE_DAMAGE } from '@/pistols/utils/pistols'
+import { Blades, ChallengeState } from '@/pistols/utils/pistols'
 import { BladesIcon, CompletedIcon, EmojiIcon, StepsIcon } from '@/pistols/components/ui/Icons'
 import { EMOJI } from '@/pistols/data/messages'
+import constants from '@/pistols/utils/constants'
 
 
 export function DuelIcons({
@@ -24,8 +25,8 @@ export function DuelIcons({
   const completedStages = isA ? (completedStagesA) : isB ? (completedStagesB) : null
   const isTurn = isA ? turnA : isB ? turnB : false
 
-  const healthRound1 = shotRound1?.health == 0 ? EMOJI.DEAD : shotRound1?.health == SINGLE_DAMAGE ? EMOJI.INJURED : null
-  const healthRound2 = shotRound2?.health == 0 ? EMOJI.DEAD : (shotRound2?.health == SINGLE_DAMAGE && !healthRound1) ? EMOJI.INJURED : null
+  const healthRound1 = shotRound1?.health == 0 ? EMOJI.DEAD : shotRound1?.health == constants.SINGLE_DAMAGE ? EMOJI.INJURED : null
+  const healthRound2 = shotRound2?.health == 0 ? EMOJI.DEAD : (shotRound2?.health == constants.SINGLE_DAMAGE && !healthRound1) ? EMOJI.INJURED : null
 
   const _size = size as IconSizeProp
 

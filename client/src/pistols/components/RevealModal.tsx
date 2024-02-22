@@ -29,7 +29,7 @@ export default function RevealModal({
     setIsSubmitting(true)
     const { salt, action } = await signAndRestoreActionFromHash(account, duelId, roundNumber, hash, possibleActions)
     if (action) {
-      await reveal_action(account, duelId, roundNumber, salt, action)
+      await reveal_action(account, duelId, roundNumber, salt, action, 0)
       setIsOpen(false)
     }
     setIsSubmitting(false)

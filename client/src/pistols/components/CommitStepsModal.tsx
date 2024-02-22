@@ -4,6 +4,7 @@ import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { signAndGenerateActionHash } from '@/pistols/utils/salt'
 import ProgressBar from '@/pistols/components/ui/ProgressBar'
+import constants from '@/pistols/utils/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -19,7 +20,7 @@ export default function CommitStepsModal({
   duelId: bigint
   roundNumber?: number
 }) {
-  const { commit_action, get_pistols_bonus, get_duelist_hit_chance, get_duelist_crit_chance } = useDojoSystemCalls()
+  const { commit_action, calc_hit_bonus, get_duelist_hit_chance, get_duelist_crit_chance } = useDojoSystemCalls()
   const { account } = useDojoAccount()
 
   const [steps, setSteps] = useState(0)
@@ -35,16 +36,16 @@ export default function CommitStepsModal({
   useEffect(() => {
     let _mounted = true
     const _getBonus = async () => {
-      const value = await get_pistols_bonus(BigInt(account.address))
+      const value = await calc_hit_bonus(BigInt(account.address))
       console.log(`BNUS:`, value)
       if (_mounted) setBonus(value)
     }
     const _getHit = async () => {
-      const value = await get_duelist_hit_chance(BigInt(account.address), steps)
+      const value = await get_duelist_hit_chance(BigInt(account.address), steps, constants.FULL_HEALTH)
       if (_mounted) setChanceToHit(value)
     }
     const _getKill = async () => {
-      const value = await get_duelist_crit_chance(BigInt(account.address), steps)
+      const value = await get_duelist_crit_chance(BigInt(account.address), steps, constants.FULL_HEALTH)
       if (_mounted) setChanceToKill(value)
     }
     if (steps) {
