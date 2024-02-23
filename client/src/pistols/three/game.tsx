@@ -547,8 +547,8 @@ export function animateShootout(paceCountA, paceCountB, healthA, healthB) {
 }
 
 const _getBladeAnimName = (blade: Blades): AnimName => (
-  blade == Blades.Light ? AnimName.STRIKE_LIGHT
-    : blade == Blades.Heavy ? AnimName.STRIKE_HEAVY
+  blade == Blades.Fast ? AnimName.STRIKE_LIGHT
+    : blade == Blades.Slow ? AnimName.STRIKE_HEAVY
       : AnimName.STRIKE_BLOCK)
 
 export function animateBlades(bladeA, bladeB, healthA, healthB) {

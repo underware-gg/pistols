@@ -15,7 +15,7 @@ export function createSystemCalls(
     try {
       // console.log(`${system} args:`, args)
       const tx = await execute(signer, 'actions', system, args)
-      console.log(`execute ${system}(${args.length}) tx:`, tx)
+      console.log(`execute ${system}() tx:`, args, tx)
 
       const receipt = await signer.waitForTransaction(tx.transaction_hash, { retryInterval: 200 })
       success = getReceiptStatus(receipt);
@@ -30,18 +30,18 @@ export function createSystemCalls(
   }
 
   const _executeCall = async (system: string, args: any[]): Promise<any | null> => {
-    let result = null
+    let results = null
     try {
       const eventData = await call('actions', system, args)
       // console.log(eventData)
       // result = decodeComponent(contractComponents['Component'], eventData.result)
-      result = BigInt(eventData.result[0])
-      console.log(`call ${system}(${args.length}) success:`, result)
+      results = eventData.result.map(v => BigInt(v))
+      // console.log(`call ${system}(${args.length}) success:`, result)
     } catch (e) {
       console.warn(`call ${system}(${args.length}) exception:`, e)
     } finally {
     }
-    return result
+    return results
   }
 
   const register_duelist = async (signer: Account, name: string, profile_pic: number): Promise<boolean> => {
@@ -73,61 +73,61 @@ export function createSystemCalls(
 
   const get_pact = async (duelist_a: bigint, duelist_b: bigint): Promise<bigint | null> => {
     const args = [duelist_a, duelist_b]
-    const result = await _executeCall('get_pact', args)
-    return result !== null ? BigInt(result) : null
+    const results = await _executeCall('get_pact', args)
+    return results !== null ? results[0] : null
   }
 
   const has_pact = async (duelist_a: bigint, duelist_b: bigint): Promise<boolean | null> => {
     const args = [duelist_a, duelist_b]
-    const result = await _executeCall('has_pact', args)
-    return result !== null ? Boolean(result) : null
+    const results = await _executeCall('has_pact', args)
+    return results !== null ? Boolean(results[0]) : null
   }
 
   const calc_hit_bonus = async (duelist: bigint): Promise<number | null> => {
     const args = [duelist]
-    const result = await _executeCall('calc_hit_bonus', args)
-    return result !== null ? Number(result) : null
+    const results = await _executeCall('calc_hit_bonus', args)
+    return results !== null ? Number(results[0]) : null
   }
 
   const calc_hit_penalty = async (health: number): Promise<number | null> => {
     const args = [health]
-    const result = await _executeCall('calc_hit_penalty', args)
-    return result !== null ? Number(result) : null
+    const results = await _executeCall('calc_hit_penalty', args)
+    return results !== null ? Number(results[0]) : null
   }
 
   const get_duelist_hit_chance = async (duelist: bigint, action: number, health: number): Promise<number | null> => {
     const args = [duelist, action, health]
-    const result = await _executeCall('get_duelist_hit_chance', args)
-    return result !== null ? Number(result) : null
+    const results = await _executeCall('get_duelist_hit_chance', args)
+    return results !== null ? Number(results[0]) : null
   }
 
   const get_duelist_crit_chance = async (duelist: bigint, action: number, health: number): Promise<number | null> => {
     const args = [duelist, action, health]
-    const result = await _executeCall('get_duelist_crit_chance', args)
-    return result !== null ? Number(result) : null
+    const results = await _executeCall('get_duelist_crit_chance', args)
+    return results !== null ? Number(results[0]) : null
   }
 
   const get_duelist_action_honour = async (duelist: bigint, action: number): Promise<number | null> => {
     const args = [duelist, action]
-    const result = await _executeCall('get_duelist_action_honour', args)
-    return result !== null ? Number(result) : null
+    const results = await _executeCall('get_duelist_action_honour', args)
+    return results !== null ? Number(results[0]) : null
   }
 
   const get_valid_packed_actions = async (round_number: number): Promise<number[] | null> => {
     const args = [round_number]
-    const result = await _executeCall('get_valid_packed_actions', args)
-    return result !== null ? result.map((v: BigNumberish) => Number(v)) : null
+    const results = await _executeCall('get_valid_packed_actions', args)
+    return results !== null ? results.map(v => Number(v)) : null
   }
-  const pack_action_slots = async (slot1: number, slot2: number): Promise<number | null> => {
-    const args = [slot1, slot2]
-    const result = await _executeCall('pack_action_slots', args)
-    return result !== null ? Number(result) : null
-  }
-  const unpack_action_slots = async (packed: number): Promise<number[] | null> => {
-    const args = [packed]
-    const result = await _executeCall('unpack_action_slots', args)
-    return result !== null ? result.map((v: BigNumberish) => Number(v)) : null
-  }
+  // const pack_action_slots = async (slot1: number, slot2: number): Promise<number | null> => {
+  //   const args = [slot1, slot2]
+  //   const results = await _executeCall('pack_action_slots', args)
+  //   return results !== null ? Number(results[0]) : null
+  // }
+  // const unpack_action_slots = async (packed: number): Promise<number[] | null> => {
+  //   const args = [packed]
+  //   const results = await _executeCall('unpack_action_slots', args)
+  //   return results !== null ? results.map(v => Number(v)) : null
+  // }
 
   return {
     register_duelist,
@@ -144,8 +144,8 @@ export function createSystemCalls(
     get_duelist_crit_chance,
     get_duelist_action_honour,
     get_valid_packed_actions,
-    pack_action_slots,
-    unpack_action_slots,
+    // pack_action_slots,
+    // unpack_action_slots,
   }
 }
 

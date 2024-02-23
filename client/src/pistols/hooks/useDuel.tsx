@@ -7,6 +7,7 @@ import { useChallenge } from "@/pistols/hooks/useChallenge"
 import { keysToEntity } from '@/pistols/utils/utils'
 import { RoundState } from "@/pistols/utils/pistols"
 import { AnimationState } from "@/pistols/three/game"
+import constants from '../utils/constants'
 
 export enum DuelStage {
   Null,             // 0
@@ -24,6 +25,7 @@ export const useDuel = (duelId: bigint | string) => {
   const challenge = useChallenge(duelId)
   const round1: any = useComponentValue(Round, keysToEntity([duelId, 1n]))
   const round2: any = useComponentValue(Round, keysToEntity([duelId, 2n]))
+  const round3: any = useComponentValue(Round, keysToEntity([duelId, 3n]))
 
   //
   // The actual stage of this duel
@@ -41,23 +43,20 @@ export const useDuel = (duelId: bigint | string) => {
 
   //
   // Actions completed by Duelist A
-  const completedStagesA = useMemo(() => {
+  const { completedStagesA, completedStagesB } = useMemo(() => {
     return {
-      [DuelStage.StepsCommit]: Boolean(round1?.shot_a.hash),
-      [DuelStage.StepsReveal]: Boolean(round1?.shot_a.action),
-      [DuelStage.BladesCommit]: Boolean(round2?.shot_a.hash),
-      [DuelStage.BladesReveal]: Boolean(round2?.shot_a.action),
-    }
-  }, [round1, round2])
-
-  //
-  // Actions completed by Duelist B
-  const completedStagesB = useMemo(() => {
-    return {
-      [DuelStage.StepsCommit]: Boolean(round1?.shot_b.hash),
-      [DuelStage.StepsReveal]: Boolean(round1?.shot_b.action),
-      [DuelStage.BladesCommit]: Boolean(round2?.shot_b.hash),
-      [DuelStage.BladesReveal]: Boolean(round2?.shot_b.action),
+      completedStagesA: {
+        [DuelStage.StepsCommit]: Boolean(round1?.shot_a.hash),
+        [DuelStage.StepsReveal]: Boolean(round1?.shot_a.action),
+        [DuelStage.BladesCommit]: Boolean(round2?.shot_a.hash),
+        [DuelStage.BladesReveal]: Boolean(round2?.shot_a.action),
+      },
+      completedStagesB: {
+        [DuelStage.StepsCommit]: Boolean(round1?.shot_b.hash),
+        [DuelStage.StepsReveal]: Boolean(round1?.shot_b.action),
+        [DuelStage.BladesCommit]: Boolean(round2?.shot_b.hash),
+        [DuelStage.BladesReveal]: Boolean(round2?.shot_b.action),
+      },
     }
   }, [round1, round2])
 
@@ -71,6 +70,7 @@ export const useDuel = (duelId: bigint | string) => {
     roundNumber: challenge.roundNumber,
     round1,
     round2,
+    round3,
     duelStage,
     completedStagesA,
     completedStagesB,
@@ -86,7 +86,7 @@ export const useDuel = (duelId: bigint | string) => {
 //
 export const useAnimatedDuel = (duelId: bigint | string) => {
   const result = useDuel(duelId)
-  const { round1, round2, duelStage } = result
+  const { round1, round2, round3, duelStage } = result
 
   const { gameImpl, audioLoaded } = useThreeJsContext()
   const { animated, dispatchAnimated } = useGameplayContext()
@@ -99,6 +99,22 @@ export const useAnimatedDuel = (duelId: bigint | string) => {
     if (round2 && duelStage > DuelStage.BladesClash && animated < AnimationState.Blades) return DuelStage.BladesClash
     return duelStage
   }, [duelStage, animated])
+
+  const { healthA, healthB } = useMemo(() => {
+    return {
+      healthA: (
+        currentStage <= DuelStage.PistolsShootout ? constants.FULL_HEALTH
+          : currentStage <= DuelStage.BladesClash ? round1.shot_a.health
+            : (round3?.shot_a.health ?? round2?.shot_a.health ?? round1?.shot_a.health)
+      ) ?? 0,
+      healthB: (
+        currentStage <= DuelStage.PistolsShootout ? constants.FULL_HEALTH
+          : currentStage <= DuelStage.BladesClash ? round1.shot_b.health
+            : (round3?.shot_b.health ?? round2?.shot_b.health ?? round1?.shot_b.health)
+      ) ?? 0,
+    }
+  }, [currentStage])
+
 
   //------------------------
   // Trigger next animations
@@ -119,16 +135,21 @@ export const useAnimatedDuel = (duelId: bigint | string) => {
   }, [gameImpl, isAnimatingPistols, audioLoaded])
 
   useEffect(() => {
-    if (gameImpl && isAnimatingBlades) {
+    if (gameImpl && isAnimatingBlades && audioLoaded) {
       console.log(`TRIGGER animateBlades()`)
       gameImpl.animateBlades(round2.shot_a.action, round2.shot_b.action, round2.shot_a.health, round2.shot_b.health)
     }
-  }, [gameImpl, isAnimatingBlades])
+  }, [gameImpl, isAnimatingBlades, audioLoaded])
+
+  const { canAutoRevealA, canAutoRevealB } = useMemo(() => ({
+    canAutoRevealA: (result.turnA && (currentStage == DuelStage.StepsReveal || currentStage == DuelStage.BladesReveal)),
+    canAutoRevealB: (result.turnB && (currentStage == DuelStage.StepsReveal || currentStage == DuelStage.BladesReveal)),
+  }), [result.turnA, result.turnB, currentStage])
 
   return {
     ...result,
     duelStage: currentStage,
-    canAutoRevealA: (result.turnA && (currentStage == DuelStage.StepsReveal || currentStage == DuelStage.BladesReveal)),
-    canAutoRevealB: (result.turnB && (currentStage == DuelStage.StepsReveal || currentStage == DuelStage.BladesReveal)),
+    healthA, healthB,
+    canAutoRevealA, canAutoRevealB,
   }
 }

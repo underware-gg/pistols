@@ -10,6 +10,8 @@ import { CustomIcon } from './Icons'
 
 type ActionButtonProps = {
   label: string | ReactElement
+  toggle?: boolean
+  active?: boolean
   disabled?: boolean
   large?: boolean
   fill?: boolean
@@ -21,6 +23,8 @@ type ActionButtonProps = {
 
 export const ActionButton = ({
   label,
+  toggle = false,
+  active = false,
   disabled = false,
   large = false,
   fill = false,
@@ -35,7 +39,17 @@ export const ActionButton = ({
   if (large) classNames.push('LargeButton')
   classNames.push((disabled || dimmed) ? 'Locked' : 'Unlocked')
   if (className) classNames.push(className)
-  return <Button className={classNames.join(' ')} disabled={disabled} onClick={() => onClick()}>{label}</Button>
+  return (
+    <Button
+      className={classNames.join(' ')}
+      toggle={toggle}
+      active={active}
+      disabled={disabled}
+      onClick={() => onClick()}
+    >
+      {label}
+    </Button>
+  )
 }
 
 

@@ -156,7 +156,7 @@ export default function ChallengeModal() {
             }
             {(state == ChallengeState.Awaiting && isChallenged) &&
               <Col>
-                <ActionButton fill label='Accept Challenge!' onClick={() => _reply(true)} />
+                <ActionButton fill attention label='Accept Challenge!' onClick={() => _reply(true)} />
               </Col>
             }
             {(state == ChallengeState.InProgress) &&

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
+import { useReadValidPackedActions } from '@/pistols/hooks/useReadOnly'
 import { Blades } from '@/pistols/utils/pistols'
 import { signAndRestoreActionFromHash } from '../utils/salt'
 
@@ -23,13 +24,14 @@ export default function RevealModal({
   const { reveal_action } = useDojoSystemCalls()
   const { account } = useDojoAccount()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const { validPackedActions } = useReadValidPackedActions(roundNumber)
 
   const _reveal = async () => {
-    const possibleActions = roundNumber == 1 ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] : roundNumber == 2 ? [Blades.Light, Blades.Heavy, Blades.Block] : []
     setIsSubmitting(true)
-    const { salt, action } = await signAndRestoreActionFromHash(account, duelId, roundNumber, hash, possibleActions)
-    if (action) {
-      await reveal_action(account, duelId, roundNumber, salt, action, 0)
+    // console.log(`reveal....`, account, duelId, roundNumber, hash, validPackedActions)
+    const { salt, packed, slot1, slot2 } = await signAndRestoreActionFromHash(account, duelId, roundNumber, hash, validPackedActions)
+    if (packed != null && slot1 != null && slot2 != null) {
+      await reveal_action(account, duelId, roundNumber, salt, slot1, slot2)
       setIsOpen(false)
     }
     setIsSubmitting(false)

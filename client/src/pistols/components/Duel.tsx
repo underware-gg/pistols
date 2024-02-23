@@ -6,8 +6,8 @@ import { useThreeJsContext } from '../hooks/ThreeJsContext'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { DuelStage, useAnimatedDuel, useDuel } from '@/pistols/hooks/useDuel'
 import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
+import { DuelStage, useAnimatedDuel, useDuel } from '@/pistols/hooks/useDuel'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { MenuDuel } from '@/pistols/components/Menus'
@@ -34,7 +34,11 @@ export default function Duel({
   const { isLive, isFinished, message, duelistA, duelistB } = useChallenge(duelId)
   const { challengeDescription } = useChallengeDescription(duelId)
 
-  const { duelStage, completedStagesA, completedStagesB, canAutoRevealA, canAutoRevealB } = useAnimatedDuel(duelId)
+  const { duelStage,
+    completedStagesA, completedStagesB,
+    canAutoRevealA, canAutoRevealB,
+    healthA, healthB,
+  } = useAnimatedDuel(duelId)
   // console.log(`Round 1:`, round1)
   // console.log(`Round 2:`, round2)
 
@@ -57,7 +61,7 @@ export default function Duel({
 
       <div className='DuelSideA'>
         <div className='DuelProfileA' >
-          <DuelProfile floated='left' address={duelistA} />
+          <DuelProfile floated='left' address={duelistA} health={healthA} />
         </div>
         <DuelProgress floated='left'
           isA
@@ -71,7 +75,7 @@ export default function Duel({
       </div>
       <div className='DuelSideB'>
         <div className='DuelProfileB' >
-          <DuelProfile floated='right' address={duelistB} />
+          <DuelProfile floated='right' address={duelistB} health={healthB} />
         </div>
         <DuelProgress floated='right'
           isB
@@ -96,6 +100,7 @@ export default function Duel({
 function DuelProfile({
   address,
   floated,
+  health,
 }) {
   const { name, profilePic } = useDuelist(address)
 
@@ -104,13 +109,27 @@ function DuelProfile({
       {floated == 'left' &&
         <ProfilePic duel profilePic={profilePic} />
       }
-      <Segment compact floated={floated} className='ProfileDescription'>
-        <ProfileDescription address={address} />
-      </Segment>
+      <div>
+        <Segment compact floated={floated} className='ProfileDescription'>
+          <ProfileDescription address={address} />
+        </Segment>
+        <DuelHealth health={health} floated={floated} />
+      </div>
       {floated == 'right' &&
         <ProfilePic duel profilePic={profilePic} />
       }
     </>
+  )
+}
+
+function DuelHealth({
+  health,
+  floated,
+}) {
+  return (
+    <Segment compact floated={floated}>
+      <h1>{health}</h1>
+    </Segment>
   )
 }
 
@@ -327,7 +346,7 @@ function ProgressItem({
     <Step
       className={classNames.join(' ')}
       completed={_completed}
-      active={_currentStage}
+      active={Boolean(_currentStage && _onClick)}
       disabled={_disabled}
       link={_onClick != null}
       onClick={_onClick}

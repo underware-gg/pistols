@@ -83,15 +83,16 @@ export enum RoundState {
 //
 export enum Blades {
   Idle = 0,
-  Light = 0x10,
-  Heavy = 0x20,
+  Fast = 0x10,
+  Slow = 0x20,
   Block = 0x30,
 }
 
 export const BladesNames = {
-  [Blades.Light]: 'Light',
-  [Blades.Heavy]: 'Heavy',
-  [Blades.Block]: 'Block',
+  [Blades.Idle]: 'Idle',
+  [Blades.Fast]: 'Thrust (Fast)',
+  [Blades.Slow]: 'Cleave (Slow)',
+  [Blades.Block]: 'Block (Fast)',
 }
 
 //-------------------------

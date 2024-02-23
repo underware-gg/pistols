@@ -19,7 +19,7 @@ $color-important: $color-medium;
 $color-active: $color-medium;
 $color-inactive: rgba($color-brightest, 0.35);
 $color-attention: $color-medium;
-$text-shadow: 0.04em 0.04em 2px $color-dark;
+$text-shadow: 0.04em 0.04em 1px $color-dark;
 $title-shadow: 0.1em 0.1em 1px $color-darkest;
 $ui-border: 6px ridge $color-active;
 
@@ -943,15 +943,18 @@ input::placeholder {
 ._button_hover {
   background-color: $color-bright;
   color: $color-dark;
+  text-shadow: $text-shadow;
 }
 ._button_focus {
   @extend ._round_border_active;
   background-color: $color-dark;
   color: $color-text;
+  text-shadow: $text-shadow;
 }
 ._button_active {
   background-color: $color-brightest;
   color: $color-dark;
+  text-shadow: $text-shadow;
 }
 ._button_disabled {
   @extend ._round_border_inactive;
@@ -967,6 +970,9 @@ input::placeholder {
 .ui.buttons .button.toggle.active,
 .ui.toggle.buttons .active.button {
   background-color: $color-important!important;
+}
+.ui.button.toggle.active:hover {
+  background-color: $color-important!important; // default is green
 }
 //
 // <Menu> buttons

@@ -238,8 +238,8 @@ export function BladesIcon({
     return <Icon name='question circle' size={size} />
   }
   const emoji =
-    blade == Blades.Light ? EMOJI.LIGHT
-      : blade == Blades.Heavy ? EMOJI.HEAVY
+    blade == Blades.Fast ? EMOJI.LIGHT
+      : blade == Blades.Slow ? EMOJI.HEAVY
         : blade == Blades.Block ? EMOJI.BLOCK
           : EMOJI.UNKNOWN
   return (

@@ -19,6 +19,8 @@ export default function ProgressBar({
   value?: number
   total?: number
 }) {
+  const _disabled = (disabled || (!value && !percent))
+  const _className = `NoMargin ${className}`
   return (
     <Grid verticalAlign='middle' className={className}>
       <Row style={{ height: '35px' }}>
@@ -26,14 +28,22 @@ export default function ProgressBar({
           {label}
         </Col>
         <Col width={12} textAlign='left'>
-          <Progress
-            disabled={disabled}
-            progress={value !== null ? 'value' : true}
-            percent={percent}
-            value={value}
-            total={total}
-            className={`NoMargin`}
-          />
+          {_disabled ?
+            <Progress
+              disabled={true}
+              value={null}
+              className={_className}
+              color='grey'
+            />
+            :
+            <Progress
+              progress={value !== null ? 'value' : true}
+              percent={percent}
+              value={value}
+              total={total}
+              className={_className}
+            />
+          }
         </Col>
       </Row>
     </Grid>
