@@ -5,19 +5,24 @@ import { useThreeJsContext } from "./ThreeJsContext"
 import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
 import { useChallenge } from "@/pistols/hooks/useChallenge"
 import { keysToEntity } from '@/pistols/utils/utils'
-import { RoundState } from "@/pistols/utils/pistols"
+import { BladesNames, RoundState } from "@/pistols/utils/pistols"
 import { AnimationState } from "@/pistols/three/game"
 import constants from '../utils/constants'
 
 export enum DuelStage {
   Null,             // 0
-  PacesCommit,      // 1
-  PacesReveal,      // 2
-  PistolsShootout,  // 3 (animating)
-  BladesCommit,     // 4
-  BladesReveal,     // 5
-  BladesClash,      // 6 (animating)
-  Finished,         // 7
+  // Paces
+  Round1Commit,     // 1
+  Round1Reveal,     // 2
+  Round1Animation,  // 3
+  // Blades Slot 1
+  Round2Commit,     // 4
+  Round2Reveal,     // 5
+  Round2Animation,  // 6
+  // Blades Slot 2
+  Round3Animation,  // 7
+  //
+  Finished,         // 8
 }
 
 export const useDuel = (duelId: bigint | string) => {
@@ -31,34 +36,32 @@ export const useDuel = (duelId: bigint | string) => {
   // The actual stage of this duel
   const duelStage = useMemo(() => {
     if (!round1 || round1.state == RoundState.Null) return DuelStage.Null
-    if (round1.state == RoundState.Commit) return DuelStage.PacesCommit
-    if (round1.state == RoundState.Reveal) return DuelStage.PacesReveal
-    // if (animated < AnimationState.Pistols) return DuelStage.PistolsShootout
+    if (round1.state == RoundState.Commit) return DuelStage.Round1Commit
+    if (round1.state == RoundState.Reveal) return DuelStage.Round1Reveal
     if (!round2) return DuelStage.Finished // finished on pistols
-    if (round2.state == RoundState.Commit) return DuelStage.BladesCommit
-    if (round2.state == RoundState.Reveal) return DuelStage.BladesReveal
-    // if (animated < AnimationState.Blades) return DuelStage.BladesClash
+    if (round2.state == RoundState.Commit) return DuelStage.Round2Commit
+    if (round2.state == RoundState.Reveal) return DuelStage.Round2Reveal
     return DuelStage.Finished
-  }, [round1, round2])
+  }, [round1, round2, round3])
 
   //
   // Actions completed by Duelist A
   const { completedStagesA, completedStagesB } = useMemo(() => {
     return {
       completedStagesA: {
-        [DuelStage.PacesCommit]: Boolean(round1?.shot_a.hash),
-        [DuelStage.PacesReveal]: Boolean(round1?.shot_a.action),
-        [DuelStage.BladesCommit]: Boolean(round2?.shot_a.hash),
-        [DuelStage.BladesReveal]: Boolean(round2?.shot_a.action),
+        [DuelStage.Round1Commit]: Boolean(round1?.shot_a.hash),
+        [DuelStage.Round1Reveal]: Boolean(round1?.shot_a.action),
+        [DuelStage.Round2Commit]: Boolean(round2?.shot_a.hash),
+        [DuelStage.Round2Reveal]: Boolean(round2?.shot_a.action),
       },
       completedStagesB: {
-        [DuelStage.PacesCommit]: Boolean(round1?.shot_b.hash),
-        [DuelStage.PacesReveal]: Boolean(round1?.shot_b.action),
-        [DuelStage.BladesCommit]: Boolean(round2?.shot_b.hash),
-        [DuelStage.BladesReveal]: Boolean(round2?.shot_b.action),
+        [DuelStage.Round1Commit]: Boolean(round1?.shot_b.hash),
+        [DuelStage.Round1Reveal]: Boolean(round1?.shot_b.action),
+        [DuelStage.Round2Commit]: Boolean(round2?.shot_b.hash),
+        [DuelStage.Round2Reveal]: Boolean(round2?.shot_b.action),
       },
     }
-  }, [round1, round2])
+  }, [round1, round2, round3])
 
   //
   // Players turns, need action
@@ -95,32 +98,35 @@ export const useAnimatedDuel = (duelId: bigint | string) => {
   // Add intermediate animation DuelStage
   //
   const currentStage = useMemo(() => {
-    if (duelStage > DuelStage.PistolsShootout && animated < AnimationState.Pistols) return DuelStage.PistolsShootout
-    if (round2 && duelStage > DuelStage.BladesClash && animated < AnimationState.Blades) return DuelStage.BladesClash
+    if (duelStage > DuelStage.Round1Animation && animated < AnimationState.Round1) return DuelStage.Round1Animation
+    if (round2 && duelStage > DuelStage.Round2Animation && animated < AnimationState.Round2) return DuelStage.Round2Animation
+    if (round3 && duelStage > DuelStage.Round3Animation && animated < AnimationState.Round3) return DuelStage.Round3Animation
     return duelStage
   }, [duelStage, animated])
 
   const { healthA, healthB } = useMemo(() => {
     return {
       healthA: (
-        currentStage <= DuelStage.PistolsShootout ? constants.FULL_HEALTH
-          : currentStage <= DuelStage.BladesClash ? round1.shot_a.health
-            : (round3?.shot_a.health ?? round2?.shot_a.health ?? round1?.shot_a.health)
-      ) ?? 0,
+        currentStage <= DuelStage.Round1Animation ? constants.FULL_HEALTH
+          : currentStage <= DuelStage.Round2Animation ? round1.shot_a.health
+            : currentStage <= DuelStage.Round3Animation ? round2.shot_a.health
+              : (round3?.shot_a.health ?? round2?.shot_a.health ?? round1?.shot_a.health)
+      ) ?? null,
       healthB: (
-        currentStage <= DuelStage.PistolsShootout ? constants.FULL_HEALTH
-          : currentStage <= DuelStage.BladesClash ? round1.shot_b.health
-            : (round3?.shot_b.health ?? round2?.shot_b.health ?? round1?.shot_b.health)
-      ) ?? 0,
+        currentStage <= DuelStage.Round1Animation ? constants.FULL_HEALTH
+          : currentStage <= DuelStage.Round2Animation ? round1.shot_b.health
+            : currentStage <= DuelStage.Round3Animation ? round2.shot_b.health
+              : (round3?.shot_b.health ?? round2?.shot_b.health ?? round1?.shot_b.health)
+      ) ?? null,
     }
-  }, [currentStage])
-
+  }, [currentStage, round1, round2, round3])
 
   //------------------------
   // Trigger next animations
   //
-  const isAnimatingPistols = useMemo(() => (currentStage == DuelStage.PistolsShootout), [currentStage])
-  const isAnimatingBlades = useMemo(() => (currentStage == DuelStage.BladesClash), [currentStage])
+  const isAnimatingRound1 = useMemo(() => (currentStage == DuelStage.Round1Animation), [currentStage])
+  const isAnimatingRound2 = useMemo(() => (currentStage == DuelStage.Round2Animation), [currentStage])
+  const isAnimatingRound3 = useMemo(() => (currentStage == DuelStage.Round3Animation), [currentStage])
   useEffect(() => {
     if (currentStage == DuelStage.Finished) {
       dispatchAnimated(AnimationState.Finished)
@@ -128,22 +134,29 @@ export const useAnimatedDuel = (duelId: bigint | string) => {
   }, [currentStage])
 
   useEffect(() => {
-    if (gameImpl && isAnimatingPistols && audioLoaded) {
-      console.log(`TRIGGER animateShootout()`)
-      gameImpl.animateShootout(round1.shot_a.action, round1.shot_b.action, round1.shot_a.health, round1.shot_b.health)
+    if (gameImpl && isAnimatingRound1 && audioLoaded) {
+      console.log(`TRIGGER animateDuel(1)`)
+      gameImpl.animateDuel(AnimationState.Round1, round1.shot_a.action, round1.shot_b.action, round1.shot_a.health, round1.shot_b.health)
     }
-  }, [gameImpl, isAnimatingPistols, audioLoaded])
+  }, [gameImpl, isAnimatingRound1, audioLoaded])
 
   useEffect(() => {
-    if (gameImpl && isAnimatingBlades && audioLoaded) {
-      console.log(`TRIGGER animateBlades()`)
-      gameImpl.animateBlades(round2.shot_a.action, round2.shot_b.action, round2.shot_a.health, round2.shot_b.health)
+    if (gameImpl && isAnimatingRound2 && audioLoaded) {
+      console.log(`TRIGGER animateDuel(2)`)
+      gameImpl.animateDuel(AnimationState.Round2, round2.shot_a.action, round2.shot_b.action, round2.shot_a.health, round2.shot_b.health)
     }
-  }, [gameImpl, isAnimatingBlades, audioLoaded])
+  }, [gameImpl, isAnimatingRound2, audioLoaded])
+
+  useEffect(() => {
+    if (gameImpl && isAnimatingRound3 && audioLoaded) {
+      console.log(`TRIGGER animateDuel(3)`)
+      gameImpl.animateDuel(AnimationState.Round3, round3.shot_a.action, round3.shot_b.action, round3.shot_a.health, round3.shot_b.health)
+    }
+  }, [gameImpl, isAnimatingRound3, audioLoaded])
 
   const { canAutoRevealA, canAutoRevealB } = useMemo(() => ({
-    canAutoRevealA: (result.turnA && (currentStage == DuelStage.PacesReveal || currentStage == DuelStage.BladesReveal)),
-    canAutoRevealB: (result.turnB && (currentStage == DuelStage.PacesReveal || currentStage == DuelStage.BladesReveal)),
+    canAutoRevealA: (result.turnA && (currentStage == DuelStage.Round1Reveal || currentStage == DuelStage.Round2Reveal)),
+    canAutoRevealB: (result.turnB && (currentStage == DuelStage.Round1Reveal || currentStage == DuelStage.Round2Reveal)),
   }), [result.turnA, result.turnB, currentStage])
 
   return {
@@ -152,4 +165,25 @@ export const useAnimatedDuel = (duelId: bigint | string) => {
     healthA, healthB,
     canAutoRevealA, canAutoRevealB,
   }
+}
+
+
+
+const _healthResult = (health: number, damage: number) => {
+  return (health == 0 ? 'is DEAD!' : damage > 0 ? `takes ${damage} DAMAGE!` : 'is SAFE!')
+}
+
+export const useDuelResult = (round: any | null, shot: any | null, duelStage: DuelStage, animationStage: DuelStage) => {
+  const result = useMemo(() => {
+    if (!round || duelStage <= animationStage) {
+      return null
+    }
+    const action = shot.action
+    const health = _healthResult(shot.health, shot.damage)
+    if (animationStage == DuelStage.Round1Animation) {
+      return <span>Walks <span className='Bold'>{action} paces</span><br />and {health}</span>
+    }
+    return <span>Clashes with <span className='Bold'>{BladesNames[action] ?? '?'}</span><br />and {health}</span>
+  }, [duelStage, animationStage, round, shot])
+  return result
 }

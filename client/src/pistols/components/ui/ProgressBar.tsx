@@ -47,7 +47,7 @@ export default function ProgressBar({
                 total={total}
                 className={_className}
               />
-              {glancePercent &&
+              {Boolean(glancePercent) &&
                 <div className='GlanceBar' style={{ width: `${glancePercent}%` }} />
               }
             </>

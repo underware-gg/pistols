@@ -73,8 +73,7 @@ export default function CommitBladesModal({
         <Modal.Description className='AlignCenter ModalText'>
           <p>
             You survived the pistols! Now choose your blades!
-          </p>
-          <p>
+            <br />
             Choose wisely. 👑
           </p>
         </Modal.Description>

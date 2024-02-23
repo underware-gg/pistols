@@ -50,24 +50,24 @@ export function DuelIcons({
 
   if (state == ChallengeState.InProgress) {
     return (<>
-      {shotRound1 && duelStage >= DuelStage.PacesCommit &&
-        <CompletedIcon completed={completedStages[DuelStage.PacesCommit]}>
+      {shotRound1 && duelStage >= DuelStage.Round1Commit &&
+        <CompletedIcon completed={completedStages[DuelStage.Round1Commit]}>
           <EmojiIcon emoji={EMOJI.STEP} size={_size} />
         </CompletedIcon>
       }
-      {shotRound1 && duelStage == DuelStage.PacesReveal &&
-        <CompletedIcon completed={completedStages[DuelStage.PacesReveal]}>
+      {shotRound1 && duelStage == DuelStage.Round1Reveal &&
+        <CompletedIcon completed={completedStages[DuelStage.Round1Reveal]}>
           <Icon name='eye' size={_size} />
         </CompletedIcon>
       }
       {healthRound1 && <EmojiIcon emoji={healthRound1} size={_size} />}
-      {shotRound2 && duelStage >= DuelStage.BladesCommit &&
-        <CompletedIcon completed={completedStages[DuelStage.BladesCommit]}>
+      {shotRound2 && duelStage >= DuelStage.Round2Commit &&
+        <CompletedIcon completed={completedStages[DuelStage.Round2Commit]}>
           <EmojiIcon emoji={EMOJI.BLADES} size={_size} />
         </CompletedIcon>
       }
-      {shotRound2 && duelStage == DuelStage.BladesReveal &&
-        <CompletedIcon completed={completedStages[DuelStage.BladesReveal]}>
+      {shotRound2 && duelStage == DuelStage.Round2Reveal &&
+        <CompletedIcon completed={completedStages[DuelStage.Round2Reveal]}>
           <Icon name='eye' size={_size} />
         </CompletedIcon>
       }

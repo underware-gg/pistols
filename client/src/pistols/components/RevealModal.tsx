@@ -26,6 +26,8 @@ export default function RevealModal({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { validPackedActions } = useGetValidPackedActions(roundNumber)
 
+  const canReveal = useMemo(() => (isOpen && duelId && roundNumber && hash && validPackedActions.length > 0 && !isSubmitting), [isOpen, duelId, roundNumber, hash, validPackedActions, isSubmitting])
+
   const _reveal = async () => {
     setIsSubmitting(true)
     // console.log(`reveal....`, account, duelId, roundNumber, hash, validPackedActions)
@@ -36,8 +38,6 @@ export default function RevealModal({
     }
     setIsSubmitting(false)
   }
-
-  const canReveal = useMemo(() => (isOpen && duelId && roundNumber && hash && !isSubmitting), [isOpen, duelId,roundNumber, hash, isSubmitting])
 
   //
   // auto-reveal (no modal)

@@ -12,6 +12,7 @@ import { DuelStage } from '@/pistols/hooks/useDuel'
 import { MusicToggle, SfxToggle } from '@/pistols/components/ui/Buttons'
 import { SPRITESHEETS } from '@/pistols/data/assets'
 import AccountHeader from '@/pistols/components/account/AccountHeader'
+import { AnimationState } from '../three/game'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -108,7 +109,7 @@ export function MenuDuel({
   const _skipAnimation = () => {
   }
 
-  const canSkip = duelStage == DuelStage.PistolsShootout || duelStage == DuelStage.BladesClash
+  const canSkip = duelStage == DuelStage.Round1Animation || duelStage == DuelStage.Round2Animation
   return (
     <div className='MenuBottom AlignCenter NoMouse'>
       <Menu secondary compact className='YesMouse' size='huge'>
@@ -146,11 +147,11 @@ function MenuDebugTriggers() {
   const { gameImpl } = useThreeJsContext()
 
   const _paces = (pacesCountA, paceCountB, healthA, healthB) => {
-    gameImpl?.animateShootout(pacesCountA, paceCountB, healthA, healthB)
+    gameImpl?.animateDuel(AnimationState.Round1, pacesCountA, paceCountB, healthA, healthB)
   }
 
   const _blades = (bladeA, bladeB, healthA, healthB) => {
-    gameImpl?.animateBlades(bladeA, bladeB, healthA, healthB)
+    gameImpl?.animateDuel(AnimationState.Round2, bladeA, bladeB, healthA, healthB)
   }
 
   return (
