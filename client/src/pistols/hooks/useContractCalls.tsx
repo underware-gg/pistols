@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useDojoSystemCalls } from '@/dojo/DojoContext'
 import { BigNumberish } from 'starknet'
 
-export const useReadHitBonus = (address: BigNumberish, defaultValue = null) => {
+export const useCalcHitBonus = (address: BigNumberish, defaultValue = null) => {
   const [value, setValue] = useState(defaultValue)
   const { calc_hit_bonus } = useDojoSystemCalls()
   useEffect(() => {
@@ -20,7 +20,7 @@ export const useReadHitBonus = (address: BigNumberish, defaultValue = null) => {
   }
 }
 
-export const useReadHitChances = (address: BigNumberish, duelId: bigint, roundNumber: number, action: number, defaultValue = null) => {
+export const useCalcHitChances = (address: BigNumberish, duelId: bigint, roundNumber: number, action: number, defaultValue = null) => {
   const [value, setValue] = useState(defaultValue)
   const { calc_hit_chances } = useDojoSystemCalls()
   useEffect(() => {
@@ -38,7 +38,7 @@ export const useReadHitChances = (address: BigNumberish, duelId: bigint, roundNu
   }
 }
 
-export const useReadCritChances = (address: BigNumberish, duelId: bigint, roundNumber: number, action: number, defaultValue = null) => {
+export const useCalcCritChances = (address: BigNumberish, duelId: bigint, roundNumber: number, action: number, defaultValue = null) => {
   const [value, setValue] = useState(defaultValue)
   const { calc_crit_chances } = useDojoSystemCalls()
   useEffect(() => {
@@ -56,7 +56,7 @@ export const useReadCritChances = (address: BigNumberish, duelId: bigint, roundN
   }
 }
 
-export const useReadGlanceChances = (address: BigNumberish, duelId: bigint, roundNumber: number, action: number, defaultValue = null) => {
+export const useCalcGlanceChances = (address: BigNumberish, duelId: bigint, roundNumber: number, action: number, defaultValue = null) => {
   const [value, setValue] = useState(defaultValue)
   const { calc_glance_chances } = useDojoSystemCalls()
   useEffect(() => {
@@ -74,7 +74,7 @@ export const useReadGlanceChances = (address: BigNumberish, duelId: bigint, roun
   }
 }
 
-export const useReadActionHonour = (address: BigNumberish, action: number, defaultValue = null) => {
+export const useCalcHonourForAction = (address: BigNumberish, action: number, defaultValue = null) => {
   const [value, setValue] = useState(defaultValue)
   const { calc_honour_for_action } = useDojoSystemCalls()
   useEffect(() => {
@@ -88,11 +88,11 @@ export const useReadActionHonour = (address: BigNumberish, action: number, defau
     return () => { _mounted = false }
   }, [address, action])
   return {
-    actionHonour: value,
+    honourForAction: value,
   }
 }
 
-export const useReadValidPackedActions = (round_number: number, defaultValue = []) => {
+export const useGetValidPackedActions = (round_number: number, defaultValue = []) => {
   const [value, setValue] = useState(defaultValue)
   const { get_valid_packed_actions } = useDojoSystemCalls()
   useEffect(() => {

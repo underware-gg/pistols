@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Modal } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
-import { useReadValidPackedActions } from '@/pistols/hooks/useReadOnly'
+import { useGetValidPackedActions } from '@/pistols/hooks/useContractCalls'
 import { Blades, BladesNames } from '@/pistols/utils/pistols'
 import { pack_action_slots, signAndGenerateActionHash } from '@/pistols/utils/salt'
 import { ActionChances } from '@/pistols/components/ActionChances'
@@ -28,7 +28,7 @@ export default function CommitBladesModal({
   const [slot2, setSlot2] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const { validPackedActions } = useReadValidPackedActions(2)
+  const { validPackedActions } = useGetValidPackedActions(2)
   const packed = useMemo(() => pack_action_slots(slot1, slot2), [slot1, slot2])
   const isValid = useMemo(() => validPackedActions.includes(packed), [validPackedActions, packed])
 

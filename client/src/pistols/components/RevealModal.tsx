@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
-import { useReadValidPackedActions } from '@/pistols/hooks/useReadOnly'
+import { useGetValidPackedActions } from '@/pistols/hooks/useContractCalls'
 import { Blades } from '@/pistols/utils/pistols'
 import { signAndRestoreActionFromHash } from '../utils/salt'
 
@@ -24,7 +24,7 @@ export default function RevealModal({
   const { reveal_action } = useDojoSystemCalls()
   const { account } = useDojoAccount()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const { validPackedActions } = useReadValidPackedActions(roundNumber)
+  const { validPackedActions } = useGetValidPackedActions(roundNumber)
 
   const _reveal = async () => {
     setIsSubmitting(true)
