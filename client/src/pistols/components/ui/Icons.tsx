@@ -241,7 +241,8 @@ export function BladesIcon({
     blade == Blades.Fast ? EMOJI.LIGHT
       : blade == Blades.Slow ? EMOJI.HEAVY
         : blade == Blades.Block ? EMOJI.BLOCK
-          : EMOJI.UNKNOWN
+          : blade == Blades.Idle ? EMOJI.IDLE
+            : EMOJI.UNKNOWN
   return (
     // <IconGroup size='large'>
     // <Icon size={size} name='circle outline' />

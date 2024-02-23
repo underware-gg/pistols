@@ -15,18 +15,20 @@ export function DuelIcons({
 }) {
   const {
     challenge: { duelistA, duelistB, state, isFinished },
-    round1, round2, duelStage, completedStagesA, completedStagesB, turnA, turnB,
+    round1, round2, round3, duelStage, completedStagesA, completedStagesB, turnA, turnB,
   } = useDuel(duelId)
 
   const isA = account == duelistA
   const isB = account == duelistB
   const shotRound1 = isA ? (round1?.shot_a ?? null) : isB ? (round1?.shot_b ?? null) : null
   const shotRound2 = isA ? (round2?.shot_a ?? null) : isB ? (round2?.shot_b ?? null) : null
+  const shotRound3 = isA ? (round3?.shot_a ?? null) : isB ? (round3?.shot_b ?? null) : null
   const completedStages = isA ? (completedStagesA) : isB ? (completedStagesB) : null
   const isTurn = isA ? turnA : isB ? turnB : false
 
-  const healthRound1 = shotRound1?.health == 0 ? EMOJI.DEAD : shotRound1?.health == constants.SINGLE_DAMAGE ? EMOJI.INJURED : null
-  const healthRound2 = shotRound2?.health == 0 ? EMOJI.DEAD : (shotRound2?.health == constants.SINGLE_DAMAGE && !healthRound1) ? EMOJI.INJURED : null
+  const healthRound1 = shotRound1?.health == 0 ? EMOJI.DEAD : shotRound1?.damage > 0 ? EMOJI.INJURED : null
+  const healthRound2 = shotRound2?.health == 0 ? EMOJI.DEAD : shotRound2?.damage > 0 ? EMOJI.INJURED : null
+  const healthRound3 = shotRound3?.health == 0 ? EMOJI.DEAD : shotRound3?.damage > 0 ? EMOJI.INJURED : null
 
   const _size = size as IconSizeProp
 
@@ -78,10 +80,12 @@ export function DuelIcons({
 
   if (isFinished) {
     return (<>
-      {shotRound1 && <PacesIcon paces={parseInt(shotRound1.move)} size={_size} />}
+      {shotRound1 && <PacesIcon paces={parseInt(shotRound1.action)} size={_size} />}
       {healthRound1 && <EmojiIcon emoji={healthRound1} size={_size} />}
-      {shotRound2 && <BladesIcon blade={parseInt(shotRound2.move) as Blades} size={_size} />}
+      {shotRound2 && <>+<BladesIcon blade={parseInt(shotRound2.action) as Blades} size={_size} /></>}
       {healthRound2 && <EmojiIcon emoji={healthRound2} size={_size} />}
+      {shotRound3 && <>+<BladesIcon blade={parseInt(shotRound3.action) as Blades} size={_size} /></>}
+      {healthRound3 && <EmojiIcon emoji={healthRound3} size={_size} />}
     </>)
   }
 

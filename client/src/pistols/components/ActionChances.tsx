@@ -33,8 +33,8 @@ export function ActionChances({
       <ProgressBar disabled={!action} label='Honour:' value={honourForAction ?? 0} total={10} className='ChancesBar' />
 
       <p className='ModalText AlignCenter'>&nbsp;
-        {hitBonus > 0 && <>(Includes Honourable <b>{hitBonus}%</b> hit bonus)</>}
-        {hitBonus === 0 && <>Keep your Honour <b>{'>'} 9.0</b> for a hit bonus</>}
+        {hitBonus > 0 && <>(Includes Honourable <b>{hitBonus}%</b> crit bonus)</>}
+        {hitBonus === 0 && <>Keep your Honour <b>{'>'} 9.0</b> for a crit bonus</>}
       </p>
     </>
   )
