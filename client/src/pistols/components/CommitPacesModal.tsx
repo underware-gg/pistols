@@ -10,7 +10,7 @@ import constants from '@/pistols/utils/constants'
 const Row = Grid.Row
 const Col = Grid.Column
 
-export default function CommitStepsModal({
+export default function CommitPacesModal({
   isOpen,
   setIsOpen,
   duelId,
@@ -24,18 +24,18 @@ export default function CommitStepsModal({
   const { commit_action } = useDojoSystemCalls()
   const { account } = useDojoAccount()
 
-  const [steps, setSteps] = useState(0)
+  const [paces, setPaces] = useState(0)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
-    setSteps(0)
+    setPaces(0)
   }, [isOpen])
 
   const _submit = async () => {
-    if (steps) {
+    if (paces) {
       setIsSubmitting(true)
-      const hash = await signAndGenerateActionHash(account, duelId, roundNumber, steps)
+      const hash = await signAndGenerateActionHash(account, duelId, roundNumber, paces)
       if (hash) {
         await commit_action(account, duelId, roundNumber, hash)
         setIsOpen(false)
@@ -51,12 +51,12 @@ export default function CommitStepsModal({
       onClose={() => setIsOpen(false)}
       open={isOpen}
     >
-      <Modal.Header className='AlignCenter'><h4>How many steps will you take?</h4></Modal.Header>
+      <Modal.Header className='AlignCenter'><h4>How many paces will you take?</h4></Modal.Header>
       <Modal.Content>
         <Modal.Description className='AlignCenter'>
           <div className='ModalText'>
             <p>
-              An honourable Lord will take all the <b>10 steps</b> before shooting.
+              An honourable Lord will take all the <b>10 paces</b> before shooting.
               <br />
               Choose wisely. 👑
             </p>
@@ -71,13 +71,13 @@ export default function CommitStepsModal({
               nextItem={null}
               siblingRange={1}
               totalPages={10}
-              onPageChange={(e, { activePage }) => setSteps(typeof activePage == 'number' ? activePage : parseInt(activePage))}
+              onPageChange={(e, { activePage }) => setPaces(typeof activePage == 'number' ? activePage : parseInt(activePage))}
             />
           </div>
 
           <Divider hidden />
           
-          <ActionChances action={steps} />
+          <ActionChances action={paces} />
 
         </Modal.Description>
       </Modal.Content>
@@ -88,7 +88,7 @@ export default function CommitStepsModal({
               <ActionButton fill label='Close' onClick={() => setIsOpen(false)} />
             </Col>
             <Col>
-              <ActionButton fill attention label='Commit...' disabled={!steps || isSubmitting} onClick={() => _submit()} />
+              <ActionButton fill attention label='Commit...' disabled={!paces || isSubmitting} onClick={() => _submit()} />
             </Col>
           </Row>
         </Grid>

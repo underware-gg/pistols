@@ -740,7 +740,7 @@ $ui-container-gap: 1em;
 	@extend .Icon;
 	// color: $color-text;
 }
-.StepsIcon {
+.PacesIcon {
   font-family: $font-family-mono!important;
   font-size: 1.2em!important;
   font-weight: 600!important;
@@ -748,17 +748,17 @@ $ui-container-gap: 1em;
   text-shadow: 0.1em 0.1em 2px #000;
   margin: -2px 0 0 -2px!important;
 }
-.StepsIcon.small {
+.PacesIcon.small {
   font-size: 1.2em!important;
 }
-.StepsIcon.large {
+.PacesIcon.large {
   font-size: 1.5em!important;
 }
-.StepsIcon.big {
+.PacesIcon.big {
   font-size: 1.5em!important;
 }
 
-.StepsIconRound {
+.PacesIconRound {
   font-family: $font-family-mono!important;
   font-size: 16px!important;
   // circle

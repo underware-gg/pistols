@@ -36,7 +36,7 @@ mod tests {
         assert(Action::Paces7 == 7_u8.into(), '7 > Action');
         assert(Action::Paces8 == 8_u8.into(), '8 > Action');
         assert(Action::Paces9 == 9_u8.into(), '9 > Action');
-        assert(Action::Paces10 == 10_u8.into(), '10 > Steps');
+        assert(Action::Paces10 == 10_u8.into(), '10 > Paces');
     }
 
     #[test]

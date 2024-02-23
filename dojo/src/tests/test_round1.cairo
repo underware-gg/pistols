@@ -87,7 +87,7 @@ mod tests {
     }
 
     //-----------------------------------------
-    // Single Round (steps only)
+    // Single Round (paces only)
     //
 
     #[test]
@@ -459,7 +459,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_clamp_invalid_idle_steps() {
+    fn test_clamp_invalid_idle_paces() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
         let hash_a: u64 = make_action_hash(0x111, 0);

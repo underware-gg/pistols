@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Container, Grid } from 'semantic-ui-react'
-import { BladesIcon, CustomIcon, EmojiIcon, StepsIcon } from '@/pistols/components/ui/Icons'
+import { BladesIcon, CustomIcon, EmojiIcon, PacesIcon } from '@/pistols/components/ui/Icons'
 import App from '@/pistols/components/App'
 import { Blades } from '@/pistols/utils/pistols'
 
@@ -16,7 +16,7 @@ export default function IndexPage() {
         <h5>Icons</h5>
         <Grid>
           <Row>
-            <Col><StepsIcon stepCount={10} /></Col>
+            <Col><PacesIcon paces={10} /></Col>
             <Col><BladesIcon blade={Blades.Slow} /></Col>
             <Col><BladesIcon blade={Blades.Fast} /></Col>
             <Col><BladesIcon blade={Blades.Block} /></Col>

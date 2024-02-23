@@ -13,7 +13,7 @@ import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { MenuDuel } from '@/pistols/components/Menus'
 import { AnimationState } from '@/pistols/three/game'
 import { EmojiIcon } from '@/pistols/components/ui/Icons'
-import CommitStepsModal from '@/pistols/components/CommitStepsModal'
+import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import CommitBladesModal from '@/pistols/components/CommitBladesModal'
 import RevealModal from '@/pistols/components/RevealModal'
 import { EMOJI } from '@/pistols/data/messages'
@@ -160,9 +160,9 @@ function DuelProgress({
 
   const pistolsResult = useMemo(() => {
     if (duelStage > DuelStage.PistolsShootout) {
-      const steps = round1Action.action
+      const paces = round1Action.action
       const health = _healthResult(round1Action.health)
-      return <span>Walks <span className='Important'>{steps} steps</span><br />and {health}</span>
+      return <span>Walks <span className='Important'>{paces} paces</span><br />and {health}</span>
     }
     return null
   }, [round1, duelStage])
@@ -203,10 +203,10 @@ function DuelProgress({
   // onClick
   const onClick = useMemo(() => {
     if (isYou && !completedStages[duelStage]) {
-      if (duelStage == DuelStage.StepsCommit || duelStage == DuelStage.BladesCommit) {
+      if (duelStage == DuelStage.PacesCommit || duelStage == DuelStage.BladesCommit) {
         return _commit
       }
-      if (duelStage == DuelStage.StepsReveal || duelStage == DuelStage.BladesReveal) {
+      if (duelStage == DuelStage.PacesReveal || duelStage == DuelStage.BladesReveal) {
         return _reveal
       }
     }
@@ -223,15 +223,15 @@ function DuelProgress({
   //------------------------------
   return (
     <>
-      <CommitStepsModal duelId={duelId} isOpen={roundNumber == 1 && commitModalIsOpen} setIsOpen={setCommitModalIsOpen} />
+      <CommitPacesModal duelId={duelId} isOpen={roundNumber == 1 && commitModalIsOpen} setIsOpen={setCommitModalIsOpen} />
       <CommitBladesModal duelId={duelId} isOpen={roundNumber == 2 && commitModalIsOpen} setIsOpen={setCommitModalIsOpen} />
       <RevealModal duelId={duelId} roundNumber={roundNumber} isOpen={revealModalIsOpen} hash={currentRoundAction?.hash} setIsOpen={setRevealModalIsOpen} />
       <Step.Group vertical size='small'>
         <ProgressItem
-          stage={DuelStage.StepsCommit}
+          stage={DuelStage.PacesCommit}
           duelStage={duelStage}
           completedStages={completedStages}
-          title='Choose Steps'
+          title='Choose Paces'
           description=''
           icon='street view'
           // emoji=EMOJI.STEP
@@ -239,10 +239,10 @@ function DuelProgress({
           onClick={onClick}
         />
         <ProgressItem
-          stage={DuelStage.StepsReveal}
+          stage={DuelStage.PacesReveal}
           duelStage={duelStage}
           completedStages={completedStages}
-          title='Reveal Steps'
+          title='Reveal Paces'
           description=''
           icon='eye'
           floated={floated}

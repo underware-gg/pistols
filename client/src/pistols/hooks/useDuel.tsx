@@ -11,8 +11,8 @@ import constants from '../utils/constants'
 
 export enum DuelStage {
   Null,             // 0
-  StepsCommit,      // 1
-  StepsReveal,      // 2
+  PacesCommit,      // 1
+  PacesReveal,      // 2
   PistolsShootout,  // 3 (animating)
   BladesCommit,     // 4
   BladesReveal,     // 5
@@ -31,8 +31,8 @@ export const useDuel = (duelId: bigint | string) => {
   // The actual stage of this duel
   const duelStage = useMemo(() => {
     if (!round1 || round1.state == RoundState.Null) return DuelStage.Null
-    if (round1.state == RoundState.Commit) return DuelStage.StepsCommit
-    if (round1.state == RoundState.Reveal) return DuelStage.StepsReveal
+    if (round1.state == RoundState.Commit) return DuelStage.PacesCommit
+    if (round1.state == RoundState.Reveal) return DuelStage.PacesReveal
     // if (animated < AnimationState.Pistols) return DuelStage.PistolsShootout
     if (!round2) return DuelStage.Finished // finished on pistols
     if (round2.state == RoundState.Commit) return DuelStage.BladesCommit
@@ -46,14 +46,14 @@ export const useDuel = (duelId: bigint | string) => {
   const { completedStagesA, completedStagesB } = useMemo(() => {
     return {
       completedStagesA: {
-        [DuelStage.StepsCommit]: Boolean(round1?.shot_a.hash),
-        [DuelStage.StepsReveal]: Boolean(round1?.shot_a.action),
+        [DuelStage.PacesCommit]: Boolean(round1?.shot_a.hash),
+        [DuelStage.PacesReveal]: Boolean(round1?.shot_a.action),
         [DuelStage.BladesCommit]: Boolean(round2?.shot_a.hash),
         [DuelStage.BladesReveal]: Boolean(round2?.shot_a.action),
       },
       completedStagesB: {
-        [DuelStage.StepsCommit]: Boolean(round1?.shot_b.hash),
-        [DuelStage.StepsReveal]: Boolean(round1?.shot_b.action),
+        [DuelStage.PacesCommit]: Boolean(round1?.shot_b.hash),
+        [DuelStage.PacesReveal]: Boolean(round1?.shot_b.action),
         [DuelStage.BladesCommit]: Boolean(round2?.shot_b.hash),
         [DuelStage.BladesReveal]: Boolean(round2?.shot_b.action),
       },
@@ -142,8 +142,8 @@ export const useAnimatedDuel = (duelId: bigint | string) => {
   }, [gameImpl, isAnimatingBlades, audioLoaded])
 
   const { canAutoRevealA, canAutoRevealB } = useMemo(() => ({
-    canAutoRevealA: (result.turnA && (currentStage == DuelStage.StepsReveal || currentStage == DuelStage.BladesReveal)),
-    canAutoRevealB: (result.turnB && (currentStage == DuelStage.StepsReveal || currentStage == DuelStage.BladesReveal)),
+    canAutoRevealA: (result.turnA && (currentStage == DuelStage.PacesReveal || currentStage == DuelStage.BladesReveal)),
+    canAutoRevealB: (result.turnB && (currentStage == DuelStage.PacesReveal || currentStage == DuelStage.BladesReveal)),
   }), [result.turnA, result.turnB, currentStage])
 
   return {

@@ -206,23 +206,23 @@ export function EmojiIcon({
 //---------------------------------
 // Duel Icons
 //
-interface StepsIconProps {
-  stepCount: number
+interface PacesIconProps {
+  paces: number
   size?: IconSizeProp
 }
-export function StepsIcon({
-  stepCount,
+export function PacesIcon({
+  paces,
   size = 'large',
-}: StepsIconProps) {
-  if (stepCount < 1 || stepCount > 10) {
+}: PacesIconProps) {
+  if (paces < 1 || paces > 10) {
     return <Icon name='question circle' size={size} />
   }
-  const steps = stepCount == 10 ? '10' : '1234567890'[stepCount - 1]
+  const _paces = paces == 10 ? '10' : '1234567890'[paces - 1]
   return (
-    // <EmojiIcon emoji={emoji} size={size} className='StepsIconRound' />
+    // <EmojiIcon emoji={emoji} size={size} className='PacesIconRound' />
     <IconGroup size={_downSize(size)}>
       <EmojiIcon emoji={EMOJI.STEP} size={size} />
-      <EmojiIcon emoji={steps} size={size} className={`StepsIcon`} />
+      <EmojiIcon emoji={_paces} size={size} className={`PacesIcon`} />
     </IconGroup>
   )
 }

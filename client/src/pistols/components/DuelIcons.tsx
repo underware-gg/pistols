@@ -3,7 +3,7 @@ import { Icon } from 'semantic-ui-react'
 import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
 import { DuelStage, useDuel } from '@/pistols/hooks/useDuel'
 import { Blades, ChallengeState } from '@/pistols/utils/pistols'
-import { BladesIcon, CompletedIcon, EmojiIcon, StepsIcon } from '@/pistols/components/ui/Icons'
+import { BladesIcon, CompletedIcon, EmojiIcon, PacesIcon } from '@/pistols/components/ui/Icons'
 import { EMOJI } from '@/pistols/data/messages'
 import constants from '@/pistols/utils/constants'
 
@@ -50,13 +50,13 @@ export function DuelIcons({
 
   if (state == ChallengeState.InProgress) {
     return (<>
-      {shotRound1 && duelStage >= DuelStage.StepsCommit &&
-        <CompletedIcon completed={completedStages[DuelStage.StepsCommit]}>
+      {shotRound1 && duelStage >= DuelStage.PacesCommit &&
+        <CompletedIcon completed={completedStages[DuelStage.PacesCommit]}>
           <EmojiIcon emoji={EMOJI.STEP} size={_size} />
         </CompletedIcon>
       }
-      {shotRound1 && duelStage == DuelStage.StepsReveal &&
-        <CompletedIcon completed={completedStages[DuelStage.StepsReveal]}>
+      {shotRound1 && duelStage == DuelStage.PacesReveal &&
+        <CompletedIcon completed={completedStages[DuelStage.PacesReveal]}>
           <Icon name='eye' size={_size} />
         </CompletedIcon>
       }
@@ -78,7 +78,7 @@ export function DuelIcons({
 
   if (isFinished) {
     return (<>
-      {shotRound1 && <StepsIcon stepCount={parseInt(shotRound1.move)} size={_size} />}
+      {shotRound1 && <PacesIcon paces={parseInt(shotRound1.move)} size={_size} />}
       {healthRound1 && <EmojiIcon emoji={healthRound1} size={_size} />}
       {shotRound2 && <BladesIcon blade={parseInt(shotRound2.move) as Blades} size={_size} />}
       {healthRound2 && <EmojiIcon emoji={healthRound2} size={_size} />}
