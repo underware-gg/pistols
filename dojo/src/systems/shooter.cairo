@@ -236,6 +236,7 @@ mod shooter {
         apply_damage(ref attack);
     }
 
+    #[inline(always)]
     fn apply_damage(ref shot: Shot) {
         shot.health = MathU8::sub(shot.health, MathU8::sub(shot.damage, shot.block));
     }
@@ -248,13 +249,13 @@ mod shooter {
             return (false);
         }
         // dice 1: crit (execution, double damage, goal)
-        attack.chance_crit = utils::get_duelist_crit_chance(world, attacker, action, attack.health);
+        attack.chance_crit = utils::calc_crit_chances(world, attacker, action, attack.health);
         attack.dice_crit = throw_dice(seed, round, 100);
         if (attack.dice_crit <= attack.chance_crit) {
             return (action.execute_crit(ref attack, ref defense));
         } else {
             // dice 2: miss or hit
-            attack.chance_hit = utils::get_duelist_hit_chance(world, attacker, action, attack.health);
+            attack.chance_hit = utils::calc_hit_chances(world, attacker, action, attack.health);
             attack.dice_hit = throw_dice(seed * 2, round, 100);
             if (attack.dice_hit <= attack.chance_hit) {
                 action.execute_hit(ref attack, ref defense);

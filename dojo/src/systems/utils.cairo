@@ -17,6 +17,11 @@ fn zero_address() -> ContractAddress {
     (starknet::contract_address_const::<0x0>())
 }
 
+
+//------------------------
+// Misc
+//
+
 #[inline(always)]
 fn duelist_exist(world: IWorldDispatcher, address: ContractAddress) -> bool {
     let duelist: Duelist = get!(world, address, Duelist);
@@ -42,6 +47,25 @@ fn make_pact_pair(duelist_a: ContractAddress, duelist_b: ContractAddress) -> u12
     (aa.low ^ bb.low)
 }
 
+fn get_duelist_round_shot(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8) -> Shot {
+    let challenge: Challenge = get!(world, (duel_id), Challenge);
+    let round: Round = get!(world, (duel_id, round_number), Round);
+    if (challenge.duelist_a == duelist_address) {
+        (round.shot_a)
+    } else if (challenge.duelist_b == duelist_address) {
+        (round.shot_b)
+    } else {
+        (init::Shot())
+    }
+}
+fn get_duelist_health(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8) -> u8 {
+    if (round_number == 1) {
+        (constants::FULL_HEALTH)
+    } else {
+        let shot: Shot = get_duelist_round_shot(world, duelist_address, duel_id, round_number);
+        (shot.health)
+    }
+}
 
 //------------------------
 // Action validators
@@ -199,21 +223,21 @@ fn update_duelist_honour(ref duelist: Duelist, duel_honour: u8) {
 // Chances
 //
 
-fn get_duelist_hit_chance(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
+fn calc_hit_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
     let chances: u8 = action.hit_chance();
     let penalty: u8 = calc_hit_penalty(world, health);
     (apply_chance_bonus_penalty(chances, 0, penalty))
 }
-fn get_duelist_crit_chance(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
+fn calc_crit_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
     let chances: u8 = action.crit_chance();
     let bonus: u8 = calc_hit_bonus(world, duelist_address);
     (apply_chance_bonus_penalty(chances, bonus, 0))
 }
-fn get_duelist_glance_chance(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
+fn calc_glance_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
     let chances: u8 = action.glance_chance();
     (chances)
 }
-fn get_duelist_action_honour(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action) -> (u8, u8) {
+fn calc_honour_for_action(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action) -> (u8, u8) {
     let mut duelist: Duelist = get!(world, duelist_address, Duelist);
     let duel_honour: u8 = action.honour();
     update_duelist_honour(ref duelist, duel_honour);
@@ -233,6 +257,10 @@ fn apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
     (MathU8::clamp(result, chance / 2, 100))
 }
 
+
+//------------------------
+// Randomizer
+//
 
 // throw a dice and return the resulting face
 // faces: the number of faces on the dice (ex: 6, or 100%)

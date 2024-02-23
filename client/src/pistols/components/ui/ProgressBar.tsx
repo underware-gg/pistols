@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 import { Grid, Progress } from 'semantic-ui-react'
 
 const Row = Grid.Row
@@ -9,13 +9,15 @@ export default function ProgressBar({
   className = null,
   disabled = false,
   percent = null,
+  glancePercent = null,
   value = null,
   total = null,
 }: {
-  label: string
+  label: string | ReactNode
   className?: string
   disabled?: boolean
   percent?: number
+  glancePercent?: number
   value?: number
   total?: number
 }) {
@@ -27,22 +29,28 @@ export default function ProgressBar({
         <Col width={4} textAlign='right' className='TitleCase'>
           {label}
         </Col>
-        <Col width={12} textAlign='left'>
-          {_disabled ?
+        <Col width={12} textAlign='left' className='Relative'>
+          {_disabled &&
             <Progress
               disabled={true}
               value={null}
               className={_className}
               color='grey'
             />
-            :
-            <Progress
-              progress={value !== null ? 'value' : true}
-              percent={percent}
-              value={value}
-              total={total}
-              className={_className}
-            />
+          }
+          {!_disabled &&
+            <>
+              <Progress
+                progress={value !== null ? 'value' : true}
+                percent={percent}
+                value={value}
+                total={total}
+                className={_className}
+              />
+              {glancePercent &&
+                <div className='GlanceBar' style={{ width: `${glancePercent}%` }} />
+              }
+            </>
           }
         </Col>
       </Row>

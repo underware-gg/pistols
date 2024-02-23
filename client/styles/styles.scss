@@ -28,10 +28,10 @@ $border-button: 1px solid $color-bright;
 $border-button-active: 1px solid $color-brightest;
 $border-button-inactive: 1px solid rgba($color-bright, 0.5);
 
-$color-positive: #4dcb51; // from $color-medium
-$color-negative: #e73e3e; // from $color-medium
-$color-warning: $color-medium;
-$color-blue: #4dcbc9; // from $color-medium
+$color-positive: #21ba45; // from $color-medium
+$color-negative: #db2828; // from $color-medium
+$color-warning: #f2c037;
+$color-blue: #31b9c3; // from $color-medium
 
 $game-width: 960px;
 $game-height: 540px;
@@ -824,6 +824,18 @@ $logo-url: '/logos/logo_avante.svg';
   margin: auto!important;
 }
 
+.GlanceBar {
+  background-color: $color-warning;
+  width: 0;
+  height: 21px;
+  position: absolute;
+  top: 0;
+  left:0;
+  // from .ui.progress .bar
+  border-radius: 0.28571429rem;
+  transition: width .1s ease, background-color .1s ease;
+}
+
 
 //--------------------
 // Unity canvas
@@ -1184,7 +1196,7 @@ a.active.step:hover,
 // <ProgressBar>
 .ui.progress .bar {
   background-color: $color-important;
-  min-width: 4em;
+  min-width: 3em;
 }
 // .ui.disaled.progress .bar {
 //   background-color: $color-inactive;
@@ -1195,6 +1207,8 @@ a.active.step:hover,
   font-weight: 600;
   font-size: 1.5em;
   color: $color-brightest;
+  text-shadow: $text-shadow;
   margin-top: -0.65em;
   margin-right: -0.2em;
+  z-index: 100;
 }

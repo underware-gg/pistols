@@ -949,7 +949,7 @@
     {
       "name": "pistols::systems::actions::actions",
       "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
-      "class_hash": "0x53b020633ec3a539f510d005056b49638713bb8843a7c29b5c0731837a508d",
+      "class_hash": "0x6f81be61bbf95230248abe6069afa69383821e9c2c5e6655ab79a87a8a38387",
       "abi": [
         {
           "type": "impl",
@@ -1248,18 +1248,22 @@
             },
             {
               "type": "function",
-              "name": "get_duelist_hit_chance",
+              "name": "calc_hit_chances",
               "inputs": [
                 {
                   "name": "duelist_address",
                   "type": "core::starknet::contract_address::ContractAddress"
                 },
                 {
-                  "name": "action",
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "round_number",
                   "type": "core::integer::u8"
                 },
                 {
-                  "name": "health",
+                  "name": "action",
                   "type": "core::integer::u8"
                 }
               ],
@@ -1272,18 +1276,22 @@
             },
             {
               "type": "function",
-              "name": "get_duelist_crit_chance",
+              "name": "calc_crit_chances",
               "inputs": [
                 {
                   "name": "duelist_address",
                   "type": "core::starknet::contract_address::ContractAddress"
                 },
                 {
-                  "name": "action",
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "round_number",
                   "type": "core::integer::u8"
                 },
                 {
-                  "name": "health",
+                  "name": "action",
                   "type": "core::integer::u8"
                 }
               ],
@@ -1296,7 +1304,35 @@
             },
             {
               "type": "function",
-              "name": "get_duelist_action_honour",
+              "name": "calc_glance_chances",
+              "inputs": [
+                {
+                  "name": "duelist_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "round_number",
+                  "type": "core::integer::u8"
+                },
+                {
+                  "name": "action",
+                  "type": "core::integer::u8"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u8"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "calc_honour_for_action",
               "inputs": [
                 {
                   "name": "duelist_address",

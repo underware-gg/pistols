@@ -99,7 +99,7 @@ export default function CommitBladesModal({
           </Row>
         </Grid>
 
-        <ActionChances action={!slot1 ? slot2 : slot1} />
+        <ActionChances duelId={duelId} roundNumber={roundNumber} action={!slot1 ? slot2 : slot1} />
 
       </Modal.Content>
       <Modal.Actions>

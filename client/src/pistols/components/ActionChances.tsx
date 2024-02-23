@@ -1,21 +1,23 @@
 import React, { useMemo } from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useDojoAccount } from '@/dojo/DojoContext'
-import { useReadActionHonour, useReadCritChance, useReadHitBonus, useReadHitChance } from '@/pistols/hooks/useReadOnly'
-import ProgressBar from '@/pistols/components/ui/ProgressBar'
-import constants from '@/pistols/utils/constants'
+import { useReadHitBonus, useReadCritChances, useReadHitChances, useReadGlanceChances, useReadActionHonour } from '@/pistols/hooks/useReadOnly'
 import { Blades } from '@/pistols/utils/pistols'
+import ProgressBar from '@/pistols/components/ui/ProgressBar'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export function ActionChances({
+  duelId,
+  roundNumber,
   action,
 }) {
   const { account } = useDojoAccount()
   const { hitBonus } = useReadHitBonus(BigInt(account.address))
-  const { hitChance } = useReadHitChance(BigInt(account.address), action, constants.FULL_HEALTH)
-  const { critChance } = useReadCritChance(BigInt(account.address), action, constants.FULL_HEALTH)
+  const { hitChances } = useReadHitChances(BigInt(account.address), duelId, roundNumber, action)
+  const { critChances } = useReadCritChances(BigInt(account.address), duelId, roundNumber, action)
+  const { glanceChances } = useReadGlanceChances(BigInt(account.address), duelId, roundNumber, action)
   const { actionHonour } = useReadActionHonour(BigInt(account.address), action)
   const execution = useMemo(() => {
     if ([Blades.Fast, Blades.Block].includes(action)) {
@@ -26,8 +28,8 @@ export function ActionChances({
   }, [action])
   return (
     <>
-      <ProgressBar disabled={!action} label={`${execution} Chance:`} percent={critChance} className='ChancesBar' />
-      <ProgressBar disabled={!action} label='Hit Chance:' percent={hitChance} className='ChancesBar' />
+      <ProgressBar disabled={!action} label={`${execution}:`} percent={critChances} className='ChancesBar' />
+      <ProgressBar disabled={!action} label={glanceChances ? <span>Hit / <span className='Warning'>Glance</span>:</span> : 'Hit:'} percent={hitChances} glancePercent={glanceChances} className='ChancesBar' />
       <ProgressBar disabled={!action} label='Honour:' value={actionHonour ?? 0} total={10} className='ChancesBar' />
 
       <p className='ModalText AlignCenter'>&nbsp;

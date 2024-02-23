@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { Divider, Grid, Modal, Pagination } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
-import { useReadActionHonour, useReadCritChance, useReadHitBonus, useReadHitChance } from '@/pistols/hooks/useReadOnly'
 import { signAndGenerateActionHash } from '@/pistols/utils/salt'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ActionChances } from '@/pistols/components/ActionChances'
-import constants from '@/pistols/utils/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -77,7 +75,7 @@ export default function CommitPacesModal({
 
           <Divider hidden />
           
-          <ActionChances action={paces} />
+          <ActionChances duelId={duelId} roundNumber={roundNumber} action={paces} />
 
         </Modal.Description>
       </Modal.Content>

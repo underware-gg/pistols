@@ -47,10 +47,10 @@ trait IActions<TContractState> {
     fn calc_hit_bonus(self: @TContractState, duelist_address: ContractAddress) -> u8;
     fn calc_hit_penalty(self: @TContractState, health: u8) -> u8;
 
-    fn get_duelist_hit_chance(self: @TContractState, duelist_address: ContractAddress, action: u8, health: u8) -> u8;
-    fn get_duelist_crit_chance(self: @TContractState, duelist_address: ContractAddress, action: u8, health: u8) -> u8;
-    fn get_duelist_glance_chance(self: @TContractState, duelist_address: ContractAddress, action: u8, health: u8) -> u8;
-    fn get_duelist_action_honour(self: @TContractState, duelist_address: ContractAddress, action: u8) -> (u8, u8);
+    fn calc_hit_chances(self: @TContractState, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8;
+    fn calc_crit_chances(self: @TContractState, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8;
+    fn calc_glance_chances(self: @TContractState, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8;
+    fn calc_honour_for_action(self: @TContractState, duelist_address: ContractAddress, action: u8) -> (u8, u8);
 
     fn get_valid_packed_actions(self: @TContractState, round_number: u8) -> Array<u16>;
     fn pack_action_slots(self: @TContractState, slot1: u8, slot2: u8) -> u16;
@@ -237,21 +237,25 @@ mod actions {
             let world: IWorldDispatcher = self.world_dispatcher.read();
             (utils::calc_hit_penalty(world, health))
         }
-        fn get_duelist_hit_chance(self: @ContractState, duelist_address: ContractAddress, action: u8, health: u8) -> u8 {
+
+        fn calc_hit_chances(self: @ContractState, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8 {
             let world: IWorldDispatcher = self.world_dispatcher.read();
-            (utils::get_duelist_hit_chance(world, duelist_address, action.into(), health))
+            let health: u8 = utils::get_duelist_health(world, duelist_address, duel_id, round_number);
+            (utils::calc_hit_chances(world, duelist_address, action.into(), health))
         }
-        fn get_duelist_crit_chance(self: @ContractState, duelist_address: ContractAddress, action: u8, health: u8) -> u8 {
+        fn calc_crit_chances(self: @ContractState, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8 {
             let world: IWorldDispatcher = self.world_dispatcher.read();
-            (utils::get_duelist_crit_chance(world, duelist_address, action.into(), health))
+            let health: u8 = utils::get_duelist_health(world, duelist_address, duel_id, round_number);
+            (utils::calc_crit_chances(world, duelist_address, action.into(), health))
         }
-        fn get_duelist_glance_chance(self: @ContractState, duelist_address: ContractAddress, action: u8, health: u8) -> u8 {
+        fn calc_glance_chances(self: @ContractState, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8 {
             let world: IWorldDispatcher = self.world_dispatcher.read();
-            (utils::get_duelist_glance_chance(world, duelist_address, action.into(), health))
+            let health: u8 = utils::get_duelist_health(world, duelist_address, duel_id, round_number);
+            (utils::calc_glance_chances(world, duelist_address, action.into(), health))
         }
-        fn get_duelist_action_honour(self: @ContractState, duelist_address: ContractAddress, action: u8) -> (u8, u8) {
+        fn calc_honour_for_action(self: @ContractState, duelist_address: ContractAddress, action: u8) -> (u8, u8) {
             let world: IWorldDispatcher = self.world_dispatcher.read();
-            (utils::get_duelist_action_honour(world, duelist_address, action.into()))
+            (utils::calc_honour_for_action(world, duelist_address, action.into()))
         }
 
         fn get_valid_packed_actions(self: @ContractState, round_number: u8) -> Array<u16> {

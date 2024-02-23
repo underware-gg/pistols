@@ -95,21 +95,27 @@ export function createSystemCalls(
     return results !== null ? Number(results[0]) : null
   }
 
-  const get_duelist_hit_chance = async (duelist: bigint, action: number, health: number): Promise<number | null> => {
-    const args = [duelist, action, health]
-    const results = await _executeCall('get_duelist_hit_chance', args)
+  const calc_hit_chances = async (duelist: bigint, duel_id: bigint, round_number: number, action): Promise<number | null> => {
+    const args = [duelist, duel_id, round_number, action]
+    const results = await _executeCall('calc_hit_chances', args)
     return results !== null ? Number(results[0]) : null
   }
 
-  const get_duelist_crit_chance = async (duelist: bigint, action: number, health: number): Promise<number | null> => {
-    const args = [duelist, action, health]
-    const results = await _executeCall('get_duelist_crit_chance', args)
+  const calc_crit_chances = async (duelist: bigint, duel_id: bigint, round_number: number, action): Promise<number | null> => {
+    const args = [duelist, duel_id, round_number, action]
+    const results = await _executeCall('calc_crit_chances', args)
     return results !== null ? Number(results[0]) : null
   }
 
-  const get_duelist_action_honour = async (duelist: bigint, action: number): Promise<number | null> => {
+  const calc_glance_chances = async (duelist: bigint, duel_id: bigint, round_number: number, action): Promise<number | null> => {
+    const args = [duelist, duel_id, round_number, action]
+    const results = await _executeCall('calc_glance_chances', args)
+    return results !== null ? Number(results[0]) : null
+  }
+
+  const calc_honour_for_action = async (duelist: bigint, action: number): Promise<number | null> => {
     const args = [duelist, action]
-    const results = await _executeCall('get_duelist_action_honour', args)
+    const results = await _executeCall('calc_honour_for_action', args)
     return results !== null ? Number(results[0]) : null
   }
 
@@ -140,9 +146,10 @@ export function createSystemCalls(
     has_pact,
     calc_hit_bonus,
     calc_hit_penalty,
-    get_duelist_hit_chance,
-    get_duelist_crit_chance,
-    get_duelist_action_honour,
+    calc_hit_chances,
+    calc_crit_chances,
+    calc_glance_chances,
+    calc_honour_for_action,
     get_valid_packed_actions,
     // pack_action_slots,
     // unpack_action_slots,

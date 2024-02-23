@@ -20,49 +20,67 @@ export const useReadHitBonus = (address: BigNumberish, defaultValue = null) => {
   }
 }
 
-export const useReadHitChance = (address: BigNumberish, action:number, health: number, defaultValue = null) => {
+export const useReadHitChances = (address: BigNumberish, duelId: bigint, roundNumber: number, action: number, defaultValue = null) => {
   const [value, setValue] = useState(defaultValue)
-  const { get_duelist_hit_chance } = useDojoSystemCalls()
+  const { calc_hit_chances } = useDojoSystemCalls()
   useEffect(() => {
     let _mounted = true
     const _get = async () => {
-      const value = await get_duelist_hit_chance(BigInt(address), action, health)
+      const value = await calc_hit_chances(BigInt(address), duelId, roundNumber, action)
       if (_mounted) setValue(value)
     }
-    if (address != null && action != null && health != null) _get()
+    if (address != null && duelId && roundNumber && action != null) _get()
     else setValue(defaultValue)
     return () => { _mounted = false }
-  }, [address, action, health])
+  }, [address, duelId, roundNumber, action])
   return {
-    hitChance: value,
+    hitChances: value,
   }
 }
 
-export const useReadCritChance = (address: BigNumberish, action: number, health: number, defaultValue = null) => {
+export const useReadCritChances = (address: BigNumberish, duelId: bigint, roundNumber: number, action: number, defaultValue = null) => {
   const [value, setValue] = useState(defaultValue)
-  const { get_duelist_crit_chance } = useDojoSystemCalls()
+  const { calc_crit_chances } = useDojoSystemCalls()
   useEffect(() => {
     let _mounted = true
     const _get = async () => {
-      const value = await get_duelist_crit_chance(BigInt(address), action, health)
+      const value = await calc_crit_chances(BigInt(address), duelId, roundNumber, action)
       if (_mounted) setValue(value)
     }
-    if (address != null && action != null && health != null) _get()
+    if (address != null && duelId && roundNumber && action != null) _get()
     else setValue(defaultValue)
     return () => { _mounted = false }
-  }, [address, action, health])
+  }, [address, duelId, roundNumber, action])
   return {
-    critChance: value,
+    critChances: value,
+  }
+}
+
+export const useReadGlanceChances = (address: BigNumberish, duelId: bigint, roundNumber: number, action: number, defaultValue = null) => {
+  const [value, setValue] = useState(defaultValue)
+  const { calc_glance_chances } = useDojoSystemCalls()
+  useEffect(() => {
+    let _mounted = true
+    const _get = async () => {
+      const value = await calc_glance_chances(BigInt(address), duelId, roundNumber, action)
+      if (_mounted) setValue(value)
+    }
+    if (address != null && duelId && roundNumber && action != null) _get()
+    else setValue(defaultValue)
+    return () => { _mounted = false }
+  }, [address, duelId, roundNumber, action])
+  return {
+    glanceChances: value,
   }
 }
 
 export const useReadActionHonour = (address: BigNumberish, action: number, defaultValue = null) => {
   const [value, setValue] = useState(defaultValue)
-  const { get_duelist_action_honour } = useDojoSystemCalls()
+  const { calc_honour_for_action } = useDojoSystemCalls()
   useEffect(() => {
     let _mounted = true
     const _get = async () => {
-      const value = await get_duelist_action_honour(BigInt(address), action)
+      const value = await calc_honour_for_action(BigInt(address), action)
       if (_mounted) setValue(value)
     }
     if (address != null && action != null) _get()

@@ -97,10 +97,10 @@ mod tests {
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
 
-        let hit_chance_a = utils::get_duelist_hit_chance(system, owner, action_a, constants::FULL_HEALTH);
-        let hit_chance_b = utils::get_duelist_hit_chance(system, owner, action_b, constants::FULL_HEALTH);
-        let kill_chance_a = utils::get_duelist_crit_chance(system, owner, action_a, constants::FULL_HEALTH);
-        let kill_chance_b = utils::get_duelist_crit_chance(system, owner, action_b, constants::FULL_HEALTH);
+        let hit_chance_a = utils::calc_hit_chances(system, owner, challenge.duel_id, challenge.round_number, action_a);
+        let hit_chance_b = utils::calc_hit_chances(system, owner, challenge.duel_id, challenge.round_number, action_b);
+        let kill_chance_a = utils::calc_crit_chances(system, owner, challenge.duel_id, challenge.round_number, action_a);
+        let kill_chance_b = utils::calc_crit_chances(system, owner, challenge.duel_id, challenge.round_number, action_b);
 
         // 1st commit
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
@@ -234,10 +234,10 @@ mod tests {
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_draw();
 
-        let hit_chance_a = utils::get_duelist_hit_chance(system, owner, action_a, constants::FULL_HEALTH);
-        let hit_chance_b = utils::get_duelist_hit_chance(system, owner, action_b, constants::FULL_HEALTH);
-        let kill_chance_a = utils::get_duelist_crit_chance(system, owner, action_a, constants::FULL_HEALTH);
-        let kill_chance_b = utils::get_duelist_crit_chance(system, owner, action_b, constants::FULL_HEALTH);
+        let hit_chance_a = utils::calc_hit_chances(system, owner, challenge.duel_id, challenge.round_number, action_a);
+        let hit_chance_b = utils::calc_hit_chances(system, owner, challenge.duel_id, challenge.round_number, action_b);
+        let kill_chance_a = utils::calc_crit_chances(system, owner, challenge.duel_id, challenge.round_number, action_a);
+        let kill_chance_b = utils::calc_crit_chances(system, owner, challenge.duel_id, challenge.round_number, action_b);
 
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
