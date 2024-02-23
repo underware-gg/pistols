@@ -76,7 +76,7 @@ trait ActionTrait {
     fn as_paces(self: Action) -> u8;
     fn crit_chance(self: Action) -> u8;
     fn hit_chance(self: Action) -> u8;
-    fn full_chance(self: Action) -> u8;
+    fn glance_chance(self: Action) -> u8;
     fn honour(self: Action) -> u8;
     fn roll_priority(self: Action, other: Action) -> i8;
     fn execute_crit(self: Action, ref attack: Shot, ref defense: Shot) -> bool;
@@ -147,12 +147,12 @@ impl ActionTraitImpl of ActionTrait {
             (0)
         }
     }
-    fn full_chance(self: Action) -> u8 {
+    fn glance_chance(self: Action) -> u8 {
         let paces: u8 = self.as_paces();
         if (paces > 0) {
-            (MathU8::map(paces, 1, 10, chances::PISTOLS_FULL_AT_STEP_1, chances::PISTOLS_FULL_AT_STEP_10))
+            (MathU8::map(paces, 1, 10, chances::PISTOLS_GLANCE_AT_STEP_1, chances::PISTOLS_GLANCE_AT_STEP_10))
         } else if (self.is_blades()) {
-            (chances::BLADES_FULL)
+            (chances::BLADES_GLANCE)
         } else {
             (0)
         }
@@ -241,11 +241,11 @@ impl ActionTraitImpl of ActionTrait {
         // Lowest paces shoot first
         let paces: u8 = self.as_paces();
         if (paces != 0) {
-            let full_chance: u8 = self.full_chance();
-            if (attack.dice_hit <= full_chance) {
-                defense.damage = constants::DOUBLE_DAMAGE;
-            } else {
+            let glance_chance: u8 = self.glance_chance();
+            if (attack.dice_hit <= glance_chance) {
                 defense.damage = constants::SINGLE_DAMAGE;
+            } else {
+                defense.damage = constants::DOUBLE_DAMAGE;
             }
         } else if (self == Action::SlowBlade) {
             defense.damage = constants::DOUBLE_DAMAGE;

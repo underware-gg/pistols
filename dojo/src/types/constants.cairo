@@ -25,11 +25,11 @@ mod chances {
     const PISTOLS_KILL_AT_STEP_10: u8 = 20;
     const PISTOLS_HIT_AT_STEP_1: u8 = 100;
     const PISTOLS_HIT_AT_STEP_10: u8 = 20;
-    const PISTOLS_FULL_AT_STEP_1: u8 = 80;
-    const PISTOLS_FULL_AT_STEP_10: u8 = 5;
+    const PISTOLS_GLANCE_AT_STEP_1: u8 = 20;
+    const PISTOLS_GLANCE_AT_STEP_10: u8 = 15;
 
     // Blades chances (percentage)
     const BLADES_KILL: u8 = 15;
     const BLADES_HIT: u8 = 65;
-    const BLADES_FULL: u8 = 100;
+    const BLADES_GLANCE: u8 = 0;
 }

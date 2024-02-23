@@ -209,6 +209,10 @@ fn get_duelist_crit_chance(world: IWorldDispatcher, duelist_address: ContractAdd
     let bonus: u8 = calc_hit_bonus(world, duelist_address);
     (apply_chance_bonus_penalty(chances, bonus, 0))
 }
+fn get_duelist_glance_chance(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
+    let chances: u8 = action.glance_chance();
+    (chances)
+}
 fn get_duelist_action_honour(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action) -> (u8, u8) {
     let mut duelist: Duelist = get!(world, duelist_address, Duelist);
     let duel_honour: u8 = action.honour();
