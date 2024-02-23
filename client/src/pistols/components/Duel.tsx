@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Grid, Segment, Icon, Step } from 'semantic-ui-react'
+import { Grid, Segment, Icon, Step, SegmentGroup } from 'semantic-ui-react'
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '../hooks/ThreeJsContext'
@@ -109,11 +109,11 @@ function DuelProfile({
       {floated == 'left' &&
         <ProfilePic duel profilePic={profilePic} />
       }
-      <div>
+      <div className='ProfileAndHealth'>
         <Segment compact floated={floated} className='ProfileDescription'>
           <ProfileDescription address={address} />
         </Segment>
-        <DuelHealth health={health} floated={floated} />
+        <DuelHealthBar health={health} floated={floated} />
       </div>
       {floated == 'right' &&
         <ProfilePic duel profilePic={profilePic} />
@@ -122,14 +122,27 @@ function DuelProfile({
   )
 }
 
-function DuelHealth({
+function DuelHealthBar({
   health,
   floated,
 }) {
+  const points = useMemo(() => {
+    let result = []
+    for (let i = 1; i <= constants.FULL_HEALTH; ++i) {
+      const full = (health >= i)
+      result.push(
+        <Segment key={`${i}_${full?'full':'empty'}`} className={full ? 'HealthPointFull' : 'HealthPointEmpty'} />
+      )
+    }
+    if (floated == 'right') {
+      result.reverse()
+    }
+    return result
+  }, [health])
   return (
-    <Segment compact floated={floated}>
-      <h1>{health}</h1>
-    </Segment>
+    <SegmentGroup horizontal className='HealthBar'>
+      {points}
+    </SegmentGroup>
   )
 }
 
@@ -154,8 +167,6 @@ function DuelProgress({
   //-------------------------
   // Duel progression
   //
-
-
   const round1Result = useDuelResult(round1, round1Shot, duelStage, DuelStage.Round1Animation);
   const round2Result = useDuelResult(round2, round2Shot, duelStage, DuelStage.Round2Animation);
   const round3Result = useDuelResult(round3, round3Shot, duelStage, DuelStage.Round3Animation);
@@ -164,7 +175,7 @@ function DuelProgress({
     return health == 0 ? 'Negative' : damage > 0 ? 'Warning' : 'Positive'
   }
   const _resultEmoji = (health: number, damage: number) => {
-    return health == 0 ? EMOJI.DEAD : damage > 0 ? EMOJI.INJURED : EMOJI.ALIVE
+    return health == 0 ? EMOJI.DEAD : damage > 0 ? EMOJI.INJURED : null // EMOJI.ALIVE
   }
 
 

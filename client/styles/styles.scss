@@ -676,6 +676,45 @@ $ui-container-gap: 1em;
   text-align: center;
 }
 
+.DuelProfileA {
+  display: flex;
+  align-items: flex-start;
+  align-content: flex-start;
+  justify-content: left;
+  text-align: left;
+  width: 100%;
+}
+.DuelProfileB {
+  @extend .DuelProfileA;
+  justify-content: right;
+  text-align: right;
+}
+
+.ProfileAndHealth {
+  display: block;
+  height: 200px;
+  // justify-self: right;
+}
+.ProfileDescription {
+  margin: 0 1em 1em 1em!important;
+}
+.HealthBar {
+  background-color: #0000!important;
+  box-shadow: none!important;
+  border: 0!important;
+  margin: 0 1em!important;
+  width: 100px;
+  clear: both;
+  // justify-self: right;
+  // margin-left: auto;
+}
+.HealthPointFull {
+  background-color: $color-positive!important;
+}
+.HealthPointEmpty {
+  background-color: $color-negative!important;
+}
+
 .DuelSideA {
   height: 100%;
   width: 50%;
@@ -696,23 +735,6 @@ $ui-container-gap: 1em;
   background-image: linear-gradient(to left, rgba($color-darkest, 0.8), transparent 30%);
 }
 
-.DuelProfileA {
-  display: flex;
-  align-items: flex-start;
-  align-content: flex-start;
-  text-align: left;
-  width: 100%;
-}
-.DuelProfileB {
-  @extend .DuelProfileA;
-  text-align: right;
-  justify-content: right;
-}
-
-.ProfileDescription {
-  margin: 0 1.5em!important;
-}
-
 .DuelProgress {
   margin-top: 20px;
 }
@@ -725,8 +747,9 @@ $ui-container-gap: 1em;
   margin: auto;
 }
 
+//
 // <IconXXX>
-
+//
 .Tooltip {
 	cursor: default; //help;
 }
