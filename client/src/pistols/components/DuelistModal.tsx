@@ -155,8 +155,13 @@ function CreateChallenge({
             selection
             fluid
             allowAdditions
+            additionLabel={''}
             value={message}
             onAddItem={() => { }}
+            onFocus={(e) => {
+              setCustomMessage('')
+              setMessage('')
+            }}
             onChange={(e, { value }) => {
               const _msg = validateCairoString(value as string)
               if (!ChallengeMessages.includes(_msg)) {
@@ -180,7 +185,7 @@ function CreateChallenge({
           </Grid>
         </Form.Field>
         <Form.Field>
-          <span className='FormLabel'>Stake $LORDS (disabled)</span>
+          <span className='FormLabel'>Wager $LORDS (disabled)</span>
           <input placeholder={'$LORDS'} value={lords} maxLength={6} onChange={(e) => {
             const _lords = parseInt(e.target.value as string)
             if (!isNaN(_lords)) {

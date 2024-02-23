@@ -50,7 +50,7 @@ export default function Duel({
 
   return (
     <>
-      <div className='TavernTitle' style={{ maxWidth: '250px' }}>
+      <div className='TavernTitle' style={{ maxWidth: '350px' }}>
         <h1 className='Quote'>{`“${message}”`}</h1>
         {(isFinished && animated == AnimationState.Finished) &&
           <Segment>
