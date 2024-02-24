@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { Grid, Table } from 'semantic-ui-react'
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { useAllDuelistIds, useDuelist } from '@/pistols/hooks/useDuelist'
 import { AccountShort } from '@/pistols/components/ui/Account'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { ProfileName } from './account/ProfileDescription'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -90,11 +90,11 @@ export function DuelistTable() {
           <HeaderCell width={1}></HeaderCell>
           <HeaderCell width={9} textAlign='left' sorted={sortColumn == DuelistColumn.Name ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Name)}>Duelist</HeaderCell>
           <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Honour ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Honour)}>Honour</HeaderCell>
+          <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Total ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Total)}>Total<br />Duels</HeaderCell>
+          <HeaderCell width={1} sorted={sortColumn == DuelistColumn.TotalHonour ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.TotalHonour)}>Total<br />Honour</HeaderCell>
           <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Wins ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Wins)}>Wins</HeaderCell>
           <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Losses ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Losses)}>Losses</HeaderCell>
           <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Draws ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Draws)}>Draws</HeaderCell>
-          <HeaderCell width={1} sorted={sortColumn == DuelistColumn.TotalHonour ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.TotalHonour)}>Total<br />Honour</HeaderCell>
-          <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Total ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Total)}>Total<br />Duels</HeaderCell>
           <HeaderCell width={1} sorted={sortColumn == DuelistColumn.WinRatio ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.WinRatio)}>Win<br />Ratio</HeaderCell>
         </Table.Row>
       </Table.Header>
@@ -125,7 +125,7 @@ function DuelistItem({
   dataCallback,
 }) {
   const duelistData = useDuelist(address)
-  const { name, profilePic, total_wins, total_losses, total_draws, total_duels, total_honour, honourDisplay, winRatio } = duelistData
+  const { profilePic, total_wins, total_losses, total_draws, total_duels, total_honour, honourDisplay, winRatio } = duelistData
   const { dispatchSelectDuelist } = usePistolsContext()
 
   useEffect(() => {
@@ -144,12 +144,20 @@ function DuelistItem({
       </Cell>
 
       <Cell textAlign='left'>
-        <h4>{name}</h4>
+        <h4><ProfileName address={address} /></h4>
         <AccountShort address={address} copyLink={false} />
       </Cell>
 
       <Cell className={_colClass(DuelistColumn.Honour)}>
         {isRookie ? '-' : <span className='TableValue'>{honourDisplay}</span>}
+      </Cell>
+
+      <Cell className={_colClass(DuelistColumn.Total)}>
+        {isRookie ? '-' : <span className='TableValue'>{total_duels}</span>}
+      </Cell>
+
+      <Cell className={_colClass(DuelistColumn.TotalHonour)}>
+        {isRookie ? '-' : <span className='TableValue'>{total_honour}</span>}
       </Cell>
 
       <Cell className={_colClass(DuelistColumn.Wins)}>
@@ -162,14 +170,6 @@ function DuelistItem({
 
       <Cell className={_colClass(DuelistColumn.Draws)}>
         {isRookie ? '-' : <span className='TableValue'>{total_draws}</span>}
-      </Cell>
-
-      <Cell className={_colClass(DuelistColumn.TotalHonour)}>
-        {isRookie ? '-' : <span className='TableValue'>{total_honour}</span>}
-      </Cell>
-
-      <Cell className={_colClass(DuelistColumn.Total)}>
-        {isRookie ? '-' : <span className='TableValue'>{total_duels}</span>}
       </Cell>
 
       <Cell className={_colClass(DuelistColumn.WinRatio)}>

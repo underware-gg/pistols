@@ -1,19 +1,29 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { AccountShort } from '@/pistols/components/ui/Account'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { EMOJI } from '@/pistols/data/messages'
+
+export function ProfileName({
+  address,
+}) {
+  const { name, honour } = useDuelist(address)
+  const badges = useMemo(() => (honour > 9.0 ? EMOJI.LORD : null), [honour])
+  return (
+    <span>{name} {badges}</span>
+  )
+}
 
 export function ProfileDescription({
   address,
-  preName = null,
-  postName = null,
   displayStats = false
 }) {
-  const { name, total_wins, total_losses, total_draws, total_duels, total_honour, honourDisplay } = useDuelist(address)
+  const { total_wins, total_losses, total_draws, total_duels, total_honour, honourAndTotal } = useDuelist(address)
   return (
     <div className='FillWidth Relative'>
-      <h1>{preName} {name} {postName}</h1>
+      <h1><ProfileName address={address} /></h1>
       <AccountShort address={address} />
-      <h3 className='Important'>Honour: {honourDisplay}</h3>
+      <h3 className='Important'>Honour: {honourAndTotal}</h3>
+
       {displayStats && total_duels > 0 &&
         <div className='ProfileStats AbsoluteRight AlignRight PaddedRight TitleCase'>
           Duels: <span className='Bold'>{total_duels}</span>

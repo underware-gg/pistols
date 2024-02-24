@@ -8,6 +8,7 @@ import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ChallengeState, ChallengeStateClasses, ChallengeStateNames } from '@/pistols/utils/pistols'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { DuelIcons } from '@/pistols/components/DuelIcons'
+import { ProfileName } from './account/ProfileDescription'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -112,8 +113,8 @@ function DuelItem({
   const {
     duelistA, duelistB, state, isLive, isCanceled, isExpired, isDraw, winner, timestamp_start,
   } = useChallenge(duelId)
-  const { name: nameA, profilePic: profilePicA } = useDuelist(duelistA)
-  const { name: nameB, profilePic: profilePicB } = useDuelist(duelistB)
+  const { profilePic: profilePicA } = useDuelist(duelistA)
+  const { profilePic: profilePicB } = useDuelist(duelistB)
 
   useEffect(() => {
     sortCallback(duelId, state, timestamp_start)
@@ -138,7 +139,7 @@ function DuelItem({
       <Cell>
         <h5>
           <PositiveResult positive={winnerIsA} negative={winnerIsB && false} warning={isDraw} canceled={isCanceled || isExpired}>
-            {nameA}
+            <ProfileName address={duelistA} />
           </PositiveResult>
         </h5>
         <DuelIcons duelId={duelId} account={duelistA} size={compact ? null : 'large'} />
@@ -151,7 +152,7 @@ function DuelItem({
       <Cell>
         <h5>
           <PositiveResult positive={winnerIsB} negative={winnerIsA && false} warning={isDraw} canceled={isCanceled || isExpired}>
-            {nameB}
+            <ProfileName address={duelistB} />
           </PositiveResult>
         </h5>
         <DuelIcons duelId={duelId} account={duelistB} size={compact ? null : 'large'} />
