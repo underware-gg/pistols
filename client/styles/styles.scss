@@ -216,6 +216,9 @@ canvas {
   // background-color: inherit!important;
   color: $color-inactive!important;
 }
+.Inactive {
+  color: $color-inactive!important;
+}
 
 .Code {
   font-family: $font-family-mono;
@@ -313,6 +316,14 @@ canvas {
 }
 .FillParent {
   @extend .FillWidth, .FillHeight;
+}
+.FillHalfHeight {
+  @extend .FillWidth;
+  height: 50%;
+}
+.FillHalfWidth {
+  @extend .FillHeight;
+  width: 50%;
 }
 
 .CenteredContainer {
@@ -859,6 +870,11 @@ $logo-url: '/logos/logo_avante.svg';
   transition: width .1s ease, background-color .1s ease;
 }
 
+.SlotNumber {
+  font-size: 1.1em;
+  padding: 0.5em;
+  color: $color-brightest;
+}
 
 //--------------------
 // Unity canvas

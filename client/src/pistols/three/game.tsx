@@ -415,7 +415,7 @@ export function zoomCameraToPaces(paceCount, seconds) {
     // animate
     _tweens.cameraPos = new TWEEN.Tween(_duelCameraRig.position)
       .to(targetPos, seconds * 1000)
-      .easing(TWEEN.Easing.Cubic.Out)
+      // .easing(TWEEN.Easing.Cubic.Out)
       .onUpdate(() => {
         // emitter.emit('movedTo', { x: _duelCameraRig.position.x, y: _duelCameraRig.position.y, z: _duelCameraRig.position.z })
       })
@@ -557,7 +557,7 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
 
 const _getBladeAnimName = (blade: Blades): AnimName => (
   blade == Blades.Fast ? AnimName.STRIKE_LIGHT
-    : blade == Blades.Slow ? AnimName.STRIKE_HEAVY
+    : blade == Blades.Strong ? AnimName.STRIKE_HEAVY
       : AnimName.STRIKE_BLOCK)
 
 function animateBlades(state: AnimationState, actionA: number, actionB: number, healthA: number, healthB: number) {

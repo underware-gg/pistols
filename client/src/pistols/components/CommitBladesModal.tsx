@@ -40,11 +40,12 @@ export default function CommitBladesModal({
   const _setSlots = (s1, s2) => {
     if (s1 !== null) {
       setSlot1(s1)
-      if (slot2 == Blades.Slow) {
+      if (slot2 == Blades.Strong) {
         setSlot2(null)
       }
     }
     if (s2 !== null) {
+      if (slot2 == Blades.Strong) setSlot1(null)
       setSlot2(s2)
     }
   }
@@ -78,22 +79,24 @@ export default function CommitBladesModal({
           </p>
         </Modal.Description>
 
-        <Grid columns={4} className='FillParent Padded' textAlign='center'>
+        <Grid className='FillParent Padded' textAlign='center'>
           <Row stretched>
-            {/* <Col>
-              <SlotButton blade={Blades.Idle} value={slot1} onClick={() => _setSlots(Blades.Idle, null)} />
-              <SlotButton blade={Blades.Idle} value={slot2} onClick={() => _setSlots(null, Blades.Idle)} />
-            </Col> */}
-            <Col>
-              <SlotButton blade={Blades.Slow} value={slot2} onClick={() => _setSlots(0, Blades.Slow)} />
+            <Col width={2} textAlign='right'>
+              <SlotNumber slotNumber={1} value={slot1} />
+              <SlotNumber slotNumber={2} value={slot2} />
             </Col>
-            <Col>
+            <Col width={4}>
+              <SlotButton blade={Blades.Strong} value={slot2} onClick={() => _setSlots(0, Blades.Strong)} />
+            </Col>
+            <Col width={4}>
               <SlotButton blade={Blades.Fast} value={slot1} onClick={() => _setSlots(Blades.Fast, null)} />
               <SlotButton blade={Blades.Fast} value={slot2} onClick={() => _setSlots(null, Blades.Fast)} />
             </Col>
-            <Col>
+            <Col width={4}>
               <SlotButton blade={Blades.Block} value={slot1} onClick={() => _setSlots(Blades.Block, null)} />
               <SlotButton blade={Blades.Block} value={slot2} onClick={() => _setSlots(null, Blades.Block)} />
+            </Col>
+            <Col width={2}>
             </Col>
           </Row>
         </Grid>
@@ -117,6 +120,17 @@ export default function CommitBladesModal({
   )
 }
 
+
+export const SlotNumber = ({
+  slotNumber,
+  value,
+}) => {
+  return (
+    <div className='FillHalfHeight TitleCase'>
+      <div className={`SlotNumber ${value == null ? 'Inactive' : ''}`}>Strike {slotNumber} :</div>
+    </div>
+  )
+}
 
 
 export const SlotButton = ({

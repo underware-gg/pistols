@@ -241,7 +241,7 @@ export function BladesIcon({
   }
   const emoji =
     blade == Blades.Fast ? EMOJI.LIGHT
-      : blade == Blades.Slow ? EMOJI.HEAVY
+      : blade == Blades.Strong ? EMOJI.HEAVY
         : blade == Blades.Block ? EMOJI.BLOCK
           : blade == Blades.Idle ? EMOJI.IDLE
             : EMOJI.UNKNOWN

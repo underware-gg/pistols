@@ -5,7 +5,7 @@ import { useThreeJsContext } from "./ThreeJsContext"
 import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
 import { useChallenge } from "@/pistols/hooks/useChallenge"
 import { keysToEntity } from '@/pistols/utils/utils'
-import { BladesNames, RoundState } from "@/pistols/utils/pistols"
+import { BladesNames, BladesVerbs, RoundState } from "@/pistols/utils/pistols"
 import { AnimationState } from "@/pistols/three/game"
 import constants from '../utils/constants'
 
@@ -183,7 +183,7 @@ export const useDuelResult = (round: any | null, shot: any | null, duelStage: Du
     if (animationStage == DuelStage.Round1Animation) {
       return <span>Walks <span className='Bold'>{action} paces</span><br />and {health}</span>
     }
-    return <span>Clashes with <span className='Bold'>{BladesNames[action] ?? '?'}</span><br />and {health}</span>
+    return <span>{BladesVerbs[action]} <span className='Bold'>{BladesNames[action] ?? '?'}</span><br />and {health}</span>
   }, [duelStage, animationStage, round, shot])
   return result
 }
