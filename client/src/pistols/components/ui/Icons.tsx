@@ -154,21 +154,23 @@ export function CopyIcon({
 
 
 //---------------------------------
-// Sync spinner
+// Loading/Sync spinner
 //
 interface LoadingIconProps {
   size?: IconSizeProp
+  style?: any
 }
 export function LoadingIcon({
   size = 'small',
+  style = {},
 }: LoadingIconProps) {
   return (
     <Icon
       className='ViewCentered NoPadding'
       loading
-      // name='sync'
-      name='compass outline'
+      name='circle notch'
       size={size}
+      style={style}
     />)
 }
 

@@ -3,7 +3,7 @@ import { Icon } from 'semantic-ui-react'
 import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
 import { DuelStage, useDuel } from '@/pistols/hooks/useDuel'
 import { Blades, ChallengeState } from '@/pistols/utils/pistols'
-import { BladesIcon, CompletedIcon, EmojiIcon, PacesIcon } from '@/pistols/components/ui/Icons'
+import { BladesIcon, CompletedIcon, EmojiIcon, LoadingIcon, PacesIcon } from '@/pistols/components/ui/Icons'
 import { EMOJI } from '@/pistols/data/messages'
 import constants from '@/pistols/utils/constants'
 
@@ -44,7 +44,7 @@ export function DuelIcons({
           <CompletedIcon completed={false}>
             <EmojiIcon emoji={EMOJI.AGREEMENT} size={_size} />
           </CompletedIcon>
-          <span className='Important'> <Icon name='spinner' loading size={_size} /></span>
+        <span className='Important'> <LoadingIcon size={_size} /></span>
         </>
       }
     </>)
@@ -74,7 +74,7 @@ export function DuelIcons({
         </CompletedIcon>
       }
       {healthRound2 && <EmojiIcon emoji={healthRound2} size={_size} />}
-      {isTurn && <span className='Important'> <Icon name='spinner' loading size={_size} /></span>}
+      {isTurn && <span className='Important'> <LoadingIcon size={_size} /></span>}
     </>)
   }
 

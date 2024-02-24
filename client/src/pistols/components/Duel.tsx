@@ -12,12 +12,11 @@ import { ProfileDescription } from '@/pistols/components/account/ProfileDescript
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { MenuDuel } from '@/pistols/components/Menus'
 import { AnimationState } from '@/pistols/three/game'
-import { EmojiIcon } from '@/pistols/components/ui/Icons'
+import { EmojiIcon, LoadingIcon } from '@/pistols/components/ui/Icons'
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import CommitBladesModal from '@/pistols/components/CommitBladesModal'
 import RevealModal from '@/pistols/components/RevealModal'
 import { EMOJI } from '@/pistols/data/messages'
-import { BladesNames } from '@/pistols/utils/pistols'
 import constants from '@/pistols/utils/constants'
 
 const Row = Grid.Row
@@ -349,6 +348,7 @@ function ProgressItem({
 
   let _icon = useMemo(() => {
     const style = _right ? { margin: '0 0 0 1rem' } : {}
+    if (_currentStage && !_completed) return <LoadingIcon style={style} />
     if (icon) return <Icon name={icon} style={style} />
     if (emoji) return <EmojiIcon emoji={emoji} style={style} flipped={emojiFlipped} rotated={emojiRotated} />
     return <></>
