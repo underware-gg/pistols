@@ -28,6 +28,7 @@
       "**/generated/*": true,
       "**/manifest.json": true,
       "/client/public/**": true,
+      "/gamejam/**": true,
     },
     "typescript.validate.enable": true,
     "editor.detectIndentation": false,

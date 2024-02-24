@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import Link from 'next/link'
 import { Icon, IconGroup, Popup, PopupContent, PopupHeader, SemanticICONS } from 'semantic-ui-react'
 import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
-import { Blades } from '@/pistols/utils/pistols'
+import { Blades, BladesNames } from '@/pistols/utils/pistols'
 import { EMOJI } from '@/pistols/data/messages'
 
 // Semantic UI Icons
@@ -206,42 +206,43 @@ export function EmojiIcon({
 //---------------------------------
 // Duel Icons
 //
-interface StepsIconProps {
-  stepCount: number
+interface PacesIconProps {
+  paces: number
   size?: IconSizeProp
 }
-export function StepsIcon({
-  stepCount,
+export function PacesIcon({
+  paces,
   size = 'large',
-}: StepsIconProps) {
-  if (stepCount < 1 || stepCount > 10) {
+}: PacesIconProps) {
+  if (paces < 1 || paces > 10) {
     return <Icon name='question circle' size={size} />
   }
-  const steps = stepCount == 10 ? '10' : '1234567890'[stepCount - 1]
+  const _paces = paces == 10 ? '10' : '1234567890'[paces - 1]
   return (
-    // <EmojiIcon emoji={emoji} size={size} className='StepsIconRound' />
+    // <EmojiIcon emoji={emoji} size={size} className='PacesIconRound' />
     <IconGroup size={_downSize(size)}>
       <EmojiIcon emoji={EMOJI.STEP} size={size} />
-      <EmojiIcon emoji={steps} size={size} className={`StepsIcon`} />
+      <EmojiIcon emoji={_paces} size={size} className={`PacesIcon`} />
     </IconGroup>
   )
 }
 interface BladesIconProps {
-  blades: Blades
+  blade: Blades
   size?: IconSizeProp
 }
 export function BladesIcon({
-  blades,
+  blade,
   size = 'large',
 }: BladesIconProps) {
-  if (blades <= Blades.Null || blades >= Blades.Count) {
+  if (!BladesNames[blade]) {
     return <Icon name='question circle' size={size} />
   }
   const emoji =
-    blades == Blades.Light ? EMOJI.LIGHT
-      : blades == Blades.Heavy ? EMOJI.HEAVY
-        : blades == Blades.Block ? EMOJI.BLOCK
-          : EMOJI.UNKNOWN
+    blade == Blades.Fast ? EMOJI.LIGHT
+      : blade == Blades.Slow ? EMOJI.HEAVY
+        : blade == Blades.Block ? EMOJI.BLOCK
+          : blade == Blades.Idle ? EMOJI.IDLE
+            : EMOJI.UNKNOWN
   return (
     // <IconGroup size='large'>
     // <Icon size={size} name='circle outline' />

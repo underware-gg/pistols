@@ -171,7 +171,7 @@ contract Pistols {
             require(
                 keccak256(abi.encodePacked(salt, shootStep))
                     == game.player1.shootStepCommitment,
-                "Shoot step does not match commitment"
+                "Shoot step does not match hash"
             );
 
             game.player1.shootStep = shootStep;
@@ -184,7 +184,7 @@ contract Pistols {
             require(
                 keccak256(abi.encodePacked(salt, shootStep))
                     == game.player2.shootStepCommitment,
-                "Shoot step does not match commitment"
+                "Shoot step does not match hash"
             );
 
             game.player2.shootStep = shootStep;
@@ -335,7 +335,7 @@ contract Pistols {
             require(
                 keccak256(abi.encodePacked(salt, battleChoice))
                     == game.player1.battleChoiceCommitment,
-                "Battle choice does not match commitment"
+                "Battle choice does not match hash"
             );
 
             game.player1.battleChoice = battleChoice;
@@ -348,7 +348,7 @@ contract Pistols {
             require(
                 keccak256(abi.encodePacked(salt, battleChoice))
                     == game.player2.battleChoiceCommitment,
-                "Battle choice does not match commitment"
+                "Battle choice does not match hash"
             );
 
             game.player2.battleChoice = battleChoice;

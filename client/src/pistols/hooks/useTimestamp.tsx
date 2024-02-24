@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useDojoSystemCalls } from '@/dojo/DojoContext'
-import { useEffectOnce } from "@/pistols/hooks/useEffectOnce"
 
 export const useClientTimestamp = (autoUpdate: boolean = false) => {
   const [clientTimestamp, setClientTimestamp] = useState(0)
@@ -28,34 +26,6 @@ export const useClientTimestamp = (autoUpdate: boolean = false) => {
 
   return {
     clientTimestamp
-  }
-}
-
-export const useContractTimestamp = () => {
-  const { get_timestamp } = useDojoSystemCalls()
-  const [isLoading, setIsLoading] = useState(null)
-  const [timestamp, setTimestamp] = useState(null)
-
-  useEffectOnce(() => {
-    let _mounted = true
-    const _fetch = async () => {
-      const _timestamp = await get_timestamp()
-      if (_mounted && _timestamp) {
-        setTimestamp(_timestamp)
-        setIsLoading(false)
-      }
-    }
-    setTimestamp(null)
-    setIsLoading(true)
-    _fetch()
-    return () => {
-      _mounted = false
-    }
-  }, [])
-
-  return {
-    timestamp,
-    isLoading,
   }
 }
 

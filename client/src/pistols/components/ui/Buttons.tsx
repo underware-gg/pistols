@@ -1,6 +1,7 @@
 import React, { ReactElement } from 'react'
 import { Menu, Button, Icon, SemanticICONS } from 'semantic-ui-react'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
+import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { CustomIcon } from './Icons'
 
 //-----------------
@@ -9,6 +10,8 @@ import { CustomIcon } from './Icons'
 
 type ActionButtonProps = {
   label: string | ReactElement
+  toggle?: boolean
+  active?: boolean
   disabled?: boolean
   large?: boolean
   fill?: boolean
@@ -20,6 +23,8 @@ type ActionButtonProps = {
 
 export const ActionButton = ({
   label,
+  toggle = false,
+  active = false,
   disabled = false,
   large = false,
   fill = false,
@@ -34,7 +39,17 @@ export const ActionButton = ({
   if (large) classNames.push('LargeButton')
   classNames.push((disabled || dimmed) ? 'Locked' : 'Unlocked')
   if (className) classNames.push(className)
-  return <Button className={classNames.join(' ')} disabled={disabled} onClick={() => onClick()}>{label}</Button>
+  return (
+    <Button
+      className={classNames.join(' ')}
+      toggle={toggle}
+      active={active}
+      disabled={disabled}
+      onClick={() => onClick()}
+    >
+      {label}
+    </Button>
+  )
 }
 
 
@@ -64,17 +79,29 @@ export function SettingsIcon({
   return <CustomIcon icon={icon} name={value ? nameOn : nameOff} onClick={() => _switch()} />
 }
 
-interface SettingsButtonProps {
-  prefix: string
-  name: string
-  value: boolean
+export function MusicToggle({
+}) {
+  const { settings, SettingsActions } = useSettingsContext()
+  const { audioLoaded } = useThreeJsContext()
+  if (!audioLoaded) return <></>
+  return <SettingsIcon settingsKey={SettingsActions.MUSIC_ENABLED} value={settings.musicEnabled} nameOn='volume-on' nameOff='volume-off' icon />
 }
+export function SfxToggle({
+}) {
+  const { settings, SettingsActions } = useSettingsContext()
+  return <SettingsIcon settingsKey={SettingsActions.SFX_ENABLED} value={settings.sfxEnabled} nameOn='volume-on' nameOff='volume-off' icon />
+}
+
 
 export function SettingsButton({
   prefix,
   name,
   value,
-}: SettingsButtonProps) {
+}: {
+  prefix: string
+  name: string
+  value: boolean
+}) {
   const { dispatchSetting } = useSettingsContext()
   const _switch = () => {
     dispatchSetting(name, !value)

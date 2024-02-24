@@ -117,7 +117,7 @@ export default function ChallengeModal() {
                 <Row columns='equal' textAlign='right'>
                   <Col>
                     <Divider horizontal className='Margin6'>
-                      <Header as='h4'>moves</Header>
+                      <Header as='h4'>actions</Header>
                     </Divider>
                   </Col>
                 </Row>
@@ -156,7 +156,7 @@ export default function ChallengeModal() {
             }
             {(state == ChallengeState.Awaiting && isChallenged) &&
               <Col>
-                <ActionButton fill label='Accept Challenge!' onClick={() => _reply(true)} />
+                <ActionButton fill attention label='Accept Challenge!' onClick={() => _reply(true)} />
               </Col>
             }
             {(state == ChallengeState.InProgress) &&

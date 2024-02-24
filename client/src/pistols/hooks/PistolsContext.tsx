@@ -37,7 +37,7 @@ const tavernMenuItems: MenuKey[] = [
 export const initialState = {
   duelistAddress: 0n,
   duelId: 0n,
-  menuKey: MenuKey.YourDuels,
+  menuKey: MenuKey.Duelists,
   sceneName: SceneName.Splash,
 }
 

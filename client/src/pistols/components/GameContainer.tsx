@@ -70,7 +70,7 @@ function GameAudioLoader() {
   if (gameImpl && atDuel) {
     return (
       <div className='Overlay'>
-        {audioLoaded === undefined && <ActionButton large label='Ready!' onClick={() => console.log(`interacted`)} />}
+        {audioLoaded === undefined && <ActionButton large label={<h4>Ready!</h4>} onClick={() => console.log(`interacted`)} />}
         {audioLoaded === false && <h1>Loading Audio...</h1>}
       </div>
     )

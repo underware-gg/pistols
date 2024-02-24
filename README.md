@@ -2,7 +2,7 @@
 
 A fully on-chain game, made with love, by Loot Underworld, with Dojo, for Realms, on Starknet.
 
-[Winner of the Dojo Game Jam #3](https://twitter.com/ohayo_dojo/status/1747626446720258059)
+Winner of the [Dojo Game Jam #3](https://twitter.com/ohayo_dojo/status/1747626446720258059)
 
 ```
                                           ~~^             ^J~                                                           
@@ -63,6 +63,44 @@ Pistols at 10 Blocks is an onchain game, in which you face off against another L
 * sfx/grunt-female.mp3 — https://freesound.org/people/SkyRaeVoicing/sounds/368843/
 * sfx/body-fall.mp3 — https://freesound.org/people/leonelmail/sounds/504626/
 
+
+## Gameplay Logic 
+
+### Pistols Round
+
+On the Pistols round, each player has a chance to **Hit** and a chance to **Execute**, both expressed as percentages, calculated based on the number of steps taken.
+
+1) Hit chance is calculated first. The highest chance at 1 pace, the lowest chance at 10 paces, interpolated in between.
+
+https://github.com/funDAOmental/pistols/blob/0d064ac90f502f348b6f14624f962661140b67aa/dojo/src/types/constants.cairo#L15-L17
+
+2) If hit, Execute chance is calculated. The highest chance at 10 paces, the lowest chance at 1 pace, interpolated in between.
+
+https://github.com/funDAOmental/pistols/blob/0d064ac90f502f348b6f14624f962661140b67aa/dojo/src/types/constants.cairo#L19-L21
+
+
+
+### Blades Round
+
+On the Pistols round, each player has a chance to Hit and a chance to Execute, both expressed as percentages, calculated based on the number of steps taken.
+
+1) Execution chance is first calculated using the `Heavy` blade.
+
+If no execution occurs...
+
+2) Players using the `Light` against a `Heavy` blade strike first.
+
+3) Else, both players attack at the same time.
+
+
+
+### Bonus and Damage penalty
+
+Honourable Lords, with Honour > 9.0, get a bonus on every Hit 
+
+
+
+
 ## Development notes
 
 ### Environment Setup
@@ -94,12 +132,12 @@ Install the [Cairo 1.0](https://marketplace.visualstudio.com/items?itemName=star
 
 > [Dojo Book](https://book.dojoengine.org/getting-started/quick-start.html)
 
-Using Dojo 0.4.3
+Using Dojo 0.5.1
 
 ```console
 curl -L https://install.dojoengine.org | bash
 # open new terminal to update PATH
-dojoup -v 0.4.3
+dojoup -v 0.5.1
 
 # test dojo
 cd dojo

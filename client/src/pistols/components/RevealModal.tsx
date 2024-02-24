@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
-import { Grid, Modal } from 'semantic-ui-react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Grid } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
-import { ActionButton } from '@/pistols/components/ui/Buttons'
+import { useGetValidPackedActions } from '@/pistols/hooks/useContractCalls'
 import { Blades } from '@/pistols/utils/pistols'
-import { signAndRestoreMoveFromHash } from '../utils/salt'
+import { signAndRestoreActionFromHash } from '../utils/salt'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -21,50 +21,32 @@ export default function RevealModal({
   roundNumber: number
   hash: bigint
 }) {
-  const { reveal_move } = useDojoSystemCalls()
+  const { reveal_action } = useDojoSystemCalls()
   const { account } = useDojoAccount()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const { validPackedActions } = useGetValidPackedActions(roundNumber)
+
+  const canReveal = useMemo(() => (isOpen && duelId && roundNumber && hash && validPackedActions.length > 0 && !isSubmitting), [isOpen, duelId, roundNumber, hash, validPackedActions, isSubmitting])
 
   const _reveal = async () => {
-    const possibleMoves = roundNumber == 1 ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] : roundNumber == 2 ? [Blades.Light, Blades.Heavy, Blades.Block] : []
     setIsSubmitting(true)
-    const { salt, move } = await signAndRestoreMoveFromHash(account, duelId, roundNumber, hash, possibleMoves)
-    if (move) {
-      await reveal_move(account, duelId, roundNumber, salt, move)
+    // console.log(`reveal....`, account, duelId, roundNumber, hash, validPackedActions)
+    const { salt, packed, slot1, slot2 } = await signAndRestoreActionFromHash(account, duelId, roundNumber, hash, validPackedActions)
+    if (packed != null && slot1 != null && slot2 != null) {
+      await reveal_action(account, duelId, roundNumber, salt, slot1, slot2)
       setIsOpen(false)
     }
     setIsSubmitting(false)
   }
 
-  const canReveal = (duelId && roundNumber && hash && !isSubmitting)
+  //
+  // auto-reveal (no modal)
+  //
+  useEffect(() => {
+    if (canReveal) {
+      _reveal()
+    }
+  }, [canReveal])
 
-  return (
-    <Modal
-      size='tiny'
-      // dimmer='inverted'
-      onClose={() => setIsOpen(false)}
-      open={isOpen}
-    >
-      {/* <Modal.Header className='AlignCenter'></Modal.Header> */}
-      <Modal.Content>
-        <Modal.Description className='AlignCenter ModalText'>
-          <p>
-            Reveal your move...
-          </p>
-        </Modal.Description>
-      </Modal.Content>
-      <Modal.Actions>
-        <Grid className='FillParent Padded' textAlign='center'>
-          <Row columns='equal'>
-            <Col>
-              <ActionButton fill label='Close' onClick={() => setIsOpen(false)} />
-            </Col>
-            <Col>
-              <ActionButton fill attention label='Reveal...' disabled={!canReveal} onClick={() => _reveal()} />
-            </Col>
-          </Row>
-        </Grid>
-      </Modal.Actions>
-    </Modal>
-  )
+  return <></>
 }

@@ -2,7 +2,8 @@ import React, { useMemo } from 'react'
 import { Image } from 'semantic-ui-react'
 
 
-const _makeUrl = (profilePic: number, suffix: string) => {
+const _makeUrl = (profilePic: number | null, suffix: string) => {
+  if (profilePic === null) return null
   return `/profiles/${('00' + profilePic).slice(-2)}_${suffix}.jpg`
 }
 const _className = (small: boolean, square: boolean, duel: boolean) => (small ? 'ProfilePicSmall' : square ? 'ProfilePicSquare' : duel ? 'ProfilePicDuel' : 'ProfilePic')
@@ -32,14 +33,20 @@ export function ProfilePicButton({
   square = false,
   duel = false,
   disabled = false,
+  dimmed = false,
 }) {
-  const className = useMemo(() => _className(small, square, duel), [square])
+  const classNames = useMemo(() => {
+    let result = [_className(small, square, duel)]
+    if (!disabled) result.push('Anchor')
+    if (disabled || dimmed) result.push('ProfilePicDisabled')
+    return result
+  }, [small, square, duel, disabled, dimmed])
   const suffix = useMemo(() => _suffix(square), [square])
   const url = useMemo(() => _makeUrl(profilePic, suffix), [profilePic, suffix])
   const _click = () => {
     if (!disabled) onClick(profilePic)
   }
-  return <Image src={url} className={`${className} ${!disabled ? `Anchor` : 'ProfilePicDisabled'}`} onClick={() => _click()} />
+  return <Image src={url} className={classNames.join(' ')} onClick={() => _click()} />
 }
 
 //-----------------
@@ -57,7 +64,8 @@ export function ProfilePicSquareButton({
   profilePic,
   small = false,
   disabled = false,
+  dimmed = false,
   onClick,
 }) {
-  return <ProfilePicButton profilePic={profilePic} onClick={onClick} disabled={disabled} small={small} square={true} />
+  return <ProfilePicButton profilePic={profilePic} onClick={onClick} disabled={disabled} dimmed={dimmed} small={small} square={true} />
 }

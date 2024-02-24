@@ -38,13 +38,13 @@ function DojoSetup({ children }) {
       masterAddress: process.env.NEXT_PUBLIC_MASTER_ADDRESS,
       masterPrivateKey: process.env.NEXT_PUBLIC_MASTER_PRIVATE_KEY,
     }
-    console.log(`DojoConfig:`, result)
     return result
   }, [])
 
   useEffectOnce(() => {
     let _mounted = true
     const _setup = async () => {
+      console.log(`DojoConfig:`, config)
       const result = await setup(config)
       if (_mounted) {
         setSetupResult(result)

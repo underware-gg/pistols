@@ -7,11 +7,11 @@ export function defineContractComponents(world: World) {
 	  Challenge: (() => {
 	    return defineComponent(
 	      world,
-	      { duel_id: RecsType.BigInt, state: RecsType.Number, duelist_a: RecsType.BigInt, duelist_b: RecsType.BigInt, message: RecsType.BigInt, pass_code: RecsType.BigInt, round_number: RecsType.Number, winner: RecsType.BigInt, timestamp: RecsType.Number, timestamp_expire: RecsType.Number, timestamp_start: RecsType.Number, timestamp_end: RecsType.Number },
+	      { duel_id: RecsType.BigInt, duelist_a: RecsType.BigInt, duelist_b: RecsType.BigInt, message: RecsType.BigInt, state: RecsType.Number, round_number: RecsType.Number, winner: RecsType.Number, timestamp_start: RecsType.Number, timestamp_end: RecsType.Number },
 	      {
 	        metadata: {
 	          name: "Challenge",
-	          types: ["u128","u8","contractaddress","contractaddress","felt252","felt252","u8","contractaddress","u64","u64","u64","u64"],
+	          types: ["u128","contractaddress","contractaddress","felt252","u8","u8","u8","u64","u64"],
 	          customTypes: [],
 	        },
 	      }
@@ -20,11 +20,11 @@ export function defineContractComponents(world: World) {
 	  Duelist: (() => {
 	    return defineComponent(
 	      world,
-	      { address: RecsType.BigInt, timestamp: RecsType.Number, name: RecsType.BigInt, profile_pic: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, total_honour: RecsType.Number, honour: RecsType.Number },
+	      { address: RecsType.BigInt, name: RecsType.BigInt, profile_pic: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, total_honour: RecsType.Number, honour: RecsType.Number, timestamp: RecsType.Number },
 	      {
 	        metadata: {
 	          name: "Duelist",
-	          types: ["contractaddress","u64","felt252","u8","u32","u32","u32","u32","u32","u8"],
+	          types: ["contractaddress","felt252","u8","u16","u16","u16","u16","u32","u8","u64"],
 	          customTypes: [],
 	        },
 	      }
@@ -46,12 +46,12 @@ export function defineContractComponents(world: World) {
 	  Round: (() => {
 	    return defineComponent(
 	      world,
-	      { duel_id: RecsType.BigInt, round_number: RecsType.Number, state: RecsType.Number, duelist_a: { hash: RecsType.BigInt, salt: RecsType.Number, move: RecsType.Number, damage: RecsType.Number, health: RecsType.Number }, duelist_b: { hash: RecsType.BigInt, salt: RecsType.Number, move: RecsType.Number, damage: RecsType.Number, health: RecsType.Number } },
+	      { duel_id: RecsType.BigInt, round_number: RecsType.Number, state: RecsType.Number, shot_a: { hash: RecsType.Number, salt: RecsType.Number, action: RecsType.Number, chance_crit: RecsType.Number, chance_hit: RecsType.Number, dice_crit: RecsType.Number, dice_hit: RecsType.Number, damage: RecsType.Number, block: RecsType.Number, health: RecsType.Number, honour: RecsType.Number }, shot_b: { hash: RecsType.Number, salt: RecsType.Number, action: RecsType.Number, chance_crit: RecsType.Number, chance_hit: RecsType.Number, dice_crit: RecsType.Number, dice_hit: RecsType.Number, damage: RecsType.Number, block: RecsType.Number, health: RecsType.Number, honour: RecsType.Number } },
 	      {
 	        metadata: {
 	          name: "Round",
-	          types: ["u128","u8","u8","felt252","u64","u8","u8","u8","felt252","u64","u8","u8","u8"],
-	          customTypes: ["Move","Move"],
+	          types: ["u128","u8","u8","u64","u64","u16","u8","u8","u8","u8","u8","u8","u8","u8","u64","u64","u16","u8","u8","u8","u8","u8","u8","u8","u8"],
+	          customTypes: ["Shot","Shot"],
 	        },
 	      }
 	    );

@@ -1,12 +1,13 @@
 // use debug::PrintTrait;
-use core::option::OptionTrait;
 use traits::{Into, TryInto};
 use starknet::{ContractAddress};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-use pistols::models::models::{Duelist, Challenge, Pact, Round, Move};
+use pistols::models::models::{init, Duelist, Challenge, Pact, Round, Shot};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round::{RoundState, RoundStateTrait};
-use pistols::types::constants::{constants};
+use pistols::types::action::{Action, ActionTrait, ACTION};
+use pistols::types::constants::{constants, chances};
+use pistols::utils::math::{MathU8, MathU16};
 
 // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
 extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
@@ -16,10 +17,26 @@ fn zero_address() -> ContractAddress {
     (starknet::contract_address_const::<0x0>())
 }
 
+
+//------------------------
+// Misc
+//
+
 #[inline(always)]
 fn duelist_exist(world: IWorldDispatcher, address: ContractAddress) -> bool {
     let duelist: Duelist = get!(world, address, Duelist);
     (duelist.name != 0)
+}
+
+#[inline(always)]
+fn make_action_hash(salt: u64, packed: u16) -> u64 {
+    let hash: u256 = pedersen(salt.into(), packed.into()).into() & constants::HASH_SALT_MASK;
+    (hash.try_into().unwrap())
+}
+
+#[inline(always)]
+fn make_round_salt(round: Round) -> u64 {
+    (round.shot_a.salt ^ round.shot_b.salt)
 }
 
 fn make_pact_pair(duelist_a: ContractAddress, duelist_b: ContractAddress) -> u128 {
@@ -29,6 +46,101 @@ fn make_pact_pair(duelist_a: ContractAddress, duelist_b: ContractAddress) -> u12
     let bb: u256 = b.into();
     (aa.low ^ bb.low)
 }
+
+fn get_duelist_round_shot(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8) -> Shot {
+    let challenge: Challenge = get!(world, (duel_id), Challenge);
+    let round: Round = get!(world, (duel_id, round_number), Round);
+    if (challenge.duelist_a == duelist_address) {
+        (round.shot_a)
+    } else if (challenge.duelist_b == duelist_address) {
+        (round.shot_b)
+    } else {
+        (init::Shot())
+    }
+}
+fn get_duelist_health(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8) -> u8 {
+    if (round_number == 1) {
+        (constants::FULL_HEALTH)
+    } else {
+        let shot: Shot = get_duelist_round_shot(world, duelist_address, duel_id, round_number);
+        (shot.health)
+    }
+}
+
+//------------------------
+// Action validators
+//
+
+fn get_valid_packed_actions(round_number: u8) -> Array<u16> {
+    if (round_number == 1) {
+        (array![
+            (ACTION::PACES_1).into(),
+            (ACTION::PACES_2).into(),
+            (ACTION::PACES_3).into(),
+            (ACTION::PACES_4).into(),
+            (ACTION::PACES_5).into(),
+            (ACTION::PACES_6).into(),
+            (ACTION::PACES_7).into(),
+            (ACTION::PACES_8).into(),
+            (ACTION::PACES_9).into(),
+            (ACTION::PACES_10).into(),
+        ])
+    } else if (round_number == 2) {
+        (array![
+            // 2 slots
+            pack_action_slots(ACTION::FAST_BLADE, ACTION::FAST_BLADE),
+            pack_action_slots(ACTION::FAST_BLADE, ACTION::BLOCK),
+            pack_action_slots(ACTION::BLOCK, ACTION::FAST_BLADE),
+            pack_action_slots(ACTION::BLOCK, ACTION::BLOCK),
+            // slot 2 only
+            pack_action_slots(ACTION::IDLE, ACTION::SLOW_BLADE),
+            pack_action_slots(ACTION::IDLE, ACTION::FAST_BLADE),
+            pack_action_slots(ACTION::IDLE, ACTION::BLOCK),
+            // slot 1 only
+            pack_action_slots(ACTION::FAST_BLADE, ACTION::IDLE),
+            pack_action_slots(ACTION::BLOCK, ACTION::IDLE),
+            // no action (stand still and wait to die)
+            0,
+        ])
+    } else {
+        (array![])
+    }
+}
+fn validate_packed_actions(round_number: u8, packed: u16) -> bool {
+    let valid_actions = get_valid_packed_actions(round_number);
+    let mut len: usize = valid_actions.len();
+    let mut n: usize = 0;
+    loop {
+        if (n == len || packed == *valid_actions.at(n)) {
+            break;
+        }
+        n += 1;
+    };
+    (n < len)
+}
+fn pack_action_slots(slot1: u8, slot2: u8) -> u16 {
+    ((slot2.into() * 0x100) | slot1.into())
+}
+fn unpack_action_slots(packed: u16) -> (u8, u8) {
+    let slot1: u8 = (packed & 0xff).try_into().unwrap();
+    let slot2: u8 = ((packed & 0xff00) / 0x100).try_into().unwrap();
+    (slot1, slot2)
+}
+fn unpack_round_slots(round: Round) -> (u8, u8, u8, u8) {
+    let (slot1_a, slot2_a): (u8, u8) = unpack_action_slots(round.shot_a.action);
+    let (slot1_b, slot2_b): (u8, u8) = unpack_action_slots(round.shot_b.action);
+    if (slot1_a == 0 && slot1_b == 0) {
+        // if slot 1 is empty, use only slot 2
+        (slot2_a, slot2_b, 0, 0)
+    } else {
+        (slot1_a, slot1_b, slot2_a, slot2_b)
+    }
+}
+
+
+//------------------------
+// Challenge setter
+//
 
 fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
     set!(world, (challenge));
@@ -45,14 +157,20 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
 
     // Start Round
     if (state == ChallengeState::InProgress) {
-        // Round 1 starts with full health
-        let mut health_a: u8 = constants::FULL_HEALTH;
-        let mut health_b: u8 = constants::FULL_HEALTH;
-        // Round 2+ need to copy previous Round's healths
-        if (challenge.round_number > 1) {
+        let mut shot_a = init::Shot();
+        let mut shot_b = init::Shot();
+
+        if (challenge.round_number == 1) {
+            // Round 1 starts with full health
+            shot_a.health = constants::FULL_HEALTH;
+            shot_b.health = constants::FULL_HEALTH;
+        } else {
+            // Round 2+ need to copy previous Round's state
             let prev_round: Round = get!(world, (challenge.duel_id, challenge.round_number - 1), Round);
-            health_a = prev_round.duelist_a.health;
-            health_b = prev_round.duelist_b.health;
+            shot_a.health = prev_round.shot_a.health;
+            shot_b.health = prev_round.shot_b.health;
+            shot_a.honour = prev_round.shot_a.honour;
+            shot_b.honour = prev_round.shot_b.honour;
         }
 
         set!(world, (
@@ -60,81 +178,129 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
                 duel_id: challenge.duel_id,
                 round_number: challenge.round_number,
                 state: RoundState::Commit.into(),
-                duelist_a: Move {
-                    hash: 0,
-                    salt: 0,
-                    move: 0,
-                    damage: 0,
-                    health: health_a,
-                },
-                duelist_b: Move {
-                    hash: 0,
-                    salt: 0,
-                    move: 0,
-                    damage: 0,
-                    health: health_b,
-                },
+                shot_a,
+                shot_b,
             }
         ));
-    }
-
-    // Update totals
-    if (state == ChallengeState::Draw || state == ChallengeState::Resolved) {
+    } else if (state == ChallengeState::Draw || state == ChallengeState::Resolved) {
+        // End Duel!
         let mut duelist_a: Duelist = get!(world, challenge.duelist_a, Duelist);
         let mut duelist_b: Duelist = get!(world, challenge.duelist_b, Duelist);
-        duelist_a.total_duels += 1;
-        duelist_b.total_duels += 1;
+        
+        // update totals, total_duels is updated in update_duelist_honour()
         if (state == ChallengeState::Draw) {
             duelist_a.total_draws += 1;
             duelist_b.total_draws += 1;
-        } else if (challenge.duelist_a == challenge.winner) {
+        } else if (challenge.winner == 1) {
             duelist_a.total_wins += 1;
             duelist_b.total_losses += 1;
-        } else if (challenge.duelist_b == challenge.winner) {
+        } else if (challenge.winner == 2) {
             duelist_a.total_losses += 1;
             duelist_b.total_wins += 1;
         } else {
             // should never get here!
         }
 
-        // compute honour from 1st round steps
-        let first_round: Round = get!(world, (challenge.duel_id, 1), Round);
-        duelist_a.total_honour += first_round.duelist_a.move.into();
-        duelist_b.total_honour += first_round.duelist_b.move.into();
-        // average honour has an extra decimal, eg: 100 = 10.0
-        duelist_a.honour = ((duelist_a.total_honour * 10) / duelist_a.total_duels).try_into().unwrap();
-        duelist_b.honour = ((duelist_b.total_honour * 10) / duelist_b.total_duels).try_into().unwrap();
+        // compute honour from final round
+        let final_round: Round = get!(world, (challenge.duel_id, challenge.round_number), Round);
+        update_duelist_honour(ref duelist_a, final_round.shot_a.honour);
+        update_duelist_honour(ref duelist_b, final_round.shot_b.honour);
         
         // save Duelists
         set!(world, (duelist_a, duelist_b));
     }
 }
 
-fn make_move_hash(salt: u64, move: u8) -> felt252 {
-    (pedersen(salt.into(), move.into()))
+// average honour has an extra decimal, eg: 100 = 10.0
+fn update_duelist_honour(ref duelist: Duelist, duel_honour: u8) {
+    duelist.total_duels += 1;
+    duelist.total_honour += duel_honour.into();
+    duelist.honour = ((duelist.total_honour * 10) / duelist.total_duels.into()).try_into().unwrap();
+}
+
+
+//------------------------
+// Chances
+//
+
+fn calc_hit_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
+    let chances: u8 = action.hit_chance();
+    let penalty: u8 = calc_hit_penalty(world, health);
+    (apply_chance_bonus_penalty(chances, 0, penalty))
+}
+fn calc_crit_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
+    let chances: u8 = action.crit_chance();
+    let bonus: u8 = calc_hit_bonus(world, duelist_address);
+    (apply_chance_bonus_penalty(chances, bonus, 0))
+}
+fn calc_glance_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
+    let chances: u8 = action.glance_chance();
+    (chances)
+}
+fn calc_honour_for_action(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action) -> (u8, u8) {
+    let mut duelist: Duelist = get!(world, duelist_address, Duelist);
+    let duel_honour: u8 = action.honour();
+    update_duelist_honour(ref duelist, duel_honour);
+    (duel_honour, duelist.honour)
+}
+
+fn calc_hit_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> u8 {
+    let duelist: Duelist = get!(world, duelist_address, Duelist);
+    let bonus: u8 = MathU8::sub(duelist.honour, 90);
+    (MathU16::min(bonus.into(), duelist.total_duels).try_into().unwrap())
+}
+fn calc_hit_penalty(world: IWorldDispatcher, health: u8) -> u8 {
+    ((constants::FULL_HEALTH - health) * constants::HIT_PENALTY_PER_DAMAGE)
+}
+fn apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
+    let mut result: u8 = MathU8::sub(chance + bonus, penalty);
+    (MathU8::clamp(result, chance / 2, 100))
+}
+
+
+//------------------------
+// Randomizer
+//
+
+// throw a dice and return the resulting face
+// faces: the number of faces on the dice (ex: 6, or 100%)
+// returns a number between 1 and faces
+fn throw_dice(seed: felt252, salt: felt252, faces: u128) -> u128 {
+    let hash: felt252 = pedersen(salt, seed);
+    let double: u256 = hash.into();
+    ((double.low % faces) + 1)
 }
 
 // throw a dice and return a positive result
-// limit: how many faces gives a positive result?
 // faces: the number of faces on the dice (ex: 6, or 100%)
-// edge case: limit 0 is always negative
-// edge case: limit=faces is always positive
-fn throw_dice(seed: felt252, salt: felt252, limit: u128, faces: u128) -> bool {
-    let hash: felt252 = pedersen(salt, seed);
-    let double: u256 = hash.into();
-    ((double.low % faces) < limit)
+// limit: how many faces gives a positive result?
+// edge case: limit <= 1, always negative
+// edge case: limit == faces, always positive
+fn check_dice(seed: felt252, salt: felt252, faces: u128, limit: u128) -> bool {
+    (throw_dice(seed, salt, faces) <= limit)
 }
 
 
 
+
+
+
+
+//------------------------------------------------------
+// Unit tests
+//
 #[cfg(test)]
 mod tests {
     use core::traits::{Into, TryInto};
     use debug::PrintTrait;
     use starknet::{ContractAddress};
 
-    use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::systems::{utils};
+    use pistols::models::models::{init, Round, Shot};
+    use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
+    use pistols::types::constants::{constants, chances};
+    use pistols::types::action::{ACTION};
+    use pistols::utils::math::{MathU8};
 
     #[test]
     #[available_gas(1_000_000)]
@@ -148,14 +314,14 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_throw_dice_average() {
+    fn test_check_dice_average() {
         // lower limit
         let mut counter: u8 = 0;
         let mut n: felt252 = 0;
         loop {
             if (n == 100) { break; }
             let seed: felt252 = 'seed_1' + n;
-            if (utils::throw_dice(seed, 'salt_1', 25, 100)) {
+            if (utils::check_dice(seed, 'salt_1', 100, 25)) {
                 counter += 1;
             }
             n += 1;
@@ -167,7 +333,7 @@ mod tests {
         loop {
             if (n == 100) { break; }
             let seed: felt252 = 'seed_2' + n;
-            if (utils::throw_dice(seed, 'salt_2', 75, 100)) {
+            if (utils::check_dice(seed, 'salt_2', 100, 75)) {
                 counter += 1;
             }
             n += 1;
@@ -177,17 +343,86 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_throw_dice_edge() {
+    fn test_check_dice_edge() {
         let mut n: felt252 = 0;
         loop {
             if (n == 100) { break; }
             let seed: felt252 = 'seed' + n;
-            let bottom: bool = utils::throw_dice(seed, 'salt', 0, 10);
+            let bottom: bool = utils::check_dice(seed, 'salt', 10, 0);
             assert(bottom == false, 'bottom');
-            let upper: bool = utils::throw_dice(seed, 'salt', 10, 10);
+            let upper: bool = utils::check_dice(seed, 'salt', 10, 10);
             assert(upper == true, 'bottom');
             n += 1;
         };
+    }
+
+    #[test]
+    #[available_gas(100_000_000)]
+    fn test_validate_packed_actions() {
+        assert(utils::validate_packed_actions(1, ACTION::PACES_1.into()) == true, '1_Paces1');
+        assert(utils::validate_packed_actions(1, ACTION::PACES_1.into()) == true, '1_Paces1');
+        assert(utils::validate_packed_actions(2, ACTION::PACES_10.into()) == false, '2_Paces10');
+        assert(utils::validate_packed_actions(2, ACTION::PACES_10.into()) == false, '2_Paces10');
+        let action = utils::pack_action_slots(ACTION::FAST_BLADE, ACTION::FAST_BLADE);
+        assert(utils::validate_packed_actions(1, action) == false, '1_bladess');
+        assert(utils::validate_packed_actions(2, action) == true, '2_blades');
+        let action = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::SLOW_BLADE);
+        assert(utils::validate_packed_actions(1, action) == false, '1_invalid');
+        assert(utils::validate_packed_actions(2, action) == false, '2_invalid');
+        let action = utils::pack_action_slots(ACTION::PACES_1, ACTION::PACES_1);
+        assert(utils::validate_packed_actions(1, action) == false, '1_dual_paces');
+        assert(utils::validate_packed_actions(2, action) == false, '2_dual_paces');
+        // inaction is valid on round 2
+        assert(utils::validate_packed_actions(1, 0) == false, '1_zero');
+        assert(utils::validate_packed_actions(2, 0) == true, '2_zero');
+    }
+
+    #[test]
+    #[available_gas(100_000_000)]
+    fn test_slot_packing_actions() {
+        let packed = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::FAST_BLADE);
+        let (slot1, slot2) = utils::unpack_action_slots(packed);
+        assert(slot1 == ACTION::SLOW_BLADE, 'slot1');
+        assert(slot2 == ACTION::FAST_BLADE, 'slot2');
+    }
+
+    #[test]
+    #[available_gas(100_000_000)]
+    fn test_slot_packing_round() {
+        let mut round = Round {
+            duel_id: 1,
+            round_number: 1,
+            state: 1,
+            shot_a: init::Shot(),
+            shot_b: init::Shot(),
+        };
+        // full
+        round.shot_a.action = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::BLOCK);
+        round.shot_b.action = utils::pack_action_slots(ACTION::FAST_BLADE, ACTION::PACES_1);
+        let packed = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::FAST_BLADE);
+        let (slot1_a, slot1_b, slot2_a, slot2_b): (u8, u8, u8, u8) = utils::unpack_round_slots(round);
+        assert(slot1_a == ACTION::SLOW_BLADE, 'slot1_a');
+        assert(slot1_b == ACTION::FAST_BLADE, 'slot1_b');
+        assert(slot2_a == ACTION::BLOCK, 'slot2_a');
+        assert(slot2_b == ACTION::PACES_1, 'slot2_b');
+        // slot 1 only
+        round.shot_a.action = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::IDLE);
+        round.shot_b.action = utils::pack_action_slots(ACTION::FAST_BLADE, ACTION::IDLE);
+        let packed = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::FAST_BLADE);
+        let (slot1_a, slot1_b, slot2_a, slot2_b): (u8, u8, u8, u8) = utils::unpack_round_slots(round);
+        assert(slot1_a == ACTION::SLOW_BLADE, 'slot1_a');
+        assert(slot1_b == ACTION::FAST_BLADE, 'slot1_b');
+        assert(slot2_a == ACTION::IDLE, 'slot2_a');
+        assert(slot2_b == ACTION::IDLE, 'slot2_b');
+        // slot 2 only
+        round.shot_a.action = utils::pack_action_slots(ACTION::IDLE, ACTION::SLOW_BLADE);
+        round.shot_b.action = utils::pack_action_slots(ACTION::IDLE, ACTION::FAST_BLADE);
+        let packed = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::FAST_BLADE);
+        let (slot1_a, slot1_b, slot2_a, slot2_b): (u8, u8, u8, u8) = utils::unpack_round_slots(round);
+        assert(slot1_a == ACTION::SLOW_BLADE, 'slot1_a');
+        assert(slot1_b == ACTION::FAST_BLADE, 'slot1_b');
+        assert(slot2_a == ACTION::IDLE, 'slot2_a');
+        assert(slot2_b == ACTION::IDLE, 'slot2_b');
     }
 
 }

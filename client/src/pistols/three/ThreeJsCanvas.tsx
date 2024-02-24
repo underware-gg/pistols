@@ -17,7 +17,7 @@ export const ThreeJsCanvas = ({
     const _initialize = async () => {
       await game.init(canvasRef.current, width, height, guiEnabled)
       if (_mounted) {
-        game.animate(0)
+        game.animate()
         // game.resetGameParams(gameParams)
         setIsLoading(false)
         setIsRunning(true)

@@ -10,6 +10,7 @@ mod utils {
 
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::types::challenge::{ChallengeState};
+    use pistols::types::action::{Action};
     use pistols::models::models::{
         Duelist, duelist,
         Challenge, challenge,
@@ -71,12 +72,11 @@ mod utils {
 
     fn execute_create_challenge(system: IActionsDispatcher, sender: ContractAddress,
         challenged: ContractAddress,
-        pass_code: felt252,
         message: felt252,
         expire_seconds: u64,
     ) -> u128 {
         testing::set_contract_address(sender);
-        let duel_id: u128 = system.create_challenge(challenged, pass_code, message, expire_seconds);
+        let duel_id: u128 = system.create_challenge(challenged, message, expire_seconds);
         _next_block();
         (duel_id)
     }
@@ -91,24 +91,25 @@ mod utils {
         (new_state)
     }
 
-    fn execute_commit_move(system: IActionsDispatcher, sender: ContractAddress,
+    fn execute_commit_action(system: IActionsDispatcher, sender: ContractAddress,
         duel_id: u128,
         round_number: u8,
-        hash: felt252,
+        hash: u64,
     ) {
         testing::set_contract_address(sender);
-        system.commit_move(duel_id, round_number, hash);
+        system.commit_action(duel_id, round_number, hash);
         _next_block();
     }
 
-    fn execute_reveal_move(system: IActionsDispatcher, sender: ContractAddress,
+    fn execute_reveal_action(system: IActionsDispatcher, sender: ContractAddress,
         duel_id: u128,
         round_number: u8,
         salt: u64,
-        move: u8,
+        slot1: u8,
+        slot2: u8,
     ) {
         testing::set_contract_address(sender);
-        system.reveal_move(duel_id, round_number, salt, move);
+        system.reveal_action(duel_id, round_number, salt, slot1, slot2);
         _next_block();
     }
 
@@ -116,17 +117,28 @@ mod utils {
     // read-only calls
     //
 
-    fn execute_get_timestamp(system: IActionsDispatcher) -> u64 {
-        let result: u64 = system.get_timestamp();
-        (result)
-    }
-
     fn execute_get_pact(system: IActionsDispatcher, a: ContractAddress, b: ContractAddress) -> u128 {
         let result: u128 = system.get_pact(a, b);
         (result)
     }
     fn execute_has_pact(system: IActionsDispatcher, a: ContractAddress, b: ContractAddress) -> bool {
         let result: bool = system.has_pact(a, b);
+        (result)
+    }
+    fn calc_hit_bonus(system: IActionsDispatcher, duelist_address: ContractAddress) -> u8 {
+        let result: u8 = system.calc_hit_bonus(duelist_address);
+        (result)
+    }
+    fn calc_hit_penalty(system: IActionsDispatcher, health: u8) -> u8 {
+        let result: u8 = system.calc_hit_penalty(health);
+        (result)
+    }
+    fn calc_hit_chances(system: IActionsDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8 {
+        let result: u8 = system.calc_hit_chances(duelist_address, duel_id, round_number, action);
+        (result)
+    }
+    fn calc_crit_chances(system: IActionsDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8 {
+        let result: u8 = system.calc_crit_chances(duelist_address, duel_id, round_number, action);
         (result)
     }
 
@@ -191,7 +203,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000)]
-    fn test_hor_hash() {
+    fn test_xor_hash() {
         let a: felt252 = 0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7;
         let b: felt252 = 0x4d07e40e93398ed3c76981e72dd1fd22557a78ce36c0515f679e27f0bb5bc5f;
         let aa: u256 = a.into();

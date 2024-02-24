@@ -1,70 +1,58 @@
 
 mod shooter {
-    use core::option::OptionTrait;
     use core::traits::TryInto;
     use starknet::{ContractAddress, get_block_timestamp};
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     use pistols::systems::{utils};
-    use pistols::models::models::{Challenge, Round, Move};
+    use pistols::models::models::{init, Challenge, Round, Shot};
     use pistols::types::constants::{constants};
     use pistols::types::challenge::{ChallengeState};
     use pistols::types::round::{RoundState};
-    use pistols::types::steps::{Steps};
-    use pistols::types::blades::{Blades};
-    use pistols::utils::math::{MathU8};
+    use pistols::types::action::{Action, ACTION, ActionTrait};
+    use pistols::utils::math::{MathU8, MathU16};
 
-    fn _assert_challenge(world: IWorldDispatcher, caller: ContractAddress, duel_id: u128, round_number: u8) -> (Challenge, felt252) {
+    fn _assert_challenge(world: IWorldDispatcher, caller: ContractAddress, duel_id: u128, round_number: u8) -> (Challenge, u8) {
         let challenge: Challenge = get!(world, duel_id, Challenge);
 
         // Assert Duelist is in the challenge
-        let duelist: felt252 = if (challenge.duelist_a == caller) { 'a' } else if (challenge.duelist_b == caller) { 'b' } else { 0 };
-        assert(duelist == 'a' || duelist == 'b', 'Not your Challenge!');
+        let duelist_number: u8 = if (challenge.duelist_a == caller) { 1 } else if (challenge.duelist_b == caller) { 2 } else { 0 };
+        assert(duelist_number == 1 || duelist_number == 2, 'Not your Challenge!');
 
         // Correct Challenge state
         assert(challenge.state == ChallengeState::InProgress.into(), 'Challenge is not In Progress');
         assert(challenge.round_number == round_number, 'Bad Round number');
         
-        (challenge, duelist)
-    }
-
-    fn _assert_round_move(round_number: u8, move: u8) {
-        if (round_number == 1) {
-            let steps: Option<Steps> = move.try_into();
-            assert(steps != Option::None, 'Bad step move');
-        } else if (round_number == 2) {
-            let blade: Option<Blades> = move.try_into();
-            assert(blade != Option::None, 'Bad blade move');
-        }
+        (challenge, duelist_number)
     }
 
 
     //-----------------------------------
     // Commit
     //
-    fn commit_move(world: IWorldDispatcher, duel_id: u128, round_number: u8, hash: felt252) {
+    fn commit_action(world: IWorldDispatcher, duel_id: u128, round_number: u8, hash: u64) {
         let caller: ContractAddress = starknet::get_caller_address();
 
         // Assert correct Challenge
-        let (challenge, duelist) = _assert_challenge(world, caller, duel_id, round_number);
+        let (challenge, duelist_number) = _assert_challenge(world, caller, duel_id, round_number);
 
         // Assert correct Round
         let mut round: Round = get!(world, (duel_id, round_number), Round);
         assert(round.state == RoundState::Commit.into(), 'Round not in Commit');
 
-        // Validate move hash
+        // Validate action hash
 
         // Store hash
-        if (duelist == 'a') {
-            assert(round.duelist_a.hash == 0, 'Already committed');
-            round.duelist_a.hash = hash;
-        } else if (duelist == 'b') {
-            assert(round.duelist_b.hash == 0, 'Already committed');
-            round.duelist_b.hash = hash;
+        if (duelist_number == 1) {
+            assert(round.shot_a.hash == 0, 'Already committed');
+            round.shot_a.hash = hash;
+        } else if (duelist_number == 2) {
+            assert(round.shot_b.hash == 0, 'Already committed');
+            round.shot_b.hash = hash;
         }
 
         // Finished commit
-        if (round.duelist_a.hash != 0 && round.duelist_b.hash != 0) {
+        if (round.shot_a.hash != 0 && round.shot_b.hash != 0) {
             round.state = RoundState::Reveal.into();
         }
 
@@ -74,92 +62,136 @@ mod shooter {
     //-----------------------------------
     // Reveal
     //
-    fn reveal_move(world: IWorldDispatcher, duel_id: u128, round_number: u8, salt: u64, move: u8) {
+    fn reveal_action(world: IWorldDispatcher, duel_id: u128, round_number: u8, salt: u64, mut packed: u16) {
         let caller: ContractAddress = starknet::get_caller_address();
 
         // Assert correct Challenge
-        let (mut challenge, duelist) = _assert_challenge(world, caller, duel_id, round_number);
+        let (mut challenge, duelist_number) = _assert_challenge(world, caller, duel_id, round_number);
 
         // Assert correct Round
         let mut round: Round = get!(world, (duel_id, round_number), Round);
         assert(round.state == RoundState::Reveal.into(), 'Round not in Reveal');
 
-        // Validate move hash
-        let hash: felt252 = utils::make_move_hash(salt, move);
+        // Validate action hash
+        let hash: u64 = utils::make_action_hash(salt, packed);
 
-        // validate move
-        assert(move > 0, 'Invalid move zero');
-        // will panic if invalid move
-        _assert_round_move(round_number, move);
-
-        // Store move
-        if (duelist == 'a') {
-            assert(round.duelist_a.move == 0, 'Already revealed');
-            assert(round.duelist_a.hash == hash, 'Move does not match commitment');
-            round.duelist_a.salt = salt;
-            round.duelist_a.move = move;
-        } else if (duelist == 'b') {
-            assert(round.duelist_b.move == 0, 'Already revealed');
-            assert(round.duelist_b.hash == hash, 'Move does not match commitment');
-            round.duelist_b.salt = salt;
-            round.duelist_b.move = move;
+        // validate stored actions
+        if (!utils::validate_packed_actions(round_number, packed)) {
+            // since the hash is validated, we cant throw an error and go back
+            packed = if (round_number == 1) {
+                // do 10 paces
+                (ACTION::PACES_10.into())
+            } else {
+                // set as Idle, player will stand still and hopefully die
+                (ACTION::IDLE.into())
+            }
         }
 
-        // Finishes round if both moves are revealed
-        if (round.duelist_a.move > 0 && round.duelist_b.move > 0) {
-            finish_round(ref challenge, ref round);
-            // update Round first, Challenge may need it
+        // Store action
+        if (duelist_number == 1) {
+            assert(round.shot_a.action == 0, 'Already revealed');
+            assert(round.shot_a.hash == hash, 'Action does not match hash');
+            round.shot_a.salt = salt;
+            round.shot_a.action = packed;
+        } else if (duelist_number == 2) {
+            assert(round.shot_b.action == 0, 'Already revealed');
+            assert(round.shot_b.hash == hash, 'Action does not match hash');
+            round.shot_b.salt = salt;
+            round.shot_b.action = packed;
+        }
+
+        // incomplete Round, update only
+        if (round.shot_a.salt == 0 || round.shot_b.salt == 0) {
             set!(world, (round));
-            // update Challenge
-            utils::set_challenge(world, challenge);
+            return;
+        }
+
+        // Process round when both actions are revealed
+        if (round_number == 1) {
+            process_round(world, ref challenge, ref round, false);
         } else {
-            // update Round only
-            set!(world, (round));
+            // split packed action slots
+            let (slot1_a, slot1_b, slot2_a, slot2_b): (u8, u8, u8, u8) = utils::unpack_round_slots(round);
+            round.shot_a.action = slot1_a.into();
+            round.shot_b.action = slot1_b.into();
+            let is_last_round: bool = (slot2_a == 0 && slot2_b == 0);
+            process_round(world, ref challenge, ref round, is_last_round);
+            // open Round 3 if not over
+            if (challenge.state == ChallengeState::InProgress.into()) {
+                // TODO: move this to init::
+                let mut round3 = Round {
+                    duel_id: challenge.duel_id,
+                    round_number: challenge.round_number,
+                    state: RoundState::Reveal.into(),
+                    shot_a: Shot {
+                        hash: 0,
+                        salt: (round.shot_a.salt ^round.shot_a.hash),
+                        action: slot2_a.into(),
+                        chance_crit: 0,
+                        chance_hit: 0,
+                        dice_crit: 0,
+                        dice_hit: 0,
+                        damage: 0,
+                        block: 0,
+                        health: round.shot_a.health,
+                        honour: round.shot_a.honour,
+                    },
+                    shot_b: Shot {
+                        hash: 0,
+                        salt: (round.shot_b.salt ^round.shot_b.hash),
+                        action: slot2_b.into(),
+                        chance_crit: 0,
+                        chance_hit: 0,
+                        dice_crit: 0,
+                        dice_hit: 0,
+                        damage: 0,
+                        block: 0,
+                        health: round.shot_b.health,
+                        honour: round.shot_b.honour,
+                    },
+                };
+                process_round(world, ref challenge, ref round3, true);
+            }
         }
+        
+        // update Challenge
+        utils::set_challenge(world, challenge);
     }
 
-    //-----------------------------------
-    // Decide who wins a round
+    //---------------------------------------
+    // Decide who wins a round, or go to next
     //
-    fn finish_round(ref challenge: Challenge, ref round: Round) {
-        let mut winner = utils::zero_address();
-
-        // get damage for each player
-        if (round.round_number == 1) {
-            let (a, b) = pistols_shootout(round);
-            round.duelist_a.damage = a;
-            round.duelist_b.damage = b;
-        } else if (round.round_number == 2) {
-            let (a, b) = blades_clash(round);
-            round.duelist_a.damage = a;
-            round.duelist_b.damage = b;
+    fn process_round(world: IWorldDispatcher, ref challenge: Challenge, ref round: Round, is_last_round: bool) {
+        let action_a: Action = apply_action_honour(ref round.shot_a);
+        let action_b: Action = apply_action_honour(ref round.shot_b);
+        
+        let priority: i8 = action_a.roll_priority(action_b);
+        if (priority < 0) {
+            // A attacks first
+            attack_sync(world, challenge.duelist_a, challenge.duelist_b, round, ref round.shot_a, ref round.shot_b, false);
+        } else if (priority > 0) {
+            // B attacks first
+            attack_sync(world, challenge.duelist_b, challenge.duelist_a, round, ref round.shot_b, ref round.shot_a, false);
+        } else {
+            // same time
+            attack_sync(world, challenge.duelist_a, challenge.duelist_b, round, ref round.shot_a, ref round.shot_b, true);
         }
 
-        // apply damage
-        round.duelist_a.health -= MathU8::min(round.duelist_a.damage, round.duelist_a.health);
-        round.duelist_b.health -= MathU8::min(round.duelist_b.damage, round.duelist_b.health);
-
         // decide results
-        if (round.duelist_a.health == 0 && round.duelist_b.health == 0) {
+        if (round.shot_a.health == 0 && round.shot_b.health == 0) {
             // both dead!
-            challenge.state = ChallengeState::Draw.into();
-            challenge.timestamp_end = get_block_timestamp();
-        } else if (round.duelist_a.health == 0) {
+            end_challenge(ref challenge, ChallengeState::Draw, 0);
+        } else if (round.shot_a.health == 0) {
             // A is dead!
-            challenge.state = ChallengeState::Resolved.into();
-            challenge.winner = challenge.duelist_b;
-            challenge.timestamp_end = get_block_timestamp();
-        } else if (round.duelist_b.health == 0) {
+            end_challenge(ref challenge, ChallengeState::Resolved, 2);
+        } else if (round.shot_b.health == 0) {
             // B is dead!
-            challenge.state = ChallengeState::Resolved.into();
-            challenge.winner = challenge.duelist_a;
-            challenge.timestamp_end = get_block_timestamp();
+            end_challenge(ref challenge, ChallengeState::Resolved, 1);
         } else {
             // both alive!
-            if (challenge.round_number == constants::ROUND_COUNT) {
+            if (challenge.round_number == constants::ROUND_COUNT || is_last_round) {
                 // end in a Draw
-                challenge.state = ChallengeState::Draw.into();
-                challenge.timestamp_end = get_block_timestamp();
+                end_challenge(ref challenge, ChallengeState::Draw, 0);
             } else {
                 // next round
                 challenge.round_number += 1;
@@ -168,127 +200,149 @@ mod shooter {
 
         // Finish round
         round.state = RoundState::Finished.into();
+        set!(world, (round));
     }
 
-    //-----------------------------------
-    // Pistols duel
+    fn apply_action_honour(ref shot: Shot) -> Action {
+        let action: Action = shot.action.into();
+        let honour: u8 = action.honour();
+        if (honour > 0) {
+            shot.honour = honour;
+        }
+        (action)
+    }
+
+    fn end_challenge(ref challenge: Challenge, state: ChallengeState, winner: u8) {
+        challenge.state = state.into();
+        challenge.winner = winner;
+        challenge.timestamp_end = get_block_timestamp();
+    }
+
+    //-------------------------
+    // Attacks
     //
-    fn pistols_shootout(round: Round) -> (u8, u8) {
-        let mut damage_a: u8 = 0;
-        let mut damage_b: u8 = 0;
 
-        let steps_a: u8 = round.duelist_a.move;
-        let steps_b: u8 = round.duelist_b.move;
-
-        if (steps_a == steps_b) {
-            // both duelists shoot together
-            damage_a = shoot_damage('shoot_b', round, steps_b);
-            damage_b = shoot_damage('shoot_a', round, steps_a);
-        } else if (steps_a < steps_b) {
-            // A shoots first
-            damage_b = shoot_damage('shoot_a', round, steps_a);
-            // if not dead, B can shoot
-            if (damage_b < constants::FULL_HEALTH) {
-                damage_a = shoot_damage('shoot_b', round, steps_b);
+    // execute attacks in sync or async
+    fn attack_sync(world: IWorldDispatcher, attacker: ContractAddress, defender: ContractAddress, round: Round, ref attack: Shot, ref defense: Shot, sync: bool) {
+        // attack first, if survives defense can attack
+        let executed: bool = attack(world, 'shoot_a', attacker, round, ref attack, ref defense);
+        if (sync || !executed) {
+            let executed: bool = attack(world, 'shoot_b', defender, round, ref defense, ref attack);
+            if (executed) {
+                attack.block = 0; // execution cancels any block
             }
+        }
+        apply_damage(ref defense);
+        apply_damage(ref attack);
+    }
+
+    #[inline(always)]
+    fn apply_damage(ref shot: Shot) {
+        shot.health = MathU8::sub(shot.health, MathU8::sub(shot.damage, shot.block));
+    }
+
+    // executes single attack
+    // returns true if ended in execution
+    fn attack(world: IWorldDispatcher, seed: felt252, attacker: ContractAddress, round: Round, ref attack: Shot, ref defense: Shot) -> bool {
+        let action: Action = attack.action.into();
+        if (action == Action::Idle) {
+            return (false);
+        }
+        // dice 1: crit (execution, double damage, goal)
+        attack.chance_crit = utils::calc_crit_chances(world, attacker, action, attack.health);
+        attack.dice_crit = throw_dice(seed, round, 100);
+        if (attack.dice_crit <= attack.chance_crit) {
+            return (action.execute_crit(ref attack, ref defense));
         } else {
-            // B shoots first
-            damage_a = shoot_damage('shoot_b', round, steps_b);
-            // if not dead, A can shoot
-            if (damage_a < constants::FULL_HEALTH) {
-                damage_b = shoot_damage('shoot_a', round, steps_a);
+            // dice 2: miss or hit
+            attack.chance_hit = utils::calc_hit_chances(world, attacker, action, attack.health);
+            attack.dice_hit = throw_dice(seed * 2, round, 100);
+            if (attack.dice_hit <= attack.chance_hit) {
+                action.execute_hit(ref attack, ref defense);
             }
         }
-
-        (damage_a, damage_b)
-    }
-
-    fn shoot_damage(seed: felt252, round: Round, steps: u8) -> u8 {
-        // dice 1: did the bullet hit the other player?
-        // at step 1: HIT chance is 80%
-        // at step 10: HIT chance is 20%
-        let percentage: u128 = MathU8::map(steps, 1, 10, constants::CHANCE_HIT_STEP_1, constants::CHANCE_HIT_STEP_10).into();
-        let hit: bool = throw_dice(seed, round, percentage, 100);
-        if (!hit) {
-            return 0;
-        }
-        // dice 2: if the bullet HIT the other player, what's the damage?
-        // at step 1: KILL chance is 10%
-        // at step 10: KILL chance is 100%
-        let percentage: u128 = MathU8::map(steps, 1, 10, constants::CHANCE_KILL_STEP_1, constants::CHANCE_KILL_STEP_10).into();
-        let killed: bool = throw_dice(seed * 2, round, percentage, 100);
-        (if (killed) { constants::FULL_HEALTH } else { constants::HALF_HEALTH })
-    }
-
-
-    //-----------------------------------
-    // Blades duel
-    //
-    // Light - hits for half damage, early
-    // Heavy - hits for full damge, late
-    // Block - blocks light but not heavy, does no damage
-    //
-    // So...
-    // light vs light = both players take 1 damage
-    // Heavy vs heavy = both players die
-    // Block vs block = nothing
-    // Light vs block = nothing
-    // Light vs heavy = light hits first, if heavy lord survives, heavy hits second (and kills the other lord)
-    // Heavy vs block = blocking lord dies
-    //
-    fn blades_clash(round: Round) -> (u8, u8) {
-        let mut damage_a: u8 = 0;
-        let mut damage_b: u8 = 0;
-
-        let blades_a: Blades = round.duelist_a.move.try_into().unwrap();
-        let blades_b: Blades = round.duelist_b.move.try_into().unwrap();
-
-        if (blades_a == Blades::Light) {
-            if (blades_b == Blades::Light) {
-                damage_a = constants::HALF_HEALTH;
-                damage_b = constants::HALF_HEALTH;
-            } else if (blades_b == Blades::Heavy) {
-                damage_b = constants::HALF_HEALTH;
-                // if B survives, A is hit
-                if (damage_b < round.duelist_b.health) {
-                    damage_a = constants::FULL_HEALTH;
-                }
-            } else if (blades_b == Blades::Block) {
-                // Nothing (successful block)
-            }
-        } else if (blades_a == Blades::Heavy) {
-            if (blades_b == Blades::Heavy) {
-                damage_a = constants::FULL_HEALTH;
-                damage_b = constants::FULL_HEALTH;
-            } else if (blades_b == Blades::Light) {
-                damage_a = constants::HALF_HEALTH;
-                // if A survives, B is hit
-                if (damage_a < round.duelist_a.health) {
-                    damage_b = constants::FULL_HEALTH;
-                }
-            } else if (blades_b == Blades::Block) {
-                damage_b = constants::FULL_HEALTH;
-            }
-        } else if (blades_a == Blades::Block) {
-            if (blades_b == Blades::Block) {
-                // Nothing (successful block)
-            } else if (blades_b == Blades::Light) {
-                // Nothing (successful block)
-            } else if (blades_b == Blades::Heavy) {
-                damage_a = constants::FULL_HEALTH;
-            }
-        }
-
-        (damage_a, damage_b)
+        (false)
     }
 
 
     //-----------------------------------
     // Randomizer
     //
-    fn throw_dice(seed: felt252, round: Round, limit: u128, faces: u128) -> bool {
-        let salt: u64 = (round.duelist_a.salt ^ round.duelist_b.salt);
-        (utils::throw_dice(seed, salt.into(), limit, faces))
+    fn throw_dice(seed: felt252, round: Round, faces: u128) -> u8 {
+        let salt: u64 = utils::make_round_salt(round);
+        (utils::throw_dice(seed, salt.into(), faces).try_into().unwrap())
+    }
+    fn check_dice(seed: felt252, round: Round, faces: u128, limit: u128) -> bool {
+        let salt: u64 = utils::make_round_salt(round);
+        (utils::check_dice(seed, salt.into(), faces, limit))
     }
 
+}
+
+
+
+
+
+
+//------------------------------------------------------
+// Unit tests
+//
+#[cfg(test)]
+mod tests {
+    use debug::PrintTrait;
+    use core::traits::{Into, TryInto};
+
+    use pistols::systems::shooter::{shooter};
+    use pistols::models::models::{init, Shot};
+    use pistols::types::action::{Action, ACTION};
+    use pistols::types::constants::{constants};
+    use pistols::systems::{utils};
+
+    #[test]
+    #[available_gas(1_000_000)]
+    fn test_apply_damage() {
+        let mut shot = init::Shot();
+        // damages
+        shot.health = 3;
+        shot.damage = 1;
+        shooter::apply_damage(ref shot);
+        assert(shot.health == 2, '3-1');
+        shooter::apply_damage(ref shot);
+        assert(shot.health == 1, '2-1');
+        shooter::apply_damage(ref shot);
+        assert(shot.health == 0, '1-1');
+        shooter::apply_damage(ref shot);
+        assert(shot.health == 0, '0-1');
+        // overflow
+        shot.health = 1;
+        shot.damage = 3;
+        shooter::apply_damage(ref shot);
+        assert(shot.health == 0, '1-3');
+        // blocks
+        shot.health = 1;
+        shot.damage = 0;
+        shot.block = 1;
+        shooter::apply_damage(ref shot);
+        assert(shot.health == 1, '1-0+1');
+        shot.health = 1;
+        shot.damage = 1;
+        shot.block = 1;
+        shooter::apply_damage(ref shot);
+        assert(shot.health == 1, '1-1+1');
+        shot.health = 1;
+        shot.damage = 2;
+        shot.block = 1;
+        shooter::apply_damage(ref shot);
+        assert(shot.health == 0, '1-2+1');
+        shot.health = 2;
+        shot.damage = 4;
+        shot.block = 1;
+        shooter::apply_damage(ref shot);
+        assert(shot.health == 0, '2-4+1');
+        shot.health = 1;
+        shot.damage = 2;
+        shot.block = 5;
+        shooter::apply_damage(ref shot);
+        assert(shot.health == 1, '1-2+5');
+    }
 }

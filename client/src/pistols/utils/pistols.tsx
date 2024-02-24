@@ -1,16 +1,5 @@
 import { bigintToHex } from "./utils"
 
-
-//------------------------------------------
-// must be in sync with CONSTANTS
-// (constants.cairo)
-//
-export const ROUND_COUNT = 2
-export const FULL_HONOUR = 100
-export const FULL_HEALTH = 100
-export const HALF_HEALTH = 50
-
-
 //------------------------------------------
 // must be in sync with CHALLENGE_STATE
 // (challenge.cairo)
@@ -90,21 +79,20 @@ export enum RoundState {
 
 //------------------------------------------
 // must be in sync with BLADES
-// (blades.cairo)
+// (action.cairo)
 //
 export enum Blades {
-  Null,
-  Light,  // 1
-  Heavy,  // 2
-  Block,  // 3
-  Count,
+  Idle = 0,
+  Fast = 0x10,
+  Slow = 0x20,
+  Block = 0x30,
 }
 
 export const BladesNames = {
-  [Blades.Null]: 'Null',
-  [Blades.Light]: 'Light',
-  [Blades.Heavy]: 'Heavy',
-  [Blades.Block]: 'Block',
+  [Blades.Idle]: 'Idle',
+  [Blades.Fast]: 'Thrust (Fast)',
+  [Blades.Slow]: 'Cleave (Slow)',
+  [Blades.Block]: 'Block (Fast)',
 }
 
 //-------------------------

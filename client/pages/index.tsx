@@ -23,10 +23,10 @@ export default function IndexPage() {
           <hr />
 
           <h5>
-            <span className='Black'>by</span> <a href='https://lootunder.world'>Team Underworld</a>
+            an [<a href='https://x.com/LootUnderworld'>Underworld</a>] game
           </h5>
           <h5>
-            <a href='https://x.com/LootUnderworld'>@LootUnderworld</a>
+            <span>by</span> [<a href='https://underware.gg'>Underware</a>]
           </h5>
 
           <div style={{ height: '5vh' }}>&nbsp;</div>

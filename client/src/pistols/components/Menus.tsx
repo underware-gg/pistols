@@ -7,11 +7,12 @@ import { useThreeJsContext } from '../hooks/ThreeJsContext'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
-import { SettingsIcon, SettingsMenuItem } from '@/pistols/components/ui/Buttons'
 import { DuelistTable } from '@/pistols/components/DuelistTable'
 import { DuelStage } from '@/pistols/hooks/useDuel'
+import { MusicToggle, SfxToggle } from '@/pistols/components/ui/Buttons'
 import { SPRITESHEETS } from '@/pistols/data/assets'
 import AccountHeader from '@/pistols/components/account/AccountHeader'
+import { AnimationState } from '../three/game'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -92,36 +93,40 @@ export function MenuTavern({
   )
 }
 
-export function MusicToggle({
-}) {
-  const { settings, SettingsActions } = useSettingsContext()
-  const { audioLoaded } = useThreeJsContext()
-  if (!audioLoaded) return <></>
-  return <SettingsIcon settingsKey={SettingsActions.MUSIC_ENABLED} value={settings.musicEnabled} nameOn='volume-on' nameOff='volume-off' icon/>
-}
-
 
 export function MenuDuel({
   duelStage,
 }) {
   const router = useRouter()
   const { settings, SettingsActions } = useSettingsContext()
+  const { dispatchSelectDuel } = usePistolsContext()
+
+  const _backToTavern = () => {
+    dispatchSelectDuel(0n)
+    router.push('/tavern')
+  }
 
   const _skipAnimation = () => {
-
   }
-  const canSkip = duelStage == DuelStage.PistolsShootout || duelStage == DuelStage.BladesClash
+
+  const canSkip = duelStage == DuelStage.Round1Animation || duelStage == DuelStage.Round2Animation
   return (
     <div className='MenuBottom AlignCenter NoMouse'>
       <Menu secondary compact className='YesMouse' size='huge'>
-        <Menu.Item onClick={() => router.push('/tavern')}>
+        <Menu.Item onClick={() => _backToTavern()}>
           Back to Tavern
         </Menu.Item>
+
         {/* <Menu.Item disabled={!canSkip} onClick={() => _skipAnimation()}>
           Skip animation
         </Menu.Item> */}
-        {/* <SettingsMenuItem prefix='Music' settingsKey={SettingsActions.MUSIC_ENABLED} currentValue={settings.musicEnabled} /> */}
-        <SettingsMenuItem prefix='SFX' settingsKey={SettingsActions.SFX_ENABLED} currentValue={settings.sfxEnabled} />
+
+        {/* <SettingsMenuItem prefix='SFX' settingsKey={SettingsActions.SFX_ENABLED} currentValue={settings.sfxEnabled} /> */}
+
+        <Menu.Item >
+          <SfxToggle />
+        </Menu.Item>
+
       </Menu>
     </div>
   )
@@ -142,11 +147,11 @@ function MenuDebugTriggers() {
   const { gameImpl } = useThreeJsContext()
 
   const _paces = (pacesCountA, paceCountB, healthA, healthB) => {
-    gameImpl?.animateShootout(pacesCountA, paceCountB, healthA, healthB)
+    gameImpl?.animateDuel(AnimationState.Round1, pacesCountA, paceCountB, healthA, healthB)
   }
 
   const _blades = (bladeA, bladeB, healthA, healthB) => {
-    gameImpl?.animateBlades(bladeA, bladeB, healthA, healthB)
+    gameImpl?.animateDuel(AnimationState.Round2, bladeA, bladeB, healthA, healthB)
   }
 
   return (

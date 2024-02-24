@@ -19,7 +19,7 @@ $color-important: $color-medium;
 $color-active: $color-medium;
 $color-inactive: rgba($color-brightest, 0.35);
 $color-attention: $color-medium;
-$text-shadow: 0.04em 0.04em 2px $color-dark;
+$text-shadow: 0.04em 0.04em 1px $color-dark;
 $title-shadow: 0.1em 0.1em 1px $color-darkest;
 $ui-border: 6px ridge $color-active;
 
@@ -28,10 +28,10 @@ $border-button: 1px solid $color-bright;
 $border-button-active: 1px solid $color-brightest;
 $border-button-inactive: 1px solid rgba($color-bright, 0.5);
 
-$color-positive: #4dcb51; // from $color-medium
-$color-negative: #e73e3e; // from $color-medium
-$color-warning: $color-medium;
-$color-blue: #4dcbc9; // from $color-medium
+$color-positive: #21ba45; // from $color-medium
+$color-negative: #db2828; // from $color-medium
+$color-warning: #f2c037;
+$color-blue: #31b9c3; // from $color-medium
 
 $game-width: 960px;
 $game-height: 540px;
@@ -481,7 +481,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 .ModalText {
-  font-size: 16px;
+  font-size: 20px;
 }
 
 // .TableHeader {
@@ -676,6 +676,45 @@ $ui-container-gap: 1em;
   text-align: center;
 }
 
+.DuelProfileA {
+  display: flex;
+  align-items: flex-start;
+  align-content: flex-start;
+  justify-content: left;
+  text-align: left;
+  width: 100%;
+}
+.DuelProfileB {
+  @extend .DuelProfileA;
+  justify-content: right;
+  text-align: right;
+}
+
+.ProfileAndHealth {
+  display: block;
+  height: 200px;
+  // justify-self: right;
+}
+.ProfileDescription {
+  margin: 0 1em 1em 1em!important;
+}
+.HealthBar {
+  background-color: #0000!important;
+  box-shadow: none!important;
+  border: 0!important;
+  margin: 0 1em!important;
+  width: 100px;
+  clear: both;
+  // justify-self: right;
+  // margin-left: auto;
+}
+.HealthPointFull {
+  background-color: $color-positive!important;
+}
+.HealthPointEmpty {
+  background-color: $color-negative!important;
+}
+
 .DuelSideA {
   height: 100%;
   width: 50%;
@@ -696,23 +735,6 @@ $ui-container-gap: 1em;
   background-image: linear-gradient(to left, rgba($color-darkest, 0.8), transparent 30%);
 }
 
-.DuelProfileA {
-  display: flex;
-  align-items: flex-start;
-  align-content: flex-start;
-  text-align: left;
-  width: 100%;
-}
-.DuelProfileB {
-  @extend .DuelProfileA;
-  text-align: right;
-  justify-content: right;
-}
-
-.ProfileDescription {
-  margin: 0 1.5em!important;
-}
-
 .DuelProgress {
   margin-top: 20px;
 }
@@ -725,8 +747,9 @@ $ui-container-gap: 1em;
   margin: auto;
 }
 
+//
 // <IconXXX>
-
+//
 .Tooltip {
 	cursor: default; //help;
 }
@@ -740,7 +763,7 @@ $ui-container-gap: 1em;
 	@extend .Icon;
 	// color: $color-text;
 }
-.StepsIcon {
+.PacesIcon {
   font-family: $font-family-mono!important;
   font-size: 1.2em!important;
   font-weight: 600!important;
@@ -748,17 +771,17 @@ $ui-container-gap: 1em;
   text-shadow: 0.1em 0.1em 2px #000;
   margin: -2px 0 0 -2px!important;
 }
-.StepsIcon.small {
+.PacesIcon.small {
   font-size: 1.2em!important;
 }
-.StepsIcon.large {
+.PacesIcon.large {
   font-size: 1.5em!important;
 }
-.StepsIcon.big {
+.PacesIcon.big {
   font-size: 1.5em!important;
 }
 
-.StepsIconRound {
+.PacesIconRound {
   font-family: $font-family-mono!important;
   font-size: 16px!important;
   // circle
@@ -819,6 +842,22 @@ $logo-url: '/logos/logo_avante.svg';
 	to { -webkit-transform: scale(1); }
 }
 
+.ChancesBar {
+  width: 450px;
+  margin: auto!important;
+}
+
+.GlanceBar {
+  background-color: $color-warning;
+  width: 0;
+  height: 21px;
+  position: absolute;
+  top: 0;
+  left:0;
+  // from .ui.progress .bar
+  border-radius: 0.28571429rem;
+  transition: width .1s ease, background-color .1s ease;
+}
 
 
 //--------------------
@@ -939,15 +978,18 @@ input::placeholder {
 ._button_hover {
   background-color: $color-bright;
   color: $color-dark;
+  text-shadow: $text-shadow;
 }
 ._button_focus {
   @extend ._round_border_active;
   background-color: $color-dark;
   color: $color-text;
+  text-shadow: $text-shadow;
 }
 ._button_active {
   background-color: $color-brightest;
   color: $color-dark;
+  text-shadow: $text-shadow;
 }
 ._button_disabled {
   @extend ._round_border_inactive;
@@ -963,6 +1005,9 @@ input::placeholder {
 .ui.buttons .button.toggle.active,
 .ui.toggle.buttons .active.button {
   background-color: $color-important!important;
+}
+.ui.button.toggle.active:hover {
+  background-color: $color-important!important; // default is green
 }
 //
 // <Menu> buttons
@@ -1123,10 +1168,9 @@ td {
   background-color: $color-darkest;
 }
 .ui.header {
+  @extend .TitleCase;
+  font-family: $font-family;
   color: $color-text;
-}
-.ui.modal>.content {
-  // font-size: 16px;
 }
 //
 // <Step>
@@ -1171,10 +1215,23 @@ a.active.step:hover,
   @extend ._round_border;
   background-color: $color-dark;
 }
-// .ui.steps .step.active {
-//   background-color: $color-positive;
+//
+// <ProgressBar>
+.ui.progress .bar {
+  background-color: $color-important;
+  min-width: 3em;
+}
+// .ui.disaled.progress .bar {
+//   background-color: $color-inactive;
 // }
-
-// .green {
-//   color: $color-positive;
-// }
+.ui.progress .bar>.progress {
+  @extend .TitleCase;
+  font-family: $font-family;
+  font-weight: 600;
+  font-size: 1.5em;
+  color: $color-brightest;
+  text-shadow: $text-shadow;
+  margin-top: -0.65em;
+  margin-right: -0.2em;
+  z-index: 100;
+}

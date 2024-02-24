@@ -22,6 +22,7 @@ export const EMOJI: any = {
   ALIVE: '❤️',
   INJURED: '🩸',
   DEAD: '☠️',
+  IDLE: '👀',
   LIGHT: '🔪',
   HEAVY: '🗡️',
   BLOCK: '🛡️',

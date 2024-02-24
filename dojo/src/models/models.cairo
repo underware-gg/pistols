@@ -7,16 +7,17 @@ use pistols::types::challenge::{ChallengeState};
 struct Duelist {
     #[key]
     address: ContractAddress,
-    timestamp: u64,   // Unix time, 1st registered
+    //-----------------------
     name: felt252,
     profile_pic: u8,
-    total_duels: u32,
-    total_wins: u32,
-    total_losses: u32,
-    total_draws: u32,
+    total_duels: u16,
+    total_wins: u16,
+    total_losses: u16,
+    total_draws: u16,
     total_honour: u32,  // sum of al duels Honour
     honour: u8,         // +1 decimal, eg: 100 = 10.0
-}
+    timestamp: u64,     // Unix time, 1st registered
+} // f + 176 bits
 
 //
 // Challenge lifecycle
@@ -24,42 +25,50 @@ struct Duelist {
 struct Challenge {
     #[key]
     duel_id: u128,
-    state: u8,                  // actually a ChallengeState
+    //-------------------------
     duelist_a: ContractAddress, // Challenger
     duelist_b: ContractAddress, // Challenged
     message: felt252,           // message to challenged
-    pass_code: felt252,
     // progress and results
+    state: u8,                  // actually a ChallengeState
     round_number: u8,           // current or final
-    winner: ContractAddress,    // if (state == ChallengeState.Resolved)
+    winner: u8,                 // 0:draw, 1:duelist_a, 2:duelist_b
     // timestamps in unix epoch
     // a 32-bit timestamp will last 82 more years
     // Sunday, February 7, 2106 6:28:15 AM
-    timestamp: u64,             // Unix time, created
-    timestamp_expire: u64,      // Unix time, challenge expiration
     timestamp_start: u64,       // Unix time, started
     timestamp_end: u64,         // Unix time, ended
-}
+} // f + f + f + 152 bits
 
 //
 // Current challenge from one Duelist to another
 #[derive(Model, Copy, Drop, Serde)]
 struct Pact {
     #[key]
-    pair: u128,     // xor'd duelists
+    pair: u128,     // xor'd duelists u256(address).low
+    //------------
     duel_id: u128,  // current Challenge, or 0x0
-}
+} // 128 bits
 
 //
-// The move of each player on a Round
+// The shot of each player on a Round
 #[derive(Copy, Drop, Serde, Introspect)]
-struct Move {
-    hash: felt252,  // hashed move (salt+move)
-    salt: u64,      // the salt
-    move: u8,       // the move
-    damage: u8,     // amount of health taken
-    health: u8,     // final health
-}
+struct Shot {
+    // player input
+    hash: u64,          // hashed action (salt + action)
+    salt: u64,          // the player's secret salt
+    action: u16,        // the player's chosen action(s) (paces, weapon, ...)
+    // shot results
+    chance_crit: u8,    // computed chances (1..100) - kill / double damage
+    chance_hit: u8,     // computed chances (1..100) - hit / normal damage
+    dice_crit: u8,      // dice roll result (1..100) - kill / double damage
+    dice_hit: u8,       // dice roll result (1..100) - hit / normal damage
+    damage: u8,         // amount of health taken
+    block: u8,          // amount of damage blocked
+    // player state
+    health: u8,         // final health
+    honour: u8,         // honour granted
+} // 208 bits
 
 //
 // Each duel round
@@ -69,7 +78,35 @@ struct Round {
     duel_id: u128,
     #[key]
     round_number: u8,
-    state: u8,          // actually a RoundState
-    duelist_a: Move,    // duelist_a move
-    duelist_b: Move,    // duelist_b move
+    //---------------
+    state: u8,      // actually a RoundState
+    shot_a: Shot,   // duelist_a shot
+    shot_b: Shot,   // duelist_b shot
+} // (8 + 208 + 208) = 424 bits ~ 2 felts (max 504)
+
+
+
+
+//-------------------------------------
+// Model initializers
+//
+mod init {
+    use pistols::models::{models};
+
+    fn Shot() -> models::Shot {
+        (models::Shot {
+            hash: 0,
+            salt: 0,
+            action: 0,
+            chance_crit: 0,
+            chance_hit: 0,
+            dice_crit: 0,
+            dice_hit: 0,
+            damage: 0,
+            block: 0,
+            health: 0,
+            honour: 0,
+        })
+    }
+
 }
