@@ -101,9 +101,33 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         (challenge, round)
     }
 
+    fn assert_winner(challenge: Challenge, round: Round, winner: u8, round_number: u8) {
+        assert(challenge.winner == winner, 'challenge.winner');
+        assert(challenge.timestamp_start < challenge.timestamp_end, 'bad timestamps');
+        assert(round.state == RoundState::Finished.into(), 'round.state');
+        if (round_number > 0) {
+            assert(challenge.round_number == round_number, 'bad challenge.round_number');
+            assert(round.round_number == round_number, 'bad round.round_number');
+        }
+        if (winner == 0) {
+            assert(challenge.state == ChallengeState::Draw.into(), 'not Draw');
+            assert(round.shot_a.win == round.shot_b.win, 'win_draw');
+        } else {
+            assert(challenge.state == ChallengeState::Resolved.into(), 'not Resolved');
+            if (winner == 1) {
+                assert(round.shot_a.win > 0, 'win_a_a');
+                assert(round.shot_b.win == 0, 'win_a_b');
+            } else if (winner == 2) {
+                assert(round.shot_a.win == 0, 'win_b_a');
+                assert(round.shot_b.win > 0, 'win_b_b');
+            } else {
+                assert(false, 'Invalid test winner');
+            }
+        }
+    }
 
     //-----------------------------------------
-    // New dices per round
+    // misc tests
     //
 
     #[test]
@@ -116,8 +140,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
             SALT_DUAL_MISS,
         );
-        assert(challenge.winner == 0, 'wrong winner');
-        assert(challenge.round_number == 3, 'ends on round 3');
+        assert_winner(challenge, round, 0, 3);
         let round2: Round = utils::get_Round(world, challenge.duel_id, 2);
         let round3: Round = utils::get_Round(world, challenge.duel_id, 3);
         // crit
@@ -136,8 +159,54 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round3.shot_b.dice_hit != round2.shot_b.dice_hit, 'shot_b.dice_hit !=');
     }
 
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_idle_actions() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
+            constants::SINGLE_DAMAGE, ACTION::IDLE, ACTION::IDLE,
+            SALT_DUAL_HIT,
+        );
+        assert_winner(challenge, round, 1, 2);
+        assert(round.shot_a.health == constants::SINGLE_DAMAGE, 'bad health_a');
+        assert(round.shot_b.health == 0, 'bad health_b');
+    }
+
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_skip_idle_slot() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::SINGLE_DAMAGE, ACTION::IDLE, ACTION::FAST_BLADE,
+            constants::SINGLE_DAMAGE, ACTION::IDLE, ACTION::FAST_BLADE,
+            SALT_DUAL_HIT,
+        );
+        assert_winner(challenge, round, 0, 2);
+        assert(round.shot_a.health == 0, 'bad health_a');
+        assert(round.shot_b.health == 0, 'bad health_b');
+    }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_invalid_actions() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
+            constants::SINGLE_DAMAGE, ACTION::SLOW_BLADE, ACTION::SLOW_BLADE,
+            SALT_DUAL_HIT,
+        );
+        assert_winner(challenge, round, 1, 2);
+        assert(round.shot_a.health == constants::SINGLE_DAMAGE, 'bad health_a');
+        assert(round.shot_b.health == 0, 'bad health_b');
+    }
+
     //-----------------------------------------
-    // Blades Combinations
+    // Blades Matches
     //
 
     #[test]
@@ -150,10 +219,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
             SALT_DUAL_HIT,
         );
-        assert(challenge.state == ChallengeState::Draw.into(), 'wrong sate');
-        assert(challenge.winner == 0, 'wrong winner');
-        assert(challenge.round_number == 2, 'ends on round 2');
-        assert(round.round_number == 2, 'ends on round 2');
+        assert_winner(challenge, round, 0, 2);
         assert(round.shot_a.damage == constants::DOUBLE_DAMAGE, 'bad shot_a.damage');
         assert(round.shot_a.health == constants::SINGLE_DAMAGE, 'bad health_a');
         assert(round.shot_b.damage == constants::DOUBLE_DAMAGE, 'bad shot_b.damage');
@@ -170,8 +236,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     //         constants::FULL_HEALTH, ACTION::SLOW_BLADE,
     //         SALT_DUAL_CRIT, // NEED THIS!!!!
     //     );
-    //     assert(challenge.winner == 0, 'wrong winner');
-    //     assert(challenge.state == ChallengeState::Draw.into(), 'wrong sate');
+    //     assert_winner(challenge, round, 0, 2);
     //     assert(round.shot_a.damage == constants::FULL_HEALTH, 'bad shot_a.damage');
     //     assert(round.shot_a.health == 0, 'bad health_a');
     //     assert(round.shot_b.damage == constants::FULL_HEALTH, 'bad shot_b.damage');
@@ -188,8 +253,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             constants::DOUBLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
             SALT_DUAL_HIT,
         );
-        assert(challenge.winner == 0, 'wrong winner');
-        assert(challenge.state == ChallengeState::Draw.into(), 'wrong sate');
+        assert_winner(challenge, round, 0, 2);
         assert(round.shot_a.damage == constants::DOUBLE_DAMAGE, 'bad shot_a.damage');
         assert(round.shot_a.health == 0, 'bad health_a');
         assert(round.shot_b.damage == constants::DOUBLE_DAMAGE, 'bad shot_b.damage');
@@ -206,8 +270,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
             SALT_DUAL_HIT,
         );
-        assert(challenge.winner == 0, 'bad winner');
-        assert(challenge.state == ChallengeState::Draw.into(), 'wrong sate');
+        assert_winner(challenge, round, 0, 2);
         assert(round.shot_a.damage == constants::SINGLE_DAMAGE, 'bad shot_a.damage');
         assert(round.shot_a.health == constants::SINGLE_DAMAGE, 'bad shot_a.health');
         assert(round.shot_b.damage == constants::SINGLE_DAMAGE, 'bad shot_b.damage');
@@ -223,8 +286,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
             SALT_HIT_MISS,
         );
-        assert(challenge.winner == 1, 'bad winner');
-        assert(challenge.state == ChallengeState::Resolved.into(), 'wrong sate');
+        assert_winner(challenge, round, 1, 2);
         assert(round.shot_a.health == constants::SINGLE_DAMAGE, 'bad health_a');
         assert(round.shot_b.health == 0, 'bad health_b');
     }
@@ -238,8 +300,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
             SALT_CRIT_MISS,
         );
-        assert(challenge.winner == 1, 'bad winner');
-        assert(challenge.state == ChallengeState::Resolved.into(), 'wrong sate');
+        assert_winner(challenge, round, 1, 2);
         assert(round.shot_a.health == constants::DOUBLE_DAMAGE, 'bad health_a');
         assert(round.shot_b.health == 0, 'bad health_b');
     }
@@ -253,8 +314,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
             SALT_MISS_HIT,
         );
-        assert(challenge.winner == 2, 'bad winner');
-        assert(challenge.state == ChallengeState::Resolved.into(), 'wrong sate');
+        assert_winner(challenge, round, 2, 2);
         assert(round.shot_a.health == 0, 'bad health_a');
         assert(round.shot_b.health == constants::SINGLE_DAMAGE, 'bad health_b');
     }
@@ -268,8 +328,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
             SALT_MISS_CRIT,
         );
-        assert(challenge.winner == 2, 'bad winner');
-        assert(challenge.state == ChallengeState::Resolved.into(), 'wrong sate');
+        assert_winner(challenge, round, 2, 2);
         assert(round.shot_a.health == 0, 'bad health_a');
         assert(round.shot_b.health == constants::DOUBLE_DAMAGE, 'bad health_b');
     }
@@ -284,8 +343,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             constants::SINGLE_DAMAGE, ACTION::BLOCK, ACTION::IDLE,
             SALT_DUAL_HIT,
         );
-        assert(challenge.winner == 0, 'wrong winner');
-        assert(challenge.state == ChallengeState::Draw.into(), 'wrong sate');
+        assert_winner(challenge, round, 0, 2);
         assert(round.shot_a.health == constants::SINGLE_DAMAGE, 'bad health_a');
         assert(round.shot_b.health == constants::SINGLE_DAMAGE, 'bad health_b');
     }
@@ -297,8 +355,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
             SALT_DUAL_HIT,
         );
-        assert(challenge.winner == 0, 'wrong winner');
-        assert(challenge.state == ChallengeState::Draw.into(), 'wrong sate');
+        assert_winner(challenge, round, 0, 2);
         assert(round.shot_a.health == constants::SINGLE_DAMAGE, 'bad health_a');
         assert(round.shot_b.health == constants::SINGLE_DAMAGE, 'bad health_b');
     }
@@ -317,9 +374,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             constants::SINGLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
             SALT_DUAL_HIT,
         );
-        assert(challenge.winner == 1, 'wrong winner');
-        assert(challenge.round_number == 2, 'ends on round 2');
-        assert(round.round_number == 2, 'ends on round 2');
+        assert_winner(challenge, round, 1, 2);
         assert(round.shot_a.health == constants::SINGLE_DAMAGE, 'bad health_a');
         assert(round.shot_b.health == 0, 'bad health_b');
     }
@@ -333,9 +388,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             constants::DOUBLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
             SALT_DUAL_HIT,
         );
-        assert(challenge.winner == 2, 'wrong winner');
-        assert(challenge.round_number == 3, 'ends on round 3');
-        assert(round.round_number == 3, 'ends on round 3');
+        assert_winner(challenge, round, 2, 3);
         assert(round.shot_a.health == 0, 'bad health_a');
         assert(round.shot_b.health == constants::SINGLE_DAMAGE, 'bad health_b');
     }
@@ -349,9 +402,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
             SALT_DUAL_HIT,
         );
-        assert(challenge.winner == 2, 'wrong winner');
-        assert(challenge.round_number == 2, 'ends on round 2');
-        assert(round.round_number == 2, 'ends on round 2');
+        assert_winner(challenge, round, 2, 2);
         assert(round.shot_a.health == 0, 'bad health_a');
         assert(round.shot_b.health == constants::SINGLE_DAMAGE, 'bad health_b');
     }
@@ -365,9 +416,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
             SALT_MISS_HIT,
         );
-        assert(challenge.winner == 1, 'wrong winner');
-        assert(challenge.round_number == 3, 'ends on round 3');
-        assert(round.round_number == 3, 'ends on round 3');
+        assert_winner(challenge, round, 1, 3);
         assert(round.shot_a.health == constants::SINGLE_DAMAGE, 'bad health_a');
         assert(round.shot_b.health == 0, 'bad health_b');
     }
@@ -386,12 +435,10 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::BLOCK,
             SALT_CRIT_HIT,
         );
-        assert(challenge.winner == 1, 'wrong winner');
-        assert(challenge.round_number == 2, 'ends on round 2');
-        assert(round.round_number == 2, 'ends on round 2');
-        assert(round.shot_a.health == constants::FULL_HEALTH, 'bad health_a');
-        assert(round.shot_b.health == 0, 'bad health_b');
-        assert(round.shot_b.damage == constants::FULL_HEALTH, 'bad damage_b');
+        assert_winner(challenge, round, 1, 2);
+        assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
+        assert(round.shot_b.health == 0, 'shot_b.health');
+        assert(round.shot_b.damage == constants::FULL_HEALTH, 'shot_b.damage');
     }
     #[test]
     #[available_gas(1_000_000_000)]
@@ -403,12 +450,189 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
             SALT_HIT_CRIT,
         );
-        assert(challenge.winner == 2, 'wrong winner');
-        assert(challenge.round_number == 2, 'ends on round 2');
-        assert(round.round_number == 2, 'ends on round 2');
-        assert(round.shot_a.health == 0, 'bad health_a');
-        assert(round.shot_b.health == constants::FULL_HEALTH, 'bad health_b');
-        assert(round.shot_a.damage == constants::FULL_HEALTH, 'bad damage_a');
+        assert_winner(challenge, round, 2, 2);
+        assert(round.shot_a.health == 0, 'shot_a.health');
+        assert(round.shot_a.damage == constants::FULL_HEALTH, 'shot_a.damage');
+        assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
+    }
+
+
+    //----------------------
+    // Block misc
+    //
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_block_vs_idle() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
+            constants::FULL_HEALTH, ACTION::IDLE, ACTION::FAST_BLADE,
+            SALT_DUAL_HIT,
+        );
+        assert_winner(challenge, round, 0, 3);
+        let round2: Round = utils::get_Round(world, challenge.duel_id, 2);
+        assert(round2.shot_a.health == constants::FULL_HEALTH, 'round2.shot_a.health');
+        assert(round2.shot_b.health == constants::FULL_HEALTH, 'round2.shot_b.health');
+        assert(round2.shot_a.block > 0, 'round2.shot_a.block');
+        assert(round2.shot_b.block == 0, 'round2.shot_b.block');
+        assert(round.shot_a.health == constants::FULL_HEALTH, 'round.shot_a.health');
+        assert(round.shot_b.health == constants::FULL_HEALTH, 'round.shot_b.health');
+        assert(round.shot_a.block > 0, 'round.shot_a.block');
+        assert(round.shot_b.block == 0, 'round.shot_b.block');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_idle_vs_block() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::IDLE, ACTION::FAST_BLADE,
+            constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
+            SALT_DUAL_HIT,
+        );
+        assert_winner(challenge, round, 0, 3);
+        let round2: Round = utils::get_Round(world, challenge.duel_id, 2);
+        assert(round2.shot_a.health == constants::FULL_HEALTH, 'round2.shot_a.health');
+        assert(round2.shot_b.health == constants::FULL_HEALTH, 'round2.shot_b.health');
+        assert(round2.shot_a.block == 0, 'round2.shot_a.block');
+        assert(round2.shot_b.block > 0, 'round2.shot_b.block');
+        assert(round.shot_a.health == constants::FULL_HEALTH, 'round.shot_a.health');
+        assert(round.shot_b.health == constants::FULL_HEALTH, 'round.shot_b.health');
+        assert(round.shot_a.block == 0, 'round.shot_a.block');
+        assert(round.shot_b.block > 0, 'round.shot_b.block');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_block_vs_block() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
+            constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
+            SALT_DUAL_HIT,
+        );
+        assert_winner(challenge, round, 0, 3);
+        let round2: Round = utils::get_Round(world, challenge.duel_id, 2);
+        assert(round2.shot_a.health == constants::FULL_HEALTH, 'round2.shot_a.health');
+        assert(round2.shot_b.health == constants::FULL_HEALTH, 'round2.shot_b.health');
+        assert(round2.shot_a.block > 0, 'round2.shot_a.block');
+        assert(round2.shot_b.block > 0, 'round2.shot_b.block');
+        assert(round.shot_a.health == constants::FULL_HEALTH, 'round.shot_a.health');
+        assert(round.shot_b.health == constants::FULL_HEALTH, 'round.shot_b.health');
+        assert(round.shot_a.block > 0, 'round.shot_a.block');
+        assert(round.shot_b.block > 0, 'round.shot_b.block');
+    }
+
+
+
+    //----------------------
+    // Flee
+    //
+    
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_flee_vs_flee() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
+            constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
+            SALT_DUAL_HIT,
+        );
+        assert_winner(challenge, round, 0, 2);
+        assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
+        assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_flee_draw_a() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
+            constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
+            0x777, // HIT_??? (chances for Paces are different!)
+        );
+        assert_winner(challenge, round, 0, 2);
+        assert(round.shot_a.action == ACTION::PACES_10.into(), 'shot_a.action');
+        assert(round.shot_b.action == ACTION::FLEE.into(), 'shot_b.action');
+        assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
+        assert(round.shot_b.health == constants::DOUBLE_DAMAGE, 'shot_b.health');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_flee_draw_b() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
+            constants::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
+            0xaaa, // ???_HIT, chances for Paces are different!
+        );
+        assert_winner(challenge, round, 0, 2);
+        assert(round.shot_a.action == ACTION::FLEE.into(), 'shot_a.action');
+        assert(round.shot_b.action == ACTION::PACES_10.into(), 'shot_b.action');
+        assert(round.shot_a.health == constants::SINGLE_DAMAGE, 'shot_a.health');
+        assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_fast_vs_flee_kill_a() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
+            constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
+            SALT_CRIT_HIT,
+        );
+        assert_winner(challenge, round, 1, 2);
+        assert(round.shot_a.action == ACTION::PACES_10.into(), 'shot_a.action');
+        assert(round.shot_b.action == ACTION::FLEE.into(), 'shot_b.action');
+        assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
+        assert(round.shot_b.health == 0, 'shot_b.health');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_slow_vs_flee_kill_a() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
+            constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
+            SALT_CRIT_HIT,
+        );
+        assert_winner(challenge, round, 1, 2);
+        assert(round.shot_a.action == ACTION::PACES_10.into(), 'shot_a.action');
+        assert(round.shot_b.action == ACTION::FLEE.into(), 'shot_b.action');
+        assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
+        assert(round.shot_b.health == 0, 'shot_b.health');
+    }
+    // #[test]
+    // #[available_gas(1_000_000_000)]
+    // fn test_flee_kill_b() {
+    //     let (world, system, owner, other) = utils::setup_world();
+    //     let (challenge, round) = _execute_blades(
+    //         world, system, owner, other,
+    //         constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
+    //         constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
+    //         SALT_HIT_CRIT,
+    //     );
+    //     assert_winner(challenge, round, 2, 2);
+        // assert(round.shot_a.health == 0, 'shot_a.health');
+        // assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
+    // }
+
+
+
+    //----------------------
+    // Steal
+    //
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_steal_vs_steal() {
+        assert(false, 'TODO STEAL');
     }
 
 }

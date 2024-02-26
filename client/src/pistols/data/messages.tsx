@@ -13,6 +13,7 @@ export const MESSAGES: any = {
 }
 
 export const EMOJI: any = {
+  //
   // tavern
   AGREEMENT: '🤝',
   AWAITING: '⏱️',
@@ -25,12 +26,20 @@ export const EMOJI: any = {
   LIGHT: '🔪',
   HEAVY: '🗡️',
   BLOCK: '🛡️',
+  FLEE: '💨', // TODO
+  STEAL: '💰', // TODO
+  SEPPUKU: '👹', // TODO
+  //
   // duel
   ALIVE: '❤️',
   INJURED: '🩸',
   DEAD: '☠️',
+  //
   // badges
   LORD: '👑',
+  WINNER: '🏅', // TODO
+  THIEF: '🥷', // TODO
+  CHICKEN: '🐣', // TODO
   //
   UNKNOWN: '?',
 }

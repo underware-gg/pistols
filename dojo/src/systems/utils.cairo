@@ -71,6 +71,7 @@ fn get_duelist_health(world: IWorldDispatcher, duelist_address: ContractAddress,
 // Action validators
 //
 
+// Validate possible actions, exposed to system
 fn get_valid_packed_actions(round_number: u8) -> Array<u16> {
     if (round_number == 1) {
         (array![
@@ -92,15 +93,17 @@ fn get_valid_packed_actions(round_number: u8) -> Array<u16> {
             pack_action_slots(ACTION::FAST_BLADE, ACTION::BLOCK),
             pack_action_slots(ACTION::BLOCK, ACTION::FAST_BLADE),
             pack_action_slots(ACTION::BLOCK, ACTION::BLOCK),
+            // slot 1 only
+            ACTION::FAST_BLADE.into(), // pack_action_slots(ACTION::FAST_BLADE, ACTION::IDLE),
+            ACTION::BLOCK.into(),      // pack_action_slots(ACTION::BLOCK, ACTION::IDLE),
+            ACTION::FLEE.into(),       // pack_action_slots(ACTION::FLEE, ACTION::IDLE),
+            ACTION::STEAL.into(),      // pack_action_slots(ACTION::STEAL, ACTION::IDLE),
             // slot 2 only
             pack_action_slots(ACTION::IDLE, ACTION::SLOW_BLADE),
             pack_action_slots(ACTION::IDLE, ACTION::FAST_BLADE),
             pack_action_slots(ACTION::IDLE, ACTION::BLOCK),
-            // slot 1 only
-            pack_action_slots(ACTION::FAST_BLADE, ACTION::IDLE),
-            pack_action_slots(ACTION::BLOCK, ACTION::IDLE),
-            // no action (stand still and wait to die)
-            0,
+            // Idle / no action
+            0, // pack_action_slots(ACTION::IDLE, ACTION::IDLE),
         ])
     } else {
         (array![])
@@ -118,23 +121,41 @@ fn validate_packed_actions(round_number: u8, packed: u16) -> bool {
     };
     (n < len)
 }
+
+// unpack validated actions
+// can re-arrange on some matches
+fn unpack_round_slots(round: Round) -> (u8, u8, u8, u8) {
+    let (slot1_a, slot2_a): (u8, u8) = unpack_action_slots(round.shot_a.action);
+    let (slot1_b, slot2_b): (u8, u8) = unpack_action_slots(round.shot_b.action);
+    // if slot 1 is empty, use only slot 2
+    if (slot1_a == 0 && slot1_b == 0) {
+        return (slot2_a, slot2_b, 0, 0);
+    }
+    // Flee/Steal triggers an opposing 10 paces shot
+    let action_a: Action = slot1_a.into();
+    let action_b: Action = slot1_b.into();
+    let run_a: bool = (action_a == Action::Flee || action_a == Action::Steal);
+    let run_b: bool = (action_b == Action::Flee || action_b == Action::Steal);
+    if (run_a && !run_b) {
+        return (slot1_a, ACTION::PACES_10, 0, 0);
+    } else if (!run_a && run_b) {
+        return (ACTION::PACES_10, slot1_b, 0, 0);
+    } else
+    // Double Steal decides in a 1 pace shootout
+    if (action_a == Action::Steal && action_b == Action::Steal) {
+        return (slot1_a, slot1_b, ACTION::PACES_1, ACTION::PACES_1);
+    }
+    (slot1_a, slot1_b, slot2_a, slot2_b)
+}
+
+// packers
 fn pack_action_slots(slot1: u8, slot2: u8) -> u16 {
-    ((slot2.into() * 0x100) | slot1.into())
+    (slot1.into() | (slot2.into() * 0x100))
 }
 fn unpack_action_slots(packed: u16) -> (u8, u8) {
     let slot1: u8 = (packed & 0xff).try_into().unwrap();
     let slot2: u8 = ((packed & 0xff00) / 0x100).try_into().unwrap();
     (slot1, slot2)
-}
-fn unpack_round_slots(round: Round) -> (u8, u8, u8, u8) {
-    let (slot1_a, slot2_a): (u8, u8) = unpack_action_slots(round.shot_a.action);
-    let (slot1_b, slot2_b): (u8, u8) = unpack_action_slots(round.shot_b.action);
-    if (slot1_a == 0 && slot1_b == 0) {
-        // if slot 1 is empty, use only slot 2
-        (slot2_a, slot2_b, 0, 0)
-    } else {
-        (slot1_a, slot1_b, slot2_a, slot2_b)
-    }
 }
 
 

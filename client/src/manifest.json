@@ -949,7 +949,7 @@
     {
       "name": "pistols::systems::actions::actions",
       "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
-      "class_hash": "0x6f81be61bbf95230248abe6069afa69383821e9c2c5e6655ab79a87a8a38387",
+      "class_hash": "0x313538d4844759c93fac9763197bc6b8aa7b361a447fd014f531842ecc25a40",
       "abi": [
         {
           "type": "impl",
@@ -2309,7 +2309,7 @@
           "key": false
         }
       ],
-      "class_hash": "0x41af7975d8177dd0b665dcfc27c560e3be11b726c6c1e7228901dbbdb0c8fad",
+      "class_hash": "0x799a68b22683b09df9af6cfbf65dd842d0d5fd6198828294b1e86ed7b576335",
       "abi": [
         {
           "type": "impl",
@@ -2526,6 +2526,10 @@
             },
             {
               "name": "honour",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "win",
               "type": "core::integer::u8"
             }
           ]
