@@ -26,20 +26,22 @@ export const EMOJI: any = {
   LIGHT: '🔪',
   HEAVY: '🗡️',
   BLOCK: '🛡️',
-  FLEE: '💨', // TODO
-  STEAL: '💰', // TODO
+  FLEE: '🏃',
+  STEAL: '🥷',
   SEPPUKU: '👹', // TODO
   //
   // duel
   ALIVE: '❤️',
   INJURED: '🩸',
   DEAD: '☠️',
+  MONEY: '💰',
   //
   // badges
   LORD: '👑',
-  WINNER: '🏅', // TODO
+  WINNER: '🏅',
   THIEF: '🥷', // TODO
   CHICKEN: '🐣', // TODO
+  GHOST: '👻', // TODO
   //
   UNKNOWN: '?',
 }

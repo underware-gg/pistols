@@ -415,7 +415,7 @@ export function zoomCameraToPaces(paceCount, seconds) {
     // animate
     _tweens.cameraPos = new TWEEN.Tween(_duelCameraRig.position)
       .to(targetPos, seconds * 1000)
-      // .easing(TWEEN.Easing.Cubic.Out)
+      .easing(TWEEN.Easing.Sinusoidal.Out)
       .onUpdate(() => {
         // emitter.emit('movedTo', { x: _duelCameraRig.position.x, y: _duelCameraRig.position.y, z: _duelCameraRig.position.z })
       })

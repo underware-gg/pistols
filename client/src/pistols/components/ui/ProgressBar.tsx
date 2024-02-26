@@ -8,24 +8,18 @@ export default function ProgressBar({
   label,
   className = null,
   disabled = false,
+  warning = false,
+  color = null,
   percent = null,
   glancePercent = null,
   value = null,
   total = null,
-}: {
-  label: string | ReactNode
-  className?: string
-  disabled?: boolean
-  percent?: number
-  glancePercent?: number
-  value?: number
-  total?: number
 }) {
   const _disabled = (disabled || (!value && !percent))
   const _className = `NoMargin ${className}`
   return (
     <Grid verticalAlign='middle' className={className}>
-      <Row style={{ height: '35px' }}>
+      <Row style={{ height: '25px' }}>
         <Col width={4} textAlign='right' className='TitleCase'>
           {label}
         </Col>
@@ -46,6 +40,8 @@ export default function ProgressBar({
                 value={value}
                 total={total}
                 className={_className}
+                error={warning}
+                color={color}
               />
               {Boolean(glancePercent) &&
                 <div className='GlanceBar' style={{ width: `${glancePercent}%` }} />

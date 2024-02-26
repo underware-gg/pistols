@@ -15,17 +15,23 @@ export default function CommitBladesModal({
   setIsOpen,
   duelId,
   roundNumber = 2,
+  isA = false,
+  isB = false,
 }: {
   isOpen: boolean
   setIsOpen: Function
   duelId: bigint
   roundNumber?: number
+  isA?: boolean,
+  isB?: boolean,
 }) {
   const { commit_action } = useDojoSystemCalls()
   const { account } = useDojoAccount()
 
   const [slot1, setSlot1] = useState(0)
   const [slot2, setSlot2] = useState(0)
+  const [isDual, setIsDual] = useState(false)
+  const [latestAction, setLatestAction] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const { validPackedActions } = useGetValidPackedActions(2)
@@ -35,19 +41,18 @@ export default function CommitBladesModal({
   useEffect(() => {
     setSlot1(null)
     setSlot2(null)
+    setLatestAction(null)
   }, [isOpen])
 
   const _setSlots = (s1, s2) => {
-    if (s1 !== null) {
-      setSlot1(s1)
-      if (slot2 == Blades.Strong) {
-        setSlot2(null)
-      }
+    if (isDual) {
+      setSlot1(null)
+      setSlot2(null)
     }
-    if (s2 !== null) {
-      if (slot2 == Blades.Strong) setSlot1(null)
-      setSlot2(s2)
-    }
+    if (s1 !== null) setSlot1(s1)
+    if (s2 !== null) setSlot2(s2)
+    setIsDual(s1 !== null && s2 !== null)
+    setLatestAction(s1 ? s1 : s2 ? s2 : 0)
   }
 
   const _submit = async () => {
@@ -71,12 +76,8 @@ export default function CommitBladesModal({
     >
       <Modal.Header className='AlignCenter'><h4>Choose your Blades</h4></Modal.Header>
       <Modal.Content>
-        <Modal.Description className='AlignCenter ModalText'>
-          <p>
-            You survived the pistols! Now choose your blades!
-            <br />
-            Choose wisely. 👑
-          </p>
+        <Modal.Description className='AlignCenter ModalText ModalBladesDescription'>
+          <ActionDescription action={latestAction} />
         </Modal.Description>
 
         <Grid className='FillParent Padded' textAlign='center'>
@@ -85,23 +86,29 @@ export default function CommitBladesModal({
               <SlotNumber slotNumber={1} value={slot1} />
               <SlotNumber slotNumber={2} value={slot2} />
             </Col>
-            <Col width={4}>
+            <Col width={2}>
               <SlotButton blade={Blades.Strong} value={slot2} onClick={() => _setSlots(0, Blades.Strong)} />
             </Col>
-            <Col width={4}>
+            <Col width={3}>
               <SlotButton blade={Blades.Fast} value={slot1} onClick={() => _setSlots(Blades.Fast, null)} />
               <SlotButton blade={Blades.Fast} value={slot2} onClick={() => _setSlots(null, Blades.Fast)} />
             </Col>
-            <Col width={4}>
+            <Col width={3}>
               <SlotButton blade={Blades.Block} value={slot1} onClick={() => _setSlots(Blades.Block, null)} />
               <SlotButton blade={Blades.Block} value={slot2} onClick={() => _setSlots(null, Blades.Block)} />
+            </Col>
+            <Col width={2}>
+              <SlotButton blade={Blades.Flee} value={slot1} onClick={() => _setSlots(Blades.Flee, 0)} />
+            </Col>
+            <Col width={2}>
+              <SlotButton blade={Blades.Steal} value={slot1} onClick={() => _setSlots(Blades.Steal, 0)} />
             </Col>
             <Col width={2}>
             </Col>
           </Row>
         </Grid>
 
-        <ActionChances duelId={duelId} roundNumber={roundNumber} action={!slot1 ? slot2 : slot1} />
+        <ActionChances duelId={duelId} roundNumber={roundNumber} action={!slot1 ? slot2 : slot1} isA={isA} isB={isB} />
 
       </Modal.Content>
       <Modal.Actions>
@@ -120,7 +127,6 @@ export default function CommitBladesModal({
   )
 }
 
-
 export const SlotNumber = ({
   slotNumber,
   value,
@@ -132,7 +138,6 @@ export const SlotNumber = ({
   )
 }
 
-
 export const SlotButton = ({
   blade,
   onClick,
@@ -142,3 +147,74 @@ export const SlotButton = ({
     <ActionButton fill toggle active={value == blade} label={BladesNames[blade]} onClick={() => onClick()} />
   )
 }
+
+
+export const ActionDescription = ({
+  action,
+}) => {
+  if (action == Blades.Strong) {
+    return (
+      <div>
+        The <b>{BladesNames[action]}</b> is powerful but slow, charging at Strike 2
+        <br />
+        <b>Crit</b>: Execute your opponent!
+        <br />
+        <b>Hit</b>: Takes 2 health points
+      </div>
+    )
+  }
+  if (action == Blades.Fast) {
+    return (
+      <p>
+        The <b>{BladesNames[action]}</b> is fast and efficient, can strike once or twice
+        <br />
+        <b>Crit</b>: Takes 2 health points
+        <br />
+        <b>Hit</b>: Takes 1 health point
+      </p>
+    )
+  }
+  if (action == Blades.Block) {
+    return (
+      <p>
+        Use <b>{BladesNames[action]}</b> to protect agains other blades, once or twice
+        <br />
+        <b>Crit</b>: Blocks 2 damage points
+        <br />
+        <b>Hit</b>: Blocks 1 damage point
+      </p>
+    )
+  }
+  if (action == Blades.Flee) {
+    return (
+      <p>
+        <b>{BladesNames[action]}</b> to avoid a shameful defeat!
+        <br />
+        <b>Honour</b>: You lost the Duel without Honour, and you keep your wager
+        <br />
+        <b>Counter</b>: Your opponent is granted a 10 paces pistol shot to stop you
+      </p>
+    )
+  }
+  if (action == Blades.Steal) {
+    return (
+      <p>
+        <b>{BladesNames[action]}</b> the wager and run away!
+        <br />
+        <b>Honour</b>: You lost the Duel without Honour, but you keep the whole wager
+        <br />
+        <b>Counter</b>: Your opponent is granted a 10 paces pistol shot to stop you
+        <br />
+        <b>Face-off</b>: If your opponent also Steals, it's a 1 pace pistol face-off!
+      </p>
+    )
+  }
+  return (
+    <p>
+      You have one or two strikes, depending on your choice
+      <br />
+      Choose wisely. 👑
+    </p>
+  )
+}
+

@@ -199,21 +199,22 @@ canvas {
   font-weight: 600;
 }
 
+.Brightest {
+  color: $color-brightest!important;
+}
 .Positive {
-  // background-color: inherit!important;
   color: $color-positive!important;
-  // color: inherit!important;
 }
 .Negative {
-  // background-color: inherit!important;
   color: $color-negative!important;
 }
 .Warning {
-  // background-color: inherit!important;
   color: $color-warning!important;
 }
+.BgWarning {
+  background-color: $color-warning!important;
+}
 .Canceled {
-  // background-color: inherit!important;
   color: $color-inactive!important;
 }
 .Inactive {
@@ -493,6 +494,10 @@ $box-h: calc((100vh - $aspect-h) / 2);
 
 .ModalText {
   font-size: 20px;
+}
+.ModalBladesDescription {
+  @extend .CenteredContainer;
+  height: 130px;
 }
 
 // .TableHeader {

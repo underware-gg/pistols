@@ -3,9 +3,8 @@ import { Icon } from 'semantic-ui-react'
 import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
 import { DuelStage, useDuel } from '@/pistols/hooks/useDuel'
 import { Blades, ChallengeState } from '@/pistols/utils/pistols'
-import { BladesIcon, CompletedIcon, EmojiIcon, LoadingIcon, PacesIcon } from '@/pistols/components/ui/Icons'
+import { ActionIcon, CompletedIcon, EmojiIcon, LoadingIcon } from '@/pistols/components/ui/Icons'
 import { EMOJI } from '@/pistols/data/messages'
-import constants from '@/pistols/utils/constants'
 
 
 export function DuelIcons({
@@ -14,12 +13,13 @@ export function DuelIcons({
   size = 'large',
 }) {
   const {
-    challenge: { duelistA, duelistB, state, isFinished },
+    challenge: { duelistA, duelistB, state, winner, roundNumber, isFinished, lords },
     round1, round2, round3, duelStage, completedStagesA, completedStagesB, turnA, turnB,
   } = useDuel(duelId)
 
-  const isA = account == duelistA
-  const isB = account == duelistB
+  const isA = (account == duelistA)
+  const isB = (account == duelistB)
+  const isWinner = (isA && winner == 1) || (isB && winner == 2)
   const shotRound1 = isA ? (round1?.shot_a ?? null) : isB ? (round1?.shot_b ?? null) : null
   const shotRound2 = isA ? (round2?.shot_a ?? null) : isB ? (round2?.shot_b ?? null) : null
   const shotRound3 = isA ? (round3?.shot_a ?? null) : isB ? (round3?.shot_b ?? null) : null
@@ -29,6 +29,16 @@ export function DuelIcons({
   const healthRound1 = shotRound1?.health == 0 ? EMOJI.DEAD : shotRound1?.damage > 0 ? EMOJI.INJURED : null
   const healthRound2 = shotRound2?.health == 0 ? EMOJI.DEAD : shotRound2?.damage > 0 ? EMOJI.INJURED : null
   const healthRound3 = shotRound3?.health == 0 ? EMOJI.DEAD : shotRound3?.damage > 0 ? EMOJI.INJURED : null
+
+  const emojiWinner = (lords > 0 ? EMOJI.MONEY : EMOJI.WINNER)
+
+  const winRound1 = (isWinner && roundNumber == 1) ? emojiWinner : null
+  const winRound2 = (isWinner && roundNumber == 1) ? emojiWinner : null
+  const winRound3 = (isWinner && roundNumber == 1) ? emojiWinner : null
+
+  // TODO: use shot wager flag
+  // const gotWager = (shotRound2?.cash > 0 && shotRound2.action == Blades.Steal) ? EMOJI.MONEY : null
+  const gotWager = (shotRound2?.health > 0 && shotRound2.action == Blades.Steal) ? EMOJI.MONEY : null
 
   const _size = size as IconSizeProp
 
@@ -80,12 +90,18 @@ export function DuelIcons({
 
   if (isFinished) {
     return (<>
-      {shotRound1 && <PacesIcon paces={parseInt(shotRound1.action)} size={_size} />}
+      {shotRound1 && <ActionIcon action={parseInt(shotRound1.action)} size={_size} />}
       {healthRound1 && <EmojiIcon emoji={healthRound1} size={_size} />}
-      {shotRound2 && <>+<BladesIcon blade={parseInt(shotRound2.action) as Blades} size={_size} /></>}
+      {winRound1 && <EmojiIcon emoji={winRound1} size={_size} />}
+
+      {shotRound2 && <>+<ActionIcon action={parseInt(shotRound2.action)} size={_size} /></>}
       {healthRound2 && <EmojiIcon emoji={healthRound2} size={_size} />}
-      {shotRound3 && <>+<BladesIcon blade={parseInt(shotRound3.action) as Blades} size={_size} /></>}
+      {winRound2 && <EmojiIcon emoji={winRound2} size={_size} />}
+      {gotWager && <EmojiIcon emoji={gotWager} size={_size} />}
+
+      {shotRound3 && <>+<ActionIcon action={parseInt(shotRound3.action)} size={_size} /></>}
       {healthRound3 && <EmojiIcon emoji={healthRound3} size={_size} />}
+      {winRound3 && <EmojiIcon emoji={winRound3} size={_size} />}
     </>)
   }
 

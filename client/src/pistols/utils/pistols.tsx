@@ -1,4 +1,5 @@
-import { bigintToHex } from "./utils"
+import { bigintToHex } from '@/pistols/utils/utils'
+import { EMOJI } from '@/pistols/data/messages'
 
 //------------------------------------------
 // must be in sync with CHALLENGE_STATE
@@ -15,7 +16,7 @@ export enum ChallengeState {
   Draw,
 }
 
-export const ChallengeStateNames = {
+export const ChallengeStateNames: Record<ChallengeState, string> = {
   [ChallengeState.Null]: 'Null',
   [ChallengeState.Awaiting]: 'Awaiting',
   [ChallengeState.Withdrawn]: 'Withdrawn',
@@ -26,7 +27,7 @@ export const ChallengeStateNames = {
   [ChallengeState.Draw]: 'Draw',
 }
 
-export const ChallengeStateDescriptions = {
+export const ChallengeStateDescriptions: Record<ChallengeState, string> = {
   [ChallengeState.Null]: "Challenge does not exist",
   [ChallengeState.Awaiting]: "Awaiting for Challenged's reply",
   [ChallengeState.Withdrawn]: "Cowardly withdrawn by Challenger",
@@ -37,7 +38,7 @@ export const ChallengeStateDescriptions = {
   [ChallengeState.Draw]: "Honour has not been satisfied",
 }
 
-export const ChallengeStateClasses = {
+export const ChallengeStateClasses: Record<ChallengeState, string> = {
   [ChallengeState.Null]: '',
   [ChallengeState.Awaiting]: '',
   [ChallengeState.Withdrawn]: 'Canceled',
@@ -86,20 +87,37 @@ export enum Blades {
   Fast = 0x10,
   Strong = 0x20,
   Block = 0x30,
+  Flee = 0x40,
+  Steal = 0x50,
+  // Seppuku = 0x60,
+
 }
 
-export const BladesNames = {
+export const BladesNames: Record<Blades, string> = {
   [Blades.Idle]: 'Idle',
   [Blades.Fast]: 'Fast Blow',
   [Blades.Strong]: 'Strong Blow',
   [Blades.Block]: 'Block',
+  [Blades.Flee]: 'Flee',
+  [Blades.Steal]: 'Steal',
 }
 
-export const BladesVerbs = {
+export const BladesVerbs: Record<Blades, string> = {
   [Blades.Idle]: 'Stays',
   [Blades.Fast]: 'Strikes a',
   [Blades.Strong]: 'Strikes a',
   [Blades.Block]: 'Do a',
+  [Blades.Flee]: 'Tries to',
+  [Blades.Steal]: 'Tries to',
+}
+
+export const BladesEmojis: Record<Blades, string> = {
+  [Blades.Idle]: EMOJI.IDLE,
+  [Blades.Fast]: EMOJI.LIGHT,
+  [Blades.Strong]: EMOJI.HEAVY,
+  [Blades.Block]: EMOJI.BLOCK,
+  [Blades.Flee]: EMOJI.FLEE,
+  [Blades.Steal]: EMOJI.STEAL,
 }
 
 //-------------------------
