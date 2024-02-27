@@ -160,10 +160,15 @@ function DuelItem({
 
       <Cell textAlign='center' className='Result'>
         <h5>
-          {/* <PositiveResult warning={isDraw || isCanceled} negative={false} positive={isInProgress || isFinished} > */}
-          <span className={ChallengeStateClasses[state]}>
-            {ChallengeStateNames[state]}
-          </span>
+          {state == ChallengeState.Resolved ?
+            <PositiveResult positive={true}>
+              <ProfileName address={winnerIsA ? duelistA : duelistB} badges={false} /><br />Wins
+            </PositiveResult>
+            :
+            <span className={ChallengeStateClasses[state]}>
+              {ChallengeStateNames[state]}
+            </span>
+          }
         </h5>
       </Cell>
 
