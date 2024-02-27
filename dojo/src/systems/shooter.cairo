@@ -137,6 +137,7 @@ mod shooter {
                         health: round.shot_a.health,
                         honour: round.shot_a.honour,
                         win: 0,
+                        wager: 0,
                     },
                     shot_b: Shot {
                         hash: 0,
@@ -151,6 +152,7 @@ mod shooter {
                         health: round.shot_b.health,
                         honour: round.shot_b.honour,
                         win: 0,
+                        wager: 0,
                     },
                 };
                 process_round(world, ref challenge, ref round3, true);
@@ -241,6 +243,7 @@ mod shooter {
         defense.health = MathU8::sub(defense.health, MathU8::sub(defense.damage, defense.block));
         if (defense.health == 0) {
             attack.win = 1;
+            attack.wager = 1;
         }
     }
 
@@ -253,13 +256,13 @@ mod shooter {
         }
         // dice 1: crit (execution, double damage, goal)
         attack.chance_crit = utils::calc_crit_chances(world, attacker, action, attack.health);
-        attack.dice_crit = throw_dice(seed, round, 100);
+        attack.dice_crit = throw_dice(seed, round, 100, attack.chance_crit);
         if (attack.dice_crit <= attack.chance_crit) {
             return (action.execute_crit(ref attack, ref defense));
         } else {
             // dice 2: miss or hit
             attack.chance_hit = utils::calc_hit_chances(world, attacker, action, attack.health);
-            attack.dice_hit = throw_dice(seed * 2, round, 100);
+            attack.dice_hit = throw_dice(seed * 2, round, 100, attack.chance_hit);
             if (attack.dice_hit <= attack.chance_hit) {
                 action.execute_hit(ref attack, ref defense);
             }
@@ -271,13 +274,14 @@ mod shooter {
     //-----------------------------------
     // Randomizer
     //
-    fn throw_dice(seed: felt252, round: Round, faces: u128) -> u8 {
+    fn throw_dice(seed: felt252, round: Round, faces: u128, chances: u8) -> u8 {
+        if (chances.into() == faces) { return chances; }
         let salt: u64 = utils::make_round_salt(round);
         (utils::throw_dice(seed, salt.into(), faces).try_into().unwrap())
     }
-    fn check_dice(seed: felt252, round: Round, faces: u128, limit: u128) -> bool {
+    fn check_dice(seed: felt252, round: Round, faces: u128, chances: u128) -> bool {
         let salt: u64 = utils::make_round_salt(round);
-        (utils::check_dice(seed, salt.into(), faces, limit))
+        (utils::check_dice(seed, salt.into(), faces, chances))
     }
 
 }

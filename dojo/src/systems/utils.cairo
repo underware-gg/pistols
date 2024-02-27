@@ -134,14 +134,14 @@ fn unpack_round_slots(round: Round) -> (u8, u8, u8, u8) {
     // Flee/Steal triggers an opposing 10 paces shot
     let action_a: Action = slot1_a.into();
     let action_b: Action = slot1_b.into();
-    let run_a: bool = (action_a == Action::Flee || action_a == Action::Steal);
-    let run_b: bool = (action_b == Action::Flee || action_b == Action::Steal);
-    if (run_a && !run_b) {
+    let runner_a: bool = action_a.is_runner();
+    let runner_b: bool = action_b.is_runner();
+    if (runner_a && !runner_b) {
         return (slot1_a, ACTION::PACES_10, 0, 0);
-    } else if (!run_a && run_b) {
+    } else if (!runner_a && runner_b) {
         return (ACTION::PACES_10, slot1_b, 0, 0);
     } else
-    // Double Steal decides in a 1 pace shootout
+    // Double Steal decides in a 1 pace face-off
     if (action_a == Action::Steal && action_b == Action::Steal) {
         return (slot1_a, slot1_b, ACTION::PACES_1, ACTION::PACES_1);
     }
@@ -226,6 +226,12 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         let final_round: Round = get!(world, (challenge.duel_id, challenge.round_number), Round);
         update_duelist_honour(ref duelist_a, final_round.shot_a.honour);
         update_duelist_honour(ref duelist_b, final_round.shot_b.honour);
+
+        // TODO: transfer wager + fees
+        if (final_round.shot_a.wager > final_round.shot_b.wager) {
+        } else if (final_round.shot_a.wager < final_round.shot_b.wager) {
+        } else {
+        }
         
         // save Duelists
         set!(world, (duelist_a, duelist_b));

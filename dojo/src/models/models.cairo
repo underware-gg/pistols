@@ -68,7 +68,8 @@ struct Shot {
     honour: u8,         // honour granted
     // more results -- TODO: move up
     win: u8,            // wins the round
-} // 208 bits
+    wager: u8,          // wins the wager
+} // 224 bits
 
 //
 // Each duel round
@@ -82,7 +83,7 @@ struct Round {
     state: u8,      // actually a RoundState
     shot_a: Shot,   // duelist_a shot
     shot_b: Shot,   // duelist_b shot
-} // (8 + 208 + 208) = 424 bits ~ 2 felts (max 504)
+} // (8 + 224 + 224) = 456 bits ~ 2 felts (max 504)
 
 
 
@@ -104,9 +105,10 @@ mod init {
             dice_hit: 0,
             damage: 0,
             block: 0,
+            win: 0,
+            wager: 0,
             health: 0,
             honour: 0,
-            win: 0,
         })
     }
 

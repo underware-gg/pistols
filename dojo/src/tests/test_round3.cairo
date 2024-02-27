@@ -544,38 +544,48 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert_winner(challenge, round, 0, 2);
         assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
+        assert(round.shot_a.wager > 0, 'shot_a.wager');
+        assert(round.shot_b.wager > 0, 'shot_b.wager');
     }
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_flee_draw_a() {
+    fn test_flee_win_a() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
-            0x777, // HIT_??? (chances for Paces are different!)
+            0x12121, // MISS
         );
-        assert_winner(challenge, round, 0, 2);
+        assert_winner(challenge, round, 1, 2);
         assert(round.shot_a.action == ACTION::PACES_10.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::FLEE.into(), 'shot_b.action');
         assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
-        assert(round.shot_b.health == constants::DOUBLE_DAMAGE, 'shot_b.health');
+        assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
+        assert(round.shot_b.chance_crit == 100, 'shot_b.chance_crit');
+        assert(round.shot_b.dice_crit == 100, 'shot_b.dice_crit');
+        assert(round.shot_a.wager > 0, 'shot_a.wager');
+        assert(round.shot_b.wager > 0, 'shot_b.wager');
     }
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_flee_draw_b() {
+    fn test_flee_win_b() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
-            0xaaa, // ???_HIT, chances for Paces are different!
+            0x12121, // MISS
         );
-        assert_winner(challenge, round, 0, 2);
+        assert_winner(challenge, round, 2, 2);
         assert(round.shot_a.action == ACTION::FLEE.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::PACES_10.into(), 'shot_b.action');
-        assert(round.shot_a.health == constants::SINGLE_DAMAGE, 'shot_a.health');
+        assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
+        assert(round.shot_a.chance_crit == 100, 'shot_a.chance_crit');
+        assert(round.shot_a.dice_crit == 100, 'shot_a.dice_crit');
+        assert(round.shot_a.wager > 0, 'shot_a.wager');
+        assert(round.shot_b.wager > 0, 'shot_b.wager');
     }
     #[test]
     #[available_gas(1_000_000_000)]
@@ -585,13 +595,15 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
-            SALT_CRIT_HIT,
+            SALT_CRIT_HIT, // CRIT_???, chances for Paces are different!
         );
         assert_winner(challenge, round, 1, 2);
         assert(round.shot_a.action == ACTION::PACES_10.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::FLEE.into(), 'shot_b.action');
         assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == 0, 'shot_b.health');
+        assert(round.shot_a.wager > 0, 'shot_a.wager');
+        assert(round.shot_b.wager == 0, 'shot_b.wager');
     }
     #[test]
     #[available_gas(1_000_000_000)]
@@ -601,28 +613,34 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
-            SALT_CRIT_HIT,
+            SALT_CRIT_HIT, // CRIT_???, chances for Paces are different!
         );
         assert_winner(challenge, round, 1, 2);
         assert(round.shot_a.action == ACTION::PACES_10.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::FLEE.into(), 'shot_b.action');
         assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == 0, 'shot_b.health');
+        assert(round.shot_a.wager > 0, 'shot_a.wager');
+        assert(round.shot_b.wager == 0, 'shot_b.wager');
     }
-    // #[test]
-    // #[available_gas(1_000_000_000)]
-    // fn test_flee_kill_b() {
-    //     let (world, system, owner, other) = utils::setup_world();
-    //     let (challenge, round) = _execute_blades(
-    //         world, system, owner, other,
-    //         constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
-    //         constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
-    //         SALT_HIT_CRIT,
-    //     );
-    //     assert_winner(challenge, round, 2, 2);
-        // assert(round.shot_a.health == 0, 'shot_a.health');
-        // assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
-    // }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_flee_kill_b() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
+            constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
+            0xeee, // ???_CRIT, chances for Paces are different!
+        );
+        assert_winner(challenge, round, 2, 2);
+        assert(round.shot_a.action == ACTION::FLEE.into(), 'shot_a.action');
+        assert(round.shot_b.action == ACTION::PACES_10.into(), 'shot_b.action');
+        assert(round.shot_a.health == 0, 'shot_a.health');
+        assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
+        assert(round.shot_a.wager == 0, 'shot_a.wager');
+        assert(round.shot_b.wager > 0, 'shot_b.wager');
+    }
 
 
 
@@ -631,8 +649,129 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     //
     #[test]
     #[available_gas(1_000_000_000)]
+    fn test_steal_vs_flee() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
+            constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
+            SALT_DUAL_HIT,
+        );
+        assert_winner(challenge, round, 0, 2);
+        assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
+        assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
+        assert(round.shot_a.wager > round.shot_b.wager, 'wager');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_flee_vs_steal() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
+            constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
+            SALT_DUAL_HIT,
+        );
+        assert_winner(challenge, round, 0, 2);
+        assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
+        assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
+        assert(round.shot_a.wager < round.shot_b.wager, 'wager');
+    }
+    //
+    // face-off
+    #[test]
+    #[available_gas(1_000_000_000)]
     fn test_steal_vs_steal() {
-        assert(false, 'TODO STEAL');
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
+            constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
+            SALT_DUAL_HIT,
+        );
+        assert_winner(challenge, round, 0, 3);
+        assert(round.shot_a.action == ACTION::PACES_1.into(), 'shot_a.action');
+        assert(round.shot_b.action == ACTION::PACES_1.into(), 'shot_b.action');
+        assert(round.shot_a.health < constants::FULL_HEALTH, 'shot_a.health');
+        assert(round.shot_b.health < constants::FULL_HEALTH, 'shot_b.health');
+        assert(round.shot_a.wager == 0, 'shot_a.wager');
+        assert(round.shot_b.wager == 0, 'shot_b.wager');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_steal_win_a() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
+            constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
+            0x12121, // MISS
+        );
+        assert_winner(challenge, round, 1, 2);
+        assert(round.shot_a.action == ACTION::PACES_10.into(), 'shot_a.action');
+        assert(round.shot_b.action == ACTION::STEAL.into(), 'shot_b.action');
+        assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
+        assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
+        assert(round.shot_b.chance_crit == 100, 'shot_b.chance_crit');
+        assert(round.shot_b.dice_crit == 100, 'shot_b.dice_crit');
+        assert(round.shot_a.wager == 0, 'shot_a.wager');
+        assert(round.shot_b.wager > 0, 'shot_b.wager');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_steal_win_b() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
+            constants::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
+            0x12121, // MISS
+        );
+        assert_winner(challenge, round, 2, 2);
+        assert(round.shot_a.action == ACTION::STEAL.into(), 'shot_a.action');
+        assert(round.shot_b.action == ACTION::PACES_10.into(), 'shot_b.action');
+        assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
+        assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
+        assert(round.shot_a.chance_crit == 100, 'shot_a.chance_crit');
+        assert(round.shot_a.dice_crit == 100, 'shot_a.dice_crit');
+        assert(round.shot_a.wager > 0, 'shot_a.wager');
+        assert(round.shot_b.wager == 0, 'shot_b.wager');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_slow_vs_steal_kill_a() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
+            constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
+            SALT_CRIT_HIT, // CRIT_???, chances for Paces are different!
+        );
+        assert_winner(challenge, round, 1, 2);
+        assert(round.shot_a.action == ACTION::PACES_10.into(), 'shot_a.action');
+        assert(round.shot_b.action == ACTION::STEAL.into(), 'shot_b.action');
+        assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
+        assert(round.shot_b.health == 0, 'shot_b.health');
+        assert(round.shot_a.wager > 0, 'shot_a.wager');
+        assert(round.shot_b.wager == 0, 'shot_b.wager');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_steal_kill_b() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
+            constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
+            0xeee, // ???_CRIT, chances for Paces are different!
+        );
+        assert_winner(challenge, round, 2, 2);
+        assert(round.shot_a.action == ACTION::STEAL.into(), 'shot_a.action');
+        assert(round.shot_b.action == ACTION::PACES_10.into(), 'shot_b.action');
+        assert(round.shot_a.health == 0, 'shot_a.health');
+        assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
+        assert(round.shot_a.wager == 0, 'shot_a.wager');
+        assert(round.shot_b.wager > 0, 'shot_b.wager');
     }
 
 }

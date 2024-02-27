@@ -76,7 +76,7 @@ mod tests {
                 let honour = action.honour();
                 if (is_pace) {
                     assert(honour == n, 'action.honour');
-                } else if (action == Action::Flee || action == Action::Steal) {
+                } else if (action.is_runner()) {
                     assert(honour == 1, 'action.honour == 1');
                 } else {
                     assert(honour == 0, 'action.honour == 0');
