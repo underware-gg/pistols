@@ -20,6 +20,9 @@ mod constants {
 }
 
 mod chances {
+    const NEVER: u8 = 0;
+    const ALWAYS: u8 = 100;
+    
     // Pistols chances (percentage) at X paces
     const PISTOLS_KILL_AT_STEP_1: u8 = 5;
     const PISTOLS_KILL_AT_STEP_10: u8 = 20;

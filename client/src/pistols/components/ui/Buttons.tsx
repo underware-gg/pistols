@@ -1,5 +1,5 @@
-import React, { ReactElement } from 'react'
-import { Menu, Button, Icon, SemanticICONS } from 'semantic-ui-react'
+import React, { ReactElement, useState } from 'react'
+import { Menu, Button, Confirm, SemanticICONS } from 'semantic-ui-react'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { CustomIcon } from './Icons'
@@ -17,6 +17,8 @@ type ActionButtonProps = {
   fill?: boolean
   dimmed?: boolean
   attention?: boolean
+  confirm?: boolean
+  confirmMessage?: string
   className?: string
   onClick: () => void
 }
@@ -30,6 +32,8 @@ export const ActionButton = ({
   fill = false,
   dimmed = false,
   attention = false,
+  confirm = false,
+  confirmMessage = null,
   className = null,
   onClick,
 }: ActionButtonProps) => {
@@ -39,16 +43,42 @@ export const ActionButton = ({
   if (large) classNames.push('LargeButton')
   classNames.push((disabled || dimmed) ? 'Locked' : 'Unlocked')
   if (className) classNames.push(className)
+
+  const [isConfirming, setIsConfirming] = useState(false)
+  const _click = () => {
+    if (confirm) {
+      if (!isConfirming) {
+        setIsConfirming(true)
+      } else {
+        onClick()
+        setIsConfirming(false)
+      }
+    } else {
+      onClick()
+    }
+  }
+
   return (
-    <Button
-      className={classNames.join(' ')}
-      toggle={toggle}
-      active={active}
-      disabled={disabled}
-      onClick={() => onClick()}
-    >
-      {label}
-    </Button>
+    <>
+      <Button
+        className={classNames.join(' ')}
+        toggle={toggle}
+        active={active}
+        disabled={disabled}
+        onClick={() => _click()}
+      >
+        {label}
+      </Button>
+      <Confirm
+        open={isConfirming}
+        onCancel={() => setIsConfirming(false)}
+        onConfirm={() => _click()}
+        header='Are you sure?'
+        content={confirmMessage}
+        className='ModalText'
+        size='mini'
+      />
+    </>
   )
 }
 

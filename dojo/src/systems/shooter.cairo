@@ -1,5 +1,6 @@
 
 mod shooter {
+    use debug::PrintTrait;
     use core::traits::TryInto;
     use starknet::{ContractAddress, get_block_timestamp};
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
@@ -135,6 +136,8 @@ mod shooter {
                         block: 0,
                         health: round.shot_a.health,
                         honour: round.shot_a.honour,
+                        win: 0,
+                        wager: 0,
                     },
                     shot_b: Shot {
                         hash: 0,
@@ -148,6 +151,8 @@ mod shooter {
                         block: 0,
                         health: round.shot_b.health,
                         honour: round.shot_b.honour,
+                        win: 0,
+                        wager: 0,
                     },
                 };
                 process_round(world, ref challenge, ref round3, true);
@@ -165,37 +170,36 @@ mod shooter {
         let action_a: Action = apply_action_honour(ref round.shot_a);
         let action_b: Action = apply_action_honour(ref round.shot_b);
         
+        let mut executed: bool = false;
         let priority: i8 = action_a.roll_priority(action_b);
         if (priority < 0) {
             // A attacks first
-            attack_sync(world, challenge.duelist_a, challenge.duelist_b, round, ref round.shot_a, ref round.shot_b, false);
+            executed = attack_sync(world, challenge.duelist_a, challenge.duelist_b, round, ref round.shot_a, ref round.shot_b, false);
         } else if (priority > 0) {
             // B attacks first
-            attack_sync(world, challenge.duelist_b, challenge.duelist_a, round, ref round.shot_b, ref round.shot_a, false);
+            executed = attack_sync(world, challenge.duelist_b, challenge.duelist_a, round, ref round.shot_b, ref round.shot_a, false);
         } else {
             // same time
-            attack_sync(world, challenge.duelist_a, challenge.duelist_b, round, ref round.shot_a, ref round.shot_b, true);
+            executed = attack_sync(world, challenge.duelist_a, challenge.duelist_b, round, ref round.shot_a, ref round.shot_b, true);
         }
 
-        // decide results
-        if (round.shot_a.health == 0 && round.shot_b.health == 0) {
-            // both dead!
-            end_challenge(ref challenge, ChallengeState::Draw, 0);
-        } else if (round.shot_a.health == 0) {
-            // A is dead!
-            end_challenge(ref challenge, ChallengeState::Resolved, 2);
-        } else if (round.shot_b.health == 0) {
-            // B is dead!
-            end_challenge(ref challenge, ChallengeState::Resolved, 1);
+        // decide results on health or win flag
+        let win_a: bool = (round.shot_a.win != 0);
+        let win_b: bool = (round.shot_b.win != 0);
+        if (win_a && win_b) {
+            end_challenge(ref challenge, ref round, ChallengeState::Draw, 0);
+        } else if (win_a) {
+            end_challenge(ref challenge, ref round, ChallengeState::Resolved, 1);
+        } else if (win_b) {
+            end_challenge(ref challenge, ref round, ChallengeState::Resolved, 2);
+        } else
+        // both players still alive
+        if (challenge.round_number == constants::ROUND_COUNT || is_last_round || executed) {
+            // finished moves, and no winner, ends in a draw
+            end_challenge(ref challenge, ref round, ChallengeState::Draw, 0);
         } else {
-            // both alive!
-            if (challenge.round_number == constants::ROUND_COUNT || is_last_round) {
-                // end in a Draw
-                end_challenge(ref challenge, ChallengeState::Draw, 0);
-            } else {
-                // next round
-                challenge.round_number += 1;
-            }
+            // next round
+            challenge.round_number += 1;
         }
 
         // Finish round
@@ -206,13 +210,13 @@ mod shooter {
     fn apply_action_honour(ref shot: Shot) -> Action {
         let action: Action = shot.action.into();
         let honour: u8 = action.honour();
-        if (honour > 0) {
+        if (honour != 0) {
             shot.honour = honour;
         }
         (action)
     }
 
-    fn end_challenge(ref challenge: Challenge, state: ChallengeState, winner: u8) {
+    fn end_challenge(ref challenge: Challenge, ref round: Round, state: ChallengeState, winner: u8) {
         challenge.state = state.into();
         challenge.winner = winner;
         challenge.timestamp_end = get_block_timestamp();
@@ -223,42 +227,43 @@ mod shooter {
     //
 
     // execute attacks in sync or async
-    fn attack_sync(world: IWorldDispatcher, attacker: ContractAddress, defender: ContractAddress, round: Round, ref attack: Shot, ref defense: Shot, sync: bool) {
+    fn attack_sync(world: IWorldDispatcher, attacker: ContractAddress, defender: ContractAddress, round: Round, ref attack: Shot, ref defense: Shot, sync: bool) -> bool {
         // attack first, if survives defense can attack
-        let executed: bool = attack(world, 'shoot_a', attacker, round, ref attack, ref defense);
+        let mut executed: bool = attack(world, 'shoot_a', attacker, round, ref attack, ref defense);
         if (sync || !executed) {
-            let executed: bool = attack(world, 'shoot_b', defender, round, ref defense, ref attack);
-            if (executed) {
-                attack.block = 0; // execution cancels any block
-            }
+            executed = attack(world, 'shoot_b', defender, round, ref defense, ref attack) || executed;
         }
-        apply_damage(ref defense);
-        apply_damage(ref attack);
+        apply_damage(ref attack, ref defense);
+        apply_damage(ref defense, ref attack);
+        (executed)
     }
 
     #[inline(always)]
-    fn apply_damage(ref shot: Shot) {
-        shot.health = MathU8::sub(shot.health, MathU8::sub(shot.damage, shot.block));
+    fn apply_damage(ref attack: Shot, ref defense: Shot) {
+        defense.health = MathU8::sub(defense.health, MathU8::sub(defense.damage, defense.block));
+        if (defense.health == 0) {
+            attack.win = 1;
+            attack.wager = 1;
+        }
     }
 
     // executes single attack
     // returns true if ended in execution
     fn attack(world: IWorldDispatcher, seed: felt252, attacker: ContractAddress, round: Round, ref attack: Shot, ref defense: Shot) -> bool {
         let action: Action = attack.action.into();
-        if (action == Action::Idle) {
-            return (false);
-        }
-        // dice 1: crit (execution, double damage, goal)
-        attack.chance_crit = utils::calc_crit_chances(world, attacker, action, attack.health);
-        attack.dice_crit = throw_dice(seed, round, 100);
-        if (attack.dice_crit <= attack.chance_crit) {
-            return (action.execute_crit(ref attack, ref defense));
-        } else {
-            // dice 2: miss or hit
-            attack.chance_hit = utils::calc_hit_chances(world, attacker, action, attack.health);
-            attack.dice_hit = throw_dice(seed * 2, round, 100);
-            if (attack.dice_hit <= attack.chance_hit) {
-                action.execute_hit(ref attack, ref defense);
+        if (action != Action::Idle) {
+            // dice 1: crit (execution, double damage, goal)
+            attack.chance_crit = utils::calc_crit_chances(world, attacker, action, attack.health);
+            attack.dice_crit = throw_dice(seed, round, 100, attack.chance_crit);
+            if (attack.dice_crit <= attack.chance_crit) {
+                return (action.execute_crit(ref attack, ref defense));
+            } else {
+                // dice 2: miss or hit
+                attack.chance_hit = utils::calc_hit_chances(world, attacker, action, attack.health);
+                attack.dice_hit = throw_dice(seed * 2, round, 100, attack.chance_hit);
+                if (attack.dice_hit <= attack.chance_hit) {
+                    action.execute_hit(ref attack, ref defense);
+                }
             }
         }
         (false)
@@ -268,13 +273,14 @@ mod shooter {
     //-----------------------------------
     // Randomizer
     //
-    fn throw_dice(seed: felt252, round: Round, faces: u128) -> u8 {
+    fn throw_dice(seed: felt252, round: Round, faces: u128, chances: u8) -> u8 {
+        if (chances.into() == faces) { return chances; }
         let salt: u64 = utils::make_round_salt(round);
         (utils::throw_dice(seed, salt.into(), faces).try_into().unwrap())
     }
-    fn check_dice(seed: felt252, round: Round, faces: u128, limit: u128) -> bool {
+    fn check_dice(seed: felt252, round: Round, faces: u128, chances: u128) -> bool {
         let salt: u64 = utils::make_round_salt(round);
-        (utils::check_dice(seed, salt.into(), faces, limit))
+        (utils::check_dice(seed, salt.into(), faces, chances))
     }
 
 }
@@ -301,48 +307,65 @@ mod tests {
     #[test]
     #[available_gas(1_000_000)]
     fn test_apply_damage() {
-        let mut shot = init::Shot();
+        let mut attack = init::Shot();
+        let mut defense = init::Shot();
         // damages
-        shot.health = 3;
-        shot.damage = 1;
-        shooter::apply_damage(ref shot);
-        assert(shot.health == 2, '3-1');
-        shooter::apply_damage(ref shot);
-        assert(shot.health == 1, '2-1');
-        shooter::apply_damage(ref shot);
-        assert(shot.health == 0, '1-1');
-        shooter::apply_damage(ref shot);
-        assert(shot.health == 0, '0-1');
+        attack.win = 0;
+        defense.health = 3;
+        defense.damage = 1;
+        shooter::apply_damage(ref attack, ref defense);
+        assert(defense.health == 2, '3-1');
+        assert(attack.win == 0, '3-1_win');
+        shooter::apply_damage(ref attack, ref defense);
+        assert(defense.health == 1, '2-1');
+        assert(attack.win == 0, '2-1_win');
+        shooter::apply_damage(ref attack, ref defense);
+        assert(defense.health == 0, '1-1');
+        assert(attack.win == 1, '1-1_win');
+        shooter::apply_damage(ref attack, ref defense);
+        assert(defense.health == 0, '0-1');
         // overflow
-        shot.health = 1;
-        shot.damage = 3;
-        shooter::apply_damage(ref shot);
-        assert(shot.health == 0, '1-3');
+        attack.win = 0;
+        defense.health = 1;
+        defense.damage = 3;
+        shooter::apply_damage(ref attack, ref defense);
+        assert(defense.health == 0, '1-3');
+        assert(attack.win == 1, '1-3_win');
         // blocks
-        shot.health = 1;
-        shot.damage = 0;
-        shot.block = 1;
-        shooter::apply_damage(ref shot);
-        assert(shot.health == 1, '1-0+1');
-        shot.health = 1;
-        shot.damage = 1;
-        shot.block = 1;
-        shooter::apply_damage(ref shot);
-        assert(shot.health == 1, '1-1+1');
-        shot.health = 1;
-        shot.damage = 2;
-        shot.block = 1;
-        shooter::apply_damage(ref shot);
-        assert(shot.health == 0, '1-2+1');
-        shot.health = 2;
-        shot.damage = 4;
-        shot.block = 1;
-        shooter::apply_damage(ref shot);
-        assert(shot.health == 0, '2-4+1');
-        shot.health = 1;
-        shot.damage = 2;
-        shot.block = 5;
-        shooter::apply_damage(ref shot);
-        assert(shot.health == 1, '1-2+5');
+        attack.win = 0;
+        defense.health = 1;
+        defense.damage = 0;
+        defense.block = 1;
+        shooter::apply_damage(ref attack, ref defense);
+        assert(defense.health == 1, '1-0+1');
+        assert(attack.win == 0, '1-0+1_win');
+        attack.win = 0;
+        defense.health = 1;
+        defense.damage = 1;
+        defense.block = 1;
+        shooter::apply_damage(ref attack, ref defense);
+        assert(defense.health == 1, '1-1+1');
+        assert(attack.win == 0, '1-1+1_win');
+        attack.win = 0;
+        defense.health = 1;
+        defense.damage = 2;
+        defense.block = 1;
+        shooter::apply_damage(ref attack, ref defense);
+        assert(defense.health == 0, '1-2+1');
+        assert(attack.win == 1, '1-2+1_win');
+        attack.win = 0;
+        defense.health = 2;
+        defense.damage = 4;
+        defense.block = 1;
+        shooter::apply_damage(ref attack, ref defense);
+        assert(defense.health == 0, '2-4+1');
+        assert(attack.win == 1, '2-4+1_win');
+        attack.win = 0;
+        defense.health = 1;
+        defense.damage = 2;
+        defense.block = 5;
+        shooter::apply_damage(ref attack, ref defense);
+        assert(defense.health == 1, '1-2+5');
+        assert(attack.win == 0, '1-2+5_win');
     }
 }

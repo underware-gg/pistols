@@ -949,7 +949,7 @@
     {
       "name": "pistols::systems::actions::actions",
       "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
-      "class_hash": "0x6f81be61bbf95230248abe6069afa69383821e9c2c5e6655ab79a87a8a38387",
+      "class_hash": "0x6dd5993421300140202fd21f8ab20946fec1c83e975396278d7c24e038d836d",
       "abi": [
         {
           "type": "impl",
@@ -2309,7 +2309,7 @@
           "key": false
         }
       ],
-      "class_hash": "0x41af7975d8177dd0b665dcfc27c560e3be11b726c6c1e7228901dbbdb0c8fad",
+      "class_hash": "0x2e82f5cb3246e30e3afea11178d5b1dda19857eb0b4673e015aad9c4e9388c6",
       "abi": [
         {
           "type": "impl",
@@ -2526,6 +2526,14 @@
             },
             {
               "name": "honour",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "win",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "wager",
               "type": "core::integer::u8"
             }
           ]

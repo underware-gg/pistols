@@ -49,7 +49,7 @@ export default function ChallengeModal() {
       // size='large'
       // dimmer='inverted'
       onClose={() => _close()}
-      onOpen={() => {}}
+      onOpen={() => { }}
       open={isOpen}
     >
       <Modal.Header>
@@ -144,14 +144,17 @@ export default function ChallengeModal() {
             <Col>
               <ActionButton fill label='Close' onClick={() => _close()} />
             </Col>
+            <Col>
+              <ActionButton fill label='Model Data' onClick={() => window.open(`/dueldata/${duelId}`, '_blank')} />
+            </Col>
             {(state == ChallengeState.Awaiting && isChallenger) &&
               <Col>
-                <ActionButton fill label='Cowardly withdraw' onClick={() => _reply(false)} />
+                <ActionButton fill label='Cowardly withdraw' onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
               </Col>
             }
             {(state == ChallengeState.Awaiting && isChallenged) &&
               <Col>
-                <ActionButton fill label='Cowardly refuse' onClick={() => _reply(false)} />
+                <ActionButton fill label='Cowardly refuse' onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
               </Col>
             }
             {(state == ChallengeState.Awaiting && isChallenged) &&

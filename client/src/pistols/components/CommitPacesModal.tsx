@@ -49,7 +49,7 @@ export default function CommitPacesModal({
       onClose={() => setIsOpen(false)}
       open={isOpen}
     >
-      <Modal.Header className='AlignCenter'><h4>How many paces will you take?</h4></Modal.Header>
+      <Modal.Header className='AlignCenter'>How many paces will you take?</Modal.Header>
       <Modal.Content>
         <Modal.Description className='AlignCenter'>
           <div className='ModalText'>
@@ -74,7 +74,7 @@ export default function CommitPacesModal({
           </div>
 
           <Divider hidden />
-          
+
           <ActionChances duelId={duelId} roundNumber={roundNumber} action={paces} />
 
         </Modal.Description>

@@ -34,14 +34,12 @@ struct Challenge {
     round_number: u8,           // current or final
     winner: u8,                 // 0:draw, 1:duelist_a, 2:duelist_b
     // timestamps in unix epoch
-    // a 32-bit timestamp will last 82 more years
-    // Sunday, February 7, 2106 6:28:15 AM
     timestamp_start: u64,       // Unix time, started
     timestamp_end: u64,         // Unix time, ended
 } // f + f + f + 152 bits
 
 //
-// Current challenge from one Duelist to another
+// Current challenge between two Duelists
 #[derive(Model, Copy, Drop, Serde)]
 struct Pact {
     #[key]
@@ -68,7 +66,10 @@ struct Shot {
     // player state
     health: u8,         // final health
     honour: u8,         // honour granted
-} // 208 bits
+    // more results -- TODO: move up
+    win: u8,            // wins the round
+    wager: u8,          // wins the wager
+} // 224 bits
 
 //
 // Each duel round
@@ -82,7 +83,7 @@ struct Round {
     state: u8,      // actually a RoundState
     shot_a: Shot,   // duelist_a shot
     shot_b: Shot,   // duelist_b shot
-} // (8 + 208 + 208) = 424 bits ~ 2 felts (max 504)
+} // (8 + 224 + 224) = 456 bits ~ 2 felts (max 504)
 
 
 
@@ -104,6 +105,8 @@ mod init {
             dice_hit: 0,
             damage: 0,
             block: 0,
+            win: 0,
+            wager: 0,
             health: 0,
             honour: 0,
         })

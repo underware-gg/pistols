@@ -65,7 +65,7 @@ html, body {
 
 body {
   margin: 0;
-  display: flex;
+  // display: flex;
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
@@ -188,37 +188,29 @@ canvas {
 .NoMouse { pointer-events: none; }
 .YesMouse { pointer-events: auto; }
 
-.Important {
-  color: $color-important;
-}
-.Black {
-  color: #444;
-}
 .Bold {
   color: $color-brightest;
   font-weight: 600;
 }
 
-.Positive {
-  // background-color: inherit!important;
-  color: $color-positive!important;
-  // color: inherit!important;
-}
-.Negative {
-  // background-color: inherit!important;
-  color: $color-negative!important;
-}
-.Warning {
-  // background-color: inherit!important;
-  color: $color-warning!important;
-}
-.Canceled {
-  // background-color: inherit!important;
-  color: $color-inactive!important;
-}
-.Inactive {
-  color: $color-inactive!important;
-}
+.Black     { color: #444; }
+.Important { color: $color-important; }
+.Brightest { color: $color-brightest!important; }
+.Positive  { color: $color-positive!important; }
+.Negative  { color: $color-negative!important; }
+.Warning   { color: $color-warning!important; }
+.Canceled  { color: $color-inactive!important; }
+.Inactive  { color: $color-inactive!important; }
+
+.BgBlack     { background-color: #444; }
+.BgImportant { background-color: $color-important!important; }
+.BgBrightest { background-color: $color-brightest!important; }
+.BgPositive  { background-color: $color-positive!important; }
+.BgNegative  { background-color: $color-negative!important; }
+.BgWarning   { background-color: $color-warning!important; }
+.BgCanceled  { background-color: $color-inactive!important; }
+.BgInactive  { background-color: $color-inactive!important; }
+
 
 .Code {
   font-family: $font-family-mono;
@@ -492,7 +484,11 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 .ModalText {
-  font-size: 20px;
+  font-size: 20px!important;
+}
+.ModalBladesDescription {
+  @extend .CenteredContainer;
+  height: 130px;
 }
 
 // .TableHeader {
@@ -868,6 +864,7 @@ $logo-url: '/logos/logo_avante.svg';
   // from .ui.progress .bar
   border-radius: 0.28571429rem;
   transition: width .1s ease, background-color .1s ease;
+  margin-left: 0.2em; // .ui.progress .bar > .progress
 }
 
 .SlotNumber {
@@ -1035,15 +1032,18 @@ input::placeholder {
   @extend ._button;
   margin: 0 0.15em;
 }
+.ui.primary.button,
 .ui.secondary.menu .active.item,
 .ui.secondary.menu .active.item:hover {
   @extend ._button_active;
 }
+.ui.primary.button:hover,
 .ui.secondary.menu .dropdown.item:hover,
 .ui.secondary.menu .link.item:hover,
 .ui.secondary.menu a.item:hover {
   @extend ._button_hover;
 }
+.ui.primary.button:active,
 .ui.secondary.menu .dropdown.item:active,
 .ui.secondary.menu .link.item:active,
 .ui.secondary.menu a.item:active {
@@ -1121,6 +1121,9 @@ $table-bg-color: rgba($color-darkest, 0.6);
 .ui.sortable.table thead th:hover {
   background-color: rgba($color-medium, 1);
 }
+.ui.attached.table {
+  border: none;
+}
 td {
   // border: 1px 0 0 0 solid $color-brightest!important;
   // border: 0!important;
@@ -1171,8 +1174,10 @@ td {
 .ui.modal>.header {
   @extend .Title;
   font-family: $font-family;
+  font-size: 2.5rem!important;
   color: $color-text;
   border-bottom: $border-hr;
+  padding: 0.2em;
 }
 .ui.modal>.actions {
   border-top: $border-hr;

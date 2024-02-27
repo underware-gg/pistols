@@ -5,11 +5,12 @@ import { EMOJI } from '@/pistols/data/messages'
 
 export function ProfileName({
   address,
+  badges = true,
 }) {
   const { name, honour } = useDuelist(address)
-  const badges = useMemo(() => (honour > 9.0 ? EMOJI.LORD : null), [honour])
+  const _badges = useMemo(() => (badges && honour > 9.0 ? ` ${EMOJI.LORD}` : null), [honour])
   return (
-    <span>{name} {badges}</span>
+    <span>{name}{_badges}</span>
   )
 }
 

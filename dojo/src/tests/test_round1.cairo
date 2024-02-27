@@ -234,16 +234,20 @@ mod tests {
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_draw();
 
-        let hit_chance_a = utils::calc_hit_chances(system, owner, challenge.duel_id, challenge.round_number, action_a);
-        let hit_chance_b = utils::calc_hit_chances(system, owner, challenge.duel_id, challenge.round_number, action_b);
-        let kill_chance_a = utils::calc_crit_chances(system, owner, challenge.duel_id, challenge.round_number, action_a);
-        let kill_chance_b = utils::calc_crit_chances(system, owner, challenge.duel_id, challenge.round_number, action_b);
+        // let hit_chance_a = utils::calc_hit_chances(system, owner, challenge.duel_id, challenge.round_number, action_a);
+        // let hit_chance_b = utils::calc_hit_chances(system, owner, challenge.duel_id, challenge.round_number, action_b);
+        // let kill_chance_a = utils::calc_crit_chances(system, owner, challenge.duel_id, challenge.round_number, action_a);
+        // let kill_chance_b = utils::calc_crit_chances(system, owner, challenge.duel_id, challenge.round_number, action_b);
 
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
         utils::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a, 0);
         utils::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b, 0);
         let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
+// round.shot_a.chance_crit.print();
+// round.shot_b.chance_crit.print();
+// round.shot_a.dice_crit.print();
+// round.shot_b.dice_crit.print();
 // round.shot_a.health.print();
 // round.shot_b.health.print();
 // challenge.state.print();
@@ -459,7 +463,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_clamp_invalid_idle_paces() {
+    fn test_clamp_invalid_paces() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
         let hash_a: u64 = make_action_hash(0x111, 0);
@@ -471,10 +475,10 @@ mod tests {
         let round: Round = utils::get_Round(world, duel_id, 1);
         assert(round.shot_a.action == 10, 'action_0');
         assert(round.shot_b.action == 10, 'action_11');
-        assert(round.shot_a.chance_crit > 0, 'a_dice_hit');
-        assert(round.shot_b.chance_crit > 0, 'b_dice_hit');
-        assert(round.shot_a.dice_crit > 0, 'a_dice_crit');
-        assert(round.shot_b.dice_crit > 0, 'b_dice_crit');
+        assert(round.shot_a.chance_crit > 0, 'shot_a.chance_crit');
+        assert(round.shot_b.chance_crit > 0, 'shot_b.chance_crit');
+        assert(round.shot_a.dice_crit > 0, 'shot_a.dice_crit');
+        assert(round.shot_b.dice_crit > 0, 'shot_b.dice_crit');
     }
 
     #[test]

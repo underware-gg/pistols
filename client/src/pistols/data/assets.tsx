@@ -40,6 +40,7 @@ enum CharacterType {
 }
 export enum AnimName {
   STILL = 'STILL',
+  STILL_BLADE = 'STILL_BLADE',
   STEP_1 = 'STEP_1',
   STEP_2 = 'STEP_2',
   TWO_STEPS = 'TWO_STEPS',
@@ -69,6 +70,11 @@ const SPRITESHEETS: Spritesheets = {
   FEMALE: {
     [AnimName.STILL]: {
       path: '/textures/animations/Female Duelist/Still',
+      frameCount: 1,
+      frameRate: 8,
+    },
+    [AnimName.STILL_BLADE]: {
+      path: '/textures/animations/Female Duelist/Still Blade',
       frameCount: 1,
       frameRate: 8,
     },

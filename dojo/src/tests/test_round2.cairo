@@ -74,7 +74,7 @@ mod tests {
     //
 
     #[test]
-    #[available_gas(1_000_000_000)]
+    #[available_gas(10_000_000_000)]
     fn test_blades_round_draw() {
         let (world, system, owner, other) = utils::setup_world();
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
@@ -238,8 +238,10 @@ mod tests {
             assert(duelist_b.total_wins == 0, 'a_win_duelist_b.total_wins');
             assert(duelist_a.total_losses == 0, 'a_win_duelist_a.total_losses');
             assert(duelist_b.total_losses == 1, 'a_win_duelist_b.total_losses');
+            assert(round.shot_a.win == 1, 'a_win_win_a');
             assert(round.shot_a.damage == 0, 'a_win_damage_a');
             assert(round.shot_a.health > 0, 'a_win_health_a');
+            assert(round.shot_b.win == 0, 'a_win_win_b');
             assert(round.shot_b.damage > 0, 'a_win_damage_b');
             assert(round.shot_b.health == 0, 'a_win_health_b');
         } else if (challenge.winner == 2) {
@@ -247,8 +249,10 @@ mod tests {
             assert(duelist_b.total_wins == 1, 'b_win_duelist_b.total_wins');
             assert(duelist_a.total_losses == 1, 'b_win_duelist_a.total_losses');
             assert(duelist_b.total_losses == 0, 'b_win_duelist_b.total_losses');
+            assert(round.shot_b.win == 1, 'b_win_win_b');
             assert(round.shot_b.damage == 0, 'b_win_damage_b');
             assert(round.shot_b.health > 0, 'b_win_health_b');
+            assert(round.shot_a.win == 0, 'b_win_win_a');
             assert(round.shot_a.damage > 0, 'b_win_damage_a');
             assert(round.shot_a.health == 0, 'b_win_health_a');
         } else {

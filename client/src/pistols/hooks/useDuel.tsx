@@ -5,7 +5,7 @@ import { useThreeJsContext } from "./ThreeJsContext"
 import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
 import { useChallenge } from "@/pistols/hooks/useChallenge"
 import { keysToEntity } from '@/pistols/utils/utils'
-import { BladesNames, BladesVerbs, RoundState } from "@/pistols/utils/pistols"
+import { ActionNames, ActionVerbs, RoundState } from "@/pistols/utils/pistols"
 import { AnimationState } from "@/pistols/three/game"
 import constants from '../utils/constants'
 
@@ -65,8 +65,8 @@ export const useDuel = (duelId: bigint | string) => {
 
   //
   // Players turns, need action
-  const turnA = useMemo(() => (completedStagesA[duelStage] === false), [duelStage, completedStagesA])
-  const turnB = useMemo(() => (completedStagesB[duelStage] === false), [duelStage, completedStagesB])
+  const turnA = useMemo(() => (completedStagesA[duelStage] === false), [duelStage, completedStagesA, challenge.isAwaiting])
+  const turnB = useMemo(() => (completedStagesB[duelStage] === false || challenge.isAwaiting), [duelStage, completedStagesB, challenge.isAwaiting])
 
   return {
     challenge,
@@ -92,7 +92,7 @@ export const useAnimatedDuel = (duelId: bigint | string) => {
   const { round1, round2, round3, duelStage } = result
 
   const { gameImpl, audioLoaded } = useThreeJsContext()
-  const { animated, dispatchAnimated } = useGameplayContext()
+  const { animated, animatedHealthA, animatedHealthB, dispatchAnimated } = useGameplayContext()
 
   //-------------------------------------
   // Add intermediate animation DuelStage
@@ -107,19 +107,19 @@ export const useAnimatedDuel = (duelId: bigint | string) => {
   const { healthA, healthB } = useMemo(() => {
     return {
       healthA: (
-        currentStage <= DuelStage.Round1Animation ? constants.FULL_HEALTH
+        (currentStage <= DuelStage.Round1Animation && !animatedHealthA) ? constants.FULL_HEALTH
           : currentStage <= DuelStage.Round2Animation ? round1.shot_a.health
             : currentStage <= DuelStage.Round3Animation ? round2.shot_a.health
               : (round3?.shot_a.health ?? round2?.shot_a.health ?? round1?.shot_a.health)
       ) ?? null,
       healthB: (
-        currentStage <= DuelStage.Round1Animation ? constants.FULL_HEALTH
+        (currentStage <= DuelStage.Round1Animation && !animatedHealthB) ? constants.FULL_HEALTH
           : currentStage <= DuelStage.Round2Animation ? round1.shot_b.health
             : currentStage <= DuelStage.Round3Animation ? round2.shot_b.health
               : (round3?.shot_b.health ?? round2?.shot_b.health ?? round1?.shot_b.health)
       ) ?? null,
     }
-  }, [currentStage, round1, round2, round3])
+  }, [currentStage, round1, round2, round3, animatedHealthA, animatedHealthB])
 
   //------------------------
   // Trigger next animations
@@ -136,21 +136,21 @@ export const useAnimatedDuel = (duelId: bigint | string) => {
   useEffect(() => {
     if (gameImpl && isAnimatingRound1 && audioLoaded) {
       console.log(`TRIGGER animateDuel(1)`)
-      gameImpl.animateDuel(AnimationState.Round1, round1.shot_a.action, round1.shot_b.action, round1.shot_a.health, round1.shot_b.health)
+      gameImpl.animateDuel(AnimationState.Round1, round1.shot_a.action, round1.shot_b.action, round1.shot_a.health, round1.shot_b.health, round1.shot_a.damage, round1.shot_b.damage)
     }
   }, [gameImpl, isAnimatingRound1, audioLoaded])
 
   useEffect(() => {
     if (gameImpl && isAnimatingRound2 && audioLoaded) {
       console.log(`TRIGGER animateDuel(2)`)
-      gameImpl.animateDuel(AnimationState.Round2, round2.shot_a.action, round2.shot_b.action, round2.shot_a.health, round2.shot_b.health)
+      gameImpl.animateDuel(AnimationState.Round2, round2.shot_a.action, round2.shot_b.action, round2.shot_a.health, round2.shot_b.health, round2.shot_a.damage, round2.shot_b.damage)
     }
   }, [gameImpl, isAnimatingRound2, audioLoaded])
 
   useEffect(() => {
     if (gameImpl && isAnimatingRound3 && audioLoaded) {
       console.log(`TRIGGER animateDuel(3)`)
-      gameImpl.animateDuel(AnimationState.Round3, round3.shot_a.action, round3.shot_b.action, round3.shot_a.health, round3.shot_b.health)
+      gameImpl.animateDuel(AnimationState.Round3, round3.shot_a.action, round3.shot_b.action, round3.shot_a.health, round3.shot_b.health, round3.shot_a.damage, round3.shot_b.damage)
     }
   }, [gameImpl, isAnimatingRound3, audioLoaded])
 
@@ -180,10 +180,7 @@ export const useDuelResult = (round: any | null, shot: any | null, duelStage: Du
     }
     const action = shot.action
     const health = _healthResult(shot.health, shot.damage)
-    if (animationStage == DuelStage.Round1Animation) {
-      return <span>Walks <span className='Bold'>{action} paces</span><br />and {health}</span>
-    }
-    return <span>{BladesVerbs[action]} <span className='Bold'>{BladesNames[action] ?? '?'}</span><br />and {health}</span>
+    return <span>{ActionVerbs[action]} <span className='Bold'>{ActionNames[action] ?? '?'}</span><br />and {health}</span>
   }, [duelStage, animationStage, round, shot])
   return result
 }

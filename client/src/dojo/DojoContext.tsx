@@ -98,6 +98,7 @@ export const useDojoAccount = () => {
   // account: { create, list, select, account, isDeploying }
   return {
     ...account,
+    accountAddress: BigInt(account?.account?.address ?? 0),
     masterAccount: setup.masterAccount,
     isMasterAccount: (setup.masterAccount == account.account),
   }
