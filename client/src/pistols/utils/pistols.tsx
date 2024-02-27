@@ -100,7 +100,6 @@ export enum Action {
   Flee = 0x40,
   Steal = 0x50,
   Seppuku = 0x60,
-
 }
 
 export const ActionNames: Record<Action, string> = {
@@ -161,6 +160,31 @@ export const ActionEmojis: Record<Action, string> = {
   [Action.Flee]: EMOJI.FLEE,
   [Action.Steal]: EMOJI.STEAL,
   [Action.Seppuku]: EMOJI.SEPPUKU,
+}
+
+export const ActionTypes: Record<string, Action[]> = {
+  paces: [
+    Action.Paces1,
+    Action.Paces2,
+    Action.Paces3,
+    Action.Paces4,
+    Action.Paces5,
+    Action.Paces6,
+    Action.Paces7,
+    Action.Paces8,
+    Action.Paces9,
+    Action.Paces10,
+  ],
+  melee: [
+    Action.Fast,
+    Action.Strong,
+    Action.Block,
+  ],
+  runner: [
+    Action.Flee,
+    Action.Steal,
+    Action.Seppuku,
+  ]
 }
 
 //-------------------------

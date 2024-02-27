@@ -155,11 +155,11 @@ function MenuDebugTriggers() {
   const { gameImpl } = useThreeJsContext()
 
   const _paces = (pacesCountA, paceCountB, healthA, healthB) => {
-    gameImpl?.animateDuel(AnimationState.Round1, pacesCountA, paceCountB, healthA, healthB)
+    gameImpl?.animateDuel(AnimationState.Round1, pacesCountA, paceCountB, healthA, healthB, healthA, healthB)
   }
 
   const _blades = (bladeA, bladeB, healthA, healthB) => {
-    gameImpl?.animateDuel(AnimationState.Round2, bladeA, bladeB, healthA, healthB)
+    gameImpl?.animateDuel(AnimationState.Round2, bladeA, bladeB, healthA, healthB, healthA, healthB)
   }
 
   return (

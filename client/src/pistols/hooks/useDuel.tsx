@@ -105,7 +105,6 @@ export const useAnimatedDuel = (duelId: bigint | string) => {
   }, [duelStage, animated])
 
   const { healthA, healthB } = useMemo(() => {
-    console.log(animatedHealthA, animatedHealthB)
     return {
       healthA: (
         (currentStage <= DuelStage.Round1Animation && !animatedHealthA) ? constants.FULL_HEALTH
@@ -137,21 +136,21 @@ export const useAnimatedDuel = (duelId: bigint | string) => {
   useEffect(() => {
     if (gameImpl && isAnimatingRound1 && audioLoaded) {
       console.log(`TRIGGER animateDuel(1)`)
-      gameImpl.animateDuel(AnimationState.Round1, round1.shot_a.action, round1.shot_b.action, round1.shot_a.health, round1.shot_b.health)
+      gameImpl.animateDuel(AnimationState.Round1, round1.shot_a.action, round1.shot_b.action, round1.shot_a.health, round1.shot_b.health, round1.shot_a.damage, round1.shot_b.damage)
     }
   }, [gameImpl, isAnimatingRound1, audioLoaded])
 
   useEffect(() => {
     if (gameImpl && isAnimatingRound2 && audioLoaded) {
       console.log(`TRIGGER animateDuel(2)`)
-      gameImpl.animateDuel(AnimationState.Round2, round2.shot_a.action, round2.shot_b.action, round2.shot_a.health, round2.shot_b.health)
+      gameImpl.animateDuel(AnimationState.Round2, round2.shot_a.action, round2.shot_b.action, round2.shot_a.health, round2.shot_b.health, round2.shot_a.damage, round2.shot_b.damage)
     }
   }, [gameImpl, isAnimatingRound2, audioLoaded])
 
   useEffect(() => {
     if (gameImpl && isAnimatingRound3 && audioLoaded) {
       console.log(`TRIGGER animateDuel(3)`)
-      gameImpl.animateDuel(AnimationState.Round3, round3.shot_a.action, round3.shot_b.action, round3.shot_a.health, round3.shot_b.health)
+      gameImpl.animateDuel(AnimationState.Round3, round3.shot_a.action, round3.shot_b.action, round3.shot_a.health, round3.shot_b.health, round3.shot_a.damage, round3.shot_b.damage)
     }
   }, [gameImpl, isAnimatingRound3, audioLoaded])
 

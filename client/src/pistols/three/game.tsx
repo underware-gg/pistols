@@ -13,7 +13,7 @@ import { AudioName, AUDIO_ASSETS, TEXTURES, SPRITESHEETS, AnimName, sceneBackgro
 import { SceneName } from '@/pistols/hooks/PistolsContext'
 import { map } from '@/pistols/utils/utils'
 import { SpriteSheet, Actor } from './SpriteSheetMaker'
-import { Action } from '@/pistols/utils/pistols'
+import { Action, ActionTypes } from '@/pistols/utils/pistols'
 import constants from '@/pistols/utils/constants'
 
 const PI = Math.PI
@@ -319,7 +319,7 @@ export function resetStaticScene() {
   if (_tweens.staticZoom) TWEEN.remove(_tweens.staticZoom)
   if (_tweens.staticFade) TWEEN.remove(_tweens.staticFade)
   let bg = _currentScene.getObjectByName('bg') as THREE.Mesh
-  
+
   // zoom out
   let from = 1.1
   bg.scale.set(from, from, from)
@@ -327,8 +327,8 @@ export function resetStaticScene() {
     .to({ x: 1, y: 1, z: 1 }, 60_000)
     .easing(TWEEN.Easing.Cubic.Out)
     .start()
-  
-    // fade in
+
+  // fade in
   let mat = bg.material as THREE.MeshBasicMaterial
   mat.color = new THREE.Color(0.25, 0.25, 0.25)
   _tweens.staticFade = new TWEEN.Tween(mat.color)
@@ -450,30 +450,30 @@ export function animateActorPaces(actorId, paceCount, seconds) {
   }
 }
 
-export function animateDuel(state:AnimationState, actionA: number, actionB:number, healthA:number, healthB:number) {
+export function animateDuel(state: AnimationState, actionA: number, actionB: number, healthA: number, healthB: number, damageA: number, damageB: number) {
   if (state == AnimationState.Round1) {
-    animateShootout(actionA, actionB, healthA, healthB);
+    animateShootout(actionA, actionB, healthA, healthB, damageA, damageB);
   } else {
-    animateBlades(state, actionA, actionA, healthA, healthB)
+    animateActions(state, actionA, actionB, healthA, healthB, damageA, damageB)
   }
 }
 
-function animateShootout(paceCountA: number, paceCountB: number, healthA: number, healthB: number) {
-  const paceCount = Math.min(paceCountA, paceCountB)
+function animateShootout(paceCountA: number, paceCountB: number, healthA: number, healthB: number, damageA: number, damageB: number) {
+  const minPaceCount = Math.min(paceCountA, paceCountB)
 
   // animate camera
   zoomCameraToPaces(0, 0)
-  zoomCameraToPaces(paceCount, paceCount)
+  zoomCameraToPaces(minPaceCount, minPaceCount)
 
   animateActorPaces('A', 0, 0)
   animateActorPaces('B', 0, 0)
-  animateActorPaces('A', paceCount, paceCount)
-  animateActorPaces('B', paceCount, paceCount)
+  animateActorPaces('A', minPaceCount, minPaceCount)
+  animateActorPaces('B', minPaceCount, minPaceCount)
 
   // animate sprites
   playActorAnimation('A', AnimName.STEP_1)
   playActorAnimation('B', AnimName.STEP_1)
-  for (let i = 1; i < paceCount; ++i) {
+  for (let i = 1; i < minPaceCount; ++i) {
     const key: AnimName = i % 2 == 1 ? AnimName.STEP_2 : AnimName.STEP_1
     setTimeout(() => {
       playActorAnimation('A', key)
@@ -483,92 +483,79 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
 
   // SHOOT!
   setTimeout(() => {
-    //
-    // Both fire at same time
-    if (paceCountA == paceCountB) {
+    const _shootA = () => {
       playActorAnimation('A', AnimName.SHOOT, () => {
         emitter.emit('animated', AnimationState.HealthB)
-        if (healthA == 0) {
-          playActorAnimation('A', AnimName.SHOT_DEAD_FRONT, () => emitter.emit('animated', AnimationState.Round1))
-        } else if (healthA < constants.FULL_HEALTH) {
-          playActorAnimation('A', AnimName.SHOT_INJURED_FRONT, () => emitter.emit('animated', AnimationState.Round1))
-        } else {
-          emitter.emit('animated', AnimationState.Round1)
-        }
-      })
-      playActorAnimation('B', AnimName.SHOOT, () => {
-        emitter.emit('animated', AnimationState.HealthA)
         if (healthB == 0) {
           playActorAnimation('B', AnimName.SHOT_DEAD_FRONT, () => emitter.emit('animated', AnimationState.Round1))
-        } else if (healthB < constants.FULL_HEALTH) {
+        } else if (damageB > 0) {
           playActorAnimation('B', AnimName.SHOT_INJURED_FRONT, () => emitter.emit('animated', AnimationState.Round1))
         } else {
           emitter.emit('animated', AnimationState.Round1)
         }
       })
     }
+    const _shootB = () => {
+      playActorAnimation('B', AnimName.SHOOT, () => {
+        emitter.emit('animated', AnimationState.HealthA)
+        if (healthA == 0) {
+          playActorAnimation('A', AnimName.SHOT_DEAD_FRONT, () => emitter.emit('animated', AnimationState.Round1))
+        } else if (damageA > 0) {
+          playActorAnimation('A', AnimName.SHOT_INJURED_FRONT, () => emitter.emit('animated', AnimationState.Round1))
+        } else {
+          emitter.emit('animated', AnimationState.Round1)
+        }
+      })
+    }
+    //
+    // Both fire at same time
+    if (paceCountA == paceCountB) {
+      _shootA()
+      _shootB()
+    }
     //
     // A fires first
     if (paceCountA < paceCountB) {
-      const _chance = () => {
-        playActorAnimation('B', AnimName.SHOOT, () => {
-          emitter.emit('animated', AnimationState.HealthA)
-          if (healthA == 0) {
-            playActorAnimation('A', AnimName.SHOT_DEAD_FRONT, () => emitter.emit('animated', AnimationState.Round1))
-          } else if (healthA < constants.FULL_HEALTH) {
-            playActorAnimation('A', AnimName.SHOT_INJURED_FRONT, () => emitter.emit('animated', AnimationState.Round1))
-          } else {
-            emitter.emit('animated', AnimationState.Round1)
-          }
-        })
-      }
       playActorAnimation('A', AnimName.SHOOT, () => {
         emitter.emit('animated', AnimationState.HealthB)
         if (healthB == 0) {
           playActorAnimation('B', AnimName.SHOT_DEAD_BACK, () => emitter.emit('animated', AnimationState.Round1))
-        } else if (healthB < constants.FULL_HEALTH) {
-          playActorAnimation('B', AnimName.SHOT_INJURED_BACK, () => _chance())
+        } else if (damageB > 0) {
+          playActorAnimation('B', AnimName.SHOT_INJURED_BACK, () => _shootB())
         } else {
-          _chance()
+          _shootB()
         }
       })
     }
     //
     // B fires first
     if (paceCountB < paceCountA) {
-      const _chance = () => {
-        playActorAnimation('A', AnimName.SHOOT, () => {
-          emitter.emit('animated', AnimationState.HealthB)
-          if (healthB == 0) {
-            playActorAnimation('B', AnimName.SHOT_DEAD_FRONT, () => emitter.emit('animated', AnimationState.Round1))
-          } else if (healthB < constants.FULL_HEALTH) {
-            playActorAnimation('B', AnimName.SHOT_INJURED_FRONT, () => emitter.emit('animated', AnimationState.Round1))
-          } else {
-            emitter.emit('animated', AnimationState.Round1)
-          }
-        })
-      }
       playActorAnimation('B', AnimName.SHOOT, () => {
         emitter.emit('animated', AnimationState.HealthA)
         if (healthA == 0) {
           playActorAnimation('A', AnimName.SHOT_DEAD_BACK, () => emitter.emit('animated', AnimationState.Round1))
-        } else if (healthA < constants.FULL_HEALTH) {
-          playActorAnimation('A', AnimName.SHOT_INJURED_BACK, () => _chance())
+        } else if (damageA > 0) {
+          playActorAnimation('A', AnimName.SHOT_INJURED_BACK, () => _shootA())
         } else {
-          _chance()
+          _shootA()
         }
       })
     }
-  }, paceCount * 1000)
-
+  }, minPaceCount * 1000)
 }
 
-const _getBladeAnimName = (blade: Action): AnimName => (
-  blade == Action.Fast ? AnimName.STRIKE_LIGHT
-    : blade == Action.Strong ? AnimName.STRIKE_HEAVY
-      : AnimName.STRIKE_BLOCK)
+const _getActionAnimName = (action: Action): AnimName => {
+  const result = ActionTypes.paces.includes(action) ? AnimName.SHOOT
+    : ActionTypes.runner.includes(action) ? AnimName.TWO_STEPS
+      : action == Action.Fast ? AnimName.STRIKE_LIGHT
+        : action == Action.Strong ? AnimName.STRIKE_HEAVY
+          : action == Action.Block ? AnimName.STRIKE_BLOCK
+            : AnimName.STILL_BLADE
+  // console.log(`_getActionAnimName:`, action, result)
+  return result
+}
 
-function animateBlades(state: AnimationState, actionA: number, actionB: number, healthA: number, healthB: number) {
+function animateActions(state: AnimationState, actionA: number, actionB: number, healthA: number, healthB: number, damageA: number, damageB: number) {
 
   // Rewind camera and
   zoomCameraToPaces(0, 0)
@@ -576,18 +563,18 @@ function animateBlades(state: AnimationState, actionA: number, actionB: number, 
   animateActorPaces('B', 0, 0)
 
   // animate sprites
-  playActorAnimation('A', _getBladeAnimName(actionA), () => {
+  playActorAnimation('A', _getActionAnimName(actionA), () => {
     let survived = 0
     if (healthB == 0) {
       playActorAnimation('B', AnimName.STRUCK_DEAD, () => emitter.emit('animated', state))
-    } else if (healthB < constants.FULL_HEALTH) {
+    } else if (damageB > 0) {
       playActorAnimation('B', AnimName.STRUCK_INJURED, () => emitter.emit('animated', state))
     } else {
       survived++
     }
     if (healthA == 0) {
       playActorAnimation('A', AnimName.STRUCK_DEAD, () => emitter.emit('animated', state))
-    } else if (healthA < constants.FULL_HEALTH) {
+    } else if (damageA > 0) {
       playActorAnimation('A', AnimName.STRUCK_INJURED, () => emitter.emit('animated', state))
     } else {
       survived++
@@ -595,7 +582,7 @@ function animateBlades(state: AnimationState, actionA: number, actionB: number, 
     if (survived == 2) emitter.emit('animated', state)
   })
 
-  playActorAnimation('B', _getBladeAnimName(actionB), () => {
+  playActorAnimation('B', _getActionAnimName(actionB), () => {
     // only A need to animate
   })
 
