@@ -20,7 +20,8 @@ export const EMOJI: any = {
   IN_PROGRESS: '⚔️',
   //
   // Actions
-  STEP: '🥾',
+  PISTOL: '🔫',
+  PACES: '🥾',
   BLADES: '⚔️',
   IDLE: '👀',
   LIGHT: '🔪',
@@ -34,7 +35,7 @@ export const EMOJI: any = {
   ALIVE: '❤️',
   INJURED: '🩸',
   DEAD: '☠️',
-  MONEY: '💰',
+  WAGER: '💰',
   //
   // badges
   LORD: '👑',

@@ -235,7 +235,7 @@ export function PacesIcon({
   return (
     // <EmojiIcon emoji={emoji} size={size} className='PacesIconRound' />
     <IconGroup size={_downSize(size)}>
-      <EmojiIcon emoji={EMOJI.STEP} size={size} />
+      <EmojiIcon emoji={EMOJI.PACES} size={size} />
       <EmojiIcon emoji={_paces} size={size} className={`PacesIcon`} />
     </IconGroup>
   )

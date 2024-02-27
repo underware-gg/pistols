@@ -18,6 +18,7 @@ import CommitBladesModal from '@/pistols/components/CommitBladesModal'
 import RevealModal from '@/pistols/components/RevealModal'
 import { EMOJI } from '@/pistols/data/messages'
 import constants from '@/pistols/utils/constants'
+import { ActionEmojis, ActionTypes } from '../utils/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -170,11 +171,17 @@ function DuelProgress({
   const round2Result = useDuelResult(round2, round2Shot, duelStage, DuelStage.Round2Animation);
   const round3Result = useDuelResult(round3, round3Shot, duelStage, DuelStage.Round3Animation);
 
-  const _resultBackground = (health: number, damage: number) => {
-    return health == 0 ? 'Negative' : damage > 0 ? 'Warning' : 'Positive'
+  const _resultBackground = (shot: any) => {
+    return shot.health == 0 ? 'Negative' : shot.damage > 0 ? 'Warning' : 'Positive'
   }
-  const _resultEmoji = (health: number, damage: number) => {
-    return health == 0 ? EMOJI.DEAD : damage > 0 ? EMOJI.INJURED : null // EMOJI.ALIVE
+  const _resultEmoji = (shot: any) => {
+    const actionEmoji = ActionEmojis[shot.action]
+    return ActionTypes.runner.includes(shot.action) ? actionEmoji
+      : shot.health == 0 ? EMOJI.DEAD
+        : shot.wager > 0 ? EMOJI.WAGER
+          : shot.win > 0 ? EMOJI.WINNER
+            : shot.damage > 0 ? EMOJI.INJURED
+              : actionEmoji // EMOJI.ALIVE
   }
 
 
@@ -228,7 +235,7 @@ function DuelProgress({
           title='Choose Paces'
           description=''
           icon='street view'
-          // emoji=EMOJI.STEP
+          // emoji=EMOJI.PACES
           floated={floated}
           onClick={onClick}
         />
@@ -251,10 +258,10 @@ function DuelProgress({
           title={round1Result ?? 'Pistols shootout!'}
           description=''
           icon={round1Result ? null : 'target'}
-          emoji={round1Result ? _resultEmoji(round1Shot.health, round1Shot.damage) : null}
+          emoji={round1Result ? _resultEmoji(round1Shot) : null}
           floated={floated}
           onClick={onClick}
-          className={round1Result ? _resultBackground(round1Shot.health, round1Shot.damage) : null}
+          className={round1Result ? _resultBackground(round1Shot) : null}
         />
 
         {(round2 && duelStage >= DuelStage.Round2Commit) &&
@@ -291,10 +298,10 @@ function DuelProgress({
               title={round2Result ?? 'Blades clash!'}
               description=''
               icon={round2Result ? null : 'target'}
-              emoji={round2Result ? _resultEmoji(round2Shot.health, round2Shot.damage) : null}
+            emoji={round2Result ? _resultEmoji(round2Shot): null}
               floated={floated}
               onClick={onClick}
-              className={round2Result ? _resultBackground(round2Shot.health, round2Shot.damage) : null}
+              className={round2Result ? _resultBackground(round2Shot) : null}
             />
           </>
         }
@@ -307,10 +314,10 @@ function DuelProgress({
             title={round3Result ?? 'Blades clash!'}
             description=''
             icon={round3Result ? null : 'target'}
-            emoji={round3Result ? _resultEmoji(round3Shot.health, round3Shot.damage) : null}
+          emoji={round3Result ? _resultEmoji(round3Shot) : null}
             floated={floated}
             onClick={onClick}
-            className={round3Result ? _resultBackground(round3Shot.health, round3Shot.damage) : null}
+            className={round3Result ? _resultBackground(round3Shot) : null}
           />
         }
 

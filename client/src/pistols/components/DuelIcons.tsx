@@ -35,9 +35,9 @@ export function DuelIcons({
   const health2 = useMemo(() => (shot2?.health == 0 ? EMOJI.DEAD : shot2?.damage > 0 ? EMOJI.INJURED : null), [shot2])
   const health3 = useMemo(() => (shot3?.health == 0 ? EMOJI.DEAD : shot3?.damage > 0 ? EMOJI.INJURED : null), [shot3])
 
-  const wager1 = useMemo(() => ((shot1?.wager > otherShot1?.wager) ? EMOJI.MONEY : null), [shot1, otherShot1])
-  const wager2 = useMemo(() => ((shot2?.wager > otherShot2?.wager) ? EMOJI.MONEY : null), [shot2, otherShot2])
-  const wager3 = useMemo(() => ((shot3?.wager > otherShot3?.wager) ? EMOJI.MONEY : null), [shot3, otherShot3])
+  const wager1 = useMemo(() => ((shot1?.wager > otherShot1?.wager) ? EMOJI.WAGER : null), [shot1, otherShot1])
+  const wager2 = useMemo(() => ((shot2?.wager > otherShot2?.wager) ? EMOJI.WAGER : null), [shot2, otherShot2])
+  const wager3 = useMemo(() => ((shot3?.wager > otherShot3?.wager) ? EMOJI.WAGER : null), [shot3, otherShot3])
 
   const win1 = useMemo(() => ((!wager1 && isWinner && roundNumber == 1) ? EMOJI.WINNER : null), [wager1, isWinner, roundNumber])
   const win2 = useMemo(() => ((!wager2 && isWinner && roundNumber == 2) ? EMOJI.WINNER : null), [wager2, isWinner, roundNumber])
@@ -67,7 +67,7 @@ export function DuelIcons({
     return (<>
       {shot1 && duelStage >= DuelStage.Round1Commit &&
         <CompletedIcon completed={completedStages[DuelStage.Round1Commit]}>
-          <EmojiIcon emoji={EMOJI.STEP} size={_size} />
+          <EmojiIcon emoji={EMOJI.PACES} size={_size} />
         </CompletedIcon>
       }
       {shot1 && duelStage == DuelStage.Round1Reveal &&
