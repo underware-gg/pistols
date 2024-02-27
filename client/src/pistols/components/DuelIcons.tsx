@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { Icon } from 'semantic-ui-react'
 import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
 import { DuelStage, useDuel } from '@/pistols/hooks/useDuel'
-import { Blades, BladesNames, ChallengeState } from '@/pistols/utils/pistols'
+import { Action, ActionNames, ChallengeState } from '@/pistols/utils/pistols'
 import { ActionIcon, CompletedIcon, EmojiIcon, LoadingIcon } from '@/pistols/components/ui/Icons'
 import { EMOJI } from '@/pistols/data/messages'
 

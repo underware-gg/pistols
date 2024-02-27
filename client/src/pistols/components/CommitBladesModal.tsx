@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Modal } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { useGetValidPackedActions } from '@/pistols/hooks/useContractCalls'
-import { Blades, BladesEmojis, BladesNames } from '@/pistols/utils/pistols'
+import { Action, ActionEmojis, ActionNames } from '@/pistols/utils/pistols'
 import { pack_action_slots, signAndGenerateActionHash } from '@/pistols/utils/salt'
 import { ActionChances } from '@/pistols/components/ActionChances'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
@@ -87,24 +87,24 @@ export default function CommitBladesModal({
               <SlotNumber slotNumber={2} value={slot2} />
             </Col>
             <Col width={2}>
-              <SlotButton blade={Blades.Strong} value={slot2} onClick={() => _setSlots(0, Blades.Strong)} />
+              <SlotButton blade={Action.Strong} value={slot2} onClick={() => _setSlots(0, Action.Strong)} />
             </Col>
             <Col width={2}>
-              <SlotButton blade={Blades.Fast} value={slot1} onClick={() => _setSlots(Blades.Fast, null)} />
-              <SlotButton blade={Blades.Fast} value={slot2} onClick={() => _setSlots(null, Blades.Fast)} />
+              <SlotButton blade={Action.Fast} value={slot1} onClick={() => _setSlots(Action.Fast, null)} />
+              <SlotButton blade={Action.Fast} value={slot2} onClick={() => _setSlots(null, Action.Fast)} />
             </Col>
             <Col width={2}>
-              <SlotButton blade={Blades.Block} value={slot1} onClick={() => _setSlots(Blades.Block, null)} />
-              <SlotButton blade={Blades.Block} value={slot2} onClick={() => _setSlots(null, Blades.Block)} />
+              <SlotButton blade={Action.Block} value={slot1} onClick={() => _setSlots(Action.Block, null)} />
+              <SlotButton blade={Action.Block} value={slot2} onClick={() => _setSlots(null, Action.Block)} />
             </Col>
             <Col width={2}>
-              <SlotButton blade={Blades.Flee} value={slot1} onClick={() => _setSlots(Blades.Flee, 0)} />
+              <SlotButton blade={Action.Flee} value={slot1} onClick={() => _setSlots(Action.Flee, 0)} />
             </Col>
             <Col width={2}>
-              <SlotButton blade={Blades.Steal} value={slot1} onClick={() => _setSlots(Blades.Steal, 0)} />
+              <SlotButton blade={Action.Steal} value={slot1} onClick={() => _setSlots(Action.Steal, 0)} />
             </Col>
             <Col width={2}>
-              <SlotButton blade={Blades.Seppuku} value={slot1} onClick={() => _setSlots(Blades.Seppuku, 0)} />
+              <SlotButton blade={Action.Seppuku} value={slot1} onClick={() => _setSlots(Action.Seppuku, 0)} />
             </Col>
             <Col width={2}>
             </Col>
@@ -147,7 +147,7 @@ export const SlotButton = ({
   value,
 }) => {
   return (
-    <ActionButton fill toggle active={value == blade} label={BladesNames[blade]} onClick={() => onClick()} />
+    <ActionButton fill toggle active={value == blade} label={ActionNames[blade]} onClick={() => onClick()} />
   )
 }
 
@@ -155,10 +155,10 @@ export const SlotButton = ({
 export const ActionDescription = ({
   action,
 }) => {
-  if (action == Blades.Strong) {
+  if (action == Action.Strong) {
     return (
       <div>
-        The <b>{BladesNames[action]}</b> is powerful but slow, charging at Strike 2
+        The <b>{ActionNames[action]}</b> is powerful but slow, charging at Strike 2
         <br />
         <b>Crit</b>: Execute your opponent!
         <br />
@@ -166,10 +166,10 @@ export const ActionDescription = ({
       </div>
     )
   }
-  if (action == Blades.Fast) {
+  if (action == Action.Fast) {
     return (
       <p>
-        The <b>{BladesNames[action]}</b> is fast and efficient, can strike once or twice
+        The <b>{ActionNames[action]}</b> is fast and efficient, can strike once or twice
         <br />
         <b>Crit</b>: Takes 2 health points
         <br />
@@ -177,10 +177,10 @@ export const ActionDescription = ({
       </p>
     )
   }
-  if (action == Blades.Block) {
+  if (action == Action.Block) {
     return (
       <p>
-        Use <b>{BladesNames[action]}</b> to protect agains other blades, once or twice
+        Use <b>{ActionNames[action]}</b> to protect agains other blades, once or twice
         <br />
         <b>Crit</b>: Blocks 2 damage points
         <br />
@@ -188,10 +188,10 @@ export const ActionDescription = ({
       </p>
     )
   }
-  if (action == Blades.Flee) {
+  if (action == Action.Flee) {
     return (
       <p>
-        <b>{BladesNames[action]}</b> to avoid a shameful defeat!
+        <b>{ActionNames[action]}</b> to avoid a shameful defeat!
         <br />
         <b>Honour</b>: You lost the Duel without Honour, and you keep your wager
         <br />
@@ -199,10 +199,10 @@ export const ActionDescription = ({
       </p>
     )
   }
-  if (action == Blades.Steal) {
+  if (action == Action.Steal) {
     return (
       <p>
-        <b>{BladesNames[action]}</b> the wager and run away!
+        <b>{ActionNames[action]}</b> the wager and run away!
         <br />
         <b>Honour</b>: You lost the Duel without Honour, but you keep the whole wager
         <br />
@@ -212,10 +212,10 @@ export const ActionDescription = ({
       </p>
     )
   }
-  if (action == Blades.Seppuku) {
+  if (action == Action.Seppuku) {
     return (
       <p>
-        Commit a <b>{BladesNames[action]}</b> to restore your Honour!
+        Commit a <b>{ActionNames[action]}</b> to restore your Honour!
         <br />
         <b>Honour</b>: A ritualistic suicide to restore your full Honour
         <br />

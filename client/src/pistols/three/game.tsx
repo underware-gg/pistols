@@ -13,7 +13,7 @@ import { AudioName, AUDIO_ASSETS, TEXTURES, SPRITESHEETS, AnimName, sceneBackgro
 import { SceneName } from '@/pistols/hooks/PistolsContext'
 import { map } from '@/pistols/utils/utils'
 import { SpriteSheet, Actor } from './SpriteSheetMaker'
-import { Blades } from '@/pistols/utils/pistols'
+import { Action } from '@/pistols/utils/pistols'
 import constants from '@/pistols/utils/constants'
 
 const PI = Math.PI
@@ -555,9 +555,9 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
 
 }
 
-const _getBladeAnimName = (blade: Blades): AnimName => (
-  blade == Blades.Fast ? AnimName.STRIKE_LIGHT
-    : blade == Blades.Strong ? AnimName.STRIKE_HEAVY
+const _getBladeAnimName = (blade: Action): AnimName => (
+  blade == Action.Fast ? AnimName.STRIKE_LIGHT
+    : blade == Action.Strong ? AnimName.STRIKE_HEAVY
       : AnimName.STRIKE_BLOCK)
 
 function animateBlades(state: AnimationState, actionA: number, actionB: number, healthA: number, healthB: number) {

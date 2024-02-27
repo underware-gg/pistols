@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Container, Grid } from 'semantic-ui-react'
 import { BladesIcon, CustomIcon, EmojiIcon, PacesIcon } from '@/pistols/components/ui/Icons'
 import App from '@/pistols/components/App'
-import { Blades } from '@/pistols/utils/pistols'
+import { Action } from '@/pistols/utils/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -17,9 +17,9 @@ export default function IndexPage() {
         <Grid>
           <Row>
             <Col><PacesIcon paces={10} /></Col>
-            <Col><BladesIcon blade={Blades.Strong} /></Col>
-            <Col><BladesIcon blade={Blades.Fast} /></Col>
-            <Col><BladesIcon blade={Blades.Block} /></Col>
+            <Col><BladesIcon blade={Action.Strong} /></Col>
+            <Col><BladesIcon blade={Action.Fast} /></Col>
+            <Col><BladesIcon blade={Action.Block} /></Col>
             <Col><EmojiIcon emoji={'😛'} /></Col>
           </Row>
           <Row>

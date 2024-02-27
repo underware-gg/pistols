@@ -82,8 +82,18 @@ export enum RoundState {
 // must be in sync with BLADES
 // (action.cairo)
 //
-export enum Blades {
+export enum Action {
   Idle = 0,
+  Paces1 = 1,
+  Paces2 = 2,
+  Paces3 = 3,
+  Paces4 = 4,
+  Paces5 = 5,
+  Paces6 = 6,
+  Paces7 = 7,
+  Paces8 = 8,
+  Paces9 = 9,
+  Paces10 = 10,
   Fast = 0x10,
   Strong = 0x20,
   Block = 0x30,
@@ -93,34 +103,64 @@ export enum Blades {
 
 }
 
-export const BladesNames: Record<Blades, string> = {
-  [Blades.Idle]: 'Idle',
-  [Blades.Fast]: 'Fast Blow',
-  [Blades.Strong]: 'Strong Blow',
-  [Blades.Block]: 'Block',
-  [Blades.Flee]: 'Flee',
-  [Blades.Steal]: 'Steal',
-  [Blades.Seppuku]: 'Seppuku',
+export const ActionNames: Record<Action, string> = {
+  [Action.Paces1]: '1 Pace',
+  [Action.Paces2]: '2 Paces',
+  [Action.Paces3]: '3 Paces',
+  [Action.Paces4]: '4 Paces',
+  [Action.Paces5]: '5 Paces',
+  [Action.Paces6]: '6 Paces',
+  [Action.Paces7]: '7 Paces',
+  [Action.Paces8]: '8 Paces',
+  [Action.Paces9]: '9 Paces',
+  [Action.Paces10]: '10 Paces',
+  [Action.Idle]: 'Idle',
+  [Action.Fast]: 'Fast Blow',
+  [Action.Strong]: 'Strong Blow',
+  [Action.Block]: 'Block',
+  [Action.Flee]: 'Flee',
+  [Action.Steal]: 'Steal',
+  [Action.Seppuku]: 'Seppuku',
 }
 
-export const BladesVerbs: Record<Blades, string> = {
-  [Blades.Idle]: 'Stays',
-  [Blades.Fast]: 'Strikes a',
-  [Blades.Strong]: 'Strikes a',
-  [Blades.Block]: 'Do a',
-  [Blades.Flee]: 'Tries to',
-  [Blades.Steal]: 'Tries to',
-  [Blades.Seppuku]: 'Commits a',
+export const ActionVerbs: Record<Action, string> = {
+  [Action.Paces1]: 'Shoots at',
+  [Action.Paces2]: 'Shoots at',
+  [Action.Paces3]: 'Shoots at',
+  [Action.Paces4]: 'Shoots at',
+  [Action.Paces5]: 'Shoots at',
+  [Action.Paces6]: 'Shoots at',
+  [Action.Paces7]: 'Shoots at',
+  [Action.Paces8]: 'Shoots at',
+  [Action.Paces9]: 'Shoots at',
+  [Action.Paces10]: 'Shoots at',
+  [Action.Idle]: 'Stays',
+  [Action.Fast]: 'Strikes a',
+  [Action.Strong]: 'Strikes a',
+  [Action.Block]: 'Do a',
+  [Action.Flee]: 'Tries to',
+  [Action.Steal]: 'Tries to',
+  [Action.Seppuku]: 'Commits a',
 }
 
-export const BladesEmojis: Record<Blades, string> = {
-  [Blades.Idle]: EMOJI.IDLE,
-  [Blades.Fast]: EMOJI.LIGHT,
-  [Blades.Strong]: EMOJI.HEAVY,
-  [Blades.Block]: EMOJI.BLOCK,
-  [Blades.Flee]: EMOJI.FLEE,
-  [Blades.Steal]: EMOJI.STEAL,
-  [Blades.Seppuku]: EMOJI.SEPPUKU,
+export const ActionEmojis: Record<Action, string> = {
+  [Action.Paces1]: EMOJI.STEP,
+  [Action.Paces2]: EMOJI.STEP,
+  [Action.Paces3]: EMOJI.STEP,
+  [Action.Paces4]: EMOJI.STEP,
+  [Action.Paces5]: EMOJI.STEP,
+  [Action.Paces6]: EMOJI.STEP,
+  [Action.Paces7]: EMOJI.STEP,
+  [Action.Paces8]: EMOJI.STEP,
+  [Action.Paces9]: EMOJI.STEP,
+  [Action.Paces10]: EMOJI.STEP,
+  [Action.Idle]: EMOJI.IDLE,
+  [Action.Fast]: EMOJI.LIGHT,
+  [Action.Strong]: EMOJI.HEAVY,
+  [Action.Block]: EMOJI.BLOCK,
+  [Action.Flee]: EMOJI.FLEE,
+  [Action.Steal]: EMOJI.STEAL,
+  [Action.Seppuku]: EMOJI.SEPPUKU,
 }
 
 //-------------------------

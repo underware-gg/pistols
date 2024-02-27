@@ -3,7 +3,7 @@ import { Grid } from 'semantic-ui-react'
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { useCalcHitBonus, useCalcCritChances, useCalcHitChances, useCalcGlanceChances, useCalcHonourForAction } from '@/pistols/hooks/useContractCalls'
 import { useDuel } from '@/pistols/hooks/useDuel'
-import { Blades } from '@/pistols/utils/pistols'
+import { Action } from '@/pistols/utils/pistols'
 import ProgressBar from '@/pistols/components/ui/ProgressBar'
 
 const Row = Grid.Row
@@ -24,9 +24,9 @@ export function ActionChances({
   const { honourForAction } = useCalcHonourForAction(BigInt(account.address), action, 0)
   const { round1 } = useDuel(duelId)
   const execution = useMemo(() => {
-    if ([Blades.Flee, Blades.Steal, Blades.Seppuku].includes(action)) {
+    if ([Action.Flee, Action.Steal, Action.Seppuku].includes(action)) {
       return 'Success'
-    } else if ([Blades.Fast, Blades.Block].includes(action)) {
+    } else if ([Action.Fast, Action.Block].includes(action)) {
       return 'Crit'
     } else {
       return 'Execution'

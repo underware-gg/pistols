@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import Link from 'next/link'
 import { Icon, IconGroup, Popup, PopupContent, PopupHeader, SemanticICONS } from 'semantic-ui-react'
 import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
-import { Blades, BladesEmojis, BladesNames } from '@/pistols/utils/pistols'
+import { Action, ActionEmojis, ActionNames } from '@/pistols/utils/pistols'
 import { EMOJI } from '@/pistols/data/messages'
 
 // Semantic UI Icons
@@ -244,13 +244,13 @@ export function BladesIcon({
   blade,
   size = 'large',
 }: {
-  blade: Blades
+  blade: Action
   size?: IconSizeProp
 }) {
-  if (!BladesNames[blade]) {
+  if (!ActionNames[blade]) {
     return <Icon name='question circle' size={size} />
   }
-  const emoji = BladesEmojis[blade] ?? EMOJI.UNKNOWN
+  const emoji = ActionEmojis[blade] ?? EMOJI.UNKNOWN
   return (
     // <IconGroup size='large'>
     // <Icon size={size} name='circle outline' />

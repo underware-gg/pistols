@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { useGetValidPackedActions } from '@/pistols/hooks/useContractCalls'
-import { Blades } from '@/pistols/utils/pistols'
+import { Action } from '@/pistols/utils/pistols'
 import { signAndRestoreActionFromHash } from '../utils/salt'
 
 const Row = Grid.Row
