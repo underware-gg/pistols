@@ -37,7 +37,7 @@ export function ActionChances({
   const _honourNegative = (honourForAction == 1)
   return (
     <>
-      <ProgressBar disabled={!action} label={`${execution}:`} percent={critChances} className='ChancesBar' />
+      <ProgressBar disabled={!action} label={hitBonus ? <span>{execution} / <span className='Warning'>Bonus</span>:</span> : `${execution}:`} percent={critChances} includedBonusPercent={hitBonus} className='ChancesBar' />
       <ProgressBar disabled={!action} label={glanceChances ? <span>Hit / <span className='Warning'>Glance</span>:</span> : 'Hit:'} percent={hitChances} glancePercent={glanceChances} className='ChancesBar' />
       <ProgressBar disabled={!action} label='Honour:' value={_honourValue} total={10} className='ChancesBar' warning={_honourWarning} negative={_honourNegative} color={honourForAction == 0 ? 'grey' : null} />
 

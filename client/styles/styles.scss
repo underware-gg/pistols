@@ -203,7 +203,7 @@ canvas {
 .Inactive  { color: $color-inactive!important; }
 
 .BgBlack     { background-color: #444; }
-.BgImportant { background-color: $color-important; }
+.BgImportant { background-color: $color-important!important; }
 .BgBrightest { background-color: $color-brightest!important; }
 .BgPositive  { background-color: $color-positive!important; }
 .BgNegative  { background-color: $color-negative!important; }
