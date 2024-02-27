@@ -49,7 +49,7 @@ export default function ChallengeModal() {
       // size='large'
       // dimmer='inverted'
       onClose={() => _close()}
-      onOpen={() => {}}
+      onOpen={() => { }}
       open={isOpen}
     >
       <Modal.Header>
@@ -143,6 +143,9 @@ export default function ChallengeModal() {
           <Row columns='equal'>
             <Col>
               <ActionButton fill label='Close' onClick={() => _close()} />
+            </Col>
+            <Col>
+              <ActionButton fill label='Model Data' onClick={() => window.open(`/dueldata/${duelId}`, '_blank')} />
             </Col>
             {(state == ChallengeState.Awaiting && isChallenger) &&
               <Col>

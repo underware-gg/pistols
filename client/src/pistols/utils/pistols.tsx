@@ -76,6 +76,12 @@ export enum RoundState {
   Reveal,
   Finished,
 }
+export const RoundStateNames: Record<RoundState, string> = {
+  [RoundState.Null]: 'Null',
+  [RoundState.Commit]: 'Commit',
+  [RoundState.Reveal]: 'Reveal',
+  [RoundState.Finished]: 'Finished',
+}
 
 
 //------------------------------------------

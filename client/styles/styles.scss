@@ -65,7 +65,7 @@ html, body {
 
 body {
   margin: 0;
-  display: flex;
+  // display: flex;
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
@@ -1120,6 +1120,9 @@ $table-bg-color: rgba($color-darkest, 0.6);
 .ui.sortable.table thead th.sorted,
 .ui.sortable.table thead th:hover {
   background-color: rgba($color-medium, 1);
+}
+.ui.attached.table {
+  border: none;
 }
 td {
   // border: 1px 0 0 0 solid $color-brightest!important;
