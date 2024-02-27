@@ -493,7 +493,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 .ModalText {
-  font-size: 20px;
+  font-size: 20px!important;
 }
 .ModalBladesDescription {
   @extend .CenteredContainer;
@@ -1040,15 +1040,18 @@ input::placeholder {
   @extend ._button;
   margin: 0 0.15em;
 }
+.ui.primary.button,
 .ui.secondary.menu .active.item,
 .ui.secondary.menu .active.item:hover {
   @extend ._button_active;
 }
+.ui.primary.button:hover,
 .ui.secondary.menu .dropdown.item:hover,
 .ui.secondary.menu .link.item:hover,
 .ui.secondary.menu a.item:hover {
   @extend ._button_hover;
 }
+.ui.primary.button:active,
 .ui.secondary.menu .dropdown.item:active,
 .ui.secondary.menu .link.item:active,
 .ui.secondary.menu a.item:active {
@@ -1176,8 +1179,10 @@ td {
 .ui.modal>.header {
   @extend .Title;
   font-family: $font-family;
+  font-size: 2.5rem!important;
   color: $color-text;
   border-bottom: $border-hr;
+  padding: 0.2em;
 }
 .ui.modal>.actions {
   border-top: $border-hr;

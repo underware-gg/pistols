@@ -146,12 +146,12 @@ export default function ChallengeModal() {
             </Col>
             {(state == ChallengeState.Awaiting && isChallenger) &&
               <Col>
-                <ActionButton fill label='Cowardly withdraw' onClick={() => _reply(false)} />
+                <ActionButton fill label='Cowardly withdraw' onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
               </Col>
             }
             {(state == ChallengeState.Awaiting && isChallenged) &&
               <Col>
-                <ActionButton fill label='Cowardly refuse' onClick={() => _reply(false)} />
+                <ActionButton fill label='Cowardly refuse' onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
               </Col>
             }
             {(state == ChallengeState.Awaiting && isChallenged) &&
