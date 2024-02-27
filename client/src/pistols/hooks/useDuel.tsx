@@ -65,8 +65,8 @@ export const useDuel = (duelId: bigint | string) => {
 
   //
   // Players turns, need action
-  const turnA = useMemo(() => (completedStagesA[duelStage] === false), [duelStage, completedStagesA])
-  const turnB = useMemo(() => (completedStagesB[duelStage] === false), [duelStage, completedStagesB])
+  const turnA = useMemo(() => (completedStagesA[duelStage] === false), [duelStage, completedStagesA, challenge.isAwaiting])
+  const turnB = useMemo(() => (completedStagesB[duelStage] === false || challenge.isAwaiting), [duelStage, completedStagesB, challenge.isAwaiting])
 
   return {
     challenge,

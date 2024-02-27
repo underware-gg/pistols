@@ -9,6 +9,7 @@ import { ChallengeState, ChallengeStateClasses, ChallengeStateNames } from '@/pi
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { DuelIcons } from '@/pistols/components/DuelIcons'
 import { ProfileName } from './account/ProfileDescription'
+import { useDuel } from '../hooks/useDuel'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -50,6 +51,7 @@ function ChallengeTableByIds({
   color = 'orange',
   compact = false,
 }) {
+  const { accountAddress } = useDojoAccount()
   const [order, setOrder] = useState({})
   const _sortCallback = (id, state, timestamp) => {
     // this pattern can handle simultaneous state set
@@ -59,7 +61,7 @@ function ChallengeTableByIds({
   const rows = useMemo(() => {
     let result = []
     challengeIds.forEach((duelId, index) => {
-      result.push(<DuelItem key={duelId} duelId={duelId} sortCallback={_sortCallback} compact={compact} />)
+      result.push(<DuelItem key={duelId} duelId={duelId} sortCallback={_sortCallback} compact={compact} address={accountAddress}/>)
     })
     return result
   }, [challengeIds])
@@ -109,10 +111,12 @@ function DuelItem({
   duelId,
   sortCallback,
   compact = false,
+  address,
 }) {
   const {
-    duelistA, duelistB, state, isLive, isCanceled, isExpired, isDraw, winner, timestamp_start,
-  } = useChallenge(duelId)
+    challenge: { duelistA, duelistB, state, isLive, isCanceled, isExpired, isDraw, winner, timestamp_start },
+    turnA, turnB,
+  } = useDuel(duelId)
   const { profilePic: profilePicA } = useDuelist(duelistA)
   const { profilePic: profilePicB } = useDuelist(duelistB)
 
@@ -123,6 +127,9 @@ function DuelItem({
   const winnerIsA = useMemo(() => (winner == 1), [winner])
   const winnerIsB = useMemo(() => (winner == 2), [winner])
 
+  const classNameA = useMemo(() => ((turnA && address == duelistA) ? 'BgImportant' : null), [address, duelistA, turnA])
+  const classNameB = useMemo(() => ((turnB && address == duelistB) ? 'BgImportant' : null), [address, duelistB, turnB])
+
   const { dispatchSelectDuel } = usePistolsContext()
 
   const _gotoChallenge = () => {
@@ -132,11 +139,11 @@ function DuelItem({
   return (
     // <Table.Row warning={isDraw || isCanceled} negative={false} positive={isInProgress || isFinished} textAlign='left' verticalAlign='middle' onClick={() => _gotoChallenge()}>
     <Table.Row textAlign='left' verticalAlign='middle' onClick={() => _gotoChallenge()}>
-      <Cell>
+      <Cell className={classNameA}>
         <ProfilePicSquare profilePic={profilePicA} small />
       </Cell>
 
-      <Cell>
+      <Cell className={classNameA}>
         <h5>
           <PositiveResult positive={winnerIsA} negative={winnerIsB && false} warning={isDraw} canceled={isCanceled || isExpired}>
             <ProfileName address={duelistA} />
@@ -145,11 +152,11 @@ function DuelItem({
         <DuelIcons duelId={duelId} account={duelistA} size={compact ? null : 'large'} />
       </Cell>
 
-      <Cell>
+      <Cell className={classNameB}>
         <ProfilePicSquare profilePic={profilePicB} small />
       </Cell>
 
-      <Cell>
+      <Cell className={classNameB}>
         <h5>
           <PositiveResult positive={winnerIsB} negative={winnerIsA && false} warning={isDraw} canceled={isCanceled || isExpired}>
             <ProfileName address={duelistB} />

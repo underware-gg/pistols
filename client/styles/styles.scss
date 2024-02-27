@@ -188,38 +188,29 @@ canvas {
 .NoMouse { pointer-events: none; }
 .YesMouse { pointer-events: auto; }
 
-.Important {
-  color: $color-important;
-}
-.Black {
-  color: #444;
-}
 .Bold {
   color: $color-brightest;
   font-weight: 600;
 }
 
-.Brightest {
-  color: $color-brightest!important;
-}
-.Positive {
-  color: $color-positive!important;
-}
-.Negative {
-  color: $color-negative!important;
-}
-.Warning {
-  color: $color-warning!important;
-}
-.BgWarning {
-  background-color: $color-warning!important;
-}
-.Canceled {
-  color: $color-inactive!important;
-}
-.Inactive {
-  color: $color-inactive!important;
-}
+.Black     { color: #444; }
+.Important { color: $color-important; }
+.Brightest { color: $color-brightest!important; }
+.Positive  { color: $color-positive!important; }
+.Negative  { color: $color-negative!important; }
+.Warning   { color: $color-warning!important; }
+.Canceled  { color: $color-inactive!important; }
+.Inactive  { color: $color-inactive!important; }
+
+.BgBlack     { background-color: #444; }
+.BgImportant { background-color: $color-important; }
+.BgBrightest { background-color: $color-brightest!important; }
+.BgPositive  { background-color: $color-positive!important; }
+.BgNegative  { background-color: $color-negative!important; }
+.BgWarning   { background-color: $color-warning!important; }
+.BgCanceled  { background-color: $color-inactive!important; }
+.BgInactive  { background-color: $color-inactive!important; }
+
 
 .Code {
   font-family: $font-family-mono;
@@ -873,6 +864,7 @@ $logo-url: '/logos/logo_avante.svg';
   // from .ui.progress .bar
   border-radius: 0.28571429rem;
   transition: width .1s ease, background-color .1s ease;
+  margin-left: 0.2em; // .ui.progress .bar > .progress
 }
 
 .SlotNumber {
