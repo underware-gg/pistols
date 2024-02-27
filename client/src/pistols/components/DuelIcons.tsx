@@ -57,7 +57,7 @@ export function DuelIcons({
           <CompletedIcon completed={false}>
             <EmojiIcon emoji={EMOJI.AGREEMENT} size={_size} />
           </CompletedIcon>
-        <span className='Important'> <LoadingIcon size={_size} /></span>
+        <span className='Brightest'> <LoadingIcon size={_size} /></span>
         </>
       }
     </>)
@@ -87,7 +87,7 @@ export function DuelIcons({
         </CompletedIcon>
       }
       {health2 && <EmojiIcon emoji={health2} size={_size} />}
-      {isTurn && <span className='Important'> <LoadingIcon size={_size} /></span>}
+      {isTurn && <span className='Brightest'> <LoadingIcon size={_size} /></span>}
     </>)
   }
 

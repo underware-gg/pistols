@@ -104,12 +104,18 @@ function DuelStats({
           </Body>
         </Table>
 
-        <br />
-        {round1 && <RoundStats duelId={duelId} roundNumber={1} round={round1} />}
-        <br />
-        {round2 && <RoundStats duelId={duelId} roundNumber={2} round={round2} />}
-        <br />
-        {round3 && <RoundStats duelId={duelId} roundNumber={3} round={round3} />}
+        {round1 && <>
+          <br />
+          <RoundStats duelId={duelId} roundNumber={1} round={round1} />
+        </>}
+        {round2 && <>
+          <br />
+          <RoundStats duelId={duelId} roundNumber={2} round={round2} />
+        </>}
+        {round3 && <>
+          <br />
+          <RoundStats duelId={duelId} roundNumber={3} round={round3} />
+        </>}
 
       </div>
       <Divider />
