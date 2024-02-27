@@ -48,6 +48,8 @@ export enum AnimationState {
   Round2 = 2,
   Round3 = 3,
   Finished = 4,
+  HealthA = 10,
+  HealthB = 11,
 }
 
 //-------------------------------------------
@@ -485,6 +487,7 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
     // Both fire at same time
     if (paceCountA == paceCountB) {
       playActorAnimation('A', AnimName.SHOOT, () => {
+        emitter.emit('animated', AnimationState.HealthB)
         if (healthA == 0) {
           playActorAnimation('A', AnimName.SHOT_DEAD_FRONT, () => emitter.emit('animated', AnimationState.Round1))
         } else if (healthA < constants.FULL_HEALTH) {
@@ -494,6 +497,7 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
         }
       })
       playActorAnimation('B', AnimName.SHOOT, () => {
+        emitter.emit('animated', AnimationState.HealthA)
         if (healthB == 0) {
           playActorAnimation('B', AnimName.SHOT_DEAD_FRONT, () => emitter.emit('animated', AnimationState.Round1))
         } else if (healthB < constants.FULL_HEALTH) {
@@ -508,6 +512,7 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
     if (paceCountA < paceCountB) {
       const _chance = () => {
         playActorAnimation('B', AnimName.SHOOT, () => {
+          emitter.emit('animated', AnimationState.HealthA)
           if (healthA == 0) {
             playActorAnimation('A', AnimName.SHOT_DEAD_FRONT, () => emitter.emit('animated', AnimationState.Round1))
           } else if (healthA < constants.FULL_HEALTH) {
@@ -518,6 +523,7 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
         })
       }
       playActorAnimation('A', AnimName.SHOOT, () => {
+        emitter.emit('animated', AnimationState.HealthB)
         if (healthB == 0) {
           playActorAnimation('B', AnimName.SHOT_DEAD_BACK, () => emitter.emit('animated', AnimationState.Round1))
         } else if (healthB < constants.FULL_HEALTH) {
@@ -532,6 +538,7 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
     if (paceCountB < paceCountA) {
       const _chance = () => {
         playActorAnimation('A', AnimName.SHOOT, () => {
+          emitter.emit('animated', AnimationState.HealthB)
           if (healthB == 0) {
             playActorAnimation('B', AnimName.SHOT_DEAD_FRONT, () => emitter.emit('animated', AnimationState.Round1))
           } else if (healthB < constants.FULL_HEALTH) {
@@ -542,6 +549,7 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
         })
       }
       playActorAnimation('B', AnimName.SHOOT, () => {
+        emitter.emit('animated', AnimationState.HealthA)
         if (healthA == 0) {
           playActorAnimation('A', AnimName.SHOT_DEAD_BACK, () => emitter.emit('animated', AnimationState.Round1))
         } else if (healthA < constants.FULL_HEALTH) {

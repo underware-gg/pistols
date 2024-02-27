@@ -92,7 +92,7 @@ export const useAnimatedDuel = (duelId: bigint | string) => {
   const { round1, round2, round3, duelStage } = result
 
   const { gameImpl, audioLoaded } = useThreeJsContext()
-  const { animated, dispatchAnimated } = useGameplayContext()
+  const { animated, animatedHealthA, animatedHealthB, dispatchAnimated } = useGameplayContext()
 
   //-------------------------------------
   // Add intermediate animation DuelStage
@@ -105,21 +105,22 @@ export const useAnimatedDuel = (duelId: bigint | string) => {
   }, [duelStage, animated])
 
   const { healthA, healthB } = useMemo(() => {
+    console.log(animatedHealthA, animatedHealthB)
     return {
       healthA: (
-        currentStage <= DuelStage.Round1Animation ? constants.FULL_HEALTH
+        (currentStage <= DuelStage.Round1Animation && !animatedHealthA) ? constants.FULL_HEALTH
           : currentStage <= DuelStage.Round2Animation ? round1.shot_a.health
             : currentStage <= DuelStage.Round3Animation ? round2.shot_a.health
               : (round3?.shot_a.health ?? round2?.shot_a.health ?? round1?.shot_a.health)
       ) ?? null,
       healthB: (
-        currentStage <= DuelStage.Round1Animation ? constants.FULL_HEALTH
+        (currentStage <= DuelStage.Round1Animation && !animatedHealthB) ? constants.FULL_HEALTH
           : currentStage <= DuelStage.Round2Animation ? round1.shot_b.health
             : currentStage <= DuelStage.Round3Animation ? round2.shot_b.health
               : (round3?.shot_b.health ?? round2?.shot_b.health ?? round1?.shot_b.health)
       ) ?? null,
     }
-  }, [currentStage, round1, round2, round3])
+  }, [currentStage, round1, round2, round3, animatedHealthA, animatedHealthB])
 
   //------------------------
   // Trigger next animations

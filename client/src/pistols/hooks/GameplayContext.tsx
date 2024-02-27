@@ -1,4 +1,5 @@
 import React, { ReactNode, createContext, useReducer, useContext } from 'react'
+import { AnimationState } from '@/pistols/three/game'
 
 
 //--------------------------------
@@ -6,7 +7,9 @@ import React, { ReactNode, createContext, useReducer, useContext } from 'react'
 //
 export const initialState = {
   health: 100,
-  animated: null, // from three.js
+  animated: AnimationState.None,
+  animatedHealthA: false,
+  animatedHealthB: false,
 }
 
 type GameplayContextState = typeof initialState
@@ -17,10 +20,14 @@ type GameplayContextState = typeof initialState
 
 const GameplayActions = {
   SET_ANIMATED: 'SET_ANIMATED',
+  SET_HEALTH_A: 'SET_HEALTH_A',
+  SET_HEALTH_B: 'SET_HEALTH_B',
 }
 
 type ActionType =
   | { type: 'SET_ANIMATED', payload: number }
+  | { type: 'SET_HEALTH_A', payload: boolean }
+  | { type: 'SET_HEALTH_B', payload: boolean }
 
 
 //--------------------------------
@@ -54,6 +61,14 @@ const GameplayProvider = ({
         newState.animated = action.payload as number
         break
       }
+      case GameplayActions.SET_HEALTH_A: {
+        newState.animatedHealthA = action.payload as boolean
+        break
+      }
+      case GameplayActions.SET_HEALTH_B: {
+        newState.animatedHealthB = action.payload as boolean
+        break
+      }
       default:
         console.warn(`GameplayProvider: Unknown action [${action.type}]`)
         return state
@@ -80,8 +95,18 @@ export const useGameplayContext = () => {
   if (!context) throw new Error("The `useGameplayContext` hook must be used within a `GameplayProvider`");
   const { state, dispatch } = context
 
-  const dispatchAnimated = (animated) => {
-    dispatch({ type: GameplayActions.SET_ANIMATED, payload: animated })
+  const dispatchAnimated = (animated: AnimationState) => {
+    if (animated == AnimationState.HealthA) {
+      dispatch({ type: GameplayActions.SET_HEALTH_A, payload: true })
+    } else if (animated == AnimationState.HealthB) {
+      dispatch({ type: GameplayActions.SET_HEALTH_B, payload: true })
+    } else {
+      dispatch({ type: GameplayActions.SET_ANIMATED, payload: animated })
+      if (animated == AnimationState.None) {
+        dispatch({ type: GameplayActions.SET_HEALTH_A, payload: false })
+        dispatch({ type: GameplayActions.SET_HEALTH_B, payload: false })
+      }
+    }
   }
 
   return {
