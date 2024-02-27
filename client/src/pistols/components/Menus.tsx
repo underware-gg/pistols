@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid, Menu, Label, Tab, TabPane } from 'semantic-ui-react'
 import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
@@ -38,6 +38,14 @@ export function MenuTavern({
 
   const yourDuelsCount = useMemo(() => (awaitingCount + inProgressCount), [awaitingCount, inProgressCount])
   const liveDuelsCount = useMemo(() => (liveChallengeIds.length), [liveChallengeIds])
+
+  const [started, setStarted] = useState(false)
+  useMemo(() => {
+    if (!started && (yourDuelsCount > 0 || liveDuelsCount > 0)) {
+      setStarted(false)
+      dispatchSetMenu(MenuKey.YourDuels)
+    }
+  }, [yourDuelsCount, liveDuelsCount])
 
   const panes = useMemo(() => {
     let result = []
