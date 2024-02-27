@@ -36,7 +36,7 @@ mod ACTION {
     const BLOCK: u8 = 0x30;
     const FLEE: u8 = 0x40;
     const STEAL: u8 = 0x50;
-    // const SEPPUKU: u8 = 0x60;
+    const SEPPUKU: u8 = 0x60;
 }
 
 
@@ -63,8 +63,10 @@ enum Action {
     FastBlade,
     SlowBlade,
     Block,
+    // Runners
     Flee,
     Steal,
+    Seppuku,
 }
 
 
@@ -105,6 +107,7 @@ impl ActionTraitImpl of ActionTrait {
             Action::Block =>        false,
             Action::Flee =>         false,
             Action::Steal =>        false,
+            Action::Seppuku =>      false,
         }
     }
     fn as_paces(self: Action) -> u8 {
@@ -128,6 +131,7 @@ impl ActionTraitImpl of ActionTrait {
             Action::Block =>        true,
             Action::Flee =>         false,
             Action::Steal =>        false,
+            Action::Seppuku =>      false,
         }
     }
     fn is_runner(self: Action) -> bool {
@@ -148,6 +152,7 @@ impl ActionTraitImpl of ActionTrait {
             Action::Block =>        false,
             Action::Flee =>         true,
             Action::Steal =>        true,
+            Action::Seppuku =>      true,
         }
     }
 
@@ -208,6 +213,7 @@ impl ActionTraitImpl of ActionTrait {
             Action::Block =>        0, // do not affect honour
             Action::Flee =>         1,
             Action::Steal =>        1,
+            Action::Seppuku =>      10,
         }
     }
 
@@ -277,10 +283,13 @@ impl ActionTraitImpl of ActionTrait {
             other_shot.wager += 1; // split wager
             other_shot.win = 1;   // opponent wins
         } else if (self == Action::Steal) {
-            self_shot.wager += 1; // keeps the wager
+            self_shot.wager += 1; // steal the wager
             if (other_shot.action != Action::Steal.into()) {
-                other_shot.win = 1;  // opponent wins, unless double steal (face-off)
+                other_shot.win = 1;  // opponent wins, unless double steal (into face-off)
             }
+        } else if (self == Action::Seppuku) {
+            self_shot.damage = constants::FULL_HEALTH;
+            other_shot.wager += 1; // resign wager
         }
         (false)
     }
@@ -336,6 +345,7 @@ impl ActionIntoU8 of Into<Action, u8> {
             Action::Block =>        ACTION::BLOCK,
             Action::Flee =>         ACTION::FLEE,
             Action::Steal =>        ACTION::STEAL,
+            Action::Seppuku =>      ACTION::SEPPUKU,
         }
     }
 }
@@ -371,6 +381,7 @@ impl U8IntoAction of Into<u8, Action> {
         else if self == ACTION::BLOCK       { Action::Block }
         else if self == ACTION::FLEE        { Action::Flee }
         else if self == ACTION::STEAL       { Action::Steal }
+        else if self == ACTION::SEPPUKU     { Action::Seppuku }
         // invalid is always Idle
         else { Action::Idle }
     }
@@ -405,6 +416,7 @@ impl ActionIntoFelt252 of Into<Action, felt252> {
             Action::Block =>        'Block',
             Action::Flee =>         'Flee',
             Action::Steal =>        'Steal',
+            Action::Seppuku =>      'Seppuku',
         }
     }
 }

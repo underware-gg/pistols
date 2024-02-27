@@ -76,6 +76,8 @@ mod tests {
                 let honour = action.honour();
                 if (is_pace) {
                     assert(honour == n, 'action.honour');
+                } else if (action == Action::Seppuku) {
+                    assert(honour == 10, 'action.honour == 10');
                 } else if (action.is_runner()) {
                     assert(honour == 1, 'action.honour == 1');
                 } else {

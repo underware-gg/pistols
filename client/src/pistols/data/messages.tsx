@@ -28,7 +28,7 @@ export const EMOJI: any = {
   BLOCK: '🛡️',
   FLEE: '🏃',
   STEAL: '🥷',
-  SEPPUKU: '👹', // TODO
+  SEPPUKU: '👹',
   //
   // duel
   ALIVE: '❤️',

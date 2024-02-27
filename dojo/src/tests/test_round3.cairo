@@ -774,4 +774,147 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_b.wager > 0, 'shot_b.wager');
     }
 
+
+
+    //----------------------
+    // Seppuku
+    //
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_seppuku_vs_seppuku() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
+            constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
+            SALT_DUAL_HIT,
+        );
+        assert_winner(challenge, round, 0, 2);
+        assert(round.shot_a.action == ACTION::SEPPUKU.into(), 'shot_a.action');
+        assert(round.shot_b.action == ACTION::SEPPUKU.into(), 'shot_b.action');
+        assert(round.shot_a.health == 0, 'shot_a.health');
+        assert(round.shot_b.health == 0, 'shot_b.health');
+        assert(round.shot_a.wager == round.shot_b.wager, 'no_wager');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_seppuku_vs_slow_b() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
+            constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
+            SALT_DUAL_HIT,
+        );
+        assert_winner(challenge, round, 2, 2);
+        assert(round.shot_a.action == ACTION::SEPPUKU.into(), 'shot_a.action');
+        assert(round.shot_b.action == ACTION::IDLE.into(), 'shot_b.action');
+        assert(round.shot_a.health == 0, 'shot_a.health');
+        assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
+        assert(round.shot_a.wager < round.shot_b.wager, 'wager_b');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_seppuku_vs_fast_b() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
+            constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::FAST_BLADE,
+            SALT_DUAL_HIT,
+        );
+        assert_winner(challenge, round, 2, 2);
+        assert(round.shot_a.action == ACTION::SEPPUKU.into(), 'shot_a.action');
+        assert(round.shot_b.action == ACTION::IDLE.into(), 'shot_b.action');
+        assert(round.shot_a.health == 0, 'shot_a.health');
+        assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
+        assert(round.shot_a.wager < round.shot_b.wager, 'wager_b');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_fast_vs_seppuku_a() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::FAST_BLADE,
+            constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
+            SALT_DUAL_HIT,
+        );
+        assert_winner(challenge, round, 1, 2);
+        assert(round.shot_a.action == ACTION::IDLE.into(), 'shot_a.action');
+        assert(round.shot_b.action == ACTION::SEPPUKU.into(), 'shot_b.action');
+        assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
+        assert(round.shot_b.health == 0, 'shot_b.health');
+        assert(round.shot_a.wager > round.shot_b.wager, 'wager_a');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_seppuku_vs_flee() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
+            constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
+            SALT_DUAL_HIT,
+        );
+        assert_winner(challenge, round, 0, 2);
+        assert(round.shot_a.action == ACTION::SEPPUKU.into(), 'shot_a.action');
+        assert(round.shot_b.action == ACTION::FLEE.into(), 'shot_b.action');
+        assert(round.shot_a.health == 0, 'shot_a.health');
+        assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
+        assert(round.shot_a.wager == round.shot_b.wager, 'no_wager');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_seppuku_vs_steal() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
+            constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
+            SALT_DUAL_HIT,
+        );
+        assert_winner(challenge, round, 0, 2);
+        assert(round.shot_a.action == ACTION::SEPPUKU.into(), 'shot_a.action');
+        assert(round.shot_b.action == ACTION::STEAL.into(), 'shot_b.action');
+        assert(round.shot_a.health == 0, 'shot_a.health');
+        assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
+        assert(round.shot_a.wager < round.shot_b.wager, 'wager_a');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_flee_vs_seppuku() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
+            constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
+            SALT_DUAL_HIT,
+        );
+        assert_winner(challenge, round, 0, 2);
+        assert(round.shot_a.action == ACTION::FLEE.into(), 'shot_a.action');
+        assert(round.shot_b.action == ACTION::SEPPUKU.into(), 'shot_b.action');
+        assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
+        assert(round.shot_b.health == 0, 'shot_b.health');
+        assert(round.shot_a.wager == round.shot_b.wager, 'no_wager');
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_steal_vs_seppuku_vs() {
+        let (world, system, owner, other) = utils::setup_world();
+        let (challenge, round) = _execute_blades(
+            world, system, owner, other,
+            constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
+            constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
+            SALT_DUAL_HIT,
+        );
+        assert_winner(challenge, round, 0, 2);
+        assert(round.shot_a.action == ACTION::STEAL.into(), 'shot_a.action');
+        assert(round.shot_b.action == ACTION::SEPPUKU.into(), 'shot_b.action');
+        assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
+        assert(round.shot_b.health == 0, 'shot_b.health');
+        assert(round.shot_a.wager > round.shot_b.wager, 'wager_b');
+    }
+
+
 }

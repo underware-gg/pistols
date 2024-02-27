@@ -215,7 +215,7 @@ export function ActionIcon({
   action: number
   size?: IconSizeProp
 }) {
-  if(action > 1 && action <= 10) {
+  if(action >= 1 && action <= 10) {
     return <PacesIcon paces={action} size={size} />
   } else {
     return <BladesIcon blade={action} size={size} />

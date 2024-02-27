@@ -98,6 +98,7 @@ fn get_valid_packed_actions(round_number: u8) -> Array<u16> {
             ACTION::BLOCK.into(),      // pack_action_slots(ACTION::BLOCK, ACTION::IDLE),
             ACTION::FLEE.into(),       // pack_action_slots(ACTION::FLEE, ACTION::IDLE),
             ACTION::STEAL.into(),      // pack_action_slots(ACTION::STEAL, ACTION::IDLE),
+            ACTION::SEPPUKU.into(),    // pack_action_slots(ACTION::SEPPUKU, ACTION::IDLE),
             // slot 2 only
             pack_action_slots(ACTION::IDLE, ACTION::SLOW_BLADE),
             pack_action_slots(ACTION::IDLE, ACTION::FAST_BLADE),
@@ -127,20 +128,26 @@ fn validate_packed_actions(round_number: u8, packed: u16) -> bool {
 fn unpack_round_slots(round: Round) -> (u8, u8, u8, u8) {
     let (slot1_a, slot2_a): (u8, u8) = unpack_action_slots(round.shot_a.action);
     let (slot1_b, slot2_b): (u8, u8) = unpack_action_slots(round.shot_b.action);
-    // if slot 1 is empty, use only slot 2
+    // if slot 1 is empty, promote slot 2
     if (slot1_a == 0 && slot1_b == 0) {
         return (slot2_a, slot2_b, 0, 0);
     }
-    // Flee/Steal triggers an opposing 10 paces shot
     let action_a: Action = slot1_a.into();
     let action_b: Action = slot1_b.into();
     let runner_a: bool = action_a.is_runner();
     let runner_b: bool = action_b.is_runner();
+    // Seppuku goes only against runners
+    if (action_a == Action::Seppuku && !runner_b) {
+        return (ACTION::SEPPUKU, ACTION::IDLE, 0, 0);
+    } else if (action_b == Action::Seppuku && !runner_a) {
+        return (ACTION::IDLE, ACTION::SEPPUKU, 0, 0);
+    }
+    // Flee/Steal triggers an opposing 10 paces shot
     if (runner_a && !runner_b) {
         return (slot1_a, ACTION::PACES_10, 0, 0);
-    } else if (!runner_a && runner_b) {
+    } else if (runner_b && !runner_a) {
         return (ACTION::PACES_10, slot1_b, 0, 0);
-    } else
+    }
     // Double Steal decides in a 1 pace face-off
     if (action_a == Action::Steal && action_b == Action::Steal) {
         return (slot1_a, slot1_b, ACTION::PACES_1, ACTION::PACES_1);

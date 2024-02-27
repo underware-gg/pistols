@@ -89,7 +89,7 @@ export enum Blades {
   Block = 0x30,
   Flee = 0x40,
   Steal = 0x50,
-  // Seppuku = 0x60,
+  Seppuku = 0x60,
 
 }
 
@@ -100,6 +100,7 @@ export const BladesNames: Record<Blades, string> = {
   [Blades.Block]: 'Block',
   [Blades.Flee]: 'Flee',
   [Blades.Steal]: 'Steal',
+  [Blades.Seppuku]: 'Seppuku',
 }
 
 export const BladesVerbs: Record<Blades, string> = {
@@ -109,6 +110,7 @@ export const BladesVerbs: Record<Blades, string> = {
   [Blades.Block]: 'Do a',
   [Blades.Flee]: 'Tries to',
   [Blades.Steal]: 'Tries to',
+  [Blades.Seppuku]: 'Commits a',
 }
 
 export const BladesEmojis: Record<Blades, string> = {
@@ -118,6 +120,7 @@ export const BladesEmojis: Record<Blades, string> = {
   [Blades.Block]: EMOJI.BLOCK,
   [Blades.Flee]: EMOJI.FLEE,
   [Blades.Steal]: EMOJI.STEAL,
+  [Blades.Seppuku]: EMOJI.SEPPUKU,
 }
 
 //-------------------------

@@ -9,6 +9,7 @@ export default function ProgressBar({
   className = null,
   disabled = false,
   warning = false,
+  negative = false,
   color = null,
   percent = null,
   glancePercent = null,
@@ -40,7 +41,8 @@ export default function ProgressBar({
                 value={value}
                 total={total}
                 className={_className}
-                error={warning}
+                warning={warning}
+                error={negative}
                 color={color}
               />
               {Boolean(glancePercent) &&

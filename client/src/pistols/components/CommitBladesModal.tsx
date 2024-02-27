@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Modal } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { useGetValidPackedActions } from '@/pistols/hooks/useContractCalls'
-import { Blades, BladesNames } from '@/pistols/utils/pistols'
+import { Blades, BladesEmojis, BladesNames } from '@/pistols/utils/pistols'
 import { pack_action_slots, signAndGenerateActionHash } from '@/pistols/utils/salt'
 import { ActionChances } from '@/pistols/components/ActionChances'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
@@ -89,11 +89,11 @@ export default function CommitBladesModal({
             <Col width={2}>
               <SlotButton blade={Blades.Strong} value={slot2} onClick={() => _setSlots(0, Blades.Strong)} />
             </Col>
-            <Col width={3}>
+            <Col width={2}>
               <SlotButton blade={Blades.Fast} value={slot1} onClick={() => _setSlots(Blades.Fast, null)} />
               <SlotButton blade={Blades.Fast} value={slot2} onClick={() => _setSlots(null, Blades.Fast)} />
             </Col>
-            <Col width={3}>
+            <Col width={2}>
               <SlotButton blade={Blades.Block} value={slot1} onClick={() => _setSlots(Blades.Block, null)} />
               <SlotButton blade={Blades.Block} value={slot2} onClick={() => _setSlots(null, Blades.Block)} />
             </Col>
@@ -102,6 +102,9 @@ export default function CommitBladesModal({
             </Col>
             <Col width={2}>
               <SlotButton blade={Blades.Steal} value={slot1} onClick={() => _setSlots(Blades.Steal, 0)} />
+            </Col>
+            <Col width={2}>
+              <SlotButton blade={Blades.Seppuku} value={slot1} onClick={() => _setSlots(Blades.Seppuku, 0)} />
             </Col>
             <Col width={2}>
             </Col>
@@ -192,7 +195,7 @@ export const ActionDescription = ({
         <br />
         <b>Honour</b>: You lost the Duel without Honour, and you keep your wager
         <br />
-        <b>Counter</b>: Your opponent is granted a 10 paces pistol shot to stop you
+        <b>Counter</b>: Your opponent wins and is granted a 10 paces pistol shot to stop you!
       </p>
     )
   }
@@ -203,9 +206,20 @@ export const ActionDescription = ({
         <br />
         <b>Honour</b>: You lost the Duel without Honour, but you keep the whole wager
         <br />
-        <b>Counter</b>: Your opponent is granted a 10 paces pistol shot to stop you
+        <b>Counter</b>: Your opponent wins and is granted a 10 paces pistol shot to stop you!
         <br />
         <b>Face-off</b>: If your opponent also Steals, it's a 1 pace pistol face-off!
+      </p>
+    )
+  }
+  if (action == Blades.Seppuku) {
+    return (
+      <p>
+        Commit a <b>{BladesNames[action]}</b> to restore your Honour!
+        <br />
+        <b>Honour</b>: A ritualistic suicide to restore your full Honour
+        <br />
+        <b>Counter</b>: Your opponent wins and takes the wager
       </p>
     )
   }
