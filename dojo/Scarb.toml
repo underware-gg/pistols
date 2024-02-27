@@ -13,7 +13,7 @@ github = "https://github.com/funDAOmental/pistols"
 
 [package]
 name = "pistols"
-version = "0.5.0"
+version = "0.6.0"
 cairo-version = "2.4.0"
 
 [cairo]
@@ -39,5 +39,5 @@ world_address = "0x269c58e5fa1e7f6fe3756f1de88ecdfab7d03ba67e79ba0365b4ef1e81155
 
 # SLOT
 rpc_url = "https://api.cartridge.gg/x/pistols/katana"
-account_address = "0x2d8755345d5904978d57e7ec9e148951ca9e2cc63a2c51c22920e70ef46035"
-private_key = "0x11d943406aa56d0ab0f9b6649e01cefc4e76d1c03588d0983025f50f08c32a9"
+account_address = "0x11ce646796234b2e4a7fbb427f8a721e1a22f5ebc26d6592e4c23a355ec6156"
+private_key = "0x2764f2035606c5a3630b1d878c86556f45bbaf9d24abefacc1bb55611cbc84a"
