@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { Grid, Table, Modal, Divider, Header } from 'semantic-ui-react'
+import { Grid, Table, Modal, Divider, Header, Icon } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
@@ -12,6 +12,7 @@ import { ChallengeState, makeDuelUrl } from '@/pistols/utils/pistols'
 import { AccountShort } from '@/pistols/components/ui/Account'
 import { DuelIcons } from '@/pistols/components/DuelIcons'
 import { ChallengeTime } from './ChallengeTime'
+import Link from 'next/link'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -54,13 +55,17 @@ export default function ChallengeModal() {
     >
       <Modal.Header>
         <Grid className='PaddedLeft PaddedRight'>
-          <Row columns='equal'>
-            <Col textAlign='left'>
-              Challenge&nbsp;&nbsp;&nbsp;
+          <Row>
+            <Col width={8} textAlign='left'>
+              Challenge
+              &nbsp;&nbsp;&nbsp;
               <AccountShort address={duelId} suffix='' />
             </Col>
-            <Col textAlign='right'>
+            <Col width={7} textAlign='right'>
               <span className='Code'><ChallengeTime duelId={duelId} prefixed /></span>
+            </Col>
+            <Col width={1} textAlign='right'>
+              <Icon className='Anchor IconClick' name='database' size={'small'} onClick={() => window.open(`/dueldata/${duelId}`, '_blank')} />
             </Col>
           </Row>
         </Grid>
@@ -143,9 +148,6 @@ export default function ChallengeModal() {
           <Row columns='equal'>
             <Col>
               <ActionButton fill label='Close' onClick={() => _close()} />
-            </Col>
-            <Col>
-              <ActionButton fill label='Model Data' onClick={() => window.open(`/dueldata/${duelId}`, '_blank')} />
             </Col>
             {(state == ChallengeState.Awaiting && isChallenger) &&
               <Col>

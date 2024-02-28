@@ -1122,7 +1122,7 @@ $table-bg-color: rgba($color-darkest, 0.6);
   background-color: rgba($color-medium, 1);
 }
 .ui.attached.table {
-  border: none;
+  border: 0.5px solid $color-shadow;
 }
 td {
   // border: 1px 0 0 0 solid $color-brightest!important;

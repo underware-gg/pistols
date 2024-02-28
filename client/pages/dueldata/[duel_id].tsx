@@ -20,10 +20,43 @@ export default function StatsPage() {
   return (
     <AppDojo title={'Duel'} backgroundImage={null}>
       {router.isReady &&
-        <DuelStats duelId={BigInt(duel_id as string)} />
+        <Stats duelId={BigInt(duel_id as string)} />
       }
     </AppDojo>
   );
+}
+
+function Stats({
+  duelId
+}: {
+  duelId: bigint
+}) {
+  const { round1, round2, round3 } = useDuel(duelId)
+
+  return (
+    <Container text>
+      <Divider hidden />
+
+      <div className='Code'>
+        <DuelStats duelId={duelId} />
+
+        {round1 && <>
+          <RoundStats duelId={duelId} roundNumber={1} round={round1} />
+          <br />
+        </>}
+        {round2 && <>
+          <RoundStats duelId={duelId} roundNumber={2} round={round2} />
+          <br />
+        </>}
+        {round3 && <>
+          <RoundStats duelId={duelId} roundNumber={3} round={round3} />
+          <br />
+        </>}
+
+      </div>
+
+    </Container>
+  )
 }
 
 function DuelStats({
@@ -31,95 +64,82 @@ function DuelStats({
 }: {
   duelId: bigint
 }) {
-  const { challenge, round1, round2, round3 } = useDuel(duelId)
+  const { challenge } = useDuel(duelId)
   const { name: nameA } = useDuelist(challenge.duelistA)
   const { name: nameB } = useDuelist(challenge.duelistB)
 
   return (
-    <Container text>
-      <Divider />
+    <Table celled striped color='red'>
+      <Header>
+        <Row>
+          <HeaderCell width={4}><h5>Challenge</h5></HeaderCell>
+          <HeaderCell>{bigintToHex(duelId)}</HeaderCell>
+        </Row>
+      </Header>
 
-      <div className='Code'>
-        <Table celled striped>
-          <Header>
-            <Row>
-              <HeaderCell width={4}><h5>Challenge</h5></HeaderCell>
-              <HeaderCell>{bigintToHex(duelId)}</HeaderCell>
-            </Row>
-          </Header>
-
-          <Body>
-            <Row>
-              <Cell>Challenger</Cell>
-              <Cell>
-                <b>{nameA}</b>
-                <br />
-                {bigintToHex(challenge.duelistA)}
-              </Cell>
-            </Row>
-            <Row>
-              <Cell>Challenged</Cell>
-              <Cell>
-                <b>{nameB}</b>
-                <br />
-                {bigintToHex(challenge.duelistB)}
-              </Cell>
-            </Row>
-            <Row>
-              <Cell>State</Cell>
-              <Cell>
-                {challenge.state}: {ChallengeStateNames[challenge.state]}
-              </Cell>
-            </Row>
-            <Row>
-              <Cell>Round Number</Cell>
-              <Cell>
-                {challenge.roundNumber}
-              </Cell>
-            </Row>
-            <Row>
-              <Cell>Winner</Cell>
-              <Cell>
-                {challenge.winner}: {challenge.winner == 1 ? 'Challenger' : challenge.winner == 2 ? 'Challenged' : null}
-              </Cell>
-            </Row>
-            <Row>
-              <Cell>Timestamp Start</Cell>
-              <Cell>
-                {formatTimestamp(challenge.timestamp_end)}
-              </Cell>
-            </Row>
-            <Row>
-              <Cell>Timestamp End</Cell>
-              <Cell>
-                {formatTimestamp(challenge.timestamp_end)}
-              </Cell>
-            </Row>
-            <Row>
-              <Cell>Message</Cell>
-              <Cell>
-                {challenge.message}
-              </Cell>
-            </Row>
-          </Body>
-        </Table>
-
-        {round1 && <>
-          <br />
-          <RoundStats duelId={duelId} roundNumber={1} round={round1} />
-        </>}
-        {round2 && <>
-          <br />
-          <RoundStats duelId={duelId} roundNumber={2} round={round2} />
-        </>}
-        {round3 && <>
-          <br />
-          <RoundStats duelId={duelId} roundNumber={3} round={round3} />
-        </>}
-
-      </div>
-      <Divider />
-    </Container>
+      <Body>
+        <Row>
+          <Cell>
+            Duelist A
+            <br />
+            (Challenger)
+          </Cell>
+          <Cell>
+            <b>{nameA}</b>
+            <br />
+            {bigintToHex(challenge.duelistA)}
+          </Cell>
+        </Row>
+        <Row>
+          <Cell>
+            Duelist B
+            <br />
+            (Challenged)
+          </Cell>
+          <Cell>
+            <b>{nameB}</b>
+            <br />
+            {bigintToHex(challenge.duelistB)}
+          </Cell>
+        </Row>
+        <Row>
+          <Cell>State</Cell>
+          <Cell>
+            {challenge.state}: {ChallengeStateNames[challenge.state]}
+          </Cell>
+        </Row>
+        <Row>
+          <Cell>Round Number</Cell>
+          <Cell>
+            {challenge.roundNumber}
+          </Cell>
+        </Row>
+        <Row>
+          <Cell>Winner</Cell>
+          <Cell>
+            {challenge.winner}: {challenge.winner == 1 ? 'Challenger' : challenge.winner == 2 ? 'Challenged' : null}
+          </Cell>
+        </Row>
+        <Row>
+          <Cell>Timestamp Start</Cell>
+          <Cell>
+            {formatTimestamp(challenge.timestamp_end)}
+          </Cell>
+        </Row>
+        <Row>
+          <Cell>Timestamp End</Cell>
+          <Cell>
+            {formatTimestamp(challenge.timestamp_end)}
+          </Cell>
+        </Row>
+        <Row>
+          <Cell>Message</Cell>
+          <Cell>
+            {challenge.message}
+          </Cell>
+        </Row>
+      </Body>
+    </Table>
   )
 }
 
@@ -134,7 +154,7 @@ function RoundStats({
 
   return (
     <>
-      <Table celled striped attached='top'>
+      <Table celled striped color='orange'>
         <Header>
           <Row>
             <HeaderCell width={4}><h5>Round</h5></HeaderCell>
@@ -163,12 +183,11 @@ function ShotStats({
   title,
   shot,
 }) {
-
   return (
     <>
-      <Table attached>
+      <Table attached='top'>
         <Header fullWidth>
-          <Row >
+          <Row>
             <HeaderCell width={4}><h5>Shot {shotNumber}</h5></HeaderCell>
             <HeaderCell><h5>{title}</h5></HeaderCell>
           </Row>
@@ -210,7 +229,7 @@ function ShotStats({
 
       <Table attached>
         <Header fullWidth>
-          <Row>
+          <Row textAlign='center'>
             <HeaderCell><h5>Damage</h5></HeaderCell>
             <HeaderCell><h5>Block</h5></HeaderCell>
             <HeaderCell><h5>Health</h5></HeaderCell>
@@ -221,7 +240,7 @@ function ShotStats({
         </Header>
 
         <Body>
-          <Row>
+          <Row textAlign='center'>
             <Cell>{shot.damage}</Cell>
             <Cell>{shot.block}</Cell>
             <Cell>{shot.health}</Cell>
