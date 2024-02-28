@@ -81,7 +81,7 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <Divider horizontal className='Margin6'>
+                <Divider horizontal className='NoMargin'>
                   <Header as='h4'>challenged</Header>
                 </Divider>
               </Col>
@@ -93,7 +93,7 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <Divider horizontal className='Margin6'>
+                <Divider horizontal className='NoMargin'>
                   <Header as='h4'>for a duel</Header>
                 </Divider>
               </Col>
@@ -103,25 +103,32 @@ export default function ChallengeModal() {
                 <h3 className='Quote'>{`“${message}”`}</h3>
               </Col>
             </Row>
+
             <Row columns='equal' textAlign='right'>
               <Col>
-                {lords == 0 ? <Divider /> :
-                  <Divider horizontal className='Margin6'>
-                    <Header as='h4'>for <span className='Code Important'>{lords}</span> $LORDS each</Header>
-                  </Divider>
+                {lords > 0 &&
+                  <>
+                    <Divider horizontal className='NoMargin'>
+                      <Header as='h3'>for <span className='Bold'>{lords} $LORDS</span> each</Header>
+                    </Divider>
+                  </>
                 }
               </Col>
             </Row>
+
             <Row columns='equal' textAlign='center'>
               <Col>
-                <h3>{challengeDescription}</h3>
+                <Divider className='NoMargin' />
+                <h3 className='TitleCase'>{challengeDescription}</h3>
+                {/* <Divider className='NoMargin' /> */}
               </Col>
             </Row>
+
             {(isLive || isFinished) &&
               <>
                 <Row columns='equal' textAlign='right'>
                   <Col>
-                    <Divider horizontal className='Margin6'>
+                    <Divider horizontal className='NoMargin'>
                       <Header as='h4'>actions</Header>
                     </Divider>
                   </Col>
@@ -139,6 +146,7 @@ export default function ChallengeModal() {
                 </Row>
               </>
             }
+
           </Grid>
         </Modal.Description>
         <ProfilePicButton profilePic={profilePicB} onClick={() => dispatchSelectDuelist(duelistB)} />

@@ -159,14 +159,16 @@ export function CopyIcon({
 interface LoadingIconProps {
   size?: IconSizeProp
   style?: any
+  className?: string
 }
 export function LoadingIcon({
   size = 'small',
   style = {},
+  className = '',
 }: LoadingIconProps) {
   return (
     <Icon
-      className='ViewCentered NoPadding'
+      className={`ViewCentered NoPadding ${className}`}
       loading
       name='circle notch'
       size={size}

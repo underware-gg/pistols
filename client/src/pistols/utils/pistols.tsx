@@ -33,7 +33,7 @@ export const ChallengeStateDescriptions: Record<ChallengeState, string> = {
   [ChallengeState.Withdrawn]: "Cowardly withdrawn by Challenger",
   [ChallengeState.Refused]: "Cowardly refused by Challenged",
   [ChallengeState.Expired]: "Challenge expired",
-  [ChallengeState.InProgress]: "Challenge in progress!",
+  [ChallengeState.InProgress]: "Challenge in progress",
   [ChallengeState.Resolved]: "Honour has been satisfied",
   [ChallengeState.Draw]: "Honour has not been satisfied",
 }
