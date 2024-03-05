@@ -17,13 +17,15 @@ export function ActionChances({
   isB = false,
 }) {
   const { account } = useDojoAccount()
+  const { challenge: { duelistA, duelistB }, round1 } = useDuel(duelId)
   const { hitBonus } = useCalcHitBonus(BigInt(account.address))
   const { hitChances } = useCalcHitChances(BigInt(account.address), duelId, roundNumber, action)
   const { critChances } = useCalcCritChances(BigInt(account.address), duelId, roundNumber, action)
   const { glanceChances } = useCalcGlanceChances(BigInt(account.address), duelId, roundNumber, action)
   const { honourForAction } = useCalcHonourForAction(BigInt(account.address), action, 0)
-  const { round1 } = useDuel(duelId)
-  const execution = useMemo(() => {
+  const { critChances: otherCritChances } = useCalcCritChances(isA ? duelistB : duelistA, duelId, roundNumber, Action.Strong)
+
+  const executionLabel = useMemo(() => {
     if ([Action.Flee, Action.Steal, Action.Seppuku].includes(action)) {
       return 'Success'
     } else if ([Action.Fast, Action.Block].includes(action)) {
@@ -32,12 +34,14 @@ export function ActionChances({
       return 'Execution'
     }
   }, [action])
+
+  const _critChances = critChances == 100 ? (critChances - otherCritChances) : critChances
   const _honourValue = (honourForAction > 0 ? honourForAction : isA ? round1?.shot_a.honour : isB ? round1?.shot_b.honour : null) ?? 0
   const _honourWarning = (honourForAction == 10)
   const _honourNegative = (honourForAction == 1)
   return (
     <>
-      <ProgressBar disabled={!action} label={hitBonus ? <span>{execution} / <span className='Warning'>Bonus</span>:</span> : `${execution}:`} percent={critChances} includedBonusPercent={hitBonus} className='ChancesBar' />
+      <ProgressBar disabled={!action} label={hitBonus ? <span>{executionLabel} / <span className='Warning'>Bonus</span>:</span> : `${executionLabel}:`} percent={_critChances} includedBonusPercent={hitBonus} className='ChancesBar' />
       <ProgressBar disabled={!action} label={glanceChances ? <span>Hit / <span className='Warning'>Glance</span>:</span> : 'Hit:'} percent={hitChances} glancePercent={glanceChances} className='ChancesBar' />
       <ProgressBar disabled={!action} label='Honour:' value={_honourValue} total={10} className='ChancesBar' warning={_honourWarning} negative={_honourNegative} color={honourForAction == 0 ? 'grey' : null} />
 
