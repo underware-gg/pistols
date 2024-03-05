@@ -75,7 +75,7 @@ export default function ChallengeModal() {
           <Grid style={{ width: '350px' }}>
             <Row columns='equal' textAlign='left'>
               <Col>
-                <ProfileDescription address={duelistA} />
+                <ProfileDescription address={duelistA} displayAddress />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -87,7 +87,7 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <ProfileDescription address={duelistB} />
+                <ProfileDescription address={duelistB} displayAddress />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>

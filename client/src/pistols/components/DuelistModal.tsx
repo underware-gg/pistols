@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Grid, Table, Modal, Form, Divider, Dropdown } from 'semantic-ui-react'
+import { useRouter } from 'next/navigation'
+import { Grid, Modal, Form, Divider, Dropdown, Icon } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
@@ -12,14 +13,15 @@ import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
 import { randomArrayElement } from '@/pistols/utils/utils'
 import { validateCairoString } from '@/pistols/utils/starknet'
 import { usePact } from '@/pistols/hooks/usePact'
+import { AccountShort } from './ui/Account'
 
 const Row = Grid.Row
 const Col = Grid.Column
-const Cell = Table.HeaderCell
 
 export default function DuelistModal() {
   const { create_challenge } = useDojoSystemCalls()
   const { account, isMasterAccount } = useDojoAccount()
+  const router = useRouter()
 
   const { duelistAddress, dispatchSelectDuelist, dispatchSelectDuel } = usePistolsContext()
   const { name, profilePic } = useDuelist(duelistAddress)
@@ -40,7 +42,13 @@ export default function DuelistModal() {
     }
   }, [isChallenging, hasPact])
 
-  const _close = () => { dispatchSelectDuelist(0n) }
+  const _close = () => {
+    dispatchSelectDuelist(0n)
+  }
+  const _switchDuelist = () => {
+    dispatchSelectDuelist(0n)
+    router.push(`/gate`)
+  }
   const _challenge = () => {
     if (challengeArgs) {
       create_challenge(account, duelistAddress, challengeArgs.message, challengeArgs.expire_seconds)
@@ -55,10 +63,30 @@ export default function DuelistModal() {
       // onOpen={() => setIsChallenging(false)}
       open={isOpen}
     >
-      <Modal.Header>Duelist</Modal.Header>
+      <Modal.Header>
+        <Grid className='PaddedLeft PaddedRight'>
+          <Row>
+            <Col width={8} textAlign='left'>
+              Duelist
+              &nbsp;&nbsp;&nbsp;
+              <AccountShort address={duelistAddress} suffix='' />
+            </Col>
+            <Col width={7} textAlign='right'>
+              {isYou &&
+                <span className='Smaller'>switch duelist</span>
+              }
+            </Col>
+            <Col width={1} textAlign='right'>
+              {isYou &&
+                <Icon className='Anchor IconClick' name='users' size={'small'} onClick={() => _switchDuelist()} />
+              }
+            </Col>
+          </Row>
+        </Grid>
+      </Modal.Header>
       <Modal.Content image>
         <ProfilePic profilePic={profilePic} />
-        <Modal.Description className='FillParent'>
+        <Modal.Description className='FillParent' style={{ width: '200px' }}>
           <ProfileDescription address={duelistAddress} displayStats />
           <Divider />
           {!isChallenging && <div className='TableInModal'><ChallengesList duelistAddress={duelistAddress} /></div>}
@@ -140,7 +168,7 @@ function CreateChallenge({
   })), [])
 
   return (
-    <div style={{width: '430px'}}>
+    <div style={{ width: '430px' }}>
       <h1>Challenge Conditions</h1>
       <br />
 
@@ -195,7 +223,6 @@ function CreateChallenge({
         </Form.Field>
 
       </Form>
-
 
     </div>
   )

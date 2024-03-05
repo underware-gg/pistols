@@ -1,18 +1,18 @@
 import React, { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { Grid } from 'semantic-ui-react'
 import { useDojoAccount } from '@/dojo/DojoContext'
-import { AccountShort } from '@/pistols/components/ui/Account'
+import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
+import { AccountShort } from '@/pistols/components/ui/Account'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export default function AccountHeader({
 }) {
-  const router = useRouter()
   const { account, isMasterAccount } = useDojoAccount()
+  const { dispatchSelectDuelist } = usePistolsContext()
 
   const { name, profilePic } = useDuelist(account?.address)
 
@@ -30,7 +30,7 @@ export default function AccountHeader({
           <AccountShort address={account?.address} />
         </Col>
         <Col width={5} verticalAlign='middle'>
-          <ProfilePicSquareButton profilePic={profilePic} onClick={() => { router.push('/gate') }} />
+          <ProfilePicSquareButton profilePic={profilePic} onClick={() => { dispatchSelectDuelist(BigInt(account.address)) }} />
         </Col>
       </Row>
     </Grid>

@@ -111,7 +111,7 @@ function DuelProfile({
       }
       <div className='ProfileAndHealth'>
         <Segment compact floated={floated} className='ProfileDescription'>
-          <ProfileDescription address={address} />
+          <ProfileDescription address={address} displayAddress />
         </Segment>
         <DuelHealthBar health={health} floated={floated} />
       </div>

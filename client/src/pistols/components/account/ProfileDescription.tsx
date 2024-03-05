@@ -1,7 +1,11 @@
 import React, { useMemo } from 'react'
-import { AccountShort } from '@/pistols/components/ui/Account'
+import { Grid } from 'semantic-ui-react'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { AccountShort } from '@/pistols/components/ui/Account'
 import { EMOJI } from '@/pistols/data/messages'
+
+const Row = Grid.Row
+const Col = Grid.Column
 
 export function ProfileName({
   address,
@@ -16,28 +20,35 @@ export function ProfileName({
 
 export function ProfileDescription({
   address,
-  displayStats = false
+  displayStats = false,
+  displayAddress = false,
 }) {
   const { total_wins, total_losses, total_draws, total_duels, total_honour, honourAndTotal } = useDuelist(address)
   return (
-    <div className='FillWidth Relative'>
-      <h1><ProfileName address={address} /></h1>
-      <AccountShort address={address} />
-      <h3 className='Important'>Honour: {honourAndTotal}</h3>
+    <Grid columns='equal'>
+      <Row>
 
-      {displayStats && total_duels > 0 &&
-        <div className='ProfileStats AbsoluteRight AlignRight PaddedRight TitleCase'>
-          Duels: <span className='Bold'>{total_duels}</span>
-          <br />
-          Wins: <span className='Bold'>{total_wins}</span>
-          <br />
-          Losses: <span className='Bold'>{total_losses}</span>
-          <br />
-          Draws: <span className='Bold'>{total_draws}</span>
-          <br />
-          Honour: <span className='Bold'>{total_honour}</span>
-        </div>
-      }
-    </div>
+        <Col>
+          <h1><ProfileName address={address} /></h1>
+          {displayAddress && <AccountShort address={address} />}
+          <h3 className='Important'>Honour: {honourAndTotal}</h3>
+        </Col>
+
+        {displayStats && total_duels > 0 &&
+          <Col className='ProfileStats PaddedRight TitleCase' textAlign='right'>
+            Duels: <span className='Bold'>{total_duels}</span>
+            <br />
+            Wins: <span className='Bold'>{total_wins}</span>
+            <br />
+            Losses: <span className='Bold'>{total_losses}</span>
+            <br />
+            Draws: <span className='Bold'>{total_draws}</span>
+            <br />
+            Honour: <span className='Bold'>{total_honour}</span>
+          </Col>
+        }
+
+      </Row>
+    </Grid>
   )
 }
