@@ -40,7 +40,7 @@ export function MenuTavern({
   const liveDuelsCount = useMemo(() => (liveChallengeIds.length), [liveChallengeIds])
 
   const [started, setStarted] = useState(false)
-  useMemo(() => {
+  useEffect(() => {
     if (!started && (yourDuelsCount > 0 || liveDuelsCount > 0)) {
       setStarted(false)
       dispatchSetMenu(MenuKey.YourDuels)

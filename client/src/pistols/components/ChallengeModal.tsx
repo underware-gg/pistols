@@ -10,9 +10,8 @@ import { ProfilePicButton } from '@/pistols/components/account/ProfilePic'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ChallengeState, makeDuelUrl } from '@/pistols/utils/pistols'
 import { AccountShort } from '@/pistols/components/ui/Account'
-import { DuelIcons } from '@/pistols/components/DuelIcons'
+import { DuelIconsAsGrid } from '@/pistols/components/DuelIcons'
 import { ChallengeTime } from './ChallengeTime'
-import Link from 'next/link'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -116,14 +115,6 @@ export default function ChallengeModal() {
               </Col>
             </Row>
 
-            <Row columns='equal' textAlign='center'>
-              <Col>
-                <Divider className='NoMargin' />
-                <h3 className='TitleCase'>{challengeDescription}</h3>
-                {/* <Divider className='NoMargin' /> */}
-              </Col>
-            </Row>
-
             {(isLive || isFinished) &&
               <>
                 <Row columns='equal' textAlign='right'>
@@ -134,18 +125,20 @@ export default function ChallengeModal() {
                   </Col>
                 </Row>
                 <Row textAlign='center'>
-                  <Col width={7} textAlign='right'>
-                    <DuelIcons duelId={duelId} account={duelistA} size='big' />
-                  </Col>
-                  <Col width={2} verticalAlign='middle'>
-                    vs
-                  </Col>
-                  <Col width={7} textAlign='left'>
-                    <DuelIcons duelId={duelId} account={duelistB} size='big' />
+                  <Col width={16} textAlign='right'>
+                    <DuelIconsAsGrid duelId={duelId} duelistA={duelistA} duelistB={duelistB} size='big' />
                   </Col>
                 </Row>
               </>
             }
+
+            <Row columns='equal' textAlign='center'>
+              <Col>
+                <Divider className='NoMargin' />
+                <h3 className='TitleCase'>{challengeDescription}</h3>
+                {/* <Divider className='NoMargin' /> */}
+              </Col>
+            </Row>
 
           </Grid>
         </Modal.Description>

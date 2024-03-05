@@ -7,7 +7,7 @@ import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ChallengeState, ChallengeStateClasses, ChallengeStateNames } from '@/pistols/utils/pistols'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
-import { DuelIcons } from '@/pistols/components/DuelIcons'
+import { DuelIconsAsRow } from '@/pistols/components/DuelIcons'
 import { ProfileName } from './account/ProfileDescription'
 import { useDuel } from '../hooks/useDuel'
 
@@ -149,7 +149,7 @@ function DuelItem({
             <ProfileName address={duelistA} />
           </PositiveResult>
         </h5>
-        <DuelIcons duelId={duelId} account={duelistA} size={compact ? null : 'large'} />
+        <DuelIconsAsRow duelId={duelId} account={duelistA} size={compact ? null : 'large'} />
       </Cell>
 
       <Cell className={classNameB}>
@@ -162,7 +162,7 @@ function DuelItem({
             <ProfileName address={duelistB} />
           </PositiveResult>
         </h5>
-        <DuelIcons duelId={duelId} account={duelistB} size={compact ? null : 'large'} />
+        <DuelIconsAsRow duelId={duelId} account={duelistB} size={compact ? null : 'large'} />
       </Cell>
 
       <Cell textAlign='center' className='Result'>
