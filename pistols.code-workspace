@@ -8,6 +8,7 @@
     "files.exclude": {
       "**/node_modules": true,
       "**/build": true,
+      "**/target": true,
       "**/.github": true,
       "**/.next": true,
       "**/_bak": true,
