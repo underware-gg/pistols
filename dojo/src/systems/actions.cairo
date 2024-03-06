@@ -17,6 +17,8 @@ trait IActions<TContractState> {
     fn create_challenge(self: @TContractState,
         challenged: ContractAddress,
         message: felt252,
+        wager_coin: u8,
+        wager_value: u32,
         expire_seconds: u64,
     ) -> u128;
     fn reply_challenge(self: @TContractState,
@@ -106,6 +108,8 @@ mod actions {
         fn create_challenge(self: @ContractState,
             challenged: ContractAddress,
             message: felt252,
+            wager_coin: u8,
+            wager_value: u32,
             expire_seconds: u64,
         ) -> u128 {
             let world: IWorldDispatcher = self.world_dispatcher.read();
@@ -121,6 +125,8 @@ mod actions {
             //     assert(utils::duelist_exist(world, caller), 'Challenged is not registered');
             // }
 
+            assert(wager_coin == 0 || wager_coin == 1, 'Invalid wager coin');
+
             // let duel_id: u32 = world.uuid();
             let duel_id: u128 = make_seed(caller);
             let timestamp_start: u64 = get_block_timestamp();
@@ -131,6 +137,8 @@ mod actions {
                 duelist_a: caller,
                 duelist_b: challenged,
                 message,
+                wager_coin,
+                wager_value: if (wager_coin == 0) { 0 } else { wager_value },
                 // progress
                 state: ChallengeState::Awaiting.into(),
                 round_number: 0,

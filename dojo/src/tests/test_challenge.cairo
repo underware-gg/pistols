@@ -15,13 +15,14 @@ mod tests {
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
     const MESSAGE_1: felt252 = 'For honour!!!';
+    const WAGER_COIN: u8 = 0;
 
     #[test]
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Challenger not registered','ENTRYPOINT_FAILED'))]
     fn test_invalid_challenger() {
         let (world, system, owner, other) = utils::setup_world();
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, 0);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, 0);
     }
 
     #[test]
@@ -30,7 +31,7 @@ mod tests {
     fn test_challenge_thyself() {
         let (world, system, owner, other) = utils::setup_world();
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, owner, MESSAGE_1, 0);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, owner, MESSAGE_1, WAGER_COIN, 0, 0);
     }
 
     #[test]
@@ -41,7 +42,7 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         let challenged_1 = zero_address();
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, challenged_1, MESSAGE_1, 0);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, challenged_1, MESSAGE_1, WAGER_COIN, 0, 0);
     }
 
     #[test]
@@ -51,8 +52,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         utils::execute_register_duelist(system, other, OTHER_NAME, 1);
-        utils::execute_create_challenge(system, owner, other, MESSAGE_1, 0);
-        utils::execute_create_challenge(system, owner, other, MESSAGE_1, 0);
+        utils::execute_create_challenge(system, owner, other, MESSAGE_1,WAGER_COIN, 0, 0);
+        utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, 0);
     }
 
     #[test]
@@ -62,8 +63,8 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         utils::execute_register_duelist(system, other, OTHER_NAME, 1);
-        utils::execute_create_challenge(system, owner, other, MESSAGE_1, 0);
-        utils::execute_create_challenge(system, other, owner, MESSAGE_1, 0);
+        utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, 0);
+        utils::execute_create_challenge(system, other, owner, MESSAGE_1, WAGER_COIN, 0, 0);
     }
 
     #[test]
@@ -73,7 +74,7 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         let expire_seconds: u64 = 60 * 60 - 1;
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, expire_seconds);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, expire_seconds);
     }
 
     #[test]
@@ -82,7 +83,7 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         let timestamp = utils::get_block_timestamp();
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, 0);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, 0);
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'state');
         assert(ch.duelist_a == owner, 'challenged');
@@ -99,7 +100,7 @@ mod tests {
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         let expire_seconds: u64 = 24 * 60 * 60;
         let timestamp = utils::get_block_timestamp();
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, expire_seconds);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, expire_seconds);
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.timestamp_start == timestamp, 'timestamp_start');
         assert(ch.timestamp_end == ch.timestamp_start + expire_seconds, 'timestamp_end');
@@ -114,7 +115,7 @@ mod tests {
         assert(utils::execute_get_pact(system, other, owner) == 0, 'get_pact_0_2');
         assert(utils::execute_has_pact(system, owner, other) == false, 'has_pact_0_1');
         assert(utils::execute_has_pact(system, other, owner) == false, 'has_pact_0_2');
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, 0);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, 0);
         assert(utils::execute_get_pact(system, owner, other) == duel_id, 'get_pact_1_1');
         assert(utils::execute_get_pact(system, other, owner) == duel_id, 'get_pact_1_2');
         assert(utils::execute_has_pact(system, owner, other) == true, 'has_pact_1_1');
@@ -134,7 +135,7 @@ mod tests {
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
 
         let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, expire_seconds);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, expire_seconds);
         utils::elapse_timestamp(timestamp::from_days(1));
         utils::execute_reply_challenge(system, owner, duel_id + 1, true);
     }
@@ -147,7 +148,7 @@ mod tests {
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
 
         let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, expire_seconds);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, expire_seconds);
         let ch = utils::get_Challenge(world, duel_id);
         let (block_number, timestamp) = utils::elapse_timestamp(timestamp::from_days(3));
         let new_state: ChallengeState = utils::execute_reply_challenge(system, other, duel_id, false);
@@ -163,7 +164,7 @@ mod tests {
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
 
         let expire_seconds: u64 = timestamp::from_days(1);
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, expire_seconds);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, expire_seconds);
         let ch = utils::get_Challenge(world, duel_id);
 
         assert(utils::execute_has_pact(system, other, owner) == true, 'has_pact_yes');
@@ -188,7 +189,7 @@ mod tests {
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
 
         let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, expire_seconds);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, expire_seconds);
         let ch = utils::get_Challenge(world, duel_id);
 
         utils::elapse_timestamp(timestamp::from_days(1));
@@ -202,7 +203,7 @@ mod tests {
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
 
         let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, expire_seconds);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, expire_seconds);
         let ch = utils::get_Challenge(world, duel_id);
         let (block_number, timestamp) = utils::elapse_timestamp(timestamp::from_days(1));
 
@@ -230,7 +231,7 @@ mod tests {
         utils::execute_register_duelist(system, impersonator, 'Impersonator', 3);
 
         let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, expire_seconds);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, expire_seconds);
         let ch = utils::get_Challenge(world, duel_id);
         let (block_number, timestamp) = utils::elapse_timestamp(timestamp::from_days(1));
         utils::execute_reply_challenge(system, impersonator, duel_id, false);
@@ -244,7 +245,7 @@ mod tests {
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
 
         let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, expire_seconds);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, expire_seconds);
         utils::elapse_timestamp(timestamp::from_days(1));
         utils::execute_reply_challenge(system, other, duel_id, true);
     }
@@ -257,7 +258,7 @@ mod tests {
         utils::execute_register_duelist(system, other, OTHER_NAME, 2);
 
         let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, expire_seconds);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, expire_seconds);
 
         assert(utils::execute_has_pact(system, other, owner) == true, 'has_pact_yes');
         let (block_number, timestamp) = utils::elapse_timestamp(timestamp::from_days(1));

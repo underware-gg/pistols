@@ -19,6 +19,7 @@ mod tests {
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
     const MESSAGE_1: felt252 = 'For honour!!!';
+    const WAGER_COIN: u8 = 0;
 
     const SALT_1_a: u64 = 0xa6f099b756a87e62;
     const SALT_1_b: u64 = 0xf9a978e92309da78;
@@ -27,7 +28,7 @@ mod tests {
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         utils::execute_register_duelist(system, other, OTHER_NAME, 2);
         let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, expire_seconds);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, expire_seconds);
         utils::elapse_timestamp(timestamp::from_days(1));
         utils::execute_reply_challenge(system, other, duel_id, true);
         let ch = utils::get_Challenge(world, duel_id);
@@ -67,7 +68,7 @@ mod tests {
         assert(utils::execute_has_pact(system, other, owner) == false, 'has_pact_no');
 
         let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, expire_seconds);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, expire_seconds);
         let ch = utils::get_Challenge(world, duel_id);
         let (block_number, timestamp) = utils::elapse_timestamp(timestamp::from_days(1));
         let new_state: ChallengeState = utils::execute_reply_challenge(system, other, duel_id, true);
@@ -378,7 +379,7 @@ mod tests {
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         utils::execute_register_duelist(system, other, OTHER_NAME, 2);
         let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, expire_seconds);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, expire_seconds);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
     }

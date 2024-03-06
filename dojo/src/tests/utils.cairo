@@ -73,10 +73,12 @@ mod utils {
     fn execute_create_challenge(system: IActionsDispatcher, sender: ContractAddress,
         challenged: ContractAddress,
         message: felt252,
+        wager_coin: u8,
+        wager_value: u32,
         expire_seconds: u64,
     ) -> u128 {
         testing::set_contract_address(sender);
-        let duel_id: u128 = system.create_challenge(challenged, message, expire_seconds);
+        let duel_id: u128 = system.create_challenge(challenged, message, wager_coin, wager_value, expire_seconds);
         _next_block();
         (duel_id)
     }

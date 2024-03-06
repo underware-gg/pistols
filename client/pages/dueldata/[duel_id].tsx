@@ -138,6 +138,18 @@ function DuelStats({
             {challenge.message}
           </Cell>
         </Row>
+        <Row>
+          <Cell>Wager Coin</Cell>
+          <Cell>
+            {challenge.wagerCoin}
+          </Cell>
+        </Row>
+        <Row>
+          <Cell>Wager Value</Cell>
+          <Cell>
+            {challenge.wagerValue}
+          </Cell>
+        </Row>
       </Body>
     </Table>
   )

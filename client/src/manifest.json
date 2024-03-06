@@ -949,7 +949,7 @@
     {
       "name": "pistols::systems::actions::actions",
       "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
-      "class_hash": "0x6dd5993421300140202fd21f8ab20946fec1c83e975396278d7c24e038d836d",
+      "class_hash": "0x2c2c5b549462fe5dab7720dee29a791aa0d5f1b9005d1241bc6c1af6b5134c4",
       "abi": [
         {
           "type": "impl",
@@ -1093,6 +1093,14 @@
                 {
                   "name": "message",
                   "type": "core::felt252"
+                },
+                {
+                  "name": "wager_coin",
+                  "type": "core::integer::u8"
+                },
+                {
+                  "name": "wager_value",
+                  "type": "core::integer::u32"
                 },
                 {
                   "name": "expire_seconds",
@@ -1956,6 +1964,16 @@
           "key": false
         },
         {
+          "name": "wager_coin",
+          "type": "u8",
+          "key": false
+        },
+        {
+          "name": "wager_value",
+          "type": "u32",
+          "key": false
+        },
+        {
           "name": "state",
           "type": "u8",
           "key": false
@@ -1981,7 +1999,7 @@
           "key": false
         }
       ],
-      "class_hash": "0x55dbc146cb3e3458130f0f9ab6ebd917df73ee93eb3087de9b5b898a8b7b60f",
+      "class_hash": "0x4d780ef55f376901e41276fcac8496f5cbb8e40c1ccab35b63400d027f73914",
       "abi": [
         {
           "type": "impl",
@@ -2171,6 +2189,14 @@
             {
               "name": "message",
               "type": "core::felt252"
+            },
+            {
+              "name": "wager_coin",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "wager_value",
+              "type": "core::integer::u32"
             },
             {
               "name": "state",
@@ -2771,7 +2797,7 @@
           "key": false
         }
       ],
-      "class_hash": "0x2e82f5cb3246e30e3afea11178d5b1dda19857eb0b4673e015aad9c4e9388c6",
+      "class_hash": "0xa717b8ef188ea04cdea691beab3d4f848d0105c2281537e382bc05886f0fe3",
       "abi": [
         {
           "type": "impl",
@@ -2983,19 +3009,19 @@
               "type": "core::integer::u8"
             },
             {
-              "name": "health",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "honour",
-              "type": "core::integer::u8"
-            },
-            {
               "name": "win",
               "type": "core::integer::u8"
             },
             {
               "name": "wager",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "health",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "honour",
               "type": "core::integer::u8"
             }
           ]

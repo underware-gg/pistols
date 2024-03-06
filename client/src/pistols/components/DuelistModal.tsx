@@ -27,7 +27,7 @@ export default function DuelistModal() {
   const { name, profilePic } = useDuelist(duelistAddress)
   const { hasPact, pactDuelId } = usePact(account.address, duelistAddress)
   const [isChallenging, setIsChallenging] = useState(false)
-  const [challengeArgs, setChallengeArgs] = useState(null)
+  const [args, setArgs] = useState(null)
 
   const isYou = useMemo(() => (duelistAddress == BigInt(account.address)), [duelistAddress, account])
   const isOpen = useMemo(() => (duelistAddress > 0), [duelistAddress])
@@ -50,8 +50,8 @@ export default function DuelistModal() {
     router.push(`/gate`)
   }
   const _challenge = () => {
-    if (challengeArgs) {
-      create_challenge(account, duelistAddress, challengeArgs.message, challengeArgs.expire_seconds)
+    if (args) {
+      create_challenge(account, duelistAddress, args.message, args.wager_coin, args.wager_value, args.expire_seconds)
     }
   }
 
@@ -90,7 +90,7 @@ export default function DuelistModal() {
           <ProfileDescription address={duelistAddress} displayStats />
           <Divider hidden />
           {!isChallenging && <div className='TableInModal'><ChallengesList duelistAddress={duelistAddress} /></div>}
-          {isChallenging && <CreateChallenge setChallengeArgs={setChallengeArgs} />}
+          {isChallenging && <CreateChallenge setArgs={setArgs} />}
         </Modal.Description>
       </Modal.Content>
       <Modal.Actions>
@@ -104,7 +104,7 @@ export default function DuelistModal() {
               <Col>
                 {
                   hasPact ? <ActionButton fill attention label='Existing Challenge!' onClick={() => dispatchSelectDuel(pactDuelId)} />
-                    : isChallenging ? <ActionButton fill disabled={!challengeArgs} label='Submit Challenge!' onClick={() => _challenge()} />
+                    : isChallenging ? <ActionButton fill disabled={!args} label='Submit Challenge!' onClick={() => _challenge()} />
                       : <ActionButton fill disabled={isMasterAccount} label='Challenge for a Duel!' onClick={() => setIsChallenging(true)} />
                 }
               </Col>
@@ -127,7 +127,7 @@ function ChallengesList({
 }
 
 function CreateChallenge({
-  setChallengeArgs
+  setArgs
 }) {
   const [message, setMessage] = useState('')
   const [days, setDays] = useState(7)
@@ -141,10 +141,11 @@ function CreateChallenge({
   const canSubmit = useMemo(() => (message.length > 3 && (days + hours) > 0), [message, days, hours, lords])
 
   useEffect(() => {
-    setChallengeArgs(canSubmit ? {
+    setArgs(canSubmit ? {
       message,
       expire_seconds: (days * 24 * 60 * 60) + (hours * 60 * 60),
-      lords,
+      wager_coin: 1,
+      wager_value: lords,
     } : null)
   }, [message, days, hours, lords])
   // console.log(canSubmit, days, hours, lords, message)
@@ -213,7 +214,7 @@ function CreateChallenge({
           </Grid>
         </Form.Field>
         <Form.Field>
-          <span className='FormLabel'>Wager $LORDS (disabled)</span>
+          <span className='FormLabel'>Wager $LORDS</span>
           <input placeholder={'$LORDS'} value={lords} maxLength={6} onChange={(e) => {
             const _lords = parseInt(e.target.value as string)
             if (!isNaN(_lords)) {

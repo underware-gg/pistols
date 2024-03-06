@@ -14,7 +14,7 @@ export function useDuelIcons({
   size = 'large',
 }) {
   const {
-    challenge: { duelistA, duelistB, winner, roundNumber, isAwaiting, isInProgress, isFinished, lords },
+    challenge: { duelistA, duelistB, winner, roundNumber, isAwaiting, isInProgress, isFinished },
     round1, round2, round3, duelStage, completedStagesA, completedStagesB, turnA, turnB,
   } = useDuel(duelId)
 

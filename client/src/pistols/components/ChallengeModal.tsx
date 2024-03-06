@@ -24,7 +24,7 @@ export default function ChallengeModal() {
 
   const { duelId, dispatchSelectDuel, dispatchSelectDuelist } = usePistolsContext()
 
-  const { state, message, duelistA, duelistB, lords, isLive, isFinished, isAwaiting } = useChallenge(duelId)
+  const { state, message, duelistA, duelistB, wagerValue, isLive, isFinished, isAwaiting } = useChallenge(duelId)
 
   const { challengeDescription } = useChallengeDescription(duelId)
 
@@ -105,10 +105,10 @@ export default function ChallengeModal() {
 
             <Row columns='equal' textAlign='right'>
               <Col>
-                {lords > 0 &&
+                {wagerValue > 0 &&
                   <>
                     <Divider horizontal className='NoMargin'>
-                      <Header as='h3'>for <span className='Bold'>{lords} $LORDS</span> each</Header>
+                      <Header as='h3'>for <span className='Bold'>{wagerValue} $LORDS</span> each</Header>
                     </Divider>
                   </>
                 }

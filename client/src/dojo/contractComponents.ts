@@ -20,11 +20,11 @@ export function defineContractComponents(world: World) {
 	  Challenge: (() => {
 	    return defineComponent(
 	      world,
-	      { duel_id: RecsType.BigInt, duelist_a: RecsType.BigInt, duelist_b: RecsType.BigInt, message: RecsType.BigInt, state: RecsType.Number, round_number: RecsType.Number, winner: RecsType.Number, timestamp_start: RecsType.Number, timestamp_end: RecsType.Number },
+	      { duel_id: RecsType.BigInt, duelist_a: RecsType.BigInt, duelist_b: RecsType.BigInt, message: RecsType.BigInt, wager_coin: RecsType.Number, wager_value: RecsType.Number, state: RecsType.Number, round_number: RecsType.Number, winner: RecsType.Number, timestamp_start: RecsType.Number, timestamp_end: RecsType.Number },
 	      {
 	        metadata: {
 	          name: "Challenge",
-	          types: ["u128","contractaddress","contractaddress","felt252","u8","u8","u8","u64","u64"],
+	          types: ["u128","contractaddress","contractaddress","felt252","u8","u32","u8","u8","u8","u64","u64"],
 	          customTypes: [],
 	        },
 	      }
@@ -59,7 +59,7 @@ export function defineContractComponents(world: World) {
 	  Round: (() => {
 	    return defineComponent(
 	      world,
-	      { duel_id: RecsType.BigInt, round_number: RecsType.Number, state: RecsType.Number, shot_a: { hash: RecsType.Number, salt: RecsType.Number, action: RecsType.Number, chance_crit: RecsType.Number, chance_hit: RecsType.Number, dice_crit: RecsType.Number, dice_hit: RecsType.Number, damage: RecsType.Number, block: RecsType.Number, health: RecsType.Number, honour: RecsType.Number, win: RecsType.Number, wager: RecsType.Number }, shot_b: { hash: RecsType.Number, salt: RecsType.Number, action: RecsType.Number, chance_crit: RecsType.Number, chance_hit: RecsType.Number, dice_crit: RecsType.Number, dice_hit: RecsType.Number, damage: RecsType.Number, block: RecsType.Number, health: RecsType.Number, honour: RecsType.Number, win: RecsType.Number, wager: RecsType.Number } },
+	      { duel_id: RecsType.BigInt, round_number: RecsType.Number, state: RecsType.Number, shot_a: { hash: RecsType.Number, salt: RecsType.Number, action: RecsType.Number, chance_crit: RecsType.Number, chance_hit: RecsType.Number, dice_crit: RecsType.Number, dice_hit: RecsType.Number, damage: RecsType.Number, block: RecsType.Number, win: RecsType.Number, wager: RecsType.Number, health: RecsType.Number, honour: RecsType.Number }, shot_b: { hash: RecsType.Number, salt: RecsType.Number, action: RecsType.Number, chance_crit: RecsType.Number, chance_hit: RecsType.Number, dice_crit: RecsType.Number, dice_hit: RecsType.Number, damage: RecsType.Number, block: RecsType.Number, win: RecsType.Number, wager: RecsType.Number, health: RecsType.Number, honour: RecsType.Number } },
 	      {
 	        metadata: {
 	          name: "Round",

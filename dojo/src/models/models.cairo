@@ -29,6 +29,8 @@ struct Challenge {
     duelist_a: ContractAddress, // Challenger
     duelist_b: ContractAddress, // Challenged
     message: felt252,           // message to challenged
+    wager_coin: u8,             // wager coin, if any
+    wager_value: u32,           // wager value (integer), if any
     // progress and results
     state: u8,                  // actually a ChallengeState
     round_number: u8,           // current or final
@@ -63,12 +65,11 @@ struct Shot {
     dice_hit: u8,       // dice roll result (1..100) - hit / normal damage
     damage: u8,         // amount of health taken
     block: u8,          // amount of damage blocked
+    win: u8,            // wins the round
+    wager: u8,          // wins the wager
     // player state
     health: u8,         // final health
     honour: u8,         // honour granted
-    // more results -- TODO: move up
-    win: u8,            // wins the round
-    wager: u8,          // wins the wager
 } // 224 bits
 
 //

@@ -85,7 +85,8 @@ export const useChallenge = (duelId: bigint | string) => {
   const duelistB = useMemo(() => BigInt(challenge?.duelist_b ?? 0), [challenge])
   const winner = useMemo(() => (challenge?.winner ?? 0), [challenge])
   const message = useMemo(() => feltToString(challenge?.message ?? 0n), [challenge])
-  const lords = useMemo(() => (challenge?.lords ?? 0), [challenge])
+  const wagerCoin = useMemo(() => (challenge?.wager_coin ?? 0), [challenge])
+  const wagerValue = useMemo(() => (challenge?.wager_value ?? 0), [challenge])
   const roundNumber = useMemo(() => (challenge?.round_number ?? 0), [challenge])
   const timestamp_start = useMemo(() => (challenge?.timestamp_start ?? 0), [challenge])
   const timestamp_end = useMemo(() => (challenge?.timestamp_end ?? 0), [challenge])
@@ -104,7 +105,8 @@ export const useChallenge = (duelId: bigint | string) => {
     challenger: duelistA,
     challenged: duelistB,
     message,
-    lords,
+    wagerCoin,
+    wagerValue,
     // progress and results
     roundNumber,
     winner,
