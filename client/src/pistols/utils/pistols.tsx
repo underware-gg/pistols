@@ -164,7 +164,7 @@ export const ActionEmojis: Record<Action, string> = {
   [Action.Strong]: EMOJI.HEAVY,
   [Action.Block]: EMOJI.BLOCK,
   [Action.Flee]: EMOJI.FLEE,
-  [Action.Steal]: EMOJI.STEAL,
+  [Action.Steal]: EMOJI.WAGER,
   [Action.Seppuku]: EMOJI.SEPPUKU,
 }
 

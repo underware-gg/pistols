@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Grid, Menu, Label, Tab, TabPane } from 'semantic-ui-react'
+import { Grid, Menu, Label, Tab, TabPane, Icon } from 'semantic-ui-react'
 import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
 import { useChallengesByDuelist, useLiveChallengeIds } from '@/pistols/hooks/useChallenge'
 import { useThreeJsContext } from '../hooks/ThreeJsContext'
@@ -13,6 +13,7 @@ import { MusicToggle, SfxToggle } from '@/pistols/components/ui/Buttons'
 import { SPRITESHEETS } from '@/pistols/data/assets'
 import AccountHeader from '@/pistols/components/account/AccountHeader'
 import { AnimationState } from '../three/game'
+import { CustomIcon } from './ui/Icons'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -104,14 +105,19 @@ export function MenuTavern({
 
 export function MenuDuel({
   duelStage,
+  duelId,
 }) {
   const router = useRouter()
-  const { settings, SettingsActions } = useSettingsContext()
+  const { dispatchSetting, settings, SettingsActions } = useSettingsContext()
   const { dispatchSelectDuel } = usePistolsContext()
 
   const _backToTavern = () => {
     dispatchSelectDuel(0n)
     router.push('/tavern')
+  }
+
+  const _switchSfx = () => {
+    dispatchSetting(SettingsActions.SFX_ENABLED, !settings.sfxEnabled)
   }
 
   const _skipAnimation = () => {
@@ -131,8 +137,13 @@ export function MenuDuel({
 
         {/* <SettingsMenuItem prefix='SFX' settingsKey={SettingsActions.SFX_ENABLED} currentValue={settings.sfxEnabled} /> */}
 
-        <Menu.Item >
-          <SfxToggle />
+        <Menu.Item onClick={() => window.open(`/dueldata/${duelId}`, '_blank')} >
+          <Icon className='IconClick' name='database' size={null} />
+        </Menu.Item>
+
+        <Menu.Item onClick={() => _switchSfx()} >
+          {/* <CustomIcon className='IconClick' icon name={settings.sfxEnabled ? 'volume-on' : 'volume-off'} /> */}
+          <Icon className='IconClick' name={settings.sfxEnabled ? 'volume up' : 'volume off'} size={null} />
         </Menu.Item>
 
       </Menu>

@@ -88,7 +88,7 @@ export default function DuelistModal() {
         <ProfilePic profilePic={profilePic} />
         <Modal.Description className='FillParent' style={{ width: '200px' }}>
           <ProfileDescription address={duelistAddress} displayStats />
-          <Divider />
+          <Divider hidden />
           {!isChallenging && <div className='TableInModal'><ChallengesList duelistAddress={duelistAddress} /></div>}
           {isChallenging && <CreateChallenge setChallengeArgs={setChallengeArgs} />}
         </Modal.Description>
@@ -172,7 +172,7 @@ function CreateChallenge({
       <h1>Challenge Conditions</h1>
       <br />
 
-      <Form>
+      <Form className=''>
         <Form.Field>
           <span className='FormLabel'>What do you have to say?</span>
           {/* <input placeholder={_defaultMessage} value={message} maxLength={31} onChange={(e) => setMessage(e.target.value)} /> */}

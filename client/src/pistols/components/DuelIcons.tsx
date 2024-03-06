@@ -131,7 +131,14 @@ export function useDuelIcons({
     return { icons1, icons2, icons3 }
   }, [isAwaiting, isInProgress, isFinished, duelStage, isA, isB, isTurn, shot1, shot2, shot3, shot3, completedStages, health1, health2, health3, win1, win2, win3, wager1, wager2, wager3, iconSize])
 
-  return { icons1, icons2, icons3 }
+  return {
+    icons1,
+    icons2,
+    icons3,
+    isAwaiting,
+    isInProgress,
+    isFinished,
+  }
 }
 
 
@@ -160,7 +167,7 @@ export function DuelIconsAsGrid({
   duelistB,
   size = 'large',
 }) {
-  const { icons1: icons1A, icons2: icons2A, icons3: icons3A } = useDuelIcons({ duelId, account: duelistA, size: 'big' })
+  const { icons1: icons1A, icons2: icons2A, icons3: icons3A, isAwaiting } = useDuelIcons({ duelId, account: duelistA, size: 'big' })
   const { icons1: icons1B, icons2: icons2B, icons3: icons3B } = useDuelIcons({ duelId, account: duelistB, size: 'big' })
 
   return (
@@ -171,7 +178,7 @@ export function DuelIconsAsGrid({
             {icons1A}
           </Col>
           <Col width={4}>
-            Round 1
+            {isAwaiting ? 'Pact' : 'Round 1'}
           </Col>
           <Col width={6} textAlign='left'>
             {icons1B}

@@ -195,6 +195,7 @@ canvas {
 
 .Black     { color: #444; }
 .Important { color: $color-important; }
+.Bright    { color: $color-bright!important; }
 .Brightest { color: $color-brightest!important; }
 .Positive  { color: $color-positive!important; }
 .Negative  { color: $color-negative!important; }
@@ -958,8 +959,9 @@ input::placeholder {
 }
 // forms
 .FormLabel {
+  @extend .TitleCase;
   color: $color-text;
-  font-size: 1.25em;
+  font-size: 1.1em;
   line-height: 1.2em;
 }
 .ui.form .field>label {

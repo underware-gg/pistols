@@ -39,8 +39,6 @@ export default function Duel({
     canAutoRevealA, canAutoRevealB,
     healthA, healthB,
   } = useAnimatedDuel(duelId)
-  // console.log(`Round 1:`, round1)
-  // console.log(`Round 2:`, round2)
 
   useEffectOnce(() => {
     gameImpl?.resetDuelScene()
@@ -88,7 +86,7 @@ export default function Duel({
         />
       </div>
 
-      <MenuDuel duelStage={duelStage} />
+      <MenuDuel duelStage={duelStage} duelId={duelId}/>
 
       {/* {process.env.NEXT_PUBLIC_DEBUG &&
         <MenuDebugAnimations />

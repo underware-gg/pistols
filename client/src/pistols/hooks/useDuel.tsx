@@ -169,8 +169,8 @@ export const useAnimatedDuel = (duelId: bigint | string) => {
 
 
 
-const _healthResult = (health: number, damage: number) => {
-  return (health == 0 ? 'is DEAD!' : damage > 0 ? `takes ${damage} DAMAGE!` : 'is SAFE!')
+const _healthResult = (health: number, damage: number, block: number) => {
+  return (health == 0 ? 'is DEAD!' : damage > 0 ? `${block > 0 ? `blocks ${block} but ` : ''}takes ${damage} DAMAGE!` : 'is ALIVE!')
 }
 
 export const useDuelResult = (round: any | null, shot: any | null, duelStage: DuelStage, animationStage: DuelStage) => {
@@ -179,7 +179,7 @@ export const useDuelResult = (round: any | null, shot: any | null, duelStage: Du
       return null
     }
     const action = shot.action
-    const health = _healthResult(shot.health, shot.damage)
+    const health = _healthResult(shot.health, shot.damage, shot.block)
     return <span>{ActionVerbs[action]} <span className='Bold'>{ActionNames[action] ?? '?'}</span><br />and {health}</span>
   }, [duelStage, animationStage, round, shot])
   return result
