@@ -8,7 +8,7 @@ else
     export PROFILE="dev"
 fi
 
-TX_SLEEP=0.5
+TX_SLEEP=0.2
 
 export RPC_URL=$(toml get Scarb.toml --raw tool.dojo.env.rpc_url)
 export WORLD_ADDRESS=$(cat ./target/dev/manifest.json | jq -r '.world.address')
@@ -44,6 +44,5 @@ echo "Initializing..."
 # Dojo 0.6.0
 # sozo -P $PROFILE execute  --world $WORLD_ADDRESS $LORDS_MOCK_ADDRESS initializer --wait > /dev/null
 # Dojo 0.5.1
-sozo -P $PROFILE execute $LORDS_MOCK_ADDRESS initializer --wait > /dev/null
-echo "Initialized LORDS MOCK!"
+sozo -P $PROFILE execute $LORDS_MOCK_ADDRESS initializer --wait > /dev/null || true
 sleep $TX_SLEEP

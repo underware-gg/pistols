@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+
+#-----------------
+echo "------------------------------------------------------------------------------"
+echo "MOCKING \$LORDS... 👑"
+sozo migrate
+scripts/default_auth.sh
+
+#-----------------
+echo "---  LORDS MOCK DONE! 👍"

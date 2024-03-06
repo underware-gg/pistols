@@ -1,8 +1,10 @@
 mod models {
+    mod config;
     mod models;
 }
 
 mod systems {
+    mod admin;
     mod actions;
     mod seeder;
     mod shooter;

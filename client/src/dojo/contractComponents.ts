@@ -4,6 +4,19 @@ import { defineComponent, Type as RecsType, World } from "@dojoengine/recs";
 
 export function defineContractComponents(world: World) {
   return {
+	  Config: (() => {
+	    return defineComponent(
+	      world,
+	      { key: RecsType.Number, initialized: RecsType.Boolean, lords_address: RecsType.BigInt, duel_fee_min: RecsType.Number, duel_fee_pct: RecsType.Number },
+	      {
+	        metadata: {
+	          name: "Config",
+	          types: ["u8","bool","contractaddress","u8","u8"],
+	          customTypes: [],
+	        },
+	      }
+	    );
+	  })(),
 	  Challenge: (() => {
 	    return defineComponent(
 	      world,
