@@ -1,7 +1,9 @@
 import { getEvents, setComponentsFromEvents, decodeComponent } from '@dojoengine/utils'
 import { SetupNetworkResult } from './setupNetwork'
 import { stringToFelt } from '@/pistols/utils/starknet'
-import { Account, BigNumberish } from 'starknet'
+import { Account } from 'starknet'
+import { emitter } from '@/pistols/three/game'
+
 
 export type SystemCalls = ReturnType<typeof createSystemCalls>;
 
@@ -157,11 +159,16 @@ export function createSystemCalls(
 }
 
 function getReceiptStatus(receipt: any): boolean {
-  if (receipt.execution_status == 'REVERTED') {
-    console.error(`Transaction reverted:`, receipt.revert_reason)
-    return false
-  } else if (receipt.execution_status != 'SUCCEEDED') {
-    console.error(`Transaction error [${receipt.execution_status}]:`, receipt)
+  if (receipt.execution_status != 'SUCCEEDED') {
+    if (receipt.execution_status == 'REVERTED') {
+      console.error(`Transaction reverted:`, receipt.revert_reason)
+    } else {
+      console.error(`Transaction error [${receipt.execution_status}]:`, receipt)
+    }
+    emitter.emit('transaction_error', {
+      status: receipt.execution_status,
+      reason: receipt.revert_reason,
+    })
     return false
   }
   return true

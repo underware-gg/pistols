@@ -6,6 +6,7 @@ import { setup } from '@/dojo/setup'
 import { ThreeJsProvider } from '@/pistols/hooks/ThreeJsContext'
 import { GameplayProvider } from '@/pistols/hooks/GameplayContext'
 import { DojoStatus } from '@/pistols/components/account/DojoStatus'
+import ErrorModal from '@/pistols/components/ErrorModal'
 import App from '@/pistols/components/App'
 import manifest from '../../manifest.json'
 
@@ -70,6 +71,7 @@ function DojoSetup({ children }) {
       <ThreeJsProvider>
         <GameplayProvider>
           {children}
+          <ErrorModal />
         </GameplayProvider>
       </ThreeJsProvider>
     </DojoProvider>

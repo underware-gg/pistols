@@ -64,7 +64,7 @@ export default function DuelistModal() {
       open={isOpen}
     >
       <Modal.Header>
-        <Grid className='PaddedLeft PaddedRight'>
+        <Grid>
           <Row>
             <Col width={8} textAlign='left'>
               Duelist

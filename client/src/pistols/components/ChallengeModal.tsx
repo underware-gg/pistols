@@ -53,7 +53,7 @@ export default function ChallengeModal() {
       open={isOpen}
     >
       <Modal.Header>
-        <Grid className='PaddedLeft PaddedRight'>
+        <Grid>
           <Row>
             <Col width={8} textAlign='left'>
               Challenge

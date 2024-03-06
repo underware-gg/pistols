@@ -1179,6 +1179,9 @@ td {
   border-bottom: $border-hr;
   padding: 0.2em;
 }
+.ui.modal>.header:not(.ui) {
+  padding: 0.25em 0.5em;
+}
 .ui.modal>.actions {
   border-top: $border-hr;
 }
