@@ -86,7 +86,7 @@ export default function Duel({
         />
       </div>
 
-      <MenuDuel duelStage={duelStage} duelId={duelId}/>
+      <MenuDuel duelStage={duelStage} duelId={duelId} />
 
       {/* {process.env.NEXT_PUBLIC_DEBUG &&
         <MenuDebugAnimations />
@@ -129,7 +129,7 @@ function DuelHealthBar({
     for (let i = 1; i <= constants.FULL_HEALTH; ++i) {
       const full = (health >= i)
       result.push(
-        <Segment key={`${i}_${full?'full':'empty'}`} className={full ? 'HealthPointFull' : 'HealthPointEmpty'} />
+        <Segment key={`${i}_${full ? 'full' : 'empty'}`} className={full ? 'HealthPointFull' : 'HealthPointEmpty'} />
       )
     }
     if (floated == 'right') {
@@ -296,7 +296,7 @@ function DuelProgress({
               title={round2Result ?? 'Blades clash!'}
               description=''
               icon={round2Result ? null : 'target'}
-            emoji={round2Result ? _resultEmoji(round2Shot): null}
+              emoji={round2Result ? _resultEmoji(round2Shot) : null}
               floated={floated}
               onClick={onClick}
               className={round2Result ? _resultBackground(round2Shot) : null}
@@ -312,7 +312,7 @@ function DuelProgress({
             title={round3Result ?? 'Blades clash!'}
             description=''
             icon={round3Result ? null : 'target'}
-          emoji={round3Result ? _resultEmoji(round3Shot) : null}
+            emoji={round3Result ? _resultEmoji(round3Shot) : null}
             floated={floated}
             onClick={onClick}
             className={round3Result ? _resultBackground(round3Shot) : null}

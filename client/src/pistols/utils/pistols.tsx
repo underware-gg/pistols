@@ -164,7 +164,7 @@ export const ActionEmojis: Record<Action, string> = {
   [Action.Strong]: EMOJI.HEAVY,
   [Action.Block]: EMOJI.BLOCK,
   [Action.Flee]: EMOJI.FLEE,
-  [Action.Steal]: EMOJI.WAGER,
+  [Action.Steal]: EMOJI.STEAL,
   [Action.Seppuku]: EMOJI.SEPPUKU,
 }
 
@@ -188,7 +188,7 @@ export const ActionTypes: Record<string, Action[]> = {
   ],
   runner: [
     Action.Flee,
-    Action.Steal,
+    // Action.Steal, // result must display wager, not action
     Action.Seppuku,
   ]
 }
