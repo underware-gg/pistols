@@ -215,13 +215,13 @@ function ShotStats({
           <Row>
             <Cell>Crit Dice / Chances</Cell>
             <Cell>
-              {shot.chance_crit} / {shot.dice_crit}
+              {shot.dice_crit} / {shot.chance_crit}
             </Cell>
           </Row>
           <Row>
             <Cell>Hit Dice / Chances</Cell>
             <Cell>
-              {shot.chance_hit} / {shot.dice_hit}
+              {shot.dice_hit} / {shot.chance_hit}
             </Cell>
           </Row>
         </Body>
