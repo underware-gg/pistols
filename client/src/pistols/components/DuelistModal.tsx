@@ -13,7 +13,7 @@ import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
 import { randomArrayElement } from '@/pistols/utils/utils'
 import { validateCairoString } from '@/pistols/utils/starknet'
 import { usePact } from '@/pistols/hooks/usePact'
-import { AccountShort } from './ui/Account'
+import { AccountShort } from './account/Account'
 
 const Row = Grid.Row
 const Col = Grid.Column

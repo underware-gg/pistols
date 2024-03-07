@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { AccountShort } from '@/pistols/components/ui/Account'
+import { AccountShort } from '@/pistols/components/account/Account'
 import { EMOJI } from '@/pistols/data/messages'
 
 const Row = Grid.Row

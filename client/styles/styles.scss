@@ -90,11 +90,11 @@ a:hover {
   text-decoration-thickness: 1px;
 }
 
-h1 { font-size: 2.6em; }
-h2 { font-size: 2.2em; }
-h3 { font-size: 1.8em; }
-h4 { font-size: 1.5em; }
-h5 { font-size: 1.2em; }
+h1, .H1 { font-size: 2.6em; }
+h2, .H2 { font-size: 2.2em; }
+h3, .H3 { font-size: 1.8em; }
+h4, .H4 { font-size: 1.5em; }
+h5, .H5 { font-size: 1.2em; }
 
 h1, h2, h3, h4, h5 {
   font-family: $font-family;
@@ -483,6 +483,13 @@ $box-h: calc((100vh - $aspect-h) / 2);
   scrollbar-width: thin;
   overflow-y: scroll;
 }
+.TableCell {
+  font-size: 1.2em;
+  line-height: 1.5em;
+  margin: 0.2em 0;
+  color: $color-brightest;
+  // font-weight: 600;
+}
 
 .ModalText {
   font-size: 20px!important;
@@ -803,6 +810,7 @@ $logo-url: '/logos/logo_avante.svg';
 	width: 1.5em;
 	height: 1.5em;
 	border: 0;
+  white-space: nowrap;
 }
 .CustomIconWrapperCentered {
 	margin: auto !important;
@@ -848,6 +856,15 @@ $logo-url: '/logos/logo_avante.svg';
 @keyframes IconClickAnimation {
 	from { -webkit-transform: scale(0.7); }
 	to { -webkit-transform: scale(1); }
+}
+
+.Wager {
+  @extend .TitleCase;
+  // font-size: 1.2rem;
+  // height: 1.5em;
+  // white-space: nowrap;
+  // overflow: hidden;
+  // margin: auto;
 }
 
 .ChancesBar {
@@ -1140,6 +1157,10 @@ td {
 }
 .ui.table td.warning, .ui.table tr.warning {
   @extend .Warning;
+}
+.ui.table td {
+  @extend .TableCell;
+  padding: 0.5em;
 }
 .ui.selectable.table tbody tr:hover {
   color: $color-text!important;

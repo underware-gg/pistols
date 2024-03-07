@@ -4,7 +4,7 @@ import { useDojoAccount } from '@/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
-import { AccountShort } from '@/pistols/components/ui/Account'
+import { AccountShort } from '@/pistols/components/account/Account'
 
 const Row = Grid.Row
 const Col = Grid.Column
