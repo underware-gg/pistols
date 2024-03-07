@@ -85,8 +85,8 @@ function ChallengeTableByIds({
           <HeaderCell>Challenger</HeaderCell>
           <HeaderCell width={1}></HeaderCell>
           <HeaderCell>Challenged</HeaderCell>
-          <HeaderCell width={2} textAlign='center'>State</HeaderCell>
-          <HeaderCell width={4} textAlign='center'>Time</HeaderCell>
+          <HeaderCell width={3} textAlign='center'>State</HeaderCell>
+          <HeaderCell width={3} textAlign='center'>Time</HeaderCell>
         </Table.Row>
       </Table.Header>
 

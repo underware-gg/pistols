@@ -50,7 +50,10 @@ export function createTypedMessage(messages: BigNumberish[]): TypedData {
 }
 
 
-
+//
+// based on:
+// https://github.com/dojoengine/dojo.js/blob/main/packages/core/src/provider/DojoProvider.ts#L157
+//
 export async function execute(
   account: Account | AccountInterface,
   contractAddress: string,
@@ -59,7 +62,7 @@ export async function execute(
   transactionDetails?: InvocationsDetails | undefined
 ): Promise<InvokeFunctionResponse> {
   try {
-    const nonce = await account?.getNonce();
+    const nonce = await account?.getNonce()
     return await account?.execute(
       [
         {
@@ -74,9 +77,9 @@ export async function execute(
         ...transactionDetails,
         nonce,
       }
-    );
+    )
   } catch (error) {
-    this.logger.error("Error occured: ", error);
-    throw error;
+    this.logger.error("Error occured: ", error)
+    throw error
   }
 }

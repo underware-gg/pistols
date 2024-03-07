@@ -2,17 +2,21 @@ import { Icon } from 'semantic-ui-react'
 import { useFaucet } from './useFaucet'
 
 export const LordsFaucet = () => {
-  const { isPending, faucet } = useFaucet();
- 
+  const { faucet, hasFaucet, isPending } = useFaucet()
+
   const onClick = () => {
-    if(isPending) return
-    faucet();
+    if (isPending) return
+    faucet()
+  }
+
+  if (!hasFaucet) {
+    return <></>
   }
 
   return (
     <>
       {/* <Icon name='add' /> */}
-      [<span className='Anchor Important' onClick={onClick} >faucet</span>]
+      [<span className='Anchor Important' onClick={onClick}>free money</span>]
     </>
-  );
-};
+  )
+}

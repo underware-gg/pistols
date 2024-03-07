@@ -25,10 +25,19 @@ dojo = { git = "https://github.com/dojoengine/dojo.git", tag = "v0.5.1" }
 token = { git = "https://github.com/dojoengine/origami", tag = "v0.5.1" }
 
 
-[[target.dojo]]
-
 [tool.dojo]
 initializer_class_hash = "0xbeef"
+
+[[target.dojo]]
+build-external-contracts = [
+    "token::components::security::initializable::initializable_model",
+    "token::components::token::erc20::erc20_metadata::erc_20_metadata_model",
+    "token::components::token::erc20::erc20_balance::erc_20_balance_model",
+    "token::components::token::erc20::erc20_allowance::erc_20_allowance_model",
+    "token::components::token::erc20::erc20_mintable::erc_20_mintable_model",
+    "token::components::token::erc20::erc20_burnable::erc_20_burnable_model",
+    "token::components::token::erc20::erc20_bridgeable::erc_20_bridgeable_model",
+]
 
 [tool.dojo.env]
 world_address = "0x269c58e5fa1e7f6fe3756f1de88ecdfab7d03ba67e79ba0365b4ef1e81155be"

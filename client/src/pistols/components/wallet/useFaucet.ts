@@ -2,22 +2,30 @@ import { useDojo, useDojoAccount } from '@/dojo/DojoContext'
 import { useConfig } from '@/pistols/hooks/useConfig'
 import { execute } from '@/pistols/utils/starknet'
 import { bigintToHex } from '@/pistols/utils/utils'
-import { useCallback, useState } from 'react'
+import { getContractByName } from '@dojoengine/core'
+import { useCallback, useMemo, useState } from 'react'
 
 export interface FaucetExecuteResult {
   hash: string
 }
 
 export interface FaucetInterface {
-  faucet: () => Promise<FaucetExecuteResult>
+  faucet: () => Promise<FaucetExecuteResult> | null
+  hasFaucet: boolean
   isPending: boolean
   error?: string
 }
 
 export const useFaucet = (): FaucetInterface => {
-  // const { dojoProvider } = useDojo()
+  const { dojoProvider } = useDojo()
   const { account } = useDojoAccount()
   const { lordsAddress } = useConfig()
+
+  const mockAddress = useMemo(() => {
+    const mockContract = getContractByName(dojoProvider.manifest, 'lords_mock')
+    return BigInt(mockContract?.address ?? 0)
+  }, [dojoProvider])
+  const hasFaucet = (mockAddress && mockAddress == BigInt(lordsAddress))
 
   const [isPending, setIsPending] = useState(false)
   const [error, setError] = useState<string | undefined>(undefined)
@@ -30,9 +38,7 @@ export const useFaucet = (): FaucetInterface => {
 
       let tx, receipt
       try {
-        // tx = await execute(account!, 'lords_mock::lords_mock::lords_mock::LordsMockFaucetImpl', 'faucet', [])
-        tx = await execute(account!, bigintToHex(lordsAddress), 'faucet', [])
-
+        tx = await dojoProvider.execute(account!, 'lords_mock', 'faucet', [])
         receipt = await account!.waitForTransaction(tx.transaction_hash, {
           retryInterval: 200,
         })
@@ -60,10 +66,10 @@ export const useFaucet = (): FaucetInterface => {
   )
 
   return {
-    faucet,
-    //
-    error,
+    faucet: hasFaucet ? faucet : null,
+    hasFaucet,
     isPending,
+    error,
   }
 }
 

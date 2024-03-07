@@ -6,16 +6,6 @@ set -e
 #
 export WORLD_ADDRESS=$(toml get Scarb.toml --raw tool.dojo.env.world_address)
 export RPC_URL=$(toml get Scarb.toml --raw tool.dojo.env.rpc_url)
-export LORDS_ADDRESS=$(toml get Scarb.toml --raw tool.dojo.env.lords_address)
-
-#-----------------
-# if $LORDS is not defined, we need to mock it
-#
-if [[ -z "$LORDS_ADDRESS" ]]; then
-  cd ../lords_mock
-  ./migrate
-  cd -
-fi
 
 #-----------------
 # migrate

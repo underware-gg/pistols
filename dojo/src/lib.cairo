@@ -36,3 +36,7 @@ mod tests {
     mod test_duelist;
     mod test_challenge;
 }
+
+mod mocks {
+    mod lords_mock;
+}

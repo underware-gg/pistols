@@ -15,14 +15,16 @@ export WORLD_ADDRESS=$(toml get Scarb.toml --raw tool.dojo.env.world_address)
 export ADMIN_ADDRESS=$(cat ./target/dev/manifest.json | jq -r '.contracts[] | select(.name == "pistols::systems::admin::admin" ).address')
 export ACTIONS_ADDRESS=$(cat ./target/dev/manifest.json | jq -r '.contracts[] | select(.name == "pistols::systems::actions::actions" ).address')
 
-export LORDS_ADDRESS=$(toml get Scarb.toml --raw tool.dojo.env.lords_address)
-if [[ -z "$LORDS_ADDRESS" ]]; then
-  echo "* use mocked \$LORDS 👑"
-  export LORDS_ADDRESS=$(cat ../lords_mock/target/dev/manifest.json | jq -r '.contracts[] | select(.name == "lords_mock::lords_mock::lords_mock" ).address')
-fi
-
 export ADMIN_COMPONENTS=("Config")
 export GAME_COMPONENTS=("Duelist" "Challenge" "Pact" "Shot" "Round")
+
+# Use mocked Lords if lords_address not defined in Scarb
+export LORDS_ADDRESS=$(toml get Scarb.toml --raw tool.dojo.env.lords_address)
+if [[ -z "$LORDS_ADDRESS" ]]; then
+  echo "* using mock \$LORDS 👑"
+  export LORDS_ADDRESS=$(cat ./target/dev/manifest.json | jq -r '.contracts[] | select(.name == "pistols::mocks::lords_mock::lords_mock" ).address')
+  export LORDS_COMPONENTS=("ERC20MetadataModel" "ERC20BalanceModel" "ERC20AllowanceModel" "ERC20BridgeableModel")
+fi
 
 echo "------------------------------------------------------------------------------"
 echo "sozo auth writer"
@@ -31,9 +33,10 @@ echo "account    : $ACCOUNT_ADDRESS"
 echo "world      : $WORLD_ADDRESS"
 echo "admin      : $ADMIN_ADDRESS"
 echo "actions    : $ACTIONS_ADDRESS"
+echo "\$LORDS     : $LORDS_ADDRESS"
 echo "admin comps: ${ADMIN_COMPONENTS[*]}"
 echo "game comps : ${GAME_COMPONENTS[*]}"
-echo "\$LORDS     : $LORDS_ADDRESS"
+echo "lords comps: ${LORDS_COMPONENTS[*]}"
 echo "------------------------------------------------------------------------------"
 
 echo "* Game auth..."
@@ -48,7 +51,20 @@ for component in ${ADMIN_COMPONENTS[@]}; do
   sleep $TX_SLEEP
 done
 
-echo "* Initializing..."
+# Mocked Lords
+if [[ ! -z "$LORDS_COMPONENTS" ]]; then
+  echo "* Mock Lords auth..."
+  for component in ${LORDS_COMPONENTS[@]}; do
+    sozo auth writer --world $WORLD_ADDRESS --rpc-url $RPC_URL $component $LORDS_ADDRESS --account-address $ACCOUNT_ADDRESS
+    sleep $TX_SLEEP
+  done
+  
+  echo "* Initializing Mock Lords..."
+  sozo execute $LORDS_ADDRESS initializer > /dev/null || true
+  sleep $TX_SLEEP
+fi
+
+echo "* Initializing Game World..."
 sozo execute $ADMIN_ADDRESS initialize --calldata $LORDS_ADDRESS
 sleep $TX_SLEEP
 
