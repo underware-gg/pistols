@@ -1,7 +1,7 @@
 import { getEvents, setComponentsFromEvents, decodeComponent } from '@dojoengine/utils'
 import { SetupNetworkResult } from './setupNetwork'
-import { stringToFelt } from '@/pistols/utils/starknet'
-import { Account } from 'starknet'
+import { ethToWei, splitU256, stringToFelt } from '@/pistols/utils/starknet'
+import { Account, BigNumberish } from 'starknet'
 import { emitter } from '@/pistols/three/game'
 
 
@@ -51,8 +51,9 @@ export function createSystemCalls(
     return await _executeTransaction(signer, 'register_duelist', args)
   }
 
-  const create_challenge = async (signer: Account, challenged: bigint, message: string, wager_coin: number, wager_value: number, expire_seconds: number): Promise<boolean> => {
-    const args = [challenged, stringToFelt(message), wager_coin, wager_value, expire_seconds]
+  const create_challenge = async (signer: Account, challenged: bigint, message: string, wager_coin: number, wager_value: BigNumberish, expire_seconds: number): Promise<boolean> => {
+    const wei = splitU256(ethToWei(wager_value))
+    const args = [challenged, stringToFelt(message), wager_coin, wei.low, wei.high, expire_seconds]
     return await _executeTransaction(signer, 'create_challenge', args)
   }
 

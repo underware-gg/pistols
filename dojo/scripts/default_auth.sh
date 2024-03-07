@@ -15,8 +15,8 @@ export WORLD_ADDRESS=$(toml get Scarb.toml --raw tool.dojo.env.world_address)
 export ADMIN_ADDRESS=$(cat ./target/dev/manifest.json | jq -r '.contracts[] | select(.name == "pistols::systems::admin::admin" ).address')
 export ACTIONS_ADDRESS=$(cat ./target/dev/manifest.json | jq -r '.contracts[] | select(.name == "pistols::systems::actions::actions" ).address')
 
-export ADMIN_COMPONENTS=("Config")
-export GAME_COMPONENTS=("Duelist" "Challenge" "Pact" "Shot" "Round")
+export ADMIN_COMPONENTS=("Config", "Coin")
+export GAME_COMPONENTS=("Duelist" "Challenge" "Wager" "Pact" "Shot" "Round")
 
 # Use mocked Lords if lords_address not defined in Scarb
 export LORDS_ADDRESS=$(toml get Scarb.toml --raw tool.dojo.env.lords_address)
@@ -65,9 +65,7 @@ if [[ ! -z "$LORDS_COMPONENTS" ]]; then
 fi
 
 echo "* Initializing Game World..."
-sozo execute $ADMIN_ADDRESS initialize --calldata 0x0 > /dev/null || true
-sleep $TX_SLEEP
-sozo execute $ADMIN_ADDRESS set_coin --calldata 0x1,$LORDS_ADDRESS,0x4,0xa
+sozo execute $ADMIN_ADDRESS initialize --calldata 0x0,$LORDS_ADDRESS > /dev/null || true
 sleep $TX_SLEEP
 
 echo "* All set! 👍"

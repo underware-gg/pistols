@@ -1,9 +1,10 @@
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { useLordsBalance } from './useLordsBalance'
 
-export const LordsBalance = () => {
-  const { account } = useDojoAccount()
-  const { balance, formatted } = useLordsBalance(account.address)
+export const LordsBalance = ({
+  address
+}) => {
+  const { balance, formatted } = useLordsBalance(address)
 
   return (
     <div>

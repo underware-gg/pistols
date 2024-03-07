@@ -86,9 +86,9 @@ mod utils {
     //
 
     // ::admin
-    fn execute_initialize(system: IAdminDispatcher, sender: ContractAddress, treasury_address: ContractAddress) {
+    fn execute_initialize(system: IAdminDispatcher, sender: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress) {
         testing::set_contract_address(sender);
-        system.initialize(treasury_address);
+        system.initialize(treasury_address, lords_address);
         _next_block();
     }
     fn execute_set_treasury(system: IAdminDispatcher, sender: ContractAddress, treasury_address: ContractAddress) {
@@ -101,9 +101,14 @@ mod utils {
         system.set_paused(paused);
         _next_block();
     }
-    fn execute_set_coin(system: IAdminDispatcher, sender: ContractAddress, coin_key: u8, contract_address: ContractAddress, fee_min: u8, fee_pct: u8) {
+    fn execute_set_coin(system: IAdminDispatcher, sender: ContractAddress, coin_key: u8, contract_address: ContractAddress, fee_min: u256, fee_pct: u8, enabled: bool) {
         testing::set_contract_address(sender);
-        system.set_coin(coin_key, contract_address, fee_min, fee_pct);
+        system.set_coin(coin_key, contract_address, fee_min, fee_pct, enabled);
+        _next_block();
+    }
+    fn execute_enable_coin(system: IAdminDispatcher, sender: ContractAddress, coin_key: u8, enabled: bool) {
+        testing::set_contract_address(sender);
+        system.enable_coin(coin_key, enabled);
         _next_block();
     }
 
@@ -119,7 +124,7 @@ mod utils {
         challenged: ContractAddress,
         message: felt252,
         wager_coin: u8,
-        wager_value: u32,
+        wager_value: u256,
         expire_seconds: u64,
     ) -> u128 {
         testing::set_contract_address(sender);

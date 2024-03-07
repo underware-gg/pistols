@@ -7,14 +7,17 @@ mod coins {
     const COUNT: u8 = 1;
 }
 
+const ETH_TO_WEI: u256 = 1_000_000_000_000_000_000;
+
 #[derive(Model, Copy, Drop, Serde)]
 struct Coin {
     #[key]
     key: u8,
     //------
     contract_address: ContractAddress,
-    fee_min: u8,
+    fee_min: u256,
     fee_pct: u8,
+    enabled: bool,
 }
 
 #[derive(Copy, Drop)]

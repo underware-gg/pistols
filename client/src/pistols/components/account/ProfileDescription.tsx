@@ -5,6 +5,8 @@ import { AccountShort } from '@/pistols/components/account/Account'
 import { EMOJI } from '@/pistols/data/messages'
 import { LordsBalance } from '../wallet/LordsBalance'
 import { LordsFaucet } from '../wallet/LordsFaucet'
+import { useDojoAccount } from '@/dojo/DojoContext'
+import { bigintEquals } from '@/pistols/utils/utils'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -27,6 +29,8 @@ export function ProfileDescription({
   displayBalance = false,
 }) {
   const { total_wins, total_losses, total_draws, total_duels, total_honour, honourAndTotal } = useDuelist(address)
+  const { account } = useDojoAccount()
+  const isYou = useMemo(() => bigintEquals(address, account.address), [address, account])
   return (
     <Grid columns='equal'>
       <Row>
@@ -35,7 +39,10 @@ export function ProfileDescription({
           <h1><ProfileName address={address} /></h1>
           {displayAddress && <AccountShort address={address} />}
           <h3 className='Important'>Honour: {honourAndTotal}</h3>
-          {displayBalance && <><h3><LordsBalance /></h3><LordsFaucet /></>}
+          {displayBalance && <>
+            <h3><LordsBalance address={address} /></h3>
+            {isYou && <LordsFaucet />}
+          </>}
         </Col>
 
         {displayStats && total_duels > 0 &&

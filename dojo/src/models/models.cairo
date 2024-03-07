@@ -29,8 +29,6 @@ struct Challenge {
     duelist_a: ContractAddress, // Challenger
     duelist_b: ContractAddress, // Challenged
     message: felt252,           // message to challenged
-    wager_coin: u8,             // wager coin, if any
-    wager_value: u32,           // wager value (integer), if any
     // progress and results
     state: u8,                  // actually a ChallengeState
     round_number: u8,           // current or final
@@ -39,6 +37,18 @@ struct Challenge {
     timestamp_start: u64,       // Unix time, started
     timestamp_end: u64,         // Unix time, ended
 } // f + f + f + 152 bits
+
+//
+// Challenge wager (optional)
+#[derive(Model, Copy, Drop, Serde)]
+struct Wager {
+    #[key]
+    duel_id: u128,
+    //------------
+    coin: u8,
+    value: u256,
+    fee: u256,
+}
 
 //
 // Current challenge between two Duelists

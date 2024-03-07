@@ -7,11 +7,11 @@ export function defineContractComponents(world: World) {
 	  Coin: (() => {
 	    return defineComponent(
 	      world,
-	      { key: RecsType.Number, contract_address: RecsType.BigInt, fee_min: RecsType.Number, fee_pct: RecsType.Number },
+	      { key: RecsType.Number, contract_address: RecsType.BigInt, fee_min: RecsType.BigInt, fee_pct: RecsType.Number, enabled: RecsType.Boolean },
 	      {
 	        metadata: {
 	          name: "Coin",
-	          types: ["u8","contractaddress","u8","u8"],
+	          types: ["u8","contractaddress","u256","u8","bool"],
 	          customTypes: [],
 	        },
 	      }
@@ -33,11 +33,11 @@ export function defineContractComponents(world: World) {
 	  Challenge: (() => {
 	    return defineComponent(
 	      world,
-	      { duel_id: RecsType.BigInt, duelist_a: RecsType.BigInt, duelist_b: RecsType.BigInt, message: RecsType.BigInt, wager_coin: RecsType.Number, wager_value: RecsType.Number, state: RecsType.Number, round_number: RecsType.Number, winner: RecsType.Number, timestamp_start: RecsType.Number, timestamp_end: RecsType.Number },
+	      { duel_id: RecsType.BigInt, duelist_a: RecsType.BigInt, duelist_b: RecsType.BigInt, message: RecsType.BigInt, state: RecsType.Number, round_number: RecsType.Number, winner: RecsType.Number, timestamp_start: RecsType.Number, timestamp_end: RecsType.Number },
 	      {
 	        metadata: {
 	          name: "Challenge",
-	          types: ["u128","contractaddress","contractaddress","felt252","u8","u32","u8","u8","u8","u64","u64"],
+	          types: ["u128","contractaddress","contractaddress","felt252","u8","u8","u8","u64","u64"],
 	          customTypes: [],
 	        },
 	      }
@@ -78,6 +78,19 @@ export function defineContractComponents(world: World) {
 	          name: "Round",
 	          types: ["u128","u8","u8","u64","u64","u16","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u64","u64","u16","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8"],
 	          customTypes: ["Shot","Shot"],
+	        },
+	      }
+	    );
+	  })(),
+	  Wager: (() => {
+	    return defineComponent(
+	      world,
+	      { duel_id: RecsType.BigInt, coin: RecsType.Number, value: RecsType.BigInt, fee: RecsType.BigInt },
+	      {
+	        metadata: {
+	          name: "Wager",
+	          types: ["u128","u8","u256","u256"],
+	          customTypes: [],
 	        },
 	      }
 	    );

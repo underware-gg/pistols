@@ -13,6 +13,7 @@ import { AccountShort } from '@/pistols/components/account/Account'
 import { DuelIconsAsGrid } from '@/pistols/components/DuelIcons'
 import { ChallengeTime } from './ChallengeTime'
 import { Wager } from './account/Wager'
+import { useWager } from '../hooks/useWager'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -25,7 +26,8 @@ export default function ChallengeModal() {
 
   const { duelId, dispatchSelectDuel, dispatchSelectDuelist } = usePistolsContext()
 
-  const { state, message, duelistA, duelistB, wagerCoin, wagerValue, isLive, isFinished, isAwaiting } = useChallenge(duelId)
+  const { state, message, duelistA, duelistB, isLive, isFinished, isAwaiting } = useChallenge(duelId)
+  const { coin, value } = useWager(duelId)
 
   const { challengeDescription } = useChallengeDescription(duelId)
 
@@ -101,8 +103,8 @@ export default function ChallengeModal() {
             <Row columns='equal' textAlign='center'>
               <Col>
                 <h3 className='Quote'>{`“${message}”`}</h3>
-                {wagerValue > 0 &&
-                  <h3><Wager coin={wagerCoin} value={wagerValue} /></h3>
+                {value > 0 &&
+                  <h3><Wager coin={coin} wei={value} /></h3>
                 }
               </Col>
             </Row>

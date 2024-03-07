@@ -18,7 +18,7 @@ trait IActions<TContractState> {
         challenged: ContractAddress,
         message: felt252,
         wager_coin: u8,
-        wager_value: u32,
+        wager_value: u256,
         expire_seconds: u64,
     ) -> u128;
     fn reply_challenge(self: @TContractState,
@@ -66,10 +66,12 @@ mod actions {
     use traits::{Into, TryInto};
     use starknet::{ContractAddress, get_block_timestamp, get_block_info};
 
-    use pistols::models::models::{Duelist, Challenge, Pact, Round, Shot};
+    use pistols::models::models::{Duelist, Challenge, Wager, Pact, Round, Shot};
+    use pistols::models::coins::{Coin, CoinManager, CoinManagerTrait, ETH_TO_WEI};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::utils::timestamp::{timestamp};
+    use pistols::utils::math::{MathU256};
     use pistols::systems::seeder::{make_seed};
     use pistols::systems::shooter::{shooter};
     use pistols::systems::{utils};
@@ -109,7 +111,7 @@ mod actions {
             challenged: ContractAddress,
             message: felt252,
             wager_coin: u8,
-            wager_value: u32,
+            wager_value: u256,
             expire_seconds: u64,
         ) -> u128 {
             let world: IWorldDispatcher = self.world_dispatcher.read();
@@ -125,10 +127,28 @@ mod actions {
             //     assert(utils::duelist_exist(world, caller), 'Challenged is not registered');
             // }
 
-            assert(wager_coin == 0 || wager_coin == 1, 'Invalid wager coin');
-
+            // create duel id
             // let duel_id: u32 = world.uuid();
             let duel_id: u128 = make_seed(caller);
+
+            // setup wager
+            if (wager_coin > 0 && wager_value > 0) {
+                let manager = CoinManagerTrait::new(self.world());
+                assert(manager.exists(wager_coin), 'Invalid coin');
+                let mut coin = manager.get(wager_coin);
+                assert(coin.enabled == true, 'Coin disabled');
+                // calc fee and store
+                let fee: u256 = MathU256::max(coin.fee_min, (wager_value / 100) * coin.fee_pct.into());
+                let wager = Wager {
+                    duel_id,
+                    coin: wager_coin,
+                    value: wager_value,
+                    fee,
+                };
+                set!(world, (wager));
+            }
+
+            // calc expiration
             let timestamp_start: u64 = get_block_timestamp();
             let timestamp_end: u64 = if (expire_seconds == 0) { 0 } else { timestamp_start + expire_seconds };
 
@@ -137,8 +157,6 @@ mod actions {
                 duelist_a: caller,
                 duelist_b: challenged,
                 message,
-                wager_coin,
-                wager_value: if (wager_coin == 0) { 0 } else { wager_value },
                 // progress
                 state: ChallengeState::Awaiting.into(),
                 round_number: 0,

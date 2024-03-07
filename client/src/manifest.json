@@ -1519,7 +1519,7 @@
     {
       "name": "pistols::systems::actions::actions",
       "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
-      "class_hash": "0x2c2c5b549462fe5dab7720dee29a791aa0d5f1b9005d1241bc6c1af6b5134c4",
+      "class_hash": "0x1389c7e1db97bd342304be6e42ef8f5bb60e0af1e1109fee942229419f374f8",
       "abi": [
         {
           "type": "impl",
@@ -1579,6 +1579,20 @@
           "type": "impl",
           "name": "ActionsImpl",
           "interface_name": "pistols::systems::actions::IActions"
+        },
+        {
+          "type": "struct",
+          "name": "core::integer::u256",
+          "members": [
+            {
+              "name": "low",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "high",
+              "type": "core::integer::u128"
+            }
+          ]
         },
         {
           "type": "enum",
@@ -1670,7 +1684,7 @@
                 },
                 {
                   "name": "wager_value",
-                  "type": "core::integer::u32"
+                  "type": "core::integer::u256"
                 },
                 {
                   "name": "expire_seconds",
@@ -2049,7 +2063,7 @@
     {
       "name": "pistols::systems::admin::admin",
       "address": "0x32c88d8593a215bac188af1cc576cf4b0704edb8d9c79ea12ccd695b7c33b81",
-      "class_hash": "0x1b0b11df4ba37b9b108ca230ecf49d96d63554946eafcfa2758d024d045ce38",
+      "class_hash": "0x7917a7433294ff38cf66af36fb3d68043f8400e3b953d7a6cd1e7f6307a9439",
       "abi": [
         {
           "type": "impl",
@@ -2126,6 +2140,20 @@
         },
         {
           "type": "struct",
+          "name": "core::integer::u256",
+          "members": [
+            {
+              "name": "low",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "high",
+              "type": "core::integer::u128"
+            }
+          ]
+        },
+        {
+          "type": "struct",
           "name": "pistols::models::config::Config",
           "members": [
             {
@@ -2160,11 +2188,15 @@
             },
             {
               "name": "fee_min",
-              "type": "core::integer::u8"
+              "type": "core::integer::u256"
             },
             {
               "name": "fee_pct",
               "type": "core::integer::u8"
+            },
+            {
+              "name": "enabled",
+              "type": "core::bool"
             }
           ]
         },
@@ -2178,6 +2210,10 @@
               "inputs": [
                 {
                   "name": "treasury_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "lords_address",
                   "type": "core::starknet::contract_address::ContractAddress"
                 }
               ],
@@ -2222,11 +2258,31 @@
                 },
                 {
                   "name": "fee_min",
-                  "type": "core::integer::u8"
+                  "type": "core::integer::u256"
                 },
                 {
                   "name": "fee_pct",
                   "type": "core::integer::u8"
+                },
+                {
+                  "name": "enabled",
+                  "type": "core::bool"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "enable_coin",
+              "inputs": [
+                {
+                  "name": "coin_key",
+                  "type": "core::integer::u8"
+                },
+                {
+                  "name": "enabled",
+                  "type": "core::bool"
                 }
               ],
               "outputs": [],
@@ -2342,16 +2398,21 @@
         },
         {
           "name": "fee_min",
-          "type": "u8",
+          "type": "u256",
           "key": false
         },
         {
           "name": "fee_pct",
           "type": "u8",
           "key": false
+        },
+        {
+          "name": "enabled",
+          "type": "bool",
+          "key": false
         }
       ],
-      "class_hash": "0x47d7cce7b8b0dbe923e52a6daf2bdf957116db2c2d9314b63dfe1874d562cb8",
+      "class_hash": "0x36dbfad1fb10dea856b3ca9023addcef9aae17423d99e718fe794f3c1999ef8",
       "abi": [
         {
           "type": "impl",
@@ -2524,6 +2585,34 @@
         },
         {
           "type": "struct",
+          "name": "core::integer::u256",
+          "members": [
+            {
+              "name": "low",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "high",
+              "type": "core::integer::u128"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::bool",
+          "variants": [
+            {
+              "name": "False",
+              "type": "()"
+            },
+            {
+              "name": "True",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "struct",
           "name": "pistols::models::coins::Coin",
           "members": [
             {
@@ -2536,11 +2625,15 @@
             },
             {
               "name": "fee_min",
-              "type": "core::integer::u8"
+              "type": "core::integer::u256"
             },
             {
               "name": "fee_pct",
               "type": "core::integer::u8"
+            },
+            {
+              "name": "enabled",
+              "type": "core::bool"
             }
           ]
         },
@@ -2851,16 +2944,6 @@
           "key": false
         },
         {
-          "name": "wager_coin",
-          "type": "u8",
-          "key": false
-        },
-        {
-          "name": "wager_value",
-          "type": "u32",
-          "key": false
-        },
-        {
           "name": "state",
           "type": "u8",
           "key": false
@@ -2886,7 +2969,7 @@
           "key": false
         }
       ],
-      "class_hash": "0x4d780ef55f376901e41276fcac8496f5cbb8e40c1ccab35b63400d027f73914",
+      "class_hash": "0x55dbc146cb3e3458130f0f9ab6ebd917df73ee93eb3087de9b5b898a8b7b60f",
       "abi": [
         {
           "type": "impl",
@@ -3076,14 +3159,6 @@
             {
               "name": "message",
               "type": "core::felt252"
-            },
-            {
-              "name": "wager_coin",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "wager_value",
-              "type": "core::integer::u32"
             },
             {
               "name": "state",
@@ -3960,6 +4035,263 @@
         {
           "type": "event",
           "name": "pistols::models::models::round::Event",
+          "kind": "enum",
+          "variants": []
+        }
+      ]
+    },
+    {
+      "name": "pistols::models::models::wager",
+      "members": [
+        {
+          "name": "duel_id",
+          "type": "u128",
+          "key": true
+        },
+        {
+          "name": "coin",
+          "type": "u8",
+          "key": false
+        },
+        {
+          "name": "value",
+          "type": "u256",
+          "key": false
+        },
+        {
+          "name": "fee",
+          "type": "u256",
+          "key": false
+        }
+      ],
+      "class_hash": "0xedd44b8b8010f8268df169b31674e70da7cf6a7edfbb24c70039cf7ac37533",
+      "abi": [
+        {
+          "type": "impl",
+          "name": "DojoModelImpl",
+          "interface_name": "dojo::model::IDojoModel"
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::integer::u8>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::integer::u8>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::felt252>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::felt252>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::array::Span::<core::felt252>>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::Struct",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "children",
+              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<(core::felt252, core::array::Span::<core::felt252>)>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::Enum",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "children",
+              "type": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "dojo::database::introspect::Ty",
+          "variants": [
+            {
+              "name": "Primitive",
+              "type": "core::felt252"
+            },
+            {
+              "name": "Struct",
+              "type": "dojo::database::introspect::Struct"
+            },
+            {
+              "name": "Enum",
+              "type": "dojo::database::introspect::Enum"
+            },
+            {
+              "name": "Tuple",
+              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::model::IDojoModel",
+          "items": [
+            {
+              "type": "function",
+              "name": "name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::felt252"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "unpacked_size",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u32"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "packed_size",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u32"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "layout",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::array::Span::<core::integer::u8>"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "schema",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "dojo::database::introspect::Ty"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "wagerImpl",
+          "interface_name": "pistols::models::models::Iwager"
+        },
+        {
+          "type": "struct",
+          "name": "core::integer::u256",
+          "members": [
+            {
+              "name": "low",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "high",
+              "type": "core::integer::u128"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "pistols::models::models::Wager",
+          "members": [
+            {
+              "name": "duel_id",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "coin",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "value",
+              "type": "core::integer::u256"
+            },
+            {
+              "name": "fee",
+              "type": "core::integer::u256"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "pistols::models::models::Iwager",
+          "items": [
+            {
+              "type": "function",
+              "name": "ensure_abi",
+              "inputs": [
+                {
+                  "name": "model",
+                  "type": "pistols::models::models::Wager"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "pistols::models::models::wager::Event",
           "kind": "enum",
           "variants": []
         }

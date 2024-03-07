@@ -11,6 +11,7 @@ import { ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { DuelIconsAsRow } from '@/pistols/components/DuelIcons'
 import { Wager } from '@/pistols/components/account/Wager'
+import { useWager } from '../hooks/useWager'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -115,9 +116,10 @@ function DuelItem({
   address,
 }) {
   const {
-    challenge: { duelistA, duelistB, state, isLive, isCanceled, isExpired, isDraw, winner, timestamp_start, wagerCoin, wagerValue },
+    challenge: { duelistA, duelistB, state, isLive, isCanceled, isExpired, isDraw, winner, timestamp_start },
     turnA, turnB,
   } = useDuel(duelId)
+  const { coin, value } = useWager(duelId)
   const { profilePic: profilePicA } = useDuelist(duelistA)
   const { profilePic: profilePicB } = useDuelist(duelistB)
 
@@ -166,18 +168,18 @@ function DuelItem({
 
       <Cell textAlign='center' className='Result'>
         {state == ChallengeState.Resolved ?
-        <>
+          <>
             <PositiveResult positive={true}>
-              <ProfileName address={winnerIsA ? duelistA : duelistB} badges={false} />{!wagerValue && <><br />Wins</>}
+              <ProfileName address={winnerIsA ? duelistA : duelistB} badges={false} />{!value && <><br />Wins</>}
             </PositiveResult>
-         <Wager coin={wagerCoin} value={wagerValue} />
-        </>
+            <Wager coin={coin} wei={value} />
+          </>
           :
           <>
             <span className={ChallengeStateClasses[state]}>
               {ChallengeStateNames[state]}
             </span>
-            <Wager coin={wagerCoin} value={wagerValue} />
+            <Wager coin={coin} wei={value} />
           </>
         }
       </Cell>

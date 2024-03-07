@@ -10,11 +10,12 @@ use pistols::models::coins::{Coin};
 
 #[starknet::interface]
 trait IAdmin<TContractState> {
-    fn initialize(self: @TContractState, treasury_address: ContractAddress);
+    fn initialize(self: @TContractState, treasury_address: ContractAddress, lords_address: ContractAddress);
     
     fn set_treasury(self: @TContractState, treasury_address: ContractAddress);
     fn set_paused(self: @TContractState, paused: bool);
-    fn set_coin(self: @TContractState, coin_key: u8, contract_address: ContractAddress, fee_min: u8, fee_pct: u8);
+    fn set_coin(self: @TContractState, coin_key: u8, contract_address: ContractAddress, fee_min: u256, fee_pct: u8, enabled: bool);
+    fn enable_coin(self: @TContractState, coin_key: u8, enabled: bool);
     
     fn get_config(self: @TContractState) -> Config;
     fn get_coin(self: @TContractState, coin_key: u8) -> Coin;
@@ -27,12 +28,12 @@ mod admin {
     use starknet::{get_caller_address, get_contract_address};
 
     use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
-    use pistols::models::coins::{Coin, CoinManager, CoinManagerTrait};
+    use pistols::models::coins::{Coin, CoinManager, CoinManagerTrait, coins, ETH_TO_WEI};
     use pistols::systems::{utils};
 
     #[abi(embed_v0)]
     impl AdminExternalImpl of super::IAdmin<ContractState> {
-        fn initialize(self: @ContractState, treasury_address: ContractAddress) {
+        fn initialize(self: @ContractState, treasury_address: ContractAddress, lords_address: ContractAddress) {
             self.assert_caller_is_owner();
             let manager = ConfigManagerTrait::new(self.world());
             let mut config = manager.get();
@@ -43,6 +44,16 @@ mod admin {
             manager.set(config);
             // set treasury
             self.set_treasury(treasury_address);
+            // set lords
+            if (lords_address != utils::zero_address()) {
+                self.set_coin(
+                    coins::LORDS,
+                    lords_address,
+                    4 * ETH_TO_WEI,
+                    10,
+                    true,
+                );
+            }
         }
 
         fn set_treasury(self: @ContractState, treasury_address: ContractAddress) {
@@ -65,17 +76,29 @@ mod admin {
             manager.set(config);
         }
 
-        fn set_coin(self: @ContractState, coin_key: u8, contract_address: ContractAddress, fee_min: u8, fee_pct: u8) {
+        fn set_coin(self: @ContractState, coin_key: u8, contract_address: ContractAddress, fee_min: u256, fee_pct: u8, enabled: bool) {
             self.assert_caller_is_owner();
-            // get config
+            // get coin
             let manager = CoinManagerTrait::new(self.world());
             assert(manager.exists(coin_key), 'Invalid coin');
-            let mut config = manager.get(coin_key);
-            // update config
-            config.contract_address = contract_address;
-            config.fee_min = fee_min;
-            config.fee_pct = fee_pct;
-            manager.set(config);
+            let mut coin = manager.get(coin_key);
+            // update coin
+            coin.contract_address = contract_address;
+            coin.fee_min = fee_min;
+            coin.fee_pct = fee_pct;
+            coin.enabled = enabled;
+            manager.set(coin);
+        }
+
+        fn enable_coin(self: @ContractState, coin_key: u8, enabled: bool) {
+            self.assert_caller_is_owner();
+            // get coin
+            let manager = CoinManagerTrait::new(self.world());
+            assert(manager.exists(coin_key), 'Invalid coin');
+            let mut coin = manager.get(coin_key);
+            // update coin
+            coin.enabled = enabled;
+            manager.set(coin);
         }
 
         //
