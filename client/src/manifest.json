@@ -2049,7 +2049,7 @@
     {
       "name": "pistols::systems::admin::admin",
       "address": "0x32c88d8593a215bac188af1cc576cf4b0704edb8d9c79ea12ccd695b7c33b81",
-      "class_hash": "0x7749d7df987b618d0803f18fc62366b30f313573ca9dfaca4b02f1c05762b77",
+      "class_hash": "0x1b0b11df4ba37b9b108ca230ecf49d96d63554946eafcfa2758d024d045ce38",
       "abi": [
         {
           "type": "impl",
@@ -2111,6 +2111,64 @@
           "interface_name": "pistols::systems::admin::IAdmin"
         },
         {
+          "type": "enum",
+          "name": "core::bool",
+          "variants": [
+            {
+              "name": "False",
+              "type": "()"
+            },
+            {
+              "name": "True",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "pistols::models::config::Config",
+          "members": [
+            {
+              "name": "key",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "initialized",
+              "type": "core::bool"
+            },
+            {
+              "name": "paused",
+              "type": "core::bool"
+            },
+            {
+              "name": "treasury_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "pistols::models::coins::Coin",
+          "members": [
+            {
+              "name": "key",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "contract_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "fee_min",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "fee_pct",
+              "type": "core::integer::u8"
+            }
+          ]
+        },
+        {
           "type": "interface",
           "name": "pistols::systems::admin::IAdmin",
           "items": [
@@ -2119,7 +2177,7 @@
               "name": "initialize",
               "inputs": [
                 {
-                  "name": "lords_address",
+                  "name": "treasury_address",
                   "type": "core::starknet::contract_address::ContractAddress"
                 }
               ],
@@ -2128,10 +2186,10 @@
             },
             {
               "type": "function",
-              "name": "set_lords_address",
+              "name": "set_treasury",
               "inputs": [
                 {
-                  "name": "lords_address",
+                  "name": "treasury_address",
                   "type": "core::starknet::contract_address::ContractAddress"
                 }
               ],
@@ -2140,14 +2198,34 @@
             },
             {
               "type": "function",
-              "name": "set_game_fee",
+              "name": "set_paused",
               "inputs": [
                 {
-                  "name": "duel_fee_min",
+                  "name": "paused",
+                  "type": "core::bool"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "set_coin",
+              "inputs": [
+                {
+                  "name": "coin_key",
                   "type": "core::integer::u8"
                 },
                 {
-                  "name": "duel_fee_pct",
+                  "name": "contract_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "fee_min",
+                  "type": "core::integer::u8"
+                },
+                {
+                  "name": "fee_pct",
                   "type": "core::integer::u8"
                 }
               ],
@@ -2156,22 +2234,27 @@
             },
             {
               "type": "function",
-              "name": "get_lords_address",
+              "name": "get_config",
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::starknet::contract_address::ContractAddress"
+                  "type": "pistols::models::config::Config"
                 }
               ],
               "state_mutability": "view"
             },
             {
               "type": "function",
-              "name": "get_game_fee",
-              "inputs": [],
+              "name": "get_coin",
+              "inputs": [
+                {
+                  "name": "coin_key",
+                  "type": "core::integer::u8"
+                }
+              ],
               "outputs": [
                 {
-                  "type": "(core::integer::u8, core::integer::u8)"
+                  "type": "pistols::models::coins::Coin"
                 }
               ],
               "state_mutability": "view"
@@ -2245,6 +2328,249 @@
   ],
   "models": [
     {
+      "name": "pistols::models::coins::coin",
+      "members": [
+        {
+          "name": "key",
+          "type": "u8",
+          "key": true
+        },
+        {
+          "name": "contract_address",
+          "type": "ContractAddress",
+          "key": false
+        },
+        {
+          "name": "fee_min",
+          "type": "u8",
+          "key": false
+        },
+        {
+          "name": "fee_pct",
+          "type": "u8",
+          "key": false
+        }
+      ],
+      "class_hash": "0x47d7cce7b8b0dbe923e52a6daf2bdf957116db2c2d9314b63dfe1874d562cb8",
+      "abi": [
+        {
+          "type": "impl",
+          "name": "DojoModelImpl",
+          "interface_name": "dojo::model::IDojoModel"
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::integer::u8>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::integer::u8>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::felt252>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::felt252>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::array::Span::<core::felt252>>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::Struct",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "children",
+              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<(core::felt252, core::array::Span::<core::felt252>)>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::Enum",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "children",
+              "type": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "dojo::database::introspect::Ty",
+          "variants": [
+            {
+              "name": "Primitive",
+              "type": "core::felt252"
+            },
+            {
+              "name": "Struct",
+              "type": "dojo::database::introspect::Struct"
+            },
+            {
+              "name": "Enum",
+              "type": "dojo::database::introspect::Enum"
+            },
+            {
+              "name": "Tuple",
+              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::model::IDojoModel",
+          "items": [
+            {
+              "type": "function",
+              "name": "name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::felt252"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "unpacked_size",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u32"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "packed_size",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u32"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "layout",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::array::Span::<core::integer::u8>"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "schema",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "dojo::database::introspect::Ty"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "coinImpl",
+          "interface_name": "pistols::models::coins::Icoin"
+        },
+        {
+          "type": "struct",
+          "name": "pistols::models::coins::Coin",
+          "members": [
+            {
+              "name": "key",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "contract_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "fee_min",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "fee_pct",
+              "type": "core::integer::u8"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "pistols::models::coins::Icoin",
+          "items": [
+            {
+              "type": "function",
+              "name": "ensure_abi",
+              "inputs": [
+                {
+                  "name": "model",
+                  "type": "pistols::models::coins::Coin"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "pistols::models::coins::coin::Event",
+          "kind": "enum",
+          "variants": []
+        }
+      ]
+    },
+    {
       "name": "pistols::models::config::config",
       "members": [
         {
@@ -2258,22 +2584,17 @@
           "key": false
         },
         {
-          "name": "lords_address",
+          "name": "paused",
+          "type": "bool",
+          "key": false
+        },
+        {
+          "name": "treasury_address",
           "type": "ContractAddress",
-          "key": false
-        },
-        {
-          "name": "duel_fee_min",
-          "type": "u8",
-          "key": false
-        },
-        {
-          "name": "duel_fee_pct",
-          "type": "u8",
           "key": false
         }
       ],
-      "class_hash": "0x616b3108449e0cd051c8e6316768f7628d84ff7760772f6ca2e3782d0c10e82",
+      "class_hash": "0x71710db9089287e6fc9b9f7c09a503103498bae4253912210de43569defa483",
       "abi": [
         {
           "type": "impl",
@@ -2471,16 +2792,12 @@
               "type": "core::bool"
             },
             {
-              "name": "lords_address",
+              "name": "paused",
+              "type": "core::bool"
+            },
+            {
+              "name": "treasury_address",
               "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
-              "name": "duel_fee_min",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "duel_fee_pct",
-              "type": "core::integer::u8"
             }
           ]
         },

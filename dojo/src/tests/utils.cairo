@@ -8,7 +8,9 @@ mod utils {
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
     use dojo::test_utils::{spawn_test_world, deploy_contract};
 
+    use pistols::systems::admin::{admin, IAdminDispatcher, IAdminDispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
+    use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
     use pistols::types::challenge::{ChallengeState};
     use pistols::types::action::{Action};
     use pistols::models::models::{
@@ -16,6 +18,8 @@ mod utils {
         Challenge, challenge,
         Round, round,
     };
+    use pistols::models::config::{Config, config};
+    use pistols::models::coins::{Coin, coin};
 
     // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
     extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
@@ -29,7 +33,10 @@ mod utils {
     const INITIAL_STEP: u64 = 0x10;
 
     fn setup_world() -> (IWorldDispatcher, IActionsDispatcher, ContractAddress, ContractAddress) {
-        let mut models = array![duelist::TEST_CLASS_HASH, challenge::TEST_CLASS_HASH, round::TEST_CLASS_HASH];
+        let mut models = array![
+            duelist::TEST_CLASS_HASH, challenge::TEST_CLASS_HASH, round::TEST_CLASS_HASH,
+            config::TEST_CLASS_HASH, coin::TEST_CLASS_HASH,
+        ];
         let world: IWorldDispatcher = spawn_test_world(models);
         let contract_address = world.deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
         let owner: ContractAddress = starknet::contract_address_const::<0x111111>();
@@ -38,7 +45,17 @@ mod utils {
         testing::set_contract_address(owner); // this is the CALLER!!
         testing::set_block_number(1);
         testing::set_block_timestamp(INITIAL_TIMESTAMP);
-        (world, IActionsDispatcher { contract_address }, owner, other)
+        (world, IActionsDispatcher{contract_address}, owner, other)
+    }
+
+    fn setup_admin(world: IWorldDispatcher) -> (IAdminDispatcher,) {
+        let contract_address = world.deploy_contract('salt', admin::TEST_CLASS_HASH.try_into().unwrap());
+        (IAdminDispatcher{contract_address},)
+    }
+
+    fn setup_lords(world: IWorldDispatcher) -> (ILordsMockDispatcher,) {
+        let contract_address = world.deploy_contract('salt', lords_mock::TEST_CLASS_HASH.try_into().unwrap());
+        (ILordsMockDispatcher{contract_address},)
     }
 
     fn _next_block() -> (u64, u64) {
@@ -63,6 +80,34 @@ mod utils {
         let block_info = starknet::get_block_info().unbox();
         (block_info.block_timestamp)
     }
+
+    //
+    // execute calls
+    //
+
+    // ::admin
+    fn execute_initialize(system: IAdminDispatcher, sender: ContractAddress, treasury_address: ContractAddress) {
+        testing::set_contract_address(sender);
+        system.initialize(treasury_address);
+        _next_block();
+    }
+    fn execute_set_treasury(system: IAdminDispatcher, sender: ContractAddress, treasury_address: ContractAddress) {
+        testing::set_contract_address(sender);
+        system.set_treasury(treasury_address);
+        _next_block();
+    }
+    fn execute_set_paused(system: IAdminDispatcher, sender: ContractAddress, paused: bool) {
+        testing::set_contract_address(sender);
+        system.set_paused(paused);
+        _next_block();
+    }
+    fn execute_set_coin(system: IAdminDispatcher, sender: ContractAddress, coin_key: u8, contract_address: ContractAddress, fee_min: u8, fee_pct: u8) {
+        testing::set_contract_address(sender);
+        system.set_coin(coin_key, contract_address, fee_min, fee_pct);
+        _next_block();
+    }
+
+    // ::actions
 
     fn execute_register_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic: u8) {
         testing::set_contract_address(sender);
@@ -119,6 +164,7 @@ mod utils {
     // read-only calls
     //
 
+    // ::actions
     fn execute_get_pact(system: IActionsDispatcher, a: ContractAddress, b: ContractAddress) -> u128 {
         let result: u128 = system.get_pact(a, b);
         (result)
@@ -147,6 +193,14 @@ mod utils {
     //
     // getters
     //
+
+    fn get_Config(world: IWorldDispatcher) -> Config {
+        (get!(world, 1, Config))
+    }
+
+    fn get_Coin(world: IWorldDispatcher, coin_key: u8) -> Coin {
+        (get!(world, coin_key, Coin))
+    }
 
     fn get_Duelist(world: IWorldDispatcher, address: ContractAddress) -> Duelist {
         (get!(world, address, Duelist))

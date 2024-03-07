@@ -1,11 +1,7 @@
 use starknet::ContractAddress;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
-mod constants {
-    const PISTOLS_CONFIG_KEY: u8 = 1;
-    const DUEL_FEE_MIN: u8 = 0x5;
-    const DUEL_FEE_PCT: u8 = 0x10;
-}
+const CONFIG_KEY: u8 = 1;
 
 #[derive(Model, Copy, Drop, Serde)]
 struct Config {
@@ -13,9 +9,8 @@ struct Config {
     key: u8,
     //------
     initialized: bool,
-    lords_address: ContractAddress,
-    duel_fee_min: u8,
-    duel_fee_pct: u8,
+    paused: bool,
+    treasury_address: ContractAddress,
 }
 
 #[derive(Copy, Drop)]
@@ -30,7 +25,7 @@ impl ConfigImpl of ConfigManagerTrait {
     }
 
     fn get(self: ConfigManager) -> Config {
-        get!(self.world, (constants::PISTOLS_CONFIG_KEY), Config)
+        get!(self.world, (CONFIG_KEY), Config)
     }
 
     fn set(self: ConfigManager, config: Config) {

@@ -16,7 +16,7 @@ export const LordsFaucet = () => {
   return (
     <>
       {/* <Icon name='add' /> */}
-      [<span className='Anchor Important' onClick={onClick}>free money</span>]
+      [ <span className='Anchor Important' onClick={onClick}>get free lordings</span> ]
     </>
   )
 }

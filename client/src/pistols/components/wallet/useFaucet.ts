@@ -1,7 +1,5 @@
 import { useDojo, useDojoAccount } from '@/dojo/DojoContext'
-import { useConfig } from '@/pistols/hooks/useConfig'
-import { execute } from '@/pistols/utils/starknet'
-import { bigintToHex } from '@/pistols/utils/utils'
+import { useCoin } from '@/pistols/hooks/useConfig'
 import { getContractByName } from '@dojoengine/core'
 import { useCallback, useMemo, useState } from 'react'
 
@@ -19,13 +17,13 @@ export interface FaucetInterface {
 export const useFaucet = (): FaucetInterface => {
   const { dojoProvider } = useDojo()
   const { account } = useDojoAccount()
-  const { lordsAddress } = useConfig()
+  const { contractAddress } = useCoin()
 
   const mockAddress = useMemo(() => {
     const mockContract = getContractByName(dojoProvider.manifest, 'lords_mock')
     return BigInt(mockContract?.address ?? 0)
   }, [dojoProvider])
-  const hasFaucet = (mockAddress && mockAddress == BigInt(lordsAddress))
+  const hasFaucet = (mockAddress && mockAddress == BigInt(contractAddress))
 
   const [isPending, setIsPending] = useState(false)
   const [error, setError] = useState<string | undefined>(undefined)
@@ -62,7 +60,7 @@ export const useFaucet = (): FaucetInterface => {
       }
 
     },
-    [account, lordsAddress],
+    [account, contractAddress],
   )
 
   return {
