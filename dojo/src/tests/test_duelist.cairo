@@ -7,6 +7,7 @@ mod tests {
 
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
+    use pistols::systems::actions::{IActionsDispatcherTrait};
     use pistols::models::models::{Duelist};
     use pistols::types::constants::{constants};
     use pistols::tests::utils::{utils};
@@ -56,51 +57,51 @@ mod tests {
         utils::execute_register_duelist(system, owner, name, 1);
         let mut duelist: Duelist = utils::get_Duelist(world, owner);
         // no bonus at start
-        let bonus: u8 = utils::calc_hit_bonus(system, owner);
+        let bonus: u8 = system.calc_hit_bonus(owner);
         assert(bonus == 0, 'bonus_0');
         //
         // No bonus
         duelist.honour = 90;
         duelist.total_duels = 100;
         set!(world,(duelist));
-        let bonus: u8 = utils::calc_hit_bonus(system, owner);
+        let bonus: u8 = system.calc_hit_bonus(owner);
         assert(bonus == 0, 'bonus_0');
         // bonus 5
         duelist.honour = 95;
         set!(world,(duelist));
-        let bonus: u8 = utils::calc_hit_bonus(system, owner);
+        let bonus: u8 = system.calc_hit_bonus(owner);
         assert(bonus == 5, 'bonus_5');
         // bonus 10
         duelist.honour = 100;
         set!(world,(duelist));
-        let bonus: u8 = utils::calc_hit_bonus(system, owner);
+        let bonus: u8 = system.calc_hit_bonus(owner);
         assert(bonus == 10, 'bonus_10');
         // bonus 11
         // duelist.honour = 101;
         // set!(world,(duelist));
-        // let bonus: u8 = utils::calc_hit_bonus(system, owner);
+        // let bonus: u8 = system.calc_hit_bonus(owner);
         // assert(bonus == 10, 'bonus_11');
         //
         // 1 duel cap
         duelist.honour = 100;
         duelist.total_duels = 1;
         set!(world,(duelist));
-        let bonus: u8 = utils::calc_hit_bonus(system, owner);
+        let bonus: u8 = system.calc_hit_bonus(owner);
         assert(bonus == 1, 'bonus_cap_1');
         // 5 duel cap
         duelist.total_duels = 5;
         set!(world,(duelist));
-        let bonus: u8 = utils::calc_hit_bonus(system, owner);
+        let bonus: u8 = system.calc_hit_bonus(owner);
         assert(bonus == 5, 'bonus_cap_5');
         // 10 duel cap
         duelist.total_duels = 10;
         set!(world,(duelist));
-        let bonus: u8 = utils::calc_hit_bonus(system, owner);
+        let bonus: u8 = system.calc_hit_bonus(owner);
         assert(bonus == 10, 'bonus_cap_10');
         // 20 duel cap
         duelist.total_duels = 20;
         set!(world,(duelist));
-        let bonus: u8 = utils::calc_hit_bonus(system, owner);
+        let bonus: u8 = system.calc_hit_bonus(owner);
         assert(bonus == 10, 'bonus_cap_20');
     }
 

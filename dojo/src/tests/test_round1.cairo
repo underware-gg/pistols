@@ -65,7 +65,7 @@ mod tests {
         let (world, system, owner, other) = utils::setup_world();
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         utils::execute_register_duelist(system, other, OTHER_NAME, 2);
-        assert(utils::execute_has_pact(system, other, owner) == false, 'has_pact_no');
+        assert(system.has_pact(other, owner) == false, 'has_pact_no');
 
         let expire_seconds: u64 = timestamp::from_days(2);
         let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, expire_seconds);
@@ -73,7 +73,7 @@ mod tests {
         let (block_number, timestamp) = utils::elapse_timestamp(timestamp::from_days(1));
         let new_state: ChallengeState = utils::execute_reply_challenge(system, other, duel_id, true);
         assert(new_state == ChallengeState::InProgress, 'in_progress');
-        assert(utils::execute_has_pact(system, other, owner) == true, 'has_pact_yes');
+        assert(system.has_pact(other, owner) == true, 'has_pact_yes');
 
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');
@@ -98,10 +98,10 @@ mod tests {
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
 
-        let hit_chance_a = utils::calc_hit_chances(system, owner, challenge.duel_id, challenge.round_number, action_a);
-        let hit_chance_b = utils::calc_hit_chances(system, owner, challenge.duel_id, challenge.round_number, action_b);
-        let kill_chance_a = utils::calc_crit_chances(system, owner, challenge.duel_id, challenge.round_number, action_a);
-        let kill_chance_b = utils::calc_crit_chances(system, owner, challenge.duel_id, challenge.round_number, action_b);
+        let hit_chance_a = system.calc_hit_chances(owner, challenge.duel_id, challenge.round_number, action_a);
+        let hit_chance_b = system.calc_hit_chances(owner, challenge.duel_id, challenge.round_number, action_b);
+        let kill_chance_a = system.calc_crit_chances(owner, challenge.duel_id, challenge.round_number, action_a);
+        let kill_chance_b = system.calc_crit_chances(owner, challenge.duel_id, challenge.round_number, action_b);
 
         // 1st commit
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
@@ -235,10 +235,10 @@ mod tests {
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_draw();
 
-        // let hit_chance_a = utils::calc_hit_chances(system, owner, challenge.duel_id, challenge.round_number, action_a);
-        // let hit_chance_b = utils::calc_hit_chances(system, owner, challenge.duel_id, challenge.round_number, action_b);
-        // let kill_chance_a = utils::calc_crit_chances(system, owner, challenge.duel_id, challenge.round_number, action_a);
-        // let kill_chance_b = utils::calc_crit_chances(system, owner, challenge.duel_id, challenge.round_number, action_b);
+        // let hit_chance_a = system.calc_hit_chances(owner, challenge.duel_id, challenge.round_number, action_a);
+        // let hit_chance_b = system.calc_hit_chances(owner, challenge.duel_id, challenge.round_number, action_b);
+        // let kill_chance_a = system.calc_crit_chances(owner, challenge.duel_id, challenge.round_number, action_a);
+        // let kill_chance_b = system.calc_crit_chances(owner, challenge.duel_id, challenge.round_number, action_b);
 
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);

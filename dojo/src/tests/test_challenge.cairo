@@ -6,6 +6,7 @@ mod tests {
 
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
+    use pistols::systems::actions::{IActionsDispatcherTrait};
     use pistols::models::models::{Duelist, Round};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::systems::utils::{zero_address};
@@ -111,15 +112,15 @@ mod tests {
     fn test_challenge_address_pact() {
         let (world, system, owner, other) = utils::setup_world();
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
-        assert(utils::execute_get_pact(system, owner, other) == 0, 'get_pact_0_1');
-        assert(utils::execute_get_pact(system, other, owner) == 0, 'get_pact_0_2');
-        assert(utils::execute_has_pact(system, owner, other) == false, 'has_pact_0_1');
-        assert(utils::execute_has_pact(system, other, owner) == false, 'has_pact_0_2');
+        assert(system.get_pact(owner, other) == 0, 'get_pact_0_1');
+        assert(system.get_pact(other, owner) == 0, 'get_pact_0_2');
+        assert(system.has_pact(owner, other) == false, 'has_pact_0_1');
+        assert(system.has_pact(other, owner) == false, 'has_pact_0_2');
         let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, 0);
-        assert(utils::execute_get_pact(system, owner, other) == duel_id, 'get_pact_1_1');
-        assert(utils::execute_get_pact(system, other, owner) == duel_id, 'get_pact_1_2');
-        assert(utils::execute_has_pact(system, owner, other) == true, 'has_pact_1_1');
-        assert(utils::execute_has_pact(system, other, owner) == true, 'has_pact_1_2');
+        assert(system.get_pact(owner, other) == duel_id, 'get_pact_1_1');
+        assert(system.get_pact(other, owner) == duel_id, 'get_pact_1_2');
+        assert(system.has_pact(owner, other) == true, 'has_pact_1_1');
+        assert(system.has_pact(other, owner) == true, 'has_pact_1_2');
     }
 
 
@@ -167,11 +168,11 @@ mod tests {
         let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, expire_seconds);
         let ch = utils::get_Challenge(world, duel_id);
 
-        assert(utils::execute_has_pact(system, other, owner) == true, 'has_pact_yes');
+        assert(system.has_pact(other, owner) == true, 'has_pact_yes');
         let (block_number, timestamp) = utils::elapse_timestamp(timestamp::from_date(1, 0, 1));
         let new_state: ChallengeState = utils::execute_reply_challenge(system, owner, duel_id, true);
         assert(new_state == ChallengeState::Expired, 'expired');
-        assert(utils::execute_has_pact(system, other, owner) == false, 'has_pact_no');
+        assert(system.has_pact(other, owner) == false, 'has_pact_no');
 
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');
@@ -207,10 +208,10 @@ mod tests {
         let ch = utils::get_Challenge(world, duel_id);
         let (block_number, timestamp) = utils::elapse_timestamp(timestamp::from_days(1));
 
-        assert(utils::execute_has_pact(system, other, owner) == true, 'has_pact_yes');
+        assert(system.has_pact(other, owner) == true, 'has_pact_yes');
         let new_state: ChallengeState = utils::execute_reply_challenge(system, owner, duel_id, false);
         assert(new_state == ChallengeState::Withdrawn, 'canceled');
-        assert(utils::execute_has_pact(system, owner, other) == false, 'has_pact_no');
+        assert(system.has_pact(owner, other) == false, 'has_pact_no');
 
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');
@@ -260,11 +261,11 @@ mod tests {
         let expire_seconds: u64 = timestamp::from_days(2);
         let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, expire_seconds);
 
-        assert(utils::execute_has_pact(system, other, owner) == true, 'has_pact_yes');
+        assert(system.has_pact(other, owner) == true, 'has_pact_yes');
         let (block_number, timestamp) = utils::elapse_timestamp(timestamp::from_days(1));
         let new_state: ChallengeState = utils::execute_reply_challenge(system, other, duel_id, false);
         assert(new_state == ChallengeState::Refused, 'refused');
-        assert(utils::execute_has_pact(system, other, owner) == false, 'has_pact_no');
+        assert(system.has_pact(other, owner) == false, 'has_pact_no');
 
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');

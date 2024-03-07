@@ -164,31 +164,10 @@ mod utils {
     // read-only calls
     //
 
-    // ::actions
-    fn execute_get_pact(system: IActionsDispatcher, a: ContractAddress, b: ContractAddress) -> u128 {
-        let result: u128 = system.get_pact(a, b);
-        (result)
-    }
-    fn execute_has_pact(system: IActionsDispatcher, a: ContractAddress, b: ContractAddress) -> bool {
-        let result: bool = system.has_pact(a, b);
-        (result)
-    }
-    fn calc_hit_bonus(system: IActionsDispatcher, duelist_address: ContractAddress) -> u8 {
-        let result: u8 = system.calc_hit_bonus(duelist_address);
-        (result)
-    }
-    fn calc_hit_penalty(system: IActionsDispatcher, health: u8) -> u8 {
-        let result: u8 = system.calc_hit_penalty(health);
-        (result)
-    }
-    fn calc_hit_chances(system: IActionsDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8 {
-        let result: u8 = system.calc_hit_chances(duelist_address, duel_id, round_number, action);
-        (result)
-    }
-    fn calc_crit_chances(system: IActionsDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8 {
-        let result: u8 = system.calc_crit_chances(duelist_address, duel_id, round_number, action);
-        (result)
-    }
+    // fn execute_get_pact(system: IActionsDispatcher, a: ContractAddress, b: ContractAddress) -> u128 {
+    //     let result: u128 = system.get_pact(a, b);
+    //     (result)
+    // }
 
     //
     // getters
