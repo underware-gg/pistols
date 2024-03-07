@@ -170,7 +170,7 @@ export const useAnimatedDuel = (duelId: bigint | string) => {
 
 
 const _healthResult = (health: number, damage: number, block: number) => {
-  return (health == 0 ? 'is DEAD!' : damage > 0 ? `${block > 0 ? `blocks ${block} but ` : ''}takes ${damage} DAMAGE!` : 'is ALIVE!')
+  return (health == 0 ? 'is DEAD!' : damage > 0 ? `${block > 0 ? `blocks ${block}${damage > block ? ` but takes ${damage - block} DAMAGE!` : ''}` : `takes ${damage} DAMAGE!`}` : 'is ALIVE!')
 }
 
 export const useDuelResult = (round: any | null, shot: any | null, duelStage: DuelStage, animationStage: DuelStage) => {
