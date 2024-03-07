@@ -157,6 +157,8 @@ mod lords_mock {
     // Initializer
     //
 
+    const ETH_TO_WEI: u256 = 1_000_000_000_000_000_000;
+
     #[abi(embed_v0)]
     impl LordsMockInitializerImpl of super::ILordsMockInitializer<ContractState> {
         fn initializer(ref self: ContractState) {
@@ -166,7 +168,7 @@ mod lords_mock {
             );
 
             self.erc20_metadata.initialize('fLORDS', 'fLORDS', 18);
-            self.erc20_mintable.mint(get_caller_address(), 420);
+            self.erc20_mintable.mint(get_caller_address(), 420 * ETH_TO_WEI);
 
             self.initializable.initialize();
         }
@@ -179,7 +181,7 @@ mod lords_mock {
     #[abi(embed_v0)]
     impl LordsMockFaucetImpl of super::ILordsMockFaucet<ContractState> {
         fn faucet(ref self: ContractState) {
-            self.erc20_mintable.mint(get_caller_address(), 420);
+            self.erc20_mintable.mint(get_caller_address(), 420 * ETH_TO_WEI);
         }
     }
 }

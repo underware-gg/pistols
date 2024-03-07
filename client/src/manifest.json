@@ -949,7 +949,7 @@
     {
       "name": "pistols::mocks::lords_mock::lords_mock",
       "address": "0x1c78b6e4a6f7fec47834ee44a18b568548b681a7adaefa9db98e699b08d5e8a",
-      "class_hash": "0x1fd8607a0d86f22db18ed5d567c8365182cd59e3d12da223d2303436f719d7f",
+      "class_hash": "0x3ac5537c9b0c68d47d074cc901a290995c32ade2bf2808851bc889c359533d9",
       "abi": [
         {
           "type": "impl",
