@@ -5,6 +5,7 @@ import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
 import { AccountShort } from '@/pistols/components/account/Account'
+import { LordsBalance } from '../wallet/LordsBalance'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -28,6 +29,7 @@ export default function AccountHeader({
         <Col width={11} textAlign='right'>
           <h3>{isMasterAccount ? 'Guest' : name}</h3>
           <AccountShort address={account?.address} />
+          <h3><LordsBalance /></h3>
         </Col>
         <Col width={5} verticalAlign='middle'>
           <ProfilePicSquareButton profilePic={profilePic} onClick={() => { dispatchSelectDuelist(BigInt(account.address)) }} />

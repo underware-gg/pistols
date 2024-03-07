@@ -5,6 +5,7 @@ import { DojoProvider } from '@/dojo/DojoContext'
 import { setup } from '@/dojo/setup'
 import { ThreeJsProvider } from '@/pistols/hooks/ThreeJsContext'
 import { GameplayProvider } from '@/pistols/hooks/GameplayContext'
+import { KatanaProvider } from '@/pistols/components/wallet/KatanaProvider'
 import { DojoStatus } from '@/pistols/components/account/DojoStatus'
 import ErrorModal from '@/pistols/components/ErrorModal'
 import App from '@/pistols/components/App'
@@ -67,13 +68,15 @@ function DojoSetup({ children }) {
   }
 
   return (
-    <DojoProvider value={setupResult}>
-      <ThreeJsProvider>
-        <GameplayProvider>
-          {children}
-          <ErrorModal />
-        </GameplayProvider>
-      </ThreeJsProvider>
-    </DojoProvider>
+    <KatanaProvider dojoConfig={config}>
+      <DojoProvider value={setupResult}>
+        <ThreeJsProvider>
+          <GameplayProvider>
+            {children}
+            <ErrorModal />
+          </GameplayProvider>
+        </ThreeJsProvider>
+      </DojoProvider>
+    </KatanaProvider>
   );
 }

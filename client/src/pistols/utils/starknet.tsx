@@ -5,6 +5,9 @@ import {
   BigNumberish,
   TypedData,
   WeierstrassSignatureType,
+  AccountInterface,
+  InvocationsDetails,
+  InvokeFunctionResponse,
 } from 'starknet'
 
 export const validateCairoString = (v: string): string => (v ? v.slice(0, 31) : '')
@@ -43,5 +46,37 @@ export function createTypedMessage(messages: BigNumberish[]): TypedData {
     message: {
       message,
     },
+  }
+}
+
+
+
+export async function execute(
+  account: Account | AccountInterface,
+  contractAddress: string,
+  call: string,
+  calldata: BigNumberish[],
+  transactionDetails?: InvocationsDetails | undefined
+): Promise<InvokeFunctionResponse> {
+  try {
+    const nonce = await account?.getNonce();
+    return await account?.execute(
+      [
+        {
+          contractAddress,
+          entrypoint: call,
+          calldata: calldata,
+        },
+      ],
+      undefined,
+      {
+        maxFee: 0, // TODO: Update this value as needed.
+        ...transactionDetails,
+        nonce,
+      }
+    );
+  } catch (error) {
+    this.logger.error("Error occured: ", error);
+    throw error;
   }
 }
