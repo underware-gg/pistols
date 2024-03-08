@@ -7,12 +7,12 @@ import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChalle
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePicButton } from '@/pistols/components/account/ProfilePic'
-import { ActionButton } from '@/pistols/components/ui/Buttons'
+import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
 import { ChallengeState, makeDuelUrl } from '@/pistols/utils/pistols'
 import { AccountShort } from '@/pistols/components/account/Account'
 import { DuelIconsAsGrid } from '@/pistols/components/DuelIcons'
 import { ChallengeTime } from './ChallengeTime'
-import { Wager } from './account/Wager'
+import { Wager, WagerAndOrFees } from './account/Wager'
 import { useWager } from '../hooks/useWager'
 
 const Row = Grid.Row
@@ -27,7 +27,7 @@ export default function ChallengeModal() {
   const { duelId, dispatchSelectDuel, dispatchSelectDuelist } = usePistolsContext()
 
   const { state, message, duelistA, duelistB, isLive, isFinished, isAwaiting } = useChallenge(duelId)
-  const { coin, value } = useWager(duelId)
+  const { coin, value, fee } = useWager(duelId)
 
   const { challengeDescription } = useChallengeDescription(duelId)
 
@@ -38,6 +38,7 @@ export default function ChallengeModal() {
 
   const isChallenger = useMemo(() => (duelistA == BigInt(account.address)), [duelistA, account])
   const isChallenged = useMemo(() => (duelistB == BigInt(account.address)), [duelistB, account])
+  const isYou = (isChallenger || isChallenged)
 
   const _close = () => { dispatchSelectDuel(0n) }
   const _reply = (accepted: boolean) => {
@@ -103,28 +104,38 @@ export default function ChallengeModal() {
             <Row columns='equal' textAlign='center'>
               <Col>
                 <h3 className='Quote'>{`“${message}”`}</h3>
-                {value > 0 &&
-                  <h3><Wager coin={coin} wei={value} /></h3>
-                }
               </Col>
             </Row>
 
-            {(isLive || isFinished) &&
-              <>
-                <Row columns='equal' textAlign='right'>
-                  <Col>
-                    <Divider horizontal className='NoMargin'>
-                      <Header as='h4'>actions</Header>
-                    </Divider>
-                  </Col>
-                </Row>
-                <Row textAlign='center'>
-                  <Col width={16} textAlign='right'>
-                    <DuelIconsAsGrid duelId={duelId} duelistA={duelistA} duelistB={duelistB} size='big' />
-                  </Col>
-                </Row>
-              </>
-            }
+            {(value > 0 || isYou) && <>
+              <Row columns='equal' textAlign='right'>
+                <Col>
+                  <Divider horizontal className='NoMargin'>
+                    <Header as='h4'>{value > 0 ? 'Placing a wager of' : 'Fees'}</Header>
+                  </Divider>
+                </Col>
+              </Row>
+              <Row columns='equal' textAlign='center'>
+                <Col>
+                  <WagerAndOrFees coin={coin} value={value} fee={isYou ? fee : 0} />
+                </Col>
+              </Row>
+            </>}
+
+            {(isLive || isFinished) && <>
+              <Row columns='equal' textAlign='right'>
+                <Col>
+                  <Divider horizontal className='NoMargin'>
+                    <Header as='h4'>actions</Header>
+                  </Divider>
+                </Col>
+              </Row>
+              <Row textAlign='center'>
+                <Col width={16} textAlign='right'>
+                  <DuelIconsAsGrid duelId={duelId} duelistA={duelistA} duelistB={duelistB} size='big' />
+                </Col>
+              </Row>
+            </>}
 
             <Row columns='equal' textAlign='center'>
               <Col>
@@ -156,7 +167,7 @@ export default function ChallengeModal() {
             }
             {(state == ChallengeState.Awaiting && isChallenged) &&
               <Col>
-                <ActionButton fill attention label='Accept Challenge!' onClick={() => _reply(true)} />
+                <BalanceRequiredButton label='Accept Challenge!' onClick={() => _reply(true)} fee={value > 0 ? value : fee} />
               </Col>
             }
             {(state == ChallengeState.InProgress) &&

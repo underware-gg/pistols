@@ -2,6 +2,24 @@ import { useEffect, useState } from 'react'
 import { useDojoSystemCalls } from '@/dojo/DojoContext'
 import { BigNumberish } from 'starknet'
 
+export const useCalcFee = (wager_coin: number, wager_value: BigNumberish, defaultValue = null) => {
+  const [value, setValue] = useState(defaultValue)
+  const { calc_fee } = useDojoSystemCalls()
+  useEffect(() => {
+    let _mounted = true
+    const _get = async () => {
+      const value = await calc_fee(wager_coin, wager_value)
+      if (_mounted) setValue(value)
+    }
+    if (wager_coin != null && wager_value != null) _get()
+    else setValue(defaultValue)
+    return () => { _mounted = false }
+  }, [wager_coin, wager_value])
+  return {
+    fee: value,
+  }
+}
+
 export const useCalcHitBonus = (address: BigNumberish, defaultValue = null) => {
   const [value, setValue] = useState(defaultValue)
   const { calc_hit_bonus } = useDojoSystemCalls()

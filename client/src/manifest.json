@@ -1519,7 +1519,7 @@
     {
       "name": "pistols::systems::actions::actions",
       "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
-      "class_hash": "0x1389c7e1db97bd342304be6e42ef8f5bb60e0af1e1109fee942229419f374f8",
+      "class_hash": "0x321eea469fb2d1a91f03a25f183dc72814405330056b16b8fc22116d494db1b",
       "abi": [
         {
           "type": "impl",
@@ -1808,6 +1808,26 @@
             },
             {
               "type": "function",
+              "name": "calc_fee",
+              "inputs": [
+                {
+                  "name": "wager_coin",
+                  "type": "core::integer::u8"
+                },
+                {
+                  "name": "wager_value",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u256"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
               "name": "calc_hit_bonus",
               "inputs": [
                 {
@@ -2063,7 +2083,7 @@
     {
       "name": "pistols::systems::admin::admin",
       "address": "0x32c88d8593a215bac188af1cc576cf4b0704edb8d9c79ea12ccd695b7c33b81",
-      "class_hash": "0x7917a7433294ff38cf66af36fb3d68043f8400e3b953d7a6cd1e7f6307a9439",
+      "class_hash": "0x5ae9a588964b89e5391e71e6b3602e87df2696fcebd4dcefc9be3fc1a323b55",
       "abi": [
         {
           "type": "impl",

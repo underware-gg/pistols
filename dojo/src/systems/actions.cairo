@@ -46,6 +46,8 @@ trait IActions<TContractState> {
     fn get_pact(self: @TContractState, duelist_a: ContractAddress, duelist_b: ContractAddress) -> u128;
     fn has_pact(self: @TContractState, duelist_a: ContractAddress, duelist_b: ContractAddress) -> bool;
 
+    fn calc_fee(self: @TContractState, wager_coin: u8, wager_value: u256) -> u256;
+
     fn calc_hit_bonus(self: @TContractState, duelist_address: ContractAddress) -> u8;
     fn calc_hit_penalty(self: @TContractState, health: u8) -> u8;
 
@@ -67,11 +69,11 @@ mod actions {
     use starknet::{ContractAddress, get_block_timestamp, get_block_info};
 
     use pistols::models::models::{Duelist, Challenge, Wager, Pact, Round, Shot};
-    use pistols::models::coins::{Coin, CoinManager, CoinManagerTrait, ETH_TO_WEI};
+    use pistols::models::coins::{Coin, CoinManager, CoinManagerTrait, CoinTrait, coins, ETH_TO_WEI};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
+    use pistols::interfaces::ierc20::{ierc20, IERC20DispatcherTrait};
     use pistols::utils::timestamp::{timestamp};
-    use pistols::utils::math::{MathU256};
     use pistols::systems::seeder::{make_seed};
     use pistols::systems::shooter::{shooter};
     use pistols::systems::{utils};
@@ -131,22 +133,28 @@ mod actions {
             // let duel_id: u32 = world.uuid();
             let duel_id: u128 = make_seed(caller);
 
-            // setup wager
-            if (wager_coin > 0 && wager_value > 0) {
-                let manager = CoinManagerTrait::new(self.world());
-                assert(manager.exists(wager_coin), 'Invalid coin');
-                let mut coin = manager.get(wager_coin);
-                assert(coin.enabled == true, 'Coin disabled');
-                // calc fee and store
-                let fee: u256 = MathU256::max(coin.fee_min, (wager_value / 100) * coin.fee_pct.into());
-                let wager = Wager {
-                    duel_id,
-                    coin: wager_coin,
-                    value: wager_value,
-                    fee,
-                };
-                set!(world, (wager));
+            // setup wager + fees
+            let coin_manager = CoinManagerTrait::new(self.world());
+            let coin: Coin = coin_manager.get(wager_coin);
+            assert(coin.enabled == true, 'Coin disabled');
+            let fee: u256 = coin.calc_fee(wager_value);
+            // check balance
+            let balance: u256 = ierc20(coin.contract_address).balance_of(starknet::get_caller_address());
+            if (wager_value > 0) {
+                assert(balance >= wager_value, 'Insufficient balance for Wager');
+// TODO: transfer to contract
+            } else {
+                assert(balance >= fee, 'Insufficient balance for Fee');
+// TODO: transfer to contract
             }
+            // calc fee and store
+            let wager = Wager {
+                duel_id,
+                coin: wager_coin,
+                value: wager_value,
+                fee,
+            };
+            set!(world, (wager));
 
             // calc expiration
             let timestamp_start: u64 = get_block_timestamp();
@@ -192,22 +200,40 @@ mod actions {
                 challenge.state = ChallengeState::Expired.into();
                 challenge.timestamp_end = timestamp;
             } else if (caller == challenge.duelist_a) {
+                // Challenger is Withdrawing
                 assert(accepted == false, 'Cannot accept own challenge');
                 challenge.state = ChallengeState::Withdrawn.into();
                 challenge.timestamp_end = timestamp;
             } else {
                 assert(caller == challenge.duelist_b, 'Not the Challenged');
                 assert(utils::duelist_exist(world, caller), 'Challenged not registered');
-                if (!accepted) {
-                    challenge.state = ChallengeState::Refused.into();
-                    challenge.timestamp_end = timestamp;
-                } else {
+                if (accepted) {
+                    // Challenged is accepting
                     challenge.state = ChallengeState::InProgress.into();
                     challenge.round_number = 1;
                     challenge.timestamp_start = timestamp;
                     challenge.timestamp_end = 0;
+                } else {
+                    // Challenged is Refusing
+                    challenge.state = ChallengeState::Refused.into();
+                    challenge.timestamp_end = timestamp;
                 }
             }
+
+            // check balance
+            if (challenge.state == ChallengeState::InProgress.into()) {
+                let wager: Wager = get!(world, (duel_id), Wager);
+                let coin : Coin = CoinManagerTrait::new(self.world()).get(wager.coin);
+                let balance: u256 = ierc20(coin.contract_address).balance_of(starknet::get_caller_address());
+                if (wager.value > 0) {
+                    assert(balance >= wager.value, 'Insufficient balance for Wager');
+    // TODO: transfer to contract
+                } else {
+                    assert(balance >= wager.fee, 'Insufficient balance for Fee');
+    // TODO: transfer to contract
+                }
+            }
+
             // update challenge state
             utils::set_challenge(world, challenge);
 
@@ -253,6 +279,12 @@ mod actions {
 
         fn has_pact(self: @ContractState, duelist_a: ContractAddress, duelist_b: ContractAddress) -> bool {
             (self.get_pact(duelist_a, duelist_b) != 0)
+        }
+
+        fn calc_fee(self: @ContractState, wager_coin: u8, wager_value: u256) -> u256 {
+            let coin_manager = CoinManagerTrait::new(self.world());
+            let coin: Coin = coin_manager.get(wager_coin);
+            (coin.calc_fee(wager_value))
         }
 
         fn calc_hit_bonus(self: @ContractState, duelist_address: ContractAddress) -> u8 {

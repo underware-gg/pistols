@@ -1,6 +1,6 @@
 import { getEvents, setComponentsFromEvents, decodeComponent } from '@dojoengine/utils'
 import { SetupNetworkResult } from './setupNetwork'
-import { ethToWei, splitU256, stringToFelt } from '@/pistols/utils/starknet'
+import { splitU256, stringToFelt } from '@/pistols/utils/starknet'
 import { Account, BigNumberish } from 'starknet'
 import { emitter } from '@/pistols/three/game'
 
@@ -52,7 +52,7 @@ export function createSystemCalls(
   }
 
   const create_challenge = async (signer: Account, challenged: bigint, message: string, wager_coin: number, wager_value: BigNumberish, expire_seconds: number): Promise<boolean> => {
-    const wei = splitU256(ethToWei(wager_value))
+    const wei = splitU256(wager_value)
     const args = [challenged, stringToFelt(message), wager_coin, wei.low, wei.high, expire_seconds]
     return await _executeTransaction(signer, 'create_challenge', args)
   }
@@ -84,6 +84,13 @@ export function createSystemCalls(
     const args = [duelist_a, duelist_b]
     const results = await _executeCall('has_pact', args)
     return results !== null ? Boolean(results[0]) : null
+  }
+
+  const calc_fee = async (wager_coin: number, wager_value: BigNumberish): Promise<bigint | null> => {
+    const wei = splitU256(wager_value)
+    const args = [wager_coin, wei.low, wei.high]
+    const results = await _executeCall('calc_fee', args)
+    return results !== null ? results[0] : null
   }
 
   const calc_hit_bonus = async (duelist: bigint): Promise<number | null> => {
@@ -147,6 +154,7 @@ export function createSystemCalls(
     // read-only calls
     get_pact,
     has_pact,
+    calc_fee,
     calc_hit_bonus,
     calc_hit_penalty,
     calc_hit_chances,

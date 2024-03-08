@@ -1,5 +1,6 @@
 use starknet::ContractAddress;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+use pistols::utils::math::{MathU256};
 
 mod coins {
     const LORDS: u8 = 1;
@@ -30,16 +31,21 @@ impl CoinManagerTraitImpl of CoinManagerTrait {
     fn new(world: IWorldDispatcher) -> CoinManager {
         CoinManager { world }
     }
-
     fn exists(self: CoinManager, coin_key: u8) -> bool {
         (coin_key >= 1 && coin_key <= coins::COUNT)
     }
-
     fn get(self: CoinManager, coin_key: u8) -> Coin {
+        assert(self.exists(coin_key) == true, 'Invalid coin');
         get!(self.world, (coin_key), Coin)
     }
-
     fn set(self: CoinManager, Coin: Coin) {
         set!(self.world, (Coin));
+    }
+}
+
+#[generate_trait]
+impl CoinTraitImpl of CoinTrait {
+    fn calc_fee(self: Coin, wager_value: u256) -> u256 {
+        (MathU256::max(self.fee_min, (wager_value / 100) * self.fee_pct.into()))
     }
 }

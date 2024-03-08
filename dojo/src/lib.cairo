@@ -19,6 +19,10 @@ mod types {
     mod round;
 }
 
+mod interfaces {
+    mod ierc20;
+}
+
 mod utils {
     mod arrays;
     mod bitwise;
@@ -37,6 +41,7 @@ mod tests {
     mod test_round1;
     mod test_round2;
     mod test_round3;
+    mod test_wager;
 }
 
 mod mocks {

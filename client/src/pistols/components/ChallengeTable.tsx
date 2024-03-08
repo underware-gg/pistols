@@ -179,6 +179,7 @@ function DuelItem({
             <span className={ChallengeStateClasses[state]}>
               {ChallengeStateNames[state]}
             </span>
+            <br />
             <Wager coin={coin} wei={value} />
           </>
         }
