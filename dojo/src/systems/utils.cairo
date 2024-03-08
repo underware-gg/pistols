@@ -1,13 +1,15 @@
-// use debug::PrintTrait;
+use debug::PrintTrait;
 use traits::{Into, TryInto};
 use starknet::{ContractAddress};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::models::models::{init, Duelist, Challenge, Pact, Round, Shot};
+use pistols::models::coins::{Coin, CoinTrait};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round::{RoundState, RoundStateTrait};
 use pistols::types::action::{Action, ActionTrait, ACTION};
 use pistols::types::constants::{constants, chances};
 use pistols::utils::math::{MathU8, MathU16};
+use pistols::interfaces::ierc20::{IERC20DispatcherTrait};
 
 // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
 extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
@@ -64,6 +66,24 @@ fn get_duelist_health(world: IWorldDispatcher, duelist_address: ContractAddress,
     } else {
         let shot: Shot = get_duelist_round_shot(world, duelist_address, duel_id, round_number);
         (shot.health)
+    }
+}
+
+// player need to allow contract to transfer funds first
+// ierc20::approve(contract_address, max(wager_value, fee));
+fn stake_player_wager_fees(world: IWorldDispatcher, coin: Coin, wager_value: u256, fee: u256) {
+    let bank: ContractAddress = starknet::get_contract_address();
+    let caller: ContractAddress = starknet::get_caller_address();
+    let balance: u256 = coin.ierc20().balance_of(caller);
+    let allowance: u256 = coin.ierc20().allowance(caller, bank);
+    if (wager_value > 0) {
+        assert(balance >= wager_value, 'Insufficient balance for Wager');
+        assert(allowance >= wager_value, 'Not allowed to transfer Wager');
+        coin.ierc20().transfer_from(caller, bank, wager_value);
+    } else {
+        assert(balance >= fee, 'Insufficient balance for Fee');
+        assert(allowance >= fee, 'Not allowed to transfer Fee');
+        coin.ierc20().transfer_from(caller, bank, fee);
     }
 }
 

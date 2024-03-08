@@ -8,6 +8,7 @@ mod utils {
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
     use dojo::test_utils::{spawn_test_world, deploy_contract};
 
+    use token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
     use pistols::systems::admin::{admin, IAdminDispatcher, IAdminDispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
@@ -20,7 +21,7 @@ mod utils {
         Round, round,
     };
     use pistols::models::config::{Config, config};
-    use pistols::models::coins::{Coin, coin};
+    use pistols::models::coins::{Coin, coin, ETH_TO_WEI};
 
     // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
     extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
@@ -33,7 +34,16 @@ mod utils {
     const INITIAL_TIMESTAMP: u64 = 0x100000000;
     const INITIAL_STEP: u64 = 0x10;
 
-    fn setup_world(initialize: bool) -> (IWorldDispatcher, IActionsDispatcher, IAdminDispatcher, ILordsMockDispatcher, ContractAddress, ContractAddress, ContractAddress) {
+    fn setup_world(initialize: bool) -> (
+        IWorldDispatcher,
+        IActionsDispatcher,
+        IAdminDispatcher,
+        ILordsMockDispatcher,
+        IERC20Dispatcher,
+        ContractAddress,
+        ContractAddress,
+        ContractAddress,
+    ) {
         let mut models = array![
             duelist::TEST_CLASS_HASH,
             challenge::TEST_CLASS_HASH,
@@ -43,7 +53,7 @@ mod utils {
             coin::TEST_CLASS_HASH,
         ];
         let world: IWorldDispatcher = spawn_test_world(models);
-        let actions = IActionsDispatcher{ contract_address: world.deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap()) };
+        let system = IActionsDispatcher{ contract_address: world.deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap()) };
         let owner: ContractAddress = starknet::contract_address_const::<0x111111>();
         let other: ContractAddress = starknet::contract_address_const::<0x222>();
         let bummer: ContractAddress = starknet::contract_address_const::<0x333>();
@@ -54,16 +64,16 @@ mod utils {
         // admin
         let admin = IAdminDispatcher{ contract_address: world.deploy_contract('salt', admin::TEST_CLASS_HASH.try_into().unwrap()) };
         let lords = ILordsMockDispatcher{ contract_address: world.deploy_contract('salt', lords_mock::TEST_CLASS_HASH.try_into().unwrap()) };
+        let ierc20 = IERC20Dispatcher{ contract_address:lords.contract_address };
         execute_initializer(lords, owner);
         execute_faucet(lords, other);
+        execute_approve(lords, owner, system.contract_address, 1_000_000 * ETH_TO_WEI);
+        execute_approve(lords, other, system.contract_address, 1_000_000 * ETH_TO_WEI);
+        execute_approve(lords, bummer, system.contract_address, 1_000_000 * ETH_TO_WEI);
         if (initialize) {
             execute_initialize(admin, owner, starknet::contract_address_const::<0x0>(), lords.contract_address);
         }
-        (world, actions, admin, lords, owner, other, bummer)
-    }
-
-    fn _next_block() -> (u64, u64) {
-        elapse_timestamp(INITIAL_STEP)
+        (world, system, admin, lords, ierc20, owner, other, bummer)
     }
 
     fn elapse_timestamp(delta: u64) -> (u64, u64) {
@@ -75,14 +85,21 @@ mod utils {
         (new_block_number, new_block_timestamp)
     }
 
+    #[inline(always)]
     fn get_block_number() -> u64 {
         let block_info = starknet::get_block_info().unbox();
         (block_info.block_number)
     }
 
+    #[inline(always)]
     fn get_block_timestamp() -> u64 {
         let block_info = starknet::get_block_info().unbox();
         (block_info.block_timestamp)
+    }
+
+    #[inline(always)]
+    fn _next_block() -> (u64, u64) {
+        elapse_timestamp(INITIAL_STEP)
     }
 
     //
@@ -125,6 +142,11 @@ mod utils {
     fn execute_faucet(system: ILordsMockDispatcher, sender: ContractAddress) {
         testing::set_contract_address(sender);
         system.faucet();
+        _next_block();
+    }
+    fn execute_approve(system: ILordsMockDispatcher, owner: ContractAddress, spender: ContractAddress, value: u256) {
+        testing::set_contract_address(owner);
+        system.approve(spender, value);
         _next_block();
     }
 
@@ -189,21 +211,31 @@ mod utils {
     // getters
     //
 
+    #[inline(always)]
     fn get_Config(world: IWorldDispatcher) -> Config {
         (get!(world, 1, Config))
     }
+    #[inline(always)]
     fn get_Coin(world: IWorldDispatcher, coin_key: u8) -> Coin {
         (get!(world, coin_key, Coin))
     }
+    #[inline(always)]
     fn get_Duelist(world: IWorldDispatcher, address: ContractAddress) -> Duelist {
         (get!(world, address, Duelist))
     }
+    #[inline(always)]
     fn get_Challenge(world: IWorldDispatcher, duel_id: u128) -> Challenge {
         (get!(world, duel_id, Challenge))
     }
+    #[inline(always)]
+    fn get_Wager(world: IWorldDispatcher, duel_id: u128) -> Wager {
+        (get!(world, duel_id, Wager))
+    }
+    #[inline(always)]
     fn get_Round(world: IWorldDispatcher, duel_id: u128, round_number: u8) -> Round {
         (get!(world, (duel_id, round_number), Round))
     }
+    #[inline(always)]
     fn get_Challenge_Round(world: IWorldDispatcher, duel_id: u128) -> (Challenge, Round) {
         let challenge = get!(world, duel_id, Challenge);
         let round = get!(world, (duel_id, challenge.round_number), Round);

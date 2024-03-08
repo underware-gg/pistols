@@ -1,5 +1,6 @@
 use starknet::ContractAddress;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
 use pistols::utils::math::{MathU256};
 
 mod coins {
@@ -45,7 +46,14 @@ impl CoinManagerTraitImpl of CoinManagerTrait {
 
 #[generate_trait]
 impl CoinTraitImpl of CoinTrait {
+    fn ierc20(self: Coin) -> IERC20Dispatcher {
+        (ierc20(self.contract_address))
+    }
     fn calc_fee(self: Coin, wager_value: u256) -> u256 {
         (MathU256::max(self.fee_min, (wager_value / 100) * self.fee_pct.into()))
     }
+    // TODO
+    // fn to_wei(self: Coin, value: u256) -> u256 {
+    //     // get decimals and multiply
+    // }
 }

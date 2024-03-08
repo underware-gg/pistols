@@ -72,7 +72,6 @@ mod actions {
     use pistols::models::coins::{Coin, CoinManager, CoinManagerTrait, CoinTrait, coins, ETH_TO_WEI};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
-    use pistols::interfaces::ierc20::{ierc20, IERC20DispatcherTrait};
     use pistols::utils::timestamp::{timestamp};
     use pistols::systems::seeder::{make_seed};
     use pistols::systems::shooter::{shooter};
@@ -138,15 +137,8 @@ mod actions {
             let coin: Coin = coin_manager.get(wager_coin);
             assert(coin.enabled == true, 'Coin disabled');
             let fee: u256 = coin.calc_fee(wager_value);
-            // check balance
-            let balance: u256 = ierc20(coin.contract_address).balance_of(starknet::get_caller_address());
-            if (wager_value > 0) {
-                assert(balance >= wager_value, 'Insufficient balance for Wager');
-// TODO: transfer to contract
-            } else {
-                assert(balance >= fee, 'Insufficient balance for Fee');
-// TODO: transfer to contract
-            }
+            // stake (transfer to contract)
+            utils::stake_player_wager_fees(world, coin, wager_value, fee);
             // calc fee and store
             let wager = Wager {
                 duel_id,
@@ -224,14 +216,8 @@ mod actions {
             if (challenge.state == ChallengeState::InProgress.into()) {
                 let wager: Wager = get!(world, (duel_id), Wager);
                 let coin : Coin = CoinManagerTrait::new(self.world()).get(wager.coin);
-                let balance: u256 = ierc20(coin.contract_address).balance_of(starknet::get_caller_address());
-                if (wager.value > 0) {
-                    assert(balance >= wager.value, 'Insufficient balance for Wager');
-    // TODO: transfer to contract
-                } else {
-                    assert(balance >= wager.fee, 'Insufficient balance for Fee');
-    // TODO: transfer to contract
-                }
+                // stake (transfer to contract)
+                utils::stake_player_wager_fees(world, coin, wager.value, wager.fee);
             }
 
             // update challenge state

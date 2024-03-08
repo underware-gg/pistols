@@ -77,7 +77,7 @@ mod tests {
     #[test]
     #[available_gas(10_000_000_000)]
     fn test_blades_round_draw() {
-        let (world, system, admin, lords, owner, other, bummer) = utils::setup_world(true);
+        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(true);
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
 
         let (salt_1_a, salt_1_b, action_1_a, action_1_b, hash_1_a, hash_1_b) = _get_actions_round_1_continue();
@@ -169,7 +169,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_blades_round_resolved() {
-        let (world, system, admin, lords, owner, other, bummer) = utils::setup_world(true);
+        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(true);
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
 
         let (salt_1_a, salt_1_b, action_1_a, action_1_b, hash_1_a, hash_1_b) = _get_actions_round_1_continue();
