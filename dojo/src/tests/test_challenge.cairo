@@ -16,13 +16,13 @@ mod tests {
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
     const MESSAGE_1: felt252 = 'For honour!!!';
-    const WAGER_COIN: u8 = 0;
+    const WAGER_COIN: u8 = 1;
 
     #[test]
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Challenger not registered','ENTRYPOINT_FAILED'))]
     fn test_invalid_challenger() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, owner, other, bummer) = utils::setup_world(true);
         let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, 0);
     }
 
@@ -30,7 +30,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Challenging thyself, you fool!','ENTRYPOINT_FAILED'))]
     fn test_challenge_thyself() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, owner, other, bummer) = utils::setup_world(true);
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         let duel_id: u128 = utils::execute_create_challenge(system, owner, owner, MESSAGE_1, WAGER_COIN, 0, 0);
     }
@@ -40,7 +40,7 @@ mod tests {
     #[should_panic(expected:('Missing challenged address','ENTRYPOINT_FAILED'))]
     // #[should_panic(expected:('Challenge a player','ENTRYPOINT_FAILED'))]
     fn test_invalid_code() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, owner, other, bummer) = utils::setup_world(true);
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         let challenged_1 = zero_address();
         let duel_id: u128 = utils::execute_create_challenge(system, owner, challenged_1, MESSAGE_1, WAGER_COIN, 0, 0);
@@ -50,7 +50,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Duplicated challenge','ENTRYPOINT_FAILED'))]
     fn test_duplicated_challenge() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, owner, other, bummer) = utils::setup_world(true);
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         utils::execute_register_duelist(system, other, OTHER_NAME, 1);
         utils::execute_create_challenge(system, owner, other, MESSAGE_1,WAGER_COIN, 0, 0);
@@ -61,7 +61,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Duplicated challenge','ENTRYPOINT_FAILED'))]
     fn test_duplicated_challenge_from_challenged() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, owner, other, bummer) = utils::setup_world(true);
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         utils::execute_register_duelist(system, other, OTHER_NAME, 1);
         utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, 0);
@@ -72,7 +72,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Invalid expire_seconds','ENTRYPOINT_FAILED'))]
     fn test_invalid_expire() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, owner, other, bummer) = utils::setup_world(true);
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         let expire_seconds: u64 = 60 * 60 - 1;
         let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, expire_seconds);
@@ -81,7 +81,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_challenge_address() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, owner, other, bummer) = utils::setup_world(true);
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         let timestamp = utils::get_block_timestamp();
         let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, 0);
@@ -97,7 +97,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_challenge_expire_ok() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, owner, other, bummer) = utils::setup_world(true);
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         let expire_seconds: u64 = 24 * 60 * 60;
         let timestamp = utils::get_block_timestamp();
@@ -110,7 +110,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_challenge_address_pact() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, owner, other, bummer) = utils::setup_world(true);
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         assert(system.get_pact(owner, other) == 0, 'get_pact_0_1');
         assert(system.get_pact(other, owner) == 0, 'get_pact_0_2');
@@ -132,7 +132,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Challenge do not exist','ENTRYPOINT_FAILED'))]
     fn test_challenge_reply_invalid() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, owner, other, bummer) = utils::setup_world(true);
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
 
         let expire_seconds: u64 = timestamp::from_days(2);
@@ -145,7 +145,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Challenge is not Awaiting','ENTRYPOINT_FAILED'))]
     fn test_challenge_reply_twice() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, owner, other, bummer) = utils::setup_world(true);
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
 
         let expire_seconds: u64 = timestamp::from_days(2);
@@ -161,7 +161,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_challenge_reply_expired() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, owner, other, bummer) = utils::setup_world(true);
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
 
         let expire_seconds: u64 = timestamp::from_days(1);
@@ -186,7 +186,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Cannot accept own challenge','ENTRYPOINT_FAILED'))]
     fn test_challenge_owner_accept() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, owner, other, bummer) = utils::setup_world(true);
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
 
         let expire_seconds: u64 = timestamp::from_days(2);
@@ -200,7 +200,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_challenge_owner_cancel() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, owner, other, bummer) = utils::setup_world(true);
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
 
         let expire_seconds: u64 = timestamp::from_days(2);
@@ -225,7 +225,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Not the Challenged','ENTRYPOINT_FAILED'))]
     fn test_challenge_impersonator() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, owner, other, bummer) = utils::setup_world(true);
         let impersonator: ContractAddress = starknet::contract_address_const::<0x333>();
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         utils::execute_register_duelist(system, other, OTHER_NAME, 2);
@@ -242,7 +242,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Challenged not registered','ENTRYPOINT_FAILED'))]
     fn test_challenge_other_not_registered() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, owner, other, bummer) = utils::setup_world(true);
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
 
         let expire_seconds: u64 = timestamp::from_days(2);
@@ -254,7 +254,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_challenge_other_refuse() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, owner, other, bummer) = utils::setup_world(true);
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         utils::execute_register_duelist(system, other, OTHER_NAME, 2);
 

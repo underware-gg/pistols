@@ -16,6 +16,7 @@ mod utils {
     use pistols::models::models::{
         Duelist, duelist,
         Challenge, challenge,
+        Wager, wager,
         Round, round,
     };
     use pistols::models::config::{Config, config};
@@ -32,30 +33,33 @@ mod utils {
     const INITIAL_TIMESTAMP: u64 = 0x100000000;
     const INITIAL_STEP: u64 = 0x10;
 
-    fn setup_world() -> (IWorldDispatcher, IActionsDispatcher, ContractAddress, ContractAddress) {
+    fn setup_world(initialize: bool) -> (IWorldDispatcher, IActionsDispatcher, IAdminDispatcher, ILordsMockDispatcher, ContractAddress, ContractAddress, ContractAddress) {
         let mut models = array![
-            duelist::TEST_CLASS_HASH, challenge::TEST_CLASS_HASH, round::TEST_CLASS_HASH,
-            config::TEST_CLASS_HASH, coin::TEST_CLASS_HASH,
+            duelist::TEST_CLASS_HASH,
+            challenge::TEST_CLASS_HASH,
+            wager::TEST_CLASS_HASH,
+            round::TEST_CLASS_HASH,
+            config::TEST_CLASS_HASH,
+            coin::TEST_CLASS_HASH,
         ];
         let world: IWorldDispatcher = spawn_test_world(models);
-        let contract_address = world.deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap());
+        let actions = IActionsDispatcher{ contract_address: world.deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap()) };
         let owner: ContractAddress = starknet::contract_address_const::<0x111111>();
         let other: ContractAddress = starknet::contract_address_const::<0x222>();
+        let bummer: ContractAddress = starknet::contract_address_const::<0x333>();
         // testing::set_caller_address(owner);   // not used??
         testing::set_contract_address(owner); // this is the CALLER!!
         testing::set_block_number(1);
         testing::set_block_timestamp(INITIAL_TIMESTAMP);
-        (world, IActionsDispatcher{contract_address}, owner, other)
-    }
-
-    fn setup_admin(world: IWorldDispatcher) -> (IAdminDispatcher,) {
-        let contract_address = world.deploy_contract('salt', admin::TEST_CLASS_HASH.try_into().unwrap());
-        (IAdminDispatcher{contract_address},)
-    }
-
-    fn setup_lords(world: IWorldDispatcher) -> (ILordsMockDispatcher,) {
-        let contract_address = world.deploy_contract('salt', lords_mock::TEST_CLASS_HASH.try_into().unwrap());
-        (ILordsMockDispatcher{contract_address},)
+        // admin
+        let admin = IAdminDispatcher{ contract_address: world.deploy_contract('salt', admin::TEST_CLASS_HASH.try_into().unwrap()) };
+        let lords = ILordsMockDispatcher{ contract_address: world.deploy_contract('salt', lords_mock::TEST_CLASS_HASH.try_into().unwrap()) };
+        execute_initializer(lords, owner);
+        execute_faucet(lords, other);
+        if (initialize) {
+            execute_initialize(admin, owner, starknet::contract_address_const::<0x0>(), lords.contract_address);
+        }
+        (world, actions, admin, lords, owner, other, bummer)
     }
 
     fn _next_block() -> (u64, u64) {
@@ -112,14 +116,24 @@ mod utils {
         _next_block();
     }
 
-    // ::actions
+    // ::ierc20
+    fn execute_initializer(system: ILordsMockDispatcher, sender: ContractAddress) {
+        testing::set_contract_address(sender);
+        system.initializer();
+        _next_block();
+    }
+    fn execute_faucet(system: ILordsMockDispatcher, sender: ContractAddress) {
+        testing::set_contract_address(sender);
+        system.faucet();
+        _next_block();
+    }
 
+    // ::actions
     fn execute_register_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic: u8) {
         testing::set_contract_address(sender);
         system.register_duelist(name, profile_pic);
         _next_block();
     }
-
     fn execute_create_challenge(system: IActionsDispatcher, sender: ContractAddress,
         challenged: ContractAddress,
         message: felt252,
@@ -132,7 +146,6 @@ mod utils {
         _next_block();
         (duel_id)
     }
-
     fn execute_reply_challenge(system: IActionsDispatcher, sender: ContractAddress,
         duel_id: u128,
         accepted: bool,
@@ -142,7 +155,6 @@ mod utils {
         _next_block();
         (new_state)
     }
-
     fn execute_commit_action(system: IActionsDispatcher, sender: ContractAddress,
         duel_id: u128,
         round_number: u8,
@@ -152,7 +164,6 @@ mod utils {
         system.commit_action(duel_id, round_number, hash);
         _next_block();
     }
-
     fn execute_reveal_action(system: IActionsDispatcher, sender: ContractAddress,
         duel_id: u128,
         round_number: u8,
@@ -181,23 +192,18 @@ mod utils {
     fn get_Config(world: IWorldDispatcher) -> Config {
         (get!(world, 1, Config))
     }
-
     fn get_Coin(world: IWorldDispatcher, coin_key: u8) -> Coin {
         (get!(world, coin_key, Coin))
     }
-
     fn get_Duelist(world: IWorldDispatcher, address: ContractAddress) -> Duelist {
         (get!(world, address, Duelist))
     }
-
     fn get_Challenge(world: IWorldDispatcher, duel_id: u128) -> Challenge {
         (get!(world, duel_id, Challenge))
     }
-
     fn get_Round(world: IWorldDispatcher, duel_id: u128, round_number: u8) -> Round {
         (get!(world, (duel_id, round_number), Round))
     }
-
     fn get_Challenge_Round(world: IWorldDispatcher, duel_id: u128) -> (Challenge, Round) {
         let challenge = get!(world, duel_id, Challenge);
         let round = get!(world, (duel_id, challenge.round_number), Round);

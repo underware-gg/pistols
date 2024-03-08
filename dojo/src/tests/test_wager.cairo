@@ -19,10 +19,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_wager_ok() {
-        let (world, system, owner, other) = utils::setup_world();
-        let (admin) = utils::setup_admin(world);
-        let (lords) = utils::setup_lords(world);
-        utils::execute_initialize(admin, owner, zero_address(), lords.contract_address);
+        let (world, system, admin, lords, owner, other, bummer) = utils::setup_world(true);
         let coin: Coin = admin.get_coin(coins::LORDS);
 
         assert(false, 'TODO');

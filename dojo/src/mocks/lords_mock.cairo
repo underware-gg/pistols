@@ -39,6 +39,7 @@ trait ILordsMock<TState> {
 
     // WITHOUT INTERFACE !!!
     fn initializer(ref self: TState);
+    fn faucet(ref self: TState);
     fn dojo_resource(self: @TState,) -> felt252;
 }
 
@@ -54,7 +55,7 @@ trait ILordsMockInitializer<TState> {
 
 #[starknet::interface]
 trait ILordsMockFaucet<TState> {
-    fn faucet(ref self: TState,);
+    fn faucet(ref self: TState);
 }
 
 #[dojo::contract]
