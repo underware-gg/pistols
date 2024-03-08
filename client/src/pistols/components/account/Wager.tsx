@@ -9,22 +9,33 @@ function Wager({
   coin = COIN_LORDS,
   value = null,
   wei = null,
+  big = false,
+  small = false,
+  clean = false,
+  pre = null,
+  post = null,
 }: {
   coin: number
   value?: BigNumberish
   wei?: BigNumberish
+    big?: boolean
+    small?: boolean
+  clean?: boolean
+  pre?: string
+  post?: string
 }) {
   const _value = useMemo(() => {
-    return wei != null ? weiToEth(wei).toString()
+    let result = wei != null ? weiToEth(wei).toString()
       : value != null ? BigInt(value).toString()
         : null
-
+    if (result) result = Number(result).toLocaleString('en-US', { maximumFractionDigits: 8 })
+    return result
   }, [value, wei])
   if (!_value) return <></>
   return (
-    <span className='Wager'>
+    <span className={small ? 'WagerSmall' : big ? 'WagerBig' : 'Wager'}>
       {/* <CustomIcon name='lords' logo color={'bisque'} centered={false} /> */}
-      💰{_value}
+      {pre}{!clean && <>💰</>}{_value}{post}
     </span>
   )
 }
@@ -37,24 +48,25 @@ function WagerAndOrFees({
   coin: number
   value: BigNumberish
   fee: BigNumberish
+  big?: boolean
 }) {
   if (BigInt(value ?? 0) > 0n) {
     return (
       <>
-        <span className='H3 TitleCase Bold'>
-          <Wager coin={coin} wei={value} />
+        <span>
+          <Wager big coin={coin} wei={value} />
         </span>
-        &nbsp;
-        <span className='H5 TitleCase'>
-          (minus <Wager coin={coin} wei={fee} /> fee)
+        &nbsp;&nbsp;
+        <span>
+          (<Wager clean coin={coin} wei={fee} pre='-' /> fee)
         </span>
       </>
     )
   }
   if (BigInt(fee ?? 0) > 0n) {
     return (
-      <span className='H3 TitleCase Bold'>
-        Fee <Wager coin={coin} wei={fee} />
+      <span>
+        <Wager big coin={coin} wei={fee} pre={'Fee '} />
       </span>
     )
   }

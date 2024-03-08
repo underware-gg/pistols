@@ -54,7 +54,7 @@ export default function Duel({
       <div className='TavernTitle' style={{ maxWidth: '350px' }}>
         <h1 className='Quote'>{`“${message}”`}</h1>
         {value > 0 &&
-          <h1><Wager coin={coin} wei={value} /></h1>
+          <h5><Wager big coin={coin} wei={value} /></h5>
         }
         {(isFinished && animated == AnimationState.Finished) &&
           <Segment>

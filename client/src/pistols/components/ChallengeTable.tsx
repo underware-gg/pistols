@@ -172,7 +172,7 @@ function DuelItem({
             <PositiveResult positive={true}>
               <ProfileName address={winnerIsA ? duelistA : duelistB} badges={false} />{!value && <><br />Wins</>}
             </PositiveResult>
-            <Wager coin={coin} wei={value} />
+            <Wager small coin={coin} wei={value} />
           </>
           :
           <>
@@ -180,7 +180,7 @@ function DuelItem({
               {ChallengeStateNames[state]}
             </span>
             <br />
-            <Wager coin={coin} wei={value} />
+            <Wager small coin={coin} wei={value} />
           </>
         }
       </Cell>

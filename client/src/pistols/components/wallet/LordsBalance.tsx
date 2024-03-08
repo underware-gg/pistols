@@ -1,19 +1,13 @@
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { useLordsBalance } from './useLordsBalance'
+import { COIN_LORDS } from '@/pistols/hooks/useConfig'
+import { Wager } from '@/pistols/components/account/Wager'
 
 export const LordsBalance = ({
   address
 }) => {
   const { balance, formatted } = useLordsBalance(address)
-
   return (
-    <div>
-      {/* {iconsBySymbol[balance?.symbol as iconsBySymbolKeys] && iconsBySymbol[balance?.symbol as iconsBySymbolKeys]({})} */}
-      💰
-      {/* <span className='TitleCase'>{balance.toString()}</span> */}
-      <span className='TitleCase'>{formatted}</span>
-      {/* <span>{balance?.symbol || "?"}</span> */}
-      {/* <span>{token}</span> */}
-    </div>
+    <Wager big coin={COIN_LORDS} wei={balance} />
   )
 }

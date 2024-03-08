@@ -17,6 +17,7 @@ import { randomArrayElement } from '@/pistols/utils/utils'
 import { AccountShort } from '@/pistols/components/account/Account'
 import { WagerAndOrFees } from '@/pistols/components/account/Wager'
 import { COIN_LORDS } from '@/pistols/hooks/useConfig'
+import { LordsFaucet } from './wallet/LordsFaucet'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -180,7 +181,7 @@ function CreateChallenge({
 
       <Form className=''>
         <Form.Field>
-          <span className='FormLabel'>What do you have to say?</span>
+          <span className='FormLabel'>&nbsp;reasoning</span>
           {/* <input placeholder={_defaultMessage} value={message} maxLength={31} onChange={(e) => setMessage(e.target.value)} /> */}
           <Dropdown
             options={messageOptions}
@@ -206,7 +207,7 @@ function CreateChallenge({
           />
         </Form.Field>
         <Form.Field>
-          <span className='FormLabel'>Expiry</span>
+          <span className='FormLabel'>&nbsp;expiration</span>
           <Grid className='NoMargin' columns={'equal'}>
             <Row>
               <Col>
@@ -219,7 +220,7 @@ function CreateChallenge({
           </Grid>
         </Form.Field>
         <Form.Field>
-          <span className='FormLabel'>Wager $LORDS</span>
+          <span className='FormLabel'>&nbsp;wager $LORDS</span>
           <input placeholder={'$LORDS'} value={value} maxLength={12} onChange={(e) => {
             const _lords = parseInt(e.target.value as string)
             if (!isNaN(_lords)) {

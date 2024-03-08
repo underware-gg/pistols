@@ -122,6 +122,14 @@ export default function ChallengeModal() {
               </Row>
             </>}
 
+            <Row columns='equal' textAlign='center'>
+              <Col>
+                <Divider className='NoMargin' />
+                <h3 className='TitleCase'>{challengeDescription}</h3>
+                {/* <Divider className='NoMargin' /> */}
+              </Col>
+            </Row>
+
             {(isLive || isFinished) && <>
               <Row columns='equal' textAlign='right'>
                 <Col>
@@ -136,14 +144,6 @@ export default function ChallengeModal() {
                 </Col>
               </Row>
             </>}
-
-            <Row columns='equal' textAlign='center'>
-              <Col>
-                <Divider className='NoMargin' />
-                <h3 className='TitleCase'>{challengeDescription}</h3>
-                {/* <Divider className='NoMargin' /> */}
-              </Col>
-            </Row>
 
           </Grid>
         </Modal.Description>
