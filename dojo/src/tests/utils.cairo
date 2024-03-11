@@ -34,7 +34,7 @@ mod utils {
     const INITIAL_TIMESTAMP: u64 = 0x100000000;
     const INITIAL_STEP: u64 = 0x10;
 
-    fn setup_world(initialize: bool) -> (
+    fn setup_world(initialize: bool, approve: bool) -> (
         IWorldDispatcher,
         IActionsDispatcher,
         IAdminDispatcher,
@@ -67,11 +67,13 @@ mod utils {
         let ierc20 = IERC20Dispatcher{ contract_address:lords.contract_address };
         execute_initializer(lords, owner);
         execute_faucet(lords, other);
-        execute_approve(lords, owner, system.contract_address, 1_000_000 * ETH_TO_WEI);
-        execute_approve(lords, other, system.contract_address, 1_000_000 * ETH_TO_WEI);
-        execute_approve(lords, bummer, system.contract_address, 1_000_000 * ETH_TO_WEI);
         if (initialize) {
             execute_initialize(admin, owner, starknet::contract_address_const::<0x0>(), lords.contract_address);
+        }
+        if (approve) {
+            execute_approve(lords, owner, system.contract_address, 1_000_000 * ETH_TO_WEI);
+            execute_approve(lords, other, system.contract_address, 1_000_000 * ETH_TO_WEI);
+            execute_approve(lords, bummer, system.contract_address, 1_000_000 * ETH_TO_WEI);
         }
         (world, system, admin, lords, ierc20, owner, other, bummer)
     }

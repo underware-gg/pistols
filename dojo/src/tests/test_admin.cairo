@@ -20,7 +20,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     // #[should_panic(expected:('Not initialized','ENTRYPOINT_FAILED'))]
     fn test_initialize() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false);
+        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false, true);
         let config: Config = admin.get_config();
         assert(config.initialized == false, 'initialized == false');
         utils::execute_initialize(admin, owner, zero_address(), zero_address());
@@ -38,7 +38,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_set_treasury() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false);
+        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false, true);
         utils::execute_initialize(admin, owner, other, zero_address());
         let config: Config = admin.get_config();
         assert(config.treasury_address == other, 'treasury_address_1');
@@ -56,7 +56,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_set_paused() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false);
+        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false, true);
         utils::execute_initialize(admin, owner, other, zero_address());
         let config: Config = admin.get_config();
         assert(config.paused == false, 'paused_1');
@@ -74,7 +74,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Already initialized','ENTRYPOINT_FAILED'))]
     fn test_initialized() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false);
+        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false, true);
         utils::execute_initialize(admin, owner, zero_address(), zero_address());
         utils::execute_initialize(admin, owner, zero_address(), zero_address());
     }
@@ -83,7 +83,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Not initialized','ENTRYPOINT_FAILED'))]
     fn test_not_initialized() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false);
+        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false, true);
         utils::execute_set_treasury(admin, owner, zero_address());
     }
 
@@ -91,7 +91,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Not owner','ENTRYPOINT_FAILED'))]
     fn test_initialize_owner() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false);
+        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false, true);
         utils::execute_initialize(admin, other, zero_address(), zero_address());
     }
 
@@ -99,7 +99,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Not owner','ENTRYPOINT_FAILED'))]
     fn test_set_treasury_owner() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false);
+        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false, true);
         utils::execute_initialize(admin, owner, other, zero_address());
         let treasury: ContractAddress = starknet::contract_address_const::<0x111111>();
         utils::execute_set_treasury(admin, other, treasury);
@@ -109,7 +109,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Not owner','ENTRYPOINT_FAILED'))]
     fn test_set_paused_owner() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false);
+        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false, true);
         utils::execute_initialize(admin, owner, other, zero_address());
         utils::execute_set_paused(admin, other, true);
     }
@@ -121,7 +121,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_initialize_coin() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false);
+        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false, true);
         utils::execute_initialize(admin, owner, zero_address(), lords.contract_address);
         let coin: Coin = admin.get_coin(coins::LORDS);
         assert(coin.contract_address == lords.contract_address, 'contract_address');
@@ -133,7 +133,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_set_coin() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false);
+        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false, true);
         // not initialized
         utils::execute_initialize(admin, owner, zero_address(), zero_address());
         let coin: Coin = admin.get_coin(coins::LORDS);
@@ -164,7 +164,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_set_coin_count() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false);
+        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false, true);
         let coin: Coin = admin.get_coin(coins::COUNT);
         assert(coin.contract_address == zero_address(), 'zero');
         // set
@@ -179,7 +179,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_enable_coin_count() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false);
+        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false, true);
         utils::execute_set_coin(admin, owner, coins::LORDS, lords.contract_address, 5, 10, false);
         let coin: Coin = admin.get_coin(coins::LORDS);
         assert(coin.enabled == false, 'enabled_1');
@@ -195,7 +195,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Not owner','ENTRYPOINT_FAILED'))]
     fn test_set_coin_owner() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false);
+        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false, true);
         utils::execute_set_coin(admin, other, coins::LORDS, lords.contract_address, 5, 10, true);
     }
 
@@ -203,7 +203,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Not owner','ENTRYPOINT_FAILED'))]
     fn test_enable_coin_owner() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false);
+        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false, true);
         utils::execute_enable_coin(admin, other, coins::LORDS, true);
     }
 
@@ -211,7 +211,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Invalid coin','ENTRYPOINT_FAILED'))]
     fn test_set_coin_zero() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false);
+        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false, true);
         utils::execute_set_coin(admin, owner, 0, lords.contract_address, 5, 10, true);
     }
 
@@ -219,7 +219,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Invalid coin','ENTRYPOINT_FAILED'))]
     fn test_set_coin_invalid() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false);
+        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false, true);
         utils::execute_set_coin(admin, owner, coins::COUNT + 1, lords.contract_address, 5, 10, true);
     }
 
@@ -227,7 +227,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Invalid coin','ENTRYPOINT_FAILED'))]
     fn test_enable_coin_zero() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false);
+        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false, true);
         utils::execute_enable_coin(admin, owner, 0, false);
     }
 
@@ -235,7 +235,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Invalid coin','ENTRYPOINT_FAILED'))]
     fn test_enable_coin_invalid() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false);
+        let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(false, true);
         utils::execute_enable_coin(admin, owner, coins::COUNT + 1, false);
     }
 

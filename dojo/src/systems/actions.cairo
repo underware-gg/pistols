@@ -137,8 +137,6 @@ mod actions {
             let coin: Coin = coin_manager.get(wager_coin);
             assert(coin.enabled == true, 'Coin disabled');
             let fee: u256 = coin.calc_fee(wager_value);
-            // stake (transfer to contract)
-            utils::stake_player_wager_fees(world, coin, wager_value, fee);
             // calc fee and store
             let wager = Wager {
                 duel_id,
@@ -166,6 +164,9 @@ mod actions {
                 timestamp_end,     // expire
             };
 
+            // transfer wager/fee from Challenger to the contract
+            utils::deposit_wager_fees(world, challenge.duelist_a, starknet::get_contract_address(), duel_id);
+
             utils::set_challenge(world, challenge);
 
             (duel_id)
@@ -179,13 +180,14 @@ mod actions {
             accepted: bool,
         ) -> ChallengeState {
             let world: IWorldDispatcher = self.world_dispatcher.read();
-            let caller: ContractAddress = starknet::get_caller_address();
 
             let mut challenge: Challenge = get!(world, duel_id, Challenge);
             let state: ChallengeState = challenge.state.try_into().unwrap();
             assert(state.exists(), 'Challenge do not exist');
             assert(state == ChallengeState::Awaiting, 'Challenge is not Awaiting');
 
+            let caller: ContractAddress = starknet::get_caller_address();
+            let contract: ContractAddress = starknet::get_contract_address();
             let timestamp: u64 = get_block_timestamp();
 
             if (challenge.timestamp_end > 0 && timestamp > challenge.timestamp_end) {
@@ -205,19 +207,13 @@ mod actions {
                     challenge.round_number = 1;
                     challenge.timestamp_start = timestamp;
                     challenge.timestamp_end = 0;
+                    // transfer wager/fee from Challenged to the contract
+                    utils::deposit_wager_fees(world, challenge.duelist_b, contract, duel_id);
                 } else {
                     // Challenged is Refusing
                     challenge.state = ChallengeState::Refused.into();
                     challenge.timestamp_end = timestamp;
                 }
-            }
-
-            // check balance
-            if (challenge.state == ChallengeState::InProgress.into()) {
-                let wager: Wager = get!(world, (duel_id), Wager);
-                let coin : Coin = CoinManagerTrait::new(self.world()).get(wager.coin);
-                // stake (transfer to contract)
-                utils::stake_player_wager_fees(world, coin, wager.value, wager.fee);
             }
 
             // update challenge state
