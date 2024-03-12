@@ -16,8 +16,7 @@ import { ChallengeMessages } from '@/pistols/utils/pistols'
 import { randomArrayElement } from '@/pistols/utils/utils'
 import { AccountShort } from '@/pistols/components/account/Account'
 import { WagerAndOrFees } from '@/pistols/components/account/Wager'
-import { COIN_LORDS } from '@/pistols/hooks/useConfig'
-import { LordsFaucet } from './wallet/LordsFaucet'
+import { COIN_LORDS, useCoin } from '@/pistols/hooks/useConfig'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -32,6 +31,9 @@ export default function DuelistModal() {
   const { hasPact, pactDuelId } = usePact(account.address, duelistAddress)
   const [isChallenging, setIsChallenging] = useState(false)
   const [args, setArgs] = useState(null)
+
+  const wagerValue = useMemo(() => (args?.wager_value ?? 0n), [args])
+  const { fee } = useCalcFee(COIN_LORDS, wagerValue)
 
   const isYou = useMemo(() => (duelistAddress == BigInt(account.address)), [duelistAddress, account])
   const isOpen = useMemo(() => (duelistAddress > 0), [duelistAddress])
@@ -222,7 +224,8 @@ function CreateChallenge({
         <Form.Field>
           <span className='FormLabel'>&nbsp;wager $LORDS</span>
           <input placeholder={'$LORDS'} value={value} maxLength={12} onChange={(e) => {
-            const _lords = parseInt(e.target.value as string)
+            const _input = e.target.value as string
+            const _lords = _input ? parseInt(_input) : 0
             if (!isNaN(_lords)) {
               setValue(_lords)
             }

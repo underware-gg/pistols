@@ -18,8 +18,10 @@ export const useCoin = (coinKey:number = COIN_LORDS) => {
   const { Coin } = useDojoComponents()
   const coin = useComponentValue(Coin, bigintToEntity(BigInt(coinKey)))
   return {
-    contractAddress: coin.contract_address ?? null,
-    feeMin: coin.fee_min ?? null,
-    feePct: coin.fee_pct ?? null,
+    contractAddress: coin?.contract_address ?? 0n,
+    description: coin?.description ?? null,
+    feeMin: coin?.fee_min ?? null,
+    feePct: coin?.fee_pct ?? null,
+    enabled: coin?.enabled ?? false,
   }
 }
