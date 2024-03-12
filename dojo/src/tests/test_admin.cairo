@@ -158,16 +158,18 @@ mod tests {
         assert(coin.contract_address == zero_address(), 'zero');
         assert(coin.enabled == false, 'zero');
         // set
-        utils::execute_set_coin(admin, owner, coins::LORDS, lords.contract_address, 5, 10, true);
+        utils::execute_set_coin(admin, owner, coins::LORDS, lords.contract_address, 'LORDS+', 5, 10, true);
         let coin: Coin = admin.get_coin(coins::LORDS);
         assert(coin.contract_address == lords.contract_address, 'contract_address_1');
+        assert(coin.description == 'LORDS+', 'description_1');
         assert(coin.fee_min == 5, 'fee_min_1');
         assert(coin.fee_pct == 10, 'fee_pct_1');
         assert(coin.enabled == true, 'enabled_1');
         // set
-        utils::execute_set_coin(admin, owner, coins::LORDS, other, 22, 33, false);
+        utils::execute_set_coin(admin, owner, coins::LORDS, other, 'LORDS+++', 22, 33, false);
         let coin: Coin = admin.get_coin(coins::LORDS);
         assert(coin.contract_address == other, 'contract_address_2');
+        assert(coin.description == 'LORDS+++', 'description_2');
         assert(coin.fee_min == 22, 'fee_min_2');
         assert(coin.fee_pct == 33, 'fee_pct_2');
         assert(coin.enabled == false, 'enabled_2');
@@ -186,9 +188,10 @@ mod tests {
         let coin: Coin = admin.get_coin(coins::COUNT);
         assert(coin.contract_address == zero_address(), 'zero');
         // set
-        utils::execute_set_coin(admin, owner, coins::COUNT, lords.contract_address, 5, 10, true);
+        utils::execute_set_coin(admin, owner, coins::COUNT, lords.contract_address, 'LORDS+', 5, 10, true);
         let coin: Coin = admin.get_coin(coins::COUNT);
         assert(coin.contract_address == lords.contract_address, 'contract_address');
+        assert(coin.description == 'LORDS+', 'description');
         assert(coin.fee_min == 5, 'fee_min');
         assert(coin.fee_pct == 10, 'fee_pct');
         assert(coin.enabled == true, 'enabled');
@@ -198,7 +201,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     fn test_enable_coin_count() {
         let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(false, true);
-        utils::execute_set_coin(admin, owner, coins::LORDS, lords.contract_address, 5, 10, false);
+        utils::execute_set_coin(admin, owner, coins::LORDS, lords.contract_address, 'LORDS+', 5, 10, false);
         let coin: Coin = admin.get_coin(coins::LORDS);
         assert(coin.enabled == false, 'enabled_1');
         utils::execute_enable_coin(admin, owner, coins::LORDS, true);
@@ -214,7 +217,7 @@ mod tests {
     #[should_panic(expected:('Not owner','ENTRYPOINT_FAILED'))]
     fn test_set_coin_owner() {
         let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(false, true);
-        utils::execute_set_coin(admin, other, coins::LORDS, lords.contract_address, 5, 10, true);
+        utils::execute_set_coin(admin, other, coins::LORDS, lords.contract_address, 'LORDS+', 5, 10, true);
     }
 
     #[test]
@@ -230,7 +233,7 @@ mod tests {
     #[should_panic(expected:('Invalid coin','ENTRYPOINT_FAILED'))]
     fn test_set_coin_zero() {
         let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(false, true);
-        utils::execute_set_coin(admin, owner, 0, lords.contract_address, 5, 10, true);
+        utils::execute_set_coin(admin, owner, 0, lords.contract_address, 'LORDS+', 5, 10, true);
     }
 
     #[test]
@@ -238,7 +241,7 @@ mod tests {
     #[should_panic(expected:('Invalid coin','ENTRYPOINT_FAILED'))]
     fn test_set_coin_invalid() {
         let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(false, true);
-        utils::execute_set_coin(admin, owner, coins::COUNT + 1, lords.contract_address, 5, 10, true);
+        utils::execute_set_coin(admin, owner, coins::COUNT + 1, lords.contract_address, 'LORDS+', 5, 10, true);
     }
 
     #[test]

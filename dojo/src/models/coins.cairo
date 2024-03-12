@@ -17,6 +17,7 @@ struct Coin {
     key: u8,
     //------
     contract_address: ContractAddress,
+    description: felt252,
     fee_min: u256,
     fee_pct: u8,
     enabled: bool,

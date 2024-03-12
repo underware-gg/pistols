@@ -14,7 +14,7 @@ trait IAdmin<TContractState> {
     
     fn set_treasury(self: @TContractState, treasury_address: ContractAddress);
     fn set_paused(self: @TContractState, paused: bool);
-    fn set_coin(self: @TContractState, coin_key: u8, contract_address: ContractAddress, fee_min: u256, fee_pct: u8, enabled: bool);
+    fn set_coin(self: @TContractState, coin_key: u8, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool);
     fn enable_coin(self: @TContractState, coin_key: u8, enabled: bool);
     
     fn get_config(self: @TContractState) -> Config;
@@ -49,6 +49,7 @@ mod admin {
                 self.set_coin(
                     coins::LORDS,
                     lords_address,
+                    '$LORDS',
                     4 * ETH_TO_WEI,
                     10,
                     true,
@@ -77,7 +78,7 @@ mod admin {
             manager.set(config);
         }
 
-        fn set_coin(self: @ContractState, coin_key: u8, contract_address: ContractAddress, fee_min: u256, fee_pct: u8, enabled: bool) {
+        fn set_coin(self: @ContractState, coin_key: u8, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool) {
             self.assert_caller_is_owner();
             // get coin
             let manager = CoinManagerTrait::new(self.world());
@@ -85,6 +86,7 @@ mod admin {
             let mut coin = manager.get(coin_key);
             // update coin
             coin.contract_address = contract_address;
+            coin.description = description;
             coin.fee_min = fee_min;
             coin.fee_pct = fee_pct;
             coin.enabled = enabled;

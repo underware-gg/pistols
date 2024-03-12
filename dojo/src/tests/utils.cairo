@@ -127,9 +127,9 @@ mod utils {
         system.set_paused(paused);
         _next_block();
     }
-    fn execute_set_coin(system: IAdminDispatcher, sender: ContractAddress, coin_key: u8, contract_address: ContractAddress, fee_min: u256, fee_pct: u8, enabled: bool) {
+    fn execute_set_coin(system: IAdminDispatcher, sender: ContractAddress, coin_key: u8, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool) {
         testing::set_contract_address(sender);
-        system.set_coin(coin_key, contract_address, fee_min, fee_pct, enabled);
+        system.set_coin(coin_key, contract_address, description, fee_min, fee_pct, enabled);
         _next_block();
     }
     fn execute_enable_coin(system: IAdminDispatcher, sender: ContractAddress, coin_key: u8, enabled: bool) {
