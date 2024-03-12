@@ -94,6 +94,28 @@ fn withdraw_wager_fees(world: IWorldDispatcher, to: ContractAddress, duel_id: u1
         coin.ierc20().transfer(to, total);
     }
 }
+fn split_wager_fees(world: IWorldDispatcher, share_1: ContractAddress, share_2: ContractAddress, duel_id: u128) {
+    let wager: Wager = get!(world, (duel_id), Wager);
+    let total: u256 = (wager.value + wager.fee) * 2;
+    if (total > 0) {
+        let coin : Coin = CoinManagerTrait::new(world).get(wager.coin);
+        let balance: u256 = coin.ierc20().balance_of(starknet::get_contract_address());
+        assert(balance >= total, 'Wager not available'); // should never happen!
+        if (wager.value > 0) {
+            if (share_1 == share_2) {
+                // single winner
+                coin.ierc20().transfer(share_1, wager.value * 2);
+            } else {
+                coin.ierc20().transfer(share_1, wager.value);
+                coin.ierc20().transfer(share_2, wager.value);
+            }
+        }
+        if (wager.fee > 0) {
+            let manager = ConfigManagerTrait::new(world).get();
+            if (manager.treasury_address != starknet::get_contract_address()) {
+                coin.ierc20().transfer(manager.treasury_address, wager.fee * 2);
+            }
+        }
     }
 }
 
@@ -267,10 +289,13 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         update_duelist_honour(ref duelist_a, final_round.shot_a.honour);
         update_duelist_honour(ref duelist_b, final_round.shot_b.honour);
 
-        // TODO: transfer wager + fees
+        // split wager/fee to winners and benefactors
         if (final_round.shot_a.wager > final_round.shot_b.wager) {
+            split_wager_fees(world, challenge.duelist_a, challenge.duelist_a, challenge.duel_id);
         } else if (final_round.shot_a.wager < final_round.shot_b.wager) {
+            split_wager_fees(world, challenge.duelist_b, challenge.duelist_b, challenge.duel_id);
         } else {
+            split_wager_fees(world, challenge.duelist_a, challenge.duelist_b, challenge.duel_id);
         }
         
         // save Duelists

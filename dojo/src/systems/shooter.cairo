@@ -119,7 +119,7 @@ mod shooter {
             process_round(world, ref challenge, ref round, is_last_round);
             // open Round 3 if not over
             if (challenge.state == ChallengeState::InProgress.into()) {
-                // TODO: move this to init::
+                // TODO: move this to init::?
                 let mut round3 = Round {
                     duel_id: challenge.duel_id,
                     round_number: challenge.round_number,

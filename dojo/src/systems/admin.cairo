@@ -43,7 +43,7 @@ mod admin {
             config.paused = false;
             manager.set(config);
             // set treasury
-            self.set_treasury(treasury_address);
+            self.set_treasury(if (treasury_address == utils::zero_address()) { get_caller_address() } else { treasury_address });
             // set lords
             if (lords_address != utils::zero_address()) {
                 self.set_coin(
@@ -62,7 +62,8 @@ mod admin {
             let mut config = manager.get();
             assert(config.initialized == true, 'Not initialized');
             // update
-            config.treasury_address = (if (treasury_address == utils::zero_address()) { get_contract_address() } else { treasury_address });
+            assert(treasury_address != utils::zero_address(), 'Null treasury_address');
+            config.treasury_address = treasury_address;
             manager.set(config);
         }
 

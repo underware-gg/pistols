@@ -24,6 +24,10 @@ impl ConfigImpl of ConfigManagerTrait {
         ConfigManager { world }
     }
 
+    fn is_initialized(world: IWorldDispatcher) -> bool {
+        (ConfigManagerTrait::new(world).get().initialized)
+    }
+
     fn get(self: ConfigManager) -> Config {
         get!(self.world, (CONFIG_KEY), Config)
     }

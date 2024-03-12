@@ -69,6 +69,7 @@ mod actions {
     use starknet::{ContractAddress, get_block_timestamp, get_block_info};
 
     use pistols::models::models::{Duelist, Challenge, Wager, Pact, Round, Shot};
+    use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
     use pistols::models::coins::{Coin, CoinManager, CoinManagerTrait, CoinTrait, coins, ETH_TO_WEI};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
@@ -89,10 +90,9 @@ mod actions {
             name: felt252,
             profile_pic: u8,
         ) {
-            let world: IWorldDispatcher = self.world_dispatcher.read();
             let caller: ContractAddress = starknet::get_caller_address();
 
-            let mut duelist: Duelist = get!(world, caller, Duelist);
+            let mut duelist: Duelist = get!(self.world(), caller, Duelist);
             // 1st time setup
             if (duelist.timestamp == 0) {
                 duelist.timestamp = get_block_timestamp();
@@ -101,7 +101,7 @@ mod actions {
             duelist.name = name;
             duelist.profile_pic = profile_pic;
 
-            set!(world, (duelist));
+            set!(self.world(), (duelist));
             return ();
         }
 
@@ -115,21 +115,21 @@ mod actions {
             wager_value: u256,
             expire_seconds: u64,
         ) -> u128 {
-            let world: IWorldDispatcher = self.world_dispatcher.read();
-            let caller: ContractAddress = starknet::get_caller_address();
+            assert(ConfigManagerTrait::is_initialized(self.world()) == true, 'Not initialized');
 
             assert(challenged != utils::zero_address(), 'Missing challenged address');
             assert(expire_seconds == 0 || expire_seconds >= timestamp::from_hours(1), 'Invalid expire_seconds');
 
-            assert(utils::duelist_exist(world, caller), 'Challenger not registered');
+            let caller: ContractAddress = starknet::get_caller_address();
+            assert(utils::duelist_exist(self.world(), caller), 'Challenger not registered');
             assert(caller != challenged, 'Challenging thyself, you fool!');
             assert(self.has_pact(caller, challenged) == false, 'Duplicated challenge');
             // if (challenged != utils::zero_address()) {
-            //     assert(utils::duelist_exist(world, caller), 'Challenged is not registered');
+            //     assert(utils::duelist_exist(self.world(), caller), 'Challenged is not registered');
             // }
 
             // create duel id
-            // let duel_id: u32 = world.uuid();
+            // let duel_id: u32 = self.world().uuid();
             let duel_id: u128 = make_seed(caller);
 
             // setup wager + fees
@@ -144,7 +144,7 @@ mod actions {
                 value: wager_value,
                 fee,
             };
-            set!(world, (wager));
+            set!(self.world(), (wager));
 
             // calc expiration
             let timestamp_start: u64 = get_block_timestamp();
@@ -165,9 +165,9 @@ mod actions {
             };
 
             // transfer wager/fee from Challenger to the contract
-            utils::deposit_wager_fees(world, challenge.duelist_a, starknet::get_contract_address(), duel_id);
+            utils::deposit_wager_fees(self.world(), challenge.duelist_a, starknet::get_contract_address(), duel_id);
 
-            utils::set_challenge(world, challenge);
+            utils::set_challenge(self.world(), challenge);
 
             (duel_id)
         }
@@ -179,9 +179,7 @@ mod actions {
             duel_id: u128,
             accepted: bool,
         ) -> ChallengeState {
-            let world: IWorldDispatcher = self.world_dispatcher.read();
-
-            let mut challenge: Challenge = get!(world, duel_id, Challenge);
+            let mut challenge: Challenge = get!(self.world(), duel_id, Challenge);
             let state: ChallengeState = challenge.state.try_into().unwrap();
             assert(state.exists(), 'Challenge do not exist');
             assert(state == ChallengeState::Awaiting, 'Challenge is not Awaiting');
@@ -200,7 +198,7 @@ mod actions {
                 challenge.timestamp_end = timestamp;
             } else {
                 assert(caller == challenge.duelist_b, 'Not the Challenged');
-                assert(utils::duelist_exist(world, caller), 'Challenged not registered');
+                assert(utils::duelist_exist(self.world(), caller), 'Challenged not registered');
                 if (accepted) {
                     // Challenged is accepting
                     challenge.state = ChallengeState::InProgress.into();
@@ -208,7 +206,7 @@ mod actions {
                     challenge.timestamp_start = timestamp;
                     challenge.timestamp_end = 0;
                     // transfer wager/fee from Challenged to the contract
-                    utils::deposit_wager_fees(world, challenge.duelist_b, contract, duel_id);
+                    utils::deposit_wager_fees(self.world(), challenge.duelist_b, contract, duel_id);
                 } else {
                     // Challenged is Refusing
                     challenge.state = ChallengeState::Refused.into();
@@ -217,7 +215,7 @@ mod actions {
             }
 
             // update challenge state
-            utils::set_challenge(world, challenge);
+            utils::set_challenge(self.world(), challenge);
 
             (challenge.state.try_into().unwrap())
         }
@@ -232,8 +230,7 @@ mod actions {
             round_number: u8,
             hash: u64,
         ) {
-            let world: IWorldDispatcher = self.world_dispatcher.read();
-            shooter::commit_action(world, duel_id, round_number, hash);
+            shooter::commit_action(self.world(), duel_id, round_number, hash);
         }
 
         fn reveal_action(self: @ContractState,
@@ -243,8 +240,7 @@ mod actions {
             action_slot1: u8,
             action_slot2: u8,
         ) {
-            let world: IWorldDispatcher = self.world_dispatcher.read();
-            shooter::reveal_action(world, duel_id, round_number, salt, utils::pack_action_slots(action_slot1, action_slot2));
+            shooter::reveal_action(self.world(), duel_id, round_number, salt, utils::pack_action_slots(action_slot1, action_slot2));
         }
 
 
@@ -254,9 +250,8 @@ mod actions {
         //
 
         fn get_pact(self: @ContractState, duelist_a: ContractAddress, duelist_b: ContractAddress) -> u128 {
-            let world: IWorldDispatcher = self.world_dispatcher.read();
             let pair: u128 = utils::make_pact_pair(duelist_a, duelist_b);
-            (get!(world, pair, Pact).duel_id)
+            (get!(self.world(), pair, Pact).duel_id)
         }
 
         fn has_pact(self: @ContractState, duelist_a: ContractAddress, duelist_b: ContractAddress) -> bool {
@@ -270,32 +265,26 @@ mod actions {
         }
 
         fn calc_hit_bonus(self: @ContractState, duelist_address: ContractAddress) -> u8 {
-            let world: IWorldDispatcher = self.world_dispatcher.read();
-            (utils::calc_hit_bonus(world, duelist_address))
+            (utils::calc_hit_bonus(self.world(), duelist_address))
         }
         fn calc_hit_penalty(self: @ContractState, health: u8) -> u8 {
-            let world: IWorldDispatcher = self.world_dispatcher.read();
-            (utils::calc_hit_penalty(world, health))
+            (utils::calc_hit_penalty(self.world(), health))
         }
 
         fn calc_hit_chances(self: @ContractState, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8 {
-            let world: IWorldDispatcher = self.world_dispatcher.read();
-            let health: u8 = utils::get_duelist_health(world, duelist_address, duel_id, round_number);
-            (utils::calc_hit_chances(world, duelist_address, action.into(), health))
+            let health: u8 = utils::get_duelist_health(self.world(), duelist_address, duel_id, round_number);
+            (utils::calc_hit_chances(self.world(), duelist_address, action.into(), health))
         }
         fn calc_crit_chances(self: @ContractState, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8 {
-            let world: IWorldDispatcher = self.world_dispatcher.read();
-            let health: u8 = utils::get_duelist_health(world, duelist_address, duel_id, round_number);
-            (utils::calc_crit_chances(world, duelist_address, action.into(), health))
+            let health: u8 = utils::get_duelist_health(self.world(), duelist_address, duel_id, round_number);
+            (utils::calc_crit_chances(self.world(), duelist_address, action.into(), health))
         }
         fn calc_glance_chances(self: @ContractState, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8 {
-            let world: IWorldDispatcher = self.world_dispatcher.read();
-            let health: u8 = utils::get_duelist_health(world, duelist_address, duel_id, round_number);
-            (utils::calc_glance_chances(world, duelist_address, action.into(), health))
+            let health: u8 = utils::get_duelist_health(self.world(), duelist_address, duel_id, round_number);
+            (utils::calc_glance_chances(self.world(), duelist_address, action.into(), health))
         }
         fn calc_honour_for_action(self: @ContractState, duelist_address: ContractAddress, action: u8) -> (u8, u8) {
-            let world: IWorldDispatcher = self.world_dispatcher.read();
-            (utils::calc_honour_for_action(world, duelist_address, action.into()))
+            (utils::calc_honour_for_action(self.world(), duelist_address, action.into()))
         }
 
         fn get_valid_packed_actions(self: @ContractState, round_number: u8) -> Array<u16> {

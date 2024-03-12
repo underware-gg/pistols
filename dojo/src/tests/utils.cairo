@@ -22,6 +22,7 @@ mod utils {
     };
     use pistols::models::config::{Config, config};
     use pistols::models::coins::{Coin, coin, ETH_TO_WEI};
+    use pistols::utils::string::{String};
 
     // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
     extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
@@ -43,6 +44,7 @@ mod utils {
         ContractAddress,
         ContractAddress,
         ContractAddress,
+        ContractAddress,
     ) {
         let mut models = array![
             duelist::TEST_CLASS_HASH,
@@ -57,6 +59,7 @@ mod utils {
         let owner: ContractAddress = starknet::contract_address_const::<0x111111>();
         let other: ContractAddress = starknet::contract_address_const::<0x222>();
         let bummer: ContractAddress = starknet::contract_address_const::<0x333>();
+        let treasury: ContractAddress = starknet::contract_address_const::<0x444>();
         // testing::set_caller_address(owner);   // not used??
         testing::set_contract_address(owner); // this is the CALLER!!
         testing::set_block_number(1);
@@ -65,17 +68,17 @@ mod utils {
         let admin = IAdminDispatcher{ contract_address: world.deploy_contract('salt', admin::TEST_CLASS_HASH.try_into().unwrap()) };
         let lords = ILordsMockDispatcher{ contract_address: world.deploy_contract('salt', lords_mock::TEST_CLASS_HASH.try_into().unwrap()) };
         let ierc20 = IERC20Dispatcher{ contract_address:lords.contract_address };
-        execute_initializer(lords, owner);
+        execute_ierc20_initializer(lords, owner);
         execute_faucet(lords, other);
         if (initialize) {
-            execute_initialize(admin, owner, starknet::contract_address_const::<0x0>(), lords.contract_address);
+            execute_initialize(admin, owner, treasury, lords.contract_address);
         }
         if (approve) {
             execute_approve(lords, owner, system.contract_address, 1_000_000 * ETH_TO_WEI);
             execute_approve(lords, other, system.contract_address, 1_000_000 * ETH_TO_WEI);
             execute_approve(lords, bummer, system.contract_address, 1_000_000 * ETH_TO_WEI);
         }
-        (world, system, admin, lords, ierc20, owner, other, bummer)
+        (world, system, admin, lords, ierc20, owner, other, bummer, treasury)
     }
 
     fn elapse_timestamp(delta: u64) -> (u64, u64) {
@@ -136,7 +139,7 @@ mod utils {
     }
 
     // ::ierc20
-    fn execute_initializer(system: ILordsMockDispatcher, sender: ContractAddress) {
+    fn execute_ierc20_initializer(system: ILordsMockDispatcher, sender: ContractAddress) {
         testing::set_contract_address(sender);
         system.initializer();
         _next_block();
@@ -243,6 +246,44 @@ mod utils {
         let round = get!(world, (duel_id, challenge.round_number), Round);
         (challenge, round)
     }
+
+    //
+    // Asserts
+    //
+
+    fn assert_balance(ierc20: IERC20Dispatcher, address: ContractAddress, balance_before: u256, subtract: u256, add: u256, prefix: felt252) -> u256 {
+        let balance: u256 = ierc20.balance_of(address);
+        if (subtract > add) {
+            assert(balance < balance_before, String::concat(prefix, ' <'));
+        } else if (add > subtract) {
+            assert(balance > balance_before, String::concat(prefix, ' >'));
+        } else {
+            assert(balance == balance_before, String::concat(prefix, ' =='));
+        }
+        assert(balance == balance_before - subtract + add, String::concat(prefix, ' =>'));
+        (balance)
+    }
+
+    fn assert_winner_balance(ierc20: IERC20Dispatcher,
+        winner: u8,
+        duelist_a: ContractAddress, duelist_b: ContractAddress,
+        balance_a: u256, balance_b: u256,
+        fee: u256, wager_value: u256,
+        prefix: felt252,
+    ) {
+        if (winner == 1) {
+            assert_balance(ierc20, duelist_a, balance_a, fee, wager_value, String::concat('A_A_', prefix));
+            assert_balance(ierc20, duelist_b, balance_b, fee + wager_value, 0, String::concat('A_B_', prefix));
+        } else if (winner == 2) {
+            assert_balance(ierc20, duelist_a, balance_a, fee + wager_value, 0, String::concat('B_A_', prefix));
+            assert_balance(ierc20, duelist_b, balance_b, fee, wager_value, String::concat('B_B_', prefix));
+        } else {
+            assert_balance(ierc20, duelist_a, balance_a, fee, 0, String::concat('D_A_', prefix));
+            assert_balance(ierc20, duelist_b, balance_b, fee, 0, String::concat('D_B_', prefix));
+        }
+    }
+
+
 }
 
 #[cfg(test)]
