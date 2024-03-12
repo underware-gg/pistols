@@ -7,11 +7,11 @@ export function defineContractComponents(world: World) {
 	  Coin: (() => {
 	    return defineComponent(
 	      world,
-	      { key: RecsType.Number, contract_address: RecsType.BigInt, fee_min: RecsType.BigInt, fee_pct: RecsType.Number, enabled: RecsType.Boolean },
+	      { key: RecsType.Number, contract_address: RecsType.BigInt, description: RecsType.BigInt, fee_min: RecsType.BigInt, fee_pct: RecsType.Number, enabled: RecsType.Boolean },
 	      {
 	        metadata: {
 	          name: "Coin",
-	          types: ["u8","contractaddress","u256","u8","bool"],
+	          types: ["u8","contractaddress","felt252","u256","u8","bool"],
 	          customTypes: [],
 	        },
 	      }
@@ -20,11 +20,11 @@ export function defineContractComponents(world: World) {
 	  Config: (() => {
 	    return defineComponent(
 	      world,
-	      { key: RecsType.Number, initialized: RecsType.Boolean, paused: RecsType.Boolean, treasury_address: RecsType.BigInt },
+	      { key: RecsType.Number, initialized: RecsType.Boolean, owner_address: RecsType.BigInt, treasury_address: RecsType.BigInt, paused: RecsType.Boolean },
 	      {
 	        metadata: {
 	          name: "Config",
-	          types: ["u8","bool","bool","contractaddress"],
+	          types: ["u8","bool","contractaddress","contractaddress","bool"],
 	          customTypes: [],
 	        },
 	      }

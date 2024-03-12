@@ -65,7 +65,7 @@ if [[ ! -z "$LORDS_COMPONENTS" ]]; then
 fi
 
 echo "* Initializing Game World..."
-sozo execute $ADMIN_ADDRESS initialize --calldata 0x0,$LORDS_ADDRESS > /dev/null || true
+sozo execute $ADMIN_ADDRESS initialize --calldata 0x0,0x0,$LORDS_ADDRESS > /dev/null || true
 sleep $TX_SLEEP
 
 echo "* All set! 👍"
