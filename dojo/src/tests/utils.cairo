@@ -71,7 +71,7 @@ mod utils {
         execute_ierc20_initializer(lords, owner);
         execute_faucet(lords, other);
         if (initialize) {
-            execute_initialize(admin, owner, treasury, lords.contract_address);
+            execute_initialize(admin, owner, owner, treasury, lords.contract_address);
         }
         if (approve) {
             execute_approve(lords, owner, system.contract_address, 1_000_000 * ETH_TO_WEI);
@@ -112,9 +112,14 @@ mod utils {
     //
 
     // ::admin
-    fn execute_initialize(system: IAdminDispatcher, sender: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress) {
+    fn execute_initialize(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress) {
         testing::set_contract_address(sender);
-        system.initialize(treasury_address, lords_address);
+        system.initialize(owner_address, treasury_address, lords_address);
+        _next_block();
+    }
+    fn execute_set_owner(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress) {
+        testing::set_contract_address(sender);
+        system.set_owner(owner_address);
         _next_block();
     }
     fn execute_set_treasury(system: IAdminDispatcher, sender: ContractAddress, treasury_address: ContractAddress) {

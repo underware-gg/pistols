@@ -1,6 +1,7 @@
 use starknet::ContractAddress;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
+use pistols::systems::utils::{zero_address};
 use pistols::utils::math::{MathU256};
 
 mod coins {
@@ -21,6 +22,17 @@ struct Coin {
     fee_min: u256,
     fee_pct: u8,
     enabled: bool,
+}
+
+fn default_coin(contract_address: ContractAddress) -> Coin {
+    (Coin {
+        key: coins::LORDS,
+        contract_address,
+        description: '$LORDS',
+        fee_min: 4 * ETH_TO_WEI,
+        fee_pct: 10,
+        enabled: (if (contract_address == zero_address()) { false } else { true }),
+   })
 }
 
 #[derive(Copy, Drop)]

@@ -10,8 +10,9 @@ use pistols::models::coins::{Coin};
 
 #[starknet::interface]
 trait IAdmin<TContractState> {
-    fn initialize(self: @TContractState, treasury_address: ContractAddress, lords_address: ContractAddress);
+    fn initialize(self: @TContractState, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress);
     
+    fn set_owner(self: @TContractState, owner_address: ContractAddress);
     fn set_treasury(self: @TContractState, treasury_address: ContractAddress);
     fn set_paused(self: @TContractState, paused: bool);
     fn set_coin(self: @TContractState, coin_key: u8, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool);
@@ -23,56 +24,60 @@ trait IAdmin<TContractState> {
 
 #[dojo::contract]
 mod admin {
+    use debug::PrintTrait;
     use core::traits::Into;
     use starknet::ContractAddress;
     use starknet::{get_caller_address, get_contract_address};
 
     use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
-    use pistols::models::coins::{Coin, CoinManager, CoinManagerTrait, coins, ETH_TO_WEI};
+    use pistols::models::coins::{Coin, CoinManager, CoinManagerTrait, default_coin};
     use pistols::systems::{utils};
 
     #[abi(embed_v0)]
     impl AdminExternalImpl of super::IAdmin<ContractState> {
-        fn initialize(self: @ContractState, treasury_address: ContractAddress, lords_address: ContractAddress) {
-            self.assert_caller_is_owner();
+        fn initialize(self: @ContractState, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress) {
+            self.assert_initializer_is_owner();
             let manager = ConfigManagerTrait::new(self.world());
             let mut config = manager.get();
             assert(config.initialized == false, 'Already initialized');
             // initialize
             config.initialized = true;
+            config.owner_address = (if (owner_address == utils::zero_address()) { get_caller_address() } else { owner_address });
+            config.treasury_address = (if (treasury_address == utils::zero_address()) { get_caller_address() } else { treasury_address });
             config.paused = false;
             manager.set(config);
-            // set treasury
-            self.set_treasury(if (treasury_address == utils::zero_address()) { get_caller_address() } else { treasury_address });
             // set lords
-            if (lords_address != utils::zero_address()) {
-                self.set_coin(
-                    coins::LORDS,
-                    lords_address,
-                    '$LORDS',
-                    4 * ETH_TO_WEI,
-                    10,
-                    true,
-                );
-            }
+            let manager = CoinManagerTrait::new(self.world());
+            manager.set(default_coin(lords_address));
+        }
+
+        fn set_owner(self: @ContractState, owner_address: ContractAddress) {
+            self.assert_caller_is_owner();
+            assert(owner_address != utils::zero_address(), 'Null owner_address');
+            // get current
+            let manager = ConfigManagerTrait::new(self.world());
+            let mut config = manager.get();
+            // update
+            config.owner_address = owner_address;
+            manager.set(config);
         }
 
         fn set_treasury(self: @ContractState, treasury_address: ContractAddress) {
             self.assert_caller_is_owner();
+            assert(treasury_address != utils::zero_address(), 'Null treasury_address');
+            // get current
             let manager = ConfigManagerTrait::new(self.world());
             let mut config = manager.get();
-            assert(config.initialized == true, 'Not initialized');
             // update
-            assert(treasury_address != utils::zero_address(), 'Null treasury_address');
             config.treasury_address = treasury_address;
             manager.set(config);
         }
 
         fn set_paused(self: @ContractState, paused: bool) {
             self.assert_caller_is_owner();
+            // get current
             let manager = ConfigManagerTrait::new(self.world());
             let mut config = manager.get();
-            assert(config.initialized == true, 'Not initialized');
             // update
             config.paused = paused;
             manager.set(config);
@@ -122,9 +127,12 @@ mod admin {
     #[generate_trait]
     impl AdminInternalImpl of AdminInternalTrait {
         #[inline(always)]
+        fn assert_initializer_is_owner(self: @ContractState) {
+            assert(self.world().is_owner(get_caller_address(), get_contract_address().into()), 'Not deployer');
+        }
         fn assert_caller_is_owner(self: @ContractState) {
-            assert(self.world().is_owner(get_caller_address(), get_contract_address().into()), 'Not owner');
+            assert(ConfigManagerTrait::is_initialized(self.world()) == true, 'Not initialized');
+            assert(ConfigManagerTrait::is_owner(self.world(), get_caller_address()) == true, 'Not owner');
         }
     }
 }
-
