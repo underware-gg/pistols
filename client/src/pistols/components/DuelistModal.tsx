@@ -110,7 +110,7 @@ export default function DuelistModal() {
               <Col>
                 {
                   hasPact ? <ActionButton fill attention label='Existing Challenge!' onClick={() => dispatchSelectDuel(pactDuelId)} />
-                    : isChallenging ? <BalanceRequiredButton disabled={!args} label='Submit Challenge!' onClick={() => _challenge()} fee={args?.wager_value ?? 0} />
+                    : isChallenging ? <BalanceRequiredButton disabled={!args} label='Submit Challenge!' onClick={() => _challenge()} wagerValue={wagerValue} fee={fee} />
                       : <ActionButton fill disabled={isMasterAccount} label='Challenge for a Duel!' onClick={() => setIsChallenging(true)} />
                 }
               </Col>

@@ -167,7 +167,7 @@ export default function ChallengeModal() {
             }
             {(state == ChallengeState.Awaiting && isChallenged) &&
               <Col>
-                <BalanceRequiredButton label='Accept Challenge!' onClick={() => _reply(true)} fee={value > 0 ? value : fee} />
+                <BalanceRequiredButton label='Accept Challenge!' onClick={() => _reply(true)} wagerValue={value} fee={fee} />
               </Col>
             }
             {(state == ChallengeState.InProgress) &&

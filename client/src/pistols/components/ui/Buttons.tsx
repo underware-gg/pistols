@@ -90,12 +90,13 @@ export const ActionButton = ({
 
 export const BalanceRequiredButton = ({
   label,
+  wagerValue,
   fee,
   onClick,
   disabled = false,
 }) => {
   const { account } = useDojoAccount()
-  const { balance, noFunds } = useLordsBalance(account.address, fee)
+  const { balance, noFunds } = useLordsBalance(account.address, wagerValue + fee)
   return (
     <ActionButton fill
       disabled={disabled}

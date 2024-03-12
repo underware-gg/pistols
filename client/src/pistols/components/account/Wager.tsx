@@ -12,15 +12,17 @@ function Wager({
   big = false,
   small = false,
   clean = false,
+  crossed = false,
   pre = null,
   post = null,
 }: {
   coin: number
   value?: BigNumberish
   wei?: BigNumberish
-    big?: boolean
-    small?: boolean
+  big?: boolean
+  small?: boolean
   clean?: boolean
+  crossed?: boolean
   pre?: string
   post?: string
 }) {
@@ -31,9 +33,20 @@ function Wager({
     if (result) result = Number(result).toLocaleString('en-US', { maximumFractionDigits: 8 })
     return result
   }, [value, wei])
+
+  let classNames = useMemo(() => {
+    let result = []
+    if (small) result.push('WagerSmall')
+    else if (big) result.push('WagerBig')
+    else result.push('Wager')
+    if (crossed) result.push('Crossed')
+    return result
+  }, [small, big, crossed])
+
   if (!_value) return <></>
+
   return (
-    <span className={small ? 'WagerSmall' : big ? 'WagerBig' : 'Wager'}>
+    <span className={classNames.join(' ')}>
       {/* <CustomIcon name='lords' logo color={'bisque'} centered={false} /> */}
       {pre}{!clean && <>💰</>}{_value}{post}
     </span>
@@ -54,11 +67,11 @@ function WagerAndOrFees({
     return (
       <>
         <span>
-          <Wager big coin={coin} wei={value} />
+          <Wager big coin={coin} wei={value} pre={'Cost: '} />
         </span>
         &nbsp;&nbsp;
         <span>
-          (<Wager clean coin={coin} wei={fee} pre='-' /> fee)
+          (<Wager clean coin={coin} wei={fee} pre='+' /> fee)
         </span>
       </>
     )
@@ -66,7 +79,7 @@ function WagerAndOrFees({
   if (BigInt(fee ?? 0) > 0n) {
     return (
       <span>
-        <Wager big coin={coin} wei={fee} pre={'Fee '} />
+        <Wager big coin={coin} wei={fee} pre={'Fee: '} />
       </span>
     )
   }

@@ -5,13 +5,13 @@ import { useAllChallengeIds, useChallengeIdsByDuelist, useLiveChallengeIds, useP
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuel } from '@/pistols/hooks/useDuel'
+import { useWager } from '@/pistols/hooks/useWager'
 import { ChallengeState, ChallengeStateClasses, ChallengeStateNames } from '@/pistols/utils/pistols'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { DuelIconsAsRow } from '@/pistols/components/DuelIcons'
 import { Wager } from '@/pistols/components/account/Wager'
-import { useWager } from '../hooks/useWager'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -86,7 +86,7 @@ function ChallengeTableByIds({
           <HeaderCell>Challenger</HeaderCell>
           <HeaderCell width={1}></HeaderCell>
           <HeaderCell>Challenged</HeaderCell>
-          <HeaderCell width={3} textAlign='center'>State</HeaderCell>
+          <HeaderCell width={3} textAlign='center'>Winner</HeaderCell>
           <HeaderCell width={3} textAlign='center'>Time</HeaderCell>
         </Table.Row>
       </Table.Header>
@@ -170,17 +170,16 @@ function DuelItem({
         {state == ChallengeState.Resolved ?
           <>
             <PositiveResult positive={true}>
-              <ProfileName address={winnerIsA ? duelistA : duelistB} badges={false} />{!value && <><br />Wins</>}
+              <ProfileName address={winnerIsA ? duelistA : duelistB} badges={false} />
             </PositiveResult>
-            <Wager small coin={coin} wei={value} />
+            {value && <><br /><Wager small coin={coin} wei={value} /></>}
           </>
           :
           <>
             <span className={ChallengeStateClasses[state]}>
               {ChallengeStateNames[state]}
             </span>
-            <br />
-            <Wager small coin={coin} wei={value} />
+            {value && <><br /><Wager small coin={coin} wei={value} crossed={!isLive} /></>}
           </>
         }
       </Cell>

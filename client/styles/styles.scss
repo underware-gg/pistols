@@ -193,6 +193,10 @@ canvas {
   font-weight: 600;
 }
 
+.Crossed {
+  text-decoration: line-through;
+}
+
 .Black     { color: #444; }
 .Important { color: $color-important; }
 .Bright    { color: $color-bright!important; }
