@@ -4,6 +4,7 @@ use starknet::{ContractAddress};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::models::models::{init, Duelist, Challenge, Wager, Pact, Round, Shot};
 use pistols::models::coins::{Coin, CoinManagerTrait, CoinTrait};
+use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round::{RoundState, RoundStateTrait};
 use pistols::types::action::{Action, ActionTrait, ACTION};
@@ -73,29 +74,26 @@ fn get_duelist_health(world: IWorldDispatcher, duelist_address: ContractAddress,
 // ierc20::approve(contract_address, max(wager.value, wager.fee));
 fn deposit_wager_fees(world: IWorldDispatcher, from: ContractAddress, to: ContractAddress, duel_id: u128) {
     let wager: Wager = get!(world, (duel_id), Wager);
-    let coin : Coin = CoinManagerTrait::new(world).get(wager.coin);
-    let balance: u256 = coin.ierc20().balance_of(from);
-    let allowance: u256 = coin.ierc20().allowance(from, to);
-    if (wager.value > 0) {
-        assert(balance >= wager.value, 'Insufficient balance for Wager');
-        assert(allowance >= wager.value, 'Not allowed to transfer Wager');
-        coin.ierc20().transfer_from(from, to, wager.value);
-    } else if (wager.fee > 0) {
-        assert(balance >= wager.fee, 'Insufficient balance for Fee');
-        assert(allowance >= wager.fee, 'Not allowed to transfer Fee');
-        coin.ierc20().transfer_from(from, to, wager.fee);
+    let total: u256 = (wager.value + wager.fee);
+    if (total > 0) {
+        let coin : Coin = CoinManagerTrait::new(world).get(wager.coin);
+        let balance: u256 = coin.ierc20().balance_of(from);
+        let allowance: u256 = coin.ierc20().allowance(from, to);
+        assert(balance >= total, 'Insufficient balance for Fees');
+        assert(allowance >= total, 'Not allowed to transfer Fees');
+        coin.ierc20().transfer_from(from, to, total);
     }
 }
 fn withdraw_wager_fees(world: IWorldDispatcher, to: ContractAddress, duel_id: u128) {
     let wager: Wager = get!(world, (duel_id), Wager);
-    let coin : Coin = CoinManagerTrait::new(world).get(wager.coin);
-    let balance: u256 = coin.ierc20().balance_of(starknet::get_contract_address());
-    if (wager.value > 0) {
-        assert(balance >= wager.value, 'Wager withdraw not available'); // should never happen!
-        coin.ierc20().transfer(to, wager.value);
-    } else if (wager.fee > 0) {
-        assert(balance >= wager.fee, 'Fee withdraw not available'); // should never happen!
-        coin.ierc20().transfer(to, wager.fee);
+    let total: u256 = (wager.value + wager.fee);
+    if (total > 0) {
+        let coin : Coin = CoinManagerTrait::new(world).get(wager.coin);
+        let balance: u256 = coin.ierc20().balance_of(starknet::get_contract_address());
+        assert(balance >= total, 'Withdraw not available'); // should never happen!
+        coin.ierc20().transfer(to, total);
+    }
+}
     }
 }
 

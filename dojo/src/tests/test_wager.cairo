@@ -70,19 +70,18 @@ mod tests {
         // approve fees
         let coin: Coin = admin.get_coin(WAGER_COIN);
         let fee: u256 = system.calc_fee(WAGER_COIN, wager_value);
-        let approved_value: u256 = if (wager_value > 0) { wager_value } else { fee };
-        assert(fee  > 0, 'fee > 0');
+        assert(fee >= coin.fee_min, 'fee >= min');
+        let approved_value: u256 = wager_value + fee;
         utils::execute_approve(lords, A, S, approved_value);
         utils::execute_approve(lords, B, S, approved_value);
-        if (wager_value > 0) {
-            assert(approved_value > fee, 'approved_value > fee')
-        }
         // create challenge
         let duel_id: u128 = utils::execute_create_challenge(system, A, B, MESSAGE_1, WAGER_COIN, wager_value, 0);
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
         // check stored wager
         let wager = utils::get_Wager(world, duel_id);
+        let total: u256 = wager.value + wager.fee;
+        assert(total == approved_value, 'wager total = approved_value');
         assert(wager.coin == WAGER_COIN, 'wager.coin');
         assert(wager.value == wager_value, 'wager.value');
         assert(wager.fee == fee, '== fee');
@@ -113,7 +112,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Insufficient balance for Fee','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('Insufficient balance for Fees','ENTRYPOINT_FAILED'))]
     fn test_fee_funds_nok() {
         let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(true, true);
         utils::execute_register_duelist(system, other, OTHER_NAME, 1);
@@ -123,7 +122,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Insufficient balance for Wager','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('Insufficient balance for Fees','ENTRYPOINT_FAILED'))]
     fn test_wager_funds_nok() {
         let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(true, true);
         utils::execute_register_duelist(system, other, OTHER_NAME, 1);
@@ -166,7 +165,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Insufficient balance for Fee','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('Insufficient balance for Fees','ENTRYPOINT_FAILED'))]
     fn test_fee_funds_ok_resp_nok() {
         let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(true, true);
         utils::execute_register_duelist(system, other, OTHER_NAME, 1);
@@ -179,7 +178,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Insufficient balance for Wager','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('Insufficient balance for Fees','ENTRYPOINT_FAILED'))]
     fn test_wager_funds_ok_resp_nok() {
         let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(true, true);
         utils::execute_register_duelist(system, other, OTHER_NAME, 1);
@@ -196,7 +195,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Not allowed to transfer Fee','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('Not allowed to transfer Fees','ENTRYPOINT_FAILED'))]
     fn test_fee_funds_ok_allowance_nok() {
         let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(true, true);
         utils::execute_register_duelist(system, other, OTHER_NAME, 1);
@@ -209,7 +208,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Not allowed to transfer Wager','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('Not allowed to transfer Fees','ENTRYPOINT_FAILED'))]
     fn test_wager_funds_ok_allowance_nok() {
         let (world, system, admin, lords, ierc20, owner, other, bummer) = utils::setup_world(true, true);
         utils::execute_register_duelist(system, other, OTHER_NAME, 1);
@@ -237,12 +236,14 @@ mod tests {
         let balance_system: u256 = ierc20.balance_of(S);
         let balance_a: u256 = ierc20.balance_of(A);
         // create challenge
-        let wager_value: u256 = 100;
+        let wager_value: u256 = 100 * ETH_TO_WEI;
+        let fee: u256 = system.calc_fee(WAGER_COIN, wager_value);
+        let approved_value: u256 = wager_value + fee;
         let duel_id: u128 = utils::execute_create_challenge(system, A, B, MESSAGE_1, WAGER_COIN, wager_value, 0);
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
-        _assert_balance(ierc20, A, balance_a, wager_value, 0, 'balance_a_1');
-        _assert_balance(ierc20, S, balance_system, 0, wager_value, 'balance_system_1');
+        _assert_balance(ierc20, A, balance_a, approved_value, 0, 'balance_a_1');
+        _assert_balance(ierc20, S, balance_system, 0, approved_value, 'balance_system_1');
         // Withdraw
         let new_state: ChallengeState = utils::execute_reply_challenge(system, A, duel_id, false);
         assert(new_state == ChallengeState::Withdrawn, 'Withdrawn');
@@ -262,12 +263,14 @@ mod tests {
         let balance_system: u256 = ierc20.balance_of(S);
         let balance_a: u256 = ierc20.balance_of(A);
         // create challenge
-        let wager_value: u256 = 100;
+        let wager_value: u256 = 100 * ETH_TO_WEI;
+        let fee: u256 = system.calc_fee(WAGER_COIN, wager_value);
+        let approved_value: u256 = wager_value + fee;
         let duel_id: u128 = utils::execute_create_challenge(system, A, B, MESSAGE_1, WAGER_COIN, wager_value, 0);
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
-        _assert_balance(ierc20, A, balance_a, wager_value, 0, 'balance_a_1');
-        _assert_balance(ierc20, S, balance_system, 0, wager_value, 'balance_system_1');
+        _assert_balance(ierc20, A, balance_a, approved_value, 0, 'balance_a_1');
+        _assert_balance(ierc20, S, balance_system, 0, approved_value, 'balance_system_1');
         // Withdraw
         let new_state: ChallengeState = utils::execute_reply_challenge(system, B, duel_id, false);
         assert(new_state == ChallengeState::Refused, 'Refused');
@@ -288,12 +291,14 @@ mod tests {
         let balance_a: u256 = ierc20.balance_of(A);
         // create challenge
         let wager_value: u256 = 100 * ETH_TO_WEI;
+        let fee: u256 = system.calc_fee(WAGER_COIN, wager_value);
+        let approved_value: u256 = wager_value + fee;
         let expire_seconds: u64 = timestamp::from_days(1);
         let duel_id: u128 = utils::execute_create_challenge(system, A, B, MESSAGE_1, WAGER_COIN, wager_value, expire_seconds);
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
-        _assert_balance(ierc20, A, balance_a, wager_value, 0, 'balance_a_1');
-        _assert_balance(ierc20, S, balance_system, 0, wager_value, 'balance_system_1');
+        _assert_balance(ierc20, A, balance_a, approved_value, 0, 'balance_a_1');
+        _assert_balance(ierc20, S, balance_system, 0, approved_value, 'balance_system_1');
         // Expire
         let (block_number, timestamp) = utils::elapse_timestamp(timestamp::from_date(1, 0, 1));
         let new_state: ChallengeState = utils::execute_reply_challenge(system, B, duel_id, true);
