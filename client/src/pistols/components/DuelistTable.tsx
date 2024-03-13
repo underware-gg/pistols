@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Table } from 'semantic-ui-react'
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { useAllDuelistIds, useDuelist } from '@/pistols/hooks/useDuelist'
-import { AccountShort } from '@/pistols/components/ui/Account'
+import { AccountShort } from '@/pistols/components/account/Account'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ProfileName } from './account/ProfileDescription'
@@ -144,7 +144,7 @@ function DuelistItem({
       </Cell>
 
       <Cell textAlign='left'>
-        <h4><ProfileName address={address} /></h4>
+        <h4 className='NoMargin'><ProfileName address={address} /></h4>
         <AccountShort address={address} copyLink={false} />
       </Cell>
 

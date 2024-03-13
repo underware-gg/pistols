@@ -10,6 +10,8 @@ export RPC_URL=$(toml get Scarb.toml --raw tool.dojo.env.rpc_url)
 #-----------------
 # migrate
 #
+echo "------------------------------------------------------------------------------"
+echo "Migrating..."
 sozo migrate --world $WORLD_ADDRESS
 
 #-----------------

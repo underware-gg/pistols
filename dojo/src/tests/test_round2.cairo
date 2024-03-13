@@ -21,6 +21,7 @@ mod tests {
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
     const MESSAGE_1: felt252 = 'For honour!!!';
+    const WAGER_COIN: u8 = 1;
 
     const SALT_1_a: u64 = 0xa6f099b756a87e62;
     const SALT_1_b: u64 = 0xf9a978e92309da78;
@@ -31,7 +32,7 @@ mod tests {
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         utils::execute_register_duelist(system, other, OTHER_NAME, 2);
         let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, expire_seconds);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, expire_seconds);
         utils::elapse_timestamp(timestamp::from_days(1));
         utils::execute_reply_challenge(system, other, duel_id, true);
         let ch = utils::get_Challenge(world, duel_id);
@@ -76,7 +77,7 @@ mod tests {
     #[test]
     #[available_gas(10_000_000_000)]
     fn test_blades_round_draw() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
 
         let (salt_1_a, salt_1_b, action_1_a, action_1_b, hash_1_a, hash_1_b) = _get_actions_round_1_continue();
@@ -168,7 +169,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_blades_round_resolved() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
 
         let (salt_1_a, salt_1_b, action_1_a, action_1_b, hash_1_a, hash_1_b) = _get_actions_round_1_continue();

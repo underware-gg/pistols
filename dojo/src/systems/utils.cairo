@@ -1,13 +1,16 @@
-// use debug::PrintTrait;
+use debug::PrintTrait;
 use traits::{Into, TryInto};
 use starknet::{ContractAddress};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-use pistols::models::models::{init, Duelist, Challenge, Pact, Round, Shot};
+use pistols::models::models::{init, Duelist, Challenge, Wager, Pact, Round, Shot};
+use pistols::models::coins::{Coin, CoinManagerTrait, CoinTrait};
+use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round::{RoundState, RoundStateTrait};
 use pistols::types::action::{Action, ActionTrait, ACTION};
 use pistols::types::constants::{constants, chances};
 use pistols::utils::math::{MathU8, MathU16};
+use pistols::interfaces::ierc20::{IERC20DispatcherTrait};
 
 // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
 extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
@@ -64,6 +67,55 @@ fn get_duelist_health(world: IWorldDispatcher, duelist_address: ContractAddress,
     } else {
         let shot: Shot = get_duelist_round_shot(world, duelist_address, duel_id, round_number);
         (shot.health)
+    }
+}
+
+// player need to allow contract to transfer funds first
+// ierc20::approve(contract_address, max(wager.value, wager.fee));
+fn deposit_wager_fees(world: IWorldDispatcher, from: ContractAddress, to: ContractAddress, duel_id: u128) {
+    let wager: Wager = get!(world, (duel_id), Wager);
+    let total: u256 = (wager.value + wager.fee);
+    if (total > 0) {
+        let coin : Coin = CoinManagerTrait::new(world).get(wager.coin);
+        let balance: u256 = coin.ierc20().balance_of(from);
+        let allowance: u256 = coin.ierc20().allowance(from, to);
+        assert(balance >= total, 'Insufficient balance for Fees');
+        assert(allowance >= total, 'Not allowed to transfer Fees');
+        coin.ierc20().transfer_from(from, to, total);
+    }
+}
+fn withdraw_wager_fees(world: IWorldDispatcher, to: ContractAddress, duel_id: u128) {
+    let wager: Wager = get!(world, (duel_id), Wager);
+    let total: u256 = (wager.value + wager.fee);
+    if (total > 0) {
+        let coin : Coin = CoinManagerTrait::new(world).get(wager.coin);
+        let balance: u256 = coin.ierc20().balance_of(starknet::get_contract_address());
+        assert(balance >= total, 'Withdraw not available'); // should never happen!
+        coin.ierc20().transfer(to, total);
+    }
+}
+fn split_wager_fees(world: IWorldDispatcher, share_1: ContractAddress, share_2: ContractAddress, duel_id: u128) {
+    let wager: Wager = get!(world, (duel_id), Wager);
+    let total: u256 = (wager.value + wager.fee) * 2;
+    if (total > 0) {
+        let coin : Coin = CoinManagerTrait::new(world).get(wager.coin);
+        let balance: u256 = coin.ierc20().balance_of(starknet::get_contract_address());
+        assert(balance >= total, 'Wager not available'); // should never happen!
+        if (wager.value > 0) {
+            if (share_1 == share_2) {
+                // single winner
+                coin.ierc20().transfer(share_1, wager.value * 2);
+            } else {
+                coin.ierc20().transfer(share_1, wager.value);
+                coin.ierc20().transfer(share_2, wager.value);
+            }
+        }
+        if (wager.fee > 0) {
+            let manager = ConfigManagerTrait::new(world).get();
+            if (manager.treasury_address != starknet::get_contract_address()) {
+                coin.ierc20().transfer(manager.treasury_address, wager.fee * 2);
+            }
+        }
     }
 }
 
@@ -177,14 +229,17 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
 
     // Set pact between Duelists to avoid duplicated challenges
     let pair: u128 = make_pact_pair(challenge.duelist_a, challenge.duelist_b);
-    let pact_duel_id: u128 = if (state.finished()) { 0 } else { challenge.duel_id };
+    let pact_duel_id: u128 = if (state.ongoing()) { challenge.duel_id } else  { 0 };
     set!(world, Pact {
         pair,
         duel_id: pact_duel_id,
     });
 
     // Start Round
-    if (state == ChallengeState::InProgress) {
+    if (state.canceled()) {
+        // transfer wager/fee back to challenger
+        withdraw_wager_fees(world, challenge.duelist_a, challenge.duel_id);
+    } else if (state == ChallengeState::InProgress) {
         let mut shot_a = init::Shot();
         let mut shot_b = init::Shot();
 
@@ -210,7 +265,7 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
                 shot_b,
             }
         ));
-    } else if (state == ChallengeState::Draw || state == ChallengeState::Resolved) {
+    } else if (state.finished()) {
         // End Duel!
         let mut duelist_a: Duelist = get!(world, challenge.duelist_a, Duelist);
         let mut duelist_b: Duelist = get!(world, challenge.duelist_b, Duelist);
@@ -234,10 +289,13 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         update_duelist_honour(ref duelist_a, final_round.shot_a.honour);
         update_duelist_honour(ref duelist_b, final_round.shot_b.honour);
 
-        // TODO: transfer wager + fees
+        // split wager/fee to winners and benefactors
         if (final_round.shot_a.wager > final_round.shot_b.wager) {
+            split_wager_fees(world, challenge.duelist_a, challenge.duelist_a, challenge.duel_id);
         } else if (final_round.shot_a.wager < final_round.shot_b.wager) {
+            split_wager_fees(world, challenge.duelist_b, challenge.duelist_b, challenge.duel_id);
         } else {
+            split_wager_fees(world, challenge.duelist_a, challenge.duelist_b, challenge.duel_id);
         }
         
         // save Duelists

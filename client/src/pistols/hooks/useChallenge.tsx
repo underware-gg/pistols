@@ -1,13 +1,14 @@
 import { useMemo } from 'react'
 import { HasValue, getComponentValue, Component } from '@dojoengine/recs'
-import { useComponentValue } from "@dojoengine/react"
 import { useDojoComponents } from '@/dojo/DojoContext'
+import { useComponentValue } from "@dojoengine/react"
 import { bigintToEntity } from '@/pistols/utils/utils'
 import { feltToString } from "@/pistols/utils/starknet"
 import { ChallengeState, ChallengeStateDescriptions } from "@/pistols/utils/pistols"
 import { useEntityKeys, useEntityKeysQuery } from '@/pistols/hooks/useEntityKeys'
 import { useClientTimestamp } from "@/pistols/hooks/useTimestamp"
 import { useDuelist } from "@/pistols/hooks/useDuelist"
+import { BigNumberish } from 'starknet'
 
 
 //-----------------------------
@@ -75,7 +76,7 @@ export const usePastChallengeIds = () => {
 // Single Challenge
 //
 
-export const useChallenge = (duelId: bigint | string) => {
+export const useChallenge = (duelId: BigNumberish) => {
   const { Challenge } = useDojoComponents()
   const challenge: any = useComponentValue(Challenge, bigintToEntity(duelId))
   // console.log(bigintToHex(duelId), challenge)
@@ -85,7 +86,6 @@ export const useChallenge = (duelId: bigint | string) => {
   const duelistB = useMemo(() => BigInt(challenge?.duelist_b ?? 0), [challenge])
   const winner = useMemo(() => (challenge?.winner ?? 0), [challenge])
   const message = useMemo(() => feltToString(challenge?.message ?? 0n), [challenge])
-  const lords = useMemo(() => (challenge?.lords ?? 0), [challenge])
   const roundNumber = useMemo(() => (challenge?.round_number ?? 0), [challenge])
   const timestamp_start = useMemo(() => (challenge?.timestamp_start ?? 0), [challenge])
   const timestamp_end = useMemo(() => (challenge?.timestamp_end ?? 0), [challenge])
@@ -104,7 +104,6 @@ export const useChallenge = (duelId: bigint | string) => {
     challenger: duelistA,
     challenged: duelistB,
     message,
-    lords,
     // progress and results
     roundNumber,
     winner,

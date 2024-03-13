@@ -4,16 +4,19 @@ import { Grid, Modal, Form, Divider, Dropdown, Icon } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { usePact } from '@/pistols/hooks/usePact'
+import { useCalcFee } from '@/pistols/hooks/useContractCalls'
+import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
+import { ethToWei, validateCairoString } from '@/pistols/utils/starknet'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ChallengeTableByDuelist } from '@/pistols/components/ChallengeTable'
-import { ActionButton } from '@/pistols/components/ui/Buttons'
+import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
 import { ChallengeMessages } from '@/pistols/utils/pistols'
-import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
 import { randomArrayElement } from '@/pistols/utils/utils'
-import { validateCairoString } from '@/pistols/utils/starknet'
-import { usePact } from '@/pistols/hooks/usePact'
-import { AccountShort } from './ui/Account'
+import { AccountShort } from '@/pistols/components/account/Account'
+import { WagerAndOrFees } from '@/pistols/components/account/Wager'
+import { COIN_LORDS, useCoin } from '@/pistols/hooks/useConfig'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -27,7 +30,10 @@ export default function DuelistModal() {
   const { name, profilePic } = useDuelist(duelistAddress)
   const { hasPact, pactDuelId } = usePact(account.address, duelistAddress)
   const [isChallenging, setIsChallenging] = useState(false)
-  const [challengeArgs, setChallengeArgs] = useState(null)
+  const [args, setArgs] = useState(null)
+
+  const wagerValue = useMemo(() => (args?.wager_value ?? 0n), [args])
+  const { fee } = useCalcFee(COIN_LORDS, wagerValue)
 
   const isYou = useMemo(() => (duelistAddress == BigInt(account.address)), [duelistAddress, account])
   const isOpen = useMemo(() => (duelistAddress > 0), [duelistAddress])
@@ -50,8 +56,8 @@ export default function DuelistModal() {
     router.push(`/gate`)
   }
   const _challenge = () => {
-    if (challengeArgs) {
-      create_challenge(account, duelistAddress, challengeArgs.message, challengeArgs.expire_seconds)
+    if (args) {
+      create_challenge(account, duelistAddress, args.message, args.wager_coin, args.wager_value, args.expire_seconds)
     }
   }
 
@@ -87,10 +93,10 @@ export default function DuelistModal() {
       <Modal.Content image>
         <ProfilePic profilePic={profilePic} />
         <Modal.Description className='FillParent' style={{ width: '200px' }}>
-          <ProfileDescription address={duelistAddress} displayStats />
-          <Divider hidden />
+          <ProfileDescription address={duelistAddress} displayStats displayBalance />
+          <div className='Spacer10' />
           {!isChallenging && <div className='TableInModal'><ChallengesList duelistAddress={duelistAddress} /></div>}
-          {isChallenging && <CreateChallenge setChallengeArgs={setChallengeArgs} />}
+          {isChallenging && <CreateChallenge setArgs={setArgs} />}
         </Modal.Description>
       </Modal.Content>
       <Modal.Actions>
@@ -104,7 +110,7 @@ export default function DuelistModal() {
               <Col>
                 {
                   hasPact ? <ActionButton fill attention label='Existing Challenge!' onClick={() => dispatchSelectDuel(pactDuelId)} />
-                    : isChallenging ? <ActionButton fill disabled={!challengeArgs} label='Submit Challenge!' onClick={() => _challenge()} />
+                    : isChallenging ? <BalanceRequiredButton disabled={!args} label='Submit Challenge!' onClick={() => _challenge()} wagerValue={wagerValue} fee={fee} />
                       : <ActionButton fill disabled={isMasterAccount} label='Challenge for a Duel!' onClick={() => setIsChallenging(true)} />
                 }
               </Col>
@@ -127,26 +133,29 @@ function ChallengesList({
 }
 
 function CreateChallenge({
-  setChallengeArgs
+  setArgs
 }) {
   const [message, setMessage] = useState('')
   const [days, setDays] = useState(7)
   const [hours, setHours] = useState(0)
-  const [lords, setLords] = useState(0)
+  const [coin, setCoin] = useState(COIN_LORDS)
+  const [value, setValue] = useState(0)
+  const { fee } = useCalcFee(coin, ethToWei(value))
 
   useEffectOnce(() => {
     setMessage(randomArrayElement(ChallengeMessages))
   }, [])
 
-  const canSubmit = useMemo(() => (message.length > 3 && (days + hours) > 0), [message, days, hours, lords])
+  const canSubmit = useMemo(() => (message.length > 3 && (days + hours) > 0), [message, days, hours, value])
 
   useEffect(() => {
-    setChallengeArgs(canSubmit ? {
+    setArgs(canSubmit ? {
       message,
       expire_seconds: (days * 24 * 60 * 60) + (hours * 60 * 60),
-      lords,
+      wager_coin: coin,
+      wager_value: ethToWei(value),
     } : null)
-  }, [message, days, hours, lords])
+  }, [message, days, hours, value])
   // console.log(canSubmit, days, hours, lords, message)
 
   const [customMessage, setCustomMessage] = useState('')
@@ -169,12 +178,12 @@ function CreateChallenge({
 
   return (
     <div style={{ width: '430px' }}>
+      <Divider />
       <h1>Challenge Conditions</h1>
-      <br />
 
       <Form className=''>
         <Form.Field>
-          <span className='FormLabel'>What do you have to say?</span>
+          <span className='FormLabel'>&nbsp;reasoning</span>
           {/* <input placeholder={_defaultMessage} value={message} maxLength={31} onChange={(e) => setMessage(e.target.value)} /> */}
           <Dropdown
             options={messageOptions}
@@ -200,7 +209,7 @@ function CreateChallenge({
           />
         </Form.Field>
         <Form.Field>
-          <span className='FormLabel'>Expiry</span>
+          <span className='FormLabel'>&nbsp;expiration</span>
           <Grid className='NoMargin' columns={'equal'}>
             <Row>
               <Col>
@@ -213,14 +222,17 @@ function CreateChallenge({
           </Grid>
         </Form.Field>
         <Form.Field>
-          <span className='FormLabel'>Wager $LORDS (disabled)</span>
-          <input placeholder={'$LORDS'} value={lords} maxLength={6} onChange={(e) => {
-            const _lords = parseInt(e.target.value as string)
+          <span className='FormLabel'>&nbsp;wager $LORDS</span>
+          <input placeholder={'$LORDS'} value={value} maxLength={12} onChange={(e) => {
+            const _input = e.target.value as string
+            const _lords = _input ? parseInt(_input) : 0
             if (!isNaN(_lords)) {
-              setLords(_lords)
+              setValue(_lords)
             }
           }} />
         </Form.Field>
+
+        <WagerAndOrFees coin={coin} value={ethToWei(value)} fee={fee} />
 
       </Form>
 

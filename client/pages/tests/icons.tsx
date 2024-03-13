@@ -24,6 +24,7 @@ export default function IndexPage() {
           </Row>
           <Row>
             <Col><CustomIcon name='target' /></Col>
+            <Col><CustomIcon name='lords' logo color='white' /></Col>
             <Col><CustomIcon name='twitter' logo /></Col>
             <Col><CustomIcon name='twitter' logo color='green' /></Col>
             <Col><CustomIcon name='twitter' logo onClick={() => alert('click')} /></Col>

@@ -22,6 +22,6 @@ export function ChallengeTime({
     return formatTimestamp(timestamp_start)
   }, [isAwaiting, isCanceled, isLive, isFinished, timestamp_start, timestamp_end, clientTimestamp])
 
-  return <span>{date}</span>
+  return <span className='TitleCase'>{date}</span>
 }
 

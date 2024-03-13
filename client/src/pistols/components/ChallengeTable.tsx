@@ -1,15 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
 import { useDojoAccount } from '@/dojo/DojoContext'
-import { useAllChallengeIds, useChallenge, useChallengeIdsByDuelist, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
+import { useAllChallengeIds, useChallengeIdsByDuelist, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { useDuel } from '@/pistols/hooks/useDuel'
+import { useWager } from '@/pistols/hooks/useWager'
 import { ChallengeState, ChallengeStateClasses, ChallengeStateNames } from '@/pistols/utils/pistols'
+import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
+import { ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { DuelIconsAsRow } from '@/pistols/components/DuelIcons'
-import { ProfileName } from './account/ProfileDescription'
-import { useDuel } from '../hooks/useDuel'
+import { Wager } from '@/pistols/components/account/Wager'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -18,17 +20,17 @@ const HeaderCell = Table.HeaderCell
 
 export function ChallengeTableAll() {
   const { challengeIds } = useAllChallengeIds()
-  return <ChallengeTableByIds challengeIds={challengeIds} />
+  return <ChallengeTableByIds challengeIds={challengeIds} compact />
 }
 
 export function ChallengeTableLive() {
   const { challengeIds } = useLiveChallengeIds()
-  return <ChallengeTableByIds challengeIds={challengeIds} color='green' />
+  return <ChallengeTableByIds challengeIds={challengeIds} color='green' compact />
 }
 
 export function ChallengeTablePast() {
   const { challengeIds } = usePastChallengeIds()
-  return <ChallengeTableByIds challengeIds={challengeIds} color='red' />
+  return <ChallengeTableByIds challengeIds={challengeIds} color='red' compact />
 }
 
 export function ChallengeTableByDuelist({
@@ -41,7 +43,7 @@ export function ChallengeTableByDuelist({
 
 export function ChallengeTableYour() {
   const { account } = useDojoAccount()
-  return <ChallengeTableByDuelist address={account.address} />
+  return <ChallengeTableByDuelist address={account.address} compact />
 }
 
 
@@ -61,7 +63,7 @@ function ChallengeTableByIds({
   const rows = useMemo(() => {
     let result = []
     challengeIds.forEach((duelId, index) => {
-      result.push(<DuelItem key={duelId} duelId={duelId} sortCallback={_sortCallback} compact={compact} address={accountAddress}/>)
+      result.push(<DuelItem key={duelId} duelId={duelId} sortCallback={_sortCallback} compact={compact} address={accountAddress} />)
     })
     return result
   }, [challengeIds])
@@ -84,8 +86,8 @@ function ChallengeTableByIds({
           <HeaderCell>Challenger</HeaderCell>
           <HeaderCell width={1}></HeaderCell>
           <HeaderCell>Challenged</HeaderCell>
-          <HeaderCell width={2} textAlign='center'>State</HeaderCell>
-          <HeaderCell width={4} textAlign='center'>Time</HeaderCell>
+          <HeaderCell width={3} textAlign='center'>Winner</HeaderCell>
+          <HeaderCell width={3} textAlign='center'>Time</HeaderCell>
         </Table.Row>
       </Table.Header>
 
@@ -117,6 +119,7 @@ function DuelItem({
     challenge: { duelistA, duelistB, state, isLive, isCanceled, isExpired, isDraw, winner, timestamp_start },
     turnA, turnB,
   } = useDuel(duelId)
+  const { coin, value } = useWager(duelId)
   const { profilePic: profilePicA } = useDuelist(duelistA)
   const { profilePic: profilePicB } = useDuelist(duelistB)
 
@@ -144,11 +147,10 @@ function DuelItem({
       </Cell>
 
       <Cell className={classNameA}>
-        <h5>
-          <PositiveResult positive={winnerIsA} negative={winnerIsB && false} warning={isDraw} canceled={isCanceled || isExpired}>
-            <ProfileName address={duelistA} />
-          </PositiveResult>
-        </h5>
+        <PositiveResult positive={winnerIsA} negative={winnerIsB && false} warning={isDraw} canceled={isCanceled || isExpired}>
+          <ProfileName address={duelistA} />
+        </PositiveResult>
+        <br />
         <DuelIconsAsRow duelId={duelId} account={duelistA} size={compact ? null : 'large'} />
       </Cell>
 
@@ -157,34 +159,35 @@ function DuelItem({
       </Cell>
 
       <Cell className={classNameB}>
-        <h5>
-          <PositiveResult positive={winnerIsB} negative={winnerIsA && false} warning={isDraw} canceled={isCanceled || isExpired}>
-            <ProfileName address={duelistB} />
-          </PositiveResult>
-        </h5>
+        <PositiveResult positive={winnerIsB} negative={winnerIsA && false} warning={isDraw} canceled={isCanceled || isExpired}>
+          <ProfileName address={duelistB} />
+        </PositiveResult>
+        <br />
         <DuelIconsAsRow duelId={duelId} account={duelistB} size={compact ? null : 'large'} />
       </Cell>
 
       <Cell textAlign='center' className='Result'>
-        <h5>
-          {state == ChallengeState.Resolved ?
+        {state == ChallengeState.Resolved ?
+          <>
             <PositiveResult positive={true}>
-              <ProfileName address={winnerIsA ? duelistA : duelistB} badges={false} /><br />Wins
+              <ProfileName address={winnerIsA ? duelistA : duelistB} badges={false} />
             </PositiveResult>
-            :
+            {value && <><br /><Wager small coin={coin} wei={value} /></>}
+          </>
+          :
+          <>
             <span className={ChallengeStateClasses[state]}>
               {ChallengeStateNames[state]}
             </span>
-          }
-        </h5>
+            {value && <><br /><Wager small coin={coin} wei={value} crossed={!isLive} /></>}
+          </>
+        }
       </Cell>
 
       <Cell textAlign='center'>
-        <h5>
-          <PositiveResult warning={isDraw} canceled={isCanceled || isExpired}>
-            <ChallengeTime duelId={duelId} />
-          </PositiveResult>
-        </h5>
+        <PositiveResult warning={isDraw} canceled={isCanceled || isExpired}>
+          <ChallengeTime duelId={duelId} />
+        </PositiveResult>
       </Cell>
     </Table.Row>
   )

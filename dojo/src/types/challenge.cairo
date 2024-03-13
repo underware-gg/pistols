@@ -26,6 +26,8 @@ mod CHALLENGE_STATE {
 
 trait ChallengeStateTrait {
     fn exists(self: ChallengeState) -> bool;
+    fn canceled(self: ChallengeState) -> bool;
+    fn ongoing(self: ChallengeState) -> bool;
     fn finished(self: ChallengeState) -> bool;
 }
 
@@ -42,13 +44,37 @@ impl ChallengeStateTraitImpl of ChallengeStateTrait {
             ChallengeState::Draw        => true,
         }
     }
-    fn finished(self: ChallengeState) -> bool {
+    fn canceled(self: ChallengeState) -> bool {
         match self {
-            ChallengeState::Null        => true,
+            ChallengeState::Null        => false,
             ChallengeState::Awaiting    => false,
             ChallengeState::Withdrawn   => true,
             ChallengeState::Refused     => true,
             ChallengeState::Expired     => true,
+            ChallengeState::InProgress  => false,
+            ChallengeState::Resolved    => false,
+            ChallengeState::Draw        => false,
+        }
+    }
+    fn ongoing(self: ChallengeState) -> bool {
+        match self {
+            ChallengeState::Null        => false,
+            ChallengeState::Awaiting    => true,
+            ChallengeState::Withdrawn   => false,
+            ChallengeState::Refused     => false,
+            ChallengeState::Expired     => false,
+            ChallengeState::InProgress  => true,
+            ChallengeState::Resolved    => false,
+            ChallengeState::Draw        => false,
+        }
+    }
+    fn finished(self: ChallengeState) -> bool {
+        match self {
+            ChallengeState::Null        => false,
+            ChallengeState::Awaiting    => false,
+            ChallengeState::Withdrawn   => false,
+            ChallengeState::Refused     => false,
+            ChallengeState::Expired     => false,
             ChallengeState::InProgress  => false,
             ChallengeState::Resolved    => true,
             ChallengeState::Draw        => true,
@@ -142,7 +168,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_challenge_exists() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         // get some random inexisting challenge
         let ch: Challenge = utils::get_Challenge(world, 0x682137812638127638127);
         let state: ChallengeState = ch.state.try_into().unwrap();

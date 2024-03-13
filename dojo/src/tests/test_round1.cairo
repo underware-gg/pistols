@@ -6,8 +6,10 @@ mod tests {
 
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
+    use token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::models::models::{Duelist, Challenge, Round};
+    use pistols::models::coins::{Coin, CoinManagerTrait, CoinTrait, coins, ETH_TO_WEI};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::types::constants::{constants};
@@ -19,15 +21,17 @@ mod tests {
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
     const MESSAGE_1: felt252 = 'For honour!!!';
+    const WAGER_COIN: u8 = 1;
+    const WAGER_VALUE: u256 = 100_000_000_000_000_000_000;
 
     const SALT_1_a: u64 = 0xa6f099b756a87e62;
     const SALT_1_b: u64 = 0xf9a978e92309da78;
     
-    fn _start_new_challenge(world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress) -> (Challenge, Round, u128) {
+    fn _start_new_challenge(world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress, wager_value: u256) -> (Challenge, Round, u128) {
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         utils::execute_register_duelist(system, other, OTHER_NAME, 2);
         let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, expire_seconds);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, wager_value, expire_seconds);
         utils::elapse_timestamp(timestamp::from_days(1));
         utils::execute_reply_challenge(system, other, duel_id, true);
         let ch = utils::get_Challenge(world, duel_id);
@@ -61,18 +65,18 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_challenge_accept_state() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         utils::execute_register_duelist(system, other, OTHER_NAME, 2);
-        assert(utils::execute_has_pact(system, other, owner) == false, 'has_pact_no');
+        assert(system.has_pact(other, owner) == false, 'has_pact_no');
 
         let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, expire_seconds);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, expire_seconds);
         let ch = utils::get_Challenge(world, duel_id);
         let (block_number, timestamp) = utils::elapse_timestamp(timestamp::from_days(1));
         let new_state: ChallengeState = utils::execute_reply_challenge(system, other, duel_id, true);
         assert(new_state == ChallengeState::InProgress, 'in_progress');
-        assert(utils::execute_has_pact(system, other, owner) == true, 'has_pact_yes');
+        assert(system.has_pact(other, owner) == true, 'has_pact_yes');
 
         let ch = utils::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');
@@ -91,16 +95,28 @@ mod tests {
     //
 
     #[test]
-    #[available_gas(1_000_000_000)]
+    #[available_gas(10_000_000_000)]
     fn test_single_round_resolved() {
-        let (world, system, owner, other) = utils::setup_world();
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
-        let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_contract: u256 = ierc20.balance_of(system.contract_address);
+        let balance_treasury: u256 = ierc20.balance_of(treasury);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        assert(fee > 0, 'fee > 0');
+        assert(balance_treasury == 0, 'balance_treasury == 0');
 
-        let hit_chance_a = utils::calc_hit_chances(system, owner, challenge.duel_id, challenge.round_number, action_a);
-        let hit_chance_b = utils::calc_hit_chances(system, owner, challenge.duel_id, challenge.round_number, action_b);
-        let kill_chance_a = utils::calc_crit_chances(system, owner, challenge.duel_id, challenge.round_number, action_a);
-        let kill_chance_b = utils::calc_crit_chances(system, owner, challenge.duel_id, challenge.round_number, action_b);
+        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other, WAGER_VALUE);
+        utils::assert_balance(ierc20, system.contract_address, balance_contract, 0, (fee + WAGER_VALUE) * 2, 'balance_contract_1');
+        utils::assert_balance(ierc20, owner, balance_a, fee + WAGER_VALUE, 0, 'balance_a_1');
+        utils::assert_balance(ierc20, other, balance_b, fee + WAGER_VALUE, 0, 'balance_b_1');
+        utils::assert_balance(ierc20, treasury, 0, 0, 0, 'balance_treasury_1');
+
+        let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
+        let hit_chance_a = system.calc_hit_chances(owner, challenge.duel_id, challenge.round_number, action_a);
+        let hit_chance_b = system.calc_hit_chances(owner, challenge.duel_id, challenge.round_number, action_b);
+        let kill_chance_a = system.calc_crit_chances(owner, challenge.duel_id, challenge.round_number, action_a);
+        let kill_chance_b = system.calc_crit_chances(owner, challenge.duel_id, challenge.round_number, action_b);
 
         // 1st commit
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
@@ -187,8 +203,14 @@ mod tests {
             assert(false, 'bad winner')
         }
 
+        utils::assert_balance(ierc20, system.contract_address, balance_contract, 0, 0, 'balance_contract_2');
+        let balance_treasury = utils::assert_balance(ierc20, treasury, balance_treasury, 0, fee * 2, 'balance_treasury_2');
+        utils::assert_winner_balance(ierc20, challenge.winner, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'balance_winner_2');
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+
         // Run same challenge to compute totals
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other, WAGER_VALUE);
         // invert player order just for fun, expect same results!
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
@@ -225,20 +247,29 @@ mod tests {
         } else {
             assert(false, 'bad winner')
         }
+
+        utils::assert_balance(ierc20, system.contract_address, balance_contract, 0, 0, 'balance_contract_3');
+        utils::assert_balance(ierc20, treasury, balance_treasury, 0, fee * 2, 'balance_treasury_3');
+        utils::assert_winner_balance(ierc20, challenge.winner, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'balance_winner_3');
     }
 
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_single_round_draw() {
-        let (world, system, owner, other) = utils::setup_world();
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_contract: u256 = ierc20.balance_of(system.contract_address);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        assert(fee > 0, 'fee > 0');
+
+        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other, WAGER_VALUE);
+        utils::assert_balance(ierc20, system.contract_address, balance_contract, 0, (fee + WAGER_VALUE) * 2, 'balance_contract_1');
+        utils::assert_balance(ierc20, owner, balance_a, fee + WAGER_VALUE, 0, 'balance_a_1');
+        utils::assert_balance(ierc20, other, balance_b, fee + WAGER_VALUE, 0, 'balance_b_1');
+        utils::assert_balance(ierc20, treasury, 0, 0, 0, 'balance_treasury_1');
+
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_draw();
-
-        // let hit_chance_a = utils::calc_hit_chances(system, owner, challenge.duel_id, challenge.round_number, action_a);
-        // let hit_chance_b = utils::calc_hit_chances(system, owner, challenge.duel_id, challenge.round_number, action_b);
-        // let kill_chance_a = utils::calc_crit_chances(system, owner, challenge.duel_id, challenge.round_number, action_a);
-        // let kill_chance_b = utils::calc_crit_chances(system, owner, challenge.duel_id, challenge.round_number, action_b);
-
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
         utils::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a, 0);
@@ -273,6 +304,11 @@ mod tests {
         assert(duelist_b.total_honour == action_b.into(), 'duelist_b.total_honour');
         assert(duelist_a.honour == (action_a * 10).try_into().unwrap(), 'duelist_a.honour');
         assert(duelist_b.honour == (action_b * 10).try_into().unwrap(), 'duelist_b.honour');
+
+        utils::assert_balance(ierc20, system.contract_address, balance_contract, 0, 0, 'balance_contract_2');
+        utils::assert_balance(ierc20, treasury, 0, 0, fee * 2, 'balance_treasury_2');
+        utils::assert_balance(ierc20, owner, balance_a, fee, 0, 'balance_a_2');
+        utils::assert_balance(ierc20, other, balance_b, fee, 0, 'balance_b_2');
     }
 
     //-------------------------------
@@ -283,8 +319,8 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Not your Challenge!','ENTRYPOINT_FAILED'))]
     fn test_wrong_player() {
-        let (world, system, owner, other) = utils::setup_world();
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other, 0);
         // try to commmit with another account
         let someone_else: ContractAddress = starknet::contract_address_const::<0x999>();
         let hash: u64 = make_action_hash(0x12121, 0x1);
@@ -295,8 +331,8 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Bad Round number','ENTRYPOINT_FAILED'))]
     fn test_wrong_round_number() {
-        let (world, system, owner, other) = utils::setup_world();
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other, 0);
         let hash: u64 = make_action_hash(0x12121, 0x1);
         utils::execute_commit_action(system, owner, duel_id, 2, hash);
     }
@@ -305,8 +341,8 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Already committed','ENTRYPOINT_FAILED'))]
     fn test_already_commit_a() {
-        let (world, system, owner, other) = utils::setup_world();
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other, 0);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
@@ -315,8 +351,8 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Already committed','ENTRYPOINT_FAILED'))]
     fn test_already_commit_b() {
-        let (world, system, owner, other) = utils::setup_world();
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other, 0);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
@@ -326,8 +362,8 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Already revealed','ENTRYPOINT_FAILED'))]
     fn test_already_revealed_a() {
-        let (world, system, owner, other) = utils::setup_world();
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other, 0);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
@@ -338,8 +374,8 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Already revealed','ENTRYPOINT_FAILED'))]
     fn test_already_revealed_b() {
-        let (world, system, owner, other) = utils::setup_world();
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other, 0);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
@@ -351,8 +387,8 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Round not in Commit','ENTRYPOINT_FAILED'))]
     fn test_not_in_commit() {
-        let (world, system, owner, other) = utils::setup_world();
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other, 0);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
@@ -363,8 +399,8 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Round not in Reveal','ENTRYPOINT_FAILED'))]
     fn test_not_in_reveal() {
-        let (world, system, owner, other) = utils::setup_world();
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other, 0);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
         utils::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b, 0);
@@ -374,11 +410,11 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Challenge is not In Progress','ENTRYPOINT_FAILED'))]
     fn test_challenge_not_started() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         utils::execute_register_duelist(system, other, OTHER_NAME, 2);
         let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, expire_seconds);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, expire_seconds);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
     }
@@ -387,8 +423,8 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Challenge is not In Progress','ENTRYPOINT_FAILED'))]
     fn test_challenge_finished_commit() {
-        let (world, system, owner, other) = utils::setup_world();
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other, 0);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
@@ -401,8 +437,8 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Challenge is not In Progress','ENTRYPOINT_FAILED'))]
     fn test_challenge_finished_reveal() {
-        let (world, system, owner, other) = utils::setup_world();
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other, 0);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
         utils::execute_commit_action(system, other, duel_id, 1, hash_b);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
@@ -415,8 +451,8 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Action does not match hash','ENTRYPOINT_FAILED'))]
     fn test_invalid_hash_action_a() {
-        let (world, system, owner, other) = utils::setup_world();
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other, 0);
         let hash_a: u64 = make_action_hash(0x111, 1);
         let hash_b: u64 = make_action_hash(0x222, 1);
         utils::execute_commit_action(system, other, duel_id, 1, hash_a);
@@ -427,8 +463,8 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Action does not match hash','ENTRYPOINT_FAILED'))]
     fn test_invalid_hash_salt_a() {
-        let (world, system, owner, other) = utils::setup_world();
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other, 0);
         let hash_a: u64 = make_action_hash(0x111, 1);
         let hash_b: u64 = make_action_hash(0x222, 1);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_b);
@@ -440,8 +476,8 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Action does not match hash','ENTRYPOINT_FAILED'))]
     fn test_invalid_hash_action_b() {
-        let (world, system, owner, other) = utils::setup_world();
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other, 0);
         let hash_a: u64 = make_action_hash(0x111, 1);
         let hash_b: u64 = make_action_hash(0x222, 1);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_b);
@@ -452,8 +488,8 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Action does not match hash','ENTRYPOINT_FAILED'))]
     fn test_invalid_hash_salt_b() {
-        let (world, system, owner, other) = utils::setup_world();
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other, 0);
         let hash_a: u64 = make_action_hash(0x111, 1);
         let hash_b: u64 = make_action_hash(0x222, 1);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_b);
@@ -464,8 +500,8 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_clamp_invalid_paces() {
-        let (world, system, owner, other) = utils::setup_world();
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other, 0);
         let hash_a: u64 = make_action_hash(0x111, 0);
         let hash_b: u64 = make_action_hash(0x222, 11);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);
@@ -484,8 +520,8 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_register_keep_scores() {
-        let (world, system, owner, other) = utils::setup_world();
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other, 0);
         let hash_a: u64 = make_action_hash(0x111, 10);
         let hash_b: u64 = make_action_hash(0x222, 1);
         utils::execute_commit_action(system, owner, duel_id, 1, hash_a);

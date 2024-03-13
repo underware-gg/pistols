@@ -38,7 +38,7 @@ export async function setup({ ...config }: DojoConfig) {
 
   // Establish system calls using the network and components.
   //@ts-ignore
-  const systemCalls = createSystemCalls(network)
+  const systemCalls = createSystemCalls(network, components, config.manifest)
 
   // create burner manager
   const burnerManager = new BurnerManager({

@@ -1,11 +1,14 @@
-import React, { useEffect, useMemo } from 'react'
+import React from 'react'
 import { useRouter } from 'next/router'
 import { Container, Divider, Table } from 'semantic-ui-react'
 import { bigintToHex, formatTimestamp } from '@/pistols/utils/utils'
 import AppDojo from '@/pistols/components/AppDojo'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { ActionEmojis, ActionNames, ChallengeStateNames, RoundState, RoundStateNames } from '@/pistols/utils/pistols'
+import { ActionEmojis, ActionNames, ChallengeStateNames, RoundStateNames } from '@/pistols/utils/pistols'
+import { BigNumberish } from 'starknet'
+import { useWager } from '@/pistols/hooks/useWager'
+import { weiToEth } from '@/pistols/utils/starknet'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -39,6 +42,7 @@ function Stats({
 
       <div className='Code'>
         <DuelStats duelId={duelId} />
+        <WagerStats duelId={duelId} />
 
         {round1 && <>
           <RoundStats duelId={duelId} roundNumber={1} round={round1} />
@@ -136,6 +140,46 @@ function DuelStats({
           <Cell>Message</Cell>
           <Cell>
             {challenge.message}
+          </Cell>
+        </Row>
+      </Body>
+    </Table>
+  )
+}
+
+function WagerStats({
+  duelId
+}: {
+  duelId: bigint
+}) {
+  const wager = useWager(duelId)
+  if (wager.value == 0) return <></>
+  return (
+    <Table celled striped color='green'>
+      <Header>
+        <Row>
+          <HeaderCell width={4}><h5>Wager</h5></HeaderCell>
+          <HeaderCell>{bigintToHex(duelId)}</HeaderCell>
+        </Row>
+      </Header>
+
+      <Body>
+        <Row>
+          <Cell>Coin</Cell>
+          <Cell>
+            {wager.coin}
+          </Cell>
+        </Row>
+        <Row>
+          <Cell>Value</Cell>
+          <Cell>
+            {wager.value.toString()} wei : {weiToEth(wager.value).toString()}
+          </Cell>
+        </Row>
+        <Row>
+          <Cell>Fee</Cell>
+          <Cell>
+            {wager.fee.toString()} wei : {weiToEth(wager.fee).toString()}
           </Cell>
         </Row>
       </Body>

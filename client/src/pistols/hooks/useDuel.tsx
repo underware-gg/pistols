@@ -1,12 +1,13 @@
 import { useEffect, useMemo } from 'react'
-import { useComponentValue } from '@dojoengine/react'
 import { useDojoComponents } from '@/dojo/DojoContext'
+import { useComponentValue } from '@dojoengine/react'
 import { useThreeJsContext } from "./ThreeJsContext"
 import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
 import { useChallenge } from "@/pistols/hooks/useChallenge"
 import { keysToEntity } from '@/pistols/utils/utils'
 import { ActionNames, ActionVerbs, RoundState } from "@/pistols/utils/pistols"
 import { AnimationState } from "@/pistols/three/game"
+import { BigNumberish } from 'starknet'
 import constants from '../utils/constants'
 
 export enum DuelStage {
@@ -25,7 +26,7 @@ export enum DuelStage {
   Finished,         // 8
 }
 
-export const useDuel = (duelId: bigint | string) => {
+export const useDuel = (duelId: BigNumberish) => {
   const { Round } = useDojoComponents()
   const challenge = useChallenge(duelId)
   const round1: any = useComponentValue(Round, keysToEntity([duelId, 1n]))
@@ -87,7 +88,7 @@ export const useDuel = (duelId: bigint | string) => {
 // extends useDuel(), adding animations Stages
 // Use only ONCE inside <Duel>!!
 //
-export const useAnimatedDuel = (duelId: bigint | string) => {
+export const useAnimatedDuel = (duelId: BigNumberish) => {
   const result = useDuel(duelId)
   const { round1, round2, round3, duelStage } = result
 

@@ -6,6 +6,7 @@ mod tests {
 
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
+    use token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::models::models::{Duelist, Challenge, Round};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
@@ -21,6 +22,8 @@ mod tests {
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
     const MESSAGE_1: felt252 = 'For honour!!!';
+    const WAGER_COIN: u8 = 1;
+    const WAGER_VALUE: u256 = 100_000_000_000_000_000_000;
 
     const SALT_1_a: u64 = 0xa6f099b756a87e62;
     const SALT_1_b: u64 = 0xf9a978e92309da78;
@@ -31,7 +34,7 @@ mod tests {
         utils::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         utils::execute_register_duelist(system, other, OTHER_NAME, 2);
         let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, expire_seconds);
+        let duel_id: u128 = utils::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, WAGER_VALUE, expire_seconds);
         utils::elapse_timestamp(timestamp::from_days(1));
         utils::execute_reply_challenge(system, other, duel_id, true);
         let ch = utils::get_Challenge(world, duel_id);
@@ -133,7 +136,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_dices() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
@@ -162,7 +165,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_idle_actions() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
@@ -178,7 +181,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_skip_idle_slot() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::SINGLE_DAMAGE, ACTION::IDLE, ACTION::FAST_BLADE,
@@ -193,7 +196,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_invalid_actions() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
@@ -212,7 +215,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_slow_vs_slow_draw() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
@@ -229,7 +232,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     // #[test]
     // #[available_gas(1_000_000_000)]
     // fn test_slow_vs_slow_suicide_pact() {
-    //     let (world, system, owner, other) = utils::setup_world();
+    //     let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
     //     let (challenge, round) = _execute_blades(
     //         world, system, owner, other,
     //         constants::FULL_HEALTH, ACTION::SLOW_BLADE,
@@ -246,7 +249,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_slow_vs_slow_suicide_pact() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::DOUBLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
@@ -263,7 +266,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_fast_vs_fast_draw() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
@@ -279,7 +282,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_fast_vs_fast_hit_a() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
@@ -293,7 +296,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_fast_vs_fast_crit_a() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
@@ -307,7 +310,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_fast_vs_fast_hit_b() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
@@ -321,7 +324,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_fast_vs_fast_crit_b() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
@@ -336,7 +339,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_fast_vs_block_a() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
@@ -348,7 +351,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_b.health == constants::SINGLE_DAMAGE, 'bad health_b');
     }
     fn test_block_vs_fast_b() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::SINGLE_DAMAGE, ACTION::BLOCK, ACTION::IDLE,
@@ -367,7 +370,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_fast_vs_slow_a() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
@@ -381,7 +384,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_fast_vs_slow_b() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
@@ -395,7 +398,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_slow_vs_fast_b() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::SINGLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
@@ -409,7 +412,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_slow_vs_fast_a() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::DOUBLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
@@ -428,7 +431,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_slow_vs_block_crit_a() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
@@ -443,7 +446,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_block_vs_slow_crit_b() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::BLOCK,
@@ -464,7 +467,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_block_vs_idle() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
@@ -485,7 +488,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_idle_vs_block() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::FAST_BLADE,
@@ -506,7 +509,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_block_vs_block() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
@@ -534,7 +537,10 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_flee_vs_flee() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
@@ -546,11 +552,15 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager > 0, 'shot_a.wager');
         assert(round.shot_b.wager > 0, 'shot_b.wager');
+        utils::assert_winner_balance(ierc20, 0, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_flee_win_a() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
@@ -566,11 +576,15 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_b.dice_crit == 100, 'shot_b.dice_crit');
         assert(round.shot_a.wager > 0, 'shot_a.wager');
         assert(round.shot_b.wager > 0, 'shot_b.wager');
+        utils::assert_winner_balance(ierc20, 0, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_flee_win_b() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
@@ -586,11 +600,15 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_a.dice_crit == 100, 'shot_a.dice_crit');
         assert(round.shot_a.wager > 0, 'shot_a.wager');
         assert(round.shot_b.wager > 0, 'shot_b.wager');
+        utils::assert_winner_balance(ierc20, 0, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_fast_vs_flee_kill_a() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
@@ -604,11 +622,15 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_b.health == 0, 'shot_b.health');
         assert(round.shot_a.wager > 0, 'shot_a.wager');
         assert(round.shot_b.wager == 0, 'shot_b.wager');
+        utils::assert_winner_balance(ierc20, 1, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_slow_vs_flee_kill_a() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
@@ -622,11 +644,15 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_b.health == 0, 'shot_b.health');
         assert(round.shot_a.wager > 0, 'shot_a.wager');
         assert(round.shot_b.wager == 0, 'shot_b.wager');
+        utils::assert_winner_balance(ierc20, 1, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_flee_kill_b() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
@@ -640,6 +666,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager == 0, 'shot_a.wager');
         assert(round.shot_b.wager > 0, 'shot_b.wager');
+        utils::assert_winner_balance(ierc20, 2, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
 
 
@@ -650,7 +677,10 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_steal_vs_flee() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
@@ -661,11 +691,15 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager > round.shot_b.wager, 'wager');
+        utils::assert_winner_balance(ierc20, 1, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_flee_vs_steal() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
@@ -676,13 +710,17 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager < round.shot_b.wager, 'wager');
+        utils::assert_winner_balance(ierc20, 2, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     //
     // face-off
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_steal_vs_steal() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
@@ -696,11 +734,15 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_b.health < constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager == 0, 'shot_a.wager');
         assert(round.shot_b.wager == 0, 'shot_b.wager');
+        utils::assert_winner_balance(ierc20, 0, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_steal_win_a() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
@@ -716,11 +758,15 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_b.dice_crit == 100, 'shot_b.dice_crit');
         assert(round.shot_a.wager == 0, 'shot_a.wager');
         assert(round.shot_b.wager > 0, 'shot_b.wager');
+        utils::assert_winner_balance(ierc20, 2, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_steal_win_b() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
@@ -736,11 +782,15 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_a.dice_crit == 100, 'shot_a.dice_crit');
         assert(round.shot_a.wager > 0, 'shot_a.wager');
         assert(round.shot_b.wager == 0, 'shot_b.wager');
+        utils::assert_winner_balance(ierc20, 1, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_slow_vs_steal_kill_a() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
@@ -754,11 +804,15 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_b.health == 0, 'shot_b.health');
         assert(round.shot_a.wager > 0, 'shot_a.wager');
         assert(round.shot_b.wager == 0, 'shot_b.wager');
+        utils::assert_winner_balance(ierc20, 1, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_steal_kill_b() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
@@ -772,6 +826,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager == 0, 'shot_a.wager');
         assert(round.shot_b.wager > 0, 'shot_b.wager');
+        utils::assert_winner_balance(ierc20, 2, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
 
 
@@ -782,7 +837,10 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_seppuku_vs_seppuku() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
@@ -795,11 +853,15 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_a.health == 0, 'shot_a.health');
         assert(round.shot_b.health == 0, 'shot_b.health');
         assert(round.shot_a.wager == round.shot_b.wager, 'no_wager');
+        utils::assert_winner_balance(ierc20, 0, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_seppuku_vs_slow_b() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
@@ -812,11 +874,15 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_a.health == 0, 'shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager < round.shot_b.wager, 'wager_b');
+        utils::assert_winner_balance(ierc20, 2, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_seppuku_vs_fast_b() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
@@ -829,11 +895,15 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_a.health == 0, 'shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager < round.shot_b.wager, 'wager_b');
+        utils::assert_winner_balance(ierc20, 2, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_fast_vs_seppuku_a() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::FAST_BLADE,
@@ -846,11 +916,15 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == 0, 'shot_b.health');
         assert(round.shot_a.wager > round.shot_b.wager, 'wager_a');
+        utils::assert_winner_balance(ierc20, 1, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_seppuku_vs_flee() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
@@ -863,11 +937,15 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_a.health == 0, 'shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager == round.shot_b.wager, 'no_wager');
+        utils::assert_winner_balance(ierc20, 0, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_seppuku_vs_steal() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
@@ -880,11 +958,15 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_a.health == 0, 'shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager < round.shot_b.wager, 'wager_a');
+        utils::assert_winner_balance(ierc20, 2, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_flee_vs_seppuku() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
@@ -897,11 +979,15 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == 0, 'shot_b.health');
         assert(round.shot_a.wager == round.shot_b.wager, 'no_wager');
+        utils::assert_winner_balance(ierc20, 0, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_steal_vs_seppuku_vs() {
-        let (world, system, owner, other) = utils::setup_world();
+        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let balance_a: u256 = ierc20.balance_of(owner);
+        let balance_b: u256 = ierc20.balance_of(other);
+        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
@@ -914,6 +1000,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == 0, 'shot_b.health');
         assert(round.shot_a.wager > round.shot_b.wager, 'wager_b');
+        utils::assert_winner_balance(ierc20, 1, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
 
 

@@ -85,6 +85,7 @@ export const useDojo = () => {
   return {
     setup: context,
     account: context.account,
+    dojoProvider: context.dojoProvider,
   };
 };
 

@@ -22,7 +22,7 @@ export const ChallengeStateNames: Record<ChallengeState, string> = {
   [ChallengeState.Withdrawn]: 'Withdrawn',
   [ChallengeState.Refused]: 'Refused',
   [ChallengeState.Expired]: 'Expired',
-  [ChallengeState.InProgress]: 'InProgress',
+  [ChallengeState.InProgress]: 'In Progress',
   [ChallengeState.Resolved]: 'Resolved',
   [ChallengeState.Draw]: 'Draw',
 }

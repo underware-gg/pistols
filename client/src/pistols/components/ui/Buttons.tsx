@@ -3,6 +3,8 @@ import { Menu, Button, Confirm, SemanticICONS } from 'semantic-ui-react'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { CustomIcon } from './Icons'
+import { useLordsBalance } from '../wallet/useLordsBalance'
+import { useDojoAccount } from '@/dojo/DojoContext'
 
 //-----------------
 // Generic Action button
@@ -17,6 +19,7 @@ type ActionButtonProps = {
   fill?: boolean
   dimmed?: boolean
   attention?: boolean
+  negative?: boolean
   confirm?: boolean
   confirmMessage?: string
   className?: string
@@ -32,6 +35,7 @@ export const ActionButton = ({
   fill = false,
   dimmed = false,
   attention = false,
+  negative = false,
   confirm = false,
   confirmMessage = null,
   className = null,
@@ -42,6 +46,7 @@ export const ActionButton = ({
   if (fill) classNames.push('FillParent')
   if (large) classNames.push('LargeButton')
   classNames.push((disabled || dimmed) ? 'Locked' : 'Unlocked')
+  if (negative) classNames.push('Negative')
   if (className) classNames.push(className)
 
   const [isConfirming, setIsConfirming] = useState(false)
@@ -79,6 +84,27 @@ export const ActionButton = ({
         size='mini'
       />
     </>
+  )
+}
+
+
+export const BalanceRequiredButton = ({
+  label,
+  wagerValue,
+  fee,
+  onClick,
+  disabled = false,
+}) => {
+  const { account } = useDojoAccount()
+  const { balance, noFunds } = useLordsBalance(account.address, wagerValue + fee)
+  return (
+    <ActionButton fill
+      disabled={disabled}
+      attention={!noFunds}
+      negative={noFunds}
+      label={noFunds ? 'No Funds!' : label}
+      onClick={() => (noFunds ? {} : onClick())}
+    />
   )
 }
 

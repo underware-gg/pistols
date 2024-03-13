@@ -39,6 +39,18 @@ struct Challenge {
 } // f + f + f + 152 bits
 
 //
+// Challenge wager (optional)
+#[derive(Model, Copy, Drop, Serde)]
+struct Wager {
+    #[key]
+    duel_id: u128,
+    //------------
+    coin: u8,
+    value: u256,
+    fee: u256,
+}
+
+//
 // Current challenge between two Duelists
 #[derive(Model, Copy, Drop, Serde)]
 struct Pact {
@@ -63,12 +75,11 @@ struct Shot {
     dice_hit: u8,       // dice roll result (1..100) - hit / normal damage
     damage: u8,         // amount of health taken
     block: u8,          // amount of damage blocked
+    win: u8,            // wins the round
+    wager: u8,          // wins the wager
     // player state
     health: u8,         // final health
     honour: u8,         // honour granted
-    // more results -- TODO: move up
-    win: u8,            // wins the round
-    wager: u8,          // wins the wager
 } // 224 bits
 
 //
