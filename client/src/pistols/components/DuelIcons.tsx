@@ -36,6 +36,10 @@ export function useDuelIcons({
   const health2 = useMemo(() => (shot2?.health == 0 ? EMOJI.DEAD : shot2?.damage > 0 ? EMOJI.INJURED : null), [shot2])
   const health3 = useMemo(() => (shot3?.health == 0 ? EMOJI.DEAD : shot3?.damage > 0 ? EMOJI.INJURED : null), [shot3])
 
+  const health1b = useMemo(() => (health1 == EMOJI.INJURED && shot1.damage > 1 ? EMOJI.INJURED : null), [health1])
+  const health2b = useMemo(() => (health2 == EMOJI.INJURED && shot2.damage > 1 ? EMOJI.INJURED : null), [health2])
+  const health3b = useMemo(() => (health3 == EMOJI.INJURED && shot3.damage > 1 ? EMOJI.INJURED : null), [health3])
+
   const wager1 = useMemo(() => ((shot1?.wager > otherShot1?.wager) ? EMOJI.WAGER : null), [shot1, otherShot1])
   const wager2 = useMemo(() => ((shot2?.wager > otherShot2?.wager) ? EMOJI.WAGER : null), [shot2, otherShot2])
   const wager3 = useMemo(() => ((shot3?.wager > otherShot3?.wager) ? EMOJI.WAGER : null), [shot3, otherShot3])
@@ -87,6 +91,7 @@ export function useDuelIcons({
           )
         }
         if (health1) icons1.push(<EmojiIcon key='health1' emoji={health1} size={iconSize} />)
+        if (health1b) icons1.push(<EmojiIcon key='health1b' emoji={health1b} size={iconSize} />)
       }
       if (shot2) {
         if (duelStage >= DuelStage.Round2Commit) {
@@ -104,6 +109,7 @@ export function useDuelIcons({
           )
         }
         if (health2) icons2.push(<EmojiIcon key='health2' emoji={health2} size={iconSize} />)
+        if (health2b) icons2.push(<EmojiIcon key='health2b' emoji={health2b} size={iconSize} />)
       }
       if (isTurn) {
         (icons2.length > 0 ? icons2 : icons1).push(<LoadingIcon key='isTurn' size={iconSize} className='Brightest' />)
@@ -114,16 +120,19 @@ export function useDuelIcons({
     if (isFinished) {
       if (shot1) icons1.push(<ActionIcon key='shot1' action={parseInt(shot1.action)} size={iconSize} />)
       if (health1) icons1.push(<EmojiIcon key='health1' emoji={health1} size={iconSize} />)
+      if (health1b) icons1.push(<EmojiIcon key='health1b' emoji={health1b} size={iconSize} />)
       if (win1) icons1.push(<EmojiIcon key='win1' emoji={win1} size={iconSize} />)
       if (wager1) icons1.push(<EmojiIcon key='wager1' emoji={wager1} size={iconSize} />)
 
       if (shot2) icons2.push(<ActionIcon key='shot2' action={parseInt(shot2.action)} size={iconSize} />)
       if (health2) icons2.push(<EmojiIcon key='health2' emoji={health2} size={iconSize} />)
+      if (health2b) icons1.push(<EmojiIcon key='health2b' emoji={health2b} size={iconSize} />)
       if (win2) icons2.push(<EmojiIcon key='win2' emoji={win2} size={iconSize} />)
       if (wager2) icons2.push(<EmojiIcon key='wager2' emoji={wager2} size={iconSize} />)
 
       if (shot3) icons3.push(<ActionIcon key='shot3' action={parseInt(shot3.action)} size={iconSize} />)
       if (health3) icons3.push(<EmojiIcon key='health3' emoji={health3} size={iconSize} />)
+      if (health3b) icons1.push(<EmojiIcon key='health3b' emoji={health3b} size={iconSize} />)
       if (win3) icons3.push(<EmojiIcon key='win3' emoji={win3} size={iconSize} />)
       if (wager3) icons3.push(<EmojiIcon key='wager3' emoji={wager3} size={iconSize} />)
     }
