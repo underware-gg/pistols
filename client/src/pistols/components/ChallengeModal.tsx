@@ -125,7 +125,7 @@ export default function ChallengeModal() {
             <Row columns='equal' textAlign='center'>
               <Col>
                 <Divider className='NoMargin' />
-                <h3 className='TitleCase'>{challengeDescription}</h3>
+                <h3 className=''>{challengeDescription}</h3>
                 {/* <Divider className='NoMargin' /> */}
               </Col>
             </Row>

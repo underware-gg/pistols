@@ -57,17 +57,19 @@ function WagerAndOrFees({
   coin = COIN_LORDS,
   value,
   fee,
+  pre = null,
 }: {
   coin: number
   value: BigNumberish
   fee: BigNumberish
-  big?: boolean
+    pre?: string
+    big?: boolean
 }) {
   if (BigInt(value ?? 0) > 0n) {
     return (
       <>
         <span>
-          <Wager big coin={coin} wei={value} pre={'Cost: '} />
+          <Wager big coin={coin} wei={value} pre={pre} />
         </span>
         &nbsp;&nbsp;
         <span>

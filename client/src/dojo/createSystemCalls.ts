@@ -36,6 +36,9 @@ export function createSystemCalls(
   const { execute, executeMulti, call, contractComponents } = network
   const { Wager, Coin } = components
 
+  // executeMulti() based on:
+  // https://github.com/cartridge-gg/rollyourown/blob/f39bfd7adc866c1a10142f5ce30a3c6f900b467e/web/src/dojo/hooks/useSystems.ts#L178-L190
+
   const _executeTransaction = async (signer: Account, params: DojoCall | Call[]): Promise<boolean> => {
     let success = false
     try {

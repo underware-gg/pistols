@@ -232,7 +232,7 @@ function CreateChallenge({
           }} />
         </Form.Field>
 
-        <WagerAndOrFees coin={coin} value={ethToWei(value)} fee={fee} />
+        <WagerAndOrFees coin={coin} value={ethToWei(value)} fee={fee} pre={'Cost: '} />
 
       </Form>
 
