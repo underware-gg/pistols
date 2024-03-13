@@ -1,13 +1,29 @@
-import { useDojoAccount } from '@/dojo/DojoContext'
 import { useLordsBalance } from './useLordsBalance'
 import { COIN_LORDS } from '@/pistols/hooks/useConfig'
 import { Wager } from '@/pistols/components/account/Wager'
+import { useLockedWager } from '@/pistols/hooks/useWager'
 
 export const LordsBalance = ({
-  address
+  address,
+  pre = null,
+  post = null,
+  clean = false,
 }) => {
   const { balance, formatted } = useLordsBalance(address)
   return (
-    <Wager big coin={COIN_LORDS} wei={balance} />
+    <Wager big coin={COIN_LORDS} wei={balance} pre={pre} post={post} clean={clean} />
   )
 }
+
+export const LockedBalance = ({
+  address,
+  pre = null,
+  post = null,
+  clean = false,
+}) => {
+  const { total } = useLockedWager(address)
+  return (
+    <Wager big coin={COIN_LORDS} wei={total} pre={pre} post={post} clean={clean} />
+  )
+}
+

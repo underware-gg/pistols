@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { AccountShort } from '@/pistols/components/account/Account'
-import { EMOJI } from '@/pistols/data/messages'
-import { LordsBalance } from '../wallet/LordsBalance'
-import { LordsFaucet } from '../wallet/LordsFaucet'
 import { useDojoAccount } from '@/dojo/DojoContext'
+import { LordsBalance, LockedBalance } from '@/pistols/components/wallet/LordsBalance'
+import { LordsFaucet } from '@/pistols/components/wallet/LordsFaucet'
+import { AccountShort } from '@/pistols/components/account/Account'
 import { bigintEquals } from '@/pistols/utils/utils'
+import { EMOJI } from '@/pistols/data/messages'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -36,11 +36,14 @@ export function ProfileDescription({
       <Row>
 
         <Col>
-          <h1><ProfileName address={address} /></h1>
+          <h1 className='NoMargin'><ProfileName address={address} /></h1>
           {displayAddress && <AccountShort address={address} />}
-          <h3 className='Important'>Honour: {honourAndTotal}</h3>
+          <h3 className='Important NoMargin'>Honour: {honourAndTotal}</h3>
           {displayBalance && <>
-            <LordsBalance address={address} />&nbsp;&nbsp;&nbsp;&nbsp;{isYou && <LordsFaucet />}            
+            <LordsBalance address={address} />
+            {' + '}
+            <LockedBalance address={address} clean /> (locked)
+            {isYou && <><br /><LordsFaucet /></>}
           </>}
         </Col>
 
