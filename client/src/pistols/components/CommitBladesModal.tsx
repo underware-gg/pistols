@@ -6,6 +6,7 @@ import { Action, ActionEmojis, ActionNames } from '@/pistols/utils/pistols'
 import { pack_action_slots, signAndGenerateActionHash } from '@/pistols/utils/salt'
 import { ActionChances } from '@/pistols/components/ActionChances'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
+import { useWager } from '../hooks/useWager'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -27,6 +28,7 @@ export default function CommitBladesModal({
 }) {
   const { commit_action } = useDojoSystemCalls()
   const { account } = useDojoAccount()
+  const { value } = useWager(duelId)
 
   const [slot1, setSlot1] = useState(0)
   const [slot2, setSlot2] = useState(0)
@@ -101,7 +103,7 @@ export default function CommitBladesModal({
               <SlotButton blade={Action.Flee} value={slot1} onClick={() => _setSlots(Action.Flee, 0)} />
             </Col>
             <Col width={2}>
-              <SlotButton blade={Action.Steal} value={slot1} onClick={() => _setSlots(Action.Steal, 0)} />
+              <SlotButton blade={Action.Steal} value={slot1} onClick={() => _setSlots(Action.Steal, 0)} disabled={!value} />
             </Col>
             <Col width={2}>
               <SlotButton blade={Action.Seppuku} value={slot1} onClick={() => _setSlots(Action.Seppuku, 0)} />
@@ -145,9 +147,10 @@ export const SlotButton = ({
   blade,
   onClick,
   value,
+  disabled = false,
 }) => {
   return (
-    <ActionButton fill toggle active={value == blade} label={ActionNames[blade]} onClick={() => onClick()} />
+    <ActionButton fill toggle active={value == blade} disabled={disabled} label={ActionNames[blade]} onClick={() => onClick()} />
   )
 }
 
