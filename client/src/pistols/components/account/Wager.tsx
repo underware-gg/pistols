@@ -85,7 +85,7 @@ function WagerAndOrFees({
   if (BigInt(fee ?? 0) > 0n) {
     return (
       <span>
-        <Wager big coin={coin} wei={fee} pre={'Fee: '} />
+        <Wager big coin={coin} wei={fee} pre={pre} />
       </span>
     )
   }

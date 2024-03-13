@@ -9,6 +9,7 @@ import { ActionEmojis, ActionNames, ChallengeStateNames, RoundStateNames } from 
 import { BigNumberish } from 'starknet'
 import { useWager } from '@/pistols/hooks/useWager'
 import { weiToEth } from '@/pistols/utils/starknet'
+import { useCoin } from '@/pistols/hooks/useConfig'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -153,6 +154,8 @@ function WagerStats({
   duelId: bigint
 }) {
   const wager = useWager(duelId)
+  const coin = useCoin(wager?.coin)
+  console.log(coin)
   if (wager.value == 0) return <></>
   return (
     <Table celled striped color='green'>
@@ -167,7 +170,7 @@ function WagerStats({
         <Row>
           <Cell>Coin</Cell>
           <Cell>
-            {wager.coin}
+            {wager.coin} ({coin.description})
           </Cell>
         </Row>
         <Row>

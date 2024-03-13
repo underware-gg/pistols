@@ -19,6 +19,16 @@ const Row = Grid.Row
 const Col = Grid.Column
 const Cell = Table.HeaderCell
 
+function DividerText({
+  text = '',
+}) {
+  return (
+    <Divider horizontal className='NoMargin'>
+      <Header as='h4'>{text}</Header>
+    </Divider>
+  )
+}
+
 export default function ChallengeModal() {
   const router = useRouter()
   const { reply_challenge } = useDojoSystemCalls()
@@ -84,9 +94,7 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <Divider horizontal className='NoMargin'>
-                  <Header as='h4'>challenged</Header>
-                </Divider>
+                <DividerText text='challenged' />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -96,9 +104,7 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <Divider horizontal className='NoMargin'>
-                  <Header as='h4'>for a duel</Header>
-                </Divider>
+                <DividerText text='for a duel' />
               </Col>
             </Row>
             <Row columns='equal' textAlign='center'>
@@ -110,9 +116,7 @@ export default function ChallengeModal() {
             {(value > 0 || isYou) && <>
               <Row columns='equal' textAlign='right'>
                 <Col>
-                  <Divider horizontal className='NoMargin'>
-                    <Header as='h4'>{value > 0 ? 'Placing a wager of' : 'Fees'}</Header>
-                  </Divider>
+                  <DividerText text={value > 0 ? 'Placing a wager of' : 'Fees'} />
                 </Col>
               </Row>
               <Row columns='equal' textAlign='center'>
@@ -122,20 +126,10 @@ export default function ChallengeModal() {
               </Row>
             </>}
 
-            <Row columns='equal' textAlign='center'>
-              <Col>
-                <Divider className='NoMargin' />
-                <h3 className=''>{challengeDescription}</h3>
-                {/* <Divider className='NoMargin' /> */}
-              </Col>
-            </Row>
-
             {(isLive || isFinished) && <>
               <Row columns='equal' textAlign='right'>
                 <Col>
-                  <Divider horizontal className='NoMargin'>
-                    <Header as='h4'>actions</Header>
-                  </Divider>
+                  <DividerText text='actions' />
                 </Col>
               </Row>
               <Row textAlign='center'>
@@ -144,6 +138,18 @@ export default function ChallengeModal() {
                 </Col>
               </Row>
             </>}
+
+            <Row columns='equal' textAlign='right'>
+              <Col>
+                <DividerText text='status' />
+              </Col>
+            </Row>
+            <Row columns='equal' textAlign='center'>
+              <Col>
+                <h3 className=''>{challengeDescription}</h3>
+                {/* <Divider className='NoMargin' /> */}
+              </Col>
+            </Row>
 
           </Grid>
         </Modal.Description>

@@ -1,6 +1,7 @@
 import { useComponentValue } from '@dojoengine/react'
 import { useDojoComponents } from '@/dojo/DojoContext'
 import { bigintToEntity } from '../utils/utils'
+import { feltToString } from '../utils/starknet'
 
 export const useConfig = () => {
   const { Config } = useDojoComponents()
@@ -19,7 +20,7 @@ export const useCoin = (coinKey:number = COIN_LORDS) => {
   const coin = useComponentValue(Coin, bigintToEntity(BigInt(coinKey)))
   return {
     contractAddress: coin?.contract_address ?? 0n,
-    description: coin?.description ?? null,
+    description: coin ? feltToString(coin.description) : '?',
     feeMin: coin?.fee_min ?? null,
     feePct: coin?.fee_pct ?? null,
     enabled: coin?.enabled ?? false,

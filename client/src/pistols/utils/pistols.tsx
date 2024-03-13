@@ -44,7 +44,7 @@ export const ChallengeStateClasses: Record<ChallengeState, string> = {
   [ChallengeState.Withdrawn]: 'Canceled',
   [ChallengeState.Refused]: 'Canceled',
   [ChallengeState.Expired]: 'Canceled',
-  [ChallengeState.InProgress]: 'Positive',
+  [ChallengeState.InProgress]: 'Bold Important',
   [ChallengeState.Resolved]: '',
   [ChallengeState.Draw]: 'Warning',
 }
