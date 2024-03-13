@@ -13,7 +13,7 @@ github = "https://github.com/funDAOmental/pistols"
 
 [package]
 name = "pistols"
-version = "0.6.0"
+version = "0.7.0"
 cairo-version = "2.4.0"
 
 [cairo]
@@ -43,13 +43,13 @@ build-external-contracts = [
 world_address = "0x269c58e5fa1e7f6fe3756f1de88ecdfab7d03ba67e79ba0365b4ef1e81155be"
 
 # Development
-rpc_url = "http://localhost:5050/"
-account_address = "0xb3ff441a68610b30fd5e2abbf3a1548eb6ba6f3559f2862bf2dc757e5828ca"
-private_key = "0x2bbf4f9fd0bbb2e60b0316c1fe0b76cf7a4d0198bd493ced9b8df2a3a24d68a"
-lords_address = ""
+# rpc_url = "http://localhost:5050/"
+# account_address = "0xb3ff441a68610b30fd5e2abbf3a1548eb6ba6f3559f2862bf2dc757e5828ca"
+# private_key = "0x2bbf4f9fd0bbb2e60b0316c1fe0b76cf7a4d0198bd493ced9b8df2a3a24d68a"
+# lords_address = ""
 
 # SLOT
-# rpc_url = "https://api.cartridge.gg/x/pistols/katana"
-# account_address = "0x11ce646796234b2e4a7fbb427f8a721e1a22f5ebc26d6592e4c23a355ec6156"
-# private_key = "0x2764f2035606c5a3630b1d878c86556f45bbaf9d24abefacc1bb55611cbc84a"
-# lords_address = ""
+rpc_url = "https://api.cartridge.gg/x/pistols/katana"
+account_address = "0x5b7d6d0110aba636b7df1d41858c036aefb8bee9dd4052c51fbf5cd9e2d614"
+private_key = "0x534363549dc5f54179835979add2d508b4a0cb315d9648977aa5f9e363da67a"
+lords_address = ""
