@@ -810,15 +810,6 @@ $ui-container-gap: 1em;
 
 // <CustomIcon>
 $logo-url: '/logos/logo_avante.svg';
-.CustomIconWrapper, .CustomIconWrapperCentered {
-	width: 1.5em;
-	height: 1.5em;
-	border: 0;
-  white-space: nowrap;
-}
-.CustomIconWrapperCentered {
-	margin: auto !important;
-}
 .CustomIcon {
 	width: 100%;
 	height: 100%;
@@ -841,6 +832,16 @@ $logo-url: '/logos/logo_avante.svg';
 }
 .IconLink:hover, .IconLink:active {
   background-color: $color-brightest;
+}
+.CustomIconPng {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+	height: 100%;
+  position: absolute;
+  top: 0.2em;
+  left: 0;
 }
 
 

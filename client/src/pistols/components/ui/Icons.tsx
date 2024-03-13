@@ -95,45 +95,6 @@ export function InfoIcon({
 
 
 //---------------------------------
-// Semantic Ui icon
-//
-interface IconIconProps {
-  name: SemanticICONS
-  size?: IconSizeProp
-  className: string
-}
-export function IconIcon({
-  name = 'smile outline',
-  className = '',
-  size = null, // normal size
-}: IconIconProps) {
-  return <Icon name={name} size={size} className={`Icon ${className}`} />
-}
-
-
-
-//---------------------------------
-// Hyperlink icon
-//
-interface AnchorLinkIconProps {
-  size?: IconSizeProp
-  url: string
-}
-export function AnchorLinkIcon({
-  size = null, // normal size
-  url = '#',
-}: AnchorLinkIconProps) {
-  return (
-    <Link href={url} passHref>
-      <a>
-        <Icon className='Anchor InfoIcon' name='linkify' size={size} />
-      </a>
-    </Link>
-  )
-}
-
-
-//---------------------------------
 // Copy to clipboard icon
 //
 interface CopyIconProps {
@@ -179,6 +140,28 @@ export function LoadingIcon({
 
 
 //---------------------------------
+// Ticked Icons
+//
+interface CompletedIconProps {
+  completed: boolean
+  size?: IconSizeProp
+  children: any
+}
+export function CompletedIcon({
+  completed,
+  size = null,
+  children,
+}: CompletedIconProps) {
+  return (
+    <IconGroup size={(size)}>
+      {children}
+      {completed && <Icon size={_upSize(size)} name='checkmark' color='green' style={{ margin: '-4px 0 0 0' }} />}
+    </IconGroup>
+  )
+}
+
+
+//---------------------------------
 // Emoji Icon
 //
 interface EmojiIconProps {
@@ -199,12 +182,108 @@ export function EmojiIcon({
   flipped = null,
   rotated = null,
 }: EmojiIconProps) {
+  let classNames = [className, 'icon', size, 'NoMargin']
+  if (rotated) classNames.push('dirotatedabled')
+  if (disabled) classNames.push('disabled')
+  if (flipped) classNames.push('flipped')
   return (
-    <i className={`${className} icon ${size} ${rotated && `${rotated} rotated`} ${disabled && `disabled`} ${flipped && `${flipped} flipped`} NoMargin`} style={style}>
+    <i className={classNames.join(' ')} style={style}>
       {emoji}
     </i>
   )
 }
+
+
+//---------------------------------
+// Custom SVG icons
+//
+interface CustomIconProps {
+  name: SemanticICONS | string,   // name of icon, logo, or Icon
+  icon?: boolean,			  // if the svg is on /icons/
+  logo?: boolean,			  // if the svg is on /logos/
+  png?: boolean,        // png extension
+  // <Icon> fallback
+  // optionals
+  className?: string,
+  size?: IconSizeProp,
+  color?: string,       // css color
+  tooltip?: string,
+  onClick?: Function,
+  // <Icon> fallback
+  disabled?: boolean,   // if <Icon>
+  flipped?: boolean,    // if <Icon>
+}
+export function CustomIcon({
+  icon = false,
+  logo = false,
+  png = false,
+  name = 'avante',
+  className = null,
+  size = null,
+  disabled = false,
+  flipped = false,
+  color = '#c8b6a8', // $color-text
+  tooltip = null,
+  onClick = null,
+}: CustomIconProps) {
+  const component = useMemo(() => {
+    const _extension = png ? 'png' : 'svg'
+    const _url = (logo ? `/logos/logo_${name}.${_extension}` : icon ? `/icons/icon_${name}.${_extension}` : null)
+    
+    // not svg, logo, icon or png
+    if (!_url) {
+      return <Icon name={name as SemanticICONS} className={className} size={size} disabled={disabled} />
+    }
+
+    // png
+    if (png) {
+      let _style = {
+        backgroundImage: `url(${_url})`,
+      }
+      return (
+        <i className={`${className} icon ${size} NoMargin Relative`}>
+          {' '}
+          <div className='CustomIconPng' style={_style} />
+        </i>
+      )
+    }
+
+    // svg logo or icon
+    let _style = {
+      WebkitMaskImage: `url(${_url})`,
+      MaskImage: `url(${_url})`,
+      backgroundColor: null,
+    }
+    let classNames = ['CustomIcon', 'icon', size]
+    if (disabled) classNames.push('disabled')
+    if (flipped) classNames.push('flipped')
+    if (onClick) {
+      classNames.push('IconLink')
+    } else {
+      _style.backgroundColor = color
+    }
+
+    return (
+      <i className={classNames.join(' ')}
+        style={_style}
+        onClick={() => (onClick?.() ?? {})}
+      >
+        {' '}
+      </i>
+    )
+
+    // result = _linkfy(result, props.linkUrl)
+
+    // TODO: breaks something, need to debug!
+    // if(props.tooltip) {
+    // 	content = <Tooltip content={props.tooltip}>{content}</Tooltip>	
+    // }
+  }, [icon, logo, png, name, className, size, color, tooltip, onClick])
+  return component
+}
+
+
+
 
 
 //---------------------------------
@@ -217,7 +296,7 @@ export function ActionIcon({
   action: number
   size?: IconSizeProp
 }) {
-  if(action >= 1 && action <= 10) {
+  if (action >= 1 && action <= 10) {
     return <PacesIcon paces={action} size={size} />
   } else {
     return <BladesIcon blade={action} size={size} />
@@ -262,102 +341,9 @@ export function BladesIcon({
 }
 
 
-//---------------------------------
-// Ticked Icons
-//
-interface CompletedIconProps {
-  completed: boolean
-  size?: IconSizeProp
-  children: any
-}
-export function CompletedIcon({
-  completed,
+export function LordsBagIcon({
   size = null,
-  children,
-}: CompletedIconProps) {
-  return (
-    <IconGroup size={(size)}>
-      {children}
-      {completed && <Icon size={_upSize(size)} name='checkmark' color='green' style={{ margin: '-4px 0 0 0' }} />}
-    </IconGroup>
-  )
+}) {
+  return <CustomIcon logo png name='lords_bag' size={size}/>
 }
-
-
-//---------------------------------
-// Custom SVG icons
-//
-interface CustomIconProps {
-  svgUrl?: string,			// optional
-  icon?: boolean,			  // if the svg is on /icons/
-  logo?: boolean,			  // if the svg is on /logos/
-  name: SemanticICONS | string,   // name of icon, logo, or Icon
-  className?: string,
-  centered?: boolean,
-  size?: IconSizeProp,	// if <Icon>
-  color?: string,        // css color
-  tooltip?: string,
-  onClick?: Function,
-}
-export function CustomIcon({
-  svgUrl,
-  icon,
-  logo,
-  name = 'chess board',
-  className,
-  centered = true,
-  size = null,
-  color = '#cb824d', // $color-medium
-  tooltip = null,
-  onClick = null,
-}: CustomIconProps) {
-  const component = useMemo(() => {
-    const _url = svgUrl ?? (logo ? `/logos/logo_${name}.svg` : icon ? `/icons/icon_${name}.svg` : null)
-    let result = null
-    if (_url) {
-      let _style = {
-        WebkitMaskImage: `url(${_url})`,
-        MaskImage: `url(${_url})`,
-        backgroundColor: null,
-      }
-      let classNames = ['CustomIcon']
-      if (className) classNames.push(className)
-      if (onClick) {
-        classNames.push('IconLink')
-      } else {
-        _style.backgroundColor = color
-      }
-      result = (
-        <div className={`CustomIconWrapper${centered ? 'Centered' : ''}`} onClick={() => (onClick?.() ?? {})}>
-          <div className={classNames.join(' ')} style={_style} />
-        </div>
-      )
-    } else {
-      result = <Icon name={name as SemanticICONS} className={className} size={size} />
-    }
-
-    // result = _linkfy(result, props.linkUrl)
-
-    // TODO: breaks something, need to debug!
-    // if(props.tooltip) {
-    // 	content = <Tooltip content={props.tooltip}>{content}</Tooltip>	
-    // }
-
-    return result
-  }, [svgUrl, icon, logo, name, className, centered, size, color, tooltip, onClick])
-  return component
-}
-
-// export function LogoIcon(props) {
-//   return <CustomIcon logo name={props.name} linkUrl={props.linkUrl} className={props.className} color={props.color} tooltip={props.tooltip} />
-// }
-// export function OpenSeaIcon(props) {
-//   return <CustomIcon logo name='opensea' linkUrl={props.linkUrl} className={props.className} color={props.color} tooltip={props.tooltip} />
-// }
-// export function EtherscanIcon(props) {
-//   return <CustomIcon logo name='etherscan' linkUrl={props.linkUrl} className={props.className} color={props.color} tooltip={props.tooltip} />
-// }
-// export function DoorIcon(props) {
-//   return <CustomIcon icon name='door' linkUrl={props.linkUrl} className={props.className} color={props.color} tooltip={props.tooltip} />
-// }
 

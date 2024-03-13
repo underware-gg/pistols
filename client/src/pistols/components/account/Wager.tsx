@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { CopyIcon, CustomIcon } from '@/pistols/components/ui/Icons'
+import { CopyIcon, CustomIcon, EmojiIcon, LordsBagIcon } from '@/pistols/components/ui/Icons'
 import { bigintToHex } from '@/pistols/utils/utils'
 import { BigNumberish } from 'starknet'
 import { weiToEth } from '@/pistols/utils/starknet'
@@ -47,8 +47,12 @@ function Wager({
 
   return (
     <span className={classNames.join(' ')}>
-      {/* <CustomIcon name='lords' logo color={'bisque'} centered={false} /> */}
-      {pre}{!clean && <>💰</>}{_value}{post}
+      {pre}
+      {/* {!clean && <>💰</>} */}
+      {/* {!clean && <EmojiIcon emoji='💰' />} */}
+      {!clean && <LordsBagIcon size={null} />}
+      {_value}
+      {post}
     </span>
   )
 }
