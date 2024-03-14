@@ -36,7 +36,7 @@ export default function ChallengeModal() {
 
   const { duelId, dispatchSelectDuel, dispatchSelectDuelist } = usePistolsContext()
 
-  const { state, message, duelistA, duelistB, isLive, isFinished, isAwaiting } = useChallenge(duelId)
+  const { state, message, duelistA, duelistB, isLive, isFinished, needToSyncExpired } = useChallenge(duelId)
   const { coin, value, fee } = useWager(duelId)
 
   const { challengeDescription } = useChallengeDescription(duelId)
@@ -184,6 +184,11 @@ export default function ChallengeModal() {
             {(state > ChallengeState.InProgress) &&
               <Col>
                 <ActionButton fill attention label='Replay Duel!' onClick={() => _watch()} />
+              </Col>
+            }
+            {(needToSyncExpired && (isChallenger || isChallenged)) &&
+              <Col>
+                <ActionButton fill attention label='Withdraw Expired Fees' onClick={() => _reply(false)} />
               </Col>
             }
           </Row>

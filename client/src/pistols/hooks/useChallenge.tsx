@@ -81,7 +81,6 @@ export const useChallenge = (duelId: BigNumberish) => {
   const challenge: any = useComponentValue(Challenge, bigintToEntity(duelId))
   // console.log(bigintToHex(duelId), challenge)
 
-  let state = useMemo(() => (challenge?.state ?? null), [challenge])
   const duelistA = useMemo(() => BigInt(challenge?.duelist_a ?? 0), [challenge])
   const duelistB = useMemo(() => BigInt(challenge?.duelist_b ?? 0), [challenge])
   const winner = useMemo(() => (challenge?.winner ?? 0), [challenge])
@@ -90,11 +89,14 @@ export const useChallenge = (duelId: BigNumberish) => {
   const timestamp_start = useMemo(() => (challenge?.timestamp_start ?? 0), [challenge])
   const timestamp_end = useMemo(() => (challenge?.timestamp_end ?? 0), [challenge])
 
-  // const isExpired = (state == ChallengeState.Expired || (state == ChallengeState.Awaiting && timestamp_end < clientTimestamp))
   const { clientTimestamp } = useClientTimestamp(false)
-  if (state == ChallengeState.Awaiting && (timestamp_end < clientTimestamp)) {
-    state = ChallengeState.Expired
-  }
+  let original_state = useMemo(() => (challenge?.state ?? null), [challenge])
+  let state = useMemo(() => {
+    if (original_state == ChallengeState.Awaiting && (timestamp_end < clientTimestamp)) {
+      return ChallengeState.Expired
+    }
+    return original_state
+  }, [original_state])
 
   return {
     challengeExists: (challenge != null),
@@ -116,6 +118,7 @@ export const useChallenge = (duelId: BigNumberish) => {
     isDraw: (state == ChallengeState.Draw),
     isCanceled: (state == ChallengeState.Withdrawn || state == ChallengeState.Refused),
     isExpired: (state == ChallengeState.Expired),
+    needToSyncExpired: (state == ChallengeState.Expired && state != original_state),
     // times
     timestamp_start,
     timestamp_end,
