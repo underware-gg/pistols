@@ -529,6 +529,11 @@ $box-h: calc((100vh - $aspect-h) / 2);
   padding: 1em 2em;
 }
 
+.FilterButton {
+  margin: 0 0.5em!important;
+  padding: 0.25em 0.5em!important;
+}
+
 .Locked {
   background-color: $color-inactive;
 }

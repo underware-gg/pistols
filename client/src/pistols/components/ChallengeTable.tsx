@@ -6,12 +6,14 @@ import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import { useWager } from '@/pistols/hooks/useWager'
-import { ChallengeState, ChallengeStateClasses, ChallengeStateNames } from '@/pistols/utils/pistols'
+import { AllChallengeStates, ChallengeState, ChallengeStateClasses, ChallengeStateNames } from '@/pistols/utils/pistols'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { DuelIconsAsRow } from '@/pistols/components/DuelIcons'
+import { FilterButton } from '@/pistols/components/ui/Buttons'
 import { Wager } from '@/pistols/components/account/Wager'
+import { BigNumberish } from 'starknet'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -24,13 +26,13 @@ export function ChallengeTableAll() {
 }
 
 export function ChallengeTableLive() {
-  const { challengeIds } = useLiveChallengeIds()
-  return <ChallengeTableByIds challengeIds={challengeIds} color='green' compact />
+  const { challengeIds, states } = useLiveChallengeIds()
+  return <ChallengeTableByIds challengeIds={challengeIds} color='green' compact states={[...states, ChallengeState.Expired]} />
 }
 
 export function ChallengeTablePast() {
-  const { challengeIds } = usePastChallengeIds()
-  return <ChallengeTableByIds challengeIds={challengeIds} color='red' compact />
+  const { challengeIds, states} = usePastChallengeIds()
+  return <ChallengeTableByIds challengeIds={challengeIds} color='red' compact states={states} />
 }
 
 export function ChallengeTableByDuelist({
@@ -38,7 +40,7 @@ export function ChallengeTableByDuelist({
   compact = false,
 }) {
   const { challengeIds } = useChallengeIdsByDuelist(address)
-  return <ChallengeTableByIds challengeIds={challengeIds} compact={compact} />
+  return <ChallengeTableByIds challengeIds={challengeIds} compact={compact} states={AllChallengeStates} />
 }
 
 export function ChallengeTableYour() {
@@ -52,6 +54,7 @@ function ChallengeTableByIds({
   challengeIds,
   color = 'orange',
   compact = false,
+  states = [],
 }) {
   const { accountAddress } = useDojoAccount()
   const [order, setOrder] = useState({})
@@ -60,13 +63,21 @@ function ChallengeTableByIds({
     setOrder(o => ({ ...o, [id]: { state, timestamp } }))
   }
 
+  const _statesToToggles = (t) => (states.reduce((a, v) => ({ ...a, [v]: t }), {}))
+
+  const [stateToggles, setStateToggles] = useState(_statesToToggles(true))
+  const selectedStated = useMemo(() => (
+    states.length == 0 ? AllChallengeStates
+      : states.reduce((a, v) => ([...a, (stateToggles[v] ? v : null)]), [])
+  ), [states, stateToggles])
+
   const rows = useMemo(() => {
     let result = []
     challengeIds.forEach((duelId, index) => {
-      result.push(<DuelItem key={duelId} duelId={duelId} sortCallback={_sortCallback} compact={compact} address={accountAddress} />)
+      result.push(<DuelItem key={duelId} duelId={duelId} sortCallback={_sortCallback} compact={compact} address={accountAddress} states={selectedStated}/>)
     })
     return result
-  }, [challengeIds])
+  }, [challengeIds, selectedStated])
 
   const sortedRows = useMemo(() => rows.sort((a, b) => {
     if (order[a.key]?.state != order[b.key]?.state) {
@@ -78,33 +89,55 @@ function ChallengeTableByIds({
     return (order[b.key]?.timestamp ?? 0) - (order[a.key]?.timestamp ?? 0)
   }), [rows, order])
 
-  return (
-    <Table sortable selectable className='Faded' color={color as SemanticCOLORS}>
-      <Table.Header className='TableHeader'>
-        <Table.Row textAlign='left' verticalAlign='middle'>
-          <HeaderCell width={1}></HeaderCell>
-          <HeaderCell>Challenger</HeaderCell>
-          <HeaderCell width={1}></HeaderCell>
-          <HeaderCell>Challenged</HeaderCell>
-          <HeaderCell width={3} textAlign='center'>Winner</HeaderCell>
-          <HeaderCell width={3} textAlign='center'>Time</HeaderCell>
-        </Table.Row>
-      </Table.Header>
+  const filters = useMemo(() => {
+    let result = []
+    if (states.length > 0) {
+      result.push(<FilterButton key={'none'} label='All' state={false} switchState={() => setStateToggles(_statesToToggles(true))} />)
+      states.forEach(state => {
+        const _switch = () => {
+          setStateToggles({
+            ...stateToggles,
+            [state]: !stateToggles[state],
+          })
+        }
+        result.push(<FilterButton key={state} label={ChallengeStateNames[state]} state={stateToggles[state]} switchState={() => _switch()} />)
+      })
+      result.push(<FilterButton key={'none'} label='Clear' state={false} switchState={() => setStateToggles(_statesToToggles(false))} />)
+    }
+    return result
+  }, [states, stateToggles])
 
-      {sortedRows.length > 0 ?
-        <Table.Body className='TableBody'>
-          {sortedRows}
-        </Table.Body>
-        :
-        <Table.Footer fullWidth>
-          <Table.Row>
-            <Cell colSpan='100%' textAlign='center'>
-              no duels here
-            </Cell>
+  return (
+    <>
+      {filters.length > 0 && <div>{filters}</div>}
+
+      <Table sortable selectable className='Faded' color={color as SemanticCOLORS}>
+        <Table.Header className='TableHeader'>
+          <Table.Row textAlign='left' verticalAlign='middle'>
+            <HeaderCell width={1}></HeaderCell>
+            <HeaderCell>Challenger</HeaderCell>
+            <HeaderCell width={1}></HeaderCell>
+            <HeaderCell>Challenged</HeaderCell>
+            <HeaderCell width={3} textAlign='center'>Winner</HeaderCell>
+            <HeaderCell width={3} textAlign='center'>Time</HeaderCell>
           </Table.Row>
-        </Table.Footer>
-      }
-    </Table>
+        </Table.Header>
+
+        {sortedRows.length > 0 ?
+          <Table.Body className='TableBody'>
+            {sortedRows}
+          </Table.Body>
+          :
+          <Table.Footer fullWidth>
+            <Table.Row>
+              <Cell colSpan='100%' textAlign='center'>
+                no duels here
+              </Cell>
+            </Table.Row>
+          </Table.Footer>
+        }
+      </Table>
+    </>
   )
 }
 
@@ -112,8 +145,9 @@ function ChallengeTableByIds({
 function DuelItem({
   duelId,
   sortCallback,
-  compact = false,
   address,
+  compact = false,
+  states = [],
 }) {
   const {
     challenge: { duelistA, duelistB, state, isLive, isCanceled, isExpired, isDraw, winner, timestamp_start },
@@ -137,6 +171,10 @@ function DuelItem({
 
   const _gotoChallenge = () => {
     dispatchSelectDuel(duelId)
+  }
+
+  if (!states.includes(state)) {
+    return <></>
   }
 
   return (

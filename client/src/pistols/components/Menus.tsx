@@ -9,11 +9,10 @@ import { useDojoAccount } from '@/dojo/DojoContext'
 import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
 import { DuelistTable } from '@/pistols/components/DuelistTable'
 import { DuelStage } from '@/pistols/hooks/useDuel'
-import { MusicToggle, SfxToggle } from '@/pistols/components/ui/Buttons'
+import { MusicToggle } from '@/pistols/components/ui/Buttons'
 import { SPRITESHEETS } from '@/pistols/data/assets'
 import AccountHeader from '@/pistols/components/account/AccountHeader'
 import { AnimationState } from '../three/game'
-import { CustomIcon } from './ui/Icons'
 
 const Row = Grid.Row
 const Col = Grid.Column

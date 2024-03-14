@@ -108,6 +108,25 @@ export const BalanceRequiredButton = ({
   )
 }
 
+export const FilterButton = ({
+  label,
+  toggle = true,
+  state = false,
+  switchState,
+}) => {
+  return (
+    <Button
+      className='FilterButton'
+      toggle={toggle}
+      active={state}
+      onClick={() => switchState()}
+      size='mini'
+    >
+      {label}
+    </Button>
+  )
+}
+
 
 //-----------------
 // Settings

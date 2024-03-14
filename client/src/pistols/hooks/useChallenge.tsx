@@ -4,7 +4,7 @@ import { useDojoComponents } from '@/dojo/DojoContext'
 import { useComponentValue } from "@dojoengine/react"
 import { bigintToEntity } from '@/pistols/utils/utils'
 import { feltToString } from "@/pistols/utils/starknet"
-import { ChallengeState, ChallengeStateDescriptions } from "@/pistols/utils/pistols"
+import { ChallengeState, ChallengeStateDescriptions, LiveChallengeStates, PastChallengeStates } from "@/pistols/utils/pistols"
 import { useEntityKeys, useEntityKeysQuery } from '@/pistols/hooks/useEntityKeys'
 import { useClientTimestamp } from "@/pistols/hooks/useTimestamp"
 import { useDuelist } from "@/pistols/hooks/useDuelist"
@@ -41,33 +41,24 @@ const _filterComponentsByValue = (component: Component, entityIds: bigint[], key
   }, [] as bigint[])
 )
 
-export const useLiveChallengeIds = (includeExpired = false) => {
-  const { Challenge } = useDojoComponents()
+export const useChallengeIdsByStates = (states: ChallengeState[]) => {
   const { challengeIds: allChallengeIds } = useAllChallengeIds()
-  const { clientTimestamp } = useClientTimestamp(false)
-  const _check_expired = (componentValue: any) => {
-    if (!includeExpired && (componentValue.state == ChallengeState.Awaiting && componentValue.timestamp_end < clientTimestamp)) {
-      return false
-    }
-    return true
-  }
+  const { Challenge } = useDojoComponents()
   const challengeIds = useMemo(() => (
-    _filterComponentsByValue(Challenge, allChallengeIds, 'state', [ChallengeState.Awaiting, ChallengeState.InProgress], true, _check_expired)
+    _filterComponentsByValue(Challenge, allChallengeIds, 'state', states, true)
   ), [allChallengeIds])
   return {
     challengeIds,
+    states,
   }
 }
 
+export const useLiveChallengeIds = () => {
+  return useChallengeIdsByStates(LiveChallengeStates)
+}
+
 export const usePastChallengeIds = () => {
-  const { Challenge } = useDojoComponents()
-  const { challengeIds: allChallengeIds } = useAllChallengeIds()
-  const challengeIds = useMemo(() => (
-    _filterComponentsByValue(Challenge, allChallengeIds, 'state', [ChallengeState.Awaiting, ChallengeState.InProgress], false)
-  ), [allChallengeIds])
-  return {
-    challengeIds,
-  }
+  return useChallengeIdsByStates(PastChallengeStates)
 }
 
 

@@ -16,6 +16,27 @@ export enum ChallengeState {
   Draw,
 }
 
+export const LiveChallengeStates: ChallengeState[] = [
+  ChallengeState.InProgress,
+  ChallengeState.Awaiting,
+]
+
+export const PastChallengeStates: ChallengeState[] = [
+  ChallengeState.Resolved,
+  ChallengeState.Draw,
+  ChallengeState.Withdrawn,
+  ChallengeState.Refused,
+  ChallengeState.Expired,
+]
+
+export const CanceledChallengeStates: ChallengeState[] = [
+  ChallengeState.Withdrawn,
+  ChallengeState.Refused,
+  ChallengeState.Expired,
+]
+
+export const AllChallengeStates: ChallengeState[] = [...LiveChallengeStates, ...PastChallengeStates]
+
 export const ChallengeStateNames: Record<ChallengeState, string> = {
   [ChallengeState.Null]: 'Null',
   [ChallengeState.Awaiting]: 'Awaiting',
