@@ -64,6 +64,9 @@ let _duelCameraRig: THREE.Object3D
 let _supportsExtension: boolean = true
 let _stats
 
+let _duelistAModel
+let _duelistBModel
+
 let _currentScene: THREE.Scene = null
 let _scenes: Partial<Record<SceneName, THREE.Scene>> = {}
 let _sceneName: SceneName
@@ -257,11 +260,16 @@ function setupDuelScene() {
   bg_duel.position.set(0, 0, 0)
   scene.add(bg_duel)
 
-
+  _actors.MALE_A = new Actor(_spriteSheets.MALE, ACTOR_WIDTH, ACTOR_WIDTH, true)
+  _actors.MALE_A.mesh.position.set(-PACES_X_0, PACES_Y, 1)
+  
   _actors.FEMALE_A = new Actor(_spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_WIDTH, true)
-  _actors.FEMALE_B = new Actor(_spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_WIDTH, false)
-
   _actors.FEMALE_A.mesh.position.set(-PACES_X_0, PACES_Y, 1)
+
+  _actors.MALE_B = new Actor(_spriteSheets.MALE, ACTOR_WIDTH, ACTOR_WIDTH, false)
+  _actors.MALE_B.mesh.position.set(PACES_X_0, PACES_Y, 1)
+
+  _actors.FEMALE_B = new Actor(_spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_WIDTH, false)
   _actors.FEMALE_B.mesh.position.set(PACES_X_0, PACES_Y, 1)
 
   onWindowResize()
@@ -272,8 +280,9 @@ function setupDuelScene() {
 export function resetDuelScene() {
   emitter.emit('animated', AnimationState.None)
 
-  switchActor('A', 'FEMALE_A')
-  switchActor('B', 'FEMALE_B')
+  //TODO if male or female
+  switchActor('A', _duelistAModel)
+  switchActor('B', _duelistBModel)
 
   zoomCameraToPaces(10, 0)
   zoomCameraToPaces(0, 5)
@@ -340,10 +349,12 @@ export function resetStaticScene() {
 // Game Interface
 //
 
-export function switchScene(sceneName) {
+export function switchScene(sceneName, duelistModelA, duelistModelB) {
   _sceneName = sceneName
   _currentScene = _scenes[sceneName]
   if (sceneName == SceneName.Duel) {
+    _duelistAModel = duelistModelA == "MALE" ? "MALE_A" : "FEMALE_A"
+    _duelistBModel = duelistModelB == "MALE" ? "MALE_B" : "FEMALE_B"
     resetDuelScene()
   } else {
     resetStaticScene()

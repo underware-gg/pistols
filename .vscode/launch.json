@@ -10,6 +10,9 @@
       "name": "Launch Chrome against localhost",
       "url": "http://localhost:3000/",
       "webRoot": "${workspaceRoot}/client",
+      "runtimeArgs": [
+        "--profile-directory=Default"
+      ]
     }
   ]
 }

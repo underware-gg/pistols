@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { SceneName } from '@/pistols/hooks/PistolsContext'
 
+
 //----------------------------
 // Texture Assets
 //
@@ -36,7 +37,7 @@ export const sceneBackgrounds: Record<SceneName, TextureName> = {
 
 enum CharacterType {
   FEMALE = 'FEMALE',
-  // MALE = 'MALE',
+  MALE = 'MALE',
 }
 export enum AnimName {
   STILL = 'STILL',
@@ -144,8 +145,106 @@ const SPRITESHEETS: Spritesheets = {
       frameRate: 8,
     },
   },
+  MALE: {
+    [AnimName.STILL]: {
+      path: '/textures/animations/Male Duelist/Still',
+      frameCount: 1,
+      frameRate: 8,
+    },
+    [AnimName.STILL_BLADE]: {
+      path: '/textures/animations/Male Duelist/Still Blade',
+      frameCount: 1,
+      frameRate: 8,
+    },
+    [AnimName.STEP_1]: {
+      path: '/textures/animations/Male Duelist/Step 1',
+      frameCount: 8,
+      frameRate: 8,
+    },
+    [AnimName.STEP_2]: {
+      path: '/textures/animations/Male Duelist/Step 2',
+      frameCount: 8,
+      frameRate: 8,
+    },
+    [AnimName.TWO_STEPS]: {
+      path: '/textures/animations/Male Duelist/Two Steps',
+      frameCount: 16,
+      frameRate: 8,
+    },
+    [AnimName.SHOOT]: {
+      path: '/textures/animations/Male Duelist/Shoot',
+      frameCount: 16,
+      frameRate: 8,
+    },
+    [AnimName.SHOT_INJURED_BACK]: {
+      path: '/textures/animations/Male Duelist/Shot and Injured Back',
+      frameCount: 11,
+      frameRate: 8,
+    },
+    [AnimName.SHOT_INJURED_FRONT]: {
+      path: '/textures/animations/Male Duelist/Shot and Injured Front',
+      frameCount: 11,
+      frameRate: 8,
+    },
+    [AnimName.SHOT_DEAD_BACK]: {
+      path: '/textures/animations/Male Duelist/Shot Dead Back',
+      frameCount: 11,
+      frameRate: 8,
+    },
+    [AnimName.SHOT_DEAD_FRONT]: {
+      path: '/textures/animations/Male Duelist/Shot Dead Front',
+      frameCount: 15,
+      frameRate: 8,
+    },
+    [AnimName.STRIKE_LIGHT]: {
+      path: '/textures/animations/Male Duelist/Strike',
+      frameCount: 13,
+      frameRate: 8,
+    },
+    [AnimName.STRIKE_HEAVY]: {
+      path: '/textures/animations/Male Duelist/Strike',
+      frameCount: 13,
+      frameRate: 8,
+    },
+    [AnimName.STRIKE_BLOCK]: {
+      path: '/textures/animations/Male Duelist/Strike',
+      frameCount: 13,
+      frameRate: 8,
+    },
+    [AnimName.STRUCK_INJURED]: {
+      path: '/textures/animations/Male Duelist/Struck and Injured',
+      frameCount: 6,
+      frameRate: 8,
+    },
+    [AnimName.STRUCK_DEAD]: {
+      path: '/textures/animations/Male Duelist/Struck Dead',
+      frameCount: 11,
+      frameRate: 8,
+    },
+  },
 }
 
+//----------------------------
+// Profile Picture to animation model
+//
+const ProfileModels: Record<number, CharacterType> = {
+  [0]: CharacterType.MALE,
+  [1]: CharacterType.MALE,
+  [2]: CharacterType.FEMALE,
+  [3]: CharacterType.MALE,
+  [4]: CharacterType.MALE,
+  [5]: CharacterType.MALE,
+  [6]: CharacterType.MALE,
+  [7]: CharacterType.MALE,
+  [8]: CharacterType.MALE,
+  [9]: CharacterType.MALE,
+  [10]: CharacterType.MALE,
+  [11]: CharacterType.FEMALE,
+  [12]: CharacterType.MALE,
+  [13]: CharacterType.MALE,
+  [14]: CharacterType.MALE,
+  [15]: CharacterType.MALE,
+}
 
 
 //----------------------------
@@ -306,6 +405,7 @@ const isAudioAssetsLoaded = () => {
 export {
   TEXTURES,
   SPRITESHEETS,
+  ProfileModels,
   loadAudioAssets,
   isAudioAssetsLoaded,
   AudioName,
