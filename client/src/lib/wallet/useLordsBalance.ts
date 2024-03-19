@@ -1,11 +1,9 @@
-import { useCoin, COIN_LORDS } from '@/pistols/hooks/useConfig'
 import { bigintToHex } from '@/lib/utils/type'
 import { useBalance } from '@starknet-react/core'
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 
-export const useLordsBalance = (address: BigNumberish, fee: BigNumberish = 0) => {
-  const { contractAddress } = useCoin(COIN_LORDS)
+export const useLordsBalance = (contractAddress:BigNumberish, address: BigNumberish, fee: BigNumberish = 0) => {
   const { data: balance } = useBalance({ address: BigInt(address).toString(), token: bigintToHex(contractAddress), watch: true, refetchInterval: 5_000 })
   // console.log(balance)
 

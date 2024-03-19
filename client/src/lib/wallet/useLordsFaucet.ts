@@ -1,7 +1,6 @@
-import { useDojo, useDojoAccount } from '@/dojo/DojoContext'
-import { useCoin, COIN_LORDS } from '@/pistols/hooks/useConfig'
-import { bigintEquals } from '@/lib/utils/type'
 import { getContractByName } from '@dojoengine/core'
+import { useDojo, useDojoAccount } from '@/dojo/DojoContext'
+import { bigintEquals } from '@/lib/utils/type'
 import { useCallback, useMemo, useState } from 'react'
 
 export interface FaucetExecuteResult {
@@ -15,10 +14,9 @@ export interface FaucetInterface {
   error?: string
 }
 
-export const useFaucet = (): FaucetInterface => {
+export const useLordsFaucet = (contractAddress): FaucetInterface => {
   const { dojoProvider } = useDojo()
   const { account } = useDojoAccount()
-  const { contractAddress } = useCoin(COIN_LORDS)
 
   const mockAddress = useMemo(() => {
     const mockContract = getContractByName(dojoProvider.manifest, 'lords_mock')

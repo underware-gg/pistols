@@ -1,8 +1,9 @@
-import { Icon } from 'semantic-ui-react'
-import { useFaucet } from './useFaucet'
+import { useCoin, COIN_LORDS } from '@/pistols/hooks/useConfig'
+import { useLordsFaucet } from '@/lib/wallet/useLordsFaucet'
 
 export const LordsFaucet = () => {
-  const { faucet, hasFaucet, isPending } = useFaucet()
+  const { contractAddress } = useCoin(COIN_LORDS)
+  const { faucet, hasFaucet, isPending } = useLordsFaucet(contractAddress)
 
   const onClick = () => {
     if (isPending) return

@@ -2,9 +2,10 @@ import React, { ReactElement, useState } from 'react'
 import { Menu, Button, Confirm, SemanticICONS } from 'semantic-ui-react'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
-import { CustomIcon } from './Icons'
-import { useLordsBalance } from '../wallet/useLordsBalance'
+import { useCoin, COIN_LORDS } from '@/pistols/hooks/useConfig'
+import { useLordsBalance } from '@/lib/wallet/useLordsBalance'
 import { useDojoAccount } from '@/dojo/DojoContext'
+import { CustomIcon } from '@/pistols/components/ui/Icons'
 
 //-----------------
 // Generic Action button
@@ -96,7 +97,8 @@ export const BalanceRequiredButton = ({
   disabled = false,
 }) => {
   const { account } = useDojoAccount()
-  const { balance, noFunds } = useLordsBalance(account.address, wagerValue + fee)
+  const { contractAddress } = useCoin(COIN_LORDS)
+  const { balance, noFunds } = useLordsBalance(contractAddress, account.address, wagerValue + fee)
   return (
     <ActionButton fill
       disabled={disabled}
