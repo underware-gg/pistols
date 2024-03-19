@@ -149,12 +149,14 @@ export const useChallengeIdsByDuelist = (address: bigint) => {
   // console.log(address, challengeIds)
   return {
     challengeIds,
+    challengerIds,
+    challengedIds,
   }
 }
 
 export const useChallengesByDuelist = (address: bigint) => {
   const { Challenge } = useDojoComponents()
-  const { challengeIds } = useChallengeIdsByDuelist(address)
+  const { challengeIds, challengerIds, challengedIds } = useChallengeIdsByDuelist(address)
 
   const challenges: any[] = useMemo(() => challengeIds.map((challengeId) => getComponentValue(Challenge, bigintToEntity(challengeId))).sort((a, b) => (a.timestamp - b.timestamp)), [challengeIds])
   // console.log(challenges)
@@ -189,6 +191,8 @@ export const useChallengesByDuelist = (address: bigint) => {
 
   return {
     challengeIds,
+    challengerIds,
+    challengedIds,
     challenges,
     ...stats
   }

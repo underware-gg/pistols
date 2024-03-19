@@ -23,12 +23,12 @@ export const useWager = (duelId: BigNumberish) => {
 
 export const useLockedWager = (address: bigint, coin: number = COIN_LORDS) => {
   const { Wager } = useDojoComponents()
-  const { challenges } = useChallengesByDuelist(address)
+  const { challenges, challengerIds } = useChallengesByDuelist(address)
   const { wagers, fees, total } = useMemo(() => {
     let wagers = 0n
     let fees = 0n
     challenges.forEach((challenge) => {
-      if (challenge.state == ChallengeState.Awaiting || challenge.state == ChallengeState.InProgress) {
+      if (challenge.state == ChallengeState.InProgress || (challenge.state == ChallengeState.Awaiting && challengerIds.includes(challenge.duel_id))) {
         const wager = getComponentValue(Wager, bigintToEntity(challenge.duel_id))
         if (wager) {
           wagers += wager.value
