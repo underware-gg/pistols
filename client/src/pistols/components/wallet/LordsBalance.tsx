@@ -23,8 +23,14 @@ export const LockedBalance = ({
   clean = false,
 }) => {
   const { total } = useLockedWager(address)
+  if (!total) return <></>
   return (
-    <Wager big coin={COIN_LORDS} wei={total} pre={pre} post={post} clean={clean} />
+    <>
+      {' + '}
+      <Wager big coin={COIN_LORDS} wei={total} pre={pre} post={post} clean={clean} />
+      {' '}
+      (locked)
+    </>
   )
 }
 

@@ -41,8 +41,7 @@ export function ProfileDescription({
           <h3 className='Important NoMargin'>Honour: {honourAndTotal}</h3>
           {displayBalance && <>
             <LordsBalance address={address} />
-            {' + '}
-            <LockedBalance address={address} clean /> (locked)
+            <LockedBalance address={address} clean />
             {isYou && <><br /><LordsFaucet /></>}
           </>}
         </Col>
