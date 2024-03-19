@@ -2,8 +2,6 @@ import React, { useMemo } from 'react'
 import Link from 'next/link'
 import { Icon, IconGroup, Popup, PopupContent, PopupHeader, SemanticICONS } from 'semantic-ui-react'
 import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
-import { Action, ActionEmojis, ActionNames } from '@/pistols/utils/pistols'
-import { EMOJI } from '@/pistols/data/messages'
 
 // Semantic UI Icons
 // https://react.semantic-ui.com/elements/icon/
@@ -12,7 +10,7 @@ import { EMOJI } from '@/pistols/data/messages'
 // re-export semantic ui Icon for convenience
 export { Icon }
 
-const _downSize = (size) => {
+export const _downSize = (size) => {
   return (
     size == 'small' ? 'tiny'
       : size == null ? 'small'
@@ -23,7 +21,7 @@ const _downSize = (size) => {
   )
 }
 
-const _upSize = (size) => {
+export const _upSize = (size) => {
   return (
     size == 'tiny' ? 'small'
       : size == 'small' ? null
@@ -280,70 +278,5 @@ export function CustomIcon({
     // }
   }, [icon, logo, png, name, className, size, color, tooltip, onClick])
   return component
-}
-
-
-
-
-
-//---------------------------------
-// Duel Icons
-//
-export function ActionIcon({
-  action,
-  size = 'large',
-}: {
-  action: number
-  size?: IconSizeProp
-}) {
-  if (action >= 1 && action <= 10) {
-    return <PacesIcon paces={action} size={size} />
-  } else {
-    return <BladesIcon blade={action} size={size} />
-  }
-}
-export function PacesIcon({
-  paces,
-  size = 'large',
-}: {
-  paces: number
-  size?: IconSizeProp
-}) {
-  if (paces < 1 || paces > 10) {
-    return <Icon name='question circle' size={size} />
-  }
-  const _paces = paces == 10 ? '10' : '1234567890'[paces - 1]
-  return (
-    // <EmojiIcon emoji={emoji} size={size} className='PacesIconRound' />
-    <IconGroup size={_downSize(size)}>
-      <EmojiIcon emoji={EMOJI.PACES} size={size} />
-      <EmojiIcon emoji={_paces} size={size} className={`PacesIcon`} />
-    </IconGroup>
-  )
-}
-export function BladesIcon({
-  blade,
-  size = 'large',
-}: {
-  blade: Action
-  size?: IconSizeProp
-}) {
-  if (!ActionNames[blade]) {
-    return <Icon name='question circle' size={size} />
-  }
-  const emoji = ActionEmojis[blade] ?? EMOJI.UNKNOWN
-  return (
-    // <IconGroup size='large'>
-    // <Icon size={size} name='circle outline' />
-    <EmojiIcon emoji={emoji} size={size} className='' />
-    // </IconGroup>
-  )
-}
-
-
-export function LordsBagIcon({
-  size = null,
-}) {
-  return <CustomIcon logo png name='lords_bag' size={size}/>
 }
 

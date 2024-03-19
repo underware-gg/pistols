@@ -14,7 +14,7 @@ import { ChallengeTableByDuelist } from '@/pistols/components/ChallengeTable'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
 import { ChallengeMessages } from '@/pistols/utils/pistols'
 import { randomArrayElement } from '@/lib/utils/random'
-import { AccountShort } from '@/pistols/components/account/Account'
+import { AddressShort } from '@/lib/ui/AddressShort'
 import { WagerAndOrFees } from '@/pistols/components/account/Wager'
 import { COIN_LORDS } from '@/pistols/hooks/useConfig'
 
@@ -75,7 +75,7 @@ export default function DuelistModal() {
             <Col width={8} textAlign='left'>
               Duelist
               &nbsp;&nbsp;&nbsp;
-              <AccountShort address={duelistAddress} suffix='' />
+              <AddressShort address={duelistAddress} suffix='' />
             </Col>
             <Col width={7} textAlign='right'>
               {isYou &&

@@ -2,9 +2,9 @@ import React, { useMemo } from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useDojoAccount } from '@/dojo/DojoContext'
-import { LordsBalance, LockedBalance } from '@/pistols/components/wallet/LordsBalance'
-import { LordsFaucet } from '@/pistols/components/wallet/LordsFaucet'
-import { AccountShort } from '@/pistols/components/account/Account'
+import { LordsBalance, LockedBalance } from '@/pistols/components/account/LordsBalance'
+import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
+import { AddressShort } from '@/lib/ui/AddressShort'
 import { bigintEquals } from '@/lib/utils/type'
 import { EMOJI } from '@/pistols/data/messages'
 
@@ -37,7 +37,7 @@ export function ProfileDescription({
 
         <Col>
           <h1 className='NoMargin'><ProfileName address={address} /></h1>
-          {displayAddress && <AccountShort address={address} />}
+          {displayAddress && <AddressShort address={address} />}
           <h3 className='Important NoMargin'>Honour: {honourAndTotal}</h3>
           {displayBalance && <>
             <LordsBalance address={address} />

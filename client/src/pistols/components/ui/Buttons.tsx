@@ -5,7 +5,7 @@ import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useCoin, COIN_LORDS } from '@/pistols/hooks/useConfig'
 import { useLordsBalance } from '@/lib/wallet/useLordsBalance'
 import { useDojoAccount } from '@/dojo/DojoContext'
-import { CustomIcon } from '@/pistols/components/ui/Icons'
+import { CustomIcon } from '@/lib/ui/Icons'
 
 //-----------------
 // Generic Action button

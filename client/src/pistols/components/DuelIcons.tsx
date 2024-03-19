@@ -2,7 +2,8 @@ import React, { useMemo } from 'react'
 import { Icon, Grid } from 'semantic-ui-react'
 import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
 import { DuelStage, useDuel } from '@/pistols/hooks/useDuel'
-import { ActionIcon, CompletedIcon, EmojiIcon, LoadingIcon } from '@/pistols/components/ui/Icons'
+import { CompletedIcon, EmojiIcon, LoadingIcon } from '@/lib/ui/Icons'
+import { ActionIcon } from '@/pistols/components/ui/ActionIcon'
 import { EMOJI } from '@/pistols/data/messages'
 
 const Row = Grid.Row

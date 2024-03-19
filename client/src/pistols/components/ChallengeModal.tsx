@@ -9,7 +9,7 @@ import { ProfileDescription } from '@/pistols/components/account/ProfileDescript
 import { ProfilePicButton } from '@/pistols/components/account/ProfilePic'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
 import { ChallengeState, makeDuelUrl } from '@/pistols/utils/pistols'
-import { AccountShort } from '@/pistols/components/account/Account'
+import { AddressShort } from '@/lib/ui/AddressShort'
 import { DuelIconsAsGrid } from '@/pistols/components/DuelIcons'
 import { ChallengeTime } from './ChallengeTime'
 import { Wager, WagerAndOrFees } from './account/Wager'
@@ -72,7 +72,7 @@ export default function ChallengeModal() {
             <Col width={8} textAlign='left'>
               Challenge
               &nbsp;&nbsp;&nbsp;
-              <AccountShort address={duelId} suffix='' />
+              <AddressShort address={duelId} suffix='' />
             </Col>
             <Col width={7} textAlign='right'>
               <span className='Code'><ChallengeTime duelId={duelId} prefixed /></span>

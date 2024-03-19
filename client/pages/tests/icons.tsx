@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { Container, Grid, Icon } from 'semantic-ui-react'
-import { BladesIcon, CustomIcon, EmojiIcon, LordsBagIcon, PacesIcon } from '@/pistols/components/ui/Icons'
-import App from '@/pistols/components/App'
+import { BladesIcon, CustomIcon, EmojiIcon, PacesIcon } from '@/lib/ui/Icons'
+import { LordsBagIcon } from '@/pistols/components/account/Wager'
 import { Action } from '@/pistols/utils/pistols'
+import App from '@/pistols/components/App'
 
 const Row = Grid.Row
 const Col = Grid.Column

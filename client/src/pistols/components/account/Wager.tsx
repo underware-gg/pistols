@@ -1,8 +1,14 @@
 import { useMemo } from 'react'
-import { LordsBagIcon } from '@/pistols/components/ui/Icons'
-import { BigNumberish } from 'starknet'
-import { weiToEth } from '@/lib/utils/starknet'
+import { CustomIcon } from '@/lib/ui/Icons'
 import { COIN_LORDS } from '@/pistols/hooks/useConfig'
+import { weiToEth } from '@/lib/utils/starknet'
+import { BigNumberish } from 'starknet'
+
+export function LordsBagIcon({
+  size = null,
+}) {
+  return <CustomIcon logo png name='lords_bag' size={size} />
+}
 
 function Wager({
   coin = COIN_LORDS,

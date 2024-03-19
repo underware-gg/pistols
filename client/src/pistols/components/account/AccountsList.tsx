@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation'
 import { Grid, Radio, Input, Button, Icon } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
 import { usePistolsContext, MenuKey, initialState } from '@/pistols/hooks/PistolsContext'
-import { AccountShort } from '@/pistols/components/account/Account'
+import { AddressShort } from '@/lib/ui/AddressShort'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
@@ -185,7 +185,7 @@ function AccountItem({
         <Radio checked={isSelected} onClick={() => select(address)} />
       </Col>
       <Col width={3} className='NoPadding'>
-        <AccountShort address={address} copyLink={false} />
+        <AddressShort address={address} copyLink={false} />
         <div className='Relative'>
           <ProfilePicSquareButton
             profilePic={_profilePic}

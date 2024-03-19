@@ -1,10 +1,10 @@
 import { useMemo } from 'react'
-import { CopyIcon } from '@/pistols/components/ui/Icons'
+import { CopyIcon } from '@/lib/ui/Icons'
 import { bigintToHex } from '@/lib/utils/type'
 
 const shortAddress = (address) => (!address ? '?' : `${address.slice(0, 6)}…${address.slice(-4)}`)
 
-function AccountShort({
+function AddressShort({
   address,
   suffix = '',
   copyLink = true,
@@ -20,5 +20,5 @@ function AccountShort({
 
 export {
   shortAddress,
-  AccountShort,
+  AddressShort,
 }

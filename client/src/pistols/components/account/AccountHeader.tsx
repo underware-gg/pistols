@@ -4,8 +4,8 @@ import { useDojoAccount } from '@/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
-import { AccountShort } from '@/pistols/components/account/Account'
-import { LordsBalance } from '../wallet/LordsBalance'
+import { AddressShort } from '@/lib/ui/AddressShort'
+import { LordsBalance } from '@/pistols/components/account/LordsBalance'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -28,7 +28,7 @@ export default function AccountHeader({
       <Row className='ProfilePicHeight' textAlign='center' verticalAlign='middle'>
         <Col width={11} textAlign='right'>
           <h3>{isMasterAccount ? 'Guest' : name}</h3>
-          <AccountShort address={account?.address} />
+          <AddressShort address={account?.address} />
           <br />
           <LordsBalance address={account.address}/>
         </Col>
