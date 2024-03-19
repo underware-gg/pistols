@@ -1,7 +1,7 @@
 import { useComponentValue } from '@dojoengine/react'
 import { useDojoComponents } from '@/dojo/DojoContext'
-import { bigintToEntity } from '../utils/utils'
-import { feltToString } from '../utils/starknet'
+import { bigintToEntity } from '@/lib/utils/type'
+import { feltToString } from '@/lib/utils/starknet'
 
 export const useConfig = () => {
   const { Config } = useDojoComponents()

@@ -11,16 +11,10 @@ export var emitter = ee()
 
 import { AudioName, AUDIO_ASSETS, TEXTURES, SPRITESHEETS, AnimName, sceneBackgrounds, TextureName } from '@/pistols/data/assets'
 import { SceneName } from '@/pistols/hooks/PistolsContext'
-import { map } from '@/pistols/utils/utils'
+import { map } from '@/lib/utils/math'
 import { SpriteSheet, Actor } from './SpriteSheetMaker'
 import { Action, ActionTypes } from '@/pistols/utils/pistols'
-import constants from '@/pistols/utils/constants'
 
-const PI = Math.PI
-const HALF_PI = Math.PI * 0.5
-const ONE_HALF_PI = Math.PI * 1.5
-const TWO_PI = Math.PI * 2
-const R_TO_D = (180 / Math.PI)
 
 //---------------------------
 // CONSTANTS

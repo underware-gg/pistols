@@ -1,11 +1,11 @@
 import { getEvents, setComponentsFromEvents, decodeComponent } from '@dojoengine/utils'
 import { SetupNetworkResult } from './setupNetwork'
-import { splitU256, stringToFelt } from '@/pistols/utils/starknet'
+import { splitU256, stringToFelt } from '@/lib/utils/starknet'
 import { Account, BigNumberish, Call, uint256 } from 'starknet'
 import { emitter } from '@/pistols/three/game'
 import { getContractByName } from '@dojoengine/core'
-import { bigintToEntity, bigintToHex } from '@/pistols/utils/utils'
-import { Component, getComponentValue } from '@dojoengine/recs'
+import { bigintToEntity, bigintToHex } from '@/lib/utils/type'
+import { getComponentValue } from '@dojoengine/recs'
 import { ClientComponents } from './createClientComponents'
 
 

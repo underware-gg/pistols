@@ -1,6 +1,6 @@
 import { useDojo, useDojoAccount } from '@/dojo/DojoContext'
 import { useCoin, COIN_LORDS } from '@/pistols/hooks/useConfig'
-import { bigintEquals } from '@/pistols/utils/utils'
+import { bigintEquals } from '@/lib/utils/type'
 import { getContractByName } from '@dojoengine/core'
 import { useCallback, useMemo, useState } from 'react'
 

@@ -1,14 +1,15 @@
 import React from 'react'
 import { useRouter } from 'next/router'
 import { Container, Divider, Table } from 'semantic-ui-react'
-import { bigintToHex, formatTimestamp } from '@/pistols/utils/utils'
+import { bigintToHex } from '@/lib/utils/type'
+import { formatTimestamp } from '@/lib/utils/timestamp'
 import AppDojo from '@/pistols/components/AppDojo'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ActionEmojis, ActionNames, ChallengeStateNames, RoundStateNames } from '@/pistols/utils/pistols'
 import { BigNumberish } from 'starknet'
 import { useWager } from '@/pistols/hooks/useWager'
-import { weiToEth } from '@/pistols/utils/starknet'
+import { weiToEth } from '@/lib/utils/starknet'
 import { useCoin } from '@/pistols/hooks/useConfig'
 
 const Row = Table.Row

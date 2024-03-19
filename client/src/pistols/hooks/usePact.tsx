@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
-import { useComponentValue } from "@dojoengine/react"
-import { useDojoComponents, useDojoSystemCalls } from '@/dojo/DojoContext'
-import { bigintToEntity, keysToEntity } from "../utils/utils"
+import { useMemo } from 'react'
+import { useComponentValue } from '@dojoengine/react'
+import { useDojoComponents } from '@/dojo/DojoContext'
+import { bigintToEntity } from '@/lib/utils/type'
 
 export const usePact = (duelist_a: bigint | string | null, duelist_b: bigint | string | null) => {
   const { Pact } = useDojoComponents()

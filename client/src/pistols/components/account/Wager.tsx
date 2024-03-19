@@ -1,8 +1,7 @@
 import { useMemo } from 'react'
-import { CopyIcon, CustomIcon, EmojiIcon, LordsBagIcon } from '@/pistols/components/ui/Icons'
-import { bigintToHex } from '@/pistols/utils/utils'
+import { LordsBagIcon } from '@/pistols/components/ui/Icons'
 import { BigNumberish } from 'starknet'
-import { weiToEth } from '@/pistols/utils/starknet'
+import { weiToEth } from '@/lib/utils/starknet'
 import { COIN_LORDS } from '@/pistols/hooks/useConfig'
 
 function Wager({

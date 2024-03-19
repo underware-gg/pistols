@@ -2,8 +2,8 @@ import { useMemo } from 'react'
 import { HasValue, getComponentValue, Component } from '@dojoengine/recs'
 import { useDojoComponents } from '@/dojo/DojoContext'
 import { useComponentValue } from "@dojoengine/react"
-import { bigintToEntity } from '@/pistols/utils/utils'
-import { feltToString } from "@/pistols/utils/starknet"
+import { bigintToEntity } from '@/lib/utils/type'
+import { feltToString } from "@/lib/utils/starknet"
 import { ChallengeState, ChallengeStateDescriptions, LiveChallengeStates, PastChallengeStates } from "@/pistols/utils/pistols"
 import { useEntityKeys, useEntityKeysQuery } from '@/pistols/hooks/useEntityKeys'
 import { useClientTimestamp } from "@/pistols/hooks/useTimestamp"

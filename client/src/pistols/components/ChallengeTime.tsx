@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { useChallenge } from '@/pistols/hooks/useChallenge'
-import { formatTimestamp, formatTimestampDelta } from '@/pistols/utils/utils'
+import { formatTimestamp, formatTimestampDelta } from '@/lib/utils/timestamp'
 import { useClientTimestamp } from '../hooks/useTimestamp'
 import { EMOJI } from '../data/messages'
 

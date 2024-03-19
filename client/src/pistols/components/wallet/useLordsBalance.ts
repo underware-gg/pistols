@@ -1,5 +1,5 @@
 import { useCoin, COIN_LORDS } from '@/pistols/hooks/useConfig'
-import { bigintToHex } from '@/pistols/utils/utils'
+import { bigintToHex } from '@/lib/utils/type'
 import { useBalance } from '@starknet-react/core'
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'

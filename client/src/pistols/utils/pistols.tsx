@@ -1,4 +1,4 @@
-import { bigintToHex } from '@/pistols/utils/utils'
+import { bigintToHex } from '@/lib/utils/type'
 import { EMOJI } from '@/pistols/data/messages'
 
 //------------------------------------------
