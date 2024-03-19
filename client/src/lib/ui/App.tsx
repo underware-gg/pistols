@@ -7,7 +7,7 @@ export default function App({
   className = '',
   children
 }: {
-  headerData: HeaderData
+  headerData?: HeaderData
   backgroundImage?: string
   className?: string
   children: ReactNode

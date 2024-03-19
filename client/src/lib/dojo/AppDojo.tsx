@@ -14,7 +14,7 @@ export default function AppDojo({
   backgroundImage = null,
   children,
 }: {
-  headerData: HeaderData
+  headerData?: HeaderData
   backgroundImage?: string
   children: ReactNode
 }) {
