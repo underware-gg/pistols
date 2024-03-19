@@ -1,6 +1,6 @@
 import React from 'react'
 import { Unity, useUnityContext } from 'react-unity-webgl'
-import App from '@/pistols/components/App'
+import App from '@/lib/ui/App'
 import { ActionButton } from '@/pistols/components/ui/Buttons';
 
 export default function UnityPage() {

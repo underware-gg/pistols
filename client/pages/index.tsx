@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import App from '@/pistols/components/App'
+import App from '@/lib/ui/App'
 import Background from '@/pistols/components/Background'
 import Logo from '@/pistols/components/Logo'
 

@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { Container, Divider, Table } from 'semantic-ui-react'
 import { bigintToHex } from '@/lib/utils/type'
 import { formatTimestamp } from '@/lib/utils/timestamp'
-import AppDojo from '@/pistols/components/AppDojo'
+import AppPistols from '@/pistols/components/AppPistols'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ActionEmojis, ActionNames, ChallengeStateNames, RoundStateNames } from '@/pistols/utils/pistols'
@@ -23,11 +23,11 @@ export default function StatsPage() {
   const { duel_id } = router.query
 
   return (
-    <AppDojo title={'Duel'} backgroundImage={null}>
+    <AppPistols title={'Duel'} backgroundImage={null}>
       {router.isReady &&
         <Stats duelId={BigInt(duel_id as string)} />
       }
-    </AppDojo>
+    </AppPistols>
   );
 }
 

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react'
 import { useRouter } from 'next/router'
 import { usePistolsContext, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
-import AppDojo from '@/pistols/components/AppDojo'
+import AppPistols from '@/pistols/components/AppPistols'
 import GameContainer from '@/pistols/components/GameContainer'
 import Background from '@/pistols/components/Background'
 import Gate from '@/pistols/components/Gate'
@@ -77,7 +77,7 @@ export default function MainPage() {
   // console.log(`AT scene [${scene}] menu [${menuKey}]`, atTavern, atDuel, duelId, gameImpl)
 
   return (
-    <AppDojo title={title} backgroundImage={null}>
+    <AppPistols title={title} backgroundImage={null}>
       <Background className={bgClassName}>
         <GameContainer
           isVisible={true}
@@ -85,7 +85,7 @@ export default function MainPage() {
         />
         <MainUI duelId={duelId} />
       </Background>
-    </AppDojo>
+    </AppPistols>
   );
 }
 

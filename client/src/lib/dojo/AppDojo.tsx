@@ -1,23 +1,25 @@
-import React, { useMemo, useState } from 'react'
+import React, { ReactNode, useMemo, useState } from 'react'
 import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
 import { DojoConfig, createDojoConfig } from '@dojoengine/core'
 import { DojoProvider } from '@/dojo/DojoContext'
 import { setup } from '@/dojo/setup'
-import { ThreeJsProvider } from '@/pistols/hooks/ThreeJsContext'
-import { GameplayProvider } from '@/pistols/hooks/GameplayContext'
 import { KatanaProvider } from '@/lib/dojo/KatanaProvider'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
-import ErrorModal from '@/pistols/components/ErrorModal'
-import App from '@/pistols/components/App'
+import { HeaderData } from '@/lib/ui/AppHeader'
+import App from '@/lib/ui/App'
 import manifest from '../../manifest.json'
 
 export default function AppDojo({
-  title = null,
+  headerData = {},
   backgroundImage = null,
   children,
+}: {
+  headerData: HeaderData
+  backgroundImage?: string
+  children: ReactNode
 }) {
   return (
-    <App title={title} backgroundImage={backgroundImage}>
+    <App headerData={headerData} backgroundImage={backgroundImage}>
       <DojoSetup>
         {children}
       </DojoSetup>
@@ -70,12 +72,7 @@ function DojoSetup({ children }) {
   return (
     <KatanaProvider dojoConfig={config}>
       <DojoProvider value={setupResult}>
-        <ThreeJsProvider>
-          <GameplayProvider>
-            {children}
-            <ErrorModal />
-          </GameplayProvider>
-        </ThreeJsProvider>
+        {children}
       </DojoProvider>
     </KatanaProvider>
   );

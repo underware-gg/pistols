@@ -1,11 +1,11 @@
 import React from 'react'
 import { Snapshots } from '@/pistols/components/Snapshots';
-import AppDojo from '@/pistols/components/AppDojo'
+import AppPistols from '@/pistols/components/AppPistols'
 
 export default function SnapshotPage() {
   return (
-    <AppDojo title={'Snapshot'}>
+    <AppPistols title={'Snapshot'}>
       <Snapshots />
-    </AppDojo>
+    </AppPistols>
   );
 }

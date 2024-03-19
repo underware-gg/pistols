@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Container, Grid } from 'semantic-ui-react'
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { createTypedMessage } from '@/lib/utils/starknet'
-import AppDojo from '@/pistols/components/AppDojo'
+import AppPistols from '@/pistols/components/AppPistols'
 import { Account, typedData } from 'starknet'
 
 const Row = Grid.Row
@@ -10,13 +10,13 @@ const Col = Grid.Column
 
 export default function IndexPage() {
   return (
-    <AppDojo>
+    <AppPistols>
       <Container text>
         <Grid>
           <ValidateMessage />
         </Grid>
       </Container>
-    </AppDojo>
+    </AppPistols>
   );
 }
 
