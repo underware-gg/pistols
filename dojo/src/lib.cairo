@@ -16,6 +16,7 @@ mod types {
     mod action;
     mod challenge;
     mod constants;
+    mod events;
     mod round;
 }
 

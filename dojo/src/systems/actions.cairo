@@ -78,6 +78,14 @@ mod actions {
     use pistols::systems::shooter::{shooter};
     use pistols::systems::{utils};
     use pistols::types::constants::{constants};
+    use pistols::types::{events};
+
+    #[event]
+    #[derive(Drop, starknet::Event)]
+    enum Event {
+        NewChallengeEvent: events::NewChallengeEvent,
+        ChallengeAcceptedEvent: events::ChallengeAcceptedEvent,
+    }
 
     // impl: implement functions specified in trait
     #[external(v0)]
@@ -169,6 +177,12 @@ mod actions {
 
             utils::set_challenge(self.world(), challenge);
 
+            emit!(self.world(), events::NewChallengeEvent {
+                duel_id,
+                duelist_a: challenge.duelist_a,
+                duelist_b: challenge.duelist_b,
+            });
+
             (duel_id)
         }
 
@@ -212,6 +226,13 @@ mod actions {
                     challenge.state = ChallengeState::Refused.into();
                     challenge.timestamp_end = timestamp;
                 }
+
+                emit!(self.world(), events::ChallengeAcceptedEvent {
+                    duel_id,
+                    duelist_a: challenge.duelist_a,
+                    duelist_b: challenge.duelist_b,
+                    accepted,
+                });
             }
 
             // update challenge state

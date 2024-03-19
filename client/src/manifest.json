@@ -1519,7 +1519,7 @@
     {
       "name": "pistols::systems::actions::actions",
       "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
-      "class_hash": "0x69a73d2cd7ed92dd4e025823a0c45ceeb5bc6732d0544ad76c7a31523d0918",
+      "class_hash": "0x44d9ae05c9034f2f73ddb9ecc85f7a38440686b39c80c51c3e1320da240c59b",
       "abi": [
         {
           "type": "impl",
@@ -2065,12 +2065,71 @@
         },
         {
           "type": "event",
+          "name": "pistols::types::events::NewChallengeEvent",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "duel_id",
+              "type": "core::integer::u128",
+              "kind": "data"
+            },
+            {
+              "name": "duelist_a",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "data"
+            },
+            {
+              "name": "duelist_b",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "pistols::types::events::ChallengeAcceptedEvent",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "duel_id",
+              "type": "core::integer::u128",
+              "kind": "data"
+            },
+            {
+              "name": "duelist_a",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "data"
+            },
+            {
+              "name": "duelist_b",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "data"
+            },
+            {
+              "name": "accepted",
+              "type": "core::bool",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
           "name": "pistols::systems::actions::actions::Event",
           "kind": "enum",
           "variants": [
             {
               "name": "UpgradeableEvent",
               "type": "dojo::components::upgradeable::upgradeable::Event",
+              "kind": "nested"
+            },
+            {
+              "name": "NewChallengeEvent",
+              "type": "pistols::types::events::NewChallengeEvent",
+              "kind": "nested"
+            },
+            {
+              "name": "ChallengeAcceptedEvent",
+              "type": "pistols::types::events::ChallengeAcceptedEvent",
               "kind": "nested"
             }
           ]
