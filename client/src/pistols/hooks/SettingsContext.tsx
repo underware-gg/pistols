@@ -1,6 +1,6 @@
 import React, { ReactNode, createContext, useReducer, useContext, useState } from 'react'
 import { useCookies } from 'react-cookie'
-import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
+import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
 
 //--------------------------------
 // Constants

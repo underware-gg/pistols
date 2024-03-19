@@ -1,5 +1,5 @@
 import React, { ReactNode, useMemo, useState } from 'react'
-import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
+import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
 import { DojoConfig, createDojoConfig } from '@dojoengine/core'
 import { DojoProvider } from '@/dojo/DojoContext'
 import { setup } from '@/dojo/setup'

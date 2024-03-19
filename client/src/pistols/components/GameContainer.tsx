@@ -5,7 +5,7 @@ import { loadAudioAssets, isAudioAssetsLoaded, AudioName } from '@/pistols/data/
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import GameCanvas from '@/pistols/components/GameCanvas'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
-import { useUserHasInteracted } from '@/pistols/hooks/useUserHasInteracted'
+import { useUserHasInteracted } from '@/lib/hooks/useUserHasInteracted'
 
 function GameContainer({
   isVisible,

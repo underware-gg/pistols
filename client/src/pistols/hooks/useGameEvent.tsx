@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useEffectOnce } from '@/pistols/hooks/useEffectOnce'
+import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
 import { emitter } from '@/pistols/three/game'
 
 export const useGameEvent = (eventName: string, defaultValue: any = null) => {

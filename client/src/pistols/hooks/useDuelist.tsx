@@ -3,7 +3,7 @@ import { useComponentValue } from '@dojoengine/react'
 import { useDojoComponents } from '@/dojo/DojoContext'
 import { bigintToEntity } from '@/lib/utils/type'
 import { feltToString } from "@/lib/utils/starknet"
-import { useEntityKeys } from '@/pistols/hooks/useEntityKeys'
+import { useEntityKeys } from '@/lib/hooks/useEntityKeys'
 
 
 //------------------
