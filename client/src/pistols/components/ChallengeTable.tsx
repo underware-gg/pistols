@@ -102,7 +102,7 @@ function ChallengeTableByIds({
         }
         result.push(<FilterButton key={state} label={ChallengeStateNames[state]} state={stateToggles[state]} switchState={() => _switch()} />)
       })
-      result.push(<FilterButton key={'none'} label='Clear' state={false} switchState={() => setStateToggles(_statesToToggles(false))} />)
+      result.push(<FilterButton key={'clear'} label='Clear' state={false} switchState={() => setStateToggles(_statesToToggles(false))} />)
     }
     return result
   }, [states, stateToggles])
