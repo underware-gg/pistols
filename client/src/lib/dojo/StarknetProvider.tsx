@@ -3,7 +3,7 @@ import { StarknetConfig, argent, braavos, jsonRpcProvider } from '@starknet-reac
 import { Chain } from '@starknet-react/chains'
 import { DojoConfig } from '@dojoengine/core'
 
-export function KatanaProvider({
+export function StarknetProvider({
   dojoConfig,
   children,
 }: {

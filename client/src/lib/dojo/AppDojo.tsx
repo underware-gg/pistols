@@ -3,7 +3,7 @@ import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
 import { DojoConfig, createDojoConfig } from '@dojoengine/core'
 import { DojoProvider } from '@/dojo/DojoContext'
 import { setup } from '@/dojo/setup'
-import { KatanaProvider } from '@/lib/dojo/KatanaProvider'
+import { StarknetProvider } from '@/lib/dojo/StarknetProvider'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { HeaderData } from '@/lib/ui/AppHeader'
 import App from '@/lib/ui/App'
@@ -70,10 +70,10 @@ function DojoSetup({ children }) {
   }
 
   return (
-    <KatanaProvider dojoConfig={config}>
+    <StarknetProvider dojoConfig={config}>
       <DojoProvider value={setupResult}>
         {children}
       </DojoProvider>
-    </KatanaProvider>
+    </StarknetProvider>
   );
 }
