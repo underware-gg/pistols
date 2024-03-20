@@ -503,6 +503,10 @@ $box-h: calc((100vh - $aspect-h) / 2);
   height: 130px;
 }
 
+.StarknetConnectModal {
+  max-width: 400px;
+}
+
 // .TableHeader {
 //   height: 30px!important;
 //   max-height: 30px!important;

@@ -40,7 +40,10 @@ export function StarknetProvider({
   const provider = jsonRpcProvider({ rpc })
 
   const chains = [katana]
-  const connectors = [braavos(), argent()]
+  const connectors = [
+    argent(),
+    braavos(),
+  ]
 
   return (
     <StarknetConfig
