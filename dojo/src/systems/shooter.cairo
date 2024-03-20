@@ -35,7 +35,7 @@ mod shooter {
         let caller: ContractAddress = starknet::get_caller_address();
 
         // Assert correct Challenge
-        let (challenge, duelist_number) = _assert_challenge(world, caller, duel_id, round_number);
+        let (_challenge, duelist_number) = _assert_challenge(world, caller, duel_id, round_number);
 
         // Assert correct Round
         let mut round: Round = get!(world, (duel_id, round_number), Round);

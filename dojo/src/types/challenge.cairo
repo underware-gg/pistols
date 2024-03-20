@@ -159,6 +159,7 @@ mod tests {
     use debug::PrintTrait;
     use core::traits::Into;
 
+    use token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     use pistols::models::models::{Challenge};
@@ -168,7 +169,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_challenge_exists() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let (world, _system, _admin, _lords, _ierc20, _owner, _other, _bummer, _treasury) = utils::setup_world(true, true);
         // get some random inexisting challenge
         let ch: Challenge = utils::get_Challenge(world, 0x682137812638127638127);
         let state: ChallengeState = ch.state.try_into().unwrap();

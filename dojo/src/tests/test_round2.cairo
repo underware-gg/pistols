@@ -77,8 +77,8 @@ mod tests {
     #[test]
     #[available_gas(10_000_000_000)]
     fn test_blades_round_draw() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = utils::setup_world(true, true);
+        let (_challenge, _round, duel_id) = _start_new_challenge(world, system, owner, other);
 
         let (salt_1_a, salt_1_b, action_1_a, action_1_b, hash_1_a, hash_1_b) = _get_actions_round_1_continue();
         let paces_a = action_1_a;
@@ -134,7 +134,7 @@ mod tests {
         assert(duelist_b.honour == (paces_b * 10).try_into().unwrap(), '__duelist_b.honour');
 
         // Run same challenge to compute totals
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let (_challenge, _round, duel_id) = _start_new_challenge(world, system, owner, other);
         let (salt_1_a, salt_1_b, action_1_a, action_1_b, hash_1_a, hash_1_b) = _get_actions_round_1_continue();
         utils::execute_commit_action(system, owner, duel_id, 1, hash_1_a);
         utils::execute_commit_action(system, other, duel_id, 1, hash_1_b);
@@ -146,7 +146,7 @@ mod tests {
         utils::execute_commit_action(system, other, duel_id, 2, hash_1_b);
         utils::execute_reveal_action(system, owner, duel_id, 2, salt_1_a, action_1_a, 0);
         utils::execute_reveal_action(system, other, duel_id, 2, salt_1_b, action_1_b, 0);
-        let (challenge, round) = utils::get_Challenge_Round(world, duel_id);
+        let (challenge, _round) = utils::get_Challenge_Round(world, duel_id);
         assert(challenge.state == ChallengeState::Draw.into(), '2__challenge.state');
 
         let duelist_a = utils::get_Duelist(world, owner);
@@ -169,8 +169,8 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_blades_round_resolved() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
-        let (challenge, round, duel_id) = _start_new_challenge(world, system, owner, other);
+        let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = utils::setup_world(true, true);
+        let (_challenge, _round, duel_id) = _start_new_challenge(world, system, owner, other);
 
         let (salt_1_a, salt_1_b, action_1_a, action_1_b, hash_1_a, hash_1_b) = _get_actions_round_1_continue();
         let paces_a = action_1_a;

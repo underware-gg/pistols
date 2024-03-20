@@ -99,7 +99,8 @@ mod tests {
     use debug::PrintTrait;
     use core::traits::Into;
 
-    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+    // use token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
+    // use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     use pistols::models::models::{Round};
     use pistols::types::round::{RoundState, RoundStateTrait};
@@ -108,7 +109,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_round_exists() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let (world, _system, _admin, _lords, _ierc20, _owner, _other, _bummer, _treasury) = utils::setup_world(true, true);
         // get some random inexisting round
         let round: Round = utils::get_Round(world, 0x682137812638127638127, 1);
         let state: RoundState = round.state.try_into().unwrap();

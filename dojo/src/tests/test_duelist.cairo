@@ -15,7 +15,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_register_ChallengeTable() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let (world, system, _admin, _lords, _ierc20, owner, _other, _bummer, _treasury) = utils::setup_world(true, true);
 
         let name: felt252 = 'DuelistName';
         utils::execute_register_duelist(system, owner, name, 1);
@@ -32,7 +32,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_register_challenged() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = utils::setup_world(true, true);
         let player1_name: felt252 = 'Player_ONE';
         let player2_name: felt252 = 'Player_TWO';
         utils::execute_register_duelist(system, owner, player1_name, 1);
@@ -52,7 +52,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_pistols_bonus() {
-        let (world, system, admin, lords, ierc20, owner, other, bummer, treasury) = utils::setup_world(true, true);
+        let (world, system, _admin, _lords, _ierc20, owner, _other, _bummer, _treasury) = utils::setup_world(true, true);
         let name: felt252 = 'DuelistName';
         utils::execute_register_duelist(system, owner, name, 1);
         let mut duelist: Duelist = utils::get_Duelist(world, owner);
