@@ -1,7 +1,10 @@
+
+export const PROFILE_PIC_COUNT = 15
+
 //------------------------------------------
+/// Cairo constants
 // must be in sync with CONSTANTS from constants.cairo
 //
-
 const constants = {
   ROUND_COUNT: 3,
   FULL_HONOUR: 100,

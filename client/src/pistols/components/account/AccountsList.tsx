@@ -9,6 +9,7 @@ import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
 import useLocalStorageState from 'use-local-storage-state'
+import { PROFILE_PIC_COUNT } from '@/pistols/utils/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -121,18 +122,17 @@ function AccountItem({
   //   console.log(address, true)
   //   return true
   // }, [address])
-
+ 
   // current name from Dojo
   const { name, profilePic, isRegistered } = useDuelist(address)
 
   const [selectedProfilePic, setSelectedProfilePic] = useState(0)
 
-  const _profilePicCount = parseInt(process.env.PROFILE_PIC_COUNT)
   const _profilePic = useMemo(() => {
     return (
       selectedProfilePic ? selectedProfilePic
         : profilePic ? profilePic
-          : (Number(BigInt(address) % BigInt(_profilePicCount)) + 1)
+          : (Number(BigInt(address) % BigInt(PROFILE_PIC_COUNT)) + 1)
     )
   }, [selectedProfilePic, profilePic])
 
@@ -181,10 +181,10 @@ function AccountItem({
           />
           {canEdit && <>
             <div className='ProfilePicLeftButton'
-              onClick={() => setSelectedProfilePic(_profilePic > 1 ? _profilePic - 1 : _profilePicCount)}
+              onClick={() => setSelectedProfilePic(_profilePic > 1 ? _profilePic - 1 : PROFILE_PIC_COUNT)}
             >◀</div>
             <div className='ProfilePicRightButton'
-              onClick={() => setSelectedProfilePic(_profilePic < _profilePicCount ? _profilePic + 1 : 1)}
+              onClick={() => setSelectedProfilePic(_profilePic < PROFILE_PIC_COUNT ? _profilePic + 1 : 1)}
             >▶</div>
           </>}
         </div>
