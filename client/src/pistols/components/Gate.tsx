@@ -1,23 +1,29 @@
 import React from 'react'
-import { Container, Divider, Grid } from 'semantic-ui-react'
+import { Divider, Grid } from 'semantic-ui-react'
+import { useAccount, useDisconnect } from '@starknet-react/core'
+import { useOpener } from '@/lib/ui/useOpener'
 import { AccountsList } from '@/pistols/components/account/AccountsList'
 import Logo from './Logo'
+import { ActionButton } from './ui/Buttons'
+import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
+import { useRouter } from 'next/navigation'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export default function Gate() {
+  const { isConnected } = useAccount()  
   return (
     <div className='UIContainer'>
 
-      <Grid className='FillWidth'>
-        <Row colums='equal'>
+      <Grid colums='equal' className='FillWidth'>
+        <Row>
           <Col>
             <Logo />
           </Col>
         </Row>
 
-        <Row colums='equal' textAlign='center' className='TitleCase'>
+        <Row textAlign='center' className='TitleCase'>
           <Col>
             <h1>Pistols at Ten Blocks</h1>
           </Col>
@@ -29,15 +35,80 @@ export default function Gate() {
           </Col>
         </Row>
 
-        <Row colums='equal' className='Title'>
+      </Grid>
+
+      {isConnected ? <ConnectedGate /> : <DisconnectedGate />}
+      
+    </div>
+  )
+}
+
+
+function DisconnectedGate() {
+  const opener = useOpener()
+  const router = useRouter()
+
+  const _enterAsGuest = () => {
+    router.push('/tavern')
+  }
+
+  return (
+    <>
+      <Grid columns='equal' textAlign='center'>
+        <Row className='Title'>
           <Col>
-            Who wants in?
+            You need a Starknet wallet and some $LORDS to play
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <ActionButton fill large onClick={() => opener.open()} label='Connect Wallet' />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Divider />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <ActionButton fill large onClick={() => _enterAsGuest()} label='Enter as Guest' />
           </Col>
         </Row>
       </Grid>
 
-      <AccountsList />
+      <StarknetConnectModal opener={opener} />
+    </>
+  )
+}
+
+
+
+function ConnectedGate() {
+  const { address } = useAccount()
+  const { disconnect } = useDisconnect()
+
+  return (
+    <>
+      <Grid columns='equal' textAlign='center'>
+        <Row className='Title'>
+          <Col>
+            {address}
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <ActionButton fill large onClick={() => disconnect()} label='Disconnect' />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Divider />
+          </Col>
+        </Row>
+      </Grid>
       
-    </div>
+      <AccountsList />
+    </>
   )
 }

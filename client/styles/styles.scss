@@ -19,8 +19,8 @@ $color-important: $color-medium;
 $color-active: $color-medium;
 $color-inactive: rgba($color-brightest, 0.35);
 $color-attention: $color-medium;
-$text-shadow: 0.04em 0.04em 1px $color-dark;
-$title-shadow: 0.1em 0.1em 1px $color-darkest;
+$text-shadow: 0.04rem 0.04rem 1px $color-dark;
+$title-shadow: 0.1rem 0.1rem 1px $color-darkest;
 $ui-border: 6px ridge $color-active;
 
 $border-hr: solid 0.5px rgba($color-bright, 0.5);

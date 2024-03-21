@@ -50,10 +50,6 @@ export function AccountsList() {
     dispatchSetMenu(menuKey)
     router.push('/tavern')
   }
-  const _enterAsGuest = () => {
-    // select(masterAccount.address)
-    _enter(MenuKey.LiveDuels)
-  }
 
   const _clear = () => {
     clear()
@@ -64,52 +60,42 @@ export function AccountsList() {
   const canEnter = useMemo(() => (!isMasterAccount && !isDeploying && isRegistered), [isMasterAccount, isDeploying, isRegistered])
 
   return (
-    <>
-      <Grid className='Faded FillWidth'>
-        <Row columns={'equal'} textAlign='center'>
-          <Col>
-            <ActionButton fill disabled={isDeploying} onClick={() => create()} label='Create Duelist' />
-          </Col>
-          <Col>
-            <ActionButton fill disabled={isDeploying} onClick={() => applyFromClipboard()} label={<>Import&nbsp;&nbsp;<Icon name='paste' size='small' /></>} />
-          </Col>
-          <Col>
-            <ActionButton fill disabled={isDeploying} onClick={() => _clear()} label='Delete All' />
-          </Col>
-          {/* <Col>
+    <Grid className='Faded FillWidth'>
+      <Row columns={'equal'} textAlign='center'>
+        <Col>
+          <ActionButton fill disabled={isDeploying} onClick={() => create()} label='Create Duelist' />
+        </Col>
+        <Col>
+          <ActionButton fill disabled={isDeploying} onClick={() => applyFromClipboard()} label={<>Import&nbsp;&nbsp;<Icon name='paste' size='small' /></>} />
+        </Col>
+        <Col>
+          <ActionButton fill disabled={isDeploying} onClick={() => _clear()} label='Delete All' />
+        </Col>
+        {/* <Col>
             <ActionButton fill disabled={isDeploying} onClick={() => applyFromClipboard()} label='Restore' />
           </Col> */}
-        </Row>
+      </Row>
 
-        <Row columns={'equal'} className='Spacer10'>
-          <Col></Col>
-        </Row>
+      <Row columns={'equal'} className='Spacer10'>
+        <Col></Col>
+      </Row>
 
-        {rows}
+      {rows}
 
-        <Row columns={'equal'} className='Spacer10'>
-          <Col></Col>
-        </Row>
+      <Row columns={'equal'} className='Spacer10'>
+        <Col></Col>
+      </Row>
 
-        <Row columns={'equal'} textAlign='center'>
-          <Col>
-            <ActionButton fill large attention={isRegistered} disabled={!canEnter} onClick={() => _enter()} label={!isRegistered ? 'Check In to Enter' : 'Enter The Tavern'} />
-          </Col>
-        </Row>
+      <Row columns={'equal'} textAlign='center'>
+        <Col>
+          <ActionButton fill large attention={isRegistered} disabled={!canEnter} onClick={() => _enter()} label={!isRegistered ? 'Check In to Enter' : 'Enter The Tavern'} />
+        </Col>
+      </Row>
 
-        <Row columns={'equal'} className='Spacer10'>
-          <Col></Col>
-        </Row>
-
-        {isMasterAccount &&
-          <Row columns={'equal'} textAlign='center'>
-            <Col>
-              <ActionButton fill large disabled={!isMasterAccount} onClick={() => _enterAsGuest()} label='Enter As Guest' />
-            </Col>
-          </Row>
-        }
-      </Grid>
-    </>
+      <Row columns={'equal'} className='Spacer10'>
+        <Col></Col>
+      </Row>
+    </Grid>
   )
 }
 
@@ -220,7 +206,7 @@ function AccountItem({
         </Input>
         <div className='Spacer5' />
         {!isRegistered
-          ? <ActionButton fill disabled={!canRegister || !inputIsValid} onClick={() => _register()} label={exists?'Check In':'Duelist not Found'} />
+          ? <ActionButton fill disabled={!canRegister || !inputIsValid} onClick={() => _register()} label={exists ? 'Check In' : 'Duelist not Found'} />
           : inputValue
             ? <ActionButton fill disabled={!canRegister || isUpdated || !inputIsValid} onClick={() => _register()} label={isUpdated ? 'Checked In' : 'Update'} />
             : <ActionButton fill disabled={!canRegister || isUpdated} onClick={() => _register()} label='Unregister' />

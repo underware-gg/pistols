@@ -6,6 +6,7 @@ import AppDojo from '@/lib/dojo/AppDojo'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import { feltToString } from '@/lib/utils/starknet'
 import { bigintToHex } from '@/lib/utils/type'
+import { useOpener } from '@/lib/ui/useOpener'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -76,13 +77,13 @@ function Connect() {
   const { address, isConnecting, isConnected, connector, chainId } = useAccount()
   const { disconnect } = useDisconnect()
 
-  const [connectIsOpen, setConnectIsOpen] = useState(false)
+  const opener = useOpener()
 
   return (
     <>
-      <StarknetConnectModal isOpen={connectIsOpen} setIsOpen={setConnectIsOpen} />
+      <StarknetConnectModal opener={opener} />
 
-      <Button disabled={isConnected || isConnecting} onClick={() => setConnectIsOpen(true)}>Connect</Button>
+      <Button disabled={isConnected || isConnecting} onClick={() => opener.open()}>Connect</Button>
       &nbsp;&nbsp;
       <Button disabled={!isConnected || isConnecting} onClick={() => disconnect()}>Disconnect</Button>
 
@@ -98,7 +99,7 @@ function Connect() {
             <Cell>wallet</Cell>
             <Cell className='Code'>
               {connector && <>
-                <Image src={connector.icon.dark} /> {connector.name}
+                <Image spaced src={connector.icon.dark} /> {connector.name}
               </>}
 
             </Cell>
