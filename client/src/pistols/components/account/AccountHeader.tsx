@@ -30,7 +30,7 @@ export default function AccountHeader({
           <h3>{isMasterAccount ? 'Guest' : name}</h3>
           <AddressShort address={account?.address} />
           <br />
-          <LordsBalance address={account.address}/>
+          <LordsBalance address={account.address} big />
         </Col>
         <Col width={5} verticalAlign='middle'>
           <ProfilePicSquareButton profilePic={profilePic} onClick={() => { dispatchSelectDuelist(BigInt(account.address)) }} />

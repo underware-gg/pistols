@@ -7,12 +7,13 @@ import Logo from './Logo'
 import { ActionButton } from './ui/Buttons'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import { useRouter } from 'next/navigation'
+import WalletHeader from './account/WalletHeader'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export default function Gate() {
-  const { isConnected } = useAccount()  
+  const { isConnected } = useAccount()
   return (
     <div className='UIContainer'>
 
@@ -38,7 +39,7 @@ export default function Gate() {
       </Grid>
 
       {isConnected ? <ConnectedGate /> : <DisconnectedGate />}
-      
+
     </div>
   )
 }
@@ -85,29 +86,27 @@ function DisconnectedGate() {
 
 
 function ConnectedGate() {
-  const { address } = useAccount()
-  const { disconnect } = useDisconnect()
-
+  // const { disconnect } = useDisconnect()
   return (
     <>
       <Grid columns='equal' textAlign='center'>
-        <Row className='Title'>
+        <Row>
           <Col>
-            {address}
+            <WalletHeader />
           </Col>
         </Row>
-        <Row>
+        {/* <Row>
           <Col>
             <ActionButton fill large onClick={() => disconnect()} label='Disconnect' />
           </Col>
-        </Row>
+        </Row> */}
         <Row>
           <Col>
             <Divider />
           </Col>
         </Row>
       </Grid>
-      
+
       <AccountsList />
     </>
   )

@@ -40,7 +40,7 @@ export function ProfileDescription({
           {displayAddress && <AddressShort address={address} />}
           <h3 className='Important NoMargin'>Honour: {honourAndTotal}</h3>
           {displayBalance && <>
-            <LordsBalance address={address} />
+            <LordsBalance address={address} big />
             <LockedBalance address={address} clean />
             {isYou && <><br /><LordsFaucet /></>}
           </>}

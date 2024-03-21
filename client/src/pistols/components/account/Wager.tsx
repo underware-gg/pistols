@@ -71,8 +71,8 @@ function WagerAndOrFees({
   coin: number
   value: BigNumberish
   fee: BigNumberish
-    pre?: string
-    big?: boolean
+  pre?: string
+  big?: boolean
 }) {
   if (BigInt(value ?? 0) > 0n) {
     return (

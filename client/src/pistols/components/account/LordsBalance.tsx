@@ -8,11 +8,12 @@ export const LordsBalance = ({
   pre = null,
   post = null,
   clean = false,
+  big = false,
 }) => {
   const { contractAddress } = useCoin(COIN_LORDS)
   const { balance, formatted } = useLordsBalance(contractAddress, address)
   return (
-    <Wager big coin={COIN_LORDS} wei={balance} pre={pre} post={post} clean={clean} />
+    <Wager big={big} coin={COIN_LORDS} wei={balance} pre={pre} post={post} clean={clean} />
   )
 }
 

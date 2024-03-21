@@ -44,7 +44,7 @@ export const ActionButton = ({
 }: ActionButtonProps) => {
   let classNames = []
   if (attention && !disabled) classNames.push('Attention')
-  if (fill) classNames.push('FillParent')
+  // if (fill) classNames.push('FillParent')
   if (large) classNames.push('LargeButton')
   classNames.push((disabled || dimmed) ? 'Locked' : 'Unlocked')
   if (negative) classNames.push('Negative')
@@ -68,6 +68,7 @@ export const ActionButton = ({
     <>
       <Button
         className={classNames.join(' ')}
+        fluid={fill}
         toggle={toggle}
         active={active}
         disabled={disabled}

@@ -270,8 +270,8 @@ canvas {
 .Relative {
   position: relative;
 }
-.AbsoluteLeft {
-  position: absolute;
+.Absolute, .AbsoluteLeft {
+  position: absolute!important;
   top: 0;
   left: 0;
 }
