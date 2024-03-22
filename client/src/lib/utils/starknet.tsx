@@ -3,8 +3,6 @@ import {
   shortString,
   Account,
   BigNumberish,
-  TypedData,
-  WeierstrassSignatureType,
   AccountInterface,
   InvocationsDetails,
   InvokeFunctionResponse,
@@ -25,39 +23,6 @@ export const splitU256 = (v: BigNumberish): { low: bigint, high: bigint } => ({
   low: BigInt(v) & 0xffffffffffffffffffffffffffffffffn,
   high: BigInt(v) >> 128n,
 })
-
-// https://github.com/starknet-io/starknet.js/blob/develop/www/docs/guides/signature.md
-export const signMessages = async (account: Account, messages: BigNumberish[]): Promise<WeierstrassSignatureType> => {
-  const typedMessage = createTypedMessage(messages)
-  return account.signMessage(typedMessage) as Promise<WeierstrassSignatureType>
-}
-export const verifyMessages = async (account: Account, messages: BigNumberish[], signature: WeierstrassSignatureType): Promise<boolean> => {
-  const typedMessage = createTypedMessage(messages)
-  return account.verifyMessage(typedMessage, signature)
-}
-
-export function createTypedMessage(messages: BigNumberish[]): TypedData {
-  const message = poseidon(messages).toString()
-  return {
-    domain: {
-      name: "Pistols",
-      chainId: "funDAOmental",
-      version: "0.1.0",
-    },
-    types: {
-      StarkNetDomain: [
-        { name: "name", type: "felt" },
-        { name: "chainId", type: "felt" },
-        { name: "version", type: "felt" },
-      ],
-      Message: [{ name: "message", type: "felt" }],
-    },
-    primaryType: "Message",
-    message: {
-      message,
-    },
-  }
-}
 
 
 //

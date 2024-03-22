@@ -77,8 +77,8 @@ export const useChallenge = (duelId: BigNumberish) => {
   const winner = useMemo(() => (challenge?.winner ?? 0), [challenge])
   const message = useMemo(() => feltToString(challenge?.message ?? 0n), [challenge])
   const roundNumber = useMemo(() => (challenge?.round_number ?? 0), [challenge])
-  const timestamp_start = useMemo(() => (challenge?.timestamp_start ?? 0), [challenge])
-  const timestamp_end = useMemo(() => (challenge?.timestamp_end ?? 0), [challenge])
+  const timestamp_start = useMemo(() => (challenge ? Number(challenge.timestamp_start) : 0), [challenge])
+  const timestamp_end = useMemo(() => (challenge ? Number(challenge.timestamp_end) : 0), [challenge])
 
   const { clientTimestamp } = useClientTimestamp(false)
   let original_state = useMemo(() => (challenge?.state ?? null), [challenge])

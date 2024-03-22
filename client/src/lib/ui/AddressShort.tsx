@@ -1,8 +1,6 @@
 import { useMemo } from 'react'
 import { CopyIcon } from '@/lib/ui/Icons'
-import { bigintToHex } from '@/lib/utils/type'
-
-const shortAddress = (address) => (!address ? '?' : `${address.slice(0, 6)}…${address.slice(-4)}`)
+import { bigintToHex, shortAddress } from '@/lib/utils/type'
 
 function AddressShort({
   address,
@@ -19,6 +17,5 @@ function AddressShort({
 }
 
 export {
-  shortAddress,
   AddressShort,
 }

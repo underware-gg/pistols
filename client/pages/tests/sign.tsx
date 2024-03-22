@@ -1,51 +1,115 @@
 import React, { useEffect, useState } from 'react'
-import { Container, Grid } from 'semantic-ui-react'
+import { Container, Table } from 'semantic-ui-react'
 import { useDojoAccount } from '@/dojo/DojoContext'
-import { createTypedMessage } from '@/lib/utils/starknet'
+import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
 import AppPistols from '@/pistols/components/AppPistols'
 import { Account, typedData } from 'starknet'
+import { bigintToHex, shortAddress } from '@/lib/utils/type'
+import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
 
-const Row = Grid.Row
-const Col = Grid.Column
+const Row = Table.Row
+const Cell = Table.Cell
+const Body = Table.Body
+const Header = Table.Header
+const HeaderCell = Table.HeaderCell
 
 export default function IndexPage() {
   return (
     <AppPistols>
-      <Container text>
-        <Grid>
-          <ValidateMessage />
-        </Grid>
+      <ConsoleTests />
+      <Container>
+        <Table celled striped size='small' color='orange'>
+          <Header>
+            <Row>
+              <HeaderCell><h5>Messages</h5></HeaderCell>
+              <HeaderCell><h5>Validated</h5></HeaderCell>
+              <HeaderCell><h5>Signature</h5></HeaderCell>
+              <HeaderCell><h5>Message</h5></HeaderCell>
+            </Row>
+          </Header>
+
+          <Body>
+            <ValidateMessage messages={{ ff:'0xff'}} />
+            <ValidateMessage messages={{ one: '0x1', eleven: '0x11' }} />
+            <ValidateMessage messages={{ bighex: '0x586fa47095df3960c7bfb369dc55487020c88d5dd51eb8d298f8a40ff010115' }} />
+            <ValidateMessage messages={{ toobig: 'qwertyuiopqwertyuiopqwertyuiopXX' }} />
+          </Body>
+
+        </Table>
       </Container>
     </AppPistols>
-  );
+  )
 }
 
-function ValidateMessage() {
-  const { account } = useDojoAccount()
+function ConsoleTests() {
+  const { masterAccount } = useDojoAccount()
+  useEffectOnce(() => {
+    const _test = async () => {
+      await testTypedData(masterAccount)
+    }
+    _test()
+  }, [])
+  return (<h5>console tests...</h5>)
+}
 
-  const [validated, setValidated] = useState(false)
+function ValidateMessage({
+  messages,
+}: {
+  messages: Messages
+}) {
+  const { masterAccount } = useDojoAccount()
+
+  const [typedMessage, setTypedMessage] = useState(null)
+  const [signature, setSignature] = useState(null)
+  const [hash, setHash] = useState(null)
+  const [validated, setValidated] = useState('...')
+
   useEffect(() => {
     const _validate = async () => {
-      const td = await testTypedData(account)
-      setValidated(td)
+      const _msg = createTypedMessage({ messages })
+      setTypedMessage(_msg)
+      console.log(messages, _msg)
+      try {
+        const _sig = await masterAccount.signMessage(_msg)
+        const _hash = typedData.getMessageHash(_msg, masterAccount.address)
+        setSignature(_sig)
+        setHash(_hash)
+        const _valid = await masterAccount.verifyMessage(_msg, _sig)
+        setValidated(_valid ? 'OK' : 'failed')
+      } catch {
+        setValidated('ERROR')
+      }
     }
     _validate()
   }, [])
 
   return (
-    <Row columns={'equal'}>
-      <Col>
-        [{validated ? 'true' : 'false'}]
-      </Col>
+    <Row columns={'equal'} verticalAlign='top'>
+      <Cell className='Code'>
+        {Object.keys(messages).map((k, i) => <React.Fragment key={k}>{i > 0 ? <br /> : <></>}{k}:{shortAddress(messages[k])}</React.Fragment>)}
+      </Cell>
+      <Cell>
+        {validated}
+      </Cell>
+      <Cell className='Code'>
+        {signature && <>
+          r:{shortAddress(bigintToHex(signature.r))}<br />
+          s:{shortAddress(bigintToHex(signature.s))}<br />
+          hash:{shortAddress(bigintToHex(hash))}
+        </>}
+      </Cell>
+      <Cell className='Code'>
+        {JSON.stringify(typedMessage)}
+      </Cell>
     </Row>
   )
 }
 
 
 export async function testTypedData(account: Account) {
-  const typedMessage0 = createTypedMessage(['0x01111'])
-  const typedMessage1 = createTypedMessage(['0x1111'])
-  const typedMessage2 = createTypedMessage(['0x1112'])
+  const typedMessage0 = createTypedMessage({ messages: { key: '0x01111' } })
+  const typedMessage1 = createTypedMessage({ messages: { key: '0x1111' } })
+  const typedMessage2 = createTypedMessage({ messages: { key: '0x1112' } })
   const signature0 = await account.signMessage(typedMessage0)
   const signature1 = await account.signMessage(typedMessage1)
   const signature2 = await account.signMessage(typedMessage2)
