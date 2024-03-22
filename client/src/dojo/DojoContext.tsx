@@ -1,11 +1,13 @@
-import { BurnerAccount, useBurnerManager } from "@dojoengine/create-burner";
 import { ReactNode, createContext, useContext, useMemo } from 'react'
+import { BurnerAccount, useBurnerManager } from "@dojoengine/create-burner"
 import { Account } from "starknet";
 import { SetupResult } from "./setup";
+import { bigintEquals } from "@/lib/utils/type";
 
 interface DojoContextType extends SetupResult {
   masterAccount: Account;
-  account: BurnerAccount;
+  account: Account | null;
+  burner: BurnerAccount;
 }
 
 export const DojoContext = createContext<DojoContextType | null>(null);
@@ -37,17 +39,19 @@ export const DojoProvider = ({
     [masterAddress, masterPrivateKey, dojoProvider.provider]
   );
 
+  console.log(`USE BURNER...`)
   const {
-    create,
-    list,
     get,
-    account,
+    list,
     select,
-    isDeploying,
+    create,
+    listConnectors,
     clear,
+    account,
+    isDeploying,
+    count,
     copyToClipboard,
     applyFromClipboard,
-    listConnectors,
   } = useBurnerManager({
     burnerManager,
   });
@@ -57,14 +61,17 @@ export const DojoProvider = ({
       value={{
         ...value,
         masterAccount,
-        account: {
-          create,
-          list,
+        account: account ?? masterAccount,
+        burner: {
           get,
+          list,
           select,
+          create,
+          // listConnectors,
           clear,
-          account: account ?? masterAccount,
+          account,
           isDeploying,
+          count,
           copyToClipboard,
           applyFromClipboard,
         },
@@ -84,6 +91,7 @@ export const useDojo = () => {
 
   return {
     setup: context,
+    burner: context.burner,
     account: context.account,
     dojoProvider: context.dojoProvider,
   };
@@ -95,13 +103,14 @@ export const useDojo = () => {
 //
 
 export const useDojoAccount = () => {
-  const { setup, account } = useDojo()
+  const { setup, burner, account } = useDojo()
   // account: { create, list, select, account, isDeploying }
   return {
-    ...account,
-    accountAddress: BigInt(account?.account?.address ?? 0),
+    ...burner,
+    account,
+    accountAddress: BigInt(account?.address ?? 0),
     masterAccount: setup.masterAccount,
-    isMasterAccount: (setup.masterAccount == account.account),
+    isMasterAccount: bigintEquals(setup.masterAccount.address, account.address),
   }
 }
 

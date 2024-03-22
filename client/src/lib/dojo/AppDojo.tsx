@@ -20,14 +20,14 @@ export default function AppDojo({
 }) {
   return (
     <App headerData={headerData} backgroundImage={backgroundImage}>
-      <DojoSetup>
+      <Providers>
         {children}
-      </DojoSetup>
+      </Providers>
     </App>
   );
 }
 
-function DojoSetup({ children }) {
+function Providers({ children }) {
   const [setupResult, setSetupResult] = useState(null)
 
   const config: DojoConfig = useMemo(() => {
@@ -35,13 +35,13 @@ function DojoSetup({ children }) {
     if (!process.env.NEXT_PUBLIC_TORII) throw (`NEXT_PUBLIC_TORII is null`)
     if (!process.env.NEXT_PUBLIC_MASTER_ADDRESS) throw (`NEXT_PUBLIC_MASTER_ADDRESS is not set`)
     if (!process.env.NEXT_PUBLIC_MASTER_PRIVATE_KEY) throw (`NEXT_PUBLIC_MASTER_PRIVATE_KEY is not set`)
-    const result = {
-      ...createDojoConfig({ manifest }),
+    const result = createDojoConfig({
+      manifest,
       rpcUrl: process.env.NEXT_PUBLIC_NODE_URL,
       toriiUrl: process.env.NEXT_PUBLIC_TORII,
       masterAddress: process.env.NEXT_PUBLIC_MASTER_ADDRESS,
       masterPrivateKey: process.env.NEXT_PUBLIC_MASTER_PRIVATE_KEY,
-    }
+    })
     return result
   }, [])
 
@@ -50,6 +50,7 @@ function DojoSetup({ children }) {
     const _setup = async () => {
       console.log(`DojoConfig:`, config)
       const result = await setup(config)
+      console.log('SETUP OK')
       if (_mounted) {
         setSetupResult(result)
       }
