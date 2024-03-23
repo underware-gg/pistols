@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Container, Table, Button, Image } from 'semantic-ui-react'
-import { useAccount, useDisconnect } from '@starknet-react/core'
+import { useAccount, useDisconnect, useSignTypedData } from '@starknet-react/core'
 import { useDojoAccount } from '@/dojo/DojoContext'
 import AppDojo from '@/lib/dojo/AppDojo'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
-import { feltToString } from '@/lib/utils/starknet'
-import { bigintToHex } from '@/lib/utils/type'
+import { feltToString, stringToFelt } from '@/lib/utils/starknet'
+import { bigintToHex, shortAddress } from '@/lib/utils/type'
 import { useOpener } from '@/lib/ui/useOpener'
+import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
+import { ArraySignatureType, typedData } from 'starknet'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -19,11 +21,10 @@ const HeaderCell = Table.HeaderCell
 export default function IndexPage() {
   return (
     <AppDojo>
-      <Container text>
+      <Container>
         <DojoAccount />
-
         <Connect />
-
+        <Sign />
       </Container>
     </AppDojo>
   );
@@ -34,7 +35,7 @@ function DojoAccount() {
   const { account, masterAccount, isMasterAccount } = useDojoAccount()
 
   return (
-    <Table celled striped color='orange'>
+    <Table celled striped color='orange' size='small'>
       {/* <Header>
         <Row>
           <HeaderCell width={4}><h5>Wager</h5></HeaderCell>
@@ -76,9 +77,7 @@ function DojoAccount() {
 function Connect() {
   const { address, isConnecting, isConnected, connector, chainId } = useAccount()
   const { disconnect } = useDisconnect()
-
   const opener = useOpener()
-
   return (
     <>
       <StarknetConnectModal opener={opener} />
@@ -87,7 +86,7 @@ function Connect() {
       &nbsp;&nbsp;
       <Button disabled={!isConnected || isConnecting} onClick={() => disconnect()}>Disconnect</Button>
 
-      <Table celled striped color={isConnected ? 'green' : 'red'}>
+      <Table celled striped color={isConnected ? 'green' : 'red'} size='small'>
         <Body>
           <Row>
             <Cell>isConnected</Cell>
@@ -107,7 +106,7 @@ function Connect() {
           <Row>
             <Cell>Chain Id</Cell>
             <Cell className='Code'>
-              {isConnected && <>
+              {chainId && <>
                 {bigintToHex(chainId)} : {feltToString(chainId)}
               </>}
             </Cell>
@@ -125,3 +124,71 @@ function Connect() {
   )
 }
 
+
+function Sign() {
+  const { account, isConnected, chainId } = useAccount()
+
+  const messages: Messages = { game: 'PISTOLS_AT_10_BLOCKS', purpose: 'DUELIST_ACCOUNT' }
+  const typedMessage = useMemo(() => (createTypedMessage({
+    chainId: chainId ? feltToString(chainId) : undefined,
+    messages,
+  })), [chainId, messages])
+  const hash = useMemo(() => (account ? typedData.getMessageHash(typedMessage, account.address) : null), [account, typedMessage])
+
+  const { data, signTypedData, signTypedDataAsync, isPending } = useSignTypedData(typedMessage)
+
+  const signature = useMemo(() => (data as ArraySignatureType ?? null), [data])
+
+  const [verifyied, setVerifyed] = useState('?')
+  useEffect(() => {
+    const _verify = async () => {
+      const _v = await account.verifyMessage(typedMessage, signature)
+      setVerifyed(_v ? 'true' : 'false')
+    }
+    if (account && signature) {
+      setVerifyed('...')
+      _verify()
+    } else {
+      setVerifyed('?')
+    }
+  }, [account, typedMessage, signature])
+
+  return (
+    <>
+      <Button disabled={!isConnected || isPending} onClick={() => signTypedData()}>Sign</Button>
+
+      <Table celled striped size='small' color={verifyied == 'true' ? 'green' : verifyied == 'false' ? 'red' : 'orange'}>
+        <Header>
+          <Row>
+            <HeaderCell><h5>Messages</h5></HeaderCell>
+            <HeaderCell><h5>Validated</h5></HeaderCell>
+            <HeaderCell><h5>Signature</h5></HeaderCell>
+            <HeaderCell><h5>Typed Data</h5></HeaderCell>
+          </Row>
+        </Header>
+
+        <Body>
+          <Row columns={'equal'} verticalAlign='top'>
+            <Cell className='Code'>
+              {Object.keys(messages).map((k, i) => <React.Fragment key={k}>{k}:{shortAddress(messages[k])}<br /></React.Fragment>)}
+              hash:{shortAddress(bigintToHex(hash))}
+            </Cell>
+            <Cell className='Code'>
+              {verifyied}
+            </Cell>
+            <Cell className='Code'>
+              {signature && <>
+                r:{shortAddress(bigintToHex(signature[0]))}<br />
+                s:{shortAddress(bigintToHex(signature[1]))}<br />
+              </>}
+            </Cell>
+            <Cell className='Code'>
+              {JSON.stringify(typedMessage)}
+            </Cell>
+          </Row>
+        </Body>
+
+      </Table>
+    </>
+  )
+}

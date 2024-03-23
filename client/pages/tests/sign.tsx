@@ -16,7 +16,6 @@ const HeaderCell = Table.HeaderCell
 export default function IndexPage() {
   return (
     <AppPistols>
-      <ConsoleTests />
       <Container>
         <Table celled striped size='small' color='orange'>
           <Header>
@@ -24,18 +23,19 @@ export default function IndexPage() {
               <HeaderCell><h5>Messages</h5></HeaderCell>
               <HeaderCell><h5>Validated</h5></HeaderCell>
               <HeaderCell><h5>Signature</h5></HeaderCell>
-              <HeaderCell><h5>Message</h5></HeaderCell>
+              <HeaderCell><h5>Typed Data</h5></HeaderCell>
             </Row>
           </Header>
-
           <Body>
             <ValidateMessage messages={{ ff:'0xff'}} />
             <ValidateMessage messages={{ one: '0x1', eleven: '0x11' }} />
             <ValidateMessage messages={{ bighex: '0x586fa47095df3960c7bfb369dc55487020c88d5dd51eb8d298f8a40ff010115' }} />
             <ValidateMessage messages={{ toobig: 'qwertyuiopqwertyuiopqwertyuiopXX' }} />
           </Body>
-
         </Table>
+
+        <ConsoleTests />
+
       </Container>
     </AppPistols>
   )
@@ -62,7 +62,7 @@ function ValidateMessage({
   const [typedMessage, setTypedMessage] = useState(null)
   const [signature, setSignature] = useState(null)
   const [hash, setHash] = useState(null)
-  const [validated, setValidated] = useState('...')
+  const [verifyied, setVerifyed] = useState('...')
 
   useEffect(() => {
     const _validate = async () => {
@@ -75,9 +75,9 @@ function ValidateMessage({
         setSignature(_sig)
         setHash(_hash)
         const _valid = await masterAccount.verifyMessage(_msg, _sig)
-        setValidated(_valid ? 'OK' : 'failed')
+        setVerifyed(_valid ? 'OK' : 'failed')
       } catch {
-        setValidated('ERROR')
+        setVerifyed('ERROR')
       }
     }
     _validate()
@@ -86,16 +86,16 @@ function ValidateMessage({
   return (
     <Row columns={'equal'} verticalAlign='top'>
       <Cell className='Code'>
-        {Object.keys(messages).map((k, i) => <React.Fragment key={k}>{i > 0 ? <br /> : <></>}{k}:{shortAddress(messages[k])}</React.Fragment>)}
+        {Object.keys(messages).map((k, i) => <React.Fragment key={k}>{k}:{shortAddress(messages[k])}<br /></React.Fragment>)}
+        hash:{shortAddress(bigintToHex(hash))}
       </Cell>
       <Cell>
-        {validated}
+        {verifyied}
       </Cell>
       <Cell className='Code'>
         {signature && <>
           r:{shortAddress(bigintToHex(signature.r))}<br />
-          s:{shortAddress(bigintToHex(signature.s))}<br />
-          hash:{shortAddress(bigintToHex(hash))}
+          s:{shortAddress(bigintToHex(signature.s))}
         </>}
       </Cell>
       <Cell className='Code'>

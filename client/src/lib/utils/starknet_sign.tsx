@@ -28,8 +28,8 @@ export interface TypedMessageOptions {
 
 export function createTypedMessage({
   primaryType = 'Message',
-  domainName = "Pistols",
-  chainId = "funDAOmental",
+  domainName = "Underware",
+  chainId = "UNDERWARE_GG",
   version = "0.1.0",
   messages
 }: TypedMessageOptions): TypedData {
