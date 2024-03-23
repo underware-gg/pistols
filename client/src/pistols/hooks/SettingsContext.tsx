@@ -1,6 +1,7 @@
 import React, { ReactNode, createContext, useReducer, useContext, useState } from 'react'
 import { useCookies } from 'react-cookie'
 import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
+import { Opener, useOpener } from '@/lib/ui/useOpener'
 
 //--------------------------------
 // Constants
@@ -8,6 +9,7 @@ import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
 export const initialState = {
   musicEnabled: true,
   sfxEnabled: true,
+  connectOpener: null,
 }
 
 const SettingsActions = {
@@ -21,6 +23,7 @@ const SettingsActions = {
 type SettingsStateType = {
   musicEnabled: boolean,
   sfxEnabled: boolean,
+  connectOpener: Opener,
 }
 
 type ActionType =
@@ -50,6 +53,7 @@ const SettingsProvider = ({
   children,
 }: SettingsProviderProps) => {
   const [cookies, setCookie] = useCookies(Object.values(SettingsActions));
+  const connectOpener = useOpener()
 
   const [state, dispatch] = useReducer((state: SettingsStateType, action: ActionType) => {
     let newState = { ...state }
@@ -87,7 +91,10 @@ const SettingsProvider = ({
   }, [dispatch, cookies])
 
   return (
-    <SettingsContext.Provider value={{ state, dispatch }}>
+    <SettingsContext.Provider value={{ dispatch, state: {
+      ...state,
+      connectOpener,
+    } }}>
       {children}
     </SettingsContext.Provider>
   )

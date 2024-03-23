@@ -6,9 +6,9 @@ import AppDojo from '@/lib/dojo/AppDojo'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
 import { bigintToHex, shortAddress } from '@/lib/utils/type'
-import { useOpener } from '@/lib/ui/useOpener'
 import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
 import { ArraySignatureType, typedData } from 'starknet'
+import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -77,12 +77,12 @@ function DojoAccount() {
 function Connect() {
   const { address, isConnecting, isConnected, connector, chainId } = useAccount()
   const { disconnect } = useDisconnect()
-  const opener = useOpener()
+  const { connectOpener } = useSettingsContext()
   return (
     <>
-      <StarknetConnectModal opener={opener} />
+      <StarknetConnectModal opener={connectOpener} />
 
-      <Button disabled={isConnected || isConnecting} onClick={() => opener.open()}>Connect</Button>
+      <Button disabled={isConnected || isConnecting} onClick={() => connectOpener.open()}>Connect</Button>
       &nbsp;&nbsp;
       <Button disabled={!isConnected || isConnecting} onClick={() => disconnect()}>Disconnect</Button>
 

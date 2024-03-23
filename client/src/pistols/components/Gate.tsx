@@ -1,13 +1,13 @@
 import React from 'react'
 import { Divider, Grid } from 'semantic-ui-react'
 import { useAccount, useDisconnect } from '@starknet-react/core'
-import { useOpener } from '@/lib/ui/useOpener'
 import { AccountsList } from '@/pistols/components/account/AccountsList'
 import Logo from './Logo'
 import { ActionButton } from './ui/Buttons'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import { useRouter } from 'next/navigation'
 import WalletHeader from './account/WalletHeader'
+import { useSettingsContext } from '../hooks/SettingsContext'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -46,7 +46,7 @@ export default function Gate() {
 
 
 function DisconnectedGate() {
-  const opener = useOpener()
+  const { connectOpener } = useSettingsContext()
   const router = useRouter()
 
   const _enterAsGuest = () => {
@@ -63,7 +63,7 @@ function DisconnectedGate() {
         </Row>
         <Row>
           <Col>
-            <ActionButton fill large onClick={() => opener.open()} label='Connect Wallet' />
+            <ActionButton fill large onClick={() => connectOpener.open()} label='Connect Wallet' />
           </Col>
         </Row>
         <Row>
@@ -78,7 +78,7 @@ function DisconnectedGate() {
         </Row>
       </Grid>
 
-      <StarknetConnectModal opener={opener} />
+      <StarknetConnectModal opener={connectOpener} />
     </>
   )
 }
