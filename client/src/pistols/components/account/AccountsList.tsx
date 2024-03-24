@@ -16,6 +16,7 @@ const Col = Grid.Column
 
 export function AccountsList() {
   const router = useRouter()
+
   const [burners] = useLocalStorageState('burners')
   const {
     create, list, get, select, clear, applyFromClipboard,

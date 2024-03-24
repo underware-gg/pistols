@@ -1,13 +1,15 @@
 import React from 'react'
-import { Divider, Grid } from 'semantic-ui-react'
-import { useAccount, useDisconnect } from '@starknet-react/core'
+import { useRouter } from 'next/navigation'
+import { Divider, Grid, Icon } from 'semantic-ui-react'
+import { useAccount } from '@starknet-react/core'
+import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
+import { useOpener } from '@/lib/ui/useOpener'
 import { AccountsList } from '@/pistols/components/account/AccountsList'
-import Logo from './Logo'
 import { ActionButton } from './ui/Buttons'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
-import { useRouter } from 'next/navigation'
-import WalletHeader from './account/WalletHeader'
-import { useSettingsContext } from '../hooks/SettingsContext'
+import WalletHeader from '@/pistols/components/account/WalletHeader'
+import Logo from './Logo'
+import AccountSetupModal from './account/AccountSetupModal'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -87,6 +89,7 @@ function DisconnectedGate() {
 
 function ConnectedGate() {
   // const { disconnect } = useDisconnect()
+  const accountSetupOpener = useOpener()
   return (
     <>
       <Grid columns='equal' textAlign='center'>
@@ -105,8 +108,25 @@ function ConnectedGate() {
             <Divider />
           </Col>
         </Row>
+        
+        <Row>
+          <Col>
+            {/* <ActionButton fill disabled={isDeploying} onClick={() => create()} label='Create Duelist' /> */}
+            <ActionButton fill onClick={() => accountSetupOpener.open()} label='Create Duelist' />
+          </Col>
+          <Col>
+            <ActionButton fill disabled={true} onClick={() => { }} label={<>Import&nbsp;&nbsp;<Icon name='paste' size='small' /></>} />
+          </Col>
+          <Col>
+            <ActionButton fill disabled={true} onClick={() => { }} label='Delete All' />
+          </Col>
+
+        </Row>
+
+        
       </Grid>
 
+      <AccountSetupModal opener={accountSetupOpener} />
       <AccountsList />
     </>
   )
