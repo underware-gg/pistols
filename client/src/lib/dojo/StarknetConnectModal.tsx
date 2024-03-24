@@ -2,6 +2,7 @@ import React, { useEffect, useMemo } from 'react'
 import { Grid, Modal, Button, Image } from 'semantic-ui-react'
 import { useConnect, Connector, useAccount } from '@starknet-react/core'
 import { Opener } from '@/lib/ui/useOpener'
+import { VStack } from '../ui/Stack'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -21,14 +22,10 @@ export default function StarknetConnectModal({
   }, [isConnected])
 
   let buttons = useMemo(() => connectors.map((connector: Connector) => (
-    <Row key={connector.id}>
-      <Col>
-        <Button fluid size='huge' disabled={!connector.available() || isConnecting} onClick={() => connect({ connector })}>
-          Connect {connector.name}
-          <Image spaced className='Square20' src={connector.icon.dark} style={{ maxHeight: '1em' }} />
-        </Button>
-      </Col>
-    </Row>
+    <Button key={connector.id} fluid size='huge' disabled={!connector.available() || isConnecting} onClick={() => connect({ connector })}>
+      Connect {connector.name}
+      <Image spaced className='Square20' src={connector.icon.dark} style={{ maxHeight: '1em' }} />
+    </Button>
   )), [connectors, isConnecting])
 
   return (
@@ -40,16 +37,13 @@ export default function StarknetConnectModal({
     >
       <Modal.Content>
         <Modal.Description className='AlignCenter'>
-          <Grid columns='equal'>
-            {buttons}
-            <Row>
-              <Col>
-                <Button fluid size='huge' onClick={() => window.open(`https://www.starknet.io/en/ecosystem/wallets`, '_blank')}>
-                  I don't have a Wallet
-                </Button>
-              </Col>
-            </Row>
-          </Grid>
+          <VStack>
+            {[...buttons,
+              <Button key='nowallet' fluid size='huge' onClick={() => window.open(`https://www.starknet.io/en/ecosystem/wallets`, '_blank')}>
+                I don't have a Wallet
+              </Button>
+            ]}
+          </VStack>
         </Modal.Description>
       </Modal.Content>
     </Modal>
