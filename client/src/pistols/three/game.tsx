@@ -388,7 +388,19 @@ export function playActorAnimation(actorId: string, key: AnimName, callback: Fun
     playAudio(AudioName.BODY_FALL, _sfxEnabled)
   }
   if ([AnimName.SHOT_INJURED_FRONT, AnimName.SHOT_INJURED_BACK, AnimName.STRUCK_INJURED].includes(key)) {
-    playAudio(AudioName.GRUNT_FEMALE, _sfxEnabled)
+    if (actorId == 'A') {
+      if (_duelistAModel == "MALE_A") {
+        playAudio(AudioName.GRUNT_MALE, _sfxEnabled)  
+      } else {
+        playAudio(AudioName.GRUNT_FEMALE, _sfxEnabled)  
+      }
+    } else {
+      if (_duelistBModel == "MALE_B") {
+        playAudio(AudioName.GRUNT_MALE, _sfxEnabled)  
+      } else {
+        playAudio(AudioName.GRUNT_FEMALE, _sfxEnabled)  
+      }
+    }
   }
   if (key == AnimName.STRIKE_LIGHT) {
     playAudio(AudioName.STRIKE_LIGHT, _sfxEnabled)
