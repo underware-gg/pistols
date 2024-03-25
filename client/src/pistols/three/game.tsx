@@ -26,9 +26,10 @@ export const ASPECT = (WIDTH / HEIGHT)
 const FOV = 45
 
 const ACTOR_WIDTH = 140
+const ACTOR_HEIGHT = 79
 const PACES_Y = -50
 const PACES_X_0 = 40
-const PACES_X_STEP = 45
+const PACES_X_STEP = 30
 
 const zoomedCameraPos = {
   x: 0,
@@ -63,6 +64,9 @@ let _duelCamera: THREE.PerspectiveCamera
 let _duelCameraRig: THREE.Object3D
 let _supportsExtension: boolean = true
 let _stats
+
+let _duelistAModel
+let _duelistBModel
 
 let _currentScene: THREE.Scene = null
 let _scenes: Partial<Record<SceneName, THREE.Scene>> = {}
@@ -257,11 +261,16 @@ function setupDuelScene() {
   bg_duel.position.set(0, 0, 0)
   scene.add(bg_duel)
 
-
-  _actors.FEMALE_A = new Actor(_spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_WIDTH, true)
-  _actors.FEMALE_B = new Actor(_spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_WIDTH, false)
-
+  _actors.MALE_A = new Actor(_spriteSheets.MALE, ACTOR_WIDTH, ACTOR_HEIGHT, true)
+  _actors.MALE_A.mesh.position.set(-PACES_X_0, PACES_Y, 1)
+  
+  _actors.FEMALE_A = new Actor(_spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_HEIGHT, true)
   _actors.FEMALE_A.mesh.position.set(-PACES_X_0, PACES_Y, 1)
+
+  _actors.MALE_B = new Actor(_spriteSheets.MALE, ACTOR_WIDTH, ACTOR_HEIGHT, false)
+  _actors.MALE_B.mesh.position.set(PACES_X_0, PACES_Y, 1)
+
+  _actors.FEMALE_B = new Actor(_spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_HEIGHT, false)
   _actors.FEMALE_B.mesh.position.set(PACES_X_0, PACES_Y, 1)
 
   onWindowResize()
@@ -272,8 +281,9 @@ function setupDuelScene() {
 export function resetDuelScene() {
   emitter.emit('animated', AnimationState.None)
 
-  switchActor('A', 'FEMALE_A')
-  switchActor('B', 'FEMALE_B')
+  //TODO if male or female
+  switchActor('A', _duelistAModel)
+  switchActor('B', _duelistBModel)
 
   zoomCameraToPaces(10, 0)
   zoomCameraToPaces(0, 5)
@@ -340,10 +350,12 @@ export function resetStaticScene() {
 // Game Interface
 //
 
-export function switchScene(sceneName) {
+export function switchScene(sceneName, duelistModelA, duelistModelB) {
   _sceneName = sceneName
   _currentScene = _scenes[sceneName]
   if (sceneName == SceneName.Duel) {
+    _duelistAModel = duelistModelA == "MALE" ? "MALE_A" : "FEMALE_A"
+    _duelistBModel = duelistModelB == "MALE" ? "MALE_B" : "FEMALE_B"
     resetDuelScene()
   } else {
     resetStaticScene()
@@ -376,7 +388,19 @@ export function playActorAnimation(actorId: string, key: AnimName, callback: Fun
     playAudio(AudioName.BODY_FALL, _sfxEnabled)
   }
   if ([AnimName.SHOT_INJURED_FRONT, AnimName.SHOT_INJURED_BACK, AnimName.STRUCK_INJURED].includes(key)) {
-    playAudio(AudioName.GRUNT_FEMALE, _sfxEnabled)
+    if (actorId == 'A') {
+      if (_duelistAModel == "MALE_A") {
+        playAudio(AudioName.GRUNT_MALE, _sfxEnabled)  
+      } else {
+        playAudio(AudioName.GRUNT_FEMALE, _sfxEnabled)  
+      }
+    } else {
+      if (_duelistBModel == "MALE_B") {
+        playAudio(AudioName.GRUNT_MALE, _sfxEnabled)  
+      } else {
+        playAudio(AudioName.GRUNT_FEMALE, _sfxEnabled)  
+      }
+    }
   }
   if (key == AnimName.STRIKE_LIGHT) {
     playAudio(AudioName.STRIKE_LIGHT, _sfxEnabled)
@@ -457,7 +481,7 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
 
   // animate camera
   zoomCameraToPaces(0, 0)
-  zoomCameraToPaces(minPaceCount, minPaceCount)
+  zoomCameraToPaces(minPaceCount / 2, minPaceCount) //adjusted zoom out value to minimize gliding effect for now.
 
   animateActorPaces('A', 0, 0)
   animateActorPaces('B', 0, 0)

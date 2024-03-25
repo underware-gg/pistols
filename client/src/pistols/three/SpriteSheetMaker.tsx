@@ -67,6 +67,7 @@ export class Actor {
     this.controls.rewindWhenFinished = false
     this.controls.hideWhenFinished = false
     this.controls.callback = null
+    this.controls.callbackTriggered = false
 
     this.ready = true
   }
@@ -134,6 +135,7 @@ export class Actor {
             this.controls.visible = false;
           }
 
+          this.controls.callbackTriggered = true
           this.controls.callback?.()
 
           this.callFinishedListeners()
@@ -163,6 +165,11 @@ export class Actor {
   }
 
   playRepeat(loopCount: number, callback: Function = null) {
+    if (!this.controls.callbackTriggered) {
+      this.controls.callbackTriggered = true;
+      this.controls.callback?.()
+    }
+    this.controls.callbackTriggered = false;
     this.controls.callback = callback;
     this.controls.loopCount = loopCount;
     this.controls.currentTile = 0;
@@ -184,6 +191,11 @@ export class Actor {
 
   // reveal the sprite and play it in a loop
   playLoop(callback: Function = null) {
+    if (!this.controls.callbackTriggered) {
+      this.controls.callbackTriggered = true;
+      this.controls.callback?.()
+    }
+    this.controls.callbackTriggered = false;
     this.controls.callback = callback;
     this.controls.loopCount = Number.MAX_SAFE_INTEGER;
     this.controls.currentAction = this;
