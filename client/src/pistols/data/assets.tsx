@@ -213,12 +213,12 @@ const SPRITESHEETS: Spritesheets = {
     },
     [AnimName.STRUCK_INJURED]: {
       path: '/textures/animations/Male Duelist/Struck and Injured',
-      frameCount: 6,
+      frameCount: 13,
       frameRate: 8,
     },
     [AnimName.STRUCK_DEAD]: {
       path: '/textures/animations/Male Duelist/Struck Dead',
-      frameCount: 11,
+      frameCount: 12,
       frameRate: 8,
     },
   },
