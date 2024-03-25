@@ -26,9 +26,10 @@ export const ASPECT = (WIDTH / HEIGHT)
 const FOV = 45
 
 const ACTOR_WIDTH = 140
+const ACTOR_HEIGHT = 79
 const PACES_Y = -50
 const PACES_X_0 = 40
-const PACES_X_STEP = 45
+const PACES_X_STEP = 30
 
 const zoomedCameraPos = {
   x: 0,
@@ -260,16 +261,16 @@ function setupDuelScene() {
   bg_duel.position.set(0, 0, 0)
   scene.add(bg_duel)
 
-  _actors.MALE_A = new Actor(_spriteSheets.MALE, ACTOR_WIDTH, ACTOR_WIDTH, true)
+  _actors.MALE_A = new Actor(_spriteSheets.MALE, ACTOR_WIDTH, ACTOR_HEIGHT, true)
   _actors.MALE_A.mesh.position.set(-PACES_X_0, PACES_Y, 1)
   
-  _actors.FEMALE_A = new Actor(_spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_WIDTH, true)
+  _actors.FEMALE_A = new Actor(_spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_HEIGHT, true)
   _actors.FEMALE_A.mesh.position.set(-PACES_X_0, PACES_Y, 1)
 
-  _actors.MALE_B = new Actor(_spriteSheets.MALE, ACTOR_WIDTH, ACTOR_WIDTH, false)
+  _actors.MALE_B = new Actor(_spriteSheets.MALE, ACTOR_WIDTH, ACTOR_HEIGHT, false)
   _actors.MALE_B.mesh.position.set(PACES_X_0, PACES_Y, 1)
 
-  _actors.FEMALE_B = new Actor(_spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_WIDTH, false)
+  _actors.FEMALE_B = new Actor(_spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_HEIGHT, false)
   _actors.FEMALE_B.mesh.position.set(PACES_X_0, PACES_Y, 1)
 
   onWindowResize()
@@ -468,7 +469,7 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
 
   // animate camera
   zoomCameraToPaces(0, 0)
-  zoomCameraToPaces(minPaceCount, minPaceCount)
+  zoomCameraToPaces(minPaceCount / 2, minPaceCount) //adjusted zoom out value to minimize gliding effect for now.
 
   animateActorPaces('A', 0, 0)
   animateActorPaces('B', 0, 0)
