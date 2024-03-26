@@ -1,4 +1,5 @@
 import React, { ReactNode, createContext, useReducer, useContext } from 'react'
+import { BigNumberish } from 'starknet'
 
 //
 // React + Typescript + Context
@@ -34,7 +35,12 @@ const tavernMenuItems: MenuKey[] = [
   MenuKey.PastDuels,
 ]
 
+//--------------------------------
+// State
+//
+
 export const initialState = {
+  walletSig: { address: 0n, sig: 0n },
   duelistAddress: 0n,
   duelId: 0n,
   menuKey: MenuKey.Duelists,
@@ -42,6 +48,7 @@ export const initialState = {
 }
 
 const PistolsActions = {
+  SET_SIG: 'SET_SIG',
   SET_SCENE: 'SET_SCENE',
   SET_MENU_KEY: 'SET_MENU_KEY',
   SELECT_DUELIST: 'SELECT_DUELIST',
@@ -55,6 +62,7 @@ const PistolsActions = {
 type PistolsContextStateType = typeof initialState
 
 type ActionType =
+  | { type: 'SET_SIG', payload: bigint[] }
   | { type: 'SET_SCENE', payload: SceneName }
   | { type: 'SET_MENU_KEY', payload: MenuKey }
   | { type: 'SELECT_DUELIST', payload: bigint }
@@ -85,6 +93,13 @@ const PistolsProvider = ({
   const [state, dispatch] = useReducer((state: PistolsContextStateType, action: ActionType) => {
     let newState = { ...state }
     switch (action.type) {
+      case PistolsActions.SET_SIG: {
+        newState.walletSig = {
+          address: action.payload[0] as bigint,
+          sig: action.payload[1] as bigint,
+        }
+        break
+      }
       case PistolsActions.SET_SCENE: {
         newState.sceneName = action.payload as SceneName
         break
@@ -95,12 +110,12 @@ const PistolsProvider = ({
         break
       }
       case PistolsActions.SELECT_DUELIST: {
-        newState.duelistAddress = BigInt(action.payload)
+        newState.duelistAddress = action.payload as bigint
         newState.duelId = 0n
         break
       }
       case PistolsActions.SELECT_DUEL: {
-        newState.duelId = BigInt(action.payload)
+        newState.duelId = action.payload as bigint
         newState.duelistAddress = 0n
         break
       }
@@ -127,6 +142,12 @@ export { PistolsProvider, PistolsContext, PistolsActions }
 
 export const usePistolsContext = () => {
   const { state, dispatch } = useContext(PistolsContext)
+  const dispatchSetSig = (address: BigNumberish | null, sig: BigNumberish | null) => {
+    dispatch({
+      type: PistolsActions.SET_SIG,
+      payload: [BigInt(address ?? 0n), BigInt(sig ?? 0n)]
+    })
+  }
   const dispatchSetScene = (scene: SceneName | null) => {
     dispatch({
       type: PistolsActions.SET_SCENE,
@@ -164,6 +185,7 @@ export const usePistolsContext = () => {
     atDuel: (state.sceneName == SceneName.Duel),
     // PistolsActions,
     // dispatch,
+    dispatchSetSig,
     dispatchSetScene,
     dispatchSetMenu,
     dispatchSelectDuelist,
