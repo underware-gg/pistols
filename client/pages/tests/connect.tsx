@@ -4,11 +4,11 @@ import { useAccount, useDisconnect, useSignTypedData } from '@starknet-react/cor
 import { useDojoAccount } from '@/dojo/DojoContext'
 import AppDojo from '@/lib/dojo/AppDojo'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
-import { feltToString, stringToFelt } from '@/lib/utils/starknet'
+import { feltToString } from '@/lib/utils/starknet'
 import { bigintToHex, shortAddress } from '@/lib/utils/types'
 import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
 import { ArraySignatureType, typedData } from 'starknet'
-import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
+import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -77,7 +77,7 @@ function DojoAccount() {
 function Connect() {
   const { address, isConnecting, isConnected, connector, chainId } = useAccount()
   const { disconnect } = useDisconnect()
-  const { connectOpener } = useSettingsContext()
+  const { connectOpener } = usePistolsContext()
   return (
     <>
       <StarknetConnectModal opener={connectOpener} />

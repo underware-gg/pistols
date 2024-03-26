@@ -2,7 +2,7 @@ import React from 'react'
 import { useRouter } from 'next/navigation'
 import { Divider, Grid, Icon } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
-import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
+import { usePistolsContext } from '../hooks/PistolsContext'
 import { useOpener } from '@/lib/ui/useOpener'
 import { AccountsList } from '@/pistols/components/account/AccountsList'
 import { ActionButton } from './ui/Buttons'
@@ -36,7 +36,7 @@ export default function Gate() {
 
 
 function DisconnectedGate() {
-  const { connectOpener } = useSettingsContext()
+  const { connectOpener } = usePistolsContext()
   const router = useRouter()
 
   const _enterAsGuest = () => {

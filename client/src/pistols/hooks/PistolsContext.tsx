@@ -1,5 +1,6 @@
 import React, { ReactNode, createContext, useReducer, useContext } from 'react'
 import { BigNumberish } from 'starknet'
+import { Opener, useOpener } from '@/lib/ui/useOpener'
 
 //
 // React + Typescript + Context
@@ -45,12 +46,15 @@ export const initialState = {
   duelId: 0n,
   menuKey: MenuKey.Duelists,
   sceneName: SceneName.Splash,
+  // injected
+  connectOpener: null as Opener,
 }
 
 const PistolsActions = {
   SET_SIG: 'SET_SIG',
-  SET_SCENE: 'SET_SCENE',
+  SET_ACCOUNT_MENU_KEY: 'SET_ACCOUNT_MENU_KEY',
   SET_MENU_KEY: 'SET_MENU_KEY',
+  SET_SCENE: 'SET_SCENE',
   SELECT_DUELIST: 'SELECT_DUELIST',
   SELECT_DUEL: 'SELECT_DUEL',
 }
@@ -63,8 +67,8 @@ type PistolsContextStateType = typeof initialState
 
 type ActionType =
   | { type: 'SET_SIG', payload: bigint[] }
-  | { type: 'SET_SCENE', payload: SceneName }
   | { type: 'SET_MENU_KEY', payload: MenuKey }
+  | { type: 'SET_SCENE', payload: SceneName }
   | { type: 'SELECT_DUELIST', payload: bigint }
   | { type: 'SELECT_DUEL', payload: bigint }
 
@@ -90,6 +94,8 @@ interface PistolsProviderProps {
 const PistolsProvider = ({
   children,
 }: PistolsProviderProps) => {
+  const connectOpener = useOpener()
+
   const [state, dispatch] = useReducer((state: PistolsContextStateType, action: ActionType) => {
     let newState = { ...state }
     switch (action.type) {
@@ -100,12 +106,12 @@ const PistolsProvider = ({
         }
         break
       }
-      case PistolsActions.SET_SCENE: {
+      case PistolsActions.SET_MENU_KEY: {
+        newState.menuKey = action.payload as MenuKey
         newState.sceneName = action.payload as SceneName
         break
       }
-      case PistolsActions.SET_MENU_KEY: {
-        newState.menuKey = action.payload as MenuKey
+      case PistolsActions.SET_SCENE: {
         newState.sceneName = action.payload as SceneName
         break
       }
@@ -127,7 +133,10 @@ const PistolsProvider = ({
   }, initialState)
 
   return (
-    <PistolsContext.Provider value={{ state, dispatch }}>
+    <PistolsContext.Provider value={{ dispatch, state: {
+      ...state,
+      connectOpener,
+    } }}>
       {children}
     </PistolsContext.Provider>
   )
