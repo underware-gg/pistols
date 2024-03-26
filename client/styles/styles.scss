@@ -507,6 +507,11 @@ $box-h: calc((100vh - $aspect-h) / 2);
   max-width: 400px;
 }
 
+.OnboardingModal {
+  width: 800px;
+  min-height: 400px;
+}
+
 // .TableHeader {
 //   height: 30px!important;
 //   max-height: 30px!important;

@@ -9,7 +9,7 @@ import { ActionButton } from './ui/Buttons'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import WalletHeader from '@/pistols/components/account/WalletHeader'
 import Logo from './Logo'
-import AccountSetupModal from './account/AccountSetupModal'
+import OnboardingModal from './account/OnboardingModal'
 import { VStack, VStackRow } from '@/lib/ui/Stack'
 import { useDojoAccount } from '@/dojo/DojoContext'
 
@@ -100,7 +100,7 @@ function ConnectedGate() {
 
       </VStack>
 
-      <AccountSetupModal opener={accountSetupOpener} />
+      <OnboardingModal opener={accountSetupOpener} />
       <AccountsList />
     </>
   )
