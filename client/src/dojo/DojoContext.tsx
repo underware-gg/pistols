@@ -39,7 +39,6 @@ export const DojoProvider = ({
     [masterAddress, masterPrivateKey, dojoProvider.provider]
   );
 
-  console.log(`USE BURNER...`)
   const {
     get,
     list,

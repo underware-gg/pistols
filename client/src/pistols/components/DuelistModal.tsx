@@ -75,7 +75,7 @@ export default function DuelistModal() {
             <Col width={8} textAlign='left'>
               Duelist
               &nbsp;&nbsp;&nbsp;
-              <AddressShort address={duelistAddress} suffix='' />
+              <AddressShort address={duelistAddress} />
             </Col>
             <Col width={7} textAlign='right'>
               {isYou &&
@@ -99,7 +99,7 @@ export default function DuelistModal() {
           {isChallenging && <CreateChallenge setArgs={setArgs} />}
         </Modal.Description>
       </Modal.Content>
-      <Modal.Actions>
+      <Modal.Actions className='NoPadding'>
         <Grid className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>

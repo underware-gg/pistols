@@ -79,7 +79,7 @@ export default function CommitPacesModal({
 
         </Modal.Description>
       </Modal.Content>
-      <Modal.Actions>
+      <Modal.Actions className='NoPadding'>
         <Grid className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>

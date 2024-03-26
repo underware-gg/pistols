@@ -116,7 +116,7 @@ export default function CommitBladesModal({
         <ActionChances duelId={duelId} roundNumber={roundNumber} action={!slot1 ? slot2 : slot1} isA={isA} isB={isB} />
 
       </Modal.Content>
-      <Modal.Actions>
+      <Modal.Actions className='NoPadding'>
         <Grid className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>

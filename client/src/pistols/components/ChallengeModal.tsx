@@ -72,7 +72,7 @@ export default function ChallengeModal() {
             <Col width={8} textAlign='left'>
               Challenge
               &nbsp;&nbsp;&nbsp;
-              <AddressShort address={duelId} suffix='' />
+              <AddressShort address={duelId} />
             </Col>
             <Col width={7} textAlign='right'>
               <span className='Code'><ChallengeTime duelId={duelId} prefixed /></span>
@@ -155,7 +155,7 @@ export default function ChallengeModal() {
         </Modal.Description>
         <ProfilePicButton profilePic={profilePicB} onClick={() => dispatchSelectDuelist(duelistB)} />
       </Modal.Content>
-      <Modal.Actions>
+      <Modal.Actions className='NoPadding'>
         <Grid className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>
