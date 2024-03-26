@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Button, Grid, Input, Modal } from 'semantic-ui-react'
+import { Button, Grid, Icon, Input, Modal } from 'semantic-ui-react'
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { Opener } from '@/lib/ui/useOpener'
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { AccountMenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useAccount, useSignTypedData } from '@starknet-react/core'
 import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
 import { feltToString, pedersen } from '@/lib/utils/starknet'
@@ -38,7 +38,13 @@ export default function AccountSetupModal({
       open={opener.isOpen}
     >
       <Modal.Header>
-        Create
+        <Grid className='FillParent NoPadding'>
+          <Row columns='equal' textAlign='center'>
+            <PhaseTitle label='Deploy' phase={AccountMenuKey.Deploy} checked={true} />
+            <PhaseTitle label='Fund' phase={AccountMenuKey.Fund} checked={false} />
+            <PhaseTitle label='Profile' phase={AccountMenuKey.Profile} checked={false} />
+          </Row>
+        </Grid>
       </Modal.Header>
       <Modal.Content className='ModalText'>
         <DeployWallet />
@@ -47,7 +53,7 @@ export default function AccountSetupModal({
         <Grid columns={4} className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>
-              <ActionButton fill label='New Duelist' onClick={() => { }} />
+              <ActionButton fill label='Deploy / Restore' onClick={() => { }} />
             </Col>
             <Col>
             </Col>
@@ -63,11 +69,24 @@ export default function AccountSetupModal({
   )
 }
 
-function PhaseButton({}) {
+function PhaseTitle({
+  label,
+  phase,
+  checked = false,
+}) {
+  const { accountMenuKey, dispatchSetAccountMenu } = usePistolsContext()
+  const disabled = useMemo(() => (accountMenuKey != phase), [accountMenuKey])
+  let classNames = ['Anchor']
+  if (disabled) classNames.push('Inactive')
   return (
-    <div className='' style={{ width: '200px', height: '200px' }}>
-      😳
-    </div>
+    <Col>
+      <span className={classNames.join(' ')} onClick={() => dispatchSetAccountMenu(phase)}>
+        {label}
+        {' '}
+        {checked && <Icon name='check' color='green' />}
+        {!checked && <Icon name='warning' color='orange' />}
+      </span>
+    </Col>
   )
 }
 

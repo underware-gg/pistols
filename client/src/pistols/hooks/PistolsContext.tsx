@@ -36,6 +36,18 @@ const tavernMenuItems: MenuKey[] = [
   MenuKey.PastDuels,
 ]
 
+export enum AccountMenuKey {
+  Deploy = 'Deploy',
+  Fund = 'Fund',
+  Profile = 'Profile',
+}
+
+const accountMenuItems: AccountMenuKey[] = [
+  AccountMenuKey.Deploy,
+  AccountMenuKey.Fund,
+  AccountMenuKey.Profile,
+]
+
 //--------------------------------
 // State
 //
@@ -45,6 +57,7 @@ export const initialState = {
   duelistAddress: 0n,
   duelId: 0n,
   menuKey: MenuKey.Duelists,
+  accountMenuKey: AccountMenuKey.Deploy,
   sceneName: SceneName.Splash,
   // injected
   connectOpener: null as Opener,
@@ -67,6 +80,7 @@ type PistolsContextStateType = typeof initialState
 
 type ActionType =
   | { type: 'SET_SIG', payload: bigint[] }
+  | { type: 'SET_ACCOUNT_MENU_KEY', payload: AccountMenuKey }
   | { type: 'SET_MENU_KEY', payload: MenuKey }
   | { type: 'SET_SCENE', payload: SceneName }
   | { type: 'SELECT_DUELIST', payload: bigint }
@@ -104,6 +118,10 @@ const PistolsProvider = ({
           address: action.payload[0] as bigint,
           sig: action.payload[1] as bigint,
         }
+        break
+      }
+      case PistolsActions.SET_ACCOUNT_MENU_KEY: {
+        newState.accountMenuKey = action.payload as AccountMenuKey
         break
       }
       case PistolsActions.SET_MENU_KEY: {
@@ -157,16 +175,22 @@ export const usePistolsContext = () => {
       payload: [BigInt(address ?? 0n), BigInt(sig ?? 0n)]
     })
   }
-  const dispatchSetScene = (scene: SceneName | null) => {
+  const dispatchSetAccountMenu = (menuKey: AccountMenuKey) => {
     dispatch({
-      type: PistolsActions.SET_SCENE,
-      payload: scene != SceneName.Tavern ? scene : state.menuKey,
+      type: PistolsActions.SET_ACCOUNT_MENU_KEY,
+      payload: menuKey,
     })
   }
   const dispatchSetMenu = (menuKey: MenuKey) => {
     dispatch({
       type: PistolsActions.SET_MENU_KEY,
       payload: menuKey,
+    })
+  }
+  const dispatchSetScene = (scene: SceneName | null) => {
+    dispatch({
+      type: PistolsActions.SET_SCENE,
+      payload: scene != SceneName.Tavern ? scene : state.menuKey,
     })
   }
   const dispatchSelectDuelist = (address: bigint) => {
@@ -184,6 +208,7 @@ export const usePistolsContext = () => {
   return {
     ...state,
     tavernMenuItems,
+    accountMenuItems,
     atSplash: (state.sceneName == SceneName.Splash),
     atGate: (state.sceneName == SceneName.Gate),
     atTavern: (state.sceneName as string == state.menuKey as string),
@@ -195,8 +220,9 @@ export const usePistolsContext = () => {
     // PistolsActions,
     // dispatch,
     dispatchSetSig,
-    dispatchSetScene,
+    dispatchSetAccountMenu,
     dispatchSetMenu,
+    dispatchSetScene,
     dispatchSelectDuelist,
     dispatchSelectDuel,
   }

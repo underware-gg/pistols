@@ -2,7 +2,7 @@ import React from 'react'
 import { useRouter } from 'next/navigation'
 import { Divider, Grid, Icon } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
-import { usePistolsContext } from '../hooks/PistolsContext'
+import { AccountMenuKey, usePistolsContext } from '../hooks/PistolsContext'
 import { useOpener } from '@/lib/ui/useOpener'
 import { AccountsList } from '@/pistols/components/account/AccountsList'
 import { ActionButton } from './ui/Buttons'
@@ -11,6 +11,7 @@ import WalletHeader from '@/pistols/components/account/WalletHeader'
 import Logo from './Logo'
 import AccountSetupModal from './account/AccountSetupModal'
 import { VStack, VStackRow } from '@/lib/ui/Stack'
+import { useDojoAccount } from '@/dojo/DojoContext'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -65,7 +66,23 @@ function DisconnectedGate() {
 
 
 function ConnectedGate() {
+  const {
+    create, list, get, select, clear, applyFromClipboard, copyToClipboard,
+    account, isMasterAccount, masterAccount, isDeploying, count,
+  } = useDojoAccount()
   const accountSetupOpener = useOpener()
+  const { dispatchSetAccountMenu } = usePistolsContext()
+
+  const _deployDuelist = () => {
+    dispatchSetAccountMenu(AccountMenuKey.Deploy)
+    accountSetupOpener.open()
+  }
+
+  const _deleteAll = () => {
+    clear()
+    location.reload()
+  }
+
   return (
     <>
       <VStack>
@@ -75,9 +92,10 @@ function ConnectedGate() {
 
         <VStackRow>
           {/* <ActionButton fill disabled={isDeploying} onClick={() => create()} label='Create Duelist' /> */}
-          <ActionButton fill onClick={() => accountSetupOpener.open()} label='Create Duelist' />
-          <ActionButton fill disabled={true} onClick={() => { }} label={<>Import&nbsp;&nbsp;<Icon name='paste' size='small' /></>} />
-          <ActionButton fill disabled={true} onClick={() => { }} label='Delete All' />
+          <ActionButton fill onClick={() => _deployDuelist()} label='Deploy Duelist' />
+          <ActionButton fill disabled={true} onClick={() => copyToClipboard()} label={<>Export All <Icon name='copy' size='small' /></>} />
+          <ActionButton fill disabled={true} onClick={() => applyFromClipboard()} label={<>Import All <Icon name='paste' size='small' /></>} />
+          <ActionButton fill disabled={true} onClick={() => _deleteAll()} label='Delete All' />
         </VStackRow>
 
       </VStack>

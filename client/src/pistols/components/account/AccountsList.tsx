@@ -8,7 +8,6 @@ import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
-import useLocalStorageState from 'use-local-storage-state'
 import { PROFILE_PIC_COUNT } from '@/pistols/utils/constants'
 
 const Row = Grid.Row
@@ -17,10 +16,9 @@ const Col = Grid.Column
 export function AccountsList() {
   const router = useRouter()
 
-  const [burners] = useLocalStorageState('burners')
   const {
     create, list, get, select, clear, applyFromClipboard,
-    account, isMasterAccount, masterAccount, isDeploying,
+    account, isMasterAccount, masterAccount, isDeploying, count,
   } = useDojoAccount()
   const { dispatchSetMenu } = usePistolsContext()
 
@@ -46,7 +44,7 @@ export function AccountsList() {
       )
     }
     return result
-  }, [account?.address, isDeploying, burners])
+  }, [account?.address, isDeploying, count])
 
   const _enter = (menuKey = initialState.menuKey) => {
     dispatchSetMenu(menuKey)
