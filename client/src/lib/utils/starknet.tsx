@@ -7,7 +7,7 @@ import {
   InvocationsDetails,
   InvokeFunctionResponse,
 } from 'starknet'
-import { bigintToHex } from './type'
+import { bigintToHex } from './types'
 
 export const ETH_TO_WEI = 1_000_000_000_000_000_000n
 

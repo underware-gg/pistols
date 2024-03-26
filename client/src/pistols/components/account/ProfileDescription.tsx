@@ -5,7 +5,7 @@ import { useDojoAccount } from '@/dojo/DojoContext'
 import { LordsBalance, LockedBalance } from '@/pistols/components/account/LordsBalance'
 import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { bigintEquals } from '@/lib/utils/type'
+import { bigintEquals } from '@/lib/utils/types'
 import { EMOJI } from '@/pistols/data/messages'
 
 const Row = Grid.Row

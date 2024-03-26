@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useComponentValue } from '@dojoengine/react'
 import { useDojoComponents } from '@/dojo/DojoContext'
-import { bigintToEntity } from '@/lib/utils/type'
+import { bigintToEntity } from '@/lib/utils/types'
 import { feltToString } from "@/lib/utils/starknet"
 import { useEntityKeys } from '@/lib/hooks/useEntityKeys'
 

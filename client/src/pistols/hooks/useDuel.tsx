@@ -4,7 +4,7 @@ import { useComponentValue } from '@dojoengine/react'
 import { useThreeJsContext } from "./ThreeJsContext"
 import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
 import { useChallenge } from "@/pistols/hooks/useChallenge"
-import { keysToEntity } from '@/lib/utils/type'
+import { keysToEntity } from '@/lib/utils/types'
 import { ActionNames, ActionVerbs, RoundState } from "@/pistols/utils/pistols"
 import { AnimationState } from "@/pistols/three/game"
 import { BigNumberish } from 'starknet'

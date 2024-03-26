@@ -1,7 +1,7 @@
 import React from 'react'
 import { useRouter } from 'next/router'
 import { Container, Divider, Table } from 'semantic-ui-react'
-import { bigintToHex } from '@/lib/utils/type'
+import { bigintToHex } from '@/lib/utils/types'
 import { formatTimestamp } from '@/lib/utils/timestamp'
 import AppPistols from '@/pistols/components/AppPistols'
 import { useDuel } from '@/pistols/hooks/useDuel'

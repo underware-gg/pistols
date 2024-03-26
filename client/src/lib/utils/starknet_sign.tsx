@@ -4,7 +4,6 @@ import {
   TypedData,
   WeierstrassSignatureType,
 } from 'starknet'
-import { poseidon } from './starknet'
 
 export type Messages = { [key: string]: string }
 

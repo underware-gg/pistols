@@ -4,7 +4,7 @@ import { useDojoAccount } from '@/dojo/DojoContext'
 import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
 import AppPistols from '@/pistols/components/AppPistols'
 import { Account, typedData } from 'starknet'
-import { bigintToHex, shortAddress } from '@/lib/utils/type'
+import { bigintToHex, shortAddress } from '@/lib/utils/types'
 import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
 
 const Row = Table.Row

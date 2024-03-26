@@ -2,7 +2,7 @@ import { getComponentValue } from '@dojoengine/recs'
 import { useComponentValue } from "@dojoengine/react"
 import { useDojoComponents } from '@/dojo/DojoContext'
 import { useChallengesByDuelist } from '@/pistols/hooks/useChallenge'
-import { bigintToEntity } from '@/lib/utils/type'
+import { bigintToEntity } from '@/lib/utils/types'
 import { BigNumberish } from 'starknet'
 import { COIN_LORDS } from './useConfig'
 import { useMemo } from 'react'

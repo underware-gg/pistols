@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import { getContractByName } from '@dojoengine/core'
 import { useDojo, useDojoAccount } from '@/dojo/DojoContext'
-import { bigintEquals } from '@/lib/utils/type'
+import { bigintEquals } from '@/lib/utils/types'
 
 export interface FaucetExecuteResult {
   hash: string

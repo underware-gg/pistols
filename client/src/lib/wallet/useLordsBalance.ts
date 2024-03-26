@@ -1,4 +1,4 @@
-import { bigintToHex } from '@/lib/utils/type'
+import { bigintToHex } from '@/lib/utils/types'
 import { useBalance } from '@starknet-react/core'
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'

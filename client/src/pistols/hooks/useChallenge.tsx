@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { HasValue, getComponentValue, Component } from '@dojoengine/recs'
 import { useDojoComponents } from '@/dojo/DojoContext'
 import { useComponentValue } from "@dojoengine/react"
-import { bigintToEntity } from '@/lib/utils/type'
+import { bigintToEntity } from '@/lib/utils/types'
 import { feltToString } from "@/lib/utils/starknet"
 import { ChallengeState, ChallengeStateDescriptions, LiveChallengeStates, PastChallengeStates } from "@/pistols/utils/pistols"
 import { useEntityKeys, useEntityKeysQuery } from '@/lib/hooks/useEntityKeys'

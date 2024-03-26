@@ -2,7 +2,7 @@ import { ReactNode, createContext, useContext, useMemo } from 'react'
 import { BurnerAccount, useBurnerManager } from "@dojoengine/create-burner"
 import { Account } from "starknet";
 import { SetupResult } from "./setup";
-import { bigintEquals } from "@/lib/utils/type";
+import { bigintEquals } from "@/lib/utils/types";
 
 interface DojoContextType extends SetupResult {
   masterAccount: Account;

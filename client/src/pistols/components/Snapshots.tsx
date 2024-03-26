@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Button, Container, Divider, TextArea } from 'semantic-ui-react'
 import { useAllDuelistIds, useDuelist } from '@/pistols/hooks/useDuelist'
 import { CopyIcon } from '@/lib/ui/Icons'
-import { bigintToHex } from '@/lib/utils/type'
+import { bigintToHex } from '@/lib/utils/types'
 
 //@ts-ignore
 BigInt.prototype.toJSON = function () { return bigintToHex(this) }
