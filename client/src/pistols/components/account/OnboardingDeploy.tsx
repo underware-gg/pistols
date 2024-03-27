@@ -1,19 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Button, Grid, Icon, Input, Modal, Segment, Step } from 'semantic-ui-react'
+import { Grid, Icon, Step } from 'semantic-ui-react'
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { Opener } from '@/lib/ui/useOpener'
-import { AccountMenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useAccount, useSignTypedData } from '@starknet-react/core'
 import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
 import { feltToString, pedersen } from '@/lib/utils/starknet'
-import { ArraySignatureType, typedData } from 'starknet'
+import { ArraySignatureType } from 'starknet'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { add } from '@tweenjs/tween.js'
-import { bigintEquals } from '@/lib/utils/types'
-import { deriveKeyPairFromSeed, BurnerKeyPair } from '@dojoengine/create-burner'
-import { VStack, VStackRow } from '@/lib/ui/Stack'
+import { bigintEquals, bigintToHex } from '@/lib/utils/types'
+import { BurnerCreateOptions } from '@dojoengine/create-burner'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -30,6 +26,7 @@ export function OnboardingDeploy({
 }) {
   const { account, isConnected, chainId } = useAccount()
   const { walletSig, hasSigned, dispatchSetSig, connectOpener } = usePistolsContext()
+  const { create, generateAddressFromSeed } = useDojoAccount()
 
   //
   // reset sig if wallet account changes
@@ -59,14 +56,23 @@ export function OnboardingDeploy({
   const [accountIndex, setAccountIndex] = useState(1)
   const [accountAddress, setAccountAddress] = useState(0n)
 
+  const createOptions = useMemo((): BurnerCreateOptions => ({
+    secret: bigintToHex(walletSig.sig ?? 0n),
+    index: accountIndex,
+    metadata: messages,
+  }), [walletSig.sig, accountIndex, messages])
+
   useEffect(() => {
     if (hasSigned) {
-      const keyPair: BurnerKeyPair = deriveKeyPairFromSeed(walletSig.sig, accountIndex)
-      setAccountAddress(BigInt(keyPair.pubKey))
+      const address = generateAddressFromSeed(createOptions)
+      setAccountAddress(BigInt(address))
     } else {
       setAccountAddress(0n)
     }
-  }, [hasSigned, walletSig, accountIndex])
+  }, [hasSigned, createOptions])
+
+  //
+  // Deployment
 
   const isDeployed = false
   const isStored = false
@@ -136,7 +142,7 @@ export function OnboardingDeploy({
             <Step completed={isDeployed} active={false && (stepNumber == DeployPhase.Deploy || stepNumber == DeployPhase.Restore)}>
               <Icon name='warning' color='orange' />
               <Step.Content className='TitleCase FillWidth90'>
-                {stepNumber == DeployPhase.Deploy ? <ActionButton fill large onClick={() => {}} label='Deploy' />
+                {stepNumber == DeployPhase.Deploy ? <ActionButton fill large onClick={() => create(createOptions)} label='Deploy' />
                   : stepNumber == DeployPhase.Restore ? <ActionButton fill large onClick={() => { }} label='Restore' />
                     : isDone ? <span className='H3'>Account Deployed</span>
                       : <Step.Title>Deploy / Restore</Step.Title>

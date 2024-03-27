@@ -39,19 +39,7 @@ export const DojoProvider = ({
     [masterAddress, masterPrivateKey, dojoProvider.provider]
   );
 
-  const {
-    get,
-    list,
-    select,
-    create,
-    listConnectors,
-    clear,
-    account,
-    isDeploying,
-    count,
-    copyToClipboard,
-    applyFromClipboard,
-  } = useBurnerManager({
+  const burner = useBurnerManager({
     burnerManager,
   });
 
@@ -60,20 +48,8 @@ export const DojoProvider = ({
       value={{
         ...value,
         masterAccount,
-        account: account ?? masterAccount,
-        burner: {
-          get,
-          list,
-          select,
-          create,
-          // listConnectors,
-          clear,
-          account,
-          isDeploying,
-          count,
-          copyToClipboard,
-          applyFromClipboard,
-        },
+        account: burner.account ?? masterAccount,
+        burner,
       }}
     >
       {children}

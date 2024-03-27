@@ -207,7 +207,7 @@ export const usePistolsContext = () => {
   }
   return {
     ...state,
-    hasSigned: (state.walletSig.sig && state.walletSig.sig > 0n),
+    hasSigned: (state.walletSig.sig > 0n),
     tavernMenuItems,
     accountMenuItems,
     atSplash: (state.sceneName == SceneName.Splash),
