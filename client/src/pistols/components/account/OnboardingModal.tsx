@@ -21,6 +21,7 @@ export default function OnboardingModal({
     <Modal
       onClose={() => opener.close()}
       open={opener.isOpen}
+      size='small'
     >
       <Modal.Header>
         <Grid className='FillParent NoPadding'>

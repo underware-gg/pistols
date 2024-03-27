@@ -219,7 +219,7 @@ canvas {
 
 .Code {
   font-family: $font-family-mono;
-  font-size: 12px;
+  font-size: 1.2rem;
 }
 
 .Quote {
@@ -244,6 +244,11 @@ canvas {
 .Anchor {
   cursor: pointer;
   pointer-events: all!important;
+  user-select: none;
+}
+
+.Unselectable {
+  user-select: none;
 }
 
 .Spacer5 {
@@ -301,6 +306,16 @@ canvas {
   -webkit-filter: sepia(1); /* Old WebKit */
 }
 
+.FillWidth80 {
+  width: 80%!important;
+  min-width: 80%;
+  align-items: center;
+}
+.FillWidth90 {
+  width: 90%!important;
+  min-width: 90%;
+  align-items: center;
+}
 .FillWidth {
   width: 100%!important;
   min-width: 100%;
@@ -508,8 +523,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 .OnboardingModal {
-  width: 800px;
-  min-height: 400px;
+  min-height: 350px;
 }
 
 // .TableHeader {
