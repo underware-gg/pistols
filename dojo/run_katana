@@ -1,4 +1,4 @@
 #!/bin/bash
 set -e
 #export RUST_LOG=info
-katana --disable-fee --invoke-max-steps 10000000 $*
+katana --disable-fee --invoke-max-steps 10000000 $* | grep -v -e starknet_call -e starknet_blockHashAndNumber
