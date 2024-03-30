@@ -88,20 +88,20 @@ function ConnectedGate() {
       <VStack>
         <WalletHeader />
 
-        <Divider />
-
         <VStackRow>
           {/* <ActionButton fill disabled={isDeploying} onClick={() => create()} label='Create Duelist' /> */}
           <ActionButton fill onClick={() => _deployDuelist()} label='Deploy Duelist' />
-          <ActionButton fill disabled={true} onClick={() => copyToClipboard()} label={<>Export All <Icon name='copy' size='small' /></>} />
-          <ActionButton fill disabled={true} onClick={() => applyFromClipboard()} label={<>Import All <Icon name='paste' size='small' /></>} />
-          <ActionButton fill disabled={true} onClick={() => _deleteAll()} label='Delete All' />
+          <ActionButton fill disabled={count == 0} onClick={() => copyToClipboard()} label={<>Export All <Icon name='copy' size='small' /></>} />
+          <ActionButton fill disabled={false} onClick={() => applyFromClipboard()} label={<>Import All <Icon name='paste' size='small' /></>} />
+          <ActionButton fill disabled={count == 0} onClick={() => _deleteAll()} label='Delete All' />
         </VStackRow>
 
       </VStack>
+      <Divider />
 
-      <OnboardingModal opener={accountSetupOpener} />
       <AccountsList />
+      
+      <OnboardingModal opener={accountSetupOpener} />
     </>
   )
 }

@@ -23,7 +23,7 @@ export default function WalletHeader({
 
   return (
     <Grid>
-      <Row className='ProfilePicHeight'>
+      <Row>
         <Col width={2} verticalAlign='middle'>
           <Image src={imageUrl} className='ProfilePicSquare' />
         </Col>

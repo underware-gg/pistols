@@ -17,8 +17,7 @@ export function AccountsList() {
   const router = useRouter()
 
   const {
-    create, list, get, select, clear, applyFromClipboard,
-    account, isMasterAccount, masterAccount, isDeploying, count,
+    list, account, isMasterAccount, masterAccount, isDeploying, count,
   } = useDojoAccount()
   const { dispatchSetMenu } = usePistolsContext()
 
@@ -51,34 +50,11 @@ export function AccountsList() {
     router.push('/tavern')
   }
 
-  const _clear = () => {
-    clear()
-    location.reload()
-  }
-
   const { isRegistered } = useDuelist(account.address)
   const canEnter = useMemo(() => (!isMasterAccount && !isDeploying && isRegistered), [isMasterAccount, isDeploying, isRegistered])
 
   return (
     <Grid className='Faded FillWidth'>
-      <Row columns={'equal'} textAlign='center'>
-        <Col>
-          <ActionButton fill disabled={isDeploying} onClick={() => create()} label='Create Duelist' />
-        </Col>
-        <Col>
-          <ActionButton fill disabled={isDeploying} onClick={() => applyFromClipboard()} label={<>Import&nbsp;&nbsp;<Icon name='paste' size='small' /></>} />
-        </Col>
-        <Col>
-          <ActionButton fill disabled={isDeploying} onClick={() => _clear()} label='Delete All' />
-        </Col>
-        {/* <Col>
-            <ActionButton fill disabled={isDeploying} onClick={() => applyFromClipboard()} label='Restore' />
-          </Col> */}
-      </Row>
-
-      <Row columns={'equal'} className='Spacer10'>
-        <Col></Col>
-      </Row>
 
       {rows}
 
