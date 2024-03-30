@@ -54,6 +54,7 @@ const accountMenuItems: AccountMenuKey[] = [
 
 export const initialState = {
   walletSig: { address: 0n, sig: 0n },
+  accountIndex: 1,
   duelistAddress: 0n,
   duelId: 0n,
   menuKey: MenuKey.Duelists,
@@ -61,10 +62,12 @@ export const initialState = {
   sceneName: SceneName.Splash,
   // injected
   connectOpener: null as Opener,
+  accountSetupOpener: null as Opener,
 }
 
 const PistolsActions = {
   SET_SIG: 'SET_SIG',
+  SET_ACCOUNT_INDEX: 'SET_ACCOUNT_INDEX',
   SET_ACCOUNT_MENU_KEY: 'SET_ACCOUNT_MENU_KEY',
   SET_MENU_KEY: 'SET_MENU_KEY',
   SET_SCENE: 'SET_SCENE',
@@ -80,6 +83,7 @@ type PistolsContextStateType = typeof initialState
 
 type ActionType =
   | { type: 'SET_SIG', payload: bigint[] }
+  | { type: 'SET_ACCOUNT_INDEX', payload: number }
   | { type: 'SET_ACCOUNT_MENU_KEY', payload: AccountMenuKey }
   | { type: 'SET_MENU_KEY', payload: MenuKey }
   | { type: 'SET_SCENE', payload: SceneName }
@@ -109,6 +113,7 @@ const PistolsProvider = ({
   children,
 }: PistolsProviderProps) => {
   const connectOpener = useOpener()
+  const accountSetupOpener = useOpener()
 
   const [state, dispatch] = useReducer((state: PistolsContextStateType, action: ActionType) => {
     let newState = { ...state }
@@ -118,6 +123,10 @@ const PistolsProvider = ({
           address: action.payload[0] as bigint,
           sig: action.payload[1] as bigint,
         }
+        break
+      }
+      case PistolsActions.SET_ACCOUNT_INDEX: {
+        newState.accountIndex = action.payload as number
         break
       }
       case PistolsActions.SET_ACCOUNT_MENU_KEY: {
@@ -154,6 +163,7 @@ const PistolsProvider = ({
     <PistolsContext.Provider value={{ dispatch, state: {
       ...state,
       connectOpener,
+      accountSetupOpener,
     } }}>
       {children}
     </PistolsContext.Provider>
@@ -173,6 +183,12 @@ export const usePistolsContext = () => {
     dispatch({
       type: PistolsActions.SET_SIG,
       payload: [BigInt(address ?? 0n), BigInt(sig ?? 0n)]
+    })
+  }
+  const dispatchSetAccountIndex = (index: number) => {
+    dispatch({
+      type: PistolsActions.SET_ACCOUNT_INDEX,
+      payload: index,
     })
   }
   const dispatchSetAccountMenu = (menuKey: AccountMenuKey) => {
@@ -221,6 +237,7 @@ export const usePistolsContext = () => {
     // PistolsActions,
     // dispatch,
     dispatchSetSig,
+    dispatchSetAccountIndex,
     dispatchSetAccountMenu,
     dispatchSetMenu,
     dispatchSetScene,

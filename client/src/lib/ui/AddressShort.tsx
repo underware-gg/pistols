@@ -8,15 +8,19 @@ function AddressShort({
   pre = '',
   post = '',
   copyLink = true,
+  important = false,
 }: {
   address: BigNumberish
   pre?: string
   post?: string
   copyLink?: boolean
+  important?: boolean
 }) {
   const display = useMemo(() => (shortAddress(bigintToHex(address))), [address])
+  let classNames = ['Code']
+  if (important) classNames.push('Important')
   return (
-    <span className='Code'>
+    <span className={classNames.join(' ')}>
       {pre} {display} {copyLink && address && <CopyIcon content={bigintToHex(address)} />} {post}
     </span>
   )

@@ -10,6 +10,8 @@ import { ArraySignatureType } from 'starknet'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { bigintEquals, bigintToHex } from '@/lib/utils/types'
 import { BurnerCreateOptions } from '@dojoengine/create-burner'
+import { IconWarning } from '@/lib/ui/Icons'
+import { useBurnerAccount } from '@/lib/wallet/useBurnerAccount'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -18,14 +20,16 @@ enum DeployPhase {
   None,
   Connect,
   Sign,
+  Account,
   Deploy,
-  Restore,
+  Import,
+  Done,
 }
 
 export function OnboardingDeploy({
 }) {
   const { account, isConnected, chainId } = useAccount()
-  const { walletSig, hasSigned, dispatchSetSig, connectOpener } = usePistolsContext()
+  const { walletSig, hasSigned, accountIndex, dispatchSetSig, dispatchSetAccountIndex, connectOpener } = usePistolsContext()
   const { create, generateAddressFromSeed } = useDojoAccount()
 
   //
@@ -53,13 +57,12 @@ export function OnboardingDeploy({
 
   //
   // derive account address from current walletSig
-  const [accountIndex, setAccountIndex] = useState(1)
   const [accountAddress, setAccountAddress] = useState(0n)
 
   const createOptions = useMemo((): BurnerCreateOptions => ({
     secret: bigintToHex(walletSig.sig ?? 0n),
     index: accountIndex,
-    metadata: messages,
+    metadata: { messages },
   }), [walletSig.sig, accountIndex, messages])
 
   useEffect(() => {
@@ -73,82 +76,63 @@ export function OnboardingDeploy({
 
   //
   // Deployment
+  const { isDeployed, isImported } = useBurnerAccount(accountAddress)
 
-  const isDeployed = false
-  const isStored = false
-  const isDone = (isDeployed && isStored)
-
-  const stepNumber = useMemo(() => (
+  const currentPhase = useMemo(() => (
     !isConnected ? DeployPhase.Connect
       : !hasSigned ? DeployPhase.Sign
         : !isDeployed ? DeployPhase.Deploy
-          : !isStored ? DeployPhase.Restore
-            : DeployPhase.None
-  ), [isConnected, hasSigned])
+          : !isImported ? DeployPhase.Import
+            : DeployPhase.Done
+  ), [isConnected, hasSigned, isDeployed, isImported])
 
   return (
-    <Grid>
+    <Grid className=''>
       <Row columns={'equal'}>
         <Col>
-          <Step.Group fluid vertical className='Unselectable'>
-            <Step completed={isConnected} active={false && stepNumber == DeployPhase.Connect}>
-              <Icon name='warning' color='orange' />
-              <Step.Content className='TitleCase FillWidth90'>
-                {isConnected ?
-                  <span className='H3'>Connected wallet: <b><AddressShort address={account?.address ?? 0n} /></b></span>
-                  : <ActionButton fill large onClick={() => connectOpener.open()} label='Connect Wallet' />
-                }
-              </Step.Content>
-            </Step>
+          <Step.Group fluid vertical className='Unselectable NoPadding NoBorder' style={{ border: '0 !important' }}>
 
-            <Step completed={hasSigned} active={false && stepNumber == DeployPhase.Sign}>
-              <Icon name='warning' color='orange' />
-              <Step.Content className='TitleCase FillWidth90'>
-                {hasSigned ?
-                  <span className='H3'>Secret: <b><AddressShort copyLink={false} address={walletSig.sig} /></b></span>
-                  : <ActionButton fill large onClick={() => signTypedData()} label='Sign Message' />
-                }
-              </Step.Content>
-            </Step>
+            <DeployStep currentPhase={currentPhase} phase={DeployPhase.Connect} completed={isConnected}
+              contentActive={<ActionButton fill large onClick={() => connectOpener.open()} label='Connect Wallet' />}
+              contentCompleted={<span>Connected wallet: <b><AddressShort address={account?.address ?? 0n} important /></b></span>}
+            />
 
-            <Step>
-              <Icon name='hashtag' />
-              <Step.Content className='TitleCase'>
-                {hasSigned ?
-                  <span className='H3'>
-                    Account ID: 
-                    <span className='Anchor Important' onClick={() => (setAccountIndex(accountIndex > 1 ? accountIndex - 1 : accountIndex))}> ◀ </span>
-                    <span className='H3'>#{accountIndex}</span>
-                    <span className='Anchor Important' onClick={() => (setAccountIndex(accountIndex + 1))}> ▶ </span>
-                  </span>
-                  : <Step.Title>Account ID</Step.Title>
-                }
-                
-                {/* <Step.Description>Enter billing information</Step.Description> */}
-              </Step.Content>
-            </Step>
+            <DeployStep currentPhase={currentPhase} phase={DeployPhase.Sign} completed={hasSigned}
+              contentActive={<ActionButton fill large onClick={() => signTypedData()} label='Sign Message' />}
+              contentCompleted={<span>Signed Secret: <b><AddressShort copyLink={false} address={walletSig.sig} important /></b></span>}
+            />
 
-            <Step>
-              <Icon name='at' />
-              <Step.Content className='TitleCase'>
-                {accountAddress ?
-                  <span className='H3'>Account address: <b><AddressShort address={accountAddress ?? 0n} /></b></span>
-                  : <Step.Title>Account Address</Step.Title>
-                }
-                {/* <Step.Description>Enter billing information</Step.Description> */}
-              </Step.Content>
-            </Step>
+            <DeployStep currentPhase={currentPhase} phase={DeployPhase.Account} completed={hasSigned}
+              contentActive={<>Account ID:&nbsp;<span className='H4'>#{accountIndex}</span></>}
+              contentCompleted={
+                <>
+                  Account ID:&nbsp;
+                  {hasSigned &&
+                    <span className='Anchor Important' onClick={() => (dispatchSetAccountIndex(accountIndex > 1 ? accountIndex - 1 : accountIndex))}> ◀ </span>
+                  }
+                  <span className='H4'>#{accountIndex}</span>
+                  {hasSigned &&
+                    <span className='Anchor Important' onClick={() => (dispatchSetAccountIndex(accountIndex + 1))}> ▶ </span>
+                  }
+                </>
+              }
+            />
 
-            <Step completed={isDeployed} active={false && (stepNumber == DeployPhase.Deploy || stepNumber == DeployPhase.Restore)}>
-              <Icon name='warning' color='orange' />
-              <Step.Content className='TitleCase FillWidth90'>
-                {stepNumber == DeployPhase.Deploy ? <ActionButton fill large onClick={() => create(createOptions)} label='Deploy' />
-                  : stepNumber == DeployPhase.Restore ? <ActionButton fill large onClick={() => { }} label='Restore' />
-                    : isDone ? <span className='H3'>Account Deployed</span>
-                      : <Step.Title>Deploy / Restore</Step.Title>
-                }
-              </Step.Content>
-            </Step>
+            <DeployStep currentPhase={currentPhase} phase={DeployPhase.Account} completed={accountAddress > 0n}
+              contentActive={<>Account Address</>}
+              contentCompleted={<>Account address: <b><AddressShort address={accountAddress} important /></b></>}
+            />
+
+            <DeployStep currentPhase={currentPhase} phase={DeployPhase.Deploy} completed={isDeployed}
+              contentActive={<ActionButton fill large disabled={currentPhase != DeployPhase.Deploy} onClick={() => create(createOptions)} label='Deploy' />}
+              contentCompleted={<>Account Deployed</>}
+            />
+
+            <DeployStep currentPhase={currentPhase} phase={DeployPhase.Import} completed={isDeployed}
+              contentActive={<ActionButton fill large disabled={currentPhase != DeployPhase.Import} onClick={() => { }} label='Import' />}
+              contentCompleted={<>Account Imported</>}
+            />
+
           </Step.Group>
         </Col>
 
@@ -157,3 +141,24 @@ export function OnboardingDeploy({
   )
 }
 
+function DeployStep({
+  phase = DeployPhase.None,
+  currentPhase = DeployPhase.None,
+  completed = false,
+  contentActive = <></>,
+  contentCompleted = <></>,
+}) {
+  const _active = (currentPhase == phase)
+  const _disabled = (currentPhase < phase)
+  let classNames = ['H3', 'TitleCase','FillWidth80']
+  if(_disabled) classNames.push('Disabled')
+  return (
+    <Step completed={completed} active={false && _active}>
+      <IconWarning />
+      <Step.Content className={classNames.join(' ')}>
+        {!completed && contentActive}
+        {completed && contentCompleted}
+      </Step.Content>
+    </Step>
+  )
+}

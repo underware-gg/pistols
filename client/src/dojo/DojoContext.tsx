@@ -39,7 +39,7 @@ export const DojoProvider = ({
     [masterAddress, masterPrivateKey, dojoProvider.provider]
   );
 
-  const burner = useBurnerManager({
+  const burner: BurnerAccount = useBurnerManager({
     burnerManager,
   });
 

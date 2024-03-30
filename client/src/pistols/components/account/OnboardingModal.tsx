@@ -1,11 +1,12 @@
 import React, { useMemo } from 'react'
-import { Grid, Icon, Modal } from 'semantic-ui-react'
+import { Modal, Tab, TabPane, Grid, Icon, Menu } from 'semantic-ui-react'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { Opener } from '@/lib/ui/useOpener'
 import { AccountMenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { OnboardingDeploy } from '@/pistols/components/account/OnboardingDeploy'
 import { OnboardingFund } from '@/pistols/components/account/OnboardingFund'
 import { OnboardingProfile } from '@/pistols/components/account/OnboardingProfile'
+import { IconChecked, IconWarning } from '@/lib/ui/Icons'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -15,27 +16,62 @@ export default function OnboardingModal({
 }: {
   opener: Opener
 }) {
-  const { accountMenuKey } = usePistolsContext()
+  const { accountMenuKey, accountMenuItems, accountIndex, dispatchSetAccountMenu } = usePistolsContext()
+  const tabIndex = accountMenuItems.findIndex(k => (k == accountMenuKey))
+
+  const isDeployed = true
+  const isFunded = false
+  const isProfiled = false
 
   return (
     <Modal
       onClose={() => opener.close()}
       open={opener.isOpen}
-      size='small'
+      size='tiny'
     >
       <Modal.Header>
-        <Grid className='FillParent NoPadding'>
-          <Row columns='equal' textAlign='center'>
-            <PhaseTitle label='Deploy' phase={AccountMenuKey.Deploy} checked={true} />
-            <PhaseTitle label='Fund' phase={AccountMenuKey.Fund} checked={false} />
-            <PhaseTitle label='Profile' phase={AccountMenuKey.Profile} checked={false} />
-          </Row>
-        </Grid>
+        Duelist Account #{accountIndex}
       </Modal.Header>
+
       <Modal.Content className='ModalText OnboardingModal'>
-        {accountMenuKey == AccountMenuKey.Deploy && <OnboardingDeploy />}
-        {accountMenuKey == AccountMenuKey.Fund && <OnboardingFund />}
-        {accountMenuKey == AccountMenuKey.Profile && <OnboardingProfile />}
+        <Tab activeIndex={tabIndex} menu={{ secondary: true, pointing: true, attached: true }} panes={[
+          {
+            menuItem: (
+              <Menu.Item key='Deploy' onClick={() => dispatchSetAccountMenu(AccountMenuKey.Deploy)}>
+                Deploy&nbsp;{isDeployed ? <IconChecked /> : <IconWarning />}
+              </Menu.Item>
+            ),
+            render: () => (
+              <TabPane attached>
+                <OnboardingDeploy />
+              </TabPane>
+            )
+          },
+          {
+            menuItem: (
+              <Menu.Item key='Fund' onClick={() => dispatchSetAccountMenu(AccountMenuKey.Fund)}>
+                Fund&nbsp;{isFunded ? <IconChecked /> : <IconWarning />}
+              </Menu.Item>
+            ),
+            render: () => (
+              <TabPane attached>
+                <OnboardingFund />
+              </TabPane>
+            )
+          },
+          {
+            menuItem: (
+              <Menu.Item key='Profile' onClick={() => dispatchSetAccountMenu(AccountMenuKey.Profile)}>
+                Profile&nbsp;{isProfiled ? <IconChecked /> : <IconWarning />}
+              </Menu.Item>
+            ),
+            render: () => (
+              <TabPane attached>
+                <OnboardingProfile />
+              </TabPane>
+            )
+          },
+        ]} />
       </Modal.Content>
       <Modal.Actions className='NoPadding'>
         <Grid columns={4} className='FillParent Padded' textAlign='center'>
@@ -54,27 +90,6 @@ export default function OnboardingModal({
         </Grid>
       </Modal.Actions>
     </Modal>
-  )
-}
-
-function PhaseTitle({
-  label,
-  phase,
-  checked = false,
-}) {
-  const { accountMenuKey, dispatchSetAccountMenu } = usePistolsContext()
-  const disabled = useMemo(() => (accountMenuKey != phase), [accountMenuKey])
-  let classNames = ['Anchor']
-  if (disabled) classNames.push('Inactive')
-  return (
-    <Col>
-      <span className={classNames.join(' ')} onClick={() => dispatchSetAccountMenu(phase)}>
-        {label}
-        {' '}
-        {checked && <Icon name='check' color='green' />}
-        {!checked && <Icon name='warning' color='orange' />}
-      </span>
-    </Col>
   )
 }
 

@@ -70,8 +70,7 @@ function ConnectedGate() {
     create, list, get, select, clear, applyFromClipboard, copyToClipboard,
     account, isMasterAccount, masterAccount, isDeploying, count,
   } = useDojoAccount()
-  const accountSetupOpener = useOpener()
-  const { dispatchSetAccountMenu } = usePistolsContext()
+  const { accountSetupOpener, dispatchSetAccountMenu } = usePistolsContext()
 
   const _deployDuelist = () => {
     dispatchSetAccountMenu(AccountMenuKey.Deploy)

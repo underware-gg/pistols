@@ -134,10 +134,11 @@ function AccountItem({
     }
   }
 
-  const _export = () => {
-    if (isSelected) {
-      copyToClipboard()
-    }
+  const { dispatchSetAccountIndex, accountSetupOpener } = usePistolsContext()
+
+  const _manage = () => {
+    dispatchSetAccountIndex(1)
+    accountSetupOpener.open()
   }
 
   return (
@@ -177,7 +178,7 @@ function AccountItem({
         >
           <input />
           &nbsp;&nbsp;&nbsp;
-          <Button type='submit' disabled={!canEdit} className='FillHeight' onClick={() => _export()}>Export&nbsp;&nbsp;<Icon name='copy' size='small' /></Button>
+          <Button type='submit' disabled={!canEdit} className='FillHeight' onClick={() => _manage()}>Manage</Button>
         </Input>
         <div className='Spacer5' />
         {!isRegistered

@@ -206,6 +206,7 @@ canvas {
 .Warning   { color: $color-warning!important; }
 .Canceled  { color: $color-inactive!important; }
 .Inactive  { color: $color-inactive!important; }
+.Disabled  { color: $color-inactive!important; }
 
 .BgBlack     { background-color: #444; }
 .BgImportant { background-color: $color-important!important; }
@@ -523,7 +524,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 .OnboardingModal {
-  min-height: 350px;
+  min-height: 400px;
 }
 
 // .TableHeader {
@@ -1128,6 +1129,7 @@ input::placeholder {
 // <Tab> <TabPane>
 .ui.attached.menu:not(.tabular) {
   border: 0;
+  padding-left: 5px;
 }
 .ui.secondary.pointing.menu .item {
   padding: 0.5em 3em 0.5em 1em; // semantic: 0.85714286em 1.14285714em;
@@ -1255,7 +1257,7 @@ td {
 }
 //
 // <Step>
-.ui.steps {
+.ui.steps:not(.NoBorder) {
   @extend ._round_border;
 }
 .ui.steps .step,
@@ -1269,6 +1271,7 @@ td {
 }
 .ui.vertical.steps .step {
   border-bottom: $border-hr;
+  padding: 1em 2em;
 }
 .ui.steps .step.active {
   background-color: $color-important;

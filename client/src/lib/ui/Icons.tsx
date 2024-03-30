@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import Link from 'next/link'
 import { Icon, IconGroup, Popup, PopupContent, PopupHeader, SemanticICONS } from 'semantic-ui-react'
-import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
+import { IconProps, IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
 
 // Semantic UI Icons
 // https://react.semantic-ui.com/elements/icon/
@@ -227,7 +227,7 @@ export function CustomIcon({
   const component = useMemo(() => {
     const _extension = png ? 'png' : 'svg'
     const _url = (logo ? `/logos/logo_${name}.${_extension}` : icon ? `/icons/icon_${name}.${_extension}` : null)
-    
+
     // not svg, logo, icon or png
     if (!_url) {
       return <Icon name={name as SemanticICONS} className={className} size={size} disabled={disabled} />
@@ -280,3 +280,13 @@ export function CustomIcon({
   return component
 }
 
+
+//-------------------------
+// Generic icons
+//
+export function IconChecked(props: IconProps) {
+  return <Icon color='green' {...props} name='check' />
+}
+export function IconWarning(props: IconProps) {
+  return <Icon color='orange' {...props} name='warning' />
+}
