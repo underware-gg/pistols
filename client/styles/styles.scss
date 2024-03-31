@@ -524,7 +524,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 .OnboardingModal {
-  min-height: 400px;
+  min-height: 450px;
 }
 
 // .TableHeader {
@@ -611,8 +611,8 @@ $ui-container-gap: 1em;
   // background-color: #f008;
   background-color: #0004; // For browsers that do not support gradients
   background-image: linear-gradient(to right, #000, transparent);
-  min-width: 700px;
-  width: 700px;
+  min-width: 620px;
+  width: 620px;
   height: 100%;
   position: absolute;
   top: 0px;

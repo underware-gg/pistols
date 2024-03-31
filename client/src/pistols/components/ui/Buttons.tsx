@@ -2,7 +2,6 @@ import React, { ReactElement, useState } from 'react'
 import { Menu, Button, Confirm, SemanticICONS } from 'semantic-ui-react'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
-import { useCoin, COIN_LORDS } from '@/pistols/hooks/useConfig'
 import { useLordsBalance } from '@/lib/wallet/useLordsBalance'
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { CustomIcon } from '@/lib/ui/Icons'
@@ -98,15 +97,14 @@ export const BalanceRequiredButton = ({
   disabled = false,
 }) => {
   const { account } = useDojoAccount()
-  const { contractAddress } = useCoin(COIN_LORDS)
-  const { balance, noFunds } = useLordsBalance(contractAddress, account.address, wagerValue + fee)
+  const { balance, noFundsForFee } = useLordsBalance(account.address, wagerValue + fee)
   return (
     <ActionButton fill
       disabled={disabled}
-      attention={!noFunds}
-      negative={noFunds}
-      label={noFunds ? 'No Funds!' : label}
-      onClick={() => (noFunds ? {} : onClick())}
+      attention={!noFundsForFee}
+      negative={noFundsForFee}
+      label={noFundsForFee ? 'No Funds!' : label}
+      onClick={() => (noFundsForFee ? {} : onClick())}
     />
   )
 }

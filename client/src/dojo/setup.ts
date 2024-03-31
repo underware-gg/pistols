@@ -59,7 +59,7 @@ export async function setup({ ...config }: DojoConfig) {
   //   }
   // }
 
-  await burnerManager.init();
+  await burnerManager.init(true);
 
   return {
     config,

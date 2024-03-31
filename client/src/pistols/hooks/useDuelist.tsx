@@ -4,6 +4,7 @@ import { useDojoComponents } from '@/dojo/DojoContext'
 import { bigintToEntity } from '@/lib/utils/types'
 import { feltToString } from "@/lib/utils/starknet"
 import { useEntityKeys } from '@/lib/hooks/useEntityKeys'
+import { BigNumberish } from 'starknet'
 
 
 //------------------
@@ -24,7 +25,7 @@ export const useAllDuelistIds = () => {
 // Single Duel
 //
 
-export const useDuelist = (address: bigint | string) => {
+export const useDuelist = (address: BigNumberish) => {
   const { Duelist } = useDojoComponents()
   const duelist: any = useComponentValue(Duelist, bigintToEntity(address))
   // console.log(`Duelist`, address, bigintToEntity(address), duelist)

@@ -9,6 +9,8 @@ import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
 import { PROFILE_PIC_COUNT } from '@/pistols/utils/constants'
+import { BigNumberish } from 'starknet'
+import { useBurner } from '@/lib/wallet/useBurnerAccount'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -80,24 +82,18 @@ function AccountItem({
   address,
   index,
   isSelected,
+}: {
+  address: BigNumberish
+  index: number
+  isSelected: boolean
 }) {
   const { register_duelist } = useDojoSystemCalls()
-  const { account, copyToClipboard, select, get } = useDojoAccount()
+  const { account, copyToClipboard, select, list } = useDojoAccount()
   const inputRef = useRef(null)
 
-  const exists = true
-  // const exists = useMemo(() => {
-  //   try {
-  //     const account = get(address)
-  //     console.log(account, true)
-  //   } catch {
-  //     console.log(address, false)
-  //     return false
-  //   }
-  //   console.log(address, true)
-  //   return true
-  // }, [address])
- 
+  const burner = useBurner(address)
+  const exists = Boolean(burner)
+
   // current name from Dojo
   const { name, profilePic, isRegistered } = useDuelist(address)
 
@@ -137,7 +133,7 @@ function AccountItem({
   const { dispatchSetAccountIndex, accountSetupOpener } = usePistolsContext()
 
   const _manage = () => {
-    dispatchSetAccountIndex(1)
+    dispatchSetAccountIndex(burner?.accountIndex ?? 0)
     accountSetupOpener.open()
   }
 

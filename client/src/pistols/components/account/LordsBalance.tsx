@@ -1,5 +1,5 @@
 import { useLordsBalance } from '@/lib/wallet/useLordsBalance'
-import { useCoin, COIN_LORDS } from '@/pistols/hooks/useConfig'
+import { COIN_LORDS } from '@/pistols/hooks/useConfig'
 import { Wager } from '@/pistols/components/account/Wager'
 import { useLockedWager } from '@/pistols/hooks/useWager'
 
@@ -10,8 +10,7 @@ export const LordsBalance = ({
   clean = false,
   big = false,
 }) => {
-  const { contractAddress } = useCoin(COIN_LORDS)
-  const { balance, formatted } = useLordsBalance(contractAddress, address)
+  const { balance, formatted } = useLordsBalance(address)
   return (
     <Wager big={big} coin={COIN_LORDS} wei={balance} pre={pre} post={post} clean={clean} />
   )

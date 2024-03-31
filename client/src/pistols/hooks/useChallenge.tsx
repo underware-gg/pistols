@@ -141,8 +141,8 @@ export const useChallengeDescription = (duelId: bigint) => {
 
 export const useChallengeIdsByDuelist = (address: bigint) => {
   const { Challenge } = useDojoComponents()
-  const challengerIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { duelist_a: BigInt(address) })])
-  const challengedIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { duelist_b: BigInt(address) })])
+  const challengerIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { duelist_a: BigInt(address ?? 0n) })])
+  const challengedIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { duelist_b: BigInt(address ?? 0n) })])
   const challengeIds: bigint[] = useMemo(() => (
     [...challengerIds, ...challengedIds]
   ), [challengerIds, challengedIds])

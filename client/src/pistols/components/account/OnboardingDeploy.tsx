@@ -11,7 +11,8 @@ import { AddressShort } from '@/lib/ui/AddressShort'
 import { bigintEquals, bigintToHex } from '@/lib/utils/types'
 import { BurnerCreateOptions } from '@dojoengine/create-burner'
 import { IconWarning } from '@/lib/ui/Icons'
-import { useBurnerAccount } from '@/lib/wallet/useBurnerAccount'
+import { useBurnerAccount, useBurnerContract } from '@/lib/wallet/useBurnerAccount'
+import { TextLink } from '@/lib/ui/Links'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -58,6 +59,7 @@ export function OnboardingDeploy({
   //
   // derive account address from current walletSig
   const [accountAddress, setAccountAddress] = useState(0n)
+  const { deployTx } = useBurnerContract(accountAddress)
 
   const createOptions = useMemo((): BurnerCreateOptions => ({
     secret: bigintToHex(walletSig.sig ?? 0n),
@@ -75,12 +77,12 @@ export function OnboardingDeploy({
   }, [hasSigned, createOptions])
 
   //
-  // Deployment
-  const { isDeployed, isImported } = useBurnerAccount(accountAddress)
+  // Local burner
+  const { isDeployed, isImported, address } = useBurnerAccount(accountIndex)
 
   const currentPhase = useMemo(() => (
     !isConnected ? DeployPhase.Connect
-      : !hasSigned ? DeployPhase.Sign
+      : (!isDeployed && !hasSigned) ? DeployPhase.Sign
         : !isDeployed ? DeployPhase.Deploy
           : !isImported ? DeployPhase.Import
             : DeployPhase.Done
@@ -98,29 +100,25 @@ export function OnboardingDeploy({
             />
 
             <DeployStep currentPhase={currentPhase} phase={DeployPhase.Sign} completed={hasSigned}
-              contentActive={<ActionButton fill large onClick={() => signTypedData()} label='Sign Message' />}
+              contentActive={<ActionButton fill large disabled={currentPhase != DeployPhase.Sign} onClick={() => signTypedData()} label='Sign Message' />}
               contentCompleted={<span>Signed Secret: <b><AddressShort copyLink={false} address={walletSig.sig} important /></b></span>}
             />
 
-            <DeployStep currentPhase={currentPhase} phase={DeployPhase.Account} completed={hasSigned}
-              contentActive={<>Account ID:&nbsp;<span className='H4'>#{accountIndex}</span></>}
+            <DeployStep currentPhase={currentPhase} phase={DeployPhase.Account} completed={hasSigned || isDeployed}
+              // contentActive={<>Account ID:&nbsp;<span className='H4'>#{accountIndex}</span></>}
               contentCompleted={
                 <>
                   Account ID:&nbsp;
-                  {hasSigned &&
-                    <span className='Anchor Important' onClick={() => (dispatchSetAccountIndex(accountIndex > 1 ? accountIndex - 1 : accountIndex))}> ◀ </span>
-                  }
+                  <TextLink disabled={accountIndex <= 1} onClick={() => (dispatchSetAccountIndex(accountIndex - 1))}> ◀ </TextLink>
                   <span className='H4'>#{accountIndex}</span>
-                  {hasSigned &&
-                    <span className='Anchor Important' onClick={() => (dispatchSetAccountIndex(accountIndex + 1))}> ▶ </span>
-                  }
+                  <TextLink disabled={!isDeployed} onClick={() => (dispatchSetAccountIndex(accountIndex + 1))}> ▶ </TextLink>
                 </>
               }
             />
 
-            <DeployStep currentPhase={currentPhase} phase={DeployPhase.Account} completed={accountAddress > 0n}
+            <DeployStep currentPhase={currentPhase} phase={DeployPhase.Account} completed={address || accountAddress}
               contentActive={<>Account Address</>}
-              contentCompleted={<>Account address: <b><AddressShort address={accountAddress} important /></b></>}
+              contentCompleted={<>Account address: <b><AddressShort address={address || accountAddress} important /></b></>}
             />
 
             <DeployStep currentPhase={currentPhase} phase={DeployPhase.Deploy} completed={isDeployed}
@@ -128,7 +126,7 @@ export function OnboardingDeploy({
               contentCompleted={<>Account Deployed</>}
             />
 
-            <DeployStep currentPhase={currentPhase} phase={DeployPhase.Import} completed={isDeployed}
+            <DeployStep currentPhase={currentPhase} phase={DeployPhase.Import} completed={isImported}
               contentActive={<ActionButton fill large disabled={currentPhase != DeployPhase.Import} onClick={() => { }} label='Import' />}
               contentCompleted={<>Account Imported</>}
             />
@@ -145,18 +143,18 @@ function DeployStep({
   phase = DeployPhase.None,
   currentPhase = DeployPhase.None,
   completed = false,
-  contentActive = <></>,
-  contentCompleted = <></>,
+  contentActive = null,
+  contentCompleted = null,
 }) {
   const _active = (currentPhase == phase)
   const _disabled = (currentPhase < phase)
-  let classNames = ['H3', 'TitleCase','FillWidth80']
-  if(_disabled) classNames.push('Disabled')
+  let classNames = ['H3', 'TitleCase', 'FillWidth80']
+  if (_disabled) classNames.push('Disabled')
   return (
     <Step completed={completed} active={false && _active}>
       <IconWarning />
       <Step.Content className={classNames.join(' ')}>
-        {!completed && contentActive}
+        {!completed && (contentActive ?? contentCompleted)}
         {completed && contentCompleted}
       </Step.Content>
     </Step>
