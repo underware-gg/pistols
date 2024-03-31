@@ -36,7 +36,7 @@ export default function WalletHeader({
           </>}
         </Col>
         <Col width={5} verticalAlign='middle'>
-          <ActionButton fill large disabled onClick={() => { }} label='Get $LORDS' />
+          <ActionButton fill large disabled onClick={() => { }} label='Buy $LORDS' />
           <ActionButton fill large onClick={() => disconnect()} label='Disconnect' />
         </Col>
       </Row>

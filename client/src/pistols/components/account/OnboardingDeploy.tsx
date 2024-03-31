@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Grid, Icon, Step } from 'semantic-ui-react'
+import { Grid, Step } from 'semantic-ui-react'
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'

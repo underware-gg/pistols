@@ -524,7 +524,8 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 .OnboardingModal {
-  min-height: 450px;
+  min-height: 390px;
+  padding-top: 0!important;
 }
 
 // .TableHeader {
@@ -644,14 +645,16 @@ $ui-container-gap: 1em;
 
 .ProfilePic {
   width: calc(439px / 2);
-  height: calc(768px / 2);
+  // height: calc(768px / 2);
+  height: auto;
   border-radius: 8px;
   border: $border-button;
 }
 .ProfilePicDuel {
   @extend .ProfilePic;
   width: calc(439px / 2.5);
-  height: calc(768px / 2.5);
+  // height: calc(768px / 2.5);
+  height: auto;
 }
 .ProfilePicSquare {
   width: $profile-pic-width;
@@ -684,12 +687,6 @@ $ui-container-gap: 1em;
 }
 .ProfilePicSelectButton:hover {
   color: $color-brightest;
-}
-.ProfilePicLeftButton {
-  @extend .AbsoluteLeft, .ProfilePicSelectButton;
-}
-.ProfilePicRightButton {
-  @extend .AbsoluteRight, .ProfilePicSelectButton;
 }
 .ProfilePicDisabled {
   // @extend .Grayscale;

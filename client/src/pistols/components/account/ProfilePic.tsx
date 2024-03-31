@@ -23,7 +23,7 @@ export function ProfilePic({
   const className = useMemo(() => _className(small, square, duel), [square])
   const suffix = useMemo(() => _suffix(square), [square])
   const url = useMemo(() => _makeUrl(profilePic, suffix), [profilePic, suffix])
-  return <Image src={url} className={className} floated={floated}/>
+  return <Image src={url} className={className} floated={floated} />
 }
 
 export function ProfilePicButton({
@@ -34,9 +34,10 @@ export function ProfilePicButton({
   duel = false,
   disabled = false,
   dimmed = false,
+  className = '',
 }) {
   const classNames = useMemo(() => {
-    let result = [_className(small, square, duel)]
+    let result = [_className(small, square, duel), className]
     if (!disabled) result.push('Anchor')
     if (disabled || dimmed) result.push('ProfilePicDisabled')
     return result

@@ -3,9 +3,9 @@ import { useContract } from '@starknet-react/core'
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { bigintEquals, bigintToHex } from '@/lib/utils/types'
-import { BigNumberish, Contract } from 'starknet'
-import abi from '@/lib/abi/braavos_account.json'
+import { BigNumberish } from 'starknet'
 import { useLordsBalance } from './useLordsBalance'
+import abi from '@/lib/abi/braavos_account.json'
 
 export const useBurner = (address: BigNumberish) => {
   const { list } = useDojoAccount()
@@ -18,21 +18,33 @@ export const useBurner = (address: BigNumberish) => {
   return burner
 }
 
+export const useBurners = (masterAccount: BigNumberish) => {
+  const { list } = useDojoAccount()
+  // const burners = useMemo(() => (
+  //   list().reduce((a, b) => {
+  //     if (bigintEquals(masterAccount, b.masterAccount)) return a.push(b)
+  //     return a
+  //   }, []).sort((a, b) => (a.accountIndex - b.accountIndex))
+  // ), [masterAccount])
+  // return burners
+  return list()
+}
+
 export const useBurnerAccount = (accountIndex: number) => {
   const { list, count, masterAccount } = useDojoAccount()
 
   //
   // Good burner: Deployed & Imported
   const burner = useMemo(() => (
-    list().reduce((a, b) => {
+    (masterAccount && accountIndex) ? list().reduce((a, b) => {
       if (!a
-        && accountIndex && accountIndex == b.accountIndex
-        && masterAccount?.address && bigintEquals(masterAccount.address, b.masterAccount)
+        && accountIndex == b.accountIndex
+        && masterAccount.address && bigintEquals(masterAccount.address, b.masterAccount)
       ) {
         return b
       }
       return a
-    }, null)
+    }, null) : null
   ), [accountIndex, masterAccount, count])
   const address = useMemo(() => (burner?.address ?? null), [burner])
 

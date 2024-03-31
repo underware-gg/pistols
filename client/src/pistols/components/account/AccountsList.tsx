@@ -1,38 +1,34 @@
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { Grid, Radio, Input, Button, Icon } from 'semantic-ui-react'
-import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
-import { usePistolsContext, MenuKey, initialState } from '@/pistols/hooks/PistolsContext'
+import { Grid, Divider } from 'semantic-ui-react'
+import { useDojoAccount } from '@/dojo/DojoContext'
+import { usePistolsContext, initialState } from '@/pistols/hooks/PistolsContext'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
-import { PROFILE_PIC_COUNT } from '@/pistols/utils/constants'
 import { BigNumberish } from 'starknet'
-import { useBurner } from '@/lib/wallet/useBurnerAccount'
+import { useBurner, useBurnerAccount, useBurners } from '@/lib/wallet/useBurnerAccount'
+import { LordsBalance } from './LordsBalance'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export function AccountsList() {
-  const router = useRouter()
 
   const {
-    list, account, isMasterAccount, masterAccount, isDeploying, count,
+    account, isMasterAccount, masterAccount, isDeploying, count,
   } = useDojoAccount()
-  const { dispatchSetMenu } = usePistolsContext()
+
+  const burners = useBurners(masterAccount)
 
   const rows = useMemo(() => {
     let result = []
-    const burners = list()
-    burners.forEach((burner, index) => {
-      const isSelected = (burner.address == account.address)
-      const key = `${burner.address}_${isSelected ? 1 : 0}`
+    burners.forEach((burner) => {
+      const key = burner.address
       result.push(<AccountItem key={key}
+        accountIndex={burner.accountIndex}
         address={burner.address}
-        index={index}
-        isSelected={isSelected}
       />)
     })
     if (result.length == 0) {
@@ -47,143 +43,70 @@ export function AccountsList() {
     return result
   }, [account?.address, isDeploying, count])
 
-  const _enter = (menuKey = initialState.menuKey) => {
-    dispatchSetMenu(menuKey)
-    router.push('/tavern')
-  }
-
-  const { isRegistered } = useDuelist(account.address)
-  const canEnter = useMemo(() => (!isMasterAccount && !isDeploying && isRegistered), [isMasterAccount, isDeploying, isRegistered])
-
   return (
     <Grid className='Faded FillWidth'>
-
       {rows}
-
-      <Row columns={'equal'} className='Spacer10'>
-        <Col></Col>
-      </Row>
-
-      <Row columns={'equal'} textAlign='center'>
-        <Col>
-          <ActionButton fill large attention={isRegistered} disabled={!canEnter} onClick={() => _enter()} label={!isRegistered ? 'Check In to Enter' : 'Enter The Tavern'} />
-        </Col>
-      </Row>
-
-      <Row columns={'equal'} className='Spacer10'>
-        <Col></Col>
-      </Row>
     </Grid>
   )
 }
 
 
 function AccountItem({
+  accountIndex,
   address,
-  index,
-  isSelected,
 }: {
+  accountIndex: number
   address: BigNumberish
-  index: number
-  isSelected: boolean
 }) {
-  const { register_duelist } = useDojoSystemCalls()
-  const { account, copyToClipboard, select, list } = useDojoAccount()
-  const inputRef = useRef(null)
+  const router = useRouter()
+  const { select } = useDojoAccount()
 
   const burner = useBurner(address)
-  const exists = Boolean(burner)
+  const { isImported, isProfiled } = useBurnerAccount(accountIndex)
+  const _canPlay = (isImported && isProfiled)
 
-  // current name from Dojo
-  const { name, profilePic, isRegistered } = useDuelist(address)
+  const { name, profilePic } = useDuelist(address)
+  const defaultAccountName = useMemo(() => (`Duelist #${accountIndex}`), [accountIndex])
 
-  const [selectedProfilePic, setSelectedProfilePic] = useState(0)
-
-  const _profilePic = useMemo(() => {
-    return (
-      selectedProfilePic ? selectedProfilePic
-        : profilePic ? profilePic
-          : (Number(BigInt(address) % BigInt(PROFILE_PIC_COUNT)) + 1)
-    )
-  }, [selectedProfilePic, profilePic])
-
-  const defaultAccountName = useMemo(() => (`ACCOUNT-${index + 1}`), [index])
-  const [inputValue, setInputValue] = useState(null)
-  const inputIsValid = useMemo(() => (inputValue?.length >= 3), [inputValue])
-  const isUpdated = useMemo(() => (name == inputValue && profilePic == _profilePic), [name, inputValue, profilePic, _profilePic])
-  const canEdit = useMemo(() => (exists && isSelected), [exists, isSelected])
-  const canRegister = useMemo(() => (canEdit && account && address), [canEdit, account, address])
-  // console.log(isUpdated, name, inputValue, profilePic, selectedProfilePic, _profilePic)
-
-  // initialize
-  useEffectOnce(() => {
-    if (inputValue == null) {
-      setInputValue(name ?? defaultAccountName)
-    } else if (inputValue != name) {
-      setInputValue(name)
-    }
-  }, [name, inputValue])
-
-  const _register = () => {
-    if (canRegister) {
-      register_duelist(account, inputValue, _profilePic)
-    }
-  }
-
-  const { dispatchSetAccountIndex, accountSetupOpener } = usePistolsContext()
+  const { accountSetupOpener, dispatchSetAccountIndex, dispatchSetMenu } = usePistolsContext()
 
   const _manage = () => {
     dispatchSetAccountIndex(burner?.accountIndex ?? 0)
     accountSetupOpener.open()
   }
 
+  const _duel = (menuKey = initialState.menuKey) => {
+    select(address)
+    dispatchSetMenu(menuKey)
+    router.push('/tavern')
+  }
+
   return (
-    <Row textAlign='center' verticalAlign='middle'>
-      <Col width={1}>
-        <Radio checked={isSelected} onClick={() => select(address)} />
-      </Col>
-      <Col width={3} className='NoPadding'>
-        <AddressShort address={address} copyLink={false} />
-        <div className='Relative'>
-          <ProfilePicSquareButton
-            profilePic={_profilePic}
-            onClick={() => select(address)}
-            // disabled={!canEdit}
-            dimmed={!canEdit}
-          />
-          {canEdit && <>
-            <div className='ProfilePicLeftButton'
-              onClick={() => setSelectedProfilePic(_profilePic > 1 ? _profilePic - 1 : PROFILE_PIC_COUNT)}
-            >◀</div>
-            <div className='ProfilePicRightButton'
-              onClick={() => setSelectedProfilePic(_profilePic < PROFILE_PIC_COUNT ? _profilePic + 1 : 1)}
-            >▶</div>
-          </>}
-        </div>
-      </Col>
-      <Col width={12} textAlign='left'>
-        <span className='FormLabel TitleCase'>Duelist Name</span>
-        <div className='Spacer5' />
-        <Input fluid
-          maxLength={31}
-          placeholder={'Duelist Name'}
-          value={inputValue ?? ''}
-          onChange={(e) => setInputValue(e.target.value)}
-          disabled={!canEdit}
-          ref={inputRef}
-        >
-          <input />
-          &nbsp;&nbsp;&nbsp;
-          <Button type='submit' disabled={!canEdit} className='FillHeight' onClick={() => _manage()}>Manage</Button>
-        </Input>
-        <div className='Spacer5' />
-        {!isRegistered
-          ? <ActionButton fill disabled={!canRegister || !inputIsValid} onClick={() => _register()} label={exists ? 'Check In' : 'Duelist not Found'} />
-          : inputValue
-            ? <ActionButton fill disabled={!canRegister || isUpdated || !inputIsValid} onClick={() => _register()} label={isUpdated ? 'Checked In' : 'Update'} />
-            : <ActionButton fill disabled={!canRegister || isUpdated} onClick={() => _register()} label='Unregister' />
-        }
-      </Col>
-    </Row>
+    <>
+
+      <Row textAlign='center' verticalAlign='top'>
+        <Col width={3} className='NoPadding'>
+          <div>
+            <ProfilePicSquareButton
+              profilePic={profilePic ?? 0}
+              onClick={() => _manage()}
+            />
+          </div>
+        </Col>
+        <Col width={8} textAlign='left'>
+          <h3>{name ?? defaultAccountName}</h3>
+          <AddressShort address={address} />
+          <h5><LordsBalance address={address} /></h5>
+        </Col>
+        <Col width={5} textAlign='left'>
+          <ActionButton fill onClick={() => _manage()} label='Manage' />
+          <div className='Spacer5' />
+          <ActionButton fill attention disabled={!_canPlay} onClick={() => _duel()} label='Duel!' />
+        </Col>
+      </Row>
+      <Row columns={1} className='NoPadding'>
+        <Col><Divider /></Col>
+      </Row>
+    </>
   )
 }

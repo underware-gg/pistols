@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo } from 'react'
-import { Modal, Tab, TabPane, Grid, Icon, Menu } from 'semantic-ui-react'
+import React, { useEffect } from 'react'
+import { Modal, Tab, TabPane, Grid, Menu } from 'semantic-ui-react'
 import { useBurnerAccount } from '@/lib/wallet/useBurnerAccount'
 import { IconChecked, IconWarning } from '@/lib/ui/Icons'
 import { AccountMenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
@@ -78,7 +78,7 @@ export default function OnboardingModal({
               </Menu.Item>
             ),
             render: () => (
-              <TabPane attached>
+              <TabPane attached className='NoPadding'>
                 <OnboardingDeploy />
               </TabPane>
             )
@@ -90,8 +90,8 @@ export default function OnboardingModal({
               </Menu.Item>
             ),
             render: () => (
-              <TabPane attached>
-                <OnboardingFund isDeployed={isDeployed}/>
+              <TabPane attached className='NoPadding'>
+                <OnboardingFund isDeployed={isDeployed} />
               </TabPane>
             )
           },
@@ -102,7 +102,7 @@ export default function OnboardingModal({
               </Menu.Item>
             ),
             render: () => (
-              <TabPane attached>
+              <TabPane attached className='NoPadding'>
                 <OnboardingProfile />
               </TabPane>
             )

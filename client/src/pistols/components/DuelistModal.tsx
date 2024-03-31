@@ -77,14 +77,13 @@ export default function DuelistModal() {
               &nbsp;&nbsp;&nbsp;
               <AddressShort address={duelistAddress} />
             </Col>
-            <Col width={7} textAlign='right'>
+            <Col width={8} textAlign='right'>
               {isYou &&
-                <span className='Smaller'>switch duelist</span>
-              }
-            </Col>
-            <Col width={1} textAlign='right'>
-              {isYou &&
-                <Icon className='Anchor IconClick' name='users' size={'small'} onClick={() => _switchDuelist()} />
+                <div className='Anchor' onClick={() => _switchDuelist()} >
+                  <span className='Smaller'>Switch Duelist</span>
+                  &nbsp;
+                  <Icon name='users' size={'small'} />
+                </div>
               }
             </Col>
           </Row>
