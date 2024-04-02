@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { ReactNode, useEffect, useMemo, useState } from 'react'
 import { Grid, Step } from 'semantic-ui-react'
 import { useDojoAccount } from '@/dojo/DojoContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
@@ -18,13 +18,13 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 enum DeployPhase {
-  None,
-  Connect,
-  Sign,
-  Account,
-  Deploy,
-  Import,
-  Done,
+  None,     // 0
+  Connect,  // 1
+  Sign,     // 2
+  Account,  // 3
+  Deploy,   // 4
+  Import,   // 5
+  Done,     // 6
 }
 
 export function OnboardingDeploy({
@@ -80,7 +80,7 @@ export function OnboardingDeploy({
   // Local burner
   const { isDeployed, isImported, address } = useBurnerAccount(accountIndex)
 
-  const currentPhase = useMemo(() => (
+  const currentPhase = useMemo<DeployPhase>(() => (
     !isConnected ? DeployPhase.Connect
       : (!isDeployed && !hasSigned) ? DeployPhase.Sign
         : !isDeployed ? DeployPhase.Deploy
@@ -109,14 +109,14 @@ export function OnboardingDeploy({
               contentCompleted={
                 <>
                   Account ID:&nbsp;
-                  <TextLink disabled={accountIndex <= 1} onClick={() => (dispatchSetAccountIndex(accountIndex - 1))}> ◀ </TextLink>
+                  <TextLink disabled={!isDeployed || accountIndex <= 1} onClick={() => (dispatchSetAccountIndex(accountIndex - 1))}> ◀ </TextLink>
                   <span className='H4'>#{accountIndex}</span>
                   <TextLink disabled={!isDeployed} onClick={() => (dispatchSetAccountIndex(accountIndex + 1))}> ▶ </TextLink>
                 </>
               }
             />
 
-            <DeployStep currentPhase={currentPhase} phase={DeployPhase.Account} completed={address || accountAddress}
+            <DeployStep currentPhase={currentPhase} phase={DeployPhase.Account} completed={Boolean(address) || Boolean(accountAddress)}
               contentActive={<>Account Address</>}
               contentCompleted={<>Account address: <b><AddressShort address={address || accountAddress} important /></b></>}
             />
@@ -140,11 +140,17 @@ export function OnboardingDeploy({
 }
 
 function DeployStep({
-  phase = DeployPhase.None,
-  currentPhase = DeployPhase.None,
-  completed = false,
-  contentActive = null,
-  contentCompleted = null,
+  phase,
+  currentPhase,
+  completed,
+  contentActive,
+  contentCompleted,
+}: {
+    phase: DeployPhase
+    currentPhase: DeployPhase
+    completed: boolean
+    contentActive?: ReactNode
+    contentCompleted: ReactNode
 }) {
   const _active = (currentPhase == phase)
   const _disabled = (currentPhase < phase)

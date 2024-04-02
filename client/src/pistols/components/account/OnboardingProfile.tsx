@@ -18,13 +18,7 @@ export function OnboardingProfile({
   const { register_duelist } = useDojoSystemCalls()
   const { accountIndex } = usePistolsContext()
   const { address } = useBurnerAccount(accountIndex)
-  const { account, copyToClipboard, select, list } = useDojoAccount()
-
-  useEffect(() => {
-    if (address) {
-      select(address)
-    }
-  }, [address])
+  const { account } = useDojoAccount()
 
   const { name, profilePic, isRegistered } = useDuelist(address)
   const [selectedProfilePic, setSelectedProfilePic] = useState(0)

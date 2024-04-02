@@ -11,6 +11,7 @@ import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import WalletHeader from '@/pistols/components/account/WalletHeader'
 import OnboardingModal from './account/OnboardingModal'
 import Logo from './Logo'
+import { LordsBagIcon } from './account/Wager'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -47,7 +48,8 @@ function DisconnectedGate() {
     <>
       <VStack>
         <span className='Title'>
-          You need a Starknet wallet and some $LORDS to play
+          This game requires need a <b>Starknet wallet</b>
+          <br />and some <LordsBagIcon /><b>LORDS</b> to play
         </span>
 
         <ActionButton fill large onClick={() => connectOpener.open()} label='Connect Wallet' />

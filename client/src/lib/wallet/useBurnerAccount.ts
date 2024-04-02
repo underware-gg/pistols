@@ -31,7 +31,7 @@ export const useBurners = (masterAccount: BigNumberish) => {
 }
 
 export const useBurnerAccount = (accountIndex: number) => {
-  const { list, count, masterAccount } = useDojoAccount()
+  const { masterAccount, count, list, select } = useDojoAccount()
 
   //
   // Good burner: Deployed & Imported
@@ -47,6 +47,12 @@ export const useBurnerAccount = (accountIndex: number) => {
     }, null) : null
   ), [accountIndex, masterAccount, count])
   const address = useMemo(() => (burner?.address ?? null), [burner])
+
+  useEffect(() => {
+    if (address) {
+      select(address)
+    }
+  }, [address])
 
   //--------------------------------------------
   // TODO: verify if deployed but not imported

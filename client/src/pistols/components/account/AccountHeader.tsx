@@ -28,7 +28,7 @@ export default function AccountHeader({
       <Row className='ProfilePicHeight' textAlign='center' verticalAlign='middle'>
         <Col width={11} textAlign='right'>
           <h3>{isMasterAccount ? 'Guest' : name}</h3>
-          <AddressShort address={account?.address} />
+          <AddressShort address={account?.address} copyLink={false} />
           <br />
           <LordsBalance address={account.address} big />
         </Col>
