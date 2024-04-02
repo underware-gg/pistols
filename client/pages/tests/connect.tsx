@@ -9,6 +9,7 @@ import { bigintToHex, shortAddress } from '@/lib/utils/types'
 import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
 import { ArraySignatureType, typedData } from 'starknet'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { CHAIN_ID } from '@/lib/dojo/setup/chains'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -20,7 +21,9 @@ const HeaderCell = Table.HeaderCell
 
 export default function IndexPage() {
   return (
-    <AppDojo>
+    <AppDojo
+      chains={[CHAIN_ID.LOCAL_KATANA, CHAIN_ID.PISTOLS_SLOT, CHAIN_ID.DOJO_REALMS_WORLD]}
+    >
       <Container>
         <DojoAccount />
         <Connect />

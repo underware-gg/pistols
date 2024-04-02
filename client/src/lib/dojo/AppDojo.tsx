@@ -2,6 +2,7 @@ import React, { ReactNode, useMemo, useState } from 'react'
 import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
 import { DojoConfig, createDojoConfig } from '@dojoengine/core'
 import { DojoProvider } from '@/dojo/DojoContext'
+import { CHAIN_ID } from '@/lib/dojo/setup/chains'
 import { setup } from '@/dojo/setup'
 import { StarknetProvider } from '@/lib/dojo/StarknetProvider'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
@@ -12,10 +13,12 @@ import manifest from '../../manifest.json'
 export default function AppDojo({
   headerData = {},
   backgroundImage = null,
+  chains,
   children,
 }: {
   headerData?: HeaderData
   backgroundImage?: string
+  chains: CHAIN_ID[],
   children: ReactNode
 }) {
   return (
