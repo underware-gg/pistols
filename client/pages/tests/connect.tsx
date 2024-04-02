@@ -48,7 +48,13 @@ function DojoAccount() {
 
       <Body>
         <Row>
-          <Cell>MASTER_ADDRESS</Cell>
+          <Cell>process.env.NODE_ENV</Cell>
+          <Cell className='Code Important'>
+            {process.env.NODE_ENV}
+          </Cell>
+        </Row>
+        <Row>
+          <Cell>NEXT_PUBLIC_MASTER_ADDRESS</Cell>
           <Cell className='Code'>
             {process.env.NEXT_PUBLIC_MASTER_ADDRESS}
           </Cell>

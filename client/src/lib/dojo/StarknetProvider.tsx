@@ -1,56 +1,41 @@
 import React from 'react'
 import { StarknetConfig, argent, braavos, jsonRpcProvider } from '@starknet-react/core'
 import { Chain } from '@starknet-react/chains'
-import { DojoConfig } from '@dojoengine/core'
+import { DojoChainConfig } from '@/lib/dojo/setup/config'
 
 export function StarknetProvider({
-  dojoConfig,
+  dojoChainConfig,
+  chains,
   children,
 }: {
-  dojoConfig: DojoConfig,
+  dojoChainConfig: DojoChainConfig,
+  chains: Chain[]
   children: any
 }) {
-  const katana: Chain = {
-    id: BigInt(420),
-    network: 'katana',
-    name: 'Katana Devnet',
-    nativeCurrency: {
-      address: '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
-      name: 'Ether',
-      symbol: 'ETH',
-      decimals: 18,
-    },
-    testnet: true,
-    rpcUrls: {
-      default: {
-        http: [],
-      },
-      public: {
-        http: [dojoConfig.rpcUrl],
-      },
-    },
-  }
 
   function rpc(chain: Chain) {
+    const nodeUrl = chain.rpcUrls.default.http[0]
     return {
-      nodeUrl: dojoConfig.rpcUrl,
+      nodeUrl,
     }
   }
 
   const provider = jsonRpcProvider({ rpc })
 
-  const chains = [katana]
   const connectors = [
     argent(),
     braavos(),
   ]
 
+  // const [explorer, setExplorer] = useState<ExplorerFactory>(() => starkscan);
+
   return (
     <StarknetConfig
       chains={chains}
-      provider={() => provider(katana)}
+      provider={() => provider(dojoChainConfig.chainConfig)}
       connectors={connectors}
-      autoConnect
+      autoConnect={false}
+    // explorer={explorer}
     >
       {children}
     </StarknetConfig>

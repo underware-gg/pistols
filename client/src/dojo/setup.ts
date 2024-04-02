@@ -1,5 +1,6 @@
 import { Account } from 'starknet'
-import { DojoConfig, DojoProvider } from '@dojoengine/core'
+import { DojoChainConfig } from '@/lib/dojo/setup/config'
+import { DojoProvider } from '@dojoengine/core'
 import { getSyncEntities } from '@dojoengine/state'
 import { BurnerManager } from '@dojoengine/create-burner'
 import { setupNetwork } from './setupNetwork'
@@ -14,7 +15,7 @@ export type SetupResult = Awaited<ReturnType<typeof setup>>
  *
  * @returns An object containing network configurations, client components, and system calls.
  */
-export async function setup({ ...config }: DojoConfig) {
+export async function setup({ ...config }: DojoChainConfig) {
 
   const toriiClient = await torii.createClient([], {
     rpcUrl: config.rpcUrl,
@@ -25,7 +26,7 @@ export async function setup({ ...config }: DojoConfig) {
   const dojoProvider = new DojoProvider(config.manifest, config.rpcUrl)
 
   // Initialize the network configuration.
-  const network = await setupNetwork(dojoProvider)
+  const network = setupNetwork(dojoProvider)
 
   // Create client components based on the network setup.
   const components = createClientComponents(network)
@@ -50,14 +51,6 @@ export async function setup({ ...config }: DojoConfig) {
     accountClassHash: config.accountClassHash,
     rpcProvider: dojoProvider.provider,
   });
-
-  // if (burnerManager.list().length === 0) {
-  //   try {
-  //     await burnerManager.create();
-  //   } catch (e) {
-  //     console.error(`setup() error:`, e);
-  //   }
-  // }
 
   await burnerManager.init(true);
 

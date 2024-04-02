@@ -1,13 +1,17 @@
 import React, { ReactNode, useMemo, useState } from 'react'
-import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
 import { DojoConfig, createDojoConfig } from '@dojoengine/core'
-import { DojoProvider } from '@/dojo/DojoContext'
+import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
+import { dojoContextConfig, isChainIdSupported } from '@/lib/dojo/setup/config'
 import { CHAIN_ID } from '@/lib/dojo/setup/chains'
-import { setup } from '@/dojo/setup'
 import { StarknetProvider } from '@/lib/dojo/StarknetProvider'
+import { useDojoChains } from '@/lib/dojo/hooks/useDojoChains'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { HeaderData } from '@/lib/ui/AppHeader'
 import App from '@/lib/ui/App'
+
+// TODO: Move into lib or pass as prop
+import { DojoProvider } from '@/dojo/DojoContext'
+import { setup } from '@/dojo/setup'
 import manifest from '../../manifest.json'
 
 export default function AppDojo({
@@ -23,46 +27,51 @@ export default function AppDojo({
 }) {
   return (
     <App headerData={headerData} backgroundImage={backgroundImage}>
-      <Providers>
+      <Providers supportedChainIds={chains}>
         {children}
       </Providers>
     </App>
   );
 }
 
-function Providers({ children }) {
-  const [setupResult, setSetupResult] = useState(null)
+function Providers({
+  supportedChainIds,
+  children,
+}: {
+  supportedChainIds: CHAIN_ID[],
+  children: ReactNode
+}) {
+  const defaultChainId = (process.env.NEXT_PUBLIC_CHAIN_ID ?? (
+    process.env.NODE_ENV === 'development' ? CHAIN_ID.LOCAL_KATANA
+      : supportedChainIds[0]
+  )) as CHAIN_ID
 
-  const config: DojoConfig = useMemo(() => {
-    if (!process.env.NEXT_PUBLIC_NODE_URL) throw (`NEXT_PUBLIC_NODE_URL is null`)
-    if (!process.env.NEXT_PUBLIC_TORII) throw (`NEXT_PUBLIC_TORII is null`)
-    if (!process.env.NEXT_PUBLIC_MASTER_ADDRESS) throw (`NEXT_PUBLIC_MASTER_ADDRESS is not set`)
-    if (!process.env.NEXT_PUBLIC_MASTER_PRIVATE_KEY) throw (`NEXT_PUBLIC_MASTER_PRIVATE_KEY is not set`)
-    const result = createDojoConfig({
-      manifest,
-      rpcUrl: process.env.NEXT_PUBLIC_NODE_URL,
-      toriiUrl: process.env.NEXT_PUBLIC_TORII,
-      masterAddress: process.env.NEXT_PUBLIC_MASTER_ADDRESS,
-      masterPrivateKey: process.env.NEXT_PUBLIC_MASTER_PRIVATE_KEY,
-    })
-    return result
-  }, [])
+  const lastSelectedChainId = (typeof window !== 'undefined' ? window?.localStorage?.getItem('lastSelectedChainId') : undefined) as CHAIN_ID
+
+  const intialChainId = isChainIdSupported(lastSelectedChainId) ? lastSelectedChainId : defaultChainId
+
+  const { selectedChainConfig, selectedChainId, selectChainId, isKatana, chains } = useDojoChains(intialChainId, supportedChainIds);
+
+  const [setupResult, setSetupResult] = useState(null)
 
   useEffectOnce(() => {
     let _mounted = true
     const _setup = async () => {
-      console.log(`DojoConfig:`, config)
-      const result = await setup(config)
-      console.log('SETUP OK')
+      const result = await setup(selectedChainConfig)
+      console.log('CHAIN SETUP OK')
       if (_mounted) {
         setSetupResult(result)
       }
     }
+    if (!selectedChainConfig) {
+      throw `Invlaid config for chain Id [${selectedChainId}]`
+    }
+    setSetupResult(null)
     _setup()
     return () => {
       _mounted = false
     }
-  }, [])
+  }, [selectedChainConfig, selectedChainId])
 
   if (!setupResult) {
     return (
@@ -74,7 +83,7 @@ function Providers({ children }) {
   }
 
   return (
-    <StarknetProvider dojoConfig={config}>
+    <StarknetProvider dojoChainConfig={selectedChainConfig} chains={chains}>
       <DojoProvider value={setupResult}>
         {children}
       </DojoProvider>

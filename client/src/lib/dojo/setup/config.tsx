@@ -7,8 +7,6 @@ import * as chains from './chains'
 // based on:
 // https://github.com/cartridge-gg/rollyourown/blob/market_packed/web/src/dojo/setup/config.ts
 
-export type SupportedChainIds = keyof typeof dojoContextConfig
-
 export type DojoContextConfig = typeof dojoContextConfig
 
 export type DojoChainConfig = {
@@ -104,8 +102,15 @@ export const getDojoChains = (): DojoChainConfig[] => {
   return Object.values(dojoContextConfig)
 }
 
-export const getStarknetProviderChains = (): Chain[] => {
-  return Object.keys(dojoContextConfig).map((key) => {
-    return dojoContextConfig[key as SupportedChainIds].chainConfig
-  })
+export const isChainIdSupported = (chainId: chains.CHAIN_ID): boolean => {
+  return Object.keys(dojoContextConfig).includes(chainId)
+}
+
+export const getStarknetProviderChains = (supportedChainIds: chains.CHAIN_ID[]): Chain[] => {
+  return Object.keys(dojoContextConfig).reduce((acc, chain_id) => {
+    if (supportedChainIds.includes(chain_id as chains.CHAIN_ID)) {
+      acc.push(dojoContextConfig[chain_id].chainConfig)
+    }
+    return acc
+  }, [])
 }

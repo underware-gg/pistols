@@ -2,11 +2,10 @@ import { Account, AllowArray, Call, num } from 'starknet'
 import { DojoProvider } from '@dojoengine/core'
 import { defineContractComponents } from './contractComponents'
 import { world } from './world'
-import manifest from '../manifest.json'
 
 export type SetupNetworkResult = Awaited<ReturnType<typeof setupNetwork>>
 
-export async function setupNetwork(provider: DojoProvider) {
+export function setupNetwork(provider: DojoProvider) {
   return {
     world,
     contractComponents: defineContractComponents(world),
