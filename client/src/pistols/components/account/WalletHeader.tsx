@@ -1,11 +1,12 @@
 import React, { useMemo } from 'react'
 import { Grid, Image } from 'semantic-ui-react'
 import { useAccount, useDisconnect, useStarkProfile } from '@starknet-react/core'
-import { AddressShort } from '@/lib/ui/AddressShort'
-import { LordsBalance } from '@/pistols/components/account/LordsBalance'
-import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { feltToString } from '@/lib/utils/starknet'
+import { useDojoAccount } from '@/dojo/DojoContext'
 import { useDojoWallet } from '@/lib/dojo/hooks/useDojoWallet'
+import { LordsBalance } from '@/pistols/components/account/LordsBalance'
+import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
+import { ActionButton } from '@/pistols/components/ui/Buttons'
+import { AddressShort } from '@/lib/ui/AddressShort'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -13,7 +14,7 @@ const Col = Grid.Column
 export default function WalletHeader({
 }) {
   const { disconnect } = useDisconnect()
-  const { address, connector, isConnected, chainId } = useAccount()
+  const { account, address, connector, isConnected, chainId } = useAccount()
   const { connectedChainName } = useDojoWallet()
 
   // BUG: https://github.com/apibara/starknet-react/issues/419
@@ -38,7 +39,7 @@ export default function WalletHeader({
           </>}
         </Col>
         <Col width={5} verticalAlign='middle'>
-          <ActionButton fill large disabled onClick={() => { }} label='Buy $LORDS' />
+          <LordsFaucet fill large account={account} />
           <ActionButton fill large onClick={() => disconnect()} label='Disconnect' />
         </Col>
       </Row>

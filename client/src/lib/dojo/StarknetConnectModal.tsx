@@ -52,7 +52,7 @@ function ConnectButtons() {
   return (
     <VStack>
       {[...buttons,
-      <Button key='nowallet' fluid size='huge' onClick={() => window.open(`https://www.starknet.io/en/ecosystem/wallets`, '_blank')}>
+      <Button key='nowallet' fluid size='huge' onClick={() => window?.open(`https://www.starknet.io/en/ecosystem/wallets`, '_blank')}>
         I don't have a Wallet
       </Button>
       ]}

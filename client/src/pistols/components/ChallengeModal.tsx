@@ -78,7 +78,7 @@ export default function ChallengeModal() {
               <span className='Code'><ChallengeTime duelId={duelId} prefixed /></span>
             </Col>
             <Col width={1} textAlign='right'>
-              <Icon className='Anchor IconClick' name='database' size={'small'} onClick={() => window.open(`/dueldata/${duelId}`, '_blank')} />
+              <Icon className='Anchor IconClick' name='database' size={'small'} onClick={() => window?.open(`/dueldata/${duelId}`, '_blank')} />
             </Col>
           </Row>
         </Grid>

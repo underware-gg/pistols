@@ -1,23 +1,38 @@
+import { Account, AccountInterface } from 'starknet'
 import { useCoin, COIN_LORDS } from '@/pistols/hooks/useConfig'
 import { useLordsFaucet } from '@/lib/wallet/useLordsFaucet'
+import { ActionButton } from '@/pistols/components/ui/Buttons'
+import { useDojo } from '@/dojo/DojoContext'
 
-export const LordsFaucet = () => {
+export const LordsFaucet = ({
+  fill = false,
+  large = false,
+  disabled = false,
+  account,
+}: {
+  fill?: boolean
+  large?: boolean
+  disabled?: boolean
+  account?: Account | AccountInterface
+}) => {
+  const { setup: { dojoChainConfig } } = useDojo()
+
   const { contractAddress } = useCoin(COIN_LORDS)
   const { faucet, hasFaucet, isPending } = useLordsFaucet(contractAddress)
 
-  const onClick = () => {
-    if (isPending) return
-    faucet()
-  }
+  const _hasFaucet = hasFaucet || Boolean(dojoChainConfig.lordsFaucetUrl)
 
-  if (!hasFaucet) {
-    return <></>
+  const onClick = () => {
+    if (!isPending) {
+      if (dojoChainConfig.lordsFaucetUrl) {
+        window?.open(dojoChainConfig.lordsFaucetUrl, '_blank')
+      } else if (hasFaucet) {
+        faucet(account)
+      }
+    }
   }
 
   return (
-    <>
-      {/* <Icon name='add' /> */}
-      [ <span className='Anchor Important' onClick={onClick}>get free $LORDS</span> ]
-    </>
+    <ActionButton fill={fill} large={large} disabled={disabled || isPending || !_hasFaucet} onClick={onClick} label='Get $LORDS' />
   )
 }

@@ -2,13 +2,15 @@ import { useCallback, useMemo, useState } from 'react'
 import { getContractByName } from '@dojoengine/core'
 import { useDojo, useDojoAccount } from '@/dojo/DojoContext'
 import { bigintEquals } from '@/lib/utils/types'
+import { Account, AccountInterface } from 'starknet'
+import { feltToString } from '../utils/starknet'
 
 export interface FaucetExecuteResult {
   hash: string
 }
 
 export interface FaucetInterface {
-  faucet: () => Promise<FaucetExecuteResult> | null
+  faucet: (fromAccount?: Account | AccountInterface) => Promise<FaucetExecuteResult> | null
   hasFaucet: boolean
   isPending: boolean
   error?: string
@@ -28,15 +30,19 @@ export const useLordsFaucet = (contractAddress): FaucetInterface => {
   const [error, setError] = useState<string | undefined>(undefined)
 
   const faucet = useCallback(
-    async (): Promise<FaucetExecuteResult> => {
+    async (fromAccount?: Account | AccountInterface): Promise<FaucetExecuteResult> => {
 
       setError(undefined)
       setIsPending(true)
 
+      const _account = (fromAccount ?? account)
+
       let tx, receipt
       try {
-        tx = await dojoProvider.execute(account!, 'lords_mock', 'faucet', [])
-        receipt = await account!.waitForTransaction(tx.transaction_hash, {
+        //@ts-ignore
+        console.log(`FAUCY:`, feltToString(_account.provider.chainId), _account)
+        tx = await dojoProvider.execute(_account!, 'lords_mock', 'faucet', [])
+        receipt = await _account!.waitForTransaction(tx.transaction_hash, {
           retryInterval: 200,
         })
       } catch (e: any) {

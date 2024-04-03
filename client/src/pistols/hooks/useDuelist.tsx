@@ -30,9 +30,9 @@ export const useDuelist = (address: BigNumberish) => {
   const duelist: any = useComponentValue(Duelist, bigintToEntity(address ?? 0n))
   // console.log(`Duelist`, address, bigintToEntity(address ?? 0n), duelist)
 
-  const name = useMemo(() => feltToString(duelist?.name ?? 0n), [duelist])
+  const name = useMemo(() => duelist?.name ? feltToString(duelist.name) : null, [duelist])
   const profilePic = useMemo(() => (duelist?.profile_pic ?? null), [duelist])
-  const isRegistered = useMemo(() => (name.length > 0), [name])
+  const isRegistered = useMemo(() => (name && name.length > 0), [name])
 
   const timestamp = useMemo(() => (duelist?.timestamp ?? 0), [duelist])
   const total_duels = useMemo(() => (duelist?.total_duels ?? 0), [duelist])

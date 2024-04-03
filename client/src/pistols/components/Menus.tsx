@@ -136,7 +136,7 @@ export function MenuDuel({
 
         {/* <SettingsMenuItem prefix='SFX' settingsKey={SettingsActions.SFX_ENABLED} currentValue={settings.sfxEnabled} /> */}
 
-        <Menu.Item onClick={() => window.open(`/dueldata/${duelId}`, '_blank')} >
+        <Menu.Item onClick={() => window?.open(`/dueldata/${duelId}`, '_blank')} >
           <Icon className='IconClick' name='database' size={null} />
         </Menu.Item>
 
