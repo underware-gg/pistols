@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Grid, Image } from 'semantic-ui-react'
 import { useAccount, useDisconnect, useStarkProfile } from '@starknet-react/core'
-import { useDojoAccount } from '@/dojo/DojoContext'
+import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useDojoWallet } from '@/lib/dojo/hooks/useDojoWallet'
 import { LordsBalance } from '@/pistols/components/account/LordsBalance'
 import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'

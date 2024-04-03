@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid } from 'semantic-ui-react'
-import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
+import { useDojoAccount, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useGetValidPackedActions } from '@/pistols/hooks/useContractCalls'
 import { Action } from '@/pistols/utils/pistols'
 import { signAndRestoreActionFromHash } from '../utils/salt'

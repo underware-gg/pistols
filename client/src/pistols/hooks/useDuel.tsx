@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react'
-import { useDojoComponents } from '@/dojo/DojoContext'
+import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { useComponentValue } from '@dojoengine/react'
 import { useThreeJsContext } from "./ThreeJsContext"
 import { useGameplayContext } from "@/pistols/hooks/GameplayContext"

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useDojoSystemCalls } from '@/dojo/DojoContext'
+import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { BigNumberish } from 'starknet'
 
 export const useCalcFee = (wager_coin: number, wager_value: BigNumberish, defaultValue = null) => {

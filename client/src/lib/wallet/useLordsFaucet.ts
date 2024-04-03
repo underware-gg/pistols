@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import { getContractByName } from '@dojoengine/core'
-import { useDojo, useDojoAccount } from '@/dojo/DojoContext'
+import { useDojo, useDojoAccount } from '@/lib/dojo/DojoContext'
 import { bigintEquals } from '@/lib/utils/types'
 import { Account, AccountInterface } from 'starknet'
 import { feltToString } from '../utils/starknet'

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid, Divider } from 'semantic-ui-react'
-import { useDojoAccount } from '@/dojo/DojoContext'
+import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { usePistolsContext, initialState } from '@/pistols/hooks/PistolsContext'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { ActionButton } from '@/pistols/components/ui/Buttons'

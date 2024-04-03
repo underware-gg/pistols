@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { Grid } from 'semantic-ui-react'
-import { useDojoAccount } from '@/dojo/DojoContext'
+import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useCalcHitBonus, useCalcCritChances, useCalcHitChances, useCalcGlanceChances, useCalcHonourForAction } from '@/pistols/hooks/useContractCalls'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import { Action } from '@/pistols/utils/pistols'

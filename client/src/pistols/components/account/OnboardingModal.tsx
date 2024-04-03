@@ -9,7 +9,7 @@ import { OnboardingFund } from '@/pistols/components/account/OnboardingFund'
 import { OnboardingProfile } from '@/pistols/components/account/OnboardingProfile'
 import { Opener } from '@/lib/ui/useOpener'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { useDojoAccount } from '@/dojo/DojoContext'
+import { useDojoAccount } from '@/lib/dojo/DojoContext'
 
 const Row = Grid.Row
 const Col = Grid.Column

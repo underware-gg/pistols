@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Divider, Grid, Modal, Pagination } from 'semantic-ui-react'
-import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
+import { useDojoAccount, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { signAndGenerateActionHash } from '@/pistols/utils/salt'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ActionChances } from '@/pistols/components/ActionChances'

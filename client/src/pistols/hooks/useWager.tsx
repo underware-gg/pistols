@@ -1,6 +1,6 @@
 import { getComponentValue } from '@dojoengine/recs'
 import { useComponentValue } from "@dojoengine/react"
-import { useDojoComponents } from '@/dojo/DojoContext'
+import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { useChallengesByDuelist } from '@/pistols/hooks/useChallenge'
 import { bigintToEntity } from '@/lib/utils/types'
 import { BigNumberish } from 'starknet'

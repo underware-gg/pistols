@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Container, Table } from 'semantic-ui-react'
-import { useDojoAccount } from '@/dojo/DojoContext'
+import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
 import AppPistols from '@/pistols/components/AppPistols'
 import { Account, typedData } from 'starknet'

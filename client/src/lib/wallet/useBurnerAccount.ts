@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useContract } from '@starknet-react/core'
-import { useDojoAccount } from '@/dojo/DojoContext'
+import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { bigintEquals, bigintToHex } from '@/lib/utils/types'
 import { BigNumberish } from 'starknet'

@@ -3,7 +3,7 @@ import { useCallback, useMemo } from 'react'
 import { SwitchStarknetChainParameter, AddStarknetChainParameters } from 'get-starknet-core'
 import { useAccount } from '@starknet-react/core'
 import { useChainConfig } from '@/lib/dojo/hooks/useDojoChains'
-import { useDojo } from '@/dojo/DojoContext'
+import { useDojo } from '@/lib/dojo/DojoContext'
 
 interface AddStarknetChainParametersImpl extends AddStarknetChainParameters {
   // accountImplementation: string, // ArgentX class hash (BUGGED)

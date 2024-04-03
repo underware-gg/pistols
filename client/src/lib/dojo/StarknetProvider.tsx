@@ -1,7 +1,7 @@
 import React from 'react'
 import { StarknetConfig, argent, braavos, jsonRpcProvider } from '@starknet-react/core'
 import { Chain } from '@starknet-react/chains'
-import { DojoChainConfig } from '@/lib/dojo/setup/config'
+import { DojoChainConfig } from '@/lib/dojo/setup/chainConfig'
 
 export function StarknetProvider({
   dojoChainConfig,

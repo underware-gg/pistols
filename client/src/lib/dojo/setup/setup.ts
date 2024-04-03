@@ -1,12 +1,14 @@
 import { Account } from 'starknet'
-import { DojoChainConfig } from '@/lib/dojo/setup/config'
+import { DojoChainConfig } from '@/lib/dojo/setup/chainConfig'
 import { DojoProvider } from '@dojoengine/core'
 import { getSyncEntities } from '@dojoengine/state'
 import { BurnerManager } from '@dojoengine/create-burner'
 import { setupNetwork } from './setupNetwork'
 import { createClientComponents } from './createClientComponents'
-import { createSystemCalls } from './createSystemCalls'
 import * as torii from '@dojoengine/torii-client'
+
+// TODO: move out of lib
+import { createSystemCalls } from '../../../dojo/createSystemCalls'
 
 export type SetupResult = Awaited<ReturnType<typeof setup>>
 

@@ -1,16 +1,14 @@
 import React, { ReactNode, useState } from 'react'
 import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
-import { isChainIdSupported } from '@/lib/dojo/setup/config'
+import { isChainIdSupported } from '@/lib/dojo/setup/chainConfig'
 import { CHAIN_ID } from '@/lib/dojo/setup/chains'
+import { SetupResult, setup } from '@/lib/dojo/setup/setup'
+import { DojoProvider } from '@/lib/dojo/DojoContext'
 import { StarknetProvider } from '@/lib/dojo/StarknetProvider'
 import { useDojoChains } from '@/lib/dojo/hooks/useDojoChains'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { HeaderData } from '@/lib/ui/AppHeader'
 import App from '@/lib/ui/App'
-
-// TODO: Move into lib or pass as prop
-import { DojoProvider } from '@/dojo/DojoContext'
-import { SetupResult, setup } from '@/dojo/setup'
 
 export interface DojoAppConfig {
   manifest: any,

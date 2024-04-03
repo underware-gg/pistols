@@ -1,12 +1,12 @@
 import { getEvents, setComponentsFromEvents, decodeComponent } from '@dojoengine/utils'
-import { SetupNetworkResult } from './setupNetwork'
+import { SetupNetworkResult } from '../lib/dojo/setup/setupNetwork'
 import { splitU256, stringToFelt } from '@/lib/utils/starknet'
 import { Account, BigNumberish, Call, uint256 } from 'starknet'
 import { emitter } from '@/pistols/three/game'
 import { getContractByName } from '@dojoengine/core'
 import { bigintToEntity, bigintToHex } from '@/lib/utils/types'
 import { getComponentValue } from '@dojoengine/recs'
-import { ClientComponents } from './createClientComponents'
+import { ClientComponents } from '../lib/dojo/setup/createClientComponents'
 
 
 export type SystemCalls = ReturnType<typeof createSystemCalls>;

@@ -1,8 +1,8 @@
 import { ReactNode, createContext, useContext, useMemo } from 'react'
 import { BurnerAccount, useBurnerManager } from "@dojoengine/create-burner"
-import { DojoChainConfig } from '@/lib/dojo/setup/config';
+import { DojoChainConfig } from '@/lib/dojo/setup/chainConfig';
 import { bigintEquals } from "@/lib/utils/types";
-import { SetupResult } from "./setup";
+import { SetupResult } from "./setup/setup";
 import { Account } from "starknet";
 
 interface DojoContextType {

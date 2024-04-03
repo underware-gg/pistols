@@ -3,7 +3,7 @@ import { Menu, Button, Confirm, SemanticICONS } from 'semantic-ui-react'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useLordsBalance } from '@/lib/wallet/useLordsBalance'
-import { useDojoAccount } from '@/dojo/DojoContext'
+import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { CustomIcon } from '@/lib/ui/Icons'
 
 //-----------------

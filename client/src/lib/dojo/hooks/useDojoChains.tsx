@@ -1,7 +1,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Chain } from '@starknet-react/chains'
-import { DojoChainConfig, dojoContextConfig, getStarknetProviderChains, isChainIdSupported } from '@/lib/dojo/setup/config'
+import { DojoChainConfig, dojoContextConfig, getStarknetProviderChains, isChainIdSupported } from '@/lib/dojo/setup/chainConfig'
 import { CHAIN_ID } from '@/lib/dojo/setup/chains'
 import { BigNumberish } from 'starknet'
 import { feltToString } from '@/lib/utils/starknet'

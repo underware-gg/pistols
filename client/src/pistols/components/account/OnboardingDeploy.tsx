@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect, useMemo, useState } from 'react'
 import { Grid, Step } from 'semantic-ui-react'
-import { useDojoAccount } from '@/dojo/DojoContext'
+import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useAccount, useSignTypedData } from '@starknet-react/core'

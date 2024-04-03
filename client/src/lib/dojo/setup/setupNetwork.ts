@@ -1,7 +1,9 @@
 import { Account, AllowArray, Call, num } from 'starknet'
 import { DojoProvider } from '@dojoengine/core'
-import { defineContractComponents } from './contractComponents'
 import { world } from './world'
+
+// TODO: move out of lib
+import { defineContractComponents } from '../../../dojo/contractComponents'
 
 export type SetupNetworkResult = Awaited<ReturnType<typeof setupNetwork>>
 

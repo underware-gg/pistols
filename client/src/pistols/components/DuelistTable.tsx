@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Table } from 'semantic-ui-react'
-import { useDojoAccount } from '@/dojo/DojoContext'
+import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useAllDuelistIds, useDuelist } from '@/pistols/hooks/useDuelist'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
