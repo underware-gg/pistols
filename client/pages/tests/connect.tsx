@@ -1,15 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Container, Table, Button, Image } from 'semantic-ui-react'
+import { ArraySignatureType, typedData } from 'starknet'
 import { useAccount, useDisconnect, useSignTypedData } from '@starknet-react/core'
+import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDojoAccount } from '@/dojo/DojoContext'
-import AppDojo from '@/lib/dojo/AppDojo'
-import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import { feltToString } from '@/lib/utils/starknet'
 import { bigintToHex, shortAddress } from '@/lib/utils/types'
 import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
-import { ArraySignatureType, typedData } from 'starknet'
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { CHAIN_ID } from '@/lib/dojo/setup/chains'
+import { makeDojoAppConfig } from '@/dojo/config'
+import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
+import AppDojo from '@/lib/dojo/AppDojo'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -21,9 +21,7 @@ const HeaderCell = Table.HeaderCell
 
 export default function IndexPage() {
   return (
-    <AppDojo
-      chains={[CHAIN_ID.KATANA, CHAIN_ID.PISTOLS_SLOT, CHAIN_ID.DOJO_REALMS_WORLD]}
-    >
+    <AppDojo dojoAppConfig={makeDojoAppConfig()}>
       <Container>
         <DojoAccount />
         <Connect />

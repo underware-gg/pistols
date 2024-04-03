@@ -11,22 +11,25 @@ import App from '@/lib/ui/App'
 // TODO: Move into lib or pass as prop
 import { DojoProvider } from '@/dojo/DojoContext'
 import { SetupResult, setup } from '@/dojo/setup'
-import manifest from '../../manifest.json'
+
+export interface DojoAppConfig {
+  supportedChainIds: CHAIN_ID[],
+}
 
 export default function AppDojo({
   headerData = {},
   backgroundImage = null,
-  chains,
+  dojoAppConfig,
   children,
 }: {
   headerData?: HeaderData
   backgroundImage?: string
-  chains: CHAIN_ID[],
+  dojoAppConfig: DojoAppConfig,
   children: ReactNode
 }) {
   return (
     <App headerData={headerData} backgroundImage={backgroundImage}>
-      <Providers supportedChainIds={chains}>
+      <Providers dojoAppConfig={dojoAppConfig}>
         {children}
       </Providers>
     </App>
@@ -34,22 +37,22 @@ export default function AppDojo({
 }
 
 function Providers({
-  supportedChainIds,
+  dojoAppConfig,
   children,
 }: {
-  supportedChainIds: CHAIN_ID[],
+  dojoAppConfig: DojoAppConfig,
   children: ReactNode
 }) {
   const defaultChainId = (process.env.NEXT_PUBLIC_CHAIN_ID ?? (
     process.env.NODE_ENV === 'development' ? CHAIN_ID.KATANA
-      : supportedChainIds[0]
+      : dojoAppConfig.supportedChainIds[0]
   )) as CHAIN_ID
 
   const lastSelectedChainId = (typeof window !== 'undefined' ? window?.localStorage?.getItem('lastSelectedChainId') : undefined) as CHAIN_ID
 
   const intialChainId = isChainIdSupported(lastSelectedChainId) ? lastSelectedChainId : defaultChainId
 
-  const { selectedChainConfig, selectedChainId, selectChainId, isKatana, chains } = useDojoChains(intialChainId, supportedChainIds);
+  const { selectedChainConfig, selectedChainId, selectChainId, isKatana, chains } = useDojoChains(intialChainId, dojoAppConfig.supportedChainIds);
 
   const [setupResult, setSetupResult] = useState<SetupResult>(null)
 
