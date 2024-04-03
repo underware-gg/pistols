@@ -27,9 +27,9 @@ export function OnboardingProfile({
     return (
       selectedProfilePic ? selectedProfilePic
         : profilePic ? profilePic
-          : (Number(BigInt(address) % BigInt(PROFILE_PIC_COUNT)) + 1)
+          : (Number(BigInt(address ?? 0n) % BigInt(PROFILE_PIC_COUNT)) + 1)
     )
-  }, [selectedProfilePic, profilePic])
+  }, [selectedProfilePic, profilePic, address])
 
   const defaultAccountName = useMemo(() => (`Duelist #${accountIndex + 1}`), [accountIndex])
   const [inputValue, setInputValue] = useState(null)
@@ -79,6 +79,7 @@ export function OnboardingProfile({
               maxLength={31}
               placeholder={'Duelist Name'}
               value={inputValue ?? ''}
+              disabled={!account || !address}
               onChange={(e) => setInputValue(e.target.value)}
             />
             <div className='Spacer5' />

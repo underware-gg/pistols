@@ -27,8 +27,8 @@ export const useAllDuelistIds = () => {
 
 export const useDuelist = (address: BigNumberish) => {
   const { Duelist } = useDojoComponents()
-  const duelist: any = useComponentValue(Duelist, bigintToEntity(address))
-  // console.log(`Duelist`, address, bigintToEntity(address), duelist)
+  const duelist: any = useComponentValue(Duelist, bigintToEntity(address ?? 0n))
+  // console.log(`Duelist`, address, bigintToEntity(address ?? 0n), duelist)
 
   const name = useMemo(() => feltToString(duelist?.name ?? 0n), [duelist])
   const profilePic = useMemo(() => (duelist?.profile_pic ?? null), [duelist])

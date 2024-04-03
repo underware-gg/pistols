@@ -10,23 +10,19 @@ import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
 import { BigNumberish } from 'starknet'
 import { useBurner, useBurnerAccount, useBurners } from '@/lib/wallet/useBurnerAccount'
 import { LordsBalance } from './LordsBalance'
+import { bigintToHex } from '@/lib/utils/types'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export function AccountsList() {
-
-  const {
-    account, isMasterAccount, masterAccount, isDeploying, count,
-  } = useDojoAccount()
-
-  const burners = useBurners(masterAccount)
+  const { account, masterAccount, isDeploying, count } = useDojoAccount()
+  const { burners } = useBurners(masterAccount.address)
 
   const rows = useMemo(() => {
     let result = []
-    burners.forEach((burner) => {
-      const key = burner.address
-      result.push(<AccountItem key={key}
+    Object.values(burners).forEach((burner) => {
+      result.push(<AccountItem key={burner.address}
         accountIndex={burner.accountIndex}
         address={burner.address}
       />)
@@ -76,7 +72,7 @@ function AccountItem({
   }
 
   const _duel = (menuKey = initialState.menuKey) => {
-    select(address)
+    select(bigintToHex(address))
     dispatchSetMenu(menuKey)
     router.push('/tavern')
   }

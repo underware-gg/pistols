@@ -109,7 +109,7 @@ export function OnboardingDeploy({
               contentCompleted={
                 <>
                   Account ID:&nbsp;
-                  <TextLink disabled={!isDeployed || accountIndex <= 1} onClick={() => (dispatchSetAccountIndex(accountIndex - 1))}> ◀ </TextLink>
+                  <TextLink disabled={accountIndex <= 1} onClick={() => (dispatchSetAccountIndex(accountIndex - 1))}> ◀ </TextLink>
                   <span className='H4'>#{accountIndex}</span>
                   <TextLink disabled={!isDeployed} onClick={() => (dispatchSetAccountIndex(accountIndex + 1))}> ▶ </TextLink>
                 </>

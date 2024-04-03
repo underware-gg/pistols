@@ -6,6 +6,7 @@ import { bigintEquals, bigintToHex } from '@/lib/utils/types'
 import { BigNumberish } from 'starknet'
 import { useLordsBalance } from './useLordsBalance'
 import abi from '@/lib/abi/braavos_account.json'
+import { Burner } from '@dojoengine/create-burner'
 
 export const useBurner = (address: BigNumberish) => {
   const { list } = useDojoAccount()
@@ -18,16 +19,35 @@ export const useBurner = (address: BigNumberish) => {
   return burner
 }
 
-export const useBurners = (masterAccount: BigNumberish) => {
-  const { list } = useDojoAccount()
-  // const burners = useMemo(() => (
-  //   list().reduce((a, b) => {
-  //     if (bigintEquals(masterAccount, b.masterAccount)) return a.push(b)
-  //     return a
-  //   }, []).sort((a, b) => (a.accountIndex - b.accountIndex))
-  // ), [masterAccount])
-  // return burners
-  return list()
+export const useBurners = (masterAccountAddress: BigNumberish) => {
+  const { list, count } = useDojoAccount()
+
+  const _burners_array = useMemo(() => (
+    list().reduce((a, b) => {
+      if (bigintEquals(masterAccountAddress, b.masterAccount)) a.push(b)
+      return a
+    }, []).sort((a, b) => (a.accountIndex - b.accountIndex))
+  ), [masterAccountAddress, count])
+
+  const burners = useMemo<{ [key: string]: Burner }>(() => (
+    _burners_array.reduce((a, b) => {
+      a[b.accountIndex] = b
+      return a
+    }, {})
+  ), [_burners_array])
+
+  const lastAccountIndex = useMemo<number>(() => (
+    _burners_array.reduce((a, b) => {
+      if (b.accountIndex > a) return b.accountIndex
+      return a
+    }, 0)
+  ), [_burners_array])
+
+  return {
+    burners,
+    lastAccountIndex,
+    nextAccountIndex: (lastAccountIndex + 1),
+  }
 }
 
 export const useBurnerAccount = (accountIndex: number) => {
@@ -35,17 +55,8 @@ export const useBurnerAccount = (accountIndex: number) => {
 
   //
   // Good burner: Deployed & Imported
-  const burner = useMemo(() => (
-    (masterAccount && accountIndex) ? list().reduce((a, b) => {
-      if (!a
-        && accountIndex == b.accountIndex
-        && masterAccount.address && bigintEquals(masterAccount.address, b.masterAccount)
-      ) {
-        return b
-      }
-      return a
-    }, null) : null
-  ), [accountIndex, masterAccount, count])
+  const { burners } = useBurners(masterAccount.address)
+  const burner = useMemo(() => (burners[accountIndex] ?? null), [accountIndex, burners])
   const address = useMemo(() => (burner?.address ?? null), [burner])
 
   useEffect(() => {

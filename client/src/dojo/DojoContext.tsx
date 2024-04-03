@@ -3,12 +3,12 @@ import { BurnerAccount, useBurnerManager } from "@dojoengine/create-burner"
 import { DojoChainConfig } from '@/lib/dojo/setup/config';
 import { bigintEquals } from "@/lib/utils/types";
 import { SetupResult } from "./setup";
-import { Account, AccountInterface } from "starknet";
+import { Account } from "starknet";
 
 interface DojoContextType {
   setup: SetupResult;
   masterAccount: Account;
-  account: AccountInterface | null;
+  account: Account | null;
   burner: BurnerAccount;
   dojoChainConfig: DojoChainConfig,
 }
@@ -50,10 +50,10 @@ export const DojoProvider = ({
     <DojoContext.Provider
       value={{
         setup: value,
-        dojoChainConfig: value.dojoChainConfig,
         masterAccount,
-        account: burner.account ?? masterAccount,
+        account: burner.account ? (burner.account as Account) : masterAccount,
         burner,
+        dojoChainConfig: value.dojoChainConfig,
       }}
     >
       {children}
@@ -78,7 +78,7 @@ export const useDojo = (): DojoContextType => {
 
 export const useDojoAccount = (): BurnerAccount & {
   masterAccount: Account
-  account: AccountInterface
+  account: Account
   accountAddress: bigint
   isMasterAccount: boolean
 } => {

@@ -12,6 +12,7 @@ import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import WalletHeader from '@/pistols/components/account/WalletHeader'
 import OnboardingModal from './account/OnboardingModal'
 import Logo from './Logo'
+import { useBurners } from '@/lib/wallet/useBurnerAccount'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -75,13 +76,12 @@ function DisconnectedGate({
 
 
 function ConnectedGate() {
-  const {
-    create, list, get, select, clear, applyFromClipboard, copyToClipboard,
-    account, isMasterAccount, masterAccount, isDeploying, count,
-  } = useDojoAccount()
-  const { accountSetupOpener, dispatchSetAccountMenu } = usePistolsContext()
+  const { clear, applyFromClipboard, copyToClipboard, masterAccount, count } = useDojoAccount()
+  const { accountSetupOpener, dispatchSetAccountMenu, dispatchSetAccountIndex } = usePistolsContext()
+  const { nextAccountIndex } = useBurners(masterAccount.address)
 
   const _deployDuelist = () => {
+    dispatchSetAccountIndex(nextAccountIndex)
     dispatchSetAccountMenu(AccountMenuKey.Deploy)
     accountSetupOpener.open()
   }

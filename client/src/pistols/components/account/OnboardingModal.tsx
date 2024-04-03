@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { Modal, Tab, TabPane, Grid, Menu } from 'semantic-ui-react'
-import { useBurnerAccount } from '@/lib/wallet/useBurnerAccount'
+import { useBurnerAccount, useBurners } from '@/lib/wallet/useBurnerAccount'
 import { IconChecked, IconWarning } from '@/lib/ui/Icons'
 import { AccountMenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
@@ -9,6 +9,7 @@ import { OnboardingFund } from '@/pistols/components/account/OnboardingFund'
 import { OnboardingProfile } from '@/pistols/components/account/OnboardingProfile'
 import { Opener } from '@/lib/ui/useOpener'
 import { AddressShort } from '@/lib/ui/AddressShort'
+import { useDojoAccount } from '@/dojo/DojoContext'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -18,7 +19,10 @@ export default function OnboardingModal({
 }: {
   opener: Opener
 }) {
-  const { accountMenuKey, accountMenuItems, accountIndex, dispatchSetAccountMenu } = usePistolsContext()
+  const { masterAccount } = useDojoAccount()
+  const { nextAccountIndex } = useBurners(masterAccount.address)
+
+  const { accountMenuKey, accountMenuItems, accountIndex, dispatchSetAccountMenu, dispatchSetAccountIndex} = usePistolsContext()
   const tabIndex = accountMenuItems.findIndex(k => (k == accountMenuKey))
 
   const { isDeployed, isImported, isFunded, isProfiled, address } = useBurnerAccount(accountIndex)
@@ -48,6 +52,11 @@ export default function OnboardingModal({
     if (accountMenuKey == AccountMenuKey.Deploy) dispatchSetAccountMenu(AccountMenuKey.Fund)
     else if (accountMenuKey == AccountMenuKey.Fund) dispatchSetAccountMenu(AccountMenuKey.Profile)
     else opener.close()
+  }
+
+  const _deployNew = () => {
+    dispatchSetAccountIndex(nextAccountIndex)
+    dispatchSetAccountMenu(AccountMenuKey.Deploy)
   }
 
   return (
@@ -113,7 +122,7 @@ export default function OnboardingModal({
         <Grid columns={4} className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>
-              <ActionButton fill disabled={true} label='Deploy New' onClick={() => { }} />
+              <ActionButton fill label='Deploy New' onClick={() => _deployNew()} />
             </Col>
             <Col>
             </Col>
