@@ -7,13 +7,13 @@ import { stringToFelt } from '@/lib/utils/starknet'
 export enum CHAIN_ID {
   SN_MAINNET = 'SN_MAINNET',
   SN_SEPOLIA = 'SN_SEPOLIA',
-  LOCAL_KATANA = 'LOCAL_KATANA',
+  KATANA = 'KATANA',
   PISTOLS_SLOT = 'PISTOLS_SLOT',
   DOJO_REALMS_WORLD = 'DOJO_REALMS_WORLD',
 }
 
 export const katanaLocalChain = {
-  id: BigInt(stringToFelt(CHAIN_ID.LOCAL_KATANA)),
+  id: BigInt(stringToFelt(CHAIN_ID.KATANA)),
   network: 'katana',
   name: 'Katana Local',
   nativeCurrency: {

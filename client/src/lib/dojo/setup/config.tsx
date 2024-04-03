@@ -92,7 +92,7 @@ const snMainnetConfig: DojoChainConfig = {
 
 
 export const dojoContextConfig: Record<chains.CHAIN_ID, DojoChainConfig> = {
-  [chains.CHAIN_ID.LOCAL_KATANA]: localKatanaConfig,
+  [chains.CHAIN_ID.KATANA]: localKatanaConfig,
   [chains.CHAIN_ID.PISTOLS_SLOT]: pistolsSlotConfig,
   [chains.CHAIN_ID.DOJO_REALMS_WORLD]: realmsWorldConfig,
   [chains.CHAIN_ID.SN_SEPOLIA]: snSepoliaConfig,

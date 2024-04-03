@@ -15,7 +15,7 @@ export default function AppPistols({
   }
   return (
     <AppDojo headerData={headerData} backgroundImage={backgroundImage}
-      chains={[CHAIN_ID.LOCAL_KATANA, CHAIN_ID.PISTOLS_SLOT, CHAIN_ID.DOJO_REALMS_WORLD]}
+      chains={[CHAIN_ID.KATANA, CHAIN_ID.PISTOLS_SLOT, CHAIN_ID.DOJO_REALMS_WORLD]}
     >
       <ThreeJsProvider>
         <GameplayProvider>

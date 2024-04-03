@@ -41,7 +41,7 @@ function Providers({
   children: ReactNode
 }) {
   const defaultChainId = (process.env.NEXT_PUBLIC_CHAIN_ID ?? (
-    process.env.NODE_ENV === 'development' ? CHAIN_ID.LOCAL_KATANA
+    process.env.NODE_ENV === 'development' ? CHAIN_ID.KATANA
       : supportedChainIds[0]
   )) as CHAIN_ID
 

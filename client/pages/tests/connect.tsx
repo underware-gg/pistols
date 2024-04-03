@@ -22,7 +22,7 @@ const HeaderCell = Table.HeaderCell
 export default function IndexPage() {
   return (
     <AppDojo
-      chains={[CHAIN_ID.LOCAL_KATANA, CHAIN_ID.PISTOLS_SLOT, CHAIN_ID.DOJO_REALMS_WORLD]}
+      chains={[CHAIN_ID.KATANA, CHAIN_ID.PISTOLS_SLOT, CHAIN_ID.DOJO_REALMS_WORLD]}
     >
       <Container>
         <DojoAccount />
