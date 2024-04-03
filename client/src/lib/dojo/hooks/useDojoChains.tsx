@@ -1,8 +1,10 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Chain } from '@starknet-react/chains'
-import { DojoChainConfig, dojoContextConfig, getStarknetProviderChains } from '@/lib/dojo/setup/config'
+import { DojoChainConfig, dojoContextConfig, getStarknetProviderChains, isChainIdSupported } from '@/lib/dojo/setup/config'
 import { CHAIN_ID } from '@/lib/dojo/setup/chains'
+import { BigNumberish } from 'starknet'
+import { feltToString } from '@/lib/utils/starknet'
 
 export type DojoChainsResult = ReturnType<typeof useDojoChains>
 
@@ -30,6 +32,22 @@ export const useDojoChains = (intialChainId: CHAIN_ID, supportedChainIds: CHAIN_
     selectChainId,
     isKatana,
     chains,
+  }
+}
+
+
+export const useChainConfig = (chain_id: CHAIN_ID | BigNumberish) => {
+  const chainId = useMemo<CHAIN_ID>(() => (
+    ((typeof chain_id === 'string' && !chain_id.startsWith('0x')) ? chain_id : feltToString(chain_id ?? 0n)) as CHAIN_ID
+  ), [chain_id])  
+  const isSupported = useMemo(() => (isChainIdSupported(chainId)), [chainId])
+  const chainConfig = useMemo(() => (dojoContextConfig[chainId] ?? null), [chainId])
+  const chainName = useMemo(() => (chainConfig?.name ?? null), [chainConfig])
+  return {
+    chainId,
+    isSupported,
+    chainName,
+    chainConfig,
   }
 }
 

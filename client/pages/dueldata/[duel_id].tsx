@@ -3,14 +3,13 @@ import { useRouter } from 'next/router'
 import { Container, Divider, Table } from 'semantic-ui-react'
 import { bigintToHex } from '@/lib/utils/types'
 import { formatTimestamp } from '@/lib/utils/timestamp'
-import AppPistols from '@/pistols/components/AppPistols'
+import { weiToEth } from '@/lib/utils/starknet'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ActionEmojis, ActionNames, ChallengeStateNames, RoundStateNames } from '@/pistols/utils/pistols'
-import { BigNumberish } from 'starknet'
 import { useWager } from '@/pistols/hooks/useWager'
-import { weiToEth } from '@/lib/utils/starknet'
 import { useCoin } from '@/pistols/hooks/useConfig'
+import AppPistols from '@/pistols/components/AppPistols'
 
 const Row = Table.Row
 const Cell = Table.Cell
