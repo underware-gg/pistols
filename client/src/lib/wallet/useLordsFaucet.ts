@@ -15,7 +15,7 @@ export interface FaucetInterface {
 }
 
 export const useLordsFaucet = (contractAddress): FaucetInterface => {
-  const { dojoProvider } = useDojo()
+  const { setup: { dojoProvider } } = useDojo()
   const { account } = useDojoAccount()
 
   const mockAddress = useMemo(() => {
