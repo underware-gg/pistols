@@ -2,22 +2,22 @@ import React from 'react'
 import { useRouter } from 'next/navigation'
 import { Divider, Grid, Icon } from 'semantic-ui-react'
 import { VStack, VStackRow } from '@/lib/ui/Stack'
-import { useAccount } from '@starknet-react/core'
 import { useDojoAccount } from '@/dojo/DojoContext'
+import { useDojoWallet } from '@/lib/dojo/hooks/useDojoWallet'
 import { AccountMenuKey, usePistolsContext } from '../hooks/PistolsContext'
 import { AccountsList } from '@/pistols/components/account/AccountsList'
 import { ActionButton } from './ui/Buttons'
+import { LordsBagIcon } from './account/Wager'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import WalletHeader from '@/pistols/components/account/WalletHeader'
 import OnboardingModal from './account/OnboardingModal'
 import Logo from './Logo'
-import { LordsBagIcon } from './account/Wager'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export default function Gate() {
-  const { isConnected } = useAccount()
+  const { isConnected, isCorrectChain } = useDojoWallet()
   return (
     <div className='UIContainer'>
 
@@ -27,16 +27,28 @@ export default function Gate() {
         <h1>Pistols at Ten Blocks</h1>
 
         <hr />
+
+        {!isConnected ?
+          <span className='Title'>
+            This game requires need a <b>Starknet wallet</b>
+            <br />and some <LordsBagIcon /><b>LORDS</b> to play
+          </span>
+          : <WalletHeader />
+        }
+
       </VStack>
 
-      {isConnected ? <ConnectedGate /> : <DisconnectedGate />}
+      {isCorrectChain ? <ConnectedGate /> : <DisconnectedGate switchChain={isConnected && !isCorrectChain} />}
 
     </div>
   )
 }
 
 
-function DisconnectedGate() {
+function DisconnectedGate({
+  switchChain = false,
+}) {
+  // const { isConnected, isCorrectChain } = useDojoWallet()
   const { connectOpener } = usePistolsContext()
   const router = useRouter()
 
@@ -47,12 +59,8 @@ function DisconnectedGate() {
   return (
     <>
       <VStack>
-        <span className='Title'>
-          This game requires need a <b>Starknet wallet</b>
-          <br />and some <LordsBagIcon /><b>LORDS</b> to play
-        </span>
 
-        <ActionButton fill large onClick={() => connectOpener.open()} label='Connect Wallet' />
+        <ActionButton fill large onClick={() => connectOpener.open()} label={switchChain ? 'Switch Chain' :'Connect Wallet'} />
 
         <Divider />
 
@@ -86,7 +94,6 @@ function ConnectedGate() {
   return (
     <>
       <VStack>
-        <WalletHeader />
 
         <VStackRow>
           {/* <ActionButton fill disabled={isDeploying} onClick={() => create()} label='Create Duelist' /> */}

@@ -1,13 +1,16 @@
 import { ReactNode, createContext, useContext, useMemo } from 'react'
 import { BurnerAccount, useBurnerManager } from "@dojoengine/create-burner"
-import { Account } from "starknet";
-import { SetupResult } from "./setup";
+import { DojoChainConfig } from '@/lib/dojo/setup/config';
 import { bigintEquals } from "@/lib/utils/types";
+import { SetupResult } from "./setup";
+import { Account, AccountInterface } from "starknet";
 
-interface DojoContextType extends SetupResult {
+interface DojoContextType {
+  setup: SetupResult;
   masterAccount: Account;
-  account: Account | null;
+  account: AccountInterface | null;
   burner: BurnerAccount;
+  dojoChainConfig: DojoChainConfig,
 }
 
 export const DojoContext = createContext<DojoContextType | null>(null);
@@ -23,7 +26,7 @@ export const DojoProvider = ({
   if (currentValue) throw new Error("DojoProvider can only be used once");
 
   const {
-    config: { masterAddress, masterPrivateKey },
+    dojoChainConfig: { masterAddress, masterPrivateKey },
     burnerManager,
     dojoProvider,
   } = value;
@@ -46,7 +49,8 @@ export const DojoProvider = ({
   return (
     <DojoContext.Provider
       value={{
-        ...value,
+        setup: value,
+        dojoChainConfig: value.dojoChainConfig,
         masterAccount,
         account: burner.account ?? masterAccount,
         burner,
@@ -59,17 +63,12 @@ export const DojoProvider = ({
 
 
 
-export const useDojo = () => {
+export const useDojo = (): DojoContextType => {
   const context = useContext(DojoContext);
   if (!context)
     throw new Error("The `useDojo` hook must be used within a `DojoProvider`");
 
-  return {
-    setup: context,
-    burner: context.burner,
-    account: context.account,
-    dojoProvider: context.dojoProvider,
-  };
+  return context;
 };
 
 
@@ -77,15 +76,20 @@ export const useDojo = () => {
 // NEW
 //
 
-export const useDojoAccount = () => {
-  const { setup, burner, account } = useDojo()
+export const useDojoAccount = (): BurnerAccount & {
+  masterAccount: Account
+  account: AccountInterface
+  accountAddress: bigint
+  isMasterAccount: boolean
+} => {
+  const { burner, account, masterAccount } = useDojo()
   // account: { create, list, select, account, isDeploying }
   return {
     ...burner,
+    masterAccount,
     account,
     accountAddress: BigInt(account?.address ?? 0),
-    masterAccount: setup.masterAccount,
-    isMasterAccount: bigintEquals(setup.masterAccount.address, account.address),
+    isMasterAccount: bigintEquals(masterAccount.address, account.address),
   }
 }
 

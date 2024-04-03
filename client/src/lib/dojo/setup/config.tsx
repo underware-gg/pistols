@@ -3,6 +3,7 @@ import { Chain, mainnet, sepolia } from '@starknet-react/chains'
 import { KATANA_CLASS_HASH } from '@dojoengine/core'
 import manifest from '../../../manifest.json'
 import * as chains from './chains'
+import { feltToString } from '@/lib/utils/starknet'
 
 // based on:
 // https://github.com/cartridge-gg/rollyourown/blob/market_packed/web/src/dojo/setup/config.ts
@@ -12,12 +13,12 @@ export type DojoContextConfig = typeof dojoContextConfig
 export type DojoChainConfig = {
   name: string
   chainConfig: Chain
-  rpcUrl?: string
+  rpcUrl: string
   toriiUrl: string,
   toriiWsUrl: string,
-  masterAddress?: string,
-  masterPrivateKey?: string,
-  accountClassHash?: string,
+  masterAddress: string,
+  masterPrivateKey: string,
+  accountClassHash: string,
   manifest: any,
   predeployedAccounts: PredeployedAccount[]
 }
@@ -98,9 +99,9 @@ export const dojoContextConfig: Record<chains.CHAIN_ID, DojoChainConfig> = {
   [chains.CHAIN_ID.SN_MAINNET]: snMainnetConfig,
 }
 
-export const getDojoChains = (): DojoChainConfig[] => {
-  return Object.values(dojoContextConfig)
-}
+// export const getDojoChains = (): DojoChainConfig[] => {
+//   return Object.values(dojoContextConfig)
+// }
 
 export const isChainIdSupported = (chainId: chains.CHAIN_ID): boolean => {
   return Object.keys(dojoContextConfig).includes(chainId)

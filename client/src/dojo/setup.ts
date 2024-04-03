@@ -15,15 +15,15 @@ export type SetupResult = Awaited<ReturnType<typeof setup>>
  *
  * @returns An object containing network configurations, client components, and system calls.
  */
-export async function setup({ ...config }: DojoChainConfig) {
+export async function setup(dojoChainConfig: DojoChainConfig) {
 
   const toriiClient = await torii.createClient([], {
-    rpcUrl: config.rpcUrl,
-    toriiUrl: config.toriiUrl,
-    worldAddress: config.manifest.world.address || '',
+    rpcUrl: dojoChainConfig.rpcUrl,
+    toriiUrl: dojoChainConfig.toriiUrl,
+    worldAddress: dojoChainConfig.manifest.world.address || '',
   })
 
-  const dojoProvider = new DojoProvider(config.manifest, config.rpcUrl)
+  const dojoProvider = new DojoProvider(dojoChainConfig.manifest, dojoChainConfig.rpcUrl)
 
   // Initialize the network configuration.
   const network = setupNetwork(dojoProvider)
@@ -39,23 +39,23 @@ export async function setup({ ...config }: DojoChainConfig) {
 
   // Establish system calls using the network and components.
   //@ts-ignore
-  const systemCalls = createSystemCalls(network, components, config.manifest)
+  const systemCalls = createSystemCalls(network, components, dojoChainConfig.manifest)
 
   // create burner manager
   const burnerManager = new BurnerManager({
     masterAccount: new Account(
       dojoProvider.provider,
-      config.masterAddress,
-      config.masterPrivateKey
+      dojoChainConfig.masterAddress,
+      dojoChainConfig.masterPrivateKey
     ),
-    accountClassHash: config.accountClassHash,
+    accountClassHash: dojoChainConfig.accountClassHash,
     rpcProvider: dojoProvider.provider,
   });
 
   await burnerManager.init(true);
 
   return {
-    config,
+    dojoChainConfig,
     dojoProvider,
     toriiClient,
     network,

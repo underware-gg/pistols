@@ -7,7 +7,7 @@ const Col = Grid.Column
 
 export function VStack(props: GridProps & {
   className?: string
-  children: ReactElement[]
+  children: ReactElement | ReactElement[]
 }) {
   const elements = useMemo(() => (Array.isArray(props.children) ? props.children : [props.children]), [props.children])
   // const _VStackRowType = React.createElement(VStackRow).type;

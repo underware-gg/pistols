@@ -1,7 +1,6 @@
-import React, { ReactNode, useMemo, useState } from 'react'
-import { DojoConfig, createDojoConfig } from '@dojoengine/core'
+import React, { ReactNode, useState } from 'react'
 import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
-import { dojoContextConfig, isChainIdSupported } from '@/lib/dojo/setup/config'
+import { isChainIdSupported } from '@/lib/dojo/setup/config'
 import { CHAIN_ID } from '@/lib/dojo/setup/chains'
 import { StarknetProvider } from '@/lib/dojo/StarknetProvider'
 import { useDojoChains } from '@/lib/dojo/hooks/useDojoChains'
@@ -11,7 +10,7 @@ import App from '@/lib/ui/App'
 
 // TODO: Move into lib or pass as prop
 import { DojoProvider } from '@/dojo/DojoContext'
-import { setup } from '@/dojo/setup'
+import { SetupResult, setup } from '@/dojo/setup'
 import manifest from '../../manifest.json'
 
 export default function AppDojo({
@@ -52,7 +51,7 @@ function Providers({
 
   const { selectedChainConfig, selectedChainId, selectChainId, isKatana, chains } = useDojoChains(intialChainId, supportedChainIds);
 
-  const [setupResult, setSetupResult] = useState(null)
+  const [setupResult, setSetupResult] = useState<SetupResult>(null)
 
   useEffectOnce(() => {
     let _mounted = true
