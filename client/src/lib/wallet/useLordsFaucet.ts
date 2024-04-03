@@ -17,11 +17,11 @@ export interface FaucetInterface {
 }
 
 export const useLordsFaucet = (contractAddress): FaucetInterface => {
-  const { setup: { dojoProvider } } = useDojo()
+  const { setup: { dojoProvider, manifest } } = useDojo()
   const { account } = useDojoAccount()
 
   const mockAddress = useMemo(() => {
-    const mockContract = getContractByName(dojoProvider.manifest, 'lords_mock')
+    const mockContract = getContractByName(manifest, 'lords_mock')
     return mockContract?.address ?? 0
   }, [dojoProvider])
   const hasFaucet = mockAddress && bigintEquals(mockAddress, contractAddress)

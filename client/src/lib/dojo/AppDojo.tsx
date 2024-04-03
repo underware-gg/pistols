@@ -13,6 +13,7 @@ import { DojoProvider } from '@/dojo/DojoContext'
 import { SetupResult, setup } from '@/dojo/setup'
 
 export interface DojoAppConfig {
+  manifest: any,
   supportedChainIds: CHAIN_ID[],
 }
 
@@ -59,7 +60,7 @@ function Providers({
   useEffectOnce(() => {
     let _mounted = true
     const _setup = async () => {
-      const result = await setup(selectedChainConfig)
+      const result = await setup(selectedChainConfig, dojoAppConfig.manifest)
       console.log('CHAIN SETUP OK')
       if (_mounted) {
         setSetupResult(result)
