@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation'
 import { Divider, Grid, Icon } from 'semantic-ui-react'
 import { VStack, VStackRow } from '@/lib/ui/Stack'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
-import { useDojoWallet } from '@/lib/dojo/hooks/useDojoWallet'
+import { useDojoChain } from '@/lib/dojo/hooks/useDojoChain'
 import { AccountMenuKey, usePistolsContext } from '../hooks/PistolsContext'
 import { AccountsList } from '@/pistols/components/account/AccountsList'
 import { ActionButton } from './ui/Buttons'
@@ -18,7 +18,7 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export default function Gate() {
-  const { isConnected, isCorrectChain } = useDojoWallet()
+  const { isConnected, isCorrectChain } = useDojoChain()
   return (
     <div className='UIContainer'>
 
@@ -49,7 +49,7 @@ export default function Gate() {
 function DisconnectedGate({
   switchChain = false,
 }) {
-  // const { isConnected, isCorrectChain } = useDojoWallet()
+  // const { isConnected, isCorrectChain } = useDojoChain()
   const { connectOpener } = usePistolsContext()
   const router = useRouter()
 

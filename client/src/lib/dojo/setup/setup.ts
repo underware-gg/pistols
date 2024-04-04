@@ -17,15 +17,15 @@ export type SetupResult = Awaited<ReturnType<typeof setup>>
  *
  * @returns An object containing network configurations, client components, and system calls.
  */
-export async function setup(dojoChainConfig: DojoChainConfig, manifest: any) {
+export async function setup(selectedChainConfig: DojoChainConfig, manifest: any) {
 
   const toriiClient = await torii.createClient([], {
-    rpcUrl: dojoChainConfig.rpcUrl,
-    toriiUrl: dojoChainConfig.toriiUrl,
+    rpcUrl: selectedChainConfig.rpcUrl,
+    toriiUrl: selectedChainConfig.toriiUrl,
     worldAddress: manifest.world.address || '',
   })
 
-  const dojoProvider = new DojoProvider(manifest, dojoChainConfig.rpcUrl)
+  const dojoProvider = new DojoProvider(manifest, selectedChainConfig.rpcUrl)
 
   // Initialize the network configuration.
   const network = setupNetwork(dojoProvider)
@@ -47,10 +47,10 @@ export async function setup(dojoChainConfig: DojoChainConfig, manifest: any) {
   const burnerManager = new BurnerManager({
     masterAccount: new Account(
       dojoProvider.provider,
-      dojoChainConfig.masterAddress,
-      dojoChainConfig.masterPrivateKey
+      selectedChainConfig.masterAddress,
+      selectedChainConfig.masterPrivateKey
     ),
-    accountClassHash: dojoChainConfig.accountClassHash,
+    accountClassHash: selectedChainConfig.accountClassHash,
     rpcProvider: dojoProvider.provider,
   });
 
@@ -58,7 +58,6 @@ export async function setup(dojoChainConfig: DojoChainConfig, manifest: any) {
 
   return {
     manifest,
-    dojoChainConfig,
     dojoProvider,
     toriiClient,
     network,

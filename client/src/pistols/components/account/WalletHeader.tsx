@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { Grid, Image } from 'semantic-ui-react'
 import { useAccount, useDisconnect, useStarkProfile } from '@starknet-react/core'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
-import { useDojoWallet } from '@/lib/dojo/hooks/useDojoWallet'
+import { useDojoChain } from '@/lib/dojo/hooks/useDojoChain'
 import { LordsBalance } from '@/pistols/components/account/LordsBalance'
 import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
@@ -15,7 +15,7 @@ export default function WalletHeader({
 }) {
   const { disconnect } = useDisconnect()
   const { account, address, connector, isConnected, chainId } = useAccount()
-  const { connectedChainName } = useDojoWallet()
+  const { connectedChainName } = useDojoChain()
 
   // BUG: https://github.com/apibara/starknet-react/issues/419
   // const { data, error, isLoading } = useStarkProfile({ address, enabled: false })

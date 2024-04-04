@@ -1,8 +1,8 @@
 import { Account, AccountInterface } from 'starknet'
-import { useCoin, COIN_LORDS } from '@/pistols/hooks/useConfig'
+import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { useLordsFaucet } from '@/lib/wallet/useLordsFaucet'
+import { useCoin, COIN_LORDS } from '@/pistols/hooks/useConfig'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { useDojo } from '@/lib/dojo/DojoContext'
 
 export const LordsFaucet = ({
   fill = false,
@@ -15,17 +15,17 @@ export const LordsFaucet = ({
   disabled?: boolean
   account?: Account | AccountInterface
 }) => {
-  const { setup: { dojoChainConfig } } = useDojo()
+  const { selectedChainConfig } = useStarknetContext()
 
   const { contractAddress } = useCoin(COIN_LORDS)
   const { faucet, hasFaucet, isPending } = useLordsFaucet(contractAddress)
 
-  const _hasFaucet = hasFaucet || Boolean(dojoChainConfig.lordsFaucetUrl)
+  const _hasFaucet = hasFaucet || Boolean(selectedChainConfig.lordsFaucetUrl)
 
   const onClick = () => {
     if (!isPending) {
-      if (dojoChainConfig.lordsFaucetUrl) {
-        window?.open(dojoChainConfig.lordsFaucetUrl, '_blank')
+      if (selectedChainConfig.lordsFaucetUrl) {
+        window?.open(selectedChainConfig.lordsFaucetUrl, '_blank')
       } else if (hasFaucet) {
         faucet(account)
       }

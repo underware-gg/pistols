@@ -1,13 +1,12 @@
 import React, { ReactNode, useState } from 'react'
 import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
-import { isChainIdSupported } from '@/lib/dojo/setup/chainConfig'
-import { CHAIN_ID } from '@/lib/dojo/setup/chains'
-import { SetupResult, setup } from '@/lib/dojo/setup/setup'
+import { StarknetProvider, useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { DojoProvider } from '@/lib/dojo/DojoContext'
-import { StarknetProvider } from '@/lib/dojo/StarknetProvider'
-import { useDojoChains } from '@/lib/dojo/hooks/useDojoChains'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
+import { SetupResult, setup } from '@/lib/dojo/setup/setup'
 import { HeaderData } from '@/lib/ui/AppHeader'
+import { feltToString } from '@/lib/utils/starknet'
+import { CHAIN_ID } from '@/lib/dojo/setup/chains'
 import App from '@/lib/ui/App'
 
 export interface DojoAppConfig {
@@ -26,53 +25,48 @@ export default function AppDojo({
   dojoAppConfig: DojoAppConfig,
   children: ReactNode
 }) {
+
   return (
     <App headerData={headerData} backgroundImage={backgroundImage}>
-      <Providers dojoAppConfig={dojoAppConfig}>
-        {children}
-      </Providers>
+      <StarknetProvider supportedChainIds={dojoAppConfig.supportedChainIds}>
+        <SetupDojoProvider dojoAppConfig={dojoAppConfig}>
+          {children}
+        </SetupDojoProvider>
+      </StarknetProvider>
     </App>
   );
 }
 
-function Providers({
+function SetupDojoProvider({
   dojoAppConfig,
   children,
 }: {
   dojoAppConfig: DojoAppConfig,
   children: ReactNode
 }) {
-  const defaultChainId = (process.env.NEXT_PUBLIC_CHAIN_ID ?? (
-    process.env.NODE_ENV === 'development' ? CHAIN_ID.KATANA
-      : dojoAppConfig.supportedChainIds[0]
-  )) as CHAIN_ID
-
-  const lastSelectedChainId = (typeof window !== 'undefined' ? window?.localStorage?.getItem('lastSelectedChainId') : undefined) as CHAIN_ID
-
-  const intialChainId = isChainIdSupported(lastSelectedChainId) ? lastSelectedChainId : defaultChainId
-
-  const { selectedChainConfig, selectedChainId, selectChainId, isKatana, chains } = useDojoChains(intialChainId, dojoAppConfig.supportedChainIds);
+  const { selectedChainConfig } = useStarknetContext()
 
   const [setupResult, setSetupResult] = useState<SetupResult>(null)
 
   useEffectOnce(() => {
     let _mounted = true
     const _setup = async () => {
+      const chainName = feltToString(selectedChainConfig.chain.id)
       const result = await setup(selectedChainConfig, dojoAppConfig.manifest)
-      console.log('CHAIN SETUP OK')
+      console.log(`Chain [${chainName}] loaded!`)
       if (_mounted) {
         setSetupResult(result)
       }
     }
     if (!selectedChainConfig) {
-      throw `Invlaid config for chain Id [${selectedChainId}]`
+      throw `Invalid config for chain Id`
     }
     setSetupResult(null)
     _setup()
     return () => {
       _mounted = false
     }
-  }, [selectedChainConfig, selectedChainId])
+  }, [selectedChainConfig])
 
   if (!setupResult) {
     return (
@@ -84,10 +78,8 @@ function Providers({
   }
 
   return (
-    <StarknetProvider dojoChainConfig={selectedChainConfig} chains={chains}>
-      <DojoProvider value={setupResult}>
-        {children}
-      </DojoProvider>
-    </StarknetProvider>
-  );
+    <DojoProvider value={setupResult}>
+      {children}
+    </DojoProvider>
+  )
 }

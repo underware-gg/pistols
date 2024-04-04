@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Modal, Button, Image } from 'semantic-ui-react'
 import { useConnect, Connector, useAccount } from '@starknet-react/core'
+import { useDojoChain } from '@/lib/dojo/hooks/useDojoChain'
 import { Opener } from '@/lib/ui/useOpener'
-import { VStack } from '../ui/Stack'
-import { useDojoWallet } from './hooks/useDojoWallet'
+import { VStack } from '@/lib/ui/Stack'
 
 
 export default function StarknetConnectModal({
@@ -11,7 +11,7 @@ export default function StarknetConnectModal({
 }: {
   opener: Opener
 }) {
-  const { isConnected, isCorrectChain } = useDojoWallet()
+  const { isConnected, isCorrectChain } = useDojoChain()
 
   useEffect(() => {
     if (isCorrectChain) {
@@ -61,7 +61,7 @@ function ConnectButtons() {
 }
 
 function SwitchChainButtons() {
-  const { connectedChainName, selectedChainName, switch_network, add_network } = useDojoWallet()
+  const { connectedChainName, selectedChainName, switch_network, add_network } = useDojoChain()
   const [chainExists, setChainExists] = useState(true)
   const [isBusy, setIsBusy] = useState(false)
 

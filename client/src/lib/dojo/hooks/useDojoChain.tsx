@@ -2,8 +2,12 @@
 import { useCallback, useMemo } from 'react'
 import { SwitchStarknetChainParameter, AddStarknetChainParameters } from 'get-starknet-core'
 import { useAccount } from '@starknet-react/core'
-import { useChainConfig } from '@/lib/dojo/hooks/useDojoChains'
-import { useDojo } from '@/lib/dojo/DojoContext'
+import { dojoContextConfig, isChainIdSupported } from '@/lib/dojo/setup/chainConfig'
+import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
+import { feltToString } from '@/lib/utils/starknet'
+import { CHAIN_ID } from '@/lib/dojo/setup/chains'
+import { BigNumberish } from 'starknet'
+
 
 interface AddStarknetChainParametersImpl extends AddStarknetChainParameters {
   // accountImplementation: string, // ArgentX class hash (BUGGED)
@@ -12,12 +16,12 @@ interface AddStarknetChainParametersImpl extends AddStarknetChainParameters {
   rpcUrl: string,
 }
 
-export const useDojoWallet = () => {
-  const { dojoChainConfig } = useDojo()
+export const useDojoChain = () => {
+  const { selectedChainConfig } = useStarknetContext()
   const { isConnecting, isConnected, chainId, connector } = useAccount()
 
-  const { chainId: selectedChainId, chainName: selectedChainName } = useChainConfig(dojoChainConfig.chainConfig.id)
-  const { chainId: connectedChainId, chainName: connectedChainName } = useChainConfig(chainId)
+  const { chainId: selectedChainId, chainName: selectedChainName } = useDojoChainConfig(selectedChainConfig.chain.id)
+  const { chainId: connectedChainId, chainName: connectedChainName } = useDojoChainConfig(chainId)
 
   const isCorrectChain = useMemo(() => {
     const result = (isConnected && connectedChainId == selectedChainId)
@@ -45,20 +49,20 @@ export const useDojoWallet = () => {
     const params: AddStarknetChainParametersImpl = {
       id: selectedChainId,
       chainId: selectedChainId,
-      chainName: dojoChainConfig.name,
-      baseUrl: dojoChainConfig.rpcUrl,
-      rpcUrl: dojoChainConfig.rpcUrl,
-      rpcUrls: [dojoChainConfig.rpcUrl],
-      nativeCurrency: dojoChainConfig.chainConfig.nativeCurrency,
-      // accountImplementation: dojoChainConfig.accountClassHash,
-      accountClassHash: dojoChainConfig.accountClassHash,
-      classHash: dojoChainConfig.accountClassHash,
+      chainName: selectedChainConfig.name,
+      baseUrl: selectedChainConfig.rpcUrl,
+      rpcUrl: selectedChainConfig.rpcUrl,
+      rpcUrls: [selectedChainConfig.rpcUrl],
+      nativeCurrency: selectedChainConfig.chain.nativeCurrency,
+      // accountImplementation: selectedChainConfig.accountClassHash,
+      accountClassHash: selectedChainConfig.accountClassHash,
+      classHash: selectedChainConfig.accountClassHash,
       // blockExplorerUrls?: string[],
       // iconUrls?: string[],
     }
     console.log(`wallet_addStarknetChain...`, params)
     return window?.starknet?.request({ type: 'wallet_addStarknetChain', params }) ?? Promise.resolve(false)
-  }, [selectedChainId, dojoChainConfig])
+  }, [selectedChainId, selectedChainConfig])
 
   return {
     isConnecting,
@@ -68,8 +72,23 @@ export const useDojoWallet = () => {
     connectedChainName,
     selectedChainId,
     selectedChainName,
-    dojoChainConfig,
+    selectedChainConfig,
     switch_network,
     add_network,
+  }
+}
+
+export const useDojoChainConfig = (chain_id: CHAIN_ID | BigNumberish) => {
+  const chainId = useMemo<CHAIN_ID>(() => (
+    ((typeof chain_id === 'string' && !chain_id.startsWith('0x')) ? chain_id : feltToString(chain_id ?? 0n)) as CHAIN_ID
+  ), [chain_id])
+  const isSupported = useMemo(() => (isChainIdSupported(chainId)), [chainId])
+  const chainConfig = useMemo(() => (dojoContextConfig[chainId] ?? null), [chainId])
+  const chainName = useMemo(() => (chainConfig?.name ?? null), [chainConfig])
+  return {
+    chainId,
+    isSupported,
+    chainName,
+    chainConfig,
   }
 }

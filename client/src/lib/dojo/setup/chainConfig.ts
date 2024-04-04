@@ -10,7 +10,7 @@ export type DojoContextConfig = typeof dojoContextConfig
 
 export type DojoChainConfig = {
   name: string
-  chainConfig: Chain
+  chain: Chain
   rpcUrl: string
   toriiUrl: string,
   toriiWsUrl: string,
@@ -24,7 +24,7 @@ export type DojoChainConfig = {
 
 const localKatanaConfig: DojoChainConfig = {
   name: chains.katanaLocalChain.name,
-  chainConfig: chains.katanaLocalChain,
+  chain: chains.katanaLocalChain,
   rpcUrl: process.env.NEXT_PUBLIC_RPC_ENDPOINT ?? 'http://localhost:5050',
   toriiUrl: process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT ?? 'http://0.0.0.0:8080',
   toriiWsUrl: process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT_WS ?? 'ws://0.0.0.0:8080/ws',
@@ -38,7 +38,7 @@ const localKatanaConfig: DojoChainConfig = {
 
 const pistolsSlotConfig: DojoChainConfig = {
   name: chains.pistolsSlotChain.name,
-  chainConfig: chains.pistolsSlotChain,
+  chain: chains.pistolsSlotChain,
   rpcUrl: 'https://api.cartridge.gg/x/pistols/katana',
   toriiUrl: 'https://api.cartridge.gg/x/pistols/torii',
   toriiWsUrl: 'wss://api.cartridge.gg/x/pistols/torii/ws',
@@ -54,7 +54,7 @@ const pistolsSlotConfig: DojoChainConfig = {
 // https://dev.realms.world/browser-wallets
 const realmsWorldConfig: DojoChainConfig = {
   name: chains.realmsWorldChain.name,
-  chainConfig: chains.realmsWorldChain,
+  chain: chains.realmsWorldChain,
   rpcUrl: 'https://api.cartridge.gg/x/realms/katana',
   toriiUrl: 'https://api.cartridge.gg/x/realms/torii',
   toriiWsUrl: 'wss://api.cartridge.gg/x/realms/torii/ws',
@@ -68,7 +68,7 @@ const realmsWorldConfig: DojoChainConfig = {
 
 const snSepoliaConfig: DojoChainConfig = {
   name: 'Starknet Sepolia',
-  chainConfig: sepolia,
+  chain: sepolia,
   rpcUrl: 'https://api.cartridge.gg/rpc/starknet-sepolia',
   toriiUrl: undefined,
   toriiWsUrl: undefined,
@@ -82,7 +82,7 @@ const snSepoliaConfig: DojoChainConfig = {
 
 const snMainnetConfig: DojoChainConfig = {
   name: 'Starknet Mainnet',
-  chainConfig: mainnet,
+  chain: mainnet,
   rpcUrl: 'https://api.cartridge.gg/rpc/starknet',
   toriiUrl: undefined,
   toriiWsUrl: undefined,
@@ -114,7 +114,7 @@ export const isChainIdSupported = (chainId: chains.CHAIN_ID): boolean => {
 export const getStarknetProviderChains = (supportedChainIds: chains.CHAIN_ID[]): Chain[] => {
   return Object.keys(dojoContextConfig).reduce((acc, chain_id) => {
     if (supportedChainIds.includes(chain_id as chains.CHAIN_ID)) {
-      acc.push(dojoContextConfig[chain_id].chainConfig)
+      acc.push(dojoContextConfig[chain_id].chain)
     }
     return acc
   }, [])
