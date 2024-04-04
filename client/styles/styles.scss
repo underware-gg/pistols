@@ -1006,6 +1006,13 @@ input::placeholder {
   color: $color-text!important;
   border-top: $border-hr;
 }
+.ui.floating.dropdown>.menu {
+  @extend ._round_border;
+  margin-top: 0!important;
+}
+.ui.dropdown .menu>.item {
+  color: $color-brightest!important;
+}
 // forms
 .FormLabel {
   @extend .TitleCase;

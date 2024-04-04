@@ -1,11 +1,9 @@
-import React, { ReactNode, useState } from 'react'
-import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
+import React, { ReactNode, useEffect, useState } from 'react'
 import { StarknetProvider, useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { DojoProvider } from '@/lib/dojo/DojoContext'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { SetupResult, setup } from '@/lib/dojo/setup/setup'
 import { HeaderData } from '@/lib/ui/AppHeader'
-import { feltToString } from '@/lib/utils/starknet'
 import { CHAIN_ID } from '@/lib/dojo/setup/chains'
 import App from '@/lib/ui/App'
 
@@ -48,16 +46,16 @@ function SetupDojoProvider({
 
   const [setupResult, setSetupResult] = useState<SetupResult>(null)
 
-  useEffectOnce(() => {
+  useEffect(() => {
     let _mounted = true
     const _setup = async () => {
-      const chainName = feltToString(selectedChainConfig.chain.id)
       const result = await setup(selectedChainConfig, dojoAppConfig.manifest)
-      console.log(`Chain [${chainName}] loaded!`)
+      console.log(`Chain [${selectedChainConfig.name}] loaded!`)
       if (_mounted) {
         setSetupResult(result)
       }
     }
+    console.log(`DOJO:`, selectedChainConfig)
     if (!selectedChainConfig) {
       throw `Invalid config for chain Id`
     }

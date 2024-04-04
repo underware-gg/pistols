@@ -11,7 +11,7 @@ interface StarknetContextType {
   selectedChainConfig: DojoChainConfig
   selectChainId: (chainId: CHAIN_ID) => void 
   isKatana: boolean
-  // chains: Chain[]
+  chains: Chain[]
 }
 
 export const StarknetContext = createContext<StarknetContextType>(null)
@@ -77,7 +77,7 @@ export const StarknetProvider = ({
   const provider = jsonRpcProvider({ rpc })
   const connectors = [
     argent(),
-    braavos(),
+    // braavos(),
   ]
 
   return (
@@ -88,7 +88,7 @@ export const StarknetProvider = ({
         selectedChainConfig,
         selectChainId,
         isKatana,
-        // chains,
+        chains,
       }}
     >
       <StarknetConfig

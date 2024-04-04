@@ -31,7 +31,7 @@ export function OnboardingProfile({
     )
   }, [selectedProfilePic, profilePic, address])
 
-  const defaultAccountName = useMemo(() => (`Duelist #${accountIndex + 1}`), [accountIndex])
+  const defaultAccountName = useMemo(() => (`Duelist #${accountIndex}`), [accountIndex])
   const [inputValue, setInputValue] = useState(null)
   const inputIsValid = useMemo(() => (inputValue?.length >= 3), [inputValue])
   const isUpdated = useMemo(() => (name == inputValue && profilePic == _profilePic), [name, inputValue, profilePic, _profilePic])
@@ -41,7 +41,7 @@ export function OnboardingProfile({
   // initialize
   useEffectOnce(() => {
     if (inputValue == null) {
-      setInputValue(name ?? defaultAccountName)
+      setInputValue(name ?? '')
     } else if (inputValue != name) {
       setInputValue(name)
     }
@@ -77,7 +77,7 @@ export function OnboardingProfile({
             <div className='Spacer5' />
             <Input fluid
               maxLength={31}
-              placeholder={'Duelist Name'}
+              placeholder={defaultAccountName}
               value={inputValue ?? ''}
               disabled={!account || !address}
               onChange={(e) => setInputValue(e.target.value)}
