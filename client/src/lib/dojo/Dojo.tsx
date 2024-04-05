@@ -4,6 +4,7 @@ import { DojoProvider } from '@/lib/dojo/DojoContext'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { SetupResult, setup } from '@/lib/dojo/setup/setup'
 import { CHAIN_ID } from '@/lib/dojo/setup/chains'
+import { useAccount } from '@starknet-react/core'
 
 export interface DojoConfig {
   manifest: any,
@@ -35,13 +36,15 @@ function SetupDojoProvider({
   children: ReactNode
 }) {
   const { selectedChainConfig } = useStarknetContext()
+  // Connected wallet or Dojo Predeployed (master)
+  const { account } = useAccount()
 
   const [setupResult, setSetupResult] = useState<SetupResult>(null)
 
   useEffect(() => {
     let _mounted = true
     const _setup = async () => {
-      const result = await setup(selectedChainConfig, dojoConfig.manifest)
+      const result = await setup(selectedChainConfig, dojoConfig.manifest, account)
       console.log(`Chain [${selectedChainConfig.name}] loaded!`)
       if (_mounted) {
         setSetupResult(result)
@@ -55,7 +58,7 @@ function SetupDojoProvider({
     return () => {
       _mounted = false
     }
-  }, [selectedChainConfig])
+  }, [selectedChainConfig, account])
 
   if (!setupResult) {
     return <DojoStatus message={'Loading Pistols...'} />

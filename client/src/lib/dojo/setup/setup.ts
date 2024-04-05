@@ -1,10 +1,12 @@
-import { Account, RpcProvider } from 'starknet'
-import { DojoChainConfig } from '@/lib/dojo/setup/chainConfig'
+import { Account, AccountInterface } from 'starknet'
+import { DojoChainConfig, getMasterPredeployedAccount } from '@/lib/dojo/setup/chainConfig'
 import { DojoProvider } from '@dojoengine/core'
 import { getSyncEntities } from '@dojoengine/state'
-import { BurnerManager } from '@dojoengine/create-burner'
-import { setupNetwork } from './setupNetwork'
+import { BurnerManager, PredeployedManager } from '@dojoengine/create-burner'
 import { createClientComponents } from './createClientComponents'
+import { setupNetwork } from './setupNetwork'
+import { feltToString } from '@/lib/utils/starknet'
+import { CHAIN_ID } from './chains'
 import * as torii from '@dojoengine/torii-client'
 
 // TODO: move out of lib
@@ -17,7 +19,7 @@ export type SetupResult = Awaited<ReturnType<typeof setup>>
  *
  * @returns An object containing network configurations, client components, and system calls.
  */
-export async function setup(selectedChainConfig: DojoChainConfig, manifest: any) {
+export async function setup(selectedChainConfig: DojoChainConfig, manifest: any, account: AccountInterface) {
 
   const toriiClient = await torii.createClient([], {
     rpcUrl: selectedChainConfig.rpcUrl,
@@ -45,18 +47,24 @@ export async function setup(selectedChainConfig: DojoChainConfig, manifest: any)
 
   // create burner manager
   const burnerManager = new BurnerManager({
-    masterAccount: new Account(
-      dojoProvider.provider,
-      selectedChainConfig.masterAddress,
-      selectedChainConfig.masterPrivateKey
-    ),
+    // masterAccount: new Account(
+    //   dojoProvider.provider,
+    //   selectedChainConfig.masterAddress,
+    //   selectedChainConfig.masterPrivateKey
+    // ),
+    masterAccount: account ?? new Account(dojoProvider.provider, '0x0', '0x0'),
     accountClassHash: selectedChainConfig.accountClassHash,
     rpcProvider: dojoProvider.provider,
   });
 
   await burnerManager.init(true);
 
-  const rpcProvider = new RpcProvider({ nodeUrl: selectedChainConfig.rpcUrl })
+  const chainId = feltToString(selectedChainConfig.chain.id) as CHAIN_ID
+  const masterPredeployedAccount = getMasterPredeployedAccount(chainId)
+  const predeployedManager = new PredeployedManager({
+    rpcProvider: dojoProvider.provider,
+    predeployedAccounts: [...masterPredeployedAccount, ...selectedChainConfig.predeployedAccounts],
+  })
 
   return {
     manifest,
@@ -67,6 +75,6 @@ export async function setup(selectedChainConfig: DojoChainConfig, manifest: any)
     systemCalls,
     burnerManager,
     selectedChainConfig,
-    rpcProvider,
+    predeployedManager,
   }
 }

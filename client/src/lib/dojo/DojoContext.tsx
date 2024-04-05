@@ -1,10 +1,7 @@
 import { ReactNode, createContext, useContext } from 'react'
-import { BurnerAccount, useBurnerManager, useBurnerWindowObject, usePredeployedWindowObject, PredeployedManager } from '@dojoengine/create-burner'
-import { getMasterPredeployedAccount } from '@/lib/dojo/setup/chainConfig'
+import { BurnerAccount, useBurnerManager, useBurnerWindowObject, usePredeployedWindowObject } from '@dojoengine/create-burner'
 import { bigintEquals } from '@/lib/utils/types'
 import { SetupResult } from '@/lib/dojo/setup/setup'
-import { feltToString } from '@/lib/utils/starknet'
-import { CHAIN_ID } from '@/lib/dojo/setup/chains'
 import { Account } from 'starknet'
 
 interface DojoContextType {
@@ -26,17 +23,12 @@ export const DojoProvider = ({
   const currentValue = useContext(DojoContext);
   if (currentValue) throw new Error('DojoProvider can only be used once');
 
-  const { burnerManager, selectedChainConfig, rpcProvider } = value
+  const { burnerManager, predeployedManager } = value
 
   const masterAccount = burnerManager.masterAccount as Account
   const burner: BurnerAccount = useBurnerManager({ burnerManager, })
 
-  const masterPredeployedAccount = getMasterPredeployedAccount(feltToString(selectedChainConfig.chain.id) as CHAIN_ID)
-  const predeployedManager = new PredeployedManager({
-    rpcProvider: rpcProvider,
-    predeployedAccounts: [...masterPredeployedAccount, ...selectedChainConfig.predeployedAccounts],
-  })
-
+  // create injected connectors asynchronously
   useBurnerWindowObject(burnerManager);
   usePredeployedWindowObject(predeployedManager);
 
@@ -45,7 +37,7 @@ export const DojoProvider = ({
       value={{
         setup: value,
         masterAccount,
-        account: burner.account ? (burner.account as Account) : masterAccount,
+        account: (burner.account ?? masterAccount) as Account,
         burner,
       }}
     >
