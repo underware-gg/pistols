@@ -45,7 +45,7 @@ export default function OnboardingModal({
   const _nextLabel = {
     [AccountMenuKey.Deploy]: 'Fund...',
     [AccountMenuKey.Fund]: 'Profile...',
-    [AccountMenuKey.Profile]: 'Duel!',
+    [AccountMenuKey.Profile]: 'Done!',
   }
 
   const _continue = () => {

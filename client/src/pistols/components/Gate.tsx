@@ -76,9 +76,9 @@ function DisconnectedGate({
 
 
 function ConnectedGate() {
-  const { clear, applyFromClipboard, copyToClipboard, masterAccount, count } = useDojoAccount()
+  const { remove, applyFromClipboard, copyToClipboard, masterAccount, count } = useDojoAccount()
   const { accountSetupOpener, dispatchSetAccountMenu, dispatchSetAccountIndex } = usePistolsContext()
-  const { nextAccountIndex } = useBurners(masterAccount.address)
+  const { burners, nextAccountIndex } = useBurners(masterAccount.address)
 
   const _deployDuelist = () => {
     dispatchSetAccountIndex(nextAccountIndex)
@@ -87,8 +87,9 @@ function ConnectedGate() {
   }
 
   const _deleteAll = () => {
-    clear()
-    location.reload()
+    Object.values(burners).forEach(burner => {
+      remove(burner.address)
+    })
   }
 
   return (
