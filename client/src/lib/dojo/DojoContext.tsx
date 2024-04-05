@@ -1,7 +1,7 @@
 import { ReactNode, createContext, useContext } from 'react'
 import { BurnerAccount, useBurnerManager, useBurnerWindowObject, usePredeployedWindowObject } from '@dojoengine/create-burner'
 import { bigintEquals } from '@/lib/utils/types'
-import { SetupResult } from '@/lib/dojo/setup/setup'
+import { SetupResult } from '@/lib/dojo/setup/useSetup'
 import { Account } from 'starknet'
 
 interface DojoContextType {

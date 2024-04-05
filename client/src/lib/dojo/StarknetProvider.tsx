@@ -62,7 +62,7 @@ export const StarknetProvider = ({
     window?.localStorage?.setItem('lastSelectedChainId', chainId)
   }, [])
 
-  useEffect(() => console.log(`Selected chain:`, selectedChainId, selectedChainConfig), [selectedChainId, selectedChainConfig])
+  useEffect(() => console.log(`Selected chain:`, selectedChainId, selectedChainConfig), [selectedChainConfig])
 
 
   //

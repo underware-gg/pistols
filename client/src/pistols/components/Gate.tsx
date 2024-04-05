@@ -4,6 +4,7 @@ import { Divider, Grid, Icon } from 'semantic-ui-react'
 import { VStack, VStackRow } from '@/lib/ui/Stack'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useDojoChain } from '@/lib/dojo/hooks/useDojoChain'
+import { useBurners } from '@/lib/wallet/useBurnerAccount'
 import { AccountMenuKey, usePistolsContext } from '../hooks/PistolsContext'
 import { AccountsList } from '@/pistols/components/account/AccountsList'
 import { ActionButton } from './ui/Buttons'
@@ -12,7 +13,6 @@ import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import WalletHeader from '@/pistols/components/account/WalletHeader'
 import OnboardingModal from './account/OnboardingModal'
 import Logo from './Logo'
-import { useBurners } from '@/lib/wallet/useBurnerAccount'
 
 const Row = Grid.Row
 const Col = Grid.Column

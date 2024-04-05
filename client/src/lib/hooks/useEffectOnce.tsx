@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, DependencyList } from 'react'
 
-export const useEffectOnce = (effect: () => void, deps: any[]) => {
+export const useEffectOnce = (effect: () => void, deps: DependencyList) => {
   const dataFetch = useRef(false)
   useEffect(() => {
     if (dataFetch.current) return

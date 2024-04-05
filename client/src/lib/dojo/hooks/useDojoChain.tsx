@@ -18,7 +18,7 @@ interface AddStarknetChainParametersImpl extends AddStarknetChainParameters {
 
 export const useDojoChain = () => {
   const { selectedChainConfig } = useStarknetContext()
-  const { isConnecting, isConnected, chainId, connector } = useAccount()
+  const { isConnecting, isConnected, chainId, account, connector } = useAccount()
 
   const { chainId: selectedChainId, chainName: selectedChainName } = useDojoChainConfig(selectedChainConfig.chain.id)
   const { chainId: connectedChainId, chainName: connectedChainName } = useDojoChainConfig(chainId)
@@ -65,6 +65,8 @@ export const useDojoChain = () => {
   }, [selectedChainId, selectedChainConfig])
 
   return {
+    account,
+    connector,
     isConnecting,
     isConnected,
     isCorrectChain,
