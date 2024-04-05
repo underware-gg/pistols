@@ -4,6 +4,7 @@ import { useConnect, Connector, useAccount } from '@starknet-react/core'
 import { useDojoChain } from '@/lib/dojo/hooks/useDojoChain'
 import { Opener } from '@/lib/ui/useOpener'
 import { VStack } from '@/lib/ui/Stack'
+import { useEffectOnce } from '../hooks/useEffectOnce'
 
 
 export default function StarknetConnectModal({
@@ -13,18 +14,25 @@ export default function StarknetConnectModal({
 }) {
   const { isConnected, isCorrectChain } = useDojoChain()
 
+  // always closed on mount
+  const [mounted, setMounted] = useState(false)
+  useEffectOnce(() => {
+    setMounted(true)
+    opener.close()
+  }, [])
+
   useEffect(() => {
     if (isCorrectChain) {
       opener.close()
     }
-  }, [isCorrectChain])
+  }, [isConnected, isCorrectChain])
 
   return (
     <Modal
       size='small'
       className='StarknetConnectModal'
       onClose={() => opener.close()}
-      open={opener.isOpen}
+      open={mounted && opener.isOpen}
     >
       <Modal.Content>
         <Modal.Description className='AlignCenter'>
