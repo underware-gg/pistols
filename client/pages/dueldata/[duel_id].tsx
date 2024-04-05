@@ -22,7 +22,7 @@ export default function StatsPage() {
   const { duel_id } = router.query
 
   return (
-    <AppPistols title={'Duel'} backgroundImage={null}>
+    <AppPistols headerData={{ title: 'Duel' }} backgroundImage={null}>
       {router.isReady &&
         <Stats duelId={BigInt(duel_id as string)} />
       }

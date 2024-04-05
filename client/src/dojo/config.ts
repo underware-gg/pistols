@@ -1,8 +1,8 @@
-import { DojoAppConfig } from '@/lib/dojo/AppDojo'
+import { DojoConfig } from '@/lib/dojo/Dojo'
 import { CHAIN_ID } from '@/lib/dojo/setup/chains'
 import manifest from '../manifest.json'
 
-export const makeDojoAppConfig = (): DojoAppConfig => {
+export const makeDojoConfig = (): DojoConfig => {
   return {
     manifest,
     supportedChainIds: [

@@ -21,13 +21,16 @@ export const useDojoStatus = () => {
 //
 
 export function DojoStatus({
-  label = '',
+  message = 'Loading Dojo...',
 }) {
   const { isError } = useDojoStatus()
   return (
-    <>
-      {/* {isConnected && <span className='Important TitleCase'>connected</span>} */}
-      {isError && <span className='Negative TitleCase'>under maintenance</span>}
-    </>
+    <div>
+      <h1 className='TitleCase'>{message}</h1>
+      <h5>
+        {/* {isConnected && <span className='Important TitleCase'>connected</span>} */}
+        {isError && <span className='Negative TitleCase'>under maintenance</span>}
+      </h5>
+    </div>
   )
 }

@@ -3,43 +3,35 @@ import { StarknetProvider, useStarknetContext } from '@/lib/dojo/StarknetProvide
 import { DojoProvider } from '@/lib/dojo/DojoContext'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { SetupResult, setup } from '@/lib/dojo/setup/setup'
-import { HeaderData } from '@/lib/ui/AppHeader'
 import { CHAIN_ID } from '@/lib/dojo/setup/chains'
-import App from '@/lib/ui/App'
 
-export interface DojoAppConfig {
+export interface DojoConfig {
   manifest: any,
   supportedChainIds: CHAIN_ID[],
 }
 
-export default function AppDojo({
-  headerData = {},
-  backgroundImage = null,
-  dojoAppConfig,
+export default function Dojo({
+  dojoConfig,
   children,
 }: {
-  headerData?: HeaderData
-  backgroundImage?: string
-  dojoAppConfig: DojoAppConfig,
+  dojoConfig: DojoConfig,
   children: ReactNode
 }) {
 
   return (
-    <App headerData={headerData} backgroundImage={backgroundImage}>
-      <StarknetProvider supportedChainIds={dojoAppConfig.supportedChainIds}>
-        <SetupDojoProvider dojoAppConfig={dojoAppConfig}>
-          {children}
-        </SetupDojoProvider>
-      </StarknetProvider>
-    </App>
-  );
+    <StarknetProvider supportedChainIds={dojoConfig.supportedChainIds}>
+      <SetupDojoProvider dojoConfig={dojoConfig}>
+        {children}
+      </SetupDojoProvider>
+    </StarknetProvider>
+  )
 }
 
 function SetupDojoProvider({
-  dojoAppConfig,
+  dojoConfig,
   children,
 }: {
-  dojoAppConfig: DojoAppConfig,
+  dojoConfig: DojoConfig,
   children: ReactNode
 }) {
   const { selectedChainConfig } = useStarknetContext()
@@ -49,13 +41,12 @@ function SetupDojoProvider({
   useEffect(() => {
     let _mounted = true
     const _setup = async () => {
-      const result = await setup(selectedChainConfig, dojoAppConfig.manifest)
+      const result = await setup(selectedChainConfig, dojoConfig.manifest)
       console.log(`Chain [${selectedChainConfig.name}] loaded!`)
       if (_mounted) {
         setSetupResult(result)
       }
     }
-    console.log(`DOJO:`, selectedChainConfig)
     if (!selectedChainConfig) {
       throw `Invalid config for chain Id`
     }
@@ -67,12 +58,7 @@ function SetupDojoProvider({
   }, [selectedChainConfig])
 
   if (!setupResult) {
-    return (
-      <>
-        <h1 className='TitleCase'>Loading Up...</h1>
-        <h5><DojoStatus /></h5>
-      </>
-    )
+    return <DojoStatus message={'Loading Pistols...'} />
   }
 
   return (

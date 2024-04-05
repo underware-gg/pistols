@@ -77,7 +77,7 @@ export default function MainPage() {
   // console.log(`AT scene [${scene}] menu [${menuKey}]`, atTavern, atDuel, duelId, gameImpl)
 
   return (
-    <AppPistols title={title} backgroundImage={null}>
+    <AppPistols headerData={{ title }} backgroundImage={null}>
       <Background className={bgClassName}>
         <GameContainer
           isVisible={true}
@@ -86,7 +86,7 @@ export default function MainPage() {
         <MainUI duelId={duelId} />
       </Background>
     </AppPistols>
-  );
+  )
 }
 
 function MainUI({

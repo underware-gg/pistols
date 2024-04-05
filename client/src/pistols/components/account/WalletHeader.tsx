@@ -57,7 +57,7 @@ function ChainSwitcher({
   return (
     <Dropdown
       text={selectedChainConfig.name}
-      className='icon AlignCenter'
+      className='icon AlignCenter Padded'
       icon='chain'
       button
       fluid
