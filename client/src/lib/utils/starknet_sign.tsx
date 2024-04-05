@@ -1,11 +1,24 @@
 import {
   Account,
-  BigNumberish,
   TypedData,
+  Signature,
+  ArraySignatureType,
   WeierstrassSignatureType,
 } from 'starknet'
 
 export type Messages = { [key: string]: string }
+
+export const splitSignature = (signature: Signature): bigint[] => {
+  if (Array.isArray(signature)) {
+    const sig = signature as ArraySignatureType
+    return [BigInt(sig[0]), BigInt(sig[1])]
+  }
+  if (signature?.r && signature?.s) {
+    const sig = signature as WeierstrassSignatureType
+    return [sig.r, sig.s]
+  }
+  return []
+}
 
 // https://github.com/starknet-io/starknet.js/blob/develop/www/docs/guides/signature.md
 export const signMessages = async (account: Account, messages: Messages): Promise<WeierstrassSignatureType> => {

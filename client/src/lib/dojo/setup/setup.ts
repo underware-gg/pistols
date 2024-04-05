@@ -1,4 +1,4 @@
-import { Account } from 'starknet'
+import { Account, RpcProvider } from 'starknet'
 import { DojoChainConfig } from '@/lib/dojo/setup/chainConfig'
 import { DojoProvider } from '@dojoengine/core'
 import { getSyncEntities } from '@dojoengine/state'
@@ -56,6 +56,8 @@ export async function setup(selectedChainConfig: DojoChainConfig, manifest: any)
 
   await burnerManager.init(true);
 
+  const rpcProvider = new RpcProvider({ nodeUrl: selectedChainConfig.rpcUrl })
+
   return {
     manifest,
     dojoProvider,
@@ -64,5 +66,7 @@ export async function setup(selectedChainConfig: DojoChainConfig, manifest: any)
     components,
     systemCalls,
     burnerManager,
+    selectedChainConfig,
+    rpcProvider,
   }
 }

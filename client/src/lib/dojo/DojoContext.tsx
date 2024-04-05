@@ -1,8 +1,11 @@
-import { ReactNode, createContext, useContext, useMemo } from 'react'
-import { BurnerAccount, useBurnerManager } from "@dojoengine/create-burner"
-import { bigintEquals } from "@/lib/utils/types";
-import { SetupResult } from "./setup/setup";
-import { Account } from "starknet";
+import { ReactNode, createContext, useContext } from 'react'
+import { BurnerAccount, useBurnerManager, useBurnerWindowObject, usePredeployedWindowObject, PredeployedManager } from '@dojoengine/create-burner'
+import { getMasterPredeployedAccount } from '@/lib/dojo/setup/chainConfig'
+import { bigintEquals } from '@/lib/utils/types'
+import { SetupResult } from '@/lib/dojo/setup/setup'
+import { feltToString } from '@/lib/utils/starknet'
+import { CHAIN_ID } from '@/lib/dojo/setup/chains'
+import { Account } from 'starknet'
 
 interface DojoContextType {
   setup: SetupResult;
@@ -21,11 +24,21 @@ export const DojoProvider = ({
   value: SetupResult;
 }) => {
   const currentValue = useContext(DojoContext);
-  if (currentValue) throw new Error("DojoProvider can only be used once");
+  if (currentValue) throw new Error('DojoProvider can only be used once');
 
-  const { burnerManager } = value
+  const { burnerManager, selectedChainConfig, rpcProvider } = value
+
   const masterAccount = burnerManager.masterAccount as Account
   const burner: BurnerAccount = useBurnerManager({ burnerManager, })
+
+  const masterPredeployedAccount = getMasterPredeployedAccount(feltToString(selectedChainConfig.chain.id) as CHAIN_ID)
+  const predeployedManager = new PredeployedManager({
+    rpcProvider: rpcProvider,
+    predeployedAccounts: [...masterPredeployedAccount, ...selectedChainConfig.predeployedAccounts],
+  })
+
+  useBurnerWindowObject(burnerManager);
+  usePredeployedWindowObject(predeployedManager);
 
   return (
     <DojoContext.Provider
@@ -45,7 +58,7 @@ export const DojoProvider = ({
 export const useDojo = (): DojoContextType => {
   const context = useContext(DojoContext);
   if (!context)
-    throw new Error("The `useDojo` hook must be used within a `DojoProvider`");
+    throw new Error('The `useDojo` hook must be used within a `DojoProvider`');
   return context;
 };
 

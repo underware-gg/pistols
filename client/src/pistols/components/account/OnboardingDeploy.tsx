@@ -4,7 +4,7 @@ import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useAccount, useSignTypedData } from '@starknet-react/core'
-import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
+import { Messages, createTypedMessage, splitSignature } from '@/lib/utils/starknet_sign'
 import { feltToString, pedersen } from '@/lib/utils/starknet'
 import { ArraySignatureType } from 'starknet'
 import { AddressShort } from '@/lib/ui/AddressShort'
@@ -49,9 +49,9 @@ export function OnboardingDeploy({
     messages,
   })), [chainId, messages])
   const { data, signTypedData, isPending } = useSignTypedData(typedMessage)
-  const signature = useMemo(() => (data as ArraySignatureType ?? null), [data])
+  const signature = useMemo(() => splitSignature(data), [data])
   useEffect(() => {
-    if (account && signature) {
+    if (account && signature.length > 0) {
       dispatchSetSig(account.address, pedersen(signature[0], signature[1]))
     }
   }, [account, signature])

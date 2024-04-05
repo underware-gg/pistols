@@ -1,6 +1,6 @@
 import React, { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { DojoChainConfig, dojoContextConfig, getStarknetProviderChains, isChainIdSupported } from '@/lib/dojo/setup/chainConfig'
-import { StarknetConfig, argent, braavos, jsonRpcProvider } from '@starknet-react/core'
+import { StarknetConfig, argent, braavos, injected, jsonRpcProvider, useInjectedConnectors } from '@starknet-react/core'
 import { CHAIN_ID } from '@/lib/dojo/setup/chains'
 import { Chain } from '@starknet-react/chains'
 
@@ -9,7 +9,7 @@ interface StarknetContextType {
   supportedChainIds: CHAIN_ID[],
   selectedChainId: CHAIN_ID
   selectedChainConfig: DojoChainConfig
-  selectChainId: (chainId: CHAIN_ID) => void 
+  selectChainId: (chainId: CHAIN_ID) => void
   isKatana: boolean
   chains: Chain[]
 }
@@ -66,6 +66,22 @@ export const StarknetProvider = ({
 
 
   //
+  // Connectors
+  const { connectors } = useInjectedConnectors({
+    // Show these connectors if the user has no connector installed.
+    recommended: [
+      // injected({ id: 'dojoburner' }),
+      injected({ id: 'dojopredeployed' }),
+      argent(),
+      // braavos(),
+    ],
+    // Hide recommended connectors if the user has any connector installed.
+    includeRecommended: 'always',
+    // Randomize the order of the connectors.
+    // order: 'random',
+  });
+
+  //
   // RPC
   //
   function rpc(chain: Chain) {
@@ -75,10 +91,6 @@ export const StarknetProvider = ({
     }
   }
   const provider = jsonRpcProvider({ rpc })
-  const connectors = [
-    argent(),
-    // braavos(),
-  ]
 
   return (
     <StarknetContext.Provider

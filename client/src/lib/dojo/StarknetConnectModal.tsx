@@ -44,7 +44,7 @@ function ConnectButtons() {
 
   let buttons = useMemo(() => connectors.map((connector: Connector) => (
     <Button key={connector.id} fluid size='huge' disabled={!connector.available() || isConnecting} onClick={() => connect({ connector })}>
-      Connect {connector.name}
+      {connector.name}
       <Image spaced className='Square20' src={connector.icon.dark} style={{ maxHeight: '1em' }} />
     </Button>
   )), [connectors, isConnecting])

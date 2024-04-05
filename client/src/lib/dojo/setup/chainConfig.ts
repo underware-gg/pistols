@@ -17,9 +17,9 @@ export type DojoChainConfig = {
   masterAddress: string,
   masterPrivateKey: string,
   accountClassHash: string,
-  predeployedAccounts: PredeployedAccount[],
   lordsContractAddress: string,
   lordsFaucetUrl: string,
+  predeployedAccounts: PredeployedAccount[],
 }
 
 const localKatanaConfig: DojoChainConfig = {
@@ -31,9 +31,9 @@ const localKatanaConfig: DojoChainConfig = {
   masterAddress: process.env.NEXT_PUBLIC_MASTER_ADDRESS ?? '0xb3ff441a68610b30fd5e2abbf3a1548eb6ba6f3559f2862bf2dc757e5828ca',
   masterPrivateKey: process.env.NEXT_PUBLIC_MASTER_PRIVATE_KEY ?? '0x2bbf4f9fd0bbb2e60b0316c1fe0b76cf7a4d0198bd493ced9b8df2a3a24d68a',
   accountClassHash: KATANA_CLASS_HASH,
-  predeployedAccounts: [],
   lordsContractAddress: undefined, // lords_mock
   lordsFaucetUrl: undefined,
+  predeployedAccounts: [],
 }
 
 const pistolsSlotConfig: DojoChainConfig = {
@@ -45,9 +45,9 @@ const pistolsSlotConfig: DojoChainConfig = {
   masterAddress: '0x5b7d6d0110aba636b7df1d41858c036aefb8bee9dd4052c51fbf5cd9e2d614',
   masterPrivateKey: '0x534363549dc5f54179835979add2d508b4a0cb315d9648977aa5f9e363da67a',
   accountClassHash: KATANA_CLASS_HASH,
-  predeployedAccounts: [],
   lordsContractAddress: undefined, // lords_mock
   lordsFaucetUrl: undefined,
+  predeployedAccounts: [],
 }
 
 // based on:
@@ -61,9 +61,9 @@ const realmsWorldConfig: DojoChainConfig = {
   masterAddress: undefined,
   masterPrivateKey: undefined,
   accountClassHash: '0x029927c8af6bccf3f6fda035981e765a7bdbf18a2dc0d630494f8758aa908e2b',
-  predeployedAccounts: [],
   lordsContractAddress: '0x51205c5e6ac3ad5691c28c0c5ffcdd62c70bddb63612f75a4bac9b2a85b9449',
   lordsFaucetUrl: 'https://internal-explorer.preview.cartridge.gg',
+  predeployedAccounts: [],
 }
 
 const snSepoliaConfig: DojoChainConfig = {
@@ -75,9 +75,9 @@ const snSepoliaConfig: DojoChainConfig = {
   masterAddress: undefined,
   masterPrivateKey: undefined,
   accountClassHash: undefined,
-  predeployedAccounts: [],
   lordsContractAddress: '0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210',
   lordsFaucetUrl: undefined,
+  predeployedAccounts: [],
 }
 
 const snMainnetConfig: DojoChainConfig = {
@@ -89,9 +89,9 @@ const snMainnetConfig: DojoChainConfig = {
   masterAddress: undefined,
   masterPrivateKey: undefined,
   accountClassHash: undefined,
-  predeployedAccounts: [],
   lordsContractAddress: '0x0124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49',
   lordsFaucetUrl: 'https://app.avnu.fi/en?amount=100&tokenFrom=0x124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49&tokenTo=0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
+  predeployedAccounts: [],
 }
 
 
@@ -118,4 +118,17 @@ export const getStarknetProviderChains = (supportedChainIds: chains.CHAIN_ID[]):
     }
     return acc
   }, [])
+}
+
+export const getMasterPredeployedAccount = (chainId: chains.CHAIN_ID): PredeployedAccount[] => {
+  const dojoChainConfig = dojoContextConfig[chainId]
+  if (dojoChainConfig?.masterAddress && dojoChainConfig?.masterPrivateKey) {
+    return [{
+      name: 'Master Account',
+      address: dojoChainConfig.masterAddress,
+      privateKey: dojoChainConfig.masterPrivateKey,
+      active: false,
+    }]
+  }
+  return []
 }
