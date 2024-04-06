@@ -1,17 +1,16 @@
 import React, { ReactNode, useEffect, useMemo, useState } from 'react'
 import { Grid, Step } from 'semantic-ui-react'
-import { useDojoAccount } from '@/lib/dojo/DojoContext'
-import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useAccount, useSignTypedData } from '@starknet-react/core'
+import { useDojoAccount } from '@/lib/dojo/DojoContext'
+import { useBurnerAccount, useBurnerContract } from '@/lib/wallet/useBurnerAccount'
+import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { Messages, createTypedMessage, splitSignature } from '@/lib/utils/starknet_sign'
 import { feltToString, pedersen } from '@/lib/utils/starknet'
-import { ArraySignatureType } from 'starknet'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { bigintEquals, bigintToHex } from '@/lib/utils/types'
 import { BurnerCreateOptions } from '@dojoengine/create-burner'
+import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { IconWarning } from '@/lib/ui/Icons'
-import { useBurnerAccount, useBurnerContract } from '@/lib/wallet/useBurnerAccount'
 import { TextLink } from '@/lib/ui/Links'
 
 const Row = Grid.Row
@@ -31,7 +30,7 @@ export function OnboardingDeploy({
 }) {
   const { account, isConnected, chainId } = useAccount()
   const { walletSig, hasSigned, accountIndex, dispatchSetSig, dispatchSetAccountIndex, connectOpener } = usePistolsContext()
-  const { create, generateAddressFromSeed } = useDojoAccount()
+  const { generateAddressFromSeed, create, isDeploying } = useDojoAccount()
 
   //
   // reset sig if wallet account changes
@@ -59,7 +58,7 @@ export function OnboardingDeploy({
   //
   // derive account address from current walletSig
   const [accountAddress, setAccountAddress] = useState(0n)
-  const { deployTx } = useBurnerContract(accountAddress)
+  const { isDeployed: contractIsDeployed } = useBurnerContract(accountAddress)
 
   const createOptions = useMemo((): BurnerCreateOptions => ({
     secret: bigintToHex(walletSig.sig ?? 0n),
@@ -80,13 +79,15 @@ export function OnboardingDeploy({
   // Local burner
   const { isDeployed, isImported, address } = useBurnerAccount(accountIndex)
 
+  const _isDeployed = (isDeployed || contractIsDeployed)
+
   const currentPhase = useMemo<DeployPhase>(() => (
     !isConnected ? DeployPhase.Connect
       : (!isDeployed && !hasSigned) ? DeployPhase.Sign
-        : !isDeployed ? DeployPhase.Deploy
+        : !_isDeployed ? DeployPhase.Deploy
           : !isImported ? DeployPhase.Import
             : DeployPhase.Done
-  ), [isConnected, hasSigned, isDeployed, isImported])
+  ), [isConnected, hasSigned, _isDeployed, isImported])
 
   return (
     <Grid className=''>
@@ -111,7 +112,7 @@ export function OnboardingDeploy({
                   Account ID:&nbsp;
                   <TextLink disabled={accountIndex <= 1} onClick={() => (dispatchSetAccountIndex(accountIndex - 1))}> ◀ </TextLink>
                   <span className='H4'>#{accountIndex}</span>
-                  <TextLink disabled={!isDeployed} onClick={() => (dispatchSetAccountIndex(accountIndex + 1))}> ▶ </TextLink>
+                  <TextLink disabled={false} onClick={() => (dispatchSetAccountIndex(accountIndex + 1))}> ▶ </TextLink>
                 </>
               }
             />
@@ -121,13 +122,13 @@ export function OnboardingDeploy({
               contentCompleted={<>Account address: <b><AddressShort address={address || accountAddress} important /></b></>}
             />
 
-            <DeployStep currentPhase={currentPhase} phase={DeployPhase.Deploy} completed={isDeployed}
-              contentActive={<ActionButton fill large disabled={currentPhase != DeployPhase.Deploy} onClick={() => create(createOptions)} label='Deploy' />}
+            <DeployStep currentPhase={currentPhase} phase={DeployPhase.Deploy} completed={_isDeployed}
+              contentActive={<ActionButton fill large disabled={currentPhase != DeployPhase.Deploy || isDeploying} onClick={() => create(createOptions)} label='Deploy' />}
               contentCompleted={<>Account Deployed</>}
             />
 
             <DeployStep currentPhase={currentPhase} phase={DeployPhase.Import} completed={isImported}
-              contentActive={<ActionButton fill large disabled={currentPhase != DeployPhase.Import} onClick={() => { }} label='Import' />}
+              contentActive={<ActionButton fill large disabled={currentPhase != DeployPhase.Import || isDeploying} onClick={() => create(createOptions)} label={currentPhase == DeployPhase.Import ? 'Restore' : 'Import'} />}
               contentCompleted={<>Account Imported</>}
             />
 
@@ -146,11 +147,11 @@ function DeployStep({
   contentActive,
   contentCompleted,
 }: {
-    phase: DeployPhase
-    currentPhase: DeployPhase
-    completed: boolean
-    contentActive?: ReactNode
-    contentCompleted: ReactNode
+  phase: DeployPhase
+  currentPhase: DeployPhase
+  completed: boolean
+  contentActive?: ReactNode
+  contentCompleted: ReactNode
 }) {
   const _active = (currentPhase == phase)
   const _disabled = (currentPhase < phase)

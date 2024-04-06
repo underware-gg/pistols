@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Burner } from '@dojoengine/create-burner'
 import { useContract } from '@starknet-react/core'
-import { useDojoAccount } from '@/lib/dojo/DojoContext'
+import { useDojo, useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { bigintEquals, bigintToHex } from '@/lib/utils/types'
-import { BigNumberish } from 'starknet'
+import { BigNumberish, hash } from 'starknet'
 import { useLordsBalance } from './useLordsBalance'
-import abi from '@/lib/abi/braavos_account.json'
-import { Burner } from '@dojoengine/create-burner'
+import katana_account from '@/lib/abi/katana_account.json'
 
 export const useBurner = (address: BigNumberish) => {
   const { list } = useDojoAccount()
@@ -65,10 +65,6 @@ export const useBurnerAccount = (accountIndex: number) => {
     }
   }, [address])
 
-  //--------------------------------------------
-  // TODO: verify if deployed but not imported
-  //--------------------------------------------
-
   //
   // Funded?
   const { balance } = useLordsBalance(address)
@@ -89,35 +85,88 @@ export const useBurnerAccount = (accountIndex: number) => {
 
 
 //
-// TODO: verify if deployed but not imported
+// Verify if an account has been deployed, from the address
+//
+// Katana uses OpenZeppelin account contract:
+// https://docs.openzeppelin.com/contracts-cairo/0.8.0/api/account#Account
+// https://github.com/OpenZeppelin/cairo-contracts/blob/main/src/account/interface.cairo
+// https://github.com/dojoengine/dojo/blob/main/crates/katana/primitives/contracts/compiled/account.json
 //
 export const useBurnerContract = (address: bigint) => {
-  const [deployTx, setDeployTx] = useState(null)
-  const { contract } = useContract({ abi: abi, address: bigintToHex(address) })
+  const [cairoVersion, setCairoVersion] = useState<bigint>(undefined)
+  const [publicKey, setPublicKey] = useState<bigint>(undefined)
+  const [deployTx, setDeployTx] = useState<bigint>(undefined)
 
+  //
+  // Create Account contract to interact with
+  //
+  const { setup: { dojoProvider, selectedChainConfig } } = useDojo()
+  const { contract } = useContract({
+    abi: katana_account,
+    address: bigintToHex(address),
+    provider: dojoProvider.provider,
+  })
+
+  //
+  // Verify if contract exists, by interacting with it
+  //
   useEffect(() => {
     let _mounted = true
     const _check_deployed = async () => {
-      const cc = await contract.deployed()
-      if (_mounted) setDeployTx(cc?.deployTransactionHash ?? null)
-      console.log('__check_contract', cc?.deployTransactionHash)
+      // console.log('__check_contract BASE:', contract, dojoProvider.provider)
+      // console.log('__check_contract BASE.getVersion:', await contract.getVersion())
+      // console.log('__check_contract BASE.getPublicKey:', await contract.getPublicKey())
+      // const cc = await contract.deployed()
+      try {
+        const { cairo } = await contract.getVersion()
+        const { publicKey } = await contract.getPublicKey()
+        if (_mounted) {
+          setCairoVersion(BigInt(cairo))
+          setPublicKey(BigInt(publicKey))
+        }
+      } catch {
+        if (_mounted) {
+          setCairoVersion(0n)
+          setPublicKey(0n)
+          setDeployTx(0n)
+        }
+      }
     }
-    setDeployTx(null)
-    if (contract?.address) _check_deployed()
+    if (BigInt(contract?.address ?? 0) > 0n) {
+      setCairoVersion(undefined)
+      setPublicKey(undefined)
+      setDeployTx(undefined)
+      _check_deployed()
+    }
     return () => { _mounted = false }
-  }, [contract?.address])
+  }, [contract])
+
+  const isVerifying = (publicKey === undefined)
+  const isDeployed = Boolean(publicKey)
+  // console.log(`DEPLOYED:`, isDeployed, bigintToHex(address))
 
   //
-  // TODO: Funded
-  const isFunded = false
-
+  // re-generate transaction hash
+  // (can't find the correct arguments...)
+  // (but redeploying is easier and works anyway)
   //
-  // Profiled
-  const { name } = useDuelist(address)
-  const isProfiled = Boolean(name)
+  // const { chain } = useNetwork()
+  // useEffect(() => {
+  //   if (publicKey !== undefined && cairoVersion !== undefined) {
+  //     const callData: BigNumberish[] = [publicKey]
+  //     //@ts-ignore (StarknetChainId)
+  //     const txHash = hash.calculateDeployTransactionHash(address, callData, cairoVersion, bigintToHex(chain.id))
+  //     console.log(`calculateDeployTransactionHash:`, bigintToHex(publicKey), cairoVersion, txHash)
+  //     setDeployTx(BigInt(txHash ?? 0n))
+  //   }
+  // }, [address, publicKey, cairoVersion])
+  // const isVerifying =(publicKey === undefined || deployTx === undefined)
+  // const isDeployed = (deployTx && deployTx > 0n)
 
   return {
-    isDeployed: (deployTx != null),
+    isVerifying,
+    isDeployed,
     deployTx,
+    publicKey,
   }
 }
