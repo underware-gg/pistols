@@ -5,7 +5,7 @@ import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useBurnerAccount, useBurnerContract } from '@/lib/dojo/hooks/useBurnerAccount'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { usePlayerId } from '@/lib/dojo/hooks/usePlayerId'
-import { Messages, createTypedMessage, splitSignature } from '@/lib/utils/starknet_sign'
+import { Messages, createTypedMessage, getMessageHash, splitSignature } from '@/lib/utils/starknet_sign'
 import { feltToString, pedersen } from '@/lib/utils/starknet'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { bigintEquals, bigintToHex, cleanDict } from '@/lib/utils/types'
@@ -53,6 +53,7 @@ export function OnboardingDeploy({
     chainId: chainId ? feltToString(chainId) : undefined,
     messages,
   })), [chainId, messages])
+  const messageHash = useMemo(() => getMessageHash(typedMessage, account?.address), [messages, account])
   const { data, signTypedData, isPending } = useSignTypedData(typedMessage)
   const signature = useMemo(() => splitSignature(data), [data])
   useEffect(() => {
@@ -69,7 +70,7 @@ export function OnboardingDeploy({
   const createOptions = useMemo((): BurnerCreateOptions => ({
     secret: bigintToHex(walletSig.sig ?? 0n),
     index: accountIndex,
-    metadata: { messages },
+    metadata: { messages, messageHash },
   }), [walletSig.sig, accountIndex, messages])
 
   useEffect(() => {

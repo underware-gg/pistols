@@ -4,6 +4,8 @@ import {
   Signature,
   ArraySignatureType,
   WeierstrassSignatureType,
+  typedData,
+  BigNumberish,
 } from 'starknet'
 
 export type Messages = { [key: string]: string }
@@ -65,3 +67,6 @@ export function createTypedMessage({
   }
 }
 
+export function getMessageHash(messages: TypedData, address: BigNumberish): string {
+  return (messages && address) ? typedData.getMessageHash(messages, address) : undefined
+}
