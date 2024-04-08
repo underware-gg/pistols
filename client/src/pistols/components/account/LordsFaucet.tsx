@@ -1,6 +1,6 @@
 import { Account, AccountInterface } from 'starknet'
 import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
-import { useLordsFaucet } from '@/lib/wallet/useLordsFaucet'
+import { useLordsFaucet } from '@/lib/dojo/hooks/useLordsFaucet'
 import { useCoin, COIN_LORDS } from '@/pistols/hooks/useConfig'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 

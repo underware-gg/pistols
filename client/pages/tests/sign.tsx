@@ -5,7 +5,7 @@ import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
 import AppPistols from '@/pistols/components/AppPistols'
 import { Account, typedData } from 'starknet'
 import { bigintToHex, shortAddress } from '@/lib/utils/types'
-import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
+import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 
 const Row = Table.Row
 const Cell = Table.Cell

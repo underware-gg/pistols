@@ -3,7 +3,7 @@ import { getContractByName } from '@dojoengine/core'
 import { useDojo, useDojoAccount } from '@/lib/dojo/DojoContext'
 import { bigintEquals } from '@/lib/utils/types'
 import { Account, AccountInterface } from 'starknet'
-import { feltToString } from '../utils/starknet'
+import { feltToString } from '../../utils/starknet'
 
 export interface FaucetExecuteResult {
   hash: string

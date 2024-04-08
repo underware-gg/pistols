@@ -4,7 +4,7 @@ import { useConnect, Connector, useAccount } from '@starknet-react/core'
 import { useDojoChain } from '@/lib/dojo/hooks/useDojoChain'
 import { Opener } from '@/lib/ui/useOpener'
 import { VStack } from '@/lib/ui/Stack'
-import { useEffectOnce } from '../hooks/useEffectOnce'
+import { useEffectOnce } from '../utils/hooks/useEffectOnce'
 
 
 export default function StarknetConnectModal({

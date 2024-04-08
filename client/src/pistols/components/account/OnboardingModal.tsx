@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { Modal, Tab, TabPane, Grid, Menu } from 'semantic-ui-react'
-import { useBurnerAccount, useBurners } from '@/lib/wallet/useBurnerAccount'
+import { useBurnerAccount, useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
 import { IconChecked, IconWarning } from '@/lib/ui/Icons'
 import { AccountMenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'

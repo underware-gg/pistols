@@ -5,8 +5,8 @@ import { useComponentValue } from "@dojoengine/react"
 import { bigintToEntity } from '@/lib/utils/types'
 import { feltToString } from "@/lib/utils/starknet"
 import { ChallengeState, ChallengeStateDescriptions, LiveChallengeStates, PastChallengeStates } from "@/pistols/utils/pistols"
-import { useEntityKeys, useEntityKeysQuery } from '@/lib/hooks/useEntityKeys'
-import { useClientTimestamp } from "@/lib/hooks/useTimestamp"
+import { useEntityKeys, useEntityKeysQuery } from '@/lib/dojo/hooks/useEntityKeys'
+import { useClientTimestamp } from "@/lib/utils/hooks/useTimestamp"
 import { useDuelist } from "@/pistols/hooks/useDuelist"
 import { BigNumberish } from 'starknet'
 

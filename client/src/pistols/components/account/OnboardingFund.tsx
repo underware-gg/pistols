@@ -1,7 +1,7 @@
 import React from 'react'
 import { Divider, Grid } from 'semantic-ui-react'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { useBurnerAccount } from '@/lib/wallet/useBurnerAccount'
+import { useBurnerAccount } from '@/lib/dojo/hooks/useBurnerAccount'
 import { LockedBalance, LordsBalance } from './LordsBalance'
 import { LordsFaucet } from './LordsFaucet'
 

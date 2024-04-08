@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
+import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 
 export const ThreeJsCanvas = ({

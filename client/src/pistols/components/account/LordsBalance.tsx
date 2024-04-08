@@ -1,4 +1,4 @@
-import { useLordsBalance } from '@/lib/wallet/useLordsBalance'
+import { useLordsBalance } from '@/lib/dojo/hooks/useLordsBalance'
 import { COIN_LORDS } from '@/pistols/hooks/useConfig'
 import { Wager } from '@/pistols/components/account/Wager'
 import { useLockedWager } from '@/pistols/hooks/useWager'

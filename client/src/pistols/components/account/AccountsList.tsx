@@ -8,7 +8,7 @@ import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
 import { BigNumberish } from 'starknet'
-import { useBurner, useBurnerAccount, useBurners } from '@/lib/wallet/useBurnerAccount'
+import { useBurner, useBurnerAccount, useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
 import { LordsBalance } from './LordsBalance'
 import { bigintToHex } from '@/lib/utils/types'
 
