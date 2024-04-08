@@ -3,6 +3,8 @@ import { DojoChainConfig, dojoContextConfig, getStarknetProviderChains, isChainI
 import { StarknetConfig, argent, braavos, injected, jsonRpcProvider, useInjectedConnectors } from '@starknet-react/core'
 import { CHAIN_ID } from '@/lib/dojo/setup/chains'
 import { Chain } from '@starknet-react/chains'
+import { DojoPredeployedStarknetWindowObject } from '@dojoengine/create-burner'
+import { DojoBurnerStarknetWindowObject } from '@dojoengine/create-burner'
 
 
 interface StarknetContextType {
@@ -70,8 +72,8 @@ export const StarknetProvider = ({
   const { connectors } = useInjectedConnectors({
     // Show these connectors if the user has no connector installed.
     recommended: [
-      // injected({ id: 'dojoburner' }),
-      injected({ id: 'dojopredeployed' }),
+      // injected({ id: DojoBurnerStarknetWindowObject.getId() }),
+      injected({ id: DojoPredeployedStarknetWindowObject.getId() }),
       argent(),
       // braavos(),
     ],

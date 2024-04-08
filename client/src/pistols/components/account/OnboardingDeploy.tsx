@@ -4,10 +4,11 @@ import { useAccount, useSignTypedData } from '@starknet-react/core'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useBurnerAccount, useBurnerContract } from '@/lib/dojo/hooks/useBurnerAccount'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { usePlayerId } from '@/lib/dojo/hooks/usePlayerId'
 import { Messages, createTypedMessage, splitSignature } from '@/lib/utils/starknet_sign'
 import { feltToString, pedersen } from '@/lib/utils/starknet'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { bigintEquals, bigintToHex } from '@/lib/utils/types'
+import { bigintEquals, bigintToHex, cleanDict } from '@/lib/utils/types'
 import { BurnerCreateOptions } from '@dojoengine/create-burner'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { IconWarning } from '@/lib/ui/Icons'
@@ -42,7 +43,12 @@ export function OnboardingDeploy({
 
   //
   // sign deployer message and store on PistolsContext
-  const messages: Messages = { game: 'PISTOLS_AT_10_BLOCKS', purpose: 'DUELIST_ACCOUNT' }
+  const { playerId } = usePlayerId()
+  const messages = useMemo<Messages>(() => cleanDict({
+    game: 'PISTOLS_AT_10_BLOCKS',
+    purpose: 'DUELIST_ACCOUNT',
+    player_id: playerId,
+  }), [playerId])
   const typedMessage = useMemo(() => (createTypedMessage({
     chainId: chainId ? feltToString(chainId) : undefined,
     messages,

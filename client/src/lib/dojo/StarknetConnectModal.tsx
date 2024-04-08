@@ -12,7 +12,7 @@ export default function StarknetConnectModal({
   walletHelp = false,
 }: {
   opener: Opener
-  walletHelp: boolean
+  walletHelp?: boolean
 }) {
   const { isConnected, isCorrectChain } = useDojoChain()
 
