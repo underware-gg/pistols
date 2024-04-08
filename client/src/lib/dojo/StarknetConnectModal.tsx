@@ -9,8 +9,10 @@ import { useEffectOnce } from '../hooks/useEffectOnce'
 
 export default function StarknetConnectModal({
   opener,
+  walletHelp = false,
 }: {
   opener: Opener
+  walletHelp: boolean
 }) {
   const { isConnected, isCorrectChain } = useDojoChain()
 
@@ -36,7 +38,7 @@ export default function StarknetConnectModal({
     >
       <Modal.Content>
         <Modal.Description className='AlignCenter'>
-          {!isConnected ? <ConnectButtons />
+          {!isConnected ? <ConnectButtons walletHelp={walletHelp} />
             : !isCorrectChain ? <SwitchChainButtons />
               : <></>
           }
@@ -46,24 +48,37 @@ export default function StarknetConnectModal({
   )
 }
 
-function ConnectButtons() {
+function ConnectButtons({
+  walletHelp,
+}: {
+  walletHelp: boolean
+}) {
   const { connect, connectors } = useConnect()
   const { isConnecting } = useAccount()
 
-  let buttons = useMemo(() => connectors.map((connector: Connector) => (
+  let connectorsButtons = useMemo(() => connectors.map((connector: Connector) => (
     <Button key={connector.id} fluid size='huge' disabled={!connector.available() || isConnecting} onClick={() => connect({ connector })}>
       {connector.name}
       <Image spaced className='Square20' src={connector.icon.dark} style={{ maxHeight: '1em' }} />
     </Button>
   )), [connectors, isConnecting])
 
+  const buttons = useMemo(() => {
+    let buttons = [...connectorsButtons]
+    if (walletHelp) {
+      buttons.push(
+        <Button key='walletHelp' fluid size='huge' onClick={() => window?.open(`https://www.starknet.io/en/ecosystem/wallets`, '_blank')}>
+          I don't have a Wallet
+        </Button>
+
+      )
+    }
+    return buttons
+  }, [connectorsButtons, walletHelp])
+
   return (
     <VStack>
-      {[...buttons,
-      <Button key='nowallet' fluid size='huge' onClick={() => window?.open(`https://www.starknet.io/en/ecosystem/wallets`, '_blank')}>
-        I don't have a Wallet
-      </Button>
-      ]}
+      {buttons}
     </VStack>
   )
 }
