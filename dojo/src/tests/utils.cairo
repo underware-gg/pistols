@@ -69,6 +69,7 @@ mod utils {
         let lords = ILordsMockDispatcher{ contract_address: world.deploy_contract('salt', lords_mock::TEST_CLASS_HASH.try_into().unwrap()) };
         let ierc20 = IERC20Dispatcher{ contract_address:lords.contract_address };
         execute_ierc20_initializer(lords, owner);
+        execute_faucet(lords, owner);
         execute_faucet(lords, other);
         if (initialize) {
             execute_initialize(admin, owner, owner, treasury, lords.contract_address);
