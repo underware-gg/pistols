@@ -6,7 +6,7 @@ import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { bigintEquals, bigintToHex } from '@/lib/utils/types'
 import { BigNumberish, hash } from 'starknet'
 import { useLordsBalance } from './useLordsBalance'
-import katana_account from '@/lib/abi/katana_account.json'
+import { katana_account_abi } from '@/lib/abi'
 
 export const useBurner = (address: BigNumberish) => {
   const { list } = useDojoAccount()
@@ -102,7 +102,7 @@ export const useBurnerContract = (address: bigint) => {
   //
   const { setup: { dojoProvider, selectedChainConfig } } = useDojo()
   const { contract } = useContract({
-    abi: katana_account,
+    abi: katana_account_abi,
     address: bigintToHex(address),
     provider: dojoProvider.provider,
   })
