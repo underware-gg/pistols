@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Divider, Grid, Input } from 'semantic-ui-react'
+import { Divider, Grid, Header, Icon, Input } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useBurnerAccount } from '@/lib/dojo/hooks/useBurnerAccount'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
@@ -28,25 +28,36 @@ export function OnboardingFund({
 
   return (
     <div className='Padded'>
+
       <h3>Account Balance</h3>
       <h3><LordsBalance address={account?.address} /></h3>
       <Divider hidden />
-      <div style={_rowStyle}>
-        {deposit ?
+      {deposit &&
+        <div style={_rowStyle}>
           <Deposit fromAddress={account?.address} toAddress={address} />
-          : <ActionButton fill disabled={!isDeployed} onClick={() => setDeposit(!deposit)} label='Deposit from Account to Duelist' />
-        }
-      </div>
-      <Divider />
+        </div>
+      }
+      {/* <ActionButton fill disabled={!isDeployed} onClick={() => setDeposit(!deposit)} label='Deposit from Account to Duelist' /> */}
+
+
+      <Divider horizontal>
+        <Header as='h2'>
+          <Icon className='NoMargin Anchor' onClick={() => setDeposit(!deposit)}
+            name={deposit ? 'arrow alternate circle down outline' : 'arrow alternate circle up outline'}
+          />
+        </Header>
+      </Divider>
+
       <h3>Duelist Balance</h3>
       <h3><LordsBalance address={address} /> <LockedBalance address={address} clean /></h3>
       <Divider hidden />
-      <div style={_rowStyle}>
-        {!deposit ?
+      {!deposit &&
+        <div style={_rowStyle}>
           <Withdraw fromAddress={address} toAddress={account?.address} />
-          : <ActionButton fill disabled={!isDeployed} onClick={() => setDeposit(!deposit)} label='Withdraw from Duelist to Account' />
-        }
-      </div>
+        </div>
+      }
+      {/* <ActionButton fill disabled={!isDeployed} onClick={() => setDeposit(!deposit)} label='Withdraw from Duelist to Account' /> */}
+
     </div>
   )
 }
@@ -59,7 +70,7 @@ function Deposit({
   const { contractAddress } = useLordsContract()
   const { transferAsync, isPending } = useERC20Transfer(toAddress, contractAddress, wei)
   return (
-    <DepositForm action='Deposit'
+    <DepositForm action='Deposit to Duelist'
       fromAddress={fromAddress}
       wei={wei}
       setWei={setWei}
@@ -77,7 +88,7 @@ function Withdraw({
   // const { transferAsync, isPending, transactionHash } = useERC20Transfer(toAddress)
   const isPending = false
   return (
-    <DepositForm action='Withdraw'
+    <DepositForm action='Withdraw to Account'
       fromAddress={fromAddress}
       wei={wei}
       setWei={setWei}
