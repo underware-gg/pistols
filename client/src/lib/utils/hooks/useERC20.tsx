@@ -5,7 +5,7 @@ import { splitU256 } from '@/lib/utils/starknet'
 import { erc20_abi } from '@/lib/abi'
 import { BigNumberish } from 'starknet'
 
-export function useERC20Transfer(toAddress: BigNumberish, contractAddress: BigNumberish, amount: bigint) {
+export function useERC20Transfer(contractAddress: BigNumberish, toAddress: BigNumberish, amount: bigint) {
   const { contract } = useContract({
     abi: erc20_abi,
     address: bigintToHex(contractAddress),
@@ -20,6 +20,7 @@ export function useERC20Transfer(toAddress: BigNumberish, contractAddress: BigNu
 
   const {
     writeAsync,
+    write,
     data,
     isPending,
   } = useContractWrite({
@@ -32,6 +33,7 @@ export function useERC20Transfer(toAddress: BigNumberish, contractAddress: BigNu
 
   return {
     transferAsync: writeAsync,
+    transfer: write,
     transactionHash,
     receipt,
     isPending: (isPending || isLoading),

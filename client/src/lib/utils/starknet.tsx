@@ -6,6 +6,7 @@ import {
   AccountInterface,
   InvocationsDetails,
   InvokeFunctionResponse,
+  Abi,
 } from 'starknet'
 import { bigintToHex } from './types'
 
@@ -32,7 +33,8 @@ export const splitU256 = (v: BigNumberish): { low: bigint, high: bigint } => ({
 export async function execute(
   account: Account | AccountInterface,
   contractAddress: string,
-  call: string,
+  abi: Abi,
+  entrypoint: string,
   calldata: BigNumberish[],
   transactionDetails?: InvocationsDetails | undefined
 ): Promise<InvokeFunctionResponse> {
@@ -42,11 +44,11 @@ export async function execute(
       [
         {
           contractAddress,
-          entrypoint: call,
-          calldata: calldata,
+          entrypoint,
+          calldata,
         },
       ],
-      undefined,
+      [abi],
       {
         maxFee: 0, // TODO: Update this value as needed.
         ...transactionDetails,
@@ -54,7 +56,9 @@ export async function execute(
       }
     )
   } catch (error) {
-    this.logger.error("Error occured: ", error)
-    throw error
+    this.logger.error("execute() error: ", error)
+    return {
+      transaction_hash: null,
+    }
   }
 }
