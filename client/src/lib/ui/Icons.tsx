@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Icon, IconGroup, Popup, PopupContent, PopupHeader, SemanticICONS } from 'semantic-ui-react'
 import { IconProps, IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
@@ -280,6 +280,29 @@ export function CustomIcon({
   return component
 }
 
+
+
+export function IconTransfer({
+  rotated,
+  setRotated,
+} : {
+  rotated: boolean
+  setRotated: Function
+}) {
+  const [halt, setHalt] = useState(false)
+  const _click = () => {
+    setRotated(!rotated)
+    setHalt(true)
+    setTimeout(() => {
+      setHalt(false)
+    }, 500)
+  }
+  return (
+    <Icon className={`NoMargin Anchor TransferIcon ${!halt ? 'TransferIconAnim' : ''}`} onClick={() => _click()}
+      name={rotated ? 'arrow alternate circle down outline' : 'arrow alternate circle up outline'}
+    />
+  )
+}
 
 //-------------------------
 // Generic icons

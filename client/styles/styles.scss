@@ -872,6 +872,17 @@ $logo-url: '/logos/logo_avante.svg';
   left: 0;
 }
 
+.TransferIcon {
+  transform: rotate(0deg);
+  line-height: 1.01em;
+}
+.TransferIcon:hover {
+  transform: rotate(180deg);
+}
+.TransferIconAnim {
+  transition: transform .25s ease;
+}
+
 
 // Icon click feedback
 .IconClick:active {

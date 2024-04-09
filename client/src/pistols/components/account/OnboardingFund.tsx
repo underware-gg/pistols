@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Divider, Grid, Header, Icon, Input } from 'semantic-ui-react'
+import { Divider, Grid, Header, Input } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useBurnerAccount } from '@/lib/dojo/hooks/useBurnerAccount'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
@@ -8,7 +8,8 @@ import { useDojoERC20Transfer } from '@/lib/dojo/hooks/useDojoERC20'
 import { useLordsBalance } from '@/lib/dojo/hooks/useLordsBalance'
 import { useERC20Transfer } from '@/lib/utils/hooks/useERC20'
 import { LockedBalance, LordsBalance } from '@/pistols/components/account/LordsBalance'
-import { ActionButton } from '../ui/Buttons'
+import { ActionButton } from '@/pistols/components/ui/Buttons'
+import { IconTransfer } from '@/lib/ui/Icons'
 import { ethToWei } from '@/lib/utils/starknet'
 import { isNumber } from '@/lib/utils/types'
 import { BigNumberish } from 'starknet'
@@ -43,9 +44,7 @@ export function OnboardingFund({
 
       <Divider horizontal>
         <Header as='h2'>
-          <Icon className='NoMargin Anchor' onClick={() => setDeposit(!deposit)}
-            name={deposit ? 'arrow alternate circle down outline' : 'arrow alternate circle up outline'}
-          />
+          <IconTransfer rotated={deposit} setRotated={setDeposit} />
         </Header>
       </Divider>
 
