@@ -960,15 +960,10 @@ input::placeholder {
 .ui.input>input,
 .ui.form input:not([type]),
 .ui.selection.dropdown {
-  @extend ._round_border;
+  @extend ._button_shape, ._round_border;
   background-color: $color-dark!important;
   // color: rgba($color-text, 0.75)!important;
   color: $color-text!important;
-  // font-style: italic!important;
-  font-size: 1.25em;
-  line-height: 1em;
-  padding: 0.5em 1em;
-  min-height: 35px;
 }
 .ui.selection.dropdown {
   color: $color-brightest!important;
@@ -1037,14 +1032,19 @@ input::placeholder {
 }
 //
 // <Button>
-._button {
-  @extend ._round_border, .TitleCase;
-  font-family: $font-family;
-  background-color: rgba($color-dark, 0.6);
-  color: $color-text;
+._button_shape {
   font-size: 1.2rem; // semantic: 1rem;
   padding: 0.5em 1em;// semantic: 0.78571429em 1.5em 0.78571429em;
   margin: 0.15em 0;
+  line-height: 1em;
+  min-height: 35px;
+  margin: 0.15em 0;
+}
+._button {
+  @extend ._button_shape, ._round_border, .TitleCase;
+  font-family: $font-family;
+  background-color: rgba($color-dark, 0.6);
+  color: $color-text;
 }
 ._button_hover {
   background-color: $color-bright;

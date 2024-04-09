@@ -1,9 +1,16 @@
-import React from 'react'
-import { Divider, Grid } from 'semantic-ui-react'
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import React, { useState } from 'react'
+import { Divider, Grid, Input } from 'semantic-ui-react'
+import { useAccount } from '@starknet-react/core'
 import { useBurnerAccount } from '@/lib/dojo/hooks/useBurnerAccount'
-import { LockedBalance, LordsBalance } from './LordsBalance'
-import { LordsFaucet } from './LordsFaucet'
+import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { LockedBalance, LordsBalance } from '@/pistols/components/account/LordsBalance'
+import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
+import { ActionButton } from '../ui/Buttons'
+import { useLordsBalance } from '@/lib/dojo/hooks/useLordsBalance'
+import { ethToWei } from '@/lib/utils/starknet'
+import { isNumber } from '@/lib/utils/types'
+import { useERC20Transfer } from '@/lib/utils/hooks/useERC20'
+import { useLordsContract } from '@/lib/dojo/hooks/useLordsContract'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -11,19 +18,121 @@ const Col = Grid.Column
 export function OnboardingFund({
   isDeployed = false,
 }) {
+  const { account } = useAccount()
   const { accountIndex } = usePistolsContext()
   const { address } = useBurnerAccount(accountIndex)
 
+  const [deposit, setDeposit] = useState(true)
+
+  const _rowStyle = { minHeight: '40px', width: '100%', padding: '5px' }
+
   return (
-    <div className='Padded H4'>
-      <h5>DEPOSIT</h5>
+    <div className='Padded'>
+      <h3>Account Balance</h3>
+      <h3><LordsBalance address={account?.address} /></h3>
+      <Divider hidden />
+      <div style={_rowStyle}>
+        {deposit ?
+          <Deposit fromAddress={account?.address} toAddress={address} />
+          : <ActionButton fill disabled={!isDeployed} onClick={() => setDeposit(!deposit)} label='Deposit from Account to Duelist' />
+        }
+      </div>
       <Divider />
-      <LordsBalance address={address} big />
-      <LockedBalance address={address} clean />
-      {isDeployed && <><br /><LordsFaucet /></>}
-      <Divider />
-      <h5>WITHDRAW</h5>
+      <h3>Duelist Balance</h3>
+      <h3><LordsBalance address={address} /> <LockedBalance address={address} clean /></h3>
+      <Divider hidden />
+      <div style={_rowStyle}>
+        {!deposit ?
+          <Withdraw fromAddress={address} toAddress={account?.address} />
+          : <ActionButton fill disabled={!isDeployed} onClick={() => setDeposit(!deposit)} label='Withdraw from Duelist to Account' />
+        }
+      </div>
     </div>
   )
 }
 
+function Deposit({
+  fromAddress,
+  toAddress,
+}) {
+  const [wei, setWei] = useState(0n)
+  const { contractAddress } = useLordsContract()
+  const { transferAsync, isPending } = useERC20Transfer(toAddress, contractAddress, wei)
+  return (
+    <DepositForm action='Deposit'
+      fromAddress={fromAddress}
+      wei={wei}
+      setWei={setWei}
+      transfer={transferAsync}
+      disabled={isPending}
+    />
+  )
+}
+
+function Withdraw({
+  fromAddress,
+  toAddress,
+}) {
+  const [wei, setWei] = useState(0n)
+  // const { transferAsync, isPending, transactionHash } = useERC20Transfer(toAddress)
+  const isPending = false
+  return (
+    <DepositForm action='Withdraw'
+      fromAddress={fromAddress}
+      wei={wei}
+      setWei={setWei}
+      transfer={() => { }}
+      disabled={isPending}
+    />
+  )
+}
+
+
+function DepositForm({
+  fromAddress,
+  action,
+  wei,
+  setWei,
+  transfer,
+  disabled,
+}: {
+  fromAddress: string
+  wei: bigint
+  action: string
+  setWei: Function
+  transfer: Function
+  disabled: boolean
+}) {
+  const { balance: fromBalance } = useLordsBalance(fromAddress)
+
+  const [inputValue, setInputValue] = useState('')
+
+  const _setAmount = (value: string) => {
+    if (isNumber(value) || value == '') {
+      setInputValue(value)
+      setWei(value ? ethToWei(parseInt(value)) : 0n)
+    }
+  }
+
+  const _noFunds = (fromBalance == 0n || wei > fromBalance)
+  const _canTransfer = (!disabled && Boolean(transfer) && wei > 0n && !_noFunds)
+
+  return (
+    <Grid className='NoPadding'>
+      <Row columns={'equal'} className='NoPadding'>
+        <Col>
+          <Input fluid
+            maxLength={7}
+            placeholder={'Amount'}
+            value={inputValue}
+            disabled={disabled}
+            onChange={(e) => _setAmount(e.target.value)}
+          />
+        </Col>
+        <Col>
+          <ActionButton fill attention disabled={!_canTransfer} onClick={() => transfer()} label={_noFunds ? 'No Funds' : action} />
+        </Col>
+      </Row>
+    </Grid>
+  )
+}

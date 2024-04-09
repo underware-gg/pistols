@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Modal, Button, Image } from 'semantic-ui-react'
+import { Modal, Button, Image, Divider } from 'semantic-ui-react'
 import { useConnect, Connector, useAccount } from '@starknet-react/core'
 import { useDojoChain } from '@/lib/dojo/hooks/useDojoChain'
 import { Opener } from '@/lib/ui/useOpener'
@@ -84,7 +84,11 @@ function ConnectButtons({
 }
 
 function SwitchChainButtons() {
-  const { connectedChainName, selectedChainName, switch_network, add_network } = useDojoChain()
+  const { 
+    connectedChainId, connectedChainName,
+    selectedChainId, selectedChainName,
+    switch_network, add_network,
+  } = useDojoChain()
   const [chainExists, setChainExists] = useState(true)
   const [isBusy, setIsBusy] = useState(false)
 
@@ -127,10 +131,14 @@ function SwitchChainButtons() {
   return (
     <VStack>
       <div className='ModalText'>
-        Connected to <b>{connectedChainName}</b>
-        <br />
-        Need <b>{selectedChainName}</b>
+        <p>
+          Connected to <b>{connectedChainName} ({connectedChainId})</b>
+        </p>
+        <p>
+          Need <b>{selectedChainName} ({selectedChainId})</b>
+        </p>
       </div>
+      <Divider />
       <Button fluid size='huge' disabled={isBusy} onClick={() => { (chainExists ? _switchNetwork : _addNetwork)() }}>
         {chainExists ? 'Switch Network' : 'Add Network'}
       </Button>

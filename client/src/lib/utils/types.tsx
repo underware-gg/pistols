@@ -3,6 +3,13 @@ import { Entity } from '@dojoengine/recs'
 import { BigNumberish } from 'starknet'
 
 //
+// Numbers
+//
+
+export const isNumber = (v: string) => (/^\d+$/.test(v))
+
+
+//
 // BigNumberish
 //
 
