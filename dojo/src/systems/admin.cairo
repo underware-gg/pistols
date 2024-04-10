@@ -1,5 +1,4 @@
 use starknet::ContractAddress;
-use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::models::config::{Config};
 use pistols::models::coins::{Coin};
 
@@ -8,18 +7,18 @@ use pistols::models::coins::{Coin};
 // https://github.com/cartridge-gg/rollyourown/blob/market_packed/src/config/ryo.cairo
 
 
-#[starknet::interface]
-trait IAdmin<TContractState> {
-    fn initialize(self: @TContractState, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress);
+#[dojo::interface]
+trait IAdmin {
+    fn initialize(owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress);
     
-    fn set_owner(self: @TContractState, owner_address: ContractAddress);
-    fn set_treasury(self: @TContractState, treasury_address: ContractAddress);
-    fn set_paused(self: @TContractState, paused: bool);
-    fn set_coin(self: @TContractState, coin_key: u8, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool);
-    fn enable_coin(self: @TContractState, coin_key: u8, enabled: bool);
+    fn set_owner(owner_address: ContractAddress);
+    fn set_treasury(treasury_address: ContractAddress);
+    fn set_paused(paused: bool);
+    fn set_coin(coin_key: u8, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool);
+    fn enable_coin(coin_key: u8, enabled: bool);
     
-    fn get_config(self: @TContractState) -> Config;
-    fn get_coin(self: @TContractState, coin_key: u8) -> Coin;
+    fn get_config() -> Config;
+    fn get_coin(coin_key: u8) -> Coin;
 }
 
 #[dojo::contract]
@@ -34,10 +33,10 @@ mod admin {
     use pistols::systems::{utils};
 
     #[abi(embed_v0)]
-    impl AdminExternalImpl of super::IAdmin<ContractState> {
-        fn initialize(self: @ContractState, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress) {
+    impl AdminImpl of super::IAdmin<ContractState> {
+        fn initialize(world: IWorldDispatcher, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress) {
             self.assert_initializer_is_owner();
-            let manager = ConfigManagerTrait::new(self.world());
+            let manager = ConfigManagerTrait::new(world);
             let mut config = manager.get();
             assert(config.initialized == false, 'Already initialized');
             // initialize
@@ -47,46 +46,46 @@ mod admin {
             config.paused = false;
             manager.set(config);
             // set lords
-            let manager = CoinManagerTrait::new(self.world());
+            let manager = CoinManagerTrait::new(world);
             manager.set(default_coin(lords_address));
         }
 
-        fn set_owner(self: @ContractState, owner_address: ContractAddress) {
+        fn set_owner(world: IWorldDispatcher, owner_address: ContractAddress) {
             self.assert_caller_is_owner();
             assert(owner_address != utils::zero_address(), 'Null owner_address');
             // get current
-            let manager = ConfigManagerTrait::new(self.world());
+            let manager = ConfigManagerTrait::new(world);
             let mut config = manager.get();
             // update
             config.owner_address = owner_address;
             manager.set(config);
         }
 
-        fn set_treasury(self: @ContractState, treasury_address: ContractAddress) {
+        fn set_treasury(world: IWorldDispatcher, treasury_address: ContractAddress) {
             self.assert_caller_is_owner();
             assert(treasury_address != utils::zero_address(), 'Null treasury_address');
             // get current
-            let manager = ConfigManagerTrait::new(self.world());
+            let manager = ConfigManagerTrait::new(world);
             let mut config = manager.get();
             // update
             config.treasury_address = treasury_address;
             manager.set(config);
         }
 
-        fn set_paused(self: @ContractState, paused: bool) {
+        fn set_paused(world: IWorldDispatcher, paused: bool) {
             self.assert_caller_is_owner();
             // get current
-            let manager = ConfigManagerTrait::new(self.world());
+            let manager = ConfigManagerTrait::new(world);
             let mut config = manager.get();
             // update
             config.paused = paused;
             manager.set(config);
         }
 
-        fn set_coin(self: @ContractState, coin_key: u8, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool) {
+        fn set_coin(world: IWorldDispatcher, coin_key: u8, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool) {
             self.assert_caller_is_owner();
             // get coin
-            let manager = CoinManagerTrait::new(self.world());
+            let manager = CoinManagerTrait::new(world);
             assert(manager.exists(coin_key), 'Invalid coin');
             let mut coin = manager.get(coin_key);
             // update coin
@@ -98,10 +97,10 @@ mod admin {
             manager.set(coin);
         }
 
-        fn enable_coin(self: @ContractState, coin_key: u8, enabled: bool) {
+        fn enable_coin(world: IWorldDispatcher, coin_key: u8, enabled: bool) {
             self.assert_caller_is_owner();
             // get coin
-            let manager = CoinManagerTrait::new(self.world());
+            let manager = CoinManagerTrait::new(world);
             assert(manager.exists(coin_key), 'Invalid coin');
             let mut coin = manager.get(coin_key);
             // update coin
@@ -113,19 +112,19 @@ mod admin {
         // getters
         //
 
-        fn get_config(self: @ContractState) -> Config {
-            (ConfigManagerTrait::new(self.world()).get())
+        fn get_config(world: IWorldDispatcher) -> Config {
+            (ConfigManagerTrait::new(world).get())
         }
 
-        fn get_coin(self: @ContractState, coin_key: u8) -> Coin {
-            let manager = CoinManagerTrait::new(self.world());
+        fn get_coin(world: IWorldDispatcher, coin_key: u8) -> Coin {
+            let manager = CoinManagerTrait::new(world);
             assert(manager.exists(coin_key), 'Invalid coin');
             (manager.get(coin_key))
         }
     }
 
     #[generate_trait]
-    impl AdminInternalImpl of AdminInternalTrait {
+    impl InternalImpl of InternalTrait {
         #[inline(always)]
         fn assert_initializer_is_owner(self: @ContractState) {
             assert(self.world().is_owner(get_caller_address(), get_contract_address().into()), 'Not deployer');

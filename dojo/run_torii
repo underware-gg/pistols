@@ -4,4 +4,11 @@ set -e
 export WORLD_ADDRESS=$(toml get Scarb.toml --raw tool.dojo.env.world_address)
 echo "@WORLD: $WORLD_ADDRESS"
 
-torii -w $WORLD_ADDRESS $*
+if [[
+  "$WORLD_ADDRESS" != "0x"*
+]]; then
+  echo "! Missing data 👎"
+  exit 1
+fi
+
+torii --world $WORLD_ADDRESS $*

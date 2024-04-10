@@ -8,8 +8,7 @@
     "start": "next start",
     "build": "npx tsc -p tsconfig.json && NODE_OPTIONS=--experimental-wasm-modules next build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "create-components": "npx @dojoengine/core ../dojo/target/dev/manifest.json src/dojo/contractComponents.ts",
-    "create-components_local": "script/generateComponents.cjs ../dojo/target/dev/manifest.json src/dojo/contractComponents.ts"
+    "create-components": "npx @dojoengine/core ./src/generated/dev/manifest.json ./src/dojo/contractComponents.ts"
   },
   "dependencies": {
     "@dojoengine/core": "file:../../dojo.js/packages/core",

@@ -7,65 +7,80 @@ if ! [ -x "$(command -v toml)" ]; then
   exit 1
 fi
 
-export TX_SLEEP=0.2
+# Profile
+if [ $# -ge 1 ]; then
+    export PROFILE=$1
+else
+    export PROFILE="dev"
+fi
 
-export RPC_URL=$(toml get Scarb.toml --raw tool.dojo.env.rpc_url)
-export ACCOUNT_ADDRESS=$(toml get Scarb.toml --raw tool.dojo.env.account_address)
+export MANIFEST_FILE_PATH="./manifests/$PROFILE/manifest.json"
+export RPC_URL=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.rpc_url)
 export WORLD_ADDRESS=$(toml get Scarb.toml --raw tool.dojo.env.world_address)
-export ADMIN_ADDRESS=$(cat ./target/dev/manifest.json | jq -r '.contracts[] | select(.name == "pistols::systems::admin::admin" ).address')
-export ACTIONS_ADDRESS=$(cat ./target/dev/manifest.json | jq -r '.contracts[] | select(.name == "pistols::systems::actions::actions" ).address')
-
-export ADMIN_COMPONENTS=("Config", "Coin")
-export GAME_COMPONENTS=("Duelist" "Challenge" "Wager" "Pact" "Shot" "Round")
+export ADMIN_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.name == "pistols::systems::admin::admin" ).address')
+export ACTIONS_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.name == "pistols::systems::actions::actions" ).address')
 
 # Use mocked Lords if lords_address not defined in Scarb
-export LORDS_ADDRESS=$(toml get Scarb.toml --raw tool.dojo.env.lords_address)
+export LORDS_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.lords_address)
 if [[ -z "$LORDS_ADDRESS" ]]; then
   echo "* using mock \$LORDS 👑"
-  export LORDS_ADDRESS=$(cat ./target/dev/manifest.json | jq -r '.contracts[] | select(.name == "pistols::mocks::lords_mock::lords_mock" ).address')
-  export LORDS_COMPONENTS=("ERC20MetadataModel" "ERC20BalanceModel" "ERC20AllowanceModel" "ERC20BridgeableModel")
+  export LORDS_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.name == "pistols::mocks::lords_mock::lords_mock" ).address')
+  export LORDS_MOCK="Yes"
 fi
 
 echo "------------------------------------------------------------------------------"
-echo "sozo auth writer"
-echo "RPC        : $RPC_URL"
-echo "account    : $ACCOUNT_ADDRESS"
-echo "world      : $WORLD_ADDRESS"
-echo "admin      : $ADMIN_ADDRESS"
-echo "actions    : $ACTIONS_ADDRESS"
-echo "\$LORDS     : $LORDS_ADDRESS"
-echo "admin comps: ${ADMIN_COMPONENTS[*]}"
-echo "game comps : ${GAME_COMPONENTS[*]}"
-echo "lords comps: ${LORDS_COMPONENTS[*]}"
+echo "Profile     : $PROFILE"
+echo "RPC         : $RPC_URL"
+echo "Manifest    : $MANIFEST_FILE_PATH"
+echo "WORLD       : $WORLD_ADDRESS"
+echo "::admin     : $ADMIN_ADDRESS"
+echo "::actions   : $ACTIONS_ADDRESS"
+echo "\$LORDS      : $LORDS_ADDRESS"
+echo "\$LORDS Mock : $LORDS_MOCK"
 echo "------------------------------------------------------------------------------"
+
+if [[
+  -z "$PROFILE" ||
+  -z "$RPC_URL" || # for testing profile
+  -z "$MANIFEST_FILE_PATH" ||
+  "$WORLD_ADDRESS" != "0x"* ||
+  "$ADMIN_ADDRESS" != "0x"* ||
+  "$ACTIONS_ADDRESS" != "0x"* ||
+  "$LORDS_ADDRESS" != "0x"*
+]]; then
+  echo "! Missing data 👎"
+  exit 1
+fi
+
+# auth ref: https://book.dojoengine.org/toolchain/sozo/world-commands/auth
+echo "* Admin auth..."
+sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
+  Config,$ADMIN_ADDRESS \
+  Coin,$ADMIN_ADDRESS
 
 echo "* Game auth..."
-for component in ${GAME_COMPONENTS[@]}; do
-  sozo auth writer --world $WORLD_ADDRESS --rpc-url $RPC_URL $component $ACTIONS_ADDRESS --account-address $ACCOUNT_ADDRESS
-  sleep $TX_SLEEP
-done
-
-echo "* Admin auth..."
-for component in ${ADMIN_COMPONENTS[@]}; do
-  sozo auth writer --world $WORLD_ADDRESS --rpc-url $RPC_URL $component $ADMIN_ADDRESS --account-address $ACCOUNT_ADDRESS
-  sleep $TX_SLEEP
-done
+sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
+  Duelist,$ACTIONS_ADDRESS \
+  Challenge,$ACTIONS_ADDRESS \
+  Wager,$ACTIONS_ADDRESS \
+  Pact,$ACTIONS_ADDRESS \
+  Round,$ACTIONS_ADDRESS
 
 # Mocked Lords
-if [[ ! -z "$LORDS_COMPONENTS" ]]; then
+if [[ ! -z "$LORDS_MOCK" ]]; then
   echo "* Mock Lords auth..."
-  for component in ${LORDS_COMPONENTS[@]}; do
-    sozo auth writer --world $WORLD_ADDRESS --rpc-url $RPC_URL $component $LORDS_ADDRESS --account-address $ACCOUNT_ADDRESS
-    sleep $TX_SLEEP
-  done
-  
+  sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
+    ERC20MetadataModel,$LORDS_ADDRESS \
+    ERC20BalanceModel,$LORDS_ADDRESS \
+    ERC20AllowanceModel,$LORDS_ADDRESS \
+    InitializableModel,$LORDS_ADDRESS
+
   echo "* Initializing Mock Lords..."
-  sozo execute $LORDS_ADDRESS initializer > /dev/null || true
-  sleep $TX_SLEEP
+  sozo --profile $PROFILE execute --world $WORLD_ADDRESS --wait $LORDS_ADDRESS initializer > /dev/null || true
 fi
 
+# execute ref: https://book.dojoengine.org/toolchain/sozo/world-commands/execute
 echo "* Initializing Game World..."
-sozo execute $ADMIN_ADDRESS initialize --calldata 0x0,0x0,$LORDS_ADDRESS > /dev/null || true
-sleep $TX_SLEEP
+sozo --profile $PROFILE execute --world $WORLD_ADDRESS --wait $ADMIN_ADDRESS initialize --calldata 0x0,0x0,$LORDS_ADDRESS > /dev/null || true
 
 echo "* All set! 👍"

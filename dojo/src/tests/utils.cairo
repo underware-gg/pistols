@@ -35,6 +35,11 @@ mod utils {
     const INITIAL_TIMESTAMP: u64 = 0x100000000;
     const INITIAL_STEP: u64 = 0x10;
 
+    fn deploy_system(world: IWorldDispatcher, class_hash_felt: felt252) -> ContractAddress {
+        let contract_address = world.deploy_contract(class_hash_felt, class_hash_felt.try_into().unwrap());
+        (contract_address)
+    }
+
     fn setup_world(initialize: bool, approve: bool) -> (
         IWorldDispatcher,
         IActionsDispatcher,
@@ -54,20 +59,23 @@ mod utils {
             config::TEST_CLASS_HASH,
             coin::TEST_CLASS_HASH,
         ];
-        let world: IWorldDispatcher = spawn_test_world(models);
-        let system = IActionsDispatcher{ contract_address: world.deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap()) };
+        // accounts
         let owner: ContractAddress = starknet::contract_address_const::<0x111111>();
         let other: ContractAddress = starknet::contract_address_const::<0x222>();
         let bummer: ContractAddress = starknet::contract_address_const::<0x333>();
         let treasury: ContractAddress = starknet::contract_address_const::<0x444>();
+        // setup testing
         // testing::set_caller_address(owner);   // not used??
         testing::set_contract_address(owner); // this is the CALLER!!
         testing::set_block_number(1);
         testing::set_block_timestamp(INITIAL_TIMESTAMP);
-        // admin
-        let admin = IAdminDispatcher{ contract_address: world.deploy_contract('salt', admin::TEST_CLASS_HASH.try_into().unwrap()) };
-        let lords = ILordsMockDispatcher{ contract_address: world.deploy_contract('salt', lords_mock::TEST_CLASS_HASH.try_into().unwrap()) };
+        // systems
+        let world: IWorldDispatcher = spawn_test_world(models);
+        let system = IActionsDispatcher{ contract_address: deploy_system(world, actions::TEST_CLASS_HASH) };
+        let admin = IAdminDispatcher{ contract_address: deploy_system(world, admin::TEST_CLASS_HASH) };
+        let lords = ILordsMockDispatcher{ contract_address: deploy_system(world, lords_mock::TEST_CLASS_HASH) };
         let ierc20 = IERC20Dispatcher{ contract_address:lords.contract_address };
+        // initializers
         execute_ierc20_initializer(lords, owner);
         execute_faucet(lords, owner);
         execute_faucet(lords, other);

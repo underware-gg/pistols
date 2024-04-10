@@ -20,9 +20,10 @@ cairo-version = "2.4.0"
 sierra-replace-ids = true
 
 [dependencies]
-# dojo = { git = "https://github.com/dojoengine/dojo.git", rev = "01eab985a3f5056e47cc7b4753ca24f64d3a078a" }
-dojo = { git = "https://github.com/dojoengine/dojo.git", tag = "v0.5.1" }
-token = { git = "https://github.com/dojoengine/origami", tag = "v0.5.1" }
+# dojo = { git = "https://github.com/dojoengine/dojo", rev = "01eab985a3f5056e47cc7b4753ca24f64d3a078a" }
+dojo = { git = "https://github.com/dojoengine/dojo", tag = "v0.6.0" }
+# token = { git = "https://github.com/dojoengine/origami", tag = "v0.6.0" }
+token = { git = "https://github.com/notV4l/origami", branch = "erc_without_events" }
 
 
 [tool.dojo]
@@ -36,20 +37,25 @@ build-external-contracts = [
     "token::components::token::erc20::erc20_allowance::erc_20_allowance_model",
     "token::components::token::erc20::erc20_mintable::erc_20_mintable_model",
     "token::components::token::erc20::erc20_burnable::erc_20_burnable_model",
-    "token::components::token::erc20::erc20_bridgeable::erc_20_bridgeable_model",
 ]
 
 [tool.dojo.env]
-world_address = "0x269c58e5fa1e7f6fe3756f1de88ecdfab7d03ba67e79ba0365b4ef1e81155be"
+world_address = "0x10923ed11da790f94efd6f68c5558f5f604df0ff2ff776bd5209b7ebb8985b8"
 
-# Development
-rpc_url = "http://localhost:5050/"
+[profile.dev.tool.dojo.env]
+rpc_url = "http://localhost:5050"
 account_address = "0xb3ff441a68610b30fd5e2abbf3a1548eb6ba6f3559f2862bf2dc757e5828ca"
 private_key = "0x2bbf4f9fd0bbb2e60b0316c1fe0b76cf7a4d0198bd493ced9b8df2a3a24d68a"
 lords_address = ""
 
-# SLOT
-# rpc_url = "https://api.cartridge.gg/x/pistols/katana"
-# account_address = "0x5b7d6d0110aba636b7df1d41858c036aefb8bee9dd4052c51fbf5cd9e2d614"
-# private_key = "0x534363549dc5f54179835979add2d508b4a0cb315d9648977aa5f9e363da67a"
-# lords_address = ""
+[profile.slot.tool.dojo.env]
+rpc_url = "https://api.cartridge.gg/x/pistols/katana"
+account_address = "0x5b7d6d0110aba636b7df1d41858c036aefb8bee9dd4052c51fbf5cd9e2d614"
+private_key = "0x534363549dc5f54179835979add2d508b4a0cb315d9648977aa5f9e363da67a"
+lords_address = ""
+
+[profile.release.tool.dojo.env]
+rpc_url = "https://api.cartridge.gg/x/realms/katana"
+account_address = ""
+private_key = ""
+lords_address = "0x51205c5e6ac3ad5691c28c0c5ffcdd62c70bddb63612f75a4bac9b2a85b9449"

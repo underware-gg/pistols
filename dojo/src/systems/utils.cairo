@@ -397,8 +397,8 @@ mod tests {
     #[test]
     #[available_gas(1_000_000)]
     fn test_pact_pair() {
-        let a: ContractAddress = starknet::contract_address_const::<0x269c58e5fa1e7f6fe3756f1de88ecdfab7d03ba67e79ba0365b4ef1e81155be>();
-        let b: ContractAddress = starknet::contract_address_const::<0xb3ff441a68610b30fd5e2abbf3a1548eb6ba6f3559f2862bf2dc757e5828ca>();
+        let a: ContractAddress = starknet::contract_address_const::<0x56c155b624fdf6bfc94f7b37cf1dbebb5e186ef2e4ab2762367cd07c8f892a1>();
+        let b: ContractAddress = starknet::contract_address_const::<0x6b86e40118f29ebe393a75469b4d926c7a44c2e2681b6d319520b7c1156d114>();
         let p_a = utils::make_pact_pair(a, b);
         let p_b = utils::make_pact_pair(b, a);
         assert(p_a == p_b, 'test_pact_pair');

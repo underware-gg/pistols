@@ -1,46 +1,39 @@
 use starknet::{ContractAddress, ClassHash};
 use dojo::world::IWorldDispatcher;
 
-#[starknet::interface]
-trait ILordsMock<TState> {
-    // IWorldProvider
-    fn world(self: @TState,) -> IWorldDispatcher;
-
+#[dojo::interface]
+trait ILordsMock {
     // IUpgradeable
-    fn upgrade(ref self: TState, new_class_hash: ClassHash);
+    fn upgrade(new_class_hash: ClassHash);
 
     // IERC20Metadata
-    fn decimals(self: @TState,) -> u8;
-    fn name(self: @TState,) -> felt252;
-    fn symbol(self: @TState,) -> felt252;
+    fn decimals() -> u8;
+    fn name() -> felt252;
+    fn symbol() -> felt252;
 
     // IERC20MetadataTotalSupply
-    fn total_supply(self: @TState,) -> u256;
+    fn total_supply() -> u256;
 
     // IERC20MetadataTotalSupplyCamel
-    fn totalSupply(self: @TState,) -> u256;
+    fn totalSupply() -> u256;
 
     // IERC20Balance
-    fn balance_of(self: @TState, account: ContractAddress) -> u256;
-    fn transfer(ref self: TState, recipient: ContractAddress, amount: u256) -> bool;
-    fn transfer_from(
-        ref self: TState, sender: ContractAddress, recipient: ContractAddress, amount: u256
-    ) -> bool;
+    fn balance_of( account: ContractAddress) -> u256;
+    fn transfer(recipient: ContractAddress, amount: u256) -> bool;
+    fn transfer_from(sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool;
 
     // IERC20BalanceCamel
-    fn balanceOf(self: @TState, account: ContractAddress) -> u256;
-    fn transferFrom(
-        ref self: TState, sender: ContractAddress, recipient: ContractAddress, amount: u256
-    ) -> bool;
+    fn balanceOf( account: ContractAddress) -> u256;
+    fn transferFrom(sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool;
 
     // IERC20Allowance
-    fn allowance(self: @TState, owner: ContractAddress, spender: ContractAddress) -> u256;
-    fn approve(ref self: TState, spender: ContractAddress, amount: u256) -> bool;
+    fn allowance( owner: ContractAddress, spender: ContractAddress) -> u256;
+    fn approve(spender: ContractAddress, amount: u256) -> bool;
 
     // WITHOUT INTERFACE !!!
-    fn initializer(ref self: TState);
-    fn faucet(ref self: TState);
-    fn dojo_resource(self: @TState,) -> felt252;
+    fn initializer();
+    fn faucet();
+    fn dojo_resource() -> felt252;
 }
 
 
@@ -48,14 +41,14 @@ trait ILordsMock<TState> {
 /// Interface required to remove compiler warnings and future
 /// deprecation.
 ///
-#[starknet::interface]
-trait ILordsMockInitializer<TState> {
-    fn initializer(ref self: TState);
+#[dojo::interface]
+trait ILordsMockInitializer {
+    fn initializer();
 }
 
-#[starknet::interface]
-trait ILordsMockFaucet<TState> {
-    fn faucet(ref self: TState);
+#[dojo::interface]
+trait ILordsMockFaucet {
+    fn faucet();
 }
 
 #[dojo::contract]
@@ -75,12 +68,9 @@ mod lords_mock {
     use token::components::token::erc20::erc20_burnable::erc20_burnable_component;
 
     component!(path: initializable_component, storage: initializable, event: InitializableEvent);
-
     component!(path: erc20_metadata_component, storage: erc20_metadata, event: ERC20MetadataEvent);
     component!(path: erc20_balance_component, storage: erc20_balance, event: ERC20BalanceEvent);
-    component!(
-        path: erc20_allowance_component, storage: erc20_allowance, event: ERC20AllowanceEvent
-    );
+    component!(path: erc20_allowance_component, storage: erc20_allowance, event: ERC20AllowanceEvent);
     component!(path: erc20_mintable_component, storage: erc20_mintable, event: ERC20MintableEvent);
     component!(path: erc20_burnable_component, storage: erc20_burnable, event: ERC20BurnableEvent);
 
@@ -120,28 +110,22 @@ mod lords_mock {
     impl InitializableImpl = initializable_component::InitializableImpl<ContractState>;
 
     #[abi(embed_v0)]
-    impl ERC20MetadataImpl =
-        erc20_metadata_component::ERC20MetadataImpl<ContractState>;
+    impl ERC20MetadataImpl = erc20_metadata_component::ERC20MetadataImpl<ContractState>;
 
     #[abi(embed_v0)]
-    impl ERC20MetadataTotalSupplyImpl =
-        erc20_metadata_component::ERC20MetadataTotalSupplyImpl<ContractState>;
+    impl ERC20MetadataTotalSupplyImpl = erc20_metadata_component::ERC20MetadataTotalSupplyImpl<ContractState>;
 
     #[abi(embed_v0)]
-    impl ERC20MetadataTotalSupplyCamelImpl =
-        erc20_metadata_component::ERC20MetadataTotalSupplyCamelImpl<ContractState>;
+    impl ERC20MetadataTotalSupplyCamelImpl = erc20_metadata_component::ERC20MetadataTotalSupplyCamelImpl<ContractState>;
 
     #[abi(embed_v0)]
-    impl ERC20BalanceImpl =
-        erc20_balance_component::ERC20BalanceImpl<ContractState>;
+    impl ERC20BalanceImpl = erc20_balance_component::ERC20BalanceImpl<ContractState>;
 
     #[abi(embed_v0)]
-    impl ERC20BalanceCamelImpl =
-        erc20_balance_component::ERC20BalanceCamelImpl<ContractState>;
+    impl ERC20BalanceCamelImpl = erc20_balance_component::ERC20BalanceCamelImpl<ContractState>;
 
     #[abi(embed_v0)]
-    impl ERC20AllowanceImpl =
-        erc20_allowance_component::ERC20AllowanceImpl<ContractState>;
+    impl ERC20AllowanceImpl = erc20_allowance_component::ERC20AllowanceImpl<ContractState>;
 
     //
     // Internal Impls
@@ -158,13 +142,11 @@ mod lords_mock {
     // Initializer
     //
 
-    const ETH_TO_WEI: u256 = 1_000_000_000_000_000_000;
-
     #[abi(embed_v0)]
     impl LordsMockInitializerImpl of super::ILordsMockInitializer<ContractState> {
-        fn initializer(ref self: ContractState) {
+        fn initializer(world: IWorldDispatcher) {
             assert(
-                self.world().is_owner(get_caller_address(), get_contract_address().into()),
+                world.is_owner(get_caller_address(), get_contract_address().into()),
                 Errors::CALLER_IS_NOT_OWNER
             );
 
@@ -179,9 +161,11 @@ mod lords_mock {
     // Faucet
     //
 
+    const ETH_TO_WEI: u256 = 1_000_000_000_000_000_000;
+
     #[abi(embed_v0)]
     impl LordsMockFaucetImpl of super::ILordsMockFaucet<ContractState> {
-        fn faucet(ref self: ContractState) {
+        fn faucet() {
             self.erc20_mintable.mint(get_caller_address(), 10_000 * ETH_TO_WEI);
         }
     }

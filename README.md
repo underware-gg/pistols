@@ -132,12 +132,12 @@ Install the [Cairo 1.0](https://marketplace.visualstudio.com/items?itemName=star
 
 > [Dojo Book](https://book.dojoengine.org/getting-started/quick-start.html)
 
-Using Dojo 0.5.1
+Using Dojo 0.6.0
 
 ```console
 curl -L https://install.dojoengine.org | bash
 # open new terminal to update PATH
-dojoup -v 0.5.1
+dojoup -v 0.6.0
 
 # test dojo
 cd dojo
