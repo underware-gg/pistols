@@ -43,12 +43,13 @@ export default function IndexPage() {
 
 function ConsoleTests() {
   const { masterAccount } = useDojoAccount()
-  useEffectOnce(() => {
+  useEffect(() => {
+    if (!BigInt(masterAccount?.address ?? 0)) return
     const _test = async () => {
       await testTypedData(masterAccount)
     }
     _test()
-  }, [])
+  }, [masterAccount])
   return (<h5>console tests...</h5>)
 }
 

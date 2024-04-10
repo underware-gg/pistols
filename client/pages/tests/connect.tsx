@@ -9,7 +9,7 @@ import { bigintToHex, shortAddress } from '@/lib/utils/types'
 import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
 import { makeDojoConfig } from '@/dojo/config'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
-import AppDojo from '@/lib/dojo/Dojo'
+import AppDojo from '@/lib/ui/AppDojo'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -105,7 +105,7 @@ function Connect() {
             <Cell>wallet</Cell>
             <Cell className='Code'>
               {connector && <>
-                <Image spaced src={connector.icon.dark} /> {connector.name}
+                <Image className='ProfilePicSmall' spaced src={connector.icon.dark} /> {connector.name}
               </>}
 
             </Cell>
