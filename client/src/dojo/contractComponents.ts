@@ -136,19 +136,6 @@ export function defineContractComponents(world: World) {
         }
       );
     })(),
-    ERC20BridgeableModel: (() => {
-      return defineComponent(
-        world,
-        { token: RecsType.BigInt, l2_bridge_address: RecsType.BigInt },
-        {
-          metadata: {
-            name: "ERC20BridgeableModel",
-            types: ["contractaddress","contractaddress"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
     ERC20MetadataModel: (() => {
       return defineComponent(
         world,
