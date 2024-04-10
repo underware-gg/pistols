@@ -13,6 +13,7 @@ import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import WalletHeader from '@/pistols/components/account/WalletHeader'
 import OnboardingModal from './account/OnboardingModal'
 import Logo from './Logo'
+import { useDojoSystem } from '@/lib/dojo/hooks/useDojoSystem'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -90,6 +91,17 @@ function ConnectedGate() {
     Object.values(burners).forEach(burner => {
       remove(burner.address)
     })
+  }
+
+  const { systemExists } = useDojoSystem('actions')
+
+  if (systemExists === false) {
+    return (
+      <VStack>
+        <hr />
+        <h3 className='TitleCase Negative'>Deployment not found!</h3>
+      </VStack>
+    )
   }
 
   return (

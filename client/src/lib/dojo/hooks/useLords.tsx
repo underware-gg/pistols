@@ -1,25 +1,19 @@
 import { useMemo } from 'react'
-import { getContractByName } from '@dojoengine/core'
 import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
+import { useDojoSystem } from '@/lib/dojo/hooks/useDojoSystem'
 import { useERC20Balance } from '@/lib/utils/hooks/useERC20'
-import { useDojo } from '@/lib/dojo/DojoContext'
 import { BigNumberish } from 'starknet'
+
 
 export const useLordsContract = () => {
   const { selectedChainConfig } = useStarknetContext()
-  const { setup: { manifest } } = useDojo()
-
   const contractAddress = useMemo(() => (selectedChainConfig.lordsContractAddress), [selectedChainConfig])
 
-  const mockAddress = useMemo(() => {
-    const mockContract = getContractByName(manifest, 'lords_mock')
-    return mockContract?.address ?? null
-  }, [manifest])
-
-  const isMock = !contractAddress && mockAddress != null
+  const { systemAddress, systemExists } = useDojoSystem('lords_mock')
+  const isMock = !contractAddress && systemExists
 
   return {
-    contractAddress: contractAddress ?? mockAddress,
+    contractAddress: (isMock ? systemAddress : contractAddress),
     isMock,
   }
 }

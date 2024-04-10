@@ -1,12 +1,13 @@
 import React, { useMemo } from 'react'
-import { Grid, Image, Dropdown, Icon } from 'semantic-ui-react'
-import { useAccount, useDisconnect, useStarkProfile } from '@starknet-react/core'
+import { Grid, Image, Dropdown } from 'semantic-ui-react'
+import { useAccount, useDisconnect } from '@starknet-react/core'
+import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
+import { useLordsContract } from '@/lib/dojo/hooks/useLords'
 import { useDojoChain } from '@/lib/dojo/hooks/useDojoChain'
 import { LordsBalance } from '@/pistols/components/account/LordsBalance'
 import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { feltToString } from '@/lib/utils/starknet'
 import { CHAIN_ID } from '@/lib/dojo/setup/chains'
 
@@ -18,6 +19,7 @@ export default function WalletHeader({
   const { disconnect } = useDisconnect()
   const { account, address, connector, isConnected } = useAccount()
   const { connectedChainName } = useDojoChain()
+  const { contractAddress } = useLordsContract()
 
   // BUG: https://github.com/apibara/starknet-react/issues/419
   // const { data, error, isLoading } = useStarkProfile({ address, enabled: false })
@@ -36,12 +38,14 @@ export default function WalletHeader({
         <Col width={9} textAlign='left' className='TitleCase Padded'>
           <h4>{name}</h4>
           <AddressShort address={address ?? 0n} />
-          {isConnected && <>
+          {isConnected && contractAddress &&
             <h5>LORDS balance: <LordsBalance address={address} big={false} /></h5>
-          </>}
+          }
         </Col>
         <Col width={5} verticalAlign='middle'>
-          <LordsFaucet fill large account={account} />
+          {isConnected && contractAddress &&
+            <LordsFaucet fill large account={account} />
+          }
           <ChainSwitcher />
           <ActionButton fill large onClick={() => disconnect()} label='Disconnect' />
         </Col>

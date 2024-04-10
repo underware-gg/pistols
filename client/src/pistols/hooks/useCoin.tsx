@@ -4,7 +4,6 @@ import { useERC20Balance } from '@/lib/utils/hooks/useERC20'
 import { bigintToEntity } from '@/lib/utils/types'
 import { feltToString } from '@/lib/utils/starknet'
 import { BigNumberish } from 'starknet'
-import { coins } from '@/pistols/utils/constants'
 
 export const useCoin = (coinKey: number) => {
   const { Coin } = useDojoComponents()

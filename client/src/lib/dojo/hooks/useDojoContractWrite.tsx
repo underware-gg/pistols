@@ -1,9 +1,8 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useWaitForTransaction } from '@starknet-react/core'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
-import { execute, splitU256 } from '@/lib/utils/starknet'
+import { execute } from '@/lib/utils/starknet'
 import { bigintToHex } from '@/lib/utils/types'
-import { erc20_abi } from '@/lib/abi'
 import { BigNumberish, Abi } from 'starknet'
 
 export function useDojoContractWrite(contractAddress: BigNumberish, abi: Abi, functionName: string, callData: BigNumberish[]) {
