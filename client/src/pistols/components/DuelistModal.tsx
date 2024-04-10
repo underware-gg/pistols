@@ -23,7 +23,7 @@ const Col = Grid.Column
 
 export default function DuelistModal() {
   const { create_challenge } = useDojoSystemCalls()
-  const { account, isMasterAccount } = useDojoAccount()
+  const { account, isGuest } = useDojoAccount()
   const router = useRouter()
 
   const { duelistAddress, dispatchSelectDuelist, dispatchSelectDuel } = usePistolsContext()
@@ -111,7 +111,7 @@ export default function DuelistModal() {
                 {
                   hasPact ? <ActionButton fill attention label='Existing Challenge!' onClick={() => dispatchSelectDuel(pactDuelId)} />
                     : isChallenging ? <BalanceRequiredButton disabled={!args} label='Submit Challenge!' onClick={() => _challenge()} coin={wagerCoin} wagerValue={wagerValue} fee={fee} />
-                      : <ActionButton fill disabled={isMasterAccount} label='Challenge for a Duel!' onClick={() => setIsChallenging(true)} />
+                      : <ActionButton fill disabled={isGuest} label='Challenge for a Duel!' onClick={() => setIsChallenging(true)} />
                 }
               </Col>
             }

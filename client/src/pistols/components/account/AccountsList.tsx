@@ -3,14 +3,14 @@ import { useRouter } from 'next/navigation'
 import { Grid, Divider } from 'semantic-ui-react'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { usePistolsContext, initialState } from '@/pistols/hooks/PistolsContext'
-import { AddressShort } from '@/lib/ui/AddressShort'
-import { ActionButton } from '@/pistols/components/ui/Buttons'
+import { useBurner, useBurnerAccount, useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
-import { BigNumberish } from 'starknet'
-import { useBurner, useBurnerAccount, useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
-import { LordsBalance } from './LordsBalance'
+import { LordsBalance } from '@/pistols/components/account/LordsBalance'
+import { ActionButton } from '@/pistols/components/ui/Buttons'
+import { AddressShort } from '@/lib/ui/AddressShort'
 import { bigintToHex } from '@/lib/utils/types'
+import { BigNumberish } from 'starknet'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -80,7 +80,9 @@ function AccountItem({
 
   return (
     <>
-
+      <Row columns={1} className='NoPadding'>
+        <Col><Divider /></Col>
+      </Row>
       <Row textAlign='center' verticalAlign='top'>
         <Col width={3} className='NoPadding'>
           <div>
@@ -100,9 +102,6 @@ function AccountItem({
           <div className='Spacer5' />
           <ActionButton fill attention disabled={!_canPlay} onClick={() => _duel()} label='Duel!' />
         </Col>
-      </Row>
-      <Row columns={1} className='NoPadding'>
-        <Col><Divider /></Col>
       </Row>
     </>
   )

@@ -4,16 +4,16 @@ import { Divider, Grid, Icon } from 'semantic-ui-react'
 import { VStack, VStackRow } from '@/lib/ui/Stack'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useDojoChain } from '@/lib/dojo/hooks/useDojoChain'
-import { useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
-import { AccountMenuKey, usePistolsContext } from '../hooks/PistolsContext'
-import { AccountsList } from '@/pistols/components/account/AccountsList'
-import { ActionButton } from './ui/Buttons'
-import { LordsBagIcon } from './account/Balance'
-import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
-import WalletHeader from '@/pistols/components/account/WalletHeader'
-import OnboardingModal from './account/OnboardingModal'
-import Logo from './Logo'
 import { useDojoSystem } from '@/lib/dojo/hooks/useDojoSystem'
+import { useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
+import { AccountMenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { AccountsList } from '@/pistols/components/account/AccountsList'
+import { ActionButton } from '@/pistols/components/ui/Buttons'
+import { LordsBagIcon } from '@/pistols/components/account/Balance'
+import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
+import OnboardingModal from '@/pistols/components/account/OnboardingModal'
+import WalletHeader from '@/pistols/components/account/WalletHeader'
+import Logo from '@/pistols/components/Logo'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -32,7 +32,7 @@ export default function Gate() {
 
         {!isConnected ?
           <span className='Title'>
-            This game requires need a <b>Starknet wallet</b>
+            Duelists require need a <b>Starknet wallet</b>
             <br />and some <LordsBagIcon /><b>LORDS</b> to play
           </span>
           : <WalletHeader />
@@ -46,27 +46,31 @@ export default function Gate() {
   )
 }
 
-
-function DisconnectedGate({
-  switchChain = false,
-}) {
-  // const { isConnected, isCorrectChain } = useDojoChain()
-  const { connectOpener } = usePistolsContext()
+function EnterAsGuestButton() {
+  const { deselect } = useDojoAccount()
   const router = useRouter()
 
   const _enterAsGuest = () => {
+    deselect()
     router.push('/tavern')
   }
 
   return (
+    <ActionButton fill large onClick={() => _enterAsGuest()} label='Enter as Guest' />
+  )
+}
+
+
+function DisconnectedGate({
+  switchChain = false,
+}) {
+  const { connectOpener } = usePistolsContext()
+  return (
     <>
       <VStack>
-
         <ActionButton fill large onClick={() => connectOpener.open()} label={switchChain ? 'Switch Chain' :'Connect Wallet'} />
-
         <Divider />
-
-        <ActionButton fill large onClick={() => _enterAsGuest()} label='Enter as Guest' />
+        <EnterAsGuestButton />
       </VStack>
 
       <StarknetConnectModal opener={connectOpener} />
@@ -117,9 +121,11 @@ function ConnectedGate() {
         </VStackRow>
 
       </VStack>
-      <Divider />
-
+      
       <AccountsList />
+
+      <Divider />
+      <EnterAsGuestButton />
 
       <OnboardingModal opener={accountSetupOpener} />
     </>

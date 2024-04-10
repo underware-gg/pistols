@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation'
 import { Grid, Menu, Label, Tab, TabPane, Icon } from 'semantic-ui-react'
 import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
 import { useChallengesByDuelist, useLiveChallengeIds } from '@/pistols/hooks/useChallenge'
-import { useThreeJsContext } from '../hooks/ThreeJsContext'
+import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
@@ -11,8 +11,8 @@ import { DuelistTable } from '@/pistols/components/DuelistTable'
 import { DuelStage } from '@/pistols/hooks/useDuel'
 import { MusicToggle } from '@/pistols/components/ui/Buttons'
 import { SPRITESHEETS } from '@/pistols/data/assets'
+import { AnimationState } from '@/pistols/three/game'
 import AccountHeader from '@/pistols/components/account/AccountHeader'
-import { AnimationState } from '../three/game'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -30,7 +30,7 @@ const _makeBubble = (count) => {
 
 export function MenuTavern({
 }) {
-  const { account } = useDojoAccount()
+  const { account, isGuest } = useDojoAccount()
   const { menuKey, tavernMenuItems, dispatchSetMenu } = usePistolsContext()
 
   const { awaitingCount, inProgressCount } = useChallengesByDuelist(BigInt(account.address))
@@ -39,13 +39,20 @@ export function MenuTavern({
   const yourDuelsCount = useMemo(() => (awaitingCount + inProgressCount), [awaitingCount, inProgressCount])
   const liveDuelsCount = useMemo(() => (liveChallengeIds.length), [liveChallengeIds])
 
-  const [started, setStarted] = useState(false)
+  const [started, setStarted] = useState<boolean>(false)
+
   useEffect(() => {
-    if (!started && (yourDuelsCount > 0 || liveDuelsCount > 0)) {
-      setStarted(false)
-      dispatchSetMenu(MenuKey.YourDuels)
+    if (!started) {
+      setStarted(true)
+      if (isGuest) {
+        dispatchSetMenu(MenuKey.LiveDuels)
+      } else if (yourDuelsCount > 0) {
+        dispatchSetMenu(MenuKey.YourDuels)
+      } else {
+        dispatchSetMenu(MenuKey.Duelists)
+      }
     }
-  }, [yourDuelsCount, liveDuelsCount])
+  }, [started, isGuest, yourDuelsCount, liveDuelsCount])
 
   const panes = useMemo(() => {
     let result = []

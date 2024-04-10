@@ -33,7 +33,7 @@ export default function IndexPage() {
 
 
 function DojoAccount() {
-  const { account, masterAccount, isMasterAccount } = useDojoAccount()
+  const { account, masterAccount, isGuest } = useDojoAccount()
 
   return (
     <Table celled striped color='orange' size='small'>
@@ -66,13 +66,13 @@ function DojoAccount() {
         <Row>
           <Cell>Dojo.account</Cell>
           <Cell className='Code'>
-            {account.address}
+            {account?.address ?? 'none'}
           </Cell>
         </Row>
         <Row>
-          <Cell>isMasterAccount</Cell>
+          <Cell>isGuest</Cell>
           <Cell className='Code Important'>
-            {isMasterAccount ? 'true' : 'false'}
+            {isGuest ? 'true' : 'false'}
           </Cell>
         </Row>
       </Body>

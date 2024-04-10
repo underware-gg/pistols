@@ -1,6 +1,5 @@
-import { ReactNode, createContext, useContext } from 'react'
+import { ReactNode, createContext, useContext, useMemo } from 'react'
 import { BurnerAccount, useBurnerManager, useBurnerWindowObject, usePredeployedWindowObject } from '@dojoengine/create-burner'
-import { bigintEquals } from '@/lib/utils/types'
 import { SetupResult } from '@/lib/dojo/setup/useSetup'
 import { Account } from 'starknet'
 
@@ -23,7 +22,7 @@ export const DojoProvider = ({
   const currentValue = useContext(DojoContext);
   if (currentValue) throw new Error('DojoProvider can only be used once');
 
-  const { burnerManager, predeployedManager } = value
+  const { burnerManager, predeployedManager, dojoProvider } = value
 
   const masterAccount = burnerManager.masterAccount as Account
   const burner: BurnerAccount = useBurnerManager({ burnerManager, })
@@ -37,7 +36,7 @@ export const DojoProvider = ({
       value={{
         setup: value,
         masterAccount,
-        account: (burner.account ?? masterAccount) as Account,
+        account: (burner.account as Account) ?? new Account(dojoProvider.provider, '0x0', '0x0'),
         burner,
       }}
     >
@@ -55,24 +54,24 @@ export const useDojo = (): DojoContextType => {
 };
 
 
-//
-// NEW
+//-----------------------
+// Pistols
 //
 
 export const useDojoAccount = (): BurnerAccount & {
   masterAccount: Account
   account: Account
   accountAddress: bigint
-  isMasterAccount: boolean
+  isGuest: boolean
 } => {
   const { burner, account, masterAccount } = useDojo()
-  // account: { create, list, select, account, isDeploying }
+  const accountAddress = useMemo(() => BigInt(account?.address ?? 0), [account])
   return {
     ...burner,
     masterAccount,
     account,
-    accountAddress: BigInt(account?.address ?? 0),
-    isMasterAccount: bigintEquals(masterAccount.address, account.address),
+    accountAddress,
+    isGuest: (accountAddress == 0n),
   }
 }
 
