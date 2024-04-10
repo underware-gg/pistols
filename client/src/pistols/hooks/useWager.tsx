@@ -1,12 +1,11 @@
+import { useMemo } from 'react'
 import { getComponentValue } from '@dojoengine/recs'
 import { useComponentValue } from "@dojoengine/react"
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { useChallengesByDuelist } from '@/pistols/hooks/useChallenge'
 import { bigintToEntity } from '@/lib/utils/types'
+import { ChallengeState } from '@/pistols/utils/pistols'
 import { BigNumberish } from 'starknet'
-import { COIN_LORDS } from './useConfig'
-import { useMemo } from 'react'
-import { ChallengeState } from '../utils/pistols'
 
 export const useWager = (duelId: BigNumberish) => {
   const { Wager } = useDojoComponents()
@@ -21,7 +20,7 @@ export const useWager = (duelId: BigNumberish) => {
   }
 }
 
-export const useLockedWager = (address: bigint, coin: number = COIN_LORDS) => {
+export const useLockedWagerTotals = (address: bigint, coin: number) => {
   const { Wager } = useDojoComponents()
   const { challenges, challengerIds } = useChallengesByDuelist(address)
   const { wagers, fees, total } = useMemo(() => {
@@ -30,7 +29,7 @@ export const useLockedWager = (address: bigint, coin: number = COIN_LORDS) => {
     challenges.forEach((challenge) => {
       if (challenge.state == ChallengeState.InProgress || (challenge.state == ChallengeState.Awaiting && challengerIds.includes(challenge.duel_id))) {
         const wager = getComponentValue(Wager, bigintToEntity(challenge.duel_id))
-        if (wager) {
+        if (wager && wager.coin == coin) {
           wagers += wager.value
           fees += wager.fee
         }

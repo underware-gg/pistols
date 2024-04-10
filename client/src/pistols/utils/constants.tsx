@@ -5,7 +5,7 @@ export const PROFILE_PIC_COUNT = 15
 /// Cairo constants
 // must be in sync with CONSTANTS from constants.cairo
 //
-const constants = {
+export const constants = {
   ROUND_COUNT: 3,
   FULL_HONOUR: 100,
   FULL_HEALTH: 3,
@@ -14,6 +14,17 @@ const constants = {
 
   // HASH_SALT_MASK: 0xffffffffffffffffn, // 64 bits
   HASH_SALT_MASK: 0x1fffffffffffffn,   // 53 bits (Number.MAX_SAFE_INTEGER, 9007199254740991)
+
+  //
+  // /dojo/src/models/coins.cairo
+  COIN_LORDS: 1,
+
 }
 
-export default constants
+//------------------------------------------
+// Coins
+// must be in sync with coins.cairo
+//
+export const coins = {
+  LORDS: 1,
+}

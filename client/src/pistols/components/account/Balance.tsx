@@ -1,17 +1,18 @@
 import { useMemo } from 'react'
-import { CustomIcon } from '@/lib/ui/Icons'
-import { COIN_LORDS } from '@/pistols/hooks/useConfig'
+import { CustomIcon, IconSizeProp } from '@/lib/ui/Icons'
 import { weiToEth } from '@/lib/utils/starknet'
 import { BigNumberish } from 'starknet'
 
 export function LordsBagIcon({
   size = null,
+} : {
+  size?: IconSizeProp
 }) {
   return <CustomIcon logo png name='lords_bag' size={size} />
 }
 
-function Wager({
-  coin = COIN_LORDS,
+export function Balance({
+  coin, // used for icon only
   value = null,
   wei = null,
   big = false,
@@ -62,42 +63,3 @@ function Wager({
   )
 }
 
-function WagerAndOrFees({
-  coin = COIN_LORDS,
-  value,
-  fee,
-  pre = null,
-}: {
-  coin: number
-  value: BigNumberish
-  fee: BigNumberish
-  pre?: string
-  big?: boolean
-}) {
-  if (BigInt(value ?? 0) > 0n) {
-    return (
-      <>
-        <span>
-          <Wager big coin={coin} wei={value} pre={pre} />
-        </span>
-        &nbsp;&nbsp;
-        <span>
-          (<Wager clean coin={coin} wei={fee} pre='+' /> fee)
-        </span>
-      </>
-    )
-  }
-  if (BigInt(fee ?? 0) > 0n) {
-    return (
-      <span>
-        <Wager big coin={coin} wei={fee} pre={pre} />
-      </span>
-    )
-  }
-  return <></>
-}
-
-export {
-  Wager,
-  WagerAndOrFees,
-}

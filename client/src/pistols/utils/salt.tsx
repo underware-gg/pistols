@@ -5,7 +5,7 @@ import {
 } from 'starknet'
 import { pedersen } from '@/lib/utils/starknet'
 import { signMessages, Messages } from '@/lib/utils/starknet_sign'
-import constants from '@/pistols/utils/constants'
+import { constants } from '@/pistols/utils/constants'
 import { bigintToHex } from '@/lib/utils/types'
 
 export const make_action_hash = (salt: BigNumberish, action: BigNumberish) => (pedersen(BigInt(salt), BigInt(action)) & constants.HASH_SALT_MASK)

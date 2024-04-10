@@ -1,9 +1,26 @@
 import { useMemo } from 'react'
-import { useContract, useContractWrite, useWaitForTransaction } from '@starknet-react/core'
+import { useBalance, useContract, useContractWrite, useWaitForTransaction } from '@starknet-react/core'
 import { bigintToHex } from '@/lib/utils/types'
 import { splitU256 } from '@/lib/utils/starknet'
 import { erc20_abi } from '@/lib/abi'
 import { BigNumberish } from 'starknet'
+
+export const useERC20Balance = (contractAddress: BigNumberish, ownerAddress: BigNumberish, fee: BigNumberish = 0n) => {
+  const { data: balance } = useBalance({ address: BigInt(ownerAddress ?? 0n).toString(), token: bigintToHex(contractAddress), watch: true, refetchInterval: 5_000 })
+
+  const noFundsForFee = useMemo(() => {
+    if (!fee || !balance) return false
+    return (BigInt(balance.value) < BigInt(fee))
+  }, [balance, fee])
+
+  return {
+    balance: balance?.value ?? 0n,        // wei
+    formatted: balance?.formatted ?? 0,   // eth
+    decimals: balance?.decimals ?? 0,     // 18
+    symbol: balance?.symbol ?? '?',       // eth
+    noFundsForFee,
+  }
+}
 
 export function useERC20Transfer(contractAddress: BigNumberish, toAddress: BigNumberish, amount: bigint) {
   const { contract } = useContract({

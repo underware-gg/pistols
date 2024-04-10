@@ -8,7 +8,7 @@ import { keysToEntity } from '@/lib/utils/types'
 import { ActionNames, ActionVerbs, RoundState } from "@/pistols/utils/pistols"
 import { AnimationState } from "@/pistols/three/game"
 import { BigNumberish } from 'starknet'
-import constants from '../utils/constants'
+import { constants } from '@/pistols/utils/constants'
 
 export enum DuelStage {
   Null,             // 0

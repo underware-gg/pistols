@@ -1,7 +1,6 @@
 import { Account, AccountInterface } from 'starknet'
 import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
-import { useLordsFaucet } from '@/lib/dojo/hooks/useLordsFaucet'
-import { useCoin, COIN_LORDS } from '@/pistols/hooks/useConfig'
+import { useLordsFaucet } from '@/lib/dojo/hooks/useLordsMock'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 
 export const LordsFaucet = ({
@@ -17,8 +16,7 @@ export const LordsFaucet = ({
 }) => {
   const { selectedChainConfig } = useStarknetContext()
 
-  const { contractAddress } = useCoin(COIN_LORDS)
-  const { faucet, hasFaucet, isPending } = useLordsFaucet(contractAddress)
+  const { faucet, hasFaucet, isPending } = useLordsFaucet()
 
   const _hasFaucet = hasFaucet || Boolean(selectedChainConfig.lordsFaucetUrl)
 

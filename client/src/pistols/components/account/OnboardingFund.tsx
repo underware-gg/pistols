@@ -3,16 +3,16 @@ import { Divider, Grid, Header, Input } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useBurnerAccount } from '@/lib/dojo/hooks/useBurnerAccount'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { useLordsContract } from '@/lib/dojo/hooks/useLordsContract'
+import { useLordsBalance, useLordsContract } from '@/lib/dojo/hooks/useLords'
 import { useDojoERC20Transfer } from '@/lib/dojo/hooks/useDojoERC20'
-import { useLordsBalance } from '@/lib/dojo/hooks/useLordsBalance'
 import { useERC20Transfer } from '@/lib/utils/hooks/useERC20'
-import { LockedBalance, LordsBalance } from '@/pistols/components/account/LordsBalance'
+import { LockedWagerBalance, LordsBalance } from '@/pistols/components/account/LordsBalance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { IconTransfer } from '@/lib/ui/Icons'
 import { ethToWei } from '@/lib/utils/starknet'
 import { isNumber } from '@/lib/utils/types'
 import { BigNumberish } from 'starknet'
+import { coins } from '@/pistols/utils/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -32,7 +32,7 @@ export function OnboardingFund({
     <div className='Padded'>
 
       <h3>Account Balance</h3>
-      <h3><LordsBalance address={account?.address} /></h3>
+      <span className='H3'><LordsBalance address={account?.address} big /></span>
       <Divider hidden />
       {deposit &&
         <div style={_rowStyle}>
@@ -49,7 +49,7 @@ export function OnboardingFund({
       </Divider>
 
       <h3>Duelist Balance</h3>
-      <h3><LordsBalance address={address} /> <LockedBalance address={address} clean /></h3>
+      <span className='H3'><LordsBalance address={address} big /></span> <LockedWagerBalance coin={coins.LORDS} address={address} clean />
       <Divider hidden />
       {!deposit &&
         <div style={_rowStyle}>
@@ -138,7 +138,7 @@ function DepositForm({
 
   return (
     <Grid className='NoPadding'>
-      <Row columns={'equal'} className='NoPadding'>
+      <Row columns={'equal'} className='NoPadding' verticalAlign='middle'>
         <Col>
           <Input fluid
             maxLength={7}

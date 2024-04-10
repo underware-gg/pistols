@@ -8,7 +8,7 @@ import { useDuel } from '@/pistols/hooks/useDuel'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ActionEmojis, ActionNames, ChallengeStateNames, RoundStateNames } from '@/pistols/utils/pistols'
 import { useWager } from '@/pistols/hooks/useWager'
-import { useCoin } from '@/pistols/hooks/useConfig'
+import { useCoin } from '@/pistols/hooks/useCoin'
 import AppPistols from '@/pistols/components/AppPistols'
 
 const Row = Table.Row
@@ -153,10 +153,9 @@ function WagerStats({
 }: {
   duelId: bigint
 }) {
-  const wager = useWager(duelId)
-  const coin = useCoin(wager?.coin)
-  console.log(coin)
-  if (wager.value == 0) return <></>
+  const { coin, value, fee } = useWager(duelId)
+  const { description } = useCoin(coin)
+  if (value == 0) return <></>
   return (
     <Table celled striped color='green'>
       <Header>
@@ -170,19 +169,19 @@ function WagerStats({
         <Row>
           <Cell>Coin</Cell>
           <Cell>
-            {wager.coin} ({coin.description})
+            {coin} ({description})
           </Cell>
         </Row>
         <Row>
           <Cell>Value</Cell>
           <Cell>
-            {wager.value.toString()} wei : {weiToEth(wager.value).toString()}
+            {value.toString()} wei : {weiToEth(value).toString()}
           </Cell>
         </Row>
         <Row>
           <Cell>Fee</Cell>
           <Cell>
-            {wager.fee.toString()} wei : {weiToEth(wager.fee).toString()}
+            {fee.toString()} wei : {weiToEth(fee).toString()}
           </Cell>
         </Row>
       </Body>

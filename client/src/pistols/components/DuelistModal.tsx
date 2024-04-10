@@ -13,10 +13,10 @@ import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ChallengeTableByDuelist } from '@/pistols/components/ChallengeTable'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
 import { ChallengeMessages } from '@/pistols/utils/pistols'
-import { randomArrayElement } from '@/lib/utils/random'
+import { WagerAndOrFees } from '@/pistols/components/account/LordsBalance'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { WagerAndOrFees } from '@/pistols/components/account/Wager'
-import { COIN_LORDS } from '@/pistols/hooks/useConfig'
+import { randomArrayElement } from '@/lib/utils/random'
+import { coins } from '@/pistols/utils/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -33,7 +33,8 @@ export default function DuelistModal() {
   const [args, setArgs] = useState(null)
 
   const wagerValue = useMemo(() => (args?.wager_value ?? 0n), [args])
-  const { fee } = useCalcFee(COIN_LORDS, wagerValue)
+  const wagerCoin = useMemo(() => (args?.wager_coin ?? coins.LORDS), [args])
+  const { fee } = useCalcFee(wagerCoin, wagerValue)
 
   const isYou = useMemo(() => (duelistAddress == BigInt(account.address)), [duelistAddress, account])
   const isOpen = useMemo(() => (duelistAddress > 0), [duelistAddress])
@@ -109,7 +110,7 @@ export default function DuelistModal() {
               <Col>
                 {
                   hasPact ? <ActionButton fill attention label='Existing Challenge!' onClick={() => dispatchSelectDuel(pactDuelId)} />
-                    : isChallenging ? <BalanceRequiredButton disabled={!args} label='Submit Challenge!' onClick={() => _challenge()} wagerValue={wagerValue} fee={fee} />
+                    : isChallenging ? <BalanceRequiredButton disabled={!args} label='Submit Challenge!' onClick={() => _challenge()} coin={wagerCoin} wagerValue={wagerValue} fee={fee} />
                       : <ActionButton fill disabled={isMasterAccount} label='Challenge for a Duel!' onClick={() => setIsChallenging(true)} />
                 }
               </Col>
@@ -137,7 +138,7 @@ function CreateChallenge({
   const [message, setMessage] = useState('')
   const [days, setDays] = useState(7)
   const [hours, setHours] = useState(0)
-  const [coin, setCoin] = useState(COIN_LORDS)
+  const [coin, setCoin] = useState(coins.LORDS)
   const [value, setValue] = useState(0)
   const { fee } = useCalcFee(coin, ethToWei(value))
 
@@ -231,7 +232,7 @@ function CreateChallenge({
           }} />
         </Form.Field>
 
-        <WagerAndOrFees coin={coin} value={ethToWei(value)} fee={fee} pre={'Cost: '} />
+        <WagerAndOrFees big coin={coin} value={ethToWei(value)} fee={fee} pre={'Cost: '} />
 
       </Form>
 

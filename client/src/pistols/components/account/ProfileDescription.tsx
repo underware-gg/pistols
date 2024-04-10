@@ -2,11 +2,12 @@ import React, { useMemo } from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
-import { LordsBalance, LockedBalance } from '@/pistols/components/account/LordsBalance'
+import { WagerBalance, LockedWagerBalance } from '@/pistols/components/account/LordsBalance'
 import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { bigintEquals } from '@/lib/utils/types'
 import { EMOJI } from '@/pistols/data/messages'
+import { coins } from '@/pistols/utils/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -29,8 +30,8 @@ export function ProfileDescription({
   displayBalance = false,
 }) {
   const { total_wins, total_losses, total_draws, total_duels, total_honour, honourAndTotal } = useDuelist(address)
-  const { account } = useDojoAccount()
-  const isYou = useMemo(() => bigintEquals(address, account.address), [address, account])
+  // const { account } = useDojoAccount()
+  // const isYou = useMemo(() => bigintEquals(address, account.address), [address, account])
   return (
     <Grid columns='equal'>
       <Row>
@@ -40,9 +41,9 @@ export function ProfileDescription({
           {displayAddress && <AddressShort address={address} />}
           <h3 className='Important NoMargin'>Honour: {honourAndTotal}</h3>
           {displayBalance && <>
-            <LordsBalance address={address} big />
-            <LockedBalance address={address} clean />
-            {isYou && <><br /><LordsFaucet /></>}
+            <WagerBalance coin={coins.LORDS} address={address} big />
+            <LockedWagerBalance coin={coins.LORDS} address={address} clean />
+            {/* {isYou && <><br /><LordsFaucet /></>} */}
           </>}
         </Col>
 

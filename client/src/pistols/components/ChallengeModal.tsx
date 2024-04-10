@@ -5,15 +5,15 @@ import { useDojoAccount, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { useWager } from '@/pistols/hooks/useWager'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePicButton } from '@/pistols/components/account/ProfilePic'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
+import { WagerAndOrFees } from '@/pistols/components/account/LordsBalance'
 import { ChallengeState, makeDuelUrl } from '@/pistols/utils/pistols'
-import { AddressShort } from '@/lib/ui/AddressShort'
 import { DuelIconsAsGrid } from '@/pistols/components/DuelIcons'
+import { AddressShort } from '@/lib/ui/AddressShort'
 import { ChallengeTime } from './ChallengeTime'
-import { Wager, WagerAndOrFees } from './account/Wager'
-import { useWager } from '../hooks/useWager'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -121,7 +121,7 @@ export default function ChallengeModal() {
               </Row>
               <Row columns='equal' textAlign='center'>
                 <Col>
-                  <WagerAndOrFees coin={coin} value={value} fee={isYou ? fee : 0} />
+                  <WagerAndOrFees big coin={coin} value={value} fee={isYou ? fee : 0} />
                 </Col>
               </Row>
             </>}
@@ -173,7 +173,7 @@ export default function ChallengeModal() {
             }
             {(state == ChallengeState.Awaiting && isChallenged) &&
               <Col>
-                <BalanceRequiredButton label='Accept Challenge!' onClick={() => _reply(true)} wagerValue={value} fee={fee} />
+                <BalanceRequiredButton label='Accept Challenge!' onClick={() => _reply(true)} coin={coin} wagerValue={value} fee={fee} />
               </Col>
             }
             {(state == ChallengeState.InProgress) &&

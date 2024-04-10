@@ -1,15 +1,16 @@
 import React, { useEffect } from 'react'
 import { Modal, Tab, TabPane, Grid, Menu } from 'semantic-ui-react'
 import { useBurnerAccount, useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
+import { useDojoAccount } from '@/lib/dojo/DojoContext'
+import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { IconChecked, IconWarning } from '@/lib/ui/Icons'
 import { AccountMenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { OnboardingDeploy } from '@/pistols/components/account/OnboardingDeploy'
 import { OnboardingFund } from '@/pistols/components/account/OnboardingFund'
 import { OnboardingProfile } from '@/pistols/components/account/OnboardingProfile'
-import { Opener } from '@/lib/ui/useOpener'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { useDojoAccount } from '@/lib/dojo/DojoContext'
+import { Opener } from '@/lib/ui/useOpener'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -25,7 +26,10 @@ export default function OnboardingModal({
   const { accountMenuKey, accountMenuItems, accountIndex, dispatchSetAccountMenu, dispatchSetAccountIndex} = usePistolsContext()
   const tabIndex = accountMenuItems.findIndex(k => (k == accountMenuKey))
 
-  const { isDeployed, isImported, isFunded, isProfiled, address } = useBurnerAccount(accountIndex)
+  const { isDeployed, isImported, isFunded, address } = useBurnerAccount(accountIndex)
+
+  const { name } = useDuelist(address)
+  const isProfiled = Boolean(name)
 
   useEffect(() => {
     if (opener.isOpen) {

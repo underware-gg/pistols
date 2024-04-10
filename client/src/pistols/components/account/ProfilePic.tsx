@@ -19,11 +19,12 @@ export function ProfilePic({
   square = false,
   duel = false,
   floated = null,
+  className = null
 }) {
-  const className = useMemo(() => _className(small, square, duel), [square])
+  const classNames = useMemo(() => [_className(small, square, duel), className], [square])
   const suffix = useMemo(() => _suffix(square), [square])
   const url = useMemo(() => _makeUrl(profilePic, suffix), [profilePic, suffix])
-  return <Image src={url} className={className} floated={floated} />
+  return <Image src={url} className={classNames.join(' ')} floated={floated} />
 }
 
 export function ProfilePicButton({

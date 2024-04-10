@@ -12,7 +12,7 @@ import { ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { DuelIconsAsRow } from '@/pistols/components/DuelIcons'
 import { FilterButton } from '@/pistols/components/ui/Buttons'
-import { Wager } from '@/pistols/components/account/Wager'
+import { Balance } from '@/pistols/components/account/Balance'
 import { BigNumberish } from 'starknet'
 
 const Row = Grid.Row
@@ -210,14 +210,14 @@ function DuelItem({
             <PositiveResult positive={true}>
               <ProfileName address={winnerIsA ? duelistA : duelistB} badges={false} />
             </PositiveResult>
-            {value && <><br /><Wager small coin={coin} wei={value} /></>}
+            {value && <><br /><Balance small coin={coin} wei={value} /></>}
           </>
           :
           <>
             <span className={ChallengeStateClasses[state]}>
               {ChallengeStateNames[state]}
             </span>
-            {value && <><br /><Wager small coin={coin} wei={value} crossed={!isLive} /></>}
+            {value && <><br /><Balance small coin={coin} wei={value} crossed={!isLive} /></>}
           </>
         }
       </Cell>

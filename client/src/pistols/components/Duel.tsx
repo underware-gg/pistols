@@ -17,9 +17,9 @@ import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import CommitBladesModal from '@/pistols/components/CommitBladesModal'
 import RevealModal from '@/pistols/components/RevealModal'
 import { EMOJI } from '@/pistols/data/messages'
-import constants from '@/pistols/utils/constants'
+import { constants } from '@/pistols/utils/constants'
 import { ActionEmojis, ActionTypes } from '../utils/pistols'
-import { Wager } from './account/Wager'
+import { Balance } from './account/Balance'
 import { useWager } from '../hooks/useWager'
 
 const Row = Grid.Row
@@ -54,7 +54,7 @@ export default function Duel({
       <div className='TavernTitle' style={{ maxWidth: '350px' }}>
         <h1 className='Quote'>{`“${message}”`}</h1>
         {value > 0 &&
-          <h5><Wager big coin={coin} wei={value} /></h5>
+          <h5><Balance big coin={coin} wei={value} /></h5>
         }
         {(isFinished && animated == AnimationState.Finished) &&
           <Segment>

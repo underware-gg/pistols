@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import Link from 'next/link'
+import React, { useMemo, useState } from 'react'
 import { Icon, IconGroup, Popup, PopupContent, PopupHeader, SemanticICONS } from 'semantic-ui-react'
 import { IconProps, IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
+
+export type { IconSizeProp, SemanticICONS }
 
 // Semantic UI Icons
 // https://react.semantic-ui.com/elements/icon/

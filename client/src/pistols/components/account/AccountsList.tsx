@@ -57,12 +57,13 @@ function AccountItem({
   const router = useRouter()
   const { select } = useDojoAccount()
 
-  const burner = useBurner(address)
-  const { isImported, isProfiled } = useBurnerAccount(accountIndex)
-  const _canPlay = (isImported && isProfiled)
-
   const { name, profilePic } = useDuelist(address)
   const defaultAccountName = useMemo(() => (`Duelist #${accountIndex}`), [accountIndex])
+  const isProfiled = Boolean(name)
+
+  const burner = useBurner(address)
+  const { isImported } = useBurnerAccount(accountIndex)
+  const _canPlay = (isImported && isProfiled)
 
   const { accountSetupOpener, dispatchSetAccountIndex, dispatchSetMenu } = usePistolsContext()
 

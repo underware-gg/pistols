@@ -59,7 +59,7 @@ export function OnboardingProfile({
         <Row textAlign='center' verticalAlign='top'>
           <Col width={5} className='NoPadding'>
             <div>
-              <ProfilePic profilePic={_profilePic} />
+              <ProfilePic profilePic={_profilePic} className='AutoHeight' />
               <Grid columns={'equal'}>
                 <Row className='H2'>
                   <Col>

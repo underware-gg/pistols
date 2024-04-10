@@ -2,10 +2,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { Burner } from '@dojoengine/create-burner'
 import { useContract } from '@starknet-react/core'
 import { useDojo, useDojoAccount } from '@/lib/dojo/DojoContext'
-import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { useLordsBalance } from '@/lib/dojo/hooks/useLords'
 import { bigintEquals, bigintToHex } from '@/lib/utils/types'
 import { BigNumberish, hash } from 'starknet'
-import { useLordsBalance } from './useLordsBalance'
 import { katana_account_abi } from '@/lib/abi'
 
 export const useBurner = (address: BigNumberish) => {
@@ -69,17 +68,11 @@ export const useBurnerAccount = (accountIndex: number) => {
   // Funded?
   const { balance } = useLordsBalance(address)
 
-  //
-  // Profiled
-  const { name } = useDuelist(address ?? 0n)
-  const isProfiled = Boolean(name)
-
   return {
     address,
     isDeployed: (burner != null),
     isImported: (burner != null),
     isFunded: (balance > 0n),
-    isProfiled,
   }
 }
 

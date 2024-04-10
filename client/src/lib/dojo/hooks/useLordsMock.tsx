@@ -1,9 +1,8 @@
-import { useCallback, useMemo, useState } from 'react'
-import { getContractByName } from '@dojoengine/core'
+import { useCallback, useState } from 'react'
 import { useDojo, useDojoAccount } from '@/lib/dojo/DojoContext'
-import { bigintEquals } from '@/lib/utils/types'
 import { Account, AccountInterface } from 'starknet'
 import { feltToString } from '../../utils/starknet'
+import { useLordsContract } from './useLords'
 
 export interface FaucetExecuteResult {
   hash: string
@@ -16,15 +15,11 @@ export interface FaucetInterface {
   error?: string
 }
 
-export const useLordsFaucet = (contractAddress): FaucetInterface => {
-  const { setup: { dojoProvider, manifest } } = useDojo()
+export const useLordsFaucet = (): FaucetInterface => {
+  const { setup: { dojoProvider } } = useDojo()
   const { account } = useDojoAccount()
 
-  const mockAddress = useMemo(() => {
-    const mockContract = getContractByName(manifest, 'lords_mock')
-    return mockContract?.address ?? 0
-  }, [dojoProvider])
-  const hasFaucet = mockAddress && bigintEquals(mockAddress, contractAddress)
+  const { contractAddress, isMock } = useLordsContract()
 
   const [isPending, setIsPending] = useState(false)
   const [error, setError] = useState<string | undefined>(undefined)
@@ -67,8 +62,8 @@ export const useLordsFaucet = (contractAddress): FaucetInterface => {
   )
 
   return {
-    faucet: hasFaucet ? faucet : null,
-    hasFaucet,
+    faucet: isMock ? faucet : null,
+    hasFaucet: isMock,
     isPending,
     error,
   }
