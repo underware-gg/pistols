@@ -146,7 +146,7 @@ sozo test
 
 # install packages
 cd ../client
-npm install
+pnpm install
 ```
 
 
@@ -180,7 +180,7 @@ cd dojo
 
 ```console
 cd client
-npm install && npm dev
+pnpm install && pnpm dev
 
 # or just...
 cd dojo
