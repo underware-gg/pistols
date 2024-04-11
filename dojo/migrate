@@ -44,14 +44,16 @@ sozo -P $PROFILE migrate apply --world $WORLD_ADDRESS
 scripts/default_auth.sh $PROFILE
 
 
-#-----------------
-# copy files
+#------------------------
+# copy manifest to client
+#
+mkdir -p $CLIENT_MANIFEST_PATH
+cp $MANIFEST_FILE_PATH $CLIENT_MANIFEST_PATH/
+
+#------------------------
+# typescript bindings
 #
 if [[ "$PROFILE" == "dev" ]]; then
-  # copy manifest to client
-  mkdir -p $CLIENT_MANIFEST_PATH
-  cp $MANIFEST_FILE_PATH $CLIENT_MANIFEST_PATH/
-
   # TODO: Enable this when bindings are working
   # generate and cop bindings
   # sozo build --typescript

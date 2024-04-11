@@ -46,11 +46,11 @@ const localKatanaConfig: DojoChainConfig = {
 const pistolsSlotConfig: DojoChainConfig = {
   name: chains.pistolsSlotChain.name,
   chain: chains.pistolsSlotChain,
-  rpcUrl: 'https://api.cartridge.gg/x/pistols/katana',
-  toriiUrl: 'https://api.cartridge.gg/x/pistols/torii',
+  rpcUrl: 'https://api.cartridge.gg/x/pistols-slot/katana',
+  toriiUrl: 'https://api.cartridge.gg/x/pistols-slot/torii',
   relayUrl: undefined,
-  masterAddress: '0x5b7d6d0110aba636b7df1d41858c036aefb8bee9dd4052c51fbf5cd9e2d614',
-  masterPrivateKey: '0x534363549dc5f54179835979add2d508b4a0cb315d9648977aa5f9e363da67a',
+  masterAddress: '0x23ce913a39de30f729aee781b8dea86281b9a25d897e5d9fb61e3e95cae8cd',
+  masterPrivateKey: '0x22372b22b591f4db22860a70e6f831c4eadb80e42669f54ccc7fe2420befea9',
   accountClassHash: KATANA_CLASS_HASH,
   lordsContractAddress: undefined, // lords_mock
   lordsFaucetUrl: undefined,

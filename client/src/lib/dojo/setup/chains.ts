@@ -50,10 +50,10 @@ export const pistolsSlotChain = {
   testnet: true,
   rpcUrls: {
     default: {
-      http: ['https://api.cartridge.gg/x/pistols/katana',],
+      http: ['https://api.cartridge.gg/x/pistols-slot/katana',],
     },
     public: {
-      http: ['https://api.cartridge.gg/x/pistols/katana',],
+      http: ['https://api.cartridge.gg/x/pistols-slot/katana',],
     },
   },
   explorers: {
