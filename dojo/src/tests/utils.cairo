@@ -76,16 +76,16 @@ mod utils {
         let lords = ILordsMockDispatcher{ contract_address: deploy_system(world, lords_mock::TEST_CLASS_HASH) };
         let ierc20 = IERC20Dispatcher{ contract_address:lords.contract_address };
         // initializers
-        execute_ierc20_initializer(lords, owner);
-        execute_faucet(lords, owner);
-        execute_faucet(lords, other);
+        execute_lords_initializer(lords, owner);
+        execute_lords_faucet(lords, owner);
+        execute_lords_faucet(lords, other);
         if (initialize) {
-            execute_initialize(admin, owner, owner, treasury, lords.contract_address);
+            execute_admin_initialize(admin, owner, owner, treasury, lords.contract_address);
         }
         if (approve) {
-            execute_approve(lords, owner, system.contract_address, 1_000_000 * ETH_TO_WEI);
-            execute_approve(lords, other, system.contract_address, 1_000_000 * ETH_TO_WEI);
-            execute_approve(lords, bummer, system.contract_address, 1_000_000 * ETH_TO_WEI);
+            execute_lords_approve(lords, owner, system.contract_address, 1_000_000 * ETH_TO_WEI);
+            execute_lords_approve(lords, other, system.contract_address, 1_000_000 * ETH_TO_WEI);
+            execute_lords_approve(lords, bummer, system.contract_address, 1_000_000 * ETH_TO_WEI);
         }
         (world, system, admin, lords, ierc20, owner, other, bummer, treasury)
     }
@@ -121,49 +121,49 @@ mod utils {
     //
 
     // ::admin
-    fn execute_initialize(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress) {
+    fn execute_admin_initialize(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress) {
         testing::set_contract_address(sender);
         system.initialize(owner_address, treasury_address, lords_address);
         _next_block();
     }
-    fn execute_set_owner(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress) {
+    fn execute_admin_set_owner(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress) {
         testing::set_contract_address(sender);
         system.set_owner(owner_address);
         _next_block();
     }
-    fn execute_set_treasury(system: IAdminDispatcher, sender: ContractAddress, treasury_address: ContractAddress) {
+    fn execute_admin_set_treasury(system: IAdminDispatcher, sender: ContractAddress, treasury_address: ContractAddress) {
         testing::set_contract_address(sender);
         system.set_treasury(treasury_address);
         _next_block();
     }
-    fn execute_set_paused(system: IAdminDispatcher, sender: ContractAddress, paused: bool) {
+    fn execute_admin_set_paused(system: IAdminDispatcher, sender: ContractAddress, paused: bool) {
         testing::set_contract_address(sender);
         system.set_paused(paused);
         _next_block();
     }
-    fn execute_set_coin(system: IAdminDispatcher, sender: ContractAddress, coin_key: u8, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool) {
+    fn execute_admin_set_coin(system: IAdminDispatcher, sender: ContractAddress, coin_key: u8, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool) {
         testing::set_contract_address(sender);
         system.set_coin(coin_key, contract_address, description, fee_min, fee_pct, enabled);
         _next_block();
     }
-    fn execute_enable_coin(system: IAdminDispatcher, sender: ContractAddress, coin_key: u8, enabled: bool) {
+    fn execute_admin_enable_coin(system: IAdminDispatcher, sender: ContractAddress, coin_key: u8, enabled: bool) {
         testing::set_contract_address(sender);
         system.enable_coin(coin_key, enabled);
         _next_block();
     }
 
     // ::ierc20
-    fn execute_ierc20_initializer(system: ILordsMockDispatcher, sender: ContractAddress) {
+    fn execute_lords_initializer(system: ILordsMockDispatcher, sender: ContractAddress) {
         testing::set_contract_address(sender);
         system.initializer();
         _next_block();
     }
-    fn execute_faucet(system: ILordsMockDispatcher, sender: ContractAddress) {
+    fn execute_lords_faucet(system: ILordsMockDispatcher, sender: ContractAddress) {
         testing::set_contract_address(sender);
         system.faucet();
         _next_block();
     }
-    fn execute_approve(system: ILordsMockDispatcher, owner: ContractAddress, spender: ContractAddress, value: u256) {
+    fn execute_lords_approve(system: ILordsMockDispatcher, owner: ContractAddress, spender: ContractAddress, value: u256) {
         testing::set_contract_address(owner);
         system.approve(spender, value);
         _next_block();

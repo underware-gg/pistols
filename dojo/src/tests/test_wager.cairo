@@ -58,8 +58,8 @@ mod tests {
         let fee: u256 = system.calc_fee(WAGER_COIN, wager_value);
         assert(fee >= coin.fee_min, 'fee >= min');
         let approved_value: u256 = wager_value + fee;
-        utils::execute_approve(lords, A, S, approved_value);
-        utils::execute_approve(lords, B, S, approved_value);
+        utils::execute_lords_approve(lords, A, S, approved_value);
+        utils::execute_lords_approve(lords, B, S, approved_value);
         // create challenge
         let duel_id: u128 = utils::execute_create_challenge(system, A, B, MESSAGE_1, WAGER_COIN, wager_value, 0);
         let ch = utils::get_Challenge(world, duel_id);
@@ -188,7 +188,7 @@ mod tests {
         utils::execute_register_duelist(system, bummer, BUMMER_NAME, 1);
         // verified by test_fee_funds_ok
         // remove allowance
-        utils::execute_approve(lords, other, system.contract_address, 0);
+        utils::execute_lords_approve(lords, other, system.contract_address, 0);
         let _duel_id: u128 = utils::execute_create_challenge(system, other, bummer, MESSAGE_1, WAGER_COIN, 0, 0);
     }
 
@@ -201,7 +201,7 @@ mod tests {
         utils::execute_register_duelist(system, bummer, BUMMER_NAME, 1);
         // verified by test_fee_funds_ok
         // remove allowance
-        utils::execute_approve(lords, other, system.contract_address, 0);
+        utils::execute_lords_approve(lords, other, system.contract_address, 0);
         let _duel_id: u128 = utils::execute_create_challenge(system, other, bummer, MESSAGE_1, WAGER_COIN, 100, 0);
     }
 
