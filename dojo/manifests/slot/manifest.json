@@ -661,7 +661,7 @@
       }
     ],
     "address": "0x10923ed11da790f94efd6f68c5558f5f604df0ff2ff776bd5209b7ebb8985b8",
-    "transaction_hash": "0x27c84ed484c6923484e59d6bbdc27c3a32f96581ed790a1c6ca854ecfb139d2",
+    "transaction_hash": "0x3e432d0a78eee4e740a695b41efed227614e63fd8954a4aa265c4d0c84d40cc",
     "block_number": 3,
     "seed": "pistols",
     "name": "dojo::world::world"
