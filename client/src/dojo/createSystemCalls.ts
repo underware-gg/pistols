@@ -1,7 +1,7 @@
 import { getEvents, setComponentsFromEvents, decodeComponent } from '@dojoengine/utils'
 import { SetupNetworkResult } from '../lib/dojo/setup/setupNetwork'
 import { splitU256, stringToFelt } from '@/lib/utils/starknet'
-import { Account, BigNumberish, Call, uint256 } from 'starknet'
+import { Account, BigNumberish, Call, CallContractResponse, uint256 } from 'starknet'
 import { emitter } from '@/pistols/three/game'
 import { getContractByName } from '@dojoengine/core'
 import { bigintToEntity, bigintToHex } from '@/lib/utils/types'
@@ -66,10 +66,10 @@ export function createSystemCalls(
   const _executeCall = async (params: DojoCall): Promise<any | null> => {
     let results = null
     try {
-      const response = await call(params.contractName, params.functionName, params.callData)
+      const response: CallContractResponse = await call(params.contractName, params.functionName, params.callData)
       // console.log(response)
       // result = decodeComponent(contractComponents['Component'], response)
-      results = response.map(v => BigInt(v))
+      results = response.result.map(v => BigInt(v))
       // console.log(`call ${system}(${args.length}) success:`, result)
     } catch (e) {
       console.warn(`call ${params.contractName}::${params.functionName}(${params.callData.length}) exception:`, e)
