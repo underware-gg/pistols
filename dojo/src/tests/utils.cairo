@@ -8,7 +8,8 @@ mod utils {
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
     use dojo::test_utils::{spawn_test_world, deploy_contract};
 
-    use token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
+    use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
+    // use token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
     use pistols::systems::admin::{admin, IAdminDispatcher, IAdminDispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};

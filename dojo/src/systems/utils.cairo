@@ -2,6 +2,7 @@ use debug::PrintTrait;
 use traits::{Into, TryInto};
 use starknet::{ContractAddress};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
 use pistols::models::models::{init, Duelist, Challenge, Wager, Pact, Round, Shot};
 use pistols::models::coins::{Coin, CoinManagerTrait, CoinTrait};
 use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
@@ -10,7 +11,6 @@ use pistols::types::round::{RoundState, RoundStateTrait};
 use pistols::types::action::{Action, ActionTrait, ACTION};
 use pistols::types::constants::{constants, chances};
 use pistols::utils::math::{MathU8, MathU16};
-use pistols::interfaces::ierc20::{IERC20DispatcherTrait};
 
 // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
 extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
