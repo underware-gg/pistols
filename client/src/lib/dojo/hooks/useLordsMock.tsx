@@ -1,11 +1,12 @@
 import { useCallback, useState } from 'react'
-import { useDojo, useDojoAccount } from '@/lib/dojo/DojoContext'
+import { useDojoAccount } from '@/lib/dojo/DojoContext'
+import { useLordsContract } from '@/lib/dojo/hooks/useLords'
+import { execute } from '@/lib/utils/starknet'
+import { bigintToHex } from '@/lib/utils/types'
 import { Account, AccountInterface } from 'starknet'
-import { feltToString } from '../../utils/starknet'
-import { useLordsContract } from './useLords'
 
 export interface FaucetExecuteResult {
-  hash: string
+  transaction_hash: string
 }
 
 export interface FaucetInterface {
@@ -16,49 +17,51 @@ export interface FaucetInterface {
 }
 
 export const useLordsFaucet = (): FaucetInterface => {
-  const { setup: { dojoProvider } } = useDojo()
   const { account } = useDojoAccount()
 
-  const { contractAddress, isMock } = useLordsContract()
+  const { contractAddress, isMock, abi } = useLordsContract()
 
   const [isPending, setIsPending] = useState(false)
   const [error, setError] = useState<string | undefined>(undefined)
 
   const faucet = useCallback(
-    async (fromAccount?: Account | AccountInterface): Promise<FaucetExecuteResult> => {
-
+    async (fromAccount?: Account): Promise<FaucetExecuteResult> => {
       setError(undefined)
       setIsPending(true)
 
       const _account = (fromAccount ?? account)
 
-      let tx, receipt
+      let transaction_hash, receipt
       try {
-        //@ts-ignore
-        // console.log(`FAUCY:`, feltToString(_account.provider.chainId), _account)
-        tx = await dojoProvider.execute(_account!, 'lords_mock', 'faucet', [])
-        receipt = await _account!.waitForTransaction(tx.transaction_hash, {
+        const tx = await execute(
+          _account!,
+          bigintToHex(contractAddress),
+          abi,
+          'faucet',
+          [],
+        )
+        transaction_hash = tx.transaction_hash
+        receipt = await _account!.waitForTransaction(transaction_hash, {
           retryInterval: 200,
         })
+        console.log(`useLordsFaucet(${_account.address}) receipt:`, receipt)
       } catch (e: any) {
         setIsPending(false)
         setError(e.toString())
-        console.error(e)
+        console.error(`useLordsFaucet() error:`, e)
         // toast({
         //   message: e.toString(),
         //   duration: 20_000,
         //   isError: true
         // })
-        throw Error(e.toString())
       }
 
       setIsPending(false)
 
       return {
-        hash: tx?.transaction_hash,
+        transaction_hash,
       }
-    },
-    [account, contractAddress],
+    }, [account, contractAddress],
   )
 
   return {

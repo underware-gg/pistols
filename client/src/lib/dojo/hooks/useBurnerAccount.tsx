@@ -50,12 +50,13 @@ export const useBurners = (masterAccountAddress: BigNumberish) => {
 }
 
 export const useBurnerAccount = (accountIndex: number) => {
-  const { masterAccount, count, list, select } = useDojoAccount()
+  const { masterAccount, account, select } = useDojoAccount()
 
   //
   // Good burner: Deployed & Imported
   const { burners } = useBurners(masterAccount.address)
   const burner = useMemo(() => (burners[accountIndex] ?? null), [accountIndex, burners])
+  const exists = useMemo(() => (burner != null), [burner])
   const address = useMemo(() => (burner?.address ?? null), [burner])
 
   useEffect(() => {
@@ -70,8 +71,9 @@ export const useBurnerAccount = (accountIndex: number) => {
 
   return {
     address,
-    isDeployed: (burner != null),
-    isImported: (burner != null),
+    account: (exists ? account : null),
+    isDeployed: exists,
+    isImported: exists,
     isFunded: (balance > 0n),
   }
 }

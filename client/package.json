@@ -31,7 +31,7 @@
     "sass": "^1.69.5",
     "semantic-ui-css": "^2.5.0",
     "semantic-ui-react": "^3.0.0-beta.2",
-    "starknet": "^6.2.0",
+    "starknet": "5.25.0",
     "swr": "^2.2.4",
     "three": "^0.157.0",
     "type-fest": "^2.14.0",

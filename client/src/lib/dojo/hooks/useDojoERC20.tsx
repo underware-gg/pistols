@@ -3,9 +3,9 @@ import { useDojoContractWrite } from '@/lib/dojo/hooks/useDojoContractWrite'
 import { splitU256 } from '@/lib/utils/starknet'
 import { bigintToHex } from '@/lib/utils/types'
 import { erc20_abi } from '@/lib/abi'
-import { BigNumberish } from 'starknet'
+import { BigNumberish, Account } from 'starknet'
 
-export function useDojoERC20Transfer(contractAddress: BigNumberish, toAddress: BigNumberish, amount: bigint) {
+export function useDojoERC20Transfer(contractAddress: BigNumberish, toAddress: BigNumberish, amount: bigint, fromAccount: Account = null) {
   const { low, high } = useMemo(() => splitU256(amount), [amount])
   const callData = useMemo(() => {
     return [
@@ -14,7 +14,7 @@ export function useDojoERC20Transfer(contractAddress: BigNumberish, toAddress: B
       bigintToHex(high),
     ]
   }, [toAddress, low, high])
-  const result = useDojoContractWrite(contractAddress, erc20_abi, 'transfer', callData)
+  const result = useDojoContractWrite(contractAddress, erc20_abi, 'transfer', callData, fromAccount)
   return {
     ...result,
     transfer: result.write,

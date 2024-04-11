@@ -22,7 +22,7 @@ export function useSetup(selectedChainConfig: DojoChainConfig, manifest: any, ac
 
   const mounted = useMounted()
 
-  const { value: toriiClient } = useAsyncMemo(async ()=> {
+  const { value: toriiClient } = useAsyncMemo(async () => {
     if (!mounted) return null
     const client = await torii.createClient([], {
       rpcUrl: selectedChainConfig.rpcUrl,
@@ -34,7 +34,7 @@ export function useSetup(selectedChainConfig: DojoChainConfig, manifest: any, ac
     return client
   }, [mounted, selectedChainConfig, manifest], null)
 
-  const { value: dojoProvider } = useAsyncMemo(async ()=> {
+  const { value: dojoProvider } = useAsyncMemo(async () => {
     if (!mounted) return null
     const dojoProvider = new DojoProvider(manifest, selectedChainConfig.rpcUrl)
     console.log(`DojoProvider:`, feltToString(await dojoProvider.provider.getChainId()), dojoProvider)
@@ -78,8 +78,8 @@ export function useSetup(selectedChainConfig: DojoChainConfig, manifest: any, ac
       // master account moved to predeployedManager
       masterAccount: account ?? new Account(dojoProvider.provider, '0x0', '0x0'),
       accountClassHash: selectedChainConfig.accountClassHash,
-      rpcProvider: dojoProvider.provider,
       feeTokenAddress: selectedChainConfig.chain.nativeCurrency.address,
+      rpcProvider: dojoProvider.provider,
     });
     await burnerManager.init(true);
     return burnerManager

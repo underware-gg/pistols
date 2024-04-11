@@ -56,6 +56,8 @@ printf "LORDS.is_initialized() : "
 sozo --profile $PROFILE call --world $WORLD_ADDRESS $LORDS_ADDRESS is_initialized
 printf "LORDS.balance_of(account) : "
 sozo --profile $PROFILE call --world $WORLD_ADDRESS $LORDS_ADDRESS balance_of --calldata $ACCOUNT_ADDRESS
+printf "LORDS.balance_of(0xxxxx) : "
+sozo --profile $PROFILE call --world $WORLD_ADDRESS $LORDS_ADDRESS balance_of --calldata 0x120e7b1e5e47526b5b11bd0be67742ee45e8fc02a275a4ec641a8f0b673b04c
 
 # Admin
 printf "ADMIN.is_initialized() : "

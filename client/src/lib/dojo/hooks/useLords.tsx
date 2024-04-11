@@ -9,11 +9,12 @@ export const useLordsContract = () => {
   const { selectedChainConfig } = useStarknetContext()
   const contractAddress = useMemo(() => (selectedChainConfig.lordsContractAddress), [selectedChainConfig])
 
-  const { systemAddress, systemExists } = useDojoSystem('lords_mock')
+  const { systemAddress, systemExists, abi } = useDojoSystem('lords_mock')
   const isMock = !contractAddress && systemExists
 
   return {
     contractAddress: (isMock ? systemAddress : contractAddress),
+    abi: (isMock ? abi : null),
     isMock,
   }
 }

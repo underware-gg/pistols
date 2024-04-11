@@ -3,9 +3,9 @@ import { useWaitForTransaction } from '@starknet-react/core'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { execute } from '@/lib/utils/starknet'
 import { bigintToHex } from '@/lib/utils/types'
-import { BigNumberish, Abi } from 'starknet'
+import { BigNumberish, Abi, Account } from 'starknet'
 
-export function useDojoContractWrite(contractAddress: BigNumberish, abi: Abi, functionName: string, callData: BigNumberish[]) {
+export function useDojoContractWrite(contractAddress: BigNumberish, abi: Abi, functionName: string, callData: BigNumberish[], fromAccount: Account = null) {
   const { account } = useDojoAccount()
   const [transactionHash, setTransactionHash] = useState<string>(null)
   const [isPending, setIsPending] = useState(false)
@@ -16,7 +16,7 @@ export function useDojoContractWrite(contractAddress: BigNumberish, abi: Abi, fu
     setIsPending(true)
     setIsError(false)
     const { transaction_hash } = await execute(
-      account,
+      fromAccount ?? account,
       bigintToHex(contractAddress),
       abi,
       functionName,
@@ -25,7 +25,7 @@ export function useDojoContractWrite(contractAddress: BigNumberish, abi: Abi, fu
     setTransactionHash(transaction_hash)
     setIsPending(false)
     setIsError(!transaction_hash)
-  }, [account, contractAddress, functionName, callData])
+  }, [account, fromAccount, contractAddress, functionName, callData])
 
   const { isLoading, isError: isReverted, error, data: receipt } = useWaitForTransaction({ hash: transactionHash, watch: true })
 

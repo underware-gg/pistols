@@ -40,5 +40,6 @@ export const useDojoSystem = (systemName: string) => {
   return {
     systemAddress: contractAddress,
     systemExists,
+    abi,
   }
 }
