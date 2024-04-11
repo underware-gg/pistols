@@ -661,8 +661,8 @@
       }
     ],
     "address": "0x10923ed11da790f94efd6f68c5558f5f604df0ff2ff776bd5209b7ebb8985b8",
-    "transaction_hash": null,
-    "block_number": null,
+    "transaction_hash": "0x610cd706a7b35b0d0a2f821c1b71157b79754a3069936f0255cf66b7df7e988",
+    "block_number": 3,
     "seed": "pistols",
     "name": "dojo::world::world"
   },
@@ -679,7 +679,7 @@
       "address": "0x775f949fd0aee5d034c3f1f1a59de273732e1b3b067b75c430d4ce33b153148",
       "class_hash": "0x5cee3ab1828c4a769426ca7ad6780ce86aad68362b8179dd29e4e9a66bc3387",
       "original_class_hash": "0x5cee3ab1828c4a769426ca7ad6780ce86aad68362b8179dd29e4e9a66bc3387",
-      "base_class_hash": "0x0",
+      "base_class_hash": "0x679177a2cb757694ac4f326d01052ff0963eac0bc2a17116a2b87badcdf6f76",
       "abi": [
         {
           "type": "impl",
@@ -1252,7 +1252,7 @@
       "address": "0x702e255a3446fce9c49df1c579a62fba9e6bfefd4621a437b28c559b68e0f81",
       "class_hash": "0x19c616e19b2627fb382a77779cf8903c9bdba685d70568f8f8edee4870b4dea",
       "original_class_hash": "0x19c616e19b2627fb382a77779cf8903c9bdba685d70568f8f8edee4870b4dea",
-      "base_class_hash": "0x0",
+      "base_class_hash": "0x679177a2cb757694ac4f326d01052ff0963eac0bc2a17116a2b87badcdf6f76",
       "abi": [
         {
           "type": "impl",
@@ -1878,7 +1878,7 @@
       "address": "0x281b9cb20b07e7aacbb9fcada94bd350a7b9d877755fdf08af4e0f3f2fe3bf2",
       "class_hash": "0x44e85eeb64e3da9e07468ba5644f57dca29e639a186e79eed9ad5df5a35a37a",
       "original_class_hash": "0x44e85eeb64e3da9e07468ba5644f57dca29e639a186e79eed9ad5df5a35a37a",
-      "base_class_hash": "0x0",
+      "base_class_hash": "0x679177a2cb757694ac4f326d01052ff0963eac0bc2a17116a2b87badcdf6f76",
       "abi": [
         {
           "type": "impl",
