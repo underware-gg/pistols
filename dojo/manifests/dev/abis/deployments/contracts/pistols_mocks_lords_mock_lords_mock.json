@@ -59,6 +59,20 @@
     "interface_name": "pistols::mocks::lords_mock::ILordsMockInitializer"
   },
   {
+    "type": "enum",
+    "name": "core::bool",
+    "variants": [
+      {
+        "name": "False",
+        "type": "()"
+      },
+      {
+        "name": "True",
+        "type": "()"
+      }
+    ]
+  },
+  {
     "type": "interface",
     "name": "pistols::mocks::lords_mock::ILordsMockInitializer",
     "items": [
@@ -67,6 +81,17 @@
         "name": "initializer",
         "inputs": [],
         "outputs": [],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "is_initialized",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::bool"
+          }
+        ],
         "state_mutability": "view"
       }
     ]
@@ -218,20 +243,6 @@
     "type": "impl",
     "name": "ERC20BalanceImpl",
     "interface_name": "token::components::token::erc20::erc20_balance::IERC20Balance"
-  },
-  {
-    "type": "enum",
-    "name": "core::bool",
-    "variants": [
-      {
-        "name": "False",
-        "type": "()"
-      },
-      {
-        "name": "True",
-        "type": "()"
-      }
-    ]
   },
   {
     "type": "interface",

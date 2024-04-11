@@ -32,6 +32,7 @@ trait ILordsMock {
 
     // WITHOUT INTERFACE !!!
     fn initializer();
+    fn is_initialized() -> bool;
     fn faucet();
     fn dojo_resource() -> felt252;
 }
@@ -44,6 +45,7 @@ trait ILordsMock {
 #[dojo::interface]
 trait ILordsMockInitializer {
     fn initializer();
+    fn is_initialized() -> bool;
 }
 
 #[dojo::interface]
@@ -154,6 +156,9 @@ mod lords_mock {
             self.erc20_mintable.mint(get_caller_address(), 1 * ETH_TO_WEI);
 
             self.initializable.initialize();
+        }
+        fn is_initialized() -> bool {
+            (self.erc20_metadata.symbol() != '')
         }
     }
 

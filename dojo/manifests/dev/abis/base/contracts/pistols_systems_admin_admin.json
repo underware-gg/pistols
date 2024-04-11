@@ -168,6 +168,17 @@
       },
       {
         "type": "function",
+        "name": "is_initialized",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::bool"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
         "name": "set_owner",
         "inputs": [
           {

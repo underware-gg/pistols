@@ -10,6 +10,7 @@ use pistols::models::coins::{Coin};
 #[dojo::interface]
 trait IAdmin {
     fn initialize(owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress);
+    fn is_initialized() -> bool;
     
     fn set_owner(owner_address: ContractAddress);
     fn set_treasury(treasury_address: ContractAddress);
@@ -48,6 +49,10 @@ mod admin {
             // set lords
             let manager = CoinManagerTrait::new(world);
             manager.set(default_coin(lords_address));
+        }
+
+        fn is_initialized(world: IWorldDispatcher) -> bool {
+            (ConfigManagerTrait::is_initialized(world))
         }
 
         fn set_owner(world: IWorldDispatcher, owner_address: ContractAddress) {
