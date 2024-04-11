@@ -1,6 +1,13 @@
 import { PredeployedAccount } from '@dojoengine/create-burner'
 import { Chain, mainnet, sepolia } from '@starknet-react/chains'
-import { KATANA_CLASS_HASH } from '@dojoengine/core'
+import {
+  LOCAL_KATANA,
+  LOCAL_TORII,
+  LOCAL_RELAY,
+  KATANA_PREFUNDED_ADDRESS,
+  KATANA_PREFUNDED_PRIVATE_KEY,
+  KATANA_CLASS_HASH,
+} from '@dojoengine/core'
 import * as chains from './chains'
 
 // based on:
@@ -13,7 +20,7 @@ export type DojoChainConfig = {
   chain: Chain
   rpcUrl: string
   toriiUrl: string,
-  toriiWsUrl: string,
+  relayUrl: string,
   masterAddress: string,
   masterPrivateKey: string,
   accountClassHash: string,
@@ -25,11 +32,11 @@ export type DojoChainConfig = {
 const localKatanaConfig: DojoChainConfig = {
   name: chains.katanaLocalChain.name,
   chain: chains.katanaLocalChain,
-  rpcUrl: process.env.NEXT_PUBLIC_RPC_ENDPOINT ?? 'http://localhost:5050',
-  toriiUrl: process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT ?? 'http://0.0.0.0:8080',
-  toriiWsUrl: process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT_WS ?? 'ws://0.0.0.0:8080/ws',
-  masterAddress: process.env.NEXT_PUBLIC_MASTER_ADDRESS ?? '0xb3ff441a68610b30fd5e2abbf3a1548eb6ba6f3559f2862bf2dc757e5828ca',
-  masterPrivateKey: process.env.NEXT_PUBLIC_MASTER_PRIVATE_KEY ?? '0x2bbf4f9fd0bbb2e60b0316c1fe0b76cf7a4d0198bd493ced9b8df2a3a24d68a',
+  rpcUrl: process.env.NEXT_PUBLIC_NODE_URL ?? LOCAL_KATANA,
+  toriiUrl: process.env.NEXT_PUBLIC_TORII ?? 'http://0.0.0.0:8080', //LOCAL_TORII,
+  relayUrl: process.env.NEXT_PUBLIC_RELAY_URL ?? LOCAL_RELAY,
+  masterAddress: process.env.NEXT_PUBLIC_MASTER_ADDRESS ?? KATANA_PREFUNDED_ADDRESS,
+  masterPrivateKey: process.env.NEXT_PUBLIC_MASTER_PRIVATE_KEY ?? KATANA_PREFUNDED_PRIVATE_KEY,
   accountClassHash: KATANA_CLASS_HASH,
   lordsContractAddress: undefined, // lords_mock
   lordsFaucetUrl: undefined,
@@ -41,7 +48,7 @@ const pistolsSlotConfig: DojoChainConfig = {
   chain: chains.pistolsSlotChain,
   rpcUrl: 'https://api.cartridge.gg/x/pistols/katana',
   toriiUrl: 'https://api.cartridge.gg/x/pistols/torii',
-  toriiWsUrl: 'wss://api.cartridge.gg/x/pistols/torii/ws',
+  relayUrl: undefined,
   masterAddress: '0x5b7d6d0110aba636b7df1d41858c036aefb8bee9dd4052c51fbf5cd9e2d614',
   masterPrivateKey: '0x534363549dc5f54179835979add2d508b4a0cb315d9648977aa5f9e363da67a',
   accountClassHash: KATANA_CLASS_HASH,
@@ -57,7 +64,7 @@ const realmsWorldConfig: DojoChainConfig = {
   chain: chains.realmsWorldChain,
   rpcUrl: 'https://api.cartridge.gg/x/realms/katana',
   toriiUrl: 'https://api.cartridge.gg/x/realms/torii',
-  toriiWsUrl: 'wss://api.cartridge.gg/x/realms/torii/ws',
+  relayUrl: undefined,
   masterAddress: undefined,
   masterPrivateKey: undefined,
   accountClassHash: '0x029927c8af6bccf3f6fda035981e765a7bdbf18a2dc0d630494f8758aa908e2b',
@@ -71,7 +78,7 @@ const snSepoliaConfig: DojoChainConfig = {
   chain: sepolia,
   rpcUrl: 'https://api.cartridge.gg/rpc/starknet-sepolia',
   toriiUrl: undefined,
-  toriiWsUrl: undefined,
+  relayUrl: undefined,
   masterAddress: undefined,
   masterPrivateKey: undefined,
   accountClassHash: undefined,
@@ -85,7 +92,7 @@ const snMainnetConfig: DojoChainConfig = {
   chain: mainnet,
   rpcUrl: 'https://api.cartridge.gg/rpc/starknet',
   toriiUrl: undefined,
-  toriiWsUrl: undefined,
+  relayUrl: undefined,
   masterAddress: undefined,
   masterPrivateKey: undefined,
   accountClassHash: undefined,

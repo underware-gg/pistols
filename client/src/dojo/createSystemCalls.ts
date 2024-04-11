@@ -66,10 +66,10 @@ export function createSystemCalls(
   const _executeCall = async (params: DojoCall): Promise<any | null> => {
     let results = null
     try {
-      const eventData = await call(params.contractName, params.functionName, params.callData)
-      // console.log(eventData)
-      // result = decodeComponent(contractComponents['Component'], eventData.result)
-      results = eventData.result.map(v => BigInt(v))
+      const response = await call(params.contractName, params.functionName, params.callData)
+      // console.log(response)
+      // result = decodeComponent(contractComponents['Component'], response)
+      results = response.map(v => BigInt(v))
       // console.log(`call ${system}(${args.length}) success:`, result)
     } catch (e) {
       console.warn(`call ${params.contractName}::${params.functionName}(${params.callData.length}) exception:`, e)

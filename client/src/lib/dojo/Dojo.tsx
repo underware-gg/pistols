@@ -5,6 +5,7 @@ import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { useSetup } from '@/lib/dojo/setup/useSetup'
 import { CHAIN_ID } from '@/lib/dojo/setup/chains'
 import { useAccount } from '@starknet-react/core'
+import { Account } from 'starknet'
 
 export interface DojoConfig {
   manifest: any,
@@ -39,7 +40,7 @@ function SetupDojoProvider({
   const { account } = useAccount()
   const { selectedChainConfig } = useStarknetContext()
   
-  const setupResult = useSetup(selectedChainConfig, dojoConfig.manifest, account)
+  const setupResult = useSetup(selectedChainConfig, dojoConfig.manifest, account as Account)
 
   if (!setupResult) {
     return <DojoStatus message={'Loading Pistols...'} />

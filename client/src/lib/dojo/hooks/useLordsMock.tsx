@@ -35,7 +35,7 @@ export const useLordsFaucet = (): FaucetInterface => {
       let tx, receipt
       try {
         //@ts-ignore
-        console.log(`FAUCY:`, feltToString(_account.provider.chainId), _account)
+        // console.log(`FAUCY:`, feltToString(_account.provider.chainId), _account)
         tx = await dojoProvider.execute(_account!, 'lords_mock', 'faucet', [])
         receipt = await _account!.waitForTransaction(tx.transaction_hash, {
           retryInterval: 200,

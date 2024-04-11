@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useAsyncMemo } from '@/lib/utils/hooks/useAsyncMemo'
-import { Account, AccountInterface } from 'starknet'
+import { Account } from 'starknet'
 import { DojoProvider } from '@dojoengine/core'
 import { getSyncEntities } from '@dojoengine/state'
 import { BurnerManager, PredeployedManager } from '@dojoengine/create-burner'
@@ -18,7 +18,7 @@ import { createSystemCalls } from '../../../dojo/createSystemCalls'
 
 export type SetupResult = ReturnType<typeof useSetup> | null
 
-export function useSetup(selectedChainConfig: DojoChainConfig, manifest: any, account: AccountInterface) {
+export function useSetup(selectedChainConfig: DojoChainConfig, manifest: any, account: Account) {
 
   const mounted = useMounted()
 
@@ -27,7 +27,8 @@ export function useSetup(selectedChainConfig: DojoChainConfig, manifest: any, ac
     const client = await torii.createClient([], {
       rpcUrl: selectedChainConfig.rpcUrl,
       toriiUrl: selectedChainConfig.toriiUrl,
-      worldAddress: manifest.world.address || '',
+      relayUrl: selectedChainConfig.relayUrl ?? '',
+      worldAddress: manifest.world.address ?? '',
     })
     // console.log(`TORII CLIENT OK!`)
     return client
@@ -78,6 +79,7 @@ export function useSetup(selectedChainConfig: DojoChainConfig, manifest: any, ac
       masterAccount: account ?? new Account(dojoProvider.provider, '0x0', '0x0'),
       accountClassHash: selectedChainConfig.accountClassHash,
       rpcProvider: dojoProvider.provider,
+      feeTokenAddress: selectedChainConfig.chain.nativeCurrency.address,
     });
     await burnerManager.init(true);
     return burnerManager
