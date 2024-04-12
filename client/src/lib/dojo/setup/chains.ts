@@ -40,7 +40,7 @@ export const katanaLocalChain = {
 export const pistolsSlotChain = {
   id: BigInt(stringToFelt(CHAIN_ID.PISTOLS_SLOT)),
   network: 'katana',
-  name: 'Slot Testnet',
+  name: 'Slot Testnet (Free)',
   nativeCurrency: {
     address: '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
     name: 'Ether',
@@ -65,7 +65,7 @@ export const pistolsSlotChain = {
 export const realmsWorldChain = {
   id: BigInt(stringToFelt(CHAIN_ID.KATANA)),
   network: 'katana',
-  name: 'Realms World L3',
+  name: 'Realms World (Ranked)',
   nativeCurrency: {
     address: '0x51205c5e6ac3ad5691c28c0c5ffcdd62c70bddb63612f75a4bac9b2a85b9449',
     name: 'Lords',

@@ -119,9 +119,10 @@ export const isChainIdSupported = (chainId: chains.CHAIN_ID): boolean => {
 }
 
 export const getStarknetProviderChains = (supportedChainIds: chains.CHAIN_ID[]): Chain[] => {
-  return Object.keys(dojoContextConfig).reduce((acc, chain_id) => {
-    if (supportedChainIds.includes(chain_id as chains.CHAIN_ID)) {
-      acc.push(dojoContextConfig[chain_id].chain)
+  return supportedChainIds.reduce((acc, chainId) => {
+    const dojoChainConfig = dojoContextConfig[chainId]
+    if (dojoChainConfig) {
+      acc.push(dojoChainConfig.chain)
     }
     return acc
   }, [])

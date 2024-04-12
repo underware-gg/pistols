@@ -8,9 +8,9 @@ export const makeDojoAppConfig = (): DojoAppConfig => {
   const mainSystemName = 'actions'
 
   const supportedChainIds = [
-    CHAIN_ID.KATANA_LOCAL,
-    CHAIN_ID.PISTOLS_SLOT,
     CHAIN_ID.KATANA,
+    CHAIN_ID.PISTOLS_SLOT,
+    CHAIN_ID.KATANA_LOCAL,
   ]
 
   const manifests = {
