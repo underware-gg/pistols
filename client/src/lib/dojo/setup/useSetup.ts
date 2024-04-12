@@ -197,8 +197,9 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     burnerManager,
     predeployedManager,
     // pass thru
-    manifest,
+    dojoAppConfig,
     selectedChainConfig,
+    manifest,
     // status
     status: {
       isLoading: (isLoading && !isError),

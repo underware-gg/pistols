@@ -1,11 +1,10 @@
 import React, { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { DojoChainConfig, dojoContextConfig, getStarknetProviderChains, isChainIdSupported } from '@/lib/dojo/setup/chainConfig'
 import { StarknetConfig, argent, braavos, injected, jsonRpcProvider, useInjectedConnectors } from '@starknet-react/core'
+import { DojoPredeployedStarknetWindowObject, DojoBurnerStarknetWindowObject } from '@dojoengine/create-burner'
+import { DojoAppConfig } from '@/lib/dojo/Dojo'
 import { CHAIN_ID } from '@/lib/dojo/setup/chains'
 import { Chain } from '@starknet-react/chains'
-import { DojoPredeployedStarknetWindowObject } from '@dojoengine/create-burner'
-import { DojoBurnerStarknetWindowObject } from '@dojoengine/create-burner'
-import { DojoAppConfig } from '@/lib/dojo/Dojo'
 
 
 interface StarknetContextType {
@@ -67,10 +66,10 @@ export const StarknetProvider = ({
   const { connectors } = useInjectedConnectors({
     // Show these connectors if the user has no connector installed.
     recommended: [
-      // injected({ id: DojoBurnerStarknetWindowObject.getId() }),
+      injected({ id: DojoBurnerStarknetWindowObject.getId() }),
       injected({ id: DojoPredeployedStarknetWindowObject.getId() }),
       argent(),
-      // braavos(),
+      braavos(),
     ],
     // Hide recommended connectors if the user has any connector installed.
     includeRecommended: 'always',

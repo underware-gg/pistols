@@ -5,6 +5,7 @@ import { useChainSwitchCallbacks, useSelectedChain } from '@/lib/dojo/hooks/useC
 import { Opener } from '@/lib/ui/useOpener'
 import { VStack } from '@/lib/ui/Stack'
 import { useEffectOnce } from '../utils/hooks/useEffectOnce'
+import { useDojo } from './DojoContext'
 
 
 export default function StarknetConnectModal({
@@ -55,13 +56,19 @@ function ConnectButtons({
 }) {
   const { connect, connectors } = useConnect()
   const { isConnecting } = useAccount()
+  const { setup: { dojoAppConfig} } = useDojo()
 
-  let connectorsButtons = useMemo(() => connectors.map((connector: Connector) => (
-    <Button key={connector.id} fluid size='huge' disabled={!connector.available() || isConnecting} onClick={() => connect({ connector })}>
-      {connector.name}
-      <Image spaced className='Square20' src={connector.icon.dark} style={{ maxHeight: '1em' }} />
-    </Button>
-  )), [connectors, isConnecting])
+  let connectorsButtons = useMemo(() => connectors.reduce((acc, connector: Connector) => {
+    if (dojoAppConfig.supportedConnectorIds.includes(connector.id)) {
+      acc.push(
+        <Button key={connector.id} fluid size='huge' disabled={!connector.available() || isConnecting} onClick={() => connect({ connector })}>
+          {connector.name}
+          <Image spaced className='Square20' src={connector.icon.dark} style={{ maxHeight: '1em' }} />
+        </Button>
+      )
+    }
+    return acc
+  }, []), [connectors, isConnecting])
 
   const buttons = useMemo(() => {
     let buttons = [...connectorsButtons]

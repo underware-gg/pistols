@@ -1,4 +1,6 @@
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
+import { DojoPredeployedStarknetWindowObject, DojoBurnerStarknetWindowObject } from '@dojoengine/create-burner'
+import { argent, braavos } from '@starknet-react/core'
 import { CHAIN_ID } from '@/lib/dojo/setup/chains'
 import manifest_katana from '@/generated/dev/manifest.json'
 import manifest_slot from '@/generated/slot/manifest.json'
@@ -6,6 +8,13 @@ import manifest_slot from '@/generated/slot/manifest.json'
 export const makeDojoAppConfig = (): DojoAppConfig => {
 
   const mainSystemName = 'actions'
+
+  const supportedConnectorIds = [
+    // argent().id,
+    // braavos().id,
+    // DojoBurnerStarknetWindowObject.getId(),
+    DojoPredeployedStarknetWindowObject.getId(),
+  ]
 
   const supportedChainIds = [
     CHAIN_ID.KATANA,
@@ -28,6 +37,7 @@ export const makeDojoAppConfig = (): DojoAppConfig => {
 
   return {
     mainSystemName,
+    supportedConnectorIds,
     supportedChainIds,
     defaultChainId,
     manifests,
