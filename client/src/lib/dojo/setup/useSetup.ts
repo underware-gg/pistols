@@ -6,7 +6,7 @@ import { getSyncEntities } from '@dojoengine/state'
 import { BurnerManager, PredeployedManager } from '@dojoengine/create-burner'
 import * as torii from '@dojoengine/torii-client'
 
-import { DojoChainConfig, getMasterPredeployedAccount } from '@/lib/dojo/setup/chainConfig'
+import { DojoChainConfig, getChainMasterAccount } from '@/lib/dojo/setup/chainConfig'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { feltToString } from '@/lib/utils/starknet'
 import { createClientComponents } from './createClientComponents'
@@ -20,6 +20,7 @@ export type SetupResult = ReturnType<typeof useSetup> | null
 
 export function useSetup(selectedChainConfig: DojoChainConfig, manifest: any, account: Account) {
 
+  // avoid double effects
   const mounted = useMounted()
 
   const { value: toriiClient } = useAsyncMemo(async () => {
@@ -90,13 +91,16 @@ export function useSetup(selectedChainConfig: DojoChainConfig, manifest: any, ac
   const { value: predeployedManager } = useAsyncMemo(async () => {
     if (!dojoProvider) return null
     const chainId = feltToString(selectedChainConfig.chain.id) as CHAIN_ID
-    const masterPredeployedAccount = getMasterPredeployedAccount(chainId)
+    let predeployedAccounts = [...selectedChainConfig.predeployedAccounts]
+    const masterAccount = getChainMasterAccount(chainId)
+    if (masterAccount) {
+      predeployedAccounts.push(masterAccount)
+    }
     const predeployedManager = new PredeployedManager({
       rpcProvider: dojoProvider.provider,
-      predeployedAccounts: [...masterPredeployedAccount, ...selectedChainConfig.predeployedAccounts],
+      predeployedAccounts,
     })
     await predeployedManager.init()
-    // console.log(`PREDEPLOYED......`, predeployedManager)
     return predeployedManager
   }, [selectedChainConfig, dojoProvider], null)
 

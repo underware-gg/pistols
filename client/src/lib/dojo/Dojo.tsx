@@ -6,23 +6,25 @@ import { useSetup } from '@/lib/dojo/setup/useSetup'
 import { CHAIN_ID } from '@/lib/dojo/setup/chains'
 import { useAccount } from '@starknet-react/core'
 import { Account } from 'starknet'
+import { useReconnectChain } from './hooks/useChain'
 
-export interface DojoConfig {
-  manifest: any,
+export interface DojoAppConfig {
   supportedChainIds: CHAIN_ID[],
+  defaultChainId: CHAIN_ID,
+  manifests: { [chain_id: string]: any | undefined },
 }
 
 export default function Dojo({
-  dojoConfig,
+  dojoAppConfig,
   children,
 }: {
-  dojoConfig: DojoConfig,
+  dojoAppConfig: DojoAppConfig,
   children: ReactNode
 }) {
 
   return (
-    <StarknetProvider supportedChainIds={dojoConfig.supportedChainIds}>
-      <SetupDojoProvider dojoConfig={dojoConfig}>
+    <StarknetProvider dojoAppConfig={dojoAppConfig}>
+      <SetupDojoProvider dojoAppConfig={dojoAppConfig}>
         {children}
       </SetupDojoProvider>
     </StarknetProvider>
@@ -30,17 +32,19 @@ export default function Dojo({
 }
 
 function SetupDojoProvider({
-  dojoConfig,
+  dojoAppConfig,
   children,
 }: {
-  dojoConfig: DojoConfig,
+  dojoAppConfig: DojoAppConfig,
   children: ReactNode
 }) {
   // Connected wallet or Dojo Predeployed (master)
   const { account } = useAccount()
-  const { selectedChainConfig } = useStarknetContext()
+  const { selectedChainId, selectedChainConfig } = useStarknetContext()
   
-  const setupResult = useSetup(selectedChainConfig, dojoConfig.manifest, account as Account)
+  useReconnectChain()
+  
+  const setupResult = useSetup(selectedChainConfig, dojoAppConfig.manifests[selectedChainId], account as Account)
 
   if (!setupResult) {
     return <DojoStatus message={'Loading Pistols...'} />

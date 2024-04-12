@@ -3,7 +3,7 @@ import { Grid, Image, Dropdown } from 'semantic-ui-react'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { useLordsContract } from '@/lib/dojo/hooks/useLords'
-import { useDojoChain } from '@/lib/dojo/hooks/useDojoChain'
+import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { LordsBalance } from '@/pistols/components/account/LordsBalance'
 import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
@@ -18,7 +18,7 @@ export default function WalletHeader({
 }) {
   const { disconnect } = useDisconnect()
   const { account, address, connector, isConnected } = useAccount()
-  const { connectedChainName } = useDojoChain()
+  const { connectedChainName } = useSelectedChain()
   const { contractAddress } = useLordsContract()
 
   // BUG: https://github.com/apibara/starknet-react/issues/419

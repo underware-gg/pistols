@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation'
 import { Divider, Grid, Icon } from 'semantic-ui-react'
 import { VStack, VStackRow } from '@/lib/ui/Stack'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
-import { useDojoChain } from '@/lib/dojo/hooks/useDojoChain'
+import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { useDojoSystem } from '@/lib/dojo/hooks/useDojoSystem'
 import { useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
 import { AccountMenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
@@ -19,7 +19,7 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export default function Gate() {
-  const { isConnected, isCorrectChain } = useDojoChain()
+  const { isConnected, isCorrectChain } = useSelectedChain()
   return (
     <div className='UIContainer'>
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Modal, Button, Image, Divider } from 'semantic-ui-react'
 import { useConnect, Connector, useAccount } from '@starknet-react/core'
-import { useDojoChain } from '@/lib/dojo/hooks/useDojoChain'
+import { useChainSwitchCallbacks, useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { Opener } from '@/lib/ui/useOpener'
 import { VStack } from '@/lib/ui/Stack'
 import { useEffectOnce } from '../utils/hooks/useEffectOnce'
@@ -14,7 +14,7 @@ export default function StarknetConnectModal({
   opener: Opener
   walletHelp?: boolean
 }) {
-  const { isConnected, isCorrectChain } = useDojoChain()
+  const { isConnected, isCorrectChain } = useSelectedChain()
 
   // always closed on mount
   const [mounted, setMounted] = useState(false)
@@ -84,11 +84,11 @@ function ConnectButtons({
 }
 
 function SwitchChainButtons() {
-  const { 
+  const {
     connectedChainId, connectedChainName,
     selectedChainId, selectedChainName,
-    switch_network, add_network,
-  } = useDojoChain()
+  } = useSelectedChain()
+  const { switch_network, add_network } = useChainSwitchCallbacks()
   const [chainExists, setChainExists] = useState(true)
   const [isBusy, setIsBusy] = useState(false)
 

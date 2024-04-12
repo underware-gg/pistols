@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
-import { useDojoChain } from '@/lib/dojo/hooks/useDojoChain'
+import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { bigintEquals } from '@/lib/utils/types'
 
 export function AccountChangeDetector({
@@ -25,7 +25,7 @@ export function ChainChangeDetector({
 }: {
   onChange?: Function
 }) {
-  const { selectedChainId } = useDojoChain()
+  const { selectedChainId } = useSelectedChain()
   const [currentChainId, setCurrentChainId] = useState<string>(null)
   useEffect(() => {
     if (!currentChainId && selectedChainId) {

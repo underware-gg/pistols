@@ -1,21 +1,21 @@
 import React from 'react'
-import Dojo, { DojoConfig } from '@/lib/dojo/Dojo'
+import Dojo, { DojoAppConfig } from '@/lib/dojo/Dojo'
 import App, { AppProps } from '@/lib/ui/App'
 
 export interface AppDojoProps extends AppProps {
-  dojoConfig: DojoConfig,
+  dojoAppConfig: DojoAppConfig,
 }
 
 export default function AppDojo({
   headerData = {},
   backgroundImage = null,
-  dojoConfig,
+  dojoAppConfig,
   children,
 }: AppDojoProps) {
 
   return (
     <App headerData={headerData} backgroundImage={backgroundImage}>
-      <Dojo dojoConfig={dojoConfig}>
+      <Dojo dojoAppConfig={dojoAppConfig}>
         {children}
       </Dojo>
     </App>

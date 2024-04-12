@@ -5,6 +5,7 @@ import { CHAIN_ID } from '@/lib/dojo/setup/chains'
 import { Chain } from '@starknet-react/chains'
 import { DojoPredeployedStarknetWindowObject } from '@dojoengine/create-burner'
 import { DojoBurnerStarknetWindowObject } from '@dojoengine/create-burner'
+import { DojoAppConfig } from '@/lib/dojo/Dojo'
 
 
 interface StarknetContextType {
@@ -19,10 +20,10 @@ interface StarknetContextType {
 export const StarknetContext = createContext<StarknetContextType>(null)
 
 export const StarknetProvider = ({
-  supportedChainIds,
+  dojoAppConfig,
   children,
 }: {
-  supportedChainIds: CHAIN_ID[]
+  dojoAppConfig: DojoAppConfig
   children: ReactNode
 }) => {
   const currentValue = useContext(StarknetContext)
@@ -37,16 +38,10 @@ export const StarknetProvider = ({
     if (isChainIdSupported(lastSelectedChainId)) {
       return lastSelectedChainId
     }
-    // select default from env
-    const defaultChainId = (process.env.NEXT_PUBLIC_CHAIN_ID ?? (
-      process.env.NODE_ENV === 'development' ? CHAIN_ID.KATANA
-        : supportedChainIds[0]
-    )) as CHAIN_ID
-    return defaultChainId
-  }, [supportedChainIds])
+    return dojoAppConfig.defaultChainId
+  }, [dojoAppConfig])
 
-  const chains: Chain[] = useMemo(() => getStarknetProviderChains(supportedChainIds), [supportedChainIds])
-
+  const chains: Chain[] = useMemo(() => getStarknetProviderChains(dojoAppConfig.supportedChainIds), [dojoAppConfig])
 
   //
   // Current chain
@@ -97,7 +92,7 @@ export const StarknetProvider = ({
   return (
     <StarknetContext.Provider
       value={{
-        supportedChainIds,
+        supportedChainIds: dojoAppConfig.supportedChainIds,
         selectedChainId,
         selectedChainConfig,
         selectChainId,

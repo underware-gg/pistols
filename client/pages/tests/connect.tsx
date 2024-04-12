@@ -4,10 +4,11 @@ import { ArraySignatureType, typedData } from 'starknet'
 import { useAccount, useDisconnect, useSignTypedData } from '@starknet-react/core'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
+import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { feltToString } from '@/lib/utils/starknet'
 import { bigintToHex, shortAddress } from '@/lib/utils/types'
 import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
-import { makeDojoConfig } from '@/dojo/config'
+import { makeDojoAppConfig } from '@/dojo/config'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import AppDojo from '@/lib/ui/AppDojo'
 
@@ -21,7 +22,7 @@ const HeaderCell = Table.HeaderCell
 
 export default function IndexPage() {
   return (
-    <AppDojo dojoConfig={makeDojoConfig()}>
+    <AppDojo dojoAppConfig={makeDojoAppConfig()}>
       <Container>
         <DojoAccount />
         <Connect />
@@ -34,6 +35,7 @@ export default function IndexPage() {
 
 function DojoAccount() {
   const { account, masterAccount, isGuest } = useDojoAccount()
+  const { selectedChainConfig } = useSelectedChain()
 
   return (
     <Table celled striped color='orange' size='small'>
@@ -54,7 +56,7 @@ function DojoAccount() {
         <Row>
           <Cell>NEXT_PUBLIC_MASTER_ADDRESS</Cell>
           <Cell className='Code'>
-            {process.env.NEXT_PUBLIC_MASTER_ADDRESS}
+            {selectedChainConfig.masterAddress}
           </Cell>
         </Row>
         <Row>

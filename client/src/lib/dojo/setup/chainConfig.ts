@@ -32,11 +32,11 @@ export type DojoChainConfig = {
 const localKatanaConfig: DojoChainConfig = {
   name: chains.katanaLocalChain.name,
   chain: chains.katanaLocalChain,
-  rpcUrl: process.env.NEXT_PUBLIC_NODE_URL ?? LOCAL_KATANA,
-  toriiUrl: process.env.NEXT_PUBLIC_TORII ?? 'http://0.0.0.0:8080', //LOCAL_TORII,
-  relayUrl: process.env.NEXT_PUBLIC_RELAY_URL ?? LOCAL_RELAY,
-  masterAddress: process.env.NEXT_PUBLIC_MASTER_ADDRESS ?? KATANA_PREFUNDED_ADDRESS,
-  masterPrivateKey: process.env.NEXT_PUBLIC_MASTER_PRIVATE_KEY ?? KATANA_PREFUNDED_PRIVATE_KEY,
+  rpcUrl: process.env.NEXT_PUBLIC_NODE_URL || LOCAL_KATANA,
+  toriiUrl: process.env.NEXT_PUBLIC_TORII || 'http://0.0.0.0:8080', //LOCAL_TORII,
+  relayUrl: process.env.NEXT_PUBLIC_RELAY_URL || LOCAL_RELAY,
+  masterAddress: process.env.NEXT_PUBLIC_MASTER_ADDRESS || KATANA_PREFUNDED_ADDRESS,
+  masterPrivateKey: process.env.NEXT_PUBLIC_MASTER_PRIVATE_KEY || KATANA_PREFUNDED_PRIVATE_KEY,
   accountClassHash: KATANA_CLASS_HASH,
   lordsContractAddress: undefined, // lords_mock
   lordsFaucetUrl: undefined,
@@ -127,15 +127,15 @@ export const getStarknetProviderChains = (supportedChainIds: chains.CHAIN_ID[]):
   }, [])
 }
 
-export const getMasterPredeployedAccount = (chainId: chains.CHAIN_ID): PredeployedAccount[] => {
+export const getChainMasterAccount = (chainId: chains.CHAIN_ID): PredeployedAccount => {
   const dojoChainConfig = dojoContextConfig[chainId]
   if (dojoChainConfig?.masterAddress && dojoChainConfig?.masterPrivateKey) {
-    return [{
+    return {
       name: 'Master Account',
       address: dojoChainConfig.masterAddress,
       privateKey: dojoChainConfig.masterPrivateKey,
       active: false,
-    }]
+    }
   }
-  return []
+  return null
 }
