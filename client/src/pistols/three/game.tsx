@@ -350,16 +350,19 @@ export function resetStaticScene() {
 // Game Interface
 //
 
-export function switchScene(sceneName, duelistModelA, duelistModelB) {
+export function switchScene(sceneName) {
   _sceneName = sceneName
   _currentScene = _scenes[sceneName]
   if (sceneName == SceneName.Duel) {
-    _duelistAModel = duelistModelA == "MALE" ? "MALE_A" : "FEMALE_A"
-    _duelistBModel = duelistModelB == "MALE" ? "MALE_B" : "FEMALE_B"
     resetDuelScene()
   } else {
     resetStaticScene()
   }
+}
+
+export function switchPlayers(duelistModelA, duelistModelB) {
+  _duelistAModel = duelistModelA == "MALE" ? "MALE_A" : "FEMALE_A"
+  _duelistBModel = duelistModelB == "MALE" ? "MALE_B" : "FEMALE_B"
 }
 
 export function getCameraRig() {

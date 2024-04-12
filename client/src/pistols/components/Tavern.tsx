@@ -3,9 +3,10 @@ import { useRouter } from 'next/navigation'
 import { Grid } from 'semantic-ui-react'
 import { MenuTavern } from '@/pistols/components/Menus'
 import { TavernAudios } from '@/pistols/components/GameContainer'
+import { AccountChangeDetector, ChainChangeDetector } from '@/lib/dojo/ChangeDetector'
+import PlayerSwitcher from '@/pistols/components/PlayerSwitcher'
 import ChallengeModal from '@/pistols/components/ChallengeModal'
 import DuelistModal from '@/pistols/components/DuelistModal'
-import { AccountChangeDetector, ChainChangeDetector } from '@/lib/dojo/ChangeDetector'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -22,6 +23,8 @@ export default function Tavern() {
       <div className='UIContainerTavern'>
         <MenuTavern />
       </div>
+
+      <PlayerSwitcher />
 
       <DuelistModal />
       <ChallengeModal />
