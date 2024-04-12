@@ -1,24 +1,26 @@
 import { useEffect, useMemo } from 'react'
-import { useAsyncMemo } from '@/lib/utils/hooks/useAsyncMemo'
-import { Account } from 'starknet'
 import { DojoProvider } from '@dojoengine/core'
 import { getSyncEntities } from '@dojoengine/state'
 import { BurnerManager, PredeployedManager } from '@dojoengine/create-burner'
-import * as torii from '@dojoengine/torii-client'
-
 import { DojoChainConfig, getChainMasterAccount } from '@/lib/dojo/setup/chainConfig'
+import { useSystem } from '@/lib/dojo/hooks/useDojoSystem'
+import { useAsyncMemo } from '@/lib/utils/hooks/useAsyncMemo'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { dummyAccount, feltToString } from '@/lib/utils/starknet'
+import { Account } from 'starknet'
+
+import { DojoAppConfig } from '@/lib/dojo/Dojo'
 import { createClientComponents } from './createClientComponents'
 import { setupNetwork } from './setupNetwork'
 import { CHAIN_ID } from './chains'
+import * as torii from '@dojoengine/torii-client'
 
 // TODO: move out of lib
 import { createSystemCalls } from '../../../dojo/createSystemCalls'
 
 export type SetupResult = ReturnType<typeof useSetup> | null
 
-export function useSetup(selectedChainConfig: DojoChainConfig, manifest: any, account: Account) {
+export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: DojoChainConfig, account: Account) {
 
   // avoid double effects
   const mounted = useMounted()
@@ -29,6 +31,12 @@ export function useSetup(selectedChainConfig: DojoChainConfig, manifest: any, ac
   // - null: when error
   // - object or true: when success
   //
+
+  const chainId = useMemo(() => (feltToString(selectedChainConfig.chain.id) as CHAIN_ID), [selectedChainConfig])
+
+  const manifest = useMemo(() => {
+    return dojoAppConfig.manifests[chainId] ?? null
+  }, [selectedChainConfig])
 
   //
   // Provider setup
@@ -60,6 +68,10 @@ export function useSetup(selectedChainConfig: DojoChainConfig, manifest: any, ac
     // console.log(`TORII CLIENT OK!`)
     return client
   }, [mounted, selectedChainConfig, manifest], undefined, null)
+
+  //
+  // Check world deployment
+  const { isDeployed } = useSystem(dojoAppConfig.mainSystemName, manifest)
 
   //
   // Initialize the network configuration.
@@ -129,7 +141,6 @@ export function useSetup(selectedChainConfig: DojoChainConfig, manifest: any, ac
     isError: predeployedManagerIsError,
   } = useAsyncMemo<PredeployedManager>(async () => {
     if (!dojoProvider) return (dojoProvider as any) // undefined or null
-    const chainId = feltToString(selectedChainConfig.chain.id) as CHAIN_ID
     let predeployedAccounts = [...selectedChainConfig.predeployedAccounts]
     const masterAccount = getChainMasterAccount(chainId)
     if (masterAccount) {
@@ -159,12 +170,13 @@ export function useSetup(selectedChainConfig: DojoChainConfig, manifest: any, ac
   const loadingMessage = (isLoading ? 'Loading Pistols...' : null)
 
   const errorMessage =
-    !manifest ? 'Not Deployed'
+    !manifest ? 'Game not Deployed'
       : dojoProviderIsError ? 'Chain Provider is unavailable'
         : toriiIsError ? 'Game Indexer is unavailable'
-          : burnerManagerIsError ? 'Burner Manager error'
-            : predeployedManagerIsError ? 'Predeployed Manager error'
-              : null
+          : !isDeployed ? 'World not found'
+            : burnerManagerIsError ? 'Burner Manager error'
+              : predeployedManagerIsError ? 'Predeployed Manager error'
+                : null
   const isError = (errorMessage != null)
 
   useEffect(() => {

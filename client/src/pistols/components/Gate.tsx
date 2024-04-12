@@ -1,11 +1,10 @@
 import React from 'react'
 import { useRouter } from 'next/navigation'
-import { Divider, Dropdown, Grid, Icon } from 'semantic-ui-react'
+import { Divider, Dropdown, Grid, Header, Icon } from 'semantic-ui-react'
 import { VStack, VStackRow } from '@/lib/ui/Stack'
 import { useDojoAccount, useDojoStatus } from '@/lib/dojo/DojoContext'
 import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
-import { useDojoSystem } from '@/lib/dojo/hooks/useDojoSystem'
 import { useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
 import { AccountMenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { AccountsList } from '@/pistols/components/account/AccountsList'
@@ -70,7 +69,9 @@ function DisconnectedGate() {
       <VStack>
         <ChainSwitcher disabled={isLoading} />
         <ActionButton fill large disabled={!canConnect} onClick={() => connectOpener.open()} label={switchChain ? 'Switch Chain' : 'Connect Wallet'} />
-        <Divider />
+        <Divider horizontal>
+          <Header as='h4'>OR</Header>
+        </Divider>
         {isLoading ? <h3 className='TitleCase Important'>{loadingMessage}</h3>
           : isError ? <h3 className='TitleCase Negative'>{errorMessage}</h3>
             : <EnterAsGuestButton />
@@ -139,17 +140,6 @@ function ConnectedGate() {
     Object.values(burners).forEach(burner => {
       remove(burner.address)
     })
-  }
-
-  const { systemExists } = useDojoSystem('actions')
-
-  if (systemExists === false) {
-    return (
-      <VStack>
-        <hr />
-        <h3 className='TitleCase Negative'>Deployment not found!</h3>
-      </VStack>
-    )
   }
 
   return (

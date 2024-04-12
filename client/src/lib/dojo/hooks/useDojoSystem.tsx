@@ -5,11 +5,15 @@ import { useContract } from '@starknet-react/core'
 
 export const useDojoSystem = (systemName: string) => {
   const { setup: { manifest } } = useDojo()
+  return useSystem(systemName, manifest)
+}
+
+export const useSystem = (systemName: string, manifest: any) => {
 
   //
-  // Get Dojo Contract
+  // Find Dojo Contract
   const { contractAddress, abi } = useMemo(() => {
-    const contract = getContractByName(manifest, systemName)
+    const contract = manifest ? getContractByName(manifest, systemName) : null
     return {
       contractAddress: contract?.address ?? null,
       abi: contract?.abi ?? null,
@@ -18,7 +22,8 @@ export const useDojoSystem = (systemName: string) => {
 
   //
   // Check if contract exists
-  const [systemExists, setSystemExists] = useState<boolean>(undefined)
+  const [cairoVersion, setCairoVersion] = useState<number>(undefined)
+  const [isDeployed, setIsDeployed] = useState<boolean>(!contractAddress ? false : undefined)
   const { contract } = useContract({
     abi,
     address: contractAddress,
@@ -28,9 +33,14 @@ export const useDojoSystem = (systemName: string) => {
     const _check_deployed = async () => {
       try {
         const { cairo } = await contract.getVersion()
-        if (_mounted) setSystemExists(true)
+        if (_mounted) {
+          setCairoVersion(parseInt(cairo))
+          setIsDeployed(true)
+        }
       } catch {
-        if (_mounted) setSystemExists(false)
+        if (_mounted) {
+          setIsDeployed(false)
+        }
       }
     }
     _check_deployed()
@@ -38,8 +48,9 @@ export const useDojoSystem = (systemName: string) => {
   }, [contract])
 
   return {
-    systemAddress: contractAddress,
-    systemExists,
+    contractAddress,
+    isDeployed,
+    cairoVersion,
     abi,
   }
 }

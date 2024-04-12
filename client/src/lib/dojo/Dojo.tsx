@@ -8,9 +8,10 @@ import { useAccount } from '@starknet-react/core'
 import { Account } from 'starknet'
 
 export interface DojoAppConfig {
-  supportedChainIds: CHAIN_ID[],
-  defaultChainId: CHAIN_ID,
-  manifests: { [chain_id: string]: any | undefined },
+  mainSystemName: string
+  supportedChainIds: CHAIN_ID[]
+  defaultChainId: CHAIN_ID
+  manifests: { [chain_id: string]: any | undefined }
 }
 
 export default function Dojo({
@@ -39,9 +40,9 @@ function SetupDojoProvider({
 }) {
   // Connected wallet or Dojo Predeployed (master)
   const { account } = useAccount()
-  const { selectedChainId, selectedChainConfig } = useStarknetContext()
+  const { selectedChainConfig } = useStarknetContext()
   
-  const setupResult = useSetup(selectedChainConfig, dojoAppConfig.manifests[selectedChainId], account as Account)
+  const setupResult = useSetup(dojoAppConfig, selectedChainConfig, account as Account)
 
   if (!setupResult) {
     return <DojoStatus message={'Loading Pistols...'} />

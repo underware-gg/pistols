@@ -7,13 +7,13 @@ import { BigNumberish } from 'starknet'
 
 export const useLordsContract = () => {
   const { selectedChainConfig } = useStarknetContext()
-  const contractAddress = useMemo(() => (selectedChainConfig.lordsContractAddress), [selectedChainConfig])
+  const lordsAddress = useMemo(() => (selectedChainConfig.lordsContractAddress), [selectedChainConfig])
 
-  const { systemAddress, systemExists, abi } = useDojoSystem('lords_mock')
-  const isMock = !contractAddress && systemExists
+  const { contractAddress: mockAddress, isDeployed, abi } = useDojoSystem('lords_mock')
+  const isMock = !lordsAddress && isDeployed
 
   return {
-    contractAddress: (isMock ? systemAddress : contractAddress),
+    contractAddress: (isMock ? mockAddress : lordsAddress),
     abi: (isMock ? abi : null),
     isMock,
   }

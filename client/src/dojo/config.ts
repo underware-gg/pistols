@@ -5,6 +5,8 @@ import manifest_slot from '@/generated/slot/manifest.json'
 
 export const makeDojoAppConfig = (): DojoAppConfig => {
 
+  const mainSystemName = 'actions'
+
   const supportedChainIds = [
     CHAIN_ID.KATANA_LOCAL,
     CHAIN_ID.PISTOLS_SLOT,
@@ -25,6 +27,7 @@ export const makeDojoAppConfig = (): DojoAppConfig => {
   )) as CHAIN_ID
 
   return {
+    mainSystemName,
     supportedChainIds,
     defaultChainId,
     manifests,
