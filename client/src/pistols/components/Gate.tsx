@@ -1,8 +1,9 @@
 import React from 'react'
 import { useRouter } from 'next/navigation'
-import { Divider, Grid, Icon } from 'semantic-ui-react'
+import { Divider, Dropdown, Grid, Icon } from 'semantic-ui-react'
 import { VStack, VStackRow } from '@/lib/ui/Stack'
-import { useDojoAccount } from '@/lib/dojo/DojoContext'
+import { useDojoAccount, useDojoStatus } from '@/lib/dojo/DojoContext'
+import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { useDojoSystem } from '@/lib/dojo/hooks/useDojoSystem'
 import { useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
@@ -10,6 +11,8 @@ import { AccountMenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContex
 import { AccountsList } from '@/pistols/components/account/AccountsList'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { LordsBagIcon } from '@/pistols/components/account/Balance'
+import { feltToString } from '@/lib/utils/starknet'
+import { CHAIN_ID } from '@/lib/dojo/setup/chains'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import OnboardingModal from '@/pistols/components/account/OnboardingModal'
 import WalletHeader from '@/pistols/components/account/WalletHeader'
@@ -20,6 +23,7 @@ const Col = Grid.Column
 
 export default function Gate() {
   const { isConnected, isCorrectChain } = useSelectedChain()
+  const { isLoading, isError } = useDojoStatus()
   return (
     <div className='UIContainer'>
 
@@ -40,11 +44,66 @@ export default function Gate() {
 
       </VStack>
 
-      {isCorrectChain ? <ConnectedGate /> : <DisconnectedGate switchChain={isConnected && !isCorrectChain} />}
+      {(isLoading || isError || !isCorrectChain) ?
+        <DisconnectedGate />
+        : <ConnectedGate />
+      }
 
     </div>
   )
 }
+
+
+//----------------------------------
+// Disconnected Gate
+//
+function DisconnectedGate() {
+  const { connectOpener } = usePistolsContext()
+  const { isConnected, isCorrectChain } = useSelectedChain()
+  const { isLoading, loadingMessage, isError, errorMessage } = useDojoStatus()
+
+  const canConnect = (!isLoading && !isError)
+  const switchChain = (isConnected && !isCorrectChain)
+
+  return (
+    <>
+      <VStack>
+        <ChainSwitcher disabled={isLoading} />
+        <ActionButton fill large disabled={!canConnect} onClick={() => connectOpener.open()} label={switchChain ? 'Switch Chain' : 'Connect Wallet'} />
+        <Divider />
+        {isLoading ? <h3 className='TitleCase Important'>{loadingMessage}</h3>
+          : isError ? <h3 className='TitleCase Negative'>{errorMessage}</h3>
+            : <EnterAsGuestButton />
+        }
+      </VStack>
+
+      <StarknetConnectModal opener={connectOpener} />
+    </>
+  )
+}
+
+function ChainSwitcher({
+  disabled = false
+}) {
+  const { chains, selectedChainConfig, selectChainId } = useStarknetContext()
+  return (
+    <Dropdown
+      text={`Server:  ${selectedChainConfig.name}`}
+      disabled={disabled}
+      className='icon AlignCenter Padded'
+      icon='chain'
+      button
+      fluid
+    >
+      <Dropdown.Menu>
+        {chains.map(chain => (
+          <Dropdown.Item key={chain.name} onClick={() => { selectChainId(feltToString(chain.id) as CHAIN_ID) }}>{chain.name}</Dropdown.Item>
+        ))}
+      </Dropdown.Menu>
+    </Dropdown>
+  )
+}
+
 
 function EnterAsGuestButton() {
   const { deselect } = useDojoAccount()
@@ -61,24 +120,9 @@ function EnterAsGuestButton() {
 }
 
 
-function DisconnectedGate({
-  switchChain = false,
-}) {
-  const { connectOpener } = usePistolsContext()
-  return (
-    <>
-      <VStack>
-        <ActionButton fill large onClick={() => connectOpener.open()} label={switchChain ? 'Switch Chain' :'Connect Wallet'} />
-        <Divider />
-        <EnterAsGuestButton />
-      </VStack>
-
-      <StarknetConnectModal opener={connectOpener} />
-    </>
-  )
-}
-
-
+//----------------------------------
+// Connected Gate
+//
 
 function ConnectedGate() {
   const { remove, applyFromClipboard, copyToClipboard, masterAccount, count } = useDojoAccount()
@@ -121,7 +165,7 @@ function ConnectedGate() {
         </VStackRow>
 
       </VStack>
-      
+
       <AccountsList />
 
       <Divider />

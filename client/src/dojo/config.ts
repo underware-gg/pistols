@@ -2,8 +2,6 @@ import { DojoAppConfig } from '@/lib/dojo/Dojo'
 import { CHAIN_ID } from '@/lib/dojo/setup/chains'
 import manifest_katana from '@/generated/dev/manifest.json'
 import manifest_slot from '@/generated/slot/manifest.json'
-// use any manifest while not deployed, world will not be found
-import manifest_realms from '@/generated/dev/manifest.json'
 
 export const makeDojoAppConfig = (): DojoAppConfig => {
 
@@ -16,7 +14,7 @@ export const makeDojoAppConfig = (): DojoAppConfig => {
   const manifests = {
     [CHAIN_ID.KATANA_LOCAL]: manifest_katana,
     [CHAIN_ID.PISTOLS_SLOT]: manifest_slot,
-    [CHAIN_ID.KATANA]: manifest_realms,
+    [CHAIN_ID.KATANA]: null,
   }
 
   const defaultChainId = (process.env.NEXT_PUBLIC_CHAIN_ID || (

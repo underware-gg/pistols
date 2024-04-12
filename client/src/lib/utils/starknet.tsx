@@ -19,6 +19,7 @@ export const pedersen = (a: BigNumberish, b: BigNumberish): bigint => (BigInt(ec
 export const poseidon = (values: BigNumberish[]): bigint => (BigInt(ec.starkCurve.poseidonHashMany(values.map(v => BigInt(v)))))
 export const ethToWei = (v: BigNumberish): bigint => (BigInt(v) * ETH_TO_WEI)
 export const weiToEth = (v: BigNumberish): bigint => (BigInt(v) / ETH_TO_WEI)
+export const dummyAccount = (): Account => (new Account({}, '0x0', '0x0'))
 
 export const splitU256 = (v: BigNumberish): { low: bigint, high: bigint } => ({
   low: BigInt(v) & 0xffffffffffffffffffffffffffffffffn,

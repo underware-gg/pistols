@@ -2,6 +2,7 @@ import { ReactNode, createContext, useContext, useMemo } from 'react'
 import { BurnerAccount, useBurnerManager, useBurnerWindowObject, usePredeployedWindowObject } from '@dojoengine/create-burner'
 import { SetupResult } from '@/lib/dojo/setup/useSetup'
 import { Account } from 'starknet'
+import { dummyAccount } from '../utils/starknet';
 
 interface DojoContextType {
   setup: SetupResult;
@@ -24,8 +25,8 @@ export const DojoProvider = ({
 
   const { burnerManager, predeployedManager, dojoProvider } = value
 
-  const masterAccount = burnerManager.masterAccount as Account
-  const burner: BurnerAccount = useBurnerManager({ burnerManager, })
+  const masterAccount = burnerManager?.masterAccount as Account
+  const burner: BurnerAccount = useBurnerManager({ burnerManager })
 
   // create injected connectors asynchronously
   useBurnerWindowObject(burnerManager);
@@ -36,7 +37,7 @@ export const DojoProvider = ({
       value={{
         setup: value,
         masterAccount,
-        account: (burner.account as Account) ?? new Account(dojoProvider.provider, '0x0', '0x0'),
+        account: (burner.account as Account) ?? dummyAccount(),
         burner,
       }}
     >
@@ -57,6 +58,13 @@ export const useDojo = (): DojoContextType => {
 //-----------------------
 // Pistols
 //
+
+export const useDojoStatus = () => {
+  const { setup: { status } } = useDojo()
+  return {
+    ...status,
+  }
+}
 
 export const useDojoAccount = (): BurnerAccount & {
   masterAccount: Account

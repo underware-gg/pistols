@@ -46,7 +46,6 @@ export default function WalletHeader({
           {isConnected && contractAddress &&
             <LordsFaucet fill large account={account} />
           }
-          <ChainSwitcher />
           <ActionButton fill large onClick={() => disconnect()} label='Disconnect' />
         </Col>
       </Row>
@@ -54,24 +53,4 @@ export default function WalletHeader({
   )
 }
 
-
-function ChainSwitcher({
-}) {
-  const { chains, selectedChainConfig, selectChainId } = useStarknetContext()
-  return (
-    <Dropdown
-      text={selectedChainConfig.name}
-      className='icon AlignCenter Padded'
-      icon='chain'
-      button
-      fluid
-    >
-      <Dropdown.Menu>
-        {chains.map(chain => (
-          <Dropdown.Item key={chain.name} onClick={() => { selectChainId(feltToString(chain.id) as CHAIN_ID) }}>{chain.name}</Dropdown.Item>
-        ))}
-      </Dropdown.Menu>
-    </Dropdown>
-  )
-}
 

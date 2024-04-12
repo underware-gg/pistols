@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useAsyncMemo } from '@/lib/utils/hooks/useAsyncMemo'
 import { Account } from 'starknet'
 import { DojoProvider } from '@dojoengine/core'
@@ -8,7 +8,7 @@ import * as torii from '@dojoengine/torii-client'
 
 import { DojoChainConfig, getChainMasterAccount } from '@/lib/dojo/setup/chainConfig'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
-import { feltToString } from '@/lib/utils/starknet'
+import { dummyAccount, feltToString } from '@/lib/utils/starknet'
 import { createClientComponents } from './createClientComponents'
 import { setupNetwork } from './setupNetwork'
 import { CHAIN_ID } from './chains'
@@ -23,49 +23,79 @@ export function useSetup(selectedChainConfig: DojoChainConfig, manifest: any, ac
   // avoid double effects
   const mounted = useMounted()
 
-  const { value: toriiClient } = useAsyncMemo(async () => {
-    if (!mounted) return null
+  //
+  // All hooks must return:
+  // - undefined: while processing
+  // - null: when error
+  // - object or true: when success
+  //
+
+  //
+  // Provider setup
+  const {
+    value: dojoProvider,
+    isError: dojoProviderIsError,
+  } = useAsyncMemo<DojoProvider>(async () => {
+    if (!mounted) return undefined
+    if (!manifest) return null
+    const dojoProvider = new DojoProvider(manifest, selectedChainConfig.rpcUrl)
+    console.log(`DojoProvider:`, feltToString(await dojoProvider.provider.getChainId()), dojoProvider)
+    return dojoProvider
+  }, [mounted, selectedChainConfig, manifest], undefined, null)
+
+  //
+  // Torii setup
+  const {
+    value: toriiClient,
+    isError: toriiIsError,
+  } = useAsyncMemo<torii.Client>(async () => {
+    if (!mounted) return undefined
+    if (!manifest) return null
     const client = await torii.createClient([], {
       rpcUrl: selectedChainConfig.rpcUrl,
       toriiUrl: selectedChainConfig.toriiUrl,
       relayUrl: selectedChainConfig.relayUrl ?? '',
-      worldAddress: manifest.world.address ?? '',
+      worldAddress: manifest?.world?.address ?? '',
     })
     // console.log(`TORII CLIENT OK!`)
     return client
-  }, [mounted, selectedChainConfig, manifest], null)
+  }, [mounted, selectedChainConfig, manifest], undefined, null)
 
-  const { value: dojoProvider } = useAsyncMemo(async () => {
-    if (!mounted) return null
-    const dojoProvider = new DojoProvider(manifest, selectedChainConfig.rpcUrl)
-    console.log(`DojoProvider:`, feltToString(await dojoProvider.provider.getChainId()), dojoProvider)
-    return dojoProvider
-  }, [mounted, selectedChainConfig, manifest], null)
-
+  //
   // Initialize the network configuration.
-  const network = useMemo(() => {
-    return dojoProvider ? setupNetwork(dojoProvider) : null
+  const network = useMemo<ReturnType<typeof setupNetwork>>(() => {
+    if (!dojoProvider) return (dojoProvider as any) // undefined or null
+    return setupNetwork(dojoProvider)
   }, [dojoProvider])
 
+  //
   // Create client components based on the network setup.
-  const components = useMemo(() => {
-    return network ? createClientComponents(network) : null
+  const components = useMemo<ReturnType<typeof createClientComponents>>(() => {
+    if (!network) return (network as any) // undefined or null
+    return createClientComponents(network)
   }, [network])
 
+  //
   // fetch all existing entities from torii
-  const { value: syncFinished } = useAsyncMemo(async () => {
-    if (!toriiClient || !network) return false
+  const { value: syncStatus } = useAsyncMemo<boolean>(async () => {
+    if (!toriiClient) return (toriiClient as any) // undefined or null
+    if (!network) return (network as any) // undefined or null
     await getSyncEntities(
       toriiClient,
       network.contractComponents as any
     )
     return true
-  }, [toriiClient, network], false)
+  }, [toriiClient, network], undefined, null)
 
+  //
   // Establish system calls using the network and components.
-  const systemCalls = useMemo(() => {
-    return (syncFinished && network && components) ? createSystemCalls(network, components, manifest) : null
-  }, [syncFinished, network, components, manifest])
+  const systemCalls = useMemo<ReturnType<typeof createSystemCalls>>(() => {
+    if (!manifest) return null
+    if (!syncStatus) return (syncStatus as any) // undefined or null
+    if (!network) return (network as any) // undefined or null
+    if (!components) return (components as any) // undefined or null
+    return createSystemCalls(network, components, manifest) ?? null
+  }, [manifest, syncStatus, network, components])
 
   //
   // TODO: Move this to DojoContext!
@@ -73,23 +103,32 @@ export function useSetup(selectedChainConfig: DojoChainConfig, manifest: any, ac
   // (the provider cannot have a null burnerManager)
   //
   // create burner manager
-  const { value: burnerManager } = useAsyncMemo(async () => {
-    if (!dojoProvider) return null
+  // cannot be null!
+  const {
+    value: burnerManager,
+    isError: burnerManagerIsError,
+  } = useAsyncMemo<BurnerManager>(async () => {
+    if (!dojoProvider) return (dojoProvider as any) // undefined or null
     const burnerManager = new BurnerManager({
       // master account moved to predeployedManager
-      masterAccount: account ?? new Account(dojoProvider.provider, '0x0', '0x0'),
+      masterAccount: account ?? dummyAccount(),
       accountClassHash: selectedChainConfig.accountClassHash,
       feeTokenAddress: selectedChainConfig.chain.nativeCurrency.address,
-      rpcProvider: dojoProvider.provider,
+      rpcProvider: dojoProvider?.provider,
     });
     await burnerManager.init(true);
     return burnerManager
-  }, [selectedChainConfig, dojoProvider, account], null)
+  }, [selectedChainConfig, dojoProvider, account], undefined, null)
 
+  //
   // Predeployed accounts
   // (includes master account)
-  const { value: predeployedManager } = useAsyncMemo(async () => {
-    if (!dojoProvider) return null
+  // can be null
+  const {
+    value: predeployedManager,
+    isError: predeployedManagerIsError,
+  } = useAsyncMemo<PredeployedManager>(async () => {
+    if (!dojoProvider) return (dojoProvider as any) // undefined or null
     const chainId = feltToString(selectedChainConfig.chain.id) as CHAIN_ID
     let predeployedAccounts = [...selectedChainConfig.predeployedAccounts]
     const masterAccount = getChainMasterAccount(chainId)
@@ -102,20 +141,41 @@ export function useSetup(selectedChainConfig: DojoChainConfig, manifest: any, ac
     })
     await predeployedManager.init()
     return predeployedManager
-  }, [selectedChainConfig, dojoProvider], null)
+  }, [selectedChainConfig, dojoProvider], undefined, null)
 
-  const isFinished = (
-    toriiClient != null &&
-    dojoProvider != null &&
-    network != null &&
-    components != null &&
-    syncFinished &&
-    systemCalls != null &&
-    burnerManager != null &&
-    predeployedManager != null
+  //
+  // Status
+
+  const isLoading = !(
+    (toriiClient !== undefined) &&
+    (dojoProvider !== undefined) &&
+    (network !== undefined) &&
+    (components !== undefined) &&
+    (syncStatus !== undefined) &&
+    (systemCalls !== undefined) &&
+    (burnerManager !== undefined) &&
+    (predeployedManager !== undefined)
   )
+  const loadingMessage = (isLoading ? 'Loading Pistols...' : null)
 
-  return !isFinished ? null : {
+  const errorMessage =
+    !manifest ? 'Not Deployed'
+      : dojoProviderIsError ? 'Chain Provider is unavailable'
+        : toriiIsError ? 'Game Indexer is unavailable'
+          : burnerManagerIsError ? 'Burner Manager error'
+            : predeployedManagerIsError ? 'Predeployed Manager error'
+              : null
+  const isError = (errorMessage != null)
+
+  useEffect(() => {
+    if (errorMessage) {
+      console.warn(`useSetup() error:`, errorMessage)
+    }
+  }, [errorMessage])
+
+  // console.log(`setting up...`, isLoading, loadingMessage, isError, errorMessage, burnerManager)
+
+  return isLoading ? null : {
     // resolved
     dojoProvider,
     toriiClient,
@@ -127,5 +187,12 @@ export function useSetup(selectedChainConfig: DojoChainConfig, manifest: any, ac
     // pass thru
     manifest,
     selectedChainConfig,
+    // status
+    status: {
+      isLoading: (isLoading && !isError),
+      loadingMessage,
+      isError,
+      errorMessage,
+    }
   }
 }

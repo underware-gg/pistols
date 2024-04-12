@@ -1,24 +1,33 @@
 import { useEffect, useState, DependencyList } from 'react'
 
-export function useAsyncMemo<T>(factory: () => Promise<T> | undefined | null, deps: DependencyList, initialValue?: T) {
+export function useAsyncMemo<T>(runner: () => Promise<T> | undefined | null, deps: DependencyList, initialValue?: T, errorValue?: T) {
   const [value, setValue] = useState<T | undefined>(initialValue)
   const [isRunning, setIsRunning] = useState(false)
   const [isResolved, setIsResolved] = useState(false)
+  const [isError, setIsError] = useState(false)
   useEffect(() => {
     let _mounted = true
-    const promise = factory()
-    if (initialValue !== undefined) {
+    if (runner) {
       setValue(initialValue)
       setIsResolved(false)
+      setIsRunning(true)
+      setIsError(false)
+      runner().then((val) => {
+        if (_mounted) {
+          setValue(val)
+          setIsRunning(false)
+          setIsResolved(true)
+        }
+      }).catch((e) => {
+        console.warn(`useAsyncMemo() exception:`, e)
+        if (_mounted) {
+          setValue(errorValue)
+          setIsRunning(false)
+          setIsResolved(false)
+          setIsError(true)
+        }
+      })
     }
-    setIsRunning(true)
-    promise?.then((val) => {
-      if (_mounted) {
-        setValue(val)
-        setIsRunning(false)
-        setIsResolved(true)
-      }
-    })
     return () => {
       _mounted = false
     }
@@ -27,5 +36,6 @@ export function useAsyncMemo<T>(factory: () => Promise<T> | undefined | null, de
     value,
     isRunning,
     isResolved,
+    isError,
   }
 }

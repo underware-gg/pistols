@@ -6,7 +6,6 @@ import { useSetup } from '@/lib/dojo/setup/useSetup'
 import { CHAIN_ID } from '@/lib/dojo/setup/chains'
 import { useAccount } from '@starknet-react/core'
 import { Account } from 'starknet'
-import { useReconnectChain } from './hooks/useChain'
 
 export interface DojoAppConfig {
   supportedChainIds: CHAIN_ID[],
@@ -42,13 +41,12 @@ function SetupDojoProvider({
   const { account } = useAccount()
   const { selectedChainId, selectedChainConfig } = useStarknetContext()
   
-  useReconnectChain()
-  
   const setupResult = useSetup(selectedChainConfig, dojoAppConfig.manifests[selectedChainId], account as Account)
 
   if (!setupResult) {
     return <DojoStatus message={'Loading Pistols...'} />
   }
+  // console.log(`setupResult:`, setupResult)
 
   return (
     <DojoProvider value={setupResult}>

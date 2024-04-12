@@ -1006,7 +1006,8 @@ input::placeholder {
 .ui.selection.visible.dropdown>.text:not(.default),
 .ui.active.search.dropdown input.search:focus+.text,
 .ui.dropdown .menu .selected.item  {
-  background-color: $color-dark!important;
+  @extend ._round_border;
+  background-color: $color-darkest!important;
   color: $color-brightest!important;
   font-weight: 600;
 }

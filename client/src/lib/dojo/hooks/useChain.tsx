@@ -56,52 +56,6 @@ export const useSelectedChain = () => {
 }
 
 
-//---------------------------------------------------------------
-// Re-connect if chain changed and using predeployed connector
-//
-export const useReconnectChain = () => {
-  const { isCorrectChain, selectedChainId } = useSelectedChain()
-  const { isConnected, connector } = useAccount()
-  const { connect, connectors } = useConnect()
-
-  // flag that we need to change
-  // because when the new connectors arrive, the account connector is undefined
-  const [reconnectPredeployed, setReconnectPredeployed] = useState(false)
-  useEffect(() => {
-    if (!reconnectPredeployed && isConnected && !isCorrectChain && connector?.id == DojoPredeployedStarknetWindowObject.getId()) {
-      setReconnectPredeployed(true)
-      location?.reload()
-    }
-  }, [isConnected, isCorrectChain, connector])
-
-  // useEffect(() => {
-  //   let _mounted = true
-  //   const _reconnect = async () => {
-  //     for (const c of connectors) {
-  //       console.log(`>>>>>>>>>>>>>>>>>>NEW CONNECTOR:`, c.id, c.available(), c)
-  //       if (c && c.available() && c.id == DojoPredeployedStarknetWindowObject.getId()) {
-  //         const _chainId = await c.chainId()
-  //         console.log(`--------------RECONNECT?`, feltToString(_chainId))
-  //         if (bigintEquals(_chainId, stringToFelt(selectedChainId))) {
-  //           console.log(`++++++++++++++RECONNECT!`)
-  //           if (_mounted) setReconnectPredeployed(false)
-  //           connect({ connector: c })
-  //           return
-  //         }
-  //       }
-  //     }
-  //   }
-  //   if (reconnectPredeployed) {
-  //     _reconnect()
-  //   }
-  //   return () => { _mounted = false }
-  // }, [reconnectPredeployed, connectors])
-  // console.log(`PRE:`, reconnectPredeployed, isConnected, isCorrectChain, connector, connectors)
-
-  return {}
-}
-
-
 //-----------------------------
 // Chain switch callbacks
 //
