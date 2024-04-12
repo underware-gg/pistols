@@ -29,10 +29,19 @@ export function OnboardingFund({
   const _rowStyle = { minHeight: '40px', width: '100%', padding: '5px' }
 
   return (
-    <div className='Padded'>
+    <div className='PaddedDouble'>
 
-      <h3>Account Balance</h3>
-      <span className='H3'><LordsBalance address={account?.address} big /></span>
+      <Grid>
+        <Row columns='equal'>
+          <Col>
+            <h3>Account Balance</h3>
+            <span className='H3'><LordsBalance address={account?.address} big /></span>
+          </Col>
+          <Col textAlign='right'>
+            <LordsFaucet account={account} />
+          </Col>
+        </Row>
+      </Grid>
       <Divider hidden />
       {deposit &&
         <div style={_rowStyle}>

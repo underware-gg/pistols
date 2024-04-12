@@ -8,7 +8,7 @@ export const useERC20Balance = (contractAddress: BigNumberish, ownerAddress: Big
     token: bigintToHex(contractAddress),
     address: bigintToHex(ownerAddress),
     watch: true,
-    refetchInterval: 2_000,
+    refetchInterval: 1_000,
     enabled: (Boolean(contractAddress) && Boolean(ownerAddress)),
   })
   // console.log(`BALANCE`, shortAddress(bigintToHex(contractAddress)), shortAddress(bigintToHex(ownerAddress)), balance)
