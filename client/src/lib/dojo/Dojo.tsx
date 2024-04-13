@@ -3,7 +3,7 @@ import { StarknetProvider, useStarknetContext } from '@/lib/dojo/StarknetProvide
 import { DojoProvider } from '@/lib/dojo/DojoContext'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { useSetup } from '@/lib/dojo/setup/useSetup'
-import { CHAIN_ID } from '@/lib/dojo/setup/chains'
+import { CHAIN_ID } from '@/lib/dojo/setup/chainConfig'
 import { useAccount } from '@starknet-react/core'
 import { Account } from 'starknet'
 
@@ -11,7 +11,7 @@ export interface DojoAppConfig {
   mainSystemName: string
   supportedConnectorIds: string[]
   supportedChainIds: CHAIN_ID[]
-  defaultChainId: CHAIN_ID
+  initialChainId: CHAIN_ID
   manifests: { [chain_id: string]: any | undefined }
 }
 
@@ -22,7 +22,6 @@ export default function Dojo({
   dojoAppConfig: DojoAppConfig,
   children: ReactNode
 }) {
-
   return (
     <StarknetProvider dojoAppConfig={dojoAppConfig}>
       <SetupDojoProvider dojoAppConfig={dojoAppConfig}>
@@ -43,6 +42,7 @@ function SetupDojoProvider({
   const { account } = useAccount()
   const { selectedChainConfig } = useStarknetContext()
   
+  // console.log(`dojoAppConfig:`, dojoAppConfig)
   const setupResult = useSetup(dojoAppConfig, selectedChainConfig, account as Account)
 
   if (!setupResult) {

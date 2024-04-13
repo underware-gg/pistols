@@ -1,9 +1,8 @@
 import React, { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { DojoChainConfig, dojoContextConfig, getStarknetProviderChains, isChainIdSupported } from '@/lib/dojo/setup/chainConfig'
+import { CHAIN_ID, DojoChainConfig, getDojoChainConfig, getStarknetProviderChains, isChainIdSupported } from '@/lib/dojo/setup/chainConfig'
 import { StarknetConfig, argent, braavos, injected, jsonRpcProvider, useInjectedConnectors } from '@starknet-react/core'
 import { DojoPredeployedStarknetWindowObject, DojoBurnerStarknetWindowObject } from '@dojoengine/create-burner'
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
-import { CHAIN_ID } from '@/lib/dojo/setup/chains'
 import { Chain } from '@starknet-react/chains'
 
 
@@ -37,7 +36,7 @@ export const StarknetProvider = ({
     if (isChainIdSupported(lastSelectedChainId)) {
       return lastSelectedChainId
     }
-    return dojoAppConfig.defaultChainId
+    return dojoAppConfig.initialChainId
   }, [dojoAppConfig])
 
   const chains: Chain[] = useMemo(() => getStarknetProviderChains(dojoAppConfig.supportedChainIds), [dojoAppConfig])
@@ -46,19 +45,18 @@ export const StarknetProvider = ({
   // Current chain
   //
   const [selectedChainId, setSelectedChainId] = useState<CHAIN_ID>(intialChainId)
-  const [selectedChainConfig, setSelectedChain] = useState<DojoChainConfig>(dojoContextConfig[intialChainId])
+  const [selectedChainConfig, setSelectedChain] = useState<DojoChainConfig>(getDojoChainConfig(intialChainId))
   const isKatana = useMemo(() => selectedChainConfig?.chain?.network === 'katana', [selectedChainConfig])
+  useEffect(() => console.log(`Selected chain:`, selectedChainId, selectedChainConfig), [selectedChainConfig])
 
   const selectChainId = useCallback((chainId: CHAIN_ID) => {
     if (!isChainIdSupported(chainId)) {
       throw `selectChainId() Invalid chain [${chainId}]`
     }
     setSelectedChainId(chainId)
-    setSelectedChain(dojoContextConfig[chainId])
+    setSelectedChain(getDojoChainConfig(chainId))
     window?.localStorage?.setItem('lastSelectedChainId', chainId)
   }, [])
-
-  useEffect(() => console.log(`Selected chain:`, selectedChainId, selectedChainConfig), [selectedChainConfig])
 
 
   //

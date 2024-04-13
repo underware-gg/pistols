@@ -1,15 +1,12 @@
 import React, { useMemo } from 'react'
-import { Grid, Image, Dropdown } from 'semantic-ui-react'
+import { Grid, Image } from 'semantic-ui-react'
 import { useAccount, useDisconnect } from '@starknet-react/core'
-import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { useLordsContract } from '@/lib/dojo/hooks/useLords'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { LordsBalance } from '@/pistols/components/account/LordsBalance'
 import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { feltToString } from '@/lib/utils/starknet'
-import { CHAIN_ID } from '@/lib/dojo/setup/chains'
 
 const Row = Grid.Row
 const Col = Grid.Column

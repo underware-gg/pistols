@@ -1,5 +1,7 @@
 import { PredeployedAccount } from '@dojoengine/create-burner'
 import { Chain, mainnet, sepolia } from '@starknet-react/chains'
+import { feltToString } from '@/lib/utils/starknet'
+import { assert } from '@/lib/utils/math'
 import {
   LOCAL_KATANA,
   LOCAL_TORII,
@@ -8,16 +10,23 @@ import {
   KATANA_PREFUNDED_PRIVATE_KEY,
   KATANA_CLASS_HASH,
 } from '@dojoengine/core'
-import * as chains from './chains'
+import {
+  CHAIN_ID,
+  katanaLocalChain,
+  pistolsSlotChain,
+  realmsWorldChain,
+} from './chains'
 
-// based on:
-// https://github.com/cartridge-gg/rollyourown/blob/market_packed/web/src/dojo/setup/config.ts
+export { CHAIN_ID }
+
+export const defaultChainId = (process.env.NEXT_PUBLIC_CHAIN_ID || undefined) as CHAIN_ID
 
 export type DojoContextConfig = typeof dojoContextConfig
 
 export type DojoChainConfig = {
-  name: string
   chain: Chain
+  chainId: CHAIN_ID
+  name: string
   rpcUrl: string
   toriiUrl: string,
   relayUrl: string,
@@ -29,14 +38,30 @@ export type DojoChainConfig = {
   predeployedAccounts: PredeployedAccount[],
 }
 
+const envChainConfig: DojoChainConfig = {
+  chain: undefined,
+  chainId: undefined,
+  name: undefined,
+  rpcUrl: process.env.NEXT_PUBLIC_NODE_URL || undefined,
+  toriiUrl: process.env.NEXT_PUBLIC_TORII || undefined,
+  relayUrl: process.env.NEXT_PUBLIC_RELAY_URL || undefined,
+  masterAddress: process.env.NEXT_PUBLIC_MASTER_ADDRESS || undefined,
+  masterPrivateKey: process.env.NEXT_PUBLIC_MASTER_PRIVATE_KEY || undefined,
+  accountClassHash: KATANA_CLASS_HASH,
+  lordsContractAddress: undefined,
+  lordsFaucetUrl: undefined,
+  predeployedAccounts: [],
+}
+
 const localKatanaConfig: DojoChainConfig = {
-  name: chains.katanaLocalChain.name,
-  chain: chains.katanaLocalChain,
-  rpcUrl: process.env.NEXT_PUBLIC_NODE_URL || LOCAL_KATANA,
-  toriiUrl: process.env.NEXT_PUBLIC_TORII || 'http://0.0.0.0:8080', //LOCAL_TORII,
-  relayUrl: process.env.NEXT_PUBLIC_RELAY_URL || LOCAL_RELAY,
-  masterAddress: process.env.NEXT_PUBLIC_MASTER_ADDRESS || KATANA_PREFUNDED_ADDRESS,
-  masterPrivateKey: process.env.NEXT_PUBLIC_MASTER_PRIVATE_KEY || KATANA_PREFUNDED_PRIVATE_KEY,
+  chain: katanaLocalChain,
+  chainId: undefined, // derived from chain
+  name: undefined,    // derived from chain
+  rpcUrl: LOCAL_KATANA,
+  toriiUrl: 'http://0.0.0.0:8080', //LOCAL_TORII,
+  relayUrl: LOCAL_RELAY,
+  masterAddress: KATANA_PREFUNDED_ADDRESS,
+  masterPrivateKey: KATANA_PREFUNDED_PRIVATE_KEY,
   accountClassHash: KATANA_CLASS_HASH,
   lordsContractAddress: undefined, // lords_mock
   lordsFaucetUrl: undefined,
@@ -44,8 +69,9 @@ const localKatanaConfig: DojoChainConfig = {
 }
 
 const pistolsSlotConfig: DojoChainConfig = {
-  name: chains.pistolsSlotChain.name,
-  chain: chains.pistolsSlotChain,
+  chain: pistolsSlotChain,
+  chainId: undefined, // derived from chain
+  name: undefined,    // derived from chain
   rpcUrl: 'https://api.cartridge.gg/x/pistols-slot/katana',
   toriiUrl: 'https://api.cartridge.gg/x/pistols-slot/torii',
   relayUrl: undefined,
@@ -60,8 +86,9 @@ const pistolsSlotConfig: DojoChainConfig = {
 // based on:
 // https://dev.realms.world/browser-wallets
 const realmsWorldConfig: DojoChainConfig = {
-  name: chains.realmsWorldChain.name,
-  chain: chains.realmsWorldChain,
+  chain: realmsWorldChain,
+  chainId: undefined, // derived from chain
+  name: undefined,    // derived from chain
   rpcUrl: 'https://api.cartridge.gg/x/realms/katana',
   toriiUrl: 'https://api.cartridge.gg/x/realms/torii',
   relayUrl: undefined,
@@ -73,23 +100,10 @@ const realmsWorldConfig: DojoChainConfig = {
   predeployedAccounts: [],
 }
 
-const snSepoliaConfig: DojoChainConfig = {
-  name: 'Starknet Sepolia',
-  chain: sepolia,
-  rpcUrl: 'https://api.cartridge.gg/rpc/starknet-sepolia',
-  toriiUrl: undefined,
-  relayUrl: undefined,
-  masterAddress: undefined,
-  masterPrivateKey: undefined,
-  accountClassHash: undefined,
-  lordsContractAddress: '0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210',
-  lordsFaucetUrl: undefined,
-  predeployedAccounts: [],
-}
-
 const snMainnetConfig: DojoChainConfig = {
-  name: 'Starknet Mainnet',
   chain: mainnet,
+  chainId: CHAIN_ID.SN_MAINNET,
+  name: 'Starknet Mainnet',
   rpcUrl: 'https://api.cartridge.gg/rpc/starknet',
   toriiUrl: undefined,
   relayUrl: undefined,
@@ -101,24 +115,36 @@ const snMainnetConfig: DojoChainConfig = {
   predeployedAccounts: [],
 }
 
-
-export const dojoContextConfig: Record<chains.CHAIN_ID, DojoChainConfig> = {
-  [chains.CHAIN_ID.KATANA_LOCAL]: localKatanaConfig,
-  [chains.CHAIN_ID.PISTOLS_SLOT]: pistolsSlotConfig,
-  [chains.CHAIN_ID.KATANA]: realmsWorldConfig,
-  [chains.CHAIN_ID.SN_SEPOLIA]: snSepoliaConfig,
-  [chains.CHAIN_ID.SN_MAINNET]: snMainnetConfig,
+const snSepoliaConfig: DojoChainConfig = {
+  chain: sepolia,
+  chainId: CHAIN_ID.SN_SEPOLIA,
+  name: 'Starknet Sepolia',
+  rpcUrl: 'https://api.cartridge.gg/rpc/starknet-sepolia',
+  toriiUrl: undefined,
+  relayUrl: undefined,
+  masterAddress: undefined,
+  masterPrivateKey: undefined,
+  accountClassHash: undefined,
+  lordsContractAddress: '0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210',
+  lordsFaucetUrl: undefined,
+  predeployedAccounts: [],
 }
 
-// export const getDojoChains = (): DojoChainConfig[] => {
-//   return Object.values(dojoContextConfig)
-// }
 
-export const isChainIdSupported = (chainId: chains.CHAIN_ID): boolean => {
+const dojoContextConfig: Record<CHAIN_ID, DojoChainConfig> = {
+  [CHAIN_ID.KATANA_LOCAL]: localKatanaConfig,
+  [CHAIN_ID.PISTOLS_SLOT]: pistolsSlotConfig,
+  [CHAIN_ID.KATANA]: realmsWorldConfig,
+  [CHAIN_ID.SN_SEPOLIA]: snSepoliaConfig,
+  [CHAIN_ID.SN_MAINNET]: snMainnetConfig,
+}
+
+
+export const isChainIdSupported = (chainId: CHAIN_ID): boolean => {
   return Object.keys(dojoContextConfig).includes(chainId)
 }
 
-export const getStarknetProviderChains = (supportedChainIds: chains.CHAIN_ID[]): Chain[] => {
+export const getStarknetProviderChains = (supportedChainIds: CHAIN_ID[]): Chain[] => {
   return supportedChainIds.reduce((acc, chainId) => {
     const dojoChainConfig = dojoContextConfig[chainId]
     if (dojoChainConfig) {
@@ -128,7 +154,36 @@ export const getStarknetProviderChains = (supportedChainIds: chains.CHAIN_ID[]):
   }, [])
 }
 
-export const getChainMasterAccount = (chainId: chains.CHAIN_ID): PredeployedAccount => {
+export const getDojoChainConfig = (chainId: CHAIN_ID): DojoChainConfig => {
+  if (!isChainIdSupported(chainId)) {
+    return null
+  }
+  let result = { ...dojoContextConfig[chainId] }
+  const chain = result.chain
+  // assert ids are in sync
+  const id = feltToString(chain.id) as CHAIN_ID
+  assert(id == chainId, `getDojoChainConfig(${chainId}) id does not match chain [${id}]`)
+  // assert custom urls are in sync
+  if (!id.startsWith('SN_')) {
+    chain.rpcUrls.default.http.forEach(url => assert(url == result.rpcUrl, `getDojoChainConfig(${chainId}) chain.rpcUrls.default.http does not match`));
+    chain.rpcUrls.public.http.forEach(url => assert(url == result.rpcUrl, `getDojoChainConfig(${chainId}) chain.rpcUrls.public.http does not match`));
+  }
+  // derive data from chain
+  if (!result.chainId) result.chainId = id
+  if (!result.name) result.name = chain.name
+  // replace config from env
+  if (chainId == defaultChainId) {
+    result = Object.keys(result).reduce((a, k) => {
+      if (envChainConfig[k]) {
+        a[k] = envChainConfig[k]
+      }
+      return a
+    }, result)
+  }
+  return result
+}
+
+export const getChainMasterAccount = (chainId: CHAIN_ID): PredeployedAccount => {
   const dojoChainConfig = dojoContextConfig[chainId]
   if (dojoChainConfig?.masterAddress && dojoChainConfig?.masterPrivateKey) {
     return {

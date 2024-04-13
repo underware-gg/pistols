@@ -1,18 +1,17 @@
 import { useEffect, useMemo } from 'react'
-import { DojoProvider } from '@dojoengine/core'
-import { getSyncEntities } from '@dojoengine/state'
 import { BurnerManager, PredeployedManager } from '@dojoengine/create-burner'
-import { DojoChainConfig, getChainMasterAccount } from '@/lib/dojo/setup/chainConfig'
+import { getSyncEntities } from '@dojoengine/state'
+import { DojoProvider } from '@dojoengine/core'
+import { DojoAppConfig } from '@/lib/dojo/Dojo'
 import { useSystem } from '@/lib/dojo/hooks/useDojoSystem'
 import { useAsyncMemo } from '@/lib/utils/hooks/useAsyncMemo'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { dummyAccount, feltToString } from '@/lib/utils/starknet'
 import { Account } from 'starknet'
 
-import { DojoAppConfig } from '@/lib/dojo/Dojo'
+import {  DojoChainConfig, getChainMasterAccount } from './chainConfig'
 import { createClientComponents } from './createClientComponents'
 import { setupNetwork } from './setupNetwork'
-import { CHAIN_ID } from './chains'
 import * as torii from '@dojoengine/torii-client'
 
 // TODO: move out of lib
@@ -32,7 +31,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   // - object or true: when success
   //
 
-  const chainId = useMemo(() => (feltToString(selectedChainConfig.chain.id) as CHAIN_ID), [selectedChainConfig])
+  const chainId = useMemo(() => (selectedChainConfig.chainId), [selectedChainConfig])
 
   const manifest = useMemo(() => {
     return dojoAppConfig.manifests[chainId] ?? null

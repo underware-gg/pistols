@@ -1,9 +1,6 @@
 import { Chain } from '@starknet-react/chains'
 import { stringToFelt } from '@/lib/utils/starknet'
 
-// based on:
-// https://github.com/cartridge-gg/rollyourown/blob/market_packed/web/src/dojo/setup/chains.ts
-
 export enum CHAIN_ID {
   SN_MAINNET = 'SN_MAINNET',
   SN_SEPOLIA = 'SN_SEPOLIA',
@@ -12,7 +9,7 @@ export enum CHAIN_ID {
   KATANA = 'KATANA', // actually DOJO_REALMS_WORLD
 }
 
-export const katanaLocalChain = {
+export const katanaLocalChain: Chain = {
   id: BigInt(stringToFelt(CHAIN_ID.KATANA_LOCAL)),
   network: 'katana',
   name: 'Katana Local',
@@ -34,10 +31,10 @@ export const katanaLocalChain = {
   explorers: {
     worlds: ['https://worlds.dev'],
   },
-} as const satisfies Chain
+} as const
 
 
-export const pistolsSlotChain = {
+export const pistolsSlotChain: Chain = {
   id: BigInt(stringToFelt(CHAIN_ID.PISTOLS_SLOT)),
   network: 'katana',
   name: 'Slot Testnet (Free)',
@@ -59,10 +56,10 @@ export const pistolsSlotChain = {
   explorers: {
     worlds: ['https://worlds.dev'],
   },
-} as const satisfies Chain
+} as const
 
 
-export const realmsWorldChain = {
+export const realmsWorldChain: Chain = {
   id: BigInt(stringToFelt(CHAIN_ID.KATANA)),
   network: 'katana',
   name: 'Realms World (Ranked)',
@@ -84,4 +81,4 @@ export const realmsWorldChain = {
   explorers: {
     worlds: ['https://worlds.dev'],
   },
-} as const satisfies Chain
+} as const
