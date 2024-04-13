@@ -83,7 +83,7 @@ export function OnboardingProfile({
               onChange={(e) => setInputValue(e.target.value)}
             />
             <div className='Spacer5' />
-            <ActionButton attention fill disabled={!canRegister || isUpdated || !inputIsValid} onClick={() => _register()} label={isUpdated ? 'Updated' : 'Update'} />
+            <ActionButton important fill disabled={!canRegister || isUpdated || !inputIsValid} onClick={() => _register()} label={isUpdated ? 'Updated' : 'Update'} />
           </Col>
         </Row>
 

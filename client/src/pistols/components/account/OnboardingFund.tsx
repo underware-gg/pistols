@@ -116,7 +116,7 @@ function Deposit({
           />
         </Col>
         <Col>
-          <ActionButton fill attention disabled={!_canTransfer} onClick={() => transfer()} label={_noFunds ? 'No Funds' : action} />
+          <ActionButton fill important disabled={!_canTransfer} onClick={() => transfer()} label={_noFunds ? 'No Funds' : action} />
         </Col>
       </Row>
     </Grid>
@@ -167,7 +167,7 @@ function Deposit({
 //           />
 //         </Col>
 //         <Col>
-//           <ActionButton fill attention disabled={!_canTransfer} onClick={() => transfer()} label={_noFunds ? 'No Funds' : action} />
+//           <ActionButton fill important disabled={!_canTransfer} onClick={() => transfer()} label={_noFunds ? 'No Funds' : action} />
 //         </Col>
 //       </Row>
 //     </Grid>

@@ -123,7 +123,7 @@ export default function CommitBladesModal({
               <ActionButton fill label='Close' onClick={() => setIsOpen(false)} />
             </Col>
             <Col>
-              <ActionButton fill attention label='Commit...' disabled={!isValid || isSubmitting} onClick={() => _submit()} />
+              <ActionButton fill important label='Commit...' disabled={!isValid || isSubmitting} onClick={() => _submit()} />
             </Col>
           </Row>
         </Grid>

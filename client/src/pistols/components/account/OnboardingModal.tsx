@@ -133,7 +133,7 @@ export default function OnboardingModal({
             <Col>
             </Col>
             <Col>
-              <ActionButton attention fill disabled={!_canContinue[accountMenuKey]} label={_nextLabel[accountMenuKey]} onClick={() => _continue()} />
+              <ActionButton important fill disabled={!_canContinue[accountMenuKey]} label={_nextLabel[accountMenuKey]} onClick={() => _continue()} />
             </Col>
 
           </Row>

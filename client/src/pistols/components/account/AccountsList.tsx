@@ -100,7 +100,7 @@ function AccountItem({
         <Col width={5} textAlign='left'>
           <ActionButton fill onClick={() => _manage()} label='Manage' />
           <div className='Spacer5' />
-          <ActionButton fill attention disabled={!_canPlay} onClick={() => _duel()} label='Duel!' />
+          <ActionButton fill important disabled={!_canPlay} onClick={() => _duel()} label='Duel!' />
         </Col>
       </Row>
     </>

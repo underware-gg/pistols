@@ -68,7 +68,7 @@ function DisconnectedGate() {
     <>
       <VStack>
         <ChainSwitcher disabled={isLoading} />
-        <ActionButton fill large disabled={!canConnect} onClick={() => connectOpener.open()} label={switchChain ? 'Switch Chain' : 'Connect Wallet'} />
+        <ActionButton fill large important disabled={!canConnect} onClick={() => connectOpener.open()} label={switchChain ? 'Switch Chain' : 'Connect Wallet'} />
         <Divider horizontal>
           <Header as='h4'>OR</Header>
         </Divider>

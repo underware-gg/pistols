@@ -18,7 +18,7 @@ type ActionButtonProps = {
   large?: boolean
   fill?: boolean
   dimmed?: boolean
-  attention?: boolean
+  important?: boolean
   negative?: boolean
   confirm?: boolean
   confirmMessage?: string
@@ -34,7 +34,7 @@ export const ActionButton = ({
   large = false,
   fill = false,
   dimmed = false,
-  attention = false,
+  important = false,
   negative = false,
   confirm = false,
   confirmMessage = null,
@@ -42,7 +42,7 @@ export const ActionButton = ({
   onClick,
 }: ActionButtonProps) => {
   let classNames = []
-  if (attention && !disabled) classNames.push('Attention')
+  if (important && !disabled) classNames.push('Important')
   // if (fill) classNames.push('FillParent')
   if (large) classNames.push('LargeButton')
   classNames.push((disabled || dimmed) ? 'Locked' : 'Unlocked')
@@ -102,7 +102,7 @@ export const BalanceRequiredButton = ({
   return (
     <ActionButton fill
       disabled={disabled}
-      attention={!noFundsForFee}
+      important={!noFundsForFee}
       negative={noFundsForFee}
       label={noFundsForFee ? 'No Funds!' : label}
       onClick={() => (noFundsForFee ? {} : onClick())}

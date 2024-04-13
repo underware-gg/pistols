@@ -7,7 +7,7 @@ $font-family-mono: 'Courier Prime', monospace;
 $color-bg: #000; //#1e1e1e;
 $color-darkest: #201a18;
 $color-dark: #584f49;
-$color-medium: #cb824d;
+$color-medium: #ef9758;
 $color-bright: #c8b6a8;
 $color-brightest: #efe1d7;
 
@@ -18,8 +18,7 @@ $color-link: $color-medium;
 $color-important: $color-medium;
 $color-active: $color-medium;
 $color-inactive: rgba($color-brightest, 0.35);
-$color-attention: $color-medium;
-$text-shadow: 0.04rem 0.04rem 1px $color-darkest;
+$text-shadow: 0.05rem 0.05rem 1px $color-darkest;
 $title-shadow: 0.1rem 0.1rem 1px $color-darkest;
 $ui-border: 6px ridge $color-active;
 
@@ -28,10 +27,10 @@ $border-button: 1px solid $color-bright;
 $border-button-active: 1px solid $color-brightest;
 $border-button-inactive: 1px solid rgba($color-bright, 0.5);
 
-$color-positive: #21ba45; // from $color-medium
-$color-negative: #db2828; // from $color-medium
+$color-positive: #21ba45;
+$color-negative: #db2828;
 $color-warning: #f2c037;
-$color-blue: #31b9c3; // from $color-medium
+$color-cold: #31b9c3;
 
 $game-width: 960px;
 $game-height: 540px;
@@ -201,7 +200,7 @@ canvas {
 }
 
 .Black     { color: #444; }
-.Important { color: $color-important; }
+.Important { color: $color-important!important; }
 .Bright    { color: $color-bright!important; }
 .Brightest { color: $color-brightest!important; }
 .Positive  { color: $color-positive!important; }
@@ -569,9 +568,6 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 .Unlocked {
   background-color: $color-active;
-}
-.Attention {
-  color: $color-attention!important;
 }
 
 // GAME CANVAS

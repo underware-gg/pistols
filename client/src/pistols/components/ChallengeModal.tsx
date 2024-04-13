@@ -178,17 +178,17 @@ export default function ChallengeModal() {
             }
             {(state == ChallengeState.InProgress) &&
               <Col>
-                <ActionButton fill attention label='Go to Live Duel!' onClick={() => _watch()} />
+                <ActionButton fill important label='Go to Live Duel!' onClick={() => _watch()} />
               </Col>
             }
             {(state > ChallengeState.InProgress) &&
               <Col>
-                <ActionButton fill attention label='Replay Duel!' onClick={() => _watch()} />
+                <ActionButton fill important label='Replay Duel!' onClick={() => _watch()} />
               </Col>
             }
             {(needToSyncExpired && (isChallenger || isChallenged)) &&
               <Col>
-                <ActionButton fill attention label='Withdraw Expired Fees' onClick={() => _reply(false)} />
+                <ActionButton fill important label='Withdraw Expired Fees' onClick={() => _reply(false)} />
               </Col>
             }
           </Row>

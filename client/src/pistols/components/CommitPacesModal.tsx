@@ -86,7 +86,7 @@ export default function CommitPacesModal({
               <ActionButton fill label='Close' onClick={() => setIsOpen(false)} />
             </Col>
             <Col>
-              <ActionButton fill attention label='Commit...' disabled={!paces || isSubmitting} onClick={() => _submit()} />
+              <ActionButton fill important label='Commit...' disabled={!paces || isSubmitting} onClick={() => _submit()} />
             </Col>
           </Row>
         </Grid>
