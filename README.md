@@ -156,9 +156,9 @@ pnpm install
 
 ```console
 cd dojo
-katana --disable-fee --invoke-max-steps 10000000
+katana --disable-fee --chain-id KATANA_LOCAL --invoke-max-steps 10000000
 
-# or just...
+# or simply...
 cd dojo
 ./run_katana
 ```
@@ -171,7 +171,7 @@ Uncomment the `world_address` parameter in `dojo/Scarb.toml` then:
 cd dojo
 torii --world 0x2d6bcc12cbb460243b73a4c937faf00ad2d071d899f40dfc9182843712f9c77
 
-# or just...
+# or simply...
 cd dojo
 ./run_torii
 ```
