@@ -70,7 +70,7 @@ export function MenuTavern({
         ),
         render: () => (
           <TabPane attached={true}>
-            <div className='UIContainerScroller'>
+            <div className='UIMenuTavernScroller'>
               {key === MenuKey.Duelists && <DuelistTable />}
               {key === MenuKey.YourDuels && <ChallengeTableYour />}
               {key === MenuKey.LiveDuels && <ChallengeTableLive />}

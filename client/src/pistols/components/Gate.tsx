@@ -156,10 +156,11 @@ function ConnectedGate() {
 
       </VStack>
 
-      <AccountsList />
-
-      <Divider />
-      <EnterAsGuestButton />
+      <div className='UIAccountsListScroller'>
+        <AccountsList />
+        <Divider />
+        <EnterAsGuestButton />
+      </div>
 
       <OnboardingModal opener={accountSetupOpener} />
     </>
