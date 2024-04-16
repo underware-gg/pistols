@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Burner } from '@dojoengine/create-burner'
-import { useContract } from '@starknet-react/core'
+import { useBlockNumber, useContract } from '@starknet-react/core'
 import { useDojo, useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useLordsBalance } from '@/lib/dojo/hooks/useLords'
 import { bigintEquals, bigintToHex } from '@/lib/utils/types'
@@ -71,8 +71,7 @@ export const useBurnerAccount = (accountIndex: number) => {
 
   return {
     address,
-    account: (exists ? account : null),
-    isDeployed: exists,
+    account: (account ?? null),
     isImported: exists,
     isFunded: (balance > 0n),
   }
@@ -87,7 +86,7 @@ export const useBurnerAccount = (accountIndex: number) => {
 // https://github.com/OpenZeppelin/cairo-contracts/blob/main/src/account/interface.cairo
 // https://github.com/dojoengine/dojo/blob/main/crates/katana/primitives/contracts/compiled/account.json
 //
-export const useBurnerContract = (address: bigint) => {
+export const useBurnerContract = (address: BigNumberish) => {
   const [cairoVersion, setCairoVersion] = useState<bigint>(undefined)
   const [publicKey, setPublicKey] = useState<bigint>(undefined)
   const [deployTx, setDeployTx] = useState<bigint>(undefined)
@@ -105,6 +104,7 @@ export const useBurnerContract = (address: bigint) => {
   //
   // Verify if contract exists, by interacting with it
   //
+  const { data: blockNumber } = useBlockNumber()
   useEffect(() => {
     let _mounted = true
     const _check_deployed = async () => {
@@ -115,6 +115,7 @@ export const useBurnerContract = (address: bigint) => {
       try {
         const { cairo } = await contract.getVersion()
         const { publicKey } = await contract.getPublicKey()
+        // console.log(`CAIRO:`, cairo, publicKey)
         if (_mounted) {
           setCairoVersion(BigInt(cairo))
           setPublicKey(BigInt(publicKey))
@@ -127,37 +128,18 @@ export const useBurnerContract = (address: bigint) => {
         }
       }
     }
-    if (BigInt(contract?.address ?? 0) > 0n) {
+    if (BigInt(contract?.address ?? 0) > 0n && blockNumber > 0) {
       setCairoVersion(undefined)
       setPublicKey(undefined)
       setDeployTx(undefined)
       _check_deployed()
     }
     return () => { _mounted = false }
-  }, [contract])
+  }, [contract, blockNumber])
 
   const isVerifying = (publicKey === undefined)
   const isDeployed = Boolean(publicKey)
-  // console.log(`DEPLOYED:`, isDeployed, bigintToHex(address))
-
-  //
-  // re-generate transaction hash
-  // (can't find the correct arguments...)
-  // (but redeploying is easier and works anyway)
-  //
-  // const { chain } = useNetwork()
-  // useEffect(() => {
-  //   if (publicKey !== undefined && cairoVersion !== undefined) {
-  //     const callData: BigNumberish[] = [publicKey]
-  //     //@ts-ignore (StarknetChainId)
-  //     const txHash = hash.calculateDeployTransactionHash(address, callData, cairoVersion, bigintToHex(chain.id))
-  //     console.log(`calculateDeployTransactionHash:`, bigintToHex(publicKey), cairoVersion, txHash)
-  //     setDeployTx(BigInt(txHash ?? 0n))
-  //   }
-  // }, [address, publicKey, cairoVersion])
-  // const isVerifying =(publicKey === undefined || deployTx === undefined)
-  // const isDeployed = (deployTx && deployTx > 0n)
-
+ 
   return {
     isVerifying,
     isDeployed,

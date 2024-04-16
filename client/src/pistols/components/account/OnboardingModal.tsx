@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { Modal, Tab, TabPane, Grid, Menu } from 'semantic-ui-react'
-import { useBurnerAccount, useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
+import { useBurnerAccount, useBurnerContract, useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { IconChecked, IconWarning } from '@/lib/ui/Icons'
@@ -26,7 +26,8 @@ export default function OnboardingModal({
   const { accountMenuKey, accountMenuItems, accountIndex, dispatchSetAccountMenu, dispatchSetAccountIndex} = usePistolsContext()
   const tabIndex = accountMenuItems.findIndex(k => (k == accountMenuKey))
 
-  const { isDeployed, isImported, isFunded, address } = useBurnerAccount(accountIndex)
+  const { isImported, isFunded, address } = useBurnerAccount(accountIndex)
+  const { isDeployed } = useBurnerContract(address)
 
   const { name } = useDuelist(address)
   const isProfiled = Boolean(name)
@@ -43,7 +44,7 @@ export default function OnboardingModal({
 
   const _canContinue = {
     [AccountMenuKey.Deploy]: isImported,
-    [AccountMenuKey.Fund]: true,
+    [AccountMenuKey.Fund]: isImported,
     [AccountMenuKey.Profile]: isProfiled,
   }
   const _nextLabel = {
@@ -76,7 +77,7 @@ export default function OnboardingModal({
               Duelist Account #{accountIndex}
             </Col>
             <Col width={6} textAlign='right'>
-              <AddressShort address={address} />
+              <AddressShort address={address} ifExists />
             </Col>
           </Row>
         </Grid>
@@ -129,8 +130,10 @@ export default function OnboardingModal({
               <ActionButton fill label='Deploy New' onClick={() => _deployNew()} />
             </Col>
             <Col>
+              <ActionButton fill label='Previous' disabled={accountIndex <= 1} onClick={() => dispatchSetAccountIndex(accountIndex - 1)} />
             </Col>
             <Col>
+              <ActionButton fill label='Next' disabled={accountIndex >= nextAccountIndex} onClick={() => dispatchSetAccountIndex(accountIndex + 1)} />
             </Col>
             <Col>
               <ActionButton important fill disabled={!_canContinue[accountMenuKey]} label={_nextLabel[accountMenuKey]} onClick={() => _continue()} />
@@ -142,4 +145,3 @@ export default function OnboardingModal({
     </Modal>
   )
 }
-
