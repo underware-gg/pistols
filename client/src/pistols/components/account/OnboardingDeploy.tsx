@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect, useMemo, useState } from 'react'
-import { Grid, Step } from 'semantic-ui-react'
+import { Divider, Grid, Step } from 'semantic-ui-react'
 import { useAccount, useSignTypedData } from '@starknet-react/core'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useBurnerAccount, useBurnerContract } from '@/lib/dojo/hooks/useBurnerAccount'
@@ -23,7 +23,7 @@ enum DeployPhase {
   Sign,     // 2
   Account,  // 3
   Deploy,   // 4
-  Import,   // 5
+  // Import,   // 5
   Done,     // 6
 }
 
@@ -91,10 +91,19 @@ export function OnboardingDeploy({
   const currentPhase = useMemo<DeployPhase>(() => (
     !isConnected ? DeployPhase.Connect
       : (!isDeployed && !hasSigned) ? DeployPhase.Sign
-        : !_isDeployed ? DeployPhase.Deploy
-          : !isImported ? DeployPhase.Import
-            : DeployPhase.Done
+        : (!_isDeployed || !isImported) ? DeployPhase.Deploy
+          : DeployPhase.Done
   ), [isConnected, hasSigned, _isDeployed, isImported])
+
+  const [createError, setCreateError] = useState(false)
+  const _create = async () => {
+    setCreateError(null)
+    try {
+      await create(createOptions)
+    } catch (e) {
+      setCreateError(e.toString())
+    }
+  }
 
   return (
     <Grid className=''>
@@ -130,19 +139,25 @@ export function OnboardingDeploy({
             />
 
             <DeployStep currentPhase={currentPhase} phase={DeployPhase.Deploy} completed={_isDeployed}
-              contentActive={<ActionButton fill large disabled={currentPhase != DeployPhase.Deploy || isDeploying} onClick={() => create(createOptions)} label='Deploy' />}
+              contentActive={<ActionButton fill large disabled={currentPhase != DeployPhase.Deploy || isDeploying} onClick={() => _create()} label={!_isDeployed ? 'Deploy' : 'Restore'} />}
               contentCompleted={<>Account Deployed</>}
-            />
-
-            <DeployStep currentPhase={currentPhase} phase={DeployPhase.Import} completed={isImported}
-              contentActive={<ActionButton fill large disabled={currentPhase != DeployPhase.Import || isDeploying} onClick={() => create(createOptions)} label={currentPhase == DeployPhase.Import ? 'Restore' : 'Import'} />}
-              contentCompleted={<>Account Imported</>}
             />
 
           </Step.Group>
         </Col>
-
       </Row>
+
+      {createError &&
+        <Row columns={'equal'}>
+          <Col className='Code Negative'>
+            <Divider className='NoMargin'/>
+            <p className='Padded'>
+              {createError}
+            </p>
+          </Col>
+        </Row>
+      }
+
     </Grid>
   )
 }
