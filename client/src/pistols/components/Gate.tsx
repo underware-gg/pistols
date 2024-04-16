@@ -69,12 +69,28 @@ function DisconnectedGate() {
       <VStack>
         <ChainSwitcher disabled={isLoading} />
         <ActionButton fill large important disabled={!canConnect} onClick={() => connectOpener.open()} label={switchChain ? 'Switch Chain' : 'Connect Wallet'} />
-        <Divider horizontal>
-          <Header as='h4'>OR</Header>
-        </Divider>
-        {isLoading ? <h3 className='TitleCase Important'>{loadingMessage}</h3>
-          : isError ? <h3 className='TitleCase Negative'>{errorMessage}</h3>
-            : <EnterAsGuestButton />
+        {isLoading &&
+          <div>
+            <Divider />
+            <h3 className='TitleCase Important'>{loadingMessage}</h3>
+          </div>
+        }
+        {isError &&
+          <div>
+            <Divider />
+            <h3 className='TitleCase Negative'>{errorMessage}</h3>
+            <Divider hidden />
+            <ActionButton fill large important onClick={() => location.reload()} label='Retry' />
+          </div>
+        }
+        {!isLoading && !isError &&
+          <div>
+            <Divider horizontal>
+              <Header as='h4'>OR</Header>
+            </Divider>
+            <br />
+            <EnterAsGuestButton />
+          </div>
         }
       </VStack>
 

@@ -42,7 +42,6 @@ export function OnboardingFund({
           </Col>
         </Row>
       </Grid>
-      <Divider hidden />
       {deposit &&
         <div style={_rowStyle}>
           <Deposit fromAccount={account as Account} fromAddress={account?.address} toAddress={address} disabled={!isDeployed} action='Deposit to Duelist' />
@@ -59,7 +58,6 @@ export function OnboardingFund({
 
       <h3>Duelist Balance</h3>
       <span className='H3'><LordsBalance address={address} big /></span> <LockedWagerBalance coin={coins.LORDS} address={address} clean />
-      <Divider hidden />
       {!deposit &&
         <div style={_rowStyle}>
           <Deposit fromAccount={burnerAccount} fromAddress={address} toAddress={account?.address} disabled={!isDeployed} action='Withdraw to Account' />

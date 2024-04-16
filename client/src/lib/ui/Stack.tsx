@@ -15,7 +15,7 @@ export function VStack(props: GridProps & {
     <Grid colums='equal' textAlign='center' className='FillWidth' {...props}>
       {elements.map((element, i) => {
         // if (element.type == _VStackRowType) { // breaks after re-render
-        if (element.type.toString().startsWith('function VStackRow')) {
+        if (element.type?.toString()?.startsWith('function VStackRow')) {
           return element
         }
         return (

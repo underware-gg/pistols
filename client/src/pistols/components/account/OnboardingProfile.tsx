@@ -61,7 +61,7 @@ export function OnboardingProfile({
             <div>
               <ProfilePic profilePic={_profilePic} className='AutoHeight' />
               <Grid columns={'equal'}>
-                <Row className='H2'>
+                <Row className='H3'>
                   <Col>
                     <TextLink onClick={() => setSelectedProfilePic(_profilePic > 1 ? _profilePic - 1 : PROFILE_PIC_COUNT)}>◀</TextLink>
                   </Col>

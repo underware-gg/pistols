@@ -118,7 +118,8 @@ export function OnboardingDeploy({
 
             <DeployStep currentPhase={currentPhase} phase={DeployPhase.Sign} completed={hasSigned}
               contentActive={<ActionButton fill large disabled={currentPhase != DeployPhase.Sign} onClick={() => signTypedData()} label='Sign Message' />}
-              contentCompleted={<span>Signed Secret: <b><AddressShort copyLink={false} address={walletSig.sig} important /></b></span>}
+              // contentCompleted={<span>Signed Secret: <b><AddressShort copyLink={false} address={walletSig.sig} important /></b></span>}
+              contentCompleted={<span>Signed Secret</span>}
             />
 
             <DeployStep currentPhase={currentPhase} phase={DeployPhase.Account} completed={hasSigned || isDeployed}
@@ -138,7 +139,7 @@ export function OnboardingDeploy({
               contentCompleted={<>Account address: <b><AddressShort address={address || accountAddress} important /></b></>}
             />
 
-            <DeployStep currentPhase={currentPhase} phase={DeployPhase.Deploy} completed={_isDeployed}
+            <DeployStep currentPhase={currentPhase} phase={DeployPhase.Deploy} completed={_isDeployed && isImported}
               contentActive={<ActionButton fill large disabled={currentPhase != DeployPhase.Deploy || isDeploying} onClick={() => _create()} label={!_isDeployed ? 'Deploy' : 'Restore'} />}
               contentCompleted={<>Account Deployed</>}
             />
