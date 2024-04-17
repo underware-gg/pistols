@@ -13,6 +13,7 @@ import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { MenuDuel } from '@/pistols/components/Menus'
 import { AnimationState } from '@/pistols/three/game'
 import { EmojiIcon, LoadingIcon } from '@/lib/ui/Icons'
+import PlayerSwitcher from '@/pistols/components/PlayerSwitcher'
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import CommitBladesModal from '@/pistols/components/CommitBladesModal'
 import RevealModal from '@/pistols/components/RevealModal'
@@ -93,6 +94,8 @@ export default function Duel({
       </div>
 
       <MenuDuel duelStage={duelStage} duelId={duelId} />
+
+      <PlayerSwitcher />
 
       {/* {process.env.NEXT_PUBLIC_DEBUG &&
         <MenuDebugAnimations />

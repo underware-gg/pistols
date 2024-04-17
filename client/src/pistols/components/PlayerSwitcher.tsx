@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
-import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
-import { useGameEvent } from '@/pistols/hooks/useGameEvent'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuel } from '../hooks/useDuel'
 import { useDuelist } from '../hooks/useDuelist'
@@ -16,8 +14,10 @@ const PlayerSwitcher = () => {
   const { profilePic: profilePicB } = useDuelist(challenge.duelistB)
 
   useEffect(() => {
-    gameImpl?.switchPlayers(ProfileModels[profilePicA], ProfileModels[profilePicB])
-  }, [gameImpl])
+    if (profilePicA && profilePicB) {
+      gameImpl?.switchPlayers(ProfileModels[profilePicA], ProfileModels[profilePicB])
+    }
+  }, [gameImpl, profilePicA, profilePicB])
 
   return <></>
 }

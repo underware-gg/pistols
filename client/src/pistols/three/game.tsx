@@ -279,6 +279,8 @@ function setupDuelScene() {
 }
 
 export function resetDuelScene() {
+  if (!_duelistAModel || !_duelistBModel) return // skip if players models not initialized yet
+
   emitter.emit('animated', AnimationState.None)
 
   //TODO if male or female
@@ -363,6 +365,7 @@ export function switchScene(sceneName) {
 export function switchPlayers(duelistModelA, duelistModelB) {
   _duelistAModel = duelistModelA == "MALE" ? "MALE_A" : "FEMALE_A"
   _duelistBModel = duelistModelB == "MALE" ? "MALE_B" : "FEMALE_B"
+  switchScene(_sceneName) // reload scene
 }
 
 export function getCameraRig() {
