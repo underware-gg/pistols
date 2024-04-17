@@ -37,7 +37,7 @@ export const DojoProvider = ({
       value={{
         setup: value,
         masterAccount,
-        account: (burner.account as Account) ?? dummyAccount(),
+        account: (burner.account as Account) ?? undefined,
         burner,
       }}
     >

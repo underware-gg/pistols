@@ -50,7 +50,7 @@ export const useBurners = (masterAccountAddress: BigNumberish) => {
 }
 
 export const useBurnerAccount = (accountIndex: number) => {
-  const { masterAccount, account, select } = useDojoAccount()
+  const { masterAccount, account, select, deselect } = useDojoAccount()
 
   //
   // Good burner: Deployed & Imported
@@ -62,6 +62,8 @@ export const useBurnerAccount = (accountIndex: number) => {
   useEffect(() => {
     if (address) {
       select(address)
+    } else {
+      deselect()
     }
   }, [address])
 
