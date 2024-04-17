@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Modal, Button, Image, Divider } from 'semantic-ui-react'
+import { Modal, Button, Image } from 'semantic-ui-react'
 import { useConnect, Connector, useAccount } from '@starknet-react/core'
 import { useChainSwitchCallbacks, useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { Opener } from '@/lib/ui/useOpener'
 import { VStack } from '@/lib/ui/Stack'
+import { Divider } from '@/lib/ui/Divider'
 import { useEffectOnce } from '../utils/hooks/useEffectOnce'
 import { useDojo } from './DojoContext'
 
@@ -38,12 +39,10 @@ export default function StarknetConnectModal({
       open={mounted && opener.isOpen}
     >
       <Modal.Content>
-        <Modal.Description className='AlignCenter'>
-          {!isConnected ? <ConnectButtons walletHelp={walletHelp} />
-            : !isCorrectChain ? <SwitchChainButtons />
-              : <></>
-          }
-        </Modal.Description>
+        {!isConnected ? <ConnectButtons walletHelp={walletHelp} />
+          : !isCorrectChain ? <SwitchChainButtons />
+            : <></>
+        }
       </Modal.Content>
     </Modal>
   )
@@ -54,9 +53,10 @@ function ConnectButtons({
 }: {
   walletHelp: boolean
 }) {
+  const { selectedChainName, selectedChainId } = useSelectedChain()
   const { connect, connectors } = useConnect()
   const { isConnecting } = useAccount()
-  const { setup: { dojoAppConfig} } = useDojo()
+  const { setup: { dojoAppConfig } } = useDojo()
 
   let connectorsButtons = useMemo(() => connectors.reduce((acc, connector: Connector) => {
     if (dojoAppConfig.supportedConnectorIds.includes(connector.id)) {
@@ -85,7 +85,14 @@ function ConnectButtons({
 
   return (
     <VStack>
-      {buttons}
+      <div className='ModalText'>
+        {/* Connect to <b>{selectedChainName} ({selectedChainId})</b> */}
+        Connect to <b>{selectedChainName}</b>
+      </div>
+      <Divider content={'with'} />
+      <VStack>
+        {buttons}
+      </VStack>
     </VStack>
   )
 }

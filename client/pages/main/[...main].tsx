@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { usePistolsContext, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import AppPistols from '@/pistols/components/AppPistols'
+import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import GameContainer from '@/pistols/components/GameContainer'
 import Background from '@/pistols/components/Background'
 import Gate from '@/pistols/components/Gate'
@@ -93,13 +94,18 @@ function MainUI({
   duelId
 }) {
   const { gameImpl } = useThreeJsContext()
-  const { atGate, atTavern, atDuel } = usePistolsContext()
+  const { atGate, atTavern, atDuel, connectOpener } = usePistolsContext()
 
-  if (gameImpl) {
-    if (atGate) return <Gate />
-    if (atTavern) return <Tavern />
-    if (atDuel && duelId) return <Duel duelId={duelId} />
+  if (!gameImpl) {
+    return <></>
   }
 
-  return <></>
+  return (
+    <>
+      {atGate && <Gate />}
+      {atTavern && <Tavern />}
+      {atDuel && duelId && <Duel duelId={duelId} />}
+      <StarknetConnectModal opener={connectOpener} />
+    </>
+  )
 }

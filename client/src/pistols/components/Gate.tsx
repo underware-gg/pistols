@@ -13,7 +13,6 @@ import { LordsBagIcon } from '@/pistols/components/account/Balance'
 import { Divider } from '@/lib/ui/Divider'
 import { feltToString } from '@/lib/utils/starknet'
 import { CHAIN_ID } from '@/lib/dojo/setup/chains'
-import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import OnboardingModal from '@/pistols/components/account/OnboardingModal'
 import WalletHeader from '@/pistols/components/account/WalletHeader'
 import Logo from '@/pistols/components/Logo'
@@ -66,35 +65,31 @@ function DisconnectedGate() {
   const switchChain = (isConnected && !isCorrectChain)
 
   return (
-    <>
-      <VStack>
-        <ChainSwitcher disabled={isLoading} />
-        <ActionButton fill large important disabled={!canConnect} onClick={() => connectOpener.open()} label={switchChain ? 'Switch Chain' : 'Connect Wallet'} />
-        {isLoading &&
-          <div>
-            <Divider />
-            <h3 className='TitleCase Important'>{loadingMessage}</h3>
-          </div>
-        }
-        {isError &&
-          <div>
-            <Divider />
-            <h3 className='TitleCase Negative'>{errorMessage}</h3>
-            <Divider hidden />
-            <ActionButton fill large important onClick={() => location.reload()} label='Retry' />
-          </div>
-        }
-        {!isLoading && !isError &&
-          <div>
-            <Divider content='OR' />
-            <br />
-            <EnterAsGuestButton />
-          </div>
-        }
-      </VStack>
-
-      <StarknetConnectModal opener={connectOpener} />
-    </>
+    <VStack>
+      <ChainSwitcher disabled={isLoading} />
+      <ActionButton fill large important disabled={!canConnect} onClick={() => connectOpener.open()} label={switchChain ? 'Switch Chain' : 'Connect Wallet'} />
+      {isLoading &&
+        <div>
+          <Divider />
+          <h3 className='TitleCase Important'>{loadingMessage}</h3>
+        </div>
+      }
+      {isError &&
+        <div>
+          <Divider />
+          <h3 className='TitleCase Negative'>{errorMessage}</h3>
+          <Divider hidden />
+          <ActionButton fill large important onClick={() => location.reload()} label='Retry' />
+        </div>
+      }
+      {!isLoading && !isError &&
+        <div>
+          <Divider content='OR' />
+          <br />
+          <EnterAsGuestButton />
+        </div>
+      }
+    </VStack>
   )
 }
 
