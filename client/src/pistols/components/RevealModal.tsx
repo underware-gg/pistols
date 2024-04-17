@@ -30,7 +30,6 @@ export default function RevealModal({
 
   const _reveal = async () => {
     setIsSubmitting(true)
-    // console.log(`reveal....`, account, duelId, roundNumber, hash, validPackedActions)
     const { salt, packed, slot1, slot2 } = await signAndRestoreActionFromHash(account, duelId, roundNumber, hash, validPackedActions)
     if (packed != null && slot1 != null && slot2 != null) {
       await reveal_action(account, duelId, roundNumber, salt, slot1, slot2)

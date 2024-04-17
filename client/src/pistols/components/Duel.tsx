@@ -7,21 +7,22 @@ import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
+import { useWager } from '@/pistols/hooks/useWager'
 import { DuelStage, useAnimatedDuel, useDuel, useDuelResult } from '@/pistols/hooks/useDuel'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { MenuDuel } from '@/pistols/components/Menus'
 import { AnimationState } from '@/pistols/three/game'
 import { EmojiIcon, LoadingIcon } from '@/lib/ui/Icons'
+import { ActionEmojis, ActionTypes } from '../utils/pistols'
+import { Balance } from '@/pistols/components/account/Balance'
+import { constants } from '@/pistols/utils/constants'
+import { EMOJI } from '@/pistols/data/messages'
 import PlayerSwitcher from '@/pistols/components/PlayerSwitcher'
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import CommitBladesModal from '@/pistols/components/CommitBladesModal'
 import RevealModal from '@/pistols/components/RevealModal'
-import { EMOJI } from '@/pistols/data/messages'
-import { constants } from '@/pistols/utils/constants'
-import { ActionEmojis, ActionTypes } from '../utils/pistols'
-import { Balance } from './account/Balance'
-import { useWager } from '../hooks/useWager'
+import { bigintEquals } from '@/lib/utils/types'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -29,7 +30,7 @@ const Col = Grid.Column
 export default function Duel({
   duelId
 }) {
-  const { account } = useDojoAccount()
+  const { accountAddress } = useDojoAccount()
   const { gameImpl } = useThreeJsContext()
   const { animated } = useGameplayContext()
   const { dispatchSelectDuel } = usePistolsContext()
@@ -72,7 +73,7 @@ export default function Duel({
           isA
           duelId={duelId}
           duelStage={duelStage}
-          account={account}
+          accountAddress={accountAddress}
           duelistAccount={duelistA}
           completedStages={completedStagesA}
           canAutoReveal={canAutoRevealA}
@@ -86,7 +87,7 @@ export default function Duel({
           isB
           duelId={duelId}
           duelStage={duelStage}
-          account={account}
+          accountAddress={accountAddress}
           duelistAccount={duelistB}
           completedStages={completedStagesB}
           canAutoReveal={canAutoRevealB}
@@ -159,7 +160,7 @@ function DuelProgress({
   isB = false,
   duelId,
   duelStage,
-  account,
+  accountAddress,
   duelistAccount,
   completedStages,
   floated,
@@ -195,7 +196,7 @@ function DuelProgress({
   //------------------------------
   // Duelist interaction
   //
-  const isYou = useMemo(() => (BigInt(account?.address) == duelistAccount), [account, duelistAccount])
+  const isYou = useMemo(() => bigintEquals(accountAddress, duelistAccount), [accountAddress, duelistAccount])
   // const isTurn = useMemo(() => ((isA && turnA) || (isB && turnB)), [isA, isB, turnA, turnB])
 
   // Commit modal control
@@ -223,8 +224,8 @@ function DuelProgress({
 
   // auto-reveal
   useEffect(() => {
-    if (onClick && canAutoReveal) {
-      onClick()
+    if (canAutoReveal) {
+      onClick?.()
     }
   }, [onClick, canAutoReveal])
 

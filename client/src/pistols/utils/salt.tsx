@@ -47,7 +47,7 @@ const signAndGenerateSalt = async (account: Account, duelId: bigint, roundNumber
 export const signAndGenerateActionHash = async (account: Account, duelId: bigint, roundNumber: number, packed: BigNumberish): Promise<bigint> => {
   const salt = await signAndGenerateSalt(account, duelId, roundNumber)
   const hash = make_action_hash(salt, BigInt(packed))
-  // console.log(`SALT_HASH`, duelId, roundNumber, action, salt, hash)
+  console.log(`signAndGenerateActionHash():`, bigintToHex(duelId), roundNumber, packed, bigintToHex(salt), bigintToHex(hash))
   return hash
 }
 
@@ -56,16 +56,20 @@ export const signAndRestoreActionFromHash = async (account: Account, duelId: big
   const salt = await signAndGenerateSalt(account, duelId, roundNumber)
   let packed = null
   let slots = null
+  console.log(`___RESTORE_HASH Duel:`, bigintToHex(duelId), 'round:', roundNumber)
   for (let i = 0; i < possibleActions.length; ++i) {
     const m = possibleActions[i]
     const h = make_action_hash(salt, m)
-    // console.log(`___RESTORE_HASH`, duelId, roundNumber, salt, hash, m)
+    console.log(`___RESTORE_HASH move:`, m, bigintToHex(hash), '>', bigintToHex(h))
     if (h == hash) {
       packed = Number(m)
       slots = unpack_action_slots(packed)
-      console.log(`___RESTORE_HASH FOUND MOVE:`, packed, slots)
+      console.log(`___RESTORE_HASH FOUND ACTION:`, packed, slots)
       break
     }
+  }
+  if (!packed) {
+    console.warn(`___RESTORE_HASH ACTION NOT FOUND for hash:`, hash)
   }
   return {
     salt,
@@ -74,3 +78,8 @@ export const signAndRestoreActionFromHash = async (account: Account, duelId: big
     slot2: slots?.[1] ?? null,
   }
 }
+
+// 12078656863973367808n
+// 12078656863973366908n
+// 0xa7a0026c1cf76000
+// 0xa7a0026c1cf75c7c

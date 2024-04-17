@@ -21,8 +21,9 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export default function Gate() {
-  const { isConnected, isCorrectChain } = useSelectedChain()
+  const { isConnected, isConnecting, isCorrectChain } = useSelectedChain()
   const { isLoading, isError } = useDojoStatus()
+
   return (
     <div className='UIContainer'>
 
@@ -43,7 +44,7 @@ export default function Gate() {
 
       </VStack>
 
-      {(isLoading || isError || !isCorrectChain) ?
+      {(isLoading || isError || !isConnected || isConnecting || !isCorrectChain) ?
         <DisconnectedGate />
         : <ConnectedGate />
       }
@@ -58,7 +59,7 @@ export default function Gate() {
 //
 function DisconnectedGate() {
   const { connectOpener } = usePistolsContext()
-  const { isConnected, isCorrectChain } = useSelectedChain()
+  const { isConnected, isConnecting, isCorrectChain } = useSelectedChain()
   const { isLoading, loadingMessage, isError, errorMessage } = useDojoStatus()
 
   const canConnect = (!isLoading && !isError)
@@ -67,27 +68,29 @@ function DisconnectedGate() {
   return (
     <VStack>
       <ChainSwitcher disabled={isLoading} />
-      <ActionButton fill large important disabled={!canConnect} onClick={() => connectOpener.open()} label={switchChain ? 'Switch Chain' : 'Connect Wallet'} />
-      {isLoading &&
+      <ActionButton fill large important disabled={!canConnect || isConnecting} onClick={() => connectOpener.open()} label={switchChain ? 'Switch Chain' : 'Connect Wallet'} />
+      {isConnecting ?
         <div>
           <Divider />
-          <h3 className='TitleCase Important'>{loadingMessage}</h3>
+          <h3 className='TitleCase Important'>Connecting...</h3>
         </div>
-      }
-      {isError &&
-        <div>
-          <Divider />
-          <h3 className='TitleCase Negative'>{errorMessage}</h3>
-          <Divider hidden />
-          <ActionButton fill large important onClick={() => location.reload()} label='Retry' />
-        </div>
-      }
-      {!isLoading && !isError &&
-        <div>
-          <Divider content='OR' />
-          <br />
-          <EnterAsGuestButton />
-        </div>
+        : isLoading ?
+          <div>
+            <Divider />
+            <h3 className='TitleCase Important'>{loadingMessage}</h3>
+          </div>
+          : isError ?
+            <div>
+              <Divider />
+              <h3 className='TitleCase Negative'>{errorMessage}</h3>
+              <Divider hidden />
+              <ActionButton fill large important onClick={() => location.reload()} label='Retry' />
+            </div>
+            : <div>
+              <Divider content='OR' />
+              <br />
+              <EnterAsGuestButton />
+            </div>
       }
     </VStack>
   )
