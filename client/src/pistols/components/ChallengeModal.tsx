@@ -68,17 +68,17 @@ export default function ChallengeModal() {
     >
       <Modal.Header>
         <Grid>
-          <Row>
-            <Col width={8} textAlign='left'>
+          <Row columns={'equal'}>
+            <Col textAlign='left'>
               Challenge
-              &nbsp;&nbsp;&nbsp;
-              <AddressShort address={duelId} />
             </Col>
-            <Col width={7} textAlign='right'>
+            <Col textAlign='center'>
               <span className='Code'><ChallengeTime duelId={duelId} prefixed /></span>
-            </Col>
-            <Col width={1} textAlign='right'>
+              &nbsp;
               <Icon className='Anchor IconClick' name='database' size={'small'} onClick={() => window?.open(`/dueldata/${duelId}`, '_blank')} />
+            </Col>
+            <Col textAlign='right'>
+              <AddressShort address={duelId} />
             </Col>
           </Row>
         </Grid>
@@ -163,12 +163,12 @@ export default function ChallengeModal() {
             </Col>
             {(state == ChallengeState.Awaiting && isChallenger) &&
               <Col>
-                <ActionButton fill label='Cowardly withdraw' onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
+                <ActionButton fill label='Cowardly Withdraw' onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
               </Col>
             }
             {(state == ChallengeState.Awaiting && isChallenged) &&
               <Col>
-                <ActionButton fill label='Cowardly refuse' onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
+                <ActionButton fill label='Cowardly Refuse' onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
               </Col>
             }
             {(state == ChallengeState.Awaiting && isChallenged) &&

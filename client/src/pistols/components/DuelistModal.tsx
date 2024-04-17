@@ -72,13 +72,11 @@ export default function DuelistModal() {
     >
       <Modal.Header>
         <Grid>
-          <Row>
-            <Col width={8} textAlign='left'>
+          <Row columns={'equal'}>
+            <Col textAlign='left'>
               Duelist
-              &nbsp;&nbsp;&nbsp;
-              <AddressShort address={duelistAddress} />
             </Col>
-            <Col width={8} textAlign='right'>
+            <Col textAlign='center'>
               {isYou &&
                 <div className='Anchor' onClick={() => _switchDuelist()} >
                   <span className='Smaller'>Switch Duelist</span>
@@ -86,6 +84,9 @@ export default function DuelistModal() {
                   <Icon name='users' size={'small'} />
                 </div>
               }
+            </Col>
+            <Col textAlign='right'>
+              <AddressShort address={duelistAddress} />
             </Col>
           </Row>
         </Grid>
