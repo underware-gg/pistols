@@ -12,8 +12,8 @@ export const constants = {
   DOUBLE_DAMAGE: 2,
   SINGLE_DAMAGE: 1,
 
-  // HASH_SALT_MASK: 0xffffffffffffffffn, // 64 bits
-  HASH_SALT_MASK: 0x1fffffffffffffn,   // 53 bits (Number.MAX_SAFE_INTEGER, 9007199254740991)
+  HASH_SALT_MASK: 0xffffffffffffffffn, // 64 bits
+  // HASH_SALT_MASK: 0x1fffffffffffffn,   // 53 bits (Number.MAX_SAFE_INTEGER, 9007199254740991)
 
   //
   // /dojo/src/models/coins.cairo

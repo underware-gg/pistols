@@ -55,7 +55,7 @@ struct Wager {
 #[derive(Model, Copy, Drop, Serde)]
 struct Pact {
     #[key]
-    pair: u128,     // xor'd duelists u256(address).low
+    pair: u128,     // xor'd duelists as u256(address).low
     //------------
     duel_id: u128,  // current Challenge, or 0x0
 } // 128 bits

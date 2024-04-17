@@ -15,8 +15,8 @@ mod constants {
     // Hit penalty per damage taken
     const HIT_PENALTY_PER_DAMAGE: u8 = 10;
 
-    // const HASH_SALT_MASK: u256 = 0xffffffffffffffff; // 64 bits
-    const HASH_SALT_MASK: u256 = 0x1fffffffffffff;   // 53 bits (Number.MAX_SAFE_INTEGER, 9007199254740991)
+    const HASH_SALT_MASK: u256 = 0xffffffffffffffff; // 64 bits
+    // const HASH_SALT_MASK: u256 = 0x1fffffffffffff;   // 53 bits (Number.MAX_SAFE_INTEGER, 9007199254740991)
 }
 
 mod chances {
