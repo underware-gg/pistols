@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { Grid, Table, Modal, Divider, Header, Icon } from 'semantic-ui-react'
+import { Grid, Table, Modal, Icon } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
@@ -14,20 +14,12 @@ import { ChallengeState, makeDuelUrl } from '@/pistols/utils/pistols'
 import { DuelIconsAsGrid } from '@/pistols/components/DuelIcons'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { ChallengeTime } from './ChallengeTime'
+import { Divider } from '@/lib/ui/Divider'
 
 const Row = Grid.Row
 const Col = Grid.Column
 const Cell = Table.HeaderCell
 
-function DividerText({
-  text = '',
-}) {
-  return (
-    <Divider horizontal className='NoMargin'>
-      <Header as='h4'>{text}</Header>
-    </Divider>
-  )
-}
 
 export default function ChallengeModal() {
   const router = useRouter()
@@ -94,7 +86,7 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <DividerText text='challenged' />
+                <Divider content='challenged' nomargin />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -104,7 +96,7 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <DividerText text='for a duel' />
+                <Divider content='for a duel' nomargin />
               </Col>
             </Row>
             <Row columns='equal' textAlign='center'>
@@ -116,7 +108,7 @@ export default function ChallengeModal() {
             {(value > 0 || isYou) && <>
               <Row columns='equal' textAlign='right'>
                 <Col>
-                  <DividerText text={value > 0 ? 'Placing a wager of' : 'Fees'} />
+                  <Divider content={value > 0 ? 'Placing a wager of' : 'Fees'} nomargin />
                 </Col>
               </Row>
               <Row columns='equal' textAlign='center'>
@@ -129,7 +121,7 @@ export default function ChallengeModal() {
             {(isLive || isFinished) && <>
               <Row columns='equal' textAlign='right'>
                 <Col>
-                  <DividerText text='actions' />
+                  <Divider content='actions' nomargin />
                 </Col>
               </Row>
               <Row textAlign='center'>
@@ -141,7 +133,7 @@ export default function ChallengeModal() {
 
             <Row columns='equal' textAlign='right'>
               <Col>
-                <DividerText text='status' />
+                <Divider content='status' nomargin />
               </Col>
             </Row>
             <Row columns='equal' textAlign='center'>

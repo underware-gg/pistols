@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Divider, Grid, Header, Input } from 'semantic-ui-react'
+import { Grid, Input } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useBurnerAccount } from '@/lib/dojo/hooks/useBurnerAccount'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
@@ -9,6 +9,7 @@ import { LockedWagerBalance, LordsBalance } from '@/pistols/components/account/L
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
 import { IconTransfer } from '@/lib/ui/Icons'
+import { Divider } from '@/lib/ui/Divider'
 import { ethToWei } from '@/lib/utils/starknet'
 import { isNumber } from '@/lib/utils/types'
 import { Account, BigNumberish } from 'starknet'
@@ -50,11 +51,9 @@ export function OnboardingFund({
       {/* <ActionButton fill disabled={!isDeployed} onClick={() => setDeposit(!deposit)} label='Deposit from Account to Duelist' /> */}
 
 
-      <Divider horizontal>
-        <Header as='h2'>
-          <IconTransfer rotated={deposit} setRotated={setDeposit} />
-        </Header>
-      </Divider>
+      <Divider as='h2' content={
+        <IconTransfer rotated={deposit} setRotated={setDeposit} />
+      } />
 
       <h3>Duelist Balance</h3>
       <span className='H3'><LordsBalance address={address} big /></span> <LockedWagerBalance coin={coins.LORDS} address={address} clean />

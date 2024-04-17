@@ -1,6 +1,6 @@
 import React from 'react'
 import { useRouter } from 'next/navigation'
-import { Divider, Dropdown, Grid, Header, Icon } from 'semantic-ui-react'
+import { Dropdown, Grid, Icon } from 'semantic-ui-react'
 import { VStack, VStackRow } from '@/lib/ui/Stack'
 import { useDojoAccount, useDojoStatus } from '@/lib/dojo/DojoContext'
 import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
@@ -10,6 +10,7 @@ import { AccountMenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContex
 import { AccountsList } from '@/pistols/components/account/AccountsList'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { LordsBagIcon } from '@/pistols/components/account/Balance'
+import { Divider } from '@/lib/ui/Divider'
 import { feltToString } from '@/lib/utils/starknet'
 import { CHAIN_ID } from '@/lib/dojo/setup/chains'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
@@ -85,9 +86,7 @@ function DisconnectedGate() {
         }
         {!isLoading && !isError &&
           <div>
-            <Divider horizontal>
-              <Header as='h4'>OR</Header>
-            </Divider>
+            <Divider content='OR' />
             <br />
             <EnterAsGuestButton />
           </div>
@@ -174,7 +173,7 @@ function ConnectedGate() {
 
       <div className='UIAccountsListScroller'>
         <AccountsList />
-        <Divider />
+        <Divider content='OR' />
         <EnterAsGuestButton />
       </div>
 
