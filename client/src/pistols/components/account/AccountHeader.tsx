@@ -14,16 +14,16 @@ const Col = Grid.Column
 export default function AccountHeader({
 }) {
   const router = useRouter()
-  const { account, isGuest } = useDojoAccount()
+  const { accountAddress, isGuest } = useDojoAccount()
   const { dispatchSelectDuelist } = usePistolsContext()
 
-  const { name, profilePic } = useDuelist(account.address)
+  const { name, profilePic } = useDuelist(accountAddress)
 
   const _click = () => {
     if(isGuest) {
       router.push('/gate')
     } else {
-      dispatchSelectDuelist(BigInt(account.address)) 
+      dispatchSelectDuelist(accountAddress) 
     }
   }
 
@@ -35,9 +35,9 @@ export default function AccountHeader({
             <h3>Guest</h3>
             : <>
               <h3>{name}</h3>
-              <AddressShort address={account?.address} copyLink={false} />
+              <AddressShort address={accountAddress} copyLink={false} />
               <br />
-              <LordsBalance address={account.address} big />
+              <LordsBalance address={accountAddress} big />
             </>}
         </Col>
         <Col width={5} verticalAlign='middle'>

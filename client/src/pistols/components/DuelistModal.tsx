@@ -16,6 +16,7 @@ import { ChallengeMessages } from '@/pistols/utils/pistols'
 import { WagerAndOrFees } from '@/pistols/components/account/LordsBalance'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { randomArrayElement } from '@/lib/utils/random'
+import { bigintEquals } from '@/lib/utils/types'
 import { coins } from '@/pistols/utils/constants'
 
 const Row = Grid.Row
@@ -23,12 +24,12 @@ const Col = Grid.Column
 
 export default function DuelistModal() {
   const { create_challenge } = useDojoSystemCalls()
-  const { account, isGuest } = useDojoAccount()
+  const { account, accountAddress, isGuest, isThisAccount } = useDojoAccount()
   const router = useRouter()
 
   const { duelistAddress, dispatchSelectDuelist, dispatchSelectDuel } = usePistolsContext()
-  const { name, profilePic } = useDuelist(duelistAddress)
-  const { hasPact, pactDuelId } = usePact(account.address, duelistAddress)
+  const { profilePic } = useDuelist(duelistAddress)
+  const { hasPact, pactDuelId } = usePact(accountAddress, duelistAddress)
   const [isChallenging, setIsChallenging] = useState(false)
   const [args, setArgs] = useState(null)
 
@@ -36,7 +37,7 @@ export default function DuelistModal() {
   const wagerCoin = useMemo(() => (args?.wager_coin ?? coins.LORDS), [args])
   const { fee } = useCalcFee(wagerCoin, wagerValue)
 
-  const isYou = useMemo(() => (duelistAddress == BigInt(account.address)), [duelistAddress, account])
+  const isYou = useMemo(() => isThisAccount(duelistAddress), [duelistAddress, isThisAccount])
   const isOpen = useMemo(() => (duelistAddress > 0), [duelistAddress])
 
   useEffect(() => {

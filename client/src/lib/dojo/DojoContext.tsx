@@ -1,8 +1,9 @@
-import { ReactNode, createContext, useContext, useMemo } from 'react'
+import { ReactNode, createContext, useCallback, useContext, useMemo } from 'react'
 import { BurnerAccount, useBurnerManager, useBurnerWindowObject, usePredeployedWindowObject } from '@dojoengine/create-burner'
 import { SetupResult } from '@/lib/dojo/setup/useSetup'
-import { Account } from 'starknet'
+import { Account, BigNumberish } from 'starknet'
 import { dummyAccount } from '../utils/starknet';
+import { bigintEquals } from '../utils/types';
 
 interface DojoContextType {
   setup: SetupResult;
@@ -71,15 +72,19 @@ export const useDojoAccount = (): BurnerAccount & {
   account: Account
   accountAddress: bigint
   isGuest: boolean
+  isThisAccount: (address: BigNumberish) => boolean
 } => {
   const { burner, account, masterAccount } = useDojo()
   const accountAddress = useMemo(() => BigInt(account?.address ?? 0), [account])
+  const isGuest = useMemo(() => (accountAddress == 0n), [accountAddress])
+  const isThisAccount = useCallback((address: BigNumberish) => (!isGuest && bigintEquals(address, accountAddress)), [accountAddress, isGuest])
   return {
     ...burner,
     masterAccount,
-    account,
-    accountAddress,
-    isGuest: (accountAddress == 0n),
+    account,          // can be null (guest)
+    accountAddress,   // can be 0n (guest)
+    isGuest,
+    isThisAccount,
   }
 }
 

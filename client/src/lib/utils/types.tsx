@@ -13,7 +13,7 @@ export const isNumber = (v: string) => (/^\d+$/.test(v))
 // BigNumberish
 //
 
-export const bigintEquals = (a: BigNumberish | null, b: BigNumberish | null): boolean => (a && b && BigInt(a) == BigInt(b))
+export const bigintEquals = (a: BigNumberish | null, b: BigNumberish | null): boolean => (a != null && b != null && BigInt(a) == BigInt(b))
 export const bigintToHex = (v: BigNumberish): string => (!v ? '0x0' : `0x${BigInt(v).toString(16)}`)
 export const bigintToEntity = (v: BigNumberish): Entity => (getEntityIdFromKeys([BigInt(v)]) as Entity)
 export const keysToEntity = (keys: any[]): Entity => (getEntityIdFromKeys(keys) as Entity)

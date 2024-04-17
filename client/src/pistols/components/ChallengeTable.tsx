@@ -44,8 +44,8 @@ export function ChallengeTableByDuelist({
 }
 
 export function ChallengeTableYour() {
-  const { account } = useDojoAccount()
-  return <ChallengeTableByDuelist address={account.address} compact />
+  const { accountAddress } = useDojoAccount()
+  return <ChallengeTableByDuelist address={accountAddress} compact />
 }
 
 

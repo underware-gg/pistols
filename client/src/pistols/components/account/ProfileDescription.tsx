@@ -30,8 +30,8 @@ export function ProfileDescription({
   displayBalance = false,
 }) {
   const { total_wins, total_losses, total_draws, total_duels, total_honour, honourAndTotal } = useDuelist(address)
-  // const { account } = useDojoAccount()
-  // const isYou = useMemo(() => bigintEquals(address, account.address), [address, account])
+  // const { accountAddress } = useDojoAccount()
+  // const isYou = useMemo(() => bigintEquals(address, accountAddress), [address, accountAddress])
   return (
     <Grid columns='equal'>
       <Row>

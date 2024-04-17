@@ -13,6 +13,7 @@ import { WagerAndOrFees } from '@/pistols/components/account/LordsBalance'
 import { ChallengeState, makeDuelUrl } from '@/pistols/utils/pistols'
 import { DuelIconsAsGrid } from '@/pistols/components/DuelIcons'
 import { AddressShort } from '@/lib/ui/AddressShort'
+import { bigintEquals } from '@/lib/utils/types'
 import { ChallengeTime } from './ChallengeTime'
 import { Divider } from '@/lib/ui/Divider'
 
@@ -24,7 +25,7 @@ const Cell = Table.HeaderCell
 export default function ChallengeModal() {
   const router = useRouter()
   const { reply_challenge } = useDojoSystemCalls()
-  const { account } = useDojoAccount()
+  const { account, isThisAccount } = useDojoAccount()
 
   const { duelId, dispatchSelectDuel, dispatchSelectDuelist } = usePistolsContext()
 
@@ -38,8 +39,8 @@ export default function ChallengeModal() {
 
   const isOpen = useMemo(() => (duelId > 0), [duelId])
 
-  const isChallenger = useMemo(() => (duelistA == BigInt(account.address)), [duelistA, account])
-  const isChallenged = useMemo(() => (duelistB == BigInt(account.address)), [duelistB, account])
+  const isChallenger = useMemo(() => isThisAccount(duelistA), [duelistA, isThisAccount])
+  const isChallenged = useMemo(() => isThisAccount(duelistB), [duelistB, isThisAccount])
   const isYou = (isChallenger || isChallenged)
 
   const _close = () => { dispatchSelectDuel(0n) }

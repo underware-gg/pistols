@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from 'react'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
-import { bigintEquals } from '@/lib/utils/types'
+import { bigintEquals, bigintToHex } from '@/lib/utils/types'
 
 export function AccountChangeDetector({
   onChange,
 }: {
   onChange?: Function
 }) {
-  const { account } = useDojoAccount()
+  const { accountAddress } = useDojoAccount()
   const [currentAccount, setCurrentAccount] = useState<string>(null)
   useEffect(() => {
-    if (!currentAccount && account) {
-      setCurrentAccount(account.address)
-    } else if (currentAccount && !bigintEquals(currentAccount, account.address)) {
+    if (!currentAccount && accountAddress) {
+      setCurrentAccount(bigintToHex(accountAddress))
+    } else if (currentAccount && !bigintEquals(currentAccount, accountAddress)) {
       onChange?.()
     }
-  }, [currentAccount, account])
+  }, [currentAccount, accountAddress])
   return <></>
 }
 

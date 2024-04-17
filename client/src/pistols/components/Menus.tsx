@@ -30,10 +30,10 @@ const _makeBubble = (count) => {
 
 export function MenuTavern({
 }) {
-  const { account, isGuest } = useDojoAccount()
+  const { accountAddress, isGuest } = useDojoAccount()
   const { menuKey, tavernMenuItems, dispatchSetMenu } = usePistolsContext()
 
-  const { awaitingCount, inProgressCount } = useChallengesByDuelist(BigInt(account.address))
+  const { awaitingCount, inProgressCount } = useChallengesByDuelist(accountAddress)
   const { challengeIds: liveChallengeIds } = useLiveChallengeIds()
 
   const yourDuelsCount = useMemo(() => (awaitingCount + inProgressCount), [awaitingCount, inProgressCount])

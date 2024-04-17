@@ -16,13 +16,13 @@ export function ActionChances({
   isA = false,
   isB = false,
 }) {
-  const { account } = useDojoAccount()
+  const { accountAddress } = useDojoAccount()
   const { challenge: { duelistA, duelistB }, round1 } = useDuel(duelId)
-  const { hitBonus } = useCalcHitBonus(BigInt(account.address))
-  const { hitChances } = useCalcHitChances(BigInt(account.address), duelId, roundNumber, action)
-  const { critChances } = useCalcCritChances(BigInt(account.address), duelId, roundNumber, action)
-  const { glanceChances } = useCalcGlanceChances(BigInt(account.address), duelId, roundNumber, action)
-  const { honourForAction } = useCalcHonourForAction(BigInt(account.address), action, 0)
+  const { hitBonus } = useCalcHitBonus(accountAddress)
+  const { hitChances } = useCalcHitChances(accountAddress, duelId, roundNumber, action)
+  const { critChances } = useCalcCritChances(accountAddress, duelId, roundNumber, action)
+  const { glanceChances } = useCalcGlanceChances(accountAddress, duelId, roundNumber, action)
+  const { honourForAction } = useCalcHonourForAction(accountAddress, action, 0)
   const { critChances: otherCritChances } = useCalcCritChances(isA ? duelistB : duelistA, duelId, roundNumber, Action.Strong)
 
   const executionLabel = useMemo(() => {

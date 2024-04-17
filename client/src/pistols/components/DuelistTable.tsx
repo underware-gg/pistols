@@ -6,6 +6,7 @@ import { AddressShort } from '@/lib/ui/AddressShort'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ProfileName } from './account/ProfileDescription'
+import { bigintEquals } from '@/lib/utils/types'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -28,7 +29,7 @@ enum SortDirection {
 }
 
 export function DuelistTable() {
-  const { account } = useDojoAccount()
+  const { accountAddress } = useDojoAccount()
   const { duelistIds } = useAllDuelistIds()
 
   // Sort
@@ -53,7 +54,7 @@ export function DuelistTable() {
   const rows = useMemo(() => {
     let result = []
     duelistIds.forEach((duelistId, index) => {
-      const isYou = (duelistId == BigInt(account.address))
+      const isYou = bigintEquals(duelistId, accountAddress)
       result.push(<DuelistItem key={duelistId} address={duelistId} index={index} isYou={isYou} sortColumn={sortColumn} dataCallback={_dataCallback}/>)
     })
     return result

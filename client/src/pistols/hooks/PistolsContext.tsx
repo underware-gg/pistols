@@ -209,16 +209,16 @@ export const usePistolsContext = () => {
       payload: scene != SceneName.Tavern ? scene : state.menuKey,
     })
   }
-  const dispatchSelectDuelist = (address: bigint) => {
+  const dispatchSelectDuelist = (address: BigNumberish) => {
     dispatch({
       type: PistolsActions.SELECT_DUELIST,
-      payload: address,
+      payload: BigInt(address),
     })
   }
-  const dispatchSelectDuel = (duelId: bigint) => {
+  const dispatchSelectDuel = (duelId: BigNumberish) => {
     dispatch({
       type: PistolsActions.SELECT_DUEL,
-      payload: duelId,
+      payload: BigInt(duelId),
     })
   }
   return {
