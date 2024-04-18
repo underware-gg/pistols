@@ -307,7 +307,18 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
 fn update_duelist_honour(ref duelist: Duelist, duel_honour: u8) {
     duelist.total_duels += 1;
     duelist.total_honour += duel_honour.into();
-    duelist.honour = ((duelist.total_honour * 10) / duelist.total_duels.into()).try_into().unwrap();
+    let average: u8 = ((duelist.total_honour * 10) / duelist.total_duels.into()).try_into().unwrap();
+    duelist.level_honour = calc_level_honour(average);
+    duelist.level_villainy = calc_level_villainy(average);
+    duelist.level_trickery = 0;
+}
+#[inline(always)]
+fn calc_level_honour(average: u8) -> u8 {
+    if (average >= 80) { MathU8::map(average, 79, 100, 0, 100) } else { 0 }
+}
+#[inline(always)]
+fn calc_level_villainy(average: u8) -> u8 {
+    if (average < 40) { MathU8::map(average, 10, 40, 100, 0) } else { 0 }
 }
 
 
@@ -333,12 +344,12 @@ fn calc_honour_for_action(world: IWorldDispatcher, duelist_address: ContractAddr
     let mut duelist: Duelist = get!(world, duelist_address, Duelist);
     let duel_honour: u8 = action.honour();
     update_duelist_honour(ref duelist, duel_honour);
-    (duel_honour, duelist.honour)
+    (duel_honour, duelist.level_honour)
 }
 
 fn calc_hit_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> u8 {
     let duelist: Duelist = get!(world, duelist_address, Duelist);
-    let bonus: u8 = MathU8::sub(duelist.honour, 90);
+    let bonus: u8 = MathU8::sub(duelist.level_honour, 90);
     (MathU16::min(bonus.into(), duelist.total_duels).try_into().unwrap())
 }
 fn calc_hit_penalty(world: IWorldDispatcher, health: u8) -> u8 {
@@ -388,7 +399,7 @@ mod tests {
     use starknet::{ContractAddress};
 
     use pistols::systems::{utils};
-    use pistols::models::models::{init, Round, Shot};
+    use pistols::models::models::{init, Round, Shot, Duelist};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::constants::{constants, chances};
     use pistols::types::action::{ACTION};
@@ -515,6 +526,54 @@ mod tests {
         assert(slot1_b == ACTION::FAST_BLADE, 'slot1_b');
         assert(slot2_a == ACTION::IDLE, 'slot2_a');
         assert(slot2_b == ACTION::IDLE, 'slot2_b');
+    }
+
+    #[test]
+    #[available_gas(100_000_000)]
+    fn test_update_duelist_honour() {
+        let mut duelist = Duelist {
+            address: starknet::contract_address_const::<0x111>(),
+            name: 'duelist',
+            profile_pic: 0,
+            total_duels: 0,
+            total_wins: 0,
+            total_losses: 0,
+            total_draws: 0,
+            total_honour: 0,
+            level_honour: 0,
+            level_villainy: 0,
+            level_trickery: 0,
+            timestamp: 0,
+        };
+        utils::update_duelist_honour(ref duelist, 10);
+        assert(duelist.level_honour == 100, 'level_honour==100');
+        assert(duelist.level_villainy == 0, 'level_honour==100_vill');
+        // just checks sync with calc_level_honour
+        let value: u8 = utils::calc_level_honour(100);
+       assert(duelist.level_honour == value, '!= calc');
+    }
+
+    #[test]
+    #[available_gas(100_000_000)]
+    fn test_calc_level_honour() {
+        assert(utils::calc_level_honour(10) == 0, 'avg_10');
+        assert(utils::calc_level_honour(79) == 0, 'avg_79');
+        assert(utils::calc_level_honour(80) == 4, 'avg_80');
+        assert(utils::calc_level_honour(81) == 9, 'avg_81');
+        assert(utils::calc_level_honour(90) == 52, 'avg_90');
+        assert(utils::calc_level_honour(99) == 95, 'avg_99');
+        assert(utils::calc_level_honour(100) == 100, 'avg_100');
+    }
+
+    #[test]
+    #[available_gas(100_000_000)]
+    fn test_calc_level_villainy() {
+        assert(utils::calc_level_villainy(0) == 100, 'avg_0');
+        assert(utils::calc_level_villainy(10) == 100, 'avg_10');
+        assert(utils::calc_level_villainy(20) == 67, 'avg_20');
+        assert(utils::calc_level_villainy(30) == 34, 'avg_30');
+        assert(utils::calc_level_villainy(40) == 0, 'avg_40');
+        assert(utils::calc_level_villainy(100) == 0, 'avg_100');
     }
 
 }

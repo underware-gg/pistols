@@ -15,9 +15,11 @@ struct Duelist {
     total_losses: u16,
     total_draws: u16,
     total_honour: u32,  // sum of al duels Honour
-    honour: u8,         // +1 decimal, eg: 100 = 10.0
+    level_honour: u8,   // 0..100
+    level_villainy: u8, // 0..100
+    level_trickery: u8, // 0..100
     timestamp: u64,     // Unix time, 1st registered
-} // f + 176 bits
+} // f + 192 bits
 
 //
 // Challenge lifecycle
