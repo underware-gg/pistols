@@ -1,6 +1,8 @@
 // use debug::PrintTrait;
 
-trait MathTrait<T> {
+trait MathTrait<T,TI> {
+    // absolute value
+    fn abs(v: TI) -> T;
     // returns minimum value
     fn min(a: T, b: T) -> T;
     // returns maximum value
@@ -19,7 +21,10 @@ trait MathTrait<T> {
     fn squaredDistance(x1: T, y1: T, x2: T, y2: T) -> T;
 }
 
-impl MathU8 of MathTrait<u8> {
+impl MathU8 of MathTrait<u8,i8> {
+    fn abs(v: i8) -> u8 {
+        if (v < 0) { (-v).try_into().unwrap() } else { (v).try_into().unwrap() }
+    }
     fn min(a: u8, b: u8) -> u8 {
         if (a < b) { (a) } else { (b) }
     }
@@ -91,7 +96,10 @@ impl MathU8 of MathTrait<u8> {
     }
 }
 
-impl MathU16 of MathTrait<u16> {
+impl MathU16 of MathTrait<u16, i16> {
+    fn abs(v: i16) -> u16 {
+        if (v < 0) { (-v).try_into().unwrap() } else { (v).try_into().unwrap() }
+    }
     fn min(a: u16, b: u16) -> u16 {
         if (a < b) { (a) } else { (b) }
     }
@@ -130,7 +138,10 @@ impl MathU16 of MathTrait<u16> {
     }
 }
 
-impl MathU32 of MathTrait<u32> {
+impl MathU32 of MathTrait<u32, i32> {
+    fn abs(v: i32) -> u32 {
+        if (v < 0) { (-v).try_into().unwrap() } else { (v).try_into().unwrap() }
+    }
     fn min(a: u32, b: u32) -> u32 {
         if (a < b) { (a) } else { (b) }
     }
@@ -168,7 +179,10 @@ impl MathU32 of MathTrait<u32> {
     }
 }
 
-impl MathU64 of MathTrait<u64> {
+impl MathU64 of MathTrait<u64, i64> {
+    fn abs(v: i64) -> u64 {
+        if (v < 0) { (-v).try_into().unwrap() } else { (v).try_into().unwrap() }
+    }
     fn min(a: u64, b: u64) -> u64 {
         if (a < b) { (a) } else { (b) }
     }
@@ -206,7 +220,10 @@ impl MathU64 of MathTrait<u64> {
     }
 }
 
-impl MathU128 of MathTrait<u128> {
+impl MathU128 of MathTrait<u128, i128> {
+    fn abs(v: i128) -> u128 {
+        if (v < 0) { (-v).try_into().unwrap() } else { (v).try_into().unwrap() }
+    }
     fn min(a: u128, b: u128) -> u128 {
         if (a < b) { (a) } else { (b) }
     }
@@ -257,7 +274,10 @@ impl MathU128 of MathTrait<u128> {
     }
 }
 
-impl MathU256 of MathTrait<u256> {
+impl MathU256 of MathTrait<u256, u256> {
+    fn abs(v: u256) -> u256 {
+        (v)
+    }
     fn min(a: u256, b: u256) -> u256 {
         if (a < b) { (a) } else { (b) }
     }
@@ -310,6 +330,18 @@ impl MathU256 of MathTrait<u256> {
 mod tests {
     use debug::PrintTrait;
     use pistols::utils::math::{MathU8,MathU16,MathU32,MathU128};
+
+    #[test]
+    #[available_gas(100_000_000)]
+    fn test_abs() {
+        assert(MathU128::abs(0) == 0, 'abs_0');
+        assert(MathU128::abs(1) == 1, 'abs_1');
+        assert(MathU128::abs(-1) == 1, 'abs_-_1');
+        assert(MathU128::abs(111) == 111, 'abs_111');
+        assert(MathU128::abs(-111) == 111, 'abs_-_111');
+        assert(MathU128::abs(0x8756876876f57f6576f) == 0x8756876876f57f6576f, 'abs_0x');
+        assert(MathU128::abs(-0x8756876876f57f6576f) == 0x8756876876f57f6576f, 'abs_-_0x');
+    }
 
     #[test]
     #[available_gas(100_000_000)]
