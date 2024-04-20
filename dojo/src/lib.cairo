@@ -42,6 +42,7 @@ mod tests {
     mod test_round1;
     mod test_round2;
     mod test_round3;
+    mod test_sys_utils;
     mod test_wager;
 }
 
