@@ -1519,7 +1519,7 @@
     {
       "name": "pistols::systems::actions::actions",
       "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
-      "class_hash": "0x44d9ae05c9034f2f73ddb9ecc85f7a38440686b39c80c51c3e1320da240c59b",
+      "class_hash": "0x3a2b828af1b4e4c65963e872ca3f78f1ad223c60e2fc5c1c2348a7b6c00623c",
       "abi": [
         {
           "type": "impl",
@@ -2114,6 +2114,28 @@
         },
         {
           "type": "event",
+          "name": "pistols::types::events::DuelistTurnEvent",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "duel_id",
+              "type": "core::integer::u128",
+              "kind": "data"
+            },
+            {
+              "name": "duelist_address",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "data"
+            },
+            {
+              "name": "round_number",
+              "type": "core::integer::u8",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
           "name": "pistols::systems::actions::actions::Event",
           "kind": "enum",
           "variants": [
@@ -2130,6 +2152,11 @@
             {
               "name": "ChallengeAcceptedEvent",
               "type": "pistols::types::events::ChallengeAcceptedEvent",
+              "kind": "nested"
+            },
+            {
+              "name": "DuelistTurnEvent",
+              "type": "pistols::types::events::DuelistTurnEvent",
               "kind": "nested"
             }
           ]

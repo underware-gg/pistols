@@ -85,6 +85,7 @@ mod actions {
     enum Event {
         NewChallengeEvent: events::NewChallengeEvent,
         ChallengeAcceptedEvent: events::ChallengeAcceptedEvent,
+        DuelistTurnEvent: events::DuelistTurnEvent,
     }
 
     // impl: implement functions specified in trait
@@ -261,7 +262,21 @@ mod actions {
             action_slot1: u8,
             action_slot2: u8,
         ) {
-            shooter::reveal_action(self.world(), duel_id, round_number, salt, utils::pack_action_slots(action_slot1, action_slot2));
+            let challenge: Challenge = shooter::reveal_action(self.world(), duel_id, round_number, salt, utils::pack_action_slots(action_slot1, action_slot2));
+
+            let state: ChallengeState = challenge.state.try_into().unwrap();
+            if (challenge.round_number > round_number && state == ChallengeState::InProgress) {
+                let duelist_address: ContractAddress = if (starknet::get_caller_address() == challenge.duelist_a) {
+                    (challenge.duelist_b)
+                } else {
+                    (challenge.duelist_a)
+                };
+                emit!(self.world(), events::DuelistTurnEvent {
+                    duel_id: challenge.duel_id,
+                    duelist_address,
+                    round_number: challenge.round_number,
+                });
+            }
         }
 
 
