@@ -213,6 +213,18 @@
         "type": "core::integer::u8"
       },
       {
+        "name": "villainy",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "trickery",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "virtue",
+        "type": "core::integer::u8"
+      },
+      {
         "name": "timestamp",
         "type": "core::integer::u64"
       }

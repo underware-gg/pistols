@@ -30,8 +30,8 @@ name = "pistols::mocks::lords_mock::lords_mock"
 [[contracts]]
 kind = "DojoContract"
 address = "0x702e255a3446fce9c49df1c579a62fba9e6bfefd4621a437b28c559b68e0f81"
-class_hash = "0xbbb11cef6b944f17ef64ff01cef1c9a3631f281af07922946c079c7737ed42"
-original_class_hash = "0xbbb11cef6b944f17ef64ff01cef1c9a3631f281af07922946c079c7737ed42"
+class_hash = "0x3ae916ed00d2ef4ac4935163edaba4c41ca96879e0161ad760850ddb557af37"
+original_class_hash = "0x3ae916ed00d2ef4ac4935163edaba4c41ca96879e0161ad760850ddb557af37"
 base_class_hash = "0x679177a2cb757694ac4f326d01052ff0963eac0bc2a17116a2b87badcdf6f76"
 abi = "abis/deployments/contracts/pistols_systems_actions_actions.json"
 reads = []
@@ -174,8 +174,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x59e9c67b9f7ce3c6b9af6cecb76a29ab88d7a292aeea33171cd6573d8562179"
-original_class_hash = "0x59e9c67b9f7ce3c6b9af6cecb76a29ab88d7a292aeea33171cd6573d8562179"
+class_hash = "0x35d376427fca9fa5b83ae138826e5b0e5cd29b39034e8029fa33f0b7e624165"
+original_class_hash = "0x35d376427fca9fa5b83ae138826e5b0e5cd29b39034e8029fa33f0b7e624165"
 abi = "abis/deployments/models/pistols_models_models_duelist.json"
 name = "pistols::models::models::duelist"
 
@@ -221,6 +221,21 @@ key = false
 
 [[models.members]]
 name = "honour"
+type = "u8"
+key = false
+
+[[models.members]]
+name = "villainy"
+type = "u8"
+key = false
+
+[[models.members]]
+name = "trickery"
+type = "u8"
+key = false
+
+[[models.members]]
+name = "virtue"
 type = "u8"
 key = false
 
