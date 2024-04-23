@@ -63,7 +63,7 @@ mod shooter {
     //-----------------------------------
     // Reveal
     //
-    fn reveal_action(world: IWorldDispatcher, duel_id: u128, round_number: u8, salt: u64, mut packed: u16) {
+    fn reveal_action(world: IWorldDispatcher, duel_id: u128, round_number: u8, salt: u64, mut packed: u16) -> Challenge {
         let caller: ContractAddress = starknet::get_caller_address();
 
         // Assert correct Challenge
@@ -104,7 +104,7 @@ mod shooter {
         // incomplete Round, update only
         if (round.shot_a.salt == 0 || round.shot_b.salt == 0) {
             set!(world, (round));
-            return;
+            return challenge;
         }
 
         // Process round when both actions are revealed
@@ -161,6 +161,8 @@ mod shooter {
         
         // update Challenge
         utils::set_challenge(world, challenge);
+
+        (challenge)
     }
 
     //---------------------------------------

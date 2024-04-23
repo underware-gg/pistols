@@ -15,3 +15,10 @@ struct ChallengeAcceptedEvent {
     duelist_b: ContractAddress,
     accepted: bool,
 }
+
+#[derive(Drop, starknet::Event)]
+struct DuelistTurnEvent {
+    duel_id: u128,
+    duelist_address: ContractAddress,
+    round_number: u8,
+}
