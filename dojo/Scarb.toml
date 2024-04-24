@@ -22,9 +22,11 @@ sierra-replace-ids = true
 [dependencies]
 # dojo = { git = "https://github.com/dojoengine/dojo", rev = "01eab985a3f5056e47cc7b4753ca24f64d3a078a" }
 dojo = { git = "https://github.com/dojoengine/dojo", tag = "v0.6.0" }
+# dojo = { git = "https://github.com/dojoengine/dojo", tag = "v0.6.1-alpha.1" }
+
 # token = { git = "https://github.com/dojoengine/origami", tag = "v0.6.0" }
-# token = { git = "https://github.com/notV4l/origami", branch = "erc_without_events" }
-token = { git = "https://github.com/notV4l/origami", rev = "32e225f40f26a1e9729f6baa068ee1b212550080" }
+token = { git = "https://github.com/notV4l/origami", rev = "32e225f40f26a1e9729f6baa068ee1b212550080" } # v0.6.0
+# token = { git = "https://github.com/notV4l/origami", branch = "erc_without_events" } # 0.6.1-alpha.1
 
 
 [tool.dojo]

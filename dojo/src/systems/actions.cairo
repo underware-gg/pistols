@@ -108,6 +108,12 @@ mod actions {
             duelist.name = name;
             duelist.profile_pic = profile_pic;
 
+            // emit!(self.world(), events::DuelistTurnEvent {
+            //     duel_id: 0x111,
+            //     duelist_address: starknet::contract_address_const::<0x222>(),
+            //     round_number: 0xff,
+            // });
+
             set!(world, (duelist));
             return ();
         }
