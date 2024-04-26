@@ -178,11 +178,11 @@ mod actions {
 
             utils::set_challenge(self.world(), challenge);
 
-            emit!(self.world(), events::NewChallengeEvent {
+            emit!(self.world(), (Event::NewChallengeEvent (events::NewChallengeEvent {
                 duel_id,
                 duelist_a: challenge.duelist_a,
                 duelist_b: challenge.duelist_b,
-            });
+            })));
 
             (duel_id)
         }
@@ -228,12 +228,12 @@ mod actions {
                     challenge.timestamp_end = timestamp;
                 }
 
-                emit!(self.world(), events::ChallengeAcceptedEvent {
+                emit!(self.world(), (Event::ChallengeAcceptedEvent (events::ChallengeAcceptedEvent {
                     duel_id,
                     duelist_a: challenge.duelist_a,
                     duelist_b: challenge.duelist_b,
                     accepted,
-                });
+                })));
             }
 
             // update challenge state
@@ -271,11 +271,11 @@ mod actions {
                 } else {
                     (challenge.duelist_a)
                 };
-                emit!(self.world(), events::DuelistTurnEvent {
+                emit!(self.world(), (Event::DuelistTurnEvent(events::DuelistTurnEvent {
                     duel_id: challenge.duel_id,
                     duelist_address,
                     round_number: challenge.round_number,
-                });
+                })));
             }
         }
 

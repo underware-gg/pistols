@@ -1519,7 +1519,7 @@
     {
       "name": "pistols::systems::actions::actions",
       "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
-      "class_hash": "0x3a2b828af1b4e4c65963e872ca3f78f1ad223c60e2fc5c1c2348a7b6c00623c",
+      "class_hash": "0x35e63495394c7654390ff5f5edc73bccf789d6066c9b12b03edbf73f3fe86f0",
       "abi": [
         {
           "type": "impl",
