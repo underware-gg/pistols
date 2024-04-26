@@ -108,11 +108,11 @@ mod actions {
             duelist.name = name;
             duelist.profile_pic = profile_pic;
 
-            // emit!(self.world(), events::DuelistTurnEvent {
+            // emit!(world, (Event::DuelistTurnEvent(events::DuelistTurnEvent {
             //     duel_id: 0x111,
             //     duelist_address: starknet::contract_address_const::<0x222>(),
             //     round_number: 0xff,
-            // });
+            // })));
 
             set!(world, (duelist));
             return ();
@@ -182,11 +182,11 @@ mod actions {
 
             utils::set_challenge(world, challenge);
 
-            emit!(world, events::NewChallengeEvent {
+            emit!(world, (Event::NewChallengeEvent (events::NewChallengeEvent {
                 duel_id,
                 duelist_a: challenge.duelist_a,
                 duelist_b: challenge.duelist_b,
-            });
+            })));
 
             (duel_id)
         }
@@ -232,12 +232,12 @@ mod actions {
                     challenge.timestamp_end = timestamp;
                 }
 
-                emit!(world, events::ChallengeAcceptedEvent {
+                emit!(world, (Event::ChallengeAcceptedEvent (events::ChallengeAcceptedEvent {
                     duel_id,
                     duelist_a: challenge.duelist_a,
                     duelist_b: challenge.duelist_b,
                     accepted,
-                });
+                })));
             }
 
             // update challenge state
@@ -275,11 +275,11 @@ mod actions {
                 } else {
                     (challenge.duelist_a)
                 };
-                emit!(self.world(), events::DuelistTurnEvent {
+                emit!(world, (Event::DuelistTurnEvent(events::DuelistTurnEvent {
                     duel_id: challenge.duel_id,
                     duelist_address,
                     round_number: challenge.round_number,
-                });
+                })));
             }
         }
 

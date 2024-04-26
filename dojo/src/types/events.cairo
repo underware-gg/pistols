@@ -22,3 +22,15 @@ struct DuelistTurnEvent {
     duelist_address: ContractAddress,
     round_number: u8,
 }
+
+//
+// Emitted events are idenfified by the event name selector key
+// which can be found like this:
+// $ starkli selector NewChallengeEvent
+// 0x014a0df74df51e02ef8dedabfd1ea9684ea2087bed6370e881b156d7e2e56975
+//
+mod selector {
+    const NewChallengeEvent: felt252 = 0x14a0df74df51e02ef8dedabfd1ea9684ea2087bed6370e881b156d7e2e56975;
+    const ChallengeAcceptedEvent: felt252 = 0x31cdbf7ac39747303190a727df1a270ae5e4f05191f6f58e452ce4eb1e98abe;
+    const DuelistTurnEvent: felt252 = 0x19556e1418f1e7a7e6962eff75d1a46abd50bda431139f855ba85c9119754a4;
+}
