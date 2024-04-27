@@ -1261,8 +1261,8 @@
     {
       "kind": "DojoContract",
       "address": "0x702e255a3446fce9c49df1c579a62fba9e6bfefd4621a437b28c559b68e0f81",
-      "class_hash": "0x282ba0358f3fcb6a86c660419ae018ee0e4e954548743b0c93a040d557512cc",
-      "original_class_hash": "0x282ba0358f3fcb6a86c660419ae018ee0e4e954548743b0c93a040d557512cc",
+      "class_hash": "0x3a74ca23371973bebe0433f7eb584bdc86403e46738d165257fc89b2d99bee0",
+      "original_class_hash": "0x3a74ca23371973bebe0433f7eb584bdc86403e46738d165257fc89b2d99bee0",
       "base_class_hash": "0x679177a2cb757694ac4f326d01052ff0963eac0bc2a17116a2b87badcdf6f76",
       "abi": [
         {
@@ -1323,6 +1323,64 @@
           "type": "impl",
           "name": "ActionsImpl",
           "interface_name": "pistols::systems::actions::IActions"
+        },
+        {
+          "type": "struct",
+          "name": "pistols::models::models::Duelist",
+          "members": [
+            {
+              "name": "address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "profile_pic",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "total_duels",
+              "type": "core::integer::u16"
+            },
+            {
+              "name": "total_wins",
+              "type": "core::integer::u16"
+            },
+            {
+              "name": "total_losses",
+              "type": "core::integer::u16"
+            },
+            {
+              "name": "total_draws",
+              "type": "core::integer::u16"
+            },
+            {
+              "name": "total_honour",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "honour",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "villainy",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "trickery",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "virtue",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "timestamp",
+              "type": "core::integer::u64"
+            }
+          ]
         },
         {
           "type": "struct",
@@ -1407,7 +1465,11 @@
                   "type": "core::integer::u8"
                 }
               ],
-              "outputs": [],
+              "outputs": [
+                {
+                  "type": "pistols::models::models::Duelist"
+                }
+              ],
               "state_mutability": "view"
             },
             {
@@ -1809,6 +1871,33 @@
         },
         {
           "type": "event",
+          "name": "pistols::types::events::DuelistRegistered",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "address",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "data"
+            },
+            {
+              "name": "name",
+              "type": "core::felt252",
+              "kind": "data"
+            },
+            {
+              "name": "profile_pic",
+              "type": "core::integer::u8",
+              "kind": "data"
+            },
+            {
+              "name": "is_new",
+              "type": "core::bool",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
           "name": "pistols::types::events::NewChallengeEvent",
           "kind": "struct",
           "members": [
@@ -1867,7 +1956,7 @@
               "kind": "data"
             },
             {
-              "name": "duelist_address",
+              "name": "address",
               "type": "core::starknet::contract_address::ContractAddress",
               "kind": "data"
             },
@@ -1886,6 +1975,11 @@
             {
               "name": "UpgradeableEvent",
               "type": "dojo::components::upgradeable::upgradeable::Event",
+              "kind": "nested"
+            },
+            {
+              "name": "DuelistRegistered",
+              "type": "pistols::types::events::DuelistRegistered",
               "kind": "nested"
             },
             {
