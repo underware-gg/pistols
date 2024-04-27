@@ -1,4 +1,5 @@
 use starknet::{ContractAddress};
+use pistols::models::models::{Duelist};
 use pistols::types::challenge::{ChallengeState};
 
 // define the interface
@@ -9,7 +10,7 @@ trait IActions {
     fn register_duelist(
         name: felt252,
         profile_pic: u8,
-    );
+    ) -> Duelist;
 
     //
     // Challenge
@@ -81,6 +82,7 @@ mod actions {
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event {
+        DuelistRegistered: events::DuelistRegistered,
         NewChallengeEvent: events::NewChallengeEvent,
         ChallengeAcceptedEvent: events::ChallengeAcceptedEvent,
         DuelistTurnEvent: events::DuelistTurnEvent,
@@ -96,26 +98,31 @@ mod actions {
         fn register_duelist(world: IWorldDispatcher,
             name: felt252,
             profile_pic: u8,
-        ) {
+        ) -> Duelist {
             let caller: ContractAddress = starknet::get_caller_address();
 
             let mut duelist: Duelist = get!(world, caller, Duelist);
+
             // 1st time setup
-            if (duelist.timestamp == 0) {
+            let is_new: bool = (duelist.timestamp == 0);
+            if (is_new) {
                 duelist.timestamp = get_block_timestamp();
             }
+
             // update
             duelist.name = name;
             duelist.profile_pic = profile_pic;
 
-            // emit!(world, (Event::DuelistTurnEvent(events::DuelistTurnEvent {
-            //     duel_id: 0x111,
-            //     duelist_address: starknet::contract_address_const::<0x222>(),
-            //     round_number: 0xff,
-            // })));
-
             set!(world, (duelist));
-            return ();
+
+            emit!(world, (Event::DuelistRegistered(events::DuelistRegistered {
+                address: duelist.address,
+                name: duelist.name,
+                profile_pic: duelist.profile_pic,
+                is_new,
+            })));
+
+            (duelist)
         }
 
         //------------------------
@@ -270,15 +277,11 @@ mod actions {
 
             let state: ChallengeState = challenge.state.try_into().unwrap();
             if (challenge.round_number > round_number && state == ChallengeState::InProgress) {
-                let duelist_address: ContractAddress = if (starknet::get_caller_address() == challenge.duelist_a) {
-                    (challenge.duelist_b)
-                } else {
-                    (challenge.duelist_a)
-                };
+                let is_a: bool = (starknet::get_caller_address() == challenge.duelist_a);
                 emit!(world, (Event::DuelistTurnEvent(events::DuelistTurnEvent {
                     duel_id: challenge.duel_id,
-                    duelist_address,
                     round_number: challenge.round_number,
+                    address: if (is_a) { (challenge.duelist_b) } else { (challenge.duelist_a) },
                 })));
             }
         }
