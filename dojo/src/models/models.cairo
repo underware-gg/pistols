@@ -14,12 +14,12 @@ struct Duelist {
     total_wins: u16,
     total_losses: u16,
     total_draws: u16,
-    total_honour: u32,  // sum of al duels Honour
-    honour: u8,         // 0..100
-    villainy: u8,       // 0..100
-    trickery: u8,       // 0..100
-    virtue: u8,         // 0..100
-    timestamp: u64,     // Unix time, 1st registered
+    total_honour: u32,      // sum of al duels Honour
+    honour: u8,             // 0..100
+    bonus_villain: u8,      // 0..100
+    bonus_trickster: u8,    // 0..100
+    bonus_lord: u8,         // 0..100
+    timestamp: u64,         // Unix time, 1st registered
 } // f + 200 bits
 
 //

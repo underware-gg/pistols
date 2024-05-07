@@ -48,7 +48,7 @@ export function defineContractComponents(world: World) {
     Duelist: (() => {
       return defineComponent(
         world,
-        { address: RecsType.BigInt, name: RecsType.BigInt, profile_pic: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, total_honour: RecsType.Number, honour: RecsType.Number, villainy: RecsType.Number, trickery: RecsType.Number, virtue: RecsType.Number, timestamp: RecsType.BigInt },
+        { address: RecsType.BigInt, name: RecsType.BigInt, profile_pic: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, total_honour: RecsType.Number, honour: RecsType.Number, bonus_villain: RecsType.Number, bonus_trickster: RecsType.Number, bonus_lord: RecsType.Number, timestamp: RecsType.BigInt },
         {
           metadata: {
             name: "Duelist",

@@ -309,29 +309,29 @@ fn update_duelist_honour(ref duelist: Duelist, duel_honour: u8) {
     duelist.total_duels += 1;
     duelist.total_honour += duel_honour.into();
     duelist.honour = ((duelist.total_honour * 10) / duelist.total_duels.into()).try_into().unwrap();
-    duelist.villainy = calc_villainy(duelist.honour);
-    duelist.trickery = calc_trickery(duelist.honour, duel_honour, duelist.trickery);
-    duelist.virtue = calc_virtue(duelist.honour);
+    duelist.bonus_villain = calc_bonus_villain(duelist.honour);
+    duelist.bonus_trickster = calc_bonus_trickster(duelist.honour, duel_honour, duelist.bonus_trickster);
+    duelist.bonus_lord = calc_bonus_lord(duelist.honour);
 }
 #[inline(always)]
-fn calc_villainy(honour: u8) -> u8 {
-    if (honour < constants::TRICKERY_START) {
-        (MathU8::map(honour, constants::VILLAINY_START, constants::TRICKERY_START, 100, 0))
+fn calc_bonus_villain(honour: u8) -> u8 {
+    if (honour < constants::BONUS_TRICKSTER_START) {
+        (MathU8::map(honour, constants::BONUS_VILLAIN_START, constants::BONUS_TRICKSTER_START, 100, 0))
     } else { (0) }
 }
 #[inline(always)]
-fn calc_trickery(honour: u8, duel_honour: u8, current_trickery: u8) -> u8 {
-    if (honour >= constants::TRICKERY_START && honour < constants::VIRTUE_START) {
-        let ti: i16 = MathU8::map(duel_honour, constants::TRICKERY_START, constants::VIRTUE_START, 0, 200).try_into().unwrap() - 100;
+fn calc_bonus_trickster(honour: u8, duel_honour: u8, current_bonus_trickster: u8) -> u8 {
+    if (honour >= constants::BONUS_TRICKSTER_START && honour < constants::BONUS_LORD_START) {
+        let ti: i16 = MathU8::map(duel_honour, constants::BONUS_TRICKSTER_START, constants::BONUS_LORD_START, 0, 200).try_into().unwrap() - 100;
         let td: u8 = MathU16::abs(ti).try_into().unwrap();
         let pyramid: u8 = if (honour <= 50) { (honour) } else { 50 - (honour - 50) }; // minimun as /\
-        ((current_trickery + MathU8::max(td, pyramid)) / 2)
+        ((current_bonus_trickster + MathU8::max(td, pyramid)) / 2)
     } else { (0) }
 }
 #[inline(always)]
-fn calc_virtue(honour: u8) -> u8 {
-    if (honour >= constants::VIRTUE_START) {
-        (MathU8::map(honour, constants::VIRTUE_START-1, 100, 0, 100))
+fn calc_bonus_lord(honour: u8) -> u8 {
+    if (honour >= constants::BONUS_LORD_START) {
+        (MathU8::map(honour, constants::BONUS_LORD_START-1, 100, 0, 100))
     } else { (0) }
 }
 

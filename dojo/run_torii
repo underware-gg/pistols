@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+torii --version
+
 export WORLD_ADDRESS=$(toml get Scarb.toml --raw tool.dojo.env.world_address)
 echo "@WORLD: $WORLD_ADDRESS"
 

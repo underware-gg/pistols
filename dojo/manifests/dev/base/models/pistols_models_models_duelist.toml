@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x35d376427fca9fa5b83ae138826e5b0e5cd29b39034e8029fa33f0b7e624165"
-original_class_hash = "0x35d376427fca9fa5b83ae138826e5b0e5cd29b39034e8029fa33f0b7e624165"
+class_hash = "0x2083602c3408fdb4e52dcfca44ad3e43efe9dcfb6892e7c92d6f24fd66ce1dd"
+original_class_hash = "0x2083602c3408fdb4e52dcfca44ad3e43efe9dcfb6892e7c92d6f24fd66ce1dd"
 abi = "manifests/dev/abis/base/models/pistols_models_models_duelist.json"
 name = "pistols::models::models::duelist"
 
@@ -50,17 +50,17 @@ type = "u8"
 key = false
 
 [[members]]
-name = "villainy"
+name = "bonus_villain"
 type = "u8"
 key = false
 
 [[members]]
-name = "trickery"
+name = "bonus_trickster"
 type = "u8"
 key = false
 
 [[members]]
-name = "virtue"
+name = "bonus_lord"
 type = "u8"
 key = false
 

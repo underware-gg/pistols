@@ -1261,8 +1261,8 @@
     {
       "kind": "DojoContract",
       "address": "0x702e255a3446fce9c49df1c579a62fba9e6bfefd4621a437b28c559b68e0f81",
-      "class_hash": "0x3a74ca23371973bebe0433f7eb584bdc86403e46738d165257fc89b2d99bee0",
-      "original_class_hash": "0x3a74ca23371973bebe0433f7eb584bdc86403e46738d165257fc89b2d99bee0",
+      "class_hash": "0x3bd4488cf6b18e17f44e00069b877f2adb2c3ae524f4b63da749e2e44ac4aad",
+      "original_class_hash": "0x3bd4488cf6b18e17f44e00069b877f2adb2c3ae524f4b63da749e2e44ac4aad",
       "base_class_hash": "0x679177a2cb757694ac4f326d01052ff0963eac0bc2a17116a2b87badcdf6f76",
       "abi": [
         {
@@ -1365,15 +1365,15 @@
               "type": "core::integer::u8"
             },
             {
-              "name": "villainy",
+              "name": "bonus_villain",
               "type": "core::integer::u8"
             },
             {
-              "name": "trickery",
+              "name": "bonus_trickster",
               "type": "core::integer::u8"
             },
             {
-              "name": "virtue",
+              "name": "bonus_lord",
               "type": "core::integer::u8"
             },
             {
@@ -3280,17 +3280,17 @@
           "key": false
         },
         {
-          "name": "villainy",
+          "name": "bonus_villain",
           "type": "u8",
           "key": false
         },
         {
-          "name": "trickery",
+          "name": "bonus_trickster",
           "type": "u8",
           "key": false
         },
         {
-          "name": "virtue",
+          "name": "bonus_lord",
           "type": "u8",
           "key": false
         },
@@ -3300,8 +3300,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x35d376427fca9fa5b83ae138826e5b0e5cd29b39034e8029fa33f0b7e624165",
-      "original_class_hash": "0x35d376427fca9fa5b83ae138826e5b0e5cd29b39034e8029fa33f0b7e624165",
+      "class_hash": "0x2083602c3408fdb4e52dcfca44ad3e43efe9dcfb6892e7c92d6f24fd66ce1dd",
+      "original_class_hash": "0x2083602c3408fdb4e52dcfca44ad3e43efe9dcfb6892e7c92d6f24fd66ce1dd",
       "abi": [
         {
           "type": "impl",
@@ -3517,15 +3517,15 @@
               "type": "core::integer::u8"
             },
             {
-              "name": "villainy",
+              "name": "bonus_villain",
               "type": "core::integer::u8"
             },
             {
-              "name": "trickery",
+              "name": "bonus_trickster",
               "type": "core::integer::u8"
             },
             {
-              "name": "virtue",
+              "name": "bonus_lord",
               "type": "core::integer::u8"
             },
             {
