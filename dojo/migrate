@@ -47,6 +47,7 @@ scripts/default_auth.sh $PROFILE
 #------------------------
 # copy manifest to client
 #
+echo "Copying manifest [$MANIFEST_FILE_PATH] to [$CLIENT_MANIFEST_PATH/]"
 mkdir -p $CLIENT_MANIFEST_PATH
 cp $MANIFEST_FILE_PATH $CLIENT_MANIFEST_PATH/
 

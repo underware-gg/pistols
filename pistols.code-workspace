@@ -19,6 +19,7 @@
     },
     "search.exclude": {
       "**/*-lock.json": true,
+      "**/*-lock.yaml": true,
       "**/*.lock": true,
       "**/artifacts/**/*.json": true,
       "**/contracts/**/*.json": true,

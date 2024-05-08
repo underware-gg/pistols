@@ -21,12 +21,9 @@ sierra-replace-ids = true
 
 [dependencies]
 # dojo = { git = "https://github.com/dojoengine/dojo", rev = "01eab985a3f5056e47cc7b4753ca24f64d3a078a" }
-dojo = { git = "https://github.com/dojoengine/dojo", tag = "v0.6.0" }
-# dojo = { git = "https://github.com/dojoengine/dojo", tag = "v0.6.1-alpha.1" }
-
-# token = { git = "https://github.com/dojoengine/origami", tag = "v0.6.0" }
-token = { git = "https://github.com/notV4l/origami", rev = "32e225f40f26a1e9729f6baa068ee1b212550080" } # v0.6.0
-# token = { git = "https://github.com/notV4l/origami", branch = "erc_without_events" } # 0.6.1-alpha.1
+# dojo = { git = "https://github.com/dojoengine/dojo", branch = "branch_name" }
+dojo = { git = "https://github.com/dojoengine/dojo", tag = "v0.7.0-alpha.1" }
+token = { git = "https://github.com/dojoengine/origami", tag = "v0.7.0-alpha.1" }
 
 
 [tool.dojo]
@@ -43,7 +40,7 @@ build-external-contracts = [
 ]
 
 [tool.dojo.env]
-world_address = "0x10923ed11da790f94efd6f68c5558f5f604df0ff2ff776bd5209b7ebb8985b8"
+world_address = "0x5ceff437958efcf79a58f82c42cf7cc9dc268c7d13b61fef2ba89d17f5390df"
 
 [profile.dev.tool.dojo.env]
 rpc_url = "http://localhost:5050"

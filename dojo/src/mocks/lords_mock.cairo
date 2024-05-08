@@ -1,40 +1,43 @@
 use starknet::{ContractAddress, ClassHash};
 use dojo::world::IWorldDispatcher;
 
-#[dojo::interface]
-trait ILordsMock {
+#[starknet::interface]
+trait ILordsMock<TState> {
+    // IWorldProvider
+    fn world(self: @TState) -> IWorldDispatcher;
+
     // IUpgradeable
-    fn upgrade(new_class_hash: ClassHash);
+    fn upgrade(ref self: TState, new_class_hash: ClassHash);
 
     // IERC20Metadata
-    fn decimals() -> u8;
-    fn name() -> felt252;
-    fn symbol() -> felt252;
+    fn decimals(self: @TState) -> u8;
+    fn name(self: @TState) -> felt252;
+    fn symbol(self: @TState) -> felt252;
 
     // IERC20MetadataTotalSupply
-    fn total_supply() -> u256;
+    fn total_supply(self: @TState) -> u256;
 
     // IERC20MetadataTotalSupplyCamel
-    fn totalSupply() -> u256;
+    fn totalSupply(self: @TState) -> u256;
 
     // IERC20Balance
-    fn balance_of( account: ContractAddress) -> u256;
-    fn transfer(recipient: ContractAddress, amount: u256) -> bool;
-    fn transfer_from(sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool;
+    fn balance_of(self: @TState, account: ContractAddress) -> u256;
+    fn transfer(ref self: TState,recipient: ContractAddress, amount: u256) -> bool;
+    fn transfer_from(ref self: TState, sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool;
 
     // IERC20BalanceCamel
-    fn balanceOf( account: ContractAddress) -> u256;
-    fn transferFrom(sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool;
+    fn balanceOf(self: @TState, account: ContractAddress) -> u256;
+    fn transferFrom(ref self: TState, sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool;
 
     // IERC20Allowance
-    fn allowance( owner: ContractAddress, spender: ContractAddress) -> u256;
-    fn approve(spender: ContractAddress, amount: u256) -> bool;
+    fn allowance(self: @TState, owner: ContractAddress, spender: ContractAddress) -> u256;
+    fn approve(ref self: TState, spender: ContractAddress, amount: u256) -> bool;
 
     // WITHOUT INTERFACE !!!
-    fn initializer();
-    fn is_initialized() -> bool;
-    fn faucet();
-    fn dojo_resource() -> felt252;
+    fn initializer(ref self: TState);
+    fn is_initialized(self: @TState) -> bool;
+    fn faucet(ref self: TState);
+    // fn dojo_resource(ref self: TState) -> felt252;
 }
 
 
@@ -42,18 +45,18 @@ trait ILordsMock {
 /// Interface required to remove compiler warnings and future
 /// deprecation.
 ///
-#[dojo::interface]
-trait ILordsMockInitializer {
-    fn initializer();
-    fn is_initialized() -> bool;
+#[starknet::interface]
+trait ILordsMockInitializer<TState> {
+    fn initializer(ref self: TState);
+    fn is_initialized(self: @TState) -> bool;
 }
 
-#[dojo::interface]
-trait ILordsMockFaucet {
-    fn faucet();
+#[starknet::interface]
+trait ILordsMockFaucet<TState> {
+    fn faucet(ref self: TState);
 }
 
-#[dojo::contract]
+#[dojo::contract(allow_ref_self)]
 mod lords_mock {
     use token::erc20::interface;
     use integer::BoundedInt;
@@ -146,9 +149,9 @@ mod lords_mock {
 
     #[abi(embed_v0)]
     impl LordsMockInitializerImpl of super::ILordsMockInitializer<ContractState> {
-        fn initializer(world: IWorldDispatcher) {
+        fn initializer(ref self: ContractState) {
             assert(
-                world.is_owner(get_caller_address(), get_contract_address().into()),
+                self.world().is_owner(get_caller_address(), get_contract_address().into()),
                 Errors::CALLER_IS_NOT_OWNER
             );
 
@@ -157,7 +160,7 @@ mod lords_mock {
 
             self.initializable.initialize();
         }
-        fn is_initialized() -> bool {
+        fn is_initialized(self: @ContractState) -> bool {
             (self.erc20_metadata.symbol() != '')
         }
     }
@@ -170,7 +173,7 @@ mod lords_mock {
 
     #[abi(embed_v0)]
     impl LordsMockFaucetImpl of super::ILordsMockFaucet<ContractState> {
-        fn faucet() {
+        fn faucet(ref self: ContractState) {
             self.erc20_mintable.mint(get_caller_address(), 10_000 * ETH_TO_WEI);
         }
     }
