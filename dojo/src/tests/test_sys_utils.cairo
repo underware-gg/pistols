@@ -171,8 +171,8 @@ mod tests {
     fn test_calc_bonus_villain() {
         assert(utils::calc_bonus_villain(0) == 100, 'honour_0');
         assert(utils::calc_bonus_villain(constants::BONUS_VILLAIN_START) == 100, 'BONUS_VILLAIN_START');
-        assert(utils::calc_bonus_villain(20) == 67, 'honour_20');
-        assert(utils::calc_bonus_villain(30) == 34, 'honour_30');
+        assert(utils::calc_bonus_villain(10) == 67, 'honour_10');
+        assert(utils::calc_bonus_villain(20) == 34, 'honour_20');
         assert(utils::calc_bonus_villain(constants::BONUS_TRICKSTER_START-1) > 0, 'BONUS_TRICKSTER_START-1');
         //-------
         assert(utils::calc_bonus_villain(constants::BONUS_TRICKSTER_START) == 0, 'BONUS_TRICKSTER_START');
@@ -186,8 +186,8 @@ mod tests {
         (v > min && v < max)
     }
 
-    fn _assert_trickstry(honour: u8, duel_honour: u8, current_bonus_trickster: u8, min: u8, max: u8, prefix: felt252) {
-        let bonus_trickster: u8 = utils::calc_bonus_trickster(honour, duel_honour, current_bonus_trickster);
+    fn _assert_trickstry(honour: u8, duel_honour: u8, min: u8, max: u8, prefix: felt252) {
+        let bonus_trickster: u8 = utils::calc_bonus_trickster(honour, duel_honour);
         assert(bonus_trickster >= min, String::concat(prefix, '_min'));
         assert(bonus_trickster <= max, String::concat(prefix, '_max'));
         // assert(bonus_trickster > 30, String::concat(prefix, '_30'));
@@ -197,12 +197,12 @@ mod tests {
     #[available_gas(100_000_000)]
     fn test_calc_bonus_trickster() {
         
-        assert(utils::calc_bonus_trickster(10, 100, 100) == 0, 'honour_10');
-        assert(utils::calc_bonus_trickster(constants::BONUS_TRICKSTER_START-1, 100, 100) == 0, 'BONUS_TRICKSTER_START-1');
-        assert(utils::calc_bonus_trickster(constants::BONUS_TRICKSTER_START-1, 0, 0) == 0, 'BONUS_TRICKSTER_START-1_00');
+        assert(utils::calc_bonus_trickster(10, 100) == 0, 'honour_10');
+        assert(utils::calc_bonus_trickster(constants::BONUS_TRICKSTER_START-1, 100) == 0, 'BONUS_TRICKSTER_START-1');
+        assert(utils::calc_bonus_trickster(constants::BONUS_TRICKSTER_START-1, 0) == 0, 'BONUS_TRICKSTER_START-1_00');
         //-------
-        assert(utils::calc_bonus_trickster(constants::BONUS_TRICKSTER_START, 100, 100) > 0, 'BONUS_TRICKSTER_START');
-        assert(utils::calc_bonus_trickster(constants::BONUS_TRICKSTER_START, 0, 0) > 0, 'BONUS_TRICKSTER_START_00');
+        assert(utils::calc_bonus_trickster(constants::BONUS_TRICKSTER_START, 100) > 0, 'BONUS_TRICKSTER_START');
+        assert(utils::calc_bonus_trickster(constants::BONUS_TRICKSTER_START, 0) > 0, 'BONUS_TRICKSTER_START_00');
 
         // let t: u8 = constants::BONUS_TRICKSTER_START;
 
@@ -215,12 +215,12 @@ mod tests {
 
 
 
-        assert(utils::calc_bonus_trickster(constants::BONUS_LORD_START-1, 100, 100) > 0, 'BONUS_LORD_START-1');
-        assert(utils::calc_bonus_trickster(constants::BONUS_LORD_START-1-1, 0, 0) > 0, 'BONUS_LORD_START-1_00');
+        assert(utils::calc_bonus_trickster(constants::BONUS_LORD_START-1, 100) > 0, 'BONUS_LORD_START-1');
+        assert(utils::calc_bonus_trickster(constants::BONUS_LORD_START-1-1, 0) > 0, 'BONUS_LORD_START-1_00');
         //-------
-        assert(utils::calc_bonus_trickster(constants::BONUS_LORD_START, 100, 100) == 0, 'BONUS_LORD_START');
-        assert(utils::calc_bonus_trickster(constants::BONUS_LORD_START, 0, 0) == 0, 'BONUS_LORD_START_00');
-        assert(utils::calc_bonus_trickster(100, 100, 100) == 0, 'honour_100');
+        assert(utils::calc_bonus_trickster(constants::BONUS_LORD_START, 100) == 0, 'BONUS_LORD_START');
+        assert(utils::calc_bonus_trickster(constants::BONUS_LORD_START, 0) == 0, 'BONUS_LORD_START_00');
+        assert(utils::calc_bonus_trickster(100, 100) == 0, 'honour_100');
     }
 
     #[test]

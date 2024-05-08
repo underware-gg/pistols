@@ -7,9 +7,10 @@ mod constants {
     const FULL_HONOUR: u8 = 100;
 
     // archetype ranges
-    const BONUS_VILLAIN_START: u8 = 10;
-    const BONUS_TRICKSTER_START: u8 = 40;
+    const BONUS_VILLAIN_START: u8 = 0;
+    const BONUS_TRICKSTER_START: u8 = 30;
     const BONUS_LORD_START: u8 = 80;
+    const BONUS_HALFWAY: u8 = 50;
     
     // initial health of a player on a duel
     const FULL_HEALTH: u8 = 3;
