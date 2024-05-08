@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x733ce322dd5d77fdb68ab997891a0a46834003fb3e5f12052f8f6227083ff72"
-original_class_hash = "0x733ce322dd5d77fdb68ab997891a0a46834003fb3e5f12052f8f6227083ff72"
+class_hash = "0x53e594213e62f41661a15c95038f89ae4c6cefe271eed0350503eee6a7c10b0"
+original_class_hash = "0x53e594213e62f41661a15c95038f89ae4c6cefe271eed0350503eee6a7c10b0"
 abi = "manifests/dev/abis/base/models/pistols_models_coins_coin.json"
 name = "pistols::models::coins::coin"
 

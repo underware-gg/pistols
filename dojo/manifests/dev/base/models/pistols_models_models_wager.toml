@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x50668cca4fde9d2bc5a65daca7bf51ff6e38159be49541322b06dfd4d479dce"
-original_class_hash = "0x50668cca4fde9d2bc5a65daca7bf51ff6e38159be49541322b06dfd4d479dce"
+class_hash = "0x54e599d573bd64aaa0163d0568f1ad3e0f7d70129ac40506b27571a31ff71b0"
+original_class_hash = "0x54e599d573bd64aaa0163d0568f1ad3e0f7d70129ac40506b27571a31ff71b0"
 abi = "manifests/dev/abis/base/models/pistols_models_models_wager.json"
 name = "pistols::models::models::wager"
 
