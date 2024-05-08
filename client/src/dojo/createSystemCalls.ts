@@ -189,15 +189,15 @@ export function createSystemCalls(
     return results !== null ? Number(results[0]) : null
   }
 
-  const calc_glance_chances = async (duelist: bigint, duel_id: bigint, round_number: number, action): Promise<number | null> => {
+  const simulate_glance_chances = async (duelist: bigint, duel_id: bigint, round_number: number, action): Promise<number | null> => {
     const args = [duelist, duel_id, round_number, action]
-    const results = await _executeCall(actions_call('calc_glance_chances', args))
+    const results = await _executeCall(actions_call('simulate_glance_chances', args))
     return results !== null ? Number(results[0]) : null
   }
 
-  const calc_honour_for_action = async (duelist: bigint, action: number): Promise<number | null> => {
+  const simulate_honour_for_action = async (duelist: bigint, action: number): Promise<number | null> => {
     const args = [duelist, action]
-    const results = await _executeCall(actions_call('calc_honour_for_action', args))
+    const results = await _executeCall(actions_call('simulate_honour_for_action', args))
     return (results !== null && results[0] >= 0) ? Number(results[0]) : null
   }
 
@@ -231,8 +231,8 @@ export function createSystemCalls(
     calc_hit_penalty,
     calc_hit_chances,
     calc_crit_chances,
-    calc_glance_chances,
-    calc_honour_for_action,
+    simulate_glance_chances,
+    simulate_honour_for_action,
     get_valid_packed_actions,
     // pack_action_slots,
     // unpack_action_slots,

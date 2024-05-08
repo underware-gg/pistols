@@ -364,18 +364,6 @@ fn calc_crit_chances(world: IWorldDispatcher, duelist_address: ContractAddress, 
     let bonus: u8 = calc_hit_bonus(world, duelist_address);
     (apply_chance_bonus_penalty(chances, bonus, 0))
 }
-fn calc_glance_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
-    let chances: u8 = action.glance_chance();
-    (chances)
-}
-fn calc_honour_for_action(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action) -> (i8, u8) {
-    let mut duelist: Duelist = get!(world, duelist_address, Duelist);
-    let action_honour: i8 = action.honour();
-    if (action_honour >= 0) {
-        update_duelist_honour(ref duelist, MathU8::abs(action_honour));
-    }
-    (action_honour, duelist.honour)
-}
 
 fn calc_hit_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> u8 {
     let duelist: Duelist = get!(world, duelist_address, Duelist);
@@ -388,6 +376,20 @@ fn calc_hit_penalty(world: IWorldDispatcher, health: u8) -> u8 {
 fn apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
     let mut result: u8 = MathU8::sub(chance + bonus, penalty);
     (MathU8::clamp(result, chance / 2, 100))
+}
+
+// used for system read calls only
+fn simulate_glance_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
+    let chances: u8 = action.glance_chance();
+    (chances)
+}
+fn simulate_honour_for_action(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action) -> (i8, u8) {
+    let mut duelist: Duelist = get!(world, duelist_address, Duelist);
+    let action_honour: i8 = action.honour();
+    if (action_honour >= 0) {
+        update_duelist_honour(ref duelist, MathU8::abs(action_honour));
+    }
+    (action_honour, duelist.honour)
 }
 
 

@@ -76,11 +76,11 @@ export const useCalcCritChances = (address: BigNumberish, duelId: bigint, roundN
 
 export const useCalcGlanceChances = (address: BigNumberish, duelId: bigint, roundNumber: number, action: number, defaultValue = null) => {
   const [value, setValue] = useState(defaultValue)
-  const { calc_glance_chances } = useDojoSystemCalls()
+  const { simulate_glance_chances } = useDojoSystemCalls()
   useEffect(() => {
     let _mounted = true
     const _get = async () => {
-      const value = await calc_glance_chances(BigInt(address), duelId, roundNumber, action)
+      const value = await simulate_glance_chances(BigInt(address), duelId, roundNumber, action)
       if (_mounted) setValue(value)
     }
     if (address != null && duelId && roundNumber && action != null) _get()
@@ -94,11 +94,11 @@ export const useCalcGlanceChances = (address: BigNumberish, duelId: bigint, roun
 
 export const useCalcHonourForAction = (address: BigNumberish, action: number, defaultValue = null) => {
   const [value, setValue] = useState(defaultValue)
-  const { calc_honour_for_action } = useDojoSystemCalls()
+  const { simulate_honour_for_action } = useDojoSystemCalls()
   useEffect(() => {
     let _mounted = true
     const _get = async () => {
-      const value = await calc_honour_for_action(BigInt(address), action)
+      const value = await simulate_honour_for_action(BigInt(address), action)
       if (_mounted) setValue(value)
     }
     if (address != null && action != null) _get()

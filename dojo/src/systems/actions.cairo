@@ -53,8 +53,8 @@ trait IActions {
 
     fn calc_hit_chances(duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8;
     fn calc_crit_chances(duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8;
-    fn calc_glance_chances(duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8;
-    fn calc_honour_for_action(duelist_address: ContractAddress, action: u8) -> (i8, u8);
+    fn simulate_glance_chances(duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8;
+    fn simulate_honour_for_action(duelist_address: ContractAddress, action: u8) -> (i8, u8);
 
     fn get_valid_packed_actions(round_number: u8) -> Array<u16>;
     fn pack_action_slots(slot1: u8, slot2: u8) -> u16;
@@ -322,12 +322,12 @@ mod actions {
             let health: u8 = utils::get_duelist_health(world, duelist_address, duel_id, round_number);
             (utils::calc_crit_chances(world, duelist_address, action.into(), health))
         }
-        fn calc_glance_chances(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8 {
+        fn simulate_glance_chances(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8 {
             let health: u8 = utils::get_duelist_health(world, duelist_address, duel_id, round_number);
-            (utils::calc_glance_chances(world, duelist_address, action.into(), health))
+            (utils::simulate_glance_chances(world, duelist_address, action.into(), health))
         }
-        fn calc_honour_for_action(world: IWorldDispatcher, duelist_address: ContractAddress, action: u8) -> (i8, u8) {
-            (utils::calc_honour_for_action(world, duelist_address, action.into()))
+        fn simulate_honour_for_action(world: IWorldDispatcher, duelist_address: ContractAddress, action: u8) -> (i8, u8) {
+            (utils::simulate_honour_for_action(world, duelist_address, action.into()))
         }
 
         fn get_valid_packed_actions(round_number: u8) -> Array<u16> {
