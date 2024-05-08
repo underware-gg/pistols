@@ -316,8 +316,8 @@ fn update_duelist_honour(ref duelist: Duelist, duel_honour: u8) {
 // Villain bonus: the less honour, more bonus
 #[inline(always)]
 fn calc_bonus_villain(honour: u8) -> u8 {
-    if (honour < constants::BONUS_TRICKSTER_START) {
-        (MathU8::map(honour, constants::BONUS_VILLAIN_START, constants::BONUS_TRICKSTER_START, 100, 0))
+    if (honour < constants::ARCH_TRICKSTER_START) {
+        (MathU8::map(honour, constants::ARCH_VILLAIN_START, constants::ARCH_TRICKSTER_START, 100, 0))
     } else { (0) }
 }
 // Trickster bonus: the max of...
@@ -325,18 +325,18 @@ fn calc_bonus_villain(honour: u8) -> u8 {
 // cap halfway without going to zero (shaped as a /\)
 #[inline(always)]
 fn calc_bonus_trickster(honour: u8, duel_honour: u8) -> u8 {
-    if (honour >= constants::BONUS_TRICKSTER_START && honour < constants::BONUS_LORD_START) {
-        let ti: i16 = MathU8::map(duel_honour, constants::BONUS_VILLAIN_START, 100, 0, 200).try_into().unwrap() - 100;
+    if (honour >= constants::ARCH_TRICKSTER_START && honour < constants::ARCH_LORD_START) {
+        let ti: i16 = MathU8::map(duel_honour, constants::ARCH_VILLAIN_START, 100, 0, 200).try_into().unwrap() - 100;
         let td: u8 = MathU16::abs(ti).try_into().unwrap();
-        let halfway: u8 = if (duel_honour <= constants::BONUS_HALFWAY) { (duel_honour) } else { constants::BONUS_HALFWAY - (duel_honour - constants::BONUS_HALFWAY) }; // minimun as /\
+        let halfway: u8 = if (duel_honour <= constants::ARCH_HALFWAY) { (duel_honour) } else { constants::ARCH_HALFWAY - (duel_honour - constants::ARCH_HALFWAY) }; // minimun as /\
         (MathU8::max(td, halfway))
     } else { (0) }
 }
 // Lord bonus: the more honour, more bonus
 #[inline(always)]
 fn calc_bonus_lord(honour: u8) -> u8 {
-    if (honour >= constants::BONUS_LORD_START) {
-        (MathU8::map(honour, constants::BONUS_LORD_START-1, 100, 0, 100))
+    if (honour >= constants::ARCH_LORD_START) {
+        (MathU8::map(honour, constants::ARCH_LORD_START-1, 100, 0, 100))
     } else { (0) }
 }
 // Always average with the current trickster bonus

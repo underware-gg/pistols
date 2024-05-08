@@ -170,12 +170,12 @@ mod tests {
     #[available_gas(100_000_000)]
     fn test_calc_bonus_villain() {
         assert(utils::calc_bonus_villain(0) == 100, 'honour_0');
-        assert(utils::calc_bonus_villain(constants::BONUS_VILLAIN_START) == 100, 'BONUS_VILLAIN_START');
+        assert(utils::calc_bonus_villain(constants::ARCH_VILLAIN_START) == 100, 'ARCH_VILLAIN_START');
         assert(utils::calc_bonus_villain(10) == 67, 'honour_10');
         assert(utils::calc_bonus_villain(20) == 34, 'honour_20');
-        assert(utils::calc_bonus_villain(constants::BONUS_TRICKSTER_START-1) > 0, 'BONUS_TRICKSTER_START-1');
+        assert(utils::calc_bonus_villain(constants::ARCH_TRICKSTER_START-1) > 0, 'ARCH_TRICKSTER_START-1');
         //-------
-        assert(utils::calc_bonus_villain(constants::BONUS_TRICKSTER_START) == 0, 'BONUS_TRICKSTER_START');
+        assert(utils::calc_bonus_villain(constants::ARCH_TRICKSTER_START) == 0, 'ARCH_TRICKSTER_START');
         assert(utils::calc_bonus_villain(100) == 0, 'honour_100');
     }
 
@@ -198,13 +198,13 @@ mod tests {
     fn test_calc_bonus_trickster() {
         
         assert(utils::calc_bonus_trickster(10, 100) == 0, 'honour_10');
-        assert(utils::calc_bonus_trickster(constants::BONUS_TRICKSTER_START-1, 100) == 0, 'BONUS_TRICKSTER_START-1');
-        assert(utils::calc_bonus_trickster(constants::BONUS_TRICKSTER_START-1, 0) == 0, 'BONUS_TRICKSTER_START-1_00');
+        assert(utils::calc_bonus_trickster(constants::ARCH_TRICKSTER_START-1, 100) == 0, 'ARCH_TRICKSTER_START-1');
+        assert(utils::calc_bonus_trickster(constants::ARCH_TRICKSTER_START-1, 0) == 0, 'ARCH_TRICKSTER_START-1_00');
         //-------
-        assert(utils::calc_bonus_trickster(constants::BONUS_TRICKSTER_START, 100) > 0, 'BONUS_TRICKSTER_START');
-        assert(utils::calc_bonus_trickster(constants::BONUS_TRICKSTER_START, 0) > 0, 'BONUS_TRICKSTER_START_00');
+        assert(utils::calc_bonus_trickster(constants::ARCH_TRICKSTER_START, 100) > 0, 'ARCH_TRICKSTER_START');
+        assert(utils::calc_bonus_trickster(constants::ARCH_TRICKSTER_START, 0) > 0, 'ARCH_TRICKSTER_START_00');
 
-        // let t: u8 = constants::BONUS_TRICKSTER_START;
+        // let t: u8 = constants::ARCH_TRICKSTER_START;
 
         // _assert_trickstry(100, 100, 0, 50, 50, 't_001');
         // _assert_trickstry(100, 100, 100, 100, 100, 't_002');
@@ -215,11 +215,11 @@ mod tests {
 
 
 
-        assert(utils::calc_bonus_trickster(constants::BONUS_LORD_START-1, 100) > 0, 'BONUS_LORD_START-1');
-        assert(utils::calc_bonus_trickster(constants::BONUS_LORD_START-1-1, 0) > 0, 'BONUS_LORD_START-1_00');
+        assert(utils::calc_bonus_trickster(constants::ARCH_LORD_START-1, 100) > 0, 'ARCH_LORD_START-1');
+        assert(utils::calc_bonus_trickster(constants::ARCH_LORD_START-1-1, 0) > 0, 'ARCH_LORD_START-1_00');
         //-------
-        assert(utils::calc_bonus_trickster(constants::BONUS_LORD_START, 100) == 0, 'BONUS_LORD_START');
-        assert(utils::calc_bonus_trickster(constants::BONUS_LORD_START, 0) == 0, 'BONUS_LORD_START_00');
+        assert(utils::calc_bonus_trickster(constants::ARCH_LORD_START, 100) == 0, 'ARCH_LORD_START');
+        assert(utils::calc_bonus_trickster(constants::ARCH_LORD_START, 0) == 0, 'ARCH_LORD_START_00');
         assert(utils::calc_bonus_trickster(100, 100) == 0, 'honour_100');
     }
 
@@ -227,9 +227,9 @@ mod tests {
     #[available_gas(100_000_000)]
     fn test_calc_bonus_lord() {
         assert(utils::calc_bonus_lord(10) == 0, 'honour_10');
-        assert(utils::calc_bonus_lord(constants::BONUS_LORD_START-1) == 0, 'BONUS_LORD_START');
+        assert(utils::calc_bonus_lord(constants::ARCH_LORD_START-1) == 0, 'ARCH_LORD_START');
         //-------
-        assert(utils::calc_bonus_lord(constants::BONUS_LORD_START) > 0, 'BONUS_LORD_START');
+        assert(utils::calc_bonus_lord(constants::ARCH_LORD_START) > 0, 'ARCH_LORD_START');
         assert(utils::calc_bonus_lord(90) == 52, 'honour_90');
         assert(utils::calc_bonus_lord(99) == 95, 'honour_99');
         assert(utils::calc_bonus_lord(100) == 100, 'honour_100');
