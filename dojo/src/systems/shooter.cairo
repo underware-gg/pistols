@@ -211,9 +211,9 @@ mod shooter {
 
     fn apply_action_honour(ref shot: Shot) -> Action {
         let action: Action = shot.action.into();
-        let honour: u8 = action.honour();
-        if (honour != 0) {
-            shot.honour = honour;
+        let action_honour: i8 = action.honour();
+        if (action_honour >= 0) {
+            shot.honour = MathU8::abs(action_honour);
         }
         (action)
     }

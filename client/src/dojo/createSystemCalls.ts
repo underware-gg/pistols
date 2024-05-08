@@ -198,7 +198,7 @@ export function createSystemCalls(
   const calc_honour_for_action = async (duelist: bigint, action: number): Promise<number | null> => {
     const args = [duelist, action]
     const results = await _executeCall(actions_call('calc_honour_for_action', args))
-    return results !== null ? Number(results[0]) : null
+    return (results !== null && results[0] >= 0) ? Number(results[0]) : null
   }
 
   const get_valid_packed_actions = async (round_number: number): Promise<number[] | null> => {

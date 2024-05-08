@@ -82,7 +82,7 @@ trait ActionTrait {
     fn crit_chance(self: Action) -> u8;
     fn hit_chance(self: Action) -> u8;
     fn glance_chance(self: Action) -> u8;
-    fn honour(self: Action) -> u8;
+    fn honour(self: Action) -> i8;
     fn roll_priority(self: Action, other: Action) -> i8;
     fn execute_crit(self: Action, ref self_shot: Shot, ref other_shot: Shot) -> bool;
     fn execute_hit(self: Action, ref self_shot: Shot, ref other_shot: Shot);
@@ -195,9 +195,9 @@ impl ActionTraitImpl of ActionTrait {
     //------------------
     // Honour per Action
     //
-    fn honour(self: Action) -> u8 {
+    fn honour(self: Action) -> i8 {
         match self {
-            Action::Idle =>         0, // do not affect honour
+            Action::Idle =>         -1, // do not affect honour
             Action::Paces1 =>       self.into(),
             Action::Paces2 =>       self.into(),
             Action::Paces3 =>       self.into(),
@@ -208,11 +208,11 @@ impl ActionTraitImpl of ActionTrait {
             Action::Paces8 =>       self.into(),
             Action::Paces9 =>       self.into(),
             Action::Paces10 =>      self.into(),
-            Action::FastBlade =>    0, // do not affect honour
-            Action::SlowBlade =>    0, // do not affect honour
-            Action::Block =>        0, // do not affect honour
-            Action::Flee =>         1,
-            Action::Steal =>        1,
+            Action::FastBlade =>    -1, // do not affect honour
+            Action::SlowBlade =>    -1, // do not affect honour
+            Action::Block =>        -1, // do not affect honour
+            Action::Flee =>         0,
+            Action::Steal =>        0,
             Action::Seppuku =>      10,
         }
     }

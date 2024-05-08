@@ -368,11 +368,13 @@ fn calc_glance_chances(world: IWorldDispatcher, duelist_address: ContractAddress
     let chances: u8 = action.glance_chance();
     (chances)
 }
-fn calc_honour_for_action(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action) -> (u8, u8) {
+fn calc_honour_for_action(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action) -> (i8, u8) {
     let mut duelist: Duelist = get!(world, duelist_address, Duelist);
-    let duel_honour: u8 = action.honour();
-    update_duelist_honour(ref duelist, duel_honour);
-    (duel_honour, duelist.honour)
+    let action_honour: i8 = action.honour();
+    if (action_honour >= 0) {
+        update_duelist_honour(ref duelist, MathU8::abs(action_honour));
+    }
+    (action_honour, duelist.honour)
 }
 
 fn calc_hit_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> u8 {

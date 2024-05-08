@@ -72,16 +72,17 @@ mod tests {
             }
             let action: Action = n.into();
             if (action != Action::Idle) {
-                let is_pace = action.is_paces();
-                let honour = action.honour();
+                let is_pace: bool = action.is_paces();
+                let action_honour: i8 = action.honour();
                 if (is_pace) {
-                    assert(honour == n, 'action.honour');
+                    assert(action_honour > 0, 'action.honour > 0');
+                    assert(MathU8::abs(action_honour) == n, 'action.honour == paces');
                 } else if (action == Action::Seppuku) {
-                    assert(honour == 10, 'action.honour == 10');
+                    assert(action_honour == 10, 'action.honour == 10');
                 } else if (action.is_runner()) {
-                    assert(honour == 1, 'action.honour == 1');
+                    assert(action_honour == 0, 'action.honour == 0');
                 } else {
-                    assert(honour == 0, 'action.honour == 0');
+                    assert(action_honour < 0, 'action.honour < 0');
                 }
             }
             n += 1;

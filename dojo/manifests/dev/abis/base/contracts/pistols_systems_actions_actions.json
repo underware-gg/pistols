@@ -497,7 +497,7 @@
         ],
         "outputs": [
           {
-            "type": "(core::integer::u8, core::integer::u8)"
+            "type": "(core::integer::i8, core::integer::u8)"
           }
         ],
         "state_mutability": "view"
