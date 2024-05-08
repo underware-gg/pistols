@@ -82,7 +82,7 @@ mod actions {
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event {
-        DuelistRegistered: events::DuelistRegistered,
+        DuelistRegisteredEvent: events::DuelistRegisteredEvent,
         NewChallengeEvent: events::NewChallengeEvent,
         ChallengeAcceptedEvent: events::ChallengeAcceptedEvent,
         DuelistTurnEvent: events::DuelistTurnEvent,
@@ -115,7 +115,7 @@ mod actions {
 
             set!(world, (duelist));
 
-            emit!(world, (Event::DuelistRegistered(events::DuelistRegistered {
+            emit!(world, (Event::DuelistRegisteredEvent(events::DuelistRegisteredEvent {
                 address: duelist.address,
                 name: duelist.name,
                 profile_pic: duelist.profile_pic,
