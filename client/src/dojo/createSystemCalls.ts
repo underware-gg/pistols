@@ -189,9 +189,9 @@ export function createSystemCalls(
     return results !== null ? Number(results[0]) : null
   }
 
-  const simulate_glance_chances = async (duelist: bigint, duel_id: bigint, round_number: number, action): Promise<number | null> => {
+  const calc_critical_chances = async (duelist: bigint, duel_id: bigint, round_number: number, action): Promise<number | null> => {
     const args = [duelist, duel_id, round_number, action]
-    const results = await _executeCall(actions_call('simulate_glance_chances', args))
+    const results = await _executeCall(actions_call('calc_critical_chances', args))
     return results !== null ? Number(results[0]) : null
   }
 
@@ -231,7 +231,7 @@ export function createSystemCalls(
     calc_hit_penalty,
     calc_hit_chances,
     calc_crit_chances,
-    simulate_glance_chances,
+    calc_critical_chances,
     simulate_honour_for_action,
     get_valid_packed_actions,
     // pack_action_slots,

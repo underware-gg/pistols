@@ -359,12 +359,21 @@ fn average_trickster(bonus: u8, current_bonus_trickster: u8) -> u8 {
 fn calc_hit_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
     let chances: u8 = action.hit_chance();
     let penalty: u8 = calc_hit_penalty(world, health);
-    (apply_chance_bonus_penalty(chances, 0, penalty))
+    (_apply_chance_bonus_penalty(chances, 0, penalty))
 }
 fn calc_crit_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
     let chances: u8 = action.crit_chance();
     let bonus: u8 = calc_hit_bonus(world, duelist_address);
-    (apply_chance_bonus_penalty(chances, bonus, 0))
+    (_apply_chance_bonus_penalty(chances, bonus, 0))
+}
+fn calc_critical_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
+    let chances: u8 = action.critical_chance();
+    let bonus: u8 = 0;
+    (_apply_chance_bonus_penalty(chances, bonus, 0))
+}
+fn _apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
+    let mut result: u8 = MathU8::sub(chance + bonus, penalty);
+    (MathU8::clamp(result, chance / 2, 100))
 }
 
 fn calc_hit_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> u8 {
@@ -375,16 +384,8 @@ fn calc_hit_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> 
 fn calc_hit_penalty(world: IWorldDispatcher, health: u8) -> u8 {
     ((constants::FULL_HEALTH - health) * constants::HIT_PENALTY_PER_DAMAGE)
 }
-fn apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
-    let mut result: u8 = MathU8::sub(chance + bonus, penalty);
-    (MathU8::clamp(result, chance / 2, 100))
-}
 
 // used for system read calls only
-fn simulate_glance_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
-    let chances: u8 = action.glance_chance();
-    (chances)
-}
 fn simulate_honour_for_action(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action) -> (i8, u8) {
     let mut duelist: Duelist = get!(world, duelist_address, Duelist);
     let action_honour: i8 = action.honour();

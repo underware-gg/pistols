@@ -81,11 +81,11 @@ trait ActionTrait {
     fn as_paces(self: Action) -> u8;
     fn crit_chance(self: Action) -> u8;
     fn hit_chance(self: Action) -> u8;
-    fn glance_chance(self: Action) -> u8;
+    fn critical_chance(self: Action) -> u8;
     fn honour(self: Action) -> i8;
     fn roll_priority(self: Action, other: Action) -> i8;
     fn execute_crit(self: Action, ref self_shot: Shot, ref other_shot: Shot) -> bool;
-    fn execute_hit(self: Action, ref self_shot: Shot, ref other_shot: Shot);
+    fn execute_hit(self: Action, ref self_shot: Shot, ref other_shot: Shot, critical_chance: u8);
 }
 
 impl ActionTraitImpl of ActionTrait {
@@ -128,35 +128,60 @@ impl ActionTraitImpl of ActionTrait {
     // Flat chances
     //
     fn crit_chance(self: Action) -> u8 {
-        let paces: u8 = self.as_paces();
-        if (paces > 0) {
-            (MathU8::map(paces, 1, 10, chances::PISTOLS_KILL_AT_STEP_1, chances::PISTOLS_KILL_AT_STEP_10))
-        } else if (self.is_melee()) {
-            (chances::BLADES_KILL)
-        } else if (self.is_runner()) {
-            (chances::ALWAYS) // always set win/wager
-        } else {
-            (chances::NEVER)
+        match self {
+            Action::Paces1 |
+            Action::Paces2 |
+            Action::Paces3 |
+            Action::Paces4 |
+            Action::Paces5 |
+            Action::Paces6 |
+            Action::Paces7 |
+            Action::Paces8 |
+            Action::Paces9 |
+            Action::Paces10 =>  (MathU8::map(self.into(), 1, 10, chances::PISTOLS_KILL_AT_STEP_1, chances::PISTOLS_KILL_AT_STEP_10)),
+            Action::FastBlade |
+            Action::SlowBlade |
+            Action::Block =>    (chances::BLADES_KILL),
+            Action::Flee |
+            Action::Steal |
+            Action::Seppuku =>  (chances::ALWAYS), // always succeedsset win/wager
+            _ =>                (chances::NEVER)
         }
     }
     fn hit_chance(self: Action) -> u8 {
-        let paces: u8 = self.as_paces();
-        if (paces > 0) {
-            (MathU8::map(paces, 1, 10, chances::PISTOLS_HIT_AT_STEP_1, chances::PISTOLS_HIT_AT_STEP_10))
-        } else if (self.is_melee()) {
-            (chances::BLADES_HIT)
-        } else {
-            (chances::NEVER)
+        match self {
+            Action::Paces1 |
+            Action::Paces2 |
+            Action::Paces3 |
+            Action::Paces4 |
+            Action::Paces5 |
+            Action::Paces6 |
+            Action::Paces7 |
+            Action::Paces8 |
+            Action::Paces9 |
+            Action::Paces10 =>  (MathU8::map(self.into(), 1, 10, chances::PISTOLS_HIT_AT_STEP_1, chances::PISTOLS_HIT_AT_STEP_10)),
+            Action::FastBlade |
+            Action::SlowBlade |
+            Action::Block =>    (chances::BLADES_HIT),
+            _ =>                (chances::NEVER)
         }
     }
-    fn glance_chance(self: Action) -> u8 {
-        let paces: u8 = self.as_paces();
-        if (paces > 0) {
-            (MathU8::map(paces, 1, 10, chances::PISTOLS_GLANCE_AT_STEP_1, chances::PISTOLS_GLANCE_AT_STEP_10))
-        } else if (self.is_melee()) {
-            (chances::BLADES_GLANCE)
-        } else {
-            (chances::NEVER)
+    fn critical_chance(self: Action) -> u8 {
+        match self {
+            Action::Paces1 |
+            Action::Paces2 |
+            Action::Paces3 |
+            Action::Paces4 |
+            Action::Paces5 |
+            Action::Paces6 |
+            Action::Paces7 |
+            Action::Paces8 |
+            Action::Paces9 |
+            Action::Paces10 =>  (MathU8::map(self.into(), 1, 10, chances::PISTOLS_CRITICAL_AT_STEP_1, chances::PISTOLS_CRITICAL_AT_STEP_10)),
+            Action::FastBlade |
+            Action::SlowBlade |
+            Action::Block =>    (chances::BLADES_CRITICAL),
+            _ =>                (chances::NEVER)
         }
     }
 
@@ -165,23 +190,20 @@ impl ActionTraitImpl of ActionTrait {
     //
     fn honour(self: Action) -> i8 {
         match self {
-            Action::Idle =>         -1, // do not affect honour
-            Action::Paces1 =>       self.into(),
-            Action::Paces2 =>       self.into(),
-            Action::Paces3 =>       self.into(),
-            Action::Paces4 =>       self.into(),
-            Action::Paces5 =>       self.into(),
-            Action::Paces6 =>       self.into(),
-            Action::Paces7 =>       self.into(),
-            Action::Paces8 =>       self.into(),
-            Action::Paces9 =>       self.into(),
-            Action::Paces10 =>      self.into(),
-            Action::FastBlade =>    -1, // do not affect honour
-            Action::SlowBlade =>    -1, // do not affect honour
-            Action::Block =>        -1, // do not affect honour
-            Action::Flee =>         0,
-            Action::Steal =>        0,
-            Action::Seppuku =>      10,
+            Action::Paces1 |
+            Action::Paces2 |
+            Action::Paces3 |
+            Action::Paces4 |
+            Action::Paces5 |
+            Action::Paces6 |
+            Action::Paces7 |
+            Action::Paces8 |
+            Action::Paces9 |
+            Action::Paces10 =>  self.into(),
+            Action::Flee =>     0,
+            Action::Steal =>    0,
+            Action::Seppuku =>  10,
+            _ =>                -1, // do not affect honour
         }
     }
 
@@ -280,7 +302,7 @@ impl ActionTraitImpl of ActionTrait {
     }
 
     // dices decided for a hit, just execute it
-    fn execute_hit(self: Action, ref self_shot: Shot, ref other_shot: Shot) {
+    fn execute_hit(self: Action, ref self_shot: Shot, ref other_shot: Shot, critical_chance: u8) {
         match self {
             Action::Paces1 |
             Action::Paces2 |
@@ -292,11 +314,10 @@ impl ActionTraitImpl of ActionTrait {
             Action::Paces8 |
             Action::Paces9 |
             Action::Paces10 => {
-                let glance_chance: u8 = self.glance_chance();
-                if (self_shot.dice_hit <= glance_chance) {
-                    other_shot.damage = constants::SINGLE_DAMAGE;
+                if (self_shot.dice_hit <= critical_chance) {
+                    other_shot.damage = constants::DOUBLE_DAMAGE;   // full damage
                 } else {
-                    other_shot.damage = constants::DOUBLE_DAMAGE;
+                    other_shot.damage = constants::SINGLE_DAMAGE;   // glance
                 }
             },
             Action::FastBlade => {

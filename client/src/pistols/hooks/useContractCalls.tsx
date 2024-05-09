@@ -74,13 +74,13 @@ export const useCalcCritChances = (address: BigNumberish, duelId: bigint, roundN
   }
 }
 
-export const useCalcGlanceChances = (address: BigNumberish, duelId: bigint, roundNumber: number, action: number, defaultValue = null) => {
+export const useCalcCriticalChances = (address: BigNumberish, duelId: bigint, roundNumber: number, action: number, defaultValue = null) => {
   const [value, setValue] = useState(defaultValue)
-  const { simulate_glance_chances } = useDojoSystemCalls()
+  const { calc_critical_chances } = useDojoSystemCalls()
   useEffect(() => {
     let _mounted = true
     const _get = async () => {
-      const value = await simulate_glance_chances(BigInt(address), duelId, roundNumber, action)
+      const value = await calc_critical_chances(BigInt(address), duelId, roundNumber, action)
       if (_mounted) setValue(value)
     }
     if (address != null && duelId && roundNumber && action != null) _get()
@@ -88,7 +88,7 @@ export const useCalcGlanceChances = (address: BigNumberish, duelId: bigint, roun
     return () => { _mounted = false }
   }, [address, duelId, roundNumber, action])
   return {
-    glanceChances: value,
+    criticalChances: value,
   }
 }
 

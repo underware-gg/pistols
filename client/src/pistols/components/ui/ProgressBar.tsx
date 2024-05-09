@@ -13,7 +13,7 @@ export default function ProgressBar({
   color = null,
   percent = null,
   includedBonusPercent = null,
-  glancePercent = null,
+  includedHeadingPercent = null,
   value = null,
   total = null,
 }) {
@@ -47,10 +47,10 @@ export default function ProgressBar({
                 color={color}
               />
               {Boolean(includedBonusPercent) &&
-                <div className='GlanceBar BgImportant' style={{ width: `${percent - includedBonusPercent}%` }} />
+                <div className='CriticalBar BgImportant' style={{ width: `${percent - includedBonusPercent}%` }} />
               }
-              {Boolean(glancePercent) &&
-                <div className='GlanceBar' style={{ width: `${glancePercent}%` }} />
+              {Boolean(includedHeadingPercent) &&
+                <div className='CriticalBar' style={{ width: `${includedHeadingPercent}%` }} />
               }
             </>
           }

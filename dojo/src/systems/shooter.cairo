@@ -264,7 +264,8 @@ mod shooter {
                 attack.chance_hit = utils::calc_hit_chances(world, attacker, action, attack.health);
                 attack.dice_hit = throw_dice(seed * 2, round, 100, attack.chance_hit);
                 if (attack.dice_hit <= attack.chance_hit) {
-                    action.execute_hit(ref attack, ref defense);
+                    let critical_chance: u8 = utils::calc_critical_chances(world, attacker, action, attack.health);
+                    action.execute_hit(ref attack, ref defense, critical_chance);
                 }
             }
         }
