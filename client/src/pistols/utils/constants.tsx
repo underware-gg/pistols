@@ -7,7 +7,6 @@ export const PROFILE_PIC_COUNT = 15
 //
 export const constants = {
   ROUND_COUNT: 3,
-  FULL_HONOUR: 100,
   FULL_HEALTH: 3,
   DOUBLE_DAMAGE: 2,
   SINGLE_DAMAGE: 1,
