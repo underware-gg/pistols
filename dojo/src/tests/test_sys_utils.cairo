@@ -11,7 +11,7 @@ mod tests {
     use pistols::systems::{utils};
     use pistols::models::models::{init, Round, Shot, Duelist};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
-    use pistols::types::constants::{constants, chances};
+    use pistols::types::constants::{constants, arch, chances};
     use pistols::types::action::{ACTION};
     use pistols::utils::math::{MathU8};
     use pistols::utils::string::{String};
@@ -169,12 +169,12 @@ mod tests {
     #[test]
     #[available_gas(100_000_000)]
     fn test_calc_bonus_villain() {
-        assert(utils::calc_bonus_villain(0) == constants::BONUS_MAX, 'honour_0');
-        assert(utils::calc_bonus_villain(constants::ARCH_VILLAIN_START) == constants::BONUS_MAX, 'ARCH_VILLAIN_START');
-        assert(utils::calc_bonus_villain(constants::ARCH_VILLAIN_START+1) < constants::BONUS_MAX, 'ARCH_VILLAIN_START+1');
-        assert(utils::calc_bonus_villain(constants::ARCH_TRICKSTER_START-2) > constants::BONUS_MIN, 'ARCH_TRICKSTER_START-2');
-        assert(utils::calc_bonus_villain(constants::ARCH_TRICKSTER_START-1) == constants::BONUS_MIN, 'ARCH_TRICKSTER_START-1');
-        assert(utils::calc_bonus_villain(constants::ARCH_TRICKSTER_START) == 0, 'ARCH_TRICKSTER_START');
+        assert(utils::calc_bonus_villain(0) == arch::BONUS_MAX, 'honour_0');
+        assert(utils::calc_bonus_villain(arch::VILLAIN_START) == arch::BONUS_MAX, 'ARCH_VILLAIN_START');
+        assert(utils::calc_bonus_villain(arch::VILLAIN_START+1) < arch::BONUS_MAX, 'ARCH_VILLAIN_START+1');
+        assert(utils::calc_bonus_villain(arch::TRICKSTER_START-2) > arch::BONUS_MIN, 'ARCH_TRICKSTER_START-2');
+        assert(utils::calc_bonus_villain(arch::TRICKSTER_START-1) == arch::BONUS_MIN, 'ARCH_TRICKSTER_START-1');
+        assert(utils::calc_bonus_villain(arch::TRICKSTER_START) == 0, 'ARCH_TRICKSTER_START');
         assert(utils::calc_bonus_villain(100) == 0, 'honour_100');
     }
 
@@ -182,11 +182,11 @@ mod tests {
     #[available_gas(100_000_000)]
     fn test_calc_bonus_lord() {
         assert(utils::calc_bonus_lord(0) == 0, 'honour_0');
-        assert(utils::calc_bonus_lord(constants::ARCH_LORD_START-1) == 0, 'ARCH_LORD_START-1');
-        assert(utils::calc_bonus_lord(constants::ARCH_LORD_START) == constants::BONUS_MIN, 'ARCH_LORD_START');
-        assert(utils::calc_bonus_lord(constants::ARCH_LORD_START+1) > constants::BONUS_MIN, 'ARCH_LORD_START+1');
-        assert(utils::calc_bonus_lord(constants::ARCH_MAX-1) < constants::BONUS_MAX, 'constants::ARCH_MAX-1');
-        assert(utils::calc_bonus_lord(constants::ARCH_MAX) == constants::BONUS_MAX, 'constants::ARCH_MAX');
+        assert(utils::calc_bonus_lord(arch::LORD_START-1) == 0, 'ARCH_LORD_START-1');
+        assert(utils::calc_bonus_lord(arch::LORD_START) == arch::BONUS_MIN, 'ARCH_LORD_START');
+        assert(utils::calc_bonus_lord(arch::LORD_START+1) > arch::BONUS_MIN, 'ARCH_LORD_START+1');
+        assert(utils::calc_bonus_lord(arch::MAX-1) < arch::BONUS_MAX, 'arch::MAX-1');
+        assert(utils::calc_bonus_lord(arch::MAX) == arch::BONUS_MAX, 'arch::MAX');
     }
 
     fn _in_range(v: u8, min: u8, max: u8) -> bool {
@@ -208,13 +208,13 @@ mod tests {
     fn test_calc_bonus_trickster() {
         
         assert(utils::calc_bonus_trickster(10, 100) == 0, 'honour_10');
-        assert(utils::calc_bonus_trickster(constants::ARCH_TRICKSTER_START-1, 100) == 0, 'ARCH_TRICKSTER_START-1');
-        assert(utils::calc_bonus_trickster(constants::ARCH_TRICKSTER_START-1, 0) == 0, 'ARCH_TRICKSTER_START-1_00');
+        assert(utils::calc_bonus_trickster(arch::TRICKSTER_START-1, 100) == 0, 'ARCH_TRICKSTER_START-1');
+        assert(utils::calc_bonus_trickster(arch::TRICKSTER_START-1, 0) == 0, 'ARCH_TRICKSTER_START-1_00');
         //-------
-        assert(utils::calc_bonus_trickster(constants::ARCH_TRICKSTER_START, 100) > 0, 'ARCH_TRICKSTER_START');
-        assert(utils::calc_bonus_trickster(constants::ARCH_TRICKSTER_START, 0) > 0, 'ARCH_TRICKSTER_START_00');
+        assert(utils::calc_bonus_trickster(arch::TRICKSTER_START, 100) > 0, 'ARCH_TRICKSTER_START');
+        assert(utils::calc_bonus_trickster(arch::TRICKSTER_START, 0) > 0, 'ARCH_TRICKSTER_START_00');
 
-        // let t: u8 = constants::ARCH_TRICKSTER_START;
+        // let t: u8 = arch::TRICKSTER_START;
 
         // _assert_trickstry(100, 100, 0, 50, 50, 't_001');
         // _assert_trickstry(100, 100, 100, 100, 100, 't_002');
@@ -225,11 +225,11 @@ mod tests {
 
 
 
-        assert(utils::calc_bonus_trickster(constants::ARCH_LORD_START-1, 100) > 0, 'ARCH_LORD_START-1');
-        assert(utils::calc_bonus_trickster(constants::ARCH_LORD_START-1-1, 0) > 0, 'ARCH_LORD_START-1_00');
+        assert(utils::calc_bonus_trickster(arch::LORD_START-1, 100) > 0, 'ARCH_LORD_START-1');
+        assert(utils::calc_bonus_trickster(arch::LORD_START-1-1, 0) > 0, 'ARCH_LORD_START-1_00');
         //-------
-        assert(utils::calc_bonus_trickster(constants::ARCH_LORD_START, 100) == 0, 'ARCH_LORD_START');
-        assert(utils::calc_bonus_trickster(constants::ARCH_LORD_START, 0) == 0, 'ARCH_LORD_START_00');
+        assert(utils::calc_bonus_trickster(arch::LORD_START, 100) == 0, 'ARCH_LORD_START');
+        assert(utils::calc_bonus_trickster(arch::LORD_START, 0) == 0, 'ARCH_LORD_START_00');
         assert(utils::calc_bonus_trickster(100, 100) == 0, 'honour_100');
     }
 

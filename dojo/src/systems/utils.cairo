@@ -10,7 +10,7 @@ use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round::{RoundState, RoundStateTrait};
 use pistols::types::action::{Action, ActionTrait, ACTION};
-use pistols::types::constants::{constants, chances};
+use pistols::types::constants::{constants, arch, chances};
 use pistols::utils::math::{MathU8, MathU16};
 
 // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
@@ -316,15 +316,15 @@ fn update_duelist_honour(ref duelist: Duelist, duel_honour: u8) {
 // Villain bonus: the less honour, more bonus
 #[inline(always)]
 fn calc_bonus_villain(honour: u8) -> u8 {
-    if (honour < constants::ARCH_TRICKSTER_START) {
-        (MathU8::map(honour, constants::ARCH_VILLAIN_START, constants::ARCH_TRICKSTER_START-1, constants::BONUS_MAX, constants::BONUS_MIN))
+    if (honour < arch::TRICKSTER_START) {
+        (MathU8::map(honour, arch::VILLAIN_START, arch::TRICKSTER_START-1, arch::BONUS_MAX, arch::BONUS_MIN))
     } else { (0) }
 }
 // Lord bonus: the more honour, more bonus
 #[inline(always)]
 fn calc_bonus_lord(honour: u8) -> u8 {
-    if (honour >= constants::ARCH_LORD_START) {
-        (MathU8::map(honour, constants::ARCH_LORD_START, constants::ARCH_MAX, constants::BONUS_MIN, constants::BONUS_MAX))
+    if (honour >= arch::LORD_START) {
+        (MathU8::map(honour, arch::LORD_START, arch::MAX, arch::BONUS_MIN, arch::BONUS_MAX))
     } else { (0) }
 }
 // Trickster bonus: the max of...
@@ -332,12 +332,12 @@ fn calc_bonus_lord(honour: u8) -> u8 {
 // cap halfway without going to zero (shaped as a /\)
 #[inline(always)]
 fn calc_bonus_trickster(honour: u8, duel_honour: u8) -> u8 {
-    if (honour >= constants::ARCH_TRICKSTER_START && honour < constants::ARCH_LORD_START) {
+    if (honour >= arch::TRICKSTER_START && honour < arch::LORD_START) {
         // high on edges, low on middle (\/)
-        let ti: i16 = MathU8::map(duel_honour, constants::ARCH_VILLAIN_START, constants::ARCH_MAX, 0, constants::BONUS_MAX*2).try_into().unwrap() - constants::BONUS_MAX.into();
+        let ti: i16 = MathU8::map(duel_honour, arch::VILLAIN_START, arch::MAX, 0, arch::BONUS_MAX*2).try_into().unwrap() - arch::BONUS_MAX.into();
         let td: u8 = MathU16::abs(ti).try_into().unwrap();
         // peak on halfway to avoid zero (/\)
-        let halfway: u8 = if (duel_honour <= constants::ARCH_HALFWAY) { (duel_honour) } else { constants::ARCH_HALFWAY - (duel_honour - constants::ARCH_HALFWAY) };
+        let halfway: u8 = if (duel_honour <= arch::HALFWAY) { (duel_honour) } else { arch::HALFWAY - (duel_honour - arch::HALFWAY) };
         (MathU8::max(td, halfway))
     } else { (0) }
 }
