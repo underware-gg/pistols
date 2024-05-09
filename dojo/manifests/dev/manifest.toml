@@ -34,8 +34,8 @@ name = "pistols::mocks::lords_mock::lords_mock"
 [[contracts]]
 kind = "DojoContract"
 address = "0x6dda46ca9b7cee1b06a77890a71f0221f332f01f6f05ebd0894feb9a76b7752"
-class_hash = "0x1ec4f0ffd7e0ef5df1346615969ac39496ed68a56c29496568c4af367fa3881"
-original_class_hash = "0x1ec4f0ffd7e0ef5df1346615969ac39496ed68a56c29496568c4af367fa3881"
+class_hash = "0x738358db517f8ad20411852fff2b4b43e585feccc07c0ebe1c6858c322619c4"
+original_class_hash = "0x738358db517f8ad20411852fff2b4b43e585feccc07c0ebe1c6858c322619c4"
 base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
 abi = "manifests/dev/abis/deployments/contracts/pistols_systems_actions_actions.json"
 reads = []

@@ -456,7 +456,7 @@
       },
       {
         "type": "function",
-        "name": "calc_glance_chances",
+        "name": "simulate_glance_chances",
         "inputs": [
           {
             "name": "duelist_address",
@@ -484,7 +484,7 @@
       },
       {
         "type": "function",
-        "name": "calc_honour_for_action",
+        "name": "simulate_honour_for_action",
         "inputs": [
           {
             "name": "duelist_address",
@@ -605,7 +605,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::types::events::DuelistRegistered",
+    "name": "pistols::types::events::DuelistRegisteredEvent",
     "kind": "struct",
     "members": [
       {
@@ -712,8 +712,8 @@
         "kind": "nested"
       },
       {
-        "name": "DuelistRegistered",
-        "type": "pistols::types::events::DuelistRegistered",
+        "name": "DuelistRegisteredEvent",
+        "type": "pistols::types::events::DuelistRegisteredEvent",
         "kind": "nested"
       },
       {
