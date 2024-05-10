@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod utils {
+mod tester {
     use starknet::{ContractAddress, testing};
     use core::traits::Into;
     use array::ArrayTrait;

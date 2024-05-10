@@ -9,9 +9,15 @@ mod tests {
     use starknet::{ContractAddress};
 
     use pistols::systems::{utils};
-    use pistols::models::models::{init, Round, Shot, Duelist};
+    use pistols::models::models::{init, Round, Shot, Duelist, Chances};
     use pistols::types::constants::{constants, honour, chances};
     use pistols::utils::string::{String};
+    use pistols::tests::tester::{tester};
+
+
+    //--------------------------------
+    // Archetype levels
+    //
 
     #[test]
     #[available_gas(100_000_000)]
@@ -79,9 +85,8 @@ mod tests {
     }
 
 
-
-    //
-    // Pistol Bonus
+    //--------------------------------
+    // Bonuses
     //
 
     // #[test]
