@@ -11,7 +11,7 @@ mod tests {
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     use pistols::systems::{utils};
-    use pistols::models::models::{init, Round, Shot, Duelist, Chances};
+    use pistols::models::models::{init, Round, Shot, Duelist, DuelistTrait, Chances};
     use pistols::types::constants::{constants, honour, chances};
     use pistols::types::action::{Action};
     use pistols::utils::string::{String};
@@ -106,6 +106,7 @@ mod tests {
         // levels
         duelist.level_lord = 100;
         duelist.total_duels = 10;
+        assert(duelist.is_lord(), 'is_lord()');
         // set!(world,(duelist));
         assert(utils::calc_crit_bonus(duelist) == chances::CRIT_BONUS_LORD, 'level_100');
         duelist.level_lord = 90;
@@ -129,16 +130,18 @@ mod tests {
         assert(utils::calc_crit_bonus(duelist) == 0, 'total_duels_0');
         //
         // not for villains
+        duelist.total_duels = 10;
         duelist.level_lord = 0;
         duelist.level_villain = 100;
-        duelist.total_duels = 10;
+        assert(duelist.is_villain(), 'is_villain()');
         assert(utils::calc_crit_bonus(duelist) == 0, 'no_villain');
         //
         // tricksters get half
+        duelist.total_duels = 10;
         duelist.level_lord = 0;
         duelist.level_villain = 0;
         duelist.level_trickster = 100;
-        duelist.total_duels = 10;
+        assert(duelist.is_trickster(), 'is_trickster()');
         assert(utils::calc_crit_bonus(duelist) == chances::CRIT_BONUS_TRICKSTER, 'trickster_level_100');
         duelist.level_trickster = 50;
         assert(utils::calc_crit_bonus(duelist) == chances::CRIT_BONUS_TRICKSTER/2, 'trickster_level_50');

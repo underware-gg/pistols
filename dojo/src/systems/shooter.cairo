@@ -175,7 +175,7 @@ mod shooter {
         let duelist_b: Duelist = get!(world, challenge.duelist_b, Duelist);
         
         let mut executed: bool = false;
-        let priority: i8 = action_a.roll_priority(action_b);
+        let priority: i8 = action_a.roll_priority(action_b, duelist_a, duelist_b);
         if (priority < 0) {
             // A attacks first
             executed = attack_sync(world, duelist_a, duelist_b, round, ref round.shot_a, ref round.shot_b, false);

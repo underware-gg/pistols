@@ -115,6 +115,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_action_paces_priority() {
+        let mut duelist = init::Duelist();
         let mut a: u8 = 0;
         loop {
             if (a > 10) { break; }
@@ -124,7 +125,7 @@ mod tests {
             loop {
                 if (b > 10) { break; }
                 let action_b: Action = b.into();
-                let priority: i8 = action_a.roll_priority(action_b);
+                let priority: i8 = action_a.roll_priority(action_b, duelist, duelist);
                 if (a == 0) {
                     assert(priority == 0, 'a_0')
                 } else if (b == 0) {

@@ -4,7 +4,7 @@ use traits::{Into, TryInto};
 use starknet::{ContractAddress};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
-use pistols::models::models::{init, Duelist, Challenge, Wager, Pact, Round, Shot};
+use pistols::models::models::{init, Duelist, DuelistTrait, Challenge, Wager, Pact, Round, Shot};
 use pistols::models::coins::{Coin, CoinManagerTrait, CoinTrait};
 use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
@@ -393,9 +393,10 @@ fn _apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
 }
 
 #[inline(always)]
-fn calc_crit_bonus(duelist: Duelist) -> u8 {    if (duelist.level_lord > 0) {
+fn calc_crit_bonus(duelist: Duelist) -> u8 {
+    if (duelist.is_lord()) {
         (_calc_bonus(chances::CRIT_BONUS_LORD, duelist.level_lord, duelist.total_duels))
-    } else if (duelist.level_trickster > 0) {
+    } else if (duelist.is_trickster()) {
         (_calc_bonus(chances::CRIT_BONUS_TRICKSTER, duelist.level_trickster, duelist.total_duels))
     } else {
         (0)
@@ -403,9 +404,9 @@ fn calc_crit_bonus(duelist: Duelist) -> u8 {    if (duelist.level_lord > 0) {
 }
 #[inline(always)]
 fn calc_lethal_bonus(duelist: Duelist) -> u8 {
-    if (duelist.level_villain > 0) {
+    if (duelist.is_villain()) {
         (_calc_bonus(chances::LETHAL_BONUS_VILLAIN, duelist.level_villain, duelist.total_duels))
-    } else if (duelist.level_trickster > 0) {
+    } else if (duelist.is_trickster()) {
         (_calc_bonus(chances::LETHAL_BONUS_TRICKSTER, duelist.level_trickster, duelist.total_duels))
     } else {
         (0)

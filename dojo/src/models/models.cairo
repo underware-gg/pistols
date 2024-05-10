@@ -1,8 +1,9 @@
 use starknet::ContractAddress;
 use pistols::types::challenge::{ChallengeState};
 
+//---------------------
+// Duelist
 //
-// Players need to register as a Duelist to play
 #[derive(Model, Copy, Drop, Serde)]
 struct Duelist {
     #[key]
@@ -22,8 +23,29 @@ struct Duelist {
     timestamp: u64,         // Unix time, 1st registered
 } // f + 200 bits
 
-//
+#[generate_trait]
+impl DuelistTraitImpl of DuelistTrait {
+    #[inline(always)]
+    fn is_villain(self: Duelist) -> bool { (self.level_villain > 0) }
+    #[inline(always)]
+    fn is_trickster(self: Duelist) -> bool { (self.level_trickster > 0) }
+    #[inline(always)]
+    fn is_lord(self: Duelist) -> bool { (self.level_lord > 0) }
+}
+
+// Current challenge between two Duelists
+#[derive(Model, Copy, Drop, Serde)]
+struct Pact {
+    #[key]
+    pair: u128,     // xor'd duelists as u256(address).low
+    //------------
+    duel_id: u128,  // current Challenge, or 0x0
+} // 128 bits
+
+
+//-------------------------
 // Challenge lifecycle
+//
 #[derive(Model, Copy, Drop, Serde)]
 struct Challenge {
     #[key]
@@ -52,16 +74,6 @@ struct Wager {
     value: u256,
     fee: u256,
 }
-
-//
-// Current challenge between two Duelists
-#[derive(Model, Copy, Drop, Serde)]
-struct Pact {
-    #[key]
-    pair: u128,     // xor'd duelists as u256(address).low
-    //------------
-    duel_id: u128,  // current Challenge, or 0x0
-} // 128 bits
 
 //
 // The shot of each player on a Round
@@ -138,6 +150,24 @@ mod init {
             wager: 0,
             health: 0,
             honour: 0,
+        })
+    }
+
+    fn Duelist() -> models::Duelist {
+        (models::Duelist {
+            address: starknet::contract_address_const::<0x0>(),
+            name: 0,
+            profile_pic: 0,
+            total_duels: 0,
+            total_wins: 0,
+            total_losses: 0,
+            total_draws: 0,
+            total_honour: 0,
+            honour: 0,
+            level_villain: 0,
+            level_trickster: 0,
+            level_lord: 0,
+            timestamp: 0,
         })
     }
 

@@ -311,6 +311,47 @@ mod tests {
         tester::assert_balance(ierc20, other, balance_b, fee, 0, 'balance_b_2');
     }
 
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_single_round_draw_to_trickster_a() {
+        let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
+        // A is a trickster, will shoot first
+        let mut duelist_a = tester::get_Duelist(world, owner);
+        duelist_a.level_trickster = 100;
+        set!(world,(duelist_a));
+        // duel!
+        let (_challenge, _round, duel_id) = _start_new_challenge(world, system, owner, other, WAGER_VALUE);
+        let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_draw();
+        tester::execute_commit_action(system, owner, duel_id, 1, hash_a);
+        tester::execute_commit_action(system, other, duel_id, 1, hash_b);
+        tester::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a, 0);
+        tester::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b, 0);
+        let (challenge, _round) = tester::get_Challenge_Round(world, duel_id);
+        assert(challenge.state == ChallengeState::Resolved.into(), 'challenge.state');
+        assert(challenge.winner == 1, 'challenge.winner');
+    }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_single_round_draw_to_trickster_b() {
+        let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
+        // A is a trickster, will shoot first
+        let mut duelist_b = tester::get_Duelist(world, other);
+        duelist_b.level_trickster = 100;
+        set!(world,(duelist_b));
+        // duel!
+        let (_challenge, _round, duel_id) = _start_new_challenge(world, system, owner, other, WAGER_VALUE);
+        let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_draw();
+        tester::execute_commit_action(system, owner, duel_id, 1, hash_a);
+        tester::execute_commit_action(system, other, duel_id, 1, hash_b);
+        tester::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a, 0);
+        tester::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b, 0);
+        let (challenge, _round) = tester::get_Challenge_Round(world, duel_id);
+        assert(challenge.state == ChallengeState::Resolved.into(), 'challenge.state');
+        assert(challenge.winner == 2, 'challenge.winner');
+    }
+
+    
     //-------------------------------
     // Fails
     //
