@@ -213,15 +213,15 @@
         "type": "core::integer::u8"
       },
       {
-        "name": "bonus_villain",
+        "name": "level_villain",
         "type": "core::integer::u8"
       },
       {
-        "name": "bonus_trickster",
+        "name": "level_trickster",
         "type": "core::integer::u8"
       },
       {
-        "name": "bonus_lord",
+        "name": "level_lord",
         "type": "core::integer::u8"
       },
       {
