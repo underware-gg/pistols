@@ -429,7 +429,8 @@ fn _calc_bonus(bonus_max: u8, level: u8, total_duels: u16) -> u8 {
 
 #[inline(always)]
 fn calc_crit_penalty(action: Action, health: u8) -> u8 {
-    (_calc_penalty(health, action.crit_penalty()))
+    // (_calc_penalty(health, action.crit_penalty()))
+    (0) // no pelanty for crits!
 }
 #[inline(always)]
 fn calc_hit_penalty(action: Action, health: u8) -> u8 {
