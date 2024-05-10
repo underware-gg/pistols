@@ -6,7 +6,7 @@ mod shooter {
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     use pistols::systems::{utils};
-    use pistols::models::models::{init, Challenge, Round, Shot};
+    use pistols::models::models::{init, Challenge, Round, Shot, Duelist};
     use pistols::types::constants::{constants};
     use pistols::types::challenge::{ChallengeState};
     use pistols::types::round::{RoundState};
@@ -171,18 +171,20 @@ mod shooter {
     fn process_round(world: IWorldDispatcher, ref challenge: Challenge, ref round: Round, is_last_round: bool) {
         let action_a: Action = apply_action_honour(ref round.shot_a);
         let action_b: Action = apply_action_honour(ref round.shot_b);
+        let duelist_a: Duelist = get!(world, challenge.duelist_a, Duelist);
+        let duelist_b: Duelist = get!(world, challenge.duelist_b, Duelist);
         
         let mut executed: bool = false;
         let priority: i8 = action_a.roll_priority(action_b);
         if (priority < 0) {
             // A attacks first
-            executed = attack_sync(world, challenge.duelist_a, challenge.duelist_b, round, ref round.shot_a, ref round.shot_b, false);
+            executed = attack_sync(world, duelist_a, duelist_b, round, ref round.shot_a, ref round.shot_b, false);
         } else if (priority > 0) {
             // B attacks first
-            executed = attack_sync(world, challenge.duelist_b, challenge.duelist_a, round, ref round.shot_b, ref round.shot_a, false);
+            executed = attack_sync(world, duelist_b, duelist_a, round, ref round.shot_b, ref round.shot_a, false);
         } else {
             // same time
-            executed = attack_sync(world, challenge.duelist_a, challenge.duelist_b, round, ref round.shot_a, ref round.shot_b, true);
+            executed = attack_sync(world, duelist_a, duelist_b, round, ref round.shot_a, ref round.shot_b, true);
         }
 
         // decide results on health or win flag
@@ -229,7 +231,7 @@ mod shooter {
     //
 
     // execute attacks in sync or async
-    fn attack_sync(world: IWorldDispatcher, attacker: ContractAddress, defender: ContractAddress, round: Round, ref attack: Shot, ref defense: Shot, sync: bool) -> bool {
+    fn attack_sync(world: IWorldDispatcher, attacker: Duelist, defender: Duelist, round: Round, ref attack: Shot, ref defense: Shot, sync: bool) -> bool {
         // attack first, if survives defense can attack
         let mut executed: bool = attack(world, 'shoot_a', attacker, round, ref attack, ref defense);
         if (sync || !executed) {
@@ -251,20 +253,20 @@ mod shooter {
 
     // executes single attack
     // returns true if ended in execution
-    fn attack(world: IWorldDispatcher, seed: felt252, attacker: ContractAddress, round: Round, ref attack: Shot, ref defense: Shot) -> bool {
+    fn attack(world: IWorldDispatcher, seed: felt252, attacker: Duelist, round: Round, ref attack: Shot, ref defense: Shot) -> bool {
         let action: Action = attack.action.into();
         if (action != Action::Idle) {
             // dice 1: crit (execution, double damage, goal)
-            attack.chance_crit = utils::calc_crit_chances(world, attacker, action, attack.health);
+            attack.chance_crit = utils::calc_crit_chances(attacker, action, attack.health);
             attack.dice_crit = throw_dice(seed, round, 100, attack.chance_crit);
             if (attack.dice_crit <= attack.chance_crit) {
                 return (action.execute_crit(ref attack, ref defense));
             } else {
                 // dice 2: miss or hit
-                attack.chance_hit = utils::calc_hit_chances(world, attacker, action, attack.health);
+                attack.chance_hit = utils::calc_hit_chances(attacker, action, attack.health);
                 attack.dice_hit = throw_dice(seed * 2, round, 100, attack.chance_hit);
                 if (attack.dice_hit <= attack.chance_hit) {
-                    let lethal_chance: u8 = utils::calc_lethal_chances(world, attacker, action, attack.health);
+                    let lethal_chance: u8 = utils::calc_lethal_chances(attacker, action, attack.health);
                     action.execute_hit(ref attack, ref defense, lethal_chance);
                 }
             }

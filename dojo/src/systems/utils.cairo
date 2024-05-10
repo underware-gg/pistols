@@ -358,28 +358,28 @@ fn _average_trickster(bonus: u8, current_level_trickster: u8) -> u8 {
 
 // crit bonus will be applied for Lords only
 #[inline(always)]
-fn calc_crit_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
+fn calc_crit_chances(duelist: Duelist, action: Action, health: u8) -> u8 {
     (_apply_chance_bonus_penalty(
         action.crit_chance(),
-        calc_crit_bonus(world, duelist_address),
+        calc_crit_bonus(duelist),
         calc_crit_penalty(action, health),
     ))
 }
 // Hit chances will be applied to Villains only
 // Both Hit and Lethal go up/down with same bonus/penalty
 #[inline(always)]
-fn calc_hit_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
+fn calc_hit_chances(duelist: Duelist, action: Action, health: u8) -> u8 {
     (_apply_chance_bonus_penalty(
         action.hit_chance(),
-        calc_lethal_bonus(world, duelist_address),
+        calc_lethal_bonus(duelist),
         calc_hit_penalty(action, health),
     ))
 }
 #[inline(always)]
-fn calc_lethal_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
+fn calc_lethal_chances(duelist: Duelist, action: Action, health: u8) -> u8 {
     (_apply_chance_bonus_penalty(
         action.lethal_chance(),
-        calc_lethal_bonus(world, duelist_address),
+        calc_lethal_bonus(duelist),
         calc_hit_penalty(action, health),
     ))
 }
@@ -393,9 +393,7 @@ fn _apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
 }
 
 #[inline(always)]
-fn calc_crit_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> u8 {
-    let duelist: Duelist = get!(world, duelist_address, Duelist);
-    if (duelist.level_lord > 0) {
+fn calc_crit_bonus(duelist: Duelist) -> u8 {    if (duelist.level_lord > 0) {
         (_calc_bonus(chances::CRIT_BONUS_LORD, duelist.level_lord, duelist.total_duels))
     } else if (duelist.level_trickster > 0) {
         (_calc_bonus(chances::CRIT_BONUS_TRICKSTER, duelist.level_trickster, duelist.total_duels))
@@ -404,8 +402,7 @@ fn calc_crit_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) ->
     }
 }
 #[inline(always)]
-fn calc_lethal_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> u8 {
-    let duelist: Duelist = get!(world, duelist_address, Duelist);
+fn calc_lethal_bonus(duelist: Duelist) -> u8 {
     if (duelist.level_villain > 0) {
         (_calc_bonus(chances::LETHAL_BONUS_VILLAIN, duelist.level_villain, duelist.total_duels))
     } else if (duelist.level_trickster > 0) {

@@ -307,13 +307,15 @@ mod actions {
         }
 
         fn simulate_chances(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> Chances {
+            let duelist: Duelist = get!(world, duelist_address, Duelist);
             let health: u8 = utils::get_duelist_health(world, duelist_address, duel_id, round_number);
-            let hit_chances: u8 = utils::calc_hit_chances(world, duelist_address, action.into(), health);
-            let crit_chances: u8 = utils::calc_crit_chances(world, duelist_address, action.into(), health);
-            let lethal_chances: u8 = utils::calc_lethal_chances(world, duelist_address, action.into(), health);
-            let crit_bonus: u8 = utils::calc_crit_bonus(world, duelist_address);
+            
+            let hit_chances: u8 = utils::calc_hit_chances(duelist, action.into(), health);
+            let crit_chances: u8 = utils::calc_crit_chances(duelist, action.into(), health);
+            let lethal_chances: u8 = utils::calc_lethal_chances(duelist, action.into(), health);
+            let crit_bonus: u8 = utils::calc_crit_bonus(duelist);
             let hit_bonus: u8 = 0;
-            let lethal_bonus: u8 = utils::calc_lethal_bonus(world, duelist_address);
+            let lethal_bonus: u8 = utils::calc_lethal_bonus(duelist);
             (Chances {
                 key: 0,
                 crit_chances,
