@@ -41,8 +41,8 @@ export function ActionChances({
   const _honourNegative = (honourForAction == 1)
   return (
     <>
-      <ProgressBar disabled={!action} label={hitBonus ? <span>{executionLabel} / <span className='Warning'>Bonus</span>:</span> : `${executionLabel}:`} percent={_critChances} includedBonusPercent={hitBonus} className='ChancesBar' />
-      <ProgressBar disabled={!action} label={criticalChances ? <span>Hit / <span className='Warning'>Critical</span>:</span> : 'Hit:'} percent={hitChances} includedBonusPercent={criticalChances} className='ChancesBar' />
+      <ProgressBar disabled={!action} label={hitBonus ? <span>{executionLabel} / <span className='Warning'>Bonus</span>:</span> : `${executionLabel}:`} percent={_critChances} includedExtraPercent={hitBonus} className='ChancesBar' />
+      <ProgressBar disabled={!action} label={criticalChances ? <span>Hit / <span className='Warning'>Critical</span>:</span> : 'Hit:'} percent={hitChances} includedInnerPercent={criticalChances} className='ChancesBar' />
       <ProgressBar disabled={!action} label='Honour:' value={_honourValue} total={10} className='ChancesBar' warning={_honourWarning} negative={_honourNegative} color={honourForAction == 0 ? 'grey' : null} />
 
       <p className=' AlignCenter'>&nbsp;

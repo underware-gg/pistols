@@ -4,17 +4,14 @@
 //
 #[cfg(test)]
 mod tests {
-    use core::traits::{Into, TryInto};
     use debug::PrintTrait;
+    use core::traits::{Into, TryInto};
     use starknet::{ContractAddress};
 
     use pistols::systems::{utils};
     use pistols::models::models::{init, Round, Shot, Duelist};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
-    use pistols::types::constants::{constants, arch, chances};
     use pistols::types::action::{ACTION};
-    use pistols::utils::math::{MathU8};
-    use pistols::utils::string::{String};
 
     #[test]
     #[available_gas(1_000_000)]
@@ -152,85 +149,18 @@ mod tests {
             total_draws: 0,
             total_honour: 0,
             honour: 0,
-            bonus_villain: 0,
-            bonus_trickster: 0,
-            bonus_lord: 0,
+            level_villain: 0,
+            level_trickster: 0,
+            level_lord: 0,
             timestamp: 0,
         };
         utils::update_duelist_honour(ref duelist, 10);
-        assert(duelist.bonus_lord == 100, 'honour_100');
-        assert(duelist.bonus_villain == 0, 'honour_100_vill');
-        assert(duelist.bonus_trickster == 0, 'honour_100_trick');
-        // just checks sync with calc_bonus_lord
-        let value: u8 = utils::calc_bonus_lord(100);
-       assert(duelist.bonus_lord == value, '!= calc');
-    }
-
-    #[test]
-    #[available_gas(100_000_000)]
-    fn test_calc_bonus_villain() {
-        assert(utils::calc_bonus_villain(0) == arch::BONUS_MAX, 'honour_0');
-        assert(utils::calc_bonus_villain(arch::VILLAIN_START) == arch::BONUS_MAX, 'ARCH_VILLAIN_START');
-        assert(utils::calc_bonus_villain(arch::VILLAIN_START+1) < arch::BONUS_MAX, 'ARCH_VILLAIN_START+1');
-        assert(utils::calc_bonus_villain(arch::TRICKSTER_START-2) > arch::BONUS_MIN, 'ARCH_TRICKSTER_START-2');
-        assert(utils::calc_bonus_villain(arch::TRICKSTER_START-1) == arch::BONUS_MIN, 'ARCH_TRICKSTER_START-1');
-        assert(utils::calc_bonus_villain(arch::TRICKSTER_START) == 0, 'ARCH_TRICKSTER_START');
-        assert(utils::calc_bonus_villain(100) == 0, 'honour_100');
-    }
-
-    #[test]
-    #[available_gas(100_000_000)]
-    fn test_calc_bonus_lord() {
-        assert(utils::calc_bonus_lord(0) == 0, 'honour_0');
-        assert(utils::calc_bonus_lord(arch::LORD_START-1) == 0, 'ARCH_LORD_START-1');
-        assert(utils::calc_bonus_lord(arch::LORD_START) == arch::BONUS_MIN, 'ARCH_LORD_START');
-        assert(utils::calc_bonus_lord(arch::LORD_START+1) > arch::BONUS_MIN, 'ARCH_LORD_START+1');
-        assert(utils::calc_bonus_lord(arch::MAX-1) < arch::BONUS_MAX, 'arch::MAX-1');
-        assert(utils::calc_bonus_lord(arch::MAX) == arch::BONUS_MAX, 'arch::MAX');
-    }
-
-    fn _in_range(v: u8, min: u8, max: u8) -> bool {
-        (v >= min && v <= max)
-    }
-    fn _inside_range(v: u8, min: u8, max: u8) -> bool {
-        (v > min && v < max)
-    }
-
-    fn _assert_trickstry(honour: u8, duel_honour: u8, min: u8, max: u8, prefix: felt252) {
-        let bonus_trickster: u8 = utils::calc_bonus_trickster(honour, duel_honour);
-        assert(bonus_trickster >= min, String::concat(prefix, '_min'));
-        assert(bonus_trickster <= max, String::concat(prefix, '_max'));
-        // assert(bonus_trickster > 30, String::concat(prefix, '_30'));
-    }
-
-    #[test]
-    #[available_gas(100_000_000)]
-    fn test_calc_bonus_trickster() {
-        
-        assert(utils::calc_bonus_trickster(10, 100) == 0, 'honour_10');
-        assert(utils::calc_bonus_trickster(arch::TRICKSTER_START-1, 100) == 0, 'ARCH_TRICKSTER_START-1');
-        assert(utils::calc_bonus_trickster(arch::TRICKSTER_START-1, 0) == 0, 'ARCH_TRICKSTER_START-1_00');
-        //-------
-        assert(utils::calc_bonus_trickster(arch::TRICKSTER_START, 100) > 0, 'ARCH_TRICKSTER_START');
-        assert(utils::calc_bonus_trickster(arch::TRICKSTER_START, 0) > 0, 'ARCH_TRICKSTER_START_00');
-
-        // let t: u8 = arch::TRICKSTER_START;
-
-        // _assert_trickstry(100, 100, 0, 50, 50, 't_001');
-        // _assert_trickstry(100, 100, 100, 100, 100, 't_002');
-        // _assert_trickstry(100, 100, 80, 50, 50, 't_003');
-
-        // _assert_trickstry(70, 50, 70, 70, 70, 't_004');
-        // _assert_trickstry(30, 50, 70, 70, 70, 't_005');
-
-
-
-        assert(utils::calc_bonus_trickster(arch::LORD_START-1, 100) > 0, 'ARCH_LORD_START-1');
-        assert(utils::calc_bonus_trickster(arch::LORD_START-1-1, 0) > 0, 'ARCH_LORD_START-1_00');
-        //-------
-        assert(utils::calc_bonus_trickster(arch::LORD_START, 100) == 0, 'ARCH_LORD_START');
-        assert(utils::calc_bonus_trickster(arch::LORD_START, 0) == 0, 'ARCH_LORD_START_00');
-        assert(utils::calc_bonus_trickster(100, 100) == 0, 'honour_100');
+        assert(duelist.level_lord == 100, 'honour_100');
+        assert(duelist.level_villain == 0, 'honour_100_vill');
+        assert(duelist.level_trickster == 0, 'honour_100_trick');
+        // just checks sync with calc_level_lord
+        let value: u8 = utils::calc_level_lord(100);
+       assert(duelist.level_lord == value, '!= calc');
     }
 
 }

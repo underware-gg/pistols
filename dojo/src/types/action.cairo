@@ -76,13 +76,15 @@ enum Action {
 
 trait ActionTrait {
     fn is_paces(self: Action) -> bool;
+    fn as_paces(self: Action) -> u8;
     fn is_melee(self: Action) -> bool;
     fn is_runner(self: Action) -> bool;
-    fn as_paces(self: Action) -> u8;
+    fn honour(self: Action) -> i8;
     fn crit_chance(self: Action) -> u8;
     fn hit_chance(self: Action) -> u8;
     fn critical_chance(self: Action) -> u8;
-    fn honour(self: Action) -> i8;
+    fn crit_penalty(self: Action) -> u8;
+    fn hit_penalty(self: Action) -> u8;
     fn roll_priority(self: Action, other: Action) -> i8;
     fn execute_crit(self: Action, ref self_shot: Shot, ref other_shot: Shot) -> bool;
     fn execute_hit(self: Action, ref self_shot: Shot, ref other_shot: Shot, critical_chance: u8);
@@ -124,6 +126,28 @@ impl ActionTraitImpl of ActionTrait {
         }
     }
 
+    //------------------
+    // Honour per Action
+    //
+    fn honour(self: Action) -> i8 {
+        match self {
+            Action::Paces1 |
+            Action::Paces2 |
+            Action::Paces3 |
+            Action::Paces4 |
+            Action::Paces5 |
+            Action::Paces6 |
+            Action::Paces7 |
+            Action::Paces8 |
+            Action::Paces9 |
+            Action::Paces10 =>  self.into(),
+            Action::Flee =>     0,  // drops honour to zero
+            Action::Steal =>    0,  // drops honour to zero
+            Action::Seppuku =>  10, // very honourable
+            _ =>                -1, // do not affect honour
+        }
+    }
+
     //-----------------
     // Flat chances
     //
@@ -144,7 +168,7 @@ impl ActionTraitImpl of ActionTrait {
             Action::Block =>    (chances::BLADES_KILL),
             Action::Flee |
             Action::Steal |
-            Action::Seppuku =>  (chances::ALWAYS), // always succeedsset win/wager
+            Action::Seppuku =>  (chances::ALWAYS), // always succeeds
             _ =>                (chances::NEVER)
         }
     }
@@ -178,17 +202,11 @@ impl ActionTraitImpl of ActionTrait {
             Action::Paces8 |
             Action::Paces9 |
             Action::Paces10 =>  (MathU8::map(self.into(), 1, 10, chances::PISTOLS_CRITICAL_AT_STEP_1, chances::PISTOLS_CRITICAL_AT_STEP_10)),
-            Action::FastBlade |
-            Action::SlowBlade |
-            Action::Block =>    (chances::BLADES_CRITICAL),
             _ =>                (chances::NEVER)
         }
     }
 
-    //------------------
-    // Honour per Action
-    //
-    fn honour(self: Action) -> i8 {
+    fn crit_penalty(self: Action) -> u8 {
         match self {
             Action::Paces1 |
             Action::Paces2 |
@@ -199,11 +217,23 @@ impl ActionTraitImpl of ActionTrait {
             Action::Paces7 |
             Action::Paces8 |
             Action::Paces9 |
-            Action::Paces10 =>  self.into(),
-            Action::Flee =>     0,
-            Action::Steal =>    0,
-            Action::Seppuku =>  10,
-            _ =>                -1, // do not affect honour
+            Action::Paces10 =>  (chances::CRIT_PENALTY_PER_DAMAGE),
+            _ =>                (0)
+        }
+    }
+    fn hit_penalty(self: Action) -> u8 {
+        match self {
+            Action::Paces1 |
+            Action::Paces2 |
+            Action::Paces3 |
+            Action::Paces4 |
+            Action::Paces5 |
+            Action::Paces6 |
+            Action::Paces7 |
+            Action::Paces8 |
+            Action::Paces9 |
+            Action::Paces10 =>  (chances::HIT_PENALTY_PER_DAMAGE),
+            _ =>                (0)
         }
     }
 

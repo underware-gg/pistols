@@ -10,7 +10,7 @@ use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round::{RoundState, RoundStateTrait};
 use pistols::types::action::{Action, ActionTrait, ACTION};
-use pistols::types::constants::{constants, arch, chances};
+use pistols::types::constants::{constants, honour, chances};
 use pistols::utils::math::{MathU8, MathU16};
 
 // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
@@ -309,35 +309,35 @@ fn update_duelist_honour(ref duelist: Duelist, duel_honour: u8) {
     duelist.total_duels += 1;
     duelist.total_honour += duel_honour.into();
     duelist.honour = ((duelist.total_honour * 10) / duelist.total_duels.into()).try_into().unwrap();
-    duelist.bonus_villain = average_trickster(calc_bonus_villain(duelist.honour), duelist.bonus_trickster);
-    duelist.bonus_lord = average_trickster(calc_bonus_lord(duelist.honour), duelist.bonus_trickster);
-    duelist.bonus_trickster = average_trickster(calc_bonus_trickster(duelist.honour, duel_honour), duelist.bonus_trickster);
+    duelist.level_villain = average_trickster(calc_level_villain(duelist.honour), duelist.level_trickster);
+    duelist.level_lord = average_trickster(calc_level_lord(duelist.honour), duelist.level_trickster);
+    duelist.level_trickster = average_trickster(calc_level_trickster(duelist.honour, duel_honour), duelist.level_trickster);
 }
 // Villain bonus: the less honour, more bonus
 #[inline(always)]
-fn calc_bonus_villain(honour: u8) -> u8 {
-    if (honour < arch::TRICKSTER_START) {
-        (MathU8::map(honour, arch::VILLAIN_START, arch::TRICKSTER_START-1, arch::BONUS_MAX, arch::BONUS_MIN))
+fn calc_level_villain(honour: u8) -> u8 {
+    if (honour < honour::TRICKSTER_START) {
+        (MathU8::map(honour, honour::VILLAIN_START, honour::TRICKSTER_START-1, honour::LEVEL_MAX, honour::LEVEL_MIN))
     } else { (0) }
 }
 // Lord bonus: the more honour, more bonus
 #[inline(always)]
-fn calc_bonus_lord(honour: u8) -> u8 {
-    if (honour >= arch::LORD_START) {
-        (MathU8::map(honour, arch::LORD_START, arch::MAX, arch::BONUS_MIN, arch::BONUS_MAX))
+fn calc_level_lord(honour: u8) -> u8 {
+    if (honour >= honour::LORD_START) {
+        (MathU8::map(honour, honour::LORD_START, honour::MAX, honour::LEVEL_MIN, honour::LEVEL_MAX))
     } else { (0) }
 }
 // Trickster bonus: the max of...
 // high on opposites, less in the middle (shaped as a \/)
 // cap halfway without going to zero (shaped as a /\)
 #[inline(always)]
-fn calc_bonus_trickster(honour: u8, duel_honour: u8) -> u8 {
-    if (honour >= arch::TRICKSTER_START && honour < arch::LORD_START) {
+fn calc_level_trickster(honour: u8, duel_honour: u8) -> u8 {
+    if (honour >= honour::TRICKSTER_START && honour < honour::LORD_START) {
         // high on edges, low on middle (\/)
-        let ti: i16 = MathU8::map(duel_honour, arch::VILLAIN_START, arch::MAX, 0, arch::BONUS_MAX*2).try_into().unwrap() - arch::BONUS_MAX.into();
+        let ti: i16 = MathU8::map(duel_honour, honour::VILLAIN_START, honour::MAX, 0, honour::LEVEL_MAX*2).try_into().unwrap() - honour::LEVEL_MAX.into();
         let td: u8 = MathU16::abs(ti).try_into().unwrap();
         // peak on halfway to avoid zero (/\)
-        let halfway: u8 = if (duel_honour <= arch::HALFWAY) { (duel_honour) } else { arch::HALFWAY - (duel_honour - arch::HALFWAY) };
+        let halfway: u8 = if (duel_honour <= honour::HALFWAY) { (duel_honour) } else { honour::HALFWAY - (duel_honour - honour::HALFWAY) };
         (MathU8::max(td, halfway))
     } else { (0) }
 }
@@ -345,9 +345,9 @@ fn calc_bonus_trickster(honour: u8, duel_honour: u8) -> u8 {
 // for Tricksters: smooth bonuses
 // for (new) Lords and Villains: Do not go straight to zero when a Trickster switch archetype
 #[inline(always)]
-fn average_trickster(bonus: u8, current_bonus_trickster: u8) -> u8 {
-    if (current_bonus_trickster > 0) {
-        ((current_bonus_trickster + bonus) / 2)
+fn average_trickster(bonus: u8, current_level_trickster: u8) -> u8 {
+    if (current_level_trickster > 0) {
+        ((current_level_trickster + bonus) / 2)
     } else { (bonus) }
 }
 
@@ -356,33 +356,69 @@ fn average_trickster(bonus: u8, current_bonus_trickster: u8) -> u8 {
 // Chances
 //
 
-fn calc_hit_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
-    let chances: u8 = action.hit_chance();
-    let penalty: u8 = calc_hit_penalty(world, health);
-    (_apply_chance_bonus_penalty(chances, 0, penalty))
-}
+// crit bonus will be applied for Lords only
+#[inline(always)]
 fn calc_crit_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
-    let chances: u8 = action.crit_chance();
-    let bonus: u8 = calc_hit_bonus(world, duelist_address);
-    (_apply_chance_bonus_penalty(chances, bonus, 0))
+    (_apply_chance_bonus_penalty(
+        action.crit_chance(),
+        calc_crit_bonus(world, duelist_address),
+        calc_crit_penalty(action, health),
+    ))
 }
+// Hit chances will be applied to Villains only
+// Both Hit and Lethal go up/down with same bonus/penalty
+#[inline(always)]
+fn calc_hit_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
+    (_apply_chance_bonus_penalty(
+        action.hit_chance(),
+        calc_critical_bonus(world, duelist_address),
+        calc_hit_penalty(action, health),
+    ))
+}
+#[inline(always)]
 fn calc_critical_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
-    let chances: u8 = action.critical_chance();
-    let bonus: u8 = 0;
-    (_apply_chance_bonus_penalty(chances, bonus, 0))
+    (_apply_chance_bonus_penalty(
+        action.critical_chance(),
+        calc_critical_bonus(world, duelist_address),
+        calc_hit_penalty(action, health),
+    ))
 }
+#[inline(always)]
 fn _apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
-    let mut result: u8 = MathU8::sub(chance + bonus, penalty);
-    (MathU8::clamp(result, chance / 2, 100))
+    (MathU8::clamp(
+        MathU8::sub(chance + bonus, penalty),
+        (chance / 2),       // never go below half chance
+        chances::ALWAYS,    // never go above 100
+    ))
 }
 
-fn calc_hit_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> u8 {
+#[inline(always)]
+fn calc_crit_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> u8 {
     let duelist: Duelist = get!(world, duelist_address, Duelist);
-    let bonus: u8 = MathU8::sub(duelist.honour, 90);
-    (MathU16::min(bonus.into(), duelist.total_duels).try_into().unwrap())
+    (_calc_bonus(world, duelist.level_lord, chances::CRIT_BONUS, duelist.total_duels))
 }
-fn calc_hit_penalty(world: IWorldDispatcher, health: u8) -> u8 {
-    ((constants::FULL_HEALTH - health) * constants::HIT_PENALTY_PER_DAMAGE)
+#[inline(always)]
+fn calc_critical_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> u8 {
+    let duelist: Duelist = get!(world, duelist_address, Duelist);
+    (_calc_bonus(world, duelist.level_villain, chances::CRITICAL_BONUS, duelist.total_duels))
+}
+#[inline(always)]
+fn _calc_bonus(world: IWorldDispatcher, level: u8, bonus_max: u8, total_duels: u16) -> u8 {
+    let value = MathU8::map(level, 0, honour::LEVEL_MAX, 0, bonus_max);
+    (MathU16::min(value.into(), total_duels).try_into().unwrap())
+}
+
+#[inline(always)]
+fn calc_crit_penalty(action: Action, health: u8) -> u8 {
+    (_calc_penalty(health, action.crit_penalty()))
+}
+#[inline(always)]
+fn calc_hit_penalty(action: Action, health: u8) -> u8 {
+    (_calc_penalty(health, action.hit_penalty()))
+}
+#[inline(always)]
+fn _calc_penalty(health: u8, penalty_per_damage: u8) -> u8 {
+    ((constants::FULL_HEALTH - health) * penalty_per_damage)
 }
 
 // used for system read calls only

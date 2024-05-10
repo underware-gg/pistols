@@ -12,8 +12,8 @@ export default function ProgressBar({
   negative = false,
   color = null,
   percent = null,
-  includedBonusPercent = null,
-  includedHeadingPercent = null,
+  includedExtraPercent = null,
+  includedInnerPercent = null,
   value = null,
   total = null,
 }) {
@@ -42,15 +42,15 @@ export default function ProgressBar({
                 value={value}
                 total={total}
                 className={_className}
-                warning={warning || Boolean(includedBonusPercent)}
+                warning={warning || Boolean(includedExtraPercent)}
                 error={negative}
                 color={color}
               />
-              {Boolean(includedBonusPercent) &&
-                <div className='CriticalBar BgImportant' style={{ width: `${percent - includedBonusPercent}%` }} />
+              {Boolean(includedExtraPercent) &&
+                <div className='CriticalBar BgImportant' style={{ width: `${percent - includedExtraPercent}%` }} />
               }
-              {Boolean(includedHeadingPercent) &&
-                <div className='CriticalBar' style={{ width: `${includedHeadingPercent}%` }} />
+              {Boolean(includedInnerPercent) &&
+                <div className='CriticalBar' style={{ width: `${includedInnerPercent}%` }} />
               }
             </>
           }

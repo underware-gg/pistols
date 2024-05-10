@@ -189,9 +189,9 @@ mod tests {
         assert(Action::Paces3.critical_chance() < chances::PISTOLS_CRITICAL_AT_STEP_1, 'Action::Paces3.critical_chance<');
         assert(Action::Paces8.critical_chance() > chances::PISTOLS_CRITICAL_AT_STEP_10, 'Action::Paces8.critical_chance>');
         assert(Action::Paces10.critical_chance() == chances::PISTOLS_CRITICAL_AT_STEP_10, 'Action::Paces10.critical_chance');
-        assert(Action::FastBlade.critical_chance() == chances::BLADES_CRITICAL, '::FastBlade.critical_chance');
-        assert(Action::SlowBlade.critical_chance() == chances::BLADES_CRITICAL, '::FastBlade.critical_chance');
-        assert(Action::Block.critical_chance() == chances::BLADES_CRITICAL, '::FastBlade.critical_chance');
+        assert(Action::FastBlade.critical_chance() == 0, '::FastBlade.critical_chance');
+        assert(Action::SlowBlade.critical_chance() == 0, '::FastBlade.critical_chance');
+        assert(Action::Block.critical_chance() == 0, '::FastBlade.critical_chance');
     }
 
 

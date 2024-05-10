@@ -307,11 +307,13 @@ mod actions {
             (coin.calc_fee(wager_value))
         }
 
-        fn calc_hit_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> u8 {
-            (utils::calc_hit_bonus(world, duelist_address))
+        fn calc_hit_bonus(duelist_address: ContractAddress) -> u8 {
+            // (utils::calc_hit_bonus(world, duelist_address))
+            (0)
         }
-        fn calc_hit_penalty(world: IWorldDispatcher, health: u8) -> u8 {
-            (utils::calc_hit_penalty(world, health))
+        fn calc_hit_penalty(health: u8) -> u8 {
+            // (utils::calc_hit_penalty(health))
+            (0)
         }
 
         fn calc_hit_chances(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8 {
