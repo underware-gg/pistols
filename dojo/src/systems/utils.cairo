@@ -309,9 +309,9 @@ fn update_duelist_honour(ref duelist: Duelist, duel_honour: u8) {
     duelist.total_duels += 1;
     duelist.total_honour += duel_honour.into();
     duelist.honour = ((duelist.total_honour * 10) / duelist.total_duels.into()).try_into().unwrap();
-    duelist.level_villain = average_trickster(calc_level_villain(duelist.honour), duelist.level_trickster);
-    duelist.level_lord = average_trickster(calc_level_lord(duelist.honour), duelist.level_trickster);
-    duelist.level_trickster = average_trickster(calc_level_trickster(duelist.honour, duel_honour), duelist.level_trickster);
+    duelist.level_villain = _average_trickster(calc_level_villain(duelist.honour), duelist.level_trickster);
+    duelist.level_lord = _average_trickster(calc_level_lord(duelist.honour), duelist.level_trickster);
+    duelist.level_trickster = _average_trickster(calc_level_trickster(duelist.honour, duel_honour), duelist.level_trickster);
 }
 // Villain bonus: the less honour, more bonus
 #[inline(always)]
@@ -345,7 +345,7 @@ fn calc_level_trickster(honour: u8, duel_honour: u8) -> u8 {
 // for Tricksters: smooth bonuses
 // for (new) Lords and Villains: Do not go straight to zero when a Trickster switch archetype
 #[inline(always)]
-fn average_trickster(bonus: u8, current_level_trickster: u8) -> u8 {
+fn _average_trickster(bonus: u8, current_level_trickster: u8) -> u8 {
     if (current_level_trickster > 0) {
         ((current_level_trickster + bonus) / 2)
     } else { (bonus) }
@@ -395,17 +395,20 @@ fn _apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
 #[inline(always)]
 fn calc_crit_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> u8 {
     let duelist: Duelist = get!(world, duelist_address, Duelist);
-    (_calc_bonus(world, duelist.level_lord, chances::CRIT_BONUS, duelist.total_duels))
+    (_calc_bonus(chances::CRIT_BONUS, duelist.level_lord, duelist.total_duels))
 }
 #[inline(always)]
 fn calc_lethal_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> u8 {
     let duelist: Duelist = get!(world, duelist_address, Duelist);
-    (_calc_bonus(world, duelist.level_villain, chances::LETHAL_BONUS, duelist.total_duels))
+    (_calc_bonus(chances::LETHAL_BONUS, duelist.level_villain, duelist.total_duels))
 }
 #[inline(always)]
-fn _calc_bonus(world: IWorldDispatcher, level: u8, bonus_max: u8, total_duels: u16) -> u8 {
-    let value = MathU8::map(level, 0, honour::LEVEL_MAX, 0, bonus_max);
-    (MathU16::min(value.into(), total_duels).try_into().unwrap())
+fn _calc_bonus(bonus_max: u8, level: u8, total_duels: u16) -> u8 {
+    (MathU8::map(
+        MathU16::min(level.into(), total_duels * 10).try_into().unwrap(),
+        0, honour::LEVEL_MAX,
+        0, bonus_max)
+    )
 }
 
 #[inline(always)]

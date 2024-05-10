@@ -163,4 +163,45 @@ mod tests {
        assert(duelist.level_lord == value, '!= calc');
     }
 
+    #[test]
+    #[available_gas(100_000_000)]
+    fn test_average_trickster() {
+        assert(utils::_average_trickster(100, 0) == 100, '100, 0');
+        assert(utils::_average_trickster(100, 50) == 75, '100, 50');
+    }
+
+    #[test]
+    #[available_gas(100_000_000)]
+    fn test_apply_chance_bonus_penalty_average_trickster() {
+        // fn _apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8;
+        assert(utils::_apply_chance_bonus_penalty(50, 10, 0) == 60, 'bonus');
+        assert(utils::_apply_chance_bonus_penalty(50, 0, 10) == 40, 'penalty');
+        assert(utils::_apply_chance_bonus_penalty(50, 20, 10) == 60, '+bonus-penalty');
+        assert(utils::_apply_chance_bonus_penalty(50, 10, 20) == 40, '-bonus+penalty');
+        // no change
+        assert(utils::_apply_chance_bonus_penalty(100, 10, 10) == 100, 'no_change_100');
+        assert(utils::_apply_chance_bonus_penalty(50, 10, 10) == 50, 'no_change_50');
+        assert(utils::_apply_chance_bonus_penalty(0, 10, 10) == 0, 'no_change_0');
+        // clamp up
+        assert(utils::_apply_chance_bonus_penalty(90, 20, 0) == 100, 'clamp_up_0');
+        assert(utils::_apply_chance_bonus_penalty(100, 10, 0) == 100, 'clamp_up_1');
+        assert(utils::_apply_chance_bonus_penalty(100, 20, 10) == 100, 'clamp_up_2');
+        assert(utils::_apply_chance_bonus_penalty(50, 100, 0) == 100, 'clamp_up_3');
+        assert(utils::_apply_chance_bonus_penalty(50, 100, 10) == 100, 'clamp_up_4');
+        // clamp down
+        assert(utils::_apply_chance_bonus_penalty(50, 0, 30) == 25, 'clamp_down_1');
+        assert(utils::_apply_chance_bonus_penalty(50, 0, 100) == 25, 'clamp_down_2');
+        assert(utils::_apply_chance_bonus_penalty(50, 50, 100) == 25, 'clamp_down_3');
+    }
+
+    #[test]
+    #[available_gas(100_000_000)]
+    fn test_calc_penalty() {
+        // fn _calc_penalty(health: u8, penalty_per_damage: u8) -> u8;
+        assert(utils::_calc_penalty(3, 10) == 0, 'h_3');
+        assert(utils::_calc_penalty(2, 10) == 10, 'h_2');
+        assert(utils::_calc_penalty(1, 10) == 20, 'h_3');
+        assert(utils::_calc_penalty(0, 10) == 30, 'h_1');
+    }
+
 }
