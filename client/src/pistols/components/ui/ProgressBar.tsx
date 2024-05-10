@@ -47,10 +47,10 @@ export default function ProgressBar({
                 color={color}
               />
               {Boolean(includedExtraPercent) &&
-                <div className='CriticalBar BgImportant' style={{ width: `${percent - includedExtraPercent}%` }} />
+                <div className='LethalBar BgImportant' style={{ width: `${percent - includedExtraPercent}%` }} />
               }
               {Boolean(includedInnerPercent) &&
-                <div className='CriticalBar' style={{ width: `${includedInnerPercent}%` }} />
+                <div className='LethalBar' style={{ width: `${includedInnerPercent}%` }} />
               }
             </>
           }

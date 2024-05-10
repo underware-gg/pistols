@@ -34,8 +34,8 @@ mod chances {
     const PISTOLS_KILL_AT_STEP_10: u8 = 20;
     const PISTOLS_HIT_AT_STEP_1: u8 = 100;
     const PISTOLS_HIT_AT_STEP_10: u8 = 20;
-    const PISTOLS_CRITICAL_AT_STEP_1: u8 = 80;    // from PISTOLS_HIT_AT_STEP_1
-    const PISTOLS_CRITICAL_AT_STEP_10: u8 = 5;    // from PISTOLS_HIT_AT_STEP_10
+    const PISTOLS_LETHAL_AT_STEP_1: u8 = 80;    // from PISTOLS_HIT_AT_STEP_1
+    const PISTOLS_LETHAL_AT_STEP_10: u8 = 5;    // from PISTOLS_HIT_AT_STEP_10
 
     // Blades chances (percentage)
     const BLADES_KILL: u8 = 15;
@@ -43,7 +43,7 @@ mod chances {
 
     // Bonus and penalties
     const CRIT_BONUS: u8 = 10;
-    const CRITICAL_BONUS: u8 = 10;
+    const LETHAL_BONUS: u8 = 10;
 
     // penalties for damage
     const HIT_PENALTY_PER_DAMAGE: u8 = 10;

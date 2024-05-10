@@ -371,15 +371,15 @@ fn calc_crit_chances(world: IWorldDispatcher, duelist_address: ContractAddress, 
 fn calc_hit_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
     (_apply_chance_bonus_penalty(
         action.hit_chance(),
-        calc_critical_bonus(world, duelist_address),
+        calc_lethal_bonus(world, duelist_address),
         calc_hit_penalty(action, health),
     ))
 }
 #[inline(always)]
-fn calc_critical_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
+fn calc_lethal_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
     (_apply_chance_bonus_penalty(
-        action.critical_chance(),
-        calc_critical_bonus(world, duelist_address),
+        action.lethal_chance(),
+        calc_lethal_bonus(world, duelist_address),
         calc_hit_penalty(action, health),
     ))
 }
@@ -398,9 +398,9 @@ fn calc_crit_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) ->
     (_calc_bonus(world, duelist.level_lord, chances::CRIT_BONUS, duelist.total_duels))
 }
 #[inline(always)]
-fn calc_critical_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> u8 {
+fn calc_lethal_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> u8 {
     let duelist: Duelist = get!(world, duelist_address, Duelist);
-    (_calc_bonus(world, duelist.level_villain, chances::CRITICAL_BONUS, duelist.total_duels))
+    (_calc_bonus(world, duelist.level_villain, chances::LETHAL_BONUS, duelist.total_duels))
 }
 #[inline(always)]
 fn _calc_bonus(world: IWorldDispatcher, level: u8, bonus_max: u8, total_duels: u16) -> u8 {

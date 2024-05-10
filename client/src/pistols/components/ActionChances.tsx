@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
-import { useCalcHitBonus, useCalcCritChances, useCalcHitChances, useCalcCriticalChances, useCalcHonourForAction } from '@/pistols/hooks/useContractCalls'
+import { useCalcHitBonus, useCalcCritChances, useCalcHitChances, useCalcLethalChances, useCalcHonourForAction } from '@/pistols/hooks/useContractCalls'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import { Action } from '@/pistols/utils/pistols'
 import ProgressBar from '@/pistols/components/ui/ProgressBar'
@@ -21,7 +21,7 @@ export function ActionChances({
   const { hitBonus } = useCalcHitBonus(accountAddress)
   const { hitChances } = useCalcHitChances(accountAddress, duelId, roundNumber, action)
   const { critChances } = useCalcCritChances(accountAddress, duelId, roundNumber, action)
-  const { criticalChances } = useCalcCriticalChances(accountAddress, duelId, roundNumber, action)
+  const { lethalChances } = useCalcLethalChances(accountAddress, duelId, roundNumber, action)
   const { honourForAction } = useCalcHonourForAction(accountAddress, action, 0)
   const { critChances: otherCritChances } = useCalcCritChances(isA ? duelistB : duelistA, duelId, roundNumber, Action.Strong)
 
@@ -42,7 +42,7 @@ export function ActionChances({
   return (
     <>
       <ProgressBar disabled={!action} label={hitBonus ? <span>{executionLabel} / <span className='Warning'>Bonus</span>:</span> : `${executionLabel}:`} percent={_critChances} includedExtraPercent={hitBonus} className='ChancesBar' />
-      <ProgressBar disabled={!action} label={criticalChances ? <span>Hit / <span className='Warning'>Critical</span>:</span> : 'Hit:'} percent={hitChances} includedInnerPercent={criticalChances} className='ChancesBar' />
+      <ProgressBar disabled={!action} label={lethalChances ? <span>Hit / <span className='Warning'>Lethal</span>:</span> : 'Hit:'} percent={hitChances} includedInnerPercent={lethalChances} className='ChancesBar' />
       <ProgressBar disabled={!action} label='Honour:' value={_honourValue} total={10} className='ChancesBar' warning={_honourWarning} negative={_honourNegative} color={honourForAction == 0 ? 'grey' : null} />
 
       <p className=' AlignCenter'>&nbsp;

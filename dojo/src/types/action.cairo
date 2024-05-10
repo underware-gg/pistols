@@ -82,12 +82,12 @@ trait ActionTrait {
     fn honour(self: Action) -> i8;
     fn crit_chance(self: Action) -> u8;
     fn hit_chance(self: Action) -> u8;
-    fn critical_chance(self: Action) -> u8;
+    fn lethal_chance(self: Action) -> u8;
     fn crit_penalty(self: Action) -> u8;
     fn hit_penalty(self: Action) -> u8;
     fn roll_priority(self: Action, other: Action) -> i8;
     fn execute_crit(self: Action, ref self_shot: Shot, ref other_shot: Shot) -> bool;
-    fn execute_hit(self: Action, ref self_shot: Shot, ref other_shot: Shot, critical_chance: u8);
+    fn execute_hit(self: Action, ref self_shot: Shot, ref other_shot: Shot, lethal_chance: u8);
 }
 
 impl ActionTraitImpl of ActionTrait {
@@ -190,7 +190,7 @@ impl ActionTraitImpl of ActionTrait {
             _ =>                (chances::NEVER)
         }
     }
-    fn critical_chance(self: Action) -> u8 {
+    fn lethal_chance(self: Action) -> u8 {
         match self {
             Action::Paces1 |
             Action::Paces2 |
@@ -201,7 +201,7 @@ impl ActionTraitImpl of ActionTrait {
             Action::Paces7 |
             Action::Paces8 |
             Action::Paces9 |
-            Action::Paces10 =>  (MathU8::map(self.into(), 1, 10, chances::PISTOLS_CRITICAL_AT_STEP_1, chances::PISTOLS_CRITICAL_AT_STEP_10)),
+            Action::Paces10 =>  (MathU8::map(self.into(), 1, 10, chances::PISTOLS_LETHAL_AT_STEP_1, chances::PISTOLS_LETHAL_AT_STEP_10)),
             _ =>                (chances::NEVER)
         }
     }
@@ -332,7 +332,7 @@ impl ActionTraitImpl of ActionTrait {
     }
 
     // dices decided for a hit, just execute it
-    fn execute_hit(self: Action, ref self_shot: Shot, ref other_shot: Shot, critical_chance: u8) {
+    fn execute_hit(self: Action, ref self_shot: Shot, ref other_shot: Shot, lethal_chance: u8) {
         match self {
             Action::Paces1 |
             Action::Paces2 |
@@ -344,7 +344,7 @@ impl ActionTraitImpl of ActionTrait {
             Action::Paces8 |
             Action::Paces9 |
             Action::Paces10 => {
-                if (self_shot.dice_hit <= critical_chance) {
+                if (self_shot.dice_hit <= lethal_chance) {
                     other_shot.damage = constants::DOUBLE_DAMAGE;   // full damage
                 } else {
                     other_shot.damage = constants::SINGLE_DAMAGE;   // glance
