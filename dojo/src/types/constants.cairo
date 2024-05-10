@@ -42,8 +42,10 @@ mod chances {
     const BLADES_HIT: u8 = 75;
 
     // Bonus and penalties
-    const CRIT_BONUS: u8 = 10;
-    const LETHAL_BONUS: u8 = 10;
+    const CRIT_BONUS_LORD: u8 = 10;
+    const CRIT_BONUS_TRICKSTER: u8 = 6;
+    const LETHAL_BONUS_VILLAIN: u8 = 20;
+    const LETHAL_BONUS_TRICKSTER: u8 = 10;
 
     // penalties for damage
     const HIT_PENALTY_PER_DAMAGE: u8 = 10;

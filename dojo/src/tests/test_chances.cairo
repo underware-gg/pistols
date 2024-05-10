@@ -8,6 +8,8 @@ mod tests {
     use core::traits::{Into, TryInto};
     use starknet::{ContractAddress};
 
+    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+
     use pistols::systems::{utils};
     use pistols::models::models::{init, Round, Shot, Duelist, Chances};
     use pistols::types::constants::{constants, honour, chances};
@@ -89,60 +91,143 @@ mod tests {
     // Bonuses
     //
 
-    // #[test]
-    // #[available_gas(1_000_000_000)]
-    // fn test_pistols_bonus() {
-    //     let (world, system, _admin, _lords, _ierc20, owner, _other, _bummer, _treasury) = utils::setup_world(true, true);
-    //     let name: felt252 = 'DuelistName';
-    //     utils::execute_register_duelist(system, owner, name, 1);
-    //     let mut duelist: Duelist = utils::get_Duelist(world, owner);
-    //     // no bonus at start
-    //     let bonus: u8 = system.calc_hit_bonus(owner);
-    //     assert(bonus == 0, 'bonus_0');
-    //     //
-    //     // No bonus
-    //     duelist.honour = 90;
-    //     duelist.total_duels = 100;
-    //     set!(world,(duelist));
-    //     let bonus: u8 = system.calc_hit_bonus(owner);
-    //     assert(bonus == 0, 'bonus_0');
-    //     // bonus 5
-    //     duelist.honour = 95;
-    //     set!(world,(duelist));
-    //     let bonus: u8 = system.calc_hit_bonus(owner);
-    //     assert(bonus == 5, 'bonus_5');
-    //     // bonus 10
-    //     duelist.honour = 100;
-    //     set!(world,(duelist));
-    //     let bonus: u8 = system.calc_hit_bonus(owner);
-    //     assert(bonus == 10, 'bonus_10');
-    //     // bonus 11
-    //     // duelist.honour = 101;
-    //     // set!(world,(duelist));
-    //     // let bonus: u8 = system.calc_hit_bonus(owner);
-    //     // assert(bonus == 10, 'bonus_11');
-    //     //
-    //     // 1 duel cap
-    //     duelist.honour = 100;
-    //     duelist.total_duels = 1;
-    //     set!(world,(duelist));
-    //     let bonus: u8 = system.calc_hit_bonus(owner);
-    //     assert(bonus == 1, 'bonus_cap_1');
-    //     // 5 duel cap
-    //     duelist.total_duels = 5;
-    //     set!(world,(duelist));
-    //     let bonus: u8 = system.calc_hit_bonus(owner);
-    //     assert(bonus == 5, 'bonus_cap_5');
-    //     // 10 duel cap
-    //     duelist.total_duels = 10;
-    //     set!(world,(duelist));
-    //     let bonus: u8 = system.calc_hit_bonus(owner);
-    //     assert(bonus == 10, 'bonus_cap_10');
-    //     // 20 duel cap
-    //     duelist.total_duels = 20;
-    //     set!(world,(duelist));
-    //     let bonus: u8 = system.calc_hit_bonus(owner);
-    //     assert(bonus == 10, 'bonus_cap_20');
-    // }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_calc_crit_bonus() {
+        let (world, system, _admin, _lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(true, true);
+        let name: felt252 = 'DuelistName';
+        tester::execute_register_duelist(system, owner, name, 1);
+        let mut duelist: Duelist = tester::get_Duelist(world, owner);
+        //
+        // No bonus
+        assert(utils::calc_crit_bonus(world, owner) == 0, 'bonus_0');
+        //
+        // levels
+        duelist.level_lord = 100;
+        duelist.total_duels = 10;
+        set!(world,(duelist));
+        assert(utils::calc_crit_bonus(world, owner) == chances::CRIT_BONUS_LORD, 'level_100');
+        duelist.level_lord = 90;
+        set!(world,(duelist));
+        assert(utils::calc_crit_bonus(world, owner) < chances::CRIT_BONUS_LORD, 'level_90');
+        duelist.level_lord = 50;
+        set!(world,(duelist));
+        assert(utils::calc_crit_bonus(world, owner) == chances::CRIT_BONUS_LORD/2, 'level_50');
+        duelist.level_lord = 10;
+        set!(world,(duelist));
+        assert(utils::calc_crit_bonus(world, owner) > 0, 'level_10');
+        duelist.level_lord = 0;
+        set!(world,(duelist));
+        assert(utils::calc_crit_bonus(world, owner) == 0, 'level_0');
+        //
+        // Clamp to total_duels
+        duelist.level_lord = 100;
+        duelist.total_duels = 9;
+        set!(world,(duelist));
+        assert(utils::calc_crit_bonus(world, owner) < chances::CRIT_BONUS_LORD, 'total_duels_9');
+        duelist.total_duels = 5;
+        set!(world,(duelist));
+        assert(utils::calc_crit_bonus(world, owner) == chances::CRIT_BONUS_LORD/2, 'total_duels_5');
+        duelist.total_duels = 1;
+        set!(world,(duelist));
+        assert(utils::calc_crit_bonus(world, owner) > 0, 'total_duels_1');
+        duelist.total_duels = 0;
+        set!(world,(duelist));
+        assert(utils::calc_crit_bonus(world, owner) == 0, 'total_duels_0');
+        //
+        // not for villains
+        duelist.level_lord = 0;
+        duelist.level_villain = 100;
+        duelist.total_duels = 10;
+        set!(world,(duelist));
+        assert(utils::calc_crit_bonus(world, owner) == 0, 'no_villain');
+        //
+        // tricksters get half
+        duelist.level_lord = 0;
+        duelist.level_villain = 0;
+        duelist.level_trickster = 100;
+        duelist.total_duels = 10;
+        set!(world,(duelist));
+        assert(utils::calc_crit_bonus(world, owner) == chances::CRIT_BONUS_TRICKSTER, 'trickster_level_100');
+        duelist.level_trickster = 50;
+        set!(world,(duelist));
+        assert(utils::calc_crit_bonus(world, owner) == chances::CRIT_BONUS_TRICKSTER/2, 'trickster_level_50');
+        duelist.level_trickster = 10;
+        set!(world,(duelist));
+        assert(utils::calc_crit_bonus(world, owner) > 0, 'trickster_level_10');
+        duelist.level_trickster = 0;
+        set!(world,(duelist));
+        assert(utils::calc_crit_bonus(world, owner) == 0, 'trickster_level_0');
+    }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_calc_lethal_bonus() {
+        let (world, system, _admin, _lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(true, true);
+        let name: felt252 = 'DuelistName';
+        tester::execute_register_duelist(system, owner, name, 1);
+        let mut duelist: Duelist = tester::get_Duelist(world, owner);
+        //
+        // No bonus
+        assert(utils::calc_lethal_bonus(world, owner) == 0, 'bonus_0');
+        //
+        // levels
+        duelist.level_villain = 100;
+        duelist.total_duels = 10;
+        set!(world,(duelist));
+        assert(utils::calc_lethal_bonus(world, owner) == chances::LETHAL_BONUS_VILLAIN, 'level_100');
+        duelist.level_villain = 90;
+        set!(world,(duelist));
+        assert(utils::calc_lethal_bonus(world, owner) < chances::LETHAL_BONUS_VILLAIN, 'level_90');
+        duelist.level_villain = 50;
+        set!(world,(duelist));
+        assert(utils::calc_lethal_bonus(world, owner) == chances::LETHAL_BONUS_VILLAIN/2, 'level_50');
+        duelist.level_villain = 10;
+        set!(world,(duelist));
+        assert(utils::calc_lethal_bonus(world, owner) > 0, 'level_10');
+        duelist.level_villain = 0;
+        set!(world,(duelist));
+        assert(utils::calc_lethal_bonus(world, owner) == 0, 'level_0');
+        //
+        // Clamp to total_duels
+        duelist.level_villain = 100;
+        duelist.total_duels = 9;
+        set!(world,(duelist));
+        assert(utils::calc_lethal_bonus(world, owner) < chances::LETHAL_BONUS_VILLAIN, 'total_duels_9');
+        duelist.total_duels = 5;
+        set!(world,(duelist));
+        assert(utils::calc_lethal_bonus(world, owner) == chances::LETHAL_BONUS_VILLAIN/2, 'total_duels_5');
+        duelist.total_duels = 1;
+        set!(world,(duelist));
+        assert(utils::calc_lethal_bonus(world, owner) > 0, 'total_duels_1');
+        duelist.total_duels = 0;
+        set!(world,(duelist));
+        assert(utils::calc_lethal_bonus(world, owner) == 0, 'total_duels_0');
+        //
+        // not for villains
+        duelist.level_lord = 100;
+        duelist.level_villain = 0;
+        duelist.total_duels = 10;
+        set!(world,(duelist));
+        assert(utils::calc_lethal_bonus(world, owner) == 0, 'no_lords');
+        //
+        // tricksters get half
+        duelist.level_lord = 0;
+        duelist.level_villain = 0;
+        duelist.level_trickster = 100;
+        duelist.total_duels = 10;
+        set!(world,(duelist));
+        assert(utils::calc_lethal_bonus(world, owner) == chances::LETHAL_BONUS_TRICKSTER, 'trickster_level_100');
+        duelist.level_trickster = 50;
+        set!(world,(duelist));
+        assert(utils::calc_lethal_bonus(world, owner) == chances::LETHAL_BONUS_TRICKSTER/2, 'trickster_level_50');
+        duelist.level_trickster = 10;
+        set!(world,(duelist));
+        assert(utils::calc_lethal_bonus(world, owner) > 0, 'trickster_level_10');
+        duelist.level_trickster = 0;
+        set!(world,(duelist));
+        assert(utils::calc_lethal_bonus(world, owner) == 0, 'trickster_level_0');
+
+    }
 
 }

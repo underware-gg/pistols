@@ -395,20 +395,36 @@ fn _apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
 #[inline(always)]
 fn calc_crit_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> u8 {
     let duelist: Duelist = get!(world, duelist_address, Duelist);
-    (_calc_bonus(chances::CRIT_BONUS, duelist.level_lord, duelist.total_duels))
+    if (duelist.level_lord > 0) {
+        (_calc_bonus(chances::CRIT_BONUS_LORD, duelist.level_lord, duelist.total_duels))
+    } else if (duelist.level_trickster > 0) {
+        (_calc_bonus(chances::CRIT_BONUS_TRICKSTER, duelist.level_trickster, duelist.total_duels))
+    } else {
+        (0)
+    }
 }
 #[inline(always)]
 fn calc_lethal_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> u8 {
     let duelist: Duelist = get!(world, duelist_address, Duelist);
-    (_calc_bonus(chances::LETHAL_BONUS, duelist.level_villain, duelist.total_duels))
+    if (duelist.level_villain > 0) {
+        (_calc_bonus(chances::LETHAL_BONUS_VILLAIN, duelist.level_villain, duelist.total_duels))
+    } else if (duelist.level_trickster > 0) {
+        (_calc_bonus(chances::LETHAL_BONUS_TRICKSTER, duelist.level_trickster, duelist.total_duels))
+    } else {
+        (0)
+    }
 }
 #[inline(always)]
 fn _calc_bonus(bonus_max: u8, level: u8, total_duels: u16) -> u8 {
-    (MathU8::map(
-        MathU16::min(level.into(), total_duels * 10).try_into().unwrap(),
-        0, honour::LEVEL_MAX,
-        0, bonus_max)
-    )
+    if (level > 0 && total_duels > 0) {
+        (MathU8::max(1, MathU8::map(
+            MathU16::min(level.into(), total_duels * 10).try_into().unwrap(),
+            0, honour::LEVEL_MAX,
+            0, bonus_max)
+        ))
+    } else {
+        (0)
+    }
 }
 
 #[inline(always)]
