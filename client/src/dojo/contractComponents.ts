@@ -45,10 +45,23 @@ export function defineContractComponents(world: World) {
         }
       );
     })(),
+    Chances: (() => {
+      return defineComponent(
+        world,
+        { key: RecsType.BigInt, crit_chances: RecsType.Number, crit_bonus: RecsType.Number, hit_chances: RecsType.Number, hit_bonus: RecsType.Number, lethal_chances: RecsType.Number, lethal_bonus: RecsType.Number },
+        {
+          metadata: {
+            name: "Chances",
+            types: ["felt252","u8","u8","u8","u8","u8","u8"],
+            customTypes: [],
+          },
+        }
+      );
+    })(),
     Duelist: (() => {
       return defineComponent(
         world,
-        { address: RecsType.BigInt, name: RecsType.BigInt, profile_pic: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, total_honour: RecsType.Number, honour: RecsType.Number, bonus_villain: RecsType.Number, bonus_trickster: RecsType.Number, bonus_lord: RecsType.Number, timestamp: RecsType.BigInt },
+        { address: RecsType.BigInt, name: RecsType.BigInt, profile_pic: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, total_honour: RecsType.Number, honour: RecsType.Number, level_villain: RecsType.Number, level_trickster: RecsType.Number, level_lord: RecsType.Number, timestamp: RecsType.BigInt },
         {
           metadata: {
             name: "Duelist",

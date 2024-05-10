@@ -165,40 +165,23 @@ export function createSystemCalls(
     return results !== null ? results[0] : null
   }
 
-  const calc_hit_bonus = async (duelist: bigint): Promise<number | null> => {
-    const args = [duelist]
-    const results = await _executeCall(actions_call('calc_hit_bonus', args))
-    return results !== null ? Number(results[0]) : null
-  }
-
-  const calc_hit_penalty = async (health: number): Promise<number | null> => {
-    const args = [health]
-    const results = await _executeCall(actions_call('calc_hit_penalty', args))
-    return results !== null ? Number(results[0]) : null
-  }
-
-  const calc_hit_chances = async (duelist: bigint, duel_id: bigint, round_number: number, action): Promise<number | null> => {
-    const args = [duelist, duel_id, round_number, action]
-    const results = await _executeCall(actions_call('calc_hit_chances', args))
-    return results !== null ? Number(results[0]) : null
-  }
-
-  const calc_crit_chances = async (duelist: bigint, duel_id: bigint, round_number: number, action): Promise<number | null> => {
-    const args = [duelist, duel_id, round_number, action]
-    const results = await _executeCall(actions_call('calc_crit_chances', args))
-    return results !== null ? Number(results[0]) : null
-  }
-
-  const calc_critical_chances = async (duelist: bigint, duel_id: bigint, round_number: number, action): Promise<number | null> => {
-    const args = [duelist, duel_id, round_number, action]
-    const results = await _executeCall(actions_call('calc_critical_chances', args))
-    return results !== null ? Number(results[0]) : null
-  }
-
   const simulate_honour_for_action = async (duelist: bigint, action: number): Promise<number | null> => {
     const args = [duelist, action]
     const results = await _executeCall(actions_call('simulate_honour_for_action', args))
     return (results !== null && results[0] >= 0) ? Number(results[0]) : null
+  }
+
+  const simulate_chances = async (duelist: bigint, duel_id: bigint, round_number: number, action): Promise<number | null> => {
+    const args = [duelist, duel_id, round_number, action]
+    const results = await _executeCall(actions_call('simulate_chances', args))
+    return results !== null ? Number(results[0]) : null
+
+  // calc_hit_bonus,
+  // calc_hit_penalty,
+  // calc_hit_chances,
+  // calc_crit_chances,
+  // calc_lethal_chances,
+
   }
 
   const get_valid_packed_actions = async (round_number: number): Promise<number[] | null> => {
@@ -227,11 +210,7 @@ export function createSystemCalls(
     get_pact,
     has_pact,
     calc_fee,
-    calc_hit_bonus,
-    calc_hit_penalty,
-    calc_hit_chances,
-    calc_crit_chances,
-    calc_critical_chances,
+    simulate_chances,
     simulate_honour_for_action,
     get_valid_packed_actions,
     // pack_action_slots,

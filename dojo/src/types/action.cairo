@@ -18,7 +18,7 @@ mod ACTION {
     // Inaction / Invalid (skip round)
     const IDLE: u8 = 0x00;
     //
-    // Paces
+    // Paces (round 1)
     const PACES_1: u8 = 0x01;
     const PACES_2: u8 = 0x02;
     const PACES_3: u8 = 0x03;
@@ -30,7 +30,7 @@ mod ACTION {
     const PACES_9: u8 = 0x09;
     const PACES_10: u8 = 0x0a;
     //
-    // Blades
+    // Blades (round 2+)
     const FAST_BLADE: u8 = 0x10;
     const SLOW_BLADE: u8 = 0x20;
     const BLOCK: u8 = 0x30;
@@ -59,7 +59,7 @@ enum Action {
     Paces8,
     Paces9,
     Paces10,
-    // Blades
+    // Melee
     FastBlade,
     SlowBlade,
     Block,
@@ -79,13 +79,13 @@ trait ActionTrait {
     fn as_paces(self: Action) -> u8;
     fn is_melee(self: Action) -> bool;
     fn is_runner(self: Action) -> bool;
+    fn roll_priority(self: Action, other: Action) -> i8;
     fn honour(self: Action) -> i8;
     fn crit_chance(self: Action) -> u8;
     fn hit_chance(self: Action) -> u8;
     fn lethal_chance(self: Action) -> u8;
     fn crit_penalty(self: Action) -> u8;
     fn hit_penalty(self: Action) -> u8;
-    fn roll_priority(self: Action, other: Action) -> i8;
     fn execute_crit(self: Action, ref self_shot: Shot, ref other_shot: Shot) -> bool;
     fn execute_hit(self: Action, ref self_shot: Shot, ref other_shot: Shot, lethal_chance: u8);
 }
@@ -123,6 +123,48 @@ impl ActionTraitImpl of ActionTrait {
             Action::Steal |
             Action::Seppuku =>  true,
             _ =>                false,
+        }
+    }
+
+    //----------------------------
+    // Roll priority
+    //
+    // returns
+    // < 0: self rolls first
+    //   0: roll simultaneously
+    // > 0: other rolls first
+    //
+    fn roll_priority(self: Action, other: Action) -> i8 {
+        // Lowest paces shoot first
+        let is_paces_a: bool = self.is_paces();
+        let is_paces_b: bool = other.is_paces();
+        if (is_paces_a && is_paces_b) {
+            //
+            // Paces vs Paces
+            //
+            // Lowest pace shoots first
+            let paces_a: i8 = self.into();
+            let paces_b: i8 = other.into();
+            (paces_a - paces_b)
+        } else {
+            //
+            // Blades vs Blades
+            //
+            // Slow crits first for a chance of Execution
+            if (self == Action::SlowBlade && other != Action::SlowBlade) {
+                return (-1);
+            }
+            if (other == Action::SlowBlade && self != Action::SlowBlade) {
+                return (1);
+            }
+            // Flee/Steal rolls after paces
+            if (self.is_runner() && is_paces_b) {
+                return (1);
+            }
+            if (is_paces_a && other.is_runner()) {
+                return (-1);
+            }
+            (0) // default in sync
         }
     }
 
@@ -238,47 +280,8 @@ impl ActionTraitImpl of ActionTrait {
     }
 
     //----------------------------
-    // Roll priority
+    // Execution
     //
-    // returns
-    // < 0: self rolls first
-    //   0: roll simultaneously
-    // > 0: other rolls first
-    //
-    fn roll_priority(self: Action, other: Action) -> i8 {
-        // Lowest paces shoot first
-        let is_paces_a: bool = self.is_paces();
-        let is_paces_b: bool = other.is_paces();
-        if (is_paces_a && is_paces_b) {
-            //
-            // Paces vs Paces
-            //
-            // Lowest pace shoots first
-            let paces_a: i8 = self.into();
-            let paces_b: i8 = other.into();
-            (paces_a - paces_b)
-        } else {
-            //
-            // Blades vs Blades
-            //
-            // Slow crits first for a chance of Execution
-            if (self == Action::SlowBlade && other != Action::SlowBlade) {
-                return (-1);
-            }
-            if (other == Action::SlowBlade && self != Action::SlowBlade) {
-                return (1);
-            }
-            // Flee/Steal rolls after paces
-            if (self.is_runner() && is_paces_b) {
-                return (1);
-            }
-            if (is_paces_a && other.is_runner()) {
-                return (-1);
-            }
-            (0) // default in sync
-        }
-    }
-
     // dices decided for a crit, just execute it
     // returns true if ended in execution
     fn execute_crit(self: Action, ref self_shot: Shot, ref other_shot: Shot) -> bool {

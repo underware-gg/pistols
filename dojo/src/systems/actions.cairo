@@ -1,5 +1,5 @@
 use starknet::{ContractAddress};
-use pistols::models::models::{Duelist};
+use pistols::models::models::{Duelist, Chances};
 use pistols::types::challenge::{ChallengeState};
 
 // define the interface
@@ -47,14 +47,9 @@ trait IActions {
     fn has_pact(duelist_a: ContractAddress, duelist_b: ContractAddress) -> bool;
 
     fn calc_fee(wager_coin: u8, wager_value: u256) -> u256;
-
-    fn calc_hit_bonus(duelist_address: ContractAddress) -> u8;
-    fn calc_hit_penalty(health: u8) -> u8;
-
-    fn calc_hit_chances(duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8;
-    fn calc_crit_chances(duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8;
-    fn calc_critical_chances(duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8;
+    
     fn simulate_honour_for_action(duelist_address: ContractAddress, action: u8) -> (i8, u8);
+    fn simulate_chances(duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> Chances;
 
     fn get_valid_packed_actions(round_number: u8) -> Array<u16>;
     fn pack_action_slots(slot1: u8, slot2: u8) -> u16;
@@ -67,7 +62,7 @@ mod actions {
     use traits::{Into, TryInto};
     use starknet::{ContractAddress, get_block_timestamp, get_block_info};
 
-    use pistols::models::models::{Duelist, Challenge, Wager, Pact, Round, Shot};
+    use pistols::models::models::{Duelist, Challenge, Wager, Pact, Round, Shot, Chances};
     use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
     use pistols::models::coins::{Coin, CoinManager, CoinManagerTrait, CoinTrait, coins, ETH_TO_WEI};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
@@ -307,29 +302,27 @@ mod actions {
             (coin.calc_fee(wager_value))
         }
 
-        fn calc_hit_bonus(duelist_address: ContractAddress) -> u8 {
-            // (utils::calc_hit_bonus(world, duelist_address))
-            (0)
-        }
-        fn calc_hit_penalty(health: u8) -> u8 {
-            // (utils::calc_hit_penalty(health))
-            (0)
-        }
-
-        fn calc_hit_chances(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8 {
-            let health: u8 = utils::get_duelist_health(world, duelist_address, duel_id, round_number);
-            (utils::calc_hit_chances(world, duelist_address, action.into(), health))
-        }
-        fn calc_crit_chances(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8 {
-            let health: u8 = utils::get_duelist_health(world, duelist_address, duel_id, round_number);
-            (utils::calc_crit_chances(world, duelist_address, action.into(), health))
-        }
-        fn calc_critical_chances(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> u8 {
-            let health: u8 = utils::get_duelist_health(world, duelist_address, duel_id, round_number);
-            (utils::calc_critical_chances(world, duelist_address, action.into(), health))
-        }
         fn simulate_honour_for_action(world: IWorldDispatcher, duelist_address: ContractAddress, action: u8) -> (i8, u8) {
             (utils::simulate_honour_for_action(world, duelist_address, action.into()))
+        }
+
+        fn simulate_chances(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> Chances {
+            let health: u8 = utils::get_duelist_health(world, duelist_address, duel_id, round_number);
+            let hit_chances: u8 = utils::calc_hit_chances(world, duelist_address, action.into(), health);
+            let crit_chances: u8 = utils::calc_crit_chances(world, duelist_address, action.into(), health);
+            let lethal_chances: u8 = utils::calc_lethal_chances(world, duelist_address, action.into(), health);
+            let crit_bonus: u8 = utils::calc_crit_bonus(world, duelist_address);
+            let hit_bonus: u8 = 0;
+            let lethal_bonus: u8 = utils::calc_lethal_bonus(world, duelist_address);
+            (Chances {
+                key: 0,
+                crit_chances,
+                crit_bonus,
+                hit_chances,
+                hit_bonus,
+                lethal_chances,
+                lethal_bonus,
+            })
         }
 
         fn get_valid_packed_actions(round_number: u8) -> Array<u16> {
