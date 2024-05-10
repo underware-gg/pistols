@@ -38,8 +38,8 @@ mod chances {
     const PISTOLS_LETHAL_AT_STEP_10: u8 = 5;    // from PISTOLS_HIT_AT_STEP_10
 
     // Blades chances (percentage)
-    const BLADES_KILL: u8 = 15;
-    const BLADES_HIT: u8 = 75;
+    const BLADES_CRIT: u8 = 20;
+    const BLADES_HIT: u8 = 90;
 
     // Bonus and penalties
     const CRIT_BONUS_LORD: u8 = 10;

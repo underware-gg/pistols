@@ -207,7 +207,7 @@ impl ActionTraitImpl of ActionTrait {
             Action::Paces10 =>  (MathU8::map(self.into(), 1, 10, chances::PISTOLS_KILL_AT_STEP_1, chances::PISTOLS_KILL_AT_STEP_10)),
             Action::FastBlade |
             Action::SlowBlade |
-            Action::Block =>    (chances::BLADES_KILL),
+            Action::Block =>    (chances::BLADES_CRIT),
             Action::Flee |
             Action::Steal |
             Action::Seppuku =>  (chances::ALWAYS), // always succeeds

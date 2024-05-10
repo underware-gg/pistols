@@ -171,9 +171,9 @@ mod tests {
         assert(Action::Paces3.crit_chance() > chances::PISTOLS_KILL_AT_STEP_1, 'Action::Paces3.crit_chance>');
         assert(Action::Paces8.crit_chance() < chances::PISTOLS_KILL_AT_STEP_10, 'Action::Paces8.crit_chance<');
         assert(Action::Paces10.crit_chance() == chances::PISTOLS_KILL_AT_STEP_10, 'Action::Paces10.crit_chance');
-        assert(Action::FastBlade.crit_chance() == chances::BLADES_KILL, 'Action::FastBlade.crit_chance');
-        assert(Action::SlowBlade.crit_chance() == chances::BLADES_KILL, 'Action::FastBlade.crit_chance');
-        assert(Action::Block.crit_chance() == chances::BLADES_KILL, 'Action::FastBlade.crit_chance');
+        assert(Action::FastBlade.crit_chance() == chances::BLADES_CRIT, 'Action::FastBlade.crit_chance');
+        assert(Action::SlowBlade.crit_chance() == chances::BLADES_CRIT, 'Action::FastBlade.crit_chance');
+        assert(Action::Block.crit_chance() == chances::BLADES_CRIT, 'Action::FastBlade.crit_chance');
 
         assert(Action::Idle.hit_chance() == 0, 'Action::Idle.hit_chance');
         assert(Action::Paces1.hit_chance() == chances::PISTOLS_HIT_AT_STEP_1, 'Action::Paces1.hit_chance');
