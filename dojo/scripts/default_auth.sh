@@ -6,6 +6,10 @@ if ! [ -x "$(command -v toml)" ]; then
   echo 'Error: toml not instlaled! Instal with: cargo install toml-cli'
   exit 1
 fi
+if ! [ -x "$(command -v jq)" ]; then
+  echo 'Error: jq not instlaled! Instal with: brew install jq'
+  exit 1
+fi
 
 # Profile
 if [ $# -ge 1 ]; then

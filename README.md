@@ -120,9 +120,10 @@ rustup update
 # Install Cargo
 curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh
 
-# other stuff you might need
-cargo install toml-cli
+# other stuff you will need
+brew install jq
 brew install protobuf
+cargo install toml-cli
 ```
 
 Install the [Cairo 1.0](https://marketplace.visualstudio.com/items?itemName=starkware.cairo1) extension for Visual Studio Code
