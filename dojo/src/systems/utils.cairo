@@ -358,28 +358,28 @@ fn _average_trickster(bonus: u8, current_level_trickster: u8) -> u8 {
 
 // crit bonus will be applied for Lords only
 #[inline(always)]
-fn calc_crit_chances(duelist: Duelist, action: Action, health: u8) -> u8 {
+fn calc_crit_chances(attacker: Duelist, defender: Duelist, action: Action, health: u8) -> u8 {
     (_apply_chance_bonus_penalty(
         action.crit_chance(),
-        calc_crit_bonus(duelist),
-        calc_crit_penalty(action, health),
+        calc_crit_bonus(attacker),
+        calc_crit_penalty(action, health) + calc_trickster_penalty(attacker, defender, chances::TRICKSTER_CRIT_PENALTY),
     ))
 }
 // Hit chances will be applied to Villains only
 // Both Hit and Lethal go up/down with same bonus/penalty
 #[inline(always)]
-fn calc_hit_chances(duelist: Duelist, action: Action, health: u8) -> u8 {
+fn calc_hit_chances(attacker: Duelist, defender: Duelist, action: Action, health: u8) -> u8 {
     (_apply_chance_bonus_penalty(
         action.hit_chance(),
-        calc_lethal_bonus(duelist),
-        calc_hit_penalty(action, health),
+        calc_lethal_bonus(attacker),
+        calc_hit_penalty(action, health) + calc_trickster_penalty(attacker, defender, chances::TRICKSTER_HIT_PENALTY),
     ))
 }
 #[inline(always)]
-fn calc_lethal_chances(duelist: Duelist, action: Action, health: u8) -> u8 {
+fn calc_lethal_chances(attacker: Duelist, defender: Duelist, action: Action, health: u8) -> u8 {
     (_apply_chance_bonus_penalty(
         action.lethal_chance(),
-        calc_lethal_bonus(duelist),
+        calc_lethal_bonus(attacker),
         calc_hit_penalty(action, health),
     ))
 }
@@ -437,6 +437,15 @@ fn calc_hit_penalty(action: Action, health: u8) -> u8 {
 #[inline(always)]
 fn _calc_penalty(health: u8, penalty_per_damage: u8) -> u8 {
     ((constants::FULL_HEALTH - health) * penalty_per_damage)
+}
+
+#[inline(always)]
+fn calc_trickster_penalty(attacker: Duelist, defender: Duelist, penalty: u8) -> u8 {
+    if (defender.is_trickster() && !attacker.is_trickster()) {
+        (penalty)
+    } else {
+        (0)
+    }
 }
 
 // used for system read calls only

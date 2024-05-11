@@ -50,4 +50,8 @@ mod chances {
     // penalties for damage
     const HIT_PENALTY_PER_DAMAGE: u8 = 10;
     const CRIT_PENALTY_PER_DAMAGE: u8 = 5;
+
+    // trickster advantage
+    const TRICKSTER_CRIT_PENALTY: u8 = 2;
+    const TRICKSTER_HIT_PENALTY: u8 = 10;
 }

@@ -310,9 +310,9 @@ mod actions {
             let duelist: Duelist = get!(world, duelist_address, Duelist);
             let health: u8 = utils::get_duelist_health(world, duelist_address, duel_id, round_number);
             
-            let hit_chances: u8 = utils::calc_hit_chances(duelist, action.into(), health);
-            let crit_chances: u8 = utils::calc_crit_chances(duelist, action.into(), health);
-            let lethal_chances: u8 = utils::calc_lethal_chances(duelist, action.into(), health);
+            let hit_chances: u8 = utils::calc_hit_chances(duelist, duelist, action.into(), health);
+            let crit_chances: u8 = utils::calc_crit_chances(duelist, duelist, action.into(), health);
+            let lethal_chances: u8 = utils::calc_lethal_chances(duelist, duelist, action.into(), health);
             let crit_bonus: u8 = utils::calc_crit_bonus(duelist);
             let hit_bonus: u8 = 0;
             let lethal_bonus: u8 = utils::calc_lethal_bonus(duelist);
