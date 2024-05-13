@@ -13,4 +13,6 @@ if [[
   exit 1
 fi
 
-torii --world $WORLD_ADDRESS $*
+torii \
+  --allowed-origins "*" --index-pending \
+  --world $WORLD_ADDRESS $*
