@@ -27,7 +27,6 @@
     "react": "file:../../dojo.js/node_modules/react",
     "react-cookie": "^6.1.1",
     "react-dom": "^18.2.0",
-    "react-unity-webgl": "^9.4.3",
     "sass": "^1.69.5",
     "semantic-ui-css": "^2.5.0",
     "semantic-ui-react": "^3.0.0-beta.2",
