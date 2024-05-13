@@ -9,32 +9,32 @@ importers:
   .:
     dependencies:
       '@dojoengine/core':
-        specifier: file:../../dojo.js/packages/core
-        version: file:../../dojo.js/packages/core(starknet@5.25.0(encoding@0.1.13))(typescript@5.4.5)(zod@3.22.4)
+        specifier: ^0.6.125
+        version: 0.6.125(starknet@5.25.0(encoding@0.1.13))(typescript@5.4.5)(zod@3.22.4)
       '@dojoengine/create-burner':
-        specifier: file:../../dojo.js/packages/create-burner
-        version: file:../../dojo.js/packages/create-burner(react@file:../../dojo.js/node_modules/react)(starknet@5.25.0(encoding@0.1.13))(typescript@5.4.5)(zod@3.22.4)
+        specifier: ^0.6.125
+        version: 0.6.125(react@18.2.0)(starknet@5.25.0(encoding@0.1.13))(typescript@5.4.5)(zod@3.22.4)
       '@dojoengine/react':
-        specifier: file:../../dojo.js/packages/react
-        version: file:../../dojo.js/packages/react(react@file:../../dojo.js/node_modules/react)(starknet@5.25.0(encoding@0.1.13))(type-fest@2.19.0)(typescript@5.4.5)(zod@3.22.4)
+        specifier: ^0.6.125
+        version: 0.6.125(react@18.2.0)(starknet@5.25.0(encoding@0.1.13))(type-fest@2.19.0)(typescript@5.4.5)(zod@3.22.4)
       '@dojoengine/recs':
         specifier: ^0.1.35
         version: 0.1.35(typescript@5.4.5)(zod@3.22.4)
       '@dojoengine/state':
-        specifier: file:../../dojo.js/packages/state
-        version: file:../../dojo.js/packages/state(starknet@5.25.0(encoding@0.1.13))(typescript@5.4.5)(zod@3.22.4)
+        specifier: ^0.6.125
+        version: 0.6.125(starknet@5.25.0(encoding@0.1.13))(typescript@5.4.5)(zod@3.22.4)
       '@dojoengine/torii-client':
-        specifier: file:../../dojo.js/packages/torii-client
-        version: file:../../dojo.js/packages/torii-client
+        specifier: ^0.6.125
+        version: 0.6.125
       '@dojoengine/utils':
-        specifier: file:../../dojo.js/packages/utils
-        version: file:../../dojo.js/packages/utils(starknet@5.25.0(encoding@0.1.13))(typescript@5.4.5)(zod@3.22.4)
+        specifier: ^0.6.125
+        version: 0.6.125(starknet@5.25.0(encoding@0.1.13))(typescript@5.4.5)(zod@3.22.4)
       '@starknet-react/chains':
         specifier: ^0.1.7
         version: 0.1.7
       '@starknet-react/core':
         specifier: ^2.4.0
-        version: 2.6.0(get-starknet-core@3.2.0(starknet@5.25.0(encoding@0.1.13)))(react@file:../../dojo.js/node_modules/react)(starknet@5.25.0(encoding@0.1.13))
+        version: 2.6.0(get-starknet-core@3.2.0(starknet@5.25.0(encoding@0.1.13)))(react@18.2.0)(starknet@5.25.0(encoding@0.1.13))
       '@tweenjs/tween.js':
         specifier: ^21.0.0
         version: 21.1.1
@@ -46,16 +46,16 @@ importers:
         version: 3.2.0(starknet@5.25.0(encoding@0.1.13))
       next:
         specifier: ^14.2.3
-        version: 14.2.3(react-dom@18.2.0(react@file:../../dojo.js/node_modules/react))(react@file:../../dojo.js/node_modules/react)(sass@1.74.1)
+        version: 14.2.3(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.74.1)
       react:
-        specifier: file:../../dojo.js/node_modules/react
-        version: file:../../dojo.js/node_modules/react
+        specifier: ^18.2.0
+        version: 18.2.0
       react-cookie:
         specifier: ^6.1.1
-        version: 6.1.3(react@file:../../dojo.js/node_modules/react)
+        version: 6.1.3(react@18.2.0)
       react-dom:
         specifier: ^18.2.0
-        version: 18.2.0(react@file:../../dojo.js/node_modules/react)
+        version: 18.2.0(react@18.2.0)
       sass:
         specifier: ^1.69.5
         version: 1.74.1
@@ -64,13 +64,13 @@ importers:
         version: 2.5.0
       semantic-ui-react:
         specifier: ^3.0.0-beta.2
-        version: 3.0.0-beta.2(react-dom@18.2.0(react@file:../../dojo.js/node_modules/react))(react@file:../../dojo.js/node_modules/react)
+        version: 3.0.0-beta.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       starknet:
         specifier: 5.25.0
         version: 5.25.0(encoding@0.1.13)
       swr:
         specifier: ^2.2.4
-        version: 2.2.5(react@file:../../dojo.js/node_modules/react)
+        version: 2.2.5(react@18.2.0)
       three:
         specifier: ^0.157.0
         version: 0.157.0
@@ -79,7 +79,7 @@ importers:
         version: 2.19.0
       use-local-storage-state:
         specifier: ^19.1.0
-        version: 19.2.0(react-dom@18.2.0(react@file:../../dojo.js/node_modules/react))(react@file:../../dojo.js/node_modules/react)
+        version: 19.2.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
     devDependencies:
       '@next/eslint-plugin-next':
         specifier: ^14.0.3
@@ -134,20 +134,14 @@ packages:
     peerDependencies:
       starknet: ^6.1.5
 
-  '@dojoengine/core@file:../../dojo.js/packages/core':
-    resolution: {directory: ../../dojo.js/packages/core, type: directory}
-    hasBin: true
-    peerDependencies:
-      starknet: ^6.1.5
-
-  '@dojoengine/create-burner@file:../../dojo.js/packages/create-burner':
-    resolution: {directory: ../../dojo.js/packages/create-burner, type: directory}
+  '@dojoengine/create-burner@0.6.125':
+    resolution: {integrity: sha512-M2SedOlkMFURPYOnDEov73K7ruUe1e38FNz0QWBzDGbqfUU/KdJJJxZzFAqGaIgojZXa4rePvOVBykQl+iF2rw==}
     peerDependencies:
       react: ^18.2.0
       starknet: ^6.1.5
 
-  '@dojoengine/react@file:../../dojo.js/packages/react':
-    resolution: {directory: ../../dojo.js/packages/react, type: directory}
+  '@dojoengine/react@0.6.125':
+    resolution: {integrity: sha512-FiBr7B2bsMMUXvjI9NYX1vvmcdPiGFYKxcTtvGl91pZkfrViJSEoj6iVbkyZXi9Y4HVuFrO8RsaRwTrxSQ42XQ==}
     peerDependencies:
       react: ^18.2.0
       starknet: ^6.1.5
@@ -161,27 +155,14 @@ packages:
     peerDependencies:
       starknet: ^6.1.5
 
-  '@dojoengine/state@file:../../dojo.js/packages/state':
-    resolution: {directory: ../../dojo.js/packages/state, type: directory}
-    peerDependencies:
-      starknet: ^6.1.5
-
   '@dojoengine/torii-client@0.6.125':
     resolution: {integrity: sha512-uxr3KG/AtKNtuwjShsdqndzqyEHh6uxLFcqJkfmf1f4TyHNWDBkgZPP6jaGaFLg13dmeIpS8yJGn3QFSjmxD8g==}
-
-  '@dojoengine/torii-client@file:../../dojo.js/packages/torii-client':
-    resolution: {directory: ../../dojo.js/packages/torii-client, type: directory}
 
   '@dojoengine/torii-wasm@0.6.125':
     resolution: {integrity: sha512-HUTblcadQ5MOcwoODbvj6w3nzIx4+JoYuRXgEWQcRaEOL4FKrBWYTmY960pSbskjwvpMtIg2BDNG9pIis6ip0g==}
 
   '@dojoengine/utils@0.6.125':
     resolution: {integrity: sha512-bAn5zpQqTr5vrnhGeWi81xuccWW/VuqsLkXULTZbiWf0MsFGlInOn8dwvy6LYf9cEUZMokKDI9xdAG90PITFJQ==}
-    peerDependencies:
-      starknet: ^6.1.5
-
-  '@dojoengine/utils@file:../../dojo.js/packages/utils':
-    resolution: {directory: ../../dojo.js/packages/utils, type: directory}
     peerDependencies:
       starknet: ^6.1.5
 
@@ -295,7 +276,6 @@ packages:
 
   '@fluentui/react-component-event-listener@0.63.1':
     resolution: {integrity: sha512-gSMdOh6tI3IJKZFqxfQwbTpskpME0CvxdxGM2tdglmf6ZPVDi0L4+KKIm+2dN8nzb8Ya1A8ZT+Ddq0KmZtwVQg==}
-    version: 0.63.1
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18
       react-dom: ^16.8.0 || ^17 || ^18
@@ -447,7 +427,6 @@ packages:
 
   '@semantic-ui-react/event-stack@3.1.3':
     resolution: {integrity: sha512-FdTmJyWvJaYinHrKRsMLDrz4tTMGdFfds299Qory53hBugiDvGC0tEJf+cHsi5igDwWb/CLOgOiChInHwq8URQ==}
-    version: 3.1.3
     peerDependencies:
       react: ^16.0.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.0.0 || ^17.0.0 || ^18.0.0
@@ -457,7 +436,6 @@ packages:
 
   '@starknet-react/core@2.3.0':
     resolution: {integrity: sha512-8g9d0Gs811gJnQJHVMxQoXYhv+y5/qug7NQ0lnJ51uytdBhr/Zz5wgeTHW4ZQ5Igljyvf+ks+yhp4P1iSvnSqA==}
-    version: 2.3.0
     peerDependencies:
       get-starknet-core: ^3.2.0
       react: ^18.0
@@ -465,7 +443,6 @@ packages:
 
   '@starknet-react/core@2.6.0':
     resolution: {integrity: sha512-T45TTOD624UDUtnkKjLOTY+TEFir/m9FP1BT+x7DazV4fNJFcRxJCbBWCe8ijWUHeNM3PfZvdN2lI7xp3SSyzg==}
-    version: 2.6.0
     peerDependencies:
       get-starknet-core: ^3.2.0
       react: ^18.0
@@ -482,7 +459,6 @@ packages:
 
   '@tanstack/react-query@5.29.0':
     resolution: {integrity: sha512-yxlhHB73jaBla6h5B6zPaGmQjokkzAhMHN4veotkPNiQ3Ac/mCxgABRZPsJJrgCTvhpcncBZcDBFxaR2B37vug==}
-    version: 5.29.0
     peerDependencies:
       react: ^18.0.0
 
@@ -1133,7 +1109,6 @@ packages:
 
   next@14.2.3:
     resolution: {integrity: sha512-dowFkFTR8v79NPJO4QsBUtxv0g9BrS/phluVpMAt2ku7H+cbcBJlopXjkWlwxrk/xGqMemr7JkGPGemPrLLX7A==}
-    version: 14.2.3
     engines: {node: '>=18.17.0'}
     hasBin: true
     peerDependencies:
@@ -1239,13 +1214,11 @@ packages:
 
   react-cookie@6.1.3:
     resolution: {integrity: sha512-cOToXQPdxvLfK0MH4ZFrrL3cOpDwbboKupFS96MCvrHsHMABMk48vdd1fRWkNG6F5D1JZMvoI5Y74sj8vtHGpA==}
-    version: 6.1.3
     peerDependencies:
       react: '>= 16.3.0'
 
   react-dom@18.2.0:
     resolution: {integrity: sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g==}
-    version: 18.2.0
     peerDependencies:
       react: ^18.2.0
 
@@ -1260,14 +1233,13 @@ packages:
 
   react-popper@2.3.0:
     resolution: {integrity: sha512-e1hj8lL3uM+sgSR4Lxzn5h1GxBlpa4CQz0XLF8kx4MDrDRWY0Ena4c97PUeSX9i5W3UAfDP0z0FXCTQkoXUl3Q==}
-    version: 2.3.0
     peerDependencies:
       '@popperjs/core': ^2.0.0
       react: ^16.8.0 || ^17 || ^18
       react-dom: ^16.8.0 || ^17 || ^18
 
-  react@file:../../dojo.js/node_modules/react:
-    resolution: {directory: ../../dojo.js/node_modules/react, type: directory}
+  react@18.2.0:
+    resolution: {integrity: sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==}
     engines: {node: '>=0.10.0'}
 
   readdirp@3.6.0:
@@ -1317,7 +1289,6 @@ packages:
 
   semantic-ui-react@3.0.0-beta.2:
     resolution: {integrity: sha512-BFqd7dGPgXPbIkWkIzkPrPRBElf/iB4NKOSFl5tZwMEaIyGQXbvtVWHyOW0sMD2A/qZPgY2Wl/19GDc9JOg3ng==}
-    version: 3.0.0-beta.2
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
@@ -1379,7 +1350,6 @@ packages:
 
   styled-jsx@5.1.1:
     resolution: {integrity: sha512-pW7uC1l4mBZ8ugbiZrcIsiIvVx1UmTfw7UkC3Um2tmfUq9Bhk8IiyEIPl6F8agHgjzku6j0xQEZbfA5uSgSaCw==}
-    version: 5.1.1
     engines: {node: '>= 12.0.0'}
     peerDependencies:
       '@babel/core': '*'
@@ -1397,7 +1367,6 @@ packages:
 
   swr@2.2.5:
     resolution: {integrity: sha512-QtxqyclFeAsxEUeZIYmsaQ0UjimSq1RZ9Un7I68/0ClKK/U3LoyQunwkQfJZr2fc22DfIXLNDc2wFyTEikCUpg==}
-    version: 2.2.5
     peerDependencies:
       react: ^16.11.0 || ^17.0.0 || ^18.0.0
 
@@ -1464,7 +1433,6 @@ packages:
 
   use-local-storage-state@19.2.0:
     resolution: {integrity: sha512-z5+n406vi3FzPJW6+lzuL/LJr4VLhXsUq1TWWeHQABL37bnJ159dSUmO7XuwqvACX93ZA9P2vkB8GMDgq1rr7A==}
-    version: 19.2.0
     engines: {node: '>=14'}
     peerDependencies:
       react: '>=18'
@@ -1472,7 +1440,6 @@ packages:
 
   use-sync-external-store@1.2.0:
     resolution: {integrity: sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==}
-    version: 1.2.0
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
 
@@ -1566,25 +1533,15 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@dojoengine/core@file:../../dojo.js/packages/core(starknet@5.25.0(encoding@0.1.13))(typescript@5.4.5)(zod@3.22.4)':
-    dependencies:
-      '@dojoengine/recs': 0.1.35(typescript@5.4.5)(zod@3.22.4)
-      starknet: 5.25.0(encoding@0.1.13)
-    transitivePeerDependencies:
-      - bufferutil
-      - typescript
-      - utf-8-validate
-      - zod
-
-  '@dojoengine/create-burner@file:../../dojo.js/packages/create-burner(react@file:../../dojo.js/node_modules/react)(starknet@5.25.0(encoding@0.1.13))(typescript@5.4.5)(zod@3.22.4)':
+  '@dojoengine/create-burner@0.6.125(react@18.2.0)(starknet@5.25.0(encoding@0.1.13))(typescript@5.4.5)(zod@3.22.4)':
     dependencies:
       '@dojoengine/core': 0.6.125(starknet@5.25.0(encoding@0.1.13))(typescript@5.4.5)(zod@3.22.4)
       '@scure/bip32': 1.4.0
-      '@starknet-react/core': 2.3.0(get-starknet-core@3.2.0(starknet@5.25.0(encoding@0.1.13)))(react@file:../../dojo.js/node_modules/react)(starknet@5.25.0(encoding@0.1.13))
+      '@starknet-react/core': 2.3.0(get-starknet-core@3.2.0(starknet@5.25.0(encoding@0.1.13)))(react@18.2.0)(starknet@5.25.0(encoding@0.1.13))
       encoding: 0.1.13
       get-starknet-core: 3.2.0(starknet@5.25.0(encoding@0.1.13))
       js-cookie: 3.0.5
-      react: file:../../dojo.js/node_modules/react
+      react: 18.2.0
       starknet: 5.25.0(encoding@0.1.13)
     transitivePeerDependencies:
       - bufferutil
@@ -1592,7 +1549,7 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@dojoengine/react@file:../../dojo.js/packages/react(react@file:../../dojo.js/node_modules/react)(starknet@5.25.0(encoding@0.1.13))(type-fest@2.19.0)(typescript@5.4.5)(zod@3.22.4)':
+  '@dojoengine/react@0.6.125(react@18.2.0)(starknet@5.25.0(encoding@0.1.13))(type-fest@2.19.0)(typescript@5.4.5)(zod@3.22.4)':
     dependencies:
       '@dojoengine/recs': 0.1.35(typescript@5.4.5)(zod@3.22.4)
       '@dojoengine/state': 0.6.125(starknet@5.25.0(encoding@0.1.13))(typescript@5.4.5)(zod@3.22.4)
@@ -1603,7 +1560,7 @@ snapshots:
       fast-deep-equal: 3.1.3
       get-starknet-core: 3.2.0(starknet@5.25.0(encoding@0.1.13))
       js-cookie: 3.0.5
-      react: file:../../dojo.js/node_modules/react
+      react: 18.2.0
       rxjs: 7.5.5
       starknet: 5.25.0(encoding@0.1.13)
       type-fest: 2.19.0
@@ -1637,24 +1594,7 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@dojoengine/state@file:../../dojo.js/packages/state(starknet@5.25.0(encoding@0.1.13))(typescript@5.4.5)(zod@3.22.4)':
-    dependencies:
-      '@dojoengine/recs': 0.1.35(typescript@5.4.5)(zod@3.22.4)
-      '@dojoengine/torii-client': 0.6.125
-      '@latticexyz/utils': 2.0.4
-      starknet: 5.25.0(encoding@0.1.13)
-    transitivePeerDependencies:
-      - bufferutil
-      - typescript
-      - utf-8-validate
-      - zod
-
   '@dojoengine/torii-client@0.6.125':
-    dependencies:
-      '@dojoengine/torii-wasm': 0.6.125
-      typescript: 5.4.5
-
-  '@dojoengine/torii-client@file:../../dojo.js/packages/torii-client':
     dependencies:
       '@dojoengine/torii-wasm': 0.6.125
       typescript: 5.4.5
@@ -1662,19 +1602,6 @@ snapshots:
   '@dojoengine/torii-wasm@0.6.125': {}
 
   '@dojoengine/utils@0.6.125(starknet@5.25.0(encoding@0.1.13))(typescript@5.4.5)(zod@3.22.4)':
-    dependencies:
-      '@dojoengine/recs': 0.1.35(typescript@5.4.5)(zod@3.22.4)
-      '@latticexyz/utils': 2.0.4
-      mathjs: 12.4.1
-      micro-starknet: 0.2.3
-      starknet: 5.25.0(encoding@0.1.13)
-    transitivePeerDependencies:
-      - bufferutil
-      - typescript
-      - utf-8-validate
-      - zod
-
-  '@dojoengine/utils@file:../../dojo.js/packages/utils(starknet@5.25.0(encoding@0.1.13))(typescript@5.4.5)(zod@3.22.4)':
     dependencies:
       '@dojoengine/recs': 0.1.35(typescript@5.4.5)(zod@3.22.4)
       '@latticexyz/utils': 2.0.4
@@ -1965,11 +1892,11 @@ snapshots:
       '@ethersproject/properties': 5.7.0
       '@ethersproject/strings': 5.7.0
 
-  '@fluentui/react-component-event-listener@0.63.1(react-dom@18.2.0(react@file:../../dojo.js/node_modules/react))(react@file:../../dojo.js/node_modules/react)':
+  '@fluentui/react-component-event-listener@0.63.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
       '@babel/runtime': 7.24.4
-      react: file:../../dojo.js/node_modules/react
-      react-dom: 18.2.0(react@file:../../dojo.js/node_modules/react)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
 
   '@humanwhocodes/config-array@0.11.14':
     dependencies:
@@ -2116,34 +2043,34 @@ snapshots:
       '@noble/curves': 1.3.0
       '@noble/hashes': 1.3.3
 
-  '@semantic-ui-react/event-stack@3.1.3(react-dom@18.2.0(react@file:../../dojo.js/node_modules/react))(react@file:../../dojo.js/node_modules/react)':
+  '@semantic-ui-react/event-stack@3.1.3(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
       exenv: 1.2.2
       prop-types: 15.8.1
-      react: file:../../dojo.js/node_modules/react
-      react-dom: 18.2.0(react@file:../../dojo.js/node_modules/react)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
 
   '@starknet-react/chains@0.1.7': {}
 
-  '@starknet-react/core@2.3.0(get-starknet-core@3.2.0(starknet@5.25.0(encoding@0.1.13)))(react@file:../../dojo.js/node_modules/react)(starknet@5.25.0(encoding@0.1.13))':
+  '@starknet-react/core@2.3.0(get-starknet-core@3.2.0(starknet@5.25.0(encoding@0.1.13)))(react@18.2.0)(starknet@5.25.0(encoding@0.1.13))':
     dependencies:
       '@starknet-react/chains': 0.1.7
-      '@tanstack/react-query': 5.29.0(react@file:../../dojo.js/node_modules/react)
+      '@tanstack/react-query': 5.29.0(react@18.2.0)
       eventemitter3: 5.0.1
       get-starknet-core: 3.2.0(starknet@5.25.0(encoding@0.1.13))
       immutable: 4.3.5
-      react: file:../../dojo.js/node_modules/react
+      react: 18.2.0
       starknet: 5.25.0(encoding@0.1.13)
       zod: 3.22.4
 
-  '@starknet-react/core@2.6.0(get-starknet-core@3.2.0(starknet@5.25.0(encoding@0.1.13)))(react@file:../../dojo.js/node_modules/react)(starknet@5.25.0(encoding@0.1.13))':
+  '@starknet-react/core@2.6.0(get-starknet-core@3.2.0(starknet@5.25.0(encoding@0.1.13)))(react@18.2.0)(starknet@5.25.0(encoding@0.1.13))':
     dependencies:
       '@starknet-react/chains': 0.1.7
-      '@tanstack/react-query': 5.29.0(react@file:../../dojo.js/node_modules/react)
+      '@tanstack/react-query': 5.29.0(react@18.2.0)
       eventemitter3: 5.0.1
       get-starknet-core: 3.2.0(starknet@5.25.0(encoding@0.1.13))
       immutable: 4.3.5
-      react: file:../../dojo.js/node_modules/react
+      react: 18.2.0
       starknet: 5.25.0(encoding@0.1.13)
       zod: 3.22.4
 
@@ -2156,10 +2083,10 @@ snapshots:
 
   '@tanstack/query-core@5.29.0': {}
 
-  '@tanstack/react-query@5.29.0(react@file:../../dojo.js/node_modules/react)':
+  '@tanstack/react-query@5.29.0(react@18.2.0)':
     dependencies:
       '@tanstack/query-core': 5.29.0
-      react: file:../../dojo.js/node_modules/react
+      react: 18.2.0
 
   '@tweenjs/tween.js@21.1.1': {}
 
@@ -2880,7 +2807,7 @@ snapshots:
 
   next-tick@1.1.0: {}
 
-  next@14.2.3(react-dom@18.2.0(react@file:../../dojo.js/node_modules/react))(react@file:../../dojo.js/node_modules/react)(sass@1.74.1):
+  next@14.2.3(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.74.1):
     dependencies:
       '@next/env': 14.2.3
       '@swc/helpers': 0.5.5
@@ -2888,9 +2815,9 @@ snapshots:
       caniuse-lite: 1.0.30001608
       graceful-fs: 4.2.11
       postcss: 8.4.31
-      react: file:../../dojo.js/node_modules/react
-      react-dom: 18.2.0(react@file:../../dojo.js/node_modules/react)
-      styled-jsx: 5.1.1(react@file:../../dojo.js/node_modules/react)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      styled-jsx: 5.1.1(react@18.2.0)
     optionalDependencies:
       '@next/swc-darwin-arm64': 14.2.3
       '@next/swc-darwin-x64': 14.2.3
@@ -2980,17 +2907,17 @@ snapshots:
 
   queue-microtask@1.2.3: {}
 
-  react-cookie@6.1.3(react@file:../../dojo.js/node_modules/react):
+  react-cookie@6.1.3(react@18.2.0):
     dependencies:
       '@types/hoist-non-react-statics': 3.3.5
       hoist-non-react-statics: 3.3.2
-      react: file:../../dojo.js/node_modules/react
+      react: 18.2.0
       universal-cookie: 6.1.3
 
-  react-dom@18.2.0(react@file:../../dojo.js/node_modules/react):
+  react-dom@18.2.0(react@18.2.0):
     dependencies:
       loose-envify: 1.4.0
-      react: file:../../dojo.js/node_modules/react
+      react: 18.2.0
       scheduler: 0.23.0
 
   react-fast-compare@3.2.2: {}
@@ -2999,15 +2926,15 @@ snapshots:
 
   react-is@18.2.0: {}
 
-  react-popper@2.3.0(@popperjs/core@2.11.8)(react-dom@18.2.0(react@file:../../dojo.js/node_modules/react))(react@file:../../dojo.js/node_modules/react):
+  react-popper@2.3.0(@popperjs/core@2.11.8)(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
       '@popperjs/core': 2.11.8
-      react: file:../../dojo.js/node_modules/react
-      react-dom: 18.2.0(react@file:../../dojo.js/node_modules/react)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
       react-fast-compare: 3.2.2
       warning: 4.0.3
 
-  react@file:../../dojo.js/node_modules/react:
+  react@18.2.0:
     dependencies:
       loose-envify: 1.4.0
 
@@ -3053,21 +2980,21 @@ snapshots:
     dependencies:
       jquery: 3.7.1
 
-  semantic-ui-react@3.0.0-beta.2(react-dom@18.2.0(react@file:../../dojo.js/node_modules/react))(react@file:../../dojo.js/node_modules/react):
+  semantic-ui-react@3.0.0-beta.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
       '@babel/runtime': 7.24.4
-      '@fluentui/react-component-event-listener': 0.63.1(react-dom@18.2.0(react@file:../../dojo.js/node_modules/react))(react@file:../../dojo.js/node_modules/react)
+      '@fluentui/react-component-event-listener': 0.63.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@popperjs/core': 2.11.8
-      '@semantic-ui-react/event-stack': 3.1.3(react-dom@18.2.0(react@file:../../dojo.js/node_modules/react))(react@file:../../dojo.js/node_modules/react)
+      '@semantic-ui-react/event-stack': 3.1.3(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       clsx: 1.2.1
       keyboard-key: 1.1.0
       lodash: 4.17.21
       lodash-es: 4.17.21
       prop-types: 15.8.1
-      react: file:../../dojo.js/node_modules/react
-      react-dom: 18.2.0(react@file:../../dojo.js/node_modules/react)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
       react-is: 18.2.0
-      react-popper: 2.3.0(@popperjs/core@2.11.8)(react-dom@18.2.0(react@file:../../dojo.js/node_modules/react))(react@file:../../dojo.js/node_modules/react)
+      react-popper: 2.3.0(@popperjs/core@2.11.8)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       shallowequal: 1.1.0
 
   semver@7.6.0:
@@ -3124,20 +3051,20 @@ snapshots:
 
   strip-json-comments@3.1.1: {}
 
-  styled-jsx@5.1.1(react@file:../../dojo.js/node_modules/react):
+  styled-jsx@5.1.1(react@18.2.0):
     dependencies:
       client-only: 0.0.1
-      react: file:../../dojo.js/node_modules/react
+      react: 18.2.0
 
   supports-color@7.2.0:
     dependencies:
       has-flag: 4.0.0
 
-  swr@2.2.5(react@file:../../dojo.js/node_modules/react):
+  swr@2.2.5(react@18.2.0):
     dependencies:
       client-only: 0.0.1
-      react: file:../../dojo.js/node_modules/react
-      use-sync-external-store: 1.2.0(react@file:../../dojo.js/node_modules/react)
+      react: 18.2.0
+      use-sync-external-store: 1.2.0(react@18.2.0)
 
   text-table@0.2.0: {}
 
@@ -3184,14 +3111,14 @@ snapshots:
 
   url-join@4.0.1: {}
 
-  use-local-storage-state@19.2.0(react-dom@18.2.0(react@file:../../dojo.js/node_modules/react))(react@file:../../dojo.js/node_modules/react):
+  use-local-storage-state@19.2.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
-      react: file:../../dojo.js/node_modules/react
-      react-dom: 18.2.0(react@file:../../dojo.js/node_modules/react)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
 
-  use-sync-external-store@1.2.0(react@file:../../dojo.js/node_modules/react):
+  use-sync-external-store@1.2.0(react@18.2.0):
     dependencies:
-      react: file:../../dojo.js/node_modules/react
+      react: 18.2.0
 
   viem@1.14.0(typescript@5.4.5)(zod@3.22.4):
     dependencies:
