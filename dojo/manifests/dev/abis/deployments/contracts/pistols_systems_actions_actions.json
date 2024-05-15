@@ -627,6 +627,23 @@
   },
   {
     "type": "event",
+    "name": "pistols::types::events::ChallengeResolvedEvent",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "duel_id",
+        "type": "core::integer::u128",
+        "kind": "data"
+      },
+      {
+        "name": "winner_address",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
     "name": "pistols::types::events::DuelistTurnEvent",
     "kind": "struct",
     "members": [
@@ -670,6 +687,11 @@
       {
         "name": "ChallengeAcceptedEvent",
         "type": "pistols::types::events::ChallengeAcceptedEvent",
+        "kind": "nested"
+      },
+      {
+        "name": "ChallengeResolvedEvent",
+        "type": "pistols::types::events::ChallengeResolvedEvent",
         "kind": "nested"
       },
       {

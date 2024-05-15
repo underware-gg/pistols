@@ -1474,8 +1474,8 @@
     {
       "kind": "DojoContract",
       "address": "0x6dda46ca9b7cee1b06a77890a71f0221f332f01f6f05ebd0894feb9a76b7752",
-      "class_hash": "0x348cd80401c121b1c3d74f8e8ff7b4b657a8b1caec74481bdbe20d84461c0cb",
-      "original_class_hash": "0x348cd80401c121b1c3d74f8e8ff7b4b657a8b1caec74481bdbe20d84461c0cb",
+      "class_hash": "0x19180db7daa416fcb806abaa464ba03249e70f58450ab6f99e35c170f57d2eb",
+      "original_class_hash": "0x19180db7daa416fcb806abaa464ba03249e70f58450ab6f99e35c170f57d2eb",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -2106,6 +2106,23 @@
         },
         {
           "type": "event",
+          "name": "pistols::types::events::ChallengeResolvedEvent",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "duel_id",
+              "type": "core::integer::u128",
+              "kind": "data"
+            },
+            {
+              "name": "winner_address",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
           "name": "pistols::types::events::DuelistTurnEvent",
           "kind": "struct",
           "members": [
@@ -2149,6 +2166,11 @@
             {
               "name": "ChallengeAcceptedEvent",
               "type": "pistols::types::events::ChallengeAcceptedEvent",
+              "kind": "nested"
+            },
+            {
+              "name": "ChallengeResolvedEvent",
+              "type": "pistols::types::events::ChallengeResolvedEvent",
               "kind": "nested"
             },
             {
