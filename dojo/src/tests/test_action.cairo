@@ -114,7 +114,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_action_paces_priority() {
+    fn test_action_roll_priority() {
         let mut duelist = init::Duelist();
         let mut a: u8 = 0;
         loop {
@@ -141,6 +141,21 @@ mod tests {
             };
             a += 1;
         }
+    }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_action_paces_priority() {
+        assert(Action::Paces1.paces_priority(Action::Paces1) == 0, '1-1');
+        assert(Action::Paces1.paces_priority(Action::Paces2) < 0, '1-2');
+        assert(Action::Paces1.paces_priority(Action::Paces10) < 0, '1-10');
+        assert(Action::Paces10.paces_priority(Action::Paces10) == 0, '10-10');
+        assert(Action::Paces10.paces_priority(Action::Paces9) > 0, '10-9');
+        assert(Action::Paces10.paces_priority(Action::Paces1) > 0, '10-1');
+        assert(Action::Paces1.paces_priority(Action::FastBlade) == 0, '1-blade');
+        assert(Action::Paces10.paces_priority(Action::FastBlade) == 0, '10-blade');
+        assert(Action::FastBlade.paces_priority(Action::Paces1) == 0, 'blade-1');
+        assert(Action::FastBlade.paces_priority(Action::Paces10) == 0, 'blade-10');
     }
 
     //-----------------------------------

@@ -41,17 +41,21 @@ mod chances {
     const BLADES_CRIT: u8 = 20;
     const BLADES_HIT: u8 = 90;
 
-    // Bonus and penalties
+    // archetype bonus
     const CRIT_BONUS_LORD: u8 = 10;
     const CRIT_BONUS_TRICKSTER: u8 = 6;
     const LETHAL_BONUS_VILLAIN: u8 = 20;
     const LETHAL_BONUS_TRICKSTER: u8 = 10;
 
+    // match bonuse
+    const EARLY_LORD_CRIT_BONUS: u8 = 10;
+    const LATE_VILLAIN_CRIT_BONUS: u8 = 10;
+
     // penalties for damage
     const HIT_PENALTY_PER_DAMAGE: u8 = 10;
     const CRIT_PENALTY_PER_DAMAGE: u8 = 5;
 
-    // trickster advantage
+    // trickster advantage as opponent penalty
     const TRICKSTER_CRIT_PENALTY: u8 = 2;
     const TRICKSTER_HIT_PENALTY: u8 = 10;
 }

@@ -357,17 +357,15 @@ fn _average_trickster(bonus: u8, current_level_trickster: u8) -> u8 {
 //
 
 // crit bonus will be applied for Lords only
-#[inline(always)]
-fn calc_crit_chances(attacker: Duelist, defender: Duelist, action: Action, health: u8) -> u8 {
+fn calc_crit_chances(attacker: Duelist, defender: Duelist, attack: Action, defense: Action, health: u8) -> u8 {
     (_apply_chance_bonus_penalty(
-        action.crit_chance(),
-        calc_crit_bonus(attacker),
-        calc_crit_penalty(action, health) + calc_trickster_penalty(attacker, defender, chances::TRICKSTER_CRIT_PENALTY),
+        attack.crit_chance(),
+        calc_crit_bonus(attacker) + calc_match_crit_bonus(attacker, attack, defense),
+        0 + calc_trickster_penalty(attacker, defender, chances::TRICKSTER_CRIT_PENALTY),
     ))
 }
 // Hit chances will be applied to Villains only
 // Both Hit and Lethal go up/down with same bonus/penalty
-#[inline(always)]
 fn calc_hit_chances(attacker: Duelist, defender: Duelist, action: Action, health: u8) -> u8 {
     (_apply_chance_bonus_penalty(
         action.hit_chance(),
@@ -375,7 +373,6 @@ fn calc_hit_chances(attacker: Duelist, defender: Duelist, action: Action, health
         calc_hit_penalty(action, health) + calc_trickster_penalty(attacker, defender, chances::TRICKSTER_HIT_PENALTY),
     ))
 }
-#[inline(always)]
 fn calc_lethal_chances(attacker: Duelist, defender: Duelist, action: Action, health: u8) -> u8 {
     (_apply_chance_bonus_penalty(
         action.lethal_chance(),
@@ -391,6 +388,10 @@ fn _apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
         chances::ALWAYS,    // never go above 100
     ))
 }
+
+//
+// bonuses
+//
 
 #[inline(always)]
 fn calc_crit_bonus(duelist: Duelist) -> u8 {
@@ -426,10 +427,23 @@ fn _calc_bonus(bonus_max: u8, level: u8, total_duels: u16) -> u8 {
 }
 
 #[inline(always)]
-fn calc_crit_penalty(action: Action, health: u8) -> u8 {
-    // (_calc_penalty(health, action.crit_penalty()))
-    (0) // no pelanty for crits!
+fn calc_match_crit_bonus(attacker: Duelist, attack: Action, defense: Action) -> u8 {
+    if (attacker.is_lord()) {
+        if (attack.paces_priority(defense) < 0) { (chances::EARLY_LORD_CRIT_BONUS) } else { (0) }
+    } else if (attacker.is_villain()) {
+        if (attack.paces_priority(defense) > 0) { (chances::LATE_VILLAIN_CRIT_BONUS) } else { (0) }
+    } else {
+        (0)
+    }
 }
+
+//
+// penalties
+//
+// #[inline(always)]
+// fn calc_crit_penalty(action: Action, health: u8) -> u8 {
+//     (_calc_penalty(health, action.crit_penalty()))
+// }
 #[inline(always)]
 fn calc_hit_penalty(action: Action, health: u8) -> u8 {
     (_calc_penalty(health, action.hit_penalty()))

@@ -204,49 +204,49 @@ mod tests {
         //
         // no bonus
         let mut lord: Duelist = _lord(0);
-        let chances_0: u8 = utils::calc_crit_chances(lord, lord, Action::Paces5, constants::FULL_HEALTH);
+        let chances_0: u8 = utils::calc_crit_chances(lord, lord, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
         assert(chances_0 > 0, 'chances_0 > 0');
         //
         // 50% bonus
         lord.level_lord = 50;
-        let chances_50: u8 = utils::calc_crit_chances(lord, lord, Action::Paces5, constants::FULL_HEALTH);
+        let chances_50: u8 = utils::calc_crit_chances(lord, lord, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
         assert(chances_50 > 0, 'chances_50 > 0');
         assert(chances_50 > chances_0, 'chances_50 > chances_0');
         //
         // 100% bonus
         lord.level_lord = 100;
-        let chances_100: u8 = utils::calc_crit_chances(lord, lord, Action::Paces5, constants::FULL_HEALTH);
+        let chances_100: u8 = utils::calc_crit_chances(lord, lord, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
         assert(chances_100 > 0, 'chances_100 > 0');
         assert(chances_100 > chances_50, 'chances_100 > chances_50');
         //
         // TRICKSTER: no bonus
         let mut trickster: Duelist = _trickster(0);
-        let trickster_0: u8 = utils::calc_crit_chances(trickster, trickster, Action::Paces5, constants::FULL_HEALTH);
+        let trickster_0: u8 = utils::calc_crit_chances(trickster, trickster, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
         assert(trickster_0 > 0, 'trickster_0 > 0');
         assert(trickster_0 == chances_0, 'trickster_0 ==');
         //
         // 50% bonus
         trickster.level_trickster = 50;
-        let trickster_50: u8 = utils::calc_crit_chances(trickster, trickster, Action::Paces5, constants::FULL_HEALTH);
+        let trickster_50: u8 = utils::calc_crit_chances(trickster, trickster, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
         assert(trickster_50 > 0, 'trickster_50 > 0');
         assert(trickster_50 > trickster_0, 'trickster_50 > trickster_0');
         assert(trickster_50 < chances_50, 'trickster_50 <');
         //
         // 100% bonus
         trickster.level_trickster = 100;
-        let trickster_100: u8 = utils::calc_crit_chances(trickster, trickster, Action::Paces5, constants::FULL_HEALTH);
+        let trickster_100: u8 = utils::calc_crit_chances(trickster, trickster, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
         assert(trickster_100 > 0, 'trickster_100 > 0');
         assert(trickster_100 > trickster_50, 'trickster_100 > trickster_50');
         assert(trickster_100 < chances_100, 'trickster_100 <');
         //
         // NO BONUS FOR VILLAINS
         let mut villain: Duelist = _villain(100);
-        let villain_0: u8 = utils::calc_crit_chances(villain, villain, Action::Paces5, constants::FULL_HEALTH);
+        let villain_0: u8 = utils::calc_crit_chances(villain, villain, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
         assert(villain_0 > 0, 'villain_0 > 0');
         //
         // 50%
         villain.level_villain = 50;
-        let villain_50: u8 = utils::calc_crit_chances(villain, villain, Action::Paces5, constants::FULL_HEALTH);
+        let villain_50: u8 = utils::calc_crit_chances(villain, villain, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
         assert(villain_0 == villain_50, 'villain_0 == villain_50');
     }
 
@@ -304,13 +304,41 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_trockster_penalty() {
+    fn test_early_late_bonus() {
+        let mut lord: Duelist = _lord(100);
+        let mut villain: Duelist = _villain(100);
+        let mut trickster: Duelist = _trickster(100);
+        // lords have a bonus shooting late
+        assert(utils::calc_crit_chances(lord, lord, Action::Paces4, Action::Paces5, constants::FULL_HEALTH)
+            > utils::calc_crit_chances(lord, lord, Action::Paces5, Action::Paces5, constants::FULL_HEALTH),
+            'lord > lord');
+        assert(utils::calc_crit_chances(lord, villain, Action::Paces4, Action::Paces5, constants::FULL_HEALTH)
+            > utils::calc_crit_chances(lord, villain, Action::Paces5, Action::Paces5, constants::FULL_HEALTH),
+            'lord > lord');
+        assert(utils::calc_crit_chances(lord, trickster, Action::Paces4, Action::Paces5, constants::FULL_HEALTH)
+            > utils::calc_crit_chances(lord, trickster, Action::Paces5, Action::Paces5, constants::FULL_HEALTH),
+            'lord > trickster');
+        // villains have a bonus shooting early
+        assert(utils::calc_crit_chances(villain, villain, Action::Paces4, Action::Paces5, constants::FULL_HEALTH)
+            < utils::calc_crit_chances(villain, villain, Action::Paces5, Action::Paces5, constants::FULL_HEALTH),
+            'villain < villain');
+        assert(utils::calc_crit_chances(villain, lord, Action::Paces4, Action::Paces5, constants::FULL_HEALTH)
+            < utils::calc_crit_chances(villain, lord, Action::Paces5, Action::Paces5, constants::FULL_HEALTH),
+            'villain < lord');
+        assert(utils::calc_crit_chances(villain, trickster, Action::Paces4, Action::Paces5, constants::FULL_HEALTH)
+            < utils::calc_crit_chances(villain, trickster, Action::Paces5, Action::Paces5, constants::FULL_HEALTH),
+            'villain < trickster');
+    }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_trickster_penalty() {
         let mut lord: Duelist = _lord(100);
         let mut villain: Duelist = _villain(100);
         let mut trickster: Duelist = _trickster(100);
         // crit chances are higher agains villain
-        let chances_l_v: u8 = utils::calc_crit_chances(lord, villain, Action::Paces5, constants::FULL_HEALTH);
-        let chances_l_t: u8 = utils::calc_crit_chances(lord, trickster, Action::Paces5, constants::FULL_HEALTH);
+        let chances_l_v: u8 = utils::calc_crit_chances(lord, villain, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
+        let chances_l_t: u8 = utils::calc_crit_chances(lord, trickster, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
         assert(chances_l_v > chances_l_t, 'crit >');
         assert(chances_l_v == chances_l_t + chances::TRICKSTER_CRIT_PENALTY, 'TRICKSTER_CRIT_PENALTY');
         // hit chances are higher agains lord

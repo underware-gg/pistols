@@ -80,6 +80,7 @@ trait ActionTrait {
     fn is_melee(self: Action) -> bool;
     fn is_runner(self: Action) -> bool;
     fn roll_priority(self: Action, other: Action, duelist_self: Duelist, duelist_other: Duelist) -> i8;
+    fn paces_priority(self: Action, other: Action) -> i8;
     fn honour(self: Action) -> i8;
     fn crit_chance(self: Action) -> u8;
     fn hit_chance(self: Action) -> u8;
@@ -127,25 +128,24 @@ impl ActionTraitImpl of ActionTrait {
     }
 
     //----------------------------
-    // Roll priority
+    // dices roll priority
     //
-    // returns
+    // returns...
     // < 0: self rolls first
     //   0: roll simultaneously
     // > 0: other rolls first
     //
     fn roll_priority(self: Action, other: Action, duelist_self: Duelist, duelist_other: Duelist) -> i8 {
         // Lowest paces shoot first
-        let is_paces_a: bool = self.is_paces();
-        let is_paces_b: bool = other.is_paces();
-        if (is_paces_a && is_paces_b) {
+        let is_paces_self: bool = self.is_paces();
+        let is_paces_other: bool = other.is_paces();
+        if (is_paces_self && is_paces_other) {
             //
-            // Paces vs Paces
+            // Round 1
             //
-            // Lowest pace shoots first
-            let paces_a: i8 = self.into();
-            let paces_b: i8 = other.into();
-            if (paces_a == paces_b) {
+            let paces_self: i8 = self.into();
+            let paces_other: i8 = other.into();
+            if (paces_self == paces_other) {
                 // Tricksters shoot first
                 if (duelist_self.is_trickster() && !duelist_other.is_trickster()) {
                     (-1)
@@ -155,11 +155,12 @@ impl ActionTraitImpl of ActionTrait {
                     (0)
                 }
             } else {
-                (paces_a - paces_b)
+                // closer pace shoots first
+                (paces_self - paces_other)
             }
         } else {
             //
-            // Blades vs Blades
+            // Round 2+
             //
             // Slow crits first for a chance of Execution
             if (self == Action::SlowBlade && other != Action::SlowBlade) {
@@ -169,13 +170,30 @@ impl ActionTraitImpl of ActionTrait {
                 return (1);
             }
             // Flee/Steal rolls after paces
-            if (self.is_runner() && is_paces_b) {
+            if (self.is_runner() && is_paces_other) {
                 return (1);
             }
-            if (is_paces_a && other.is_runner()) {
+            if (is_paces_self && other.is_runner()) {
                 return (-1);
             }
-            (0) // default in sync
+            (0) // default simultaneously
+        }
+    }
+
+    //
+    // on a paces round, who chose to shoot first?
+    //
+    // returns:
+    // < 0: self
+    //   0: simultaneously or n/a
+    // > 0: other
+    fn paces_priority(self: Action, other: Action) -> i8 {
+        let paces_self: i8 = self.as_paces().try_into().unwrap();
+        let paces_other: i8 = other.as_paces().try_into().unwrap();
+        if (paces_self > 0 && paces_other > 0) {
+            (paces_self - paces_other)
+        } else {
+            (0)
         }
     }
 
