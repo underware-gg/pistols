@@ -80,6 +80,7 @@ mod actions {
         DuelistRegisteredEvent: events::DuelistRegisteredEvent,
         NewChallengeEvent: events::NewChallengeEvent,
         ChallengeAcceptedEvent: events::ChallengeAcceptedEvent,
+        ChallengeResolvedEvent: events::ChallengeResolvedEvent,
         DuelistTurnEvent: events::DuelistTurnEvent,
     }
 
@@ -277,6 +278,17 @@ mod actions {
                     duel_id: challenge.duel_id,
                     round_number: challenge.round_number,
                     address: if (is_a) { (challenge.duelist_b) } else { (challenge.duelist_a) },
+                })));
+            }
+
+            if (state == ChallengeState::Resolved || state == ChallengeState::Draw) {
+                let winner_address: ContractAddress = 
+                    if (challenge.winner == 1) { (challenge.duelist_a) }
+                    else if (challenge.winner == 2) { (challenge.duelist_b) }
+                    else { (utils::zero_address()) };
+                emit!(world, (Event::ChallengeResolvedEvent(events::ChallengeResolvedEvent {
+                    duel_id: challenge.duel_id,
+                    winner_address,
                 })));
             }
         }
