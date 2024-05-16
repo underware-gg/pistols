@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
 use pistols::models::config::{Config};
-use pistols::models::coins::{Coin};
+use pistols::models::table::{Table};
 
 // based on RYO
 // https://github.com/cartridge-gg/rollyourown/blob/market_packed/src/systems/ryo.cairo
@@ -15,11 +15,11 @@ trait IAdmin {
     fn set_owner(owner_address: ContractAddress);
     fn set_treasury(treasury_address: ContractAddress);
     fn set_paused(paused: bool);
-    fn set_coin(coin_key: u8, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool);
-    fn enable_coin(coin_key: u8, enabled: bool);
+    fn set_table(table_id: u8, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool);
+    fn enable_table(table_id: u8, enabled: bool);
     
     fn get_config() -> Config;
-    fn get_coin(coin_key: u8) -> Coin;
+    fn get_table(table_id: u8) -> Table;
 }
 
 #[dojo::contract]
@@ -30,7 +30,7 @@ mod admin {
     use starknet::{get_caller_address, get_contract_address};
 
     use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
-    use pistols::models::coins::{Coin, CoinManager, CoinManagerTrait, default_coin};
+    use pistols::models::table::{Table, TableManager, TableManagerTrait, default_table};
     use pistols::systems::{utils};
 
     #[abi(embed_v0)]
@@ -47,8 +47,8 @@ mod admin {
             config.paused = false;
             manager.set(config);
             // set lords
-            let manager = CoinManagerTrait::new(world);
-            manager.set(default_coin(lords_address));
+            let manager = TableManagerTrait::new(world);
+            manager.set(default_table(lords_address));
         }
 
         fn is_initialized(world: IWorldDispatcher) -> bool {
@@ -87,30 +87,30 @@ mod admin {
             manager.set(config);
         }
 
-        fn set_coin(world: IWorldDispatcher, coin_key: u8, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool) {
+        fn set_table(world: IWorldDispatcher, table_id: u8, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool) {
             self.assert_caller_is_owner();
-            // get coin
-            let manager = CoinManagerTrait::new(world);
-            assert(manager.exists(coin_key), 'Invalid coin');
-            let mut coin = manager.get(coin_key);
-            // update coin
-            coin.contract_address = contract_address;
-            coin.description = description;
-            coin.fee_min = fee_min;
-            coin.fee_pct = fee_pct;
-            coin.enabled = enabled;
-            manager.set(coin);
+            // get table
+            let manager = TableManagerTrait::new(world);
+            assert(manager.exists(table_id), 'Invalid table');
+            let mut table = manager.get(table_id);
+            // update table
+            table.contract_address = contract_address;
+            table.description = description;
+            table.fee_min = fee_min;
+            table.fee_pct = fee_pct;
+            table.enabled = enabled;
+            manager.set(table);
         }
 
-        fn enable_coin(world: IWorldDispatcher, coin_key: u8, enabled: bool) {
+        fn enable_table(world: IWorldDispatcher, table_id: u8, enabled: bool) {
             self.assert_caller_is_owner();
-            // get coin
-            let manager = CoinManagerTrait::new(world);
-            assert(manager.exists(coin_key), 'Invalid coin');
-            let mut coin = manager.get(coin_key);
-            // update coin
-            coin.enabled = enabled;
-            manager.set(coin);
+            // get table
+            let manager = TableManagerTrait::new(world);
+            assert(manager.exists(table_id), 'Invalid table');
+            let mut table = manager.get(table_id);
+            // update table
+            table.enabled = enabled;
+            manager.set(table);
         }
 
         //
@@ -121,10 +121,10 @@ mod admin {
             (ConfigManagerTrait::new(world).get())
         }
 
-        fn get_coin(world: IWorldDispatcher, coin_key: u8) -> Coin {
-            let manager = CoinManagerTrait::new(world);
-            assert(manager.exists(coin_key), 'Invalid coin');
-            (manager.get(coin_key))
+        fn get_table(world: IWorldDispatcher, table_id: u8) -> Table {
+            let manager = TableManagerTrait::new(world);
+            assert(manager.exists(table_id), 'Invalid table');
+            (manager.get(table_id))
         }
     }
 

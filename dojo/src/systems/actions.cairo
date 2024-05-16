@@ -17,7 +17,7 @@ trait IActions {
     fn create_challenge(
         challenged: ContractAddress,
         message: felt252,
-        wager_coin: u8,
+        table_id: u8,
         wager_value: u256,
         expire_seconds: u64,
     ) -> u128;
@@ -46,7 +46,7 @@ trait IActions {
     fn get_pact(duelist_a: ContractAddress, duelist_b: ContractAddress) -> u128;
     fn has_pact(duelist_a: ContractAddress, duelist_b: ContractAddress) -> bool;
 
-    fn calc_fee(wager_coin: u8, wager_value: u256) -> u256;
+    fn calc_fee(table_id: u8, wager_value: u256) -> u256;
     
     fn simulate_honour_for_action(duelist_address: ContractAddress, action: u8) -> (i8, u8);
     fn simulate_chances(duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> Chances;
@@ -64,7 +64,7 @@ mod actions {
 
     use pistols::models::models::{Duelist, Challenge, Wager, Pact, Round, Shot, Chances};
     use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
-    use pistols::models::coins::{Coin, CoinManager, CoinManagerTrait, CoinTrait, coins, ETH_TO_WEI};
+    use pistols::models::table::{Table, TableManager, TableTrait, TableManagerTrait, tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::utils::timestamp::{timestamp};
@@ -127,7 +127,7 @@ mod actions {
         fn create_challenge(world: IWorldDispatcher,
             challenged: ContractAddress,
             message: felt252,
-            wager_coin: u8,
+            table_id: u8,
             wager_value: u256,
             expire_seconds: u64,
         ) -> u128 {
@@ -149,14 +149,14 @@ mod actions {
             let duel_id: u128 = make_seed(caller);
 
             // setup wager + fees
-            let coin_manager = CoinManagerTrait::new(world);
-            let coin: Coin = coin_manager.get(wager_coin);
-            assert(coin.enabled == true, 'Coin disabled');
-            let fee: u256 = coin.calc_fee(wager_value);
+            let table_manager = TableManagerTrait::new(world);
+            let table: Table = table_manager.get(table_id);
+            assert(table.enabled == true, 'Table disabled');
+            let fee: u256 = table.calc_fee(wager_value);
             // calc fee and store
             let wager = Wager {
                 duel_id,
-                coin: wager_coin,
+                table_id,
                 value: wager_value,
                 fee,
             };
@@ -310,10 +310,10 @@ mod actions {
             (self.get_pact(duelist_a, duelist_b) != 0)
         }
 
-        fn calc_fee(world: IWorldDispatcher, wager_coin: u8, wager_value: u256) -> u256 {
-            let coin_manager = CoinManagerTrait::new(world);
-            let coin: Coin = coin_manager.get(wager_coin);
-            (coin.calc_fee(wager_value))
+        fn calc_fee(world: IWorldDispatcher, table_id: u8, wager_value: u256) -> u256 {
+            let table_manager = TableManagerTrait::new(world);
+            let table: Table = table_manager.get(table_id);
+            (table.calc_fee(wager_value))
         }
 
         fn simulate_honour_for_action(world: IWorldDispatcher, duelist_address: ContractAddress, action: u8) -> (i8, u8) {
@@ -324,12 +324,12 @@ mod actions {
             let duelist: Duelist = get!(world, duelist_address, Duelist);
             let health: u8 = utils::get_duelist_health(world, duelist_address, duel_id, round_number);
             
-            let hit_chances: u8 = utils::calc_hit_chances(duelist, duelist, action.into(), health);
-            let crit_chances: u8 = utils::calc_crit_chances(duelist, duelist, action.into(), action.into(), health);
-            let lethal_chances: u8 = utils::calc_lethal_chances(duelist, duelist, action.into(), health);
-            let crit_bonus: u8 = utils::calc_crit_bonus(duelist);
+            let hit_chances: u8 = utils::calc_hit_chances(duelist.score, duelist.score, action.into(), health);
+            let crit_chances: u8 = utils::calc_crit_chances(duelist.score, duelist.score, action.into(), action.into(), health);
+            let lethal_chances: u8 = utils::calc_lethal_chances(duelist.score, duelist.score, action.into(), health);
+            let crit_bonus: u8 = utils::calc_crit_bonus(duelist.score);
             let hit_bonus: u8 = 0;
-            let lethal_bonus: u8 = utils::calc_lethal_bonus(duelist);
+            let lethal_bonus: u8 = utils::calc_lethal_bonus(duelist.score);
             (Chances {
                 key: 0,
                 crit_chances,

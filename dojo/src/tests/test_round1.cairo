@@ -8,12 +8,12 @@ mod tests {
 
     use token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
-    use pistols::models::models::{Duelist, Challenge, Round, Chances};
-    use pistols::models::coins::{Coin, CoinManagerTrait, CoinTrait, coins, ETH_TO_WEI};
+    use pistols::models::models::{Duelist, Challenge, Wager, Round, Chances};
+    use pistols::models::table::{Table, TableTrait, TableManagerTrait, tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::types::constants::{constants};
-    use pistols::systems::utils::{zero_address, make_action_hash, make_snapshot_duelist_key};
+    use pistols::systems::utils::{zero_address, make_action_hash};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::math::{MathU8};
     use pistols::tests::tester::{tester};
@@ -21,7 +21,7 @@ mod tests {
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
     const MESSAGE_1: felt252 = 'For honour!!!';
-    const WAGER_COIN: u8 = 1;
+    const TABLE_ID: u8 = 1;
     const WAGER_VALUE: u256 = 100_000_000_000_000_000_000;
 
     const SALT_1_a: u64 = 0xa6f099b756a87e62;
@@ -31,7 +31,7 @@ mod tests {
         tester::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         tester::execute_register_duelist(system, other, OTHER_NAME, 2);
         let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = tester::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, wager_value, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, owner, other, MESSAGE_1, TABLE_ID, wager_value, expire_seconds);
         tester::elapse_timestamp(timestamp::from_days(1));
         tester::execute_reply_challenge(system, other, duel_id, true);
         let ch = tester::get_Challenge(world, duel_id);
@@ -71,7 +71,7 @@ mod tests {
         assert(system.has_pact(other, owner) == false, 'has_pact_no');
 
         let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = tester::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, owner, other, MESSAGE_1, TABLE_ID, 0, expire_seconds);
         let _ch = tester::get_Challenge(world, duel_id);
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
         let new_state: ChallengeState = tester::execute_reply_challenge(system, other, duel_id, true);
@@ -88,18 +88,6 @@ mod tests {
         assert(round.duel_id == duel_id, 'round.duel_id');
         assert(round.round_number == 1, 'round.round_number');
         assert(round.state == RoundState::Commit.into(), 'round.state');
-
-        // Snapshot was created
-        let duelist_a = tester::get_Duelist(world, ch.duelist_a);
-        let duelist_b = tester::get_Duelist(world, ch.duelist_b);
-        assert(duelist_a.name != '', 'duelist_a.name');
-        assert(duelist_b.name != '', 'duelist_b.name');
-        let snap_key_a = make_snapshot_duelist_key(duel_id, ch.duelist_a);
-        let snap_key_b = make_snapshot_duelist_key(duel_id, ch.duelist_b);
-        let snap_duelist_a = tester::get_Duelist(world, snap_key_a);
-        let snap_duelist_b = tester::get_Duelist(world, snap_key_b);
-        assert(snap_duelist_a.name == duelist_a.name, 'snap_a.name');
-        assert(snap_duelist_b.name == duelist_b.name, 'snap_b.name');
     }
 
     //-----------------------------------------
@@ -114,7 +102,7 @@ mod tests {
         let balance_treasury: u256 = ierc20.balance_of(treasury);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         assert(fee > 0, 'fee > 0');
         assert(balance_treasury == 0, 'balance_treasury == 0');
 
@@ -178,20 +166,20 @@ mod tests {
 
         let duelist_a = tester::get_Duelist(world, owner);
         let duelist_b = tester::get_Duelist(world, other);
-        assert(duelist_a.total_duels == 1, 'duelist_a.total_duels');
-        assert(duelist_b.total_duels == 1, 'duelist_b.total_duels');
-        assert(duelist_a.total_draws == 0, 'duelist_a.total_draws');
-        assert(duelist_b.total_draws == 0, 'duelist_b.total_draws');
-        assert(duelist_a.total_honour == action_a.into(), 'duelist_a.total_honour');
-        assert(duelist_b.total_honour == action_b.into(), 'duelist_b.total_honour');
-        assert(duelist_a.honour == (action_a * 10).try_into().unwrap(), 'duelist_a.honour');
-        assert(duelist_b.honour == (action_b * 10).try_into().unwrap(), 'duelist_b.honour');
+        assert(duelist_a.score.total_duels == 1, 'duelist_a.total_duels');
+        assert(duelist_b.score.total_duels == 1, 'duelist_b.total_duels');
+        assert(duelist_a.score.total_draws == 0, 'duelist_a.total_draws');
+        assert(duelist_b.score.total_draws == 0, 'duelist_b.total_draws');
+        assert(duelist_a.score.total_honour == action_a.into(), 'duelist_a.total_honour');
+        assert(duelist_b.score.total_honour == action_b.into(), 'duelist_b.total_honour');
+        assert(duelist_a.score.honour == (action_a * 10).try_into().unwrap(), 'duelist_a.score.honour');
+        assert(duelist_b.score.honour == (action_b * 10).try_into().unwrap(), 'duelist_b.score.honour');
 
         if (challenge.winner == 1) {
-            assert(duelist_a.total_wins == 1, 'a_win_duelist_a.total_wins');
-            assert(duelist_b.total_wins == 0, 'a_win_duelist_b.total_wins');
-            assert(duelist_a.total_losses == 0, 'a_win_duelist_a.total_losses');
-            assert(duelist_b.total_losses == 1, 'a_win_duelist_b.total_losses');
+            assert(duelist_a.score.total_wins == 1, 'a_win_duelist_a.total_wins');
+            assert(duelist_b.score.total_wins == 0, 'a_win_duelist_b.total_wins');
+            assert(duelist_a.score.total_losses == 0, 'a_win_duelist_a.total_losses');
+            assert(duelist_b.score.total_losses == 1, 'a_win_duelist_b.total_losses');
             assert(round.shot_a.damage < constants::FULL_HEALTH, 'a_win_damage_a');
             assert(round.shot_a.health > 0, 'a_win_health_a');
             assert(round.shot_a.dice_crit > 0 && round.shot_a.dice_crit <= kill_chance_a, 'kill_chance_a');
@@ -200,10 +188,10 @@ mod tests {
             assert(round.shot_b.damage == constants::FULL_HEALTH, 'a_win_damage_b');
             assert(round.shot_b.health == 0, 'a_win_health_b');
         } else if (challenge.winner == 2) {
-            assert(duelist_a.total_wins == 0, 'b_win_duelist_a.total_wins');
-            assert(duelist_b.total_wins == 1, 'b_win_duelist_b.total_wins');
-            assert(duelist_a.total_losses == 1, 'b_win_duelist_a.total_losses');
-            assert(duelist_b.total_losses == 0, 'b_win_duelist_b.total_losses');
+            assert(duelist_a.score.total_wins == 0, 'b_win_duelist_a.total_wins');
+            assert(duelist_b.score.total_wins == 1, 'b_win_duelist_b.total_wins');
+            assert(duelist_a.score.total_losses == 1, 'b_win_duelist_a.total_losses');
+            assert(duelist_b.score.total_losses == 0, 'b_win_duelist_b.total_losses');
             assert(round.shot_b.damage < constants::FULL_HEALTH, 'b_win_damage_b');
             assert(round.shot_b.health > 0, 'b_win_health_b');
             assert(round.shot_b.dice_crit > 0 && round.shot_b.dice_crit <= kill_chance_b, 'kill_chance_b');
@@ -237,25 +225,25 @@ mod tests {
         assert(round.state == RoundState::Finished.into(), '4__state');
         let duelist_a = tester::get_Duelist(world, owner);
         let duelist_b = tester::get_Duelist(world, other);
-        assert(duelist_a.total_duels == 2, '__duelist_a.total_duels');
-        assert(duelist_b.total_duels == 2, '__duelist_b.total_duels');
-        assert(duelist_a.total_draws == 0, '__duelist_a.total_draws');
-        assert(duelist_b.total_draws == 0, '__duelist_b.total_draws');
-        assert(duelist_a.total_honour == (action_a * 2).into(), '__duelist_a.total_honour');
-        assert(duelist_b.total_honour == (action_b * 2).into(), '__duelist_b.total_honour');
-        assert(duelist_a.honour == (action_a * 10).try_into().unwrap(), '__duelist_a.honour');
-        assert(duelist_b.honour == (action_b * 10).try_into().unwrap(), '__duelist_b.honour');
+        assert(duelist_a.score.total_duels == 2, '__duelist_a.total_duels');
+        assert(duelist_b.score.total_duels == 2, '__duelist_b.total_duels');
+        assert(duelist_a.score.total_draws == 0, '__duelist_a.total_draws');
+        assert(duelist_b.score.total_draws == 0, '__duelist_b.total_draws');
+        assert(duelist_a.score.total_honour == (action_a * 2).into(), '__duelist_a.total_honour');
+        assert(duelist_b.score.total_honour == (action_b * 2).into(), '__duelist_b.total_honour');
+        assert(duelist_a.score.honour == (action_a * 10).try_into().unwrap(), '__duelist_a.score.honour');
+        assert(duelist_b.score.honour == (action_b * 10).try_into().unwrap(), '__duelist_b.score.honour');
 
         if (challenge.winner == 1) {
-            assert(duelist_a.total_wins == 2, '__a_win_duelist_a.total_wins');
-            assert(duelist_b.total_wins == 0, '__a_win_duelist_b.total_wins');
-            assert(duelist_a.total_losses == 0, '__a_win_duelist_a.total_losses');
-            assert(duelist_b.total_losses == 2, '__a_win_duelist_b.total_losses');
+            assert(duelist_a.score.total_wins == 2, '__a_win_duelist_a.total_wins');
+            assert(duelist_b.score.total_wins == 0, '__a_win_duelist_b.total_wins');
+            assert(duelist_a.score.total_losses == 0, '__a_win_duelist_a.total_losses');
+            assert(duelist_b.score.total_losses == 2, '__a_win_duelist_b.total_losses');
         } else if (challenge.winner == 2) {
-            assert(duelist_a.total_wins == 0, '__b_win_duelist_a.total_wins');
-            assert(duelist_b.total_wins == 2, '__b_win_duelist_b.total_wins');
-            assert(duelist_a.total_losses == 2, '__b_win_duelist_a.total_losses');
-            assert(duelist_b.total_losses == 0, '__b_win_duelist_b.total_losses');
+            assert(duelist_a.score.total_wins == 0, '__b_win_duelist_a.total_wins');
+            assert(duelist_b.score.total_wins == 2, '__b_win_duelist_b.total_wins');
+            assert(duelist_a.score.total_losses == 2, '__b_win_duelist_a.total_losses');
+            assert(duelist_b.score.total_losses == 0, '__b_win_duelist_b.total_losses');
         } else {
             assert(false, 'bad winner')
         }
@@ -265,16 +253,11 @@ mod tests {
         tester::assert_winner_balance(ierc20, challenge.winner, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'balance_winner_3');
 
         // Snapshot was created and kept original value
-        let snap_key_a = make_snapshot_duelist_key(duel_id, challenge.duelist_a);
-        let snap_key_b = make_snapshot_duelist_key(duel_id, challenge.duelist_b);
-        let snap_duelist_a = tester::get_Duelist(world, snap_key_a);
-        let snap_duelist_b = tester::get_Duelist(world, snap_key_b);
-        assert(snap_duelist_a.name == duelist_a.name, 'snap_a.name');
-        assert(snap_duelist_b.name == duelist_b.name, 'snap_b.name');
-        assert(snap_duelist_a.total_duels > 0, 'snap_a.total_duels >');
-        assert(snap_duelist_b.total_duels > 0, 'snap_b.total_duels >');
-        assert(snap_duelist_a.total_duels < duelist_a.total_duels, 'snap_a.total_duels <');
-        assert(snap_duelist_b.total_duels < duelist_b.total_duels, 'snap_b.total_duels <');
+        let snapshot = tester::get_Snapshot(world, duel_id);
+        assert(snapshot.score_a.total_duels > 0, 'snap_a.total_duels >');
+        assert(snapshot.score_b.total_duels > 0, 'snap_b.total_duels >');
+        assert(snapshot.score_a.total_duels < duelist_a.score.total_duels, 'snap_a.total_duels <');
+        assert(snapshot.score_b.total_duels < duelist_b.score.total_duels, 'snap_b.total_duels <');
     }
 
     #[test]
@@ -284,7 +267,7 @@ mod tests {
         let balance_contract: u256 = ierc20.balance_of(system.contract_address);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         assert(fee > 0, 'fee > 0');
 
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, owner, other, WAGER_VALUE);
@@ -316,18 +299,18 @@ mod tests {
 
         let duelist_a = tester::get_Duelist(world, owner);
         let duelist_b = tester::get_Duelist(world, other);
-        assert(duelist_a.total_duels == 1, 'duelist_a.total_duels');
-        assert(duelist_b.total_duels == 1, 'duelist_b.total_duels');
-        assert(duelist_a.total_draws == 1, 'duelist_a.total_draws');
-        assert(duelist_b.total_draws == 1, 'duelist_b.total_draws');
-        assert(duelist_a.total_wins == 0, 'duelist_a.total_wins');
-        assert(duelist_b.total_wins == 0, 'duelist_b.total_wins');
-        assert(duelist_a.total_losses == 0, 'duelist_a.total_losses');
-        assert(duelist_b.total_losses == 0, 'duelist_b.total_losses');
-        assert(duelist_a.total_honour == action_a.into(), 'duelist_a.total_honour');
-        assert(duelist_b.total_honour == action_b.into(), 'duelist_b.total_honour');
-        assert(duelist_a.honour == (action_a * 10).try_into().unwrap(), 'duelist_a.honour');
-        assert(duelist_b.honour == (action_b * 10).try_into().unwrap(), 'duelist_b.honour');
+        assert(duelist_a.score.total_duels == 1, 'duelist_a.total_duels');
+        assert(duelist_b.score.total_duels == 1, 'duelist_b.total_duels');
+        assert(duelist_a.score.total_draws == 1, 'duelist_a.total_draws');
+        assert(duelist_b.score.total_draws == 1, 'duelist_b.total_draws');
+        assert(duelist_a.score.total_wins == 0, 'duelist_a.total_wins');
+        assert(duelist_b.score.total_wins == 0, 'duelist_b.total_wins');
+        assert(duelist_a.score.total_losses == 0, 'duelist_a.total_losses');
+        assert(duelist_b.score.total_losses == 0, 'duelist_b.total_losses');
+        assert(duelist_a.score.total_honour == action_a.into(), 'duelist_a.total_honour');
+        assert(duelist_b.score.total_honour == action_b.into(), 'duelist_b.total_honour');
+        assert(duelist_a.score.honour == (action_a * 10).try_into().unwrap(), 'duelist_a.score.honour');
+        assert(duelist_b.score.honour == (action_b * 10).try_into().unwrap(), 'duelist_b.score.honour');
 
         tester::assert_balance(ierc20, system.contract_address, balance_contract, 0, 0, 'balance_contract_2');
         tester::assert_balance(ierc20, treasury, 0, 0, fee * 2, 'balance_treasury_2');
@@ -341,7 +324,7 @@ mod tests {
         let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         // A is a trickster, will shoot first
         let mut duelist_a = tester::get_Duelist(world, owner);
-        duelist_a.level_trickster = 100;
+        duelist_a.score.level_trickster = 100;
         set!(world,(duelist_a));
         // duel!
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, owner, other, WAGER_VALUE);
@@ -361,7 +344,7 @@ mod tests {
         let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         // A is a trickster, will shoot first
         let mut duelist_b = tester::get_Duelist(world, other);
-        duelist_b.level_trickster = 100;
+        duelist_b.score.level_trickster = 100;
         set!(world,(duelist_b));
         // duel!
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, owner, other, WAGER_VALUE);
@@ -479,7 +462,7 @@ mod tests {
         tester::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         tester::execute_register_duelist(system, other, OTHER_NAME, 2);
         let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = tester::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, 0, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, owner, other, MESSAGE_1, TABLE_ID, 0, expire_seconds);
         let (_salt_a, _salt_b, _action_a, _action_b, _hash_a, hash_b) = _get_actions_round_1_resolved();
         tester::execute_commit_action(system, other, duel_id, 1, hash_b);
     }
@@ -599,11 +582,11 @@ mod tests {
         assert(duelist_a_before.name != duelist_a_after.name, 'name');
         assert(duelist_a_before.profile_pic != duelist_a_after.profile_pic, 'profile_pic');
         assert(duelist_a_before.timestamp == duelist_a_after.timestamp, 'timestamp');
-        assert(duelist_a_before.total_duels == duelist_a_after.total_duels, 'total_duels');
-        assert(duelist_a_before.total_wins == duelist_a_after.total_wins, 'total_wins');
-        assert(duelist_a_before.total_losses == duelist_a_after.total_losses, 'total_losses');
-        assert(duelist_a_before.total_draws == duelist_a_after.total_draws, 'total_draws');
-        assert(duelist_a_before.total_honour == duelist_a_after.total_honour, 'total_honour');
-        assert(duelist_a_before.honour == duelist_a_after.honour, 'honour');
+        assert(duelist_a_before.score.total_duels == duelist_a_after.score.total_duels, 'total_duels');
+        assert(duelist_a_before.score.total_wins == duelist_a_after.score.total_wins, 'total_wins');
+        assert(duelist_a_before.score.total_losses == duelist_a_after.score.total_losses, 'total_losses');
+        assert(duelist_a_before.score.total_draws == duelist_a_after.score.total_draws, 'total_draws');
+        assert(duelist_a_before.score.total_honour == duelist_a_after.score.total_honour, 'total_honour');
+        assert(duelist_a_before.score.honour == duelist_a_after.score.honour, 'honour');
     }
 }

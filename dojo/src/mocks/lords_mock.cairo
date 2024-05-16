@@ -64,6 +64,8 @@ mod lords_mock {
     use starknet::{get_caller_address, get_contract_address};
     use zeroable::Zeroable;
 
+    use pistols::types::constants::{constants};
+
     use token::components::security::initializable::initializable_component;
 
     use token::components::token::erc20::erc20_metadata::erc20_metadata_component;
@@ -156,7 +158,7 @@ mod lords_mock {
             );
 
             self.erc20_metadata.initialize('fLORDS', 'fLORDS', 18);
-            self.erc20_mintable.mint(get_caller_address(), 1 * ETH_TO_WEI);
+            self.erc20_mintable.mint(get_caller_address(), 1 * constants::ETH_TO_WEI);
 
             self.initializable.initialize();
         }
@@ -169,12 +171,10 @@ mod lords_mock {
     // Faucet
     //
 
-    const ETH_TO_WEI: u256 = 1_000_000_000_000_000_000;
-
     #[abi(embed_v0)]
     impl LordsMockFaucetImpl of super::ILordsMockFaucet<ContractState> {
         fn faucet(ref self: ContractState) {
-            self.erc20_mintable.mint(get_caller_address(), 10_000 * ETH_TO_WEI);
+            self.erc20_mintable.mint(get_caller_address(), 10_000 * constants::ETH_TO_WEI);
         }
     }
 }

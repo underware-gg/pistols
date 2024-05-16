@@ -1,7 +1,7 @@
 mod models {
-    mod coins;
     mod config;
     mod models;
+    mod table;
 }
 
 mod systems {

@@ -26,9 +26,9 @@ mod CHALLENGE_STATE {
 
 trait ChallengeStateTrait {
     fn exists(self: ChallengeState) -> bool;
-    fn canceled(self: ChallengeState) -> bool;
-    fn ongoing(self: ChallengeState) -> bool;
-    fn finished(self: ChallengeState) -> bool;
+    fn is_canceled(self: ChallengeState) -> bool;
+    fn is_ongoing(self: ChallengeState) -> bool;
+    fn is_finished(self: ChallengeState) -> bool;
 }
 
 impl ChallengeStateTraitImpl of ChallengeStateTrait {
@@ -44,7 +44,7 @@ impl ChallengeStateTraitImpl of ChallengeStateTrait {
             ChallengeState::Draw        => true,
         }
     }
-    fn canceled(self: ChallengeState) -> bool {
+    fn is_canceled(self: ChallengeState) -> bool {
         match self {
             ChallengeState::Null        => false,
             ChallengeState::Awaiting    => false,
@@ -56,7 +56,7 @@ impl ChallengeStateTraitImpl of ChallengeStateTrait {
             ChallengeState::Draw        => false,
         }
     }
-    fn ongoing(self: ChallengeState) -> bool {
+    fn is_ongoing(self: ChallengeState) -> bool {
         match self {
             ChallengeState::Null        => false,
             ChallengeState::Awaiting    => true,
@@ -68,7 +68,7 @@ impl ChallengeStateTraitImpl of ChallengeStateTrait {
             ChallengeState::Draw        => false,
         }
     }
-    fn finished(self: ChallengeState) -> bool {
+    fn is_finished(self: ChallengeState) -> bool {
         match self {
             ChallengeState::Null        => false,
             ChallengeState::Awaiting    => false,

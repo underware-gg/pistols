@@ -60,12 +60,14 @@ fi
 echo "* Admin auth..."
 sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
   Config,$ADMIN_ADDRESS \
-  Coin,$ADMIN_ADDRESS
+  Table,$ADMIN_ADDRESS
 
 echo "* Game auth..."
 sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
   Duelist,$ACTIONS_ADDRESS \
+  Scoreboard,$ACTIONS_ADDRESS \
   Challenge,$ACTIONS_ADDRESS \
+  Snapshot,$ACTIONS_ADDRESS \
   Wager,$ACTIONS_ADDRESS \
   Pact,$ACTIONS_ADDRESS \
   Round,$ACTIONS_ADDRESS

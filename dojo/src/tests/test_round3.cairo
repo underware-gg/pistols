@@ -22,7 +22,7 @@ mod tests {
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
     const MESSAGE_1: felt252 = 'For honour!!!';
-    const WAGER_COIN: u8 = 1;
+    const TABLE_ID: u8 = 1;
     const WAGER_VALUE: u256 = 100_000_000_000_000_000_000;
 
     const SALT_1_a: u64 = 0xa6f099b756a87e62;
@@ -34,7 +34,7 @@ mod tests {
         tester::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         tester::execute_register_duelist(system, other, OTHER_NAME, 2);
         let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = tester::execute_create_challenge(system, owner, other, MESSAGE_1, WAGER_COIN, WAGER_VALUE, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, owner, other, MESSAGE_1, TABLE_ID, WAGER_VALUE, expire_seconds);
         tester::elapse_timestamp(timestamp::from_days(1));
         tester::execute_reply_challenge(system, other, duel_id, true);
         let ch = tester::get_Challenge(world, duel_id);
@@ -540,7 +540,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
@@ -560,7 +560,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
@@ -584,7 +584,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
@@ -608,7 +608,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
@@ -630,7 +630,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
@@ -652,7 +652,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
@@ -680,7 +680,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
@@ -699,7 +699,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
@@ -720,7 +720,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
@@ -742,7 +742,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
@@ -766,7 +766,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
@@ -790,7 +790,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
@@ -812,7 +812,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
@@ -840,7 +840,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
@@ -861,7 +861,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
@@ -882,7 +882,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
@@ -903,7 +903,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::FAST_BLADE,
@@ -924,7 +924,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
@@ -945,7 +945,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
@@ -966,7 +966,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
@@ -987,7 +987,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let balance_a: u256 = ierc20.balance_of(owner);
         let balance_b: u256 = ierc20.balance_of(other);
-        let fee: u256 = system.calc_fee(WAGER_COIN, WAGER_VALUE);
+        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,

@@ -6,7 +6,7 @@ mod shooter {
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     use pistols::systems::{utils};
-    use pistols::models::models::{init, Challenge, Round, Shot, Duelist};
+    use pistols::models::models::{init, Score, Challenge, Snapshot, Round, Shot, Duelist};
     use pistols::types::constants::{constants};
     use pistols::types::challenge::{ChallengeState};
     use pistols::types::round::{RoundState};
@@ -169,23 +169,22 @@ mod shooter {
     // Decide who wins a round, or go to next
     //
     fn process_round(world: IWorldDispatcher, ref challenge: Challenge, ref round: Round, is_last_round: bool) {
-        let duelist_a: Duelist = utils::get_snapshot_duelist(world, challenge.duel_id, challenge.duelist_a);
-        let duelist_b: Duelist = utils::get_snapshot_duelist(world, challenge.duel_id, challenge.duelist_b);
+        let snapshot: Snapshot = get!(world, challenge.duel_id, Snapshot);
         
         let action_a: Action = apply_action_honour(ref round.shot_a);
         let action_b: Action = apply_action_honour(ref round.shot_b);
         
         let mut executed: bool = false;
-        let priority: i8 = action_a.roll_priority(action_b, duelist_a, duelist_b);
+        let priority: i8 = action_a.roll_priority(action_b, snapshot.score_a, snapshot.score_b);
         if (priority < 0) {
             // A attacks first
-            executed = attack_sync(world, round, duelist_a, duelist_b, ref round.shot_a, ref round.shot_b, false);
+            executed = attack_sync(world, round, snapshot.score_a, snapshot.score_b, ref round.shot_a, ref round.shot_b, false);
         } else if (priority > 0) {
             // B attacks first
-            executed = attack_sync(world, round, duelist_b, duelist_a, ref round.shot_b, ref round.shot_a, false);
+            executed = attack_sync(world, round, snapshot.score_b, snapshot.score_a, ref round.shot_b, ref round.shot_a, false);
         } else {
             // same time
-            executed = attack_sync(world, round, duelist_a, duelist_b, ref round.shot_a, ref round.shot_b, true);
+            executed = attack_sync(world, round, snapshot.score_a, snapshot.score_b, ref round.shot_a, ref round.shot_b, true);
         }
 
         // decide results on health or win flag
@@ -232,7 +231,7 @@ mod shooter {
     //
 
     // execute attacks in sync or async
-    fn attack_sync(world: IWorldDispatcher, round: Round, attacker: Duelist, defender: Duelist, ref attack: Shot, ref defense: Shot, sync: bool) -> bool {
+    fn attack_sync(world: IWorldDispatcher, round: Round, attacker: Score, defender: Score, ref attack: Shot, ref defense: Shot, sync: bool) -> bool {
         // attack first, if survives defense can attack
         let mut executed: bool = attack(world, 'shoot_a', attacker, defender, round, ref attack, ref defense);
         if (sync || !executed) {
@@ -254,7 +253,7 @@ mod shooter {
 
     // executes single attack
     // returns true if ended in execution
-    fn attack(world: IWorldDispatcher, seed: felt252, attacker: Duelist, defender: Duelist, round: Round, ref attack: Shot, ref defense: Shot) -> bool {
+    fn attack(world: IWorldDispatcher, seed: felt252, attacker: Score, defender: Score, round: Round, ref attack: Shot, ref defense: Shot) -> bool {
         let action: Action = attack.action.into();
         if (action != Action::Idle) {
             // dice 1: crit (execution, double damage, goal)

@@ -14,15 +14,22 @@ mod tester {
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
     use pistols::types::challenge::{ChallengeState};
+    use pistols::types::constants::{constants};
     use pistols::types::action::{Action};
     use pistols::models::models::{
         Duelist, duelist,
+        Scoreboard, scoreboard,
         Challenge, challenge,
+        Snapshot, snapshot,
         Wager, wager,
         Round, round,
     };
-    use pistols::models::config::{Config, config};
-    use pistols::models::coins::{Coin, coin, ETH_TO_WEI};
+    use pistols::models::config::{
+        Config, config,
+    };
+    use pistols::models::table::{
+        Table, table,
+    };
     use pistols::utils::string::{String};
 
     // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
@@ -54,11 +61,13 @@ mod tester {
     ) {
         let mut models = array![
             duelist::TEST_CLASS_HASH,
+            scoreboard::TEST_CLASS_HASH,
             challenge::TEST_CLASS_HASH,
+            snapshot::TEST_CLASS_HASH,
             wager::TEST_CLASS_HASH,
             round::TEST_CLASS_HASH,
             config::TEST_CLASS_HASH,
-            coin::TEST_CLASS_HASH,
+            table::TEST_CLASS_HASH,
         ];
         // accounts
         let owner: ContractAddress = starknet::contract_address_const::<0x111111>();
@@ -84,9 +93,9 @@ mod tester {
             execute_admin_initialize(admin, owner, owner, treasury, lords.contract_address);
         }
         if (approve) {
-            execute_lords_approve(lords, owner, system.contract_address, 1_000_000 * ETH_TO_WEI);
-            execute_lords_approve(lords, other, system.contract_address, 1_000_000 * ETH_TO_WEI);
-            execute_lords_approve(lords, bummer, system.contract_address, 1_000_000 * ETH_TO_WEI);
+            execute_lords_approve(lords, owner, system.contract_address, 1_000_000 * constants::ETH_TO_WEI);
+            execute_lords_approve(lords, other, system.contract_address, 1_000_000 * constants::ETH_TO_WEI);
+            execute_lords_approve(lords, bummer, system.contract_address, 1_000_000 * constants::ETH_TO_WEI);
         }
         (world, system, admin, lords, ierc20, owner, other, bummer, treasury)
     }
@@ -142,14 +151,14 @@ mod tester {
         system.set_paused(paused);
         _next_block();
     }
-    fn execute_admin_set_coin(system: IAdminDispatcher, sender: ContractAddress, coin_key: u8, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool) {
+    fn execute_admin_set_table(system: IAdminDispatcher, sender: ContractAddress, table_id: u8, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool) {
         testing::set_contract_address(sender);
-        system.set_coin(coin_key, contract_address, description, fee_min, fee_pct, enabled);
+        system.set_table(table_id, contract_address, description, fee_min, fee_pct, enabled);
         _next_block();
     }
-    fn execute_admin_enable_coin(system: IAdminDispatcher, sender: ContractAddress, coin_key: u8, enabled: bool) {
+    fn execute_admin_enable_table(system: IAdminDispatcher, sender: ContractAddress, table_id: u8, enabled: bool) {
         testing::set_contract_address(sender);
-        system.enable_coin(coin_key, enabled);
+        system.enable_table(table_id, enabled);
         _next_block();
     }
 
@@ -179,12 +188,12 @@ mod tester {
     fn execute_create_challenge(system: IActionsDispatcher, sender: ContractAddress,
         challenged: ContractAddress,
         message: felt252,
-        wager_coin: u8,
+        table_id: u8,
         wager_value: u256,
         expire_seconds: u64,
     ) -> u128 {
         testing::set_contract_address(sender);
-        let duel_id: u128 = system.create_challenge(challenged, message, wager_coin, wager_value, expire_seconds);
+        let duel_id: u128 = system.create_challenge(challenged, message, table_id, wager_value, expire_seconds);
         _next_block();
         (duel_id)
     }
@@ -236,16 +245,24 @@ mod tester {
         (get!(world, 1, Config))
     }
     #[inline(always)]
-    fn get_Coin(world: IWorldDispatcher, coin_key: u8) -> Coin {
-        (get!(world, coin_key, Coin))
+    fn get_Table(world: IWorldDispatcher, table_id: u8) -> Table {
+        (get!(world, table_id, Table))
     }
     #[inline(always)]
     fn get_Duelist(world: IWorldDispatcher, address: ContractAddress) -> Duelist {
         (get!(world, address, Duelist))
     }
     #[inline(always)]
+    fn get_Scoreboard(world: IWorldDispatcher, address: ContractAddress, table: u8) -> Scoreboard {
+        (get!(world, (address, table), Scoreboard))
+    }
+    #[inline(always)]
     fn get_Challenge(world: IWorldDispatcher, duel_id: u128) -> Challenge {
         (get!(world, duel_id, Challenge))
+    }
+    #[inline(always)]
+    fn get_Snapshot(world: IWorldDispatcher, duel_id: u128) -> Snapshot {
+        (get!(world, duel_id, Snapshot))
     }
     #[inline(always)]
     fn get_Wager(world: IWorldDispatcher, duel_id: u128) -> Wager {

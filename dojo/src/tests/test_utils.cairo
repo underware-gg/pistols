@@ -9,7 +9,7 @@ mod tests {
     use starknet::{ContractAddress};
 
     use pistols::systems::{utils};
-    use pistols::models::models::{init, Round, Shot, Duelist, DuelistTrait};
+    use pistols::models::models::{init, Round, Shot, Duelist, Score, ScoreTrait};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::action::{ACTION};
 
@@ -138,18 +138,19 @@ mod tests {
 
     #[test]
     #[available_gas(100_000_000)]
-    fn test_update_duelist_honour() {
+    fn test_update_score_honour() {
         let mut duelist = init::Duelist();
         duelist.address = starknet::contract_address_const::<0x111>();
         duelist.name = 'duelist';
-        utils::update_duelist_honour(ref duelist, 10);
-        assert(duelist.level_lord == 100, 'honour_100');
-        assert(duelist.level_villain == 0, 'honour_100_vill');
-        assert(duelist.level_trickster == 0, 'honour_100_trick');
-        assert(duelist.is_lord(), 'is_lord()');
+        duelist.score.total_duels = 1;
+        utils::update_score_honour(ref duelist.score, 10);
+        assert(duelist.score.level_lord == 100, 'honour_100');
+        assert(duelist.score.level_villain == 0, 'honour_100_vill');
+        assert(duelist.score.level_trickster == 0, 'honour_100_trick');
+        assert(duelist.score.is_lord(), 'is_lord()');
         // just checks sync with calc_level_lord
         let value: u8 = utils::calc_level_lord(100);
-       assert(duelist.level_lord == value, '!= calc');
+       assert(duelist.score.level_lord == value, '!= calc');
     }
 
     #[test]

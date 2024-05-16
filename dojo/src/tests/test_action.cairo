@@ -125,7 +125,7 @@ mod tests {
             loop {
                 if (b > 10) { break; }
                 let action_b: Action = b.into();
-                let priority: i8 = action_a.roll_priority(action_b, duelist, duelist);
+                let priority: i8 = action_a.roll_priority(action_b, duelist.score, duelist.score);
                 if (a == 0) {
                     assert(priority == 0, 'a_0')
                 } else if (b == 0) {

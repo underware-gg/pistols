@@ -8,8 +8,9 @@ mod tests {
 
     use pistols::systems::admin::{IAdminDispatcher, IAdminDispatcherTrait};
     use pistols::models::config::{Config};
-    use pistols::models::coins::{Coin, coins, ETH_TO_WEI};
+    use pistols::models::table::{Table, tables};
     use pistols::systems::utils::{zero_address};
+    use pistols::types::constants::{constants};
     use pistols::tests::tester::{tester};
 
     //
@@ -184,141 +185,141 @@ mod tests {
     }
 
     //
-    // Coins
+    // Tables
     //
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_initialize_coin_defaults() {
+    fn test_initialize_table_defaults() {
         let (_world, _system, admin, _lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(false, false);
         tester::execute_admin_initialize(admin, owner, zero_address(), zero_address(), zero_address());
-        let coin: Coin = admin.get_coin(coins::LORDS);
-        assert(coin.contract_address == zero_address(), 'contract_address');
-        assert(coin.enabled == false, 'enabled');
+        let table: Table = admin.get_table(tables::LORDS);
+        assert(table.contract_address == zero_address(), 'contract_address');
+        assert(table.enabled == false, 'enabled');
     }
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_initialize_coin() {
+    fn test_initialize_table() {
         let (_world, _system, admin, lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(false, false);
         tester::execute_admin_initialize(admin, owner, zero_address(), zero_address(), lords.contract_address);
-        let coin: Coin = admin.get_coin(coins::LORDS);
-        assert(coin.contract_address == lords.contract_address, 'contract_address');
-        assert(coin.fee_min == 4 * ETH_TO_WEI, 'fee_min');
-        assert(coin.fee_pct == 10, 'fee_pct');
-        assert(coin.enabled == true, 'enabled');
+        let table: Table = admin.get_table(tables::LORDS);
+        assert(table.contract_address == lords.contract_address, 'contract_address');
+        assert(table.fee_min == 4 * constants::ETH_TO_WEI, 'fee_min');
+        assert(table.fee_pct == 10, 'fee_pct');
+        assert(table.enabled == true, 'enabled');
     }
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_set_coin() {
+    fn test_set_table() {
         let (world, _system, admin, lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(false, false);
         // not initialized
         tester::execute_admin_initialize(admin, owner, zero_address(), zero_address(), zero_address());
-        let coin: Coin = admin.get_coin(coins::LORDS);
-        assert(coin.contract_address == zero_address(), 'zero');
-        assert(coin.enabled == false, 'zero');
+        let table: Table = admin.get_table(tables::LORDS);
+        assert(table.contract_address == zero_address(), 'zero');
+        assert(table.enabled == false, 'zero');
         // set
-        tester::execute_admin_set_coin(admin, owner, coins::LORDS, lords.contract_address, 'LORDS+', 5, 10, true);
-        let coin: Coin = admin.get_coin(coins::LORDS);
-        assert(coin.contract_address == lords.contract_address, 'contract_address_1');
-        assert(coin.description == 'LORDS+', 'description_1');
-        assert(coin.fee_min == 5, 'fee_min_1');
-        assert(coin.fee_pct == 10, 'fee_pct_1');
-        assert(coin.enabled == true, 'enabled_1');
+        tester::execute_admin_set_table(admin, owner, tables::LORDS, lords.contract_address, 'LORDS+', 5, 10, true);
+        let table: Table = admin.get_table(tables::LORDS);
+        assert(table.contract_address == lords.contract_address, 'contract_address_1');
+        assert(table.description == 'LORDS+', 'description_1');
+        assert(table.fee_min == 5, 'fee_min_1');
+        assert(table.fee_pct == 10, 'fee_pct_1');
+        assert(table.enabled == true, 'enabled_1');
         // set
-        tester::execute_admin_set_coin(admin, owner, coins::LORDS, other, 'LORDS+++', 22, 33, false);
-        let coin: Coin = admin.get_coin(coins::LORDS);
-        assert(coin.contract_address == other, 'contract_address_2');
-        assert(coin.description == 'LORDS+++', 'description_2');
-        assert(coin.fee_min == 22, 'fee_min_2');
-        assert(coin.fee_pct == 33, 'fee_pct_2');
-        assert(coin.enabled == false, 'enabled_2');
+        tester::execute_admin_set_table(admin, owner, tables::LORDS, other, 'LORDS+++', 22, 33, false);
+        let table: Table = admin.get_table(tables::LORDS);
+        assert(table.contract_address == other, 'contract_address_2');
+        assert(table.description == 'LORDS+++', 'description_2');
+        assert(table.fee_min == 22, 'fee_min_2');
+        assert(table.fee_pct == 33, 'fee_pct_2');
+        assert(table.enabled == false, 'enabled_2');
         // get
-        let get_coin: Coin = tester::get_Coin(world, coins::LORDS);
-        assert(coin.contract_address == get_coin.contract_address, 'get_coin.contract_address');
-        assert(coin.fee_min == get_coin.fee_min, 'get_coin.fee_min');
-        assert(coin.fee_pct == get_coin.fee_pct, 'get_coin.fee_pct');
-        assert(coin.enabled == get_coin.enabled, 'get_coin.enabled');
+        let table: Table = tester::get_Table(world, tables::LORDS);
+        assert(table.contract_address == table.contract_address, 'get_table.contract_address');
+        assert(table.fee_min == table.fee_min, 'get_table.fee_min');
+        assert(table.fee_pct == table.fee_pct, 'get_table.fee_pct');
+        assert(table.enabled == table.enabled, 'get_table.enabled');
     }
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_set_coin_count() {
+    fn test_set_table_count() {
         let (_world, _system, admin, lords, _ierc20, owner, _other, bummer, _treasury) = tester::setup_world(true, false);
-        let coin: Coin = admin.get_coin(coins::COUNT);
-        assert(coin.contract_address == lords.contract_address, 'zero');
+        let table: Table = admin.get_table(tables::COUNT);
+        assert(table.contract_address == lords.contract_address, 'zero');
         // set must work
-        tester::execute_admin_set_coin(admin, owner, coins::COUNT, bummer, 'LORDS+', 5, 10, true);
-        let coin: Coin = admin.get_coin(coins::COUNT);
-        assert(coin.contract_address == bummer, 'contract_address');
-        assert(coin.description == 'LORDS+', 'description');
-        assert(coin.fee_min == 5, 'fee_min');
-        assert(coin.fee_pct == 10, 'fee_pct');
-        assert(coin.enabled == true, 'enabled');
+        tester::execute_admin_set_table(admin, owner, tables::COUNT, bummer, 'LORDS+', 5, 10, true);
+        let table: Table = admin.get_table(tables::COUNT);
+        assert(table.contract_address == bummer, 'contract_address');
+        assert(table.description == 'LORDS+', 'description');
+        assert(table.fee_min == 5, 'fee_min');
+        assert(table.fee_pct == 10, 'fee_pct');
+        assert(table.enabled == true, 'enabled');
     }
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_enable_coin_count() {
+    fn test_enable_table_count() {
         let (_world, _system, admin, lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(true, false);
-        tester::execute_admin_set_coin(admin, owner, coins::LORDS, lords.contract_address, 'LORDS+', 5, 10, false);
-        let coin: Coin = admin.get_coin(coins::LORDS);
-        assert(coin.enabled == false, 'enabled_1');
-        tester::execute_admin_enable_coin(admin, owner, coins::LORDS, true);
-        let coin: Coin = admin.get_coin(coins::LORDS);
-        assert(coin.enabled == true, 'enabled_2');
-        tester::execute_admin_enable_coin(admin, owner, coins::LORDS, false);
-        let coin: Coin = admin.get_coin(coins::LORDS);
-        assert(coin.enabled == false, 'enabled_3');
+        tester::execute_admin_set_table(admin, owner, tables::LORDS, lords.contract_address, 'LORDS+', 5, 10, false);
+        let table: Table = admin.get_table(tables::LORDS);
+        assert(table.enabled == false, 'enabled_1');
+        tester::execute_admin_enable_table(admin, owner, tables::LORDS, true);
+        let table: Table = admin.get_table(tables::LORDS);
+        assert(table.enabled == true, 'enabled_2');
+        tester::execute_admin_enable_table(admin, owner, tables::LORDS, false);
+        let table: Table = admin.get_table(tables::LORDS);
+        assert(table.enabled == false, 'enabled_3');
     }
 
     #[test]
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Not owner','ENTRYPOINT_FAILED'))]
-    fn test_set_coin_not_owner() {
+    fn test_set_table_not_owner() {
         let (_world, _system, admin, lords, _ierc20, _owner, other, _bummer, _treasury) = tester::setup_world(true, false);
-        tester::execute_admin_set_coin(admin, other, coins::LORDS, lords.contract_address, 'LORDS+', 5, 10, true);
+        tester::execute_admin_set_table(admin, other, tables::LORDS, lords.contract_address, 'LORDS+', 5, 10, true);
     }
 
     #[test]
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('Not owner','ENTRYPOINT_FAILED'))]
-    fn test_enable_coin_not_owner() {
+    fn test_enable_table_not_owner() {
         let (_world, _system, admin, _lords, _ierc20, _owner, other, _bummer, _treasury) = tester::setup_world(true, false);
-        tester::execute_admin_enable_coin(admin, other, coins::LORDS, true);
+        tester::execute_admin_enable_table(admin, other, tables::LORDS, true);
     }
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Invalid coin','ENTRYPOINT_FAILED'))]
-    fn test_set_coin_zero() {
+    #[should_panic(expected:('Invalid table','ENTRYPOINT_FAILED'))]
+    fn test_set_table_zero() {
         let (_world, _system, admin, lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(true, false);
-        tester::execute_admin_set_coin(admin, owner, 0, lords.contract_address, 'LORDS+', 5, 10, true);
+        tester::execute_admin_set_table(admin, owner, 0, lords.contract_address, 'LORDS+', 5, 10, true);
     }
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Invalid coin','ENTRYPOINT_FAILED'))]
-    fn test_set_coin_invalid() {
+    #[should_panic(expected:('Invalid table','ENTRYPOINT_FAILED'))]
+    fn test_set_table_invalid() {
         let (_world, _system, admin, lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(true, false);
-        tester::execute_admin_set_coin(admin, owner, coins::COUNT + 1, lords.contract_address, 'LORDS+', 5, 10, true);
+        tester::execute_admin_set_table(admin, owner, tables::COUNT + 1, lords.contract_address, 'LORDS+', 5, 10, true);
     }
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Invalid coin','ENTRYPOINT_FAILED'))]
-    fn test_enable_coin_zero() {
+    #[should_panic(expected:('Invalid table','ENTRYPOINT_FAILED'))]
+    fn test_enable_table_zero() {
         let (_world, _system, admin, _lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(true, false);
-        tester::execute_admin_enable_coin(admin, owner, 0, false);
+        tester::execute_admin_enable_table(admin, owner, 0, false);
     }
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Invalid coin','ENTRYPOINT_FAILED'))]
-    fn test_enable_coin_invalid() {
+    #[should_panic(expected:('Invalid table','ENTRYPOINT_FAILED'))]
+    fn test_enable_table_invalid() {
         let (_world, _system, admin, _lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(true, false);
-        tester::execute_admin_enable_coin(admin, owner, coins::COUNT + 1, false);
+        tester::execute_admin_enable_table(admin, owner, tables::COUNT + 1, false);
     }
 
 

@@ -1,7 +1,7 @@
 use traits::{Into, PartialOrd};
 use debug::PrintTrait;
 
-use pistols::models::models::{Shot, Duelist, DuelistTrait};
+use pistols::models::models::{Shot, Duelist, Score, ScoreTrait};
 use pistols::types::constants::{constants, chances};
 use pistols::utils::math::{MathU8};
 
@@ -79,7 +79,7 @@ trait ActionTrait {
     fn as_paces(self: Action) -> u8;
     fn is_melee(self: Action) -> bool;
     fn is_runner(self: Action) -> bool;
-    fn roll_priority(self: Action, other: Action, duelist_self: Duelist, duelist_other: Duelist) -> i8;
+    fn roll_priority(self: Action, other: Action, score_self: Score, score_other: Score) -> i8;
     fn paces_priority(self: Action, other: Action) -> i8;
     fn honour(self: Action) -> i8;
     fn crit_chance(self: Action) -> u8;
@@ -135,7 +135,7 @@ impl ActionTraitImpl of ActionTrait {
     //   0: roll simultaneously
     // > 0: other rolls first
     //
-    fn roll_priority(self: Action, other: Action, duelist_self: Duelist, duelist_other: Duelist) -> i8 {
+    fn roll_priority(self: Action, other: Action, score_self: Score, score_other: Score) -> i8 {
         // Lowest paces shoot first
         let is_paces_self: bool = self.is_paces();
         let is_paces_other: bool = other.is_paces();
@@ -147,9 +147,9 @@ impl ActionTraitImpl of ActionTrait {
             let paces_other: i8 = other.into();
             if (paces_self == paces_other) {
                 // Tricksters shoot first
-                if (duelist_self.is_trickster() && !duelist_other.is_trickster()) {
+                if (score_self.is_trickster() && !score_other.is_trickster()) {
                     (-1)
-                } else if (!duelist_self.is_trickster() && duelist_other.is_trickster()) {
+                } else if (!score_self.is_trickster() && score_other.is_trickster()) {
                     (1)
                 } else {
                     (0)

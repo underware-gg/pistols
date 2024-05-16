@@ -11,8 +11,9 @@ mod tests {
     use pistols::systems::admin::{IAdminDispatcher, IAdminDispatcherTrait};
     use pistols::systems::utils::{zero_address};
     use pistols::models::config::{Config};
-    use pistols::models::coins::{Coin, CoinManagerTrait, CoinTrait, coins, ETH_TO_WEI};
+    use pistols::models::table::{Table, TableTrait, TableManagerTrait, tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
+    use pistols::types::constants::{constants};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::math::{MathU256};
     use pistols::tests::tester::{tester};
@@ -21,7 +22,7 @@ mod tests {
     const OTHER_NAME: felt252 = 'Senpai';
     const BUMMER_NAME: felt252 = 'Bummer';
     const MESSAGE_1: felt252 = 'For honour!!!';
-    const WAGER_COIN: u8 = 1;
+    const TABLE_ID: u8 = 1;
 
     //
     // Fees balance
@@ -31,16 +32,16 @@ mod tests {
     #[available_gas(1_000_000_000)]
     fn test_calc_fee() {
         let (_world, system, admin, _lords, _ierc20, _owner, _other, _bummer, _treasury) = tester::setup_world(true, false);
-        let coin: Coin = admin.get_coin(WAGER_COIN);
+        let table: Table = admin.get_table(TABLE_ID);
         // no wager
-        let fee: u256 = system.calc_fee(WAGER_COIN, 0);
-        assert(fee == coin.fee_min, 'fee > 0');
+        let fee: u256 = system.calc_fee(TABLE_ID, 0);
+        assert(fee == table.fee_min, 'fee > 0');
         // low wager
-        let fee: u256 = system.calc_fee(WAGER_COIN, 10 * ETH_TO_WEI);
-        assert(fee == coin.fee_min, 'fee == min');
+        let fee: u256 = system.calc_fee(TABLE_ID, 10 * constants::ETH_TO_WEI);
+        assert(fee == table.fee_min, 'fee == min');
         // high wager
-        let fee: u256 = system.calc_fee(WAGER_COIN, 100 * ETH_TO_WEI);
-        assert(fee > coin.fee_min, 'fee > min');
+        let fee: u256 = system.calc_fee(TABLE_ID, 100 * constants::ETH_TO_WEI);
+        assert(fee > table.fee_min, 'fee > min');
     }
 
     fn _test_balance_ok(wager_value: u256) {
@@ -54,21 +55,21 @@ mod tests {
         let balance_a: u256 = ierc20.balance_of(A);
         let balance_b: u256 = ierc20.balance_of(B);
         // approve fees
-        let coin: Coin = admin.get_coin(WAGER_COIN);
-        let fee: u256 = system.calc_fee(WAGER_COIN, wager_value);
-        assert(fee >= coin.fee_min, 'fee >= min');
+        let table: Table = admin.get_table(TABLE_ID);
+        let fee: u256 = system.calc_fee(TABLE_ID, wager_value);
+        assert(fee >= table.fee_min, 'fee >= min');
         let approved_value: u256 = wager_value + fee;
         tester::execute_lords_approve(lords, A, S, approved_value);
         tester::execute_lords_approve(lords, B, S, approved_value);
         // create challenge
-        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, WAGER_COIN, wager_value, 0);
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, wager_value, 0);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
         // check stored wager
         let wager = tester::get_Wager(world, duel_id);
         let total: u256 = wager.value + wager.fee;
         assert(total == approved_value, 'wager total = approved_value');
-        assert(wager.coin == WAGER_COIN, 'wager.coin');
+        assert(wager.table_id == TABLE_ID, 'wager.table_id');
         assert(wager.value == wager_value, 'wager.value');
         assert(wager.fee == fee, '== fee');
         // check balances
@@ -89,7 +90,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_wager_balance_ok() {
-        _test_balance_ok(100 * ETH_TO_WEI);
+        _test_balance_ok(100 * constants::ETH_TO_WEI);
     }
 
     //
@@ -103,7 +104,7 @@ mod tests {
         let (_world, system, _admin, _lords, _ierc20, _owner, other, bummer, _treasury) = tester::setup_world(true, true);
         tester::execute_register_duelist(system, other, OTHER_NAME, 1);
         tester::execute_register_duelist(system, bummer, BUMMER_NAME, 1);
-        let _duel_id: u128 = tester::execute_create_challenge(system, bummer, other, MESSAGE_1, WAGER_COIN, 0, 0);
+        let _duel_id: u128 = tester::execute_create_challenge(system, bummer, other, MESSAGE_1, TABLE_ID, 0, 0);
     }
 
     #[test]
@@ -113,7 +114,7 @@ mod tests {
         let (_world, system, _admin, _lords, _ierc20, _owner, other, bummer, _treasury) = tester::setup_world(true, true);
         tester::execute_register_duelist(system, other, OTHER_NAME, 1);
         tester::execute_register_duelist(system, bummer, BUMMER_NAME, 1);
-        let _duel_id: u128 = tester::execute_create_challenge(system, bummer, other, MESSAGE_1, WAGER_COIN, 100, 0);
+        let _duel_id: u128 = tester::execute_create_challenge(system, bummer, other, MESSAGE_1, TABLE_ID, 100, 0);
     }
 
 
@@ -128,7 +129,7 @@ mod tests {
         tester::execute_register_duelist(system, other, OTHER_NAME, 1);
         tester::execute_register_duelist(system, bummer, BUMMER_NAME, 1);
         let _balance: u256 = ierc20.balance_of(other);
-        let duel_id: u128 = tester::execute_create_challenge(system, other, bummer, MESSAGE_1, WAGER_COIN, 0, 0);
+        let duel_id: u128 = tester::execute_create_challenge(system, other, bummer, MESSAGE_1, TABLE_ID, 0, 0);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
     }
@@ -140,7 +141,7 @@ mod tests {
         tester::execute_register_duelist(system, other, OTHER_NAME, 1);
         tester::execute_register_duelist(system, bummer, BUMMER_NAME, 1);
         let _balance: u256 = ierc20.balance_of(other);
-        let duel_id: u128 = tester::execute_create_challenge(system, other, bummer, MESSAGE_1, WAGER_COIN, 100, 0);
+        let duel_id: u128 = tester::execute_create_challenge(system, other, bummer, MESSAGE_1, TABLE_ID, 100, 0);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
     }
@@ -157,7 +158,7 @@ mod tests {
         tester::execute_register_duelist(system, other, OTHER_NAME, 1);
         tester::execute_register_duelist(system, bummer, BUMMER_NAME, 1);
         // verified by test_fee_funds_ok
-        let duel_id: u128 = tester::execute_create_challenge(system, other, bummer, MESSAGE_1, WAGER_COIN, 0, 0);
+        let duel_id: u128 = tester::execute_create_challenge(system, other, bummer, MESSAGE_1, TABLE_ID, 0, 0);
         // panic here
         tester::execute_reply_challenge(system, bummer, duel_id, true);
     }
@@ -170,7 +171,7 @@ mod tests {
         tester::execute_register_duelist(system, other, OTHER_NAME, 1);
         tester::execute_register_duelist(system, bummer, BUMMER_NAME, 1);
         // verified by test_wager_funds_ok
-        let duel_id: u128 = tester::execute_create_challenge(system, other, bummer, MESSAGE_1, WAGER_COIN, 100, 0);
+        let duel_id: u128 = tester::execute_create_challenge(system, other, bummer, MESSAGE_1, TABLE_ID, 100, 0);
         // panic here
         tester::execute_reply_challenge(system, bummer, duel_id, true);
     }
@@ -189,7 +190,7 @@ mod tests {
         // verified by test_fee_funds_ok
         // remove allowance
         tester::execute_lords_approve(lords, other, system.contract_address, 0);
-        let _duel_id: u128 = tester::execute_create_challenge(system, other, bummer, MESSAGE_1, WAGER_COIN, 0, 0);
+        let _duel_id: u128 = tester::execute_create_challenge(system, other, bummer, MESSAGE_1, TABLE_ID, 0, 0);
     }
 
     #[test]
@@ -202,7 +203,7 @@ mod tests {
         // verified by test_fee_funds_ok
         // remove allowance
         tester::execute_lords_approve(lords, other, system.contract_address, 0);
-        let _duel_id: u128 = tester::execute_create_challenge(system, other, bummer, MESSAGE_1, WAGER_COIN, 100, 0);
+        let _duel_id: u128 = tester::execute_create_challenge(system, other, bummer, MESSAGE_1, TABLE_ID, 100, 0);
     }
 
 
@@ -222,10 +223,10 @@ mod tests {
         let balance_contract: u256 = ierc20.balance_of(S);
         let balance_a: u256 = ierc20.balance_of(A);
         // create challenge
-        let wager_value: u256 = 100 * ETH_TO_WEI;
-        let fee: u256 = system.calc_fee(WAGER_COIN, wager_value);
+        let wager_value: u256 = 100 * constants::ETH_TO_WEI;
+        let fee: u256 = system.calc_fee(TABLE_ID, wager_value);
         let approved_value: u256 = wager_value + fee;
-        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, WAGER_COIN, wager_value, 0);
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, wager_value, 0);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
         tester::assert_balance(ierc20, A, balance_a, approved_value, 0, 'balance_a_1');
@@ -249,10 +250,10 @@ mod tests {
         let balance_contract: u256 = ierc20.balance_of(S);
         let balance_a: u256 = ierc20.balance_of(A);
         // create challenge
-        let wager_value: u256 = 100 * ETH_TO_WEI;
-        let fee: u256 = system.calc_fee(WAGER_COIN, wager_value);
+        let wager_value: u256 = 100 * constants::ETH_TO_WEI;
+        let fee: u256 = system.calc_fee(TABLE_ID, wager_value);
         let approved_value: u256 = wager_value + fee;
-        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, WAGER_COIN, wager_value, 0);
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, wager_value, 0);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
         tester::assert_balance(ierc20, A, balance_a, approved_value, 0, 'balance_a_1');
@@ -276,11 +277,11 @@ mod tests {
         let balance_contract: u256 = ierc20.balance_of(S);
         let balance_a: u256 = ierc20.balance_of(A);
         // create challenge
-        let wager_value: u256 = 100 * ETH_TO_WEI;
-        let fee: u256 = system.calc_fee(WAGER_COIN, wager_value);
+        let wager_value: u256 = 100 * constants::ETH_TO_WEI;
+        let fee: u256 = system.calc_fee(TABLE_ID, wager_value);
         let approved_value: u256 = wager_value + fee;
         let expire_seconds: u64 = timestamp::from_days(1);
-        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, WAGER_COIN, wager_value, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, wager_value, expire_seconds);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
         tester::assert_balance(ierc20, A, balance_a, approved_value, 0, 'balance_a_1');

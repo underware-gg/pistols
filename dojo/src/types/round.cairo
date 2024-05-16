@@ -18,7 +18,7 @@ mod ROUND_STATE {
 
 trait RoundStateTrait {
     fn exists(self: RoundState) -> bool;
-    fn finished(self: RoundState) -> bool;
+    fn is_finished(self: RoundState) -> bool;
 }
 
 impl RoundStateTraitImpl of RoundStateTrait {
@@ -30,7 +30,7 @@ impl RoundStateTraitImpl of RoundStateTrait {
             RoundState::Finished    => true,
         }
     }
-    fn finished(self: RoundState) -> bool {
+    fn is_finished(self: RoundState) -> bool {
         match self {
             RoundState::Null        => true,
             RoundState::Commit      => false,

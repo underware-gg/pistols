@@ -4,8 +4,8 @@ use traits::{Into, TryInto};
 use starknet::{ContractAddress};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
-use pistols::models::models::{init, Duelist, DuelistTrait, Challenge, Wager, Pact, Round, Shot};
-use pistols::models::coins::{Coin, CoinManagerTrait, CoinTrait};
+use pistols::models::models::{init, Duelist, Scoreboard, Score, ScoreTrait, Challenge, Snapshot, Wager, Pact, Round, Shot};
+use pistols::models::table::{Table, TableTrait, TableManagerTrait};
 use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round::{RoundState, RoundStateTrait};
@@ -72,21 +72,14 @@ fn get_duelist_health(world: IWorldDispatcher, duelist_address: ContractAddress,
 }
 
 fn create_challenge_snapshot(world: IWorldDispatcher, challenge: Challenge) {
-    let mut duelist_a: Duelist = get!(world, challenge.duelist_a, Duelist);
-    let mut duelist_b: Duelist = get!(world, challenge.duelist_b, Duelist);
-    duelist_a.address = make_snapshot_duelist_key(challenge.duel_id, challenge.duelist_a);
-    duelist_b.address = make_snapshot_duelist_key(challenge.duel_id, challenge.duelist_b);
-    set!(world, (duelist_a, duelist_b));
-}
-fn get_snapshot_duelist(world: IWorldDispatcher, duel_id: u128, address: ContractAddress) -> Duelist {
-    let key: ContractAddress = make_snapshot_duelist_key(duel_id, address);
-    (get!(world, key, Duelist))
-}
-fn make_snapshot_duelist_key(duel_id: u128, address: ContractAddress) -> ContractAddress {
-    let address_felt: felt252 = address.into();
-    let address_u256: u256 = address_felt.into();
-    let key: felt252 = (duel_id ^ address_u256.low).into();
-    (key.try_into().unwrap())
+    let duelist_a: Duelist = get!(world, challenge.duelist_a, Duelist);
+    let duelist_b: Duelist = get!(world, challenge.duelist_b, Duelist);
+    let snapshot = Snapshot {
+        duel_id: challenge.duel_id,
+        score_a: duelist_a.score,
+        score_b: duelist_b.score,
+    };
+    set!(world, (snapshot));
 }
 
 // player need to allow contract to transfer funds first
@@ -95,47 +88,50 @@ fn deposit_wager_fees(world: IWorldDispatcher, from: ContractAddress, to: Contra
     let wager: Wager = get!(world, (duel_id), Wager);
     let total: u256 = (wager.value + wager.fee);
     if (total > 0) {
-        let coin : Coin = CoinManagerTrait::new(world).get(wager.coin);
-        let balance: u256 = coin.ierc20().balance_of(from);
-        let allowance: u256 = coin.ierc20().allowance(from, to);
+        let table : Table = TableManagerTrait::new(world).get(wager.table_id);
+        let balance: u256 = table.ierc20().balance_of(from);
+        let allowance: u256 = table.ierc20().allowance(from, to);
         assert(balance >= total, 'Insufficient balance for Fees');
         assert(allowance >= total, 'Not allowed to transfer Fees');
-        coin.ierc20().transfer_from(from, to, total);
+        table.ierc20().transfer_from(from, to, total);
     }
 }
 fn withdraw_wager_fees(world: IWorldDispatcher, to: ContractAddress, duel_id: u128) {
     let wager: Wager = get!(world, (duel_id), Wager);
     let total: u256 = (wager.value + wager.fee);
     if (total > 0) {
-        let coin : Coin = CoinManagerTrait::new(world).get(wager.coin);
-        let balance: u256 = coin.ierc20().balance_of(starknet::get_contract_address());
+        let table : Table = TableManagerTrait::new(world).get(wager.table_id);
+        let balance: u256 = table.ierc20().balance_of(starknet::get_contract_address());
         assert(balance >= total, 'Withdraw not available'); // should never happen!
-        coin.ierc20().transfer(to, total);
+        table.ierc20().transfer(to, total);
     }
 }
-fn split_wager_fees(world: IWorldDispatcher, share_1: ContractAddress, share_2: ContractAddress, duel_id: u128) {
+// spllit wager beteen duelist_a and duelist_b
+fn split_wager_fees(world: IWorldDispatcher, duelist_a: ContractAddress, duelist_b: ContractAddress, duel_id: u128) -> u256 {
     let wager: Wager = get!(world, (duel_id), Wager);
     let total: u256 = (wager.value + wager.fee) * 2;
     if (total > 0) {
-        let coin : Coin = CoinManagerTrait::new(world).get(wager.coin);
-        let balance: u256 = coin.ierc20().balance_of(starknet::get_contract_address());
+        let table : Table = TableManagerTrait::new(world).get(wager.table_id);
+        let balance: u256 = table.ierc20().balance_of(starknet::get_contract_address());
         assert(balance >= total, 'Wager not available'); // should never happen!
         if (wager.value > 0) {
-            if (share_1 == share_2) {
+            if (duelist_a == duelist_b) {
                 // single winner
-                coin.ierc20().transfer(share_1, wager.value * 2);
+                table.ierc20().transfer(duelist_a, wager.value * 2);
             } else {
-                coin.ierc20().transfer(share_1, wager.value);
-                coin.ierc20().transfer(share_2, wager.value);
+                // split wager back to duelists
+                table.ierc20().transfer(duelist_a, wager.value);
+                table.ierc20().transfer(duelist_b, wager.value);
             }
         }
         if (wager.fee > 0) {
             let manager = ConfigManagerTrait::new(world).get();
             if (manager.treasury_address != starknet::get_contract_address()) {
-                coin.ierc20().transfer(manager.treasury_address, wager.fee * 2);
+                table.ierc20().transfer(manager.treasury_address, wager.fee * 2);
             }
         }
     }
+    (wager.value)
 }
 
 //------------------------
@@ -248,14 +244,14 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
 
     // Set pact between Duelists to avoid duplicated challenges
     let pair: u128 = make_pact_pair(challenge.duelist_a, challenge.duelist_b);
-    let pact_duel_id: u128 = if (state.ongoing()) { challenge.duel_id } else  { 0 };
+    let pact_duel_id: u128 = if (state.is_ongoing()) { challenge.duel_id } else  { 0 };
     set!(world, Pact {
         pair,
         duel_id: pact_duel_id,
     });
 
     // Start Round
-    if (state.canceled()) {
+    if (state.is_canceled()) {
         // transfer wager/fee back to challenger
         withdraw_wager_fees(world, challenge.duelist_a, challenge.duel_id);
     } else if (state == ChallengeState::InProgress) {
@@ -284,53 +280,72 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
                 shot_b,
             }
         ));
-    } else if (state.finished()) {
+    } else if (state.is_finished()) {
         // End Duel!
         let mut duelist_a: Duelist = get!(world, challenge.duelist_a, Duelist);
         let mut duelist_b: Duelist = get!(world, challenge.duelist_b, Duelist);
+        let wager: Wager = get!(world, (challenge.duel_id), Wager);
+        let mut scoreboard_a: Scoreboard = get!(world, (challenge.duelist_a, wager.table_id), Scoreboard);
+        let mut scoreboard_b: Scoreboard = get!(world, (challenge.duelist_b, wager.table_id), Scoreboard);
         
-        // update totals, total_duels is updated in update_duelist_honour()
-        if (state == ChallengeState::Draw) {
-            duelist_a.total_draws += 1;
-            duelist_b.total_draws += 1;
-        } else if (challenge.winner == 1) {
-            duelist_a.total_wins += 1;
-            duelist_b.total_losses += 1;
-        } else if (challenge.winner == 2) {
-            duelist_a.total_losses += 1;
-            duelist_b.total_wins += 1;
-        } else {
-            // should never get here!
-        }
+        // update totals
+        update_score_totals(ref duelist_a.score, ref duelist_b.score, state, challenge.winner);
+        update_score_totals(ref scoreboard_a.score, ref scoreboard_b.score, state, challenge.winner);
 
         // compute honour from final round
         let final_round: Round = get!(world, (challenge.duel_id, challenge.round_number), Round);
-        update_duelist_honour(ref duelist_a, final_round.shot_a.honour);
-        update_duelist_honour(ref duelist_b, final_round.shot_b.honour);
+        update_score_honour(ref duelist_a.score, final_round.shot_a.honour);
+        update_score_honour(ref duelist_b.score, final_round.shot_b.honour);
+        update_score_honour(ref scoreboard_a.score, final_round.shot_a.honour);
+        update_score_honour(ref scoreboard_b.score, final_round.shot_b.honour);
 
         // split wager/fee to winners and benefactors
         if (final_round.shot_a.wager > final_round.shot_b.wager) {
-            split_wager_fees(world, challenge.duelist_a, challenge.duelist_a, challenge.duel_id);
+            // duelist_a won the Wager
+            let wager_value: u256 = split_wager_fees(world, challenge.duelist_a, challenge.duelist_a, challenge.duel_id);
+            scoreboard_a.wager_won += wager_value;
+            scoreboard_b.wager_lost += wager_value;
         } else if (final_round.shot_a.wager < final_round.shot_b.wager) {
-            split_wager_fees(world, challenge.duelist_b, challenge.duelist_b, challenge.duel_id);
+            // duelist_b won the Wager
+            let wager_value: u256 = split_wager_fees(world, challenge.duelist_b, challenge.duelist_b, challenge.duel_id);
+            scoreboard_a.wager_lost += wager_value;
+            scoreboard_b.wager_won += wager_value;
         } else {
+            // no-one gets the Wager
             split_wager_fees(world, challenge.duelist_a, challenge.duelist_b, challenge.duel_id);
         }
         
-        // save Duelists
-        set!(world, (duelist_a, duelist_b));
+        // save
+        set!(world, (duelist_a, duelist_b, scoreboard_a, scoreboard_b));
     }
 }
 
-// average honour has an extra decimal, eg: 100 = 10.0
-fn update_duelist_honour(ref duelist: Duelist, duel_honour: u8) {
-    duelist.total_duels += 1;
-    duelist.total_honour += duel_honour.into();
-    duelist.honour = ((duelist.total_honour * 10) / duelist.total_duels.into()).try_into().unwrap();
-    duelist.level_villain = _average_trickster(calc_level_villain(duelist.honour), duelist.level_trickster);
-    duelist.level_lord = _average_trickster(calc_level_lord(duelist.honour), duelist.level_trickster);
-    duelist.level_trickster = _average_trickster(calc_level_trickster(duelist.honour, duel_honour), duelist.level_trickster);
+// update duel totals only
+fn update_score_totals(ref score_a: Score, ref score_b: Score, state: ChallengeState, winner: u8) {
+    score_a.total_duels += 1;
+    score_b.total_duels += 1;
+    if (state == ChallengeState::Draw) {
+        score_a.total_draws += 1;
+        score_b.total_draws += 1;
+    } else if (winner == 1) {
+        score_a.total_wins += 1;
+        score_b.total_losses += 1;
+    } else if (winner == 2) {
+        score_a.total_losses += 1;
+        score_b.total_wins += 1;
+    } else {
+        // should never get here!
+    }
 }
+// average honour has an extra decimal, eg: 100 = 10.0
+fn update_score_honour(ref score: Score, duel_honour: u8) {
+    score.total_honour += duel_honour.into();
+    score.honour = ((score.total_honour * 10) / score.total_duels.into()).try_into().unwrap();
+    score.level_villain = _average_trickster(calc_level_villain(score.honour), score.level_trickster);
+    score.level_lord = _average_trickster(calc_level_lord(score.honour), score.level_trickster);
+    score.level_trickster = _average_trickster(calc_level_trickster(score.honour, duel_honour), score.level_trickster);
+}
+
 // Villain bonus: the less honour, more bonus
 #[inline(always)]
 fn calc_level_villain(honour: u8) -> u8 {
@@ -375,7 +390,7 @@ fn _average_trickster(bonus: u8, current_level_trickster: u8) -> u8 {
 //
 
 // crit bonus will be applied for Lords only
-fn calc_crit_chances(attacker: Duelist, defender: Duelist, attack: Action, defense: Action, health: u8) -> u8 {
+fn calc_crit_chances(attacker: Score, defender: Score, attack: Action, defense: Action, health: u8) -> u8 {
     (_apply_chance_bonus_penalty(
         attack.crit_chance(),
         calc_crit_bonus(attacker) + calc_match_crit_bonus(attacker, attack, defense),
@@ -384,14 +399,14 @@ fn calc_crit_chances(attacker: Duelist, defender: Duelist, attack: Action, defen
 }
 // Hit chances will be applied to Villains only
 // Both Hit and Lethal go up/down with same bonus/penalty
-fn calc_hit_chances(attacker: Duelist, defender: Duelist, action: Action, health: u8) -> u8 {
+fn calc_hit_chances(attacker: Score, defender: Score, action: Action, health: u8) -> u8 {
     (_apply_chance_bonus_penalty(
         action.hit_chance(),
         calc_lethal_bonus(attacker),
         calc_hit_penalty(action, health) + calc_trickster_penalty(attacker, defender, chances::TRICKSTER_HIT_PENALTY),
     ))
 }
-fn calc_lethal_chances(attacker: Duelist, defender: Duelist, action: Action, health: u8) -> u8 {
+fn calc_lethal_chances(attacker: Score, defender: Score, action: Action, health: u8) -> u8 {
     (_apply_chance_bonus_penalty(
         action.lethal_chance(),
         calc_lethal_bonus(attacker),
@@ -412,21 +427,21 @@ fn _apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
 //
 
 #[inline(always)]
-fn calc_crit_bonus(duelist: Duelist) -> u8 {
-    if (duelist.is_lord()) {
-        (_calc_bonus(chances::CRIT_BONUS_LORD, duelist.level_lord, duelist.total_duels))
-    } else if (duelist.is_trickster()) {
-        (_calc_bonus(chances::CRIT_BONUS_TRICKSTER, duelist.level_trickster, duelist.total_duels))
+fn calc_crit_bonus(attacker: Score) -> u8 {
+    if (attacker.is_lord()) {
+        (_calc_bonus(chances::CRIT_BONUS_LORD, attacker.level_lord, attacker.total_duels))
+    } else if (attacker.is_trickster()) {
+        (_calc_bonus(chances::CRIT_BONUS_TRICKSTER, attacker.level_trickster, attacker.total_duels))
     } else {
         (0)
     }
 }
 #[inline(always)]
-fn calc_lethal_bonus(duelist: Duelist) -> u8 {
-    if (duelist.is_villain()) {
-        (_calc_bonus(chances::LETHAL_BONUS_VILLAIN, duelist.level_villain, duelist.total_duels))
-    } else if (duelist.is_trickster()) {
-        (_calc_bonus(chances::LETHAL_BONUS_TRICKSTER, duelist.level_trickster, duelist.total_duels))
+fn calc_lethal_bonus(attacker: Score) -> u8 {
+    if (attacker.is_villain()) {
+        (_calc_bonus(chances::LETHAL_BONUS_VILLAIN, attacker.level_villain, attacker.total_duels))
+    } else if (attacker.is_trickster()) {
+        (_calc_bonus(chances::LETHAL_BONUS_TRICKSTER, attacker.level_trickster, attacker.total_duels))
     } else {
         (0)
     }
@@ -445,7 +460,7 @@ fn _calc_bonus(bonus_max: u8, level: u8, total_duels: u16) -> u8 {
 }
 
 #[inline(always)]
-fn calc_match_crit_bonus(attacker: Duelist, attack: Action, defense: Action) -> u8 {
+fn calc_match_crit_bonus(attacker: Score, attack: Action, defense: Action) -> u8 {
     if (attacker.is_lord()) {
         if (attack.paces_priority(defense) < 0) { (chances::EARLY_LORD_CRIT_BONUS) } else { (0) }
     } else if (attacker.is_villain()) {
@@ -472,7 +487,7 @@ fn _calc_penalty(health: u8, penalty_per_damage: u8) -> u8 {
 }
 
 #[inline(always)]
-fn calc_trickster_penalty(attacker: Duelist, defender: Duelist, penalty: u8) -> u8 {
+fn calc_trickster_penalty(attacker: Score, defender: Score, penalty: u8) -> u8 {
     if (defender.is_trickster() && !attacker.is_trickster()) {
         (penalty)
     } else {
@@ -485,9 +500,10 @@ fn simulate_honour_for_action(world: IWorldDispatcher, duelist_address: Contract
     let mut duelist: Duelist = get!(world, duelist_address, Duelist);
     let action_honour: i8 = action.honour();
     if (action_honour >= 0) {
-        update_duelist_honour(ref duelist, MathU8::abs(action_honour));
+        duelist.score.total_duels += 1;
+        update_score_honour(ref duelist.score, MathU8::abs(action_honour));
     }
-    (action_honour, duelist.honour)
+    (action_honour, duelist.score.honour)
 }
 
 
