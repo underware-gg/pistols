@@ -169,8 +169,9 @@ mod shooter {
     // Decide who wins a round, or go to next
     //
     fn process_round(world: IWorldDispatcher, ref challenge: Challenge, ref round: Round, is_last_round: bool) {
-        let duelist_a: Duelist = get!(world, challenge.duelist_a, Duelist);
-        let duelist_b: Duelist = get!(world, challenge.duelist_b, Duelist);
+        let duelist_a: Duelist = utils::get_snapshot_duelist(world, challenge.duel_id, challenge.duelist_a);
+        let duelist_b: Duelist = utils::get_snapshot_duelist(world, challenge.duel_id, challenge.duelist_b);
+        
         let action_a: Action = apply_action_honour(ref round.shot_a);
         let action_b: Action = apply_action_honour(ref round.shot_b);
         

@@ -13,7 +13,7 @@ mod tests {
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::types::constants::{constants};
-    use pistols::systems::utils::{zero_address, make_action_hash};
+    use pistols::systems::utils::{zero_address, make_action_hash, make_snapshot_duelist_key};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::math::{MathU8};
     use pistols::tests::tester::{tester};
@@ -88,6 +88,18 @@ mod tests {
         assert(round.duel_id == duel_id, 'round.duel_id');
         assert(round.round_number == 1, 'round.round_number');
         assert(round.state == RoundState::Commit.into(), 'round.state');
+
+        // Snapshot was created
+        let duelist_a = tester::get_Duelist(world, ch.duelist_a);
+        let duelist_b = tester::get_Duelist(world, ch.duelist_b);
+        assert(duelist_a.name != '', 'duelist_a.name');
+        assert(duelist_b.name != '', 'duelist_b.name');
+        let snap_key_a = make_snapshot_duelist_key(duel_id, ch.duelist_a);
+        let snap_key_b = make_snapshot_duelist_key(duel_id, ch.duelist_b);
+        let snap_duelist_a = tester::get_Duelist(world, snap_key_a);
+        let snap_duelist_b = tester::get_Duelist(world, snap_key_b);
+        assert(snap_duelist_a.name == duelist_a.name, 'snap_a.name');
+        assert(snap_duelist_b.name == duelist_b.name, 'snap_b.name');
     }
 
     //-----------------------------------------
@@ -251,6 +263,18 @@ mod tests {
         tester::assert_balance(ierc20, system.contract_address, balance_contract, 0, 0, 'balance_contract_3');
         tester::assert_balance(ierc20, treasury, balance_treasury, 0, fee * 2, 'balance_treasury_3');
         tester::assert_winner_balance(ierc20, challenge.winner, owner, other, balance_a, balance_b, fee, WAGER_VALUE, 'balance_winner_3');
+
+        // Snapshot was created and kept original value
+        let snap_key_a = make_snapshot_duelist_key(duel_id, challenge.duelist_a);
+        let snap_key_b = make_snapshot_duelist_key(duel_id, challenge.duelist_b);
+        let snap_duelist_a = tester::get_Duelist(world, snap_key_a);
+        let snap_duelist_b = tester::get_Duelist(world, snap_key_b);
+        assert(snap_duelist_a.name == duelist_a.name, 'snap_a.name');
+        assert(snap_duelist_b.name == duelist_b.name, 'snap_b.name');
+        assert(snap_duelist_a.total_duels > 0, 'snap_a.total_duels >');
+        assert(snap_duelist_b.total_duels > 0, 'snap_b.total_duels >');
+        assert(snap_duelist_a.total_duels < duelist_a.total_duels, 'snap_a.total_duels <');
+        assert(snap_duelist_b.total_duels < duelist_b.total_duels, 'snap_b.total_duels <');
     }
 
     #[test]

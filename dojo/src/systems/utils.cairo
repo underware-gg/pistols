@@ -71,6 +71,24 @@ fn get_duelist_health(world: IWorldDispatcher, duelist_address: ContractAddress,
     }
 }
 
+fn create_challenge_snapshot(world: IWorldDispatcher, challenge: Challenge) {
+    let mut duelist_a: Duelist = get!(world, challenge.duelist_a, Duelist);
+    let mut duelist_b: Duelist = get!(world, challenge.duelist_b, Duelist);
+    duelist_a.address = make_snapshot_duelist_key(challenge.duel_id, challenge.duelist_a);
+    duelist_b.address = make_snapshot_duelist_key(challenge.duel_id, challenge.duelist_b);
+    set!(world, (duelist_a, duelist_b));
+}
+fn get_snapshot_duelist(world: IWorldDispatcher, duel_id: u128, address: ContractAddress) -> Duelist {
+    let key: ContractAddress = make_snapshot_duelist_key(duel_id, address);
+    (get!(world, key, Duelist))
+}
+fn make_snapshot_duelist_key(duel_id: u128, address: ContractAddress) -> ContractAddress {
+    let address_felt: felt252 = address.into();
+    let address_u256: u256 = address_felt.into();
+    let key: felt252 = (duel_id ^ address_u256.low).into();
+    (key.try_into().unwrap())
+}
+
 // player need to allow contract to transfer funds first
 // ierc20::approve(contract_address, max(wager.value, wager.fee));
 fn deposit_wager_fees(world: IWorldDispatcher, from: ContractAddress, to: ContractAddress, duel_id: u128) {
