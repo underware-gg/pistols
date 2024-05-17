@@ -9,6 +9,7 @@ mod tests {
     use token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::models::models::{Duelist, Challenge, Round};
+    use pistols::models::table::{tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::types::action::{Action, ACTION};
@@ -22,7 +23,7 @@ mod tests {
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
     const MESSAGE_1: felt252 = 'For honour!!!';
-    const TABLE_ID: u8 = 1;
+    const TABLE_ID: felt252 = tables::LORDS;
     const WAGER_VALUE: u256 = 100_000_000_000_000_000_000;
 
     const SALT_1_a: u64 = 0xa6f099b756a87e62;

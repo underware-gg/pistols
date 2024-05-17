@@ -21,7 +21,7 @@ mod tests {
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
     const MESSAGE_1: felt252 = 'For honour!!!';
-    const TABLE_ID: u8 = 1;
+    const TABLE_ID: felt252 = tables::LORDS;
     const WAGER_VALUE: u256 = 100_000_000_000_000_000_000;
 
     const SALT_1_a: u64 = 0xa6f099b756a87e62;

@@ -15,11 +15,11 @@ trait IAdmin {
     fn set_owner(owner_address: ContractAddress);
     fn set_treasury(treasury_address: ContractAddress);
     fn set_paused(paused: bool);
-    fn set_table(table_id: u8, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool);
-    fn enable_table(table_id: u8, enabled: bool);
+    fn set_table(table_id: felt252, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool);
+    fn enable_table(table_id: felt252, enabled: bool);
     
     fn get_config() -> Config;
-    fn get_table(table_id: u8) -> Table;
+    fn get_table(table_id: felt252) -> Table;
 }
 
 #[dojo::contract]
@@ -30,7 +30,7 @@ mod admin {
     use starknet::{get_caller_address, get_contract_address};
 
     use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
-    use pistols::models::table::{Table, TableManager, TableManagerTrait, default_table};
+    use pistols::models::table::{Table, TableManager, TableManagerTrait, default_tables};
     use pistols::systems::{utils};
 
     #[abi(embed_v0)]
@@ -48,7 +48,7 @@ mod admin {
             manager.set(config);
             // set lords
             let manager = TableManagerTrait::new(world);
-            manager.set(default_table(lords_address));
+            manager.set_array(default_tables(lords_address));
         }
 
         fn is_initialized(world: IWorldDispatcher) -> bool {
@@ -87,7 +87,7 @@ mod admin {
             manager.set(config);
         }
 
-        fn set_table(world: IWorldDispatcher, table_id: u8, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool) {
+        fn set_table(world: IWorldDispatcher, table_id: felt252, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool) {
             self.assert_caller_is_owner();
             // get table
             let manager = TableManagerTrait::new(world);
@@ -98,18 +98,18 @@ mod admin {
             table.description = description;
             table.fee_min = fee_min;
             table.fee_pct = fee_pct;
-            table.enabled = enabled;
+            table.is_open = enabled;
             manager.set(table);
         }
 
-        fn enable_table(world: IWorldDispatcher, table_id: u8, enabled: bool) {
+        fn enable_table(world: IWorldDispatcher, table_id: felt252, enabled: bool) {
             self.assert_caller_is_owner();
             // get table
             let manager = TableManagerTrait::new(world);
             assert(manager.exists(table_id), 'Invalid table');
             let mut table = manager.get(table_id);
             // update table
-            table.enabled = enabled;
+            table.is_open = enabled;
             manager.set(table);
         }
 
@@ -121,7 +121,7 @@ mod admin {
             (ConfigManagerTrait::new(world).get())
         }
 
-        fn get_table(world: IWorldDispatcher, table_id: u8) -> Table {
+        fn get_table(world: IWorldDispatcher, table_id: felt252) -> Table {
             let manager = TableManagerTrait::new(world);
             assert(manager.exists(table_id), 'Invalid table');
             (manager.get(table_id))

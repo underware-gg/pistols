@@ -13,6 +13,8 @@ mod tests {
     use pistols::types::constants::{constants};
     use pistols::tests::tester::{tester};
 
+    const INVALID_TABLE: felt252 = 'TheBookIsOnTheTable';
+
     //
     // Initialize
     //
@@ -195,7 +197,7 @@ mod tests {
         tester::execute_admin_initialize(admin, owner, zero_address(), zero_address(), zero_address());
         let table: Table = admin.get_table(tables::LORDS);
         assert(table.contract_address == zero_address(), 'contract_address');
-        assert(table.enabled == false, 'enabled');
+        assert(table.is_open == false, 'enabled');
     }
 
     #[test]
@@ -207,7 +209,7 @@ mod tests {
         assert(table.contract_address == lords.contract_address, 'contract_address');
         assert(table.fee_min == 4 * constants::ETH_TO_WEI, 'fee_min');
         assert(table.fee_pct == 10, 'fee_pct');
-        assert(table.enabled == true, 'enabled');
+        assert(table.is_open == true, 'enabled');
     }
 
     #[test]
@@ -218,7 +220,7 @@ mod tests {
         tester::execute_admin_initialize(admin, owner, zero_address(), zero_address(), zero_address());
         let table: Table = admin.get_table(tables::LORDS);
         assert(table.contract_address == zero_address(), 'zero');
-        assert(table.enabled == false, 'zero');
+        assert(table.is_open == false, 'zero');
         // set
         tester::execute_admin_set_table(admin, owner, tables::LORDS, lords.contract_address, 'LORDS+', 5, 10, true);
         let table: Table = admin.get_table(tables::LORDS);
@@ -226,7 +228,7 @@ mod tests {
         assert(table.description == 'LORDS+', 'description_1');
         assert(table.fee_min == 5, 'fee_min_1');
         assert(table.fee_pct == 10, 'fee_pct_1');
-        assert(table.enabled == true, 'enabled_1');
+        assert(table.is_open == true, 'enabled_1');
         // set
         tester::execute_admin_set_table(admin, owner, tables::LORDS, other, 'LORDS+++', 22, 33, false);
         let table: Table = admin.get_table(tables::LORDS);
@@ -234,29 +236,29 @@ mod tests {
         assert(table.description == 'LORDS+++', 'description_2');
         assert(table.fee_min == 22, 'fee_min_2');
         assert(table.fee_pct == 33, 'fee_pct_2');
-        assert(table.enabled == false, 'enabled_2');
+        assert(table.is_open == false, 'enabled_2');
         // get
         let table: Table = tester::get_Table(world, tables::LORDS);
         assert(table.contract_address == table.contract_address, 'get_table.contract_address');
         assert(table.fee_min == table.fee_min, 'get_table.fee_min');
         assert(table.fee_pct == table.fee_pct, 'get_table.fee_pct');
-        assert(table.enabled == table.enabled, 'get_table.enabled');
+        assert(table.is_open == table.is_open, 'get_table.is_open');
     }
 
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_set_table_count() {
         let (_world, _system, admin, lords, _ierc20, owner, _other, bummer, _treasury) = tester::setup_world(true, false);
-        let table: Table = admin.get_table(tables::COUNT);
+        let table: Table = admin.get_table(INVALID_TABLE);
         assert(table.contract_address == lords.contract_address, 'zero');
         // set must work
-        tester::execute_admin_set_table(admin, owner, tables::COUNT, bummer, 'LORDS+', 5, 10, true);
-        let table: Table = admin.get_table(tables::COUNT);
+        tester::execute_admin_set_table(admin, owner, INVALID_TABLE, bummer, 'LORDS+', 5, 10, true);
+        let table: Table = admin.get_table(INVALID_TABLE);
         assert(table.contract_address == bummer, 'contract_address');
         assert(table.description == 'LORDS+', 'description');
         assert(table.fee_min == 5, 'fee_min');
         assert(table.fee_pct == 10, 'fee_pct');
-        assert(table.enabled == true, 'enabled');
+        assert(table.is_open == true, 'enabled');
     }
 
     #[test]
@@ -265,13 +267,13 @@ mod tests {
         let (_world, _system, admin, lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(true, false);
         tester::execute_admin_set_table(admin, owner, tables::LORDS, lords.contract_address, 'LORDS+', 5, 10, false);
         let table: Table = admin.get_table(tables::LORDS);
-        assert(table.enabled == false, 'enabled_1');
+        assert(table.is_open == false, 'enabled_1');
         tester::execute_admin_enable_table(admin, owner, tables::LORDS, true);
         let table: Table = admin.get_table(tables::LORDS);
-        assert(table.enabled == true, 'enabled_2');
+        assert(table.is_open == true, 'enabled_2');
         tester::execute_admin_enable_table(admin, owner, tables::LORDS, false);
         let table: Table = admin.get_table(tables::LORDS);
-        assert(table.enabled == false, 'enabled_3');
+        assert(table.is_open == false, 'enabled_3');
     }
 
     #[test]
@@ -303,7 +305,7 @@ mod tests {
     #[should_panic(expected:('Invalid table','ENTRYPOINT_FAILED'))]
     fn test_set_table_invalid() {
         let (_world, _system, admin, lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(true, false);
-        tester::execute_admin_set_table(admin, owner, tables::COUNT + 1, lords.contract_address, 'LORDS+', 5, 10, true);
+        tester::execute_admin_set_table(admin, owner, INVALID_TABLE, lords.contract_address, 'LORDS+', 5, 10, true);
     }
 
     #[test]
@@ -319,7 +321,7 @@ mod tests {
     #[should_panic(expected:('Invalid table','ENTRYPOINT_FAILED'))]
     fn test_enable_table_invalid() {
         let (_world, _system, admin, _lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(true, false);
-        tester::execute_admin_enable_table(admin, owner, tables::COUNT + 1, false);
+        tester::execute_admin_enable_table(admin, owner, INVALID_TABLE, false);
     }
 
 

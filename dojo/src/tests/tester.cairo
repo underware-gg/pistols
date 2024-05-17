@@ -151,12 +151,12 @@ mod tester {
         system.set_paused(paused);
         _next_block();
     }
-    fn execute_admin_set_table(system: IAdminDispatcher, sender: ContractAddress, table_id: u8, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool) {
+    fn execute_admin_set_table(system: IAdminDispatcher, sender: ContractAddress, table_id: felt252, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool) {
         testing::set_contract_address(sender);
         system.set_table(table_id, contract_address, description, fee_min, fee_pct, enabled);
         _next_block();
     }
-    fn execute_admin_enable_table(system: IAdminDispatcher, sender: ContractAddress, table_id: u8, enabled: bool) {
+    fn execute_admin_enable_table(system: IAdminDispatcher, sender: ContractAddress, table_id: felt252, enabled: bool) {
         testing::set_contract_address(sender);
         system.enable_table(table_id, enabled);
         _next_block();
@@ -188,7 +188,7 @@ mod tester {
     fn execute_create_challenge(system: IActionsDispatcher, sender: ContractAddress,
         challenged: ContractAddress,
         message: felt252,
-        table_id: u8,
+        table_id: felt252,
         wager_value: u256,
         expire_seconds: u64,
     ) -> u128 {
@@ -245,7 +245,7 @@ mod tester {
         (get!(world, 1, Config))
     }
     #[inline(always)]
-    fn get_Table(world: IWorldDispatcher, table_id: u8) -> Table {
+    fn get_Table(world: IWorldDispatcher, table_id: felt252) -> Table {
         (get!(world, table_id, Table))
     }
     #[inline(always)]

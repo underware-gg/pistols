@@ -17,7 +17,7 @@ trait IActions {
     fn create_challenge(
         challenged: ContractAddress,
         message: felt252,
-        table_id: u8,
+        table_id: felt252,
         wager_value: u256,
         expire_seconds: u64,
     ) -> u128;
@@ -46,7 +46,7 @@ trait IActions {
     fn get_pact(duelist_a: ContractAddress, duelist_b: ContractAddress) -> u128;
     fn has_pact(duelist_a: ContractAddress, duelist_b: ContractAddress) -> bool;
 
-    fn calc_fee(table_id: u8, wager_value: u256) -> u256;
+    fn calc_fee(table_id: felt252, wager_value: u256) -> u256;
     
     fn simulate_honour_for_action(duelist_address: ContractAddress, action: u8) -> (i8, u8);
     fn simulate_chances(duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> Chances;
@@ -127,7 +127,7 @@ mod actions {
         fn create_challenge(world: IWorldDispatcher,
             challenged: ContractAddress,
             message: felt252,
-            table_id: u8,
+            table_id: felt252,
             wager_value: u256,
             expire_seconds: u64,
         ) -> u128 {
@@ -151,7 +151,7 @@ mod actions {
             // setup wager + fees
             let table_manager = TableManagerTrait::new(world);
             let table: Table = table_manager.get(table_id);
-            assert(table.enabled == true, 'Table disabled');
+            assert(table.is_open == true, 'Table disabled');
             let fee: u256 = table.calc_fee(wager_value);
             // calc fee and store
             let wager = Wager {
@@ -310,7 +310,7 @@ mod actions {
             (self.get_pact(duelist_a, duelist_b) != 0)
         }
 
-        fn calc_fee(world: IWorldDispatcher, table_id: u8, wager_value: u256) -> u256 {
+        fn calc_fee(world: IWorldDispatcher, table_id: felt252, wager_value: u256) -> u256 {
             let table_manager = TableManagerTrait::new(world);
             let table: Table = table_manager.get(table_id);
             (table.calc_fee(wager_value))

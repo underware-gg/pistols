@@ -8,6 +8,7 @@ mod tests {
 
     use pistols::systems::actions::{IActionsDispatcherTrait};
     use pistols::models::models::{Duelist, Round};
+    use pistols::models::table::{tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::systems::utils::{zero_address};
     use pistols::utils::timestamp::{timestamp};
@@ -16,7 +17,7 @@ mod tests {
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
     const MESSAGE_1: felt252 = 'For honour!!!';
-    const TABLE_ID: u8 = 1;
+    const TABLE_ID: felt252 = tables::LORDS;
 
     #[test]
     #[available_gas(1_000_000_000)]

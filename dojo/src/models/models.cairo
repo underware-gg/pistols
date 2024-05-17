@@ -31,7 +31,7 @@ struct Scoreboard {
     #[key]
     address: ContractAddress,
     #[key]
-    table_id: u8,
+    table_id: felt252,
     //------------
     score: Score,
     wager_won: u256,
@@ -98,7 +98,7 @@ struct Wager {
     #[key]
     duel_id: u128,
     //------------
-    table_id: u8,
+    table_id: felt252,
     value: u256,
     fee: u256,
 }

@@ -6,32 +6,46 @@ use pistols::utils::math::{MathU256};
 use pistols::types::constants::{constants};
 
 mod tables {
-    const LORDS: u8 = 1;
+    const LORDS: felt252 = 'Lords';
+    const COMMONERS: felt252 = 'Commoners';
     // number of valid tables
-    const COUNT: u8 = 1;
+    const COUNT: u8 = 2;
 }
 
 #[derive(Model, Copy, Drop, Serde)]
 struct Table { // TODO: Rename to Board or Table
     #[key]
-    key: u8,
+    table_id: felt252,
     //------
-    contract_address: ContractAddress,
     description: felt252,
+    contract_address: ContractAddress,
+    wager_min: u256,
     fee_min: u256,
     fee_pct: u8,
-    enabled: bool,
+    is_open: bool,
 }
 
-fn default_table(contract_address: ContractAddress) -> Table {
-    (Table {
-        key: tables::LORDS,
-        contract_address,
-        description: '$LORDS',
-        fee_min: 4 * constants::ETH_TO_WEI,
-        fee_pct: 10,
-        enabled: (if (contract_address == zero_address()) { false } else { true }),
-   })
+fn default_tables(lords_address: ContractAddress) -> Array<Table> {
+    (array![
+        (Table {
+            table_id: tables::LORDS,
+            description: 'The Lords Table',
+            contract_address: lords_address,
+            wager_min: 0,
+            fee_min: 4 * constants::ETH_TO_WEI,
+            fee_pct: 10,
+            is_open: (lords_address != zero_address()),
+        }),
+        (Table {
+            table_id: tables::COMMONERS,
+            description: 'The Commoners Table',
+            contract_address: zero_address(),
+            wager_min: 0,
+            fee_min: 0,
+            fee_pct: 0,
+            is_open: true,
+        })
+    ])
 }
 
 #[derive(Copy, Drop)]
@@ -44,15 +58,26 @@ impl TableManagerTraitImpl of TableManagerTrait {
     fn new(world: IWorldDispatcher) -> TableManager {
         TableManager { world }
     }
-    fn exists(self: TableManager, table_id: u8) -> bool {
-        (table_id >= 1 && table_id <= tables::COUNT)
+    fn exists(self: TableManager, table_id: felt252) -> bool {
+        let table: Table = get!(self.world, (table_id), Table);
+        (table.description != 0)
     }
-    fn get(self: TableManager, table_id: u8) -> Table {
-        assert(self.exists(table_id) == true, 'Invalid Table');
-        get!(self.world, (table_id), Table)
+    fn get(self: TableManager, table_id: felt252) -> Table {
+        let table: Table = get!(self.world, (table_id), Table);
+        assert(table.description != 0, 'Invalid Table');
+        (table)
     }
-    fn set(self: TableManager, Table: Table) {
-        set!(self.world, (Table));
+    fn set(self: TableManager, table: Table) {
+        assert(table.description != 0, 'Need a description');
+        set!(self.world, (table));
+    }
+    fn set_array(self: TableManager, tables: Array<Table>) {
+        let mut n: usize = 0;
+        loop {
+            if (n == tables.len()) { break; }
+            self.set(*tables.at(n));
+            n += 1;
+        };
     }
 }
 

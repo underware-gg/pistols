@@ -22,7 +22,7 @@ mod tests {
     const OTHER_NAME: felt252 = 'Senpai';
     const BUMMER_NAME: felt252 = 'Bummer';
     const MESSAGE_1: felt252 = 'For honour!!!';
-    const TABLE_ID: u8 = 1;
+    const TABLE_ID: felt252 = tables::LORDS;
 
     //
     // Fees balance
