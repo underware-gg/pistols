@@ -44,7 +44,7 @@ mod tests {
         assert(fee > table.fee_min, 'fee > min');
     }
 
-    fn _test_balance_ok(wager_value: u256) {
+    fn _test_balance_ok(table_id: felt252, wager_value: u256, wager_min: u256) {
         let (world, system, admin, lords, ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, false);
         tester::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         tester::execute_register_duelist(system, other, OTHER_NAME, 1);
@@ -55,43 +55,74 @@ mod tests {
         let balance_a: u256 = ierc20.balance_of(A);
         let balance_b: u256 = ierc20.balance_of(B);
         // approve fees
-        let table: Table = admin.get_table(TABLE_ID);
-        let fee: u256 = system.calc_fee(TABLE_ID, wager_value);
+        let mut table: Table = admin.get_table(table_id);
+        if (wager_min > 0) {
+            table.wager_min = wager_min;
+            set!(world, (table));
+        }
+        let fee: u256 = system.calc_fee(table_id, wager_value);
         assert(fee >= table.fee_min, 'fee >= min');
         let approved_value: u256 = wager_value + fee;
         tester::execute_lords_approve(lords, A, S, approved_value);
         tester::execute_lords_approve(lords, B, S, approved_value);
         // create challenge
-        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, wager_value, 0);
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, table_id, wager_value, 0);
         let ch = tester::get_Challenge(world, duel_id);
-        assert(ch.table_id == TABLE_ID, 'ch.table_id');
+        assert(ch.table_id == table_id, 'ch.table_id');
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
         // check stored wager
         let wager = tester::get_Wager(world, duel_id);
         let total: u256 = wager.value + wager.fee;
         assert(total == approved_value, 'wager total = approved_value');
+        assert(wager.value >= table.wager_min, 'waager >= wager_min');
         assert(wager.value == wager_value, 'wager.value');
-        assert(wager.fee == fee, '== fee');
+        assert(wager.fee == fee, 'wager.fee');
         // check balances
-        let _balance_a: u256 = tester::assert_balance(ierc20, A, balance_a, approved_value, 0, 'balance_a');
-        let balance_contract: u256 = tester::assert_balance(ierc20, S, balance_contract, 0, approved_value, 'balance_contract+a');
+        let final_balance_a: u256 = tester::assert_balance(ierc20, A, balance_a, approved_value, 0, 'balance_a');
+        let fina_balance_contract: u256 = tester::assert_balance(ierc20, S, balance_contract, 0, approved_value, 'balance_contract+a');
         // accept
         tester::execute_reply_challenge(system, B, duel_id, true);
-        let _balance_b: u256 = tester::assert_balance(ierc20, B, balance_b, approved_value, 0, 'balance_b');
-        let _balance_contract: u256 = tester::assert_balance(ierc20, S, balance_contract, 0, approved_value, 'balance_contract+b');
+        let final_balance_b: u256 = tester::assert_balance(ierc20, B, balance_b, approved_value, 0, 'balance_b');
+        let final_balance_contract: u256 = tester::assert_balance(ierc20, S, fina_balance_contract, 0, approved_value, 'balance_contract+b');
+        if (table_id == tables::LORDS) {
+            assert(fee > 0, 'fee > 0');
+            assert(final_balance_a < balance_a, 'final_balance_a');
+            assert(final_balance_b < balance_b, 'final_balance_b');
+            assert(final_balance_contract > balance_contract, 'final_balance_contract');
+        } else if (table_id == tables::COMMONERS) {
+            assert(fee == 0, 'fee == 0');
+            assert(final_balance_a == balance_a, 'final_balance_a');
+            assert(final_balance_b == balance_b, 'final_balance_b');
+            assert(final_balance_contract == balance_contract, 'final_balance_contract');
+        }
     }
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_fee_balance_ok() {
-        _test_balance_ok(0);
+    fn test_LORDS_fee_balance_ok() {
+        _test_balance_ok(tables::LORDS, 0, 0);
     }
-
+    fn test_COMMONERS_fee_balance_ok() {
+        _test_balance_ok(tables::COMMONERS, 0, 0);
+    }
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_wager_balance_ok() {
-        _test_balance_ok(100 * constants::ETH_TO_WEI);
+    fn test_LORDS_wager_balance_ok() {
+        _test_balance_ok(tables::LORDS, 100 * constants::ETH_TO_WEI, 0);
     }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    #[should_panic(expected:('No wager on this table','ENTRYPOINT_FAILED'))]
+    fn test_COMMONERS_wager_balance_ok() {
+        _test_balance_ok(tables::COMMONERS, 100 * constants::ETH_TO_WEI, 0);
+    }
+    #[test]
+    #[available_gas(1_000_000_000)]
+    #[should_panic(expected:('Minimum wager not met','ENTRYPOINT_FAILED'))]
+    fn test_LORDS_wager_balance_min_wager() {
+        _test_balance_ok(tables::LORDS, 99 * constants::ETH_TO_WEI, 100 * constants::ETH_TO_WEI);
+    }
+
 
     //
     // Challenge

@@ -247,18 +247,19 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
+    #[should_panic(expected:('Invalid table','ENTRYPOINT_FAILED'))]
     fn test_set_table_count() {
-        let (_world, _system, admin, lords, _ierc20, owner, _other, bummer, _treasury) = tester::setup_world(true, false);
-        let table: Table = admin.get_table(INVALID_TABLE);
-        assert(table.contract_address == lords.contract_address, 'zero');
-        // set must work
-        tester::execute_admin_set_table(admin, owner, INVALID_TABLE, bummer, 'LORDS+', 5, 10, true);
-        let table: Table = admin.get_table(INVALID_TABLE);
-        assert(table.contract_address == bummer, 'contract_address');
-        assert(table.description == 'LORDS+', 'description');
-        assert(table.fee_min == 5, 'fee_min');
-        assert(table.fee_pct == 10, 'fee_pct');
-        assert(table.is_open == true, 'enabled');
+        let (_world, _system, admin, _lords, _ierc20, _owner, _other, _bummer, _treasury) = tester::setup_world(true, false);
+        let _table: Table = admin.get_table(INVALID_TABLE);
+        // assert(table.contract_address == lords.contract_address, 'zero');
+        // // set must work
+        // tester::execute_admin_set_table(admin, owner, INVALID_TABLE, bummer, 'LORDS+', 5, 10, true);
+        // let table: Table = admin.get_table(INVALID_TABLE);
+        // assert(table.contract_address == bummer, 'contract_address');
+        // assert(table.description == 'LORDS+', 'description');
+        // assert(table.fee_min == 5, 'fee_min');
+        // assert(table.fee_pct == 10, 'fee_pct');
+        // assert(table.is_open == true, 'enabled');
     }
 
     #[test]

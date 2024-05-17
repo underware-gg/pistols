@@ -148,22 +148,6 @@ mod actions {
             // let duel_id: u32 = world.uuid();
             let duel_id: u128 = make_seed(caller);
 
-            // setup wager + fees
-            let table_manager = TableManagerTrait::new(world);
-            let table: Table = table_manager.get(table_id);
-            assert(table.is_open == true, 'Table is closed');
-            assert(wager_value >= table.wager_min, 'Minimum wager not met');
-            let fee: u256 = table.calc_fee(wager_value);
-            // calc fee and store
-            if (fee > 0 || wager_value > 0) {
-                let wager = Wager {
-                    duel_id,
-                    value: wager_value,
-                    fee,
-                };
-                set!(world, (wager));
-            }
-
             // calc expiration
             let timestamp_start: u64 = get_block_timestamp();
             let timestamp_end: u64 = if (expire_seconds == 0) { 0 } else { timestamp_start + expire_seconds };
@@ -183,9 +167,27 @@ mod actions {
                 timestamp_end,     // expire
             };
 
-            // transfer wager/fee from Challenger to the contract
-            utils::deposit_wager_fees(world, challenge, challenge.duelist_a, starknet::get_contract_address());
+            // setup wager + fees
+            let table_manager = TableManagerTrait::new(world);
+            let table: Table = table_manager.get(table_id);
+            assert(table.is_open == true, 'Table is closed');
+            assert(wager_value >= table.wager_min, 'Minimum wager not met');
+            let fee: u256 = table.calc_fee(wager_value);
+            // calc fee and store
+            if (fee > 0 || wager_value > 0) {
+                assert(table.contract_address != utils::zero_address(), 'No wager on this table');
+                let wager = Wager {
+                    duel_id,
+                    value: wager_value,
+                    fee,
+                };
+                set!(world, (wager));
 
+                // transfer wager/fee from Challenger to the contract
+                utils::deposit_wager_fees(world, challenge, challenge.duelist_a, starknet::get_contract_address());
+            }
+
+            // create challenge
             utils::set_challenge(world, challenge);
 
             emit!(world, (Event::NewChallengeEvent (events::NewChallengeEvent {
