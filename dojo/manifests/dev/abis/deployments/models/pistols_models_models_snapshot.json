@@ -169,8 +169,8 @@
   },
   {
     "type": "impl",
-    "name": "duelistImpl",
-    "interface_name": "pistols::models::models::Iduelist"
+    "name": "snapshotImpl",
+    "interface_name": "pistols::models::models::Isnapshot"
   },
   {
     "type": "struct",
@@ -216,33 +216,25 @@
   },
   {
     "type": "struct",
-    "name": "pistols::models::models::Duelist",
+    "name": "pistols::models::models::Snapshot",
     "members": [
       {
-        "name": "address",
-        "type": "core::starknet::contract_address::ContractAddress"
+        "name": "duel_id",
+        "type": "core::integer::u128"
       },
       {
-        "name": "name",
-        "type": "core::felt252"
-      },
-      {
-        "name": "profile_pic",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "score",
+        "name": "score_a",
         "type": "pistols::models::models::Score"
       },
       {
-        "name": "timestamp",
-        "type": "core::integer::u64"
+        "name": "score_b",
+        "type": "pistols::models::models::Score"
       }
     ]
   },
   {
     "type": "interface",
-    "name": "pistols::models::models::Iduelist",
+    "name": "pistols::models::models::Isnapshot",
     "items": [
       {
         "type": "function",
@@ -250,7 +242,7 @@
         "inputs": [
           {
             "name": "model",
-            "type": "pistols::models::models::Duelist"
+            "type": "pistols::models::models::Snapshot"
           }
         ],
         "outputs": [],
@@ -260,7 +252,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::models::models::duelist::Event",
+    "name": "pistols::models::models::snapshot::Event",
     "kind": "enum",
     "variants": []
   }

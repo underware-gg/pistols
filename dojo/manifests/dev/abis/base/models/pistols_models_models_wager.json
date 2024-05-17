@@ -195,10 +195,6 @@
         "type": "core::integer::u128"
       },
       {
-        "name": "coin",
-        "type": "core::integer::u8"
-      },
-      {
         "name": "value",
         "type": "core::integer::u256"
       },

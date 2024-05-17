@@ -169,80 +169,74 @@
   },
   {
     "type": "impl",
-    "name": "duelistImpl",
-    "interface_name": "pistols::models::models::Iduelist"
+    "name": "tableImpl",
+    "interface_name": "pistols::models::table::Itable"
   },
   {
     "type": "struct",
-    "name": "pistols::models::models::Score",
+    "name": "core::integer::u256",
     "members": [
       {
-        "name": "honour",
-        "type": "core::integer::u8"
+        "name": "low",
+        "type": "core::integer::u128"
       },
       {
-        "name": "level_villain",
-        "type": "core::integer::u8"
+        "name": "high",
+        "type": "core::integer::u128"
+      }
+    ]
+  },
+  {
+    "type": "enum",
+    "name": "core::bool",
+    "variants": [
+      {
+        "name": "False",
+        "type": "()"
       },
       {
-        "name": "level_trickster",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "level_lord",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "total_duels",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "total_wins",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "total_losses",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "total_draws",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "total_honour",
-        "type": "core::integer::u32"
+        "name": "True",
+        "type": "()"
       }
     ]
   },
   {
     "type": "struct",
-    "name": "pistols::models::models::Duelist",
+    "name": "pistols::models::table::Table",
     "members": [
       {
-        "name": "address",
-        "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
-        "name": "name",
+        "name": "table_id",
         "type": "core::felt252"
       },
       {
-        "name": "profile_pic",
+        "name": "description",
+        "type": "core::felt252"
+      },
+      {
+        "name": "contract_address",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "wager_min",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "fee_min",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "fee_pct",
         "type": "core::integer::u8"
       },
       {
-        "name": "score",
-        "type": "pistols::models::models::Score"
-      },
-      {
-        "name": "timestamp",
-        "type": "core::integer::u64"
+        "name": "is_open",
+        "type": "core::bool"
       }
     ]
   },
   {
     "type": "interface",
-    "name": "pistols::models::models::Iduelist",
+    "name": "pistols::models::table::Itable",
     "items": [
       {
         "type": "function",
@@ -250,7 +244,7 @@
         "inputs": [
           {
             "name": "model",
-            "type": "pistols::models::models::Duelist"
+            "type": "pistols::models::table::Table"
           }
         ],
         "outputs": [],
@@ -260,7 +254,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::models::models::duelist::Event",
+    "name": "pistols::models::table::table::Event",
     "kind": "enum",
     "variants": []
   }

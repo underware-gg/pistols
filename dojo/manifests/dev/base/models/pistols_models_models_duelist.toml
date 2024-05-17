@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x438f236f410ba9530647b1b08e47e0e032a77803bb04aa85130af515f9b57c"
-original_class_hash = "0x438f236f410ba9530647b1b08e47e0e032a77803bb04aa85130af515f9b57c"
+class_hash = "0x2932ab31209ea10efe20e131e751edb29a26d24363a4c06e10a43846d88a21c"
+original_class_hash = "0x2932ab31209ea10efe20e131e751edb29a26d24363a4c06e10a43846d88a21c"
 abi = "manifests/dev/abis/base/models/pistols_models_models_duelist.json"
 name = "pistols::models::models::duelist"
 
@@ -20,48 +20,8 @@ type = "u8"
 key = false
 
 [[members]]
-name = "total_duels"
-type = "u16"
-key = false
-
-[[members]]
-name = "total_wins"
-type = "u16"
-key = false
-
-[[members]]
-name = "total_losses"
-type = "u16"
-key = false
-
-[[members]]
-name = "total_draws"
-type = "u16"
-key = false
-
-[[members]]
-name = "total_honour"
-type = "u32"
-key = false
-
-[[members]]
-name = "honour"
-type = "u8"
-key = false
-
-[[members]]
-name = "level_villain"
-type = "u8"
-key = false
-
-[[members]]
-name = "level_trickster"
-type = "u8"
-key = false
-
-[[members]]
-name = "level_lord"
-type = "u8"
+name = "score"
+type = "Score"
 key = false
 
 [[members]]

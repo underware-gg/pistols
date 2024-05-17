@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x54e599d573bd64aaa0163d0568f1ad3e0f7d70129ac40506b27571a31ff71b0"
-original_class_hash = "0x54e599d573bd64aaa0163d0568f1ad3e0f7d70129ac40506b27571a31ff71b0"
+class_hash = "0x58dca7f606b1b85ea1e1da94a0f89363a0dad6af5775f62143fdb63689e8dcb"
+original_class_hash = "0x58dca7f606b1b85ea1e1da94a0f89363a0dad6af5775f62143fdb63689e8dcb"
 abi = "manifests/dev/abis/base/models/pistols_models_models_wager.json"
 name = "pistols::models::models::wager"
 
@@ -8,11 +8,6 @@ name = "pistols::models::models::wager"
 name = "duel_id"
 type = "u128"
 key = true
-
-[[members]]
-name = "coin"
-type = "u8"
-key = false
 
 [[members]]
 name = "value"

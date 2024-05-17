@@ -34,8 +34,8 @@ name = "pistols::mocks::lords_mock::lords_mock"
 [[contracts]]
 kind = "DojoContract"
 address = "0x6dda46ca9b7cee1b06a77890a71f0221f332f01f6f05ebd0894feb9a76b7752"
-class_hash = "0x19180db7daa416fcb806abaa464ba03249e70f58450ab6f99e35c170f57d2eb"
-original_class_hash = "0x19180db7daa416fcb806abaa464ba03249e70f58450ab6f99e35c170f57d2eb"
+class_hash = "0x62d1448ac245121e3b99dd8d9df1cad9c8841894c910e43fba55bdd0138f59d"
+original_class_hash = "0x62d1448ac245121e3b99dd8d9df1cad9c8841894c910e43fba55bdd0138f59d"
 base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
 abi = "manifests/dev/abis/deployments/contracts/pistols_systems_actions_actions.json"
 reads = []
@@ -46,51 +46,14 @@ name = "pistols::systems::actions::actions"
 [[contracts]]
 kind = "DojoContract"
 address = "0x772fa6174987748d59cb7d9acfa7bb4f6c647c068cddb6a309e102c00c90c5d"
-class_hash = "0xd2e0f642fcd4ea973a09335c0f5458ae76953f5a1e1a73c17e003416954b4"
-original_class_hash = "0xd2e0f642fcd4ea973a09335c0f5458ae76953f5a1e1a73c17e003416954b4"
+class_hash = "0x1804bf5f993b728fb6ea72b99d5f4259a51a5f7d4ba90cf4e5cedd15d5e279a"
+original_class_hash = "0x1804bf5f993b728fb6ea72b99d5f4259a51a5f7d4ba90cf4e5cedd15d5e279a"
 base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
 abi = "manifests/dev/abis/deployments/contracts/pistols_systems_admin_admin.json"
 reads = []
 writes = []
 computed = []
 name = "pistols::systems::admin::admin"
-
-[[models]]
-kind = "DojoModel"
-class_hash = "0x53e594213e62f41661a15c95038f89ae4c6cefe271eed0350503eee6a7c10b0"
-original_class_hash = "0x53e594213e62f41661a15c95038f89ae4c6cefe271eed0350503eee6a7c10b0"
-abi = "manifests/dev/abis/deployments/models/pistols_models_coins_coin.json"
-name = "pistols::models::coins::coin"
-
-[[models.members]]
-name = "key"
-type = "u8"
-key = true
-
-[[models.members]]
-name = "contract_address"
-type = "ContractAddress"
-key = false
-
-[[models.members]]
-name = "description"
-type = "felt252"
-key = false
-
-[[models.members]]
-name = "fee_min"
-type = "u256"
-key = false
-
-[[models.members]]
-name = "fee_pct"
-type = "u8"
-key = false
-
-[[models.members]]
-name = "enabled"
-type = "bool"
-key = false
 
 [[models]]
 kind = "DojoModel"
@@ -126,8 +89,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x7127679bc0ecad1d7c268cad065b62ab68c5e60ed791d8f0d447b96ed6d0b5d"
-original_class_hash = "0x7127679bc0ecad1d7c268cad065b62ab68c5e60ed791d8f0d447b96ed6d0b5d"
+class_hash = "0x774a94012a2c4d100777c8cdb3dee4550f9431ceb9d71b31bbbc3c3d1e75399"
+original_class_hash = "0x774a94012a2c4d100777c8cdb3dee4550f9431ceb9d71b31bbbc3c3d1e75399"
 abi = "manifests/dev/abis/deployments/models/pistols_models_models_challenge.json"
 name = "pistols::models::models::challenge"
 
@@ -148,6 +111,11 @@ key = false
 
 [[models.members]]
 name = "message"
+type = "felt252"
+key = false
+
+[[models.members]]
+name = "table_id"
 type = "felt252"
 key = false
 
@@ -220,8 +188,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x438f236f410ba9530647b1b08e47e0e032a77803bb04aa85130af515f9b57c"
-original_class_hash = "0x438f236f410ba9530647b1b08e47e0e032a77803bb04aa85130af515f9b57c"
+class_hash = "0x2932ab31209ea10efe20e131e751edb29a26d24363a4c06e10a43846d88a21c"
+original_class_hash = "0x2932ab31209ea10efe20e131e751edb29a26d24363a4c06e10a43846d88a21c"
 abi = "manifests/dev/abis/deployments/models/pistols_models_models_duelist.json"
 name = "pistols::models::models::duelist"
 
@@ -241,48 +209,8 @@ type = "u8"
 key = false
 
 [[models.members]]
-name = "total_duels"
-type = "u16"
-key = false
-
-[[models.members]]
-name = "total_wins"
-type = "u16"
-key = false
-
-[[models.members]]
-name = "total_losses"
-type = "u16"
-key = false
-
-[[models.members]]
-name = "total_draws"
-type = "u16"
-key = false
-
-[[models.members]]
-name = "total_honour"
-type = "u32"
-key = false
-
-[[models.members]]
-name = "honour"
-type = "u8"
-key = false
-
-[[models.members]]
-name = "level_villain"
-type = "u8"
-key = false
-
-[[models.members]]
-name = "level_trickster"
-type = "u8"
-key = false
-
-[[models.members]]
-name = "level_lord"
-type = "u8"
+name = "score"
+type = "Score"
 key = false
 
 [[models.members]]
@@ -341,8 +269,62 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x54e599d573bd64aaa0163d0568f1ad3e0f7d70129ac40506b27571a31ff71b0"
-original_class_hash = "0x54e599d573bd64aaa0163d0568f1ad3e0f7d70129ac40506b27571a31ff71b0"
+class_hash = "0xddba1cce7b3356afc52ffe8449cb5d116ba9a386da0e3716f7f211a724bc0c"
+original_class_hash = "0xddba1cce7b3356afc52ffe8449cb5d116ba9a386da0e3716f7f211a724bc0c"
+abi = "manifests/dev/abis/deployments/models/pistols_models_models_scoreboard.json"
+name = "pistols::models::models::scoreboard"
+
+[[models.members]]
+name = "address"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "table_id"
+type = "felt252"
+key = true
+
+[[models.members]]
+name = "score"
+type = "Score"
+key = false
+
+[[models.members]]
+name = "wager_won"
+type = "u256"
+key = false
+
+[[models.members]]
+name = "wager_lost"
+type = "u256"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x75c22ab39a3b7cb1dc5fb39005129e31906a57a0c9f2a1340fd4f188ad41701"
+original_class_hash = "0x75c22ab39a3b7cb1dc5fb39005129e31906a57a0c9f2a1340fd4f188ad41701"
+abi = "manifests/dev/abis/deployments/models/pistols_models_models_snapshot.json"
+name = "pistols::models::models::snapshot"
+
+[[models.members]]
+name = "duel_id"
+type = "u128"
+key = true
+
+[[models.members]]
+name = "score_a"
+type = "Score"
+key = false
+
+[[models.members]]
+name = "score_b"
+type = "Score"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x58dca7f606b1b85ea1e1da94a0f89363a0dad6af5775f62143fdb63689e8dcb"
+original_class_hash = "0x58dca7f606b1b85ea1e1da94a0f89363a0dad6af5775f62143fdb63689e8dcb"
 abi = "manifests/dev/abis/deployments/models/pistols_models_models_wager.json"
 name = "pistols::models::models::wager"
 
@@ -352,11 +334,6 @@ type = "u128"
 key = true
 
 [[models.members]]
-name = "coin"
-type = "u8"
-key = false
-
-[[models.members]]
 name = "value"
 type = "u256"
 key = false
@@ -364,6 +341,48 @@ key = false
 [[models.members]]
 name = "fee"
 type = "u256"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x1c86441315b8ead91624bcd2f46d342874f54c32e7603490e7d3b395f0e591"
+original_class_hash = "0x1c86441315b8ead91624bcd2f46d342874f54c32e7603490e7d3b395f0e591"
+abi = "manifests/dev/abis/deployments/models/pistols_models_table_table.json"
+name = "pistols::models::table::table"
+
+[[models.members]]
+name = "table_id"
+type = "felt252"
+key = true
+
+[[models.members]]
+name = "description"
+type = "felt252"
+key = false
+
+[[models.members]]
+name = "contract_address"
+type = "ContractAddress"
+key = false
+
+[[models.members]]
+name = "wager_min"
+type = "u256"
+key = false
+
+[[models.members]]
+name = "fee_min"
+type = "u256"
+key = false
+
+[[models.members]]
+name = "fee_pct"
+type = "u8"
+key = false
+
+[[models.members]]
+name = "is_open"
+type = "bool"
 key = false
 
 [[models]]
