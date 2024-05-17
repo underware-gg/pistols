@@ -85,7 +85,7 @@ export function DuelistTable() {
   const isEmpty = (sortedRows.length == 0)
 
   return (
-    <Table selectable sortable={!isEmpty} className='Faded' color='orange'>
+    <Table selectable sortableId={!isEmpty} className='Faded' color='orange'>
       <Table.Header className='TableHeader'>
         <Table.Row textAlign='center' verticalAlign='middle'>
           <HeaderCell width={1}></HeaderCell>

@@ -150,10 +150,10 @@ function DuelItem({
   states = [],
 }) {
   const {
-    challenge: { duelistA, duelistB, state, isLive, isCanceled, isExpired, isDraw, winner, timestamp_start },
+    challenge: { duelistA, duelistB, tableId, state, isLive, isCanceled, isExpired, isDraw, winner, timestamp_start },
     turnA, turnB,
   } = useDuel(duelId)
-  const { coin, value } = useWager(duelId)
+  const { value } = useWager(duelId)
   const { profilePic: profilePicA } = useDuelist(duelistA)
   const { profilePic: profilePicB } = useDuelist(duelistB)
 
@@ -210,14 +210,14 @@ function DuelItem({
             <PositiveResult positive={true}>
               <ProfileName address={winnerIsA ? duelistA : duelistB} badges={false} />
             </PositiveResult>
-            {value && <><br /><Balance small coin={coin} wei={value} /></>}
+            {value && <><br /><Balance small tableId={tableId} wei={value} /></>}
           </>
           :
           <>
             <span className={ChallengeStateClasses[state]}>
               {ChallengeStateNames[state]}
             </span>
-            {value && <><br /><Balance small coin={coin} wei={value} crossed={!isLive} /></>}
+            {value && <><br /><Balance small tableId={tableId} wei={value} crossed={!isLive} /></>}
           </>
         }
       </Cell>

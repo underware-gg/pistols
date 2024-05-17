@@ -9,7 +9,7 @@ export function createClientComponents({ contractComponents }: SetupNetworkResul
     //@ts-ignore
     result[key] = overridableComponent(contractComponents[key]);
     return result;
-  }, {});
+  }, {}) as typeof contractComponents;
 
   return {
     ...contractComponents,

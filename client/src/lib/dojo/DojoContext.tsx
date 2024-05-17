@@ -67,6 +67,20 @@ export const useDojoStatus = () => {
   }
 }
 
+export const useDojoSystemCalls = () => {
+  const { setup: { systemCalls } } = useDojo()
+  return {
+    ...systemCalls,
+  }
+}
+
+export const useDojoComponents = () => {
+  const { setup: { components } } = useDojo()
+  return {
+    ...components,
+  }
+}
+
 export const useDojoAccount = (): BurnerAccount & {
   masterAccount: Account
   account: Account
@@ -88,16 +102,3 @@ export const useDojoAccount = (): BurnerAccount & {
   }
 }
 
-export const useDojoSystemCalls = () => {
-  const { setup: { systemCalls } } = useDojo()
-  return {
-    ...systemCalls,
-  }
-}
-
-export const useDojoComponents = () => {
-  const { setup: { components } } = useDojo()
-  return {
-    ...components,
-  }
-}

@@ -12,24 +12,25 @@ export const useWager = (duelId: BigNumberish) => {
   const wager: any = useComponentValue(Wager, bigintToEntity(duelId))
 
   return {
-    coin: wager?.coin ?? null,
     value: wager?.value ?? null,
     fee: wager?.fee ?? null,
-    formatted: wager?.coin ?? null,
     feeFormatted: wager?.fee ?? null,
   }
 }
 
-export const useLockedWagerTotals = (address: bigint, coin: number) => {
+export const useLockedWagerTotals = (address: bigint, tableId: string) => {
   const { Wager } = useDojoComponents()
   const { challenges, challengerIds } = useChallengesByDuelist(address)
   const { wagers, fees, total } = useMemo(() => {
     let wagers = 0n
     let fees = 0n
     challenges.forEach((challenge) => {
-      if (challenge.state == ChallengeState.InProgress || (challenge.state == ChallengeState.Awaiting && challengerIds.includes(challenge.duel_id))) {
+      if (challenge.tableId == tableId && (
+        challenge.state == ChallengeState.InProgress ||
+        (challenge.state == ChallengeState.Awaiting && challengerIds.includes(challenge.duel_id))
+      )) {
         const wager = getComponentValue(Wager, bigintToEntity(challenge.duel_id))
-        if (wager && wager.coin == coin) {
+        if (wager) {
           wagers += wager.value
           fees += wager.fee
         }

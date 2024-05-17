@@ -72,6 +72,7 @@ export const useChallenge = (duelId: BigNumberish) => {
   const challenge: any = useComponentValue(Challenge, bigintToEntity(duelId))
   // console.log(bigintToHex(duelId), challenge)
 
+  const tableId = useMemo(() => feltToString(challenge?.table_id ?? 0n), [challenge])
   const duelistA = useMemo(() => BigInt(challenge?.duelist_a ?? 0), [challenge])
   const duelistB = useMemo(() => BigInt(challenge?.duelist_b ?? 0), [challenge])
   const winner = useMemo(() => (challenge?.winner ?? 0), [challenge])
@@ -91,6 +92,7 @@ export const useChallenge = (duelId: BigNumberish) => {
 
   return {
     challengeExists: (challenge != null),
+    tableId,
     state,
     duelistA,
     duelistB,
@@ -158,7 +160,7 @@ export const useChallengesByDuelist = (address: bigint) => {
   const { Challenge } = useDojoComponents()
   const { challengeIds, challengerIds, challengedIds } = useChallengeIdsByDuelist(address)
 
-  const challenges: any[] = useMemo(() => challengeIds.map((challengeId) => getComponentValue(Challenge, bigintToEntity(challengeId))).sort((a, b) => (a.timestamp - b.timestamp)), [challengeIds])
+  const challenges: any[] = useMemo(() => challengeIds.map((challengeId) => getComponentValue(Challenge, bigintToEntity(challengeId))).sort((a, b) => ((a.timestamp_end && b.timestamp_end) ? (a.timestamp_end - b.timestamp_end) : (a.timestamp_start - b.timestamp_start))), [challengeIds])
   // console.log(challenges)
   const stats: any = useMemo(() => {
     let result = {

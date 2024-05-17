@@ -8,24 +8,24 @@ import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 export const initialState = {
   musicEnabled: true,
   sfxEnabled: true,
+  tableId: '',
 }
 
 const SettingsActions = {
   MUSIC_ENABLED: 'settings.MUSIC_ENABLED',
   SFX_ENABLED: 'settings.SFX_ENABLED',
+  TABLE_ID: 'settings.TABLE_ID',
 }
 
 //--------------------------------
 // Types
 //
-type SettingsStateType = {
-  musicEnabled: boolean,
-  sfxEnabled: boolean,
-}
+type SettingsStateType = typeof initialState
 
 type ActionType =
   | { type: 'MUSIC_ENABLED', payload: boolean }
   | { type: 'SFX_ENABLED', payload: boolean }
+  | { type: 'TABLE_ID', payload: string }
 
 
 
@@ -62,6 +62,11 @@ const SettingsProvider = ({
       case SettingsActions.SFX_ENABLED: {
         newState.sfxEnabled = action.payload as boolean
         setCookie(SettingsActions.SFX_ENABLED, newState.sfxEnabled)
+        break
+      }
+      case SettingsActions.TABLE_ID: {
+        newState.tableId = action.payload as string
+        setCookie(SettingsActions.TABLE_ID, newState.tableId)
         break
       }
       default:

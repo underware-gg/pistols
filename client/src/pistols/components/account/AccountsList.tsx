@@ -98,9 +98,9 @@ function AccountItem({
           <h5><LordsBalance address={address} /></h5>
         </Col>
         <Col width={5} textAlign='left'>
-          <ActionButton fill important disabled={!_canPlay} onClick={() => _duel()} label='Duel!' />
-          <div className='Spacer5' />
           <ActionButton fill onClick={() => _manage()} label='Manage' />
+          <div className='Spacer5' />
+          <ActionButton fill important disabled={!_canPlay} onClick={() => _duel()} label='Duel!' />
         </Col>
       </Row>
     </>

@@ -16,13 +16,14 @@ import { ChallengeMessages } from '@/pistols/utils/pistols'
 import { WagerAndOrFees } from '@/pistols/components/account/LordsBalance'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { randomArrayElement } from '@/lib/utils/random'
-import { bigintEquals } from '@/lib/utils/types'
-import { coins } from '@/pistols/utils/constants'
+import { tables } from '@/pistols/utils/constants'
+import { useSettingsContext } from '../hooks/SettingsContext'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export default function DuelistModal() {
+  const { tableId } = useSettingsContext()
   const { create_challenge } = useDojoSystemCalls()
   const { account, accountAddress, isGuest, isThisAccount } = useDojoAccount()
   const router = useRouter()
@@ -34,8 +35,7 @@ export default function DuelistModal() {
   const [args, setArgs] = useState(null)
 
   const wagerValue = useMemo(() => (args?.wager_value ?? 0n), [args])
-  const wagerCoin = useMemo(() => (args?.wager_coin ?? coins.LORDS), [args])
-  const { fee } = useCalcFee(wagerCoin, wagerValue)
+  const { fee } = useCalcFee(tableId, wagerValue)
 
   const isYou = useMemo(() => isThisAccount(duelistAddress), [duelistAddress, isThisAccount])
   const isOpen = useMemo(() => (duelistAddress > 0), [duelistAddress])
@@ -59,7 +59,7 @@ export default function DuelistModal() {
   }
   const _challenge = () => {
     if (args) {
-      create_challenge(account, duelistAddress, args.message, args.wager_coin, args.wager_value, args.expire_seconds)
+      create_challenge(account, duelistAddress, args.message, args.table_id, args.wager_value, args.expire_seconds)
     }
   }
 
@@ -112,7 +112,7 @@ export default function DuelistModal() {
               <Col>
                 {
                   hasPact ? <ActionButton fill important label='Existing Challenge!' onClick={() => dispatchSelectDuel(pactDuelId)} />
-                    : isChallenging ? <BalanceRequiredButton disabled={!args} label='Submit Challenge!' onClick={() => _challenge()} coin={wagerCoin} wagerValue={wagerValue} fee={fee} />
+                    : isChallenging ? <BalanceRequiredButton disabled={!args} label='Submit Challenge!' onClick={() => _challenge()} tableId={tableId} wagerValue={wagerValue} fee={fee} />
                       : <ActionButton fill disabled={isGuest} label='Challenge for a Duel!' onClick={() => setIsChallenging(true)} />
                 }
               </Col>
@@ -137,12 +137,12 @@ function ChallengesList({
 function CreateChallenge({
   setArgs
 }) {
+  const { tableId } = useSettingsContext()
   const [message, setMessage] = useState('')
   const [days, setDays] = useState(7)
   const [hours, setHours] = useState(0)
-  const [coin, setCoin] = useState(coins.LORDS)
   const [value, setValue] = useState(0)
-  const { fee } = useCalcFee(coin, ethToWei(value))
+  const { fee } = useCalcFee(tableId, ethToWei(value))
 
   useEffectOnce(() => {
     setMessage(randomArrayElement(ChallengeMessages))
@@ -154,7 +154,7 @@ function CreateChallenge({
     setArgs(canSubmit ? {
       message,
       expire_seconds: (days * 24 * 60 * 60) + (hours * 60 * 60),
-      wager_coin: coin,
+      table_id: tableId,
       wager_value: ethToWei(value),
     } : null)
   }, [message, days, hours, value])
@@ -234,7 +234,7 @@ function CreateChallenge({
           }} />
         </Form.Field>
 
-        <WagerAndOrFees big coin={coin} value={ethToWei(value)} fee={fee} pre={'Cost: '} />
+        <WagerAndOrFees big tableId={tableId} value={ethToWei(value)} fee={fee} pre={'Cost: '} />
 
       </Form>
 

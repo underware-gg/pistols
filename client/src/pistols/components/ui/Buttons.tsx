@@ -3,7 +3,7 @@ import { Menu, Button, Confirm, SemanticICONS } from 'semantic-ui-react'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
-import { useCoinBalance } from '@/pistols/hooks/useCoin'
+import { useTableBalance } from '@/pistols/hooks/useTable'
 import { CustomIcon } from '@/lib/ui/Icons'
 
 //-----------------
@@ -91,14 +91,14 @@ export const ActionButton = ({
 
 export const BalanceRequiredButton = ({
   label,
-  coin,
+  tableId,
   wagerValue,
   fee,
   onClick,
   disabled = false,
 }) => {
   const { account } = useDojoAccount()
-  const { balance, noFundsForFee } = useCoinBalance(coin, account.address, wagerValue + fee)
+  const { balance, noFundsForFee } = useTableBalance(tableId, account.address, wagerValue + fee)
   return (
     <ActionButton fill
       disabled={disabled}

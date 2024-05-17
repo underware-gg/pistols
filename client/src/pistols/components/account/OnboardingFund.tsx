@@ -13,7 +13,7 @@ import { Divider } from '@/lib/ui/Divider'
 import { ethToWei } from '@/lib/utils/starknet'
 import { isNumber } from '@/lib/utils/types'
 import { Account, BigNumberish } from 'starknet'
-import { coins } from '@/pistols/utils/constants'
+import { tables } from '@/pistols/utils/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -56,7 +56,7 @@ export function OnboardingFund({
       } />
 
       <h3>Duelist Balance</h3>
-      <span className='H3'><LordsBalance address={address} big /></span> <LockedWagerBalance coin={coins.LORDS} address={address} clean />
+      <span className='H3'><LordsBalance address={address} big /></span> <LockedWagerBalance tableId={tables.LORDS} address={address} clean />
       {!deposit &&
         <div style={_rowStyle}>
           <Deposit fromAccount={burnerAccount} fromAddress={address} toAddress={account?.address} disabled={!isDeployed} action='Withdraw to Account' />

@@ -12,7 +12,7 @@ export function LordsBagIcon({
 }
 
 export function Balance({
-  coin, // used for icon only
+  tableId, // used for icon only
   value = null,
   wei = null,
   big = false,
@@ -22,7 +22,7 @@ export function Balance({
   pre = null,
   post = null,
 }: {
-  coin: number
+  tableId: string
   value?: BigNumberish
   wei?: BigNumberish
   big?: boolean

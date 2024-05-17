@@ -8,7 +8,7 @@ import { useDuel } from '@/pistols/hooks/useDuel'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ActionEmojis, ActionNames, ChallengeStateNames, RoundStateNames } from '@/pistols/utils/pistols'
 import { useWager } from '@/pistols/hooks/useWager'
-import { useCoin } from '@/pistols/hooks/useCoin'
+import { useTable } from '@/pistols/hooks/useTable'
 import AppPistols from '@/pistols/components/AppPistols'
 
 const Row = Table.Row
@@ -35,7 +35,10 @@ function Stats({
 }: {
   duelId: bigint
 }) {
-  const { round1, round2, round3 } = useDuel(duelId)
+  const {
+    challenge: { tableId },
+    round1, round2, round3,
+  } = useDuel(duelId)
 
   return (
     <Container text>
@@ -43,7 +46,7 @@ function Stats({
 
       <div className='Code'>
         <DuelStats duelId={duelId} />
-        <WagerStats duelId={duelId} />
+        <WagerStats duelId={duelId} tableId={tableId}/>
 
         {round1 && <>
           <RoundStats duelId={duelId} roundNumber={1} round={round1} />
@@ -149,12 +152,14 @@ function DuelStats({
 }
 
 function WagerStats({
-  duelId
+  duelId,
+  tableId,
 }: {
   duelId: bigint
+  tableId: string
 }) {
-  const { coin, value, fee } = useWager(duelId)
-  const { description } = useCoin(coin)
+  const { value, fee } = useWager(duelId)
+  const { description } = useTable(tableId)
   if (value == 0) return <></>
   return (
     <Table celled striped color='green'>
@@ -167,9 +172,9 @@ function WagerStats({
 
       <Body>
         <Row>
-          <Cell>Coin</Cell>
+          <Cell>Table</Cell>
           <Cell>
-            {coin} ({description})
+            {tableId} ({description})
           </Cell>
         </Row>
         <Row>

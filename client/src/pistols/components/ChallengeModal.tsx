@@ -29,8 +29,8 @@ export default function ChallengeModal() {
 
   const { duelId, dispatchSelectDuel, dispatchSelectDuelist } = usePistolsContext()
 
-  const { state, message, duelistA, duelistB, isLive, isFinished, needToSyncExpired } = useChallenge(duelId)
-  const { coin, value, fee } = useWager(duelId)
+  const { state, tableId, message, duelistA, duelistB, isLive, isFinished, needToSyncExpired } = useChallenge(duelId)
+  const { value, fee } = useWager(duelId)
 
   const { challengeDescription } = useChallengeDescription(duelId)
 
@@ -114,7 +114,7 @@ export default function ChallengeModal() {
               </Row>
               <Row columns='equal' textAlign='center'>
                 <Col>
-                  <WagerAndOrFees big coin={coin} value={value} fee={isYou ? fee : 0} />
+                  <WagerAndOrFees big tableId={tableId} value={value} fee={isYou ? fee : 0} />
                 </Col>
               </Row>
             </>}
@@ -166,7 +166,7 @@ export default function ChallengeModal() {
             }
             {(state == ChallengeState.Awaiting && isChallenged) &&
               <Col>
-                <BalanceRequiredButton label='Accept Challenge!' onClick={() => _reply(true)} coin={coin} wagerValue={value} fee={fee} />
+                <BalanceRequiredButton label='Accept Challenge!' onClick={() => _reply(true)} tableId={tableId} wagerValue={value} fee={fee} />
               </Col>
             }
             {(state == ChallengeState.InProgress) &&

@@ -41,7 +41,7 @@ export function createSystemCalls(
   manifest: any,
 ) {
   const { execute, executeMulti, call, contractComponents } = network
-  const { Wager, Coin } = components
+  const { Challenge, Wager, Table } = components
 
   // executeMulti() based on:
   // https://github.com/cartridge-gg/rollyourown/blob/f39bfd7adc866c1a10142f5ce30a3c6f900b467e/web/src/dojo/hooks/useSystems.ts#L178-L190
@@ -90,51 +90,58 @@ export function createSystemCalls(
     return await _executeTransaction(signer, actions_call('register_duelist', args))
   }
 
-  const create_challenge = async (signer: Account, challenged: bigint, message: string, wager_coin: number, wager_value: bigint, expire_seconds: number): Promise<boolean> => {
+  const create_challenge = async (signer: Account, challenged: bigint, message: string, table_id: string, wager_value: bigint, expire_seconds: number): Promise<boolean> => {
     // find lords contract
-    const coin = getComponentValue(Coin, bigintToEntity(wager_coin))
+    const table = getComponentValue(Table, bigintToEntity(table_id))
     //calculate value
-    const fee = await calc_fee(wager_coin, wager_value)
+    const fee = await calc_fee(table_id, wager_value)
     const approved_value = (wager_value + fee)
+    let calls: Call[] = []
     // approve call
     const actions_contract = getContractByName(manifest, 'actions')
-    const approve_call: Call = {
-      contractAddress: bigintToHex(coin.contract_address),
-      entrypoint: 'approve',
-      calldata: [actions_contract.address, uint256.bnToUint256(approved_value)]
+    if (BigInt(table.contract_address) > 0n) {
+      calls.push({
+        contractAddress: bigintToHex(table.contract_address),
+        entrypoint: 'approve',
+        calldata: [actions_contract.address, uint256.bnToUint256(approved_value)]
+      })
     }
     // game call
-    const create_challenge_call = {
+    calls.push({
       contractAddress: actions_contract.address,
       entrypoint: 'create_challenge',
-      calldata: [challenged, stringToFelt(message), wager_coin, uint256.bnToUint256(wager_value), expire_seconds]
-    }
-    return await _executeTransaction(signer, [approve_call, create_challenge_call])
+      calldata: [challenged, stringToFelt(message), table_id, uint256.bnToUint256(wager_value), expire_seconds]
+    })
+    return await _executeTransaction(signer, calls)
   }
 
   const reply_challenge = async (signer: Account, duel_id: bigint, accepted: boolean): Promise<boolean> => {
     const args = [duel_id, accepted]
     if (accepted) {
       // find Wager
+      const challenge = getComponentValue(Challenge, bigintToEntity(duel_id))
       const wager = getComponentValue(Wager, bigintToEntity(duel_id))
       const approved_value = (wager.value + wager.fee)
       if (approved_value > 0n) {
         // find lords contract
-        const coin = getComponentValue(Coin, bigintToEntity(wager.coin))
+        const table = getComponentValue(Table, bigintToEntity(challenge.table_id))
         // approve call
+        let calls: Call[] = []
         const actions_contract = getContractByName(manifest, 'actions')
-        const approve_call: Call = {
-          contractAddress: bigintToHex(coin.contract_address),
-          entrypoint: 'approve',
-          calldata: [actions_contract.address, uint256.bnToUint256(approved_value)]
+        if (BigInt(table.contract_address) > 0n) {
+          calls.push({
+            contractAddress: bigintToHex(table.contract_address),
+            entrypoint: 'approve',
+            calldata: [actions_contract.address, uint256.bnToUint256(approved_value)]
+          })
         }
         // game call
-        const reply_challenge_call = {
+        calls.push({
           contractAddress: actions_contract.address,
           entrypoint: 'reply_challenge',
           calldata: args,
-        }
-        return await _executeTransaction(signer, [approve_call, reply_challenge_call])
+        })
+        return await _executeTransaction(signer, calls)
       }
     }
     // no need to approve
@@ -165,9 +172,9 @@ export function createSystemCalls(
     return results !== null ? Boolean(results[0]) : null
   }
 
-  const calc_fee = async (wager_coin: number, wager_value: BigNumberish): Promise<bigint | null> => {
+  const calc_fee = async (table_id: string, wager_value: BigNumberish): Promise<bigint | null> => {
     const wei = splitU256(wager_value)
-    const args = [wager_coin, wei.low, wei.high]
+    const args = [stringToFelt(table_id), wei.low, wei.high]
     const results = await _executeCall(actions_call('calc_fee', args))
     return results !== null ? results[0] : null
   }
@@ -183,11 +190,11 @@ export function createSystemCalls(
     const results = await _executeCall(actions_call('simulate_chances', args))
     return results !== null ? Number(results[0]) : null
 
-  // calc_hit_bonus,
-  // calc_hit_penalty,
-  // calc_hit_chances,
-  // calc_crit_chances,
-  // calc_lethal_chances,
+    // calc_hit_bonus,
+    // calc_hit_penalty,
+    // calc_hit_chances,
+    // calc_crit_chances,
+    // calc_lethal_chances,
 
   }
 

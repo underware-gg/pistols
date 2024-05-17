@@ -38,12 +38,14 @@ export default function Duel({
   const { isLive, isFinished, message, duelistA, duelistB } = useChallenge(duelId)
   const { challengeDescription } = useChallengeDescription(duelId)
 
-  const { duelStage,
+  const {
+    challenge: { tableId },
+    duelStage,
     completedStagesA, completedStagesB,
     canAutoRevealA, canAutoRevealB,
     healthA, healthB,
   } = useAnimatedDuel(duelId)
-  const { coin, value } = useWager(duelId)
+  const { value } = useWager(duelId)
 
   useEffectOnce(() => {
     gameImpl?.resetDuelScene()
@@ -56,7 +58,7 @@ export default function Duel({
       <div className='TavernTitle' style={{ maxWidth: '350px' }}>
         <h1 className='Quote'>{`“${message}”`}</h1>
         {value > 0 &&
-          <h5><Balance big coin={coin} wei={value} /></h5>
+          <h5><Balance big tableId={tableId} wei={value} /></h5>
         }
         {(isFinished && animated == AnimationState.Finished) &&
           <Segment>
