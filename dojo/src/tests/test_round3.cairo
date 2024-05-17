@@ -58,7 +58,7 @@ mod tests {
 
     const SALT_DUAL_MISS: u64 = 0xcb34333b;
     const SALT_DUAL_HIT: u64 = 0x3764564;
-// const SALT_DUAL_CRIT: u64 = 0xffffff;
+    const SALT_DUAL_CRIT: u64 = 0xb6800612482e938f;
     const SALT_HIT_MISS: u64 = 0xffffff; // 3,1
     const SALT_MISS_HIT: u64 = 0x1ff8f8f88f; // 1,3
     const SALT_CRIT_MISS: u64 = 0xdfdfdf; // 3,0
@@ -302,8 +302,13 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             world, system, owner, other,
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
-            SALT_CRIT_MISS,
+            SALT_DUAL_CRIT,
         );
+// challenge.winner.print();
+// round.shot_a.chance_crit.print();
+// round.shot_a.dice_crit.print();
+// round.shot_b.chance_crit.print();
+// round.shot_b.dice_crit.print();
         assert_winner(challenge, round, 1, 2);
         assert(round.shot_a.health == constants::DOUBLE_DAMAGE, 'bad health_a');
         assert(round.shot_b.health == 0, 'bad health_b');

@@ -45,6 +45,7 @@ mod tests {
     mod test_round3;
     mod test_utils;
     mod test_wager;
+    mod salt_generator;
 }
 
 mod mocks {

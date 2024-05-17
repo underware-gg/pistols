@@ -72,8 +72,8 @@ fn get_duelist_health(world: IWorldDispatcher, duelist_address: ContractAddress,
 }
 
 fn create_challenge_snapshot(world: IWorldDispatcher, challenge: Challenge) {
-    let scoreboard_a: Scoreboard = get!(world, (challenge.duelist_a, challenge.duel_id), Scoreboard);
-    let scoreboard_b: Scoreboard = get!(world, (challenge.duelist_b, challenge.duel_id), Scoreboard);
+    let scoreboard_a: Scoreboard = get!(world, (challenge.duelist_a, challenge.table_id), Scoreboard);
+    let scoreboard_b: Scoreboard = get!(world, (challenge.duelist_b, challenge.table_id), Scoreboard);
     let snapshot = Snapshot {
         duel_id: challenge.duel_id,
         score_a: scoreboard_a.score,
