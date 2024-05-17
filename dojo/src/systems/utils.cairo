@@ -72,14 +72,26 @@ fn get_duelist_health(world: IWorldDispatcher, duelist_address: ContractAddress,
 }
 
 fn create_challenge_snapshot(world: IWorldDispatcher, challenge: Challenge) {
-    let duelist_a: Duelist = get!(world, challenge.duelist_a, Duelist);
-    let duelist_b: Duelist = get!(world, challenge.duelist_b, Duelist);
+    let scoreboard_a: Scoreboard = get!(world, (challenge.duelist_a, challenge.duel_id), Scoreboard);
+    let scoreboard_b: Scoreboard = get!(world, (challenge.duelist_b, challenge.duel_id), Scoreboard);
     let snapshot = Snapshot {
         duel_id: challenge.duel_id,
-        score_a: duelist_a.score,
-        score_b: duelist_b.score,
+        score_a: scoreboard_a.score,
+        score_b: scoreboard_b.score,
     };
     set!(world, (snapshot));
+}
+
+fn get_snapshot_scores(world: IWorldDispatcher, address: ContractAddress, duel_id: u128) -> (Score, Score) {
+    let challenge: Challenge = get!(world, duel_id, Challenge);
+    let snapshot: Snapshot = get!(world, duel_id, Snapshot);
+    if (address == challenge.duelist_a) {
+        (snapshot.score_a, snapshot.score_b)
+    } else if (address == challenge.duelist_b) {
+        (snapshot.score_b, snapshot.score_a)
+    } else {
+        (init::Score(), init::Score())
+    }
 }
 
 // player need to allow contract to transfer funds first

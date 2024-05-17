@@ -62,7 +62,7 @@ mod actions {
     use traits::{Into, TryInto};
     use starknet::{ContractAddress, get_block_timestamp, get_block_info};
 
-    use pistols::models::models::{Duelist, Challenge, Wager, Pact, Round, Shot, Chances};
+    use pistols::models::models::{Duelist, Score, Challenge, Wager, Pact, Round, Shot, Chances};
     use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
     use pistols::models::table::{Table, TableManager, TableTrait, TableManagerTrait, tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
@@ -324,15 +324,14 @@ mod actions {
         }
 
         fn simulate_chances(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> Chances {
-            let duelist: Duelist = get!(world, duelist_address, Duelist);
             let health: u8 = utils::get_duelist_health(world, duelist_address, duel_id, round_number);
-            
-            let hit_chances: u8 = utils::calc_hit_chances(duelist.score, duelist.score, action.into(), health);
-            let crit_chances: u8 = utils::calc_crit_chances(duelist.score, duelist.score, action.into(), action.into(), health);
-            let lethal_chances: u8 = utils::calc_lethal_chances(duelist.score, duelist.score, action.into(), health);
-            let crit_bonus: u8 = utils::calc_crit_bonus(duelist.score);
+            let (score_self, score_other): (Score, Score) = utils::get_snapshot_scores(world, duelist_address, duel_id);
+            let hit_chances: u8 = utils::calc_hit_chances(score_self, score_other, action.into(), health);
+            let crit_chances: u8 = utils::calc_crit_chances(score_self, score_other, action.into(), action.into(), health);
+            let lethal_chances: u8 = utils::calc_lethal_chances(score_self, score_other, action.into(), health);
+            let crit_bonus: u8 = utils::calc_crit_bonus(score_self);
             let hit_bonus: u8 = 0;
-            let lethal_bonus: u8 = utils::calc_lethal_bonus(duelist.score);
+            let lethal_bonus: u8 = utils::calc_lethal_bonus(score_self);
             (Chances {
                 key: 0,
                 crit_chances,
