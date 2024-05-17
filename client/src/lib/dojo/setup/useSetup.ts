@@ -9,7 +9,7 @@ import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { dummyAccount, feltToString } from '@/lib/utils/starknet'
 import { Account } from 'starknet'
 
-import {  DojoChainConfig, getChainMasterAccount } from './chainConfig'
+import { DojoChainConfig, getChainMasterAccount } from './chainConfig'
 import { createClientComponents } from './createClientComponents'
 import { setupNetwork } from './setupNetwork'
 import * as torii from '@dojoengine/torii-client'
@@ -95,6 +95,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
       toriiClient,
       network.contractComponents as any
     )
+    console.log(`SYNC FINISHED!!!`)
     return true
   }, [toriiClient, network], undefined, null)
 
@@ -170,12 +171,13 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
 
   const errorMessage =
     !manifest ? 'Game not Deployed'
-      : dojoProviderIsError ? 'Chain Provider is unavailable'
-        : toriiIsError ? 'Game Indexer is unavailable'
-          : !isDeployed ? 'World not found'
-            : burnerManagerIsError ? 'Burner Manager error'
-              : predeployedManagerIsError ? 'Predeployed Manager error'
-                : null
+      : dojoProviderIsError ? 'Chain Provider is Unavailable'
+        : toriiIsError ? 'Game Indexer is Unavailable'
+          : syncStatus === null ? 'Sync Error'
+            : isDeployed === null ? 'World not Found'
+              : burnerManagerIsError ? 'Burner Manager error'
+                : predeployedManagerIsError ? 'Predeployed Manager error'
+                  : null
   const isError = (errorMessage != null)
 
   useEffect(() => {
