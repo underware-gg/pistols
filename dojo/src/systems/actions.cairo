@@ -151,16 +151,18 @@ mod actions {
             // setup wager + fees
             let table_manager = TableManagerTrait::new(world);
             let table: Table = table_manager.get(table_id);
-            assert(table.is_open == true, 'Table disabled');
+            assert(table.is_open == true, 'Table is closed');
+            assert(wager_value >= table.wager_min, 'Minimum wager not met');
             let fee: u256 = table.calc_fee(wager_value);
             // calc fee and store
-            let wager = Wager {
-                duel_id,
-                table_id,
-                value: wager_value,
-                fee,
-            };
-            set!(world, (wager));
+            if (fee > 0 || wager_value > 0) {
+                let wager = Wager {
+                    duel_id,
+                    value: wager_value,
+                    fee,
+                };
+                set!(world, (wager));
+            }
 
             // calc expiration
             let timestamp_start: u64 = get_block_timestamp();
@@ -171,6 +173,7 @@ mod actions {
                 duelist_a: caller,
                 duelist_b: challenged,
                 message,
+                table_id,
                 // progress
                 state: ChallengeState::Awaiting.into(),
                 round_number: 0,
@@ -181,7 +184,7 @@ mod actions {
             };
 
             // transfer wager/fee from Challenger to the contract
-            utils::deposit_wager_fees(world, challenge.duelist_a, starknet::get_contract_address(), duel_id);
+            utils::deposit_wager_fees(world, challenge, challenge.duelist_a, starknet::get_contract_address());
 
             utils::set_challenge(world, challenge);
 
@@ -230,7 +233,7 @@ mod actions {
                     // create Duelists snapshots for this Challenge
                     utils::create_challenge_snapshot(world, challenge);
                     // transfer wager/fee from Challenged to the contract
-                    utils::deposit_wager_fees(world, challenge.duelist_b, contract, duel_id);
+                    utils::deposit_wager_fees(world, challenge, challenge.duelist_b, contract);
                 } else {
                     // Challenged is Refusing
                     challenge.state = ChallengeState::Refused.into();

@@ -64,12 +64,12 @@ mod tests {
         // create challenge
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, wager_value, 0);
         let ch = tester::get_Challenge(world, duel_id);
+        assert(ch.table_id == TABLE_ID, 'ch.table_id');
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
         // check stored wager
         let wager = tester::get_Wager(world, duel_id);
         let total: u256 = wager.value + wager.fee;
         assert(total == approved_value, 'wager total = approved_value');
-        assert(wager.table_id == TABLE_ID, 'wager.table_id');
         assert(wager.value == wager_value, 'wager.value');
         assert(wager.fee == fee, '== fee');
         // check balances

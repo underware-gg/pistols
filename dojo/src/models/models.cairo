@@ -73,6 +73,7 @@ struct Challenge {
     duelist_a: ContractAddress, // Challenger
     duelist_b: ContractAddress, // Challenged
     message: felt252,           // message to challenged
+    table_id: felt252,
     // progress and results
     state: u8,                  // actually a ChallengeState
     round_number: u8,           // current or final
@@ -82,6 +83,17 @@ struct Challenge {
     timestamp_end: u64,         // Unix time, ended
 } // [f] [f] [f] [152]
 
+// Challenge wager (optional)
+#[derive(Model, Copy, Drop, Serde)]
+struct Wager {
+    #[key]
+    duel_id: u128,
+    //------------
+    value: u256,
+    fee: u256,
+}
+
+// Score snapshot
 #[derive(Model, Copy, Drop, Serde)]
 struct Snapshot {
     #[key]
@@ -92,16 +104,18 @@ struct Snapshot {
 }
 
 //
-// Challenge wager (optional)
+// Each duel round
 #[derive(Model, Copy, Drop, Serde)]
-struct Wager {
+struct Round {
     #[key]
     duel_id: u128,
-    //------------
-    table_id: felt252,
-    value: u256,
-    fee: u256,
-}
+    #[key]
+    round_number: u8,
+    //---------------
+    state: u8,      // actually a RoundState
+    shot_a: Shot,   // duelist_a shot
+    shot_b: Shot,   // duelist_b shot
+} // (8 + 224 + 224) = 456 bits ~ 2 felts (max 504)
 
 //
 // The shot of each player on a Round
@@ -124,20 +138,6 @@ struct Shot {
     health: u8,         // final health
     honour: u8,         // honour granted
 } // 224 bits
-
-//
-// Each duel round
-#[derive(Model, Copy, Drop, Serde)]
-struct Round {
-    #[key]
-    duel_id: u128,
-    #[key]
-    round_number: u8,
-    //---------------
-    state: u8,      // actually a RoundState
-    shot_a: Shot,   // duelist_a shot
-    shot_b: Shot,   // duelist_b shot
-} // (8 + 224 + 224) = 456 bits ~ 2 felts (max 504)
 
 
 //--------------------------------------------

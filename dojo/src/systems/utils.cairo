@@ -84,11 +84,11 @@ fn create_challenge_snapshot(world: IWorldDispatcher, challenge: Challenge) {
 
 // player need to allow contract to transfer funds first
 // ierc20::approve(contract_address, max(wager.value, wager.fee));
-fn deposit_wager_fees(world: IWorldDispatcher, from: ContractAddress, to: ContractAddress, duel_id: u128) {
-    let wager: Wager = get!(world, (duel_id), Wager);
+fn deposit_wager_fees(world: IWorldDispatcher, challenge: Challenge, from: ContractAddress, to: ContractAddress) {
+    let wager: Wager = get!(world, (challenge.duel_id), Wager);
     let total: u256 = (wager.value + wager.fee);
     if (total > 0) {
-        let table : Table = TableManagerTrait::new(world).get(wager.table_id);
+        let table : Table = TableManagerTrait::new(world).get(challenge.table_id);
         let balance: u256 = table.ierc20().balance_of(from);
         let allowance: u256 = table.ierc20().allowance(from, to);
         assert(balance >= total, 'Insufficient balance for Fees');
@@ -96,22 +96,22 @@ fn deposit_wager_fees(world: IWorldDispatcher, from: ContractAddress, to: Contra
         table.ierc20().transfer_from(from, to, total);
     }
 }
-fn withdraw_wager_fees(world: IWorldDispatcher, to: ContractAddress, duel_id: u128) {
-    let wager: Wager = get!(world, (duel_id), Wager);
+fn withdraw_wager_fees(world: IWorldDispatcher, challenge: Challenge, to: ContractAddress) {
+    let wager: Wager = get!(world, (challenge.duel_id), Wager);
     let total: u256 = (wager.value + wager.fee);
     if (total > 0) {
-        let table : Table = TableManagerTrait::new(world).get(wager.table_id);
+        let table : Table = TableManagerTrait::new(world).get(challenge.table_id);
         let balance: u256 = table.ierc20().balance_of(starknet::get_contract_address());
         assert(balance >= total, 'Withdraw not available'); // should never happen!
         table.ierc20().transfer(to, total);
     }
 }
 // spllit wager beteen duelist_a and duelist_b
-fn split_wager_fees(world: IWorldDispatcher, duelist_a: ContractAddress, duelist_b: ContractAddress, duel_id: u128) -> u256 {
-    let wager: Wager = get!(world, (duel_id), Wager);
+fn split_wager_fees(world: IWorldDispatcher, challenge: Challenge, duelist_a: ContractAddress, duelist_b: ContractAddress) -> u256 {
+    let wager: Wager = get!(world, (challenge.duel_id), Wager);
     let total: u256 = (wager.value + wager.fee) * 2;
     if (total > 0) {
-        let table : Table = TableManagerTrait::new(world).get(wager.table_id);
+        let table : Table = TableManagerTrait::new(world).get(challenge.table_id);
         let balance: u256 = table.ierc20().balance_of(starknet::get_contract_address());
         assert(balance >= total, 'Wager not available'); // should never happen!
         if (wager.value > 0) {
@@ -253,7 +253,7 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
     // Start Round
     if (state.is_canceled()) {
         // transfer wager/fee back to challenger
-        withdraw_wager_fees(world, challenge.duelist_a, challenge.duel_id);
+        withdraw_wager_fees(world, challenge, challenge.duelist_a);
     } else if (state == ChallengeState::InProgress) {
         let mut shot_a = init::Shot();
         let mut shot_b = init::Shot();
@@ -284,9 +284,8 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         // End Duel!
         let mut duelist_a: Duelist = get!(world, challenge.duelist_a, Duelist);
         let mut duelist_b: Duelist = get!(world, challenge.duelist_b, Duelist);
-        let wager: Wager = get!(world, (challenge.duel_id), Wager);
-        let mut scoreboard_a: Scoreboard = get!(world, (challenge.duelist_a, wager.table_id), Scoreboard);
-        let mut scoreboard_b: Scoreboard = get!(world, (challenge.duelist_b, wager.table_id), Scoreboard);
+        let mut scoreboard_a: Scoreboard = get!(world, (challenge.duelist_a, challenge.table_id), Scoreboard);
+        let mut scoreboard_b: Scoreboard = get!(world, (challenge.duelist_b, challenge.table_id), Scoreboard);
         
         // update totals
         update_score_totals(ref duelist_a.score, ref duelist_b.score, state, challenge.winner);
@@ -302,17 +301,17 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         // split wager/fee to winners and benefactors
         if (final_round.shot_a.wager > final_round.shot_b.wager) {
             // duelist_a won the Wager
-            let wager_value: u256 = split_wager_fees(world, challenge.duelist_a, challenge.duelist_a, challenge.duel_id);
+            let wager_value: u256 = split_wager_fees(world, challenge, challenge.duelist_a, challenge.duelist_a);
             scoreboard_a.wager_won += wager_value;
             scoreboard_b.wager_lost += wager_value;
         } else if (final_round.shot_a.wager < final_round.shot_b.wager) {
             // duelist_b won the Wager
-            let wager_value: u256 = split_wager_fees(world, challenge.duelist_b, challenge.duelist_b, challenge.duel_id);
+            let wager_value: u256 = split_wager_fees(world, challenge, challenge.duelist_b, challenge.duelist_b);
             scoreboard_a.wager_lost += wager_value;
             scoreboard_b.wager_won += wager_value;
         } else {
             // no-one gets the Wager
-            split_wager_fees(world, challenge.duelist_a, challenge.duelist_b, challenge.duel_id);
+            split_wager_fees(world, challenge, challenge.duelist_a, challenge.duelist_b);
         }
         
         // save
