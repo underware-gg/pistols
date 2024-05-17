@@ -120,6 +120,9 @@ rustup update
 # Install Cargo
 curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh
 
+# Install pnpm
+curl -fsSL https://get.pnpm.io/install.sh | sh -
+
 # other stuff you will need
 brew install jq
 brew install protobuf
