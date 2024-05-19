@@ -160,7 +160,7 @@ export const useChallengesByDuelist = (address: bigint) => {
   const { Challenge } = useDojoComponents()
   const { challengeIds, challengerIds, challengedIds } = useChallengeIdsByDuelist(address)
 
-  const challenges: any[] = useMemo(() => challengeIds.map((challengeId) => getComponentValue(Challenge, bigintToEntity(challengeId))).sort((a, b) => ((a.timestamp_end && b.timestamp_end) ? (a.timestamp_end - b.timestamp_end) : (a.timestamp_start - b.timestamp_start))), [challengeIds])
+  const challenges: any[] = useMemo(() => challengeIds.map((challengeId) => getComponentValue(Challenge, bigintToEntity(challengeId))).sort((a, b) => Number((a.timestamp_end && b.timestamp_end) ? (a.timestamp_end - b.timestamp_end) : (a.timestamp_start - b.timestamp_start))), [challengeIds])
   // console.log(challenges)
   const stats: any = useMemo(() => {
     let result = {
