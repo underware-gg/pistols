@@ -4,7 +4,9 @@ import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useTableBalance } from '@/pistols/hooks/useTable'
+import { bigintAdd } from '@/lib/utils/types'
 import { CustomIcon } from '@/lib/ui/Icons'
+import { BigNumberish } from 'starknet'
 
 //-----------------
 // Generic Action button
@@ -96,9 +98,16 @@ export const BalanceRequiredButton = ({
   fee,
   onClick,
   disabled = false,
+}: {
+  label: string
+  tableId: string
+  wagerValue: BigNumberish
+  fee: BigNumberish
+  onClick: Function
+  disabled?: boolean
 }) => {
   const { account } = useDojoAccount()
-  const { balance, noFundsForFee } = useTableBalance(tableId, account.address, wagerValue + fee)
+  const { balance, noFundsForFee } = useTableBalance(tableId, account.address, bigintAdd(wagerValue, fee))
   return (
     <ActionButton fill
       disabled={disabled}
@@ -115,6 +124,11 @@ export const FilterButton = ({
   toggle = true,
   state = false,
   switchState,
+}: {
+  label: string
+  toggle?: boolean
+  state?: boolean
+  switchState: Function
 }) => {
   return (
     <Button
@@ -156,15 +170,13 @@ export function SettingsIcon({
   return <CustomIcon icon={icon} name={value ? nameOn : nameOff} onClick={() => _switch()} />
 }
 
-export function MusicToggle({
-}) {
+export function MusicToggle() {
   const { settings, SettingsActions } = useSettingsContext()
   const { audioLoaded } = useThreeJsContext()
   if (!audioLoaded) return <></>
   return <SettingsIcon settingsKey={SettingsActions.MUSIC_ENABLED} value={settings.musicEnabled} nameOn='volume-on' nameOff='volume-off' icon />
 }
-export function SfxToggle({
-}) {
+export function SfxToggle() {
   const { settings, SettingsActions } = useSettingsContext()
   return <SettingsIcon settingsKey={SettingsActions.SFX_ENABLED} value={settings.sfxEnabled} nameOn='volume-on' nameOff='volume-off' icon />
 }
@@ -190,6 +202,10 @@ export function SettingsMenuItem({
   prefix,
   settingsKey,
   currentValue,
+}: {
+  prefix: string
+  settingsKey: string
+  currentValue: any
 }) {
   const { dispatchSetting } = useSettingsContext()
   const _switch = () => {

@@ -21,7 +21,7 @@ export function Divider({
   if (nomargin) classNames.push('NoMargin')
 
   if (!content) {
-    <_Divider_ hidden={hidden} className={classNames.join(' ')} />
+    return <_Divider_ hidden={hidden} className={classNames.join(' ')} />
   }
 
   return (

@@ -7,7 +7,7 @@ import { splitU256, stringToFelt } from '@/lib/utils/starknet'
 import { Account, BigNumberish, Call, CallContractResponse, uint256 } from 'starknet'
 import { emitter } from '@/pistols/three/game'
 import { getContractByName } from '@dojoengine/core'
-import { bigintToEntity, bigintToHex } from '@/lib/utils/types'
+import { bigintAdd, bigintToEntity, bigintToHex } from '@/lib/utils/types'
 import { getComponentValue } from '@dojoengine/recs'
 import { ClientComponents } from '../lib/dojo/setup/createClientComponents'
 
@@ -41,7 +41,7 @@ export function createSystemCalls(
   manifest: any,
 ) {
   const { execute, executeMulti, call, contractComponents } = network
-  const { Challenge, Wager, Table } = components
+  const { Challenge, Wager, TTable } = components
 
   // executeMulti() based on:
   // https://github.com/cartridge-gg/rollyourown/blob/f39bfd7adc866c1a10142f5ce30a3c6f900b467e/web/src/dojo/hooks/useSystems.ts#L178-L190
@@ -92,10 +92,11 @@ export function createSystemCalls(
 
   const create_challenge = async (signer: Account, challenged: bigint, message: string, table_id: string, wager_value: bigint, expire_seconds: number): Promise<boolean> => {
     // find lords contract
-    const table = getComponentValue(Table, bigintToEntity(table_id))
+    const table = getComponentValue(TTable, bigintToEntity(stringToFelt(table_id)))
+    if (!table) throw new Error(`Table does not exist [${table_id}]`)
     //calculate value
     const fee = await calc_fee(table_id, wager_value)
-    const approved_value = (wager_value + fee)
+    const approved_value = bigintAdd(wager_value, fee)
     let calls: Call[] = []
     // approve call
     const actions_contract = getContractByName(manifest, 'actions')
@@ -124,7 +125,8 @@ export function createSystemCalls(
       const approved_value = (wager.value + wager.fee)
       if (approved_value > 0n) {
         // find lords contract
-        const table = getComponentValue(Table, bigintToEntity(challenge.table_id))
+        const table = getComponentValue(TTable, bigintToEntity(challenge.table_id))
+        if (!table) throw new Error(`Table does not exist [${challenge.table_id}]`)
         // approve call
         let calls: Call[] = []
         const actions_contract = getContractByName(manifest, 'actions')

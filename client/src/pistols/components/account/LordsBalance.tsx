@@ -73,9 +73,11 @@ export function WagerAndOrFees({
           <Balance big={big} tableId={tableId} wei={value} pre={pre} />
         </span>
         &nbsp;&nbsp;
-        <span>
-          (<Balance clean tableId={tableId} wei={fee} pre='+' /> fee)
-        </span>
+        {fee &&
+          <span>
+            (<Balance clean tableId={tableId} wei={fee} pre='+' /> fee)
+          </span>
+        }
       </>
     )
   }

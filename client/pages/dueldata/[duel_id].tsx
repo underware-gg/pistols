@@ -180,13 +180,13 @@ function WagerStats({
         <Row>
           <Cell>Value</Cell>
           <Cell>
-            {value.toString()} wei : {weiToEth(value).toString()}
+            {value?.toString() ?? 0} wei : {weiToEth(value ?? 0).toString()}
           </Cell>
         </Row>
         <Row>
           <Cell>Fee</Cell>
           <Cell>
-            {fee.toString()} wei : {weiToEth(fee).toString()}
+            {fee?.toString() ?? 0} wei : {weiToEth(fee ?? 0).toString()}
           </Cell>
         </Row>
       </Body>
