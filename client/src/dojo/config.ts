@@ -17,20 +17,20 @@ export const makeDojoAppConfig = (): DojoAppConfig => {
 
   const supportedChainIds = [
     CHAIN_ID.KATANA,
-    CHAIN_ID.PISTOLS_SLOT,
+    CHAIN_ID.WP_PISTOLS_SLOT,
     CHAIN_ID.KATANA_LOCAL,
   ]
 
   const manifests = {
     [CHAIN_ID.KATANA_LOCAL]: manifest_katana,
-    [CHAIN_ID.PISTOLS_SLOT]: manifest_slot,
+    [CHAIN_ID.WP_PISTOLS_SLOT]: manifest_slot,
     [CHAIN_ID.KATANA]: null,
   }
 
   const initialChainId = (defaultChainId || (
     process.env.NODE_ENV === 'development' ? CHAIN_ID.KATANA_LOCAL
       : process.env.NODE_ENV === 'production' ? CHAIN_ID.KATANA
-        : process.env.NODE_ENV === 'test' ? CHAIN_ID.PISTOLS_SLOT
+        : process.env.NODE_ENV === 'test' ? CHAIN_ID.WP_PISTOLS_SLOT
           : supportedChainIds[0]
   )) as CHAIN_ID
 

@@ -5,7 +5,7 @@ export enum CHAIN_ID {
   SN_MAINNET = 'SN_MAINNET',
   SN_SEPOLIA = 'SN_SEPOLIA',
   KATANA_LOCAL = 'KATANA_LOCAL',
-  PISTOLS_SLOT = 'PISTOLS_SLOT',
+  WP_PISTOLS_SLOT = 'WP_PISTOLS_SLOT',
   KATANA = 'KATANA', // actually DOJO_REALMS_WORLD
 }
 
@@ -35,7 +35,7 @@ export const katanaLocalChain: Chain = {
 
 
 export const pistolsSlotChain: Chain = {
-  id: BigInt(stringToFelt(CHAIN_ID.PISTOLS_SLOT)),
+  id: BigInt(stringToFelt(CHAIN_ID.WP_PISTOLS_SLOT)),
   network: 'katana',
   name: 'Slot Testnet (Free)',
   nativeCurrency: {

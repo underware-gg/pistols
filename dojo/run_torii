@@ -14,5 +14,6 @@ if [[
 fi
 
 torii \
+  --world $WORLD_ADDRESS $* \
   --allowed-origins "*" --index-pending \
-  --world $WORLD_ADDRESS $*
+

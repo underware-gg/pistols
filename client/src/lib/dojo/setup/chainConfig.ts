@@ -75,8 +75,8 @@ const pistolsSlotConfig: DojoChainConfig = {
   rpcUrl: 'https://api.cartridge.gg/x/pistols-slot/katana',
   toriiUrl: 'https://api.cartridge.gg/x/pistols-slot/torii',
   relayUrl: undefined,
-  masterAddress: '0x23ce913a39de30f729aee781b8dea86281b9a25d897e5d9fb61e3e95cae8cd',
-  masterPrivateKey: '0x22372b22b591f4db22860a70e6f831c4eadb80e42669f54ccc7fe2420befea9',
+  masterAddress: '0xeab31925d81d7ba7d37ccc5c615311311e439a0da59b2bf9e971c06621f63d',
+  masterPrivateKey: '0x4ff26d2c211f52a7ecb2340605938e1f478a329ab208139fd5efcdd5c71d2d6',
   accountClassHash: KATANA_CLASS_HASH,
   lordsContractAddress: undefined, // lords_mock
   lordsFaucetUrl: undefined,
@@ -133,7 +133,7 @@ const snSepoliaConfig: DojoChainConfig = {
 
 const dojoContextConfig: Record<CHAIN_ID, DojoChainConfig> = {
   [CHAIN_ID.KATANA_LOCAL]: localKatanaConfig,
-  [CHAIN_ID.PISTOLS_SLOT]: pistolsSlotConfig,
+  [CHAIN_ID.WP_PISTOLS_SLOT]: pistolsSlotConfig,
   [CHAIN_ID.KATANA]: realmsWorldConfig,
   [CHAIN_ID.SN_SEPOLIA]: snSepoliaConfig,
   [CHAIN_ID.SN_MAINNET]: snMainnetConfig,
