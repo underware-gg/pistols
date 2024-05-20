@@ -60,7 +60,7 @@ fi
 echo "* Admin auth..."
 sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
   Config,$ADMIN_ADDRESS \
-  Table,$ADMIN_ADDRESS
+  TTable,$ADMIN_ADDRESS
 
 echo "* Game auth..."
 sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \

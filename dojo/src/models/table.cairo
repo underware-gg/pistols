@@ -12,8 +12,10 @@ mod tables {
     const COUNT: u8 = 2;
 }
 
+// Temporarily renamed to TTable while this bug exists:
+// https://github.com/dojoengine/dojo.js/issues/204
 #[derive(Model, Copy, Drop, Serde)]
-struct Table { // TODO: Rename to Board or Table
+struct TTable {
     #[key]
     table_id: felt252,
     //------
@@ -25,9 +27,9 @@ struct Table { // TODO: Rename to Board or Table
     is_open: bool,
 }
 
-fn default_tables(lords_address: ContractAddress) -> Array<Table> {
+fn default_tables(lords_address: ContractAddress) -> Array<TTable> {
     (array![
-        (Table {
+        (TTable {
             table_id: tables::LORDS,
             description: 'The Lords Table',
             contract_address: lords_address,
@@ -36,7 +38,7 @@ fn default_tables(lords_address: ContractAddress) -> Array<Table> {
             fee_pct: 10,
             is_open: (lords_address != zero_address()),
         }),
-        (Table {
+        (TTable {
             table_id: tables::COMMONERS,
             description: 'The Commoners Table',
             contract_address: zero_address(),
@@ -59,19 +61,19 @@ impl TableManagerTraitImpl of TableManagerTrait {
         TableManager { world }
     }
     fn exists(self: TableManager, table_id: felt252) -> bool {
-        let table: Table = get!(self.world, (table_id), Table);
+        let table: TTable = get!(self.world, (table_id), TTable);
         (table.description != 0)
     }
-    fn get(self: TableManager, table_id: felt252) -> Table {
-        let table: Table = get!(self.world, (table_id), Table);
+    fn get(self: TableManager, table_id: felt252) -> TTable {
+        let table: TTable = get!(self.world, (table_id), TTable);
         assert(table.description != 0, 'Invalid Table');
         (table)
     }
-    fn set(self: TableManager, table: Table) {
+    fn set(self: TableManager, table: TTable) {
         assert(table.description != 0, 'Need a description');
         set!(self.world, (table));
     }
-    fn set_array(self: TableManager, tables: Array<Table>) {
+    fn set_array(self: TableManager, tables: Array<TTable>) {
         let mut n: usize = 0;
         loop {
             if (n == tables.len()) { break; }
@@ -83,14 +85,14 @@ impl TableManagerTraitImpl of TableManagerTrait {
 
 #[generate_trait]
 impl TableTraitImpl of TableTrait {
-    fn ierc20(self: Table) -> IERC20Dispatcher {
+    fn ierc20(self: TTable) -> IERC20Dispatcher {
         (ierc20(self.contract_address))
     }
-    fn calc_fee(self: Table, wager_value: u256) -> u256 {
+    fn calc_fee(self: TTable, wager_value: u256) -> u256 {
         (MathU256::max(self.fee_min, (wager_value / 100) * self.fee_pct.into()))
     }
     // TODO
-    // fn to_wei(self: Table, value: u256) -> u256 {
+    // fn to_wei(self: TTable, value: u256) -> u256 {
     //     // get decimals and multiply
     // }
 }

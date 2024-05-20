@@ -64,7 +64,7 @@ mod actions {
 
     use pistols::models::models::{Duelist, Score, Challenge, Wager, Pact, Round, Shot, Chances};
     use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
-    use pistols::models::table::{Table, TableManager, TableTrait, TableManagerTrait, tables};
+    use pistols::models::table::{TTable, TableManager, TableTrait, TableManagerTrait, tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::utils::timestamp::{timestamp};
@@ -169,7 +169,7 @@ mod actions {
 
             // setup wager + fees
             let table_manager = TableManagerTrait::new(world);
-            let table: Table = table_manager.get(table_id);
+            let table: TTable = table_manager.get(table_id);
             assert(table.is_open == true, 'Table is closed');
             assert(wager_value >= table.wager_min, 'Minimum wager not met');
             let fee: u256 = table.calc_fee(wager_value);
@@ -317,7 +317,7 @@ mod actions {
 
         fn calc_fee(world: IWorldDispatcher, table_id: felt252, wager_value: u256) -> u256 {
             let table_manager = TableManagerTrait::new(world);
-            let table: Table = table_manager.get(table_id);
+            let table: TTable = table_manager.get(table_id);
             (table.calc_fee(wager_value))
         }
 

@@ -6,8 +6,8 @@ import { feltToString, stringToFelt } from '@/lib/utils/starknet'
 import { BigNumberish } from 'starknet'
 
 export const useTable = (tableId: string) => {
-  const { Table } = useDojoComponents()
-  const table = useComponentValue(Table, bigintToEntity(stringToFelt(tableId ?? '')))
+  const { TTable } = useDojoComponents()
+  const table = useComponentValue(TTable, bigintToEntity(stringToFelt(tableId ?? '')))
   return {
     contractAddress: table?.contract_address ?? 0n,
     description: table ? feltToString(table.description) : '?',

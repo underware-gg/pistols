@@ -11,7 +11,7 @@ mod tests {
     use pistols::systems::admin::{IAdminDispatcher, IAdminDispatcherTrait};
     use pistols::systems::utils::{zero_address};
     use pistols::models::config::{Config};
-    use pistols::models::table::{Table, TableTrait, TableManagerTrait, tables};
+    use pistols::models::table::{TTable, TableTrait, TableManagerTrait, tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::constants::{constants};
     use pistols::utils::timestamp::{timestamp};
@@ -32,7 +32,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     fn test_calc_fee() {
         let (_world, system, admin, _lords, _ierc20, _owner, _other, _bummer, _treasury) = tester::setup_world(true, false);
-        let table: Table = admin.get_table(TABLE_ID);
+        let table: TTable = admin.get_table(TABLE_ID);
         // no wager
         let fee: u256 = system.calc_fee(TABLE_ID, 0);
         assert(fee == table.fee_min, 'fee > 0');
@@ -55,7 +55,7 @@ mod tests {
         let balance_a: u256 = ierc20.balance_of(A);
         let balance_b: u256 = ierc20.balance_of(B);
         // approve fees
-        let mut table: Table = admin.get_table(table_id);
+        let mut table: TTable = admin.get_table(table_id);
         if (wager_min > 0) {
             table.wager_min = wager_min;
             set!(world, (table));

@@ -28,7 +28,7 @@ mod tester {
         Config, config,
     };
     use pistols::models::table::{
-        Table, table,
+        TTable, t_table,
     };
     use pistols::utils::string::{String};
 
@@ -67,7 +67,7 @@ mod tester {
             wager::TEST_CLASS_HASH,
             round::TEST_CLASS_HASH,
             config::TEST_CLASS_HASH,
-            table::TEST_CLASS_HASH,
+            t_table::TEST_CLASS_HASH,
         ];
         // accounts
         let owner: ContractAddress = starknet::contract_address_const::<0x111111>();
@@ -245,8 +245,8 @@ mod tester {
         (get!(world, 1, Config))
     }
     #[inline(always)]
-    fn get_Table(world: IWorldDispatcher, table_id: felt252) -> Table {
-        (get!(world, table_id, Table))
+    fn get_Table(world: IWorldDispatcher, table_id: felt252) -> TTable {
+        (get!(world, table_id, TTable))
     }
     #[inline(always)]
     fn get_Duelist(world: IWorldDispatcher, address: ContractAddress) -> Duelist {
