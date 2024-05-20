@@ -34,8 +34,8 @@ name = "pistols::mocks::lords_mock::lords_mock"
 [[contracts]]
 kind = "DojoContract"
 address = "0x6dda46ca9b7cee1b06a77890a71f0221f332f01f6f05ebd0894feb9a76b7752"
-class_hash = "0x13d72f62157707889318d8193aa8ef1026e8a9d96383cb53b5001504925c0ee"
-original_class_hash = "0x13d72f62157707889318d8193aa8ef1026e8a9d96383cb53b5001504925c0ee"
+class_hash = "0x796cde69fd288375c452f1f9f3913a8bb70692b68036bada62cb626c918498c"
+original_class_hash = "0x796cde69fd288375c452f1f9f3913a8bb70692b68036bada62cb626c918498c"
 base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
 abi = "manifests/dev/abis/deployments/contracts/pistols_systems_actions_actions.json"
 reads = []
@@ -46,8 +46,8 @@ name = "pistols::systems::actions::actions"
 [[contracts]]
 kind = "DojoContract"
 address = "0x772fa6174987748d59cb7d9acfa7bb4f6c647c068cddb6a309e102c00c90c5d"
-class_hash = "0x1804bf5f993b728fb6ea72b99d5f4259a51a5f7d4ba90cf4e5cedd15d5e279a"
-original_class_hash = "0x1804bf5f993b728fb6ea72b99d5f4259a51a5f7d4ba90cf4e5cedd15d5e279a"
+class_hash = "0x3b5708d3bdd1355fe7431d6952dc2b8236666baa9dff6d9cd8e087490ed6e1e"
+original_class_hash = "0x3b5708d3bdd1355fe7431d6952dc2b8236666baa9dff6d9cd8e087490ed6e1e"
 base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
 abi = "manifests/dev/abis/deployments/contracts/pistols_systems_admin_admin.json"
 reads = []
@@ -345,10 +345,10 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x1c86441315b8ead91624bcd2f46d342874f54c32e7603490e7d3b395f0e591"
-original_class_hash = "0x1c86441315b8ead91624bcd2f46d342874f54c32e7603490e7d3b395f0e591"
-abi = "manifests/dev/abis/deployments/models/pistols_models_table_table.json"
-name = "pistols::models::table::table"
+class_hash = "0x42e3c5dd1fa2eb9280cc6f57b5acc77b9c9b49b18175f6b1a8e680caef4a62a"
+original_class_hash = "0x42e3c5dd1fa2eb9280cc6f57b5acc77b9c9b49b18175f6b1a8e680caef4a62a"
+abi = "manifests/dev/abis/deployments/models/pistols_models_table_t_table.json"
+name = "pistols::models::table::t_table"
 
 [[models.members]]
 name = "table_id"

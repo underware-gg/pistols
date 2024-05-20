@@ -123,13 +123,13 @@ export function defineContractComponents(world: World) {
         }
       );
     })(),
-    Table: (() => {
+    TTable: (() => {
       return defineComponent(
         world,
         { table_id: RecsType.BigInt, description: RecsType.BigInt, contract_address: RecsType.BigInt, wager_min: RecsType.BigInt, fee_min: RecsType.BigInt, fee_pct: RecsType.Number, is_open: RecsType.Boolean },
         {
           metadata: {
-            name: "Table",
+            name: "TTable",
             types: ["felt252","felt252","contractaddress","u256","u256","u8","bool"],
             customTypes: [],
           },

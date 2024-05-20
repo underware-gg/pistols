@@ -169,8 +169,8 @@
   },
   {
     "type": "impl",
-    "name": "tableImpl",
-    "interface_name": "pistols::models::table::Itable"
+    "name": "t_tableImpl",
+    "interface_name": "pistols::models::table::It_table"
   },
   {
     "type": "struct",
@@ -202,7 +202,7 @@
   },
   {
     "type": "struct",
-    "name": "pistols::models::table::Table",
+    "name": "pistols::models::table::TTable",
     "members": [
       {
         "name": "table_id",
@@ -236,7 +236,7 @@
   },
   {
     "type": "interface",
-    "name": "pistols::models::table::Itable",
+    "name": "pistols::models::table::It_table",
     "items": [
       {
         "type": "function",
@@ -244,7 +244,7 @@
         "inputs": [
           {
             "name": "model",
-            "type": "pistols::models::table::Table"
+            "type": "pistols::models::table::TTable"
           }
         ],
         "outputs": [],
@@ -254,7 +254,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::models::table::table::Event",
+    "name": "pistols::models::table::t_table::Event",
     "kind": "enum",
     "variants": []
   }

@@ -12,21 +12,23 @@ export function useAsyncMemo<T>(runner: () => Promise<T> | undefined | null, dep
       setIsResolved(false)
       setIsRunning(true)
       setIsError(false)
-      runner().then((val) => {
-        if (_mounted) {
-          setValue(val)
-          setIsRunning(false)
-          setIsResolved(true)
-        }
-      }).catch((e) => {
-        console.warn(`useAsyncMemo() exception:`, e)
-        if (_mounted) {
-          setValue(errorValue)
-          setIsRunning(false)
-          setIsResolved(false)
-          setIsError(true)
-        }
-      })
+      runner()
+        .then((val) => {
+          if (_mounted) {
+            setValue(val)
+            setIsRunning(false)
+            setIsResolved(true)
+          }
+        })
+        .catch((e) => {
+          console.warn(`useAsyncMemo() exception:`, e)
+          if (_mounted) {
+            setValue(errorValue)
+            setIsRunning(false)
+            setIsResolved(false)
+            setIsError(true)
+          }
+        })
     }
     return () => {
       _mounted = false
