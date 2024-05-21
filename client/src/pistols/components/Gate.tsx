@@ -12,7 +12,7 @@ import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { LordsBagIcon } from '@/pistols/components/account/Balance'
 import { Divider } from '@/lib/ui/Divider'
 import { feltToString } from '@/lib/utils/starknet'
-import { CHAIN_ID } from '@/lib/dojo/setup/chains'
+import { ChainId } from '@/lib/dojo/setup/chains'
 import OnboardingModal from '@/pistols/components/account/OnboardingModal'
 import WalletHeader from '@/pistols/components/account/WalletHeader'
 import Logo from '@/pistols/components/Logo'
@@ -111,7 +111,7 @@ function ChainSwitcher({
     >
       <Dropdown.Menu>
         {chains.map(chain => (
-          <Dropdown.Item key={chain.name} onClick={() => { selectChainId(feltToString(chain.id) as CHAIN_ID) }}>{chain.name}</Dropdown.Item>
+          <Dropdown.Item key={chain.name} onClick={() => { selectChainId(feltToString(chain.id) as ChainId) }}>{chain.name}</Dropdown.Item>
         ))}
       </Dropdown.Menu>
     </Dropdown>

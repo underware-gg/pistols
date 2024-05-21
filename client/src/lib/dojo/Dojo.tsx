@@ -3,14 +3,14 @@ import { StarknetProvider, useStarknetContext } from '@/lib/dojo/StarknetProvide
 import { DojoProvider } from '@/lib/dojo/DojoContext'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { useSetup } from '@/lib/dojo/setup/useSetup'
-import { CHAIN_ID } from '@/lib/dojo/setup/chainConfig'
+import { ChainId } from '@/lib/dojo/setup/chains'
 import { useAccount } from '@starknet-react/core'
 import { Account } from 'starknet'
 
 export interface DojoAppConfig {
   mainSystemName: string
-  supportedChainIds: CHAIN_ID[]
-  initialChainId: CHAIN_ID
+  supportedChainIds: ChainId[]
+  initialChainId: ChainId
   manifests: { [chain_id: string]: any | undefined }
 }
 

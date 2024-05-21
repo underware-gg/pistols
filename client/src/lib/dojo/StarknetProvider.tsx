@@ -1,5 +1,5 @@
 import React, { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { CHAIN_ID, DojoChainConfig, getDojoChainConfig, getStarknetProviderChains, isChainIdSupported } from '@/lib/dojo/setup/chainConfig'
+import { ChainId, DojoChainConfig, getDojoChainConfig, getStarknetProviderChains, isChainIdSupported } from '@/lib/dojo/setup/chainConfig'
 import { StarknetConfig, argent, braavos, injected, jsonRpcProvider, useInjectedConnectors } from '@starknet-react/core'
 import { DojoPredeployedStarknetWindowObject, DojoBurnerStarknetWindowObject } from '@dojoengine/create-burner'
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
@@ -7,10 +7,10 @@ import { Chain } from '@starknet-react/chains'
 
 
 interface StarknetContextType {
-  supportedChainIds: CHAIN_ID[],
-  selectedChainId: CHAIN_ID
+  supportedChainIds: ChainId[],
+  selectedChainId: ChainId
   selectedChainConfig: DojoChainConfig
-  selectChainId: (chainId: CHAIN_ID) => void
+  selectChainId: (chainId: ChainId) => void
   isKatana: boolean
   chains: Chain[]
 }
@@ -32,7 +32,7 @@ export const StarknetProvider = ({
   //
   const intialChainId = useMemo(() => {
     // connect to last
-    const lastSelectedChainId = (typeof window !== 'undefined' ? window?.localStorage?.getItem('lastSelectedChainId') : undefined) as CHAIN_ID
+    const lastSelectedChainId = (typeof window !== 'undefined' ? window?.localStorage?.getItem('lastSelectedChainId') : undefined) as ChainId
     if (isChainIdSupported(lastSelectedChainId)) {
       return lastSelectedChainId
     }
@@ -44,12 +44,12 @@ export const StarknetProvider = ({
   //
   // Current chain
   //
-  const [selectedChainId, setSelectedChainId] = useState<CHAIN_ID>(intialChainId)
+  const [selectedChainId, setSelectedChainId] = useState<ChainId>(intialChainId)
   const [selectedChainConfig, setSelectedChain] = useState<DojoChainConfig>(getDojoChainConfig(intialChainId))
   const isKatana = useMemo(() => selectedChainConfig?.chain?.network === 'katana', [selectedChainConfig])
   useEffect(() => console.log(`Selected chain:`, selectedChainId, selectedChainConfig), [selectedChainConfig])
 
-  const selectChainId = useCallback((chainId: CHAIN_ID) => {
+  const selectChainId = useCallback((chainId: ChainId) => {
     if (!isChainIdSupported(chainId)) {
       throw `selectChainId() Invalid chain [${chainId}]`
     }

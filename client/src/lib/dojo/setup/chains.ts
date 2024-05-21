@@ -17,7 +17,7 @@ import { supportedConnetorIds } from './connectors'
 // supported chain ids
 //
 
-export enum CHAIN_ID {
+export enum ChainId {
   SN_MAINNET = 'SN_MAINNET',
   SN_SEPOLIA = 'SN_SEPOLIA',
   KATANA_LOCAL = 'KATANA_LOCAL',
@@ -56,7 +56,7 @@ const WORLD_EXPLORER: ChainExplorers = {
 //
 export type DojoChainConfig = {
   chain: Chain
-  chainId: CHAIN_ID
+  chainId: ChainId
   name: string
   rpcUrl: string
   toriiUrl: string
@@ -98,7 +98,7 @@ export const envChainConfig: DojoChainConfig = {
 
 const localKatanaConfig: DojoChainConfig = {
   chain: undefined, // derive from this
-  chainId: CHAIN_ID.KATANA_LOCAL,
+  chainId: ChainId.KATANA_LOCAL,
   name: 'Katana Local',
   rpcUrl: LOCAL_KATANA,
   toriiUrl: 'http://0.0.0.0:8080', //LOCAL_TORII,
@@ -117,7 +117,7 @@ const localKatanaConfig: DojoChainConfig = {
 
 const pistolsSlotConfig: DojoChainConfig = {
   chain: undefined, // derive from this
-  chainId: CHAIN_ID.WP_PISTOLS_SLOT,
+  chainId: ChainId.WP_PISTOLS_SLOT,
   name: 'Slot Testnet (Free)',
   rpcUrl: 'https://api.cartridge.gg/x/pistols-slot/katana',
   toriiUrl: 'https://api.cartridge.gg/x/pistols-slot/torii',
@@ -138,7 +138,7 @@ const pistolsSlotConfig: DojoChainConfig = {
 // https://dev.realms.world/browser-wallets
 const realmsWorldConfig: DojoChainConfig = {
   chain: undefined, // derive from this
-  chainId: CHAIN_ID.KATANA,
+  chainId: ChainId.KATANA,
   name: 'Realms World (Ranked)',
   rpcUrl: 'https://api.cartridge.gg/x/realms/katana',
   toriiUrl: 'https://api.cartridge.gg/x/realms/torii',
@@ -157,7 +157,7 @@ const realmsWorldConfig: DojoChainConfig = {
 
 const snMainnetConfig: DojoChainConfig = {
   chain: mainnet,
-  chainId: CHAIN_ID.SN_MAINNET,
+  chainId: ChainId.SN_MAINNET,
   name: 'Starknet Mainnet',
   rpcUrl: 'https://api.cartridge.gg/rpc/starknet',
   toriiUrl: undefined,
@@ -173,7 +173,7 @@ const snMainnetConfig: DojoChainConfig = {
 
 const snSepoliaConfig: DojoChainConfig = {
   chain: sepolia,
-  chainId: CHAIN_ID.SN_SEPOLIA,
+  chainId: ChainId.SN_SEPOLIA,
   name: 'Starknet Sepolia',
   rpcUrl: 'https://api.cartridge.gg/rpc/starknet-sepolia',
   toriiUrl: undefined,
@@ -192,10 +192,10 @@ const snSepoliaConfig: DojoChainConfig = {
 // Available chains
 //
 
-export const dojoContextConfig: Record<CHAIN_ID, DojoChainConfig> = {
-  [CHAIN_ID.KATANA_LOCAL]: localKatanaConfig,
-  [CHAIN_ID.WP_PISTOLS_SLOT]: pistolsSlotConfig,
-  [CHAIN_ID.KATANA]: realmsWorldConfig,
-  [CHAIN_ID.SN_SEPOLIA]: snSepoliaConfig,
-  [CHAIN_ID.SN_MAINNET]: snMainnetConfig,
+export const dojoContextConfig: Record<ChainId, DojoChainConfig> = {
+  [ChainId.KATANA_LOCAL]: localKatanaConfig,
+  [ChainId.WP_PISTOLS_SLOT]: pistolsSlotConfig,
+  [ChainId.KATANA]: realmsWorldConfig,
+  [ChainId.SN_SEPOLIA]: snSepoliaConfig,
+  [ChainId.SN_MAINNET]: snMainnetConfig,
 }

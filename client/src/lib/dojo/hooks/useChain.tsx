@@ -2,15 +2,15 @@
 import { useCallback, useMemo } from 'react'
 import { SwitchStarknetChainParameter, AddStarknetChainParameters } from 'get-starknet-core'
 import { useAccount } from '@starknet-react/core'
-import { CHAIN_ID, getDojoChainConfig, isChainIdSupported } from '@/lib/dojo/setup/chainConfig'
+import { ChainId, getDojoChainConfig, isChainIdSupported } from '@/lib/dojo/setup/chainConfig'
 import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { feltToString } from '@/lib/utils/starknet'
 import { BigNumberish } from 'starknet'
 
 
-export const useChainConfig = (chain_id: CHAIN_ID | BigNumberish) => {
-  const chainId = useMemo<CHAIN_ID>(() => (
-    ((typeof chain_id === 'string' && !chain_id.startsWith('0x')) ? chain_id : feltToString(chain_id ?? 0n)) as CHAIN_ID
+export const useChainConfig = (chain_id: ChainId | BigNumberish) => {
+  const chainId = useMemo<ChainId>(() => (
+    ((typeof chain_id === 'string' && !chain_id.startsWith('0x')) ? chain_id : feltToString(chain_id ?? 0n)) as ChainId
   ), [chain_id])
   const isSupported = useMemo(() => (isChainIdSupported(chainId)), [chainId])
   const chainConfig = useMemo(() => (getDojoChainConfig(chainId) ?? null), [chainId])

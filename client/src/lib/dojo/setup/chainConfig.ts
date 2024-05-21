@@ -2,21 +2,21 @@ import { Chain } from '@starknet-react/chains'
 import { PredeployedAccount } from '@dojoengine/create-burner'
 import { stringToFelt } from '@/lib/utils/starknet'
 import {
-  CHAIN_ID,
+  ChainId,
   DojoChainConfig,
   dojoContextConfig,
   envChainConfig,
 } from './chains'
 
-export { CHAIN_ID, type DojoChainConfig }
+export { ChainId, type DojoChainConfig }
 
-export const defaultChainId = (process.env.NEXT_PUBLIC_CHAIN_ID || undefined) as CHAIN_ID
+export const defaultChainId = (process.env.NEXT_PUBLIC_CHAIN_ID || undefined) as ChainId
 
-export const isChainIdSupported = (chainId: CHAIN_ID): boolean => {
+export const isChainIdSupported = (chainId: ChainId): boolean => {
   return Object.keys(dojoContextConfig).includes(chainId)
 }
 
-export const getDojoChainConfig = (chainId: CHAIN_ID): DojoChainConfig => {
+export const getDojoChainConfig = (chainId: ChainId): DojoChainConfig => {
   if (!isChainIdSupported(chainId)) {
     return null
   }
@@ -58,7 +58,7 @@ export const getDojoChainConfig = (chainId: CHAIN_ID): DojoChainConfig => {
   return result
 }
 
-export const getStarknetProviderChains = (supportedChainIds: CHAIN_ID[]): Chain[] => {
+export const getStarknetProviderChains = (supportedChainIds: ChainId[]): Chain[] => {
   return supportedChainIds.reduce((acc, chainId) => {
     const dojoChainConfig = getDojoChainConfig(chainId)
     if (dojoChainConfig?.chain) {
@@ -68,7 +68,7 @@ export const getStarknetProviderChains = (supportedChainIds: CHAIN_ID[]): Chain[
   }, [])
 }
 
-export const getChainMasterAccount = (chainId: CHAIN_ID): PredeployedAccount => {
+export const getChainMasterAccount = (chainId: ChainId): PredeployedAccount => {
   const dojoChainConfig = dojoContextConfig[chainId]
   if (dojoChainConfig?.masterAddress && dojoChainConfig?.masterPrivateKey) {
     return {
