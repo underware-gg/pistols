@@ -8,8 +8,8 @@ mod constants {
     const DOUBLE_DAMAGE: u8 = 2;
     const SINGLE_DAMAGE: u8 = 1;
 
-    const HASH_SALT_MASK: u256 = 0xffffffffffffffff; // 64 bits
-    // const HASH_SALT_MASK: u256 = 0x1fffffffffffff;   // 53 bits (Number.MAX_SAFE_INTEGER, 9007199254740991)
+    // const HASH_SALT_MASK: u256 = 0xffffffffffffffff; // 64 bits
+    const HASH_SALT_MASK: u256 = 0x1fffffffffffff;   // 53 bits (Number.MAX_SAFE_INTEGER, 9007199254740991)
 
     const ETH_TO_WEI: u256 = 1_000_000_000_000_000_000;
 }
