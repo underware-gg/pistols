@@ -46,6 +46,13 @@ export const useDuelist = (address: BigNumberish) => {
   const honourAndTotal = useMemo(() => (total_duels > 0 && honour > 0 ? <>{honour.toFixed(1)}<span className='Smaller'>/{total_duels}</span></> : '—'), [honour, total_duels])
   const winRatio = useMemo(() => (total_duels > 0 ? (total_wins / total_duels) : null), [total_wins, total_duels])
 
+  const level_villain = useMemo(() => (parseFloat((duelist?.score?.level_villain ?? 0)) / 10.0), [duelist, total_duels])
+  const level_trickster = useMemo(() => (parseFloat((duelist?.score?.level_trickster ?? 0)) / 10.0), [duelist, total_duels])
+  const level_lord = useMemo(() => (parseFloat((duelist?.score?.level_lord ?? 0)) / 10.0), [duelist, total_duels])
+  const level = useMemo(() => Math.max(level_villain, level_trickster, level_lord), [level_villain, level_trickster, level_lord])
+  const levelDisplay = useMemo(() => (total_duels > 0 && level > 0 ? level.toFixed(1) : '—'), [level, total_duels])
+  const levelAndTotal = useMemo(() => (total_duels > 0 && level > 0 ? <>{level.toFixed(1)}<span className='Smaller'>/{total_duels}</span></> : '—'), [level, total_duels])
+
   return {
     address,
     name,
@@ -57,6 +64,15 @@ export const useDuelist = (address: BigNumberish) => {
     total_losses,
     total_draws,
     total_honour,
+    level_villain,
+    level_trickster,
+    level_lord,
+    level,
+    levelDisplay,
+    levelAndTotal,
+    is_villain: (level_villain > 0),
+    is_trickster: (level_trickster > 0),
+    is_lord: (level_lord > 0),
     honour,
     honourDisplay,
     honourAndTotal,

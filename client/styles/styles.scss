@@ -1193,6 +1193,7 @@ $table-bg-color: rgba($color-darkest, 0.6);
   background-color: rgba($color-darkest, 1);
   color: $color-brightest!important;
   font-size: 0.9em!important;
+  padding: 0.8em 0.2em;
 }
 .ui.sortable.table thead th.sorted,
 .ui.sortable.table thead th:hover {
@@ -1218,7 +1219,7 @@ td {
 }
 .ui.table td {
   @extend .TableCell;
-  padding: 0.5em;
+  padding: 0.2em 0.4em;
 }
 .ui.selectable.table tbody tr:hover {
   color: $color-text!important;

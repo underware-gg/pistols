@@ -12,9 +12,8 @@ import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/But
 import { WagerAndOrFees } from '@/pistols/components/account/LordsBalance'
 import { ChallengeState, makeDuelUrl } from '@/pistols/utils/pistols'
 import { DuelIconsAsGrid } from '@/pistols/components/DuelIcons'
+import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { bigintEquals } from '@/lib/utils/types'
-import { ChallengeTime } from './ChallengeTime'
 import { Divider } from '@/lib/ui/Divider'
 
 const Row = Grid.Row
@@ -61,16 +60,17 @@ export default function ChallengeModal() {
     >
       <Modal.Header>
         <Grid>
-          <Row columns={'equal'}>
-            <Col textAlign='left'>
+          <Row>
+            <Col width={4} textAlign='left'>
               Challenge
             </Col>
-            <Col textAlign='center'>
+            <Col width={8} textAlign='center'>
               <span className='Code'><ChallengeTime duelId={duelId} prefixed /></span>
-              &nbsp;
+            </Col>
+            <Col width={1} textAlign='right'>
               <Icon className='Anchor IconClick' name='database' size={'small'} onClick={() => window?.open(`/dueldata/${duelId}`, '_blank')} />
             </Col>
-            <Col textAlign='right'>
+            <Col width={3} textAlign='right'>
               <AddressShort address={duelId} />
             </Col>
           </Row>

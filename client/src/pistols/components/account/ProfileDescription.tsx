@@ -2,13 +2,9 @@ import React, { useMemo } from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { WagerBalance, LockedWagerBalance } from '@/pistols/components/account/LordsBalance'
-import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { bigintEquals } from '@/lib/utils/types'
 import { EMOJI } from '@/pistols/data/messages'
-import { tables } from '@/pistols/utils/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -17,10 +13,15 @@ export function ProfileName({
   address,
   badges = true,
 }) {
-  const { name, honour } = useDuelist(address)
-  const _badges = useMemo(() => (badges && honour > 9.0 ? ` ${EMOJI.LORD}` : null), [honour])
+  const { name, honour, is_villain, is_trickster, is_lord } = useDuelist(address)
+  const _badge = useMemo(() => (badges ? (
+    is_villain ? EMOJI.VILLAIN :
+      is_trickster ? EMOJI.TRICKSTER :
+        is_lord ? EMOJI.LORD
+          : null
+  ) : null), [honour])
   return (
-    <span className='BreakWord'>{name}{_badges}</span>
+    <span className='BreakWord'>{name} {_badge}</span>
   )
 }
 
@@ -31,17 +32,25 @@ export function ProfileDescription({
   displayBalance = false,
 }) {
   const { tableId } = useSettingsContext()
-  const { total_wins, total_losses, total_draws, total_duels, total_honour, honourAndTotal } = useDuelist(address)
+  const {
+    total_wins, total_losses, total_draws, total_duels, total_honour, honourAndTotal,
+    is_villain, is_trickster, is_lord, levelDisplay, levelAndTotal,
+  } = useDuelist(address)
   // const { accountAddress } = useDojoAccount()
   // const isYou = useMemo(() => bigintEquals(address, accountAddress), [address, accountAddress])
   return (
-    <Grid columns='equal'>
+    <Grid>
       <Row>
 
-        <Col>
-          <h1 className='NoMargin'><ProfileName address={address} /></h1>
+        <Col width={displayStats ? 12 : 16}>
+          <h1 className='NoMargin'><ProfileName address={address} badges={false}/></h1>
           {displayAddress && <AddressShort address={address} />}
-          <h3 className='Important NoMargin'>Honour: {honourAndTotal}</h3>
+          <h3 className='Important NoMargin'>
+            Honour: {honourAndTotal}
+            {is_villain && <> {EMOJI.VILLAIN} {levelDisplay}</>}
+            {is_trickster && <> {EMOJI.TRICKSTER} {levelDisplay}</>}
+            {is_lord && <> {EMOJI.LORD} {levelDisplay}</>}
+          </h3>
           {displayBalance && <>
             <WagerBalance tableId={tableId} address={address} big />
             <LockedWagerBalance tableId={tableId} address={address} clean />
@@ -50,7 +59,7 @@ export function ProfileDescription({
         </Col>
 
         {displayStats && total_duels > 0 &&
-          <Col className='ProfileStats PaddedRight TitleCase' textAlign='right'>
+          <Col width={4} className='ProfileStats PaddedRight TitleCase' textAlign='right'>
             Duels: <span className='Bold'>{total_duels}</span>
             <br />
             Wins: <span className='Bold'>{total_wins}</span>
