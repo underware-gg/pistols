@@ -222,7 +222,7 @@ function DuelItem({
         }
       </Cell>
 
-      <Cell textAlign='center'>
+      <Cell textAlign='center' style={{ minWidth: '90px' }}>
         <PositiveResult warning={isDraw} canceled={isCanceled || isExpired}>
           <ChallengeTime duelId={duelId} />
         </PositiveResult>

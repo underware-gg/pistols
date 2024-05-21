@@ -187,6 +187,9 @@ canvas {
 .Block { display: inline-block; }
 .Flex { display: flex; }
 
+.Overflow { overflow: hidden; } // do not expand parent
+.BreakWord { word-wrap:break-word!important; overflow-wrap: break-word!important; }
+
 .NoMouse { pointer-events: none; }
 .YesMouse { pointer-events: auto; }
 

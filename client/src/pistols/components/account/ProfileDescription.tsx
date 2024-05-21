@@ -20,7 +20,7 @@ export function ProfileName({
   const { name, honour } = useDuelist(address)
   const _badges = useMemo(() => (badges && honour > 9.0 ? ` ${EMOJI.LORD}` : null), [honour])
   return (
-    <span>{name}{_badges}</span>
+    <span className='BreakWord'>{name}{_badges}</span>
   )
 }
 

@@ -85,7 +85,7 @@ export function DuelistTable() {
   const isEmpty = (sortedRows.length == 0)
 
   return (
-    <Table selectable sortable={!isEmpty} className='Faded' color='orange'>
+    <Table selectable sortable={!isEmpty} className='Faded' color='orange' style={{ maxWidth: '100%' }}>
       <Table.Header className='TableHeader'>
         <Table.Row textAlign='center' verticalAlign='middle'>
           <HeaderCell width={1}></HeaderCell>
@@ -144,7 +144,7 @@ function DuelistItem({
         <ProfilePicSquare profilePic={profilePic} small />
       </Cell>
 
-      <Cell textAlign='left'>
+      <Cell textAlign='left' style={{ maxWidth: '175px' }}>
         <h4 className='NoMargin'><ProfileName address={address} /></h4>
         <AddressShort address={address} copyLink={false} />
       </Cell>
