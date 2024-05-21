@@ -193,6 +193,10 @@
         "type": "core::felt252"
       },
       {
+        "name": "table_id",
+        "type": "core::felt252"
+      },
+      {
         "name": "state",
         "type": "core::integer::u8"
       },

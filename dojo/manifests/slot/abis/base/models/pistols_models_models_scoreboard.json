@@ -169,8 +169,8 @@
   },
   {
     "type": "impl",
-    "name": "duelistImpl",
-    "interface_name": "pistols::models::models::Iduelist"
+    "name": "scoreboardImpl",
+    "interface_name": "pistols::models::models::Iscoreboard"
   },
   {
     "type": "struct",
@@ -216,33 +216,47 @@
   },
   {
     "type": "struct",
-    "name": "pistols::models::models::Duelist",
+    "name": "core::integer::u256",
+    "members": [
+      {
+        "name": "low",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "high",
+        "type": "core::integer::u128"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "pistols::models::models::Scoreboard",
     "members": [
       {
         "name": "address",
         "type": "core::starknet::contract_address::ContractAddress"
       },
       {
-        "name": "name",
+        "name": "table_id",
         "type": "core::felt252"
-      },
-      {
-        "name": "profile_pic",
-        "type": "core::integer::u8"
       },
       {
         "name": "score",
         "type": "pistols::models::models::Score"
       },
       {
-        "name": "timestamp",
-        "type": "core::integer::u64"
+        "name": "wager_won",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "wager_lost",
+        "type": "core::integer::u256"
       }
     ]
   },
   {
     "type": "interface",
-    "name": "pistols::models::models::Iduelist",
+    "name": "pistols::models::models::Iscoreboard",
     "items": [
       {
         "type": "function",
@@ -250,7 +264,7 @@
         "inputs": [
           {
             "name": "model",
-            "type": "pistols::models::models::Duelist"
+            "type": "pistols::models::models::Scoreboard"
           }
         ],
         "outputs": [],
@@ -260,7 +274,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::models::models::duelist::Event",
+    "name": "pistols::models::models::scoreboard::Event",
     "kind": "enum",
     "variants": []
   }

@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x59e9c67b9f7ce3c6b9af6cecb76a29ab88d7a292aeea33171cd6573d8562179"
-original_class_hash = "0x59e9c67b9f7ce3c6b9af6cecb76a29ab88d7a292aeea33171cd6573d8562179"
+class_hash = "0x2932ab31209ea10efe20e131e751edb29a26d24363a4c06e10a43846d88a21c"
+original_class_hash = "0x2932ab31209ea10efe20e131e751edb29a26d24363a4c06e10a43846d88a21c"
 abi = "manifests/slot/abis/base/models/pistols_models_models_duelist.json"
 name = "pistols::models::models::duelist"
 
@@ -20,33 +20,8 @@ type = "u8"
 key = false
 
 [[members]]
-name = "total_duels"
-type = "u16"
-key = false
-
-[[members]]
-name = "total_wins"
-type = "u16"
-key = false
-
-[[members]]
-name = "total_losses"
-type = "u16"
-key = false
-
-[[members]]
-name = "total_draws"
-type = "u16"
-key = false
-
-[[members]]
-name = "total_honour"
-type = "u32"
-key = false
-
-[[members]]
-name = "honour"
-type = "u8"
+name = "score"
+type = "Score"
 key = false
 
 [[members]]

@@ -174,18 +174,22 @@
   },
   {
     "type": "struct",
-    "name": "pistols::models::models::Duelist",
+    "name": "pistols::models::models::Score",
     "members": [
       {
-        "name": "address",
-        "type": "core::starknet::contract_address::ContractAddress"
+        "name": "honour",
+        "type": "core::integer::u8"
       },
       {
-        "name": "name",
-        "type": "core::felt252"
+        "name": "level_villain",
+        "type": "core::integer::u8"
       },
       {
-        "name": "profile_pic",
+        "name": "level_trickster",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "level_lord",
         "type": "core::integer::u8"
       },
       {
@@ -207,10 +211,28 @@
       {
         "name": "total_honour",
         "type": "core::integer::u32"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "pistols::models::models::Duelist",
+    "members": [
+      {
+        "name": "address",
+        "type": "core::starknet::contract_address::ContractAddress"
       },
       {
-        "name": "honour",
+        "name": "name",
+        "type": "core::felt252"
+      },
+      {
+        "name": "profile_pic",
         "type": "core::integer::u8"
+      },
+      {
+        "name": "score",
+        "type": "pistols::models::models::Score"
       },
       {
         "name": "timestamp",

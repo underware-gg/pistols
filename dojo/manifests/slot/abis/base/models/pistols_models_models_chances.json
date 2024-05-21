@@ -169,70 +169,46 @@
   },
   {
     "type": "impl",
-    "name": "coinImpl",
-    "interface_name": "pistols::models::coins::Icoin"
+    "name": "chancesImpl",
+    "interface_name": "pistols::models::models::Ichances"
   },
   {
     "type": "struct",
-    "name": "core::integer::u256",
-    "members": [
-      {
-        "name": "low",
-        "type": "core::integer::u128"
-      },
-      {
-        "name": "high",
-        "type": "core::integer::u128"
-      }
-    ]
-  },
-  {
-    "type": "enum",
-    "name": "core::bool",
-    "variants": [
-      {
-        "name": "False",
-        "type": "()"
-      },
-      {
-        "name": "True",
-        "type": "()"
-      }
-    ]
-  },
-  {
-    "type": "struct",
-    "name": "pistols::models::coins::Coin",
+    "name": "pistols::models::models::Chances",
     "members": [
       {
         "name": "key",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "contract_address",
-        "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
-        "name": "description",
         "type": "core::felt252"
       },
       {
-        "name": "fee_min",
-        "type": "core::integer::u256"
-      },
-      {
-        "name": "fee_pct",
+        "name": "crit_chances",
         "type": "core::integer::u8"
       },
       {
-        "name": "enabled",
-        "type": "core::bool"
+        "name": "crit_bonus",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "hit_chances",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "hit_bonus",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "lethal_chances",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "lethal_bonus",
+        "type": "core::integer::u8"
       }
     ]
   },
   {
     "type": "interface",
-    "name": "pistols::models::coins::Icoin",
+    "name": "pistols::models::models::Ichances",
     "items": [
       {
         "type": "function",
@@ -240,7 +216,7 @@
         "inputs": [
           {
             "name": "model",
-            "type": "pistols::models::coins::Coin"
+            "type": "pistols::models::models::Chances"
           }
         ],
         "outputs": [],
@@ -250,7 +226,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::models::coins::coin::Event",
+    "name": "pistols::models::models::chances::Event",
     "kind": "enum",
     "variants": []
   }

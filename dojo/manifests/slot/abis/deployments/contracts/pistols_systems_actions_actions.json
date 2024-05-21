@@ -60,6 +60,74 @@
   },
   {
     "type": "struct",
+    "name": "pistols::models::models::Score",
+    "members": [
+      {
+        "name": "honour",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "level_villain",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "level_trickster",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "level_lord",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "total_duels",
+        "type": "core::integer::u16"
+      },
+      {
+        "name": "total_wins",
+        "type": "core::integer::u16"
+      },
+      {
+        "name": "total_losses",
+        "type": "core::integer::u16"
+      },
+      {
+        "name": "total_draws",
+        "type": "core::integer::u16"
+      },
+      {
+        "name": "total_honour",
+        "type": "core::integer::u32"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "pistols::models::models::Duelist",
+    "members": [
+      {
+        "name": "address",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "name",
+        "type": "core::felt252"
+      },
+      {
+        "name": "profile_pic",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "score",
+        "type": "pistols::models::models::Score"
+      },
+      {
+        "name": "timestamp",
+        "type": "core::integer::u64"
+      }
+    ]
+  },
+  {
+    "type": "struct",
     "name": "core::integer::u256",
     "members": [
       {
@@ -125,6 +193,40 @@
     ]
   },
   {
+    "type": "struct",
+    "name": "pistols::models::models::Chances",
+    "members": [
+      {
+        "name": "key",
+        "type": "core::felt252"
+      },
+      {
+        "name": "crit_chances",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "crit_bonus",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "hit_chances",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "hit_bonus",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "lethal_chances",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "lethal_bonus",
+        "type": "core::integer::u8"
+      }
+    ]
+  },
+  {
     "type": "interface",
     "name": "pistols::systems::actions::IActions",
     "items": [
@@ -141,7 +243,11 @@
             "type": "core::integer::u8"
           }
         ],
-        "outputs": [],
+        "outputs": [
+          {
+            "type": "pistols::models::models::Duelist"
+          }
+        ],
         "state_mutability": "view"
       },
       {
@@ -157,8 +263,8 @@
             "type": "core::felt252"
           },
           {
-            "name": "wager_coin",
-            "type": "core::integer::u8"
+            "name": "table_id",
+            "type": "core::felt252"
           },
           {
             "name": "wager_value",
@@ -289,8 +395,8 @@
         "name": "calc_fee",
         "inputs": [
           {
-            "name": "wager_coin",
-            "type": "core::integer::u8"
+            "name": "table_id",
+            "type": "core::felt252"
           },
           {
             "name": "wager_value",
@@ -306,39 +412,27 @@
       },
       {
         "type": "function",
-        "name": "calc_hit_bonus",
+        "name": "simulate_honour_for_action",
         "inputs": [
           {
             "name": "duelist_address",
             "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "action",
+            "type": "core::integer::u8"
           }
         ],
         "outputs": [
           {
-            "type": "core::integer::u8"
+            "type": "(core::integer::i8, core::integer::u8)"
           }
         ],
         "state_mutability": "view"
       },
       {
         "type": "function",
-        "name": "calc_hit_penalty",
-        "inputs": [
-          {
-            "name": "health",
-            "type": "core::integer::u8"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "core::integer::u8"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "calc_hit_chances",
+        "name": "simulate_chances",
         "inputs": [
           {
             "name": "duelist_address",
@@ -359,83 +453,7 @@
         ],
         "outputs": [
           {
-            "type": "core::integer::u8"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "calc_crit_chances",
-        "inputs": [
-          {
-            "name": "duelist_address",
-            "type": "core::starknet::contract_address::ContractAddress"
-          },
-          {
-            "name": "duel_id",
-            "type": "core::integer::u128"
-          },
-          {
-            "name": "round_number",
-            "type": "core::integer::u8"
-          },
-          {
-            "name": "action",
-            "type": "core::integer::u8"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "core::integer::u8"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "calc_glance_chances",
-        "inputs": [
-          {
-            "name": "duelist_address",
-            "type": "core::starknet::contract_address::ContractAddress"
-          },
-          {
-            "name": "duel_id",
-            "type": "core::integer::u128"
-          },
-          {
-            "name": "round_number",
-            "type": "core::integer::u8"
-          },
-          {
-            "name": "action",
-            "type": "core::integer::u8"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "core::integer::u8"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "calc_honour_for_action",
-        "inputs": [
-          {
-            "name": "duelist_address",
-            "type": "core::starknet::contract_address::ContractAddress"
-          },
-          {
-            "name": "action",
-            "type": "core::integer::u8"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "(core::integer::u8, core::integer::u8)"
+            "type": "pistols::models::models::Chances"
           }
         ],
         "state_mutability": "view"
@@ -543,6 +561,33 @@
   },
   {
     "type": "event",
+    "name": "pistols::types::events::DuelistRegisteredEvent",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "address",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "name",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "profile_pic",
+        "type": "core::integer::u8",
+        "kind": "data"
+      },
+      {
+        "name": "is_new",
+        "type": "core::bool",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
     "name": "pistols::types::events::NewChallengeEvent",
     "kind": "struct",
     "members": [
@@ -592,12 +637,56 @@
   },
   {
     "type": "event",
+    "name": "pistols::types::events::ChallengeResolvedEvent",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "duel_id",
+        "type": "core::integer::u128",
+        "kind": "data"
+      },
+      {
+        "name": "winner_address",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "pistols::types::events::DuelistTurnEvent",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "duel_id",
+        "type": "core::integer::u128",
+        "kind": "data"
+      },
+      {
+        "name": "address",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "round_number",
+        "type": "core::integer::u8",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
     "name": "pistols::systems::actions::actions::Event",
     "kind": "enum",
     "variants": [
       {
         "name": "UpgradeableEvent",
         "type": "dojo::components::upgradeable::upgradeable::Event",
+        "kind": "nested"
+      },
+      {
+        "name": "DuelistRegisteredEvent",
+        "type": "pistols::types::events::DuelistRegisteredEvent",
         "kind": "nested"
       },
       {
@@ -608,6 +697,16 @@
       {
         "name": "ChallengeAcceptedEvent",
         "type": "pistols::types::events::ChallengeAcceptedEvent",
+        "kind": "nested"
+      },
+      {
+        "name": "ChallengeResolvedEvent",
+        "type": "pistols::types::events::ChallengeResolvedEvent",
+        "kind": "nested"
+      },
+      {
+        "name": "DuelistTurnEvent",
+        "type": "pistols::types::events::DuelistTurnEvent",
         "kind": "nested"
       }
     ]

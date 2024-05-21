@@ -169,80 +169,46 @@
   },
   {
     "type": "impl",
-    "name": "duelistImpl",
-    "interface_name": "pistols::models::models::Iduelist"
+    "name": "chancesImpl",
+    "interface_name": "pistols::models::models::Ichances"
   },
   {
     "type": "struct",
-    "name": "pistols::models::models::Score",
+    "name": "pistols::models::models::Chances",
     "members": [
       {
-        "name": "honour",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "level_villain",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "level_trickster",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "level_lord",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "total_duels",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "total_wins",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "total_losses",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "total_draws",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "total_honour",
-        "type": "core::integer::u32"
-      }
-    ]
-  },
-  {
-    "type": "struct",
-    "name": "pistols::models::models::Duelist",
-    "members": [
-      {
-        "name": "address",
-        "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
-        "name": "name",
+        "name": "key",
         "type": "core::felt252"
       },
       {
-        "name": "profile_pic",
+        "name": "crit_chances",
         "type": "core::integer::u8"
       },
       {
-        "name": "score",
-        "type": "pistols::models::models::Score"
+        "name": "crit_bonus",
+        "type": "core::integer::u8"
       },
       {
-        "name": "timestamp",
-        "type": "core::integer::u64"
+        "name": "hit_chances",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "hit_bonus",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "lethal_chances",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "lethal_bonus",
+        "type": "core::integer::u8"
       }
     ]
   },
   {
     "type": "interface",
-    "name": "pistols::models::models::Iduelist",
+    "name": "pistols::models::models::Ichances",
     "items": [
       {
         "type": "function",
@@ -250,7 +216,7 @@
         "inputs": [
           {
             "name": "model",
-            "type": "pistols::models::models::Duelist"
+            "type": "pistols::models::models::Chances"
           }
         ],
         "outputs": [],
@@ -260,7 +226,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::models::models::duelist::Event",
+    "name": "pistols::models::models::chances::Event",
     "kind": "enum",
     "variants": []
   }

@@ -81,7 +81,7 @@
         "name": "initializer",
         "inputs": [],
         "outputs": [],
-        "state_mutability": "view"
+        "state_mutability": "external"
       },
       {
         "type": "function",
@@ -110,7 +110,7 @@
         "name": "faucet",
         "inputs": [],
         "outputs": [],
-        "state_mutability": "view"
+        "state_mutability": "external"
       }
     ]
   },
@@ -282,7 +282,7 @@
             "type": "core::bool"
           }
         ],
-        "state_mutability": "view"
+        "state_mutability": "external"
       },
       {
         "type": "function",
@@ -306,7 +306,7 @@
             "type": "core::bool"
           }
         ],
-        "state_mutability": "view"
+        "state_mutability": "external"
       }
     ]
   },
@@ -357,7 +357,7 @@
             "type": "core::bool"
           }
         ],
-        "state_mutability": "view"
+        "state_mutability": "external"
       }
     ]
   },
@@ -408,7 +408,7 @@
             "type": "core::bool"
           }
         ],
-        "state_mutability": "view"
+        "state_mutability": "external"
       }
     ]
   },

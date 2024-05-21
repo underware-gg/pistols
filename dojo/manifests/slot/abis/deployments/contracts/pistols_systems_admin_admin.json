@@ -114,19 +114,23 @@
   },
   {
     "type": "struct",
-    "name": "pistols::models::coins::Coin",
+    "name": "pistols::models::table::TTable",
     "members": [
       {
-        "name": "key",
-        "type": "core::integer::u8"
+        "name": "table_id",
+        "type": "core::felt252"
+      },
+      {
+        "name": "description",
+        "type": "core::felt252"
       },
       {
         "name": "contract_address",
         "type": "core::starknet::contract_address::ContractAddress"
       },
       {
-        "name": "description",
-        "type": "core::felt252"
+        "name": "wager_min",
+        "type": "core::integer::u256"
       },
       {
         "name": "fee_min",
@@ -137,7 +141,7 @@
         "type": "core::integer::u8"
       },
       {
-        "name": "enabled",
+        "name": "is_open",
         "type": "core::bool"
       }
     ]
@@ -215,11 +219,11 @@
       },
       {
         "type": "function",
-        "name": "set_coin",
+        "name": "set_table",
         "inputs": [
           {
-            "name": "coin_key",
-            "type": "core::integer::u8"
+            "name": "table_id",
+            "type": "core::felt252"
           },
           {
             "name": "contract_address",
@@ -247,11 +251,11 @@
       },
       {
         "type": "function",
-        "name": "enable_coin",
+        "name": "enable_table",
         "inputs": [
           {
-            "name": "coin_key",
-            "type": "core::integer::u8"
+            "name": "table_id",
+            "type": "core::felt252"
           },
           {
             "name": "enabled",
@@ -274,16 +278,16 @@
       },
       {
         "type": "function",
-        "name": "get_coin",
+        "name": "get_table",
         "inputs": [
           {
-            "name": "coin_key",
-            "type": "core::integer::u8"
+            "name": "table_id",
+            "type": "core::felt252"
           }
         ],
         "outputs": [
           {
-            "type": "pistols::models::coins::Coin"
+            "type": "pistols::models::table::TTable"
           }
         ],
         "state_mutability": "view"

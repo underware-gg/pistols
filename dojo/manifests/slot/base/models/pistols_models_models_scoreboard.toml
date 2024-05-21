@@ -1,0 +1,30 @@
+kind = "DojoModel"
+class_hash = "0xddba1cce7b3356afc52ffe8449cb5d116ba9a386da0e3716f7f211a724bc0c"
+original_class_hash = "0xddba1cce7b3356afc52ffe8449cb5d116ba9a386da0e3716f7f211a724bc0c"
+abi = "manifests/slot/abis/base/models/pistols_models_models_scoreboard.json"
+name = "pistols::models::models::scoreboard"
+
+[[members]]
+name = "address"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "table_id"
+type = "felt252"
+key = true
+
+[[members]]
+name = "score"
+type = "Score"
+key = false
+
+[[members]]
+name = "wager_won"
+type = "u256"
+key = false
+
+[[members]]
+name = "wager_lost"
+type = "u256"
+key = false
