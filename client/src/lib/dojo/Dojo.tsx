@@ -9,7 +9,6 @@ import { Account } from 'starknet'
 
 export interface DojoAppConfig {
   mainSystemName: string
-  supportedConnectorIds: string[]
   supportedChainIds: CHAIN_ID[]
   initialChainId: CHAIN_ID
   manifests: { [chain_id: string]: any | undefined }

@@ -53,13 +53,12 @@ function ConnectButtons({
 }: {
   walletHelp: boolean
 }) {
-  const { selectedChainName, selectedChainId } = useSelectedChain()
+  const { selectedChainName, selectedChainConfig } = useSelectedChain()
   const { connect, connectors } = useConnect()
   const { isConnecting } = useAccount()
-  const { setup: { dojoAppConfig } } = useDojo()
 
   let connectorsButtons = useMemo(() => connectors.reduce((acc, connector: Connector) => {
-    if (dojoAppConfig.supportedConnectorIds.includes(connector.id)) {
+    if (selectedChainConfig.connectorIds.includes(connector.id)) {
       acc.push(
         <Button key={connector.id} fluid size='huge' disabled={!connector.available() || isConnecting} onClick={() => connect({ connector })}>
           {connector.name}

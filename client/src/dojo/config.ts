@@ -1,5 +1,4 @@
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
-import { DojoPredeployedStarknetWindowObject, DojoBurnerStarknetWindowObject } from '@dojoengine/create-burner'
 import { defaultChainId, CHAIN_ID } from '@/lib/dojo/setup/chainConfig'
 import manifest_katana from '@/generated/dev/manifest.json'
 import manifest_slot from '@/generated/slot/manifest.json'
@@ -8,17 +7,12 @@ export const makeDojoAppConfig = (): DojoAppConfig => {
 
   const mainSystemName = 'actions'
 
-  const supportedConnectorIds = [
-    // argent().id,
-    // braavos().id,
-    // DojoBurnerStarknetWindowObject.getId(),
-    DojoPredeployedStarknetWindowObject.getId(),
-  ]
-
   const supportedChainIds = [
-    CHAIN_ID.KATANA,
-    CHAIN_ID.WP_PISTOLS_SLOT,
+    // CHAIN_ID.KATANA, // Realms L3
     CHAIN_ID.KATANA_LOCAL,
+    CHAIN_ID.WP_PISTOLS_SLOT,
+    CHAIN_ID.SN_SEPOLIA,
+    // CHAIN_ID.SN_MAINNET,
   ]
 
   const manifests = {
@@ -36,7 +30,6 @@ export const makeDojoAppConfig = (): DojoAppConfig => {
 
   return {
     mainSystemName,
-    supportedConnectorIds,
     supportedChainIds,
     initialChainId,
     manifests,
