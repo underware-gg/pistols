@@ -27,13 +27,27 @@ if [[
   exit 1
 fi
 
+echo "------------------------------------------------------------------------------"
+echo ""
+echo "PROFILE: $PROFILE"
+echo ""
+
+#-----------------
+# build
+#
+if [[ "$PROFILE" != "dev" ]]; then
+  echo "------------------------------------------------------------------------------"
+  echo "Cleaning..."
+  sozo -P $PROFILE clean
+  echo "Building..."
+  sozo -P $PROFILE build
+fi
+
 #-----------------
 # migrate
 #
 echo "------------------------------------------------------------------------------"
 echo "Migrating..."
-echo ""
-echo "PROFILE: $PROFILE"
 # sozo --profile $PROFILE migrate plan --world $WORLD_ADDRESS
 # exit 0
 sozo -P $PROFILE migrate apply --world $WORLD_ADDRESS

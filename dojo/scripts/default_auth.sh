@@ -27,7 +27,7 @@ export ACTIONS_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(
 # Use mocked Lords if lords_address not defined in Scarb
 export LORDS_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.lords_address)
 if [[ -z "$LORDS_ADDRESS" ]]; then
-  echo "* using mock \$LORDS 👑"
+  echo "- using mock \$LORDS 👑"
   export LORDS_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.name == "pistols::mocks::lords_mock::lords_mock" ).address')
   export LORDS_MOCK="Yes"
 fi
@@ -57,12 +57,12 @@ if [[
 fi
 
 # auth ref: https://book.dojoengine.org/toolchain/sozo/world-commands/auth
-echo "* Admin auth..."
+echo "- Admin auth..."
 sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
   Config,$ADMIN_ADDRESS \
   TTable,$ADMIN_ADDRESS
 
-echo "* Game auth..."
+echo "- Game auth..."
 sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
   Duelist,$ACTIONS_ADDRESS \
   Scoreboard,$ACTIONS_ADDRESS \
@@ -74,14 +74,14 @@ sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
 
 # Mocked Lords
 if [[ ! -z "$LORDS_MOCK" ]]; then
-  echo "* Mock Lords auth..."
+  echo "- Mock Lords auth..."
   sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
     ERC20MetadataModel,$LORDS_ADDRESS \
     ERC20BalanceModel,$LORDS_ADDRESS \
     ERC20AllowanceModel,$LORDS_ADDRESS \
     InitializableModel,$LORDS_ADDRESS
 
-  echo "* Initializing Mock Lords..."
+  echo "- Initializing Mock Lords..."
   INITIALIZED=$(sozo --profile $PROFILE call --world $WORLD_ADDRESS $LORDS_ADDRESS is_initialized)
   if [[ $INITIALIZED == *"0x1"* ]]; then
     echo "Already initialized"
@@ -91,7 +91,7 @@ if [[ ! -z "$LORDS_MOCK" ]]; then
 fi
 
 # execute ref: https://book.dojoengine.org/toolchain/sozo/world-commands/execute
-echo "* Initializing Game World..."
+echo "- Initializing Game World..."
 INITIALIZED=$(sozo --profile $PROFILE call --world $WORLD_ADDRESS $ADMIN_ADDRESS is_initialized)
 if [[ $INITIALIZED == *"0x1"* ]]; then
     echo "Already initialized"
@@ -99,4 +99,4 @@ else
   sozo --profile $PROFILE execute --world $WORLD_ADDRESS --wait $ADMIN_ADDRESS initialize --calldata 0x0,0x0,$LORDS_ADDRESS || true
 fi
 
-echo "* All set! 👍"
+echo "--- Auth ok! 👍"
