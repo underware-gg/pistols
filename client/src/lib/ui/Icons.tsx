@@ -74,19 +74,19 @@ export function Tooltip({
 //---------------------------------
 // Info icon + Tooltip
 //
-interface InfoIconProps {
+interface IconInfoProps {
   size?: IconSizeProp
   content: string | typeof PopupContent
   header: typeof PopupHeader
 }
-export function InfoIcon({
+export function IconInfo({
   size = null, // normal size
   header = null,
   content = 'gabba bagga hey',
-}: InfoIconProps) {
+}: IconInfoProps) {
   return (
     <Tooltip header={header} content={content}>
-      <Icon name='info circle' size={size} className='InfoIcon' />
+      <Icon name='info circle' size={size} className='IconClick' />
     </Tooltip>
   )
 }
@@ -108,7 +108,7 @@ export function CopyIcon({
     navigator?.clipboard?.writeText(content)
   }
   return (
-    <Icon className='Anchor InfoIcon IconClick' name='copy' size={size} onClick={() => _copy()} />
+    <Icon className='Anchor IconClick' name='copy' size={size} onClick={() => _copy()} />
   )
 }
 
@@ -253,11 +253,12 @@ export function CustomIcon({
       MaskImage: `url(${_url})`,
       backgroundColor: null,
     }
-    let classNames = ['CustomIcon', 'icon', size]
+    let classNames = [className ?? '', 'CustomIcon', 'icon', size]
     if (disabled) classNames.push('disabled')
     if (flipped) classNames.push('flipped')
     if (onClick) {
       classNames.push('IconLink')
+      classNames.push('IconClick')
     } else {
       _style.backgroundColor = color
     }

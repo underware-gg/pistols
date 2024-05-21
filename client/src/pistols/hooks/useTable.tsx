@@ -1,4 +1,5 @@
 import { useComponentValue } from '@dojoengine/react'
+import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { useERC20Balance } from '@/lib/utils/hooks/useERC20'
 import { bigintToEntity } from '@/lib/utils/types'
@@ -16,6 +17,11 @@ export const useTable = (tableId: string) => {
     feePct: table?.fee_pct ?? null,
     isOpen: table?.is_open ?? false,
   }
+}
+
+export const useCurrentTable = () => {
+  const { tableId } = useSettingsContext()
+  return useTable(tableId);
 }
 
 export const useTableBalance = (tableId: string, address: BigNumberish, fee: BigNumberish = 0n) => {

@@ -1,6 +1,6 @@
 import React from 'react'
 import { TavernAudios } from '@/pistols/components/GameContainer'
-import { MenuTavern } from '@/pistols/components/Menus'
+import { TavernMenu } from '@/pistols/components/TavernMenu'
 import PlayerSwitcher from '@/pistols/components/PlayerSwitcher'
 import ConnectionDetector from './account/ConnectionDetector'
 import ChallengeModal from '@/pistols/components/ChallengeModal'
@@ -10,7 +10,7 @@ export default function Tavern() {
   return (
     <>
       <div className='UIContainerTavern'>
-        <MenuTavern />
+        <TavernMenu />
       </div>
 
       <PlayerSwitcher />

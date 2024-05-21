@@ -167,7 +167,12 @@ export function SettingsIcon({
   const _switch = () => {
     dispatchSetting(settingsKey, !value)
   }
-  return <CustomIcon icon={icon} name={value ? nameOn : nameOff} onClick={() => _switch()} />
+  return (
+    <CustomIcon
+      // className='IconClick'
+      icon={icon} name={value ? nameOn : nameOff} onClick={() => _switch()} size='large'
+    />
+  )
 }
 
 export function MusicToggle() {
