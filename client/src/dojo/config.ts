@@ -24,7 +24,7 @@ export const makeDojoAppConfig = (): DojoAppConfig => {
   const manifests = {
     [CHAIN_ID.KATANA_LOCAL]: manifest_katana,
     [CHAIN_ID.WP_PISTOLS_SLOT]: manifest_slot,
-    [CHAIN_ID.KATANA]: null,
+    [CHAIN_ID.KATANA]: null, // Realms
   }
 
   const initialChainId = (defaultChainId || (
