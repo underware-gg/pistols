@@ -402,6 +402,7 @@ fn _average_trickster(bonus: u8, current_level_trickster: u8) -> u8 {
 
 // crit bonus will be applied for Lords only
 fn calc_crit_chances(attacker: Score, defender: Score, attack: Action, defense: Action, health: u8) -> u8 {
+    if (attack == Action::Idle) { return 0; }
     (_apply_chance_bonus_penalty(
         attack.crit_chance(),
         calc_crit_bonus(attacker) + calc_match_crit_bonus(attacker, attack, defense),
@@ -411,6 +412,7 @@ fn calc_crit_chances(attacker: Score, defender: Score, attack: Action, defense: 
 // Hit chances will be applied to Villains only
 // Both Hit and Lethal go up/down with same bonus/penalty
 fn calc_hit_chances(attacker: Score, defender: Score, action: Action, health: u8) -> u8 {
+    if (action == Action::Idle) { return 0; }
     (_apply_chance_bonus_penalty(
         action.hit_chance(),
         calc_lethal_bonus(attacker),
@@ -418,6 +420,7 @@ fn calc_hit_chances(attacker: Score, defender: Score, action: Action, health: u8
     ))
 }
 fn calc_lethal_chances(attacker: Score, defender: Score, action: Action, health: u8) -> u8 {
+    if (action == Action::Idle) { return 0; }
     (_apply_chance_bonus_penalty(
         action.lethal_chance(),
         calc_lethal_bonus(attacker),
