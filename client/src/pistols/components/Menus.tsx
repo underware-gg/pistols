@@ -81,66 +81,68 @@ function MenuDebugTriggers() {
     gameImpl?.animateDuel(AnimationState.Round2, bladeA, bladeB, healthA, healthB, healthA, healthB)
   }
 
+  const className = 'PaddedHalf Important ResetSize'
+
   return (
     <>
       <div className='MenuBottom AlignCenter' style={{ bottom: '120px' }}>
         <Menu secondary compact>
-          <Menu.Item className='NoPadding' onClick={() => _paces(1, 1, 0, 0)}>
+          <Menu.Item className={className} onClick={() => _paces(1, 1, 0, 0)}>
             1_1:DD
           </Menu.Item>
-          <Menu.Item className='NoPadding' onClick={() => _paces(5, 5, 0, 0)}>
+          <Menu.Item className={className} onClick={() => _paces(5, 5, 0, 0)}>
             5_5:DD
           </Menu.Item>
-          <Menu.Item className='NoPadding' onClick={() => _paces(10, 10, 0, 0)}>
+          <Menu.Item className={className} onClick={() => _paces(10, 10, 0, 0)}>
             10_10:DD
           </Menu.Item>
 
-          <Menu.Item className='NoPadding' onClick={() => _paces(4, 4, 100, 100)}>
+          <Menu.Item className={className} onClick={() => _paces(4, 4, 100, 100)}>
             44:AA
           </Menu.Item>
-          <Menu.Item className='NoPadding' onClick={() => _paces(4, 4, 50, 50)}>
+          <Menu.Item className={className} onClick={() => _paces(4, 4, 50, 50)}>
             44:II
           </Menu.Item>
 
-          <Menu.Item className='NoPadding' onClick={() => _paces(4, 4, 50, 0)}>
+          <Menu.Item className={className} onClick={() => _paces(4, 4, 50, 0)}>
             44:ID
           </Menu.Item>
-          <Menu.Item className='NoPadding' onClick={() => _paces(4, 4, 0, 50)}>
+          <Menu.Item className={className} onClick={() => _paces(4, 4, 0, 50)}>
             44:DI
           </Menu.Item>
 
-          <Menu.Item className='NoPadding' onClick={() => _paces(4, 5, 50, 100)}>
+          <Menu.Item className={className} onClick={() => _paces(4, 5, 50, 100)}>
             45:IA
           </Menu.Item>
-          <Menu.Item className='NoPadding' onClick={() => _paces(5, 4, 100, 50)}>
+          <Menu.Item className={className} onClick={() => _paces(5, 4, 100, 50)}>
             54:AI
           </Menu.Item>
 
-          <Menu.Item className='NoPadding' onClick={() => _paces(4, 5, 0, 100)}>
+          <Menu.Item className={className} onClick={() => _paces(4, 5, 0, 100)}>
             45:DA
           </Menu.Item>
-          <Menu.Item className='NoPadding' onClick={() => _paces(5, 4, 100, 0)}>
+          <Menu.Item className={className} onClick={() => _paces(5, 4, 100, 0)}>
             54:AD
           </Menu.Item>
 
-          <Menu.Item className='NoPadding' onClick={() => _paces(4, 5, 100, 0)}>
+          <Menu.Item className={className} onClick={() => _paces(4, 5, 100, 0)}>
             45:AD
           </Menu.Item>
-          <Menu.Item className='NoPadding' onClick={() => _paces(5, 4, 0, 100)}>
+          <Menu.Item className={className} onClick={() => _paces(5, 4, 0, 100)}>
             54:DA
           </Menu.Item>
 
-          <Menu.Item className='NoPadding' onClick={() => _paces(4, 5, 50, 50)}>
+          <Menu.Item className={className} onClick={() => _paces(4, 5, 50, 50)}>
             45:II
           </Menu.Item>
-          <Menu.Item className='NoPadding' onClick={() => _paces(5, 4, 50, 50)}>
+          <Menu.Item className={className} onClick={() => _paces(5, 4, 50, 50)}>
             54:II
           </Menu.Item>
 
-          <Menu.Item className='NoPadding' onClick={() => _paces(4, 5, 0, 50)}>
+          <Menu.Item className={className} onClick={() => _paces(4, 5, 0, 50)}>
             45:DI
           </Menu.Item>
-          <Menu.Item className='NoPadding' onClick={() => _paces(5, 4, 50, 0)}>
+          <Menu.Item className={className} onClick={() => _paces(5, 4, 50, 0)}>
             54:ID
           </Menu.Item>
 
@@ -150,31 +152,31 @@ function MenuDebugTriggers() {
 
       <div className='MenuBottom AlignCenter' style={{ bottom: '150px' }}>
         <Menu secondary compact>
-          <Menu.Item className='NoPadding' onClick={() => _blades(1, 1, 100, 100)}>
+          <Menu.Item className={className} onClick={() => _blades(1, 1, 100, 100)}>
             H_H:AA
           </Menu.Item>
-          <Menu.Item className='NoPadding' onClick={() => _blades(1, 1, 50, 50)}>
+          <Menu.Item className={className} onClick={() => _blades(1, 1, 50, 50)}>
             H_H:II
           </Menu.Item>
-          <Menu.Item className='NoPadding' onClick={() => _blades(1, 1, 0, 0)}>
+          <Menu.Item className={className} onClick={() => _blades(1, 1, 0, 0)}>
             H_H:DD
           </Menu.Item>
-          <Menu.Item className='NoPadding' onClick={() => _blades(1, 1, 100, 50)}>
+          <Menu.Item className={className} onClick={() => _blades(1, 1, 100, 50)}>
             H_H:AI
           </Menu.Item>
-          <Menu.Item className='NoPadding' onClick={() => _blades(1, 1, 50, 100)}>
+          <Menu.Item className={className} onClick={() => _blades(1, 1, 50, 100)}>
             H_H:IA
           </Menu.Item>
-          <Menu.Item className='NoPadding' onClick={() => _blades(1, 1, 100, 0)}>
+          <Menu.Item className={className} onClick={() => _blades(1, 1, 100, 0)}>
             H_H:AD
           </Menu.Item>
-          <Menu.Item className='NoPadding' onClick={() => _blades(1, 1, 0, 100)}>
+          <Menu.Item className={className} onClick={() => _blades(1, 1, 0, 100)}>
             H_H:DA
           </Menu.Item>
-          <Menu.Item className='NoPadding' onClick={() => _blades(1, 1, 50, 0)}>
+          <Menu.Item className={className} onClick={() => _blades(1, 1, 50, 0)}>
             H_H:ID
           </Menu.Item>
-          <Menu.Item className='NoPadding' onClick={() => _blades(1, 1, 0, 50)}>
+          <Menu.Item className={className} onClick={() => _blades(1, 1, 0, 50)}>
             H_H:DI
           </Menu.Item>
         </Menu>
@@ -192,12 +194,14 @@ function MenuDebugActors({
     gameImpl?.playActorAnimation(actorId, key)
   }
 
+  const className = 'PaddedHalf Important Smaller'
+
   const items = useMemo(() => {
     if (!gameImpl) return
     let result = []
     Object.keys(SPRITESHEETS.FEMALE).forEach(key => {
       result.push(
-        <Menu.Item key={key} className='NoPadding' onClick={() => _play(key)}>
+        <Menu.Item key={key} className={className} onClick={() => _play(key)}>
           {actorId}:{key}
         </Menu.Item>
       )

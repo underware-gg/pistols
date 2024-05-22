@@ -4,6 +4,7 @@ import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '../hooks/ThreeJsContext'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
+import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
@@ -11,7 +12,7 @@ import { useWager } from '@/pistols/hooks/useWager'
 import { DuelStage, useAnimatedDuel, useDuel, useDuelResult } from '@/pistols/hooks/useDuel'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
-import { MenuDuel } from '@/pistols/components/Menus'
+import { MenuDebugAnimations, MenuDuel } from '@/pistols/components/Menus'
 import { AnimationState } from '@/pistols/three/game'
 import { EmojiIcon, LoadingIcon } from '@/lib/ui/Icons'
 import { ActionEmojis, ActionTypes } from '../utils/pistols'
@@ -33,6 +34,7 @@ export default function Duel({
   const { accountAddress } = useDojoAccount()
   const { gameImpl } = useThreeJsContext()
   const { animated } = useGameplayContext()
+  const { debugMode } = useSettingsContext()
   const { dispatchSelectDuel } = usePistolsContext()
 
   const { isLive, isFinished, message, duelistA, duelistB } = useChallenge(duelId)
@@ -100,9 +102,7 @@ export default function Duel({
 
       <PlayerSwitcher />
 
-      {/* {process.env.NEXT_PUBLIC_DEBUG &&
-        <MenuDebugAnimations />
-      } */}
+      {debugMode && <MenuDebugAnimations />}
     </>
   )
 }

@@ -235,7 +235,10 @@ canvas {
 }
 
 .Smaller {
-  font-size: 0.7em;
+  font-size: 0.7em!important;
+}
+.ResetSize {
+  font-size: 1.0em!important;
 }
 .Larger {
   font-size: 1.5em!important;
