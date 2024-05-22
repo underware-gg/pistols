@@ -59,11 +59,10 @@ function AccountItem({
   const { select } = useDojoAccount()
 
   const { name, profilePic } = useDuelist(address)
-  const defaultAccountName = useMemo(() => (`Duelist #${accountIndex}`), [accountIndex])
   const isProfiled = Boolean(name)
 
   const burner = useBurner(address)
-  const { isImported } = useBurnerAccount(accountIndex)
+  const { isImported, accountName } = useBurnerAccount(accountIndex)
   const _canPlay = (isImported && isProfiled)
 
   const { accountSetupOpener, dispatchSetAccountIndex, dispatchSetMenu } = usePistolsContext()
@@ -94,7 +93,7 @@ function AccountItem({
           </div>
         </Col>
         <Col width={8} textAlign='left'>
-          <h3>{name ? <ProfileName address={address} /> : defaultAccountName}</h3>
+          <h3>{name ? <ProfileName address={address} /> : accountName}</h3>
           <AddressShort address={address} />
           <h5><LordsBalance address={address} /></h5>
         </Col>

@@ -118,7 +118,7 @@ const localKatanaConfig: DojoChainConfig = {
 const pistolsSlotConfig: DojoChainConfig = {
   chain: undefined, // derive from this
   chainId: ChainId.WP_PISTOLS_SLOT,
-  name: 'Slot Testnet (Free)',
+  name: 'Slot Testnet',
   rpcUrl: 'https://api.cartridge.gg/x/pistols-slot/katana',
   toriiUrl: 'https://api.cartridge.gg/x/pistols-slot/torii',
   relayUrl: undefined,
@@ -174,7 +174,7 @@ const snMainnetConfig: DojoChainConfig = {
 const snSepoliaConfig: DojoChainConfig = {
   chain: sepolia,
   chainId: ChainId.SN_SEPOLIA,
-  name: 'Starknet Sepolia',
+  name: 'Starknet Sepolia Testnet',
   rpcUrl: 'https://api.cartridge.gg/rpc/starknet-sepolia',
   toriiUrl: undefined,
   relayUrl: undefined,

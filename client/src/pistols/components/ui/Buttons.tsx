@@ -95,6 +95,7 @@ export const BalanceRequiredButton = ({
   label,
   tableId,
   wagerValue,
+  minWagerValue,
   fee,
   onClick,
   disabled = false,
@@ -102,19 +103,22 @@ export const BalanceRequiredButton = ({
   label: string
   tableId: string
   wagerValue: BigNumberish
+  minWagerValue?: BigNumberish
   fee: BigNumberish
   onClick: Function
   disabled?: boolean
 }) => {
   const { account } = useDojoAccount()
   const { balance, noFundsForFee } = useTableBalance(tableId, account.address, bigintAdd(wagerValue, fee))
+  const wagerTooLow = (BigInt(minWagerValue ?? 0) > 0n && BigInt(wagerValue) < BigInt(minWagerValue))
+  const canSubmit = !(wagerTooLow || noFundsForFee)
   return (
     <ActionButton fill
       disabled={disabled}
-      important={!noFundsForFee}
-      negative={noFundsForFee}
-      label={noFundsForFee ? 'No Funds!' : label}
-      onClick={() => (noFundsForFee ? {} : onClick())}
+      important={canSubmit}
+      negative={!canSubmit}
+      label={wagerTooLow ? 'Minimum Not Met' : noFundsForFee ? 'No Funds!' : label}
+      onClick={() => (canSubmit ? onClick() : {})}
     />
   )
 }

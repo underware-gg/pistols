@@ -58,6 +58,7 @@ export const useBurnerAccount = (accountIndex: number) => {
   const burner = useMemo(() => (burners[accountIndex] ?? null), [accountIndex, burners])
   const exists = useMemo(() => (burner != null), [burner])
   const address = useMemo(() => (burner?.address ?? null), [burner])
+  const accountName = useMemo(() => (`Duelist #${accountIndex}`), [accountIndex])
 
   useEffect(() => {
     if (address) {
@@ -76,6 +77,7 @@ export const useBurnerAccount = (accountIndex: number) => {
     account: (account ?? null),
     isImported: exists,
     isFunded: (balance > 0n),
+    accountName,
   }
 }
 

@@ -17,6 +17,7 @@ import { WagerAndOrFees } from '@/pistols/components/account/LordsBalance'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { randomArrayElement } from '@/lib/utils/random'
 import { useSettingsContext } from '../hooks/SettingsContext'
+import { useTable } from '../hooks/useTable'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -34,6 +35,7 @@ export default function DuelistModal() {
 
   const wagerValue = useMemo(() => (args?.wager_value ?? 0n), [args])
   const { fee } = useCalcFee(tableId, wagerValue)
+  const { wagerMin } = useTable(tableId)
 
   const isYou = useMemo(() => isThisAccount(duelistAddress), [duelistAddress, isThisAccount])
   const isOpen = useMemo(() => (duelistAddress > 0), [duelistAddress])
@@ -117,7 +119,7 @@ export default function DuelistModal() {
               <Col>
                 {
                   hasPact ? <ActionButton fill important label='Existing Challenge!' onClick={() => dispatchSelectDuel(pactDuelId)} />
-                    : isChallenging ? <BalanceRequiredButton disabled={!args || isSubmitting} label='Submit Challenge!' onClick={() => _challenge()} tableId={tableId} wagerValue={wagerValue} fee={fee} />
+                    : isChallenging ? <BalanceRequiredButton disabled={!args || isSubmitting} label='Submit Challenge!' onClick={() => _challenge()} tableId={tableId} wagerValue={wagerValue} minWagerValue={wagerMin} fee={fee} />
                       : <ActionButton fill disabled={isGuest} label='Challenge for a Duel!' onClick={() => setIsChallenging(true)} />
                 }
               </Col>

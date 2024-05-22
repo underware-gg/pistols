@@ -38,14 +38,9 @@ export function OnboardingProfile({
   const canRegister = useMemo(() => (inputIsValid && account && address), [inputIsValid, account, address])
   // console.log(isUpdated, name, inputValue, profilePic, selectedProfilePic, _profilePic)
 
-  // initialize
-  useEffectOnce(() => {
-    if (inputValue == null) {
-      setInputValue(name ?? '')
-    } else if (inputValue != name) {
-      setInputValue(name)
-    }
-  }, [name, inputValue])
+  useEffect(() => {
+    setInputValue(name ?? '')
+  }, [name])
 
   const _register = () => {
     if (canRegister) {
