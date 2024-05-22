@@ -352,8 +352,8 @@ fn update_score_totals(ref score_a: Score, ref score_b: Score, state: ChallengeS
 fn update_score_honour(ref score: Score, duel_honour: u8) {
     score.total_honour += duel_honour.into();
     score.honour = ((score.total_honour * 10) / score.total_duels.into()).try_into().unwrap();
-    score.level_villain = _average_trickster(calc_level_villain(score.honour), score.level_trickster);
-    score.level_lord = _average_trickster(calc_level_lord(score.honour), score.level_trickster);
+    score.level_villain = calc_level_villain(score.honour);
+    score.level_lord = calc_level_lord(score.honour);
     score.level_trickster = _average_trickster(calc_level_trickster(score.honour, duel_honour), score.level_trickster);
 }
 
@@ -389,10 +389,10 @@ fn calc_level_trickster(honour: u8, duel_honour: u8) -> u8 {
 // for Tricksters: smooth bonuses
 // for (new) Lords and Villains: Do not go straight to zero when a Trickster switch archetype
 #[inline(always)]
-fn _average_trickster(bonus: u8, current_level_trickster: u8) -> u8 {
-    if (current_level_trickster > 0) {
-        ((current_level_trickster + bonus) / 2)
-    } else { (bonus) }
+fn _average_trickster(level: u8, current_level_trickster: u8) -> u8 {
+    if (level > 0 && current_level_trickster > 0) {
+        ((current_level_trickster + level) / 2)
+    } else { (level) }
 }
 
 
