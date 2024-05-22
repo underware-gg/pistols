@@ -13,16 +13,20 @@ export function ProfileName({
   address,
   badges = true,
 }) {
-  const { name, honour, is_villain, is_trickster, is_lord } = useDuelist(address)
-  const _badge = useMemo(() => (badges ? (
-    is_villain ? EMOJI.VILLAIN :
-      is_trickster ? EMOJI.TRICKSTER :
-        is_lord ? EMOJI.LORD
-          : null
-  ) : null), [honour])
+  const { name } = useDuelist(address)
   return (
-    <span className='BreakWord'>{name} {_badge}</span>
+    <span className='BreakWord'>{name} {badges && <ProfileBadge address={address} />}</span>
   )
+}
+
+export function ProfileBadge({
+  address,
+}) {
+  const { is_villain, is_trickster, is_lord } = useDuelist(address)
+  if (is_villain) return <>{EMOJI.VILLAIN}</>
+  if (is_trickster) return <>{EMOJI.TRICKSTER}</>
+  if (is_lord) return <>{EMOJI.LORD}</>
+  return <></>
 }
 
 export function ProfileDescription({

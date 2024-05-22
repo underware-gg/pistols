@@ -11,6 +11,7 @@ import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { bigintToHex } from '@/lib/utils/types'
 import { BigNumberish } from 'starknet'
+import { ProfileName } from './ProfileDescription'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -88,12 +89,12 @@ function AccountItem({
           <div>
             <ProfilePicSquareButton
               profilePic={profilePic ?? 0}
-              onClick={() => _manage()}
+              onClick={() => (_canPlay ? _duel : _manage)()}
             />
           </div>
         </Col>
         <Col width={8} textAlign='left'>
-          <h3>{name ?? defaultAccountName}</h3>
+          <h3>{name ? <ProfileName address={address} /> : defaultAccountName}</h3>
           <AddressShort address={address} />
           <h5><LordsBalance address={address} /></h5>
         </Col>
