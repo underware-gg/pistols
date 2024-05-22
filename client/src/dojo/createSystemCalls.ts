@@ -181,23 +181,49 @@ export function createSystemCalls(
     return results !== null ? results[0] : null
   }
 
-  const simulate_honour_for_action = async (duelist: bigint, action: number): Promise<number | null> => {
+  type simulate_honour_for_action_result = {
+    action_honour: number
+    duelist_honour: number
+  }
+  const simulate_honour_for_action = async (duelist: bigint, action: number): Promise<simulate_honour_for_action_result | null> => {
     const args = [duelist, action]
     const results = await _executeCall(actions_call('simulate_honour_for_action', args))
-    return (results !== null && results[0] >= 0) ? Number(results[0]) : null
+    if (!results) return null
+    const [action_honour, duelist_honour] = results.map((v: bigint) => Number(v > 255n ? -1 : v))
+    console.log(results, action_honour, duelist_honour)
+    return {
+      action_honour,
+      duelist_honour,
+    }
   }
 
-  const simulate_chances = async (duelist: bigint, duel_id: bigint, round_number: number, action): Promise<number | null> => {
+  type simulate_chances_result = {
+    crit_chances: number
+    crit_bonus: number
+    hit_chances: number
+    hit_bonus: number
+    lethal_chances: number
+    lethal_bonus: number
+  }
+  const simulate_chances = async (duelist: bigint, duel_id: bigint, round_number: number, action): Promise<simulate_chances_result | null> => {
     const args = [duelist, duel_id, round_number, action]
     const results = await _executeCall(actions_call('simulate_chances', args))
-    return results !== null ? Number(results[0]) : null
-
-    // calc_hit_bonus,
-    // calc_hit_penalty,
-    // calc_hit_chances,
-    // calc_crit_chances,
-    // calc_lethal_chances,
-
+    if (!results) return null
+    const [key,
+      crit_chances,
+      crit_bonus,
+      hit_chances,
+      hit_bonus,
+      lethal_chances,
+      lethal_bonus] = results.map((v: bigint) => Number(v))
+    return {
+      crit_chances,
+      crit_bonus,
+      hit_chances,
+      hit_bonus,
+      lethal_chances,
+      lethal_bonus,
+    }
   }
 
   const get_valid_packed_actions = async (round_number: number): Promise<number[] | null> => {

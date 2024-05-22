@@ -150,7 +150,7 @@ export const SlotButton = ({
   disabled = false,
 }) => {
   return (
-    <ActionButton fill toggle active={value == blade} disabled={disabled} label={ActionNames[blade]} onClick={() => onClick()} />
+    <ActionButton className='NoSidePadding' fill toggle active={value == blade} disabled={disabled} label={ActionNames[blade]} onClick={() => onClick()} />
   )
 }
 

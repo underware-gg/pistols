@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid, Table, Modal, Icon } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
@@ -42,10 +42,19 @@ export default function ChallengeModal() {
   const isChallenged = useMemo(() => isThisAccount(duelistB), [duelistB, isThisAccount])
   const isYou = (isChallenger || isChallenged)
 
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const _close = () => { dispatchSelectDuel(0n) }
+
   const _reply = (accepted: boolean) => {
-    reply_challenge(account, duelId, accepted)
+    const _submit = async () => {
+      setIsSubmitting(true)
+      await reply_challenge(account, duelId, accepted)
+      setIsSubmitting(false)
+    }
+    _submit()
   }
+
   const _watch = () => {
     router.push(makeDuelUrl(duelId))
   }
@@ -156,17 +165,17 @@ export default function ChallengeModal() {
             </Col>
             {(state == ChallengeState.Awaiting && isChallenger) &&
               <Col>
-                <ActionButton fill label='Cowardly Withdraw' onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
+                <ActionButton fill label='Cowardly Withdraw' disabled={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
               </Col>
             }
             {(state == ChallengeState.Awaiting && isChallenged) &&
               <Col>
-                <ActionButton fill label='Cowardly Refuse' onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
+                <ActionButton fill label='Cowardly Refuse' disabled={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
               </Col>
             }
             {(state == ChallengeState.Awaiting && isChallenged) &&
               <Col>
-                <BalanceRequiredButton label='Accept Challenge!' onClick={() => _reply(true)} tableId={tableId} wagerValue={value} fee={fee} />
+                <BalanceRequiredButton label='Accept Challenge!' disabled={isSubmitting} onClick={() => _reply(true)} tableId={tableId} wagerValue={value} fee={fee} />
               </Col>
             }
             {(state == ChallengeState.InProgress) &&
@@ -181,7 +190,7 @@ export default function ChallengeModal() {
             }
             {(needToSyncExpired && (isChallenger || isChallenged)) &&
               <Col>
-                <ActionButton fill important label='Withdraw Expired Fees' onClick={() => _reply(false)} />
+                <ActionButton fill important label='Withdraw Expired Fees' disabled={isSubmitting} onClick={() => _reply(false)} />
               </Col>
             }
           </Row>

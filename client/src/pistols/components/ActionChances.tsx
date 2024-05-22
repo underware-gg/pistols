@@ -26,7 +26,7 @@ export function ActionChances({
     lethal_chances,
     lethal_bonus,
   } = useSimulateChances(accountAddress, duelId, roundNumber, action)
-  const { honourForAction } = useCalcHonourForAction(accountAddress, action, 0)
+  const { action_honour, duelist_honour } = useCalcHonourForAction(accountAddress, action, 0)
   const { crit_chances: other_crit_chances } = useSimulateChances(isA ? duelistB : duelistA, duelId, roundNumber, Action.Strong)
 
   const executionLabel = useMemo(() => {
@@ -40,14 +40,15 @@ export function ActionChances({
   }, [action])
 
   const _critChances = crit_chances == 100 ? (crit_chances - other_crit_chances) : crit_chances
-  const _honourValue = (honourForAction > 0 ? honourForAction : isA ? round1?.shot_a.honour : isB ? round1?.shot_b.honour : null) ?? 0
-  const _honourWarning = (honourForAction == 10)
-  const _honourNegative = (honourForAction == 1)
+  const _honourValue = (action_honour > 0 ? action_honour : isA ? round1?.shot_a.honour : isB ? round1?.shot_b.honour : null) ?? 0
+  const _honourWarning = (action_honour == 10)
+  const _honourNegative = (action_honour == 1)
+  console.log(`HONOUR:`, action_honour, _honourValue)
   return (
     <>
       <ProgressBar disabled={!action} label={hit_bonus ? <span>{executionLabel} / <span className='Warning'>Bonus</span>:</span> : `${executionLabel}:`} percent={_critChances} includedExtraPercent={hit_bonus} className='ChancesBar' />
       <ProgressBar disabled={!action} label={lethal_chances ? <span>Hit / <span className='Warning'>Lethal</span>:</span> : 'Hit:'} percent={hit_chances} includedInnerPercent={lethal_chances} className='ChancesBar' />
-      <ProgressBar disabled={!action} label='Honour:' value={_honourValue} total={10} className='ChancesBar' warning={_honourWarning} negative={_honourNegative} color={honourForAction == 0 ? 'grey' : null} />
+      <ProgressBar disabled={!action} label='Honour:' value={_honourValue} total={10} className='ChancesBar' warning={_honourWarning} negative={_honourNegative} color={action_honour == 0 ? 'grey' : null} />
 
       <p className=' AlignCenter'>&nbsp;
         {hit_bonus > 0 && <>(Includes Honourable <b>{hit_bonus}%</b> crit bonus)</>}

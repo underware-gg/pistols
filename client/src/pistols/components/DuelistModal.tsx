@@ -16,7 +16,6 @@ import { ChallengeMessages } from '@/pistols/utils/pistols'
 import { WagerAndOrFees } from '@/pistols/components/account/LordsBalance'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { randomArrayElement } from '@/lib/utils/random'
-import { tables } from '@/pistols/utils/constants'
 import { useSettingsContext } from '../hooks/SettingsContext'
 
 const Row = Grid.Row
@@ -31,7 +30,6 @@ export default function DuelistModal() {
   const { duelistAddress, dispatchSelectDuelist, dispatchSelectDuel } = usePistolsContext()
   const { profilePic } = useDuelist(duelistAddress)
   const { hasPact, pactDuelId } = usePact(accountAddress, duelistAddress)
-  const [isChallenging, setIsChallenging] = useState(false)
   const [args, setArgs] = useState(null)
 
   const wagerValue = useMemo(() => (args?.wager_value ?? 0n), [args])
@@ -40,8 +38,12 @@ export default function DuelistModal() {
   const isYou = useMemo(() => isThisAccount(duelistAddress), [duelistAddress, isThisAccount])
   const isOpen = useMemo(() => (duelistAddress > 0), [duelistAddress])
 
+  const [isChallenging, setIsChallenging] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   useEffect(() => {
     setIsChallenging(false)
+    setIsSubmitting(false)
   }, [isOpen])
 
   useEffect(() => {
@@ -58,9 +60,12 @@ export default function DuelistModal() {
     router.push(`/gate`)
   }
   const _challenge = () => {
-    if (args) {
-      create_challenge(account, duelistAddress, args.message, args.table_id, args.wager_value, args.expire_seconds)
+    const _submit = async () => {
+      setIsSubmitting(true)
+      await create_challenge(account, duelistAddress, args.message, args.table_id, args.wager_value, args.expire_seconds)
+      setIsSubmitting(false)
     }
+    if (args) _submit()
   }
 
   return (
@@ -112,7 +117,7 @@ export default function DuelistModal() {
               <Col>
                 {
                   hasPact ? <ActionButton fill important label='Existing Challenge!' onClick={() => dispatchSelectDuel(pactDuelId)} />
-                    : isChallenging ? <BalanceRequiredButton disabled={!args} label='Submit Challenge!' onClick={() => _challenge()} tableId={tableId} wagerValue={wagerValue} fee={fee} />
+                    : isChallenging ? <BalanceRequiredButton disabled={!args || isSubmitting} label='Submit Challenge!' onClick={() => _challenge()} tableId={tableId} wagerValue={wagerValue} fee={fee} />
                       : <ActionButton fill disabled={isGuest} label='Challenge for a Duel!' onClick={() => setIsChallenging(true)} />
                 }
               </Col>

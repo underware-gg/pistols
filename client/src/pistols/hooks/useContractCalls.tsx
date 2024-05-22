@@ -3,8 +3,8 @@ import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { BigNumberish } from 'starknet'
 
 export const useCalcFee = (table_id: string, wager_value: BigNumberish, defaultValue = null) => {
-  const [value, setValue] = useState(defaultValue)
   const { calc_fee } = useDojoSystemCalls()
+  const [value, setValue] = useState(defaultValue)
   useEffect(() => {
     let _mounted = true
     const _get = async () => {
@@ -20,9 +20,9 @@ export const useCalcFee = (table_id: string, wager_value: BigNumberish, defaultV
   }
 }
 
-export const useCalcHonourForAction = (address: BigNumberish, action: number, defaultValue = null) => {
-  const [value, setValue] = useState(defaultValue)
+export const useCalcHonourForAction = (address: BigNumberish, action: number, defaultValue = {}) => {
   const { simulate_honour_for_action } = useDojoSystemCalls()
+  const [value, setValue] = useState(defaultValue)
   useEffect(() => {
     let _mounted = true
     const _get = async () => {
@@ -33,14 +33,12 @@ export const useCalcHonourForAction = (address: BigNumberish, action: number, de
     else setValue(defaultValue)
     return () => { _mounted = false }
   }, [address, action])
-  return {
-    honourForAction: value,
-  }
+  return value as Awaited<ReturnType<typeof simulate_honour_for_action>>
 }
 
-export const useSimulateChances = (address: BigNumberish, duelId: bigint, roundNumber: number, action: number, defaultValue = null) => {
-  const [value, setValue] = useState(defaultValue)
+export const useSimulateChances = (address: BigNumberish, duelId: bigint, roundNumber: number, action: number, defaultValue = {}) => {
   const { simulate_chances } = useDojoSystemCalls()
+  const [value, setValue] = useState<any | null>(defaultValue)
   useEffect(() => {
     let _mounted = true
     const _get = async () => {
@@ -51,9 +49,7 @@ export const useSimulateChances = (address: BigNumberish, duelId: bigint, roundN
     else setValue(defaultValue)
     return () => { _mounted = false }
   }, [address, duelId, roundNumber, action])
-  return {
-    ...value,
-  }
+  return value as Awaited<ReturnType<typeof simulate_chances>>
 }
 
 export const useGetValidPackedActions = (round_number: number, defaultValue = []) => {
