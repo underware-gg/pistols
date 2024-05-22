@@ -1519,7 +1519,7 @@
     {
       "name": "pistols::systems::actions::actions",
       "address": "0x78af18db6887ee0eb2b339f95619e88b65aa47c7025ad42dc81c7be43b631ff",
-      "class_hash": "0x27e6bc638b72e38fe06dc973b77e39b026dcec372ec7084fbfc02e262d52cad",
+      "class_hash": "0x69a73d2cd7ed92dd4e025823a0c45ceeb5bc6732d0544ad76c7a31523d0918",
       "abi": [
         {
           "type": "impl",
@@ -1579,52 +1579,6 @@
           "type": "impl",
           "name": "ActionsImpl",
           "interface_name": "pistols::systems::actions::IActions"
-        },
-        {
-          "type": "struct",
-          "name": "pistols::models::models::Duelist",
-          "members": [
-            {
-              "name": "address",
-              "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
-              "name": "name",
-              "type": "core::felt252"
-            },
-            {
-              "name": "profile_pic",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "total_duels",
-              "type": "core::integer::u16"
-            },
-            {
-              "name": "total_wins",
-              "type": "core::integer::u16"
-            },
-            {
-              "name": "total_losses",
-              "type": "core::integer::u16"
-            },
-            {
-              "name": "total_draws",
-              "type": "core::integer::u16"
-            },
-            {
-              "name": "total_honour",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "honour",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "timestamp",
-              "type": "core::integer::u64"
-            }
-          ]
         },
         {
           "type": "struct",
@@ -1709,11 +1663,7 @@
                   "type": "core::integer::u8"
                 }
               ],
-              "outputs": [
-                {
-                  "type": "pistols::models::models::Duelist"
-                }
-              ],
+              "outputs": [],
               "state_mutability": "view"
             },
             {
@@ -2115,130 +2065,12 @@
         },
         {
           "type": "event",
-          "name": "pistols::types::events::DuelistRegistered",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "address",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "data"
-            },
-            {
-              "name": "name",
-              "type": "core::felt252",
-              "kind": "data"
-            },
-            {
-              "name": "profile_pic",
-              "type": "core::integer::u8",
-              "kind": "data"
-            },
-            {
-              "name": "is_new",
-              "type": "core::bool",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "pistols::types::events::NewChallengeEvent",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "duel_id",
-              "type": "core::integer::u128",
-              "kind": "data"
-            },
-            {
-              "name": "duelist_a",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "data"
-            },
-            {
-              "name": "duelist_b",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "pistols::types::events::ChallengeAcceptedEvent",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "duel_id",
-              "type": "core::integer::u128",
-              "kind": "data"
-            },
-            {
-              "name": "duelist_a",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "data"
-            },
-            {
-              "name": "duelist_b",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "data"
-            },
-            {
-              "name": "accepted",
-              "type": "core::bool",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "pistols::types::events::DuelistTurnEvent",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "duel_id",
-              "type": "core::integer::u128",
-              "kind": "data"
-            },
-            {
-              "name": "address",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "data"
-            },
-            {
-              "name": "round_number",
-              "type": "core::integer::u8",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
           "name": "pistols::systems::actions::actions::Event",
           "kind": "enum",
           "variants": [
             {
               "name": "UpgradeableEvent",
               "type": "dojo::components::upgradeable::upgradeable::Event",
-              "kind": "nested"
-            },
-            {
-              "name": "DuelistRegistered",
-              "type": "pistols::types::events::DuelistRegistered",
-              "kind": "nested"
-            },
-            {
-              "name": "NewChallengeEvent",
-              "type": "pistols::types::events::NewChallengeEvent",
-              "kind": "nested"
-            },
-            {
-              "name": "ChallengeAcceptedEvent",
-              "type": "pistols::types::events::ChallengeAcceptedEvent",
-              "kind": "nested"
-            },
-            {
-              "name": "DuelistTurnEvent",
-              "type": "pistols::types::events::DuelistTurnEvent",
               "kind": "nested"
             }
           ]

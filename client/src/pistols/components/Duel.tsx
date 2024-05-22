@@ -10,7 +10,7 @@ import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
 import { DuelStage, useAnimatedDuel, useDuel, useDuelResult } from '@/pistols/hooks/useDuel'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
-import { MenuDuel } from '@/pistols/components/Menus'
+import { MenuDebugAnimations, MenuDuel } from '@/pistols/components/Menus'
 import { AnimationState } from '@/pistols/three/game'
 import { EmojiIcon, LoadingIcon } from '@/lib/ui/Icons'
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
@@ -94,9 +94,9 @@ export default function Duel({
 
       <MenuDuel duelStage={duelStage} duelId={duelId} />
 
-      {/* {process.env.NEXT_PUBLIC_DEBUG &&
+      {process.env.NEXT_PUBLIC_DEBUG &&
         <MenuDebugAnimations />
-      } */}
+      }
     </>
   )
 }

@@ -13,6 +13,9 @@ export enum TextureName {
   bg_duels_live = 'BG_DUEL',
   bg_duels_past = 'BG_bg_duels_pastDUEL',
   bg_duel = 'bg_duel',
+  duel_ground = 'duel_ground',
+  duel_ground_normal = 'duel_ground_normal',
+  duel_water_dudv = 'duel_water_dudv',
 }
 const TEXTURES: Record<TextureName, { path: string }> = {
   [TextureName.Testcard]: { path: '/textures/testcard.jpg' },
@@ -22,6 +25,9 @@ const TEXTURES: Record<TextureName, { path: string }> = {
   [TextureName.bg_duels_live]: { path: '/images/bg_duels_live.jpg' },
   [TextureName.bg_duels_past]: { path: '/images/bg_duels_past.jpg' },
   [TextureName.bg_duel]: { path: '/images/bg_duel.jpg' },
+  [TextureName.duel_ground]: { path: '/textures/ground.png' },
+  [TextureName.duel_ground_normal]: { path: '/textures/ground_normalmap.png' },
+  [TextureName.duel_water_dudv]: { path: '/textures/waterdudv.jpg' },
 }
 
 export const sceneBackgrounds: Record<SceneName, TextureName> = {

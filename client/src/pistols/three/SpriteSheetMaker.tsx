@@ -61,6 +61,7 @@ export class Actor {
 
     this.controls.lastDisplayTime = 0
     this.controls.currentTile = 0
+    this.controls.delay = 0
     this.controls.paused = true
     this.controls.loopCount = 0;
     this.controls.visible = true
@@ -82,9 +83,7 @@ export class Actor {
     this.material.map = this.currentSheet.textures[this.controls.currentTile]
   }
 
-
-  update(clock: THREE.Clock) {
-    const seconds = clock.getElapsedTime()
+  update(seconds: number) {
 
     if (!this.ready || !seconds) return
 
@@ -233,7 +232,9 @@ export class Actor {
     this.updateMaterialWithCurrentTile()
   }
 
-
+  adjustFrameRate(frameRate) {
+    this.currentSheet.frameRate = frameRate
+    this.controls.tileDisplaySeconds = (1 / this.currentSheet.frameRate)
+  }
 
 }
-

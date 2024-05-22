@@ -83,7 +83,7 @@ export default function MainPage() {
           isVisible={true}
           duelId={duelId}
         />
-        <MainUI duelId={duelId} />
+        {/* <MainUI duelId={duelId} /> */}
       </Background>
     </AppPistols>
   );
