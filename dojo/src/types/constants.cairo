@@ -16,9 +16,9 @@ mod constants {
 
 mod honour {
     // archetype ranges (Honour)
-    const VILLAIN_START: u8 = 0;   // min honour
-    const TRICKSTER_START: u8 = 30;
-    const LORD_START: u8 = 80;
+    const VILLAIN_START: u8 = 10;  // min honour
+    const TRICKSTER_START: u8 = 35;
+    const LORD_START: u8 = 75;
     const HALFWAY: u8 = 50;        // half honour
     const MAX: u8 = 100;           // max honour
 
