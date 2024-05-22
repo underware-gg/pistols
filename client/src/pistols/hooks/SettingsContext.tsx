@@ -7,12 +7,14 @@ import { tables } from '@/pistols/utils/constants'
 // Constants
 //
 export const initialState = {
+  debugMode: false,
   musicEnabled: true,
   sfxEnabled: true,
   tableId: tables.LORDS,
 }
 
 const SettingsActions = {
+  DEBUG_MODE: 'settings.DEBUG_MODE',
   MUSIC_ENABLED: 'settings.MUSIC_ENABLED',
   SFX_ENABLED: 'settings.SFX_ENABLED',
   TABLE_ID: 'settings.TABLE_ID',
@@ -24,6 +26,7 @@ const SettingsActions = {
 type SettingsStateType = typeof initialState
 
 type ActionType =
+  | { type: 'DEBUG_MODE', payload: boolean }
   | { type: 'MUSIC_ENABLED', payload: boolean }
   | { type: 'SFX_ENABLED', payload: boolean }
   | { type: 'TABLE_ID', payload: string }
@@ -55,6 +58,11 @@ const SettingsProvider = ({
   const [state, dispatch] = useReducer((state: SettingsStateType, action: ActionType) => {
     let newState = { ...state }
     switch (action.type) {
+      case SettingsActions.DEBUG_MODE: {
+        newState.debugMode = action.payload as boolean
+        setCookie(SettingsActions.DEBUG_MODE, newState.debugMode)
+        break
+      }
       case SettingsActions.MUSIC_ENABLED: {
         newState.musicEnabled = action.payload as boolean
         setCookie(SettingsActions.MUSIC_ENABLED, newState.musicEnabled)
