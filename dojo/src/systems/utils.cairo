@@ -377,12 +377,10 @@ fn calc_level_lord(honour: u8) -> u8 {
 #[inline(always)]
 fn calc_level_trickster(honour: u8, duel_honour: u8) -> u8 {
     if (honour >= honour::TRICKSTER_START && honour < honour::LORD_START) {
-        // high on edges, low on middle (\/)
-        let ti: i16 = MathU8::map(duel_honour, honour::VILLAIN_START, honour::MAX, 0, honour::LEVEL_MAX*2).try_into().unwrap() - honour::LEVEL_MAX.into();
-        let td: u8 = MathU16::abs(ti).try_into().unwrap();
-        // peak on halfway to avoid zero (/\)
-        let halfway: u8 = if (duel_honour <= honour::HALFWAY) { (duel_honour) } else { honour::HALFWAY - (duel_honour - honour::HALFWAY) };
-        (MathU8::max(td, halfway))
+        // simple \/ shape of LEVEL_MAX/2 at middle range to LEVEL_MAX at extremities
+        let level_i: i16 = MathU8::map(duel_honour, honour::VILLAIN_START, honour::MAX, 0, honour::LEVEL_MAX).try_into().unwrap() - (honour::LEVEL_MAX / 2).into();
+        let level: u8 = MathU16::abs(level_i).try_into().unwrap() + (honour::LEVEL_MAX / 2);
+        (level)
     } else { (0) }
 }
 // Always average with the current trickster bonus

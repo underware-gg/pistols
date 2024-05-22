@@ -70,38 +70,25 @@ mod tests {
         (v > min && v < max)
     }
 
-    fn _assert_trickstry(honour: u8, duel_honour: u8, min: u8, max: u8, prefix: felt252) {
-        let level_trickster: u8 = utils::calc_level_trickster(honour, duel_honour);
-        assert(level_trickster >= min, String::concat(prefix, '_min'));
-        assert(level_trickster <= max, String::concat(prefix, '_max'));
-        // assert(level_trickster > 30, String::concat(prefix, '_30'));
-    }
-
     #[test]
     #[available_gas(100_000_000)]
     fn test_calc_level_trickster() {
         
         assert(utils::calc_level_trickster(10, 100) == 0, 'honour_10');
         assert(utils::calc_level_trickster(honour::TRICKSTER_START-1, 100) == 0, 'ARCH_TRICKSTER_START-1');
-        assert(utils::calc_level_trickster(honour::TRICKSTER_START-1, 0) == 0, 'ARCH_TRICKSTER_START-1_00');
+        assert(utils::calc_level_trickster(honour::TRICKSTER_START-1, 100) == 0, 'ARCH_TRICKSTER_START-1_00');
         //-------
         assert(utils::calc_level_trickster(honour::TRICKSTER_START, 100) > 0, 'ARCH_TRICKSTER_START');
         assert(utils::calc_level_trickster(honour::TRICKSTER_START, 0) > 0, 'ARCH_TRICKSTER_START_00');
-
-        // let t: u8 = honour::TRICKSTER_START;
-
-        // _assert_trickstry(100, 100, 0, 50, 50, 't_001');
-        // _assert_trickstry(100, 100, 100, 100, 100, 't_002');
-        // _assert_trickstry(100, 100, 80, 50, 50, 't_003');
-
-        // _assert_trickstry(70, 50, 70, 70, 70, 't_004');
-        // _assert_trickstry(30, 50, 70, 70, 70, 't_005');
-
-        assert(utils::calc_level_trickster(honour::LORD_START-1, 100) > 0, 'ARCH_LORD_START-1');
-        assert(utils::calc_level_trickster(honour::LORD_START-1-1, 0) > 0, 'ARCH_LORD_START-1_00');
+        assert(utils::calc_level_trickster(honour::HALFWAY, 50) >= 50, '50 >= 50');
+        assert(utils::calc_level_trickster(honour::HALFWAY, 50) < 60, '50 < 60');
+        assert(utils::calc_level_trickster(honour::HALFWAY, 0) == 100, 'zero');
+        assert(utils::calc_level_trickster(honour::HALFWAY, honour::VILLAIN_START) == 100, 'villain_100');
+        assert(utils::calc_level_trickster(honour::HALFWAY, honour::LEVEL_MAX) == 100, 'lord_100');
+        assert(utils::calc_level_trickster(honour::LORD_START-1, 0) > 0, 'ARCH_LORD_START-1');
         //-------
         assert(utils::calc_level_trickster(honour::LORD_START, 100) == 0, 'ARCH_LORD_START');
-        assert(utils::calc_level_trickster(honour::LORD_START, 0) == 0, 'ARCH_LORD_START_00');
+        assert(utils::calc_level_trickster(honour::LORD_START, 100) == 0, 'ARCH_LORD_START_00');
         assert(utils::calc_level_trickster(100, 100) == 0, 'honour_100');
     }
 
