@@ -28,6 +28,7 @@ export function TavernMenu({
 }) {
   const { accountAddress, isGuest } = useDojoAccount()
   const { menuKey, tavernMenuItems, dispatchSetMenu } = usePistolsContext()
+  const { tableOpener } = usePistolsContext()
 
   const { awaitingCount, inProgressCount } = useChallengesByDuelist(accountAddress)
   const { challengeIds: liveChallengeIds } = useLiveChallengeIds()
@@ -84,7 +85,7 @@ export function TavernMenu({
   const menuIndex = tavernMenuItems.findIndex(k => (k == menuKey))
 
   const _changeTable = () => {
-    console.log(`TABLE`)
+    tableOpener.open()
   }
 
   return (

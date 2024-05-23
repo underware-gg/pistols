@@ -63,6 +63,7 @@ export const initialState = {
   // injected
   connectOpener: null as Opener,
   accountSetupOpener: null as Opener,
+  tableOpener: null as Opener,
 }
 
 const PistolsActions = {
@@ -114,6 +115,7 @@ const PistolsProvider = ({
 }: PistolsProviderProps) => {
   const connectOpener = useOpener()
   const accountSetupOpener = useOpener()
+  const tableOpener = useOpener()
 
   const [state, dispatch] = useReducer((state: PistolsContextStateType, action: ActionType) => {
     let newState = { ...state }
@@ -164,6 +166,7 @@ const PistolsProvider = ({
       ...state,
       connectOpener,
       accountSetupOpener,
+      tableOpener,
     } }}>
       {children}
     </PistolsContext.Provider>
