@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Grid, Table, Modal, Icon } from 'semantic-ui-react'
+import { Grid, Table, Modal } from 'semantic-ui-react'
 import { useDojoAccount, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
@@ -15,6 +15,7 @@ import { ChallengeState, makeDuelUrl } from '@/pistols/utils/pistols'
 import { DuelIconsAsGrid } from '@/pistols/components/DuelIcons'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { AddressShort } from '@/lib/ui/AddressShort'
+import { IconClick } from '@/lib/ui/Icons'
 import { Divider } from '@/lib/ui/Divider'
 
 const Row = Grid.Row
@@ -78,7 +79,7 @@ export default function ChallengeModal() {
               {tableDescription}
             </Col>
             <Col width={1} textAlign='right'>
-              <Icon className='Anchor IconClick' name='database' size={'small'} onClick={() => window?.open(`/dueldata/${duelId}`, '_blank')} />
+              <IconClick name='database' size={'small'} onClick={() => window?.open(`/dueldata/${duelId}`, '_blank')} />
             </Col>
             <Col width={3} textAlign='right'>
               <AddressShort address={duelId} />

@@ -172,10 +172,7 @@ export function SettingsIcon({
     dispatchSetting(settingsKey, !value)
   }
   return (
-    <CustomIcon
-      // className='IconClick'
-      icon={icon} name={value ? nameOn : nameOff} onClick={() => _switch()} size='large'
-    />
+    <CustomIcon icon={icon} name={value ? nameOn : nameOff} onClick={() => _switch()} size='large' />
   )
 }
 

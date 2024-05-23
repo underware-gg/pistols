@@ -27,11 +27,6 @@ export default function DuelistModal() {
   const { profilePic } = useDuelist(duelistAddress)
   const { hasPact, pactDuelId } = usePact(accountAddress, duelistAddress)
 
-  const _switchDuelist = () => {
-    dispatchSelectDuelist(0n)
-    router.push(`/gate`)
-  }
-
   return (
     <Modal
       // size='small'
@@ -47,7 +42,7 @@ export default function DuelistModal() {
             </Col>
             <Col textAlign='center'>
               {isYou &&
-                <div className='Anchor' onClick={() => _switchDuelist()} >
+                <div className='Anchor' onClick={() => router.push(`/gate`)} >
                   <span className='Smaller'>Switch Duelist</span>
                   &nbsp;
                   <Icon name='users' size={'small'} />

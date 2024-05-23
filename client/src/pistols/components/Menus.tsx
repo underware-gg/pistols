@@ -1,12 +1,13 @@
 import React, { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { Grid, Menu, Icon } from 'semantic-ui-react'
-import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
+import { Grid, Menu } from 'semantic-ui-react'
+import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { DuelStage } from '@/pistols/hooks/useDuel'
 import { SPRITESHEETS } from '@/pistols/data/assets'
 import { AnimationState } from '@/pistols/three/game'
+import { IconClick } from '@/lib/ui/Icons'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -45,13 +46,12 @@ export function MenuDuel({
 
         {/* <SettingsMenuItem prefix='SFX' settingsKey={SettingsActions.SFX_ENABLED} currentValue={settings.sfxEnabled} /> */}
 
-        <Menu.Item onClick={() => window?.open(`/dueldata/${duelId}`, '_blank')} >
-          <Icon className='IconClick' name='database' size={null} />
+        <Menu.Item>
+          <IconClick name='database' onClick={() => window?.open(`/dueldata/${duelId}`, '_blank')} />
         </Menu.Item>
 
-        <Menu.Item onClick={() => _switchSfx()} >
-          {/* <CustomIcon className='IconClick' icon name={settings.sfxEnabled ? 'volume-on' : 'volume-off'} /> */}
-          <Icon className='IconClick' name={settings.sfxEnabled ? 'volume up' : 'volume off'} size={null} />
+        <Menu.Item  >
+          <IconClick name={settings.sfxEnabled ? 'volume up' : 'volume off'} onClick={() => _switchSfx()} />
         </Menu.Item>
 
       </Menu>

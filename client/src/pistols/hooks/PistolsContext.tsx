@@ -126,7 +126,7 @@ const PistolsProvider = ({
   const _updateRoute = (params: any | null) => {
     let url = router.asPath.split('?')[0]
     if (params) url += '?' + new URLSearchParams(params)
-    // console.log(`ROUTING...`, url)
+    console.log(`ROUTING...`, url)
     router.push(url, undefined, { shallow: true })
   }
 

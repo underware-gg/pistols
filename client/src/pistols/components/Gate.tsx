@@ -2,6 +2,7 @@ import React from 'react'
 import { useRouter } from 'next/navigation'
 import { Dropdown, Grid, Icon } from 'semantic-ui-react'
 import { VStack, VStackRow } from '@/lib/ui/Stack'
+import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useDojoAccount, useDojoStatus } from '@/lib/dojo/DojoContext'
 import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
@@ -23,6 +24,13 @@ const Col = Grid.Column
 export default function Gate() {
   const { isConnected, isConnecting, isCorrectChain } = useSelectedChain()
   const { isLoading, isError } = useDojoStatus()
+
+  const { dispatchSelectDuel } = usePistolsContext()
+
+  // cler tavern state
+  useEffectOnce(() => {
+    dispatchSelectDuel(0n)
+  }, [])
 
   return (
     <div className='UIContainer'>

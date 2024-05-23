@@ -86,31 +86,11 @@ export function IconInfo({
 }: IconInfoProps) {
   return (
     <Tooltip header={header} content={content}>
-      <Icon name='info circle' size={size} className='IconClick' />
+      <Icon name='info circle' size={size} />
     </Tooltip>
   )
 }
 
-
-
-//---------------------------------
-// Copy to clipboard icon
-//
-interface CopyIconProps {
-  size?: IconSizeProp
-  content: string
-}
-export function CopyIcon({
-  size = null, // normal size
-  content = null, // content to copy
-}: CopyIconProps) {
-  function _copy() {
-    navigator?.clipboard?.writeText(content)
-  }
-  return (
-    <Icon className='Anchor IconClick' name='copy' size={size} onClick={() => _copy()} />
-  )
-}
 
 
 //---------------------------------
@@ -136,6 +116,33 @@ export function LoadingIcon({
     />)
 }
 
+
+//---------------------------------
+// clickable, animated icon
+//
+interface IconClickProps extends IconProps {
+  onClick: Function
+}
+export function IconClick(props: IconClickProps) {
+  return (
+    <Icon {...props} className='IconClick' onClick={() => props.onClick()} />
+  )
+}
+
+//---------------------------------
+// Copy to clipboard
+//
+interface CopyIconProps extends IconProps {
+  content: string
+}
+export function CopyIcon(props: CopyIconProps) {
+  function _copy() {
+    navigator?.clipboard?.writeText(props.content)
+  }
+  return (
+    <IconClick {...props} name='copy' onClick={() => _copy()} />
+  )
+}
 
 
 //---------------------------------
@@ -257,8 +264,7 @@ export function CustomIcon({
     if (disabled) classNames.push('disabled')
     if (flipped) classNames.push('flipped')
     if (onClick) {
-      classNames.push('IconLink')
-      classNames.push('IconClick')
+      classNames.push('IconClick CustomIconClick')
     } else {
       _style.backgroundColor = color
     }
@@ -287,7 +293,7 @@ export function CustomIcon({
 export function IconTransfer({
   rotated,
   setRotated,
-} : {
+}: {
   rotated: boolean
   setRotated: Function
 }) {

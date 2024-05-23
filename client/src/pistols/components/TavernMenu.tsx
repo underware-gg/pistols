@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Grid, Menu, Label, Tab, TabPane, Icon } from 'semantic-ui-react'
+import { useRouter } from 'next/navigation'
+import { Grid, Menu, Label, Tab, TabPane } from 'semantic-ui-react'
 import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
 import { useChallengesByDuelistTotals, useLiveChallengeIds } from '@/pistols/hooks/useChallenge'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
@@ -7,6 +8,7 @@ import { useCurrentTable } from '@/pistols/hooks/useTable'
 import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
 import { DuelistTable } from '@/pistols/components/DuelistTable'
 import { MusicToggle } from '@/pistols/components/ui/Buttons'
+import { IconClick } from '@/lib/ui/Icons'
 import AccountHeader from '@/pistols/components/account/AccountHeader'
 
 const Row = Grid.Row
@@ -25,6 +27,7 @@ const _makeBubble = (count) => {
 
 export function TavernMenu({
 }) {
+  const router = useRouter()
   const { accountAddress, isGuest } = useDojoAccount()
   const { menuKey, tavernMenuItems, dispatchSetMenu } = usePistolsContext()
   const { tableOpener } = usePistolsContext()
@@ -91,7 +94,7 @@ export function TavernMenu({
           <Col width={7} verticalAlign='middle' className='Title NoBreak'>
             &nbsp;&nbsp;&nbsp;<b>Pistols at 10 Blocks</b>
             <br />
-            &nbsp;&nbsp;&nbsp;<Icon className='Anchor IconClick' name='ticket' size={'small'} onClick={() => _changeTable()} /> <b className='Smaller Important'>{description}</b>
+            &nbsp;&nbsp;&nbsp;<IconClick name='ticket' size={'small'} onClick={() => _changeTable()} /> <b className='Smaller Important'>{description}</b>
           </Col>
           <Col width={9} textAlign='right'>
             <AccountHeader />
@@ -103,6 +106,8 @@ export function TavernMenu({
 
         <div className='AbsoluteRight PaddedDouble'>
           <MusicToggle />
+          &nbsp;&nbsp;
+          <IconClick name='users' size={'large'} onClick={() => router.push(`/gate`)} />
         </div>
 
         <Tab activeIndex={menuIndex} menu={{ secondary: true, pointing: true, attached: true }} panes={panes} />

@@ -257,7 +257,7 @@ canvas {
 }
 
 .Anchor {
-  cursor: pointer;
+  cursor: pointer!important;
   pointer-events: all!important;
   user-select: none;
 }
@@ -845,6 +845,51 @@ $ui-container-gap: 1em;
   background: rgba($color-bg, 0.8);
 }
 
+// Icon click feedback
+.IconClick_hover {
+  color: $color-brightest;
+	animation-name: IconHoverAnimation;
+	animation-duration: 0.1s;
+	animation-iteration-count: 1;
+	animation-timing-function: ease-out;
+	animation-fill-mode: forwards;
+	-webkit-animation-name: IconHoverAnimation;
+	-webkit-animation-duration: 0.1s;
+	-webkit-animation-iteration-count: 1;
+	-webkit-animation-timing-function: ease-out;
+	-webkit-animation-fill-mode: forwards;
+}
+.IconClick_active {
+	animation-name: IconClickAnimation;
+	animation-duration: 0.2s;
+	animation-iteration-count: 1;
+	animation-timing-function: ease-out;
+	animation-fill-mode: forwards;
+	-webkit-animation-name: IconClickAnimation;
+	-webkit-animation-duration: 0.2s;
+	-webkit-animation-iteration-count: 1;
+	-webkit-animation-timing-function: ease-out;
+	-webkit-animation-fill-mode: forwards;
+}
+.IconClick {
+  @extend .Anchor;
+  color: $color-bright;
+  &:hover {
+    @extend .IconClick_hover;
+  }
+  &:active {
+    @extend .IconClick_active;
+  }
+}
+@keyframes IconClickAnimation {
+	from { -webkit-transform: scale(0.9); }
+	to { -webkit-transform: scale(1); }
+}
+@keyframes IconHoverAnimation {
+	from { -webkit-transform: scale(1); }
+	to { -webkit-transform: scale(1.1); }
+}
+
 // <CustomIcon>
 $logo-url: '/logos/logo_avante.svg';
 .CustomIcon {
@@ -862,13 +907,14 @@ $logo-url: '/logos/logo_avante.svg';
   mask-repeat: no-repeat;
 	@include make-box-shadow(0.1em 0 $color-dark);
 }
-.IconLink {
-  background-color: $color-link!important;
-  pointer-events: auto;
-  cursor: pointer;
-}
-.IconLink:hover, .IconLink:active {
-  background-color: $color-brightest;
+.CustomIconClick {
+  background-color: $color-bright!important;
+  &:hover {
+    background-color: $color-brightest!important;
+  }
+  &:active {
+    background-color: $color-brightest!important;
+  }
 }
 .CustomIconPng {
   background-size: contain;
@@ -892,45 +938,6 @@ $logo-url: '/logos/logo_avante.svg';
   transition: transform .25s ease;
 }
 
-
-// Icon click feedback
-.IconClick {
-  z-index: 100;
-  cursor: pointer;
-  position: unset;
-}
-.IconClick:hover {
-	animation-name: IconHoverAnimation;
-	animation-duration: 0.1s;
-	animation-iteration-count: 1;
-	animation-timing-function: ease-out;
-	animation-fill-mode: forwards;
-	-webkit-animation-name: IconHoverAnimation;
-	-webkit-animation-duration: 0.1s;
-	-webkit-animation-iteration-count: 1;
-	-webkit-animation-timing-function: ease-out;
-	-webkit-animation-fill-mode: forwards;
-}
-.IconClick:active {
-	animation-name: IconClickAnimation;
-	animation-duration: 0.2s;
-	animation-iteration-count: 1;
-	animation-timing-function: ease-out;
-	animation-fill-mode: forwards;
-	-webkit-animation-name: IconClickAnimation;
-	-webkit-animation-duration: 0.2s;
-	-webkit-animation-iteration-count: 1;
-	-webkit-animation-timing-function: ease-out;
-	-webkit-animation-fill-mode: forwards;
-}
-@keyframes IconClickAnimation {
-	from { -webkit-transform: scale(0.9); }
-	to { -webkit-transform: scale(1); }
-}
-@keyframes IconHoverAnimation {
-	from { -webkit-transform: scale(1); }
-	to { -webkit-transform: scale(1.1); }
-}
 
 .WagerBig {
   @extend .TitleCase, .H3, .Bold;
