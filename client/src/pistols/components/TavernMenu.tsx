@@ -29,10 +29,8 @@ export function TavernMenu({
   const { menuKey, tavernMenuItems, dispatchSetMenu } = usePistolsContext()
   const { tableOpener } = usePistolsContext()
 
-  const { awaitingCount, inProgressCount } = useChallengesByDuelistCount(accountAddress)
+  const { liveDuelsCount: yourDuelsCount } = useChallengesByDuelistCount(accountAddress)
   const { challengeIds: liveChallengeIds } = useLiveChallengeIds()
-
-  const yourDuelsCount = useMemo(() => (awaitingCount + inProgressCount), [awaitingCount, inProgressCount])
   const liveDuelsCount = useMemo(() => (liveChallengeIds.length), [liveChallengeIds])
 
   const [started, setStarted] = useState<boolean>(false)
@@ -90,11 +88,11 @@ export function TavernMenu({
   return (
     <div>
       <Grid>
-        <Row className='ProfilePicHeight'>
+        <Row className='ProfilePicHeight Unselectable'>
           <Col width={7} verticalAlign='middle' className='Title NoBreak'>
             &nbsp;&nbsp;&nbsp;<b>Pistols at 10 Blocks</b>
             <br />
-            &nbsp;&nbsp;&nbsp;<b className='Important'>{description}</b> <Icon className='Anchor IconClick' name='ticket' size={'small'} onClick={() => _changeTable()} />
+            &nbsp;&nbsp;&nbsp;<Icon className='Anchor IconClick' name='ticket' size={'small'} onClick={() => _changeTable()} /> <b className='Smaller Important'>{description}</b> 
           </Col>
           <Col width={9} textAlign='right'>
             <AccountHeader />

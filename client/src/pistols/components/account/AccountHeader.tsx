@@ -35,7 +35,7 @@ export default function AccountHeader({
             <h3>Guest</h3>
             : <>
               <h3>{name}</h3>
-              <AddressShort address={accountAddress} copyLink={false} />
+              <AddressShort address={accountAddress} copyLink={true} />
               <br />
               <LordsBalance address={accountAddress} big />
             </>}
