@@ -1,6 +1,8 @@
 import React, { ReactNode, createContext, useReducer, useContext } from 'react'
-import { BigNumberish } from 'starknet'
+import { useRouter } from 'next/router'
 import { Opener, useOpener } from '@/lib/ui/useOpener'
+import { BigNumberish } from 'starknet'
+import { bigintToHex } from '@/lib/utils/types'
 
 //
 // React + Typescript + Context
@@ -116,9 +118,17 @@ interface PistolsProviderProps {
 const PistolsProvider = ({
   children,
 }: PistolsProviderProps) => {
+  const router = useRouter()
   const connectOpener = useOpener()
   const accountSetupOpener = useOpener()
   const tableOpener = useOpener()
+
+  const _updateRoute = (params: any | null) => {
+    let url = router.asPath.split('?')[0]
+    if (params) url += '?' + new URLSearchParams(params)
+    // console.log(`ROUTING...`, url)
+    router.push(url, undefined, { shallow: true })
+  }
 
   const [state, dispatch] = useReducer((state: PistolsContextStateType, action: ActionType) => {
     let newState = { ...state }
@@ -151,18 +161,21 @@ const PistolsProvider = ({
         newState.duelId = action.payload as bigint
         newState.duelistAddress = 0n
         newState.challengedAddress = 0n
+        _updateRoute(newState.duelId ? { duel: bigintToHex(newState.duelId) } : null)
         break
       }
       case PistolsActions.SELECT_DUELIST: {
         newState.duelId = 0n
         newState.duelistAddress = action.payload as bigint
         newState.challengedAddress = 0n
+        _updateRoute(newState.duelistAddress ? { duelist: bigintToHex(newState.duelistAddress) } : null)
         break
       }
       case PistolsActions.SELECT_CHALLENGED: {
         newState.duelId = 0n
         newState.duelistAddress = 0n
         newState.challengedAddress = action.payload as bigint
+        _updateRoute(null)
         break
       }
       default:
