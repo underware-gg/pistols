@@ -6,14 +6,14 @@ import { EMOJI } from '@/pistols/data/messages'
 // (challenge.cairo)
 //
 export enum ChallengeState {
-  Null,
-  Awaiting,
-  Withdrawn,
-  Refused,
-  Expired,
-  InProgress,
-  Resolved,
-  Draw,
+  Null,       // 0
+  Awaiting,   // 1
+  Withdrawn,  // 2
+  Refused,    // 3
+  Expired,    // 4
+  InProgress, // 5
+  Resolved,   // 6
+  Draw,       // 7
 }
 
 export const LiveChallengeStates: ChallengeState[] = [

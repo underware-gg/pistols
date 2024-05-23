@@ -923,11 +923,11 @@ $logo-url: '/logos/logo_avante.svg';
 	to { -webkit-transform: scale(1.1); }
 }
 
-.Wager {
-  @extend .TitleCase, .H4;
-}
 .WagerBig {
   @extend .TitleCase, .H3, .Bold;
+}
+.Wager {
+  @extend .TitleCase, .H4;
 }
 .WagerSmall {
   @extend .TitleCase, .H5, .Bold;

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { WagerBalance, LockedWagerBalance } from '@/pistols/components/account/LordsBalance'
+import { LordsBalance, LockedWagerBalance } from '@/pistols/components/account/LordsBalance'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { EMOJI } from '@/pistols/data/messages'
 
@@ -56,7 +56,7 @@ export function ProfileDescription({
             {is_lord && <> {EMOJI.LORD} {levelDisplay}</>}
           </h3>
           {displayBalance && <>
-            <WagerBalance tableId={tableId} address={address} big />
+            <LordsBalance address={address} big />
             <LockedWagerBalance tableId={tableId} address={address} clean />
             {/* {isYou && <><br /><LordsFaucet /></>} */}
           </>}

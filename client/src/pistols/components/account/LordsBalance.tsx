@@ -1,7 +1,7 @@
 import { useERC20Balance } from '@/lib/utils/hooks/useERC20'
 import { useLordsBalance } from '@/lib/dojo/hooks/useLords'
 import { useTable } from '@/pistols/hooks/useTable'
-import { useLockedWagerTotals } from '@/pistols/hooks/useWager'
+import { useLockedLordsBalance } from '@/pistols/hooks/useWager'
 import { Balance } from '@/pistols/components/account/Balance'
 import { tables } from '@/pistols/utils/constants'
 import { BigNumberish } from 'starknet'
@@ -41,7 +41,7 @@ export const LockedWagerBalance = ({
   post = null,
   clean = false,
 }) => {
-  const { total } = useLockedWagerTotals(address, tableId)
+  const { total } = useLockedLordsBalance(address)
   if (!total) return <></>
   return (
     <>

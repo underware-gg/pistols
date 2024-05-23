@@ -11,6 +11,8 @@ import { useDuelist } from "@/pistols/hooks/useDuelist"
 import { BigNumberish } from 'starknet'
 
 
+const _challegeSorterByTimestamp = ((a: any, b: any) => Number((a.timestamp_end && b.timestamp_end) ? (a.timestamp_end - b.timestamp_end) : (a.timestamp_start - b.timestamp_start)))
+
 //-----------------------------
 // All Challenges
 //
@@ -158,45 +160,46 @@ export const useChallengeIdsByDuelist = (address: bigint) => {
 
 export const useChallengesByDuelist = (address: bigint) => {
   const { Challenge } = useDojoComponents()
-  const { challengeIds, challengerIds, challengedIds } = useChallengeIdsByDuelist(address)
+  const { challengeIds } = useChallengeIdsByDuelist(address)
+  const raw_challenges: any[] = useMemo(() => (
+    challengeIds.map((challengeId) => getComponentValue(Challenge, bigintToEntity(challengeId)))
+      .sort(_challegeSorterByTimestamp)
+  ), [challengeIds])
+  return {
+    raw_challenges,
+    challengeIds,
+  }
+}
 
-  const challenges: any[] = useMemo(() => challengeIds.map((challengeId) => getComponentValue(Challenge, bigintToEntity(challengeId))).sort((a, b) => Number((a.timestamp_end && b.timestamp_end) ? (a.timestamp_end - b.timestamp_end) : (a.timestamp_start - b.timestamp_start))), [challengeIds])
+export const useChallengesByDuelistCount = (address: bigint) => {
+  const { raw_challenges, challengeIds } = useChallengesByDuelist(address)
   // console.log(challenges)
-  const stats: any = useMemo(() => {
+  const counts: any = useMemo(() => {
     let result = {
-      challengeCount: challenges.length,
-      awaitingCount: challenges.reduce((acc, ch) => {
-        if (ch.state == ChallengeState.Awaiting) acc++;
-        return acc;
-      }, 0),
-      inProgressCount: challenges.reduce((acc, ch) => {
-        if (ch.state == ChallengeState.InProgress) acc++;
-        return acc;
-      }, 0),
-      drawCount: challenges.reduce((acc, ch) => {
-        if (ch.state == ChallengeState.Draw) acc++;
-        return acc;
-      }, 0),
-      winCount: challenges.reduce((acc, ch) => {
-        let winnerDuelist = (ch.winner == 1 ? ch.duelistA : ch.winner == 2 ? ch.duelistB : 0n)
-        if (ch.state == ChallengeState.Resolved && winnerDuelist == address) acc++;
-        return acc;
-      }, 0),
-      loseCount: challenges.reduce((acc, ch) => {
-        let winnerDuelist = (ch.winner == 1 ? ch.duelistA : ch.winner == 2 ? ch.duelistB : 0n)
-        if (ch.state == ChallengeState.Resolved && winnerDuelist != address) acc++;
-        return acc;
-      }, 0),
+      challengeCount: raw_challenges.length,
+      awaitingCount: 0,
+      inProgressCount: 0,
+      drawCount: 0,
+      winCount: 0,
+      loseCount: 0,
     }
+    raw_challenges.forEach(ch => {
+      if (ch.state == ChallengeState.Awaiting) result.awaitingCount++;
+      if (ch.state == ChallengeState.InProgress) result.inProgressCount++;
+      if (ch.state == ChallengeState.Draw) result.drawCount++;
+      if (ch.state == ChallengeState.Resolved) {
+        let winnerDuelist = (ch.winner == 1 ? ch.duelistA : ch.winner == 2 ? ch.duelistB : 0n)
+        if (winnerDuelist == address) result.winCount++;
+        if (winnerDuelist != address) result.loseCount++;
+      }
+    })
     return result
-  }, [challenges])
+  }, [raw_challenges])
 
   return {
+    raw_challenges,
     challengeIds,
-    challengerIds,
-    challengedIds,
-    challenges,
-    ...stats
+    ...counts
   }
 }
 

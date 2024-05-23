@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Menu, Label, Tab, TabPane, Icon } from 'semantic-ui-react'
 import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
-import { useChallengesByDuelist, useLiveChallengeIds } from '@/pistols/hooks/useChallenge'
+import { useChallengesByDuelistCount, useLiveChallengeIds } from '@/pistols/hooks/useChallenge'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useCurrentTable } from '@/pistols/hooks/useTable'
 import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
@@ -29,7 +29,7 @@ export function TavernMenu({
   const { menuKey, tavernMenuItems, dispatchSetMenu } = usePistolsContext()
   const { tableOpener } = usePistolsContext()
 
-  const { awaitingCount, inProgressCount } = useChallengesByDuelist(accountAddress)
+  const { awaitingCount, inProgressCount } = useChallengesByDuelistCount(accountAddress)
   const { challengeIds: liveChallengeIds } = useLiveChallengeIds()
 
   const yourDuelsCount = useMemo(() => (awaitingCount + inProgressCount), [awaitingCount, inProgressCount])
