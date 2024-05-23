@@ -149,14 +149,14 @@ export const useChallengeDescription = (duelId: bigint) => {
 // Challenges by Duelist
 //
 
-export const useChallengeIdsByDuelist = (address: bigint) => {
+export const useChallengeIdsByDuelist = (address: bigint, tableId?: string) => {
   const { Challenge } = useDojoComponents()
   const challengerIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { duelist_a: BigInt(address ?? 0n) })])
   const challengedIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { duelist_b: BigInt(address ?? 0n) })])
-  const challengeIds: bigint[] = useMemo(() => (
-    [...challengerIds, ...challengedIds]
-  ), [challengerIds, challengedIds])
-  // console.log(address, challengeIds)
+  const allChallengeIds: bigint[] = useMemo(() => ([...challengerIds, ...challengedIds]), [challengerIds, challengedIds])
+  const challengeIds = useMemo(() => (
+    tableId ? _filterChallengesByTable(Challenge, allChallengeIds, tableId) : allChallengeIds
+  ), [allChallengeIds, tableId])
   return {
     challengeIds,
     challengerIds,
@@ -164,9 +164,9 @@ export const useChallengeIdsByDuelist = (address: bigint) => {
   }
 }
 
-export const useChallengesByDuelist = (address: bigint) => {
+export const useChallengesByDuelist = (address: bigint, tableId?: string) => {
   const { Challenge } = useDojoComponents()
-  const { challengeIds } = useChallengeIdsByDuelist(address)
+  const { challengeIds } = useChallengeIdsByDuelist(address, tableId)
   const raw_challenges: any[] = useMemo(() => (
     challengeIds.map((challengeId) => getComponentValue(Challenge, bigintToEntity(challengeId)))
       .sort(_challegeSorterByTimestamp)
@@ -177,8 +177,8 @@ export const useChallengesByDuelist = (address: bigint) => {
   }
 }
 
-export const useChallengesByDuelistCount = (address: bigint) => {
-  const { raw_challenges, challengeIds } = useChallengesByDuelist(address)
+export const useChallengesByDuelistTotals = (address: bigint, tableId?: string) => {
+  const { raw_challenges, challengeIds } = useChallengesByDuelist(address, tableId)
   // console.log(challenges)
   const counts: any = useMemo(() => {
     let result = {

@@ -20,34 +20,50 @@ const Col = Grid.Column
 const Cell = Table.Cell
 const HeaderCell = Table.HeaderCell
 
-export function ChallengeTableAll() {
-  const { challengeIds } = useAllChallengeIds()
+type ChallengeTableProps = {
+  tableId?: string
+}
+
+export function ChallengeTableAll({
+  tableId
+}: ChallengeTableProps) {
+  const { challengeIds } = useAllChallengeIds(tableId)
   return <ChallengeTableByIds challengeIds={challengeIds} compact />
 }
 
-export function ChallengeTableLive() {
-  const { challengeIds, states } = useLiveChallengeIds()
+export function ChallengeTableLive({
+  tableId
+}: ChallengeTableProps) {
+  const { challengeIds, states } = useLiveChallengeIds(tableId)
   return <ChallengeTableByIds challengeIds={challengeIds} color='green' compact states={[...states, ChallengeState.Expired]} />
 }
 
-export function ChallengeTablePast() {
-  const { challengeIds, states} = usePastChallengeIds()
+export function ChallengeTablePast({
+  tableId
+}: ChallengeTableProps) {
+  const { challengeIds, states } = usePastChallengeIds(tableId)
   return <ChallengeTableByIds challengeIds={challengeIds} color='red' compact states={states} />
+}
+
+export function ChallengeTableYour({
+  tableId
+}: ChallengeTableProps) {
+  const { accountAddress } = useDojoAccount()
+  return <ChallengeTableByDuelist address={accountAddress} compact tableId={tableId} />
 }
 
 export function ChallengeTableByDuelist({
   address = null,
   compact = false,
+  tableId
+}: {
+  address: bigint
+  compact: boolean
+  tableId?: string
 }) {
-  const { challengeIds } = useChallengeIdsByDuelist(address)
+  const { challengeIds } = useChallengeIdsByDuelist(address, tableId)
   return <ChallengeTableByIds challengeIds={challengeIds} compact={compact} states={AllChallengeStates} />
 }
-
-export function ChallengeTableYour() {
-  const { accountAddress } = useDojoAccount()
-  return <ChallengeTableByDuelist address={accountAddress} compact />
-}
-
 
 
 function ChallengeTableByIds({
@@ -74,7 +90,7 @@ function ChallengeTableByIds({
   const rows = useMemo(() => {
     let result = []
     challengeIds.forEach((duelId, index) => {
-      result.push(<DuelItem key={duelId} duelId={duelId} sortCallback={_sortCallback} compact={compact} address={accountAddress} states={selectedStated}/>)
+      result.push(<DuelItem key={duelId} duelId={duelId} sortCallback={_sortCallback} compact={compact} address={accountAddress} states={selectedStated} />)
     })
     return result
   }, [challengeIds, selectedStated])

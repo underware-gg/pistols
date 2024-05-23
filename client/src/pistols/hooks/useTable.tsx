@@ -12,6 +12,7 @@ export const useTable = (tableId: string) => {
   const table = useComponentValue(TTable, bigintToEntity(stringToFelt(tableId ?? '')))
   const contractAddress = useMemo(() => (table?.contract_address ?? 0n), [table])
   return {
+    tableId,
     contractAddress,
     canWager: (contractAddress != 0n),
     description: table ? feltToString(table.description) : '?',
