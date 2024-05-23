@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { ReactNode, useMemo } from 'react'
 import { CustomIcon, IconSizeProp } from '@/lib/ui/Icons'
 import { weiToEth } from '@/lib/utils/starknet'
 import { BigNumberish } from 'starknet'
@@ -21,6 +21,7 @@ export function Balance({
   crossed = false,
   pre = null,
   post = null,
+  children = null,
 }: {
   tableId: string
   value?: BigNumberish
@@ -31,12 +32,16 @@ export function Balance({
   crossed?: boolean
   pre?: string
   post?: string
+  children ?: ReactNode
 }) {
   const _value = useMemo(() => {
-    let result = wei != null ? weiToEth(wei).toString()
-      : value != null ? BigInt(value).toString()
-        : null
-    if (result) result = Number(result).toLocaleString('en-US', { maximumFractionDigits: 8 })
+    let result = (
+      wei != null ? weiToEth(wei)
+        : value != null ? BigInt(value)
+          : children ?? null)
+    if (typeof result == 'bigint') {
+      result = Number(result.toString()).toLocaleString('en-US', { maximumFractionDigits: 8 })
+    }
     return result
   }, [value, wei])
 

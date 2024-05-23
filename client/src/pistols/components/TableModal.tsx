@@ -12,6 +12,7 @@ import { tables } from '../utils/constants'
 import { useSettingsContext } from '../hooks/SettingsContext'
 import { useTable } from '../hooks/useTable'
 import { Balance } from './account/Balance'
+import { useERC20TokenName } from '@/lib/utils/hooks/useERC20'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -68,9 +69,9 @@ export default function TableModal({
         </Grid>
       </Modal.Header>
       <Modal.Content>
-        <Modal.Description className='FillParent ModalText'>
+        <Modal.Description className='FillParent ModalText TitleCase'>
           <TableSwitcher tableId={selectedTableId} setSelectedTableId={setSelectedTableId}/>
-          <Divider />
+          <Divider hidden />
           <TableDescription tableId={selectedTableId} />
         </Modal.Description>
       </Modal.Content>
@@ -101,34 +102,54 @@ function TableDescription({
     feePct,
     isOpen,
  } = useTable(tableId)
+  const { tokenName, tokenSymbol } = useERC20TokenName(contractAddress)
   return (
-    <Grid>
-      <Row verticalAlign='middle'>
-        <Col width={6} textAlign='right'>
+    <Grid >
+      <Row className='NoPadding' verticalAlign='middle'>
+        <Col width={8} textAlign='right'>
+          Wager Coin:
+        </Col>
+        <Col width={8}>
+          <Balance tableId={tableId}>{tokenName}</Balance>
+        </Col>
+      </Row>
+
+      <Row className='NoPadding' verticalAlign='middle'>
+        <Col width={8} textAlign='right'>
           Minimun Wager:
         </Col>
-        <Col width={10}>
+        <Col width={8}>
           <Balance tableId={tableId} wei={wagerMin} />
         </Col>
       </Row>
 
-      <Row verticalAlign='middle'>
-        <Col width={6} textAlign='right'>
+      <Row className='NoPadding' verticalAlign='middle'>
+        <Col width={8} textAlign='right'>
           Minimun Fee:
         </Col>
-        <Col width={10}>
-            <Balance tableId={tableId} wei={feeMin} />
-            {Boolean(feePct) &&
-              <> (or {feePct}%)</>
-            }
+        <Col width={8}>
+          {(Boolean(feePct) && !Boolean(feeMin)) ?
+            <span className='Wager'>{feePct}%</span>
+            : <>
+              <Balance tableId={tableId} wei={feeMin ?? 0} />
+              {Boolean(feePct) && <> (or {feePct}%)</>}
+            </>
+          }
         </Col>
       </Row>
 
-      <Row columns={'equal'}>
-        <Col><Divider /></Col>
+      <Row className='NoPadding' verticalAlign='middle'>
+        <Col width={8} textAlign='right'>
+          Duels:
+        </Col>
+        <Col width={8} className='Wager PaddedLeft'>
+          99
+        </Col>
       </Row>
-      <Row columns={'equal'} textAlign='center'>
+
+      <Row columns={'equal'} className='NoPadding' textAlign='center'>
         <Col>
+          <Divider />
           <h5>Table is {isOpen ? <span className='Important'>Open</span> : <span className='Negative'>Closed</span>}</h5>
         </Col>
       </Row>

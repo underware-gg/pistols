@@ -1,7 +1,9 @@
 import { useMemo } from 'react'
-import { useBalance } from '@starknet-react/core'
+import { useAccount, useBalance, useContractRead } from '@starknet-react/core'
 import { bigintToHex } from '@/lib/utils/types'
 import { BigNumberish } from 'starknet'
+import { erc20_abi } from '@/lib/abi'
+import { feltToString } from '../starknet'
 
 export const useERC20Balance = (contractAddress: BigNumberish, ownerAddress: BigNumberish, fee: BigNumberish = 0n) => {
   const { data: balance } = useBalance({
@@ -26,3 +28,27 @@ export const useERC20Balance = (contractAddress: BigNumberish, ownerAddress: Big
     noFundsForFee,
   }
 }
+
+export const useERC20TokenName = (contractAddress: BigNumberish) => {
+  const { data: data_name, isError, isLoading, error } = useContractRead({
+    functionName: "name",
+    args: [],
+    abi: erc20_abi,
+    address: bigintToHex(contractAddress),
+  })
+  const { data: data_symbol } = useContractRead({
+    functionName: "symbol",
+    args: [],
+    abi: erc20_abi,
+    address: bigintToHex(contractAddress),
+  })
+  //@ts-ignore
+  const tokenName = useMemo(() => (data_name?.name ? feltToString(data_name?.name) : null), [data_symbol])
+  //@ts-ignore
+  const tokenSymbol = useMemo(() => (data_symbol?.symbol ? feltToString(data_symbol?.symbol) : null), [data_symbol])
+  return {
+    tokenName,
+    tokenSymbol,
+  }
+}
+

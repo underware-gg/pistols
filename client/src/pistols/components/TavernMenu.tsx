@@ -8,7 +8,6 @@ import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pi
 import { DuelistTable } from '@/pistols/components/DuelistTable'
 import { MusicToggle } from '@/pistols/components/ui/Buttons'
 import AccountHeader from '@/pistols/components/account/AccountHeader'
-import { CopyIcon, CustomIcon } from '@/lib/ui/Icons'
 
 const Row = Grid.Row
 const Col = Grid.Column
