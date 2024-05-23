@@ -387,10 +387,10 @@ fn calc_level_trickster(honour: u8, duel_honour: u8) -> u8 {
 // for Tricksters: smooth bonuses
 // for (new) Lords and Villains: Do not go straight to zero when a Trickster switch archetype
 #[inline(always)]
-fn _average_trickster(level: u8, current_level_trickster: u8) -> u8 {
-    if (level > 0 && current_level_trickster > 0) {
-        ((current_level_trickster + level) / 2)
-    } else { (level) }
+fn _average_trickster(new_level: u8, current_level: u8) -> u8 {
+    if (new_level > 0) {
+        ((new_level + current_level) / 2)
+    } else { (new_level) }
 }
 
 
