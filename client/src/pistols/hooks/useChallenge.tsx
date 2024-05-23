@@ -69,6 +69,22 @@ export const usePastChallengeIds = (tableId?: string) => {
   return useChallengeIdsByStates(PastChallengeStates, tableId)
 }
 
+export const useActiveDuelists = (tableId?: string) => {
+  const { challengeIds: allChallengeIds } = useAllChallengeIds(tableId)
+  const { Challenge } = useDojoComponents()
+  const activeDuelists = useMemo(() => (
+    allChallengeIds.reduce((acc: bigint[], id: bigint) => {
+      const componentValue = getComponentValue(Challenge, bigintToEntity(id))
+      if (!acc.includes(componentValue.duelist_a)) acc.push(componentValue.duelist_a)
+      if (!acc.includes(componentValue.duelist_b)) acc.push(componentValue.duelist_b)
+      return acc
+    }, [] as bigint[])
+  ), [allChallengeIds])
+  return {
+    activeDuelists,
+    activeDuelistsCount: activeDuelists.length,
+  }
+}
 
 
 //-----------------------------

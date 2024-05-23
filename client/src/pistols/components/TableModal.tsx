@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Grid, Modal, Dropdown } from 'semantic-ui-react'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
-import { useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
+import { useActiveDuelists, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
 import { Opener } from '@/lib/ui/useOpener'
 import { Divider } from '@/lib/ui/Divider'
 import { ActionButton } from './ui/Buttons'
@@ -64,7 +64,7 @@ export default function TableModal({
         </Grid>
       </Modal.Header>
       <Modal.Content>
-        <Modal.Description className='FillParent ModalText TitleCase'>
+        <Modal.Description className='FillParent TitleCase'>
           <TableSwitcher tableId={selectedTableId} setSelectedTableId={setSelectedTableId}/>
           <Divider hidden />
           <TableDescription tableId={selectedTableId} />
@@ -100,8 +100,9 @@ function TableDescription({
   const { tokenName, tokenSymbol } = useERC20TokenName(contractAddress)
   const { challengeIds: liveChallengeIds } = useLiveChallengeIds(tableId)
   const { challengeIds: pastChallengeIds } = usePastChallengeIds(tableId)
+  const { activeDuelistsCount } = useActiveDuelists(tableId)
   return (
-    <Grid >
+    <Grid className='H4'>
       <Row className='NoPadding' verticalAlign='middle'>
         <Col width={8} textAlign='right'>
           Wager Coin:
@@ -155,7 +156,16 @@ function TableDescription({
         </Col>
       </Row>
 
-      <Row columns={'equal'} className='NoPadding' textAlign='center'>
+      <Row className='NoPadding' verticalAlign='middle'>
+        <Col width={8} textAlign='right'>
+          Active Duelists:
+        </Col>
+        <Col width={8} className='Wager PaddedLeft Bold'>
+          {activeDuelistsCount}
+        </Col>
+      </Row>
+
+      <Row columns={'equal'} className='NoPadding H5' textAlign='center'>
         <Col>
           <Divider />
           <h5>Table is {isOpen ? <span className='Important'>Open</span> : <span className='Negative'>Closed</span>}</h5>
