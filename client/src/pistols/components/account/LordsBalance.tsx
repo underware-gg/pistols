@@ -81,12 +81,9 @@ export function WagerAndOrFees({
       </>
     )
   }
-  if (BigInt(fee ?? 0) > 0n) {
-    return (
-      <span>
-        <Balance big={big} tableId={tableId} wei={fee} pre={pre} />
-      </span>
-    )
-  }
-  return <></>
+  return (
+    <span>
+      <Balance big={big} tableId={tableId} wei={fee} pre={pre} placeholdder={0} />
+    </span>
+  )
 }

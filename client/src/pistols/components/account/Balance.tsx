@@ -22,6 +22,7 @@ export function Balance({
   pre = null,
   post = null,
   children = null,
+  placeholdder = '?',
 }: {
   tableId: string
   value?: BigNumberish
@@ -32,7 +33,9 @@ export function Balance({
   crossed?: boolean
   pre?: string
   post?: string
+  placeholdder?: string | number
   children ?: ReactNode
+  
 }) {
   const _value = useMemo(() => {
     let result = (
@@ -54,15 +57,13 @@ export function Balance({
     return result
   }, [small, big, crossed])
 
-  if (!_value) return <></>
-
   return (
     <span className={classNames.join(' ')}>
       {pre}
       {/* {!clean && <>💰</>} */}
       {/* {!clean && <EmojiIcon emoji='💰' />} */}
       {!clean && <LordsBagIcon size={null} />}
-      {_value}
+      {_value ?? placeholdder}
       {post}
     </span>
   )

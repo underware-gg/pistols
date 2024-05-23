@@ -14,8 +14,8 @@ export const useWager = (duelId: BigNumberish) => {
   const wager: any = useComponentValue(Wager, bigintToEntity(duelId))
 
   return {
-    value: wager?.value ?? null,
-    fee: wager?.fee ?? null,
+    value: wager ? BigInt(wager.value) : null,
+    fee: wager ? BigInt(wager.fee) : null,
     feeFormatted: wager?.fee ?? null,
   }
 }

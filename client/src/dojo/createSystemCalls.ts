@@ -122,7 +122,7 @@ export function createSystemCalls(
       // find Wager
       const challenge = getComponentValue(Challenge, bigintToEntity(duel_id))
       const wager = getComponentValue(Wager, bigintToEntity(duel_id))
-      const approved_value = (wager.value + wager.fee)
+      const approved_value = wager ? (wager.value + wager.fee) : 0n
       if (approved_value > 0n) {
         // find lords contract
         const table = getComponentValue(TTable, bigintToEntity(challenge.table_id))

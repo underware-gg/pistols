@@ -191,6 +191,7 @@ canvas {
 
 .Overflow { overflow: hidden; } // do not expand parent
 .BreakWord { word-wrap:break-word!important; overflow-wrap: break-word!important; }
+.NoBreak { white-space: nowrap; }
 
 .NoMouse { pointer-events: none; }
 .YesMouse { pointer-events: auto; }
@@ -329,7 +330,7 @@ canvas {
 }
 .FillWidth {
   width: 100%!important;
-  min-width: 100%;
+  min-width: 100%!important;
   align-items: center;
 }
 .FillHeight {

@@ -6,6 +6,7 @@ import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useWager } from '@/pistols/hooks/useWager'
+import { useTable } from '@/pistols/hooks/useTable'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePicButton } from '@/pistols/components/account/ProfilePic'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
@@ -27,24 +28,24 @@ export default function ChallengeModal() {
   const { account, isThisAccount } = useDojoAccount()
 
   const { duelId, dispatchSelectDuel, dispatchSelectDuelist } = usePistolsContext()
+  const isOpen = useMemo(() => (duelId > 0), [duelId])
+
+  const _close = () => { dispatchSelectDuel(0n) }
 
   const { state, tableId, message, duelistA, duelistB, isLive, isFinished, needToSyncExpired } = useChallenge(duelId)
   const { value, fee } = useWager(duelId)
+  const { description: tableDescription }= useTable(tableId)
 
   const { challengeDescription } = useChallengeDescription(duelId)
 
   const { profilePic: profilePicA } = useDuelist(duelistA)
   const { profilePic: profilePicB } = useDuelist(duelistB)
 
-  const isOpen = useMemo(() => (duelId > 0), [duelId])
-
   const isChallenger = useMemo(() => isThisAccount(duelistA), [duelistA, isThisAccount])
   const isChallenged = useMemo(() => isThisAccount(duelistB), [duelistB, isThisAccount])
   const isYou = (isChallenger || isChallenged)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
-
-  const _close = () => { dispatchSelectDuel(0n) }
 
   const _reply = (accepted: boolean) => {
     const _submit = async () => {
@@ -73,8 +74,8 @@ export default function ChallengeModal() {
             <Col width={4} textAlign='left'>
               Challenge
             </Col>
-            <Col width={8} textAlign='center'>
-              <span className='Code'><ChallengeTime duelId={duelId} prefixed /></span>
+            <Col width={8} textAlign='center' className='NoBreak Important'>
+              {tableDescription}
             </Col>
             <Col width={1} textAlign='right'>
               <Icon className='Anchor IconClick' name='database' size={'small'} onClick={() => window?.open(`/dueldata/${duelId}`, '_blank')} />
@@ -115,10 +116,10 @@ export default function ChallengeModal() {
               </Col>
             </Row>
 
-            {(value > 0 || isYou) && <>
+            {(value || (isYou && fee)) && <>
               <Row columns='equal' textAlign='right'>
                 <Col>
-                  <Divider content={value > 0 ? 'Placing a wager of' : 'Fees'} nomargin />
+                  <Divider content={value ? 'Placing a wager of' : 'Fees'} nomargin />
                 </Col>
               </Row>
               <Row columns='equal' textAlign='center'>
@@ -149,6 +150,7 @@ export default function ChallengeModal() {
             <Row columns='equal' textAlign='center'>
               <Col>
                 <h3 className=''>{challengeDescription}</h3>
+                <span className='Code'><ChallengeTime duelId={duelId} prefixed /></span>
                 {/* <Divider className='NoMargin' /> */}
               </Col>
             </Row>

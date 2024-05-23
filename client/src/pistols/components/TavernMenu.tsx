@@ -91,7 +91,7 @@ export function TavernMenu({
     <div>
       <Grid>
         <Row className='ProfilePicHeight'>
-          <Col width={7} className='Title' verticalAlign='middle'>
+          <Col width={7} verticalAlign='middle' className='Title NoBreak'>
             &nbsp;&nbsp;&nbsp;<b>Pistols at 10 Blocks</b>
             <br />
             &nbsp;&nbsp;&nbsp;<b className='Important'>{description}</b> <Icon className='Anchor IconClick' name='ticket' size={'small'} onClick={() => _changeTable()} />

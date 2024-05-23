@@ -7,6 +7,7 @@ import ConnectionDetector from './account/ConnectionDetector'
 import TableModal from '@/pistols/components/TableModal'
 import DuelistModal from '@/pistols/components/DuelistModal'
 import ChallengeModal from '@/pistols/components/ChallengeModal'
+import NewChallengeModal from '@/pistols/components/NewChallengeModal'
 
 export default function Tavern() {
   const { tableOpener } = usePistolsContext()
@@ -22,6 +23,7 @@ export default function Tavern() {
       <TableModal opener={tableOpener} />
       <DuelistModal />
       <ChallengeModal />
+      <NewChallengeModal />
       <TavernAudios />
 
       <ConnectionDetector />

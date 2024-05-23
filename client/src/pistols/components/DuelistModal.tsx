@@ -1,73 +1,35 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { Grid, Modal, Form, Divider, Dropdown, Icon } from 'semantic-ui-react'
-import { useDojoAccount, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
+import { Grid, Modal, Icon } from 'semantic-ui-react'
+import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { usePact } from '@/pistols/hooks/usePact'
-import { useCalcFee } from '@/pistols/hooks/useContractCalls'
-import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
-import { ethToWei, validateCairoString } from '@/lib/utils/starknet'
-import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
+import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ChallengeTableByDuelist } from '@/pistols/components/ChallengeTable'
-import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
-import { ChallengeMessages } from '@/pistols/utils/pistols'
-import { WagerAndOrFees } from '@/pistols/components/account/LordsBalance'
+import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { randomArrayElement } from '@/lib/utils/random'
-import { useSettingsContext } from '../hooks/SettingsContext'
-import { useTable } from '../hooks/useTable'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export default function DuelistModal() {
-  const { tableId } = useSettingsContext()
-  const { create_challenge } = useDojoSystemCalls()
-  const { account, accountAddress, isGuest, isThisAccount } = useDojoAccount()
+  const { accountAddress, isGuest, isThisAccount } = useDojoAccount()
   const router = useRouter()
 
-  const { duelistAddress, dispatchSelectDuelist, dispatchSelectDuel } = usePistolsContext()
+  const { duelistAddress, dispatchSelectDuel, dispatchSelectDuelist, dispatchChallengedDuelist } = usePistolsContext()
+  const isOpen = useMemo(() => (duelistAddress > 0), [duelistAddress])
+  const isYou = useMemo(() => isThisAccount(duelistAddress), [duelistAddress, isThisAccount])
+
+  const _close = () => { dispatchSelectDuelist(0n) }
+
   const { profilePic } = useDuelist(duelistAddress)
   const { hasPact, pactDuelId } = usePact(accountAddress, duelistAddress)
-  const [args, setArgs] = useState(null)
 
-  const wagerValue = useMemo(() => (args?.wager_value ?? 0n), [args])
-  const { fee } = useCalcFee(tableId, wagerValue)
-  const { wagerMin } = useTable(tableId)
-
-  const isYou = useMemo(() => isThisAccount(duelistAddress), [duelistAddress, isThisAccount])
-  const isOpen = useMemo(() => (duelistAddress > 0), [duelistAddress])
-
-  const [isChallenging, setIsChallenging] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  useEffect(() => {
-    setIsChallenging(false)
-    setIsSubmitting(false)
-  }, [isOpen])
-
-  useEffect(() => {
-    if (isChallenging && hasPact) {
-      dispatchSelectDuel(pactDuelId)
-    }
-  }, [isChallenging, hasPact])
-
-  const _close = () => {
-    dispatchSelectDuelist(0n)
-  }
   const _switchDuelist = () => {
     dispatchSelectDuelist(0n)
     router.push(`/gate`)
-  }
-  const _challenge = () => {
-    const _submit = async () => {
-      setIsSubmitting(true)
-      await create_challenge(account, duelistAddress, args.message, args.table_id, args.wager_value, args.expire_seconds)
-      setIsSubmitting(false)
-    }
-    if (args) _submit()
   }
 
   return (
@@ -75,7 +37,6 @@ export default function DuelistModal() {
       // size='small'
       // dimmer='inverted'
       onClose={() => _close()}
-      // onOpen={() => setIsChallenging(false)}
       open={isOpen}
     >
       <Modal.Header>
@@ -104,24 +65,21 @@ export default function DuelistModal() {
         <Modal.Description className='FillParent' style={{ width: '200px' }}>
           <ProfileDescription address={duelistAddress} displayStats displayBalance />
           <div className='Spacer10' />
-          {!isChallenging && <div className='TableInModal'><ChallengesList duelistAddress={duelistAddress} /></div>}
-          {isChallenging && <CreateChallenge setArgs={setArgs} />}
+          <div style={{ width: '620px' }}>
+            <ChallengeTableByDuelist address={duelistAddress} compact />
+          </div>
         </Modal.Description>
       </Modal.Content>
       <Modal.Actions className='NoPadding'>
         <Grid className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>
-              {!isChallenging && <ActionButton fill label='Close' onClick={() => _close()} />}
-              {isChallenging && <ActionButton fill label='Back Out' onClick={() => setIsChallenging(false)} />}
+              <ActionButton fill label='Close' onClick={() => _close()} />
             </Col>
             {!isYou &&
               <Col>
-                {
-                  hasPact ? <ActionButton fill important label='Existing Challenge!' onClick={() => dispatchSelectDuel(pactDuelId)} />
-                    : isChallenging ? <BalanceRequiredButton disabled={!args || isSubmitting} label='Submit Challenge!' onClick={() => _challenge()} tableId={tableId} wagerValue={wagerValue} minWagerValue={wagerMin} fee={fee} />
-                      : <ActionButton fill disabled={isGuest} label='Challenge for a Duel!' onClick={() => setIsChallenging(true)} />
-                }
+                {hasPact && <ActionButton fill important label='Challenge In Progress!' onClick={() => dispatchSelectDuel(pactDuelId)} />}
+                {!hasPact && <ActionButton fill disabled={isGuest} label='Challenge for a Duel!' onClick={() => dispatchChallengedDuelist(duelistAddress)} />}
               </Col>
             }
           </Row>
@@ -130,122 +88,3 @@ export default function DuelistModal() {
     </Modal>
   )
 }
-
-function ChallengesList({
-  duelistAddress
-}) {
-  return (
-    <div style={{ width: '620px' }}>
-      <ChallengeTableByDuelist address={duelistAddress} compact />
-    </div>
-  )
-}
-
-function CreateChallenge({
-  setArgs
-}) {
-  const { tableId } = useSettingsContext()
-  const [message, setMessage] = useState('')
-  const [days, setDays] = useState(7)
-  const [hours, setHours] = useState(0)
-  const [value, setValue] = useState(0)
-  const { fee } = useCalcFee(tableId, ethToWei(value))
-
-  useEffectOnce(() => {
-    setMessage(randomArrayElement(ChallengeMessages))
-  }, [])
-
-  const canSubmit = useMemo(() => (message.length > 3 && (days + hours) > 0), [message, days, hours, value])
-
-  useEffect(() => {
-    setArgs(canSubmit ? {
-      message,
-      expire_seconds: (days * 24 * 60 * 60) + (hours * 60 * 60),
-      table_id: tableId,
-      wager_value: ethToWei(value),
-    } : null)
-  }, [message, days, hours, value])
-  // console.log(canSubmit, days, hours, lords, message)
-
-  const [customMessage, setCustomMessage] = useState('')
-  const messageOptions: any[] = useMemo(() =>
-    (ChallengeMessages.includes(customMessage) ? ChallengeMessages : [customMessage, ...ChallengeMessages]).map(msg => ({
-      key: msg.replace(' ', '_'),
-      value: msg,
-      text: msg,
-    })), [customMessage])
-  const daysOptions: any[] = useMemo(() => Array.from(Array(8).keys()).map(index => ({
-    key: `${index}d`,
-    value: `${index}`,
-    text: `${index} days`,
-  })), [])
-  const hoursOptions: any[] = useMemo(() => Array.from(Array(24).keys()).map(index => ({
-    key: `${index}h`,
-    value: `${index}`,
-    text: `${index} hours`,
-  })), [])
-
-  return (
-    <div style={{ width: '430px' }}>
-      <Divider />
-      <h1>Challenge Conditions</h1>
-
-      <Form className=''>
-        <Form.Field>
-          <span className='FormLabel'>&nbsp;reasoning</span>
-          {/* <input placeholder={_defaultMessage} value={message} maxLength={31} onChange={(e) => setMessage(e.target.value)} /> */}
-          <Dropdown
-            options={messageOptions}
-            placeholder={'say something!'}
-            search
-            selection
-            fluid
-            allowAdditions
-            additionLabel={''}
-            value={message}
-            onAddItem={() => { }}
-            onFocus={(e) => {
-              setCustomMessage('')
-              setMessage('')
-            }}
-            onChange={(e, { value }) => {
-              const _msg = validateCairoString(value as string)
-              if (!ChallengeMessages.includes(_msg)) {
-                setCustomMessage(_msg)
-              }
-              setMessage(_msg)
-            }}
-          />
-        </Form.Field>
-        <Form.Field>
-          <span className='FormLabel'>&nbsp;expiration</span>
-          <Grid className='NoMargin' columns={'equal'}>
-            <Row>
-              <Col>
-                <Dropdown defaultValue='7' placeholder='Days' selection options={daysOptions} onChange={(e, { value }) => setDays(parseInt(value as string))} />
-              </Col>
-              <Col>
-                <Dropdown defaultValue='0' placeholder='Hours' selection options={hoursOptions} onChange={(e, { value }) => setHours(parseInt(value as string))} />
-              </Col>
-            </Row>
-          </Grid>
-        </Form.Field>
-        <Form.Field>
-          <span className='FormLabel'>&nbsp;wager $LORDS</span>
-          <input placeholder={'$LORDS'} value={value} maxLength={12} onChange={(e) => {
-            const _input = e.target.value as string
-            const _lords = _input ? parseInt(_input) : 0
-            if (!isNaN(_lords)) {
-              setValue(_lords)
-            }
-          }} />
-        </Form.Field>
-
-        <WagerAndOrFees big tableId={tableId} value={ethToWei(value)} fee={fee} pre={'Cost: '} />
-
-      </Form>
-
-    </div>
-  )
-}
-

@@ -5,12 +5,15 @@ import { useERC20Balance } from '@/lib/utils/hooks/useERC20'
 import { bigintToEntity } from '@/lib/utils/types'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
 import { BigNumberish } from 'starknet'
+import { useMemo } from 'react'
 
 export const useTable = (tableId: string) => {
   const { TTable } = useDojoComponents()
   const table = useComponentValue(TTable, bigintToEntity(stringToFelt(tableId ?? '')))
+  const contractAddress = useMemo(() => (table?.contract_address ?? 0n), [table])
   return {
-    contractAddress: table?.contract_address ?? 0n,
+    contractAddress,
+    canWager: (contractAddress != 0n),
     description: table ? feltToString(table.description) : '?',
     wagerMin: table?.wager_min ?? null,
     feeMin: table?.fee_min ?? null,
