@@ -1,12 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { Grid, Modal, Button, Image, Dropdown } from 'semantic-ui-react'
-import { useConnect, Connector, useAccount } from '@starknet-react/core'
-import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
+import React, { useEffect, useState } from 'react'
+import { Grid, Modal, Dropdown } from 'semantic-ui-react'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
+import { useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
 import { Opener } from '@/lib/ui/useOpener'
-import { VStack } from '@/lib/ui/Stack'
 import { Divider } from '@/lib/ui/Divider'
-import { AddressShort } from '@/lib/ui/AddressShort'
 import { ActionButton } from './ui/Buttons'
 import { tables } from '../utils/constants'
 import { useSettingsContext } from '../hooks/SettingsContext'
@@ -20,10 +17,8 @@ const Col = Grid.Column
 
 export default function TableModal({
   opener,
-  walletHelp = false,
 }: {
   opener: Opener
-  walletHelp?: boolean
 }) {
   const { tableId } = useSettingsContext()
   const [selectedTableId, setSelectedTableId] = useState('')
@@ -103,14 +98,18 @@ function TableDescription({
     isOpen,
  } = useTable(tableId)
   const { tokenName, tokenSymbol } = useERC20TokenName(contractAddress)
+  const { challengeIds: liveChallengeIds } = useLiveChallengeIds(tableId)
+  const { challengeIds: pastChallengeIds } = usePastChallengeIds(tableId)
   return (
     <Grid >
       <Row className='NoPadding' verticalAlign='middle'>
         <Col width={8} textAlign='right'>
           Wager Coin:
         </Col>
-        <Col width={8}>
-          <Balance tableId={tableId}>{tokenName}</Balance>
+        <Col width={8} className='Bold'>
+          {/* {tokenName && <Balance tableId={tableId}>{tokenName}</Balance>} */}
+          {/* {!tokenName && <>N/A</>} */}
+          {tokenName ?? <>N/A</>}
         </Col>
       </Row>
 
@@ -118,7 +117,7 @@ function TableDescription({
         <Col width={8} textAlign='right'>
           Minimun Wager:
         </Col>
-        <Col width={8}>
+        <Col width={8} className='Bold'>
           <Balance tableId={tableId} wei={wagerMin} />
         </Col>
       </Row>
@@ -127,7 +126,7 @@ function TableDescription({
         <Col width={8} textAlign='right'>
           Minimun Fee:
         </Col>
-        <Col width={8}>
+        <Col width={8} className='Bold'>
           {(Boolean(feePct) && !Boolean(feeMin)) ?
             <span className='Wager'>{feePct}%</span>
             : <>
@@ -140,10 +139,19 @@ function TableDescription({
 
       <Row className='NoPadding' verticalAlign='middle'>
         <Col width={8} textAlign='right'>
-          Duels:
+          Live Duels:
         </Col>
-        <Col width={8} className='Wager PaddedLeft'>
-          99
+        <Col width={8} className='Wager PaddedLeft Bold'>
+          {liveChallengeIds.length}
+        </Col>
+      </Row>
+
+      <Row className='NoPadding' verticalAlign='middle'>
+        <Col width={8} textAlign='right'>
+          Past Duels:
+        </Col>
+        <Col width={8} className='Wager PaddedLeft Bold'>
+          {pastChallengeIds.length}
         </Col>
       </Row>
 

@@ -3,7 +3,7 @@ import { HasValue, getComponentValue, Component } from '@dojoengine/recs'
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { useComponentValue } from "@dojoengine/react"
 import { bigintToEntity } from '@/lib/utils/types'
-import { feltToString } from "@/lib/utils/starknet"
+import { feltToString, stringToFelt } from "@/lib/utils/starknet"
 import { ChallengeState, ChallengeStateDescriptions, LiveChallengeStates, PastChallengeStates } from "@/pistols/utils/pistols"
 import { useEntityKeys, useEntityKeysQuery } from '@/lib/dojo/hooks/useEntityKeys'
 import { useClientTimestamp } from "@/lib/utils/hooks/useTimestamp"
@@ -12,26 +12,6 @@ import { BigNumberish } from 'starknet'
 
 
 const _challegeSorterByTimestamp = ((a: any, b: any) => Number((a.timestamp_end && b.timestamp_end) ? (a.timestamp_end - b.timestamp_end) : (a.timestamp_start - b.timestamp_start)))
-
-//-----------------------------
-// All Challenges
-//
-
-export const useAllChallengeIds = () => {
-  const { Challenge } = useDojoComponents()
-  const challengeIds: bigint[] = useEntityKeys(Challenge, 'duel_id')
-  return {
-    challengeIds,
-  }
-}
-
-export const useChallengeIdsByState = (state: ChallengeState) => {
-  const { Challenge } = useDojoComponents()
-  const challengeIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { state: state })])
-  return {
-    challengeIds,
-  }
-}
 
 const _filterComponentsByValue = (component: Component, entityIds: bigint[], keyName: string, values: any[], include: boolean, also: Function = null): bigint[] => (
   entityIds.reduce((acc: bigint[], id: bigint) => {
@@ -43,8 +23,34 @@ const _filterComponentsByValue = (component: Component, entityIds: bigint[], key
   }, [] as bigint[])
 )
 
-export const useChallengeIdsByStates = (states: ChallengeState[]) => {
-  const { challengeIds: allChallengeIds } = useAllChallengeIds()
+const _filterChallengesByTable = (component: Component, entityIds: bigint[], tableId: string): bigint[] => {
+  const table_id = stringToFelt(tableId)
+  return entityIds.reduce((acc: bigint[], id: bigint) => {
+    const componentValue = getComponentValue(component, bigintToEntity(id))
+    if (componentValue.table_id == table_id) {
+      acc.push(id)
+    }
+    return acc
+  }, [] as bigint[])
+}
+
+//-----------------------------
+// All Challenges
+//
+
+export const useAllChallengeIds = (tableId?: string) => {
+  const { Challenge } = useDojoComponents()
+  const allChallengeIds: bigint[] = useEntityKeys(Challenge, 'duel_id')
+  const challengeIds = useMemo(() => (
+    tableId ? _filterChallengesByTable(Challenge, allChallengeIds, tableId) : allChallengeIds
+  ), [allChallengeIds, tableId])
+  return {
+    challengeIds,
+  }
+}
+
+export const useChallengeIdsByStates = (states: ChallengeState[], tableId?: string) => {
+  const { challengeIds: allChallengeIds } = useAllChallengeIds(tableId)
   const { Challenge } = useDojoComponents()
   const challengeIds = useMemo(() => (
     _filterComponentsByValue(Challenge, allChallengeIds, 'state', states, true)
@@ -55,12 +61,12 @@ export const useChallengeIdsByStates = (states: ChallengeState[]) => {
   }
 }
 
-export const useLiveChallengeIds = () => {
-  return useChallengeIdsByStates(LiveChallengeStates)
+export const useLiveChallengeIds = (tableId?: string) => {
+  return useChallengeIdsByStates(LiveChallengeStates, tableId)
 }
 
-export const usePastChallengeIds = () => {
-  return useChallengeIdsByStates(PastChallengeStates)
+export const usePastChallengeIds = (tableId?: string) => {
+  return useChallengeIdsByStates(PastChallengeStates, tableId)
 }
 
 
@@ -182,6 +188,7 @@ export const useChallengesByDuelistCount = (address: bigint) => {
       drawCount: 0,
       winCount: 0,
       loseCount: 0,
+      liveDuelsCount: 0,
     }
     raw_challenges.forEach(ch => {
       if (ch.state == ChallengeState.Awaiting) result.awaitingCount++;
@@ -193,6 +200,7 @@ export const useChallengesByDuelistCount = (address: bigint) => {
         if (winnerDuelist != address) result.loseCount++;
       }
     })
+    result.liveDuelsCount = (result.awaitingCount + result.inProgressCount)
     return result
   }, [raw_challenges])
 
