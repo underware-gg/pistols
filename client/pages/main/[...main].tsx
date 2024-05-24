@@ -39,11 +39,11 @@ export default function MainPage() {
       const _slugs = router.query.main.slice(1)
       if (_page == 'gate') {
         scene = SceneName.Gate
-        title = 'Pistols - The Gate'
+        title = 'Pistols - Gate'
         // bgClassName = 'BackgroundGate'
       } else if (_page == 'tavern') {
         scene = SceneName.Tavern
-        title = 'Pistols - The Tavern'
+        title = 'Pistols - Tavern'
         // bgClassName = menuKey ? bgsTavern[menuKey] : 'BackgroundDuelists'
       } else if (_page == 'duel') {
         // '/room/[duel_id]'
