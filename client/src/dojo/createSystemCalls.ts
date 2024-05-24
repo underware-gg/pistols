@@ -2,7 +2,7 @@ import {
   getEvents,
   // setComponentsFromEvents,
 } from '@dojoengine/utils'
-import { SetupNetworkResult } from '../lib/dojo/setup/setupNetwork'
+import { SetupNetworkResult } from '../lib/dojo/setup/setup'
 import { splitU256, stringToFelt } from '@/lib/utils/starknet'
 import { Account, BigNumberish, Call, CallContractResponse, uint256 } from 'starknet'
 import { emitter } from '@/pistols/three/game'

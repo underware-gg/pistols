@@ -14,8 +14,8 @@ import { createClientComponents } from './createClientComponents'
 import { setupNetwork } from './setupNetwork'
 import * as torii from '@dojoengine/torii-client'
 
-// TODO: move out of lib
-import { createSystemCalls } from '../../../dojo/createSystemCalls'
+// TODO: move out of lib??
+import { createSystemCalls, defineContractComponents, type SetupNetworkResult } from './setup'
 
 export type SetupResult = ReturnType<typeof useSetup> | null
 
@@ -74,9 +74,9 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
 
   //
   // Initialize the network configuration.
-  const network = useMemo<ReturnType<typeof setupNetwork>>(() => {
+  const network = useMemo<SetupNetworkResult>(() => {
     if (!dojoProvider) return (dojoProvider as any) // undefined or null
-    return setupNetwork(dojoProvider)
+    return setupNetwork(dojoProvider, defineContractComponents)
   }, [dojoProvider])
 
   //

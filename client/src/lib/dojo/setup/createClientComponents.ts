@@ -1,5 +1,5 @@
 import { overridableComponent } from "@dojoengine/recs";
-import { SetupNetworkResult } from "./setupNetwork";
+import { SetupNetworkResult } from "./setup";
 
 export type ClientComponents = ReturnType<typeof createClientComponents>;
 

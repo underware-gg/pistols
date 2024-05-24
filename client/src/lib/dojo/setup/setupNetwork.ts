@@ -1,19 +1,23 @@
 import { Account, AllowArray, Call, num } from 'starknet'
-import { createWorld } from '@dojoengine/recs'
+import { createWorld, World } from '@dojoengine/recs'
 import { DojoProvider } from '@dojoengine/core'
 
-// TODO: move out of lib
-import { defineContractComponents } from '../../../dojo/contractComponents'
+export type IDefineContractComponentsFunction = (world: World) => any
+
+export type ISetupNetworkResult<CC extends IDefineContractComponentsFunction> = {
+  world: World
+  contractComponents: ReturnType<CC>
+  execute: DojoProvider['execute']
+  executeMulti: DojoProvider['executeMulti']
+  call: DojoProvider['call']
+}
 
 export const world = createWorld()
-export const contractComponents = defineContractComponents(world)
 
-export type SetupNetworkResult = Awaited<ReturnType<typeof setupNetwork>>
-
-export function setupNetwork(provider: DojoProvider) {
+export function setupNetwork<CC extends IDefineContractComponentsFunction>(provider: DojoProvider, defineContractComponents: CC): ISetupNetworkResult<CC> {
   return {
     world,
-    contractComponents,
+    contractComponents: defineContractComponents(world),
     execute: async (signer: Account, contract: string, system: string, call_data: num.BigNumberish[]) => {
       return provider.execute(signer, contract, system, call_data)
     },
