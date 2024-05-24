@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo } from 'react'
 import { useRouter } from 'next/router'
+import { useRouterStarter, useRouterListener } from '@/pistols/hooks/useRouterListener'
 import { usePistolsContext, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
-import { useRouterStarter } from '@/pistols/hooks/useRouterListener'
 import AppPistols from '@/pistols/components/AppPistols'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import GameContainer from '@/pistols/components/GameContainer'
@@ -95,6 +95,7 @@ function MainUI({
   duelId
 }) {
   useRouterStarter()
+  useRouterListener()
   const { gameImpl } = useThreeJsContext()
   const { atGate, atTavern, atDuel, connectOpener } = usePistolsContext()
 
