@@ -160,7 +160,7 @@ function WagerStats({
 }) {
   const { value, fee } = useWager(duelId)
   const { description } = useTable(tableId)
-  if (value == 0) return <></>
+  if (!value) return <></>
   return (
     <Table celled striped color='green'>
       <Header>
