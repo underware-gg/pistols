@@ -1,7 +1,7 @@
 import React from 'react'
 import { ThreeJsProvider } from '@/pistols/hooks/ThreeJsContext'
 import { GameplayProvider } from '@/pistols/hooks/GameplayContext'
-import { makeDojoAppConfig } from '@/dojo/config'
+import { makeDojoAppConfig } from '@/games/pistols/config'
 import { HeaderData } from '@/lib/ui/AppHeader'
 import ErrorModal from '@/pistols/components/ErrorModal'
 import Dojo from '@/lib/dojo/Dojo'

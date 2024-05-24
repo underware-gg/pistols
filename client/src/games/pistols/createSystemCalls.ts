@@ -2,14 +2,14 @@ import {
   getEvents,
   // setComponentsFromEvents,
 } from '@dojoengine/utils'
-import { SetupNetworkResult } from '../lib/dojo/setup/setup'
+import { SetupNetworkResult } from '../../lib/dojo/setup/setup'
 import { splitU256, stringToFelt } from '@/lib/utils/starknet'
 import { Account, BigNumberish, Call, CallContractResponse, uint256 } from 'starknet'
 import { emitter } from '@/pistols/three/game'
 import { getContractByName } from '@dojoengine/core'
 import { bigintAdd, bigintToEntity, bigintToHex } from '@/lib/utils/types'
 import { getComponentValue } from '@dojoengine/recs'
-import { ClientComponents } from '../lib/dojo/setup/createClientComponents'
+import { ClientComponents } from '../../lib/dojo/setup/createClientComponents'
 
 // FIX while this is not merged
 // https://github.com/dojoengine/dojo.js/pull/190

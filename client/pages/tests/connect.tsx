@@ -8,7 +8,7 @@ import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { feltToString } from '@/lib/utils/starknet'
 import { bigintToHex, shortAddress } from '@/lib/utils/types'
 import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
-import { makeDojoAppConfig } from '@/dojo/config'
+import { makeDojoAppConfig } from '@/games/pistols/config'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import AppDojo from '@/lib/ui/AppDojo'
 

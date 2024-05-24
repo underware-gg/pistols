@@ -1,7 +1,7 @@
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
 import { ChainId, defaultChainId } from '@/lib/dojo/setup/chainConfig'
-import pistols_manifest_dev from '@/generated/pistols/dev/manifest.json'
-import pistols_manifest_slot from '@/generated/pistols/slot/manifest.json'
+import pistols_manifest_dev from '@/games/pistols/generated/dev/manifest.json'
+import pistols_manifest_slot from '@/games/pistols/generated/slot/manifest.json'
 
 export const makeDojoAppConfig = (): DojoAppConfig => {
 
