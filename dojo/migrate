@@ -12,7 +12,8 @@ fi
 #
 export MANIFEST_FILE_PATH="./manifests/$PROFILE/manifest.json"
 export BINDINGS_PATH="./bindings/typescript"
-export CLIENT_PATH="../client/src/games/pistols/generated/$PROFILE"
+export GAME_SLUG="pistols"
+export CLIENT_PATH="../client/src/games/$GAME_SLUG/generated/$PROFILE"
 export PROJECT_NAME=$(toml get Scarb.toml --raw tool.dojo.world.name)
 export WORLD_ADDRESS=$(toml get Scarb.toml --raw tool.dojo.env.world_address)
 export RPC_URL=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.rpc_url)
@@ -77,10 +78,8 @@ cp $MANIFEST_FILE_PATH $CLIENT_PATH/
 # TODO: Remove this when bindings are working
 # copy to client
 cd ../client
-npm run create-components-pistols --profile=$PROFILE $RPC_URL $WORLD_ADDRESS
+npm run create-components ---game=$GAME_SLUG --profile=$PROFILE $RPC_URL $WORLD_ADDRESS
 
-
-#------------------
 # list copied files
 ls -ld $CLIENT_PATH/* | grep -E 'ts|json'
 
