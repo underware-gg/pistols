@@ -1,18 +1,36 @@
-import React, { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
+import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
+import { usePistolsContext } from './PistolsContext'
 
-export const useRouterListener = () => {
+export const useRouterStarter = () => {
   const router = useRouter()
-  const { debug } = router.query
+  const { duel, duelist, table, debug } = router.query
 
+  const { dispatchSelectDuel, dispatchSelectDuelist } = usePistolsContext()
   const { dispatchSetting, SettingsActions } = useSettingsContext()
 
-  // useEffect(() => {
-  //   console.log(`Q:`, router.query)
-  // }, [router.query])
+  // select duel if url contains 'duel=0x1234'
+  useEffectOnce(() => {
+    if (typeof duel == 'string') {
+      dispatchSelectDuel(duel)
+    }
+  }, [duel])
 
-  useEffect(() => {
+  useEffectOnce(() => {
+    if (typeof duelist == 'string') {
+      dispatchSelectDuelist(duelist)
+    }
+  }, [duelist])
+
+  useEffectOnce(() => {
+    if (typeof table == 'string') {
+      dispatchSetting(SettingsActions.TABLE_ID, table)
+    }
+  }, [table])
+
+  useEffectOnce(() => {
     if (typeof debug == 'string') {
       dispatchSetting(SettingsActions.DEBUG_MODE, parseInt(debug) != 0)
     }
