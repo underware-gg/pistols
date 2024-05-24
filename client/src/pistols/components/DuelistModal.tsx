@@ -57,10 +57,10 @@ export default function DuelistModal() {
       </Modal.Header>
       <Modal.Content image>
         <ProfilePic profilePic={profilePic} />
-        <Modal.Description className='FillParent' style={{ width: '200px' }}>
-          <ProfileDescription address={duelistAddress} displayStats displayBalance />
-          <div className='Spacer10' />
+        <Modal.Description className='FillParent'>
           <div style={{ width: '620px' }}>
+            <ProfileDescription address={duelistAddress} displayStats displayBalance />
+            <div className='Spacer10' />
             <ChallengeTableByDuelist address={duelistAddress} compact />
           </div>
         </Modal.Description>
