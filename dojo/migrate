@@ -12,8 +12,8 @@ fi
 #
 export MANIFEST_FILE_PATH="./manifests/$PROFILE/manifest.json"
 export BINDINGS_PATH="./bindings/typescript"
-export CLIENT_PATH="../client/src/generated"
-export CLIENT_MANIFEST_PATH="../client/src/generated/$PROFILE"
+export CLIENT_PATH="../client/src/generated/pistols/$PROFILE"
+export PROJECT_NAME=$(toml get Scarb.toml --raw tool.dojo.world.name)
 export WORLD_ADDRESS=$(toml get Scarb.toml --raw tool.dojo.env.world_address)
 export RPC_URL=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.rpc_url)
 
@@ -29,6 +29,7 @@ fi
 
 echo "------------------------------------------------------------------------------"
 echo ""
+echo "PROJECT: $PROJECT_NAME"
 echo "PROFILE: $PROFILE"
 echo ""
 
@@ -61,27 +62,27 @@ scripts/default_auth.sh $PROFILE
 #------------------------
 # copy manifest to client
 #
-echo "Copying manifest [$MANIFEST_FILE_PATH] to [$CLIENT_MANIFEST_PATH/]"
-mkdir -p $CLIENT_MANIFEST_PATH
-cp $MANIFEST_FILE_PATH $CLIENT_MANIFEST_PATH/
+echo "Copying manifest [$MANIFEST_FILE_PATH] to [$CLIENT_PATH/]"
+mkdir -p $CLIENT_PATH
+cp $MANIFEST_FILE_PATH $CLIENT_PATH/
 
 #------------------------
 # typescript bindings
 #
-if [[ "$PROFILE" == "dev" ]]; then
-  # TODO: Enable this when bindings are working
-  # generate and cop bindings
-  # sozo build --typescript
-  # cp $BINDINGS_PATH/* $CLIENT_PATH/
+# TODO: Enable this when bindings are working
+# generate and cop bindings
+# sozo build --typescript
+# cp $BINDINGS_PATH/* $CLIENT_PATH/
+#
+# TODO: Remove this when bindings are working
+# copy to client
+cd ../client
+npm run create-components-pistols --profile=$PROFILE $RPC_URL $WORLD_ADDRESS
 
-  # TODO: Remove this when bindings are working
-  # copy to client
-  cd ../client
-  npm run create-components $RPC_URL $WORLD_ADDRESS
 
-  # list copied files
-  ls -ld $CLIENT_PATH/* $CLIENT_MANIFEST_PATH/* | grep -E 'ts|json'
-fi
+#------------------
+# list copied files
+ls -ld $CLIENT_PATH/* | grep -E 'ts|json'
 
-#-----------------
+#------------------
 echo "--- DONE! 👍"

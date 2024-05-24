@@ -1,7 +1,7 @@
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
 import { ChainId, defaultChainId } from '@/lib/dojo/setup/chainConfig'
-import manifest_katana from '@/generated/dev/manifest.json'
-import manifest_slot from '@/generated/slot/manifest.json'
+import pistols_manifest_dev from '@/generated/pistols/dev/manifest.json'
+import pistols_manifest_slot from '@/generated/pistols/slot/manifest.json'
 
 export const makeDojoAppConfig = (): DojoAppConfig => {
 
@@ -16,8 +16,8 @@ export const makeDojoAppConfig = (): DojoAppConfig => {
   ]
 
   const manifests = {
-    [ChainId.KATANA_LOCAL]: manifest_katana,
-    [ChainId.WP_PISTOLS_SLOT]: manifest_slot,
+    [ChainId.KATANA_LOCAL]: pistols_manifest_dev,
+    [ChainId.WP_PISTOLS_SLOT]: pistols_manifest_slot,
     [ChainId.KATANA]: null, // Realms
   }
 
