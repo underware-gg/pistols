@@ -34,14 +34,10 @@ export default function Duel({
   const { accountAddress } = useDojoAccount()
   const { gameImpl } = useThreeJsContext()
   const { animated } = useGameplayContext()
-  const { debugMode } = useSettingsContext()
-  const { dispatchSelectDuel } = usePistolsContext()
 
-  const { isLive, isFinished, message, duelistA, duelistB } = useChallenge(duelId)
   const { challengeDescription } = useChallengeDescription(duelId)
-
   const {
-    challenge: { tableId },
+    challenge: { tableId, isFinished, message, duelistA, duelistB },
     duelStage,
     completedStagesA, completedStagesB,
     canAutoRevealA, canAutoRevealB,
@@ -53,7 +49,11 @@ export default function Duel({
     gameImpl?.resetDuelScene()
   }, [])
 
+  const { debugMode, dispatchSetting, SettingsActions } = useSettingsContext()
+  const { dispatchSelectDuel } = usePistolsContext()
+
   useEffect(() => dispatchSelectDuel(duelId), [duelId])
+  useEffect(() => dispatchSetting(SettingsActions.TABLE_ID, tableId), [tableId])
 
   return (
     <>
