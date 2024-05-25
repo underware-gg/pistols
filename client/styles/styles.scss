@@ -1047,6 +1047,9 @@ input::placeholder {
   color: $color-brightest!important;
   font-weight: 600;
 }
+.ui.dropdown .menu>.item:hover {
+  background-color: $color-dark!important;
+}
 .ui.selection.dropdown .menu>.item {
   background-color: $color-dark!important;
   color: $color-text!important;
@@ -1058,6 +1061,9 @@ input::placeholder {
 }
 .ui.dropdown .menu>.item {
   color: $color-brightest!important;
+}
+.ui.active.button, .ui.active.button:hover {
+  @extend ._button_active;
 }
 // forms
 .FormLabel {

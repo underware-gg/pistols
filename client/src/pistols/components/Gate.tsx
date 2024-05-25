@@ -113,7 +113,7 @@ function ChainSwitcher({
       text={`Server:  ${selectedChainConfig.name}`}
       disabled={disabled}
       className='icon AlignCenter Padded'
-      icon='chain'
+      // icon='chain'
       button
       fluid
     >
