@@ -21,8 +21,8 @@ export enum ChainId {
   SN_MAINNET = 'SN_MAINNET',
   SN_SEPOLIA = 'SN_SEPOLIA',
   KATANA_LOCAL = 'KATANA_LOCAL',
-  WP_PISTOLS_SLOT = 'WP_PISTOLS_SLOT',
-  KATANA = 'KATANA', // actually DOJO_REALMS_WORLD
+  PISTOLS_SLOT = 'WP_PISTOLS_SLOT',
+  REALMS_WORLD = 'KATANA', // actually DOJO_REALMS_WORLD
 }
 
 //
@@ -117,7 +117,7 @@ const localKatanaConfig: DojoChainConfig = {
 
 const pistolsSlotConfig: DojoChainConfig = {
   chain: undefined, // derive from this
-  chainId: ChainId.WP_PISTOLS_SLOT,
+  chainId: ChainId.PISTOLS_SLOT,
   name: 'Slot Testnet',
   rpcUrl: 'https://api.cartridge.gg/x/pistols-slot/katana',
   toriiUrl: 'https://api.cartridge.gg/x/pistols-slot/torii',
@@ -138,7 +138,7 @@ const pistolsSlotConfig: DojoChainConfig = {
 // https://dev.realms.world/browser-wallets
 const realmsWorldConfig: DojoChainConfig = {
   chain: undefined, // derive from this
-  chainId: ChainId.KATANA,
+  chainId: ChainId.REALMS_WORLD,
   name: 'Realms World (Ranked)',
   rpcUrl: 'https://api.cartridge.gg/x/realms/katana',
   toriiUrl: 'https://api.cartridge.gg/x/realms/torii',
@@ -194,8 +194,8 @@ const snSepoliaConfig: DojoChainConfig = {
 
 export const dojoContextConfig: Record<ChainId, DojoChainConfig> = {
   [ChainId.KATANA_LOCAL]: localKatanaConfig,
-  [ChainId.WP_PISTOLS_SLOT]: pistolsSlotConfig,
-  [ChainId.KATANA]: realmsWorldConfig,
+  [ChainId.PISTOLS_SLOT]: pistolsSlotConfig,
+  [ChainId.REALMS_WORLD]: realmsWorldConfig,
   [ChainId.SN_SEPOLIA]: snSepoliaConfig,
   [ChainId.SN_MAINNET]: snMainnetConfig,
 }

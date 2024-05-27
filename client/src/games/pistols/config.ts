@@ -7,26 +7,28 @@ export const makeDojoAppConfig = (): DojoAppConfig => {
 
   const mainSystemName = 'actions'
 
-  const supportedChainIds = [
-    // ChainId.KATANA, // Realms L3
+  const supportedChainIds: ChainId[] = [
     ChainId.KATANA_LOCAL,
-    ChainId.WP_PISTOLS_SLOT,
+    ChainId.PISTOLS_SLOT,
+    // ChainId.REALMS_WORLD, // Realms L3
     ChainId.SN_SEPOLIA,
     // ChainId.SN_MAINNET,
   ]
 
-  const manifests = {
+  const manifests: Record<ChainId, any> = {
     [ChainId.KATANA_LOCAL]: pistols_manifest_dev,
-    [ChainId.WP_PISTOLS_SLOT]: pistols_manifest_slot,
-    [ChainId.KATANA]: null, // Realms
+    [ChainId.PISTOLS_SLOT]: pistols_manifest_slot,
+    [ChainId.REALMS_WORLD]: null,
+    [ChainId.SN_SEPOLIA]: null,
+    [ChainId.SN_MAINNET]: null,
   }
 
-  const initialChainId = (defaultChainId || (
+  const initialChainId: ChainId = (defaultChainId || (
     process.env.NODE_ENV === 'development' ? ChainId.KATANA_LOCAL
-      : process.env.NODE_ENV === 'production' ? ChainId.KATANA
-        : process.env.NODE_ENV === 'test' ? ChainId.WP_PISTOLS_SLOT
+      : process.env.NODE_ENV === 'production' ? ChainId.REALMS_WORLD
+        : process.env.NODE_ENV === 'test' ? ChainId.PISTOLS_SLOT
           : supportedChainIds[0]
-  )) as ChainId
+  ))
 
   return {
     mainSystemName,
