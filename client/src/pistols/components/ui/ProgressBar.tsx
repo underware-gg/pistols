@@ -10,17 +10,17 @@ export default function ProgressBar({
   disabled = false,
   warning = false,
   negative = false,
-  color = null,
+  neutral = false,
   percent = null,
-  includedBonusPercent = null,
-  glancePercent = null,
+  includedExtraPercent = null,
+  includedInnerPercent = null,
   value = null,
   total = null,
 }) {
-  const _disabled = (disabled || (!value && !percent))
+  const _disabled = (disabled || (value === null && !percent))
   const _className = `NoMargin ${className}`
   return (
-    <Grid verticalAlign='middle' className={className}>
+    <Grid verticalAlign='middle' className={`ChancesBar ${className}`}>
       <Row style={{ height: '25px' }}>
         <Col width={4} textAlign='right' className='TitleCase'>
           {label}
@@ -42,15 +42,15 @@ export default function ProgressBar({
                 value={value}
                 total={total}
                 className={_className}
-                warning={warning || Boolean(includedBonusPercent)}
+                warning={warning || Boolean(includedExtraPercent)}
                 error={negative}
-                color={color}
+                color={neutral ? 'grey' : null}
               />
-              {Boolean(includedBonusPercent) &&
-                <div className='GlanceBar BgImportant' style={{ width: `${percent - includedBonusPercent}%` }} />
+              {Boolean(includedExtraPercent) &&
+                <div className='LethalBar BgImportant' style={{ width: `${percent - includedExtraPercent}%` }} />
               }
-              {Boolean(glancePercent) &&
-                <div className='GlanceBar' style={{ width: `${glancePercent}%` }} />
+              {Boolean(includedInnerPercent) &&
+                <div className='LethalBar' style={{ width: `${includedInnerPercent}%` }} />
               }
             </>
           }

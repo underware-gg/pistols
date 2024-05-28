@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Divider, Grid, Modal, Pagination } from 'semantic-ui-react'
-import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
+import { useDojoAccount, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { signAndGenerateActionHash } from '@/pistols/utils/salt'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ActionChances } from '@/pistols/components/ActionChances'
@@ -79,14 +79,14 @@ export default function CommitPacesModal({
 
         </Modal.Description>
       </Modal.Content>
-      <Modal.Actions>
+      <Modal.Actions className='NoPadding'>
         <Grid className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>
               <ActionButton fill label='Close' onClick={() => setIsOpen(false)} />
             </Col>
             <Col>
-              <ActionButton fill attention label='Commit...' disabled={!paces || isSubmitting} onClick={() => _submit()} />
+              <ActionButton fill important label='Commit...' disabled={!paces || isSubmitting} onClick={() => _submit()} />
             </Col>
           </Row>
         </Grid>

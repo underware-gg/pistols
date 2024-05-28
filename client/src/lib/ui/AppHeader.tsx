@@ -9,11 +9,13 @@ export interface HeaderData {
   xHandle?: string
 }
 
+export interface AppHeaderProps {
+  headerData: HeaderData
+}
+
 export function AppHeader({
   headerData = {}
-}: {
-  headerData: HeaderData
-}) {
+}: AppHeaderProps) {
   const domain = process.env.SERVER_URL
 
   let title = headerData.title ?? 'Underware.gg'

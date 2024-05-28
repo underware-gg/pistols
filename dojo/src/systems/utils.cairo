@@ -1,16 +1,17 @@
+use core::option::OptionTrait;
 use debug::PrintTrait;
 use traits::{Into, TryInto};
 use starknet::{ContractAddress};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-use pistols::models::models::{init, Duelist, Challenge, Wager, Pact, Round, Shot};
-use pistols::models::coins::{Coin, CoinManagerTrait, CoinTrait};
+use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
+use pistols::models::models::{init, Duelist, Scoreboard, Score, ScoreTrait, Challenge, Snapshot, Wager, Pact, Round, Shot};
+use pistols::models::table::{TTable, TableTrait, TableManagerTrait};
 use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round::{RoundState, RoundStateTrait};
 use pistols::types::action::{Action, ActionTrait, ACTION};
-use pistols::types::constants::{constants, chances};
+use pistols::types::constants::{constants, honour, chances};
 use pistols::utils::math::{MathU8, MathU16};
-use pistols::interfaces::ierc20::{IERC20DispatcherTrait};
 
 // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
 extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
@@ -70,53 +71,79 @@ fn get_duelist_health(world: IWorldDispatcher, duelist_address: ContractAddress,
     }
 }
 
+fn create_challenge_snapshot(world: IWorldDispatcher, challenge: Challenge) {
+    let scoreboard_a: Scoreboard = get!(world, (challenge.duelist_a, challenge.table_id), Scoreboard);
+    let scoreboard_b: Scoreboard = get!(world, (challenge.duelist_b, challenge.table_id), Scoreboard);
+    let snapshot = Snapshot {
+        duel_id: challenge.duel_id,
+        score_a: scoreboard_a.score,
+        score_b: scoreboard_b.score,
+    };
+    set!(world, (snapshot));
+}
+
+fn get_snapshot_scores(world: IWorldDispatcher, address: ContractAddress, duel_id: u128) -> (Score, Score) {
+    let challenge: Challenge = get!(world, duel_id, Challenge);
+    let snapshot: Snapshot = get!(world, duel_id, Snapshot);
+    if (address == challenge.duelist_a) {
+        (snapshot.score_a, snapshot.score_b)
+    } else if (address == challenge.duelist_b) {
+        (snapshot.score_b, snapshot.score_a)
+    } else {
+        (init::Score(), init::Score())
+    }
+}
+
 // player need to allow contract to transfer funds first
 // ierc20::approve(contract_address, max(wager.value, wager.fee));
-fn deposit_wager_fees(world: IWorldDispatcher, from: ContractAddress, to: ContractAddress, duel_id: u128) {
-    let wager: Wager = get!(world, (duel_id), Wager);
+fn deposit_wager_fees(world: IWorldDispatcher, challenge: Challenge, from: ContractAddress, to: ContractAddress) {
+    let wager: Wager = get!(world, (challenge.duel_id), Wager);
     let total: u256 = (wager.value + wager.fee);
     if (total > 0) {
-        let coin : Coin = CoinManagerTrait::new(world).get(wager.coin);
-        let balance: u256 = coin.ierc20().balance_of(from);
-        let allowance: u256 = coin.ierc20().allowance(from, to);
+        let table : TTable = TableManagerTrait::new(world).get(challenge.table_id);
+        let balance: u256 = table.ierc20().balance_of(from);
+        let allowance: u256 = table.ierc20().allowance(from, to);
         assert(balance >= total, 'Insufficient balance for Fees');
         assert(allowance >= total, 'Not allowed to transfer Fees');
-        coin.ierc20().transfer_from(from, to, total);
+        table.ierc20().transfer_from(from, to, total);
     }
 }
-fn withdraw_wager_fees(world: IWorldDispatcher, to: ContractAddress, duel_id: u128) {
-    let wager: Wager = get!(world, (duel_id), Wager);
+fn withdraw_wager_fees(world: IWorldDispatcher, challenge: Challenge, to: ContractAddress) {
+    let wager: Wager = get!(world, (challenge.duel_id), Wager);
     let total: u256 = (wager.value + wager.fee);
     if (total > 0) {
-        let coin : Coin = CoinManagerTrait::new(world).get(wager.coin);
-        let balance: u256 = coin.ierc20().balance_of(starknet::get_contract_address());
+        let table : TTable = TableManagerTrait::new(world).get(challenge.table_id);
+        let balance: u256 = table.ierc20().balance_of(starknet::get_contract_address());
         assert(balance >= total, 'Withdraw not available'); // should never happen!
-        coin.ierc20().transfer(to, total);
+        table.ierc20().transfer(to, total);
     }
 }
-fn split_wager_fees(world: IWorldDispatcher, share_1: ContractAddress, share_2: ContractAddress, duel_id: u128) {
-    let wager: Wager = get!(world, (duel_id), Wager);
+// spllit wager beteen duelist_a and duelist_b
+fn split_wager_fees(world: IWorldDispatcher, challenge: Challenge, duelist_a: ContractAddress, duelist_b: ContractAddress) -> u256 {
+    let wager: Wager = get!(world, (challenge.duel_id), Wager);
     let total: u256 = (wager.value + wager.fee) * 2;
     if (total > 0) {
-        let coin : Coin = CoinManagerTrait::new(world).get(wager.coin);
-        let balance: u256 = coin.ierc20().balance_of(starknet::get_contract_address());
+        let table : TTable = TableManagerTrait::new(world).get(challenge.table_id);
+        let balance: u256 = table.ierc20().balance_of(starknet::get_contract_address());
         assert(balance >= total, 'Wager not available'); // should never happen!
         if (wager.value > 0) {
-            if (share_1 == share_2) {
+            if (duelist_a == duelist_b) {
                 // single winner
-                coin.ierc20().transfer(share_1, wager.value * 2);
+                table.ierc20().transfer(duelist_a, wager.value * 2);
             } else {
-                coin.ierc20().transfer(share_1, wager.value);
-                coin.ierc20().transfer(share_2, wager.value);
+                // split wager back to duelists
+                table.ierc20().transfer(duelist_a, wager.value);
+                table.ierc20().transfer(duelist_b, wager.value);
             }
         }
         if (wager.fee > 0) {
             let manager = ConfigManagerTrait::new(world).get();
             if (manager.treasury_address != starknet::get_contract_address()) {
-                coin.ierc20().transfer(manager.treasury_address, wager.fee * 2);
+                table.ierc20().transfer(manager.treasury_address, wager.fee * 2);
             }
         }
     }
+    (wager.value)
 }
 
 //------------------------
@@ -229,16 +256,16 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
 
     // Set pact between Duelists to avoid duplicated challenges
     let pair: u128 = make_pact_pair(challenge.duelist_a, challenge.duelist_b);
-    let pact_duel_id: u128 = if (state.ongoing()) { challenge.duel_id } else  { 0 };
+    let pact_duel_id: u128 = if (state.is_ongoing()) { challenge.duel_id } else  { 0 };
     set!(world, Pact {
         pair,
         duel_id: pact_duel_id,
     });
 
     // Start Round
-    if (state.canceled()) {
+    if (state.is_canceled()) {
         // transfer wager/fee back to challenger
-        withdraw_wager_fees(world, challenge.duelist_a, challenge.duel_id);
+        withdraw_wager_fees(world, challenge, challenge.duelist_a);
     } else if (state == ChallengeState::InProgress) {
         let mut shot_a = init::Shot();
         let mut shot_b = init::Shot();
@@ -265,49 +292,105 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
                 shot_b,
             }
         ));
-    } else if (state.finished()) {
+    } else if (state.is_finished()) {
         // End Duel!
         let mut duelist_a: Duelist = get!(world, challenge.duelist_a, Duelist);
         let mut duelist_b: Duelist = get!(world, challenge.duelist_b, Duelist);
+        let mut scoreboard_a: Scoreboard = get!(world, (challenge.duelist_a, challenge.table_id), Scoreboard);
+        let mut scoreboard_b: Scoreboard = get!(world, (challenge.duelist_b, challenge.table_id), Scoreboard);
         
-        // update totals, total_duels is updated in update_duelist_honour()
-        if (state == ChallengeState::Draw) {
-            duelist_a.total_draws += 1;
-            duelist_b.total_draws += 1;
-        } else if (challenge.winner == 1) {
-            duelist_a.total_wins += 1;
-            duelist_b.total_losses += 1;
-        } else if (challenge.winner == 2) {
-            duelist_a.total_losses += 1;
-            duelist_b.total_wins += 1;
-        } else {
-            // should never get here!
-        }
+        // update totals
+        update_score_totals(ref duelist_a.score, ref duelist_b.score, state, challenge.winner);
+        update_score_totals(ref scoreboard_a.score, ref scoreboard_b.score, state, challenge.winner);
 
         // compute honour from final round
         let final_round: Round = get!(world, (challenge.duel_id, challenge.round_number), Round);
-        update_duelist_honour(ref duelist_a, final_round.shot_a.honour);
-        update_duelist_honour(ref duelist_b, final_round.shot_b.honour);
+        update_score_honour(ref duelist_a.score, final_round.shot_a.honour);
+        update_score_honour(ref duelist_b.score, final_round.shot_b.honour);
+        update_score_honour(ref scoreboard_a.score, final_round.shot_a.honour);
+        update_score_honour(ref scoreboard_b.score, final_round.shot_b.honour);
 
         // split wager/fee to winners and benefactors
         if (final_round.shot_a.wager > final_round.shot_b.wager) {
-            split_wager_fees(world, challenge.duelist_a, challenge.duelist_a, challenge.duel_id);
+            // duelist_a won the Wager
+            let wager_value: u256 = split_wager_fees(world, challenge, challenge.duelist_a, challenge.duelist_a);
+            scoreboard_a.wager_won += wager_value;
+            scoreboard_b.wager_lost += wager_value;
         } else if (final_round.shot_a.wager < final_round.shot_b.wager) {
-            split_wager_fees(world, challenge.duelist_b, challenge.duelist_b, challenge.duel_id);
+            // duelist_b won the Wager
+            let wager_value: u256 = split_wager_fees(world, challenge, challenge.duelist_b, challenge.duelist_b);
+            scoreboard_a.wager_lost += wager_value;
+            scoreboard_b.wager_won += wager_value;
         } else {
-            split_wager_fees(world, challenge.duelist_a, challenge.duelist_b, challenge.duel_id);
+            // no-one gets the Wager
+            split_wager_fees(world, challenge, challenge.duelist_a, challenge.duelist_b);
         }
         
-        // save Duelists
-        set!(world, (duelist_a, duelist_b));
+        // save
+        set!(world, (duelist_a, duelist_b, scoreboard_a, scoreboard_b));
     }
 }
 
+// update duel totals only
+fn update_score_totals(ref score_a: Score, ref score_b: Score, state: ChallengeState, winner: u8) {
+    score_a.total_duels += 1;
+    score_b.total_duels += 1;
+    if (state == ChallengeState::Draw) {
+        score_a.total_draws += 1;
+        score_b.total_draws += 1;
+    } else if (winner == 1) {
+        score_a.total_wins += 1;
+        score_b.total_losses += 1;
+    } else if (winner == 2) {
+        score_a.total_losses += 1;
+        score_b.total_wins += 1;
+    } else {
+        // should never get here!
+    }
+}
 // average honour has an extra decimal, eg: 100 = 10.0
-fn update_duelist_honour(ref duelist: Duelist, duel_honour: u8) {
-    duelist.total_duels += 1;
-    duelist.total_honour += duel_honour.into();
-    duelist.honour = ((duelist.total_honour * 10) / duelist.total_duels.into()).try_into().unwrap();
+fn update_score_honour(ref score: Score, duel_honour: u8) {
+    score.total_honour += duel_honour.into();
+    score.honour = ((score.total_honour * 10) / score.total_duels.into()).try_into().unwrap();
+    score.level_villain = calc_level_villain(score.honour);
+    score.level_lord = calc_level_lord(score.honour);
+    score.level_trickster = _average_trickster(calc_level_trickster(score.honour, duel_honour), score.level_trickster);
+}
+
+// Villain bonus: the less honour, more bonus
+#[inline(always)]
+fn calc_level_villain(honour: u8) -> u8 {
+    if (honour < honour::TRICKSTER_START) {
+        (MathU8::map(honour, honour::VILLAIN_START, honour::TRICKSTER_START-1, honour::LEVEL_MAX, honour::LEVEL_MIN))
+    } else { (0) }
+}
+// Lord bonus: the more honour, more bonus
+#[inline(always)]
+fn calc_level_lord(honour: u8) -> u8 {
+    if (honour >= honour::LORD_START) {
+        (MathU8::map(honour, honour::LORD_START, honour::MAX, honour::LEVEL_MIN, honour::LEVEL_MAX))
+    } else { (0) }
+}
+// Trickster bonus: the max of...
+// high on opposites, less in the middle (shaped as a \/)
+// cap halfway without going to zero (shaped as a /\)
+#[inline(always)]
+fn calc_level_trickster(honour: u8, duel_honour: u8) -> u8 {
+    if (honour >= honour::TRICKSTER_START && honour < honour::LORD_START) {
+        // simple \/ shape of LEVEL_MAX/2 at middle range to LEVEL_MAX at extremities
+        let level_i: i16 = MathU8::map(duel_honour, honour::VILLAIN_START, honour::MAX, 0, honour::LEVEL_MAX).try_into().unwrap() - (honour::LEVEL_MAX / 2).into();
+        let level: u8 = MathU16::abs(level_i).try_into().unwrap() + (honour::LEVEL_MAX / 2);
+        (level)
+    } else { (0) }
+}
+// Always average with the current trickster bonus
+// for Tricksters: smooth bonuses
+// for (new) Lords and Villains: Do not go straight to zero when a Trickster switch archetype
+#[inline(always)]
+fn _average_trickster(new_level: u8, current_level: u8) -> u8 {
+    if (new_level > 0) {
+        ((new_level + current_level) / 2)
+    } else { (new_level) }
 }
 
 
@@ -315,38 +398,124 @@ fn update_duelist_honour(ref duelist: Duelist, duel_honour: u8) {
 // Chances
 //
 
-fn calc_hit_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
-    let chances: u8 = action.hit_chance();
-    let penalty: u8 = calc_hit_penalty(world, health);
-    (apply_chance_bonus_penalty(chances, 0, penalty))
+// crit bonus will be applied for Lords only
+fn calc_crit_chances(attacker: Score, defender: Score, attack: Action, defense: Action, health: u8) -> u8 {
+    if (attack == Action::Idle) { return 0; }
+    (_apply_chance_bonus_penalty(
+        attack.crit_chance(),
+        calc_crit_bonus(attacker) + calc_match_crit_bonus(attacker, attack, defense),
+        0 + calc_trickster_penalty(attacker, defender, chances::TRICKSTER_CRIT_PENALTY),
+    ))
 }
-fn calc_crit_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
-    let chances: u8 = action.crit_chance();
-    let bonus: u8 = calc_hit_bonus(world, duelist_address);
-    (apply_chance_bonus_penalty(chances, bonus, 0))
+// Hit chances will be applied to Villains only
+// Both Hit and Lethal go up/down with same bonus/penalty
+fn calc_hit_chances(attacker: Score, defender: Score, action: Action, health: u8) -> u8 {
+    if (action == Action::Idle) { return 0; }
+    (_apply_chance_bonus_penalty(
+        action.hit_chance(),
+        calc_lethal_bonus(attacker),
+        calc_hit_penalty(action, health) + calc_trickster_penalty(attacker, defender, chances::TRICKSTER_HIT_PENALTY),
+    ))
 }
-fn calc_glance_chances(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action, health: u8) -> u8 {
-    let chances: u8 = action.glance_chance();
-    (chances)
+fn calc_lethal_chances(attacker: Score, defender: Score, action: Action, health: u8) -> u8 {
+    if (action == Action::Idle) { return 0; }
+    (_apply_chance_bonus_penalty(
+        action.lethal_chance(),
+        calc_lethal_bonus(attacker),
+        calc_hit_penalty(action, health),
+    ))
 }
-fn calc_honour_for_action(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action) -> (u8, u8) {
-    let mut duelist: Duelist = get!(world, duelist_address, Duelist);
-    let duel_honour: u8 = action.honour();
-    update_duelist_honour(ref duelist, duel_honour);
-    (duel_honour, duelist.honour)
+#[inline(always)]
+fn _apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
+    (MathU8::clamp(
+        MathU8::sub(chance + bonus, penalty),
+        (chance / 2),       // never go below half chance
+        chances::ALWAYS,    // never go above 100
+    ))
 }
 
-fn calc_hit_bonus(world: IWorldDispatcher, duelist_address: ContractAddress) -> u8 {
-    let duelist: Duelist = get!(world, duelist_address, Duelist);
-    let bonus: u8 = MathU8::sub(duelist.honour, 90);
-    (MathU16::min(bonus.into(), duelist.total_duels).try_into().unwrap())
+//
+// bonuses
+//
+
+#[inline(always)]
+fn calc_crit_bonus(attacker: Score) -> u8 {
+    if (attacker.is_lord()) {
+        (_calc_bonus(chances::CRIT_BONUS_LORD, attacker.level_lord, attacker.total_duels))
+    } else if (attacker.is_trickster()) {
+        (_calc_bonus(chances::CRIT_BONUS_TRICKSTER, attacker.level_trickster, attacker.total_duels))
+    } else {
+        (0)
+    }
 }
-fn calc_hit_penalty(world: IWorldDispatcher, health: u8) -> u8 {
-    ((constants::FULL_HEALTH - health) * constants::HIT_PENALTY_PER_DAMAGE)
+#[inline(always)]
+fn calc_lethal_bonus(attacker: Score) -> u8 {
+    if (attacker.is_villain()) {
+        (_calc_bonus(chances::LETHAL_BONUS_VILLAIN, attacker.level_villain, attacker.total_duels))
+    } else if (attacker.is_trickster()) {
+        (_calc_bonus(chances::LETHAL_BONUS_TRICKSTER, attacker.level_trickster, attacker.total_duels))
+    } else {
+        (0)
+    }
 }
-fn apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
-    let mut result: u8 = MathU8::sub(chance + bonus, penalty);
-    (MathU8::clamp(result, chance / 2, 100))
+#[inline(always)]
+fn _calc_bonus(bonus_max: u8, level: u8, total_duels: u16) -> u8 {
+    if (level > 0 && total_duels > 0) {
+        (MathU8::max(1, MathU8::map(
+            MathU16::min(level.into(), total_duels * 10).try_into().unwrap(),
+            0, honour::LEVEL_MAX,
+            0, bonus_max)
+        ))
+    } else {
+        (0)
+    }
+}
+
+#[inline(always)]
+fn calc_match_crit_bonus(attacker: Score, attack: Action, defense: Action) -> u8 {
+    if (attacker.is_lord()) {
+        if (attack.paces_priority(defense) < 0) { (chances::EARLY_LORD_CRIT_BONUS) } else { (0) }
+    } else if (attacker.is_villain()) {
+        if (attack.paces_priority(defense) > 0) { (chances::LATE_VILLAIN_CRIT_BONUS) } else { (0) }
+    } else {
+        (0)
+    }
+}
+
+//
+// penalties
+//
+// #[inline(always)]
+// fn calc_crit_penalty(action: Action, health: u8) -> u8 {
+//     (_calc_penalty(health, action.crit_penalty()))
+// }
+#[inline(always)]
+fn calc_hit_penalty(action: Action, health: u8) -> u8 {
+    (_calc_penalty(health, action.hit_penalty()))
+}
+#[inline(always)]
+fn _calc_penalty(health: u8, penalty_per_damage: u8) -> u8 {
+    ((constants::FULL_HEALTH - health) * penalty_per_damage)
+}
+
+#[inline(always)]
+fn calc_trickster_penalty(attacker: Score, defender: Score, penalty: u8) -> u8 {
+    if (defender.is_trickster() && !attacker.is_trickster()) {
+        (penalty)
+    } else {
+        (0)
+    }
+}
+
+// used for system read calls only
+fn simulate_honour_for_action(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action) -> (i8, u8) {
+    let mut duelist: Duelist = get!(world, duelist_address, Duelist);
+    let action_honour: i8 = action.honour();
+    if (action_honour >= 0) {
+        duelist.score.total_duels += 1;
+        update_score_honour(ref duelist.score, MathU8::abs(action_honour));
+    }
+    (action_honour, duelist.score.honour)
 }
 
 
@@ -372,149 +541,3 @@ fn check_dice(seed: felt252, salt: felt252, faces: u128, limit: u128) -> bool {
     (throw_dice(seed, salt, faces) <= limit)
 }
 
-
-
-
-
-
-
-//------------------------------------------------------
-// Unit tests
-//
-#[cfg(test)]
-mod tests {
-    use core::traits::{Into, TryInto};
-    use debug::PrintTrait;
-    use starknet::{ContractAddress};
-
-    use pistols::systems::{utils};
-    use pistols::models::models::{init, Round, Shot};
-    use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
-    use pistols::types::constants::{constants, chances};
-    use pistols::types::action::{ACTION};
-    use pistols::utils::math::{MathU8};
-
-    #[test]
-    #[available_gas(1_000_000)]
-    fn test_pact_pair() {
-        let a: ContractAddress = starknet::contract_address_const::<0x269c58e5fa1e7f6fe3756f1de88ecdfab7d03ba67e79ba0365b4ef1e81155be>();
-        let b: ContractAddress = starknet::contract_address_const::<0xb3ff441a68610b30fd5e2abbf3a1548eb6ba6f3559f2862bf2dc757e5828ca>();
-        let p_a = utils::make_pact_pair(a, b);
-        let p_b = utils::make_pact_pair(b, a);
-        assert(p_a == p_b, 'test_pact_pair');
-    }
-
-    #[test]
-    #[available_gas(1_000_000_000)]
-    fn test_check_dice_average() {
-        // lower limit
-        let mut counter: u8 = 0;
-        let mut n: felt252 = 0;
-        loop {
-            if (n == 100) { break; }
-            let seed: felt252 = 'seed_1' + n;
-            if (utils::check_dice(seed, 'salt_1', 100, 25)) {
-                counter += 1;
-            }
-            n += 1;
-        };
-        assert(counter > 10 && counter < 40, 'dices_25');
-        // higher limit
-        let mut counter: u8 = 0;
-        let mut n: felt252 = 0;
-        loop {
-            if (n == 100) { break; }
-            let seed: felt252 = 'seed_2' + n;
-            if (utils::check_dice(seed, 'salt_2', 100, 75)) {
-                counter += 1;
-            }
-            n += 1;
-        };
-        assert(counter > 60 && counter < 90, 'dices_75');
-    }
-
-    #[test]
-    #[available_gas(1_000_000_000)]
-    fn test_check_dice_edge() {
-        let mut n: felt252 = 0;
-        loop {
-            if (n == 100) { break; }
-            let seed: felt252 = 'seed' + n;
-            let bottom: bool = utils::check_dice(seed, 'salt', 10, 0);
-            assert(bottom == false, 'bottom');
-            let upper: bool = utils::check_dice(seed, 'salt', 10, 10);
-            assert(upper == true, 'bottom');
-            n += 1;
-        };
-    }
-
-    #[test]
-    #[available_gas(100_000_000)]
-    fn test_validate_packed_actions() {
-        assert(utils::validate_packed_actions(1, ACTION::PACES_1.into()) == true, '1_Paces1');
-        assert(utils::validate_packed_actions(1, ACTION::PACES_1.into()) == true, '1_Paces1');
-        assert(utils::validate_packed_actions(2, ACTION::PACES_10.into()) == false, '2_Paces10');
-        assert(utils::validate_packed_actions(2, ACTION::PACES_10.into()) == false, '2_Paces10');
-        let action = utils::pack_action_slots(ACTION::FAST_BLADE, ACTION::FAST_BLADE);
-        assert(utils::validate_packed_actions(1, action) == false, '1_bladess');
-        assert(utils::validate_packed_actions(2, action) == true, '2_blades');
-        let action = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::SLOW_BLADE);
-        assert(utils::validate_packed_actions(1, action) == false, '1_invalid');
-        assert(utils::validate_packed_actions(2, action) == false, '2_invalid');
-        let action = utils::pack_action_slots(ACTION::PACES_1, ACTION::PACES_1);
-        assert(utils::validate_packed_actions(1, action) == false, '1_dual_paces');
-        assert(utils::validate_packed_actions(2, action) == false, '2_dual_paces');
-        // inaction is valid on round 2
-        assert(utils::validate_packed_actions(1, 0) == false, '1_zero');
-        assert(utils::validate_packed_actions(2, 0) == true, '2_zero');
-    }
-
-    #[test]
-    #[available_gas(100_000_000)]
-    fn test_slot_packing_actions() {
-        let packed = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::FAST_BLADE);
-        let (slot1, slot2) = utils::unpack_action_slots(packed);
-        assert(slot1 == ACTION::SLOW_BLADE, 'slot1');
-        assert(slot2 == ACTION::FAST_BLADE, 'slot2');
-    }
-
-    #[test]
-    #[available_gas(100_000_000)]
-    fn test_slot_packing_round() {
-        let mut round = Round {
-            duel_id: 1,
-            round_number: 1,
-            state: 1,
-            shot_a: init::Shot(),
-            shot_b: init::Shot(),
-        };
-        // full
-        round.shot_a.action = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::BLOCK);
-        round.shot_b.action = utils::pack_action_slots(ACTION::FAST_BLADE, ACTION::PACES_1);
-        let _packed = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::FAST_BLADE);
-        let (slot1_a, slot1_b, slot2_a, slot2_b): (u8, u8, u8, u8) = utils::unpack_round_slots(round);
-        assert(slot1_a == ACTION::SLOW_BLADE, 'slot1_a');
-        assert(slot1_b == ACTION::FAST_BLADE, 'slot1_b');
-        assert(slot2_a == ACTION::BLOCK, 'slot2_a');
-        assert(slot2_b == ACTION::PACES_1, 'slot2_b');
-        // slot 1 only
-        round.shot_a.action = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::IDLE);
-        round.shot_b.action = utils::pack_action_slots(ACTION::FAST_BLADE, ACTION::IDLE);
-        let _packed = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::FAST_BLADE);
-        let (slot1_a, slot1_b, slot2_a, slot2_b): (u8, u8, u8, u8) = utils::unpack_round_slots(round);
-        assert(slot1_a == ACTION::SLOW_BLADE, 'slot1_a');
-        assert(slot1_b == ACTION::FAST_BLADE, 'slot1_b');
-        assert(slot2_a == ACTION::IDLE, 'slot2_a');
-        assert(slot2_b == ACTION::IDLE, 'slot2_b');
-        // slot 2 only
-        round.shot_a.action = utils::pack_action_slots(ACTION::IDLE, ACTION::SLOW_BLADE);
-        round.shot_b.action = utils::pack_action_slots(ACTION::IDLE, ACTION::FAST_BLADE);
-        let _packed = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::FAST_BLADE);
-        let (slot1_a, slot1_b, slot2_a, slot2_b): (u8, u8, u8, u8) = utils::unpack_round_slots(round);
-        assert(slot1_a == ACTION::SLOW_BLADE, 'slot1_a');
-        assert(slot1_b == ACTION::FAST_BLADE, 'slot1_b');
-        assert(slot2_a == ACTION::IDLE, 'slot2_a');
-        assert(slot2_b == ACTION::IDLE, 'slot2_b');
-    }
-
-}

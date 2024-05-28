@@ -1,38 +1,44 @@
+import { useMemo } from 'react'
 import { getComponentValue } from '@dojoengine/recs'
 import { useComponentValue } from "@dojoengine/react"
-import { useDojoComponents } from '@/dojo/DojoContext'
+import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { useChallengesByDuelist } from '@/pistols/hooks/useChallenge'
-import { bigintToEntity } from '@/lib/utils/type'
+import { useLordsContract } from '@/lib/dojo/hooks/useLords'
+import { ChallengeState } from '@/pistols/utils/pistols'
+import { feltToString } from '@/lib/utils/starknet'
+import { bigintEquals, bigintToEntity, bigintToHex } from '@/lib/utils/types'
 import { BigNumberish } from 'starknet'
-import { COIN_LORDS } from './useConfig'
-import { useMemo } from 'react'
-import { ChallengeState } from '../utils/pistols'
 
 export const useWager = (duelId: BigNumberish) => {
   const { Wager } = useDojoComponents()
   const wager: any = useComponentValue(Wager, bigintToEntity(duelId))
 
   return {
-    coin: wager?.coin ?? null,
-    value: wager?.value ?? null,
-    fee: wager?.fee ?? null,
-    formatted: wager?.coin ?? null,
+    value: wager ? BigInt(wager.value) : null,
+    fee: wager ? BigInt(wager.fee) : null,
     feeFormatted: wager?.fee ?? null,
   }
 }
 
-export const useLockedWager = (address: bigint, coin: number = COIN_LORDS) => {
-  const { Wager } = useDojoComponents()
-  const { challenges, challengerIds } = useChallengesByDuelist(address)
+export const useLockedLordsBalance = (address: bigint) => {
+  const { contractAddress } = useLordsContract()
+  const { Wager, TTable } = useDojoComponents()
+  const { raw_challenges } = useChallengesByDuelist(address)
   const { wagers, fees, total } = useMemo(() => {
     let wagers = 0n
     let fees = 0n
-    challenges.forEach((challenge) => {
-      if (challenge.state == ChallengeState.InProgress || (challenge.state == ChallengeState.Awaiting && challengerIds.includes(challenge.duel_id))) {
-        const wager = getComponentValue(Wager, bigintToEntity(challenge.duel_id))
-        if (wager) {
-          wagers += wager.value
-          fees += wager.fee
+    raw_challenges.forEach((raw_challenge) => {
+      const table = getComponentValue(TTable, bigintToEntity(raw_challenge.table_id))
+      // if (feltToString(raw_challenge.table_id) == tableId) {
+      if (bigintEquals(table.contract_address, contractAddress)) {
+        if (raw_challenge.state == ChallengeState.InProgress ||
+          (raw_challenge.state == ChallengeState.Awaiting && bigintEquals(address, raw_challenge.duelist_a))
+        ) {
+          const wager = getComponentValue(Wager, bigintToEntity(raw_challenge.duel_id))
+          if (wager) {
+            wagers += wager.value
+            fees += wager.fee
+          }
         }
       }
     })
@@ -42,7 +48,7 @@ export const useLockedWager = (address: bigint, coin: number = COIN_LORDS) => {
       total: (wagers + fees)
     }
 
-  }, [challenges])
+  }, [address, raw_challenges, contractAddress])
   return {
     wagers,
     fees,

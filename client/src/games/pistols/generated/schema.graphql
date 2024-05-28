@@ -1,0 +1,1166 @@
+schema {
+  query: World__Query
+  subscription: World__Subscription
+}
+
+type Challenge {
+  duel_id: u128
+  duelist_a: ContractAddress
+  duelist_b: ContractAddress
+  message: felt252
+  state: u8
+  round_number: u8
+  winner: u8
+  timestamp_start: u64
+  timestamp_end: u64
+  entity: World__Entity
+}
+
+type ChallengeConnection {
+  edges: [ChallengeEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type ChallengeEdge {
+  node: Challenge
+  cursor: Cursor
+}
+
+input ChallengeOrder {
+  direction: OrderDirection!
+  field: ChallengeOrderField!
+}
+
+enum ChallengeOrderField {
+  DUEL_ID
+  DUELIST_A
+  DUELIST_B
+  MESSAGE
+  STATE
+  ROUND_NUMBER
+  WINNER
+  TIMESTAMP_START
+  TIMESTAMP_END
+}
+
+input ChallengeWhereInput {
+  duel_id: u128
+  duel_idGT: u128
+  duel_idGTE: u128
+  duel_idLT: u128
+  duel_idLTE: u128
+  duel_idNEQ: u128
+  duel_idEQ: u128
+  duelist_a: ContractAddress
+  duelist_aGT: ContractAddress
+  duelist_aGTE: ContractAddress
+  duelist_aLT: ContractAddress
+  duelist_aLTE: ContractAddress
+  duelist_aNEQ: ContractAddress
+  duelist_aEQ: ContractAddress
+  duelist_b: ContractAddress
+  duelist_bGT: ContractAddress
+  duelist_bGTE: ContractAddress
+  duelist_bLT: ContractAddress
+  duelist_bLTE: ContractAddress
+  duelist_bNEQ: ContractAddress
+  duelist_bEQ: ContractAddress
+  message: felt252
+  messageGT: felt252
+  messageGTE: felt252
+  messageLT: felt252
+  messageLTE: felt252
+  messageNEQ: felt252
+  messageEQ: felt252
+  state: u8
+  stateGT: u8
+  stateGTE: u8
+  stateLT: u8
+  stateLTE: u8
+  stateNEQ: u8
+  stateEQ: u8
+  round_number: u8
+  round_numberGT: u8
+  round_numberGTE: u8
+  round_numberLT: u8
+  round_numberLTE: u8
+  round_numberNEQ: u8
+  round_numberEQ: u8
+  winner: u8
+  winnerGT: u8
+  winnerGTE: u8
+  winnerLT: u8
+  winnerLTE: u8
+  winnerNEQ: u8
+  winnerEQ: u8
+  timestamp_start: u64
+  timestamp_startGT: u64
+  timestamp_startGTE: u64
+  timestamp_startLT: u64
+  timestamp_startLTE: u64
+  timestamp_startNEQ: u64
+  timestamp_startEQ: u64
+  timestamp_end: u64
+  timestamp_endGT: u64
+  timestamp_endGTE: u64
+  timestamp_endLT: u64
+  timestamp_endLTE: u64
+  timestamp_endNEQ: u64
+  timestamp_endEQ: u64
+}
+
+type Coin {
+  key: u8
+  contract_address: ContractAddress
+  description: felt252
+  fee_min: u256
+  fee_pct: u8
+  enabled: bool
+  entity: World__Entity
+}
+
+type CoinConnection {
+  edges: [CoinEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type CoinEdge {
+  node: Coin
+  cursor: Cursor
+}
+
+input CoinOrder {
+  direction: OrderDirection!
+  field: CoinOrderField!
+}
+
+enum CoinOrderField {
+  KEY
+  CONTRACT_ADDRESS
+  DESCRIPTION
+  FEE_MIN
+  FEE_PCT
+  ENABLED
+}
+
+input CoinWhereInput {
+  key: u8
+  keyGT: u8
+  keyGTE: u8
+  keyLT: u8
+  keyLTE: u8
+  keyNEQ: u8
+  keyEQ: u8
+  contract_address: ContractAddress
+  contract_addressGT: ContractAddress
+  contract_addressGTE: ContractAddress
+  contract_addressLT: ContractAddress
+  contract_addressLTE: ContractAddress
+  contract_addressNEQ: ContractAddress
+  contract_addressEQ: ContractAddress
+  description: felt252
+  descriptionGT: felt252
+  descriptionGTE: felt252
+  descriptionLT: felt252
+  descriptionLTE: felt252
+  descriptionNEQ: felt252
+  descriptionEQ: felt252
+  fee_min: u256
+  fee_minGT: u256
+  fee_minGTE: u256
+  fee_minLT: u256
+  fee_minLTE: u256
+  fee_minNEQ: u256
+  fee_minEQ: u256
+  fee_pct: u8
+  fee_pctGT: u8
+  fee_pctGTE: u8
+  fee_pctLT: u8
+  fee_pctLTE: u8
+  fee_pctNEQ: u8
+  fee_pctEQ: u8
+  enabled: bool
+}
+
+type Config {
+  key: u8
+  initialized: bool
+  owner_address: ContractAddress
+  treasury_address: ContractAddress
+  paused: bool
+  entity: World__Entity
+}
+
+type ConfigConnection {
+  edges: [ConfigEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type ConfigEdge {
+  node: Config
+  cursor: Cursor
+}
+
+input ConfigOrder {
+  direction: OrderDirection!
+  field: ConfigOrderField!
+}
+
+enum ConfigOrderField {
+  KEY
+  INITIALIZED
+  OWNER_ADDRESS
+  TREASURY_ADDRESS
+  PAUSED
+}
+
+input ConfigWhereInput {
+  key: u8
+  keyGT: u8
+  keyGTE: u8
+  keyLT: u8
+  keyLTE: u8
+  keyNEQ: u8
+  keyEQ: u8
+  initialized: bool
+  owner_address: ContractAddress
+  owner_addressGT: ContractAddress
+  owner_addressGTE: ContractAddress
+  owner_addressLT: ContractAddress
+  owner_addressLTE: ContractAddress
+  owner_addressNEQ: ContractAddress
+  owner_addressEQ: ContractAddress
+  treasury_address: ContractAddress
+  treasury_addressGT: ContractAddress
+  treasury_addressGTE: ContractAddress
+  treasury_addressLT: ContractAddress
+  treasury_addressLTE: ContractAddress
+  treasury_addressNEQ: ContractAddress
+  treasury_addressEQ: ContractAddress
+  paused: bool
+}
+
+scalar ContractAddress
+
+scalar Cursor
+
+scalar DateTime
+
+type Duelist {
+  address: ContractAddress
+  name: felt252
+  profile_pic: u8
+  total_duels: u16
+  total_wins: u16
+  total_losses: u16
+  total_draws: u16
+  total_honour: u32
+  honour: u8
+  villainy: u8
+  trickery: u8
+  virtue: u8
+  timestamp: u64
+  entity: World__Entity
+}
+
+type DuelistConnection {
+  edges: [DuelistEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type DuelistEdge {
+  node: Duelist
+  cursor: Cursor
+}
+
+input DuelistOrder {
+  direction: OrderDirection!
+  field: DuelistOrderField!
+}
+
+enum DuelistOrderField {
+  ADDRESS
+  NAME
+  PROFILE_PIC
+  TOTAL_DUELS
+  TOTAL_WINS
+  TOTAL_LOSSES
+  TOTAL_DRAWS
+  TOTAL_HONOUR
+  HONOUR
+  VILLAINY
+  TRICKERY
+  VIRTUE
+  TIMESTAMP
+}
+
+input DuelistWhereInput {
+  address: ContractAddress
+  addressGT: ContractAddress
+  addressGTE: ContractAddress
+  addressLT: ContractAddress
+  addressLTE: ContractAddress
+  addressNEQ: ContractAddress
+  addressEQ: ContractAddress
+  name: felt252
+  nameGT: felt252
+  nameGTE: felt252
+  nameLT: felt252
+  nameLTE: felt252
+  nameNEQ: felt252
+  nameEQ: felt252
+  profile_pic: u8
+  profile_picGT: u8
+  profile_picGTE: u8
+  profile_picLT: u8
+  profile_picLTE: u8
+  profile_picNEQ: u8
+  profile_picEQ: u8
+  total_duels: u16
+  total_duelsGT: u16
+  total_duelsGTE: u16
+  total_duelsLT: u16
+  total_duelsLTE: u16
+  total_duelsNEQ: u16
+  total_duelsEQ: u16
+  total_wins: u16
+  total_winsGT: u16
+  total_winsGTE: u16
+  total_winsLT: u16
+  total_winsLTE: u16
+  total_winsNEQ: u16
+  total_winsEQ: u16
+  total_losses: u16
+  total_lossesGT: u16
+  total_lossesGTE: u16
+  total_lossesLT: u16
+  total_lossesLTE: u16
+  total_lossesNEQ: u16
+  total_lossesEQ: u16
+  total_draws: u16
+  total_drawsGT: u16
+  total_drawsGTE: u16
+  total_drawsLT: u16
+  total_drawsLTE: u16
+  total_drawsNEQ: u16
+  total_drawsEQ: u16
+  total_honour: u32
+  total_honourGT: u32
+  total_honourGTE: u32
+  total_honourLT: u32
+  total_honourLTE: u32
+  total_honourNEQ: u32
+  total_honourEQ: u32
+  honour: u8
+  honourGT: u8
+  honourGTE: u8
+  honourLT: u8
+  honourLTE: u8
+  honourNEQ: u8
+  honourEQ: u8
+  villainy: u8
+  villainyGT: u8
+  villainyGTE: u8
+  villainyLT: u8
+  villainyLTE: u8
+  villainyNEQ: u8
+  villainyEQ: u8
+  trickery: u8
+  trickeryGT: u8
+  trickeryGTE: u8
+  trickeryLT: u8
+  trickeryLTE: u8
+  trickeryNEQ: u8
+  trickeryEQ: u8
+  virtue: u8
+  virtueGT: u8
+  virtueGTE: u8
+  virtueLT: u8
+  virtueLTE: u8
+  virtueNEQ: u8
+  virtueEQ: u8
+  timestamp: u64
+  timestampGT: u64
+  timestampGTE: u64
+  timestampLT: u64
+  timestampLTE: u64
+  timestampNEQ: u64
+  timestampEQ: u64
+}
+
+type ERC20AllowanceModel {
+  token: ContractAddress
+  owner: ContractAddress
+  spender: ContractAddress
+  amount: u256
+  entity: World__Entity
+}
+
+type ERC20AllowanceModelConnection {
+  edges: [ERC20AllowanceModelEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type ERC20AllowanceModelEdge {
+  node: ERC20AllowanceModel
+  cursor: Cursor
+}
+
+input ERC20AllowanceModelOrder {
+  direction: OrderDirection!
+  field: ERC20AllowanceModelOrderField!
+}
+
+enum ERC20AllowanceModelOrderField {
+  TOKEN
+  OWNER
+  SPENDER
+  AMOUNT
+}
+
+input ERC20AllowanceModelWhereInput {
+  token: ContractAddress
+  tokenGT: ContractAddress
+  tokenGTE: ContractAddress
+  tokenLT: ContractAddress
+  tokenLTE: ContractAddress
+  tokenNEQ: ContractAddress
+  tokenEQ: ContractAddress
+  owner: ContractAddress
+  ownerGT: ContractAddress
+  ownerGTE: ContractAddress
+  ownerLT: ContractAddress
+  ownerLTE: ContractAddress
+  ownerNEQ: ContractAddress
+  ownerEQ: ContractAddress
+  spender: ContractAddress
+  spenderGT: ContractAddress
+  spenderGTE: ContractAddress
+  spenderLT: ContractAddress
+  spenderLTE: ContractAddress
+  spenderNEQ: ContractAddress
+  spenderEQ: ContractAddress
+  amount: u256
+  amountGT: u256
+  amountGTE: u256
+  amountLT: u256
+  amountLTE: u256
+  amountNEQ: u256
+  amountEQ: u256
+}
+
+type ERC20BalanceModel {
+  token: ContractAddress
+  account: ContractAddress
+  amount: u256
+  entity: World__Entity
+}
+
+type ERC20BalanceModelConnection {
+  edges: [ERC20BalanceModelEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type ERC20BalanceModelEdge {
+  node: ERC20BalanceModel
+  cursor: Cursor
+}
+
+input ERC20BalanceModelOrder {
+  direction: OrderDirection!
+  field: ERC20BalanceModelOrderField!
+}
+
+enum ERC20BalanceModelOrderField {
+  TOKEN
+  ACCOUNT
+  AMOUNT
+}
+
+input ERC20BalanceModelWhereInput {
+  token: ContractAddress
+  tokenGT: ContractAddress
+  tokenGTE: ContractAddress
+  tokenLT: ContractAddress
+  tokenLTE: ContractAddress
+  tokenNEQ: ContractAddress
+  tokenEQ: ContractAddress
+  account: ContractAddress
+  accountGT: ContractAddress
+  accountGTE: ContractAddress
+  accountLT: ContractAddress
+  accountLTE: ContractAddress
+  accountNEQ: ContractAddress
+  accountEQ: ContractAddress
+  amount: u256
+  amountGT: u256
+  amountGTE: u256
+  amountLT: u256
+  amountLTE: u256
+  amountNEQ: u256
+  amountEQ: u256
+}
+
+type ERC20MetadataModel {
+  token: ContractAddress
+  name: felt252
+  symbol: felt252
+  decimals: u8
+  total_supply: u256
+  entity: World__Entity
+}
+
+type ERC20MetadataModelConnection {
+  edges: [ERC20MetadataModelEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type ERC20MetadataModelEdge {
+  node: ERC20MetadataModel
+  cursor: Cursor
+}
+
+input ERC20MetadataModelOrder {
+  direction: OrderDirection!
+  field: ERC20MetadataModelOrderField!
+}
+
+enum ERC20MetadataModelOrderField {
+  TOKEN
+  NAME
+  SYMBOL
+  DECIMALS
+  TOTAL_SUPPLY
+}
+
+input ERC20MetadataModelWhereInput {
+  token: ContractAddress
+  tokenGT: ContractAddress
+  tokenGTE: ContractAddress
+  tokenLT: ContractAddress
+  tokenLTE: ContractAddress
+  tokenNEQ: ContractAddress
+  tokenEQ: ContractAddress
+  name: felt252
+  nameGT: felt252
+  nameGTE: felt252
+  nameLT: felt252
+  nameLTE: felt252
+  nameNEQ: felt252
+  nameEQ: felt252
+  symbol: felt252
+  symbolGT: felt252
+  symbolGTE: felt252
+  symbolLT: felt252
+  symbolLTE: felt252
+  symbolNEQ: felt252
+  symbolEQ: felt252
+  decimals: u8
+  decimalsGT: u8
+  decimalsGTE: u8
+  decimalsLT: u8
+  decimalsLTE: u8
+  decimalsNEQ: u8
+  decimalsEQ: u8
+  total_supply: u256
+  total_supplyGT: u256
+  total_supplyGTE: u256
+  total_supplyLT: u256
+  total_supplyLTE: u256
+  total_supplyNEQ: u256
+  total_supplyEQ: u256
+}
+
+type InitializableModel {
+  token: ContractAddress
+  initialized: bool
+  entity: World__Entity
+}
+
+type InitializableModelConnection {
+  edges: [InitializableModelEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type InitializableModelEdge {
+  node: InitializableModel
+  cursor: Cursor
+}
+
+input InitializableModelOrder {
+  direction: OrderDirection!
+  field: InitializableModelOrderField!
+}
+
+enum InitializableModelOrderField {
+  TOKEN
+  INITIALIZED
+}
+
+input InitializableModelWhereInput {
+  token: ContractAddress
+  tokenGT: ContractAddress
+  tokenGTE: ContractAddress
+  tokenLT: ContractAddress
+  tokenLTE: ContractAddress
+  tokenNEQ: ContractAddress
+  tokenEQ: ContractAddress
+  initialized: bool
+}
+
+union ModelUnion =
+    Coin
+  | Config
+  | Challenge
+  | Duelist
+  | Pact
+  | Round
+  | Wager
+  | InitializableModel
+  | ERC20AllowanceModel
+  | ERC20BalanceModel
+  | ERC20MetadataModel
+
+enum OrderDirection {
+  ASC
+  DESC
+}
+
+type Pact {
+  pair: u128
+  duel_id: u128
+  entity: World__Entity
+}
+
+type PactConnection {
+  edges: [PactEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type PactEdge {
+  node: Pact
+  cursor: Cursor
+}
+
+input PactOrder {
+  direction: OrderDirection!
+  field: PactOrderField!
+}
+
+enum PactOrderField {
+  PAIR
+  DUEL_ID
+}
+
+input PactWhereInput {
+  pair: u128
+  pairGT: u128
+  pairGTE: u128
+  pairLT: u128
+  pairLTE: u128
+  pairNEQ: u128
+  pairEQ: u128
+  duel_id: u128
+  duel_idGT: u128
+  duel_idGTE: u128
+  duel_idLT: u128
+  duel_idLTE: u128
+  duel_idNEQ: u128
+  duel_idEQ: u128
+}
+
+type Round {
+  duel_id: u128
+  round_number: u8
+  state: u8
+  shot_a: Round_Shot
+  shot_b: Round_Shot
+  entity: World__Entity
+}
+
+type RoundConnection {
+  edges: [RoundEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type RoundEdge {
+  node: Round
+  cursor: Cursor
+}
+
+input RoundOrder {
+  direction: OrderDirection!
+  field: RoundOrderField!
+}
+
+enum RoundOrderField {
+  DUEL_ID
+  ROUND_NUMBER
+  STATE
+  SHOT_A
+  SHOT_B
+}
+
+input RoundWhereInput {
+  duel_id: u128
+  duel_idGT: u128
+  duel_idGTE: u128
+  duel_idLT: u128
+  duel_idLTE: u128
+  duel_idNEQ: u128
+  duel_idEQ: u128
+  round_number: u8
+  round_numberGT: u8
+  round_numberGTE: u8
+  round_numberLT: u8
+  round_numberLTE: u8
+  round_numberNEQ: u8
+  round_numberEQ: u8
+  state: u8
+  stateGT: u8
+  stateGTE: u8
+  stateLT: u8
+  stateLTE: u8
+  stateNEQ: u8
+  stateEQ: u8
+}
+
+type Round_Shot {
+  hash: u64
+  salt: u64
+  action: u16
+  chance_crit: u8
+  chance_hit: u8
+  dice_crit: u8
+  dice_hit: u8
+  damage: u8
+  block: u8
+  win: u8
+  wager: u8
+  health: u8
+  honour: u8
+}
+
+type Wager {
+  duel_id: u128
+  coin: u8
+  value: u256
+  fee: u256
+  entity: World__Entity
+}
+
+type WagerConnection {
+  edges: [WagerEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type WagerEdge {
+  node: Wager
+  cursor: Cursor
+}
+
+input WagerOrder {
+  direction: OrderDirection!
+  field: WagerOrderField!
+}
+
+enum WagerOrderField {
+  DUEL_ID
+  COIN
+  VALUE
+  FEE
+}
+
+input WagerWhereInput {
+  duel_id: u128
+  duel_idGT: u128
+  duel_idGTE: u128
+  duel_idLT: u128
+  duel_idLTE: u128
+  duel_idNEQ: u128
+  duel_idEQ: u128
+  coin: u8
+  coinGT: u8
+  coinGTE: u8
+  coinLT: u8
+  coinLTE: u8
+  coinNEQ: u8
+  coinEQ: u8
+  value: u256
+  valueGT: u256
+  valueGTE: u256
+  valueLT: u256
+  valueLTE: u256
+  valueNEQ: u256
+  valueEQ: u256
+  fee: u256
+  feeGT: u256
+  feeGTE: u256
+  feeLT: u256
+  feeLTE: u256
+  feeNEQ: u256
+  feeEQ: u256
+}
+
+type World__Content {
+  name: String
+  description: String
+  website: String
+  iconUri: String
+  coverUri: String
+  socials: [World__Social]
+}
+
+type World__Entity {
+  id: ID
+  keys: [String]
+  eventId: String
+  executedAt: DateTime
+  createdAt: DateTime
+  updatedAt: DateTime
+  models: [ModelUnion]
+}
+
+type World__EntityConnection {
+  edges: [World__EntityEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type World__EntityEdge {
+  node: World__Entity
+  cursor: Cursor
+}
+
+type World__Event {
+  id: ID
+  keys: [String]
+  data: [String]
+  executedAt: DateTime
+  createdAt: DateTime
+  transactionHash: String
+}
+
+type World__EventConnection {
+  edges: [World__EventEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type World__EventEdge {
+  node: World__Event
+  cursor: Cursor
+}
+
+type World__EventMessage {
+  id: ID
+  keys: [String]
+  eventId: String
+  executedAt: DateTime
+  createdAt: DateTime
+  updatedAt: DateTime
+  models: [ModelUnion]
+}
+
+type World__EventMessageConnection {
+  edges: [World__EventMessageEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type World__EventMessageEdge {
+  node: World__EventMessage
+  cursor: Cursor
+}
+
+type World__Metadata {
+  id: ID
+  uri: String
+  worldAddress: String!
+  content: World__Content
+  iconImg: String
+  coverImg: String
+  executedAt: DateTime
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+type World__MetadataConnection {
+  edges: [World__MetadataEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type World__MetadataEdge {
+  node: World__Metadata
+  cursor: Cursor
+}
+
+type World__Model {
+  id: ID
+  name: String
+  classHash: felt252
+  contractAddress: felt252
+  transactionHash: felt252
+  executedAt: DateTime
+  createdAt: DateTime
+}
+
+type World__ModelConnection {
+  edges: [World__ModelEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type World__ModelEdge {
+  node: World__Model
+  cursor: Cursor
+}
+
+input World__ModelOrder {
+  direction: OrderDirection!
+  field: World__ModelOrderField!
+}
+
+enum World__ModelOrderField {
+  NAME
+  CLASS_HASH
+}
+
+type World__PageInfo {
+  hasPreviousPage: Boolean
+  hasNextPage: Boolean
+  startCursor: Cursor
+  endCursor: Cursor
+}
+
+type World__Query {
+  entity(id: ID!): World__Entity!
+  entities(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    keys: [String]
+  ): World__EntityConnection
+  eventMessage(id: ID!): World__EventMessage!
+  eventMessages(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    keys: [String]
+  ): World__EventMessageConnection
+  events(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    keys: [String]
+  ): World__EventConnection
+  metadatas(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+  ): World__MetadataConnection
+  model(id: ID!): World__Model!
+  models(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    order: World__ModelOrder
+  ): World__ModelConnection
+  transaction(transactionHash: ID!): World__Transaction!
+  transactions(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+  ): World__TransactionConnection
+  coinModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: CoinWhereInput
+    order: CoinOrder
+  ): CoinConnection
+  configModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: ConfigWhereInput
+    order: ConfigOrder
+  ): ConfigConnection
+  challengeModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: ChallengeWhereInput
+    order: ChallengeOrder
+  ): ChallengeConnection
+  duelistModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: DuelistWhereInput
+    order: DuelistOrder
+  ): DuelistConnection
+  pactModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: PactWhereInput
+    order: PactOrder
+  ): PactConnection
+  roundModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: RoundWhereInput
+    order: RoundOrder
+  ): RoundConnection
+  wagerModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: WagerWhereInput
+    order: WagerOrder
+  ): WagerConnection
+  initializableModelModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: InitializableModelWhereInput
+    order: InitializableModelOrder
+  ): InitializableModelConnection
+  erc20AllowanceModelModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: ERC20AllowanceModelWhereInput
+    order: ERC20AllowanceModelOrder
+  ): ERC20AllowanceModelConnection
+  erc20BalanceModelModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: ERC20BalanceModelWhereInput
+    order: ERC20BalanceModelOrder
+  ): ERC20BalanceModelConnection
+  erc20MetadataModelModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: ERC20MetadataModelWhereInput
+    order: ERC20MetadataModelOrder
+  ): ERC20MetadataModelConnection
+}
+
+type World__Social {
+  name: String
+  url: String
+}
+
+type World__Subscription {
+  entityUpdated(id: ID): World__Entity!
+  eventMessageUpdated(id: ID): World__EventMessage!
+  eventEmitted(keys: [String]): World__Event!
+  modelRegistered(id: ID): World__Model!
+}
+
+type World__Transaction {
+  id: ID
+  transactionHash: felt252
+  senderAddress: felt252
+  calldata: [felt252]
+  maxFee: felt252
+  signature: [felt252]
+  nonce: felt252
+  executedAt: DateTime
+  createdAt: DateTime
+}
+
+type World__TransactionConnection {
+  edges: [World__TransactionEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type World__TransactionEdge {
+  node: World__Transaction
+  cursor: Cursor
+}
+
+scalar bool
+
+scalar felt252
+
+scalar u128
+
+scalar u16
+
+scalar u256
+
+scalar u32
+
+scalar u64
+
+scalar u8

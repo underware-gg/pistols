@@ -1,36 +1,89 @@
-import { useLordsBalance } from '@/lib/wallet/useLordsBalance'
-import { useCoin, COIN_LORDS } from '@/pistols/hooks/useConfig'
-import { Wager } from '@/pistols/components/account/Wager'
-import { useLockedWager } from '@/pistols/hooks/useWager'
+import { useERC20Balance } from '@/lib/utils/hooks/useERC20'
+import { useLordsBalance } from '@/lib/dojo/hooks/useLords'
+import { useTable } from '@/pistols/hooks/useTable'
+import { useLockedLordsBalance } from '@/pistols/hooks/useWager'
+import { Balance } from '@/pistols/components/account/Balance'
+import { tables } from '@/pistols/utils/constants'
+import { BigNumberish } from 'starknet'
 
 export const LordsBalance = ({
   address,
   pre = null,
   post = null,
   clean = false,
+  big = false,
 }) => {
-  const { contractAddress } = useCoin(COIN_LORDS)
-  const { balance, formatted } = useLordsBalance(contractAddress, address)
+  const { balance } = useLordsBalance(address)
   return (
-    <Wager big coin={COIN_LORDS} wei={balance} pre={pre} post={post} clean={clean} />
+    <Balance big={big} tableId={tables.LORDS} wei={balance} pre={pre} post={post} clean={clean} />
   )
 }
 
-export const LockedBalance = ({
+export const WagerBalance = ({
+  tableId,
+  address,
+  pre = null,
+  post = null,
+  clean = false,
+  big = false,
+}) => {
+  const { contractAddress } = useTable(tableId)
+  const { balance } = useERC20Balance(contractAddress, address)
+  return (
+    <Balance big={big} tableId={tableId} wei={balance} pre={pre} post={post} clean={clean} />
+  )
+}
+
+export const LockedWagerBalance = ({
+  tableId,
   address,
   pre = null,
   post = null,
   clean = false,
 }) => {
-  const { total } = useLockedWager(address)
+  const { total } = useLockedLordsBalance(address)
   if (!total) return <></>
   return (
     <>
       {' + '}
-      <Wager big coin={COIN_LORDS} wei={total} pre={pre} post={post} clean={clean} />
+      <Balance big tableId={tableId} wei={total} pre={pre} post={post} clean={clean} />
       {' '}
       (locked)
     </>
   )
 }
 
+export function WagerAndOrFees({
+  tableId,
+  value,
+  fee,
+  pre = null,
+  big = false,
+}: {
+  tableId: string
+  value: BigNumberish
+  fee: BigNumberish
+  pre?: string
+  big?: boolean
+}) {
+  if (BigInt(value ?? 0) > 0n) {
+    return (
+      <>
+        <span>
+          <Balance big={big} tableId={tableId} wei={value} pre={pre} />
+        </span>
+        &nbsp;&nbsp;
+        {fee &&
+          <span>
+            (<Balance clean tableId={tableId} wei={fee} pre='+' /> fee)
+          </span>
+        }
+      </>
+    )
+  }
+  return (
+    <span>
+      <Balance big={big} tableId={tableId} wei={fee} pre={pre} placeholdder={0} />
+    </span>
+  )
+}

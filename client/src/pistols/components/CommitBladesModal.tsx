@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Modal } from 'semantic-ui-react'
-import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
+import { useDojoAccount, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useGetValidPackedActions } from '@/pistols/hooks/useContractCalls'
 import { Action, ActionEmojis, ActionNames } from '@/pistols/utils/pistols'
 import { pack_action_slots, signAndGenerateActionHash } from '@/pistols/utils/salt'
@@ -116,14 +116,14 @@ export default function CommitBladesModal({
         <ActionChances duelId={duelId} roundNumber={roundNumber} action={!slot1 ? slot2 : slot1} isA={isA} isB={isB} />
 
       </Modal.Content>
-      <Modal.Actions>
+      <Modal.Actions className='NoPadding'>
         <Grid className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>
               <ActionButton fill label='Close' onClick={() => setIsOpen(false)} />
             </Col>
             <Col>
-              <ActionButton fill attention label='Commit...' disabled={!isValid || isSubmitting} onClick={() => _submit()} />
+              <ActionButton fill important label='Commit...' disabled={!isValid || isSubmitting} onClick={() => _submit()} />
             </Col>
           </Row>
         </Grid>
@@ -150,7 +150,7 @@ export const SlotButton = ({
   disabled = false,
 }) => {
   return (
-    <ActionButton fill toggle active={value == blade} disabled={disabled} label={ActionNames[blade]} onClick={() => onClick()} />
+    <ActionButton className='Padded' fill toggle active={value == blade} disabled={disabled} label={ActionNames[blade]} onClick={() => onClick()} />
   )
 }
 

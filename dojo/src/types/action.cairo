@@ -1,7 +1,7 @@
 use traits::{Into, PartialOrd};
 use debug::PrintTrait;
 
-use pistols::models::models::{Shot};
+use pistols::models::models::{Shot, Duelist, Score, ScoreTrait};
 use pistols::types::constants::{constants, chances};
 use pistols::utils::math::{MathU8};
 
@@ -18,7 +18,7 @@ mod ACTION {
     // Inaction / Invalid (skip round)
     const IDLE: u8 = 0x00;
     //
-    // Paces
+    // Paces (round 1)
     const PACES_1: u8 = 0x01;
     const PACES_2: u8 = 0x02;
     const PACES_3: u8 = 0x03;
@@ -30,7 +30,7 @@ mod ACTION {
     const PACES_9: u8 = 0x09;
     const PACES_10: u8 = 0x0a;
     //
-    // Blades
+    // Blades (round 2+)
     const FAST_BLADE: u8 = 0x10;
     const SLOW_BLADE: u8 = 0x20;
     const BLOCK: u8 = 0x30;
@@ -59,7 +59,7 @@ enum Action {
     Paces8,
     Paces9,
     Paces10,
-    // Blades
+    // Melee
     FastBlade,
     SlowBlade,
     Block,
@@ -76,38 +76,35 @@ enum Action {
 
 trait ActionTrait {
     fn is_paces(self: Action) -> bool;
+    fn as_paces(self: Action) -> u8;
     fn is_melee(self: Action) -> bool;
     fn is_runner(self: Action) -> bool;
-    fn as_paces(self: Action) -> u8;
+    fn roll_priority(self: Action, other: Action, score_self: Score, score_other: Score) -> i8;
+    fn paces_priority(self: Action, other: Action) -> i8;
+    fn honour(self: Action) -> i8;
     fn crit_chance(self: Action) -> u8;
     fn hit_chance(self: Action) -> u8;
-    fn glance_chance(self: Action) -> u8;
-    fn honour(self: Action) -> u8;
-    fn roll_priority(self: Action, other: Action) -> i8;
+    fn lethal_chance(self: Action) -> u8;
+    fn crit_penalty(self: Action) -> u8;
+    fn hit_penalty(self: Action) -> u8;
     fn execute_crit(self: Action, ref self_shot: Shot, ref other_shot: Shot) -> bool;
-    fn execute_hit(self: Action, ref self_shot: Shot, ref other_shot: Shot);
+    fn execute_hit(self: Action, ref self_shot: Shot, ref other_shot: Shot, lethal_chance: u8);
 }
 
 impl ActionTraitImpl of ActionTrait {
     fn is_paces(self: Action) -> bool {
         match self {
-            Action::Idle =>         false,
-            Action::Paces1 =>       true,
-            Action::Paces2 =>       true,
-            Action::Paces3 =>       true,
-            Action::Paces4 =>       true,
-            Action::Paces5 =>       true,
-            Action::Paces6 =>       true,
-            Action::Paces7 =>       true,
-            Action::Paces8 =>       true,
-            Action::Paces9 =>       true,
-            Action::Paces10 =>      true,
-            Action::FastBlade =>    false,
-            Action::SlowBlade =>    false,
-            Action::Block =>        false,
-            Action::Flee =>         false,
-            Action::Steal =>        false,
-            Action::Seppuku =>      false,
+            Action::Paces1 |
+            Action::Paces2 |
+            Action::Paces3 |
+            Action::Paces4 |
+            Action::Paces5 |
+            Action::Paces6 |
+            Action::Paces7 |
+            Action::Paces8 |
+            Action::Paces9 |
+            Action::Paces10 =>  true,
+            _ =>                false,
         }
     }
     fn as_paces(self: Action) -> u8 {
@@ -115,132 +112,55 @@ impl ActionTraitImpl of ActionTrait {
     }
     fn is_melee(self: Action) -> bool {
         match self {
-            Action::Idle =>         false,
-            Action::Paces1 =>       false,
-            Action::Paces2 =>       false,
-            Action::Paces3 =>       false,
-            Action::Paces4 =>       false,
-            Action::Paces5 =>       false,
-            Action::Paces6 =>       false,
-            Action::Paces7 =>       false,
-            Action::Paces8 =>       false,
-            Action::Paces9 =>       false,
-            Action::Paces10 =>      false,
-            Action::FastBlade =>    true,
-            Action::SlowBlade =>    true,
-            Action::Block =>        true,
-            Action::Flee =>         false,
-            Action::Steal =>        false,
-            Action::Seppuku =>      false,
+            Action::FastBlade |
+            Action::SlowBlade |
+            Action::Block =>    true,
+            _ =>                false,
         }
     }
     fn is_runner(self: Action) -> bool {
         match self {
-            Action::Idle =>         false,
-            Action::Paces1 =>       false,
-            Action::Paces2 =>       false,
-            Action::Paces3 =>       false,
-            Action::Paces4 =>       false,
-            Action::Paces5 =>       false,
-            Action::Paces6 =>       false,
-            Action::Paces7 =>       false,
-            Action::Paces8 =>       false,
-            Action::Paces9 =>       false,
-            Action::Paces10 =>      false,
-            Action::FastBlade =>    false,
-            Action::SlowBlade =>    false,
-            Action::Block =>        false,
-            Action::Flee =>         true,
-            Action::Steal =>        true,
-            Action::Seppuku =>      true,
-        }
-    }
-
-    //-----------------
-    // Flat chances
-    //
-    fn crit_chance(self: Action) -> u8 {
-        let paces: u8 = self.as_paces();
-        if (paces > 0) {
-            (MathU8::map(paces, 1, 10, chances::PISTOLS_KILL_AT_STEP_1, chances::PISTOLS_KILL_AT_STEP_10))
-        } else if (self.is_melee()) {
-            (chances::BLADES_KILL)
-        } else if (self.is_runner()) {
-            (chances::ALWAYS) // always set win/wager
-        } else {
-            (chances::NEVER)
-        }
-    }
-    fn hit_chance(self: Action) -> u8 {
-        let paces: u8 = self.as_paces();
-        if (paces > 0) {
-            (MathU8::map(paces, 1, 10, chances::PISTOLS_HIT_AT_STEP_1, chances::PISTOLS_HIT_AT_STEP_10))
-        } else if (self.is_melee()) {
-            (chances::BLADES_HIT)
-        } else {
-            (chances::NEVER)
-        }
-    }
-    fn glance_chance(self: Action) -> u8 {
-        let paces: u8 = self.as_paces();
-        if (paces > 0) {
-            (MathU8::map(paces, 1, 10, chances::PISTOLS_GLANCE_AT_STEP_1, chances::PISTOLS_GLANCE_AT_STEP_10))
-        } else if (self.is_melee()) {
-            (chances::BLADES_GLANCE)
-        } else {
-            (chances::NEVER)
-        }
-    }
-
-    //------------------
-    // Honour per Action
-    //
-    fn honour(self: Action) -> u8 {
-        match self {
-            Action::Idle =>         0, // do not affect honour
-            Action::Paces1 =>       self.into(),
-            Action::Paces2 =>       self.into(),
-            Action::Paces3 =>       self.into(),
-            Action::Paces4 =>       self.into(),
-            Action::Paces5 =>       self.into(),
-            Action::Paces6 =>       self.into(),
-            Action::Paces7 =>       self.into(),
-            Action::Paces8 =>       self.into(),
-            Action::Paces9 =>       self.into(),
-            Action::Paces10 =>      self.into(),
-            Action::FastBlade =>    0, // do not affect honour
-            Action::SlowBlade =>    0, // do not affect honour
-            Action::Block =>        0, // do not affect honour
-            Action::Flee =>         1,
-            Action::Steal =>        1,
-            Action::Seppuku =>      10,
+            Action::Flee |
+            Action::Steal |
+            Action::Seppuku =>  true,
+            _ =>                false,
         }
     }
 
     //----------------------------
-    // Roll priority
+    // dices roll priority
     //
-    // returns
+    // returns...
     // < 0: self rolls first
     //   0: roll simultaneously
     // > 0: other rolls first
     //
-    // TODO: Dojo 0.6.0: Use match???
-    fn roll_priority(self: Action, other: Action) -> i8 {
+    fn roll_priority(self: Action, other: Action, score_self: Score, score_other: Score) -> i8 {
         // Lowest paces shoot first
-        let is_paces_a: bool = self.is_paces();
-        let is_paces_b: bool = other.is_paces();
-        if (is_paces_a && is_paces_b) {
+        let is_paces_self: bool = self.is_paces();
+        let is_paces_other: bool = other.is_paces();
+        if (is_paces_self && is_paces_other) {
             //
-            // Paces vs Paces
+            // Round 1
             //
-            // Lowest pace shoots first
-            let paces_a: i8 = self.into();
-            let paces_b: i8 = other.into();
-            return (paces_a - paces_b);
+            let paces_self: i8 = self.into();
+            let paces_other: i8 = other.into();
+            if (paces_self == paces_other) {
+                // Tricksters shoot first
+                if (score_self.is_trickster() && !score_other.is_trickster()) {
+                    (-1)
+                } else if (!score_self.is_trickster() && score_other.is_trickster()) {
+                    (1)
+                } else {
+                    (0)
+                }
+            } else {
+                // closer pace shoots first
+                (paces_self - paces_other)
+            }
         } else {
             //
-            // Blades vs Blades
+            // Round 2+
             //
             // Slow crits first for a chance of Execution
             if (self == Action::SlowBlade && other != Action::SlowBlade) {
@@ -250,71 +170,229 @@ impl ActionTraitImpl of ActionTrait {
                 return (1);
             }
             // Flee/Steal rolls after paces
-            if (self.is_runner() && other.is_paces()) {
+            if (self.is_runner() && is_paces_other) {
                 return (1);
             }
-            if (self.is_paces() && other.is_runner()) {
+            if (is_paces_self && other.is_runner()) {
                 return (-1);
             }
+            (0) // default simultaneously
         }
-
-        (0) // default in sync
     }
 
+    //
+    // on a paces round, who chose to shoot first?
+    //
+    // returns:
+    // < 0: self
+    //   0: simultaneously or n/a
+    // > 0: other
+    fn paces_priority(self: Action, other: Action) -> i8 {
+        let paces_self: i8 = self.as_paces().try_into().unwrap();
+        let paces_other: i8 = other.as_paces().try_into().unwrap();
+        if (paces_self > 0 && paces_other > 0) {
+            (paces_self - paces_other)
+        } else {
+            (0)
+        }
+    }
+
+    //------------------
+    // Honour per Action
+    //
+    fn honour(self: Action) -> i8 {
+        match self {
+            Action::Paces1 |
+            Action::Paces2 |
+            Action::Paces3 |
+            Action::Paces4 |
+            Action::Paces5 |
+            Action::Paces6 |
+            Action::Paces7 |
+            Action::Paces8 |
+            Action::Paces9 |
+            Action::Paces10 =>  self.into(),
+            Action::Flee =>     0,  // drops honour to zero
+            Action::Steal =>    0,  // drops honour to zero
+            Action::Seppuku =>  10, // very honourable
+            _ =>                -1, // do not affect honour
+        }
+    }
+
+    //-----------------
+    // Flat chances
+    //
+    fn crit_chance(self: Action) -> u8 {
+        match self {
+            Action::Paces1 |
+            Action::Paces2 |
+            Action::Paces3 |
+            Action::Paces4 |
+            Action::Paces5 |
+            Action::Paces6 |
+            Action::Paces7 |
+            Action::Paces8 |
+            Action::Paces9 |
+            Action::Paces10 =>  (MathU8::map(self.into(), 1, 10, chances::PISTOLS_KILL_AT_STEP_1, chances::PISTOLS_KILL_AT_STEP_10)),
+            Action::FastBlade |
+            Action::SlowBlade |
+            Action::Block =>    (chances::BLADES_CRIT),
+            Action::Flee |
+            Action::Steal |
+            Action::Seppuku =>  (chances::ALWAYS), // always succeeds
+            _ =>                (chances::NEVER)
+        }
+    }
+    fn hit_chance(self: Action) -> u8 {
+        match self {
+            Action::Paces1 |
+            Action::Paces2 |
+            Action::Paces3 |
+            Action::Paces4 |
+            Action::Paces5 |
+            Action::Paces6 |
+            Action::Paces7 |
+            Action::Paces8 |
+            Action::Paces9 |
+            Action::Paces10 =>  (MathU8::map(self.into(), 1, 10, chances::PISTOLS_HIT_AT_STEP_1, chances::PISTOLS_HIT_AT_STEP_10)),
+            Action::FastBlade |
+            Action::SlowBlade |
+            Action::Block =>    (chances::BLADES_HIT),
+            _ =>                (chances::NEVER)
+        }
+    }
+    fn lethal_chance(self: Action) -> u8 {
+        match self {
+            Action::Paces1 |
+            Action::Paces2 |
+            Action::Paces3 |
+            Action::Paces4 |
+            Action::Paces5 |
+            Action::Paces6 |
+            Action::Paces7 |
+            Action::Paces8 |
+            Action::Paces9 |
+            Action::Paces10 =>  (MathU8::map(self.into(), 1, 10, chances::PISTOLS_LETHAL_AT_STEP_1, chances::PISTOLS_LETHAL_AT_STEP_10)),
+            _ =>                (chances::NEVER)
+        }
+    }
+
+    fn crit_penalty(self: Action) -> u8 {
+        match self {
+            Action::Paces1 |
+            Action::Paces2 |
+            Action::Paces3 |
+            Action::Paces4 |
+            Action::Paces5 |
+            Action::Paces6 |
+            Action::Paces7 |
+            Action::Paces8 |
+            Action::Paces9 |
+            Action::Paces10 =>  (chances::CRIT_PENALTY_PER_DAMAGE),
+            _ =>                (0)
+        }
+    }
+    fn hit_penalty(self: Action) -> u8 {
+        match self {
+            Action::Paces1 |
+            Action::Paces2 |
+            Action::Paces3 |
+            Action::Paces4 |
+            Action::Paces5 |
+            Action::Paces6 |
+            Action::Paces7 |
+            Action::Paces8 |
+            Action::Paces9 |
+            Action::Paces10 =>  (chances::HIT_PENALTY_PER_DAMAGE),
+            _ =>                (0)
+        }
+    }
+
+    //----------------------------
+    // Execution
+    //
     // dices decided for a crit, just execute it
     // returns true if ended in execution
-    // TODO: Dojo 0.6.0: Use match
     fn execute_crit(self: Action, ref self_shot: Shot, ref other_shot: Shot) -> bool {
-        // Lowest paces shoot first
-        let paces: u8 = self.as_paces();
-        if (paces != 0) {
-            // pistols crit is execution
-            other_shot.damage = constants::FULL_HEALTH;
-            return (true);
-        } else if (self == Action::SlowBlade) {
-            other_shot.damage = constants::FULL_HEALTH;
-            return (true);
-        } else if (self == Action::FastBlade) {
-            other_shot.damage = constants::DOUBLE_DAMAGE;
-        } else if (self == Action::Block) {
-            self_shot.block = constants::DOUBLE_DAMAGE;
-        } else if (self == Action::Flee) {
-            self_shot.wager += 1;  // split wager
-            other_shot.wager += 1; // split wager
-            other_shot.win = 1;   // opponent wins
-        } else if (self == Action::Steal) {
-            self_shot.wager += 1; // steal the wager
-            if (other_shot.action != Action::Steal.into()) {
-                other_shot.win = 1;  // opponent wins, unless double steal (into face-off)
-            }
-        } else if (self == Action::Seppuku) {
-            self_shot.damage = constants::FULL_HEALTH;
-            other_shot.wager += 1; // resign wager
+        match self {
+            Action::Paces1 |
+            Action::Paces2 |
+            Action::Paces3 |
+            Action::Paces4 |
+            Action::Paces5 |
+            Action::Paces6 |
+            Action::Paces7 |
+            Action::Paces8 |
+            Action::Paces9 |
+            Action::Paces10 => {
+                // pistols crit is execution
+                other_shot.damage = constants::FULL_HEALTH;
+                (true)
+            },
+            Action::FastBlade => {
+                other_shot.damage = constants::DOUBLE_DAMAGE;
+                (false)
+            },
+            Action::SlowBlade => {
+                other_shot.damage = constants::FULL_HEALTH;
+                (true)
+            },
+            Action::Block => {
+                self_shot.block = constants::DOUBLE_DAMAGE;
+                (false)
+            },
+            Action::Flee => {
+                self_shot.wager += 1;  // split wager
+                other_shot.wager += 1; // split wager
+                other_shot.win = 1;   // opponent wins
+                (false)
+            },
+            Action::Steal => {
+                self_shot.wager += 1; // steal the wager
+                if (other_shot.action != Action::Steal.into()) {
+                    other_shot.win = 1;  // opponent wins, unless double steal (into face-off)
+                }
+                (false)
+            },
+            Action::Seppuku => {
+                self_shot.damage = constants::FULL_HEALTH;
+                other_shot.wager += 1; // resign wager
+                (false)
+            },
+            _ => (false),
         }
-        (false)
     }
 
     // dices decided for a hit, just execute it
-    // TODO: Dojo 0.6.0: Use match
-    fn execute_hit(self: Action, ref self_shot: Shot, ref other_shot: Shot) {
-        // Lowest paces shoot first
-        let paces: u8 = self.as_paces();
-        if (paces != 0) {
-            let glance_chance: u8 = self.glance_chance();
-            if (self_shot.dice_hit <= glance_chance) {
+    fn execute_hit(self: Action, ref self_shot: Shot, ref other_shot: Shot, lethal_chance: u8) {
+        match self {
+            Action::Paces1 |
+            Action::Paces2 |
+            Action::Paces3 |
+            Action::Paces4 |
+            Action::Paces5 |
+            Action::Paces6 |
+            Action::Paces7 |
+            Action::Paces8 |
+            Action::Paces9 |
+            Action::Paces10 => {
+                if (self_shot.dice_hit <= lethal_chance) {
+                    other_shot.damage = constants::DOUBLE_DAMAGE;   // full damage
+                } else {
+                    other_shot.damage = constants::SINGLE_DAMAGE;   // glance
+                }
+            },
+            Action::FastBlade => {
                 other_shot.damage = constants::SINGLE_DAMAGE;
-            } else {
+            },
+            Action::SlowBlade => {
                 other_shot.damage = constants::DOUBLE_DAMAGE;
-            }
-        } else if (self == Action::SlowBlade) {
-            other_shot.damage = constants::DOUBLE_DAMAGE;
-        } else if (self == Action::FastBlade) {
-            other_shot.damage = constants::SINGLE_DAMAGE;
-        } else if (self == Action::Block) {
-            self_shot.block = constants::SINGLE_DAMAGE;
-        } else if (self.is_runner()) {
-            // no hit for you
-        }
+            },
+            Action::Block => {
+                self_shot.block = constants::SINGLE_DAMAGE;
+            },
+            _ => {},
+        };
     }
 
 }

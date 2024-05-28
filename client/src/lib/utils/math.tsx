@@ -18,3 +18,7 @@ export const TWO_PI = Math.PI * 2
 export const DEGREES_PER_RADIANS = (180 / Math.PI);
 export const toDegrees = (r: number) => (r * DEGREES_PER_RADIANS)
 export const toRadians = (d: number) => (d / DEGREES_PER_RADIANS)
+
+export const assert = (condition: boolean, error: string) => {
+  if (!condition) throw new Error(error)
+}

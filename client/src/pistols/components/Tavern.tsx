@@ -1,24 +1,32 @@
 import React from 'react'
-import { Grid } from 'semantic-ui-react'
-import { MenuTavern } from '@/pistols/components/Menus'
+import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { TavernAudios } from '@/pistols/components/GameContainer'
-import ChallengeModal from '@/pistols/components/ChallengeModal'
+import { TavernMenu } from '@/pistols/components/TavernMenu'
+import PlayerSwitcher from '@/pistols/components/PlayerSwitcher'
+import ConnectionDetector from './account/ConnectionDetector'
+import TableModal from '@/pistols/components/TableModal'
 import DuelistModal from '@/pistols/components/DuelistModal'
-
-const Row = Grid.Row
-const Col = Grid.Column
+import ChallengeModal from '@/pistols/components/ChallengeModal'
+import NewChallengeModal from '@/pistols/components/NewChallengeModal'
 
 export default function Tavern() {
+  const { tableOpener } = usePistolsContext()
 
   return (
     <>
       <div className='UIContainerTavern'>
-        <MenuTavern />
+        <TavernMenu />
       </div>
 
+      <PlayerSwitcher />
+
+      <TableModal opener={tableOpener} />
       <DuelistModal />
       <ChallengeModal />
+      <NewChallengeModal />
       <TavernAudios />
+
+      <ConnectionDetector />
     </>
   )
 }

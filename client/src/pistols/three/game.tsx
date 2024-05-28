@@ -391,7 +391,9 @@ function setupDuelScene(statsEnabled) {
 }
 
 export function resetDuelScene() {
-	emitter.emit('animated', AnimationState.None)
+    if (!_duelistAModel || !_duelistBModel) return // skip if players models not initialized yet
+
+    emitter.emit('animated', AnimationState.None)
 
     _actor['A']?.stop()
     _actor['B']?.stop()
@@ -696,18 +698,22 @@ export function resetStaticScene() {
 // Game Interface
 //
 
-export function switchScene(sceneName, duelistModelA, duelistModelB) {
-	_sceneName = sceneName
-	_currentScene = _scenes[sceneName]
-	if (sceneName == SceneName.Duel) {
-        localStorage.setItem("DUELIST_A", duelistModelA == "MALE" ? "MALE_A" : "FEMALE_A")
-        localStorage.setItem("DUELIST_B", duelistModelB == "MALE" ? "MALE_B" : "FEMALE_B")
-		_duelistAModel = localStorage.getItem("DUELIST_A")
-		_duelistBModel = localStorage.getItem("DUELIST_B")
-		resetDuelScene()
-	} else {
-		resetStaticScene()
-	}
+export function switchScene(sceneName) {
+  _sceneName = sceneName
+  _currentScene = _scenes[sceneName]
+  if (sceneName == SceneName.Duel) {
+    resetDuelScene()
+  } else {
+    resetStaticScene()
+  }
+}
+
+export function switchPlayers(duelistModelA, duelistModelB) {
+    localStorage.setItem("DUELIST_A", duelistModelA == "MALE" ? "MALE_A" : "FEMALE_A")
+    localStorage.setItem("DUELIST_B", duelistModelB == "MALE" ? "MALE_B" : "FEMALE_B")
+    _duelistAModel = localStorage.getItem("DUELIST_A")
+    _duelistBModel = localStorage.getItem("DUELIST_B")
+    switchScene(_sceneName) // reload scene
 }
 
 export function switchActor(actorId, newActorName) {

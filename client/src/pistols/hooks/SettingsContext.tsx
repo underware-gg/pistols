@@ -1,31 +1,35 @@
 import React, { ReactNode, createContext, useReducer, useContext, useState } from 'react'
 import { useCookies } from 'react-cookie'
-import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
+import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
+import { tables } from '@/pistols/utils/constants'
 
 //--------------------------------
 // Constants
 //
 export const initialState = {
+  debugMode: false,
   musicEnabled: true,
   sfxEnabled: true,
+  tableId: tables.LORDS,
 }
 
 const SettingsActions = {
+  DEBUG_MODE: 'settings.DEBUG_MODE',
   MUSIC_ENABLED: 'settings.MUSIC_ENABLED',
   SFX_ENABLED: 'settings.SFX_ENABLED',
+  TABLE_ID: 'settings.TABLE_ID',
 }
 
 //--------------------------------
 // Types
 //
-type SettingsStateType = {
-  musicEnabled: boolean,
-  sfxEnabled: boolean,
-}
+type SettingsStateType = typeof initialState
 
 type ActionType =
+  | { type: 'DEBUG_MODE', payload: boolean }
   | { type: 'MUSIC_ENABLED', payload: boolean }
   | { type: 'SFX_ENABLED', payload: boolean }
+  | { type: 'TABLE_ID', payload: string }
 
 
 
@@ -54,6 +58,11 @@ const SettingsProvider = ({
   const [state, dispatch] = useReducer((state: SettingsStateType, action: ActionType) => {
     let newState = { ...state }
     switch (action.type) {
+      case SettingsActions.DEBUG_MODE: {
+        newState.debugMode = action.payload as boolean
+        setCookie(SettingsActions.DEBUG_MODE, newState.debugMode)
+        break
+      }
       case SettingsActions.MUSIC_ENABLED: {
         newState.musicEnabled = action.payload as boolean
         setCookie(SettingsActions.MUSIC_ENABLED, newState.musicEnabled)
@@ -62,6 +71,11 @@ const SettingsProvider = ({
       case SettingsActions.SFX_ENABLED: {
         newState.sfxEnabled = action.payload as boolean
         setCookie(SettingsActions.SFX_ENABLED, newState.sfxEnabled)
+        break
+      }
+      case SettingsActions.TABLE_ID: {
+        newState.tableId = action.payload as string
+        setCookie(SettingsActions.TABLE_ID, newState.tableId)
         break
       }
       default:

@@ -25,7 +25,7 @@ export default function ErrorModal() {
       <Modal.Content className='Code Negative'>
         {eventData?.reason}
       </Modal.Content>
-      <Modal.Actions>
+      <Modal.Actions className='NoPadding'>
         <ActionButton fill label='Close' onClick={() => setIsOpen(false)} />
       </Modal.Actions>
     </Modal>

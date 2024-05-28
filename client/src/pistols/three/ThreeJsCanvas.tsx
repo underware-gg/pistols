@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
+import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 
 export const ThreeJsCanvas = ({
@@ -7,9 +7,12 @@ export const ThreeJsCanvas = ({
   height = 540,
   guiEnabled = false,
 }) => {
-  const { game, dispatchGameImpl } = useThreeJsContext()
+  const {
+    game,     // raw game module (game.tsx)
+    gameImpl, // initialized module (playable)
+    dispatchGameImpl,
+  } = useThreeJsContext()
   const [isLoading, setIsLoading] = useState(false)
-  const [isRunning, setIsRunning] = useState(false)
   const canvasRef = useRef()
 
   useEffectOnce(() => {
@@ -20,24 +23,24 @@ export const ThreeJsCanvas = ({
         game.animate()
         // game.resetGameParams(gameParams)
         setIsLoading(false)
-        setIsRunning(true)
         dispatchGameImpl(game)
         //@ts-ignore
         canvasRef.current?.focus()
       }
     }
 
-    if (canvasRef.current && !isLoading && !isRunning) {
+    // runs once on mount
+    if (canvasRef.current && !isLoading) {
+      if (gameImpl) {
+        gameImpl.dispose()
+        dispatchGameImpl(null)
+      }
       setIsLoading(true)
       _initialize()
     }
 
     return () => {
       _mounted = false
-      if (isRunning && game) {
-        game.dispose()
-        dispatchGameImpl(null)
-      }
     }
   }, [canvasRef.current])
 

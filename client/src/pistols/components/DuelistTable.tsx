@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Table } from 'semantic-ui-react'
-import { useDojoAccount } from '@/dojo/DojoContext'
+import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useAllDuelistIds, useDuelist } from '@/pistols/hooks/useDuelist'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ProfileName } from './account/ProfileDescription'
+import { bigintEquals } from '@/lib/utils/types'
+import { EMOJI } from '@/pistols/data/messages'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -15,6 +17,7 @@ const HeaderCell = Table.HeaderCell
 enum DuelistColumn {
   Name = 'Name',
   Honour = 'Honour',
+  Level = 'Level',
   TotalHonour = 'TotalHonour',
   Wins = 'Wins',
   Losses = 'Losses',
@@ -28,7 +31,7 @@ enum SortDirection {
 }
 
 export function DuelistTable() {
-  const { account } = useDojoAccount()
+  const { accountAddress } = useDojoAccount()
   const { duelistIds } = useAllDuelistIds()
 
   // Sort
@@ -53,7 +56,7 @@ export function DuelistTable() {
   const rows = useMemo(() => {
     let result = []
     duelistIds.forEach((duelistId, index) => {
-      const isYou = (duelistId == BigInt(account.address))
+      const isYou = bigintEquals(duelistId, accountAddress)
       result.push(<DuelistItem key={duelistId} address={duelistId} index={index} isYou={isYou} sortColumn={sortColumn} dataCallback={_dataCallback}/>)
     })
     return result
@@ -72,6 +75,7 @@ export function DuelistTable() {
     }
     const _sortTotals = (a, b) => (!isAscending ? (b - a) : (a && !b) ? -1 : (!a && b) ? 1 : (a - b))
     if (sortColumn == DuelistColumn.Honour) return _sortTotals(dataA.honour, dataB.honour)
+    if (sortColumn == DuelistColumn.Level) return _sortTotals(dataA.level, dataB.level)
     if (sortColumn == DuelistColumn.TotalHonour) return _sortTotals(dataA.total_honour, dataB.total_honour)
     if (sortColumn == DuelistColumn.Wins) return _sortTotals(dataA.total_wins, dataB.total_wins)
     if (sortColumn == DuelistColumn.Losses) return _sortTotals(dataA.total_losses, dataB.total_losses)
@@ -84,12 +88,13 @@ export function DuelistTable() {
   const isEmpty = (sortedRows.length == 0)
 
   return (
-    <Table selectable sortable={!isEmpty} className='Faded' color='orange'>
+    <Table selectable sortable={!isEmpty} className='Faded' color='orange' style={{ maxWidth: '100%' }}>
       <Table.Header className='TableHeader'>
         <Table.Row textAlign='center' verticalAlign='middle'>
           <HeaderCell width={1}></HeaderCell>
           <HeaderCell width={9} textAlign='left' sorted={sortColumn == DuelistColumn.Name ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Name)}>Duelist</HeaderCell>
           <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Honour ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Honour)}>Honour</HeaderCell>
+          <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Level ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Level)}>{EMOJI.LORD}{EMOJI.TRICKSTER}{EMOJI.VILLAIN}<br />Level</HeaderCell>
           <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Total ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Total)}>Total<br />Duels</HeaderCell>
           <HeaderCell width={1} sorted={sortColumn == DuelistColumn.TotalHonour ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.TotalHonour)}>Total<br />Honour</HeaderCell>
           <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Wins ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Wins)}>Wins</HeaderCell>
@@ -125,7 +130,11 @@ function DuelistItem({
   dataCallback,
 }) {
   const duelistData = useDuelist(address)
-  const { profilePic, total_wins, total_losses, total_draws, total_duels, total_honour, honourDisplay, winRatio } = duelistData
+  const {
+    profilePic,
+    total_wins, total_losses, total_draws, total_duels, total_honour,
+    honourDisplay, levelDisplay, winRatio,
+  } = duelistData
   const { dispatchSelectDuelist } = usePistolsContext()
 
   useEffect(() => {
@@ -143,13 +152,17 @@ function DuelistItem({
         <ProfilePicSquare profilePic={profilePic} small />
       </Cell>
 
-      <Cell textAlign='left'>
-        <h4 className='NoMargin'><ProfileName address={address} /></h4>
+      <Cell textAlign='left' style={{ maxWidth: '175px' }}>
+        <h5 className='NoMargin'><ProfileName address={address} /></h5>
         <AddressShort address={address} copyLink={false} />
       </Cell>
 
       <Cell className={_colClass(DuelistColumn.Honour)}>
         {isRookie ? '-' : <span className='TableValue'>{honourDisplay}</span>}
+      </Cell>
+
+      <Cell className={_colClass(DuelistColumn.Level)}>
+        {isRookie ? '-' : <span className='TableValue'>{levelDisplay}</span>}
       </Cell>
 
       <Cell className={_colClass(DuelistColumn.Total)}>

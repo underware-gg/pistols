@@ -1,30 +1,87 @@
 #!/bin/bash
 set -e
 
+if [ $# -ge 1 ]; then
+    export PROFILE=$1
+else
+    export PROFILE="dev"
+fi
+
 #-----------------
 # env setup
 #
+export MANIFEST_FILE_PATH="./manifests/$PROFILE/manifest.json"
+export BINDINGS_PATH="./bindings/typescript"
+export GAME_SLUG="pistols"
+export CLIENT_PATH="../client/src/games/$GAME_SLUG/generated/$PROFILE"
+export PROJECT_NAME=$(toml get Scarb.toml --raw tool.dojo.world.name)
 export WORLD_ADDRESS=$(toml get Scarb.toml --raw tool.dojo.env.world_address)
-export RPC_URL=$(toml get Scarb.toml --raw tool.dojo.env.rpc_url)
+export RPC_URL=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.rpc_url)
+
+if [[
+  -z "$PROFILE" ||
+  -z "$MANIFEST_FILE_PATH" ||
+  "$WORLD_ADDRESS" != "0x"* ||
+  "$RPC_URL" != "http"*
+]]; then
+  echo "! Missing data 👎"
+  exit 1
+fi
+
+echo "------------------------------------------------------------------------------"
+echo ""
+echo "PROJECT: $PROJECT_NAME"
+echo "PROFILE: $PROFILE"
+echo ""
+
+#-----------------
+# build
+#
+if [[ "$PROFILE" != "dev" ]]; then
+  echo "------------------------------------------------------------------------------"
+  echo "Cleaning..."
+  sozo -P $PROFILE clean
+  echo "Building..."
+  sozo -P $PROFILE build
+fi
 
 #-----------------
 # migrate
 #
 echo "------------------------------------------------------------------------------"
 echo "Migrating..."
-sozo migrate --world $WORLD_ADDRESS
+# sozo --profile $PROFILE migrate plan --world $WORLD_ADDRESS
+# exit 0
+sozo -P $PROFILE migrate apply --world $WORLD_ADDRESS
 
 #-----------------
 # auth write
 #
-scripts/default_auth.sh
+scripts/default_auth.sh $PROFILE
 
-#-----------------
-# client update
+
+#------------------------
+# copy manifest to client
 #
-cp target/dev/manifest.json ../client/src/
-cd ../client
-npm run create-components $RPC_URL $WORLD_ADDRESS
+echo "Copying manifest [$MANIFEST_FILE_PATH] to [$CLIENT_PATH/]"
+mkdir -p $CLIENT_PATH
+cp $MANIFEST_FILE_PATH $CLIENT_PATH/
 
-#-----------------
+#------------------------
+# typescript bindings
+#
+# TODO: Enable this when bindings are working
+# generate and cop bindings
+# sozo build --typescript
+# cp $BINDINGS_PATH/* $CLIENT_PATH/
+#
+# TODO: Remove this when bindings are working
+# copy to client
+cd ../client
+npm run create-components ---game=$GAME_SLUG --profile=$PROFILE $RPC_URL $WORLD_ADDRESS
+
+# list copied files
+ls -ld $CLIENT_PATH/* | grep -E 'ts|json'
+
+#------------------
 echo "--- DONE! 👍"

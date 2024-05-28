@@ -15,9 +15,11 @@
       "**/*.tsbuildinfo": true,
       // "**/.vscode": true,
       // "**/.env*": true,
+      "lords_mock": true,
     },
     "search.exclude": {
       "**/*-lock.json": true,
+      "**/*-lock.yaml": true,
       "**/*.lock": true,
       "**/artifacts/**/*.json": true,
       "**/contracts/**/*.json": true,
@@ -27,9 +29,12 @@
       "**/.gitmodules": true,
       "**/database.json": true,
       "**/generated/*": true,
-      "**/manifest.json": true,
-      "/client/public/**": true,
-      "/gamejam/**": true,
+      // "**/manifest.json": true,
+      "client/public/**": true,
+      "dojo/abis/**": true,
+      "dojo/manifests/**": true,
+      "dojo/bindings/**": true,
+      "gamejam": true,
     },
     "typescript.validate.enable": true,
     "editor.detectIndentation": false,
@@ -42,8 +47,8 @@
     "[cairo]": {
       "editor.tabSize": 4,
     },
-    "cairo1.languageServerPath": "${userHome}/.dojo/bin/dojo-language-server",
-    "cairo1.enableLanguageServer": true,
-    "cairo1.enableScarb": false
+    // "cairo1.languageServerPath": "${userHome}/.dojo/bin/dojo-language-server",
+    // "cairo1.enableLanguageServer": true,
+    "cairo1.enableScarb": true
   }
 }

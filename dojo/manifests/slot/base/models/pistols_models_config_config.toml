@@ -1,0 +1,30 @@
+kind = "DojoModel"
+class_hash = "0x45ed73bfdec60f65c8d2d7ebd28df55814db6387ac61b7f7359b1493ac3a819"
+original_class_hash = "0x45ed73bfdec60f65c8d2d7ebd28df55814db6387ac61b7f7359b1493ac3a819"
+abi = "manifests/slot/abis/base/models/pistols_models_config_config.json"
+name = "pistols::models::config::config"
+
+[[members]]
+name = "key"
+type = "u8"
+key = true
+
+[[members]]
+name = "initialized"
+type = "bool"
+key = false
+
+[[members]]
+name = "owner_address"
+type = "ContractAddress"
+key = false
+
+[[members]]
+name = "treasury_address"
+type = "ContractAddress"
+key = false
+
+[[members]]
+name = "paused"
+type = "bool"
+key = false

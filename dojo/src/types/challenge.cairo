@@ -26,9 +26,9 @@ mod CHALLENGE_STATE {
 
 trait ChallengeStateTrait {
     fn exists(self: ChallengeState) -> bool;
-    fn canceled(self: ChallengeState) -> bool;
-    fn ongoing(self: ChallengeState) -> bool;
-    fn finished(self: ChallengeState) -> bool;
+    fn is_canceled(self: ChallengeState) -> bool;
+    fn is_ongoing(self: ChallengeState) -> bool;
+    fn is_finished(self: ChallengeState) -> bool;
 }
 
 impl ChallengeStateTraitImpl of ChallengeStateTrait {
@@ -44,7 +44,7 @@ impl ChallengeStateTraitImpl of ChallengeStateTrait {
             ChallengeState::Draw        => true,
         }
     }
-    fn canceled(self: ChallengeState) -> bool {
+    fn is_canceled(self: ChallengeState) -> bool {
         match self {
             ChallengeState::Null        => false,
             ChallengeState::Awaiting    => false,
@@ -56,7 +56,7 @@ impl ChallengeStateTraitImpl of ChallengeStateTrait {
             ChallengeState::Draw        => false,
         }
     }
-    fn ongoing(self: ChallengeState) -> bool {
+    fn is_ongoing(self: ChallengeState) -> bool {
         match self {
             ChallengeState::Null        => false,
             ChallengeState::Awaiting    => true,
@@ -68,7 +68,7 @@ impl ChallengeStateTraitImpl of ChallengeStateTrait {
             ChallengeState::Draw        => false,
         }
     }
-    fn finished(self: ChallengeState) -> bool {
+    fn is_finished(self: ChallengeState) -> bool {
         match self {
             ChallengeState::Null        => false,
             ChallengeState::Awaiting    => false,
@@ -164,14 +164,14 @@ mod tests {
 
     use pistols::models::models::{Challenge};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
-    use pistols::tests::utils::{utils};
+    use pistols::tests::tester::{tester};
 
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_challenge_exists() {
-        let (world, _system, _admin, _lords, _ierc20, _owner, _other, _bummer, _treasury) = utils::setup_world(true, true);
+        let (world, _system, _admin, _lords, _ierc20, _owner, _other, _bummer, _treasury) = tester::setup_world(true, true);
         // get some random inexisting challenge
-        let ch: Challenge = utils::get_Challenge(world, 0x682137812638127638127);
+        let ch: Challenge = tester::get_Challenge(world, 0x682137812638127638127);
         let state: ChallengeState = ch.state.try_into().unwrap();
         assert(state == ChallengeState::Null, 'ChallengeState::Null');
         assert(state.exists() == false, 'exists()');
