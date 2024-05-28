@@ -41,8 +41,8 @@ export class Actor {
   currentSheet: SpriteSheet = null
   controls: any = {}
   ready: boolean = false
-  animationQueue: { key: string, count: number, loop: boolean, move: {x: number, y: number, z: number}, onStart: any, onEnd: any }[] = []  // Animation queue
-  
+  animationQueue: { key: string, count: number, loop: boolean, move: { x: number, y: number, z: number }, onStart: any, onEnd: any }[] = []  // Animation queue
+
   constructor(spriteSheets: any, width: number, height: number, flipped: boolean) {
     const geometry = new THREE.PlaneGeometry(width, height)
 
@@ -58,7 +58,7 @@ export class Actor {
 
     this.material = this.currentSheet.makeMaterial()
     this.mesh = new THREE.Mesh(geometry, this.material)
-    
+
     if (flipped) {
       this.mesh.position.set(-0.5, (height / 2) - (height * 0.0675), 2)
     } else {
@@ -85,15 +85,15 @@ export class Actor {
     this.ready = true
   }
 
-  playOnce(key, frameMovement = {x: 0, y: 0, z: 0}, onStart = null, onEnd = null) {
+  playOnce(key, frameMovement = { x: 0, y: 0, z: 0 }, onStart = null, onEnd = null) {
     this.playRepeat(key, 1, frameMovement, onStart, onEnd);
   }
 
-  playRepeat(key, loopCount, frameMovement = {x: 0, y: 0, z: 0}, onStart = null, onEnd = null, loop = null) {
+  playRepeat(key, loopCount, frameMovement = { x: 0, y: 0, z: 0 }, onStart = null, onEnd = null, loop = null) {
     this.animationQueue.push({ key: key, count: loopCount, move: frameMovement, onStart: onStart, onEnd: onEnd, loop: loop });
   }
 
-  playLoop(key, frameMovement = {x: 0, y: 0, z: 0}, onStart = null, onEnd = null) {
+  playLoop(key, frameMovement = { x: 0, y: 0, z: 0 }, onStart = null, onEnd = null) {
     this.playRepeat(key, 1, frameMovement, onStart, onEnd, true);
   }
 
@@ -106,7 +106,7 @@ export class Actor {
         return
       }
     }
-  
+
     const elapsed = seconds - this.controls.lastDisplayTime
     if (elapsed >= this.controls.tileDisplaySeconds) {
       this.controls.lastDisplayTime = seconds
@@ -115,12 +115,12 @@ export class Actor {
       if (this.controls.flipped) {
         console.log(this.controls.currentTile, seconds)
       }
-      
+
       if (this.controls.currentTile >= this.controls.frameCount) {
         // Reset to the start of the animation
         this.controls.currentTile = 0
         this.controls.loopCount--
-  
+
         if (this.controls.loopCount > 0 || this.controls.loop) {
           // Continue looping the current animation
           this.updateMaterialWithCurrentTile()
@@ -133,19 +133,19 @@ export class Actor {
             this.controls.currentTile = 0;
             this.updateMaterialWithCurrentTile()
           }
-  
+
           // Check if we should hide the mesh after the animation finishes
           if (this.controls.hideWhenFinished) {
             this.controls.visible = false
           }
-  
+
           // Trigger callback if any
           if (this.controls.callback) {
             this.controls.callback()
             // Reset callback to ensure it's called only once
             this.controls.callback = null
           }
-  
+
           // Check if there is another animation in the queue and set it up
           if (this.animationQueue.length > 0) {
             this.updateNextAnimation()
@@ -162,7 +162,7 @@ export class Actor {
       this.interpolatePosition(t);
     }
   }
-  
+
   interpolatePosition(t) {
     const interpolatedX = this.controls.startPositionX + t * (this.controls.targetPositionX - this.controls.startPositionX);
     this.mesh.position.x = interpolatedX;
@@ -177,7 +177,7 @@ export class Actor {
 
   private lastUpdateDuration = 0
   private timeStart = 0
-  
+
   updateNextAnimation() {
     this.lastUpdateDuration = performance.now() - this.timeStart
     if (this.controls.flipped) {

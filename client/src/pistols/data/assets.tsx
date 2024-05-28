@@ -376,8 +376,8 @@ const _loadAudios = async (listener: THREE.AudioListener) => {
         }
         resolve(audio)
       })
-      } catch(e) {
-        console.error(`CACHED AUDIO [${name}] FAILED!`, e)
+    } catch (e) {
+      console.error(`CACHED AUDIO [${name}] FAILED!`, e)
     }
   })
 }

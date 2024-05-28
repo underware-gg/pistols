@@ -43,7 +43,7 @@ export async function loadShaders() {
     vsh: await loadShader('/shaders/water-model-vsh.glsl'),
     fsh: await loadShader('/shaders/water-model-fsh.glsl'),
   };
-} 
+}
 
 
 export class ShaderMaterial extends THREE.ShaderMaterial {

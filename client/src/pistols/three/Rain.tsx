@@ -99,7 +99,7 @@ export class Rain extends THREE.Object3D {
       eye2.position.x = -14
       var ghost = new THREE.Group()
       ghost.add(eye1, eye2)
-      ghost.position.set(THREE.MathUtils.randFloatSpread(0.8 * WIDTH), THREE.MathUtils.randFloatSpread(0.7 * HEIGHT),0)
+      ghost.position.set(THREE.MathUtils.randFloatSpread(0.8 * WIDTH), THREE.MathUtils.randFloatSpread(0.7 * HEIGHT), 0)
       this.ghostsEyes.push(ghost)
       this.ghosts.push(ghost.position)
       this.scene.add(ghost)
