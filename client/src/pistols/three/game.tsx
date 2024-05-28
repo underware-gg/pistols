@@ -194,9 +194,11 @@ export async function init(canvas, width, height, statsEnabled = false) {
   setCameras()
 
   setRender(canvas)
-  setupScenes(statsEnabled)
 
   window.addEventListener('resize', onWindowResize)
+  onWindowResize()
+
+  setupScenes(statsEnabled)
 
   _clock = new THREE.Clock(true)
 
@@ -563,8 +565,6 @@ function loadGltf(scene: THREE.Scene, statsEnabled: boolean) {
 
       scene.add(_grass);
       scene.add(gltf.scene);
-
-      onWindowResize()
     }
   );
 }
