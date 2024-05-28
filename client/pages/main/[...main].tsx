@@ -10,6 +10,8 @@ import Background from '@/pistols/components/Background'
 import Gate from '@/pistols/components/Gate'
 import Tavern from '@/pistols/components/Tavern'
 import Duel from '@/pistols/components/Duel'
+import { useDojoStatus } from '@/lib/dojo/DojoContext'
+import { DojoStatus } from '@/lib/dojo/DojoStatus'
 
 // enable wasm in build (this is for api routes)
 // export const config = {
@@ -98,9 +100,14 @@ function MainUI({
   useRouterListener()
   const { gameImpl } = useThreeJsContext()
   const { atGate, atTavern, atDuel, connectOpener } = usePistolsContext()
+  const { isInitialized } = useDojoStatus()
 
   if (!gameImpl) {
     return <></>
+  }
+
+  if (!isInitialized) {
+    return <DojoStatus message={'Loading Pistols...'} />
   }
 
   return (
