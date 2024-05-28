@@ -1,7 +1,6 @@
 import { ReactNode, createContext, useCallback, useContext, useMemo } from 'react'
 import { BurnerAccount, useBurnerManager, useBurnerWindowObject, usePredeployedWindowObject } from '@dojoengine/create-burner'
 import { SetupResult } from '@/lib/dojo/setup/useSetup'
-import { dummyAccount } from '../utils/starknet';
 import { bigintEquals } from '@/lib/utils/types';
 import { Account, BigNumberish } from 'starknet'
 
@@ -27,7 +26,6 @@ export const DojoProvider = ({
 
   const { burnerManager, predeployedManager, dojoProvider } = value ?? {}
 
-  // const masterAccount = burnerManager?.masterAccount ?? dummyAccount()
   const masterAccount = burnerManager?.masterAccount as Account
   const burner: BurnerAccount = useBurnerManager({ burnerManager })
 

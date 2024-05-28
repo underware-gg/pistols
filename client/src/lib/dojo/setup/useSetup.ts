@@ -123,10 +123,10 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     if (!dojoProvider) return (dojoProvider as any) // undefined or null
     const burnerManager = new BurnerManager({
       // master account moved to predeployedManager
-      masterAccount: account ?? dummyAccount(),
+      masterAccount: account ?? dummyAccount(dojoProvider.provider),
       accountClassHash: selectedChainConfig.accountClassHash,
       feeTokenAddress: selectedChainConfig.chain.nativeCurrency.address,
-      rpcProvider: dojoProvider?.provider,
+      rpcProvider: dojoProvider.provider,
     });
     await burnerManager.init(true);
     return burnerManager
