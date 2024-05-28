@@ -7,8 +7,7 @@
     "**/.next": true,
     "**/_bak": true,
     "**/*.tsbuildinfo": true,
-    // "**/.vscode": true,
-    // "**/.env*": true,
+    "**/next-env.d.ts": true,
     "lords_mock": true,
   },
   "search.exclude": {
@@ -23,7 +22,7 @@
     "**/.gitmodules": true,
     "**/database.json": true,
     "**/generated/*": true,
-    // "**/manifest.json": true,
+    "**/manifest.json": true,
     "client/public/**": true,
     "dojo/abis/**": true,
     "dojo/manifests/**": true,
