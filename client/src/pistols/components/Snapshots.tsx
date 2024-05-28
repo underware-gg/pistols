@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Button, Container, Divider, TextArea } from 'semantic-ui-react'
 import { useAllDuelistIds, useDuelist } from '@/pistols/hooks/useDuelist'
+import { useDojoStatus } from '@/lib/dojo/DojoContext'
+import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { CopyIcon } from '@/lib/ui/Icons'
 import { bigintToHex } from '@/lib/utils/types'
 
@@ -9,7 +11,12 @@ BigInt.prototype.toJSON = function () { return bigintToHex(this) }
 
 
 export function Snapshots() {
+  const { isInitialized } = useDojoStatus()
   const [data, setData] = useState('')
+
+  if (!isInitialized) {
+    return <DojoStatus message={'Loading Pistols...'} />
+  }
 
   const _update = (newData: any[]) => {
     setData(JSON.stringify(newData, null, '  '))

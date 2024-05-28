@@ -3,12 +3,13 @@ import { Container, Table, Button, Image } from 'semantic-ui-react'
 import { ArraySignatureType, typedData } from 'starknet'
 import { useAccount, useDisconnect, useSignTypedData } from '@starknet-react/core'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { useDojoAccount } from '@/lib/dojo/DojoContext'
+import { useDojoAccount, useDojoStatus } from '@/lib/dojo/DojoContext'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { feltToString } from '@/lib/utils/starknet'
 import { bigintToHex, shortAddress } from '@/lib/utils/types'
 import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
 import { makeDojoAppConfig } from '@/games/pistols/config'
+import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import AppDojo from '@/lib/ui/AppDojo'
 
@@ -34,8 +35,13 @@ export default function IndexPage() {
 
 
 function DojoAccount() {
+  const { isInitialized } = useDojoStatus()
   const { account, masterAccount, isGuest } = useDojoAccount()
   const { selectedChainConfig } = useSelectedChain()
+
+  if (!isInitialized) {
+    return <DojoStatus message={'Loading Pistols...'} />
+  }
 
   return (
     <Table celled striped color='orange' size='small'>
