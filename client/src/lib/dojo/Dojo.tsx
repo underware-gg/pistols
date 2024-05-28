@@ -40,15 +40,7 @@ function SetupDojoProvider({
   // Connected wallet or Dojo Predeployed (master)
   const { account } = useAccount()
   const { selectedChainConfig } = useStarknetContext()
-  
-  // console.log(`dojoAppConfig:`, dojoAppConfig)
   const setupResult = useSetup(dojoAppConfig, selectedChainConfig, account as Account)
-
-  if (!setupResult) {
-    return <DojoStatus message={'Loading Pistols...'} />
-  }
-  // console.log(`setupResult:`, setupResult)
-
   return (
     <DojoProvider value={setupResult}>
       {children}

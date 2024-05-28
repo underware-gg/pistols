@@ -58,20 +58,11 @@ export const useKatanaStatus = () => {
 export function DojoStatus({
   message = 'Loading Dojo...',
 }) {
-  const { toriiIsError } = useToriiStatus()
-  const { katanaIsError } = useKatanaStatus()
-  // const { disconnect } = useDisconnect()
   return (
-    <VStack>
-      <h1 className='TitleCase'>{message}</h1>
-
-      {/* <h5 className='TitleCase Negative'>
-        {(toriiIsError || katanaIsError) && <>chain is unavailable</>}
-      </h5> */}
-      
-      {/* <h5 className='TitleCase Important Anchor' onClick={() => disconnect()}>
-        {isError && <>disconnect</>}
-      </h5> */}
-    </VStack>
+    <div className='Overlay FillParent'>
+      <VStack>
+        <h1 className='TitleCase'>{message}</h1>
+      </VStack>
+    </div>
   )
 }

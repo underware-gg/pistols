@@ -1,11 +1,12 @@
 import { ReactNode, createContext, useCallback, useContext, useMemo } from 'react'
 import { BurnerAccount, useBurnerManager, useBurnerWindowObject, usePredeployedWindowObject } from '@dojoengine/create-burner'
 import { SetupResult } from '@/lib/dojo/setup/useSetup'
-import { Account, BigNumberish } from 'starknet'
 import { dummyAccount } from '../utils/starknet';
-import { bigintEquals } from '../utils/types';
+import { bigintEquals } from '@/lib/utils/types';
+import { Account, BigNumberish } from 'starknet'
 
 interface DojoContextType {
+  isInitialized: boolean;
   setup: SetupResult;
   masterAccount: Account;
   account: Account | null;
@@ -24,8 +25,9 @@ export const DojoProvider = ({
   const currentValue = useContext(DojoContext);
   if (currentValue) throw new Error('DojoProvider can only be used once');
 
-  const { burnerManager, predeployedManager, dojoProvider } = value
+  const { burnerManager, predeployedManager, dojoProvider } = value ?? {}
 
+  // const masterAccount = burnerManager?.masterAccount ?? dummyAccount()
   const masterAccount = burnerManager?.masterAccount as Account
   const burner: BurnerAccount = useBurnerManager({ burnerManager })
 
@@ -36,7 +38,8 @@ export const DojoProvider = ({
   return (
     <DojoContext.Provider
       value={{
-        setup: value,
+        isInitialized: Boolean(value),
+        setup: value ?? {} as SetupResult,
         masterAccount,
         account: (burner.account as Account) ?? undefined,
         burner,
@@ -61,8 +64,9 @@ export const useDojo = (): DojoContextType => {
 //
 
 export const useDojoStatus = () => {
-  const { setup: { status } } = useDojo()
+  const { isInitialized, setup: { status } } = useDojo()
   return {
+    isInitialized,
     ...status,
   }
 }

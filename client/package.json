@@ -34,6 +34,7 @@
     "starknet": "5.25.0",
     "swr": "^2.2.4",
     "three": "^0.157.0",
+    "lil-gui": "^0.19.2",
     "type-fest": "^2.14.0",
     "use-local-storage-state": "^19.1.0"
   },

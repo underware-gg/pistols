@@ -2,12 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Modal, Button, Image } from 'semantic-ui-react'
 import { useConnect, Connector, useAccount } from '@starknet-react/core'
 import { useChainSwitchCallbacks, useSelectedChain } from '@/lib/dojo/hooks/useChain'
+import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { Opener } from '@/lib/ui/useOpener'
 import { VStack } from '@/lib/ui/Stack'
 import { Divider } from '@/lib/ui/Divider'
-import { useEffectOnce } from '../utils/hooks/useEffectOnce'
-import { useDojo } from './DojoContext'
-
 
 export default function StarknetConnectModal({
   opener,
