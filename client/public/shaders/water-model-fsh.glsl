@@ -22,10 +22,21 @@ void main() {
 
     vec4 base = texture2DProj( tDiffuse, uv );
 
-    gl_FragColor = vec4( mix( base.rgb, color, 0.8 ), 1.0 );
-    // gl_FragColor = vec4(vUv.xy, 0.0, 1.0);
+    // Adjust the mixing ratio to allow more of the base color to come through
+    float mixRatio = 0.7;
+
+    // Enhance color saturation
+    vec3 enhancedColor = color * 1.2;
+
+    // Mix the enhanced color with the base texture color
+    vec3 finalColor = mix(base.rgb, enhancedColor, mixRatio);
+
+    // Apply contrast adjustment
+    float contrast = 1.12;
+    finalColor = ((finalColor - 0.5) * contrast + 0.5);
+
+    gl_FragColor = vec4(finalColor, 1.0);
 
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
-
 }

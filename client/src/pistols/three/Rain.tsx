@@ -122,7 +122,7 @@ export class Rain extends THREE.Object3D {
   }
 
   animate(clock) {
-    var dTime = clock.getDelta()
+    var dTime = 0.01 //just in case so that it doesnt mess the clocks deltas, will be replaced back once rain is completely implemented
     var time = clock.getElapsedTime()
     if (M < N) M += 5
     const positions = this.snowflakes.getAttribute('position')

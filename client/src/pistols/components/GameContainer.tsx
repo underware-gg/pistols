@@ -49,7 +49,7 @@ function GameAudioLoader() {
   useEffect(() => {
     const _preloadAudio = async () => {
       dispatchLoadedAudioAssets(false)
-      await loadAudioAssets(gameImpl?.getCameraRig())
+      await loadAudioAssets()
       dispatchLoadedAudioAssets(true)
     }
     if (isAudioAssetsLoaded()) {

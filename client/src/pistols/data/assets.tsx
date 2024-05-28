@@ -392,11 +392,10 @@ const _loadAudios = async (listener: THREE.AudioListener) => {
 // Audios need to be loaded after user interaction
 // call this from some button
 let _audioAssetsLoaded: boolean
-const loadAudioAssets = async (cameraRig: any) => {
+const loadAudioAssets = async () => {
   if (_audioAssetsLoaded === undefined) {
     _audioAssetsLoaded = false
     const listener = new THREE.AudioListener()
-    cameraRig.add(listener)
     await _loadAudios(listener)
     console.log(`--- CACHED AUDIOS! 👍`)
     _audioAssetsLoaded = true

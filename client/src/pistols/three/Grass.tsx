@@ -19,6 +19,11 @@ export class Grass extends THREE.Object3D{
     private depthMaterial: shaders.ShaderMaterial;
     private mesh: THREE.InstancedMesh;
 
+    private grassDebugObject = {
+        baseColor: '#655d06',
+        tipColor: '#bbc624'
+    }
+
     constructor(params: { height: number; offset: number; heightmap: any; dims: any; transforms: any; }, statsEnabled = false, gui = null) {
         super();
         
@@ -162,9 +167,9 @@ export class Grass extends THREE.Object3D{
         material.setUniformValue('windDirection', new THREE.Vector3(0.0, 0.0, -1.0))
         material.setUniformValue('windStrength', 8)
         material.setUniformValue('windSpeed', 1.0)
-        material.setUniformValue('gradientOffset', 1.6)
-        material.setUniformValue('baseColor', new THREE.Color(0.180, 0.188, 0.051))
-        material.setUniformValue('tipColor', new THREE.Color(0.486, 0.510, 0.110))
+        material.setUniformValue('gradientOffset', 1.9)
+        material.setUniformValue('baseColor', new THREE.Color(this.grassDebugObject.baseColor))
+        material.setUniformValue('tipColor', new THREE.Color(this.grassDebugObject.tipColor))
         material.setUniformValue('opacity', 1.0)
 
         return material;
@@ -228,10 +233,16 @@ export class Grass extends THREE.Object3D{
             .name('gradientOffset')
             .min(0.0).max(10.0).step(0.01);
         grassFolder
-            .addColor(this.materialHigh.getUniforms()['baseColor'], 'value')
+            .addColor(this.grassDebugObject, 'baseColor')
+            .onChange( () => { 
+                this.materialHigh.setUniformValue('baseColor', new THREE.Color(this.grassDebugObject.baseColor))
+            } )
             .name('baseColor');
         grassFolder
-            .addColor(this.materialHigh.getUniforms()['tipColor'], 'value')
+            .addColor(this.grassDebugObject, 'tipColor')
+            .onChange( () => { 
+                this.materialHigh.setUniformValue('tipColor', new THREE.Color(this.grassDebugObject.tipColor))
+            } )
             .name('tipColor');
     }
 

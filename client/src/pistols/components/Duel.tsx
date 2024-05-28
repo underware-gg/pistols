@@ -94,9 +94,9 @@ export default function Duel({
 
       <MenuDuel duelStage={duelStage} duelId={duelId} />
 
-      {process.env.NEXT_PUBLIC_DEBUG &&
+      {/* {process.env.NEXT_PUBLIC_DEBUG &&
         <MenuDebugAnimations />
-      }
+      } */}
     </>
   )
 }
