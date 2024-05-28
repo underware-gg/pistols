@@ -1722,7 +1722,11 @@
                   "type": "core::integer::u8"
                 }
               ],
-              "outputs": [],
+              "outputs": [
+                {
+                  "type": "pistols::models::models::Duelist"
+                }
+              ],
               "state_mutability": "view"
             },
             {
