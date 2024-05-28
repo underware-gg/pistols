@@ -174,12 +174,13 @@ export async function init(canvas, width, height, statsEnabled = false) {
     return
   }
 
-  console.log(`THREE.init()`)
+  console.log(`THREE.init() loading assets...`)
 
   // color space migration
   // https://discourse.threejs.org/t/updates-to-color-management-in-three-js-r152/50791
   // THREE.ColorManagement.enabled = false
   await loadAssets()
+  console.log(`THREE.init() assets loaded...`)
 
   _duelistAModel = localStorage.getItem("DUELIST_A")
   _duelistBModel = localStorage.getItem("DUELIST_B")

@@ -30,8 +30,8 @@ export const ThreeJsCanvas = ({
     }
 
     // runs once on mount
-    if (canvasRef.current && !isLoading) {
-      if (gameImpl) {
+    if (canvasRef.current && !isLoading && !gameImpl) {
+      if (gameImpl) { // should never happen, but lets keep it for now
         gameImpl.dispose()
         dispatchGameImpl(null)
       }
@@ -40,10 +40,10 @@ export const ThreeJsCanvas = ({
     }
 
     return () => {
+      console.warn(`UNMOUNTED ThreeJsCanvas! this should not be happening`)
       _mounted = false
     }
   }, [canvasRef.current])
-
 
   return (
     <canvas
