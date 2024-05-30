@@ -273,22 +273,26 @@ impl ActionTraitImpl of ActionTrait {
             Action::Paces8 |
             Action::Paces9 |
             Action::Paces10 =>  (MathU8::map(self.into(), 1, 10, chances::PISTOLS_LETHAL_AT_STEP_1, chances::PISTOLS_LETHAL_AT_STEP_10)),
+            // Blades do not have lethal chances, it's on crit
             _ =>                (chances::NEVER)
         }
     }
 
     fn crit_penalty(self: Action) -> u8 {
         match self {
-            Action::Paces1 |
-            Action::Paces2 |
-            Action::Paces3 |
-            Action::Paces4 |
-            Action::Paces5 |
-            Action::Paces6 |
-            Action::Paces7 |
-            Action::Paces8 |
-            Action::Paces9 |
-            Action::Paces10 =>  (chances::CRIT_PENALTY_PER_DAMAGE),
+            // Action::Paces1 |
+            // Action::Paces2 |
+            // Action::Paces3 |
+            // Action::Paces4 |
+            // Action::Paces5 |
+            // Action::Paces6 |
+            // Action::Paces7 |
+            // Action::Paces8 |
+            // Action::Paces9 |
+            // Action::Paces10 |
+            // Action::FastBlade |
+            // Action::SlowBlade |
+            // Action::Block =>    (chances::CRIT_PENALTY_PER_DAMAGE),
             _ =>                (0)
         }
     }
@@ -303,7 +307,10 @@ impl ActionTraitImpl of ActionTrait {
             Action::Paces7 |
             Action::Paces8 |
             Action::Paces9 |
-            Action::Paces10 =>  (chances::HIT_PENALTY_PER_DAMAGE),
+            Action::Paces10 |
+            Action::FastBlade |
+            Action::SlowBlade |
+            Action::Block =>    (chances::HIT_PENALTY_PER_DAMAGE),
             _ =>                (0)
         }
     }
