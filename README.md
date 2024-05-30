@@ -27,7 +27,7 @@ Winner of the [Dojo Game Jam #3](https://twitter.com/ohayo_dojo/status/174762644
  JP5?~^...^?JG&#^      / ____/ (__  ) /_/ /_/ / (__  )  / /_/ / /_    / / /_/ /  / /_/ / / /_/ / /__/ ,< (__  )     
  ~PY!::. .:7?YBB^     /_/   /_/____/\__/\____/_/____/   \__,_/\__/   /_/\____/  /_____/_/\____/\___/_/|_/____/      
   ~55J!~:^7?5PY^                                                                                                        
-    ~?YYYJ?7!^        A game of honour, chance and betrayal. Defend thine honour, scound! By Loot Underworld.               
+    ~?YYYJ?7!^        A game of honour, chance and betrayal. Defend thine honour, scound! By Underware.gg.               
        ^^^                                                                                                                       
 ```
 
@@ -52,8 +52,10 @@ Pistols at 10 Blocks is an onchain game, in which you face off against another L
 * Recipromancer — Lead, Renaissance Chaos Mode
 * Mataleone — Engineering
 * Voltrevo — Engineering, Hidden information mechanism
-* Amaro — Art, Design & Animations
+* FortunaRegem - Engineering, Frontend, UI & Animations
+* Amaro — Art, Design, UI & Animations
 * Mononoke — Logo & Art
+* Jubiliee - Technical 3D systems
 
 ## Assets
 
@@ -68,37 +70,35 @@ Pistols at 10 Blocks is an onchain game, in which you face off against another L
 
 ### Pistols Round
 
-On the Pistols round, each player has a chance to **Hit** and a chance to **Execute**, both expressed as percentages, calculated based on the number of steps taken.
+In the Pistols round, each player has a chance to **injure** (1 dmg) or **wound** (2 dmg) and a chance to **execute**, each expressed as percentages, calculated based on the number of steps taken.
 
-1) Hit chance is calculated first. The highest chance at 1 pace, the lowest chance at 10 paces, interpolated in between.
+2) Hit chance is calculated, affected by hit penalties. The highest chance at 1 pace, the lowest chance at 10 paces, interpolated in between.
 
 https://github.com/funDAOmental/pistols/blob/0d064ac90f502f348b6f14624f962661140b67aa/dojo/src/types/constants.cairo#L15-L17
 
-2) If hit, Execute chance is calculated. The highest chance at 10 paces, the lowest chance at 1 pace, interpolated in between.
+1) Execute chances is calculated, not affected by hit penalties. The highest chance at 10 paces, the lowest chance at 1 pace, interpolated in between.
 
 https://github.com/funDAOmental/pistols/blob/0d064ac90f502f348b6f14624f962661140b67aa/dojo/src/types/constants.cairo#L19-L21
 
-
-
 ### Blades Round
 
-On the Pistols round, each player has a chance to Hit and a chance to Execute, both expressed as percentages, calculated based on the number of steps taken.
+In the Blades round, each player has two strikes, each with a chance to **injure** or **wound**, each expressed as percentages.
 
-1) Execution chance is first calculated using the `Heavy` blade.
+1) `Heavy` blades use both strikes, doing nothing on the first strike and 2 dmg on the second strike. They have a chance to **execute**, which occurs before other strikes.
 
 If no execution occurs...
 
-2) Players using the `Light` against a `Heavy` blade strike first.
+2) `Light` blades do 1 dmg, `Block` prevents 1 damage, and each use one strike. They have a chance to **crit**, doubling their effect.
 
-3) Else, both players attack at the same time.
+3) All other strikes happen at the same time, and `Block` only prevents damage against strikes that happen at the same time as it.
 
 
 
 ### Bonus and Damage penalty
 
-Honourable Lords, with Honour > 9.0, get a bonus on every Hit 
+Honourable duelists, with Honour > 9.0, get a bonus to crit or execution on every Hit
 
-
+Injured duelists suffer a penalty to Hit
 
 
 ## Development notes
