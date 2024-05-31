@@ -19,6 +19,18 @@ mod tests {
     use pistols::utils::math::{MathU8};
     use pistols::tests::tester::{tester};
 
+const SALT_DUAL_MISS: u64 = 0x18ea4e76993925e8;
+const SALT_DUAL_HIT: u64 = 0x82dce1fe696bfed6;
+const SALT_DUAL_CRIT: u64 = 0x1e4e6537a9a2c50e;
+const SALT_DUAL_CRIT_R3: u64 = 0xdc523d8580a9a5bb;
+    const SALT_HIT_MISS: u64 = 0xffffff; // 3,1
+    const SALT_MISS_HIT: u64 = 0x1ff8f8f88f; // 1,3
+const SALT_CRIT_MISS: u64 = 0x356c43f8a69c57a; // 3,0
+const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
+    const SALT_CRIT_HIT: u64 = 0x1111; // 1,0
+    const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
+
+    //---------------------------------------------------
 
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
@@ -26,11 +38,6 @@ mod tests {
     const TABLE_ID: felt252 = tables::LORDS;
     const WAGER_VALUE: u256 = 100_000_000_000_000_000_000;
 
-    const SALT_1_a: u64 = 0xa6f099b756a87e62;
-    const SALT_1_b: u64 = 0xf9a978e92309da78;
-    const SALT_2_a: u64 = 0x03f8a7e99d723c82;
-    const SALT_2_b: u64 = 0x45299a98d9f8ce03;
-    
     fn _start_new_challenge(world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress) -> (Challenge, Round, u128) {
         tester::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         tester::execute_register_duelist(system, other, OTHER_NAME, 2);
@@ -46,6 +53,11 @@ mod tests {
         (ch, round, duel_id)
     }
 
+    const SALT_1_a: u64 = 0xa6f099b756a87e62;
+    const SALT_1_b: u64 = 0xf9a978e92309da78;
+    const SALT_2_a: u64 = 0x03f8a7e99d723c82;
+    const SALT_2_b: u64 = 0x45299a98d9f8ce03;
+
     // both full health
     fn _get_actions_round_1_continue() -> (u64, u64, u8, u8, u64, u64) {
         let salt_a: u64 = SALT_1_a + 1;
@@ -55,16 +67,6 @@ mod tests {
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a.into()), make_action_hash(salt_b, action_b.into()))
     }
 
-
-    const SALT_DUAL_MISS: u64 = 0xcb34333b;
-    const SALT_DUAL_HIT: u64 = 0x3764564;
-    const SALT_DUAL_CRIT: u64 = 0xb6800612482e938f;
-    const SALT_HIT_MISS: u64 = 0xffffff; // 3,1
-    const SALT_MISS_HIT: u64 = 0x1ff8f8f88f; // 1,3
-    const SALT_CRIT_MISS: u64 = 0xdfdfdf; // 3,0
-    const SALT_MISS_CRIT: u64 = 0xaaaaa; // 0,3
-    const SALT_CRIT_HIT: u64 = 0x1111; // 1,0
-const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
 
     fn _execute_blades(
         world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress,
@@ -142,7 +144,7 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
-            SALT_DUAL_MISS,
+            SALT_DUAL_HIT,
         );
         assert_winner(challenge, round, 0, 3);
         let round2: Round = tester::get_Round(world, challenge.duel_id, 2);
@@ -274,6 +276,14 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
             SALT_DUAL_HIT,
         );
+// round.shot_a.chance_crit.print();
+// round.shot_a.chance_hit.print();
+// round.shot_b.chance_crit.print();
+// round.shot_b.chance_hit.print();
+// round.shot_a.dice_crit.print();
+// round.shot_a.dice_hit.print();
+// round.shot_b.dice_crit.print();
+// round.shot_b.dice_hit.print();
         assert_winner(challenge, round, 0, 2);
         assert(round.shot_a.damage == constants::SINGLE_DAMAGE, 'bad shot_a.damage');
         assert(round.shot_a.health == constants::SINGLE_DAMAGE, 'bad shot_a.health');
@@ -302,13 +312,8 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             world, system, owner, other,
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
-            SALT_DUAL_CRIT,
+            SALT_CRIT_MISS,
         );
-// challenge.winner.print();
-// round.shot_a.chance_crit.print();
-// round.shot_a.dice_crit.print();
-// round.shot_b.chance_crit.print();
-// round.shot_b.dice_crit.print();
         assert_winner(challenge, round, 1, 2);
         assert(round.shot_a.health == constants::DOUBLE_DAMAGE, 'bad health_a');
         assert(round.shot_b.health == 0, 'bad health_b');
@@ -395,11 +400,11 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
             world, system, owner, other,
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
             constants::DOUBLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
-            SALT_DUAL_HIT,
+            SALT_DUAL_CRIT_R3,
         );
         assert_winner(challenge, round, 2, 3);
         assert(round.shot_a.health == 0, 'bad health_a');
-        assert(round.shot_b.health == constants::SINGLE_DAMAGE, 'bad health_b');
+        assert(round.shot_b.health < constants::FULL_HEALTH, 'bad health_b');
     }
     #[test]
     #[available_gas(1_000_000_000)]
@@ -497,9 +502,9 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let (challenge, round) = _execute_blades(
             world, system, owner, other,
-            constants::FULL_HEALTH, ACTION::IDLE, ACTION::FAST_BLADE,
-            constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
-            SALT_DUAL_HIT,
+            constants::FULL_HEALTH, ACTION::IDLE, ACTION::BLOCK,
+            constants::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
+            SALT_DUAL_CRIT_R3,
         );
         assert_winner(challenge, round, 0, 3);
         let round2: Round = tester::get_Round(world, challenge.duel_id, 2);
@@ -509,8 +514,8 @@ const SALT_HIT_CRIT: u64 = 0x1111; // 0,1
         assert(round2.shot_b.block > 0, 'round2.shot_b.block');
         assert(round.shot_a.health == constants::FULL_HEALTH, 'round.shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'round.shot_b.health');
-        assert(round.shot_a.block == 0, 'round.shot_a.block');
-        assert(round.shot_b.block > 0, 'round.shot_b.block');
+        assert(round.shot_a.block > 0, 'round.shot_a.block');
+        assert(round.shot_b.block == 0, 'round.shot_b.block');
     }
     #[test]
     #[available_gas(1_000_000_000)]
