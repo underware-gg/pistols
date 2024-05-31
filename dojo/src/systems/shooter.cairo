@@ -126,7 +126,7 @@ mod shooter {
                     state: RoundState::Reveal.into(),
                     shot_a: Shot {
                         hash: 0,
-                        salt: (round.shot_a.salt ^round.shot_a.hash),
+                        salt: utils::scramble_salt(round.shot_a.salt),
                         action: slot2_a.into(),
                         chance_crit: 0,
                         chance_hit: 0,
@@ -141,7 +141,7 @@ mod shooter {
                     },
                     shot_b: Shot {
                         hash: 0,
-                        salt: (round.shot_b.salt ^round.shot_b.hash),
+                        salt: utils::scramble_salt(round.shot_b.salt),
                         action: slot2_b.into(),
                         chance_crit: 0,
                         chance_hit: 0,

@@ -43,6 +43,12 @@ fn make_round_salt(round: Round) -> u64 {
     (round.shot_a.salt ^ round.shot_b.salt)
 }
 
+#[inline(always)]
+fn scramble_salt(salt: u64) -> u64 {
+    let hash: u256 = pedersen(salt.into(), (~salt).into()).into() & constants::HASH_SALT_MASK;
+    (hash.try_into().unwrap())
+}
+
 fn make_pact_pair(duelist_a: ContractAddress, duelist_b: ContractAddress) -> u128 {
     let a: felt252 = duelist_a.into();
     let b: felt252 = duelist_b.into();
