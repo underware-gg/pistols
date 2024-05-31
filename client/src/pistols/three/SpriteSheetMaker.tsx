@@ -112,10 +112,6 @@ export class Actor {
       this.controls.lastDisplayTime = seconds
       this.controls.currentTile++;
 
-      if (this.controls.flipped) {
-        console.log(this.controls.currentTile, seconds)
-      }
-
       if (this.controls.currentTile >= this.controls.frameCount) {
         // Reset to the start of the animation
         this.controls.currentTile = 0
@@ -158,44 +154,55 @@ export class Actor {
         this.updateMaterialWithCurrentTile()
       }
     } else {
-      const t = elapsed / this.controls.tileDisplaySeconds;
+      const t = (elapsed + (this.controls.currentTile * this.controls.tileDisplaySeconds)) / this.controls.totalAnimationDuration;
       this.interpolatePosition(t);
     }
   }
 
   interpolatePosition(t) {
-    const interpolatedX = this.controls.startPositionX + t * (this.controls.targetPositionX - this.controls.startPositionX);
+    const easedT = this.fastInFastOut(t);
+    const interpolatedX = this.controls.startPositionX + easedT * (this.controls.targetPositionX - this.controls.startPositionX);
     this.mesh.position.x = interpolatedX;
   }
 
+  cubicBezier(t, p1, p2, p3, p4) {
+    const u = 1 - t;
+    const tt = t * t;
+    const uu = u * u;
+    const uuu = uu * u;
+    const ttt = tt * t;
+
+    let p = uuu * p1; //initial anchor point
+    p += 3 * uu * t * p2; //control point 1
+    p += 3 * u * tt * p3; //control point 2
+    p += ttt * p4; //end anchor point
+
+    return p;
+}
+
+fastInFastOut(t) {
+    return this.cubicBezier(t, 0, 0.3, 0.7, 1.0);
+}
+
   updateMaterialWithCurrentTile() {
-    this.controls.startPositionX = this.mesh.position.x;
-    this.controls.targetPositionX = this.controls.startPositionX + this.controls.frameMovement.x * (this.controls.flipped ? -1 : 1);
     this.material.map = this.currentSheet.textures[this.controls.currentTile]
-    // this.mesh.position.x += this.controls.frameMovement.x * (this.controls.flipped ? -1 : 1)
   }
 
-  private lastUpdateDuration = 0
-  private timeStart = 0
-
   updateNextAnimation() {
-    this.lastUpdateDuration = performance.now() - this.timeStart
-    if (this.controls.flipped) {
-      console.log(this.lastUpdateDuration / 1000)
-    }
-    this.timeStart = performance.now()
     const next = this.animationQueue.shift()
-    if (this.controls.flipped) {
-      console.log("+++++++++++++++++++", next.key, "+++++++++++++++++++")
-    }
     this.currentSheet = this.sheets[next.key]
     this.controls.loopCount = next.count
     this.controls.loop = next.loop
     this.controls.callback = next.onEnd
+    
     this.controls.frameMovement = next.move
+    this.controls.startPositionX = this.mesh.position.x;
+    this.controls.targetPositionX = this.controls.startPositionX + this.controls.frameMovement.x * (this.controls.flipped ? -1 : 1);
+    
     this.controls.tileDisplaySeconds = 1 / this.currentSheet.frameRate
     this.controls.frameCount = this.currentSheet.frameCount
 
+    this.controls.totalAnimationDuration = this.controls.tileDisplaySeconds * this.controls.frameCount;
 
     this.controls.callbackTriggered = false
     this.controls.currentTile = 0
