@@ -44,7 +44,7 @@ mod chances {
     const BLADES_HIT: u8 = 75;
 
     // archetype bonus
-    const CRIT_BONUS_LORD: u8 = 10;
+    const CRIT_BONUS_LORD: u8 = 12;
     const CRIT_BONUS_TRICKSTER: u8 = 6;
     const LETHAL_BONUS_VILLAIN: u8 = 20;
     const LETHAL_BONUS_TRICKSTER: u8 = 10;
