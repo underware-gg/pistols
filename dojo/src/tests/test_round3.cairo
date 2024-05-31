@@ -758,10 +758,10 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
-            0x12121, // MISS
+            SALT_DUAL_MISS,
         );
         assert_winner(challenge, round, 1, 2);
-        assert(round.shot_a.action == ACTION::PACES_10.into(), 'shot_a.action');
+        assert(round.shot_a.action == ACTION::PACES_5.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::STEAL.into(), 'shot_b.action');
         assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
@@ -782,11 +782,11 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
             world, system, owner, other,
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
-            0x12121, // MISS
+            SALT_DUAL_MISS,
         );
         assert_winner(challenge, round, 2, 2);
         assert(round.shot_a.action == ACTION::STEAL.into(), 'shot_a.action');
-        assert(round.shot_b.action == ACTION::PACES_10.into(), 'shot_b.action');
+        assert(round.shot_b.action == ACTION::PACES_5.into(), 'shot_b.action');
         assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.chance_crit == 100, 'shot_a.chance_crit');
@@ -809,7 +809,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
             SALT_CRIT_HIT, // CRIT_???, chances for Paces are different!
         );
         assert_winner(challenge, round, 1, 2);
-        assert(round.shot_a.action == ACTION::PACES_10.into(), 'shot_a.action');
+        assert(round.shot_a.action == ACTION::PACES_5.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::STEAL.into(), 'shot_b.action');
         assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == 0, 'shot_b.health');
@@ -832,7 +832,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         );
         assert_winner(challenge, round, 2, 2);
         assert(round.shot_a.action == ACTION::STEAL.into(), 'shot_a.action');
-        assert(round.shot_b.action == ACTION::PACES_10.into(), 'shot_b.action');
+        assert(round.shot_b.action == ACTION::PACES_5.into(), 'shot_b.action');
         assert(round.shot_a.health == 0, 'shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager == 0, 'shot_a.wager');

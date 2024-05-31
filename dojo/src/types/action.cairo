@@ -79,6 +79,7 @@ trait ActionTrait {
     fn as_paces(self: Action) -> u8;
     fn is_melee(self: Action) -> bool;
     fn is_runner(self: Action) -> bool;
+    fn runner_against_blades(self: Action) -> Action;
     fn roll_priority(self: Action, other: Action, score_self: Score, score_other: Score) -> i8;
     fn paces_priority(self: Action, other: Action) -> i8;
     fn honour(self: Action) -> i8;
@@ -124,6 +125,16 @@ impl ActionTraitImpl of ActionTrait {
             Action::Steal |
             Action::Seppuku =>  true,
             _ =>                false,
+        }
+    }
+
+    // when a runner goes against blades, they either shoot back or just watch
+    fn runner_against_blades(self: Action) -> Action {
+        match self {
+            Action::Flee    => Action::Paces10,
+            Action::Steal   => Action::Paces5,
+            Action::Seppuku => Action::Idle,
+            _ =>               Action::Idle,
         }
     }
 

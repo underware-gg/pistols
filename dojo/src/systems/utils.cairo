@@ -219,23 +219,18 @@ fn unpack_round_slots(round: Round) -> (u8, u8, u8, u8) {
     }
     let action_a: Action = slot1_a.into();
     let action_b: Action = slot1_b.into();
-    let runner_a: bool = action_a.is_runner();
-    let runner_b: bool = action_b.is_runner();
-    // Seppuku goes only against runners
-    if (action_a == Action::Seppuku && !runner_b) {
-        return (ACTION::SEPPUKU, ACTION::IDLE, 0, 0);
-    } else if (action_b == Action::Seppuku && !runner_a) {
-        return (ACTION::IDLE, ACTION::SEPPUKU, 0, 0);
-    }
-    // Flee/Steal triggers an opposing 10 paces shot
-    if (runner_a && !runner_b) {
-        return (slot1_a, ACTION::PACES_10, 0, 0);
-    } else if (runner_b && !runner_a) {
-        return (ACTION::PACES_10, slot1_b, 0, 0);
-    }
     // Double Steal decides in a 1 pace face-off
     if (action_a == Action::Steal && action_b == Action::Steal) {
         return (slot1_a, slot1_b, ACTION::PACES_1, ACTION::PACES_1);
+    }
+    // Runners against blades
+    let runner_a: bool = action_a.is_runner();
+    let runner_b: bool = action_b.is_runner();
+    if (runner_a && !runner_b) {
+        return (slot1_a, action_a.runner_against_blades().into(), 0, 0);
+    }
+    if (runner_b && !runner_a) {
+        return (action_b.runner_against_blades().into(), slot1_b, 0, 0);
     }
     (slot1_a, slot1_b, slot2_a, slot2_b)
 }
