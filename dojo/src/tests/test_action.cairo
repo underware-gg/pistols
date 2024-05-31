@@ -114,7 +114,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_action_roll_priority() {
+    fn test_roll_priority() {
         let mut duelist = init::Duelist();
         let mut a: u8 = 0;
         loop {
@@ -145,7 +145,22 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_action_paces_priority() {
+    fn test_roll_priority_trickster() {
+        let mut duelist = init::Duelist();
+        let mut trickster = init::Duelist();
+        assert(Action::Paces10.roll_priority(Action::Paces10, trickster.score, duelist.score) == 0, 'simm');
+        trickster.score.level_trickster = 100;
+        assert(Action::Paces10.roll_priority(Action::Paces10, trickster.score, duelist.score) == -1, '10_trickster_a');
+        assert(Action::Paces10.roll_priority(Action::Paces10, duelist.score, trickster.score) == 1, '10_trickster_b');
+        assert(Action::Paces5.roll_priority(Action::Paces5, trickster.score, duelist.score) == -1, '5_trickster_a');
+        assert(Action::Paces5.roll_priority(Action::Paces5, duelist.score, trickster.score) == 1, '5_trickster_b');
+        assert(Action::Paces1.roll_priority(Action::Paces1, trickster.score, duelist.score) == -1, '1_trickster_a');
+        assert(Action::Paces1.roll_priority(Action::Paces1, duelist.score, trickster.score) == 1, '1_trickster_b');
+    }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_paces_priority() {
         assert(Action::Paces1.paces_priority(Action::Paces1) == 0, '1-1');
         assert(Action::Paces1.paces_priority(Action::Paces2) < 0, '1-2');
         assert(Action::Paces1.paces_priority(Action::Paces10) < 0, '1-10');

@@ -156,8 +156,9 @@ mod tests {
     #[test]
     #[available_gas(100_000_000)]
     fn test_average_trickster() {
-        assert(utils::_average_trickster(100, 0) == 100, '100, 0');
+        assert(utils::_average_trickster(100, 0) == 50, '100, 0');
         assert(utils::_average_trickster(100, 50) == 75, '100, 50');
+        assert(utils::_average_trickster(0, 50) == 0, '0, 50');
     }
 
     #[test]

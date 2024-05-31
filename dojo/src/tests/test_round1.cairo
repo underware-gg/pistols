@@ -312,6 +312,15 @@ mod tests {
         assert(duelist_a.score.honour == (action_a * 10).try_into().unwrap(), 'duelist_a.score.honour');
         assert(duelist_b.score.honour == (action_b * 10).try_into().unwrap(), 'duelist_b.score.honour');
 
+        let mut scoreboard_a = tester::get_Scoreboard(world, owner, TABLE_ID);
+        let mut scoreboard_b = tester::get_Scoreboard(world, other, TABLE_ID);
+        assert(duelist_a.score.total_duels == scoreboard_a.score.total_duels, 'scoreboard_a.total_duels');
+        assert(duelist_b.score.total_duels == scoreboard_b.score.total_duels, 'scoreboard_b.total_duels');
+        assert(duelist_a.score.total_honour == scoreboard_a.score.total_honour, 'scoreboard_a.total_honour');
+        assert(duelist_b.score.total_honour == scoreboard_b.score.total_honour, 'scoreboard_b.total_honour');
+        assert(duelist_a.score.honour == scoreboard_a.score.honour, 'scoreboard_a.score.honour');
+        assert(duelist_b.score.honour == scoreboard_b.score.honour, 'scoreboard_b.score.honour');
+
         tester::assert_balance(ierc20, system.contract_address, balance_contract, 0, 0, 'balance_contract_2');
         tester::assert_balance(ierc20, treasury, 0, 0, fee * 2, 'balance_treasury_2');
         tester::assert_balance(ierc20, owner, balance_a, fee, 0, 'balance_a_2');
@@ -323,9 +332,11 @@ mod tests {
     fn test_single_round_draw_to_trickster_a() {
         let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         // A is a trickster, will shoot first
-        let mut duelist_a = tester::get_Duelist(world, owner);
-        duelist_a.score.level_trickster = 100;
-        set!(world,(duelist_a));
+        // let mut duelist_a = tester::get_Duelist(world, owner);
+        // duelist_a.score.level_trickster = 100;
+        let mut scoreboard_a = tester::get_Scoreboard(world, owner, TABLE_ID);
+        scoreboard_a.score.level_trickster = 100;
+        set!(world,(scoreboard_a));
         // duel!
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, owner, other, WAGER_VALUE);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_draw();
@@ -343,9 +354,11 @@ mod tests {
     fn test_single_round_draw_to_trickster_b() {
         let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         // A is a trickster, will shoot first
-        let mut duelist_b = tester::get_Duelist(world, other);
-        duelist_b.score.level_trickster = 100;
-        set!(world,(duelist_b));
+        // let mut duelist_b = tester::get_Duelist(world, other);
+        // duelist_b.score.level_trickster = 100;
+        let mut scoreboard_b = tester::get_Scoreboard(world, other, TABLE_ID);
+        scoreboard_b.score.level_trickster = 100;
+        set!(world,(scoreboard_b));
         // duel!
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, owner, other, WAGER_VALUE);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_draw();

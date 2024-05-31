@@ -253,7 +253,7 @@ mod tester {
         (get!(world, address, Duelist))
     }
     #[inline(always)]
-    fn get_Scoreboard(world: IWorldDispatcher, address: ContractAddress, table: u8) -> Scoreboard {
+    fn get_Scoreboard(world: IWorldDispatcher, address: ContractAddress, table: felt252) -> Scoreboard {
         (get!(world, (address, table), Scoreboard))
     }
     #[inline(always)]
