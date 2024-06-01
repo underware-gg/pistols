@@ -410,20 +410,20 @@ fn calc_crit_chances(attacker: Score, defender: Score, attack: Action, defense: 
 }
 // Hit chances will be applied to Villains only
 // Both Hit and Lethal go up/down with same bonus/penalty
-fn calc_hit_chances(attacker: Score, defender: Score, action: Action, health: u8) -> u8 {
-    if (action == Action::Idle) { return 0; }
+fn calc_hit_chances(attacker: Score, defender: Score, attack: Action, health: u8) -> u8 {
+    if (attack == Action::Idle) { return 0; }
     (_apply_chance_bonus_penalty(
-        action.hit_chance(),
+        attack.hit_chance(),
         calc_lethal_bonus(attacker),
-        calc_hit_penalty(action, health) + calc_trickster_penalty(attacker, defender, chances::TRICKSTER_HIT_PENALTY),
+        calc_hit_penalty(attack, health) + calc_trickster_penalty(attacker, defender, chances::TRICKSTER_HIT_PENALTY),
     ))
 }
-fn calc_lethal_chances(attacker: Score, defender: Score, action: Action, health: u8) -> u8 {
-    if (action == Action::Idle) { return 0; }
+fn calc_lethal_chances(attacker: Score, defender: Score, attack: Action, health: u8) -> u8 {
+    if (attack == Action::Idle) { return 0; }
     (_apply_chance_bonus_penalty(
-        action.lethal_chance(),
+        attack.lethal_chance(),
         calc_lethal_bonus(attacker),
-        calc_hit_penalty(action, health),
+        calc_hit_penalty(attack, health),
     ))
 }
 #[inline(always)]
@@ -487,12 +487,12 @@ fn calc_match_crit_bonus(attacker: Score, attack: Action, defense: Action) -> u8
 // penalties
 //
 // #[inline(always)]
-// fn calc_crit_penalty(action: Action, health: u8) -> u8 {
-//     (_calc_penalty(health, action.crit_penalty()))
+// fn calc_crit_penalty(attack: Action, health: u8) -> u8 {
+//     (_calc_penalty(health, attack.crit_penalty()))
 // }
 #[inline(always)]
-fn calc_hit_penalty(action: Action, health: u8) -> u8 {
-    (_calc_penalty(health, action.hit_penalty()))
+fn calc_hit_penalty(attack: Action, health: u8) -> u8 {
+    (_calc_penalty(health, attack.hit_penalty()))
 }
 #[inline(always)]
 fn _calc_penalty(health: u8, penalty_per_damage: u8) -> u8 {

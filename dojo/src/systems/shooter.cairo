@@ -119,7 +119,6 @@ mod shooter {
             process_round(world, ref challenge, ref round, is_last_round);
             // open Round 3 if not over
             if (challenge.state == ChallengeState::InProgress.into()) {
-                // TODO: move this to init::?
                 let mut round3 = Round {
                     duel_id: challenge.duel_id,
                     round_number: challenge.round_number,
@@ -177,14 +176,14 @@ mod shooter {
         let mut executed: bool = false;
         let priority: i8 = action_a.roll_priority(action_b, snapshot.score_a, snapshot.score_b);
         if (priority < 0) {
-            // A attacks first
-            executed = attack_sync(world, round, snapshot.score_a, snapshot.score_b, ref round.shot_a, ref round.shot_b, false);
+            // A strikes first
+            executed = strike_async(world, round, snapshot.score_a, snapshot.score_b, ref round.shot_a, ref round.shot_b);
         } else if (priority > 0) {
-            // B attacks first
-            executed = attack_sync(world, round, snapshot.score_b, snapshot.score_a, ref round.shot_b, ref round.shot_a, false);
+            // B strikes first
+            executed = strike_async(world, round, snapshot.score_b, snapshot.score_a, ref round.shot_b, ref round.shot_a);
         } else {
-            // same time
-            executed = attack_sync(world, round, snapshot.score_a, snapshot.score_b, ref round.shot_a, ref round.shot_b, true);
+            // A and B strike simultaneously
+            executed = strike_sync(world, round, snapshot.score_a, snapshot.score_b, ref round.shot_a, ref round.shot_b);
         }
 
         // decide results on health or win flag
@@ -227,19 +226,26 @@ mod shooter {
     }
 
     //-------------------------
-    // Attacks
+    // Strikes
     //
 
-    // execute attacks in sync or async
-    fn attack_sync(world: IWorldDispatcher, round: Round, attacker: Score, defender: Score, ref attack: Shot, ref defense: Shot, sync: bool) -> bool {
-        // attack first, if survives defense can attack
-        let mut executed: bool = attack(world, 'shoot_a', attacker, defender, round, ref attack, ref defense);
-        if (sync || !executed) {
-            executed = attack(world, 'shoot_b', defender, attacker, round, ref defense, ref attack) || executed;
+    // attacker strikes first, then defender only if not executed
+    fn strike_async(world: IWorldDispatcher, round: Round, attacker: Score, defender: Score, ref attack: Shot, ref defense: Shot) -> bool {
+        let mut executed: bool = strike(world, 'shoot_a', attacker, defender, round, ref attack, ref defense);
+        apply_damage(ref attack, ref defense);
+        if (!executed) {
+            executed = strike(world, 'shoot_b', defender, attacker, round, ref defense, ref attack);
+            apply_damage(ref defense, ref attack);
         }
+        (executed)
+    }
+    // sync strike, both at the same time
+    fn strike_sync(world: IWorldDispatcher, round: Round, attacker: Score, defender: Score, ref attack: Shot, ref defense: Shot) -> bool {
+        let mut executed_a: bool = strike(world, 'shoot_a', attacker, defender, round, ref attack, ref defense);
+        let mut executed_b: bool = strike(world, 'shoot_b', defender, attacker, round, ref defense, ref attack);
         apply_damage(ref attack, ref defense);
         apply_damage(ref defense, ref attack);
-        (executed)
+        (executed_a || executed_b)
     }
 
     #[inline(always)]
@@ -253,7 +259,7 @@ mod shooter {
 
     // executes single attack
     // returns true if ended in execution
-    fn attack(world: IWorldDispatcher, seed: felt252, attacker: Score, defender: Score, round: Round, ref attack: Shot, ref defense: Shot) -> bool {
+    fn strike(world: IWorldDispatcher, seed: felt252, attacker: Score, defender: Score, round: Round, ref attack: Shot, ref defense: Shot) -> bool {
         let action: Action = attack.action.into();
         if (action != Action::Idle) {
             // dice 1: crit (execution, double damage, goal)

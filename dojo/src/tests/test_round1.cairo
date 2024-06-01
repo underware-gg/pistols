@@ -26,7 +26,7 @@ mod tests {
 
     const SALT_1_a: u64 = 0xa6f099b756a87e62;
     const SALT_1_b: u64 = 0xf9a978e92309da78;
-    
+
     fn _start_new_challenge(world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress, wager_value: u256) -> (Challenge, Round, u128) {
         tester::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         tester::execute_register_duelist(system, other, OTHER_NAME, 2);
@@ -50,11 +50,28 @@ mod tests {
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a.into()), make_action_hash(salt_b, action_b.into()))
     }
 
-    fn _get_actions_round_1_draw() -> (u64, u64, u8, u8, u64, u64) {
+    fn _get_actions_round_1_dual_crit(action_a: u8, action_b: u8) -> (u64, u64, u8, u8, u64, u64) {
         let salt_a: u64 = SALT_1_a + 52;
         let salt_b: u64 = SALT_1_b + 52;
-        let action_a: u8 = 10;
+        (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a.into()), make_action_hash(salt_b, action_b.into()))
+    }
+
+    fn _get_actions_round_1_crit_a() -> (u64, u64, u8, u8, u64, u64) {
+        let salt_a: u64 = SALT_1_a + 52;
+        let salt_b: u64 = SALT_1_b + 52;
+        let action_a: u8 = 9;
         let action_b: u8 = 10;
+        (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a.into()), make_action_hash(salt_b, action_b.into()))
+    }
+
+    fn _get_actions_round_1_dual_hit(action_a: u8, action_b: u8) -> (u64, u64, u8, u8, u64, u64) {
+        let salt_a: u64 = 0x32533f48; // for (3, 3) paces!!
+        let salt_b: u64 = SALT_1_b;
+        (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a.into()), make_action_hash(salt_b, action_b.into()))
+    }
+
+    fn _get_actions_round_1_dual_hit_find(action_a: u8, action_b: u8, salt_a: u64) -> (u64, u64, u8, u8, u64, u64) {
+        let salt_b: u64 = SALT_1_b;
         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a.into()), make_action_hash(salt_b, action_b.into()))
     }
 
@@ -96,7 +113,7 @@ mod tests {
 
     #[test]
     #[available_gas(10_000_000_000)]
-    fn test_single_round_resolved() {
+    fn test_resolved() {
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, treasury) = tester::setup_world(true, true);
         let balance_contract: u256 = ierc20.balance_of(system.contract_address);
         let balance_treasury: u256 = ierc20.balance_of(treasury);
@@ -262,7 +279,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_single_round_draw() {
+    fn test_dual_crit() {
         let (world, system, _admin, _lords, ierc20, owner, other, _bummer, treasury) = tester::setup_world(true, true);
         let balance_contract: u256 = ierc20.balance_of(system.contract_address);
         let balance_a: u256 = ierc20.balance_of(owner);
@@ -276,7 +293,7 @@ mod tests {
         tester::assert_balance(ierc20, other, balance_b, fee + WAGER_VALUE, 0, 'balance_b_1');
         tester::assert_balance(ierc20, treasury, 0, 0, 0, 'balance_treasury_1');
 
-        let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_draw();
+        let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(10, 10);
         tester::execute_commit_action(system, owner, duel_id, 1, hash_a);
         tester::execute_commit_action(system, other, duel_id, 1, hash_b);
         tester::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a, 0);
@@ -329,7 +346,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_single_round_draw_to_trickster_a() {
+    fn test_dual_crit_to_trickster_a() {
         let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         // A is a trickster, will shoot first
         // let mut duelist_a = tester::get_Duelist(world, owner);
@@ -339,7 +356,7 @@ mod tests {
         set!(world,(scoreboard_a));
         // duel!
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, owner, other, WAGER_VALUE);
-        let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_draw();
+        let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(10, 10);
         tester::execute_commit_action(system, owner, duel_id, 1, hash_a);
         tester::execute_commit_action(system, other, duel_id, 1, hash_b);
         tester::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a, 0);
@@ -351,7 +368,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    fn test_single_round_draw_to_trickster_b() {
+    fn test_dual_crit_to_trickster_b() {
         let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         // A is a trickster, will shoot first
         // let mut duelist_b = tester::get_Duelist(world, other);
@@ -361,7 +378,7 @@ mod tests {
         set!(world,(scoreboard_b));
         // duel!
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, owner, other, WAGER_VALUE);
-        let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_draw();
+        let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(10, 10);
         tester::execute_commit_action(system, owner, duel_id, 1, hash_a);
         tester::execute_commit_action(system, other, duel_id, 1, hash_b);
         tester::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a, 0);
@@ -371,6 +388,176 @@ mod tests {
         assert(challenge.winner == 2, 'challenge.winner');
     }
 
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_early_crit() {
+        let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
+        let (_challenge, _round, duel_id) = _start_new_challenge(world, system, owner, other, WAGER_VALUE);
+        let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(9, 10);
+        tester::execute_commit_action(system, owner, duel_id, 1, hash_a);
+        tester::execute_commit_action(system, other, duel_id, 1, hash_b);
+        tester::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a, 0);
+        tester::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b, 0);
+        let (challenge, round) = tester::get_Challenge_Round(world, duel_id);
+        assert(challenge.state == ChallengeState::Resolved.into(), 'challenge.state');
+        assert(challenge.winner == 1, 'challenge.winner');
+        assert(challenge.round_number == 1, 'challenge.round_number');
+        assert(round.round_number == 1, 'round.round_number');
+        assert(round.state == RoundState::Finished.into(), 'round.state');
+        assert(round.shot_a.health == constants::FULL_HEALTH, 'round.shot_a.health');
+        assert(round.shot_b.health == 0, 'round.shot_b.health');
+    }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_late_crit() {
+        let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
+        let (_challenge, _round, duel_id) = _start_new_challenge(world, system, owner, other, WAGER_VALUE);
+        let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(10, 9);
+        tester::execute_commit_action(system, owner, duel_id, 1, hash_a);
+        tester::execute_commit_action(system, other, duel_id, 1, hash_b);
+        tester::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a, 0);
+        tester::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b, 0);
+        let (challenge, round) = tester::get_Challenge_Round(world, duel_id);
+        assert(challenge.state == ChallengeState::Resolved.into(), 'challenge.state');
+        assert(challenge.winner == 2, 'challenge.winner');
+        assert(challenge.round_number == 1, 'challenge.round_number');
+        assert(round.round_number == 1, 'round.round_number');
+        assert(round.state == RoundState::Finished.into(), 'round.state');
+        assert(round.shot_a.health == 0, 'round.shot_a.health');
+        assert(round.shot_b.health == constants::FULL_HEALTH, 'round.shot_b.health');
+    }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_dual_hit() {
+        let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
+        let (_challenge, _round, duel_id) = _start_new_challenge(world, system, owner, other, WAGER_VALUE);
+        let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_hit(3, 3);
+        tester::execute_commit_action(system, owner, duel_id, 1, hash_a);
+        tester::execute_commit_action(system, other, duel_id, 1, hash_b);
+        tester::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a, 0);
+        tester::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b, 0);
+        let (challenge, round) = tester::get_Challenge_Round(world, duel_id);
+        assert(challenge.state == ChallengeState::InProgress.into(), 'challenge.state');
+        assert(round.round_number == 2, 'round2.round_number');
+        let round1: Round = tester::get_Round(world, challenge.duel_id, 1);
+        assert(round1.shot_a.health < constants::FULL_HEALTH, 'round1.shot_a.health');
+        assert(round1.shot_b.health < constants::FULL_HEALTH, 'round1.shot_b.health');
+        assert(round1.shot_a.chance_hit > 0, 'round1.chance_hit > 0');
+        assert(round1.shot_a.chance_hit == round1.shot_b.chance_hit, 'round1.chance_hit ==');
+// save to test_dual_hit_chance_hit_at_3_paces
+// round1.shot_a.chance_hit.print();
+// round1.shot_b.chance_hit.print();
+    }
+
+    const test_dual_hit_chance_hit_at_3_paces: u8 = 0x53;
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_dual_hit_penalty_a() {
+        let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
+        let (_challenge, _round, duel_id) = _start_new_challenge(world, system, owner, other, WAGER_VALUE);
+        let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_hit(3, 2);
+        tester::execute_commit_action(system, owner, duel_id, 1, hash_a);
+        tester::execute_commit_action(system, other, duel_id, 1, hash_b);
+        tester::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a, 0);
+        tester::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b, 0);
+        let (challenge, _round) = tester::get_Challenge_Round(world, duel_id);
+        assert(challenge.state == ChallengeState::InProgress.into(), 'challenge.state');
+        let round1: Round = tester::get_Round(world, challenge.duel_id, 1);
+        assert(round1.shot_a.chance_hit < test_dual_hit_chance_hit_at_3_paces, 'round1.shot_a.chance_hit');
+        assert(round1.shot_b.chance_hit > test_dual_hit_chance_hit_at_3_paces, 'round1.shot_b.chance_hit');
+    }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_dual_hit_penalty_b() {
+        let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
+        let (_challenge, _round, duel_id) = _start_new_challenge(world, system, owner, other, WAGER_VALUE);
+        let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_hit(2, 3);
+        tester::execute_commit_action(system, owner, duel_id, 1, hash_a);
+        tester::execute_commit_action(system, other, duel_id, 1, hash_b);
+        tester::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a, 0);
+        tester::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b, 0);
+        let (challenge, _round) = tester::get_Challenge_Round(world, duel_id);
+        assert(challenge.state == ChallengeState::InProgress.into(), 'challenge.state');
+        let round1: Round = tester::get_Round(world, challenge.duel_id, 1);
+        assert(round1.shot_a.chance_hit > test_dual_hit_chance_hit_at_3_paces, 'round1.shot_a.chance_hit');
+        assert(round1.shot_b.chance_hit < test_dual_hit_chance_hit_at_3_paces, 'round1.shot_b.chance_hit');
+    }
+
+    // #[test]
+    // #[available_gas(1_000_000_000_000)]
+    // fn test_dual_hit_find() {
+    //     let mut salt: u64 = 0x324ffd23;
+    //     loop {
+    //         salt.print();
+    //         let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
+    //         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, owner, other, WAGER_VALUE);
+    //         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_hit_find(3, 3, salt);
+    //         tester::execute_commit_action(system, owner, duel_id, 1, hash_a);
+    //         tester::execute_commit_action(system, other, duel_id, 1, hash_b);
+    //         tester::execute_reveal_action(system, owner, duel_id, 1, salt_a, action_a, 0);
+    //         tester::execute_reveal_action(system, other, duel_id, 1, salt_b, action_b, 0);
+    //         let (challenge, _round) = tester::get_Challenge_Round(world, duel_id);
+    //         let round1: Round = tester::get_Round(world, challenge.duel_id, 1);
+    //         if (
+    //             challenge.state == ChallengeState::InProgress.into() &&
+    //             round1.shot_a.health < constants::FULL_HEALTH &&
+    //             round1.shot_b.health < constants::FULL_HEALTH
+    //         ) {
+    //             'FOUND!!!!'.print();
+    //             break;
+    //         }
+    //         salt += 0x34225;
+    //     };
+    // }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_clamp_invalid_paces() {
+        let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
+        let (_challenge, _round, duel_id) = _start_new_challenge(world, system, owner, other, 0);
+        let hash_a: u64 = make_action_hash(0x111, 0);
+        let hash_b: u64 = make_action_hash(0x222, 11);
+        tester::execute_commit_action(system, owner, duel_id, 1, hash_a);
+        tester::execute_commit_action(system, other, duel_id, 1, hash_b);
+        tester::execute_reveal_action(system, owner, duel_id, 1, 0x111, 0, 0);
+        tester::execute_reveal_action(system, other, duel_id, 1, 0x222, 11, 0);
+        let round: Round = tester::get_Round(world, duel_id, 1);
+        assert(round.shot_a.action == 10, 'action_0');
+        assert(round.shot_b.action == 10, 'action_11');
+        assert(round.shot_a.chance_crit > 0, 'shot_a.chance_crit');
+        assert(round.shot_b.chance_crit > 0, 'shot_b.chance_crit');
+        assert(round.shot_a.dice_crit > 0, 'shot_a.dice_crit');
+        assert(round.shot_b.dice_crit > 0, 'shot_b.dice_crit');
+    }
+
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_register_keep_scores() {
+        let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
+        let (_challenge, _round, duel_id) = _start_new_challenge(world, system, owner, other, 0);
+        let hash_a: u64 = make_action_hash(0x111, 10);
+        let hash_b: u64 = make_action_hash(0x222, 1);
+        tester::execute_commit_action(system, owner, duel_id, 1, hash_a);
+        tester::execute_commit_action(system, other, duel_id, 1, hash_b);
+        tester::execute_reveal_action(system, owner, duel_id, 1, 0x111, 10, 0);
+        let duelist_a_before = tester::get_Duelist(world, owner);
+        tester::execute_register_duelist(system, owner, 'dssadsa', 3);
+        let duelist_a_after = tester::get_Duelist(world, owner);
+        assert(duelist_a_before.address == duelist_a_after.address, 'address');
+        assert(duelist_a_before.name != duelist_a_after.name, 'name');
+        assert(duelist_a_before.profile_pic != duelist_a_after.profile_pic, 'profile_pic');
+        assert(duelist_a_before.timestamp == duelist_a_after.timestamp, 'timestamp');
+        assert(duelist_a_before.score.total_duels == duelist_a_after.score.total_duels, 'total_duels');
+        assert(duelist_a_before.score.total_wins == duelist_a_after.score.total_wins, 'total_wins');
+        assert(duelist_a_before.score.total_losses == duelist_a_after.score.total_losses, 'total_losses');
+        assert(duelist_a_before.score.total_draws == duelist_a_after.score.total_draws, 'total_draws');
+        assert(duelist_a_before.score.total_honour == duelist_a_after.score.total_honour, 'total_honour');
+        assert(duelist_a_before.score.honour == duelist_a_after.score.honour, 'honour');
+    }    
     
     //-------------------------------
     // Fails
@@ -558,48 +745,4 @@ mod tests {
         tester::execute_reveal_action(system, other, duel_id, 1, 0x2222, 1, 0);
     }
 
-    #[test]
-    #[available_gas(1_000_000_000)]
-    fn test_clamp_invalid_paces() {
-        let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
-        let (_challenge, _round, duel_id) = _start_new_challenge(world, system, owner, other, 0);
-        let hash_a: u64 = make_action_hash(0x111, 0);
-        let hash_b: u64 = make_action_hash(0x222, 11);
-        tester::execute_commit_action(system, owner, duel_id, 1, hash_a);
-        tester::execute_commit_action(system, other, duel_id, 1, hash_b);
-        tester::execute_reveal_action(system, owner, duel_id, 1, 0x111, 0, 0);
-        tester::execute_reveal_action(system, other, duel_id, 1, 0x222, 11, 0);
-        let round: Round = tester::get_Round(world, duel_id, 1);
-        assert(round.shot_a.action == 10, 'action_0');
-        assert(round.shot_b.action == 10, 'action_11');
-        assert(round.shot_a.chance_crit > 0, 'shot_a.chance_crit');
-        assert(round.shot_b.chance_crit > 0, 'shot_b.chance_crit');
-        assert(round.shot_a.dice_crit > 0, 'shot_a.dice_crit');
-        assert(round.shot_b.dice_crit > 0, 'shot_b.dice_crit');
-    }
-
-    #[test]
-    #[available_gas(1_000_000_000)]
-    fn test_register_keep_scores() {
-        let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
-        let (_challenge, _round, duel_id) = _start_new_challenge(world, system, owner, other, 0);
-        let hash_a: u64 = make_action_hash(0x111, 10);
-        let hash_b: u64 = make_action_hash(0x222, 1);
-        tester::execute_commit_action(system, owner, duel_id, 1, hash_a);
-        tester::execute_commit_action(system, other, duel_id, 1, hash_b);
-        tester::execute_reveal_action(system, owner, duel_id, 1, 0x111, 10, 0);
-        let duelist_a_before = tester::get_Duelist(world, owner);
-        tester::execute_register_duelist(system, owner, 'dssadsa', 3);
-        let duelist_a_after = tester::get_Duelist(world, owner);
-        assert(duelist_a_before.address == duelist_a_after.address, 'address');
-        assert(duelist_a_before.name != duelist_a_after.name, 'name');
-        assert(duelist_a_before.profile_pic != duelist_a_after.profile_pic, 'profile_pic');
-        assert(duelist_a_before.timestamp == duelist_a_after.timestamp, 'timestamp');
-        assert(duelist_a_before.score.total_duels == duelist_a_after.score.total_duels, 'total_duels');
-        assert(duelist_a_before.score.total_wins == duelist_a_after.score.total_wins, 'total_wins');
-        assert(duelist_a_before.score.total_losses == duelist_a_after.score.total_losses, 'total_losses');
-        assert(duelist_a_before.score.total_draws == duelist_a_after.score.total_draws, 'total_draws');
-        assert(duelist_a_before.score.total_honour == duelist_a_after.score.total_honour, 'total_honour');
-        assert(duelist_a_before.score.honour == duelist_a_after.score.honour, 'honour');
-    }
 }
