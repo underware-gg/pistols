@@ -36,8 +36,8 @@ mod chances {
     const PISTOLS_KILL_AT_STEP_10: u8 = 20;
     const PISTOLS_HIT_AT_STEP_1: u8 = 100;
     const PISTOLS_HIT_AT_STEP_10: u8 = 20;
-    const PISTOLS_LETHAL_AT_STEP_1: u8 = 80;    // from PISTOLS_HIT_AT_STEP_1
-    const PISTOLS_LETHAL_AT_STEP_10: u8 = 5;    // from PISTOLS_HIT_AT_STEP_10
+    const PISTOLS_LETHAL_AT_STEP_1: u8 = 80;    // inside PISTOLS_HIT_AT_STEP_1
+    const PISTOLS_LETHAL_AT_STEP_10: u8 = 5;    // inside PISTOLS_HIT_AT_STEP_10
 
     // Blades chances (percentage)
     const BLADES_CRIT: u8 = 20;
@@ -46,8 +46,8 @@ mod chances {
     // archetype bonus
     const CRIT_BONUS_LORD: u8 = 12;
     const CRIT_BONUS_TRICKSTER: u8 = 6;
-    const LETHAL_BONUS_VILLAIN: u8 = 20;
-    const LETHAL_BONUS_TRICKSTER: u8 = 10;
+    const HIT_BONUS_VILLAIN: u8 = 20;
+    const HIT_BONUS_TRICKSTER: u8 = 10;
 
     // match bonuse
     const EARLY_LORD_CRIT_BONUS: u8 = 10;
@@ -56,6 +56,9 @@ mod chances {
     // penalties for damage
     const CRIT_PENALTY_PER_DAMAGE: u8 = 0;
     const HIT_PENALTY_PER_DAMAGE: u8 = 10;
+
+    // Lords advantage when shooting equal or late
+    const LORD_LETHAL_PENALTY: u8 = 10;
 
     // trickster advantage as opponent penalty
     const TRICKSTER_CRIT_PENALTY: u8 = 2;

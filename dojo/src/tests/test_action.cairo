@@ -225,6 +225,20 @@ mod tests {
         assert(Action::Block.lethal_chance() == 0, '::FastBlade.lethal_chance');
     }
 
+    #[test]
+    #[available_gas(1_000_000_000)]
+    fn test_calc_lethal_chances_less_than_hit() {
+        let mut paces: u8 = 1;
+        loop {
+            if (paces > 10) {
+                break;
+            }
+            let action: Action = paces.into();
+            assert(action.lethal_chance() < action.hit_chance(), 'not less!');
+            paces += 1;
+        }
+    }
+
 
     //-----------------------------------
     // Shot

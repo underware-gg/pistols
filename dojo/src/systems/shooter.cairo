@@ -262,17 +262,18 @@ mod shooter {
     fn strike(world: IWorldDispatcher, seed: felt252, attacker: Score, defender: Score, round: Round, ref attack: Shot, ref defense: Shot) -> bool {
         let action: Action = attack.action.into();
         if (action != Action::Idle) {
+            let defense_action: Action = defense.action.into();
             // dice 1: crit (execution, double damage, goal)
-            attack.chance_crit = utils::calc_crit_chances(attacker, defender, action, defense.action.into(), attack.health);
+            attack.chance_crit = utils::calc_crit_chances(attacker, defender, action, defense_action, attack.health);
             attack.dice_crit = throw_dice(seed, round, 100, attack.chance_crit);
             if (attack.dice_crit <= attack.chance_crit) {
                 return (action.execute_crit(ref attack, ref defense));
             } else {
                 // dice 2: miss or hit
-                attack.chance_hit = utils::calc_hit_chances(attacker, defender, action, attack.health);
+                attack.chance_hit = utils::calc_hit_chances(attacker, defender, action, defense_action, attack.health);
                 attack.dice_hit = throw_dice(seed * 2, round, 100, attack.chance_hit);
                 if (attack.dice_hit <= attack.chance_hit) {
-                    let lethal_chance: u8 = utils::calc_lethal_chances(attacker, defender, action, attack.health);
+                    let lethal_chance: u8 = utils::calc_lethal_chances(attacker, defender, action, defense_action, attack.chance_hit);
                     action.execute_hit(ref attack, ref defense, lethal_chance);
                 }
             }

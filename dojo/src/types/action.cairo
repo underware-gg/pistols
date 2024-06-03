@@ -192,17 +192,17 @@ impl ActionTraitImpl of ActionTrait {
     }
 
     //
-    // on a paces round, who chose to shoot first?
+    // on a pistols round, who is shooting first?
     //
     // returns:
     // < 0: self
     //   0: simultaneously or n/a
     // > 0: other
     fn paces_priority(self: Action, other: Action) -> i8 {
-        let paces_self: i8 = self.as_paces().try_into().unwrap();
-        let paces_other: i8 = other.as_paces().try_into().unwrap();
+        let paces_self: u8 = self.as_paces();
+        let paces_other: u8 = other.as_paces();
         if (paces_self > 0 && paces_other > 0) {
-            (paces_self - paces_other)
+            (paces_self.try_into().unwrap() - paces_other.try_into().unwrap())
         } else {
             (0)
         }
@@ -382,6 +382,7 @@ impl ActionTraitImpl of ActionTrait {
     }
 
     // dices decided for a hit, just execute it
+    // lethal_chance affects Paces only
     fn execute_hit(self: Action, ref self_shot: Shot, ref other_shot: Shot, lethal_chance: u8) {
         match self {
             Action::Paces1 |
