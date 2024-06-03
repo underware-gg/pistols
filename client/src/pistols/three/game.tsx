@@ -40,7 +40,7 @@ export const ASPECT = (WIDTH / HEIGHT)
  * Camera Constants
  */
 const cameraData = {
-  fieldOfView: 16,
+  fieldOfView: 13,
   nearPlane: 0.1,
   farPlane: 150,
 }
@@ -80,8 +80,13 @@ const PACES_X_0 = 0.5
 
 const zoomedCameraPos = {
   x: 0,
-  y: 0.3,
-  z: -3,
+  y: 0.4,
+  z: -4,
+}
+const zoomedOutCameraPos = {
+  x: 0,
+  y: 1.7,
+  z: -35,
 }
 
 export enum AnimationState {
@@ -150,6 +155,9 @@ let _sceneName: SceneName
 
 let _sfxEnabled = true
 let _statsEnabled = false
+let _round1Animated = false
+let _round2Animated = false
+let _round3Animated = false
 
 const _skyState = {
   path: '/textures/animations/Sky/sky.mp4',
@@ -415,7 +423,7 @@ function setupDuelScene() {
 
   if (_statsEnabled) {
     setGUI()
-    setCameraControls(scene)
+    setCameraHelpers(scene)
   }
 
   loadDuelists()
@@ -428,6 +436,9 @@ export function resetDuelScene() {
   if (!_duelistA.model || !_duelistB.model) return // skip if players models not initialized yet
 
   emitter.emit('animated', AnimationState.None)
+  _round1Animated = false
+  _round2Animated = false
+  _round3Animated = false
 
   _actor['A']?.stop()
   _actor['B']?.stop()
@@ -679,13 +690,23 @@ function createGrass() {
   _scenes[SceneName.Duel].add(_grass);
 }
 
-function setCameraControls(scene) {
+function setCameraHelpers(scene) {
   // _controls = new OrbitControls(_duelCamera, _renderer.domElement)
   // _controls.enableDamping = true
   // _controls.dampingFactor = 0.04
 
   const axesHelper = new THREE.AxesHelper(3)
   scene.add(axesHelper)
+
+  if (_statsEnabled) {
+    _gui
+      .add(_duelCamera, 'fov')
+      .name('FOV')
+      .min(0).max(60).step(0.1)
+      .onChange(() => {
+        _duelCamera.updateProjectionMatrix()
+      })
+  }
 }
 
 //
@@ -849,9 +870,9 @@ export function playActorAnimation(actorId: string, key: AnimName, onEnd: Functi
 
 export function zoomCameraToPaces(paceCount, seconds) {
   const targetPos = {
-    x: map(paceCount, 0, 10, zoomedCameraPos.x, 0),
-    y: map(paceCount, 0, 10, zoomedCameraPos.y, 2),
-    z: map(paceCount, 0, 10, zoomedCameraPos.z, -45),
+    x: map(paceCount, 0, 10, zoomedCameraPos.x, zoomedOutCameraPos.x),
+    y: map(paceCount, 0, 10, zoomedCameraPos.y, zoomedOutCameraPos.y),
+    z: map(paceCount, 0, 10, zoomedCameraPos.z, zoomedOutCameraPos.z),
   }
 
   if (_tweens.cameraPos) TWEEN.remove(_tweens.cameraPos)
@@ -867,6 +888,7 @@ export function zoomCameraToPaces(paceCount, seconds) {
       .easing(TWEEN.Easing.Sinusoidal.Out)
       .onUpdate(() => {
         // emitter.emit('movedTo', { x: _duelCameraRig.position.x, y: _duelCameraRig.position.y, z: _duelCameraRig.position.z })
+        // _duelCamera.lookAt(0, 0.5, 2)
       })
       .start()
       .onComplete(() => {
@@ -881,9 +903,15 @@ export function resetActorPositions() {
 }
 
 export function animateDuel(state: AnimationState, actionA: number, actionB: number, healthA: number, healthB: number, damageA: number, damageB: number) {
-  if (state == AnimationState.Round1) {
+  //only animated once per entry safety
+  if (state == AnimationState.Round1 && !_round1Animated) {
+    _round1Animated = true
     animateShootout(actionA, actionB, healthA, healthB, damageA, damageB);
-  } else {
+  } else if (state == AnimationState.Round2 && !_round2Animated) {
+    _round2Animated = true
+    animateActions(state, actionA, actionB, healthA, healthB, damageA, damageB)
+  } else if (state == AnimationState.Round3 && !_round3Animated) {
+    _round3Animated = true
     animateActions(state, actionA, actionB, healthA, healthB, damageA, damageB)
   }
 }
@@ -903,7 +931,7 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
 
   // animate camera
   zoomCameraToPaces(0, 0)
-  zoomCameraToPaces(minPaceCount / 2, (minPaceCount + 1)) //adjusted zoom out value to minimize gliding effect for now.
+  zoomCameraToPaces(minPaceCount, (minPaceCount + 1)) //adjusted zoom out value to minimize gliding effect for now.
 
   resetActorPositions()
 
@@ -989,6 +1017,7 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
     playActorAnimation('A', AnimName.SHOOT, () => {
       emitter.emit('animated', AnimationState.HealthB)
       if (healthB > 0 && damageB == 0) {
+        _updateB()
         _shootB()
       }
     })
@@ -1004,6 +1033,7 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
     playActorAnimation('B', AnimName.SHOOT, () => {
       emitter.emit('animated', AnimationState.HealthA)
       if (healthA > 0 && damageA == 0) {
+        _updateA()
         _shootA()
       }
     })
