@@ -1,27 +1,36 @@
 import * as THREE from 'three'
-import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader.js'
 
 export class SpriteSheet {
   key = null
   frameCount = 1
   textures = []
   frameRate = 8
+  isLoaded = false
 
-  constructor(key, SHEET, textureLoader) {
+  constructor(key, SHEET, loader) {
     this.key = key
     this.frameCount = SHEET.frameCount
+
+    this.loadTextures(SHEET, loader)
+    
+    if (SHEET.frameRate) {
+      this.frameRate = SHEET.frameRate
+    }
+  }
+
+  async loadTextures(SHEET, loader) {
     for (let f = 1; f <= this.frameCount; ++f) {
-      const frameNumber = ('000' + f.toString()).slice(-2)
-      const path = `${SHEET.path}/frame_${frameNumber}.dds`
-      const tex = new DDSLoader().load(path)
+      const frameNumber = ('000' + f.toString()).slice(-3)
+      const path = `${SHEET.path}/frame_${frameNumber}.ktx2`
+      const tex = await loader.loadAsync(path)
+
       tex.colorSpace = THREE.SRGBColorSpace
       tex.generateMipmaps = false
       tex.minFilter = THREE.LinearFilter
       this.textures.push(tex)
     }
-    if (SHEET.frameRate) {
-      this.frameRate = SHEET.frameRate
-    }
+
+    this.isLoaded = true
   }
 
   makeMaterial() {
@@ -60,10 +69,10 @@ export class Actor {
     this.mesh = new THREE.Mesh(geometry, this.material)
 
     if (flipped) {
-      this.mesh.position.set(-0.5, (height / 2) - (height * 0.0675), 2)
+      this.mesh.position.set(-0.5, (height / 2) - (height * 0.005), 2)
     } else {
       this.mesh.rotateY(Math.PI)
-      this.mesh.position.set(0.5, (height / 2) - (height * 0.0675), 2)
+      this.mesh.position.set(0.5, (height / 2) - (height * 0.005), 2)
     }
     this.mesh.rotateZ(Math.PI)
     this.mesh.castShadow = true
@@ -81,24 +90,35 @@ export class Actor {
     this.controls.callbackTriggered = false
     this.controls.flipped = flipped
     this.controls.frameMovement = {}
+    this.controls.frameReady = false
 
     this.ready = true
   }
 
-  playOnce(key, frameMovement = { x: 0, y: 0, z: 0 }, onStart = null, onEnd = null) {
+  playOnce(key, frameMovement = { x: 0, y: 0, z: 0, frames: 0 }, onStart = null, onEnd = null) {
     this.playRepeat(key, 1, frameMovement, onStart, onEnd);
   }
 
-  playRepeat(key, loopCount, frameMovement = { x: 0, y: 0, z: 0 }, onStart = null, onEnd = null, loop = null) {
+  playRepeat(key, loopCount, frameMovement = { x: 0, y: 0, z: 0, frames: 0 }, onStart = null, onEnd = null, loop = null) {
     this.animationQueue.push({ key: key, count: loopCount, move: frameMovement, onStart: onStart, onEnd: onEnd, loop: loop });
   }
 
-  playLoop(key, frameMovement = { x: 0, y: 0, z: 0 }, onStart = null, onEnd = null) {
+  playLoop(key, frameMovement = { x: 0, y: 0, z: 0, frames: 0 }, onStart = null, onEnd = null) {
     this.playRepeat(key, 1, frameMovement, onStart, onEnd, true);
   }
 
   update(seconds) {
     if (!this.ready || !seconds) return
+    
+    //Make sure the sheet is loaded and displayed properly
+    if (!this.controls.frameReady) {
+      if (this.currentSheet.isLoaded) {
+        this.updateMaterialWithCurrentTile()
+        this.controls.frameReady = true
+      }
+    }
+    
+    //Start playing animations if there are any in queue
     if (this.controls.paused) {
       if (this.animationQueue.length > 0) {
         this.updateNextAnimation();
@@ -154,15 +174,15 @@ export class Actor {
         this.updateMaterialWithCurrentTile()
       }
     } else {
-      const t = (elapsed + (this.controls.currentTile * this.controls.tileDisplaySeconds)) / this.controls.totalAnimationDuration;
-      this.interpolatePosition(t);
+      const t = Math.min((elapsed + (this.controls.currentTile * this.controls.tileDisplaySeconds)) / this.controls.totalAnimationMovementDuration, 1)
+      this.interpolatePosition(t)
     }
   }
 
   interpolatePosition(t) {
-    const easedT = this.fastInFastOut(t);
-    const interpolatedX = this.controls.startPositionX + easedT * (this.controls.targetPositionX - this.controls.startPositionX);
-    this.mesh.position.x = interpolatedX;
+    const easedT = this.fastInFastOut(t)
+    const interpolatedX = this.controls.startPositionX + easedT * (this.controls.targetPositionX - this.controls.startPositionX)
+    this.mesh.position.x = interpolatedX
   }
 
   cubicBezier(t, p1, p2, p3, p4) {
@@ -191,6 +211,7 @@ fastInFastOut(t) {
   updateNextAnimation() {
     const next = this.animationQueue.shift()
     this.currentSheet = this.sheets[next.key]
+    this.controls.frameReady = this.currentSheet.isLoaded
     this.controls.loopCount = next.count
     this.controls.loop = next.loop
     this.controls.callback = next.onEnd
@@ -201,8 +222,7 @@ fastInFastOut(t) {
     
     this.controls.tileDisplaySeconds = 1 / this.currentSheet.frameRate
     this.controls.frameCount = this.currentSheet.frameCount
-
-    this.controls.totalAnimationDuration = this.controls.tileDisplaySeconds * this.controls.frameCount;
+    this.controls.totalAnimationMovementDuration = this.controls.tileDisplaySeconds * (this.controls.frameMovement.frames > 0 ? this.controls.frameMovement.frames : this.controls.frameCount)
 
     this.controls.callbackTriggered = false
     this.controls.currentTile = 0

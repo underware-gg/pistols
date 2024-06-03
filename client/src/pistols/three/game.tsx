@@ -4,6 +4,7 @@ import GUI from 'lil-gui'
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader.js'
+import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js'
 
 import TWEEN from '@tweenjs/tween.js'
 //@ts-ignore
@@ -135,9 +136,11 @@ let _grassTransforms
 let _growthPercentage
 let _grass
 
+let _ground
 let _groundMirrorShallow
 let _groundMirrorDeep
-let _sky
+let _skyVideo
+let _skyVideoTexture
 let _ladySecond
 let _sirSecond
 
@@ -149,7 +152,7 @@ let _sfxEnabled = true
 let _statsEnabled = false
 
 const _skyState = {
-  key: 'SKY',
+  path: '/textures/animations/Sky/sky.mp4',
   frameRate: 8,
   framesCount: 126,
   isBackwards: false,
@@ -192,6 +195,8 @@ export async function init(canvas, width, height, statsEnabled = false) {
     return
   }
 
+  setRender(canvas)
+
   console.log(`THREE.init() loading assets...`)
 
   // color space migration
@@ -215,8 +220,6 @@ export async function init(canvas, width, height, statsEnabled = false) {
 
   _fullScreenGeom = new THREE.PlaneGeometry(WIDTH, HEIGHT)
   setCameras()
-
-  setRender(canvas)
 
   window.addEventListener('resize', onWindowResize)
   onWindowResize()
@@ -244,38 +247,44 @@ async function loadAssets() {
 
   const loadingManager = new THREE.LoadingManager();
   const textureLoader = new THREE.TextureLoader(loadingManager);
-  const ddsLoader = new DDSLoader(loadingManager);
+  const ktx2Loader = new KTX2Loader(loadingManager)
+  ktx2Loader.setTranscoderPath( '/basis/' )
+  ktx2Loader.detectSupport( _renderer )
+  ktx2Loader.setWorkerLimit(32)
 
   Object.keys(TEXTURES).forEach(key => {
     const TEX = TEXTURES[key]
-    const tex = textureLoader.load(TEX.path)
-    tex.colorSpace = THREE.SRGBColorSpace
-    tex.generateMipmaps = false
-    tex.minFilter = THREE.LinearFilter
-    _textures[key] = tex
+    if (TEX.path.includes('.ktx2')) {
+      ktx2Loader.load(TEX.path, (tex) => {
+        tex.colorSpace = THREE.SRGBColorSpace
+        tex.generateMipmaps = false
+        tex.minFilter = THREE.LinearFilter
+        _textures[key] = tex
+
+        if (key == TextureName.duel_ground && _ground) {
+          _ground.material.map = tex
+        }
+        if (key == TextureName.duel_ground_normal && _ground) {
+          _ground.material.normalMap = tex
+        }
+      })
+    } else {
+      const tex = textureLoader.load(TEX.path)
+      tex.colorSpace = THREE.SRGBColorSpace
+      tex.generateMipmaps = false
+      tex.minFilter = THREE.LinearFilter
+      _textures[key] = tex
+    }
   })
+
   Object.keys(SPRITESHEETS).forEach(actorName => {
     _spriteSheets[actorName] = {}
     Object.keys(SPRITESHEETS[actorName]).forEach(key => {
-      _spriteSheets[actorName][key] = new SpriteSheet(key, SPRITESHEETS[actorName][key], textureLoader)
+      _spriteSheets[actorName][key] = new SpriteSheet(key, SPRITESHEETS[actorName][key], ktx2Loader)
     })
   })
 
-  // for (let f = 1; f <= _skyState.framesCount; ++f) {
-  //   const frameNumber = ('000' + f.toString()).slice(-3)
-  //   let path = `/textures/animations/sky/frame_${frameNumber}.dds`
-  //   let tex = ddsLoader.load(path)
-
-  //   tex.colorSpace = THREE.SRGBColorSpace
-  //   tex.generateMipmaps = false
-  //   tex.minFilter = THREE.LinearFilter
-  //   tex.flipY = false
-
-  //   if (!_textures[_skyState.key]) {
-  //     _textures[_skyState.key] = []
-  //   }
-  //   _textures[_skyState.key].push(tex)
-  // }
+  ktx2Loader.dispose()
 
   _textures[TextureName.duel_water_dudv].wrapS = _textures[TextureName.duel_water_dudv].wrapT = THREE.RepeatWrapping;
 }
@@ -369,8 +378,6 @@ export function animate() {
   if (_currentScene && _sceneName == SceneName.Duel) {  //Duelists and sky take care of their own framerate so for frame consistency this is better
     _actor.A?.update(elapsedTime);
     _actor.B?.update(elapsedTime);
-
-    // updateSky(elapsedTime)
   }
 
   // Continue the animation loop
@@ -465,7 +472,7 @@ function loadGltf(scene: THREE.Scene) {
   const loader = new GLTFLoader();
 
   loader.load(
-    '/models/Duel_3.glb',
+    '/models/Duel_3_empty_y.glb',
     function (gltf) {
 
       /**
@@ -518,9 +525,11 @@ function loadGltf(scene: THREE.Scene) {
 
         if (child.name == glTFNames.ground) {
           child.receiveShadow = true
-          child.material.map = _textures[TextureName.duel_ground]
-          child.material.normalMap = _textures[TextureName.duel_ground_normal]
+          child.material.map = _textures[TextureName.duel_ground],
+          child.material.normalMap = _textures[TextureName.duel_ground_normal],
           child.position.set(0, 0, 0)
+
+          _ground = child
         }
 
         if (child.name.includes(glTFNames.grass)) {
@@ -538,7 +547,22 @@ function loadGltf(scene: THREE.Scene) {
           child.position.y = 0.2
           child.position.z = 50
 
-          _sky = child
+          const video = document.createElement('video');
+          video.src = _skyState.path;
+          video.muted = true;
+          video.autoplay = true;
+          video.loop = true;
+          video.playbackRate = 0.5 //8 fps -> update with wind to go faster or slower even
+          video.play()
+
+          const texture = new THREE.VideoTexture(video);
+          texture.colorSpace = THREE.SRGBColorSpace
+          texture.flipY = false
+          
+          child.material.map = texture
+
+          _skyVideo = video
+          _skyVideoTexture = texture
         }
 
         if (child.name == glTFNames.water) {
@@ -570,7 +594,6 @@ function loadGltf(scene: THREE.Scene) {
         }
       })
 
-      console.log("SET TRANSFORMS")
       _grassTransforms = grassTransforms
       createGrass()
       
@@ -771,7 +794,8 @@ export function playActorAnimation(actorId: string, key: AnimName, onEnd: Functi
   let movement = {
     x: 0,
     y: 0,
-    z: 0
+    z: 0,
+    frames: 0,
   }
 
   if (key == AnimName.STEP_1 || key == AnimName.STEP_2 || key == AnimName.TWO_STEPS) {
@@ -779,8 +803,21 @@ export function playActorAnimation(actorId: string, key: AnimName, onEnd: Functi
   } else if (key == AnimName.SHOOT) {
     onStart = () => { playAudio(AudioName.SHOOT, _sfxEnabled) }
   } else if ([AnimName.SHOT_DEAD_FRONT, AnimName.SHOT_DEAD_BACK, AnimName.STRUCK_DEAD].includes(key)) {
+    if (key == AnimName.SHOT_DEAD_BACK) {
+      if ((actorId == 'A' && _duelistA.model == "MALE_A") || (actorId == 'B' && _duelistA.model == "MALE_B")) {
+        movement.x = 0.088
+        movement.frames = 2
+      } else {
+        movement.x = 0.176
+        movement.frames = 4
+      }
+    }
     onStart = () => { playAudio(AudioName.BODY_FALL, _sfxEnabled) }
   } else if ([AnimName.SHOT_INJURED_FRONT, AnimName.SHOT_INJURED_BACK, AnimName.STRUCK_INJURED].includes(key)) {
+    if (key == AnimName.SHOT_INJURED_BACK) {
+      movement.x = 0.176
+      movement.frames = 4
+    }
     if (actorId == 'A') {
       if (_duelistA.model == "MALE_A") {
         onStart = () => { playAudio(AudioName.GRUNT_MALE, _sfxEnabled) }
@@ -805,30 +842,6 @@ export function playActorAnimation(actorId: string, key: AnimName, onEnd: Functi
   _actor[actorId].playOnce(key, movement, onStart, onEnd)
 
 }
-
-function updateSky(seconds) {
-  if (!_sky) return
-
-  const elapsed = seconds - _skyState.lastDisplayTime
-  if (elapsed >= 1 / _skyState.frameRate) {
-    _skyState.lastDisplayTime = seconds
-    if (_skyState.isBackwards) {
-      _skyState.currentFrame--;
-    } else {
-      _skyState.currentFrame++;
-    }
-
-    if (_skyState.currentFrame >= _skyState.framesCount) {
-      _skyState.currentFrame = 0
-    } else if (_skyState.currentFrame < 0) {
-      _skyState.currentFrame = _skyState.framesCount - 1
-    }
-
-    _sky.material.map = _textures[_skyState.key][_skyState.currentFrame]
-  }
-}
-
-
 
 //----------------
 // Animation triggers
@@ -877,7 +890,6 @@ export function animateDuel(state: AnimationState, actionA: number, actionB: num
 
 function animateShootout(paceCountA: number, paceCountB: number, healthA: number, healthB: number, damageA: number, damageB: number) {
   const minPaceCount = Math.min(paceCountA, paceCountB)
-  const paceDifference = Math.min(Math.abs(paceCountA - paceCountB), 2) //if one duelist walks further, we add 1 or 2 steps so his walking animation matches the other duelists shoot asnimation
 
   if (_ladySecond && _sirSecond) {
     if (minPaceCount == 4 || minPaceCount == 5) {
@@ -896,14 +908,20 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
   resetActorPositions()
 
   // animate sprites
-  for (let i = 0; i < minPaceCount + paceDifference; i++) {
+  for (let i = 0; i < minPaceCount + 2; i++) {
     const key: AnimName = i % 2 == 1 ? AnimName.STEP_2 : AnimName.STEP_1
 
-    //To make the other duelist walt while one goes to shooting
-    if (i >= minPaceCount) {
-      if (paceCountA > paceCountB) {
+    //To make the other duelist walk while one goes to shooting
+    if (i == minPaceCount && paceCountA > paceCountB) {
+      playActorAnimation('A', key)
+    } else if (i == minPaceCount && paceCountB > paceCountA) {
+      playActorAnimation('B', key)
+    } else if (i > minPaceCount && paceCountA > paceCountB) {
+      if (damageA == 0) {
         playActorAnimation('A', key)
-      } else if (paceCountB > paceCountA) {
+      }
+    } else if (i > minPaceCount && paceCountB > paceCountA) {
+      if (damageB == 0) {
         playActorAnimation('B', key)
       }
     } else {
@@ -918,11 +936,11 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
     playActorAnimation('A', AnimName.SHOOT, () => {
       emitter.emit('animated', AnimationState.HealthB)
       if (healthB == 0) {
-        playActorAnimation('B', AnimName.SHOT_DEAD_FRONT, () => emitter.emit('animated', AnimationState.Round1))
+        playActorAnimation('B', AnimName.SHOT_DEAD_FRONT, () => _updateB())
       } else if (damageB > 0) {
-        playActorAnimation('B', AnimName.SHOT_INJURED_FRONT, () => emitter.emit('animated', AnimationState.Round1))
+        playActorAnimation('B', AnimName.SHOT_INJURED_FRONT, () => _updateB())
       } else {
-        emitter.emit('animated', AnimationState.Round1)
+        _updateB()
       }
     })
   }
@@ -930,13 +948,33 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
     playActorAnimation('B', AnimName.SHOOT, () => {
       emitter.emit('animated', AnimationState.HealthA)
       if (healthA == 0) {
-        playActorAnimation('A', AnimName.SHOT_DEAD_FRONT, () => emitter.emit('animated', AnimationState.Round1))
+        playActorAnimation('A', AnimName.SHOT_DEAD_FRONT, () => _updateA())
       } else if (damageA > 0) {
-        playActorAnimation('A', AnimName.SHOT_INJURED_FRONT, () => emitter.emit('animated', AnimationState.Round1))
+        playActorAnimation('A', AnimName.SHOT_INJURED_FRONT, () => _updateA())
       } else {
-        emitter.emit('animated', AnimationState.Round1)
+        _updateA()
       }
     })
+  }
+
+  let hasUpdatedA = false
+  let hasUpdatedB = false
+  const _updateA = () => {
+    if (!hasUpdatedA) {
+      hasUpdatedA = true
+      _updateAnimatedState()
+    }
+  }
+  const _updateB = () => {
+    if (!hasUpdatedB) {
+      hasUpdatedB = true
+      _updateAnimatedState()
+    }
+  }
+  const _updateAnimatedState = () => {
+    if (hasUpdatedA && hasUpdatedB) {
+      emitter.emit('animated', AnimationState.Round1)
+    }
   }
 
   //
@@ -950,28 +988,30 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
   if (paceCountA < paceCountB) {
     playActorAnimation('A', AnimName.SHOOT, () => {
       emitter.emit('animated', AnimationState.HealthB)
-      if (healthB == 0) {
-        playActorAnimation('B', AnimName.SHOT_DEAD_BACK, () => emitter.emit('animated', AnimationState.Round1))
-      } else if (damageB > 0) {
-        playActorAnimation('B', AnimName.SHOT_INJURED_BACK, () => _shootB())
-      } else {
+      if (healthB > 0 && damageB == 0) {
         _shootB()
       }
     })
+    if (healthB == 0) {
+      playActorAnimation('B', AnimName.SHOT_DEAD_BACK, () => _updateB())
+    } else if (damageB > 0) {
+      playActorAnimation('B', AnimName.SHOT_INJURED_BACK, () => _shootB())
+    }
   }
   //
   // B fires first
   if (paceCountB < paceCountA) {
     playActorAnimation('B', AnimName.SHOOT, () => {
       emitter.emit('animated', AnimationState.HealthA)
-      if (healthA == 0) {
-        playActorAnimation('A', AnimName.SHOT_DEAD_BACK, () => emitter.emit('animated', AnimationState.Round1))
-      } else if (damageA > 0) {
-        playActorAnimation('A', AnimName.SHOT_INJURED_BACK, () => _shootA())
-      } else {
+      if (healthA > 0 && damageA == 0) {
         _shootA()
       }
     })
+    if (healthA == 0) {
+      playActorAnimation('A', AnimName.SHOT_DEAD_BACK, () => _updateA())
+    } else if (damageA > 0) {
+      playActorAnimation('A', AnimName.SHOT_INJURED_BACK, () => _shootA())
+    }
   }
 }
 
