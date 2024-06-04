@@ -1,5 +1,5 @@
 use starknet::{ContractAddress};
-use pistols::models::models::{Duelist, Chances};
+use pistols::models::models::{Duelist, Chances, Challenge};
 use pistols::types::challenge::{ChallengeState};
 
 // define the interface
@@ -56,6 +56,16 @@ trait IActions {
     fn unpack_action_slots(packed: u16) -> (u8, u8);
 }
 
+// private/internal functions
+#[dojo::interface]
+trait IActionsInternal {
+    fn _emitDuelistRegisteredEvent(duelist: Duelist, is_new: bool);
+    fn _emitNewChallengeEvent(challenge: Challenge);
+    fn _emitChallengeAcceptedEvent(challenge: Challenge, accepted: bool);
+    fn _emitChallengeResolvedEvent(challenge: Challenge);
+    fn _emitDuelistTurnEvent(challenge: Challenge);
+}
+
 #[dojo::contract]
 mod actions {
     use debug::PrintTrait;
@@ -74,16 +84,6 @@ mod actions {
     use pistols::systems::{utils};
     use pistols::types::constants::{constants};
     use pistols::types::{events};
-
-    #[event]
-    #[derive(Drop, starknet::Event)]
-    enum Event {
-        DuelistRegisteredEvent: events::DuelistRegisteredEvent,
-        NewChallengeEvent: events::NewChallengeEvent,
-        ChallengeAcceptedEvent: events::ChallengeAcceptedEvent,
-        ChallengeResolvedEvent: events::ChallengeResolvedEvent,
-        DuelistTurnEvent: events::DuelistTurnEvent,
-    }
 
     // impl: implement functions specified in trait
     #[abi(embed_v0)]
@@ -112,12 +112,7 @@ mod actions {
 
             set!(world, (duelist));
 
-            emit!(world, (Event::DuelistRegisteredEvent(events::DuelistRegisteredEvent {
-                address: duelist.address,
-                name: duelist.name,
-                profile_pic: duelist.profile_pic,
-                is_new,
-            })));
+            self._emitDuelistRegisteredEvent(duelist, is_new);
 
             (duelist)
         }
@@ -191,11 +186,7 @@ mod actions {
             // create challenge
             utils::set_challenge(world, challenge);
 
-            emit!(world, (Event::NewChallengeEvent (events::NewChallengeEvent {
-                duel_id,
-                duelist_a: challenge.duelist_a,
-                duelist_b: challenge.duelist_b,
-            })));
+            self._emitNewChallengeEvent(challenge);
 
             (duel_id)
         }
@@ -243,12 +234,7 @@ mod actions {
                     challenge.timestamp_end = timestamp;
                 }
 
-                emit!(world, (Event::ChallengeAcceptedEvent (events::ChallengeAcceptedEvent {
-                    duel_id,
-                    duelist_a: challenge.duelist_a,
-                    duelist_b: challenge.duelist_b,
-                    accepted,
-                })));
+                self._emitChallengeAcceptedEvent(challenge, accepted);
             }
 
             // update challenge state
@@ -268,6 +254,8 @@ mod actions {
             hash: u64,
         ) {
             shooter::commit_action(world, duel_id, round_number, hash);
+
+            self._emitDuelistTurnEvent(get!(world, duel_id, Challenge));
         }
 
         fn reveal_action(world: IWorldDispatcher,
@@ -279,26 +267,8 @@ mod actions {
         ) {
             let challenge: Challenge = shooter::reveal_action(world, duel_id, round_number, salt, utils::pack_action_slots(action_slot1, action_slot2));
 
-            let state: ChallengeState = challenge.state.try_into().unwrap();
-            if (challenge.round_number > round_number && state == ChallengeState::InProgress) {
-                let is_a: bool = (starknet::get_caller_address() == challenge.duelist_a);
-                emit!(world, (Event::DuelistTurnEvent(events::DuelistTurnEvent {
-                    duel_id: challenge.duel_id,
-                    round_number: challenge.round_number,
-                    address: if (is_a) { (challenge.duelist_b) } else { (challenge.duelist_a) },
-                })));
-            }
-
-            if (state == ChallengeState::Resolved || state == ChallengeState::Draw) {
-                let winner_address: ContractAddress = 
-                    if (challenge.winner == 1) { (challenge.duelist_a) }
-                    else if (challenge.winner == 2) { (challenge.duelist_b) }
-                    else { (utils::zero_address()) };
-                emit!(world, (Event::ChallengeResolvedEvent(events::ChallengeResolvedEvent {
-                    duel_id: challenge.duel_id,
-                    winner_address,
-                })));
-            }
+            self._emitDuelistTurnEvent(challenge);
+            self._emitChallengeResolvedEvent(challenge);
         }
 
 
@@ -360,6 +330,73 @@ mod actions {
         }
         fn unpack_action_slots(packed: u16) -> (u8, u8) {
             (utils::unpack_action_slots(packed))
+        }
+    }
+
+
+    //------------------------------------
+    // Internal calls
+    //
+
+    #[event]
+    #[derive(Drop, starknet::Event)]
+    enum Event {
+        DuelistRegisteredEvent: events::DuelistRegisteredEvent,
+        NewChallengeEvent: events::NewChallengeEvent,
+        ChallengeAcceptedEvent: events::ChallengeAcceptedEvent,
+        ChallengeResolvedEvent: events::ChallengeResolvedEvent,
+        DuelistTurnEvent: events::DuelistTurnEvent,
+    }
+
+    // #[abi(embed_v0)] // commented to make this private
+    impl ActionsInternalImpl of super::IActionsInternal<ContractState> {
+        fn _emitDuelistRegisteredEvent(world: IWorldDispatcher, duelist: Duelist, is_new: bool) {
+            emit!(world, (Event::DuelistRegisteredEvent(events::DuelistRegisteredEvent {
+                address: duelist.address,
+                name: duelist.name,
+                profile_pic: duelist.profile_pic,
+                is_new,
+            })));
+        }
+        fn _emitNewChallengeEvent(world: IWorldDispatcher, challenge: Challenge) {
+            emit!(world, (Event::NewChallengeEvent (events::NewChallengeEvent {
+                duel_id: challenge.duel_id,
+                duelist_a: challenge.duelist_a,
+                duelist_b: challenge.duelist_b,
+            })));
+        }
+        fn _emitChallengeAcceptedEvent(world: IWorldDispatcher, challenge: Challenge, accepted: bool) {
+            emit!(world, (Event::ChallengeAcceptedEvent (events::ChallengeAcceptedEvent {
+                duel_id: challenge.duel_id,
+                duelist_a: challenge.duelist_a,
+                duelist_b: challenge.duelist_b,
+                accepted,
+            })));
+        }
+        fn _emitDuelistTurnEvent(world: IWorldDispatcher, challenge: Challenge) {
+            let state: ChallengeState = challenge.state.try_into().unwrap();
+            if (state == ChallengeState::InProgress) {
+                let address: ContractAddress = if (starknet::get_caller_address() == challenge.duelist_a)
+                    { (challenge.duelist_b) } else { (challenge.duelist_a) };
+                emit!(world, (Event::DuelistTurnEvent(events::DuelistTurnEvent {
+                    duel_id: challenge.duel_id,
+                    round_number: challenge.round_number,
+                    address,
+                })));
+            }
+        }
+        fn _emitChallengeResolvedEvent(world: IWorldDispatcher, challenge: Challenge) {
+            let state: ChallengeState = challenge.state.try_into().unwrap();
+            if (state == ChallengeState::Resolved || state == ChallengeState::Draw) {
+                let winner_address: ContractAddress = 
+                    if (challenge.winner == 1) { (challenge.duelist_a) }
+                    else if (challenge.winner == 2) { (challenge.duelist_b) }
+                    else { (utils::zero_address()) };
+                emit!(world, (Event::ChallengeResolvedEvent(events::ChallengeResolvedEvent {
+                    duel_id: challenge.duel_id,
+                    winner_address,
+                })));
+            }
         }
     }
 }
