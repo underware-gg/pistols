@@ -5,6 +5,7 @@ const GRASS_PATCH_SIZE_LENGTH = 0.1;
 const GRASS_PATCH_SIZE_DEPTH = 0.01;
 const GRASS_WIDTH = 0.012;
 const GRASS_HEIGHT = 0.1;
+const MAX_GRASS_GROWTH = 0.3;
 const NUM_GRASS = (32) * 3;
 const GRASS_SEGMENTS_HIGH = 6;
 const GRASS_VERTICES_HIGH = (GRASS_SEGMENTS_HIGH + 1) * 2;
@@ -24,7 +25,7 @@ export class Grass extends THREE.Object3D {
     tipColor: '#bbc624'
   }
 
-  constructor(params: { height: number; offset: number; heightmap: any; dims: any; transforms: any; }, statsEnabled = false, gui = null) {
+  constructor(params: { height: number; offset: number; heightmap: any; dims: any; transforms: any; growth: number }, statsEnabled = false, gui = null) {
     super();
 
     this.geometryHigh = this.createGrassGeometry(GRASS_SEGMENTS_HIGH, params.transforms);
@@ -42,6 +43,7 @@ export class Grass extends THREE.Object3D {
         depthWrite: false,
         depthTest: true,
         alphaTest: 0.5,
+        growth: params.growth
       }
     );
 
@@ -58,6 +60,7 @@ export class Grass extends THREE.Object3D {
         depthWrite: false,
         depthTest: true,
         alphaTest: 0.5,
+        growth: params.growth
       }
     );
 
@@ -158,9 +161,9 @@ export class Grass extends THREE.Object3D {
     return geo;
   }
 
-  private createGrassMaterial(name: string, params: { segments?: number; vertices?: number; height: number; offset: number; heightmap: any; dims: any; transparent?: boolean; depthWrite?: boolean; depthTest?: boolean; alphaTest?: number; }) {
+  private createGrassMaterial(name: string, params: { segments?: number; vertices?: number; height: number; offset: number; heightmap: any; dims: any; transparent?: boolean; depthWrite?: boolean; depthTest?: boolean; alphaTest?: number; growth?: number }) {
     let material = new shaders.ShaderMaterial(name, {})
-    material.setUniformValue('grassSize', new THREE.Vector2(GRASS_WIDTH, GRASS_HEIGHT));
+    material.setUniformValue('grassSize', new THREE.Vector2(GRASS_WIDTH, GRASS_HEIGHT + (MAX_GRASS_GROWTH * params.growth)));
     material.setUniformValue('grassParams', new THREE.Vector4(GRASS_SEGMENTS_HIGH, GRASS_VERTICES_HIGH, params.height, params.offset));
     material.setUniformValue('heightmap', params.heightmap);
     material.setUniformValue('heightParams', new THREE.Vector4(params.dims, 0, 0, 0))

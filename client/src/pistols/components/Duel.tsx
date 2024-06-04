@@ -19,7 +19,7 @@ import { ActionEmojis, ActionTypes } from '../utils/pistols'
 import { Balance } from '@/pistols/components/account/Balance'
 import { constants } from '@/pistols/utils/constants'
 import { EMOJI } from '@/pistols/data/messages'
-import PlayerSwitcher from '@/pistols/components/PlayerSwitcher'
+import DuelInfoSwitcher from '@/pistols/components/DuelInfoSwitcher'
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import CommitBladesModal from '@/pistols/components/CommitBladesModal'
 import RevealModal from '@/pistols/components/RevealModal'
@@ -100,7 +100,7 @@ export default function Duel({
 
       <MenuDuel duelStage={duelStage} duelId={duelId} />
 
-      <PlayerSwitcher />
+      <DuelInfoSwitcher />
 
       {debugMode && <MenuDebugAnimations />}
     </>

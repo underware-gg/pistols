@@ -21,7 +21,7 @@ const GameCanvas = () => {
 
   return (
     <div className='Relative GameCanvas'>
-      <ThreeJsCanvas guiEnabled={true} />
+      <ThreeJsCanvas guiEnabled={false} />
     </div>
   )
 }
