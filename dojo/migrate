@@ -78,7 +78,8 @@ cp $MANIFEST_FILE_PATH $CLIENT_PATH/
 # TODO: Remove this when bindings are working
 # copy to client
 cd ../client
-npm run create-components ---game=$GAME_SLUG --profile=$PROFILE $RPC_URL $WORLD_ADDRESS
+npm run create-components --game=$GAME_SLUG --profile=$PROFILE $RPC_URL $WORLD_ADDRESS
+npm run create-constants --game=$GAME_SLUG --profile=$PROFILE
 
 # list copied files
 ls -ld $CLIENT_PATH/* | grep -E 'ts|json'
