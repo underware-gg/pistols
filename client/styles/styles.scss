@@ -1,6 +1,7 @@
 
 $font-family: 'EB Garamond', serif;
 $font-family-mono: 'Courier Prime', monospace;
+// $font-family-mono: 'Xanh Mono', monospace;
 
 // Figma colors
 // https://www.figma.com/file/eseZA1jRIoX6IYNtoHgz30/Pistols-at-Ten-Blocks
@@ -226,8 +227,13 @@ canvas {
 .BgInactive  { background-color: $color-inactive!important; }
 
 
-.Code {
+.Number {
+  // @extend .TitleCase;
   font-family: $font-family-mono;
+  line-height: 1.0rem!important;
+}
+.Code {
+  @extend .Number;
   font-size: 1.2rem;
 }
 
@@ -940,13 +946,13 @@ $logo-url: '/logos/logo_avante.svg';
 
 
 .WagerBig {
-  @extend .TitleCase, .H3, .Bold;
+  @extend .TitleCase, .H3, .Bold;//, .Number;
 }
 .Wager {
-  @extend .TitleCase, .H4;
+  @extend .TitleCase, .H4;//, .Number;
 }
 .WagerSmall {
-  @extend .TitleCase, .H5, .Bold;
+  @extend .TitleCase, .H5, .Bold;//, .Number;
 }
 
 .ChancesBar {

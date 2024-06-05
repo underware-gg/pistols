@@ -5,6 +5,7 @@ import { useLockedLordsBalance } from '@/pistols/hooks/useWager'
 import { Balance } from '@/pistols/components/account/Balance'
 import { tables } from '@/pistols/utils/constants'
 import { BigNumberish } from 'starknet'
+import { useMemo } from 'react'
 
 export const LordsBalance = ({
   address,
@@ -57,30 +58,38 @@ export function WagerAndOrFees({
   tableId,
   value,
   fee,
-  pre = null,
+  prefixed = false,
   big = false,
 }: {
   tableId: string
   value: BigNumberish
   fee: BigNumberish
-  pre?: string
+  prefixed?: boolean
   big?: boolean
 }) {
-  if (BigInt(value ?? 0) > 0n) {
+  const hasValue = useMemo(() => (BigInt(value ?? 0) > 0), [value])
+  const hasFees = useMemo(() => (BigInt(fee ?? 0) > 0), [fee])
+  const pre = useMemo(() => (prefixed ? (hasValue || !hasFees ? 'Cost: ' : 'Fee: ') : null), [prefixed, hasValue, hasFees])
+  if (hasValue && hasFees) {
+    return (<>
+      <span>
+        <Balance big={big} tableId={tableId} wei={value} pre={pre} />
+      </span>
+      &nbsp;&nbsp;
+      <span>
+        (<Balance clean tableId={tableId} wei={fee} pre='+' /> fee)
+      </span>
+    </>)
+  }
+  // value only
+  if (hasValue && hasFees) {
     return (
-      <>
-        <span>
-          <Balance big={big} tableId={tableId} wei={value} pre={pre} />
-        </span>
-        &nbsp;&nbsp;
-        {fee &&
-          <span>
-            (<Balance clean tableId={tableId} wei={fee} pre='+' /> fee)
-          </span>
-        }
-      </>
+      <span>
+        <Balance big={big} tableId={tableId} wei={value} pre={pre} />
+      </span>
     )
   }
+  // fees only
   return (
     <span>
       <Balance big={big} tableId={tableId} wei={fee} pre={pre} placeholdder={0} />

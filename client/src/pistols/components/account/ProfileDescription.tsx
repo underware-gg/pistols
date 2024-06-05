@@ -49,11 +49,11 @@ export function ProfileDescription({
         <Col width={displayStats ? 12 : 16}>
           <h1 className='NoMargin'><ProfileName address={address} badges={false}/></h1>
           {displayAddress && <AddressShort address={address} />}
-          <h3 className='Important NoMargin'>
-            Honour: {honourAndTotal}
-            {is_villain && <> {EMOJI.VILLAIN} {levelDisplay}</>}
-            {is_trickster && <> {EMOJI.TRICKSTER} {levelDisplay}</>}
-            {is_lord && <> {EMOJI.LORD} {levelDisplay}</>}
+          <h3 className='Important NoMargin TitleCase'>
+            Honour: <span className='Wager'>{honourAndTotal}</span>
+            {is_villain && <> {EMOJI.VILLAIN} <span className='Wager'>{levelDisplay}</span></>}
+            {is_trickster && <> {EMOJI.TRICKSTER} <span className='Wager'>{levelDisplay}</span></>}
+            {is_lord && <> {EMOJI.LORD} <span className='Wager'>{levelDisplay}</span></>}
           </h3>
           {displayBalance && <>
             <LordsBalance address={address} big />

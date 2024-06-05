@@ -29,6 +29,8 @@ export const formatTimestampDelta = (start: number, end: number): string => {
   const days = Math.floor(t / (24 * 60 * 60))
   let result = ''
   if (days > 0) result += `${days}d `
-  if (days > 0 || parseInt(hour) > 0) result += `${hour == '00' ? '0' : hour}h `
-  return result + `${minutes}m ${seconds}s`
+  if (days > 0 || parseInt(hour) > 0) result += `${hour == '00' ? '0' : hour}:`
+  result += `${minutes}`
+  if (days == 0) result += `:${seconds}`
+  return result
 }

@@ -22,7 +22,7 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export default function NewChallengeModal() {
-  const { create_challenge } = useDojoSystemCalls()
+ const { create_challenge } = useDojoSystemCalls()
   const { account, accountAddress } = useDojoAccount()
 
   const { challengedAddress, dispatchChallengedDuelist, dispatchSelectDuelist, dispatchSelectDuel } = usePistolsContext()
@@ -257,7 +257,7 @@ function NewChallengeForm({
           />
         </Form.Field>
 
-        <WagerAndOrFees big tableId={tableId} value={ethToWei(value)} fee={fee} pre={'Cost: '} />
+        <WagerAndOrFees big tableId={tableId} value={ethToWei(value)} fee={fee} prefixed />
 
       </Form>
     </div>

@@ -7,6 +7,7 @@ import { useTableBalance } from '@/pistols/hooks/useTable'
 import { bigintAdd } from '@/lib/utils/types'
 import { CustomIcon } from '@/lib/ui/Icons'
 import { BigNumberish } from 'starknet'
+import { LordsBagIcon } from '../account/Balance'
 
 //-----------------
 // Generic Action button
@@ -117,7 +118,7 @@ export const BalanceRequiredButton = ({
       disabled={disabled}
       important={canSubmit}
       negative={!canSubmit}
-      label={wagerTooLow ? 'Minimum Not Met' : noFundsForFee ? 'No Funds!' : label}
+      label={wagerTooLow ? 'Minimum Not Met' : noFundsForFee ? 'No Funds!' : <>{label} <LordsBagIcon /></>}
       onClick={() => (canSubmit ? onClick() : {})}
     />
   )

@@ -11,7 +11,7 @@ export const useCalcFee = (table_id: string, wager_value: BigNumberish, defaultV
       const value = await calc_fee(table_id, wager_value)
       if (_mounted) setValue(value)
     }
-    if (table_id && wager_value) _get()
+    if (table_id) _get()
     else setValue(defaultValue)
     return () => { _mounted = false }
   }, [table_id, wager_value])

@@ -15,13 +15,23 @@ export function ChallengeTime({
 
   const { clientTimestamp } = useClientTimestamp(isAwaiting || isLive)
 
+  const emoji = useMemo(() => {
+    if (isAwaiting) return EMOJI.AWAITING
+    if (isLive) return EMOJI.IN_PROGRESS
+    return null
+  }, [isAwaiting, isLive])
+
   const date = useMemo(() => {
-    if (isAwaiting) return EMOJI.AWAITING + ' ' + formatTimestampDelta(clientTimestamp, timestamp_end)
-    if (isLive) return EMOJI.IN_PROGRESS + ' ' + formatTimestampDelta(timestamp_start, clientTimestamp)
+    if (isAwaiting)  formatTimestampDelta(clientTimestamp, timestamp_end)
+    if (isLive) formatTimestampDelta(timestamp_start, clientTimestamp)
     if (isCanceled || isFinished) return (prefixed ? 'Finished at ' : '') + formatTimestamp(timestamp_end)
     return formatTimestamp(timestamp_start)
   }, [isAwaiting, isCanceled, isLive, isFinished, timestamp_start, timestamp_end, clientTimestamp])
 
-  return <span className='TitleCase'>{date}</span>
+  return (
+    <>
+      {emoji} <span className='Number Smaller'>{date}</span>
+    </>
+  )
 }
 

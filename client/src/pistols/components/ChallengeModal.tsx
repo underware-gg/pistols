@@ -52,12 +52,13 @@ export default function ChallengeModal() {
     const _submit = async () => {
       setIsSubmitting(true)
       await reply_challenge(account, duelId, accepted)
+      if (accepted) _gotoDuel()
       setIsSubmitting(false)
     }
     _submit()
   }
 
-  const _watch = () => {
+  const _gotoDuel = () => {
     router.push(makeDuelUrl(duelId))
   }
 
@@ -168,12 +169,12 @@ export default function ChallengeModal() {
             </Col>
             {(state == ChallengeState.Awaiting && isChallenger) &&
               <Col>
-                <ActionButton fill label='Cowardly Withdraw' disabled={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
+                <ActionButton fill negative label='Cowardly Withdraw' disabled={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
               </Col>
             }
             {(state == ChallengeState.Awaiting && isChallenged) &&
               <Col>
-                <ActionButton fill label='Cowardly Refuse' disabled={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
+                <ActionButton fill negative label='Cowardly Refuse' disabled={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
               </Col>
             }
             {(state == ChallengeState.Awaiting && isChallenged) &&
@@ -183,12 +184,12 @@ export default function ChallengeModal() {
             }
             {(state == ChallengeState.InProgress) &&
               <Col>
-                <ActionButton fill important label='Go to Live Duel!' onClick={() => _watch()} />
+                <ActionButton fill important label='Go to Live Duel!' onClick={() => _gotoDuel()} />
               </Col>
             }
             {(state > ChallengeState.InProgress) &&
               <Col>
-                <ActionButton fill important label='Replay Duel!' onClick={() => _watch()} />
+                <ActionButton fill important label='Replay Duel!' onClick={() => _gotoDuel()} />
               </Col>
             }
             {(needToSyncExpired && (isChallenger || isChallenged)) &&
