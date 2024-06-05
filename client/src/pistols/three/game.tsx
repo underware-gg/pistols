@@ -271,8 +271,7 @@ async function loadAssets() {
 
         if (key == TextureName.duel_ground && _ground) {
           _ground.material.map = tex
-        }
-        if (key == TextureName.duel_ground_normal && _ground) {
+        } else if (key == TextureName.duel_ground_normal && _ground) {
           _ground.material.normalMap = tex
         }
       })
@@ -623,10 +622,9 @@ function createWaterPlane(name, geometry, params) {
 
   water.setUniformValue('waterStrength', 0.04)
   water.setUniformValue('waterSpeed', 0.03)
-  water.setUniformValue('waveStrength', 0.04)
+  water.setUniformValue('waveStrength', 0.035)
   water.setUniformValue('waveSpeed', 0.05)
   water.setUniformValue('tDudv', _textures[TextureName.duel_water_dudv])
-  water.setUniformValue('windDirection', new THREE.Vector2(1.0, 0.0))
   water.setUniformValue('windDirection', new THREE.Vector2(1.0, 0.0))
 
   water.position.y = params.height;
@@ -920,7 +918,7 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
   const minPaceCount = Math.min(paceCountA, paceCountB)
 
   if (_ladySecond && _sirSecond) {
-    if (minPaceCount == 4 || minPaceCount == 5) {
+    if (minPaceCount < 5) {
       _sirSecond.visible = false
       _ladySecond.visible = false
     } else {
@@ -1024,7 +1022,10 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
     if (healthB == 0) {
       playActorAnimation('B', AnimName.SHOT_DEAD_BACK, () => _updateB())
     } else if (damageB > 0) {
-      playActorAnimation('B', AnimName.SHOT_INJURED_BACK, () => _shootB())
+      playActorAnimation('B', AnimName.SHOT_INJURED_BACK, () => {
+        _updateB()
+        _shootB()
+      })
     }
   }
   //
@@ -1040,7 +1041,10 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
     if (healthA == 0) {
       playActorAnimation('A', AnimName.SHOT_DEAD_BACK, () => _updateA())
     } else if (damageA > 0) {
-      playActorAnimation('A', AnimName.SHOT_INJURED_BACK, () => _shootA())
+      playActorAnimation('A', AnimName.SHOT_INJURED_BACK, () => {
+        _updateA()
+        _shootA()
+      })
     }
   }
 }
