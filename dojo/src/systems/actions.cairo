@@ -62,6 +62,7 @@ trait IActionsInternal {
     fn _emitDuelistRegisteredEvent(duelist: Duelist, is_new: bool);
     fn _emitNewChallengeEvent(challenge: Challenge);
     fn _emitChallengeAcceptedEvent(challenge: Challenge, accepted: bool);
+    fn _emitPostRevealEvents(challenge: Challenge);
     fn _emitChallengeResolvedEvent(challenge: Challenge);
     fn _emitDuelistTurnEvent(challenge: Challenge);
 }
@@ -228,13 +229,16 @@ mod actions {
                     utils::create_challenge_snapshot(world, challenge);
                     // transfer wager/fee from Challenged to the contract
                     utils::deposit_wager_fees(world, challenge, challenge.duelist_b, contract);
+                    // events
+                    self._emitChallengeAcceptedEvent(challenge, accepted);
+                    self._emitDuelistTurnEvent(challenge);
                 } else {
                     // Challenged is Refusing
                     challenge.state = ChallengeState::Refused.into();
                     challenge.timestamp_end = timestamp;
+                    // events
+                    self._emitChallengeAcceptedEvent(challenge, accepted);
                 }
-
-                self._emitChallengeAcceptedEvent(challenge, accepted);
             }
 
             // update challenge state
@@ -254,8 +258,6 @@ mod actions {
             hash: u64,
         ) {
             shooter::commit_action(world, duel_id, round_number, hash);
-
-            self._emitDuelistTurnEvent(get!(world, duel_id, Challenge));
         }
 
         fn reveal_action(world: IWorldDispatcher,
@@ -267,8 +269,7 @@ mod actions {
         ) {
             let challenge: Challenge = shooter::reveal_action(world, duel_id, round_number, salt, utils::pack_action_slots(action_slot1, action_slot2));
 
-            self._emitDuelistTurnEvent(challenge);
-            self._emitChallengeResolvedEvent(challenge);
+            self._emitPostRevealEvents(challenge);
         }
 
 
@@ -373,30 +374,32 @@ mod actions {
                 accepted,
             })));
         }
-        fn _emitDuelistTurnEvent(world: IWorldDispatcher, challenge: Challenge) {
+        fn _emitPostRevealEvents(challenge: Challenge) {
             let state: ChallengeState = challenge.state.try_into().unwrap();
             if (state == ChallengeState::InProgress) {
-                let address: ContractAddress = if (starknet::get_caller_address() == challenge.duelist_a)
-                    { (challenge.duelist_b) } else { (challenge.duelist_a) };
-                emit!(world, (Event::DuelistTurnEvent(events::DuelistTurnEvent {
-                    duel_id: challenge.duel_id,
-                    round_number: challenge.round_number,
-                    address,
-                })));
+                self._emitDuelistTurnEvent(challenge);
+            } else if (state == ChallengeState::Resolved || state == ChallengeState::Draw) {
+                self._emitChallengeResolvedEvent(challenge);
             }
         }
+        fn _emitDuelistTurnEvent(world: IWorldDispatcher, challenge: Challenge) {
+            let address: ContractAddress = if (starknet::get_caller_address() == challenge.duelist_a)
+                { (challenge.duelist_b) } else { (challenge.duelist_a) };
+            emit!(world, (Event::DuelistTurnEvent(events::DuelistTurnEvent {
+                duel_id: challenge.duel_id,
+                round_number: challenge.round_number,
+                address,
+            })));
+        }
         fn _emitChallengeResolvedEvent(world: IWorldDispatcher, challenge: Challenge) {
-            let state: ChallengeState = challenge.state.try_into().unwrap();
-            if (state == ChallengeState::Resolved || state == ChallengeState::Draw) {
-                let winner_address: ContractAddress = 
-                    if (challenge.winner == 1) { (challenge.duelist_a) }
-                    else if (challenge.winner == 2) { (challenge.duelist_b) }
-                    else { (utils::zero_address()) };
-                emit!(world, (Event::ChallengeResolvedEvent(events::ChallengeResolvedEvent {
-                    duel_id: challenge.duel_id,
-                    winner_address,
-                })));
-            }
+            let winner_address: ContractAddress = 
+                if (challenge.winner == 1) { (challenge.duelist_a) }
+                else if (challenge.winner == 2) { (challenge.duelist_b) }
+                else { (utils::zero_address()) };
+            emit!(world, (Event::ChallengeResolvedEvent(events::ChallengeResolvedEvent {
+                duel_id: challenge.duel_id,
+                winner_address,
+            })));
         }
     }
 }

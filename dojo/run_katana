@@ -6,4 +6,4 @@ katana \
   --chain-id KATANA_LOCAL \
   --invoke-max-steps 10000000 $* \
   --allowed-origins "*" \
-| grep -v -e starknet_call -e starknet_blockHashAndNumber
+| grep -v -e starknet_call -e starknet_blockHashAndNumber -e starknet_getBlockWithTxs
