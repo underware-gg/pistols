@@ -35,7 +35,6 @@ export class SpriteSheet {
 
   makeMaterial() {
     return new THREE.MeshBasicMaterial({
-      map: this.textures[0],
       transparent: true,
       side: THREE.DoubleSide,
       alphaTest: 0.5

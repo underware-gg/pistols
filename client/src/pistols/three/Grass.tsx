@@ -14,7 +14,7 @@ export class Grass extends THREE.Object3D {
 
   private totalTime = 0.0;
   private lastTime = 0.0;
-  private windUpdateFPS = 6;
+  private windUpdateFPS = 8;
   private geometryHigh: THREE.InstancedBufferGeometry;
   private materialHigh: shaders.ShaderMaterial;
   private depthMaterial: shaders.ShaderMaterial;
@@ -184,6 +184,7 @@ export class Grass extends THREE.Object3D {
     mesh.position.set(0, 0, 0);
     mesh.castShadow = true;
     mesh.visible = true;
+    mesh.frustumCulled = false;
     mesh.instanceMatrix.needsUpdate = true;
 
     if (depthMaterial) {
@@ -264,5 +265,34 @@ export class Grass extends THREE.Object3D {
 
       this.lastTime = 0;
     }
+  }
+
+  public growGrass(height: number) {
+    this.materialHigh.setUniformValue('grassSize', new THREE.Vector2(GRASS_WIDTH, height));
+    this.depthMaterial.setUniformValue('grassSize', new THREE.Vector2(GRASS_WIDTH, height));
+  }
+
+  public getGrassHeight() {
+    return this.materialHigh.getUniforms()['grassSize'].value
+  }
+
+  public setWind(strength: number, speed: number) {
+    this.materialHigh.setUniformValue('windStrength', strength)
+    this.materialHigh.setUniformValue('windSpeed', speed)
+
+    this.depthMaterial.setUniformValue('windStrength', strength)
+    this.depthMaterial.setUniformValue('windSpeed', speed)
+  }
+
+  public getWind() {
+    return {
+      strength: this.materialHigh.getUniforms()['windStrength'].value,
+      speed: this.materialHigh.getUniforms()['windSpeed'].value
+    }
+  }
+
+  public setDirection(direction: number) {
+    this.materialHigh.setUniformValue('windDirection', new THREE.Vector3(0.0, 0.0, direction))
+    this.depthMaterial.setUniformValue('windDirection', new THREE.Vector3(0.0, 0.0, direction))
   }
 }
