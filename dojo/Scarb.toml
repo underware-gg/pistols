@@ -13,7 +13,7 @@ github = "https://github.com/funDAOmental/pistols"
 
 [package]
 name = "pistols"
-version = "0.8.1"
+version = "0.8.2"
 cairo-version = "2.6.3"
 
 [cairo]
