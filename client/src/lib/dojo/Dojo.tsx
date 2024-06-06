@@ -1,7 +1,6 @@
 import React, { ReactNode } from 'react'
 import { StarknetProvider, useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { DojoProvider } from '@/lib/dojo/DojoContext'
-import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { useSetup } from '@/lib/dojo/setup/useSetup'
 import { ChainId } from '@/lib/dojo/setup/chains'
 import { useAccount } from '@starknet-react/core'
