@@ -2,18 +2,19 @@ import {
   getEvents,
   // setComponentsFromEvents,
 } from '@dojoengine/utils'
-import { SetupNetworkResult } from '../../lib/dojo/setup/setup'
-import { splitU256, stringToFelt } from '@/lib/utils/starknet'
-import { Account, BigNumberish, Call, CallContractResponse, uint256 } from 'starknet'
-import { emitter } from '@/pistols/three/game'
 import { getContractByName } from '@dojoengine/core'
-import { bigintAdd, bigintToEntity, bigintToHex } from '@/lib/utils/types'
 import { getComponentValue } from '@dojoengine/recs'
-import { ClientComponents } from '../../lib/dojo/setup/createClientComponents'
+import { Account, BigNumberish, Call, CallContractResponse, uint256 } from 'starknet'
+import { ClientComponents } from '@/lib/dojo/setup/createClientComponents'
+import { SetupNetworkResult } from '@/lib/dojo/setup/setup'
+import { splitU256, stringToFelt } from '@/lib/utils/starknet'
+import { bigintAdd, bigintToEntity, bigintToHex } from '@/lib/utils/types'
+import { emitter } from '@/pistols/three/game'
 
 // FIX while this is not merged
 // https://github.com/dojoengine/dojo.js/pull/190
 import { setComponentsFromEvents } from '@/lib/dojo/fix/setComponentsFromEvents'
+import { setStructFromValues } from '@/lib/dojo/fix/setStructFromValues'
 
 
 export type SystemCalls = ReturnType<typeof createSystemCalls>;
@@ -74,7 +75,6 @@ export function createSystemCalls(
     let results = null
     try {
       const response: CallContractResponse = await call(params.contractName, params.functionName, params.callData)
-      // console.log(response)
       // result = decodeComponent(contractComponents['Component'], response)
       results = response.result.map(v => BigInt(v))
       // console.log(`call ${system}(${args.length}) success:`, result)
@@ -190,40 +190,17 @@ export function createSystemCalls(
     const results = await _executeCall(actions_call('simulate_honour_for_action', args))
     if (!results) return null
     const [action_honour, duelist_honour] = results.map((v: bigint) => Number(v > 255n ? -1 : v))
-    console.log(results, action_honour, duelist_honour)
     return {
       action_honour,
       duelist_honour,
     }
   }
 
-  type simulate_chances_result = {
-    crit_chances: number
-    crit_bonus: number
-    hit_chances: number
-    hit_bonus: number
-    lethal_chances: number
-    lethal_bonus: number
-  }
-  const simulate_chances = async (duelist: bigint, duel_id: bigint, round_number: number, action): Promise<simulate_chances_result | null> => {
+  const simulate_chances = async (duelist: bigint, duel_id: bigint, round_number: number, action): Promise<any | null> => {
     const args = [duelist, duel_id, round_number, action]
     const results = await _executeCall(actions_call('simulate_chances', args))
     if (!results) return null
-    const [key,
-      crit_chances,
-      crit_bonus,
-      hit_chances,
-      hit_bonus,
-      lethal_chances,
-      lethal_bonus] = results.map((v: bigint) => Number(v))
-    return {
-      crit_chances,
-      crit_bonus,
-      hit_chances,
-      hit_bonus,
-      lethal_chances,
-      lethal_bonus,
-    }
+    return setStructFromValues(manifest, 'Chances', results)
   }
 
   const get_valid_packed_actions = async (round_number: number): Promise<number[] | null> => {

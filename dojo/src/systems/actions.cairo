@@ -1,5 +1,6 @@
 use starknet::{ContractAddress};
-use pistols::models::models::{Duelist, Chances, Challenge};
+use pistols::models::models::{Duelist, Challenge};
+use pistols::models::structs::{Chances};
 use pistols::types::challenge::{ChallengeState};
 
 // define the interface
@@ -73,7 +74,8 @@ mod actions {
     use traits::{Into, TryInto};
     use starknet::{ContractAddress, get_block_timestamp, get_block_info};
 
-    use pistols::models::models::{Duelist, Score, Challenge, Wager, Pact, Round, Shot, Chances};
+    use pistols::models::models::{Duelist, Score, Challenge, Wager, Pact, Round, Shot};
+    use pistols::models::structs::{Chances};
     use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
     use pistols::models::table::{TTable, TableManager, TableTrait, TableManagerTrait, tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
@@ -313,7 +315,6 @@ mod actions {
             let lethal_chances: u8 = utils::calc_lethal_chances(score_self, score_other, action_self, action_other, hit_chances);
             let lethal_bonus: u8 = utils::calc_hit_bonus(score_self);
             (Chances {
-                key: 0,
                 crit_chances,
                 crit_bonus,
                 hit_chances,

@@ -1,6 +1,7 @@
 mod models {
     mod config;
     mod models;
+    mod structs;
     mod table;
 }
 

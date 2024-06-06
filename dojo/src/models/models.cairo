@@ -140,22 +140,6 @@ struct Shot {
 } // 224 bits
 
 
-//--------------------------------------------
-// Models used exclusively for read-only calls
-//
-#[derive(Model, Copy, Drop, Serde)]
-struct Chances {
-    #[key]
-    key: felt252,
-    crit_chances: u8,
-    crit_bonus: u8,
-    hit_chances: u8,
-    hit_bonus: u8,
-    lethal_chances: u8,
-    lethal_bonus: u8,
-}
-
-
 
 //-------------------------------------
 // Model initializers
