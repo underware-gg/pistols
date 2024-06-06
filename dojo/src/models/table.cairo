@@ -14,7 +14,8 @@ mod tables {
 
 // Temporarily renamed to TTable while this bug exists:
 // https://github.com/dojoengine/dojo.js/issues/204
-#[derive(Model, Copy, Drop, Serde)]
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
 struct TTable {
     #[key]
     table_id: felt252,

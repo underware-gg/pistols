@@ -4,7 +4,8 @@ use pistols::types::challenge::{ChallengeState};
 //---------------------
 // Duelist
 //
-#[derive(Model, Copy, Drop, Serde)]
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
 struct Duelist {
     #[key]
     address: ContractAddress,
@@ -16,7 +17,8 @@ struct Duelist {
 }
 
 // Current challenge between two Duelists
-#[derive(Model, Copy, Drop, Serde)]
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
 struct Pact {
     #[key]
     pair: u128,     // xor'd duelists as u256(address).low
@@ -26,7 +28,8 @@ struct Pact {
 
 //
 // Duelist scores and wager balance per Table
-#[derive(Model, Copy, Drop, Serde)]
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
 struct Scoreboard {
     #[key]
     address: ContractAddress,
@@ -65,7 +68,8 @@ impl ScoreTraitImpl of ScoreTrait {
 //-------------------------
 // Challenge lifecycle
 //
-#[derive(Model, Copy, Drop, Serde)]
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
 struct Challenge {
     #[key]
     duel_id: u128,
@@ -84,7 +88,8 @@ struct Challenge {
 } // [f] [f] [f] [152]
 
 // Challenge wager (optional)
-#[derive(Model, Copy, Drop, Serde)]
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
 struct Wager {
     #[key]
     duel_id: u128,
@@ -94,7 +99,8 @@ struct Wager {
 }
 
 // Score snapshot
-#[derive(Model, Copy, Drop, Serde)]
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
 struct Snapshot {
     #[key]
     duel_id: u128,
@@ -105,7 +111,8 @@ struct Snapshot {
 
 //
 // Each duel round
-#[derive(Model, Copy, Drop, Serde)]
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
 struct Round {
     #[key]
     duel_id: u128,

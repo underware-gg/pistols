@@ -4,7 +4,7 @@
 // dont need to be models
 //
 
-#[derive(Copy, Drop, Serde)]
+#[derive(Copy, Drop, Serde, Introspect)]
 struct Chances {
     crit_chances: u8,
     crit_bonus: u8,

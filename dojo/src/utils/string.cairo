@@ -22,7 +22,7 @@ impl String of StringTrait {
     }
 
     fn join(left: felt252, right: felt252) -> felt252 {
-        String::concat(String::concat(left, '_'), right)
+        Self::concat(Self::concat(left, '_'), right)
     }
 }
 
