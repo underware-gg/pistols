@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x3cac1205f629a93c0e9b01478ed8e56ab67d66798710607ce91dab42df5e75a"
-original_class_hash = "0x3cac1205f629a93c0e9b01478ed8e56ab67d66798710607ce91dab42df5e75a"
+class_hash = "0x648f87547cad4c7ff85ab3c422f77850b4a6f0b0f1494011440449a52aa8053"
+original_class_hash = "0x648f87547cad4c7ff85ab3c422f77850b4a6f0b0f1494011440449a52aa8053"
 abi = "manifests/dev/abis/base/models/token_components_token_erc20_erc20_metadata_erc_20_metadata_model.json"
 name = "token::components::token::erc20::erc20_metadata::erc_20_metadata_model"
 
