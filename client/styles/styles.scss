@@ -369,6 +369,11 @@ canvas {
 	// text-align: center;
 }
 
+.Scroller {
+  scrollbar-width: thin;
+  overflow-y: scroll;
+}
+
 TextArea {
   font-family: $font-family-mono;
   background-color: $color-dark;
@@ -505,12 +510,11 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 .TableMain {
+  @extend .Scroller;
   position: relative;
   margin-top: 100px;
   max-height: 500px;
   width: 800px;
-  scrollbar-width: thin;
-  overflow-y: scroll;
   // border: 0.5px solid #0001;
 }
 .TableValue {
@@ -519,9 +523,8 @@ $box-h: calc((100vh - $aspect-h) / 2);
   font-weight: 600;
 }
 .TableInModal {
+  @extend .Scroller;
   max-height: 400px;
-  scrollbar-width: thin;
-  overflow-y: scroll;
 }
 .TableCell {
   font-size: 1.2em;
@@ -534,7 +537,10 @@ $box-h: calc((100vh - $aspect-h) / 2);
 .ModalText {
   font-size: 20px!important;
 }
-.ModalBladesDescription {
+.DuelistModalDescription {
+  width: 620px;
+}
+.BladesModalDescription {
   @extend .CenteredContainer;
   height: 130px;
 }
@@ -644,11 +650,9 @@ $ui-container-gap: 1em;
   width: 620px;
 }
 .UIMenuTavernScroller {
+  @extend .Scroller;
   width: 100%;
   height: calc($aspect-h - $profile-pic-width - 1em * 6 - 1px);
-  scrollbar-width: thin;
-  overflow-y: scroll;
-  // border: 0.5px solid #0001;
 }
 .UIAccountsListScroller {
   @extend .UIMenuTavernScroller;

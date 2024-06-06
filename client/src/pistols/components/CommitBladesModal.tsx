@@ -78,7 +78,7 @@ export default function CommitBladesModal({
     >
       <Modal.Header className='AlignCenter'><h4>Choose your Blades</h4></Modal.Header>
       <Modal.Content>
-        <Modal.Description className='AlignCenter ModalText ModalBladesDescription'>
+        <Modal.Description className='AlignCenter ModalText BladesModalDescription'>
           <ActionDescription action={latestAction} />
         </Modal.Description>
 
