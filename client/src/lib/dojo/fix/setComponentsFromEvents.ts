@@ -8,6 +8,7 @@ import {
   Schema,
 } from "@dojoengine/recs";
 import { getEntityIdFromKeys, hexToAscii } from "@dojoengine/utils";
+import { entityIdToKey } from '@/lib/utils/types'
 
 
 /**
@@ -35,7 +36,13 @@ export function setComponentFromEvent(
   let index = 0;
 
   // index 0: get component name
+  // Dojo 0.7.5-alphs.5: eventData[0] is messed up!
   const componentName = hexToAscii(eventData[index++]);
+  // console.log(`EVENTDATA`, eventData)
+
+  // retrieve the component from name
+  const component = components[componentName];
+  // console.log(componentName, component)
 
   // index 1: keys count
   const keysNumber = parseInt(eventData[index++]);
@@ -45,14 +52,13 @@ export function setComponentFromEvent(
     .slice(index, index + keysNumber)
     .map((key) => BigInt(key));
   const string_keys = keys.map((key) => key.toString());
+  // console.log(keysNumber, keys)
 
   // get values
   index += keysNumber;
   const numberOfValues = parseInt(eventData[index++]);
   const values = eventData.slice(index, index + numberOfValues);
-
-  // retrieve the component from name
-  const component = components[componentName];
+  // console.log(numberOfValues, values)
 
   // create component object from values with schema
   const componentValues = decodeComponent(component, [

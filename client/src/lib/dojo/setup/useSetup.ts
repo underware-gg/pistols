@@ -93,7 +93,8 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     if (!network) return (network as any) // undefined or null
     await getSyncEntities(
       toriiClient,
-      network.contractComponents as any
+      network.contractComponents as any,
+      [],
     )
     console.log(`SYNC FINISHED!!!`)
     return true

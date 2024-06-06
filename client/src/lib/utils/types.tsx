@@ -1,5 +1,5 @@
 import { getEntityIdFromKeys } from '@dojoengine/utils'
-import { Entity } from '@dojoengine/recs'
+import { Component, Entity, getComponentValue } from '@dojoengine/recs'
 import { BigNumberish } from 'starknet'
 
 //
@@ -20,6 +20,7 @@ export const bigintSub = (a: BigNumberish | null, b: BigNumberish | null): bigin
 
 export const bigintToEntity = (v: BigNumberish): Entity => (getEntityIdFromKeys([BigInt(v)]) as Entity)
 export const keysToEntity = (keys: any[]): Entity => (getEntityIdFromKeys(keys) as Entity)
+export const entityIdToKey = (component: Component, keyName: string, entityId: Entity) => (BigInt(getComponentValue(component, entityId)[keyName]))
 
 export const shortAddress = (address: string | null) => (
   !address ? '?'

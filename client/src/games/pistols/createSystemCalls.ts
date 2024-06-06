@@ -4,10 +4,10 @@ import {
 } from '@dojoengine/utils'
 import { getContractByName } from '@dojoengine/core'
 import { getComponentValue } from '@dojoengine/recs'
-import { Account, BigNumberish, Call, CallContractResponse, uint256 } from 'starknet'
+import { Account, BigNumberish, Call, Result, uint256 } from 'starknet'
 import { ClientComponents } from '@/lib/dojo/setup/createClientComponents'
 import { SetupNetworkResult } from '@/lib/dojo/setup/setup'
-import { splitU256, stringToFelt } from '@/lib/utils/starknet'
+import { stringToFelt } from '@/lib/utils/starknet'
 import { bigintAdd, bigintToEntity, bigintToHex } from '@/lib/utils/types'
 import { emitter } from '@/pistols/three/game'
 
@@ -21,19 +21,19 @@ export type SystemCalls = ReturnType<typeof createSystemCalls>;
 
 export type DojoCall = {
   contractName: string
-  functionName: string
-  callData: BigNumberish[]
+  entrypoint: string
+  calldata: BigNumberish[]
 }
 
-const actions_call = (functionName: string, callData: any[]) => ({
+const actions_call = (entrypoint: string, calldata: any[]) => ({
   contractName: 'actions',
-  functionName,
-  callData,
+  entrypoint,
+  calldata,
 })
-const admin_call = (functionName: string, callData: any[]) => ({
+const admin_call = (entrypoint: string, calldata: any[]) => ({
   contractName: 'admin',
-  functionName,
-  callData,
+  entrypoint,
+  calldata,
 })
 
 export function createSystemCalls(
@@ -41,7 +41,7 @@ export function createSystemCalls(
   components: ClientComponents,
   manifest: any,
 ) {
-  const { execute, executeMulti, call, contractComponents } = network
+  const { execute, call, contractComponents } = network
   const { Challenge, Wager, TTable } = components
 
   // executeMulti() based on:
@@ -50,20 +50,21 @@ export function createSystemCalls(
   const _executeTransaction = async (signer: Account, params: DojoCall | Call[]): Promise<boolean> => {
     let success = false
     try {
-      let tx = null
+      const tx = await execute(signer, params);
       if (!Array.isArray(params)) {
-        tx = await execute(signer, params.contractName, params.functionName, params.callData);
-        console.log(`execute ${params.contractName}::${params.functionName}() tx:`, params.callData, tx)
+        console.log(`execute ${params?.contractName}::${params.entrypoint}() tx:`, params.calldata, tx)
       } else {
-        tx = await executeMulti(signer, params)
-        console.log(`executeMulti:`, params, ` tx:`, tx)
+        params.forEach((param, index) => {
+          console.log(`execute[${index}] ${param.contractAddress}::${param.entrypoint}() tx:`, param.calldata, tx)
+        })
       }
 
       const receipt = await signer.waitForTransaction(tx.transaction_hash, { retryInterval: 200 })
       success = getReceiptStatus(receipt);
       (success ? console.log : console.warn)(`execute success:`, success, 'receipt:', receipt, 'params:', params)
 
-      setComponentsFromEvents(contractComponents, getEvents(receipt));
+      // set from events ahead of torii
+      // setComponentsFromEvents(contractComponents, getEvents(receipt));
     } catch (e) {
       console.warn(`execute exception:`, params, e)
     } finally {
@@ -74,12 +75,13 @@ export function createSystemCalls(
   const _executeCall = async (params: DojoCall): Promise<any | null> => {
     let results = null
     try {
-      const response: CallContractResponse = await call(params.contractName, params.functionName, params.callData)
+      const response: Result = await call(params)
       // result = decodeComponent(contractComponents['Component'], response)
-      results = response.result.map(v => BigInt(v))
+      // results = Array.isArray(response) ? response.map(v => BigInt(v)) : typeof response == 'boolean' ? response : BigInt(response)
+      results = response
       // console.log(`call ${system}(${args.length}) success:`, result)
     } catch (e) {
-      console.warn(`call ${params.contractName}::${params.functionName}(${params.callData.length}) exception:`, e)
+      console.warn(`call ${params.contractName}::${params.entrypoint}(${params.calldata.length}) exception:`, e)
     } finally {
     }
     return results
@@ -175,8 +177,7 @@ export function createSystemCalls(
   }
 
   const calc_fee = async (table_id: string, wager_value: BigNumberish): Promise<bigint | null> => {
-    const wei = splitU256(wager_value)
-    const args = [stringToFelt(table_id), wei.low, wei.high]
+    const args = [stringToFelt(table_id), wager_value]
     const results = await _executeCall(actions_call('calc_fee', args))
     return results !== null ? results[0] : null
   }
@@ -189,7 +190,8 @@ export function createSystemCalls(
     const args = [duelist, action]
     const results = await _executeCall(actions_call('simulate_honour_for_action', args))
     if (!results) return null
-    const [action_honour, duelist_honour] = results.map((v: bigint) => Number(v > 255n ? -1 : v))
+    // convert to Numbers
+    const [action_honour, duelist_honour] = Object.values(results).map((v: bigint) => Number(v > 255n ? -1 : v))
     return {
       action_honour,
       duelist_honour,
@@ -199,8 +201,13 @@ export function createSystemCalls(
   const simulate_chances = async (duelist: bigint, duel_id: bigint, round_number: number, action): Promise<any | null> => {
     const args = [duelist, duel_id, round_number, action]
     const results = await _executeCall(actions_call('simulate_chances', args))
+    // console.log(`simulate_chances`, results)
     if (!results) return null
-    return setStructFromValues(manifest, 'Chances', results)
+    // convert to Numbers
+    return Object.keys(results).reduce((acc, k) => {
+      acc[k] = Number(results[k])
+      return acc
+    }, {})
   }
 
   const get_valid_packed_actions = async (round_number: number): Promise<number[] | null> => {

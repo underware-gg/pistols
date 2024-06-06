@@ -1,6 +1,6 @@
-import { Account, AllowArray, Call, num } from 'starknet'
+import { Account, AccountInterface, AllowArray, Call, UniversalDetails } from 'starknet'
 import { createWorld, World } from '@dojoengine/recs'
-import { DojoProvider } from '@dojoengine/core'
+import { DojoCall, DojoProvider } from '@dojoengine/core'
 
 export type IDefineContractComponentsFunction = (world: World) => any
 
@@ -8,8 +8,7 @@ export type ISetupNetworkResult<CC extends IDefineContractComponentsFunction> = 
   world: World
   contractComponents: ReturnType<CC>
   execute: DojoProvider['execute']
-  executeMulti: DojoProvider['executeMulti']
-  call: DojoProvider['call']
+  call: DojoProvider['call'] // call(call: DojoCall | Call): Promise<Result>;
 }
 
 export const world = createWorld()
@@ -18,14 +17,13 @@ export function setupNetwork<CC extends IDefineContractComponentsFunction>(provi
   return {
     world,
     contractComponents: defineContractComponents(world),
-    execute: async (signer: Account, contract: string, system: string, call_data: num.BigNumberish[]) => {
-      return provider.execute(signer, contract, system, call_data)
+    // execute: async (signer: Account, contract: string, system: string, call_data: num.BigNumberish[]) => {
+    execute: async (account: Account | AccountInterface, call: AllowArray<DojoCall | Call>, details?: UniversalDetails) => {
+      return provider.execute(account, call, details)
     },
-    executeMulti: async (signer: Account, calls: AllowArray<Call>) => {
-      return provider.executeMulti(signer, calls)
-    },
-    call: async (contract: string, system: string, call_data: num.BigNumberish[]) => {
-      return provider.call(contract, system, call_data)
+    // call: async (contract: string, system: string, call_data: num.BigNumberish[]) => {
+    call: async (call: DojoCall | Call) => {
+      return provider.call(call)
     },
   }
 }
