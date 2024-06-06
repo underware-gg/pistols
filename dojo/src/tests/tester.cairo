@@ -43,8 +43,8 @@ mod tester {
     const INITIAL_TIMESTAMP: u64 = 0x100000000;
     const INITIAL_STEP: u64 = 0x10;
 
-    fn deploy_system(world: IWorldDispatcher, class_hash_felt: felt252) -> ContractAddress {
-        let contract_address = world.deploy_contract(class_hash_felt, class_hash_felt.try_into().unwrap());
+    fn deploy_system(world: IWorldDispatcher, salt: felt252, class_hash: felt252) -> ContractAddress {
+        let contract_address = world.deploy_contract(salt, class_hash.try_into().unwrap(), array![].span());
         (contract_address)
     }
 
@@ -81,9 +81,9 @@ mod tester {
         testing::set_block_timestamp(INITIAL_TIMESTAMP);
         // systems
         let world: IWorldDispatcher = spawn_test_world(models);
-        let system = IActionsDispatcher{ contract_address: deploy_system(world, actions::TEST_CLASS_HASH) };
-        let admin = IAdminDispatcher{ contract_address: deploy_system(world, admin::TEST_CLASS_HASH) };
-        let lords = ILordsMockDispatcher{ contract_address: deploy_system(world, lords_mock::TEST_CLASS_HASH) };
+        let system = IActionsDispatcher{ contract_address: deploy_system(world, 'salt', actions::TEST_CLASS_HASH) };
+        let admin = IAdminDispatcher{ contract_address: deploy_system(world, 'admin', admin::TEST_CLASS_HASH) };
+        let lords = ILordsMockDispatcher{ contract_address: deploy_system(world, 'lords_mock', lords_mock::TEST_CLASS_HASH) };
         let ierc20 = IERC20Dispatcher{ contract_address:lords.contract_address };
         // initializers
         execute_lords_initializer(lords, owner);

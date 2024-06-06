@@ -8,7 +8,8 @@ mod tests {
 
     use token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
-    use pistols::models::models::{Duelist, Challenge, Wager, Round, Chances};
+    use pistols::models::models::{Duelist, Challenge, Wager, Round};
+    use pistols::models::structs::{Chances};
     use pistols::models::table::{TTable, TableTrait, TableManagerTrait, tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};

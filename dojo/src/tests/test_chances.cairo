@@ -12,7 +12,8 @@ use debug::PrintTrait;
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     use pistols::systems::{utils};
-    use pistols::models::models::{init, Round, Shot, Duelist, Score, ScoreTrait, Chances};
+    use pistols::models::models::{init, Round, Shot, Duelist, Score, ScoreTrait};
+    use pistols::models::structs::{Chances};
     use pistols::types::constants::{constants, honour, chances};
     use pistols::types::action::{Action};
     use pistols::utils::string::{String};
