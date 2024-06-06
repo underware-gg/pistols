@@ -530,7 +530,11 @@ fn calc_lord_lethal_penalty(attacker: Score, defender: Score, attack: Action, de
     }
 }
 
-// used for system read calls only
+
+//------------------------
+// read calls
+//
+
 fn simulate_honour_for_action(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action) -> (i8, u8) {
     let mut duelist: Duelist = get!(world, duelist_address, Duelist);
     let action_honour: i8 = action.honour();

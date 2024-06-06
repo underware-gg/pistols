@@ -9,7 +9,7 @@ mod tests {
     use token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::models::models::{Duelist, Challenge, Wager, Round};
-    use pistols::models::structs::{Chances};
+    use pistols::models::structs::{SimulateChances};
     use pistols::models::table::{TTable, TableTrait, TableManagerTrait, tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
@@ -131,10 +131,12 @@ mod tests {
         tester::assert_balance(ierc20, treasury, 0, 0, 0, 'balance_treasury_1');
 
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
-        let _hit_chance_a = system.simulate_chances(owner, challenge.duel_id, challenge.round_number, action_a).hit_chances;
-        let _hit_chance_b = system.simulate_chances(owner, challenge.duel_id, challenge.round_number, action_b).hit_chances;
-        let kill_chance_a = system.simulate_chances(owner, challenge.duel_id, challenge.round_number, action_a).hit_chances;
-        let kill_chance_b = system.simulate_chances(owner, challenge.duel_id, challenge.round_number, action_b).hit_chances;
+        let chances_a: SimulateChances = system.simulate_chances(owner, challenge.duel_id, challenge.round_number, action_a);
+        let chances_b: SimulateChances = system.simulate_chances(owner, challenge.duel_id, challenge.round_number, action_b);
+        let _hit_chance_a = chances_a.hit_chances;
+        let _hit_chance_b = chances_b.hit_chances;
+        let kill_chance_a = chances_a.crit_chances;
+        let kill_chance_b = chances_b.crit_chances;
 
         // 1st commit
         tester::execute_commit_action(system, owner, duel_id, 1, hash_a);

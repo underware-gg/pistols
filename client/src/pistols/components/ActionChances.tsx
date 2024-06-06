@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
-import { useSimulateChances, useCalcHonourForAction } from '@/pistols/hooks/useContractCalls'
+import { useSimulateChances } from '@/pistols/hooks/useContractCalls'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import { Action } from '@/pistols/utils/pistols'
 import ProgressBar from '@/pistols/components/ui/ProgressBar'
@@ -21,6 +21,8 @@ export function ActionChances({
   const { accountAddress } = useDojoAccount()
   const { challenge: { duelistA, duelistB }, round1 } = useDuel(duelId)
   const {
+    action_honour,
+    duelist_honour,
     crit_chances,
     crit_bonus,
     hit_chances,
@@ -28,7 +30,6 @@ export function ActionChances({
     lethal_chances,
     lethal_bonus,
   } = useSimulateChances(accountAddress, duelId, roundNumber, action)
-  const { action_honour, duelist_honour } = useCalcHonourForAction(accountAddress, action, 0)
   const { crit_chances: other_crit_chances } = useSimulateChances(isA ? duelistB : duelistA, duelId, roundNumber, Action.Strong)
   // console.log(`CHANCES:`, crit_chances, crit_bonus, hit_chances, hit_bonus, lethal_chances, lethal_bonus)
 

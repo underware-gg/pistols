@@ -180,22 +180,6 @@ export function createSystemCalls(
     return results !== null ? results[0] : null
   }
 
-  type simulate_honour_for_action_result = {
-    action_honour: number
-    duelist_honour: number
-  }
-  const simulate_honour_for_action = async (duelist: bigint, action: number): Promise<simulate_honour_for_action_result | null> => {
-    const args = [duelist, action]
-    const results = await _executeCall(actions_call('simulate_honour_for_action', args))
-    if (!results) return null
-    // convert to Numbers
-    const [action_honour, duelist_honour] = Object.values(results).map((v: bigint) => Number(v > 255n ? -1 : v))
-    return {
-      action_honour,
-      duelist_honour,
-    }
-  }
-
   const simulate_chances = async (duelist: bigint, duel_id: bigint, round_number: number, action): Promise<any | null> => {
     const args = [duelist, duel_id, round_number, action]
     const results = await _executeCall(actions_call('simulate_chances', args))
@@ -235,7 +219,6 @@ export function createSystemCalls(
     has_pact,
     calc_fee,
     simulate_chances,
-    simulate_honour_for_action,
     get_valid_packed_actions,
     // pack_action_slots,
     // unpack_action_slots,

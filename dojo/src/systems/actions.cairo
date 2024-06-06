@@ -1,6 +1,6 @@
 use starknet::{ContractAddress};
 use pistols::models::models::{Duelist, Challenge};
-use pistols::models::structs::{Chances};
+use pistols::models::structs::{SimulateChances};
 use pistols::types::challenge::{ChallengeState};
 
 // define the interface
@@ -49,8 +49,7 @@ trait IActions {
 
     fn calc_fee(table_id: felt252, wager_value: u256) -> u256;
     
-    fn simulate_honour_for_action(duelist_address: ContractAddress, action: u8) -> (i8, u8);
-    fn simulate_chances(duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> Chances;
+    fn simulate_chances(duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> SimulateChances;
 
     fn get_valid_packed_actions(round_number: u8) -> Array<u16>;
     fn pack_action_slots(slot1: u8, slot2: u8) -> u16;
@@ -75,7 +74,7 @@ mod actions {
     use starknet::{ContractAddress, get_block_timestamp, get_block_info};
 
     use pistols::models::models::{Duelist, Score, Challenge, Wager, Pact, Round, Shot};
-    use pistols::models::structs::{Chances};
+    use pistols::models::structs::{SimulateChances};
     use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
     use pistols::models::table::{TTable, TableManager, TableTrait, TableManagerTrait, tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
@@ -295,15 +294,13 @@ mod actions {
             (table.calc_fee(wager_value))
         }
 
-        fn simulate_honour_for_action(world: IWorldDispatcher, duelist_address: ContractAddress, action: u8) -> (i8, u8) {
-            (utils::simulate_honour_for_action(world, duelist_address, action.into()))
-        }
-
-        fn simulate_chances(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> Chances {
+        fn simulate_chances(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> SimulateChances {
             let health: u8 = utils::get_duelist_health(world, duelist_address, duel_id, round_number);
             let action_self: Action = action.into();
             let action_other: Action = action.into();
             
+            let (action_honour, duelist_honour): (i8, u8) = utils::simulate_honour_for_action(world, duelist_address, action_self);
+
             let (score_self, score_other): (Score, Score) = utils::get_snapshot_scores(world, duelist_address, duel_id);
             
             let crit_chances: u8 = utils::calc_crit_chances(score_self, score_other, action_self, action_other, health);
@@ -314,7 +311,9 @@ mod actions {
 
             let lethal_chances: u8 = utils::calc_lethal_chances(score_self, score_other, action_self, action_other, hit_chances);
             let lethal_bonus: u8 = utils::calc_hit_bonus(score_self);
-            (Chances {
+            (SimulateChances {
+                action_honour,
+                duelist_honour,
                 crit_chances,
                 crit_bonus,
                 hit_chances,

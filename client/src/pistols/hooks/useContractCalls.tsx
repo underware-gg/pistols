@@ -20,22 +20,6 @@ export const useCalcFee = (table_id: string, wager_value: BigNumberish, defaultV
   }
 }
 
-export const useCalcHonourForAction = (address: BigNumberish, action: number, defaultValue = {}) => {
-  const { simulate_honour_for_action } = useDojoSystemCalls()
-  const [value, setValue] = useState(defaultValue)
-  useEffect(() => {
-    let _mounted = true
-    const _get = async () => {
-      const value = await simulate_honour_for_action(BigInt(address), action)
-      if (_mounted) setValue(value)
-    }
-    if (address != null && action != null) _get()
-    else setValue(defaultValue)
-    return () => { _mounted = false }
-  }, [address, action])
-  return value as Awaited<ReturnType<typeof simulate_honour_for_action>>
-}
-
 export const useSimulateChances = (address: BigNumberish, duelId: bigint, roundNumber: number, action: number, defaultValue = {}) => {
   const { simulate_chances } = useDojoSystemCalls()
   const [value, setValue] = useState<any | null>(defaultValue)
