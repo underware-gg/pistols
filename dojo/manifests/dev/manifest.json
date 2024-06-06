@@ -1474,8 +1474,8 @@
     {
       "kind": "DojoContract",
       "address": "0x6dda46ca9b7cee1b06a77890a71f0221f332f01f6f05ebd0894feb9a76b7752",
-      "class_hash": "0x4266a471d3adcf14ff8e4a5d1ede0f256c4d9c67e904c0b47936bed2728d9b8",
-      "original_class_hash": "0x4266a471d3adcf14ff8e4a5d1ede0f256c4d9c67e904c0b47936bed2728d9b8",
+      "class_hash": "0x2d48f9c0e023f285d926e4eb79a6aa463b29aba666725be6b4edf2edfcd061",
+      "original_class_hash": "0x2d48f9c0e023f285d926e4eb79a6aa463b29aba666725be6b4edf2edfcd061",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -1673,12 +1673,8 @@
         },
         {
           "type": "struct",
-          "name": "pistols::models::models::Chances",
+          "name": "pistols::models::structs::Chances",
           "members": [
-            {
-              "name": "key",
-              "type": "core::felt252"
-            },
             {
               "name": "crit_chances",
               "type": "core::integer::u8"
@@ -1932,7 +1928,7 @@
               ],
               "outputs": [
                 {
-                  "type": "pistols::models::models::Chances"
+                  "type": "pistols::models::structs::Chances"
                 }
               ],
               "state_mutability": "view"
@@ -3139,282 +3135,6 @@
         }
       ],
       "name": "pistols::models::models::challenge"
-    },
-    {
-      "kind": "DojoModel",
-      "members": [
-        {
-          "name": "key",
-          "type": "felt252",
-          "key": true
-        },
-        {
-          "name": "crit_chances",
-          "type": "u8",
-          "key": false
-        },
-        {
-          "name": "crit_bonus",
-          "type": "u8",
-          "key": false
-        },
-        {
-          "name": "hit_chances",
-          "type": "u8",
-          "key": false
-        },
-        {
-          "name": "hit_bonus",
-          "type": "u8",
-          "key": false
-        },
-        {
-          "name": "lethal_chances",
-          "type": "u8",
-          "key": false
-        },
-        {
-          "name": "lethal_bonus",
-          "type": "u8",
-          "key": false
-        }
-      ],
-      "class_hash": "0x33d2265485a3f0d4526c4301252df10ceff481c92664fe3f261ea69e3b31b60",
-      "original_class_hash": "0x33d2265485a3f0d4526c4301252df10ceff481c92664fe3f261ea69e3b31b60",
-      "abi": [
-        {
-          "type": "impl",
-          "name": "DojoModelImpl",
-          "interface_name": "dojo::model::IDojoModel"
-        },
-        {
-          "type": "struct",
-          "name": "core::array::Span::<core::integer::u8>",
-          "members": [
-            {
-              "name": "snapshot",
-              "type": "@core::array::Array::<core::integer::u8>"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "core::array::Span::<core::felt252>",
-          "members": [
-            {
-              "name": "snapshot",
-              "type": "@core::array::Array::<core::felt252>"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "core::array::Span::<core::array::Span::<core::felt252>>",
-          "members": [
-            {
-              "name": "snapshot",
-              "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "dojo::database::introspect::Struct",
-          "members": [
-            {
-              "name": "name",
-              "type": "core::felt252"
-            },
-            {
-              "name": "attrs",
-              "type": "core::array::Span::<core::felt252>"
-            },
-            {
-              "name": "children",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>",
-          "members": [
-            {
-              "name": "snapshot",
-              "type": "@core::array::Array::<(core::felt252, core::array::Span::<core::felt252>)>"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "dojo::database::introspect::Enum",
-          "members": [
-            {
-              "name": "name",
-              "type": "core::felt252"
-            },
-            {
-              "name": "attrs",
-              "type": "core::array::Span::<core::felt252>"
-            },
-            {
-              "name": "children",
-              "type": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>"
-            }
-          ]
-        },
-        {
-          "type": "enum",
-          "name": "dojo::database::introspect::Ty",
-          "variants": [
-            {
-              "name": "Primitive",
-              "type": "core::felt252"
-            },
-            {
-              "name": "Struct",
-              "type": "dojo::database::introspect::Struct"
-            },
-            {
-              "name": "Enum",
-              "type": "dojo::database::introspect::Enum"
-            },
-            {
-              "name": "Tuple",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
-            },
-            {
-              "name": "Array",
-              "type": "core::integer::u32"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "dojo::model::IDojoModel",
-          "items": [
-            {
-              "type": "function",
-              "name": "name",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::felt252"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "unpacked_size",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::integer::u32"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "packed_size",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::integer::u32"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "layout",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::array::Span::<core::integer::u8>"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "schema",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "dojo::database::introspect::Ty"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "chancesImpl",
-          "interface_name": "pistols::models::models::Ichances"
-        },
-        {
-          "type": "struct",
-          "name": "pistols::models::models::Chances",
-          "members": [
-            {
-              "name": "key",
-              "type": "core::felt252"
-            },
-            {
-              "name": "crit_chances",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "crit_bonus",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "hit_chances",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "hit_bonus",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "lethal_chances",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "lethal_bonus",
-              "type": "core::integer::u8"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "pistols::models::models::Ichances",
-          "items": [
-            {
-              "type": "function",
-              "name": "ensure_abi",
-              "inputs": [
-                {
-                  "name": "model",
-                  "type": "pistols::models::models::Chances"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "pistols::models::models::chances::Event",
-          "kind": "enum",
-          "variants": []
-        }
-      ],
-      "name": "pistols::models::models::chances"
     },
     {
       "kind": "DojoModel",

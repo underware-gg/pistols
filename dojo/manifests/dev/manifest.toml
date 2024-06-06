@@ -34,8 +34,8 @@ name = "pistols::mocks::lords_mock::lords_mock"
 [[contracts]]
 kind = "DojoContract"
 address = "0x6dda46ca9b7cee1b06a77890a71f0221f332f01f6f05ebd0894feb9a76b7752"
-class_hash = "0x4266a471d3adcf14ff8e4a5d1ede0f256c4d9c67e904c0b47936bed2728d9b8"
-original_class_hash = "0x4266a471d3adcf14ff8e4a5d1ede0f256c4d9c67e904c0b47936bed2728d9b8"
+class_hash = "0x2d48f9c0e023f285d926e4eb79a6aa463b29aba666725be6b4edf2edfcd061"
+original_class_hash = "0x2d48f9c0e023f285d926e4eb79a6aa463b29aba666725be6b4edf2edfcd061"
 base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
 abi = "manifests/dev/abis/deployments/contracts/pistols_systems_actions_actions.json"
 reads = []
@@ -142,48 +142,6 @@ key = false
 [[models.members]]
 name = "timestamp_end"
 type = "u64"
-key = false
-
-[[models]]
-kind = "DojoModel"
-class_hash = "0x33d2265485a3f0d4526c4301252df10ceff481c92664fe3f261ea69e3b31b60"
-original_class_hash = "0x33d2265485a3f0d4526c4301252df10ceff481c92664fe3f261ea69e3b31b60"
-abi = "manifests/dev/abis/deployments/models/pistols_models_models_chances.json"
-name = "pistols::models::models::chances"
-
-[[models.members]]
-name = "key"
-type = "felt252"
-key = true
-
-[[models.members]]
-name = "crit_chances"
-type = "u8"
-key = false
-
-[[models.members]]
-name = "crit_bonus"
-type = "u8"
-key = false
-
-[[models.members]]
-name = "hit_chances"
-type = "u8"
-key = false
-
-[[models.members]]
-name = "hit_bonus"
-type = "u8"
-key = false
-
-[[models.members]]
-name = "lethal_chances"
-type = "u8"
-key = false
-
-[[models.members]]
-name = "lethal_bonus"
-type = "u8"
 key = false
 
 [[models]]

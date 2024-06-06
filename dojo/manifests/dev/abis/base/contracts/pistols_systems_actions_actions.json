@@ -194,12 +194,8 @@
   },
   {
     "type": "struct",
-    "name": "pistols::models::models::Chances",
+    "name": "pistols::models::structs::Chances",
     "members": [
-      {
-        "name": "key",
-        "type": "core::felt252"
-      },
       {
         "name": "crit_chances",
         "type": "core::integer::u8"
@@ -453,7 +449,7 @@
         ],
         "outputs": [
           {
-            "type": "pistols::models::models::Chances"
+            "type": "pistols::models::structs::Chances"
           }
         ],
         "state_mutability": "view"
