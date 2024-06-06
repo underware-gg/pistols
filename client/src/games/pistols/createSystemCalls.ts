@@ -14,8 +14,6 @@ import { emitter } from '@/pistols/three/game'
 // FIX while this is not merged
 // https://github.com/dojoengine/dojo.js/pull/190
 import { setComponentsFromEvents } from '@/lib/dojo/fix/setComponentsFromEvents'
-import { setStructFromValues } from '@/lib/dojo/fix/setStructFromValues'
-
 
 export type SystemCalls = ReturnType<typeof createSystemCalls>;
 
