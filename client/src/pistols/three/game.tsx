@@ -63,8 +63,7 @@ const glTFNames = {
   light: 'Sun',
   ground: 'Ground',
   grass: 'Grass',
-  water: 'WaterPlane',
-  puddles: 'Puddles',
+  water: 'SimpleWaterPlane',
   cliffs: 'Cliffs',
   skyBackground: 'Sky',
   sirSecond: 'Sir_Second',
@@ -86,7 +85,7 @@ const zoomedCameraPos = {
 const zoomedOutCameraPos = {
   x: 0,
   y: 1.7,
-  z: -35,
+  z: -30,
 }
 
 export enum AnimationState {
@@ -142,8 +141,7 @@ let _growthPercentage
 let _grass
 
 let _ground
-let _groundMirrorShallow
-let _groundMirrorDeep
+let _groundMirror
 let _skyVideo
 let _skyVideoTexture
 let _ladySecond
@@ -271,8 +269,10 @@ async function loadAssets() {
 
         if (key == TextureName.duel_ground && _ground) {
           _ground.material.map = tex
+          _ground.material.needsUpdate = true
         } else if (key == TextureName.duel_ground_normal && _ground) {
           _ground.material.normalMap = tex
+          _ground.material.needsUpdate = true
         }
       })
     } else {
@@ -365,8 +365,7 @@ export function animate() {
       _renderer.clear();
 
       if (_sceneName == SceneName.Duel) {
-        _groundMirrorShallow?.setUniformValue("time", elapsedTime);
-        _groundMirrorDeep?.setUniformValue("time", elapsedTime);
+        _groundMirror?.setUniformValue("time", elapsedTime);
         _mixer?.update(deltaTime);
         _controls?.update();
         _grass?.update(deltaTime);
@@ -439,6 +438,11 @@ export function resetDuelScene() {
   _round2Animated = false
   _round3Animated = false
 
+  if (_sirSecond && _ladySecond) {
+    _sirSecond.visible = true
+    _ladySecond.visible = true
+  }
+
   _actor['A']?.stop()
   _actor['B']?.stop()
 
@@ -482,7 +486,7 @@ function loadGltf(scene: THREE.Scene) {
   const loader = new GLTFLoader();
 
   loader.load(
-    '/models/Duel_3_empty_y.glb',
+    '/models/Duel_3_water_y.glb',
     function (gltf) {
 
       /**
@@ -577,31 +581,17 @@ function loadGltf(scene: THREE.Scene) {
 
         if (child.name == glTFNames.water) {
           child.visible = false
-          child.geometry.applyMatrix4(new THREE.Matrix4().makeRotationX(- Math.PI / 2));
+          child.geometry.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
 
-          _groundMirrorShallow = createWaterPlane("WaterShallow", child.geometry, {
-            color: 0x597f86,
+          _groundMirror = createWaterPlane("Water", child.geometry, {
             height: -0.001,
             rotation: child.rotation,
             scale: child.scale
           })
 
-          scene.add(_groundMirrorShallow)
+          scene.add(_groundMirror)
         }
-
-        if (child.name == glTFNames.puddles) {
-          child.visible = false
-          child.geometry.applyMatrix4(new THREE.Matrix4().makeRotationX(- Math.PI / 2));
-
-          _groundMirrorDeep = createWaterPlane("WaterDeep", child.geometry, {
-            color: 0x35595e,
-            height: -0.0001,
-            rotation: child.rotation,
-            scale: child.scale
-          })
-
-          scene.add(_groundMirrorDeep)
-        }
+        
       })
 
       _grassTransforms = grassTransforms
@@ -617,20 +607,30 @@ function createWaterPlane(name, geometry, params) {
     clipBias: 0.0003,
     textureWidth: WIDTH,
     textureHeight: HEIGHT, //TODO check if this works??
-    color: params.color
   });
 
   water.setUniformValue('waterStrength', 0.04)
   water.setUniformValue('waterSpeed', 0.03)
-  water.setUniformValue('waveStrength', 0.035)
+  water.setUniformValue('waveStrength', 0.04)
   water.setUniformValue('waveSpeed', 0.05)
   water.setUniformValue('tDudv', _textures[TextureName.duel_water_dudv])
+  water.setUniformValue('waterMap', _textures[TextureName.duel_water_map])
   water.setUniformValue('windDirection', new THREE.Vector2(1.0, 0.0))
+  water.setUniformValue('colorDeep', new THREE.Color(0x35595e))
+  water.setUniformValue('colorShallow', new THREE.Color(0x597f86))
 
-  water.position.y = params.height;
   water.rotation.set(params.rotation.x, params.rotation.y, params.rotation.z)
   water.rotateX(Math.PI / 2)
   water.scale.set(params.scale.x, params.scale.z, params.scale.y)
+  water.position.y = params.height;
+  water.position.z += 0.01
+  water.scale.x += 0.0025
+  water.scale.y += 0.0025
+
+  const waterColors = {
+    shallow: 0x597f86,
+    deep: 0x35595e
+  }
 
   if (_statsEnabled) {
     let waterGUI = _gui.addFolder(name);
@@ -659,9 +659,17 @@ function createWaterPlane(name, geometry, params) {
       .name('windDirection - y')
       .min(-1.0).max(1.0).step(0.01)
     waterGUI
-      //@ts-ignore
-      .addColor(water.getUniforms().color, 'value')
-      .name('waterColor')
+      .addColor(waterColors, 'shallow')
+      .onChange(() => {
+        water.setUniformValue('colorShallow', new THREE.Color(waterColors.shallow))
+      })
+      .name('colorShallow');
+    waterGUI
+      .addColor(waterColors, 'deep')
+      .onChange(() => {
+        water.setUniformValue('colorDeep', new THREE.Color(waterColors.deep))
+      })
+      .name('colorDeep');
   }
 
   return water
@@ -950,7 +958,7 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
       if (damageB == 0) {
         playActorAnimation('B', key)
       }
-    } else {
+    } else if (i < minPaceCount) {
       //timeout not needed with animationQueue
       playActorAnimation('A', key)
       playActorAnimation('B', key)
@@ -1063,7 +1071,7 @@ const _getActionAnimName = (action: Action): AnimName => {
 function animateActions(state: AnimationState, actionA: number, actionB: number, healthA: number, healthB: number, damageA: number, damageB: number) {
 
   // Rewind camera and
-  zoomCameraToPaces(0, 0)
+  zoomCameraToPaces(1, 0)
   resetActorPositions()
 
   // animate sprites
