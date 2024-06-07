@@ -13,12 +13,15 @@ function GameContainer({
 }) {
   const { dispatchSelectDuel } = usePistolsContext()
   const { audioLoaded } = useThreeJsContext()
+  const { initialized } = useSettingsContext()
 
   useEffect(() => {
     if (duelId) {
       dispatchSelectDuel(duelId)
     }
   }, [duelId])
+
+  if (!initialized) return <></>
 
   return (
     <div className={`GameContainer ${isVisible ? '' : 'Hidden'}`}>

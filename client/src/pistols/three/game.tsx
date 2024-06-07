@@ -111,6 +111,8 @@ enum DuelistsData {
 // Setup
 //
 
+let _framerate = 60
+
 let _textures: any = {}
 let _spriteSheets: any = {}
 
@@ -197,11 +199,14 @@ export function dispose() {
   _scenes = {}
 }
 
-export async function init(canvas, width, height, statsEnabled = false) {
+export async function init(canvas, framerate = 60, statsEnabled = false) {
 
   if (Object.keys(_scenes).length > 0) {
     return
   }
+
+  _framerate = framerate
+  _statsEnabled = statsEnabled
 
   setRender(canvas)
 
@@ -219,9 +224,8 @@ export async function init(canvas, width, height, statsEnabled = false) {
   _duelistB.name = localStorage.getItem(DuelistsData.DUELIST_B_NAME)
   _growthPercentage = localStorage.getItem('GROWTH')
   
-  _statsEnabled = statsEnabled
-
   if (_statsEnabled) {
+    console.log(`DEBUG>>>>>>>>`)
     _stats = new Stats()
     document.body.appendChild(_stats.dom)
   }
@@ -344,7 +348,6 @@ function onWindowResize() {
 //
 
 let lastFrameTime = performance.now();
-const frameDuration = 1000 / 60;
 
 export function animate() {
   if (!_supportsExtension || !_renderer) return;
@@ -354,6 +357,8 @@ export function animate() {
 
   const deltaTime = _clock.getDelta();
   const elapsedTime = _clock.getElapsedTime();
+
+  const frameDuration = 1000 / _framerate;
 
   // More precise frame rate controll
   if (delta >= frameDuration) {
