@@ -1,10 +1,10 @@
 import { useEffect, useMemo } from 'react'
 import { useRouter } from 'next/router'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
+import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext } from './PistolsContext'
 import { bigintToHex } from '@/lib/utils/types'
-import { tables } from '../utils/constants'
 
 type PistolsParams = {
   duel?: string
@@ -18,6 +18,7 @@ type PistolsParams = {
 // (run once when page stards)
 //
 export const useRouterStarter = () => {
+  const { tables } = useDojoConstants()
   const router = useRouter()
   const { duel, duelist, table, debug }: PistolsParams = router.query
 

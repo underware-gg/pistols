@@ -17,13 +17,13 @@ import { AnimationState } from '@/pistols/three/game'
 import { EmojiIcon, LoadingIcon } from '@/lib/ui/Icons'
 import { ActionEmojis, ActionTypes } from '../utils/pistols'
 import { Balance } from '@/pistols/components/account/Balance'
-import { constants } from '@/pistols/utils/constants'
 import { EMOJI } from '@/pistols/data/messages'
 import DuelInfoSwitcher from '@/pistols/components/DuelInfoSwitcher'
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import CommitBladesModal from '@/pistols/components/CommitBladesModal'
 import RevealModal from '@/pistols/components/RevealModal'
 import { bigintEquals } from '@/lib/utils/types'
+import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -136,6 +136,7 @@ function DuelHealthBar({
   health,
   floated,
 }) {
+  const { constants } = useDojoConstants()
   const points = useMemo(() => {
     let result = []
     for (let i = 1; i <= constants.FULL_HEALTH; ++i) {

@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react'
+import { ConstantsProvider } from '@/lib/dojo/ConstantsContext'
 import { StarknetProvider, useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { DojoProvider } from '@/lib/dojo/DojoContext'
 import { useSetup } from '@/lib/dojo/setup/useSetup'
@@ -11,6 +12,7 @@ export interface DojoAppConfig {
   supportedChainIds: ChainId[]
   initialChainId: ChainId
   manifests: { [chain_id: string]: any | undefined }
+  constants: { [chain_id: string]: any | undefined }
 }
 
 export default function Dojo({
@@ -23,7 +25,9 @@ export default function Dojo({
   return (
     <StarknetProvider dojoAppConfig={dojoAppConfig}>
       <SetupDojoProvider dojoAppConfig={dojoAppConfig}>
-        {children}
+        <ConstantsProvider dojoAppConfig={dojoAppConfig}>
+          {children}
+        </ConstantsProvider>
       </SetupDojoProvider>
     </StarknetProvider>
   )

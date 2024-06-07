@@ -1,9 +1,9 @@
+import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 import { useERC20Balance } from '@/lib/utils/hooks/useERC20'
 import { useLordsBalance } from '@/lib/dojo/hooks/useLords'
 import { useTable } from '@/pistols/hooks/useTable'
 import { useLockedLordsBalance } from '@/pistols/hooks/useWager'
 import { Balance } from '@/pistols/components/account/Balance'
-import { tables } from '@/pistols/utils/constants'
 import { BigNumberish } from 'starknet'
 import { useMemo } from 'react'
 
@@ -14,6 +14,7 @@ export const LordsBalance = ({
   clean = false,
   big = false,
 }) => {
+  const { tables } = useDojoConstants()
   const { balance } = useLordsBalance(address)
   return (
     <Balance big={big} tableId={tables.LORDS} wei={balance} pre={pre} post={post} clean={clean} />

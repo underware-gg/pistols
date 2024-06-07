@@ -5,12 +5,10 @@ import { BigNumberish } from 'starknet';
 type mod_tables_Type = {
   LORDS: string, // cairo: felt252
   COMMONERS: string, // cairo: felt252
-  COUNT: number, // cairo: u8
 };
 export const tables: mod_tables_Type = {
   LORDS: 'Lords',
   COMMONERS: 'Commoners',
-  COUNT: 2,
 };
 
 // from: ../dojo/src/types/action.cairo

@@ -5,10 +5,10 @@ import {
 } from 'starknet'
 import { pedersen } from '@/lib/utils/starknet'
 import { signMessages, Messages } from '@/lib/utils/starknet_sign'
-import { constants } from '@/pistols/utils/constants'
+import { HASH_SALT_MASK } from '@/pistols/utils/constants'
 import { bigintToHex } from '@/lib/utils/types'
 
-export const make_action_hash = (salt: BigNumberish, action: BigNumberish) => (pedersen(BigInt(salt), BigInt(action)) & constants.HASH_SALT_MASK)
+export const make_action_hash = (salt: BigNumberish, action: BigNumberish) => (pedersen(BigInt(salt), BigInt(action)) & HASH_SALT_MASK)
 
 export const pack_action_slots = (slot1: number | null, slot2: number | null): number | null => {
   if (slot1 != null && slot2 != null) {
@@ -35,7 +35,7 @@ const signAndGenerateSalt = async (account: Account, duelId: bigint, roundNumber
         roundNumber: bigintToHex(roundNumber),
       }
       const sig: WeierstrassSignatureType = await signMessages(account, messages)
-      result = ((sig.r ^ sig.s) & constants.HASH_SALT_MASK)
+      result = ((sig.r ^ sig.s) & HASH_SALT_MASK)
     } catch (e) {
       console.warn(`signAndGenerateSalt() exception:`, e)
     }

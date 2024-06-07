@@ -1,7 +1,6 @@
-import React, { ReactNode, createContext, useReducer, useContext, useState } from 'react'
+import React, { ReactNode, createContext, useReducer, useContext, useState, useMemo, useEffect } from 'react'
 import { useCookies } from 'react-cookie'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
-import { tables } from '@/pistols/utils/constants'
 
 //--------------------------------
 // Constants
@@ -10,7 +9,7 @@ export const initialState = {
   debugMode: false,
   musicEnabled: true,
   sfxEnabled: true,
-  tableId: tables.LORDS,
+  tableId: '',
 }
 
 const SettingsActions = {

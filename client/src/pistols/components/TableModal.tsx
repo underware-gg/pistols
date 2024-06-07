@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { Grid, Modal, Dropdown } from 'semantic-ui-react'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
+import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 import { useActiveDuelists, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
 import { Opener } from '@/lib/ui/useOpener'
 import { Divider } from '@/lib/ui/Divider'
 import { ActionButton } from './ui/Buttons'
-import { tables } from '../utils/constants'
 import { useSettingsContext } from '../hooks/SettingsContext'
 import { useTable } from '../hooks/useTable'
 import { Balance } from './account/Balance'
@@ -180,6 +180,7 @@ function TableSwitcher({
   tableId,
   setSelectedTableId,
 }) {
+  const { tables } = useDojoConstants()
   const { description } = useTable(tableId)
   return (
     <Dropdown

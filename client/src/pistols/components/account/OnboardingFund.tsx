@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
 import { Grid, Input } from 'semantic-ui-react'
+import { Account, BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useBurnerAccount } from '@/lib/dojo/hooks/useBurnerAccount'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 import { useLordsBalance, useLordsContract } from '@/lib/dojo/hooks/useLords'
 import { useDojoERC20Transfer } from '@/lib/dojo/hooks/useDojoERC20'
 import { LockedWagerBalance, LordsBalance } from '@/pistols/components/account/LordsBalance'
@@ -12,8 +14,6 @@ import { IconTransfer } from '@/lib/ui/Icons'
 import { Divider } from '@/lib/ui/Divider'
 import { ethToWei } from '@/lib/utils/starknet'
 import { isNumber } from '@/lib/utils/types'
-import { Account, BigNumberish } from 'starknet'
-import { tables } from '@/pistols/utils/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -21,6 +21,7 @@ const Col = Grid.Column
 export function OnboardingFund({
   isDeployed = false,
 }) {
+  const { tables } = useDojoConstants()
   const { account } = useAccount()
   const { accountIndex } = usePistolsContext()
   const { account: burnerAccount, address } = useBurnerAccount(accountIndex)

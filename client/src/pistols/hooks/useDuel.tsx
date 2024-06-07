@@ -8,7 +8,7 @@ import { keysToEntity } from '@/lib/utils/types'
 import { ActionNames, ActionVerbs, RoundState } from "@/pistols/utils/pistols"
 import { AnimationState } from "@/pistols/three/game"
 import { BigNumberish } from 'starknet'
-import { constants } from '@/pistols/utils/constants'
+import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 
 export enum DuelStage {
   Null,             // 0
@@ -89,6 +89,8 @@ export const useDuel = (duelId: BigNumberish) => {
 // Use only ONCE inside <Duel>!!
 //
 export const useAnimatedDuel = (duelId: BigNumberish) => {
+  const { constants } = useDojoConstants()
+
   const result = useDuel(duelId)
   const { round1, round2, round3, duelStage } = result
 

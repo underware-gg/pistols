@@ -8,8 +8,6 @@ use pistols::types::constants::{constants};
 mod tables {
     const LORDS: felt252 = 'Lords';
     const COMMONERS: felt252 = 'Commoners';
-    // number of valid tables
-    const COUNT: u8 = 2;
 }
 
 // Temporarily renamed to TTable while this bug exists:

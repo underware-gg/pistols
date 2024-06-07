@@ -6,7 +6,7 @@ import { useDuel } from '@/pistols/hooks/useDuel'
 import { Action } from '@/pistols/utils/pistols'
 import ProgressBar from '@/pistols/components/ui/ProgressBar'
 import { ProfileBadge } from './account/ProfileDescription'
-import { constants } from '../utils/constants'
+import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -18,6 +18,7 @@ export function ActionChances({
   isA = false,
   isB = false,
 }) {
+  const { honour } = useDojoConstants()
   const { accountAddress } = useDojoAccount()
   const { challenge: { duelistA, duelistB }, round1 } = useDuel(duelId)
   const {
@@ -60,8 +61,8 @@ export function ActionChances({
       />
       <ProgressBar disabled={!action} label='Honour:'
         value={_honourValue} total={10}
-        negative={action_honour >= 0 && action_honour < constants.TRICKSTER_START}
-        warning={action_honour >= constants.LORD_START}
+        negative={action_honour >= 0 && action_honour < honour.TRICKSTER_START}
+        warning={action_honour >= honour.LORD_START}
         neutral={action_honour < 0}
       />
 

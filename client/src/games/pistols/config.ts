@@ -2,6 +2,8 @@ import { DojoAppConfig } from '@/lib/dojo/Dojo'
 import { ChainId, defaultChainId } from '@/lib/dojo/setup/chainConfig'
 import pistols_manifest_dev from '@/games/pistols/generated/dev/manifest.json'
 import pistols_manifest_slot from '@/games/pistols/generated/slot/manifest.json'
+import * as pistols_constants_dev from '@/games/pistols/generated/dev/contractConstants'
+import * as pistols_constants_slot from '@/games/pistols/generated/slot/contractConstants'
 
 export const makeDojoAppConfig = (): DojoAppConfig => {
 
@@ -10,17 +12,25 @@ export const makeDojoAppConfig = (): DojoAppConfig => {
   const supportedChainIds: ChainId[] = [
     ChainId.KATANA_LOCAL,
     ChainId.PISTOLS_SLOT,
-    // ChainId.REALMS_WORLD, // Realms L3
     ChainId.SN_SEPOLIA,
     // ChainId.SN_MAINNET,
+    // ChainId.REALMS_WORLD,
   ]
 
   const manifests: Record<ChainId, any> = {
     [ChainId.KATANA_LOCAL]: pistols_manifest_dev,
     [ChainId.PISTOLS_SLOT]: pistols_manifest_slot,
-    [ChainId.REALMS_WORLD]: null,
     [ChainId.SN_SEPOLIA]: null,
     [ChainId.SN_MAINNET]: null,
+    [ChainId.REALMS_WORLD]: null,
+  }
+
+  const constants: Record<ChainId, any> = {
+    [ChainId.KATANA_LOCAL]: pistols_constants_dev,
+    [ChainId.PISTOLS_SLOT]: pistols_constants_slot,
+    [ChainId.SN_SEPOLIA]: null,
+    [ChainId.SN_MAINNET]: null,
+    [ChainId.REALMS_WORLD]: null,
   }
 
   const initialChainId: ChainId = (defaultChainId || (
@@ -35,5 +45,6 @@ export const makeDojoAppConfig = (): DojoAppConfig => {
     supportedChainIds,
     initialChainId,
     manifests,
+    constants,
   }
 }
