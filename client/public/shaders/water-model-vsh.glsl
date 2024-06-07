@@ -3,13 +3,16 @@ uniform sampler2D tDudv;
 uniform float time;
 uniform float waterStrength;
 uniform float waterSpeed;
+
 varying vec4 vUv;
+varying vec2 vTexture;
 
 #include <common>
 #include <logdepthbuf_pars_vertex>
 
 void main() {
     vUv = textureMatrix * vec4(position, 1.0);
+    vTexture = uv;
     
     vec2 uv = position.xy;
     vec2 distortion = texture2D(tDudv, uv + vec2(time * waterSpeed, 0.0)).rg;
@@ -17,7 +20,7 @@ void main() {
 
     vec3 newPosition = position + vec3(distortion.xy, 0.0);
 
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     
     #include <logdepthbuf_vertex>
 }
