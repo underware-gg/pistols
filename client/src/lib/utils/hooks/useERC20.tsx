@@ -1,12 +1,16 @@
-import { useMemo } from 'react'
-import { useAccount, useBalance, useContractRead } from '@starknet-react/core'
+import { useEffect, useMemo } from 'react'
+import { useContractRead,
+  // useBalance,
+  UseBalanceProps, Balance,
+ } from '@starknet-react/core'
 import { bigintToHex } from '@/lib/utils/types'
-import { BigNumberish } from 'starknet'
+import { BigNumberish, Uint256 } from 'starknet'
 import { erc20_abi } from '@/lib/abi'
-import { feltToString } from '../starknet'
+import { Uint256ToBigint, feltToString, weiToEth } from '../starknet'
 
 export const useERC20Balance = (contractAddress: BigNumberish, ownerAddress: BigNumberish, fee: BigNumberish = 0n) => {
-  const { data: balance } = useBalance({
+  // const { data: balance } = useBalance({
+  const balance = _useBalance({
     token: bigintToHex(contractAddress),
     address: bigintToHex(ownerAddress),
     watch: true,
@@ -52,3 +56,36 @@ export const useERC20TokenName = (contractAddress: BigNumberish) => {
   }
 }
 
+
+//--------------------------------------
+// TEMP
+// until @starknet-react/core v3 + starknet v6
+// https://github.com/apibara/starknet-react/issues/451
+//
+enum BlockTag {
+  pending = "pending",
+  latest = "latest"
+}
+export const _useBalance = (props: UseBalanceProps): Balance => {
+  const { data, isError, isLoading, error } = useContractRead({
+    functionName: "balanceOf",
+    args: [bigintToHex(props.address)],
+    abi: erc20_abi,
+    address: bigintToHex(props.token),
+    enabled: (BigInt(props.address || 0) > 0n && BigInt(props.token || 0) > 0n),
+    // refetchInterval: 2000, // update every 2 seconds
+    // update every block
+    watch: true,
+    blockIdentifier: BlockTag.pending,
+  })
+  useEffect(() => { if (error) console.warn(`_useBalance() ERROR:`, error) }, [error])
+  //@ts-ignore
+  const value = useMemo<bigint>(() => (data?.balance ? Uint256ToBigint(data.balance as Uint256) : 0n), [data])
+  const formatted = useMemo(() => Number(weiToEth(value)).toString(), [value])
+  return {
+    decimals: 18,
+    symbol: '$?',
+    formatted,
+    value,
+  }
+}

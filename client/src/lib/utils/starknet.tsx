@@ -1,13 +1,14 @@
 import {
-  ec,
-  shortString,
   Account,
-  BigNumberish,
   AccountInterface,
   InvocationsDetails,
   InvokeFunctionResponse,
   RpcProvider,
+  shortString,
+  BigNumberish,
+  Uint256,
   Abi,
+  ec,
 } from 'starknet'
 import { bigintToHex } from './types'
 
@@ -22,7 +23,8 @@ export const ethToWei = (v: BigNumberish): bigint => (BigInt(v) * ETH_TO_WEI)
 export const weiToEth = (v: BigNumberish): bigint => (BigInt(v) / ETH_TO_WEI)
 export const dummyAccount = (rpc?: RpcProvider): Account => (new Account(rpc ?? {}, '0x0', '0x0'))
 
-export const splitU256 = (v: BigNumberish): { low: bigint, high: bigint } => ({
+export const Uint256ToBigint = (v: Uint256): bigint => ((BigInt(v.high) << 128n) + BigInt(v.low))
+export const bigintToUint256 = (v: BigNumberish): Uint256 => ({
   low: BigInt(v) & 0xffffffffffffffffffffffffffffffffn,
   high: BigInt(v) >> 128n,
 })
