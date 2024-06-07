@@ -6,6 +6,7 @@ import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useDojoAccount, useDojoStatus } from '@/lib/dojo/DojoContext'
 import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
+import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
 import { ChainId } from '@/lib/dojo/setup/chains'
 import { AccountMenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
@@ -14,6 +15,7 @@ import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { LordsBagIcon } from '@/pistols/components/account/Balance'
 import { Divider } from '@/lib/ui/Divider'
 import { feltToString } from '@/lib/utils/starknet'
+import { makeTavernUrl } from '@/pistols/utils/pistols'
 import OnboardingModal from '@/pistols/components/account/OnboardingModal'
 import WalletHeader from '@/pistols/components/account/WalletHeader'
 import Logo from '@/pistols/components/Logo'
@@ -130,10 +132,11 @@ function ChainSwitcher({
 function EnterAsGuestButton() {
   const { deselect } = useDojoAccount()
   const router = useRouter()
+  const { tableId } = useSettingsContext()
 
   const _enterAsGuest = () => {
     deselect()
-    router.push('/tavern')
+    router.push(makeTavernUrl(tableId))
   }
 
   return (

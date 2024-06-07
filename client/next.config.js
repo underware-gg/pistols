@@ -24,8 +24,8 @@ const nextConfig = {
         destination: '/main/gate',
       },
       {
-        source: '/tavern',
-        destination: '/main/tavern',
+        source: '/tavern/:slug*',
+        destination: '/main/tavern/:slug*',
       },
       {
         source: '/duel/:slug*',

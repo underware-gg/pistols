@@ -54,8 +54,8 @@ export default function MainPage() {
           duelId = BigInt(_slugs[0])
           title = 'Pistols - Duel!'
         } else {
-          scene = SceneName.Tavern
-          router.push('/tavern')
+          scene = SceneName.Gate
+          router.push('/gate')
         }
         // bgClassName = 'BackgroundDuel'
       }

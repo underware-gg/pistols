@@ -218,5 +218,6 @@ export const ActionTypes: Record<string, Action[]> = {
 // client stuff
 //
 
+export const makeTavernUrl = (tableId: string) => (`/tavern/${tableId}`)
 export const makeDuelUrl = (duelId: bigint) => (`/duel/${bigintToHex(duelId)}`)
 

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { Grid } from 'semantic-ui-react'
-import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
+import { useRouterTable } from '@/pistols/hooks/useRouterListener'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { LordsBalance, LockedWagerBalance } from '@/pistols/components/account/LordsBalance'
 import { AddressShort } from '@/lib/ui/AddressShort'
@@ -35,7 +35,7 @@ export function ProfileDescription({
   displayAddress = false,
   displayBalance = false,
 }) {
-  const { tableId } = useSettingsContext()
+  const { tableId } = useRouterTable()
   const {
     total_wins, total_losses, total_draws, total_duels, total_honour, honourAndTotal,
     is_villain, is_trickster, is_lord, levelDisplay, levelAndTotal,

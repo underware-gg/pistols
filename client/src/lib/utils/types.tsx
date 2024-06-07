@@ -33,6 +33,7 @@ export const shortAddress = (address: string | null) => (
 // dictionaries
 //
 
+export const getKeyByValue = (dict: any, value: any) => Object.keys(dict).find(key => dict[key] === value)
 export const cleanDict = (dict: any): any => Object.keys(dict).reduce((a, k) => {
   if (dict[k] !== undefined) a[k] = dict[k]
   return a

@@ -8,6 +8,7 @@ import { DuelStage } from '@/pistols/hooks/useDuel'
 import { SPRITESHEETS } from '@/pistols/data/assets'
 import { AnimationState } from '@/pistols/three/game'
 import { IconClick } from '@/lib/ui/Icons'
+import { makeTavernUrl } from '@/pistols/utils/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -15,6 +16,7 @@ const Col = Grid.Column
 export function MenuDuel({
   duelStage,
   duelId,
+  tableId,
 }) {
   const router = useRouter()
   const { dispatchSetting, settings, SettingsActions } = useSettingsContext()
@@ -22,7 +24,7 @@ export function MenuDuel({
 
   const _backToTavern = () => {
     dispatchSelectDuel(0n)
-    router.push('/tavern')
+    router.push(makeTavernUrl(tableId))
   }
 
   const _switchSfx = () => {

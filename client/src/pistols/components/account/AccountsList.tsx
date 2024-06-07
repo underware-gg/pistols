@@ -3,15 +3,17 @@ import { useRouter } from 'next/navigation'
 import { Grid, Divider } from 'semantic-ui-react'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { usePistolsContext, initialState } from '@/pistols/hooks/PistolsContext'
+import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useBurner, useBurnerAccount, useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
+import { ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { LordsBalance } from '@/pistols/components/account/LordsBalance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { bigintToHex } from '@/lib/utils/types'
+import { makeTavernUrl } from '@/pistols/utils/pistols'
 import { BigNumberish } from 'starknet'
-import { ProfileName } from './ProfileDescription'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -72,11 +74,13 @@ function AccountItem({
     accountSetupOpener.open()
   }
 
+  const { tableId } = useSettingsContext()
   const _duel = (menuKey = initialState.menuKey) => {
     select(bigintToHex(address))
     dispatchSetMenu(menuKey)
-    router.push('/tavern')
+    router.push(makeTavernUrl(tableId))
   }
+
 
   return (
     <>

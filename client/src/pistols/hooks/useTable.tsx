@@ -1,6 +1,6 @@
 import { useComponentValue } from '@dojoengine/react'
-import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
+import { useRouterTable } from '@/pistols/hooks/useRouterListener'
 import { useERC20Balance } from '@/lib/utils/hooks/useERC20'
 import { bigintToEntity } from '@/lib/utils/types'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
@@ -19,12 +19,12 @@ export const useTable = (tableId: string) => {
     wagerMin: table?.wager_min ?? null,
     feeMin: table?.fee_min ?? null,
     feePct: table?.fee_pct ?? null,
-    isOpen: table?.is_open ?? false,
+    tableIsOpen: table?.is_open ?? false,
   }
 }
 
 export const useCurrentTable = () => {
-  const { tableId } = useSettingsContext()
+  const { tableId } = useRouterTable()
   return useTable(tableId);
 }
 

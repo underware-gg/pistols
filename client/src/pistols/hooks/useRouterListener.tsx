@@ -1,26 +1,48 @@
 import { useEffect, useMemo } from 'react'
 import { useRouter } from 'next/router'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
-import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext } from './PistolsContext'
 import { bigintToHex } from '@/lib/utils/types'
 
-type PistolsParams = {
-  duel?: string
-  duelist?: string
-  table?: string
-  debug?: string
+
+//
+// Get current table from route
+// (makes urls linkable)
+//
+export const useRouterTable = () => {
+  const router = useRouter()
+
+  const tableId = useMemo(() => {
+    if (router.isReady && router.query.main) {
+      const _page = router.query.main[0]
+      const _slugs = router.query.main.slice(1)
+      if (_page == 'tavern') {
+        return _slugs[0] ?? null
+      }
+    }
+    return undefined
+  }, [router.isReady, router.query])
+  // console.log(`ROUTE:`, router.isReady, tableId, router.query.main)
+
+  return {
+    tableId
+  }
 }
+
 
 //
 // read intitial url params and
 // (run once when page stards)
 //
+type PistolsParams = {
+  duel?: string
+  duelist?: string
+  debug?: string
+}
 export const useRouterStarter = () => {
-  const { tables } = useDojoConstants()
   const router = useRouter()
-  const { duel, duelist, table, debug }: PistolsParams = router.query
+  const { duel, duelist, debug }: PistolsParams = router.query
 
   const { dispatchSelectDuel, dispatchSelectDuelist } = usePistolsContext()
   const { dispatchSetting, SettingsActions } = useSettingsContext()
@@ -39,12 +61,6 @@ export const useRouterStarter = () => {
   }, [duelist])
 
   useEffectOnce(() => {
-    if (typeof table == 'string' && Object.values(tables).includes(table)) {
-      dispatchSetting(SettingsActions.TABLE_ID, table)
-    }
-  }, [table])
-
-  useEffectOnce(() => {
     if (typeof debug == 'string') {
       dispatchSetting(SettingsActions.DEBUG_MODE, parseInt(debug) != 0)
     }
@@ -61,12 +77,16 @@ export const useRouterListener = () => {
   const router = useRouter()
   const routerPath = useMemo(() => (router.asPath.split('?')[0]), [router.asPath])
 
-  const { tableId } = useSettingsContext()
-  const { duelId, duelistAddress } = usePistolsContext()
-
+  // keep settings updated with slug
+  const { tableId } = useRouterTable()
+  const { dispatchSetting, SettingsActions } = useSettingsContext()
   useEffect(() => {
-    _updateRoute({})
-  }, [routerPath, tableId])
+    if (tableId) {
+      dispatchSetting(SettingsActions.TABLE_ID, tableId)
+    }
+  }, [tableId])
+
+  const { duelId, duelistAddress } = usePistolsContext()
 
   useEffect(() => {
     _updateRoute(duelId ? { duel: bigintToHex(duelId) } : {})
@@ -77,9 +97,8 @@ export const useRouterListener = () => {
   }, [duelistAddress])
 
   const _updateRoute = (params: PistolsParams) => {
-    if (routerPath == '/tavern') {
+    if (routerPath.startsWith('/tavern/')) {
       const url = routerPath + '?' + new URLSearchParams({
-        table: tableId,
         ...params,
       })
       router.push(url, undefined, { shallow: true })

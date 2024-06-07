@@ -3,7 +3,7 @@ import { Grid, Modal, Form, Dropdown } from 'semantic-ui-react'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useDojoAccount, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
+import { useRouterTable } from '@/pistols/hooks/useRouterListener'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useTable, useTableBalance } from '@/pistols/hooks/useTable'
 import { usePact } from '@/pistols/hooks/usePact'
@@ -36,7 +36,7 @@ export default function NewChallengeModal() {
   const { profilePic: profilePicB } = useDuelist(duelistB)
   const { hasPact, pactDuelId } = usePact(duelistA, duelistB)
 
-  const { tableId } = useSettingsContext()
+  const { tableId } = useRouterTable()
   const { description: tableDescription } = useTable(tableId)
   const { balance: balanceA } = useTableBalance(tableId, duelistA)
   const { balance: balanceB } = useTableBalance(tableId, duelistA)
@@ -45,7 +45,7 @@ export default function NewChallengeModal() {
 
   const wagerValue = useMemo(() => (args?.wager_value ?? 0n), [args])
   const { fee } = useCalcFee(tableId, wagerValue)
-  const { canWager, wagerMin } = useTable(tableId)
+  const { canWager, wagerMin, tableIsOpen } = useTable(tableId)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -134,15 +134,18 @@ export default function NewChallengeModal() {
               <ActionButton fill label='Nevermind!' onClick={() => _close()} />
             </Col>
             <Col>
-              <BalanceRequiredButton
-                tableId={tableId}
-                wagerValue={wagerValue}
-                minWagerValue={wagerMin}
-                fee={fee}
-                disabled={!args || isSubmitting}
-                label='Submit Challenge!'
-                onClick={() => _create_challenge()}
-              />
+              {tableIsOpen &&
+                <BalanceRequiredButton
+                  tableId={tableId}
+                  wagerValue={wagerValue}
+                  minWagerValue={wagerMin}
+                  fee={fee}
+                  disabled={!args || isSubmitting}
+                  label='Submit Challenge!'
+                  onClick={() => _create_challenge()}
+                />
+              }
+              {!tableIsOpen && <ActionButton fill disabled negative label='Table is Closed!' onClick={() => { }} />}
             </Col>
           </Row>
         </Grid>
@@ -155,7 +158,7 @@ function NewChallengeForm({
   setArgs,
   canWager,
 }) {
-  const { tableId } = useSettingsContext()
+  const { tableId } = useRouterTable()
   const [message, setMessage] = useState('')
   const [days, setDays] = useState(7)
   const [hours, setHours] = useState(0)

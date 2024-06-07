@@ -1,28 +1,30 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/router'
 import { Grid, Modal, Dropdown } from 'semantic-ui-react'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 import { useActiveDuelists, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
+import { useRouterTable } from '@/pistols/hooks/useRouterListener'
+import { useERC20TokenName } from '@/lib/utils/hooks/useERC20'
+import { useTable } from '@/pistols/hooks/useTable'
 import { Opener } from '@/lib/ui/useOpener'
 import { Divider } from '@/lib/ui/Divider'
-import { ActionButton } from './ui/Buttons'
-import { useSettingsContext } from '../hooks/SettingsContext'
-import { useTable } from '../hooks/useTable'
-import { Balance } from './account/Balance'
-import { useERC20TokenName } from '@/lib/utils/hooks/useERC20'
+import { Balance } from '@/pistols/components/account/Balance'
+import { ActionButton } from '@/pistols/components/ui/Buttons'
+import { getKeyByValue } from '@/lib/utils/types'
+import { makeTavernUrl } from '@/pistols/utils/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column
-
 
 export default function TableModal({
   opener,
 }: {
   opener: Opener
 }) {
-  const { tableId } = useSettingsContext()
+  const { tableId } = useRouterTable()
   const [selectedTableId, setSelectedTableId] = useState('')
-  const { isOpen } = useTable(selectedTableId)
+  const { tableIsOpen } = useTable(selectedTableId)
 
   // always closed on mount
   const [mounted, setMounted] = useState(false)
@@ -31,15 +33,25 @@ export default function TableModal({
     opener.close()
   }, [])
 
+  // initialize
   useEffect(() => {
     if (opener.isOpen) {
       setSelectedTableId(tableId)
     }
   }, [opener.isOpen])
 
-  const { dispatchSetting, SettingsActions } = useSettingsContext()
+  const { tables } = useDojoConstants()
+  const unknownTable = useMemo(() => (tableId !== undefined && getKeyByValue(tables, tableId) === undefined), [tableId])
+  useEffect(() => {
+    if (unknownTable && !opener.isOpen) {
+      opener.open()
+    }
+  }, [unknownTable, opener.isOpen])
+  // console.log(unknownTable, tableId, selectedTableId)
+
+  const router = useRouter()
   const _joinTable = () => {
-    dispatchSetting(SettingsActions.TABLE_ID, selectedTableId)
+    router.push(makeTavernUrl(selectedTableId))
     opener.close()
   }
 
@@ -77,7 +89,10 @@ export default function TableModal({
               <ActionButton fill label='Close' onClick={() => opener.close()} />
             </Col>
             <Col>
-              <ActionButton fill important label='Join Table' disabled={!isOpen} onClick={() => _joinTable()} />
+              <ActionButton fill label='Leave Tavern' onClick={() => router.push(`/gate`)} />
+            </Col>
+            <Col>
+              <ActionButton fill important label='Join Table' disabled={!tableIsOpen || !selectedTableId} onClick={() => _joinTable()} />
             </Col>
           </Row>
         </Grid>
@@ -95,7 +110,7 @@ function TableDescription({
     wagerMin,
     feeMin,
     feePct,
-    isOpen,
+    tableIsOpen,
  } = useTable(tableId)
   const { tokenName, tokenSymbol } = useERC20TokenName(contractAddress)
   const { challengeIds: liveChallengeIds } = useLiveChallengeIds(tableId)
@@ -168,7 +183,7 @@ function TableDescription({
       <Row columns={'equal'} className='NoPadding H5' textAlign='center'>
         <Col>
           <Divider />
-          <h5>Table is {isOpen ? <span className='Important'>Open</span> : <span className='Negative'>Closed</span>}</h5>
+          <h5>Table is {tableIsOpen ? <span className='Important'>Open</span> : <span className='Negative'>Closed</span>}</h5>
         </Col>
       </Row>
 

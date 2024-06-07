@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Segment, Icon, Step, SegmentGroup } from 'semantic-ui-react'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
+import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '../hooks/ThreeJsContext'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
-import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
+import { useChallengeDescription } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useWager } from '@/pistols/hooks/useWager'
@@ -18,12 +19,11 @@ import { EmojiIcon, LoadingIcon } from '@/lib/ui/Icons'
 import { ActionEmojis, ActionTypes } from '../utils/pistols'
 import { Balance } from '@/pistols/components/account/Balance'
 import { EMOJI } from '@/pistols/data/messages'
+import { bigintEquals } from '@/lib/utils/types'
 import DuelInfoSwitcher from '@/pistols/components/DuelInfoSwitcher'
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import CommitBladesModal from '@/pistols/components/CommitBladesModal'
 import RevealModal from '@/pistols/components/RevealModal'
-import { bigintEquals } from '@/lib/utils/types'
-import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -53,7 +53,6 @@ export default function Duel({
   const { dispatchSelectDuel } = usePistolsContext()
 
   useEffect(() => dispatchSelectDuel(duelId), [duelId])
-  useEffect(() => dispatchSetting(SettingsActions.TABLE_ID, tableId), [tableId])
 
   return (
     <>
@@ -98,7 +97,7 @@ export default function Duel({
         />
       </div>
 
-      <MenuDuel duelStage={duelStage} duelId={duelId} />
+      <MenuDuel duelStage={duelStage} duelId={duelId} tableId={tableId} />
 
       <DuelInfoSwitcher />
 
