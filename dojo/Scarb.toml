@@ -1,19 +1,19 @@
 [tool.dojo.world]
 name = "Pistols at 10 Blocks"
 description = "An on-chain pistol duelling game of honour and betrayal."
-icon_uri = "https://pistols.lootunder.world/images/logo.png"
-cover_uri = "https://pistols.lootunder.world/images/splash.png"
-website = "https://pistols.lootunder.world"
+icon_uri = "https://pistols.underware.gg/images/logo.png"
+cover_uri = "https://pistols.underware.gg/images/splash.png"
+website = "https://pistols.underware.gg"
 
 [tool.dojo.world.socials]
-x = "https://x.com/lootunderworld"
-github = "https://github.com/funDAOmental/pistols"
+x = "https://x.com/underware_gg"
+github = "https://github.com/underware-gg/pistols"
 # discord = "https://discord.gg/FB2wR6uF"
 # telegram = "https://t.me/dojoengine"
 
 [package]
 name = "pistols"
-version = "0.8.2"
+version = "0.8.3"
 cairo-version = "2.6.3"
 
 [cairo]
@@ -59,8 +59,8 @@ lords_address = ""
 [profile.staging.tool.dojo.env]
 rpc_url = "https://api.cartridge.gg/x/pistols-staging/katana"
 world_address = "0x509c209fc7c9ad157b463a1b48d92a399239bce020392ab2a920e7f2af31bb5"
-account_address = "0x61702bc93bd47c05ee13b994394aafd51c8b707bbea6d37bf87decd14c5cf0"
-private_key = "0x6d9a55955a0af9cd592e4a19f40e5bcad8786fda11394be4c8671d7a6bedab"
+account_address = "0x7947c7d3e02e85da3ba8c93024b006ab7f10dc6b8fb3cb151569c996869edba"
+private_key = "0x329a6dea7e53dcd104ab13494a29c6ddb1e472afebddcbd3ae11f8fe76a9e53"
 lords_address = ""
 
 [profile.release.tool.dojo.env]
