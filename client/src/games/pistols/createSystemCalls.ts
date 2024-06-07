@@ -70,19 +70,18 @@ export function createSystemCalls(
     return success
   }
 
-  const _executeCall = async (params: DojoCall): Promise<any | null> => {
-    let results = null
+  const _executeCall = async <T extends Result>(params: DojoCall): Promise<T | null> => {
+    let results: Result = undefined
     try {
-      const response: Result = await call(params)
+      results = await call(params)
       // result = decodeComponent(contractComponents['Component'], response)
       // results = Array.isArray(response) ? response.map(v => BigInt(v)) : typeof response == 'boolean' ? response : BigInt(response)
-      results = response
       // console.log(`call ${system}(${args.length}) success:`, result)
     } catch (e) {
       console.warn(`call ${params.contractName}::${params.entrypoint}(${params.calldata.length}) exception:`, e)
     } finally {
     }
-    return results
+    return results as T
   }
 
   const register_duelist = async (signer: Account, name: string, profile_pic: number): Promise<boolean> => {
@@ -164,37 +163,40 @@ export function createSystemCalls(
 
   const get_pact = async (duelist_a: bigint, duelist_b: bigint): Promise<bigint | null> => {
     const args = [duelist_a, duelist_b]
-    const results = await _executeCall(actions_call('get_pact', args))
-    return results !== null ? results[0] : null
+    const results = await _executeCall<bigint>(actions_call('get_pact', args))
+    return results ?? null
   }
 
   const has_pact = async (duelist_a: bigint, duelist_b: bigint): Promise<boolean | null> => {
     const args = [duelist_a, duelist_b]
-    const results = await _executeCall(actions_call('has_pact', args))
-    return results !== null ? Boolean(results[0]) : null
+    const results = await _executeCall<boolean>(actions_call('has_pact', args))
+    return results ?? null
   }
 
   const calc_fee = async (table_id: string, wager_value: BigNumberish): Promise<bigint | null> => {
     const args = [stringToFelt(table_id), wager_value]
-    const results = await _executeCall(actions_call('calc_fee', args))
-    return results !== null ? results[0] : null
+    const results = await _executeCall<bigint>(actions_call('calc_fee', args))
+    return results ?? null
   }
 
   const simulate_chances = async (duelist: bigint, duel_id: bigint, round_number: number, action): Promise<any | null> => {
     const args = [duelist, duel_id, round_number, action]
-    const results = await _executeCall(actions_call('simulate_chances', args))
-    // console.log(`simulate_chances`, results)
+    const results = await _executeCall<any>(actions_call('simulate_chances', args))
+    console.log(`simulate_chances`, results)
     if (!results) return null
-    // convert to Numbers
+    // convert to u8 / i8
     return Object.keys(results).reduce((acc, k) => {
-      acc[k] = Number(results[k])
+      const value = results[k]
+      const isNegative = (value > 255) // safe because all values are either u8 or i8
+      acc[k] = isNegative ? -1 : Number(value)
+      // console.log(`simulate_chances [${k}]:`, acc[k], isNegative, bigintToHex(value))
       return acc
     }, {})
   }
 
   const get_valid_packed_actions = async (round_number: number): Promise<number[] | null> => {
     const args = [round_number]
-    const results = await _executeCall(actions_call('get_valid_packed_actions', args))
+    const results = await _executeCall<any>(actions_call('get_valid_packed_actions', args))
     return results !== null ? results.map(v => Number(v)) : null
   }
   // const pack_action_slots = async (slot1: number, slot2: number): Promise<number | null> => {

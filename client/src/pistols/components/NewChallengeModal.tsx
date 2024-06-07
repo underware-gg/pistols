@@ -244,7 +244,7 @@ function NewChallengeForm({
         </Form.Field>
 
         <Form.Field>
-          <span className='FormLabel'>&nbsp;wager (deposit now, winner takes all minus fee)</span>
+          <span className='FormLabel'>&nbsp;wager (deposit now, winner takes all, minus fee)</span>
           <input
             disabled={!canWager}
             placeholder={'$LORDS'}
