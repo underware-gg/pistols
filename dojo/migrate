@@ -1,10 +1,11 @@
 #!/bin/bash
 set -e
 
+# Profile
 if [ $# -ge 1 ]; then
-    export PROFILE=$1
+  export PROFILE=$1
 else
-    export PROFILE="dev"
+  export PROFILE="dev"
 fi
 
 #-----------------
@@ -15,7 +16,7 @@ export BINDINGS_PATH="./bindings/typescript"
 export GAME_SLUG="pistols"
 export CLIENT_PATH="../client/src/games/$GAME_SLUG/generated/$PROFILE"
 export PROJECT_NAME=$(toml get Scarb.toml --raw tool.dojo.world.name)
-export WORLD_ADDRESS=$(toml get Scarb.toml --raw tool.dojo.env.world_address)
+export WORLD_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.world_address)
 export RPC_URL=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.rpc_url)
 
 if [[

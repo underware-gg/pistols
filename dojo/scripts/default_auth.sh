@@ -2,6 +2,13 @@
 set -euo pipefail
 pushd $(dirname "$0")/..
 
+# Profile
+if [ $# -ge 1 ]; then
+  export PROFILE=$1
+else
+  export PROFILE="dev"
+fi
+
 if ! [ -x "$(command -v toml)" ]; then
   echo 'Error: toml not instlaled! Instal with: cargo install toml-cli'
   exit 1
@@ -11,15 +18,8 @@ if ! [ -x "$(command -v jq)" ]; then
   exit 1
 fi
 
-# Profile
-if [ $# -ge 1 ]; then
-    export PROFILE=$1
-else
-    export PROFILE="dev"
-fi
-
 export MANIFEST_FILE_PATH="./manifests/$PROFILE/manifest.json"
-export WORLD_ADDRESS=$(toml get Scarb.toml --raw tool.dojo.env.world_address)
+export WORLD_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.world_address)
 export ACCOUNT_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.account_address)
 export ADMIN_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.name == "pistols::systems::admin::admin" ).address')
 export ACTIONS_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.name == "pistols::systems::actions::actions" ).address')

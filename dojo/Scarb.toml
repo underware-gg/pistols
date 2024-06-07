@@ -40,22 +40,32 @@ build-external-contracts = [
 ]
 
 [tool.dojo.env]
-world_address = "0x509c209fc7c9ad157b463a1b48d92a399239bce020392ab2a920e7f2af31bb5"
+# world_address = ""
 
 [profile.dev.tool.dojo.env]
 rpc_url = "http://localhost:5050"
+world_address = "0x509c209fc7c9ad157b463a1b48d92a399239bce020392ab2a920e7f2af31bb5"
 account_address = "0xb3ff441a68610b30fd5e2abbf3a1548eb6ba6f3559f2862bf2dc757e5828ca"
 private_key = "0x2bbf4f9fd0bbb2e60b0316c1fe0b76cf7a4d0198bd493ced9b8df2a3a24d68a"
 lords_address = ""
 
 [profile.slot.tool.dojo.env]
-rpc_url = "https://api.cartridge.gg/x/pistols-slot/katana"
+rpc_url = "https://api.cartridge.gg/x/pistols/katana"
+world_address = "0x1234"
+account_address = "0x1234"
+private_key = "0x1234"
+lords_address = ""
+
+[profile.staging.tool.dojo.env]
+rpc_url = "https://api.cartridge.gg/x/pistols-staging/katana"
+world_address = "0x509c209fc7c9ad157b463a1b48d92a399239bce020392ab2a920e7f2af31bb5"
 account_address = "0x61702bc93bd47c05ee13b994394aafd51c8b707bbea6d37bf87decd14c5cf0"
-private_key = "0x25e53c73c1e13c4214ffb048609ac69fd4d9671b4061c0e813a07bc4fe33743"
+private_key = "0x6d9a55955a0af9cd592e4a19f40e5bcad8786fda11394be4c8671d7a6bedab"
 lords_address = ""
 
 [profile.release.tool.dojo.env]
 rpc_url = "https://api.cartridge.gg/x/realms/katana"
+world_address = "0x1234"
 account_address = ""
 private_key = ""
 lords_address = "0x51205c5e6ac3ad5691c28c0c5ffcdd62c70bddb63612f75a4bac9b2a85b9449"

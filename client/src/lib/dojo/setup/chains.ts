@@ -21,7 +21,8 @@ export enum ChainId {
   SN_MAINNET = 'SN_MAINNET',
   SN_SEPOLIA = 'SN_SEPOLIA',
   KATANA_LOCAL = 'KATANA_LOCAL',
-  PISTOLS_SLOT = 'WP_PISTOLS_SLOT',
+  PISTOLS_SLOT = 'WP_PISTOLS',
+  PISTOLS_STAGING = 'WP_PISTOLS_STAGING',
   REALMS_WORLD = 'KATANA', // actually DOJO_REALMS_WORLD
 }
 
@@ -121,11 +122,30 @@ const pistolsSlotConfig: DojoChainConfig = {
   chain: undefined, // derive from this
   chainId: ChainId.PISTOLS_SLOT,
   name: 'Slot Testnet',
-  rpcUrl: 'https://api.cartridge.gg/x/pistols-slot/katana',
-  toriiUrl: 'https://api.cartridge.gg/x/pistols-slot/torii',
+  rpcUrl: 'https://api.cartridge.gg/x/pistols/katana',
+  toriiUrl: 'https://api.cartridge.gg/x/pistols/torii',
+  relayUrl: undefined,
+  masterAddress: '0x0',
+  masterPrivateKey: '0x0',
+  accountClassHash: KATANA_CLASS_HASH,
+  lordsContractAddress: undefined, // lords_mock
+  lordsFaucetUrl: undefined,
+  predeployedAccounts: [],
+  connectorIds: [supportedConnetorIds.DOJO_PREDEPLOYED],
+  // starknet Chain
+  nativeCurrency: ETH_KATANA,
+  explorers: WORLD_EXPLORER,
+} as const
+
+const pistolsStagingConfig: DojoChainConfig = {
+  chain: undefined, // derive from this
+  chainId: ChainId.PISTOLS_STAGING,
+  name: 'Slot Staging',
+  rpcUrl: 'https://api.cartridge.gg/x/pistols-staging/katana',
+  toriiUrl: 'https://api.cartridge.gg/x/pistols-staging/torii',
   relayUrl: undefined,
   masterAddress: '0x61702bc93bd47c05ee13b994394aafd51c8b707bbea6d37bf87decd14c5cf0',
-  masterPrivateKey: '0x25e53c73c1e13c4214ffb048609ac69fd4d9671b4061c0e813a07bc4fe33743',
+  masterPrivateKey: '0x6d9a55955a0af9cd592e4a19f40e5bcad8786fda11394be4c8671d7a6bedab',
   accountClassHash: KATANA_CLASS_HASH,
   lordsContractAddress: undefined, // lords_mock
   lordsFaucetUrl: undefined,
@@ -197,6 +217,7 @@ const snSepoliaConfig: DojoChainConfig = {
 export const dojoContextConfig: Record<ChainId, DojoChainConfig> = {
   [ChainId.KATANA_LOCAL]: localKatanaConfig,
   [ChainId.PISTOLS_SLOT]: pistolsSlotConfig,
+  [ChainId.PISTOLS_STAGING]: pistolsStagingConfig,
   [ChainId.REALMS_WORLD]: realmsWorldConfig,
   [ChainId.SN_SEPOLIA]: snSepoliaConfig,
   [ChainId.SN_MAINNET]: snMainnetConfig,
