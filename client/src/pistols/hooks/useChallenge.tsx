@@ -20,6 +20,7 @@ export const useAllChallengeIds = () => {
   const challengeIds: bigint[] = useEntityKeys(Challenge, 'duel_id')
   return {
     challengeIds,
+    challengeCount: challengeIds.length,
   }
 }
 
@@ -91,6 +92,7 @@ export const useChallenge = (duelId: BigNumberish) => {
 
   return {
     challengeExists: (challenge != null),
+    duelId,
     state,
     duelistA,
     duelistB,
