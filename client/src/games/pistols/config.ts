@@ -12,10 +12,10 @@ export const makeDojoAppConfig = (): DojoAppConfig => {
   const mainSystemName = 'actions'
 
   const supportedChainIds: ChainId[] = [
-    ChainId.KATANA_LOCAL,
     ChainId.PISTOLS_SLOT,
-    ChainId.PISTOLS_STAGING,
+    // ChainId.PISTOLS_STAGING,
     ChainId.SN_SEPOLIA,
+    ChainId.KATANA_LOCAL,
     // ChainId.SN_MAINNET,
     // ChainId.REALMS_WORLD,
   ]
