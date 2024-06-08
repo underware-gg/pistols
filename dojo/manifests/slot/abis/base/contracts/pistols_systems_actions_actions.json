@@ -194,11 +194,15 @@
   },
   {
     "type": "struct",
-    "name": "pistols::models::models::Chances",
+    "name": "pistols::models::structs::SimulateChances",
     "members": [
       {
-        "name": "key",
-        "type": "core::felt252"
+        "name": "action_honour",
+        "type": "core::integer::i8"
+      },
+      {
+        "name": "duelist_honour",
+        "type": "core::integer::u8"
       },
       {
         "name": "crit_chances",
@@ -412,26 +416,6 @@
       },
       {
         "type": "function",
-        "name": "simulate_honour_for_action",
-        "inputs": [
-          {
-            "name": "duelist_address",
-            "type": "core::starknet::contract_address::ContractAddress"
-          },
-          {
-            "name": "action",
-            "type": "core::integer::u8"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "(core::integer::i8, core::integer::u8)"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
         "name": "simulate_chances",
         "inputs": [
           {
@@ -453,7 +437,7 @@
         ],
         "outputs": [
           {
-            "type": "pistols::models::models::Chances"
+            "type": "pistols::models::structs::SimulateChances"
           }
         ],
         "state_mutability": "view"
@@ -508,6 +492,24 @@
             "type": "(core::integer::u8, core::integer::u8)"
           }
         ],
+        "state_mutability": "view"
+      }
+    ]
+  },
+  {
+    "type": "impl",
+    "name": "IDojoInitImpl",
+    "interface_name": "pistols::systems::actions::actions::IDojoInit"
+  },
+  {
+    "type": "interface",
+    "name": "pistols::systems::actions::actions::IDojoInit",
+    "items": [
+      {
+        "type": "function",
+        "name": "dojo_init",
+        "inputs": [],
+        "outputs": [],
         "state_mutability": "view"
       }
     ]

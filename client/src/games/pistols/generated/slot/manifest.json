@@ -1,8 +1,8 @@
 {
   "world": {
     "kind": "WorldContract",
-    "class_hash": "0x301ba8a1a13cec9291b049dea531f73a600e0812908cefa26d17214da411e9c",
-    "original_class_hash": "0x301ba8a1a13cec9291b049dea531f73a600e0812908cefa26d17214da411e9c",
+    "class_hash": "0xf6f44afb3cacbcc01a371aff62c86ca9a45feba065424c99f7cd8637514d8f",
+    "original_class_hash": "0xf6f44afb3cacbcc01a371aff62c86ca9a45feba065424c99f7cd8637514d8f",
     "abi": [
       {
         "type": "impl",
@@ -11,11 +11,19 @@
       },
       {
         "type": "struct",
-        "name": "core::array::Span::<core::felt252>",
+        "name": "core::byte_array::ByteArray",
         "members": [
           {
-            "name": "snapshot",
-            "type": "@core::array::Array::<core::felt252>"
+            "name": "data",
+            "type": "core::array::Array::<core::bytes_31::bytes31>"
+          },
+          {
+            "name": "pending_word",
+            "type": "core::felt252"
+          },
+          {
+            "name": "pending_word_len",
+            "type": "core::integer::u32"
           }
         ]
       },
@@ -29,7 +37,17 @@
           },
           {
             "name": "metadata_uri",
-            "type": "core::array::Span::<core::felt252>"
+            "type": "core::byte_array::ByteArray"
+          }
+        ]
+      },
+      {
+        "type": "struct",
+        "name": "core::array::Span::<core::felt252>",
+        "members": [
+          {
+            "name": "snapshot",
+            "type": "@core::array::Array::<core::felt252>"
           }
         ]
       },
@@ -40,6 +58,70 @@
           {
             "name": "snapshot",
             "type": "@core::array::Array::<core::integer::u8>"
+          }
+        ]
+      },
+      {
+        "type": "struct",
+        "name": "dojo::database::introspect::FieldLayout",
+        "members": [
+          {
+            "name": "selector",
+            "type": "core::felt252"
+          },
+          {
+            "name": "layout",
+            "type": "dojo::database::introspect::Layout"
+          }
+        ]
+      },
+      {
+        "type": "struct",
+        "name": "core::array::Span::<dojo::database::introspect::FieldLayout>",
+        "members": [
+          {
+            "name": "snapshot",
+            "type": "@core::array::Array::<dojo::database::introspect::FieldLayout>"
+          }
+        ]
+      },
+      {
+        "type": "struct",
+        "name": "core::array::Span::<dojo::database::introspect::Layout>",
+        "members": [
+          {
+            "name": "snapshot",
+            "type": "@core::array::Array::<dojo::database::introspect::Layout>"
+          }
+        ]
+      },
+      {
+        "type": "enum",
+        "name": "dojo::database::introspect::Layout",
+        "variants": [
+          {
+            "name": "Fixed",
+            "type": "core::array::Span::<core::integer::u8>"
+          },
+          {
+            "name": "Struct",
+            "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
+          },
+          {
+            "name": "Tuple",
+            "type": "core::array::Span::<dojo::database::introspect::Layout>"
+          },
+          {
+            "name": "Array",
+            "type": "core::array::Span::<dojo::database::introspect::Layout>"
+          },
+          {
+            "name": "ByteArray",
+            "type": "()"
+          },
+          {
+            "name": "Enum",
+            "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
           }
         ]
       },
@@ -94,7 +176,7 @@
             "name": "model",
             "inputs": [
               {
-                "name": "name",
+                "name": "selector",
                 "type": "core::felt252"
               }
             ],
@@ -128,6 +210,10 @@
               {
                 "name": "class_hash",
                 "type": "core::starknet::class_hash::ClassHash"
+              },
+              {
+                "name": "init_calldata",
+                "type": "core::array::Span::<core::felt252>"
               }
             ],
             "outputs": [
@@ -198,7 +284,7 @@
               },
               {
                 "name": "layout",
-                "type": "core::array::Span::<core::integer::u8>"
+                "type": "dojo::database::introspect::Layout"
               }
             ],
             "outputs": [
@@ -226,22 +312,11 @@
               },
               {
                 "name": "layout",
-                "type": "core::array::Span::<core::integer::u8>"
+                "type": "dojo::database::introspect::Layout"
               }
             ],
             "outputs": [],
             "state_mutability": "external"
-          },
-          {
-            "type": "function",
-            "name": "base",
-            "inputs": [],
-            "outputs": [
-              {
-                "type": "core::starknet::class_hash::ClassHash"
-              }
-            ],
-            "state_mutability": "view"
           },
           {
             "type": "function",
@@ -257,11 +332,22 @@
               },
               {
                 "name": "layout",
-                "type": "core::array::Span::<core::integer::u8>"
+                "type": "dojo::database::introspect::Layout"
               }
             ],
             "outputs": [],
             "state_mutability": "external"
+          },
+          {
+            "type": "function",
+            "name": "base",
+            "inputs": [],
+            "outputs": [
+              {
+                "type": "core::starknet::class_hash::ClassHash"
+              }
+            ],
+            "state_mutability": "view"
           },
           {
             "type": "function",
@@ -324,7 +410,7 @@
                 "type": "core::felt252"
               },
               {
-                "name": "system",
+                "name": "contract",
                 "type": "core::starknet::contract_address::ContractAddress"
               }
             ],
@@ -344,7 +430,7 @@
                 "type": "core::felt252"
               },
               {
-                "name": "system",
+                "name": "contract",
                 "type": "core::starknet::contract_address::ContractAddress"
               }
             ],
@@ -360,7 +446,7 @@
                 "type": "core::felt252"
               },
               {
-                "name": "system",
+                "name": "contract",
                 "type": "core::starknet::contract_address::ContractAddress"
               }
             ],
@@ -628,7 +714,7 @@
           },
           {
             "name": "uri",
-            "type": "core::array::Span::<core::felt252>",
+            "type": "core::byte_array::ByteArray",
             "kind": "data"
           }
         ]
@@ -640,7 +726,7 @@
         "members": [
           {
             "name": "name",
-            "type": "core::felt252",
+            "type": "core::byte_array::ByteArray",
             "kind": "data"
           },
           {
@@ -715,7 +801,7 @@
             "kind": "data"
           },
           {
-            "name": "system",
+            "name": "contract",
             "type": "core::starknet::contract_address::ContractAddress",
             "kind": "data"
           },
@@ -869,13 +955,13 @@
         ]
       }
     ],
-    "address": "0x5ceff437958efcf79a58f82c42cf7cc9dc268c7d13b61fef2ba89d17f5390df",
-    "transaction_hash": "0x1ac375ab64cb25d741267b9fbccaafbc6092ce5f23889276446d89644b6ddb8",
+    "address": "0x509c209fc7c9ad157b463a1b48d92a399239bce020392ab2a920e7f2af31bb5",
+    "transaction_hash": "0x3d75e20c91f9c47d33f9098a7ea3b937479be9a7950ba3ca2cd27fbc41797c2",
     "block_number": 3,
     "seed": "pistols",
     "metadata": {
       "profile_name": "slot",
-      "rpc_url": "https://api.cartridge.gg/x/pistols-slot/katana"
+      "rpc_url": "https://api.cartridge.gg/x/pistols/katana"
     },
     "name": "dojo::world::world"
   },
@@ -889,9 +975,9 @@
   "contracts": [
     {
       "kind": "DojoContract",
-      "address": "0x27e1b946e704895b29301e044fb6ffa956fb82074a092fadebfd8af2221c2f1",
-      "class_hash": "0x4c823099f2864338081f58de3c86a0f1dcdd7b3cc5edc9da2e4c335582224d8",
-      "original_class_hash": "0x4c823099f2864338081f58de3c86a0f1dcdd7b3cc5edc9da2e4c335582224d8",
+      "address": "0xde77c78f35b39f081eca10228d65e4e5cbc827ed6f1db30539e90e7420900c",
+      "class_hash": "0x6e080db0d09addf181b02489323d3145e03397169492b3ac3e0856e19c46929",
+      "original_class_hash": "0x6e080db0d09addf181b02489323d3145e03397169492b3ac3e0856e19c46929",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -1006,6 +1092,24 @@
               "inputs": [],
               "outputs": [],
               "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "IDojoInitImpl",
+          "interface_name": "pistols::mocks::lords_mock::lords_mock::IDojoInit"
+        },
+        {
+          "type": "interface",
+          "name": "pistols::mocks::lords_mock::lords_mock::IDojoInit",
+          "items": [
+            {
+              "type": "function",
+              "name": "dojo_init",
+              "inputs": [],
+              "outputs": [],
+              "state_mutability": "view"
             }
           ]
         },
@@ -1469,13 +1573,14 @@
       "reads": [],
       "writes": [],
       "computed": [],
+      "init_calldata": [],
       "name": "pistols::mocks::lords_mock::lords_mock"
     },
     {
       "kind": "DojoContract",
-      "address": "0x6dda46ca9b7cee1b06a77890a71f0221f332f01f6f05ebd0894feb9a76b7752",
-      "class_hash": "0x4266a471d3adcf14ff8e4a5d1ede0f256c4d9c67e904c0b47936bed2728d9b8",
-      "original_class_hash": "0x4266a471d3adcf14ff8e4a5d1ede0f256c4d9c67e904c0b47936bed2728d9b8",
+      "address": "0x34bbde433b8d8cb45ce22d801f4d65a5dcb77b0ef8396d0b5cdc20fc71a1c73",
+      "class_hash": "0x4cc88b2ecd48c3498c4efbcc0922d280fe0241830dd07c8543a16cd64582e37",
+      "original_class_hash": "0x4cc88b2ecd48c3498c4efbcc0922d280fe0241830dd07c8543a16cd64582e37",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -1673,11 +1778,15 @@
         },
         {
           "type": "struct",
-          "name": "pistols::models::models::Chances",
+          "name": "pistols::models::structs::SimulateChances",
           "members": [
             {
-              "name": "key",
-              "type": "core::felt252"
+              "name": "action_honour",
+              "type": "core::integer::i8"
+            },
+            {
+              "name": "duelist_honour",
+              "type": "core::integer::u8"
             },
             {
               "name": "crit_chances",
@@ -1891,26 +2000,6 @@
             },
             {
               "type": "function",
-              "name": "simulate_honour_for_action",
-              "inputs": [
-                {
-                  "name": "duelist_address",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "action",
-                  "type": "core::integer::u8"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "(core::integer::i8, core::integer::u8)"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
               "name": "simulate_chances",
               "inputs": [
                 {
@@ -1932,7 +2021,7 @@
               ],
               "outputs": [
                 {
-                  "type": "pistols::models::models::Chances"
+                  "type": "pistols::models::structs::SimulateChances"
                 }
               ],
               "state_mutability": "view"
@@ -1987,6 +2076,24 @@
                   "type": "(core::integer::u8, core::integer::u8)"
                 }
               ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "IDojoInitImpl",
+          "interface_name": "pistols::systems::actions::actions::IDojoInit"
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::actions::actions::IDojoInit",
+          "items": [
+            {
+              "type": "function",
+              "name": "dojo_init",
+              "inputs": [],
+              "outputs": [],
               "state_mutability": "view"
             }
           ]
@@ -2194,13 +2301,14 @@
       "reads": [],
       "writes": [],
       "computed": [],
+      "init_calldata": [],
       "name": "pistols::systems::actions::actions"
     },
     {
       "kind": "DojoContract",
-      "address": "0x772fa6174987748d59cb7d9acfa7bb4f6c647c068cddb6a309e102c00c90c5d",
-      "class_hash": "0x3b5708d3bdd1355fe7431d6952dc2b8236666baa9dff6d9cd8e087490ed6e1e",
-      "original_class_hash": "0x3b5708d3bdd1355fe7431d6952dc2b8236666baa9dff6d9cd8e087490ed6e1e",
+      "address": "0x225f690595a067273bdf36583ea9dd91ae2f2fbc78ee2f7480dfcf6b75ba01a",
+      "class_hash": "0x2a79c09b10d04b4cda61e82f4f5d14bd49ea81b360455aee46cf3d6d9e8681e",
+      "original_class_hash": "0x2a79c09b10d04b4cda61e82f4f5d14bd49ea81b360455aee46cf3d6d9e8681e",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -2500,6 +2608,24 @@
         },
         {
           "type": "impl",
+          "name": "IDojoInitImpl",
+          "interface_name": "pistols::systems::admin::admin::IDojoInit"
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::admin::admin::IDojoInit",
+          "items": [
+            {
+              "type": "function",
+              "name": "dojo_init",
+              "inputs": [],
+              "outputs": [],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
           "name": "UpgradableImpl",
           "interface_name": "dojo::components::upgradeable::IUpgradeable"
         },
@@ -2561,6 +2687,7 @@
       "reads": [],
       "writes": [],
       "computed": [],
+      "init_calldata": [],
       "name": "pistols::systems::admin::admin"
     }
   ],
@@ -2594,13 +2721,45 @@
           "key": false
         }
       ],
-      "class_hash": "0x45ed73bfdec60f65c8d2d7ebd28df55814db6387ac61b7f7359b1493ac3a819",
-      "original_class_hash": "0x45ed73bfdec60f65c8d2d7ebd28df55814db6387ac61b7f7359b1493ac3a819",
+      "class_hash": "0x7c7d28127e68b07de6d798667641b044ed54745a18943aa8fa5d9c0b7883781",
+      "original_class_hash": "0x7c7d28127e68b07de6d798667641b044ed54745a18943aa8fa5d9c0b7883781",
       "abi": [
         {
           "type": "impl",
           "name": "DojoModelImpl",
-          "interface_name": "dojo::model::IDojoModel"
+          "interface_name": "dojo::model::IModel"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::option::Option::<core::integer::u32>",
+          "variants": [
+            {
+              "name": "Some",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "None",
+              "type": "()"
+            }
+          ]
         },
         {
           "type": "struct",
@@ -2609,6 +2768,70 @@
             {
               "name": "snapshot",
               "type": "@core::array::Array::<core::integer::u8>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::FieldLayout",
+          "members": [
+            {
+              "name": "selector",
+              "type": "core::felt252"
+            },
+            {
+              "name": "layout",
+              "type": "dojo::database::introspect::Layout"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::FieldLayout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::FieldLayout>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Layout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Layout>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "dojo::database::introspect::Layout",
+          "variants": [
+            {
+              "name": "Fixed",
+              "type": "core::array::Span::<core::integer::u8>"
+            },
+            {
+              "name": "Struct",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
+            },
+            {
+              "name": "Tuple",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "Array",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
+            },
+            {
+              "name": "Enum",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
             }
           ]
         },
@@ -2624,11 +2847,29 @@
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<core::array::Span::<core::felt252>>",
+          "name": "dojo::database::introspect::Member",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "ty",
+              "type": "dojo::database::introspect::Ty"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Member>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
+              "type": "@core::array::Array::<dojo::database::introspect::Member>"
             }
           ]
         },
@@ -2646,17 +2887,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Member>"
             }
           ]
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>",
+          "name": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "@core::array::Array::<(core::felt252, dojo::database::introspect::Ty)>"
             }
           ]
         },
@@ -2674,7 +2915,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Ty>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Ty>"
             }
           ]
         },
@@ -2696,21 +2947,25 @@
             },
             {
               "name": "Tuple",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
             },
             {
               "name": "Array",
-              "type": "core::integer::u32"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
             }
           ]
         },
         {
           "type": "interface",
-          "name": "dojo::model::IDojoModel",
+          "name": "dojo::model::IModel",
           "items": [
             {
               "type": "function",
-              "name": "name",
+              "name": "selector",
               "inputs": [],
               "outputs": [
                 {
@@ -2721,11 +2976,33 @@
             },
             {
               "type": "function",
+              "name": "name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "version",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u8"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
               "name": "unpacked_size",
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -2736,7 +3013,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -2747,7 +3024,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::array::Span::<core::integer::u8>"
+                  "type": "dojo::database::introspect::Layout"
                 }
               ],
               "state_mutability": "view"
@@ -2891,13 +3168,45 @@
           "key": false
         }
       ],
-      "class_hash": "0x774a94012a2c4d100777c8cdb3dee4550f9431ceb9d71b31bbbc3c3d1e75399",
-      "original_class_hash": "0x774a94012a2c4d100777c8cdb3dee4550f9431ceb9d71b31bbbc3c3d1e75399",
+      "class_hash": "0x10134fdb3931edf88cb49604a0d0292a9983b3d680179fec23864058beffcfb",
+      "original_class_hash": "0x10134fdb3931edf88cb49604a0d0292a9983b3d680179fec23864058beffcfb",
       "abi": [
         {
           "type": "impl",
           "name": "DojoModelImpl",
-          "interface_name": "dojo::model::IDojoModel"
+          "interface_name": "dojo::model::IModel"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::option::Option::<core::integer::u32>",
+          "variants": [
+            {
+              "name": "Some",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "None",
+              "type": "()"
+            }
+          ]
         },
         {
           "type": "struct",
@@ -2906,6 +3215,70 @@
             {
               "name": "snapshot",
               "type": "@core::array::Array::<core::integer::u8>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::FieldLayout",
+          "members": [
+            {
+              "name": "selector",
+              "type": "core::felt252"
+            },
+            {
+              "name": "layout",
+              "type": "dojo::database::introspect::Layout"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::FieldLayout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::FieldLayout>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Layout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Layout>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "dojo::database::introspect::Layout",
+          "variants": [
+            {
+              "name": "Fixed",
+              "type": "core::array::Span::<core::integer::u8>"
+            },
+            {
+              "name": "Struct",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
+            },
+            {
+              "name": "Tuple",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "Array",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
+            },
+            {
+              "name": "Enum",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
             }
           ]
         },
@@ -2921,11 +3294,29 @@
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<core::array::Span::<core::felt252>>",
+          "name": "dojo::database::introspect::Member",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "ty",
+              "type": "dojo::database::introspect::Ty"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Member>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
+              "type": "@core::array::Array::<dojo::database::introspect::Member>"
             }
           ]
         },
@@ -2943,17 +3334,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Member>"
             }
           ]
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>",
+          "name": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "@core::array::Array::<(core::felt252, dojo::database::introspect::Ty)>"
             }
           ]
         },
@@ -2971,7 +3362,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Ty>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Ty>"
             }
           ]
         },
@@ -2993,21 +3394,25 @@
             },
             {
               "name": "Tuple",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
             },
             {
               "name": "Array",
-              "type": "core::integer::u32"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
             }
           ]
         },
         {
           "type": "interface",
-          "name": "dojo::model::IDojoModel",
+          "name": "dojo::model::IModel",
           "items": [
             {
               "type": "function",
-              "name": "name",
+              "name": "selector",
               "inputs": [],
               "outputs": [
                 {
@@ -3018,11 +3423,33 @@
             },
             {
               "type": "function",
+              "name": "name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "version",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u8"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
               "name": "unpacked_size",
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -3033,7 +3460,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -3044,7 +3471,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::array::Span::<core::integer::u8>"
+                  "type": "dojo::database::introspect::Layout"
                 }
               ],
               "state_mutability": "view"
@@ -3144,282 +3571,6 @@
       "kind": "DojoModel",
       "members": [
         {
-          "name": "key",
-          "type": "felt252",
-          "key": true
-        },
-        {
-          "name": "crit_chances",
-          "type": "u8",
-          "key": false
-        },
-        {
-          "name": "crit_bonus",
-          "type": "u8",
-          "key": false
-        },
-        {
-          "name": "hit_chances",
-          "type": "u8",
-          "key": false
-        },
-        {
-          "name": "hit_bonus",
-          "type": "u8",
-          "key": false
-        },
-        {
-          "name": "lethal_chances",
-          "type": "u8",
-          "key": false
-        },
-        {
-          "name": "lethal_bonus",
-          "type": "u8",
-          "key": false
-        }
-      ],
-      "class_hash": "0x33d2265485a3f0d4526c4301252df10ceff481c92664fe3f261ea69e3b31b60",
-      "original_class_hash": "0x33d2265485a3f0d4526c4301252df10ceff481c92664fe3f261ea69e3b31b60",
-      "abi": [
-        {
-          "type": "impl",
-          "name": "DojoModelImpl",
-          "interface_name": "dojo::model::IDojoModel"
-        },
-        {
-          "type": "struct",
-          "name": "core::array::Span::<core::integer::u8>",
-          "members": [
-            {
-              "name": "snapshot",
-              "type": "@core::array::Array::<core::integer::u8>"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "core::array::Span::<core::felt252>",
-          "members": [
-            {
-              "name": "snapshot",
-              "type": "@core::array::Array::<core::felt252>"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "core::array::Span::<core::array::Span::<core::felt252>>",
-          "members": [
-            {
-              "name": "snapshot",
-              "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "dojo::database::introspect::Struct",
-          "members": [
-            {
-              "name": "name",
-              "type": "core::felt252"
-            },
-            {
-              "name": "attrs",
-              "type": "core::array::Span::<core::felt252>"
-            },
-            {
-              "name": "children",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>",
-          "members": [
-            {
-              "name": "snapshot",
-              "type": "@core::array::Array::<(core::felt252, core::array::Span::<core::felt252>)>"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "dojo::database::introspect::Enum",
-          "members": [
-            {
-              "name": "name",
-              "type": "core::felt252"
-            },
-            {
-              "name": "attrs",
-              "type": "core::array::Span::<core::felt252>"
-            },
-            {
-              "name": "children",
-              "type": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>"
-            }
-          ]
-        },
-        {
-          "type": "enum",
-          "name": "dojo::database::introspect::Ty",
-          "variants": [
-            {
-              "name": "Primitive",
-              "type": "core::felt252"
-            },
-            {
-              "name": "Struct",
-              "type": "dojo::database::introspect::Struct"
-            },
-            {
-              "name": "Enum",
-              "type": "dojo::database::introspect::Enum"
-            },
-            {
-              "name": "Tuple",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
-            },
-            {
-              "name": "Array",
-              "type": "core::integer::u32"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "dojo::model::IDojoModel",
-          "items": [
-            {
-              "type": "function",
-              "name": "name",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::felt252"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "unpacked_size",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::integer::u32"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "packed_size",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::integer::u32"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "layout",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::array::Span::<core::integer::u8>"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "schema",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "dojo::database::introspect::Ty"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "chancesImpl",
-          "interface_name": "pistols::models::models::Ichances"
-        },
-        {
-          "type": "struct",
-          "name": "pistols::models::models::Chances",
-          "members": [
-            {
-              "name": "key",
-              "type": "core::felt252"
-            },
-            {
-              "name": "crit_chances",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "crit_bonus",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "hit_chances",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "hit_bonus",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "lethal_chances",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "lethal_bonus",
-              "type": "core::integer::u8"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "pistols::models::models::Ichances",
-          "items": [
-            {
-              "type": "function",
-              "name": "ensure_abi",
-              "inputs": [
-                {
-                  "name": "model",
-                  "type": "pistols::models::models::Chances"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "pistols::models::models::chances::Event",
-          "kind": "enum",
-          "variants": []
-        }
-      ],
-      "name": "pistols::models::models::chances"
-    },
-    {
-      "kind": "DojoModel",
-      "members": [
-        {
           "name": "address",
           "type": "ContractAddress",
           "key": true
@@ -3445,13 +3596,45 @@
           "key": false
         }
       ],
-      "class_hash": "0x2932ab31209ea10efe20e131e751edb29a26d24363a4c06e10a43846d88a21c",
-      "original_class_hash": "0x2932ab31209ea10efe20e131e751edb29a26d24363a4c06e10a43846d88a21c",
+      "class_hash": "0x697c394b9f03f9dfb52b72f313966b5ec04bae949fb83f5e1781bd51b358a8d",
+      "original_class_hash": "0x697c394b9f03f9dfb52b72f313966b5ec04bae949fb83f5e1781bd51b358a8d",
       "abi": [
         {
           "type": "impl",
           "name": "DojoModelImpl",
-          "interface_name": "dojo::model::IDojoModel"
+          "interface_name": "dojo::model::IModel"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::option::Option::<core::integer::u32>",
+          "variants": [
+            {
+              "name": "Some",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "None",
+              "type": "()"
+            }
+          ]
         },
         {
           "type": "struct",
@@ -3460,6 +3643,70 @@
             {
               "name": "snapshot",
               "type": "@core::array::Array::<core::integer::u8>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::FieldLayout",
+          "members": [
+            {
+              "name": "selector",
+              "type": "core::felt252"
+            },
+            {
+              "name": "layout",
+              "type": "dojo::database::introspect::Layout"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::FieldLayout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::FieldLayout>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Layout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Layout>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "dojo::database::introspect::Layout",
+          "variants": [
+            {
+              "name": "Fixed",
+              "type": "core::array::Span::<core::integer::u8>"
+            },
+            {
+              "name": "Struct",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
+            },
+            {
+              "name": "Tuple",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "Array",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
+            },
+            {
+              "name": "Enum",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
             }
           ]
         },
@@ -3475,11 +3722,29 @@
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<core::array::Span::<core::felt252>>",
+          "name": "dojo::database::introspect::Member",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "ty",
+              "type": "dojo::database::introspect::Ty"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Member>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
+              "type": "@core::array::Array::<dojo::database::introspect::Member>"
             }
           ]
         },
@@ -3497,17 +3762,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Member>"
             }
           ]
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>",
+          "name": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "@core::array::Array::<(core::felt252, dojo::database::introspect::Ty)>"
             }
           ]
         },
@@ -3525,7 +3790,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Ty>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Ty>"
             }
           ]
         },
@@ -3547,21 +3822,25 @@
             },
             {
               "name": "Tuple",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
             },
             {
               "name": "Array",
-              "type": "core::integer::u32"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
             }
           ]
         },
         {
           "type": "interface",
-          "name": "dojo::model::IDojoModel",
+          "name": "dojo::model::IModel",
           "items": [
             {
               "type": "function",
-              "name": "name",
+              "name": "selector",
               "inputs": [],
               "outputs": [
                 {
@@ -3572,11 +3851,33 @@
             },
             {
               "type": "function",
+              "name": "name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "version",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u8"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
               "name": "unpacked_size",
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -3587,7 +3888,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -3598,7 +3899,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::array::Span::<core::integer::u8>"
+                  "type": "dojo::database::introspect::Layout"
                 }
               ],
               "state_mutability": "view"
@@ -3730,13 +4031,45 @@
           "key": false
         }
       ],
-      "class_hash": "0x6930ab524bcd759ec513287058c4546916ece5fcd10cda1dd075bfb628bd876",
-      "original_class_hash": "0x6930ab524bcd759ec513287058c4546916ece5fcd10cda1dd075bfb628bd876",
+      "class_hash": "0x41b9f5d9320da8200fa32123dc2388e490cfb628d4469d4d63a3dad628dc06f",
+      "original_class_hash": "0x41b9f5d9320da8200fa32123dc2388e490cfb628d4469d4d63a3dad628dc06f",
       "abi": [
         {
           "type": "impl",
           "name": "DojoModelImpl",
-          "interface_name": "dojo::model::IDojoModel"
+          "interface_name": "dojo::model::IModel"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::option::Option::<core::integer::u32>",
+          "variants": [
+            {
+              "name": "Some",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "None",
+              "type": "()"
+            }
+          ]
         },
         {
           "type": "struct",
@@ -3745,6 +4078,70 @@
             {
               "name": "snapshot",
               "type": "@core::array::Array::<core::integer::u8>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::FieldLayout",
+          "members": [
+            {
+              "name": "selector",
+              "type": "core::felt252"
+            },
+            {
+              "name": "layout",
+              "type": "dojo::database::introspect::Layout"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::FieldLayout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::FieldLayout>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Layout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Layout>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "dojo::database::introspect::Layout",
+          "variants": [
+            {
+              "name": "Fixed",
+              "type": "core::array::Span::<core::integer::u8>"
+            },
+            {
+              "name": "Struct",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
+            },
+            {
+              "name": "Tuple",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "Array",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
+            },
+            {
+              "name": "Enum",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
             }
           ]
         },
@@ -3760,11 +4157,29 @@
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<core::array::Span::<core::felt252>>",
+          "name": "dojo::database::introspect::Member",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "ty",
+              "type": "dojo::database::introspect::Ty"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Member>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
+              "type": "@core::array::Array::<dojo::database::introspect::Member>"
             }
           ]
         },
@@ -3782,17 +4197,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Member>"
             }
           ]
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>",
+          "name": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "@core::array::Array::<(core::felt252, dojo::database::introspect::Ty)>"
             }
           ]
         },
@@ -3810,7 +4225,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Ty>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Ty>"
             }
           ]
         },
@@ -3832,21 +4257,25 @@
             },
             {
               "name": "Tuple",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
             },
             {
               "name": "Array",
-              "type": "core::integer::u32"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
             }
           ]
         },
         {
           "type": "interface",
-          "name": "dojo::model::IDojoModel",
+          "name": "dojo::model::IModel",
           "items": [
             {
               "type": "function",
-              "name": "name",
+              "name": "selector",
               "inputs": [],
               "outputs": [
                 {
@@ -3857,11 +4286,33 @@
             },
             {
               "type": "function",
+              "name": "name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "version",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u8"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
               "name": "unpacked_size",
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -3872,7 +4323,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -3883,7 +4334,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::array::Span::<core::integer::u8>"
+                  "type": "dojo::database::introspect::Layout"
                 }
               ],
               "state_mutability": "view"
@@ -3976,13 +4427,45 @@
           "key": false
         }
       ],
-      "class_hash": "0x666124090af485e3f5de024809c6174930e7b910abfadb5fed2ae6c479b5577",
-      "original_class_hash": "0x666124090af485e3f5de024809c6174930e7b910abfadb5fed2ae6c479b5577",
+      "class_hash": "0x7c19533a2d1c38c6827023613ef7b83830ab894b2ba296378a06137ff9705d9",
+      "original_class_hash": "0x7c19533a2d1c38c6827023613ef7b83830ab894b2ba296378a06137ff9705d9",
       "abi": [
         {
           "type": "impl",
           "name": "DojoModelImpl",
-          "interface_name": "dojo::model::IDojoModel"
+          "interface_name": "dojo::model::IModel"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::option::Option::<core::integer::u32>",
+          "variants": [
+            {
+              "name": "Some",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "None",
+              "type": "()"
+            }
+          ]
         },
         {
           "type": "struct",
@@ -3991,6 +4474,70 @@
             {
               "name": "snapshot",
               "type": "@core::array::Array::<core::integer::u8>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::FieldLayout",
+          "members": [
+            {
+              "name": "selector",
+              "type": "core::felt252"
+            },
+            {
+              "name": "layout",
+              "type": "dojo::database::introspect::Layout"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::FieldLayout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::FieldLayout>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Layout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Layout>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "dojo::database::introspect::Layout",
+          "variants": [
+            {
+              "name": "Fixed",
+              "type": "core::array::Span::<core::integer::u8>"
+            },
+            {
+              "name": "Struct",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
+            },
+            {
+              "name": "Tuple",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "Array",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
+            },
+            {
+              "name": "Enum",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
             }
           ]
         },
@@ -4006,11 +4553,29 @@
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<core::array::Span::<core::felt252>>",
+          "name": "dojo::database::introspect::Member",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "ty",
+              "type": "dojo::database::introspect::Ty"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Member>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
+              "type": "@core::array::Array::<dojo::database::introspect::Member>"
             }
           ]
         },
@@ -4028,17 +4593,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Member>"
             }
           ]
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>",
+          "name": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "@core::array::Array::<(core::felt252, dojo::database::introspect::Ty)>"
             }
           ]
         },
@@ -4056,7 +4621,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Ty>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Ty>"
             }
           ]
         },
@@ -4078,21 +4653,25 @@
             },
             {
               "name": "Tuple",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
             },
             {
               "name": "Array",
-              "type": "core::integer::u32"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
             }
           ]
         },
         {
           "type": "interface",
-          "name": "dojo::model::IDojoModel",
+          "name": "dojo::model::IModel",
           "items": [
             {
               "type": "function",
-              "name": "name",
+              "name": "selector",
               "inputs": [],
               "outputs": [
                 {
@@ -4103,11 +4682,33 @@
             },
             {
               "type": "function",
+              "name": "name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "version",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u8"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
               "name": "unpacked_size",
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -4118,7 +4719,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -4129,7 +4730,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::array::Span::<core::integer::u8>"
+                  "type": "dojo::database::introspect::Layout"
                 }
               ],
               "state_mutability": "view"
@@ -4292,13 +4893,45 @@
           "key": false
         }
       ],
-      "class_hash": "0xddba1cce7b3356afc52ffe8449cb5d116ba9a386da0e3716f7f211a724bc0c",
-      "original_class_hash": "0xddba1cce7b3356afc52ffe8449cb5d116ba9a386da0e3716f7f211a724bc0c",
+      "class_hash": "0x2378ffc0f8726c96264becc5efe65a5f68ca4aaa5ed294a04d0e58283190924",
+      "original_class_hash": "0x2378ffc0f8726c96264becc5efe65a5f68ca4aaa5ed294a04d0e58283190924",
       "abi": [
         {
           "type": "impl",
           "name": "DojoModelImpl",
-          "interface_name": "dojo::model::IDojoModel"
+          "interface_name": "dojo::model::IModel"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::option::Option::<core::integer::u32>",
+          "variants": [
+            {
+              "name": "Some",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "None",
+              "type": "()"
+            }
+          ]
         },
         {
           "type": "struct",
@@ -4307,6 +4940,70 @@
             {
               "name": "snapshot",
               "type": "@core::array::Array::<core::integer::u8>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::FieldLayout",
+          "members": [
+            {
+              "name": "selector",
+              "type": "core::felt252"
+            },
+            {
+              "name": "layout",
+              "type": "dojo::database::introspect::Layout"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::FieldLayout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::FieldLayout>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Layout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Layout>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "dojo::database::introspect::Layout",
+          "variants": [
+            {
+              "name": "Fixed",
+              "type": "core::array::Span::<core::integer::u8>"
+            },
+            {
+              "name": "Struct",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
+            },
+            {
+              "name": "Tuple",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "Array",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
+            },
+            {
+              "name": "Enum",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
             }
           ]
         },
@@ -4322,11 +5019,29 @@
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<core::array::Span::<core::felt252>>",
+          "name": "dojo::database::introspect::Member",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "ty",
+              "type": "dojo::database::introspect::Ty"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Member>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
+              "type": "@core::array::Array::<dojo::database::introspect::Member>"
             }
           ]
         },
@@ -4344,17 +5059,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Member>"
             }
           ]
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>",
+          "name": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "@core::array::Array::<(core::felt252, dojo::database::introspect::Ty)>"
             }
           ]
         },
@@ -4372,7 +5087,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Ty>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Ty>"
             }
           ]
         },
@@ -4394,21 +5119,25 @@
             },
             {
               "name": "Tuple",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
             },
             {
               "name": "Array",
-              "type": "core::integer::u32"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
             }
           ]
         },
         {
           "type": "interface",
-          "name": "dojo::model::IDojoModel",
+          "name": "dojo::model::IModel",
           "items": [
             {
               "type": "function",
-              "name": "name",
+              "name": "selector",
               "inputs": [],
               "outputs": [
                 {
@@ -4419,11 +5148,33 @@
             },
             {
               "type": "function",
+              "name": "name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "version",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u8"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
               "name": "unpacked_size",
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -4434,7 +5185,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -4445,7 +5196,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::array::Span::<core::integer::u8>"
+                  "type": "dojo::database::introspect::Layout"
                 }
               ],
               "state_mutability": "view"
@@ -4596,13 +5347,45 @@
           "key": false
         }
       ],
-      "class_hash": "0x75c22ab39a3b7cb1dc5fb39005129e31906a57a0c9f2a1340fd4f188ad41701",
-      "original_class_hash": "0x75c22ab39a3b7cb1dc5fb39005129e31906a57a0c9f2a1340fd4f188ad41701",
+      "class_hash": "0x2a944262c5784a67297717f50a9179dca0dc8758499818aa053c22aa29d2ea8",
+      "original_class_hash": "0x2a944262c5784a67297717f50a9179dca0dc8758499818aa053c22aa29d2ea8",
       "abi": [
         {
           "type": "impl",
           "name": "DojoModelImpl",
-          "interface_name": "dojo::model::IDojoModel"
+          "interface_name": "dojo::model::IModel"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::option::Option::<core::integer::u32>",
+          "variants": [
+            {
+              "name": "Some",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "None",
+              "type": "()"
+            }
+          ]
         },
         {
           "type": "struct",
@@ -4611,6 +5394,70 @@
             {
               "name": "snapshot",
               "type": "@core::array::Array::<core::integer::u8>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::FieldLayout",
+          "members": [
+            {
+              "name": "selector",
+              "type": "core::felt252"
+            },
+            {
+              "name": "layout",
+              "type": "dojo::database::introspect::Layout"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::FieldLayout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::FieldLayout>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Layout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Layout>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "dojo::database::introspect::Layout",
+          "variants": [
+            {
+              "name": "Fixed",
+              "type": "core::array::Span::<core::integer::u8>"
+            },
+            {
+              "name": "Struct",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
+            },
+            {
+              "name": "Tuple",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "Array",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
+            },
+            {
+              "name": "Enum",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
             }
           ]
         },
@@ -4626,11 +5473,29 @@
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<core::array::Span::<core::felt252>>",
+          "name": "dojo::database::introspect::Member",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "ty",
+              "type": "dojo::database::introspect::Ty"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Member>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
+              "type": "@core::array::Array::<dojo::database::introspect::Member>"
             }
           ]
         },
@@ -4648,17 +5513,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Member>"
             }
           ]
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>",
+          "name": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "@core::array::Array::<(core::felt252, dojo::database::introspect::Ty)>"
             }
           ]
         },
@@ -4676,7 +5541,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Ty>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Ty>"
             }
           ]
         },
@@ -4698,21 +5573,25 @@
             },
             {
               "name": "Tuple",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
             },
             {
               "name": "Array",
-              "type": "core::integer::u32"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
             }
           ]
         },
         {
           "type": "interface",
-          "name": "dojo::model::IDojoModel",
+          "name": "dojo::model::IModel",
           "items": [
             {
               "type": "function",
-              "name": "name",
+              "name": "selector",
               "inputs": [],
               "outputs": [
                 {
@@ -4723,11 +5602,33 @@
             },
             {
               "type": "function",
+              "name": "name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "version",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u8"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
               "name": "unpacked_size",
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -4738,7 +5639,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -4749,7 +5650,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::array::Span::<core::integer::u8>"
+                  "type": "dojo::database::introspect::Layout"
                 }
               ],
               "state_mutability": "view"
@@ -4878,13 +5779,45 @@
           "key": false
         }
       ],
-      "class_hash": "0x58dca7f606b1b85ea1e1da94a0f89363a0dad6af5775f62143fdb63689e8dcb",
-      "original_class_hash": "0x58dca7f606b1b85ea1e1da94a0f89363a0dad6af5775f62143fdb63689e8dcb",
+      "class_hash": "0x4d5ef85d815ac09cc85fca98671995dd454d25e156c9ab4bec948122acac445",
+      "original_class_hash": "0x4d5ef85d815ac09cc85fca98671995dd454d25e156c9ab4bec948122acac445",
       "abi": [
         {
           "type": "impl",
           "name": "DojoModelImpl",
-          "interface_name": "dojo::model::IDojoModel"
+          "interface_name": "dojo::model::IModel"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::option::Option::<core::integer::u32>",
+          "variants": [
+            {
+              "name": "Some",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "None",
+              "type": "()"
+            }
+          ]
         },
         {
           "type": "struct",
@@ -4893,6 +5826,70 @@
             {
               "name": "snapshot",
               "type": "@core::array::Array::<core::integer::u8>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::FieldLayout",
+          "members": [
+            {
+              "name": "selector",
+              "type": "core::felt252"
+            },
+            {
+              "name": "layout",
+              "type": "dojo::database::introspect::Layout"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::FieldLayout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::FieldLayout>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Layout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Layout>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "dojo::database::introspect::Layout",
+          "variants": [
+            {
+              "name": "Fixed",
+              "type": "core::array::Span::<core::integer::u8>"
+            },
+            {
+              "name": "Struct",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
+            },
+            {
+              "name": "Tuple",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "Array",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
+            },
+            {
+              "name": "Enum",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
             }
           ]
         },
@@ -4908,11 +5905,29 @@
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<core::array::Span::<core::felt252>>",
+          "name": "dojo::database::introspect::Member",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "ty",
+              "type": "dojo::database::introspect::Ty"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Member>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
+              "type": "@core::array::Array::<dojo::database::introspect::Member>"
             }
           ]
         },
@@ -4930,17 +5945,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Member>"
             }
           ]
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>",
+          "name": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "@core::array::Array::<(core::felt252, dojo::database::introspect::Ty)>"
             }
           ]
         },
@@ -4958,7 +5973,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Ty>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Ty>"
             }
           ]
         },
@@ -4980,21 +6005,25 @@
             },
             {
               "name": "Tuple",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
             },
             {
               "name": "Array",
-              "type": "core::integer::u32"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
             }
           ]
         },
         {
           "type": "interface",
-          "name": "dojo::model::IDojoModel",
+          "name": "dojo::model::IModel",
           "items": [
             {
               "type": "function",
-              "name": "name",
+              "name": "selector",
               "inputs": [],
               "outputs": [
                 {
@@ -5005,11 +6034,33 @@
             },
             {
               "type": "function",
+              "name": "name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "version",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u8"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
               "name": "unpacked_size",
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -5020,7 +6071,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -5031,7 +6082,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::array::Span::<core::integer::u8>"
+                  "type": "dojo::database::introspect::Layout"
                 }
               ],
               "state_mutability": "view"
@@ -5152,13 +6203,45 @@
           "key": false
         }
       ],
-      "class_hash": "0x42e3c5dd1fa2eb9280cc6f57b5acc77b9c9b49b18175f6b1a8e680caef4a62a",
-      "original_class_hash": "0x42e3c5dd1fa2eb9280cc6f57b5acc77b9c9b49b18175f6b1a8e680caef4a62a",
+      "class_hash": "0x2d7f48d08a0977e048af24f84c5236b1326b641520ed5a62fe5d4b7e50ae115",
+      "original_class_hash": "0x2d7f48d08a0977e048af24f84c5236b1326b641520ed5a62fe5d4b7e50ae115",
       "abi": [
         {
           "type": "impl",
           "name": "DojoModelImpl",
-          "interface_name": "dojo::model::IDojoModel"
+          "interface_name": "dojo::model::IModel"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::option::Option::<core::integer::u32>",
+          "variants": [
+            {
+              "name": "Some",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "None",
+              "type": "()"
+            }
+          ]
         },
         {
           "type": "struct",
@@ -5167,6 +6250,70 @@
             {
               "name": "snapshot",
               "type": "@core::array::Array::<core::integer::u8>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::FieldLayout",
+          "members": [
+            {
+              "name": "selector",
+              "type": "core::felt252"
+            },
+            {
+              "name": "layout",
+              "type": "dojo::database::introspect::Layout"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::FieldLayout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::FieldLayout>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Layout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Layout>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "dojo::database::introspect::Layout",
+          "variants": [
+            {
+              "name": "Fixed",
+              "type": "core::array::Span::<core::integer::u8>"
+            },
+            {
+              "name": "Struct",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
+            },
+            {
+              "name": "Tuple",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "Array",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
+            },
+            {
+              "name": "Enum",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
             }
           ]
         },
@@ -5182,11 +6329,29 @@
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<core::array::Span::<core::felt252>>",
+          "name": "dojo::database::introspect::Member",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "ty",
+              "type": "dojo::database::introspect::Ty"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Member>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
+              "type": "@core::array::Array::<dojo::database::introspect::Member>"
             }
           ]
         },
@@ -5204,17 +6369,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Member>"
             }
           ]
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>",
+          "name": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "@core::array::Array::<(core::felt252, dojo::database::introspect::Ty)>"
             }
           ]
         },
@@ -5232,7 +6397,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Ty>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Ty>"
             }
           ]
         },
@@ -5254,21 +6429,25 @@
             },
             {
               "name": "Tuple",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
             },
             {
               "name": "Array",
-              "type": "core::integer::u32"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
             }
           ]
         },
         {
           "type": "interface",
-          "name": "dojo::model::IDojoModel",
+          "name": "dojo::model::IModel",
           "items": [
             {
               "type": "function",
-              "name": "name",
+              "name": "selector",
               "inputs": [],
               "outputs": [
                 {
@@ -5279,11 +6458,33 @@
             },
             {
               "type": "function",
+              "name": "name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "version",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u8"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
               "name": "unpacked_size",
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -5294,7 +6495,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -5305,7 +6506,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::array::Span::<core::integer::u8>"
+                  "type": "dojo::database::introspect::Layout"
                 }
               ],
               "state_mutability": "view"
@@ -5431,13 +6632,45 @@
           "key": false
         }
       ],
-      "class_hash": "0x77a395b8ce90c15c128ca0b653a0f02ef268921c482c55aebf2bfa0703548b1",
-      "original_class_hash": "0x77a395b8ce90c15c128ca0b653a0f02ef268921c482c55aebf2bfa0703548b1",
+      "class_hash": "0x43d32948aa1be53f26e75e04da5ec56796f6e86030084b3ebede98c45ace32a",
+      "original_class_hash": "0x43d32948aa1be53f26e75e04da5ec56796f6e86030084b3ebede98c45ace32a",
       "abi": [
         {
           "type": "impl",
           "name": "DojoModelImpl",
-          "interface_name": "dojo::model::IDojoModel"
+          "interface_name": "dojo::model::IModel"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::option::Option::<core::integer::u32>",
+          "variants": [
+            {
+              "name": "Some",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "None",
+              "type": "()"
+            }
+          ]
         },
         {
           "type": "struct",
@@ -5446,6 +6679,70 @@
             {
               "name": "snapshot",
               "type": "@core::array::Array::<core::integer::u8>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::FieldLayout",
+          "members": [
+            {
+              "name": "selector",
+              "type": "core::felt252"
+            },
+            {
+              "name": "layout",
+              "type": "dojo::database::introspect::Layout"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::FieldLayout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::FieldLayout>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Layout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Layout>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "dojo::database::introspect::Layout",
+          "variants": [
+            {
+              "name": "Fixed",
+              "type": "core::array::Span::<core::integer::u8>"
+            },
+            {
+              "name": "Struct",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
+            },
+            {
+              "name": "Tuple",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "Array",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
+            },
+            {
+              "name": "Enum",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
             }
           ]
         },
@@ -5461,11 +6758,29 @@
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<core::array::Span::<core::felt252>>",
+          "name": "dojo::database::introspect::Member",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "ty",
+              "type": "dojo::database::introspect::Ty"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Member>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
+              "type": "@core::array::Array::<dojo::database::introspect::Member>"
             }
           ]
         },
@@ -5483,17 +6798,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Member>"
             }
           ]
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>",
+          "name": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "@core::array::Array::<(core::felt252, dojo::database::introspect::Ty)>"
             }
           ]
         },
@@ -5511,7 +6826,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Ty>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Ty>"
             }
           ]
         },
@@ -5533,21 +6858,25 @@
             },
             {
               "name": "Tuple",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
             },
             {
               "name": "Array",
-              "type": "core::integer::u32"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
             }
           ]
         },
         {
           "type": "interface",
-          "name": "dojo::model::IDojoModel",
+          "name": "dojo::model::IModel",
           "items": [
             {
               "type": "function",
-              "name": "name",
+              "name": "selector",
               "inputs": [],
               "outputs": [
                 {
@@ -5558,11 +6887,33 @@
             },
             {
               "type": "function",
+              "name": "name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "version",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u8"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
               "name": "unpacked_size",
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -5573,7 +6924,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -5584,7 +6935,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::array::Span::<core::integer::u8>"
+                  "type": "dojo::database::introspect::Layout"
                 }
               ],
               "state_mutability": "view"
@@ -5686,13 +7037,45 @@
           "key": false
         }
       ],
-      "class_hash": "0x549aae8b06c195d7fd764f13da14eac3fe391e6d466a13f4b32b9d4da7b6367",
-      "original_class_hash": "0x549aae8b06c195d7fd764f13da14eac3fe391e6d466a13f4b32b9d4da7b6367",
+      "class_hash": "0x304439814dd12e69d7898d226219e2fa2a374e82dae38f902c1b6a706bc8e82",
+      "original_class_hash": "0x304439814dd12e69d7898d226219e2fa2a374e82dae38f902c1b6a706bc8e82",
       "abi": [
         {
           "type": "impl",
           "name": "DojoModelImpl",
-          "interface_name": "dojo::model::IDojoModel"
+          "interface_name": "dojo::model::IModel"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::option::Option::<core::integer::u32>",
+          "variants": [
+            {
+              "name": "Some",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "None",
+              "type": "()"
+            }
+          ]
         },
         {
           "type": "struct",
@@ -5701,6 +7084,70 @@
             {
               "name": "snapshot",
               "type": "@core::array::Array::<core::integer::u8>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::FieldLayout",
+          "members": [
+            {
+              "name": "selector",
+              "type": "core::felt252"
+            },
+            {
+              "name": "layout",
+              "type": "dojo::database::introspect::Layout"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::FieldLayout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::FieldLayout>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Layout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Layout>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "dojo::database::introspect::Layout",
+          "variants": [
+            {
+              "name": "Fixed",
+              "type": "core::array::Span::<core::integer::u8>"
+            },
+            {
+              "name": "Struct",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
+            },
+            {
+              "name": "Tuple",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "Array",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
+            },
+            {
+              "name": "Enum",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
             }
           ]
         },
@@ -5716,11 +7163,29 @@
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<core::array::Span::<core::felt252>>",
+          "name": "dojo::database::introspect::Member",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "ty",
+              "type": "dojo::database::introspect::Ty"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Member>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
+              "type": "@core::array::Array::<dojo::database::introspect::Member>"
             }
           ]
         },
@@ -5738,17 +7203,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Member>"
             }
           ]
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>",
+          "name": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "@core::array::Array::<(core::felt252, dojo::database::introspect::Ty)>"
             }
           ]
         },
@@ -5766,7 +7231,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Ty>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Ty>"
             }
           ]
         },
@@ -5788,21 +7263,25 @@
             },
             {
               "name": "Tuple",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
             },
             {
               "name": "Array",
-              "type": "core::integer::u32"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
             }
           ]
         },
         {
           "type": "interface",
-          "name": "dojo::model::IDojoModel",
+          "name": "dojo::model::IModel",
           "items": [
             {
               "type": "function",
-              "name": "name",
+              "name": "selector",
               "inputs": [],
               "outputs": [
                 {
@@ -5813,11 +7292,33 @@
             },
             {
               "type": "function",
+              "name": "name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "version",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u8"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
               "name": "unpacked_size",
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -5828,7 +7329,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -5839,7 +7340,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::array::Span::<core::integer::u8>"
+                  "type": "dojo::database::introspect::Layout"
                 }
               ],
               "state_mutability": "view"
@@ -5944,13 +7445,45 @@
           "key": false
         }
       ],
-      "class_hash": "0x58cbe8c82c5c7364bd50c1f5548221c90d771cfdad9ec8982e1c988b3564681",
-      "original_class_hash": "0x58cbe8c82c5c7364bd50c1f5548221c90d771cfdad9ec8982e1c988b3564681",
+      "class_hash": "0x291d91ffdce5772e40317feaf3b43873e8c716716d948b35c77c06c21fa4e9d",
+      "original_class_hash": "0x291d91ffdce5772e40317feaf3b43873e8c716716d948b35c77c06c21fa4e9d",
       "abi": [
         {
           "type": "impl",
           "name": "DojoModelImpl",
-          "interface_name": "dojo::model::IDojoModel"
+          "interface_name": "dojo::model::IModel"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::option::Option::<core::integer::u32>",
+          "variants": [
+            {
+              "name": "Some",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "None",
+              "type": "()"
+            }
+          ]
         },
         {
           "type": "struct",
@@ -5959,6 +7492,70 @@
             {
               "name": "snapshot",
               "type": "@core::array::Array::<core::integer::u8>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::FieldLayout",
+          "members": [
+            {
+              "name": "selector",
+              "type": "core::felt252"
+            },
+            {
+              "name": "layout",
+              "type": "dojo::database::introspect::Layout"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::FieldLayout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::FieldLayout>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Layout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Layout>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "dojo::database::introspect::Layout",
+          "variants": [
+            {
+              "name": "Fixed",
+              "type": "core::array::Span::<core::integer::u8>"
+            },
+            {
+              "name": "Struct",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
+            },
+            {
+              "name": "Tuple",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "Array",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
+            },
+            {
+              "name": "Enum",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
             }
           ]
         },
@@ -5974,11 +7571,29 @@
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<core::array::Span::<core::felt252>>",
+          "name": "dojo::database::introspect::Member",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "ty",
+              "type": "dojo::database::introspect::Ty"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Member>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
+              "type": "@core::array::Array::<dojo::database::introspect::Member>"
             }
           ]
         },
@@ -5996,17 +7611,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Member>"
             }
           ]
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>",
+          "name": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "@core::array::Array::<(core::felt252, dojo::database::introspect::Ty)>"
             }
           ]
         },
@@ -6024,7 +7639,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Ty>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Ty>"
             }
           ]
         },
@@ -6046,21 +7671,25 @@
             },
             {
               "name": "Tuple",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
             },
             {
               "name": "Array",
-              "type": "core::integer::u32"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
             }
           ]
         },
         {
           "type": "interface",
-          "name": "dojo::model::IDojoModel",
+          "name": "dojo::model::IModel",
           "items": [
             {
               "type": "function",
-              "name": "name",
+              "name": "selector",
               "inputs": [],
               "outputs": [
                 {
@@ -6071,11 +7700,33 @@
             },
             {
               "type": "function",
+              "name": "name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "version",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u8"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
               "name": "unpacked_size",
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -6086,7 +7737,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -6097,7 +7748,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::array::Span::<core::integer::u8>"
+                  "type": "dojo::database::introspect::Layout"
                 }
               ],
               "state_mutability": "view"
@@ -6208,13 +7859,45 @@
           "key": false
         }
       ],
-      "class_hash": "0x3cac1205f629a93c0e9b01478ed8e56ab67d66798710607ce91dab42df5e75a",
-      "original_class_hash": "0x3cac1205f629a93c0e9b01478ed8e56ab67d66798710607ce91dab42df5e75a",
+      "class_hash": "0x648f87547cad4c7ff85ab3c422f77850b4a6f0b0f1494011440449a52aa8053",
+      "original_class_hash": "0x648f87547cad4c7ff85ab3c422f77850b4a6f0b0f1494011440449a52aa8053",
       "abi": [
         {
           "type": "impl",
           "name": "DojoModelImpl",
-          "interface_name": "dojo::model::IDojoModel"
+          "interface_name": "dojo::model::IModel"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::option::Option::<core::integer::u32>",
+          "variants": [
+            {
+              "name": "Some",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "None",
+              "type": "()"
+            }
+          ]
         },
         {
           "type": "struct",
@@ -6223,6 +7906,70 @@
             {
               "name": "snapshot",
               "type": "@core::array::Array::<core::integer::u8>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::FieldLayout",
+          "members": [
+            {
+              "name": "selector",
+              "type": "core::felt252"
+            },
+            {
+              "name": "layout",
+              "type": "dojo::database::introspect::Layout"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::FieldLayout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::FieldLayout>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Layout>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Layout>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "dojo::database::introspect::Layout",
+          "variants": [
+            {
+              "name": "Fixed",
+              "type": "core::array::Span::<core::integer::u8>"
+            },
+            {
+              "name": "Struct",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
+            },
+            {
+              "name": "Tuple",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "Array",
+              "type": "core::array::Span::<dojo::database::introspect::Layout>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
+            },
+            {
+              "name": "Enum",
+              "type": "core::array::Span::<dojo::database::introspect::FieldLayout>"
             }
           ]
         },
@@ -6238,11 +7985,29 @@
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<core::array::Span::<core::felt252>>",
+          "name": "dojo::database::introspect::Member",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "ty",
+              "type": "dojo::database::introspect::Ty"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Member>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
+              "type": "@core::array::Array::<dojo::database::introspect::Member>"
             }
           ]
         },
@@ -6260,17 +8025,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Member>"
             }
           ]
         },
         {
           "type": "struct",
-          "name": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>",
+          "name": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>",
           "members": [
             {
               "name": "snapshot",
-              "type": "@core::array::Array::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "@core::array::Array::<(core::felt252, dojo::database::introspect::Ty)>"
             }
           ]
         },
@@ -6288,7 +8053,17 @@
             },
             {
               "name": "children",
-              "type": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>"
+              "type": "core::array::Span::<(core::felt252, dojo::database::introspect::Ty)>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<dojo::database::introspect::Ty>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<dojo::database::introspect::Ty>"
             }
           ]
         },
@@ -6310,21 +8085,25 @@
             },
             {
               "name": "Tuple",
-              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
             },
             {
               "name": "Array",
-              "type": "core::integer::u32"
+              "type": "core::array::Span::<dojo::database::introspect::Ty>"
+            },
+            {
+              "name": "ByteArray",
+              "type": "()"
             }
           ]
         },
         {
           "type": "interface",
-          "name": "dojo::model::IDojoModel",
+          "name": "dojo::model::IModel",
           "items": [
             {
               "type": "function",
-              "name": "name",
+              "name": "selector",
               "inputs": [],
               "outputs": [
                 {
@@ -6335,11 +8114,33 @@
             },
             {
               "type": "function",
+              "name": "name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "version",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u8"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
               "name": "unpacked_size",
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -6350,7 +8151,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::integer::u32"
+                  "type": "core::option::Option::<core::integer::u32>"
                 }
               ],
               "state_mutability": "view"
@@ -6361,7 +8162,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "core::array::Span::<core::integer::u8>"
+                  "type": "dojo::database::introspect::Layout"
                 }
               ],
               "state_mutability": "view"

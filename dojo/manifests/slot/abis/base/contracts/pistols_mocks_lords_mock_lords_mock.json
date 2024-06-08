@@ -116,6 +116,24 @@
   },
   {
     "type": "impl",
+    "name": "IDojoInitImpl",
+    "interface_name": "pistols::mocks::lords_mock::lords_mock::IDojoInit"
+  },
+  {
+    "type": "interface",
+    "name": "pistols::mocks::lords_mock::lords_mock::IDojoInit",
+    "items": [
+      {
+        "type": "function",
+        "name": "dojo_init",
+        "inputs": [],
+        "outputs": [],
+        "state_mutability": "view"
+      }
+    ]
+  },
+  {
+    "type": "impl",
     "name": "UpgradableImpl",
     "interface_name": "dojo::components::upgradeable::IUpgradeable"
   },

@@ -296,6 +296,24 @@
   },
   {
     "type": "impl",
+    "name": "IDojoInitImpl",
+    "interface_name": "pistols::systems::admin::admin::IDojoInit"
+  },
+  {
+    "type": "interface",
+    "name": "pistols::systems::admin::admin::IDojoInit",
+    "items": [
+      {
+        "type": "function",
+        "name": "dojo_init",
+        "inputs": [],
+        "outputs": [],
+        "state_mutability": "view"
+      }
+    ]
+  },
+  {
+    "type": "impl",
     "name": "UpgradableImpl",
     "interface_name": "dojo::components::upgradeable::IUpgradeable"
   },

@@ -32,19 +32,6 @@ export function defineContractComponents(world: World) {
         }
       );
     })(),
-    Chances: (() => {
-      return defineComponent(
-        world,
-        { key: RecsType.BigInt, crit_chances: RecsType.Number, crit_bonus: RecsType.Number, hit_chances: RecsType.Number, hit_bonus: RecsType.Number, lethal_chances: RecsType.Number, lethal_bonus: RecsType.Number },
-        {
-          metadata: {
-            name: "Chances",
-            types: ["felt252","u8","u8","u8","u8","u8","u8"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
     Duelist: (() => {
       return defineComponent(
         world,

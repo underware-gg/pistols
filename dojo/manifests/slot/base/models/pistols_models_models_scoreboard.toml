@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0xddba1cce7b3356afc52ffe8449cb5d116ba9a386da0e3716f7f211a724bc0c"
-original_class_hash = "0xddba1cce7b3356afc52ffe8449cb5d116ba9a386da0e3716f7f211a724bc0c"
+class_hash = "0x2378ffc0f8726c96264becc5efe65a5f68ca4aaa5ed294a04d0e58283190924"
+original_class_hash = "0x2378ffc0f8726c96264becc5efe65a5f68ca4aaa5ed294a04d0e58283190924"
 abi = "manifests/slot/abis/base/models/pistols_models_models_scoreboard.json"
 name = "pistols::models::models::scoreboard"
 
