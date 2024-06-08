@@ -116,6 +116,7 @@ export const useChallenge = (duelId: BigNumberish) => {
 
   return {
     challengeExists: (challenge != null),
+    duelId,
     tableId,
     state,
     duelistA,
