@@ -19,6 +19,7 @@ import { makeTavernUrl } from '@/pistols/utils/pistols'
 import OnboardingModal from '@/pistols/components/account/OnboardingModal'
 import WalletHeader from '@/pistols/components/account/WalletHeader'
 import Logo from '@/pistols/components/Logo'
+import { PACKAGE_VERSION } from '../utils/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -41,6 +42,8 @@ export default function Gate() {
         <Logo />
 
         <h1>Pistols at Ten Blocks</h1>
+
+        <div className='Code Disabled'>v{PACKAGE_VERSION}</div>
 
         <hr />
 
