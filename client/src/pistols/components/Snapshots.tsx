@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Button, Container, Divider, TextArea } from 'semantic-ui-react'
 import { useAllDuelistIds, useDuelist } from '@/pistols/hooks/useDuelist'
+import { useAllChallengeIds, useChallenge } from '@/pistols/hooks/useChallenge'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { CopyIcon } from '@/lib/ui/Icons'
-import { bigintToHex } from '@/lib/utils/types'
-import { bigintEquals, bigintToHex } from '@/lib/utils/type'
-import { useAllChallengeIds, useChallenge } from '../hooks/useChallenge'
+import { bigintEquals, bigintToHex } from '@/lib/utils/types'
 
 const Row = Grid.Row
 const Col = Grid.Column

@@ -46,6 +46,7 @@ export const useAllChallengeIds = (tableId?: string) => {
   ), [allChallengeIds, tableId])
   return {
     challengeIds,
+    challengeCount: challengeIds.length,
   }
 }
 
