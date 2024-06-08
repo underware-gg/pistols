@@ -1,7 +1,8 @@
 mod models {
-    mod coins;
     mod config;
     mod models;
+    mod structs;
+    mod table;
 }
 
 mod systems {
@@ -34,15 +35,18 @@ mod utils {
 }
 
 mod tests {
-    mod utils;
-    mod test_admin;
-    mod test_duelist;
+    mod tester;
     mod test_action;
+    mod test_admin;
     mod test_challenge;
+    mod test_chances;
+    mod test_duelist;
     mod test_round1;
     mod test_round2;
     mod test_round3;
+    mod test_utils;
     mod test_wager;
+    mod salt_generator;
 }
 
 mod mocks {

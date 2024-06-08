@@ -236,7 +236,7 @@ function SpriteMixer() {
       map: texture, color: 0xffffff
     });
 
-    let actionSprite:any = new THREE.Sprite(spriteMaterial);
+    let actionSprite: any = new THREE.Sprite(spriteMaterial);
     actionSprite.isIndexedSprite = true;
 
     actionSprite.tilesHoriz = tilesHoriz;

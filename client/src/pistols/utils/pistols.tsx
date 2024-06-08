@@ -1,4 +1,4 @@
-import { bigintToHex } from '@/lib/utils/type'
+import { bigintToHex } from '@/lib/utils/types'
 import { EMOJI } from '@/pistols/data/messages'
 
 //------------------------------------------
@@ -6,14 +6,14 @@ import { EMOJI } from '@/pistols/data/messages'
 // (challenge.cairo)
 //
 export enum ChallengeState {
-  Null,
-  Awaiting,
-  Withdrawn,
-  Refused,
-  Expired,
-  InProgress,
-  Resolved,
-  Draw,
+  Null,       // 0
+  Awaiting,   // 1
+  Withdrawn,  // 2
+  Refused,    // 3
+  Expired,    // 4
+  InProgress, // 5
+  Resolved,   // 6
+  Draw,       // 7
 }
 
 export const LiveChallengeStates: ChallengeState[] = [
@@ -50,7 +50,7 @@ export const ChallengeStateNames: Record<ChallengeState, string> = {
 
 export const ChallengeStateDescriptions: Record<ChallengeState, string> = {
   [ChallengeState.Null]: "Challenge does not exist",
-  [ChallengeState.Awaiting]: "Awaiting for Challenged's reply",
+  [ChallengeState.Awaiting]: "Awaiting for Challenged's response",
   [ChallengeState.Withdrawn]: "Cowardly withdrawn by Challenger",
   [ChallengeState.Refused]: "Cowardly refused by Challenged",
   [ChallengeState.Expired]: "Challenge expired",
@@ -218,5 +218,6 @@ export const ActionTypes: Record<string, Action[]> = {
 // client stuff
 //
 
+export const makeTavernUrl = (tableId: string) => (`/tavern/${tableId}`)
 export const makeDuelUrl = (duelId: bigint) => (`/duel/${bigintToHex(duelId)}`)
 

@@ -1,0 +1,484 @@
+[world]
+kind = "WorldContract"
+class_hash = "0x301ba8a1a13cec9291b049dea531f73a600e0812908cefa26d17214da411e9c"
+original_class_hash = "0x301ba8a1a13cec9291b049dea531f73a600e0812908cefa26d17214da411e9c"
+abi = "manifests/slot/abis/deployments/dojo_world_world.json"
+address = "0x5ceff437958efcf79a58f82c42cf7cc9dc268c7d13b61fef2ba89d17f5390df"
+transaction_hash = "0x1ac375ab64cb25d741267b9fbccaafbc6092ce5f23889276446d89644b6ddb8"
+block_number = 3
+seed = "pistols"
+name = "dojo::world::world"
+
+[world.metadata]
+profile_name = "slot"
+rpc_url = "https://api.cartridge.gg/x/pistols-slot/katana"
+
+[base]
+kind = "Class"
+class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
+original_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
+name = "dojo::base::base"
+
+[[contracts]]
+kind = "DojoContract"
+address = "0x27e1b946e704895b29301e044fb6ffa956fb82074a092fadebfd8af2221c2f1"
+class_hash = "0x4c823099f2864338081f58de3c86a0f1dcdd7b3cc5edc9da2e4c335582224d8"
+original_class_hash = "0x4c823099f2864338081f58de3c86a0f1dcdd7b3cc5edc9da2e4c335582224d8"
+base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
+abi = "manifests/slot/abis/deployments/contracts/pistols_mocks_lords_mock_lords_mock.json"
+reads = []
+writes = []
+computed = []
+name = "pistols::mocks::lords_mock::lords_mock"
+
+[[contracts]]
+kind = "DojoContract"
+address = "0x6dda46ca9b7cee1b06a77890a71f0221f332f01f6f05ebd0894feb9a76b7752"
+class_hash = "0x4266a471d3adcf14ff8e4a5d1ede0f256c4d9c67e904c0b47936bed2728d9b8"
+original_class_hash = "0x4266a471d3adcf14ff8e4a5d1ede0f256c4d9c67e904c0b47936bed2728d9b8"
+base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
+abi = "manifests/slot/abis/deployments/contracts/pistols_systems_actions_actions.json"
+reads = []
+writes = []
+computed = []
+name = "pistols::systems::actions::actions"
+
+[[contracts]]
+kind = "DojoContract"
+address = "0x772fa6174987748d59cb7d9acfa7bb4f6c647c068cddb6a309e102c00c90c5d"
+class_hash = "0x3b5708d3bdd1355fe7431d6952dc2b8236666baa9dff6d9cd8e087490ed6e1e"
+original_class_hash = "0x3b5708d3bdd1355fe7431d6952dc2b8236666baa9dff6d9cd8e087490ed6e1e"
+base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
+abi = "manifests/slot/abis/deployments/contracts/pistols_systems_admin_admin.json"
+reads = []
+writes = []
+computed = []
+name = "pistols::systems::admin::admin"
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x45ed73bfdec60f65c8d2d7ebd28df55814db6387ac61b7f7359b1493ac3a819"
+original_class_hash = "0x45ed73bfdec60f65c8d2d7ebd28df55814db6387ac61b7f7359b1493ac3a819"
+abi = "manifests/slot/abis/deployments/models/pistols_models_config_config.json"
+name = "pistols::models::config::config"
+
+[[models.members]]
+name = "key"
+type = "u8"
+key = true
+
+[[models.members]]
+name = "initialized"
+type = "bool"
+key = false
+
+[[models.members]]
+name = "owner_address"
+type = "ContractAddress"
+key = false
+
+[[models.members]]
+name = "treasury_address"
+type = "ContractAddress"
+key = false
+
+[[models.members]]
+name = "paused"
+type = "bool"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x774a94012a2c4d100777c8cdb3dee4550f9431ceb9d71b31bbbc3c3d1e75399"
+original_class_hash = "0x774a94012a2c4d100777c8cdb3dee4550f9431ceb9d71b31bbbc3c3d1e75399"
+abi = "manifests/slot/abis/deployments/models/pistols_models_models_challenge.json"
+name = "pistols::models::models::challenge"
+
+[[models.members]]
+name = "duel_id"
+type = "u128"
+key = true
+
+[[models.members]]
+name = "duelist_a"
+type = "ContractAddress"
+key = false
+
+[[models.members]]
+name = "duelist_b"
+type = "ContractAddress"
+key = false
+
+[[models.members]]
+name = "message"
+type = "felt252"
+key = false
+
+[[models.members]]
+name = "table_id"
+type = "felt252"
+key = false
+
+[[models.members]]
+name = "state"
+type = "u8"
+key = false
+
+[[models.members]]
+name = "round_number"
+type = "u8"
+key = false
+
+[[models.members]]
+name = "winner"
+type = "u8"
+key = false
+
+[[models.members]]
+name = "timestamp_start"
+type = "u64"
+key = false
+
+[[models.members]]
+name = "timestamp_end"
+type = "u64"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x33d2265485a3f0d4526c4301252df10ceff481c92664fe3f261ea69e3b31b60"
+original_class_hash = "0x33d2265485a3f0d4526c4301252df10ceff481c92664fe3f261ea69e3b31b60"
+abi = "manifests/slot/abis/deployments/models/pistols_models_models_chances.json"
+name = "pistols::models::models::chances"
+
+[[models.members]]
+name = "key"
+type = "felt252"
+key = true
+
+[[models.members]]
+name = "crit_chances"
+type = "u8"
+key = false
+
+[[models.members]]
+name = "crit_bonus"
+type = "u8"
+key = false
+
+[[models.members]]
+name = "hit_chances"
+type = "u8"
+key = false
+
+[[models.members]]
+name = "hit_bonus"
+type = "u8"
+key = false
+
+[[models.members]]
+name = "lethal_chances"
+type = "u8"
+key = false
+
+[[models.members]]
+name = "lethal_bonus"
+type = "u8"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x2932ab31209ea10efe20e131e751edb29a26d24363a4c06e10a43846d88a21c"
+original_class_hash = "0x2932ab31209ea10efe20e131e751edb29a26d24363a4c06e10a43846d88a21c"
+abi = "manifests/slot/abis/deployments/models/pistols_models_models_duelist.json"
+name = "pistols::models::models::duelist"
+
+[[models.members]]
+name = "address"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "name"
+type = "felt252"
+key = false
+
+[[models.members]]
+name = "profile_pic"
+type = "u8"
+key = false
+
+[[models.members]]
+name = "score"
+type = "Score"
+key = false
+
+[[models.members]]
+name = "timestamp"
+type = "u64"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x6930ab524bcd759ec513287058c4546916ece5fcd10cda1dd075bfb628bd876"
+original_class_hash = "0x6930ab524bcd759ec513287058c4546916ece5fcd10cda1dd075bfb628bd876"
+abi = "manifests/slot/abis/deployments/models/pistols_models_models_pact.json"
+name = "pistols::models::models::pact"
+
+[[models.members]]
+name = "pair"
+type = "u128"
+key = true
+
+[[models.members]]
+name = "duel_id"
+type = "u128"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x666124090af485e3f5de024809c6174930e7b910abfadb5fed2ae6c479b5577"
+original_class_hash = "0x666124090af485e3f5de024809c6174930e7b910abfadb5fed2ae6c479b5577"
+abi = "manifests/slot/abis/deployments/models/pistols_models_models_round.json"
+name = "pistols::models::models::round"
+
+[[models.members]]
+name = "duel_id"
+type = "u128"
+key = true
+
+[[models.members]]
+name = "round_number"
+type = "u8"
+key = true
+
+[[models.members]]
+name = "state"
+type = "u8"
+key = false
+
+[[models.members]]
+name = "shot_a"
+type = "Shot"
+key = false
+
+[[models.members]]
+name = "shot_b"
+type = "Shot"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0xddba1cce7b3356afc52ffe8449cb5d116ba9a386da0e3716f7f211a724bc0c"
+original_class_hash = "0xddba1cce7b3356afc52ffe8449cb5d116ba9a386da0e3716f7f211a724bc0c"
+abi = "manifests/slot/abis/deployments/models/pistols_models_models_scoreboard.json"
+name = "pistols::models::models::scoreboard"
+
+[[models.members]]
+name = "address"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "table_id"
+type = "felt252"
+key = true
+
+[[models.members]]
+name = "score"
+type = "Score"
+key = false
+
+[[models.members]]
+name = "wager_won"
+type = "u256"
+key = false
+
+[[models.members]]
+name = "wager_lost"
+type = "u256"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x75c22ab39a3b7cb1dc5fb39005129e31906a57a0c9f2a1340fd4f188ad41701"
+original_class_hash = "0x75c22ab39a3b7cb1dc5fb39005129e31906a57a0c9f2a1340fd4f188ad41701"
+abi = "manifests/slot/abis/deployments/models/pistols_models_models_snapshot.json"
+name = "pistols::models::models::snapshot"
+
+[[models.members]]
+name = "duel_id"
+type = "u128"
+key = true
+
+[[models.members]]
+name = "score_a"
+type = "Score"
+key = false
+
+[[models.members]]
+name = "score_b"
+type = "Score"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x58dca7f606b1b85ea1e1da94a0f89363a0dad6af5775f62143fdb63689e8dcb"
+original_class_hash = "0x58dca7f606b1b85ea1e1da94a0f89363a0dad6af5775f62143fdb63689e8dcb"
+abi = "manifests/slot/abis/deployments/models/pistols_models_models_wager.json"
+name = "pistols::models::models::wager"
+
+[[models.members]]
+name = "duel_id"
+type = "u128"
+key = true
+
+[[models.members]]
+name = "value"
+type = "u256"
+key = false
+
+[[models.members]]
+name = "fee"
+type = "u256"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x42e3c5dd1fa2eb9280cc6f57b5acc77b9c9b49b18175f6b1a8e680caef4a62a"
+original_class_hash = "0x42e3c5dd1fa2eb9280cc6f57b5acc77b9c9b49b18175f6b1a8e680caef4a62a"
+abi = "manifests/slot/abis/deployments/models/pistols_models_table_t_table.json"
+name = "pistols::models::table::t_table"
+
+[[models.members]]
+name = "table_id"
+type = "felt252"
+key = true
+
+[[models.members]]
+name = "description"
+type = "felt252"
+key = false
+
+[[models.members]]
+name = "contract_address"
+type = "ContractAddress"
+key = false
+
+[[models.members]]
+name = "wager_min"
+type = "u256"
+key = false
+
+[[models.members]]
+name = "fee_min"
+type = "u256"
+key = false
+
+[[models.members]]
+name = "fee_pct"
+type = "u8"
+key = false
+
+[[models.members]]
+name = "is_open"
+type = "bool"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x77a395b8ce90c15c128ca0b653a0f02ef268921c482c55aebf2bfa0703548b1"
+original_class_hash = "0x77a395b8ce90c15c128ca0b653a0f02ef268921c482c55aebf2bfa0703548b1"
+abi = "manifests/slot/abis/deployments/models/token_components_security_initializable_initializable_model.json"
+name = "token::components::security::initializable::initializable_model"
+
+[[models.members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "initialized"
+type = "bool"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x549aae8b06c195d7fd764f13da14eac3fe391e6d466a13f4b32b9d4da7b6367"
+original_class_hash = "0x549aae8b06c195d7fd764f13da14eac3fe391e6d466a13f4b32b9d4da7b6367"
+abi = "manifests/slot/abis/deployments/models/token_components_token_erc20_erc20_allowance_erc_20_allowance_model.json"
+name = "token::components::token::erc20::erc20_allowance::erc_20_allowance_model"
+
+[[models.members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "owner"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "spender"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "amount"
+type = "u256"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x58cbe8c82c5c7364bd50c1f5548221c90d771cfdad9ec8982e1c988b3564681"
+original_class_hash = "0x58cbe8c82c5c7364bd50c1f5548221c90d771cfdad9ec8982e1c988b3564681"
+abi = "manifests/slot/abis/deployments/models/token_components_token_erc20_erc20_balance_erc_20_balance_model.json"
+name = "token::components::token::erc20::erc20_balance::erc_20_balance_model"
+
+[[models.members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "account"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "amount"
+type = "u256"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x3cac1205f629a93c0e9b01478ed8e56ab67d66798710607ce91dab42df5e75a"
+original_class_hash = "0x3cac1205f629a93c0e9b01478ed8e56ab67d66798710607ce91dab42df5e75a"
+abi = "manifests/slot/abis/deployments/models/token_components_token_erc20_erc20_metadata_erc_20_metadata_model.json"
+name = "token::components::token::erc20::erc20_metadata::erc_20_metadata_model"
+
+[[models.members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "name"
+type = "felt252"
+key = false
+
+[[models.members]]
+name = "symbol"
+type = "felt252"
+key = false
+
+[[models.members]]
+name = "decimals"
+type = "u8"
+key = false
+
+[[models.members]]
+name = "total_supply"
+type = "u256"
+key = false

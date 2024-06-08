@@ -1,13 +1,14 @@
 
 $font-family: 'EB Garamond', serif;
 $font-family-mono: 'Courier Prime', monospace;
+// $font-family-mono: 'Xanh Mono', monospace;
 
 // Figma colors
 // https://www.figma.com/file/eseZA1jRIoX6IYNtoHgz30/Pistols-at-Ten-Blocks
 $color-bg: #000; //#1e1e1e;
 $color-darkest: #201a18;
 $color-dark: #584f49;
-$color-medium: #cb824d;
+$color-medium: #ef9758;
 $color-bright: #c8b6a8;
 $color-brightest: #efe1d7;
 
@@ -18,9 +19,8 @@ $color-link: $color-medium;
 $color-important: $color-medium;
 $color-active: $color-medium;
 $color-inactive: rgba($color-brightest, 0.35);
-$color-attention: $color-medium;
-$text-shadow: 0.04em 0.04em 1px $color-dark;
-$title-shadow: 0.1em 0.1em 1px $color-darkest;
+$text-shadow: 0.05rem 0.05rem 1px $color-darkest;
+$title-shadow: 0.1rem 0.1rem 1px $color-darkest;
 $ui-border: 6px ridge $color-active;
 
 $border-hr: solid 0.5px rgba($color-bright, 0.5);
@@ -28,10 +28,10 @@ $border-button: 1px solid $color-bright;
 $border-button-active: 1px solid $color-brightest;
 $border-button-inactive: 1px solid rgba($color-bright, 0.5);
 
-$color-positive: #21ba45; // from $color-medium
-$color-negative: #db2828; // from $color-medium
+$color-positive: #21ba45;
+$color-negative: #db2828;
 $color-warning: #f2c037;
-$color-blue: #31b9c3; // from $color-medium
+$color-cold: #31b9c3;
 
 $game-width: 960px;
 $game-height: 540px;
@@ -41,7 +41,7 @@ $ui-column: 60px;
 $ui-row: 40px;
 
 html {
-	overflow: scroll;
+	overflow: hidden;
 	// scroll-behavior: smooth;
 }
 
@@ -170,11 +170,16 @@ canvas {
 .AlignBottom { vertical-align: bottom; }
 
 .NoPadding { padding: 0!important; }
+.NoSidePadding { padding-left: 0!important; padding-right: 0!important; }
 .NoMargin { margin: 0!important }
 .NoBorder { border: 0!important }
 .AutoMargin { margin: auto!important }
+.AutoWidth { width: auto!important }
+.AutoHeight { height: auto!important }
 
 .Padded { padding: 0.5em!important; }
+.PaddedHalf { padding: 0.25em!important; }
+.PaddedDouble { padding: 1em!important; }
 .PaddedLeft { padding-left: 0.5em!important; }
 .PaddedRight { padding-right: 0.5em!important; }
 .PaddedTop { padding-top: 0.5em!important; }
@@ -184,6 +189,10 @@ canvas {
 
 .Block { display: inline-block; }
 .Flex { display: flex; }
+
+.Overflow { overflow: hidden; } // do not expand parent
+.BreakWord { word-wrap:break-word!important; overflow-wrap: break-word!important; }
+.NoBreak { white-space: nowrap; }
 
 .NoMouse { pointer-events: none; }
 .YesMouse { pointer-events: auto; }
@@ -198,7 +207,7 @@ canvas {
 }
 
 .Black     { color: #444; }
-.Important { color: $color-important; }
+.Important { color: $color-important!important; }
 .Bright    { color: $color-bright!important; }
 .Brightest { color: $color-brightest!important; }
 .Positive  { color: $color-positive!important; }
@@ -206,6 +215,7 @@ canvas {
 .Warning   { color: $color-warning!important; }
 .Canceled  { color: $color-inactive!important; }
 .Inactive  { color: $color-inactive!important; }
+.Disabled  { color: $color-inactive!important; }
 
 .BgBlack     { background-color: #444; }
 .BgImportant { background-color: $color-important!important; }
@@ -217,17 +227,28 @@ canvas {
 .BgInactive  { background-color: $color-inactive!important; }
 
 
-.Code {
+.Number {
+  // @extend .TitleCase;
   font-family: $font-family-mono;
-  font-size: 12px;
+  line-height: 1.0rem!important;
+}
+.Code {
+  @extend .Number;
+  font-size: 1.2rem;
 }
 
 .Quote {
   font-style: italic;
 }
 
+.Smallest {
+  font-size: 0.7em!important;
+}
 .Smaller {
-  font-size: 0.7em;
+  font-size: 0.8em!important;
+}
+.ResetSize {
+  font-size: 1.0em!important;
 }
 .Larger {
   font-size: 1.5em!important;
@@ -242,8 +263,13 @@ canvas {
 }
 
 .Anchor {
-  cursor: pointer;
+  cursor: pointer!important;
   pointer-events: all!important;
+  user-select: none;
+}
+
+.Unselectable {
+  user-select: none;
 }
 
 .Spacer5 {
@@ -270,8 +296,8 @@ canvas {
 .Relative {
   position: relative;
 }
-.AbsoluteLeft {
-  position: absolute;
+.Absolute, .AbsoluteLeft {
+  position: absolute!important;
   top: 0;
   left: 0;
 }
@@ -301,9 +327,19 @@ canvas {
   -webkit-filter: sepia(1); /* Old WebKit */
 }
 
+.FillWidth80 {
+  width: 80%!important;
+  min-width: 80%;
+  align-items: center;
+}
+.FillWidth90 {
+  width: 90%!important;
+  min-width: 90%;
+  align-items: center;
+}
 .FillWidth {
   width: 100%!important;
-  min-width: 100%;
+  min-width: 100%!important;
   align-items: center;
 }
 .FillHeight {
@@ -331,6 +367,11 @@ canvas {
 	justify-content: center;
 	align-items: center;
 	// text-align: center;
+}
+
+.Scroller {
+  scrollbar-width: thin;
+  overflow-y: scroll;
 }
 
 TextArea {
@@ -469,12 +510,11 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 .TableMain {
+  @extend .Scroller;
   position: relative;
   margin-top: 100px;
   max-height: 500px;
   width: 800px;
-  scrollbar-width: thin;
-  overflow-y: scroll;
   // border: 0.5px solid #0001;
 }
 .TableValue {
@@ -483,9 +523,8 @@ $box-h: calc((100vh - $aspect-h) / 2);
   font-weight: 600;
 }
 .TableInModal {
+  @extend .Scroller;
   max-height: 400px;
-  scrollbar-width: thin;
-  overflow-y: scroll;
 }
 .TableCell {
   font-size: 1.2em;
@@ -498,9 +537,21 @@ $box-h: calc((100vh - $aspect-h) / 2);
 .ModalText {
   font-size: 20px!important;
 }
-.ModalBladesDescription {
+.DuelistModalDescription {
+  width: 620px;
+}
+.BladesModalDescription {
   @extend .CenteredContainer;
   height: 130px;
+}
+
+.StarknetConnectModal {
+  max-width: 400px;
+}
+
+.OnboardingModal {
+  min-height: 380px;
+  padding-top: 0!important;
 }
 
 // .TableHeader {
@@ -522,6 +573,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 .SmallButton {
   margin: 0 0.1em;
   padding: 0.1em 0.4em;
+  min-height: unset;
 }
 
 .LargeButton {
@@ -532,6 +584,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 .FilterButton {
   margin: 0 0.5em!important;
   padding: 0.25em 0.5em!important;
+  min-height: 20px!important;
 }
 
 .Locked {
@@ -539,9 +592,6 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 .Unlocked {
   background-color: $color-active;
-}
-.Attention {
-  color: $color-attention!important;
 }
 
 // GAME CANVAS
@@ -587,8 +637,8 @@ $ui-container-gap: 1em;
   // background-color: #f008;
   background-color: #0004; // For browsers that do not support gradients
   background-image: linear-gradient(to right, #000, transparent);
-  min-width: 700px;
-  width: 700px;
+  min-width: 620px;
+  width: 620px;
   height: 100%;
   position: absolute;
   top: 0px;
@@ -599,12 +649,14 @@ $ui-container-gap: 1em;
   @extend .UIContainer;
   width: 620px;
 }
-.UIContainerScroller {
+.UIMenuTavernScroller {
+  @extend .Scroller;
   width: 100%;
   height: calc($aspect-h - $profile-pic-width - 1em * 6 - 1px);
-  scrollbar-width: thin;
-  overflow-y: scroll;
-  // border: 0.5px solid #0001;
+}
+.UIAccountsListScroller {
+  @extend .UIMenuTavernScroller;
+  height: calc($aspect-h - 12px - 285px - 12px - 41px - 12px);
 }
 
 .TitleCase {
@@ -660,12 +712,6 @@ $ui-container-gap: 1em;
 }
 .ProfilePicSelectButton:hover {
   color: $color-brightest;
-}
-.ProfilePicLeftButton {
-  @extend .AbsoluteLeft, .ProfilePicSelectButton;
-}
-.ProfilePicRightButton {
-  @extend .AbsoluteRight, .ProfilePicSelectButton;
 }
 .ProfilePicDisabled {
   // @extend .Grayscale;
@@ -783,10 +829,6 @@ $ui-container-gap: 1em;
 	text-shadow: 0.1em 0 $color-shadow;
 	color: $color-text;
 }
-.InfoIcon {
-	@extend .Icon;
-	// color: $color-text;
-}
 .PacesIcon {
   font-family: $font-family-mono!important;
   font-size: 1.2em!important;
@@ -813,6 +855,51 @@ $ui-container-gap: 1em;
   background: rgba($color-bg, 0.8);
 }
 
+// Icon click feedback
+.IconClick_hover {
+  color: $color-brightest;
+	animation-name: IconHoverAnimation;
+	animation-duration: 0.1s;
+	animation-iteration-count: 1;
+	animation-timing-function: ease-out;
+	animation-fill-mode: forwards;
+	-webkit-animation-name: IconHoverAnimation;
+	-webkit-animation-duration: 0.1s;
+	-webkit-animation-iteration-count: 1;
+	-webkit-animation-timing-function: ease-out;
+	-webkit-animation-fill-mode: forwards;
+}
+.IconClick_active {
+	animation-name: IconClickAnimation;
+	animation-duration: 0.2s;
+	animation-iteration-count: 1;
+	animation-timing-function: ease-out;
+	animation-fill-mode: forwards;
+	-webkit-animation-name: IconClickAnimation;
+	-webkit-animation-duration: 0.2s;
+	-webkit-animation-iteration-count: 1;
+	-webkit-animation-timing-function: ease-out;
+	-webkit-animation-fill-mode: forwards;
+}
+.IconClick {
+  @extend .Anchor;
+  color: $color-bright;
+  &:hover {
+    @extend .IconClick_hover;
+  }
+  &:active {
+    @extend .IconClick_active;
+  }
+}
+@keyframes IconClickAnimation {
+	from { -webkit-transform: scale(0.9); }
+	to { -webkit-transform: scale(1); }
+}
+@keyframes IconHoverAnimation {
+	from { -webkit-transform: scale(1); }
+	to { -webkit-transform: scale(1.1); }
+}
+
 // <CustomIcon>
 $logo-url: '/logos/logo_avante.svg';
 .CustomIcon {
@@ -830,13 +917,14 @@ $logo-url: '/logos/logo_avante.svg';
   mask-repeat: no-repeat;
 	@include make-box-shadow(0.1em 0 $color-dark);
 }
-.IconLink {
-  background-color: $color-link;
-  pointer-events: auto;
-  cursor: pointer;
-}
-.IconLink:hover, .IconLink:active {
-  background-color: $color-brightest;
+.CustomIconClick {
+  background-color: $color-bright!important;
+  &:hover {
+    background-color: $color-brightest!important;
+  }
+  &:active {
+    background-color: $color-brightest!important;
+  }
 }
 .CustomIconPng {
   background-size: contain;
@@ -849,33 +937,26 @@ $logo-url: '/logos/logo_avante.svg';
   left: 0;
 }
 
-
-// Icon click feedback
-.IconClick:active {
-	animation-name: IconClickAnimation;
-	animation-duration: 0.2s;
-	animation-iteration-count: 1;
-	animation-timing-function: ease-out;
-	animation-fill-mode: forwards;
-	-webkit-animation-name: IconClickAnimation;
-	-webkit-animation-duration: 0.2s;
-	-webkit-animation-iteration-count: 1;
-	-webkit-animation-timing-function: ease-out;
-	-webkit-animation-fill-mode: forwards;
+.TransferIcon {
+  transform: rotate(0deg);
+  line-height: 1.01em;
 }
-@keyframes IconClickAnimation {
-	from { -webkit-transform: scale(0.7); }
-	to { -webkit-transform: scale(1); }
+.TransferIcon:hover {
+  transform: rotate(180deg);
+}
+.TransferIconAnim {
+  transition: transform .25s ease;
 }
 
-.Wager {
-  @extend .TitleCase, .H4;
-}
+
 .WagerBig {
-  @extend .TitleCase, .H3, .Bold;
+  @extend .TitleCase, .H3, .Bold;//, .Number;
+}
+.Wager {
+  @extend .TitleCase, .H4;//, .Number;
 }
 .WagerSmall {
-  @extend .TitleCase, .H5, .Bold;
+  @extend .TitleCase, .H5, .Bold;//, .Number;
 }
 
 .ChancesBar {
@@ -883,7 +964,7 @@ $logo-url: '/logos/logo_avante.svg';
   margin: auto!important;
 }
 
-.GlanceBar {
+.LethalBar {
   background-color: $color-warning;
   width: 0;
   height: 21px;
@@ -939,15 +1020,10 @@ input::placeholder {
 .ui.input>input,
 .ui.form input:not([type]),
 .ui.selection.dropdown {
-  @extend ._round_border;
+  @extend ._button_shape, ._round_border;
   background-color: $color-dark!important;
   // color: rgba($color-text, 0.75)!important;
   color: $color-text!important;
-  // font-style: italic!important;
-  font-size: 1.25em;
-  line-height: 1em;
-  padding: 0.5em 1em;
-  min-height: 35px;
 }
 .ui.selection.dropdown {
   color: $color-brightest!important;
@@ -976,14 +1052,28 @@ input::placeholder {
 .ui.selection.visible.dropdown>.text:not(.default),
 .ui.active.search.dropdown input.search:focus+.text,
 .ui.dropdown .menu .selected.item  {
-  background-color: $color-dark!important;
+  @extend ._round_border;
+  background-color: $color-darkest!important;
   color: $color-brightest!important;
   font-weight: 600;
+}
+.ui.dropdown .menu>.item:hover {
+  background-color: $color-dark!important;
 }
 .ui.selection.dropdown .menu>.item {
   background-color: $color-dark!important;
   color: $color-text!important;
   border-top: $border-hr;
+}
+.ui.floating.dropdown>.menu {
+  @extend ._round_border;
+  margin-top: 0!important;
+}
+.ui.dropdown .menu>.item {
+  color: $color-brightest!important;
+}
+.ui.active.button, .ui.active.button:hover {
+  @extend ._button_active;
 }
 // forms
 .FormLabel {
@@ -1009,14 +1099,19 @@ input::placeholder {
 }
 //
 // <Button>
-._button {
-  @extend ._round_border, .TitleCase;
-  font-family: $font-family;
-  background-color: rgba($color-dark, 0.6);
-  color: $color-text;
+._button_shape {
   font-size: 1.2rem; // semantic: 1rem;
   padding: 0.5em 1em;// semantic: 0.78571429em 1.5em 0.78571429em;
   margin: 0.15em 0;
+  line-height: 1em;
+  min-height: 30px;
+  margin: 0.15em 0;
+}
+._button {
+  @extend ._button_shape, ._round_border, .TitleCase;
+  font-family: $font-family;
+  background-color: rgba($color-dark, 0.6);
+  color: $color-text;
 }
 ._button_hover {
   background-color: $color-bright;
@@ -1105,6 +1200,7 @@ input::placeholder {
 // <Tab> <TabPane>
 .ui.attached.menu:not(.tabular) {
   border: 0;
+  padding-left: 5px;
 }
 .ui.secondary.pointing.menu .item {
   padding: 0.5em 3em 0.5em 1em; // semantic: 0.85714286em 1.14285714em;
@@ -1146,6 +1242,7 @@ $table-bg-color: rgba($color-darkest, 0.6);
   background-color: rgba($color-darkest, 1);
   color: $color-brightest!important;
   font-size: 0.9em!important;
+  padding: 0.8em 0.2em;
 }
 .ui.sortable.table thead th.sorted,
 .ui.sortable.table thead th:hover {
@@ -1171,7 +1268,7 @@ td {
 }
 .ui.table td {
   @extend .TableCell;
-  padding: 0.5em;
+  padding: 0.2em 0.4em;
 }
 .ui.selectable.table tbody tr:hover {
   color: $color-text!important;
@@ -1215,6 +1312,7 @@ td {
 }
 .ui.modal>.header:not(.ui) {
   padding: 0.25em 0.5em;
+  height: 2em;
 }
 .ui.modal>.actions {
   border-top: $border-hr;
@@ -1232,7 +1330,7 @@ td {
 }
 //
 // <Step>
-.ui.steps {
+.ui.steps:not(.NoBorder) {
   @extend ._round_border;
 }
 .ui.steps .step,
@@ -1246,6 +1344,7 @@ td {
 }
 .ui.vertical.steps .step {
   border-bottom: $border-hr;
+  padding: 1em 2em;
 }
 .ui.steps .step.active {
   background-color: $color-important;

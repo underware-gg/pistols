@@ -1,11 +1,9 @@
 import React, { useMemo } from 'react'
 import { Grid } from 'semantic-ui-react'
+import { useRouterTable } from '@/pistols/hooks/useRouterListener'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { useDojoAccount } from '@/dojo/DojoContext'
-import { LordsBalance, LockedBalance } from '@/pistols/components/account/LordsBalance'
-import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
+import { LordsBalance, LockedWagerBalance } from '@/pistols/components/account/LordsBalance'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { bigintEquals } from '@/lib/utils/type'
 import { EMOJI } from '@/pistols/data/messages'
 
 const Row = Grid.Row
@@ -15,11 +13,20 @@ export function ProfileName({
   address,
   badges = true,
 }) {
-  const { name, honour } = useDuelist(address)
-  const _badges = useMemo(() => (badges && honour > 9.0 ? ` ${EMOJI.LORD}` : null), [honour])
+  const { name } = useDuelist(address)
   return (
-    <span>{name}{_badges}</span>
+    <span className='BreakWord'>{name} {badges && <ProfileBadge address={address} />}</span>
   )
+}
+
+export function ProfileBadge({
+  address,
+}) {
+  const { is_villain, is_trickster, is_lord } = useDuelist(address)
+  if (is_villain) return <>{EMOJI.VILLAIN}</>
+  if (is_trickster) return <>{EMOJI.TRICKSTER}</>
+  if (is_lord) return <>{EMOJI.LORD}</>
+  return <></>
 }
 
 export function ProfileDescription({
@@ -28,26 +35,35 @@ export function ProfileDescription({
   displayAddress = false,
   displayBalance = false,
 }) {
-  const { total_wins, total_losses, total_draws, total_duels, total_honour, honourAndTotal } = useDuelist(address)
-  const { account } = useDojoAccount()
-  const isYou = useMemo(() => bigintEquals(address, account.address), [address, account])
+  const { tableId } = useRouterTable()
+  const {
+    total_wins, total_losses, total_draws, total_duels, total_honour, honourAndTotal,
+    is_villain, is_trickster, is_lord, levelDisplay, levelAndTotal,
+  } = useDuelist(address)
+  // const { accountAddress } = useDojoAccount()
+  // const isYou = useMemo(() => bigintEquals(address, accountAddress), [address, accountAddress])
   return (
-    <Grid columns='equal'>
+    <Grid>
       <Row>
 
-        <Col>
-          <h1 className='NoMargin'><ProfileName address={address} /></h1>
+        <Col width={displayStats ? 12 : 16}>
+          <h1 className='NoMargin'><ProfileName address={address} badges={false}/></h1>
           {displayAddress && <AddressShort address={address} />}
-          <h3 className='Important NoMargin'>Honour: {honourAndTotal}</h3>
+          <h3 className='Important NoMargin TitleCase'>
+            Honour: <span className='Wager'>{honourAndTotal}</span>
+            {is_villain && <> {EMOJI.VILLAIN} <span className='Wager'>{levelDisplay}</span></>}
+            {is_trickster && <> {EMOJI.TRICKSTER} <span className='Wager'>{levelDisplay}</span></>}
+            {is_lord && <> {EMOJI.LORD} <span className='Wager'>{levelDisplay}</span></>}
+          </h3>
           {displayBalance && <>
-            <LordsBalance address={address} />
-            <LockedBalance address={address} clean />
-            {isYou && <><br /><LordsFaucet /></>}
+            <LordsBalance address={address} big />
+            <LockedWagerBalance tableId={tableId} address={address} clean />
+            {/* {isYou && <><br /><LordsFaucet /></>} */}
           </>}
         </Col>
 
         {displayStats && total_duels > 0 &&
-          <Col className='ProfileStats PaddedRight TitleCase' textAlign='right'>
+          <Col width={4} className='ProfileStats PaddedRight TitleCase' textAlign='right'>
             Duels: <span className='Bold'>{total_duels}</span>
             <br />
             Wins: <span className='Bold'>{total_wins}</span>

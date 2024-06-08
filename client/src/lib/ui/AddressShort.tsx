@@ -1,24 +1,34 @@
 import { useMemo } from 'react'
 import { CopyIcon } from '@/lib/ui/Icons'
-import { bigintToHex } from '@/lib/utils/type'
-
-const shortAddress = (address) => (!address ? '?' : `${address.slice(0, 6)}…${address.slice(-4)}`)
+import { bigintToHex, shortAddress } from '@/lib/utils/types'
+import { BigNumberish } from 'starknet'
 
 function AddressShort({
   address,
-  suffix = '',
+  pre = '',
+  post = '',
   copyLink = true,
+  important = false,
+  ifExists = false,
+}: {
+  address: BigNumberish
+  pre?: string
+  post?: string
+  copyLink?: boolean
+  important?: boolean
+  ifExists?: boolean
 }) {
-  const _address = useMemo(() => (typeof address == 'bigint' ? `0x${address.toString(16)}` : address), [address])
-  const display = useMemo(() => (_address ? shortAddress(_address) : '0x?'), [_address])
+  const display = useMemo(() => (shortAddress(bigintToHex(address))), [address])
+  let classNames = ['Code']
+  if (important) classNames.push('Important')
+  if (ifExists && BigInt(address ?? 0) == 0n) return <></>
   return (
-    <span className='Code'>
-      {copyLink && <CopyIcon content={bigintToHex(address)} />} {suffix}{display} 
+    <span className={classNames.join(' ')}>
+      {pre} {display} {copyLink && address && <CopyIcon content={bigintToHex(address)} />} {post}
     </span>
   )
 }
 
 export {
-  shortAddress,
   AddressShort,
 }

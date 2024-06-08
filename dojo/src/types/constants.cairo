@@ -3,20 +3,28 @@ mod constants {
     // number of rounds per duel
     const ROUND_COUNT: u8 = 3;
     
-    // max honour of a player
-    const FULL_HONOUR: u8 = 100;
-    
-    // initial health of a player on a duel
-    const FULL_HEALTH: u8 = 3;
-    // damage taken
+    // duelist health & damage
+    const FULL_HEALTH: u8 = 3;      // initial health
     const DOUBLE_DAMAGE: u8 = 2;
     const SINGLE_DAMAGE: u8 = 1;
 
-    // Hit penalty per damage taken
-    const HIT_PENALTY_PER_DAMAGE: u8 = 10;
-
     // const HASH_SALT_MASK: u256 = 0xffffffffffffffff; // 64 bits
     const HASH_SALT_MASK: u256 = 0x1fffffffffffff;   // 53 bits (Number.MAX_SAFE_INTEGER, 9007199254740991)
+
+    const ETH_TO_WEI: u256 = 1_000_000_000_000_000_000;
+}
+
+mod honour {
+    // archetype ranges (Honour)
+    const VILLAIN_START: u8 = 10;  // min honour
+    const TRICKSTER_START: u8 = 35;
+    const LORD_START: u8 = 75;
+    const HALFWAY: u8 = 50;        // half honour
+    const MAX: u8 = 100;           // max honour
+
+    // Bonus values
+    const LEVEL_MIN: u8 = 10;
+    const LEVEL_MAX: u8 = 100;
 }
 
 mod chances {
@@ -28,11 +36,31 @@ mod chances {
     const PISTOLS_KILL_AT_STEP_10: u8 = 20;
     const PISTOLS_HIT_AT_STEP_1: u8 = 100;
     const PISTOLS_HIT_AT_STEP_10: u8 = 20;
-    const PISTOLS_GLANCE_AT_STEP_1: u8 = 20;
-    const PISTOLS_GLANCE_AT_STEP_10: u8 = 15;
+    const PISTOLS_LETHAL_AT_STEP_1: u8 = 80;    // inside PISTOLS_HIT_AT_STEP_1
+    const PISTOLS_LETHAL_AT_STEP_10: u8 = 5;    // inside PISTOLS_HIT_AT_STEP_10
 
     // Blades chances (percentage)
-    const BLADES_KILL: u8 = 15;
+    const BLADES_CRIT: u8 = 20;
     const BLADES_HIT: u8 = 75;
-    const BLADES_GLANCE: u8 = 0;
+
+    // archetype bonus
+    const CRIT_BONUS_LORD: u8 = 12;
+    const CRIT_BONUS_TRICKSTER: u8 = 6;
+    const HIT_BONUS_VILLAIN: u8 = 20;
+    const HIT_BONUS_TRICKSTER: u8 = 10;
+
+    // match bonuse
+    const EARLY_LORD_CRIT_BONUS: u8 = 10;
+    const LATE_VILLAIN_CRIT_BONUS: u8 = 10;
+
+    // penalties for damage
+    const CRIT_PENALTY_PER_DAMAGE: u8 = 0;
+    const HIT_PENALTY_PER_DAMAGE: u8 = 10;
+
+    // Lords advantage when shooting equal or late
+    const LORD_LETHAL_PENALTY: u8 = 10;
+
+    // trickster advantage as opponent penalty
+    const TRICKSTER_CRIT_PENALTY: u8 = 2;
+    const TRICKSTER_HIT_PENALTY: u8 = 10;
 }

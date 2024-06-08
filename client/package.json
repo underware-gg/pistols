@@ -1,37 +1,39 @@
 {
   "name": "pistols",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.8.3",
   "type": "module",
   "scripts": {
-    "dev": "NODE_OPTIONS=--experimental-wasm-modules next dev",
+    "dev": "NODE_OPTIONS='--experimental-wasm-modules' next dev",
     "start": "next start",
-    "build": "npx tsc -p tsconfig.json && NODE_OPTIONS=--experimental-wasm-modules next build",
+    "build": "npx tsc -p tsconfig.json && NODE_OPTIONS='--experimental-wasm-modules' next build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "create-components": "npx @dojoengine/core ../dojo/target/dev/manifest.json src/dojo/contractComponents.ts",
-    "create-components_local": "script/generateComponents.cjs ../dojo/target/dev/manifest.json src/dojo/contractComponents.ts"
+    "print-profile": "echo usage: npm run print-profile --profile=dev && echo \"profile:[$npm_config_profile]\"",
+    "create-components": "GEN_PATH=\"./src/games/$npm_config_game/generated/$npm_config_profile\" && echo create-components:[$GEN_PATH] && npx @dojoengine/core $GEN_PATH/manifest.json $GEN_PATH/contractComponents.ts",
+    "create-constants": "GEN_PATH=\"./src/games/$npm_config_game/generated/$npm_config_profile\" && echo create-constants:[$GEN_PATH] && ./src/lib/bin/generateConstants.cjs ../dojo/src $GEN_PATH/contractConstants.ts"
   },
   "dependencies": {
-    "@dojoengine/core": "^0.5.6",
-    "@dojoengine/create-burner": "^0.5.6",
-    "@dojoengine/react": "^0.5.6",
+    "@dojoengine/core": "^0.7.0-alpha.2",
+    "@dojoengine/create-burner": "^0.7.0-alpha.2",
+    "@dojoengine/react": "^0.7.0-alpha.2",
     "@dojoengine/recs": "^0.1.35",
-    "@dojoengine/state": "^0.5.6",
-    "@dojoengine/torii-client": "^0.5.6",
-    "@dojoengine/utils": "^0.5.6",
+    "@dojoengine/state": "^0.7.0-alpha.2",
+    "@dojoengine/torii-client": "^0.7.0-alpha.2",
+    "@dojoengine/utils": "^0.7.0-alpha.2",
     "@starknet-react/chains": "^0.1.7",
-    "@starknet-react/core": "^2.3.0",
+    "@starknet-react/core": "^2.2.5",
     "@tweenjs/tween.js": "^21.0.0",
     "event-emitter": "^0.3.5",
+    "get-starknet-core": "^3.2.0",
+    "lil-gui": "^0.19.2",
     "next": "^13.5.6",
     "react": "^18.2.0",
     "react-cookie": "^6.1.1",
     "react-dom": "^18.2.0",
-    "react-unity-webgl": "^9.4.3",
     "sass": "^1.69.5",
     "semantic-ui-css": "^2.5.0",
     "semantic-ui-react": "^3.0.0-beta.2",
-    "starknet": "5.29.0",
+    "starknet": "^6.1.5",
     "swr": "^2.2.4",
     "three": "^0.157.0",
     "type-fest": "^2.14.0",
@@ -48,6 +50,10 @@
     "eslint": "^8.51.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
-    "typescript": "^5.0.2"
+    "typescript": "^5.0.3"
+  },
+  "engines": {
+    "pnpm": ">=9",
+    "node": ">=18"
   }
 }

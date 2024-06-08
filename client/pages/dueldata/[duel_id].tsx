@@ -1,16 +1,15 @@
 import React from 'react'
 import { useRouter } from 'next/router'
 import { Container, Divider, Table } from 'semantic-ui-react'
-import { bigintToHex } from '@/lib/utils/type'
+import { bigintToHex } from '@/lib/utils/types'
 import { formatTimestamp } from '@/lib/utils/timestamp'
-import AppPistols from '@/pistols/components/AppPistols'
+import { weiToEth } from '@/lib/utils/starknet'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ActionEmojis, ActionNames, ChallengeStateNames, RoundStateNames } from '@/pistols/utils/pistols'
-import { BigNumberish } from 'starknet'
 import { useWager } from '@/pistols/hooks/useWager'
-import { weiToEth } from '@/lib/utils/starknet'
-import { useCoin } from '@/pistols/hooks/useConfig'
+import { useTable } from '@/pistols/hooks/useTable'
+import AppPistols from '@/pistols/components/AppPistols'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -23,7 +22,7 @@ export default function StatsPage() {
   const { duel_id } = router.query
 
   return (
-    <AppPistols title={'Duel'} backgroundImage={null}>
+    <AppPistols headerData={{ title: 'Duel' }} backgroundImage={null}>
       {router.isReady &&
         <Stats duelId={BigInt(duel_id as string)} />
       }
@@ -36,7 +35,10 @@ function Stats({
 }: {
   duelId: bigint
 }) {
-  const { round1, round2, round3 } = useDuel(duelId)
+  const {
+    challenge: { tableId },
+    round1, round2, round3,
+  } = useDuel(duelId)
 
   return (
     <Container text>
@@ -44,7 +46,7 @@ function Stats({
 
       <div className='Code'>
         <DuelStats duelId={duelId} />
-        <WagerStats duelId={duelId} />
+        <WagerStats duelId={duelId} tableId={tableId}/>
 
         {round1 && <>
           <RoundStats duelId={duelId} roundNumber={1} round={round1} />
@@ -150,14 +152,15 @@ function DuelStats({
 }
 
 function WagerStats({
-  duelId
+  duelId,
+  tableId,
 }: {
   duelId: bigint
+  tableId: string
 }) {
-  const wager = useWager(duelId)
-  const coin = useCoin(wager?.coin)
-  console.log(coin)
-  if (wager.value == 0) return <></>
+  const { value, fee } = useWager(duelId)
+  const { description } = useTable(tableId)
+  if (!value) return <></>
   return (
     <Table celled striped color='green'>
       <Header>
@@ -169,21 +172,21 @@ function WagerStats({
 
       <Body>
         <Row>
-          <Cell>Coin</Cell>
+          <Cell>Table</Cell>
           <Cell>
-            {wager.coin} ({coin.description})
+            {tableId} ({description})
           </Cell>
         </Row>
         <Row>
           <Cell>Value</Cell>
           <Cell>
-            {wager.value.toString()} wei : {weiToEth(wager.value).toString()}
+            {value?.toString() ?? 0} wei : {weiToEth(value ?? 0).toString()}
           </Cell>
         </Row>
         <Row>
           <Cell>Fee</Cell>
           <Cell>
-            {wager.fee.toString()} wei : {weiToEth(wager.fee).toString()}
+            {fee?.toString() ?? 0} wei : {weiToEth(fee ?? 0).toString()}
           </Cell>
         </Row>
       </Body>

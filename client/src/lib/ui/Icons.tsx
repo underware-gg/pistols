@@ -1,7 +1,8 @@
-import React, { useMemo } from 'react'
-import Link from 'next/link'
+import React, { useMemo, useState } from 'react'
 import { Icon, IconGroup, Popup, PopupContent, PopupHeader, SemanticICONS } from 'semantic-ui-react'
-import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
+import { IconProps, IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
+
+export type { IconSizeProp, SemanticICONS }
 
 // Semantic UI Icons
 // https://react.semantic-ui.com/elements/icon/
@@ -73,43 +74,23 @@ export function Tooltip({
 //---------------------------------
 // Info icon + Tooltip
 //
-interface InfoIconProps {
+interface IconInfoProps {
   size?: IconSizeProp
   content: string | typeof PopupContent
   header: typeof PopupHeader
 }
-export function InfoIcon({
+export function IconInfo({
   size = null, // normal size
   header = null,
   content = 'gabba bagga hey',
-}: InfoIconProps) {
+}: IconInfoProps) {
   return (
     <Tooltip header={header} content={content}>
-      <Icon name='info circle' size={size} className='InfoIcon' />
+      <Icon name='info circle' size={size} />
     </Tooltip>
   )
 }
 
-
-
-//---------------------------------
-// Copy to clipboard icon
-//
-interface CopyIconProps {
-  size?: IconSizeProp
-  content: string
-}
-export function CopyIcon({
-  size = null, // normal size
-  content = null, // content to copy
-}: CopyIconProps) {
-  function _copy() {
-    navigator?.clipboard?.writeText(content)
-  }
-  return (
-    <Icon className='Anchor InfoIcon IconClick' name='copy' size={size} onClick={() => _copy()} />
-  )
-}
 
 
 //---------------------------------
@@ -135,6 +116,33 @@ export function LoadingIcon({
     />)
 }
 
+
+//---------------------------------
+// clickable, animated icon
+//
+interface IconClickProps extends IconProps {
+  onClick: Function
+}
+export function IconClick(props: IconClickProps) {
+  return (
+    <Icon {...props} className='IconClick' onClick={() => props.onClick()} />
+  )
+}
+
+//---------------------------------
+// Copy to clipboard
+//
+interface CopyIconProps extends IconProps {
+  content: string
+}
+export function CopyIcon(props: CopyIconProps) {
+  function _copy() {
+    navigator?.clipboard?.writeText(props.content)
+  }
+  return (
+    <IconClick {...props} name='copy' onClick={() => _copy()} />
+  )
+}
 
 
 //---------------------------------
@@ -227,7 +235,7 @@ export function CustomIcon({
   const component = useMemo(() => {
     const _extension = png ? 'png' : 'svg'
     const _url = (logo ? `/logos/logo_${name}.${_extension}` : icon ? `/icons/icon_${name}.${_extension}` : null)
-    
+
     // not svg, logo, icon or png
     if (!_url) {
       return <Icon name={name as SemanticICONS} className={className} size={size} disabled={disabled} />
@@ -252,11 +260,11 @@ export function CustomIcon({
       MaskImage: `url(${_url})`,
       backgroundColor: null,
     }
-    let classNames = ['CustomIcon', 'icon', size]
+    let classNames = [className ?? '', 'CustomIcon', 'icon', size]
     if (disabled) classNames.push('disabled')
     if (flipped) classNames.push('flipped')
     if (onClick) {
-      classNames.push('IconLink')
+      classNames.push('IconClick CustomIconClick')
     } else {
       _style.backgroundColor = color
     }
@@ -280,3 +288,36 @@ export function CustomIcon({
   return component
 }
 
+
+
+export function IconTransfer({
+  rotated,
+  setRotated,
+}: {
+  rotated: boolean
+  setRotated: Function
+}) {
+  const [halt, setHalt] = useState(false)
+  const _click = () => {
+    setRotated(!rotated)
+    setHalt(true)
+    setTimeout(() => {
+      setHalt(false)
+    }, 500)
+  }
+  return (
+    <Icon className={`NoMargin Anchor TransferIcon ${!halt ? 'TransferIconAnim' : ''}`} onClick={() => _click()}
+      name={rotated ? 'arrow alternate circle down outline' : 'arrow alternate circle up outline'}
+    />
+  )
+}
+
+//-------------------------
+// Generic icons
+//
+export function IconChecked(props: IconProps) {
+  return <Icon color='green' {...props} name='check' />
+}
+export function IconWarning(props: IconProps) {
+  return <Icon color='orange' {...props} name='warning' />
+}

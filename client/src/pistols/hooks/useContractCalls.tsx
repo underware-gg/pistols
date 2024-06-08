@@ -1,113 +1,39 @@
 import { useEffect, useState } from 'react'
-import { useDojoSystemCalls } from '@/dojo/DojoContext'
+import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { BigNumberish } from 'starknet'
 
-export const useCalcFee = (wager_coin: number, wager_value: BigNumberish, defaultValue = null) => {
-  const [value, setValue] = useState(defaultValue)
+export const useCalcFee = (table_id: string, wager_value: BigNumberish, defaultValue = null) => {
   const { calc_fee } = useDojoSystemCalls()
+  const [value, setValue] = useState(defaultValue)
   useEffect(() => {
     let _mounted = true
     const _get = async () => {
-      const value = await calc_fee(wager_coin, wager_value)
+      const value = await calc_fee(table_id, wager_value)
       if (_mounted) setValue(value)
     }
-    if (wager_coin != null && wager_value != null) _get()
+    if (table_id) _get()
     else setValue(defaultValue)
     return () => { _mounted = false }
-  }, [wager_coin, wager_value])
+  }, [table_id, wager_value])
   return {
     fee: value,
   }
 }
 
-export const useCalcHitBonus = (address: BigNumberish, defaultValue = null) => {
-  const [value, setValue] = useState(defaultValue)
-  const { calc_hit_bonus } = useDojoSystemCalls()
+export const useSimulateChances = (address: BigNumberish, duelId: bigint, roundNumber: number, action: number, defaultValue = {}) => {
+  const { simulate_chances } = useDojoSystemCalls()
+  const [value, setValue] = useState<any | null>(defaultValue)
   useEffect(() => {
     let _mounted = true
     const _get = async () => {
-      const value = await calc_hit_bonus(BigInt(address))
-      if (_mounted) setValue(value)
-    }
-    if (address != null) _get()
-    else setValue(defaultValue)
-    return () => { _mounted = false }
-  }, [address])
-  return {
-    hitBonus: value,
-  }
-}
-
-export const useCalcHitChances = (address: BigNumberish, duelId: bigint, roundNumber: number, action: number, defaultValue = null) => {
-  const [value, setValue] = useState(defaultValue)
-  const { calc_hit_chances } = useDojoSystemCalls()
-  useEffect(() => {
-    let _mounted = true
-    const _get = async () => {
-      const value = await calc_hit_chances(BigInt(address), duelId, roundNumber, action)
+      const value = await simulate_chances(BigInt(address), duelId, roundNumber, action)
       if (_mounted) setValue(value)
     }
     if (address != null && duelId && roundNumber && action != null) _get()
     else setValue(defaultValue)
     return () => { _mounted = false }
   }, [address, duelId, roundNumber, action])
-  return {
-    hitChances: value,
-  }
-}
-
-export const useCalcCritChances = (address: BigNumberish, duelId: bigint, roundNumber: number, action: number, defaultValue = null) => {
-  const [value, setValue] = useState(defaultValue)
-  const { calc_crit_chances } = useDojoSystemCalls()
-  useEffect(() => {
-    let _mounted = true
-    const _get = async () => {
-      const value = await calc_crit_chances(BigInt(address), duelId, roundNumber, action)
-      if (_mounted) setValue(value)
-    }
-    if (address != null && duelId && roundNumber && action != null) _get()
-    else setValue(defaultValue)
-    return () => { _mounted = false }
-  }, [address, duelId, roundNumber, action])
-  return {
-    critChances: value,
-  }
-}
-
-export const useCalcGlanceChances = (address: BigNumberish, duelId: bigint, roundNumber: number, action: number, defaultValue = null) => {
-  const [value, setValue] = useState(defaultValue)
-  const { calc_glance_chances } = useDojoSystemCalls()
-  useEffect(() => {
-    let _mounted = true
-    const _get = async () => {
-      const value = await calc_glance_chances(BigInt(address), duelId, roundNumber, action)
-      if (_mounted) setValue(value)
-    }
-    if (address != null && duelId && roundNumber && action != null) _get()
-    else setValue(defaultValue)
-    return () => { _mounted = false }
-  }, [address, duelId, roundNumber, action])
-  return {
-    glanceChances: value,
-  }
-}
-
-export const useCalcHonourForAction = (address: BigNumberish, action: number, defaultValue = null) => {
-  const [value, setValue] = useState(defaultValue)
-  const { calc_honour_for_action } = useDojoSystemCalls()
-  useEffect(() => {
-    let _mounted = true
-    const _get = async () => {
-      const value = await calc_honour_for_action(BigInt(address), action)
-      if (_mounted) setValue(value)
-    }
-    if (address != null && action != null) _get()
-    else setValue(defaultValue)
-    return () => { _mounted = false }
-  }, [address, action])
-  return {
-    honourForAction: value,
-  }
+  return value as Awaited<ReturnType<typeof simulate_chances>>
 }
 
 export const useGetValidPackedActions = (round_number: number, defaultValue = []) => {

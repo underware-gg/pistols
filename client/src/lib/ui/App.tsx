@@ -1,17 +1,19 @@
 import React, { ReactNode, useMemo } from 'react'
 import { AppHeader, HeaderData } from '@/lib/ui/AppHeader'
 
+export interface AppProps {
+  headerData?: HeaderData
+  backgroundImage?: string
+  className?: string
+  children: ReactNode
+}
+
 export default function App({
   headerData = {},
   backgroundImage = null,
   className = '',
   children
-}: {
-  headerData?: HeaderData
-  backgroundImage?: string
-  className?: string
-  children: ReactNode
-}) {
+}: AppProps) {
   const style = useMemo(() => (backgroundImage ? {
     backgroundImage: `url(${backgroundImage})`,
     backgroundSize: `cover`,

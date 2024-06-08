@@ -1,8 +1,17 @@
 import * as THREE from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import GUI from 'lil-gui'
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader.js'
+import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js'
+
 import TWEEN from '@tweenjs/tween.js'
 //@ts-ignore
 import Stats from 'three/addons/libs/stats.module.js'
 import { Rain } from './Rain'
+import { Grass } from './Grass.tsx';
+import * as shaders from './shaders.tsx'
 
 // event emitter
 // var ee = require('event-emitter');
@@ -20,21 +29,63 @@ import { Action, ActionTypes } from '@/pistols/utils/pistols'
 // CONSTANTS
 //
 
+/**
+ * Sizes
+ */
 export const WIDTH = 1920//1200
 export const HEIGHT = 1080//675
 export const ASPECT = (WIDTH / HEIGHT)
-const FOV = 45
 
-const ACTOR_WIDTH = 140
-const ACTOR_HEIGHT = 79
-const PACES_Y = -50
-const PACES_X_0 = 40
-const PACES_X_STEP = 30
+/**
+ * Camera Constants
+ */
+const cameraData = {
+  fieldOfView: 13,
+  nearPlane: 0.1,
+  farPlane: 150,
+}
+
+const lightCameraShadowData = {
+  intensity: 2,
+  mapSize: 8192,
+  near: 30,
+  far: 80,
+  top: 30,
+  bottom: 10,
+  left: -10,
+  right: 10,
+}
+
+/**
+ * glTF file custom object names
+ */
+const glTFNames = {
+  light: 'Sun',
+  ground: 'Ground',
+  grass: 'Grass',
+  water: 'SimpleWaterPlane',
+  cliffs: 'Cliffs',
+  skyBackground: 'Sky',
+  sirSecond: 'Sir_Second',
+  speechBubblesLeft: 'Speech_Bubbles',
+  ladySecond: 'Lady_Second',
+  duelistLeft: 'Sir',
+  duelistRight: 'Lady',
+}
+
+const ACTOR_WIDTH = 2.5
+const ACTOR_HEIGHT = 1.35
+const PACES_X_0 = 0.5
 
 const zoomedCameraPos = {
   x: 0,
-  y: PACES_Y,
-  z: -HEIGHT,
+  y: 0.4,
+  z: -4,
+}
+const zoomedOutCameraPos = {
+  x: 0,
+  y: 1.7,
+  z: -30,
 }
 
 export enum AnimationState {
@@ -47,32 +98,75 @@ export enum AnimationState {
   HealthB = 11,
 }
 
+enum DuelistsData {
+  DUELIST_A_MODEL = 'DUELIST_A_MODEL',
+  DUELIST_A_NAME = 'DUELIST_A_NAME',
+
+  DUELIST_B_MODEL = 'DUELIST_B_MODEL',
+  DUELIST_B_NAME = 'DUELIST_B_NAME',
+}
+
 //-------------------------------------------
 // Setup
 //
+
+let _framerate = 60
 
 let _textures: any = {}
 let _spriteSheets: any = {}
 
 export let _renderer: THREE.WebGLRenderer
-export let _fullScreenGeom: THREE.PlaneGeometry = null
+export let _fullScreenGeom: THREE.PlaneGeometry = null //TODO test what this is
 
 let _animationRequest = null
 let _clock: THREE.Clock
 let _staticCamera: THREE.OrthographicCamera
 let _duelCamera: THREE.PerspectiveCamera
-let _duelCameraRig: THREE.Object3D
 let _supportsExtension: boolean = true
 let _stats
+let _controls
+let _mixer
+let _animations
+let _gui;
 
-let _duelistAModel
-let _duelistBModel
+let _duelistA = {
+  model: undefined,
+  name: undefined
+}
+let _duelistB = {
+  model: undefined,
+  name: undefined
+}
+
+let _grassTransforms
+let _growthPercentage
+let _grass
+
+let _ground
+let _groundMirror
+let _skyVideo
+let _skyVideoTexture
+let _ladySecond
+let _sirSecond
 
 let _currentScene: THREE.Scene = null
 let _scenes: Partial<Record<SceneName, THREE.Scene>> = {}
 let _sceneName: SceneName
 
 let _sfxEnabled = true
+let _statsEnabled = false
+let _round1Animated = false
+let _round2Animated = false
+let _round3Animated = false
+
+const _skyState = {
+  path: '/textures/animations/Sky/sky.mp4',
+  frameRate: 8,
+  framesCount: 126,
+  isBackwards: false,
+  lastDisplayTime: 0,
+  currentFrame: 0
+}
 
 const _tweens = {
   cameraPos: null,
@@ -83,12 +177,13 @@ const _tweens = {
 }
 
 export const _makeStaticCamera = (x, y, z) => {
-  let result = new THREE.OrthographicCamera(
+  let result = new THREE.OrthographicCamera( //TODO maybe switch to perspective??? Backround is the only problem
     -WIDTH / 2,
     WIDTH / 2,
     HEIGHT / 2,
     -HEIGHT / 2,
-    1, 10000)
+    cameraData.nearPlane, cameraData.farPlane
+  )
   result.position.set(x, y, z)
   return result
 }
@@ -102,90 +197,148 @@ export function dispose() {
   _scenes = {}
 }
 
-export async function init(canvas, width, height, statsEnabled = false) {
+export async function init(canvas, framerate = 60, statsEnabled = false) {
 
   if (Object.keys(_scenes).length > 0) {
     return
   }
 
-  console.log(`THREE.init()`)
+  _framerate = framerate
+  _statsEnabled = statsEnabled
 
-  Object.keys(TEXTURES).forEach(key => {
-    const TEX = TEXTURES[key]
-    const tex = new THREE.TextureLoader().load(TEX.path)
-    // tex.colorSpace = THREE.LinearSRGBColorSpace
-    _textures[key] = tex
-  })
-  Object.keys(SPRITESHEETS).forEach(actorName => {
-    _spriteSheets[actorName] = {}
-    Object.keys(SPRITESHEETS[actorName]).forEach(key => {
-      _spriteSheets[actorName][key] = new SpriteSheet(key, SPRITESHEETS[actorName][key])
-    })
-  })
+  setRender(canvas)
+
+  console.log(`THREE.init() loading assets...`)
 
   // color space migration
   // https://discourse.threejs.org/t/updates-to-color-management-in-three-js-r152/50791
   // THREE.ColorManagement.enabled = false
+  await loadAssets()
+  console.log(`THREE.init() assets loaded...`)
 
-  _renderer = new THREE.WebGLRenderer({
-    antialias: true,
-    alpha: true,
-    canvas,
-  })
-  _renderer.setSize(WIDTH, HEIGHT)
-  // _renderer.setClearColor(0, 1)
-  _renderer.outputColorSpace = THREE.LinearSRGBColorSpace // fix bright textures
-  _renderer.autoClear = false
-  _renderer.autoClearColor = false
-
-  _staticCamera = _makeStaticCamera(0, 0, HEIGHT)
-
-  _duelCameraRig = new THREE.Object3D()
-  _duelCameraRig.position.set(0, 0, 0)
-
-  _duelCamera = new THREE.PerspectiveCamera(
-    FOV,        // fov
-    ASPECT,     // aspect
-    0.01,       // near
-    WIDTH * 2,  // far
-  )
-  _duelCameraRig.add(_duelCamera)
-
-  _fullScreenGeom = new THREE.PlaneGeometry(WIDTH, HEIGHT)
-
-  window.addEventListener('resize', onWindowResize)
-
-  setupScenes()
-
-  // framerate
-  if (statsEnabled) {
+  _duelistA.model = localStorage.getItem(DuelistsData.DUELIST_A_MODEL)
+  _duelistB.model = localStorage.getItem(DuelistsData.DUELIST_B_MODEL)
+  _duelistA.name = localStorage.getItem(DuelistsData.DUELIST_A_NAME)
+  _duelistB.name = localStorage.getItem(DuelistsData.DUELIST_B_NAME)
+  _growthPercentage = localStorage.getItem('GROWTH')
+  
+  if (_statsEnabled) {
+    console.log(`DEBUG>>>>>>>>`)
     _stats = new Stats()
     document.body.appendChild(_stats.dom)
   }
+
+  _fullScreenGeom = new THREE.PlaneGeometry(WIDTH, HEIGHT)
+  setCameras()
+
+  window.addEventListener('resize', onWindowResize)
+  onWindowResize()
+
+  setupScenes()
 
   _clock = new THREE.Clock(true)
 
   console.log(`THREE.init() done 👍`)
 }
 
+function setCameras() {
+  _staticCamera = _makeStaticCamera(0, 0, 10)
+
+  _duelCamera = new THREE.PerspectiveCamera(
+    cameraData.fieldOfView,
+    ASPECT,
+    cameraData.nearPlane,
+    cameraData.farPlane,
+  )
+}
+
+async function loadAssets() {
+  await shaders.loadShaders();
+
+  const loadingManager = new THREE.LoadingManager();
+  const textureLoader = new THREE.TextureLoader(loadingManager);
+  const ktx2Loader = new KTX2Loader(loadingManager)
+  ktx2Loader.setTranscoderPath( '/basis/' )
+  ktx2Loader.detectSupport( _renderer )
+  ktx2Loader.setWorkerLimit(32)
+
+  Object.keys(TEXTURES).forEach(key => {
+    const TEX = TEXTURES[key]
+    if (TEX.path.includes('.ktx2')) {
+      ktx2Loader.load(TEX.path, (tex) => {
+        tex.colorSpace = THREE.SRGBColorSpace
+        tex.generateMipmaps = false
+        tex.minFilter = THREE.LinearFilter
+        _textures[key] = tex
+
+        if (key == TextureName.duel_ground && _ground) {
+          _ground.material.map = tex
+          _ground.material.needsUpdate = true
+        } else if (key == TextureName.duel_ground_normal && _ground) {
+          _ground.material.normalMap = tex
+          _ground.material.needsUpdate = true
+        }
+      })
+    } else {
+      const tex = textureLoader.load(TEX.path)
+      tex.colorSpace = THREE.SRGBColorSpace
+      tex.generateMipmaps = false
+      tex.minFilter = THREE.LinearFilter
+      _textures[key] = tex
+    }
+  })
+
+  Object.keys(SPRITESHEETS).forEach(actorName => {
+    _spriteSheets[actorName] = {}
+    Object.keys(SPRITESHEETS[actorName]).forEach(key => {
+      _spriteSheets[actorName][key] = new SpriteSheet(key, SPRITESHEETS[actorName][key], ktx2Loader)
+    })
+  })
+
+  ktx2Loader.dispose()
+
+  _textures[TextureName.duel_water_dudv].wrapS = _textures[TextureName.duel_water_dudv].wrapT = THREE.RepeatWrapping;
+}
+
+function setGUI() {
+  _gui = new GUI({
+    width: 400,
+    title: 'Scene Debug UI',
+    closeFolders: true,
+  });
+  _gui.close();
+}
+
+function setRender(canvas) {
+  _renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    alpha: true,
+    canvas,
+  })
+  _renderer.setSize(WIDTH, HEIGHT)
+  _renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3));
+  // _renderer.outputColorSpace = THREE.LinearSRGBColorSpace
+  // _renderer.autoClear = false
+  // _renderer.autoClearColor = false
+  _renderer.shadowMap.enabled = true
+  _renderer.shadowMap.type = THREE.PCFSoftShadowMap
+
+  // _renderer.debug.checkShaderErrors = false;
+}
+
 function onWindowResize() {
   // calc canvas size
-  const dpr = window.devicePixelRatio
   const winWidth = window.innerWidth
   const winHeight = window.innerHeight
   const aspect = winWidth / winHeight
   const canvasWidth = aspect > ASPECT ? winHeight * ASPECT : winWidth
   const canvasHeight = aspect > ASPECT ? winHeight : winWidth / ASPECT
-  _renderer.setPixelRatio(dpr)
   _renderer.setSize(canvasWidth, canvasHeight)
-  // calc cam height so I can work with (WIDTH, HEIGHT)
-  const h_z_ratio = Math.tan(FOV / 2.0 * Math.PI / 180.0) * 2.0
-  const scale = WIDTH / canvasWidth
-  const camHeight = (canvasHeight * scale) / h_z_ratio
+  _renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3));
+
   // setup cam
-  _duelCamera.up.set(0, 1, 0)
-  _duelCamera.position.set(0, 0, camHeight)
-  _duelCamera.lookAt(0, 0, 0)
+  _duelCamera.position.set(0, 0.3, -3)
+  _duelCamera.lookAt(0, 0.5, 2)
   _duelCamera.updateProjectionMatrix()
 }
 
@@ -194,30 +347,52 @@ function onWindowResize() {
 // Game Loop
 //
 
+let lastFrameTime = performance.now();
+
 export function animate() {
-  if (!_supportsExtension || !_renderer) return
+  if (!_supportsExtension || !_renderer) return;
 
-  // limit framerate
-  setTimeout(function () {
-    _animationRequest = requestAnimationFrame(animate)
-  }, 1000 / 60)
+  const now = performance.now();
+  const delta = now - lastFrameTime;
 
-  if (_currentScene) {
-    TWEEN.update()
+  const deltaTime = _clock.getDelta();
+  const elapsedTime = _clock.getElapsedTime();
 
-    _renderer.clear()
+  const frameDuration = 1000 / _framerate;
 
-    if (_sceneName == SceneName.Duel) {
-      _actor.A.update(_clock)
-      _actor.B.update(_clock)
-      _renderer.render(_currentScene, _duelCamera)
-      _stats?.update()
-    } else {
-      //@ts-ignore
-      _currentScene.children.forEach(c => c.animate?.(_clock))
-      _renderer.render(_currentScene, _staticCamera)
+  // More precise frame rate controll
+  if (delta >= frameDuration) {
+    lastFrameTime = now - (delta % frameDuration);
+
+    if (_currentScene) {
+      TWEEN.update();
+
+      _renderer.clear();
+
+      if (_sceneName == SceneName.Duel) {
+        _groundMirror?.setUniformValue("time", elapsedTime);
+        _mixer?.update(deltaTime);
+        _controls?.update();
+        _grass?.update(deltaTime);
+
+        _renderer.render(_currentScene, _duelCamera);
+      } else {
+        //@ts-ignore
+        _currentScene.children.forEach(c => c.animate?.(deltaTime)); //replaced with deltaTime (could be elapsedTime), because if more than one childs had called getDelta() the animation wont work as supposed
+        _renderer.render(_currentScene, _staticCamera);
+      }
+
+      _stats?.update();
     }
   }
+
+  if (_currentScene && _sceneName == SceneName.Duel) {  //Duelists and sky take care of their own framerate so for frame consistency this is better
+    _actor.A?.update(elapsedTime);
+    _actor.B?.update(elapsedTime);
+  }
+
+  // Continue the animation loop
+  _animationRequest = requestAnimationFrame(animate);
 }
 
 
@@ -245,53 +420,304 @@ function setupScenes() {
 //
 function setupDuelScene() {
   const scene = new THREE.Scene()
-  scene.add(_duelCameraRig)
+  scene.add(_duelCamera)
 
-  // const light = new THREE.AmbientLight(0x404040) // soft white light
-  // scene.add(light)
+  setEnvironment(scene)
 
-  // const testcard_mat = new THREE.MeshBasicMaterial({ color: 0xffffff, map: _textures.Testcard })
-  // const testcard = new THREE.Mesh(_fullScreenGeom, testcard_mat)
-  // testcard.position.set(0, 0, -1)
-  // scene.add(testcard)
+  if (_statsEnabled) {
+    setGUI()
+    setCameraHelpers(scene)
+  }
 
-  // BG
-  const bg_duel_mat = new THREE.MeshBasicMaterial({ map: _textures.bg_duel })
-  const bg_duel = new THREE.Mesh(_fullScreenGeom, bg_duel_mat)
-  bg_duel.position.set(0, 0, 0)
-  scene.add(bg_duel)
-
-  _actors.MALE_A = new Actor(_spriteSheets.MALE, ACTOR_WIDTH, ACTOR_HEIGHT, true)
-  _actors.MALE_A.mesh.position.set(-PACES_X_0, PACES_Y, 1)
-  
-  _actors.FEMALE_A = new Actor(_spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_HEIGHT, true)
-  _actors.FEMALE_A.mesh.position.set(-PACES_X_0, PACES_Y, 1)
-
-  _actors.MALE_B = new Actor(_spriteSheets.MALE, ACTOR_WIDTH, ACTOR_HEIGHT, false)
-  _actors.MALE_B.mesh.position.set(PACES_X_0, PACES_Y, 1)
-
-  _actors.FEMALE_B = new Actor(_spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_HEIGHT, false)
-  _actors.FEMALE_B.mesh.position.set(PACES_X_0, PACES_Y, 1)
-
-  onWindowResize()
+  loadDuelists()
+  loadGltf(scene)
 
   return scene
 }
 
 export function resetDuelScene() {
-  emitter.emit('animated', AnimationState.None)
+  if (!_duelistA.model || !_duelistB.model) return // skip if players models not initialized yet
 
-  //TODO if male or female
-  switchActor('A', _duelistAModel)
-  switchActor('B', _duelistBModel)
+  emitter.emit('animated', AnimationState.None)
+  _round1Animated = false
+  _round2Animated = false
+  _round3Animated = false
+
+  if (_sirSecond && _ladySecond) {
+    _sirSecond.visible = true
+    _ladySecond.visible = true
+  }
+
+  _actor['A']?.stop()
+  _actor['B']?.stop()
+
+  switchActor('A', _duelistA.model)
+  switchActor('B', _duelistB.model)
 
   zoomCameraToPaces(10, 0)
   zoomCameraToPaces(0, 5)
 
-  animateActorPaces('A', 0, 0)
-  animateActorPaces('B', 0, 0)
+  resetActorPositions()
   playActorAnimation('A', AnimName.STILL)
   playActorAnimation('B', AnimName.STILL)
+}
+
+/**
+ * Environment map
+ * set the scene environment and or background
+ */
+function setEnvironment(scene: THREE.Scene) { //TODO add skymap
+  const rgbeLoader = new RGBELoader();
+  rgbeLoader.load('/textures/sky_2k.hdr', (environmentMap) => {
+    environmentMap.mapping = THREE.EquirectangularReflectionMapping
+
+    scene.background = environmentMap
+    scene.environment = environmentMap
+  })
+}
+
+function loadDuelists() {
+  _actors.MALE_A = new Actor(_spriteSheets.MALE, ACTOR_WIDTH, ACTOR_HEIGHT, false)
+  _actors.FEMALE_A = new Actor(_spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_HEIGHT, false)
+
+  _actors.MALE_B = new Actor(_spriteSheets.MALE, ACTOR_WIDTH, ACTOR_HEIGHT, true)
+  _actors.FEMALE_B = new Actor(_spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_HEIGHT, true)
+}
+
+/**
+ * glTF loading
+ */
+function loadGltf(scene: THREE.Scene) {
+  const loader = new GLTFLoader();
+
+  loader.load(
+    '/models/Duel_3_water_y.glb',
+    function (gltf) {
+
+      /**
+       * Load Animations
+       */
+
+      _mixer = new THREE.AnimationMixer(gltf.scene);
+      _animations = gltf.animations
+
+      /**
+       * Adjust gltf children
+       */
+
+      const grassTransforms = []
+      Array.from(gltf.scene.children).forEach((child: any) => {
+        if (child.isLight) {
+          if (child.name == glTFNames.light) {
+            child.intensity = lightCameraShadowData.intensity
+            child.shadow.mapSize.set(lightCameraShadowData.mapSize, lightCameraShadowData.mapSize)
+            child.shadow.camera.near = lightCameraShadowData.near
+            child.shadow.camera.far = lightCameraShadowData.far
+            child.shadow.camera.top = lightCameraShadowData.top
+            child.shadow.camera.bottom = lightCameraShadowData.bottom
+            child.shadow.camera.left = lightCameraShadowData.left
+            child.shadow.camera.right = lightCameraShadowData.right
+            child.castShadow = true
+
+            //Light helpers
+            // const dirLightCameraHelper2 = new THREE.CameraHelper(child.shadow.camera)
+            // const directionalLightHelper2 = new THREE.DirectionalLightHelper(child) 
+            // scene.add(directionalLightHelper2)
+            // scene.add(dirLightCameraHelper2)
+          }
+        }
+
+        if (child.name == glTFNames.sirSecond || child.name == glTFNames.ladySecond) {
+          child.castShadow = true
+          child.material.alphaTest = 0.5
+          child.position.y = 0
+          if (child.name == glTFNames.sirSecond) {
+            _sirSecond = child
+          } else {
+            _ladySecond = child
+          }
+        } else if (child.name == glTFNames.duelistLeft || child.name == glTFNames.duelistRight) {
+          child.castShadow = true
+          child.material.alphaTest = 0.5
+          child.visible = false
+        }
+
+        if (child.name == glTFNames.ground) {
+          child.receiveShadow = true
+          child.material.map = _textures[TextureName.duel_ground],
+          child.material.normalMap = _textures[TextureName.duel_ground_normal],
+          child.position.set(0, 0, 0)
+
+          _ground = child
+        }
+
+        if (child.name.includes(glTFNames.grass)) {
+          const matrix = new THREE.Matrix4()
+          matrix.compose(child.getWorldPosition(new THREE.Vector3()), child.getWorldQuaternion(new THREE.Quaternion()), child.getWorldScale(new THREE.Vector3()))
+
+          grassTransforms.push(matrix)
+
+          gltf.scene.remove(child)
+        }
+
+        if (child.name == glTFNames.skyBackground) {
+          child.material.alphaTest = 0.5
+          child.renderOrder = -1
+          child.position.y = 0.2
+          child.position.z = 50
+
+          const video = document.createElement('video');
+          video.src = _skyState.path;
+          video.muted = true;
+          video.autoplay = true;
+          video.loop = true;
+          video.playbackRate = 0.5 //8 fps -> update with wind to go faster or slower even
+          video.play()
+
+          const texture = new THREE.VideoTexture(video);
+          texture.colorSpace = THREE.SRGBColorSpace
+          texture.flipY = false
+          
+          child.material.map = texture
+
+          _skyVideo = video
+          _skyVideoTexture = texture
+        }
+
+        if (child.name == glTFNames.water) {
+          child.visible = false
+          child.geometry.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
+
+          _groundMirror = createWaterPlane("Water", child.geometry, {
+            height: -0.001,
+            rotation: child.rotation,
+            scale: child.scale
+          })
+
+          scene.add(_groundMirror)
+        }
+        
+      })
+
+      _grassTransforms = grassTransforms
+      createGrass()
+      
+      scene.add(gltf.scene);
+    }
+  );
+}
+
+function createWaterPlane(name, geometry, params) {
+  const water = new shaders.ReflectorMaterial("WATER", geometry, {
+    clipBias: 0.0003,
+    textureWidth: WIDTH,
+    textureHeight: HEIGHT, //TODO check if this works??
+  });
+
+  water.setUniformValue('waterStrength', 0.04)
+  water.setUniformValue('waterSpeed', 0.03)
+  water.setUniformValue('waveStrength', 0.04)
+  water.setUniformValue('waveSpeed', 0.05)
+  water.setUniformValue('tDudv', _textures[TextureName.duel_water_dudv])
+  water.setUniformValue('waterMap', _textures[TextureName.duel_water_map])
+  water.setUniformValue('windDirection', new THREE.Vector2(1.0, 0.0))
+  water.setUniformValue('colorDeep', new THREE.Color(0x35595e))
+  water.setUniformValue('colorShallow', new THREE.Color(0x597f86))
+
+  water.rotation.set(params.rotation.x, params.rotation.y, params.rotation.z)
+  water.rotateX(Math.PI / 2)
+  water.scale.set(params.scale.x, params.scale.z, params.scale.y)
+  water.position.y = params.height;
+  water.position.z += 0.01
+  water.scale.x += 0.0025
+  water.scale.y += 0.0025
+
+  const waterColors = {
+    shallow: 0x597f86,
+    deep: 0x35595e
+  }
+
+  if (_statsEnabled) {
+    let waterGUI = _gui.addFolder(name);
+    waterGUI
+      .add(water.getUniforms()['waterSpeed'], 'value')
+      .name('waterSpeed')
+      .min(0.0001).max(1).step(0.0001)
+    waterGUI
+      .add(water.getUniforms()['waterStrength'], 'value')
+      .name('waterStrength')
+      .min(0.0001).max(1).step(0.0001)
+    waterGUI
+      .add(water.getUniforms()['waveSpeed'], 'value')
+      .name('waveSpeed')
+      .min(0.0001).max(1).step(0.0001)
+    waterGUI
+      .add(water.getUniforms()['waveStrength'], 'value')
+      .name('waveStrength')
+      .min(0.0001).max(1).step(0.0001)
+    waterGUI
+      .add(water.getUniforms()['windDirection'].value, 'x')
+      .name('windDirection - x')
+      .min(-1.0).max(1.0).step(0.01)
+    waterGUI
+      .add(water.getUniforms()['windDirection'].value, 'y')
+      .name('windDirection - y')
+      .min(-1.0).max(1.0).step(0.01)
+    waterGUI
+      .addColor(waterColors, 'shallow')
+      .onChange(() => {
+        water.setUniformValue('colorShallow', new THREE.Color(waterColors.shallow))
+      })
+      .name('colorShallow');
+    waterGUI
+      .addColor(waterColors, 'deep')
+      .onChange(() => {
+        water.setUniformValue('colorDeep', new THREE.Color(waterColors.deep))
+      })
+      .name('colorDeep');
+  }
+
+  return water
+}
+
+function createGrass() {
+  if (!_scenes[SceneName.Duel]) return;
+  if (!_grassTransforms || _growthPercentage == undefined) return;
+  if (_grass) return;
+
+  _grass = new Grass(
+    {
+      height: 0,
+      offset: 0.007,
+      heightmap: null,
+      dims: 256,
+      transforms: _grassTransforms,
+      growth: _growthPercentage
+    },
+    _statsEnabled,
+    _gui
+  );
+
+  _scenes[SceneName.Duel].add(_grass);
+}
+
+function setCameraHelpers(scene) {
+  // _controls = new OrbitControls(_duelCamera, _renderer.domElement)
+  // _controls.enableDamping = true
+  // _controls.dampingFactor = 0.04
+
+  const axesHelper = new THREE.AxesHelper(3)
+  scene.add(axesHelper)
+
+  if (_statsEnabled) {
+    _gui
+      .add(_duelCamera, 'fov')
+      .name('FOV')
+      .min(0).max(60).step(0.1)
+      .onChange(() => {
+        _duelCamera.updateProjectionMatrix()
+      })
+  }
 }
 
 //
@@ -320,6 +746,8 @@ function setupStaticScene(sceneName) {
 }
 
 export function resetStaticScene() {
+  if (!_currentScene) return
+  
   if (_tweens.staticZoom) TWEEN.remove(_tweens.staticZoom)
   if (_tweens.staticFade) TWEEN.remove(_tweens.staticFade)
   let bg = _currentScene.getObjectByName('bg') as THREE.Mesh
@@ -350,20 +778,28 @@ export function resetStaticScene() {
 // Game Interface
 //
 
-export function switchScene(sceneName, duelistModelA, duelistModelB) {
+export function switchScene(sceneName) {
   _sceneName = sceneName
   _currentScene = _scenes[sceneName]
   if (sceneName == SceneName.Duel) {
-    _duelistAModel = duelistModelA == "MALE" ? "MALE_A" : "FEMALE_A"
-    _duelistBModel = duelistModelB == "MALE" ? "MALE_B" : "FEMALE_B"
     resetDuelScene()
   } else {
     resetStaticScene()
   }
 }
 
-export function getCameraRig() {
-  return _duelCameraRig
+export function switchPlayers(duelistNameA, duelistModelA, duelistNameB, duelistModelB) {
+  localStorage.setItem(DuelistsData.DUELIST_A_MODEL, duelistModelA == "MALE" ? "MALE_A" : "FEMALE_A")
+  localStorage.setItem(DuelistsData.DUELIST_B_MODEL, duelistModelB == "MALE" ? "MALE_B" : "FEMALE_B")
+  _duelistA.model = localStorage.getItem(DuelistsData.DUELIST_A_MODEL)
+  _duelistB.model = localStorage.getItem(DuelistsData.DUELIST_B_MODEL)
+
+  localStorage.setItem(DuelistsData.DUELIST_A_NAME, duelistNameA)
+  localStorage.setItem(DuelistsData.DUELIST_B_NAME, duelistNameB)
+  _duelistA.name = localStorage.getItem(DuelistsData.DUELIST_A_NAME)
+  _duelistB.name = localStorage.getItem(DuelistsData.DUELIST_B_NAME)
+  
+  switchScene(_sceneName) // reload scene
 }
 
 export function switchActor(actorId, newActorName) {
@@ -377,43 +813,67 @@ export function switchActor(actorId, newActorName) {
   if (position) _actor[actorId].position = position
 }
 
-
-export function playActorAnimation(actorId: string, key: AnimName, callback: Function = null) {
-  _actor[actorId].setAnimation(key)
-  _actor[actorId].playOnce(callback)
-  if (key == AnimName.SHOOT) {
-    playAudio(AudioName.SHOOT, _sfxEnabled)
-  }
-  if ([AnimName.SHOT_DEAD_FRONT, AnimName.SHOT_DEAD_BACK, AnimName.STRUCK_DEAD].includes(key)) {
-    playAudio(AudioName.BODY_FALL, _sfxEnabled)
-  }
-  if ([AnimName.SHOT_INJURED_FRONT, AnimName.SHOT_INJURED_BACK, AnimName.STRUCK_INJURED].includes(key)) {
-    if (actorId == 'A') {
-      if (_duelistAModel == "MALE_A") {
-        playAudio(AudioName.GRUNT_MALE, _sfxEnabled)  
-      } else {
-        playAudio(AudioName.GRUNT_FEMALE, _sfxEnabled)  
-      }
-    } else {
-      if (_duelistBModel == "MALE_B") {
-        playAudio(AudioName.GRUNT_MALE, _sfxEnabled)  
-      } else {
-        playAudio(AudioName.GRUNT_FEMALE, _sfxEnabled)  
-      }
-    }
-  }
-  if (key == AnimName.STRIKE_LIGHT) {
-    playAudio(AudioName.STRIKE_LIGHT, _sfxEnabled)
-  }
-  if (key == AnimName.STRIKE_HEAVY) {
-    playAudio(AudioName.STRIKE_HEAVY, _sfxEnabled)
-  }
-  if (key == AnimName.STRIKE_BLOCK) {
-    playAudio(AudioName.STRIKE_BLOCK, _sfxEnabled)
-  }
+export function setDuelTimePercentage(timePassed: number) {
+  const timePassedPercentage = timePassed / 259_200_000.0 // grow for three days
+  localStorage.setItem('GROWTH', timePassedPercentage.toString())
+  _growthPercentage = parseFloat(localStorage.getItem('GROWTH'))
+  createGrass()
 }
 
 
+export function playActorAnimation(actorId: string, key: AnimName, onEnd: Function = null) {
+  let onStart = null
+  let movement = {
+    x: 0,
+    y: 0,
+    z: 0,
+    frames: 0,
+  }
+
+  if (key == AnimName.STEP_1 || key == AnimName.STEP_2 || key == AnimName.TWO_STEPS) {
+    movement.x = 0.352
+  } else if (key == AnimName.SHOOT) {
+    onStart = () => { playAudio(AudioName.SHOOT, _sfxEnabled) }
+  } else if ([AnimName.SHOT_DEAD_FRONT, AnimName.SHOT_DEAD_BACK, AnimName.STRUCK_DEAD].includes(key)) {
+    if (key == AnimName.SHOT_DEAD_BACK) {
+      if ((actorId == 'A' && _duelistA.model == "MALE_A") || (actorId == 'B' && _duelistA.model == "MALE_B")) {
+        movement.x = 0.088
+        movement.frames = 2
+      } else {
+        movement.x = 0.176
+        movement.frames = 4
+      }
+    }
+    onStart = () => { playAudio(AudioName.BODY_FALL, _sfxEnabled) }
+  } else if ([AnimName.SHOT_INJURED_FRONT, AnimName.SHOT_INJURED_BACK, AnimName.STRUCK_INJURED].includes(key)) {
+    if (key == AnimName.SHOT_INJURED_BACK) {
+      movement.x = 0.176
+      movement.frames = 4
+    }
+    if (actorId == 'A') {
+      if (_duelistA.model == "MALE_A") {
+        onStart = () => { playAudio(AudioName.GRUNT_MALE, _sfxEnabled) }
+      } else {
+        onStart = () => { playAudio(AudioName.GRUNT_FEMALE, _sfxEnabled) }
+      }
+    } else {
+      if (_duelistB.model == "MALE_B") {
+        onStart = () => { playAudio(AudioName.GRUNT_MALE, _sfxEnabled) }
+      } else {
+        onStart = () => { playAudio(AudioName.GRUNT_FEMALE, _sfxEnabled) }
+      }
+    }
+  } else if (key == AnimName.STRIKE_LIGHT) {
+    onStart = () => { playAudio(AudioName.STRIKE_LIGHT, _sfxEnabled) }
+  } else if (key == AnimName.STRIKE_HEAVY) {
+    onStart = () => { playAudio(AudioName.STRIKE_HEAVY, _sfxEnabled) }
+  } else if (key == AnimName.STRIKE_BLOCK) {
+    onStart = () => { playAudio(AudioName.STRIKE_BLOCK, _sfxEnabled) }
+  }
+
+  _actor[actorId].playOnce(key, movement, onStart, onEnd)
+
+}
 
 //----------------
 // Animation triggers
@@ -421,57 +881,48 @@ export function playActorAnimation(actorId: string, key: AnimName, callback: Fun
 
 export function zoomCameraToPaces(paceCount, seconds) {
   const targetPos = {
-    x: map(paceCount, 0, 10, zoomedCameraPos.x, 0),
-    y: map(paceCount, 0, 10, zoomedCameraPos.y, 0),
-    z: map(paceCount, 0, 10, zoomedCameraPos.z, 0),
+    x: map(paceCount, 0, 10, zoomedCameraPos.x, zoomedOutCameraPos.x),
+    y: map(paceCount, 0, 10, zoomedCameraPos.y, zoomedOutCameraPos.y),
+    z: map(paceCount, 0, 10, zoomedCameraPos.z, zoomedOutCameraPos.z),
   }
+
   if (_tweens.cameraPos) TWEEN.remove(_tweens.cameraPos)
   if (seconds == 0) {
     // just set
     // console.log(`CAMS SET`, targetPos)
-    _duelCameraRig.position.set(targetPos.x, targetPos.y, targetPos.z)
+    _duelCamera.position.set(targetPos.x, targetPos.y, targetPos.z)
   } else {
     // console.log(`CAM ANIM`, targetPos)
     // animate
-    _tweens.cameraPos = new TWEEN.Tween(_duelCameraRig.position)
+    _tweens.cameraPos = new TWEEN.Tween(_duelCamera.position)
       .to(targetPos, seconds * 1000)
       .easing(TWEEN.Easing.Sinusoidal.Out)
       .onUpdate(() => {
         // emitter.emit('movedTo', { x: _duelCameraRig.position.x, y: _duelCameraRig.position.y, z: _duelCameraRig.position.z })
+        // _duelCamera.lookAt(0, 0.5, 2)
       })
       .start()
       .onComplete(() => {
-        // console.log(`CAM ===`, _duelCamera.position, _duelCameraRig.position)
+        // console.log(`CAM ===`, _duelCamera.position, _duelCamera.position)
       })
   }
 }
 
-export function animateActorPaces(actorId, paceCount, seconds) {
-  const tweenKey = `actorPos${actorId}`
-  const direction = actorId == 'A' ? -1 : 1
-  const start = PACES_X_0 * direction
-  const targetPos = {
-    x: map(paceCount, 0, 10, start, start + (PACES_X_STEP * paceCount * direction)),
-    y: PACES_Y,
-    z: 10,
-  }
-  if (_tweens[tweenKey]) TWEEN.remove(_tweens[tweenKey])
-  if (seconds == 0) {
-    // just set
-    _actor[actorId].mesh.position.set(targetPos.x, targetPos.y, targetPos.z)
-  } else {
-    // animate
-    _tweens[tweenKey] = new TWEEN.Tween(_actor[actorId].mesh.position)
-      .to(targetPos, seconds * 1000)
-      // .easing(TWEEN.Easing.Cubic.Out)
-      .start()
-  }
+export function resetActorPositions() {
+  _actor['A'].mesh.position.set(PACES_X_0, _actor['A'].mesh.position.y, _actor['A'].mesh.position.z)
+  _actor['B'].mesh.position.set(-PACES_X_0, _actor['B'].mesh.position.y, _actor['B'].mesh.position.z)
 }
 
 export function animateDuel(state: AnimationState, actionA: number, actionB: number, healthA: number, healthB: number, damageA: number, damageB: number) {
-  if (state == AnimationState.Round1) {
+  //only animated once per entry safety
+  if (state == AnimationState.Round1 && !_round1Animated) {
+    _round1Animated = true
     animateShootout(actionA, actionB, healthA, healthB, damageA, damageB);
-  } else {
+  } else if (state == AnimationState.Round2 && !_round2Animated) {
+    _round2Animated = true
+    animateActions(state, actionA, actionB, healthA, healthB, damageA, damageB)
+  } else if (state == AnimationState.Round3 && !_round3Animated) {
+    _round3Animated = true
     animateActions(state, actionA, actionB, healthA, healthB, damageA, damageB)
   }
 }
@@ -479,87 +930,136 @@ export function animateDuel(state: AnimationState, actionA: number, actionB: num
 function animateShootout(paceCountA: number, paceCountB: number, healthA: number, healthB: number, damageA: number, damageB: number) {
   const minPaceCount = Math.min(paceCountA, paceCountB)
 
+  if (_ladySecond && _sirSecond) {
+    if (minPaceCount < 5) {
+      _sirSecond.visible = false
+      _ladySecond.visible = false
+    } else {
+      _sirSecond.visible = true
+      _ladySecond.visible = true
+    }
+  }
+
   // animate camera
   zoomCameraToPaces(0, 0)
-  zoomCameraToPaces(minPaceCount / 2, minPaceCount) //adjusted zoom out value to minimize gliding effect for now.
+  zoomCameraToPaces(minPaceCount, (minPaceCount + 1)) //adjusted zoom out value to minimize gliding effect for now.
 
-  animateActorPaces('A', 0, 0)
-  animateActorPaces('B', 0, 0)
-  animateActorPaces('A', minPaceCount, minPaceCount)
-  animateActorPaces('B', minPaceCount, minPaceCount)
+  resetActorPositions()
 
   // animate sprites
-  playActorAnimation('A', AnimName.STEP_1)
-  playActorAnimation('B', AnimName.STEP_1)
-  for (let i = 1; i < minPaceCount; ++i) {
+  for (let i = 0; i < minPaceCount + 2; i++) {
     const key: AnimName = i % 2 == 1 ? AnimName.STEP_2 : AnimName.STEP_1
-    setTimeout(() => {
+
+    //To make the other duelist walk while one goes to shooting
+    if (i == minPaceCount && paceCountA > paceCountB) {
+      playActorAnimation('A', key)
+    } else if (i == minPaceCount && paceCountB > paceCountA) {
+      playActorAnimation('B', key)
+    } else if (i > minPaceCount && paceCountA > paceCountB) {
+      if (damageA == 0) {
+        playActorAnimation('A', key)
+      }
+    } else if (i > minPaceCount && paceCountB > paceCountA) {
+      if (damageB == 0) {
+        playActorAnimation('B', key)
+      }
+    } else if (i < minPaceCount) {
+      //timeout not needed with animationQueue
       playActorAnimation('A', key)
       playActorAnimation('B', key)
-    }, i * 1000)
+    }
   }
 
   // SHOOT!
-  setTimeout(() => {
-    const _shootA = () => {
-      playActorAnimation('A', AnimName.SHOOT, () => {
-        emitter.emit('animated', AnimationState.HealthB)
-        if (healthB == 0) {
-          playActorAnimation('B', AnimName.SHOT_DEAD_FRONT, () => emitter.emit('animated', AnimationState.Round1))
-        } else if (damageB > 0) {
-          playActorAnimation('B', AnimName.SHOT_INJURED_FRONT, () => emitter.emit('animated', AnimationState.Round1))
-        } else {
-          emitter.emit('animated', AnimationState.Round1)
-        }
+  const _shootA = () => {
+    playActorAnimation('A', AnimName.SHOOT, () => {
+      emitter.emit('animated', AnimationState.HealthB)
+      if (healthB == 0) {
+        playActorAnimation('B', AnimName.SHOT_DEAD_FRONT, () => _updateB())
+      } else if (damageB > 0) {
+        playActorAnimation('B', AnimName.SHOT_INJURED_FRONT, () => _updateB())
+      } else {
+        _updateB()
+      }
+    })
+  }
+  const _shootB = () => {
+    playActorAnimation('B', AnimName.SHOOT, () => {
+      emitter.emit('animated', AnimationState.HealthA)
+      if (healthA == 0) {
+        playActorAnimation('A', AnimName.SHOT_DEAD_FRONT, () => _updateA())
+      } else if (damageA > 0) {
+        playActorAnimation('A', AnimName.SHOT_INJURED_FRONT, () => _updateA())
+      } else {
+        _updateA()
+      }
+    })
+  }
+
+  let hasUpdatedA = false
+  let hasUpdatedB = false
+  const _updateA = () => {
+    if (!hasUpdatedA) {
+      hasUpdatedA = true
+      _updateAnimatedState()
+    }
+  }
+  const _updateB = () => {
+    if (!hasUpdatedB) {
+      hasUpdatedB = true
+      _updateAnimatedState()
+    }
+  }
+  const _updateAnimatedState = () => {
+    if (hasUpdatedA && hasUpdatedB) {
+      emitter.emit('animated', AnimationState.Round1)
+    }
+  }
+
+  //
+  // Both fire at same time
+  if (paceCountA == paceCountB) {
+    _shootA()
+    _shootB()
+  }
+  //
+  // A fires first
+  if (paceCountA < paceCountB) {
+    playActorAnimation('A', AnimName.SHOOT, () => {
+      emitter.emit('animated', AnimationState.HealthB)
+      if (healthB > 0 && damageB == 0) {
+        _updateB()
+        _shootB()
+      }
+    })
+    if (healthB == 0) {
+      playActorAnimation('B', AnimName.SHOT_DEAD_BACK, () => _updateB())
+    } else if (damageB > 0) {
+      playActorAnimation('B', AnimName.SHOT_INJURED_BACK, () => {
+        _updateB()
+        _shootB()
       })
     }
-    const _shootB = () => {
-      playActorAnimation('B', AnimName.SHOOT, () => {
-        emitter.emit('animated', AnimationState.HealthA)
-        if (healthA == 0) {
-          playActorAnimation('A', AnimName.SHOT_DEAD_FRONT, () => emitter.emit('animated', AnimationState.Round1))
-        } else if (damageA > 0) {
-          playActorAnimation('A', AnimName.SHOT_INJURED_FRONT, () => emitter.emit('animated', AnimationState.Round1))
-        } else {
-          emitter.emit('animated', AnimationState.Round1)
-        }
+  }
+  //
+  // B fires first
+  if (paceCountB < paceCountA) {
+    playActorAnimation('B', AnimName.SHOOT, () => {
+      emitter.emit('animated', AnimationState.HealthA)
+      if (healthA > 0 && damageA == 0) {
+        _updateA()
+        _shootA()
+      }
+    })
+    if (healthA == 0) {
+      playActorAnimation('A', AnimName.SHOT_DEAD_BACK, () => _updateA())
+    } else if (damageA > 0) {
+      playActorAnimation('A', AnimName.SHOT_INJURED_BACK, () => {
+        _updateA()
+        _shootA()
       })
     }
-    //
-    // Both fire at same time
-    if (paceCountA == paceCountB) {
-      _shootA()
-      _shootB()
-    }
-    //
-    // A fires first
-    if (paceCountA < paceCountB) {
-      playActorAnimation('A', AnimName.SHOOT, () => {
-        emitter.emit('animated', AnimationState.HealthB)
-        if (healthB == 0) {
-          playActorAnimation('B', AnimName.SHOT_DEAD_BACK, () => emitter.emit('animated', AnimationState.Round1))
-        } else if (damageB > 0) {
-          playActorAnimation('B', AnimName.SHOT_INJURED_BACK, () => _shootB())
-        } else {
-          _shootB()
-        }
-      })
-    }
-    //
-    // B fires first
-    if (paceCountB < paceCountA) {
-      playActorAnimation('B', AnimName.SHOOT, () => {
-        emitter.emit('animated', AnimationState.HealthA)
-        if (healthA == 0) {
-          playActorAnimation('A', AnimName.SHOT_DEAD_BACK, () => emitter.emit('animated', AnimationState.Round1))
-        } else if (damageA > 0) {
-          playActorAnimation('A', AnimName.SHOT_INJURED_BACK, () => _shootA())
-        } else {
-          _shootA()
-        }
-      })
-    }
-  }, minPaceCount * 1000)
+  }
 }
 
 const _getActionAnimName = (action: Action): AnimName => {
@@ -576,9 +1076,8 @@ const _getActionAnimName = (action: Action): AnimName => {
 function animateActions(state: AnimationState, actionA: number, actionB: number, healthA: number, healthB: number, damageA: number, damageB: number) {
 
   // Rewind camera and
-  zoomCameraToPaces(0, 0)
-  animateActorPaces('A', 0, 0)
-  animateActorPaces('B', 0, 0)
+  zoomCameraToPaces(1, 0)
+  resetActorPositions()
 
   // animate sprites
   playActorAnimation('A', _getActionAnimName(actionA), () => {

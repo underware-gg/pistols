@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Container, Grid, Icon } from 'semantic-ui-react'
 import { CustomIcon, EmojiIcon } from '@/lib/ui/Icons'
 import { BladesIcon, PacesIcon } from '@/pistols/components/ui/ActionIcon'
-import { LordsBagIcon } from '@/pistols/components/account/Wager'
+import { LordsBagIcon } from '@/pistols/components/account/Balance'
 import { Action } from '@/pistols/utils/pistols'
 import App from '@/lib/ui/App'
 

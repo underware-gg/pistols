@@ -1,0 +1,123 @@
+[
+  {
+    "name": "ExternalMethods",
+    "type": "impl",
+    "interface_name": "braavos_account::presets::braavos_base_account::IBraavosBaseAccount"
+  },
+  {
+    "name": "core::array::Span::<core::felt252>",
+    "type": "struct",
+    "members": [
+      {
+        "name": "snapshot",
+        "type": "@core::array::Array::<core::felt252>"
+      }
+    ]
+  },
+  {
+    "name": "core::starknet::account::Call",
+    "type": "struct",
+    "members": [
+      {
+        "name": "to",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "selector",
+        "type": "core::felt252"
+      },
+      {
+        "name": "calldata",
+        "type": "core::array::Span::<core::felt252>"
+      }
+    ]
+  },
+  {
+    "name": "braavos_account::signers::signers::StarkPubKey",
+    "type": "struct",
+    "members": [
+      {
+        "name": "pub_key",
+        "type": "core::felt252"
+      }
+    ]
+  },
+  {
+    "name": "braavos_account::presets::braavos_base_account::IBraavosBaseAccount",
+    "type": "interface",
+    "items": [
+      {
+        "name": "__validate__",
+        "type": "function",
+        "inputs": [
+          {
+            "name": "calls",
+            "type": "core::array::Array::<core::starknet::account::Call>"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::felt252"
+          }
+        ],
+        "state_mutability": "external"
+      },
+      {
+        "name": "__execute__",
+        "type": "function",
+        "inputs": [
+          {
+            "name": "calls",
+            "type": "core::array::Array::<core::starknet::account::Call>"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::array::Array::<core::array::Span::<core::felt252>>"
+          }
+        ],
+        "state_mutability": "external"
+      },
+      {
+        "name": "__validate_deploy__",
+        "type": "function",
+        "inputs": [
+          {
+            "name": "class_hash",
+            "type": "core::felt252"
+          },
+          {
+            "name": "salt",
+            "type": "core::felt252"
+          },
+          {
+            "name": "stark_pub_key",
+            "type": "braavos_account::signers::signers::StarkPubKey"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::felt252"
+          }
+        ],
+        "state_mutability": "view"
+      }
+    ]
+  },
+  {
+    "name": "constructor",
+    "type": "constructor",
+    "inputs": [
+      {
+        "name": "stark_pub_key",
+        "type": "braavos_account::signers::signers::StarkPubKey"
+      }
+    ]
+  },
+  {
+    "kind": "enum",
+    "name": "braavos_account::presets::braavos_base_account::BraavosBaseAccount::Event",
+    "type": "event",
+    "variants": []
+  }
+]

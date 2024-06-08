@@ -1,46 +1,51 @@
 import { useState, useRef } from 'react'
-import { useEffectOnce } from '@/lib/hooks/useEffectOnce'
+import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
+import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 
 export const ThreeJsCanvas = ({
   width = 960,
   height = 540,
   guiEnabled = false,
 }) => {
-  const { game, dispatchGameImpl } = useThreeJsContext()
+  const {
+    game,     // raw game module (game.tsx)
+    gameImpl, // initialized module (playable)
+    dispatchGameImpl,
+  } = useThreeJsContext()
+  const { framerate, debugScene } = useSettingsContext()
   const [isLoading, setIsLoading] = useState(false)
-  const [isRunning, setIsRunning] = useState(false)
   const canvasRef = useRef()
 
   useEffectOnce(() => {
     let _mounted = true
     const _initialize = async () => {
-      await game.init(canvasRef.current, width, height, guiEnabled)
+      await game.init(canvasRef.current, framerate, guiEnabled || debugScene)
       if (_mounted) {
         game.animate()
         // game.resetGameParams(gameParams)
         setIsLoading(false)
-        setIsRunning(true)
         dispatchGameImpl(game)
         //@ts-ignore
         canvasRef.current?.focus()
       }
     }
 
-    if (canvasRef.current && !isLoading && !isRunning) {
+    // runs once on mount
+    if (canvasRef.current && !isLoading && !gameImpl) {
+      if (gameImpl) { // should never happen, but lets keep it for now
+        gameImpl.dispose()
+        dispatchGameImpl(null)
+      }
       setIsLoading(true)
       _initialize()
     }
 
     return () => {
+      console.warn(`UNMOUNTED ThreeJsCanvas! this should not be happening`)
       _mounted = false
-      if (isRunning && game) {
-        game.dispose()
-        dispatchGameImpl(null)
-      }
     }
   }, [canvasRef.current])
-
 
   return (
     <canvas

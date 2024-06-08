@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react'
+import React from 'react'
+import { useRouter } from 'next/navigation'
 import { Grid } from 'semantic-ui-react'
-import { useDojoAccount } from '@/dojo/DojoContext'
+import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
@@ -12,28 +13,35 @@ const Col = Grid.Column
 
 export default function AccountHeader({
 }) {
-  const { account, isMasterAccount } = useDojoAccount()
+  const router = useRouter()
+  const { accountAddress, isGuest } = useDojoAccount()
   const { dispatchSelectDuelist } = usePistolsContext()
 
-  const { name, profilePic } = useDuelist(account?.address)
+  const { name, profilePic } = useDuelist(accountAddress)
 
-  useEffect(() => {
-    if (isMasterAccount) {
-      // router.push('/gate')
+  const _click = () => {
+    if(isGuest) {
+      router.push('/gate')
+    } else {
+      dispatchSelectDuelist(accountAddress) 
     }
-  }, [isMasterAccount])
+  }
 
   return (
     <Grid>
-      <Row className='ProfilePicHeight' textAlign='center' verticalAlign='middle'>
-        <Col width={11} textAlign='right'>
-          <h3>{isMasterAccount ? 'Guest' : name}</h3>
-          <AddressShort address={account?.address} />
-          <br />
-          <LordsBalance address={account.address}/>
+      <Row className='ProfilePicHeight' textAlign='center'>
+        <Col width={11} textAlign='right' verticalAlign='top'>
+          {isGuest ?
+            <h3>Guest</h3>
+            : <>
+              <h3>{name}</h3>
+              <AddressShort address={accountAddress} copyLink={true} />
+              <br />
+              <LordsBalance address={accountAddress} big />
+            </>}
         </Col>
         <Col width={5} verticalAlign='middle'>
-          <ProfilePicSquareButton profilePic={profilePic} onClick={() => { dispatchSelectDuelist(BigInt(account.address)) }} />
+          <ProfilePicSquareButton profilePic={profilePic ?? 0} onClick={() => _click()} />
         </Col>
       </Row>
     </Grid>

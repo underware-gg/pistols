@@ -1,62 +1,33 @@
 import {
-  ec,
-  shortString,
   Account,
-  BigNumberish,
-  TypedData,
-  WeierstrassSignatureType,
   AccountInterface,
   InvocationsDetails,
   InvokeFunctionResponse,
+  RpcProvider,
+  shortString,
+  BigNumberish,
+  Uint256,
+  Abi,
+  ec,
 } from 'starknet'
+import { bigintToHex } from './types'
 
 export const ETH_TO_WEI = 1_000_000_000_000_000_000n
 
 export const validateCairoString = (v: string): string => (v ? v.slice(0, 31) : '')
 export const stringToFelt = (v: string): string => (v ? shortString.encodeShortString(v) : '0x0')
-export const feltToString = (hex: string): string => (BigInt(hex) > 0n ? shortString.decodeShortString(hex) : '')
+export const feltToString = (v: BigNumberish): string => (BigInt(v) > 0n ? shortString.decodeShortString(bigintToHex(v)) : '')
 export const pedersen = (a: BigNumberish, b: BigNumberish): bigint => (BigInt(ec.starkCurve.pedersen(BigInt(a), BigInt(b))))
 export const poseidon = (values: BigNumberish[]): bigint => (BigInt(ec.starkCurve.poseidonHashMany(values.map(v => BigInt(v)))))
 export const ethToWei = (v: BigNumberish): bigint => (BigInt(v) * ETH_TO_WEI)
 export const weiToEth = (v: BigNumberish): bigint => (BigInt(v) / ETH_TO_WEI)
+export const dummyAccount = (rpc?: RpcProvider): Account => (new Account(rpc ?? {}, '0x0', '0x0'))
 
-export const splitU256 = (v: BigNumberish): { low: bigint, high: bigint } => ({
+export const Uint256ToBigint = (v: Uint256): bigint => ((BigInt(v.high) << 128n) + BigInt(v.low))
+export const bigintToUint256 = (v: BigNumberish): Uint256 => ({
   low: BigInt(v) & 0xffffffffffffffffffffffffffffffffn,
   high: BigInt(v) >> 128n,
 })
-
-// https://github.com/starknet-io/starknet.js/blob/develop/www/docs/guides/signature.md
-export const signMessages = async (account: Account, messages: BigNumberish[]): Promise<WeierstrassSignatureType> => {
-  const typedMessage = createTypedMessage(messages)
-  return account.signMessage(typedMessage) as Promise<WeierstrassSignatureType>
-}
-export const verifyMessages = async (account: Account, messages: BigNumberish[], signature: WeierstrassSignatureType): Promise<boolean> => {
-  const typedMessage = createTypedMessage(messages)
-  return account.verifyMessage(typedMessage, signature)
-}
-
-export function createTypedMessage(messages: BigNumberish[]): TypedData {
-  const message = poseidon(messages).toString()
-  return {
-    domain: {
-      name: "Pistols",
-      chainId: "funDAOmental",
-      version: "0.1.0",
-    },
-    types: {
-      StarkNetDomain: [
-        { name: "name", type: "felt" },
-        { name: "chainId", type: "felt" },
-        { name: "version", type: "felt" },
-      ],
-      Message: [{ name: "message", type: "felt" }],
-    },
-    primaryType: "Message",
-    message: {
-      message,
-    },
-  }
-}
 
 
 //
@@ -66,7 +37,8 @@ export function createTypedMessage(messages: BigNumberish[]): TypedData {
 export async function execute(
   account: Account | AccountInterface,
   contractAddress: string,
-  call: string,
+  abi: Abi,
+  entrypoint: string,
   calldata: BigNumberish[],
   transactionDetails?: InvocationsDetails | undefined
 ): Promise<InvokeFunctionResponse> {
@@ -76,11 +48,11 @@ export async function execute(
       [
         {
           contractAddress,
-          entrypoint: call,
-          calldata: calldata,
+          entrypoint,
+          calldata,
         },
       ],
-      undefined,
+      [abi],
       {
         maxFee: 0, // TODO: Update this value as needed.
         ...transactionDetails,
@@ -88,7 +60,9 @@ export async function execute(
       }
     )
   } catch (error) {
-    this.logger.error("Error occured: ", error)
-    throw error
+    this.logger.error("execute() error: ", error)
+    return {
+      transaction_hash: null,
+    }
   }
 }

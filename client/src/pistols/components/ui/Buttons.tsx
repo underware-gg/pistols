@@ -2,10 +2,12 @@ import React, { ReactElement, useState } from 'react'
 import { Menu, Button, Confirm, SemanticICONS } from 'semantic-ui-react'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
-import { useCoin, COIN_LORDS } from '@/pistols/hooks/useConfig'
-import { useLordsBalance } from '@/lib/wallet/useLordsBalance'
-import { useDojoAccount } from '@/dojo/DojoContext'
+import { useDojoAccount } from '@/lib/dojo/DojoContext'
+import { useTableBalance } from '@/pistols/hooks/useTable'
+import { bigintAdd } from '@/lib/utils/types'
 import { CustomIcon } from '@/lib/ui/Icons'
+import { BigNumberish } from 'starknet'
+import { LordsBagIcon } from '../account/Balance'
 
 //-----------------
 // Generic Action button
@@ -19,7 +21,7 @@ type ActionButtonProps = {
   large?: boolean
   fill?: boolean
   dimmed?: boolean
-  attention?: boolean
+  important?: boolean
   negative?: boolean
   confirm?: boolean
   confirmMessage?: string
@@ -35,7 +37,7 @@ export const ActionButton = ({
   large = false,
   fill = false,
   dimmed = false,
-  attention = false,
+  important = false,
   negative = false,
   confirm = false,
   confirmMessage = null,
@@ -43,8 +45,8 @@ export const ActionButton = ({
   onClick,
 }: ActionButtonProps) => {
   let classNames = []
-  if (attention && !disabled) classNames.push('Attention')
-  if (fill) classNames.push('FillParent')
+  if (important && !disabled) classNames.push('Important')
+  // if (fill) classNames.push('FillParent')
   if (large) classNames.push('LargeButton')
   classNames.push((disabled || dimmed) ? 'Locked' : 'Unlocked')
   if (negative) classNames.push('Negative')
@@ -68,6 +70,7 @@ export const ActionButton = ({
     <>
       <Button
         className={classNames.join(' ')}
+        fluid={fill}
         toggle={toggle}
         active={active}
         disabled={disabled}
@@ -91,21 +94,32 @@ export const ActionButton = ({
 
 export const BalanceRequiredButton = ({
   label,
+  tableId,
   wagerValue,
+  minWagerValue,
   fee,
   onClick,
   disabled = false,
+}: {
+  label: string
+  tableId: string
+  wagerValue: BigNumberish
+  minWagerValue?: BigNumberish
+  fee: BigNumberish
+  onClick: Function
+  disabled?: boolean
 }) => {
   const { account } = useDojoAccount()
-  const { contractAddress } = useCoin(COIN_LORDS)
-  const { balance, noFunds } = useLordsBalance(contractAddress, account.address, wagerValue + fee)
+  const { balance, noFundsForFee } = useTableBalance(tableId, account.address, bigintAdd(wagerValue, fee))
+  const wagerTooLow = (BigInt(minWagerValue ?? 0) > 0n && BigInt(wagerValue) < BigInt(minWagerValue))
+  const canSubmit = (!wagerTooLow && !noFundsForFee)
   return (
     <ActionButton fill
       disabled={disabled}
-      attention={!noFunds}
-      negative={noFunds}
-      label={noFunds ? 'No Funds!' : label}
-      onClick={() => (noFunds ? {} : onClick())}
+      important={canSubmit}
+      negative={!canSubmit}
+      label={wagerTooLow ? 'Minimum Not Met' : noFundsForFee ? 'No Funds!' : <>{label} <LordsBagIcon /></>}
+      onClick={() => (canSubmit ? onClick() : {})}
     />
   )
 }
@@ -115,6 +129,11 @@ export const FilterButton = ({
   toggle = true,
   state = false,
   switchState,
+}: {
+  label: string
+  toggle?: boolean
+  state?: boolean
+  switchState: Function
 }) => {
   return (
     <Button
@@ -153,18 +172,18 @@ export function SettingsIcon({
   const _switch = () => {
     dispatchSetting(settingsKey, !value)
   }
-  return <CustomIcon icon={icon} name={value ? nameOn : nameOff} onClick={() => _switch()} />
+  return (
+    <CustomIcon icon={icon} name={value ? nameOn : nameOff} onClick={() => _switch()} size='large' />
+  )
 }
 
-export function MusicToggle({
-}) {
+export function MusicToggle() {
   const { settings, SettingsActions } = useSettingsContext()
   const { audioLoaded } = useThreeJsContext()
   if (!audioLoaded) return <></>
   return <SettingsIcon settingsKey={SettingsActions.MUSIC_ENABLED} value={settings.musicEnabled} nameOn='volume-on' nameOff='volume-off' icon />
 }
-export function SfxToggle({
-}) {
+export function SfxToggle() {
   const { settings, SettingsActions } = useSettingsContext()
   return <SettingsIcon settingsKey={SettingsActions.SFX_ENABLED} value={settings.sfxEnabled} nameOn='volume-on' nameOff='volume-off' icon />
 }
@@ -190,6 +209,10 @@ export function SettingsMenuItem({
   prefix,
   settingsKey,
   currentValue,
+}: {
+  prefix: string
+  settingsKey: string
+  currentValue: any
 }) {
   const { dispatchSetting } = useSettingsContext()
   const _switch = () => {

@@ -1,0 +1,64 @@
+#!/bin/bash
+set -euo pipefail
+
+# Profile
+if [ $# -ge 1 ]; then
+  export PROFILE=$1
+else
+  export PROFILE="dev"
+fi
+
+if ! [ -x "$(command -v toml)" ]; then
+  echo 'Error: toml not instlaled! Instal with: cargo install toml-cli'
+  exit 1
+fi
+
+export MANIFEST_FILE_PATH="./manifests/$PROFILE/manifest.json"
+export ACCOUNT_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.account_address)
+export WORLD_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.world_address)
+export ADMIN_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.name == "pistols::systems::admin::admin" ).address')
+export ACTIONS_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.name == "pistols::systems::actions::actions" ).address')
+
+# Use mocked Lords if lords_address not defined in Scarb
+export LORDS_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.lords_address)
+if [[ -z "$LORDS_ADDRESS" ]]; then
+  echo "* using mock \$LORDS 👑"
+  export LORDS_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.name == "pistols::mocks::lords_mock::lords_mock" ).address')
+  export LORDS_MOCK="Yes"
+fi
+
+echo "------------------------------------------------------------------------------"
+echo "Profile     : $PROFILE"
+echo "Manifest    : $MANIFEST_FILE_PATH"
+echo "Account     : $ACCOUNT_ADDRESS"
+echo "World       : $WORLD_ADDRESS"
+echo "::admin     : $ADMIN_ADDRESS"
+echo "::actions   : $ACTIONS_ADDRESS"
+echo "\$LORDS      : $LORDS_ADDRESS"
+echo "\$LORDS Mock : $LORDS_MOCK"
+echo "------------------------------------------------------------------------------"
+
+if [[
+  -z "$PROFILE" ||
+  -z "$MANIFEST_FILE_PATH" ||
+  "$ACCOUNT_ADDRESS" != "0x"* ||
+  "$WORLD_ADDRESS" != "0x"* ||
+  "$ADMIN_ADDRESS" != "0x"* ||
+  "$ACTIONS_ADDRESS" != "0x"* ||
+  "$LORDS_ADDRESS" != "0x"*
+]]; then
+  echo "! Missing data 👎"
+  exit 1
+fi
+
+# Lords
+printf "LORDS.is_initialized() : "
+sozo --profile $PROFILE call --world $WORLD_ADDRESS $LORDS_ADDRESS is_initialized
+printf "LORDS.balance_of(account) : "
+sozo --profile $PROFILE call --world $WORLD_ADDRESS $LORDS_ADDRESS balance_of --calldata $ACCOUNT_ADDRESS
+printf "LORDS.balance_of(0xxxxx) : "
+sozo --profile $PROFILE call --world $WORLD_ADDRESS $LORDS_ADDRESS balance_of --calldata 0x120e7b1e5e47526b5b11bd0be67742ee45e8fc02a275a4ec641a8f0b673b04c
+
+# Admin
+printf "ADMIN.is_initialized() : "
+sozo --profile $PROFILE call --world $WORLD_ADDRESS $ADMIN_ADDRESS is_initialized

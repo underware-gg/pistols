@@ -1,6 +1,8 @@
 // use debug::PrintTrait;
 
-trait MathTrait<T> {
+trait MathTrait<T,TI> {
+    // absolute value
+    fn abs(v: TI) -> T;
     // returns minimum value
     fn min(a: T, b: T) -> T;
     // returns maximum value
@@ -19,7 +21,10 @@ trait MathTrait<T> {
     fn squaredDistance(x1: T, y1: T, x2: T, y2: T) -> T;
 }
 
-impl MathU8 of MathTrait<u8> {
+impl MathU8 of MathTrait<u8,i8> {
+    fn abs(v: i8) -> u8 {
+        if (v < 0) { (-v).try_into().unwrap() } else { (v).try_into().unwrap() }
+    }
     fn min(a: u8, b: u8) -> u8 {
         if (a < b) { (a) } else { (b) }
     }
@@ -36,9 +41,9 @@ impl MathU8 of MathTrait<u8> {
 
     fn gdc(mut a: u8, mut b: u8) -> u8 {
         // recursive (not fastest)
-        // if (b == 0) { (a) } else { (MathU8::gdc(b, a % b)) }
+        // if (b == 0) { (a) } else { (Self::gdc(b, a % b)) }
         // iterative: https://stackoverflow.com/a/17445322/360930
-        if (b > a) { return MathU8::gdc(b, a); }
+        if (b > a) { return Self::gdc(b, a); }
         let mut result: u8 = 0;
         loop {
             if (b == 0) { result = a; break; }
@@ -50,31 +55,38 @@ impl MathU8 of MathTrait<u8> {
     }
 
     fn map(v: u8, in_min: u8, in_max: u8, out_min: u8, out_max: u8) -> u8 {
-        if (v == in_min) { return out_min; }
-        if (v == in_max) { return out_max; }
-        let result: u32 = MathU32::map(v.into(), in_min.into(), in_max.into(), out_min.into() * 1000, out_max.into() * 1000) / 1000;
+        let result: u128 = MathU128::map(v.into(), in_min.into(), in_max.into(), out_min.into(), out_max.into());
         (result.try_into().unwrap())
-        // if (out_min > out_max) { 
-        //     (out_min - MathU8::map(v, in_min, in_max, 0, out_min - out_max))
-        // } else {
-        //     let mut d = (in_max - in_min);
-        //     let mut c = (v - in_min);
-        //     let gdc = MathU8::gdc(d, c);
-        //     if (gdc > 1) {
-        //         d /= gdc;
-        //         c /= gdc;
-        //     }
-        //     let x = ((out_max - out_min) / d) * c;
-        //     (out_min + x)
-        //     // (out_min + (((out_max - out_min) / (in_max - in_min)) * (v - in_min)))
-        // }
     }
+    // fn map(v: u8, in_min: u8, in_max: u8, out_min: u8, out_max: u8) -> u8 {
+    //     if (out_min > out_max) { 
+    //         (out_min - Self::map(v, in_min, in_max, 0, out_min - out_max))
+    //     } else {
+    //         (out_min + (((out_max - out_min) / (in_max - in_min)) * (v - in_min)))
+    //     }
+    // }
+    // fn map(v: u8, in_min: u8, in_max: u8, out_min: u8, out_max: u8) -> u8 {
+    //     if (out_min > out_max) { 
+    //         (out_min - Self::map(v, in_min, in_max, 0, out_min - out_max))
+    //     } else {
+    //         let mut d = (in_max - in_min);
+    //         let mut c = (v - in_min);
+    //         let gdc = Self::gdc(d, c);
+    //         if (gdc > 1) {
+    //             d /= gdc;
+    //             c /= gdc;
+    //         }
+    //         let x = ((out_max - out_min) / d) * c;
+    //         (out_min + x)
+    //         // (out_min + (((out_max - out_min) / (in_max - in_min)) * (v - in_min)))
+    //     }
+    // }
 
     fn pow(base: u8, exp: u8) -> u8 {
         if exp == 0 { 1 }
         else if exp == 1 { base }
-        else if exp % 2 == 0 { MathU8::pow(base * base, exp / 2) }
-        else { base * MathU8::pow(base * base, (exp - 1) / 2) }
+        else if exp % 2 == 0 { Self::pow(base * base, exp / 2) }
+        else { base * Self::pow(base * base, (exp - 1) / 2) }
     }
 
     fn squaredDistance(x1: u8, y1: u8, x2: u8, y2: u8) -> u8 {
@@ -84,7 +96,10 @@ impl MathU8 of MathTrait<u8> {
     }
 }
 
-impl MathU16 of MathTrait<u16> {
+impl MathU16 of MathTrait<u16, i16> {
+    fn abs(v: i16) -> u16 {
+        if (v < 0) { (-v).try_into().unwrap() } else { (v).try_into().unwrap() }
+    }
     fn min(a: u16, b: u16) -> u16 {
         if (a < b) { (a) } else { (b) }
     }
@@ -101,22 +116,19 @@ impl MathU16 of MathTrait<u16> {
 
     fn gdc(a: u16, b: u16) -> u16 {
         // recursive (not fastest)
-        if (b == 0) { (a) } else { (MathU16::gdc(b, a % b)) }
+        if (b == 0) { (a) } else { (Self::gdc(b, a % b)) }
     }
 
     fn map(v: u16, in_min: u16, in_max: u16, out_min: u16, out_max: u16) -> u16 {
-        if (out_min > out_max) { 
-            (out_min - MathU16::map(v, in_min, in_max, 0, out_min - out_max))
-        } else {
-            (out_min + (((out_max - out_min) / (in_max - in_min)) * (v - in_min)))
-        }
+        let result: u128 = MathU128::map(v.into(), in_min.into(), in_max.into(), out_min.into(), out_max.into());
+        (result.try_into().unwrap())
     }
 
     fn pow(base: u16, exp: u16) -> u16 {
         if exp == 0 { 1 }
         else if exp == 1 { base }
-        else if exp % 2 == 0 { MathU16::pow(base * base, exp / 2) }
-        else { base * MathU16::pow(base * base, (exp - 1) / 2) }
+        else if exp % 2 == 0 { Self::pow(base * base, exp / 2) }
+        else { base * Self::pow(base * base, (exp - 1) / 2) }
     }
 
     fn squaredDistance(x1: u16, y1: u16, x2: u16, y2: u16) -> u16 {
@@ -126,7 +138,10 @@ impl MathU16 of MathTrait<u16> {
     }
 }
 
-impl MathU32 of MathTrait<u32> {
+impl MathU32 of MathTrait<u32, i32> {
+    fn abs(v: i32) -> u32 {
+        if (v < 0) { (-v).try_into().unwrap() } else { (v).try_into().unwrap() }
+    }
     fn min(a: u32, b: u32) -> u32 {
         if (a < b) { (a) } else { (b) }
     }
@@ -142,22 +157,19 @@ impl MathU32 of MathTrait<u32> {
     }
 
     fn gdc(a: u32, b: u32) -> u32 {
-        if (b == 0) { (a) } else { (MathU32::gdc(b, a % b)) }
+        if (b == 0) { (a) } else { (Self::gdc(b, a % b)) }
     }
 
     fn map(v: u32, in_min: u32, in_max: u32, out_min: u32, out_max: u32) -> u32 {
-        if (out_min > out_max) { 
-            (out_min - MathU32::map(v, in_min, in_max, 0, out_min - out_max))
-        } else {
-            (out_min + (((out_max - out_min) / (in_max - in_min)) * (v - in_min)))
-        }
+        let result: u128 = MathU128::map(v.into(), in_min.into(), in_max.into(), out_min.into(), out_max.into());
+        (result.try_into().unwrap())
     }
 
     fn pow(base: u32, exp: u32) -> u32 {
         if exp == 0 { 1 }
         else if exp == 1 { base }
-        else if exp % 2 == 0 { MathU32::pow(base * base, exp / 2) }
-        else { base * MathU32::pow(base * base, (exp - 1) / 2) }
+        else if exp % 2 == 0 { Self::pow(base * base, exp / 2) }
+        else { base * Self::pow(base * base, (exp - 1) / 2) }
     }
 
     fn squaredDistance(x1: u32, y1: u32, x2: u32, y2: u32) -> u32 {
@@ -167,7 +179,10 @@ impl MathU32 of MathTrait<u32> {
     }
 }
 
-impl MathU64 of MathTrait<u64> {
+impl MathU64 of MathTrait<u64, i64> {
+    fn abs(v: i64) -> u64 {
+        if (v < 0) { (-v).try_into().unwrap() } else { (v).try_into().unwrap() }
+    }
     fn min(a: u64, b: u64) -> u64 {
         if (a < b) { (a) } else { (b) }
     }
@@ -183,22 +198,19 @@ impl MathU64 of MathTrait<u64> {
     }
 
     fn gdc(a: u64, b: u64) -> u64 {
-        if (b == 0) { (a) } else { (MathU64::gdc(b, a % b)) }
+        if (b == 0) { (a) } else { (Self::gdc(b, a % b)) }
     }
 
     fn map(v: u64, in_min: u64, in_max: u64, out_min: u64, out_max: u64) -> u64 {
-        if (out_min > out_max) { 
-            (out_min - MathU64::map(v, in_min, in_max, 0, out_min - out_max))
-        } else {
-            (out_min + (((out_max - out_min) / (in_max - in_min)) * (v - in_min)))
-        }
+        let result: u128 = MathU128::map(v.into(), in_min.into(), in_max.into(), out_min.into(), out_max.into());
+        (result.try_into().unwrap())
     }
 
     fn pow(base: u64, exp: u64) -> u64 {
         if exp == 0 { 1 }
         else if exp == 1 { base }
-        else if exp % 2 == 0 { MathU64::pow(base * base, exp / 2) }
-        else { base * MathU64::pow(base * base, (exp - 1) / 2) }
+        else if exp % 2 == 0 { Self::pow(base * base, exp / 2) }
+        else { base * Self::pow(base * base, (exp - 1) / 2) }
     }
 
     fn squaredDistance(x1: u64, y1: u64, x2: u64, y2: u64) -> u64 {
@@ -208,7 +220,10 @@ impl MathU64 of MathTrait<u64> {
     }
 }
 
-impl MathU128 of MathTrait<u128> {
+impl MathU128 of MathTrait<u128, i128> {
+    fn abs(v: i128) -> u128 {
+        if (v < 0) { (-v).try_into().unwrap() } else { (v).try_into().unwrap() }
+    }
     fn min(a: u128, b: u128) -> u128 {
         if (a < b) { (a) } else { (b) }
     }
@@ -224,14 +239,18 @@ impl MathU128 of MathTrait<u128> {
     }
 
     fn gdc(a: u128, b: u128) -> u128 {
-        if (b == 0) { (a) } else { (MathU128::gdc(b, a % b)) }
+        if (b == 0) { (a) } else { (Self::gdc(b, a % b)) }
     }
 
     fn map(v: u128, in_min: u128, in_max: u128, out_min: u128, out_max: u128) -> u128 {
-        if (out_min > out_max) { 
-            (out_min - MathU128::map(v, in_min, in_max, 0, out_min - out_max))
+        if (v <= in_min) {
+            (out_min)
+        } else if (v >= in_max) {
+            (out_max)
+        } else if (out_min > out_max) { 
+            (out_min - Self::map(v, in_min, in_max, 0, out_min - out_max))
         } else {
-            (out_min + (((out_max - out_min) / (in_max - in_min)) * (v - in_min)))
+            (out_min + ((((v * 1_000_000 - in_min * 1_000_000) / (in_max - in_min)) * (out_max - out_min)) / 1_000_000))
         }
     }
 
@@ -244,8 +263,8 @@ impl MathU128 of MathTrait<u128> {
     fn pow(base: u128, exp: u128) -> u128 {
         if exp == 0 { 1 }
         else if exp == 1 { base }
-        else if exp % 2 == 0 { MathU128::pow(base * base, exp / 2) }
-        else { base * MathU128::pow(base * base, (exp - 1) / 2) }
+        else if exp % 2 == 0 { Self::pow(base * base, exp / 2) }
+        else { base * Self::pow(base * base, (exp - 1) / 2) }
     }
 
     fn squaredDistance(x1: u128, y1: u128, x2: u128, y2: u128) -> u128 {
@@ -255,7 +274,10 @@ impl MathU128 of MathTrait<u128> {
     }
 }
 
-impl MathU256 of MathTrait<u256> {
+impl MathU256 of MathTrait<u256, u256> {
+    fn abs(v: u256) -> u256 {
+        (v)
+    }
     fn min(a: u256, b: u256) -> u256 {
         if (a < b) { (a) } else { (b) }
     }
@@ -271,22 +293,26 @@ impl MathU256 of MathTrait<u256> {
     }
 
     fn gdc(a: u256, b: u256) -> u256 {
-        if (b == 0) { (a) } else { (MathU256::gdc(b, a % b)) }
+        if (b == 0) { (a) } else { (Self::gdc(b, a % b)) }
     }
 
     fn map(v: u256, in_min: u256, in_max: u256, out_min: u256, out_max: u256) -> u256 {
-        if (out_min > out_max) { 
-            (out_min - MathU256::map(v, in_min, in_max, 0, out_min - out_max))
+        if (v <= in_min) {
+            (out_min)
+        } else if (v >= in_max) {
+            (out_max)
+        } else if (out_min > out_max) { 
+            (out_min - Self::map(v, in_min, in_max, 0, out_min - out_max))
         } else {
-            (out_min + (((out_max - out_min) / (in_max - in_min)) * (v - in_min)))
+            (out_min + ((((v * 1_000_000 - in_min * 1_000_000) / (in_max - in_min)) * (out_max - out_min)) / 1_000_000))
         }
     }
 
     fn pow(base: u256, exp: u256) -> u256 {
         if exp == 0 { 1 }
         else if exp == 1 { base }
-        else if exp % 2 == 0 { MathU256::pow(base * base, exp / 2) }
-        else { base * MathU256::pow(base * base, (exp - 1) / 2) }
+        else if exp % 2 == 0 { Self::pow(base * base, exp / 2) }
+        else { base * Self::pow(base * base, (exp - 1) / 2) }
     }
 
     fn squaredDistance(x1: u256, y1: u256, x2: u256, y2: u256) -> u256 {
@@ -304,6 +330,18 @@ impl MathU256 of MathTrait<u256> {
 mod tests {
     use debug::PrintTrait;
     use pistols::utils::math::{MathU8,MathU16,MathU32,MathU128};
+
+    #[test]
+    #[available_gas(100_000_000)]
+    fn test_abs() {
+        assert(MathU128::abs(0) == 0, 'abs_0');
+        assert(MathU128::abs(1) == 1, 'abs_1');
+        assert(MathU128::abs(-1) == 1, 'abs_-_1');
+        assert(MathU128::abs(111) == 111, 'abs_111');
+        assert(MathU128::abs(-111) == 111, 'abs_-_111');
+        assert(MathU128::abs(0x8756876876f57f6576f) == 0x8756876876f57f6576f, 'abs_0x');
+        assert(MathU128::abs(-0x8756876876f57f6576f) == 0x8756876876f57f6576f, 'abs_-_0x');
+    }
 
     #[test]
     #[available_gas(100_000_000)]
@@ -380,11 +418,13 @@ mod tests {
     #[test]
     #[available_gas(100_000_000)]
     fn test_map() {
+        assert(MathU8::map(0, 1, 5, 20, 40) == 20, 'map_0_clamped');
         assert(MathU8::map(1, 1, 5, 20, 40) == 20, 'map_1');
         assert(MathU8::map(2, 1, 5, 20, 40) == 25, 'map_2');
         assert(MathU8::map(3, 1, 5, 20, 40) == 30, 'map_3');
         assert(MathU8::map(4, 1, 5, 20, 40) == 35, 'map_4');
         assert(MathU8::map(5, 1, 5, 20, 40) == 40, 'map_5');
+        assert(MathU8::map(6, 1, 5, 20, 40) == 40, 'map_6_clamped');
         // output values can be inverted
         assert(MathU8::map(1, 1, 5, 40, 20) == 40, 'map_i_1');
         assert(MathU8::map(2, 1, 5, 40, 20) == 35, 'map_i_2');
@@ -397,12 +437,37 @@ mod tests {
         assert(MathU8::map(30, 10, 50, 1, 5) == 3, 'map___3');
         assert(MathU8::map(40, 10, 50, 1, 5) == 4, 'map___4');
         assert(MathU8::map(50, 10, 50, 1, 5) == 5, 'map___5');
-        // bad case
+        // bad cases
         assert(MathU8::map(1, 1, 100, 1, 50) == 1, 'map_bad_1');
         assert(MathU8::map(20, 1, 100, 1, 50) == 10, 'map_bad_20');
         assert(MathU8::map(40, 1, 100, 1, 50) == 20, 'map_bad_40');
         assert(MathU8::map(60, 1, 100, 1, 50) == 30, 'map_bad_60');
         assert(MathU8::map(80, 1, 100, 1, 50) == 40, 'map_bad_80');
         assert(MathU8::map(100, 1, 100, 1, 50) == 50, 'map_bad_100');
+        // precision
+        assert(MathU8::map(0, 0, 6, 10, 30) == 10, 'prec_0');
+        assert(MathU8::map(1, 0, 6, 10, 30) == 13, 'prec_1');
+        assert(MathU8::map(2, 0, 6, 10, 30) == 16, 'prec_2');
+        assert(MathU8::map(3, 0, 6, 10, 30) == 20, 'prec_3');
+        assert(MathU8::map(4, 0, 6, 10, 30) == 23, 'prec_4');
+        assert(MathU8::map(5, 0, 6, 10, 30) == 26, 'prec_5');
+        assert(MathU8::map(6, 0, 6, 10, 30) == 30, 'prec_6');
+        // precision inv
+        assert(MathU8::map(10, 10, 30, 0, 6) == 0, 'prec_i_0');
+        assert(MathU8::map(14, 10, 30, 0, 6) == 1, 'prec_i_1');
+        assert(MathU8::map(17, 10, 30, 0, 6) == 2, 'prec_i_2');
+        assert(MathU8::map(20, 10, 30, 0, 6) == 3, 'prec_i_3');
+        assert(MathU8::map(24, 10, 30, 0, 6) == 4, 'prec_i_4');
+        assert(MathU8::map(27, 10, 30, 0, 6) == 5, 'prec_i_5');
+        assert(MathU8::map(30, 10, 30, 0, 6) == 6, 'prec_i_6');
+        // no gaps
+        assert(MathU8::map(1, 5, 5, 1, 50) == 1, 'edge_in_1');      // under is in
+        assert(MathU8::map(5, 5, 5, 1, 50) == 1, 'edge_in_5');      // any is in
+        assert(MathU8::map(10, 5, 5, 1, 50) == 50, 'edge_in_10');   // over is max
+        assert(MathU8::map(1, 3, 8, 20, 20) == 20, 'edge_out_1');
+        assert(MathU8::map(3, 3, 8, 20, 20) == 20, 'edge_out_3');
+        assert(MathU8::map(5, 3, 8, 20, 20) == 20, 'edge_out_5');
+        assert(MathU8::map(8, 3, 8, 20, 20) == 20, 'edge_out_8');
+        assert(MathU8::map(10, 3, 8, 20, 20) == 20, 'edge_out_10');
     }
 }

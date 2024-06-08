@@ -36,10 +36,12 @@ export const EMOJI: any = {
   INJURED: '🩸',
   DEAD: '☠️',
   WAGER: '💰',
+  WINNER: '🏅',
   //
   // badges
   LORD: '👑',
-  WINNER: '🏅',
+  TRICKSTER: '🃏',
+  VILLAIN: '👺',
   THIEF: '🥷', // TODO
   CHICKEN: '🐣', // TODO
   GHOST: '👻', // TODO

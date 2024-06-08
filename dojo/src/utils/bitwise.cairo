@@ -19,36 +19,36 @@ trait Bitwise<T> {
 
 impl U8Bitwise of Bitwise<u8> {
     fn bit(n: usize) -> u8 {
-        if n == 0 { return 0b00000001; }
-        if n == 1 { return 0b00000010; }
-        if n == 2 { return 0b00000100; }
-        if n == 3 { return 0b00001000; }
-        if n == 4 { return 0b00010000; }
-        if n == 5 { return 0b00100000; }
-        if n == 6 { return 0b01000000; }
-        if n == 7 { return 0b10000000; }
-        0
+        if n == 0 { (0b00000001) }
+        else if (n == 1) { (0b00000010) }
+        else if (n == 2) { (0b00000100) }
+        else if (n == 3) { (0b00001000) }
+        else if (n == 4) { (0b00010000) }
+        else if (n == 5) { (0b00100000) }
+        else if (n == 6) { (0b01000000) }
+        else if (n == 7) { (0b10000000) }
+        else { (0) }
     }
     #[inline(always)]
     fn set(x: u8, n: usize) -> u8 {
-        x | U8Bitwise::bit(n)
+        x | Self::bit(n)
     }
     #[inline(always)]
     fn unset(x: u8, n: usize) -> u8 {
-        x & ~U8Bitwise::bit(n)
+        x & ~Self::bit(n)
     }
     #[inline(always)]
     fn shl(x: u8, n: usize) -> u8 {
-        x * U8Bitwise::bit(n)
+        x * Self::bit(n)
     }
     #[inline(always)]
     fn shr(x: u8, n: usize) -> u8 {
-        if (n < 8) { return (x / U8Bitwise::bit(n)); }
-        0
+        if (n < 8) { (x / Self::bit(n)) }
+        else { (0) }
     }
     #[inline(always)]
     fn is_set(x: u8, n: usize) -> bool {
-        ((U8Bitwise::shr(x, n) & 1) != 0)
+        ((Self::shr(x, n) & 1) != 0)
     }
     fn count_bits(x: u8) -> usize {
         let mut result: usize = 0;
@@ -64,30 +64,30 @@ impl U8Bitwise of Bitwise<u8> {
 
 impl U16Bitwise of Bitwise<u16> {
     fn bit(n: usize) -> u16 {
-        if n < 8 { return U8Bitwise::bit(n).into(); }
-        if n < 16 { return U8Bitwise::bit(n-8).into() * 0x100; }
-        0
+        if n < 8 { (U8Bitwise::bit(n).into()) }
+        else if n < 16 { (U8Bitwise::bit(n-8).into() * 0x100) }
+        else { (0) }
     }
     #[inline(always)]
     fn set(x: u16, n: usize) -> u16 {
-        x | U16Bitwise::bit(n)
+        x | Self::bit(n)
     }
     #[inline(always)]
     fn unset(x: u16, n: usize) -> u16 {
-        x & ~U16Bitwise::bit(n)
+        x & ~Self::bit(n)
     }
     #[inline(always)]
     fn shl(x: u16, n: usize) -> u16 {
-        x * U16Bitwise::bit(n)
+        x * Self::bit(n)
     }
     #[inline(always)]
     fn shr(x: u16, n: usize) -> u16 {
-        if (n < 16) { return (x / U16Bitwise::bit(n)); }
-        0
+        if (n < 16) { (x / Self::bit(n)) }
+        else { (0) }
     }
     #[inline(always)]
     fn is_set(x: u16, n: usize) -> bool {
-        ((U16Bitwise::shr(x, n) & 1) != 0)
+        ((Self::shr(x, n) & 1) != 0)
     }
     fn count_bits(x: u16) -> usize {
         let mut result: usize = 0;
@@ -103,30 +103,30 @@ impl U16Bitwise of Bitwise<u16> {
 
 impl U32Bitwise of Bitwise<u32> {
     fn bit(n: usize) -> u32 {
-        if n < 16 { return U16Bitwise::bit(n).into(); }
-        if n < 32 { return U16Bitwise::bit(n-16).into() * 0x10000; }
-        0
+        if n < 16 { (U16Bitwise::bit(n).into()) }
+        else if n < 32 { (U16Bitwise::bit(n-16).into() * 0x10000) }
+        else { (0) }
     }
     #[inline(always)]
     fn set(x: u32, n: usize) -> u32 {
-        x | U32Bitwise::bit(n)
+        x | Self::bit(n)
     }
     #[inline(always)]
     fn unset(x: u32, n: usize) -> u32 {
-        x & ~U32Bitwise::bit(n)
+        x & ~Self::bit(n)
     }
     #[inline(always)]
     fn shl(x: u32, n: usize) -> u32 {
-        x * U32Bitwise::bit(n)
+        x * Self::bit(n)
     }
     #[inline(always)]
     fn shr(x: u32, n: usize) -> u32 {
-        if (n < 32) { return (x / U32Bitwise::bit(n)); }
-        0
+        if (n < 32) { (x / Self::bit(n)) }
+        else { (0) }
     }
     #[inline(always)]
     fn is_set(x: u32, n: usize) -> bool {
-        ((U32Bitwise::shr(x, n) & 1) != 0)
+        ((Self::shr(x, n) & 1) != 0)
     }
     fn count_bits(x: u32) -> usize {
         let mut result: usize = 0;
@@ -142,30 +142,30 @@ impl U32Bitwise of Bitwise<u32> {
 
 impl U64Bitwise of Bitwise<u64> {
     fn bit(n: usize) -> u64 {
-        if n < 32 { return U32Bitwise::bit(n).into(); }
-        if n < 64 { return U32Bitwise::bit(n-32).into() * 0x100000000; }
-        0
+        if n < 32 { (U32Bitwise::bit(n).into()) }
+        else if n < 64 { (U32Bitwise::bit(n-32).into() * 0x100000000) }
+        else { (0) }
     }
     #[inline(always)]
     fn set(x: u64, n: usize) -> u64 {
-        x | U64Bitwise::bit(n)
+        x | Self::bit(n)
     }
     #[inline(always)]
     fn unset(x: u64, n: usize) -> u64 {
-        x &  ~U64Bitwise::bit(n)
+        x &  ~Self::bit(n)
     }
     #[inline(always)]
     fn shl(x: u64, n: usize) -> u64 {
-        x * U64Bitwise::bit(n)
+        x * Self::bit(n)
     }
     #[inline(always)]
     fn shr(x: u64, n: usize) -> u64 {
-        if (n < 64) { return (x / U64Bitwise::bit(n)); }
-        0
+        if (n < 64) { (x / Self::bit(n)) }
+        else { (0) }
     }
     #[inline(always)]
     fn is_set(x: u64, n: usize) -> bool {
-        ((U64Bitwise::shr(x, n) & 1) != 0)
+        ((Self::shr(x, n) & 1) != 0)
     }
     fn count_bits(x: u64) -> usize {
         let mut result: usize = 0;
@@ -181,30 +181,30 @@ impl U64Bitwise of Bitwise<u64> {
 
 impl U128Bitwise of Bitwise<u128> {
     fn bit(n: usize) -> u128 {
-        if n < 64 { return U64Bitwise::bit(n).into(); }
-        if n < 128 { return U64Bitwise::bit(n-64).into() * 0x10000000000000000; }
-        0
+        if n < 64 { (U64Bitwise::bit(n).into()) }
+        else if n < 128 { (U64Bitwise::bit(n-64).into() * 0x10000000000000000) }
+        else { (0) }
     }
     #[inline(always)]
     fn set(x: u128, n: usize) -> u128 {
-        x | U128Bitwise::bit(n)
+        x | Self::bit(n)
     }
     #[inline(always)]
     fn unset(x: u128, n: usize) -> u128 {
-        x & ~U128Bitwise::bit(n)
+        x & ~Self::bit(n)
     }
     #[inline(always)]
     fn shl(x: u128, n: usize) -> u128 {
-        x * U128Bitwise::bit(n)
+        x * Self::bit(n)
     }
     #[inline(always)]
     fn shr(x: u128, n: usize) -> u128 {
-        if (n < 128) { return (x / U128Bitwise::bit(n)); }
-        0
+        if (n < 128) { (x / Self::bit(n)) }
+        else { (0) }
     }
     #[inline(always)]
     fn is_set(x: u128, n: usize) -> bool {
-        ((U128Bitwise::shr(x, n) & 1) != 0)
+        ((Self::shr(x, n) & 1) != 0)
     }
     fn count_bits(x: u128) -> usize {
         let mut result: usize = 0;
@@ -220,30 +220,30 @@ impl U128Bitwise of Bitwise<u128> {
 
 impl U256Bitwise of Bitwise<u256> {
     fn bit(n: usize) -> u256 {
-        if n < 128 { return u256 { low: U128Bitwise::bit(n), high: 0x0 }; }
-        if n < 256 { return u256 { low: 0x0, high: U128Bitwise::bit(n-128) }; }
-        0
+        if n < 128 { (u256 { low: U128Bitwise::bit(n), high: 0x0 }) }
+        else if n < 256 { (u256 { low: 0x0, high: U128Bitwise::bit(n-128) }) }
+        else { (0) }
     }
     #[inline(always)]
     fn set(x: u256, n: usize) -> u256 {
-        x | U256Bitwise::bit(n)
+        x | Self::bit(n)
     }
     #[inline(always)]
     fn unset(x: u256, n: usize) -> u256 {
-        x & ~U256Bitwise::bit(n)
+        x & ~Self::bit(n)
     }
     #[inline(always)]
     fn shl(x: u256, n: usize) -> u256 {
-        x * U256Bitwise::bit(n)
+        x * Self::bit(n)
     }
     #[inline(always)]
     fn shr(x: u256, n: usize) -> u256 {
-        if (n < 256) { return (x / U256Bitwise::bit(n)); }
-        0
+        if (n < 256) { (x / Self::bit(n)) }
+        else { (0) }
     }
     #[inline(always)]
     fn is_set(x: u256, n: usize) -> bool {
-        ((U256Bitwise::shr(x, n) & 1) != 0)
+        ((Self::shr(x, n) & 1) != 0)
     }
     fn count_bits(x: u256) -> usize {
         let mut result: usize = 0;

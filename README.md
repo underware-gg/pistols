@@ -120,9 +120,13 @@ rustup update
 # Install Cargo
 curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh
 
-# other stuff you might need
-cargo install toml-cli
+# Install pnpm
+curl -fsSL https://get.pnpm.io/install.sh | sh -
+
+# other stuff you will need
+brew install jq
 brew install protobuf
+cargo install toml-cli
 ```
 
 Install the [Cairo 1.0](https://marketplace.visualstudio.com/items?itemName=starkware.cairo1) extension for Visual Studio Code
@@ -132,12 +136,12 @@ Install the [Cairo 1.0](https://marketplace.visualstudio.com/items?itemName=star
 
 > [Dojo Book](https://book.dojoengine.org/getting-started/quick-start.html)
 
-Using Dojo 0.5.1
+Currenty using Dojo version `v0.7.0-alpha.5`
 
 ```console
 curl -L https://install.dojoengine.org | bash
 # open new terminal to update PATH
-dojoup -v 0.5.1
+dojoup -v v0.7.0-alpha.5
 
 # test dojo
 cd dojo
@@ -146,7 +150,7 @@ sozo test
 
 # install packages
 cd ../client
-npm install
+pnpm install
 ```
 
 
@@ -156,9 +160,9 @@ npm install
 
 ```console
 cd dojo
-katana --disable-fee --invoke-max-steps 10000000
+katana --disable-fee --chain-id KATANA_LOCAL --invoke-max-steps 10000000
 
-# or just...
+# or simply...
 cd dojo
 ./run_katana
 ```
@@ -171,7 +175,7 @@ Uncomment the `world_address` parameter in `dojo/Scarb.toml` then:
 cd dojo
 torii --world 0x2d6bcc12cbb460243b73a4c937faf00ad2d071d899f40dfc9182843712f9c77
 
-# or just...
+# or simply...
 cd dojo
 ./run_torii
 ```
@@ -180,7 +184,7 @@ cd dojo
 
 ```console
 cd client
-npm install && npm dev
+pnpm install && pnpm dev
 
 # or just...
 cd dojo

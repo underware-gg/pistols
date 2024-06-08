@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { useThreeJsContext } from '../hooks/ThreeJsContext'
+import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
+import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
+import { useUserHasInteracted } from '@/lib/utils/hooks/useUserHasInteracted'
 import { loadAudioAssets, isAudioAssetsLoaded, AudioName } from '@/pistols/data/assets'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import GameCanvas from '@/pistols/components/GameCanvas'
-import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
-import { useUserHasInteracted } from '@/lib/hooks/useUserHasInteracted'
 
 function GameContainer({
   isVisible,
@@ -13,12 +13,15 @@ function GameContainer({
 }) {
   const { dispatchSelectDuel } = usePistolsContext()
   const { audioLoaded } = useThreeJsContext()
+  const { initialized } = useSettingsContext()
 
   useEffect(() => {
     if (duelId) {
       dispatchSelectDuel(duelId)
     }
   }, [duelId])
+
+  if (!initialized) return <></>
 
   return (
     <div className={`GameContainer ${isVisible ? '' : 'Hidden'}`}>
@@ -49,7 +52,7 @@ function GameAudioLoader() {
   useEffect(() => {
     const _preloadAudio = async () => {
       dispatchLoadedAudioAssets(false)
-      await loadAudioAssets(gameImpl?.getCameraRig())
+      await loadAudioAssets()
       dispatchLoadedAudioAssets(true)
     }
     if (isAudioAssetsLoaded()) {

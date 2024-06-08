@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid } from 'semantic-ui-react'
-import { useDojoAccount, useDojoSystemCalls } from '@/dojo/DojoContext'
+import { useDojoAccount, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useGetValidPackedActions } from '@/pistols/hooks/useContractCalls'
 import { Action } from '@/pistols/utils/pistols'
 import { signAndRestoreActionFromHash } from '../utils/salt'
@@ -30,7 +30,6 @@ export default function RevealModal({
 
   const _reveal = async () => {
     setIsSubmitting(true)
-    // console.log(`reveal....`, account, duelId, roundNumber, hash, validPackedActions)
     const { salt, packed, slot1, slot2 } = await signAndRestoreActionFromHash(account, duelId, roundNumber, hash, validPackedActions)
     if (packed != null && slot1 != null && slot2 != null) {
       await reveal_action(account, duelId, roundNumber, salt, slot1, slot2)

@@ -1,4 +1,6 @@
 import React, { ReactNode, createContext, useReducer, useContext } from 'react'
+import { Opener, useOpener } from '@/lib/ui/useOpener'
+import { BigNumberish } from 'starknet'
 
 //
 // React + Typescript + Context
@@ -34,18 +36,46 @@ const tavernMenuItems: MenuKey[] = [
   MenuKey.PastDuels,
 ]
 
+export enum AccountMenuKey {
+  Deploy = 'Deploy',
+  Fund = 'Fund',
+  Profile = 'Profile',
+}
+
+const accountMenuItems: AccountMenuKey[] = [
+  AccountMenuKey.Deploy,
+  AccountMenuKey.Fund,
+  AccountMenuKey.Profile,
+]
+
+//--------------------------------
+// State
+//
+
 export const initialState = {
-  duelistAddress: 0n,
+  walletSig: { address: 0n, sig: 0n },
+  accountIndex: 1,
   duelId: 0n,
+  duelistAddress: 0n,
+  challengedAddress: 0n,
   menuKey: MenuKey.Duelists,
+  accountMenuKey: AccountMenuKey.Deploy,
   sceneName: SceneName.Splash,
+  // injected
+  connectOpener: null as Opener,
+  accountSetupOpener: null as Opener,
+  tableOpener: null as Opener,
 }
 
 const PistolsActions = {
-  SET_SCENE: 'SET_SCENE',
+  SET_SIG: 'SET_SIG',
+  SET_ACCOUNT_INDEX: 'SET_ACCOUNT_INDEX',
+  SET_ACCOUNT_MENU_KEY: 'SET_ACCOUNT_MENU_KEY',
   SET_MENU_KEY: 'SET_MENU_KEY',
-  SELECT_DUELIST: 'SELECT_DUELIST',
+  SET_SCENE: 'SET_SCENE',
   SELECT_DUEL: 'SELECT_DUEL',
+  SELECT_DUELIST: 'SELECT_DUELIST',
+  SELECT_CHALLENGED: 'SELECT_CHALLENGED',
 }
 
 
@@ -55,10 +85,14 @@ const PistolsActions = {
 type PistolsContextStateType = typeof initialState
 
 type ActionType =
-  | { type: 'SET_SCENE', payload: SceneName }
+  | { type: 'SET_SIG', payload: bigint[] }
+  | { type: 'SET_ACCOUNT_INDEX', payload: number }
+  | { type: 'SET_ACCOUNT_MENU_KEY', payload: AccountMenuKey }
   | { type: 'SET_MENU_KEY', payload: MenuKey }
-  | { type: 'SELECT_DUELIST', payload: bigint }
+  | { type: 'SET_SCENE', payload: SceneName }
   | { type: 'SELECT_DUEL', payload: bigint }
+  | { type: 'SELECT_DUELIST', payload: bigint }
+  | { type: 'SELECT_CHALLENGED', payload: bigint }
 
 
 
@@ -82,11 +116,26 @@ interface PistolsProviderProps {
 const PistolsProvider = ({
   children,
 }: PistolsProviderProps) => {
+  const connectOpener = useOpener()
+  const accountSetupOpener = useOpener()
+  const tableOpener = useOpener()
+
   const [state, dispatch] = useReducer((state: PistolsContextStateType, action: ActionType) => {
     let newState = { ...state }
     switch (action.type) {
-      case PistolsActions.SET_SCENE: {
-        newState.sceneName = action.payload as SceneName
+      case PistolsActions.SET_SIG: {
+        newState.walletSig = {
+          address: action.payload[0] as bigint,
+          sig: action.payload[1] as bigint,
+        }
+        break
+      }
+      case PistolsActions.SET_ACCOUNT_INDEX: {
+        newState.accountIndex = action.payload as number
+        break
+      }
+      case PistolsActions.SET_ACCOUNT_MENU_KEY: {
+        newState.accountMenuKey = action.payload as AccountMenuKey
         break
       }
       case PistolsActions.SET_MENU_KEY: {
@@ -94,14 +143,26 @@ const PistolsProvider = ({
         newState.sceneName = action.payload as SceneName
         break
       }
-      case PistolsActions.SELECT_DUELIST: {
-        newState.duelistAddress = BigInt(action.payload)
-        newState.duelId = 0n
+      case PistolsActions.SET_SCENE: {
+        newState.sceneName = action.payload as SceneName
         break
       }
       case PistolsActions.SELECT_DUEL: {
-        newState.duelId = BigInt(action.payload)
+        newState.duelId = action.payload as bigint
         newState.duelistAddress = 0n
+        newState.challengedAddress = 0n
+        break
+      }
+      case PistolsActions.SELECT_DUELIST: {
+        newState.duelId = 0n
+        newState.duelistAddress = action.payload as bigint
+        newState.challengedAddress = 0n
+        break
+      }
+      case PistolsActions.SELECT_CHALLENGED: {
+        newState.duelId = 0n
+        newState.duelistAddress = 0n
+        newState.challengedAddress = action.payload as bigint
         break
       }
       default:
@@ -112,7 +173,12 @@ const PistolsProvider = ({
   }, initialState)
 
   return (
-    <PistolsContext.Provider value={{ state, dispatch }}>
+    <PistolsContext.Provider value={{ dispatch, state: {
+      ...state,
+      connectOpener,
+      accountSetupOpener,
+      tableOpener,
+    } }}>
       {children}
     </PistolsContext.Provider>
   )
@@ -127,10 +193,22 @@ export { PistolsProvider, PistolsContext, PistolsActions }
 
 export const usePistolsContext = () => {
   const { state, dispatch } = useContext(PistolsContext)
-  const dispatchSetScene = (scene: SceneName | null) => {
+  const dispatchSetSig = (address: BigNumberish | null, sig: BigNumberish | null) => {
     dispatch({
-      type: PistolsActions.SET_SCENE,
-      payload: scene != SceneName.Tavern ? scene : state.menuKey,
+      type: PistolsActions.SET_SIG,
+      payload: [BigInt(address ?? 0n), BigInt(sig ?? 0n)]
+    })
+  }
+  const dispatchSetAccountIndex = (index: number) => {
+    dispatch({
+      type: PistolsActions.SET_ACCOUNT_INDEX,
+      payload: index,
+    })
+  }
+  const dispatchSetAccountMenu = (menuKey: AccountMenuKey) => {
+    dispatch({
+      type: PistolsActions.SET_ACCOUNT_MENU_KEY,
+      payload: menuKey,
     })
   }
   const dispatchSetMenu = (menuKey: MenuKey) => {
@@ -139,21 +217,35 @@ export const usePistolsContext = () => {
       payload: menuKey,
     })
   }
-  const dispatchSelectDuelist = (address: bigint) => {
+  const dispatchSetScene = (scene: SceneName | null) => {
     dispatch({
-      type: PistolsActions.SELECT_DUELIST,
-      payload: address,
+      type: PistolsActions.SET_SCENE,
+      payload: scene != SceneName.Tavern ? scene : state.menuKey,
     })
   }
-  const dispatchSelectDuel = (duelId: bigint) => {
+  const dispatchSelectDuelist = (address: BigNumberish) => {
+    dispatch({
+      type: PistolsActions.SELECT_DUELIST,
+      payload: BigInt(address),
+    })
+  }
+  const dispatchChallengedDuelist = (address: BigNumberish) => {
+    dispatch({
+      type: PistolsActions.SELECT_CHALLENGED,
+      payload: BigInt(address),
+    })
+  }
+  const dispatchSelectDuel = (duelId: BigNumberish) => {
     dispatch({
       type: PistolsActions.SELECT_DUEL,
-      payload: duelId,
+      payload: BigInt(duelId),
     })
   }
   return {
     ...state,
+    hasSigned: (state.walletSig.sig > 0n),
     tavernMenuItems,
+    accountMenuItems,
     atSplash: (state.sceneName == SceneName.Splash),
     atGate: (state.sceneName == SceneName.Gate),
     atTavern: (state.sceneName as string == state.menuKey as string),
@@ -164,9 +256,13 @@ export const usePistolsContext = () => {
     atDuel: (state.sceneName == SceneName.Duel),
     // PistolsActions,
     // dispatch,
-    dispatchSetScene,
+    dispatchSetSig,
+    dispatchSetAccountIndex,
+    dispatchSetAccountMenu,
     dispatchSetMenu,
-    dispatchSelectDuelist,
+    dispatchSetScene,
     dispatchSelectDuel,
+    dispatchSelectDuelist,
+    dispatchChallengedDuelist,
   }
 }

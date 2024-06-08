@@ -1,0 +1,15 @@
+kind = "DojoModel"
+class_hash = "0x6930ab524bcd759ec513287058c4546916ece5fcd10cda1dd075bfb628bd876"
+original_class_hash = "0x6930ab524bcd759ec513287058c4546916ece5fcd10cda1dd075bfb628bd876"
+abi = "manifests/slot/abis/base/models/pistols_models_models_pact.json"
+name = "pistols::models::models::pact"
+
+[[members]]
+name = "pair"
+type = "u128"
+key = true
+
+[[members]]
+name = "duel_id"
+type = "u128"
+key = false

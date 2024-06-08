@@ -99,7 +99,7 @@ export class Rain extends THREE.Object3D {
       eye2.position.x = -14
       var ghost = new THREE.Group()
       ghost.add(eye1, eye2)
-      ghost.position.set(THREE.MathUtils.randFloatSpread(0.8 * WIDTH), THREE.MathUtils.randFloatSpread(0.7 * HEIGHT),0)
+      ghost.position.set(THREE.MathUtils.randFloatSpread(0.8 * WIDTH), THREE.MathUtils.randFloatSpread(0.7 * HEIGHT), 0)
       this.ghostsEyes.push(ghost)
       this.ghosts.push(ghost.position)
       this.scene.add(ghost)
@@ -122,7 +122,7 @@ export class Rain extends THREE.Object3D {
   }
 
   animate(clock) {
-    var dTime = clock.getDelta()
+    var dTime = 0.01 //just in case so that it doesnt mess the clocks deltas, will be replaced back once rain is completely implemented
     var time = clock.getElapsedTime()
     if (M < N) M += 5
     const positions = this.snowflakes.getAttribute('position')

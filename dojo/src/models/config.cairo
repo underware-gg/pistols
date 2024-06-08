@@ -3,7 +3,8 @@ use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
 const CONFIG_KEY: u8 = 1;
 
-#[derive(Model, Copy, Drop, Serde)]
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
 struct Config {
     #[key]
     key: u8,
@@ -31,9 +32,9 @@ impl ConfigManagerTraitImpl of ConfigManagerTrait {
         set!(self.world, (config));
     }
     fn is_initialized(world: IWorldDispatcher) -> bool {
-        (ConfigManagerTrait::new(world).get().initialized)
+        (Self::new(world).get().initialized)
     }
     fn is_owner(world: IWorldDispatcher, address: ContractAddress) -> bool {
-        (ConfigManagerTrait::new(world).get().owner_address == address)
+        (Self::new(world).get().owner_address == address)
     }
 }

@@ -1,18 +1,53 @@
 import React, { useMemo } from 'react'
+import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
+import { VStack } from '../ui/Stack'
 import useSWR from 'swr'
+
 const textFetcher = (url: string) => fetch(url).then((res) => res.text())
 
-
-export const useDojoStatus = () => {
+export const useToriiStatus = () => {
+  const { selectedChainConfig } = useSelectedChain()
+  const { data, error, isLoading } = useSWR(selectedChainConfig.toriiUrl, textFetcher)
   // data: string = {"service":"torii","success":true}
-  const { data, error, isLoading } = useSWR(process.env.NEXT_PUBLIC_TORII, textFetcher)
-  // console.log(`torii:`, data, error, isLoading)
+  // console.log(`torii:`, data, data, error, isLoading)
 
-  const isError = error ?? (data?.startsWith('Deployment doesnt exist')) ?? false
+  const isSuccess = useMemo(() => {
+    if (error || !data) return false
+    try {
+      const _data = JSON.parse(data)
+      return _data?.success ?? false
+    } catch {
+      return false
+    }
+  }, [data, error])
 
   return {
-    // isConnected: (!error && !isLoading),
-    isError,
+    toriiIsLoading: isLoading,
+    toriiIsOk: isSuccess,
+    toriiIsError: !isLoading && !isSuccess,
+  }
+}
+
+export const useKatanaStatus = () => {
+  const { selectedChainConfig } = useSelectedChain()
+  const { data, error, isLoading } = useSWR(selectedChainConfig.rpcUrl, textFetcher)
+  // data: string = {"health":true}
+  // console.log(`torii:`, data, data, error, isLoading)
+
+  const isSuccess = useMemo(() => {
+    if (error || !data) return false
+    try {
+      const _data = JSON.parse(data)
+      return _data?.health ?? false
+    } catch {
+      return false
+    }
+  }, [data, error])
+
+  return {
+    katanaIsLoading: isLoading,
+    katanaIsOk: isSuccess,
+    katanaIsError: !isLoading && !isSuccess,
   }
 }
 
@@ -21,13 +56,13 @@ export const useDojoStatus = () => {
 //
 
 export function DojoStatus({
-  label = '',
+  message = 'Loading Dojo...',
 }) {
-  const { isError } = useDojoStatus()
   return (
-    <>
-      {/* {isConnected && <span className='Important TitleCase'>connected</span>} */}
-      {isError && <span className='Negative TitleCase'>under maintenance</span>}
-    </>
+    <div className='Overlay FillParent'>
+      <VStack>
+        <h1 className='TitleCase'>{message}</h1>
+      </VStack>
+    </div>
   )
 }
