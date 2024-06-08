@@ -46,8 +46,10 @@ export default function Gate() {
 
         {!isConnected ?
           <span className='Title'>
-            Duelists require a <b>Starknet wallet</b>
-            <br />and some <LordsBagIcon /><b>LORDS</b> to play
+            {/* Duelists use a <b>Controller wallet</b> */}
+            {/* <br />and some <LordsBagIcon /><b>LORDS</b> to play */}
+            Settle Your Grudges Honourably
+            <br />Wager some <LordsBagIcon /><b>LORDS</b> or duel for free
           </span>
           : <WalletHeader />
         }
