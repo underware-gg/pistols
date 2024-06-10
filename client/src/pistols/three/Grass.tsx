@@ -295,4 +295,13 @@ export class Grass extends THREE.Object3D {
     this.materialHigh.setUniformValue('windDirection', new THREE.Vector3(0.0, 0.0, direction))
     this.depthMaterial.setUniformValue('windDirection', new THREE.Vector3(0.0, 0.0, direction))
   }
+
+  public dispose() {
+    this.geometryHigh.dispose();
+
+    this.materialHigh.dispose();
+    this.depthMaterial.dispose();
+
+    this.removeFromParent();
+  }
 }
