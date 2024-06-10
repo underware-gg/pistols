@@ -122,10 +122,13 @@ export function LoadingIcon({
 //
 interface IconClickProps extends IconProps {
   onClick: Function
+  important?: boolean
 }
 export function IconClick(props: IconClickProps) {
+  const classNames = ['IconClick']
+  if (props.important) classNames.push('Important')
   return (
-    <Icon {...props} className='IconClick' onClick={() => props.onClick()} />
+    <Icon {...props} className={classNames.join(' ')} onClick={() => props.onClick()} />
   )
 }
 

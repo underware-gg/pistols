@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { Modal, Tab, TabPane, Grid, Menu } from 'semantic-ui-react'
 import { useBurnerAccount, useBurnerContract, useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { IconChecked, IconWarning } from '@/lib/ui/Icons'
+import { IconChecked, IconClick, IconWarning } from '@/lib/ui/Icons'
 import { AccountMenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { OnboardingDeploy } from '@/pistols/components/account/OnboardingDeploy'
@@ -64,6 +64,11 @@ export default function OnboardingModal({
     dispatchSetAccountMenu(AccountMenuKey.Deploy)
   }
 
+  const canGoPrev = (accountIndex > 1)
+  const canGoNext = (accountIndex < nextAccountIndex - 1)
+  const gotoPrevAccount = useCallback(() => (canGoPrev ? dispatchSetAccountIndex(accountIndex - 1) : null), [canGoPrev, dispatchSetAccountIndex])
+  const gotoNextAccount = useCallback(() => (canGoNext ? dispatchSetAccountIndex(accountIndex + 1) : null), [canGoNext, dispatchSetAccountIndex])
+
   return (
     <Modal
       onClose={() => opener.close()}
@@ -73,10 +78,13 @@ export default function OnboardingModal({
       <Modal.Header>
         <Grid>
           <Row>
-            <Col width={10} textAlign='left'>
-              Duelist Account #{accountIndex}
+            <Col width={11} textAlign='left'>
+              Duelist Account
+              <IconClick name='caret left' size='small' important disabled={!canGoPrev} onClick={() => gotoPrevAccount()} />
+              #{accountIndex}
+              <IconClick name='caret right' size='small' important disabled={!canGoNext} onClick={() => gotoNextAccount()} />
             </Col>
-            <Col width={6} textAlign='right'>
+            <Col width={5} textAlign='right'>
               <AddressShort address={address} ifExists />
             </Col>
           </Row>
@@ -129,16 +137,16 @@ export default function OnboardingModal({
             <Col>
               <ActionButton fill label='Deploy New' onClick={() => _deployNew()} />
             </Col>
-            <Col>
-              <ActionButton fill label='Previous' disabled={accountIndex <= 1} onClick={() => dispatchSetAccountIndex(accountIndex - 1)} />
-            </Col>
-            <Col>
-              <ActionButton fill label='Next' disabled={accountIndex >= nextAccountIndex} onClick={() => dispatchSetAccountIndex(accountIndex + 1)} />
-            </Col>
+            <Col></Col>
+            {/* <Col>
+              <ActionButton fill label='Previous' disabled={!canGoPrev} onClick={() => gotoPrevAccount()} />
+            </Col> */}
+            {/* <Col>
+              <ActionButton fill label='Next' disabled={!canGoNext} onClick={() => gotoNextAccount()} />
+            </Col> */}
             <Col>
               <ActionButton important fill disabled={!_canContinue[accountMenuKey]} label={_nextLabel[accountMenuKey]} onClick={() => _continue()} />
             </Col>
-
           </Row>
         </Grid>
       </Modal.Actions>
