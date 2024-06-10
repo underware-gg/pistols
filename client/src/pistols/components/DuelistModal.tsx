@@ -45,7 +45,7 @@ export default function DuelistModal() {
                 <div className='Anchor' onClick={() => router.push(`/gate`)} >
                   <span className='Smaller'>Switch Duelist</span>
                   &nbsp;
-                  <Icon name='users' size={'small'} />
+                  <Icon name='sign out' size={'small'} />
                 </div>
               }
             </Col>
