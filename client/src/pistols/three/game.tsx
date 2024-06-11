@@ -260,7 +260,7 @@ async function loadAssets() {
   const ktx2Loader = new KTX2Loader(loadingManager)
   ktx2Loader.setTranscoderPath( '/basis/' )
   ktx2Loader.detectSupport( _renderer )
-  ktx2Loader.setWorkerLimit(32)
+  ktx2Loader.setWorkerLimit(4)
 
   Object.keys(TEXTURES).forEach(key => {
     const TEX = TEXTURES[key]
