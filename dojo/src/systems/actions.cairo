@@ -295,31 +295,48 @@ mod actions {
         }
 
         fn simulate_chances(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> SimulateChances {
+            let (score_self, score_other): (Score, Score) = utils::get_snapshot_scores(world, duelist_address, duel_id);
             let health: u8 = utils::get_duelist_health(world, duelist_address, duel_id, round_number);
             let action_self: Action = action.into();
             let action_other: Action = action.into();
-            
+            // honour
             let (action_honour, duelist_honour): (i8, u8) = utils::simulate_honour_for_action(world, duelist_address, action_self);
-
-            let (score_self, score_other): (Score, Score) = utils::get_snapshot_scores(world, duelist_address, duel_id);
-            
+            // crit
             let crit_chances: u8 = utils::calc_crit_chances(score_self, score_other, action_self, action_other, health);
+            let crit_base_chance: u8 = action_self.crit_chance();
             let crit_bonus: u8 = utils::calc_crit_bonus(score_self);
-
+            let crit_match_bonus: u8 = utils::calc_crit_match_bonus(score_self, action_self, action_other);
+            let crit_trickster_penalty: u8 = utils::calc_crit_trickster_penalty(score_self, score_other);
+            // hit
             let hit_chances: u8 = utils::calc_hit_chances(score_self, score_other, action_self, action_other, health);
-            let hit_bonus: u8 = 0;
-
+            let hit_base_chance: u8 = action_self.hit_chance();
+            let hit_bonus: u8 = utils::calc_hit_bonus(score_self);
+            let hit_injury_penalty: u8 = utils::calc_hit_injury_penalty(action_self, health);
+            let hit_trickster_penalty: u8 = utils::calc_hit_trickster_penalty(score_self, score_other);
+            // lethal
             let lethal_chances: u8 = utils::calc_lethal_chances(score_self, score_other, action_self, action_other, hit_chances);
-            let lethal_bonus: u8 = utils::calc_hit_bonus(score_self);
+            let lethal_base_chance: u8 = action_self.lethal_chance();
+            let lethal_lord_penalty: u8 = utils::calc_lethal_lord_penalty(score_self, score_other, action_self, action_other);
             (SimulateChances {
+                // honour
                 action_honour,
                 duelist_honour,
+                // crit
                 crit_chances,
+                crit_base_chance,
                 crit_bonus,
+                crit_match_bonus,
+                crit_trickster_penalty,
+                // hit
                 hit_chances,
+                hit_base_chance,
                 hit_bonus,
+                hit_injury_penalty,
+                hit_trickster_penalty,
+                // lethal
                 lethal_chances,
-                lethal_bonus,
+                lethal_base_chance,
+                lethal_lord_penalty,
             })
         }
 

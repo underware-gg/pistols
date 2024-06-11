@@ -406,8 +406,8 @@ fn calc_crit_chances(attacker: Score, defender: Score, attack: Action, defense: 
     else {
         (_apply_chance_bonus_penalty(
             crit_chance,
-            calc_crit_bonus(attacker) + calc_match_crit_bonus(attacker, attack, defense),
-            0 + calc_trickster_hit_penalty(attacker, defender, chances::TRICKSTER_CRIT_PENALTY),
+            calc_crit_bonus(attacker) + calc_crit_match_bonus(attacker, attack, defense),
+            0 + calc_crit_trickster_penalty(attacker, defender),
         ))
     }
 }
@@ -420,7 +420,7 @@ fn calc_hit_chances(attacker: Score, defender: Score, attack: Action, defense: A
         (_apply_chance_bonus_penalty(
             hit_chance,
             calc_hit_bonus(attacker),
-            calc_hit_penalty(attack, health) + calc_trickster_hit_penalty(attacker, defender, chances::TRICKSTER_HIT_PENALTY),
+            calc_hit_injury_penalty(attack, health) + calc_hit_trickster_penalty(attacker, defender),
         ))
     }
 }
@@ -434,7 +434,7 @@ fn calc_lethal_chances(attacker: Score, defender: Score, attack: Action, defense
         (_apply_chance_bonus_penalty(
             MathU8::sub(hit_chances, diff),
             0,
-            calc_lord_lethal_penalty(attacker, defender, attack, defense, chances::LORD_LETHAL_PENALTY),
+            calc_lethal_lord_penalty(attacker, defender, attack, defense),
         ))
     }
 }
@@ -450,7 +450,6 @@ fn _apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
 // bonuses
 //
 
-#[inline(always)]
 fn calc_crit_bonus(attacker: Score) -> u8 {
     if (attacker.is_lord()) {
         (_calc_bonus(chances::CRIT_BONUS_LORD, attacker.level_lord, attacker.total_duels))
@@ -460,7 +459,6 @@ fn calc_crit_bonus(attacker: Score) -> u8 {
         (0)
     }
 }
-#[inline(always)]
 fn calc_hit_bonus(attacker: Score) -> u8 {
     if (attacker.is_villain()) {
         (_calc_bonus(chances::HIT_BONUS_VILLAIN, attacker.level_villain, attacker.total_duels))
@@ -470,7 +468,6 @@ fn calc_hit_bonus(attacker: Score) -> u8 {
         (0)
     }
 }
-#[inline(always)]
 fn _calc_bonus(bonus_max: u8, level: u8, total_duels: u16) -> u8 {
     if (level > 0 && total_duels > 0) {
         (MathU8::max(1, MathU8::map(
@@ -483,8 +480,7 @@ fn _calc_bonus(bonus_max: u8, level: u8, total_duels: u16) -> u8 {
     }
 }
 
-#[inline(always)]
-fn calc_match_crit_bonus(attacker: Score, attack: Action, defense: Action) -> u8 {
+fn calc_crit_match_bonus(attacker: Score, attack: Action, defense: Action) -> u8 {
     if (attacker.is_lord()) {
         if (attack.paces_priority(defense) < 0) { (chances::EARLY_LORD_CRIT_BONUS) } else { (0) }
     } else if (attacker.is_villain()) {
@@ -502,7 +498,7 @@ fn calc_match_crit_bonus(attacker: Score, attack: Action, defense: Action) -> u8
 //     (_calc_penalty(health, attack.crit_penalty()))
 // }
 #[inline(always)]
-fn calc_hit_penalty(attack: Action, health: u8) -> u8 {
+fn calc_hit_injury_penalty(attack: Action, health: u8) -> u8 {
     (_calc_penalty(health, attack.hit_penalty()))
 }
 #[inline(always)]
@@ -510,8 +506,15 @@ fn _calc_penalty(health: u8, penalty_per_damage: u8) -> u8 {
     ((constants::FULL_HEALTH - health) * penalty_per_damage)
 }
 
+
+fn calc_crit_trickster_penalty(attacker: Score, defender: Score) -> u8 {
+    (_calc_trickster_penalty(attacker, defender, chances::TRICKSTER_CRIT_PENALTY))
+}
+fn calc_hit_trickster_penalty(attacker: Score, defender: Score) -> u8 {
+    (_calc_trickster_penalty(attacker, defender, chances::TRICKSTER_HIT_PENALTY))
+}
 #[inline(always)]
-fn calc_trickster_hit_penalty(attacker: Score, defender: Score, penalty: u8) -> u8 {
+fn _calc_trickster_penalty(attacker: Score, defender: Score, penalty: u8) -> u8 {
     // tricksters reduce non-trickster chances to hit
     if (defender.is_trickster() && !attacker.is_trickster()) {
         (penalty)
@@ -520,11 +523,10 @@ fn calc_trickster_hit_penalty(attacker: Score, defender: Score, penalty: u8) -> 
     }
 }
 
-#[inline(always)]
-fn calc_lord_lethal_penalty(attacker: Score, defender: Score, attack: Action, defense: Action, penalty: u8) -> u8 {
+fn calc_lethal_lord_penalty(attacker: Score, defender: Score, attack: Action, defense: Action) -> u8 {
     // lord shooting late have <penalty> chances to get less damage
     if (defender.is_lord() && !attacker.is_lord() && attack.paces_priority(defense) > 0) {
-        (penalty)
+        (chances::LORD_LETHAL_PENALTY)
     } else {
         (0)
     }

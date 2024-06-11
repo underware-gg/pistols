@@ -2,11 +2,11 @@ import React, { useMemo } from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useSimulateChances } from '@/pistols/hooks/useContractCalls'
+import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import { Action } from '@/pistols/utils/pistols'
 import ProgressBar from '@/pistols/components/ui/ProgressBar'
-import { ProfileBadge } from './account/ProfileDescription'
-import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
+import { EMOJI } from '../data/messages'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -24,12 +24,22 @@ export function ActionChances({
   const {
     action_honour,
     duelist_honour,
+    // crit
     crit_chances,
+    crit_base_chance,
     crit_bonus,
+    crit_match_bonus,
+    crit_trickster_penalty,
+    // hit
     hit_chances,
+    hit_base_chance,
     hit_bonus,
+    hit_injury_penalty,
+    hit_trickster_penalty,
+    // lethal
     lethal_chances,
-    lethal_bonus,
+    lethal_base_chance,
+    lethal_lord_penalty,
   } = useSimulateChances(accountAddress, duelId, roundNumber, action)
   const { crit_chances: other_crit_chances } = useSimulateChances(isA ? duelistB : duelistA, duelId, roundNumber, Action.Strong)
   // console.log(`CHANCES:`, crit_chances, crit_bonus, hit_chances, hit_bonus, lethal_chances, lethal_bonus)
@@ -66,12 +76,33 @@ export function ActionChances({
         neutral={action_honour < 0}
       />
 
-      <br />
-      <div className='H5 AlignCenter'>
-        {(crit_chances > 0 && crit_bonus > 0) && <div>(Includes <ProfileBadge address={accountAddress} /> <b>{crit_bonus}% Crit Bonus</b>)</div>}
-        {(hit_chances > 0 && hit_bonus > 0) && <div>(Includes <ProfileBadge address={accountAddress} /> <b>{hit_bonus}% Hit Bonus</b> )</div>}
-        {(lethal_chances > 0 && lethal_bonus > 0) && <div>(Includes <ProfileBadge address={accountAddress} /> <b>{lethal_bonus}% Lethal Bonus</b> )</div>}
-      </div>
+      {action > 0 &&
+        <Grid columns={'equal'}>
+          <Row>
+            <Col>
+              Raw bonus and penalties. More info on the <a href='https://docs.underware.gg/pistols/advanced' target='_blank'>docs</a>.
+            </Col>
+          </Row>
+          <Row className='H5 Bold'>
+            <Col></Col>
+            <Col>
+              {EMOJI.LORD} {crit_bonus}% Crit Bonus
+              <br />{crit_base_chance}% Crit Base Chances
+              {(crit_match_bonus > 0) && <><br />{crit_match_bonus}% Crit Match Bonus</>}
+              {(crit_trickster_penalty > 0) && <><br />{crit_trickster_penalty}% Trickster Penalty</>}
+            </Col>
+            <Col>
+              {EMOJI.VILLAIN} {hit_bonus}% Hit Bonus
+              <br />{hit_base_chance}% Hit Base Chances
+              {(lethal_base_chance > 0) && <><br />{lethal_base_chance}% Hit Lethal Chances</>}
+              {(hit_injury_penalty > 0) && <><br />{hit_injury_penalty}% Injury Penalty</>}
+              {(hit_trickster_penalty > 0) && <><br />{hit_trickster_penalty}% Trickster Penalty</>}
+              {(lethal_lord_penalty > 0) && <><br />{lethal_lord_penalty}% Lord Penalty</>}
+            </Col>
+            <Col></Col>
+          </Row>
+        </Grid>
+      }
     </>
   )
 }
