@@ -127,8 +127,9 @@ interface IconClickProps extends IconProps {
 export function IconClick(props: IconClickProps) {
   const classNames = ['IconClick']
   if (props.important) classNames.push('Important')
+  const iconProps = useMemo(() => ({ ...props, important: undefined }), [props])
   return (
-    <Icon {...props} className={classNames.join(' ')} onClick={() => props.onClick()} />
+    <Icon {...iconProps} className={classNames.join(' ')} onClick={() => props.onClick()} />
   )
 }
 
