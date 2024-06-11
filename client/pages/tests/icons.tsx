@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Container, Grid, Icon } from 'semantic-ui-react'
 import { CustomIcon, EmojiIcon } from '@/lib/ui/Icons'
-import { BladesIcon, PacesIcon } from '@/pistols/components/ui/ActionIcon'
+import { ArchetypeIcon, BladesIcon, PacesIcon } from '@/pistols/components/ui/PistolsIcon'
 import { LordsBagIcon } from '@/pistols/components/account/Balance'
 import { Action } from '@/pistols/utils/pistols'
 import App from '@/lib/ui/App'
@@ -16,21 +16,24 @@ export default function IndexPage() {
       <Container text>
 
         <h5>Icons</h5>
-        <Grid celled columns={8}>
-          <Row>
+        <Grid celled>
+          <Row columns={'equal'}>
             <Col><PacesIcon paces={10} /><br />PacesIcon</Col>
             <Col><BladesIcon blade={Action.Strong} /><br />BladesIcon</Col>
             <Col><BladesIcon blade={Action.Fast} /><br />BladesIcon</Col>
             <Col><BladesIcon blade={Action.Block} /><br />BladesIcon</Col>
-            <Col><EmojiIcon emoji={'😛'} /><br />EmojiIcon</Col>
+            <Col><ArchetypeIcon villainous /><br />ArchetypeIcon</Col>
+            <Col><ArchetypeIcon trickster /><br />ArchetypeIcon</Col>
+            <Col><ArchetypeIcon honourable /><br />ArchetypeIcon</Col>
           </Row>
 
-          <Row>
+          <Row columns={'equal'}>
             <Col><CustomIcon name='home' /><br />Custom fallback</Col>
             <Col><CustomIcon name='twitter' logo /><br />Logo default</Col>
             <Col><CustomIcon name='twitter' logo color='green' /><br />Logo color</Col>
             <Col><CustomIcon name='twitter' logo onClick={() => alert('click')} /><br />Logo onClick</Col>
             <Col><CustomIcon name={`volume-${state ? 'on' : 'off'}`} icon onClick={() => setState(!state)} /><br />Logo state</Col>
+            <Col><EmojiIcon emoji={'😛'} /><br />EmojiIcon</Col>
           </Row>
 
           <Row columns={'equal'}>

@@ -18,6 +18,7 @@ export function ActionIcon({
     return <BladesIcon blade={action} size={size} />
   }
 }
+
 export function PacesIcon({
   paces,
   size = 'large',
@@ -37,6 +38,7 @@ export function PacesIcon({
     </IconGroup>
   )
 }
+
 export function BladesIcon({
   blade,
   size = 'large',
@@ -54,4 +56,20 @@ export function BladesIcon({
     <EmojiIcon emoji={emoji} size={size} className='' />
     // </IconGroup>
   )
+}
+
+export function ArchetypeIcon({
+  villainous,
+  trickster,
+  honourable,
+  size = 'large',
+}: {
+  villainous?: boolean
+  trickster?: boolean
+  honourable?: boolean
+  size?: IconSizeProp
+}) {
+  if (villainous) return <EmojiIcon emoji={EMOJI.VILLAIN} size={size} />
+  if (trickster) return <EmojiIcon emoji={EMOJI.TRICKSTER} size={size} />
+  if (honourable) return <EmojiIcon emoji={EMOJI.LORD} size={size} />
 }

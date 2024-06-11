@@ -3,7 +3,7 @@ import { Icon, Grid } from 'semantic-ui-react'
 import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
 import { DuelStage, useDuel } from '@/pistols/hooks/useDuel'
 import { CompletedIcon, EmojiIcon, LoadingIcon } from '@/lib/ui/Icons'
-import { ActionIcon } from '@/pistols/components/ui/ActionIcon'
+import { ActionIcon } from '@/pistols/components/ui/PistolsIcon'
 import { EMOJI } from '@/pistols/data/messages'
 
 const Row = Grid.Row
