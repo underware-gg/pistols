@@ -1,14 +1,16 @@
 import React from 'react'
 import { useRouter } from 'next/router'
 import { Container, Divider, Table } from 'semantic-ui-react'
-import { bigintToHex } from '@/lib/utils/types'
-import { formatTimestamp } from '@/lib/utils/timestamp'
-import { weiToEth } from '@/lib/utils/starknet'
+import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { ActionEmojis, ActionNames, ChallengeStateNames, RoundStateNames } from '@/pistols/utils/pistols'
 import { useWager } from '@/pistols/hooks/useWager'
 import { useTable } from '@/pistols/hooks/useTable'
+import { ActionEmojis, ActionNames, ChallengeStateNames, RoundStateNames } from '@/pistols/utils/pistols'
+import { DojoStatus } from '@/lib/dojo/DojoStatus'
+import { formatTimestamp } from '@/lib/utils/timestamp'
+import { bigintToHex } from '@/lib/utils/types'
+import { weiToEth } from '@/lib/utils/starknet'
 import AppPistols from '@/pistols/components/AppPistols'
 
 const Row = Table.Row
@@ -18,17 +20,29 @@ const Header = Table.Header
 const HeaderCell = Table.HeaderCell
 
 export default function StatsPage() {
+  return (
+    <AppPistols headerData={{ title: 'Duel' }} backgroundImage={null}>
+      <StatsLoader />
+    </AppPistols>
+  );
+}
+
+function StatsLoader() {
+  const { isInitialized } = useDojoStatus()
+
   const router = useRouter()
   const { duel_id } = router.query
 
   return (
-    <AppPistols headerData={{ title: 'Duel' }} backgroundImage={null}>
-      {router.isReady &&
-        <Stats duelId={BigInt(duel_id as string)} />
+    <Container text>
+      {(isInitialized && duel_id)
+        ? <Stats duelId={BigInt(duel_id as string)} />
+        : <DojoStatus />
       }
-    </AppPistols>
-  );
+    </Container>
+  )
 }
+
 
 function Stats({
   duelId
@@ -41,12 +55,12 @@ function Stats({
   } = useDuel(duelId)
 
   return (
-    <Container text>
+    <>
       <Divider hidden />
 
       <div className='Code'>
         <DuelStats duelId={duelId} />
-        <WagerStats duelId={duelId} tableId={tableId}/>
+        <WagerStats duelId={duelId} tableId={tableId} />
 
         {round1 && <>
           <RoundStats duelId={duelId} roundNumber={1} round={round1} />
@@ -63,7 +77,7 @@ function Stats({
 
       </div>
 
-    </Container>
+    </>
   )
 }
 
