@@ -2,15 +2,14 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js'
 
 import TWEEN from '@tweenjs/tween.js'
 //@ts-ignore
 import Stats from 'three/addons/libs/stats.module.js'
 import { Rain } from './Rain'
-import { Grass } from './Grass.tsx';
+import { Grass } from './Grass.tsx'
 import * as shaders from './shaders.tsx'
 
 // event emitter
@@ -125,8 +124,6 @@ let _duelCamera: THREE.PerspectiveCamera
 let _supportsExtension: boolean = true
 let _stats
 let _controls
-let _mixer
-let _animations
 let _gui;
 
 let _duelistA = {
@@ -188,15 +185,6 @@ export const _makeStaticCamera = (x, y, z) => {
   return result
 }
 
-export function dispose() {
-  if (_animationRequest) cancelAnimationFrame(_animationRequest)
-  _animationRequest = null
-  _renderer?.dispose()
-  _renderer = null
-  _currentScene = null
-  _scenes = {}
-}
-
 export async function init(canvas, framerate = 60, statsEnabled = false) {
 
   if (Object.keys(_scenes).length > 0) {
@@ -231,6 +219,7 @@ export async function init(canvas, framerate = 60, statsEnabled = false) {
   _fullScreenGeom = new THREE.PlaneGeometry(WIDTH, HEIGHT)
   setCameras()
 
+  window.addEventListener('beforeunload', dispose);
   window.addEventListener('resize', onWindowResize)
   onWindowResize()
 
@@ -265,6 +254,7 @@ async function loadAssets() {
   Object.keys(TEXTURES).forEach(key => {
     const TEX = TEXTURES[key]
     if (TEX.path.includes('.ktx2')) {
+      ktxLoaderCount ++;
       ktx2Loader.load(TEX.path, (tex) => {
         tex.colorSpace = THREE.SRGBColorSpace
         tex.generateMipmaps = false
@@ -277,7 +267,11 @@ async function loadAssets() {
         } else if (key == TextureName.duel_ground_normal && _ground) {
           _ground.material.normalMap = tex
           _ground.material.needsUpdate = true
+        } else if (key == TextureName.duel_water_map && _groundMirror) {
+          _groundMirror.setUniformValue('waterMap', tex)
         }
+
+        ktxLoaderCount --;
       })
     } else {
       const tex = textureLoader.load(TEX.path)
@@ -295,9 +289,31 @@ async function loadAssets() {
     })
   })
 
-  ktx2Loader.dispose()
+  setTimeout(() => {
+    checkKTX2LoaderState(ktx2Loader)
+  }, 5_000)
 
   _textures[TextureName.duel_water_dudv].wrapS = _textures[TextureName.duel_water_dudv].wrapT = THREE.RepeatWrapping;
+}
+
+let ktxLoaderCount = 0
+//make sure the ktx2 loader disposes AFTER all the textures have been loaded
+function checkKTX2LoaderState(loader) {
+  let completed = true
+  Object.keys(SPRITESHEETS).forEach(actorName => {
+    Object.keys(SPRITESHEETS[actorName]).forEach(key => {
+      if (!_spriteSheets[actorName][key].isLoaded) {
+        completed = false 
+      }
+    })
+  })
+  if (ktxLoaderCount == 0 && completed) {
+    loader.dispose()
+  } else {
+    setTimeout(() => {
+      checkKTX2LoaderState(loader)
+    }, 1_000)
+  } 
 }
 
 function setGUI() {
@@ -371,7 +387,6 @@ export function animate() {
 
       if (_sceneName == SceneName.Duel) {
         _groundMirror?.setUniformValue("time", elapsedTime);
-        _mixer?.update(deltaTime);
         _controls?.update();
         _grass?.update(deltaTime);
 
@@ -458,8 +473,8 @@ export function resetDuelScene() {
   zoomCameraToPaces(0, 5)
 
   resetActorPositions()
-  playActorAnimation('A', AnimName.STILL)
-  playActorAnimation('B', AnimName.STILL)
+  playActorAnimation('A', AnimName.STILL, null, true)
+  playActorAnimation('B', AnimName.STILL, null, true)
 }
 
 /**
@@ -493,13 +508,6 @@ function loadGltf(scene: THREE.Scene) {
   loader.load(
     '/models/Duel_3_water_y.glb',
     function (gltf) {
-
-      /**
-       * Load Animations
-       */
-
-      _mixer = new THREE.AnimationMixer(gltf.scene);
-      _animations = gltf.animations
 
       /**
        * Adjust gltf children
@@ -821,7 +829,7 @@ export function setDuelTimePercentage(timePassed: number) {
 }
 
 
-export function playActorAnimation(actorId: string, key: AnimName, onEnd: Function = null) {
+export function playActorAnimation(actorId: string, key: AnimName, onEnd: Function = null, loop: boolean = false) {
   let onStart = null
   let movement = {
     x: 0,
@@ -871,7 +879,11 @@ export function playActorAnimation(actorId: string, key: AnimName, onEnd: Functi
     onStart = () => { playAudio(AudioName.STRIKE_BLOCK, _sfxEnabled) }
   }
 
-  _actor[actorId].playOnce(key, movement, onStart, onEnd)
+  if (loop) {
+    _actor[actorId].playLoop(key, movement, onStart, onEnd)
+  } else {
+    _actor[actorId].playOnce(key, movement, onStart, onEnd)
+  }
 
 }
 
@@ -1136,4 +1148,117 @@ export function stopAudio(name: AudioName) {
 
 export function setSfxEnabled(enabled: boolean) {
   _sfxEnabled = enabled
+}
+
+export function dispose() {
+  // 1. Stop the Animation Loop:
+  if (_animationRequest) {
+    cancelAnimationFrame(_animationRequest);
+    _animationRequest = null;
+  }
+
+  TWEEN.removeAll();
+
+  // 2. Dispose of the Renderer:
+  _renderer?.dispose();
+  _renderer = null;
+
+  // 3. Dispose of Scenes and Objects:
+  _currentScene = null;
+  for (const scene of Object.values(_scenes)) {
+    disposeOfScene(scene);
+  }
+  _scenes = {};
+
+  // 4. Dispose of Textures and Sprite Sheets:
+  disposeTexturesAndSpriteSheets();
+
+  // 5. Dispose of Cameras and Controls:
+  _staticCamera = null;
+  _duelCamera = null;
+  _controls?.dispose();
+  _controls = null;
+
+  // 6. Dispose of GUI and Stats:
+  if (_gui) {
+    _gui.destroy();
+    _gui = null;
+  }
+  if (_stats) {
+    document.body.removeChild(_stats.dom);
+    _stats = null;
+  }
+  if (_grass) {
+    _grass.dispose();
+    _grass = null;
+  }
+  if (_groundMirror) {
+    _groundMirror.dispose();
+    _groundMirror = null;
+  }
+
+  // 7. Additional Cleanup (As Needed):
+  // - Dispose of other custom objects or resources
+  window.removeEventListener('resize', onWindowResize);
+
+  Object.values(AUDIO_ASSETS).forEach(audio => {
+      if (audio.object) {
+          audio.object.stop();
+          audio.object.disconnect();
+      }
+  });
+
+  TWEEN.removeAll();
+
+  // 8. Clear References:
+  _duelistA = { model: undefined, name: undefined };
+  _duelistB = { model: undefined, name: undefined };
+  _grassTransforms = null;
+  _growthPercentage = null;
+  _ground = null;
+  _skyVideo = null;
+  _skyVideoTexture = null;
+  _ladySecond = null;
+  _sirSecond = null;
+  _sfxEnabled = true;
+  _statsEnabled = false;
+  _round1Animated = false;
+  _round2Animated = false;
+  _round3Animated = false;
+  _fullScreenGeom = null;
+  _clock = null;
+}
+
+// Helper function to dispose of a Three.js scene recursively
+function disposeOfScene(scene) {
+  if (!scene) return;
+  for (const child of scene.children) {
+    if (child.type === "Mesh") {
+      child.geometry.dispose();
+      child.material.dispose();
+    }
+    if (child.dispose) {
+      child.dispose();
+    }
+    disposeOfScene(child);
+  }
+}
+
+//dispose textures and spritesheets
+function disposeTexturesAndSpriteSheets() {
+  for (const actorName of Object.keys(_spriteSheets)) {
+    for (const animName of Object.keys(_spriteSheets[actorName])) {
+      const spriteSheet = _spriteSheets[actorName][animName];
+      for (const texture of spriteSheet.textures) {
+        texture.dispose();
+      }
+      spriteSheet.textures = [];
+    }
+  }
+  _spriteSheets = {};
+  
+  for (const textureKey of Object.keys(_textures)) {
+    _textures[textureKey].dispose();
+  }
+  _textures = {};
 }

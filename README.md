@@ -187,7 +187,7 @@ cd client
 pnpm install && pnpm dev
 
 # or just...
-cd dojo
+cd client
 ./run_client
 ```
 

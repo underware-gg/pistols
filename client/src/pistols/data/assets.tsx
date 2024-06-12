@@ -29,7 +29,7 @@ const TEXTURES: Record<TextureName, { path: string }> = {
   [TextureName.duel_ground]: { path: '/textures/ground.ktx2' },
   [TextureName.duel_ground_normal]: { path: '/textures/ground_normalmap.ktx2' },
   [TextureName.duel_water_dudv]: { path: '/textures/waterdudv.jpg' },
-  [TextureName.duel_water_map]: { path: '/textures/water_map.png' },
+  [TextureName.duel_water_map]: { path: '/textures/water_map.ktx2' },
 }
 
 export const sceneBackgrounds: Record<SceneName, TextureName> = {
@@ -79,7 +79,7 @@ const SPRITESHEETS: Spritesheets = {
   FEMALE: {
     [AnimName.STILL]: {
       path: '/textures/animations/Female Duelist/Still',
-      frameCount: 1,
+      frameCount: 14,
       frameRate: 8,
     },
     [AnimName.STILL_BLADE]: {
@@ -156,7 +156,7 @@ const SPRITESHEETS: Spritesheets = {
   MALE: {
     [AnimName.STILL]: {
       path: '/textures/animations/Male Duelist/Still',
-      frameCount: 1,
+      frameCount: 8,
       frameRate: 8,
     },
     [AnimName.STILL_BLADE]: {
