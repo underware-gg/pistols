@@ -2,15 +2,14 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js'
 
 import TWEEN from '@tweenjs/tween.js'
 //@ts-ignore
 import Stats from 'three/addons/libs/stats.module.js'
 import { Rain } from './Rain'
-import { Grass } from './Grass.tsx';
+import { Grass } from './Grass.tsx'
 import * as shaders from './shaders.tsx'
 
 // event emitter
@@ -309,7 +308,6 @@ function checkKTX2LoaderState(loader) {
     })
   })
   if (ktxLoaderCount == 0 && completed) {
-    console.log("MADE IT")
     loader.dispose()
   } else {
     setTimeout(() => {
