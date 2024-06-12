@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Burner, BurnerCreateOptions } from '@dojoengine/create-burner'
+import { Burner, BurnerCreateOptions } from '@rsodre/create-burner'
 import { useBlockNumber, useContract } from '@starknet-react/core'
 import { useDojo, useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useLordsBalance } from '@/lib/dojo/hooks/useLords'

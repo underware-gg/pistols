@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@dojoengine/core": "^0.7.0-alpha.2",
-    "@dojoengine/create-burner": "file:../../dojo.js/packages/create-burner",
+    "@rsodre/create-burner": "^0.7.0-alpha.2.1",
     "@dojoengine/react": "^0.7.0-alpha.2",
     "@dojoengine/recs": "^0.1.35",
     "@dojoengine/state": "^0.7.0-alpha.2",

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { DojoPredeployedStarknetWindowObject } from '@dojoengine/create-burner'
+import { DojoPredeployedStarknetWindowObject } from '@rsodre/create-burner'
 import { useAccount } from '@starknet-react/core'
 import { stark } from 'starknet'
 

@@ -1,7 +1,7 @@
 import React, { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { ChainId, DojoChainConfig, getDojoChainConfig, getStarknetProviderChains, isChainIdSupported } from '@/lib/dojo/setup/chainConfig'
 import { StarknetConfig, argent, braavos, injected, jsonRpcProvider, useInjectedConnectors } from '@starknet-react/core'
-import { DojoPredeployedStarknetWindowObject, DojoBurnerStarknetWindowObject } from '@dojoengine/create-burner'
+import { DojoPredeployedStarknetWindowObject, DojoBurnerStarknetWindowObject } from '@rsodre/create-burner'
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
 import { Chain } from '@starknet-react/chains'
 
