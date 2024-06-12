@@ -84,7 +84,7 @@ export function OnboardingDeploy({
   // Local burner
   const { isImported, address } = useBurnerAccount(accountIndex)
   const accountAddress = useMemo(() => (generatedAddress ?? address ?? 0n), [generatedAddress, address])
-  const { isDeployed, isVerifying, isDeploying, deployOrRestore, deployError } = useBurnerDeployment(accountAddress, createOptions)
+  const { isDeployed, isVerifying, isDeploying, isRestoring, deployOrRestore, deployError } = useBurnerDeployment(accountAddress, createOptions)
   const isGoodToUse = (isDeployed && isImported)
 
   //
@@ -104,29 +104,39 @@ export function OnboardingDeploy({
           <Step.Group fluid vertical className='Unselectable NoPadding NoBorder' style={{ border: '0 !important' }}>
 
             <DeployStep currentPhase={currentPhase} phase={DeployPhase.Account} completed={true}
-              // contentActive={<>Account ID:&nbsp;<span className='H4'>#{accountIndex}</span></>}
-              contentCompleted={<>Account ID: <span className='H4'>#{accountIndex}</span></>}
+              content={<>Account ID: <span className='H4'>#{accountIndex}</span></>}
             />
 
             <DeployStep currentPhase={currentPhase} phase={DeployPhase.Connect} completed={isConnected}
-              contentActive={<ActionButton fill large onClick={() => connectOpener.open()} label='Connect Wallet' />}
-              contentCompleted={<span>Connected wallet: <b><AddressShort address={account?.address ?? 0n} important /></b></span>}
+              content={
+                isConnected ? <span>Connected wallet: <b><AddressShort address={account?.address ?? 0n} important /></b></span>
+                  : <ActionButton fill large onClick={() => connectOpener.open()} label='Connect Wallet' />
+              }
             />
 
             <DeployStep currentPhase={currentPhase} phase={DeployPhase.Account} completed={Boolean(accountAddress)}
-              contentActive={<>Account Address</>}
-              contentCompleted={<>Account address: <b><AddressShort address={accountAddress} important /></b></>}
+              content={
+                Boolean(accountAddress) ? <>Account address: <b><AddressShort address={accountAddress} important /></b></>
+                  : <>Account Address</>
+              }
             />
 
             <DeployStep currentPhase={currentPhase} phase={DeployPhase.Sign} completed={hasSigned}
-              contentActive={<ActionButton fill large disabled={currentPhase != DeployPhase.Sign} onClick={() => signTypedData()} label='Sign Message' />}
-              // contentCompleted={<span>Signed Secret: <b><AddressShort copyLink={false} address={walletSig.sig} important /></b></span>}
-              contentCompleted={<span>Is Honourable</span>}
+              content={
+                // hasSigned ? <span>Signed Secret: <b><AddressShort copyLink={false} address={walletSig.sig} important /></b></span>
+                hasSigned ? <span>Is Honourable</span>
+                  : <ActionButton fill large disabled={currentPhase != DeployPhase.Sign} onClick={() => signTypedData()} label='Sign Message' />
+              }
             />
 
             <DeployStep currentPhase={currentPhase} phase={DeployPhase.Deploy} completed={isGoodToUse}
-              contentActive={<ActionButton fill large disabled={currentPhase != DeployPhase.Deploy || isVerifying || isDeploying} onClick={() => deployOrRestore()} label={isVerifying ? 'Verifying...' : isDeploying ? 'Deploying...' : isDeployed ? 'Restore' : 'Deploy'} />}
-              contentCompleted={<>Account Deployed</>}
+              content={
+                isGoodToUse ? <>Account Deployed</>
+                  : isVerifying ? <>Verifying...</>
+                    : isRestoring ? <>Restoring...</>
+                      : isDeploying ? <>Deploying...</>
+                        : <ActionButton fill large disabled={currentPhase != DeployPhase.Deploy} onClick={() => deployOrRestore()} label={isDeployed ? 'Restore' : 'Deploy'} />
+              }
             />
 
           </Step.Group>
@@ -136,7 +146,7 @@ export function OnboardingDeploy({
       {deployError &&
         <Row columns={'equal'}>
           <Col className='Code Negative'>
-            <Divider className='NoMargin'/>
+            <Divider className='NoMargin' />
             <p className='Padded'>
               {deployError}
             </p>
@@ -152,14 +162,12 @@ function DeployStep({
   phase,
   currentPhase,
   completed,
-  contentActive,
-  contentCompleted,
+  content,
 }: {
   phase: DeployPhase
   currentPhase: DeployPhase
   completed: boolean
-  contentActive?: ReactNode
-  contentCompleted: ReactNode
+  content: ReactNode
 }) {
   const _active = (currentPhase == phase)
   const _disabled = (currentPhase < phase)
@@ -169,8 +177,7 @@ function DeployStep({
     <Step completed={completed} active={false && _active}>
       <IconWarning />
       <Step.Content className={classNames.join(' ')}>
-        {!completed && (contentActive ?? contentCompleted)}
-        {completed && contentCompleted}
+        {content}
       </Step.Content>
     </Step>
   )

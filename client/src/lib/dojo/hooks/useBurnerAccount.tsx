@@ -86,8 +86,9 @@ export const useBurnerDeployment = (address: BigNumberish, createOptions?: Burne
 
   //
   // Verify if is already deployed
-  const [isVerifying, setIsVerifying] = useState<boolean>(false)
+  const [isVerifying, setIsVerifying] = useState<boolean>(true)
   const [isDeployed, setIsDeployed] = useState<boolean>(undefined)
+  const { data: blockNumber } = useBlockNumber()
   useEffect(() => {
     let _mounted = true
     const _check = async () => {
@@ -103,7 +104,7 @@ export const useBurnerDeployment = (address: BigNumberish, createOptions?: Burne
       _check()
     }
     return () => { _mounted = false }
-  }, [address])
+  }, [address, blockNumber])
 
   //
   // Deploy!
@@ -126,8 +127,9 @@ export const useBurnerDeployment = (address: BigNumberish, createOptions?: Burne
     address,
     isDeployed,
     isVerifying,
-    isDeploying,
     deployOrRestore,
+    isDeploying,
+    isRestoring: (isDeployed && isDeploying),
     deployError,
   }
 }

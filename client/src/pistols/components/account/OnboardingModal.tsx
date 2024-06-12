@@ -28,6 +28,7 @@ export default function OnboardingModal({
 
   const { isImported, isFunded, address } = useBurnerAccount(accountIndex)
   const { isDeployed } = useBurnerDeployment(address)
+  const isGoodToUse = (isDeployed && isImported)
 
   const { name } = useDuelist(address)
   const isProfiled = Boolean(name)
@@ -35,7 +36,7 @@ export default function OnboardingModal({
   useEffect(() => {
     if (opener.isOpen) {
       dispatchSetAccountMenu(
-        (!isDeployed || !isImported) ? AccountMenuKey.Deploy
+        !isGoodToUse ? AccountMenuKey.Deploy
           : !isFunded ? AccountMenuKey.Fund
             : AccountMenuKey.Profile
       )
@@ -81,9 +82,11 @@ export default function OnboardingModal({
             <Col width={11} textAlign='left'>
               Duelist
               {' '}
-              <IconClick name='angle double left' size='small' disabled={!canGoPrev} onClick={() => gotoPrevAccount()} />
+              <IconClick important name='angle double left' size='small' disabled={!canGoPrev} onClick={() => gotoPrevAccount()} />
+              {' '}
               #{accountIndex}
-              <IconClick name='angle double right' size='small' disabled={!canGoNext} onClick={() => gotoNextAccount()} />
+              {' '}
+              <IconClick important name='angle double right' size='small' disabled={!canGoNext} onClick={() => gotoNextAccount()} />
             </Col>
             <Col width={5} textAlign='right'>
               <AddressShort address={address} ifExists />
@@ -114,7 +117,7 @@ export default function OnboardingModal({
             ),
             render: () => (
               <TabPane attached className='NoPadding'>
-                <OnboardingFund isDeployed={isDeployed} />
+                <OnboardingFund disabled={!isGoodToUse} />
               </TabPane>
             )
           },

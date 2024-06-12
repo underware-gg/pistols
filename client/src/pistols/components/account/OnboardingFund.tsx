@@ -19,7 +19,7 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export function OnboardingFund({
-  isDeployed = false,
+  disabled = true,
 }) {
   const { tables } = useDojoConstants()
   const { account } = useAccount()
@@ -46,7 +46,7 @@ export function OnboardingFund({
       </Grid>
       {deposit &&
         <div style={_rowStyle}>
-          <Deposit fromAccount={account as Account} fromAddress={account?.address} toAddress={address} disabled={!isDeployed} action='Deposit to Duelist' />
+          <Deposit fromAccount={account as Account} fromAddress={account?.address} toAddress={address} disabled={disabled} action='Deposit to Duelist' />
         </div>
       }
       {/* <ActionButton fill disabled={!isDeployed} onClick={() => setDeposit(!deposit)} label='Deposit from Account to Duelist' /> */}
@@ -60,7 +60,7 @@ export function OnboardingFund({
       <span className='H3'><LordsBalance address={address} big /></span> <LockedWagerBalance tableId={tables.LORDS} address={address} clean />
       {!deposit &&
         <div style={_rowStyle}>
-          <Deposit fromAccount={burnerAccount} fromAddress={address} toAddress={account?.address} disabled={!isDeployed} action='Withdraw to Account' />
+          <Deposit fromAccount={burnerAccount} fromAddress={address} toAddress={account?.address} disabled={disabled} action='Withdraw to Account' />
         </div>
       }
       {/* <LordsFaucet /> */}
