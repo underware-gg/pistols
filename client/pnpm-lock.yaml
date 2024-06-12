@@ -12,8 +12,8 @@ importers:
         specifier: ^0.7.0-alpha.2
         version: 0.7.0-alpha.2(starknet@6.9.0(encoding@0.1.13))(typescript@5.4.5)
       '@dojoengine/create-burner':
-        specifier: ^0.7.0-alpha.2
-        version: 0.7.0-alpha.2(react@18.3.1)(starknet@6.9.0(encoding@0.1.13))(typescript@5.4.5)
+        specifier: file:../../dojo.js/packages/create-burner
+        version: file:../../dojo.js/packages/create-burner(react@18.3.1)(starknet@6.9.0(encoding@0.1.13))(typescript@5.4.5)
       '@dojoengine/react':
         specifier: ^0.7.0-alpha.2
         version: 0.7.0-alpha.2(@types/react@18.3.3)(react@18.3.1)(starknet@6.9.0(encoding@0.1.13))(type-fest@2.19.0)(typescript@5.4.5)(zod@3.23.8)
@@ -133,8 +133,8 @@ packages:
     peerDependencies:
       starknet: ^6.1.5
 
-  '@dojoengine/create-burner@0.7.0-alpha.2':
-    resolution: {integrity: sha512-QiH+7kDVaj0ATeXGmtz8yu+GKxk1vV/g9c6YPTiWSq5Ll9dGXyiHO32kKNyxG4OeKr5sxohDR49h1mLRuls6YQ==}
+  '@dojoengine/create-burner@file:../../dojo.js/packages/create-burner':
+    resolution: {directory: ../../dojo.js/packages/create-burner, type: directory}
     peerDependencies:
       react: ^18.2.0
       starknet: ^6.1.5
@@ -1654,7 +1654,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@dojoengine/create-burner@0.7.0-alpha.2(react@18.3.1)(starknet@6.9.0(encoding@0.1.13))(typescript@5.4.5)':
+  '@dojoengine/create-burner@file:../../dojo.js/packages/create-burner(react@18.3.1)(starknet@6.9.0(encoding@0.1.13))(typescript@5.4.5)':
     dependencies:
       '@dojoengine/core': 0.7.0-alpha.2(starknet@6.9.0(encoding@0.1.13))(typescript@5.4.5)
       '@scure/bip32': 1.4.0

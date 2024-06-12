@@ -1,8 +1,8 @@
 import React, { ReactNode, useEffect, useMemo, useState } from 'react'
 import { Divider, Grid, Step } from 'semantic-ui-react'
 import { useAccount, useSignTypedData } from '@starknet-react/core'
-import { useDojoAccount } from '@/lib/dojo/DojoContext'
-import { useBurnerAccount, useBurnerContract } from '@/lib/dojo/hooks/useBurnerAccount'
+import { useDojo, useDojoAccount } from '@/lib/dojo/DojoContext'
+import { useBurnerAccount, useBurnerDeployment } from '@/lib/dojo/hooks/useBurnerAccount'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { usePlayerId } from '@/lib/dojo/hooks/usePlayerId'
 import { Messages, createTypedMessage, getMessageHash, splitSignature } from '@/lib/utils/starknet_sign'
@@ -30,17 +30,7 @@ export function OnboardingDeploy({
 }) {
   const { account, isConnected, chainId } = useAccount()
   const { walletSig, hasSigned, accountIndex, dispatchSetSig, connectOpener } = usePistolsContext()
-  const { generateAddressFromSeed, create, isDeploying } = useDojoAccount()
-
-  const [createError, setCreateError] = useState(false)
-  const _create = async () => {
-    setCreateError(null)
-    try {
-      await create(createOptions)
-    } catch (e) {
-      setCreateError(e.toString())
-    }
-  }
+  const { generateAddressFromSeed } = useDojoAccount()
 
   //
   // reset sig if wallet account changes
@@ -94,7 +84,7 @@ export function OnboardingDeploy({
   // Local burner
   const { isImported, address } = useBurnerAccount(accountIndex)
   const accountAddress = useMemo(() => (generatedAddress ?? address ?? 0n), [generatedAddress, address])
-  const { isDeployed } = useBurnerContract(accountAddress)
+  const { isDeployed, isVerifying, isDeploying, deployOrRestore, deployError } = useBurnerDeployment(accountAddress, createOptions)
   const isGoodToUse = (isDeployed && isImported)
 
   //
@@ -135,7 +125,7 @@ export function OnboardingDeploy({
             />
 
             <DeployStep currentPhase={currentPhase} phase={DeployPhase.Deploy} completed={isGoodToUse}
-              contentActive={<ActionButton fill large disabled={currentPhase != DeployPhase.Deploy || isDeploying} onClick={() => _create()} label={isDeploying ? 'Deploying...' : !isDeployed ? 'Deploy' : 'Restore'} />}
+              contentActive={<ActionButton fill large disabled={currentPhase != DeployPhase.Deploy || isVerifying || isDeploying} onClick={() => deployOrRestore()} label={isVerifying ? 'Verifying...' : isDeploying ? 'Deploying...' : isDeployed ? 'Restore' : 'Deploy'} />}
               contentCompleted={<>Account Deployed</>}
             />
 
@@ -143,12 +133,12 @@ export function OnboardingDeploy({
         </Col>
       </Row>
 
-      {createError &&
+      {deployError &&
         <Row columns={'equal'}>
           <Col className='Code Negative'>
             <Divider className='NoMargin'/>
             <p className='Padded'>
-              {createError}
+              {deployError}
             </p>
           </Col>
         </Row>

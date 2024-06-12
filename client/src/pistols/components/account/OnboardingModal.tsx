@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from 'react'
 import { Modal, Tab, TabPane, Grid, Menu } from 'semantic-ui-react'
-import { useBurnerAccount, useBurnerContract, useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
+import { useBurnerAccount, useBurnerDeployment, useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { IconChecked, IconClick, IconWarning } from '@/lib/ui/Icons'
@@ -27,7 +27,7 @@ export default function OnboardingModal({
   const tabIndex = accountMenuItems.findIndex(k => (k == accountMenuKey))
 
   const { isImported, isFunded, address } = useBurnerAccount(accountIndex)
-  const { isDeployed } = useBurnerContract(address)
+  const { isDeployed } = useBurnerDeployment(address)
 
   const { name } = useDuelist(address)
   const isProfiled = Boolean(name)
