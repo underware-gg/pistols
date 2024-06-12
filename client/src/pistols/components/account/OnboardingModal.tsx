@@ -79,10 +79,11 @@ export default function OnboardingModal({
         <Grid>
           <Row>
             <Col width={11} textAlign='left'>
-              Duelist Account
-              <IconClick name='caret left' size='small' important disabled={!canGoPrev} onClick={() => gotoPrevAccount()} />
+              Duelist
+              {' '}
+              <IconClick name='angle double left' size='small' disabled={!canGoPrev} onClick={() => gotoPrevAccount()} />
               #{accountIndex}
-              <IconClick name='caret right' size='small' important disabled={!canGoNext} onClick={() => gotoNextAccount()} />
+              <IconClick name='angle double right' size='small' disabled={!canGoNext} onClick={() => gotoNextAccount()} />
             </Col>
             <Col width={5} textAlign='right'>
               <AddressShort address={address} ifExists />

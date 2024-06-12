@@ -9,6 +9,7 @@ import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { PROFILE_PIC_COUNT } from '@/pistols/utils/constants'
 import { TextLink } from '@/lib/ui/Links'
+import { IconClick } from '@/lib/ui/Icons'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -54,14 +55,18 @@ export function OnboardingProfile({
         <Row textAlign='center' verticalAlign='top'>
           <Col width={5} className='NoPadding'>
             <div>
-              <ProfilePic profilePic={_profilePic} className='AutoHeight' />
+              <ProfilePic profilePic={_profilePic} className='AutoHeight NoBorder' />
               <Grid columns={'equal'}>
                 <Row className='H3'>
                   <Col>
-                    <TextLink onClick={() => setSelectedProfilePic(_profilePic > 1 ? _profilePic - 1 : PROFILE_PIC_COUNT)}>◀</TextLink>
+                    <IconClick name='angle double left' size={null}
+                      onClick={() => setSelectedProfilePic(_profilePic > 1 ? _profilePic - 1 : PROFILE_PIC_COUNT)}
+                    />
                   </Col>
                   <Col>
-                    <TextLink onClick={() => setSelectedProfilePic(_profilePic < PROFILE_PIC_COUNT ? _profilePic + 1 : 1)}>▶</TextLink>
+                    <IconClick name='angle double right' size={null}
+                      onClick={() => setSelectedProfilePic(_profilePic < PROFILE_PIC_COUNT ? _profilePic + 1 : 1)}
+                    />
                   </Col>
                 </Row>
               </Grid>
@@ -78,7 +83,7 @@ export function OnboardingProfile({
               onChange={(e) => setInputValue(e.target.value)}
             />
             <div className='Spacer5' />
-            <ActionButton important fill disabled={!canRegister || isUpdated || !inputIsValid} onClick={() => _register()} label={isUpdated ? 'Updated' : 'Update'} />
+            <ActionButton important fill disabled={!canRegister || isUpdated || !inputIsValid} onClick={() => _register()} label={isUpdated ? 'Good!' : 'Check In'} />
           </Col>
         </Row>
 

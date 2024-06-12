@@ -113,15 +113,15 @@ export function OnboardingDeploy({
               contentCompleted={<span>Connected wallet: <b><AddressShort address={account?.address ?? 0n} important /></b></span>}
             />
 
-            <DeployStep currentPhase={currentPhase} phase={DeployPhase.Sign} completed={hasSigned}
-              contentActive={<ActionButton fill large disabled={currentPhase != DeployPhase.Sign} onClick={() => signTypedData()} label='Sign Message' />}
-              // contentCompleted={<span>Signed Secret: <b><AddressShort copyLink={false} address={walletSig.sig} important /></b></span>}
-              contentCompleted={<span>Signed Secret</span>}
-            />
-
             <DeployStep currentPhase={currentPhase} phase={DeployPhase.Account} completed={Boolean(accountAddress)}
               contentActive={<>Account Address</>}
               contentCompleted={<>Account address: <b><AddressShort address={accountAddress} important /></b></>}
+            />
+
+            <DeployStep currentPhase={currentPhase} phase={DeployPhase.Sign} completed={hasSigned}
+              contentActive={<ActionButton fill large disabled={currentPhase != DeployPhase.Sign} onClick={() => signTypedData()} label='Sign Message' />}
+              // contentCompleted={<span>Signed Secret: <b><AddressShort copyLink={false} address={walletSig.sig} important /></b></span>}
+              contentCompleted={<span>Is Honourable</span>}
             />
 
             <DeployStep currentPhase={currentPhase} phase={DeployPhase.Deploy} completed={isGoodToUse}
