@@ -209,7 +209,19 @@
         "type": "core::integer::u8"
       },
       {
+        "name": "crit_base_chance",
+        "type": "core::integer::u8"
+      },
+      {
         "name": "crit_bonus",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "crit_match_bonus",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "crit_trickster_penalty",
         "type": "core::integer::u8"
       },
       {
@@ -217,7 +229,19 @@
         "type": "core::integer::u8"
       },
       {
+        "name": "hit_base_chance",
+        "type": "core::integer::u8"
+      },
+      {
         "name": "hit_bonus",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "hit_injury_penalty",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "hit_trickster_penalty",
         "type": "core::integer::u8"
       },
       {
@@ -225,7 +249,11 @@
         "type": "core::integer::u8"
       },
       {
-        "name": "lethal_bonus",
+        "name": "lethal_base_chance",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "lethal_lord_penalty",
         "type": "core::integer::u8"
       }
     ]

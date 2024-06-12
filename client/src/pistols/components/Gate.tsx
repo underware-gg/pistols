@@ -177,10 +177,11 @@ function ConnectedGate() {
 
         <VStackRow>
           {/* <ActionButton fill disabled={isDeploying} onClick={() => create()} label='Create Duelist' /> */}
-          <ActionButton fill onClick={() => _deployDuelist()} label='Deploy Duelist' />
-          <ActionButton fill disabled={count == 0} onClick={() => copyToClipboard()} label={<>Export All <Icon name='copy' size='small' /></>} />
-          <ActionButton fill disabled={false} onClick={() => applyFromClipboard()} label={<>Import All <Icon name='paste' size='small' /></>} />
-          <ActionButton fill disabled={count == 0} onClick={() => _deleteAll()} label='Delete All' />
+          <ActionButton fill onClick={() => _deployDuelist()} label='Deploy New Duelist' />
+          {/* <ActionButton fill disabled={count == 0} onClick={() => copyToClipboard()} label={<>Export All <Icon name='copy' size='small' /></>} /> */}
+          {/* <ActionButton fill disabled={false} onClick={() => applyFromClipboard()} label={<>Import All <Icon name='paste' size='small' /></>} /> */}
+          <ActionButton fill onClick={() => {}} label='Import /Export' />
+          <ActionButton fill disabled={count == 0} onClick={() => _deleteAll()} label='Clear All' />
         </VStackRow>
 
       </VStack>

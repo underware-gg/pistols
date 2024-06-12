@@ -1579,8 +1579,8 @@
     {
       "kind": "DojoContract",
       "address": "0x34bbde433b8d8cb45ce22d801f4d65a5dcb77b0ef8396d0b5cdc20fc71a1c73",
-      "class_hash": "0x4cc88b2ecd48c3498c4efbcc0922d280fe0241830dd07c8543a16cd64582e37",
-      "original_class_hash": "0x4cc88b2ecd48c3498c4efbcc0922d280fe0241830dd07c8543a16cd64582e37",
+      "class_hash": "0x772ad70374b44897b93fbfb8540faec41aae1e7aceb335618c5e9a6a8db07ba",
+      "original_class_hash": "0x772ad70374b44897b93fbfb8540faec41aae1e7aceb335618c5e9a6a8db07ba",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -1793,7 +1793,19 @@
               "type": "core::integer::u8"
             },
             {
+              "name": "crit_base_chance",
+              "type": "core::integer::u8"
+            },
+            {
               "name": "crit_bonus",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "crit_match_bonus",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "crit_trickster_penalty",
               "type": "core::integer::u8"
             },
             {
@@ -1801,7 +1813,19 @@
               "type": "core::integer::u8"
             },
             {
+              "name": "hit_base_chance",
+              "type": "core::integer::u8"
+            },
+            {
               "name": "hit_bonus",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "hit_injury_penalty",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "hit_trickster_penalty",
               "type": "core::integer::u8"
             },
             {
@@ -1809,7 +1833,11 @@
               "type": "core::integer::u8"
             },
             {
-              "name": "lethal_bonus",
+              "name": "lethal_base_chance",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "lethal_lord_penalty",
               "type": "core::integer::u8"
             }
           ]

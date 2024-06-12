@@ -13,14 +13,14 @@ $color-bright: #c8b6a8;
 $color-brightest: #efe1d7;
 
 $color-white: $color-brightest;
-$color-shadow: $color-dark;
+$color-shadow: $color-bg;
 $color-text: $color-bright;
 $color-link: $color-medium;
 $color-important: $color-medium;
 $color-active: $color-medium;
 $color-inactive: rgba($color-brightest, 0.35);
-$text-shadow: 0.05rem 0.05rem 1px $color-darkest;
-$title-shadow: 0.1rem 0.1rem 1px $color-darkest;
+$text-shadow: 0.05rem 0.05rem 1px rgba($color-darkest, 0.5);
+$title-shadow: 0.2rem 0.2rem 1px rgba($color-bg, 0.5);
 $ui-border: 6px ridge $color-active;
 
 $border-hr: solid 0.5px rgba($color-bright, 0.5);
@@ -675,6 +675,7 @@ $ui-container-gap: 1em;
   height: calc(768px / 2);
   border-radius: 8px;
   border: $border-button;
+  box-shadow: $title-shadow;
 }
 .ProfilePicDuel {
   @extend .ProfilePic;
@@ -884,6 +885,7 @@ $ui-container-gap: 1em;
 .IconClick {
   @extend .Anchor;
   color: $color-bright;
+	text-shadow: 0.1rem 0.1rem $color-shadow;
   &:hover {
     @extend .IconClick_hover;
   }
@@ -1371,6 +1373,7 @@ a.active.step:hover,
 .ui.segment {
   @extend ._round_border;
   background-color: $color-dark;
+  border: 0.5px solid rgba($color-bright, 0.8)!important;
 }
 //
 // <ProgressBar>

@@ -31,6 +31,6 @@ export const LordsFaucet = ({
   }
 
   return (
-    <ActionButton fill={fill} large={large} disabled={disabled || isPending || !_hasFaucet} onClick={onClick} label='Get $LORDS' />
+    <ActionButton important fill={fill} large={large} disabled={disabled || isPending || !_hasFaucet} onClick={onClick} label='Get $LORDS' />
   )
 }

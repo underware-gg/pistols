@@ -2,7 +2,7 @@ import {
   Chain, NativeCurrency,
   mainnet, sepolia,
 } from '@starknet-react/chains'
-import { PredeployedAccount } from '@dojoengine/create-burner'
+import { PredeployedAccount } from '@rsodre/create-burner'
 import {
   LOCAL_KATANA,
   LOCAL_TORII,

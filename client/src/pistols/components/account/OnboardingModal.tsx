@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from 'react'
 import { Modal, Tab, TabPane, Grid, Menu } from 'semantic-ui-react'
-import { useBurnerAccount, useBurnerContract, useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
+import { useBurnerAccount, useBurnerDeployment, useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { IconChecked, IconClick, IconWarning } from '@/lib/ui/Icons'
@@ -27,7 +27,8 @@ export default function OnboardingModal({
   const tabIndex = accountMenuItems.findIndex(k => (k == accountMenuKey))
 
   const { isImported, isFunded, address } = useBurnerAccount(accountIndex)
-  const { isDeployed } = useBurnerContract(address)
+  const { isDeployed } = useBurnerDeployment(address)
+  const isGoodToUse = (isDeployed && isImported)
 
   const { name } = useDuelist(address)
   const isProfiled = Boolean(name)
@@ -35,7 +36,7 @@ export default function OnboardingModal({
   useEffect(() => {
     if (opener.isOpen) {
       dispatchSetAccountMenu(
-        (!isDeployed || !isImported) ? AccountMenuKey.Deploy
+        !isGoodToUse ? AccountMenuKey.Deploy
           : !isFunded ? AccountMenuKey.Fund
             : AccountMenuKey.Profile
       )
@@ -79,10 +80,13 @@ export default function OnboardingModal({
         <Grid>
           <Row>
             <Col width={11} textAlign='left'>
-              Duelist Account
-              <IconClick name='caret left' size='small' important disabled={!canGoPrev} onClick={() => gotoPrevAccount()} />
+              Duelist
+              {' '}
+              <IconClick important name='angle double left' size='small' disabled={!canGoPrev} onClick={() => gotoPrevAccount()} />
+              {' '}
               #{accountIndex}
-              <IconClick name='caret right' size='small' important disabled={!canGoNext} onClick={() => gotoNextAccount()} />
+              {' '}
+              <IconClick important name='angle double right' size='small' disabled={!canGoNext} onClick={() => gotoNextAccount()} />
             </Col>
             <Col width={5} textAlign='right'>
               <AddressShort address={address} ifExists />
@@ -113,7 +117,7 @@ export default function OnboardingModal({
             ),
             render: () => (
               <TabPane attached className='NoPadding'>
-                <OnboardingFund isDeployed={isDeployed} />
+                <OnboardingFund disabled={!isGoodToUse} />
               </TabPane>
             )
           },
