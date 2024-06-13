@@ -3,6 +3,7 @@ import { ChainId, DojoChainConfig, getDojoChainConfig, getStarknetProviderChains
 import { StarknetConfig, argent, braavos, injected, jsonRpcProvider, useInjectedConnectors } from '@starknet-react/core'
 import { DojoPredeployedStarknetWindowObject, DojoBurnerStarknetWindowObject } from '@rsodre/create-burner'
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
+import { useController } from '@/lib/dojo/hooks/useController'
 import { Chain } from '@starknet-react/chains'
 
 
@@ -58,6 +59,10 @@ export const StarknetProvider = ({
     window?.localStorage?.setItem('lastSelectedChainId', chainId)
   }, [])
 
+  //
+  // Cartridge Controller
+  const manifest = useMemo(() => (dojoAppConfig.manifests[selectedChainId] ?? null), [selectedChainConfig])
+  const { controller } = useController(manifest)
 
   //
   // Connectors
@@ -68,6 +73,7 @@ export const StarknetProvider = ({
       injected({ id: DojoPredeployedStarknetWindowObject.getId() }),
       argent(),
       braavos(),
+      controller,
     ],
     // Hide recommended connectors if the user has any connector installed.
     includeRecommended: 'always',

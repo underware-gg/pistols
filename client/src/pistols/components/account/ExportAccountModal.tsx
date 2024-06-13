@@ -30,7 +30,7 @@ export default function ExportAccountModal({
 
   const usesPlayerId = useMemo(() => (connector?.id == DojoPredeployedStarknetWindowObject.getId()), [connector])
   const canExport = useMemo(() => (usesPlayerId), [usesPlayerId])
-  const canImport = useMemo(() => (usesPlayerId && isBigint(clipboard)), [usesPlayerId, clipboard])
+  const canImport = useMemo(() => (usesPlayerId && isBigint(clipboard) && BigInt(clipboard) > 0n), [usesPlayerId, clipboard])
   const isExported = useMemo(() => (canImport && bigintEquals(clipboard, playerId)), [canImport, playerId, clipboard])
 
   // always closed on mount

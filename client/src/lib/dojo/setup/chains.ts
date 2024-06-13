@@ -112,7 +112,10 @@ const localKatanaConfig: DojoChainConfig = {
   lordsContractAddress: undefined, // lords_mock
   lordsFaucetUrl: undefined,
   predeployedAccounts: [],
-  connectorIds: [supportedConnetorIds.DOJO_PREDEPLOYED],
+  connectorIds: [
+    supportedConnetorIds.DOJO_PREDEPLOYED,
+    // supportedConnetorIds.CONTROLLER,
+  ],
   // starknet Chain
   nativeCurrency: ETH_KATANA,
   explorers: WORLD_EXPLORER,
@@ -132,7 +135,10 @@ const pistolsSlotConfig: DojoChainConfig = {
   lordsContractAddress: undefined, // lords_mock
   lordsFaucetUrl: undefined,
   predeployedAccounts: [],
-  connectorIds: [supportedConnetorIds.DOJO_PREDEPLOYED],
+  connectorIds: [
+    supportedConnetorIds.DOJO_PREDEPLOYED,
+    // supportedConnetorIds.CONTROLLER,
+  ],
   // starknet Chain
   nativeCurrency: ETH_KATANA,
   explorers: WORLD_EXPLORER,
@@ -151,7 +157,10 @@ const pistolsStagingConfig: DojoChainConfig = {
   lordsContractAddress: undefined, // lords_mock
   lordsFaucetUrl: undefined,
   predeployedAccounts: [],
-  connectorIds: [supportedConnetorIds.DOJO_PREDEPLOYED],
+  connectorIds: [
+    supportedConnetorIds.DOJO_PREDEPLOYED,
+    // supportedConnetorIds.CONTROLLER,
+  ],
   // starknet Chain
   nativeCurrency: ETH_KATANA,
   explorers: WORLD_EXPLORER,
@@ -172,11 +181,19 @@ const realmsWorldConfig: DojoChainConfig = {
   lordsContractAddress: '0x51205c5e6ac3ad5691c28c0c5ffcdd62c70bddb63612f75a4bac9b2a85b9449',
   lordsFaucetUrl: 'https://internal-explorer.preview.cartridge.gg',
   predeployedAccounts: [],
-  connectorIds: [supportedConnetorIds.DOJO_PREDEPLOYED],
+  connectorIds: [
+    supportedConnetorIds.DOJO_PREDEPLOYED,
+    // supportedConnetorIds.CONTROLLER,
+  ],
   // starknet Chain
   nativeCurrency: LORDS_REALMS_L3,
   explorers: WORLD_EXPLORER,
 } as const
+
+
+//-------------------------------
+// Starknet
+//
 
 const snMainnetConfig: DojoChainConfig = {
   chain: mainnet,
@@ -191,7 +208,11 @@ const snMainnetConfig: DojoChainConfig = {
   lordsContractAddress: '0x0124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49',
   lordsFaucetUrl: 'https://app.avnu.fi/en?amount=100&tokenFrom=0x124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49&tokenTo=0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
   predeployedAccounts: [],
-  connectorIds: [supportedConnetorIds.ARGENT],
+  connectorIds: [
+    // supportedConnetorIds.CONTROLLER,
+    supportedConnetorIds.ARGENT,
+    supportedConnetorIds.DOJO_PREDEPLOYED,
+  ],
 } as const
 
 const snSepoliaConfig: DojoChainConfig = {
@@ -207,7 +228,11 @@ const snSepoliaConfig: DojoChainConfig = {
   lordsContractAddress: '0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210',
   lordsFaucetUrl: undefined,
   predeployedAccounts: [],
-  connectorIds: [supportedConnetorIds.ARGENT],
+  connectorIds: [
+    supportedConnetorIds.CONTROLLER,
+    supportedConnetorIds.ARGENT,
+    supportedConnetorIds.DOJO_PREDEPLOYED,
+  ],
 } as const
 
 

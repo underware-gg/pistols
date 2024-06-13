@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react'
+import { Manifest } from '@dojoengine/core'
 import { ConstantsProvider } from '@/lib/dojo/ConstantsContext'
 import { StarknetProvider, useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { DojoProvider } from '@/lib/dojo/DojoContext'
@@ -11,7 +12,7 @@ export interface DojoAppConfig {
   mainSystemName: string
   supportedChainIds: ChainId[]
   initialChainId: ChainId
-  manifests: { [chain_id: string]: any | undefined }
+  manifests: { [chain_id: string]: Manifest | undefined }
   constants: { [chain_id: string]: any | undefined }
 }
 

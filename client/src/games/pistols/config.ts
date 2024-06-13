@@ -1,3 +1,4 @@
+import { Manifest } from '@dojoengine/core'
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
 import { ChainId, defaultChainId } from '@/lib/dojo/setup/chainConfig'
 import pistols_manifest_dev from '@/games/pistols/generated/dev/manifest.json'
@@ -20,10 +21,10 @@ export const makeDojoAppConfig = (): DojoAppConfig => {
     // ChainId.REALMS_WORLD,
   ]
 
-  const manifests: Record<ChainId, any> = {
-    [ChainId.KATANA_LOCAL]: pistols_manifest_dev,
-    [ChainId.PISTOLS_SLOT]: pistols_manifest_slot,
-    [ChainId.PISTOLS_STAGING]: pistols_manifest_staging,
+  const manifests: Record<ChainId, Manifest> = {
+    [ChainId.KATANA_LOCAL]: pistols_manifest_dev as Manifest,
+    [ChainId.PISTOLS_SLOT]: pistols_manifest_slot as Manifest,
+    [ChainId.PISTOLS_STAGING]: pistols_manifest_staging as Manifest,
     [ChainId.SN_SEPOLIA]: null,
     [ChainId.SN_MAINNET]: null,
     [ChainId.REALMS_WORLD]: null,
