@@ -160,9 +160,9 @@ pnpm install
 
 ```console
 cd dojo
-katana --disable-fee --chain-id KATANA_LOCAL --invoke-max-steps 10000000
+katana --disable-fee --chain-id KATANA_LOCAL --invoke-max-steps 10000000 --allowed-origins "*" --accounts 10
 
-# or simply...
+# or preferably...
 cd dojo
 ./run_katana
 ```
@@ -173,39 +173,46 @@ Uncomment the `world_address` parameter in `dojo/Scarb.toml` then:
 
 ```console
 cd dojo
-torii --world 0x2d6bcc12cbb460243b73a4c937faf00ad2d071d899f40dfc9182843712f9c77
+torii --allowed-origins "*" --index-pending --world 0x509c209fc7c9ad157b463a1b48d92a399239bce020392ab2a920e7f2af31bb5
 
-# or simply...
+# or preferably...
 cd dojo
 ./run_torii
 ```
 
-#### Terminal 3: Client
-
-```console
-cd client
-pnpm install && pnpm dev
-
-# or just...
-cd client
-./run_client
-```
-
-#### Terminal 4: Sozo commands
+#### Terminal 3: Sozo commands / migration
 
 ```console
 # build world and systems
 cd dojo
+sozo clean
 sozo build
 
 # migrate to local Katana
-cd dojo
 ./migrate
 ```
 
 
-#### Open the game on a browser
+#### Terminal 4: Client
 
-* [http://localhost:3000/](http://localhost:3000/)
+Install dependencies
 
+```console
+cd client
+pnpm i
+```
+
+Start the client
+
+```console
+# http server
+# http://localhost:3000
+pnpm run dev
+
+# https server (required for Catridge Controller)
+# https://localhost:3000
+pnpm run devs
+```
+
+Open [http://localhost:3000](http://localhost:3000) or [https://localhost:3000](https://localhost:3000)
 
