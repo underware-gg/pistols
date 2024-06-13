@@ -13,6 +13,7 @@ varying vec2 vTexture;
 void main() {
     vUv = textureMatrix * vec4(position, 1.0);
     vTexture = uv;
+    vTexture.y = 1.0 - vTexture.y;
     
     vec2 uv = position.xy;
     vec2 distortion = texture2D(tDudv, uv + vec2(time * waterSpeed, 0.0)).rg;
