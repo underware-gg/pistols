@@ -306,6 +306,11 @@ canvas {
   top: 0;
   right: 0;
 }
+.AbsoluteBottom {
+  position: absolute;
+  top: unset;
+  bottom: 0;
+}
 
 .Grayscale {
   filter: grayscale(100%); /* Current draft standard */

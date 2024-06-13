@@ -8,6 +8,7 @@ import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
+import { useOpener } from '@/lib/ui/useOpener'
 import { ChainId } from '@/lib/dojo/setup/chains'
 import { AccountMenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { AccountsList } from '@/pistols/components/account/AccountsList'
@@ -21,9 +22,6 @@ import OnboardingModal from '@/pistols/components/account/OnboardingModal'
 import ExportAccountModal from '@/pistols/components/account/ExportAccountModal'
 import WalletHeader from '@/pistols/components/account/WalletHeader'
 import Logo from '@/pistols/components/Logo'
-import { useOpener } from '@/lib/ui/useOpener'
-import { usePlayerId } from '@/lib/dojo/hooks/usePlayerId'
-import { bigintEquals } from '@/lib/utils/types'
 
 const Row = Grid.Row
 const Col = Grid.Column

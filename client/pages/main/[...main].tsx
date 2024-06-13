@@ -3,6 +3,8 @@ import { useRouter } from 'next/router'
 import { useRouterStarter, useRouterListener } from '@/pistols/hooks/useRouterListener'
 import { usePistolsContext, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
+import { useDojoStatus } from '@/lib/dojo/DojoContext'
+import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import AppPistols from '@/pistols/components/AppPistols'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import GameContainer from '@/pistols/components/GameContainer'
@@ -10,8 +12,6 @@ import Background from '@/pistols/components/Background'
 import Gate from '@/pistols/components/Gate'
 import Tavern from '@/pistols/components/Tavern'
 import Duel from '@/pistols/components/Duel'
-import { useDojoStatus } from '@/lib/dojo/DojoContext'
-import { DojoStatus } from '@/lib/dojo/DojoStatus'
 
 // enable wasm in build (this is for api routes)
 // export const config = {

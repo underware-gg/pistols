@@ -6,6 +6,7 @@ import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { LordsBalance } from '@/pistols/components/account/LordsBalance'
 import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
+import { MusicToggle } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
 
 const Row = Grid.Row
@@ -38,8 +39,11 @@ export default function WalletHeader({
           {isConnected && contractAddress &&
             <h5>LORDS balance: <LordsBalance address={address} big={false} /></h5>
           }
+          <div className='AbsoluteRight AbsoluteBottom PaddedDouble'>
+            {/* <MusicToggle /> */}
+          </div>
         </Col>
-        <Col width={5} verticalAlign='middle'>
+        <Col width={5} verticalAlign='middle' textAlign='right'>
           {isConnected && contractAddress &&
             <LordsFaucet fill large account={account} />
           }
