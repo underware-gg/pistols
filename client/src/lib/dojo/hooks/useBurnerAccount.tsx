@@ -86,7 +86,7 @@ export const useBurnerDeployment = (address: BigNumberish, createOptions?: Burne
 
   //
   // Verify if is already deployed
-  const [isVerifying, setIsVerifying] = useState<boolean>(true)
+  const [isVerifying, setIsVerifying] = useState<boolean>(false)
   const [isDeployed, setIsDeployed] = useState<boolean>(undefined)
   const { data: blockNumber } = useBlockNumber()
   useEffect(() => {

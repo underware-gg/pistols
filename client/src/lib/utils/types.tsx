@@ -17,6 +17,13 @@ export const bigintToHex = (v: BigNumberish): string => (!v ? '0x0' : `0x${BigIn
 export const bigintEquals = (a: BigNumberish | null, b: BigNumberish | null): boolean => (a != null && b != null && BigInt(a) == BigInt(b))
 export const bigintAdd = (a: BigNumberish | null, b: BigNumberish | null): bigint => (BigInt(a ?? 0) + BigInt(b ?? 0))
 export const bigintSub = (a: BigNumberish | null, b: BigNumberish | null): bigint => (BigInt(a ?? 0) - BigInt(b ?? 0))
+export const isBigint = (v: BigNumberish | null): boolean => {
+  try {
+    return BigInt(v) >= 0n;
+  } catch {
+    return false;
+  }
+}
 
 export const bigintToEntity = (v: BigNumberish): Entity => (getEntityIdFromKeys([BigInt(v)]) as Entity)
 export const keysToEntity = (keys: any[]): Entity => (getEntityIdFromKeys(keys) as Entity)

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Dropdown, Grid, Icon } from 'semantic-ui-react'
 import { VStack, VStackRow } from '@/lib/ui/Stack'
@@ -16,10 +16,14 @@ import { LordsBagIcon } from '@/pistols/components/account/Balance'
 import { Divider } from '@/lib/ui/Divider'
 import { feltToString } from '@/lib/utils/starknet'
 import { makeTavernUrl } from '@/pistols/utils/pistols'
+import { PACKAGE_VERSION } from '@/pistols/utils/constants'
 import OnboardingModal from '@/pistols/components/account/OnboardingModal'
+import ExportAccountModal from '@/pistols/components/account/ExportAccountModal'
 import WalletHeader from '@/pistols/components/account/WalletHeader'
 import Logo from '@/pistols/components/Logo'
-import { PACKAGE_VERSION } from '../utils/constants'
+import { useOpener } from '@/lib/ui/useOpener'
+import { usePlayerId } from '@/lib/dojo/hooks/usePlayerId'
+import { bigintEquals } from '@/lib/utils/types'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -155,9 +159,10 @@ function EnterAsGuestButton() {
 //
 
 function ConnectedGate() {
-  const { remove, applyFromClipboard, copyToClipboard, masterAccount, count } = useDojoAccount()
+  const { remove, masterAccount, count } = useDojoAccount()
   const { accountSetupOpener, dispatchSetAccountMenu, dispatchSetAccountIndex } = usePistolsContext()
   const { burners, nextAccountIndex } = useBurners(masterAccount.address)
+  const exportOpener = useOpener()
 
   const _deployDuelist = () => {
     dispatchSetAccountIndex(nextAccountIndex)
@@ -178,9 +183,7 @@ function ConnectedGate() {
         <VStackRow>
           {/* <ActionButton fill disabled={isDeploying} onClick={() => create()} label='Create Duelist' /> */}
           <ActionButton fill onClick={() => _deployDuelist()} label='Deploy New Duelist' />
-          {/* <ActionButton fill disabled={count == 0} onClick={() => copyToClipboard()} label={<>Export All <Icon name='copy' size='small' /></>} /> */}
-          {/* <ActionButton fill disabled={false} onClick={() => applyFromClipboard()} label={<>Import All <Icon name='paste' size='small' /></>} /> */}
-          <ActionButton fill onClick={() => {}} label='Import /Export' />
+          <ActionButton fill onClick={() => exportOpener.open()} label='Export / Import' />
           <ActionButton fill disabled={count == 0} onClick={() => _deleteAll()} label='Clear All' />
         </VStackRow>
 
@@ -193,6 +196,7 @@ function ConnectedGate() {
       </div>
 
       <OnboardingModal opener={accountSetupOpener} />
+      <ExportAccountModal opener={exportOpener} onImported={() => _deleteAll()} />
     </>
   )
 }

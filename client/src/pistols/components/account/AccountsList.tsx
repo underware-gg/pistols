@@ -34,6 +34,7 @@ export function AccountsList() {
       result.push(
         <Row key='empty' columns={'equal'} textAlign='center'>
           <Col>
+            <Divider hidden />
             <h3 className='TitleCase Important'>Create a Duelist to Play</h3>
           </Col>
         </Row>

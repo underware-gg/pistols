@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { DojoPredeployedStarknetWindowObject } from '@rsodre/create-burner'
 import { useAccount } from '@starknet-react/core'
 import { stark } from 'starknet'
@@ -8,6 +8,11 @@ export const usePlayerId = () => {
   const { connector } = useAccount()
   const [playerId, setPlayerId] = useState<string>(undefined)
 
+  const replacePlayerId = useCallback((newPlayerId: string) => {
+    window?.localStorage?.setItem('player_id', newPlayerId)
+    setPlayerId(newPlayerId)
+  }, [])
+
   useEffect(() => {
     if (connector?.id == DojoPredeployedStarknetWindowObject.getId()) {
       const storedPlayerId = (typeof window !== 'undefined' ? window?.localStorage?.getItem('player_id') : undefined)
@@ -15,8 +20,7 @@ export const usePlayerId = () => {
         setPlayerId(storedPlayerId)
       } else {
         const newPlayerId = stark.randomAddress()
-        window?.localStorage?.setItem('player_id', newPlayerId)
-        setPlayerId(newPlayerId)
+        replacePlayerId(newPlayerId)
       }
     } else {
       setPlayerId(undefined)
@@ -25,5 +29,6 @@ export const usePlayerId = () => {
 
   return {
     playerId,
+    replacePlayerId,
   }
 }

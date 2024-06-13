@@ -14,12 +14,12 @@
   },
   "dependencies": {
     "@dojoengine/core": "^0.7.0-alpha.2",
-    "@rsodre/create-burner": "^0.7.0-alpha.2.1",
     "@dojoengine/react": "^0.7.0-alpha.2",
     "@dojoengine/recs": "^0.1.35",
     "@dojoengine/state": "^0.7.0-alpha.2",
     "@dojoengine/torii-client": "^0.7.0-alpha.2",
     "@dojoengine/utils": "^0.7.0-alpha.2",
+    "@rsodre/create-burner": "^0.7.0-alpha.2.1",
     "@starknet-react/chains": "^0.1.7",
     "@starknet-react/core": "^2.2.5",
     "@tweenjs/tween.js": "^21.0.0",
