@@ -1,0 +1,10 @@
+kind = "DojoContract"
+class_hash = "0x772ad70374b44897b93fbfb8540faec41aae1e7aceb335618c5e9a6a8db07ba"
+original_class_hash = "0x772ad70374b44897b93fbfb8540faec41aae1e7aceb335618c5e9a6a8db07ba"
+base_class_hash = "0x0"
+abi = "manifests/sepolia/abis/base/contracts/pistols_systems_actions_actions.json"
+reads = []
+writes = []
+computed = []
+init_calldata = []
+name = "pistols::systems::actions::actions"
