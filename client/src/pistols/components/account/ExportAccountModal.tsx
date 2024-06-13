@@ -26,7 +26,7 @@ export default function ExportAccountModal({
   const { connector } = useAccount()
   const { playerId, replacePlayerId } = usePlayerId()
   const { dispatchSetSig } = usePistolsContext()
-  const { clipboard, copyToClipboard } = useClipboard(opener.isOpen)
+  const { clipboard, writeToClipboard, readClipboard } = useClipboard(opener.isOpen)
 
   const usesPlayerId = useMemo(() => (connector?.id == DojoPredeployedStarknetWindowObject.getId()), [connector])
   const canExport = useMemo(() => (usesPlayerId), [usesPlayerId])
@@ -42,7 +42,7 @@ export default function ExportAccountModal({
 
   const _export = () => {
     if (canExport) {
-      copyToClipboard(playerId)
+      writeToClipboard(playerId)
     }
   }
   const _import = () => {
@@ -55,7 +55,7 @@ export default function ExportAccountModal({
 
   return (
     <Modal
-      size='tiny'
+      size='small'
       // dimmer='inverted'
       onClose={() => opener.close()}
       open={mounted && opener.isOpen}
@@ -110,13 +110,19 @@ export default function ExportAccountModal({
             <Col>
               <ActionButton fill label='Close' onClick={() => opener.close()} />
             </Col>
+            <Col></Col>
             <Col>
-              {/* <ActionButton fill onClick={() => copyToClipboard()} label={<>Export All <Icon name='copy' size='small' /></>} /> */}
+              {/* <ActionButton fill onClick={() => writeToClipboard()} label={<>Export All <Icon name='copy' size='small' /></>} /> */}
               <ActionButton fill disabled={!canExport} label={<>Export <Icon name='copy' size='small' /></>} onClick={() => _export()} />
+            </Col>
+            <Col></Col>
+            <Col>
+              {/* <ActionButton fill onClick={() => applyFromClipboard()} label={<>Import All <Icon name='paste' size='small' /></>} /> */}
+              <ActionButton fill label={<>Check <Icon name='paste' size='small' /></>} onClick={() => readClipboard()} />
             </Col>
             <Col>
               {/* <ActionButton fill onClick={() => applyFromClipboard()} label={<>Import All <Icon name='paste' size='small' /></>} /> */}
-              <ActionButton fill disabled={!canImport || isExported} label={<>Import <Icon name='paste' size='small' /></>} onClick={() => _import()} />
+              <ActionButton fill disabled={!canImport || isExported} label={<>Import</>} onClick={() => _import()} />
             </Col>
           </Row>
         </Grid>

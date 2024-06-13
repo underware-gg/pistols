@@ -53,6 +53,7 @@ export default function Gate() {
           <span className='Title'>
             {/* Duelists use a <b>Controller wallet</b> */}
             {/* <br />and some <LordsBagIcon /><b>LORDS</b> to play */}
+            <br />
             Settle Your Grudges Honourably
             <br />Wager some <LordsBagIcon /><b>LORDS</b> or duel for free
           </span>
@@ -84,8 +85,17 @@ function DisconnectedGate() {
 
   return (
     <VStack>
-      <ChainSwitcher disabled={isLoading} />
-      <ActionButton fill large important disabled={!canConnect || isConnecting} onClick={() => connectOpener.open()} label={switchChain ? 'Switch Chain' : 'Connect Wallet'} />
+      <Divider />
+      <Grid>
+        <Row columns={'equal'}>
+          <Col>
+            <ChainSwitcher disabled={isLoading} />
+          </Col>
+          <Col>
+            <ActionButton fill large important disabled={!canConnect || isConnecting} onClick={() => connectOpener.open()} label={switchChain ? 'Switch Chain' : 'Connect Wallet'} />
+          </Col>
+        </Row>
+      </Grid>
       {isConnecting ?
         <div>
           <Divider />

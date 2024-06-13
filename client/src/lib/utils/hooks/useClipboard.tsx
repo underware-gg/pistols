@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-export const useClipboard = (autoUpdate: boolean = false) => {
+export const useClipboard = (autoUpdate?: boolean) => {
   const [value, setValue] = useState('')
 
   const _getClipboard = async (): Promise<void> => {
@@ -10,36 +10,41 @@ export const useClipboard = (autoUpdate: boolean = false) => {
     } catch {}
   }
 
-  const [intervalId, setIntervalId] = useState(null)
-  useEffect(() => {
-    let _mounted = true
-    // reset
-    clearInterval(intervalId)
-    setIntervalId(null)
-    _getClipboard()
-    // auto updates
-    if (autoUpdate) {
-      const _interval = setInterval(() => {
-        if (_mounted) {
-          _getClipboard()
-        }
-      }, 500)
-      setIntervalId(_interval)
-    }
-    return () => {
-      _mounted = false
-      clearInterval(intervalId)
-      setIntervalId(null)
-    }
-  }, [autoUpdate])
+  // const [intervalId, setIntervalId] = useState(null)
+  // useEffect(() => {
+  //   let _mounted = true
+  //   // reset
+  //   clearInterval(intervalId)
+  //   setIntervalId(null)
+  //   _getClipboard()
+  //   // auto updates
+  //   if (autoUpdate) {
+  //     const _interval = setInterval(() => {
+  //       if (_mounted) {
+  //         _getClipboard()
+  //       }
+  //     }, 500)
+  //     setIntervalId(_interval)
+  //   }
+  //   return () => {
+  //     _mounted = false
+  //     clearInterval(intervalId)
+  //     setIntervalId(null)
+  //   }
+  // }, [autoUpdate])
 
-  const copyToClipboard = async (newValue: string): Promise<void> => {
+  const writeToClipboard = async (newValue: string): Promise<void> => {
     await navigator.clipboard.writeText(newValue)
+    await _getClipboard()
+  }
+
+  const readClipboard = async (): Promise<void> => {
     await _getClipboard()
   }
 
   return {
     clipboard: value,
-    copyToClipboard,
+    writeToClipboard,
+    readClipboard,
   }
 }
