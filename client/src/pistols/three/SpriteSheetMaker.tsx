@@ -68,10 +68,10 @@ export class Actor {
     this.mesh = new THREE.Mesh(geometry, this.material)
 
     if (flipped) {
-      this.mesh.position.set(-0.5, (height / 2) - (height * 0.005), 2)
+      this.mesh.position.set(-0.5, (height / 2), 2)
     } else {
       this.mesh.rotateY(Math.PI)
-      this.mesh.position.set(0.5, (height / 2) - (height * 0.005), 2)
+      this.mesh.position.set(0.5, (height / 2), 2)
     }
     this.mesh.rotateZ(Math.PI)
     this.mesh.castShadow = true
@@ -124,6 +124,10 @@ export class Actor {
       } else {
         return
       }
+    }
+
+    if (this.controls.loop && this.animationQueue.length > 0) {
+      this.updateNextAnimation()
     }
 
     const elapsed = seconds - this.controls.lastDisplayTime
