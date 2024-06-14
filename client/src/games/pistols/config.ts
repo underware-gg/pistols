@@ -41,17 +41,10 @@ export const makeDojoAppConfig = (): DojoAppConfig => {
     [ChainId.REALMS_WORLD]: null,
   }
 
-  const initialChainId: ChainId = (defaultChainId || (
-    process.env.NODE_ENV === 'development' ? ChainId.KATANA_LOCAL
-      : process.env.NODE_ENV === 'production' ? ChainId.REALMS_WORLD
-        : process.env.NODE_ENV === 'test' ? ChainId.PISTOLS_SLOT
-          : supportedChainIds[0]
-  ))
-
   return {
     mainSystemName,
     supportedChainIds,
-    initialChainId,
+    initialChainId: defaultChainId,
     manifests,
     constants,
   }

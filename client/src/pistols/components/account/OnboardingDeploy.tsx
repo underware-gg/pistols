@@ -8,7 +8,7 @@ import { usePlayerId } from '@/lib/dojo/hooks/usePlayerId'
 import { Messages, createTypedMessage, getMessageHash, splitSignature } from '@/lib/utils/starknet_sign'
 import { feltToString, pedersen } from '@/lib/utils/starknet'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { bigintEquals, bigintToHex, cleanDict } from '@/lib/utils/types'
+import { bigintEquals, bigintToHex, cleanObject } from '@/lib/utils/types'
 import { BurnerCreateOptions } from '@dojoengine/create-burner'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { IconWarning } from '@/lib/ui/Icons'
@@ -43,7 +43,7 @@ export function OnboardingDeploy({
   //
   // sign deployer message and store on PistolsContext
   const { playerId, requiresPlayerId } = usePlayerId()
-  const messages = useMemo<Messages>(() => cleanDict({
+  const messages = useMemo<Messages>(() => cleanObject({
     game: 'PISTOLS_AT_10_BLOCKS',
     purpose: 'DUELIST_ACCOUNT',
     player_id: requiresPlayerId ? playerId : undefined,

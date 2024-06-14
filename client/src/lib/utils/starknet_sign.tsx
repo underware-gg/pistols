@@ -1,4 +1,4 @@
-import { cleanDict } from '@/lib/utils/types'
+import { cleanObject } from '@/lib/utils/types'
 import {
   Account,
   TypedData,
@@ -48,7 +48,7 @@ export function createTypedMessage({
   version = "0.1.0",
   messages
 }: TypedMessageOptions): TypedData {
-  const _messages = cleanDict(messages)
+  const _messages = cleanObject(messages)
   const _types = Object.keys(_messages).map(v => ({ name: v, type: "felt" }))
   return {
     primaryType,

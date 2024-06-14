@@ -1,6 +1,7 @@
 import { Chain } from '@starknet-react/chains'
 import { PredeployedAccount } from '@dojoengine/create-burner'
 import { stringToFelt } from '@/lib/utils/starknet'
+import { cleanObject } from '@/lib/utils/types'
 import {
   ChainId,
   DojoChainConfig,
@@ -36,24 +37,22 @@ export const getDojoChainConfig = (chainId: ChainId): DojoChainConfig => {
       },
       explorers: result.explorers,
     } as Chain
-    //
-    // replace config from env
-    if (chainId == defaultChainId) {
-      result = Object.keys(result).reduce((a, k) => {
-        if (envChainConfig[k]) {
-          a[k] = envChainConfig[k]
-        }
-        return a
-      }, result)
-    }
-    //
-    // use Cartridge RPCs
-    if (result.rpcUrl) {
-      result.chain.rpcUrls.default.http = [result.rpcUrl]
-      result.chain.rpcUrls.public.http = [result.rpcUrl]
-    }
-    // console.log(result)
   }
+  //
+  // override env (default chain only)
+  if (chainId == defaultChainId) {
+    result = {
+      ...result,
+      ...cleanObject(envChainConfig),
+    }
+  }
+  //
+  // use Cartridge RPCs
+  if (result.rpcUrl) {
+    result.chain.rpcUrls.default.http = [result.rpcUrl]
+    // result.chain.rpcUrls.public.http = [result.rpcUrl]
+  }
+  // console.log(result)
 
   return result
 }

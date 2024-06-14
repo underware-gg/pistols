@@ -86,7 +86,7 @@ export const envChainConfig: DojoChainConfig = {
   relayUrl: process.env.NEXT_PUBLIC_RELAY_URL || undefined,
   masterAddress: process.env.NEXT_PUBLIC_MASTER_ADDRESS || undefined,
   masterPrivateKey: process.env.NEXT_PUBLIC_MASTER_PRIVATE_KEY || undefined,
-  accountClassHash: KATANA_CLASS_HASH,
+  accountClassHash: undefined,
   lordsContractAddress: undefined,
   lordsFaucetUrl: undefined,
   predeployedAccounts: undefined,
@@ -196,7 +196,7 @@ const realmsWorldConfig: DojoChainConfig = {
 //
 
 const snSepoliaConfig: DojoChainConfig = {
-  chain: sepolia,
+  chain: { ...sepolia },
   chainId: ChainId.SN_SEPOLIA,
   name: 'Sepolia Testnet',
   rpcUrl: 'https://api.cartridge.gg/rpc/starknet-sepolia',
@@ -211,12 +211,12 @@ const snSepoliaConfig: DojoChainConfig = {
   connectorIds: [
     supportedConnetorIds.CONTROLLER,
     supportedConnetorIds.ARGENT,
-    supportedConnetorIds.DOJO_PREDEPLOYED,
+    supportedConnetorIds.BRAAVOS,
   ],
 } as const
 
 const snMainnetConfig: DojoChainConfig = {
-  chain: mainnet,
+  chain: { ...mainnet },
   chainId: ChainId.SN_MAINNET,
   name: 'Mainnet',
   rpcUrl: 'https://api.cartridge.gg/rpc/starknet',
@@ -229,9 +229,9 @@ const snMainnetConfig: DojoChainConfig = {
   lordsFaucetUrl: 'https://app.avnu.fi/en?amount=100&tokenFrom=0x124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49&tokenTo=0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
   predeployedAccounts: [],
   connectorIds: [
-    // supportedConnetorIds.CONTROLLER,
+    supportedConnetorIds.CONTROLLER,
     supportedConnetorIds.ARGENT,
-    supportedConnetorIds.DOJO_PREDEPLOYED,
+    supportedConnetorIds.BRAAVOS,
   ],
 } as const
 

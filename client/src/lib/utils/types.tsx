@@ -40,8 +40,8 @@ export const shortAddress = (address: string | null) => (
 // dictionaries
 //
 
-export const getKeyByValue = (dict: any, value: any) => Object.keys(dict).find(key => dict[key] === value)
-export const cleanDict = (dict: any): any => Object.keys(dict).reduce((a, k) => {
-  if (dict[k] !== undefined) a[k] = dict[k]
-  return a
+export const getObjectKeyByValue = (obj: any, value: any) => Object.keys(obj).find(key => obj[key] === value)
+export const cleanObject = (obj: any): any => Object.keys(obj).reduce((acc, key) => {
+  if (obj[key] !== undefined) acc[key] = obj[key]
+  return acc
 }, {})
