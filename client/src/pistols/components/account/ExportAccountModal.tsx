@@ -23,14 +23,13 @@ export default function ExportAccountModal({
   opener: Opener
   onImported: Function
 }) {
-  const { connector } = useAccount()
-  const { playerId, replacePlayerId } = usePlayerId()
+  const { address, connector } = useAccount()
+  const { playerId, replacePlayerId, requiresPlayerId } = usePlayerId()
   const { dispatchSetSig } = usePistolsContext()
   const { clipboard, writeToClipboard, readClipboard } = useClipboard(opener.isOpen)
 
-  const usesPlayerId = useMemo(() => (connector?.id == DojoPredeployedStarknetWindowObject.getId()), [connector])
-  const canExport = useMemo(() => (usesPlayerId), [usesPlayerId])
-  const canImport = useMemo(() => (usesPlayerId && isBigint(clipboard) && BigInt(clipboard) > 0n), [usesPlayerId, clipboard])
+  const canExport = useMemo(() => (requiresPlayerId), [requiresPlayerId])
+  const canImport = useMemo(() => (requiresPlayerId && isBigint(clipboard) && BigInt(clipboard) > 0n), [requiresPlayerId, clipboard])
   const isExported = useMemo(() => (canImport && bigintEquals(clipboard, playerId)), [canImport, playerId, clipboard])
 
   // always closed on mount
@@ -71,11 +70,11 @@ export default function ExportAccountModal({
         <Modal.Description className='FillParent ModalText Centered'>
           <VStack>
             <div>
-              Accounts are deterministic and attacked to your wallet.
+              Accounts are deterministic and attached to your wallet.
               <p>
-                To play on another device, <b>connect with the same wallet</b>
+                To play on another device, just <b>connect with the same wallet</b>
                 <br />
-                and <b>Deploy</b> to restore your duelists.
+                and <b>Deploy Duelist</b> to restore your duelists.
               </p>
             </div>
             <Divider />
@@ -83,7 +82,12 @@ export default function ExportAccountModal({
               <h5>Connected with <Image width='30' height='30' spaced src={connector?.icon.dark} /> {connector?.name}</h5>
             </div>
             <div>
-              {usesPlayerId &&
+              {!requiresPlayerId &&
+                <div>
+                  Account: <b><AddressShort important address={address} /></b>
+                </div>
+              }
+              {requiresPlayerId &&
                 <div>
                   This is a shared wallet <b>for testing only</b>.
                   <br />
@@ -108,20 +112,22 @@ export default function ExportAccountModal({
             <Col>
               <ActionButton fill label='Close' onClick={() => opener.close()} />
             </Col>
-            <Col></Col>
-            <Col>
-              {/* <ActionButton fill onClick={() => writeToClipboard()} label={<>Export All <Icon name='copy' size='small' /></>} /> */}
-              <ActionButton fill disabled={!canExport} label={<>Export <Icon name='copy' size='small' /></>} onClick={() => _export()} />
-            </Col>
-            <Col></Col>
-            <Col>
-              {/* <ActionButton fill onClick={() => applyFromClipboard()} label={<>Import All <Icon name='paste' size='small' /></>} /> */}
-              <ActionButton fill label={<>Check <Icon name='paste' size='small' /></>} onClick={() => readClipboard()} />
-            </Col>
-            <Col>
-              {/* <ActionButton fill onClick={() => applyFromClipboard()} label={<>Import All <Icon name='paste' size='small' /></>} /> */}
-              <ActionButton fill disabled={!canImport || isExported} label={<>Import</>} onClick={() => _import()} />
-            </Col>
+            {requiresPlayerId && <>
+              <Col></Col>
+              <Col>
+                {/* <ActionButton fill onClick={() => writeToClipboard()} label={<>Export All <Icon name='copy' size='small' /></>} /> */}
+                <ActionButton fill disabled={!canExport} label={<>Export <Icon name='copy' size='small' /></>} onClick={() => _export()} />
+              </Col>
+              <Col></Col>
+              <Col>
+                {/* <ActionButton fill onClick={() => applyFromClipboard()} label={<>Import All <Icon name='paste' size='small' /></>} /> */}
+                <ActionButton fill disabled={!requiresPlayerId} label={<>Check <Icon name='paste' size='small' /></>} onClick={() => readClipboard()} />
+              </Col>
+              <Col>
+                {/* <ActionButton fill onClick={() => applyFromClipboard()} label={<>Import All <Icon name='paste' size='small' /></>} /> */}
+                <ActionButton fill disabled={!canImport || isExported} label={<>Import</>} onClick={() => _import()} />
+              </Col>
+            </>}
           </Row>
         </Grid>
       </Modal.Actions>

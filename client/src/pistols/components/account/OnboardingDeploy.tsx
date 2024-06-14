@@ -42,12 +42,12 @@ export function OnboardingDeploy({
 
   //
   // sign deployer message and store on PistolsContext
-  const { playerId } = usePlayerId()
+  const { playerId, requiresPlayerId } = usePlayerId()
   const messages = useMemo<Messages>(() => cleanDict({
     game: 'PISTOLS_AT_10_BLOCKS',
     purpose: 'DUELIST_ACCOUNT',
-    player_id: playerId,
-  }), [playerId])
+    player_id: requiresPlayerId ? playerId : undefined,
+  }), [requiresPlayerId, playerId])
   const typedMessage = useMemo(() => (createTypedMessage({
     chainId: chainId ? feltToString(chainId) : undefined,
     messages,
