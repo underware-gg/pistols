@@ -1,9 +1,10 @@
 import { useEffect, useMemo } from 'react'
-import { useContractRead,
+import {
+  useContractRead,
   // useBalance,
   UseBalanceProps, Balance,
- } from '@starknet-react/core'
-import { bigintToHex } from '@/lib/utils/types'
+} from '@starknet-react/core'
+import { bigintToHex, shortAddress } from '@/lib/utils/types'
 import { BigNumberish, Uint256 } from 'starknet'
 import { erc20_abi } from '@/lib/abi'
 import { Uint256ToBigint, feltToString, weiToEth } from '../starknet'

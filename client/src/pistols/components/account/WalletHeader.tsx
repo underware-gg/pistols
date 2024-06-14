@@ -3,7 +3,7 @@ import { Grid, Image } from 'semantic-ui-react'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useLordsContract } from '@/lib/dojo/hooks/useLords'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
-import { LordsBalance } from '@/pistols/components/account/LordsBalance'
+import { EtherBalance, LordsBalance } from '@/pistols/components/account/LordsBalance'
 import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { MusicToggle } from '@/pistols/components/ui/Buttons'
@@ -37,7 +37,11 @@ export default function WalletHeader({
           <h4>{name}</h4>
           <AddressShort address={address ?? 0n} />
           {isConnected && contractAddress &&
-            <h5>LORDS balance: <LordsBalance address={address} big={false} /></h5>
+            <h5>
+              LORDS: <LordsBalance address={address} big={false} />
+              &nbsp;&nbsp;/&nbsp;
+              <EtherBalance address={address} />
+              </h5>
           }
           <div className='AbsoluteRight AbsoluteBottom PaddedDouble'>
             {/* <MusicToggle /> */}

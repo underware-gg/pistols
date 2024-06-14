@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { useDojoSystem } from '@/lib/dojo/hooks/useDojoSystem'
+import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { useERC20Balance } from '@/lib/utils/hooks/useERC20'
 import { BigNumberish } from 'starknet'
 
@@ -22,4 +23,9 @@ export const useLordsContract = () => {
 export const useLordsBalance = (address: BigNumberish, fee: BigNumberish = 0n) => {
   const { contractAddress } = useLordsContract()
   return useERC20Balance(contractAddress, address, fee)
+}
+
+export const useEtherBalance = (address: BigNumberish, fee: BigNumberish = 0n) => {
+  const { selectedChainConfig } = useSelectedChain()
+  return useERC20Balance(selectedChainConfig.etherAddress, address, fee)
 }

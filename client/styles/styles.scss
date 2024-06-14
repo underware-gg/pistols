@@ -835,6 +835,10 @@ $ui-container-gap: 1em;
 	text-shadow: 0.1em 0 $color-shadow;
 	color: $color-text;
 }
+.EtherIcon {
+  position:relative;
+  top:0.25rem;
+}
 .PacesIcon {
   font-family: $font-family-mono!important;
   font-size: 1.2em!important;
