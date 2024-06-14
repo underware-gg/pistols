@@ -14,19 +14,19 @@ export const LordsFaucet = ({
   account?: Account | AccountInterface
 }) => {
 
-  const { faucet, isPending, faucetUrl } = useLordsFaucet()
+  const { mintLords, isMinting, faucetUrl } = useLordsFaucet()
 
   const onClick = () => {
-    if (!isPending) {
+    if (!isMinting) {
       if (faucetUrl) {
         window?.open(faucetUrl, '_blank')
       } else {
-        faucet(account)
+        mintLords(account)
       }
     }
   }
 
   return (
-    <ActionButton important fill={fill} large={large} disabled={disabled || isPending} onClick={onClick} label='Get $LORDS' />
+    <ActionButton important fill={fill} large={large} disabled={disabled || isMinting} onClick={onClick} label='Get $LORDS' />
   )
 }

@@ -12,9 +12,9 @@ export interface FaucetExecuteResult {
 
 export interface FaucetInterface {
   isMock: boolean
-  faucet: (recipientAccount?: Account | AccountInterface) => Promise<FaucetExecuteResult> | null
+  mintLords: (recipientAccount?: Account | AccountInterface) => Promise<FaucetExecuteResult> | null
   faucetUrl: string | null
-  isPending: boolean
+  isMinting: boolean
   error?: string
 }
 
@@ -23,13 +23,13 @@ export const useLordsFaucet = (): FaucetInterface => {
   const { selectedChainConfig } = useStarknetContext()
   const { contractAddress, isMock, abi } = useLordsContract()
 
-  const [isPending, setIsPending] = useState(false)
+  const [isMinting, setIsMinting] = useState(false)
   const [error, setError] = useState<string | undefined>(undefined)
 
-  const faucet = useCallback(
+  const mintLords = useCallback(
     async (recipientAccount?: Account): Promise<FaucetExecuteResult> => {
       setError(undefined)
-      setIsPending(true)
+      setIsMinting(true)
 
       const _signerAccount = (recipientAccount ?? account)
       const amount = bigintToUint256(ethToWei(10_000))
@@ -47,22 +47,19 @@ export const useLordsFaucet = (): FaucetInterface => {
         )
         transaction_hash = tx.transaction_hash
         receipt = await _signerAccount!.waitForTransaction(transaction_hash, {
-          retryInterval: 200,
+          retryInterval: 500,
         })
-        console.log(`useLordsFaucet(${_signerAccount.address}) receipt:`, receipt)
+        console.log(`mintLords(${_signerAccount.address}) receipt:`, receipt)
       } catch (e: any) {
-        setIsPending(false)
         setError(e.toString())
-        console.error(`useLordsFaucet() error:`, e)
+        console.error(`mintLords(${_signerAccount.address}) error:`, e)
         // toast({
         //   message: e.toString(),
         //   duration: 20_000,
         //   isError: true
         // })
       }
-
-      setIsPending(false)
-
+      setIsMinting(false)
       return {
         transaction_hash,
       }
@@ -71,9 +68,9 @@ export const useLordsFaucet = (): FaucetInterface => {
 
   return {
     isMock,
-    faucet,
+    mintLords,
     faucetUrl: selectedChainConfig.lordsFaucetUrl ?? null,
-    isPending,
+    isMinting,
     error,
   }
 }
