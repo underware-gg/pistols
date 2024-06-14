@@ -63,9 +63,10 @@ account_address = "0x7947c7d3e02e85da3ba8c93024b006ab7f10dc6b8fb3cb151569c996869
 private_key = "0x329a6dea7e53dcd104ab13494a29c6ddb1e472afebddcbd3ae11f8fe76a9e53"
 lords_address = ""
 
-[profile.release.tool.dojo.env]
-rpc_url = "https://api.cartridge.gg/x/realms/katana"
-world_address = "0x1234"
-account_address = ""
-private_key = ""
-lords_address = "0x51205c5e6ac3ad5691c28c0c5ffcdd62c70bddb63612f75a4bac9b2a85b9449"
+[profile.sepolia.tool.dojo.env]
+# rpc_url = "https://api.cartridge.gg/rpc/starknet-sepolia" # env: STARKNET_RPC_URL
+# rpc_url = "https://api.cartridge.gg/rpc/starknet-sepolia/v0_6" # env: STARKNET_RPC_URL
+world_address = "0x509c209fc7c9ad157b463a1b48d92a399239bce020392ab2a920e7f2af31bb5"
+# account_address = "" # env: DOJO_ACCOUNT_ADDRESS
+# private_key = ""     # env: DOJO_PRIVATE_KEY
+lords_address = "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210"

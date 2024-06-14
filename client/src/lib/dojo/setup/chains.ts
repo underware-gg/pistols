@@ -195,10 +195,30 @@ const realmsWorldConfig: DojoChainConfig = {
 // Starknet
 //
 
+const snSepoliaConfig: DojoChainConfig = {
+  chain: sepolia,
+  chainId: ChainId.SN_SEPOLIA,
+  name: 'Sepolia Testnet',
+  rpcUrl: 'https://api.cartridge.gg/rpc/starknet-sepolia',
+  toriiUrl: 'https://api.cartridge.gg/x/pistols-sepolia/torii',
+  relayUrl: undefined,
+  masterAddress: undefined,
+  masterPrivateKey: undefined,
+  accountClassHash: KATANA_CLASS_HASH,
+  lordsContractAddress: '0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210',
+  lordsFaucetUrl: 'https://sepolia.voyager.online/contract/0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210#writeContract',
+  predeployedAccounts: [],
+  connectorIds: [
+    supportedConnetorIds.CONTROLLER,
+    supportedConnetorIds.ARGENT,
+    supportedConnetorIds.DOJO_PREDEPLOYED,
+  ],
+} as const
+
 const snMainnetConfig: DojoChainConfig = {
   chain: mainnet,
   chainId: ChainId.SN_MAINNET,
-  name: 'Starknet Mainnet',
+  name: 'Mainnet',
   rpcUrl: 'https://api.cartridge.gg/rpc/starknet',
   toriiUrl: undefined,
   relayUrl: undefined,
@@ -210,26 +230,6 @@ const snMainnetConfig: DojoChainConfig = {
   predeployedAccounts: [],
   connectorIds: [
     // supportedConnetorIds.CONTROLLER,
-    supportedConnetorIds.ARGENT,
-    supportedConnetorIds.DOJO_PREDEPLOYED,
-  ],
-} as const
-
-const snSepoliaConfig: DojoChainConfig = {
-  chain: sepolia,
-  chainId: ChainId.SN_SEPOLIA,
-  name: 'Starknet Sepolia Testnet',
-  rpcUrl: 'https://api.cartridge.gg/rpc/starknet-sepolia',
-  toriiUrl: undefined,
-  relayUrl: undefined,
-  masterAddress: undefined,
-  masterPrivateKey: undefined,
-  accountClassHash: undefined,
-  lordsContractAddress: '0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210',
-  lordsFaucetUrl: undefined,
-  predeployedAccounts: [],
-  connectorIds: [
-    supportedConnetorIds.CONTROLLER,
     supportedConnetorIds.ARGENT,
     supportedConnetorIds.DOJO_PREDEPLOYED,
   ],

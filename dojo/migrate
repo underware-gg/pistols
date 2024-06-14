@@ -17,7 +17,8 @@ export GAME_SLUG="pistols"
 export CLIENT_PATH="../client/src/games/$GAME_SLUG/generated/$PROFILE"
 export PROJECT_NAME=$(toml get Scarb.toml --raw tool.dojo.world.name)
 export WORLD_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.world_address)
-export RPC_URL=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.rpc_url)
+# use $STARKNET_RPC_URL else read from profile
+export RPC_URL=${STARKNET_RPC_URL:-$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.rpc_url)}
 
 if [[
   -z "$PROFILE" ||
