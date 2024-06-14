@@ -1,5 +1,4 @@
 import { Account, AccountInterface } from 'starknet'
-import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { useLordsFaucet } from '@/lib/dojo/hooks/useLordsMock'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 
@@ -14,23 +13,20 @@ export const LordsFaucet = ({
   disabled?: boolean
   account?: Account | AccountInterface
 }) => {
-  const { selectedChainConfig } = useStarknetContext()
 
-  const { faucet, hasFaucet, isPending } = useLordsFaucet()
-
-  const _hasFaucet = hasFaucet || Boolean(selectedChainConfig.lordsFaucetUrl)
+  const { faucet, isPending, faucetUrl } = useLordsFaucet()
 
   const onClick = () => {
     if (!isPending) {
-      if (selectedChainConfig.lordsFaucetUrl) {
-        window?.open(selectedChainConfig.lordsFaucetUrl, '_blank')
-      } else if (hasFaucet) {
+      if (faucetUrl) {
+        window?.open(faucetUrl, '_blank')
+      } else {
         faucet(account)
       }
     }
   }
 
   return (
-    <ActionButton important fill={fill} large={large} disabled={disabled || isPending || !_hasFaucet} onClick={onClick} label='Get $LORDS' />
+    <ActionButton important fill={fill} large={large} disabled={disabled || isPending} onClick={onClick} label='Get $LORDS' />
   )
 }

@@ -14,8 +14,8 @@ export const useLordsContract = () => {
 
   return {
     contractAddress: (isMock ? mockAddress : lordsAddress),
-    abi: (isMock ? abi : null),
     isMock,
+    abi,
   }
 }
 

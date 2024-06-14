@@ -60,7 +60,7 @@ export async function execute(
       }
     )
   } catch (error) {
-    this.logger.error("execute() error: ", error)
+    console.error("execute() error: ", error)
     return {
       transaction_hash: null,
     }

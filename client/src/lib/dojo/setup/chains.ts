@@ -206,7 +206,7 @@ const snSepoliaConfig: DojoChainConfig = {
   masterPrivateKey: undefined,
   accountClassHash: KATANA_CLASS_HASH,
   lordsContractAddress: '0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210',
-  lordsFaucetUrl: 'https://sepolia.voyager.online/contract/0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210#writeContract',
+  lordsFaucetUrl: undefined, //'https://sepolia.voyager.online/contract/0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210#writeContract',
   predeployedAccounts: [],
   connectorIds: [
     supportedConnetorIds.CONTROLLER,
