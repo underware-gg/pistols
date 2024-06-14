@@ -9,7 +9,7 @@ import { Messages, createTypedMessage, getMessageHash, splitSignature } from '@/
 import { feltToString, pedersen } from '@/lib/utils/starknet'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { bigintEquals, bigintToHex, cleanDict } from '@/lib/utils/types'
-import { BurnerCreateOptions } from '@rsodre/create-burner'
+import { BurnerCreateOptions } from '@dojoengine/create-burner'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { IconWarning } from '@/lib/ui/Icons'
 

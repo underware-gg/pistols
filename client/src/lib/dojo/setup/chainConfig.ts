@@ -1,5 +1,5 @@
 import { Chain } from '@starknet-react/chains'
-import { PredeployedAccount } from '@rsodre/create-burner'
+import { PredeployedAccount } from '@dojoengine/create-burner'
 import { stringToFelt } from '@/lib/utils/starknet'
 import {
   ChainId,

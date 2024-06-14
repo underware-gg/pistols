@@ -1,4 +1,4 @@
-import { DojoPredeployedStarknetWindowObject, DojoBurnerStarknetWindowObject } from '@rsodre/create-burner'
+import { DojoPredeployedStarknetWindowObject, DojoBurnerStarknetWindowObject } from '@dojoengine/create-burner'
 import { argent, braavos } from '@starknet-react/core'
 
 export const supportedConnetorIds = {

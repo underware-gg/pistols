@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react'
-import { BurnerManager, PredeployedManager } from '@rsodre/create-burner'
+import { BurnerManager, PredeployedManager } from '@dojoengine/create-burner'
 import { getSyncEntities } from '@dojoengine/state'
 import { DojoProvider } from '@dojoengine/core'
 import { DojoAppConfig } from '@/lib/dojo/Dojo'

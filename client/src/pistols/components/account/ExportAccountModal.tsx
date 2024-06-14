@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { Grid, Modal, Image, Icon } from 'semantic-ui-react'
-import { DojoPredeployedStarknetWindowObject } from '@rsodre/create-burner'
+import { DojoPredeployedStarknetWindowObject } from '@dojoengine/create-burner'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { useClipboard } from '@/lib/utils/hooks/useClipboard'
 import { usePlayerId } from '@/lib/dojo/hooks/usePlayerId'
