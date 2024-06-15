@@ -206,6 +206,7 @@ const snSepoliaConfig: DojoChainConfig = {
   chain: { ...sepolia },
   chainId: ChainId.SN_SEPOLIA,
   name: 'Sepolia Testnet',
+  // rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia/v0_6',
   rpcUrl: 'https://api.cartridge.gg/rpc/starknet-sepolia',
   toriiUrl: 'https://api.cartridge.gg/x/pistols-sepolia/torii',
   relayUrl: undefined,

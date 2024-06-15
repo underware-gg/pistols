@@ -35,7 +35,7 @@ export const weiToEthString = (v: BigNumberish, decimals: number = 0, trailingZe
   return result
 }
 
-export const dummyAccount = (rpc?: RpcProvider): Account => (new Account(rpc ?? {}, '0x0', '0x0'))
+export const dummyAccount = (provider?: RpcProvider): Account => (new Account(provider ?? {}, '0x0', '0x0'))
 
 export const Uint256ToBigint = (v: Uint256): bigint => ((BigInt(v.high) << 128n) + BigInt(v.low))
 export const bigintToUint256 = (v: BigNumberish): Uint256 => ({

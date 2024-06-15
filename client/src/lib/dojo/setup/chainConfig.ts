@@ -50,7 +50,7 @@ export const getDojoChainConfig = (chainId: ChainId): DojoChainConfig => {
   // use Cartridge RPCs
   if (result.rpcUrl) {
     result.chain.rpcUrls.default.http = [result.rpcUrl]
-    // result.chain.rpcUrls.public.http = [result.rpcUrl]
+    result.chain.rpcUrls.public.http = [result.rpcUrl]
   }
   // console.log(result)
 
