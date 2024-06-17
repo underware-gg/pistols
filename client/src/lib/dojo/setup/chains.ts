@@ -122,7 +122,8 @@ const pistolsSlotConfig: DojoChainConfig = {
   chain: undefined, // derive from this
   chainId: ChainId.PISTOLS_SLOT,
   name: 'Slot Testnet',
-  rpcUrl: 'https://api.cartridge.gg/x/pistols/katana',
+  // rpcUrl: 'https://api.cartridge.gg/x/pistols/katana',
+  rpcUrl: 'https://us-east.api.cartridge.gg/x/pistols/katana',
   toriiUrl: 'https://api.cartridge.gg/x/pistols/torii',
   relayUrl: undefined,
   masterAddress: '0x199df3260858b341a7985245c94361a320569635d0c405b1827ffa4d7ded985',
