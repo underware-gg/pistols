@@ -6,6 +6,7 @@ import { ChainId, getDojoChainConfig, isChainIdSupported } from '@/lib/dojo/setu
 import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { feltToString } from '@/lib/utils/starknet'
 import { BigNumberish } from 'starknet'
+import { useAddStarknetChain, useSwitchStarknetChain } from './useWalletRequest'
 
 
 export const useChainConfig = (chain_id: ChainId | BigNumberish) => {
@@ -65,19 +66,15 @@ interface AddStarknetChainParametersImpl extends AddStarknetChainParameters {
 export const useChainSwitchCallbacks = () => {
   const { selectedChainId, selectedChainConfig } = useSelectedChain()
 
-  // Call to switch network to current connected wallet
-  // https://github.com/starknet-io/starknet.js/blob/develop/src/wallet/connect.ts
-  const switch_network = useCallback(() => {
+  const switch_params = useMemo(() => {
     const params: SwitchStarknetChainParameter = {
       chainId: selectedChainId,
     }
-    console.log(`wallet_switchStarknetChain...`, params)
-    return window?.starknet?.request({ type: 'wallet_switchStarknetChain', params }) ?? Promise.resolve(false)
+    return params
   }, [selectedChainId])
+  const { switch_starknet_chain } = useSwitchStarknetChain(switch_params)
 
-  // Call to add network to current connected wallet
-  // https://github.com/starknet-io/starknet.js/blob/develop/src/wallet/connect.ts
-  const add_network = useCallback(() => {
+  const add_params = useMemo(() => {
     const params: AddStarknetChainParametersImpl = {
       id: selectedChainId,
       chainId: selectedChainId,
@@ -92,13 +89,13 @@ export const useChainSwitchCallbacks = () => {
       // blockExplorerUrls?: string[],
       // iconUrls?: string[],
     }
-    console.log(`wallet_addStarknetChain...`, params)
-    return window?.starknet?.request({ type: 'wallet_addStarknetChain', params }) ?? Promise.resolve(false)
+    return params
   }, [selectedChainId, selectedChainConfig])
+  const { add_starknet_chain } = useAddStarknetChain(add_params)
 
   return {
-    switch_network,
-    add_network,
+    switch_starknet_chain,
+    add_starknet_chain,
   }
 }
 
