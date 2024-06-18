@@ -280,7 +280,7 @@
             "type": "pistols::models::models::Duelist"
           }
         ],
-        "state_mutability": "view"
+        "state_mutability": "external"
       },
       {
         "type": "function",
@@ -312,7 +312,7 @@
             "type": "core::integer::u128"
           }
         ],
-        "state_mutability": "view"
+        "state_mutability": "external"
       },
       {
         "type": "function",
@@ -332,7 +332,7 @@
             "type": "pistols::types::challenge::ChallengeState"
           }
         ],
-        "state_mutability": "view"
+        "state_mutability": "external"
       },
       {
         "type": "function",
@@ -352,7 +352,7 @@
           }
         ],
         "outputs": [],
-        "state_mutability": "view"
+        "state_mutability": "external"
       },
       {
         "type": "function",
@@ -380,7 +380,7 @@
           }
         ],
         "outputs": [],
-        "state_mutability": "view"
+        "state_mutability": "external"
       },
       {
         "type": "function",

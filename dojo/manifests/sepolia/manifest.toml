@@ -1,9 +1,9 @@
 [world]
 kind = "WorldContract"
-class_hash = "0xf6f44afb3cacbcc01a371aff62c86ca9a45feba065424c99f7cd8637514d8f"
-original_class_hash = "0xf6f44afb3cacbcc01a371aff62c86ca9a45feba065424c99f7cd8637514d8f"
+class_hash = "0x3f63cecdc4964acafb921ba2934c6507d1b3c344edb64c2762cf08053169ab9"
+original_class_hash = "0x3f63cecdc4964acafb921ba2934c6507d1b3c344edb64c2762cf08053169ab9"
 abi = "manifests/sepolia/abis/deployments/dojo_world_world.json"
-address = "0x509c209fc7c9ad157b463a1b48d92a399239bce020392ab2a920e7f2af31bb5"
+address = "0x545c8aff15426c3d43b3ba8fd45c61870b30ca4ec0bfbd69193facee4c7b97c"
 transaction_hash = "0x15594ca30346cac3b38d2187f2697b3a4e8e76342d1265506d720eee791a8cb"
 seed = "pistols"
 name = "dojo::world::world"
@@ -20,22 +20,9 @@ name = "dojo::base::base"
 
 [[contracts]]
 kind = "DojoContract"
-address = "0xde77c78f35b39f081eca10228d65e4e5cbc827ed6f1db30539e90e7420900c"
-class_hash = "0x6e080db0d09addf181b02489323d3145e03397169492b3ac3e0856e19c46929"
-original_class_hash = "0x6e080db0d09addf181b02489323d3145e03397169492b3ac3e0856e19c46929"
-base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
-abi = "manifests/sepolia/abis/deployments/contracts/pistols_mocks_lords_mock_lords_mock.json"
-reads = []
-writes = []
-computed = []
-init_calldata = []
-name = "pistols::mocks::lords_mock::lords_mock"
-
-[[contracts]]
-kind = "DojoContract"
-address = "0x34bbde433b8d8cb45ce22d801f4d65a5dcb77b0ef8396d0b5cdc20fc71a1c73"
-class_hash = "0x772ad70374b44897b93fbfb8540faec41aae1e7aceb335618c5e9a6a8db07ba"
-original_class_hash = "0x772ad70374b44897b93fbfb8540faec41aae1e7aceb335618c5e9a6a8db07ba"
+address = "0x30663cb812dc7e2930b9683945132ca6054483af40e1e7daccb77091e02e7b1"
+class_hash = "0x6a5d4e1f6476f18b7f5862d36b71cd3289761fe81405a54f5f96b679a45b3a7"
+original_class_hash = "0x6a5d4e1f6476f18b7f5862d36b71cd3289761fe81405a54f5f96b679a45b3a7"
 base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
 abi = "manifests/sepolia/abis/deployments/contracts/pistols_systems_actions_actions.json"
 reads = []
@@ -46,9 +33,9 @@ name = "pistols::systems::actions::actions"
 
 [[contracts]]
 kind = "DojoContract"
-address = "0x225f690595a067273bdf36583ea9dd91ae2f2fbc78ee2f7480dfcf6b75ba01a"
-class_hash = "0x2a79c09b10d04b4cda61e82f4f5d14bd49ea81b360455aee46cf3d6d9e8681e"
-original_class_hash = "0x2a79c09b10d04b4cda61e82f4f5d14bd49ea81b360455aee46cf3d6d9e8681e"
+address = "0x725717f8ac5508bb1b6dfbf53949f20b7f38f59c7310feab688cb5f18ef0635"
+class_hash = "0x6103e99c5ede4c34affd0379761dd4c5beb690d2c51a774ac2b9fa93d0fb079"
+original_class_hash = "0x6103e99c5ede4c34affd0379761dd4c5beb690d2c51a774ac2b9fa93d0fb079"
 base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
 abi = "manifests/sepolia/abis/deployments/contracts/pistols_systems_admin_admin.json"
 reads = []
@@ -305,8 +292,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x2d7f48d08a0977e048af24f84c5236b1326b641520ed5a62fe5d4b7e50ae115"
-original_class_hash = "0x2d7f48d08a0977e048af24f84c5236b1326b641520ed5a62fe5d4b7e50ae115"
+class_hash = "0x5cb47bd5e0b2259a07e3713b5b2bfe7247bbeed56505be171ef1c6c7ca54f5"
+original_class_hash = "0x5cb47bd5e0b2259a07e3713b5b2bfe7247bbeed56505be171ef1c6c7ca54f5"
 abi = "manifests/sepolia/abis/deployments/models/pistols_models_table_t_table.json"
 name = "pistols::models::table::t_table"
 
@@ -343,6 +330,11 @@ key = false
 [[models.members]]
 name = "is_open"
 type = "bool"
+key = false
+
+[[models.members]]
+name = "table_type"
+type = "u8"
 key = false
 
 [[models]]
@@ -413,8 +405,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x648f87547cad4c7ff85ab3c422f77850b4a6f0b0f1494011440449a52aa8053"
-original_class_hash = "0x648f87547cad4c7ff85ab3c422f77850b4a6f0b0f1494011440449a52aa8053"
+class_hash = "0x1f925352eb45c770d7f13d2750ed4f8e58e3fd43000d33ceb845247a5bd7538"
+original_class_hash = "0x1f925352eb45c770d7f13d2750ed4f8e58e3fd43000d33ceb845247a5bd7538"
 abi = "manifests/sepolia/abis/deployments/models/token_components_token_erc20_erc20_metadata_erc_20_metadata_model.json"
 name = "token::components::token::erc20::erc20_metadata::erc_20_metadata_model"
 
@@ -425,12 +417,12 @@ key = true
 
 [[models.members]]
 name = "name"
-type = "felt252"
+type = "ByteArray"
 key = false
 
 [[models.members]]
 name = "symbol"
-type = "felt252"
+type = "ByteArray"
 key = false
 
 [[models.members]]

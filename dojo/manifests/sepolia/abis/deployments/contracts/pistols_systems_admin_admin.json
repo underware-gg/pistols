@@ -143,6 +143,10 @@
       {
         "name": "is_open",
         "type": "core::bool"
+      },
+      {
+        "name": "table_type",
+        "type": "core::integer::u8"
       }
     ]
   },
@@ -168,7 +172,7 @@
           }
         ],
         "outputs": [],
-        "state_mutability": "view"
+        "state_mutability": "external"
       },
       {
         "type": "function",
@@ -191,7 +195,7 @@
           }
         ],
         "outputs": [],
-        "state_mutability": "view"
+        "state_mutability": "external"
       },
       {
         "type": "function",
@@ -203,7 +207,7 @@
           }
         ],
         "outputs": [],
-        "state_mutability": "view"
+        "state_mutability": "external"
       },
       {
         "type": "function",
@@ -215,7 +219,7 @@
           }
         ],
         "outputs": [],
-        "state_mutability": "view"
+        "state_mutability": "external"
       },
       {
         "type": "function",
@@ -247,7 +251,7 @@
           }
         ],
         "outputs": [],
-        "state_mutability": "view"
+        "state_mutability": "external"
       },
       {
         "type": "function",
@@ -263,7 +267,7 @@
           }
         ],
         "outputs": [],
-        "state_mutability": "view"
+        "state_mutability": "external"
       },
       {
         "type": "function",
