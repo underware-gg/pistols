@@ -1,6 +1,6 @@
 
-import { useEffect, useMemo } from 'react'
-import { Connector } from '@starknet-react/core'
+import { useEffect, useMemo, useState } from 'react'
+import { Connector, useAccount, useConnect } from '@starknet-react/core'
 import { Manifest } from '@dojoengine/core'
 import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
 import CartridgeConnector from '@cartridge/connector'
@@ -47,6 +47,22 @@ export const useController = (manifest: Manifest, contractNames?: string[]) => {
 
   return {
     controller,
+  }
+}
+
+
+export const useControllerUsername = () => {
+  const { address, connector } = useAccount()
+  const [username, setUsername] = useState<string>(undefined)
+  const controllerConnector = useMemo(() => (connector as unknown as CartridgeConnector), [connector])
+  useEffect(() => {
+    setUsername(undefined)
+    if (address && controllerConnector?.username) {
+      controllerConnector.username().then((n) => setUsername(n))
+    }
+  }, [address, connector])
+  return {
+    username,
   }
 }
 

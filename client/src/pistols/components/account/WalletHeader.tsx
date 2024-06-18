@@ -8,6 +8,7 @@ import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { MusicToggle } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
+import { useControllerUsername } from '@/lib/dojo/hooks/useController'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -27,6 +28,8 @@ export default function WalletHeader({
   const name = useMemo(() => (data?.name ?? `Connected to ${connectedChainName}`), [data])
   const imageUrl = useMemo(() => (data?.profilePicture ?? connector?.icon?.dark ?? '/profiles/00_sq.jpg'), [data, connector])
 
+  const { username } = useControllerUsername()
+
   return (
     <Grid>
       <Row>
@@ -35,7 +38,7 @@ export default function WalletHeader({
         </Col>
         <Col width={9} textAlign='left' className='TitleCase Padded'>
           <h4>{name}</h4>
-          <AddressShort address={address ?? 0n} />
+          {username && <span className='H4 Bold'>{username} / </span>} <AddressShort address={address ?? 0n} />
           {isConnected && contractAddress &&
             <h5>
               LORDS: <LordsBalance address={address} big={false} />
