@@ -11,7 +11,7 @@ mod tests {
     use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::models::models::{Duelist, Challenge, Wager, Round};
-    use pistols::models::table::{Table, TableTrait, TableManagerTrait, tables};
+    use pistols::models::table::{tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::types::constants::{constants};
