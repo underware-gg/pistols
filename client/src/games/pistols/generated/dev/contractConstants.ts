@@ -11,6 +11,18 @@ export const tables: mod_tables_Type = {
   COMMONERS: 'Commoners',
 };
 
+// from: ../dojo/src/models/table.cairo
+type mod_table_types_Type = {
+  CLASSIC: number, // cairo: u8
+  DEMO: number, // cairo: u8
+  TOURNAMENT: number, // cairo: u8
+};
+export const table_types: mod_table_types_Type = {
+  CLASSIC: 1,
+  DEMO: 2,
+  TOURNAMENT: 3,
+};
+
 // from: ../dojo/src/types/action.cairo
 type mod_ACTION_Type = {
   PACES_MASK: number, // cairo: u8

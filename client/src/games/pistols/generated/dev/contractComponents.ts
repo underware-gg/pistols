@@ -113,11 +113,11 @@ export function defineContractComponents(world: World) {
     TTable: (() => {
       return defineComponent(
         world,
-        { table_id: RecsType.BigInt, description: RecsType.BigInt, contract_address: RecsType.BigInt, wager_min: RecsType.BigInt, fee_min: RecsType.BigInt, fee_pct: RecsType.Number, is_open: RecsType.Boolean },
+        { table_id: RecsType.BigInt, description: RecsType.BigInt, contract_address: RecsType.BigInt, wager_min: RecsType.BigInt, fee_min: RecsType.BigInt, fee_pct: RecsType.Number, is_open: RecsType.Boolean, table_type: RecsType.Number },
         {
           metadata: {
             name: "TTable",
-            types: ["felt252","felt252","contractaddress","u256","u256","u8","bool"],
+            types: ["felt252","felt252","contractaddress","u256","u256","u8","bool","u8"],
             customTypes: [],
           },
         }
@@ -165,11 +165,11 @@ export function defineContractComponents(world: World) {
     ERC20MetadataModel: (() => {
       return defineComponent(
         world,
-        { token: RecsType.BigInt, name: RecsType.BigInt, symbol: RecsType.BigInt, decimals: RecsType.Number, total_supply: RecsType.BigInt },
+        { token: RecsType.BigInt, name: undefined, symbol: undefined, decimals: RecsType.Number, total_supply: RecsType.BigInt },
         {
           metadata: {
             name: "ERC20MetadataModel",
-            types: ["contractaddress","felt252","felt252","u8","u256"],
+            types: ["contractaddress","u8","u256"],
             customTypes: [],
           },
         }

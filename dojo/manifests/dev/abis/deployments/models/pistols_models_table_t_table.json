@@ -381,6 +381,10 @@
       {
         "name": "is_open",
         "type": "core::bool"
+      },
+      {
+        "name": "table_type",
+        "type": "core::integer::u8"
       }
     ]
   },
