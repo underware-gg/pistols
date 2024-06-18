@@ -138,7 +138,7 @@ Install the [Cairo 1.0](https://marketplace.visualstudio.com/items?itemName=star
 
 Currenty using Dojo version `v0.7.1`
 
-```console
+```sh
 curl -L https://install.dojoengine.org | bash
 # open new terminal to update PATH
 dojoup -v v0.7.1
@@ -158,7 +158,7 @@ pnpm install
 
 #### Terminal 1: Katana (local node)
 
-```console
+```sh
 cd dojo
 katana --disable-fee --chain-id KATANA_LOCAL --invoke-max-steps 10000000 --allowed-origins "*" --accounts 10
 
@@ -171,7 +171,7 @@ cd dojo
 
 Uncomment the `world_address` parameter in `dojo/Scarb.toml` then:
 
-```console
+```sh
 cd dojo
 torii --allowed-origins "*" --index-pending --world 0x0545c8aff15426c3d43b3ba8fd45c61870b30ca4ec0bfbd69193facee4c7b97c
 
@@ -182,7 +182,9 @@ cd dojo
 
 #### Terminal 3: Sozo commands / migration
 
-```console
+Migrating to localhost:
+
+```sh
 # build world and systems
 cd dojo
 sozo clean
@@ -190,6 +192,32 @@ sozo build
 
 # migrate to local Katana
 ./migrate
+
+# migrate other profiles
+./migrate <PROFILE_NAME>
+# example:
+./migrate slot
+```
+
+For Starknet chains, create env files for `SN_SEPOLIA` (`.env.sepolia`) and/or `SN_MAINNET` (`.env.mainnet`)
+
+```sh
+export STARKNET_RPC_URL=https://sepolia.your-favorite-rpc-provider.com/xxx/
+export DOJO_ACCOUNT_ADDRESS=0x1234
+export DOJO_PRIVATE_KEY=0x1234
+```
+
+then migrate...
+
+```sh
+# enable env
+source .env.sepolia
+
+# migrate to local Katana
+./migrate sepolia
+
+# clear env if you want to work on another profile
+source .env.clear
 ```
 
 
@@ -197,14 +225,14 @@ sozo build
 
 Install dependencies
 
-```console
+```sh
 cd client
 pnpm i
 ```
 
 Start the client
 
-```console
+```sh
 # http server
 # http://localhost:3000
 pnpm run dev
