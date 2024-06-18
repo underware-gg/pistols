@@ -6,7 +6,7 @@ mod tests {
 
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
-    use token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
+    use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
     use pistols::systems::actions::{IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::systems::admin::{IAdminDispatcher, IAdminDispatcherTrait};
     use pistols::systems::utils::{zero_address};

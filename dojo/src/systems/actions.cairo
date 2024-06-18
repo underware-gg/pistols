@@ -9,6 +9,7 @@ trait IActions {
     //
     // Duelists
     fn register_duelist(
+        ref world: IWorldDispatcher,
         name: felt252,
         profile_pic: u8,
     ) -> Duelist;
@@ -16,6 +17,7 @@ trait IActions {
     //
     // Challenge
     fn create_challenge(
+        ref world: IWorldDispatcher,
         challenged: ContractAddress,
         message: felt252,
         table_id: felt252,
@@ -23,6 +25,7 @@ trait IActions {
         expire_seconds: u64,
     ) -> u128;
     fn reply_challenge(
+        ref world: IWorldDispatcher,
         duel_id: u128,
         accepted: bool,
     ) -> ChallengeState;
@@ -30,11 +33,13 @@ trait IActions {
     //
     // Duel
     fn commit_action(
+        ref world: IWorldDispatcher,
         duel_id: u128,
         round_number: u8,
         hash: u64,
     );
     fn reveal_action(
+        ref world: IWorldDispatcher,
         duel_id: u128,
         round_number: u8,
         salt: u64,
@@ -44,12 +49,12 @@ trait IActions {
 
     //
     // read-only calls
-    fn get_pact(duelist_a: ContractAddress, duelist_b: ContractAddress) -> u128;
+    fn get_pact(world: @IWorldDispatcher, duelist_a: ContractAddress, duelist_b: ContractAddress) -> u128;
     fn has_pact(duelist_a: ContractAddress, duelist_b: ContractAddress) -> bool;
 
-    fn calc_fee(table_id: felt252, wager_value: u256) -> u256;
+    fn calc_fee(world: @IWorldDispatcher, table_id: felt252, wager_value: u256) -> u256;
     
-    fn simulate_chances(duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> SimulateChances;
+    fn simulate_chances(world: @IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> SimulateChances;
 
     fn get_valid_packed_actions(round_number: u8) -> Array<u16>;
     fn pack_action_slots(slot1: u8, slot2: u8) -> u16;
@@ -59,15 +64,15 @@ trait IActions {
 // private/internal functions
 #[dojo::interface]
 trait IActionsInternal {
-    fn _emitDuelistRegisteredEvent(duelist: Duelist, is_new: bool);
-    fn _emitNewChallengeEvent(challenge: Challenge);
-    fn _emitChallengeAcceptedEvent(challenge: Challenge, accepted: bool);
-    fn _emitPostRevealEvents(challenge: Challenge);
-    fn _emitChallengeResolvedEvent(challenge: Challenge);
-    fn _emitDuelistTurnEvent(challenge: Challenge);
+    fn _emitDuelistRegisteredEvent(ref world: IWorldDispatcher, duelist: Duelist, is_new: bool);
+    fn _emitNewChallengeEvent(ref world: IWorldDispatcher, challenge: Challenge);
+    fn _emitChallengeAcceptedEvent(ref world: IWorldDispatcher, challenge: Challenge, accepted: bool);
+    fn _emitPostRevealEvents(ref world: IWorldDispatcher, challenge: Challenge);
+    fn _emitChallengeResolvedEvent(ref world: IWorldDispatcher, challenge: Challenge);
+    fn _emitDuelistTurnEvent(ref world: IWorldDispatcher, challenge: Challenge);
 }
 
-#[dojo::contract]
+#[dojo::contract(allow_ref_self)]
 mod actions {
     use debug::PrintTrait;
     use traits::{Into, TryInto};
@@ -94,7 +99,7 @@ mod actions {
         //------------------------
         // Duelists
         //
-        fn register_duelist(world: IWorldDispatcher,
+        fn register_duelist(ref world: IWorldDispatcher,
             name: felt252,
             profile_pic: u8,
         ) -> Duelist {
@@ -122,7 +127,7 @@ mod actions {
         //------------------------
         // NEW Challenge
         //
-        fn create_challenge(world: IWorldDispatcher,
+        fn create_challenge(ref world: IWorldDispatcher,
             challenged: ContractAddress,
             message: felt252,
             table_id: felt252,
@@ -196,7 +201,7 @@ mod actions {
         //------------------------
         // REPLY Challenge
         //
-        fn reply_challenge(world: IWorldDispatcher,
+        fn reply_challenge(ref world: IWorldDispatcher,
             duel_id: u128,
             accepted: bool,
         ) -> ChallengeState {
@@ -253,7 +258,7 @@ mod actions {
         // COMMIT Duel action
         //
 
-        fn commit_action(world: IWorldDispatcher,
+        fn commit_action(ref world: IWorldDispatcher,
             duel_id: u128,
             round_number: u8,
             hash: u64,
@@ -261,7 +266,7 @@ mod actions {
             shooter::commit_action(world, duel_id, round_number, hash);
         }
 
-        fn reveal_action(world: IWorldDispatcher,
+        fn reveal_action(ref world: IWorldDispatcher,
             duel_id: u128,
             round_number: u8,
             salt: u64,
@@ -279,7 +284,7 @@ mod actions {
         // read-only calls
         //
 
-        fn get_pact(world: IWorldDispatcher, duelist_a: ContractAddress, duelist_b: ContractAddress) -> u128 {
+        fn get_pact(world: @IWorldDispatcher, duelist_a: ContractAddress, duelist_b: ContractAddress) -> u128 {
             let pair: u128 = utils::make_pact_pair(duelist_a, duelist_b);
             (get!(world, pair, Pact).duel_id)
         }
@@ -288,13 +293,13 @@ mod actions {
             (self.get_pact(duelist_a, duelist_b) != 0)
         }
 
-        fn calc_fee(world: IWorldDispatcher, table_id: felt252, wager_value: u256) -> u256 {
+        fn calc_fee(world: @IWorldDispatcher, table_id: felt252, wager_value: u256) -> u256 {
             let table_manager = TableManagerTrait::new(world);
             let table: TTable = table_manager.get(table_id);
             (table.calc_fee(wager_value))
         }
 
-        fn simulate_chances(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> SimulateChances {
+        fn simulate_chances(world: @IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> SimulateChances {
             let (score_self, score_other): (Score, Score) = utils::get_snapshot_scores(world, duelist_address, duel_id);
             let health: u8 = utils::get_duelist_health(world, duelist_address, duel_id, round_number);
             let action_self: Action = action.into();
@@ -368,7 +373,7 @@ mod actions {
 
     // #[abi(embed_v0)] // commented to make this private
     impl ActionsInternalImpl of super::IActionsInternal<ContractState> {
-        fn _emitDuelistRegisteredEvent(world: IWorldDispatcher, duelist: Duelist, is_new: bool) {
+        fn _emitDuelistRegisteredEvent(ref world: IWorldDispatcher, duelist: Duelist, is_new: bool) {
             emit!(world, (Event::DuelistRegisteredEvent(events::DuelistRegisteredEvent {
                 address: duelist.address,
                 name: duelist.name,
@@ -376,14 +381,14 @@ mod actions {
                 is_new,
             })));
         }
-        fn _emitNewChallengeEvent(world: IWorldDispatcher, challenge: Challenge) {
+        fn _emitNewChallengeEvent(ref world: IWorldDispatcher, challenge: Challenge) {
             emit!(world, (Event::NewChallengeEvent (events::NewChallengeEvent {
                 duel_id: challenge.duel_id,
                 duelist_a: challenge.duelist_a,
                 duelist_b: challenge.duelist_b,
             })));
         }
-        fn _emitChallengeAcceptedEvent(world: IWorldDispatcher, challenge: Challenge, accepted: bool) {
+        fn _emitChallengeAcceptedEvent(ref world: IWorldDispatcher, challenge: Challenge, accepted: bool) {
             emit!(world, (Event::ChallengeAcceptedEvent (events::ChallengeAcceptedEvent {
                 duel_id: challenge.duel_id,
                 duelist_a: challenge.duelist_a,
@@ -391,7 +396,7 @@ mod actions {
                 accepted,
             })));
         }
-        fn _emitPostRevealEvents(challenge: Challenge) {
+        fn _emitPostRevealEvents(ref world: IWorldDispatcher, challenge: Challenge) {
             let state: ChallengeState = challenge.state.try_into().unwrap();
             if (state == ChallengeState::InProgress) {
                 self._emitDuelistTurnEvent(challenge);
@@ -399,7 +404,7 @@ mod actions {
                 self._emitChallengeResolvedEvent(challenge);
             }
         }
-        fn _emitDuelistTurnEvent(world: IWorldDispatcher, challenge: Challenge) {
+        fn _emitDuelistTurnEvent(ref world: IWorldDispatcher, challenge: Challenge) {
             let address: ContractAddress = if (starknet::get_caller_address() == challenge.duelist_a)
                 { (challenge.duelist_b) } else { (challenge.duelist_a) };
             emit!(world, (Event::DuelistTurnEvent(events::DuelistTurnEvent {
@@ -408,7 +413,7 @@ mod actions {
                 address,
             })));
         }
-        fn _emitChallengeResolvedEvent(world: IWorldDispatcher, challenge: Challenge) {
+        fn _emitChallengeResolvedEvent(ref world: IWorldDispatcher, challenge: Challenge) {
             let winner_address: ContractAddress = 
                 if (challenge.winner == 1) { (challenge.duelist_a) }
                 else if (challenge.winner == 2) { (challenge.duelist_b) }

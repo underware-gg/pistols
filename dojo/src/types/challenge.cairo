@@ -159,7 +159,7 @@ mod tests {
     use debug::PrintTrait;
     use core::traits::Into;
 
-    use token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
+    use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     use pistols::models::models::{Challenge};
