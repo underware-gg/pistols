@@ -39,7 +39,7 @@ export function Balance({
   children?: ReactNode
 }) {
   const _value = useMemo<string>(() => {
-    const decimals = (ether ? 5 : 0)
+    const decimals = (ether ? 6 : 0)
     return (
       wei != null ? weiToEthString(wei, decimals)
         : value != null ? weiToEthString(value, decimals)

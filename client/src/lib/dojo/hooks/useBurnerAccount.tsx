@@ -4,8 +4,10 @@ import { useBlockNumber, useContract } from '@starknet-react/core'
 import { useDojo, useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useLordsBalance } from '@/lib/dojo/hooks/useLords'
 import { bigintEquals, bigintToHex } from '@/lib/utils/types'
-import { BigNumberish, RpcProvider, hash } from 'starknet'
+import { BigNumberish, CallData, DeployAccountContractPayload, RpcProvider, ec, hash, stark } from 'starknet'
 import { katana_account_abi } from '@/lib/abi'
+import { KATANA_CLASS_HASH } from '@dojoengine/core'
+import { ETH_TO_WEI } from '@/lib/utils/starknet'
 
 export const useBurner = (address: BigNumberish) => {
   const { list } = useDojoAccount()
@@ -104,7 +106,7 @@ export const useBurnerDeployment = (address: BigNumberish, createOptions?: Burne
       _check()
     }
     return () => { _mounted = false }
-  }, [address, blockNumber])
+  }, [address, blockNumber, isDeploying])
 
   //
   // Deploy!
@@ -113,7 +115,10 @@ export const useBurnerDeployment = (address: BigNumberish, createOptions?: Burne
     const _deploy = async () => {
       setDeployError(null)
       try {
-        await create(createOptions)
+        await create({
+          ...createOptions,
+          // prefundedAmount: bigintToHex(ETH_TO_WEI / 1_000_000n),
+        })
       } catch (e) {
         setDeployError(e.toString())
       }
@@ -123,10 +128,33 @@ export const useBurnerDeployment = (address: BigNumberish, createOptions?: Burne
     }
   }, [address, createOptions, isVerifying])
 
+
+  const { masterAccount } = useDojoAccount()
+  const _estimate_dummy = async () => {
+    const privateKey = stark.randomAddress();
+    const publicKey = ec.starkCurve.getStarkKey(privateKey);
+    const payload: DeployAccountContractPayload = {
+      classHash: KATANA_CLASS_HASH,
+      constructorCalldata: CallData.compile({ publicKey }),
+      addressSalt: publicKey,
+    };
+    try {
+      console.log(`PREFUND....`)
+      // const { suggestedMaxFee } =
+      const estimatedFee = await masterAccount.estimateAccountDeployFee(payload, { version: "0x3  ", skipValidate:false });
+      console.log(`PREFUND_1::`, estimatedFee)
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+
   return {
     address,
     isDeployed,
     isVerifying,
+    // deployOrRestore: _estimate_dummy,
     deployOrRestore,
     isDeploying,
     isRestoring: (isDeployed && isDeploying),

@@ -79,7 +79,7 @@ export function OnboardingDeploy({
       setGeneratedAddress(null)
     }
   }, [hasSigned, createOptions])
-
+  
   //
   // Local burner
   const { isImported, address } = useBurnerAccount(accountIndex)
@@ -135,7 +135,7 @@ export function OnboardingDeploy({
                   : isVerifying ? <>Verifying...</>
                     : isRestoring ? <>Restoring...</>
                       : isDeploying ? <>Deploying...</>
-                        : <ActionButton fill large disabled={currentPhase != DeployPhase.Deploy} onClick={() => deployOrRestore()} label={isDeployed ? 'Restore' : 'Deploy'} />
+                        : <ActionButton fill large disabled={currentPhase != DeployPhase.Deploy} onClick={() => deployOrRestore()} label={isDeployed ? 'Restore' : 'Prefund + Deploy'} />
               }
             />
 

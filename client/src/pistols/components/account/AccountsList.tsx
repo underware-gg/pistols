@@ -8,7 +8,7 @@ import { useBurner, useBurnerAccount, useBurners } from '@/lib/dojo/hooks/useBur
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
 import { ProfileName } from '@/pistols/components/account/ProfileDescription'
-import { LordsBalance } from '@/pistols/components/account/LordsBalance'
+import { EtherBalance, LordsBalance } from '@/pistols/components/account/LordsBalance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { bigintToHex } from '@/lib/utils/types'
@@ -100,7 +100,11 @@ function AccountItem({
         <Col width={8} textAlign='left'>
           <h3>{name ? <ProfileName address={address} /> : accountName}</h3>
           <AddressShort address={address} />
-          <h5><LordsBalance address={address} /></h5>
+          <h5>
+            <LordsBalance address={address} />
+            &nbsp;/&nbsp;
+            <EtherBalance address={address} />
+          </h5>
         </Col>
         <Col width={5} textAlign='left'>
           <ActionButton fill onClick={() => _manage()} label='Manage' />
