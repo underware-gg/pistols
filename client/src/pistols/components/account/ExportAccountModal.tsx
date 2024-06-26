@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import { Grid, Modal, Image, Icon } from 'semantic-ui-react'
 import { DojoPredeployedStarknetWindowObject } from '@rsodre/create-burner'
-import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
+import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { useClipboard } from '@/lib/utils/hooks/useClipboard'
 import { usePlayerId } from '@/lib/dojo/hooks/usePlayerId'
 import { useAccount } from '@starknet-react/core'
@@ -34,11 +34,9 @@ export default function ExportAccountModal({
   const isExported = useMemo(() => (canImport && bigintEquals(clipboard, playerId)), [canImport, playerId, clipboard])
 
   // always closed on mount
-  const [mounted, setMounted] = useState(false)
-  useEffectOnce(() => {
-    setMounted(true)
+  const mounted = useMounted(() => {
     opener.close()
-  }, [])
+  })
 
   const _export = () => {
     if (canExport) {

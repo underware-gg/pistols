@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Modal, Button, Image } from 'semantic-ui-react'
 import { useConnect, Connector, useAccount } from '@starknet-react/core'
 import { useChainSwitchCallbacks, useSelectedChain } from '@/lib/dojo/hooks/useChain'
-import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
+import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { Opener } from '@/lib/ui/useOpener'
 import { VStack } from '@/lib/ui/Stack'
 import { Divider } from '@/lib/ui/Divider'
@@ -17,11 +17,9 @@ export default function StarknetConnectModal({
   const { isConnected, isCorrectChain } = useSelectedChain()
 
   // always closed on mount
-  const [mounted, setMounted] = useState(false)
-  useEffectOnce(() => {
-    setMounted(true)
+  const mounted = useMounted(() => {
     opener.close()
-  }, [])
+  })
 
   useEffect(() => {
     if (isCorrectChain) {

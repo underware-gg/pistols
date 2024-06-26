@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/router'
 import { Grid, Modal, Dropdown } from 'semantic-ui-react'
-import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
+import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 import { useActiveDuelists, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
 import { useRouterTable } from '@/pistols/hooks/useRouterListener'
@@ -27,11 +27,9 @@ export default function TableModal({
   const { tableIsOpen } = useTable(selectedTableId)
 
   // always closed on mount
-  const [mounted, setMounted] = useState(false)
-  useEffectOnce(() => {
-    setMounted(true)
+  const mounted = useMounted(() => {
     opener.close()
-  }, [])
+  })
 
   // initialize
   useEffect(() => {
