@@ -88,27 +88,27 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
 
   //
   // fetch all existing entities from torii
-  const { value: syncStatus } = useAsyncMemo<boolean>(async () => {
+  const { value: subscription } = useAsyncMemo<torii.Subscription>(async () => {
     if (!toriiClient) return (toriiClient as any) // undefined or null
     if (!network) return (network as any) // undefined or null
-    await getSyncEntities(
+    const subscription = await getSyncEntities(
       toriiClient,
       network.contractComponents as any,
       [],
     )
     console.log(`SYNC FINISHED!!!`)
-    return true
+    return subscription
   }, [toriiClient, network], undefined, null)
 
   //
   // Establish system calls using the network and components.
   const systemCalls = useMemo<ReturnType<typeof createSystemCalls>>(() => {
     if (!manifest) return null
-    if (!syncStatus) return (syncStatus as any) // undefined or null
+    if (!subscription) return (subscription as any) // undefined or null
     if (!network) return (network as any) // undefined or null
     if (!components) return (components as any) // undefined or null
     return createSystemCalls(network, components, manifest) ?? null
-  }, [manifest, syncStatus, network, components])
+  }, [manifest, subscription, network, components])
 
   //
   // TODO: Move this to DojoContext!
@@ -163,7 +163,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     (dojoProvider !== undefined) &&
     (network !== undefined) &&
     (components !== undefined) &&
-    (syncStatus !== undefined) &&
+    (subscription !== undefined) &&
     (systemCalls !== undefined) &&
     (burnerManager !== undefined) &&
     (predeployedManager !== undefined)
@@ -174,7 +174,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     !manifest ? 'Game not Deployed'
       : dojoProviderIsError ? 'Chain Provider is Unavailable'
         : toriiIsError ? 'Game Indexer is Unavailable'
-          : syncStatus === null ? 'Sync Error'
+          : subscription === null ? 'Sync Error'
             : isDeployed === null ? 'World not Found'
               : burnerManagerIsError ? 'Burner Manager error'
                 : predeployedManagerIsError ? 'Predeployed Manager error'
