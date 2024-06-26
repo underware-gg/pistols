@@ -165,7 +165,7 @@ export function defineContractComponents(world: World) {
     ERC20MetadataModel: (() => {
       return defineComponent(
         world,
-        { token: RecsType.BigInt, name: undefined, symbol: undefined, decimals: RecsType.Number, total_supply: RecsType.BigInt },
+        { token: RecsType.BigInt, name: RecsType.String, symbol: RecsType.String, decimals: RecsType.Number, total_supply: RecsType.BigInt },
         {
           metadata: {
             name: "ERC20MetadataModel",

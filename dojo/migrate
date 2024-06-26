@@ -39,13 +39,13 @@ echo ""
 #-----------------
 # build
 #
-if [[ "$PROFILE" != "dev" ]]; then
+# if [[ "$PROFILE" != "dev" ]]; then
   echo "------------------------------------------------------------------------------"
   echo "Cleaning..."
   sozo -P $PROFILE clean
   echo "Building..."
   sozo -P $PROFILE build
-fi
+# fi
 
 #-----------------
 # migrate
