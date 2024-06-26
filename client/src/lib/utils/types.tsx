@@ -19,14 +19,14 @@ export const bigintAdd = (a: BigNumberish | null, b: BigNumberish | null): bigin
 export const bigintSub = (a: BigNumberish | null, b: BigNumberish | null): bigint => (BigInt(a ?? 0) - BigInt(b ?? 0))
 export const isBigint = (v: BigNumberish | null): boolean => {
   try {
-    return BigInt(v) >= 0n;
+    return (v != null && BigInt(v) >= 0n);
   } catch {
     return false;
   }
 }
 
 export const bigintToEntity = (v: BigNumberish): Entity => (getEntityIdFromKeys([BigInt(v)]) as Entity)
-export const keysToEntity = (keys: any[]): Entity => (getEntityIdFromKeys(keys) as Entity)
+export const keysToEntity = (keys: BigNumberish[]): Entity => (getEntityIdFromKeys(keys.map(v => BigInt(v ?? 0))) as Entity)
 export const entityIdToKey = (component: Component, keyName: string, entityId: Entity) => (BigInt(getComponentValue(component, entityId)[keyName]))
 
 export const shortAddress = (address: string | null) => (
@@ -44,4 +44,4 @@ export const getObjectKeyByValue = (obj: any, value: any) => Object.keys(obj).fi
 export const cleanObject = (obj: any): any => Object.keys(obj).reduce((acc, key) => {
   if (obj[key] !== undefined) acc[key] = obj[key]
   return acc
-}, {})
+}, {} as { [key: string]: any })
