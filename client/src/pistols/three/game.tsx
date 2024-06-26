@@ -450,7 +450,7 @@ function setupDuelScene() {
   return scene
 }
 
-export function resetDuelScene() {
+function resetDuelScene() {
   if (!_duelistA.model || !_duelistB.model) return // skip if players models not initialized yet
 
   emitter.emit('animated', AnimationState.None)
@@ -789,14 +789,12 @@ export function resetStaticScene() {
 export function switchScene(sceneName) {
   _sceneName = sceneName
   _currentScene = _scenes[sceneName]
-  if (sceneName == SceneName.Duel) {
-    resetDuelScene()
-  } else {
+  if (sceneName != SceneName.Duel) {
     resetStaticScene()
   }
 }
 
-export function switchPlayers(duelistNameA, duelistModelA, duelistNameB, duelistModelB) {
+export function startDuelWithPlayers(duelistNameA, duelistModelA, duelistNameB, duelistModelB) {
   localStorage.setItem(DuelistsData.DUELIST_A_MODEL, duelistModelA == "MALE" ? "MALE_A" : "FEMALE_A")
   localStorage.setItem(DuelistsData.DUELIST_B_MODEL, duelistModelB == "MALE" ? "MALE_B" : "FEMALE_B")
   _duelistA.model = localStorage.getItem(DuelistsData.DUELIST_A_MODEL)
@@ -807,7 +805,8 @@ export function switchPlayers(duelistNameA, duelistModelA, duelistNameB, duelist
   _duelistA.name = localStorage.getItem(DuelistsData.DUELIST_A_NAME)
   _duelistB.name = localStorage.getItem(DuelistsData.DUELIST_B_NAME)
   
-  switchScene(_sceneName) // reload scene
+  switchScene(SceneName.Duel) // make sure we're in the correct scene (duel page refresh)
+  resetDuelScene()
 }
 
 export function switchActor(actorId, newActorName) {

@@ -88,7 +88,7 @@ export const useDuel = (duelId: BigNumberish) => {
 // extends useDuel(), adding animations Stages
 // Use only ONCE inside <Duel>!!
 //
-export const useAnimatedDuel = (duelId: BigNumberish) => {
+export const useAnimatedDuel = (duelId: BigNumberish, enabled: boolean) => {
   const { constants } = useDojoConstants()
 
   const result = useDuel(duelId)
@@ -131,31 +131,31 @@ export const useAnimatedDuel = (duelId: BigNumberish) => {
   const isAnimatingRound2 = useMemo(() => (currentStage == DuelStage.Round2Animation), [currentStage])
   const isAnimatingRound3 = useMemo(() => (currentStage == DuelStage.Round3Animation), [currentStage])
   useEffect(() => {
-    if (currentStage == DuelStage.Finished) {
+    if (enabled && currentStage == DuelStage.Finished) {
       dispatchAnimated(AnimationState.Finished)
     }
-  }, [currentStage])
+  }, [enabled, currentStage])
 
   useEffect(() => {
-    if (gameImpl && isAnimatingRound1 && audioLoaded) {
+    if (enabled && gameImpl && isAnimatingRound1 && audioLoaded) {
       console.log(`TRIGGER animateDuel(1)`)
       gameImpl.animateDuel(AnimationState.Round1, round1.shot_a.action, round1.shot_b.action, round1.shot_a.health, round1.shot_b.health, round1.shot_a.damage, round1.shot_b.damage)
     }
-  }, [gameImpl, isAnimatingRound1, audioLoaded])
+  }, [enabled, gameImpl, isAnimatingRound1, audioLoaded])
 
   useEffect(() => {
-    if (gameImpl && isAnimatingRound2 && audioLoaded) {
+    if (enabled && gameImpl && isAnimatingRound2 && audioLoaded) {
       console.log(`TRIGGER animateDuel(2)`)
       gameImpl.animateDuel(AnimationState.Round2, round2.shot_a.action, round2.shot_b.action, round2.shot_a.health, round2.shot_b.health, round2.shot_a.damage, round2.shot_b.damage)
     }
-  }, [gameImpl, isAnimatingRound2, audioLoaded])
+  }, [enabled, gameImpl, isAnimatingRound2, audioLoaded])
 
   useEffect(() => {
-    if (gameImpl && isAnimatingRound3 && audioLoaded) {
+    if (enabled && gameImpl && isAnimatingRound3 && audioLoaded) {
       console.log(`TRIGGER animateDuel(3)`)
       gameImpl.animateDuel(AnimationState.Round3, round3.shot_a.action, round3.shot_b.action, round3.shot_a.health, round3.shot_b.health, round3.shot_a.damage, round3.shot_b.damage)
     }
-  }, [gameImpl, isAnimatingRound3, audioLoaded])
+  }, [enabled, gameImpl, isAnimatingRound3, audioLoaded])
 
   const { canAutoRevealA, canAutoRevealB } = useMemo(() => ({
     canAutoRevealA: (result.turnA && (currentStage == DuelStage.Round1Reveal || currentStage == DuelStage.Round2Reveal)),

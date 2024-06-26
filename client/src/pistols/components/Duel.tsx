@@ -6,7 +6,7 @@ import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '../hooks/ThreeJsContext'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
-import { useChallengeDescription } from '@/pistols/hooks/useChallenge'
+import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useWager } from '@/pistols/hooks/useWager'
@@ -16,14 +16,16 @@ import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { MenuDebugAnimations, MenuDuel } from '@/pistols/components/Menus'
 import { AnimationState } from '@/pistols/three/game'
 import { EmojiIcon, LoadingIcon } from '@/lib/ui/Icons'
-import { ActionEmojis, ActionTypes } from '../utils/pistols'
+import { ActionEmojis, ActionTypes } from '@/pistols/utils/pistols'
 import { Balance } from '@/pistols/components/account/Balance'
+import { ProfileModels } from '@/pistols/data/assets'
 import { EMOJI } from '@/pistols/data/messages'
 import { bigintEquals } from '@/lib/utils/types'
-import DuelInfoSwitcher from '@/pistols/components/DuelInfoSwitcher'
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import CommitBladesModal from '@/pistols/components/CommitBladesModal'
 import RevealModal from '@/pistols/components/RevealModal'
+import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
+import { useMounted } from '@/lib/utils/hooks/useMounted'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -36,23 +38,43 @@ export default function Duel({
   const { animated } = useGameplayContext()
 
   const { challengeDescription } = useChallengeDescription(duelId)
+  const { tableId, isFinished, message, duelistA, duelistB, timestamp_start } = useChallenge(duelId)
+  const { value } = useWager(duelId)
+
+  // guarantee to run only once when this component mounts
+  const mounted = useMounted()
+  const [duelSceneStarted, setDuelSceneStarted] = useState(false)
+  const { profilePic: profilePicA, name: nameA } = useDuelist(duelistA)
+  const { profilePic: profilePicB, name: nameB } = useDuelist(duelistB)
+  useEffect(() => {
+    if (gameImpl && mounted && !duelSceneStarted && profilePicA && profilePicB && nameA && nameB) {
+      gameImpl.startDuelWithPlayers(nameA, ProfileModels[profilePicA], nameB, ProfileModels[profilePicB])
+      setDuelSceneStarted(true)
+    }
+  }, [gameImpl, mounted, duelSceneStarted, profilePicA, profilePicB, nameA, nameB])
+
+  // setup grass animation
+  const { clientTimestamp } = useClientTimestamp(false)
+  useEffect(() => {
+    if (clientTimestamp && timestamp_start) {
+      gameImpl?.setDuelTimePercentage(clientTimestamp - timestamp_start)
+    }
+  }, [gameImpl, clientTimestamp, timestamp_start])
+
+  // Animated duel is useDuel added with intermediate animation stages
   const {
-    challenge: { tableId, isFinished, message, duelistA, duelistB },
     duelStage,
     completedStagesA, completedStagesB,
     canAutoRevealA, canAutoRevealB,
     healthA, healthB,
-  } = useAnimatedDuel(duelId)
-  const { value } = useWager(duelId)
+  } = useAnimatedDuel(duelId, duelSceneStarted)
 
-  useEffectOnce(() => {
-    gameImpl?.resetDuelScene()
-  }, [])
-
-  const { debugMode, dispatchSetting, SettingsActions } = useSettingsContext()
+  const { debugMode } = useSettingsContext()
   const { dispatchSelectDuel } = usePistolsContext()
 
   useEffect(() => dispatchSelectDuel(duelId), [duelId])
+
+  if (!duelSceneStarted) return <></>
 
   return (
     <>
@@ -98,8 +120,6 @@ export default function Duel({
       </div>
 
       <MenuDuel duelStage={duelStage} duelId={duelId} tableId={tableId} />
-
-      <DuelInfoSwitcher />
 
       {debugMode && <MenuDebugAnimations />}
     </>
