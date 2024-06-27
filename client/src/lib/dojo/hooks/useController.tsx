@@ -29,7 +29,7 @@ export const useController = (manifest: Manifest, contractNames?: string[]) => {
           if (abi.type == 'interface') {
             abi.items.forEach((item) => {
               // functions
-              if (item.type == 'function') {
+              if (item.type == 'function' && item.state_mutability == 'external') {
                 policies.push({
                   target: contract.address,
                   method: item.name,
