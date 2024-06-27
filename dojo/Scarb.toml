@@ -13,7 +13,7 @@ github = "https://github.com/underware-gg/pistols"
 
 [package]
 name = "pistols"
-version = "0.8.6"
+version = "0.8.7"
 cairo-version = "2.6.3"
 
 [cairo]
@@ -56,7 +56,7 @@ private_key = "0x2bbf4f9fd0bbb2e60b0316c1fe0b76cf7a4d0198bd493ced9b8df2a3a24d68a
 # 
 [profile.slot.tool.dojo.env]
 rpc_url = "https://api.cartridge.gg/x/pistols/katana"
-world_address = "0x509c209fc7c9ad157b463a1b48d92a399239bce020392ab2a920e7f2af31bb5"
+world_address = "0x0545c8aff15426c3d43b3ba8fd45c61870b30ca4ec0bfbd69193facee4c7b97c"
 account_address = "0x199df3260858b341a7985245c94361a320569635d0c405b1827ffa4d7ded985"
 private_key = "0x680cf081e48a2c0651fe1a66b9f4b52203951a746e5d6c14aa65ed8e4245b88"
 
