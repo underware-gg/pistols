@@ -2,7 +2,7 @@ import React from 'react'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { TavernAudios } from '@/pistols/components/GameContainer'
 import { TavernMenu } from '@/pistols/components/TavernMenu'
-import ConnectionDetector from '@/pistols/components/account/ConnectionDetector'
+import { ConnectionDetector, DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionDetector'
 import TableModal from '@/pistols/components/TableModal'
 import DuelistModal from '@/pistols/components/DuelistModal'
 import ChallengeModal from '@/pistols/components/ChallengeModal'
@@ -23,6 +23,7 @@ export default function Tavern() {
       <NewChallengeModal />
       <TavernAudios />
 
+      <DojoSetupErrorDetector />
       <ConnectionDetector />
     </>
   )

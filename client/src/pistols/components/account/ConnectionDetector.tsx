@@ -1,11 +1,24 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { AccountChangeDetector, ChainChangeDetector } from '@/lib/dojo/ChangeDetector'
 
-export default function ConnectionDetector() {
+export function DojoSetupErrorDetector() {
+  const { isError } = useDojoStatus()
+  const router = useRouter()
+  useEffect(() => {
+    if(isError) {
+      router.push('/gate')
+      // location.href = '/gate'
+    }
+  }, [isError])
+  return <></>
+}
+
+export function ConnectionDetector() {
   const { isConnected } = useSelectedChain()
   const { connectOpener } = usePistolsContext()
   const { isGuest, deselect } = useDojoAccount()

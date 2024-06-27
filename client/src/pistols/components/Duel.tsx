@@ -8,24 +8,24 @@ import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useWager } from '@/pistols/hooks/useWager'
+import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
+import { useMounted } from '@/lib/utils/hooks/useMounted'
+import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionDetector'
 import { DuelStage, useAnimatedDuel, useDuel, useDuelResult } from '@/pistols/hooks/useDuel'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
-import { MenuDebugAnimations, MenuDuel } from '@/pistols/components/Menus'
+import { ProfileModels } from '@/pistols/data/assets'
 import { AnimationState } from '@/pistols/three/game'
 import { EmojiIcon, LoadingIcon } from '@/lib/ui/Icons'
 import { ActionEmojis, ActionTypes } from '@/pistols/utils/pistols'
+import { MenuDebugAnimations, MenuDuel } from '@/pistols/components/Menus'
 import { Balance } from '@/pistols/components/account/Balance'
-import { ProfileModels } from '@/pistols/data/assets'
 import { EMOJI } from '@/pistols/data/messages'
 import { bigintEquals } from '@/lib/utils/types'
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import CommitBladesModal from '@/pistols/components/CommitBladesModal'
 import RevealModal from '@/pistols/components/RevealModal'
-import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
-import { useMounted } from '@/lib/utils/hooks/useMounted'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -120,6 +120,8 @@ export default function Duel({
       </div>
 
       <MenuDuel duelStage={duelStage} duelId={duelId} tableId={tableId} />
+
+      <DojoSetupErrorDetector />
 
       {debugMode && <MenuDebugAnimations />}
     </>
