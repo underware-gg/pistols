@@ -11,7 +11,13 @@ import { Policy, ControllerOptions } from "@cartridge/controller";
 export const useController = (manifest: Manifest, contractNames?: string[]) => {
 
   const controller = useMemo(() => {
-    const options: ControllerOptions = {}
+    const options: ControllerOptions = {
+      // paymaster: {
+      //   caller: stringToFelt("ANY_CALLER"),
+      // },
+      theme: "pistols",
+      colorMode: "dark"
+    }
     const policies: Policy[] = []
     // contracts
     manifest?.contracts.forEach((contract) => {
