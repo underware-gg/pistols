@@ -55,7 +55,8 @@ export default function Gate() {
             {/* <br />and some <LordsBagIcon /><b>LORDS</b> to play */}
             <br />
             Settle Your Grudges Honourably
-            <br />Wager some <LordsBagIcon /><b>LORDS</b> or duel for free
+            <br />Wager some <LordsBagIcon /><b>LORDS</b> or practice for free
+            <br />But remember... Don't lose your hat!
           </span>
           : <WalletHeader />
         }
