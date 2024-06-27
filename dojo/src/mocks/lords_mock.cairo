@@ -37,6 +37,7 @@ trait ILordsMock<TState> {
     fn initializer(ref self: TState);
     fn is_initialized(self: @TState) -> bool;
     fn faucet(ref self: TState);
+    fn mint(ref self: TState, to: ContractAddress, amount: u256);
     // fn dojo_resource(ref self: TState) -> felt252;
 }
 
@@ -54,6 +55,7 @@ trait ILordsMockInitializer<TState> {
 #[starknet::interface]
 trait ILordsMockFaucet<TState> {
     fn faucet(ref self: TState);
+    fn mint(ref self: TState, to: ContractAddress, amount: u256);
 }
 
 #[dojo::contract(allow_ref_self)]
@@ -174,6 +176,9 @@ mod lords_mock {
     impl LordsMockFaucetImpl of super::ILordsMockFaucet<ContractState> {
         fn faucet(ref self: ContractState) {
             self.erc20_mintable.mint(get_caller_address(), 10_000 * constants::ETH_TO_WEI);
+        }
+        fn mint(ref self: ContractState, to: ContractAddress, amount: u256) {
+            self.erc20_mintable.mint(to, amount);
         }
     }
 }
