@@ -9,17 +9,17 @@ use pistols::models::table::{TTable};
 
 #[dojo::interface]
 trait IAdmin {
-    fn initialize(owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress);
-    fn is_initialized() -> bool;
+    fn initialize(ref world: IWorldDispatcher, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress);
+    fn is_initialized(world: @IWorldDispatcher) -> bool;
     
-    fn set_owner(owner_address: ContractAddress);
-    fn set_treasury(treasury_address: ContractAddress);
-    fn set_paused(paused: bool);
-    fn set_table(table_id: felt252, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool);
-    fn enable_table(table_id: felt252, enabled: bool);
+    fn set_owner(ref world: IWorldDispatcher, owner_address: ContractAddress);
+    fn set_treasury(ref world: IWorldDispatcher, treasury_address: ContractAddress);
+    fn set_paused(ref world: IWorldDispatcher, paused: bool);
+    fn set_table(ref world: IWorldDispatcher, table_id: felt252, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool);
+    fn enable_table(ref world: IWorldDispatcher, table_id: felt252, enabled: bool);
     
-    fn get_config() -> Config;
-    fn get_table(table_id: felt252) -> TTable;
+    fn get_config(world: @IWorldDispatcher) -> Config;
+    fn get_table(world: @IWorldDispatcher, table_id: felt252) -> TTable;
 }
 
 #[dojo::contract]
@@ -35,7 +35,7 @@ mod admin {
 
     #[abi(embed_v0)]
     impl AdminImpl of super::IAdmin<ContractState> {
-        fn initialize(world: IWorldDispatcher, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress) {
+        fn initialize(ref world: IWorldDispatcher, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress) {
             self.assert_initializer_is_owner();
             let manager = ConfigManagerTrait::new(world);
             let mut config = manager.get();
@@ -51,11 +51,11 @@ mod admin {
             manager.set_array(default_tables(lords_address));
         }
 
-        fn is_initialized(world: IWorldDispatcher) -> bool {
+        fn is_initialized(world: @IWorldDispatcher) -> bool {
             (ConfigManagerTrait::is_initialized(world))
         }
 
-        fn set_owner(world: IWorldDispatcher, owner_address: ContractAddress) {
+        fn set_owner(ref world: IWorldDispatcher, owner_address: ContractAddress) {
             self.assert_caller_is_owner();
             assert(owner_address != utils::zero_address(), 'Null owner_address');
             // get current
@@ -66,7 +66,7 @@ mod admin {
             manager.set(config);
         }
 
-        fn set_treasury(world: IWorldDispatcher, treasury_address: ContractAddress) {
+        fn set_treasury(ref world: IWorldDispatcher, treasury_address: ContractAddress) {
             self.assert_caller_is_owner();
             assert(treasury_address != utils::zero_address(), 'Null treasury_address');
             // get current
@@ -77,7 +77,7 @@ mod admin {
             manager.set(config);
         }
 
-        fn set_paused(world: IWorldDispatcher, paused: bool) {
+        fn set_paused(ref world: IWorldDispatcher, paused: bool) {
             self.assert_caller_is_owner();
             // get current
             let manager = ConfigManagerTrait::new(world);
@@ -87,7 +87,7 @@ mod admin {
             manager.set(config);
         }
 
-        fn set_table(world: IWorldDispatcher, table_id: felt252, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool) {
+        fn set_table(ref world: IWorldDispatcher, table_id: felt252, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool) {
             self.assert_caller_is_owner();
             // get table
             let manager = TableManagerTrait::new(world);
@@ -102,7 +102,7 @@ mod admin {
             manager.set(table);
         }
 
-        fn enable_table(world: IWorldDispatcher, table_id: felt252, enabled: bool) {
+        fn enable_table(ref world: IWorldDispatcher, table_id: felt252, enabled: bool) {
             self.assert_caller_is_owner();
             // get table
             let manager = TableManagerTrait::new(world);
@@ -117,11 +117,11 @@ mod admin {
         // getters
         //
 
-        fn get_config(world: IWorldDispatcher) -> Config {
+        fn get_config(world: @IWorldDispatcher) -> Config {
             (ConfigManagerTrait::new(world).get())
         }
 
-        fn get_table(world: IWorldDispatcher, table_id: felt252) -> TTable {
+        fn get_table(world: @IWorldDispatcher, table_id: felt252) -> TTable {
             let manager = TableManagerTrait::new(world);
             assert(manager.exists(table_id), 'Invalid table');
             (manager.get(table_id))

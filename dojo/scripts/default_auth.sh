@@ -20,11 +20,15 @@ fi
 
 export MANIFEST_FILE_PATH="./manifests/$PROFILE/manifest.json"
 export WORLD_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.world_address)
-export ACCOUNT_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.account_address)
 export ADMIN_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.name == "pistols::systems::admin::admin" ).address')
 export ACTIONS_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.name == "pistols::systems::actions::actions" ).address')
+# use $DOJO_ACCOUNT_ADDRESS else read from profile
+export ACCOUNT_ADDRESS=${DOJO_ACCOUNT_ADDRESS:-$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.account_address)}
+
+
 
 # Use mocked Lords if lords_address not defined in Scarb
+export LORDS_MOCK=
 export LORDS_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.lords_address)
 if [[ -z "$LORDS_ADDRESS" ]]; then
   echo "- using mock \$LORDS 👑"

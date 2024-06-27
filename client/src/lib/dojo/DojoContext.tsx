@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useCallback, useContext, useMemo } from 'react'
-import { BurnerAccount, useBurnerManager, useBurnerWindowObject, usePredeployedWindowObject } from '@rsodre/create-burner'
+import { BurnerAccount, useBurnerManager, useBurnerWindowObject, usePredeployedWindowObject } from '@dojoengine/create-burner'
 import { SetupResult } from '@/lib/dojo/setup/useSetup'
 import { bigintEquals } from '@/lib/utils/types';
 import { Account, BigNumberish } from 'starknet'

@@ -11,7 +11,7 @@ import { Opener } from '@/lib/ui/useOpener'
 import { Divider } from '@/lib/ui/Divider'
 import { Balance } from '@/pistols/components/account/Balance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { getKeyByValue } from '@/lib/utils/types'
+import { getObjectKeyByValue } from '@/lib/utils/types'
 import { makeTavernUrl } from '@/pistols/utils/pistols'
 
 const Row = Grid.Row
@@ -39,7 +39,7 @@ export default function TableModal({
   }, [opener.isOpen])
 
   const { tables } = useDojoConstants()
-  const unknownTable = useMemo(() => (tableId !== undefined && getKeyByValue(tables, tableId) === undefined), [tableId])
+  const unknownTable = useMemo(() => (tableId !== undefined && getObjectKeyByValue(tables, tableId) === undefined), [tableId])
   useEffect(() => {
     if (unknownTable && !opener.isOpen) {
       opener.open()

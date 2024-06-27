@@ -21,7 +21,21 @@ export const pedersen = (a: BigNumberish, b: BigNumberish): bigint => (BigInt(ec
 export const poseidon = (values: BigNumberish[]): bigint => (BigInt(ec.starkCurve.poseidonHashMany(values.map(v => BigInt(v)))))
 export const ethToWei = (v: BigNumberish): bigint => (BigInt(v) * ETH_TO_WEI)
 export const weiToEth = (v: BigNumberish): bigint => (BigInt(v) / ETH_TO_WEI)
-export const dummyAccount = (rpc?: RpcProvider): Account => (new Account(rpc ?? {}, '0x0', '0x0'))
+export const weiToEthDecimals = (v: BigNumberish): bigint => (BigInt(v) % ETH_TO_WEI)
+export const weiToEthString = (v: BigNumberish, decimals: number = 0, trailingZeros: boolean = false): string => {
+  let result = Number(weiToEth(v)).toLocaleString('en-US', { maximumFractionDigits: 8 })
+  if (decimals > 0) {
+    let ethDecimals = weiToEthDecimals(v)
+    let decimalsStr = (ETH_TO_WEI + ethDecimals).toString().slice(1, decimals + 1)
+    while (!trailingZeros && decimalsStr.length > 1 && decimalsStr.at(-1) == '0') {
+      decimalsStr = decimalsStr.slice(0, -1)
+    }
+    result += '.' + decimalsStr
+  }
+  return result
+}
+
+export const dummyAccount = (provider?: RpcProvider): Account => (new Account(provider ?? {}, '0x0', '0x0'))
 
 export const Uint256ToBigint = (v: Uint256): bigint => ((BigInt(v.high) << 128n) + BigInt(v.low))
 export const bigintToUint256 = (v: BigNumberish): Uint256 => ({
@@ -60,7 +74,7 @@ export async function execute(
       }
     )
   } catch (error) {
-    this.logger.error("execute() error: ", error)
+    console.error("execute() error: ", error)
     return {
       transaction_hash: null,
     }

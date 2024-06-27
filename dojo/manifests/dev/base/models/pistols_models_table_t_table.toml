@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x2d7f48d08a0977e048af24f84c5236b1326b641520ed5a62fe5d4b7e50ae115"
-original_class_hash = "0x2d7f48d08a0977e048af24f84c5236b1326b641520ed5a62fe5d4b7e50ae115"
+class_hash = "0x5cb47bd5e0b2259a07e3713b5b2bfe7247bbeed56505be171ef1c6c7ca54f5"
+original_class_hash = "0x5cb47bd5e0b2259a07e3713b5b2bfe7247bbeed56505be171ef1c6c7ca54f5"
 abi = "manifests/dev/abis/base/models/pistols_models_table_t_table.json"
 name = "pistols::models::table::t_table"
 
@@ -37,4 +37,9 @@ key = false
 [[members]]
 name = "is_open"
 type = "bool"
+key = false
+
+[[members]]
+name = "table_type"
+type = "u8"
 key = false

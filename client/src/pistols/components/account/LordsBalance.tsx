@@ -1,11 +1,26 @@
+import { useBalance } from '@starknet-react/core'
 import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 import { useERC20Balance } from '@/lib/utils/hooks/useERC20'
-import { useLordsBalance } from '@/lib/dojo/hooks/useLords'
+import { useLordsBalance, useEtherBalance } from '@/lib/dojo/hooks/useLords'
 import { useTable } from '@/pistols/hooks/useTable'
 import { useLockedLordsBalance } from '@/pistols/hooks/useWager'
 import { Balance } from '@/pistols/components/account/Balance'
 import { BigNumberish } from 'starknet'
 import { useMemo } from 'react'
+import { bigintToHex } from '@/lib/utils/types'
+
+export const EtherBalance = ({
+  address,
+  pre = null,
+  post = null,
+  clean = false,
+  big = false,
+}) => {
+  const { balance } = useEtherBalance(address)
+  return (
+    <Balance ether big={big} wei={balance} pre={pre} post={post} clean={clean} />
+  )
+}
 
 export const LordsBalance = ({
   address,

@@ -10,6 +10,12 @@ mod tables {
     const COMMONERS: felt252 = 'Commoners';
 }
 
+mod table_types {
+    const CLASSIC: u8 = 1;
+    const DEMO: u8 = 2;
+    const TOURNAMENT: u8 = 3;
+}
+
 // Temporarily renamed to TTable while this bug exists:
 // https://github.com/dojoengine/dojo.js/issues/204
 #[derive(Copy, Drop, Serde)]
@@ -24,6 +30,7 @@ struct TTable {
     fee_min: u256,
     fee_pct: u8,
     is_open: bool,
+    table_type: u8,
 }
 
 fn default_tables(lords_address: ContractAddress) -> Array<TTable> {
@@ -36,6 +43,7 @@ fn default_tables(lords_address: ContractAddress) -> Array<TTable> {
             fee_min: 4 * constants::ETH_TO_WEI,
             fee_pct: 10,
             is_open: (lords_address != zero_address()),
+            table_type: table_types::CLASSIC,
         }),
         (TTable {
             table_id: tables::COMMONERS,
@@ -45,6 +53,7 @@ fn default_tables(lords_address: ContractAddress) -> Array<TTable> {
             fee_min: 0,
             fee_pct: 0,
             is_open: true,
+            table_type: table_types::CLASSIC,
         })
     ])
 }

@@ -11,10 +11,10 @@ export const useCalcFee = (table_id: string, wager_value: BigNumberish, defaultV
       const value = await calc_fee(table_id, wager_value)
       if (_mounted) setValue(value)
     }
-    if (table_id) _get()
+    if (table_id && calc_fee) _get()
     else setValue(defaultValue)
     return () => { _mounted = false }
-  }, [table_id, wager_value])
+  }, [calc_fee, table_id, wager_value])
   return {
     fee: value,
   }
@@ -29,10 +29,10 @@ export const useSimulateChances = (address: BigNumberish, duelId: bigint, roundN
       const value = await simulate_chances(BigInt(address), duelId, roundNumber, action)
       if (_mounted) setValue(value)
     }
-    if (address != null && duelId && roundNumber && action != null) _get()
+    if (simulate_chances && address != null && duelId && roundNumber && action != null) _get()
     else setValue(defaultValue)
     return () => { _mounted = false }
-  }, [address, duelId, roundNumber, action])
+  }, [simulate_chances, address, duelId, roundNumber, action])
   return value as Awaited<ReturnType<typeof simulate_chances>>
 }
 
@@ -45,10 +45,10 @@ export const useGetValidPackedActions = (round_number: number, defaultValue = []
       const value = await get_valid_packed_actions(round_number)
       if (_mounted) setValue(value)
     }
-    if (round_number != null) _get()
+    if (get_valid_packed_actions && round_number != null) _get()
     else setValue(defaultValue)
     return () => { _mounted = false }
-  }, [round_number])
+  }, [get_valid_packed_actions, round_number])
   return {
     validPackedActions: value,
   }

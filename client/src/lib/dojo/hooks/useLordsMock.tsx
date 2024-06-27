@@ -1,7 +1,8 @@
 import { useCallback, useState } from 'react'
+import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useLordsContract } from '@/lib/dojo/hooks/useLords'
-import { execute } from '@/lib/utils/starknet'
+import { bigintToUint256, ethToWei, execute } from '@/lib/utils/starknet'
 import { bigintToHex } from '@/lib/utils/types'
 import { Account, AccountInterface } from 'starknet'
 
@@ -10,54 +11,55 @@ export interface FaucetExecuteResult {
 }
 
 export interface FaucetInterface {
-  faucet: (fromAccount?: Account | AccountInterface) => Promise<FaucetExecuteResult> | null
-  hasFaucet: boolean
-  isPending: boolean
+  isMock: boolean
+  mintLords: (recipientAccount?: Account | AccountInterface) => Promise<FaucetExecuteResult> | null
+  faucetUrl: string | null
+  isMinting: boolean
   error?: string
 }
 
 export const useLordsFaucet = (): FaucetInterface => {
   const { account } = useDojoAccount()
-
+  const { selectedChainConfig } = useStarknetContext()
   const { contractAddress, isMock, abi } = useLordsContract()
 
-  const [isPending, setIsPending] = useState(false)
+  const [isMinting, setIsMinting] = useState(false)
   const [error, setError] = useState<string | undefined>(undefined)
 
-  const faucet = useCallback(
-    async (fromAccount?: Account): Promise<FaucetExecuteResult> => {
+  const mintLords = useCallback(
+    async (recipientAccount?: Account): Promise<FaucetExecuteResult> => {
       setError(undefined)
-      setIsPending(true)
+      setIsMinting(true)
 
-      const _account = (fromAccount ?? account)
+      const _signerAccount = (recipientAccount ?? account)
+      const amount = bigintToUint256(ethToWei(10_000))
 
       let transaction_hash, receipt
       try {
         const tx = await execute(
-          _account!,
+          _signerAccount!,
           bigintToHex(contractAddress),
-          abi,
-          'faucet',
-          [],
+          abi!,
+          'mint',
+          [bigintToHex(_signerAccount.address), bigintToHex(amount.low), bigintToHex(amount.high)],
+          // 'faucet',
+          // [],
         )
         transaction_hash = tx.transaction_hash
-        receipt = await _account!.waitForTransaction(transaction_hash, {
-          retryInterval: 200,
+        receipt = await _signerAccount!.waitForTransaction(transaction_hash, {
+          retryInterval: 500,
         })
-        console.log(`useLordsFaucet(${_account.address}) receipt:`, receipt)
+        console.log(`mintLords(${_signerAccount.address}) receipt:`, receipt)
       } catch (e: any) {
-        setIsPending(false)
         setError(e.toString())
-        console.error(`useLordsFaucet() error:`, e)
+        console.error(`mintLords(${_signerAccount.address}) error:`, e)
         // toast({
         //   message: e.toString(),
         //   duration: 20_000,
         //   isError: true
         // })
       }
-
-      setIsPending(false)
-
+      setIsMinting(false)
       return {
         transaction_hash,
       }
@@ -65,9 +67,10 @@ export const useLordsFaucet = (): FaucetInterface => {
   )
 
   return {
-    faucet: isMock ? faucet : null,
-    hasFaucet: isMock,
-    isPending,
+    isMock,
+    mintLords,
+    faucetUrl: selectedChainConfig.lordsFaucetUrl ?? null,
+    isMinting,
     error,
   }
 }

@@ -212,6 +212,7 @@ interface CustomIconProps {
   icon?: boolean,			  // if the svg is on /icons/
   logo?: boolean,			  // if the svg is on /logos/
   png?: boolean,        // png extension
+  alt?: string,
   // <Icon> fallback
   // optionals
   className?: string,
@@ -227,6 +228,7 @@ export function CustomIcon({
   icon = false,
   logo = false,
   png = false,
+  alt = undefined,    // TODO: add tooltip
   name = 'avante',
   className = null,
   size = null,

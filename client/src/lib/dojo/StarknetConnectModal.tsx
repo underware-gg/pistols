@@ -97,13 +97,13 @@ function SwitchChainButtons() {
     connectedChainId, connectedChainName,
     selectedChainId, selectedChainName,
   } = useSelectedChain()
-  const { switch_network, add_network } = useChainSwitchCallbacks()
+  const { switch_starknet_chain, add_starknet_chain } = useChainSwitchCallbacks()
   const [chainExists, setChainExists] = useState(true)
   const [isBusy, setIsBusy] = useState(false)
 
   const _switchNetwork = () => {
     setIsBusy(true)
-    switch_network().then((response) => {
+    switch_starknet_chain().then((response) => {
       console.log(`wallet_switchStarknetChain RESPONSE:`, response)
       setIsBusy(false)
       if (!response) {
@@ -117,7 +117,7 @@ function SwitchChainButtons() {
 
   const _addNetwork = () => {
     setIsBusy(true)
-    add_network().then((response) => {
+    add_starknet_chain().then((response) => {
       console.log(`wallet_addStarknetChain RESPONSE:`, response)
       if (response) {
         setChainExists(true)

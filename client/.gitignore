@@ -26,3 +26,5 @@ dist-ssr
 # next.js
 .next
 next-env.d.ts
+
+certificates

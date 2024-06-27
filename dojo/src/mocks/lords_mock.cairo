@@ -58,7 +58,6 @@ trait ILordsMockFaucet<TState> {
 
 #[dojo::contract(allow_ref_self)]
 mod lords_mock {
-    use token::erc20::interface;
     use integer::BoundedInt;
     use starknet::ContractAddress;
     use starknet::{get_caller_address, get_contract_address};
@@ -157,13 +156,13 @@ mod lords_mock {
                 Errors::CALLER_IS_NOT_OWNER
             );
 
-            self.erc20_metadata.initialize('fLORDS', 'fLORDS', 18);
+            self.erc20_metadata.initialize("fLORDS", "fLORDS", 18);
             self.erc20_mintable.mint(get_caller_address(), 1 * constants::ETH_TO_WEI);
 
             self.initializable.initialize();
         }
         fn is_initialized(self: @ContractState) -> bool {
-            (self.erc20_metadata.symbol() != '')
+            (self.erc20_metadata.symbol() != "")
         }
     }
 

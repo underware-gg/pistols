@@ -211,7 +211,6 @@ export async function init(canvas, framerate = 60, statsEnabled = false) {
   _growthPercentage = localStorage.getItem('GROWTH')
   
   if (_statsEnabled) {
-    console.log(`DEBUG>>>>>>>>`)
     _stats = new Stats()
     document.body.appendChild(_stats.dom)
   }

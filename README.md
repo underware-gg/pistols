@@ -136,12 +136,12 @@ Install the [Cairo 1.0](https://marketplace.visualstudio.com/items?itemName=star
 
 > [Dojo Book](https://book.dojoengine.org/getting-started/quick-start.html)
 
-Currenty using Dojo version `v0.7.0-alpha.5`
+Currenty using Dojo version `v0.7.2`
 
-```console
+```sh
 curl -L https://install.dojoengine.org | bash
 # open new terminal to update PATH
-dojoup -v v0.7.0-alpha.5
+dojoup -v v0.7.2
 
 # test dojo
 cd dojo
@@ -158,11 +158,11 @@ pnpm install
 
 #### Terminal 1: Katana (local node)
 
-```console
+```sh
 cd dojo
-katana --disable-fee --chain-id KATANA_LOCAL --invoke-max-steps 10000000
+katana --disable-fee --chain-id KATANA_LOCAL --invoke-max-steps 10000000 --allowed-origins "*" --accounts 10
 
-# or simply...
+# or preferably...
 cd dojo
 ./run_katana
 ```
@@ -171,41 +171,76 @@ cd dojo
 
 Uncomment the `world_address` parameter in `dojo/Scarb.toml` then:
 
-```console
+```sh
 cd dojo
-torii --world 0x2d6bcc12cbb460243b73a4c937faf00ad2d071d899f40dfc9182843712f9c77
+torii --allowed-origins "*" --index-pending --world 0x0545c8aff15426c3d43b3ba8fd45c61870b30ca4ec0bfbd69193facee4c7b97c
 
-# or simply...
+# or preferably...
 cd dojo
 ./run_torii
 ```
 
-#### Terminal 3: Client
+#### Terminal 3: Sozo commands / migration
 
-```console
-cd client
-pnpm install && pnpm dev
+Migrating to localhost:
 
-# or just...
-cd client
-./run_client
-```
-
-#### Terminal 4: Sozo commands
-
-```console
+```sh
 # build world and systems
 cd dojo
+sozo clean
 sozo build
 
 # migrate to local Katana
-cd dojo
 ./migrate
+
+# migrate other profiles
+./migrate <PROFILE_NAME>
+# example:
+./migrate slot
+```
+
+For Starknet chains, create env files for `SN_SEPOLIA` (`.env.sepolia`) and/or `SN_MAINNET` (`.env.mainnet`)
+
+```sh
+export STARKNET_RPC_URL=https://sepolia.your-favorite-rpc-provider.com/xxx/
+export DOJO_ACCOUNT_ADDRESS=0x1234
+export DOJO_PRIVATE_KEY=0x1234
+```
+
+then migrate...
+
+```sh
+# enable env
+source .env.sepolia
+
+# migrate to local Katana
+./migrate sepolia
+
+# clear env if you want to work on another profile
+source .env.clear
 ```
 
 
-#### Open the game on a browser
+#### Terminal 4: Client
 
-* [http://localhost:3000/](http://localhost:3000/)
+Install dependencies
 
+```sh
+cd client
+pnpm i
+```
+
+Start the client
+
+```sh
+# http server
+# http://localhost:3000
+pnpm run dev
+
+# https server (required for Catridge Controller)
+# https://localhost:3000
+pnpm run devs
+```
+
+Open [http://localhost:3000](http://localhost:3000) or [https://localhost:3000](https://localhost:3000)
 
