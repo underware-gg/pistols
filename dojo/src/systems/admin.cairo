@@ -48,7 +48,7 @@ mod admin {
             manager.set(config);
             // set lords
             let manager = TableManagerTrait::new(world);
-            manager.set_array(default_tables(lords_address));
+            manager.set_array(@default_tables(lords_address));
         }
 
         fn is_initialized(world: @IWorldDispatcher) -> bool {

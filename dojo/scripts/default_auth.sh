@@ -64,7 +64,8 @@ fi
 echo "- Admin auth..."
 sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
   Config,$ADMIN_ADDRESS \
-  TTable,$ADMIN_ADDRESS
+  TTable,$ADMIN_ADDRESS \
+  TableAdmittance,$ADMIN_ADDRESS
 
 echo "- Game auth..."
 sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \

@@ -140,6 +140,11 @@ mod actions {
             assert(expire_seconds == 0 || expire_seconds >= timestamp::from_hours(1), 'Invalid expire_seconds');
 
             let caller: ContractAddress = starknet::get_caller_address();
+            let table_manager = TableManagerTrait::new(world);
+
+            assert(table_manager.can_join(table_id, caller, caller), 'Challenger not admitted');
+            assert(table_manager.can_join(table_id, challenged, challenged), 'Challenged not admitted');
+
             assert(utils::duelist_exist(world, caller), 'Challenger not registered');
             assert(caller != challenged, 'Challenging thyself, you fool!');
             assert(self.has_pact(caller, challenged) == false, 'Duplicated challenge');
@@ -171,7 +176,6 @@ mod actions {
             };
 
             // setup wager + fees
-            let table_manager = TableManagerTrait::new(world);
             let table: TTable = table_manager.get(table_id);
             assert(table.is_open == true, 'Table is closed');
             assert(wager_value >= table.wager_min, 'Minimum wager not met');
