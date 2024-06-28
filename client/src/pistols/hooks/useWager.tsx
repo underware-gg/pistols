@@ -22,13 +22,13 @@ export const useWager = (duelId: BigNumberish) => {
 
 export const useLockedLordsBalance = (address: bigint) => {
   const { contractAddress } = useLordsContract()
-  const { Wager, TTable } = useDojoComponents()
+  const { Wager, TableConfig } = useDojoComponents()
   const { raw_challenges } = useChallengesByDuelist(address)
   const { wagers, fees, total } = useMemo(() => {
     let wagers = 0n
     let fees = 0n
     raw_challenges.forEach((raw_challenge) => {
-      const table = getComponentValue(TTable, bigintToEntity(raw_challenge.table_id))
+      const table = getComponentValue(TableConfig, bigintToEntity(raw_challenge.table_id))
       // if (feltToString(raw_challenge.table_id) == tableId) {
       if (bigintEquals(table.contract_address, contractAddress)) {
         if (raw_challenge.state == ChallengeState.InProgress ||

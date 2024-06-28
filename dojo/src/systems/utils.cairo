@@ -5,7 +5,7 @@ use starknet::{ContractAddress};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
 use pistols::models::models::{init, Duelist, Scoreboard, Score, ScoreTrait, Challenge, Snapshot, Wager, Pact, Round, Shot};
-use pistols::models::table::{TTable, TableTrait, TableManagerTrait};
+use pistols::models::table::{TableConfig, TableTrait, TableManagerTrait};
 use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round::{RoundState, RoundStateTrait};
@@ -106,7 +106,7 @@ fn deposit_wager_fees(world: IWorldDispatcher, challenge: Challenge, from: Contr
     let wager: Wager = get!(world, (challenge.duel_id), Wager);
     let total: u256 = (wager.value + wager.fee);
     if (total > 0) {
-        let table : TTable = TableManagerTrait::new(world).get(challenge.table_id);
+        let table : TableConfig = TableManagerTrait::new(world).get(challenge.table_id);
         let balance: u256 = table.ierc20().balance_of(from);
         let allowance: u256 = table.ierc20().allowance(from, to);
         assert(balance >= total, 'Insufficient balance for Fees');
@@ -118,7 +118,7 @@ fn withdraw_wager_fees(world: IWorldDispatcher, challenge: Challenge, to: Contra
     let wager: Wager = get!(world, (challenge.duel_id), Wager);
     let total: u256 = (wager.value + wager.fee);
     if (total > 0) {
-        let table : TTable = TableManagerTrait::new(world).get(challenge.table_id);
+        let table : TableConfig = TableManagerTrait::new(world).get(challenge.table_id);
         let balance: u256 = table.ierc20().balance_of(starknet::get_contract_address());
         assert(balance >= total, 'Withdraw not available'); // should never happen!
         table.ierc20().transfer(to, total);
@@ -129,7 +129,7 @@ fn split_wager_fees(world: IWorldDispatcher, challenge: Challenge, duelist_a: Co
     let wager: Wager = get!(world, (challenge.duel_id), Wager);
     let total: u256 = (wager.value + wager.fee) * 2;
     if (total > 0) {
-        let table : TTable = TableManagerTrait::new(world).get(challenge.table_id);
+        let table : TableConfig = TableManagerTrait::new(world).get(challenge.table_id);
         let balance: u256 = table.ierc20().balance_of(starknet::get_contract_address());
         assert(balance >= total, 'Wager not available'); // should never happen!
         if (wager.value > 0) {

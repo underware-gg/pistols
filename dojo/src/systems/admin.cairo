@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
 use pistols::models::config::{Config};
-use pistols::models::table::{TTable};
+use pistols::models::table::{TableConfig};
 
 // based on RYO
 // https://github.com/cartridge-gg/rollyourown/blob/market_packed/src/systems/ryo.cairo
@@ -19,7 +19,7 @@ trait IAdmin {
     fn enable_table(ref world: IWorldDispatcher, table_id: felt252, enabled: bool);
     
     fn get_config(world: @IWorldDispatcher) -> Config;
-    fn get_table(world: @IWorldDispatcher, table_id: felt252) -> TTable;
+    fn get_table(world: @IWorldDispatcher, table_id: felt252) -> TableConfig;
 }
 
 #[dojo::contract]
@@ -30,7 +30,7 @@ mod admin {
     use starknet::{get_caller_address, get_contract_address};
 
     use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
-    use pistols::models::table::{TTable, TableManager, TableManagerTrait, default_tables};
+    use pistols::models::table::{TableConfig, TableManager, TableManagerTrait, default_tables};
     use pistols::systems::{utils};
 
     #[abi(embed_v0)]
@@ -121,7 +121,7 @@ mod admin {
             (ConfigManagerTrait::new(world).get())
         }
 
-        fn get_table(world: @IWorldDispatcher, table_id: felt252) -> TTable {
+        fn get_table(world: @IWorldDispatcher, table_id: felt252) -> TableConfig {
             let manager = TableManagerTrait::new(world);
             assert(manager.exists(table_id), 'Invalid table');
             (manager.get(table_id))

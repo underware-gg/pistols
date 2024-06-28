@@ -40,7 +40,7 @@ export function createSystemCalls(
   manifest: any,
 ) {
   const { execute, call, contractComponents } = network
-  const { Challenge, Wager, TTable } = components
+  const { Challenge, Wager, TableConfig } = components
 
   // executeMulti() based on:
   // https://github.com/cartridge-gg/rollyourown/blob/f39bfd7adc866c1a10142f5ce30a3c6f900b467e/web/src/dojo/hooks/useSystems.ts#L178-L190
@@ -91,7 +91,7 @@ export function createSystemCalls(
 
   const create_challenge = async (signer: Account, challenged: bigint, message: string, table_id: string, wager_value: bigint, expire_seconds: number): Promise<boolean> => {
     // find lords contract
-    const table = getComponentValue(TTable, bigintToEntity(stringToFelt(table_id)))
+    const table = getComponentValue(TableConfig, bigintToEntity(stringToFelt(table_id)))
     if (!table) throw new Error(`Table does not exist [${table_id}]`)
     //calculate value
     const fee = await calc_fee(table_id, wager_value)
@@ -124,7 +124,7 @@ export function createSystemCalls(
       const approved_value = wager ? (wager.value + wager.fee) : 0n
       if (approved_value > 0n) {
         // find lords contract
-        const table = getComponentValue(TTable, bigintToEntity(challenge.table_id))
+        const table = getComponentValue(TableConfig, bigintToEntity(challenge.table_id))
         if (!table) throw new Error(`Table does not exist [${challenge.table_id}]`)
         // approve call
         let calls: Call[] = []

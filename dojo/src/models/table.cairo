@@ -18,11 +18,11 @@ mod table_types {
     const IRL_TOURNAMENT: u8 = 3;
 }
 
-// Temporarily renamed to TTable while this bug exists:
+// Temporarily renamed to TableConfig while this bug exists:
 // https://github.com/dojoengine/dojo/issues/2057
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-struct TTable {
+struct TableConfig {
     #[key]
     table_id: felt252,
     //------
@@ -45,9 +45,9 @@ struct TableAdmittance {
     duelists: Array<ContractAddress>,
 }
 
-fn default_tables(lords_address: ContractAddress) -> Array<TTable> {
+fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
     (array![
-        (TTable {
+        (TableConfig {
             table_id: tables::LORDS,
             description: 'The Lords Table',
             contract_address: lords_address,
@@ -57,7 +57,7 @@ fn default_tables(lords_address: ContractAddress) -> Array<TTable> {
             is_open: (lords_address != ZERO()),
             table_type: table_types::CLASSIC,
         }),
-        (TTable {
+        (TableConfig {
             table_id: tables::COMMONERS,
             description: 'The Commoners Table',
             contract_address: ZERO(),
@@ -67,7 +67,7 @@ fn default_tables(lords_address: ContractAddress) -> Array<TTable> {
             is_open: true,
             table_type: table_types::CLASSIC,
         }),
-        (TTable {
+        (TableConfig {
             table_id: tables::BRUSSELS,
             description: 'Brussels Tournament',
             contract_address: ZERO(),
@@ -95,19 +95,19 @@ impl TableManagerTraitImpl of TableManagerTrait {
         TableManager { world }
     }
     fn exists(self: TableManager, table_id: felt252) -> bool {
-        let table: TTable = get!(self.world, (table_id), TTable);
+        let table: TableConfig = get!(self.world, (table_id), TableConfig);
         (table.description != 0)
     }
-    fn get(self: TableManager, table_id: felt252) -> TTable {
-        let table: TTable = get!(self.world, (table_id), TTable);
+    fn get(self: TableManager, table_id: felt252) -> TableConfig {
+        let table: TableConfig = get!(self.world, (table_id), TableConfig);
         assert(table.description != 0, 'Invalid Table');
         (table)
     }
-    fn set(self: TableManager, table: TTable) {
+    fn set(self: TableManager, table: TableConfig) {
         assert(table.description != 0, 'Need a description');
         set!(self.world, (table));
     }
-    fn set_array(self: TableManager, tables: @Array<TTable>) {
+    fn set_array(self: TableManager, tables: @Array<TableConfig>) {
         let mut n: usize = 0;
         loop {
             if (n == tables.len()) { break; }
@@ -126,10 +126,10 @@ impl TableManagerTraitImpl of TableManagerTrait {
 //
 #[generate_trait]
 impl TableTraitImpl of TableTrait {
-    fn ierc20(self: TTable) -> IERC20Dispatcher {
+    fn ierc20(self: TableConfig) -> IERC20Dispatcher {
         (ierc20(self.contract_address))
     }
-    fn calc_fee(self: TTable, wager_value: u256) -> u256 {
+    fn calc_fee(self: TableConfig, wager_value: u256) -> u256 {
         (MathU256::max(self.fee_min, (wager_value / 100) * self.fee_pct.into()))
     }
 }

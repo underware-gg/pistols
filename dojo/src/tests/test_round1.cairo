@@ -10,7 +10,7 @@ mod tests {
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::models::models::{Duelist, Challenge, Wager, Round};
     use pistols::models::structs::{SimulateChances};
-    use pistols::models::table::{TTable, TableTrait, TableManagerTrait, tables};
+    use pistols::models::table::{TableConfig, TableTrait, TableManagerTrait, tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::types::constants::{constants};

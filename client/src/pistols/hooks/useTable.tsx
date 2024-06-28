@@ -8,8 +8,8 @@ import { BigNumberish } from 'starknet'
 import { useMemo } from 'react'
 
 export const useTable = (tableId: string) => {
-  const { TTable } = useDojoComponents()
-  const table = useComponentValue(TTable, bigintToEntity(stringToFelt(tableId ?? '')))
+  const { TableConfig } = useDojoComponents()
+  const table = useComponentValue(TableConfig, bigintToEntity(stringToFelt(tableId ?? '')))
   const contractAddress = useMemo(() => (table?.contract_address ?? 0n), [table])
   return {
     tableId,
