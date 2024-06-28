@@ -1,7 +1,7 @@
 use starknet::ContractAddress;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
-use pistols::systems::utils::{zero_address};
+use pistols::systems::utils::{ZERO};
 use pistols::utils::math::{MathU256};
 use pistols::utils::arrays::{ArrayTrait};
 use pistols::types::constants::{constants};
@@ -54,13 +54,13 @@ fn default_tables(lords_address: ContractAddress) -> Array<TTable> {
             wager_min: 0,
             fee_min: 4 * constants::ETH_TO_WEI,
             fee_pct: 10,
-            is_open: (lords_address != zero_address()),
+            is_open: (lords_address != ZERO()),
             table_type: table_types::CLASSIC,
         }),
         (TTable {
             table_id: tables::COMMONERS,
             description: 'The Commoners Table',
-            contract_address: zero_address(),
+            contract_address: ZERO(),
             wager_min: 0,
             fee_min: 0,
             fee_pct: 0,
@@ -70,7 +70,7 @@ fn default_tables(lords_address: ContractAddress) -> Array<TTable> {
         (TTable {
             table_id: tables::BRUSSELS,
             description: 'Brussels Tournament',
-            contract_address: zero_address(),
+            contract_address: ZERO(),
             wager_min: 0,
             fee_min: 0,
             fee_pct: 0,

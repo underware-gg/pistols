@@ -42,8 +42,8 @@ mod admin {
             assert(config.initialized == false, 'Already initialized');
             // initialize
             config.initialized = true;
-            config.owner_address = (if (owner_address == utils::zero_address()) { get_caller_address() } else { owner_address });
-            config.treasury_address = (if (treasury_address == utils::zero_address()) { get_caller_address() } else { treasury_address });
+            config.owner_address = (if (owner_address == utils::ZERO()) { get_caller_address() } else { owner_address });
+            config.treasury_address = (if (treasury_address == utils::ZERO()) { get_caller_address() } else { treasury_address });
             config.paused = false;
             manager.set(config);
             // set lords
@@ -57,7 +57,7 @@ mod admin {
 
         fn set_owner(ref world: IWorldDispatcher, owner_address: ContractAddress) {
             self.assert_caller_is_owner();
-            assert(owner_address != utils::zero_address(), 'Null owner_address');
+            assert(owner_address != utils::ZERO(), 'Null owner_address');
             // get current
             let manager = ConfigManagerTrait::new(world);
             let mut config = manager.get();
@@ -68,7 +68,7 @@ mod admin {
 
         fn set_treasury(ref world: IWorldDispatcher, treasury_address: ContractAddress) {
             self.assert_caller_is_owner();
-            assert(treasury_address != utils::zero_address(), 'Null treasury_address');
+            assert(treasury_address != utils::ZERO(), 'Null treasury_address');
             // get current
             let manager = ConfigManagerTrait::new(world);
             let mut config = manager.get();

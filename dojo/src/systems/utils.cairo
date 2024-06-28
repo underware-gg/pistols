@@ -17,7 +17,7 @@ use pistols::utils::math::{MathU8, MathU16};
 extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
 
 #[inline(always)]
-fn zero_address() -> ContractAddress {
+fn ZERO() -> ContractAddress {
     (starknet::contract_address_const::<0x0>())
 }
 

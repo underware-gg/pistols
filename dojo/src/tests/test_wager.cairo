@@ -9,7 +9,7 @@ mod tests {
     use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
     use pistols::systems::actions::{IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::systems::admin::{IAdminDispatcher, IAdminDispatcherTrait};
-    use pistols::systems::utils::{zero_address};
+    use pistols::systems::utils::{ZERO};
     use pistols::models::config::{Config};
     use pistols::models::table::{TTable, TableTrait, TableManagerTrait, tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};

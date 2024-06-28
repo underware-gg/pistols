@@ -10,7 +10,7 @@ mod tests {
     use pistols::models::models::{Duelist, Round};
     use pistols::models::table::{tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
-    use pistols::systems::utils::{zero_address};
+    use pistols::systems::utils::{ZERO};
     use pistols::utils::timestamp::{timestamp};
     use pistols::tests::tester::{tester};
 
@@ -43,7 +43,7 @@ mod tests {
     fn test_invalid_code() {
         let (_world, system, _admin, _lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(true, true);
         tester::execute_register_duelist(system, owner, PLAYER_NAME, 1);
-        let challenged_1 = zero_address();
+        let challenged_1 = ZERO();
         let _duel_id: u128 = tester::execute_create_challenge(system, owner, challenged_1, MESSAGE_1, TABLE_ID, 0, 0);
     }
 

@@ -136,7 +136,7 @@ mod actions {
         ) -> u128 {
             assert(ConfigManagerTrait::is_initialized(world) == true, 'Not initialized');
 
-            assert(challenged != utils::zero_address(), 'Missing challenged address');
+            assert(challenged != utils::ZERO(), 'Missing challenged address');
             assert(expire_seconds == 0 || expire_seconds >= timestamp::from_hours(1), 'Invalid expire_seconds');
 
             let caller: ContractAddress = starknet::get_caller_address();
@@ -148,7 +148,7 @@ mod actions {
             assert(utils::duelist_exist(world, caller), 'Challenger not registered');
             assert(caller != challenged, 'Challenging thyself, you fool!');
             assert(self.has_pact(caller, challenged) == false, 'Duplicated challenge');
-            // if (challenged != utils::zero_address()) {
+            // if (challenged != utils::ZERO()) {
             //     assert(utils::duelist_exist(world, caller), 'Challenged is not registered');
             // }
 
@@ -182,7 +182,7 @@ mod actions {
             let fee: u256 = table.calc_fee(wager_value);
             // calc fee and store
             if (fee > 0 || wager_value > 0) {
-                assert(table.contract_address != utils::zero_address(), 'No wager on this table');
+                assert(table.contract_address != utils::ZERO(), 'No wager on this table');
                 let wager = Wager {
                     duel_id,
                     value: wager_value,
@@ -421,7 +421,7 @@ mod actions {
             let winner_address: ContractAddress = 
                 if (challenge.winner == 1) { (challenge.duelist_a) }
                 else if (challenge.winner == 2) { (challenge.duelist_b) }
-                else { (utils::zero_address()) };
+                else { (utils::ZERO()) };
             emit!(world, (Event::ChallengeResolvedEvent(events::ChallengeResolvedEvent {
                 duel_id: challenge.duel_id,
                 winner_address,
