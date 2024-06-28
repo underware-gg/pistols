@@ -52,6 +52,7 @@ trait IActions {
     fn get_pact(world: @IWorldDispatcher, duelist_a: ContractAddress, duelist_b: ContractAddress) -> u128;
     fn has_pact(duelist_a: ContractAddress, duelist_b: ContractAddress) -> bool;
 
+    fn can_join(world: @IWorldDispatcher, table_id: felt252, duelist_address: ContractAddress) -> bool;
     fn calc_fee(world: @IWorldDispatcher, table_id: felt252, wager_value: u256) -> u256;
     
     fn simulate_chances(world: @IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> SimulateChances;
@@ -322,6 +323,11 @@ mod actions {
 
         fn has_pact(duelist_a: ContractAddress, duelist_b: ContractAddress) -> bool {
             (self.get_pact(duelist_a, duelist_b) != 0)
+        }
+
+        fn can_join(world: @IWorldDispatcher, table_id: felt252, duelist_address: ContractAddress) -> bool {
+            let table_manager = TableManagerTrait::new(world);
+            (table_manager.can_join(table_id, starknet::get_caller_address(), duelist_address))
         }
 
         fn calc_fee(world: @IWorldDispatcher, table_id: felt252, wager_value: u256) -> u256 {
