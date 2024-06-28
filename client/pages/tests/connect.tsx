@@ -10,6 +10,7 @@ import { bigintToHex, shortAddress } from '@/lib/utils/types'
 import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
 import { makeDojoAppConfig } from '@/games/pistols/config'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
+import { ChainSwitcher } from '@/lib/dojo/ChainSwitcher'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import AppDojo from '@/lib/ui/AppDojo'
 
@@ -97,6 +98,8 @@ function Connect() {
     <>
       <StarknetConnectModal opener={connectOpener} />
 
+      <ChainSwitcher />
+
       <Button disabled={isConnected || isConnecting} onClick={() => connectOpener.open()}>Connect</Button>
       &nbsp;&nbsp;
       <Button disabled={!isConnected || isConnecting} onClick={() => disconnect()}>Disconnect</Button>
@@ -157,8 +160,13 @@ function Sign() {
   const [verifyied, setVerifyed] = useState('?')
   useEffect(() => {
     const _verify = async () => {
-      const _v = await account.verifyMessage(typedMessage, signature)
-      setVerifyed(_v ? 'true' : 'false')
+      try {
+        const _v = await account.verifyMessage(typedMessage, signature)
+        setVerifyed(_v ? 'true' : 'false')
+      } catch (e) {
+        console.warn(`SIGN ERROR:`, e)
+        setVerifyed('false')
+      }
     }
     if (account && signature) {
       setVerifyed('...')

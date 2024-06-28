@@ -1,21 +1,19 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { useRouter } from 'next/navigation'
-import { Dropdown, Grid, Icon } from 'semantic-ui-react'
+import { Grid } from 'semantic-ui-react'
 import { VStack, VStackRow } from '@/lib/ui/Stack'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useDojoAccount, useDojoStatus } from '@/lib/dojo/DojoContext'
-import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
 import { useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
 import { useOpener } from '@/lib/ui/useOpener'
-import { ChainId } from '@/lib/dojo/setup/chains'
+import { ChainSwitcher } from '@/lib/dojo/ChainSwitcher'
 import { AccountMenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { AccountsList } from '@/pistols/components/account/AccountsList'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { LordsBagIcon } from '@/pistols/components/account/Balance'
 import { Divider } from '@/lib/ui/Divider'
-import { feltToString } from '@/lib/utils/starknet'
 import { makeTavernUrl } from '@/pistols/utils/pistols'
 import { PACKAGE_VERSION } from '@/pistols/utils/constants'
 import OnboardingModal from '@/pistols/components/account/OnboardingModal'
@@ -90,7 +88,7 @@ function DisconnectedGate() {
       <Grid>
         <Row columns={'equal'}>
           <Col>
-            <ChainSwitcher disabled={isLoading} />
+            <ChainSwitcher fluid disabled={isLoading} />
           </Col>
           <Col>
             <ActionButton fill large important disabled={!canConnect || isConnecting} onClick={() => connectOpener.open()} label={switchChain ? 'Switch Chain' : 'Connect Wallet'} />
@@ -121,28 +119,6 @@ function DisconnectedGate() {
             </div>
       }
     </VStack>
-  )
-}
-
-function ChainSwitcher({
-  disabled = false
-}) {
-  const { chains, selectedChainConfig, selectChainId } = useStarknetContext()
-  return (
-    <Dropdown
-      text={`Server:  ${selectedChainConfig.name}`}
-      disabled={disabled}
-      className='icon AlignCenter Padded'
-      // icon='chain'
-      button
-      fluid
-    >
-      <Dropdown.Menu>
-        {chains.map(chain => (
-          <Dropdown.Item key={chain.name} onClick={() => { selectChainId(feltToString(chain.id) as ChainId) }}>{chain.name}</Dropdown.Item>
-        ))}
-      </Dropdown.Menu>
-    </Dropdown>
   )
 }
 
