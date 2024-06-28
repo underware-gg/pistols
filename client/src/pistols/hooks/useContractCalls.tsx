@@ -1,58 +1,72 @@
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
+import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
+import { useDojoCall } from '@/lib/dojo/hooks/useDojoCall'
+import { isBigint } from '@/lib/utils/types'
 import { BigNumberish } from 'starknet'
 
-export const useCalcFee = (table_id: string, wager_value: BigNumberish, defaultValue = null) => {
-  const { calc_fee } = useDojoSystemCalls()
-  const [value, setValue] = useState(defaultValue)
-  useEffect(() => {
-    let _mounted = true
-    const _get = async () => {
-      const value = await calc_fee(table_id, wager_value)
-      if (_mounted) setValue(value)
-    }
-    if (table_id && calc_fee) _get()
-    else setValue(defaultValue)
-    return () => { _mounted = false }
-  }, [calc_fee, table_id, wager_value])
+export const useCanJoin = () => {
+  const { address } = useAccount()
+  const { can_join } = useDojoSystemCalls()
+  const args = useMemo(() => [BigInt(address ?? 0), BigInt(address ?? 0)], [address])
+  const enabled = useMemo(() => isBigint(address), [address])
+  const { value, isPending } = useDojoCall({
+    call: can_join,
+    args,
+    enabled,
+    defaultValue: null,
+  })
   return {
     fee: value,
+    isPending
   }
 }
 
-export const useSimulateChances = (address: BigNumberish, duelId: bigint, roundNumber: number, action: number, defaultValue = {}) => {
+export const useCalcFee = (table_id: string, wager_value: BigNumberish) => {
+  const { calc_fee } = useDojoSystemCalls()
+  const args = useMemo(() => [table_id, wager_value], [table_id, wager_value])
+  const enabled = useMemo(() => Boolean(table_id), [table_id])
+  const { value, isPending } = useDojoCall({
+    call: calc_fee,
+    args,
+    enabled,
+    defaultValue: null,
+  })
+  return {
+    fee: value,
+    isPending,
+  }
+}
+
+export const useSimulateChances = (address: BigNumberish, duelId: bigint, roundNumber: number, action: number) => {
   const { simulate_chances } = useDojoSystemCalls()
-  const [value, setValue] = useState<any | null>(defaultValue)
-  useEffect(() => {
-    let _mounted = true
-    const _get = async () => {
-      const value = await simulate_chances(BigInt(address), duelId, roundNumber, action)
-      if (_mounted) setValue(value)
-    }
-    if (simulate_chances && address != null && duelId && roundNumber && action != null) _get()
-    else setValue(defaultValue)
-    return () => { _mounted = false }
-  }, [simulate_chances, address, duelId, roundNumber, action])
+  const args = useMemo(() => [BigInt(address), duelId, roundNumber, action], [address, duelId, roundNumber, action])
+  const enabled = useMemo(() => (address != null && duelId && roundNumber && action != null), [address, duelId, roundNumber, action])
+  const { value } = useDojoCall({
+    call: simulate_chances,
+    args,
+    enabled,
+    defaultValue: {},
+  })
   return value as Awaited<ReturnType<typeof simulate_chances>>
 }
 
-export const useGetValidPackedActions = (round_number: number, defaultValue = []) => {
-  const [value, setValue] = useState(defaultValue)
+export const useGetValidPackedActions = (roundNumber: number) => {
   const { get_valid_packed_actions } = useDojoSystemCalls()
-  useEffect(() => {
-    let _mounted = true
-    const _get = async () => {
-      const value = await get_valid_packed_actions(round_number)
-      if (_mounted) setValue(value)
-    }
-    if (get_valid_packed_actions && round_number != null) _get()
-    else setValue(defaultValue)
-    return () => { _mounted = false }
-  }, [get_valid_packed_actions, round_number])
+  const args = useMemo(() => [roundNumber], [roundNumber])
+  const enabled = useMemo(() => Boolean(roundNumber), [roundNumber])
+  const { value, isPending } = useDojoCall({
+    call: get_valid_packed_actions,
+    args,
+    enabled,
+    defaultValue: [],
+  })
   return {
     validPackedActions: value,
+    isPending,
   }
 }
+
 
 // export const usePackActionSlots = (slot1: number, slot2: number, defaultValue = null) => {
 //   const [value, setValue] = useState(defaultValue)

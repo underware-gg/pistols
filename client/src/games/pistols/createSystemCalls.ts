@@ -173,6 +173,12 @@ export function createSystemCalls(
     return results ?? null
   }
 
+  const can_join = async (account_address: bigint, duelist_address: bigint): Promise<boolean | null> => {
+    const args = [account_address, duelist_address]
+    const results = await _executeCall<boolean>(actions_call('can_join', args))
+    return results ?? null
+  }
+
   const calc_fee = async (table_id: string, wager_value: BigNumberish): Promise<bigint | null> => {
     const args = [stringToFelt(table_id), wager_value]
     const results = await _executeCall<bigint>(actions_call('calc_fee', args))
@@ -219,6 +225,7 @@ export function createSystemCalls(
     // read-only calls
     get_pact,
     has_pact,
+    can_join,
     calc_fee,
     simulate_chances,
     get_valid_packed_actions,
