@@ -50,16 +50,13 @@ trait IActions {
     //
     // read-only calls
     fn get_pact(world: @IWorldDispatcher, duelist_a: ContractAddress, duelist_b: ContractAddress) -> u128;
-    fn has_pact(duelist_a: ContractAddress, duelist_b: ContractAddress) -> bool;
-
+    fn has_pact(world: @IWorldDispatcher, duelist_a: ContractAddress, duelist_b: ContractAddress) -> bool;
     fn can_join(world: @IWorldDispatcher, table_id: felt252, duelist_address: ContractAddress) -> bool;
     fn calc_fee(world: @IWorldDispatcher, table_id: felt252, wager_value: u256) -> u256;
-    
     fn simulate_chances(world: @IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> SimulateChances;
-
-    fn get_valid_packed_actions(round_number: u8) -> Array<u16>;
-    fn pack_action_slots(slot1: u8, slot2: u8) -> u16;
-    fn unpack_action_slots(packed: u16) -> (u8, u8);
+    fn get_valid_packed_actions(world: @IWorldDispatcher, round_number: u8) -> Array<u16>;
+    fn pack_action_slots(world: @IWorldDispatcher, slot1: u8, slot2: u8) -> u16;
+    fn unpack_action_slots(world: @IWorldDispatcher, packed: u16) -> (u8, u8);
 }
 
 // private/internal functions
@@ -132,9 +129,7 @@ mod actions {
             name: felt252,
             profile_pic: u8,
         ) -> Duelist {
-            let caller: ContractAddress = starknet::get_caller_address();
-
-            let mut duelist: Duelist = get!(world, caller, Duelist);
+            let mut duelist: Duelist = get!(world, starknet::get_caller_address(), Duelist);
 
             // 1st time setup
             let is_new: bool = (duelist.timestamp == 0);
@@ -306,7 +301,6 @@ mod actions {
             action_slot2: u8,
         ) {
             let challenge: Challenge = shooter::reveal_action(world, duel_id, round_number, salt, utils::pack_action_slots(action_slot1, action_slot2));
-
             self._emitPostRevealEvents(challenge);
         }
 
@@ -321,7 +315,8 @@ mod actions {
             (get!(world, pair, Pact).duel_id)
         }
 
-        fn has_pact(duelist_a: ContractAddress, duelist_b: ContractAddress) -> bool {
+        fn has_pact(world: @IWorldDispatcher, duelist_a: ContractAddress, duelist_b: ContractAddress) -> bool {
+            utils::WORLD(world);
             (self.get_pact(duelist_a, duelist_b) != 0)
         }
 
@@ -382,13 +377,16 @@ mod actions {
             })
         }
 
-        fn get_valid_packed_actions(round_number: u8) -> Array<u16> {
+        fn get_valid_packed_actions(world: @IWorldDispatcher, round_number: u8) -> Array<u16> {
+            utils::WORLD(world);
             (utils::get_valid_packed_actions(round_number))
         }
-        fn pack_action_slots(slot1: u8, slot2: u8) -> u16 {
+        fn pack_action_slots(world: @IWorldDispatcher, slot1: u8, slot2: u8) -> u16 {
+            utils::WORLD(world);
             (utils::pack_action_slots(slot1, slot2))
         }
-        fn unpack_action_slots(packed: u16) -> (u8, u8) {
+        fn unpack_action_slots(world: @IWorldDispatcher, packed: u16) -> (u8, u8) {
+            utils::WORLD(world);
             (utils::unpack_action_slots(packed))
         }
     }
@@ -434,6 +432,7 @@ mod actions {
             })));
         }
         fn _emitPostRevealEvents(ref world: IWorldDispatcher, challenge: Challenge) {
+            utils::WORLD(world);
             let state: ChallengeState = challenge.state.try_into().unwrap();
             if (state == ChallengeState::InProgress) {
                 self._emitDuelistTurnEvent(challenge);
