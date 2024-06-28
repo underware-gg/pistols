@@ -92,6 +92,34 @@ mod actions {
     use pistols::types::constants::{constants};
     use pistols::types::{events};
 
+    mod Errors {
+        const NOT_INITIALIZED: felt252           = 'PISTOLS: Not initialized';
+        const INVALID_CHALLENGED: felt252        = 'PISTOLS: Invalid challenged';
+        const INVALID_EXPIRE: felt252            = 'PISTOLS: Invalid expire_seconds';
+        const INVALID_CHALLENGE: felt252         = 'PISTOLS: Invalid Challenge';
+        const CHALLENGER_NOT_ADMITTED: felt252   = 'PISTOLS: Challenger not allowed';
+        const CHALLENGED_NOT_ADMITTED: felt252   = 'PISTOLS: Challenged not allowed';
+        const CHALLENGER_NOT_REGISTERED: felt252 = 'PISTOLS: Challenger unknown';
+        const CHALLENGED_NOT_REGISTERED: felt252 = 'PISTOLS: Challenged unknown';
+        const CHALLENGE_EXISTS: felt252          = 'PISTOLS: Challenge exists';
+        const CHALLENGE_WRONG_STATE: felt252     = 'PISTOLS: Wrong Challenge state';
+        const NOT_YOUR_CHALLENGE: felt252        = 'PISTOLS: Not your Challenge';
+        const TABLE_IS_CLOSED: felt252           = 'PISTOLS: Table is closed';
+        const MINIMUM_WAGER_NOT_MET: felt252     = 'PISTOLS: Minimum wager not met';
+        const NO_WAGER: felt252                  = 'PISTOLS: No wager on this table';
+        const INSUFFICIENT_BALANCE: felt252      = 'PISTOLS: Insufficient balance';
+        const NO_ALLOWANCE: felt252              = 'PISTOLS: No transfer allowance';
+        const WITHDRAW_NOT_AVAILABLE: felt252    = 'PISTOLS: Withdraw not available';
+        const WAGER_NOT_AVAILABLE: felt252       = 'PISTOLS: Wager not available';
+        const INVALID_ROUND_NUMBER: felt252      = 'PISTOLS: Invalid round number';
+        const ROUND_NOT_IN_COMMIT: felt252       = 'PISTOLS: Round not in commit';
+        const ROUND_NOT_IN_REVEAL: felt252       = 'PISTOLS: Round not in reveal';
+        const ALREADY_COMMITTED: felt252         = 'PISTOLS: Already committed';
+        const ALREADY_REVEALED: felt252          = 'PISTOLS: Already revealed';
+        const ACTION_HASH_MISMATCH: felt252      = 'PISTOLS: Action hash mismatch';
+
+    }
+
     // impl: implement functions specified in trait
     #[abi(embed_v0)]
     impl ActionsImpl of super::IActions<ContractState> {
@@ -134,22 +162,22 @@ mod actions {
             wager_value: u256,
             expire_seconds: u64,
         ) -> u128 {
-            assert(ConfigManagerTrait::is_initialized(world) == true, 'Not initialized');
+            assert(ConfigManagerTrait::is_initialized(world) == true, Errors::NOT_INITIALIZED);
 
-            assert(challenged != utils::ZERO(), 'Missing challenged address');
-            assert(expire_seconds == 0 || expire_seconds >= timestamp::from_hours(1), 'Invalid expire_seconds');
+            assert(challenged != utils::ZERO(), Errors::INVALID_CHALLENGED);
+            assert(expire_seconds == 0 || expire_seconds >= timestamp::from_hours(1), Errors::INVALID_EXPIRE);
 
             let caller: ContractAddress = starknet::get_caller_address();
             let table_manager = TableManagerTrait::new(world);
 
-            assert(table_manager.can_join(table_id, caller, caller), 'Challenger not admitted');
-            assert(table_manager.can_join(table_id, challenged, challenged), 'Challenged not admitted');
+            assert(table_manager.can_join(table_id, caller, caller), Errors::CHALLENGER_NOT_ADMITTED);
+            assert(table_manager.can_join(table_id, challenged, challenged), Errors::CHALLENGED_NOT_ADMITTED);
 
-            assert(utils::duelist_exist(world, caller), 'Challenger not registered');
-            assert(caller != challenged, 'Challenging thyself, you fool!');
-            assert(self.has_pact(caller, challenged) == false, 'Duplicated challenge');
+            assert(utils::duelist_exist(world, caller), Errors::CHALLENGER_NOT_REGISTERED);
+            assert(caller != challenged, Errors::INVALID_CHALLENGED);
+            assert(self.has_pact(caller, challenged) == false, Errors::CHALLENGE_EXISTS);
             // if (challenged != utils::ZERO()) {
-            //     assert(utils::duelist_exist(world, caller), 'Challenged is not registered');
+            //     assert(utils::duelist_exist(world, caller), Errors::CHALLENGED_NOT_REGISTERED);
             // }
 
             // create duel id
@@ -177,12 +205,12 @@ mod actions {
 
             // setup wager + fees
             let table: TableConfig = table_manager.get(table_id);
-            assert(table.is_open == true, 'Table is closed');
-            assert(wager_value >= table.wager_min, 'Minimum wager not met');
+            assert(table.is_open == true, Errors::TABLE_IS_CLOSED);
+            assert(wager_value >= table.wager_min, Errors::MINIMUM_WAGER_NOT_MET);
             let fee: u256 = table.calc_fee(wager_value);
             // calc fee and store
             if (fee > 0 || wager_value > 0) {
-                assert(table.contract_address != utils::ZERO(), 'No wager on this table');
+                assert(table.contract_address != utils::ZERO(), Errors::NO_WAGER);
                 let wager = Wager {
                     duel_id,
                     value: wager_value,
@@ -211,8 +239,8 @@ mod actions {
         ) -> ChallengeState {
             let mut challenge: Challenge = get!(world, duel_id, Challenge);
             let state: ChallengeState = challenge.state.try_into().unwrap();
-            assert(state.exists(), 'Challenge do not exist');
-            assert(state == ChallengeState::Awaiting, 'Challenge is not Awaiting');
+            assert(state.exists(), Errors::INVALID_CHALLENGE);
+            assert(state == ChallengeState::Awaiting, Errors::CHALLENGE_WRONG_STATE);
 
             let caller: ContractAddress = starknet::get_caller_address();
             let contract: ContractAddress = starknet::get_contract_address();
@@ -221,14 +249,13 @@ mod actions {
             if (challenge.timestamp_end > 0 && timestamp > challenge.timestamp_end) {
                 challenge.state = ChallengeState::Expired.into();
                 challenge.timestamp_end = timestamp;
-            } else if (caller == challenge.duelist_a) {
+            } else if (caller == challenge.duelist_a && accepted == false) {
                 // Challenger is Withdrawing
-                assert(accepted == false, 'Cannot accept own challenge');
                 challenge.state = ChallengeState::Withdrawn.into();
                 challenge.timestamp_end = timestamp;
             } else {
-                assert(caller == challenge.duelist_b, 'Not the Challenged');
-                assert(utils::duelist_exist(world, caller), 'Challenged not registered');
+                assert(caller == challenge.duelist_b, Errors::NOT_YOUR_CHALLENGE);
+                assert(utils::duelist_exist(world, caller), Errors::CHALLENGED_NOT_REGISTERED);
                 if (accepted) {
                     // Challenged is accepting
                     challenge.state = ChallengeState::InProgress.into();

@@ -33,13 +33,24 @@ mod admin {
     use pistols::models::table::{TableConfig, TableManager, TableManagerTrait, default_tables};
     use pistols::systems::{utils};
 
+    mod Errors {
+        const ALREADY_INITIALIZED: felt252 = 'ADMIN: Already initialized';
+        const INVALID_OWNER: felt252       = 'ADMIN: Invalid owner_address';
+        const INVALID_TREASURY: felt252    = 'ADMIN: Invalid treasury_address';
+        const INVALID_TABLE: felt252       = 'ADMIN: Invalid table';
+        const INVALID_DESCRIPTION: felt252 = 'ADMIN: Invalid description';
+        const NOT_DEPLOYER: felt252        = 'ADMIN: Not deployer';
+        const NOT_INITIALIZED: felt252     = 'ADMIN: Not initialized';
+        const NOT_OWNER: felt252           = 'ADMIN: Not owner';
+    }
+    
     #[abi(embed_v0)]
     impl AdminImpl of super::IAdmin<ContractState> {
         fn initialize(ref world: IWorldDispatcher, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress) {
             self.assert_initializer_is_owner();
             let manager = ConfigManagerTrait::new(world);
             let mut config = manager.get();
-            assert(config.initialized == false, 'Already initialized');
+            assert(config.initialized == false, Errors::ALREADY_INITIALIZED);
             // initialize
             config.initialized = true;
             config.owner_address = (if (owner_address == utils::ZERO()) { get_caller_address() } else { owner_address });
@@ -57,7 +68,7 @@ mod admin {
 
         fn set_owner(ref world: IWorldDispatcher, owner_address: ContractAddress) {
             self.assert_caller_is_owner();
-            assert(owner_address != utils::ZERO(), 'Null owner_address');
+            assert(owner_address != utils::ZERO(), Errors::INVALID_OWNER);
             // get current
             let manager = ConfigManagerTrait::new(world);
             let mut config = manager.get();
@@ -68,7 +79,7 @@ mod admin {
 
         fn set_treasury(ref world: IWorldDispatcher, treasury_address: ContractAddress) {
             self.assert_caller_is_owner();
-            assert(treasury_address != utils::ZERO(), 'Null treasury_address');
+            assert(treasury_address != utils::ZERO(), Errors::INVALID_TREASURY);
             // get current
             let manager = ConfigManagerTrait::new(world);
             let mut config = manager.get();
@@ -91,7 +102,7 @@ mod admin {
             self.assert_caller_is_owner();
             // get table
             let manager = TableManagerTrait::new(world);
-            assert(manager.exists(table_id), 'Invalid table');
+            assert(manager.exists(table_id), Errors::INVALID_TABLE);
             let mut table = manager.get(table_id);
             // update table
             table.contract_address = contract_address;
@@ -106,7 +117,7 @@ mod admin {
             self.assert_caller_is_owner();
             // get table
             let manager = TableManagerTrait::new(world);
-            assert(manager.exists(table_id), 'Invalid table');
+            assert(manager.exists(table_id), Errors::INVALID_TABLE);
             let mut table = manager.get(table_id);
             // update table
             table.is_open = enabled;
@@ -123,7 +134,7 @@ mod admin {
 
         fn get_table(world: @IWorldDispatcher, table_id: felt252) -> TableConfig {
             let manager = TableManagerTrait::new(world);
-            assert(manager.exists(table_id), 'Invalid table');
+            assert(manager.exists(table_id), Errors::INVALID_TABLE);
             (manager.get(table_id))
         }
     }
@@ -132,11 +143,11 @@ mod admin {
     impl InternalImpl of InternalTrait {
         #[inline(always)]
         fn assert_initializer_is_owner(self: @ContractState) {
-            assert(self.world().is_owner(get_caller_address(), get_contract_address().into()), 'Not deployer');
+            assert(self.world().is_owner(get_caller_address(), get_contract_address().into()), Errors::NOT_DEPLOYER);
         }
         fn assert_caller_is_owner(self: @ContractState) {
-            assert(ConfigManagerTrait::is_initialized(self.world()) == true, 'Not initialized');
-            assert(ConfigManagerTrait::is_owner(self.world(), get_caller_address()) == true, 'Not owner');
+            assert(ConfigManagerTrait::is_initialized(self.world()) == true, Errors::NOT_INITIALIZED);
+            assert(ConfigManagerTrait::is_owner(self.world(), get_caller_address()) == true, Errors::NOT_OWNER);
         }
     }
 }

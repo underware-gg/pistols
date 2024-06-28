@@ -4,6 +4,7 @@ use traits::{Into, TryInto};
 use starknet::{ContractAddress};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
+use pistols::systems::actions::actions::{Errors};
 use pistols::models::models::{init, Duelist, Scoreboard, Score, ScoreTrait, Challenge, Snapshot, Wager, Pact, Round, Shot};
 use pistols::models::table::{TableConfig, TableTrait, TableManagerTrait};
 use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
@@ -109,8 +110,8 @@ fn deposit_wager_fees(world: IWorldDispatcher, challenge: Challenge, from: Contr
         let table : TableConfig = TableManagerTrait::new(world).get(challenge.table_id);
         let balance: u256 = table.ierc20().balance_of(from);
         let allowance: u256 = table.ierc20().allowance(from, to);
-        assert(balance >= total, 'Insufficient balance for Fees');
-        assert(allowance >= total, 'Not allowed to transfer Fees');
+        assert(balance >= total, Errors::INSUFFICIENT_BALANCE);
+        assert(allowance >= total, Errors::NO_ALLOWANCE);
         table.ierc20().transfer_from(from, to, total);
     }
 }
@@ -120,7 +121,7 @@ fn withdraw_wager_fees(world: IWorldDispatcher, challenge: Challenge, to: Contra
     if (total > 0) {
         let table : TableConfig = TableManagerTrait::new(world).get(challenge.table_id);
         let balance: u256 = table.ierc20().balance_of(starknet::get_contract_address());
-        assert(balance >= total, 'Withdraw not available'); // should never happen!
+        assert(balance >= total, Errors::WITHDRAW_NOT_AVAILABLE); // should never happen!
         table.ierc20().transfer(to, total);
     }
 }
@@ -131,7 +132,7 @@ fn split_wager_fees(world: IWorldDispatcher, challenge: Challenge, duelist_a: Co
     if (total > 0) {
         let table : TableConfig = TableManagerTrait::new(world).get(challenge.table_id);
         let balance: u256 = table.ierc20().balance_of(starknet::get_contract_address());
-        assert(balance >= total, 'Wager not available'); // should never happen!
+        assert(balance >= total, Errors::WAGER_NOT_AVAILABLE); // should never happen!
         if (wager.value > 0) {
             if (duelist_a == duelist_b) {
                 // single winner

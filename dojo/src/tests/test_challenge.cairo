@@ -21,7 +21,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Challenger not registered','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: Challenger unknown', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_challenger() {
         let (_world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let _duel_id: u128 = tester::execute_create_challenge(system, owner, other, MESSAGE_1, TABLE_ID, 0, 0);
@@ -29,8 +29,8 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Challenging thyself, you fool!','ENTRYPOINT_FAILED'))]
-    fn test_challenge_thyself() {
+    #[should_panic(expected:('PISTOLS: Invalid challenged', 'ENTRYPOINT_FAILED'))]
+    fn test_INVALID_CHALLENGED() {
         let (_world, system, _admin, _lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(true, true);
         tester::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         let _duel_id: u128 = tester::execute_create_challenge(system, owner, owner, MESSAGE_1, TABLE_ID, 0, 0);
@@ -38,8 +38,8 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Missing challenged address','ENTRYPOINT_FAILED'))]
-    // #[should_panic(expected:('Challenge a player','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: Invalid challenged', 'ENTRYPOINT_FAILED'))]
+    // #[should_panic(expected:('Challenge a player', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_code() {
         let (_world, system, _admin, _lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(true, true);
         tester::execute_register_duelist(system, owner, PLAYER_NAME, 1);
@@ -49,8 +49,8 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Duplicated challenge','ENTRYPOINT_FAILED'))]
-    fn test_duplicated_challenge() {
+    #[should_panic(expected:('PISTOLS: Challenge exists', 'ENTRYPOINT_FAILED'))]
+    fn test_CHALLENGE_EXISTS() {
         let (_world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         tester::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         tester::execute_register_duelist(system, other, OTHER_NAME, 1);
@@ -60,8 +60,8 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Duplicated challenge','ENTRYPOINT_FAILED'))]
-    fn test_duplicated_challenge_from_challenged() {
+    #[should_panic(expected:('PISTOLS: Challenge exists', 'ENTRYPOINT_FAILED'))]
+    fn test_CHALLENGE_EXISTS_from_challenged() {
         let (_world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         tester::execute_register_duelist(system, owner, PLAYER_NAME, 1);
         tester::execute_register_duelist(system, other, OTHER_NAME, 1);
@@ -71,7 +71,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Invalid expire_seconds','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: Invalid expire_seconds', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_expire() {
         let (_world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         tester::execute_register_duelist(system, owner, PLAYER_NAME, 1);
@@ -131,7 +131,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Challenge do not exist','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: Invalid Challenge', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_reply_invalid() {
         let (_world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         tester::execute_register_duelist(system, owner, PLAYER_NAME, 1);
@@ -144,7 +144,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Challenge is not Awaiting','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: Wrong Challenge state', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_reply_twice() {
         let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         tester::execute_register_duelist(system, owner, PLAYER_NAME, 1);
@@ -185,7 +185,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Cannot accept own challenge','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('Cannot accept own challenge', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_owner_accept() {
         let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         tester::execute_register_duelist(system, owner, PLAYER_NAME, 1);
@@ -224,7 +224,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Not the Challenged','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: Not your Challenge', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_impersonator() {
         let (world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         let impersonator: ContractAddress = starknet::contract_address_const::<0x333>();
@@ -241,7 +241,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Challenged not registered','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: Challenged unknown', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_other_not_registered() {
         let (_world, system, _admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(true, true);
         tester::execute_register_duelist(system, owner, PLAYER_NAME, 1);

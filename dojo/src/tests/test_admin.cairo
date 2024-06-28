@@ -21,7 +21,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    // #[should_panic(expected:('Not initialized','ENTRYPOINT_FAILED'))]
+    // #[should_panic(expected:('ADMIN: Not initialized', 'ENTRYPOINT_FAILED'))]
     fn test_initialize_defaults() {
         let (world, _system, admin, _lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(false, false);
         let config: Config = admin.get_config();
@@ -91,7 +91,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Null owner_address','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: Invalid owner_address', 'ENTRYPOINT_FAILED'))]
     fn test_set_owner_null() {
         let (_world, _system, admin, _lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(false, false);
         tester::execute_admin_initialize(admin, owner, ZERO(), ZERO(), ZERO());
@@ -100,7 +100,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Null treasury_address','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: Invalid treasury_address', 'ENTRYPOINT_FAILED'))]
     fn test_set_treasury_null() {
         let (_world, _system, admin, _lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(false, false);
         tester::execute_admin_initialize(admin, owner, ZERO(), ZERO(), ZERO());
@@ -126,7 +126,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Already initialized','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: Already initialized', 'ENTRYPOINT_FAILED'))]
     fn test_initialized() {
         let (_world, _system, admin, _lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(false, false);
         tester::execute_admin_initialize(admin, owner, ZERO(), ZERO(), ZERO());
@@ -135,7 +135,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Not initialized','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: Not initialized', 'ENTRYPOINT_FAILED'))]
     fn test_set_owner_not_initialized() {
         let (_world, _system, admin, _lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(false, false);
         tester::execute_admin_set_owner(admin, owner, ZERO());
@@ -143,7 +143,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Not initialized','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: Not initialized', 'ENTRYPOINT_FAILED'))]
     fn test_set_treasury_not_initialized() {
         let (_world, _system, admin, _lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(false, false);
         tester::execute_admin_set_treasury(admin, owner, ZERO());
@@ -151,7 +151,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Not deployer','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: Not deployer', 'ENTRYPOINT_FAILED'))]
     fn test_initialize_not_deployer() {
         let (_world, _system, admin, _lords, _ierc20, _owner, other, _bummer, _treasury) = tester::setup_world(false, false);
         tester::execute_admin_initialize(admin, other, ZERO(), ZERO(), ZERO());
@@ -159,7 +159,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Not owner','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
     fn test_set_owner_not_owner() {
         let (_world, _system, admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(false, false);
         tester::execute_admin_initialize(admin, owner, ZERO(), ZERO(), ZERO());
@@ -169,7 +169,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Not owner','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
     fn test_set_treasury_not_owner() {
         let (_world, _system, admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(false, false);
         tester::execute_admin_initialize(admin, owner, ZERO(), ZERO(), ZERO());
@@ -179,7 +179,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Not owner','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
     fn test_set_paused_not_owner() {
         let (_world, _system, admin, _lords, _ierc20, owner, other, _bummer, _treasury) = tester::setup_world(false, false);
         tester::execute_admin_initialize(admin, owner, ZERO(), ZERO(), ZERO());
@@ -247,7 +247,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Invalid table','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: Invalid table', 'ENTRYPOINT_FAILED'))]
     fn test_set_table_count() {
         let (_world, _system, admin, _lords, _ierc20, _owner, _other, _bummer, _treasury) = tester::setup_world(true, false);
         let _table: TableConfig = admin.get_table(INVALID_TABLE);
@@ -279,7 +279,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Not owner','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
     fn test_set_table_not_owner() {
         let (_world, _system, admin, lords, _ierc20, _owner, other, _bummer, _treasury) = tester::setup_world(true, false);
         tester::execute_admin_set_table(admin, other, tables::LORDS, lords.contract_address, 'LORDS+', 5, 10, true);
@@ -287,7 +287,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Not owner','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
     fn test_enable_table_not_owner() {
         let (_world, _system, admin, _lords, _ierc20, _owner, other, _bummer, _treasury) = tester::setup_world(true, false);
         tester::execute_admin_enable_table(admin, other, tables::LORDS, true);
@@ -295,7 +295,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Invalid table','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: Invalid table', 'ENTRYPOINT_FAILED'))]
     fn test_set_table_zero() {
         let (_world, _system, admin, lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(true, false);
         tester::execute_admin_set_table(admin, owner, 0, lords.contract_address, 'LORDS+', 5, 10, true);
@@ -303,7 +303,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Invalid table','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: Invalid table', 'ENTRYPOINT_FAILED'))]
     fn test_set_table_invalid() {
         let (_world, _system, admin, lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(true, false);
         tester::execute_admin_set_table(admin, owner, INVALID_TABLE, lords.contract_address, 'LORDS+', 5, 10, true);
@@ -311,7 +311,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Invalid table','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: Invalid table', 'ENTRYPOINT_FAILED'))]
     fn test_enable_table_zero() {
         let (_world, _system, admin, _lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(true, false);
         tester::execute_admin_enable_table(admin, owner, 0, false);
@@ -319,7 +319,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Invalid table','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: Invalid table', 'ENTRYPOINT_FAILED'))]
     fn test_enable_table_invalid() {
         let (_world, _system, admin, _lords, _ierc20, owner, _other, _bummer, _treasury) = tester::setup_world(true, false);
         tester::execute_admin_enable_table(admin, owner, INVALID_TABLE, false);

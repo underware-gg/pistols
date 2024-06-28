@@ -112,13 +112,13 @@ mod tests {
     }
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('No wager on this table','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: No wager on this table', 'ENTRYPOINT_FAILED'))]
     fn test_COMMONERS_wager_balance_ok() {
         _test_balance_ok(tables::COMMONERS, 100 * constants::ETH_TO_WEI, 0);
     }
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Minimum wager not met','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: Minimum wager not met', 'ENTRYPOINT_FAILED'))]
     fn test_LORDS_wager_balance_min_wager() {
         _test_balance_ok(tables::LORDS, 99 * constants::ETH_TO_WEI, 100 * constants::ETH_TO_WEI);
     }
@@ -130,7 +130,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Insufficient balance for Fees','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: Insufficient balance', 'ENTRYPOINT_FAILED'))]
     fn test_fee_funds_nok() {
         let (_world, system, _admin, _lords, _ierc20, _owner, other, bummer, _treasury) = tester::setup_world(true, true);
         tester::execute_register_duelist(system, other, OTHER_NAME, 1);
@@ -140,7 +140,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Insufficient balance for Fees','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: Insufficient balance', 'ENTRYPOINT_FAILED'))]
     fn test_wager_funds_nok() {
         let (_world, system, _admin, _lords, _ierc20, _owner, other, bummer, _treasury) = tester::setup_world(true, true);
         tester::execute_register_duelist(system, other, OTHER_NAME, 1);
@@ -183,7 +183,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Insufficient balance for Fees','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: Insufficient balance', 'ENTRYPOINT_FAILED'))]
     fn test_fee_funds_ok_resp_nok() {
         let (_world, system, _admin, _lords, _ierc20, _owner, other, bummer, _treasury) = tester::setup_world(true, true);
         tester::execute_register_duelist(system, other, OTHER_NAME, 1);
@@ -196,7 +196,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Insufficient balance for Fees','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: Insufficient balance', 'ENTRYPOINT_FAILED'))]
     fn test_wager_funds_ok_resp_nok() {
         let (_world, system, _admin, _lords, _ierc20, _owner, other, bummer, _treasury) = tester::setup_world(true, true);
         tester::execute_register_duelist(system, other, OTHER_NAME, 1);
@@ -213,7 +213,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Not allowed to transfer Fees','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: No transfer allowance', 'ENTRYPOINT_FAILED'))]
     fn test_fee_funds_ok_allowance_nok() {
         let (_world, system, _admin, lords, _ierc20, _owner, other, bummer, _treasury) = tester::setup_world(true, true);
         tester::execute_register_duelist(system, other, OTHER_NAME, 1);
@@ -226,7 +226,7 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('Not allowed to transfer Fees','ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: No transfer allowance', 'ENTRYPOINT_FAILED'))]
     fn test_wager_funds_ok_allowance_nok() {
         let (_world, system, _admin, lords, _ierc20, _owner, other, bummer, _treasury) = tester::setup_world(true, true);
         tester::execute_register_duelist(system, other, OTHER_NAME, 1);

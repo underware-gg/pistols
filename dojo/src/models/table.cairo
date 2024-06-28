@@ -1,6 +1,7 @@
 use starknet::ContractAddress;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
+use pistols::systems::admin::admin::{Errors};
 use pistols::systems::utils::{ZERO};
 use pistols::utils::math::{MathU256};
 use pistols::utils::arrays::{ArrayTrait};
@@ -100,11 +101,11 @@ impl TableManagerTraitImpl of TableManagerTrait {
     }
     fn get(self: TableManager, table_id: felt252) -> TableConfig {
         let table: TableConfig = get!(self.world, (table_id), TableConfig);
-        assert(table.description != 0, 'Invalid Table');
+        assert(table.description != 0, Errors::INVALID_TABLE);
         (table)
     }
     fn set(self: TableManager, table: TableConfig) {
-        assert(table.description != 0, 'Need a description');
+        assert(table.description != 0, Errors::INVALID_DESCRIPTION);
         set!(self.world, (table));
     }
     fn set_array(self: TableManager, tables: @Array<TableConfig>) {

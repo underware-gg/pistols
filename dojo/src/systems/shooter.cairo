@@ -5,6 +5,7 @@ mod shooter {
     use starknet::{ContractAddress, get_block_timestamp};
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
+    use pistols::systems::actions::actions::{Errors};
     use pistols::systems::{utils};
     use pistols::models::models::{init, Score, Challenge, Snapshot, Round, Shot, Duelist};
     use pistols::types::constants::{constants};
@@ -18,11 +19,11 @@ mod shooter {
 
         // Assert Duelist is in the challenge
         let duelist_number: u8 = if (challenge.duelist_a == caller) { 1 } else if (challenge.duelist_b == caller) { 2 } else { 0 };
-        assert(duelist_number == 1 || duelist_number == 2, 'Not your Challenge!');
+        assert(duelist_number == 1 || duelist_number == 2, Errors::NOT_YOUR_CHALLENGE);
 
         // Correct Challenge state
-        assert(challenge.state == ChallengeState::InProgress.into(), 'Challenge is not In Progress');
-        assert(challenge.round_number == round_number, 'Bad Round number');
+        assert(challenge.state == ChallengeState::InProgress.into(), Errors::CHALLENGE_WRONG_STATE);
+        assert(challenge.round_number == round_number, Errors::INVALID_ROUND_NUMBER);
         
         (challenge, duelist_number)
     }
@@ -39,16 +40,16 @@ mod shooter {
 
         // Assert correct Round
         let mut round: Round = get!(world, (duel_id, round_number), Round);
-        assert(round.state == RoundState::Commit.into(), 'Round not in Commit');
+        assert(round.state == RoundState::Commit.into(), Errors::ROUND_NOT_IN_COMMIT);
 
         // Validate action hash
 
         // Store hash
         if (duelist_number == 1) {
-            assert(round.shot_a.hash == 0, 'Already committed');
+            assert(round.shot_a.hash == 0, Errors::ALREADY_COMMITTED);
             round.shot_a.hash = hash;
         } else if (duelist_number == 2) {
-            assert(round.shot_b.hash == 0, 'Already committed');
+            assert(round.shot_b.hash == 0, Errors::ALREADY_COMMITTED);
             round.shot_b.hash = hash;
         }
 
@@ -71,7 +72,7 @@ mod shooter {
 
         // Assert correct Round
         let mut round: Round = get!(world, (duel_id, round_number), Round);
-        assert(round.state == RoundState::Reveal.into(), 'Round not in Reveal');
+        assert(round.state == RoundState::Reveal.into(), Errors::ROUND_NOT_IN_REVEAL);
 
         // Validate action hash
         let hash: u64 = utils::make_action_hash(salt, packed);
@@ -90,13 +91,13 @@ mod shooter {
 
         // Store action
         if (duelist_number == 1) {
-            assert(round.shot_a.action == 0, 'Already revealed');
-            assert(round.shot_a.hash == hash, 'Action does not match hash');
+            assert(round.shot_a.action == 0, Errors::ALREADY_REVEALED);
+            assert(round.shot_a.hash == hash, Errors::ACTION_HASH_MISMATCH);
             round.shot_a.salt = salt;
             round.shot_a.action = packed;
         } else if (duelist_number == 2) {
-            assert(round.shot_b.action == 0, 'Already revealed');
-            assert(round.shot_b.hash == hash, 'Action does not match hash');
+            assert(round.shot_b.action == 0, Errors::ALREADY_REVEALED);
+            assert(round.shot_b.hash == hash, Errors::ACTION_HASH_MISMATCH);
             round.shot_b.salt = salt;
             round.shot_b.action = packed;
         }
