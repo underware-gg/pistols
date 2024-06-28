@@ -6,11 +6,18 @@ import { bigintToEntity } from '@/lib/utils/types'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
 import { BigNumberish } from 'starknet'
 import { useMemo } from 'react'
+import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 
 export const useTable = (tableId: string) => {
   const { TableConfig } = useDojoComponents()
+  const { table_types } = useDojoConstants()
   const table = useComponentValue(TableConfig, bigintToEntity(stringToFelt(tableId ?? '')))
   const contractAddress = useMemo(() => (table?.contract_address ?? 0n), [table])
+  const tableType = useMemo(() => (table?.table_type ? {
+    [table_types.CLASSIC]: 'Classic',
+    [table_types.TOURNAMENT]: 'Tournament',
+    [table_types.IRL_TOURNAMENT]: 'IRL Tournamment',
+  }[Number(table.table_type)] : null), [table])
   return {
     tableId,
     contractAddress,
@@ -19,6 +26,7 @@ export const useTable = (tableId: string) => {
     wagerMin: table?.wager_min ?? null,
     feeMin: table?.fee_min ?? null,
     feePct: table?.fee_pct ?? null,
+    tableType: tableType ?? '?',
     tableIsOpen: table?.is_open ?? false,
   }
 }

@@ -109,13 +109,24 @@ function TableDescription({
     feeMin,
     feePct,
     tableIsOpen,
+    tableType,
  } = useTable(tableId)
   const { tokenName, tokenSymbol } = useERC20TokenName(contractAddress)
   const { challengeIds: liveChallengeIds } = useLiveChallengeIds(tableId)
   const { challengeIds: pastChallengeIds } = usePastChallengeIds(tableId)
   const { activeDuelistsCount } = useActiveDuelists(tableId)
   return (
-    <Grid className='H4'>
+    <Grid className='H5'>
+
+      <Row className='NoPadding' verticalAlign='middle'>
+        <Col width={8} textAlign='right'>
+          Game Type:
+        </Col>
+        <Col width={8} className='Wager PaddedLeft Bold'>
+          {tableType}
+        </Col>
+      </Row>
+
       <Row className='NoPadding' verticalAlign='middle'>
         <Col width={8} textAlign='right'>
           Wager Coin:
@@ -153,6 +164,15 @@ function TableDescription({
 
       <Row className='NoPadding' verticalAlign='middle'>
         <Col width={8} textAlign='right'>
+          Active Duelists:
+        </Col>
+        <Col width={8} className='Wager PaddedLeft Bold'>
+          {activeDuelistsCount}
+        </Col>
+      </Row>
+
+      <Row className='NoPadding' verticalAlign='middle'>
+        <Col width={8} textAlign='right'>
           Live Duels:
         </Col>
         <Col width={8} className='Wager PaddedLeft Bold'>
@@ -166,15 +186,6 @@ function TableDescription({
         </Col>
         <Col width={8} className='Wager PaddedLeft Bold'>
           {pastChallengeIds.length}
-        </Col>
-      </Row>
-
-      <Row className='NoPadding' verticalAlign='middle'>
-        <Col width={8} textAlign='right'>
-          Active Duelists:
-        </Col>
-        <Col width={8} className='Wager PaddedLeft Bold'>
-          {activeDuelistsCount}
         </Col>
       </Row>
 
