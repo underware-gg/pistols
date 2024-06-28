@@ -1,0 +1,20 @@
+kind = "DojoModel"
+class_hash = "0x2a944262c5784a67297717f50a9179dca0dc8758499818aa053c22aa29d2ea8"
+original_class_hash = "0x2a944262c5784a67297717f50a9179dca0dc8758499818aa053c22aa29d2ea8"
+abi = "manifests/dev/abis/base/models/pistols_models_models_snapshot.json"
+name = "pistols::models::models::snapshot"
+
+[[members]]
+name = "duel_id"
+type = "u128"
+key = true
+
+[[members]]
+name = "score_a"
+type = "Score"
+key = false
+
+[[members]]
+name = "score_b"
+type = "Score"
+key = false

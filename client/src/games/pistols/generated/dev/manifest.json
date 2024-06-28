@@ -1657,8 +1657,8 @@
     {
       "kind": "DojoContract",
       "address": "0x30663cb812dc7e2930b9683945132ca6054483af40e1e7daccb77091e02e7b1",
-      "class_hash": "0x1020d6597eb85e006b914b60320f134e9dc6614e3c78b61b7ef0858c2e6cde5",
-      "original_class_hash": "0x1020d6597eb85e006b914b60320f134e9dc6614e3c78b61b7ef0858c2e6cde5",
+      "class_hash": "0x557b913690d715a07145e8ec346ef3bf4b44fd43643f9dd89dbe1d53156e416",
+      "original_class_hash": "0x557b913690d715a07145e8ec346ef3bf4b44fd43643f9dd89dbe1d53156e416",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -2074,6 +2074,26 @@
                 },
                 {
                   "name": "duelist_b",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "can_join",
+              "inputs": [
+                {
+                  "name": "table_id",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "duelist_address",
                   "type": "core::starknet::contract_address::ContractAddress"
                 }
               ],
