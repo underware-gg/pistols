@@ -5,22 +5,100 @@ import { BigNumberish } from 'starknet';
 type mod_tables_Type = {
   LORDS: string, // cairo: felt252
   COMMONERS: string, // cairo: felt252
+  BRUSSELS: string, // cairo: felt252
 };
 export const tables: mod_tables_Type = {
   LORDS: 'Lords',
   COMMONERS: 'Commoners',
+  BRUSSELS: 'Brussels',
 };
 
 // from: ../dojo/src/models/table.cairo
 type mod_table_types_Type = {
   CLASSIC: number, // cairo: u8
-  DEMO: number, // cairo: u8
   TOURNAMENT: number, // cairo: u8
+  IRL_TOURNAMENT: number, // cairo: u8
 };
 export const table_types: mod_table_types_Type = {
   CLASSIC: 1,
-  DEMO: 2,
-  TOURNAMENT: 3,
+  TOURNAMENT: 2,
+  IRL_TOURNAMENT: 3,
+};
+
+// from: ../dojo/src/systems/actions.cairo
+type mod_actions_Type = {
+  NOT_INITIALIZED: string, // cairo: felt252
+  INVALID_CHALLENGED: string, // cairo: felt252
+  INVALID_EXPIRE: string, // cairo: felt252
+  INVALID_CHALLENGE: string, // cairo: felt252
+  CHALLENGER_NOT_ADMITTED: string, // cairo: felt252
+  CHALLENGED_NOT_ADMITTED: string, // cairo: felt252
+  CHALLENGER_NOT_REGISTERED: string, // cairo: felt252
+  CHALLENGED_NOT_REGISTERED: string, // cairo: felt252
+  CHALLENGE_EXISTS: string, // cairo: felt252
+  CHALLENGE_WRONG_STATE: string, // cairo: felt252
+  NOT_YOUR_CHALLENGE: string, // cairo: felt252
+  TABLE_IS_CLOSED: string, // cairo: felt252
+  MINIMUM_WAGER_NOT_MET: string, // cairo: felt252
+  NO_WAGER: string, // cairo: felt252
+  INSUFFICIENT_BALANCE: string, // cairo: felt252
+  NO_ALLOWANCE: string, // cairo: felt252
+  WITHDRAW_NOT_AVAILABLE: string, // cairo: felt252
+  WAGER_NOT_AVAILABLE: string, // cairo: felt252
+  INVALID_ROUND_NUMBER: string, // cairo: felt252
+  ROUND_NOT_IN_COMMIT: string, // cairo: felt252
+  ROUND_NOT_IN_REVEAL: string, // cairo: felt252
+  ALREADY_COMMITTED: string, // cairo: felt252
+  ALREADY_REVEALED: string, // cairo: felt252
+  ACTION_HASH_MISMATCH: string, // cairo: felt252
+};
+export const actions: mod_actions_Type = {
+  NOT_INITIALIZED: 'PISTOLS: Not initialized',
+  INVALID_CHALLENGED: 'PISTOLS: Invalid challenged',
+  INVALID_EXPIRE: 'PISTOLS: Invalid expire_seconds',
+  INVALID_CHALLENGE: 'PISTOLS: Invalid Challenge',
+  CHALLENGER_NOT_ADMITTED: 'PISTOLS: Challenger not allowed',
+  CHALLENGED_NOT_ADMITTED: 'PISTOLS: Challenged not allowed',
+  CHALLENGER_NOT_REGISTERED: 'PISTOLS: Challenger unknown',
+  CHALLENGED_NOT_REGISTERED: 'PISTOLS: Challenged unknown',
+  CHALLENGE_EXISTS: 'PISTOLS: Challenge exists',
+  CHALLENGE_WRONG_STATE: 'PISTOLS: Wrong Challenge state',
+  NOT_YOUR_CHALLENGE: 'PISTOLS: Not your Challenge',
+  TABLE_IS_CLOSED: 'PISTOLS: Table is closed',
+  MINIMUM_WAGER_NOT_MET: 'PISTOLS: Minimum wager not met',
+  NO_WAGER: 'PISTOLS: No wager on this table',
+  INSUFFICIENT_BALANCE: 'PISTOLS: Insufficient balance',
+  NO_ALLOWANCE: 'PISTOLS: No transfer allowance',
+  WITHDRAW_NOT_AVAILABLE: 'PISTOLS: Withdraw not available',
+  WAGER_NOT_AVAILABLE: 'PISTOLS: Wager not available',
+  INVALID_ROUND_NUMBER: 'PISTOLS: Invalid round number',
+  ROUND_NOT_IN_COMMIT: 'PISTOLS: Round not in commit',
+  ROUND_NOT_IN_REVEAL: 'PISTOLS: Round not in reveal',
+  ALREADY_COMMITTED: 'PISTOLS: Already committed',
+  ALREADY_REVEALED: 'PISTOLS: Already revealed',
+  ACTION_HASH_MISMATCH: 'PISTOLS: Action hash mismatch',
+};
+
+// from: ../dojo/src/systems/admin.cairo
+type mod_admin_Type = {
+  ALREADY_INITIALIZED: string, // cairo: felt252
+  INVALID_OWNER: string, // cairo: felt252
+  INVALID_TREASURY: string, // cairo: felt252
+  INVALID_TABLE: string, // cairo: felt252
+  INVALID_DESCRIPTION: string, // cairo: felt252
+  NOT_DEPLOYER: string, // cairo: felt252
+  NOT_INITIALIZED: string, // cairo: felt252
+  NOT_OWNER: string, // cairo: felt252
+};
+export const admin: mod_admin_Type = {
+  ALREADY_INITIALIZED: 'ADMIN: Already initialized',
+  INVALID_OWNER: 'ADMIN: Invalid owner_address',
+  INVALID_TREASURY: 'ADMIN: Invalid treasury_address',
+  INVALID_TABLE: 'ADMIN: Invalid table',
+  INVALID_DESCRIPTION: 'ADMIN: Invalid description',
+  NOT_DEPLOYER: 'ADMIN: Not deployer',
+  NOT_INITIALIZED: 'ADMIN: Not initialized',
+  NOT_OWNER: 'ADMIN: Not owner',
 };
 
 // from: ../dojo/src/types/action.cairo

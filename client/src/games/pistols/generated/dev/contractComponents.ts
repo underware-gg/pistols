@@ -110,13 +110,26 @@ export function defineContractComponents(world: World) {
         }
       );
     })(),
-    TTable: (() => {
+    TableAdmittance: (() => {
+      return defineComponent(
+        world,
+        { table_id: RecsType.BigInt, accounts: RecsType.StringArray, duelists: RecsType.StringArray },
+        {
+          metadata: {
+            name: "TableAdmittance",
+            types: ["felt252"],
+            customTypes: [],
+          },
+        }
+      );
+    })(),
+    TableConfig: (() => {
       return defineComponent(
         world,
         { table_id: RecsType.BigInt, description: RecsType.BigInt, contract_address: RecsType.BigInt, wager_min: RecsType.BigInt, fee_min: RecsType.BigInt, fee_pct: RecsType.Number, is_open: RecsType.Boolean, table_type: RecsType.Number },
         {
           metadata: {
-            name: "TTable",
+            name: "TableConfig",
             types: ["felt252","felt252","contractaddress","u256","u256","u8","bool","u8"],
             customTypes: [],
           },

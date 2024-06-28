@@ -114,7 +114,7 @@
   },
   {
     "type": "struct",
-    "name": "pistols::models::table::TTable",
+    "name": "pistols::models::table::TableConfig",
     "members": [
       {
         "name": "table_id",
@@ -291,7 +291,7 @@
         ],
         "outputs": [
           {
-            "type": "pistols::models::table::TTable"
+            "type": "pistols::models::table::TableConfig"
           }
         ],
         "state_mutability": "view"

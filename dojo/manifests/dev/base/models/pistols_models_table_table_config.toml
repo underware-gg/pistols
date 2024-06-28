@@ -1,8 +1,8 @@
 kind = "DojoModel"
-class_hash = "0x5cb47bd5e0b2259a07e3713b5b2bfe7247bbeed56505be171ef1c6c7ca54f5"
-original_class_hash = "0x5cb47bd5e0b2259a07e3713b5b2bfe7247bbeed56505be171ef1c6c7ca54f5"
-abi = "manifests/dev/abis/base/models/pistols_models_table_t_table.json"
-name = "pistols::models::table::t_table"
+class_hash = "0x4f1a2c28708d94b46a6d16210668ace7c6ec20870c899a588b5ff710c22a3e6"
+original_class_hash = "0x4f1a2c28708d94b46a6d16210668ace7c6ec20870c899a588b5ff710c22a3e6"
+abi = "manifests/dev/abis/base/models/pistols_models_table_table_config.json"
+name = "pistols::models::table::table_config"
 
 [[members]]
 name = "table_id"

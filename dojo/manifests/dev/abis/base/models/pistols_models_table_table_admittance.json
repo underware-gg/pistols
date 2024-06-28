@@ -319,78 +319,30 @@
   },
   {
     "type": "impl",
-    "name": "t_tableImpl",
-    "interface_name": "pistols::models::table::It_table"
+    "name": "table_admittanceImpl",
+    "interface_name": "pistols::models::table::Itable_admittance"
   },
   {
     "type": "struct",
-    "name": "core::integer::u256",
-    "members": [
-      {
-        "name": "low",
-        "type": "core::integer::u128"
-      },
-      {
-        "name": "high",
-        "type": "core::integer::u128"
-      }
-    ]
-  },
-  {
-    "type": "enum",
-    "name": "core::bool",
-    "variants": [
-      {
-        "name": "False",
-        "type": "()"
-      },
-      {
-        "name": "True",
-        "type": "()"
-      }
-    ]
-  },
-  {
-    "type": "struct",
-    "name": "pistols::models::table::TTable",
+    "name": "pistols::models::table::TableAdmittance",
     "members": [
       {
         "name": "table_id",
         "type": "core::felt252"
       },
       {
-        "name": "description",
-        "type": "core::felt252"
+        "name": "accounts",
+        "type": "core::array::Array::<core::starknet::contract_address::ContractAddress>"
       },
       {
-        "name": "contract_address",
-        "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
-        "name": "wager_min",
-        "type": "core::integer::u256"
-      },
-      {
-        "name": "fee_min",
-        "type": "core::integer::u256"
-      },
-      {
-        "name": "fee_pct",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "is_open",
-        "type": "core::bool"
-      },
-      {
-        "name": "table_type",
-        "type": "core::integer::u8"
+        "name": "duelists",
+        "type": "core::array::Array::<core::starknet::contract_address::ContractAddress>"
       }
     ]
   },
   {
     "type": "interface",
-    "name": "pistols::models::table::It_table",
+    "name": "pistols::models::table::Itable_admittance",
     "items": [
       {
         "type": "function",
@@ -398,7 +350,7 @@
         "inputs": [
           {
             "name": "model",
-            "type": "pistols::models::table::TTable"
+            "type": "pistols::models::table::TableAdmittance"
           }
         ],
         "outputs": [],
@@ -408,7 +360,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::models::table::t_table::Event",
+    "name": "pistols::models::table::table_admittance::Event",
     "kind": "enum",
     "variants": []
   }
