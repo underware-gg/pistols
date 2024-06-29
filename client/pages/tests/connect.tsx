@@ -183,34 +183,75 @@ function SignV0() {
       <Button disabled={!isConnected || isPending} onClick={() => signTypedData()}>Sign V0</Button>
 
       <Table celled striped size='small' color={verifyied == 'true' ? 'green' : verifyied == 'false' ? 'red' : 'orange'}>
-        <Header>
+        {/* <Header>
           <Row>
             <HeaderCell><h5>Messages</h5></HeaderCell>
             <HeaderCell><h5>Validated</h5></HeaderCell>
             <HeaderCell><h5>Signature</h5></HeaderCell>
             <HeaderCell><h5>Typed Data</h5></HeaderCell>
           </Row>
-        </Header>
+        </Header> */}
 
         <Body>
           <Row columns={'equal'} verticalAlign='top'>
+            <Cell>
+              Message
+            </Cell>
             <Cell className='Code'>
               {Object.keys(messages).map((k, i) => <React.Fragment key={k}>{k}:{shortAddress(messages[k])}<br /></React.Fragment>)}
-              hash:{shortAddress(bigintToHex(hash))}
             </Cell>
+          </Row>
+
+          <Row columns={'equal'} verticalAlign='top'>
             <Cell className='Code'>
-              {verifyied}
-            </Cell>
-            <Cell className='Code'>
-              {signature && <>
-                r:{shortAddress(bigintToHex(signature[0]))}<br />
-                s:{shortAddress(bigintToHex(signature[1]))}<br />
-              </>}
+              Typed Data
             </Cell>
             <Cell className='Code'>
               {JSON.stringify(typedMessage)}
             </Cell>
           </Row>
+
+          <Row columns={'equal'} verticalAlign='top'>
+            <Cell>
+              Hash
+            </Cell>
+            <Cell className='Code'>
+              {/* {shortAddress(bigintToHex(hash))} */}
+              {bigintToHex(hash)}
+            </Cell>
+          </Row>
+
+          <Row columns={'equal'} verticalAlign='top'>
+            <Cell>
+              Signature
+            </Cell>
+            <Cell className='Code'>
+              {signature ?? <>?</>}
+            </Cell>
+          </Row>
+
+          <Row columns={'equal'} verticalAlign='top'>
+            <Cell>
+              Signature (r,s)
+            </Cell>
+            <Cell className='Code'>
+              {signature ? <>
+                r:{shortAddress(bigintToHex(signature[0]))}<br />
+                s:{shortAddress(bigintToHex(signature[1]))}<br />
+              </> : <>?</>}
+            </Cell>
+          </Row>
+
+          <Row columns={'equal'} verticalAlign='top'>
+            <Cell>
+               Verifyied
+            </Cell>
+            <Cell className='Code'>
+              {verifyied}
+            </Cell>
+          </Row>
+
+
         </Body>
 
       </Table>
@@ -261,36 +302,69 @@ useEffect(() => console.log(`typedMessage/hash/data:`, typedMessage, hash, data)
       <Button disabled={!isConnected || isPending} onClick={() => signTypedData()}>Sign V1</Button>
 
       <Table celled striped size='small' color={verifyied == 'true' ? 'green' : verifyied == 'false' ? 'red' : 'orange'}>
-        <Header>
-          <Row>
-            <HeaderCell><h5>Messages</h5></HeaderCell>
-            <HeaderCell><h5>Validated</h5></HeaderCell>
-            <HeaderCell><h5>Signature</h5></HeaderCell>
-            <HeaderCell><h5>Typed Data</h5></HeaderCell>
-          </Row>
-        </Header>
+
 
         <Body>
           <Row columns={'equal'} verticalAlign='top'>
+            <Cell>
+              Message
+            </Cell>
             <Cell className='Code'>
               {Object.keys(messages).map((k, i) => <React.Fragment key={k}>{k}:{shortAddress(messages[k])}<br /></React.Fragment>)}
-              hash:{shortAddress(bigintToHex(hash))}
             </Cell>
+          </Row>
+
+          <Row columns={'equal'} verticalAlign='top'>
             <Cell className='Code'>
-              {verifyied}
-            </Cell>
-            <Cell className='Code'>
-              {signature && <>
-                r:{shortAddress(bigintToHex(signature[0]))}<br />
-                s:{shortAddress(bigintToHex(signature[1]))}<br />
-              </>}
+              Typed Data
             </Cell>
             <Cell className='Code'>
               {JSON.stringify(typedMessage)}
             </Cell>
           </Row>
-        </Body>
 
+          <Row columns={'equal'} verticalAlign='top'>
+            <Cell>
+              Hash
+            </Cell>
+            <Cell className='Code'>
+              {/* {shortAddress(bigintToHex(hash))} */}
+              {bigintToHex(hash)}
+            </Cell>
+          </Row>
+
+          <Row columns={'equal'} verticalAlign='top'>
+            <Cell>
+              Signature
+            </Cell>
+            <Cell className='Code'>
+              {/* {signature ?? <>?</>} */}
+              {JSON.stringify(data ?? {})}
+            </Cell>
+          </Row>
+
+          <Row columns={'equal'} verticalAlign='top'>
+            <Cell>
+              Signature (r,s)
+            </Cell>
+            <Cell className='Code'>
+              {signature ? <>
+                r:{shortAddress(bigintToHex(signature[0]))}<br />
+                s:{shortAddress(bigintToHex(signature[1]))}<br />
+              </> : <>?</>}
+            </Cell>
+          </Row>
+
+          <Row columns={'equal'} verticalAlign='top'>
+            <Cell>
+              Verifyied
+            </Cell>
+            <Cell className='Code'>
+              {verifyied}
+            </Cell>
+          </Row>
+
+        </Body>
       </Table>
     </>
   )
