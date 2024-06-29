@@ -34,7 +34,7 @@ const signAndGenerateSalt = async (account: Account, duelId: bigint, roundNumber
         duelId: bigintToHex(duelId),
         roundNumber: bigintToHex(roundNumber),
       }
-      const sig: WeierstrassSignatureType = await signMessages(account, messages)
+      const sig: WeierstrassSignatureType = await signMessages(account, 1, messages)
       result = ((sig.r ^ sig.s) & HASH_SALT_MASK)
     } catch (e) {
       console.warn(`signAndGenerateSalt() exception:`, e)

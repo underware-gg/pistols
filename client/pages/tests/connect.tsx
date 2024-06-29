@@ -28,7 +28,8 @@ export default function IndexPage() {
       <Container>
         <DojoAccount />
         <Connect />
-        <Sign />
+        <SignV0 />
+        <SignV1 />
       </Container>
     </AppDojo>
   );
@@ -99,7 +100,7 @@ function Connect() {
       <StarknetConnectModal opener={connectOpener} />
 
       <ChainSwitcher />
-
+      &nbsp;&nbsp;
       <Button disabled={isConnected || isConnecting} onClick={() => connectOpener.open()}>Connect</Button>
       &nbsp;&nbsp;
       <Button disabled={!isConnected || isConnecting} onClick={() => disconnect()}>Disconnect</Button>
@@ -143,11 +144,12 @@ function Connect() {
 }
 
 
-function Sign() {
+function SignV0() {
   const { account, isConnected, chainId } = useAccount()
 
   const messages: Messages = { game: 'PISTOLS_AT_10_BLOCKS', purpose: 'DUELIST_ACCOUNT' }
   const typedMessage = useMemo(() => (createTypedMessage({
+    revision: 0,
     chainId: chainId ? feltToString(chainId) : undefined,
     messages,
   })), [chainId, messages])
@@ -178,7 +180,85 @@ function Sign() {
 
   return (
     <>
-      <Button disabled={!isConnected || isPending} onClick={() => signTypedData()}>Sign</Button>
+      <Button disabled={!isConnected || isPending} onClick={() => signTypedData()}>Sign V0</Button>
+
+      <Table celled striped size='small' color={verifyied == 'true' ? 'green' : verifyied == 'false' ? 'red' : 'orange'}>
+        <Header>
+          <Row>
+            <HeaderCell><h5>Messages</h5></HeaderCell>
+            <HeaderCell><h5>Validated</h5></HeaderCell>
+            <HeaderCell><h5>Signature</h5></HeaderCell>
+            <HeaderCell><h5>Typed Data</h5></HeaderCell>
+          </Row>
+        </Header>
+
+        <Body>
+          <Row columns={'equal'} verticalAlign='top'>
+            <Cell className='Code'>
+              {Object.keys(messages).map((k, i) => <React.Fragment key={k}>{k}:{shortAddress(messages[k])}<br /></React.Fragment>)}
+              hash:{shortAddress(bigintToHex(hash))}
+            </Cell>
+            <Cell className='Code'>
+              {verifyied}
+            </Cell>
+            <Cell className='Code'>
+              {signature && <>
+                r:{shortAddress(bigintToHex(signature[0]))}<br />
+                s:{shortAddress(bigintToHex(signature[1]))}<br />
+              </>}
+            </Cell>
+            <Cell className='Code'>
+              {JSON.stringify(typedMessage)}
+            </Cell>
+          </Row>
+        </Body>
+
+      </Table>
+    </>
+  )
+}
+
+function SignV1() {
+  const { account, isConnected, chainId } = useAccount()
+
+  const messages: Messages = { game: 'PISTOLS_AT_10_BLOCKS', purpose: 'DUELIST_ACCOUNT' }
+  const typedMessage = useMemo(() => (createTypedMessage({
+    revision: 1,
+    chainId: chainId ? feltToString(chainId) : undefined,
+    messages,
+  })), [chainId, messages])
+  const hash = useMemo(() => (account ? 
+    typedData.getMessageHash(typedMessage, account.address) : null), 
+    [account, typedMessage])
+
+  const { data, signTypedData, signTypedDataAsync, isPending } = useSignTypedData(typedMessage)
+
+useEffect(() => console.log(`typedMessage/hash/data:`, typedMessage, hash, data), [typedMessage, hash, data])
+
+  const signature = useMemo(() => (data as ArraySignatureType ?? null), [data])
+
+  const [verifyied, setVerifyed] = useState('?')
+  useEffect(() => {
+    const _verify = async () => {
+      try {
+        const _v = await account.verifyMessage(typedMessage, signature)
+        setVerifyed(_v ? 'true' : 'false')
+      } catch (e) {
+        console.warn(`SIGN ERROR:`, e)
+        setVerifyed('false')
+      }
+    }
+    if (account && signature) {
+      setVerifyed('...')
+      _verify()
+    } else {
+      setVerifyed('?')
+    }
+  }, [account, typedMessage, signature])
+
+  return (
+    <>
+      <Button disabled={!isConnected || isPending} onClick={() => signTypedData()}>Sign V1</Button>
 
       <Table celled striped size='small' color={verifyied == 'true' ? 'green' : verifyied == 'false' ? 'red' : 'orange'}>
         <Header>

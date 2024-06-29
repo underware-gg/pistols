@@ -49,6 +49,7 @@ export function OnboardingDeploy({
     player_id: requiresPlayerId ? playerId : undefined,
   }), [requiresPlayerId, playerId])
   const typedMessage = useMemo(() => (createTypedMessage({
+    revision: 1,
     chainId: chainId ? feltToString(chainId) : undefined,
     messages,
   })), [chainId, messages])

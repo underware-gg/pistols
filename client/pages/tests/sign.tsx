@@ -67,7 +67,7 @@ function ValidateMessage({
 
   useEffect(() => {
     const _validate = async () => {
-      const _msg = createTypedMessage({ messages })
+      const _msg = createTypedMessage({ revision: 1, messages })
       setTypedMessage(_msg)
       console.log(messages, _msg)
       try {
@@ -108,9 +108,9 @@ function ValidateMessage({
 
 
 export async function testTypedData(account: Account) {
-  const typedMessage0 = createTypedMessage({ messages: { key: '0x01111' } })
-  const typedMessage1 = createTypedMessage({ messages: { key: '0x1111' } })
-  const typedMessage2 = createTypedMessage({ messages: { key: '0x1112' } })
+  const typedMessage0 = createTypedMessage({ revision: 1, messages: { key: '0x01111' } })
+  const typedMessage1 = createTypedMessage({ revision: 1, messages: { key: '0x1111' } })
+  const typedMessage2 = createTypedMessage({ revision: 1, messages: { key: '0x1112' } })
   const signature0 = await account.signMessage(typedMessage0)
   const signature1 = await account.signMessage(typedMessage1)
   const signature2 = await account.signMessage(typedMessage2)

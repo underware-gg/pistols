@@ -9,7 +9,12 @@ import {
   BigNumberish,
 } from 'starknet'
 
+const DEFAULT_DOMAIN_NAME = "Underware";
+const DEFAULT_CHAIN_ID = "UNDERWARE_GG";
+const DEFAULT_VERSION = "0.1.0";
+
 export type Messages = { [key: string]: string }
+export type Revision = 0 | 1
 
 export const splitSignature = (signature: Signature): bigint[] => {
   if (Array.isArray(signature)) {
@@ -23,18 +28,25 @@ export const splitSignature = (signature: Signature): bigint[] => {
   return []
 }
 
-// https://github.com/starknet-io/starknet.js/blob/develop/www/docs/guides/signature.md
-export const signMessages = async (account: Account, messages: Messages): Promise<WeierstrassSignatureType> => {
-  const typedMessage = createTypedMessage({ messages })
+export const signMessages = async (account: Account, revision: Revision, messages: Messages): Promise<WeierstrassSignatureType> => {
+  const typedMessage = createTypedMessage({ revision, messages })
   return account.signMessage(typedMessage) as Promise<WeierstrassSignatureType>
 }
-export const verifyMessages = async (account: Account, messages: Messages, signature: WeierstrassSignatureType): Promise<boolean> => {
-  const typedMessage = createTypedMessage({ messages })
+export const verifyMessages = async (account: Account, revision: Revision, messages: Messages, signature: WeierstrassSignatureType): Promise<boolean> => {
+  const typedMessage = createTypedMessage({ revision, messages })
   return account.verifyMessage(typedMessage, signature)
 }
 
+
+//
+// Revision 0:
+// https://github.com/starknet-io/starknet.js/blob/develop/www/docs/guides/signature.md
+//
+// Revision 1:
+// https://github.com/starknet-io/SNIPs/blob/main/SNIPS%2Fsnip-12.md
+//
 export interface TypedMessageOptions {
-  primaryType?: string
+  revision: Revision
   domainName?: string
   chainId?: string
   version?: string
@@ -42,16 +54,15 @@ export interface TypedMessageOptions {
 }
 
 export function createTypedMessage({
-  primaryType = 'Message',
-  domainName = "Underware",
-  chainId = "UNDERWARE_GG",
-  version = "0.1.0",
-  messages
+  revision,
+  domainName = DEFAULT_DOMAIN_NAME,
+  chainId = DEFAULT_CHAIN_ID,
+  version = DEFAULT_VERSION,
+  messages,
 }: TypedMessageOptions): TypedData {
   const _messages = cleanObject(messages)
-  const _types = Object.keys(_messages).map(v => ({ name: v, type: "felt" }))
-  return {
-    primaryType,
+  const result = revision == 0 ? {
+    primaryType: "Message",
     domain: {
       name: domainName,
       chainId,
@@ -63,10 +74,29 @@ export function createTypedMessage({
         { name: "chainId", type: "felt" },
         { name: "version", type: "felt" },
       ],
-      Message: _types,
+      Message: Object.keys(_messages).map((name) => ({ name, type: "felt" })),
     },
     message: _messages,
+  } : {
+      primaryType: "Message",
+      domain: {
+        revision: revision.toString(),
+        name: domainName,
+        chainId,
+        version,
+      },
+      types: {
+        StarknetDomain: [
+          { name: "revision", type: "shortstring" },
+          { name: "name", type: "shortstring" },
+          { name: "chainId", type: "shortstring" },
+          { name: "version", type: "shortstring" },
+        ],
+        Message: Object.keys(_messages).map((name) => ({ name, type: "string" })),
+      },
+      message: _messages,
   }
+  return result
 }
 
 export function getMessageHash(messages: TypedData, address: BigNumberish): string {
