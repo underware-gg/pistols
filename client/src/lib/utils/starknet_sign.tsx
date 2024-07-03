@@ -19,7 +19,13 @@ export type Revision = 0 | 1
 export const splitSignature = (signature: Signature): bigint[] => {
   if (Array.isArray(signature)) {
     const sig = signature as ArraySignatureType
-    return [BigInt(sig[0]), BigInt(sig[1])]
+    if (signature.length == 2) {
+      return [BigInt(sig[0]), BigInt(sig[1])]
+    }
+    if (signature.length == 3) { // Braavos
+      return [BigInt(sig[1]), BigInt(sig[2])]
+    }
+    return []
   }
   if (signature?.r && signature?.s) {
     const sig = signature as WeierstrassSignatureType

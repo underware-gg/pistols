@@ -7,12 +7,11 @@ import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { CopyIcon } from '@/lib/ui/Icons'
 import { bigintEquals, bigintToHex } from '@/lib/utils/types'
 
-const Row = Grid.Row
-const Col = Grid.Column
-
 //@ts-ignore
 BigInt.prototype.toJSON = function () { return bigintToHex(this) }
 
+const Row = Grid.Row
+const Col = Grid.Column
 
 export function Snapshots() {
   const { isInitialized } = useDojoStatus()

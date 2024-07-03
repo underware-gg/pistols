@@ -1,12 +1,13 @@
 import React, { ReactNode, useEffect, useMemo, useState } from 'react'
 import { Divider, Grid, Step } from 'semantic-ui-react'
-import { useAccount, useSignTypedData } from '@starknet-react/core'
-import { useDojo, useDojoAccount } from '@/lib/dojo/DojoContext'
+import { useAccount } from '@starknet-react/core'
+import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useBurnerAccount, useBurnerDeployment } from '@/lib/dojo/hooks/useBurnerAccount'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { usePlayerId } from '@/lib/dojo/hooks/usePlayerId'
-import { Messages, createTypedMessage, getMessageHash, splitSignature } from '@/lib/utils/starknet_sign'
-import { feltToString, pedersen } from '@/lib/utils/starknet'
+import { useSignTypedMessage, useTypedMessage } from '@/lib/utils/hooks/useTypedMessage'
+import { Messages } from '@/lib/utils/starknet_sign'
+import { pedersen } from '@/lib/utils/starknet'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { bigintEquals, bigintToHex, cleanObject } from '@/lib/utils/types'
 import { BurnerCreateOptions } from '@dojoengine/create-burner'
@@ -48,19 +49,19 @@ export function OnboardingDeploy({
     purpose: 'DUELIST_ACCOUNT',
     player_id: requiresPlayerId ? playerId : undefined,
   }), [requiresPlayerId, playerId])
-  const typedMessage = useMemo(() => (createTypedMessage({
+  const { typedMessage, hash } = useTypedMessage({
     revision: 1,
-    chainId: chainId ? feltToString(chainId) : undefined,
     messages,
-  })), [chainId, messages])
-  const messageHash = useMemo(() => getMessageHash(typedMessage, account?.address), [messages, account])
-  const { data, signTypedData, isPending } = useSignTypedData(typedMessage)
-  const signature = useMemo(() => splitSignature(data), [data])
+    chainId,
+    account,
+  })
+  const { sign, signAsync, isSigning, rawSignature, signaturePair } = useSignTypedMessage(typedMessage)
+
   useEffect(() => {
-    if (account && signature.length > 0) {
-      dispatchSetSig(account.address, pedersen(signature[0], signature[1]))
+    if (account && signaturePair.length > 0) {
+      dispatchSetSig(account.address, pedersen(signaturePair[0], signaturePair[1]))
     }
-  }, [account, signature])
+  }, [account, signaturePair])
 
   //
   // derive account address from current walletSig
@@ -69,7 +70,7 @@ export function OnboardingDeploy({
   const createOptions = useMemo((): BurnerCreateOptions => ({
     secret: bigintToHex(walletSig.sig ?? 0n),
     index: accountIndex,
-    metadata: { messages, messageHash },
+    metadata: { messages, hash },
   }), [walletSig.sig, accountIndex, messages])
 
   useEffect(() => {
@@ -126,7 +127,7 @@ export function OnboardingDeploy({
               content={
                 // hasSigned ? <span>Signed Secret: <b><AddressShort copyLink={false} address={walletSig.sig} important /></b></span>
                 hasSigned ? <span>Is Honourable</span>
-                  : <ActionButton fill large disabled={currentPhase != DeployPhase.Sign} onClick={() => signTypedData()} label='Sign Message' />
+                  : <ActionButton fill large disabled={currentPhase != DeployPhase.Sign || isSigning} onClick={() => sign()} label='Sign Message' />
               }
             />
 

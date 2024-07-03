@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react'
+import { Account, typedData } from 'starknet'
 import { Container, Table } from 'semantic-ui-react'
+import { useTypedMessage } from '@/lib/utils/hooks/useTypedMessage'
 import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
-import AppPistols from '@/pistols/components/AppPistols'
-import { Account, typedData } from 'starknet'
 import { bigintToHex, shortAddress } from '@/lib/utils/types'
-import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
+import AppPistols from '@/pistols/components/AppPistols'
+
+//@ts-ignore
+BigInt.prototype.toJSON = function () { return bigintToHex(this) }
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -60,22 +63,20 @@ function ValidateMessage({
 }) {
   const { masterAccount } = useDojoAccount()
 
-  const [typedMessage, setTypedMessage] = useState(null)
   const [signature, setSignature] = useState(null)
-  const [hash, setHash] = useState(null)
-  const [verifyied, setVerifyed] = useState('...')
+  const [verified, setVerifyed] = useState('...')
+
+  const { typedMessage, hash } = useTypedMessage({
+    revision: 0,
+    messages,
+  })
 
   useEffect(() => {
     const _validate = async () => {
-      const _msg = createTypedMessage({ revision: 1, messages })
-      setTypedMessage(_msg)
-      console.log(messages, _msg)
       try {
-        const _sig = await masterAccount.signMessage(_msg)
-        const _hash = typedData.getMessageHash(_msg, masterAccount.address)
+        const _sig = await masterAccount.signMessage(typedMessage)
         setSignature(_sig)
-        setHash(_hash)
-        const _valid = await masterAccount.verifyMessage(_msg, _sig)
+        const _valid = await masterAccount.verifyMessage(typedMessage, _sig)
         setVerifyed(_valid ? 'OK' : 'failed')
       } catch {
         setVerifyed('ERROR')
@@ -91,7 +92,7 @@ function ValidateMessage({
         hash:{shortAddress(bigintToHex(hash))}
       </Cell>
       <Cell>
-        {verifyied}
+        {verified}
       </Cell>
       <Cell className='Code'>
         {signature && <>

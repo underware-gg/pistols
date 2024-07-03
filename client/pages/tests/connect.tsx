@@ -1,18 +1,22 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { Container, Table, Button, Image } from 'semantic-ui-react'
-import { ArraySignatureType, typedData } from 'starknet'
-import { useAccount, useDisconnect, useSignTypedData } from '@starknet-react/core'
+import { ArraySignatureType, TypedData } from 'starknet'
+import { useAccount, useDisconnect } from '@starknet-react/core'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDojoAccount, useDojoStatus } from '@/lib/dojo/DojoContext'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
+import { useSignTypedMessage, useTypedMessage, useVerifyMessagesOffChain, useVerifyMessagesOnChain } from '@/lib/utils/hooks/useTypedMessage'
 import { feltToString } from '@/lib/utils/starknet'
 import { bigintToHex, shortAddress } from '@/lib/utils/types'
-import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
 import { makeDojoAppConfig } from '@/games/pistols/config'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { ChainSwitcher } from '@/lib/dojo/ChainSwitcher'
+import { Messages } from '@/lib/utils/starknet_sign'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import AppDojo from '@/lib/ui/AppDojo'
+
+//@ts-ignore
+BigInt.prototype.toJSON = function () { return bigintToHex(this) }
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -147,114 +151,27 @@ function Connect() {
 function SignV0() {
   const { account, isConnected, chainId } = useAccount()
 
-  const messages: Messages = { game: 'PISTOLS_AT_10_BLOCKS', purpose: 'DUELIST_ACCOUNT' }
-  const typedMessage = useMemo(() => (createTypedMessage({
+  const messages: Messages = useMemo(() => ({ game: 'PISTOLS_AT_10_BLOCKS', purpose: 'SIGN_V0_TEST' }), [])
+  const { typedMessage, hash } = useTypedMessage({
     revision: 0,
-    chainId: chainId ? feltToString(chainId) : undefined,
     messages,
-  })), [chainId, messages])
-  const hash = useMemo(() => (account ? typedData.getMessageHash(typedMessage, account.address) : null), [account, typedMessage])
-
-  const { data, signTypedData, signTypedDataAsync, isPending } = useSignTypedData(typedMessage)
-
-  const signature = useMemo(() => (data as ArraySignatureType ?? null), [data])
-
-  const [verifyied, setVerifyed] = useState('?')
-  useEffect(() => {
-    const _verify = async () => {
-      try {
-        const _v = await account.verifyMessage(typedMessage, signature)
-        setVerifyed(_v ? 'true' : 'false')
-      } catch (e) {
-        console.warn(`SIGN ERROR:`, e)
-        setVerifyed('false')
-      }
-    }
-    if (account && signature) {
-      setVerifyed('...')
-      _verify()
-    } else {
-      setVerifyed('?')
-    }
-  }, [account, typedMessage, signature])
+    chainId,
+    account,
+  })
+  const { sign, signAsync, isSigning, rawSignature, signaturePair } = useSignTypedMessage(typedMessage)
+  const { formatted } = useVerifyMessagesOffChain(account, typedMessage, rawSignature)
 
   return (
     <>
-      <Button disabled={!isConnected || isPending} onClick={() => signTypedData()}>Sign V0</Button>
-
-      <Table celled striped size='small' color={verifyied == 'true' ? 'green' : verifyied == 'false' ? 'red' : 'orange'}>
-        {/* <Header>
-          <Row>
-            <HeaderCell><h5>Messages</h5></HeaderCell>
-            <HeaderCell><h5>Validated</h5></HeaderCell>
-            <HeaderCell><h5>Signature</h5></HeaderCell>
-            <HeaderCell><h5>Typed Data</h5></HeaderCell>
-          </Row>
-        </Header> */}
-
-        <Body>
-          <Row columns={'equal'} verticalAlign='top'>
-            <Cell>
-              Message
-            </Cell>
-            <Cell className='Code'>
-              {Object.keys(messages).map((k, i) => <React.Fragment key={k}>{k}:{shortAddress(messages[k])}<br /></React.Fragment>)}
-            </Cell>
-          </Row>
-
-          <Row columns={'equal'} verticalAlign='top'>
-            <Cell className='Code'>
-              Typed Data
-            </Cell>
-            <Cell className='Code'>
-              {JSON.stringify(typedMessage)}
-            </Cell>
-          </Row>
-
-          <Row columns={'equal'} verticalAlign='top'>
-            <Cell>
-              Hash
-            </Cell>
-            <Cell className='Code'>
-              {/* {shortAddress(bigintToHex(hash))} */}
-              {bigintToHex(hash)}
-            </Cell>
-          </Row>
-
-          <Row columns={'equal'} verticalAlign='top'>
-            <Cell>
-              Signature
-            </Cell>
-            <Cell className='Code'>
-              {signature ?? <>?</>}
-            </Cell>
-          </Row>
-
-          <Row columns={'equal'} verticalAlign='top'>
-            <Cell>
-              Signature (r,s)
-            </Cell>
-            <Cell className='Code'>
-              {signature ? <>
-                r:{shortAddress(bigintToHex(signature[0]))}<br />
-                s:{shortAddress(bigintToHex(signature[1]))}<br />
-              </> : <>?</>}
-            </Cell>
-          </Row>
-
-          <Row columns={'equal'} verticalAlign='top'>
-            <Cell>
-               Verifyied
-            </Cell>
-            <Cell className='Code'>
-              {verifyied}
-            </Cell>
-          </Row>
-
-
-        </Body>
-
-      </Table>
+      <Button disabled={!isConnected || isSigning} onClick={() => sign()}>Sign V0</Button>
+      <Sign
+        messages={messages}
+        typedMessage={typedMessage}
+        hash={hash}
+        rawSignature={rawSignature}
+        signaturePair={signaturePair}
+        verified={formatted}
+      />
     </>
   )
 }
@@ -262,110 +179,112 @@ function SignV0() {
 function SignV1() {
   const { account, isConnected, chainId } = useAccount()
 
-  const messages: Messages = { game: 'PISTOLS_AT_10_BLOCKS', purpose: 'DUELIST_ACCOUNT' }
-  const typedMessage = useMemo(() => (createTypedMessage({
+  const messages: Messages = useMemo(() => ({ game: 'PISTOLS_AT_10_BLOCKS', purpose: 'SIGN_V1_TEST' }), [])
+  const { typedMessage, hash } = useTypedMessage({
+    account,
     revision: 1,
-    chainId: chainId ? feltToString(chainId) : undefined,
+    chainId,
     messages,
-  })), [chainId, messages])
-  const hash = useMemo(() => (account ? 
-    typedData.getMessageHash(typedMessage, account.address) : null), 
-    [account, typedMessage])
+  })
+  const { sign, signAsync, isSigning, rawSignature, signaturePair } = useSignTypedMessage(typedMessage)
+  const { formatted } = useVerifyMessagesOnChain(account, typedMessage, rawSignature)
 
-  const { data, signTypedData, signTypedDataAsync, isPending } = useSignTypedData(typedMessage)
-
-useEffect(() => console.log(`typedMessage/hash/data:`, typedMessage, hash, data), [typedMessage, hash, data])
-
-  const signature = useMemo(() => (data as ArraySignatureType ?? null), [data])
-
-  const [verifyied, setVerifyed] = useState('?')
-  useEffect(() => {
-    const _verify = async () => {
-      try {
-        const _v = await account.verifyMessage(typedMessage, signature)
-        setVerifyed(_v ? 'true' : 'false')
-      } catch (e) {
-        console.warn(`SIGN ERROR:`, e)
-        setVerifyed('false')
-      }
-    }
-    if (account && signature) {
-      setVerifyed('...')
-      _verify()
-    } else {
-      setVerifyed('?')
-    }
-  }, [account, typedMessage, signature])
+  // useEffect(() => console.log(`typedMessage/hash/data:`, typedMessage, hash, rawSignature), [typedMessage, hash, rawSignature])
 
   return (
     <>
-      <Button disabled={!isConnected || isPending} onClick={() => signTypedData()}>Sign V1</Button>
-
-      <Table celled striped size='small' color={verifyied == 'true' ? 'green' : verifyied == 'false' ? 'red' : 'orange'}>
-
-
-        <Body>
-          <Row columns={'equal'} verticalAlign='top'>
-            <Cell>
-              Message
-            </Cell>
-            <Cell className='Code'>
-              {Object.keys(messages).map((k, i) => <React.Fragment key={k}>{k}:{shortAddress(messages[k])}<br /></React.Fragment>)}
-            </Cell>
-          </Row>
-
-          <Row columns={'equal'} verticalAlign='top'>
-            <Cell className='Code'>
-              Typed Data
-            </Cell>
-            <Cell className='Code'>
-              {JSON.stringify(typedMessage)}
-            </Cell>
-          </Row>
-
-          <Row columns={'equal'} verticalAlign='top'>
-            <Cell>
-              Hash
-            </Cell>
-            <Cell className='Code'>
-              {/* {shortAddress(bigintToHex(hash))} */}
-              {bigintToHex(hash)}
-            </Cell>
-          </Row>
-
-          <Row columns={'equal'} verticalAlign='top'>
-            <Cell>
-              Signature
-            </Cell>
-            <Cell className='Code'>
-              {/* {signature ?? <>?</>} */}
-              {JSON.stringify(data ?? {})}
-            </Cell>
-          </Row>
-
-          <Row columns={'equal'} verticalAlign='top'>
-            <Cell>
-              Signature (r,s)
-            </Cell>
-            <Cell className='Code'>
-              {signature ? <>
-                r:{shortAddress(bigintToHex(signature[0]))}<br />
-                s:{shortAddress(bigintToHex(signature[1]))}<br />
-              </> : <>?</>}
-            </Cell>
-          </Row>
-
-          <Row columns={'equal'} verticalAlign='top'>
-            <Cell>
-              Verifyied
-            </Cell>
-            <Cell className='Code'>
-              {verifyied}
-            </Cell>
-          </Row>
-
-        </Body>
-      </Table>
+      <Button disabled={!isConnected || isSigning} onClick={() => sign()}>Sign V1</Button>
+      <Sign
+        messages={messages}
+        typedMessage={typedMessage}
+        hash={hash}
+        rawSignature={rawSignature}
+        signaturePair={signaturePair}
+        verified={formatted}
+      />
     </>
+  )
+}
+
+
+function Sign({
+  messages,
+  typedMessage,
+  hash,
+  rawSignature,
+  signaturePair,
+  verified,
+}: {
+  messages: Messages
+  typedMessage: TypedData
+  hash: string
+  rawSignature: ArraySignatureType
+  signaturePair: bigint[]
+  verified: string
+}) {
+  return (
+    <Table celled striped size='small' color={verified == 'true' ? 'green' : verified == 'false' ? 'red' : 'orange'}>
+      <Body>
+        <Row columns={'equal'} verticalAlign='top'>
+          <Cell>
+            Message
+          </Cell>
+          <Cell className='Code'>
+            {Object.keys(messages).map((k, i) => <React.Fragment key={k}>{k}:{shortAddress(messages[k])}<br /></React.Fragment>)}
+          </Cell>
+        </Row>
+
+        <Row columns={'equal'} verticalAlign='top'>
+          <Cell className='Code'>
+            Typed Data
+          </Cell>
+          <Cell className='Code'>
+            {JSON.stringify(typedMessage)}
+          </Cell>
+        </Row>
+
+        <Row columns={'equal'} verticalAlign='top'>
+          <Cell>
+            Hash
+          </Cell>
+          <Cell className='Code'>
+            {/* {shortAddress(bigintToHex(hash))} */}
+            {bigintToHex(hash)}
+          </Cell>
+        </Row>
+
+        <Row columns={'equal'} verticalAlign='top'>
+          <Cell>
+            Signature
+          </Cell>
+          <Cell className='Code'>
+            {/* {signature ?? <>?</>} */}
+            {JSON.stringify(rawSignature ?? {})}
+          </Cell>
+        </Row>
+
+        <Row columns={'equal'} verticalAlign='top'>
+          <Cell>
+            Signature (r,s)
+          </Cell>
+          <Cell className='Code'>
+            {signaturePair ? <>
+              r:{shortAddress(bigintToHex(signaturePair[0]))}<br />
+              s:{shortAddress(bigintToHex(signaturePair[1]))}<br />
+            </> : <>?</>}
+          </Cell>
+        </Row>
+
+        <Row columns={'equal'} verticalAlign='top'>
+          <Cell>
+            Verified
+          </Cell>
+          <Cell className='Code'>
+            {verified}
+          </Cell>
+        </Row>
+
+      </Body>
+    </Table>
   )
 }
