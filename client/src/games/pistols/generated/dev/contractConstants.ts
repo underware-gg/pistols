@@ -101,6 +101,22 @@ export const admin: mod_admin_Type = {
   NOT_OWNER: 'ADMIN: Not owner',
 };
 
+// from: ../dojo/src/systems/minter.cairo
+type mod_minter_Type = {
+  INVALID_TOKEN_ADDRESS: string, // cairo: felt252
+  INVALID_SUPPLY: string, // cairo: felt252
+  MINT_CLOSED: string, // cairo: felt252
+  MINTED_OUT: string, // cairo: felt252
+  NOT_OWNER: string, // cairo: felt252
+};
+export const minter: mod_minter_Type = {
+  INVALID_TOKEN_ADDRESS: 'DUELIST: invalid token address',
+  INVALID_SUPPLY: 'DUELIST: invalid supply',
+  MINT_CLOSED: 'DUELIST: minting is closed',
+  MINTED_OUT: 'DUELIST: minted out',
+  NOT_OWNER: 'DUELIST: not owner',
+};
+
 // from: ../dojo/src/types/action.cairo
 type mod_ACTION_Type = {
   PACES_MASK: number, // cairo: u8
