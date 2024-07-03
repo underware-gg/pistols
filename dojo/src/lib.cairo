@@ -1,19 +1,25 @@
-mod models {
-    mod config;
-    mod models;
-    mod structs;
-    mod table;
+mod mocks {
+    mod lords_mock;
 }
 
 mod systems {
     mod admin;
     mod actions;
+    mod token_duelist;
 }
 
 mod libs {
     mod seeder;
     mod shooter;
     mod utils;
+}
+
+mod models {
+    mod config;
+    mod models;
+    mod structs;
+    mod table;
+    mod token_config;
 }
 
 mod types {
@@ -26,6 +32,7 @@ mod types {
 
 mod interfaces {
     mod ierc20;
+    mod ierc721;
 }
 
 mod utils {
@@ -37,8 +44,9 @@ mod utils {
     mod timestamp;
 }
 
+#[cfg(test)]
 mod tests {
-    mod tester;
+    // pistols
     mod test_action;
     mod test_admin;
     mod test_challenge;
@@ -47,11 +55,11 @@ mod tests {
     mod test_round1;
     mod test_round2;
     mod test_round3;
-    mod test_utils;
     mod test_wager;
+    mod test_utils;
+    // tokens
+    mod test_token_duelist;
+    // utils
+    mod tester;
     mod salt_generator;
-}
-
-mod mocks {
-    mod lords_mock;
 }
