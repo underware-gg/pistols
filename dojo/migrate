@@ -11,6 +11,7 @@ fi
 #-----------------
 # env setup
 #
+export WORLD_NAME_SEED="pistols"
 export MANIFEST_FILE_PATH="./manifests/$PROFILE/manifest.json"
 export BINDINGS_PATH="./bindings/typescript"
 export GAME_SLUG="pistols"
@@ -54,7 +55,7 @@ echo "--------------------------------------------------------------------------
 echo "Migrating..."
 # sozo --profile $PROFILE migrate plan --world $WORLD_ADDRESS
 # exit 0
-sozo -P $PROFILE migrate apply --world $WORLD_ADDRESS
+sozo -P $PROFILE migrate apply --world $WORLD_ADDRESS --name $WORLD_NAME_SEED
 
 #-----------------
 # auth write
