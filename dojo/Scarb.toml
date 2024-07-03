@@ -74,7 +74,7 @@ account_address = "0x199df3260858b341a7985245c94361a320569635d0c405b1827ffa4d7de
 private_key = "0x680cf081e48a2c0651fe1a66b9f4b52203951a746e5d6c14aa65ed8e4245b88"
 
 # -----------------------
-# slot2 (pistils-slot)
+# staging (pistols-slot)
 # 
 [profile.staging.tool.dojo.env]
 rpc_url = "https://api.cartridge.gg/x/pistols-staging/katana"
