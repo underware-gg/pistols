@@ -13,7 +13,7 @@ mod tests {
     use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::types::action::{Action, ACTION};
     use pistols::types::constants::{constants};
-    use pistols::systems::utils::{ZERO, make_action_hash, pack_action_slots, unpack_action_slots};
+    use pistols::libs::utils::{ZERO, make_action_hash, pack_action_slots, unpack_action_slots};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::math::{MathU8};
     use pistols::tests::tester::{tester};

@@ -9,7 +9,7 @@ mod tests {
     use pistols::systems::admin::{IAdminDispatcher, IAdminDispatcherTrait};
     use pistols::models::config::{Config};
     use pistols::models::table::{TableConfig, tables};
-    use pistols::systems::utils::{ZERO};
+    use pistols::libs::utils::{ZERO};
     use pistols::types::constants::{constants};
     use pistols::tests::tester::{tester};
 

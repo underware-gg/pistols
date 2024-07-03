@@ -6,7 +6,7 @@ mod shooter {
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     use pistols::systems::actions::actions::{Errors};
-    use pistols::systems::{utils};
+    use pistols::libs::utils;
     use pistols::models::models::{init, Score, Challenge, Snapshot, Round, Shot, Duelist};
     use pistols::types::constants::{constants};
     use pistols::types::challenge::{ChallengeState};
@@ -311,11 +311,11 @@ mod tests {
     use debug::PrintTrait;
     use core::traits::{Into, TryInto};
 
-    use pistols::systems::shooter::{shooter};
+    use pistols::libs::shooter::{shooter};
     use pistols::models::models::{init, Shot};
     use pistols::types::action::{Action, ACTION};
     use pistols::types::constants::{constants};
-    use pistols::systems::{utils};
+    use pistols::libs::utils;
 
     #[test]
     #[available_gas(1_000_000)]

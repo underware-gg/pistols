@@ -1,6 +1,6 @@
 
 //------------------------------------------------------
-// systems::utils tests
+// libs::utils tests
 //
 #[cfg(test)]
 mod tests {
@@ -8,7 +8,7 @@ mod tests {
     use core::traits::{Into, TryInto};
     use starknet::{ContractAddress};
 
-    use pistols::systems::{utils};
+    use pistols::libs::utils;
     use pistols::models::models::{init, Round, Shot, Duelist, Score, ScoreTrait};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::action::{ACTION};

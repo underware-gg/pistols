@@ -1,6 +1,6 @@
 
 //------------------------------------------------------
-// systems::utils tests
+// libs::utils tests
 //
 #[cfg(test)]
 mod tests {
@@ -11,7 +11,7 @@ use debug::PrintTrait;
 
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
-    use pistols::systems::{utils};
+    use pistols::libs::utils;
     use pistols::models::models::{init, Round, Shot, Duelist, Score, ScoreTrait};
     use pistols::types::constants::{constants, honour, chances};
     use pistols::types::action::{Action};

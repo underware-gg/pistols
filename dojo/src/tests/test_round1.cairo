@@ -14,7 +14,7 @@ mod tests {
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::types::constants::{constants};
-    use pistols::systems::utils::{ZERO, make_action_hash};
+    use pistols::libs::utils::{ZERO, make_action_hash};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::math::{MathU8};
     use pistols::tests::tester::{tester};

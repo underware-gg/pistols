@@ -15,8 +15,8 @@ mod tests {
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::types::constants::{constants};
-    use pistols::systems::{utils};
-    use pistols::systems::shooter::{shooter};
+    use pistols::libs::utils;
+    use pistols::libs::shooter::{shooter};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::math::{MathU16};
     use pistols::tests::tester::{tester};

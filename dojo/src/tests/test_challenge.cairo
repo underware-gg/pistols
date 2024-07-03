@@ -10,7 +10,7 @@ mod tests {
     use pistols::models::models::{Duelist, Round};
     use pistols::models::table::{tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
-    use pistols::systems::utils::{ZERO};
+    use pistols::libs::utils::{ZERO};
     use pistols::utils::timestamp::{timestamp};
     use pistols::tests::tester::{tester};
 

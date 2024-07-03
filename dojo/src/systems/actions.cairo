@@ -84,9 +84,9 @@ mod actions {
     use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::types::action::{Action, ActionTrait};
     use pistols::utils::timestamp::{timestamp};
-    use pistols::systems::seeder::{make_seed};
-    use pistols::systems::shooter::{shooter};
-    use pistols::systems::{utils};
+    use pistols::libs::seeder::{make_seed};
+    use pistols::libs::shooter::{shooter};
+    use pistols::libs::utils;
     use pistols::types::constants::{constants};
     use pistols::types::{events};
 

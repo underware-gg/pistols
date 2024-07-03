@@ -8,6 +8,9 @@ mod models {
 mod systems {
     mod admin;
     mod actions;
+}
+
+mod libs {
     mod seeder;
     mod shooter;
     mod utils;

@@ -31,7 +31,7 @@ mod admin {
 
     use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
     use pistols::models::table::{TableConfig, TableManager, TableManagerTrait, default_tables};
-    use pistols::systems::{utils};
+    use pistols::libs::utils;
 
     mod Errors {
         const ALREADY_INITIALIZED: felt252 = 'ADMIN: Already initialized';

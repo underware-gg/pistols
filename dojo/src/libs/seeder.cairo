@@ -25,7 +25,7 @@ fn _make_block_hash() -> u128 {
 mod tests {
     use debug::PrintTrait;
     use pistols::utils::bitwise::{U256Bitwise};
-    use pistols::systems::seeder::{
+    use pistols::libs::seeder::{
         _make_block_hash,
         make_seed,
     };
