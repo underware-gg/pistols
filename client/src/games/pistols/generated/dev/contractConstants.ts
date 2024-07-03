@@ -105,16 +105,18 @@ export const admin: mod_admin_Type = {
 type mod_minter_Type = {
   INVALID_TOKEN_ADDRESS: string, // cairo: felt252
   INVALID_SUPPLY: string, // cairo: felt252
-  MINT_CLOSED: string, // cairo: felt252
-  MINTED_OUT: string, // cairo: felt252
   NOT_OWNER: string, // cairo: felt252
+  MINTED_OUT: string, // cairo: felt252
+  MINTING_IS_CLOSED: string, // cairo: felt252
+  MAXED_WALLET: string, // cairo: felt252
 };
 export const minter: mod_minter_Type = {
-  INVALID_TOKEN_ADDRESS: 'DUELIST: invalid token address',
-  INVALID_SUPPLY: 'DUELIST: invalid supply',
-  MINT_CLOSED: 'DUELIST: minting is closed',
-  MINTED_OUT: 'DUELIST: minted out',
-  NOT_OWNER: 'DUELIST: not owner',
+  INVALID_TOKEN_ADDRESS: 'MINTER: invalid token address',
+  INVALID_SUPPLY: 'MINTER: invalid supply',
+  NOT_OWNER: 'MINTER: not owner',
+  MINTED_OUT: 'MINTER: minted out',
+  MINTING_IS_CLOSED: 'MINTER: minting closed',
+  MAXED_WALLET: 'MINTER: wallet maxed out',
 };
 
 // from: ../dojo/src/types/action.cairo

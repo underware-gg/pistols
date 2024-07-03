@@ -2823,8 +2823,8 @@
     {
       "kind": "DojoContract",
       "address": null,
-      "class_hash": "0x7ceb975abe6e5b61c20b4b0c5fa4dd58890433952ca21acb0f940953b59dd40",
-      "original_class_hash": "0x7ceb975abe6e5b61c20b4b0c5fa4dd58890433952ca21acb0f940953b59dd40",
+      "class_hash": "0x1cb976835b2fabc9246f44d524c5138514485d13b504767725b67fc728cb0b5",
+      "original_class_hash": "0x1cb976835b2fabc9246f44d524c5138514485d13b504767725b67fc728cb0b5",
       "base_class_hash": "0x0",
       "abi": [
         {
@@ -2900,7 +2900,11 @@
                 },
                 {
                   "name": "max_supply",
-                  "type": "core::integer::u128"
+                  "type": "core::integer::u16"
+                },
+                {
+                  "name": "max_per_wallet",
+                  "type": "core::integer::u16"
                 },
                 {
                   "name": "is_open",
@@ -3038,8 +3042,8 @@
     {
       "kind": "DojoContract",
       "address": null,
-      "class_hash": "0x45e26d7cd328038bac7109cfdc1770cce2a9543c3d615157257c8ede24ea8b7",
-      "original_class_hash": "0x45e26d7cd328038bac7109cfdc1770cce2a9543c3d615157257c8ede24ea8b7",
+      "class_hash": "0x1f6fc16ceb081baff6ddaa455a7cac1715a6379bec340cee2a0ddf6b9842355",
+      "original_class_hash": "0x1f6fc16ceb081baff6ddaa455a7cac1715a6379bec340cee2a0ddf6b9842355",
       "base_class_hash": "0x0",
       "abi": [
         {
@@ -3134,6 +3138,20 @@
           ]
         },
         {
+          "type": "enum",
+          "name": "core::bool",
+          "variants": [
+            {
+              "name": "False",
+              "type": "()"
+            },
+            {
+              "name": "True",
+              "type": "()"
+            }
+          ]
+        },
+        {
           "type": "interface",
           "name": "pistols::systems::token_duelist::ITokenDuelistPublic",
           "items": [
@@ -3192,6 +3210,10 @@
                 {
                   "name": "token_id",
                   "type": "core::integer::u256"
+                },
+                {
+                  "name": "encode",
+                  "type": "core::bool"
                 }
               ],
               "outputs": [
@@ -3248,20 +3270,6 @@
           "type": "impl",
           "name": "SRC5Impl",
           "interface_name": "token::components::introspection::src5::ISRC5"
-        },
-        {
-          "type": "enum",
-          "name": "core::bool",
-          "variants": [
-            {
-              "name": "False",
-              "type": "()"
-            },
-            {
-              "name": "True",
-              "type": "()"
-            }
-          ]
         },
         {
           "type": "interface",
@@ -8419,7 +8427,12 @@
         },
         {
           "name": "max_supply",
-          "type": "u128",
+          "type": "u16",
+          "key": false
+        },
+        {
+          "name": "max_per_wallet",
+          "type": "u16",
           "key": false
         },
         {
@@ -8428,8 +8441,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x601ee5f39b5506dbb2645ccd584defdcdfcb2dd2f61229c81f7485c565a247e",
-      "original_class_hash": "0x601ee5f39b5506dbb2645ccd584defdcdfcb2dd2f61229c81f7485c565a247e",
+      "class_hash": "0x216ef76502ad59802f36de3d6c0e612e35545f3017581a48e941eb6f754ae97",
+      "original_class_hash": "0x216ef76502ad59802f36de3d6c0e612e35545f3017581a48e941eb6f754ae97",
       "abi": [
         {
           "type": "impl",
@@ -8782,7 +8795,11 @@
             },
             {
               "name": "max_supply",
-              "type": "core::integer::u128"
+              "type": "core::integer::u16"
+            },
+            {
+              "name": "max_per_wallet",
+              "type": "core::integer::u16"
             },
             {
               "name": "is_open",

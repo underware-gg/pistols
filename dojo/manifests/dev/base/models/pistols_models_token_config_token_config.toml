@@ -1,0 +1,30 @@
+kind = "DojoModel"
+class_hash = "0x216ef76502ad59802f36de3d6c0e612e35545f3017581a48e941eb6f754ae97"
+original_class_hash = "0x216ef76502ad59802f36de3d6c0e612e35545f3017581a48e941eb6f754ae97"
+abi = "manifests/dev/abis/base/models/pistols_models_token_config_token_config.json"
+name = "pistols::models::token_config::token_config"
+
+[[members]]
+name = "token_address"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "minter_address"
+type = "ContractAddress"
+key = false
+
+[[members]]
+name = "max_supply"
+type = "u16"
+key = false
+
+[[members]]
+name = "max_per_wallet"
+type = "u16"
+key = false
+
+[[members]]
+name = "is_open"
+type = "bool"
+key = false

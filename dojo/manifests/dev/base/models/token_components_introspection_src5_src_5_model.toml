@@ -1,0 +1,20 @@
+kind = "DojoModel"
+class_hash = "0x237bbd2a48bd68b9c230a134f3a99385c3f98044b428caee05f57fc9c7844d3"
+original_class_hash = "0x237bbd2a48bd68b9c230a134f3a99385c3f98044b428caee05f57fc9c7844d3"
+abi = "manifests/dev/abis/base/models/token_components_introspection_src5_src_5_model.json"
+name = "token::components::introspection::src5::src_5_model"
+
+[[members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "interface_id"
+type = "felt252"
+key = true
+
+[[members]]
+name = "supports"
+type = "bool"
+key = false

@@ -1,0 +1,10 @@
+kind = "DojoContract"
+class_hash = "0x1f6fc16ceb081baff6ddaa455a7cac1715a6379bec340cee2a0ddf6b9842355"
+original_class_hash = "0x1f6fc16ceb081baff6ddaa455a7cac1715a6379bec340cee2a0ddf6b9842355"
+base_class_hash = "0x0"
+abi = "manifests/dev/abis/base/contracts/pistols_systems_token_duelist_token_duelist.json"
+reads = []
+writes = []
+computed = []
+init_calldata = []
+name = "pistols::systems::token_duelist::token_duelist"
