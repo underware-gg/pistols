@@ -5,6 +5,7 @@ mod mocks {
 mod systems {
     mod admin;
     mod actions;
+    mod minter;
     mod token_duelist;
 }
 

@@ -2,8 +2,7 @@ use starknet::{ContractAddress};
 use dojo::world::IWorldDispatcher;
 
 #[starknet::interface]
-// trait IERC721EnumMintBurnPreset {
-trait IDuelistToken<TState> {
+trait ITokenDuelist<TState> {
     // IWorldProvider
     fn world(self: @TState,) -> IWorldDispatcher;
 
@@ -64,40 +63,35 @@ trait IDuelistToken<TState> {
     fn tokenByIndex(self: @TState, index: u256) -> u256;
     fn tokenOfOwnerByIndex(self: @TState, owner: ContractAddress, index: u256) -> u256;
 
-    // token_duelist
-    fn initialize(
-        ref self: TState,
-        name: ByteArray,
-        symbol: ByteArray,
-        base_uri: ByteArray,
-    );
+    // ITokenDuelistPublic
+    fn initialize(ref self: TState, name: ByteArray, symbol: ByteArray, base_uri: ByteArray);
     fn mint(ref self: TState, to: ContractAddress, token_id: u256);
     fn burn(ref self: TState, token_id: u256);
+    fn build_uri(self: @TState, token_id: u256) -> ByteArray;
+
+    // ITokenDuelistInternal
 }
 
 #[starknet::interface]
-trait IERC721EnumMintBurn<TState> {
+trait ITokenDuelistPublic<TState> {
+    fn initialize(ref self: TState, name: ByteArray, symbol: ByteArray, base_uri: ByteArray);
     fn mint(ref self: TState, to: ContractAddress, token_id: u256);
     fn burn(ref self: TState, token_id: u256);
+    fn build_uri(self: @TState, token_id: u256) -> ByteArray;
 }
 
-#[starknet::interface]
-trait IERC721EnumInit<TState> {
-    fn initialize(
-        ref self: TState,
-        name: ByteArray,
-        symbol: ByteArray,
-        base_uri: ByteArray,
-    );
-}
+// #[starknet::interface]
+// trait ITokenDuelistInternal<TState> {
+// }
 
 #[dojo::contract]
-mod token_duelist {
+mod token_duelist {    
     use debug::PrintTrait;
     use starknet::ContractAddress;
     use starknet::{get_contract_address, get_caller_address};
 
     use pistols::models::token_config::{TokenConfig, TokenConfigTrait};
+    use pistols::libs::utils::{CONSUME_BYTE_ARRAY};
 
     use token::components::security::initializable::initializable_component;
     use token::components::introspection::src5::src5_component;
@@ -213,60 +207,55 @@ mod token_duelist {
         const SAFE_TRANSFER_FAILED: felt252 = 'ERC721: safe transfer failed';
     }
 
-    #[abi(embed_v0)]
-    impl EnumInitImpl of super::IERC721EnumInit<ContractState> {
-        fn initialize(
-            ref self: ContractState,
-            name: ByteArray,
-            symbol: ByteArray,
-            base_uri: ByteArray,
-        ) {
-            self.erc721_metadata.initialize(name, symbol, base_uri);
-            self.erc721_enumerable.initialize();
-            self.initializable.initialize();
-        }
-    }
-
-    #[abi(embed_v0)]
-    impl EnumMintBurnImpl of super::IERC721EnumMintBurn<ContractState> {
-        fn mint(
-            ref self: ContractState,
-            to: ContractAddress,
-            token_id: u256,
-        ) {
-            let config: TokenConfig = get!(self.world(), (get_contract_address()), TokenConfig);
-            assert(
-                config.is_open,
-                Errors::MINTING_IS_CLOSED,
-            );
-            assert(
-                config.is_minter(get_caller_address()),
-                Errors::CALLER_IS_NOT_MINTER
-            );
-            self.erc721_mintable.mint(to, token_id);
-        }
-        fn burn(
-            ref self: ContractState,
-            token_id: u256,
-        ) {
-            self.erc721_burnable.burn(token_id);
-        }
-    }
-
     //
     // Metadata Hooks
     //
-    use super::{IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait};
+    use super::{ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait};
     impl ERC721MetadataHooksImpl<ContractState> of erc721_metadata_component::ERC721MetadataHooksTrait<ContractState> {
         fn custom_uri(
             self: @erc721_metadata_component::ComponentState<ContractState>,
             base_uri: @ByteArray,
             token_id: u256,
         ) -> ByteArray {
-            let contract_address = get_contract_address();
-            let selfie = IDuelistTokenDispatcher{ contract_address };
-            let world = selfie.world();
-            format!("/duelist/{}", token_id)
+            CONSUME_BYTE_ARRAY(base_uri);
+            let selfie = ITokenDuelistDispatcher{ contract_address: get_contract_address() };
+            (selfie.build_uri(token_id))
         }
     }
+
+    //-----------------------------------
+    // Public
+    //
+    #[abi(embed_v0)]
+    impl TokenDuelistPublicImpl of super::ITokenDuelistPublic<ContractState> {
+        fn initialize(ref self: ContractState, name: ByteArray, symbol: ByteArray, base_uri: ByteArray) {
+            self.erc721_metadata.initialize(name, symbol, base_uri);
+            self.erc721_enumerable.initialize();
+            self.initializable.initialize();
+        }
+
+        fn mint(ref self: ContractState, to: ContractAddress, token_id: u256) {
+            let config: TokenConfig = get!(self.world(), (get_contract_address()), TokenConfig);
+            assert(config.is_open, Errors::MINTING_IS_CLOSED);
+            assert(config.is_minter(get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
+            self.erc721_mintable.mint(to, token_id);
+        }
+        
+        fn burn(ref self: ContractState, token_id: u256) {
+            self.erc721_burnable.burn(token_id);
+        }
+
+        fn build_uri(self: @ContractState, token_id: u256) -> ByteArray {
+            // let contract_address = get_contract_address();
+            // let selfie = ITokenDuelistDispatcher{ contract_address };
+            // let world = selfie.world();
+            format!("{{\"id\":\"{}\"}}", token_id)
+        }
+    }
+
+    //-----------------------------------
+    // Private
+    //
+    // impl TokenDuelistInternalImpl of super::ITokenDuelistInternal<ContractState> {
+    // }
 }

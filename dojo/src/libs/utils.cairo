@@ -25,6 +25,9 @@ fn ZERO() -> ContractAddress {
 #[inline(always)]
 fn WORLD(_world: IWorldDispatcher) {}
 
+#[inline(always)]
+fn CONSUME_BYTE_ARRAY(_value: @ByteArray) {}
+
 
 //------------------------
 // Misc

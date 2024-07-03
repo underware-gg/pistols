@@ -36,7 +36,7 @@ use token::components::token::erc721::erc721_mintable::erc721_mintable_component
 use token::components::token::erc721::erc721_burnable::erc721_burnable_component::InternalImpl as ERC721BurnableInternalImpl;
 
 use pistols::systems::token_duelist::{
-    token_duelist, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
+    token_duelist, ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait,
 };
 use pistols::models::{
     token_config::{TokenConfig, TokenConfigTrait},
@@ -83,7 +83,7 @@ fn assert_only_event_approval(
 // Setup
 //
 
-fn setup_uninitialized() -> (IWorldDispatcher, IDuelistTokenDispatcher) {
+fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher) {
     let world = spawn_test_world(
         array![
             erc_721_token_approval_model::TEST_CLASS_HASH,
@@ -93,7 +93,7 @@ fn setup_uninitialized() -> (IWorldDispatcher, IDuelistTokenDispatcher) {
     );
 
     // deploy contract
-    let mut token_dispatcher = IDuelistTokenDispatcher {
+    let mut token_dispatcher = ITokenDuelistDispatcher {
         contract_address: world.deploy_contract('salt', token_duelist::TEST_CLASS_HASH.try_into().unwrap(), array![].span())
     };
 
@@ -133,9 +133,7 @@ fn setup_uninitialized() -> (IWorldDispatcher, IDuelistTokenDispatcher) {
         TokenConfig{
             token_address: token_dispatcher.contract_address,
             minter_address: OWNER(),
-            painter_address: token_dispatcher.contract_address,
             max_supply: 512,
-            cool_down: false,
             is_open: true,
         }
     ));
@@ -143,7 +141,7 @@ fn setup_uninitialized() -> (IWorldDispatcher, IDuelistTokenDispatcher) {
     (world, token_dispatcher)
 }
 
-fn setup() -> (IWorldDispatcher, IDuelistTokenDispatcher) {
+fn setup() -> (IWorldDispatcher, ITokenDuelistDispatcher) {
     let (world, mut token_dispatcher) = setup_uninitialized();
 
     // initialize contracts
@@ -169,9 +167,8 @@ fn test_initializer() {
     assert(token_dispatcher.balance_of(OWNER()) == 2, 'Should eq 2');
     assert(token_dispatcher.name() == "NAME", 'Name should be NAME');
     assert(token_dispatcher.symbol() == "SYMBOL", 'Symbol should be SYMBOL');
-    // no painter here to build uri
-    // assert(token_dispatcher.token_uri(TOKEN_ID) == "URI21", 'Uri should be URI21');
-    // assert(token_dispatcher.tokenURI(TOKEN_ID) == "URI21", 'Uri should be URI21 Camel');
+    assert(token_dispatcher.token_uri(TOKEN_ID)[0] == '{', 'Uri should not be empty');
+    assert(token_dispatcher.tokenURI(TOKEN_ID)[0] == '{', 'Uri should not be empty Camel');
     
     assert(token_dispatcher.supports_interface(IERC721_ID) == true, 'should support IERC721_ID');
     assert(token_dispatcher.supports_interface(IERC721_METADATA_ID) == true, 'should support METADATA');

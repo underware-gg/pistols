@@ -7,9 +7,7 @@ struct TokenConfig {
     token_address: ContractAddress,
     //------
     minter_address: ContractAddress,
-    painter_address: ContractAddress,
     max_supply: u128,
-    cool_down: bool,
     is_open: bool,
 }
 
