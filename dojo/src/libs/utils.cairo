@@ -36,12 +36,6 @@ fn CONSUME_BYTE_ARRAY(_value: @ByteArray) {}
 //
 
 #[inline(always)]
-fn duelist_exist(world: IWorldDispatcher, address: ContractAddress) -> bool {
-    let duelist: Duelist = get!(world, address, Duelist);
-    (duelist.name != 0)
-}
-
-#[inline(always)]
 fn make_action_hash(salt: u64, packed: u16) -> u64 {
     let hash: u256 = pedersen(salt.into(), packed.into()).into() & constants::HASH_SALT_MASK;
     (hash.try_into().unwrap())
@@ -58,37 +52,17 @@ fn scramble_salt(salt: u64) -> u64 {
     (hash.try_into().unwrap())
 }
 
-fn make_pact_pair(duelist_a: ContractAddress, duelist_b: ContractAddress) -> u128 {
-    let a: felt252 = duelist_a.into();
-    let b: felt252 = duelist_b.into();
-    let aa: u256 = a.into();
-    let bb: u256 = b.into();
+fn make_pact_pair(duelist_id_a: u128, duelist_id_b: u128) -> u128 {
+    let a: felt252 = duelist_id_a.into();
+    let b: felt252 = duelist_id_b.into();
+    let aa: u256 = pedersen(a, a).into();
+    let bb: u256 = pedersen(b, b).into();
     (aa.low ^ bb.low)
 }
 
-fn get_duelist_round_shot(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8) -> Shot {
-    let challenge: Challenge = get!(world, (duel_id), Challenge);
-    let round: Round = get!(world, (duel_id, round_number), Round);
-    if (challenge.duelist_a == duelist_address) {
-        (round.shot_a)
-    } else if (challenge.duelist_b == duelist_address) {
-        (round.shot_b)
-    } else {
-        (init::Shot())
-    }
-}
-fn get_duelist_health(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8) -> u8 {
-    if (round_number == 1) {
-        (constants::FULL_HEALTH)
-    } else {
-        let shot: Shot = get_duelist_round_shot(world, duelist_address, duel_id, round_number);
-        (shot.health)
-    }
-}
-
 fn create_challenge_snapshot(world: IWorldDispatcher, challenge: Challenge) {
-    let scoreboard_a: Scoreboard = get!(world, (challenge.duelist_a, challenge.table_id), Scoreboard);
-    let scoreboard_b: Scoreboard = get!(world, (challenge.duelist_b, challenge.table_id), Scoreboard);
+    let scoreboard_a: Scoreboard = get!(world, (challenge.table_id, challenge.duelist_id_a), Scoreboard);
+    let scoreboard_b: Scoreboard = get!(world, (challenge.table_id, challenge.duelist_id_b), Scoreboard);
     let snapshot = Snapshot {
         duel_id: challenge.duel_id,
         score_a: scoreboard_a.score,
@@ -97,17 +71,6 @@ fn create_challenge_snapshot(world: IWorldDispatcher, challenge: Challenge) {
     set!(world, (snapshot));
 }
 
-fn get_snapshot_scores(world: IWorldDispatcher, address: ContractAddress, duel_id: u128) -> (Score, Score) {
-    let challenge: Challenge = get!(world, duel_id, Challenge);
-    let snapshot: Snapshot = get!(world, duel_id, Snapshot);
-    if (address == challenge.duelist_a) {
-        (snapshot.score_a, snapshot.score_b)
-    } else if (address == challenge.duelist_b) {
-        (snapshot.score_b, snapshot.score_a)
-    } else {
-        (init::Score(), init::Score())
-    }
-}
 
 // player need to allow contract to transfer funds first
 // ierc20::approve(contract_address, max(wager.value, wager.fee));
@@ -133,8 +96,8 @@ fn withdraw_wager_fees(world: IWorldDispatcher, challenge: Challenge, to: Contra
         table.ierc20().transfer(to, total);
     }
 }
-// spllit wager beteen duelist_a and duelist_b
-fn split_wager_fees(world: IWorldDispatcher, challenge: Challenge, duelist_a: ContractAddress, duelist_b: ContractAddress) -> u256 {
+// spllit wager beteen address_a and address_b
+fn split_wager_fees(world: IWorldDispatcher, challenge: Challenge, address_a: ContractAddress, address_b: ContractAddress) -> u256 {
     let wager: Wager = get!(world, (challenge.duel_id), Wager);
     let total: u256 = (wager.value + wager.fee) * 2;
     if (total > 0) {
@@ -142,13 +105,13 @@ fn split_wager_fees(world: IWorldDispatcher, challenge: Challenge, duelist_a: Co
         let balance: u256 = table.ierc20().balance_of(starknet::get_contract_address());
         assert(balance >= total, Errors::WAGER_NOT_AVAILABLE); // should never happen!
         if (wager.value > 0) {
-            if (duelist_a == duelist_b) {
+            if (address_a == address_b) {
                 // single winner
-                table.ierc20().transfer(duelist_a, wager.value * 2);
+                table.ierc20().transfer(address_a, wager.value * 2);
             } else {
-                // split wager back to duelists
-                table.ierc20().transfer(duelist_a, wager.value);
-                table.ierc20().transfer(duelist_b, wager.value);
+                // split wager back to addresss
+                table.ierc20().transfer(address_a, wager.value);
+                table.ierc20().transfer(address_b, wager.value);
             }
         }
         if (wager.fee > 0) {
@@ -265,7 +228,7 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
     let state: ChallengeState = challenge.state.try_into().unwrap();
 
     // Set pact between Duelists to avoid duplicated challenges
-    let pair: u128 = make_pact_pair(challenge.duelist_a, challenge.duelist_b);
+    let pair: u128 = make_pact_pair(challenge.duelist_id_a, challenge.duelist_id_b);
     let pact_duel_id: u128 = if (state.is_ongoing()) { challenge.duel_id } else  { 0 };
     set!(world, Pact {
         pair,
@@ -275,7 +238,7 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
     // Start Round
     if (state.is_canceled()) {
         // transfer wager/fee back to challenger
-        withdraw_wager_fees(world, challenge, challenge.duelist_a);
+        withdraw_wager_fees(world, challenge, challenge.address_a);
     } else if (state == ChallengeState::InProgress) {
         let mut shot_a = init::Shot();
         let mut shot_b = init::Shot();
@@ -304,10 +267,10 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         ));
     } else if (state.is_finished()) {
         // End Duel!
-        let mut duelist_a: Duelist = get!(world, challenge.duelist_a, Duelist);
-        let mut duelist_b: Duelist = get!(world, challenge.duelist_b, Duelist);
-        let mut scoreboard_a: Scoreboard = get!(world, (challenge.duelist_a, challenge.table_id), Scoreboard);
-        let mut scoreboard_b: Scoreboard = get!(world, (challenge.duelist_b, challenge.table_id), Scoreboard);
+        let mut duelist_a: Duelist = get!(world, challenge.duelist_id_a, Duelist);
+        let mut duelist_b: Duelist = get!(world, challenge.duelist_id_b, Duelist);
+        let mut scoreboard_a: Scoreboard = get!(world, (challenge.table_id, challenge.duelist_id_a), Scoreboard);
+        let mut scoreboard_b: Scoreboard = get!(world, (challenge.table_id, challenge.duelist_id_b), Scoreboard);
         
         // update totals
         update_score_totals(ref duelist_a.score, ref duelist_b.score, state, challenge.winner);
@@ -323,17 +286,17 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         // split wager/fee to winners and benefactors
         if (final_round.shot_a.wager > final_round.shot_b.wager) {
             // duelist_a won the Wager
-            let wager_value: u256 = split_wager_fees(world, challenge, challenge.duelist_a, challenge.duelist_a);
+            let wager_value: u256 = split_wager_fees(world, challenge, challenge.address_a, challenge.address_a);
             scoreboard_a.wager_won += wager_value;
             scoreboard_b.wager_lost += wager_value;
         } else if (final_round.shot_a.wager < final_round.shot_b.wager) {
             // duelist_b won the Wager
-            let wager_value: u256 = split_wager_fees(world, challenge, challenge.duelist_b, challenge.duelist_b);
+            let wager_value: u256 = split_wager_fees(world, challenge, challenge.address_b, challenge.address_b);
             scoreboard_a.wager_lost += wager_value;
             scoreboard_b.wager_won += wager_value;
         } else {
             // no-one gets the Wager
-            split_wager_fees(world, challenge, challenge.duelist_a, challenge.duelist_b);
+            split_wager_fees(world, challenge, challenge.address_a, challenge.address_b);
         }
         
         // save
@@ -542,19 +505,6 @@ fn calc_lethal_lord_penalty(attacker: Score, defender: Score, attack: Action, de
 }
 
 
-//------------------------
-// read calls
-//
-
-fn simulate_honour_for_action(world: IWorldDispatcher, duelist_address: ContractAddress, action: Action) -> (i8, u8) {
-    let mut duelist: Duelist = get!(world, duelist_address, Duelist);
-    let action_honour: i8 = action.honour();
-    if (action_honour >= 0) {
-        duelist.score.total_duels += 1;
-        update_score_honour(ref duelist.score, MathU8::abs(action_honour));
-    }
-    (action_honour, duelist.score.honour)
-}
 
 
 //------------------------
@@ -577,5 +527,53 @@ fn throw_dice(seed: felt252, salt: felt252, faces: u128) -> u128 {
 // edge case: limit == faces, always positive
 fn check_dice(seed: felt252, salt: felt252, faces: u128, limit: u128) -> bool {
     (throw_dice(seed, salt, faces) <= limit)
+}
+
+
+
+
+//------------------------
+// read calls
+//
+
+fn call_simulate_honour_for_action(world: IWorldDispatcher, mut score: Score, action: Action) -> (i8, u8) {
+    let action_honour: i8 = action.honour();
+    if (action_honour >= 0) {
+        score.total_duels += 1;
+        update_score_honour(ref score, MathU8::abs(action_honour));
+    }
+    (action_honour, score.honour)
+}
+
+fn call_get_duelist_health(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8) -> u8 {
+    if (round_number == 1) {
+        (constants::FULL_HEALTH)
+    } else {
+        let shot: Shot = call_get_duelist_round_shot(world, duelist_address, duel_id, round_number);
+        (shot.health)
+    }
+}
+fn call_get_duelist_round_shot(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8) -> Shot {
+    let challenge: Challenge = get!(world, (duel_id), Challenge);
+    let round: Round = get!(world, (duel_id, round_number), Round);
+    if (challenge.address_a == duelist_address) {
+        (round.shot_a)
+    } else if (challenge.address_b == duelist_address) {
+        (round.shot_b)
+    } else {
+        (init::Shot())
+    }
+}
+
+fn call_get_snapshot_scores(world: IWorldDispatcher, address: ContractAddress, duel_id: u128) -> (Score, Score) {
+    let challenge: Challenge = get!(world, duel_id, Challenge);
+    let snapshot: Snapshot = get!(world, duel_id, Snapshot);
+    if (challenge.address_a == address) {
+        (snapshot.score_a, snapshot.score_b)
+    } else if (challenge.address_b == address) {
+        (snapshot.score_b, snapshot.score_a)
+    } else {
+        (init::Score(), init::Score())
+    }
 }
 

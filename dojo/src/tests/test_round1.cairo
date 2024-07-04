@@ -18,7 +18,7 @@ mod tests {
     use pistols::libs::utils::{make_action_hash};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::math::{MathU8};
-    use pistols::tests::tester::{tester, tester::{ZERO, OWNER, OTHER, BUMMER, TREASURY}};
+    use pistols::tests::tester::{tester, tester::{ZERO, OWNER, OTHER, BUMMER, TREASURY, ID}};
 
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
@@ -87,7 +87,7 @@ mod tests {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
         tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 2);
-        assert(system.has_pact(OTHER(), OWNER()) == false, 'has_pact_no');
+        assert(system.has_pact(ID(OTHER()), ID(OWNER())) == false, 'has_pact_no');
 
         let expire_seconds: u64 = timestamp::from_days(2);
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_seconds);
@@ -95,7 +95,7 @@ mod tests {
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
         let new_state: ChallengeState = tester::execute_reply_challenge(system, OTHER(), duel_id, true);
         assert(new_state == ChallengeState::InProgress, 'in_progress');
-        assert(system.has_pact(OTHER(), OWNER()) == true, 'has_pact_yes');
+        assert(system.has_pact(ID(OTHER()), ID(OWNER())) == true, 'has_pact_yes');
 
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');
@@ -333,8 +333,8 @@ mod tests {
         assert(duelist_a.score.honour == (action_a * 10).try_into().unwrap(), 'duelist_a.score.honour');
         assert(duelist_b.score.honour == (action_b * 10).try_into().unwrap(), 'duelist_b.score.honour');
 
-        let mut scoreboard_a = tester::get_Scoreboard(world, OWNER(), TABLE_ID);
-        let mut scoreboard_b = tester::get_Scoreboard(world, OTHER(), TABLE_ID);
+        let mut scoreboard_a = tester::get_Scoreboard(world, TABLE_ID, OWNER());
+        let mut scoreboard_b = tester::get_Scoreboard(world, TABLE_ID, OTHER());
         assert(duelist_a.score.total_duels == scoreboard_a.score.total_duels, 'scoreboard_a.total_duels');
         assert(duelist_b.score.total_duels == scoreboard_b.score.total_duels, 'scoreboard_b.total_duels');
         assert(duelist_a.score.total_honour == scoreboard_a.score.total_honour, 'scoreboard_a.total_honour');
@@ -355,7 +355,7 @@ mod tests {
         // A is a trickster, will shoot first
         // let mut duelist_a = tester::get_Duelist(world, OWNER());
         // duelist_a.score.level_trickster = 100;
-        let mut scoreboard_a = tester::get_Scoreboard(world, OWNER(), TABLE_ID);
+        let mut scoreboard_a = tester::get_Scoreboard(world, TABLE_ID, OWNER());
         scoreboard_a.score.level_trickster = 100;
         set!(world,(scoreboard_a));
         // duel!
@@ -377,7 +377,7 @@ mod tests {
         // A is a trickster, will shoot first
         // let mut duelist_b = tester::get_Duelist(world, OTHER());
         // duelist_b.score.level_trickster = 100;
-        let mut scoreboard_b = tester::get_Scoreboard(world, OTHER(), TABLE_ID);
+        let mut scoreboard_b = tester::get_Scoreboard(world, TABLE_ID, OTHER());
         scoreboard_b.score.level_trickster = 100;
         set!(world,(scoreboard_b));
         // duel!
@@ -551,7 +551,7 @@ mod tests {
         let duelist_a_before = tester::get_Duelist(world, OWNER());
         tester::execute_register_duelist(system, OWNER(), 'dssadsa', 3);
         let duelist_a_after = tester::get_Duelist(world, OWNER());
-        assert(duelist_a_before.address == duelist_a_after.address, 'address');
+        assert(duelist_a_before.duelist_id == duelist_a_after.duelist_id, 'duelist_id');
         assert(duelist_a_before.name != duelist_a_after.name, 'name');
         assert(duelist_a_before.profile_pic != duelist_a_after.profile_pic, 'profile_pic');
         assert(duelist_a_before.timestamp == duelist_a_after.timestamp, 'timestamp');

@@ -7,7 +7,7 @@ use starknet::{ContractAddress};
 //
 
 #[generate_trait]
-impl ByteArrayImpl of ByteArraysTrait {
+impl ByteArrays of ByteArraysTrait {
     #[inline(always)]
     fn copy(self: @ByteArray) -> ByteArray { format!("{}", self) }
 }

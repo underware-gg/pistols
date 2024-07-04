@@ -28,7 +28,7 @@ struct TableConfig {
     table_id: felt252,
     //------
     description: felt252,
-    contract_address: ContractAddress,
+    contract_address: ContractAddress, // wager contract, or 0x0
     wager_min: u256,
     fee_min: u256,
     fee_pct: u8,
@@ -43,7 +43,7 @@ struct TableAdmittance {
     table_id: felt252,
     //------
     accounts: Array<ContractAddress>,
-    duelists: Array<ContractAddress>,
+    duelists: Array<u128>,
 }
 
 fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
@@ -116,9 +116,9 @@ impl TableManagerTraitImpl of TableManagerTrait {
             n += 1;
         };
     }
-    fn can_join(self: TableManager, table_id: felt252, account_address: ContractAddress, duelist_address: ContractAddress) -> bool {
+    fn can_join(self: TableManager, table_id: felt252, account_address: ContractAddress, duelist_id: u128) -> bool {
         let admittance: TableAdmittance = get!(self.world, (table_id), TableAdmittance);
-        (admittance.can_join(account_address, duelist_address))
+        (admittance.can_join(account_address, duelist_id))
     }
 }
 
@@ -140,11 +140,11 @@ impl TableTraitImpl of TableTrait {
 //
 #[generate_trait]
 impl TableAdmittanceTraitImpl of TableAdmittanceTrait {
-    fn can_join(self: @TableAdmittance, account_address: ContractAddress, duelist_address: ContractAddress) -> bool {
+    fn can_join(self: @TableAdmittance, account_address: ContractAddress, duelist_id: u128) -> bool {
         if (self.accounts.len() == 0 && self.duelists.len() == 0) {
             (true)
         } else {
-            (self.accounts.contains(@account_address) || self.duelists.contains(@duelist_address))
+            (self.accounts.contains(@account_address) || self.duelists.contains(@duelist_id))
         }
     }
 }
@@ -168,42 +168,53 @@ mod tests {
     #[available_gas(10_000_00)]
     fn test_admittance() {
         let table_id: felt252 = 'RoundTable';
-        let duelist_1: ContractAddress = starknet::contract_address_const::<0x111>();
-        let duelist_2: ContractAddress = starknet::contract_address_const::<0x222>();
-        let duelist_3: ContractAddress = starknet::contract_address_const::<0x333>();
+        let address_1: ContractAddress = starknet::contract_address_const::<0x111>();
+        let address_2: ContractAddress = starknet::contract_address_const::<0x222>();
+        let address_3: ContractAddress = starknet::contract_address_const::<0x333>();
+        let duelist_id_1: u128 = 0x1;
+        let duelist_id_2: u128 = 0x2;
+        let duelist_id_3: u128 = 0x3;
         let admittance = @TableAdmittance{
             table_id,
             accounts: array![],
             duelists: array![],
         };
-        assert(admittance.can_join(duelist_1, duelist_1) == true, 'empty_1');
-        assert(admittance.can_join(duelist_1, duelist_2) == true, 'empty_2');
-        assert(admittance.can_join(duelist_2, duelist_1) == true, 'empty_3');
+        assert(admittance.can_join(address_1, duelist_id_1) == true, 'empty_1');
+        assert(admittance.can_join(address_1, duelist_id_2) == true, 'empty_2');
+        assert(admittance.can_join(address_2, duelist_id_1) == true, 'empty_3');
         let admittance = TableAdmittance{
             table_id,
-            accounts: array![duelist_3],
+            accounts: array![address_3],
             duelists: array![],
         };
-        assert(admittance.can_join(duelist_1, duelist_2) == false, 'accounts_1_2');
-        assert(admittance.can_join(duelist_2, duelist_1) == false, 'accounts_2_1');
-        assert(admittance.can_join(duelist_1, duelist_3) == false, 'accounts_1_3');
-        assert(admittance.can_join(duelist_3, duelist_1) == true, 'accounts_3_1');
+        assert(admittance.can_join(address_1, duelist_id_2) == false, 'accounts_1_2');
+        assert(admittance.can_join(address_2, duelist_id_1) == false, 'accounts_2_1');
+        assert(admittance.can_join(address_1, duelist_id_3) == false, 'accounts_1_3');
+        assert(admittance.can_join(address_3, duelist_id_1) == true, 'accounts_3_1');
         let admittance = TableAdmittance{
             table_id,
             accounts: array![],
-            duelists: array![duelist_3],
+            duelists: array![duelist_id_3],
         };
-        assert(admittance.can_join(duelist_1, duelist_2) == false, 'duelists_1_2');
-        assert(admittance.can_join(duelist_2, duelist_1) == false, 'duelists_2_1');
-        assert(admittance.can_join(duelist_1, duelist_3) == true, 'duelists_1_3');
-        assert(admittance.can_join(duelist_3, duelist_1) == false, 'duelists_3_1');
+        assert(admittance.can_join(address_1, duelist_id_2) == false, 'duelists_1_2');
+        assert(admittance.can_join(address_2, duelist_id_1) == false, 'duelists_2_1');
+        assert(admittance.can_join(address_1, duelist_id_3) == true, 'duelists_1_3');
+        assert(admittance.can_join(address_3, duelist_id_1) == false, 'duelists_3_1');
         let admittance = TableAdmittance{
             table_id,
-            accounts: array![duelist_1, duelist_2],
+            accounts: array![address_1, address_2],
             duelists: array![],
         };
-        assert(admittance.can_join(duelist_1, duelist_2) == true, 'dual_1_2');
-        assert(admittance.can_join(duelist_2, duelist_1) == true, 'dual_2_1');
-        assert(admittance.can_join(duelist_3, duelist_3) == false, 'dual_3_3');
+        assert(admittance.can_join(address_1, duelist_id_2) == true, 'dual_1_2');
+        assert(admittance.can_join(address_2, duelist_id_1) == true, 'dual_2_1');
+        assert(admittance.can_join(address_3, duelist_id_3) == false, 'dual_3_3');
+        let admittance = TableAdmittance{
+            table_id,
+            accounts: array![],
+            duelists: array![duelist_id_1, duelist_id_2],
+        };
+        assert(admittance.can_join(address_1, duelist_id_2) == true, 'dual_1_2');
+        assert(admittance.can_join(address_2, duelist_id_1) == true, 'dual_2_1');
+        assert(admittance.can_join(address_3, duelist_id_3) == false, 'dual_3_3');
     }
 }

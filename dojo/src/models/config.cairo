@@ -24,7 +24,7 @@ struct ConfigManager {
 #[generate_trait]
 impl ConfigManagerTraitImpl of ConfigManagerTrait {
     fn new(world: IWorldDispatcher) -> ConfigManager {
-        ConfigManager { world }
+        (ConfigManager { world })
     }
     fn get(self: ConfigManager) -> Config {
         get!(self.world, (CONFIG_KEY), Config)

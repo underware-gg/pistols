@@ -79,7 +79,6 @@ sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
   Wager,$ACTIONS_ADDRESS \
   Pact,$ACTIONS_ADDRESS \
   Round,$ACTIONS_ADDRESS
-duelists
 
 echo "- Duelists auth..."
 sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
@@ -95,7 +94,6 @@ sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
   ERC721EnumerableTokenModel,$DUELISTS_ADDRESS \
   ERC721EnumerableTotalModel,$DUELISTS_ADDRESS \
   ERC721OwnerModel,$DUELISTS_ADDRESS \
-
 
 # Mocked Lords
 if [[ ! -z "$LORDS_MOCK" ]]; then

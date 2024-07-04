@@ -18,11 +18,23 @@ mod tests {
     #[test]
     #[available_gas(1_000_000)]
     fn test_pact_pair() {
-        let a: ContractAddress = starknet::contract_address_const::<0x56c155b624fdf6bfc94f7b37cf1dbebb5e186ef2e4ab2762367cd07c8f892a1>();
-        let b: ContractAddress = starknet::contract_address_const::<0x6b86e40118f29ebe393a75469b4d926c7a44c2e2681b6d319520b7c1156d114>();
+        let a: u128 = 0xb5e186ef2e4ab2762367cd07c8f892a1;
+        let b: u128 = 0x6b86e40118f29ebe393a75469b4d926c;
         let p_a = utils::make_pact_pair(a, b);
         let p_b = utils::make_pact_pair(b, a);
         assert(p_a == p_b, 'test_pact_pair');
+    }
+
+    #[test]
+    #[available_gas(1_000_000)]
+    fn test_pact_pair_self() {
+        let p1: u128 = utils::make_pact_pair(1, 1);
+        let p2: u128 = utils::make_pact_pair(2, 2);
+        assert(p1 != 0, 'p1 != 0');
+        assert(p1 != 1, 'p1 != 1');
+        assert(p2 != 0, 'p2 != 0');
+        assert(p2 != 2, 'p2 != 2');
+        assert(p1 != p2, 'p1 != p2');
     }
 
     #[test]
@@ -142,7 +154,7 @@ mod tests {
     #[available_gas(100_000_000)]
     fn test_update_score_honour() {
         let mut duelist = init::Duelist();
-        duelist.address = starknet::contract_address_const::<0x111>();
+        duelist.duelist_id = 0x111;
         duelist.name = 'duelist';
         duelist.score.total_duels = 1;
         utils::update_score_honour(ref duelist.score, 10);

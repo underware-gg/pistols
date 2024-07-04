@@ -29,7 +29,7 @@ export const table_types: mod_table_types_Type = {
 type mod_actions_Type = {
   NOT_INITIALIZED: string, // cairo: felt252
   INVALID_CHALLENGED: string, // cairo: felt252
-  INVALID_EXPIRE: string, // cairo: felt252
+  INVALID_EXPIRY: string, // cairo: felt252
   INVALID_CHALLENGE: string, // cairo: felt252
   CHALLENGER_NOT_ADMITTED: string, // cairo: felt252
   CHALLENGED_NOT_ADMITTED: string, // cairo: felt252
@@ -51,11 +51,12 @@ type mod_actions_Type = {
   ALREADY_COMMITTED: string, // cairo: felt252
   ALREADY_REVEALED: string, // cairo: felt252
   ACTION_HASH_MISMATCH: string, // cairo: felt252
+  NOT_DUELIST_OWNER: string, // cairo: felt252
 };
 export const actions: mod_actions_Type = {
   NOT_INITIALIZED: 'PISTOLS: Not initialized',
   INVALID_CHALLENGED: 'PISTOLS: Invalid challenged',
-  INVALID_EXPIRE: 'PISTOLS: Invalid expire_seconds',
+  INVALID_EXPIRY: 'PISTOLS: Invalid expiry',
   INVALID_CHALLENGE: 'PISTOLS: Invalid Challenge',
   CHALLENGER_NOT_ADMITTED: 'PISTOLS: Challenger not allowed',
   CHALLENGED_NOT_ADMITTED: 'PISTOLS: Challenged not allowed',
@@ -77,6 +78,7 @@ export const actions: mod_actions_Type = {
   ALREADY_COMMITTED: 'PISTOLS: Already committed',
   ALREADY_REVEALED: 'PISTOLS: Already revealed',
   ACTION_HASH_MISMATCH: 'PISTOLS: Action hash mismatch',
+  NOT_DUELIST_OWNER: 'PISTOLS: Not your duelist',
 };
 
 // from: ../dojo/src/systems/admin.cairo

@@ -12,7 +12,7 @@ mod tests {
     use pistols::models::table::{tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::utils::timestamp::{timestamp};
-    use pistols::tests::tester::{tester, tester::{ZERO, OWNER, OTHER, BUMMER, TREASURY}};
+    use pistols::tests::tester::{tester, tester::{ZERO, OWNER, OTHER, BUMMER, TREASURY, ID}};
 
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
@@ -71,8 +71,8 @@ mod tests {
 
     #[test]
     #[available_gas(1_000_000_000)]
-    #[should_panic(expected:('PISTOLS: Invalid expire_seconds', 'ENTRYPOINT_FAILED'))]
-    fn test_invalid_expire() {
+    #[should_panic(expected:('PISTOLS: Invalid expiry', 'ENTRYPOINT_FAILED'))]
+    fn test_invalid_expiry() {
         let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
         let expire_seconds: u64 = 60 * 60 - 1;
@@ -88,8 +88,10 @@ mod tests {
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 0);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'state');
-        assert(ch.duelist_a == OWNER(), 'challenged');
-        assert(ch.duelist_b == OTHER(), 'challenged');
+        assert(ch.address_a == OWNER(), 'challenged');
+        assert(ch.address_b == OTHER(), 'challenger');
+        assert(ch.duelist_id_a == ID(OWNER()), 'challenger_id');
+        assert(ch.duelist_id_b == ID(OTHER()), 'challenged_id');
         assert(ch.message == MESSAGE_1, 'message');
         assert(ch.timestamp_start == timestamp, 'timestamp_start');
         assert(ch.timestamp_end == 0, 'timestamp_end');
@@ -113,15 +115,15 @@ mod tests {
     fn test_challenge_address_pact() {
         let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
-        assert(system.get_pact(OWNER(), OTHER()) == 0, 'get_pact_0_1');
-        assert(system.get_pact(OTHER(), OWNER()) == 0, 'get_pact_0_2');
-        assert(system.has_pact(OWNER(), OTHER()) == false, 'has_pact_0_1');
-        assert(system.has_pact(OTHER(), OWNER()) == false, 'has_pact_0_2');
+        assert(system.get_pact(ID(OWNER()), ID(OTHER())) == 0, 'get_pact_0_1');
+        assert(system.get_pact(ID(OTHER()), ID(OWNER())) == 0, 'get_pact_0_2');
+        assert(system.has_pact(ID(OWNER()), ID(OTHER())) == false, 'has_pact_0_1');
+        assert(system.has_pact(ID(OTHER()), ID(OWNER())) == false, 'has_pact_0_2');
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 0);
-        assert(system.get_pact(OWNER(), OTHER()) == duel_id, 'get_pact_1_1');
-        assert(system.get_pact(OTHER(), OWNER()) == duel_id, 'get_pact_1_2');
-        assert(system.has_pact(OWNER(), OTHER()) == true, 'has_pact_1_1');
-        assert(system.has_pact(OTHER(), OWNER()) == true, 'has_pact_1_2');
+        assert(system.get_pact(ID(OWNER()), ID(OTHER())) == duel_id, 'get_pact_1_1');
+        assert(system.get_pact(ID(OTHER()), ID(OWNER())) == duel_id, 'get_pact_1_2');
+        assert(system.has_pact(ID(OWNER()), ID(OTHER())) == true, 'has_pact_1_1');
+        assert(system.has_pact(ID(OTHER()), ID(OWNER())) == true, 'has_pact_1_2');
     }
 
 
@@ -169,11 +171,11 @@ mod tests {
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_seconds);
         let _ch = tester::get_Challenge(world, duel_id);
 
-        assert(system.has_pact(OTHER(), OWNER()) == true, 'has_pact_yes');
+        assert(system.has_pact(ID(OTHER()), ID(OWNER())) == true, 'has_pact_yes');
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_date(1, 0, 1));
         let new_state: ChallengeState = tester::execute_reply_challenge(system, OWNER(), duel_id, true);
         assert(new_state == ChallengeState::Expired, 'expired');
-        assert(system.has_pact(OTHER(), OWNER()) == false, 'has_pact_no');
+        assert(system.has_pact(ID(OTHER()), ID(OWNER())) == false, 'has_pact_no');
 
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');
@@ -209,10 +211,10 @@ mod tests {
         let _ch = tester::get_Challenge(world, duel_id);
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
 
-        assert(system.has_pact(OTHER(), OWNER()) == true, 'has_pact_yes');
+        assert(system.has_pact(ID(OTHER()), ID(OWNER())) == true, 'has_pact_yes');
         let new_state: ChallengeState = tester::execute_reply_challenge(system, OWNER(), duel_id, false);
         assert(new_state == ChallengeState::Withdrawn, 'canceled');
-        assert(system.has_pact(OWNER(), OTHER()) == false, 'has_pact_no');
+        assert(system.has_pact(ID(OWNER()), ID(OTHER())) == false, 'has_pact_no');
 
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');
@@ -227,16 +229,15 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Not your Challenge', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_impersonator() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
-        let impersonator: ContractAddress = starknet::contract_address_const::<0x333>();
         tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
         tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 2);
-        tester::execute_register_duelist(system, impersonator, 'Impersonator', 3);
+        tester::execute_register_duelist(system, BUMMER(), 'impersonator', 3);
 
         let expire_seconds: u64 = timestamp::from_days(2);
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_seconds);
         let _ch = tester::get_Challenge(world, duel_id);
         let (_block_number, _timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
-        tester::execute_reply_challenge(system, impersonator, duel_id, false);
+        tester::execute_reply_challenge(system, BUMMER(), duel_id, false);
     }
 
     #[test]
@@ -262,11 +263,11 @@ mod tests {
         let expire_seconds: u64 = timestamp::from_days(2);
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_seconds);
 
-        assert(system.has_pact(OTHER(), OWNER()) == true, 'has_pact_yes');
+        assert(system.has_pact(ID(OTHER()), ID(OWNER())) == true, 'has_pact_yes');
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
         let new_state: ChallengeState = tester::execute_reply_challenge(system, OTHER(), duel_id, false);
         assert(new_state == ChallengeState::Refused, 'refused');
-        assert(system.has_pact(OTHER(), OWNER()) == false, 'has_pact_no');
+        assert(system.has_pact(ID(OTHER()), ID(OWNER())) == false, 'has_pact_no');
 
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');

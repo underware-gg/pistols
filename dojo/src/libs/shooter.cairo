@@ -19,8 +19,11 @@ mod shooter {
         let challenge: Challenge = get!(world, duel_id, Challenge);
 
         // Assert Duelist is in the challenge
-        let duelist_number: u8 = if (challenge.duelist_a == caller) { 1 } else if (challenge.duelist_b == caller) { 2 } else { 0 };
-        assert(duelist_number == 1 || duelist_number == 2, Errors::NOT_YOUR_CHALLENGE);
+        let duelist_number: u8 =
+            if (challenge.address_a == caller) { 1 }
+            else if (challenge.address_b == caller) { 2 }
+            else { 0 };
+        assert(duelist_number != 0, Errors::NOT_YOUR_CHALLENGE);
 
         // Correct Challenge state
         assert(challenge.state == ChallengeState::InProgress.into(), Errors::CHALLENGE_WRONG_STATE);

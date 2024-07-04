@@ -12,9 +12,6 @@ mod tester {
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::systems::token_duelist::{token_duelist, ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait};
     use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
-    use pistols::types::challenge::{ChallengeState};
-    use pistols::types::constants::{constants};
-    use pistols::types::action::{Action};
     use pistols::models::challenge::{
         Challenge, challenge,
         Snapshot, snapshot,
@@ -22,7 +19,7 @@ mod tester {
         Round, round,
     };
     use pistols::models::duelist::{
-        Duelist, duelist,
+        Duelist, duelist, DuelistTrait,
         Scoreboard, scoreboard,
     };
     use pistols::models::config::{
@@ -31,6 +28,9 @@ mod tester {
     use pistols::models::table::{
         TableConfig, table_config,
     };
+    use pistols::types::challenge::{ChallengeState};
+    use pistols::types::constants::{constants};
+    use pistols::types::action::{Action};
     use pistols::utils::short_string::{ShortString};
 
     // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
@@ -44,11 +44,22 @@ mod tester {
     const INITIAL_TIMESTAMP: u64 = 0x100000000;
     const INITIAL_STEP: u64 = 0x10;
 
+
+    #[inline(always)]
     fn ZERO() -> ContractAddress { starknet::contract_address_const::<0x0>() }
+    #[inline(always)]
     fn OWNER() -> ContractAddress { starknet::contract_address_const::<0x111111>() }
+    #[inline(always)]
     fn OTHER() -> ContractAddress { starknet::contract_address_const::<0x222>() }
+    #[inline(always)]
     fn BUMMER() -> ContractAddress { starknet::contract_address_const::<0x333>() }
+    #[inline(always)]
     fn TREASURY() -> ContractAddress { starknet::contract_address_const::<0x444>() }
+
+    #[inline(always)]
+    fn ID(address: ContractAddress) -> u128 {
+        (DuelistTrait::address_to_id(address))
+    }
 
     fn impersonate(address: ContractAddress) {
         // testing::set_caller_address(address);   // not used??
@@ -206,7 +217,7 @@ mod tester {
     // ::actions
     fn execute_register_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic: u8) {
         impersonate(sender);
-        system.register_duelist(name, profile_pic);
+        system.register_duelist(ID(sender), name, profile_pic);
         _next_block();
     }
     fn execute_create_challenge(system: IActionsDispatcher, sender: ContractAddress,
@@ -217,7 +228,7 @@ mod tester {
         expire_seconds: u64,
     ) -> u128 {
         impersonate(sender);
-        let duel_id: u128 = system.create_challenge(challenged, message, table_id, wager_value, expire_seconds);
+        let duel_id: u128 = system.create_challenge(ID(sender), challenged, message, table_id, wager_value, expire_seconds);
         _next_block();
         (duel_id)
     }
@@ -226,7 +237,7 @@ mod tester {
         accepted: bool,
     ) -> ChallengeState {
         impersonate(sender);
-        let new_state: ChallengeState = system.reply_challenge(duel_id, accepted);
+        let new_state: ChallengeState = system.reply_challenge(ID(sender), duel_id, accepted);
         _next_block();
         (new_state)
     }
@@ -277,8 +288,8 @@ mod tester {
         (get!(world, address, Duelist))
     }
     #[inline(always)]
-    fn get_Scoreboard(world: IWorldDispatcher, address: ContractAddress, table: felt252) -> Scoreboard {
-        (get!(world, (address, table), Scoreboard))
+    fn get_Scoreboard(world: IWorldDispatcher, table: felt252, address: ContractAddress) -> Scoreboard {
+        (get!(world, (table, address), Scoreboard))
     }
     #[inline(always)]
     fn get_Challenge(world: IWorldDispatcher, duel_id: u128) -> Challenge {

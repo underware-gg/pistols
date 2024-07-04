@@ -4,6 +4,7 @@ use starknet::{ContractAddress};
 #[derive(Drop, starknet::Event)]
 struct DuelistRegisteredEvent {
     address: ContractAddress,
+    duelist_id: u128,
     name: felt252,
     profile_pic: u8,
     is_new: bool,
@@ -12,15 +13,15 @@ struct DuelistRegisteredEvent {
 #[derive(Drop, starknet::Event)]
 struct NewChallengeEvent {
     duel_id: u128,
-    duelist_a: ContractAddress,
-    duelist_b: ContractAddress,
+    address_a: ContractAddress,
+    address_b: ContractAddress,
 }
 
 #[derive(Drop, starknet::Event)]
 struct ChallengeAcceptedEvent {
     duel_id: u128,
-    duelist_a: ContractAddress,
-    duelist_b: ContractAddress,
+    address_a: ContractAddress,
+    address_b: ContractAddress,
     accepted: bool,
 }
 

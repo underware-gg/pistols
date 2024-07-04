@@ -6,53 +6,14 @@ export type ContractComponents = Awaited<ReturnType<typeof defineContractCompone
 
 export function defineContractComponents(world: World) {
   return {
-    Config: (() => {
-      return defineComponent(
-        world,
-        { key: RecsType.Number, initialized: RecsType.Boolean, owner_address: RecsType.BigInt, treasury_address: RecsType.BigInt, paused: RecsType.Boolean },
-        {
-          metadata: {
-            name: "Config",
-            types: ["u8","bool","contractaddress","contractaddress","bool"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
     Challenge: (() => {
       return defineComponent(
         world,
-        { duel_id: RecsType.BigInt, duelist_a: RecsType.BigInt, duelist_b: RecsType.BigInt, message: RecsType.BigInt, table_id: RecsType.BigInt, state: RecsType.Number, round_number: RecsType.Number, winner: RecsType.Number, timestamp_start: RecsType.BigInt, timestamp_end: RecsType.BigInt },
+        { duel_id: RecsType.BigInt, table_id: RecsType.BigInt, message: RecsType.BigInt, address_a: RecsType.BigInt, address_b: RecsType.BigInt, duelist_id_a: RecsType.BigInt, duelist_id_b: RecsType.BigInt, state: RecsType.Number, round_number: RecsType.Number, winner: RecsType.Number, timestamp_start: RecsType.BigInt, timestamp_end: RecsType.BigInt },
         {
           metadata: {
             name: "Challenge",
-            types: ["u128","contractaddress","contractaddress","felt252","felt252","u8","u8","u8","u64","u64"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
-    Duelist: (() => {
-      return defineComponent(
-        world,
-        { address: RecsType.BigInt, name: RecsType.BigInt, profile_pic: RecsType.Number, score: { honour: RecsType.Number, level_villain: RecsType.Number, level_trickster: RecsType.Number, level_lord: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, total_honour: RecsType.Number }, timestamp: RecsType.BigInt },
-        {
-          metadata: {
-            name: "Duelist",
-            types: ["contractaddress","felt252","u8","u8","u8","u8","u8","u16","u16","u16","u16","u32","u64"],
-            customTypes: ["Score"],
-          },
-        }
-      );
-    })(),
-    Pact: (() => {
-      return defineComponent(
-        world,
-        { pair: RecsType.BigInt, duel_id: RecsType.BigInt },
-        {
-          metadata: {
-            name: "Pact",
-            types: ["u128","u128"],
+            types: ["u128","felt252","felt252","contractaddress","contractaddress","u128","u128","u8","u8","u8","u64","u64"],
             customTypes: [],
           },
         }
@@ -67,19 +28,6 @@ export function defineContractComponents(world: World) {
             name: "Round",
             types: ["u128","u8","u8","u64","u64","u16","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u64","u64","u16","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8"],
             customTypes: ["Shot","Shot"],
-          },
-        }
-      );
-    })(),
-    Scoreboard: (() => {
-      return defineComponent(
-        world,
-        { address: RecsType.BigInt, table_id: RecsType.BigInt, score: { honour: RecsType.Number, level_villain: RecsType.Number, level_trickster: RecsType.Number, level_lord: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, total_honour: RecsType.Number }, wager_won: RecsType.BigInt, wager_lost: RecsType.BigInt },
-        {
-          metadata: {
-            name: "Scoreboard",
-            types: ["contractaddress","felt252","u8","u8","u8","u8","u16","u16","u16","u16","u32","u256","u256"],
-            customTypes: ["Score"],
           },
         }
       );
@@ -106,6 +54,58 @@ export function defineContractComponents(world: World) {
             name: "Wager",
             types: ["u128","u256","u256"],
             customTypes: [],
+          },
+        }
+      );
+    })(),
+    Config: (() => {
+      return defineComponent(
+        world,
+        { key: RecsType.Number, initialized: RecsType.Boolean, owner_address: RecsType.BigInt, treasury_address: RecsType.BigInt, duelists_address: RecsType.BigInt, paused: RecsType.Boolean },
+        {
+          metadata: {
+            name: "Config",
+            types: ["u8","bool","contractaddress","contractaddress","contractaddress","bool"],
+            customTypes: [],
+          },
+        }
+      );
+    })(),
+    Duelist: (() => {
+      return defineComponent(
+        world,
+        { duelist_id: RecsType.BigInt, name: RecsType.BigInt, profile_pic: RecsType.Number, score: { honour: RecsType.Number, level_villain: RecsType.Number, level_trickster: RecsType.Number, level_lord: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, total_honour: RecsType.Number }, timestamp: RecsType.BigInt },
+        {
+          metadata: {
+            name: "Duelist",
+            types: ["u128","felt252","u8","u8","u8","u8","u8","u16","u16","u16","u16","u32","u64"],
+            customTypes: ["Score"],
+          },
+        }
+      );
+    })(),
+    Pact: (() => {
+      return defineComponent(
+        world,
+        { pair: RecsType.BigInt, duel_id: RecsType.BigInt },
+        {
+          metadata: {
+            name: "Pact",
+            types: ["u128","u128"],
+            customTypes: [],
+          },
+        }
+      );
+    })(),
+    Scoreboard: (() => {
+      return defineComponent(
+        world,
+        { table_id: RecsType.BigInt, duelist_id: RecsType.BigInt, score: { honour: RecsType.Number, level_villain: RecsType.Number, level_trickster: RecsType.Number, level_lord: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, total_honour: RecsType.Number }, wager_won: RecsType.BigInt, wager_lost: RecsType.BigInt },
+        {
+          metadata: {
+            name: "Scoreboard",
+            types: ["felt252","u128","u8","u8","u8","u8","u16","u16","u16","u16","u32","u256","u256"],
+            customTypes: ["Score"],
           },
         }
       );

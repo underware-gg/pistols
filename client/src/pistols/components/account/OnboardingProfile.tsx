@@ -45,7 +45,7 @@ export function OnboardingProfile({
 
   const _register = () => {
     if (canRegister) {
-      register_duelist(account, inputValue, _profilePic)
+      register_duelist(account, 0n, inputValue, _profilePic)
     }
   }
 

@@ -62,7 +62,7 @@ export default function NewChallengeModal() {
   const _create_challenge = () => {
     const _submit = async () => {
       setIsSubmitting(true)
-      await create_challenge(account, challengedAddress, args.message, tableId, args.wager_value, args.expire_seconds)
+      await create_challenge(account, 0n, challengedAddress, args.message, tableId, args.wager_value, args.expire_seconds)
       setIsSubmitting(false)
     }
     if (args) _submit()

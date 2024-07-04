@@ -49,7 +49,7 @@ mod tests {
     #[test]
     // #[available_gas(20000)]
     fn test_felt_to_u128() {
-        assert(0xab9d03074bff6ee2d4dbc374dbf3f846 == felt_to_u128(0x7f25249bc3b57d4a9cb82bd75d25579ab9d03074bff6ee2d4dbc374dbf3f846), '');
+        assert(0xab9d03074bff6ee2d4dbc374dbf3f846 == felt_to_u128(0x7f25249bc3b57d4a9cb82bd75d25579ab9d03074bff6ee2d4dbc374dbf3f846), 'bump');
     }
 
     #[test]
@@ -61,12 +61,12 @@ mod tests {
         let rnd12 = hash_felt(25, 2);
         let rnd2  = hash_felt(26, 1);
         let rnd22 = hash_felt(26, 2);
-        assert(rnd0 == 0x7f25249bc3b57d4a9cb82bd75d25579ab9d03074bff6ee2d4dbc374dbf3f846, '');
-        assert(rnd0 != rnd00, '');
-        assert(rnd0 == rnd1, '');
-        assert(rnd1 != rnd12, '');
-        assert(rnd1 != rnd2, '');
-        assert(rnd2 != rnd22, '');
+        assert(rnd0 == 0x7f25249bc3b57d4a9cb82bd75d25579ab9d03074bff6ee2d4dbc374dbf3f846, 'bump');
+        assert(rnd0 != rnd00, 'bump');
+        assert(rnd0 == rnd1, 'bump');
+        assert(rnd1 != rnd12, 'bump');
+        assert(rnd1 != rnd2, 'bump');
+        assert(rnd2 != rnd22, 'bump');
     }
 
     #[test]
@@ -79,11 +79,11 @@ mod tests {
         let rnd2  = hash_u128(26, 1);
         let rnd22 = hash_u128(26, 2);
         // rnd.print();
-        assert(rnd0 == 0xab9d03074bff6ee2d4dbc374dbf3f846, '');
-        assert(rnd0 != rnd00, '');
-        assert(rnd0 == rnd1, '');
-        assert(rnd1 != rnd12, '');
-        assert(rnd1 != rnd2, '');
-        assert(rnd2 != rnd22, '');
+        assert(rnd0 == 0xab9d03074bff6ee2d4dbc374dbf3f846, 'bump');
+        assert(rnd0 != rnd00, 'bump');
+        assert(rnd0 == rnd1, 'bump');
+        assert(rnd1 != rnd12, 'bump');
+        assert(rnd1 != rnd2, 'bump');
+        assert(rnd2 != rnd22, 'bump');
     }
 }

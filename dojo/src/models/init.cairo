@@ -25,7 +25,8 @@ mod init {
 
     fn Duelist() -> duelist::Duelist {
         (duelist::Duelist {
-            address: starknet::contract_address_const::<0x0>(),
+            duelist_id: 0,
+            //----------------
             name: 0,
             profile_pic: 0,
             score: Score(),
@@ -49,8 +50,9 @@ mod init {
 
     fn Scoreboard() -> duelist::Scoreboard {
         (duelist::Scoreboard {
-            address: starknet::contract_address_const::<0x0>(),
             table_id: 0,
+            duelist_id: 0,
+            //----------------
             score: Score(),
             wager_won: 0,
             wager_lost: 0,

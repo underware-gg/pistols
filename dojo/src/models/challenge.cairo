@@ -10,10 +10,12 @@ struct Challenge {
     #[key]
     duel_id: u128,
     //-------------------------
-    duelist_a: ContractAddress, // Challenger
-    duelist_b: ContractAddress, // Challenged
-    message: felt252,           // message to challenged
     table_id: felt252,
+    message: felt252,           // message to challenged
+    address_a: ContractAddress, // Challenger wallet
+    address_b: ContractAddress, // Challenged wallet
+    duelist_id_a: u128,         // Challenger duelist
+    duelist_id_b: u128,         // Challenged duelist 
     // progress and results
     state: u8,                  // actually a ChallengeState
     round_number: u8,           // current or final
@@ -21,7 +23,7 @@ struct Challenge {
     // timestamps in unix epoch
     timestamp_start: u64,       // Unix time, started
     timestamp_end: u64,         // Unix time, ended
-} // [f] [f] [f] [152]
+} // [f] [f] [256] [152]
 
 // Challenge wager (optional)
 #[derive(Copy, Drop, Serde)]
