@@ -9,5 +9,6 @@ export const useConfig = () => {
     initialized: config.initialized ?? null,
     paused: config.paused ?? null,
     treasury_address: config.treasury_address ?? null,
+    duelist_address: config.duelist_address ?? null,
   }
 }

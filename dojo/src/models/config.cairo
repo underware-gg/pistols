@@ -12,6 +12,7 @@ struct Config {
     initialized: bool,
     owner_address: ContractAddress,
     treasury_address: ContractAddress,
+    duelists_address: ContractAddress,
     paused: bool,
 }
 

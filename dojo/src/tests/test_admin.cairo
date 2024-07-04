@@ -25,7 +25,7 @@ mod tests {
         let (world, _system, admin, _lords) = tester::setup_world(false, true, false, false, false);
         let config: Config = admin.get_config();
         assert(config.initialized == false, 'initialized == false');
-        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO());
+        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO(), ZERO());
         let config: Config = admin.get_config();
         assert(config.initialized == true, 'initialized == true');
         assert(config.owner_address == OWNER(), 'owner_address');
@@ -43,7 +43,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     fn test_set_owner_defaults() {
         let (_world, _system, admin, _lords) = tester::setup_world(false, true, false, false, false);
-        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO());
+        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO(), ZERO());
         let config: Config = admin.get_config();
         assert(config.owner_address == OWNER(), 'owner_address_param');
         // set
@@ -61,7 +61,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     fn test_set_owner() {
         let (_world, _system, admin, _lords) = tester::setup_world(false, true, false, false, false);
-        tester::execute_admin_initialize(admin, OWNER(), OTHER(), ZERO(), ZERO());
+        tester::execute_admin_initialize(admin, OWNER(), OTHER(), ZERO(), ZERO(), ZERO());
         let config: Config = admin.get_config();
         assert(config.owner_address == OTHER(), 'owner_address_param');
         // set
@@ -74,7 +74,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     fn test_set_treasury() {
         let (_world, _system, admin, _lords) = tester::setup_world(false, true, false, false, false);
-        tester::execute_admin_initialize(admin, OWNER(), ZERO(), OTHER(), ZERO());
+        tester::execute_admin_initialize(admin, OWNER(), ZERO(), OTHER(), ZERO(), ZERO());
         let config: Config = admin.get_config();
         assert(config.treasury_address == OTHER(), 'treasury_address_param');
         // set
@@ -93,7 +93,7 @@ mod tests {
     #[should_panic(expected:('ADMIN: Invalid owner_address', 'ENTRYPOINT_FAILED'))]
     fn test_set_owner_null() {
         let (_world, _system, admin, _lords) = tester::setup_world(false, true, false, false, false);
-        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO());
+        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO(), ZERO());
         tester::execute_admin_set_owner(admin, OWNER(), ZERO());
     }
 
@@ -102,7 +102,7 @@ mod tests {
     #[should_panic(expected:('ADMIN: Invalid treasury_address', 'ENTRYPOINT_FAILED'))]
     fn test_set_treasury_null() {
         let (_world, _system, admin, _lords) = tester::setup_world(false, true, false, false, false);
-        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO());
+        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO(), ZERO());
         tester::execute_admin_set_treasury(admin, OWNER(), ZERO());
     }
 
@@ -110,7 +110,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     fn test_set_paused() {
         let (_world, _system, admin, _lords) = tester::setup_world(false, true, false, false, false);
-        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO());
+        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO(), ZERO());
         let config: Config = admin.get_config();
         assert(config.paused == false, 'paused_1');
         // set
@@ -128,8 +128,8 @@ mod tests {
     #[should_panic(expected:('ADMIN: Already initialized', 'ENTRYPOINT_FAILED'))]
     fn test_initialized() {
         let (_world, _system, admin, _lords) = tester::setup_world(false, true, false, false, false);
-        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO());
-        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO());
+        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO(), ZERO());
+        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO(), ZERO());
     }
 
     #[test]
@@ -153,7 +153,7 @@ mod tests {
     #[should_panic(expected:('ADMIN: Not deployer', 'ENTRYPOINT_FAILED'))]
     fn test_initialize_not_deployer() {
         let (_world, _system, admin, _lords) = tester::setup_world(false, true, false, false, false);
-        tester::execute_admin_initialize(admin, OTHER(), ZERO(), ZERO(), ZERO());
+        tester::execute_admin_initialize(admin, OTHER(), ZERO(), ZERO(), ZERO(), ZERO());
     }
 
     #[test]
@@ -161,7 +161,7 @@ mod tests {
     #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
     fn test_set_owner_not_owner() {
         let (_world, _system, admin, _lords) = tester::setup_world(false, true, false, false, false);
-        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO());
+        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO(), ZERO());
         let new_treasury: ContractAddress = starknet::contract_address_const::<0x121212>();
         tester::execute_admin_set_owner(admin, OTHER(), new_treasury);
     }
@@ -171,7 +171,7 @@ mod tests {
     #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
     fn test_set_treasury_not_owner() {
         let (_world, _system, admin, _lords) = tester::setup_world(false, true, false, false, false);
-        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO());
+        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO(), ZERO());
         let new_treasury: ContractAddress = starknet::contract_address_const::<0x121212>();
         tester::execute_admin_set_treasury(admin, OTHER(), new_treasury);
     }
@@ -181,7 +181,7 @@ mod tests {
     #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
     fn test_set_paused_not_owner() {
         let (_world, _system, admin, _lords) = tester::setup_world(false, true, false, false, false);
-        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO());
+        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO(), ZERO());
         tester::execute_admin_set_paused(admin, OTHER(), true);
     }
 
@@ -193,7 +193,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     fn test_initialize_table_defaults() {
         let (_world, _system, admin, _lords) = tester::setup_world(false, true, false, false, false);
-        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO());
+        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO(), ZERO());
         let table: TableConfig = admin.get_table(tables::LORDS);
         assert(table.contract_address == ZERO(), 'contract_address');
         assert(table.is_open == false, 'enabled');
@@ -203,7 +203,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     fn test_initialize_table() {
         let (_world, _system, admin, lords) = tester::setup_world(false, false, true, false, false);
-        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), lords.contract_address);
+        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), lords.contract_address, ZERO());
         let table: TableConfig = admin.get_table(tables::LORDS);
         assert(table.contract_address == lords.contract_address, 'contract_address');
         assert(table.fee_min == 4 * constants::ETH_TO_WEI, 'fee_min');
@@ -216,7 +216,7 @@ mod tests {
     fn test_set_table() {
         let (world, _system, admin, lords) = tester::setup_world(false, false, true, false, false);
         // not initialized
-        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO());
+        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO(), ZERO());
         let table: TableConfig = admin.get_table(tables::LORDS);
         assert(table.contract_address == ZERO(), 'zero');
         assert(table.is_open == false, 'zero');

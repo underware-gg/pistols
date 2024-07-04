@@ -22,6 +22,7 @@ export MANIFEST_FILE_PATH="./manifests/$PROFILE/manifest.json"
 export WORLD_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.world_address)
 export ADMIN_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.name == "pistols::systems::admin::admin" ).address')
 export ACTIONS_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.name == "pistols::systems::actions::actions" ).address')
+export DUELISTS_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.name == "pistols::systems::token_duelist::token_duelist" ).address')
 # use $DOJO_ACCOUNT_ADDRESS else read from profile
 export ACCOUNT_ADDRESS=${DOJO_ACCOUNT_ADDRESS:-$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.account_address)}
 
@@ -43,6 +44,7 @@ echo "Account     : $ACCOUNT_ADDRESS"
 echo "World       : $WORLD_ADDRESS"
 echo "::admin     : $ADMIN_ADDRESS"
 echo "::actions   : $ACTIONS_ADDRESS"
+echo "::duelists  : $DUELISTS_ADDRESS"
 echo "\$LORDS      : $LORDS_ADDRESS"
 echo "\$LORDS Mock : $LORDS_MOCK"
 echo "------------------------------------------------------------------------------"
@@ -54,6 +56,7 @@ if [[
   "$WORLD_ADDRESS" != "0x"* ||
   "$ADMIN_ADDRESS" != "0x"* ||
   "$ACTIONS_ADDRESS" != "0x"* ||
+  "$DUELISTS_ADDRESS" != "0x"* ||
   "$LORDS_ADDRESS" != "0x"*
 ]]; then
   echo "! Missing data 👎"
@@ -76,6 +79,23 @@ sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
   Wager,$ACTIONS_ADDRESS \
   Pact,$ACTIONS_ADDRESS \
   Round,$ACTIONS_ADDRESS
+duelists
+
+echo "- Duelists auth..."
+sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
+  InitializableModel,$DUELISTS_ADDRESS \
+  SRC5Model,$DUELISTS_ADDRESS \
+  ERC721MetaModel,$DUELISTS_ADDRESS \
+  ERC721OperatorApprovalModel,$DUELISTS_ADDRESS \
+  ERC721TokenApprovalModel,$DUELISTS_ADDRESS \
+  ERC721BalanceModel,$DUELISTS_ADDRESS \
+  ERC721EnumerableIndexModel,$DUELISTS_ADDRESS \
+  ERC721EnumerableOwnerIndexModel,$DUELISTS_ADDRESS \
+  ERC721EnumerableOwnerTokenModel,$DUELISTS_ADDRESS \
+  ERC721EnumerableTokenModel,$DUELISTS_ADDRESS \
+  ERC721EnumerableTotalModel,$DUELISTS_ADDRESS \
+  ERC721OwnerModel,$DUELISTS_ADDRESS \
+
 
 # Mocked Lords
 if [[ ! -z "$LORDS_MOCK" ]]; then
@@ -101,7 +121,7 @@ INITIALIZED=$(sozo --profile $PROFILE call --world $WORLD_ADDRESS $ADMIN_ADDRESS
 if [[ $INITIALIZED == *"0x1"* ]]; then
     echo "Already initialized"
 else
-  sozo --profile $PROFILE execute --world $WORLD_ADDRESS --wait $ADMIN_ADDRESS initialize --calldata 0x0,0x0,$LORDS_ADDRESS || true
+  sozo --profile $PROFILE execute --world $WORLD_ADDRESS --wait $ADMIN_ADDRESS initialize --calldata 0x0,0x0,$LORDS_ADDRESS,$DUELISTS_ADDRESS || true
 fi
 
 echo "--- Auth ok! 👍"

@@ -9,7 +9,7 @@ use pistols::models::table::{TableConfig};
 
 #[dojo::interface]
 trait IAdmin {
-    fn initialize(ref world: IWorldDispatcher, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress);
+    fn initialize(ref world: IWorldDispatcher, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress, duelists_address: ContractAddress);
     fn is_initialized(world: @IWorldDispatcher) -> bool;
     
     fn set_owner(ref world: IWorldDispatcher, owner_address: ContractAddress);
@@ -46,7 +46,12 @@ mod admin {
     
     #[abi(embed_v0)]
     impl AdminImpl of super::IAdmin<ContractState> {
-        fn initialize(ref world: IWorldDispatcher, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress) {
+        fn initialize(ref world: IWorldDispatcher,
+            owner_address: ContractAddress,
+            treasury_address: ContractAddress,
+            lords_address: ContractAddress,
+            duelists_address: ContractAddress,
+        ) {
             self.assert_initializer_is_owner();
             let manager = ConfigManagerTrait::new(world);
             let mut config = manager.get();
@@ -55,6 +60,7 @@ mod admin {
             config.initialized = true;
             config.owner_address = (if (owner_address == utils::ZERO()) { get_caller_address() } else { owner_address });
             config.treasury_address = (if (treasury_address == utils::ZERO()) { get_caller_address() } else { treasury_address });
+            config.duelists_address = duelists_address;
             config.paused = false;
             manager.set(config);
             // set lords

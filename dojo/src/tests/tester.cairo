@@ -10,6 +10,7 @@ mod tester {
 
     use pistols::systems::admin::{admin, IAdminDispatcher, IAdminDispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
+    use pistols::systems::token_duelist::{token_duelist, ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait};
     use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
     use pistols::types::challenge::{ChallengeState};
     use pistols::types::constants::{constants};
@@ -103,6 +104,9 @@ mod tester {
         let lords = ILordsMockDispatcher{ contract_address:
             if (deploy_lords) {deploy_system(world, 'lords_mock', lords_mock::TEST_CLASS_HASH)} else {ZERO()}
         };
+        let duelists = ITokenDuelistDispatcher{ contract_address:
+            if (deploy_system) {deploy_system(world, 'duelists', token_duelist::TEST_CLASS_HASH)} else {ZERO()}
+        };
         // initializers
         if (deploy_lords) {
             execute_lords_initializer(lords, OWNER());
@@ -110,7 +114,7 @@ mod tester {
             execute_lords_faucet(lords, OTHER());
         }
         if (initialize) {
-            execute_admin_initialize(admin, OWNER(), OWNER(), TREASURY(), lords.contract_address);
+            execute_admin_initialize(admin, OWNER(), OWNER(), TREASURY(), lords.contract_address, duelists.contract_address);
         }
         if (approve) {
             execute_lords_approve(lords, OWNER(), system.contract_address, 1_000_000 * constants::ETH_TO_WEI);
@@ -151,9 +155,9 @@ mod tester {
     //
 
     // ::admin
-    fn execute_admin_initialize(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress) {
+    fn execute_admin_initialize(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress, duelist_address: ContractAddress) {
         impersonate(sender);
-        system.initialize(owner_address, treasury_address, lords_address);
+        system.initialize(owner_address, treasury_address, lords_address, duelist_address);
         _next_block();
     }
     fn execute_admin_set_owner(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress) {
