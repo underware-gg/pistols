@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x7c7d28127e68b07de6d798667641b044ed54745a18943aa8fa5d9c0b7883781"
-original_class_hash = "0x7c7d28127e68b07de6d798667641b044ed54745a18943aa8fa5d9c0b7883781"
+class_hash = "0x6b416c5ac7ad1dad71849ec5fa279e08b78a9ad8a45ffe0832f8dff6888bdc1"
+original_class_hash = "0x6b416c5ac7ad1dad71849ec5fa279e08b78a9ad8a45ffe0832f8dff6888bdc1"
 abi = "manifests/dev/abis/base/models/pistols_models_config_config.json"
 name = "pistols::models::config::config"
 
@@ -21,6 +21,11 @@ key = false
 
 [[members]]
 name = "treasury_address"
+type = "ContractAddress"
+key = false
+
+[[members]]
+name = "duelists_address"
 type = "ContractAddress"
 key = false
 

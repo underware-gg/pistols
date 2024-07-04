@@ -319,26 +319,66 @@
   },
   {
     "type": "impl",
-    "name": "pactImpl",
-    "interface_name": "pistols::models::models::Ipact"
+    "name": "challengeImpl",
+    "interface_name": "pistols::models::challenge::Ichallenge"
   },
   {
     "type": "struct",
-    "name": "pistols::models::models::Pact",
+    "name": "pistols::models::challenge::Challenge",
     "members": [
-      {
-        "name": "pair",
-        "type": "core::integer::u128"
-      },
       {
         "name": "duel_id",
         "type": "core::integer::u128"
+      },
+      {
+        "name": "table_id",
+        "type": "core::felt252"
+      },
+      {
+        "name": "message",
+        "type": "core::felt252"
+      },
+      {
+        "name": "address_a",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "address_b",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "duelist_id_a",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "duelist_id_b",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "state",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "round_number",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "winner",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "timestamp_start",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "timestamp_end",
+        "type": "core::integer::u64"
       }
     ]
   },
   {
     "type": "interface",
-    "name": "pistols::models::models::Ipact",
+    "name": "pistols::models::challenge::Ichallenge",
     "items": [
       {
         "type": "function",
@@ -346,7 +386,7 @@
         "inputs": [
           {
             "name": "model",
-            "type": "pistols::models::models::Pact"
+            "type": "pistols::models::challenge::Challenge"
           }
         ],
         "outputs": [],
@@ -356,7 +396,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::models::models::pact::Event",
+    "name": "pistols::models::challenge::challenge::Event",
     "kind": "enum",
     "variants": []
   }

@@ -107,6 +107,10 @@
         "type": "core::starknet::contract_address::ContractAddress"
       },
       {
+        "name": "duelists_address",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
         "name": "paused",
         "type": "core::bool"
       }
@@ -168,6 +172,10 @@
           },
           {
             "name": "lords_address",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "duelists_address",
             "type": "core::starknet::contract_address::ContractAddress"
           }
         ],

@@ -319,30 +319,94 @@
   },
   {
     "type": "impl",
-    "name": "table_admittanceImpl",
-    "interface_name": "pistols::models::table::Itable_admittance"
+    "name": "scoreboardImpl",
+    "interface_name": "pistols::models::duelist::Iscoreboard"
   },
   {
     "type": "struct",
-    "name": "pistols::models::table::TableAdmittance",
+    "name": "pistols::models::duelist::Score",
+    "members": [
+      {
+        "name": "honour",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "level_villain",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "level_trickster",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "level_lord",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "total_duels",
+        "type": "core::integer::u16"
+      },
+      {
+        "name": "total_wins",
+        "type": "core::integer::u16"
+      },
+      {
+        "name": "total_losses",
+        "type": "core::integer::u16"
+      },
+      {
+        "name": "total_draws",
+        "type": "core::integer::u16"
+      },
+      {
+        "name": "total_honour",
+        "type": "core::integer::u32"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "core::integer::u256",
+    "members": [
+      {
+        "name": "low",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "high",
+        "type": "core::integer::u128"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "pistols::models::duelist::Scoreboard",
     "members": [
       {
         "name": "table_id",
         "type": "core::felt252"
       },
       {
-        "name": "accounts",
-        "type": "core::array::Array::<core::starknet::contract_address::ContractAddress>"
+        "name": "duelist_id",
+        "type": "core::integer::u128"
       },
       {
-        "name": "duelists",
-        "type": "core::array::Array::<core::integer::u128>"
+        "name": "score",
+        "type": "pistols::models::duelist::Score"
+      },
+      {
+        "name": "wager_won",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "wager_lost",
+        "type": "core::integer::u256"
       }
     ]
   },
   {
     "type": "interface",
-    "name": "pistols::models::table::Itable_admittance",
+    "name": "pistols::models::duelist::Iscoreboard",
     "items": [
       {
         "type": "function",
@@ -350,7 +414,7 @@
         "inputs": [
           {
             "name": "model",
-            "type": "pistols::models::table::TableAdmittance"
+            "type": "pistols::models::duelist::Scoreboard"
           }
         ],
         "outputs": [],
@@ -360,7 +424,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::models::table::table_admittance::Event",
+    "name": "pistols::models::duelist::scoreboard::Event",
     "kind": "enum",
     "variants": []
   }

@@ -1,8 +1,8 @@
 kind = "DojoModel"
-class_hash = "0x7c19533a2d1c38c6827023613ef7b83830ab894b2ba296378a06137ff9705d9"
-original_class_hash = "0x7c19533a2d1c38c6827023613ef7b83830ab894b2ba296378a06137ff9705d9"
-abi = "manifests/dev/abis/base/models/pistols_models_models_round.json"
-name = "pistols::models::models::round"
+class_hash = "0x6b89e5b8d5b269d100e9d7c5533371c16079b3a492cdc539f87cb31c2b1d465"
+original_class_hash = "0x6b89e5b8d5b269d100e9d7c5533371c16079b3a492cdc539f87cb31c2b1d465"
+abi = "manifests/dev/abis/base/models/pistols_models_challenge_round.json"
+name = "pistols::models::challenge::round"
 
 [[members]]
 name = "duel_id"

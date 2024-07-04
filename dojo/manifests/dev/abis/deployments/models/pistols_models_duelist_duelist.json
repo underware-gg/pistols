@@ -319,12 +319,12 @@
   },
   {
     "type": "impl",
-    "name": "scoreboardImpl",
-    "interface_name": "pistols::models::models::Iscoreboard"
+    "name": "duelistImpl",
+    "interface_name": "pistols::models::duelist::Iduelist"
   },
   {
     "type": "struct",
-    "name": "pistols::models::models::Score",
+    "name": "pistols::models::duelist::Score",
     "members": [
       {
         "name": "honour",
@@ -366,47 +366,33 @@
   },
   {
     "type": "struct",
-    "name": "core::integer::u256",
+    "name": "pistols::models::duelist::Duelist",
     "members": [
       {
-        "name": "low",
+        "name": "duelist_id",
         "type": "core::integer::u128"
       },
       {
-        "name": "high",
-        "type": "core::integer::u128"
-      }
-    ]
-  },
-  {
-    "type": "struct",
-    "name": "pistols::models::models::Scoreboard",
-    "members": [
-      {
-        "name": "address",
-        "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
-        "name": "table_id",
+        "name": "name",
         "type": "core::felt252"
       },
       {
+        "name": "profile_pic",
+        "type": "core::integer::u8"
+      },
+      {
         "name": "score",
-        "type": "pistols::models::models::Score"
+        "type": "pistols::models::duelist::Score"
       },
       {
-        "name": "wager_won",
-        "type": "core::integer::u256"
-      },
-      {
-        "name": "wager_lost",
-        "type": "core::integer::u256"
+        "name": "timestamp",
+        "type": "core::integer::u64"
       }
     ]
   },
   {
     "type": "interface",
-    "name": "pistols::models::models::Iscoreboard",
+    "name": "pistols::models::duelist::Iduelist",
     "items": [
       {
         "type": "function",
@@ -414,7 +400,7 @@
         "inputs": [
           {
             "name": "model",
-            "type": "pistols::models::models::Scoreboard"
+            "type": "pistols::models::duelist::Duelist"
           }
         ],
         "outputs": [],
@@ -424,7 +410,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::models::models::scoreboard::Event",
+    "name": "pistols::models::duelist::duelist::Event",
     "kind": "enum",
     "variants": []
   }

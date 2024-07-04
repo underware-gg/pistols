@@ -319,30 +319,96 @@
   },
   {
     "type": "impl",
-    "name": "table_admittanceImpl",
-    "interface_name": "pistols::models::table::Itable_admittance"
+    "name": "roundImpl",
+    "interface_name": "pistols::models::challenge::Iround"
   },
   {
     "type": "struct",
-    "name": "pistols::models::table::TableAdmittance",
+    "name": "pistols::models::challenge::Shot",
     "members": [
       {
-        "name": "table_id",
-        "type": "core::felt252"
+        "name": "hash",
+        "type": "core::integer::u64"
       },
       {
-        "name": "accounts",
-        "type": "core::array::Array::<core::starknet::contract_address::ContractAddress>"
+        "name": "salt",
+        "type": "core::integer::u64"
       },
       {
-        "name": "duelists",
-        "type": "core::array::Array::<core::integer::u128>"
+        "name": "action",
+        "type": "core::integer::u16"
+      },
+      {
+        "name": "chance_crit",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "chance_hit",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "dice_crit",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "dice_hit",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "damage",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "block",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "win",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "wager",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "health",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "honour",
+        "type": "core::integer::u8"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "pistols::models::challenge::Round",
+    "members": [
+      {
+        "name": "duel_id",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "round_number",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "state",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "shot_a",
+        "type": "pistols::models::challenge::Shot"
+      },
+      {
+        "name": "shot_b",
+        "type": "pistols::models::challenge::Shot"
       }
     ]
   },
   {
     "type": "interface",
-    "name": "pistols::models::table::Itable_admittance",
+    "name": "pistols::models::challenge::Iround",
     "items": [
       {
         "type": "function",
@@ -350,7 +416,7 @@
         "inputs": [
           {
             "name": "model",
-            "type": "pistols::models::table::TableAdmittance"
+            "type": "pistols::models::challenge::Round"
           }
         ],
         "outputs": [],
@@ -360,7 +426,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::models::table::table_admittance::Event",
+    "name": "pistols::models::challenge::round::Event",
     "kind": "enum",
     "variants": []
   }

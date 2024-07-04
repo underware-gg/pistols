@@ -1,1 +1,10 @@
 name = "pistols::systems::minter::minter"
+reads = []
+writes = ["TokenConfig"]
+computed = []
+init_calldata = [
+  "$contract_address:pistols::systems::token_duelist::token_duelist",
+  "512",
+  "3",
+  "1",
+]

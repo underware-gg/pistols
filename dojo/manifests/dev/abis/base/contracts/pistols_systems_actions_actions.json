@@ -60,7 +60,7 @@
   },
   {
     "type": "struct",
-    "name": "pistols::models::models::Score",
+    "name": "pistols::models::duelist::Score",
     "members": [
       {
         "name": "honour",
@@ -102,11 +102,11 @@
   },
   {
     "type": "struct",
-    "name": "pistols::models::models::Duelist",
+    "name": "pistols::models::duelist::Duelist",
     "members": [
       {
-        "name": "address",
-        "type": "core::starknet::contract_address::ContractAddress"
+        "name": "duelist_id",
+        "type": "core::integer::u128"
       },
       {
         "name": "name",
@@ -118,7 +118,7 @@
       },
       {
         "name": "score",
-        "type": "pistols::models::models::Score"
+        "type": "pistols::models::duelist::Score"
       },
       {
         "name": "timestamp",
@@ -267,6 +267,10 @@
         "name": "register_duelist",
         "inputs": [
           {
+            "name": "duelist_id",
+            "type": "core::integer::u128"
+          },
+          {
             "name": "name",
             "type": "core::felt252"
           },
@@ -277,7 +281,7 @@
         ],
         "outputs": [
           {
-            "type": "pistols::models::models::Duelist"
+            "type": "pistols::models::duelist::Duelist"
           }
         ],
         "state_mutability": "external"
@@ -286,6 +290,10 @@
         "type": "function",
         "name": "create_challenge",
         "inputs": [
+          {
+            "name": "duelist_id",
+            "type": "core::integer::u128"
+          },
           {
             "name": "challenged",
             "type": "core::starknet::contract_address::ContractAddress"
@@ -318,6 +326,10 @@
         "type": "function",
         "name": "reply_challenge",
         "inputs": [
+          {
+            "name": "duelist_id",
+            "type": "core::integer::u128"
+          },
           {
             "name": "duel_id",
             "type": "core::integer::u128"
@@ -387,12 +399,12 @@
         "name": "get_pact",
         "inputs": [
           {
-            "name": "duelist_a",
-            "type": "core::starknet::contract_address::ContractAddress"
+            "name": "duelist_id_a",
+            "type": "core::integer::u128"
           },
           {
-            "name": "duelist_b",
-            "type": "core::starknet::contract_address::ContractAddress"
+            "name": "duelist_id_b",
+            "type": "core::integer::u128"
           }
         ],
         "outputs": [
@@ -407,12 +419,12 @@
         "name": "has_pact",
         "inputs": [
           {
-            "name": "duelist_a",
-            "type": "core::starknet::contract_address::ContractAddress"
+            "name": "duelist_id_a",
+            "type": "core::integer::u128"
           },
           {
-            "name": "duelist_b",
-            "type": "core::starknet::contract_address::ContractAddress"
+            "name": "duelist_id_b",
+            "type": "core::integer::u128"
           }
         ],
         "outputs": [
@@ -431,8 +443,8 @@
             "type": "core::felt252"
           },
           {
-            "name": "duelist_address",
-            "type": "core::starknet::contract_address::ContractAddress"
+            "name": "duelist_id",
+            "type": "core::integer::u128"
           }
         ],
         "outputs": [
@@ -620,6 +632,11 @@
         "kind": "data"
       },
       {
+        "name": "duelist_id",
+        "type": "core::integer::u128",
+        "kind": "data"
+      },
+      {
         "name": "name",
         "type": "core::felt252",
         "kind": "data"
@@ -647,12 +664,12 @@
         "kind": "data"
       },
       {
-        "name": "duelist_a",
+        "name": "address_a",
         "type": "core::starknet::contract_address::ContractAddress",
         "kind": "data"
       },
       {
-        "name": "duelist_b",
+        "name": "address_b",
         "type": "core::starknet::contract_address::ContractAddress",
         "kind": "data"
       }
@@ -669,12 +686,12 @@
         "kind": "data"
       },
       {
-        "name": "duelist_a",
+        "name": "address_a",
         "type": "core::starknet::contract_address::ContractAddress",
         "kind": "data"
       },
       {
-        "name": "duelist_b",
+        "name": "address_b",
         "type": "core::starknet::contract_address::ContractAddress",
         "kind": "data"
       },

@@ -576,12 +576,6 @@
   },
   {
     "type": "event",
-    "name": "token::components::token::erc20::erc20_burnable::erc20_burnable_component::Event",
-    "kind": "enum",
-    "variants": []
-  },
-  {
-    "type": "event",
     "name": "pistols::mocks::lords_mock::lords_mock::Event",
     "kind": "enum",
     "variants": [
@@ -613,11 +607,6 @@
       {
         "name": "ERC20MintableEvent",
         "type": "token::components::token::erc20::erc20_mintable::erc20_mintable_component::Event",
-        "kind": "nested"
-      },
-      {
-        "name": "ERC20BurnableEvent",
-        "type": "token::components::token::erc20::erc20_burnable::erc20_burnable_component::Event",
         "kind": "nested"
       }
     ]

@@ -319,96 +319,44 @@
   },
   {
     "type": "impl",
-    "name": "roundImpl",
-    "interface_name": "pistols::models::models::Iround"
+    "name": "wagerImpl",
+    "interface_name": "pistols::models::challenge::Iwager"
   },
   {
     "type": "struct",
-    "name": "pistols::models::models::Shot",
+    "name": "core::integer::u256",
     "members": [
       {
-        "name": "hash",
-        "type": "core::integer::u64"
+        "name": "low",
+        "type": "core::integer::u128"
       },
       {
-        "name": "salt",
-        "type": "core::integer::u64"
-      },
-      {
-        "name": "action",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "chance_crit",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "chance_hit",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "dice_crit",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "dice_hit",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "damage",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "block",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "win",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "wager",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "health",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "honour",
-        "type": "core::integer::u8"
+        "name": "high",
+        "type": "core::integer::u128"
       }
     ]
   },
   {
     "type": "struct",
-    "name": "pistols::models::models::Round",
+    "name": "pistols::models::challenge::Wager",
     "members": [
       {
         "name": "duel_id",
         "type": "core::integer::u128"
       },
       {
-        "name": "round_number",
-        "type": "core::integer::u8"
+        "name": "value",
+        "type": "core::integer::u256"
       },
       {
-        "name": "state",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "shot_a",
-        "type": "pistols::models::models::Shot"
-      },
-      {
-        "name": "shot_b",
-        "type": "pistols::models::models::Shot"
+        "name": "fee",
+        "type": "core::integer::u256"
       }
     ]
   },
   {
     "type": "interface",
-    "name": "pistols::models::models::Iround",
+    "name": "pistols::models::challenge::Iwager",
     "items": [
       {
         "type": "function",
@@ -416,7 +364,7 @@
         "inputs": [
           {
             "name": "model",
-            "type": "pistols::models::models::Round"
+            "type": "pistols::models::challenge::Wager"
           }
         ],
         "outputs": [],
@@ -426,7 +374,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::models::models::round::Event",
+    "name": "pistols::models::challenge::wager::Event",
     "kind": "enum",
     "variants": []
   }

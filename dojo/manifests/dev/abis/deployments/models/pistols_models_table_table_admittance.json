@@ -336,7 +336,7 @@
       },
       {
         "name": "duelists",
-        "type": "core::array::Array::<core::starknet::contract_address::ContractAddress>"
+        "type": "core::array::Array::<core::integer::u128>"
       }
     ]
   },

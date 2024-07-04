@@ -319,72 +319,66 @@
   },
   {
     "type": "impl",
-    "name": "snapshotImpl",
-    "interface_name": "pistols::models::models::Isnapshot"
+    "name": "challengeImpl",
+    "interface_name": "pistols::models::challenge::Ichallenge"
   },
   {
     "type": "struct",
-    "name": "pistols::models::models::Score",
-    "members": [
-      {
-        "name": "honour",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "level_villain",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "level_trickster",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "level_lord",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "total_duels",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "total_wins",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "total_losses",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "total_draws",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "total_honour",
-        "type": "core::integer::u32"
-      }
-    ]
-  },
-  {
-    "type": "struct",
-    "name": "pistols::models::models::Snapshot",
+    "name": "pistols::models::challenge::Challenge",
     "members": [
       {
         "name": "duel_id",
         "type": "core::integer::u128"
       },
       {
-        "name": "score_a",
-        "type": "pistols::models::models::Score"
+        "name": "table_id",
+        "type": "core::felt252"
       },
       {
-        "name": "score_b",
-        "type": "pistols::models::models::Score"
+        "name": "message",
+        "type": "core::felt252"
+      },
+      {
+        "name": "address_a",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "address_b",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "duelist_id_a",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "duelist_id_b",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "state",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "round_number",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "winner",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "timestamp_start",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "timestamp_end",
+        "type": "core::integer::u64"
       }
     ]
   },
   {
     "type": "interface",
-    "name": "pistols::models::models::Isnapshot",
+    "name": "pistols::models::challenge::Ichallenge",
     "items": [
       {
         "type": "function",
@@ -392,7 +386,7 @@
         "inputs": [
           {
             "name": "model",
-            "type": "pistols::models::models::Snapshot"
+            "type": "pistols::models::challenge::Challenge"
           }
         ],
         "outputs": [],
@@ -402,7 +396,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::models::models::snapshot::Event",
+    "name": "pistols::models::challenge::challenge::Event",
     "kind": "enum",
     "variants": []
   }

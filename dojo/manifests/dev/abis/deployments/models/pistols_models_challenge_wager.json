@@ -320,7 +320,7 @@
   {
     "type": "impl",
     "name": "wagerImpl",
-    "interface_name": "pistols::models::models::Iwager"
+    "interface_name": "pistols::models::challenge::Iwager"
   },
   {
     "type": "struct",
@@ -338,7 +338,7 @@
   },
   {
     "type": "struct",
-    "name": "pistols::models::models::Wager",
+    "name": "pistols::models::challenge::Wager",
     "members": [
       {
         "name": "duel_id",
@@ -356,7 +356,7 @@
   },
   {
     "type": "interface",
-    "name": "pistols::models::models::Iwager",
+    "name": "pistols::models::challenge::Iwager",
     "items": [
       {
         "type": "function",
@@ -364,7 +364,7 @@
         "inputs": [
           {
             "name": "model",
-            "type": "pistols::models::models::Wager"
+            "type": "pistols::models::challenge::Wager"
           }
         ],
         "outputs": [],
@@ -374,7 +374,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::models::models::wager::Event",
+    "name": "pistols::models::challenge::wager::Event",
     "kind": "enum",
     "variants": []
   }

@@ -319,30 +319,26 @@
   },
   {
     "type": "impl",
-    "name": "table_admittanceImpl",
-    "interface_name": "pistols::models::table::Itable_admittance"
+    "name": "pactImpl",
+    "interface_name": "pistols::models::duelist::Ipact"
   },
   {
     "type": "struct",
-    "name": "pistols::models::table::TableAdmittance",
+    "name": "pistols::models::duelist::Pact",
     "members": [
       {
-        "name": "table_id",
-        "type": "core::felt252"
+        "name": "pair",
+        "type": "core::integer::u128"
       },
       {
-        "name": "accounts",
-        "type": "core::array::Array::<core::starknet::contract_address::ContractAddress>"
-      },
-      {
-        "name": "duelists",
-        "type": "core::array::Array::<core::integer::u128>"
+        "name": "duel_id",
+        "type": "core::integer::u128"
       }
     ]
   },
   {
     "type": "interface",
-    "name": "pistols::models::table::Itable_admittance",
+    "name": "pistols::models::duelist::Ipact",
     "items": [
       {
         "type": "function",
@@ -350,7 +346,7 @@
         "inputs": [
           {
             "name": "model",
-            "type": "pistols::models::table::TableAdmittance"
+            "type": "pistols::models::duelist::Pact"
           }
         ],
         "outputs": [],
@@ -360,7 +356,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::models::table::table_admittance::Event",
+    "name": "pistols::models::duelist::pact::Event",
     "kind": "enum",
     "variants": []
   }
