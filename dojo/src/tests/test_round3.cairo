@@ -6,7 +6,7 @@ mod tests {
 
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
-    use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
+    use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::models::models::{Duelist, Challenge, Round};
     use pistols::models::table::{tables};
@@ -139,7 +139,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_dices() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
@@ -168,7 +168,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_idle_actions() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
@@ -184,7 +184,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_skip_idle_slot() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::IDLE, ACTION::FAST_BLADE,
@@ -199,7 +199,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_invalid_actions() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
@@ -218,7 +218,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_slow_vs_slow_draw() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
@@ -235,7 +235,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     // #[test]
     // #[available_gas(1_000_000_000)]
     // fn test_slow_vs_slow_suicide_pact() {
-    //     let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+    //     let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
     //     let (challenge, round) = _execute_blades(
     //         world, system, OWNER(), OTHER(),
     //         constants::FULL_HEALTH, ACTION::SLOW_BLADE,
@@ -252,7 +252,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_slow_vs_slow_suicide_pact() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::DOUBLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
@@ -269,7 +269,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_fast_vs_fast_draw() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
@@ -293,7 +293,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_fast_vs_fast_hit_a() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
@@ -307,7 +307,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_fast_vs_fast_crit_a() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
@@ -321,7 +321,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_fast_vs_fast_hit_b() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
@@ -335,7 +335,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_fast_vs_fast_crit_b() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
@@ -350,7 +350,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_fast_vs_block_a() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
@@ -362,7 +362,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_b.health == constants::SINGLE_DAMAGE, 'bad health_b');
     }
     fn test_block_vs_fast_b() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::BLOCK, ACTION::IDLE,
@@ -381,7 +381,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_fast_vs_slow_a() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
@@ -395,7 +395,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_fast_vs_slow_b() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
@@ -409,7 +409,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_slow_vs_fast_b() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
@@ -423,7 +423,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_slow_vs_fast_a() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::DOUBLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
@@ -442,7 +442,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_slow_vs_block_crit_a() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
@@ -457,7 +457,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_block_vs_slow_crit_b() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::BLOCK,
@@ -478,7 +478,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_block_vs_idle() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
@@ -499,7 +499,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_idle_vs_block() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::BLOCK,
@@ -520,7 +520,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_block_vs_block() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
@@ -548,9 +548,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_flee_vs_flee() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
@@ -563,14 +563,14 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager > 0, 'shot_a.wager');
         assert(round.shot_b.wager > 0, 'shot_b.wager');
-        tester::assert_winner_balance(ierc20, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
+        tester::assert_winner_balance(lords, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_flee_win_a() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
@@ -587,14 +587,14 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_b.dice_crit == 100, 'shot_b.dice_crit');
         assert(round.shot_a.wager > 0, 'shot_a.wager');
         assert(round.shot_b.wager > 0, 'shot_b.wager');
-        tester::assert_winner_balance(ierc20, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
+        tester::assert_winner_balance(lords, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_flee_win_b() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
@@ -611,14 +611,14 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_a.dice_crit == 100, 'shot_a.dice_crit');
         assert(round.shot_a.wager > 0, 'shot_a.wager');
         assert(round.shot_b.wager > 0, 'shot_b.wager');
-        tester::assert_winner_balance(ierc20, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
+        tester::assert_winner_balance(lords, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_fast_vs_flee_kill_a() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
@@ -633,14 +633,14 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_b.health == 0, 'shot_b.health');
         assert(round.shot_a.wager > 0, 'shot_a.wager');
         assert(round.shot_b.wager == 0, 'shot_b.wager');
-        tester::assert_winner_balance(ierc20, 1, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
+        tester::assert_winner_balance(lords, 1, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_slow_vs_flee_kill_a() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
@@ -655,14 +655,14 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_b.health == 0, 'shot_b.health');
         assert(round.shot_a.wager > 0, 'shot_a.wager');
         assert(round.shot_b.wager == 0, 'shot_b.wager');
-        tester::assert_winner_balance(ierc20, 1, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
+        tester::assert_winner_balance(lords, 1, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_flee_kill_b() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
@@ -677,7 +677,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager == 0, 'shot_a.wager');
         assert(round.shot_b.wager > 0, 'shot_b.wager');
-        tester::assert_winner_balance(ierc20, 2, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
+        tester::assert_winner_balance(lords, 2, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
 
 
@@ -688,9 +688,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_steal_vs_flee() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
@@ -702,14 +702,14 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager > round.shot_b.wager, 'wager');
-        tester::assert_winner_balance(ierc20, 1, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
+        tester::assert_winner_balance(lords, 1, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_flee_vs_steal() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
@@ -721,16 +721,16 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager < round.shot_b.wager, 'wager');
-        tester::assert_winner_balance(ierc20, 2, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
+        tester::assert_winner_balance(lords, 2, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     //
     // face-off
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_steal_vs_steal() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
@@ -745,14 +745,14 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_b.health < constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager == 0, 'shot_a.wager');
         assert(round.shot_b.wager == 0, 'shot_b.wager');
-        tester::assert_winner_balance(ierc20, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
+        tester::assert_winner_balance(lords, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_steal_win_a() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
@@ -769,14 +769,14 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_b.dice_crit == 100, 'shot_b.dice_crit');
         assert(round.shot_a.wager == 0, 'shot_a.wager');
         assert(round.shot_b.wager > 0, 'shot_b.wager');
-        tester::assert_winner_balance(ierc20, 2, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
+        tester::assert_winner_balance(lords, 2, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_steal_win_b() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
@@ -793,14 +793,14 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_a.dice_crit == 100, 'shot_a.dice_crit');
         assert(round.shot_a.wager > 0, 'shot_a.wager');
         assert(round.shot_b.wager == 0, 'shot_b.wager');
-        tester::assert_winner_balance(ierc20, 1, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
+        tester::assert_winner_balance(lords, 1, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_slow_vs_steal_kill_a() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
@@ -815,14 +815,14 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_b.health == 0, 'shot_b.health');
         assert(round.shot_a.wager > 0, 'shot_a.wager');
         assert(round.shot_b.wager == 0, 'shot_b.wager');
-        tester::assert_winner_balance(ierc20, 1, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
+        tester::assert_winner_balance(lords, 1, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_steal_kill_b() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
@@ -837,7 +837,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager == 0, 'shot_a.wager');
         assert(round.shot_b.wager > 0, 'shot_b.wager');
-        tester::assert_winner_balance(ierc20, 2, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
+        tester::assert_winner_balance(lords, 2, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
 
 
@@ -848,9 +848,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_seppuku_vs_seppuku() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
@@ -864,14 +864,14 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_a.health == 0, 'shot_a.health');
         assert(round.shot_b.health == 0, 'shot_b.health');
         assert(round.shot_a.wager == round.shot_b.wager, 'no_wager');
-        tester::assert_winner_balance(ierc20, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
+        tester::assert_winner_balance(lords, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_seppuku_vs_slow_b() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
@@ -885,14 +885,14 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_a.health == 0, 'shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager < round.shot_b.wager, 'wager_b');
-        tester::assert_winner_balance(ierc20, 2, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
+        tester::assert_winner_balance(lords, 2, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_seppuku_vs_fast_b() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
@@ -906,14 +906,14 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_a.health == 0, 'shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager < round.shot_b.wager, 'wager_b');
-        tester::assert_winner_balance(ierc20, 2, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
+        tester::assert_winner_balance(lords, 2, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_fast_vs_seppuku_a() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
@@ -927,14 +927,14 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == 0, 'shot_b.health');
         assert(round.shot_a.wager > round.shot_b.wager, 'wager_a');
-        tester::assert_winner_balance(ierc20, 1, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
+        tester::assert_winner_balance(lords, 1, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_seppuku_vs_flee() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
@@ -948,14 +948,14 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_a.health == 0, 'shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager == round.shot_b.wager, 'no_wager');
-        tester::assert_winner_balance(ierc20, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
+        tester::assert_winner_balance(lords, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_seppuku_vs_steal() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
@@ -969,14 +969,14 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_a.health == 0, 'shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager < round.shot_b.wager, 'wager_a');
-        tester::assert_winner_balance(ierc20, 2, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
+        tester::assert_winner_balance(lords, 2, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_flee_vs_seppuku() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
@@ -990,14 +990,14 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == 0, 'shot_b.health');
         assert(round.shot_a.wager == round.shot_b.wager, 'no_wager');
-        tester::assert_winner_balance(ierc20, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
+        tester::assert_winner_balance(lords, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_steal_vs_seppuku_vs() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
@@ -1011,7 +1011,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == 0, 'shot_b.health');
         assert(round.shot_a.wager > round.shot_b.wager, 'wager_b');
-        tester::assert_winner_balance(ierc20, 1, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
+        tester::assert_winner_balance(lords, 1, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
 
 

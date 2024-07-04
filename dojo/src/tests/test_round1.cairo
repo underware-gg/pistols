@@ -6,7 +6,7 @@ mod tests {
 
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
-    use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
+    use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::models::models::{Duelist, Challenge, Wager, Round};
     use pistols::models::structs::{SimulateChances};
@@ -83,7 +83,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_challenge_accept_state() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
         tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 2);
         assert(system.has_pact(OTHER(), OWNER()) == false, 'has_pact_no');
@@ -115,20 +115,20 @@ mod tests {
     #[test]
     #[available_gas(10_000_000_000)]
     fn test_resolved() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_contract: u256 = ierc20.balance_of(system.contract_address);
-        let balance_treasury: u256 = ierc20.balance_of(TREASURY());
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_contract: u256 = lords.balance_of(system.contract_address);
+        let balance_treasury: u256 = lords.balance_of(TREASURY());
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         assert(fee > 0, 'fee > 0');
         assert(balance_treasury == 0, 'balance_treasury == 0');
 
         let (challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);
-        tester::assert_balance(ierc20, system.contract_address, balance_contract, 0, (fee + WAGER_VALUE) * 2, 'balance_contract_1');
-        tester::assert_balance(ierc20, OWNER(), balance_a, fee + WAGER_VALUE, 0, 'balance_a_1');
-        tester::assert_balance(ierc20, OTHER(), balance_b, fee + WAGER_VALUE, 0, 'balance_b_1');
-        tester::assert_balance(ierc20, TREASURY(), 0, 0, 0, 'balance_treasury_1');
+        tester::assert_balance(lords, system.contract_address, balance_contract, 0, (fee + WAGER_VALUE) * 2, 'balance_contract_1');
+        tester::assert_balance(lords, OWNER(), balance_a, fee + WAGER_VALUE, 0, 'balance_a_1');
+        tester::assert_balance(lords, OTHER(), balance_b, fee + WAGER_VALUE, 0, 'balance_b_1');
+        tester::assert_balance(lords, TREASURY(), 0, 0, 0, 'balance_treasury_1');
 
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
         let chances_a: SimulateChances = system.simulate_chances(OWNER(), challenge.duel_id, challenge.round_number, action_a);
@@ -223,11 +223,11 @@ mod tests {
             assert(false, 'bad winner')
         }
 
-        tester::assert_balance(ierc20, system.contract_address, balance_contract, 0, 0, 'balance_contract_2');
-        let balance_treasury = tester::assert_balance(ierc20, TREASURY(), balance_treasury, 0, fee * 2, 'balance_treasury_2');
-        tester::assert_winner_balance(ierc20, challenge.winner, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'balance_winner_2');
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        tester::assert_balance(lords, system.contract_address, balance_contract, 0, 0, 'balance_contract_2');
+        let balance_treasury = tester::assert_balance(lords, TREASURY(), balance_treasury, 0, fee * 2, 'balance_treasury_2');
+        tester::assert_winner_balance(lords, challenge.winner, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'balance_winner_2');
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
 
         // Run same challenge to compute totals
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);
@@ -268,9 +268,9 @@ mod tests {
             assert(false, 'bad winner')
         }
 
-        tester::assert_balance(ierc20, system.contract_address, balance_contract, 0, 0, 'balance_contract_3');
-        tester::assert_balance(ierc20, TREASURY(), balance_treasury, 0, fee * 2, 'balance_treasury_3');
-        tester::assert_winner_balance(ierc20, challenge.winner, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'balance_winner_3');
+        tester::assert_balance(lords, system.contract_address, balance_contract, 0, 0, 'balance_contract_3');
+        tester::assert_balance(lords, TREASURY(), balance_treasury, 0, fee * 2, 'balance_treasury_3');
+        tester::assert_winner_balance(lords, challenge.winner, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'balance_winner_3');
 
         // Snapshot was created and kept original value
         let snapshot = tester::get_Snapshot(world, duel_id);
@@ -283,18 +283,18 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_dual_crit() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
-        let balance_contract: u256 = ierc20.balance_of(system.contract_address);
-        let balance_a: u256 = ierc20.balance_of(OWNER());
-        let balance_b: u256 = ierc20.balance_of(OTHER());
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let balance_contract: u256 = lords.balance_of(system.contract_address);
+        let balance_a: u256 = lords.balance_of(OWNER());
+        let balance_b: u256 = lords.balance_of(OTHER());
         let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         assert(fee > 0, 'fee > 0');
 
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);
-        tester::assert_balance(ierc20, system.contract_address, balance_contract, 0, (fee + WAGER_VALUE) * 2, 'balance_contract_1');
-        tester::assert_balance(ierc20, OWNER(), balance_a, fee + WAGER_VALUE, 0, 'balance_a_1');
-        tester::assert_balance(ierc20, OTHER(), balance_b, fee + WAGER_VALUE, 0, 'balance_b_1');
-        tester::assert_balance(ierc20, TREASURY(), 0, 0, 0, 'balance_treasury_1');
+        tester::assert_balance(lords, system.contract_address, balance_contract, 0, (fee + WAGER_VALUE) * 2, 'balance_contract_1');
+        tester::assert_balance(lords, OWNER(), balance_a, fee + WAGER_VALUE, 0, 'balance_a_1');
+        tester::assert_balance(lords, OTHER(), balance_b, fee + WAGER_VALUE, 0, 'balance_b_1');
+        tester::assert_balance(lords, TREASURY(), 0, 0, 0, 'balance_treasury_1');
 
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(10, 10);
         tester::execute_commit_action(system, OWNER(), duel_id, 1, hash_a);
@@ -341,16 +341,16 @@ mod tests {
         assert(duelist_a.score.honour == scoreboard_a.score.honour, 'scoreboard_a.score.honour');
         assert(duelist_b.score.honour == scoreboard_b.score.honour, 'scoreboard_b.score.honour');
 
-        tester::assert_balance(ierc20, system.contract_address, balance_contract, 0, 0, 'balance_contract_2');
-        tester::assert_balance(ierc20, TREASURY(), 0, 0, fee * 2, 'balance_treasury_2');
-        tester::assert_balance(ierc20, OWNER(), balance_a, fee, 0, 'balance_a_2');
-        tester::assert_balance(ierc20, OTHER(), balance_b, fee, 0, 'balance_b_2');
+        tester::assert_balance(lords, system.contract_address, balance_contract, 0, 0, 'balance_contract_2');
+        tester::assert_balance(lords, TREASURY(), 0, 0, fee * 2, 'balance_treasury_2');
+        tester::assert_balance(lords, OWNER(), balance_a, fee, 0, 'balance_a_2');
+        tester::assert_balance(lords, OTHER(), balance_b, fee, 0, 'balance_b_2');
     }
 
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_dual_crit_to_trickster_a() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         // A is a trickster, will shoot first
         // let mut duelist_a = tester::get_Duelist(world, OWNER());
         // duelist_a.score.level_trickster = 100;
@@ -372,7 +372,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_dual_crit_to_trickster_b() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         // A is a trickster, will shoot first
         // let mut duelist_b = tester::get_Duelist(world, OTHER());
         // duelist_b.score.level_trickster = 100;
@@ -394,7 +394,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_early_crit() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(9, 10);
         tester::execute_commit_action(system, OWNER(), duel_id, 1, hash_a);
@@ -414,7 +414,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_late_crit() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(10, 9);
         tester::execute_commit_action(system, OWNER(), duel_id, 1, hash_a);
@@ -434,7 +434,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_dual_hit() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_hit(3, 3);
         tester::execute_commit_action(system, OWNER(), duel_id, 1, hash_a);
@@ -459,7 +459,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_dual_hit_penalty_a() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_hit(3, 2);
         tester::execute_commit_action(system, OWNER(), duel_id, 1, hash_a);
@@ -476,7 +476,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_dual_hit_penalty_b() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_hit(2, 3);
         tester::execute_commit_action(system, OWNER(), duel_id, 1, hash_a);
@@ -496,7 +496,7 @@ mod tests {
     //     let mut salt: u64 = 0x324ffd23;
     //     loop {
     //         salt.print();
-    //         let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+    //         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
     //         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);
     //         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_hit_find(3, 3, salt);
     //         tester::execute_commit_action(system, OWNER(), duel_id, 1, hash_a);
@@ -520,7 +520,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_clamp_invalid_paces() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let hash_a: u64 = make_action_hash(0x111, 0);
         let hash_b: u64 = make_action_hash(0x222, 11);
@@ -540,7 +540,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_register_keep_scores() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let hash_a: u64 = make_action_hash(0x111, 10);
         let hash_b: u64 = make_action_hash(0x222, 1);
@@ -570,7 +570,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Not your Challenge', 'ENTRYPOINT_FAILED'))]
     fn test_wrong_player() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         // try to commmit with another account
         let someone_else: ContractAddress = starknet::contract_address_const::<0x999>();
@@ -582,7 +582,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Invalid round number', 'ENTRYPOINT_FAILED'))]
     fn test_wrong_round_number() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let hash: u64 = make_action_hash(0x12121, 0x1);
         tester::execute_commit_action(system, OWNER(), duel_id, 2, hash);
@@ -592,7 +592,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Already committed', 'ENTRYPOINT_FAILED'))]
     fn test_already_commit_a() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let (_salt_a, _salt_b, _action_a, _action_b, hash_a, _hash_b) = _get_actions_round_1_resolved();
         tester::execute_commit_action(system, OWNER(), duel_id, 1, hash_a);
@@ -602,7 +602,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Already committed', 'ENTRYPOINT_FAILED'))]
     fn test_already_commit_b() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let (_salt_a, _salt_b, _action_a, _action_b, _hash_a, hash_b) = _get_actions_round_1_resolved();
         tester::execute_commit_action(system, OTHER(), duel_id, 1, hash_b);
@@ -613,7 +613,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Already revealed', 'ENTRYPOINT_FAILED'))]
     fn test_already_revealed_a() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let (salt_a, _salt_b, action_a, _action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
         tester::execute_commit_action(system, OWNER(), duel_id, 1, hash_a);
@@ -625,7 +625,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Already revealed', 'ENTRYPOINT_FAILED'))]
     fn test_already_revealed_b() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let (_salt_a, salt_b, _action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
         tester::execute_commit_action(system, OWNER(), duel_id, 1, hash_a);
@@ -638,7 +638,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Round not in commit', 'ENTRYPOINT_FAILED'))]
     fn test_not_in_commit() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let (_salt_a, _salt_b, _action_a, _action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
         tester::execute_commit_action(system, OWNER(), duel_id, 1, hash_a);
@@ -650,7 +650,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Round not in reveal', 'ENTRYPOINT_FAILED'))]
     fn test_not_in_reveal() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let (_salt_a, salt_b, _action_a, action_b, _hash_a, hash_b) = _get_actions_round_1_resolved();
         tester::execute_commit_action(system, OTHER(), duel_id, 1, hash_b);
@@ -661,7 +661,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Wrong Challenge state', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_not_started() {
-        let (_world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
         tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 2);
         let expire_seconds: u64 = timestamp::from_days(2);
@@ -674,7 +674,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Wrong Challenge state', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_finished_commit() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
         tester::execute_commit_action(system, OTHER(), duel_id, 1, hash_b);
@@ -688,7 +688,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Wrong Challenge state', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_finished_reveal() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
         tester::execute_commit_action(system, OTHER(), duel_id, 1, hash_b);
@@ -702,7 +702,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Action hash mismatch', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_hash_action_a() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let hash_a: u64 = make_action_hash(0x111, 1);
         let hash_b: u64 = make_action_hash(0x222, 1);
@@ -714,7 +714,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Action hash mismatch', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_hash_salt_a() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let hash_a: u64 = make_action_hash(0x111, 1);
         let hash_b: u64 = make_action_hash(0x222, 1);
@@ -727,7 +727,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Action hash mismatch', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_hash_action_b() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let hash_a: u64 = make_action_hash(0x111, 1);
         let hash_b: u64 = make_action_hash(0x222, 1);
@@ -739,7 +739,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Action hash mismatch', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_hash_salt_b() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let hash_a: u64 = make_action_hash(0x111, 1);
         let hash_b: u64 = make_action_hash(0x222, 1);

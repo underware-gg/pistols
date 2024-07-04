@@ -15,7 +15,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_register_ChallengeTable() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
 
         let name: felt252 = 'DuelistName';
         tester::execute_register_duelist(system, OWNER(), name, 1);
@@ -32,7 +32,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_register_challenged() {
-        let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let player1_name: felt252 = 'Player_ONE';
         let player2_name: felt252 = 'Player_TWO';
         tester::execute_register_duelist(system, OWNER(), player1_name, 1);

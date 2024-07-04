@@ -8,7 +8,7 @@ mod tests {
 
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
-    use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
+    use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::models::models::{Duelist, Challenge, Wager, Round};
     use pistols::models::table::{tables};
@@ -78,7 +78,7 @@ mod tests {
 //     #[test]
 //     #[available_gas(10_000_000_000)]
 //     fn match_salt_to_challenge() {
-//         let (world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+//         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);
 //         // let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
 //         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_draw();

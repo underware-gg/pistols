@@ -6,7 +6,7 @@ mod tests {
 
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
-    use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
+    use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
     use pistols::systems::actions::{IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::systems::admin::{IAdminDispatcher, IAdminDispatcherTrait};
     use pistols::models::config::{Config};
@@ -30,7 +30,7 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_calc_fee() {
-        let (_world, system, admin, _lords, _ierc20) = tester::setup_world(true, false);
+        let (_world, system, admin, _lords) = tester::setup_world(true, true, false, true, false);
         let table: TableConfig = admin.get_table(TABLE_ID);
         // no wager
         let fee: u256 = system.calc_fee(TABLE_ID, 0);
@@ -44,15 +44,15 @@ mod tests {
     }
 
     fn _test_balance_ok(table_id: felt252, wager_value: u256, wager_min: u256) {
-        let (world, system, admin, lords, ierc20) = tester::setup_world(true, false);
+        let (world, system, admin, lords) = tester::setup_world(true, true, true, true, false);
         tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
         tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
         let S = system.contract_address;
         let A = OTHER();
         let B = OWNER();
-        let balance_contract: u256 = ierc20.balance_of(S);
-        let balance_a: u256 = ierc20.balance_of(A);
-        let balance_b: u256 = ierc20.balance_of(B);
+        let balance_contract: u256 = lords.balance_of(S);
+        let balance_a: u256 = lords.balance_of(A);
+        let balance_b: u256 = lords.balance_of(B);
         // approve fees
         let mut table: TableConfig = admin.get_table(table_id);
         if (wager_min > 0) {
@@ -77,12 +77,12 @@ mod tests {
         assert(wager.value == wager_value, 'wager.value');
         assert(wager.fee == fee, 'wager.fee');
         // check balances
-        let final_balance_a: u256 = tester::assert_balance(ierc20, A, balance_a, approved_value, 0, 'balance_a');
-        let fina_balance_contract: u256 = tester::assert_balance(ierc20, S, balance_contract, 0, approved_value, 'balance_contract+a');
+        let final_balance_a: u256 = tester::assert_balance(lords, A, balance_a, approved_value, 0, 'balance_a');
+        let fina_balance_contract: u256 = tester::assert_balance(lords, S, balance_contract, 0, approved_value, 'balance_contract+a');
         // accept
         tester::execute_reply_challenge(system, B, duel_id, true);
-        let final_balance_b: u256 = tester::assert_balance(ierc20, B, balance_b, approved_value, 0, 'balance_b');
-        let final_balance_contract: u256 = tester::assert_balance(ierc20, S, fina_balance_contract, 0, approved_value, 'balance_contract+b');
+        let final_balance_b: u256 = tester::assert_balance(lords, B, balance_b, approved_value, 0, 'balance_b');
+        let final_balance_contract: u256 = tester::assert_balance(lords, S, fina_balance_contract, 0, approved_value, 'balance_contract+b');
         if (table_id == tables::LORDS) {
             assert(fee > 0, 'fee > 0');
             assert(final_balance_a < balance_a, 'final_balance_a');
@@ -131,7 +131,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Insufficient balance', 'ENTRYPOINT_FAILED'))]
     fn test_fee_funds_nok() {
-        let (_world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
         tester::execute_register_duelist(system, BUMMER(), BUMMER_NAME, 1);
         let _duel_id: u128 = tester::execute_create_challenge(system, BUMMER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 0);
@@ -141,7 +141,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Insufficient balance', 'ENTRYPOINT_FAILED'))]
     fn test_wager_funds_nok() {
-        let (_world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
         tester::execute_register_duelist(system, BUMMER(), BUMMER_NAME, 1);
         let _duel_id: u128 = tester::execute_create_challenge(system, BUMMER(), OTHER(), MESSAGE_1, TABLE_ID, 100, 0);
@@ -155,10 +155,10 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_fee_funds_ok() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
         tester::execute_register_duelist(system, BUMMER(), BUMMER_NAME, 1);
-        let _balance: u256 = ierc20.balance_of(OTHER());
+        let _balance: u256 = lords.balance_of(OTHER());
         let duel_id: u128 = tester::execute_create_challenge(system, OTHER(), BUMMER(), MESSAGE_1, TABLE_ID, 0, 0);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
@@ -167,10 +167,10 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_wager_funds_ok() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
         tester::execute_register_duelist(system, BUMMER(), BUMMER_NAME, 1);
-        let _balance: u256 = ierc20.balance_of(OTHER());
+        let _balance: u256 = lords.balance_of(OTHER());
         let duel_id: u128 = tester::execute_create_challenge(system, OTHER(), BUMMER(), MESSAGE_1, TABLE_ID, 100, 0);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
@@ -184,7 +184,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Insufficient balance', 'ENTRYPOINT_FAILED'))]
     fn test_fee_funds_ok_resp_nok() {
-        let (_world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
         tester::execute_register_duelist(system, BUMMER(), BUMMER_NAME, 1);
         // verified by test_fee_funds_ok
@@ -197,7 +197,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Insufficient balance', 'ENTRYPOINT_FAILED'))]
     fn test_wager_funds_ok_resp_nok() {
-        let (_world, system, _admin, _lords, _ierc20) = tester::setup_world(true, true);
+        let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
         tester::execute_register_duelist(system, BUMMER(), BUMMER_NAME, 1);
         // verified by test_wager_funds_ok
@@ -214,7 +214,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: No transfer allowance', 'ENTRYPOINT_FAILED'))]
     fn test_fee_funds_ok_allowance_nok() {
-        let (_world, system, _admin, lords, _ierc20) = tester::setup_world(true, true);
+        let (_world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
         tester::execute_register_duelist(system, BUMMER(), BUMMER_NAME, 1);
         // verified by test_fee_funds_ok
@@ -227,7 +227,7 @@ mod tests {
     #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: No transfer allowance', 'ENTRYPOINT_FAILED'))]
     fn test_wager_funds_ok_allowance_nok() {
-        let (_world, system, _admin, lords, _ierc20) = tester::setup_world(true, true);
+        let (_world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
         tester::execute_register_duelist(system, BUMMER(), BUMMER_NAME, 1);
         // verified by test_fee_funds_ok
@@ -244,14 +244,14 @@ mod tests {
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_withdraw_fees() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
         tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
         let S = system.contract_address;
         let A = OTHER();
         let B = OWNER();
-        let balance_contract: u256 = ierc20.balance_of(S);
-        let balance_a: u256 = ierc20.balance_of(A);
+        let balance_contract: u256 = lords.balance_of(S);
+        let balance_a: u256 = lords.balance_of(A);
         // create challenge
         let wager_value: u256 = 100 * constants::ETH_TO_WEI;
         let fee: u256 = system.calc_fee(TABLE_ID, wager_value);
@@ -259,26 +259,26 @@ mod tests {
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, wager_value, 0);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
-        tester::assert_balance(ierc20, A, balance_a, approved_value, 0, 'balance_a_1');
-        tester::assert_balance(ierc20, S, balance_contract, 0, approved_value, 'balance_contract_1');
+        tester::assert_balance(lords, A, balance_a, approved_value, 0, 'balance_a_1');
+        tester::assert_balance(lords, S, balance_contract, 0, approved_value, 'balance_contract_1');
         // Withdraw
         let new_state: ChallengeState = tester::execute_reply_challenge(system, A, duel_id, false);
         assert(new_state == ChallengeState::Withdrawn, 'Withdrawn');
-        tester::assert_balance(ierc20, A, balance_a, 0, 0, 'balance_a_2');
-        tester::assert_balance(ierc20, S, balance_contract, 0, 0, 'balance_contract_2');
+        tester::assert_balance(lords, A, balance_a, 0, 0, 'balance_a_2');
+        tester::assert_balance(lords, S, balance_contract, 0, 0, 'balance_contract_2');
     }
 
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_refused_fees() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
         tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
         let S = system.contract_address;
         let A = OTHER();
         let B = OWNER();
-        let balance_contract: u256 = ierc20.balance_of(S);
-        let balance_a: u256 = ierc20.balance_of(A);
+        let balance_contract: u256 = lords.balance_of(S);
+        let balance_a: u256 = lords.balance_of(A);
         // create challenge
         let wager_value: u256 = 100 * constants::ETH_TO_WEI;
         let fee: u256 = system.calc_fee(TABLE_ID, wager_value);
@@ -286,26 +286,26 @@ mod tests {
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, wager_value, 0);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
-        tester::assert_balance(ierc20, A, balance_a, approved_value, 0, 'balance_a_1');
-        tester::assert_balance(ierc20, S, balance_contract, 0, approved_value, 'balance_contract_1');
+        tester::assert_balance(lords, A, balance_a, approved_value, 0, 'balance_a_1');
+        tester::assert_balance(lords, S, balance_contract, 0, approved_value, 'balance_contract_1');
         // Withdraw
         let new_state: ChallengeState = tester::execute_reply_challenge(system, B, duel_id, false);
         assert(new_state == ChallengeState::Refused, 'Refused');
-        tester::assert_balance(ierc20, A, balance_a, 0, 0, 'balance_a_2');
-        tester::assert_balance(ierc20, S, balance_contract, 0, 0, 'balance_contract_2');
+        tester::assert_balance(lords, A, balance_a, 0, 0, 'balance_a_2');
+        tester::assert_balance(lords, S, balance_contract, 0, 0, 'balance_contract_2');
     }
 
     #[test]
     #[available_gas(1_000_000_000)]
     fn test_expired_fees() {
-        let (world, system, _admin, _lords, ierc20) = tester::setup_world(true, true);
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
         tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
         let S = system.contract_address;
         let A = OTHER();
         let B = OWNER();
-        let balance_contract: u256 = ierc20.balance_of(S);
-        let balance_a: u256 = ierc20.balance_of(A);
+        let balance_contract: u256 = lords.balance_of(S);
+        let balance_a: u256 = lords.balance_of(A);
         // create challenge
         let wager_value: u256 = 100 * constants::ETH_TO_WEI;
         let fee: u256 = system.calc_fee(TABLE_ID, wager_value);
@@ -314,14 +314,14 @@ mod tests {
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, wager_value, expire_seconds);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
-        tester::assert_balance(ierc20, A, balance_a, approved_value, 0, 'balance_a_1');
-        tester::assert_balance(ierc20, S, balance_contract, 0, approved_value, 'balance_contract_1');
+        tester::assert_balance(lords, A, balance_a, approved_value, 0, 'balance_a_1');
+        tester::assert_balance(lords, S, balance_contract, 0, approved_value, 'balance_contract_1');
         // Expire
         let (_block_number, _timestamp) = tester::elapse_timestamp(timestamp::from_date(1, 0, 1));
         let new_state: ChallengeState = tester::execute_reply_challenge(system, B, duel_id, true);
         assert(new_state == ChallengeState::Expired, 'Expired');
-        tester::assert_balance(ierc20, A, balance_a, 0, 0, 'balance_a_2');
-        tester::assert_balance(ierc20, S, balance_contract, 0, 0, 'balance_contract_2');
+        tester::assert_balance(lords, A, balance_a, 0, 0, 'balance_a_2');
+        tester::assert_balance(lords, S, balance_contract, 0, 0, 'balance_contract_2');
     }
 
 }
