@@ -87,6 +87,7 @@ trait ITokenDuelistPublic<TState> {
 #[dojo::contract]
 mod token_duelist {    
     use debug::PrintTrait;
+    use core::byte_array::ByteArrayTrait;
     use starknet::ContractAddress;
     use starknet::{get_contract_address, get_caller_address};
 
@@ -197,14 +198,7 @@ mod token_duelist {
     }
 
     mod Errors {
-        const CALLER_IS_NOT_OWNER: felt252 = 'ERC721: caller is not owner';
-        const CALLER_IS_NOT_MINTER: felt252 = 'ERC721: caller is not minter';
-        const MINTING_IS_CLOSED: felt252 = 'ERC721: minting closed';
-        const INVALID_ACCOUNT: felt252 = 'ERC721: invalid account';
-        const UNAUTHORIZED: felt252 = 'ERC721: unauthorized caller';
-        const INVALID_RECEIVER: felt252 = 'ERC721: invalid receiver';
-        const WRONG_SENDER: felt252 = 'ERC721: wrong sender';
-        const SAFE_TRANSFER_FAILED: felt252 = 'ERC721: safe transfer failed';
+        const CALLER_IS_NOT_MINTER: felt252 = 'DUELIST: caller is not minter';
     }
 
     //
@@ -236,7 +230,6 @@ mod token_duelist {
 
         fn mint(ref self: ContractState, to: ContractAddress, token_id: u256) {
             let config: TokenConfig = get!(self.world(), (get_contract_address()), TokenConfig);
-            assert(config.is_open, Errors::MINTING_IS_CLOSED);
             assert(config.is_minter(get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
             self.erc721_mintable.mint(to, token_id);
         }
@@ -249,7 +242,11 @@ mod token_duelist {
             // let contract_address = get_contract_address();
             // let selfie = ITokenDuelistDispatcher{ contract_address };
             // let world = selfie.world();
-            format!("{{\"id\":\"{}\"}}", token_id)
+            let base_uri: ByteArray = self.erc721_metadata.get_meta().base_uri;
+            format!("{{\"id\":\"{}\",\"image\":\"{}/profiles/00_sq.jpg\"}}",
+                token_id,
+                base_uri,
+            )
         }
     }
 

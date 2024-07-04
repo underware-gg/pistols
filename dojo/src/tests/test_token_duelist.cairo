@@ -3,7 +3,7 @@ use starknet::{ContractAddress, get_contract_address, get_caller_address};
 use starknet::storage::{StorageMemberAccessTrait};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use dojo::test_utils::spawn_test_world;
-use token::tests::constants::{ZERO, OWNER, SPENDER, RECIPIENT, TOKEN_ID, TOKEN_ID_2, TOKEN_ID_3};
+use token::tests::constants::{ZERO, OWNER, SPENDER, RECIPIENT};//, TOKEN_ID, TOKEN_ID_2, TOKEN_ID_3};
 
 use token::tests::utils;
 
@@ -37,6 +37,9 @@ use token::components::token::erc721::erc721_burnable::erc721_burnable_component
 
 use pistols::systems::token_duelist::{
     token_duelist, ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait,
+};
+use pistols::systems::minter::{
+    minter, IMinterDispatcher, IMinterDispatcherTrait,
 };
 use pistols::models::{
     token_config::{TokenConfig, TokenConfigTrait},
@@ -83,7 +86,13 @@ fn assert_only_event_approval(
 // Setup
 //
 
-fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher) {
+const TOKEN_ID: u256 = 1;
+const TOKEN_ID_2: u256 = 2;
+const TOKEN_ID_3: u256 = 3;
+const TOKEN_ID_4: u256 = 4;
+const TOKEN_ID_5: u256 = 5;
+
+fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterDispatcher) {
     let world = spawn_test_world(
         array![
             erc_721_token_approval_model::TEST_CLASS_HASH,
@@ -92,26 +101,40 @@ fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher) {
         ]
     );
 
-    // deploy contract
-    let mut token_dispatcher = ITokenDuelistDispatcher {
-        contract_address: world.deploy_contract('salt', token_duelist::TEST_CLASS_HASH.try_into().unwrap(), array![].span())
+    let mut token = ITokenDuelistDispatcher {
+        contract_address: world.deploy_contract('salt',
+            token_duelist::TEST_CLASS_HASH.try_into().unwrap(),
+            array![].span(),
+        )
+    };
+    let minter_call_data: Array<felt252> = array![
+        token.contract_address.into(),
+        3, // max_supply
+        2, // wallet_max
+        1, // is_open
+    ];
+    let mut minter = IMinterDispatcher {
+        contract_address: world.deploy_contract('salt2',
+            minter::TEST_CLASS_HASH.try_into().unwrap(),
+            minter_call_data.span(),
+        )
     };
 
     // setup auth
-    world.grant_writer(selector!("SRC5Model"), token_dispatcher.contract_address);
-    world.grant_writer(selector!("InitializableModel"), token_dispatcher.contract_address);
-    world.grant_writer(selector!("ERC721MetaModel"), token_dispatcher.contract_address);
-    world.grant_writer(selector!("ERC721TokenApprovalModel"), token_dispatcher.contract_address);
-    world.grant_writer(selector!("ERC721BalanceModel"), token_dispatcher.contract_address);
-    world.grant_writer(selector!("ERC721EnumerableIndexModel"),token_dispatcher.contract_address);
-    world.grant_writer(selector!("ERC721EnumerableOwnerIndexModel"),token_dispatcher.contract_address);
-    world.grant_writer(selector!("ERC721EnumerableTokenModel"),token_dispatcher.contract_address);
-    world.grant_writer(selector!("ERC721EnumerableOwnerTokenModel"),token_dispatcher.contract_address);
-    world.grant_writer(selector!("ERC721EnumerableTotalModel"),token_dispatcher.contract_address);
-    world.grant_writer(selector!("ERC721MetadataModel"), token_dispatcher.contract_address);
-    world.grant_writer(selector!("ERC721OwnerModel"), token_dispatcher.contract_address);
-    world.grant_writer(selector!("TokenConfig"), token_dispatcher.contract_address);
-    world.grant_writer(selector!("TokenData"), token_dispatcher.contract_address);
+    world.grant_writer(selector!("SRC5Model"), token.contract_address);
+    world.grant_writer(selector!("InitializableModel"), token.contract_address);
+    world.grant_writer(selector!("ERC721MetaModel"), token.contract_address);
+    world.grant_writer(selector!("ERC721TokenApprovalModel"), token.contract_address);
+    world.grant_writer(selector!("ERC721BalanceModel"), token.contract_address);
+    world.grant_writer(selector!("ERC721EnumerableIndexModel"),token.contract_address);
+    world.grant_writer(selector!("ERC721EnumerableOwnerIndexModel"),token.contract_address);
+    world.grant_writer(selector!("ERC721EnumerableTokenModel"),token.contract_address);
+    world.grant_writer(selector!("ERC721EnumerableOwnerTokenModel"),token.contract_address);
+    world.grant_writer(selector!("ERC721EnumerableTotalModel"),token.contract_address);
+    world.grant_writer(selector!("ERC721MetadataModel"), token.contract_address);
+    world.grant_writer(selector!("ERC721OwnerModel"), token.contract_address);
+    world.grant_writer(selector!("TokenConfig"), token.contract_address);
+    world.grant_writer(selector!("TokenData"), token.contract_address);
     
     world.grant_writer(selector!("SRC5Model"), OWNER());
     world.grant_writer(selector!("InitializableModel"), OWNER());
@@ -129,31 +152,23 @@ fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher) {
     world.grant_writer(selector!("TokenData"), OWNER());
 
     utils::impersonate(OWNER());
-    set!(world, (
-        TokenConfig{
-            token_address: token_dispatcher.contract_address,
-            minter_address: OWNER(),
-            max_supply: 512,
-            is_open: true,
-        }
-    ));
 
-    (world, token_dispatcher)
+    (world, token, minter)
 }
 
-fn setup() -> (IWorldDispatcher, ITokenDuelistDispatcher) {
-    let (world, mut token_dispatcher) = setup_uninitialized();
+fn setup() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterDispatcher) {
+    let (world, mut token, mut minter) = setup_uninitialized();
 
     // initialize contracts
-    token_dispatcher.initialize("NAME", "SYMBOL", "URI");
-    token_dispatcher.mint(OWNER(), TOKEN_ID);
-    token_dispatcher.mint(OWNER(), TOKEN_ID_2);
+    minter.mint(token.contract_address);
+    minter.mint(token.contract_address);
 
     // drop all events
-    utils::drop_all_events(token_dispatcher.contract_address);
     utils::drop_all_events(world.contract_address);
+    utils::drop_all_events(token.contract_address);
+    utils::drop_all_events(minter.contract_address);
 
-    (world, token_dispatcher)
+    (world, token, minter)
 }
 
 //
@@ -162,37 +177,37 @@ fn setup() -> (IWorldDispatcher, ITokenDuelistDispatcher) {
 
 #[test]
 fn test_initializer() {
-    let (_world, mut token_dispatcher) = setup();
+    let (_world, mut token, mut _minter) = setup();
 
-    assert(token_dispatcher.balance_of(OWNER()) == 2, 'Should eq 2');
-    assert(token_dispatcher.name() == "NAME", 'Name should be NAME');
-    assert(token_dispatcher.symbol() == "SYMBOL", 'Symbol should be SYMBOL');
-    assert(token_dispatcher.token_uri(TOKEN_ID)[0] == '{', 'Uri should not be empty');
-    assert(token_dispatcher.tokenURI(TOKEN_ID)[0] == '{', 'Uri should not be empty Camel');
+    assert(token.balance_of(OWNER()) == 2, 'Should eq 2');
+    assert(token.name() == "Pistols at 10 Blocks Duelists", 'Name is wrong');
+    assert(token.symbol() == "DUELIST", 'Symbol is wrong');
+    assert(token.token_uri(TOKEN_ID)[0] == '{', 'Uri should not be empty');
+    assert(token.tokenURI(TOKEN_ID)[0] == '{', 'Uri should not be empty Camel');
     
-    assert(token_dispatcher.supports_interface(IERC721_ID) == true, 'should support IERC721_ID');
-    assert(token_dispatcher.supports_interface(IERC721_METADATA_ID) == true, 'should support METADATA');
-    assert(token_dispatcher.supports_interface(IERC721_ENUMERABLE_ID) == true, 'should support ENUMERABLE');
-    assert(token_dispatcher.supportsInterface(IERC721_ID) == true, 'should support IERC721_ID Camel');
+    assert(token.supports_interface(IERC721_ID) == true, 'should support IERC721_ID');
+    assert(token.supports_interface(IERC721_METADATA_ID) == true, 'should support METADATA');
+    assert(token.supports_interface(IERC721_ENUMERABLE_ID) == true, 'should support ENUMERABLE');
+    assert(token.supportsInterface(IERC721_ID) == true, 'should support IERC721_ID Camel');
 }
 
 // #[test]
 // #[should_panic(expected: ('ERC721: caller is not owner', 'ENTRYPOINT_FAILED'))]
 // fn test_initialize_not_world_owner() {
-//     let (_world, mut token_dispatcher) = setup_uninitialized();
+//     let (_world, mut token, mut minter) = setup_uninitialized();
 
 //     utils::impersonate(OWNER());
 
 //     // initialize contracts
-//     token_dispatcher.initialize("NAME", "SYMBOL", "URI");
+//     token.initialize("NAME", "SYMBOL", "URI");
 // }
 
 #[test]
 #[should_panic(expected: ('Initializable: is initialized', 'ENTRYPOINT_FAILED'))]
 fn test_initialize_multiple() {
-    let (_world, mut token_dispatcher) = setup();
+    let (_world, mut token, mut _minter) = setup();
 
-    token_dispatcher.initialize("NAME", "SYMBOL", "URI");
+    token.initialize("NAME", "SYMBOL", "URI");
 }
 
 //
@@ -201,17 +216,17 @@ fn test_initialize_multiple() {
 
 #[test]
 fn test_approve() {
-    let (world, mut token_dispatcher) = setup();
+    let (world, mut token, mut _minter) = setup();
 
     utils::impersonate(OWNER());
 
-    token_dispatcher.approve(SPENDER(), TOKEN_ID);
-    assert(token_dispatcher.get_approved(TOKEN_ID) == SPENDER(), 'Spender not approved correctly');
+    token.approve(SPENDER(), TOKEN_ID);
+    assert(token.get_approved(TOKEN_ID) == SPENDER(), 'Spender not approved correctly');
 
     // drop StoreSetRecord ERC721TokenApprovalModel
     utils::drop_event(world.contract_address);
 
-    assert_only_event_approval(token_dispatcher.contract_address, OWNER(), SPENDER(), TOKEN_ID);
+    assert_only_event_approval(token.contract_address, OWNER(), SPENDER(), TOKEN_ID);
     assert_only_event_approval(world.contract_address, OWNER(), SPENDER(), TOKEN_ID);
 }
 
@@ -221,27 +236,27 @@ fn test_approve() {
 
 #[test]
 fn test_transfer_from() {
-    let (world, mut token_dispatcher) = setup();
+    let (world, mut token, mut _minter) = setup();
 
     utils::impersonate(OWNER());
-    token_dispatcher.approve(SPENDER(), TOKEN_ID);
+    token.approve(SPENDER(), TOKEN_ID);
 
-    utils::drop_all_events(token_dispatcher.contract_address);
+    utils::drop_all_events(token.contract_address);
     utils::drop_all_events(world.contract_address);
-    utils::assert_no_events_left(token_dispatcher.contract_address);
+    utils::assert_no_events_left(token.contract_address);
 
     utils::impersonate(SPENDER());
-    token_dispatcher.transfer_from(OWNER(), RECIPIENT(), TOKEN_ID);
+    token.transfer_from(OWNER(), RECIPIENT(), TOKEN_ID);
 
-    assert_only_event_transfer(token_dispatcher.contract_address, OWNER(), RECIPIENT(), TOKEN_ID);
+    assert_only_event_transfer(token.contract_address, OWNER(), RECIPIENT(), TOKEN_ID);
 
-    assert(token_dispatcher.balance_of(RECIPIENT()) == 1, 'Should eq 1');
-    assert(token_dispatcher.balance_of(OWNER()) == 1, 'Should eq 1');
-    assert(token_dispatcher.get_approved(TOKEN_ID) == ZERO(), 'Should eq 0');
-    assert(token_dispatcher.total_supply() == 2, 'Should eq 2');
-    assert(token_dispatcher.token_by_index(0) == TOKEN_ID, 'Should eq TOKEN_ID');
+    assert(token.balance_of(RECIPIENT()) == 1, 'Should eq 1');
+    assert(token.balance_of(OWNER()) == 1, 'Should eq 1');
+    assert(token.get_approved(TOKEN_ID) == ZERO(), 'Should eq 0');
+    assert(token.total_supply() == 2, 'Should eq 2');
+    assert(token.token_by_index(0) == TOKEN_ID, 'Should eq TOKEN_ID');
     assert(
-        token_dispatcher.token_of_owner_by_index(RECIPIENT(), 0) == TOKEN_ID, 'Should eq TOKEN_ID'
+        token.token_of_owner_by_index(RECIPIENT(), 0) == TOKEN_ID, 'Should eq TOKEN_ID'
     );
 }
 
@@ -251,16 +266,40 @@ fn test_transfer_from() {
 
 #[test]
 fn test_mint() {
-    let (_world, mut token_dispatcher) = setup();
+    let (_world, mut token, mut minter) = setup();
 
-    token_dispatcher.mint(RECIPIENT(), 3);
-    assert(token_dispatcher.balance_of(RECIPIENT()) == 1, 'invalid balance_of');
-    assert(token_dispatcher.total_supply() == 3, 'invalid total_supply');
-    assert(token_dispatcher.token_by_index(2) == 3, 'invalid token_by_index');
+    utils::impersonate(RECIPIENT());
+    minter.mint(token.contract_address);
+    assert(token.balance_of(RECIPIENT()) == 1, 'invalid balance_of');
+    assert(token.total_supply() == 3, 'invalid total_supply');
+    assert(token.token_by_index(2) == TOKEN_ID_3, 'invalid token_by_index');
     assert(
-        token_dispatcher.token_of_owner_by_index(RECIPIENT(), 0) == 3,
+        token.token_of_owner_by_index(RECIPIENT(), 0) == 3,
         'invalid token_of_owner_by_index'
     );
+}
+
+#[test]
+#[should_panic(expected: ('DUELIST: caller is not minter', 'ENTRYPOINT_FAILED'))]
+fn test_mint_not_minter() {
+    let (_world, mut token, mut _minter) = setup();
+    token.mint(RECIPIENT(), TOKEN_ID_3);
+}
+
+#[test]
+#[should_panic(expected: ('MINTER: wallet maxed out', 'ENTRYPOINT_FAILED'))]
+fn test_mint_maxed_out() {
+    let (_world, mut token, mut minter) = setup();
+    minter.mint(token.contract_address);
+}
+
+#[test]
+#[should_panic(expected: ('MINTER: minted out', 'ENTRYPOINT_FAILED'))]
+fn test_mint_minted_out() {
+    let (_world, mut token, mut minter) = setup();
+    utils::impersonate(RECIPIENT());
+    minter.mint(token.contract_address);
+    minter.mint(token.contract_address);
 }
 
 //
@@ -269,14 +308,14 @@ fn test_mint() {
 
 #[test]
 fn test_burn() {
-    let (_world, mut token_dispatcher) = setup();
+    let (_world, mut token, mut _minter) = setup();
 
-    token_dispatcher.burn(TOKEN_ID_2);
-    assert(token_dispatcher.balance_of(OWNER()) == 1, 'invalid balance_of');
-    assert(token_dispatcher.total_supply() == 1, 'invalid total_supply');
-    assert(token_dispatcher.token_by_index(0) == TOKEN_ID, 'invalid token_by_index');
+    token.burn(TOKEN_ID_2);
+    assert(token.balance_of(OWNER()) == 1, 'invalid balance_of');
+    assert(token.total_supply() == 1, 'invalid total_supply');
+    assert(token.token_by_index(0) == TOKEN_ID, 'invalid token_by_index');
     assert(
-        token_dispatcher.token_of_owner_by_index(OWNER(), 0) == TOKEN_ID,
+        token.token_of_owner_by_index(OWNER(), 0) == TOKEN_ID,
         'invalid token_of_owner_by_index'
     );
 }

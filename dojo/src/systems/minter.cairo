@@ -24,11 +24,14 @@ mod minter {
     };
 
     mod Errors {
-        const INVALID_TOKEN_ADDRESS: felt252 = 'DUELIST: invalid token address';
-        const INVALID_SUPPLY: felt252 = 'DUELIST: invalid supply';
-        const MINT_CLOSED: felt252 = 'DUELIST: minting is closed';
-        const MINTED_OUT: felt252 = 'DUELIST: minted out';
-        const NOT_OWNER: felt252 = 'DUELIST: not owner';
+        // admin
+        const INVALID_TOKEN_ADDRESS: felt252 = 'MINTER: invalid token address';
+        const INVALID_SUPPLY: felt252 = 'MINTER: invalid supply';
+        const NOT_OWNER: felt252 = 'MINTER: not owner';
+        // mint
+        const MINTED_OUT: felt252 = 'MINTER: minted out';
+        const MINTING_IS_CLOSED: felt252 = 'MINTER: minting closed';
+        const MAXED_WALLET: felt252 = 'MINTER: wallet maxed out';
     }
 
     //---------------------------------------
@@ -40,7 +43,8 @@ mod minter {
     fn dojo_init(
         world: @IWorldDispatcher,
         token_address: ContractAddress,
-        max_supply: u128,
+        max_supply: u16,
+        max_per_wallet: u16,
         is_open: u8,
     ) {
         // 'dojo_init()...'.print();
@@ -48,7 +52,7 @@ mod minter {
         //*******************************
         let TOKEN_NAME = "Pistols at 10 Blocks Duelists";
         let TOKEN_SYMBOL = "DUELIST";
-        let BASE_URI = "/";
+        let BASE_URI = "https://pistols.underware.gg";
         //*******************************
 
         assert(token_address.is_non_zero(), Errors::INVALID_TOKEN_ADDRESS);
@@ -60,6 +64,7 @@ mod minter {
             token_address,
             minter_address: get_contract_address(),
             max_supply,
+            max_per_wallet,
             is_open: (is_open != 0),
         }));
 
@@ -75,19 +80,22 @@ mod minter {
     #[abi(embed_v0)]
     impl MinterImpl of IMinter<ContractState> {
         fn mint(ref world: IWorldDispatcher, token_contract_address: ContractAddress) -> u128 {
-            let token = (ITokenDuelistDispatcher{contract_address:token_contract_address});
+            let token = (ITokenDuelistDispatcher{ contract_address: token_contract_address });
             let total_supply: u256 = token.total_supply();
 
             // check availability
             let config: TokenConfig = get!(world, (token_contract_address), TokenConfig);
-            assert(total_supply.low < config.max_supply, Errors::MINTED_OUT);
-            assert(config.is_open, Errors::MINT_CLOSED);
-            
-            // get next token_id
-            let token_id: u256 = (total_supply + 1);
+            assert(total_supply.low < config.max_supply.into(), Errors::MINTED_OUT);
+            assert(config.is_open, Errors::MINTING_IS_CLOSED);
 
-            // mint!
-            token.mint(get_caller_address(), token_id);
+            // check wallet
+            let to: ContractAddress = get_caller_address();
+            let balance: u256 = token.balance_of(to);
+            assert(balance.low < config.max_per_wallet.into(), Errors::MAXED_WALLET);
+            
+            // mint next token_id
+            let token_id: u256 = (total_supply + 1);
+            token.mint(to, token_id);
 
             // return minted token id
             (token_id.low)

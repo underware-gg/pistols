@@ -7,7 +7,8 @@ struct TokenConfig {
     token_address: ContractAddress,
     //------
     minter_address: ContractAddress,
-    max_supply: u128,
+    max_supply: u16,
+    max_per_wallet: u16,
     is_open: bool,
 }
 
