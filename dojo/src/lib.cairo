@@ -38,6 +38,7 @@ mod interfaces {
 
 mod utils {
     mod arrays;
+    mod byte_arrays;
     mod bitwise;
     mod encoding;
     mod hash;

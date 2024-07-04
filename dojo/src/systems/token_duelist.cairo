@@ -90,8 +90,9 @@ mod token_duelist {
     use pistols::models::token_config::{TokenConfig, TokenConfigTrait};
     use pistols::models::models::{Duelist, Score, ScoreTrait};
     use pistols::libs::utils::{CONSUME_BYTE_ARRAY};
-    use pistols::utils::encoding::bytes_base64_encode;
+    use pistols::utils::byte_arrays::{ByteArraysTrait, U8IntoByteArray, U16IntoByteArray, U32IntoByteArray, U256IntoByteArray, ByteArraySpanIntoByteArray};
     use pistols::utils::short_string::ShortStringTrait;
+    use pistols::utils::encoding::bytes_base64_encode;
     use graffiti::json::JsonImpl;
     use graffiti::{Tag, TagImpl};
 
@@ -245,7 +246,7 @@ mod token_duelist {
 
             let attributes: Span<ByteArray> = self.get_attributes(duelist);
             let metadata = JsonImpl::new()
-                .add("id", format!("{}", token_id))
+                .add("id", token_id.into())
                 .add("name", self.format_name(token_id, duelist))
                 .add("description", self.format_description(token_id, duelist))
                 .add("image", self.format_image(duelist, "sq"))
@@ -279,7 +280,7 @@ mod token_duelist {
         
         fn format_image(self: @ContractState, duelist: Duelist, variant: ByteArray) -> ByteArray {
             let base_uri: ByteArray = self.erc721_metadata.get_meta().base_uri;
-            let number = if (duelist.profile_pic < 10) {format!("0{}", duelist.profile_pic)} else {format!("{}", duelist.profile_pic)};
+            let number = if (duelist.profile_pic < 10) {format!("0{}", duelist.profile_pic)} else {duelist.profile_pic.into()};
             (format!("{}/profiles/{}_{}.jpg", base_uri, number, variant))
         }
 
@@ -296,7 +297,7 @@ mod token_duelist {
                 else if(duelist.score.is_lord()) {"Honourable"}
                 else {"Undefined"};
             result.append("Archetype");
-            result.append(format!("{}",archetype));
+            result.append(archetype.copy());
             // Levels
             if (duelist.score.total_duels > 0) {
                 let level: ByteArray = ScoreTrait::format_honour(
@@ -306,20 +307,20 @@ mod token_duelist {
                     else {0}
                 );
                 result.append("Archetype Level");
-                result.append(format!("{}",level));
+                result.append(level.copy());
                 result.append(format!("{} Level", archetype));
-                result.append(level);
+                result.append(level.copy());
             }
             // Totals
             result.append("Total Duels");
-            result.append(format!("{}", duelist.score.total_duels));
+            result.append(duelist.score.total_duels.into());
             if (duelist.score.total_duels > 0) {
                 result.append("Total Wins");
-                result.append(format!("{}", duelist.score.total_wins));
+                result.append(duelist.score.total_wins.into());
                 result.append("Total Losses");
-                result.append(format!("{}", duelist.score.total_losses));
+                result.append(duelist.score.total_losses.into());
                 result.append("Total Draws");
-                result.append(format!("{}", duelist.score.total_draws));
+                result.append(duelist.score.total_draws.into());
                 result.append("Accumulated Honour");
                 result.append(ScoreTrait::format_total_honour(duelist.score.total_honour));
             }
@@ -332,8 +333,8 @@ mod token_duelist {
             let mut n: usize = 0;
             loop {
                 if (n >= attributes.len()) { break; }
-                let name = format!("{}",attributes.at(n));
-                let value = format!("{}",attributes.at(n+1));
+                let name = attributes.at(n).into();
+                let value = attributes.at(n+1).into();
                 json = json.add(name, value);
                 n += 2;
             };
@@ -346,8 +347,8 @@ mod token_duelist {
             let mut n: usize = 0;
             loop {
                 if (n >= attributes.len()) { break; }
-                let name = format!("{}",attributes.at(n));
-                let value = format!("{}",attributes.at(n+1));
+                let name = attributes.at(n).into();
+                let value = attributes.at(n+1).into();
                 let json = JsonImpl::new()
                     .add("trait", name)
                     .add("value", value);
