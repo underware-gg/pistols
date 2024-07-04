@@ -39,6 +39,7 @@ mod interfaces {
 mod utils {
     mod arrays;
     mod bitwise;
+    mod encoding;
     mod hash;
     mod math;
     mod string;

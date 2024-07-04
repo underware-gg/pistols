@@ -62,6 +62,10 @@ impl ScoreTraitImpl of ScoreTrait {
     fn is_trickster(self: Score) -> bool { (self.level_trickster > 0) }
     #[inline(always)]
     fn is_lord(self: Score) -> bool { (self.level_lord > 0) }
+    #[inline(always)]
+    fn format_honour(value: u8) -> ByteArray { (format!("{}.{}", value/10, value%10)) }
+    #[inline(always)]
+    fn format_total_honour(value: u32) -> ByteArray { (format!("{}.{}", value/10, value%10)) }
 }
 
 

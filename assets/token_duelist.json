@@ -1,0 +1,45 @@
+{
+  "id": "1",
+  "name": "Duelist #1",
+  "description": "Pistols at 10 Blocks Duelist #1",
+  "image": "https://pistols.underware.gg/profiles/00_sq.jpg",
+  "metadata": {
+    "Honour": "0.0",
+    "Archetype": "Undefined",
+    "Total Duels": "0",
+    "Total Wins": "0",
+    "Total Losses": "0",
+    "Total Draws": "0",
+    "Accumulated Honour": "0"
+  },
+  "attributes": [
+    {
+      "trait": "Honour",
+      "value": "0.0"
+    },
+    {
+      "trait": "Archetype",
+      "value": "Undefined"
+    },
+    {
+      "trait": "Total Duels",
+      "value": "0"
+    },
+    {
+      "trait": "Total Wins",
+      "value": "0"
+    },
+    {
+      "trait": "Total Losses",
+      "value": "0"
+    },
+    {
+      "trait": "Total Draws",
+      "value": "0"
+    },
+    {
+      "trait": "Accumulated Honour",
+      "value": "0"
+    }
+  ]
+}

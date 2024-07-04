@@ -182,13 +182,22 @@ fn test_initializer() {
     assert(token.balance_of(OWNER()) == 2, 'Should eq 2');
     assert(token.name() == "Pistols at 10 Blocks Duelists", 'Name is wrong');
     assert(token.symbol() == "DUELIST", 'Symbol is wrong');
-    assert(token.token_uri(TOKEN_ID)[0] == '{', 'Uri should not be empty');
-    assert(token.tokenURI(TOKEN_ID)[0] == '{', 'Uri should not be empty Camel');
+    assert(token.token_uri(TOKEN_ID) != "", 'Uri should not be empty');
+    assert(token.tokenURI(TOKEN_ID) != "", 'Uri should not be empty Camel');
     
     assert(token.supports_interface(IERC721_ID) == true, 'should support IERC721_ID');
     assert(token.supports_interface(IERC721_METADATA_ID) == true, 'should support METADATA');
     assert(token.supports_interface(IERC721_ENUMERABLE_ID) == true, 'should support ENUMERABLE');
     assert(token.supportsInterface(IERC721_ID) == true, 'should support IERC721_ID Camel');
+}
+
+#[test]
+fn test_token_uri() {
+    let (_world, mut token, mut _minter) = setup();
+
+    let uri = token.token_uri(TOKEN_ID);
+    println!("{}", uri);
+    assert(uri[0] == '{', 'Uri should not be empty');
 }
 
 // #[test]

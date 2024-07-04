@@ -67,7 +67,7 @@ trait ITokenDuelist<TState> {
     fn initialize(ref self: TState, name: ByteArray, symbol: ByteArray, base_uri: ByteArray);
     fn mint(ref self: TState, to: ContractAddress, token_id: u256);
     fn burn(ref self: TState, token_id: u256);
-    fn build_uri(self: @TState, token_id: u256) -> ByteArray;
+    fn build_uri(self: @TState, token_id: u256, encode: bool) -> ByteArray;
 
     // ITokenDuelistInternal
 }
@@ -77,12 +77,8 @@ trait ITokenDuelistPublic<TState> {
     fn initialize(ref self: TState, name: ByteArray, symbol: ByteArray, base_uri: ByteArray);
     fn mint(ref self: TState, to: ContractAddress, token_id: u256);
     fn burn(ref self: TState, token_id: u256);
-    fn build_uri(self: @TState, token_id: u256) -> ByteArray;
+    fn build_uri(self: @TState, token_id: u256, encode: bool) -> ByteArray;
 }
-
-// #[starknet::interface]
-// trait ITokenDuelistInternal<TState> {
-// }
 
 #[dojo::contract]
 mod token_duelist {    
@@ -92,7 +88,12 @@ mod token_duelist {
     use starknet::{get_contract_address, get_caller_address};
 
     use pistols::models::token_config::{TokenConfig, TokenConfigTrait};
+    use pistols::models::models::{Duelist, Score, ScoreTrait};
     use pistols::libs::utils::{CONSUME_BYTE_ARRAY};
+    use pistols::utils::encoding::bytes_base64_encode;
+    use pistols::utils::string::StringTrait;
+    use graffiti::json::JsonImpl;
+    use graffiti::{Tag, TagImpl};
 
     use token::components::security::initializable::initializable_component;
     use token::components::introspection::src5::src5_component;
@@ -213,7 +214,8 @@ mod token_duelist {
         ) -> ByteArray {
             CONSUME_BYTE_ARRAY(base_uri);
             let selfie = ITokenDuelistDispatcher{ contract_address: get_contract_address() };
-            (selfie.build_uri(token_id))
+            // let world = selfie.world();
+            (selfie.build_uri(token_id, false))
         }
     }
 
@@ -238,21 +240,121 @@ mod token_duelist {
             self.erc721_burnable.burn(token_id);
         }
 
-        fn build_uri(self: @ContractState, token_id: u256) -> ByteArray {
-            // let contract_address = get_contract_address();
-            // let selfie = ITokenDuelistDispatcher{ contract_address };
-            // let world = selfie.world();
-            let base_uri: ByteArray = self.erc721_metadata.get_meta().base_uri;
-            format!("{{\"id\":\"{}\",\"image\":\"{}/profiles/00_sq.jpg\"}}",
-                token_id,
-                base_uri,
-            )
+        fn build_uri(self: @ContractState, token_id: u256, encode: bool) -> ByteArray {
+            let duelist: Duelist = get!(self.world(), (token_id), Duelist);
+
+            let attributes: Span<ByteArray> = self.get_attributes(duelist);
+            let metadata = JsonImpl::new()
+                .add("id", format!("{}", token_id))
+                .add("name", self.format_name(token_id, duelist))
+                .add("description", self.format_description(token_id, duelist))
+                .add("image", self.format_image(duelist, "sq"))
+                .add("portrait", self.format_image(duelist, "a"))
+                .add("metadata", self.format_metadata(attributes))
+                .add_array("attributes", self.format_traits_array(attributes));
+            let metadata = metadata.build();
+
+            if (encode) {
+                let base64_encoded_metadata: ByteArray = bytes_base64_encode(metadata);
+                (format!("data:application/json;base64,{}", base64_encoded_metadata))
+            } else {
+                (metadata)
+            }
         }
     }
 
     //-----------------------------------
     // Private
     //
-    // impl TokenDuelistInternalImpl of super::ITokenDuelistInternal<ContractState> {
-    // }
+    #[generate_trait]
+    impl TokenDuelistInternalImpl of TokenDuelistInternalTrait {
+        fn format_name(self: @ContractState, token_id: u256, duelist: Duelist) -> ByteArray {
+            let name: ByteArray = if (duelist.name != '') { duelist.name.to_byte_array() } else { "Duelist" };
+            (format!("{} #{}", name, token_id))
+        }
+        
+        fn format_description(self: @ContractState, token_id: u256, _duelist: Duelist) -> ByteArray {
+            (format!("Pistols at 10 Blocks Duelist #{}", token_id))
+        }
+        
+        fn format_image(self: @ContractState, duelist: Duelist, variant: ByteArray) -> ByteArray {
+            let base_uri: ByteArray = self.erc721_metadata.get_meta().base_uri;
+            let number = if (duelist.profile_pic < 10) {format!("0{}", duelist.profile_pic)} else {format!("{}", duelist.profile_pic)};
+            (format!("{}/profiles/{}_{}.jpg", base_uri, number, variant))
+        }
+
+        // returns: [key1, value1, key2, value2,...]
+        fn get_attributes(self: @ContractState, duelist: Duelist) -> Span<ByteArray> {
+            let mut result: Array<ByteArray> = array![];
+            // Honour
+            result.append("Honour");
+            result.append(ScoreTrait::format_honour(duelist.score.honour));
+            // Archetype
+            let archetype: ByteArray = 
+                if (duelist.score.is_villain()) {"Villain"}
+                else if(duelist.score.is_trickster()) {"Trickster"}
+                else if(duelist.score.is_lord()) {"Honourable"}
+                else {"Undefined"};
+            result.append("Archetype");
+            result.append(format!("{}",archetype));
+            // Levels
+            if (duelist.score.total_duels > 0) {
+                let level: ByteArray = ScoreTrait::format_honour(
+                    if (duelist.score.is_villain()) {duelist.score.level_villain}
+                    else if(duelist.score.is_trickster()) {duelist.score.level_trickster}
+                    else if(duelist.score.is_lord()) {duelist.score.level_lord}
+                    else {0}
+                );
+                result.append("Archetype Level");
+                result.append(format!("{}",level));
+                result.append(format!("{} Level", archetype));
+                result.append(level);
+            }
+            // Totals
+            result.append("Total Duels");
+            result.append(format!("{}", duelist.score.total_duels));
+            if (duelist.score.total_duels > 0) {
+                result.append("Total Wins");
+                result.append(format!("{}", duelist.score.total_wins));
+                result.append("Total Losses");
+                result.append(format!("{}", duelist.score.total_losses));
+                result.append("Total Draws");
+                result.append(format!("{}", duelist.score.total_draws));
+                result.append("Accumulated Honour");
+                result.append(ScoreTrait::format_total_honour(duelist.score.total_honour));
+            }
+            // done!
+            (result.span())
+        }
+
+        fn format_metadata(self: @ContractState, attributes: Span<ByteArray>) -> ByteArray {
+            let mut json = JsonImpl::new();
+            let mut n: usize = 0;
+            loop {
+                if (n >= attributes.len()) { break; }
+                let name = format!("{}",attributes.at(n));
+                let value = format!("{}",attributes.at(n+1));
+                json = json.add(name, value);
+                n += 2;
+            };
+            let result = json.build();
+            (result)
+        }
+
+        fn format_traits_array(self: @ContractState, attributes: Span<ByteArray>) -> Span<ByteArray> {
+            let mut result: Array<ByteArray> = array![];
+            let mut n: usize = 0;
+            loop {
+                if (n >= attributes.len()) { break; }
+                let name = format!("{}",attributes.at(n));
+                let value = format!("{}",attributes.at(n+1));
+                let json = JsonImpl::new()
+                    .add("trait", name)
+                    .add("value", value);
+                result.append(json.build());
+                n += 2;
+            };
+            (result.span())
+        }
+    }
 }
