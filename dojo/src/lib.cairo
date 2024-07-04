@@ -42,7 +42,7 @@ mod utils {
     mod encoding;
     mod hash;
     mod math;
-    mod string;
+    mod short_string;
     mod timestamp;
 }
 

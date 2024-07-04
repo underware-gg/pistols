@@ -91,7 +91,7 @@ mod token_duelist {
     use pistols::models::models::{Duelist, Score, ScoreTrait};
     use pistols::libs::utils::{CONSUME_BYTE_ARRAY};
     use pistols::utils::encoding::bytes_base64_encode;
-    use pistols::utils::string::StringTrait;
+    use pistols::utils::short_string::ShortStringTrait;
     use graffiti::json::JsonImpl;
     use graffiti::{Tag, TagImpl};
 

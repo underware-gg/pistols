@@ -15,7 +15,7 @@ use debug::PrintTrait;
     use pistols::models::models::{init, Round, Shot, Duelist, Score, ScoreTrait};
     use pistols::types::constants::{constants, honour, chances};
     use pistols::types::action::{Action};
-    use pistols::utils::string::{String};
+    use pistols::utils::short_string::{ShortString};
     use pistols::tests::tester::{tester};
 
     fn _lord(level: u8) -> Duelist {

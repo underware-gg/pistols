@@ -29,7 +29,7 @@ mod tester {
     use pistols::models::table::{
         TableConfig, table_config,
     };
-    use pistols::utils::string::{String};
+    use pistols::utils::short_string::{ShortString};
 
     // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
     extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
@@ -285,13 +285,13 @@ mod tester {
     fn assert_balance(ierc20: IERC20Dispatcher, address: ContractAddress, balance_before: u256, subtract: u256, add: u256, prefix: felt252) -> u256 {
         let balance: u256 = ierc20.balance_of(address);
         if (subtract > add) {
-            assert(balance < balance_before, String::concat(prefix, ' <'));
+            assert(balance < balance_before, ShortString::concat(prefix, ' <'));
         } else if (add > subtract) {
-            assert(balance > balance_before, String::concat(prefix, ' >'));
+            assert(balance > balance_before, ShortString::concat(prefix, ' >'));
         } else {
-            assert(balance == balance_before, String::concat(prefix, ' =='));
+            assert(balance == balance_before, ShortString::concat(prefix, ' =='));
         }
-        assert(balance == balance_before - subtract + add, String::concat(prefix, ' =>'));
+        assert(balance == balance_before - subtract + add, ShortString::concat(prefix, ' =>'));
         (balance)
     }
 
@@ -303,14 +303,14 @@ mod tester {
         prefix: felt252,
     ) {
         if (winner == 1) {
-            assert_balance(ierc20, duelist_a, balance_a, fee, wager_value, String::concat('A_A_', prefix));
-            assert_balance(ierc20, duelist_b, balance_b, fee + wager_value, 0, String::concat('A_B_', prefix));
+            assert_balance(ierc20, duelist_a, balance_a, fee, wager_value, ShortString::concat('A_A_', prefix));
+            assert_balance(ierc20, duelist_b, balance_b, fee + wager_value, 0, ShortString::concat('A_B_', prefix));
         } else if (winner == 2) {
-            assert_balance(ierc20, duelist_a, balance_a, fee + wager_value, 0, String::concat('B_A_', prefix));
-            assert_balance(ierc20, duelist_b, balance_b, fee, wager_value, String::concat('B_B_', prefix));
+            assert_balance(ierc20, duelist_a, balance_a, fee + wager_value, 0, ShortString::concat('B_A_', prefix));
+            assert_balance(ierc20, duelist_b, balance_b, fee, wager_value, ShortString::concat('B_B_', prefix));
         } else {
-            assert_balance(ierc20, duelist_a, balance_a, fee, 0, String::concat('D_A_', prefix));
-            assert_balance(ierc20, duelist_b, balance_b, fee, 0, String::concat('D_B_', prefix));
+            assert_balance(ierc20, duelist_a, balance_a, fee, 0, ShortString::concat('D_A_', prefix));
+            assert_balance(ierc20, duelist_b, balance_b, fee, 0, ShortString::concat('D_B_', prefix));
         }
     }
 

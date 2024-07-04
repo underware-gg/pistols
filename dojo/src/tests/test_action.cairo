@@ -8,7 +8,7 @@ mod tests {
     use pistols::models::models::{init, Round, Shot};
     use pistols::types::action::{Action, ActionTrait, ACTION};
     use pistols::types::constants::{constants, chances};
-    use pistols::utils::string::{String};
+    use pistols::utils::short_string::{ShortString};
     use pistols::utils::math::{MathU8};
 
     #[test]
