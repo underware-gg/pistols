@@ -14,13 +14,15 @@ mod tester {
     use pistols::types::challenge::{ChallengeState};
     use pistols::types::constants::{constants};
     use pistols::types::action::{Action};
-    use pistols::models::models::{
-        Duelist, duelist,
-        Scoreboard, scoreboard,
+    use pistols::models::challenge::{
         Challenge, challenge,
         Snapshot, snapshot,
         Wager, wager,
         Round, round,
+    };
+    use pistols::models::duelist::{
+        Duelist, duelist,
+        Scoreboard, scoreboard,
     };
     use pistols::models::config::{
         Config, config,

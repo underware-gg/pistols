@@ -9,7 +9,9 @@ mod tests {
     use starknet::{ContractAddress};
 
     use pistols::libs::utils;
-    use pistols::models::models::{init, Round, Shot, Duelist, Score, ScoreTrait};
+    use pistols::models::challenge::{Round, Shot};
+    use pistols::models::duelist::{Duelist, Score, ScoreTrait};
+    use pistols::models::init::{init};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::action::{ACTION};
 

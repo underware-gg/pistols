@@ -102,7 +102,7 @@ mod tests {
     // use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
     // use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
-    use pistols::models::models::{Round};
+    use pistols::models::challenge::{Round};
     use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::tests::tester::{tester};
 

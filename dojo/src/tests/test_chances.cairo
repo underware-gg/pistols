@@ -12,7 +12,9 @@ use debug::PrintTrait;
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     use pistols::libs::utils;
-    use pistols::models::models::{init, Round, Shot, Duelist, Score, ScoreTrait};
+    use pistols::models::challenge::{Round, Shot};
+    use pistols::models::duelist::{Duelist, Score, ScoreTrait};
+    use pistols::models::init::{init};
     use pistols::types::constants::{constants, honour, chances};
     use pistols::types::action::{Action};
     use pistols::utils::short_string::{ShortString};

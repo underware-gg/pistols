@@ -1,5 +1,6 @@
 use starknet::{ContractAddress};
-use pistols::models::models::{Duelist, Challenge};
+use pistols::models::challenge::{Challenge};
+use pistols::models::duelist::{Duelist};
 use pistols::models::structs::{SimulateChances};
 use pistols::types::challenge::{ChallengeState};
 
@@ -76,7 +77,8 @@ mod actions {
     use traits::{Into, TryInto};
     use starknet::{ContractAddress, get_block_timestamp, get_block_info};
 
-    use pistols::models::models::{Duelist, Score, Challenge, Wager, Pact, Round, Shot};
+    use pistols::models::challenge::{Challenge, Wager, Round, Shot};
+    use pistols::models::duelist::{Duelist, Score, Pact};
     use pistols::models::structs::{SimulateChances};
     use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
     use pistols::models::table::{TableConfig, TableManager, TableTrait, TableManagerTrait, tables};

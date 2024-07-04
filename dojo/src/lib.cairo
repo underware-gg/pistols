@@ -16,8 +16,10 @@ mod libs {
 }
 
 mod models {
+    mod challenge;
     mod config;
-    mod models;
+    mod duelist;
+    mod init;
     mod structs;
     mod table;
     mod token_config;

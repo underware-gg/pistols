@@ -8,7 +8,7 @@ mod tests {
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     use pistols::systems::actions::{IActionsDispatcherTrait};
-    use pistols::models::models::{Duelist};
+    use pistols::models::duelist::{Duelist};
     use pistols::types::constants::{constants};
     use pistols::tests::tester::{tester, tester::{ZERO, OWNER, OTHER, BUMMER, TREASURY}};
 

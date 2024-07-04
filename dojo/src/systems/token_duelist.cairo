@@ -88,7 +88,7 @@ mod token_duelist {
     use starknet::{get_contract_address, get_caller_address};
 
     use pistols::models::token_config::{TokenConfig, TokenConfigTrait};
-    use pistols::models::models::{Duelist, Score, ScoreTrait};
+    use pistols::models::duelist::{Duelist, Score, ScoreTrait};
     use pistols::libs::utils::{CONSUME_BYTE_ARRAY};
     use pistols::utils::byte_arrays::{ByteArraysTrait, U8IntoByteArray, U16IntoByteArray, U32IntoByteArray, U256IntoByteArray, ByteArraySpanIntoByteArray};
     use pistols::utils::short_string::ShortStringTrait;

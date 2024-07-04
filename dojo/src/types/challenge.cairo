@@ -162,7 +162,7 @@ mod tests {
     use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
-    use pistols::models::models::{Challenge};
+    use pistols::models::challenge::{Challenge};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::tests::tester::{tester};
 

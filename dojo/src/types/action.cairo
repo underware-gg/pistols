@@ -1,7 +1,8 @@
 use traits::{Into, PartialOrd};
 use debug::PrintTrait;
 
-use pistols::models::models::{Shot, Duelist, Score, ScoreTrait};
+use pistols::models::challenge::{Shot};
+use pistols::models::duelist::{Duelist, Score, ScoreTrait};
 use pistols::types::constants::{constants, chances};
 use pistols::utils::math::{MathU8};
 

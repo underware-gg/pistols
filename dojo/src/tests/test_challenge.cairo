@@ -7,7 +7,8 @@ mod tests {
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     use pistols::systems::actions::{IActionsDispatcherTrait};
-    use pistols::models::models::{Duelist, Round};
+    use pistols::models::challenge::{Round};
+    use pistols::models::duelist::{Duelist};
     use pistols::models::table::{tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::utils::timestamp::{timestamp};

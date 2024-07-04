@@ -5,7 +5,8 @@ mod tests {
     use core::traits::Into;
     use core::traits::TryInto;
 
-    use pistols::models::models::{init, Round, Shot};
+    use pistols::models::challenge::{Round, Shot};
+    use pistols::models::init::{init};
     use pistols::types::action::{Action, ActionTrait, ACTION};
     use pistols::types::constants::{constants, chances};
     use pistols::utils::short_string::{ShortString};

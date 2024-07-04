@@ -7,7 +7,8 @@ mod shooter {
 
     use pistols::systems::actions::actions::{Errors};
     use pistols::libs::utils;
-    use pistols::models::models::{init, Score, Challenge, Snapshot, Round, Shot, Duelist};
+    use pistols::models::challenge::{Challenge, Snapshot, Round, Shot};
+    use pistols::models::duelist::{Duelist, Score};
     use pistols::types::constants::{constants};
     use pistols::types::challenge::{ChallengeState};
     use pistols::types::round::{RoundState};
@@ -312,7 +313,8 @@ mod tests {
     use core::traits::{Into, TryInto};
 
     use pistols::libs::shooter::{shooter};
-    use pistols::models::models::{init, Shot};
+    use pistols::models::challenge::{Shot};
+    use pistols::models::init::{init};
     use pistols::types::action::{Action, ACTION};
     use pistols::types::constants::{constants};
     use pistols::libs::utils;
