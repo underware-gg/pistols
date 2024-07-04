@@ -16,7 +16,7 @@ use debug::PrintTrait;
     use pistols::types::constants::{constants, honour, chances};
     use pistols::types::action::{Action};
     use pistols::utils::short_string::{ShortString};
-    use pistols::tests::tester::{tester};
+    use pistols::tests::tester::{tester, tester::{ZERO, OWNER, OTHER, BUMMER, TREASURY}};
 
     fn _lord(level: u8) -> Duelist {
         let mut duelist: Duelist = init::Duelist();

@@ -42,6 +42,12 @@ mod tester {
     const INITIAL_TIMESTAMP: u64 = 0x100000000;
     const INITIAL_STEP: u64 = 0x10;
 
+    fn ZERO() -> ContractAddress { starknet::contract_address_const::<0x0>() }
+    fn OWNER() -> ContractAddress { starknet::contract_address_const::<0x111111>() }
+    fn OTHER() -> ContractAddress { starknet::contract_address_const::<0x222>() }
+    fn BUMMER() -> ContractAddress { starknet::contract_address_const::<0x333>() }
+    fn TREASURY() -> ContractAddress { starknet::contract_address_const::<0x444>() }
+
     fn deploy_system(world: IWorldDispatcher, salt: felt252, class_hash: felt252) -> ContractAddress {
         let contract_address = world.deploy_contract(salt, class_hash.try_into().unwrap(), array![].span());
         (contract_address)
@@ -53,10 +59,6 @@ mod tester {
         IAdminDispatcher,
         ILordsMockDispatcher,
         IERC20Dispatcher,
-        ContractAddress,
-        ContractAddress,
-        ContractAddress,
-        ContractAddress,
     ) {
         let mut models = array![
             duelist::TEST_CLASS_HASH,
@@ -74,8 +76,8 @@ mod tester {
         let bummer: ContractAddress = starknet::contract_address_const::<0x333>();
         let treasury: ContractAddress = starknet::contract_address_const::<0x444>();
         // setup testing
-        // testing::set_caller_address(owner);   // not used??
-        testing::set_contract_address(owner); // this is the CALLER!!
+        // testing::set_caller_address(OWNER());   // not used??
+        testing::set_contract_address(OWNER()); // this is the CALLER!!
         testing::set_block_number(1);
         testing::set_block_timestamp(INITIAL_TIMESTAMP);
         // systems
@@ -85,18 +87,18 @@ mod tester {
         let lords = ILordsMockDispatcher{ contract_address: deploy_system(world, 'lords_mock', lords_mock::TEST_CLASS_HASH) };
         let ierc20 = IERC20Dispatcher{ contract_address:lords.contract_address };
         // initializers
-        execute_lords_initializer(lords, owner);
-        execute_lords_faucet(lords, owner);
-        execute_lords_faucet(lords, other);
+        execute_lords_initializer(lords, OWNER());
+        execute_lords_faucet(lords, OWNER());
+        execute_lords_faucet(lords, OTHER());
         if (initialize) {
-            execute_admin_initialize(admin, owner, owner, treasury, lords.contract_address);
+            execute_admin_initialize(admin, OWNER(), OWNER(), TREASURY(), lords.contract_address);
         }
         if (approve) {
-            execute_lords_approve(lords, owner, system.contract_address, 1_000_000 * constants::ETH_TO_WEI);
-            execute_lords_approve(lords, other, system.contract_address, 1_000_000 * constants::ETH_TO_WEI);
-            execute_lords_approve(lords, bummer, system.contract_address, 1_000_000 * constants::ETH_TO_WEI);
+            execute_lords_approve(lords, OWNER(), system.contract_address, 1_000_000 * constants::ETH_TO_WEI);
+            execute_lords_approve(lords, OTHER(), system.contract_address, 1_000_000 * constants::ETH_TO_WEI);
+            execute_lords_approve(lords, BUMMER(), system.contract_address, 1_000_000 * constants::ETH_TO_WEI);
         }
-        (world, system, admin, lords, ierc20, owner, other, bummer, treasury)
+        (world, system, admin, lords, ierc20)
     }
 
     fn elapse_timestamp(delta: u64) -> (u64, u64) {
@@ -173,7 +175,7 @@ mod tester {
         _next_block();
     }
     fn execute_lords_approve(system: ILordsMockDispatcher, owner: ContractAddress, spender: ContractAddress, value: u256) {
-        testing::set_contract_address(owner);
+        testing::set_contract_address(OWNER());
         system.approve(spender, value);
         _next_block();
     }

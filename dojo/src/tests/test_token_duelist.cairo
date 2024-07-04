@@ -136,22 +136,22 @@ fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterD
     world.grant_writer(selector!("TokenConfig"), token.contract_address);
     world.grant_writer(selector!("TokenData"), token.contract_address);
     
-    world.grant_writer(selector!("SRC5Model"), OWNER());
-    world.grant_writer(selector!("InitializableModel"), OWNER());
-    world.grant_writer(selector!("ERC721MetaModel"), OWNER());
-    world.grant_writer(selector!("ERC721TokenApprovalModel"),  OWNER());
-    world.grant_writer(selector!("ERC721BalanceModel"),  OWNER());
-    world.grant_writer(selector!("ERC721EnumerableIndexModel"), OWNER());
-    world.grant_writer(selector!("ERC721EnumerableOwnerIndexModel"), OWNER());
-    world.grant_writer(selector!("ERC721EnumerableTokenModel"), OWNER());
-    world.grant_writer(selector!("ERC721EnumerableOwnerTokenModel"), OWNER());
-    world.grant_writer(selector!("ERC721EnumerableTotalModel"), OWNER());
-    world.grant_writer(selector!("ERC721MetadataModel"),  OWNER());
-    world.grant_writer(selector!("ERC721OwnerModel"),  OWNER());
-    world.grant_writer(selector!("TokenConfig"), OWNER());
-    world.grant_writer(selector!("TokenData"), OWNER());
+    world.grant_writer(selector!("SRC5Model"), OWNER(),);
+    world.grant_writer(selector!("InitializableModel"), OWNER(),);
+    world.grant_writer(selector!("ERC721MetaModel"), OWNER(),);
+    world.grant_writer(selector!("ERC721TokenApprovalModel"),  OWNER(),);
+    world.grant_writer(selector!("ERC721BalanceModel"),  OWNER(),);
+    world.grant_writer(selector!("ERC721EnumerableIndexModel"), OWNER(),);
+    world.grant_writer(selector!("ERC721EnumerableOwnerIndexModel"), OWNER(),);
+    world.grant_writer(selector!("ERC721EnumerableTokenModel"), OWNER(),);
+    world.grant_writer(selector!("ERC721EnumerableOwnerTokenModel"), OWNER(),);
+    world.grant_writer(selector!("ERC721EnumerableTotalModel"), OWNER(),);
+    world.grant_writer(selector!("ERC721MetadataModel"),  OWNER(),);
+    world.grant_writer(selector!("ERC721OwnerModel"),  OWNER(),);
+    world.grant_writer(selector!("TokenConfig"), OWNER(),);
+    world.grant_writer(selector!("TokenData"), OWNER(),);
 
-    utils::impersonate(OWNER());
+    utils::impersonate(OWNER(),);
 
     (world, token, minter)
 }
@@ -179,7 +179,7 @@ fn setup() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterDispatcher) {
 fn test_initializer() {
     let (_world, mut token, mut _minter) = setup();
 
-    assert(token.balance_of(OWNER()) == 2, 'Should eq 2');
+    assert(token.balance_of(OWNER(),) == 2, 'Should eq 2');
     assert(token.name() == "Pistols at 10 Blocks Duelists", 'Name is wrong');
     assert(token.symbol() == "DUELIST", 'Symbol is wrong');
     assert(token.token_uri(TOKEN_ID) != "", 'Uri should not be empty');
@@ -205,7 +205,7 @@ fn test_token_uri() {
 // fn test_initialize_not_world_owner() {
 //     let (_world, mut token, mut minter) = setup_uninitialized();
 
-//     utils::impersonate(OWNER());
+//     utils::impersonate(OWNER(),);
 
 //     // initialize contracts
 //     token.initialize("NAME", "SYMBOL", "URI");
@@ -227,7 +227,7 @@ fn test_initialize_multiple() {
 fn test_approve() {
     let (world, mut token, mut _minter) = setup();
 
-    utils::impersonate(OWNER());
+    utils::impersonate(OWNER(),);
 
     token.approve(SPENDER(), TOKEN_ID);
     assert(token.get_approved(TOKEN_ID) == SPENDER(), 'Spender not approved correctly');
@@ -247,7 +247,7 @@ fn test_approve() {
 fn test_transfer_from() {
     let (world, mut token, mut _minter) = setup();
 
-    utils::impersonate(OWNER());
+    utils::impersonate(OWNER(),);
     token.approve(SPENDER(), TOKEN_ID);
 
     utils::drop_all_events(token.contract_address);
@@ -260,7 +260,7 @@ fn test_transfer_from() {
     assert_only_event_transfer(token.contract_address, OWNER(), RECIPIENT(), TOKEN_ID);
 
     assert(token.balance_of(RECIPIENT()) == 1, 'Should eq 1');
-    assert(token.balance_of(OWNER()) == 1, 'Should eq 1');
+    assert(token.balance_of(OWNER(),) == 1, 'Should eq 1');
     assert(token.get_approved(TOKEN_ID) == ZERO(), 'Should eq 0');
     assert(token.total_supply() == 2, 'Should eq 2');
     assert(token.token_by_index(0) == TOKEN_ID, 'Should eq TOKEN_ID');
@@ -320,7 +320,7 @@ fn test_burn() {
     let (_world, mut token, mut _minter) = setup();
 
     token.burn(TOKEN_ID_2);
-    assert(token.balance_of(OWNER()) == 1, 'invalid balance_of');
+    assert(token.balance_of(OWNER(),) == 1, 'invalid balance_of');
     assert(token.total_supply() == 1, 'invalid total_supply');
     assert(token.token_by_index(0) == TOKEN_ID, 'invalid token_by_index');
     assert(
