@@ -82,7 +82,6 @@ mod tests {
     //
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_challenge_accept_state() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
@@ -114,7 +113,6 @@ mod tests {
     //
 
     #[test]
-    #[available_gas(10_000_000_000)]
     fn test_resolved() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_contract: u256 = lords.balance_of(system.contract_address);
@@ -282,7 +280,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_dual_crit() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_contract: u256 = lords.balance_of(system.contract_address);
@@ -349,7 +346,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_dual_crit_to_trickster_a() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         // A is a trickster, will shoot first
@@ -371,7 +367,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_dual_crit_to_trickster_b() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         // A is a trickster, will shoot first
@@ -393,7 +388,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_early_crit() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);
@@ -413,7 +407,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_late_crit() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);
@@ -433,7 +426,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_dual_hit() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);
@@ -458,7 +450,6 @@ mod tests {
     const test_dual_hit_chance_hit_at_3_paces: u8 = 0x53;
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_dual_hit_penalty_a() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);
@@ -475,7 +466,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_dual_hit_penalty_b() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);
@@ -492,7 +482,6 @@ mod tests {
     }
 
     // #[test]
-    // #[available_gas(1_000_000_000_000)]
     // fn test_dual_hit_find() {
     //     let mut salt: u64 = 0x324ffd23;
     //     loop {
@@ -519,7 +508,6 @@ mod tests {
     // }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_clamp_invalid_paces() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
@@ -539,7 +527,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_register_keep_scores() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
@@ -568,7 +555,6 @@ mod tests {
     //
 
     #[test]
-    #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Not your Challenge', 'ENTRYPOINT_FAILED'))]
     fn test_wrong_player() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
@@ -580,7 +566,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Invalid round number', 'ENTRYPOINT_FAILED'))]
     fn test_wrong_round_number() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
@@ -590,7 +575,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Already committed', 'ENTRYPOINT_FAILED'))]
     fn test_already_commit_a() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
@@ -600,7 +584,6 @@ mod tests {
         tester::execute_commit_action(system, OWNER(), duel_id, 1, hash_a);
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Already committed', 'ENTRYPOINT_FAILED'))]
     fn test_already_commit_b() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
@@ -611,7 +594,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Already revealed', 'ENTRYPOINT_FAILED'))]
     fn test_already_revealed_a() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
@@ -623,7 +605,6 @@ mod tests {
         tester::execute_reveal_action(system, OWNER(), duel_id, 1, salt_a, action_a, 0);
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Already revealed', 'ENTRYPOINT_FAILED'))]
     fn test_already_revealed_b() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
@@ -636,7 +617,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Round not in commit', 'ENTRYPOINT_FAILED'))]
     fn test_not_in_commit() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
@@ -648,7 +628,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Round not in reveal', 'ENTRYPOINT_FAILED'))]
     fn test_not_in_reveal() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
@@ -659,7 +638,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Wrong Challenge state', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_not_started() {
         let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
@@ -672,7 +650,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Wrong Challenge state', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_finished_commit() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
@@ -686,7 +663,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Wrong Challenge state', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_finished_reveal() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
@@ -700,7 +676,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Action hash mismatch', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_hash_action_a() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
@@ -712,7 +687,6 @@ mod tests {
         tester::execute_reveal_action(system, OWNER(), duel_id, 1, 0x111, 2, 0);
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Action hash mismatch', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_hash_salt_a() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
@@ -725,7 +699,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Action hash mismatch', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_hash_action_b() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
@@ -737,7 +710,6 @@ mod tests {
         tester::execute_reveal_action(system, OTHER(), duel_id, 1, 0x222, 2, 0);
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     #[should_panic(expected:('PISTOLS: Action hash mismatch', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_hash_salt_b() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);

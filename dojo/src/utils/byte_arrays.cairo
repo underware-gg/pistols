@@ -71,7 +71,6 @@ mod tests {
     };
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_into() {
         let as_u8: ByteArray = 255_u8.into();
         let as_u16: ByteArray = 65535_u16.into();

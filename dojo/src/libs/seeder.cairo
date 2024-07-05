@@ -31,14 +31,12 @@ mod tests {
     };
 
     #[test]
-    #[available_gas(100_000)]
     fn test__make_block_hash() {
         let h = _make_block_hash();
         assert(h != 0, 'block hash');
     }
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_make_seed() {
         let s0 = make_seed(starknet::contract_address_const::<0x0>(), 1);
         let s1 = make_seed(starknet::contract_address_const::<0x1>(), 1);

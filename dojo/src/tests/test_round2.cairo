@@ -77,7 +77,6 @@ mod tests {
     //
 
     #[test]
-    #[available_gas(10_000_000_000)]
     fn test_blades_round_draw() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER());
@@ -169,7 +168,6 @@ mod tests {
 
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_blades_round_resolved() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER());

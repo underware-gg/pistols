@@ -323,7 +323,6 @@ mod tests {
     use pistols::libs::utils;
 
     #[test]
-    #[available_gas(1_000_000)]
     fn test_apply_damage() {
         let mut attack = init::Shot();
         let mut defense = init::Shot();

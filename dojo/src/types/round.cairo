@@ -107,7 +107,6 @@ mod tests {
     use pistols::tests::tester::{tester};
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_round_exists() {
         let (world, _system, _admin, _lords) = tester::setup_world(false, false, false, true, true);
         // get some random inexisting round

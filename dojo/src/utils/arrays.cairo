@@ -36,7 +36,6 @@ mod tests {
     use super::{ArrayTrait, SpanTrait};
 
     #[test]
-    #[available_gas(10_000_00)]
     fn test_array_contains() {
         let arr0: Array<usize> = array![0, 2, 4];
         let arr1: Array<usize> = array![1, 3, 5];

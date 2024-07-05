@@ -270,7 +270,6 @@ mod tests {
     };
 
     #[test]
-    #[available_gas(50_000_000)]
     fn test_bitwise_bit() {
         let mut bit: u256 = 0x1;
         let mut n: usize = 0;
@@ -315,7 +314,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(300_000)]
     fn test_bitwise_shift_u8() {
         let mut n: usize = 0;
         loop {
@@ -328,7 +326,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000)]
     fn test_bitwise_shift_u16() {
         let mut n: usize = 0;
         loop {
@@ -341,7 +338,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(3_000_000)]
     fn test_bitwise_shift_u32() {
         let mut n: usize = 0;
         loop {
@@ -354,7 +350,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(7_000_000)]
     fn test_bitwise_shift_u64() {
         let mut n: usize = 0;
         loop {
@@ -367,7 +362,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(20_000_000)]
     fn test_bitwise_shift_u128() {
         let mut n: usize = 0;
         loop {
@@ -380,7 +374,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(50_000_000)]
     fn test_bitwise_shift_u256() {
         let mut n: usize = 0;
         loop {
@@ -394,7 +387,6 @@ mod tests {
 
 
     #[test]
-    #[available_gas(1_000_000)]
     fn test_bitwise_set_u8() {
         let ok: u8 = 0x55;
         let mut bitmap: u8 = ok;
@@ -427,7 +419,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(10_000_000)]
     fn test_bitwise_set_u16() {
         let ok: u16 = 0x5555;
         let mut bitmap: u16 = ok;
@@ -460,7 +451,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_bitwise_set_u32() {
         let ok: u32 = 0x55555555;
         let mut bitmap: u32 = ok;
@@ -493,7 +483,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_bitwise_set_u64() {
         let ok: u64 = 0x5555555555555555;
         let mut bitmap: u64 = ok;
@@ -526,7 +515,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(10_000_000_000)]
     fn test_bitwise_set_u128() {
         let ok: u128 = 0x55555555555555555555555555555555;
         let mut bitmap: u128 = ok;
@@ -559,7 +547,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(100_000_000_000)]
     fn test_bitwise_set_u256() {
         let ok: u256 = 0x5555555555555555555555555555555555555555555555555555555555555555;
         let mut bitmap: u256 = ok;
@@ -593,7 +580,6 @@ mod tests {
 
 
     #[test]
-    #[available_gas(1_000_000)]
     fn test_bitwise_count_u8() {
         let full: u8 = 0xff;
         let half: u8 = 0x55;
@@ -603,7 +589,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(10_000_000)]
     fn test_bitwise_count_u16() {
         let full: u16 = 0xffff;
         let half: u16 = 0x5555;
@@ -613,7 +598,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(10_000_000)]
     fn test_bitwise_count_u32() {
         let full: u32 = 0xffffffff;
         let half: u32 = 0x55555555;
@@ -623,7 +607,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(10_000_000)]
     fn test_bitwise_count_u64() {
         let full: u64 = 0xffffffffffffffff;
         let half: u64 = 0x5555555555555555;
@@ -633,7 +616,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_bitwise_count_u128() {
         let full: u128 = 0xffffffffffffffffffffffffffffffff;
         let half: u128 = 0x55555555555555555555555555555555;
@@ -643,7 +625,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_bitwise_count_u256() {
         let full: u256 = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
         let half: u256 = 0x5555555555555555555555555555555555555555555555555555555555555555;

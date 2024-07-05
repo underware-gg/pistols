@@ -332,7 +332,6 @@ mod tests {
     use pistols::utils::math::{MathU8,MathU16,MathU32,MathU128};
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_abs() {
         assert(MathU128::abs(0) == 0, 'abs_0');
         assert(MathU128::abs(1) == 1, 'abs_1');
@@ -344,7 +343,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_min_max() {
         assert(MathU128::min(0,0) == 0, 'min_0,0');
         assert(MathU128::min(0,1) == 0, 'min_0,1');
@@ -360,7 +358,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_clamp() {
         assert(MathU128::clamp(0, 10, 100) == 10, 'clamp_0');
         assert(MathU128::clamp(10, 10, 100) == 10, 'clamp_10');
@@ -370,7 +367,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_sub() {
         assert(MathU8::sub(10, 0) == 10, 'sub_10_0');
         assert(MathU8::sub(10, 2) == 8, 'sub_10_2');
@@ -381,7 +377,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_gdc() {
         assert(MathU8::gdc(4, 4) == 4, 'gdc_4_4');
         assert(MathU8::gdc(4, 2) == 2, 'gdc_4_2');
@@ -395,7 +390,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_pow() {
         assert(MathU128::pow(0,0) == 1, 'test_math_pow_0,0');
         assert(MathU128::pow(0,1) == 0, 'test_math_pow_0,1');
@@ -416,7 +410,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_map() {
         assert(MathU8::map(0, 1, 5, 20, 40) == 20, 'map_0_clamped');
         assert(MathU8::map(1, 1, 5, 20, 40) == 20, 'map_1');

@@ -165,7 +165,6 @@ mod tests {
     use super::{TableAdmittance, TableAdmittanceTrait};
 
     #[test]
-    #[available_gas(10_000_00)]
     fn test_admittance() {
         let table_id: felt252 = 'RoundTable';
         let address_1: ContractAddress = starknet::contract_address_const::<0x111>();

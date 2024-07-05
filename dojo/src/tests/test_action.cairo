@@ -13,7 +13,6 @@ mod tests {
     use pistols::utils::math::{MathU8};
 
     #[test]
-    #[available_gas(1_000_000)]
     fn test_action_to_paces() {
         assert(Action::Idle.into() == 0_u8, 'Action > 0');
         assert(Action::Paces1.into() == 1_u8, 'Action > 1');
@@ -41,7 +40,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_action_is_paces() {
         let mut n: u8 = 0;
         loop {
@@ -64,7 +62,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_action_honour() {
         let mut n: u8 = 0;
         loop {
@@ -91,7 +88,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_action_mask() {
         let mut n: u8 = 0;
         loop {
@@ -114,7 +110,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_roll_priority() {
         let mut duelist = init::Duelist();
         let mut a: u8 = 0;
@@ -145,7 +140,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_roll_priority_trickster() {
         let mut duelist = init::Duelist();
         let mut trickster = init::Duelist();
@@ -160,7 +154,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_paces_priority() {
         assert(Action::Paces1.paces_priority(Action::Paces1) == 0, '1-1');
         assert(Action::Paces1.paces_priority(Action::Paces2) < 0, '1-2');
@@ -179,7 +172,6 @@ mod tests {
     //
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_hit_kill_maps() {
         assert(MathU8::map(1, 1, 10, chances::PISTOLS_KILL_AT_STEP_1, chances::PISTOLS_KILL_AT_STEP_10) == chances::PISTOLS_KILL_AT_STEP_1, 'PISTOLS_KILL_AT_STEP_1');
         assert(MathU8::map(10, 1, 10, chances::PISTOLS_KILL_AT_STEP_1, chances::PISTOLS_KILL_AT_STEP_10) == chances::PISTOLS_KILL_AT_STEP_10, 'PISTOLS_KILL_AT_STEP_10');
@@ -196,7 +188,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_action_chances() {
         assert(Action::Idle.crit_chance() == 0, 'Action::Idle.crit_chance');
         assert(Action::Paces1.crit_chance() == chances::PISTOLS_KILL_AT_STEP_1, 'Action::Paces1.crit_chance');
@@ -227,7 +218,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_calc_lethal_chances_less_than_hit() {
         let mut paces: u8 = 1;
         loop {
@@ -246,7 +236,6 @@ mod tests {
     //
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_execute_crit() {
         let mut attack = init::Shot();
         // Paces1
@@ -273,7 +262,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_execute_hit() {
         let mut attack = init::Shot();
         //

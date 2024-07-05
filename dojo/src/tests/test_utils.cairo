@@ -16,7 +16,6 @@ mod tests {
     use pistols::types::action::{ACTION};
 
     #[test]
-    #[available_gas(1_000_000)]
     fn test_pact_pair() {
         let a: u128 = 0xb5e186ef2e4ab2762367cd07c8f892a1;
         let b: u128 = 0x6b86e40118f29ebe393a75469b4d926c;
@@ -26,7 +25,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000)]
     fn test_pact_pair_self() {
         let p1: u128 = utils::make_pact_pair(1, 1);
         let p2: u128 = utils::make_pact_pair(2, 2);
@@ -38,7 +36,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_check_dice_average() {
         // lower limit
         let mut counter: u8 = 0;
@@ -67,7 +64,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_check_dice_edge() {
         let mut n: felt252 = 0;
         loop {
@@ -82,7 +78,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_validate_packed_actions() {
         assert(utils::validate_packed_actions(1, ACTION::PACES_1.into()) == true, '1_Paces1');
         assert(utils::validate_packed_actions(1, ACTION::PACES_1.into()) == true, '1_Paces1');
@@ -103,7 +98,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_slot_packing_actions() {
         let packed = utils::pack_action_slots(ACTION::SLOW_BLADE, ACTION::FAST_BLADE);
         let (slot1, slot2) = utils::unpack_action_slots(packed);
@@ -112,7 +106,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_slot_packing_round() {
         let mut round = Round {
             duel_id: 1,
@@ -151,7 +144,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_update_score_honour() {
         let mut duelist = init::Duelist();
         duelist.duelist_id = 0x111;
@@ -168,7 +160,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_average_trickster() {
         assert(utils::_average_trickster(100, 0) == 50, '100, 0');
         assert(utils::_average_trickster(100, 50) == 75, '100, 50');
@@ -176,7 +167,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_apply_chance_bonus_penalty_average_trickster() {
         // fn _apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8;
         assert(utils::_apply_chance_bonus_penalty(50, 10, 0) == 60, 'bonus');
@@ -200,7 +190,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_calc_penalty() {
         // fn _calc_penalty(health: u8, penalty_per_damage: u8) -> u8;
         assert(utils::_calc_penalty(3, 10) == 0, 'h_3');
@@ -210,7 +199,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_dice_round3() {
         let seed: felt252 = 'shoot_a';
         let salt_a: u64 = 0x136f23ce20ac7ee1;

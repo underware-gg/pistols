@@ -13,7 +13,6 @@ mod tests {
     use pistols::tests::tester::{tester, tester::{ZERO, OWNER, OTHER, BUMMER, TREASURY}};
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_register_ChallengeTable() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
 
@@ -30,7 +29,6 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_register_challenged() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let player1_name: felt252 = 'Player_ONE';

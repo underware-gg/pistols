@@ -77,7 +77,6 @@ mod tests {
     //
 
 //     #[test]
-//     #[available_gas(10_000_000_000)]
 //     fn match_salt_to_challenge() {
 //         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);
@@ -176,7 +175,6 @@ mod tests {
 
     #[cfg(skip)]
     #[test]
-    #[available_gas(10_000_000_000)]
     fn generate_salts() {
         let mut salt_seed_a: felt252 = 0x10000001;
         let mut salt_seed_b: felt252 = 0x20000002;

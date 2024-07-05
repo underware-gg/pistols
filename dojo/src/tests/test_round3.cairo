@@ -138,7 +138,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     //
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_dices() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
@@ -167,7 +166,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_idle_actions() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
@@ -183,7 +181,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_skip_idle_slot() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
@@ -198,7 +195,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_invalid_actions() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
@@ -217,7 +213,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     //
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_slow_vs_slow_draw() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
@@ -234,7 +229,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
 
     // #[test]
-    // #[available_gas(1_000_000_000)]
     // fn test_slow_vs_slow_suicide_pact() {
     //     let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
     //     let (challenge, round) = _execute_blades(
@@ -251,7 +245,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     // }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_slow_vs_slow_suicide_pact() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
@@ -268,7 +261,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_fast_vs_fast_draw() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
@@ -292,7 +284,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_b.health == constants::SINGLE_DAMAGE, 'bad shot_b.health');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_fast_vs_fast_hit_a() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
@@ -306,7 +297,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_b.health == 0, 'bad health_b');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_fast_vs_fast_crit_a() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
@@ -320,7 +310,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_b.health == 0, 'bad health_b');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_fast_vs_fast_hit_b() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
@@ -334,7 +323,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_b.health == constants::SINGLE_DAMAGE, 'bad health_b');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_fast_vs_fast_crit_b() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
@@ -349,7 +337,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_fast_vs_block_a() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
@@ -380,7 +367,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     //
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_fast_vs_slow_a() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
@@ -394,7 +380,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_b.health == 0, 'bad health_b');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_fast_vs_slow_b() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
@@ -408,7 +393,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_b.health < constants::FULL_HEALTH, 'bad health_b');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_slow_vs_fast_b() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
@@ -422,7 +406,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_b.health == constants::SINGLE_DAMAGE, 'bad health_b');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_slow_vs_fast_a() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
@@ -441,7 +424,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     //
     
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_slow_vs_block_crit_a() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
@@ -456,7 +438,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_b.damage == constants::FULL_HEALTH, 'shot_b.damage');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_block_vs_slow_crit_b() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
@@ -477,7 +458,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     //
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_block_vs_idle() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
@@ -498,7 +478,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_b.block == 0, 'round.shot_b.block');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_idle_vs_block() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
@@ -519,7 +498,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_b.block == 0, 'round.shot_b.block');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_block_vs_block() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (challenge, round) = _execute_blades(
@@ -547,7 +525,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     //
     
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_flee_vs_flee() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_a: u256 = lords.balance_of(OWNER());
@@ -567,7 +544,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         tester::assert_winner_balance(lords, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_flee_win_a() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_a: u256 = lords.balance_of(OWNER());
@@ -591,7 +567,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         tester::assert_winner_balance(lords, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_flee_win_b() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_a: u256 = lords.balance_of(OWNER());
@@ -615,7 +590,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         tester::assert_winner_balance(lords, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_fast_vs_flee_kill_a() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_a: u256 = lords.balance_of(OWNER());
@@ -637,7 +611,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         tester::assert_winner_balance(lords, 1, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_slow_vs_flee_kill_a() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_a: u256 = lords.balance_of(OWNER());
@@ -659,7 +632,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         tester::assert_winner_balance(lords, 1, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_flee_kill_b() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_a: u256 = lords.balance_of(OWNER());
@@ -687,7 +659,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     // Steal
     //
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_steal_vs_flee() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_a: u256 = lords.balance_of(OWNER());
@@ -706,7 +677,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         tester::assert_winner_balance(lords, 1, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_flee_vs_steal() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_a: u256 = lords.balance_of(OWNER());
@@ -727,7 +697,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     //
     // face-off
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_steal_vs_steal() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_a: u256 = lords.balance_of(OWNER());
@@ -749,7 +718,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         tester::assert_winner_balance(lords, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_steal_win_a() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_a: u256 = lords.balance_of(OWNER());
@@ -773,7 +741,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         tester::assert_winner_balance(lords, 2, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_steal_win_b() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_a: u256 = lords.balance_of(OWNER());
@@ -797,7 +764,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         tester::assert_winner_balance(lords, 1, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_slow_vs_steal_kill_a() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_a: u256 = lords.balance_of(OWNER());
@@ -819,7 +785,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         tester::assert_winner_balance(lords, 1, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_steal_kill_b() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_a: u256 = lords.balance_of(OWNER());
@@ -847,7 +812,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     // Seppuku
     //
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_seppuku_vs_seppuku() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_a: u256 = lords.balance_of(OWNER());
@@ -868,7 +832,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         tester::assert_winner_balance(lords, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_seppuku_vs_slow_b() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_a: u256 = lords.balance_of(OWNER());
@@ -889,7 +852,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         tester::assert_winner_balance(lords, 2, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_seppuku_vs_fast_b() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_a: u256 = lords.balance_of(OWNER());
@@ -910,7 +872,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         tester::assert_winner_balance(lords, 2, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_fast_vs_seppuku_a() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_a: u256 = lords.balance_of(OWNER());
@@ -931,7 +892,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         tester::assert_winner_balance(lords, 1, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_seppuku_vs_flee() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_a: u256 = lords.balance_of(OWNER());
@@ -952,7 +912,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         tester::assert_winner_balance(lords, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_seppuku_vs_steal() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_a: u256 = lords.balance_of(OWNER());
@@ -973,7 +932,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         tester::assert_winner_balance(lords, 2, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_flee_vs_seppuku() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_a: u256 = lords.balance_of(OWNER());
@@ -994,7 +952,6 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         tester::assert_winner_balance(lords, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
     }
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_steal_vs_seppuku_vs() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let balance_a: u256 = lords.balance_of(OWNER());

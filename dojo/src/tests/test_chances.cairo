@@ -44,7 +44,6 @@ use debug::PrintTrait;
     //
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_calc_level_villain() {
         assert(utils::calc_level_villain(0) == honour::LEVEL_MAX, 'honour_0');
         assert(utils::calc_level_villain(honour::VILLAIN_START) == honour::LEVEL_MAX, 'ARCH_VILLAIN_START');
@@ -56,7 +55,6 @@ use debug::PrintTrait;
     }
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_calc_level_lord() {
         assert(utils::calc_level_lord(0) == 0, 'honour_0');
         assert(utils::calc_level_lord(honour::LORD_START-1) == 0, 'ARCH_LORD_START-1');
@@ -74,7 +72,6 @@ use debug::PrintTrait;
     }
 
     #[test]
-    #[available_gas(100_000_000)]
     fn test_calc_level_trickster() {
         
         assert(utils::calc_level_trickster(10, 100) == 0, 'honour_10');
@@ -101,7 +98,6 @@ use debug::PrintTrait;
     //
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_calc_crit_bonus() {
         let mut lord: Duelist = _lord(100);
         assert(lord.score.is_lord(), 'is_lord()');
@@ -147,7 +143,6 @@ use debug::PrintTrait;
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_calc_hit_bonus() {
         //
         // levels
@@ -189,7 +184,6 @@ use debug::PrintTrait;
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_calc_crit_chances() {
         //
         // no bonus
@@ -241,7 +235,6 @@ use debug::PrintTrait;
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_calc_hit_chances() {
         //
         // no bonus
@@ -293,7 +286,6 @@ use debug::PrintTrait;
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_early_late_bonus() {
         let mut lord: Duelist = _lord(100);
         let mut villain: Duelist = _villain(100);
@@ -321,7 +313,6 @@ use debug::PrintTrait;
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_trickster_hit_penalty() {
         let mut lord: Duelist = _lord(100);
         let mut villain: Duelist = _villain(100);
@@ -354,7 +345,6 @@ use debug::PrintTrait;
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_lord_lethal_chances() {
         let mut lord: Duelist = _lord(100);
         let mut villain: Duelist = _villain(100);
@@ -401,7 +391,6 @@ use debug::PrintTrait;
     }
 
     #[test]
-    #[available_gas(1_000_000_000)]
     fn test_calc_lethal_hit_sync() {
         //
         // no bonus

@@ -52,7 +52,6 @@ mod tests {
     use super::{ShortString};
     
     #[test]
-    #[available_gas(100_000_000)]
     fn test_string_concat() {
         assert(ShortString::concat('ABC', '123') == 'ABC123', 'ABC123');
         assert(ShortString::concat('Hello ', 'World') == 'Hello World', 'Hello 1');
@@ -63,7 +62,6 @@ mod tests {
     }
     
     #[test]
-    #[available_gas(100_000_000)]
     fn test_to_byte_array() {
         assert(''.to_byte_array() == "", 'not empty');
         assert('1'.to_byte_array() == "1", 'not 1');
