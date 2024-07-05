@@ -60,7 +60,7 @@ mod tester {
     #[inline(always)]
     fn BIG_BOY() -> ContractAddress { starknet::contract_address_const::<0x54f650fb5e1fb61d7b429ae728a365b69e5aff9a559a05de70f606aaea1a243>() }
     #[inline(always)]
-    fn LITTLE_BOY() -> ContractAddress { starknet::contract_address_const::<0xb5e186ef2e4ab2762367cd07c8f892a1>() }
+    fn LITTLE_BOY() -> ContractAddress { starknet::contract_address_const::<0xffff00000000000ee>() }
 
     #[inline(always)]
     fn ID(address: ContractAddress) -> u128 {
@@ -252,6 +252,16 @@ mod tester {
     ) -> ChallengeState {
         impersonate(sender);
         let new_state: ChallengeState = system.reply_challenge(ID(sender), duel_id, accepted);
+        _next_block();
+        (new_state)
+    }
+    fn execute_reply_challenge_id(system: IActionsDispatcher, sender: ContractAddress,
+        duel_id: u128,
+        token_id: u128,
+        accepted: bool,
+    ) -> ChallengeState {
+        impersonate(sender);
+        let new_state: ChallengeState = system.reply_challenge(token_id, duel_id, accepted);
         _next_block();
         (new_state)
     }

@@ -269,8 +269,8 @@ mod actions {
             assert(state.exists(), Errors::INVALID_CHALLENGE);
             assert(state == ChallengeState::Awaiting, Errors::CHALLENGE_WRONG_STATE);
 
-            let duelist_id_b: u128 = duelist_id;
             let address_b: ContractAddress = starknet::get_caller_address();
+            let duelist_id_b: u128 = duelist_id;
             let timestamp: u64 = get_block_timestamp();
 
             if (challenge.timestamp_end > 0 && timestamp > challenge.timestamp_end) {
@@ -284,6 +284,9 @@ mod actions {
             } else {
                 // validate duelist ownership
                 let duelist_manager = DuelistManagerTrait::new(world);
+// address_b.print();
+// duelist_id_b.print();
+// duelist_manager.owner_of(duelist_id_b).print();
                 assert(duelist_manager.is_owner_of(address_b, duelist_id_b) == true, Errors::NOT_DUELIST_OWNER);
 
                 // validate challenged identity
@@ -291,12 +294,13 @@ mod actions {
                 if (challenge.duelist_id_b != 0) {
                     // challenged the duelist
                     assert(challenge.duelist_id_b == duelist_id_b, Errors::NOT_YOUR_CHALLENGE);
-                    // assert(self.has_pact(challenge.duelist_id_a, duelist_id_b) == false, Errors::CHALLENGE_EXISTS);
                     // fill missing wallet
                     challenge.address_b = address_b;
                 } else {
                     // challenged the wallet
                     assert(challenge.address_b == address_b, Errors::NOT_YOUR_CHALLENGE);
+                    // check if chosed duelist has a pact
+                    assert(self.has_pact(challenge.duelist_id_a, duelist_id_b) == false, Errors::CHALLENGE_EXISTS);
                     // fil missing duelist
                     challenge.duelist_id_b = duelist_id_b;
                 }

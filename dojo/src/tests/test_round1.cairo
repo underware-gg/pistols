@@ -18,7 +18,7 @@ mod tests {
     use pistols::libs::utils::{make_action_hash};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::math::{MathU8};
-    use pistols::tests::tester::{tester, tester::{ZERO, OWNER, OTHER, BUMMER, TREASURY, ID}};
+    use pistols::tests::tester::{tester, tester::{ZERO, OWNER, OTHER, BUMMER, TREASURY, BIG_BOY, LITTLE_BOY, ID}};
 
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
@@ -82,31 +82,128 @@ mod tests {
     //
 
     #[test]
-    fn test_challenge_accept_state() {
+    fn test_challenge_accept_to_duelist() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
-        tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
-        tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 2);
-        assert(system.has_pact(ID(OTHER()), ID(OWNER())) == false, 'has_pact_no');
+        // tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
+        // tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 2);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        assert(system.has_pact(ID(A), ID(B)) == false, 'has_pact_no_1');
+        assert(system.has_pact(ID(B), ID(A)) == false, 'has_pact_no_2');
 
         let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_seconds);
-        let _ch = tester::get_Challenge(world, duel_id);
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        let ch = tester::get_Challenge(world, duel_id);
+        assert(ch.state == ChallengeState::Awaiting.into(), 'state');
+        assert(ch.address_a == A, 'challenged');
+        assert(ch.address_b == ZERO(), 'challenger');   // challenged an id, address is empty
+        assert(ch.duelist_id_a == ID(A), 'challenger_id');
+        assert(ch.duelist_id_b == ID(B), 'challenged_id');
+
+        // reply...
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
-        let new_state: ChallengeState = tester::execute_reply_challenge(system, OTHER(), duel_id, true);
+        let new_state: ChallengeState = tester::execute_reply_challenge(system, B, duel_id, true);
         assert(new_state == ChallengeState::InProgress, 'in_progress');
-        assert(system.has_pact(ID(OTHER()), ID(OWNER())) == true, 'has_pact_yes');
+        assert(system.has_pact(ID(A), ID(B)) == true, 'has_pact_yes_1');
+        assert(system.has_pact(ID(B), ID(A)) == true, 'has_pact_yes_2');
 
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');
         assert(ch.round_number == 1, 'round_number');
         assert(ch.timestamp_start == timestamp, 'timestamp_start');
         assert(ch.timestamp_end == 0, 'timestamp_end');
+        assert(ch.address_b == B, 'challenger');   // << UPDATED!!!
         
         let round: Round = tester::get_Round(world, duel_id, 1);
         assert(round.duel_id == duel_id, 'round.duel_id');
         assert(round.round_number == 1, 'round.round_number');
         assert(round.state == RoundState::Commit.into(), 'round.state');
     }
+
+    #[test]
+    fn test_challenge_accept_to_address() {
+        let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = LITTLE_BOY();
+        assert(system.has_pact(ID(A), ID(B)) == false, 'has_pact_no_1');
+        assert(system.has_pact(ID(B), ID(A)) == false, 'has_pact_no_2');
+
+        let expire_seconds: u64 = timestamp::from_days(2);
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        let ch = tester::get_Challenge(world, duel_id);
+        assert(ch.state == ChallengeState::Awaiting.into(), 'state');
+        assert(ch.address_a == A, 'challenged');
+        assert(ch.address_b == B, 'challenger');
+        assert(ch.duelist_id_a == ID(A), 'challenger_id');
+        assert(ch.duelist_id_b == 0, 'challenged_id'); // challenged an address, id is empty
+        // fund account
+        tester::execute_lords_faucet(lords, B);
+        tester::execute_lords_approve(lords, B, system.contract_address, 1_000_000 * constants::ETH_TO_WEI);
+        // reply...
+        let new_state: ChallengeState = tester::execute_reply_challenge(system, B, duel_id, true);
+        assert(new_state == ChallengeState::InProgress, 'in_progress');
+        assert(system.has_pact(ID(A), ID(B)) == true, 'has_pact_yes_1');
+        assert(system.has_pact(ID(B), ID(A)) == true, 'has_pact_yes_2');
+        let ch = tester::get_Challenge(world, duel_id);
+        assert(ch.duelist_id_b == ID(B), 'challenged_id');   // << UPDATED!!!
+    }
+
+    #[test]
+    #[should_panic(expected:('PISTOLS: Not your duelist', 'ENTRYPOINT_FAILED'))]
+    fn test_reply_wrong_duelist() {
+        let (_world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let expire_seconds: u64 = timestamp::from_days(2);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER(); // challenge a duelist
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        // reply with different TOKEN ID
+        let _new_state: ChallengeState = tester::execute_reply_challenge_id(system, B, duel_id, 0xaaa, true);
+    }
+
+    #[test]
+    #[should_panic(expected:('PISTOLS: Not your Challenge', 'ENTRYPOINT_FAILED'))]
+    fn test_reply_wrong_player_address() {
+        let (_world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let expire_seconds: u64 = timestamp::from_days(2);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = LITTLE_BOY(); // challenge a wallet
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        // reply with different TOKEN ID
+        let another_boy: ContractAddress = starknet::contract_address_const::<0xaaaa00000000000aa>();
+        let _new_state: ChallengeState = tester::execute_reply_challenge(system, another_boy, duel_id, true);
+    }
+
+    #[test]
+    #[should_panic(expected:('PISTOLS: Not your Challenge', 'ENTRYPOINT_FAILED'))]
+    fn test_reply_wrong_player_duelist() {
+        let (_world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let expire_seconds: u64 = timestamp::from_days(2);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER(); // challenge a duelist
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        // reply with different TOKEN ID
+        let _new_state: ChallengeState = tester::execute_reply_challenge(system, BUMMER(), duel_id, true);
+    }
+
+    #[test]
+    #[should_panic(expected:('PISTOLS: Challenge exists', 'ENTRYPOINT_FAILED'))]
+    fn test_reply_has_pact() {
+        let (_world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let expire_seconds: u64 = timestamp::from_days(2);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = LITTLE_BOY(); // challenge a wallet
+        // fund account
+        tester::execute_lords_faucet(lords, B);
+        tester::execute_lords_approve(lords, B, system.contract_address, 1_000_000 * constants::ETH_TO_WEI);
+        // new challenge
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        let _new_state: ChallengeState = tester::execute_reply_challenge(system, B, duel_id, true);
+        // new challenge
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        let _new_state: ChallengeState = tester::execute_reply_challenge(system, B, duel_id, true);
+    }
+
+
 
     //-----------------------------------------
     // Single Round (paces only)
@@ -551,12 +648,12 @@ mod tests {
     }    
     
     //-------------------------------
-    // Fails
+    // Commit/Revela Fails
     //
 
     #[test]
     #[should_panic(expected:('PISTOLS: Not your Challenge', 'ENTRYPOINT_FAILED'))]
-    fn test_wrong_player() {
+    fn test_commit_wrong_player_to_duelist() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         // try to commmit with another account
@@ -566,8 +663,18 @@ mod tests {
     }
 
     #[test]
+    #[should_panic(expected:('PISTOLS: Not your Challenge', 'ENTRYPOINT_FAILED'))]
+    fn test_commit_wrong_player_to_address() {
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
+        let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
+        // try to commmit with another account
+        let hash: u64 = make_action_hash(0x12121, 0x1);
+        tester::execute_commit_action(system, LITTLE_BOY(), duel_id, 1, hash);
+    }
+
+    #[test]
     #[should_panic(expected:('PISTOLS: Invalid round number', 'ENTRYPOINT_FAILED'))]
-    fn test_wrong_round_number() {
+    fn test_commit_wrong_round_number() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let hash: u64 = make_action_hash(0x12121, 0x1);
@@ -576,7 +683,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected:('PISTOLS: Already committed', 'ENTRYPOINT_FAILED'))]
-    fn test_already_commit_a() {
+    fn test_commit_already_commit_a() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let (_salt_a, _salt_b, _action_a, _action_b, hash_a, _hash_b) = _get_actions_round_1_resolved();
@@ -585,7 +692,7 @@ mod tests {
     }
     #[test]
     #[should_panic(expected:('PISTOLS: Already committed', 'ENTRYPOINT_FAILED'))]
-    fn test_already_commit_b() {
+    fn test_commit_already_commit_b() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let (_salt_a, _salt_b, _action_a, _action_b, _hash_a, hash_b) = _get_actions_round_1_resolved();
@@ -595,7 +702,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected:('PISTOLS: Already revealed', 'ENTRYPOINT_FAILED'))]
-    fn test_already_revealed_a() {
+    fn test_reveal_already_revealed_a() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let (salt_a, _salt_b, action_a, _action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
@@ -606,7 +713,7 @@ mod tests {
     }
     #[test]
     #[should_panic(expected:('PISTOLS: Already revealed', 'ENTRYPOINT_FAILED'))]
-    fn test_already_revealed_b() {
+    fn test_reveal_already_revealed_b() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let (_salt_a, salt_b, _action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
@@ -618,7 +725,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected:('PISTOLS: Round not in commit', 'ENTRYPOINT_FAILED'))]
-    fn test_not_in_commit() {
+    fn test_reveal_not_in_commit() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let (_salt_a, _salt_b, _action_a, _action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
@@ -629,7 +736,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected:('PISTOLS: Round not in reveal', 'ENTRYPOINT_FAILED'))]
-    fn test_not_in_reveal() {
+    fn test_reveal_not_in_reveal() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let (_salt_a, salt_b, _action_a, action_b, _hash_a, hash_b) = _get_actions_round_1_resolved();
@@ -639,7 +746,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected:('PISTOLS: Wrong Challenge state', 'ENTRYPOINT_FAILED'))]
-    fn test_challenge_not_started() {
+    fn test_reveal_challenge_not_started() {
         let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let expire_seconds: u64 = timestamp::from_days(2);
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_seconds);
@@ -649,7 +756,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected:('PISTOLS: Wrong Challenge state', 'ENTRYPOINT_FAILED'))]
-    fn test_challenge_finished_commit() {
+    fn test_commit_challenge_finished_commit() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
@@ -662,7 +769,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected:('PISTOLS: Wrong Challenge state', 'ENTRYPOINT_FAILED'))]
-    fn test_challenge_finished_reveal() {
+    fn test_reveal_challenge_finished_reveal() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
@@ -675,7 +782,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected:('PISTOLS: Action hash mismatch', 'ENTRYPOINT_FAILED'))]
-    fn test_invalid_hash_action_a() {
+    fn test_reveal_invalid_hash_action_a() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let hash_a: u64 = make_action_hash(0x111, 1);
@@ -686,7 +793,7 @@ mod tests {
     }
     #[test]
     #[should_panic(expected:('PISTOLS: Action hash mismatch', 'ENTRYPOINT_FAILED'))]
-    fn test_invalid_hash_salt_a() {
+    fn test_reveal_invalid_hash_salt_a() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let hash_a: u64 = make_action_hash(0x111, 1);
@@ -698,7 +805,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected:('PISTOLS: Action hash mismatch', 'ENTRYPOINT_FAILED'))]
-    fn test_invalid_hash_action_b() {
+    fn test_reveal_invalid_hash_action_b() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let hash_a: u64 = make_action_hash(0x111, 1);
@@ -709,7 +816,7 @@ mod tests {
     }
     #[test]
     #[should_panic(expected:('PISTOLS: Action hash mismatch', 'ENTRYPOINT_FAILED'))]
-    fn test_invalid_hash_salt_b() {
+    fn test_reveal_invalid_hash_salt_b() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         let hash_a: u64 = make_action_hash(0x111, 1);

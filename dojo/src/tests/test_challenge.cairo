@@ -61,7 +61,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected:('PISTOLS: Challenge exists', 'ENTRYPOINT_FAILED'))]
-    fn test_CHALLENGE_EXISTS() {
+    fn test_challenge_exists() {
         let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
         tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
@@ -71,7 +71,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected:('PISTOLS: Challenge exists', 'ENTRYPOINT_FAILED'))]
-    fn test_CHALLENGE_EXISTS_from_challenged() {
+    fn test_challenge_exists_from_challenged() {
         let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
         tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
@@ -83,7 +83,6 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Invalid expiry', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_expiry() {
         let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
-        tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
         let expire_seconds: u64 = 60 * 60 - 1;
         let _duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_seconds);
     }
@@ -91,7 +90,6 @@ mod tests {
     #[test]
     fn test_challenge_to_address() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
-        tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
         let timestamp = tester::get_block_timestamp();
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), BIG_BOY(), MESSAGE_1, TABLE_ID, 0, 0);
         let ch = tester::get_Challenge(world, duel_id);
@@ -108,7 +106,6 @@ mod tests {
     #[test]
     fn test_challenge_to_duelist() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
-        tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 0);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'state');
@@ -121,7 +118,6 @@ mod tests {
     #[test]
     fn test_challenge_expire_ok() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
-        tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
         let expire_seconds: u64 = 24 * 60 * 60;
         let timestamp = tester::get_block_timestamp();
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_seconds);

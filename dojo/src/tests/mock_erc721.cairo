@@ -20,6 +20,7 @@ mod mock_erc721 {
         fn owner_of(world: @IWorldDispatcher, token_id: u256) -> ContractAddress {
             WORLD(world);
             let as_felt: felt252 = token_id.low.into();
+// token_id.low.print();
             (as_felt.try_into().unwrap())
         }
     }
