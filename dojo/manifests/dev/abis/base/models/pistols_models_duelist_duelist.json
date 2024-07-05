@@ -377,16 +377,20 @@
         "type": "core::felt252"
       },
       {
-        "name": "profile_pic",
-        "type": "core::integer::u8"
+        "name": "profile_pic_uri",
+        "type": "core::byte_array::ByteArray"
       },
       {
-        "name": "score",
-        "type": "pistols::models::duelist::Score"
+        "name": "profile_pic_type",
+        "type": "core::integer::u8"
       },
       {
         "name": "timestamp",
         "type": "core::integer::u64"
+      },
+      {
+        "name": "score",
+        "type": "pistols::models::duelist::Score"
       }
     ]
   },

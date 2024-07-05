@@ -116,6 +116,10 @@
         "name": "mint",
         "inputs": [
           {
+            "name": "to",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
             "name": "token_contract_address",
             "type": "core::starknet::contract_address::ContractAddress"
           }

@@ -61,11 +61,11 @@ export function defineContractComponents(world: World) {
     Config: (() => {
       return defineComponent(
         world,
-        { key: RecsType.Number, initialized: RecsType.Boolean, owner_address: RecsType.BigInt, treasury_address: RecsType.BigInt, duelists_address: RecsType.BigInt, paused: RecsType.Boolean },
+        { key: RecsType.Number, initialized: RecsType.Boolean, owner_address: RecsType.BigInt, treasury_address: RecsType.BigInt, token_duelist_address: RecsType.BigInt, minter_address: RecsType.BigInt, paused: RecsType.Boolean },
         {
           metadata: {
             name: "Config",
-            types: ["u8","bool","contractaddress","contractaddress","contractaddress","bool"],
+            types: ["u8","bool","contractaddress","contractaddress","contractaddress","contractaddress","bool"],
             customTypes: [],
           },
         }
@@ -74,11 +74,11 @@ export function defineContractComponents(world: World) {
     Duelist: (() => {
       return defineComponent(
         world,
-        { duelist_id: RecsType.BigInt, name: RecsType.BigInt, profile_pic: RecsType.Number, score: { honour: RecsType.Number, level_villain: RecsType.Number, level_trickster: RecsType.Number, level_lord: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, total_honour: RecsType.Number }, timestamp: RecsType.BigInt },
+        { duelist_id: RecsType.BigInt, name: RecsType.BigInt, profile_pic_uri: RecsType.String, profile_pic_type: RecsType.Number, timestamp: RecsType.BigInt, score: { honour: RecsType.Number, level_villain: RecsType.Number, level_trickster: RecsType.Number, level_lord: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, total_honour: RecsType.Number } },
         {
           metadata: {
             name: "Duelist",
-            types: ["u128","felt252","u8","u8","u8","u8","u8","u16","u16","u16","u16","u32","u64"],
+            types: ["u128","felt252","u8","u64","u8","u8","u8","u8","u16","u16","u16","u16","u32"],
             customTypes: ["Score"],
           },
         }
@@ -139,11 +139,11 @@ export function defineContractComponents(world: World) {
     TokenConfig: (() => {
       return defineComponent(
         world,
-        { token_address: RecsType.BigInt, minter_address: RecsType.BigInt, max_supply: RecsType.Number, max_per_wallet: RecsType.Number, is_open: RecsType.Boolean },
+        { token_address: RecsType.BigInt, minter_address: RecsType.BigInt, max_supply: RecsType.Number, max_per_wallet: RecsType.Number, minted_count: RecsType.Number, is_open: RecsType.Boolean },
         {
           metadata: {
             name: "TokenConfig",
-            types: ["contractaddress","contractaddress","u16","u16","bool"],
+            types: ["contractaddress","contractaddress","u16","u16","u16","bool"],
             customTypes: [],
           },
         }

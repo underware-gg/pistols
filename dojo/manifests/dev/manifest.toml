@@ -35,8 +35,8 @@ name = "pistols::mocks::lords_mock::lords_mock"
 [[contracts]]
 kind = "DojoContract"
 address = "0x30663cb812dc7e2930b9683945132ca6054483af40e1e7daccb77091e02e7b1"
-class_hash = "0x1a157b64290303669552fb1e84cb7f3afe2e8b3a33292733eade42e9fd37a5d"
-original_class_hash = "0x1a157b64290303669552fb1e84cb7f3afe2e8b3a33292733eade42e9fd37a5d"
+class_hash = "0x38a3992861753cd1b7ab457990771dd9e815c6a021f8c9e6e08aacfd26bbbbe"
+original_class_hash = "0x38a3992861753cd1b7ab457990771dd9e815c6a021f8c9e6e08aacfd26bbbbe"
 base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
 abi = "manifests/dev/abis/deployments/contracts/pistols_systems_actions_actions.json"
 reads = []
@@ -48,8 +48,8 @@ name = "pistols::systems::actions::actions"
 [[contracts]]
 kind = "DojoContract"
 address = "0x725717f8ac5508bb1b6dfbf53949f20b7f38f59c7310feab688cb5f18ef0635"
-class_hash = "0x5d165b4aa5592c789f1f356300242cb3d93ca25a337735c9974e1906cc5c005"
-original_class_hash = "0x5d165b4aa5592c789f1f356300242cb3d93ca25a337735c9974e1906cc5c005"
+class_hash = "0xa7cb19170f019c122d8da04214a8a5c885b0b5f5c19fe96c9ea56acaf7506a"
+original_class_hash = "0xa7cb19170f019c122d8da04214a8a5c885b0b5f5c19fe96c9ea56acaf7506a"
 base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
 abi = "manifests/dev/abis/deployments/contracts/pistols_systems_admin_admin.json"
 reads = []
@@ -61,8 +61,8 @@ name = "pistols::systems::admin::admin"
 [[contracts]]
 kind = "DojoContract"
 address = "0x54a9565eedc4904d5e2fa4beeff5e713b1fd23b95286287daf29570b227dfcb"
-class_hash = "0x1cb976835b2fabc9246f44d524c5138514485d13b504767725b67fc728cb0b5"
-original_class_hash = "0x1cb976835b2fabc9246f44d524c5138514485d13b504767725b67fc728cb0b5"
+class_hash = "0x52d5ad475e9b61d4dc9b47962f9bc1e218a9419cee1e2898a7ff1706cc69715"
+original_class_hash = "0x52d5ad475e9b61d4dc9b47962f9bc1e218a9419cee1e2898a7ff1706cc69715"
 base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
 abi = "manifests/dev/abis/deployments/contracts/pistols_systems_minter_minter.json"
 reads = []
@@ -79,8 +79,8 @@ name = "pistols::systems::minter::minter"
 [[contracts]]
 kind = "DojoContract"
 address = "0x774e613f68f731df522253c22bce0f77549afc8203d0cfec5086d2ee2a992d6"
-class_hash = "0x207dfa75b727657355d13147ab9afbaac4d854db21344c77c46749a576d1872"
-original_class_hash = "0x207dfa75b727657355d13147ab9afbaac4d854db21344c77c46749a576d1872"
+class_hash = "0x2df4cdc08dbd87c82f644bfb2d6dd6f5fe4db24c1440bdf71ce27f808743385"
+original_class_hash = "0x2df4cdc08dbd87c82f644bfb2d6dd6f5fe4db24c1440bdf71ce27f808743385"
 base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
 abi = "manifests/dev/abis/deployments/contracts/pistols_systems_token_duelist_token_duelist.json"
 reads = []
@@ -234,8 +234,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x6b416c5ac7ad1dad71849ec5fa279e08b78a9ad8a45ffe0832f8dff6888bdc1"
-original_class_hash = "0x6b416c5ac7ad1dad71849ec5fa279e08b78a9ad8a45ffe0832f8dff6888bdc1"
+class_hash = "0x5404fc2c06faaf521c57423b176ed8e8059d405f2ffa2878603aed509e447d9"
+original_class_hash = "0x5404fc2c06faaf521c57423b176ed8e8059d405f2ffa2878603aed509e447d9"
 abi = "manifests/dev/abis/deployments/models/pistols_models_config_config.json"
 name = "pistols::models::config::config"
 
@@ -260,7 +260,12 @@ type = "ContractAddress"
 key = false
 
 [[models.members]]
-name = "duelists_address"
+name = "token_duelist_address"
+type = "ContractAddress"
+key = false
+
+[[models.members]]
+name = "minter_address"
 type = "ContractAddress"
 key = false
 
@@ -271,8 +276,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x14540eed9e7d7bcb94ed3f0ff139e343baa7b1fff2f0b8d55d8128862c0d73e"
-original_class_hash = "0x14540eed9e7d7bcb94ed3f0ff139e343baa7b1fff2f0b8d55d8128862c0d73e"
+class_hash = "0x7d0b6654aac1d1760255c46595980390e6d30d6240297e04dbf4340c4bf906a"
+original_class_hash = "0x7d0b6654aac1d1760255c46595980390e6d30d6240297e04dbf4340c4bf906a"
 abi = "manifests/dev/abis/deployments/models/pistols_models_duelist_duelist.json"
 name = "pistols::models::duelist::duelist"
 
@@ -287,18 +292,23 @@ type = "felt252"
 key = false
 
 [[models.members]]
-name = "profile_pic"
-type = "u8"
+name = "profile_pic_uri"
+type = "ByteArray"
 key = false
 
 [[models.members]]
-name = "score"
-type = "Score"
+name = "profile_pic_type"
+type = "u8"
 key = false
 
 [[models.members]]
 name = "timestamp"
 type = "u64"
+key = false
+
+[[models.members]]
+name = "score"
+type = "Score"
 key = false
 
 [[models]]
@@ -421,8 +431,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x216ef76502ad59802f36de3d6c0e612e35545f3017581a48e941eb6f754ae97"
-original_class_hash = "0x216ef76502ad59802f36de3d6c0e612e35545f3017581a48e941eb6f754ae97"
+class_hash = "0x3167d741defc4e983ce1cbd9f9a04fe9f4564863a345469bf8b0cbac37e570f"
+original_class_hash = "0x3167d741defc4e983ce1cbd9f9a04fe9f4564863a345469bf8b0cbac37e570f"
 abi = "manifests/dev/abis/deployments/models/pistols_models_token_config_token_config.json"
 name = "pistols::models::token_config::token_config"
 
@@ -443,6 +453,11 @@ key = false
 
 [[models.members]]
 name = "max_per_wallet"
+type = "u16"
+key = false
+
+[[models.members]]
+name = "minted_count"
 type = "u16"
 key = false
 

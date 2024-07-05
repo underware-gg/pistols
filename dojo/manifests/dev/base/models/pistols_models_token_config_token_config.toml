@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x216ef76502ad59802f36de3d6c0e612e35545f3017581a48e941eb6f754ae97"
-original_class_hash = "0x216ef76502ad59802f36de3d6c0e612e35545f3017581a48e941eb6f754ae97"
+class_hash = "0x3167d741defc4e983ce1cbd9f9a04fe9f4564863a345469bf8b0cbac37e570f"
+original_class_hash = "0x3167d741defc4e983ce1cbd9f9a04fe9f4564863a345469bf8b0cbac37e570f"
 abi = "manifests/dev/abis/base/models/pistols_models_token_config_token_config.json"
 name = "pistols::models::token_config::token_config"
 
@@ -21,6 +21,11 @@ key = false
 
 [[members]]
 name = "max_per_wallet"
+type = "u16"
+key = false
+
+[[members]]
+name = "minted_count"
 type = "u16"
 key = false
 

@@ -357,6 +357,10 @@
         "type": "core::integer::u16"
       },
       {
+        "name": "minted_count",
+        "type": "core::integer::u16"
+      },
+      {
         "name": "is_open",
         "type": "core::bool"
       }

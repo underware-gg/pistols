@@ -107,7 +107,11 @@
         "type": "core::starknet::contract_address::ContractAddress"
       },
       {
-        "name": "duelists_address",
+        "name": "token_duelist_address",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "minter_address",
         "type": "core::starknet::contract_address::ContractAddress"
       },
       {
@@ -175,7 +179,11 @@
             "type": "core::starknet::contract_address::ContractAddress"
           },
           {
-            "name": "duelists_address",
+            "name": "token_duelist_address",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "minter_address",
             "type": "core::starknet::contract_address::ContractAddress"
           }
         ],

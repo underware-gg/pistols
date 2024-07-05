@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x14540eed9e7d7bcb94ed3f0ff139e343baa7b1fff2f0b8d55d8128862c0d73e"
-original_class_hash = "0x14540eed9e7d7bcb94ed3f0ff139e343baa7b1fff2f0b8d55d8128862c0d73e"
+class_hash = "0x7d0b6654aac1d1760255c46595980390e6d30d6240297e04dbf4340c4bf906a"
+original_class_hash = "0x7d0b6654aac1d1760255c46595980390e6d30d6240297e04dbf4340c4bf906a"
 abi = "manifests/dev/abis/base/models/pistols_models_duelist_duelist.json"
 name = "pistols::models::duelist::duelist"
 
@@ -15,16 +15,21 @@ type = "felt252"
 key = false
 
 [[members]]
-name = "profile_pic"
-type = "u8"
+name = "profile_pic_uri"
+type = "ByteArray"
 key = false
 
 [[members]]
-name = "score"
-type = "Score"
+name = "profile_pic_type"
+type = "u8"
 key = false
 
 [[members]]
 name = "timestamp"
 type = "u64"
+key = false
+
+[[members]]
+name = "score"
+type = "Score"
 key = false
