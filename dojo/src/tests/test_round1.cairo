@@ -641,12 +641,10 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Wrong Challenge state', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_not_started() {
         let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
-        tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
-        tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 2);
         let expire_seconds: u64 = timestamp::from_days(2);
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_seconds);
         let (_salt_a, _salt_b, _action_a, _action_b, _hash_a, hash_b) = _get_actions_round_1_resolved();
-        tester::execute_commit_action(system, OTHER(), duel_id, 1, hash_b);
+        tester::execute_commit_action(system, OWNER(), duel_id, 1, hash_b);
     }
 
     #[test]

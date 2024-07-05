@@ -2,6 +2,7 @@ use starknet::ContractAddress;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::models::config::{ConfigManager, ConfigManagerTrait};
 use pistols::interfaces::ierc721::{ierc721, IERC721Dispatcher, IERC721DispatcherTrait};
+use pistols::types::constants::{constants};
 use pistols::libs::utils::{ZERO};
 
 //---------------------
@@ -76,7 +77,7 @@ impl DuelistTraitImpl of DuelistTrait {
     fn address_to_id(address: ContractAddress) -> u128 {
         let as_felt: felt252 = address.into();
         let as_u256: u256 = as_felt.into();
-        if (as_u256.high == 0) {(as_u256.low)} else {(0)}
+        if (as_u256 <= constants::MAX_DUELIST_ID.into()) {(as_u256.low)} else {(0)}
     }
 }
 
@@ -121,11 +122,13 @@ impl DuelistManagerTraitImpl of DuelistManagerTrait {
     fn get_token_dispatcher(self: DuelistManager) -> IERC721Dispatcher {
         (self.token_dispatcher)
     }
+    fn owner_of(self: DuelistManager, duelist_id: u128) -> ContractAddress {
+        (self.token_dispatcher.owner_of(duelist_id.into()))
+    }
     fn exists(self: DuelistManager, duelist_id: u128) -> bool {
-        (self.token_dispatcher.owner_of(duelist_id.into()) != ZERO())
+        (self.owner_of(duelist_id) != ZERO())
     }
     fn is_owner_of(self: DuelistManager, address: ContractAddress, duelist_id: u128) -> bool {
-        if (self.token_dispatcher.owner_of(duelist_id.into()) == address) {(true)}
-        else {(DuelistTrait::address_to_id(address) == duelist_id)} // works only for testing
+        (self.owner_of(duelist_id)  == address)
     }
 }

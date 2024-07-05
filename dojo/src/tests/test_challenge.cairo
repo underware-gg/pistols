@@ -12,7 +12,7 @@ mod tests {
     use pistols::models::table::{tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::utils::timestamp::{timestamp};
-    use pistols::tests::tester::{tester, tester::{ZERO, OWNER, OTHER, BUMMER, TREASURY, ID}};
+    use pistols::tests::tester::{tester, tester::{ZERO, OWNER, OTHER, BUMMER, TREASURY, BIG_BOY, LITTLE_BOY, ID}};
 
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
@@ -20,28 +20,43 @@ mod tests {
     const TABLE_ID: felt252 = tables::LORDS;
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Challenger unknown', 'ENTRYPOINT_FAILED'))]
-    fn test_invalid_challenger() {
+    #[should_panic(expected:('PISTOLS: Not your duelist', 'ENTRYPOINT_FAILED'))]
+    fn test_invalid_challenged_not_your_duelist() {
         let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
-        let _duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 0);
+        // BIG_BOY: u256.high + low > id != address
+        let HIGH: ContractAddress = starknet::contract_address_const::<0x100000000000000000000000000000000000001>();
+        let _duel_id: u128 = tester::execute_create_challenge(system, HIGH, OTHER(), MESSAGE_1, TABLE_ID, 0, 0);
     }
 
+    // #[test]
+    // #[should_panic(expected:('PISTOLS: Challenged unknown', 'ENTRYPOINT_FAILED'))]
+    // fn test_invalid_challenged_unknown() {
+    //     let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
+    //     // fill u256.high, empty low > no owner > unknown
+    //     let HIGH: ContractAddress = starknet::contract_address_const::<0x100000000000000000000000000000000000000>();
+    //     let _duel_id: u128 = tester::execute_create_challenge(system, OWNER(), HIGH, MESSAGE_1, TABLE_ID, 0, 0);
+    // }
+
     #[test]
-    #[should_panic(expected:('PISTOLS: Invalid challenged', 'ENTRYPOINT_FAILED'))]
-    fn test_INVALID_CHALLENGED() {
+    #[should_panic(expected:('PISTOLS: Challenged self', 'ENTRYPOINT_FAILED'))]
+    fn test_invalid_challenged_self_duelist() {
         let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
-        tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
         let _duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OWNER(), MESSAGE_1, TABLE_ID, 0, 0);
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Invalid challenged', 'ENTRYPOINT_FAILED'))]
-    // #[should_panic(expected:('Challenge a player', 'ENTRYPOINT_FAILED'))]
-    fn test_invalid_code() {
+    #[should_panic(expected:('PISTOLS: Challenged self', 'ENTRYPOINT_FAILED'))]
+    fn test_invalid_challenged_self_address() {
         let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
-        tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
-        let challenged_1 = ZERO();
-        let _duel_id: u128 = tester::execute_create_challenge(system, OWNER(), challenged_1, MESSAGE_1, TABLE_ID, 0, 0);
+        let _duel_id: u128 = tester::execute_create_challenge(system, LITTLE_BOY(), LITTLE_BOY(), MESSAGE_1, TABLE_ID, 0, 0);
+    }
+
+    #[test]
+    #[should_panic(expected:('PISTOLS: Challenged null', 'ENTRYPOINT_FAILED'))]
+    // #[should_panic(expected:('Challenge a player', 'ENTRYPOINT_FAILED'))]
+    fn test_invalid_challenged_zero() {
+        let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
+        let _duel_id: u128 = tester::execute_create_challenge(system, OWNER(), ZERO(), MESSAGE_1, TABLE_ID, 0, 0);
     }
 
     #[test]
@@ -74,20 +89,33 @@ mod tests {
     }
 
     #[test]
-    fn test_challenge_address() {
+    fn test_challenge_to_address() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
         let timestamp = tester::get_block_timestamp();
+        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), BIG_BOY(), MESSAGE_1, TABLE_ID, 0, 0);
+        let ch = tester::get_Challenge(world, duel_id);
+        assert(ch.state == ChallengeState::Awaiting.into(), 'state');
+        assert(ch.address_a == OWNER(), 'challenged');
+        assert(ch.address_b == BIG_BOY(), 'challenger');
+        assert(ch.duelist_id_a == ID(OWNER()), 'challenger_id');
+        assert(ch.duelist_id_b == 0, 'challenged_id'); // challenged an address, id is empty
+        assert(ch.message == MESSAGE_1, 'message');
+        assert(ch.timestamp_start == timestamp, 'timestamp_start');
+        assert(ch.timestamp_end == 0, 'timestamp_end');
+    }
+
+    #[test]
+    fn test_challenge_to_duelist() {
+        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
+        tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 0);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'state');
         assert(ch.address_a == OWNER(), 'challenged');
-        assert(ch.address_b == OTHER(), 'challenger');
+        assert(ch.address_b == ZERO(), 'challenger');   // challenged an id, address is empty
         assert(ch.duelist_id_a == ID(OWNER()), 'challenger_id');
         assert(ch.duelist_id_b == ID(OTHER()), 'challenged_id');
-        assert(ch.message == MESSAGE_1, 'message');
-        assert(ch.timestamp_start == timestamp, 'timestamp_start');
-        assert(ch.timestamp_end == 0, 'timestamp_end');
     }
 
     #[test]
@@ -174,8 +202,8 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('Cannot accept own challenge', 'ENTRYPOINT_FAILED'))]
-    fn test_challenge_owner_accept() {
+    #[should_panic(expected:('PISTOLS: Not your Challenge', 'ENTRYPOINT_FAILED'))]
+    fn test_challenge_owner_accept_self() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
 
@@ -223,18 +251,6 @@ mod tests {
         let _ch = tester::get_Challenge(world, duel_id);
         let (_block_number, _timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
         tester::execute_reply_challenge(system, BUMMER(), duel_id, false);
-    }
-
-    #[test]
-    #[should_panic(expected:('PISTOLS: Challenged unknown', 'ENTRYPOINT_FAILED'))]
-    fn test_challenge_other_not_registered() {
-        let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
-        tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
-
-        let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_seconds);
-        tester::elapse_timestamp(timestamp::from_days(1));
-        tester::execute_reply_challenge(system, OTHER(), duel_id, true);
     }
 
     #[test]

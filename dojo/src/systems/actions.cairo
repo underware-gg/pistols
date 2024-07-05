@@ -97,13 +97,14 @@ mod actions {
 
     mod Errors {
         const NOT_INITIALIZED: felt252           = 'PISTOLS: Not initialized';
-        const INVALID_CHALLENGED: felt252        = 'PISTOLS: Invalid challenged';
+        const INVALID_CHALLENGED: felt252        = 'PISTOLS: Challenged unknown';
+        const INVALID_CHALLENGED_NULL: felt252   = 'PISTOLS: Challenged null';
+        const INVALID_CHALLENGED_SELF: felt252   = 'PISTOLS: Challenged self';
         const INVALID_EXPIRY: felt252            = 'PISTOLS: Invalid expiry';
         const INVALID_CHALLENGE: felt252         = 'PISTOLS: Invalid Challenge';
+        const NOT_DUELIST_OWNER: felt252         = 'PISTOLS: Not your duelist';
         const CHALLENGER_NOT_ADMITTED: felt252   = 'PISTOLS: Challenger not allowed';
         const CHALLENGED_NOT_ADMITTED: felt252   = 'PISTOLS: Challenged not allowed';
-        const CHALLENGER_NOT_REGISTERED: felt252 = 'PISTOLS: Challenger unknown';
-        const CHALLENGED_NOT_REGISTERED: felt252 = 'PISTOLS: Challenged unknown';
         const CHALLENGE_EXISTS: felt252          = 'PISTOLS: Challenge exists';
         const CHALLENGE_WRONG_STATE: felt252     = 'PISTOLS: Wrong Challenge state';
         const NOT_YOUR_CHALLENGE: felt252        = 'PISTOLS: Not your Challenge';
@@ -120,7 +121,6 @@ mod actions {
         const ALREADY_COMMITTED: felt252         = 'PISTOLS: Already committed';
         const ALREADY_REVEALED: felt252          = 'PISTOLS: Already revealed';
         const ACTION_HASH_MISMATCH: felt252      = 'PISTOLS: Action hash mismatch';
-        const NOT_DUELIST_OWNER: felt252         = 'PISTOLS: Not your duelist';
     }
 
     // impl: implement functions specified in trait
@@ -176,6 +176,9 @@ mod actions {
             let address_a: ContractAddress = starknet::get_caller_address();
             let duelist_manager = DuelistManagerTrait::new(world);
             assert(duelist_manager.is_owner_of(address_a, duelist_id_a) == true, Errors::NOT_DUELIST_OWNER);
+// address_a.print();
+// duelist_id_a.print();
+// duelist_manager.owner_of(duelist_id_a).print();
 
             // validate table
             let table_manager = TableManagerTrait::new(world);
@@ -184,16 +187,17 @@ mod actions {
             assert(table_manager.can_join(table_id, address_a, duelist_id_a), Errors::CHALLENGER_NOT_ADMITTED);
 
             // validate challenged
-            assert(challenged != utils::ZERO(), Errors::INVALID_CHALLENGED);
+            assert(challenged != utils::ZERO(), Errors::INVALID_CHALLENGED_NULL);
             let duelist_id_b: u128 = DuelistTrait::address_to_id(challenged);
-            let address_b: ContractAddress = if (duelist_id_b != 0) {
+            let address_b: ContractAddress = if (duelist_id_b > 0) {
                 // challenging a duelist
                 assert(duelist_manager.exists(duelist_id_b) == true, Errors::INVALID_CHALLENGED);
+                assert(duelist_id_a != duelist_id_b, Errors::INVALID_CHALLENGED_SELF);
                 assert(self.has_pact(duelist_id_a, duelist_id_b) == false, Errors::CHALLENGE_EXISTS);
                 (utils::ZERO())
             } else {
                 // challenging a wallet
-                assert(challenged != address_a, Errors::INVALID_CHALLENGED);
+                assert(challenged != address_a, Errors::INVALID_CHALLENGED_SELF);
                 (challenged)
             };
             assert(table_manager.can_join(table_id, address_b, duelist_id_b), Errors::CHALLENGED_NOT_ADMITTED);
@@ -287,6 +291,7 @@ mod actions {
                 if (challenge.duelist_id_b != 0) {
                     // challenged the duelist
                     assert(challenge.duelist_id_b == duelist_id_b, Errors::NOT_YOUR_CHALLENGE);
+                    // assert(self.has_pact(challenge.duelist_id_a, duelist_id_b) == false, Errors::CHALLENGE_EXISTS);
                     // fill missing wallet
                     challenge.address_b = address_b;
                 } else {

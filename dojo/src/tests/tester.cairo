@@ -12,6 +12,12 @@ mod tester {
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::systems::token_duelist::{token_duelist, ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait};
     use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
+    use pistols::tests::mock_erc721::{mock_erc721, IMockERC721Dispatcher, IMockERC721DispatcherTrait};
+    use pistols::types::challenge::{ChallengeState};
+    use pistols::types::constants::{constants};
+    use pistols::types::action::{Action};
+    use pistols::utils::short_string::{ShortString};
+
     use pistols::models::challenge::{
         Challenge, challenge,
         Snapshot, snapshot,
@@ -28,10 +34,6 @@ mod tester {
     use pistols::models::table::{
         TableConfig, table_config,
     };
-    use pistols::types::challenge::{ChallengeState};
-    use pistols::types::constants::{constants};
-    use pistols::types::action::{Action};
-    use pistols::utils::short_string::{ShortString};
 
     // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
     extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
@@ -48,17 +50,24 @@ mod tester {
     #[inline(always)]
     fn ZERO() -> ContractAddress { starknet::contract_address_const::<0x0>() }
     #[inline(always)]
-    fn OWNER() -> ContractAddress { starknet::contract_address_const::<0x111111>() }
+    fn OWNER() -> ContractAddress { starknet::contract_address_const::<0x111>() }
     #[inline(always)]
     fn OTHER() -> ContractAddress { starknet::contract_address_const::<0x222>() }
     #[inline(always)]
     fn BUMMER() -> ContractAddress { starknet::contract_address_const::<0x333>() }
     #[inline(always)]
     fn TREASURY() -> ContractAddress { starknet::contract_address_const::<0x444>() }
+    #[inline(always)]
+    fn BIG_BOY() -> ContractAddress { starknet::contract_address_const::<0x54f650fb5e1fb61d7b429ae728a365b69e5aff9a559a05de70f606aaea1a243>() }
+    #[inline(always)]
+    fn LITTLE_BOY() -> ContractAddress { starknet::contract_address_const::<0xb5e186ef2e4ab2762367cd07c8f892a1>() }
 
     #[inline(always)]
     fn ID(address: ContractAddress) -> u128 {
-        (DuelistTrait::address_to_id(address))
+        let as_felt: felt252 = address.into();
+        let as_u256: u256 = as_felt.into();
+        (as_u256.low)
+        // (DuelistTrait::address_to_id(address))
     }
 
     fn impersonate(address: ContractAddress) {
@@ -107,16 +116,21 @@ mod tester {
         // systems
         let world: IWorldDispatcher = spawn_test_world(models);
         let system = IActionsDispatcher{ contract_address:
-            if (deploy_system) {deploy_system(world, 'salt', actions::TEST_CLASS_HASH)} else {ZERO()}
+            if (deploy_system) {deploy_system(world, 'salt', actions::TEST_CLASS_HASH)}
+            else {ZERO()}
         };
         let admin = IAdminDispatcher{ contract_address:
-            if (deploy_admin) {deploy_system(world, 'admin', admin::TEST_CLASS_HASH)} else {ZERO()}
+            if (deploy_admin) {deploy_system(world, 'admin', admin::TEST_CLASS_HASH)}
+            else {ZERO()}
         };
         let lords = ILordsMockDispatcher{ contract_address:
-            if (deploy_lords) {deploy_system(world, 'lords_mock', lords_mock::TEST_CLASS_HASH)} else {ZERO()}
+            if (deploy_lords) {deploy_system(world, 'lords_mock', lords_mock::TEST_CLASS_HASH)}
+            else {ZERO()}
         };
         let duelists = ITokenDuelistDispatcher{ contract_address:
-            if (deploy_system) {deploy_system(world, 'duelists', token_duelist::TEST_CLASS_HASH)} else {ZERO()}
+            // if (deploy_system) {deploy_system(world, 'duelists', token_duelist::TEST_CLASS_HASH)}
+            // else {deploy_system(world, 'mock_erc721', mock_erc721::TEST_CLASS_HASH)}
+            deploy_system(world, 'mock_erc721', mock_erc721::TEST_CLASS_HASH)
         };
         // initializers
         if (deploy_lords) {

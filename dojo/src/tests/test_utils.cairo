@@ -25,17 +25,6 @@ mod tests {
     }
 
     #[test]
-    fn test_pact_pair_self() {
-        let p1: u128 = utils::make_pact_pair(1, 1);
-        let p2: u128 = utils::make_pact_pair(2, 2);
-        assert(p1 != 0, 'p1 != 0');
-        assert(p1 != 1, 'p1 != 1');
-        assert(p2 != 0, 'p2 != 0');
-        assert(p2 != 2, 'p2 != 2');
-        assert(p1 != p2, 'p1 != p2');
-    }
-
-    #[test]
     fn test_check_dice_average() {
         // lower limit
         let mut counter: u8 = 0;

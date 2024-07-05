@@ -185,7 +185,7 @@ mod tests {
 
     #[test]
     fn test_initialize_table() {
-        let (_world, _system, admin, lords) = tester::setup_world(false, false, true, false, false);
+        let (_world, _system, admin, lords) = tester::setup_world(false, true, true, false, false);
         tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), lords.contract_address, ZERO());
         let table: TableConfig = admin.get_table(tables::LORDS);
         assert(table.contract_address == lords.contract_address, 'contract_address');
@@ -196,7 +196,7 @@ mod tests {
 
     #[test]
     fn test_set_table() {
-        let (world, _system, admin, lords) = tester::setup_world(false, false, true, false, false);
+        let (world, _system, admin, lords) = tester::setup_world(false, true, true, false, false);
         // not initialized
         tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO(), ZERO());
         let table: TableConfig = admin.get_table(tables::LORDS);

@@ -3,6 +3,9 @@ mod constants {
     // number of rounds per duel
     const ROUND_COUNT: u8 = 3;
     
+    // the hard max duelist id (max supply)
+    const MAX_DUELIST_ID: u128 = 0x10000; // 16 bits (65536)
+    
     // duelist health & damage
     const FULL_HEALTH: u8 = 3;      // initial health
     const DOUBLE_DAMAGE: u8 = 2;
