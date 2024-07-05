@@ -23,6 +23,7 @@ export WORLD_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.
 export ADMIN_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.name == "pistols::systems::admin::admin" ).address')
 export ACTIONS_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.name == "pistols::systems::actions::actions" ).address')
 export DUELISTS_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.name == "pistols::systems::token_duelist::token_duelist" ).address')
+export MINTER_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.name == "pistols::systems::minter::minter" ).address')
 # use $DOJO_ACCOUNT_ADDRESS else read from profile
 export ACCOUNT_ADDRESS=${DOJO_ACCOUNT_ADDRESS:-$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.account_address)}
 
@@ -45,6 +46,7 @@ echo "World       : $WORLD_ADDRESS"
 echo "::admin     : $ADMIN_ADDRESS"
 echo "::actions   : $ACTIONS_ADDRESS"
 echo "::duelists  : $DUELISTS_ADDRESS"
+echo "::minter    : $MINTER_ADDRESS"
 echo "\$LORDS      : $LORDS_ADDRESS"
 echo "\$LORDS Mock : $LORDS_MOCK"
 echo "------------------------------------------------------------------------------"
@@ -119,7 +121,7 @@ INITIALIZED=$(sozo --profile $PROFILE call --world $WORLD_ADDRESS $ADMIN_ADDRESS
 if [[ $INITIALIZED == *"0x1"* ]]; then
     echo "Already initialized"
 else
-  sozo --profile $PROFILE execute --world $WORLD_ADDRESS --wait $ADMIN_ADDRESS initialize --calldata 0x0,0x0,$LORDS_ADDRESS,$DUELISTS_ADDRESS || true
+  sozo --profile $PROFILE execute --world $WORLD_ADDRESS --wait $ADMIN_ADDRESS initialize --calldata 0x0,0x0,$LORDS_ADDRESS,$DUELISTS_ADDRESS,$MINTER_ADDRESS || true
 fi
 
 echo "--- Auth ok! 👍"

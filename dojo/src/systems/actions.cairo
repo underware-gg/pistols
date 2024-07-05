@@ -9,7 +9,13 @@ use pistols::types::challenge::{ChallengeState};
 trait IActions {
     //
     // Duelists
-    fn register_duelist(
+    fn mint_duelist(
+        ref world: IWorldDispatcher,
+        name: felt252,
+        profile_pic_type: u8,
+        profile_pic_uri: ByteArray,
+    ) -> Duelist;
+    fn update_duelist(
         ref world: IWorldDispatcher,
         duelist_id: u128,
         name: felt252,
@@ -81,6 +87,7 @@ mod actions {
     use traits::{Into, TryInto};
     use starknet::{ContractAddress, get_block_timestamp, get_block_info};
 
+    use pistols::systems::minter::{IMinterDispatcher, IMinterDispatcherTrait};
     use pistols::models::challenge::{Challenge, Wager, Round, Shot};
     use pistols::models::duelist::{Duelist, DuelistTrait, Score, Pact, DuelistManager, DuelistManagerTrait};
     use pistols::models::structs::{SimulateChances};
@@ -131,7 +138,22 @@ mod actions {
         //------------------------
         // Duelists
         //
-        fn register_duelist(ref world: IWorldDispatcher,
+        fn mint_duelist(ref world: IWorldDispatcher,
+            name: felt252,
+            profile_pic_type: u8,
+            profile_pic_uri: ByteArray,
+        ) -> Duelist {
+            let config_manager = ConfigManagerTrait::new(world).get();
+            let minter_dispatcher = IMinterDispatcher{
+                contract_address: config_manager.minter_address
+            };
+            // mint if you can
+            let token_id: u128 = minter_dispatcher.mint(starknet::get_caller_address(), config_manager.token_duelist_address);
+            // update
+            (self.update_duelist(token_id, name, profile_pic_type, profile_pic_uri))
+        }
+
+        fn update_duelist(ref world: IWorldDispatcher,
             duelist_id: u128,
             name: felt252,
             profile_pic_type: u8,
@@ -156,7 +178,9 @@ mod actions {
             // save
             duelist_manager.set(duelist.clone());
 
+'33'.print();
             self._emitDuelistRegisteredEvent(caller, duelist.clone(), is_new);
+'44'.print();
 
             (duelist)
         }

@@ -16,7 +16,7 @@ const Col = Grid.Column
 
 export function OnboardingProfile({
 }) {
-  const { register_duelist } = useDojoSystemCalls()
+  const { update_duelist } = useDojoSystemCalls()
   const { accountIndex } = usePistolsContext()
   const { address } = useBurnerAccount(accountIndex)
   const { account } = useDojoAccount()
@@ -45,7 +45,7 @@ export function OnboardingProfile({
 
   const _register = () => {
     if (canRegister) {
-      register_duelist(account, 0n, inputValue, _profilePic)
+      update_duelist(account, 0n, inputValue, _profilePic)
     }
   }
 

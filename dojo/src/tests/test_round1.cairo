@@ -30,8 +30,8 @@ mod tests {
     const SALT_1_b: u64 = 0xf9a978e92309da78;
 
     fn _start_new_challenge(world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress, wager_value: u256) -> (Challenge, Round, u128) {
-        // tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1, "1");
-        // tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1, "2");
+        // tester::execute_update_duelist(system, OWNER(), PLAYER_NAME, 1, "1");
+        // tester::execute_update_duelist(system, OTHER(), OTHER_NAME, 1, "2");
         let expire_seconds: u64 = timestamp::from_days(2);
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, wager_value, expire_seconds);
         tester::elapse_timestamp(timestamp::from_days(1));
@@ -631,7 +631,7 @@ mod tests {
         tester::execute_commit_action(system, OTHER(), duel_id, 1, hash_b);
         tester::execute_reveal_action(system, OWNER(), duel_id, 1, 0x111, 10, 0);
         let duelist_a_before = tester::get_Duelist(world, OWNER());
-        tester::execute_register_duelist(system, OWNER(), 'dssadsa', 1, "3");
+        tester::execute_update_duelist(system, OWNER(), 'dssadsa', 1, "3");
         let duelist_a_after = tester::get_Duelist(world, OWNER());
         assert(duelist_a_before.duelist_id == duelist_a_after.duelist_id, 'duelist_id');
         assert(duelist_a_before.name != duelist_a_after.name, 'name');

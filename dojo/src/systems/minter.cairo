@@ -2,7 +2,7 @@ use starknet::{ContractAddress};
 
 #[dojo::interface]
 trait IMinter {
-    fn mint(ref world: IWorldDispatcher, token_contract_address: ContractAddress) -> u128;
+    fn mint(ref world: IWorldDispatcher, to: ContractAddress, token_contract_address: ContractAddress) -> u128;
     fn set_open(ref world: IWorldDispatcher, token_contract_address: ContractAddress, is_open: bool);
     // fn get_token_svg(ref world: IWorldDispatcher, token_id: u128) -> ByteArray;
 }
@@ -79,7 +79,7 @@ mod minter {
     //
     #[abi(embed_v0)]
     impl MinterImpl of IMinter<ContractState> {
-        fn mint(ref world: IWorldDispatcher, token_contract_address: ContractAddress) -> u128 {
+        fn mint(ref world: IWorldDispatcher, to: ContractAddress, token_contract_address: ContractAddress) -> u128 {
             let token = (ITokenDuelistDispatcher{ contract_address: token_contract_address });
             let total_supply: u256 = token.total_supply();
 
@@ -89,7 +89,6 @@ mod minter {
             assert(config.is_open, Errors::MINTING_IS_CLOSED);
 
             // check wallet
-            let to: ContractAddress = get_caller_address();
             let balance: u256 = token.balance_of(to);
             assert(balance.low < config.max_per_wallet.into(), Errors::MAXED_WALLET);
             

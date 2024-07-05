@@ -160,8 +160,8 @@ fn setup() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterDispatcher) {
     let (world, mut token, mut minter) = setup_uninitialized();
 
     // initialize contracts
-    minter.mint(token.contract_address);
-    minter.mint(token.contract_address);
+    minter.mint(OWNER(), token.contract_address);
+    minter.mint(OWNER(), token.contract_address);
 
     // drop all events
     utils::drop_all_events(world.contract_address);
@@ -277,8 +277,7 @@ fn test_transfer_from() {
 fn test_mint() {
     let (_world, mut token, mut minter) = setup();
 
-    utils::impersonate(RECIPIENT());
-    minter.mint(token.contract_address);
+    minter.mint(RECIPIENT(), token.contract_address);
     assert(token.balance_of(RECIPIENT()) == 1, 'invalid balance_of');
     assert(token.total_supply() == 3, 'invalid total_supply');
     assert(token.token_by_index(2) == TOKEN_ID_3, 'invalid token_by_index');
@@ -299,16 +298,15 @@ fn test_mint_not_minter() {
 #[should_panic(expected: ('MINTER: wallet maxed out', 'ENTRYPOINT_FAILED'))]
 fn test_mint_maxed_out() {
     let (_world, mut token, mut minter) = setup();
-    minter.mint(token.contract_address);
+    minter.mint(OWNER(), token.contract_address);
 }
 
 #[test]
 #[should_panic(expected: ('MINTER: minted out', 'ENTRYPOINT_FAILED'))]
 fn test_mint_minted_out() {
     let (_world, mut token, mut minter) = setup();
-    utils::impersonate(RECIPIENT());
-    minter.mint(token.contract_address);
-    minter.mint(token.contract_address);
+    minter.mint(RECIPIENT(), token.contract_address);
+    minter.mint(RECIPIENT(), token.contract_address);
 }
 
 //

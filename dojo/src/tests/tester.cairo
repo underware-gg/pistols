@@ -139,7 +139,7 @@ mod tester {
             execute_lords_faucet(lords, OTHER());
         }
         if (initialize) {
-            execute_admin_initialize(admin, OWNER(), OWNER(), TREASURY(), lords.contract_address, duelists.contract_address);
+            execute_admin_initialize(admin, OWNER(), OWNER(), TREASURY(), lords.contract_address, duelists.contract_address, ZERO());
         }
         if (approve) {
             execute_lords_approve(lords, OWNER(), system.contract_address, 1_000_000 * constants::ETH_TO_WEI);
@@ -180,9 +180,9 @@ mod tester {
     //
 
     // ::admin
-    fn execute_admin_initialize(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress, duelist_address: ContractAddress) {
+    fn execute_admin_initialize(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress, duelist_address: ContractAddress, minter_address: ContractAddress) {
         impersonate(sender);
-        system.initialize(owner_address, treasury_address, lords_address, duelist_address);
+        system.initialize(owner_address, treasury_address, lords_address, duelist_address, minter_address);
         _next_block();
     }
     fn execute_admin_set_owner(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress) {
@@ -229,9 +229,9 @@ mod tester {
     }
 
     // ::actions
-    fn execute_register_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: u8, profile_pic_uri: ByteArray) {
+    fn execute_update_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: u8, profile_pic_uri: ByteArray) {
         impersonate(sender);
-        system.register_duelist(ID(sender), name, profile_pic_type, profile_pic_uri);
+        system.update_duelist(ID(sender), name, profile_pic_type, profile_pic_uri);
         _next_block();
     }
     fn execute_create_challenge(system: IActionsDispatcher, sender: ContractAddress,

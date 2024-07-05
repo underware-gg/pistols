@@ -121,7 +121,7 @@ struct DuelistManager {
 #[generate_trait]
 impl DuelistManagerTraitImpl of DuelistManagerTrait {
     fn new(world: IWorldDispatcher) -> DuelistManager {
-        let token_dispatcher = ierc721(ConfigManagerTrait::new(world).get().duelists_address);
+        let token_dispatcher = ierc721(ConfigManagerTrait::new(world).get().token_duelist_address);
         (DuelistManager { world, token_dispatcher })
     }
     fn get(self: DuelistManager, duelist_id: u128) -> Duelist {
