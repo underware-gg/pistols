@@ -42,7 +42,7 @@ use pistols::systems::minter::{
     minter, IMinterDispatcher, IMinterDispatcherTrait,
 };
 use pistols::models::{
-    token_config::{TokenConfig, TokenConfigTrait},
+    token_config::{token_config, TokenConfig, TokenConfigTrait},
 };
 
 //
@@ -98,6 +98,7 @@ fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterD
             erc_721_token_approval_model::TEST_CLASS_HASH,
             erc_721_balance_model::TEST_CLASS_HASH,
             erc_721_meta_model::TEST_CLASS_HASH,
+            token_config::TEST_CLASS_HASH,
         ]
     );
 
@@ -134,8 +135,9 @@ fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterD
     world.grant_writer(selector!("ERC721MetadataModel"), token.contract_address);
     world.grant_writer(selector!("ERC721OwnerModel"), token.contract_address);
     world.grant_writer(selector!("TokenConfig"), token.contract_address);
-    world.grant_writer(selector!("TokenData"), token.contract_address);
-    
+
+    world.grant_writer(selector!("TokenConfig"), minter.contract_address);
+
     world.grant_writer(selector!("SRC5Model"), OWNER(),);
     world.grant_writer(selector!("InitializableModel"), OWNER(),);
     world.grant_writer(selector!("ERC721MetaModel"), OWNER(),);
@@ -149,7 +151,6 @@ fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterD
     world.grant_writer(selector!("ERC721MetadataModel"),  OWNER(),);
     world.grant_writer(selector!("ERC721OwnerModel"),  OWNER(),);
     world.grant_writer(selector!("TokenConfig"), OWNER(),);
-    world.grant_writer(selector!("TokenData"), OWNER(),);
 
     utils::impersonate(OWNER(),);
 

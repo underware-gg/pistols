@@ -19,9 +19,8 @@ mod minter {
     use zeroable::Zeroable;
     use starknet::{ContractAddress, get_contract_address, get_caller_address};
     use pistols::systems::token_duelist::{ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait};
-    use pistols::models::{
-        token_config::{TokenConfig, TokenConfigTrait},
-    };
+    use pistols::models::token_config::{TokenConfig, TokenConfigTrait};
+    use pistols::types::constants::{constants};
 
     mod Errors {
         // admin
@@ -65,6 +64,7 @@ mod minter {
             minter_address: get_contract_address(),
             max_supply,
             max_per_wallet,
+            minted_count: 0,
             is_open: (is_open != 0),
         }));
 
@@ -81,11 +81,11 @@ mod minter {
     impl MinterImpl of IMinter<ContractState> {
         fn mint(ref world: IWorldDispatcher, to: ContractAddress, token_contract_address: ContractAddress) -> u128 {
             let token = (ITokenDuelistDispatcher{ contract_address: token_contract_address });
-            let total_supply: u256 = token.total_supply();
 
             // check availability
-            let config: TokenConfig = get!(world, (token_contract_address), TokenConfig);
-            assert(total_supply.low < config.max_supply.into(), Errors::MINTED_OUT);
+            let mut config: TokenConfig = get!(world, (token_contract_address), TokenConfig);
+            assert(config.minted_count < config.max_supply, Errors::MINTED_OUT);
+            assert(config.minted_count.into() < constants::MAX_DUELIST_ID, Errors::MINTED_OUT);
             assert(config.is_open, Errors::MINTING_IS_CLOSED);
 
             // check wallet
@@ -93,8 +93,11 @@ mod minter {
             assert(balance.low < config.max_per_wallet.into(), Errors::MAXED_WALLET);
             
             // mint next token_id
-            let token_id: u256 = (total_supply + 1);
+            config.minted_count += 1;
+            let token_id: u256 = config.minted_count.into();
             token.mint(to, token_id);
+
+            set!(world, (config));
 
             // return minted token id
             (token_id.low)

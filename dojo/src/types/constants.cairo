@@ -4,7 +4,7 @@ mod constants {
     const ROUND_COUNT: u8 = 3;
     
     // the hard max duelist id (max supply)
-    const MAX_DUELIST_ID: u128 = 0x10000; // 16 bits (65536)
+    const MAX_DUELIST_ID: u128 = 0xffff; // 16 bits (65535)
     
     // duelist health & damage
     const FULL_HEALTH: u8 = 3;      // initial health

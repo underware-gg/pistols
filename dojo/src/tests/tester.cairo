@@ -34,6 +34,9 @@ mod tester {
     use pistols::models::table::{
         TableConfig, table_config,
     };
+    use pistols::models::token_config::{
+        TokenConfig, token_config,
+    };
 
     // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
     extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
@@ -102,6 +105,7 @@ mod tester {
             round::TEST_CLASS_HASH,
             config::TEST_CLASS_HASH,
             table_config::TEST_CLASS_HASH,
+            token_config::TEST_CLASS_HASH,
         ];
 
         // setup testing
@@ -132,6 +136,8 @@ mod tester {
             // else {deploy_system(world, 'mock_erc721', mock_erc721::TEST_CLASS_HASH)}
             deploy_system(world, 'mock_erc721', mock_erc721::TEST_CLASS_HASH)
         };
+        // auths
+        // world.grant_writer(selector!("TokenConfig"), duelists.contract_address);
         // initializers
         if (deploy_lords) {
             execute_lords_initializer(lords, OWNER());

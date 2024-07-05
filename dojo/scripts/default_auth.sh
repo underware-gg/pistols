@@ -82,6 +82,10 @@ sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
   Pact,$ACTIONS_ADDRESS \
   Round,$ACTIONS_ADDRESS
 
+echo "- Minter auth..."
+sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
+  TokenConfig,$MINTER_ADDRESS \
+
 echo "- Duelists auth..."
 sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
   InitializableModel,$DUELISTS_ADDRESS \
