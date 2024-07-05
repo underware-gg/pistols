@@ -5,6 +5,7 @@ import {
   useContractRead,
   UseBalanceProps, Balance,
   useAccount,
+  useBlockNumber,
 } from '@starknet-react/core'
 import { Uint256ToBigint, weiToEth } from '@/lib/utils/starknet'
 import { bigintToHex } from '@/lib/utils/types'
@@ -21,6 +22,10 @@ enum BlockTag {
   latest = "latest"
 }
 export const _useBalance = (props: UseBalanceProps): Balance => {
+  // const { data: blockNumber } = useBlockNumber({
+  //   refetchInterval: 100,
+  // })
+  // console.log(`blockNumber`, blockNumber)
   const { data, isError, isLoading, error } = useContractRead({
     functionName: "balanceOf",
     args: [bigintToHex(props.address)],
@@ -30,7 +35,7 @@ export const _useBalance = (props: UseBalanceProps): Balance => {
     // refetchInterval: 2000, // update every 2 seconds
     // update every block
     watch: true,
-    blockIdentifier: BlockTag.pending,
+    // blockIdentifier: BlockTag.pending,
   })
   useEffect(() => { if (error) console.warn(`_useBalance() ERROR:`, error) }, [error])
   //@ts-ignore
