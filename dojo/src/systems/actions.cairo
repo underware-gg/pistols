@@ -13,7 +13,8 @@ trait IActions {
         ref world: IWorldDispatcher,
         duelist_id: u128,
         name: felt252,
-        profile_pic: u8,
+        profile_pic_type: u8,
+        profile_pic_uri: ByteArray,
     ) -> Duelist;
 
     //
@@ -133,7 +134,8 @@ mod actions {
         fn register_duelist(ref world: IWorldDispatcher,
             duelist_id: u128,
             name: felt252,
-            profile_pic: u8,
+            profile_pic_type: u8,
+            profile_pic_uri: ByteArray,
         ) -> Duelist {
             let duelist_manager = DuelistManagerTrait::new(world);
             let caller: ContractAddress = starknet::get_caller_address();
@@ -149,11 +151,12 @@ mod actions {
             // update
             duelist.duelist_id = duelist_id;
             duelist.name = name;
-            duelist.profile_pic = profile_pic;
+            duelist.profile_pic_type = profile_pic_type;
+            duelist.profile_pic_uri = profile_pic_uri;
             // save
-            duelist_manager.set(duelist);
+            duelist_manager.set(duelist.clone());
 
-            self._emitDuelistRegisteredEvent(caller, duelist, is_new);
+            self._emitDuelistRegisteredEvent(caller, duelist.clone(), is_new);
 
             (duelist)
         }
@@ -466,7 +469,8 @@ mod actions {
                 address,
                 duelist_id: duelist.duelist_id,
                 name: duelist.name,
-                profile_pic: duelist.profile_pic,
+                profile_pic_type: duelist.profile_pic_type,
+                profile_pic_uri: duelist.profile_pic_uri,
                 is_new,
             })));
         }

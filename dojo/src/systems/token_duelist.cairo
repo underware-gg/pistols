@@ -244,13 +244,13 @@ mod token_duelist {
         fn build_uri(self: @ContractState, token_id: u256, encode: bool) -> ByteArray {
             let duelist: Duelist = get!(self.world(), (token_id), Duelist);
 
-            let attributes: Span<ByteArray> = self.get_attributes(duelist);
+            let attributes: Span<ByteArray> = self.get_attributes(duelist.clone());
             let metadata = JsonImpl::new()
                 .add("id", token_id.into())
-                .add("name", self.format_name(token_id, duelist))
-                .add("description", self.format_description(token_id, duelist))
-                .add("image", self.format_image(duelist, "sq"))
-                .add("portrait", self.format_image(duelist, "a"))
+                .add("name", self.format_name(token_id, duelist.clone()))
+                .add("description", self.format_description(token_id, duelist.clone()))
+                .add("image", self.format_image(duelist.clone(), "sq"))
+                .add("portrait", self.format_image(duelist.clone(), "a"))
                 .add("metadata", self.format_metadata(attributes))
                 .add_array("attributes", self.format_traits_array(attributes));
             let metadata = metadata.build();
@@ -280,7 +280,10 @@ mod token_duelist {
         
         fn format_image(self: @ContractState, duelist: Duelist, variant: ByteArray) -> ByteArray {
             let base_uri: ByteArray = self.erc721_metadata.get_meta().base_uri;
-            let number = if (duelist.profile_pic < 10) {format!("0{}", duelist.profile_pic)} else {duelist.profile_pic.into()};
+            let number =
+                if (duelist.profile_pic_uri.len() == 0) {"00"}
+                else if (duelist.profile_pic_uri.len() == 1) {format!("0{}", duelist.profile_pic_uri)}
+                else {duelist.profile_pic_uri};
             (format!("{}/profiles/{}_{}.jpg", base_uri, number, variant))
         }
 

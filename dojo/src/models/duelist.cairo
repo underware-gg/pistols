@@ -5,19 +5,30 @@ use pistols::interfaces::ierc721::{ierc721, IERC721Dispatcher, IERC721Dispatcher
 use pistols::types::constants::{constants};
 use pistols::libs::utils::{ZERO};
 
+
+mod profile_pic_type {
+    const DUELIST: u8 = 1;      // profile_pic_uri = number
+    const EXTERNAL: u8 = 2;     // image URL
+    // const STARK_ID: u8 = 3;     // stark.id (ipfs?)
+    // const ERC721: u8 = 4;       // Owned erc-721 (hard to validate and keep up to date)
+    // const DISCORD: u8 = 5;      // Linked account (had to be cloned, or just copy the url)
+}
+
 //---------------------
 // Duelist
 //
-#[derive(Copy, Drop, Serde)]
+// #[derive(Copy, Drop, Serde)] // ByteArray is not copiable!
+#[derive(Clone, Drop, Serde)]   // pass to functions using duelist.clone()
 #[dojo::model]
 struct Duelist {
     #[key]
-    duelist_id: u128,
+    duelist_id: u128,   // erc721 token_id
     //-----------------------
     name: felt252,
-    profile_pic: u8,
+    profile_pic_uri: ByteArray,     // can be anything
+    profile_pic_type: u8,
+    timestamp: u64,                 // date registered
     score: Score,
-    timestamp: u64, // when registered
 }
 
 // Current challenge between two Duelists

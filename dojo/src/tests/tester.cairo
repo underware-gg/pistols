@@ -229,9 +229,9 @@ mod tester {
     }
 
     // ::actions
-    fn execute_register_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic: u8) {
+    fn execute_register_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: u8, profile_pic_uri: ByteArray) {
         impersonate(sender);
-        system.register_duelist(ID(sender), name, profile_pic);
+        system.register_duelist(ID(sender), name, profile_pic_type, profile_pic_uri);
         _next_block();
     }
     fn execute_create_challenge(system: IActionsDispatcher, sender: ContractAddress,

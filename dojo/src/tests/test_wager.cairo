@@ -44,8 +44,6 @@ mod tests {
 
     fn _test_balance_ok(table_id: felt252, wager_value: u256, wager_min: u256) {
         let (world, system, admin, lords) = tester::setup_world(true, true, true, true, false);
-        tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
-        tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
         let S = system.contract_address;
         let A = OTHER();
         let B = OWNER();
@@ -126,8 +124,6 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Insufficient balance', 'ENTRYPOINT_FAILED'))]
     fn test_fee_funds_nok() {
         let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
-        tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
-        tester::execute_register_duelist(system, BUMMER(), BUMMER_NAME, 1);
         let _duel_id: u128 = tester::execute_create_challenge(system, BUMMER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 0);
     }
 
@@ -135,8 +131,6 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Insufficient balance', 'ENTRYPOINT_FAILED'))]
     fn test_wager_funds_nok() {
         let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
-        tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
-        tester::execute_register_duelist(system, BUMMER(), BUMMER_NAME, 1);
         let _duel_id: u128 = tester::execute_create_challenge(system, BUMMER(), OTHER(), MESSAGE_1, TABLE_ID, 100, 0);
     }
 
@@ -148,8 +142,6 @@ mod tests {
     #[test]
     fn test_fee_funds_ok() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
-        tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
-        tester::execute_register_duelist(system, BUMMER(), BUMMER_NAME, 1);
         let _balance: u256 = lords.balance_of(OTHER());
         let duel_id: u128 = tester::execute_create_challenge(system, OTHER(), BUMMER(), MESSAGE_1, TABLE_ID, 0, 0);
         let ch = tester::get_Challenge(world, duel_id);
@@ -159,8 +151,6 @@ mod tests {
     #[test]
     fn test_wager_funds_ok() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
-        tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
-        tester::execute_register_duelist(system, BUMMER(), BUMMER_NAME, 1);
         let _balance: u256 = lords.balance_of(OTHER());
         let duel_id: u128 = tester::execute_create_challenge(system, OTHER(), BUMMER(), MESSAGE_1, TABLE_ID, 100, 0);
         let ch = tester::get_Challenge(world, duel_id);
@@ -175,8 +165,6 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Insufficient balance', 'ENTRYPOINT_FAILED'))]
     fn test_fee_funds_ok_resp_nok() {
         let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
-        tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
-        tester::execute_register_duelist(system, BUMMER(), BUMMER_NAME, 1);
         // verified by test_fee_funds_ok
         let duel_id: u128 = tester::execute_create_challenge(system, OTHER(), BUMMER(), MESSAGE_1, TABLE_ID, 0, 0);
         // panic here
@@ -187,8 +175,6 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Insufficient balance', 'ENTRYPOINT_FAILED'))]
     fn test_wager_funds_ok_resp_nok() {
         let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
-        tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
-        tester::execute_register_duelist(system, BUMMER(), BUMMER_NAME, 1);
         // verified by test_wager_funds_ok
         let duel_id: u128 = tester::execute_create_challenge(system, OTHER(), BUMMER(), MESSAGE_1, TABLE_ID, 100, 0);
         // panic here
@@ -203,8 +189,6 @@ mod tests {
     #[should_panic(expected:('PISTOLS: No transfer allowance', 'ENTRYPOINT_FAILED'))]
     fn test_fee_funds_ok_allowance_nok() {
         let (_world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
-        tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
-        tester::execute_register_duelist(system, BUMMER(), BUMMER_NAME, 1);
         // verified by test_fee_funds_ok
         // remove allowance
         tester::execute_lords_approve(lords, OTHER(), system.contract_address, 0);
@@ -215,8 +199,6 @@ mod tests {
     #[should_panic(expected:('PISTOLS: No transfer allowance', 'ENTRYPOINT_FAILED'))]
     fn test_wager_funds_ok_allowance_nok() {
         let (_world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
-        tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
-        tester::execute_register_duelist(system, BUMMER(), BUMMER_NAME, 1);
         // verified by test_fee_funds_ok
         // remove allowance
         tester::execute_lords_approve(lords, OTHER(), system.contract_address, 0);
@@ -231,8 +213,6 @@ mod tests {
     #[test]
     fn test_withdraw_fees() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
-        tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
-        tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
         let S = system.contract_address;
         let A = OTHER();
         let B = OWNER();
@@ -257,8 +237,6 @@ mod tests {
     #[test]
     fn test_refused_fees() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
-        tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
-        tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
         let S = system.contract_address;
         let A = OTHER();
         let B = OWNER();
@@ -283,8 +261,6 @@ mod tests {
     #[test]
     fn test_expired_fees() {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
-        tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
-        tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1);
         let S = system.contract_address;
         let A = OTHER();
         let B = OWNER();

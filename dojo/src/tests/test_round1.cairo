@@ -30,8 +30,8 @@ mod tests {
     const SALT_1_b: u64 = 0xf9a978e92309da78;
 
     fn _start_new_challenge(world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress, wager_value: u256) -> (Challenge, Round, u128) {
-        tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
-        tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 2);
+        // tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1, "1");
+        // tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 1, "2");
         let expire_seconds: u64 = timestamp::from_days(2);
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, wager_value, expire_seconds);
         tester::elapse_timestamp(timestamp::from_days(1));
@@ -84,8 +84,6 @@ mod tests {
     #[test]
     fn test_challenge_accept_to_duelist() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
-        // tester::execute_register_duelist(system, OWNER(), PLAYER_NAME, 1);
-        // tester::execute_register_duelist(system, OTHER(), OTHER_NAME, 2);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         assert(system.has_pact(ID(A), ID(B)) == false, 'has_pact_no_1');
@@ -151,7 +149,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Not your duelist', 'ENTRYPOINT_FAILED'))]
     fn test_reply_wrong_duelist() {
-        let (_world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let (_world, system, _admin, _lords) = tester::setup_world(true, false, true, true, true);
         let expire_seconds: u64 = timestamp::from_days(2);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER(); // challenge a duelist
@@ -163,7 +161,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Not your Challenge', 'ENTRYPOINT_FAILED'))]
     fn test_reply_wrong_player_address() {
-        let (_world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let (_world, system, _admin, _lords) = tester::setup_world(true, false, true, true, true);
         let expire_seconds: u64 = timestamp::from_days(2);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = LITTLE_BOY(); // challenge a wallet
@@ -176,7 +174,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Not your Challenge', 'ENTRYPOINT_FAILED'))]
     fn test_reply_wrong_player_duelist() {
-        let (_world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
+        let (_world, system, _admin, _lords) = tester::setup_world(true, false, true, true, true);
         let expire_seconds: u64 = timestamp::from_days(2);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER(); // challenge a duelist
@@ -633,11 +631,11 @@ mod tests {
         tester::execute_commit_action(system, OTHER(), duel_id, 1, hash_b);
         tester::execute_reveal_action(system, OWNER(), duel_id, 1, 0x111, 10, 0);
         let duelist_a_before = tester::get_Duelist(world, OWNER());
-        tester::execute_register_duelist(system, OWNER(), 'dssadsa', 3);
+        tester::execute_register_duelist(system, OWNER(), 'dssadsa', 1, "3");
         let duelist_a_after = tester::get_Duelist(world, OWNER());
         assert(duelist_a_before.duelist_id == duelist_a_after.duelist_id, 'duelist_id');
         assert(duelist_a_before.name != duelist_a_after.name, 'name');
-        assert(duelist_a_before.profile_pic != duelist_a_after.profile_pic, 'profile_pic');
+        assert(duelist_a_before.profile_pic_uri != duelist_a_after.profile_pic_uri, 'profile_pic_uri');
         assert(duelist_a_before.timestamp == duelist_a_after.timestamp, 'timestamp');
         assert(duelist_a_before.score.total_duels == duelist_a_after.score.total_duels, 'total_duels');
         assert(duelist_a_before.score.total_wins == duelist_a_after.score.total_wins, 'total_wins');

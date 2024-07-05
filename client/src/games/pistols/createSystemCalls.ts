@@ -84,8 +84,8 @@ export function createSystemCalls(
     return results as T
   }
 
-  const register_duelist = async (signer: Account, duelist_id: BigNumberish, name: string, profile_pic: number): Promise<boolean> => {
-    const args = [BigInt(duelist_id), stringToFelt(name), profile_pic]
+  const register_duelist = async (signer: Account, duelist_id: BigNumberish, name: string, profile_pic_type: number, profile_pic_uri: string): Promise<boolean> => {
+    const args = [BigInt(duelist_id), stringToFelt(name), profile_pic_type, profile_pic_uri]
     return await _executeTransaction(signer, actions_call('register_duelist', args))
   }
 
