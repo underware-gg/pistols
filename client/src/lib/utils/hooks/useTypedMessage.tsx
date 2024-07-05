@@ -75,7 +75,7 @@ export type UseVerifyMessagesResult = {
 const useVerifyMessages = (
   account: AccountInterface,
   typedMessage: TypedData,
-  signature: ArraySignatureType,
+  signature: Signature,
   verifyAsync: () => Promise<boolean>
 ): UseVerifyMessagesResult => {
   const [isVerifying, setisVerifying] = useState(false)
@@ -113,13 +113,13 @@ const useVerifyMessages = (
 export const useVerifyMessagesOffChain = (
   account: AccountInterface,
   typedMessage: TypedData,
-  signature: ArraySignatureType,
+  signature: Signature,
 ): UseVerifyMessagesResult => {
   return useVerifyMessages(account, typedMessage, signature, async () => {
     if (!signature) {
       return false
     }
-    if (signature.length == 2) {
+    if (splitSignature(signature).length != 0) {
       return await account.verifyMessage(typedMessage, signature)
     }
     console.warn(`useVerifyMessagesOffChain() invalid signature`, signature)

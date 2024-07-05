@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { Container, Table, Button, Image } from 'semantic-ui-react'
 import { ArraySignatureType, TypedData } from 'starknet'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { useDojoAccount, useDojoStatus } from '@/lib/dojo/DojoContext'
+import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { useSignTypedMessage, useTypedMessage, useVerifyMessagesOffChain, useVerifyMessagesOnChain } from '@/lib/utils/hooks/useTypedMessage'
 import { feltToString } from '@/lib/utils/starknet'
@@ -42,7 +42,7 @@ export default function IndexPage() {
 
 function DojoAccount() {
   const { isInitialized } = useDojoStatus()
-  const { account, masterAccount, isGuest } = useDojoAccount()
+  const { account } = useAccount()
   const { selectedChainConfig } = useSelectedChain()
 
   if (!isInitialized) {
@@ -72,21 +72,9 @@ function DojoAccount() {
           </Cell>
         </Row>
         <Row>
-          <Cell>Dojo.masterAccount</Cell>
-          <Cell className='Code'>
-            {masterAccount.address}
-          </Cell>
-        </Row>
-        <Row>
           <Cell>Dojo.account</Cell>
           <Cell className='Code'>
             {account?.address ?? 'none'}
-          </Cell>
-        </Row>
-        <Row>
-          <Cell>isGuest</Cell>
-          <Cell className='Code Important'>
-            {isGuest ? 'true' : 'false'}
           </Cell>
         </Row>
       </Body>
@@ -159,7 +147,8 @@ function SignV0() {
     account,
   })
   const { sign, signAsync, isSigning, rawSignature, signaturePair } = useSignTypedMessage(typedMessage)
-  const { formatted } = useVerifyMessagesOffChain(account, typedMessage, rawSignature)
+  const { isVerified, formatted } = useVerifyMessagesOffChain(account, typedMessage, rawSignature)
+  useEffect(() => console.log(`SignV0`, isSigning, rawSignature, signaturePair, '>>>>>', isVerified), [isSigning, rawSignature, signaturePair, isVerified])
 
   return (
     <>
@@ -187,7 +176,8 @@ function SignV1() {
     messages,
   })
   const { sign, signAsync, isSigning, rawSignature, signaturePair } = useSignTypedMessage(typedMessage)
-  const { formatted } = useVerifyMessagesOnChain(account, typedMessage, rawSignature)
+  const { isVerified, formatted } = useVerifyMessagesOnChain(account, typedMessage, rawSignature)
+  useEffect(() => console.log(`SignV1`, isSigning, rawSignature, signaturePair, '>>>>>', isVerified), [isSigning, rawSignature, signaturePair, isVerified])
 
   // useEffect(() => console.log(`typedMessage/hash/data:`, typedMessage, hash, rawSignature), [typedMessage, hash, rawSignature])
 
