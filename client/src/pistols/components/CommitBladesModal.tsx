@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Modal } from 'semantic-ui-react'
-import { useDojoAccount, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
+import { useAccount } from '@starknet-react/core'
+import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useGetValidPackedActions } from '@/pistols/hooks/useContractCalls'
-import { Action, ActionEmojis, ActionNames } from '@/pistols/utils/pistols'
+import { Action, ActionNames } from '@/pistols/utils/pistols'
 import { pack_action_slots, signAndGenerateActionHash } from '@/pistols/utils/salt'
 import { ActionChances } from '@/pistols/components/ActionChances'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
@@ -27,7 +28,7 @@ export default function CommitBladesModal({
   isB?: boolean,
 }) {
   const { commit_action } = useDojoSystemCalls()
-  const { account } = useDojoAccount()
+  const { account } = useAccount()
   const { value } = useWager(duelId)
 
   const [slot1, setSlot1] = useState(0)

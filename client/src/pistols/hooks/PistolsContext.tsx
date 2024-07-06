@@ -37,14 +37,14 @@ const tavernMenuItems: MenuKey[] = [
 ]
 
 export enum AccountMenuKey {
-  Deploy = 'Deploy',
-  Fund = 'Fund',
+  // Deploy = 'Deploy',
+  // Fund = 'Fund',
   Profile = 'Profile',
 }
 
 const accountMenuItems: AccountMenuKey[] = [
-  AccountMenuKey.Deploy,
-  AccountMenuKey.Fund,
+  // AccountMenuKey.Deploy,
+  // AccountMenuKey.Fund,
   AccountMenuKey.Profile,
 ]
 
@@ -55,11 +55,11 @@ const accountMenuItems: AccountMenuKey[] = [
 export const initialState = {
   walletSig: { address: 0n, sig: 0n },
   accountIndex: 1,
-  duelId: 0n,
-  duelistAddress: 0n,
-  challengedAddress: 0n,
+  selectedDuelId: 0n,
+  selectedDuelistId: 0n,
+  challengingId: 0n,
   menuKey: MenuKey.Duelists,
-  accountMenuKey: AccountMenuKey.Deploy,
+  accountMenuKey: AccountMenuKey.Profile,
   sceneName: SceneName.Splash,
   // injected
   connectOpener: null as Opener,
@@ -74,8 +74,8 @@ const PistolsActions = {
   SET_MENU_KEY: 'SET_MENU_KEY',
   SET_SCENE: 'SET_SCENE',
   SELECT_DUEL: 'SELECT_DUEL',
-  SELECT_DUELIST: 'SELECT_DUELIST',
-  SELECT_CHALLENGED: 'SELECT_CHALLENGED',
+  SELECT_DUELIST_ID: 'SELECT_DUELIST_ID',
+  SELECT_CHALLENGING_ID: 'SELECT_CHALLENGING_ID',
 }
 
 
@@ -91,8 +91,8 @@ type ActionType =
   | { type: 'SET_MENU_KEY', payload: MenuKey }
   | { type: 'SET_SCENE', payload: SceneName }
   | { type: 'SELECT_DUEL', payload: bigint }
-  | { type: 'SELECT_DUELIST', payload: bigint }
-  | { type: 'SELECT_CHALLENGED', payload: bigint }
+  | { type: 'SELECT_DUELIST_ID', payload: bigint }
+  | { type: 'SELECT_CHALLENGING_ID', payload: bigint }
 
 
 
@@ -148,21 +148,21 @@ const PistolsProvider = ({
         break
       }
       case PistolsActions.SELECT_DUEL: {
-        newState.duelId = action.payload as bigint
-        newState.duelistAddress = 0n
-        newState.challengedAddress = 0n
+        newState.selectedDuelId = action.payload as bigint
+        newState.selectedDuelistId = 0n
+        newState.challengingId = 0n
         break
       }
-      case PistolsActions.SELECT_DUELIST: {
-        newState.duelId = 0n
-        newState.duelistAddress = action.payload as bigint
-        newState.challengedAddress = 0n
+      case PistolsActions.SELECT_DUELIST_ID: {
+        newState.selectedDuelId = 0n
+        newState.selectedDuelistId = action.payload as bigint
+        newState.challengingId = 0n
         break
       }
-      case PistolsActions.SELECT_CHALLENGED: {
-        newState.duelId = 0n
-        newState.duelistAddress = 0n
-        newState.challengedAddress = action.payload as bigint
+      case PistolsActions.SELECT_CHALLENGING_ID: {
+        newState.selectedDuelId = 0n
+        newState.selectedDuelistId = 0n
+        newState.challengingId = action.payload as bigint
         break
       }
       default:
@@ -223,22 +223,22 @@ export const usePistolsContext = () => {
       payload: scene != SceneName.Tavern ? scene : state.menuKey,
     })
   }
-  const dispatchSelectDuelist = (address: BigNumberish) => {
+  const dispatchSelectDuelistId = (newId: BigNumberish) => {
     dispatch({
-      type: PistolsActions.SELECT_DUELIST,
-      payload: BigInt(address),
+      type: PistolsActions.SELECT_DUELIST_ID,
+      payload: BigInt(newId),
     })
   }
-  const dispatchChallengedDuelist = (address: BigNumberish) => {
+  const dispatchChallengedDuelistId = (newId: BigNumberish) => {
     dispatch({
-      type: PistolsActions.SELECT_CHALLENGED,
-      payload: BigInt(address),
+      type: PistolsActions.SELECT_CHALLENGING_ID,
+      payload: BigInt(newId),
     })
   }
-  const dispatchSelectDuel = (duelId: BigNumberish) => {
+  const dispatchSelectDuel = (newId: BigNumberish) => {
     dispatch({
       type: PistolsActions.SELECT_DUEL,
-      payload: BigInt(duelId),
+      payload: BigInt(newId),
     })
   }
   return {
@@ -262,7 +262,7 @@ export const usePistolsContext = () => {
     dispatchSetMenu,
     dispatchSetScene,
     dispatchSelectDuel,
-    dispatchSelectDuelist,
-    dispatchChallengedDuelist,
+    dispatchSelectDuelistId,
+    dispatchChallengedDuelistId,
   }
 }

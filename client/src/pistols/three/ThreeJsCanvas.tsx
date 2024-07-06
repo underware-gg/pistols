@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
-import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 
 export const ThreeJsCanvas = ({
   width = 960,
@@ -13,7 +13,7 @@ export const ThreeJsCanvas = ({
     gameImpl, // initialized module (playable)
     dispatchGameImpl,
   } = useThreeJsContext()
-  const { framerate, debugScene } = useSettingsContext()
+  const { framerate, debugScene } = useSettings()
   const [isLoading, setIsLoading] = useState(false)
   const canvasRef = useRef()
 

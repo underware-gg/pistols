@@ -1,14 +1,13 @@
 import { useEffect, useMemo } from 'react'
-import { BurnerManager, PredeployedManager } from '@dojoengine/create-burner'
+import { Account } from 'starknet'
+import { PredeployedManager } from '@dojoengine/create-burner'
 import { getSyncEntities } from '@dojoengine/state'
 import { DojoProvider } from '@dojoengine/core'
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
 import { useSystem } from '@/lib/dojo/hooks/useDojoSystem'
 import { useAsyncMemo } from '@/lib/utils/hooks/useAsyncMemo'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
-import { dummyAccount, feltToString } from '@/lib/utils/starknet'
-import { Account } from 'starknet'
-
+import { feltToString } from '@/lib/utils/starknet'
 import { DojoChainConfig, getChainMasterAccount } from './chainConfig'
 import { createClientComponents } from './createClientComponents'
 import { setupNetwork } from './setupNetwork'
@@ -111,29 +110,6 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   }, [manifest, subscription, network, components])
 
   //
-  // TODO: Move this to DojoContext!
-  // must solve the async init problem
-  // (the provider cannot have a null burnerManager)
-  //
-  // create burner manager
-  // cannot be null!
-  const {
-    value: burnerManager,
-    isError: burnerManagerIsError,
-  } = useAsyncMemo<BurnerManager>(async () => {
-    if (!dojoProvider) return (dojoProvider as any) // undefined or null
-    const burnerManager = new BurnerManager({
-      // master account moved to predeployedManager
-      masterAccount: account ?? dummyAccount(dojoProvider.provider),
-      accountClassHash: selectedChainConfig.accountClassHash,
-      feeTokenAddress: selectedChainConfig.chain.nativeCurrency.address,
-      rpcProvider: dojoProvider.provider,
-    });
-    await burnerManager.init(true);
-    return burnerManager
-  }, [selectedChainConfig, dojoProvider, account], undefined, null)
-
-  //
   // Predeployed accounts
   // (includes master account)
   // can be null
@@ -165,7 +141,6 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     (components !== undefined) &&
     (subscription !== undefined) &&
     (systemCalls !== undefined) &&
-    (burnerManager !== undefined) &&
     (predeployedManager !== undefined)
   )
   const loadingMessage = (isLoading ? 'Loading Pistols...' : null)
@@ -176,7 +151,6 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
         : toriiIsError ? 'Game Indexer is Unavailable'
           : subscription === null ? 'Sync Error'
             : isDeployed === null ? 'World not Found'
-              : burnerManagerIsError ? 'Burner Manager error'
                 : predeployedManagerIsError ? 'Predeployed Manager error'
                   : null
   const isError = (errorMessage != null)
@@ -187,8 +161,6 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     }
   }, [errorMessage])
 
-  // console.log(`setting up...`, isLoading, loadingMessage, isError, errorMessage, burnerManager)
-
   return isLoading ? null : {
     // resolved
     dojoProvider,
@@ -196,7 +168,6 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     network,
     components,
     systemCalls,
-    burnerManager,
     predeployedManager,
     // pass thru
     dojoAppConfig,

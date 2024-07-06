@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { getComponentValue } from '@dojoengine/recs'
 import { useComponentValue } from "@dojoengine/react"
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
-import { useChallengesByDuelist } from '@/pistols/hooks/useChallenge'
+import { useChallengesByDuelistId } from '@/pistols/hooks/useChallenge'
 import { useLordsContract } from '@/lib/dojo/hooks/useLords'
 import { ChallengeState } from '@/pistols/utils/pistols'
 import { feltToString } from '@/lib/utils/starknet'
@@ -23,7 +23,7 @@ export const useWager = (duelId: BigNumberish) => {
 export const useLockedLordsBalance = (address: bigint) => {
   const { contractAddress } = useLordsContract()
   const { Wager, TableConfig } = useDojoComponents()
-  const { raw_challenges } = useChallengesByDuelist(address)
+  const { raw_challenges } = useChallengesByDuelistId(address)
   const { wagers, fees, total } = useMemo(() => {
     let wagers = 0n
     let fees = 0n

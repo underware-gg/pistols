@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
-import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useUserHasInteracted } from '@/lib/utils/hooks/useUserHasInteracted'
 import { loadAudioAssets, isAudioAssetsLoaded, AudioName } from '@/pistols/data/assets'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
@@ -13,7 +13,7 @@ function GameContainer({
 }) {
   const { dispatchSelectDuel } = usePistolsContext()
   const { audioLoaded } = useThreeJsContext()
-  const { initialized } = useSettingsContext()
+  const { initialized } = useSettings()
 
   useEffect(() => {
     if (duelId) {
@@ -88,7 +88,7 @@ function GameAudioLoader() {
 const GameAudios = ({
   isVisible
 }) => {
-  const { musicEnabled, sfxEnabled } = useSettingsContext()
+  const { musicEnabled, sfxEnabled } = useSettings()
   const { gameImpl, audioLoaded } = useThreeJsContext()
 
   useEffect(() => {
@@ -114,7 +114,7 @@ const GameAudios = ({
 // Will disable MUSIC settings if not interacted yet
 //
 export const TavernAudios = () => {
-  const { musicEnabled } = useSettingsContext()
+  const { musicEnabled } = useSettings()
   const { gameImpl, audioLoaded } = useThreeJsContext()
 
   useEffect(() => {

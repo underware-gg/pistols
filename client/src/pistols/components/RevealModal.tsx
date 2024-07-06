@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid } from 'semantic-ui-react'
-import { useDojoAccount, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
+import { useAccount } from '@starknet-react/core'
+import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useGetValidPackedActions } from '@/pistols/hooks/useContractCalls'
-import { Action } from '@/pistols/utils/pistols'
 import { signAndRestoreActionFromHash } from '../utils/salt'
 
 const Row = Grid.Row
@@ -22,7 +22,7 @@ export default function RevealModal({
   hash: bigint
 }) {
   const { reveal_action } = useDojoSystemCalls()
-  const { account } = useDojoAccount()
+  const { account } = useAccount()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { validPackedActions } = useGetValidPackedActions(roundNumber)
 

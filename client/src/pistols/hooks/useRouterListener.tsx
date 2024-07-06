@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { useRouter } from 'next/router'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
-import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext } from './PistolsContext'
 import { bigintToHex } from '@/lib/utils/types'
 
@@ -44,8 +44,8 @@ export const useRouterStarter = () => {
   const router = useRouter()
   const { duel, duelist, debug }: PistolsParams = router.query
 
-  const { dispatchSelectDuel, dispatchSelectDuelist } = usePistolsContext()
-  const { dispatchSetting, SettingsActions } = useSettingsContext()
+  const { dispatchSelectDuel, dispatchSelectDuelistId } = usePistolsContext()
+  const { dispatchSetting, SettingsActions } = useSettings()
 
   // select duel if url contains 'duel=0x1234'
   useEffectOnce(() => {
@@ -56,7 +56,7 @@ export const useRouterStarter = () => {
 
   useEffectOnce(() => {
     if (typeof duelist == 'string') {
-      dispatchSelectDuelist(duelist)
+      dispatchSelectDuelistId(duelist)
     }
   }, [duelist])
 
@@ -79,22 +79,22 @@ export const useRouterListener = () => {
 
   // keep settings updated with slug
   const { tableId } = useRouterTable()
-  const { dispatchSetting, SettingsActions } = useSettingsContext()
+  const { dispatchTableId } = useSettings()
   useEffect(() => {
     if (tableId) {
-      dispatchSetting(SettingsActions.TABLE_ID, tableId)
+      dispatchTableId(tableId)
     }
   }, [tableId])
 
-  const { duelId, duelistAddress } = usePistolsContext()
+  const { selectedDuelId, selectedDuelistId } = usePistolsContext()
 
   useEffect(() => {
-    _updateRoute(duelId ? { duel: bigintToHex(duelId) } : {})
-  }, [duelId])
+    _updateRoute(selectedDuelId ? { duel: bigintToHex(selectedDuelId) } : {})
+  }, [selectedDuelId])
 
   useEffect(() => {
-    _updateRoute(duelistAddress ? { duelist: bigintToHex(duelistAddress) } : {})
-  }, [duelistAddress])
+    _updateRoute(selectedDuelistId ? { duelist: bigintToHex(selectedDuelistId) } : {})
+  }, [selectedDuelistId])
 
   const _updateRoute = (params: PistolsParams) => {
     if (routerPath.startsWith('/tavern/')) {

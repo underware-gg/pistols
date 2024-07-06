@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
+import { useAccount } from '@starknet-react/core'
 import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
-import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useLordsContract } from '@/lib/dojo/hooks/useLords'
 import { bigintToUint256, ethToWei, execute } from '@/lib/utils/starknet'
 import { bigintToHex } from '@/lib/utils/types'
@@ -19,7 +19,7 @@ export interface FaucetInterface {
 }
 
 export const useLordsFaucet = (): FaucetInterface => {
-  const { account } = useDojoAccount()
+  const { account } = useAccount()
   const { selectedChainConfig } = useStarknetContext()
   const { contractAddress, isMock, abi } = useLordsContract()
 

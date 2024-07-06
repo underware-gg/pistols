@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid, Menu, Label, Tab, TabPane } from 'semantic-ui-react'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
-import { useChallengesByDuelistTotals, useLiveChallengeIds } from '@/pistols/hooks/useChallenge'
-import { useDojoAccount } from '@/lib/dojo/DojoContext'
+import { useChallengesByDuelistIdTotals, useLiveChallengeIds } from '@/pistols/hooks/useChallenge'
 import { useCurrentTable } from '@/pistols/hooks/useTable'
 import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
 import { DuelistTable } from '@/pistols/components/DuelistTable'
@@ -28,12 +28,11 @@ const _makeBubble = (count) => {
 export function TavernMenu({
 }) {
   const router = useRouter()
-  const { accountAddress, isGuest } = useDojoAccount()
-  const { menuKey, tavernMenuItems, dispatchSetMenu } = usePistolsContext()
-  const { tableOpener } = usePistolsContext()
+  const { duelistId, isGuest } = useSettings()
+  const { menuKey, tavernMenuItems, tableOpener, dispatchSetMenu } = usePistolsContext()
   const { tableId, description } = useCurrentTable()
 
-  const { liveDuelsCount: yourDuelsCount } = useChallengesByDuelistTotals(accountAddress, tableId)
+  const { liveDuelsCount: yourDuelsCount } = useChallengesByDuelistIdTotals(duelistId, tableId)
   const { challengeIds: liveChallengeIds } = useLiveChallengeIds(tableId)
   const liveDuelsCount = useMemo(() => (liveChallengeIds.length), [liveChallengeIds])
 

@@ -3,11 +3,9 @@ import { useRouter } from 'next/navigation'
 import { Grid } from 'semantic-ui-react'
 import { VStack, VStackRow } from '@/lib/ui/Stack'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
-import { useDojoAccount, useDojoStatus } from '@/lib/dojo/DojoContext'
+import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
-import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
-import { useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
-import { useOpener } from '@/lib/ui/useOpener'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { ChainSwitcher } from '@/lib/dojo/ChainSwitcher'
 import { AccountMenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { AccountsList } from '@/pistols/components/account/AccountsList'
@@ -17,7 +15,6 @@ import { Divider } from '@/lib/ui/Divider'
 import { makeTavernUrl } from '@/pistols/utils/pistols'
 import { PACKAGE_VERSION } from '@/pistols/utils/constants'
 import OnboardingModal from '@/pistols/components/account/OnboardingModal'
-import ExportAccountModal from '@/pistols/components/account/ExportAccountModal'
 import WalletHeader from '@/pistols/components/account/WalletHeader'
 import Logo from '@/pistols/components/Logo'
 
@@ -124,12 +121,11 @@ function DisconnectedGate() {
 
 
 function EnterAsGuestButton() {
-  const { deselect } = useDojoAccount()
+  const { tableId, dispatchDuelistId } = useSettings()
   const router = useRouter()
-  const { tableId } = useSettingsContext()
 
   const _enterAsGuest = () => {
-    deselect()
+    dispatchDuelistId(0n)
     router.push(makeTavernUrl(tableId))
   }
 
@@ -144,21 +140,11 @@ function EnterAsGuestButton() {
 //
 
 function ConnectedGate() {
-  const { remove, masterAccount, count } = useDojoAccount()
-  const { accountSetupOpener, dispatchSetAccountMenu, dispatchSetAccountIndex } = usePistolsContext()
-  const { burners, nextAccountIndex } = useBurners(masterAccount.address)
-  const exportOpener = useOpener()
+  const { accountSetupOpener, dispatchSetAccountMenu } = usePistolsContext()
 
-  const _deployDuelist = () => {
-    dispatchSetAccountIndex(nextAccountIndex)
-    dispatchSetAccountMenu(AccountMenuKey.Deploy)
+  const _mintDuelist = () => {
+    dispatchSetAccountMenu(AccountMenuKey.Profile)
     accountSetupOpener.open()
-  }
-
-  const _deleteAll = () => {
-    Object.values(burners).forEach(burner => {
-      remove(burner.address)
-    })
   }
 
   return (
@@ -166,10 +152,7 @@ function ConnectedGate() {
       <VStack>
 
         <VStackRow>
-          {/* <ActionButton fill disabled={isDeploying} onClick={() => create()} label='Create Duelist' /> */}
-          <ActionButton fill onClick={() => _deployDuelist()} label='Deploy New Duelist' />
-          <ActionButton fill onClick={() => exportOpener.open()} label='Export / Import' />
-          <ActionButton fill disabled={count == 0} onClick={() => _deleteAll()} label='Clear All' />
+          <ActionButton fill onClick={() => _mintDuelist()} label='Mint New Duelist' />
         </VStackRow>
 
       </VStack>
@@ -181,7 +164,6 @@ function ConnectedGate() {
       </div>
 
       <OnboardingModal opener={accountSetupOpener} />
-      <ExportAccountModal opener={exportOpener} onImported={() => _deleteAll()} />
     </>
   )
 }

@@ -1,28 +1,34 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useRouterTable } from '@/pistols/hooks/useRouterListener'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { LordsBalance, LockedWagerBalance } from '@/pistols/components/account/LordsBalance'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { EMOJI } from '@/pistols/data/messages'
+import { BigNumberish } from 'starknet'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export function ProfileName({
-  address,
+  duelistId,
   badges = true,
+}: {
+  duelistId: BigNumberish,
+  badges?: boolean
 }) {
-  const { name } = useDuelist(address)
+  const { name } = useDuelist(duelistId)
   return (
-    <span className='BreakWord'>{name} {badges && <ProfileBadge address={address} />}</span>
+    <span className='BreakWord'>{name} {badges && <ProfileBadge duelistId={duelistId} />}</span>
   )
 }
 
 export function ProfileBadge({
-  address,
+  duelistId,
+} : {
+  duelistId: BigNumberish
 }) {
-  const { is_villain, is_trickster, is_lord } = useDuelist(address)
+  const { is_villain, is_trickster, is_lord } = useDuelist(duelistId)
   if (is_villain) return <>{EMOJI.VILLAIN}</>
   if (is_trickster) return <>{EMOJI.TRICKSTER}</>
   if (is_lord) return <>{EMOJI.LORD}</>
@@ -30,36 +36,40 @@ export function ProfileBadge({
 }
 
 export function ProfileDescription({
-  address,
+  duelistId,
   displayStats = false,
   displayAddress = false,
   displayBalance = false,
+}: {
+  duelistId: BigNumberish,
+  displayStats?: boolean
+  displayAddress?: boolean
+  displayBalance?: boolean
 }) {
   const { tableId } = useRouterTable()
   const {
     total_wins, total_losses, total_draws, total_duels, total_honour, honourAndTotal,
     is_villain, is_trickster, is_lord, levelDisplay, levelAndTotal,
-  } = useDuelist(address)
-  // const { accountAddress } = useDojoAccount()
+  } = useDuelist(duelistId)
+  // const { address: accountAddress } = useAccount()
   // const isYou = useMemo(() => bigintEquals(address, accountAddress), [address, accountAddress])
   return (
     <Grid>
       <Row>
 
         <Col width={displayStats ? 12 : 16}>
-          <h1 className='NoMargin'><ProfileName address={address} badges={false}/></h1>
-          {displayAddress && <AddressShort address={address} />}
+          <h1 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /> #{duelistId}</h1>
+          {/* {displayAddress && <AddressShort address={address} />} */}
           <h3 className='Important NoMargin TitleCase'>
             Honour: <span className='Wager'>{honourAndTotal}</span>
             {is_villain && <> {EMOJI.VILLAIN} <span className='Wager'>{levelDisplay}</span></>}
             {is_trickster && <> {EMOJI.TRICKSTER} <span className='Wager'>{levelDisplay}</span></>}
             {is_lord && <> {EMOJI.LORD} <span className='Wager'>{levelDisplay}</span></>}
           </h3>
-          {displayBalance && <>
+          {/* {displayBalance && <>
             <LordsBalance address={address} big />
             <LockedWagerBalance tableId={tableId} address={address} clean />
-            {/* {isYou && <><br /><LordsFaucet /></>} */}
-          </>}
+          </>} */}
         </Col>
 
         {displayStats && total_duels > 0 &&

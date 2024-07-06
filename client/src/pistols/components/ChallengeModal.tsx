@@ -1,12 +1,15 @@
 import React, { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Grid, Table, Modal } from 'semantic-ui-react'
-import { useDojoAccount, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
+import { Grid, Modal } from 'semantic-ui-react'
+import { useAccount } from '@starknet-react/core'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useWager } from '@/pistols/hooks/useWager'
 import { useTable } from '@/pistols/hooks/useTable'
+import { useIsMyDuelist } from '@/pistols/hooks/useIsMyDuelist'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePicButton } from '@/pistols/components/account/ProfilePic'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
@@ -20,30 +23,29 @@ import { Divider } from '@/lib/ui/Divider'
 
 const Row = Grid.Row
 const Col = Grid.Column
-const Cell = Table.HeaderCell
-
 
 export default function ChallengeModal() {
   const router = useRouter()
   const { reply_challenge } = useDojoSystemCalls()
-  const { account, isThisAccount } = useDojoAccount()
+  const { duelistId } = useSettings()
+  const { account } = useAccount()
 
-  const { duelId, dispatchSelectDuel, dispatchSelectDuelist } = usePistolsContext()
-  const isOpen = useMemo(() => (duelId > 0), [duelId])
+  const { selectedDuelId, dispatchSelectDuel, dispatchSelectDuelistId } = usePistolsContext()
+  const isOpen = useMemo(() => (selectedDuelId > 0), [selectedDuelId])
 
   const _close = () => { dispatchSelectDuel(0n) }
 
-  const { state, tableId, message, duelistA, duelistB, isLive, isFinished, needToSyncExpired } = useChallenge(duelId)
-  const { value, fee } = useWager(duelId)
+  const { state, tableId, message, duelistIdA, duelistIdB, isLive, isFinished, needToSyncExpired } = useChallenge(selectedDuelId)
+  const { value, fee } = useWager(selectedDuelId)
   const { description: tableDescription }= useTable(tableId)
 
-  const { challengeDescription } = useChallengeDescription(duelId)
+  const { challengeDescription } = useChallengeDescription(selectedDuelId)
 
-  const { profilePic: profilePicA } = useDuelist(duelistA)
-  const { profilePic: profilePicB } = useDuelist(duelistB)
+  const { profilePic: profilePicA } = useDuelist(duelistIdA)
+  const { profilePic: profilePicB } = useDuelist(duelistIdB)
 
-  const isChallenger = useMemo(() => isThisAccount(duelistA), [duelistA, isThisAccount])
-  const isChallenged = useMemo(() => isThisAccount(duelistB), [duelistB, isThisAccount])
+  const isChallenger = useIsMyDuelist(duelistIdA)
+  const isChallenged = useIsMyDuelist(duelistIdB)
   const isYou = (isChallenger || isChallenged)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -51,7 +53,7 @@ export default function ChallengeModal() {
   const _reply = (accepted: boolean) => {
     const _submit = async () => {
       setIsSubmitting(true)
-      await reply_challenge(account, duelId, accepted)
+      await reply_challenge(account, selectedDuelId, duelistId, accepted)
       if (accepted) _gotoDuel()
       setIsSubmitting(false)
     }
@@ -59,7 +61,7 @@ export default function ChallengeModal() {
   }
 
   const _gotoDuel = () => {
-    router.push(makeDuelUrl(duelId))
+    router.push(makeDuelUrl(selectedDuelId))
   }
 
   return (
@@ -80,21 +82,21 @@ export default function ChallengeModal() {
               {tableDescription}
             </Col>
             <Col width={1} textAlign='right'>
-              <IconClick name='database' size={'small'} onClick={() => window?.open(`/dueldata/${duelId}`, '_blank')} />
+              <IconClick name='database' size={'small'} onClick={() => window?.open(`/dueldata/${selectedDuelId}`, '_blank')} />
             </Col>
             <Col width={3} textAlign='right'>
-              <AddressShort address={duelId} />
+              <AddressShort address={selectedDuelId} />
             </Col>
           </Row>
         </Grid>
       </Modal.Header>
       <Modal.Content image>
-        <ProfilePicButton profilePic={profilePicA} onClick={() => dispatchSelectDuelist(duelistA)} />
+        <ProfilePicButton profilePic={profilePicA} onClick={() => dispatchSelectDuelistId(duelistIdA)} />
         <Modal.Description className='Padded' style={{ width: '550px' }}>
           <Grid style={{ width: '350px' }}>
             <Row columns='equal' textAlign='left'>
               <Col>
-                <ProfileDescription address={duelistA} displayAddress />
+                <ProfileDescription duelistId={duelistIdA} displayAddress />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -104,7 +106,7 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <ProfileDescription address={duelistB} displayAddress />
+                <ProfileDescription duelistId={duelistIdB} displayAddress />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -139,7 +141,7 @@ export default function ChallengeModal() {
               </Row>
               <Row textAlign='center'>
                 <Col width={16} textAlign='right'>
-                  <DuelIconsAsGrid duelId={duelId} duelistA={duelistA} duelistB={duelistB} size='big' />
+                  <DuelIconsAsGrid duelId={selectedDuelId} duelistIdA={duelistIdA} duelistIdB={duelistIdB} size='big' />
                 </Col>
               </Row>
             </>}
@@ -152,14 +154,14 @@ export default function ChallengeModal() {
             <Row columns='equal' textAlign='center'>
               <Col>
                 <h3 className=''>{challengeDescription}</h3>
-                <span className='Code'><ChallengeTime duelId={duelId} prefixed /></span>
+                <span className='Code'><ChallengeTime duelId={selectedDuelId} prefixed /></span>
                 {/* <Divider className='NoMargin' /> */}
               </Col>
             </Row>
 
           </Grid>
         </Modal.Description>
-        <ProfilePicButton profilePic={profilePicB} onClick={() => dispatchSelectDuelist(duelistB)} />
+        <ProfilePicButton profilePic={profilePicB} onClick={() => dispatchSelectDuelistId(duelistIdB)} />
       </Modal.Content>
       <Modal.Actions className='NoPadding'>
         <Grid className='FillParent Padded' textAlign='center'>

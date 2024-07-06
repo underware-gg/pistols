@@ -1,5 +1,5 @@
 import {
-  Account,
+  AccountInterface,
   BigNumberish,
   WeierstrassSignatureType,
 } from 'starknet'
@@ -26,7 +26,7 @@ export const unpack_action_slots = (packed: number | null): number[] | null => {
 
 
 /** @returns a 64-bit salt from account signature, or 0 if fail */
-const signAndGenerateSalt = async (account: Account, duelId: bigint, roundNumber: number): Promise<bigint> => {
+const signAndGenerateSalt = async (account: AccountInterface, duelId: bigint, roundNumber: number): Promise<bigint> => {
   let result = 0n
   if (duelId && roundNumber) {
     try {
@@ -44,7 +44,7 @@ const signAndGenerateSalt = async (account: Account, duelId: bigint, roundNumber
 }
 
 /** @returns the felt252 hash for an action, or 0 if fail */
-export const signAndGenerateActionHash = async (account: Account, duelId: bigint, roundNumber: number, packed: BigNumberish): Promise<bigint> => {
+export const signAndGenerateActionHash = async (account: AccountInterface, duelId: bigint, roundNumber: number, packed: BigNumberish): Promise<bigint> => {
   const salt = await signAndGenerateSalt(account, duelId, roundNumber)
   const hash = make_action_hash(salt, BigInt(packed))
   console.log(`signAndGenerateActionHash():`, bigintToHex(duelId), roundNumber, packed, bigintToHex(salt), bigintToHex(hash))
@@ -52,7 +52,7 @@ export const signAndGenerateActionHash = async (account: Account, duelId: bigint
 }
 
 /** @returns the original action from an action hash, or 0 if fail */
-export const signAndRestoreActionFromHash = async (account: Account, duelId: bigint, roundNumber: number, hash: bigint, possibleActions: BigNumberish[]): Promise<{ salt: bigint, packed: number, slot1: number, slot2: number }> => {
+export const signAndRestoreActionFromHash = async (account: AccountInterface, duelId: bigint, roundNumber: number, hash: bigint, possibleActions: BigNumberish[]): Promise<{ salt: bigint, packed: number, slot1: number, slot2: number }> => {
   const salt = await signAndGenerateSalt(account, duelId, roundNumber)
   let packed = null
   let slots = null

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Divider, Grid, Modal, Pagination } from 'semantic-ui-react'
-import { useDojoAccount, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
+import { useAccount } from '@starknet-react/core'
+import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { signAndGenerateActionHash } from '@/pistols/utils/salt'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ActionChances } from '@/pistols/components/ActionChances'
@@ -20,7 +21,7 @@ export default function CommitPacesModal({
   roundNumber?: number
 }) {
   const { commit_action } = useDojoSystemCalls()
-  const { account } = useDojoAccount()
+  const { account } = useAccount()
 
   const [paces, setPaces] = useState(0)
 

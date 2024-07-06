@@ -1,15 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Input } from 'semantic-ui-react'
-import { useDojoAccount, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
+import { useAccount } from '@starknet-react/core'
+import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
-import { useBurnerAccount } from '@/lib/dojo/hooks/useBurnerAccount'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { PROFILE_PIC_COUNT } from '@/pistols/utils/constants'
-import { TextLink } from '@/lib/ui/Links'
 import { IconClick } from '@/lib/ui/Icons'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -18,17 +17,17 @@ export function OnboardingProfile({
 }) {
   const { update_duelist } = useDojoSystemCalls()
   const { accountIndex } = usePistolsContext()
-  const { address } = useBurnerAccount(accountIndex)
-  const { account } = useDojoAccount()
+  const { duelistId } = useSettings()
+  const { account, address } = useAccount()
 
-  const { name, profilePic, isRegistered } = useDuelist(address)
+  const { name, profilePic, isRegistered } = useDuelist(duelistId)
   const [selectedProfilePic, setSelectedProfilePic] = useState(0)
 
   const _profilePic = useMemo(() => {
     return (
       selectedProfilePic ? selectedProfilePic
         : profilePic ? profilePic
-          : (Number(BigInt(address ?? 0n) % BigInt(PROFILE_PIC_COUNT)) + 1)
+          : (Number((BigInt(address ?? 0n) + BigInt(duelistId)) % BigInt(PROFILE_PIC_COUNT)) + 1)
     )
   }, [selectedProfilePic, profilePic, address])
 
@@ -36,7 +35,7 @@ export function OnboardingProfile({
   const [inputValue, setInputValue] = useState(null)
   const inputIsValid = useMemo(() => (inputValue?.length >= 3), [inputValue])
   const isUpdated = useMemo(() => (name == inputValue && profilePic == _profilePic), [name, inputValue, profilePic, _profilePic])
-  const canRegister = useMemo(() => (inputIsValid && account && address), [inputIsValid, account, address])
+  const canRegister = useMemo(() => (inputIsValid && duelistId && account), [inputIsValid, duelistId, account])
   // console.log(isUpdated, name, inputValue, profilePic, selectedProfilePic, _profilePic)
 
   useEffect(() => {
@@ -45,7 +44,7 @@ export function OnboardingProfile({
 
   const _register = () => {
     if (canRegister) {
-      update_duelist(account, 0n, inputValue, _profilePic)
+      update_duelist(account, duelistId, inputValue, 1, _profilePic.toString())
     }
   }
 

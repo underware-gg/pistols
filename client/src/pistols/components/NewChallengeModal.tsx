@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Modal, Form, Dropdown } from 'semantic-ui-react'
+import { useAccount } from '@starknet-react/core'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
-import { useDojoAccount, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
+import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useRouterTable } from '@/pistols/hooks/useRouterListener'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
@@ -23,23 +24,23 @@ const Col = Grid.Column
 
 export default function NewChallengeModal() {
  const { create_challenge } = useDojoSystemCalls()
-  const { account, accountAddress } = useDojoAccount()
+  const { account, address } = useAccount()
 
-  const { challengedAddress, dispatchChallengedDuelist, dispatchSelectDuelist, dispatchSelectDuel } = usePistolsContext()
-  const isOpen = useMemo(() => (challengedAddress > 0n), [challengedAddress])
-  const duelistA = accountAddress
-  const duelistB = challengedAddress
+  const { challengingId, dispatchChallengedDuelistId, dispatchSelectDuelistId, dispatchSelectDuel } = usePistolsContext()
+  const isOpen = useMemo(() => (challengingId > 0n), [challengingId])
+  const duelistIdA = address
+  const duelistIdB = challengingId
 
-  const _close = () => { dispatchChallengedDuelist(0n) }
+  const _close = () => { dispatchChallengedDuelistId(0n) }
 
-  const { profilePic: profilePicA } = useDuelist(duelistA)
-  const { profilePic: profilePicB } = useDuelist(duelistB)
-  const { hasPact, pactDuelId } = usePact(duelistA, duelistB)
+  const { profilePic: profilePicA } = useDuelist(duelistIdA)
+  const { profilePic: profilePicB } = useDuelist(duelistIdB)
+  const { hasPact, pactDuelId } = usePact(duelistIdA, duelistIdB)
 
   const { tableId } = useRouterTable()
   const { description: tableDescription } = useTable(tableId)
-  const { balance: balanceA } = useTableBalance(tableId, duelistA)
-  const { balance: balanceB } = useTableBalance(tableId, duelistA)
+  const { balance: balanceA } = useTableBalance(tableId, duelistIdA)
+  const { balance: balanceB } = useTableBalance(tableId, duelistIdB)
 
   const [args, setArgs] = useState(null)
 
@@ -62,7 +63,7 @@ export default function NewChallengeModal() {
   const _create_challenge = () => {
     const _submit = async () => {
       setIsSubmitting(true)
-      await create_challenge(account, 0n, challengedAddress, args.message, tableId, args.wager_value, args.expire_seconds)
+      await create_challenge(account, 0n, challengingId, args.message, tableId, args.wager_value, args.expire_seconds)
       setIsSubmitting(false)
     }
     if (args) _submit()
@@ -91,13 +92,13 @@ export default function NewChallengeModal() {
         </Grid>
       </Modal.Header>
       <Modal.Content image>
-        <ProfilePicButton profilePic={profilePicA} onClick={() => dispatchSelectDuelist(duelistA)} />
+        <ProfilePicButton profilePic={profilePicA} onClick={() => dispatchSelectDuelistId(duelistIdA)} />
 
         <Modal.Description className='Padded' style={{ width: '550px' }}>
           <Grid style={{ width: '350px' }}>
             <Row columns='equal' textAlign='left'>
               <Col>
-                <ProfileDescription address={duelistA} displayAddress={false} />
+                <ProfileDescription duelistId={duelistIdA} displayAddress={false} />
                 {canWager && <h5><Balance tableId={tableId} wei={balanceA} /></h5>}
               </Col>
             </Row>
@@ -108,7 +109,7 @@ export default function NewChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <ProfileDescription address={duelistB} displayAddress={false} />
+                <ProfileDescription duelistId={duelistIdB} displayAddress={false} />
                 {canWager && <h5><Balance tableId={tableId} wei={balanceB} /></h5>}
               </Col>
             </Row>
@@ -125,7 +126,7 @@ export default function NewChallengeModal() {
           </Grid>
         </Modal.Description>
 
-        <ProfilePicButton profilePic={profilePicB} onClick={() => dispatchSelectDuelist(duelistB)} />
+        <ProfilePicButton profilePic={profilePicB} onClick={() => dispatchSelectDuelistId(duelistIdB)} />
       </Modal.Content>
       <Modal.Actions className='NoPadding'>
         <Grid className='FillParent Padded' textAlign='center'>

@@ -1,13 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Table } from 'semantic-ui-react'
-import { useDojoAccount } from '@/lib/dojo/DojoContext'
-import { useAllDuelistIds, useDuelist } from '@/pistols/hooks/useDuelist'
+import { useAccount } from '@starknet-react/core'
+import { useAllDuelistKeys, useDuelist } from '@/pistols/hooks/useDuelist'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ProfileName } from './account/ProfileDescription'
 import { bigintEquals } from '@/lib/utils/types'
 import { EMOJI } from '@/pistols/data/messages'
+import { BigNumberish } from 'starknet'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -31,8 +32,8 @@ enum SortDirection {
 }
 
 export function DuelistTable() {
-  const { accountAddress } = useDojoAccount()
-  const { duelistIds } = useAllDuelistIds()
+  const { address } = useAccount()
+  const { duelistKeys } = useAllDuelistKeys()
 
   // Sort
   const [sortColumn, setSortColumn] = useState(DuelistColumn.Honour)
@@ -55,12 +56,12 @@ export function DuelistTable() {
 
   const rows = useMemo(() => {
     let result = []
-    duelistIds.forEach((duelistId, index) => {
-      const isYou = bigintEquals(duelistId, accountAddress)
-      result.push(<DuelistItem key={duelistId} address={duelistId} index={index} isYou={isYou} sortColumn={sortColumn} dataCallback={_dataCallback}/>)
+    duelistKeys.forEach((duelistId, index) => {
+      const isYou = bigintEquals(duelistId, address)
+      result.push(<DuelistItem key={duelistId} duelistId={duelistId} index={index} isYou={isYou} sortColumn={sortColumn} dataCallback={_dataCallback}/>)
     })
     return result
-  }, [duelistIds, sortColumn])
+  }, [duelistKeys, sortColumn])
 
   // Sort rows
   const sortedRows = useMemo(() => rows.sort((a, b) => {
@@ -123,23 +124,29 @@ export function DuelistTable() {
 
 
 function DuelistItem({
-  address,
-  index,
-  isYou,
+  duelistId,
   sortColumn,
   dataCallback,
+  index,
+  isYou,
+}: {
+  duelistId: BigNumberish
+  sortColumn: DuelistColumn
+  dataCallback: Function
+  index?: number
+  isYou?: boolean
 }) {
-  const duelistData = useDuelist(address)
+  const duelistData = useDuelist(duelistId)
   const {
     profilePic,
     total_wins, total_losses, total_draws, total_duels, total_honour,
     honourDisplay, levelDisplay, winRatio,
   } = duelistData
-  const { dispatchSelectDuelist } = usePistolsContext()
+  const { dispatchSelectDuelistId } = usePistolsContext()
 
   useEffect(() => {
     // console.log(duelistData)
-    dataCallback(address, duelistData)
+    dataCallback(duelistId, duelistData)
   }, [duelistData])
 
   const _colClass = (col: DuelistColumn) => (sortColumn == col ? 'Important' : null)
@@ -147,14 +154,14 @@ function DuelistItem({
   const isRookie = (total_duels == 0)
 
   return (
-    <Table.Row textAlign='center' verticalAlign='middle' onClick={() => dispatchSelectDuelist(address)}>
+    <Table.Row textAlign='center' verticalAlign='middle' onClick={() => dispatchSelectDuelistId(duelistId)}>
       <Cell>
         <ProfilePicSquare profilePic={profilePic} small />
       </Cell>
 
       <Cell textAlign='left' style={{ maxWidth: '175px' }}>
-        <h5 className='NoMargin'><ProfileName address={address} /></h5>
-        <AddressShort address={address} copyLink={false} />
+        <h5 className='NoMargin'><ProfileName duelistId={duelistId} /></h5>
+        {/* <AddressShort address={address} copyLink={false} /> */}
       </Cell>
 
       <Cell className={_colClass(DuelistColumn.Honour)}>

@@ -1,6 +1,6 @@
 import React, { ReactNode, createContext, useContext, useEffect, useMemo } from 'react'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
-import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
 import { HASH_SALT_MASK } from '@/pistols/utils/constants'
 
@@ -28,10 +28,10 @@ export const ConstantsProvider = ({
   // console.log(constants)
 
   // initialize default table
-  const { dispatchSetting, SettingsActions, tableId } = useSettingsContext()
+  const { dispatchTableId, tableId } = useSettings()
   useEffect(() => {
     if (!tableId && constants.tables?.LORDS) {
-      dispatchSetting(SettingsActions.TABLE_ID, constants.tables.LORDS)
+      dispatchTableId(constants.tables.LORDS)
     }
   }, [constants, tableId])
 

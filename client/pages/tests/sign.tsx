@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { Account, typedData } from 'starknet'
+import { AccountInterface, typedData } from 'starknet'
 import { Container, Table } from 'semantic-ui-react'
+import { useAccount } from '@starknet-react/core'
 import { useTypedMessage } from '@/lib/utils/hooks/useTypedMessage'
-import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
 import { bigintToHex, shortAddress } from '@/lib/utils/types'
 import AppPistols from '@/pistols/components/AppPistols'
@@ -45,14 +45,14 @@ export default function IndexPage() {
 }
 
 function ConsoleTests() {
-  const { masterAccount } = useDojoAccount()
+  const { account } = useAccount()
   useEffect(() => {
-    if (!BigInt(masterAccount?.address ?? 0)) return
+    if (!BigInt(account?.address ?? 0)) return
     const _test = async () => {
-      await testTypedData(masterAccount)
+      await testTypedData(account)
     }
     _test()
-  }, [masterAccount])
+  }, [account])
   return (<h5>console tests...</h5>)
 }
 
@@ -61,7 +61,7 @@ function ValidateMessage({
 }: {
   messages: Messages
 }) {
-  const { masterAccount } = useDojoAccount()
+  const { account } = useAccount()
 
   const [signature, setSignature] = useState(null)
   const [verified, setVerifyed] = useState('...')
@@ -74,9 +74,9 @@ function ValidateMessage({
   useEffect(() => {
     const _validate = async () => {
       try {
-        const _sig = await masterAccount.signMessage(typedMessage)
+        const _sig = await account.signMessage(typedMessage)
         setSignature(_sig)
-        const _valid = await masterAccount.verifyMessage(typedMessage, _sig)
+        const _valid = await account.verifyMessage(typedMessage, _sig)
         setVerifyed(_valid ? 'OK' : 'failed')
       } catch {
         setVerifyed('ERROR')
@@ -108,7 +108,7 @@ function ValidateMessage({
 }
 
 
-export async function testTypedData(account: Account) {
+export async function testTypedData(account: AccountInterface) {
   const typedMessage0 = createTypedMessage({ revision: 1, messages: { key: '0x01111' } })
   const typedMessage1 = createTypedMessage({ revision: 1, messages: { key: '0x1111' } })
   const typedMessage2 = createTypedMessage({ revision: 1, messages: { key: '0x1112' } })

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
-import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { AccountChangeDetector, ChainChangeDetector } from '@/lib/dojo/ChangeDetector'
 
 export function DojoSetupErrorDetector() {
@@ -21,12 +21,12 @@ export function DojoSetupErrorDetector() {
 export function ConnectionDetector() {
   const { isConnected } = useSelectedChain()
   const { connectOpener } = usePistolsContext()
-  const { isGuest, deselect } = useDojoAccount()
+  const { isGuest, dispatchDuelistId } = useSettings()
 
   // const router = useRouter()
   const _backToGate = () => {
     // router.push('/gate')
-    deselect()
+    dispatchDuelistId(0n)
   }
 
   // on mount, try to connect if not connected
@@ -48,7 +48,7 @@ export function ConnectionDetector() {
       if (isConnected) {
         setAskedToConnect(false)
       } else {
-        deselect()
+        dispatchDuelistId(0n)
       }
     }
   }, [askedToConnect, isConnected, connectOpener.isOpen])

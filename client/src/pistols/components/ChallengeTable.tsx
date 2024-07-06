@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
-import { useDojoAccount } from '@/lib/dojo/DojoContext'
-import { useAllChallengeIds, useChallengeIdsByDuelist, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
+import { BigNumberish } from 'starknet'
+import { useAllChallengeIds, useChallengeIdsByDuelistId, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuel } from '@/pistols/hooks/useDuel'
@@ -13,7 +14,7 @@ import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { DuelIconsAsRow } from '@/pistols/components/DuelIcons'
 import { FilterButton } from '@/pistols/components/ui/Buttons'
 import { Balance } from '@/pistols/components/account/Balance'
-import { BigNumberish } from 'starknet'
+import { bigintEquals } from '@/lib/utils/types'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -48,20 +49,20 @@ export function ChallengeTablePast({
 export function ChallengeTableYour({
   tableId
 }: ChallengeTableProps) {
-  const { accountAddress } = useDojoAccount()
-  return <ChallengeTableByDuelist address={accountAddress} compact tableId={tableId} />
+  const { duelistId } = useSettings()
+  return <ChallengeTableByDuelist duelistId={duelistId} compact tableId={tableId} />
 }
 
 export function ChallengeTableByDuelist({
-  address = null,
+  duelistId = null,
   compact = false,
   tableId
 }: {
-  address: bigint
+    duelistId: BigNumberish
   compact: boolean
   tableId?: string
 }) {
-  const { challengeIds } = useChallengeIdsByDuelist(address, tableId)
+  const { challengeIds } = useChallengeIdsByDuelistId(duelistId, tableId)
   return <ChallengeTableByIds challengeIds={challengeIds} compact={compact} states={AllChallengeStates} />
 }
 
@@ -72,7 +73,6 @@ function ChallengeTableByIds({
   compact = false,
   states = [],
 }) {
-  const { accountAddress } = useDojoAccount()
   const [order, setOrder] = useState({})
   const _sortCallback = (id, state, timestamp) => {
     // this pattern can handle simultaneous state set
@@ -90,7 +90,7 @@ function ChallengeTableByIds({
   const rows = useMemo(() => {
     let result = []
     challengeIds.forEach((duelId, index) => {
-      result.push(<DuelItem key={duelId} duelId={duelId} sortCallback={_sortCallback} compact={compact} address={accountAddress} states={selectedStated} />)
+      result.push(<DuelItem key={duelId} duelId={duelId} sortCallback={_sortCallback} compact={compact} states={selectedStated} />)
     })
     return result
   }, [challengeIds, selectedStated])
@@ -161,17 +161,17 @@ function ChallengeTableByIds({
 function DuelItem({
   duelId,
   sortCallback,
-  address,
   compact = false,
   states = [],
 }) {
+  const { duelistId } = useSettings()
   const {
-    challenge: { duelistA, duelistB, tableId, state, isLive, isCanceled, isExpired, isDraw, winner, timestamp_start },
+    challenge: { duelistIdA, duelistIdB, tableId, state, isLive, isCanceled, isExpired, isDraw, winner, timestamp_start },
     turnA, turnB,
   } = useDuel(duelId)
   const { value } = useWager(duelId)
-  const { profilePic: profilePicA } = useDuelist(duelistA)
-  const { profilePic: profilePicB } = useDuelist(duelistB)
+  const { profilePic: profilePicA } = useDuelist(duelistIdA)
+  const { profilePic: profilePicB } = useDuelist(duelistIdB)
 
   useEffect(() => {
     sortCallback(duelId, state, timestamp_start)
@@ -180,8 +180,8 @@ function DuelItem({
   const winnerIsA = useMemo(() => (winner == 1), [winner])
   const winnerIsB = useMemo(() => (winner == 2), [winner])
 
-  const classNameA = useMemo(() => ((turnA && address == duelistA) ? 'BgImportant' : null), [address, duelistA, turnA])
-  const classNameB = useMemo(() => ((turnB && address == duelistB) ? 'BgImportant' : null), [address, duelistB, turnB])
+  const classNameA = useMemo(() => ((turnA && bigintEquals(duelistId, duelistIdA)) ? 'BgImportant' : null), [duelistId, duelistIdA, turnA])
+  const classNameB = useMemo(() => ((turnB && bigintEquals(duelistId, duelistIdB)) ? 'BgImportant' : null), [duelistId, duelistIdB, turnB])
 
   const { dispatchSelectDuel } = usePistolsContext()
 
@@ -202,10 +202,10 @@ function DuelItem({
 
       <Cell className={classNameA}>
         <PositiveResult positive={winnerIsA} negative={winnerIsB && false} warning={isDraw} canceled={isCanceled || isExpired}>
-          <ProfileName address={duelistA} />
+          <ProfileName duelistId={duelistIdA} />
         </PositiveResult>
         <br />
-        <DuelIconsAsRow duelId={duelId} account={duelistA} size={compact ? null : 'large'} />
+        <DuelIconsAsRow duelId={duelId} duelistId={duelistIdA} size={compact ? null : 'large'} />
       </Cell>
 
       <Cell className={classNameB}>
@@ -214,17 +214,17 @@ function DuelItem({
 
       <Cell className={classNameB}>
         <PositiveResult positive={winnerIsB} negative={winnerIsA && false} warning={isDraw} canceled={isCanceled || isExpired}>
-          <ProfileName address={duelistB} />
+          <ProfileName duelistId={duelistIdB} />
         </PositiveResult>
         <br />
-        <DuelIconsAsRow duelId={duelId} account={duelistB} size={compact ? null : 'large'} />
+        <DuelIconsAsRow duelId={duelId} duelistId={duelistIdB} size={compact ? null : 'large'} />
       </Cell>
 
       <Cell textAlign='center' className='Result'>
         {state == ChallengeState.Resolved ?
           <>
             <PositiveResult positive={true}>
-              <ProfileName address={winnerIsA ? duelistA : duelistB} badges={false} />
+              <ProfileName duelistId={winnerIsA ? duelistIdA : duelistIdB} badges={false} />
             </PositiveResult>
             {value && <><br /><Balance small tableId={tableId} wei={value} /></>}
           </>

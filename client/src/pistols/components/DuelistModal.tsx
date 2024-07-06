@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid, Modal, Icon } from 'semantic-ui-react'
-import { useDojoAccount } from '@/lib/dojo/DojoContext'
+import { useSettings } from '../hooks/SettingsContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { usePact } from '@/pistols/hooks/usePact'
+import { useIsMyDuelist } from '../hooks/useIsMyDuelist'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ChallengeTableByDuelist } from '@/pistols/components/ChallengeTable'
@@ -15,17 +16,17 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export default function DuelistModal() {
-  const { accountAddress, isGuest, isThisAccount } = useDojoAccount()
+  const { duelistId, isGuest } = useSettings()
   const router = useRouter()
 
-  const { duelistAddress, dispatchSelectDuel, dispatchSelectDuelist, dispatchChallengedDuelist } = usePistolsContext()
-  const isOpen = useMemo(() => (duelistAddress > 0), [duelistAddress])
-  const isYou = useMemo(() => isThisAccount(duelistAddress), [duelistAddress, isThisAccount])
+  const { selectedDuelistId, dispatchSelectDuel, dispatchSelectDuelistId, dispatchChallengedDuelistId } = usePistolsContext()
+  const isOpen = useMemo(() => (selectedDuelistId > 0), [selectedDuelistId])
+  const isYou = useIsMyDuelist(duelistId)
 
-  const _close = () => { dispatchSelectDuelist(0n) }
+  const _close = () => { dispatchSelectDuelistId(0n) }
 
-  const { profilePic } = useDuelist(duelistAddress)
-  const { hasPact, pactDuelId } = usePact(accountAddress, duelistAddress)
+  const { profilePic } = useDuelist(duelistId)
+  const { hasPact, pactDuelId } = usePact(duelistId, selectedDuelistId)
 
   return (
     <Modal
@@ -50,7 +51,7 @@ export default function DuelistModal() {
               }
             </Col>
             <Col textAlign='right'>
-              <AddressShort address={duelistAddress} />
+              <AddressShort address={duelistId} />
             </Col>
           </Row>
         </Grid>
@@ -59,10 +60,10 @@ export default function DuelistModal() {
         <ProfilePic profilePic={profilePic} />
         <Modal.Description className='FillParent'>
           <div className='DuelistModalDescription'>
-            <ProfileDescription address={duelistAddress} displayStats displayBalance />
+            <ProfileDescription duelistId={duelistId} displayStats displayBalance />
             <div className='Spacer10' />
             <div className='TableInModal'>
-              <ChallengeTableByDuelist address={duelistAddress} compact />
+              <ChallengeTableByDuelist duelistId={duelistId} compact />
             </div>
           </div>
         </Modal.Description>
@@ -76,7 +77,7 @@ export default function DuelistModal() {
             {!isYou &&
               <Col>
                 {hasPact && <ActionButton fill important label='Challenge In Progress!' onClick={() => dispatchSelectDuel(pactDuelId)} />}
-                {!hasPact && <ActionButton fill disabled={isGuest} label='Challenge for a Duel!' onClick={() => dispatchChallengedDuelist(duelistAddress)} />}
+                {!hasPact && <ActionButton fill disabled={isGuest} label='Challenge for a Duel!' onClick={() => dispatchChallengedDuelistId(duelistId)} />}
               </Col>
             }
           </Row>

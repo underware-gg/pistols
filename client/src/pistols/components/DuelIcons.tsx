@@ -4,23 +4,29 @@ import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon
 import { DuelStage, useDuel } from '@/pistols/hooks/useDuel'
 import { CompletedIcon, EmojiIcon, LoadingIcon } from '@/lib/ui/Icons'
 import { ActionIcon } from '@/pistols/components/ui/PistolsIcon'
+import { bigintEquals } from '@/lib/utils/types'
 import { EMOJI } from '@/pistols/data/messages'
+import { BigNumberish } from 'starknet'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export function useDuelIcons({
   duelId,
-  account,
+  duelistId,
   size = 'large',
+}: {
+  duelId: BigNumberish
+  duelistId: BigNumberish
+  size: IconSizeProp
 }) {
   const {
-    challenge: { duelistA, duelistB, winner, roundNumber, isAwaiting, isInProgress, isFinished },
+    challenge: { duelistIdA, duelistIdB, winner, roundNumber, isAwaiting, isInProgress, isFinished },
     round1, round2, round3, duelStage, completedStagesA, completedStagesB, turnA, turnB,
   } = useDuel(duelId)
 
-  const isA = useMemo(() => (account == duelistA), [account, duelistA])
-  const isB = useMemo(() => (account == duelistB), [account, duelistB])
+  const isA = useMemo(() => bigintEquals(duelistId, duelistIdA), [duelistId, duelistIdA])
+  const isB = useMemo(() => bigintEquals(duelistId, duelistIdB), [duelistId, duelistIdB])
 
   const shot1 = useMemo(() => (isA ? (round1?.shot_a ?? null) : isB ? (round1?.shot_b ?? null) : null), [isA, isB, round1])
   const shot2 = useMemo(() => (isA ? (round2?.shot_a ?? null) : isB ? (round2?.shot_b ?? null) : null), [isA, isB, round2])
@@ -154,10 +160,14 @@ export function useDuelIcons({
 
 export function DuelIconsAsRow({
   duelId,
-  account,
+  duelistId,
   size = 'large',
+}: {
+  duelId: BigNumberish
+  duelistId: BigNumberish
+  size: IconSizeProp
 }) {
-  const { icons1, icons2, icons3 } = useDuelIcons({ duelId, account, size })
+  const { icons1, icons2, icons3 } = useDuelIcons({ duelId, duelistId, size })
 
   return (
     <>
@@ -173,12 +183,17 @@ export function DuelIconsAsRow({
 
 export function DuelIconsAsGrid({
   duelId,
-  duelistA,
-  duelistB,
+  duelistIdA,
+  duelistIdB,
   size = 'large',
+}: {
+  duelId: BigNumberish
+  duelistIdA: BigNumberish
+  duelistIdB: BigNumberish
+  size: IconSizeProp
 }) {
-  const { icons1: icons1A, icons2: icons2A, icons3: icons3A, isAwaiting } = useDuelIcons({ duelId, account: duelistA, size: 'big' })
-  const { icons1: icons1B, icons2: icons2B, icons3: icons3B } = useDuelIcons({ duelId, account: duelistB, size: 'big' })
+  const { icons1: icons1A, icons2: icons2A, icons3: icons3A, isAwaiting } = useDuelIcons({ duelId, duelistId: duelistIdA, size: 'big' })
+  const { icons1: icons1B, icons2: icons2B, icons3: icons3B } = useDuelIcons({ duelId, duelistId: duelistIdB, size: 'big' })
 
   return (
     <Grid textAlign='center' verticalAlign='middle' className='TitleCase'>

@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Segment, Icon, Step, SegmentGroup } from 'semantic-ui-react'
-import { useDojoAccount } from '@/lib/dojo/DojoContext'
+import { useAccount } from '@starknet-react/core'
 import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '../hooks/ThreeJsContext'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
-import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useWager } from '@/pistols/hooks/useWager'
@@ -33,7 +33,7 @@ const Col = Grid.Column
 export default function Duel({
   duelId
 }) {
-  const { accountAddress } = useDojoAccount()
+  const { address } = useAccount()
   const { gameImpl } = useThreeJsContext()
   const { animated } = useGameplayContext()
 
@@ -69,7 +69,7 @@ export default function Duel({
     healthA, healthB,
   } = useAnimatedDuel(duelId, duelSceneStarted)
 
-  const { debugMode } = useSettingsContext()
+  const { debugMode } = useSettings()
   const { dispatchSelectDuel } = usePistolsContext()
 
   useEffect(() => dispatchSelectDuel(duelId), [duelId])
@@ -98,7 +98,7 @@ export default function Duel({
           isA
           duelId={duelId}
           duelStage={duelStage}
-          accountAddress={accountAddress}
+          accountAddress={address}
           duelistAccount={duelistA}
           completedStages={completedStagesA}
           canAutoReveal={canAutoRevealA}
@@ -112,7 +112,7 @@ export default function Duel({
           isB
           duelId={duelId}
           duelStage={duelStage}
-          accountAddress={accountAddress}
+          accountAddress={address}
           duelistAccount={duelistB}
           completedStages={completedStagesB}
           canAutoReveal={canAutoRevealB}

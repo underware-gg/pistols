@@ -1,6 +1,7 @@
 import React, { ReactNode, createContext, useReducer, useContext, useState, useCallback } from 'react'
 import { useCookies } from 'react-cookie'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
+import { BigNumberish } from 'starknet'
 
 //--------------------------------
 // Constants
@@ -12,6 +13,7 @@ export const initialState = {
   musicEnabled: true,
   sfxEnabled: true,
   tableId: '',
+  duelistId: 0n,
   // internal
   initialized: false,
 }
@@ -23,6 +25,7 @@ const SettingsActions = {
   MUSIC_ENABLED: 'settings.MUSIC_ENABLED',
   SFX_ENABLED: 'settings.SFX_ENABLED',
   TABLE_ID: 'settings.TABLE_ID',
+  DUELIST_ID: 'settings.DUELIST_ID',
 }
 
 //--------------------------------
@@ -37,6 +40,7 @@ type ActionType =
   | { type: 'MUSIC_ENABLED', payload: boolean }
   | { type: 'SFX_ENABLED', payload: boolean }
   | { type: 'TABLE_ID', payload: string }
+  | { type: 'DUELIST_ID', payload: bigint }
   // internal
   | { type: 'INITIALIZED', payload: boolean }
 
@@ -73,6 +77,7 @@ const SettingsProvider = ({
       [SettingsActions.MUSIC_ENABLED]: () => setCookie(cookieName, state.musicEnabled, _options),
       [SettingsActions.SFX_ENABLED]: () => setCookie(cookieName, state.sfxEnabled, _options),
       [SettingsActions.TABLE_ID]: () => setCookie(cookieName, state.tableId, _options),
+      [SettingsActions.DUELIST_ID]: () => setCookie(cookieName, state.duelistId, _options),
     }
     _setters[cookieName]?.()
   }, [setCookie])
@@ -114,6 +119,11 @@ const SettingsProvider = ({
         cookieSetter(SettingsActions.TABLE_ID, newState)
         break
       }
+      case SettingsActions.DUELIST_ID: {
+        newState.duelistId = action.payload as bigint
+        cookieSetter(SettingsActions.DUELIST_ID, newState)
+        break
+      }
       default:
         console.warn(`SettingsProvider: Unknown action [${action.type}]`)
         return state
@@ -153,7 +163,7 @@ export { SettingsProvider, SettingsContext, SettingsActions }
 // Hooks
 //
 
-export const useSettingsContext = () => {
+export const useSettings = () => {
   const { state, dispatch } = useContext(SettingsContext)
 
   const dispatchSetting = (key: string, value: any) => {
@@ -163,11 +173,28 @@ export const useSettingsContext = () => {
     })
   }
 
+  const dispatchTableId = (newId: string) => {
+    dispatch({
+      type: SettingsActions.TABLE_ID,
+      payload: newId,
+    })
+  }
+
+  const dispatchDuelistId = (newId: bigint) => {
+    dispatch({
+      type: SettingsActions.DUELIST_ID,
+      payload: newId,
+    })
+  }
+
   return {
     ...state,   // expose individual settings values
+    isGuest: state.duelistId == 0n,
     settings: { ...state },  // expose settings as object {}
     SettingsActions,
     dispatchSetting,
+    dispatchTableId,
+    dispatchDuelistId,
   }
 }
 

@@ -1,10 +1,9 @@
 import React, { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid, Divider } from 'semantic-ui-react'
-import { useDojoAccount } from '@/lib/dojo/DojoContext'
+import { useAccount } from '@starknet-react/core'
 import { usePistolsContext, initialState } from '@/pistols/hooks/PistolsContext'
-import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
-import { useBurner, useBurnerAccount, useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
 import { ProfileName } from '@/pistols/components/account/ProfileDescription'
@@ -14,22 +13,20 @@ import { AddressShort } from '@/lib/ui/AddressShort'
 import { bigintToHex } from '@/lib/utils/types'
 import { makeTavernUrl } from '@/pistols/utils/pistols'
 import { BigNumberish } from 'starknet'
+import { useDuelistBalanceOf, useDuelistOfOwnerByIndex } from '@/pistols/hooks/useTokenDuelist'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export function AccountsList() {
-  const { account, masterAccount, isDeploying, count } = useDojoAccount()
-  const { burners } = useBurners(masterAccount.address)
+  const { address } = useAccount()
+  const { duelistBalance } = useDuelistBalanceOf(address)
 
   const rows = useMemo(() => {
     let result = []
-    Object.values(burners).forEach((burner) => {
-      result.push(<AccountItem key={burner.address}
-        accountIndex={burner.accountIndex}
-        address={burner.address}
-      />)
-    })
+    for (let index = 0; index < duelistBalance; ++index) {
+      result.push(<AccountItem key={`i${index}`} index={index} />)
+    }
     if (result.length == 0) {
       result.push(
         <Row key='empty' columns={'equal'} textAlign='center'>
@@ -41,7 +38,7 @@ export function AccountsList() {
       )
     }
     return result
-  }, [account?.address, isDeploying, count])
+  }, [address, duelistBalance])
 
   return (
     <Grid className='Faded FillWidth'>
@@ -52,32 +49,28 @@ export function AccountsList() {
 
 
 function AccountItem({
-  accountIndex,
-  address,
+  index,
 }: {
-  accountIndex: number
-  address: BigNumberish
+  index: number
 }) {
   const router = useRouter()
-  const { select } = useDojoAccount()
+  const { address } = useAccount()
+  const { duelistId } = useDuelistOfOwnerByIndex(address, index)
+  const { exists, name, profilePic } = useDuelist(duelistId)
 
-  const { name, profilePic } = useDuelist(address)
-  const isProfiled = Boolean(name)
-
-  const burner = useBurner(address)
-  const { isImported, accountName } = useBurnerAccount(accountIndex)
-  const _canPlay = (isImported && isProfiled)
+  const _canPlay = (exists)
 
   const { accountSetupOpener, dispatchSetAccountIndex, dispatchSetMenu } = usePistolsContext()
+  const { dispatchDuelistId } = useSettings()
 
   const _manage = () => {
-    dispatchSetAccountIndex(burner?.accountIndex ?? 0)
+    dispatchSetAccountIndex(index)
     accountSetupOpener.open()
   }
 
-  const { tableId } = useSettingsContext()
+  const { tableId } = useSettings()
   const _duel = (menuKey = initialState.menuKey) => {
-    select(bigintToHex(address))
+    dispatchDuelistId(BigInt(duelistId ?? 0))
     dispatchSetMenu(menuKey)
     router.push(makeTavernUrl(tableId))
   }
@@ -98,8 +91,8 @@ function AccountItem({
           </div>
         </Col>
         <Col width={8} textAlign='left'>
-          <h3>{name ? <ProfileName address={address} /> : accountName}</h3>
-          <AddressShort address={address} />
+          <h3><ProfileName duelistId={duelistId} /></h3>
+          {/* <AddressShort address={address} /> */}
           <h5>
             <LordsBalance address={address} />
             &nbsp;/&nbsp;

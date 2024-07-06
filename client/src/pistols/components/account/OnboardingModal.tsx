@@ -1,13 +1,11 @@
 import React, { useCallback, useEffect } from 'react'
 import { Modal, Tab, TabPane, Grid, Menu } from 'semantic-ui-react'
-import { useBurnerAccount, useBurnerDeployment, useBurners } from '@/lib/dojo/hooks/useBurnerAccount'
-import { useDojoAccount } from '@/lib/dojo/DojoContext'
+import { useAccount } from '@starknet-react/core'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { IconChecked, IconClick, IconWarning } from '@/lib/ui/Icons'
 import { AccountMenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { OnboardingDeploy } from '@/pistols/components/account/OnboardingDeploy'
-import { OnboardingFund } from '@/pistols/components/account/OnboardingFund'
 import { OnboardingProfile } from '@/pistols/components/account/OnboardingProfile'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { Opener } from '@/lib/ui/useOpener'
@@ -20,49 +18,25 @@ export default function OnboardingModal({
 }: {
   opener: Opener
 }) {
-  const { masterAccount } = useDojoAccount()
-  const { nextAccountIndex } = useBurners(masterAccount.address)
+  const { address } = useAccount()
+  const { dispatchDuelistId } = useSettings()
 
   const { accountMenuKey, accountMenuItems, accountIndex, dispatchSetAccountMenu, dispatchSetAccountIndex} = usePistolsContext()
   const tabIndex = accountMenuItems.findIndex(k => (k == accountMenuKey))
-
-  const { isImported, isFunded, address } = useBurnerAccount(accountIndex)
-  const { isDeployed } = useBurnerDeployment(address)
-  const isGoodToUse = (isDeployed && isImported)
 
   const { name } = useDuelist(address)
   const isProfiled = Boolean(name)
 
   useEffect(() => {
     if (opener.isOpen) {
-      dispatchSetAccountMenu(
-        !isGoodToUse ? AccountMenuKey.Deploy
-          : !isFunded ? AccountMenuKey.Fund
-            : AccountMenuKey.Profile
-      )
+      dispatchSetAccountMenu(AccountMenuKey.Profile)
     }
   }, [opener.isOpen])
 
-  const _canContinue = {
-    [AccountMenuKey.Deploy]: isImported,
-    [AccountMenuKey.Fund]: isImported,
-    [AccountMenuKey.Profile]: isProfiled,
-  }
-  const _nextLabel = {
-    [AccountMenuKey.Deploy]: 'Fund...',
-    [AccountMenuKey.Fund]: 'Profile...',
-    [AccountMenuKey.Profile]: 'Done!',
-  }
-
-  const _continue = () => {
-    if (accountMenuKey == AccountMenuKey.Deploy) dispatchSetAccountMenu(AccountMenuKey.Fund)
-    else if (accountMenuKey == AccountMenuKey.Fund) dispatchSetAccountMenu(AccountMenuKey.Profile)
-    else opener.close()
-  }
-
   const _deployNew = () => {
+    dispatchDuelistId(0n)
     dispatchSetAccountIndex(nextAccountIndex)
-    dispatchSetAccountMenu(AccountMenuKey.Deploy)
+    dispatchSetAccountMenu(AccountMenuKey.Profile)
   }
 
   const canGoPrev = (accountIndex > 1)
@@ -97,30 +71,6 @@ export default function OnboardingModal({
 
       <Modal.Content className='ModalText OnboardingModal'>
         <Tab activeIndex={tabIndex} menu={{ secondary: true, pointing: true, attached: true }} panes={[
-          {
-            menuItem: (
-              <Menu.Item key='Deploy' onClick={() => dispatchSetAccountMenu(AccountMenuKey.Deploy)}>
-                Deploy&nbsp;{isImported ? <IconChecked /> : <IconWarning />}
-              </Menu.Item>
-            ),
-            render: () => (
-              <TabPane attached className='NoPadding'>
-                <OnboardingDeploy />
-              </TabPane>
-            )
-          },
-          {
-            menuItem: (
-              <Menu.Item key='Fund' onClick={() => dispatchSetAccountMenu(AccountMenuKey.Fund)}>
-                Fund&nbsp;{isFunded ? <IconChecked /> : <IconWarning />}
-              </Menu.Item>
-            ),
-            render: () => (
-              <TabPane attached className='NoPadding'>
-                <OnboardingFund disabled={!isGoodToUse} />
-              </TabPane>
-            )
-          },
           {
             menuItem: (
               <Menu.Item key='Profile' onClick={() => dispatchSetAccountMenu(AccountMenuKey.Profile)}>

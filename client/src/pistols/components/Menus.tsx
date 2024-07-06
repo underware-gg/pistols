@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation'
 import { Grid, Menu } from 'semantic-ui-react'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
-import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { DuelStage } from '@/pistols/hooks/useDuel'
 import { SPRITESHEETS } from '@/pistols/data/assets'
 import { AnimationState } from '@/pistols/three/game'
@@ -19,7 +19,7 @@ export function MenuDuel({
   tableId,
 }) {
   const router = useRouter()
-  const { dispatchSetting, settings, SettingsActions } = useSettingsContext()
+  const { dispatchSetting, settings, SettingsActions } = useSettings()
   const { dispatchSelectDuel } = usePistolsContext()
 
   const _backToTavern = () => {

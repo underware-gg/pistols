@@ -1,8 +1,8 @@
 import React, { ReactElement, useState } from 'react'
 import { Menu, Button, Confirm, SemanticICONS } from 'semantic-ui-react'
-import { useSettingsContext } from '@/pistols/hooks/SettingsContext'
+import { useAccount } from '@starknet-react/core'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
-import { useDojoAccount } from '@/lib/dojo/DojoContext'
 import { useTableBalance } from '@/pistols/hooks/useTable'
 import { bigintAdd } from '@/lib/utils/types'
 import { CustomIcon } from '@/lib/ui/Icons'
@@ -109,7 +109,7 @@ export const BalanceRequiredButton = ({
   onClick: Function
   disabled?: boolean
 }) => {
-  const { account } = useDojoAccount()
+  const { account } = useAccount()
   const { balance, noFundsForFee } = useTableBalance(tableId, account.address, bigintAdd(wagerValue, fee))
   const wagerTooLow = (BigInt(minWagerValue ?? 0) > 0n && BigInt(wagerValue) < BigInt(minWagerValue))
   const canSubmit = (!wagerTooLow && !noFundsForFee)
@@ -168,7 +168,7 @@ export function SettingsIcon({
   value,
   icon = false,
 }: SettingsIconProps) {
-  const { dispatchSetting } = useSettingsContext()
+  const { dispatchSetting } = useSettings()
   const _switch = () => {
     dispatchSetting(settingsKey, !value)
   }
@@ -178,13 +178,13 @@ export function SettingsIcon({
 }
 
 export function MusicToggle() {
-  const { settings, SettingsActions } = useSettingsContext()
+  const { settings, SettingsActions } = useSettings()
   const { audioLoaded } = useThreeJsContext()
   if (!audioLoaded) return <></>
   return <SettingsIcon settingsKey={SettingsActions.MUSIC_ENABLED} value={settings.musicEnabled} nameOn='volume-on' nameOff='volume-off' icon />
 }
 export function SfxToggle() {
-  const { settings, SettingsActions } = useSettingsContext()
+  const { settings, SettingsActions } = useSettings()
   return <SettingsIcon settingsKey={SettingsActions.SFX_ENABLED} value={settings.sfxEnabled} nameOn='volume-on' nameOff='volume-off' icon />
 }
 
@@ -198,7 +198,7 @@ export function SettingsButton({
   name: string
   value: boolean
 }) {
-  const { dispatchSetting } = useSettingsContext()
+  const { dispatchSetting } = useSettings()
   const _switch = () => {
     dispatchSetting(name, !value)
   }
@@ -214,7 +214,7 @@ export function SettingsMenuItem({
   settingsKey: string
   currentValue: any
 }) {
-  const { dispatchSetting } = useSettingsContext()
+  const { dispatchSetting } = useSettings()
   const _switch = () => {
     dispatchSetting(settingsKey, !currentValue)
   }

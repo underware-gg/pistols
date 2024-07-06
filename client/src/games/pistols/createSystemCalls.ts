@@ -4,7 +4,7 @@ import {
 } from '@dojoengine/utils'
 import { getContractByName } from '@dojoengine/core'
 import { getComponentValue } from '@dojoengine/recs'
-import { Account, BigNumberish, Call, Result, uint256 } from 'starknet'
+import { AccountInterface, BigNumberish, Call, Result, uint256 } from 'starknet'
 import { ClientComponents } from '@/lib/dojo/setup/createClientComponents'
 import { SetupNetworkResult } from '@/lib/dojo/setup/setup'
 import { stringToFelt } from '@/lib/utils/starknet'
@@ -45,7 +45,7 @@ export function createSystemCalls(
   // executeMulti() based on:
   // https://github.com/cartridge-gg/rollyourown/blob/f39bfd7adc866c1a10142f5ce30a3c6f900b467e/web/src/dojo/hooks/useSystems.ts#L178-L190
 
-  const _executeTransaction = async (signer: Account, params: DojoCall | Call[]): Promise<boolean> => {
+  const _executeTransaction = async (signer: AccountInterface, params: DojoCall | Call[]): Promise<boolean> => {
     let success = false
     try {
       const tx = await execute(signer, params);
@@ -84,12 +84,12 @@ export function createSystemCalls(
     return results as T
   }
 
-  const update_duelist = async (signer: Account, duelist_id: BigNumberish, name: string, profile_pic_type: number, profile_pic_uri: string): Promise<boolean> => {
+  const update_duelist = async (signer: AccountInterface, duelist_id: BigNumberish, name: string, profile_pic_type: number, profile_pic_uri: string): Promise<boolean> => {
     const args = [BigInt(duelist_id), stringToFelt(name), profile_pic_type, profile_pic_uri]
     return await _executeTransaction(signer, actions_call('update_duelist', args))
   }
 
-  const create_challenge = async (signer: Account, duelist_id: BigNumberish, challenged: bigint, message: string, table_id: string, wager_value: bigint, expire_seconds: number): Promise<boolean> => {
+  const create_challenge = async (signer: AccountInterface, duelist_id: BigNumberish, challenged: bigint, message: string, table_id: string, wager_value: bigint, expire_seconds: number): Promise<boolean> => {
     // find lords contract
     const table = getComponentValue(TableConfig, bigintToEntity(stringToFelt(table_id)))
     if (!table) throw new Error(`Table does not exist [${table_id}]`)
@@ -115,7 +115,7 @@ export function createSystemCalls(
     return await _executeTransaction(signer, calls)
   }
 
-  const reply_challenge = async (signer: Account, duel_id: bigint, duelist_id: BigNumberish, accepted: boolean): Promise<boolean> => {
+  const reply_challenge = async (signer: AccountInterface, duel_id: bigint, duelist_id: BigNumberish, accepted: boolean): Promise<boolean> => {
     const reply_args = [BigInt(duelist_id), duel_id, accepted]
     if (accepted) {
       // find Wager
@@ -149,12 +149,12 @@ export function createSystemCalls(
     return await _executeTransaction(signer, actions_call('reply_challenge', reply_args))
   }
 
-  const commit_action = async (signer: Account, duel_id: bigint, round_number: number, hash: bigint): Promise<boolean> => {
+  const commit_action = async (signer: AccountInterface, duel_id: bigint, round_number: number, hash: bigint): Promise<boolean> => {
     const args = [duel_id, round_number, hash]
     return await _executeTransaction(signer, actions_call('commit_action', args))
   }
 
-  const reveal_action = async (signer: Account, duel_id: bigint, round_number: number, salt: bigint, action1: number, action2: number): Promise<boolean> => {
+  const reveal_action = async (signer: AccountInterface, duel_id: bigint, round_number: number, salt: bigint, action1: number, action2: number): Promise<boolean> => {
     const args = [duel_id, round_number, salt, action1, action2]
     return await _executeTransaction(signer, actions_call('reveal_action', args))
   }

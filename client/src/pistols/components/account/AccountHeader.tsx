@@ -1,7 +1,8 @@
 import React from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid } from 'semantic-ui-react'
-import { useDojoAccount } from '@/lib/dojo/DojoContext'
+import { useAccount } from '@starknet-react/core'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
@@ -14,16 +15,17 @@ const Col = Grid.Column
 export default function AccountHeader({
 }) {
   const router = useRouter()
-  const { accountAddress, isGuest } = useDojoAccount()
-  const { dispatchSelectDuelist } = usePistolsContext()
+  const { address } = useAccount()
+  const { isGuest } = useSettings()
+  const { dispatchSelectDuelistId } = usePistolsContext()
 
-  const { name, profilePic } = useDuelist(accountAddress)
+  const { name, profilePic } = useDuelist(address)
 
   const _click = () => {
     if(isGuest) {
       router.push('/gate')
     } else {
-      dispatchSelectDuelist(accountAddress) 
+      dispatchSelectDuelistId(address) 
     }
   }
 
@@ -35,9 +37,9 @@ export default function AccountHeader({
             <h3>Guest</h3>
             : <>
               <h3>{name}</h3>
-              <AddressShort address={accountAddress} copyLink={true} />
+              <AddressShort address={address} copyLink={true} />
               <br />
-              <LordsBalance address={accountAddress} big />
+              <LordsBalance address={address} big />
             </>}
         </Col>
         <Col width={5} verticalAlign='middle'>

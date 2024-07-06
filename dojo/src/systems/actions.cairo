@@ -178,9 +178,7 @@ mod actions {
             // save
             duelist_manager.set(duelist.clone());
 
-'33'.print();
             self._emitDuelistRegisteredEvent(caller, duelist.clone(), is_new);
-'44'.print();
 
             (duelist)
         }

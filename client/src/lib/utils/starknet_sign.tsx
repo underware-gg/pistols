@@ -1,6 +1,6 @@
 import { cleanObject } from '@/lib/utils/types'
 import {
-  Account,
+  AccountInterface,
   TypedData,
   Signature,
   ArraySignatureType,
@@ -34,11 +34,11 @@ export const splitSignature = (signature: Signature): bigint[] => {
   return []
 }
 
-export const signMessages = async (account: Account, revision: Revision, messages: Messages): Promise<WeierstrassSignatureType> => {
+export const signMessages = async (account: AccountInterface, revision: Revision, messages: Messages): Promise<WeierstrassSignatureType> => {
   const typedMessage = createTypedMessage({ revision, messages })
   return account.signMessage(typedMessage) as Promise<WeierstrassSignatureType>
 }
-export const verifyMessages = async (account: Account, revision: Revision, messages: Messages, signature: WeierstrassSignatureType): Promise<boolean> => {
+export const verifyMessages = async (account: AccountInterface, revision: Revision, messages: Messages, signature: WeierstrassSignatureType): Promise<boolean> => {
   const typedMessage = createTypedMessage({ revision, messages })
   return account.verifyMessage(typedMessage, signature)
 }

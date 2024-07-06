@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { Grid, Modal, Dropdown } from 'semantic-ui-react'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
-import { useActiveDuelists, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
+import { useActiveDuelistIds, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
 import { useRouterTable } from '@/pistols/hooks/useRouterListener'
 import { useERC20TokenName } from '@/lib/utils/hooks/useERC20'
 import { useTable } from '@/pistols/hooks/useTable'
@@ -114,7 +114,7 @@ function TableDescription({
   const { tokenName, tokenSymbol } = useERC20TokenName(contractAddress)
   const { challengeIds: liveChallengeIds } = useLiveChallengeIds(tableId)
   const { challengeIds: pastChallengeIds } = usePastChallengeIds(tableId)
-  const { activeDuelistsCount } = useActiveDuelists(tableId)
+  const { activeDuelistIdsCount } = useActiveDuelistIds(tableId)
   return (
     <Grid className='H5'>
 
@@ -167,7 +167,7 @@ function TableDescription({
           Active Duelists:
         </Col>
         <Col width={8} className='Wager PaddedLeft Bold'>
-          {activeDuelistsCount}
+          {activeDuelistIdsCount}
         </Col>
       </Row>
 

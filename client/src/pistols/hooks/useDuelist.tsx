@@ -11,12 +11,12 @@ import { BigNumberish } from 'starknet'
 // All Duels
 //
 
-export const useAllDuelistIds = () => {
+export const useAllDuelistKeys = () => {
   const { Duelist } = useDojoComponents()
-  const duelistIds: bigint[] = useEntityKeys(Duelist, 'address')
+  const duelistKeys: bigint[] = useEntityKeys(Duelist, 'duelist_id')
   return {
-    duelistIds,
-    duelistCount: duelistIds.length,
+    duelistKeys,
+    duelistKeysCount: duelistKeys.length,
   }
 }
 
@@ -25,9 +25,9 @@ export const useAllDuelistIds = () => {
 // Single Duel
 //
 
-export const useDuelist = (address: BigNumberish) => {
+export const useDuelist = (duelist_id: BigNumberish) => {
   const { Duelist } = useDojoComponents()
-  const duelist: any = useComponentValue(Duelist, bigintToEntity(address ?? 0n))
+  const duelist: any = useComponentValue(Duelist, bigintToEntity(duelist_id ?? 0n))
   // console.log(`Duelist`, address, bigintToEntity(address ?? 0n), duelist)
 
   const name = useMemo(() => duelist?.name ? feltToString(duelist.name) : null, [duelist])
@@ -55,12 +55,13 @@ export const useDuelist = (address: BigNumberish) => {
   const levelAndTotal = useMemo(() => (total_duels > 0 && level > 0 ? <>{level.toFixed(1)}<span className='Smaller'>/{total_duels}</span></> : '—'), [level, total_duels])
 
   return {
-    address,
-    name,
+    duelistId: duelist_id,
+    name: (name || `Duelist #${duelist_id}`),
+    exists: Boolean(timestamp),
+    timestamp,
     profilePicType,
     profilePic,
     isRegistered,
-    timestamp,
     total_duels,
     total_wins,
     total_losses,

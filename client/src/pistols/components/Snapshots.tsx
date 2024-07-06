@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Button, Container, Divider, TextArea } from 'semantic-ui-react'
-import { useAllDuelistIds, useDuelist } from '@/pistols/hooks/useDuelist'
+import { useAllDuelistKeys, useDuelist } from '@/pistols/hooks/useDuelist'
 import { useAllChallengeIds, useChallenge } from '@/pistols/hooks/useChallenge'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
@@ -54,11 +54,11 @@ export function Snapshots() {
 function SnapshotDuelists({
   update,
 }) {
-  const { duelistIds, duelistCount } = useAllDuelistIds()
+  const { duelistKeys, duelistKeysCount } = useAllDuelistKeys()
   const [duelists, setDuelists] = useState([])
 
   const [snapping, setSnapping] = useState(false)
-  const canSnap = (duelistCount > 0 && (!snapping || duelists.length == duelistIds.length))
+  const canSnap = (duelistKeysCount > 0 && (!snapping || duelists.length == duelistKeys.length))
 
   useEffect(() => {
     if(snapping) {
@@ -72,13 +72,13 @@ function SnapshotDuelists({
 
   const loaders = useMemo(() => {
     let result = []
-    if (snapping && duelists.length < duelistIds.length) {
-      const address = duelistIds[duelists.length]
+    if (snapping && duelists.length < duelistKeys.length) {
+      const address = duelistKeys[duelists.length]
       // console.log(`...loaders`, duelists.length, address.toString(16))
       result.push(<SnapDuelist key={address} address={address} update={_update} />)
     }
     return result
-  }, [snapping, duelistIds, duelists])
+  }, [snapping, duelistKeys, duelists])
 
   const _start = () => {
     setSnapping(true)
@@ -88,7 +88,7 @@ function SnapshotDuelists({
   return (
     <>
       <Button className='FillParent' disabled={!canSnap} onClick={() => _start()}>
-        Duelists Snapshot ({duelistCount > 0 ? `${duelists.length}/${duelistCount}` : '...'})
+        Duelists Snapshot ({duelistKeysCount > 0 ? `${duelists.length}/${duelistKeysCount}` : '...'})
       </Button>
       {loaders}
     </>

@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useCallback, useContext, useMemo } from 'react'
-import { BurnerAccount, useBurnerManager, useBurnerWindowObject, usePredeployedWindowObject } from '@dojoengine/create-burner'
+import { usePredeployedWindowObject } from '@dojoengine/create-burner'
 import { SetupResult } from '@/lib/dojo/setup/useSetup'
 import { bigintEquals } from '@/lib/utils/types';
 import { Account, BigNumberish } from 'starknet'
@@ -7,9 +7,6 @@ import { Account, BigNumberish } from 'starknet'
 interface DojoContextType {
   isInitialized: boolean;
   setup: SetupResult;
-  masterAccount: Account;
-  account: Account | null;
-  burner: BurnerAccount;
 }
 
 export const DojoContext = createContext<DojoContextType | null>(null);
@@ -24,13 +21,9 @@ export const DojoProvider = ({
   const currentValue = useContext(DojoContext);
   if (currentValue) throw new Error('DojoProvider can only be used once');
 
-  const { burnerManager, predeployedManager, dojoProvider } = value ?? {}
-
-  const masterAccount = burnerManager?.masterAccount as Account
-  const burner: BurnerAccount = useBurnerManager({ burnerManager })
+  const { predeployedManager, dojoProvider } = value ?? {}
 
   // create injected connectors asynchronously
-  useBurnerWindowObject(burnerManager);
   usePredeployedWindowObject(predeployedManager);
 
   return (
@@ -38,9 +31,6 @@ export const DojoProvider = ({
       value={{
         isInitialized: Boolean(value),
         setup: value ?? {} as SetupResult,
-        masterAccount,
-        account: (burner.account as Account) ?? undefined,
-        burner,
       }}
     >
       {children}
@@ -80,27 +70,6 @@ export const useDojoComponents = () => {
   const { setup: { components } } = useDojo()
   return {
     ...components,
-  }
-}
-
-export const useDojoAccount = (): BurnerAccount & {
-  masterAccount: Account
-  account: Account
-  accountAddress: bigint
-  isGuest: boolean
-  isThisAccount: (address: BigNumberish) => boolean
-} => {
-  const { burner, account, masterAccount } = useDojo()
-  const accountAddress = useMemo(() => BigInt(account?.address ?? 0), [account])
-  const isGuest = useMemo(() => (accountAddress == 0n), [accountAddress])
-  const isThisAccount = useCallback((address: BigNumberish) => (!isGuest && bigintEquals(address, accountAddress)), [accountAddress, isGuest])
-  return {
-    ...burner,
-    masterAccount,
-    account,          // can be null (guest)
-    accountAddress,   // can be 0n (guest)
-    isGuest,
-    isThisAccount,
   }
 }
 

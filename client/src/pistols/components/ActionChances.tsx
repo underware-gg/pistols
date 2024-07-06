@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { Grid } from 'semantic-ui-react'
-import { useDojoAccount } from '@/lib/dojo/DojoContext'
+import { useAccount } from '@starknet-react/core'
 import { useSimulateChances } from '@/pistols/hooks/useContractCalls'
 import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 import { useDuel } from '@/pistols/hooks/useDuel'
@@ -19,7 +19,7 @@ export function ActionChances({
   isB = false,
 }) {
   const { honour } = useDojoConstants()
-  const { accountAddress } = useDojoAccount()
+  const { address } = useAccount()
   const { challenge: { duelistA, duelistB }, round1 } = useDuel(duelId)
   const {
     action_honour,
@@ -40,7 +40,7 @@ export function ActionChances({
     lethal_chances,
     lethal_base_chance,
     lethal_lord_penalty,
-  } = useSimulateChances(accountAddress, duelId, roundNumber, action)
+  } = useSimulateChances(address, duelId, roundNumber, action)
   const { crit_chances: other_crit_chances } = useSimulateChances(isA ? duelistB : duelistA, duelId, roundNumber, Action.Strong)
   // console.log(`CHANCES:`, crit_chances, crit_bonus, hit_chances, hit_bonus, lethal_chances, lethal_bonus)
 
