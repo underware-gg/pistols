@@ -42,7 +42,7 @@ export default function IndexPage() {
 
 function DojoAccount() {
   const { isInitialized } = useDojoStatus()
-  const { account } = useAccount()
+  const { address } = useAccount()
   const { selectedChainConfig } = useSelectedChain()
 
   if (!isInitialized) {
@@ -74,7 +74,7 @@ function DojoAccount() {
         <Row>
           <Cell>Dojo.account</Cell>
           <Cell className='Code'>
-            {account?.address ?? 'none'}
+            {address ?? 'none'}
           </Cell>
         </Row>
       </Body>

@@ -9,6 +9,7 @@ import { SPRITESHEETS } from '@/pistols/data/assets'
 import { AnimationState } from '@/pistols/three/game'
 import { IconClick } from '@/lib/ui/Icons'
 import { makeTavernUrl } from '@/pistols/utils/pistols'
+import { bigintToHex } from '@/lib/utils/types'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -49,7 +50,7 @@ export function MenuDuel({
         {/* <SettingsMenuItem prefix='SFX' settingsKey={SettingsActions.SFX_ENABLED} currentValue={settings.sfxEnabled} /> */}
 
         <Menu.Item>
-          <IconClick name='database' onClick={() => window?.open(`/dueldata/${duelId}`, '_blank')} />
+          <IconClick name='database' onClick={() => window?.open(`/dueldata/${bigintToHex(duelId)}`, '_blank')} />
         </Menu.Item>
 
         <Menu.Item  >

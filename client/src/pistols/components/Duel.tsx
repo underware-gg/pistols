@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Segment, Icon, Step, SegmentGroup, SemanticFLOATS } from 'semantic-ui-react'
-import { useAccount } from '@starknet-react/core'
+import { BigNumberish } from 'starknet'
+import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '../hooks/ThreeJsContext'
@@ -8,9 +9,9 @@ import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { useIsYou } from '@/pistols/hooks/useIsMyDuelist'
 import { useWager } from '@/pistols/hooks/useWager'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
-import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionDetector'
 import { DuelStage, useAnimatedDuel, useDuel, useDuelResult } from '@/pistols/hooks/useDuel'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
@@ -22,12 +23,9 @@ import { ActionEmojis, ActionTypes } from '@/pistols/utils/pistols'
 import { MenuDebugAnimations, MenuDuel } from '@/pistols/components/Menus'
 import { Balance } from '@/pistols/components/account/Balance'
 import { EMOJI } from '@/pistols/data/messages'
-import { bigintEquals } from '@/lib/utils/types'
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import CommitBladesModal from '@/pistols/components/CommitBladesModal'
 import RevealModal from '@/pistols/components/RevealModal'
-import { BigNumberish } from 'starknet'
-import { useIsMyDuelist } from '../hooks/useIsMyDuelist'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -222,7 +220,7 @@ function DuelProgress({
   //------------------------------
   // Duelist interaction
   //
-  const isYou = useIsMyDuelist(duelistId)
+  const isYou = useIsYou(duelistId)
   // const isTurn = useMemo(() => ((isA && turnA) || (isB && turnB)), [isA, isB, turnA, turnB])
 
   // Commit modal control

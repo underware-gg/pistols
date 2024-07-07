@@ -216,7 +216,7 @@ export const usePistolsContext = () => {
       payload: BigInt(newId),
     })
   }
-  const dispatchChallengedDuelistId = (newId: BigNumberish) => {
+  const dispatchChallengingDuelistId = (newId: BigNumberish) => {
     dispatch({
       type: PistolsActions.SELECT_CHALLENGING_ID,
       payload: BigInt(newId),
@@ -249,6 +249,6 @@ export const usePistolsContext = () => {
     dispatchSetScene,
     dispatchSelectDuel,
     dispatchSelectDuelistId,
-    dispatchChallengedDuelistId,
+    dispatchChallengingDuelistId,
   }
 }

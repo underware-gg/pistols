@@ -45,9 +45,10 @@ export default function OnboardingModal({
     }
   }, [lastDuelistId])
 
-  const canGoPrev = Boolean(prevDuelistId)
-  const canGoNext = Boolean(nextDuelistId)
-  const gotoPrevAccount = useCallback(() => (canGoPrev ? dispatchDuelistId(prevDuelistId) : null), [canGoPrev, dispatchDuelistId])
+  const isNewDuelist = !Boolean(duelistId)
+  const canGoPrev = (!isNewDuelist && Boolean(prevDuelistId)) || (isNewDuelist && Boolean(lastDuelistId))
+  const canGoNext = (!isNewDuelist && Boolean(nextDuelistId))
+  const gotoPrevAccount = useCallback(() => (canGoPrev ? dispatchDuelistId(prevDuelistId ?? lastDuelistId) : null), [canGoPrev, dispatchDuelistId])
   const gotoNextAccount = useCallback(() => (canGoNext ? dispatchDuelistId(nextDuelistId) : null), [canGoNext, dispatchDuelistId])
 
   return (
@@ -86,7 +87,7 @@ export default function OnboardingModal({
               <ActionButton fill label='Next' disabled={!canGoNext} onClick={() => gotoNextAccount()} />
             </Col>
             <Col>
-              <ActionButton important fill disabled={!duelistId} label={'Duel!'} onClick={() => opener.close()} />
+              <ActionButton important fill disabled={!duelistId} label={'Done!'} onClick={() => opener.close()} />
             </Col>
           </Row>
         </Grid>

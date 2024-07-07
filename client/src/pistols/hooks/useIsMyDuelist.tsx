@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
+import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useTokenContract } from '@/pistols/hooks/useTokenDuelist'
 import { useOrigamiERC721OwnerOf } from '@/lib/dojo/hooks/useOrigamiERC721'
 import { bigintEquals } from '@/lib/utils/types'
@@ -13,10 +14,16 @@ export const useIsMyAccount = (otherAddress: BigNumberish) => {
   return isMyAccount
 }
 
-export const useIsMyDuelist = (dueistId: BigNumberish) => {
+export const useIsYou = (otherDueistId: BigNumberish) => {
+  const { duelistId } = useSettings()
+  const isYou = useMemo(() => (bigintEquals(duelistId, otherDueistId)), [duelistId, otherDueistId])
+  return isYou
+}
+
+export const useIsMyDuelist = (otherDueistId: BigNumberish) => {
   const { contractAddress, components } = useTokenContract()
   const { address } = useAccount()
-  const { owner } = useOrigamiERC721OwnerOf(contractAddress, dueistId, components)
+  const { owner } = useOrigamiERC721OwnerOf(contractAddress, otherDueistId, components)
   const isMyDuelist = useMemo(() => (bigintEquals(address, owner)), [address, owner])
   return isMyDuelist
 }

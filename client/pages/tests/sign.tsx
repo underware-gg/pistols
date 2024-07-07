@@ -45,9 +45,9 @@ export default function IndexPage() {
 }
 
 function ConsoleTests() {
-  const { account } = useAccount()
+  const { account, address } = useAccount()
   useEffect(() => {
-    if (!BigInt(account?.address ?? 0)) return
+    if (!BigInt(address ?? 0)) return
     const _test = async () => {
       await testTypedData(account)
     }

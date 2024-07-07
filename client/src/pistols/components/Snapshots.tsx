@@ -73,9 +73,9 @@ function SnapshotDuelists({
   const loaders = useMemo(() => {
     let result = []
     if (snapping && duelists.length < duelistKeys.length) {
-      const address = duelistKeys[duelists.length]
+      const duelistId = duelistKeys[duelists.length]
       // console.log(`...loaders`, duelists.length, address.toString(16))
-      result.push(<SnapDuelist key={address} address={address} update={_update} />)
+      result.push(<SnapDuelist key={bigintToHex(duelistId)} duelistId={duelistId} update={_update} />)
     }
     return result
   }, [snapping, duelistKeys, duelists])
@@ -96,10 +96,10 @@ function SnapshotDuelists({
 }
 
 export function SnapDuelist({
-  address,
+  duelistId,
   update,
 }) {
-  const duelist = useDuelist(address)
+  const duelist = useDuelist(duelistId)
   useEffect(() => {
     update({
       ...duelist,

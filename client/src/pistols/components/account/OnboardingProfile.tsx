@@ -53,7 +53,7 @@ export function OnboardingProfile({
     }
   }
 
-  const _submitLabel = isUpdated ? 'Updated' : isNew ? 'Mint' : 'Update'
+  const _submitLabel = isUpdated ? 'Duelist Updated' : isNew ? 'Mint New Duelist' : 'Update Duelist'
 
   return (
     <Grid className='OnboardingProfile'>

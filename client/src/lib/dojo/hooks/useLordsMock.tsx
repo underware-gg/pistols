@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { useLordsContract } from '@/lib/dojo/hooks/useLords'
-import { bigintToUint256, ethToWei, execute } from '@/lib/utils/starknet'
+import { bigintToU256, ethToWei, execute } from '@/lib/utils/starknet'
 import { bigintToHex } from '@/lib/utils/types'
 import { Account, AccountInterface } from 'starknet'
 
@@ -32,7 +32,7 @@ export const useLordsFaucet = (): FaucetInterface => {
       setIsMinting(true)
 
       const _signerAccount = (recipientAccount ?? account)
-      const amount = bigintToUint256(ethToWei(10_000))
+      const amount = bigintToU256(ethToWei(10_000))
 
       let transaction_hash, receipt
       try {

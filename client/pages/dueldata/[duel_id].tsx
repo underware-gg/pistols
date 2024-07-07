@@ -12,6 +12,7 @@ import { formatTimestamp } from '@/lib/utils/timestamp'
 import { bigintToHex } from '@/lib/utils/types'
 import { weiToEth } from '@/lib/utils/starknet'
 import AppPistols from '@/pistols/components/AppPistols'
+import { useChallenge } from '@/pistols/hooks/useChallenge'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -53,6 +54,9 @@ function Stats({
     challenge: { tableId },
     round1, round2, round3,
   } = useDuel(duelId)
+
+  const challenge = useChallenge(duelId)
+  console.log(challenge)
 
   return (
     <>

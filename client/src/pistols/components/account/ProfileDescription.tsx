@@ -6,6 +6,7 @@ import { LordsBalance, LockedWagerBalance } from '@/pistols/components/account/L
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { EMOJI } from '@/pistols/data/messages'
 import { BigNumberish } from 'starknet'
+import { useDuelistOwner } from '@/pistols/hooks/useTokenDuelist'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -51,15 +52,14 @@ export function ProfileDescription({
     total_wins, total_losses, total_draws, total_duels, total_honour, honourAndTotal,
     is_villain, is_trickster, is_lord, levelDisplay, levelAndTotal,
   } = useDuelist(duelistId)
-  // const { address: accountAddress } = useAccount()
-  // const isYou = useMemo(() => bigintEquals(address, accountAddress), [address, accountAddress])
+  const { owner } = useDuelistOwner(duelistId)
   return (
     <Grid>
       <Row>
 
         <Col width={displayStats ? 12 : 16}>
-          <h1 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /> #{duelistId}</h1>
-          {/* {displayAddress && <AddressShort address={address} />} */}
+          <h1 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /></h1>
+          {displayAddress && <AddressShort address={owner} />}
           <h3 className='Important NoMargin TitleCase'>
             Honour: <span className='Wager'>{honourAndTotal}</span>
             {is_villain && <> {EMOJI.VILLAIN} <span className='Wager'>{levelDisplay}</span></>}

@@ -106,7 +106,7 @@ export const StarknetProvider = ({
         chains={chains}
         provider={() => provider(selectedChainConfig.chain)}
         connectors={connectors}
-        autoConnect={false}
+        autoConnect={true}
       // explorer={explorer}
       >
         {children}

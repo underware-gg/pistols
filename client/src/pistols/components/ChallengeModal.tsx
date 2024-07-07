@@ -9,7 +9,7 @@ import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChalle
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useWager } from '@/pistols/hooks/useWager'
 import { useTable } from '@/pistols/hooks/useTable'
-import { useIsMyDuelist } from '@/pistols/hooks/useIsMyDuelist'
+import { useIsYou } from '@/pistols/hooks/useIsMyDuelist'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePicButton } from '@/pistols/components/account/ProfilePic'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
@@ -20,6 +20,7 @@ import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { IconClick } from '@/lib/ui/Icons'
 import { Divider } from '@/lib/ui/Divider'
+import { bigintToHex } from '@/lib/utils/types'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -44,8 +45,8 @@ export default function ChallengeModal() {
   const { profilePic: profilePicA } = useDuelist(duelistIdA)
   const { profilePic: profilePicB } = useDuelist(duelistIdB)
 
-  const isChallenger = useIsMyDuelist(duelistIdA)
-  const isChallenged = useIsMyDuelist(duelistIdB)
+  const isChallenger = useIsYou(duelistIdA)
+  const isChallenged = useIsYou(duelistIdB)
   const isYou = (isChallenger || isChallenged)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -82,7 +83,7 @@ export default function ChallengeModal() {
               {tableDescription}
             </Col>
             <Col width={1} textAlign='right'>
-              <IconClick name='database' size={'small'} onClick={() => window?.open(`/dueldata/${selectedDuelId}`, '_blank')} />
+              <IconClick name='database' size={'small'} onClick={() => window?.open(`/dueldata/${bigintToHex(selectedDuelId)}`, '_blank')} />
             </Col>
             <Col width={3} textAlign='right'>
               <AddressShort address={selectedDuelId} />

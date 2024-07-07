@@ -109,8 +109,8 @@ export const BalanceRequiredButton = ({
   onClick: Function
   disabled?: boolean
 }) => {
-  const { account } = useAccount()
-  const { balance, noFundsForFee } = useTableBalance(tableId, account.address, bigintAdd(wagerValue, fee))
+  const { address } = useAccount()
+  const { balance, noFundsForFee } = useTableBalance(tableId, address, bigintAdd(wagerValue, fee))
   const wagerTooLow = (BigInt(minWagerValue ?? 0) > 0n && BigInt(wagerValue) < BigInt(minWagerValue))
   const canSubmit = (!wagerTooLow && !noFundsForFee)
   return (

@@ -57,8 +57,7 @@ export function DuelistTable() {
   const rows = useMemo(() => {
     let result = []
     duelistKeys.forEach((duelistId, index) => {
-      const isYou = bigintEquals(duelistId, address)
-      result.push(<DuelistItem key={duelistId} duelistId={duelistId} index={index} isYou={isYou} sortColumn={sortColumn} dataCallback={_dataCallback}/>)
+      result.push(<DuelistItem key={duelistId} duelistId={duelistId} index={index} sortColumn={sortColumn} dataCallback={_dataCallback}/>)
     })
     return result
   }, [duelistKeys, sortColumn])
@@ -128,7 +127,6 @@ function DuelistItem({
   sortColumn,
   dataCallback,
   index,
-  isYou,
 }: {
   duelistId: BigNumberish
   sortColumn: DuelistColumn
@@ -151,10 +149,14 @@ function DuelistItem({
 
   const _colClass = (col: DuelistColumn) => (sortColumn == col ? 'Important' : null)
 
+  const _select = () => {
+    dispatchSelectDuelistId(duelistId)
+  }
+
   const isRookie = (total_duels == 0)
 
   return (
-    <Table.Row textAlign='center' verticalAlign='middle' onClick={() => dispatchSelectDuelistId(duelistId)}>
+    <Table.Row textAlign='center' verticalAlign='middle' onClick={() => _select()}>
       <Cell>
         <ProfilePicSquare profilePic={profilePic} small />
       </Cell>

@@ -93,8 +93,6 @@ function AccountItem({
           {/* <AddressShort address={address} /> */}
           <h5>
             <LordsBalance address={address} />
-            &nbsp;/&nbsp;
-            <EtherBalance address={address} />
           </h5>
         </Col>
         <Col width={5} textAlign='left'>

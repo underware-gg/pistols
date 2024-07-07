@@ -38,7 +38,7 @@ export const weiToEthString = (v: BigNumberish, decimals: number = 0, trailingZe
 export const dummyAccount = (provider?: RpcProvider): Account => (new Account(provider ?? {}, '0x0', '0x0'))
 
 export const Uint256ToBigint = (v: Uint256): bigint => ((BigInt(v.high) << 128n) + BigInt(v.low))
-export const bigintToUint256 = (v: BigNumberish): Uint256 => ({
+export const bigintToU256 = (v: BigNumberish): Uint256 => ({
   low: BigInt(v) & 0xffffffffffffffffffffffffffffffffn,
   high: BigInt(v) >> 128n,
 })

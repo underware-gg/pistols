@@ -47,7 +47,8 @@ type mod_actions_Type = {
   CHALLENGER_NOT_ADMITTED: string, // cairo: felt252
   CHALLENGED_NOT_ADMITTED: string, // cairo: felt252
   CHALLENGE_EXISTS: string, // cairo: felt252
-  CHALLENGE_WRONG_STATE: string, // cairo: felt252
+  CHALLENGE_NOT_AWAITING: string, // cairo: felt252
+  CHALLENGE_NOT_IN_PROGRESS: string, // cairo: felt252
   NOT_YOUR_CHALLENGE: string, // cairo: felt252
   TABLE_IS_CLOSED: string, // cairo: felt252
   MINIMUM_WAGER_NOT_MET: string, // cairo: felt252
@@ -74,7 +75,8 @@ export const actions: mod_actions_Type = {
   CHALLENGER_NOT_ADMITTED: 'PISTOLS: Challenger not allowed',
   CHALLENGED_NOT_ADMITTED: 'PISTOLS: Challenged not allowed',
   CHALLENGE_EXISTS: 'PISTOLS: Challenge exists',
-  CHALLENGE_WRONG_STATE: 'PISTOLS: Wrong Challenge state',
+  CHALLENGE_NOT_AWAITING: 'PISTOLS: Challenge not Awaiting',
+  CHALLENGE_NOT_IN_PROGRESS: 'PISTOLS: Challenge not Progress',
   NOT_YOUR_CHALLENGE: 'PISTOLS: Not your Challenge',
   TABLE_IS_CLOSED: 'PISTOLS: Table is closed',
   MINIMUM_WAGER_NOT_MET: 'PISTOLS: Minimum wager not met',

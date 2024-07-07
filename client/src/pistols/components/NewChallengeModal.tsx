@@ -4,6 +4,7 @@ import { useAccount } from '@starknet-react/core'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useRouterTable } from '@/pistols/hooks/useRouterListener'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useTable, useTableBalance } from '@/pistols/hooks/useTable'
@@ -25,13 +26,14 @@ const Col = Grid.Column
 export default function NewChallengeModal() {
  const { create_challenge } = useDojoSystemCalls()
   const { account, address } = useAccount()
+  const { duelistId } = useSettings()
 
-  const { challengingId, dispatchChallengedDuelistId, dispatchSelectDuelistId, dispatchSelectDuel } = usePistolsContext()
+  const { challengingId, dispatchChallengingDuelistId, dispatchSelectDuelistId, dispatchSelectDuel } = usePistolsContext()
   const isOpen = useMemo(() => (challengingId > 0n), [challengingId])
-  const duelistIdA = address
+  const duelistIdA = duelistId
   const duelistIdB = challengingId
 
-  const _close = () => { dispatchChallengedDuelistId(0n) }
+  const _close = () => { dispatchChallengingDuelistId(0n) }
 
   const { profilePic: profilePicA } = useDuelist(duelistIdA)
   const { profilePic: profilePicB } = useDuelist(duelistIdB)
@@ -63,7 +65,7 @@ export default function NewChallengeModal() {
   const _create_challenge = () => {
     const _submit = async () => {
       setIsSubmitting(true)
-      await create_challenge(account, 0n, challengingId, args.message, tableId, args.wager_value, args.expire_seconds)
+      await create_challenge(account, duelistId, challengingId, args.message, tableId, args.wager_value, args.expire_seconds)
       setIsSubmitting(false)
     }
     if (args) _submit()

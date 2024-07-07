@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react"
 import { getContractByName } from "@dojoengine/core"
 import { useDojo, useDojoComponents, useDojoSystemCalls } from "@/lib/dojo/DojoContext"
 import { bigintToEntity, bigintToHex } from "@/lib/utils/types"
-import { useOrigamiERC721BalanceOf, useOrigamiERC721IndexOfOwnerByToken, useOrigamiERC721TokenOfOwnerByIndex, useOrigamiERC721TotalSupply } from "@/lib/dojo/hooks/useOrigamiERC721"
+import { useOrigamiERC721BalanceOf, useOrigamiERC721IndexOfOwnerByToken, useOrigamiERC721OwnerOf, useOrigamiERC721TokenOfOwnerByIndex, useOrigamiERC721TotalSupply } from "@/lib/dojo/hooks/useOrigamiERC721"
 import { BigNumberish } from "starknet"
 
 
@@ -28,6 +28,14 @@ export const useDuelistTokenCount = () => {
   const { totalSupply } = useOrigamiERC721TotalSupply(contractAddress, components)
   return {
     tokenCount: totalSupply ?? 0,
+  }
+}
+
+export const useDuelistOwner = (token_id: BigNumberish) => {
+  const { contractAddress, components } = useTokenContract()
+  const { owner } = useOrigamiERC721OwnerOf(contractAddress, token_id, components)
+  return {
+    owner,
   }
 }
 

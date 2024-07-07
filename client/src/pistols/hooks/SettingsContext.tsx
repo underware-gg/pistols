@@ -120,7 +120,7 @@ const SettingsProvider = ({
         break
       }
       case SettingsActions.DUELIST_ID: {
-        newState.duelistId = action.payload as bigint
+        newState.duelistId = BigInt(action.payload)
         cookieSetter(SettingsActions.DUELIST_ID, newState)
         break
       }
@@ -180,10 +180,10 @@ export const useSettings = () => {
     })
   }
 
-  const dispatchDuelistId = (newId: bigint) => {
+  const dispatchDuelistId = (newId: BigNumberish) => {
     dispatch({
       type: SettingsActions.DUELIST_ID,
-      payload: newId,
+      payload: BigInt(newId),
     })
   }
 

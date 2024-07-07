@@ -18,14 +18,15 @@ export default function AccountHeader({
   const { address } = useAccount()
   const { isGuest } = useSettings()
   const { dispatchSelectDuelistId } = usePistolsContext()
+  const { duelistId } = useSettings()
 
-  const { nameDisplay, profilePic } = useDuelist(address)
+  const { nameDisplay, profilePic } = useDuelist(duelistId)
 
   const _click = () => {
     if(isGuest) {
       router.push('/gate')
     } else {
-      dispatchSelectDuelistId(address) 
+      dispatchSelectDuelistId(duelistId) 
     }
   }
 
