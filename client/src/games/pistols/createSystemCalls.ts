@@ -33,6 +33,16 @@ const admin_call = (entrypoint: string, calldata: any[]) => ({
   entrypoint,
   calldata,
 })
+const token_duelist_call = (entrypoint: string, calldata: any[]) => ({
+  contractName: 'token_duelist',
+  entrypoint,
+  calldata,
+})
+const minter_call = (entrypoint: string, calldata: any[]) => ({
+  contractName: 'minter',
+  entrypoint,
+  calldata,
+})
 
 export function createSystemCalls(
   network: SetupNetworkResult,
@@ -221,6 +231,18 @@ export function createSystemCalls(
   //   return results !== null ? results.map(v => Number(v)) : null
   // }
 
+  const can_mint = async (to: bigint, token_address: bigint): Promise<boolean | null> => {
+    const args = [to, token_address]
+    const results = await _executeCall<boolean>(minter_call('can_mint', args))
+    return results ?? null
+  }
+
+  const duelist_token_uri = async (token_id: bigint): Promise<string | null> => {
+    const args = [token_id]
+    const results = await _executeCall<string>(token_duelist_call('token_uri', args))
+    return results ?? null
+  }
+
   return {
     mint_duelist,
     update_duelist,
@@ -237,6 +259,10 @@ export function createSystemCalls(
     get_valid_packed_actions,
     // pack_action_slots,
     // unpack_action_slots,
+    //
+    // DUELISTS
+    can_mint,
+    duelist_token_uri,
   }
 }
 

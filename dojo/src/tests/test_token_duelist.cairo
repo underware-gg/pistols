@@ -278,6 +278,7 @@ fn test_transfer_from() {
 fn test_mint() {
     let (_world, mut token, mut minter) = setup();
 
+    assert(minter.can_mint(RECIPIENT(), token.contract_address) == true, '!can_mint');
     minter.mint(RECIPIENT(), token.contract_address);
     assert(token.balance_of(RECIPIENT()) == 1, 'invalid balance_of');
     assert(token.total_supply() == 3, 'invalid total_supply');
@@ -299,6 +300,7 @@ fn test_mint_not_minter() {
 #[should_panic(expected: ('MINTER: wallet maxed out', 'ENTRYPOINT_FAILED'))]
 fn test_mint_maxed_out() {
     let (_world, mut token, mut minter) = setup();
+    assert(minter.can_mint(OWNER(), token.contract_address) == false, 'can_mint');
     minter.mint(OWNER(), token.contract_address);
 }
 
@@ -306,7 +308,9 @@ fn test_mint_maxed_out() {
 #[should_panic(expected: ('MINTER: minted out', 'ENTRYPOINT_FAILED'))]
 fn test_mint_minted_out() {
     let (_world, mut token, mut minter) = setup();
+    assert(minter.can_mint(RECIPIENT(), token.contract_address) == true, 'can_mint');
     minter.mint(RECIPIENT(), token.contract_address);
+    assert(minter.can_mint(RECIPIENT(), token.contract_address) == false, 'can_mint');
     minter.mint(RECIPIENT(), token.contract_address);
 }
 

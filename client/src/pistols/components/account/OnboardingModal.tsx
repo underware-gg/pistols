@@ -2,7 +2,7 @@ import React, { useCallback, useEffect } from 'react'
 import { Modal, Grid } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useDuelistIndexOfOwner, useDuelistOfOwnerByIndex } from '@/pistols/hooks/useTokenDuelist'
+import { useCanMintDuelist, useDuelistBalanceOf, useDuelistIndexOfOwner, useDuelistOfOwnerByIndex } from '@/pistols/hooks/useTokenDuelist'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { OnboardingProfile } from '@/pistols/components/account/OnboardingProfile'
 import { AddressShort } from '@/lib/ui/AddressShort'
@@ -34,6 +34,16 @@ export default function OnboardingModal({
     dispatchDuelistId(0n)
     // dispatchSetAccountMenu(AccountMenuKey.Profile)
   }
+
+  // watch new mints
+  const { canMint } = useCanMintDuelist(address)
+  const { duelistBalance } = useDuelistBalanceOf(address)
+  const { duelistId: lastDuelistId } = useDuelistOfOwnerByIndex(address, duelistBalance - 1)
+  useEffect(() => {
+    if (lastDuelistId) {
+      dispatchDuelistId(lastDuelistId)
+    }
+  }, [lastDuelistId])
 
   const canGoPrev = Boolean(prevDuelistId)
   const canGoNext = Boolean(nextDuelistId)
@@ -67,7 +77,7 @@ export default function OnboardingModal({
         <Grid columns={4} className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>
-              <ActionButton fill label='Deploy New' onClick={() => _deployNew()} />
+              <ActionButton fill label='Deploy New' disabled={!canMint} onClick={() => _deployNew()} />
             </Col>
             <Col>
               <ActionButton fill label='Previous' disabled={!canGoPrev} onClick={() => gotoPrevAccount()} />

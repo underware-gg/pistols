@@ -2,10 +2,12 @@ import React from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid } from 'semantic-ui-react'
 import { VStack, VStackRow } from '@/lib/ui/Stack'
+import { useAccount } from '@starknet-react/core'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
+import { useCanMintDuelist } from '../hooks/useTokenDuelist'
 import { ChainSwitcher } from '@/lib/dojo/ChainSwitcher'
 import { AccountMenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { AccountsList } from '@/pistols/components/account/AccountsList'
@@ -142,6 +144,8 @@ function EnterAsGuestButton() {
 function ConnectedGate() {
   const { accountSetupOpener, dispatchSetAccountMenu } = usePistolsContext()
   const { tableId, dispatchDuelistId } = useSettings()
+  const { address } = useAccount()
+  const { canMint } = useCanMintDuelist(address)
 
   const _mintDuelist = () => {
     dispatchDuelistId(0n)
@@ -154,7 +158,7 @@ function ConnectedGate() {
       <VStack>
 
         <VStackRow>
-          <ActionButton fill onClick={() => _mintDuelist()} label='Mint New Duelist' />
+          <ActionButton fill disabled={!canMint} onClick={() => _mintDuelist()} label='Mint New Duelist' />
         </VStackRow>
 
       </VStack>

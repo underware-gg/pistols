@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import { getContractByName } from "@dojoengine/core"
-import { useDojo, useDojoComponents } from "@/lib/dojo/DojoContext"
+import { useDojo, useDojoComponents, useDojoSystemCalls } from "@/lib/dojo/DojoContext"
 import { bigintToEntity, bigintToHex } from "@/lib/utils/types"
 import { useOrigamiERC721BalanceOf, useOrigamiERC721IndexOfOwnerByToken, useOrigamiERC721TokenOfOwnerByIndex, useOrigamiERC721TotalSupply } from "@/lib/dojo/hooks/useOrigamiERC721"
 import { BigNumberish } from "starknet"
@@ -21,6 +21,7 @@ export const useTokenContract = () => {
     contractAddressKey,
   }
 }
+
 
 export const useDuelistTokenCount = () => {
   const { contractAddress, components } = useTokenContract()
@@ -54,4 +55,25 @@ export const useDuelistIndexOfOwner = (address: BigNumberish, token_id: BigNumbe
   }
 }
 
+
+export const useCanMintDuelist = (address: BigNumberish) => {
+  const [canMint, setCanMint] = useState<boolean>()
+  const { contractAddress } = useTokenContract()
+  const { duelistBalance } = useDuelistBalanceOf(address)
+  const { can_mint } = useDojoSystemCalls()
+  useEffect(() => {
+    if (address && contractAddress) {
+      can_mint(BigInt(address), BigInt(contractAddress)).then(v => {
+        setCanMint(v)
+      }).catch(e => {
+        setCanMint(false)
+      })
+    } else {
+      setCanMint(false)
+    }
+  }, [address, contractAddress, duelistBalance])
+  return {
+    canMint,
+  }
+}
 

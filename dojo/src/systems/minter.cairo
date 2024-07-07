@@ -3,6 +3,7 @@ use starknet::{ContractAddress};
 #[dojo::interface]
 trait IMinter {
     fn mint(ref world: IWorldDispatcher, to: ContractAddress, token_contract_address: ContractAddress) -> u128;
+    fn can_mint(world: @IWorldDispatcher, to: ContractAddress, token_contract_address: ContractAddress) -> bool;
     fn set_open(ref world: IWorldDispatcher, token_contract_address: ContractAddress, is_open: bool);
     // fn get_token_svg(ref world: IWorldDispatcher, token_id: u128) -> ByteArray;
 }
@@ -101,6 +102,18 @@ mod minter {
 
             // return minted token id
             (token_id.low)
+        }
+
+        fn can_mint(world: @IWorldDispatcher, to: ContractAddress, token_contract_address: ContractAddress) -> bool {
+            let token = (ITokenDuelistDispatcher{ contract_address: token_contract_address });
+            let mut config: TokenConfig = get!(world, (token_contract_address), TokenConfig);
+            let balance: u256 = token.balance_of(to);
+            (
+                (config.minted_count < config.max_supply) &&
+                (config.minted_count.into() < constants::MAX_DUELIST_ID) &&
+                (config.is_open) &&
+                (balance.low < config.max_per_wallet.into())
+            )
         }
 
         fn set_open(ref world: IWorldDispatcher, token_contract_address: ContractAddress, is_open: bool) {
