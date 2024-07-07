@@ -135,6 +135,7 @@ mod shooter {
                         action: slot2_a.into(),
                         chance_crit: 0,
                         chance_hit: 0,
+                        chance_lethal: 0,
                         dice_crit: 0,
                         dice_hit: 0,
                         damage: 0,
@@ -150,6 +151,7 @@ mod shooter {
                         action: slot2_b.into(),
                         chance_crit: 0,
                         chance_hit: 0,
+                        chance_lethal: 0,
                         dice_crit: 0,
                         dice_hit: 0,
                         damage: 0,
@@ -279,8 +281,8 @@ mod shooter {
                 attack.chance_hit = utils::calc_hit_chances(attacker, defender, action, defense_action, attack.health);
                 attack.dice_hit = throw_dice(seed * 2, round, 100, attack.chance_hit);
                 if (attack.dice_hit <= attack.chance_hit) {
-                    let lethal_chance: u8 = utils::calc_lethal_chances(attacker, defender, action, defense_action, attack.chance_hit);
-                    action.execute_hit(ref attack, ref defense, lethal_chance);
+                    attack.chance_lethal = utils::calc_lethal_chances(attacker, defender, action, defense_action, attack.chance_hit);
+                    action.execute_hit(ref attack, ref defense, attack.chance_lethal);
                 }
             }
         }
@@ -292,7 +294,6 @@ mod shooter {
     // Randomizer
     //
     fn throw_dice(seed: felt252, round: Round, faces: u128, chances: u8) -> u8 {
-        if (chances.into() == faces) { return chances; }
         let salt: u64 = utils::make_round_salt(round);
         (utils::throw_dice(seed, salt.into(), faces).try_into().unwrap())
     }

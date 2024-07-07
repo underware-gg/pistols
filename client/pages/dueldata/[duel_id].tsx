@@ -208,6 +208,7 @@ function WagerStats({
 }
 
 function RoundStats({
+  duelId,
   roundNumber,
   round,
 }: {
@@ -215,7 +216,9 @@ function RoundStats({
   roundNumber: number
   round: any
 }) {
-
+  const { challenge } = useDuel(duelId)
+  const { nameDisplay: nameA } = useDuelist(challenge.duelistIdA)
+  const { nameDisplay: nameB } = useDuelist(challenge.duelistIdB)
   return (
     <>
       <Table celled striped color='orange'>
@@ -236,8 +239,8 @@ function RoundStats({
         </Body>
       </Table>
 
-      <ShotStats shot={round.shot_a} shotNumber='A' title='Challenger' />
-      <ShotStats shot={round.shot_b} shotNumber='B' title='Challenged' />
+      <ShotStats shot={round.shot_a} shotNumber='A' title={nameA} />
+      <ShotStats shot={round.shot_b} shotNumber='B' title={nameB} />
     </>
   )
 }
@@ -277,15 +280,21 @@ function ShotStats({
             </Cell>
           </Row>
           <Row>
-            <Cell>Crit Dice / Chances</Cell>
+            <Cell>Crit</Cell>
             <Cell>
-              {shot.dice_crit} / {shot.chance_crit}
+              🎲 {shot.dice_crit} / {shot.chance_crit} %
             </Cell>
           </Row>
           <Row>
-            <Cell>Hit Dice / Chances</Cell>
+            <Cell>Hit</Cell>
             <Cell>
-              {shot.dice_hit} / {shot.chance_hit}
+              🎲 {shot.dice_hit} / {shot.chance_hit} %
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>Lethal</Cell>
+            <Cell>
+              🎲 {shot.chance_lethal > 0 ? shot.dice_hit : 0} / {shot.chance_lethal} %
             </Cell>
           </Row>
         </Body>

@@ -55,7 +55,7 @@ export default function DuelistModal() {
             <Col textAlign='center'>
               {(isYou || isMyDuelist) &&
                 <div className='Anchor' onClick={() => _switch()} >
-                  <span className='Smaller'>Switch Duelist</span>
+                  <span className='Smaller'>{isYou ? 'Exit to Gate' : 'Switch Duelist'}</span>
                   &nbsp;
                   <Icon name={isYou ? 'sign out' : 'sync alternate'} size={'small'} />
                 </div>

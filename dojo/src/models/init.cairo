@@ -12,6 +12,7 @@ mod init {
             action: 0,
             chance_crit: 0,
             chance_hit: 0,
+            chance_lethal: 0,
             dice_crit: 0,
             dice_hit: 0,
             damage: 0,

@@ -60,7 +60,7 @@ struct Round {
     state: u8,      // actually a RoundState
     shot_a: Shot,   // duelist_a shot
     shot_b: Shot,   // duelist_b shot
-} // (8 + 224 + 224) = 456 bits ~ 2 felts (max 504)
+} // (8 + 232 + 232) = 472 bits ~ 2 felts (max 504)
 
 //
 // The shot of each player on a Round
@@ -71,9 +71,10 @@ struct Shot {
     salt: u64,          // the player's secret salt
     action: u16,        // the player's chosen action(s) (paces, weapon, ...)
     // shot results
-    chance_crit: u8,    // computed chances (1..100) - kill / double damage
+    chance_crit: u8,    // computed chances (1..100) - execution
     chance_hit: u8,     // computed chances (1..100) - hit / normal damage
-    dice_crit: u8,      // dice roll result (1..100) - kill / double damage
+    chance_lethal: u8,  // computed chances (1..100) - hit / double damage
+    dice_crit: u8,      // dice roll result (1..100) - execution
     dice_hit: u8,       // dice roll result (1..100) - hit / normal damage
     damage: u8,         // amount of health taken
     block: u8,          // amount of damage blocked
@@ -82,6 +83,6 @@ struct Shot {
     // player state
     health: u8,         // final health
     honour: u8,         // honour granted
-} // 224 bits
+} // 232 bits
 
 
