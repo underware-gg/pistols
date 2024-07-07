@@ -1,8 +1,13 @@
 kind = "DojoModel"
-class_hash = "0x4662ade1fbf928d8f6a7385014d2d820fea026c9e42cc10fd1ec97b22d59ae6"
-original_class_hash = "0x4662ade1fbf928d8f6a7385014d2d820fea026c9e42cc10fd1ec97b22d59ae6"
+class_hash = "0x736e03785d94cf63c151e7bcba309addecad18bfb8434d3cd277c0fc6a6cf34"
+original_class_hash = "0x736e03785d94cf63c151e7bcba309addecad18bfb8434d3cd277c0fc6a6cf34"
 abi = "manifests/dev/abis/base/models/pistols_models_duelist_pact.json"
 name = "pistols::models::duelist::pact"
+
+[[members]]
+name = "table_id"
+type = "felt252"
+key = true
 
 [[members]]
 name = "pair"

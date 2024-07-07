@@ -347,6 +347,10 @@
         "type": "core::integer::u8"
       },
       {
+        "name": "chance_lethal",
+        "type": "core::integer::u8"
+      },
+      {
         "name": "dice_crit",
         "type": "core::integer::u8"
       },

@@ -351,6 +351,28 @@
     ]
   },
   {
+    "type": "enum",
+    "name": "pistols::models::table::TableType",
+    "variants": [
+      {
+        "name": "Undefined",
+        "type": "()"
+      },
+      {
+        "name": "Classic",
+        "type": "()"
+      },
+      {
+        "name": "Tournament",
+        "type": "()"
+      },
+      {
+        "name": "IRLTournament",
+        "type": "()"
+      }
+    ]
+  },
+  {
     "type": "struct",
     "name": "pistols::models::table::TableConfig",
     "members": [
@@ -384,7 +406,7 @@
       },
       {
         "name": "table_type",
-        "type": "core::integer::u8"
+        "type": "pistols::models::table::TableType"
       }
     ]
   },

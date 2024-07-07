@@ -59,6 +59,28 @@
     "interface_name": "pistols::systems::actions::IActions"
   },
   {
+    "type": "enum",
+    "name": "pistols::models::duelist::Archetype",
+    "variants": [
+      {
+        "name": "Undefined",
+        "type": "()"
+      },
+      {
+        "name": "Villainous",
+        "type": "()"
+      },
+      {
+        "name": "Trickster",
+        "type": "()"
+      },
+      {
+        "name": "Honourable",
+        "type": "()"
+      }
+    ]
+  },
+  {
     "type": "struct",
     "name": "core::byte_array::ByteArray",
     "members": [
@@ -298,7 +320,11 @@
           },
           {
             "name": "profile_pic_uri",
-            "type": "core::byte_array::ByteArray"
+            "type": "core::felt252"
+          },
+          {
+            "name": "initial_archetype",
+            "type": "pistols::models::duelist::Archetype"
           }
         ],
         "outputs": [
@@ -326,7 +352,7 @@
           },
           {
             "name": "profile_pic_uri",
-            "type": "core::byte_array::ByteArray"
+            "type": "core::felt252"
           }
         ],
         "outputs": [
@@ -345,7 +371,7 @@
             "type": "core::integer::u128"
           },
           {
-            "name": "challenged",
+            "name": "challenged_id_or_address",
             "type": "core::starknet::contract_address::ContractAddress"
           },
           {
@@ -401,6 +427,10 @@
         "name": "commit_action",
         "inputs": [
           {
+            "name": "duelist_id",
+            "type": "core::integer::u128"
+          },
+          {
             "name": "duel_id",
             "type": "core::integer::u128"
           },
@@ -420,6 +450,10 @@
         "type": "function",
         "name": "reveal_action",
         "inputs": [
+          {
+            "name": "duelist_id",
+            "type": "core::integer::u128"
+          },
           {
             "name": "duel_id",
             "type": "core::integer::u128"
@@ -449,6 +483,10 @@
         "name": "get_pact",
         "inputs": [
           {
+            "name": "table_id",
+            "type": "core::felt252"
+          },
+          {
             "name": "duelist_id_a",
             "type": "core::integer::u128"
           },
@@ -468,6 +506,10 @@
         "type": "function",
         "name": "has_pact",
         "inputs": [
+          {
+            "name": "table_id",
+            "type": "core::felt252"
+          },
           {
             "name": "duelist_id_a",
             "type": "core::integer::u128"

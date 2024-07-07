@@ -327,6 +327,10 @@
     "name": "pistols::models::duelist::Pact",
     "members": [
       {
+        "name": "table_id",
+        "type": "core::felt252"
+      },
+      {
         "name": "pair",
         "type": "core::integer::u128"
       },

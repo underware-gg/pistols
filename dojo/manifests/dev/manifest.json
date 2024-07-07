@@ -1646,8 +1646,8 @@
     {
       "kind": "DojoContract",
       "address": "0x30663cb812dc7e2930b9683945132ca6054483af40e1e7daccb77091e02e7b1",
-      "class_hash": "0x38a3992861753cd1b7ab457990771dd9e815c6a021f8c9e6e08aacfd26bbbbe",
-      "original_class_hash": "0x38a3992861753cd1b7ab457990771dd9e815c6a021f8c9e6e08aacfd26bbbbe",
+      "class_hash": "0x5153dcda1ffb4a89a132c0eef5cfdc041cc73ed81a50a6307ed23fd84ece233",
+      "original_class_hash": "0x5153dcda1ffb4a89a132c0eef5cfdc041cc73ed81a50a6307ed23fd84ece233",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -1708,6 +1708,28 @@
           "type": "impl",
           "name": "ActionsImpl",
           "interface_name": "pistols::systems::actions::IActions"
+        },
+        {
+          "type": "enum",
+          "name": "pistols::models::duelist::Archetype",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Villainous",
+              "type": "()"
+            },
+            {
+              "name": "Trickster",
+              "type": "()"
+            },
+            {
+              "name": "Honourable",
+              "type": "()"
+            }
+          ]
         },
         {
           "type": "struct",
@@ -1949,7 +1971,11 @@
                 },
                 {
                   "name": "profile_pic_uri",
-                  "type": "core::byte_array::ByteArray"
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "initial_archetype",
+                  "type": "pistols::models::duelist::Archetype"
                 }
               ],
               "outputs": [
@@ -1977,7 +2003,7 @@
                 },
                 {
                   "name": "profile_pic_uri",
-                  "type": "core::byte_array::ByteArray"
+                  "type": "core::felt252"
                 }
               ],
               "outputs": [
@@ -1996,7 +2022,7 @@
                   "type": "core::integer::u128"
                 },
                 {
-                  "name": "challenged",
+                  "name": "challenged_id_or_address",
                   "type": "core::starknet::contract_address::ContractAddress"
                 },
                 {
@@ -2052,6 +2078,10 @@
               "name": "commit_action",
               "inputs": [
                 {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                },
+                {
                   "name": "duel_id",
                   "type": "core::integer::u128"
                 },
@@ -2071,6 +2101,10 @@
               "type": "function",
               "name": "reveal_action",
               "inputs": [
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                },
                 {
                   "name": "duel_id",
                   "type": "core::integer::u128"
@@ -2100,6 +2134,10 @@
               "name": "get_pact",
               "inputs": [
                 {
+                  "name": "table_id",
+                  "type": "core::felt252"
+                },
+                {
                   "name": "duelist_id_a",
                   "type": "core::integer::u128"
                 },
@@ -2119,6 +2157,10 @@
               "type": "function",
               "name": "has_pact",
               "inputs": [
+                {
+                  "name": "table_id",
+                  "type": "core::felt252"
+                },
                 {
                   "name": "duelist_id_a",
                   "type": "core::integer::u128"
@@ -2494,8 +2536,8 @@
     {
       "kind": "DojoContract",
       "address": "0x725717f8ac5508bb1b6dfbf53949f20b7f38f59c7310feab688cb5f18ef0635",
-      "class_hash": "0xa7cb19170f019c122d8da04214a8a5c885b0b5f5c19fe96c9ea56acaf7506a",
-      "original_class_hash": "0xa7cb19170f019c122d8da04214a8a5c885b0b5f5c19fe96c9ea56acaf7506a",
+      "class_hash": "0x4f7ed485fc8ed0c06f67f2ca9e529c8a705e7a892c3eb43e65a353eaf0395d3",
+      "original_class_hash": "0x4f7ed485fc8ed0c06f67f2ca9e529c8a705e7a892c3eb43e65a353eaf0395d3",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -2620,6 +2662,28 @@
           ]
         },
         {
+          "type": "enum",
+          "name": "pistols::models::table::TableType",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Classic",
+              "type": "()"
+            },
+            {
+              "name": "Tournament",
+              "type": "()"
+            },
+            {
+              "name": "IRLTournament",
+              "type": "()"
+            }
+          ]
+        },
+        {
           "type": "struct",
           "name": "pistols::models::table::TableConfig",
           "members": [
@@ -2653,7 +2717,7 @@
             },
             {
               "name": "table_type",
-              "type": "core::integer::u8"
+              "type": "pistols::models::table::TableType"
             }
           ]
         },
@@ -2900,8 +2964,8 @@
     {
       "kind": "DojoContract",
       "address": "0x54a9565eedc4904d5e2fa4beeff5e713b1fd23b95286287daf29570b227dfcb",
-      "class_hash": "0x52d5ad475e9b61d4dc9b47962f9bc1e218a9419cee1e2898a7ff1706cc69715",
-      "original_class_hash": "0x52d5ad475e9b61d4dc9b47962f9bc1e218a9419cee1e2898a7ff1706cc69715",
+      "class_hash": "0x5b77527c0d56b8369b09ff224d3a81cadc04a04f8c6516e7ae5c32e27021536",
+      "original_class_hash": "0x5b77527c0d56b8369b09ff224d3a81cadc04a04f8c6516e7ae5c32e27021536",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -3035,6 +3099,26 @@
                 }
               ],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "can_mint",
+              "inputs": [
+                {
+                  "name": "to",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "token_contract_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
             },
             {
               "type": "function",
@@ -4675,8 +4759,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x6b89e5b8d5b269d100e9d7c5533371c16079b3a492cdc539f87cb31c2b1d465",
-      "original_class_hash": "0x6b89e5b8d5b269d100e9d7c5533371c16079b3a492cdc539f87cb31c2b1d465",
+      "class_hash": "0x6161137dd65989ef77fa903b18895bf776defd169795d92d04002d6dec81906",
+      "original_class_hash": "0x6161137dd65989ef77fa903b18895bf776defd169795d92d04002d6dec81906",
       "abi": [
         {
           "type": "impl",
@@ -5023,6 +5107,10 @@
             },
             {
               "name": "chance_hit",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "chance_lethal",
               "type": "core::integer::u8"
             },
             {
@@ -6851,6 +6939,11 @@
       "kind": "DojoModel",
       "members": [
         {
+          "name": "table_id",
+          "type": "felt252",
+          "key": true
+        },
+        {
           "name": "pair",
           "type": "u128",
           "key": true
@@ -6861,8 +6954,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x4662ade1fbf928d8f6a7385014d2d820fea026c9e42cc10fd1ec97b22d59ae6",
-      "original_class_hash": "0x4662ade1fbf928d8f6a7385014d2d820fea026c9e42cc10fd1ec97b22d59ae6",
+      "class_hash": "0x736e03785d94cf63c151e7bcba309addecad18bfb8434d3cd277c0fc6a6cf34",
+      "original_class_hash": "0x736e03785d94cf63c151e7bcba309addecad18bfb8434d3cd277c0fc6a6cf34",
       "abi": [
         {
           "type": "impl",
@@ -7191,6 +7284,10 @@
           "type": "struct",
           "name": "pistols::models::duelist::Pact",
           "members": [
+            {
+              "name": "table_id",
+              "type": "core::felt252"
+            },
             {
               "name": "pair",
               "type": "core::integer::u128"
@@ -8122,12 +8219,12 @@
         },
         {
           "name": "table_type",
-          "type": "u8",
+          "type": "TableType",
           "key": false
         }
       ],
-      "class_hash": "0x4f1a2c28708d94b46a6d16210668ace7c6ec20870c899a588b5ff710c22a3e6",
-      "original_class_hash": "0x4f1a2c28708d94b46a6d16210668ace7c6ec20870c899a588b5ff710c22a3e6",
+      "class_hash": "0x429e7f4af04864d9cd0081d6b55293ce22ddd09e5a41f9a3667e9a4626cc726",
+      "original_class_hash": "0x429e7f4af04864d9cd0081d6b55293ce22ddd09e5a41f9a3667e9a4626cc726",
       "abi": [
         {
           "type": "impl",
@@ -8481,6 +8578,28 @@
           ]
         },
         {
+          "type": "enum",
+          "name": "pistols::models::table::TableType",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Classic",
+              "type": "()"
+            },
+            {
+              "name": "Tournament",
+              "type": "()"
+            },
+            {
+              "name": "IRLTournament",
+              "type": "()"
+            }
+          ]
+        },
+        {
           "type": "struct",
           "name": "pistols::models::table::TableConfig",
           "members": [
@@ -8514,7 +8633,7 @@
             },
             {
               "name": "table_type",
-              "type": "core::integer::u8"
+              "type": "pistols::models::table::TableType"
             }
           ]
         },
