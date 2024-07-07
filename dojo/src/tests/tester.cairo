@@ -235,7 +235,7 @@ mod tester {
     }
 
     // ::actions
-    fn execute_update_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: u8, profile_pic_uri: ByteArray) {
+    fn execute_update_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: u8, profile_pic_uri: felt252) {
         impersonate(sender);
         system.update_duelist(ID(sender), name, profile_pic_type, profile_pic_uri);
         _next_block();

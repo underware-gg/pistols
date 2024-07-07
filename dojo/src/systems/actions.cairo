@@ -13,14 +13,14 @@ trait IActions {
         ref world: IWorldDispatcher,
         name: felt252,
         profile_pic_type: u8,
-        profile_pic_uri: ByteArray,
+        profile_pic_uri: felt252,
     ) -> Duelist;
     fn update_duelist(
         ref world: IWorldDispatcher,
         duelist_id: u128,
         name: felt252,
         profile_pic_type: u8,
-        profile_pic_uri: ByteArray,
+        profile_pic_uri: felt252,
     ) -> Duelist;
 
     //
@@ -97,6 +97,7 @@ mod actions {
     use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::types::action::{Action, ActionTrait};
     use pistols::utils::timestamp::{timestamp};
+    use pistols::utils::short_string::{ShortStringTrait};
     use pistols::libs::seeder::{make_seed};
     use pistols::libs::shooter::{shooter};
     use pistols::libs::utils;
@@ -141,7 +142,7 @@ mod actions {
         fn mint_duelist(ref world: IWorldDispatcher,
             name: felt252,
             profile_pic_type: u8,
-            profile_pic_uri: ByteArray,
+            profile_pic_uri: felt252,
         ) -> Duelist {
             let config_manager = ConfigManagerTrait::new(world).get();
             let minter_dispatcher = IMinterDispatcher{
@@ -157,7 +158,7 @@ mod actions {
             duelist_id: u128,
             name: felt252,
             profile_pic_type: u8,
-            profile_pic_uri: ByteArray,
+            profile_pic_uri: felt252,
         ) -> Duelist {
             let duelist_manager = DuelistManagerTrait::new(world);
             let caller: ContractAddress = starknet::get_caller_address();
@@ -174,7 +175,7 @@ mod actions {
             duelist.duelist_id = duelist_id;
             duelist.name = name;
             duelist.profile_pic_type = profile_pic_type;
-            duelist.profile_pic_uri = profile_pic_uri;
+            duelist.profile_pic_uri = profile_pic_uri.to_byte_array();
             // save
             duelist_manager.set(duelist.clone());
 

@@ -1,7 +1,7 @@
 {
   "name": "pistols",
   "private": true,
-  "version": "00.9.0-0",
+  "version": "0.9.0-0",
   "type": "module",
   "scripts": {
     "dev": "NODE_OPTIONS='--experimental-wasm-modules' next dev",

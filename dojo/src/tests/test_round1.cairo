@@ -631,7 +631,7 @@ mod tests {
         tester::execute_commit_action(system, OTHER(), duel_id, 1, hash_b);
         tester::execute_reveal_action(system, OWNER(), duel_id, 1, 0x111, 10, 0);
         let duelist_a_before = tester::get_Duelist(world, OWNER());
-        tester::execute_update_duelist(system, OWNER(), 'dssadsa', 1, "3");
+        tester::execute_update_duelist(system, OWNER(), 'dssadsa', 1, '3');
         let duelist_a_after = tester::get_Duelist(world, OWNER());
         assert(duelist_a_before.duelist_id == duelist_a_after.duelist_id, 'duelist_id');
         assert(duelist_a_before.name != duelist_a_after.name, 'name');

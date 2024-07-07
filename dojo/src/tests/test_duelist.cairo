@@ -18,8 +18,8 @@ mod tests {
         let (world, system, _admin, _lords) = tester::setup_world(true, true, false, true, false);
         let player1_name: felt252 = 'Player_ONE';
         let player2_name: felt252 = 'Player_TWO';
-        tester::execute_update_duelist(system, OWNER(), player1_name, 1, "1");
-        tester::execute_update_duelist(system, OTHER(), player2_name, 1, "2");
+        tester::execute_update_duelist(system, OWNER(), player1_name, 1, '1');
+        tester::execute_update_duelist(system, OTHER(), player2_name, 1, '2');
         let player1: Duelist = tester::get_Duelist(world, OWNER());
         let player2: Duelist = tester::get_Duelist(world, OTHER());
         assert(player1.name == player1_name, 'player1_name');
