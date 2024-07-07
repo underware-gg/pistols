@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Segment, Icon, Step, SegmentGroup, SemanticFLOATS } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
+import { useAccount } from '@starknet-react/core'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
@@ -220,6 +221,7 @@ function DuelProgress({
   //------------------------------
   // Duelist interaction
   //
+  const { isConnected } = useAccount()
   const isYou = useIsYou(duelistId)
   // const isTurn = useMemo(() => ((isA && turnA) || (isB && turnB)), [isA, isB, turnA, turnB])
 
@@ -235,7 +237,7 @@ function DuelProgress({
 
   // onClick
   const onClick = useMemo(() => {
-    if (isYou && !completedStages[duelStage]) {
+    if (isYou && isConnected && !completedStages[duelStage]) {
       if (duelStage == DuelStage.Round1Commit || duelStage == DuelStage.Round2Commit) {
         return _commit
       }
@@ -244,7 +246,7 @@ function DuelProgress({
       }
     }
     return null
-  }, [isYou, duelStage, completedStages])
+  }, [isYou, isConnected, duelStage, completedStages])
 
   // auto-reveal
   useEffect(() => {

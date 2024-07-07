@@ -41,7 +41,7 @@ export const useDojoCall = <T extends any>({
     return () => {
       _mounted = false
     }
-  }, [call, args, enabled, defaultValue])
+  }, [call, args, enabled])
   return {
     value,
     isPending,

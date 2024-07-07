@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Modal } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useGetValidPackedActions } from '@/pistols/hooks/useContractCalls'
 import { Action, ActionNames } from '@/pistols/utils/pistols'
@@ -29,6 +30,7 @@ export default function CommitBladesModal({
 }) {
   const { commit_action } = useDojoSystemCalls()
   const { account } = useAccount()
+  const { duelistId } = useSettings()
   const { value } = useWager(duelId)
 
   const [slot1, setSlot1] = useState(0)
@@ -61,9 +63,9 @@ export default function CommitBladesModal({
   const _submit = async () => {
     if (isValid) {
       setIsSubmitting(true)
-      const hash = await signAndGenerateActionHash(account, duelId, roundNumber, packed)
+      const hash = await signAndGenerateActionHash(account, duelistId, duelId, roundNumber, packed)
       if (hash) {
-        await commit_action(account, duelId, roundNumber, hash)
+        await commit_action(account, duelistId, duelId, roundNumber, hash)
         setIsOpen(false)
       }
       setIsSubmitting(false)

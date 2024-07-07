@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Divider, Grid, Modal, Pagination } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { signAndGenerateActionHash } from '@/pistols/utils/salt'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
@@ -20,28 +21,32 @@ export default function CommitPacesModal({
   duelId: bigint
   roundNumber?: number
 }) {
-  const { commit_action } = useDojoSystemCalls()
   const { account } = useAccount()
+  const { duelistId } = useSettings()
+  const { commit_action } = useDojoSystemCalls()
 
   const [paces, setPaces] = useState(0)
-
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     setPaces(0)
   }, [isOpen])
 
-  const _submit = async () => {
-    if (paces) {
+  const canSubmit = useMemo(() =>
+    (account && duelId && roundNumber && paces && !isSubmitting),
+  [account, duelId, roundNumber, paces, isSubmitting])
+
+  const _submit = useCallback(async () => {
+    if (canSubmit) {
       setIsSubmitting(true)
-      const hash = await signAndGenerateActionHash(account, duelId, roundNumber, paces)
+      const hash = await signAndGenerateActionHash(account, duelistId, duelId, roundNumber, paces)
       if (hash) {
-        await commit_action(account, duelId, roundNumber, hash)
+        await commit_action(account, duelistId, duelId, roundNumber, hash)
         setIsOpen(false)
       }
       setIsSubmitting(false)
     }
-  }
+  }, [canSubmit])
 
   return (
     <Modal
@@ -87,7 +92,7 @@ export default function CommitPacesModal({
               <ActionButton fill label='Close' onClick={() => setIsOpen(false)} />
             </Col>
             <Col>
-              <ActionButton fill important label='Commit...' disabled={!paces || isSubmitting} onClick={() => _submit()} />
+              <ActionButton fill important label='Commit...' disabled={!canSubmit} onClick={() => _submit()} />
             </Col>
           </Row>
         </Grid>

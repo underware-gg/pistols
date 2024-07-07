@@ -56,7 +56,6 @@ function Stats({
   } = useDuel(duelId)
 
   const challenge = useChallenge(duelId)
-  console.log(challenge)
 
   return (
     <>
@@ -112,8 +111,6 @@ function DuelStats({
           </Cell>
           <Cell>
             <b>{nameA}</b>
-            <br />
-            {bigintToHex(challenge.duelistA)}
           </Cell>
         </Row>
         <Row>
@@ -124,8 +121,6 @@ function DuelStats({
           </Cell>
           <Cell>
             <b>{nameB}</b>
-            <br />
-            {bigintToHex(challenge.duelistB)}
           </Cell>
         </Row>
         <Row>

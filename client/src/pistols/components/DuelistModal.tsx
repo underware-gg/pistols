@@ -6,7 +6,7 @@ import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { usePact } from '@/pistols/hooks/usePact'
 import { useDuelistOwner } from '@/pistols/hooks/useTokenDuelist'
-import { useIsYou } from '@/pistols/hooks/useIsMyDuelist'
+import { useIsMyDuelist, useIsYou } from '@/pistols/hooks/useIsMyDuelist'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ChallengeTableByDuelist } from '@/pistols/components/ChallengeTable'
@@ -17,18 +17,27 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export default function DuelistModal() {
-  const { duelistId, isGuest } = useSettings()
+  const { duelistId, isGuest, dispatchDuelistId } = useSettings()
   const router = useRouter()
 
   const { selectedDuelistId, dispatchSelectDuel, dispatchSelectDuelistId, dispatchChallengingDuelistId } = usePistolsContext()
   const { owner } = useDuelistOwner(selectedDuelistId)
   const isOpen = useMemo(() => (selectedDuelistId > 0), [selectedDuelistId])
   const isYou = useIsYou(selectedDuelistId)
+  const isMyDuelist = useIsMyDuelist(selectedDuelistId)
 
   const _close = () => { dispatchSelectDuelistId(0n) }
 
   const { profilePic } = useDuelist(selectedDuelistId)
   const { hasPact, pactDuelId } = usePact(duelistId, selectedDuelistId)
+
+  const _switch = () => {
+    if (isYou) {
+      router.push(`/gate`)
+    } else if (isMyDuelist) {
+      dispatchDuelistId(selectedDuelistId)
+    }
+  }
 
   return (
     <Modal
@@ -44,11 +53,11 @@ export default function DuelistModal() {
               Duelist
             </Col>
             <Col textAlign='center'>
-              {isYou &&
-                <div className='Anchor' onClick={() => router.push(`/gate`)} >
+              {(isYou || isMyDuelist) &&
+                <div className='Anchor' onClick={() => _switch()} >
                   <span className='Smaller'>Switch Duelist</span>
                   &nbsp;
-                  <Icon name='sign out' size={'small'} />
+                  <Icon name={isYou ? 'sign out' : 'sync alternate'} size={'small'} />
                 </div>
               }
             </Col>

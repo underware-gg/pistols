@@ -54,7 +54,7 @@ export default function ChallengeModal() {
   const _reply = (accepted: boolean) => {
     const _submit = async () => {
       setIsSubmitting(true)
-      await reply_challenge(account, selectedDuelId, duelistId, accepted)
+      await reply_challenge(account, duelistId, selectedDuelId, accepted)
       if (accepted) _gotoDuel()
       setIsSubmitting(false)
     }

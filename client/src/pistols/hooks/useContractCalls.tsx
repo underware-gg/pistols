@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useDojoCall } from '@/lib/dojo/hooks/useDojoCall'
@@ -48,6 +48,7 @@ export const useSimulateChances = (address: BigNumberish, duelId: bigint, roundN
     enabled,
     defaultValue: {},
   })
+
   return value as Awaited<ReturnType<typeof simulate_chances>>
 }
 

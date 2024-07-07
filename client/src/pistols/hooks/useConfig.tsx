@@ -8,7 +8,9 @@ export const useConfig = () => {
   return {
     initialized: config.initialized ?? null,
     paused: config.paused ?? null,
-    treasury_address: config.treasury_address ?? null,
-    duelist_address: config.duelist_address ?? null,
+    ownerAddress: config.owner_address ?? null,
+    treasuryAddress: config.treasury_address ?? null,
+    duelistAddress: config.token_duelist_address ?? null,
+    minterAddress: config.minter_address ?? null,
   }
 }

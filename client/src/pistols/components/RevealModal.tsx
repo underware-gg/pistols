@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useGetValidPackedActions } from '@/pistols/hooks/useContractCalls'
 import { signAndRestoreActionFromHash } from '../utils/salt'
@@ -23,6 +24,7 @@ export default function RevealModal({
 }) {
   const { reveal_action } = useDojoSystemCalls()
   const { account } = useAccount()
+  const { duelistId } = useSettings()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { validPackedActions } = useGetValidPackedActions(roundNumber)
 
@@ -30,9 +32,9 @@ export default function RevealModal({
 
   const _reveal = async () => {
     setIsSubmitting(true)
-    const { salt, packed, slot1, slot2 } = await signAndRestoreActionFromHash(account, duelId, roundNumber, hash, validPackedActions)
+    const { salt, packed, slot1, slot2 } = await signAndRestoreActionFromHash(account, duelistId, duelId, roundNumber, hash, validPackedActions)
     if (packed != null && slot1 != null && slot2 != null) {
-      await reveal_action(account, duelId, roundNumber, salt, slot1, slot2)
+      await reveal_action(account, duelistId, duelId, roundNumber, salt, slot1, slot2)
       setIsOpen(false)
     }
     setIsSubmitting(false)
