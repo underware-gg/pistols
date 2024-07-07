@@ -150,8 +150,8 @@ export const useChallenge = (duelId: BigNumberish) => {
 
 export const useChallengeDescription = (duelId: bigint) => {
   const { state, duelistIdA, duelistIdB, winnerDuelistId } = useChallenge(duelId)
-  const { name: nameA } = useDuelist(duelistIdA)
-  const { name: nameB } = useDuelist(duelistIdB)
+  const { nameDisplay: nameA } = useDuelist(duelistIdA)
+  const { nameDisplay: nameB } = useDuelist(duelistIdB)
 
   const challengeDescription = useMemo(() => {
     let result = ChallengeStateDescriptions[state]

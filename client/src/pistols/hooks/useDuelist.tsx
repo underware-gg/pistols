@@ -31,10 +31,11 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   // console.log(`Duelist`, address, bigintToEntity(address ?? 0n), duelist)
 
   const name = useMemo(() => duelist?.name ? feltToString(duelist.name) : null, [duelist])
+  const nameDisplay = useMemo(() => (`${name || 'Duelist'} #${duelist_id}`), [name, duelist_id])
   const profilePicType = useMemo(() => (duelist?.profile_pic_type ?? null), [duelist])
   const profilePic = useMemo(() => Number(duelist?.profile_pic_uri ?? 0), [duelist])
-  const isRegistered = useMemo(() => (name && name.length > 0), [name])
   const timestamp = useMemo(() => (duelist?.timestamp ?? 0), [duelist])
+  const exists = useMemo(() => Boolean(timestamp), [timestamp])
 
   // scores
   const total_duels = useMemo(() => (duelist?.score?.total_duels ?? 0), [duelist])
@@ -56,12 +57,12 @@ export const useDuelist = (duelist_id: BigNumberish) => {
 
   return {
     duelistId: duelist_id,
-    name: (name || `Duelist #${duelist_id}`),
-    exists: Boolean(timestamp),
+    name,
+    nameDisplay,
+    exists,
     timestamp,
     profilePicType,
     profilePic,
-    isRegistered,
     total_duels,
     total_wins,
     total_losses,

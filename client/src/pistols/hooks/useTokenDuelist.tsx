@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react"
 import { getContractByName } from "@dojoengine/core"
 import { useDojo, useDojoComponents } from "@/lib/dojo/DojoContext"
-import { bigintToEntity } from "@/lib/utils/types"
-import { useOrigamiERC721BalanceOf, useOrigamiERC721TokenOfOwnerByIndex, useOrigamiERC721TotalSupply } from "@/lib/dojo/hooks/useOrigamiERC721"
+import { bigintToEntity, bigintToHex } from "@/lib/utils/types"
+import { useOrigamiERC721BalanceOf, useOrigamiERC721IndexOfOwnerByToken, useOrigamiERC721TokenOfOwnerByIndex, useOrigamiERC721TotalSupply } from "@/lib/dojo/hooks/useOrigamiERC721"
 import { BigNumberish } from "starknet"
 
 
@@ -11,7 +11,7 @@ export const useTokenContract = () => {
   const [contractAddress, setTokenContractAddress] = useState('')
   const { setup: { manifest } } = useDojo()
   useEffect(() => {
-    const contract = getContractByName(manifest, 'duelist_token');
+    const contract = getContractByName(manifest, 'token_duelist');
     setTokenContractAddress(contract?.address ?? '')
   }, [])
   const contractAddressKey = useMemo(() => bigintToEntity(contractAddress), [contractAddress])
@@ -22,7 +22,7 @@ export const useTokenContract = () => {
   }
 }
 
-export const useTokenCount = () => {
+export const useDuelistTokenCount = () => {
   const { contractAddress, components } = useTokenContract()
   const { totalSupply } = useOrigamiERC721TotalSupply(contractAddress, components)
   return {
@@ -43,6 +43,14 @@ export const useDuelistOfOwnerByIndex = (address: BigNumberish, index: BigNumber
   const { tokenId } = useOrigamiERC721TokenOfOwnerByIndex(contractAddress, address, index, components)
   return {
     duelistId: tokenId,
+  }
+}
+
+export const useDuelistIndexOfOwner = (address: BigNumberish, token_id: BigNumberish) => {
+  const { contractAddress, components } = useTokenContract()
+  const { index } = useOrigamiERC721IndexOfOwnerByToken(contractAddress, address, token_id, components)
+  return {
+    duelistIndex: index,
   }
 }
 

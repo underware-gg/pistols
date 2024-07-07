@@ -1646,8 +1646,8 @@
     {
       "kind": "DojoContract",
       "address": "0x30663cb812dc7e2930b9683945132ca6054483af40e1e7daccb77091e02e7b1",
-      "class_hash": "0x38a3992861753cd1b7ab457990771dd9e815c6a021f8c9e6e08aacfd26bbbbe",
-      "original_class_hash": "0x38a3992861753cd1b7ab457990771dd9e815c6a021f8c9e6e08aacfd26bbbbe",
+      "class_hash": "0x60e203fc20a786c4a5ac17856cd6fe0da7ed4104fd7d139806ff29377abafeb",
+      "original_class_hash": "0x60e203fc20a786c4a5ac17856cd6fe0da7ed4104fd7d139806ff29377abafeb",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -1949,7 +1949,7 @@
                 },
                 {
                   "name": "profile_pic_uri",
-                  "type": "core::byte_array::ByteArray"
+                  "type": "core::felt252"
                 }
               ],
               "outputs": [
@@ -1977,7 +1977,7 @@
                 },
                 {
                   "name": "profile_pic_uri",
-                  "type": "core::byte_array::ByteArray"
+                  "type": "core::felt252"
                 }
               ],
               "outputs": [

@@ -230,6 +230,15 @@ cd client
 pnpm i
 ```
 
+Configure default chain id in a `.env` file:
+
+```sh
+NEXT_PUBLIC_DEBUG=0
+NEXT_PUBLIC_CHAIN_ID=KATANA_LOCAL
+#NEXT_PUBLIC_CHAIN_ID=SN_SEPOLIA
+#NEXT_PUBLIC_CHAIN_ID=WP_PISTOLS_SLOT
+```
+
 Start the client
 
 ```sh

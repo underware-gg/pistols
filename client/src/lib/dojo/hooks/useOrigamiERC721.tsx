@@ -1,7 +1,8 @@
 import { Components } from '@dojoengine/recs'
 import { BigNumberish } from 'starknet'
 import { useComponentValue } from '@dojoengine/react'
-import { keysToEntity } from '@/lib/utils/types'
+import { bigintToHex, keysToEntity } from '@/lib/utils/types'
+import { getEntityIdFromKeys } from '@dojoengine/utils'
 
 
 type MetadataResult = {
@@ -85,10 +86,10 @@ export const useOrigamiERC721IndexByToken = (token: BigNumberish, token_id: BigN
   }
 }
 
-type IndexOfOwnerByIndexResult = {
+type IndexOfOwnerByTokenRsult = {
   index: number
 }
-export const useOrigamiERC721IndexOfOwnerByIndex = (token: BigNumberish, owner: BigNumberish, token_id: BigNumberish, components: Components): IndexOfOwnerByIndexResult => {
+export const useOrigamiERC721IndexOfOwnerByToken = (token: BigNumberish, owner: BigNumberish, token_id: BigNumberish, components: Components): IndexOfOwnerByTokenRsult => {
   const { ERC721EnumerableOwnerTokenModel } = components
   const model: any = useComponentValue(ERC721EnumerableOwnerTokenModel, keysToEntity([token, owner, token_id]))
   return {

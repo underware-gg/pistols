@@ -87,8 +87,8 @@ function DuelStats({
   duelId: bigint
 }) {
   const { challenge } = useDuel(duelId)
-  const { name: nameA } = useDuelist(challenge.duelistA)
-  const { name: nameB } = useDuelist(challenge.duelistB)
+  const { nameDisplay: nameA } = useDuelist(challenge.duelistIdA)
+  const { nameDisplay: nameB } = useDuelist(challenge.duelistIdB)
 
   return (
     <Table celled striped color='red'>

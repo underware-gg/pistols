@@ -54,7 +54,6 @@ const accountMenuItems: AccountMenuKey[] = [
 
 export const initialState = {
   walletSig: { address: 0n, sig: 0n },
-  accountIndex: 1,
   selectedDuelId: 0n,
   selectedDuelistId: 0n,
   challengingId: 0n,
@@ -69,7 +68,6 @@ export const initialState = {
 
 const PistolsActions = {
   SET_SIG: 'SET_SIG',
-  SET_ACCOUNT_INDEX: 'SET_ACCOUNT_INDEX',
   SET_ACCOUNT_MENU_KEY: 'SET_ACCOUNT_MENU_KEY',
   SET_MENU_KEY: 'SET_MENU_KEY',
   SET_SCENE: 'SET_SCENE',
@@ -86,7 +84,6 @@ type PistolsContextStateType = typeof initialState
 
 type ActionType =
   | { type: 'SET_SIG', payload: bigint[] }
-  | { type: 'SET_ACCOUNT_INDEX', payload: number }
   | { type: 'SET_ACCOUNT_MENU_KEY', payload: AccountMenuKey }
   | { type: 'SET_MENU_KEY', payload: MenuKey }
   | { type: 'SET_SCENE', payload: SceneName }
@@ -128,10 +125,6 @@ const PistolsProvider = ({
           address: action.payload[0] as bigint,
           sig: action.payload[1] as bigint,
         }
-        break
-      }
-      case PistolsActions.SET_ACCOUNT_INDEX: {
-        newState.accountIndex = action.payload as number
         break
       }
       case PistolsActions.SET_ACCOUNT_MENU_KEY: {
@@ -199,12 +192,6 @@ export const usePistolsContext = () => {
       payload: [BigInt(address ?? 0n), BigInt(sig ?? 0n)]
     })
   }
-  const dispatchSetAccountIndex = (index: number) => {
-    dispatch({
-      type: PistolsActions.SET_ACCOUNT_INDEX,
-      payload: index,
-    })
-  }
   const dispatchSetAccountMenu = (menuKey: AccountMenuKey) => {
     dispatch({
       type: PistolsActions.SET_ACCOUNT_MENU_KEY,
@@ -257,7 +244,6 @@ export const usePistolsContext = () => {
     // PistolsActions,
     // dispatch,
     dispatchSetSig,
-    dispatchSetAccountIndex,
     dispatchSetAccountMenu,
     dispatchSetMenu,
     dispatchSetScene,

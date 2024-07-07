@@ -2,18 +2,15 @@ import React, { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid, Divider } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
-import { usePistolsContext, initialState } from '@/pistols/hooks/PistolsContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
+import { usePistolsContext, initialState } from '@/pistols/hooks/PistolsContext'
+import { useDuelistBalanceOf, useDuelistOfOwnerByIndex, useDuelistTokenCount } from '@/pistols/hooks/useTokenDuelist'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
 import { ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { EtherBalance, LordsBalance } from '@/pistols/components/account/LordsBalance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { AddressShort } from '@/lib/ui/AddressShort'
-import { bigintToHex } from '@/lib/utils/types'
 import { makeTavernUrl } from '@/pistols/utils/pistols'
-import { BigNumberish } from 'starknet'
-import { useDuelistBalanceOf, useDuelistOfOwnerByIndex } from '@/pistols/hooks/useTokenDuelist'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -21,6 +18,7 @@ const Col = Grid.Column
 export function AccountsList() {
   const { address } = useAccount()
   const { duelistBalance } = useDuelistBalanceOf(address)
+  const { tokenCount } = useDuelistTokenCount()
 
   const rows = useMemo(() => {
     let result = []
@@ -56,15 +54,15 @@ function AccountItem({
   const router = useRouter()
   const { address } = useAccount()
   const { duelistId } = useDuelistOfOwnerByIndex(address, index)
-  const { exists, name, profilePic } = useDuelist(duelistId)
+  const { exists, profilePic } = useDuelist(duelistId)
 
   const _canPlay = (exists)
 
-  const { accountSetupOpener, dispatchSetAccountIndex, dispatchSetMenu } = usePistolsContext()
+  const { accountSetupOpener, dispatchSetMenu } = usePistolsContext()
   const { dispatchDuelistId } = useSettings()
 
   const _manage = () => {
-    dispatchSetAccountIndex(index)
+    dispatchDuelistId(BigInt(duelistId ?? 0))
     accountSetupOpener.open()
   }
 
@@ -100,7 +98,7 @@ function AccountItem({
           </h5>
         </Col>
         <Col width={5} textAlign='left'>
-          <ActionButton fill onClick={() => _manage()} label='Manage' />
+          <ActionButton fill onClick={() => _manage()} label='Edit' />
           <div className='Spacer5' />
           <ActionButton fill important disabled={!_canPlay} onClick={() => _duel()} label='Duel!' />
         </Col>

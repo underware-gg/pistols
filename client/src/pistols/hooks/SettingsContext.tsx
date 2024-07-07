@@ -77,7 +77,7 @@ const SettingsProvider = ({
       [SettingsActions.MUSIC_ENABLED]: () => setCookie(cookieName, state.musicEnabled, _options),
       [SettingsActions.SFX_ENABLED]: () => setCookie(cookieName, state.sfxEnabled, _options),
       [SettingsActions.TABLE_ID]: () => setCookie(cookieName, state.tableId, _options),
-      [SettingsActions.DUELIST_ID]: () => setCookie(cookieName, state.duelistId, _options),
+      [SettingsActions.DUELIST_ID]: () => setCookie(cookieName, Number(state.duelistId), _options),
     }
     _setters[cookieName]?.()
   }, [setCookie])

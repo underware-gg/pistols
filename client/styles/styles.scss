@@ -182,6 +182,7 @@ canvas {
 .PaddedDouble { padding: 1em!important; }
 .PaddedLeft { padding-left: 0.5em!important; }
 .PaddedRight { padding-right: 0.5em!important; }
+.PaddedSides { @extend .PaddedLeft; @extend .PaddedRight; }
 .PaddedTop { padding-top: 0.5em!important; }
 .PaddedBottom { padding-bottom: 0.5em!important; }
 
@@ -554,9 +555,8 @@ $box-h: calc((100vh - $aspect-h) / 2);
   max-width: 400px;
 }
 
-.OnboardingModal {
-  min-height: 380px;
-  padding-top: 0!important;
+.OnboardingProfile {
+  max-height: 290px;
 }
 
 // .TableHeader {

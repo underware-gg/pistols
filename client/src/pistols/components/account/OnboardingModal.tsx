@@ -1,10 +1,8 @@
 import React, { useCallback, useEffect } from 'react'
-import { Modal, Tab, TabPane, Grid, Menu } from 'semantic-ui-react'
+import { Modal, Grid } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { IconChecked, IconClick, IconWarning } from '@/lib/ui/Icons'
-import { AccountMenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { useDuelistIndexOfOwner, useDuelistOfOwnerByIndex } from '@/pistols/hooks/useTokenDuelist'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { OnboardingProfile } from '@/pistols/components/account/OnboardingProfile'
 import { AddressShort } from '@/lib/ui/AddressShort'
@@ -19,30 +17,28 @@ export default function OnboardingModal({
   opener: Opener
 }) {
   const { address } = useAccount()
-  const { dispatchDuelistId } = useSettings()
+  const { duelistId, dispatchDuelistId } = useSettings()
+  const { duelistIndex } = useDuelistIndexOfOwner(address, duelistId)
+  const { duelistId: prevDuelistId } = useDuelistOfOwnerByIndex(address, duelistIndex - 1)
+  const { duelistId: nextDuelistId } = useDuelistOfOwnerByIndex(address, duelistIndex + 1)
 
-  const { accountMenuKey, accountMenuItems, accountIndex, dispatchSetAccountMenu, dispatchSetAccountIndex} = usePistolsContext()
-  const tabIndex = accountMenuItems.findIndex(k => (k == accountMenuKey))
-
-  const { name } = useDuelist(address)
-  const isProfiled = Boolean(name)
+  // const { accountMenuKey, accountMenuItems, dispatchSetAccountMenu } = usePistolsContext()
 
   useEffect(() => {
     if (opener.isOpen) {
-      dispatchSetAccountMenu(AccountMenuKey.Profile)
+      // dispatchSetAccountMenu(AccountMenuKey.Profile)
     }
   }, [opener.isOpen])
 
   const _deployNew = () => {
     dispatchDuelistId(0n)
-    dispatchSetAccountIndex(nextAccountIndex)
-    dispatchSetAccountMenu(AccountMenuKey.Profile)
+    // dispatchSetAccountMenu(AccountMenuKey.Profile)
   }
 
-  const canGoPrev = (accountIndex > 1)
-  const canGoNext = (accountIndex < nextAccountIndex - 1)
-  const gotoPrevAccount = useCallback(() => (canGoPrev ? dispatchSetAccountIndex(accountIndex - 1) : null), [canGoPrev, dispatchSetAccountIndex])
-  const gotoNextAccount = useCallback(() => (canGoNext ? dispatchSetAccountIndex(accountIndex + 1) : null), [canGoNext, dispatchSetAccountIndex])
+  const canGoPrev = Boolean(prevDuelistId)
+  const canGoNext = Boolean(nextDuelistId)
+  const gotoPrevAccount = useCallback(() => (canGoPrev ? dispatchDuelistId(prevDuelistId) : null), [canGoPrev, dispatchDuelistId])
+  const gotoNextAccount = useCallback(() => (canGoNext ? dispatchDuelistId(nextDuelistId) : null), [canGoNext, dispatchDuelistId])
 
   return (
     <Modal
@@ -55,12 +51,7 @@ export default function OnboardingModal({
           <Row>
             <Col width={11} textAlign='left'>
               Duelist
-              {' '}
-              <IconClick important name='angle double left' size='small' disabled={!canGoPrev} onClick={() => gotoPrevAccount()} />
-              {' '}
-              #{accountIndex}
-              {' '}
-              <IconClick important name='angle double right' size='small' disabled={!canGoNext} onClick={() => gotoNextAccount()} />
+              #{duelistId ? Number(duelistId) : '?'}
             </Col>
             <Col width={5} textAlign='right'>
               <AddressShort address={address} ifExists />
@@ -70,20 +61,7 @@ export default function OnboardingModal({
       </Modal.Header>
 
       <Modal.Content className='ModalText OnboardingModal'>
-        <Tab activeIndex={tabIndex} menu={{ secondary: true, pointing: true, attached: true }} panes={[
-          {
-            menuItem: (
-              <Menu.Item key='Profile' onClick={() => dispatchSetAccountMenu(AccountMenuKey.Profile)}>
-                Profile&nbsp;{isProfiled ? <IconChecked /> : <IconWarning />}
-              </Menu.Item>
-            ),
-            render: () => (
-              <TabPane attached className='NoPadding'>
-                <OnboardingProfile />
-              </TabPane>
-            )
-          },
-        ]} />
+        <OnboardingProfile />
       </Modal.Content>
       <Modal.Actions className='NoPadding'>
         <Grid columns={4} className='FillParent Padded' textAlign='center'>
@@ -91,15 +69,14 @@ export default function OnboardingModal({
             <Col>
               <ActionButton fill label='Deploy New' onClick={() => _deployNew()} />
             </Col>
-            <Col></Col>
-            {/* <Col>
-              <ActionButton fill label='Previous' disabled={!canGoPrev} onClick={() => gotoPrevAccount()} />
-            </Col> */}
-            {/* <Col>
-              <ActionButton fill label='Next' disabled={!canGoNext} onClick={() => gotoNextAccount()} />
-            </Col> */}
             <Col>
-              <ActionButton important fill disabled={!_canContinue[accountMenuKey]} label={_nextLabel[accountMenuKey]} onClick={() => _continue()} />
+              <ActionButton fill label='Previous' disabled={!canGoPrev} onClick={() => gotoPrevAccount()} />
+            </Col>
+            <Col>
+              <ActionButton fill label='Next' disabled={!canGoNext} onClick={() => gotoNextAccount()} />
+            </Col>
+            <Col>
+              <ActionButton important fill disabled={!duelistId} label={'Duel!'} onClick={() => opener.close()} />
             </Col>
           </Row>
         </Grid>

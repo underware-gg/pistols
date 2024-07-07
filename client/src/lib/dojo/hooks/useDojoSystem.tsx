@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { getContractByName } from '@dojoengine/core'
+import { getContractByName, Manifest } from '@dojoengine/core'
 import { useDojo } from '@/lib/dojo/DojoContext'
 import { useContract } from '@starknet-react/core'
 
@@ -8,7 +8,7 @@ export const useDojoSystem = (systemName: string) => {
   return useSystem(systemName, manifest)
 }
 
-export const useSystem = (systemName: string, manifest: any) => {
+export const useSystem = (systemName: string, manifest: Manifest) => {
 
   //
   // Find Dojo Contract

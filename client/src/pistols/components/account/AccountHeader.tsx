@@ -19,7 +19,7 @@ export default function AccountHeader({
   const { isGuest } = useSettings()
   const { dispatchSelectDuelistId } = usePistolsContext()
 
-  const { name, profilePic } = useDuelist(address)
+  const { nameDisplay, profilePic } = useDuelist(address)
 
   const _click = () => {
     if(isGuest) {
@@ -36,7 +36,7 @@ export default function AccountHeader({
           {isGuest ?
             <h3>Guest</h3>
             : <>
-              <h3>{name}</h3>
+              <h3>{nameDisplay}</h3>
               <AddressShort address={address} copyLink={true} />
               <br />
               <LordsBalance address={address} big />

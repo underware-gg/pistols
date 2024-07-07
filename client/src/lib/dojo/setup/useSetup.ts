@@ -95,7 +95,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
       network.contractComponents as any,
       [],
     )
-    console.log(`SYNC FINISHED!!!`)
+    console.log(`SYNC FINISHED!!!`, subscription, components)
     return subscription
   }, [toriiClient, network], undefined, null)
 

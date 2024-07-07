@@ -141,8 +141,10 @@ function EnterAsGuestButton() {
 
 function ConnectedGate() {
   const { accountSetupOpener, dispatchSetAccountMenu } = usePistolsContext()
+  const { tableId, dispatchDuelistId } = useSettings()
 
   const _mintDuelist = () => {
+    dispatchDuelistId(0n)
     dispatchSetAccountMenu(AccountMenuKey.Profile)
     accountSetupOpener.open()
   }

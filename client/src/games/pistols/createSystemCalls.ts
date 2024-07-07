@@ -84,8 +84,13 @@ export function createSystemCalls(
     return results as T
   }
 
+  const mint_duelist = async (signer: AccountInterface, name: string, profile_pic_type: number, profile_pic_uri: string): Promise<boolean> => {
+    const args = [stringToFelt(name), profile_pic_type, stringToFelt(profile_pic_uri)]
+    return await _executeTransaction(signer, actions_call('mint_duelist', args))
+  }
+
   const update_duelist = async (signer: AccountInterface, duelist_id: BigNumberish, name: string, profile_pic_type: number, profile_pic_uri: string): Promise<boolean> => {
-    const args = [BigInt(duelist_id), stringToFelt(name), profile_pic_type, profile_pic_uri]
+    const args = [BigInt(duelist_id), stringToFelt(name), profile_pic_type, stringToFelt(profile_pic_uri)]
     return await _executeTransaction(signer, actions_call('update_duelist', args))
   }
 
@@ -217,6 +222,7 @@ export function createSystemCalls(
   // }
 
   return {
+    mint_duelist,
     update_duelist,
     create_challenge,
     reply_challenge,

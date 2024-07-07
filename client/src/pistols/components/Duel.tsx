@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Grid, Segment, Icon, Step, SegmentGroup } from 'semantic-ui-react'
+import { Grid, Segment, Icon, Step, SegmentGroup, SemanticFLOATS } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
@@ -26,6 +26,8 @@ import { bigintEquals } from '@/lib/utils/types'
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import CommitBladesModal from '@/pistols/components/CommitBladesModal'
 import RevealModal from '@/pistols/components/RevealModal'
+import { BigNumberish } from 'starknet'
+import { useIsMyDuelist } from '../hooks/useIsMyDuelist'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -33,19 +35,18 @@ const Col = Grid.Column
 export default function Duel({
   duelId
 }) {
-  const { address } = useAccount()
   const { gameImpl } = useThreeJsContext()
   const { animated } = useGameplayContext()
 
   const { challengeDescription } = useChallengeDescription(duelId)
-  const { tableId, isFinished, message, duelistA, duelistB, timestamp_start } = useChallenge(duelId)
+  const { tableId, isFinished, message, duelistIdA, duelistIdB, timestamp_start } = useChallenge(duelId)
   const { value } = useWager(duelId)
 
   // guarantee to run only once when this component mounts
   const mounted = useMounted()
   const [duelSceneStarted, setDuelSceneStarted] = useState(false)
-  const { profilePic: profilePicA, name: nameA } = useDuelist(duelistA)
-  const { profilePic: profilePicB, name: nameB } = useDuelist(duelistB)
+  const { profilePic: profilePicA, nameDisplay: nameA } = useDuelist(duelistIdA)
+  const { profilePic: profilePicB, nameDisplay: nameB } = useDuelist(duelistIdB)
   useEffect(() => {
     if (gameImpl && mounted && !duelSceneStarted && profilePicA && profilePicB && nameA && nameB) {
       gameImpl.startDuelWithPlayers(nameA, ProfileModels[profilePicA], nameB, ProfileModels[profilePicB])
@@ -92,28 +93,26 @@ export default function Duel({
 
       <div className='DuelSideA'>
         <div className='DuelProfileA' >
-          <DuelProfile floated='left' address={duelistA} health={healthA} />
+          <DuelProfile floated='left' duelistId={duelistIdA} health={healthA} />
         </div>
         <DuelProgress floated='left'
           isA
           duelId={duelId}
           duelStage={duelStage}
-          accountAddress={address}
-          duelistAccount={duelistA}
+          duelistId={duelistIdA}
           completedStages={completedStagesA}
           canAutoReveal={canAutoRevealA}
         />
       </div>
       <div className='DuelSideB'>
         <div className='DuelProfileB' >
-          <DuelProfile floated='right' address={duelistB} health={healthB} />
+          <DuelProfile floated='right' duelistId={duelistIdB} health={healthB} />
         </div>
         <DuelProgress floated='right'
           isB
           duelId={duelId}
           duelStage={duelStage}
-          accountAddress={address}
-          duelistAccount={duelistB}
+          duelistId={duelistIdB}
           completedStages={completedStagesB}
           canAutoReveal={canAutoRevealB}
         />
@@ -129,11 +128,15 @@ export default function Duel({
 }
 
 function DuelProfile({
-  address,
+  duelistId,
   floated,
   health,
+}: {
+  duelistId: BigNumberish,
+  floated: SemanticFLOATS
+  health: number
 }) {
-  const { name, profilePic } = useDuelist(address)
+  const { profilePic } = useDuelist(duelistId)
 
   return (
     <>
@@ -142,7 +145,7 @@ function DuelProfile({
       }
       <div className='ProfileAndHealth'>
         <Segment compact floated={floated} className='ProfileDescription'>
-          <ProfileDescription address={address} displayAddress />
+          <ProfileDescription duelistId={duelistId} displayAddress />
         </Segment>
         <DuelHealthBar health={health} floated={floated} />
       </div>
@@ -184,8 +187,7 @@ function DuelProgress({
   isB = false,
   duelId,
   duelStage,
-  accountAddress,
-  duelistAccount,
+  duelistId,
   completedStages,
   floated,
   canAutoReveal = false
@@ -220,7 +222,7 @@ function DuelProgress({
   //------------------------------
   // Duelist interaction
   //
-  const isYou = useMemo(() => bigintEquals(accountAddress, duelistAccount), [accountAddress, duelistAccount])
+  const isYou = useIsMyDuelist(duelistId)
   // const isTurn = useMemo(() => ((isA && turnA) || (isB && turnB)), [isA, isB, turnA, turnB])
 
   // Commit modal control
