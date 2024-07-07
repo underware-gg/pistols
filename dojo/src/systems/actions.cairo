@@ -28,7 +28,7 @@ trait IActions {
     fn create_challenge(
         ref world: IWorldDispatcher,
         duelist_id: u128,
-        challenged: ContractAddress,
+        challenged_id_or_address: ContractAddress,
         message: felt252,
         table_id: felt252,
         wager_value: u256,
@@ -45,12 +45,14 @@ trait IActions {
     // Duel
     fn commit_action(
         ref world: IWorldDispatcher,
+        duelist_id: u128,
         duel_id: u128,
         round_number: u8,
         hash: u64,
     );
     fn reveal_action(
         ref world: IWorldDispatcher,
+        duelist_id: u128,
         duel_id: u128,
         round_number: u8,
         salt: u64,
@@ -109,15 +111,16 @@ mod actions {
         const INVALID_CHALLENGED: felt252        = 'PISTOLS: Challenged unknown';
         const INVALID_CHALLENGED_NULL: felt252   = 'PISTOLS: Challenged null';
         const INVALID_CHALLENGED_SELF: felt252   = 'PISTOLS: Challenged self';
+        const INVALID_REPLY_SELF: felt252        = 'PISTOLS: Reply self';
         const INVALID_EXPIRY: felt252            = 'PISTOLS: Invalid expiry';
         const INVALID_CHALLENGE: felt252         = 'PISTOLS: Invalid Challenge';
-        const NOT_DUELIST_OWNER: felt252         = 'PISTOLS: Not your duelist';
+        const NOT_YOUR_CHALLENGE: felt252        = 'PISTOLS: Not your Challenge';
+        const NOT_YOUR_DUELIST: felt252          = 'PISTOLS: Not your duelist';
         const CHALLENGER_NOT_ADMITTED: felt252   = 'PISTOLS: Challenger not allowed';
         const CHALLENGED_NOT_ADMITTED: felt252   = 'PISTOLS: Challenged not allowed';
         const CHALLENGE_EXISTS: felt252          = 'PISTOLS: Challenge exists';
         const CHALLENGE_NOT_AWAITING: felt252    = 'PISTOLS: Challenge not Awaiting';
         const CHALLENGE_NOT_IN_PROGRESS: felt252 = 'PISTOLS: Challenge not Progress';
-        const NOT_YOUR_CHALLENGE: felt252        = 'PISTOLS: Not your Challenge';
         const TABLE_IS_CLOSED: felt252           = 'PISTOLS: Table is closed';
         const MINIMUM_WAGER_NOT_MET: felt252     = 'PISTOLS: Minimum wager not met';
         const NO_WAGER: felt252                  = 'PISTOLS: No wager on this table';
@@ -161,9 +164,9 @@ mod actions {
             profile_pic_type: u8,
             profile_pic_uri: felt252,
         ) -> Duelist {
-            let duelist_manager = DuelistManagerTrait::new(world);
             let caller: ContractAddress = starknet::get_caller_address();
-            assert(duelist_manager.is_owner_of(caller, duelist_id) == true, Errors::NOT_DUELIST_OWNER);
+            let duelist_manager = DuelistManagerTrait::new(world);
+            assert(duelist_manager.is_owner_of(caller, duelist_id) == true, Errors::NOT_YOUR_DUELIST);
 
             // get current
             let mut duelist = duelist_manager.get(duelist_id);
@@ -190,7 +193,7 @@ mod actions {
         //
         fn create_challenge(ref world: IWorldDispatcher,
             duelist_id: u128,
-            challenged: ContractAddress,
+            challenged_id_or_address: ContractAddress,
             message: felt252,
             table_id: felt252,
             wager_value: u256,
@@ -202,7 +205,7 @@ mod actions {
             let duelist_id_a: u128 = duelist_id;
             let address_a: ContractAddress = starknet::get_caller_address();
             let duelist_manager = DuelistManagerTrait::new(world);
-            assert(duelist_manager.is_owner_of(address_a, duelist_id_a) == true, Errors::NOT_DUELIST_OWNER);
+            assert(duelist_manager.is_owner_of(address_a, duelist_id_a) == true, Errors::NOT_YOUR_DUELIST);
 // address_a.print();
 // duelist_id_a.print();
 // duelist_manager.owner_of(duelist_id_a).print();
@@ -214,8 +217,8 @@ mod actions {
             assert(table_manager.can_join(table_id, address_a, duelist_id_a), Errors::CHALLENGER_NOT_ADMITTED);
 
             // validate challenged
-            assert(challenged != utils::ZERO(), Errors::INVALID_CHALLENGED_NULL);
-            let duelist_id_b: u128 = DuelistTrait::address_to_id(challenged);
+            assert(challenged_id_or_address != utils::ZERO(), Errors::INVALID_CHALLENGED_NULL);
+            let duelist_id_b: u128 = DuelistTrait::address_to_id(challenged_id_or_address);
             let address_b: ContractAddress = if (duelist_id_b > 0) {
                 // challenging a duelist
                 assert(duelist_manager.exists(duelist_id_b) == true, Errors::INVALID_CHALLENGED);
@@ -224,8 +227,8 @@ mod actions {
                 (utils::ZERO())
             } else {
                 // challenging a wallet
-                assert(challenged != address_a, Errors::INVALID_CHALLENGED_SELF);
-                (challenged)
+                assert(challenged_id_or_address != address_a, Errors::INVALID_CHALLENGED_SELF);
+                (challenged_id_or_address)
             };
             assert(table_manager.can_join(table_id, address_b, duelist_id_b), Errors::CHALLENGED_NOT_ADMITTED);
 
@@ -304,8 +307,9 @@ mod actions {
                 // Expired, close it!
                 challenge.state = ChallengeState::Expired.into();
                 challenge.timestamp_end = timestamp;
-            } else if (challenge.address_a == address_b && accepted == false) {
-                // Challenger is Withdrawing
+            } else if (challenge.duelist_id_a == duelist_id_b) {
+                // same duelist, can only withdraw...
+                assert(accepted == false, Errors::INVALID_REPLY_SELF);
                 challenge.state = ChallengeState::Withdrawn.into();
                 challenge.timestamp_end = timestamp;
             } else {
@@ -314,7 +318,7 @@ mod actions {
 // address_b.print();
 // duelist_id_b.print();
 // duelist_manager.owner_of(duelist_id_b).print();
-                assert(duelist_manager.is_owner_of(address_b, duelist_id_b) == true, Errors::NOT_DUELIST_OWNER);
+                assert(duelist_manager.is_owner_of(address_b, duelist_id_b) == true, Errors::NOT_YOUR_DUELIST);
 
                 // validate challenged identity
                 // either wallet ot duelist was challenged, never both
@@ -366,21 +370,23 @@ mod actions {
         //
 
         fn commit_action(ref world: IWorldDispatcher,
+            duelist_id: u128,
             duel_id: u128,
             round_number: u8,
             hash: u64,
         ) {
-            shooter::commit_action(world, duel_id, round_number, hash);
+            shooter::commit_action(world, duelist_id, duel_id, round_number, hash);
         }
 
         fn reveal_action(ref world: IWorldDispatcher,
+            duelist_id: u128,
             duel_id: u128,
             round_number: u8,
             salt: u64,
             action_slot1: u8,
             action_slot2: u8,
         ) {
-            let challenge: Challenge = shooter::reveal_action(world, duel_id, round_number, salt, utils::pack_action_slots(action_slot1, action_slot2));
+            let challenge: Challenge = shooter::reveal_action(world, duelist_id, duel_id, round_number, salt, utils::pack_action_slots(action_slot1, action_slot2));
             self._emitPostRevealEvents(challenge);
         }
 

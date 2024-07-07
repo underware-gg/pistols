@@ -15,15 +15,20 @@ mod shooter {
     use pistols::types::action::{Action, ACTION, ActionTrait};
     use pistols::utils::math::{MathU8, MathU16};
 
-    fn _assert_challenge(world: IWorldDispatcher, caller: ContractAddress, duel_id: u128, round_number: u8) -> (Challenge, u8) {
+    fn _assert_challenge(world: IWorldDispatcher, caller: ContractAddress, duelist_id: u128, duel_id: u128, round_number: u8) -> (Challenge, u8) {
         let challenge: Challenge = get!(world, duel_id, Challenge);
 
         // Assert Duelist is in the challenge
         let duelist_number: u8 =
-            if (challenge.address_a == caller) { 1 }
-            else if (challenge.address_b == caller) { 2 }
+            if (challenge.duelist_id_a == duelist_id) { 1 }
+            else if (challenge.duelist_id_b == duelist_id) { 2 }
             else { 0 };
-        assert(duelist_number != 0, Errors::NOT_YOUR_CHALLENGE);
+        assert(duelist_number != 0, Errors::NOT_YOUR_DUELIST);
+
+        let duelist_address: ContractAddress =
+            if (duelist_number == 1) { challenge.address_a }
+            else { challenge.address_b };
+        assert(caller == duelist_address, Errors::NOT_YOUR_CHALLENGE);
 
         // Correct Challenge state
         assert(challenge.state == ChallengeState::InProgress.into(), Errors::CHALLENGE_NOT_IN_PROGRESS);
@@ -36,11 +41,9 @@ mod shooter {
     //-----------------------------------
     // Commit
     //
-    fn commit_action(world: IWorldDispatcher, duel_id: u128, round_number: u8, hash: u64) {
-        let caller: ContractAddress = starknet::get_caller_address();
-
+    fn commit_action(world: IWorldDispatcher, duelist_id: u128, duel_id: u128, round_number: u8, hash: u64) {
         // Assert correct Challenge
-        let (_challenge, duelist_number) = _assert_challenge(world, caller, duel_id, round_number);
+        let (_challenge, duelist_number) = _assert_challenge(world, starknet::get_caller_address(), duelist_id, duel_id, round_number);
 
         // Assert correct Round
         let mut round: Round = get!(world, (duel_id, round_number), Round);
@@ -68,11 +71,9 @@ mod shooter {
     //-----------------------------------
     // Reveal
     //
-    fn reveal_action(world: IWorldDispatcher, duel_id: u128, round_number: u8, salt: u64, mut packed: u16) -> Challenge {
-        let caller: ContractAddress = starknet::get_caller_address();
-
+    fn reveal_action(world: IWorldDispatcher, duelist_id: u128, duel_id: u128, round_number: u8, salt: u64, mut packed: u16) -> Challenge {
         // Assert correct Challenge
-        let (mut challenge, duelist_number) = _assert_challenge(world, caller, duel_id, round_number);
+        let (mut challenge, duelist_number) = _assert_challenge(world, starknet::get_caller_address(), duelist_id, duel_id, round_number);
 
         // Assert correct Round
         let mut round: Round = get!(world, (duel_id, round_number), Round);

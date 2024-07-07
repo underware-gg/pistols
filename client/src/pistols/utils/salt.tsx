@@ -30,13 +30,13 @@ const signAndGenerateSalt = async (account: AccountInterface, duelistId: bigint,
   if (duelId && roundNumber) {
     try {
       const messages: Messages = {
+        account: bigintToHex(account.address),
         duelistId: bigintToHex(duelistId),
         duelId: bigintToHex(duelId),
         roundNumber: bigintToHex(roundNumber),
       }
       const signature = await signMessages(account, 1, messages)
       const sig = splitSignature(signature)
-      console.log(`SIGNATURE:`, messages, sig)
       result = ((sig[0] ^ sig[1]) & HASH_SALT_MASK)
     } catch (e) {
       console.warn(`signAndGenerateSalt() exception:`, e)

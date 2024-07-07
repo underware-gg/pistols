@@ -277,7 +277,7 @@ mod tester {
         hash: u64,
     ) {
         impersonate(sender);
-        system.commit_action(duel_id, round_number, hash);
+        system.commit_action(ID(sender), duel_id, round_number, hash);
         _next_block();
     }
     fn execute_reveal_action(system: IActionsDispatcher, sender: ContractAddress,
@@ -288,7 +288,7 @@ mod tester {
         slot2: u8,
     ) {
         impersonate(sender);
-        system.reveal_action(duel_id, round_number, salt, slot1, slot2);
+        system.reveal_action(ID(sender), duel_id, round_number, salt, slot1, slot2);
         _next_block();
     }
 
