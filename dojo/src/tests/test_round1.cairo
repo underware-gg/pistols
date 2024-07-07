@@ -743,7 +743,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Wrong Challenge state', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: Challenge not Progress', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_challenge_not_started() {
         let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let expire_seconds: u64 = timestamp::from_days(2);
@@ -753,7 +753,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Wrong Challenge state', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: Challenge not Progress', 'ENTRYPOINT_FAILED'))]
     fn test_commit_challenge_finished_commit() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
@@ -766,7 +766,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Wrong Challenge state', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: Challenge not Progress', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_challenge_finished_reveal() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);

@@ -115,7 +115,8 @@ mod actions {
         const CHALLENGER_NOT_ADMITTED: felt252   = 'PISTOLS: Challenger not allowed';
         const CHALLENGED_NOT_ADMITTED: felt252   = 'PISTOLS: Challenged not allowed';
         const CHALLENGE_EXISTS: felt252          = 'PISTOLS: Challenge exists';
-        const CHALLENGE_WRONG_STATE: felt252     = 'PISTOLS: Wrong Challenge state';
+        const CHALLENGE_NOT_AWAITING: felt252    = 'PISTOLS: Challenge not Awaiting';
+        const CHALLENGE_NOT_IN_PROGRESS: felt252 = 'PISTOLS: Challenge not Progress';
         const NOT_YOUR_CHALLENGE: felt252        = 'PISTOLS: Not your Challenge';
         const TABLE_IS_CLOSED: felt252           = 'PISTOLS: Table is closed';
         const MINIMUM_WAGER_NOT_MET: felt252     = 'PISTOLS: Minimum wager not met';
@@ -293,7 +294,7 @@ mod actions {
             let mut challenge: Challenge = get!(world, duel_id, Challenge);
             let state: ChallengeState = challenge.state.try_into().unwrap();
             assert(state.exists(), Errors::INVALID_CHALLENGE);
-            assert(state == ChallengeState::Awaiting, Errors::CHALLENGE_WRONG_STATE);
+            assert(state == ChallengeState::Awaiting, Errors::CHALLENGE_NOT_AWAITING);
 
             let address_b: ContractAddress = starknet::get_caller_address();
             let duelist_id_b: u128 = duelist_id;

@@ -26,7 +26,7 @@ mod shooter {
         assert(duelist_number != 0, Errors::NOT_YOUR_CHALLENGE);
 
         // Correct Challenge state
-        assert(challenge.state == ChallengeState::InProgress.into(), Errors::CHALLENGE_WRONG_STATE);
+        assert(challenge.state == ChallengeState::InProgress.into(), Errors::CHALLENGE_NOT_IN_PROGRESS);
         assert(challenge.round_number == round_number, Errors::INVALID_ROUND_NUMBER);
         
         (challenge, duelist_number)

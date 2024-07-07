@@ -152,7 +152,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Wrong Challenge state', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: Challenge not Awaiting', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_reply_twice() {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let expire_seconds: u64 = timestamp::from_days(2);
