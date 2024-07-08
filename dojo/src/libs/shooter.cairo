@@ -18,7 +18,6 @@ mod shooter {
 
     fn _assert_challenge(world: IWorldDispatcher, caller: ContractAddress, duelist_id: u128, duel_id: u128, round_number: u8) -> (Challenge, u8) {
         let challenge: Challenge = get!(world, duel_id, Challenge);
-
         // Assert Duelist is in the challenge
         let duelist_number: u8 =
             if (challenge.duelist_id_a == duelist_id) { 1 }

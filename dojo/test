@@ -1,0 +1,3 @@
+date
+sozo test -f $1
+date

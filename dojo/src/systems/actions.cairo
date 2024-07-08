@@ -105,7 +105,7 @@ mod actions {
     use pistols::libs::seeder::{make_seed};
     use pistols::libs::shooter::{shooter};
     use pistols::libs::utils;
-    use pistols::types::constants::{constants};
+    use pistols::types::constants::{constants, honour};
     use pistols::types::{events};
 
     mod Errors {
@@ -115,9 +115,9 @@ mod actions {
         const INVALID_CHALLENGED_SELF: felt252   = 'PISTOLS: Challenged self';
         const INVALID_REPLY_SELF: felt252        = 'PISTOLS: Reply self';
         const INVALID_EXPIRY: felt252            = 'PISTOLS: Invalid expiry';
-        const INVALID_CHALLENGE: felt252         = 'PISTOLS: Invalid Challenge';
+        const INVALID_CHALLENGE: felt252         = 'PISTOLS: Invalid challenge';
         const INVALID_DUELIST: felt252           = 'PISTOLS: Invalid duelist';
-        const NOT_YOUR_CHALLENGE: felt252        = 'PISTOLS: Not your Challenge';
+        const NOT_YOUR_CHALLENGE: felt252        = 'PISTOLS: Not your challenge';
         const NOT_YOUR_DUELIST: felt252          = 'PISTOLS: Not your duelist';
         const CHALLENGER_NOT_ADMITTED: felt252   = 'PISTOLS: Challenger not allowed';
         const CHALLENGED_NOT_ADMITTED: felt252   = 'PISTOLS: Challenged not allowed';
@@ -168,9 +168,9 @@ mod actions {
                 score: init::Score(),
             };
             match initial_archetype {
-                Archetype::Villainous => { duelist.score.level_villain = 100; },
-                Archetype::Trickster =>  { duelist.score.level_trickster = 100; },
-                Archetype::Honourable => { duelist.score.level_lord = 100; },
+                Archetype::Villainous => { duelist.score.level_villain = honour::LEVEL_MAX; },
+                Archetype::Trickster =>  { duelist.score.level_trickster = honour::LEVEL_MAX; },
+                Archetype::Honourable => { duelist.score.level_lord = honour::LEVEL_MAX; },
                 _ => {},
             };
             // // save
@@ -189,11 +189,10 @@ mod actions {
         ) -> Duelist {
             let caller: ContractAddress = starknet::get_caller_address();
             let duelist_manager: DuelistManager = DuelistManagerTrait::new(world);
-            assert(duelist_manager.is_owner_of(caller, duelist_id) == true, Errors::NOT_YOUR_DUELIST);
-
-            // get current
             let mut duelist = duelist_manager.get(duelist_id);
             assert(duelist.timestamp != 0, Errors::INVALID_DUELIST);
+            assert(duelist_manager.is_owner_of(caller, duelist_id) == true, Errors::NOT_YOUR_DUELIST);
+
             // update
             duelist.name = name;
             duelist.profile_pic_type = profile_pic_type;

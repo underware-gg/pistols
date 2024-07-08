@@ -127,6 +127,16 @@ impl ArchetypeIntoFelt252 of Into<Archetype, felt252> {
         }
     }
 }
+impl ArchetypeIntoByteArray of Into<Archetype, ByteArray> {
+    fn into(self: Archetype) -> ByteArray {
+        match self {
+            Archetype::Undefined => "Undefined",
+            Archetype::Villainous => "Villainous",
+            Archetype::Trickster => "Trickster",
+            Archetype::Honourable => "Honourable",
+        }
+    }
+}
 
 
 

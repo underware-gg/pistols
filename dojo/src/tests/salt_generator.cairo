@@ -78,7 +78,7 @@ mod tests {
 
 //     #[test]
 //     fn match_salt_to_challenge() {
-//         let (world, system, _admin, _lords) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+//         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);
 //         // let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
 //         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_draw();

@@ -168,7 +168,7 @@ mod tests {
 
     #[test]
     fn test_challenge_exists() {
-        let (world, _system, _admin, _lords) = tester::setup_world(flags::INITIALIZE | flags::APPROVE);
+        let (world, _system, _admin, _lords, _minter) = tester::setup_world(flags::INITIALIZE | flags::APPROVE);
         // get some random inexisting challenge
         let ch: Challenge = tester::get_Challenge(world, 0x682137812638127638127);
         let state: ChallengeState = ch.state.try_into().unwrap();
