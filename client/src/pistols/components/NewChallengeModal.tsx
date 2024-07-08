@@ -5,7 +5,6 @@ import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useRouterTable } from '@/pistols/hooks/useRouterListener'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useTable, useTableBalance } from '@/pistols/hooks/useTable'
 import { usePact } from '@/pistols/hooks/usePact'
@@ -25,8 +24,8 @@ const Col = Grid.Column
 
 export default function NewChallengeModal() {
  const { create_challenge } = useDojoSystemCalls()
-  const { account, address } = useAccount()
-  const { duelistId } = useSettings()
+  const { account } = useAccount()
+  const { tableId, duelistId } = useSettings()
 
   const { challengingId, dispatchChallengingDuelistId, dispatchSelectDuelistId, dispatchSelectDuel } = usePistolsContext()
   const isOpen = useMemo(() => (challengingId > 0n), [challengingId])
@@ -37,9 +36,8 @@ export default function NewChallengeModal() {
 
   const { profilePic: profilePicA } = useDuelist(duelistIdA)
   const { profilePic: profilePicB } = useDuelist(duelistIdB)
-  const { hasPact, pactDuelId } = usePact(duelistIdA, duelistIdB)
+  const { hasPact, pactDuelId } = usePact(tableId, duelistIdA, duelistIdB)
 
-  const { tableId } = useRouterTable()
   const { description: tableDescription } = useTable(tableId)
   const { balance: balanceA } = useTableBalance(tableId, duelistIdA)
   const { balance: balanceB } = useTableBalance(tableId, duelistIdB)
@@ -161,7 +159,7 @@ function NewChallengeForm({
   setArgs,
   canWager,
 }) {
-  const { tableId } = useRouterTable()
+  const { tableId } = useSettings()
   const [message, setMessage] = useState('')
   const [days, setDays] = useState(7)
   const [hours, setHours] = useState(0)

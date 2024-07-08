@@ -63,8 +63,8 @@ trait IActions {
 
     //
     // read-only calls
-    fn get_pact(world: @IWorldDispatcher, duelist_id_a: u128, duelist_id_b: u128) -> u128;
-    fn has_pact(world: @IWorldDispatcher, duelist_id_a: u128, duelist_id_b: u128) -> bool;
+    fn get_pact(world: @IWorldDispatcher, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128;
+    fn has_pact(world: @IWorldDispatcher, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool;
     fn can_join(world: @IWorldDispatcher, table_id: felt252, duelist_id: u128) -> bool;
     fn calc_fee(world: @IWorldDispatcher, table_id: felt252, wager_value: u256) -> u256;
     fn simulate_chances(world: @IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> SimulateChances;
@@ -241,7 +241,7 @@ mod actions {
                 // challenging a duelist
                 assert(duelist_manager.exists(duelist_id_b) == true, Errors::INVALID_CHALLENGED);
                 assert(duelist_id_a != duelist_id_b, Errors::INVALID_CHALLENGED_SELF);
-                assert(self.has_pact(duelist_id_a, duelist_id_b) == false, Errors::CHALLENGE_EXISTS);
+                assert(self.has_pact(table_id, duelist_id_a, duelist_id_b) == false, Errors::CHALLENGE_EXISTS);
                 (utils::ZERO())
             } else {
                 // challenging a wallet
@@ -349,7 +349,7 @@ mod actions {
                     // challenged the wallet
                     assert(challenge.address_b == address_b, Errors::NOT_YOUR_CHALLENGE);
                     // check if chosed duelist has a pact
-                    assert(self.has_pact(challenge.duelist_id_a, duelist_id_b) == false, Errors::CHALLENGE_EXISTS);
+                    assert(self.has_pact(challenge.table_id, challenge.duelist_id_a, duelist_id_b) == false, Errors::CHALLENGE_EXISTS);
                     // fil missing duelist
                     challenge.duelist_id_b = duelist_id_b;
                 }
@@ -414,14 +414,14 @@ mod actions {
         // read-only calls
         //
 
-        fn get_pact(world: @IWorldDispatcher, duelist_id_a: u128, duelist_id_b: u128) -> u128 {
+        fn get_pact(world: @IWorldDispatcher, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128 {
             let pair: u128 = utils::make_pact_pair(duelist_id_a, duelist_id_b);
-            (get!(world, pair, Pact).duel_id)
+            (get!(world, (table_id, pair), Pact).duel_id)
         }
 
-        fn has_pact(world: @IWorldDispatcher, duelist_id_a: u128, duelist_id_b: u128) -> bool {
+        fn has_pact(world: @IWorldDispatcher, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool {
             utils::WORLD(world);
-            (self.get_pact(duelist_id_a, duelist_id_b) != 0)
+            (self.get_pact(table_id, duelist_id_a, duelist_id_b) != 0)
         }
 
         fn can_join(world: @IWorldDispatcher, table_id: felt252, duelist_id: u128) -> bool {

@@ -1,6 +1,5 @@
 import React from 'react'
-import { Grid, SemanticSIZES } from 'semantic-ui-react'
-import { useRouterTable } from '@/pistols/hooks/useRouterListener'
+import { Grid } from 'semantic-ui-react'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { LordsBalance, LockedWagerBalance } from '@/pistols/components/account/LordsBalance'
 import { AddressShort } from '@/lib/ui/AddressShort'
@@ -47,7 +46,6 @@ export function ProfileDescription({
   displayAddress?: boolean
   displayBalance?: boolean
 }) {
-  const { tableId } = useRouterTable()
   const {
     total_wins, total_losses, total_draws, total_duels, total_honour, honourAndTotal,
     isVillainous, isTrickster, isHonourable, levelDisplay, levelAndTotal,

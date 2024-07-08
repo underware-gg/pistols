@@ -45,6 +45,8 @@ struct Duelist {
 #[dojo::model]
 struct Pact {
     #[key]
+    table_id: felt252,
+    #[key]
     pair: u128,     // xor'd duelists as u256(address).low
     //------------
     duel_id: u128,  // current Challenge, or 0x0

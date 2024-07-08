@@ -33,11 +33,6 @@ export const useTable = (tableId: string) => {
   }
 }
 
-export const useCurrentTable = () => {
-  const { tableId } = useRouterTable()
-  return useTable(tableId);
-}
-
 export const useTableBalance = (tableId: string, address: BigNumberish, fee: BigNumberish = 0n) => {
   const { contractAddress } = useTable(tableId)
   return useERC20Balance(contractAddress, address, fee)

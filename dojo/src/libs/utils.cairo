@@ -231,6 +231,7 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
     let pair: u128 = make_pact_pair(challenge.duelist_id_a, challenge.duelist_id_b);
     let pact_duel_id: u128 = if (state.is_ongoing()) { challenge.duel_id } else  { 0 };
     set!(world, Pact {
+        table_id: challenge.table_id,
         pair,
         duel_id: pact_duel_id,
     });

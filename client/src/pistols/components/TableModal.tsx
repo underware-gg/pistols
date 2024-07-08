@@ -2,9 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/router'
 import { Grid, Modal, Dropdown } from 'semantic-ui-react'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 import { useActiveDuelistIds, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
-import { useRouterTable } from '@/pistols/hooks/useRouterListener'
 import { useERC20TokenName } from '@/lib/utils/hooks/useERC20'
 import { useTable } from '@/pistols/hooks/useTable'
 import { Opener } from '@/lib/ui/useOpener'
@@ -22,7 +22,7 @@ export default function TableModal({
 }: {
   opener: Opener
 }) {
-  const { tableId } = useRouterTable()
+  const { tableId } = useSettings()
   const [selectedTableId, setSelectedTableId] = useState('')
   const { tableIsOpen } = useTable(selectedTableId)
 

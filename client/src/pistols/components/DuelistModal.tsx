@@ -29,7 +29,7 @@ export default function DuelistModal() {
   const _close = () => { dispatchSelectDuelistId(0n) }
 
   const { profilePic } = useDuelist(selectedDuelistId)
-  const { hasPact, pactDuelId } = usePact(duelistId, selectedDuelistId)
+  const { hasPact, pactDuelId } = usePact(tableId, duelistId, selectedDuelistId)
 
   const _switch = () => {
     if (isYou) {

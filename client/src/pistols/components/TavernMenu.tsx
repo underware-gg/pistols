@@ -4,7 +4,7 @@ import { Grid, Menu, Label, Tab, TabPane } from 'semantic-ui-react'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
 import { useChallengesByDuelistIdTotals, useLiveChallengeIds } from '@/pistols/hooks/useChallenge'
-import { useCurrentTable } from '@/pistols/hooks/useTable'
+import { useTable } from '@/pistols/hooks/useTable'
 import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
 import { DuelistTable } from '@/pistols/components/DuelistTable'
 import { MusicToggle } from '@/pistols/components/ui/Buttons'
@@ -28,9 +28,9 @@ const _makeBubble = (count) => {
 export function TavernMenu({
 }) {
   const router = useRouter()
-  const { duelistId, isGuest } = useSettings()
+  const { tableId, duelistId, isGuest } = useSettings()
   const { menuKey, tavernMenuItems, tableOpener, dispatchSetMenu } = usePistolsContext()
-  const { tableId, description } = useCurrentTable()
+  const { description } = useTable(tableId)
 
   const { liveDuelsCount: yourDuelsCount } = useChallengesByDuelistIdTotals(duelistId, tableId)
   const { challengeIds: liveChallengeIds } = useLiveChallengeIds(tableId)
