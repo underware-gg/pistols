@@ -1,5 +1,3 @@
-use alexandria_encoding::base64::get_base64_char_set;
-
 /// Convert bytes array to base64 encoded bytes array
 ///
 /// # Arguments
@@ -9,6 +7,14 @@ use alexandria_encoding::base64::get_base64_char_set;
 /// * `ByteArray` - the base64 encoded bytes array
 ///                 e.g. "aGVsbG8gd29ybGQ="
 ///
+
+
+// from:
+// alexandria_math = { git = "https://github.com/keep-starknet-strange/alexandria.git", tag = "cairo-v2.6.0" }
+// use alexandria_encoding::base64::get_base64_char_set;
+fn get_base64_char_set() -> Array<u8> {
+    (array!['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','0','1','2','3','4','5','6','7','8','9'])
+}
 
 fn bytes_base64_encode(_bytes: ByteArray) -> ByteArray {
     let mut char_set = get_base64_char_set();

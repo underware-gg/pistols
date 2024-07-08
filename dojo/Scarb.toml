@@ -23,7 +23,6 @@ sierra-replace-ids = true
 dojo = { git = "https://github.com/dojoengine/dojo", tag = "v0.7.2" }
 # token = { git = "https://github.com/dojoengine/origami", tag = "v0.7.2" }
 token = { git = "https://github.com/rsodre/origami", branch = "balance-enumerable" }
-alexandria_math = { git = "https://github.com/keep-starknet-strange/alexandria.git", rev = "417c5a80ed2fef05ce159d643f3e34a5386ee06c" }
 graffiti = { git = "https://github.com/ponderingdemocritus/graffiti", rev = "bc569531791dbc71c6cd8d9bc154c34eedad31fe" }
 
 
