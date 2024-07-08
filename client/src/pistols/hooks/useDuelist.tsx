@@ -4,6 +4,7 @@ import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { bigintToEntity } from '@/lib/utils/types'
 import { feltToString } from "@/lib/utils/starknet"
 import { useEntityKeys } from '@/lib/dojo/hooks/useEntityKeys'
+import { Archetype, ArchetypeNames } from '@/pistols/utils/pistols'
 import { BigNumberish } from 'starknet'
 
 
@@ -51,9 +52,15 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   const level_villain = useMemo(() => (parseFloat((duelist?.score?.level_villain ?? 0)) / 10.0), [duelist, total_duels])
   const level_trickster = useMemo(() => (parseFloat((duelist?.score?.level_trickster ?? 0)) / 10.0), [duelist, total_duels])
   const level_lord = useMemo(() => (parseFloat((duelist?.score?.level_lord ?? 0)) / 10.0), [duelist, total_duels])
-  const level = useMemo(() => Math.max(level_villain, level_trickster, level_lord), [level_villain, level_trickster, level_lord])
+  const level = useMemo(() => Math.max(level_villain, level_trickster, level_lord), [level_villain, level_trickster, level_lord])  
   const levelDisplay = useMemo(() => (total_duels > 0 && level > 0 ? level.toFixed(1) : '—'), [level, total_duels])
   const levelAndTotal = useMemo(() => (total_duels > 0 && level > 0 ? <>{level.toFixed(1)}<span className='Smaller'>/{total_duels}</span></> : '—'), [level, total_duels])
+
+  const isVillainous = useMemo(() => (level_villain > 0), [level_villain])
+  const isTrickster = useMemo(() => (level_trickster > 0), [level_trickster])
+  const isHonourable = useMemo(() => (level_lord > 0), [level_lord])
+  const archetype = useMemo(() => (isVillainous ? Archetype.Villainous : isTrickster ? Archetype.Trickster : isHonourable ? Archetype.Honourable : Archetype.Undefined), [level_villain, level_trickster, level_lord])
+  const archetypeName = useMemo(() => (ArchetypeNames[archetype]), [archetype])
 
   return {
     duelistId: duelist_id,
@@ -74,9 +81,11 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     level,
     levelDisplay,
     levelAndTotal,
-    is_villain: (level_villain > 0),
-    is_trickster: (level_trickster > 0),
-    is_lord: (level_lord > 0),
+    isVillainous,
+    isTrickster,
+    isHonourable,
+    archetype,
+    archetypeName,
     honour,
     honourDisplay,
     honourAndTotal,

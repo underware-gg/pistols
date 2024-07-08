@@ -1,5 +1,5 @@
 import React from 'react'
-import { Grid } from 'semantic-ui-react'
+import { Grid, SemanticSIZES } from 'semantic-ui-react'
 import { useRouterTable } from '@/pistols/hooks/useRouterListener'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { LordsBalance, LockedWagerBalance } from '@/pistols/components/account/LordsBalance'
@@ -26,13 +26,13 @@ export function ProfileName({
 
 export function ProfileBadge({
   duelistId,
-} : {
+}: {
   duelistId: BigNumberish
 }) {
-  const { is_villain, is_trickster, is_lord } = useDuelist(duelistId)
-  if (is_villain) return <>{EMOJI.VILLAIN}</>
-  if (is_trickster) return <>{EMOJI.TRICKSTER}</>
-  if (is_lord) return <>{EMOJI.LORD}</>
+  const { isVillainous, isTrickster, isHonourable } = useDuelist(duelistId)
+  if (isVillainous) return <>{EMOJI.VILLAIN}</>
+  if (isTrickster) return <>{EMOJI.TRICKSTER}</>
+  if (isHonourable) return <>{EMOJI.LORD}</>
   return <></>
 }
 
@@ -50,7 +50,7 @@ export function ProfileDescription({
   const { tableId } = useRouterTable()
   const {
     total_wins, total_losses, total_draws, total_duels, total_honour, honourAndTotal,
-    is_villain, is_trickster, is_lord, levelDisplay, levelAndTotal,
+    isVillainous, isTrickster, isHonourable, levelDisplay, levelAndTotal,
   } = useDuelist(duelistId)
   const { owner } = useDuelistOwner(duelistId)
   return (
@@ -62,9 +62,9 @@ export function ProfileDescription({
           {displayAddress && <AddressShort address={owner} />}
           <h3 className='Important NoMargin TitleCase'>
             Honour: <span className='Wager'>{honourAndTotal}</span>
-            {is_villain && <> {EMOJI.VILLAIN} <span className='Wager'>{levelDisplay}</span></>}
-            {is_trickster && <> {EMOJI.TRICKSTER} <span className='Wager'>{levelDisplay}</span></>}
-            {is_lord && <> {EMOJI.LORD} <span className='Wager'>{levelDisplay}</span></>}
+            {isVillainous && <> {EMOJI.VILLAIN} <span className='Wager'>{levelDisplay}</span></>}
+            {isTrickster && <> {EMOJI.TRICKSTER} <span className='Wager'>{levelDisplay}</span></>}
+            {isHonourable && <> {EMOJI.LORD} <span className='Wager'>{levelDisplay}</span></>}
           </h3>
           {/* {displayBalance && <>
             <LordsBalance address={address} big />

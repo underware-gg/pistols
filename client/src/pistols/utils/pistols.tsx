@@ -221,3 +221,18 @@ export const ActionTypes: Record<string, Action[]> = {
 export const makeTavernUrl = (tableId: string) => (`/tavern/${tableId}`)
 export const makeDuelUrl = (duelId: bigint) => (`/duel/${bigintToHex(duelId)}`)
 
+
+//
+// TODO: MOVE TO generateContants.ts
+export enum Archetype {
+  Undefined,  // 0
+  Villainous, // 1
+  Trickster,  // 2
+  Honourable, // 3
+}
+export const ArchetypeNames: Record<Archetype, string> = {
+  [Archetype.Undefined]: 'Undefined',
+  [Archetype.Villainous]: 'Villainous',
+  [Archetype.Trickster]: 'Trickster',
+  [Archetype.Honourable]: 'Honourable',
+}

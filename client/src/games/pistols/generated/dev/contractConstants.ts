@@ -43,13 +43,14 @@ type mod_actions_Type = {
   INVALID_CHALLENGED_SELF: string, // cairo: felt252
   INVALID_EXPIRY: string, // cairo: felt252
   INVALID_CHALLENGE: string, // cairo: felt252
-  NOT_DUELIST_OWNER: string, // cairo: felt252
+  INVALID_DUELIST: string, // cairo: felt252
+  NOT_YOUR_CHALLENGE: string, // cairo: felt252
+  NOT_YOUR_DUELIST: string, // cairo: felt252
   CHALLENGER_NOT_ADMITTED: string, // cairo: felt252
   CHALLENGED_NOT_ADMITTED: string, // cairo: felt252
   CHALLENGE_EXISTS: string, // cairo: felt252
   CHALLENGE_NOT_AWAITING: string, // cairo: felt252
   CHALLENGE_NOT_IN_PROGRESS: string, // cairo: felt252
-  NOT_YOUR_CHALLENGE: string, // cairo: felt252
   TABLE_IS_CLOSED: string, // cairo: felt252
   MINIMUM_WAGER_NOT_MET: string, // cairo: felt252
   NO_WAGER: string, // cairo: felt252
@@ -71,13 +72,14 @@ export const actions: mod_actions_Type = {
   INVALID_CHALLENGED_SELF: 'PISTOLS: Challenged self',
   INVALID_EXPIRY: 'PISTOLS: Invalid expiry',
   INVALID_CHALLENGE: 'PISTOLS: Invalid Challenge',
-  NOT_DUELIST_OWNER: 'PISTOLS: Not your duelist',
+  INVALID_DUELIST: 'PISTOLS: Invalid duelist',
+  NOT_YOUR_CHALLENGE: 'PISTOLS: Not your Challenge',
+  NOT_YOUR_DUELIST: 'PISTOLS: Not your duelist',
   CHALLENGER_NOT_ADMITTED: 'PISTOLS: Challenger not allowed',
   CHALLENGED_NOT_ADMITTED: 'PISTOLS: Challenged not allowed',
   CHALLENGE_EXISTS: 'PISTOLS: Challenge exists',
   CHALLENGE_NOT_AWAITING: 'PISTOLS: Challenge not Awaiting',
   CHALLENGE_NOT_IN_PROGRESS: 'PISTOLS: Challenge not Progress',
-  NOT_YOUR_CHALLENGE: 'PISTOLS: Not your Challenge',
   TABLE_IS_CLOSED: 'PISTOLS: Table is closed',
   MINIMUM_WAGER_NOT_MET: 'PISTOLS: Minimum wager not met',
   NO_WAGER: 'PISTOLS: No wager on this table',

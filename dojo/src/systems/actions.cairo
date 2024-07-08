@@ -1,6 +1,6 @@
 use starknet::{ContractAddress};
 use pistols::models::challenge::{Challenge};
-use pistols::models::duelist::{Duelist};
+use pistols::models::duelist::{Duelist, Archetype};
 use pistols::models::structs::{SimulateChances};
 use pistols::types::challenge::{ChallengeState};
 
@@ -14,6 +14,7 @@ trait IActions {
         name: felt252,
         profile_pic_type: u8,
         profile_pic_uri: felt252,
+        initial_archetype: Archetype,
     ) -> Duelist;
     fn update_duelist(
         ref world: IWorldDispatcher,
@@ -91,10 +92,11 @@ mod actions {
 
     use pistols::systems::minter::{IMinterDispatcher, IMinterDispatcherTrait};
     use pistols::models::challenge::{Challenge, Wager, Round, Shot};
-    use pistols::models::duelist::{Duelist, DuelistTrait, Score, Pact, DuelistManager, DuelistManagerTrait};
+    use pistols::models::duelist::{Duelist, DuelistTrait, Archetype, Score, Pact, DuelistManager, DuelistManagerTrait};
     use pistols::models::structs::{SimulateChances};
     use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
     use pistols::models::table::{TableConfig, TableManager, TableTrait, TableManagerTrait, tables};
+    use pistols::models::init::{init};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::types::action::{Action, ActionTrait};
@@ -114,6 +116,7 @@ mod actions {
         const INVALID_REPLY_SELF: felt252        = 'PISTOLS: Reply self';
         const INVALID_EXPIRY: felt252            = 'PISTOLS: Invalid expiry';
         const INVALID_CHALLENGE: felt252         = 'PISTOLS: Invalid Challenge';
+        const INVALID_DUELIST: felt252           = 'PISTOLS: Invalid duelist';
         const NOT_YOUR_CHALLENGE: felt252        = 'PISTOLS: Not your Challenge';
         const NOT_YOUR_DUELIST: felt252          = 'PISTOLS: Not your duelist';
         const CHALLENGER_NOT_ADMITTED: felt252   = 'PISTOLS: Challenger not allowed';
@@ -147,15 +150,35 @@ mod actions {
             name: felt252,
             profile_pic_type: u8,
             profile_pic_uri: felt252,
+            initial_archetype: Archetype,
         ) -> Duelist {
-            let config_manager = ConfigManagerTrait::new(world).get();
-            let minter_dispatcher = IMinterDispatcher{
-                contract_address: config_manager.minter_address
-            };
             // mint if you can
-            let token_id: u128 = minter_dispatcher.mint(starknet::get_caller_address(), config_manager.token_duelist_address);
-            // update
-            (self.update_duelist(token_id, name, profile_pic_type, profile_pic_uri))
+            let caller: ContractAddress = starknet::get_caller_address();
+            let config_manager: Config = ConfigManagerTrait::new(world).get();
+            let minter_dispatcher = IMinterDispatcher{ contract_address: config_manager.minter_address };
+            let token_id: u128 = minter_dispatcher.mint(caller, config_manager.token_duelist_address);
+
+            // // create
+            let mut duelist = Duelist {
+                duelist_id: token_id,
+                timestamp: get_block_timestamp(),
+                name: name,
+                profile_pic_type: profile_pic_type,
+                profile_pic_uri: profile_pic_uri.to_byte_array(),
+                score: init::Score(),
+            };
+            match initial_archetype {
+                Archetype::Villainous => { duelist.score.level_villain = 10; },
+                Archetype::Trickster =>  { duelist.score.level_trickster = 10; },
+                Archetype::Honourable => { duelist.score.level_lord = 10; },
+                _ => {},
+            };
+            // // save
+            DuelistManagerTrait::new(world).set(duelist.clone());
+
+            self._emitDuelistRegisteredEvent(caller, duelist.clone(), true);
+
+            (duelist)
         }
 
         fn update_duelist(ref world: IWorldDispatcher,
@@ -165,25 +188,20 @@ mod actions {
             profile_pic_uri: felt252,
         ) -> Duelist {
             let caller: ContractAddress = starknet::get_caller_address();
-            let duelist_manager = DuelistManagerTrait::new(world);
+            let duelist_manager: DuelistManager = DuelistManagerTrait::new(world);
             assert(duelist_manager.is_owner_of(caller, duelist_id) == true, Errors::NOT_YOUR_DUELIST);
 
             // get current
             let mut duelist = duelist_manager.get(duelist_id);
-            // 1st time setup
-            let is_new: bool = (duelist.timestamp == 0);
-            if (is_new) {
-                duelist.timestamp = get_block_timestamp();
-            }
+            assert(duelist.timestamp != 0, Errors::INVALID_DUELIST);
             // update
-            duelist.duelist_id = duelist_id;
             duelist.name = name;
             duelist.profile_pic_type = profile_pic_type;
             duelist.profile_pic_uri = profile_pic_uri.to_byte_array();
             // save
             duelist_manager.set(duelist.clone());
 
-            self._emitDuelistRegisteredEvent(caller, duelist.clone(), is_new);
+            self._emitDuelistRegisteredEvent(caller, duelist.clone(), false);
 
             (duelist)
         }

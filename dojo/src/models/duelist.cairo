@@ -6,6 +6,14 @@ use pistols::types::constants::{constants};
 use pistols::libs::utils::{ZERO};
 
 
+#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
+enum Archetype {
+    Undefined,
+    Villainous,
+    Trickster,
+    Honourable,
+}
+
 mod profile_pic_type {
     const DUELIST: u8 = 1;      // profile_pic_uri = number
     const EXTERNAL: u8 = 2;     // image URL
@@ -13,6 +21,7 @@ mod profile_pic_type {
     // const ERC721: u8 = 4;       // Owned erc-721 (hard to validate and keep up to date)
     // const DISCORD: u8 = 5;      // Linked account (had to be cloned, or just copy the url)
 }
+
 
 //---------------------
 // Duelist
@@ -104,6 +113,17 @@ impl ScoreTraitImpl of ScoreTrait {
     fn format_honour(value: u8) -> ByteArray { (format!("{}.{}", value/10, value%10)) }
     #[inline(always)]
     fn format_total_honour(value: u32) -> ByteArray { (format!("{}.{}", value/10, value%10)) }
+}
+
+impl ArchetypeIntoFelt252 of Into<Archetype, felt252> {
+    fn into(self: Archetype) -> felt252 {
+        match self {
+            Archetype::Undefined => 0,
+            Archetype::Villainous => 1,
+            Archetype::Trickster => 2,
+            Archetype::Honourable => 3,
+        }
+    }
 }
 
 

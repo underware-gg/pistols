@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Grid, Input } from 'semantic-ui-react'
+import { Button, ButtonGroup, Grid, Input, Pagination } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
@@ -10,6 +10,9 @@ import { PROFILE_PIC_COUNT } from '@/pistols/utils/constants'
 import { IconClick } from '@/lib/ui/Icons'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { pedersen } from '@/lib/utils/starknet'
+import { Archetype, ArchetypeNames } from '@/pistols/utils/pistols'
+import { ArchetypeIcon } from '../ui/PistolsIcon'
+import { ProfileBadge } from './ProfileDescription'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -20,7 +23,7 @@ export function OnboardingProfile({
   const { duelistId } = useSettings()
   const { account, address } = useAccount()
 
-  const { name, profilePic } = useDuelist(duelistId)
+  const { name, profilePic, archetypeName } = useDuelist(duelistId)
   const [selectedProfilePic, setSelectedProfilePic] = useState(0)
   const { duelistBalance } = useDuelistBalanceOf(address)
 
@@ -32,23 +35,24 @@ export function OnboardingProfile({
     )
   }, [selectedProfilePic, profilePic, address, duelistBalance])
 
-  const [inputValue, setInputValue] = useState(null)
-  const inputIsValid = useMemo(() => (inputValue?.length >= 3), [inputValue])
-  const isUpdated = useMemo(() => (name == inputValue && profilePic == _profilePic), [name, inputValue, profilePic, _profilePic])
+  const [inputName, setInputName] = useState(null)
+  const [inputArchetype, setInputArchetype] = useState(Archetype.Undefined)
+  const inputIsValid = useMemo(() => (inputName?.length >= 3), [inputName])
+  const isUpdated = useMemo(() => (name == inputName && profilePic == _profilePic), [name, inputName, profilePic, _profilePic])
 
   const isNew = !Boolean(duelistId)
   const canSubmit = (inputIsValid && account && !isUpdated)
 
   useEffect(() => {
-    setInputValue(name ?? '')
+    setInputName(name ?? '')
   }, [name])
 
   const _submit = () => {
     if (canSubmit) {
       if (isNew) {
-        mint_duelist(account, inputValue, 1, _profilePic.toString())
+        mint_duelist(account, inputName, 1, _profilePic.toString(), inputArchetype)
       } else {
-        update_duelist(account, duelistId, inputValue, 1, _profilePic.toString())
+        update_duelist(account, duelistId, inputName, 1, _profilePic.toString())
       }
     }
   }
@@ -79,15 +83,40 @@ export function OnboardingProfile({
         </Col>
         <Col width={11} textAlign='left' className='PaddedSides'>
           <span className='FormLabel TitleCase'>Duelist Name</span>
-          <div className='Spacer5' />
           <Input fluid
             maxLength={31}
             placeholder={'Duelist Name'}
-            value={inputValue ?? ''}
+            value={inputName ?? ''}
             disabled={!account || !address}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(e) => setInputName(e.target.value)}
           />
-          <div className='Spacer5' />
+
+          <div className='Spacer10' />
+          <span className='FormLabel TitleCase'>Archetype: <b>{isNew ? ArchetypeNames[inputArchetype] : archetypeName}</b></span>
+          {isNew &&
+            <div>
+              <Button icon toggle active={inputArchetype == Archetype.Undefined} onClick={() => setInputArchetype(Archetype.Undefined)}>
+                <ArchetypeIcon size='big' />
+              </Button>
+              &nbsp;&nbsp;
+              <Button icon toggle active={inputArchetype == Archetype.Villainous} onClick={() => setInputArchetype(Archetype.Villainous)}>
+                <ArchetypeIcon villainous size='big' />
+              </Button>
+              &nbsp;&nbsp;
+              <Button icon toggle active={inputArchetype == Archetype.Trickster} onClick={() => setInputArchetype(Archetype.Trickster)}>
+                <ArchetypeIcon trickster size='big' />
+              </Button>
+              &nbsp;&nbsp;
+              <Button icon toggle active={inputArchetype == Archetype.Honourable} onClick={() => setInputArchetype(Archetype.Honourable)}>
+                <ArchetypeIcon honourable size='big' />
+              </Button>
+            </div>
+          }
+          {!isNew && <h3><ProfileBadge duelistId={duelistId} /></h3>}
+
+          <div className='Spacer10' />
+          <div className='Spacer10' />
+          <div className='Spacer10' />
           <ActionButton important fill disabled={!canSubmit} onClick={() => _submit()} label={_submitLabel} />
         </Col>
       </Row>

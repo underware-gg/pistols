@@ -94,8 +94,8 @@ export function createSystemCalls(
     return results as T
   }
 
-  const mint_duelist = async (signer: AccountInterface, name: string, profile_pic_type: number, profile_pic_uri: string): Promise<boolean> => {
-    const args = [stringToFelt(name), profile_pic_type, stringToFelt(profile_pic_uri)]
+  const mint_duelist = async (signer: AccountInterface, name: string, profile_pic_type: number, profile_pic_uri: string, archetype: number): Promise<boolean> => {
+    const args = [stringToFelt(name), profile_pic_type, stringToFelt(profile_pic_uri), archetype]
     return await _executeTransaction(signer, actions_call('mint_duelist', args))
   }
 

@@ -72,4 +72,5 @@ export function ArchetypeIcon({
   if (villainous) return <EmojiIcon emoji={EMOJI.VILLAIN} size={size} />
   if (trickster) return <EmojiIcon emoji={EMOJI.TRICKSTER} size={size} />
   if (honourable) return <EmojiIcon emoji={EMOJI.LORD} size={size} />
+  return <EmojiIcon emoji={EMOJI.NEUTRAL} size={size} />
 }
