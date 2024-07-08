@@ -17,7 +17,7 @@ mod tests {
     use pistols::libs::utils::{make_action_hash, pack_action_slots, unpack_action_slots};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::math::{MathU8};
-    use pistols::tests::tester::{tester, tester::{ZERO, OWNER, OTHER, BUMMER, TREASURY}};
+    use pistols::tests::tester::{tester, tester::{flags, ZERO, OWNER, OTHER, BUMMER, TREASURY}};
 
 
     const PLAYER_NAME: felt252 = 'Sensei';
@@ -78,7 +78,7 @@ mod tests {
 
     #[test]
     fn test_blades_round_draw() {
-        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER());
 
         let (salt_1_a, salt_1_b, action_1_a, action_1_b, hash_1_a, hash_1_b) = _get_actions_round_1_continue();
@@ -169,7 +169,7 @@ mod tests {
 
     #[test]
     fn test_blades_round_resolved() {
-        let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
+        let (world, system, _admin, _lords) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER());
 
         let (salt_1_a, salt_1_b, action_1_a, action_1_b, hash_1_a, hash_1_b) = _get_actions_round_1_continue();

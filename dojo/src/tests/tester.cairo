@@ -47,10 +47,6 @@ mod tester {
     // https://github.com/starkware-libs/cairo/blob/main/corelib/src/starknet/testing.cairo
     //
 
-    const INITIAL_TIMESTAMP: u64 = 0x100000000;
-    const INITIAL_STEP: u64 = 0x10;
-
-
     #[inline(always)]
     fn ZERO() -> ContractAddress { starknet::contract_address_const::<0x0>() }
     #[inline(always)]
@@ -83,24 +79,39 @@ mod tester {
     }
 
 
+    //-------------------------------
+    // Test world
+
+    const INITIAL_TIMESTAMP: u64 = 0x100000000;
+    const INITIAL_STEP: u64 = 0x10;
+
+    mod flags {
+        const SYSTEM: u8     = 0b000001;
+        const ADMIN: u8      = 0b000010;
+        const LORDS: u8      = 0b000100;
+        const MINTER: u8     = 0b001000;
+        const INITIALIZE: u8 = 0b010000;
+        const APPROVE: u8    = 0b100000;
+    }
 
     fn deploy_system(world: IWorldDispatcher, salt: felt252, class_hash: felt252) -> ContractAddress {
         let contract_address = world.deploy_contract(salt, class_hash.try_into().unwrap(), array![].span());
         (contract_address)
     }
 
-    fn setup_world(
-        mut deploy_system: bool,
-        mut deploy_admin: bool,
-        mut deploy_lords: bool,
-        initialize: bool,
-        approve: bool,
-    ) -> (
+    fn setup_world(flags: u8) -> (
         IWorldDispatcher,
         IActionsDispatcher,
         IAdminDispatcher,
         ILordsMockDispatcher,
     ) {
+        let mut deploy_system: bool = (flags & flags::SYSTEM) != 0;
+        let mut deploy_admin: bool = (flags & flags::ADMIN) != 0;
+        let mut deploy_lords: bool = (flags & flags::LORDS) != 0;
+        // let mut deploy_minter: bool = (flags & flags::MINTER) != 0;
+        let initialize: bool = (flags & flags::INITIALIZE) != 0;
+        let approve: bool = (flags & flags::APPROVE) != 0;
+
         let mut models = array![
             duelist::TEST_CLASS_HASH,
             scoreboard::TEST_CLASS_HASH,
