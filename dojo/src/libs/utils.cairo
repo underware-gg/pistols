@@ -404,6 +404,7 @@ fn _average_trickster(new_level: u8, current_level: u8) -> u8 {
 // crit bonus will be applied for Lords only
 fn calc_crit_chances(attacker: Score, defender: Score, attack: Action, defense: Action, health: u8, table_type: TableType) -> u8 {
     let crit_chance: u8 = attack.crit_chance();
+// calc_crit_bonus(attacker, table_type).print();
     if (crit_chance == 0) { (0) }
     else {
         (_apply_chance_bonus_penalty(
@@ -577,32 +578,32 @@ fn call_simulate_honour_for_action(world: IWorldDispatcher, mut score: Score, ac
     (action_honour, score.honour)
 }
 
-fn call_get_duelist_health(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8) -> u8 {
+fn call_get_duelist_health(world: IWorldDispatcher, duelist_id: u128, duel_id: u128, round_number: u8) -> u8 {
     if (round_number == 1) {
         (constants::FULL_HEALTH)
     } else {
-        let shot: Shot = call_get_duelist_round_shot(world, duelist_address, duel_id, round_number);
+        let shot: Shot = call_get_duelist_round_shot(world, duelist_id, duel_id, round_number);
         (shot.health)
     }
 }
-fn call_get_duelist_round_shot(world: IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8) -> Shot {
+fn call_get_duelist_round_shot(world: IWorldDispatcher, duelist_id: u128, duel_id: u128, round_number: u8) -> Shot {
     let challenge: Challenge = get!(world, (duel_id), Challenge);
     let round: Round = get!(world, (duel_id, round_number), Round);
-    if (challenge.address_a == duelist_address) {
+    if (challenge.duelist_id_a == duelist_id) {
         (round.shot_a)
-    } else if (challenge.address_b == duelist_address) {
+    } else if (challenge.duelist_id_b == duelist_id) {
         (round.shot_b)
     } else {
         (init::Shot())
     }
 }
 
-fn call_get_snapshot_scores(world: IWorldDispatcher, address: ContractAddress, duel_id: u128) -> (Score, Score) {
+fn call_get_snapshot_scores(world: IWorldDispatcher, duelist_id: u128, duel_id: u128) -> (Score, Score) {
     let challenge: Challenge = get!(world, duel_id, Challenge);
     let snapshot: Snapshot = get!(world, duel_id, Snapshot);
-    if (challenge.address_a == address) {
+    if (challenge.duelist_id_a == duelist_id) {
         (snapshot.score_a, snapshot.score_b)
-    } else if (challenge.address_b == address) {
+    } else if (challenge.duelist_id_b == duelist_id) {
         (snapshot.score_b, snapshot.score_a)
     } else {
         (init::Score(), init::Score())

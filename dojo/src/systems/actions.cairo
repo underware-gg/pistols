@@ -67,7 +67,7 @@ trait IActions {
     fn has_pact(world: @IWorldDispatcher, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool;
     fn can_join(world: @IWorldDispatcher, table_id: felt252, duelist_id: u128) -> bool;
     fn calc_fee(world: @IWorldDispatcher, table_id: felt252, wager_value: u256) -> u256;
-    fn simulate_chances(world: @IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> SimulateChances;
+    fn simulate_chances(world: @IWorldDispatcher, duelist_id: u128, duel_id: u128, round_number: u8, action: u8) -> SimulateChances;
     fn get_valid_packed_actions(world: @IWorldDispatcher, round_number: u8) -> Array<u16>;
     fn pack_action_slots(world: @IWorldDispatcher, slot1: u8, slot2: u8) -> u16;
     fn unpack_action_slots(world: @IWorldDispatcher, packed: u16) -> (u8, u8);
@@ -434,9 +434,9 @@ mod actions {
             (table.calc_fee(wager_value))
         }
 
-        fn simulate_chances(world: @IWorldDispatcher, duelist_address: ContractAddress, duel_id: u128, round_number: u8, action: u8) -> SimulateChances {
-            let (score_self, score_other): (Score, Score) = utils::call_get_snapshot_scores(world, duelist_address, duel_id);
-            let health: u8 = utils::call_get_duelist_health(world, duelist_address, duel_id, round_number);
+        fn simulate_chances(world: @IWorldDispatcher, duelist_id: u128, duel_id: u128, round_number: u8, action: u8) -> SimulateChances {
+            let (score_self, score_other): (Score, Score) = utils::call_get_snapshot_scores(world, duelist_id, duel_id);
+            let health: u8 = utils::call_get_duelist_health(world, duelist_id, duel_id, round_number);
             let action_self: Action = action.into();
             let action_other: Action = action.into();
             let challenge: Challenge = get!(world, duel_id, Challenge);
