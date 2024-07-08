@@ -8,10 +8,10 @@ use pistols::libs::utils::{ZERO};
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 enum Archetype {
-    Undefined,
-    Villainous,
-    Trickster,
-    Honourable,
+    Undefined,  // 0
+    Villainous, // 1
+    Trickster,  // 2
+    Honourable, // 3
 }
 
 mod profile_pic_type {

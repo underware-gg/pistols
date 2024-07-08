@@ -17,7 +17,7 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export default function DuelistModal() {
-  const { duelistId, isGuest, dispatchDuelistId } = useSettings()
+  const { tableId, duelistId, isGuest, dispatchDuelistId } = useSettings()
   const router = useRouter()
 
   const { selectedDuelistId, dispatchSelectDuel, dispatchSelectDuelistId, dispatchChallengingDuelistId } = usePistolsContext()
@@ -74,7 +74,7 @@ export default function DuelistModal() {
             <ProfileDescription duelistId={selectedDuelistId} displayStats displayBalance />
             <div className='Spacer10' />
             <div className='TableInModal'>
-              <ChallengeTableByDuelist duelistId={selectedDuelistId} compact />
+              <ChallengeTableByDuelist duelistId={selectedDuelistId} compact tableId={tableId} />
             </div>
           </div>
         </Modal.Description>

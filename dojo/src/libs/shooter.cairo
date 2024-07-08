@@ -9,6 +9,7 @@ mod shooter {
     use pistols::libs::utils;
     use pistols::models::challenge::{Challenge, Snapshot, Round, Shot};
     use pistols::models::duelist::{Duelist, Score};
+    use pistols::models::table::{TableConfig, TableType};
     use pistols::types::constants::{constants};
     use pistols::types::challenge::{ChallengeState};
     use pistols::types::round::{RoundState};
@@ -177,6 +178,7 @@ mod shooter {
     //
     fn process_round(world: IWorldDispatcher, ref challenge: Challenge, ref round: Round, is_last_round: bool) {
         let snapshot: Snapshot = get!(world, challenge.duel_id, Snapshot);
+        let table_type: TableType = get!(world, challenge.table_id, TableConfig).table_type;
         
         let action_a: Action = apply_action_honour(ref round.shot_a);
         let action_b: Action = apply_action_honour(ref round.shot_b);
@@ -185,13 +187,13 @@ mod shooter {
         let priority: i8 = action_a.roll_priority(action_b, snapshot.score_a, snapshot.score_b);
         if (priority < 0) {
             // A strikes first
-            executed = strike_async(world, round, snapshot.score_a, snapshot.score_b, ref round.shot_a, ref round.shot_b);
+            executed = strike_async(world, round, snapshot.score_a, snapshot.score_b, ref round.shot_a, ref round.shot_b, table_type);
         } else if (priority > 0) {
             // B strikes first
-            executed = strike_async(world, round, snapshot.score_b, snapshot.score_a, ref round.shot_b, ref round.shot_a);
+            executed = strike_async(world, round, snapshot.score_b, snapshot.score_a, ref round.shot_b, ref round.shot_a, table_type);
         } else {
             // A and B strike simultaneously
-            executed = strike_sync(world, round, snapshot.score_a, snapshot.score_b, ref round.shot_a, ref round.shot_b);
+            executed = strike_sync(world, round, snapshot.score_a, snapshot.score_b, ref round.shot_a, ref round.shot_b, table_type);
         }
 
         // decide results on health or win flag
@@ -238,19 +240,19 @@ mod shooter {
     //
 
     // attacker strikes first, then defender only if not executed
-    fn strike_async(world: IWorldDispatcher, round: Round, attacker: Score, defender: Score, ref attack: Shot, ref defense: Shot) -> bool {
-        let mut executed: bool = strike(world, 'shoot_a', attacker, defender, round, ref attack, ref defense);
+    fn strike_async(world: IWorldDispatcher, round: Round, attacker: Score, defender: Score, ref attack: Shot, ref defense: Shot, table_type: TableType) -> bool {
+        let mut executed: bool = strike(world, 'shoot_a', attacker, defender, round, ref attack, ref defense, table_type);
         apply_damage(ref attack, ref defense);
         if (!executed) {
-            executed = strike(world, 'shoot_b', defender, attacker, round, ref defense, ref attack);
+            executed = strike(world, 'shoot_b', defender, attacker, round, ref defense, ref attack, table_type);
             apply_damage(ref defense, ref attack);
         }
         (executed)
     }
     // sync strike, both at the same time
-    fn strike_sync(world: IWorldDispatcher, round: Round, attacker: Score, defender: Score, ref attack: Shot, ref defense: Shot) -> bool {
-        let mut executed_a: bool = strike(world, 'shoot_a', attacker, defender, round, ref attack, ref defense);
-        let mut executed_b: bool = strike(world, 'shoot_b', defender, attacker, round, ref defense, ref attack);
+    fn strike_sync(world: IWorldDispatcher, round: Round, attacker: Score, defender: Score, ref attack: Shot, ref defense: Shot, table_type: TableType) -> bool {
+        let mut executed_a: bool = strike(world, 'shoot_a', attacker, defender, round, ref attack, ref defense, table_type);
+        let mut executed_b: bool = strike(world, 'shoot_b', defender, attacker, round, ref defense, ref attack, table_type);
         apply_damage(ref attack, ref defense);
         apply_damage(ref defense, ref attack);
         (executed_a || executed_b)
@@ -267,18 +269,18 @@ mod shooter {
 
     // executes single attack
     // returns true if ended in execution
-    fn strike(world: IWorldDispatcher, seed: felt252, attacker: Score, defender: Score, round: Round, ref attack: Shot, ref defense: Shot) -> bool {
+    fn strike(world: IWorldDispatcher, seed: felt252, attacker: Score, defender: Score, round: Round, ref attack: Shot, ref defense: Shot, table_type: TableType) -> bool {
         let action: Action = attack.action.into();
         if (action != Action::Idle) {
             let defense_action: Action = defense.action.into();
             // dice 1: crit (execution, double damage, goal)
-            attack.chance_crit = utils::calc_crit_chances(attacker, defender, action, defense_action, attack.health);
+            attack.chance_crit = utils::calc_crit_chances(attacker, defender, action, defense_action, attack.health, table_type);
             attack.dice_crit = throw_dice(seed, round, 100, attack.chance_crit);
             if (attack.dice_crit <= attack.chance_crit) {
                 return (action.execute_crit(ref attack, ref defense));
             } else {
                 // dice 2: miss or hit
-                attack.chance_hit = utils::calc_hit_chances(attacker, defender, action, defense_action, attack.health);
+                attack.chance_hit = utils::calc_hit_chances(attacker, defender, action, defense_action, attack.health, table_type);
                 attack.dice_hit = throw_dice(seed * 2, round, 100, attack.chance_hit);
                 if (attack.dice_hit <= attack.chance_hit) {
                     attack.chance_lethal = utils::calc_lethal_chances(attacker, defender, action, defense_action, attack.chance_hit);

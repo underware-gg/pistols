@@ -27,6 +27,7 @@ import { EMOJI } from '@/pistols/data/messages'
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import CommitBladesModal from '@/pistols/components/CommitBladesModal'
 import RevealModal from '@/pistols/components/RevealModal'
+import { useTable } from '../hooks/useTable'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -39,6 +40,7 @@ export default function Duel({
 
   const { challengeDescription } = useChallengeDescription(duelId)
   const { tableId, isFinished, message, duelistIdA, duelistIdB, timestamp_start } = useChallenge(duelId)
+  const { description } = useTable(tableId)
   const { value } = useWager(duelId)
 
   // guarantee to run only once when this component mounts
@@ -79,6 +81,7 @@ export default function Duel({
   return (
     <>
       <div className='TavernTitle' style={{ maxWidth: '350px' }}>
+        <h3 className='Important'>{description}</h3>
         <h1 className='Quote'>{`“${message}”`}</h1>
         {value > 0 &&
           <h5><Balance big tableId={tableId} wei={value} /></h5>

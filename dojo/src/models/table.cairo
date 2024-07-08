@@ -13,6 +13,15 @@ mod tables {
     const BRUSSELS: felt252 = 'Brussels';
 }
 
+#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
+enum TableType {
+    Undefined,      // 0
+    Classic,        // 1
+    Tournament,     // 2
+    IRLTournament,  // 3
+}
+
+// TODO: REMOVE THIS
 mod table_types {
     const CLASSIC: u8 = 1;
     const TOURNAMENT: u8 = 2;
@@ -33,7 +42,7 @@ struct TableConfig {
     fee_min: u256,
     fee_pct: u8,
     is_open: bool,
-    table_type: u8,
+    table_type: TableType,
 }
 
 #[derive(Drop, Serde)]
@@ -56,7 +65,7 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
             fee_min: 4 * constants::ETH_TO_WEI,
             fee_pct: 10,
             is_open: (lords_address != ZERO()),
-            table_type: table_types::CLASSIC,
+            table_type: TableType::Classic,
         }),
         (TableConfig {
             table_id: tables::COMMONERS,
@@ -66,7 +75,7 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
             fee_min: 0,
             fee_pct: 0,
             is_open: true,
-            table_type: table_types::CLASSIC,
+            table_type: TableType::Classic,
         }),
         (TableConfig {
             table_id: tables::BRUSSELS,
@@ -76,7 +85,7 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
             fee_min: 0,
             fee_pct: 0,
             is_open: true,
-            table_type: table_types::IRL_TOURNAMENT,
+            table_type: TableType::IRLTournament,
         }),
     ])
 }
@@ -150,6 +159,30 @@ impl TableAdmittanceTraitImpl of TableAdmittanceTrait {
 }
 
 
+//---------------------------
+// enum traits
+//
+
+impl TableTypeIntoFelt252 of Into<TableType, felt252> {
+    fn into(self: TableType) -> felt252 {
+        match self {
+            TableType::Undefined => 0,
+            TableType::Classic => 1,
+            TableType::Tournament => 2,
+            TableType::IRLTournament => 3,
+        }
+    }
+}
+
+#[generate_trait]
+impl TableTypeTraitImpl of TableTypeTrait {
+    fn maxxed_up_levels(self: TableType) -> bool {
+        match self {
+            TableType::IRLTournament => true,
+            _ => false,
+        }
+    }
+}
 
 
 

@@ -39,7 +39,7 @@ export const EMOJI: any = {
   WINNER: '🏅',
   //
   // badges
-  NEUTRAL: '🎩',
+  NEUTRAL: '🫥',
   LORD: '👑',
   TRICKSTER: '🃏',
   VILLAIN: '👺',

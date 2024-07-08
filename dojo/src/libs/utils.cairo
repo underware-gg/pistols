@@ -7,7 +7,7 @@ use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
 use pistols::systems::actions::actions::{Errors};
 use pistols::models::challenge::{Challenge, Snapshot, Wager, Round, Shot};
 use pistols::models::duelist::{Duelist, Pact, Scoreboard, Score, ScoreTrait};
-use pistols::models::table::{TableConfig, TableTrait, TableManagerTrait};
+use pistols::models::table::{TableConfig, TableTrait, TableManagerTrait, TableType, TableTypeTrait};
 use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
 use pistols::models::init::{init};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
@@ -277,11 +277,17 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         update_score_totals(ref scoreboard_a.score, ref scoreboard_b.score, state, challenge.winner);
 
         // compute honour from final round
+        let table : TableConfig = TableManagerTrait::new(world).get(challenge.table_id);
         let final_round: Round = get!(world, (challenge.duel_id, challenge.round_number), Round);
+        // update honour and levels
         update_score_honour(ref duelist_a.score, final_round.shot_a.honour);
         update_score_honour(ref duelist_b.score, final_round.shot_b.honour);
         update_score_honour(ref scoreboard_a.score, final_round.shot_a.honour);
         update_score_honour(ref scoreboard_b.score, final_round.shot_b.honour);
+        if (table.table_type.maxxed_up_levels()) {
+            maxx_up_levels(ref scoreboard_a.score);
+            maxx_up_levels(ref scoreboard_b.score);
+        }
 
         // split wager/fee to winners and benefactors
         if (final_round.shot_a.wager > final_round.shot_b.wager) {
@@ -329,6 +335,11 @@ fn update_score_honour(ref score: Score, duel_honour: u8) {
     score.level_lord = calc_level_lord(score.honour);
     score.level_trickster = _average_trickster(calc_level_trickster(score.honour, duel_honour), score.level_trickster);
 }
+fn maxx_up_levels(ref score: Score) {
+    if (score.is_villain()) { score.level_villain = honour::LEVEL_MAX; }
+    else if (score.is_trickster()) { score.level_trickster = honour::LEVEL_MAX; }
+    else if (score.is_lord()) { score.level_lord = honour::LEVEL_MAX; }
+}
 
 // Villain bonus: the less honour, more bonus
 #[inline(always)]
@@ -372,26 +383,26 @@ fn _average_trickster(new_level: u8, current_level: u8) -> u8 {
 //
 
 // crit bonus will be applied for Lords only
-fn calc_crit_chances(attacker: Score, defender: Score, attack: Action, defense: Action, health: u8) -> u8 {
+fn calc_crit_chances(attacker: Score, defender: Score, attack: Action, defense: Action, health: u8, table_type: TableType) -> u8 {
     let crit_chance: u8 = attack.crit_chance();
     if (crit_chance == 0) { (0) }
     else {
         (_apply_chance_bonus_penalty(
             crit_chance,
-            calc_crit_bonus(attacker) + calc_crit_match_bonus(attacker, attack, defense),
+            calc_crit_bonus(attacker, table_type) + calc_crit_match_bonus(attacker, attack, defense),
             0 + calc_crit_trickster_penalty(attacker, defender),
         ))
     }
 }
 // Hit chances will be applied to Villains only
 // Both Hit and Lethal go up/down with same bonus/penalty
-fn calc_hit_chances(attacker: Score, defender: Score, attack: Action, defense: Action, health: u8) -> u8 {
+fn calc_hit_chances(attacker: Score, defender: Score, attack: Action, defense: Action, health: u8, table_type: TableType) -> u8 {
     let hit_chance: u8 = attack.hit_chance();
     if (hit_chance == 0) { (0) }
     else {
         (_apply_chance_bonus_penalty(
             hit_chance,
-            calc_hit_bonus(attacker),
+            calc_hit_bonus(attacker, table_type),
             calc_hit_injury_penalty(attack, health) + calc_hit_trickster_penalty(attacker, defender),
         ))
     }
@@ -422,28 +433,30 @@ fn _apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
 // bonuses
 //
 
-fn calc_crit_bonus(attacker: Score) -> u8 {
+fn calc_crit_bonus(attacker: Score, table_type: TableType) -> u8 {
+    let max_level: u16 = if (table_type.maxxed_up_levels()) {honour::LEVEL_MAX.into()} else {(attacker.total_duels * 10)};
     if (attacker.is_lord()) {
-        (_calc_bonus(chances::CRIT_BONUS_LORD, attacker.level_lord, attacker.total_duels))
+        (_calc_bonus(chances::CRIT_BONUS_LORD, attacker.level_lord, max_level))
     } else if (attacker.is_trickster()) {
-        (_calc_bonus(chances::CRIT_BONUS_TRICKSTER, attacker.level_trickster, attacker.total_duels))
+        (_calc_bonus(chances::CRIT_BONUS_TRICKSTER, attacker.level_trickster, max_level))
     } else {
         (0)
     }
 }
-fn calc_hit_bonus(attacker: Score) -> u8 {
+fn calc_hit_bonus(attacker: Score, table_type: TableType) -> u8 {
+    let max_level: u16 = if (table_type.maxxed_up_levels()) {honour::LEVEL_MAX.into()} else {(attacker.total_duels * 10)};
     if (attacker.is_villain()) {
-        (_calc_bonus(chances::HIT_BONUS_VILLAIN, attacker.level_villain, attacker.total_duels))
+        (_calc_bonus(chances::HIT_BONUS_VILLAIN, attacker.level_villain, max_level))
     } else if (attacker.is_trickster()) {
-        (_calc_bonus(chances::HIT_BONUS_TRICKSTER, attacker.level_trickster, attacker.total_duels))
+        (_calc_bonus(chances::HIT_BONUS_TRICKSTER, attacker.level_trickster, max_level))
     } else {
         (0)
     }
 }
-fn _calc_bonus(bonus_max: u8, level: u8, total_duels: u16) -> u8 {
-    if (level > 0 && total_duels > 0) {
+fn _calc_bonus(bonus_max: u8, level: u8, max_level: u16) -> u8 {
+    if (level > 0 && max_level > 0) {
         (MathU8::max(1, MathU8::map(
-            MathU16::min(level.into(), total_duels * 10).try_into().unwrap(),
+            MathU16::min(level.into(), max_level).try_into().unwrap(),
             0, honour::LEVEL_MAX,
             0, bonus_max)
         ))

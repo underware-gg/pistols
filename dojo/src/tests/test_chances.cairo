@@ -14,6 +14,7 @@ use debug::PrintTrait;
     use pistols::libs::utils;
     use pistols::models::challenge::{Round, Shot};
     use pistols::models::duelist::{Duelist, Score, ScoreTrait};
+    use pistols::models::table::{TableType};
     use pistols::models::init::{init};
     use pistols::types::constants::{constants, honour, chances};
     use pistols::types::action::{Action};
@@ -188,49 +189,49 @@ use debug::PrintTrait;
         //
         // no bonus
         let mut lord: Duelist = _lord(0);
-        let chances_0: u8 = utils::calc_crit_chances(lord.score, lord.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
+        let chances_0: u8 = utils::calc_crit_chances(lord.score, lord.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
         assert(chances_0 > 0, 'chances_0 > 0');
         //
         // 50% bonus
         lord.score.level_lord = 50;
-        let chances_50: u8 = utils::calc_crit_chances(lord.score, lord.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
+        let chances_50: u8 = utils::calc_crit_chances(lord.score, lord.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
         assert(chances_50 > 0, 'chances_50 > 0');
         assert(chances_50 > chances_0, 'chances_50 > chances_0');
         //
         // 100% bonus
         lord.score.level_lord = 100;
-        let chances_100: u8 = utils::calc_crit_chances(lord.score, lord.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
+        let chances_100: u8 = utils::calc_crit_chances(lord.score, lord.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
         assert(chances_100 > 0, 'chances_100 > 0');
         assert(chances_100 > chances_50, 'chances_100 > chances_50');
         //
         // TRICKSTER: no bonus
         let mut trickster: Duelist = _trickster(0);
-        let trickster_0: u8 = utils::calc_crit_chances(trickster.score, trickster.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
+        let trickster_0: u8 = utils::calc_crit_chances(trickster.score, trickster.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
         assert(trickster_0 > 0, 'trickster_0 > 0');
         assert(trickster_0 == chances_0, 'trickster_0 ==');
         //
         // 50% bonus
         trickster.score.level_trickster = 50;
-        let trickster_50: u8 = utils::calc_crit_chances(trickster.score, trickster.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
+        let trickster_50: u8 = utils::calc_crit_chances(trickster.score, trickster.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
         assert(trickster_50 > 0, 'trickster_50 > 0');
         assert(trickster_50 > trickster_0, 'trickster_50 > trickster_0');
         assert(trickster_50 < chances_50, 'trickster_50 <');
         //
         // 100% bonus
         trickster.score.level_trickster = 100;
-        let trickster_100: u8 = utils::calc_crit_chances(trickster.score, trickster.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
+        let trickster_100: u8 = utils::calc_crit_chances(trickster.score, trickster.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
         assert(trickster_100 > 0, 'trickster_100 > 0');
         assert(trickster_100 > trickster_50, 'trickster_100 > trickster_50');
         assert(trickster_100 < chances_100, 'trickster_100 <');
         //
         // NO BONUS FOR VILLAINS
         let mut villain: Duelist = _villain(100);
-        let villain_0: u8 = utils::calc_crit_chances(villain.score, villain.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
+        let villain_0: u8 = utils::calc_crit_chances(villain.score, villain.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
         assert(villain_0 > 0, 'villain_0 > 0');
         //
         // 50%
         villain.score.level_villain = 50;
-        let villain_50: u8 = utils::calc_crit_chances(villain.score, villain.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
+        let villain_50: u8 = utils::calc_crit_chances(villain.score, villain.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
         assert(villain_0 == villain_50, 'villain_0 == villain_50');
     }
 
@@ -239,49 +240,49 @@ use debug::PrintTrait;
         //
         // no bonus
         let mut villain: Duelist = _villain(0);
-        let chances_0: u8 = utils::calc_hit_chances(villain.score, villain.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
+        let chances_0: u8 = utils::calc_hit_chances(villain.score, villain.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
         assert(chances_0 > 0, 'chances_0 > 0');
         //
         // 50% bonus
         villain.score.level_villain = 50;
-        let chances_50: u8 = utils::calc_hit_chances(villain.score, villain.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
+        let chances_50: u8 = utils::calc_hit_chances(villain.score, villain.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
         assert(chances_50 > 0, 'chances_50 > 0');
         assert(chances_50 > chances_0, 'chances_50 > chances_0');
         //
         // 100% bonus
         villain.score.level_villain = 100;
-        let chances_100: u8 = utils::calc_hit_chances(villain.score, villain.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
+        let chances_100: u8 = utils::calc_hit_chances(villain.score, villain.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
         assert(chances_100 > 0, 'chances_100 > 0');
         assert(chances_100 > chances_50, 'chances_100 > chances_50');
         //
         // TRICKSTER: no bonus
         let mut trickster: Duelist = _trickster(0);
-        let trickster_0: u8 = utils::calc_hit_chances(trickster.score, trickster.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
+        let trickster_0: u8 = utils::calc_hit_chances(trickster.score, trickster.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
         assert(trickster_0 > 0, 'trickster_0 > 0');
         assert(trickster_0 == chances_0, 'trickster_0 ==');
         //
         // 50% bonus
         trickster.score.level_trickster = 50;
-        let trickster_50: u8 = utils::calc_hit_chances(trickster.score, trickster.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
+        let trickster_50: u8 = utils::calc_hit_chances(trickster.score, trickster.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
         assert(trickster_50 > 0, 'trickster_50 > 0');
         assert(trickster_50 > trickster_0, 'trickster_50 > trickster_0');
         assert(trickster_50 < chances_50, 'trickster_50 <');
         //
         // 100% bonus
         trickster.score.level_trickster = 100;
-        let trickster_100: u8 = utils::calc_hit_chances(trickster.score, trickster.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
+        let trickster_100: u8 = utils::calc_hit_chances(trickster.score, trickster.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
         assert(trickster_100 > 0, 'trickster_100 > 0');
         assert(trickster_100 > trickster_50, 'trickster_100 > trickster_50');
         assert(trickster_100 < chances_100, 'trickster_100 <');
         //
         // NO BONUS FOR LORDS
         let mut lord: Duelist = _lord(0);
-        let lord_0: u8 = utils::calc_hit_chances(lord.score, lord.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
+        let lord_0: u8 = utils::calc_hit_chances(lord.score, lord.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH), TableType::Classic;
         assert(lord_0 > 0, 'lord_0 > 0');
         //
         // 50%
         lord.score.level_lord = 50;
-        let lord_50: u8 = utils::calc_hit_chances(lord.score, lord.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
+        let lord_50: u8 = utils::calc_hit_chances(lord.score, lord.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
         assert(lord_0 == lord_50, 'lord_0 == lord_50');
     }
 
@@ -291,24 +292,24 @@ use debug::PrintTrait;
         let mut villain: Duelist = _villain(100);
         let mut trickster: Duelist = _trickster(100);
         // lords have a bonus shooting late
-        assert(utils::calc_crit_chances(lord.score, lord.score, Action::Paces4, Action::Paces5, constants::FULL_HEALTH)
-            > utils::calc_crit_chances(lord.score, lord.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH),
+        assert(utils::calc_crit_chances(lord.score, lord.score, Action::Paces4, Action::Paces5, constants::FULL_HEALTH, TableType::Classic)
+            > utils::calc_crit_chances(lord.score, lord.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic),
             'lord > lord');
-        assert(utils::calc_crit_chances(lord.score, villain.score, Action::Paces4, Action::Paces5, constants::FULL_HEALTH)
-            > utils::calc_crit_chances(lord.score, villain.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH),
+        assert(utils::calc_crit_chances(lord.score, villain.score, Action::Paces4, Action::Paces5, constants::FULL_HEALTH, TableType::Classic)
+            > utils::calc_crit_chances(lord.score, villain.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic),
             'lord > lord');
-        assert(utils::calc_crit_chances(lord.score, trickster.score, Action::Paces4, Action::Paces5, constants::FULL_HEALTH)
-            > utils::calc_crit_chances(lord.score, trickster.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH),
+        assert(utils::calc_crit_chances(lord.score, trickster.score, Action::Paces4, Action::Paces5, constants::FULL_HEALTH, TableType::Classic)
+            > utils::calc_crit_chances(lord.score, trickster.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic),
             'lord > trickster');
         // villains have a bonus shooting early
-        assert(utils::calc_crit_chances(villain.score, villain.score, Action::Paces4, Action::Paces5, constants::FULL_HEALTH)
-            < utils::calc_crit_chances(villain.score, villain.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH),
+        assert(utils::calc_crit_chances(villain.score, villain.score, Action::Paces4, Action::Paces5, constants::FULL_HEALTH, TableType::Classic)
+            < utils::calc_crit_chances(villain.score, villain.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic),
             'villain < villain');
-        assert(utils::calc_crit_chances(villain.score, lord.score, Action::Paces4, Action::Paces5, constants::FULL_HEALTH)
-            < utils::calc_crit_chances(villain.score, lord.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH),
+        assert(utils::calc_crit_chances(villain.score, lord.score, Action::Paces4, Action::Paces5, constants::FULL_HEALTH, TableType::Classic)
+            < utils::calc_crit_chances(villain.score, lord.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic),
             'villain < lord');
-        assert(utils::calc_crit_chances(villain.score, trickster.score, Action::Paces4, Action::Paces5, constants::FULL_HEALTH)
-            < utils::calc_crit_chances(villain.score, trickster.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH),
+        assert(utils::calc_crit_chances(villain.score, trickster.score, Action::Paces4, Action::Paces5, constants::FULL_HEALTH, TableType::Classic)
+            < utils::calc_crit_chances(villain.score, trickster.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic),
             'villain < trickster');
     }
 
@@ -318,13 +319,13 @@ use debug::PrintTrait;
         let mut villain: Duelist = _villain(100);
         let mut trickster: Duelist = _trickster(100);
         // crit chances are higher agains villain
-        let chances_l_v: u8 = utils::calc_crit_chances(lord.score, villain.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
-        let chances_l_t: u8 = utils::calc_crit_chances(lord.score, trickster.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
+        let chances_l_v: u8 = utils::calc_crit_chances(lord.score, villain.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
+        let chances_l_t: u8 = utils::calc_crit_chances(lord.score, trickster.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
         assert(chances_l_v > chances_l_t, 'crit >');
         assert(chances_l_v == chances_l_t + chances::TRICKSTER_CRIT_PENALTY, 'TRICKSTER_CRIT_PENALTY');
         // hit chances are higher agains lord
-        let chances_v_l: u8 = utils::calc_hit_chances(villain.score, lord.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
-        let chances_v_t: u8 = utils::calc_hit_chances(villain.score, trickster.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
+        let chances_v_l: u8 = utils::calc_hit_chances(villain.score, lord.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
+        let chances_v_t: u8 = utils::calc_hit_chances(villain.score, trickster.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
         assert(chances_v_l > chances_v_t, 'hit >');
         assert(chances_v_l == chances_v_t + chances::TRICKSTER_HIT_PENALTY, 'TRICKSTER_HIT_PENALTY');
         // affects lethal_penalty at same amount
@@ -338,7 +339,7 @@ use debug::PrintTrait;
     }
 
     fn _lethal_chances(attacker: Duelist, defender: Duelist, attack: Action, defense: Action) -> u8 {
-        // let hit_chances: u8 = utils::calc_hit_chances(attacker.score, defender.score, attack, defense, constants::FULL_HEALTH);
+        // let hit_chances: u8 = utils::calc_hit_chances(attacker.score, defender.score, attack, defense, constants::FULL_HEALTH, TableType::Classic);
         let hit_chances: u8 = 50;
         let lethal_chances: u8 = utils::calc_lethal_chances(attacker.score, defender.score, attack, defense, hit_chances);
         (lethal_chances)
@@ -395,7 +396,7 @@ use debug::PrintTrait;
         //
         // no bonus
         let mut villain: Duelist = _villain(0);
-        let hit_chances_0: u8 = utils::calc_hit_chances(villain.score, villain.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
+        let hit_chances_0: u8 = utils::calc_hit_chances(villain.score, villain.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
         let lethal_chances_0: u8 = utils::calc_lethal_chances(villain.score, villain.score, Action::Paces5, Action::Paces5, hit_chances_0);
         assert(hit_chances_0 > 0, 'hit_0 > 0');
         assert(lethal_chances_0 > 0, 'lethal_0 > 0');
@@ -403,7 +404,7 @@ use debug::PrintTrait;
         //
         // 50% bonus
         villain.score.level_villain = 50;
-        let hit_chances_50: u8 = utils::calc_hit_chances(villain.score, villain.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
+        let hit_chances_50: u8 = utils::calc_hit_chances(villain.score, villain.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
         let lethal_chances_50: u8 = utils::calc_lethal_chances(villain.score, villain.score, Action::Paces5, Action::Paces5, hit_chances_50);
         assert(hit_chances_50 > 0, 'hit_50 > 0');
         assert(hit_chances_50 > hit_chances_0, 'hit_50 > hit_0');
@@ -416,7 +417,7 @@ use debug::PrintTrait;
         //
         // 100% bonus
         villain.score.level_villain = 100;
-        let hit_chances_100: u8 = utils::calc_hit_chances(villain.score, villain.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH);
+        let hit_chances_100: u8 = utils::calc_hit_chances(villain.score, villain.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
         let lethal_chances_100: u8 = utils::calc_lethal_chances(villain.score, villain.score, Action::Paces5, Action::Paces5, hit_chances_100);
         assert(hit_chances_100 > 0, 'hit_100 > 0');
         assert(hit_chances_100 > hit_chances_50, 'hit_100 > hit_50');

@@ -95,7 +95,7 @@ mod actions {
     use pistols::models::duelist::{Duelist, DuelistTrait, Archetype, Score, Pact, DuelistManager, DuelistManagerTrait};
     use pistols::models::structs::{SimulateChances};
     use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
-    use pistols::models::table::{TableConfig, TableManager, TableTrait, TableManagerTrait, tables};
+    use pistols::models::table::{TableConfig, TableManager, TableTrait, TableManagerTrait, tables, TableType};
     use pistols::models::init::{init};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
@@ -168,9 +168,9 @@ mod actions {
                 score: init::Score(),
             };
             match initial_archetype {
-                Archetype::Villainous => { duelist.score.level_villain = 10; },
-                Archetype::Trickster =>  { duelist.score.level_trickster = 10; },
-                Archetype::Honourable => { duelist.score.level_lord = 10; },
+                Archetype::Villainous => { duelist.score.level_villain = 100; },
+                Archetype::Trickster =>  { duelist.score.level_trickster = 100; },
+                Archetype::Honourable => { duelist.score.level_lord = 100; },
                 _ => {},
             };
             // // save
@@ -440,18 +440,20 @@ mod actions {
             let health: u8 = utils::call_get_duelist_health(world, duelist_address, duel_id, round_number);
             let action_self: Action = action.into();
             let action_other: Action = action.into();
+            let challenge: Challenge = get!(world, duel_id, Challenge);
+            let table_type: TableType = get!(world, challenge.table_id, TableConfig).table_type;
             // honour
             let (action_honour, duelist_honour): (i8, u8) = utils::call_simulate_honour_for_action(world, score_self, action_self);
             // crit
-            let crit_chances: u8 = utils::calc_crit_chances(score_self, score_other, action_self, action_other, health);
+            let crit_chances: u8 = utils::calc_crit_chances(score_self, score_other, action_self, action_other, health, table_type);
             let crit_base_chance: u8 = action_self.crit_chance();
-            let crit_bonus: u8 = utils::calc_crit_bonus(score_self);
+            let crit_bonus: u8 = utils::calc_crit_bonus(score_self, table_type);
             let crit_match_bonus: u8 = utils::calc_crit_match_bonus(score_self, action_self, action_other);
             let crit_trickster_penalty: u8 = utils::calc_crit_trickster_penalty(score_self, score_other);
             // hit
-            let hit_chances: u8 = utils::calc_hit_chances(score_self, score_other, action_self, action_other, health);
+            let hit_chances: u8 = utils::calc_hit_chances(score_self, score_other, action_self, action_other, health, table_type);
             let hit_base_chance: u8 = action_self.hit_chance();
-            let hit_bonus: u8 = utils::calc_hit_bonus(score_self);
+            let hit_bonus: u8 = utils::calc_hit_bonus(score_self, table_type);
             let hit_injury_penalty: u8 = utils::calc_hit_injury_penalty(action_self, health);
             let hit_trickster_penalty: u8 = utils::calc_hit_trickster_penalty(score_self, score_other);
             // lethal

@@ -58,7 +58,7 @@ export function ChallengeTableByDuelist({
   compact = false,
   tableId
 }: {
-    duelistId: BigNumberish
+  duelistId: BigNumberish
   compact: boolean
   tableId?: string
 }) {
