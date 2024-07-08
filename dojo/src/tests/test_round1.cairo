@@ -86,8 +86,8 @@ mod tests {
         let (world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
-        assert(system.has_pact(ID(A), ID(B)) == false, 'has_pact_no_1');
-        assert(system.has_pact(ID(B), ID(A)) == false, 'has_pact_no_2');
+        assert(system.has_pact(TABLE_ID, ID(A), ID(B)) == false, 'has_pact_no_1');
+        assert(system.has_pact(TABLE_ID, ID(B), ID(A)) == false, 'has_pact_no_2');
 
         let expire_seconds: u64 = timestamp::from_days(2);
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, expire_seconds);
@@ -102,8 +102,8 @@ mod tests {
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
         let new_state: ChallengeState = tester::execute_reply_challenge(system, B, duel_id, true);
         assert(new_state == ChallengeState::InProgress, 'in_progress');
-        assert(system.has_pact(ID(A), ID(B)) == true, 'has_pact_yes_1');
-        assert(system.has_pact(ID(B), ID(A)) == true, 'has_pact_yes_2');
+        assert(system.has_pact(TABLE_ID, ID(A), ID(B)) == true, 'has_pact_yes_1');
+        assert(system.has_pact(TABLE_ID, ID(B), ID(A)) == true, 'has_pact_yes_2');
 
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');
@@ -123,8 +123,8 @@ mod tests {
         let (world, system, _admin, lords) = tester::setup_world(true, false, true, true, true);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = LITTLE_BOY();
-        assert(system.has_pact(ID(A), ID(B)) == false, 'has_pact_no_1');
-        assert(system.has_pact(ID(B), ID(A)) == false, 'has_pact_no_2');
+        assert(system.has_pact(TABLE_ID, ID(A), ID(B)) == false, 'has_pact_no_1');
+        assert(system.has_pact(TABLE_ID, ID(B), ID(A)) == false, 'has_pact_no_2');
 
         let expire_seconds: u64 = timestamp::from_days(2);
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, expire_seconds);
@@ -140,8 +140,8 @@ mod tests {
         // reply...
         let new_state: ChallengeState = tester::execute_reply_challenge(system, B, duel_id, true);
         assert(new_state == ChallengeState::InProgress, 'in_progress');
-        assert(system.has_pact(ID(A), ID(B)) == true, 'has_pact_yes_1');
-        assert(system.has_pact(ID(B), ID(A)) == true, 'has_pact_yes_2');
+        assert(system.has_pact(TABLE_ID, ID(A), ID(B)) == true, 'has_pact_yes_1');
+        assert(system.has_pact(TABLE_ID, ID(B), ID(A)) == true, 'has_pact_yes_2');
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.duelist_id_b == ID(B), 'challenged_id');   // << UPDATED!!!
     }

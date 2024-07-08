@@ -125,15 +125,15 @@ mod tests {
     #[test]
     fn test_challenge_address_pact() {
         let (_world, system, _admin, _lords) = tester::setup_world(true, false, false, true, true);
-        assert(system.get_pact(ID(OWNER()), ID(OTHER())) == 0, 'get_pact_0_1');
-        assert(system.get_pact(ID(OTHER()), ID(OWNER())) == 0, 'get_pact_0_2');
-        assert(system.has_pact(ID(OWNER()), ID(OTHER())) == false, 'has_pact_0_1');
-        assert(system.has_pact(ID(OTHER()), ID(OWNER())) == false, 'has_pact_0_2');
+        assert(system.get_pact(TABLE_ID, ID(OWNER()), ID(OTHER())) == 0, 'get_pact_0_1');
+        assert(system.get_pact(TABLE_ID, ID(OTHER()), ID(OWNER())) == 0, 'get_pact_0_2');
+        assert(system.has_pact(TABLE_ID, ID(OWNER()), ID(OTHER())) == false, 'has_pact_0_1');
+        assert(system.has_pact(TABLE_ID, ID(OTHER()), ID(OWNER())) == false, 'has_pact_0_2');
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 0);
-        assert(system.get_pact(ID(OWNER()), ID(OTHER())) == duel_id, 'get_pact_1_1');
-        assert(system.get_pact(ID(OTHER()), ID(OWNER())) == duel_id, 'get_pact_1_2');
-        assert(system.has_pact(ID(OWNER()), ID(OTHER())) == true, 'has_pact_1_1');
-        assert(system.has_pact(ID(OTHER()), ID(OWNER())) == true, 'has_pact_1_2');
+        assert(system.get_pact(TABLE_ID, ID(OWNER()), ID(OTHER())) == duel_id, 'get_pact_1_1');
+        assert(system.get_pact(TABLE_ID, ID(OTHER()), ID(OWNER())) == duel_id, 'get_pact_1_2');
+        assert(system.has_pact(TABLE_ID, ID(OWNER()), ID(OTHER())) == true, 'has_pact_1_1');
+        assert(system.has_pact(TABLE_ID, ID(OTHER()), ID(OWNER())) == true, 'has_pact_1_2');
     }
 
 
@@ -172,11 +172,11 @@ mod tests {
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_seconds);
         let _ch = tester::get_Challenge(world, duel_id);
 
-        assert(system.has_pact(ID(OTHER()), ID(OWNER())) == true, 'has_pact_yes');
+        assert(system.has_pact(TABLE_ID, ID(OTHER()), ID(OWNER())) == true, 'has_pact_yes');
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_date(1, 0, 1));
         let new_state: ChallengeState = tester::execute_reply_challenge(system, OWNER(), duel_id, true);
         assert(new_state == ChallengeState::Expired, 'expired');
-        assert(system.has_pact(ID(OTHER()), ID(OWNER())) == false, 'has_pact_no');
+        assert(system.has_pact(TABLE_ID, ID(OTHER()), ID(OWNER())) == false, 'has_pact_no');
 
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');
@@ -206,10 +206,10 @@ mod tests {
         let _ch = tester::get_Challenge(world, duel_id);
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
 
-        assert(system.has_pact(ID(OTHER()), ID(OWNER())) == true, 'has_pact_yes');
+        assert(system.has_pact(TABLE_ID, ID(OTHER()), ID(OWNER())) == true, 'has_pact_yes');
         let new_state: ChallengeState = tester::execute_reply_challenge(system, OWNER(), duel_id, false);
         assert(new_state == ChallengeState::Withdrawn, 'canceled');
-        assert(system.has_pact(ID(OWNER()), ID(OTHER())) == false, 'has_pact_no');
+        assert(system.has_pact(TABLE_ID, ID(OWNER()), ID(OTHER())) == false, 'has_pact_no');
 
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');
@@ -236,11 +236,11 @@ mod tests {
         let expire_seconds: u64 = timestamp::from_days(2);
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_seconds);
 
-        assert(system.has_pact(ID(OTHER()), ID(OWNER())) == true, 'has_pact_yes');
+        assert(system.has_pact(TABLE_ID, ID(OTHER()), ID(OWNER())) == true, 'has_pact_yes');
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
         let new_state: ChallengeState = tester::execute_reply_challenge(system, OTHER(), duel_id, false);
         assert(new_state == ChallengeState::Refused, 'refused');
-        assert(system.has_pact(ID(OTHER()), ID(OWNER())) == false, 'has_pact_no');
+        assert(system.has_pact(TABLE_ID, ID(OTHER()), ID(OWNER())) == false, 'has_pact_no');
 
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');

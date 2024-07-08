@@ -61,14 +61,31 @@ fn make_pact_pair(duelist_id_a: u128, duelist_id_b: u128) -> u128 {
 }
 
 fn create_challenge_snapshot(world: IWorldDispatcher, challenge: Challenge) {
-    let scoreboard_a: Scoreboard = get!(world, (challenge.table_id, challenge.duelist_id_a), Scoreboard);
-    let scoreboard_b: Scoreboard = get!(world, (challenge.table_id, challenge.duelist_id_b), Scoreboard);
+    // copy data from Table scoreboard
+    let mut scoreboard_a: Scoreboard = get!(world, (challenge.table_id, challenge.duelist_id_a), Scoreboard);
+    let mut scoreboard_b: Scoreboard = get!(world, (challenge.table_id, challenge.duelist_id_b), Scoreboard);
+    // check maxxed up tables...
+    let table : TableConfig = TableManagerTrait::new(world).get(challenge.table_id);
+    if (table.table_type.maxxed_up_levels()) {
+        // new duelist on this table, copy levels from main profile
+        clone_snapshot_duelist_levels(world, challenge.duelist_id_a, ref scoreboard_a.score);
+        clone_snapshot_duelist_levels(world, challenge.duelist_id_b, ref scoreboard_b.score);
+    }
+    // create snapshot
     let snapshot = Snapshot {
         duel_id: challenge.duel_id,
         score_a: scoreboard_a.score,
         score_b: scoreboard_b.score,
     };
     set!(world, (snapshot));
+}
+fn clone_snapshot_duelist_levels(world: IWorldDispatcher, duelist_id: u128, ref score: Score) {
+    if (score.total_duels == 0) {
+        let duelist: Duelist = get!(world, duelist_id, Duelist);
+        score.level_villain = duelist.score.level_villain;
+        score.level_trickster = duelist.score.level_trickster;
+        score.level_lord = duelist.score.level_lord;
+    }
 }
 
 
@@ -280,6 +297,7 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         // compute honour from final round
         let table : TableConfig = TableManagerTrait::new(world).get(challenge.table_id);
         let final_round: Round = get!(world, (challenge.duel_id, challenge.round_number), Round);
+
         // update honour and levels
         update_score_honour(ref duelist_a.score, final_round.shot_a.honour);
         update_score_honour(ref duelist_b.score, final_round.shot_b.honour);

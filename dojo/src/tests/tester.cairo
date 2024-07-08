@@ -27,6 +27,7 @@ mod tester {
     use pistols::models::duelist::{
         Duelist, duelist, DuelistTrait,
         Scoreboard, scoreboard,
+        Archetype,
     };
     use pistols::models::config::{
         Config, config,
@@ -73,11 +74,15 @@ mod tester {
         // (DuelistTrait::address_to_id(address))
     }
 
+    // set_contract_address : to define the address of the calling contract,
+    // set_account_contract_address : to define the address of the account used for the current transaction.
     fn impersonate(address: ContractAddress) {
         // testing::set_caller_address(address);   // not used??
         testing::set_contract_address(address); // this is the CALLER!!
         // testing::set_account_contract_address(address); // throws 'not writer'
     }
+
+
 
     fn deploy_system(world: IWorldDispatcher, salt: felt252, class_hash: felt252) -> ContractAddress {
         let contract_address = world.deploy_contract(salt, class_hash.try_into().unwrap(), array![].span());
@@ -235,6 +240,11 @@ mod tester {
     }
 
     // ::actions
+    fn execute_mint_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: u8, profile_pic_uri: felt252, archetype: Archetype) {
+        impersonate(sender);
+        system.mint_duelist(name, profile_pic_type, profile_pic_uri, archetype);
+        _next_block();
+    }
     fn execute_update_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: u8, profile_pic_uri: felt252) {
         impersonate(sender);
         system.update_duelist(ID(sender), name, profile_pic_type, profile_pic_uri);

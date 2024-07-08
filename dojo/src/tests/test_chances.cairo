@@ -105,42 +105,42 @@ use debug::PrintTrait;
         //
         // levels
         // set!(world,(lord));
-        assert(utils::calc_crit_bonus(lord.score) == chances::CRIT_BONUS_LORD, 'level_100');
+        assert(utils::calc_crit_bonus(lord.score, TableType::Classic) == chances::CRIT_BONUS_LORD, 'level_100');
         lord.score.level_lord = 90;
-        assert(utils::calc_crit_bonus(lord.score) < chances::CRIT_BONUS_LORD, 'level_90');
+        assert(utils::calc_crit_bonus(lord.score, TableType::Classic) < chances::CRIT_BONUS_LORD, 'level_90');
         lord.score.level_lord = 50;
-        assert(utils::calc_crit_bonus(lord.score) == chances::CRIT_BONUS_LORD/2, 'level_50');
+        assert(utils::calc_crit_bonus(lord.score, TableType::Classic) == chances::CRIT_BONUS_LORD/2, 'level_50');
         lord.score.level_lord = 10;
-        assert(utils::calc_crit_bonus(lord.score) > 0, 'level_10');
+        assert(utils::calc_crit_bonus(lord.score, TableType::Classic) > 0, 'level_10');
         lord.score.level_lord = 0;
-        assert(utils::calc_crit_bonus(lord.score) == 0, 'level_0');
+        assert(utils::calc_crit_bonus(lord.score, TableType::Classic) == 0, 'level_0');
         //
         // Clamp to total_duels
         lord.score.level_lord = 100;
         lord.score.total_duels = 9;
-        assert(utils::calc_crit_bonus(lord.score) < chances::CRIT_BONUS_LORD, 'total_duels_9');
+        assert(utils::calc_crit_bonus(lord.score, TableType::Classic) < chances::CRIT_BONUS_LORD, 'total_duels_9');
         lord.score.total_duels = 5;
-        assert(utils::calc_crit_bonus(lord.score) == chances::CRIT_BONUS_LORD/2, 'total_duels_5');
+        assert(utils::calc_crit_bonus(lord.score, TableType::Classic) == chances::CRIT_BONUS_LORD/2, 'total_duels_5');
         lord.score.total_duels = 1;
-        assert(utils::calc_crit_bonus(lord.score) > 0, 'total_duels_1');
+        assert(utils::calc_crit_bonus(lord.score, TableType::Classic) > 0, 'total_duels_1');
         lord.score.total_duels = 0;
-        assert(utils::calc_crit_bonus(lord.score) == 0, 'total_duels_0');
+        assert(utils::calc_crit_bonus(lord.score, TableType::Classic) == 0, 'total_duels_0');
         //
         // not for villains
         let villain: Duelist = _villain(100);
         assert(villain.score.is_villain(), 'is_villain()');
-        assert(utils::calc_crit_bonus(villain.score) == 0, 'no_villain');
+        assert(utils::calc_crit_bonus(villain.score, TableType::Classic) == 0, 'no_villain');
         //
         // tricksters get half
         let mut trickster: Duelist = _trickster(100);
         assert(trickster.score.is_trickster(), 'is_trickster()');
-        assert(utils::calc_crit_bonus(trickster.score) == chances::CRIT_BONUS_TRICKSTER, 'trickster_level_100');
+        assert(utils::calc_crit_bonus(trickster.score, TableType::Classic) == chances::CRIT_BONUS_TRICKSTER, 'trickster_level_100');
         trickster.score.level_trickster = 50;
-        assert(utils::calc_crit_bonus(trickster.score) == chances::CRIT_BONUS_TRICKSTER/2, 'trickster_level_50');
+        assert(utils::calc_crit_bonus(trickster.score, TableType::Classic) == chances::CRIT_BONUS_TRICKSTER/2, 'trickster_level_50');
         trickster.score.level_trickster = 10;
-        assert(utils::calc_crit_bonus(trickster.score) > 0, 'trickster_level_10');
+        assert(utils::calc_crit_bonus(trickster.score, TableType::Classic) > 0, 'trickster_level_10');
         trickster.score.level_trickster = 0;
-        assert(utils::calc_crit_bonus(trickster.score) == 0, 'trickster_level_0');
+        assert(utils::calc_crit_bonus(trickster.score, TableType::Classic) == 0, 'trickster_level_0');
     }
 
     #[test]
@@ -148,40 +148,40 @@ use debug::PrintTrait;
         //
         // levels
         let mut villain: Duelist = _villain(100);
-        assert(utils::calc_hit_bonus(villain.score) == chances::HIT_BONUS_VILLAIN, 'level_100');
+        assert(utils::calc_hit_bonus(villain.score, TableType::Classic) == chances::HIT_BONUS_VILLAIN, 'level_100');
         villain.score.level_villain = 90;
-        assert(utils::calc_hit_bonus(villain.score) < chances::HIT_BONUS_VILLAIN, 'level_90');
+        assert(utils::calc_hit_bonus(villain.score, TableType::Classic) < chances::HIT_BONUS_VILLAIN, 'level_90');
         villain.score.level_villain = 50;
-        assert(utils::calc_hit_bonus(villain.score) == chances::HIT_BONUS_VILLAIN/2, 'level_50');
+        assert(utils::calc_hit_bonus(villain.score, TableType::Classic) == chances::HIT_BONUS_VILLAIN/2, 'level_50');
         villain.score.level_villain = 10;
-        assert(utils::calc_hit_bonus(villain.score) > 0, 'level_10');
+        assert(utils::calc_hit_bonus(villain.score, TableType::Classic) > 0, 'level_10');
         villain.score.level_villain = 0;
-        assert(utils::calc_hit_bonus(villain.score) == 0, 'level_0');
+        assert(utils::calc_hit_bonus(villain.score, TableType::Classic) == 0, 'level_0');
         //
         // Clamp to total_duels
         villain.score.level_villain = 100;
         villain.score.total_duels = 9;
-        assert(utils::calc_hit_bonus(villain.score) < chances::HIT_BONUS_VILLAIN, 'total_duels_9');
+        assert(utils::calc_hit_bonus(villain.score, TableType::Classic) < chances::HIT_BONUS_VILLAIN, 'total_duels_9');
         villain.score.total_duels = 5;
-        assert(utils::calc_hit_bonus(villain.score) == chances::HIT_BONUS_VILLAIN/2, 'total_duels_5');
+        assert(utils::calc_hit_bonus(villain.score, TableType::Classic) == chances::HIT_BONUS_VILLAIN/2, 'total_duels_5');
         villain.score.total_duels = 1;
-        assert(utils::calc_hit_bonus(villain.score) > 0, 'total_duels_1');
+        assert(utils::calc_hit_bonus(villain.score, TableType::Classic) > 0, 'total_duels_1');
         villain.score.total_duels = 0;
-        assert(utils::calc_hit_bonus(villain.score) == 0, 'total_duels_0');
+        assert(utils::calc_hit_bonus(villain.score, TableType::Classic) == 0, 'total_duels_0');
         //
         // not for lords
         let lord: Duelist = _lord(100);
-        assert(utils::calc_hit_bonus(lord.score) == 0, 'no_lords');
+        assert(utils::calc_hit_bonus(lord.score, TableType::Classic) == 0, 'no_lords');
         //
         // tricksters get half
         let mut trickster: Duelist = _trickster(100);
-        assert(utils::calc_hit_bonus(trickster.score) == chances::HIT_BONUS_TRICKSTER, 'trickster_level_100');
+        assert(utils::calc_hit_bonus(trickster.score, TableType::Classic) == chances::HIT_BONUS_TRICKSTER, 'trickster_level_100');
         trickster.score.level_trickster = 50;   
-        assert(utils::calc_hit_bonus(trickster.score) == chances::HIT_BONUS_TRICKSTER/2, 'trickster_level_50');
+        assert(utils::calc_hit_bonus(trickster.score, TableType::Classic) == chances::HIT_BONUS_TRICKSTER/2, 'trickster_level_50');
         trickster.score.level_trickster = 10;
-        assert(utils::calc_hit_bonus(trickster.score) > 0, 'trickster_level_10');
+        assert(utils::calc_hit_bonus(trickster.score, TableType::Classic) > 0, 'trickster_level_10');
         trickster.score.level_trickster = 0;
-        assert(utils::calc_hit_bonus(trickster.score) == 0, 'trickster_level_0');
+        assert(utils::calc_hit_bonus(trickster.score, TableType::Classic) == 0, 'trickster_level_0');
     }
 
     #[test]
@@ -277,7 +277,7 @@ use debug::PrintTrait;
         //
         // NO BONUS FOR LORDS
         let mut lord: Duelist = _lord(0);
-        let lord_0: u8 = utils::calc_hit_chances(lord.score, lord.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH), TableType::Classic;
+        let lord_0: u8 = utils::calc_hit_chances(lord.score, lord.score, Action::Paces5, Action::Paces5, constants::FULL_HEALTH, TableType::Classic);
         assert(lord_0 > 0, 'lord_0 > 0');
         //
         // 50%
