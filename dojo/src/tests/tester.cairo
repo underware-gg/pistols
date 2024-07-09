@@ -224,7 +224,7 @@ mod tester {
     // ::admin
     fn execute_admin_initialize(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress, duelist_address: ContractAddress, minter_address: ContractAddress) {
         impersonate(sender);
-        system.initialize(owner_address, treasury_address, lords_address, duelist_address, minter_address);
+        system.initialize(owner_address, treasury_address, lords_address, duelist_address, minter_address, ZERO(), ZERO());
         _next_block();
     }
     fn execute_admin_set_owner(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress) {

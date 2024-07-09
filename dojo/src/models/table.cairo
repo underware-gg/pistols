@@ -193,7 +193,7 @@ impl TableAdmittanceTraitImpl of TableAdmittanceTrait {
         } else if (self.account_a == @ZERO() && self.account_b == @ZERO()) {
             (true)
         } else {
-            (@account_address == self.account_a  || @account_address == self.account_b)
+            (@account_address == self.account_a  || @account_address == self.account_b || duelist_id <= 6)
         }
     }
 }
