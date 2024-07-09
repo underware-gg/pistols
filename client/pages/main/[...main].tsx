@@ -14,45 +14,39 @@ import Gate from '@/pistols/components/Gate'
 import Tavern from '@/pistols/components/Tavern'
 import Duel from '@/pistols/components/Duel'
 
-// enable wasm in build (this is for api routes)
+// // enable wasm in build (this is for api routes and server issues)
 // export const config = {
 //   runtime: 'experimental-edge'
 // }
 
-// const bgsTavern: Record<MenuKey, string | null> = {
-//   [MenuKey.Duelists]: null,//'BackgroundDuelists',
-//   [MenuKey.YourDuels]: null,//'BackgroundDuelsYour',
-//   [MenuKey.LiveDuels]: null,//'BackgroundDuelsLive',
-//   [MenuKey.PastDuels]: null,//'BackgroundDuelsPast',
+// //
+// // Booth config
+// import type { InferGetServerSidePropsType, GetServerSideProps } from 'next'
+// type Repo = {
+//   playerId: string
 // }
-
-//
-// Booth config
-import type { InferGetServerSidePropsType, GetServerSideProps } from 'next'
-type Repo = {
-  playerId: string
-}
-export const getServerSideProps = (async () => {
-  const repo: Repo = {
-    playerId: process.env.PLAYER_ID ?? ''
-  }
-  return { props: { repo } }
-}) satisfies GetServerSideProps<{ repo: Repo }>
+// export const getServerSideProps = (async () => {
+//   const repo: Repo = {
+//     playerId: process.env.PLAYER_ID ?? ''
+//   }
+//   return { props: { repo } }
+// }) satisfies GetServerSideProps<{ repo: Repo }>
 
 
-export default function MainPage({
-  repo,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+// export default function MainPage({
+//   repo,
+// }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function MainPage() {
   const router = useRouter()
   const { menuKey, dispatchSetScene } = usePistolsContext()
   const { playerId } = usePlayerId()
 
-  useEffect(() => {
-    console.log((repo.playerId == playerId), playerId, repo)
-    if (repo.playerId && playerId && repo.playerId != playerId) {
-      router.push('/')
-    }
-  }, [playerId, repo])
+  // useEffect(() => {
+  //   console.log((repo.playerId == playerId), playerId, repo)
+  //   if (repo.playerId && playerId && repo.playerId != playerId) {
+  //     router.push('/')
+  //   }
+  // }, [playerId, repo])
 
   const { scene, title, duelId, bgClassName } = useMemo(() => {
     let scene = undefined
