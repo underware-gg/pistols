@@ -42,20 +42,22 @@ echo ""
 #
 # if [[ "$PROFILE" != "dev" ]]; then
   echo "------------------------------------------------------------------------------"
-  echo "Cleaning..."
+  echo ">>> Cleaning..."
   sozo -P $PROFILE clean
-  echo "Building..."
+  echo ">>> Building..."
   sozo -P $PROFILE build
+  echo "👍"
 # fi
 
 #-----------------
 # migrate
 #
 echo "------------------------------------------------------------------------------"
-echo "Migrating..."
+echo ">>> Migrating..."
 # sozo --profile $PROFILE migrate plan --world $WORLD_ADDRESS
 # exit 0
 sozo -P $PROFILE migrate apply --world $WORLD_ADDRESS --name $WORLD_NAME_SEED
+echo "👍"
 
 #-----------------
 # auth write
@@ -66,9 +68,11 @@ scripts/default_auth.sh $PROFILE
 #------------------------
 # copy manifest to client
 #
-echo "Copying manifest [$MANIFEST_FILE_PATH] to [$CLIENT_PATH/]"
+echo "------------------------------------------------------------------------------"
+echo ">>> Copying manifest [$MANIFEST_FILE_PATH] to [$CLIENT_PATH/]"
 mkdir -p $CLIENT_PATH
 cp $MANIFEST_FILE_PATH $CLIENT_PATH/
+echo "👍"
 
 #------------------------
 # typescript bindings
@@ -80,11 +84,15 @@ cp $MANIFEST_FILE_PATH $CLIENT_PATH/
 #
 # TODO: Remove this when bindings are working
 # copy to client
+echo "------------------------------------------------------------------------------"
+echo ">>> Generate sources..."
 cd ../client
 npm run create-components --game=$GAME_SLUG --profile=$PROFILE $RPC_URL $WORLD_ADDRESS
 npm run create-constants --game=$GAME_SLUG --profile=$PROFILE
+echo "👍?"
 
 # list copied files
+echo "------------------------------------------------------------------------------"
 ls -ld $CLIENT_PATH/* | grep -E 'ts|json'
 
 #------------------

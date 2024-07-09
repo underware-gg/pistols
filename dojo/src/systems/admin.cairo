@@ -30,7 +30,7 @@ mod admin {
     use starknet::{get_caller_address, get_contract_address};
 
     use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
-    use pistols::models::table::{TableConfig, TableManager, TableManagerTrait, default_tables};
+    use pistols::models::table::{TableConfig, TableManager, TableManagerTrait};
     use pistols::libs::utils;
 
     mod Errors {
@@ -66,8 +66,7 @@ mod admin {
             config.paused = false;
             manager.set(config);
             // set lords
-            let manager = TableManagerTrait::new(world);
-            manager.set_array(@default_tables(lords_address));
+            TableManagerTrait::new(world).initialize(lords_address);
         }
 
         fn is_initialized(world: @IWorldDispatcher) -> bool {

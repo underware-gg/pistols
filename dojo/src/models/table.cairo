@@ -129,6 +129,21 @@ impl TableManagerTraitImpl of TableManagerTrait {
         let admittance: TableAdmittance = get!(self.world, (table_id), TableAdmittance);
         (admittance.can_join(account_address, duelist_id))
     }
+    //
+    // Initialize tables
+    fn initialize(self: TableManager, lords_address: ContractAddress) {
+        //
+        // default tables
+        self.set_array(@default_tables(lords_address));
+        //
+        // Brussels setup
+        let admittance = TableAdmittance{
+            table_id: tables::BRUSSELS,
+            accounts: array![],
+            duelists: array![1,2,3,4,5,6],
+        };
+        set!(self.world, (admittance));
+    }
 }
 
 //---------------------------
