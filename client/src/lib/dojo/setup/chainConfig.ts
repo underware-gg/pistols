@@ -67,8 +67,8 @@ export const getStarknetProviderChains = (supportedChainIds: ChainId[]): Chain[]
   }, [])
 }
 
-export const getChainMasterAccount = (chainId: ChainId): PredeployedAccount => {
-  const dojoChainConfig = dojoContextConfig[chainId]
+export const getChainMasterAccount = (dojoChainConfig: DojoChainConfig): PredeployedAccount => {
+  // const dojoChainConfig = dojoContextConfig[chainId]
   if (dojoChainConfig?.masterAddress && dojoChainConfig?.masterPrivateKey) {
     return {
       name: 'Master Account',

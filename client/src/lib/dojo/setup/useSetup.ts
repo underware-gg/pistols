@@ -119,7 +119,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   } = useAsyncMemo<PredeployedManager>(async () => {
     if (!dojoProvider) return (dojoProvider as any) // undefined or null
     let predeployedAccounts = [...selectedChainConfig.predeployedAccounts]
-    const masterAccount = getChainMasterAccount(chainId)
+    const masterAccount = getChainMasterAccount(selectedChainConfig)
     if (masterAccount) {
       predeployedAccounts.push(masterAccount)
     }
