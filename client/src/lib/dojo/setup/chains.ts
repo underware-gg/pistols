@@ -133,8 +133,8 @@ const pistolsSlotConfig: DojoChainConfig = {
   rpcUrl: 'https://us-east.api.cartridge.gg/x/pistols/katana',
   toriiUrl: 'https://api.cartridge.gg/x/pistols/torii',
   relayUrl: undefined,
-  masterAddress: '0x199df3260858b341a7985245c94361a320569635d0c405b1827ffa4d7ded985',
-  masterPrivateKey: '0x680cf081e48a2c0651fe1a66b9f4b52203951a746e5d6c14aa65ed8e4245b88',
+  masterAddress: '0x2ec24cd4415a28e821c5b4b9dc3801340cb2e1a23f4289443d15fea60e2daab',
+  masterPrivateKey: '0x1f3a9e4f7827167d6f7e93b8f2debc3129b06ceca19d02355434499592bf16c',
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
   lordsContractAddress: undefined, // lords_mock

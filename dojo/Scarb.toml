@@ -69,8 +69,8 @@ private_key = "0x2bbf4f9fd0bbb2e60b0316c1fe0b76cf7a4d0198bd493ced9b8df2a3a24d68a
 [profile.slot.tool.dojo.env]
 rpc_url = "https://api.cartridge.gg/x/pistols/katana"
 world_address = "0x0545c8aff15426c3d43b3ba8fd45c61870b30ca4ec0bfbd69193facee4c7b97c"
-account_address = "0x199df3260858b341a7985245c94361a320569635d0c405b1827ffa4d7ded985"
-private_key = "0x680cf081e48a2c0651fe1a66b9f4b52203951a746e5d6c14aa65ed8e4245b88"
+account_address = "0x2ec24cd4415a28e821c5b4b9dc3801340cb2e1a23f4289443d15fea60e2daab"
+private_key = "0x1f3a9e4f7827167d6f7e93b8f2debc3129b06ceca19d02355434499592bf16c"
 
 # -----------------------
 # staging (pistols-slot)
