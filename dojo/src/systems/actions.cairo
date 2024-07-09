@@ -237,14 +237,14 @@ mod actions {
             assert(challenged_id_or_address != utils::ZERO(), Errors::INVALID_CHALLENGED_NULL);
             let duelist_id_b: u128 = DuelistTrait::address_to_id(challenged_id_or_address);
             let address_b: ContractAddress = if (duelist_id_b > 0) {
-                // challenging a duelist
+                // challenging a duelist...
                 assert(duelist_manager.exists(duelist_id_b) == true, Errors::INVALID_CHALLENGED);
                 assert(duelist_id_a != duelist_id_b, Errors::INVALID_CHALLENGED_SELF);
                 assert(self.has_pact(table_id, duelist_id_a, duelist_id_b) == false, Errors::CHALLENGE_EXISTS);
                 (utils::ZERO())
             } else {
-                // challenging a wallet
-                assert(challenged_id_or_address != address_a, Errors::INVALID_CHALLENGED_SELF);
+                // challenging a wallet...
+                // assert(challenged_id_or_address != address_a, Errors::INVALID_CHALLENGED_SELF);
                 (challenged_id_or_address)
             };
             assert(table_manager.can_join(table_id, address_b, duelist_id_b), Errors::CHALLENGED_NOT_ADMITTED);
@@ -340,14 +340,17 @@ mod actions {
                 // validate challenged identity
                 // either wallet ot duelist was challenged, never both
                 if (challenge.duelist_id_b != 0) {
-                    // challenged the duelist
+                    // challenged the duelist...
+                    // can only be accepted by it
                     assert(challenge.duelist_id_b == duelist_id_b, Errors::NOT_YOUR_CHALLENGE);
                     // fill missing wallet
                     challenge.address_b = address_b;
                 } else {
-                    // challenged the wallet
+                    // challenged the wallet...
+                    // can only be accepted by it
                     assert(challenge.address_b == address_b, Errors::NOT_YOUR_CHALLENGE);
-                    // check if chosed duelist has a pact
+                    // validate chosen duelist
+                    assert(challenge.duelist_id_a != duelist_id_b, Errors::INVALID_CHALLENGED_SELF);
                     assert(self.has_pact(challenge.table_id, challenge.duelist_id_a, duelist_id_b) == false, Errors::CHALLENGE_EXISTS);
                     // fil missing duelist
                     challenge.duelist_id_b = duelist_id_b;
