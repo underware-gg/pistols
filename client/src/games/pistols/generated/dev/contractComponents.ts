@@ -113,11 +113,11 @@ export function defineContractComponents(world: World) {
     TableAdmittance: (() => {
       return defineComponent(
         world,
-        { table_id: RecsType.BigInt, accounts: RecsType.StringArray, duelists: RecsType.StringArray },
+        { table_id: RecsType.BigInt, account_a: RecsType.BigInt, account_b: RecsType.BigInt },
         {
           metadata: {
             name: "TableAdmittance",
-            types: ["felt252"],
+            types: ["felt252","contractaddress","contractaddress"],
             customTypes: [],
           },
         }

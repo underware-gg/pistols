@@ -124,7 +124,7 @@ INITIALIZED=$(sozo --profile $PROFILE call --world $WORLD_ADDRESS $ADMIN_ADDRESS
 if [[ $INITIALIZED == *"0x1"* ]]; then
     echo "Already initialized"
 else
-  sozo --profile $PROFILE execute --world $WORLD_ADDRESS --wait $ADMIN_ADDRESS initialize --calldata 0x0,0x0,$LORDS_ADDRESS,$DUELISTS_ADDRESS,$MINTER_ADDRESS || true
+  sozo --profile $PROFILE execute --world $WORLD_ADDRESS --wait $ADMIN_ADDRESS initialize --calldata 0x0,0x0,$LORDS_ADDRESS,$DUELISTS_ADDRESS,$MINTER_ADDRESS,$ACCOUNT_A,$ACCOUNT_B || true
 fi
 
 echo "👍"

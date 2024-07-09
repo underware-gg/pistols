@@ -9,7 +9,15 @@ use pistols::models::table::{TableConfig};
 
 #[dojo::interface]
 trait IAdmin {
-    fn initialize(ref world: IWorldDispatcher, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress, token_duelist_address: ContractAddress, minter_address: ContractAddress);
+    fn initialize(ref world: IWorldDispatcher,
+        owner_address: ContractAddress,
+        treasury_address: ContractAddress,
+        lords_address: ContractAddress,
+        token_duelist_address: ContractAddress,
+        minter_address: ContractAddress,
+        account_a: ContractAddress,
+        account_b: ContractAddress,
+    );
     fn is_initialized(world: @IWorldDispatcher) -> bool;
     
     fn set_owner(ref world: IWorldDispatcher, owner_address: ContractAddress);
@@ -52,6 +60,8 @@ mod admin {
             lords_address: ContractAddress,
             token_duelist_address: ContractAddress,
             minter_address: ContractAddress,
+            account_a: ContractAddress,
+            account_b: ContractAddress,
         ) {
             self.assert_initializer_is_owner();
             let manager = ConfigManagerTrait::new(world);
@@ -66,7 +76,7 @@ mod admin {
             config.paused = false;
             manager.set(config);
             // set lords
-            TableManagerTrait::new(world).initialize(lords_address);
+            TableManagerTrait::new(world).initialize(lords_address, account_a, account_b);
         }
 
         fn is_initialized(world: @IWorldDispatcher) -> bool {
