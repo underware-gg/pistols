@@ -107,14 +107,44 @@
         "type": "core::starknet::contract_address::ContractAddress"
       },
       {
+        "name": "token_duelist_address",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "minter_address",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
         "name": "paused",
         "type": "core::bool"
       }
     ]
   },
   {
+    "type": "enum",
+    "name": "pistols::models::table::TableType",
+    "variants": [
+      {
+        "name": "Undefined",
+        "type": "()"
+      },
+      {
+        "name": "Classic",
+        "type": "()"
+      },
+      {
+        "name": "Tournament",
+        "type": "()"
+      },
+      {
+        "name": "IRLTournament",
+        "type": "()"
+      }
+    ]
+  },
+  {
     "type": "struct",
-    "name": "pistols::models::table::TTable",
+    "name": "pistols::models::table::TableConfig",
     "members": [
       {
         "name": "table_id",
@@ -146,7 +176,7 @@
       },
       {
         "name": "table_type",
-        "type": "core::integer::u8"
+        "type": "pistols::models::table::TableType"
       }
     ]
   },
@@ -168,6 +198,22 @@
           },
           {
             "name": "lords_address",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "token_duelist_address",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "minter_address",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "account_a",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "account_b",
             "type": "core::starknet::contract_address::ContractAddress"
           }
         ],
@@ -291,7 +337,7 @@
         ],
         "outputs": [
           {
-            "type": "pistols::models::table::TTable"
+            "type": "pistols::models::table::TableConfig"
           }
         ],
         "state_mutability": "view"

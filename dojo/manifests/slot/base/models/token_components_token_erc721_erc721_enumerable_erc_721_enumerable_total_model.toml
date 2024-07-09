@@ -1,0 +1,15 @@
+kind = "DojoModel"
+class_hash = "0x254d52feafeeabcf794133e9fc1eeb0b0d5d7089189e400b989706b192c7ad9"
+original_class_hash = "0x254d52feafeeabcf794133e9fc1eeb0b0d5d7089189e400b989706b192c7ad9"
+abi = "manifests/slot/abis/base/models/token_components_token_erc721_erc721_enumerable_erc_721_enumerable_total_model.json"
+name = "token::components::token::erc721::erc721_enumerable::erc_721_enumerable_total_model"
+
+[[members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "total_supply"
+type = "u128"
+key = false

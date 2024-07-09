@@ -102,6 +102,20 @@
     "interface_name": "pistols::mocks::lords_mock::ILordsMockFaucet"
   },
   {
+    "type": "struct",
+    "name": "core::integer::u256",
+    "members": [
+      {
+        "name": "low",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "high",
+        "type": "core::integer::u128"
+      }
+    ]
+  },
+  {
     "type": "interface",
     "name": "pistols::mocks::lords_mock::ILordsMockFaucet",
     "items": [
@@ -109,6 +123,22 @@
         "type": "function",
         "name": "faucet",
         "inputs": [],
+        "outputs": [],
+        "state_mutability": "external"
+      },
+      {
+        "type": "function",
+        "name": "mint",
+        "inputs": [
+          {
+            "name": "to",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "amount",
+            "type": "core::integer::u256"
+          }
+        ],
         "outputs": [],
         "state_mutability": "external"
       }
@@ -221,20 +251,6 @@
     "type": "impl",
     "name": "ERC20MetadataTotalSupplyImpl",
     "interface_name": "token::components::token::erc20::erc20_metadata::IERC20MetadataTotalSupply"
-  },
-  {
-    "type": "struct",
-    "name": "core::integer::u256",
-    "members": [
-      {
-        "name": "low",
-        "type": "core::integer::u128"
-      },
-      {
-        "name": "high",
-        "type": "core::integer::u128"
-      }
-    ]
   },
   {
     "type": "interface",
@@ -560,12 +576,6 @@
   },
   {
     "type": "event",
-    "name": "token::components::token::erc20::erc20_burnable::erc20_burnable_component::Event",
-    "kind": "enum",
-    "variants": []
-  },
-  {
-    "type": "event",
     "name": "pistols::mocks::lords_mock::lords_mock::Event",
     "kind": "enum",
     "variants": [
@@ -597,11 +607,6 @@
       {
         "name": "ERC20MintableEvent",
         "type": "token::components::token::erc20::erc20_mintable::erc20_mintable_component::Event",
-        "kind": "nested"
-      },
-      {
-        "name": "ERC20BurnableEvent",
-        "type": "token::components::token::erc20::erc20_burnable::erc20_burnable_component::Event",
         "kind": "nested"
       }
     ]

@@ -1,0 +1,25 @@
+kind = "DojoModel"
+class_hash = "0x762ff8a2da45cda62e2bf84276e2f7378b9b158bce2a0478c96b8dfd5c073b1"
+original_class_hash = "0x762ff8a2da45cda62e2bf84276e2f7378b9b158bce2a0478c96b8dfd5c073b1"
+abi = "manifests/slot/abis/base/models/token_components_token_erc721_erc721_approval_erc_721_operator_approval_model.json"
+name = "token::components::token::erc721::erc721_approval::erc_721_operator_approval_model"
+
+[[members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "owner"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "operator"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "approved"
+type = "bool"
+key = false

@@ -357,6 +357,14 @@
         "type": "core::starknet::contract_address::ContractAddress"
       },
       {
+        "name": "token_duelist_address",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "minter_address",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
         "name": "paused",
         "type": "core::bool"
       }

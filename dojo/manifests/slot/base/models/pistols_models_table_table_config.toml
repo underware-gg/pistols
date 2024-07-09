@@ -1,0 +1,45 @@
+kind = "DojoModel"
+class_hash = "0x429e7f4af04864d9cd0081d6b55293ce22ddd09e5a41f9a3667e9a4626cc726"
+original_class_hash = "0x429e7f4af04864d9cd0081d6b55293ce22ddd09e5a41f9a3667e9a4626cc726"
+abi = "manifests/slot/abis/base/models/pistols_models_table_table_config.json"
+name = "pistols::models::table::table_config"
+
+[[members]]
+name = "table_id"
+type = "felt252"
+key = true
+
+[[members]]
+name = "description"
+type = "felt252"
+key = false
+
+[[members]]
+name = "contract_address"
+type = "ContractAddress"
+key = false
+
+[[members]]
+name = "wager_min"
+type = "u256"
+key = false
+
+[[members]]
+name = "fee_min"
+type = "u256"
+key = false
+
+[[members]]
+name = "fee_pct"
+type = "u8"
+key = false
+
+[[members]]
+name = "is_open"
+type = "bool"
+key = false
+
+[[members]]
+name = "table_type"
+type = "TableType"
+key = false

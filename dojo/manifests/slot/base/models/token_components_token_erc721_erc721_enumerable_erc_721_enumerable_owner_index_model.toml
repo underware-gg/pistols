@@ -1,0 +1,25 @@
+kind = "DojoModel"
+class_hash = "0x6eb61f3bca048d7ac7e518cb65393ac8448fbe7a67ab4ea1aa113248626cb8b"
+original_class_hash = "0x6eb61f3bca048d7ac7e518cb65393ac8448fbe7a67ab4ea1aa113248626cb8b"
+abi = "manifests/slot/abis/base/models/token_components_token_erc721_erc721_enumerable_erc_721_enumerable_owner_index_model.json"
+name = "token::components::token::erc721::erc721_enumerable::erc_721_enumerable_owner_index_model"
+
+[[members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "owner"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "index"
+type = "u128"
+key = true
+
+[[members]]
+name = "token_id"
+type = "u128"
+key = false
