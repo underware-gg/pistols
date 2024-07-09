@@ -1,4 +1,4 @@
-# Pistols at 10 Blocks
+# Pistols at 10 Blocks (ETHCC Brussels)
 
 A fully on-chain game, made with love, by Loot Underworld, with Dojo, for Realms, on Starknet.
 
