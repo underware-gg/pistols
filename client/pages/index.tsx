@@ -3,20 +3,22 @@ import Link from 'next/link'
 import App from '@/lib/ui/App'
 import Background from '@/pistols/components/Background'
 import Logo from '@/pistols/components/Logo'
+import { usePlayerId } from '@/lib/dojo/hooks/usePlayerId'
 
 export default function IndexPage() {
+  const { playerId } = usePlayerId()
   return (
     <App>
       <Background className='BackgroundSplash'>
         <div className='AlignCenter'>
 
-          <Link href='/gate'>
+          <Link href='https://pistols.underware.gg/gate'>
             <Logo />
           </Link>
 
           <div className='Spacer20' />
 
-          <Link href='/gate'>
+          <Link href='https://pistols.underware.gg/gate'>
             <h1 className='TitleCase'>Pistols at 10 Blocks</h1>
           </Link>
 

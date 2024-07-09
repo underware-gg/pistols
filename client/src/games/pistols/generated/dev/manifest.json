@@ -1646,8 +1646,8 @@
     {
       "kind": "DojoContract",
       "address": "0x30663cb812dc7e2930b9683945132ca6054483af40e1e7daccb77091e02e7b1",
-      "class_hash": "0x2a620796f20cb8efc3b142dd7dc40370c46b8301173e6a2920d761b629e873d",
-      "original_class_hash": "0x2a620796f20cb8efc3b142dd7dc40370c46b8301173e6a2920d761b629e873d",
+      "class_hash": "0x53e24e6c20b55d9fc56d3856d2fe4aad0991948ec06a7dc2c264b43dfb56554",
+      "original_class_hash": "0x53e24e6c20b55d9fc56d3856d2fe4aad0991948ec06a7dc2c264b43dfb56554",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -2536,8 +2536,8 @@
     {
       "kind": "DojoContract",
       "address": "0x725717f8ac5508bb1b6dfbf53949f20b7f38f59c7310feab688cb5f18ef0635",
-      "class_hash": "0x118fe858b9d1bb4a2ad9c8e6e0953a1e975e99537dba984971a9dd8d79bbb7d",
-      "original_class_hash": "0x118fe858b9d1bb4a2ad9c8e6e0953a1e975e99537dba984971a9dd8d79bbb7d",
+      "class_hash": "0x1ca9fe17ce5fca6acd2f8bc4a098f50351fc8bc17b090c971eaf29a15fe6a56",
+      "original_class_hash": "0x1ca9fe17ce5fca6acd2f8bc4a098f50351fc8bc17b090c971eaf29a15fe6a56",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -2747,6 +2747,14 @@
                 },
                 {
                   "name": "minter_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "account_a",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "account_b",
                   "type": "core::starknet::contract_address::ContractAddress"
                 }
               ],
@@ -3205,8 +3213,8 @@
       "computed": [],
       "init_calldata": [
         "$contract_address:pistols::systems::token_duelist::token_duelist",
-        "512",
-        "3",
+        "10000",
+        "100",
         "1"
       ],
       "name": "pistols::systems::minter::minter"
@@ -7798,18 +7806,18 @@
           "key": true
         },
         {
-          "name": "accounts",
-          "type": "Array<ContractAddress>",
+          "name": "account_a",
+          "type": "ContractAddress",
           "key": false
         },
         {
-          "name": "duelists",
-          "type": "Array<u128>",
+          "name": "account_b",
+          "type": "ContractAddress",
           "key": false
         }
       ],
-      "class_hash": "0x5a0e21f8cad43b6679931f00416be00635fd39b969ee4107ad764e9c474bb8f",
-      "original_class_hash": "0x5a0e21f8cad43b6679931f00416be00635fd39b969ee4107ad764e9c474bb8f",
+      "class_hash": "0x506b155f8dbf1bf15943979cba5d883571d973cbab16deae21d50bb952f6dd5",
+      "original_class_hash": "0x506b155f8dbf1bf15943979cba5d883571d973cbab16deae21d50bb952f6dd5",
       "abi": [
         {
           "type": "impl",
@@ -8143,12 +8151,12 @@
               "type": "core::felt252"
             },
             {
-              "name": "accounts",
-              "type": "core::array::Array::<core::starknet::contract_address::ContractAddress>"
+              "name": "account_a",
+              "type": "core::starknet::contract_address::ContractAddress"
             },
             {
-              "name": "duelists",
-              "type": "core::array::Array::<core::integer::u128>"
+              "name": "account_b",
+              "type": "core::starknet::contract_address::ContractAddress"
             }
           ]
         },

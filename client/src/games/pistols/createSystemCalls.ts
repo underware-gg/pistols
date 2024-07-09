@@ -203,7 +203,7 @@ export function createSystemCalls(
   const simulate_chances = async (duelist_id: BigNumberish, duel_id: BigNumberish, round_number: number, action): Promise<any | null> => {
     const args = [duelist_id, duel_id, round_number, action]
     const results = await _executeCall<any>(actions_call('simulate_chances', args))
-    console.log(`simulate_chances`, results)
+    console.log(`simulate_chances`, args, results)
     if (!results) return null
     // convert to u8 / i8
     return Object.keys(results).reduce((acc, k) => {

@@ -13,6 +13,7 @@ import { bigintToHex } from '@/lib/utils/types'
 import { weiToEth } from '@/lib/utils/starknet'
 import AppPistols from '@/pistols/components/AppPistols'
 import { useChallenge } from '@/pistols/hooks/useChallenge'
+import { table } from 'console'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -90,6 +91,7 @@ function DuelStats({
   duelId: bigint
 }) {
   const { challenge } = useDuel(duelId)
+  const { description } = useTable(challenge.tableId)
   const { nameDisplay: nameA } = useDuelist(challenge.duelistIdA)
   const { nameDisplay: nameB } = useDuelist(challenge.duelistIdB)
 
@@ -98,7 +100,11 @@ function DuelStats({
       <Header>
         <Row>
           <HeaderCell width={4}><h5>Challenge</h5></HeaderCell>
-          <HeaderCell>{bigintToHex(duelId)}</HeaderCell>
+          <HeaderCell>
+            {bigintToHex(duelId)}
+            <br />
+            {duelId.toString()}
+          </HeaderCell>
         </Row>
       </Header>
 
@@ -121,6 +127,12 @@ function DuelStats({
           </Cell>
           <Cell>
             <b>{nameB}</b>
+          </Cell>
+        </Row>
+        <Row>
+          <Cell>Table</Cell>
+          <Cell>
+            {challenge.tableId} ({description})
           </Cell>
         </Row>
         <Row>

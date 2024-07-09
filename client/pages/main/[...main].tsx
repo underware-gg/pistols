@@ -4,6 +4,7 @@ import { useRouterStarter, useRouterListener } from '@/pistols/hooks/useRouterLi
 import { usePistolsContext, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
+import { usePlayerId } from '@/lib/dojo/hooks/usePlayerId'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import AppPistols from '@/pistols/components/AppPistols'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
@@ -25,9 +26,33 @@ import Duel from '@/pistols/components/Duel'
 //   [MenuKey.PastDuels]: null,//'BackgroundDuelsPast',
 // }
 
-export default function MainPage() {
+//
+// Booth config
+import type { InferGetServerSidePropsType, GetServerSideProps } from 'next'
+type Repo = {
+  playerId: string
+}
+export const getServerSideProps = (async () => {
+  const repo: Repo = {
+    playerId: process.env.PLAYER_ID ?? ''
+  }
+  return { props: { repo } }
+}) satisfies GetServerSideProps<{ repo: Repo }>
+
+
+export default function MainPage({
+  repo,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter()
   const { menuKey, dispatchSetScene } = usePistolsContext()
+  const { playerId } = usePlayerId()
+
+  useEffect(() => {
+    console.log((repo.playerId == playerId), playerId, repo)
+    if (repo.playerId && playerId && repo.playerId != playerId) {
+      router.push('/')
+    }
+  }, [playerId, repo])
 
   const { scene, title, duelId, bgClassName } = useMemo(() => {
     let scene = undefined
