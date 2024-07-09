@@ -207,6 +207,14 @@
           {
             "name": "minter_address",
             "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "account_a",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "account_b",
+            "type": "core::starknet::contract_address::ContractAddress"
           }
         ],
         "outputs": [],

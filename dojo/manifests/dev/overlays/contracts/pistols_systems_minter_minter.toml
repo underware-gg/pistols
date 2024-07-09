@@ -4,7 +4,7 @@ writes = ["TokenConfig"]
 computed = []
 init_calldata = [
   "$contract_address:pistols::systems::token_duelist::token_duelist",
-  "512",
-  "3",
-  "1",
+  "10000",  # max supply
+  "100",    # max per wallet
+  "1",      # is_open
 ]

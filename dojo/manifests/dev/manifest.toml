@@ -35,8 +35,8 @@ name = "pistols::mocks::lords_mock::lords_mock"
 [[contracts]]
 kind = "DojoContract"
 address = "0x30663cb812dc7e2930b9683945132ca6054483af40e1e7daccb77091e02e7b1"
-class_hash = "0x5153dcda1ffb4a89a132c0eef5cfdc041cc73ed81a50a6307ed23fd84ece233"
-original_class_hash = "0x5153dcda1ffb4a89a132c0eef5cfdc041cc73ed81a50a6307ed23fd84ece233"
+class_hash = "0x53e24e6c20b55d9fc56d3856d2fe4aad0991948ec06a7dc2c264b43dfb56554"
+original_class_hash = "0x53e24e6c20b55d9fc56d3856d2fe4aad0991948ec06a7dc2c264b43dfb56554"
 base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
 abi = "manifests/dev/abis/deployments/contracts/pistols_systems_actions_actions.json"
 reads = []
@@ -48,8 +48,8 @@ name = "pistols::systems::actions::actions"
 [[contracts]]
 kind = "DojoContract"
 address = "0x725717f8ac5508bb1b6dfbf53949f20b7f38f59c7310feab688cb5f18ef0635"
-class_hash = "0x4f7ed485fc8ed0c06f67f2ca9e529c8a705e7a892c3eb43e65a353eaf0395d3"
-original_class_hash = "0x4f7ed485fc8ed0c06f67f2ca9e529c8a705e7a892c3eb43e65a353eaf0395d3"
+class_hash = "0x1ca9fe17ce5fca6acd2f8bc4a098f50351fc8bc17b090c971eaf29a15fe6a56"
+original_class_hash = "0x1ca9fe17ce5fca6acd2f8bc4a098f50351fc8bc17b090c971eaf29a15fe6a56"
 base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
 abi = "manifests/dev/abis/deployments/contracts/pistols_systems_admin_admin.json"
 reads = []
@@ -70,8 +70,8 @@ writes = ["TokenConfig"]
 computed = []
 init_calldata = [
     "$contract_address:pistols::systems::token_duelist::token_duelist",
-    "512",
-    "3",
+    "10000",
+    "100",
     "1",
 ]
 name = "pistols::systems::minter::minter"
@@ -367,8 +367,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x5a0e21f8cad43b6679931f00416be00635fd39b969ee4107ad764e9c474bb8f"
-original_class_hash = "0x5a0e21f8cad43b6679931f00416be00635fd39b969ee4107ad764e9c474bb8f"
+class_hash = "0x506b155f8dbf1bf15943979cba5d883571d973cbab16deae21d50bb952f6dd5"
+original_class_hash = "0x506b155f8dbf1bf15943979cba5d883571d973cbab16deae21d50bb952f6dd5"
 abi = "manifests/dev/abis/deployments/models/pistols_models_table_table_admittance.json"
 name = "pistols::models::table::table_admittance"
 
@@ -378,13 +378,13 @@ type = "felt252"
 key = true
 
 [[models.members]]
-name = "accounts"
-type = "Array<ContractAddress>"
+name = "account_a"
+type = "ContractAddress"
 key = false
 
 [[models.members]]
-name = "duelists"
-type = "Array<u128>"
+name = "account_b"
+type = "ContractAddress"
 key = false
 
 [[models]]

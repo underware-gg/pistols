@@ -1646,8 +1646,8 @@
     {
       "kind": "DojoContract",
       "address": "0x30663cb812dc7e2930b9683945132ca6054483af40e1e7daccb77091e02e7b1",
-      "class_hash": "0x5153dcda1ffb4a89a132c0eef5cfdc041cc73ed81a50a6307ed23fd84ece233",
-      "original_class_hash": "0x5153dcda1ffb4a89a132c0eef5cfdc041cc73ed81a50a6307ed23fd84ece233",
+      "class_hash": "0x2a620796f20cb8efc3b142dd7dc40370c46b8301173e6a2920d761b629e873d",
+      "original_class_hash": "0x2a620796f20cb8efc3b142dd7dc40370c46b8301173e6a2920d761b629e873d",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -2222,8 +2222,8 @@
               "name": "simulate_chances",
               "inputs": [
                 {
-                  "name": "duelist_address",
-                  "type": "core::starknet::contract_address::ContractAddress"
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
                 },
                 {
                   "name": "duel_id",
@@ -2536,8 +2536,8 @@
     {
       "kind": "DojoContract",
       "address": "0x725717f8ac5508bb1b6dfbf53949f20b7f38f59c7310feab688cb5f18ef0635",
-      "class_hash": "0x4f7ed485fc8ed0c06f67f2ca9e529c8a705e7a892c3eb43e65a353eaf0395d3",
-      "original_class_hash": "0x4f7ed485fc8ed0c06f67f2ca9e529c8a705e7a892c3eb43e65a353eaf0395d3",
+      "class_hash": "0x118fe858b9d1bb4a2ad9c8e6e0953a1e975e99537dba984971a9dd8d79bbb7d",
+      "original_class_hash": "0x118fe858b9d1bb4a2ad9c8e6e0953a1e975e99537dba984971a9dd8d79bbb7d",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {

@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x5a0e21f8cad43b6679931f00416be00635fd39b969ee4107ad764e9c474bb8f"
-original_class_hash = "0x5a0e21f8cad43b6679931f00416be00635fd39b969ee4107ad764e9c474bb8f"
+class_hash = "0x506b155f8dbf1bf15943979cba5d883571d973cbab16deae21d50bb952f6dd5"
+original_class_hash = "0x506b155f8dbf1bf15943979cba5d883571d973cbab16deae21d50bb952f6dd5"
 abi = "manifests/dev/abis/base/models/pistols_models_table_table_admittance.json"
 name = "pistols::models::table::table_admittance"
 
@@ -10,11 +10,11 @@ type = "felt252"
 key = true
 
 [[members]]
-name = "accounts"
-type = "Array<ContractAddress>"
+name = "account_a"
+type = "ContractAddress"
 key = false
 
 [[members]]
-name = "duelists"
-type = "Array<u128>"
+name = "account_b"
+type = "ContractAddress"
 key = false
