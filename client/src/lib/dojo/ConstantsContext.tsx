@@ -28,12 +28,12 @@ export const ConstantsProvider = ({
   // console.log(constants)
 
   // initialize default table
-  const { dispatchTableId, tableId } = useSettings()
+  const { dispatchTableId, tableId, initialized } = useSettings()
   useEffect(() => {
-    if (!tableId && constants.tables?.LORDS) {
+    if (initialized && !tableId && constants.tables?.LORDS) {
       dispatchTableId(constants.tables.LORDS)
     }
-  }, [constants, tableId])
+  }, [initialized, tableId, constants.tables])
 
   // assert mask is correct
   useEffect(() => {

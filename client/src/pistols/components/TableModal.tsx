@@ -22,7 +22,7 @@ export default function TableModal({
 }: {
   opener: Opener
 }) {
-  const { tableId } = useSettings()
+  const { tableId, dispatchTableId } = useSettings()
   const [selectedTableId, setSelectedTableId] = useState('')
   const { tableIsOpen } = useTable(selectedTableId)
 
@@ -49,7 +49,8 @@ export default function TableModal({
 
   const router = useRouter()
   const _joinTable = () => {
-    router.push(makeTavernUrl(selectedTableId))
+    dispatchTableId(selectedTableId)
+    router.replace(makeTavernUrl(selectedTableId))
     opener.close()
   }
 
@@ -75,7 +76,7 @@ export default function TableModal({
       </Modal.Header>
       <Modal.Content>
         <Modal.Description className='FillParent TitleCase'>
-          <TableSwitcher tableId={selectedTableId} setSelectedTableId={setSelectedTableId}/>
+          <TableSwitcher tableId={selectedTableId} setSelectedTableId={setSelectedTableId} />
           <Divider hidden />
           <TableDescription tableId={selectedTableId} />
         </Modal.Description>
@@ -110,7 +111,7 @@ function TableDescription({
     feePct,
     tableIsOpen,
     tableType,
- } = useTable(tableId)
+  } = useTable(tableId)
   const { tokenName, tokenSymbol } = useERC20TokenName(contractAddress)
   const { challengeIds: liveChallengeIds } = useLiveChallengeIds(tableId)
   const { challengeIds: pastChallengeIds } = usePastChallengeIds(tableId)
@@ -216,7 +217,7 @@ function TableSwitcher({
     >
       <Dropdown.Menu>
         {Object.keys(tables).map(key => (
-          <TableSwitcherItem key={tables[key]} tableId={tables[key]} setSelectedTableId={setSelectedTableId}/>
+          <TableSwitcherItem key={tables[key]} tableId={tables[key]} setSelectedTableId={setSelectedTableId} />
         ))}
       </Dropdown.Menu>
     </Dropdown>
