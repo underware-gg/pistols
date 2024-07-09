@@ -63,6 +63,7 @@ mod tests {
     mod test_round2;
     mod test_round3;
     mod test_wager;
+    mod test_torna;
     mod test_utils;
     // tokens
     mod test_token_duelist;

@@ -14,7 +14,7 @@ mod tests {
     use pistols::models::table::{TableConfig, TableTrait, TableManagerTrait, tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
-    use pistols::types::constants::{constants};
+    use pistols::types::constants::{constants, honour};
     use pistols::libs::utils::{make_action_hash};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::math::{MathU8};
@@ -225,8 +225,8 @@ mod tests {
         tester::assert_balance(lords, TREASURY(), 0, 0, 0, 'balance_treasury_1');
 
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
-        let chances_a: SimulateChances = system.simulate_chances(OWNER(), challenge.duel_id, challenge.round_number, action_a);
-        let chances_b: SimulateChances = system.simulate_chances(OWNER(), challenge.duel_id, challenge.round_number, action_b);
+        let chances_a: SimulateChances = system.simulate_chances(ID(OWNER()), challenge.duel_id, challenge.round_number, action_a);
+        let chances_b: SimulateChances = system.simulate_chances(ID(OWNER()), challenge.duel_id, challenge.round_number, action_b);
         let _hit_chance_a = chances_a.hit_chances;
         let _hit_chance_b = chances_b.hit_chances;
         let kill_chance_a = chances_a.crit_chances;
@@ -445,9 +445,9 @@ mod tests {
         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
         // A is a trickster, will shoot first
         // let mut duelist_a = tester::get_Duelist(world, OWNER());
-        // duelist_a.score.level_trickster = 100;
+        // duelist_a.score.level_trickster = honour::MAX;
         let mut scoreboard_a = tester::get_Scoreboard(world, TABLE_ID, OWNER());
-        scoreboard_a.score.level_trickster = 100;
+        scoreboard_a.score.level_trickster = honour::MAX;
         set!(world,(scoreboard_a));
         // duel!
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);
@@ -466,9 +466,9 @@ mod tests {
         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
         // A is a trickster, will shoot first
         // let mut duelist_b = tester::get_Duelist(world, OTHER());
-        // duelist_b.score.level_trickster = 100;
+        // duelist_b.score.level_trickster = honour::MAX;
         let mut scoreboard_b = tester::get_Scoreboard(world, TABLE_ID, OTHER());
-        scoreboard_b.score.level_trickster = 100;
+        scoreboard_b.score.level_trickster = honour::MAX;
         set!(world,(scoreboard_b));
         // duel!
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);

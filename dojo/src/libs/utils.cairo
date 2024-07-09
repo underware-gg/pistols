@@ -67,9 +67,9 @@ fn create_challenge_snapshot(world: IWorldDispatcher, challenge: Challenge) {
     // check maxxed up tables...
     let table : TableConfig = TableManagerTrait::new(world).get(challenge.table_id);
     if (table.table_type.maxxed_up_levels()) {
-        // new duelist on this table, copy levels from main profile
-        clone_snapshot_duelist_levels(world, challenge.duelist_id_a, ref scoreboard_a.score);
-        clone_snapshot_duelist_levels(world, challenge.duelist_id_b, ref scoreboard_b.score);
+        // new duelist on this table, copy levels from main scoreboard
+        clone_snapshot_duelist_levels(world, challenge.duelist_id_a, ref scoreboard_a);
+        clone_snapshot_duelist_levels(world, challenge.duelist_id_b, ref scoreboard_b);
     }
     // create snapshot
     let snapshot = Snapshot {
@@ -79,12 +79,15 @@ fn create_challenge_snapshot(world: IWorldDispatcher, challenge: Challenge) {
     };
     set!(world, (snapshot));
 }
-fn clone_snapshot_duelist_levels(world: IWorldDispatcher, duelist_id: u128, ref score: Score) {
-    if (score.total_duels == 0) {
+fn clone_snapshot_duelist_levels(world: IWorldDispatcher, duelist_id: u128, ref scoreboard: Scoreboard) {
+    // only new duelist on this table...
+    if (scoreboard.score.total_duels == 0) {
+        // maxx up main scoreboard levels
         let duelist: Duelist = get!(world, duelist_id, Duelist);
-        score.level_villain = duelist.score.level_villain;
-        score.level_trickster = duelist.score.level_trickster;
-        score.level_lord = duelist.score.level_lord;
+        scoreboard.score.level_villain = if (duelist.score.is_villain()) {honour::LEVEL_MAX} else {0};
+        scoreboard.score.level_trickster = if (duelist.score.is_trickster()) {honour::LEVEL_MAX} else {0};
+        scoreboard.score.level_lord = if (duelist.score.is_lord()) {honour::LEVEL_MAX} else {0};
+        set!(world, (scoreboard));
     }
 }
 
@@ -299,14 +302,11 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         let final_round: Round = get!(world, (challenge.duel_id, challenge.round_number), Round);
 
         // update honour and levels
-        update_score_honour(ref duelist_a.score, final_round.shot_a.honour);
-        update_score_honour(ref duelist_b.score, final_round.shot_b.honour);
-        update_score_honour(ref scoreboard_a.score, final_round.shot_a.honour);
-        update_score_honour(ref scoreboard_b.score, final_round.shot_b.honour);
-        if (table.table_type.maxxed_up_levels()) {
-            maxx_up_levels(ref scoreboard_a.score);
-            maxx_up_levels(ref scoreboard_b.score);
-        }
+        let calc_levels = !table.table_type.maxxed_up_levels();
+        update_score_honour(ref duelist_a.score, final_round.shot_a.honour, true);
+        update_score_honour(ref duelist_b.score, final_round.shot_b.honour, true);
+        update_score_honour(ref scoreboard_a.score, final_round.shot_a.honour, calc_levels);
+        update_score_honour(ref scoreboard_b.score, final_round.shot_b.honour, calc_levels);
 
         // split wager/fee to winners and benefactors
         if (final_round.shot_a.wager > final_round.shot_b.wager) {
@@ -347,17 +347,14 @@ fn update_score_totals(ref score_a: Score, ref score_b: Score, state: ChallengeS
     }
 }
 // average honour has an extra decimal, eg: 100 = 10.0
-fn update_score_honour(ref score: Score, duel_honour: u8) {
+fn update_score_honour(ref score: Score, duel_honour: u8, calc_levels: bool) {
     score.total_honour += duel_honour.into();
     score.honour = ((score.total_honour * 10) / score.total_duels.into()).try_into().unwrap();
-    score.level_villain = calc_level_villain(score.honour);
-    score.level_lord = calc_level_lord(score.honour);
-    score.level_trickster = _average_trickster(calc_level_trickster(score.honour, duel_honour), score.level_trickster);
-}
-fn maxx_up_levels(ref score: Score) {
-    if (score.is_villain()) { score.level_villain = honour::LEVEL_MAX; }
-    else if (score.is_trickster()) { score.level_trickster = honour::LEVEL_MAX; }
-    else if (score.is_lord()) { score.level_lord = honour::LEVEL_MAX; }
+    if (calc_levels) {
+        score.level_villain = calc_level_villain(score.honour);
+        score.level_lord = calc_level_lord(score.honour);
+        score.level_trickster = _average_trickster(calc_level_trickster(score.honour, duel_honour), score.level_trickster);
+    }
 }
 
 // Villain bonus: the less honour, more bonus
@@ -569,11 +566,11 @@ fn check_dice(seed: felt252, salt: felt252, faces: u128, limit: u128) -> bool {
 // read calls
 //
 
-fn call_simulate_honour_for_action(world: IWorldDispatcher, mut score: Score, action: Action) -> (i8, u8) {
+fn call_simulate_honour_for_action(world: IWorldDispatcher, mut score: Score, action: Action, table_type: TableType) -> (i8, u8) {
     let action_honour: i8 = action.honour();
     if (action_honour >= 0) {
         score.total_duels += 1;
-        update_score_honour(ref score, MathU8::abs(action_honour));
+        update_score_honour(ref score, MathU8::abs(action_honour), !table_type.maxxed_up_levels());
     }
     (action_honour, score.honour)
 }

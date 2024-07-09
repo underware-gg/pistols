@@ -442,7 +442,7 @@ mod actions {
             let challenge: Challenge = get!(world, duel_id, Challenge);
             let table_type: TableType = get!(world, challenge.table_id, TableConfig).table_type;
             // honour
-            let (action_honour, duelist_honour): (i8, u8) = utils::call_simulate_honour_for_action(world, score_self, action_self);
+            let (action_honour, duelist_honour): (i8, u8) = utils::call_simulate_honour_for_action(world, score_self, action_self, table_type);
             // crit
             let crit_chances: u8 = utils::calc_crit_chances(score_self, score_other, action_self, action_other, health, table_type);
             let crit_base_chance: u8 = action_self.crit_chance();

@@ -80,11 +80,11 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
         (TableConfig {
             table_id: tables::BRUSSELS,
             description: 'Brussels Tournament',
-            contract_address: ZERO(),
+            contract_address: lords_address,
             wager_min: 0,
             fee_min: 0,
             fee_pct: 0,
-            is_open: true,
+            is_open: (lords_address != ZERO()),
             table_type: TableType::IRLTournament,
         }),
     ])
@@ -170,6 +170,16 @@ impl TableTypeIntoFelt252 of Into<TableType, felt252> {
             TableType::Classic => 1,
             TableType::Tournament => 2,
             TableType::IRLTournament => 3,
+        }
+    }
+}
+impl TableTypeIntoByteArray of Into<TableType, ByteArray> {
+    fn into(self: TableType) -> ByteArray {
+        match self {
+            TableType::Undefined => "Undefined",
+            TableType::Classic => "Classic",
+            TableType::Tournament => "Tournament",
+            TableType::IRLTournament => "IRLTournament",
         }
     }
 }
