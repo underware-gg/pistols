@@ -1,3 +1,4 @@
+use debug::PrintTrait;
 use starknet::ContractAddress;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
@@ -188,9 +189,7 @@ impl TableAdmittanceTraitImpl of TableAdmittanceTrait {
     //     }
     // }
     fn can_join(self: @TableAdmittance, account_address: ContractAddress, duelist_id: u128) -> bool {
-        if (duelist_id == 0) {
-            (false)
-        } else if (self.account_a == @ZERO() && self.account_b == @ZERO()) {
+        if (self.account_a == @ZERO() && self.account_b == @ZERO()) {
             (true)
         } else {
             (@account_address == self.account_a  || @account_address == self.account_b || duelist_id <= 6)
