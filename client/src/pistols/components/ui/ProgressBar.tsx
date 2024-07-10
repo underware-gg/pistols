@@ -10,6 +10,7 @@ export default function ProgressBar({
   disabled = false,
   warning = false,
   negative = false,
+  cold = false,
   neutral = false,
   percent = null,
   includedExtraPercent = null,
@@ -44,7 +45,7 @@ export default function ProgressBar({
                 className={_className}
                 warning={warning || Boolean(includedExtraPercent)}
                 error={negative}
-                color={neutral ? 'grey' : null}
+                color={neutral ? 'grey' : cold ? 'teal' : null}
               />
               {Boolean(includedExtraPercent) &&
                 <div className='LethalBar BgImportant' style={{ width: `${percent - includedExtraPercent}%` }} />

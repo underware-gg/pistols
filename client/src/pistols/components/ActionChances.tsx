@@ -44,7 +44,7 @@ export function ActionChances({
   const otherDuelistId = useMemo(() => (isA ? duelistIdB : duelistIdA), [isA, isB, duelistIdB, duelistIdA])
   const { crit_chances: other_crit_chances } = useSimulateChances(otherDuelistId, duelId, roundNumber, Action.Strong)
 
-  // console.log(`CHANCES:`, crit_chances, crit_bonus, hit_chances, hit_bonus, lethal_chances, lethal_bonus)
+  console.log(`CHANCES:`, action_honour, crit_chances, crit_bonus, hit_chances, hit_bonus, lethal_chances, lethal_chances)
 
   const executionLabel = useMemo(() => {
     if ([Action.Flee, Action.Steal, Action.Seppuku].includes(action)) {
@@ -57,7 +57,8 @@ export function ActionChances({
   }, [action])
 
   const _critChances = crit_chances == 100 ? (crit_chances - other_crit_chances) : crit_chances
-  const _honourValue = (action_honour >= 0 ? action_honour : isA ? round1?.shot_a.honour : isB ? round1?.shot_b.honour : null) ?? 0
+  const _action_honour = (action_honour * 10)
+  const _honourValue = (action_honour >= 0 ? _action_honour : isA ? round1?.shot_a.honour : isB ? round1?.shot_b.honour : null) ?? 0
   // console.log(`HONOUR:`, action_honour, _honourValue)
   return (
     <>
@@ -72,10 +73,11 @@ export function ActionChances({
         includedInnerPercent={lethal_chances}
       />
       <ProgressBar disabled={!action} label='Honour:'
-        value={_honourValue} total={10}
-        negative={action_honour >= 0 && action_honour < honour.TRICKSTER_START}
-        warning={action_honour >= honour.LORD_START}
-        neutral={action_honour < 0}
+        value={_honourValue / 10} total={10}
+        negative={_action_honour >= 0 && _action_honour < honour.TRICKSTER_START}
+        warning={_action_honour >= honour.TRICKSTER_START && _action_honour < honour.LORD_START}
+        cold={_action_honour >= honour.LORD_START}
+        neutral={_action_honour < 0}
       />
 
       {action > 0 &&
