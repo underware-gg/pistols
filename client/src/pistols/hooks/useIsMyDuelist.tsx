@@ -4,7 +4,7 @@ import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useTokenContract } from '@/pistols/hooks/useTokenDuelist'
 import { useOrigamiERC721OwnerOf } from '@/lib/dojo/hooks/useOrigamiERC721'
-import { bigintEquals } from '@/lib/utils/types'
+import { bigintEquals, isPositiveBigint } from '@/lib/utils/types'
 import { BigNumberish } from 'starknet'
 
 export const useIsMyAccount = (otherAddress: BigNumberish) => {
@@ -24,6 +24,6 @@ export const useIsMyDuelist = (otherDueistId: BigNumberish) => {
   const { contractAddress, components } = useTokenContract()
   const { address } = useAccount()
   const { owner } = useOrigamiERC721OwnerOf(contractAddress, otherDueistId, components)
-  const isMyDuelist = useMemo(() => (bigintEquals(address, owner)), [address, owner])
+  const isMyDuelist = useMemo(() => ((isPositiveBigint(address) && isPositiveBigint(owner)) ? bigintEquals(address, owner) : undefined), [address, owner])
   return isMyDuelist
 }

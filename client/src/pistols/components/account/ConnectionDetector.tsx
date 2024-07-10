@@ -4,6 +4,7 @@ import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
+import { useIsMyDuelist } from '@/pistols/hooks/useIsMyDuelist'
 import { AccountChangeDetector, ChainChangeDetector } from '@/lib/dojo/ChangeDetector'
 
 export function DojoSetupErrorDetector() {
@@ -21,13 +22,18 @@ export function DojoSetupErrorDetector() {
 export function ConnectionDetector() {
   const { isConnected } = useSelectedChain()
   const { connectOpener } = usePistolsContext()
-  const { isGuest, dispatchDuelistId } = useSettings()
+  const { duelistId, isGuest, dispatchDuelistId } = useSettings()
+  const isMyDuelist = useIsMyDuelist(duelistId)
 
   // const router = useRouter()
   const _backToGate = () => {
     // router.push('/gate')
     dispatchDuelistId(0n)
   }
+
+  useEffect(() => {
+    if (isMyDuelist === false) _backToGate()
+  }, [isMyDuelist])
 
   // on mount, try to connect if not connected
   const [askedToConnect, setAskedToConnect] = useState<boolean>(undefined)
