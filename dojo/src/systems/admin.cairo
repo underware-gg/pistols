@@ -66,7 +66,7 @@ mod admin {
             self.assert_initializer_is_owner();
             let manager = ConfigManagerTrait::new(world);
             let mut config = manager.get();
-            assert(config.initialized == false, Errors::ALREADY_INITIALIZED);
+            // assert(config.initialized == false, Errors::ALREADY_INITIALIZED);
             // initialize
             config.initialized = true;
             config.owner_address = (if (owner_address == utils::ZERO()) { get_caller_address() } else { owner_address });
