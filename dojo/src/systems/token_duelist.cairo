@@ -88,7 +88,9 @@ mod token_duelist {
     use starknet::{get_contract_address, get_caller_address};
 
     use pistols::models::token_config::{TokenConfig, TokenConfigTrait};
-    use pistols::models::duelist::{Duelist, Score, ScoreTrait};
+    use pistols::models::duelist::{Duelist, Score, Scoreboard, ScoreTrait};
+    use pistols::models::table::{tables};
+    use pistols::types::constants::{constants};
     use pistols::libs::utils::{CONSUME_BYTE_ARRAY};
     use pistols::utils::byte_arrays::{ByteArraysTrait, U8IntoByteArray, U16IntoByteArray, U32IntoByteArray, U256IntoByteArray, ByteArraySpanIntoByteArray};
     use pistols::utils::short_string::ShortStringTrait;
@@ -243,7 +245,6 @@ mod token_duelist {
 
         fn build_uri(self: @ContractState, token_id: u256, encode: bool) -> ByteArray {
             let duelist: Duelist = get!(self.world(), (token_id), Duelist);
-
             let attributes: Span<ByteArray> = self.get_attributes(duelist.clone());
             let metadata = JsonImpl::new()
                 .add("id", token_id.into())
@@ -326,6 +327,24 @@ mod token_duelist {
                 result.append(duelist.score.total_draws.into());
                 result.append("Accumulated Honour");
                 result.append(ScoreTrait::format_total_honour(duelist.score.total_honour));
+                // Wager on Lords table
+                let scoreboard: Scoreboard = get!(self.world(), (tables::LORDS, duelist.duelist_id), Scoreboard);
+                result.append("Lords Won");
+                result.append((scoreboard.wager_won / constants::ETH_TO_WEI).into());
+                result.append("Lords Lost");
+                if (scoreboard.wager_lost == 0) {
+                    result.append("0");
+                } else {
+                    let amount: u256 = (scoreboard.wager_lost / constants::ETH_TO_WEI);
+                    result.append(format!("-{}", amount));
+                }
+                result.append("Lords Balance");
+                if (scoreboard.wager_lost > scoreboard.wager_won) {
+                    let amount: u256 = ((scoreboard.wager_lost - scoreboard.wager_won) / constants::ETH_TO_WEI);
+                    result.append(format!("-{}", amount));
+                } else {
+                    result.append(((scoreboard.wager_won - scoreboard.wager_lost) / constants::ETH_TO_WEI).into());
+                }
             }
             // done!
             (result.span())

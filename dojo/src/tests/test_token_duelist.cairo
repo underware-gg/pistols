@@ -1,5 +1,6 @@
+use debug::PrintTrait;
 use integer::BoundedInt;
-use starknet::{ContractAddress, get_contract_address, get_caller_address};
+use starknet::{ContractAddress, get_contract_address, get_caller_address, testing};
 use starknet::storage::{StorageMemberAccessTrait};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use dojo::test_utils::spawn_test_world;
@@ -43,7 +44,11 @@ use pistols::systems::minter::{
 };
 use pistols::models::{
     token_config::{token_config, TokenConfig, TokenConfigTrait},
+    duelist::{duelist, Duelist, Score, scoreboard, Scoreboard, profile_pic_type},
 };
+
+use pistols::models::table::{tables};
+use pistols::types::constants::{constants};
 
 //
 // events helpers
@@ -93,12 +98,17 @@ const TOKEN_ID_4: u256 = 4;
 const TOKEN_ID_5: u256 = 5;
 
 fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterDispatcher) {
-    let world = spawn_test_world(
+    testing::set_block_number(1);
+    testing::set_block_timestamp(1);
+
+    let mut world = spawn_test_world(
         array![
             erc_721_token_approval_model::TEST_CLASS_HASH,
             erc_721_balance_model::TEST_CLASS_HASH,
             erc_721_meta_model::TEST_CLASS_HASH,
             token_config::TEST_CLASS_HASH,
+            duelist::TEST_CLASS_HASH,
+            scoreboard::TEST_CLASS_HASH,
         ]
     );
 
@@ -151,6 +161,8 @@ fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterD
     world.grant_writer(selector!("ERC721MetadataModel"),  OWNER(),);
     world.grant_writer(selector!("ERC721OwnerModel"),  OWNER(),);
     world.grant_writer(selector!("TokenConfig"), OWNER(),);
+    world.grant_writer(selector!("Duelist"), OWNER(),);
+    world.grant_writer(selector!("Scoreboard"), OWNER(),);
 
     utils::impersonate(OWNER(),);
 
@@ -158,7 +170,7 @@ fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterD
 }
 
 fn setup() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterDispatcher) {
-    let (world, mut token, mut minter) = setup_uninitialized();
+    let (mut world, mut token, mut minter) = setup_uninitialized();
 
     // initialize contracts
     minter.mint(OWNER(), token.contract_address);
@@ -194,11 +206,57 @@ fn test_initializer() {
 
 #[test]
 fn test_token_uri() {
-    let (_world, mut token, mut _minter) = setup();
+    let (mut world, mut token, mut _minter) = setup();
 
-    let uri = token.token_uri(TOKEN_ID);
-    println!("{}", uri);
-    assert(uri[0] == '{', 'Uri should not be empty');
+    let duelist = Duelist {
+        duelist_id: TOKEN_ID.low,
+        name: 'Ser Walker',
+        profile_pic_type: profile_pic_type::DUELIST,
+        profile_pic_uri: "1",
+        timestamp: 999999,
+        score: Score {
+            honour: 100,
+            level_villain: 0,
+            level_trickster: 0,
+            level_lord: 90,
+            total_duels: 6,
+            total_wins: 3,
+            total_losses: 2,
+            total_draws: 1,
+            total_honour: 500,
+        },
+    };
+    let scoreboard: Scoreboard = Scoreboard{
+        table_id: tables::LORDS,
+        duelist_id: TOKEN_ID.low,
+        score: duelist.score,
+        wager_won: (1000 * constants::ETH_TO_WEI),
+        wager_lost: (200 * constants::ETH_TO_WEI),
+    };
+
+    set!(world, (duelist));
+    set!(world, (scoreboard));
+
+let duelist: Duelist = get!(world, (TOKEN_ID), Duelist);
+duelist.duelist_id.print();
+duelist.name.print();
+
+    let uri_1 = token.token_uri(TOKEN_ID);
+    let uri_2 = token.token_uri(TOKEN_ID_2);
+    
+    println!("{}", uri_1);
+    println!("{}", uri_2);
+
+    assert(uri_1[0] == '{', 'Uri 1 should not be empty');
+    assert(uri_2[0] == '{', 'Uri 2 should not be empty');
+    // assert(uri_1.len() > uri_2.len(), 'uri_1 > uri_2');
+}
+
+#[test]
+#[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))]
+fn test_token_uri_invalid() {
+    let (_world, mut token, mut _minter) = setup();
+    token.token_uri(999);
 }
 
 // #[test]
