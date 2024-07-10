@@ -40,6 +40,8 @@ export const sceneBackgrounds: Record<SceneName, TextureName> = {
   [SceneName.YourDuels]: TextureName.bg_duels_yours,
   [SceneName.LiveDuels]: TextureName.bg_duels_live,
   [SceneName.PastDuels]: TextureName.bg_duels_past,
+  [SceneName.Tournament]: TextureName.bg_duels_live,
+  [SceneName.IRLTournament]: TextureName.bg_duels_live,
   [SceneName.Duel]: TextureName.bg_duel,
 }
 
