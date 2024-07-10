@@ -6,6 +6,7 @@ import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
 import { useChallengesByDuelistIdTotals, useLiveChallengeIds } from '@/pistols/hooks/useChallenge'
 import { useTable } from '@/pistols/hooks/useTable'
 import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
+import { IRLTournamentTab } from '@/pistols/components/tournament/IRLTournamentTab'
 import { DuelistTable } from '@/pistols/components/DuelistTable'
 import { MusicToggle } from '@/pistols/components/ui/Buttons'
 import { IconClick } from '@/lib/ui/Icons'
@@ -30,7 +31,7 @@ export function TavernMenu({
   const router = useRouter()
   const { tableId, duelistId, isGuest } = useSettings()
   const { menuKey, tavernMenuItems, tableOpener, dispatchSetMenu } = usePistolsContext()
-  const { description } = useTable(tableId)
+  const { description, isTournament, isIRLTournament } = useTable(tableId)
 
   const { liveDuelsCount: yourDuelsCount } = useChallengesByDuelistIdTotals(duelistId, tableId)
   const { challengeIds: liveChallengeIds } = useLiveChallengeIds(tableId)
@@ -43,6 +44,10 @@ export function TavernMenu({
       setStarted(true)
       if (isGuest) {
         dispatchSetMenu(MenuKey.LiveDuels)
+      } else if (isTournament) {
+        dispatchSetMenu(MenuKey.Tournament)
+      } else if (isIRLTournament) {
+        dispatchSetMenu(MenuKey.IRLTournament)
       } else if (yourDuelsCount > 0) {
         dispatchSetMenu(MenuKey.YourDuels)
       } else {
@@ -54,8 +59,11 @@ export function TavernMenu({
   const panes = useMemo(() => {
     let result = []
     tavernMenuItems.forEach(key => {
+      if (key === MenuKey.Tournament && !isTournament) return
+      if (key === MenuKey.IRLTournament && !isIRLTournament) return
       const bubble = (key == MenuKey.YourDuels) ? _makeBubble(yourDuelsCount) : (key == MenuKey.LiveDuels) ? _makeBubble(liveDuelsCount) : null
       result.push({
+        key,
         menuItem: (
           <Menu.Item
             key={key}
@@ -69,18 +77,20 @@ export function TavernMenu({
           <TabPane attached={true}>
             <div className='UIMenuTavernScroller'>
               {key === MenuKey.Duelists && <DuelistTable />}
-              {key === MenuKey.YourDuels && <ChallengeTableYour tableId={tableId} />}
-              {key === MenuKey.LiveDuels && <ChallengeTableLive tableId={tableId} />}
-              {key === MenuKey.PastDuels && <ChallengeTablePast tableId={tableId} />}
+              {key === MenuKey.YourDuels && <ChallengeTableYour />}
+              {key === MenuKey.LiveDuels && <ChallengeTableLive />}
+              {key === MenuKey.PastDuels && <ChallengeTablePast />}
+              {key === MenuKey.Tournament && <></>}
+              {key === MenuKey.IRLTournament && <IRLTournamentTab />}
             </div>
           </TabPane>
         )
       })
     })
     return result
-  }, [tavernMenuItems, yourDuelsCount, liveDuelsCount, tableId])
+  }, [tavernMenuItems, yourDuelsCount, liveDuelsCount, isTournament, isIRLTournament])
 
-  const menuIndex = tavernMenuItems.findIndex(k => (k == menuKey))
+  const menuIndex = panes.findIndex(pane => (pane.key == menuKey))
 
   const _changeTable = () => {
     tableOpener.open()
@@ -90,10 +100,13 @@ export function TavernMenu({
     <div>
       <Grid>
         <Row className='ProfilePicHeight Unselectable'>
-          <Col width={7} verticalAlign='middle' className='Title NoBreak'>
-            &nbsp;&nbsp;&nbsp;<b>Pistols at 10 Blocks</b>
-            <br />
-            &nbsp;&nbsp;&nbsp;<IconClick name='ticket' size={'small'} onClick={() => _changeTable()} /> <b className='Smaller Important'>{description}</b>
+          <Col width={7} verticalAlign='top' className='TitleCase NoBreak Padded Relative'>
+            <h2>Pistols at 10 Blocks</h2>
+            <h3>
+              <IconClick name='ticket' size={'small'} onClick={() => _changeTable()} />
+              {' '}
+              <b className='Smaller Important'>{description}</b>
+            </h3>
           </Col>
           <Col width={9} textAlign='right'>
             <AccountHeader />

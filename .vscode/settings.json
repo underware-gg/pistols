@@ -21,7 +21,7 @@
     "**/.gitignore": true,
     "**/.gitmodules": true,
     "**/database.json": true,
-    "**/generated/*": true,
+    // "**/generated/*": true,
     "**/manifest.json": true,
     "client/public/**": true,
     "dojo/abis/**": true,

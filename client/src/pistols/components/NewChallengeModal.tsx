@@ -98,7 +98,7 @@ export default function NewChallengeModal() {
           <Grid style={{ width: '350px' }}>
             <Row columns='equal' textAlign='left'>
               <Col>
-                <ProfileDescription duelistId={duelistIdA} displayAddress={false} />
+                <ProfileDescription duelistId={duelistIdA} displayOwnerAddress={false} />
                 {canWager && <h5><Balance tableId={tableId} wei={balanceA} /></h5>}
               </Col>
             </Row>
@@ -109,7 +109,7 @@ export default function NewChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <ProfileDescription duelistId={duelistIdB} displayAddress={false} />
+                <ProfileDescription duelistId={duelistIdB} displayOwnerAddress={false} />
                 {canWager && <h5><Balance tableId={tableId} wei={balanceB} /></h5>}
               </Col>
             </Row>

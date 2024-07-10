@@ -9,7 +9,7 @@ import { useTable } from '@/pistols/hooks/useTable'
 import { ActionEmojis, ActionNames, ChallengeStateNames, RoundStateNames } from '@/pistols/utils/pistols'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { formatTimestamp } from '@/lib/utils/timestamp'
-import { bigintToHex } from '@/lib/utils/types'
+import { bigintToHex, shortAddress } from '@/lib/utils/types'
 import { weiToEth } from '@/lib/utils/starknet'
 import AppPistols from '@/pistols/components/AppPistols'
 import { useChallenge } from '@/pistols/hooks/useChallenge'
@@ -111,9 +111,23 @@ function DuelStats({
       <Body>
         <Row>
           <Cell>
+            Account A
+          </Cell>
+          <Cell>
+            <b>{shortAddress(bigintToHex(challenge.duelistAddressA))}</b>
+          </Cell>
+        </Row>
+        <Row>
+          <Cell>
+            Account B
+          </Cell>
+          <Cell>
+            <b>{shortAddress(bigintToHex(challenge.duelistAddressB))}</b>
+          </Cell>
+        </Row>
+        <Row>
+          <Cell>
             Duelist A
-            <br />
-            (Challenger)
           </Cell>
           <Cell>
             <b>{nameA}</b>
@@ -122,8 +136,6 @@ function DuelStats({
         <Row>
           <Cell>
             Duelist B
-            <br />
-            (Challenged)
           </Cell>
           <Cell>
             <b>{nameB}</b>

@@ -994,6 +994,20 @@ $logo-url: '/logos/logo_avante.svg';
   color: $color-brightest;
 }
 
+.TornaContents {
+  height: 310px;
+}
+.TornaImage {
+  @extend .Anchor;
+  height: 300px;
+  width: auto;
+  border: 5px solid #0000;
+}
+.TornaImageSelected {
+  @extend .TornaImage;
+  border: 5px solid $color-medium!important;
+}
+
 //--------------------
 // Unity canvas
 //
@@ -1202,9 +1216,9 @@ input::placeholder {
   // top: -1em; // semantic
   // left: 100%; // semantic
   // margin: 0 0 0 -1.5em!important; // semantic
-  top: 0.5em;
+  top: -0.35em;
   left: unset;
-  right: 1em;
+  right: 0em;
   margin: 0 0 0 -1.5em!important;
 }
 //
@@ -1214,7 +1228,7 @@ input::placeholder {
   padding-left: 5px;
 }
 .ui.secondary.pointing.menu .item {
-  padding: 0.5em 3em 0.5em 1em; // semantic: 0.85714286em 1.14285714em;
+  padding: 0.5em 1.0em 0.5em 0.5em; // semantic: 0.85714286em 1.14285714em;
   background-color: transparent;
   color: $color-bright;
   text-shadow: $title-shadow;

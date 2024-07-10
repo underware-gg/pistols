@@ -19,6 +19,8 @@ export enum SceneName {
   YourDuels = 'Your Duels',
   LiveDuels = 'Live Duels',
   PastDuels = 'Past Duels',
+  Tournament = 'Tournament',
+  IRLTournament = 'IRL Tournament',
   Duel = 'Duel',
 }
 
@@ -27,6 +29,8 @@ export enum MenuKey {
   YourDuels = SceneName.YourDuels,
   LiveDuels = SceneName.LiveDuels,
   PastDuels = SceneName.PastDuels,
+  Tournament = SceneName.Tournament,
+  IRLTournament = SceneName.IRLTournament,
 }
 
 const tavernMenuItems: MenuKey[] = [
@@ -34,6 +38,8 @@ const tavernMenuItems: MenuKey[] = [
   MenuKey.YourDuels,
   MenuKey.LiveDuels,
   MenuKey.PastDuels,
+  MenuKey.Tournament,
+  MenuKey.IRLTournament,
 ]
 
 export enum AccountMenuKey {
@@ -240,6 +246,8 @@ export const usePistolsContext = () => {
     atYourDuels: (state.sceneName == SceneName.YourDuels),
     atLiveDuels: (state.sceneName == SceneName.LiveDuels),
     atPastDuels: (state.sceneName == SceneName.PastDuels),
+    atTournament: (state.sceneName == SceneName.Tournament),
+    atIRLTournament: (state.sceneName == SceneName.IRLTournament),
     atDuel: (state.sceneName == SceneName.Duel),
     // PistolsActions,
     // dispatch,

@@ -154,10 +154,11 @@ export const useChallengeDescription = (duelId: bigint) => {
   const { name: nameB } = useDuelist(duelistIdB)
 
   const challengeDescription = useMemo(() => {
+    if (!state) return null
     let result = ChallengeStateDescriptions[state]
-    if (winnerDuelistId == duelistIdA) result += ' in favor of Challenger'
-    if (winnerDuelistId == duelistIdB) result += ' in favor of Challenged'
-    return result.replace('Challenger', nameA).replace('Challenged', nameB)
+    if (winnerDuelistId > 0 && winnerDuelistId == duelistIdA) result += ' in favor of Challenger'
+    if (winnerDuelistId > 0 && winnerDuelistId == duelistIdB) result += ' in favor of Challenged'
+    return result.replace('Challenger', nameA ?? 'Duelist').replace('Challenged', nameB ?? 'Duelist')
   }, [state, winnerDuelistId, duelistIdA, duelistIdB, nameA, nameB])
 
   return {

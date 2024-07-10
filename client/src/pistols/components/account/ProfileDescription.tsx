@@ -37,13 +37,15 @@ export function ProfileBadge({
 
 export function ProfileDescription({
   duelistId,
+  address = null,
   displayStats = false,
-  displayAddress = false,
+  displayOwnerAddress = false,
   displayBalance = false,
 }: {
   duelistId: BigNumberish,
+    address?: BigNumberish
   displayStats?: boolean
-  displayAddress?: boolean
+  displayOwnerAddress?: boolean
   displayBalance?: boolean
 }) {
   const {
@@ -57,7 +59,9 @@ export function ProfileDescription({
 
         <Col width={displayStats ? 12 : 16}>
           <h1 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /></h1>
-          {displayAddress && <AddressShort address={owner} />}
+          {address ? <AddressShort address={address} />
+            : displayOwnerAddress ? <AddressShort address={owner} />
+              : <></>}
           <h3 className='Important NoMargin TitleCase'>
             Honour: <span className='Wager'>{honourAndTotal}</span>
             {isVillainous && <> {EMOJI.VILLAIN} <span className='Wager'>{levelDisplay}</span></>}

@@ -36,7 +36,7 @@ export default function ChallengeModal() {
 
   const _close = () => { dispatchSelectDuel(0n) }
 
-  const { state, tableId, message, duelistIdA, duelistIdB, isLive, isFinished, needToSyncExpired } = useChallenge(selectedDuelId)
+  const { state, tableId, message, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, isLive, isFinished, needToSyncExpired } = useChallenge(selectedDuelId)
   const { value, fee } = useWager(selectedDuelId)
   const { description: tableDescription }= useTable(tableId)
 
@@ -97,7 +97,7 @@ export default function ChallengeModal() {
           <Grid style={{ width: '350px' }}>
             <Row columns='equal' textAlign='left'>
               <Col>
-                <ProfileDescription duelistId={duelistIdA} displayAddress />
+                <ProfileDescription duelistId={duelistIdA} address={duelistAddressA} />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -107,7 +107,7 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <ProfileDescription duelistId={duelistIdB} displayAddress />
+                <ProfileDescription duelistId={duelistIdB} address={duelistAddressB} />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>

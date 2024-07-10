@@ -74,7 +74,7 @@ export const getChainMasterAccount = (dojoChainConfig: DojoChainConfig): Predepl
       name: 'Master Account',
       address: dojoChainConfig.masterAddress,
       privateKey: dojoChainConfig.masterPrivateKey,
-      active: false,
+      active: true,
     }
   }
   return null

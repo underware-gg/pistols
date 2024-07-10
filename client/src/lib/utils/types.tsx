@@ -18,11 +18,10 @@ export const bigintEquals = (a: BigNumberish | null, b: BigNumberish | null): bo
 export const bigintAdd = (a: BigNumberish | null, b: BigNumberish | null): bigint => (BigInt(a ?? 0) + BigInt(b ?? 0))
 export const bigintSub = (a: BigNumberish | null, b: BigNumberish | null): bigint => (BigInt(a ?? 0) - BigInt(b ?? 0))
 export const isBigint = (v: BigNumberish | null): boolean => {
-  try {
-    return (v != null && BigInt(v) >= 0n);
-  } catch {
-    return false;
-  }
+  try { return (v != null && BigInt(v) >= 0n) } catch { return false }
+}
+export const isPositiveBigint = (v: BigNumberish | null): boolean => {
+  try { return (v != null && BigInt(v) > 0n) } catch { return false }
 }
 
 export const bigintToEntity = (v: BigNumberish): Entity => (getEntityIdFromKeys([BigInt(v)]) as Entity)
@@ -35,6 +34,11 @@ export const shortAddress = (address: string | null) => (
       : address.length < 12 ? address             // size is good
         : `${address.slice(0, 6)}..${address.slice(-4)}`
 )
+
+//
+// arrays
+//
+export const arrayUnique = (array: any[]) => array.filter((value, index, array) => (array.indexOf(value) === index))
 
 //
 // dictionaries

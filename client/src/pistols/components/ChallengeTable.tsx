@@ -21,35 +21,26 @@ const Col = Grid.Column
 const Cell = Table.Cell
 const HeaderCell = Table.HeaderCell
 
-type ChallengeTableProps = {
-  tableId?: string
-}
-
-export function ChallengeTableAll({
-  tableId
-}: ChallengeTableProps) {
+export function ChallengeTableAll() {
+  const { tableId } = useSettings()
   const { challengeIds } = useAllChallengeIds(tableId)
   return <ChallengeTableByIds challengeIds={challengeIds} compact />
 }
 
-export function ChallengeTableLive({
-  tableId
-}: ChallengeTableProps) {
+export function ChallengeTableLive() {
+  const { tableId } = useSettings()
   const { challengeIds, states } = useLiveChallengeIds(tableId)
   return <ChallengeTableByIds challengeIds={challengeIds} color='green' compact states={[...states, ChallengeState.Expired]} />
 }
 
-export function ChallengeTablePast({
-  tableId
-}: ChallengeTableProps) {
+export function ChallengeTablePast() {
+  const { tableId } = useSettings()
   const { challengeIds, states } = usePastChallengeIds(tableId)
   return <ChallengeTableByIds challengeIds={challengeIds} color='red' compact states={states} />
 }
 
-export function ChallengeTableYour({
-  tableId
-}: ChallengeTableProps) {
-  const { duelistId } = useSettings()
+export function ChallengeTableYour() {
+  const { tableId, duelistId } = useSettings()
   return <ChallengeTableByDuelist duelistId={duelistId} compact tableId={tableId} />
 }
 
