@@ -57,11 +57,11 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   } = useAsyncMemo<torii.Client>(async () => {
     if (!mounted) return undefined
     if (!manifest) return null
-    const client = await torii.createClient([], {
+    const client = await torii.createClient({
       rpcUrl: selectedChainConfig.rpcUrl,
       toriiUrl: selectedChainConfig.toriiUrl,
       relayUrl: selectedChainConfig.relayUrl ?? '',
-      worldAddress: manifest?.world?.address ?? '',
+      worldAddress: manifest.world.address ?? '',
     })
     // console.log(`TORII CLIENT OK!`)
     return client
@@ -93,7 +93,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     const subscription = await getSyncEntities(
       toriiClient,
       network.contractComponents as any,
-      [],
+      undefined,
     )
     console.log(`SYNC FINISHED!!!`, subscription, components)
     return subscription
