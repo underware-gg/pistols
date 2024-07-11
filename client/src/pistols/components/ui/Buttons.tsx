@@ -3,7 +3,7 @@ import { Menu, Button, Confirm, SemanticICONS } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
-import { useTableBalance } from '@/pistols/hooks/useTable'
+import { useTableAccountBalance } from '@/pistols/hooks/useTable'
 import { bigintAdd } from '@/lib/utils/types'
 import { CustomIcon } from '@/lib/ui/Icons'
 import { BigNumberish } from 'starknet'
@@ -110,7 +110,7 @@ export const BalanceRequiredButton = ({
   disabled?: boolean
 }) => {
   const { address } = useAccount()
-  const { balance, noFundsForFee } = useTableBalance(tableId, address, bigintAdd(wagerValue, fee))
+  const { balance, noFundsForFee } = useTableAccountBalance(tableId, address, bigintAdd(wagerValue, fee))
   const wagerTooLow = (BigInt(minWagerValue ?? 0) > 0n && BigInt(wagerValue) < BigInt(minWagerValue))
   const canSubmit = (!wagerTooLow && !noFundsForFee)
   return (

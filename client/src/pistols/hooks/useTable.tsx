@@ -38,7 +38,7 @@ export const useTable = (tableId: string) => {
   }
 }
 
-export const useTableBalance = (tableId: string, address: BigNumberish, fee: BigNumberish = 0n) => {
+export const useTableAccountBalance = (tableId: string, address: BigNumberish, fee: BigNumberish = 0n) => {
   const { contractAddress } = useTable(tableId)
   return useERC20Balance(contractAddress, address, fee)
 }

@@ -13,13 +13,15 @@ const Col = Grid.Column
 export function ProfileName({
   duelistId,
   badges = true,
+  displayId = true,
 }: {
   duelistId: BigNumberish,
   badges?: boolean
+  displayId?: boolean
 }) {
-  const { nameDisplay } = useDuelist(duelistId)
+  const { name, nameDisplay } = useDuelist(duelistId)
   return (
-    <span className='BreakWord'>{nameDisplay} {badges && <ProfileBadge duelistId={duelistId} />}</span>
+    <span className='BreakWord'>{displayId ? nameDisplay : name} {badges && <ProfileBadge duelistId={duelistId} />}</span>
   )
 }
 

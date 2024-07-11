@@ -6,7 +6,7 @@ import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { useTable, useTableBalance } from '@/pistols/hooks/useTable'
+import { useTable, useTableAccountBalance } from '@/pistols/hooks/useTable'
 import { usePact } from '@/pistols/hooks/usePact'
 import { useCalcFee } from '@/pistols/hooks/useContractCalls'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
@@ -39,8 +39,8 @@ export default function NewChallengeModal() {
   const { hasPact, pactDuelId } = usePact(tableId, duelistIdA, duelistIdB)
 
   const { description: tableDescription } = useTable(tableId)
-  const { balance: balanceA } = useTableBalance(tableId, duelistIdA)
-  const { balance: balanceB } = useTableBalance(tableId, duelistIdB)
+  const { balance: balanceA } = useTableAccountBalance(tableId, duelistIdA)
+  const { balance: balanceB } = useTableAccountBalance(tableId, duelistIdB)
 
   const [args, setArgs] = useState(null)
 

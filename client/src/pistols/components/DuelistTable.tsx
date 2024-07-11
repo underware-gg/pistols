@@ -1,12 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Table } from 'semantic-ui-react'
-import { useAccount } from '@starknet-react/core'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useAllDuelistKeys, useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { ProfileName } from '@/pistols/components/account/ProfileDescription'
+import { ProfileBadge, ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { EMOJI } from '@/pistols/data/messages'
 import { BigNumberish } from 'starknet'
+import { useScoreboard } from '../hooks/useScore'
+import { LordsBagIcon } from './account/Balance'
+import { useTable } from '../hooks/useTable'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -23,6 +26,7 @@ enum DuelistColumn {
   Draws = 'Draws',
   Total = 'Total',
   WinRatio = 'WinRatio',
+  Balance = 'Balance',
 }
 enum SortDirection {
   Ascending = 'ascending',
@@ -30,8 +34,9 @@ enum SortDirection {
 }
 
 export function DuelistTable() {
-  const { address } = useAccount()
+  const { tableId } = useSettings()
   const { duelistKeys } = useAllDuelistKeys()
+  const { canWager } = useTable(tableId)
 
   // Sort
   const [sortColumn, setSortColumn] = useState(DuelistColumn.Honour)
@@ -44,10 +49,10 @@ export function DuelistTable() {
       setSortDirection(column == DuelistColumn.Name ? SortDirection.Ascending : SortDirection.Descending)
     }
   }
-  
+
   // callback to store each Duelist data for sorting
   const [duelistsData, setDuelistsData] = useState({})
-  const _dataCallback = (address:bigint, data:any) => {
+  const _dataCallback = (address: bigint, data: any) => {
     // this pattern can handle simultaneous state set
     setDuelistsData(o => ({ ...o, [address.toString()]: data }))
   }
@@ -55,10 +60,17 @@ export function DuelistTable() {
   const rows = useMemo(() => {
     let result = []
     duelistKeys.forEach((duelistId, index) => {
-      result.push(<DuelistItem key={duelistId} duelistId={duelistId} index={index} sortColumn={sortColumn} dataCallback={_dataCallback}/>)
+      result.push(<DuelistItem key={duelistId}
+        tableId={tableId}
+        duelistId={duelistId}
+        index={index}
+        sortColumn={sortColumn}
+        dataCallback={_dataCallback}
+        canWager={canWager}
+      />)
     })
     return result
-  }, [duelistKeys, sortColumn])
+  }, [tableId, duelistKeys, sortColumn, canWager])
 
   // Sort rows
   const sortedRows = useMemo(() => rows.sort((a, b) => {
@@ -69,7 +81,7 @@ export function DuelistTable() {
     if (!dataB) return -1
     const isAscending = (sortDirection == SortDirection.Ascending)
     if (sortColumn == DuelistColumn.Name) {
-      return isAscending ? dataA.name.localeCompare(dataB.name) : dataB.name.localeCompare(dataA.name) 
+      return isAscending ? dataA.name.localeCompare(dataB.name) : dataB.name.localeCompare(dataA.name)
     }
     const _sortTotals = (a, b) => (!isAscending ? (b - a) : (a && !b) ? -1 : (!a && b) ? 1 : (a - b))
     if (sortColumn == DuelistColumn.Honour) return _sortTotals(dataA.honour, dataB.honour)
@@ -80,6 +92,7 @@ export function DuelistTable() {
     if (sortColumn == DuelistColumn.Draws) return _sortTotals(dataA.total_draws, dataB.total_draws)
     if (sortColumn == DuelistColumn.Total) return _sortTotals(dataA.total_duels, dataB.total_duels)
     if (sortColumn == DuelistColumn.WinRatio) return _sortTotals(dataA.winRatio, dataB.winRatio)
+    if (sortColumn == DuelistColumn.Balance) return _sortTotals(dataA.balance, dataB.balance)
     return 0
   }), [rows, duelistsData, sortColumn, sortDirection])
 
@@ -99,6 +112,9 @@ export function DuelistTable() {
           <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Losses ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Losses)}>Losses</HeaderCell>
           <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Draws ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Draws)}>Draws</HeaderCell>
           <HeaderCell width={1} sorted={sortColumn == DuelistColumn.WinRatio ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.WinRatio)}>Win<br />Ratio</HeaderCell>
+          {canWager &&
+            <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Balance ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Balance)}><h3><LordsBagIcon /></h3></HeaderCell>
+          }
         </Table.Row>
       </Table.Header>
 
@@ -121,16 +137,21 @@ export function DuelistTable() {
 
 
 function DuelistItem({
+  tableId,
   duelistId,
   sortColumn,
   dataCallback,
+  canWager,
+  isYou,
   index,
 }: {
+  tableId: string
   duelistId: BigNumberish
   sortColumn: DuelistColumn
   dataCallback: Function
-  index?: number
+  canWager: boolean
   isYou?: boolean
+  index?: number
 }) {
   const duelistData = useDuelist(duelistId)
   const {
@@ -138,12 +159,18 @@ function DuelistItem({
     total_wins, total_losses, total_draws, total_duels, total_honour,
     honourDisplay, levelDisplay, winRatio,
   } = duelistData
+  const scoreboard = useScoreboard(tableId, duelistId)
+  const { balance, balanceFormatted } = scoreboard
+
   const { dispatchSelectDuelistId } = usePistolsContext()
 
   useEffect(() => {
     // console.log(duelistData)
-    dataCallback(duelistId, duelistData)
-  }, [duelistData])
+    dataCallback(duelistId, {
+      ...duelistData,
+      ...scoreboard,
+    })
+  }, [duelistData, scoreboard])
 
   const _colClass = (col: DuelistColumn) => (sortColumn == col ? 'Important' : null)
 
@@ -160,7 +187,8 @@ function DuelistItem({
       </Cell>
 
       <Cell textAlign='left' style={{ maxWidth: '175px' }}>
-        <h5 className='NoMargin'><ProfileName duelistId={duelistId} /></h5>
+        <h5 className='NoMargin'><ProfileName duelistId={duelistId} displayId={false} badges={false} /></h5>
+        <div className='Normal NoMargin'>Duelist #{Number(duelistId ?? 0)} <ProfileBadge duelistId={duelistId} /></div>
         {/* <AddressShort address={address} copyLink={false} /> */}
       </Cell>
 
@@ -193,8 +221,14 @@ function DuelistItem({
       </Cell>
 
       <Cell className={_colClass(DuelistColumn.WinRatio)}>
-        {winRatio === null ? '-' : <span className='TableValue'>{Math.floor(winRatio * 100)}%</span>}
+        {isRookie || winRatio === null ? '-' : <span className='TableValue'>{Math.floor(winRatio * 100)}%</span>}
       </Cell>
+
+      {canWager &&
+        <Cell className={_colClass(DuelistColumn.Balance)}>
+          {isRookie ? '-' : <span className='TableValue'>{balanceFormatted}</span>}
+        </Cell>
+      }
     </Table.Row>
   )
 }
