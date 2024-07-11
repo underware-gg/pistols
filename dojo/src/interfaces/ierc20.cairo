@@ -16,5 +16,6 @@ trait IERC20<TState> {
 
 #[inline(always)]
 fn ierc20(contract_address: ContractAddress) -> IERC20Dispatcher {
+    assert(contract_address.is_non_zero(), 'ierc20(): null address');
     (IERC20Dispatcher{contract_address})
 }

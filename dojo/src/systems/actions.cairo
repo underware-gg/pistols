@@ -117,6 +117,7 @@ mod actions {
         const INVALID_EXPIRY: felt252            = 'PISTOLS: Invalid expiry';
         const INVALID_CHALLENGE: felt252         = 'PISTOLS: Invalid challenge';
         const INVALID_DUELIST: felt252           = 'PISTOLS: Invalid duelist';
+        const INVALID_MINTER: felt252            = 'PISTOLS: Null minter address';
         const NOT_YOUR_CHALLENGE: felt252        = 'PISTOLS: Not your challenge';
         const NOT_YOUR_DUELIST: felt252          = 'PISTOLS: Not your duelist';
         const CHALLENGER_NOT_ADMITTED: felt252   = 'PISTOLS: Challenger not allowed';
@@ -155,6 +156,7 @@ mod actions {
             // mint if you can
             let caller: ContractAddress = starknet::get_caller_address();
             let config_manager: Config = ConfigManagerTrait::new(world).get();
+            assert(config_manager.minter_address.is_non_zero(), Errors::INVALID_MINTER);
             let minter_dispatcher = IMinterDispatcher{ contract_address: config_manager.minter_address };
             let token_id: u128 = minter_dispatcher.mint(caller, config_manager.token_duelist_address);
 

@@ -81,6 +81,7 @@ mod minter {
     #[abi(embed_v0)]
     impl MinterImpl of IMinter<ContractState> {
         fn mint(ref world: IWorldDispatcher, to: ContractAddress, token_contract_address: ContractAddress) -> u128 {
+            assert(token_contract_address.is_non_zero(), Errors::INVALID_TOKEN_ADDRESS);
             let token = (ITokenDuelistDispatcher{ contract_address: token_contract_address });
 
             // check availability
@@ -105,6 +106,7 @@ mod minter {
         }
 
         fn can_mint(world: @IWorldDispatcher, to: ContractAddress, token_contract_address: ContractAddress) -> bool {
+            assert(token_contract_address.is_non_zero(), Errors::INVALID_TOKEN_ADDRESS);
             let token = (ITokenDuelistDispatcher{ contract_address: token_contract_address });
             let mut config: TokenConfig = get!(world, (token_contract_address), TokenConfig);
             let balance: u256 = token.balance_of(to);

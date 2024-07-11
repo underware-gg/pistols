@@ -63,5 +63,6 @@ trait IERC721<TState> {
 
 #[inline(always)]
 fn ierc721(contract_address: ContractAddress) -> IERC721Dispatcher {
+    assert(contract_address.is_non_zero(), 'ierc721(): null address');
     (IERC721Dispatcher{contract_address})
 }

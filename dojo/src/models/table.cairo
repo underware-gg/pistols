@@ -67,7 +67,7 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
             wager_min: 0,
             fee_min: 4 * constants::ETH_TO_WEI,
             fee_pct: 10,
-            is_open: (lords_address != ZERO()),
+            is_open: (lords_address.is_non_zero()),
             table_type: TableType::Classic,
         }),
         (TableConfig {
@@ -87,7 +87,7 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
             wager_min: 0,
             fee_min: 0,
             fee_pct: 0,
-            is_open: (lords_address != ZERO()),
+            is_open: (lords_address.is_non_zero()),
             table_type: TableType::IRLTournament,
         }),
     ])
@@ -189,7 +189,8 @@ impl TableAdmittanceTraitImpl of TableAdmittanceTrait {
     //     }
     // }
     fn can_join(self: @TableAdmittance, account_address: ContractAddress, duelist_id: u128) -> bool {
-        if (self.account_a == @ZERO() && self.account_b == @ZERO()) {
+        if ((*self.account_a).is_zero() && (*self.account_b).is_zero()) {
+            // not set, enyone can join
             (true)
         } else {
             (@account_address == self.account_a  || @account_address == self.account_b || duelist_id <= 6)

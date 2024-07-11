@@ -3,7 +3,6 @@ use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::models::config::{ConfigManager, ConfigManagerTrait};
 use pistols::interfaces::ierc721::{ierc721, IERC721Dispatcher, IERC721DispatcherTrait};
 use pistols::types::constants::{constants};
-use pistols::libs::utils::{ZERO};
 
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
@@ -153,7 +152,9 @@ struct DuelistManager {
 #[generate_trait]
 impl DuelistManagerTraitImpl of DuelistManagerTrait {
     fn new(world: IWorldDispatcher) -> DuelistManager {
-        let token_dispatcher = ierc721(ConfigManagerTrait::new(world).get().token_duelist_address);
+        let contract_address: ContractAddress = ConfigManagerTrait::new(world).get().token_duelist_address;
+        assert(contract_address.is_non_zero(), 'DuelistManager: null token addr');
+        let token_dispatcher = ierc721(contract_address);
         (DuelistManager { world, token_dispatcher })
     }
     fn get(self: DuelistManager, duelist_id: u128) -> Duelist {
@@ -169,7 +170,7 @@ impl DuelistManagerTraitImpl of DuelistManagerTrait {
         (self.token_dispatcher.owner_of(duelist_id.into()))
     }
     fn exists(self: DuelistManager, duelist_id: u128) -> bool {
-        (self.owner_of(duelist_id) != ZERO())
+        (self.owner_of(duelist_id).is_non_zero())
     }
     fn is_owner_of(self: DuelistManager, address: ContractAddress, duelist_id: u128) -> bool {
         (self.owner_of(duelist_id)  == address)
