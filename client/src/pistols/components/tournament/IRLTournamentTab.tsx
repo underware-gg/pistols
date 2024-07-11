@@ -23,8 +23,8 @@ export const useChallengeToSelf = () => {
   const { address } = useAccount()
   const { Challenge } = useDojoComponents()
   const ids_a: Entity[] = useEntityQuery([HasValue(Challenge, { address_a: BigInt(address ?? 0n), state: ChallengeState.Awaiting })]) ?? []
-  const ids_b: Entity[] = useEntityQuery([HasValue(Challenge, { address_b: BigInt(address ?? 0n), state: ChallengeState.InProgress })]) ?? []
-  const ids_c: Entity[] = useEntityQuery([HasValue(Challenge, { address_a: BigInt(address ?? 0n), state: ChallengeState.Awaiting })]) ?? []
+  const ids_b: Entity[] = useEntityQuery([HasValue(Challenge, { address_a: BigInt(address ?? 0n), state: ChallengeState.InProgress })]) ?? []
+  const ids_c: Entity[] = useEntityQuery([HasValue(Challenge, { address_b: BigInt(address ?? 0n), state: ChallengeState.Awaiting })]) ?? []
   const ids_d: Entity[] = useEntityQuery([HasValue(Challenge, { address_b: BigInt(address ?? 0n), state: ChallengeState.InProgress })]) ?? []
   const ids = useMemo(() => arrayUnique([...ids_a, ...ids_b, ...ids_c, ...ids_d]), [ids_a, ids_b, ids_c, ids_d])
   const duelKey = useMemo(() => (ids[0] ?? ids[0] ?? null), [ids])

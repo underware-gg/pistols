@@ -49,10 +49,11 @@ export default function IRLTournamentModal({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const wagerValue = 0n;
   const expireSeconds = (60 * 60);
+  const isReply = Boolean(duelId)
   const _challenge = () => {
     const _submit = async () => {
       setIsSubmitting(true)
-      if (duelId) {
+      if (isReply) {
         // accept challenge
         await reply_challenge(account, duelistId, duelId, true)
       } else {
@@ -104,7 +105,7 @@ export default function IRLTournamentModal({
               <ActionButton fill label='Close' onClick={() => opener.close()} />
             </Col>
             <Col>
-              <ActionButton fill important label='Challenge Your Opponent!' disabled={!selectedArchetype || isSubmitting} onClick={() => _challenge()} />
+              <ActionButton fill important label={isReply ? 'Your Opponent is Waiting!' : 'Challenge Your Opponent!'} disabled={!selectedArchetype || isSubmitting} onClick={() => _challenge()} />
             </Col>
           </Row>
         </Grid>

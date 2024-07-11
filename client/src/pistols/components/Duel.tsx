@@ -1,15 +1,17 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Grid, Segment, Icon, Step, SegmentGroup, SemanticFLOATS } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { useThreeJsContext } from '../hooks/ThreeJsContext'
+import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { useTable } from '@/pistols/hooks/useTable'
+import { useRevealAction } from '@/pistols/hooks/useRevealAction'
 import { useIsYou } from '@/pistols/hooks/useIsMyDuelist'
 import { useWager } from '@/pistols/hooks/useWager'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
@@ -26,8 +28,6 @@ import { Balance } from '@/pistols/components/account/Balance'
 import { EMOJI } from '@/pistols/data/messages'
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import CommitBladesModal from '@/pistols/components/CommitBladesModal'
-import RevealModal from '@/pistols/components/RevealModal'
-import { useTable } from '../hooks/useTable'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -230,25 +230,17 @@ function DuelProgress({
 
   // Commit modal control
   const [commitModalIsOpen, setCommitModalIsOpen] = useState(false)
-  const [revealModalIsOpen, setRevealModalIsOpen] = useState(false)
-  const _commit = () => {
-    setCommitModalIsOpen(true)
-  }
-  const _reveal = () => {
-    setRevealModalIsOpen(true)
-  }
-
-  // onClick
-  const onClick = useMemo(() => {
-    if (isYou && isConnected && !completedStages[duelStage]) {
+  const { reveal } = useRevealAction(duelId, roundNumber, currentRoundAction?.hash)
+  const onClick = useCallback(() => {
+    if (isYou && isConnected && completedStages[duelStage] === false) {
       if (duelStage == DuelStage.Round1Commit || duelStage == DuelStage.Round2Commit) {
-        return _commit
+        setCommitModalIsOpen(true)
       }
       if (duelStage == DuelStage.Round1Reveal || duelStage == DuelStage.Round2Reveal) {
-        return _reveal
+        console.log(`_reveal()....`)
+        reveal()
       }
     }
-    return null
   }, [isYou, isConnected, duelStage, completedStages])
 
   // auto-reveal
@@ -263,7 +255,6 @@ function DuelProgress({
     <>
       <CommitPacesModal duelId={duelId} isOpen={roundNumber == 1 && commitModalIsOpen} setIsOpen={setCommitModalIsOpen} />
       <CommitBladesModal duelId={duelId} isOpen={roundNumber == 2 && commitModalIsOpen} setIsOpen={setCommitModalIsOpen} isA={isA} isB={isB} />
-      <RevealModal duelId={duelId} roundNumber={roundNumber} isOpen={revealModalIsOpen} hash={currentRoundAction?.hash} setIsOpen={setRevealModalIsOpen} />
       <Step.Group vertical size='small'>
         <ProgressItem
           stage={DuelStage.Round1Commit}
@@ -274,7 +265,7 @@ function DuelProgress({
           icon='street view'
           // emoji=EMOJI.PACES
           floated={floated}
-          onClick={onClick}
+          onClick={isYou ? onClick : null}
         />
         {duelStage <= DuelStage.Round1Reveal &&
           <ProgressItem
@@ -285,7 +276,7 @@ function DuelProgress({
             description=''
             icon='eye'
             floated={floated}
-            onClick={onClick}
+            onClick={isYou ? onClick : null}
           />
         }
         <ProgressItem
@@ -297,7 +288,7 @@ function DuelProgress({
           icon={round1Result ? null : 'target'}
           emoji={round1Result ? _resultEmoji(round1Shot) : null}
           floated={floated}
-          onClick={onClick}
+          onClick={null}
           className={round1Result ? _resultBackground(round1Shot) : null}
         />
 
@@ -314,7 +305,7 @@ function DuelProgress({
               // emojiFlipped='horizontally'
               // emojiRotated='clockwise'
               floated={floated}
-              onClick={onClick}
+              onClick={isYou ? onClick : null}
             />
             {duelStage <= DuelStage.Round2Reveal &&
               <ProgressItem
@@ -325,7 +316,7 @@ function DuelProgress({
                 description=''
                 icon='eye'
                 floated={floated}
-                onClick={onClick}
+                onClick={isYou ? onClick : null}
               />
             }
             <ProgressItem
@@ -337,7 +328,7 @@ function DuelProgress({
               icon={round2Result ? null : 'target'}
               emoji={round2Result ? _resultEmoji(round2Shot) : null}
               floated={floated}
-              onClick={onClick}
+              onClick={null}
               className={round2Result ? _resultBackground(round2Shot) : null}
             />
           </>
@@ -353,7 +344,7 @@ function DuelProgress({
             icon={round3Result ? null : 'target'}
             emoji={round3Result ? _resultEmoji(round3Shot) : null}
             floated={floated}
-            onClick={onClick}
+            onClick={null}
             className={round3Result ? _resultBackground(round3Shot) : null}
           />
         }
@@ -377,38 +368,40 @@ function ProgressItem({
   onClick = null,
   className = null,
 }) {
-  const _currentStage = (duelStage == stage)
+  const _isCurrentStage = (duelStage == stage)
   const _completed =
     stage != DuelStage.Round1Animation && stage != DuelStage.Round2Animation && stage != DuelStage.Round3Animation // animations do not complete
     && (
       (stage < duelStage) // past stage
-      || (_currentStage && completedStages[stage] === true
+      || (_isCurrentStage && completedStages[stage] === true
       ))
-  const _onClick = (_currentStage && !_completed ? onClick : null)
+  const _canClick = (_isCurrentStage && !_completed && Boolean(onClick))
+
   const _disabled = (duelStage < stage)
   const _left = (floated == 'left')
   const _right = (floated == 'right')
-  let classNames = className ? [className] : []
+
+  let classNames = ['AlignCenter']
+  if (className) classNames.push(className)
+  if (!_canClick) classNames.push('NoMouse')
 
   let _icon = useMemo(() => {
     const style = _right ? { margin: '0 0 0 1rem' } : {}
-    if (_currentStage && !_completed) return <LoadingIcon style={style} />
+    if (_isCurrentStage && !_completed) return <LoadingIcon style={style} />
     if (icon) return <Icon name={icon} style={style} />
     if (emoji) return <EmojiIcon emoji={emoji} style={style} flipped={emojiFlipped} rotated={emojiRotated} />
     return <></>
   }, [icon, emoji, _completed, _right])
 
   // if (_right) classNames.push('AlignRight')
-  classNames.push('AlignCenter')
-  if (!_onClick) classNames.push('NoMouse')
   return (
     <Step
       className={classNames.join(' ')}
       completed={_completed}
-      active={Boolean(_currentStage && _onClick)}
+      active={_canClick}
       disabled={_disabled}
-      link={_onClick != null}
-      onClick={_onClick}
+      link={_canClick}
+      onClick={() => (_canClick ? onClick : null)?.()}
     >
       {_left && _icon}
       <Step.Content className='AutoMargin'>
