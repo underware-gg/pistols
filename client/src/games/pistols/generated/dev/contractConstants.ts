@@ -45,6 +45,7 @@ type mod_actions_Type = {
   INVALID_EXPIRY: string, // cairo: felt252
   INVALID_CHALLENGE: string, // cairo: felt252
   INVALID_DUELIST: string, // cairo: felt252
+  INVALID_MINTER: string, // cairo: felt252
   NOT_YOUR_CHALLENGE: string, // cairo: felt252
   NOT_YOUR_DUELIST: string, // cairo: felt252
   CHALLENGER_NOT_ADMITTED: string, // cairo: felt252
@@ -75,6 +76,7 @@ export const actions: mod_actions_Type = {
   INVALID_EXPIRY: 'PISTOLS: Invalid expiry',
   INVALID_CHALLENGE: 'PISTOLS: Invalid challenge',
   INVALID_DUELIST: 'PISTOLS: Invalid duelist',
+  INVALID_MINTER: 'PISTOLS: Null minter address',
   NOT_YOUR_CHALLENGE: 'PISTOLS: Not your challenge',
   NOT_YOUR_DUELIST: 'PISTOLS: Not your duelist',
   CHALLENGER_NOT_ADMITTED: 'PISTOLS: Challenger not allowed',

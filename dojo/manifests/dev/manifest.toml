@@ -35,8 +35,8 @@ name = "pistols::mocks::lords_mock::lords_mock"
 [[contracts]]
 kind = "DojoContract"
 address = "0x30663cb812dc7e2930b9683945132ca6054483af40e1e7daccb77091e02e7b1"
-class_hash = "0x7888263b3919dc7ead427bfbf2b998bf03760d20b30eb66c889371ca46aa1d4"
-original_class_hash = "0x7888263b3919dc7ead427bfbf2b998bf03760d20b30eb66c889371ca46aa1d4"
+class_hash = "0x7a28eb710831b86946535366cacd19552ca0d2c2fc1ec7a7a0d5dca717ccabe"
+original_class_hash = "0x7a28eb710831b86946535366cacd19552ca0d2c2fc1ec7a7a0d5dca717ccabe"
 base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
 abi = "manifests/dev/abis/deployments/contracts/pistols_systems_actions_actions.json"
 reads = []
@@ -48,8 +48,8 @@ name = "pistols::systems::actions::actions"
 [[contracts]]
 kind = "DojoContract"
 address = "0x725717f8ac5508bb1b6dfbf53949f20b7f38f59c7310feab688cb5f18ef0635"
-class_hash = "0x16d1767d6183d719999fb43d905a664dee516124f8c3e024b5ef832afa4e3f7"
-original_class_hash = "0x16d1767d6183d719999fb43d905a664dee516124f8c3e024b5ef832afa4e3f7"
+class_hash = "0x71cbbacddb9bc397b868a930ae5f542b25024d2fa4fd82a9f6d06f05c562d2a"
+original_class_hash = "0x71cbbacddb9bc397b868a930ae5f542b25024d2fa4fd82a9f6d06f05c562d2a"
 base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
 abi = "manifests/dev/abis/deployments/contracts/pistols_systems_admin_admin.json"
 reads = []
@@ -61,8 +61,8 @@ name = "pistols::systems::admin::admin"
 [[contracts]]
 kind = "DojoContract"
 address = "0x54a9565eedc4904d5e2fa4beeff5e713b1fd23b95286287daf29570b227dfcb"
-class_hash = "0x5b77527c0d56b8369b09ff224d3a81cadc04a04f8c6516e7ae5c32e27021536"
-original_class_hash = "0x5b77527c0d56b8369b09ff224d3a81cadc04a04f8c6516e7ae5c32e27021536"
+class_hash = "0x1dc5842bd3b1310f2ade17574de7179fa3b8ce93e7abd2f3604c51528cebb29"
+original_class_hash = "0x1dc5842bd3b1310f2ade17574de7179fa3b8ce93e7abd2f3604c51528cebb29"
 base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
 abi = "manifests/dev/abis/deployments/contracts/pistols_systems_minter_minter.json"
 reads = []
@@ -79,8 +79,8 @@ name = "pistols::systems::minter::minter"
 [[contracts]]
 kind = "DojoContract"
 address = "0x774e613f68f731df522253c22bce0f77549afc8203d0cfec5086d2ee2a992d6"
-class_hash = "0x2df4cdc08dbd87c82f644bfb2d6dd6f5fe4db24c1440bdf71ce27f808743385"
-original_class_hash = "0x2df4cdc08dbd87c82f644bfb2d6dd6f5fe4db24c1440bdf71ce27f808743385"
+class_hash = "0x48ebca76e3221fc0e710e8c75de4f0df3c00b38f5b4194a7b64325aa2e26550"
+original_class_hash = "0x48ebca76e3221fc0e710e8c75de4f0df3c00b38f5b4194a7b64325aa2e26550"
 base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
 abi = "manifests/dev/abis/deployments/contracts/pistols_systems_token_duelist_token_duelist.json"
 reads = []
