@@ -1,5 +1,8 @@
+import { useSettings } from '@/pistols/hooks/SettingsContext'
+import { useIsMyDuelist, useIsYou } from '@/pistols/hooks/useIsMyDuelist'
 import React, { useMemo } from 'react'
-import { Image } from 'semantic-ui-react'
+import { Icon, Image, SemanticFLOATS } from 'semantic-ui-react'
+import { BigNumberish } from 'starknet'
 
 
 const _makeUrl = (profilePic: number | null, suffix: string) => {
@@ -20,6 +23,13 @@ export function ProfilePic({
   duel = false,
   floated = null,
   className = null
+}: {
+  profilePic: number
+  small?: boolean
+  square?: boolean
+  duel?: boolean
+  floated?: SemanticFLOATS
+  className?: string
 }) {
   const classNames = useMemo(() => [_className(small, square, duel), className], [square])
   const suffix = useMemo(() => _suffix(square), [square])
@@ -36,6 +46,20 @@ export function ProfilePicButton({
   disabled = false,
   dimmed = false,
   className = '',
+  duelistId,
+  floated,
+}: {
+  profilePic: number
+  onClick: Function
+  small?: boolean
+  square?: boolean
+  duel?: boolean
+  disabled?: boolean
+  dimmed?: boolean
+  className?: string
+  //switch duelist
+  duelistId?: BigNumberish
+  floated?: SemanticFLOATS
 }) {
   const classNames = useMemo(() => {
     let result = [_className(small, square, duel), className]
@@ -48,7 +72,28 @@ export function ProfilePicButton({
   const _click = () => {
     if (!disabled) onClick(profilePic)
   }
-  return <Image src={url} className={classNames.join(' ')} onClick={() => _click()} />
+  // switch duelist
+  const { dispatchDuelistId } = useSettings()
+  const isYou = useIsYou(duelistId)
+  const isMyDuelist = useIsMyDuelist(duelistId)
+  const _canSwitch = (Boolean(duelistId) && isMyDuelist && !isYou)
+  const _switch = () => {
+    dispatchDuelistId(duelistId)
+  }
+  const _style = floated == 'left' ? {
+    top: '25px',
+    left: '25px',
+  } : floated == 'right' ? {
+    top: '25px',
+    left: 'unset',
+    right: '25px',
+  } : {}
+  return (
+    <>
+      <Image src={url} className={classNames.join(' ')} onClick={() => _click()} />
+      {_canSwitch && <Icon name='sync alternate' size='big' onClick={() => _switch()} className='Absolute Anchor' style={_style} />}
+    </>
+  )
 }
 
 //-----------------

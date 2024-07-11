@@ -91,8 +91,9 @@ export default function ChallengeModal() {
           </Row>
         </Grid>
       </Modal.Header>
-      <Modal.Content image>
-        <ProfilePicButton profilePic={profilePicA} onClick={() => dispatchSelectDuelistId(duelistIdA)} />
+      <Modal.Content image className='Relative'>
+        <ProfilePicButton profilePic={profilePicA} duelistId={duelistIdA} floated='left' onClick={() => dispatchSelectDuelistId(duelistIdA)} />
+        
         <Modal.Description className='Padded' style={{ width: '550px' }}>
           <Grid style={{ width: '350px' }}>
             <Row columns='equal' textAlign='left'>
@@ -162,7 +163,8 @@ export default function ChallengeModal() {
 
           </Grid>
         </Modal.Description>
-        <ProfilePicButton profilePic={profilePicB} onClick={() => dispatchSelectDuelistId(duelistIdB)} />
+
+        <ProfilePicButton profilePic={profilePicB} duelistId={duelistIdB} floated='right' onClick={() => dispatchSelectDuelistId(duelistIdB)} />
       </Modal.Content>
       <Modal.Actions className='NoPadding'>
         <Grid className='FillParent Padded' textAlign='center'>
