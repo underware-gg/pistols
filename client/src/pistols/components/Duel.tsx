@@ -230,7 +230,7 @@ function DuelProgress({
 
   // Commit modal control
   const [commitModalIsOpen, setCommitModalIsOpen] = useState(false)
-  const { reveal } = useRevealAction(duelId, roundNumber, currentRoundAction?.hash)
+  const { reveal } = useRevealAction(duelId, roundNumber, currentRoundAction?.hash, duelStage == DuelStage.Round1Reveal || duelStage == DuelStage.Round2Reveal)
   const onClick = useCallback(() => {
     if (isYou && isConnected && completedStages[duelStage] === false) {
       if (duelStage == DuelStage.Round1Commit || duelStage == DuelStage.Round2Commit) {
