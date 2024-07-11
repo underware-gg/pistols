@@ -74,15 +74,20 @@ export function DuelistTable() {
 
   // Sort rows
   const sortedRows = useMemo(() => rows.sort((a, b) => {
-    const dataA = duelistsData[a.props.address]
-    const dataB = duelistsData[b.props.address]
+    const dataA = duelistsData[a.props.duelistId]
+    const dataB = duelistsData[b.props.duelistId]
     if (!dataA && !dataB) return 0
     if (!dataA) return 1
     if (!dataB) return -1
+    // Sort by names, or both rookies
     const isAscending = (sortDirection == SortDirection.Ascending)
-    if (sortColumn == DuelistColumn.Name) {
+    if (sortColumn == DuelistColumn.Name || (dataA.isRookie && dataB.isRookie)) {
       return isAscending ? dataA.name.localeCompare(dataB.name) : dataB.name.localeCompare(dataA.name)
     }
+    // Rookies at the bottom
+    if (dataA.isRookie) return 1
+    if (dataB.isRookie) return -1
+    // Sort by values
     const _sortTotals = (a, b) => (!isAscending ? (b - a) : (a && !b) ? -1 : (!a && b) ? 1 : (a - b))
     if (sortColumn == DuelistColumn.Honour) return _sortTotals(dataA.honour, dataB.honour)
     if (sortColumn == DuelistColumn.Level) return _sortTotals(dataA.level, dataB.level)
@@ -92,7 +97,7 @@ export function DuelistTable() {
     if (sortColumn == DuelistColumn.Draws) return _sortTotals(dataA.total_draws, dataB.total_draws)
     if (sortColumn == DuelistColumn.Total) return _sortTotals(dataA.total_duels, dataB.total_duels)
     if (sortColumn == DuelistColumn.WinRatio) return _sortTotals(dataA.winRatio, dataB.winRatio)
-    if (sortColumn == DuelistColumn.Balance) return _sortTotals(dataA.balance, dataB.balance)
+    if (sortColumn == DuelistColumn.Balance) return _sortTotals(dataA.balanceSort, dataB.balanceSort)
     return 0
   }), [rows, duelistsData, sortColumn, sortDirection])
 
@@ -161,6 +166,7 @@ function DuelistItem({
   } = duelistData
   const scoreboard = useScoreboard(tableId, duelistId)
   const { balance, balanceFormatted } = scoreboard
+  const isRookie = (total_duels == 0)
 
   const { dispatchSelectDuelistId } = usePistolsContext()
 
@@ -169,16 +175,16 @@ function DuelistItem({
     dataCallback(duelistId, {
       ...duelistData,
       ...scoreboard,
+      balanceSort: balance === 0 ? -9999999999999 : balance,
+      isRookie,
     })
-  }, [duelistData, scoreboard])
+  }, [duelistData, scoreboard, isRookie])
 
   const _colClass = (col: DuelistColumn) => (sortColumn == col ? 'Important' : null)
 
   const _select = () => {
     dispatchSelectDuelistId(duelistId)
   }
-
-  const isRookie = (total_duels == 0)
 
   return (
     <Table.Row textAlign='center' verticalAlign='middle' onClick={() => _select()}>
