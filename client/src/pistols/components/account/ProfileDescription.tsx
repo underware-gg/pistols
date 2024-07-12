@@ -30,7 +30,7 @@ export function ProfileBadge({
 }: {
   duelistId: BigNumberish
 }) {
-  const { isVillainous, isTrickster, isHonourable } = useDuelist(duelistId)
+  const { score: { isVillainous, isTrickster, isHonourable } } = useDuelist(duelistId)
   if (isVillainous) return <>{EMOJI.VILLAIN}</>
   if (isTrickster) return <>{EMOJI.TRICKSTER}</>
   if (isHonourable) return <>{EMOJI.LORD}</>
@@ -45,15 +45,15 @@ export function ProfileDescription({
   displayBalance = false,
 }: {
   duelistId: BigNumberish,
-    address?: BigNumberish
+  address?: BigNumberish
   displayStats?: boolean
   displayOwnerAddress?: boolean
   displayBalance?: boolean
 }) {
-  const {
+  const { score: {
     total_wins, total_losses, total_draws, total_duels, total_honour, honourAndTotal,
     isVillainous, isTrickster, isHonourable, levelDisplay, levelAndTotal,
-  } = useDuelist(duelistId)
+  } } = useDuelist(duelistId)
   const { owner } = useDuelistOwner(duelistId)
   return (
     <Grid>

@@ -23,7 +23,7 @@ export function OnboardingProfile({
   const { duelistId } = useSettings()
   const { account, address } = useAccount()
 
-  const { name, profilePic, archetypeName } = useDuelist(duelistId)
+  const { name, profilePic, score: { archetypeName } } = useDuelist(duelistId)
   const [selectedProfilePic, setSelectedProfilePic] = useState(0)
   const { duelistBalance } = useDuelistBalanceOf(address)
 
