@@ -1,8 +1,9 @@
+import React, { useMemo } from 'react'
+import { Image, SemanticFLOATS } from 'semantic-ui-react'
+import { BigNumberish } from 'starknet'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useIsMyDuelist, useIsYou } from '@/pistols/hooks/useIsMyDuelist'
-import React, { useMemo } from 'react'
-import { Icon, Image, SemanticFLOATS } from 'semantic-ui-react'
-import { BigNumberish } from 'starknet'
+import { IconClick } from '@/lib/ui/Icons'
 
 
 const _makeUrl = (profilePic: number | null, suffix: string) => {
@@ -21,56 +22,42 @@ export function ProfilePic({
   small = false,
   square = false,
   duel = false,
-  floated = null,
-  className = null
-}: {
-  profilePic: number
-  small?: boolean
-  square?: boolean
-  duel?: boolean
-  floated?: SemanticFLOATS
-  className?: string
-}) {
-  const classNames = useMemo(() => [_className(small, square, duel), className], [square])
-  const suffix = useMemo(() => _suffix(square), [square])
-  const url = useMemo(() => _makeUrl(profilePic, suffix), [profilePic, suffix])
-  return <Image src={url} className={classNames.join(' ')} floated={floated} />
-}
-
-export function ProfilePicButton({
-  profilePic,
-  onClick,
-  small = false,
-  square = false,
-  duel = false,
-  disabled = false,
   dimmed = false,
   className = '',
-  duelistId,
   floated,
+  // as button
+  onClick,
+  disabled = false,
+  // switch button
+  duelistId,
 }: {
   profilePic: number
-  onClick: Function
   small?: boolean
   square?: boolean
   duel?: boolean
-  disabled?: boolean
   dimmed?: boolean
   className?: string
-  //switch duelist
+    floated?: SemanticFLOATS
+  // as button
+  onClick?: Function
+    disabled?: boolean
+  // switch duelist
   duelistId?: BigNumberish
-  floated?: SemanticFLOATS
 }) {
+  const _clickable = (onClick != null && !disabled)
+
   const classNames = useMemo(() => {
     let result = [_className(small, square, duel), className]
-    if (!disabled) result.push('Anchor')
+    if (_clickable) result.push('Anchor')
     if (disabled || dimmed) result.push('ProfilePicDisabled')
     return result
-  }, [small, square, duel, disabled, dimmed])
+  }, [className, small, square, duel, disabled, dimmed])
   const suffix = useMemo(() => _suffix(square), [square])
   const url = useMemo(() => _makeUrl(profilePic, suffix), [profilePic, suffix])
+
+  // as Button
   const _click = () => {
-    if (!disabled) onClick(profilePic)
+    if (_clickable) onClick(profilePic)
   }
   // switch duelist
   const { dispatchDuelistId } = useSettings()
@@ -80,18 +67,19 @@ export function ProfilePicButton({
   const _switch = () => {
     dispatchDuelistId(duelistId)
   }
-  const _style = floated == 'left' ? {
-    top: '25px',
-    left: '25px',
-  } : floated == 'right' ? {
+  const _iconStyle = floated == 'right' ? {
     top: '25px',
     left: 'unset',
     right: '25px',
+  } : (floated == 'left' || _canSwitch) ? {
+    top: '25px',
+    left: '25px',
   } : {}
+
   return (
     <>
-      <Image src={url} className={classNames.join(' ')} onClick={() => _click()} />
-      {_canSwitch && <Icon name='sync alternate' size='big' onClick={() => _switch()} className='Absolute Anchor' style={_style} />}
+      <Image src={url} className={classNames.join(' ')} floated={floated} onClick={() => _click()} />
+      {_canSwitch && <IconClick important name='sync alternate' size='big' onClick={() => _switch()} className='Absolute' style={_iconStyle} />}
     </>
   )
 }
@@ -114,5 +102,5 @@ export function ProfilePicSquareButton({
   dimmed = false,
   onClick,
 }) {
-  return <ProfilePicButton profilePic={profilePic} onClick={onClick} disabled={disabled} dimmed={dimmed} small={small} square={true} />
+  return <ProfilePic profilePic={profilePic} onClick={onClick} disabled={disabled} dimmed={dimmed} small={small} square={true} />
 }

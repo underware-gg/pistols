@@ -11,7 +11,7 @@ import { useWager } from '@/pistols/hooks/useWager'
 import { useTable } from '@/pistols/hooks/useTable'
 import { useIsYou } from '@/pistols/hooks/useIsMyDuelist'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
-import { ProfilePicButton } from '@/pistols/components/account/ProfilePic'
+import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
 import { WagerAndOrFees } from '@/pistols/components/account/LordsBalance'
 import { ChallengeState, makeDuelUrl } from '@/pistols/utils/pistols'
@@ -92,13 +92,13 @@ export default function ChallengeModal() {
         </Grid>
       </Modal.Header>
       <Modal.Content image className='Relative'>
-        <ProfilePicButton profilePic={profilePicA} duelistId={duelistIdA} floated='left' onClick={() => dispatchSelectDuelistId(duelistIdA)} />
+        <ProfilePic profilePic={profilePicA} duelistId={duelistIdA} floated='left' onClick={() => dispatchSelectDuelistId(duelistIdA)} />
         
         <Modal.Description className='Padded' style={{ width: '550px' }}>
           <Grid style={{ width: '350px' }}>
             <Row columns='equal' textAlign='left'>
               <Col>
-                <ProfileDescription duelistId={duelistIdA} address={duelistAddressA} />
+                <ProfileDescription duelistId={duelistIdA} />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -108,7 +108,7 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <ProfileDescription duelistId={duelistIdB} address={duelistAddressB} />
+                <ProfileDescription duelistId={duelistIdB} />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -164,7 +164,7 @@ export default function ChallengeModal() {
           </Grid>
         </Modal.Description>
 
-        <ProfilePicButton profilePic={profilePicB} duelistId={duelistIdB} floated='right' onClick={() => dispatchSelectDuelistId(duelistIdB)} />
+        <ProfilePic profilePic={profilePicB} duelistId={duelistIdB} floated='right' onClick={() => dispatchSelectDuelistId(duelistIdB)} />
       </Modal.Content>
       <Modal.Actions className='NoPadding'>
         <Grid className='FillParent Padded' textAlign='center'>

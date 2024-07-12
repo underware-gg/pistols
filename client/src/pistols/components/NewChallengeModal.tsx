@@ -10,7 +10,7 @@ import { useTable, useTableAccountBalance } from '@/pistols/hooks/useTable'
 import { usePact } from '@/pistols/hooks/usePact'
 import { useCalcFee } from '@/pistols/hooks/useContractCalls'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
-import { ProfilePicButton } from '@/pistols/components/account/ProfilePic'
+import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { WagerAndOrFees } from '@/pistols/components/account/LordsBalance'
 import { ethToWei, validateCairoString } from '@/lib/utils/starknet'
@@ -92,7 +92,7 @@ export default function NewChallengeModal() {
         </Grid>
       </Modal.Header>
       <Modal.Content image>
-        <ProfilePicButton profilePic={profilePicA} onClick={() => dispatchSelectDuelistId(duelistIdA)} />
+        <ProfilePic profilePic={profilePicA} onClick={() => dispatchSelectDuelistId(duelistIdA)} />
 
         <Modal.Description className='Padded' style={{ width: '550px' }}>
           <Grid style={{ width: '350px' }}>
@@ -126,7 +126,7 @@ export default function NewChallengeModal() {
           </Grid>
         </Modal.Description>
 
-        <ProfilePicButton profilePic={profilePicB} onClick={() => dispatchSelectDuelistId(duelistIdB)} />
+        <ProfilePic profilePic={profilePicB} onClick={() => dispatchSelectDuelistId(duelistIdB)} />
       </Modal.Content>
       <Modal.Actions className='NoPadding'>
         <Grid className='FillParent Padded' textAlign='center'>

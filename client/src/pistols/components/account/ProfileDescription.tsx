@@ -39,13 +39,13 @@ export function ProfileBadge({
 
 export function ProfileDescription({
   duelistId,
-  address = null,
+  tableId,
   displayStats = false,
   displayOwnerAddress = false,
   displayBalance = false,
 }: {
   duelistId: BigNumberish,
-  address?: BigNumberish
+  tableId?: BigNumberish,
   displayStats?: boolean
   displayOwnerAddress?: boolean
   displayBalance?: boolean
@@ -61,19 +61,19 @@ export function ProfileDescription({
 
         <Col width={displayStats ? 12 : 16}>
           <h1 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /></h1>
-          {address ? <AddressShort address={address} />
-            : displayOwnerAddress ? <AddressShort address={owner} />
-              : <></>}
+          {displayOwnerAddress && <AddressShort address={owner} />}
           <h3 className='Important NoMargin TitleCase'>
             Honour: <span className='Wager'>{honourAndTotal}</span>
             {isVillainous && <> {EMOJI.VILLAIN} <span className='Wager'>{levelDisplay}</span></>}
             {isTrickster && <> {EMOJI.TRICKSTER} <span className='Wager'>{levelDisplay}</span></>}
             {isHonourable && <> {EMOJI.LORD} <span className='Wager'>{levelDisplay}</span></>}
           </h3>
-          {/* {displayBalance && <>
-            <LordsBalance address={address} big />
-            <LockedWagerBalance tableId={tableId} address={address} clean />
-          </>} */}
+          {displayBalance &&
+            <h5>
+              <LordsBalance address={owner} big />
+              {tableId && <LockedWagerBalance tableId={tableId} address={owner} clean />}
+            </h5>
+          }
         </Col>
 
         {displayStats && total_duels > 0 &&

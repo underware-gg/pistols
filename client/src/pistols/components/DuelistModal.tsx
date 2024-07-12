@@ -12,6 +12,7 @@ import { ProfileDescription } from '@/pistols/components/account/ProfileDescript
 import { ChallengeTableByDuelist } from '@/pistols/components/ChallengeTable'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
+import { IconClick } from '@/lib/ui/Icons'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -53,13 +54,19 @@ export default function DuelistModal() {
               Duelist
             </Col>
             <Col textAlign='center'>
-              {(isYou || isMyDuelist) &&
+              {/* {(isYou || isMyDuelist) &&
                 <div className='Anchor' onClick={() => _switch()} >
                   <span className='Smaller'>{isYou ? 'Exit to Gate' : 'Switch Duelist'}</span>
                   &nbsp;
                   <Icon name={isYou ? 'sign out' : 'sync alternate'} size={'small'} />
                 </div>
-              }
+              } */}
+              <span className='Smaller Important'>
+                {isYou ? <>Current</>
+                  : isMyDuelist ? <>Yours <IconClick important name='sync alternate' size='small' onClick={() => _switch()} /></>
+                    : <></>
+                }
+              </span>
             </Col>
             <Col textAlign='right'>
               <AddressShort address={owner} />
@@ -67,8 +74,8 @@ export default function DuelistModal() {
           </Row>
         </Grid>
       </Modal.Header>
-      <Modal.Content image>
-        <ProfilePic profilePic={profilePic} />
+      <Modal.Content image className='Relative'>
+        <ProfilePic profilePic={profilePic} duelistId={selectedDuelistId} />
         <Modal.Description className='FillParent'>
           <div className='DuelistModalDescription'>
             <ProfileDescription duelistId={selectedDuelistId} displayStats displayBalance />

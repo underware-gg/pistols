@@ -123,13 +123,16 @@ export function LoadingIcon({
 interface IconClickProps extends IconProps {
   onClick: Function
   important?: boolean
+  className?: string
+  style?: any
 }
 export function IconClick(props: IconClickProps) {
   const classNames = ['IconClick']
   if (props.important) classNames.push('Important')
+  if (props.className) classNames.push(props.className)
   const iconProps = useMemo(() => ({ ...props, important: undefined }), [props])
   return (
-    <Icon {...iconProps} className={classNames.join(' ')} onClick={() => props.onClick()} />
+    <Icon {...iconProps} className={classNames.join(' ')} style={props.style} onClick={() => props.onClick()} />
   )
 }
 
