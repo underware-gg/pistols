@@ -3,7 +3,7 @@ import { Grid, Segment, Icon, Step, SegmentGroup, SemanticFLOATS } from 'semanti
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
-import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
+import { useDojoConstants } from '@/lib/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'

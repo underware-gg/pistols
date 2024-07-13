@@ -2,21 +2,30 @@ import { Account, AccountInterface, AllowArray, Call, UniversalDetails } from 's
 import { createWorld, World } from '@dojoengine/recs'
 import { DojoCall, DojoProvider } from '@dojoengine/core'
 
-export type IDefineContractComponentsFunction = (world: World) => any
+export type IDefineContractComponentsFunction = (world: World) => any;
+export type IDefineContractConstantsFunction = () => any;
 
-export type ISetupNetworkResult<CC extends IDefineContractComponentsFunction> = {
+export type ISetupNetworkResult<
+  CCOMP extends IDefineContractComponentsFunction,
+  CCONST extends IDefineContractConstantsFunction,
+> = {
   world: World
-  contractComponents: ReturnType<CC>
+  contractComponents: ReturnType<CCOMP>
+  contractConstants: ReturnType<CCONST>
   execute: DojoProvider['execute']
   call: DojoProvider['call'] // call(call: DojoCall | Call): Promise<Result>;
-}
+};
 
-export const world = createWorld()
+export const world = createWorld();
 
-export function setupNetwork<CC extends IDefineContractComponentsFunction>(provider: DojoProvider, defineContractComponents: CC): ISetupNetworkResult<CC> {
+export function setupNetwork<
+  CCOMP extends IDefineContractComponentsFunction,
+  CCONST extends IDefineContractConstantsFunction
+>(provider: DojoProvider, defineContractComponents: CCOMP, defineContractConstants: CCONST): ISetupNetworkResult<CCOMP, CCONST> {
   return {
     world,
     contractComponents: defineContractComponents(world),
+    contractConstants: defineContractConstants(),
     // execute: async (signer: Account, contract: string, system: string, call_data: num.BigNumberish[]) => {
     execute: async (account: Account | AccountInterface, call: AllowArray<DojoCall | Call>, details?: UniversalDetails) => {
       return provider.execute(account, call, details)

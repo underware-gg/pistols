@@ -1,8 +1,6 @@
-import { ReactNode, createContext, useCallback, useContext, useMemo } from 'react'
+import { ReactNode, createContext, useContext } from 'react'
 import { usePredeployedWindowObject } from '@dojoengine/create-burner'
 import { SetupResult } from '@/lib/dojo/setup/useSetup'
-import { bigintEquals } from '@/lib/utils/types';
-import { Account, BigNumberish } from 'starknet'
 
 interface DojoContextType {
   isInitialized: boolean;
@@ -73,3 +71,9 @@ export const useDojoComponents = () => {
   }
 }
 
+export const useDojoConstants = () => {
+  const { setup: { constants } } = useDojo()
+  return {
+    ...constants,
+  }
+}

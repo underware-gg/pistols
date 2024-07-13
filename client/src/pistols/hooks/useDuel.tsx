@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react'
-import { useDojoComponents } from '@/lib/dojo/DojoContext'
+import { useDojoComponents, useDojoConstants } from '@/lib/dojo/DojoContext'
 import { useComponentValue } from '@dojoengine/react'
 import { useThreeJsContext } from "./ThreeJsContext"
 import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
@@ -8,7 +8,6 @@ import { keysToEntity } from '@/lib/utils/types'
 import { ActionNames, ActionVerbs, RoundState } from "@/pistols/utils/pistols"
 import { AnimationState } from "@/pistols/three/game"
 import { BigNumberish } from 'starknet'
-import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 
 export enum DuelStage {
   Null,             // 0

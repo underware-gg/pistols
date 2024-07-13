@@ -3,9 +3,9 @@ import { ThreeJsProvider } from '@/pistols/hooks/ThreeJsContext'
 import { GameplayProvider } from '@/pistols/hooks/GameplayContext'
 import { makeDojoAppConfig } from '@/games/pistols/config'
 import { HeaderData } from '@/lib/ui/AppHeader'
+import App, { AppProps } from '@/lib/ui/App'
 import ErrorModal from '@/pistols/components/ErrorModal'
 import Dojo from '@/lib/dojo/Dojo'
-import App, { AppProps } from '@/lib/ui/App'
 
 export default function AppPistols({
   headerData = null,

@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import { useComponentValue } from '@dojoengine/react'
-import { useDojoComponents } from '@/lib/dojo/DojoContext'
-import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
+import { useDojoComponents, useDojoConstants } from '@/lib/dojo/DojoContext'
 import { useERC20Balance } from '@/lib/utils/hooks/useERC20'
 import { bigintToEntity } from '@/lib/utils/types'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
