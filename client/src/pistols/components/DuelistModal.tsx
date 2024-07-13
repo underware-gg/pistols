@@ -78,7 +78,7 @@ export default function DuelistModal() {
         <ProfilePic profilePic={profilePic} duelistId={selectedDuelistId} />
         <Modal.Description className='FillParent'>
           <div className='DuelistModalDescription'>
-            <ProfileDescription duelistId={selectedDuelistId} displayStats displayBalance />
+            <ProfileDescription duelistId={selectedDuelistId} tableId={tableId} displayBalance displayStats />
             <div className='Spacer10' />
             <div className='TableInModal'>
               <ChallengeTableByDuelist duelistId={selectedDuelistId} compact tableId={tableId} />

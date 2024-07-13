@@ -7,21 +7,24 @@ import { useLockedLordsBalance } from '@/pistols/hooks/useWager'
 import { Balance } from '@/pistols/components/account/Balance'
 import { BigNumberish } from 'starknet'
 import { useMemo } from 'react'
-import { bigintToHex } from '@/lib/utils/types'
 
+
+//
+// Ether balance of an account
+//
 export const EtherBalance = ({
   address,
-  pre = null,
-  post = null,
-  clean = false,
-  big = false,
 }) => {
   const { balance } = useEtherBalance(address)
   return (
-    <Balance ether big={big} wei={balance} pre={pre} post={post} clean={clean} />
+    <Balance ether wei={balance} />
   )
 }
 
+
+//
+// Lords balance of an account
+//
 export const LordsBalance = ({
   address,
   pre = null,
@@ -36,6 +39,10 @@ export const LordsBalance = ({
   )
 }
 
+
+//
+// Wager Balance of a Duelist
+//
 export const WagerBalance = ({
   tableId,
   address,
@@ -51,25 +58,10 @@ export const WagerBalance = ({
   )
 }
 
-export const LockedWagerBalance = ({
-  tableId,
-  address,
-  pre = null,
-  post = null,
-  clean = false,
-}) => {
-  const { total } = useLockedLordsBalance(address)
-  if (!total) return <></>
-  return (
-    <>
-      {' + '}
-      <Balance big tableId={tableId} wei={total} pre={pre} post={post} clean={clean} />
-      {' '}
-      (locked)
-    </>
-  )
-}
-
+//
+// Wager and fees of a Challenge
+// Used at challenge descriptions
+//
 export function WagerAndOrFees({
   tableId,
   value,
@@ -112,3 +104,27 @@ export function WagerAndOrFees({
     </span>
   )
 }
+
+//
+// Locked wagers of a duslist
+// Used at owned profiles
+//
+export const LockedWagerBalance = ({
+  tableId,
+  address,
+  pre = null,
+  post = null,
+  clean = false,
+}) => {
+  const { total } = useLockedLordsBalance(address)
+  if (!total) return <></>
+  return (
+    <>
+      {' + '}
+      <Balance big tableId={tableId} wei={total} pre={pre} post={post} clean={clean} />
+      {' '}
+      <span className='Normal'>(wagered)</span>
+    </>
+  )
+}
+

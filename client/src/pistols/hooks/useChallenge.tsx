@@ -172,10 +172,27 @@ export const useChallengeDescription = (duelId: bigint) => {
 // Challenges by Duelist
 //
 
+const invalidId = 9999999999999n
+
 export const useChallengeIdsByDuelistId = (duelist_id: BigNumberish, tableId?: string) => {
   const { Challenge } = useDojoComponents()
-  const challengerIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { duelist_id_a: BigInt(duelist_id ?? 0n) })])
-  const challengedIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { duelist_id_b: BigInt(duelist_id ?? 0n) })])
+  const challengerIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { duelist_id_a: BigInt(duelist_id ?? invalidId) })])
+  const challengedIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { duelist_id_b: BigInt(duelist_id ?? invalidId) })])
+  const allChallengeIds: bigint[] = useMemo(() => ([...challengerIds, ...challengedIds]), [challengerIds, challengedIds])
+  const challengeIds = useMemo(() => (
+    tableId ? _filterChallengesByTable(Challenge, allChallengeIds, tableId) : allChallengeIds
+  ), [allChallengeIds, tableId])
+  return {
+    challengeIds,
+    challengerIds,
+    challengedIds,
+  }
+}
+
+export const useChallengeIdsByOwner = (address: BigNumberish, tableId?: string) => {
+  const { Challenge } = useDojoComponents()
+  const challengerIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { address_a: BigInt(address ?? invalidId) })])
+  const challengedIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { address_b: BigInt(address ?? invalidId) })])
   const allChallengeIds: bigint[] = useMemo(() => ([...challengerIds, ...challengedIds]), [challengerIds, challengedIds])
   const challengeIds = useMemo(() => (
     tableId ? _filterChallengesByTable(Challenge, allChallengeIds, tableId) : allChallengeIds
@@ -190,6 +207,19 @@ export const useChallengeIdsByDuelistId = (duelist_id: BigNumberish, tableId?: s
 export const useChallengesByDuelistId = (duelist_id: BigNumberish, tableId?: string) => {
   const { Challenge } = useDojoComponents()
   const { challengeIds } = useChallengeIdsByDuelistId(duelist_id, tableId)
+  const raw_challenges: any[] = useMemo(() => (
+    challengeIds.map((challengeId) => getComponentValue(Challenge, bigintToEntity(challengeId)))
+      .sort(_challegeSorterByTimestamp)
+  ), [challengeIds])
+  return {
+    raw_challenges,
+    challengeIds,
+  }
+}
+
+export const useChallengesByOwner = (address: BigNumberish, tableId?: string) => {
+  const { Challenge } = useDojoComponents()
+  const { challengeIds } = useChallengeIdsByOwner(address, tableId)
   const raw_challenges: any[] = useMemo(() => (
     challengeIds.map((challengeId) => getComponentValue(Challenge, bigintToEntity(challengeId)))
       .sort(_challegeSorterByTimestamp)
