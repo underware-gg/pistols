@@ -7,6 +7,7 @@ import { useLockedLordsBalance } from '@/pistols/hooks/useWager'
 import { Balance } from '@/pistols/components/account/Balance'
 import { BigNumberish } from 'starknet'
 import { useMemo } from 'react'
+import { useScoreboard } from '@/pistols/hooks/useScore'
 
 
 //
@@ -41,20 +42,15 @@ export const LordsBalance = ({
 
 
 //
-// Wager Balance of a Duelist
+// Wager Balance of a Duelist on a Table
 //
 export const WagerBalance = ({
   tableId,
-  address,
-  pre = null,
-  post = null,
-  clean = false,
-  big = false,
+  duelistId,
 }) => {
-  const { contractAddress } = useTable(tableId)
-  const { balance } = useERC20Balance(contractAddress, address)
+  const { wagerBalanceWei } = useScoreboard(tableId, duelistId)
   return (
-    <Balance big={big} tableId={tableId} wei={balance} pre={pre} post={post} clean={clean} />
+    <Balance tableId={tableId} wei={wagerBalanceWei} />
   )
 }
 

@@ -1,7 +1,8 @@
 import { ReactNode, useMemo } from 'react'
+import { BigNumberish } from 'starknet'
 import { CustomIcon, IconSizeProp } from '@/lib/ui/Icons'
 import { weiToEthString } from '@/lib/utils/starknet'
-import { BigNumberish } from 'starknet'
+import { EMOJI } from '@/pistols/data/messages'
 
 export function LordsBagIcon({
   size = null,
@@ -40,11 +41,12 @@ export function Balance({
 }) {
   const _value = useMemo<string>(() => {
     const decimals = (ether ? 6 : 0)
-    return (
+    const result = (
       wei != null ? weiToEthString(wei, decimals)
         : value != null ? weiToEthString(value, decimals)
           : ''
     )
+    return (result == '0' || result == '0.0') ? EMOJI.ZERO : result
   }, [value, wei])
 
   let classNames = useMemo(() => {

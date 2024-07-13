@@ -43,9 +43,10 @@ export const EMOJI: any = {
   LORD: '👑',
   TRICKSTER: '🃏',
   VILLAIN: '👺',
-  THIEF: '🥷', // TODO
-  CHICKEN: '🐣', // TODO
-  GHOST: '👻', // TODO
+  THIEF: '🥷',    // TODO? used Steal
+  CHICKEN: '🐣',  // TODO? used Flee
+  GHOST: '👻',    // TODO? used Seppuku / permadeath
   //
+  ZERO: '—',      // zero honour, zero balance
   UNKNOWN: '?',
 }

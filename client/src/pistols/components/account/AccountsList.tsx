@@ -6,9 +6,10 @@ import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext, initialState } from '@/pistols/hooks/PistolsContext'
 import { useDuelistBalanceOf, useDuelistOfOwnerByIndex, useDuelistTokenCount } from '@/pistols/hooks/useTokenDuelist'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { useDojoConstants } from '@/lib/dojo/ConstantsContext'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
 import { ProfileName } from '@/pistols/components/account/ProfileDescription'
-import { EtherBalance, LordsBalance } from '@/pistols/components/account/LordsBalance'
+import { WagerBalance } from '@/pistols/components/account/LordsBalance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { makeTavernUrl } from '@/pistols/utils/pistols'
 
@@ -55,6 +56,7 @@ function AccountItem({
   const { address } = useAccount()
   const { duelistId } = useDuelistOfOwnerByIndex(address, index)
   const { exists, profilePic } = useDuelist(duelistId)
+  const { tables } = useDojoConstants()
 
   const _canPlay = (exists)
 
@@ -72,7 +74,6 @@ function AccountItem({
     dispatchSetMenu(menuKey)
     router.push(makeTavernUrl(tableId))
   }
-
 
   return (
     <>
@@ -92,7 +93,7 @@ function AccountItem({
           <h3><ProfileName duelistId={duelistId} /></h3>
           {/* <AddressShort address={address} /> */}
           <h5>
-            <LordsBalance address={address} />
+            <WagerBalance tableId={tables.LORDS} duelistId={duelistId} />
           </h5>
         </Col>
         <Col width={5} textAlign='left'>

@@ -93,7 +93,7 @@ export const useRouterListener = () => {
   }, [selectedDuelId])
 
   useEffect(() => {
-    _updateRoute(selectedDuelistId ? { duelist: bigintToHex(selectedDuelistId) } : {})
+    _updateRoute(selectedDuelistId ? { duelist: selectedDuelistId.toString() } : {})
   }, [selectedDuelistId])
 
   const _updateRoute = (params: PistolsParams) => {
