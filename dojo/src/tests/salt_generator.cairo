@@ -37,8 +37,8 @@ mod tests {
     fn _start_new_challenge(world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress, wager_value: u256) -> (Challenge, Round, u128) {
         // tester::execute_update_duelist(system, OWNER(), PLAYER_NAME, 1, "1");
         // tester::execute_update_duelist(system, OTHER(), OTHER_NAME, 1, "2");
-        let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, wager_value, expire_seconds);
+        let expire_hours: u64 = 48;
+        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, wager_value, expire_hours);
         tester::elapse_timestamp(timestamp::from_days(1));
         tester::execute_reply_challenge(system, OTHER(), duel_id, true);
         let ch = tester::get_Challenge(world, duel_id);

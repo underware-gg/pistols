@@ -104,7 +104,7 @@ export function createSystemCalls(
     return await _executeTransaction(signer, actions_call('update_duelist', args))
   }
 
-  const create_challenge = async (signer: AccountInterface, duelist_id: BigNumberish, challenged_id_or_address: BigNumberish, message: string, table_id: string, wager_value: BigNumberish, expire_seconds: number): Promise<boolean> => {
+  const create_challenge = async (signer: AccountInterface, duelist_id: BigNumberish, challenged_id_or_address: BigNumberish, message: string, table_id: string, wager_value: BigNumberish, expire_hours: number): Promise<boolean> => {
     // find lords contract
     const table = getComponentValue(TableConfig, bigintToEntity(stringToFelt(table_id)))
     if (!table) throw new Error(`Table does not exist [${table_id}]`)
@@ -125,7 +125,7 @@ export function createSystemCalls(
     calls.push({
       contractAddress: actions_contract.address,
       entrypoint: 'create_challenge',
-      calldata: [duelist_id, BigInt(challenged_id_or_address), stringToFelt(message), table_id, uint256.bnToUint256(wager_value), expire_seconds],
+      calldata: [duelist_id, BigInt(challenged_id_or_address), stringToFelt(message), table_id, uint256.bnToUint256(wager_value), expire_hours],
     })
     return await _executeTransaction(signer, calls)
   }

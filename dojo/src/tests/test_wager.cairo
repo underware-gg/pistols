@@ -270,8 +270,7 @@ mod tests {
         let wager_value: u256 = 100 * constants::ETH_TO_WEI;
         let fee: u256 = system.calc_fee(TABLE_ID, wager_value);
         let approved_value: u256 = wager_value + fee;
-        let expire_seconds: u64 = timestamp::from_days(1);
-        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, wager_value, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, wager_value, 24);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
         tester::assert_balance(lords, A, balance_a, approved_value, 0, 'balance_a_1');

@@ -76,14 +76,6 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Invalid expiry', 'ENTRYPOINT_FAILED'))]
-    fn test_invalid_expiry() {
-        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
-        let expire_seconds: u64 = 60 * 60 - 1;
-        let _duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_seconds);
-    }
-
-    #[test]
     fn test_challenge_to_address() {
         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
         let timestamp = tester::get_block_timestamp();
@@ -114,12 +106,12 @@ mod tests {
     #[test]
     fn test_challenge_expire_ok() {
         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
-        let expire_seconds: u64 = 24 * 60 * 60;
+        let expire_hours: u64 = 24;
         let timestamp = tester::get_block_timestamp();
-        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_hours);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.timestamp_start == timestamp, 'timestamp_start');
-        assert(ch.timestamp_end == ch.timestamp_start + expire_seconds, 'timestamp_end');
+        assert(ch.timestamp_end == ch.timestamp_start + timestamp::from_hours(expire_hours), 'timestamp_end');
     }
 
     #[test]
@@ -145,8 +137,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Invalid challenge', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_reply_invalid() {
         let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
-        let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 48);
         tester::elapse_timestamp(timestamp::from_days(1));
         tester::execute_reply_challenge(system, OWNER(), duel_id + 1, true);
     }
@@ -155,21 +146,18 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Challenge not Awaiting', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_reply_twice() {
         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
-        let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 48);
         let _ch = tester::get_Challenge(world, duel_id);
         let (_block_number, _timestamp) = tester::elapse_timestamp(timestamp::from_days(3));
         let new_state: ChallengeState = tester::execute_reply_challenge(system, OTHER(), duel_id, false);
         assert(new_state != ChallengeState::Awaiting, '!awaiting');
-        
         tester::execute_reply_challenge(system, OTHER(), duel_id, true);
     }
 
     #[test]
     fn test_challenge_reply_expired() {
         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
-        let expire_seconds: u64 = timestamp::from_days(1);
-        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 24);
         let _ch = tester::get_Challenge(world, duel_id);
 
         assert(system.has_pact(TABLE_ID, ID(OTHER()), ID(OWNER())) == true, 'has_pact_yes');
@@ -190,8 +178,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Not your challenge', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_owner_accept_self() {
         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
-        let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 48);
         let _ch = tester::get_Challenge(world, duel_id);
 
         tester::elapse_timestamp(timestamp::from_days(1));
@@ -201,8 +188,7 @@ mod tests {
     #[test]
     fn test_challenge_owner_cancel() {
         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
-        let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 48);
         let _ch = tester::get_Challenge(world, duel_id);
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
 
@@ -223,8 +209,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Not your challenge', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_impersonator() {
         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
-        let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 48);
         let _ch = tester::get_Challenge(world, duel_id);
         let (_block_number, _timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
         tester::execute_reply_challenge(system, BUMMER(), duel_id, false);
@@ -233,8 +218,7 @@ mod tests {
     #[test]
     fn test_challenge_other_refuse() {
         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
-        let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 48);
 
         assert(system.has_pact(TABLE_ID, ID(OTHER()), ID(OWNER())) == true, 'has_pact_yes');
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));

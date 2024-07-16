@@ -32,8 +32,7 @@ mod tests {
     fn _start_new_challenge(world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress, wager_value: u256) -> (Challenge, Round, u128) {
         // tester::execute_update_duelist(system, OWNER(), PLAYER_NAME, 1, "1");
         // tester::execute_update_duelist(system, OTHER(), OTHER_NAME, 1, "2");
-        let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, wager_value, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, wager_value, 48);
         tester::elapse_timestamp(timestamp::from_days(1));
         tester::execute_reply_challenge(system, OTHER(), duel_id, true);
         let ch = tester::get_Challenge(world, duel_id);
@@ -89,8 +88,7 @@ mod tests {
         assert(system.has_pact(TABLE_ID, ID(A), ID(B)) == false, 'has_pact_no_1');
         assert(system.has_pact(TABLE_ID, ID(B), ID(A)) == false, 'has_pact_no_2');
 
-        let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, 48);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'state');
         assert(ch.address_a == A, 'challenged');
@@ -126,8 +124,7 @@ mod tests {
         assert(system.has_pact(TABLE_ID, ID(A), ID(B)) == false, 'has_pact_no_1');
         assert(system.has_pact(TABLE_ID, ID(B), ID(A)) == false, 'has_pact_no_2');
 
-        let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, 48);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'state');
         assert(ch.address_a == A, 'challenged');
@@ -150,10 +147,9 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Not your duelist', 'ENTRYPOINT_FAILED'))]
     fn test_reply_wrong_duelist() {
         let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let expire_seconds: u64 = timestamp::from_days(2);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER(); // challenge a duelist
-        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, 48);
         // reply with different TOKEN ID
         let _new_state: ChallengeState = tester::execute_reply_challenge_id(system, B, duel_id, 0xaaa, true);
     }
@@ -162,10 +158,9 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Not your challenge', 'ENTRYPOINT_FAILED'))]
     fn test_reply_wrong_player_address() {
         let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let expire_seconds: u64 = timestamp::from_days(2);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = LITTLE_BOY(); // challenge a wallet
-        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, 48);
         // reply with different TOKEN ID
         let another_boy: ContractAddress = starknet::contract_address_const::<0xaaaa00000000000aa>();
         let _new_state: ChallengeState = tester::execute_reply_challenge(system, another_boy, duel_id, true);
@@ -175,10 +170,9 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Not your challenge', 'ENTRYPOINT_FAILED'))]
     fn test_reply_wrong_player_duelist() {
         let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let expire_seconds: u64 = timestamp::from_days(2);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER(); // challenge a duelist
-        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, 48);
         // reply with different TOKEN ID
         let _new_state: ChallengeState = tester::execute_reply_challenge(system, BUMMER(), duel_id, true);
     }
@@ -187,17 +181,16 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Challenge exists', 'ENTRYPOINT_FAILED'))]
     fn test_reply_has_pact() {
         let (_world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let expire_seconds: u64 = timestamp::from_days(2);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = LITTLE_BOY(); // challenge a wallet
         // fund account
         tester::execute_lords_faucet(lords, B);
         tester::execute_lords_approve(lords, B, system.contract_address, 1_000_000 * constants::ETH_TO_WEI);
         // new challenge
-        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, 48);
         let _new_state: ChallengeState = tester::execute_reply_challenge(system, B, duel_id, true);
         // new challenge
-        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, 48);
         let _new_state: ChallengeState = tester::execute_reply_challenge(system, B, duel_id, true);
     }
 
@@ -765,8 +758,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Challenge not Progress', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_challenge_not_started() {
         let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
-        let expire_seconds: u64 = timestamp::from_days(2);
-        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_seconds);
+        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 48);
         let (_salt_a, _salt_b, _action_a, _action_b, _hash_a, hash_b) = _get_actions_round_1_resolved();
         tester::execute_commit_action(system, OWNER(), duel_id, 1, hash_b);
     }
