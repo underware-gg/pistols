@@ -138,7 +138,7 @@ mod tests {
         duelist.duelist_id = 0x111;
         duelist.name = 'duelist';
         duelist.score.total_duels = 1;
-        utils::update_score_honour(ref duelist.score, 10, true);
+        utils::update_score_honour(ref duelist.score, 100, true);
         assert(duelist.score.level_lord == 100, 'honour_100');
         assert(duelist.score.level_villain == 0, 'honour_100_vill');
         assert(duelist.score.level_trickster == 0, 'honour_100_trick');
