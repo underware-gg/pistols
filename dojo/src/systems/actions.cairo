@@ -33,7 +33,7 @@ trait IActions {
         message: felt252,
         table_id: felt252,
         wager_value: u256,
-        expire_seconds: u64,
+        expire_hours: u64,
     ) -> u128;
     fn reply_challenge(
         ref world: IWorldDispatcher,
@@ -114,7 +114,6 @@ mod actions {
         const INVALID_CHALLENGED_NULL: felt252   = 'PISTOLS: Challenged null';
         const INVALID_CHALLENGED_SELF: felt252   = 'PISTOLS: Challenged self';
         const INVALID_REPLY_SELF: felt252        = 'PISTOLS: Reply self';
-        const INVALID_EXPIRY: felt252            = 'PISTOLS: Invalid expiry';
         const INVALID_CHALLENGE: felt252         = 'PISTOLS: Invalid challenge';
         const INVALID_DUELIST: felt252           = 'PISTOLS: Invalid duelist';
         const INVALID_MINTER: felt252            = 'PISTOLS: Null minter address';
@@ -216,7 +215,7 @@ mod actions {
             message: felt252,
             table_id: felt252,
             wager_value: u256,
-            expire_seconds: u64,
+            expire_hours: u64,
         ) -> u128 {
             assert(ConfigManagerTrait::is_initialized(world) == true, Errors::NOT_INITIALIZED);
 
@@ -251,15 +250,12 @@ mod actions {
             };
             assert(table_manager.can_join(table_id, address_b, duelist_id_b), Errors::CHALLENGED_NOT_ADMITTED);
 
-            // validate expiry
-            assert(expire_seconds == 0 || expire_seconds >= timestamp::from_hours(1), Errors::INVALID_EXPIRY);
-
             // create duel id
             let duel_id: u128 = make_seed(address_a, world.uuid());
 
             // calc expiration
             let timestamp_start: u64 = get_block_timestamp();
-            let timestamp_end: u64 = if (expire_seconds == 0) { 0 } else { timestamp_start + expire_seconds };
+            let timestamp_end: u64 = if (expire_hours == 0) { 0 } else { timestamp_start + timestamp::from_hours(expire_hours) };
 
             let challenge = Challenge {
                 duel_id,

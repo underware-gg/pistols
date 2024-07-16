@@ -291,10 +291,10 @@ mod tester {
         message: felt252,
         table_id: felt252,
         wager_value: u256,
-        expire_seconds: u64,
+        expire_hours: u64,
     ) -> u128 {
         impersonate(sender);
-        let duel_id: u128 = system.create_challenge(ID(sender), challenged, message, table_id, wager_value, expire_seconds);
+        let duel_id: u128 = system.create_challenge(ID(sender), challenged, message, table_id, wager_value, expire_hours);
         _next_block();
         (duel_id)
     }

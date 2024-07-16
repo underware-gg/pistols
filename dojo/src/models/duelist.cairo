@@ -64,7 +64,7 @@ struct Scoreboard {
     score: Score,
     wager_won: u256,
     wager_lost: u256,
-} // [32, 128] [128] [128] [128, 96]
+} // [128] [128,128] [128, 128]
 
 #[derive(Copy, Drop, Serde, Introspect)]
 struct Score {

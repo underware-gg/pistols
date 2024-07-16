@@ -63,7 +63,7 @@ export default function NewChallengeModal() {
   const _create_challenge = () => {
     const _submit = async () => {
       setIsSubmitting(true)
-      await create_challenge(account, duelistId, challengingId, args.message, tableId, args.wager_value, args.expire_seconds)
+      await create_challenge(account, duelistId, challengingId, args.message, tableId, args.wager_value, args.expire_hours)
       setIsSubmitting(false)
     }
     if (args) _submit()
@@ -175,7 +175,7 @@ function NewChallengeForm({
   useEffect(() => {
     setArgs(canSubmit ? {
       message,
-      expire_seconds: (days * 24 * 60 * 60) + (hours * 60 * 60),
+      expire_hours: ((days * 24 * 60 * 60) + hours),
       table_id: tableId,
       wager_value: ethToWei(value),
     } : null)
