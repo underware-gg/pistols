@@ -235,6 +235,32 @@ mod tests {
     }
 
     #[test]
+    fn test_withdraw_expired_fees() {
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let S = system.contract_address;
+        let A = OTHER();
+        let B = OWNER();
+        let balance_contract: u256 = lords.balance_of(S);
+        let balance_a: u256 = lords.balance_of(A);
+        // create challenge, check balances
+        let wager_value: u256 = 100 * constants::ETH_TO_WEI;
+        let fee: u256 = system.calc_fee(TABLE_ID, wager_value);
+        let approved_value: u256 = wager_value + fee;
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, wager_value, 24);
+        let ch = tester::get_Challenge(world, duel_id);
+        assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
+        tester::assert_balance(lords, A, balance_a, approved_value, 0, 'balance_a_1');
+        tester::assert_balance(lords, S, balance_contract, 0, approved_value, 'balance_contract_1');
+        // reply, will expire...
+        let (_block_number, _timestamp) = tester::elapse_timestamp(timestamp::from_date(1, 0, 1));
+        let new_state: ChallengeState = tester::execute_reply_challenge(system, A, duel_id, true);
+        assert(new_state == ChallengeState::Expired, 'expired');
+        // check balances...
+        tester::assert_balance(lords, A, balance_a, 0, 0, 'balance_a_2');
+        tester::assert_balance(lords, S, balance_contract, 0, 0, 'balance_contract_2');
+    }
+
+    #[test]
     fn test_refused_fees() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
         let S = system.contract_address;
