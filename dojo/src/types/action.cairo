@@ -223,11 +223,11 @@ impl ActionTraitImpl of ActionTrait {
             Action::Paces7 |
             Action::Paces8 |
             Action::Paces9 |
-            Action::Paces10 =>  self.into(),
-            Action::Flee =>     0,  // drops honour to zero
-            Action::Steal =>    0,  // drops honour to zero
-            Action::Seppuku =>  10, // very honourable
-            _ =>                -1, // do not affect honour
+            Action::Paces10 =>  self.into() * 10,
+            Action::Flee =>     0,      // drops honour to zero
+            Action::Steal =>    0,      // drops honour to zero
+            Action::Seppuku =>  100,    // very honourable
+            _ =>                -1,     // do not affect honour
         }
     }
 

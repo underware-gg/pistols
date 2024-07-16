@@ -57,8 +57,7 @@ export function ActionChances({
   }, [action])
 
   const _critChances = crit_chances == 100 ? (crit_chances - other_crit_chances) : crit_chances
-  const _action_honour = (action_honour * 10)
-  const _honourValue = (action_honour >= 0 ? _action_honour : isA ? round1?.shot_a.honour : isB ? round1?.shot_b.honour : null) ?? 0
+  const _honourValue = (action_honour >= 0 ? action_honour : isA ? round1?.shot_a.honour : isB ? round1?.shot_b.honour : null) ?? 0
   // console.log(`HONOUR:`, action_honour, _honourValue)
   return (
     <>
@@ -74,10 +73,10 @@ export function ActionChances({
       />
       <ProgressBar disabled={!action} label='Honour:'
         value={_honourValue / 10} total={10}
-        negative={_action_honour >= 0 && _action_honour < honour.TRICKSTER_START}
-        warning={_action_honour >= honour.TRICKSTER_START && _action_honour < honour.LORD_START}
-        cold={_action_honour >= honour.LORD_START}
-        neutral={_action_honour < 0}
+        negative={action_honour >= 0 && action_honour < honour.TRICKSTER_START}
+        warning={action_honour >= honour.TRICKSTER_START && action_honour < honour.LORD_START}
+        cold={action_honour >= honour.LORD_START}
+        neutral={action_honour < 0}
       />
 
       {action > 0 &&

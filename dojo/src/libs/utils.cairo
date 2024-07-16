@@ -349,7 +349,7 @@ fn update_score_totals(ref score_a: Score, ref score_b: Score, state: ChallengeS
 // average honour has an extra decimal, eg: 100 = 10.0
 fn update_score_honour(ref score: Score, duel_honour: u8, calc_levels: bool) {
     score.total_honour += duel_honour.into();
-    score.honour = ((score.total_honour * 10) / score.total_duels.into()).try_into().unwrap();
+    score.honour = (score.total_honour / score.total_duels.into()).try_into().unwrap();
     if (calc_levels) {
         score.level_villain = calc_level_villain(score.honour);
         score.level_lord = calc_level_lord(score.honour);

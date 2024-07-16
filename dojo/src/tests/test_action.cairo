@@ -74,9 +74,9 @@ mod tests {
                 let action_honour: i8 = action.honour();
                 if (is_pace) {
                     assert(action_honour > 0, 'action.honour > 0');
-                    assert(MathU8::abs(action_honour) == n, 'action.honour == paces');
+                    assert(MathU8::abs(action_honour) == n * 10, 'action.honour == paces');
                 } else if (action == Action::Seppuku) {
-                    assert(action_honour == 10, 'action.honour == 10');
+                    assert(action_honour == 100, 'action.honour == 100');
                 } else if (action.is_runner()) {
                     assert(action_honour == 0, 'action.honour == 0');
                 } else {
