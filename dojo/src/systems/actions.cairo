@@ -280,7 +280,7 @@ mod actions {
             let fee: u256 = table.calc_fee(wager_value);
             // calc fee and store
             if (fee > 0 || wager_value > 0) {
-                assert(table.contract_address != utils::ZERO(), Errors::NO_WAGER);
+                assert(table.wager_contract_address != utils::ZERO(), Errors::NO_WAGER);
                 let wager = Wager {
                     duel_id,
                     value: wager_value,

@@ -114,9 +114,9 @@ export function createSystemCalls(
     let calls: Call[] = []
     // approve call
     const actions_contract = getContractByName(manifest, 'actions')
-    if (BigInt(table.contract_address) > 0n) {
+    if (BigInt(table.wager_contract_address) > 0n) {
       calls.push({
-        contractAddress: bigintToHex(table.contract_address),
+        contractAddress: bigintToHex(table.wager_contract_address),
         entrypoint: 'approve',
         calldata: [actions_contract.address, uint256.bnToUint256(approved_value)],
       })
@@ -144,9 +144,9 @@ export function createSystemCalls(
         // approve call
         let calls: Call[] = []
         const actions_contract = getContractByName(manifest, 'actions')
-        if (BigInt(table.contract_address) > 0n) {
+        if (BigInt(table.wager_contract_address) > 0n) {
           calls.push({
-            contractAddress: bigintToHex(table.contract_address),
+            contractAddress: bigintToHex(table.wager_contract_address),
             entrypoint: 'approve',
             calldata: [actions_contract.address, uint256.bnToUint256(approved_value)],
           })
