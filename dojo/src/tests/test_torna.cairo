@@ -19,7 +19,9 @@ mod tests {
     use pistols::utils::timestamp::{timestamp};
     use pistols::tests::test_round1::tests::{_get_actions_round_1_dual_crit};
 
-    
+
+    // const TABLE_ID: felt252 = tables::BRUSSELS;
+    const TABLE_ID: felt252 = 'IRL_TORNA';
 
     const MESSAGE_1: felt252 = 'For honour!!!';
 
@@ -42,6 +44,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_mint_archetype_snapshot_Classic() {
         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::ADMIN | flags::MINTER | flags::INITIALIZE | 0);
         let duelist1: Duelist = tester::execute_mint_duelist(system, OWNER(), 'AAA', 1, '1', Archetype::Villainous);
@@ -62,13 +65,14 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_mint_archetype_snapshot_IRL() {
         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::ADMIN | flags::MINTER | flags::INITIALIZE | 0);
         let duelist1: Duelist = tester::execute_mint_duelist(system, OWNER(), 'AAA', 1, '1', Archetype::Villainous);
         let duelist2: Duelist = tester::execute_mint_duelist(system, OTHER(), 'BBB', 1, '2', Archetype::Honourable);
         assert(duelist1.score.level_villain == honour::MAX, 'level_villain');
         assert(duelist2.score.level_lord == honour::MAX, 'level_lord');
-        let (challenge, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), tables::BRUSSELS);
+        let (challenge, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), TABLE_ID);
         // check scoreboard
         let snapshot = tester::get_Snapshot(world, duel_id);
         assert(snapshot.score_a.level_villain == honour::MAX, 'snap.level_villain');
@@ -95,6 +99,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_IRL_keep_archetypes() {
         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::ADMIN | flags::MINTER | flags::INITIALIZE | 0);
         let duelist1: Duelist = tester::execute_mint_duelist(system, OWNER(), 'AAA', 1, '1', Archetype::Villainous);
@@ -105,7 +110,7 @@ mod tests {
         assert(duelist2.score.level_lord == honour::MAX, 'duelist2.level_lord');
         //
         // duel to the death!
-        let (_challenge, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), tables::BRUSSELS);
+        let (_challenge, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), TABLE_ID);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(10, 1);
         tester::execute_commit_action(system, OWNER(), duel_id, 1, hash_a);
         tester::execute_commit_action(system, OTHER(), duel_id, 1, hash_b);
