@@ -385,7 +385,7 @@
         "type": "core::felt252"
       },
       {
-        "name": "contract_address",
+        "name": "wager_contract_address",
         "type": "core::starknet::contract_address::ContractAddress"
       },
       {

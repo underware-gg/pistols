@@ -1646,8 +1646,8 @@
     {
       "kind": "DojoContract",
       "address": "0x30663cb812dc7e2930b9683945132ca6054483af40e1e7daccb77091e02e7b1",
-      "class_hash": "0x7a28eb710831b86946535366cacd19552ca0d2c2fc1ec7a7a0d5dca717ccabe",
-      "original_class_hash": "0x7a28eb710831b86946535366cacd19552ca0d2c2fc1ec7a7a0d5dca717ccabe",
+      "class_hash": "0x736551a5f024d2c97e0827016f547559fa3e0c34267f340b7cfd9e92531a69e",
+      "original_class_hash": "0x736551a5f024d2c97e0827016f547559fa3e0c34267f340b7cfd9e92531a69e",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -1788,6 +1788,10 @@
             {
               "name": "total_honour",
               "type": "core::integer::u32"
+            },
+            {
+              "name": "honour_history",
+              "type": "core::integer::u64"
             }
           ]
         },
@@ -2038,7 +2042,7 @@
                   "type": "core::integer::u256"
                 },
                 {
-                  "name": "expire_seconds",
+                  "name": "expire_hours",
                   "type": "core::integer::u64"
                 }
               ],
@@ -2536,8 +2540,8 @@
     {
       "kind": "DojoContract",
       "address": "0x725717f8ac5508bb1b6dfbf53949f20b7f38f59c7310feab688cb5f18ef0635",
-      "class_hash": "0x71cbbacddb9bc397b868a930ae5f542b25024d2fa4fd82a9f6d06f05c562d2a",
-      "original_class_hash": "0x71cbbacddb9bc397b868a930ae5f542b25024d2fa4fd82a9f6d06f05c562d2a",
+      "class_hash": "0x7b70ea4301ceed7fad7b39dbeb7d6500524477b7f242c73d5cb77c20f6e7d96",
+      "original_class_hash": "0x7b70ea4301ceed7fad7b39dbeb7d6500524477b7f242c73d5cb77c20f6e7d96",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -2696,7 +2700,7 @@
               "type": "core::felt252"
             },
             {
-              "name": "contract_address",
+              "name": "wager_contract_address",
               "type": "core::starknet::contract_address::ContractAddress"
             },
             {
@@ -3222,8 +3226,8 @@
     {
       "kind": "DojoContract",
       "address": "0x774e613f68f731df522253c22bce0f77549afc8203d0cfec5086d2ee2a992d6",
-      "class_hash": "0x48ebca76e3221fc0e710e8c75de4f0df3c00b38f5b4194a7b64325aa2e26550",
-      "original_class_hash": "0x48ebca76e3221fc0e710e8c75de4f0df3c00b38f5b4194a7b64325aa2e26550",
+      "class_hash": "0x3a45a730db3c23717f15a916abb0919c97e9cd299072cfa8d9ebf0040cc78a2",
+      "original_class_hash": "0x3a45a730db3c23717f15a916abb0919c97e9cd299072cfa8d9ebf0040cc78a2",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -5227,8 +5231,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x6c3467ec5f07b86172b4ef51df92bd4649fa37db4f20965ad7903440dea22c2",
-      "original_class_hash": "0x6c3467ec5f07b86172b4ef51df92bd4649fa37db4f20965ad7903440dea22c2",
+      "class_hash": "0x17e1babdde18196b7147165c157ca231b5bab7edae757d588a442b7c9d5ee87",
+      "original_class_hash": "0x17e1babdde18196b7147165c157ca231b5bab7edae757d588a442b7c9d5ee87",
       "abi": [
         {
           "type": "impl",
@@ -5592,6 +5596,10 @@
             {
               "name": "total_honour",
               "type": "core::integer::u32"
+            },
+            {
+              "name": "honour_history",
+              "type": "core::integer::u64"
             }
           ]
         },
@@ -6518,8 +6526,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x7d0b6654aac1d1760255c46595980390e6d30d6240297e04dbf4340c4bf906a",
-      "original_class_hash": "0x7d0b6654aac1d1760255c46595980390e6d30d6240297e04dbf4340c4bf906a",
+      "class_hash": "0x1866f3ea11fcce3f9cbd98c6a7b51c205d4957a599c01e906bd92b5b0bc31bb",
+      "original_class_hash": "0x1866f3ea11fcce3f9cbd98c6a7b51c205d4957a599c01e906bd92b5b0bc31bb",
       "abi": [
         {
           "type": "impl",
@@ -6883,6 +6891,10 @@
             {
               "name": "total_honour",
               "type": "core::integer::u32"
+            },
+            {
+              "name": "honour_history",
+              "type": "core::integer::u64"
             }
           ]
         },
@@ -7362,8 +7374,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x6f3e4d09b1410dfcc3b5d63c79d84b2d261a37e30337ad8e8186fde784bcae7",
-      "original_class_hash": "0x6f3e4d09b1410dfcc3b5d63c79d84b2d261a37e30337ad8e8186fde784bcae7",
+      "class_hash": "0x6586fdf90ffc354643b214f7c4ace123900f0301a09331ee96089c6a8df7dc",
+      "original_class_hash": "0x6586fdf90ffc354643b214f7c4ace123900f0301a09331ee96089c6a8df7dc",
       "abi": [
         {
           "type": "impl",
@@ -7727,6 +7739,10 @@
             {
               "name": "total_honour",
               "type": "core::integer::u32"
+            },
+            {
+              "name": "honour_history",
+              "type": "core::integer::u64"
             }
           ]
         },
@@ -8201,7 +8217,7 @@
           "key": false
         },
         {
-          "name": "contract_address",
+          "name": "wager_contract_address",
           "type": "ContractAddress",
           "key": false
         },
@@ -8231,8 +8247,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x429e7f4af04864d9cd0081d6b55293ce22ddd09e5a41f9a3667e9a4626cc726",
-      "original_class_hash": "0x429e7f4af04864d9cd0081d6b55293ce22ddd09e5a41f9a3667e9a4626cc726",
+      "class_hash": "0x263b1937ecd58448c77c5d1eb500eff83422c5dd65aecd350ab76e8e221c0d4",
+      "original_class_hash": "0x263b1937ecd58448c77c5d1eb500eff83422c5dd65aecd350ab76e8e221c0d4",
       "abi": [
         {
           "type": "impl",
@@ -8620,7 +8636,7 @@
               "type": "core::felt252"
             },
             {
-              "name": "contract_address",
+              "name": "wager_contract_address",
               "type": "core::starknet::contract_address::ContractAddress"
             },
             {

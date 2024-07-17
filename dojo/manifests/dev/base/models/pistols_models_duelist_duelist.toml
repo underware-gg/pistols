@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x7d0b6654aac1d1760255c46595980390e6d30d6240297e04dbf4340c4bf906a"
-original_class_hash = "0x7d0b6654aac1d1760255c46595980390e6d30d6240297e04dbf4340c4bf906a"
+class_hash = "0x1866f3ea11fcce3f9cbd98c6a7b51c205d4957a599c01e906bd92b5b0bc31bb"
+original_class_hash = "0x1866f3ea11fcce3f9cbd98c6a7b51c205d4957a599c01e906bd92b5b0bc31bb"
 abi = "manifests/dev/abis/base/models/pistols_models_duelist_duelist.json"
 name = "pistols::models::duelist::duelist"
 
