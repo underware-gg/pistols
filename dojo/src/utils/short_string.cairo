@@ -1,5 +1,5 @@
 use core::byte_array::ByteArrayTrait;
-use pistols::utils::bitwise::{U256Bitwise};
+use pistols::utils::bitwise::{BitwiseU256};
 
 trait ShortStringTrait {
     fn concat(self: felt252, value: felt252) -> felt252;
@@ -15,12 +15,12 @@ impl ShortString of ShortStringTrait {
         let mut i: usize = 0;
         loop {
             if(i == 256) { break; }
-            if(_value & U256Bitwise::shl(0xff, i) != 0) {
+            if(_value & BitwiseU256::shl(0xff, i) != 0) {
                 offset = i + 8;
             }
             i += 8;
         };
-        (_value | U256Bitwise::shl(_self, offset)).try_into().unwrap()
+        (_value | BitwiseU256::shl(_self, offset)).try_into().unwrap()
     }
 
     fn join(self: felt252, value: felt252) -> felt252 {
