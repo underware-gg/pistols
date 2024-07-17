@@ -11,7 +11,7 @@ export const useTable = (tableId: string) => {
   const { table_types } = useDojoConstants()
 
   const table = useComponentValue(TableConfig, bigintToEntity(stringToFelt(tableId ?? '')))
-  const contractAddress = useMemo(() => (table?.contract_address ?? 0n), [table])
+  const wagerContractAddress = useMemo(() => (table?.wager_contract_address ?? 0n), [table])
 
   // const tableType = useMemo(() => (table?.table_type ? {
   //   [table_types.CLASSIC]: 'Classic',
@@ -21,8 +21,8 @@ export const useTable = (tableId: string) => {
   
   return {
     tableId,
-    contractAddress,
-    canWager: (contractAddress != 0n),
+    wagerContractAddress,
+    canWager: (wagerContractAddress != 0n),
     description: table ? feltToString(table.description) : '?',
     wagerMin: table?.wager_min ?? null,
     feeMin: table?.fee_min ?? null,
@@ -38,6 +38,6 @@ export const useTable = (tableId: string) => {
 }
 
 export const useTableAccountBalance = (tableId: string, address: BigNumberish, fee: BigNumberish = 0n) => {
-  const { contractAddress } = useTable(tableId)
-  return useERC20Balance(contractAddress, address, fee)
+  const { wagerContractAddress } = useTable(tableId)
+  return useERC20Balance(wagerContractAddress, address, fee)
 }

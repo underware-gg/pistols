@@ -122,7 +122,7 @@ mod admin {
             assert(manager.exists(table_id), Errors::INVALID_TABLE);
             let mut table = manager.get(table_id);
             // update table
-            table.contract_address = contract_address;
+            table.wager_contract_address = contract_address;
             table.description = description;
             table.fee_min = fee_min;
             table.fee_pct = fee_pct;

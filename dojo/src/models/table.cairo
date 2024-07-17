@@ -38,7 +38,7 @@ struct TableConfig {
     table_id: felt252,
     //------
     description: felt252,
-    contract_address: ContractAddress, // wager contract, or 0x0
+    wager_contract_address: ContractAddress,    // 0x0 if no wager or fees
     wager_min: u256,
     fee_min: u256,
     fee_pct: u8,
@@ -63,7 +63,7 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
         (TableConfig {
             table_id: tables::LORDS,
             description: 'The Lords Table',
-            contract_address: lords_address,
+            wager_contract_address: lords_address,
             wager_min: 0,
             fee_min: 4 * constants::ETH_TO_WEI,
             fee_pct: 10,
@@ -73,7 +73,7 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
         (TableConfig {
             table_id: tables::COMMONERS,
             description: 'The Commoners Table',
-            contract_address: ZERO(),
+            wager_contract_address: ZERO(),
             wager_min: 0,
             fee_min: 0,
             fee_pct: 0,
@@ -83,7 +83,7 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
         (TableConfig {
             table_id: tables::BRUSSELS,
             description: 'Brussels Tournament',
-            contract_address: lords_address,
+            wager_contract_address: lords_address,
             wager_min: 0,
             fee_min: 0,
             fee_pct: 0,
@@ -169,7 +169,7 @@ impl TableManagerTraitImpl of TableManagerTrait {
 #[generate_trait]
 impl TableTraitImpl of TableTrait {
     fn ierc20(self: TableConfig) -> IERC20Dispatcher {
-        (ierc20(self.contract_address))
+        (ierc20(self.wager_contract_address))
     }
     fn calc_fee(self: TableConfig, wager_value: u256) -> u256 {
         (MathU256::max(self.fee_min, (wager_value / 100) * self.fee_pct.into()))

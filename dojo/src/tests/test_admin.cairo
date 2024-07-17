@@ -179,7 +179,7 @@ mod tests {
         let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN | 0 | 0 | 0);
         tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO(), ZERO(), ZERO());
         let table: TableConfig = admin.get_table(tables::LORDS);
-        assert(table.contract_address == ZERO(), 'contract_address');
+        assert(table.wager_contract_address == ZERO(), 'contract_address');
         assert(table.is_open == false, 'enabled');
     }
 
@@ -188,7 +188,7 @@ mod tests {
         let (_world, _system, admin, lords, _minter) = tester::setup_world(flags::ADMIN | flags::LORDS | 0 | 0);
         tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), lords.contract_address, ZERO(), ZERO());
         let table: TableConfig = admin.get_table(tables::LORDS);
-        assert(table.contract_address == lords.contract_address, 'contract_address');
+        assert(table.wager_contract_address == lords.contract_address, 'contract_address');
         assert(table.fee_min == 4 * constants::ETH_TO_WEI, 'fee_min');
         assert(table.fee_pct == 10, 'fee_pct');
         assert(table.is_open == true, 'enabled');
@@ -200,12 +200,12 @@ mod tests {
         // not initialized
         tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO(), ZERO(), ZERO());
         let table: TableConfig = admin.get_table(tables::LORDS);
-        assert(table.contract_address == ZERO(), 'zero');
+        assert(table.wager_contract_address == ZERO(), 'zero');
         assert(table.is_open == false, 'zero');
         // set
         tester::execute_admin_set_table(admin, OWNER(), tables::LORDS, lords.contract_address, 'LORDS+', 5, 10, true);
         let table: TableConfig = admin.get_table(tables::LORDS);
-        assert(table.contract_address == lords.contract_address, 'contract_address_1');
+        assert(table.wager_contract_address == lords.contract_address, 'contract_address_1');
         assert(table.description == 'LORDS+', 'description_1');
         assert(table.fee_min == 5, 'fee_min_1');
         assert(table.fee_pct == 10, 'fee_pct_1');
@@ -213,14 +213,14 @@ mod tests {
         // set
         tester::execute_admin_set_table(admin, OWNER(), tables::LORDS, OTHER(), 'LORDS+++', 22, 33, false);
         let table: TableConfig = admin.get_table(tables::LORDS);
-        assert(table.contract_address == OTHER(), 'contract_address_2');
+        assert(table.wager_contract_address == OTHER(), 'contract_address_2');
         assert(table.description == 'LORDS+++', 'description_2');
         assert(table.fee_min == 22, 'fee_min_2');
         assert(table.fee_pct == 33, 'fee_pct_2');
         assert(table.is_open == false, 'enabled_2');
         // get
         let table: TableConfig = tester::get_Table(world, tables::LORDS);
-        assert(table.contract_address == table.contract_address, 'get_table.contract_address');
+        assert(table.wager_contract_address == table.wager_contract_address, 'get_table.wager_address');
         assert(table.fee_min == table.fee_min, 'get_table.fee_min');
         assert(table.fee_pct == table.fee_pct, 'get_table.fee_pct');
         assert(table.is_open == table.is_open, 'get_table.is_open');
@@ -231,11 +231,11 @@ mod tests {
     fn test_set_table_count() {
         let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN | 0 | flags::INITIALIZE | 0);
         let _table: TableConfig = admin.get_table(INVALID_TABLE);
-        // assert(table.contract_address == lords.contract_address, 'zero');
+        // assert(table.wager_contract_address == lords.contract_address, 'zero');
         // // set must work
         // tester::execute_admin_set_table(admin, OWNER(), INVALID_TABLE, BUMMER(), 'LORDS+', 5, 10, true);
         // let table: TableConfig = admin.get_table(INVALID_TABLE);
-        // assert(table.contract_address == BUMMER(), 'contract_address');
+        // assert(table.wager_contract_address == BUMMER(), 'contract_address');
         // assert(table.description == 'LORDS+', 'description');
         // assert(table.fee_min == 5, 'fee_min');
         // assert(table.fee_pct == 10, 'fee_pct');

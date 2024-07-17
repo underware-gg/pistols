@@ -38,15 +38,15 @@ mod init {
 
     fn Score() -> duelist::Score {
         (duelist::Score {
+            honour: 0,
+            level_villain: 0,
+            level_trickster: 0,
+            level_lord: 0,
             total_duels: 0,
             total_wins: 0,
             total_losses: 0,
             total_draws: 0,
             total_honour: 0,
-            honour: 0,
-            level_villain: 0,
-            level_trickster: 0,
-            level_lord: 0,
             honour_history: 0,
         })
     }
