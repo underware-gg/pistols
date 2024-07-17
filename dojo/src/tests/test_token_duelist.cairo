@@ -224,6 +224,7 @@ fn test_token_uri() {
             total_losses: 2,
             total_draws: 1,
             total_honour: 500,
+            honour_history: 0,
         },
     };
     let scoreboard: Scoreboard = Scoreboard{

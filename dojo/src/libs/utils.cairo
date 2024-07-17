@@ -14,7 +14,8 @@ use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round::{RoundState, RoundStateTrait};
 use pistols::types::action::{Action, ActionTrait, ACTION};
 use pistols::types::constants::{constants, honour, chances};
-use pistols::utils::math::{MathU8, MathU16};
+use pistols::utils::math::{MathU8, MathU16, MathU64};
+use pistols::utils::bitwise::{BitwiseU64};
 
 // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
 extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
@@ -348,8 +349,12 @@ fn update_score_totals(ref score_a: Score, ref score_b: Score, state: ChallengeS
 }
 // average honour has an extra decimal, eg: 100 = 10.0
 fn update_score_honour(ref score: Score, duel_honour: u8, calc_levels: bool) {
+    let history_pos: usize = ((score.total_duels.into() - 1) % 8) * 8;
+    score.honour_history =
+        (score.honour_history & ~BitwiseU64::shl(0xff, history_pos)) |
+        BitwiseU64::shl(duel_honour.into(), history_pos);
+    score.honour = (BitwiseU64::sum_bytes(score.honour_history) / MathU64::min(score.total_duels.into(), 8)).try_into().unwrap();
     score.total_honour += duel_honour.into();
-    score.honour = (score.total_honour / score.total_duels.into()).try_into().unwrap();
     if (calc_levels) {
         score.level_villain = calc_level_villain(score.honour);
         score.level_lord = calc_level_lord(score.honour);
