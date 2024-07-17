@@ -245,7 +245,7 @@ mod actions {
                 (utils::ZERO())
             } else {
                 // challenging a wallet...
-                // assert(challenged_id_or_address != address_a, Errors::INVALID_CHALLENGED_SELF);
+                assert(challenged_id_or_address != address_a, Errors::INVALID_CHALLENGED_SELF);
                 (challenged_id_or_address)
             };
             assert(table_manager.can_join(table_id, address_b, duelist_id_b), Errors::CHALLENGED_NOT_ADMITTED);
