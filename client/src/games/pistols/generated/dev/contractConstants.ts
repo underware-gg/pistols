@@ -46,7 +46,6 @@ type actions_Type = {
   INVALID_CHALLENGED_NULL: string, // cairo: felt252
   INVALID_CHALLENGED_SELF: string, // cairo: felt252
   INVALID_REPLY_SELF: string, // cairo: felt252
-  INVALID_EXPIRY: string, // cairo: felt252
   INVALID_CHALLENGE: string, // cairo: felt252
   INVALID_DUELIST: string, // cairo: felt252
   INVALID_MINTER: string, // cairo: felt252
@@ -77,7 +76,6 @@ export const actions: actions_Type = {
   INVALID_CHALLENGED_NULL: 'PISTOLS: Challenged null',
   INVALID_CHALLENGED_SELF: 'PISTOLS: Challenged self',
   INVALID_REPLY_SELF: 'PISTOLS: Reply self',
-  INVALID_EXPIRY: 'PISTOLS: Invalid expiry',
   INVALID_CHALLENGE: 'PISTOLS: Invalid challenge',
   INVALID_DUELIST: 'PISTOLS: Invalid duelist',
   INVALID_MINTER: 'PISTOLS: Null minter address',

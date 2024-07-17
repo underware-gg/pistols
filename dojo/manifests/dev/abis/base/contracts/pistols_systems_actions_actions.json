@@ -137,6 +137,10 @@
       {
         "name": "total_honour",
         "type": "core::integer::u32"
+      },
+      {
+        "name": "honour_history",
+        "type": "core::integer::u64"
       }
     ]
   },
@@ -387,7 +391,7 @@
             "type": "core::integer::u256"
           },
           {
-            "name": "expire_seconds",
+            "name": "expire_hours",
             "type": "core::integer::u64"
           }
         ],
