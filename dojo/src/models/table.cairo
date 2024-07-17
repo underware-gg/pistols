@@ -11,7 +11,6 @@ use pistols::types::constants::{constants};
 mod tables {
     const LORDS: felt252 = 'Lords';
     const COMMONERS: felt252 = 'Commoners';
-    const BRUSSELS: felt252 = 'Brussels';
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
@@ -80,16 +79,6 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
             is_open: true,
             table_type: TableType::Classic,
         }),
-        (TableConfig {
-            table_id: tables::BRUSSELS,
-            description: 'Brussels Tournament',
-            wager_contract_address: lords_address,
-            wager_min: 0,
-            fee_min: 0,
-            fee_pct: 0,
-            is_open: (lords_address.is_non_zero()),
-            table_type: TableType::IRLTournament,
-        }),
     ])
 }
 
@@ -146,20 +135,6 @@ impl TableManagerTraitImpl of TableManagerTrait {
         //
         // default tables
         self.set_array(@default_tables(lords_address));
-        //
-        // Torna setup
-        // let admittance = TableAdmittance{
-        //     table_id: tables::BRUSSELS,
-        //     accounts: array![],
-        //     duelists: array![1,2,3,4,5,6],
-        // };
-        // set!(self.world, (admittance));
-        let admittance = TableAdmittance{
-            table_id: tables::BRUSSELS,
-            account_a,
-            account_b,
-        };
-        set!(self.world, (admittance));
     }
 }
 
