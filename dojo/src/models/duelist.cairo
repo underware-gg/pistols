@@ -66,7 +66,7 @@ struct Scoreboard {
     wager_lost: u256,
 } // [128] [128,128] [128, 128]
 
-#[derive(Copy, Drop, Serde, Introspect)]
+#[derive(Copy, Drop, Serde, IntrospectPacked)]
 struct Score {
     honour: u8,             // 0..100
     level_villain: u8,      // 0..100
@@ -77,7 +77,8 @@ struct Score {
     total_losses: u16,
     total_draws: u16,
     total_honour: u32,      // sum of al duels Honour
-} // [128]
+    honour_history: u64,    // past 8 duels, each byte holds one duel honour
+} // [192]
 
 
 

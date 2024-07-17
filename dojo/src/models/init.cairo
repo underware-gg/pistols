@@ -47,6 +47,7 @@ mod init {
             level_villain: 0,
             level_trickster: 0,
             level_lord: 0,
+            honour_history: 0,
         })
     }
 

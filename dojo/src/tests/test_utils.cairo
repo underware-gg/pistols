@@ -14,6 +14,7 @@ mod tests {
     use pistols::models::init::{init};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::action::{ACTION};
+    use pistols::utils::short_string::{ShortString};
 
     #[test]
     fn test_pact_pair() {
@@ -134,18 +135,47 @@ mod tests {
 
     #[test]
     fn test_update_score_honour() {
-        let mut duelist = init::Duelist();
-        duelist.duelist_id = 0x111;
-        duelist.name = 'duelist';
-        duelist.score.total_duels = 1;
-        utils::update_score_honour(ref duelist.score, 100, true);
-        assert(duelist.score.level_lord == 100, 'honour_100');
-        assert(duelist.score.level_villain == 0, 'honour_100_vill');
-        assert(duelist.score.level_trickster == 0, 'honour_100_trick');
-        assert(duelist.score.is_lord(), 'is_lord()');
+        let mut score = init::Score();
+        score.total_duels = 1;
+        utils::update_score_honour(ref score, 100, true);
+        assert(score.level_lord == 100, 'honour_100_lord');
+        assert(score.level_villain == 0, 'honour_100_vill');
+        assert(score.level_trickster == 0, 'honour_100_trick');
+        assert(score.is_lord(), 'is_lord()');
         // just checks sync with calc_level_lord
         let value: u8 = utils::calc_level_lord(100);
-       assert(duelist.score.level_lord == value, '!= calc');
+       assert(score.level_lord == value, '!= calc');
+    }
+
+    #[test]
+    fn test_honour_history() {
+        let mut score = init::Score();
+        let mut sum: u8 = 0;
+        let mut n: u8 = 1;
+        loop {
+            if (n > 8) { break; }
+            score.total_duels += 1;
+            utils::update_score_honour(ref score, n, true);
+            sum += n;
+            assert(score.honour == (sum / n), ShortString::concat('sum_8___', n.into()));
+            n += 1;
+        };
+        assert(score.honour_history == 0x0807060504030201, '0x0807060504030201');
+        // loop history
+        loop {
+            if (n > 16) { break; }
+            score.total_duels += 1;
+            utils::update_score_honour(ref score, n, true);
+            sum -= n - 8;
+            sum += n;
+            assert(score.honour == (sum / 8), ShortString::concat('sum_16___', n.into()));
+            n += 1;
+        };
+        assert(score.honour_history == 0x100f0e0d0c0b0a09, '0x100f0e0d0c0b0a09');
+        // new loop
+        score.total_duels += 1;
+        utils::update_score_honour(ref score, n, true);
+        assert(score.honour_history == 0x100f0e0d0c0b0a11, '0x100f0e0d0c0b0a11');
     }
 
     #[test]
