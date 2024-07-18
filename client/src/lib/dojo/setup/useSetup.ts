@@ -131,9 +131,11 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   } = useAsyncMemo<PredeployedManager>(async () => {
     if (!dojoProvider) return (dojoProvider as any) // undefined or null
     let predeployedAccounts = [...selectedChainConfig.predeployedAccounts]
-    const masterAccount = getChainMasterAccount(selectedChainConfig)
-    if (masterAccount) {
-      predeployedAccounts.push(masterAccount)
+    if (predeployedAccounts.length == 0) {
+      const masterAccount = getChainMasterAccount(selectedChainConfig)
+      if (masterAccount) {
+        predeployedAccounts.push(masterAccount)
+      }
     }
     const predeployedManager = new PredeployedManager({
       rpcProvider: dojoProvider.provider,
@@ -163,8 +165,8 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
         : toriiIsError ? 'Game Indexer is Unavailable'
           : subscription === null ? 'Sync Error'
             : isDeployed === null ? 'World not Found'
-                : predeployedManagerIsError ? 'Predeployed Manager error'
-                  : null
+              : predeployedManagerIsError ? 'Predeployed Manager error'
+                : null
   const isError = (errorMessage != null)
 
   useEffect(() => {
