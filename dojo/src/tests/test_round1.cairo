@@ -24,12 +24,12 @@ mod tests {
     const OTHER_NAME: felt252 = 'Senpai';
     const MESSAGE_1: felt252 = 'For honour!!!';
     const TABLE_ID: felt252 = tables::LORDS;
-    const WAGER_VALUE: u256 = 100_000_000_000_000_000_000;
+    const WAGER_VALUE: u128 = 100_000_000_000_000_000_000;
 
     const SALT_1_a: u64 = 0xa6f099b756a87e62;
     const SALT_1_b: u64 = 0xf9a978e92309da78;
 
-    fn _start_new_challenge(world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress, wager_value: u256) -> (Challenge, Round, u128) {
+    fn _start_new_challenge(world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress, wager_value: u128) -> (Challenge, Round, u128) {
         // tester::execute_update_duelist(system, OWNER(), PLAYER_NAME, 1, "1");
         // tester::execute_update_duelist(system, OTHER(), OTHER_NAME, 1, "2");
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, wager_value, 48);
@@ -133,7 +133,7 @@ mod tests {
         assert(ch.duelist_id_b == 0, 'challenged_id'); // challenged an address, id is empty
         // fund account
         tester::execute_lords_faucet(lords, B);
-        tester::execute_lords_approve(lords, B, system.contract_address, 1_000_000 * constants::ETH_TO_WEI);
+        tester::execute_lords_approve(lords, B, system.contract_address, 1_000_000 * constants::ETH_TO_WEI.low);
         // reply...
         let new_state: ChallengeState = tester::execute_reply_challenge(system, B, duel_id, true);
         assert(new_state == ChallengeState::InProgress, 'in_progress');
@@ -185,7 +185,7 @@ mod tests {
         let B: ContractAddress = LITTLE_BOY(); // challenge a wallet
         // fund account
         tester::execute_lords_faucet(lords, B);
-        tester::execute_lords_approve(lords, B, system.contract_address, 1_000_000 * constants::ETH_TO_WEI);
+        tester::execute_lords_approve(lords, B, system.contract_address, 1_000_000 * constants::ETH_TO_WEI.low);
         // new challenge
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, 48);
         let _new_state: ChallengeState = tester::execute_reply_challenge(system, B, duel_id, true);
@@ -203,11 +203,11 @@ mod tests {
     #[test]
     fn test_resolved() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_contract: u256 = lords.balance_of(system.contract_address);
-        let balance_treasury: u256 = lords.balance_of(TREASURY());
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_contract: u128 = lords.balance_of(system.contract_address).low;
+        let balance_treasury: u128 = lords.balance_of(TREASURY()).low;
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         assert(fee > 0, 'fee > 0');
         assert(balance_treasury == 0, 'balance_treasury == 0');
 
@@ -311,8 +311,8 @@ mod tests {
         tester::assert_balance(lords, system.contract_address, balance_contract, 0, 0, 'balance_contract_2');
         let balance_treasury = tester::assert_balance(lords, TREASURY(), balance_treasury, 0, fee * 2, 'balance_treasury_2');
         tester::assert_winner_balance(lords, challenge.winner, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'balance_winner_2');
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
 
         // Run same challenge to compute totals
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);
@@ -366,10 +366,10 @@ mod tests {
     #[test]
     fn test_dual_crit() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_contract: u256 = lords.balance_of(system.contract_address);
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_contract: u128 = lords.balance_of(system.contract_address).low;
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         assert(fee > 0, 'fee > 0');
 
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);

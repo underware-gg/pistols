@@ -62,9 +62,9 @@ struct Scoreboard {
     duelist_id: u128,
     //------------
     score: Score,
-    wager_won: u256,
-    wager_lost: u256,
-} // [128] [128,128] [128, 128]
+    wager_won: u128,
+    wager_lost: u128,
+} // [160] [128] [128]
 
 #[derive(Copy, Drop, Serde, IntrospectPacked)]
 struct Score {

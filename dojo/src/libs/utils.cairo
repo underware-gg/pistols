@@ -97,7 +97,7 @@ fn clone_snapshot_duelist_levels(world: IWorldDispatcher, duelist_id: u128, ref 
 // ierc20::approve(contract_address, max(wager.value, wager.fee));
 fn deposit_wager_fees(world: IWorldDispatcher, challenge: Challenge, from: ContractAddress, to: ContractAddress) {
     let wager: Wager = get!(world, (challenge.duel_id), Wager);
-    let total: u256 = (wager.value + wager.fee);
+    let total: u256 = (wager.value + wager.fee).into();
     if (total > 0) {
         let table : TableConfig = TableManagerTrait::new(world).get(challenge.table_id);
         let balance: u256 = table.ierc20().balance_of(from);
@@ -109,7 +109,7 @@ fn deposit_wager_fees(world: IWorldDispatcher, challenge: Challenge, from: Contr
 }
 fn withdraw_wager_fees(world: IWorldDispatcher, challenge: Challenge, to: ContractAddress) {
     let wager: Wager = get!(world, (challenge.duel_id), Wager);
-    let total: u256 = (wager.value + wager.fee);
+    let total: u256 = (wager.value + wager.fee).into();
     if (total > 0) {
         let table : TableConfig = TableManagerTrait::new(world).get(challenge.table_id);
         let balance: u256 = table.ierc20().balance_of(starknet::get_contract_address());
@@ -118,9 +118,9 @@ fn withdraw_wager_fees(world: IWorldDispatcher, challenge: Challenge, to: Contra
     }
 }
 // spllit wager beteen address_a and address_b
-fn split_wager_fees(world: IWorldDispatcher, challenge: Challenge, address_a: ContractAddress, address_b: ContractAddress) -> u256 {
+fn split_wager_fees(world: IWorldDispatcher, challenge: Challenge, address_a: ContractAddress, address_b: ContractAddress) -> u128 {
     let wager: Wager = get!(world, (challenge.duel_id), Wager);
-    let total: u256 = (wager.value + wager.fee) * 2;
+    let total: u256 = (wager.value + wager.fee).into() * 2;
     if (total > 0) {
         let table : TableConfig = TableManagerTrait::new(world).get(challenge.table_id);
         let balance: u256 = table.ierc20().balance_of(starknet::get_contract_address());
@@ -128,17 +128,17 @@ fn split_wager_fees(world: IWorldDispatcher, challenge: Challenge, address_a: Co
         if (wager.value > 0) {
             if (address_a == address_b) {
                 // single winner
-                table.ierc20().transfer(address_a, wager.value * 2);
+                table.ierc20().transfer(address_a, wager.value.into() * 2);
             } else {
                 // split wager back to addresss
-                table.ierc20().transfer(address_a, wager.value);
-                table.ierc20().transfer(address_b, wager.value);
+                table.ierc20().transfer(address_a, wager.value.into());
+                table.ierc20().transfer(address_b, wager.value.into());
             }
         }
         if (wager.fee > 0) {
             let manager = ConfigManagerTrait::new(world).get();
             if (manager.treasury_address != starknet::get_contract_address()) {
-                table.ierc20().transfer(manager.treasury_address, wager.fee * 2);
+                table.ierc20().transfer(manager.treasury_address, wager.fee.into() * 2);
             }
         }
     }
@@ -312,12 +312,12 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         // split wager/fee to winners and benefactors
         if (final_round.shot_a.wager > final_round.shot_b.wager) {
             // duelist_a won the Wager
-            let wager_value: u256 = split_wager_fees(world, challenge, challenge.address_a, challenge.address_a);
+            let wager_value: u128 = split_wager_fees(world, challenge, challenge.address_a, challenge.address_a);
             scoreboard_a.wager_won += wager_value;
             scoreboard_b.wager_lost += wager_value;
         } else if (final_round.shot_a.wager < final_round.shot_b.wager) {
             // duelist_b won the Wager
-            let wager_value: u256 = split_wager_fees(world, challenge, challenge.address_b, challenge.address_b);
+            let wager_value: u128 = split_wager_fees(world, challenge, challenge.address_b, challenge.address_b);
             scoreboard_a.wager_lost += wager_value;
             scoreboard_b.wager_won += wager_value;
         } else {

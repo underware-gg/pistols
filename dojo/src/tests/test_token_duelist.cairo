@@ -230,8 +230,8 @@ fn test_token_uri() {
         table_id: tables::LORDS,
         duelist_id: TOKEN_ID.low,
         score: duelist.score,
-        wager_won: (1000 * constants::ETH_TO_WEI),
-        wager_lost: (200 * constants::ETH_TO_WEI),
+        wager_won: (1000 * constants::ETH_TO_WEI.low),
+        wager_lost: (200 * constants::ETH_TO_WEI.low),
     };
 
     set!(world, (duelist));

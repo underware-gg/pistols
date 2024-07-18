@@ -14,7 +14,6 @@ mod tests {
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::constants::{constants};
     use pistols::utils::timestamp::{timestamp};
-    use pistols::utils::math::{MathU256};
     use pistols::tests::tester::{tester, tester::{flags, ZERO, OWNER, OTHER, BUMMER, TREASURY}};
 
     const PLAYER_NAME: felt252 = 'Sensei';
@@ -32,33 +31,33 @@ mod tests {
         let (_world, system, admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::ADMIN | 0 | flags::INITIALIZE | 0);
         let table: TableConfig = admin.get_table(TABLE_ID);
         // no wager
-        let fee: u256 = system.calc_fee(TABLE_ID, 0);
+        let fee: u128 = system.calc_fee(TABLE_ID, 0);
         assert(fee == table.fee_min, 'fee > 0');
         // low wager
-        let fee: u256 = system.calc_fee(TABLE_ID, 10 * constants::ETH_TO_WEI);
+        let fee: u128 = system.calc_fee(TABLE_ID, 10 * constants::ETH_TO_WEI.low);
         assert(fee == table.fee_min, 'fee == min');
         // high wager
-        let fee: u256 = system.calc_fee(TABLE_ID, 100 * constants::ETH_TO_WEI);
+        let fee: u128 = system.calc_fee(TABLE_ID, 100 * constants::ETH_TO_WEI.low);
         assert(fee > table.fee_min, 'fee > min');
     }
 
-    fn _test_balance_ok(table_id: felt252, wager_value: u256, wager_min: u256) {
+    fn _test_balance_ok(table_id: felt252, wager_value: u128, wager_min: u128) {
         let (world, system, admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::ADMIN | flags::LORDS | flags::INITIALIZE | 0);
         let S = system.contract_address;
         let A = OTHER();
         let B = OWNER();
-        let balance_contract: u256 = lords.balance_of(S);
-        let balance_a: u256 = lords.balance_of(A);
-        let balance_b: u256 = lords.balance_of(B);
+        let balance_contract: u128 = lords.balance_of(S).low;
+        let balance_a: u128 = lords.balance_of(A).low;
+        let balance_b: u128 = lords.balance_of(B).low;
         // approve fees
         let mut table: TableConfig = admin.get_table(table_id);
         if (wager_min > 0) {
             table.wager_min = wager_min;
             set!(world, (table));
         }
-        let fee: u256 = system.calc_fee(table_id, wager_value);
+        let fee: u128 = system.calc_fee(table_id, wager_value);
         assert(fee >= table.fee_min, 'fee >= min');
-        let approved_value: u256 = wager_value + fee;
+        let approved_value: u128 = wager_value + fee;
         tester::execute_lords_approve(lords, A, S, approved_value);
         tester::execute_lords_approve(lords, B, S, approved_value);
         // create challenge
@@ -68,18 +67,18 @@ mod tests {
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
         // check stored wager
         let wager = tester::get_Wager(world, duel_id);
-        let total: u256 = wager.value + wager.fee;
+        let total: u128 = wager.value + wager.fee;
         assert(total == approved_value, 'wager total = approved_value');
         assert(wager.value >= table.wager_min, 'waager >= wager_min');
         assert(wager.value == wager_value, 'wager.value');
         assert(wager.fee == fee, 'wager.fee');
         // check balances
-        let final_balance_a: u256 = tester::assert_balance(lords, A, balance_a, approved_value, 0, 'balance_a');
-        let fina_balance_contract: u256 = tester::assert_balance(lords, S, balance_contract, 0, approved_value, 'balance_contract+a');
+        let final_balance_a: u128 = tester::assert_balance(lords, A, balance_a, approved_value, 0, 'balance_a');
+        let fina_balance_contract: u128 = tester::assert_balance(lords, S, balance_contract, 0, approved_value, 'balance_contract+a');
         // accept
         tester::execute_reply_challenge(system, B, duel_id, true);
-        let final_balance_b: u256 = tester::assert_balance(lords, B, balance_b, approved_value, 0, 'balance_b');
-        let final_balance_contract: u256 = tester::assert_balance(lords, S, fina_balance_contract, 0, approved_value, 'balance_contract+b');
+        let final_balance_b: u128 = tester::assert_balance(lords, B, balance_b, approved_value, 0, 'balance_b');
+        let final_balance_contract: u128 = tester::assert_balance(lords, S, fina_balance_contract, 0, approved_value, 'balance_contract+b');
         if (table_id == tables::LORDS) {
             assert(fee > 0, 'fee > 0');
             assert(final_balance_a < balance_a, 'final_balance_a');
@@ -102,17 +101,17 @@ mod tests {
     }
     #[test]
     fn test_LORDS_wager_balance_ok() {
-        _test_balance_ok(tables::LORDS, 100 * constants::ETH_TO_WEI, 0);
+        _test_balance_ok(tables::LORDS, 100 * constants::ETH_TO_WEI.low, 0);
     }
     #[test]
     #[should_panic(expected:('PISTOLS: No wager on this table', 'ENTRYPOINT_FAILED'))]
     fn test_COMMONERS_wager_balance_ok() {
-        _test_balance_ok(tables::COMMONERS, 100 * constants::ETH_TO_WEI, 0);
+        _test_balance_ok(tables::COMMONERS, 100 * constants::ETH_TO_WEI.low, 0);
     }
     #[test]
     #[should_panic(expected:('PISTOLS: Minimum wager not met', 'ENTRYPOINT_FAILED'))]
     fn test_LORDS_wager_balance_min_wager() {
-        _test_balance_ok(tables::LORDS, 99 * constants::ETH_TO_WEI, 100 * constants::ETH_TO_WEI);
+        _test_balance_ok(tables::LORDS, 99 * constants::ETH_TO_WEI.low, 100 * constants::ETH_TO_WEI.low);
     }
 
 
@@ -142,7 +141,7 @@ mod tests {
     #[test]
     fn test_fee_funds_ok() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let _balance: u256 = lords.balance_of(OTHER());
+        let _balance: u128 = lords.balance_of(OTHER()).low;
         let duel_id: u128 = tester::execute_create_challenge(system, OTHER(), BUMMER(), MESSAGE_1, TABLE_ID, 0, 0);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
@@ -151,7 +150,7 @@ mod tests {
     #[test]
     fn test_wager_funds_ok() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let _balance: u256 = lords.balance_of(OTHER());
+        let _balance: u128 = lords.balance_of(OTHER()).low;
         let duel_id: u128 = tester::execute_create_challenge(system, OTHER(), BUMMER(), MESSAGE_1, TABLE_ID, 100, 0);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
@@ -216,12 +215,12 @@ mod tests {
         let S = system.contract_address;
         let A = OTHER();
         let B = OWNER();
-        let balance_contract: u256 = lords.balance_of(S);
-        let balance_a: u256 = lords.balance_of(A);
+        let balance_contract: u128 = lords.balance_of(S).low;
+        let balance_a: u128 = lords.balance_of(A).low;
         // create challenge
-        let wager_value: u256 = 100 * constants::ETH_TO_WEI;
-        let fee: u256 = system.calc_fee(TABLE_ID, wager_value);
-        let approved_value: u256 = wager_value + fee;
+        let wager_value: u128 = 100 * constants::ETH_TO_WEI.low;
+        let fee: u128 = system.calc_fee(TABLE_ID, wager_value);
+        let approved_value: u128 = wager_value + fee;
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, wager_value, 0);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
@@ -240,12 +239,12 @@ mod tests {
         let S = system.contract_address;
         let A = OTHER();
         let B = OWNER();
-        let balance_contract: u256 = lords.balance_of(S);
-        let balance_a: u256 = lords.balance_of(A);
+        let balance_contract: u128 = lords.balance_of(S).low;
+        let balance_a: u128 = lords.balance_of(A).low;
         // create challenge, check balances
-        let wager_value: u256 = 100 * constants::ETH_TO_WEI;
-        let fee: u256 = system.calc_fee(TABLE_ID, wager_value);
-        let approved_value: u256 = wager_value + fee;
+        let wager_value: u128 = 100 * constants::ETH_TO_WEI.low;
+        let fee: u128 = system.calc_fee(TABLE_ID, wager_value);
+        let approved_value: u128 = wager_value + fee;
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, wager_value, 24);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
@@ -266,12 +265,12 @@ mod tests {
         let S = system.contract_address;
         let A = OTHER();
         let B = OWNER();
-        let balance_contract: u256 = lords.balance_of(S);
-        let balance_a: u256 = lords.balance_of(A);
+        let balance_contract: u128 = lords.balance_of(S).low;
+        let balance_a: u128 = lords.balance_of(A).low;
         // create challenge
-        let wager_value: u256 = 100 * constants::ETH_TO_WEI;
-        let fee: u256 = system.calc_fee(TABLE_ID, wager_value);
-        let approved_value: u256 = wager_value + fee;
+        let wager_value: u128 = 100 * constants::ETH_TO_WEI.low;
+        let fee: u128 = system.calc_fee(TABLE_ID, wager_value);
+        let approved_value: u128 = wager_value + fee;
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, wager_value, 0);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
@@ -290,12 +289,12 @@ mod tests {
         let S = system.contract_address;
         let A = OTHER();
         let B = OWNER();
-        let balance_contract: u256 = lords.balance_of(S);
-        let balance_a: u256 = lords.balance_of(A);
+        let balance_contract: u128 = lords.balance_of(S).low;
+        let balance_a: u128 = lords.balance_of(A).low;
         // create challenge
-        let wager_value: u256 = 100 * constants::ETH_TO_WEI;
-        let fee: u256 = system.calc_fee(TABLE_ID, wager_value);
-        let approved_value: u256 = wager_value + fee;
+        let wager_value: u128 = 100 * constants::ETH_TO_WEI.low;
+        let fee: u128 = system.calc_fee(TABLE_ID, wager_value);
+        let approved_value: u128 = wager_value + fee;
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, wager_value, 24);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');

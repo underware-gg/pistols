@@ -23,7 +23,7 @@ struct Challenge {
     // timestamps in unix epoch
     timestamp_start: u64,       // Unix time, started
     timestamp_end: u64,         // Unix time, ended
-} // [f] [f] [256] [152]
+} // [f] [f] [f] [f] [128] [128] [152]
 
 // Challenge wager (optional)
 #[derive(Copy, Drop, Serde)]
@@ -32,8 +32,8 @@ struct Wager {
     #[key]
     duel_id: u128,
     //------------
-    value: u256,
-    fee: u256,
+    value: u128,
+    fee: u128,
 }
 
 // Score snapshot
