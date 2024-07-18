@@ -53,8 +53,6 @@ mod tester {
     #[inline(always)]
     fn OWNER() -> ContractAddress { starknet::contract_address_const::<0x1>() }
     #[inline(always)]
-    fn FAKE_OWNER() -> ContractAddress { starknet::contract_address_const::<0x1000000000000000000000000000000001>() }
-    #[inline(always)]
     fn OTHER() -> ContractAddress { starknet::contract_address_const::<0x2>() }
     #[inline(always)]
     fn BUMMER() -> ContractAddress { starknet::contract_address_const::<0x3>() }
@@ -64,6 +62,14 @@ mod tester {
     fn BIG_BOY() -> ContractAddress { starknet::contract_address_const::<0x54f650fb5e1fb61d7b429ae728a365b69e5aff9a559a05de70f606aaea1a243>() }
     #[inline(always)]
     fn LITTLE_BOY() -> ContractAddress { starknet::contract_address_const::<0xffff00000000000ee>() }
+    #[inline(always)]
+    fn FAKE_OWNER_1_1() -> ContractAddress { starknet::contract_address_const::<0x1000000000000000000000000000000001>() }
+    #[inline(always)]
+    fn FAKE_OWNER_1_2() -> ContractAddress { starknet::contract_address_const::<0x1000000000000000000000000000000002>() }
+    #[inline(always)]
+    fn FAKE_OWNER_2_1() -> ContractAddress { starknet::contract_address_const::<0x2000000000000000000000000000000001>() }
+    #[inline(always)]
+    fn FAKE_OWNER_2_2() -> ContractAddress { starknet::contract_address_const::<0x2000000000000000000000000000000002>() }
 
     #[inline(always)]
     fn ID(address: ContractAddress) -> u128 {

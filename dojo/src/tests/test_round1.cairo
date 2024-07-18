@@ -18,7 +18,7 @@ mod tests {
     use pistols::libs::utils::{make_action_hash};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::math::{MathU8};
-    use pistols::tests::tester::{tester, tester::{flags, ZERO, OWNER, FAKE_OWNER, OTHER, BUMMER, TREASURY, BIG_BOY, LITTLE_BOY, ID}};
+    use pistols::tests::tester::{tester, tester::{flags, ZERO, OWNER, OTHER, BUMMER, TREASURY, BIG_BOY, LITTLE_BOY, FAKE_OWNER_1_1, ID}};
 
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
@@ -679,7 +679,7 @@ mod tests {
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
         // try to commmit with another account
         let hash: u64 = make_action_hash(0x12121, 0x1);
-        tester::execute_commit_action(system, FAKE_OWNER(), duel_id, 1, hash);
+        tester::execute_commit_action(system, FAKE_OWNER_1_1(), duel_id, 1, hash);
     }
 
     #[test]
