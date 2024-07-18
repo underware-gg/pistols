@@ -7,8 +7,8 @@ import pistols_manifest_staging from './generated/staging/manifest.json'
 import pistols_manifest_sepolia from './generated/sepolia/manifest.json'
 
 // TODO: move this here!
-// import { defineContractConstants } from './generated/dev/contractConstants'
-// import { defineContractComponents } from './generated/dev/contractComponents'
+// import { defineContractConstants } from './generated/contractConstants'
+// import { defineContractComponents } from './generated/contractComponents'
 // import { createSystemCalls } from './createSystemCalls'
 
 const supportedChainIds: ChainId[] = [

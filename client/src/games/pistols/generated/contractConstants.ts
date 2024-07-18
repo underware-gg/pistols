@@ -19,12 +19,10 @@ export const profile_pic_type: profile_pic_type_Type = {
 type tables_Type = {
   LORDS: string, // cairo: felt252
   COMMONERS: string, // cairo: felt252
-  BRUSSELS: string, // cairo: felt252
 };
 export const tables: tables_Type = {
   LORDS: 'Lords',
   COMMONERS: 'Commoners',
-  BRUSSELS: 'Brussels',
 };
 
 // from: ../dojo/src/models/table.cairo
@@ -46,7 +44,6 @@ type actions_Type = {
   INVALID_CHALLENGED_NULL: string, // cairo: felt252
   INVALID_CHALLENGED_SELF: string, // cairo: felt252
   INVALID_REPLY_SELF: string, // cairo: felt252
-  INVALID_EXPIRY: string, // cairo: felt252
   INVALID_CHALLENGE: string, // cairo: felt252
   INVALID_DUELIST: string, // cairo: felt252
   INVALID_MINTER: string, // cairo: felt252
@@ -77,7 +74,6 @@ export const actions: actions_Type = {
   INVALID_CHALLENGED_NULL: 'PISTOLS: Challenged null',
   INVALID_CHALLENGED_SELF: 'PISTOLS: Challenged self',
   INVALID_REPLY_SELF: 'PISTOLS: Reply self',
-  INVALID_EXPIRY: 'PISTOLS: Invalid expiry',
   INVALID_CHALLENGE: 'PISTOLS: Invalid challenge',
   INVALID_DUELIST: 'PISTOLS: Invalid duelist',
   INVALID_MINTER: 'PISTOLS: Null minter address',
