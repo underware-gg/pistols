@@ -6,12 +6,17 @@ import { useIsMyDuelist, useIsYou } from '@/pistols/hooks/useIsMyDuelist'
 import { IconClick } from '@/lib/ui/Icons'
 
 
-const _makeUrl = (profilePic: number | null, suffix: string) => {
+const _makeUrl = (profilePic: number | null, square: boolean) => {
   if (profilePic === null) return null
-  return `/profiles/${('00' + profilePic).slice(-2)}_${suffix}.jpg`
+  const variant = (square ? 'square' : 'portrait')
+  return `/profiles/${variant}/${('00' + profilePic).slice(-2)}.jpg`
 }
-const _className = (small: boolean, square: boolean, duel: boolean) => (small ? 'ProfilePicSmall' : square ? 'ProfilePicSquare' : duel ? 'ProfilePicDuel' : 'ProfilePic')
-const _suffix = (square: boolean) => (square ? 'sq' : 'a')
+const _className = (small: boolean, square: boolean, duel: boolean) => (
+  small ? 'ProfilePicSmall'
+    : square ? 'ProfilePicSquare'
+      : duel ? 'ProfilePicDuel'
+        : 'ProfilePic'
+)
 
 //---------------
 // Portraits
@@ -37,10 +42,10 @@ export function ProfilePic({
   duel?: boolean
   dimmed?: boolean
   className?: string
-    floated?: SemanticFLOATS
+  floated?: SemanticFLOATS
   // as button
   onClick?: Function
-    disabled?: boolean
+  disabled?: boolean
   // switch duelist
   duelistId?: BigNumberish
 }) {
@@ -52,8 +57,7 @@ export function ProfilePic({
     if (disabled || dimmed) result.push('ProfilePicDisabled')
     return result
   }, [className, small, square, duel, disabled, dimmed])
-  const suffix = useMemo(() => _suffix(square), [square])
-  const url = useMemo(() => _makeUrl(profilePic, suffix), [profilePic, suffix])
+  const url = useMemo(() => _makeUrl(profilePic, square), [profilePic, square])
 
   // as Button
   const _click = () => {
