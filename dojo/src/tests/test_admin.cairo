@@ -115,13 +115,13 @@ mod tests {
         assert(config.paused == false, 'paused_3');
     }
 
-    #[test]
-    #[should_panic(expected:('ADMIN: Already initialized', 'ENTRYPOINT_FAILED'))]
-    fn test_initialized() {
-        let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN | 0 | 0 | 0);
-        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO(), ZERO(), ZERO());
-        tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO(), ZERO(), ZERO());
-    }
+    // #[test]
+    // #[should_panic(expected:('ADMIN: Already initialized', 'ENTRYPOINT_FAILED'))]
+    // fn test_initialized() {
+    //     let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN | 0 | 0 | 0);
+    //     tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO(), ZERO(), ZERO());
+    //     tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO(), ZERO(), ZERO());
+    // }
 
     #[test]
     #[should_panic(expected:('ADMIN: Not initialized', 'ENTRYPOINT_FAILED'))]

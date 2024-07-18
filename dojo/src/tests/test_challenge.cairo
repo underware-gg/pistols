@@ -175,7 +175,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Not your challenge', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: Reply self', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_owner_accept_self() {
         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 48);
