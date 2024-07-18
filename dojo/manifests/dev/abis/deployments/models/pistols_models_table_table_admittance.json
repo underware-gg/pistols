@@ -331,12 +331,12 @@
         "type": "core::felt252"
       },
       {
-        "name": "account_a",
-        "type": "core::starknet::contract_address::ContractAddress"
+        "name": "accounts",
+        "type": "core::array::Array::<core::starknet::contract_address::ContractAddress>"
       },
       {
-        "name": "account_b",
-        "type": "core::starknet::contract_address::ContractAddress"
+        "name": "duelists",
+        "type": "core::array::Array::<core::integer::u128>"
       }
     ]
   },

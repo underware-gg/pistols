@@ -1646,8 +1646,8 @@
     {
       "kind": "DojoContract",
       "address": "0x30663cb812dc7e2930b9683945132ca6054483af40e1e7daccb77091e02e7b1",
-      "class_hash": "0x736551a5f024d2c97e0827016f547559fa3e0c34267f340b7cfd9e92531a69e",
-      "original_class_hash": "0x736551a5f024d2c97e0827016f547559fa3e0c34267f340b7cfd9e92531a69e",
+      "class_hash": "0x1e61c702a5e01538796471d2b7f61b4055be16699c901d074292f7a529d3eb5",
+      "original_class_hash": "0x1e61c702a5e01538796471d2b7f61b4055be16699c901d074292f7a529d3eb5",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -1784,10 +1784,6 @@
             {
               "name": "total_draws",
               "type": "core::integer::u16"
-            },
-            {
-              "name": "total_honour",
-              "type": "core::integer::u32"
             },
             {
               "name": "honour_history",
@@ -2540,8 +2536,8 @@
     {
       "kind": "DojoContract",
       "address": "0x725717f8ac5508bb1b6dfbf53949f20b7f38f59c7310feab688cb5f18ef0635",
-      "class_hash": "0x7b70ea4301ceed7fad7b39dbeb7d6500524477b7f242c73d5cb77c20f6e7d96",
-      "original_class_hash": "0x7b70ea4301ceed7fad7b39dbeb7d6500524477b7f242c73d5cb77c20f6e7d96",
+      "class_hash": "0x51df9612e7032482fd6f76b6196c758c5f7a02068a93dd615347d5ea0751f3f",
+      "original_class_hash": "0x51df9612e7032482fd6f76b6196c758c5f7a02068a93dd615347d5ea0751f3f",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -2696,8 +2692,16 @@
               "type": "core::felt252"
             },
             {
+              "name": "table_type",
+              "type": "pistols::models::table::TableType"
+            },
+            {
               "name": "description",
               "type": "core::felt252"
+            },
+            {
+              "name": "fee_collector_address",
+              "type": "core::starknet::contract_address::ContractAddress"
             },
             {
               "name": "wager_contract_address",
@@ -2718,10 +2722,6 @@
             {
               "name": "is_open",
               "type": "core::bool"
-            },
-            {
-              "name": "table_type",
-              "type": "pistols::models::table::TableType"
             }
           ]
         },
@@ -2751,14 +2751,6 @@
                 },
                 {
                   "name": "minter_address",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "account_a",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "account_b",
                   "type": "core::starknet::contract_address::ContractAddress"
                 }
               ],
@@ -2837,7 +2829,7 @@
                   "type": "core::integer::u8"
                 },
                 {
-                  "name": "enabled",
+                  "name": "is_open",
                   "type": "core::bool"
                 }
               ],
@@ -2846,14 +2838,14 @@
             },
             {
               "type": "function",
-              "name": "enable_table",
+              "name": "open_table",
               "inputs": [
                 {
                   "name": "table_id",
                   "type": "core::felt252"
                 },
                 {
-                  "name": "enabled",
+                  "name": "is_open",
                   "type": "core::bool"
                 }
               ],
@@ -3226,8 +3218,8 @@
     {
       "kind": "DojoContract",
       "address": "0x774e613f68f731df522253c22bce0f77549afc8203d0cfec5086d2ee2a992d6",
-      "class_hash": "0x3a45a730db3c23717f15a916abb0919c97e9cd299072cfa8d9ebf0040cc78a2",
-      "original_class_hash": "0x3a45a730db3c23717f15a916abb0919c97e9cd299072cfa8d9ebf0040cc78a2",
+      "class_hash": "0x7a35e58ea33014238fda666a196bc8d861eaa0a627543a1b92daffaaf0e2c71",
+      "original_class_hash": "0x7a35e58ea33014238fda666a196bc8d861eaa0a627543a1b92daffaaf0e2c71",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -5231,8 +5223,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x17e1babdde18196b7147165c157ca231b5bab7edae757d588a442b7c9d5ee87",
-      "original_class_hash": "0x17e1babdde18196b7147165c157ca231b5bab7edae757d588a442b7c9d5ee87",
+      "class_hash": "0x5382c409bb4fd7cb00788d52be823c7250f713c36ae9bdf5577bf879307d104",
+      "original_class_hash": "0x5382c409bb4fd7cb00788d52be823c7250f713c36ae9bdf5577bf879307d104",
       "abi": [
         {
           "type": "impl",
@@ -5592,10 +5584,6 @@
             {
               "name": "total_draws",
               "type": "core::integer::u16"
-            },
-            {
-              "name": "total_honour",
-              "type": "core::integer::u32"
             },
             {
               "name": "honour_history",
@@ -6526,8 +6514,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x1866f3ea11fcce3f9cbd98c6a7b51c205d4957a599c01e906bd92b5b0bc31bb",
-      "original_class_hash": "0x1866f3ea11fcce3f9cbd98c6a7b51c205d4957a599c01e906bd92b5b0bc31bb",
+      "class_hash": "0x3de0a6ffc4cb49e1669e00e49f8073009df44e22db4e15d307e5e068d9e42d1",
+      "original_class_hash": "0x3de0a6ffc4cb49e1669e00e49f8073009df44e22db4e15d307e5e068d9e42d1",
       "abi": [
         {
           "type": "impl",
@@ -6887,10 +6875,6 @@
             {
               "name": "total_draws",
               "type": "core::integer::u16"
-            },
-            {
-              "name": "total_honour",
-              "type": "core::integer::u32"
             },
             {
               "name": "honour_history",
@@ -7374,8 +7358,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x6586fdf90ffc354643b214f7c4ace123900f0301a09331ee96089c6a8df7dc",
-      "original_class_hash": "0x6586fdf90ffc354643b214f7c4ace123900f0301a09331ee96089c6a8df7dc",
+      "class_hash": "0x77429cbea916a564e7ed25b5175ebb6bbdcf90e9da8aeb89b729f7e5b2a1d4f",
+      "original_class_hash": "0x77429cbea916a564e7ed25b5175ebb6bbdcf90e9da8aeb89b729f7e5b2a1d4f",
       "abi": [
         {
           "type": "impl",
@@ -7737,10 +7721,6 @@
               "type": "core::integer::u16"
             },
             {
-              "name": "total_honour",
-              "type": "core::integer::u32"
-            },
-            {
               "name": "honour_history",
               "type": "core::integer::u64"
             }
@@ -7822,18 +7802,18 @@
           "key": true
         },
         {
-          "name": "account_a",
-          "type": "ContractAddress",
+          "name": "accounts",
+          "type": "Array<ContractAddress>",
           "key": false
         },
         {
-          "name": "account_b",
-          "type": "ContractAddress",
+          "name": "duelists",
+          "type": "Array<u128>",
           "key": false
         }
       ],
-      "class_hash": "0x506b155f8dbf1bf15943979cba5d883571d973cbab16deae21d50bb952f6dd5",
-      "original_class_hash": "0x506b155f8dbf1bf15943979cba5d883571d973cbab16deae21d50bb952f6dd5",
+      "class_hash": "0x5a0e21f8cad43b6679931f00416be00635fd39b969ee4107ad764e9c474bb8f",
+      "original_class_hash": "0x5a0e21f8cad43b6679931f00416be00635fd39b969ee4107ad764e9c474bb8f",
       "abi": [
         {
           "type": "impl",
@@ -8167,12 +8147,12 @@
               "type": "core::felt252"
             },
             {
-              "name": "account_a",
-              "type": "core::starknet::contract_address::ContractAddress"
+              "name": "accounts",
+              "type": "core::array::Array::<core::starknet::contract_address::ContractAddress>"
             },
             {
-              "name": "account_b",
-              "type": "core::starknet::contract_address::ContractAddress"
+              "name": "duelists",
+              "type": "core::array::Array::<core::integer::u128>"
             }
           ]
         },
@@ -8212,8 +8192,18 @@
           "key": true
         },
         {
+          "name": "table_type",
+          "type": "TableType",
+          "key": false
+        },
+        {
           "name": "description",
           "type": "felt252",
+          "key": false
+        },
+        {
+          "name": "fee_collector_address",
+          "type": "ContractAddress",
           "key": false
         },
         {
@@ -8240,15 +8230,10 @@
           "name": "is_open",
           "type": "bool",
           "key": false
-        },
-        {
-          "name": "table_type",
-          "type": "TableType",
-          "key": false
         }
       ],
-      "class_hash": "0x263b1937ecd58448c77c5d1eb500eff83422c5dd65aecd350ab76e8e221c0d4",
-      "original_class_hash": "0x263b1937ecd58448c77c5d1eb500eff83422c5dd65aecd350ab76e8e221c0d4",
+      "class_hash": "0x360008ed9235b10f1d0cd5f791f76e24755de070bd430054dcb0297fe1ffd7a",
+      "original_class_hash": "0x360008ed9235b10f1d0cd5f791f76e24755de070bd430054dcb0297fe1ffd7a",
       "abi": [
         {
           "type": "impl",
@@ -8574,6 +8559,28 @@
           "interface_name": "pistols::models::table::Itable_config"
         },
         {
+          "type": "enum",
+          "name": "pistols::models::table::TableType",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Classic",
+              "type": "()"
+            },
+            {
+              "name": "Tournament",
+              "type": "()"
+            },
+            {
+              "name": "IRLTournament",
+              "type": "()"
+            }
+          ]
+        },
+        {
           "type": "struct",
           "name": "core::integer::u256",
           "members": [
@@ -8602,28 +8609,6 @@
           ]
         },
         {
-          "type": "enum",
-          "name": "pistols::models::table::TableType",
-          "variants": [
-            {
-              "name": "Undefined",
-              "type": "()"
-            },
-            {
-              "name": "Classic",
-              "type": "()"
-            },
-            {
-              "name": "Tournament",
-              "type": "()"
-            },
-            {
-              "name": "IRLTournament",
-              "type": "()"
-            }
-          ]
-        },
-        {
           "type": "struct",
           "name": "pistols::models::table::TableConfig",
           "members": [
@@ -8632,8 +8617,16 @@
               "type": "core::felt252"
             },
             {
+              "name": "table_type",
+              "type": "pistols::models::table::TableType"
+            },
+            {
               "name": "description",
               "type": "core::felt252"
+            },
+            {
+              "name": "fee_collector_address",
+              "type": "core::starknet::contract_address::ContractAddress"
             },
             {
               "name": "wager_contract_address",
@@ -8654,10 +8647,6 @@
             {
               "name": "is_open",
               "type": "core::bool"
-            },
-            {
-              "name": "table_type",
-              "type": "pistols::models::table::TableType"
             }
           ]
         },

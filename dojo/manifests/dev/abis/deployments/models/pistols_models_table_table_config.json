@@ -323,6 +323,28 @@
     "interface_name": "pistols::models::table::Itable_config"
   },
   {
+    "type": "enum",
+    "name": "pistols::models::table::TableType",
+    "variants": [
+      {
+        "name": "Undefined",
+        "type": "()"
+      },
+      {
+        "name": "Classic",
+        "type": "()"
+      },
+      {
+        "name": "Tournament",
+        "type": "()"
+      },
+      {
+        "name": "IRLTournament",
+        "type": "()"
+      }
+    ]
+  },
+  {
     "type": "struct",
     "name": "core::integer::u256",
     "members": [
@@ -351,28 +373,6 @@
     ]
   },
   {
-    "type": "enum",
-    "name": "pistols::models::table::TableType",
-    "variants": [
-      {
-        "name": "Undefined",
-        "type": "()"
-      },
-      {
-        "name": "Classic",
-        "type": "()"
-      },
-      {
-        "name": "Tournament",
-        "type": "()"
-      },
-      {
-        "name": "IRLTournament",
-        "type": "()"
-      }
-    ]
-  },
-  {
     "type": "struct",
     "name": "pistols::models::table::TableConfig",
     "members": [
@@ -381,8 +381,16 @@
         "type": "core::felt252"
       },
       {
+        "name": "table_type",
+        "type": "pistols::models::table::TableType"
+      },
+      {
         "name": "description",
         "type": "core::felt252"
+      },
+      {
+        "name": "fee_collector_address",
+        "type": "core::starknet::contract_address::ContractAddress"
       },
       {
         "name": "wager_contract_address",
@@ -403,10 +411,6 @@
       {
         "name": "is_open",
         "type": "core::bool"
-      },
-      {
-        "name": "table_type",
-        "type": "pistols::models::table::TableType"
       }
     ]
   },
