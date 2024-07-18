@@ -364,7 +364,7 @@ mod tests {
     }
 
     #[test]
-    fn test_dual_crit() {
+    fn test_resolved_draw() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
         let balance_contract: u128 = lords.balance_of(system.contract_address).low;
         let balance_a: u128 = lords.balance_of(OWNER()).low;
@@ -423,6 +423,35 @@ mod tests {
         tester::assert_balance(lords, TREASURY(), 0, 0, fee * 2, 'balance_treasury_2');
         tester::assert_balance(lords, OWNER(), balance_a, fee, 0, 'balance_a_2');
         tester::assert_balance(lords, OTHER(), balance_b, fee, 0, 'balance_b_2');
+    }
+
+    #[test]
+    fn test_resolved_table_collector() {
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+
+        let mut table: TableConfig = get!(world, (TABLE_ID), TableConfig);
+        table.fee_collector_address = BUMMER();
+        set!(world, (table));
+
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        assert(fee > 0, 'fee > 0');
+
+        let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);
+        tester::assert_balance(lords, system.contract_address, 0, 0, (fee + WAGER_VALUE) * 2, 'balance_contract_1');
+        tester::assert_balance(lords, table.fee_collector_address, 0, 0, 0, 'balance_colelctor_1');
+        tester::assert_balance(lords, TREASURY(), 0, 0, 0, 'balance_treasury_1');
+
+        let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(10, 10);
+        tester::execute_commit_action(system, OWNER(), duel_id, 1, hash_a);
+        tester::execute_commit_action(system, OTHER(), duel_id, 1, hash_b);
+        tester::execute_reveal_action(system, OWNER(), duel_id, 1, salt_a, action_a, 0);
+        tester::execute_reveal_action(system, OTHER(), duel_id, 1, salt_b, action_b, 0);
+        let (challenge, _round) = tester::get_Challenge_Round(world, duel_id);
+        assert(challenge.state == ChallengeState::Draw.into(), 'challenge.state');
+
+        tester::assert_balance(lords, system.contract_address, 0, 0, 0, 'balance_contract_2');
+        tester::assert_balance(lords, table.fee_collector_address, 0, 0, fee * 2, 'balance_collector_2');
+        tester::assert_balance(lords, TREASURY(), 0, 0, 0, 'balance_treasury_1');
     }
 
     #[test]

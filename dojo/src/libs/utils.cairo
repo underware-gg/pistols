@@ -1,8 +1,11 @@
+// use debug::PrintTrait;
 use core::option::OptionTrait;
-use debug::PrintTrait;
+use zeroable::Zeroable;
 use traits::{Into, TryInto};
 use starknet::{ContractAddress};
+
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+
 use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
 use pistols::systems::actions::actions::{Errors};
 use pistols::models::challenge::{Challenge, Snapshot, Wager, Round, Shot};
@@ -136,9 +139,16 @@ fn split_wager_fees(world: IWorldDispatcher, challenge: Challenge, address_a: Co
             }
         }
         if (wager.fee > 0) {
-            let manager = ConfigManagerTrait::new(world).get();
-            if (manager.treasury_address != starknet::get_contract_address()) {
-                table.ierc20().transfer(manager.treasury_address, wager.fee.into() * 2);
+            let table : TableConfig = TableManagerTrait::new(world).get(challenge.table_id);
+            let fees_address: ContractAddress =
+                if (table.fee_collector_address.is_non_zero()) {
+                    (table.fee_collector_address)
+                } else {
+                    let config = ConfigManagerTrait::new(world).get();
+                    (config.treasury_address)
+                };
+            if (fees_address.is_non_zero() && fees_address != starknet::get_contract_address()) {
+                table.ierc20().transfer(fees_address, wager.fee.into() * 2);
             }
         }
     }
