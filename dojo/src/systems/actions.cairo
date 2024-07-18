@@ -32,7 +32,7 @@ trait IActions {
         challenged_id_or_address: ContractAddress,
         message: felt252,
         table_id: felt252,
-        wager_value: u256,
+        wager_value: u128,
         expire_hours: u64,
     ) -> u128;
     fn reply_challenge(
@@ -66,7 +66,7 @@ trait IActions {
     fn get_pact(world: @IWorldDispatcher, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128;
     fn has_pact(world: @IWorldDispatcher, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool;
     fn can_join(world: @IWorldDispatcher, table_id: felt252, duelist_id: u128) -> bool;
-    fn calc_fee(world: @IWorldDispatcher, table_id: felt252, wager_value: u256) -> u256;
+    fn calc_fee(world: @IWorldDispatcher, table_id: felt252, wager_value: u128) -> u128;
     fn simulate_chances(world: @IWorldDispatcher, duelist_id: u128, duel_id: u128, round_number: u8, action: u8) -> SimulateChances;
     fn get_valid_packed_actions(world: @IWorldDispatcher, round_number: u8) -> Array<u16>;
     fn pack_action_slots(world: @IWorldDispatcher, slot1: u8, slot2: u8) -> u16;
@@ -214,7 +214,7 @@ mod actions {
             challenged_id_or_address: ContractAddress,
             message: felt252,
             table_id: felt252,
-            wager_value: u256,
+            wager_value: u128,
             expire_hours: u64,
         ) -> u128 {
             assert(ConfigManagerTrait::is_initialized(world) == true, Errors::NOT_INITIALIZED);
@@ -277,7 +277,7 @@ mod actions {
 
             // setup wager + fees
             assert(wager_value >= table.wager_min, Errors::MINIMUM_WAGER_NOT_MET);
-            let fee: u256 = table.calc_fee(wager_value);
+            let fee: u128 = table.calc_fee(wager_value);
             // calc fee and store
             if (fee > 0 || wager_value > 0) {
                 assert(table.wager_contract_address != utils::ZERO(), Errors::NO_WAGER);
@@ -429,7 +429,7 @@ mod actions {
             (table_manager.can_join(table_id, starknet::get_caller_address(), duelist_id))
         }
 
-        fn calc_fee(world: @IWorldDispatcher, table_id: felt252, wager_value: u256) -> u256 {
+        fn calc_fee(world: @IWorldDispatcher, table_id: felt252, wager_value: u128) -> u128 {
             let table_manager = TableManagerTrait::new(world);
             let table: TableConfig = table_manager.get(table_id);
             (table.calc_fee(wager_value))

@@ -190,9 +190,9 @@ mod tester {
             );
         }
         if (approve) {
-            execute_lords_approve(lords, OWNER(), system.contract_address, 1_000_000 * constants::ETH_TO_WEI);
-            execute_lords_approve(lords, OTHER(), system.contract_address, 1_000_000 * constants::ETH_TO_WEI);
-            execute_lords_approve(lords, BUMMER(), system.contract_address, 1_000_000 * constants::ETH_TO_WEI);
+            execute_lords_approve(lords, OWNER(), system.contract_address, 1_000_000 * constants::ETH_TO_WEI.low);
+            execute_lords_approve(lords, OTHER(), system.contract_address, 1_000_000 * constants::ETH_TO_WEI.low);
+            execute_lords_approve(lords, BUMMER(), system.contract_address, 1_000_000 * constants::ETH_TO_WEI.low);
         }
         (world, system, admin, lords, minter)
     }
@@ -248,7 +248,7 @@ mod tester {
         system.set_paused(paused);
         _next_block();
     }
-    fn execute_admin_set_table(system: IAdminDispatcher, sender: ContractAddress, table_id: felt252, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool) {
+    fn execute_admin_set_table(system: IAdminDispatcher, sender: ContractAddress, table_id: felt252, contract_address: ContractAddress, description: felt252, fee_min: u128, fee_pct: u8, enabled: bool) {
         impersonate(sender);
         system.set_table(table_id, contract_address, description, fee_min, fee_pct, enabled);
         _next_block();
@@ -270,9 +270,9 @@ mod tester {
         system.faucet();
         _next_block();
     }
-    fn execute_lords_approve(system: ILordsMockDispatcher, owner: ContractAddress, spender: ContractAddress, value: u256) {
+    fn execute_lords_approve(system: ILordsMockDispatcher, owner: ContractAddress, spender: ContractAddress, value: u128) {
         impersonate(owner);
-        system.approve(spender, value);
+        system.approve(spender, value.into());
         _next_block();
     }
 
@@ -296,7 +296,7 @@ mod tester {
         challenged: ContractAddress,
         message: felt252,
         table_id: felt252,
-        wager_value: u256,
+        wager_value: u128,
         expire_hours: u64,
     ) -> u128 {
         impersonate(sender);
@@ -408,8 +408,8 @@ mod tester {
     // Asserts
     //
 
-    fn assert_balance(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u256, subtract: u256, add: u256, prefix: felt252) -> u256 {
-        let balance: u256 = lords.balance_of(address);
+    fn assert_balance(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, subtract: u128, add: u128, prefix: felt252) -> u128 {
+        let balance: u128 = lords.balance_of(address).low;
         if (subtract > add) {
             assert(balance < balance_before, ShortString::concat(prefix, ' <'));
         } else if (add > subtract) {
@@ -424,8 +424,8 @@ mod tester {
     fn assert_winner_balance(lords: ILordsMockDispatcher,
         winner: u8,
         duelist_a: ContractAddress, duelist_b: ContractAddress,
-        balance_a: u256, balance_b: u256,
-        fee: u256, wager_value: u256,
+        balance_a: u128, balance_b: u128,
+        fee: u128, wager_value: u128,
         prefix: felt252,
     ) {
         if (winner == 1) {

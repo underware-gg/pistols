@@ -4,7 +4,7 @@ use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
 use pistols::systems::admin::admin::{Errors};
 use pistols::libs::utils::{ZERO};
-use pistols::utils::math::{MathU256};
+use pistols::utils::math::{MathU128};
 use pistols::utils::arrays::{ArrayTrait};
 use pistols::types::constants::{constants};
 
@@ -33,8 +33,8 @@ struct TableConfig {
     description: felt252,
     fee_collector_address: ContractAddress,     // 0x0 goes to default treasury
     wager_contract_address: ContractAddress,    // 0x0 if no wager or fees
-    wager_min: u256,
-    fee_min: u256,
+    wager_min: u128,
+    fee_min: u128,
     fee_pct: u8,
     is_open: bool,
 }
@@ -58,7 +58,7 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
             fee_collector_address: ZERO(),
             wager_contract_address: lords_address,
             wager_min: 0,
-            fee_min: 4 * constants::ETH_TO_WEI,
+            fee_min: 4 * constants::ETH_TO_WEI.low,
             fee_pct: 10,
             is_open: (lords_address.is_non_zero()),
         }),
@@ -136,8 +136,8 @@ impl TableTraitImpl of TableTrait {
     fn ierc20(self: TableConfig) -> IERC20Dispatcher {
         (ierc20(self.wager_contract_address))
     }
-    fn calc_fee(self: TableConfig, wager_value: u256) -> u256 {
-        (MathU256::max(self.fee_min, (wager_value / 100) * self.fee_pct.into()))
+    fn calc_fee(self: TableConfig, wager_value: u128) -> u128 {
+        (MathU128::max(self.fee_min, (wager_value / 100) * self.fee_pct.into()))
     }
 }
 

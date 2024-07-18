@@ -37,7 +37,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     const OTHER_NAME: felt252 = 'Senpai';
     const MESSAGE_1: felt252 = 'For honour!!!';
     const TABLE_ID: felt252 = tables::LORDS;
-    const WAGER_VALUE: u256 = 100_000_000_000_000_000_000;
+    const WAGER_VALUE: u128 = 100_000_000_000_000_000_000;
 
     fn _start_new_challenge(world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress) -> (Challenge, Round, u128) {
         // tester::execute_update_duelist(system, OWNER(), PLAYER_NAME, 1, "1");
@@ -526,9 +526,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_flee_vs_flee() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
@@ -545,9 +545,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_flee_win_a() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
@@ -568,9 +568,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_flee_win_b() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
@@ -591,9 +591,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_fast_vs_flee_kill_a() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
@@ -612,9 +612,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_slow_vs_flee_kill_a() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
@@ -633,9 +633,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_flee_kill_b() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
@@ -660,9 +660,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_steal_vs_flee() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
@@ -678,9 +678,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_flee_vs_steal() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
@@ -698,9 +698,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_steal_vs_steal() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
@@ -719,9 +719,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_steal_win_a() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
@@ -742,9 +742,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_steal_win_b() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
@@ -765,9 +765,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_slow_vs_steal_kill_a() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
@@ -786,9 +786,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_steal_kill_b() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
@@ -813,9 +813,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_seppuku_vs_seppuku() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
@@ -833,9 +833,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_seppuku_vs_slow_b() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
@@ -853,9 +853,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_seppuku_vs_fast_b() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
@@ -873,9 +873,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_fast_vs_seppuku_a() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::FAST_BLADE,
@@ -893,9 +893,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_seppuku_vs_flee() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
@@ -913,9 +913,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_seppuku_vs_steal() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
@@ -933,9 +933,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_flee_vs_seppuku() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
@@ -953,9 +953,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_steal_vs_seppuku_vs() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let balance_a: u256 = lords.balance_of(OWNER());
-        let balance_b: u256 = lords.balance_of(OTHER());
-        let fee: u256 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let balance_a: u128 = lords.balance_of(OWNER()).low;
+        let balance_b: u128 = lords.balance_of(OTHER()).low;
+        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,

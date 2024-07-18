@@ -26,7 +26,7 @@ mod tests {
     const OTHER_NAME: felt252 = 'Senpai';
     const MESSAGE_1: felt252 = 'For honour!!!';
     const TABLE_ID: felt252 = tables::LORDS;
-    const WAGER_VALUE: u256 = 100_000_000_000_000_000_000;
+    const WAGER_VALUE: u128 = 100_000_000_000_000_000_000;
 
     const SEED_A: felt252 = 'shoot_a';
     const SEED_B: felt252 = 'shoot_b';
@@ -34,7 +34,7 @@ mod tests {
     const SALT_1_a: u64 = 0xa6f099b756a87e62;
     const SALT_1_b: u64 = 0xf9a978e92309da78;
     
-    fn _start_new_challenge(world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress, wager_value: u256) -> (Challenge, Round, u128) {
+    fn _start_new_challenge(world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress, wager_value: u128) -> (Challenge, Round, u128) {
         // tester::execute_update_duelist(system, OWNER(), PLAYER_NAME, 1, "1");
         // tester::execute_update_duelist(system, OTHER(), OTHER_NAME, 1, "2");
         let expire_hours: u64 = 48;

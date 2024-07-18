@@ -321,27 +321,35 @@ mod token_duelist {
             if (duelist.score.total_duels > 0) {
                 result.append("Total Wins");
                 result.append(duelist.score.total_wins.into());
+
                 result.append("Total Losses");
                 result.append(duelist.score.total_losses.into());
+                
                 result.append("Total Draws");
                 result.append(duelist.score.total_draws.into());
+                
                 // Wager on Lords table
                 let scoreboard: Scoreboard = get!(self.world(), (tables::LORDS, duelist.duelist_id), Scoreboard);
+                
                 result.append("Lords Won");
-                result.append((scoreboard.wager_won / constants::ETH_TO_WEI).into());
+                let amount: u128 = (scoreboard.wager_won / constants::ETH_TO_WEI.low);
+                result.append(format!("{}", amount));
+                
                 result.append("Lords Lost");
                 if (scoreboard.wager_lost == 0) {
                     result.append("0");
                 } else {
-                    let amount: u256 = (scoreboard.wager_lost / constants::ETH_TO_WEI);
+                    let amount: u128 = (scoreboard.wager_lost / constants::ETH_TO_WEI.low);
                     result.append(format!("-{}", amount));
                 }
+                
                 result.append("Lords Balance");
                 if (scoreboard.wager_lost > scoreboard.wager_won) {
-                    let amount: u256 = ((scoreboard.wager_lost - scoreboard.wager_won) / constants::ETH_TO_WEI);
+                    let amount: u128 = ((scoreboard.wager_lost - scoreboard.wager_won) / constants::ETH_TO_WEI.low);
                     result.append(format!("-{}", amount));
                 } else {
-                    result.append(((scoreboard.wager_won - scoreboard.wager_lost) / constants::ETH_TO_WEI).into());
+                    let amount: u128 = ((scoreboard.wager_won - scoreboard.wager_lost) / constants::ETH_TO_WEI.low);
+                    result.append(format!("{}", amount));
                 }
             }
             // done!

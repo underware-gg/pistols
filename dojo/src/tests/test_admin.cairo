@@ -189,7 +189,7 @@ mod tests {
         tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), lords.contract_address, ZERO(), ZERO());
         let table: TableConfig = admin.get_table(tables::LORDS);
         assert(table.wager_contract_address == lords.contract_address, 'contract_address');
-        assert(table.fee_min == 4 * constants::ETH_TO_WEI, 'fee_min');
+        assert(table.fee_min == 4 * constants::ETH_TO_WEI.low, 'fee_min');
         assert(table.fee_pct == 10, 'fee_pct');
         assert(table.is_open == true, 'is_open');
     }

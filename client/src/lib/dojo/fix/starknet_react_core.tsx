@@ -7,7 +7,7 @@ import {
   useAccount,
   useBlockNumber,
 } from '@starknet-react/core'
-import { Uint256ToBigint, weiToEth } from '@/lib/utils/starknet'
+import { U256ToBigint, weiToEth } from '@/lib/utils/starknet'
 import { bigintToHex } from '@/lib/utils/types'
 import { erc20_abi } from '@/lib/abi'
 
@@ -39,7 +39,7 @@ export const _useBalance = (props: UseBalanceProps): Balance => {
   })
   useEffect(() => { if (error) console.warn(`_useBalance() ERROR:`, error) }, [error])
   //@ts-ignore
-  const value = useMemo<bigint>(() => (data?.balance ? Uint256ToBigint(data.balance as Uint256) : 0n), [data])
+  const value = useMemo<bigint>(() => (data?.balance ? U256ToBigint(data.balance as Uint256) : 0n), [data])
   const formatted = useMemo(() => Number(weiToEth(value)).toString(), [value])
   return {
     decimals: 18,

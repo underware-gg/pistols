@@ -4,10 +4,10 @@ import {
 } from '@dojoengine/utils'
 import { getContractByName } from '@dojoengine/core'
 import { getComponentValue } from '@dojoengine/recs'
-import { AccountInterface, BigNumberish, Call, Result, uint256 } from 'starknet'
+import { AccountInterface, BigNumberish, Call, Result } from 'starknet'
 import { ClientComponents } from '@/lib/dojo/setup/createClientComponents'
 import { SetupNetworkResult } from '@/lib/dojo/setup/setup'
-import { stringToFelt } from '@/lib/utils/starknet'
+import { stringToFelt, bigintToU256 } from '@/lib/utils/starknet'
 import { bigintAdd, bigintToEntity, bigintToHex } from '@/lib/utils/types'
 import { emitter } from '@/pistols/three/game'
 
@@ -118,14 +118,14 @@ export function createSystemCalls(
       calls.push({
         contractAddress: bigintToHex(table.wager_contract_address),
         entrypoint: 'approve',
-        calldata: [actions_contract.address, uint256.bnToUint256(approved_value)],
+        calldata: [actions_contract.address, bigintToU256(approved_value)],
       })
     }
     // game call
     calls.push({
       contractAddress: actions_contract.address,
       entrypoint: 'create_challenge',
-      calldata: [duelist_id, BigInt(challenged_id_or_address), stringToFelt(message), table_id, uint256.bnToUint256(wager_value), expire_hours],
+      calldata: [duelist_id, BigInt(challenged_id_or_address), stringToFelt(message), table_id, wager_value, expire_hours],
     })
     return await _executeTransaction(signer, calls)
   }
@@ -148,7 +148,7 @@ export function createSystemCalls(
           calls.push({
             contractAddress: bigintToHex(table.wager_contract_address),
             entrypoint: 'approve',
-            calldata: [actions_contract.address, uint256.bnToUint256(approved_value)],
+            calldata: [actions_contract.address, bigintToU256(approved_value)],
           })
         }
         // game call

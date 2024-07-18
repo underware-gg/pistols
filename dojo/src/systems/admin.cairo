@@ -21,7 +21,7 @@ trait IAdmin {
     fn set_owner(ref world: IWorldDispatcher, owner_address: ContractAddress);
     fn set_treasury(ref world: IWorldDispatcher, treasury_address: ContractAddress);
     fn set_paused(ref world: IWorldDispatcher, paused: bool);
-    fn set_table(ref world: IWorldDispatcher, table_id: felt252, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, is_open: bool);
+    fn set_table(ref world: IWorldDispatcher, table_id: felt252, contract_address: ContractAddress, description: felt252, fee_min: u128, fee_pct: u8, is_open: bool);
     fn open_table(ref world: IWorldDispatcher, table_id: felt252, is_open: bool);
     
     fn get_config(world: @IWorldDispatcher) -> Config;
@@ -111,7 +111,7 @@ mod admin {
             manager.set(config);
         }
 
-        fn set_table(ref world: IWorldDispatcher, table_id: felt252, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, is_open: bool) {
+        fn set_table(ref world: IWorldDispatcher, table_id: felt252, contract_address: ContractAddress, description: felt252, fee_min: u128, fee_pct: u8, is_open: bool) {
             self.assert_caller_is_owner();
             // get table
             let manager = TableManagerTrait::new(world);
