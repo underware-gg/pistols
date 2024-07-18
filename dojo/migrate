@@ -12,6 +12,7 @@ fi
 # env setup
 #
 export WORLD_NAME_SEED="pistols"
+# export WORLD_NAME_SEED="pistols092"
 export MANIFEST_FILE_PATH="./manifests/$PROFILE/manifest.json"
 export BINDINGS_PATH="./bindings/typescript"
 export GAME_SLUG="pistols"

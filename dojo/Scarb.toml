@@ -88,9 +88,8 @@ private_key = "0x329a6dea7e53dcd104ab13494a29c6ddb1e472afebddcbd3ae11f8fe76a9e53
 skip_migration = ["pistols::mocks::lords_mock::lords_mock"]
 
 [profile.sepolia.tool.dojo.env]
-# rpc_url = "https://api.cartridge.gg/rpc/starknet-sepolia" # env: STARKNET_RPC_URL
-# rpc_url = "https://api.cartridge.gg/rpc/starknet-sepolia/v0_6" # env: STARKNET_RPC_URL
+# rpc_url = ""          # env: STARKNET_RPC_URL
 world_address = "0x0545c8aff15426c3d43b3ba8fd45c61870b30ca4ec0bfbd69193facee4c7b97c"
-# account_address = "" # env: DOJO_ACCOUNT_ADDRESS
-# private_key = ""     # env: DOJO_PRIVATE_KEY
+# account_address = ""  # env: DOJO_ACCOUNT_ADDRESS
+# private_key = ""      # env: DOJO_PRIVATE_KEY
 lords_address = "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210"
