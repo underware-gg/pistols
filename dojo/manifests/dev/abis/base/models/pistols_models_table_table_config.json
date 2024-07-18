@@ -345,20 +345,6 @@
     ]
   },
   {
-    "type": "struct",
-    "name": "core::integer::u256",
-    "members": [
-      {
-        "name": "low",
-        "type": "core::integer::u128"
-      },
-      {
-        "name": "high",
-        "type": "core::integer::u128"
-      }
-    ]
-  },
-  {
     "type": "enum",
     "name": "core::bool",
     "variants": [
@@ -398,11 +384,11 @@
       },
       {
         "name": "wager_min",
-        "type": "core::integer::u256"
+        "type": "core::integer::u128"
       },
       {
         "name": "fee_min",
-        "type": "core::integer::u256"
+        "type": "core::integer::u128"
       },
       {
         "name": "fee_pct",

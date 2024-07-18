@@ -52,7 +52,7 @@ export function defineContractComponents(world: World) {
         {
           metadata: {
             name: "Wager",
-            types: ["u128","u256","u256"],
+            types: ["u128","u128","u128"],
             customTypes: [],
           },
         }
@@ -104,7 +104,7 @@ export function defineContractComponents(world: World) {
         {
           metadata: {
             name: "Scoreboard",
-            types: ["felt252","u128","u8","u8","u8","u8","u16","u16","u16","u16","u64","u256","u256"],
+            types: ["felt252","u128","u8","u8","u8","u8","u16","u16","u16","u16","u64","u128","u128"],
             customTypes: ["Score"],
           },
         }
@@ -130,7 +130,7 @@ export function defineContractComponents(world: World) {
         {
           metadata: {
             name: "TableConfig",
-            types: ["felt252","enum","felt252","contractaddress","contractaddress","u256","u256","u8","bool"],
+            types: ["felt252","enum","felt252","contractaddress","contractaddress","u128","u128","u8","bool"],
             customTypes: ["TableType"],
           },
         }
