@@ -21,8 +21,8 @@ trait IAdmin {
     fn set_owner(ref world: IWorldDispatcher, owner_address: ContractAddress);
     fn set_treasury(ref world: IWorldDispatcher, treasury_address: ContractAddress);
     fn set_paused(ref world: IWorldDispatcher, paused: bool);
-    fn set_table(ref world: IWorldDispatcher, table_id: felt252, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool);
-    fn enable_table(ref world: IWorldDispatcher, table_id: felt252, enabled: bool);
+    fn set_table(ref world: IWorldDispatcher, table_id: felt252, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, is_open: bool);
+    fn open_table(ref world: IWorldDispatcher, table_id: felt252, is_open: bool);
     
     fn get_config(world: @IWorldDispatcher) -> Config;
     fn get_table(world: @IWorldDispatcher, table_id: felt252) -> TableConfig;
@@ -111,7 +111,7 @@ mod admin {
             manager.set(config);
         }
 
-        fn set_table(ref world: IWorldDispatcher, table_id: felt252, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool) {
+        fn set_table(ref world: IWorldDispatcher, table_id: felt252, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, is_open: bool) {
             self.assert_caller_is_owner();
             // get table
             let manager = TableManagerTrait::new(world);
@@ -122,18 +122,18 @@ mod admin {
             table.description = description;
             table.fee_min = fee_min;
             table.fee_pct = fee_pct;
-            table.is_open = enabled;
+            table.is_open = is_open;
             manager.set(table);
         }
 
-        fn enable_table(ref world: IWorldDispatcher, table_id: felt252, enabled: bool) {
+        fn open_table(ref world: IWorldDispatcher, table_id: felt252, is_open: bool) {
             self.assert_caller_is_owner();
             // get table
             let manager = TableManagerTrait::new(world);
             assert(manager.exists(table_id), Errors::INVALID_TABLE);
             let mut table = manager.get(table_id);
             // update table
-            table.is_open = enabled;
+            table.is_open = is_open;
             manager.set(table);
         }
 

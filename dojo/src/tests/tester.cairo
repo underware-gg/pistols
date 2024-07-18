@@ -247,9 +247,9 @@ mod tester {
         system.set_table(table_id, contract_address, description, fee_min, fee_pct, enabled);
         _next_block();
     }
-    fn execute_admin_enable_table(system: IAdminDispatcher, sender: ContractAddress, table_id: felt252, enabled: bool) {
+    fn execute_admin_open_table(system: IAdminDispatcher, sender: ContractAddress, table_id: felt252, enabled: bool) {
         impersonate(sender);
-        system.enable_table(table_id, enabled);
+        system.open_table(table_id, enabled);
         _next_block();
     }
 

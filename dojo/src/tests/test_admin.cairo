@@ -180,7 +180,7 @@ mod tests {
         tester::execute_admin_initialize(admin, OWNER(), ZERO(), ZERO(), ZERO(), ZERO(), ZERO());
         let table: TableConfig = admin.get_table(tables::LORDS);
         assert(table.wager_contract_address == ZERO(), 'contract_address');
-        assert(table.is_open == false, 'enabled');
+        assert(table.is_open == false, 'is_open');
     }
 
     #[test]
@@ -191,7 +191,7 @@ mod tests {
         assert(table.wager_contract_address == lords.contract_address, 'contract_address');
         assert(table.fee_min == 4 * constants::ETH_TO_WEI, 'fee_min');
         assert(table.fee_pct == 10, 'fee_pct');
-        assert(table.is_open == true, 'enabled');
+        assert(table.is_open == true, 'is_open');
     }
 
     #[test]
@@ -209,7 +209,7 @@ mod tests {
         assert(table.description == 'LORDS+', 'description_1');
         assert(table.fee_min == 5, 'fee_min_1');
         assert(table.fee_pct == 10, 'fee_pct_1');
-        assert(table.is_open == true, 'enabled_1');
+        assert(table.is_open == true, 'is_open_1');
         // set
         tester::execute_admin_set_table(admin, OWNER(), tables::LORDS, OTHER(), 'LORDS+++', 22, 33, false);
         let table: TableConfig = admin.get_table(tables::LORDS);
@@ -217,7 +217,7 @@ mod tests {
         assert(table.description == 'LORDS+++', 'description_2');
         assert(table.fee_min == 22, 'fee_min_2');
         assert(table.fee_pct == 33, 'fee_pct_2');
-        assert(table.is_open == false, 'enabled_2');
+        assert(table.is_open == false, 'is_open_2');
         // get
         let table: TableConfig = tester::get_Table(world, tables::LORDS);
         assert(table.wager_contract_address == table.wager_contract_address, 'get_table.wager_address');
@@ -239,21 +239,21 @@ mod tests {
         // assert(table.description == 'LORDS+', 'description');
         // assert(table.fee_min == 5, 'fee_min');
         // assert(table.fee_pct == 10, 'fee_pct');
-        // assert(table.is_open == true, 'enabled');
+        // assert(table.is_open == true, 'is_open');
     }
 
     #[test]
-    fn test_enable_table_count() {
+    fn test_open_table() {
         let (_world, _system, admin, lords, _minter) = tester::setup_world(0 | flags::LORDS | flags::INITIALIZE | 0);
         tester::execute_admin_set_table(admin, OWNER(), tables::LORDS, lords.contract_address, 'LORDS+', 5, 10, false);
         let table: TableConfig = admin.get_table(tables::LORDS);
-        assert(table.is_open == false, 'enabled_1');
-        tester::execute_admin_enable_table(admin, OWNER(), tables::LORDS, true);
+        assert(table.is_open == false, 'is_open_1');
+        tester::execute_admin_open_table(admin, OWNER(), tables::LORDS, true);
         let table: TableConfig = admin.get_table(tables::LORDS);
-        assert(table.is_open == true, 'enabled_2');
-        tester::execute_admin_enable_table(admin, OWNER(), tables::LORDS, false);
+        assert(table.is_open == true, 'is_open_2');
+        tester::execute_admin_open_table(admin, OWNER(), tables::LORDS, false);
         let table: TableConfig = admin.get_table(tables::LORDS);
-        assert(table.is_open == false, 'enabled_3');
+        assert(table.is_open == false, 'is_open_3');
     }
 
     #[test]
@@ -265,9 +265,9 @@ mod tests {
 
     #[test]
     #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
-    fn test_enable_table_not_owner() {
+    fn test_open_table_not_owner() {
         let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN | 0 | flags::INITIALIZE | 0);
-        tester::execute_admin_enable_table(admin, OTHER(), tables::LORDS, true);
+        tester::execute_admin_open_table(admin, OTHER(), tables::LORDS, true);
     }
 
     #[test]
@@ -286,16 +286,16 @@ mod tests {
 
     #[test]
     #[should_panic(expected:('ADMIN: Invalid table', 'ENTRYPOINT_FAILED'))]
-    fn test_enable_table_zero() {
+    fn test_open_table_zero() {
         let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN | 0 | flags::INITIALIZE | 0);
-        tester::execute_admin_enable_table(admin, OWNER(), 0, false);
+        tester::execute_admin_open_table(admin, OWNER(), 0, false);
     }
 
     #[test]
     #[should_panic(expected:('ADMIN: Invalid table', 'ENTRYPOINT_FAILED'))]
-    fn test_enable_table_invalid() {
+    fn test_open_table_invalid() {
         let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN | 0 | flags::INITIALIZE | 0);
-        tester::execute_admin_enable_table(admin, OWNER(), INVALID_TABLE, false);
+        tester::execute_admin_open_table(admin, OWNER(), INVALID_TABLE, false);
     }
 
 

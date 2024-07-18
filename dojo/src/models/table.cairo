@@ -36,13 +36,13 @@ struct TableConfig {
     #[key]
     table_id: felt252,
     //------
+    table_type: TableType,
     description: felt252,
     wager_contract_address: ContractAddress,    // 0x0 if no wager or fees
     wager_min: u256,
     fee_min: u256,
     fee_pct: u8,
     is_open: bool,
-    table_type: TableType,
 }
 
 #[derive(Drop, Serde)]
@@ -59,23 +59,23 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
     (array![
         (TableConfig {
             table_id: tables::LORDS,
+            table_type: TableType::Classic,
             description: 'The Lords Table',
             wager_contract_address: lords_address,
             wager_min: 0,
             fee_min: 4 * constants::ETH_TO_WEI,
             fee_pct: 10,
             is_open: (lords_address.is_non_zero()),
-            table_type: TableType::Classic,
         }),
         (TableConfig {
             table_id: tables::COMMONERS,
+            table_type: TableType::Classic,
             description: 'The Commoners Table',
             wager_contract_address: ZERO(),
             wager_min: 0,
             fee_min: 0,
             fee_pct: 0,
             is_open: true,
-            table_type: TableType::Classic,
         }),
     ])
 }
