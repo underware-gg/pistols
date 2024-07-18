@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x263b1937ecd58448c77c5d1eb500eff83422c5dd65aecd350ab76e8e221c0d4"
-original_class_hash = "0x263b1937ecd58448c77c5d1eb500eff83422c5dd65aecd350ab76e8e221c0d4"
+class_hash = "0x360008ed9235b10f1d0cd5f791f76e24755de070bd430054dcb0297fe1ffd7a"
+original_class_hash = "0x360008ed9235b10f1d0cd5f791f76e24755de070bd430054dcb0297fe1ffd7a"
 abi = "manifests/dev/abis/base/models/pistols_models_table_table_config.json"
 name = "pistols::models::table::table_config"
 
@@ -10,8 +10,18 @@ type = "felt252"
 key = true
 
 [[members]]
+name = "table_type"
+type = "TableType"
+key = false
+
+[[members]]
 name = "description"
 type = "felt252"
+key = false
+
+[[members]]
+name = "fee_collector_address"
+type = "ContractAddress"
 key = false
 
 [[members]]
@@ -37,9 +47,4 @@ key = false
 [[members]]
 name = "is_open"
 type = "bool"
-key = false
-
-[[members]]
-name = "table_type"
-type = "TableType"
 key = false

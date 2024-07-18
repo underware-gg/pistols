@@ -151,8 +151,16 @@
         "type": "core::felt252"
       },
       {
+        "name": "table_type",
+        "type": "pistols::models::table::TableType"
+      },
+      {
         "name": "description",
         "type": "core::felt252"
+      },
+      {
+        "name": "fee_collector_address",
+        "type": "core::starknet::contract_address::ContractAddress"
       },
       {
         "name": "wager_contract_address",
@@ -173,10 +181,6 @@
       {
         "name": "is_open",
         "type": "core::bool"
-      },
-      {
-        "name": "table_type",
-        "type": "pistols::models::table::TableType"
       }
     ]
   },
@@ -206,14 +210,6 @@
           },
           {
             "name": "minter_address",
-            "type": "core::starknet::contract_address::ContractAddress"
-          },
-          {
-            "name": "account_a",
-            "type": "core::starknet::contract_address::ContractAddress"
-          },
-          {
-            "name": "account_b",
             "type": "core::starknet::contract_address::ContractAddress"
           }
         ],
@@ -292,7 +288,7 @@
             "type": "core::integer::u8"
           },
           {
-            "name": "enabled",
+            "name": "is_open",
             "type": "core::bool"
           }
         ],
@@ -301,14 +297,14 @@
       },
       {
         "type": "function",
-        "name": "enable_table",
+        "name": "open_table",
         "inputs": [
           {
             "name": "table_id",
             "type": "core::felt252"
           },
           {
-            "name": "enabled",
+            "name": "is_open",
             "type": "core::bool"
           }
         ],
