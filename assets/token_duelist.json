@@ -1,45 +1,66 @@
 {
   "id": "1",
-  "name": "Duelist #1",
+  "name": "Ser Walker #1",
   "description": "Pistols at 10 Blocks Duelist #1",
-  "image": "https://pistols.underware.gg/profiles/00_sq.jpg",
+  "image": "https://pistols.underware.gg/profiles/01_sq.jpg",
+  "portrait": "https://pistols.underware.gg/profiles/01_po.jpg",
   "metadata": {
-    "Honour": "0.0",
-    "Archetype": "Undefined",
-    "Total Duels": "0",
-    "Total Wins": "0",
-    "Total Losses": "0",
-    "Total Draws": "0",
-    "Accumulated Honour": "0"
+    "Honour": "9.9",
+    "Archetype": "Honourable",
+    "Archetype Level": "9.1",
+    "Honourable Level": "9.1",
+    "Total Duels": "6",
+    "Total Wins": "3",
+    "Total Losses": "2",
+    "Total Draws": "1",
+    "Lords Won": "1000",
+    "Lords Lost": "-200",
+    "Lords Balance": "800"
   },
   "attributes": [
     {
       "trait": "Honour",
-      "value": "0.0"
+      "value": "9.9"
     },
     {
       "trait": "Archetype",
-      "value": "Undefined"
+      "value": "Honourable"
+    },
+    {
+      "trait": "Archetype Level",
+      "value": "9.1"
+    },
+    {
+      "trait": "Honourable Level",
+      "value": "9.1"
     },
     {
       "trait": "Total Duels",
-      "value": "0"
+      "value": "6"
     },
     {
       "trait": "Total Wins",
-      "value": "0"
+      "value": "3"
     },
     {
       "trait": "Total Losses",
-      "value": "0"
+      "value": "2"
     },
     {
       "trait": "Total Draws",
-      "value": "0"
+      "value": "1"
     },
     {
-      "trait": "Accumulated Honour",
-      "value": "0"
+      "trait": "Lords Won",
+      "value": "1000"
+    },
+    {
+      "trait": "Lords Lost",
+      "value": "-200"
+    },
+    {
+      "trait": "Lords Balance",
+      "value": "800"
     }
   ]
 }

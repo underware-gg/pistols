@@ -244,7 +244,7 @@ mod token_duelist {
         }
 
         fn build_uri(self: @ContractState, token_id: u256, encode: bool) -> ByteArray {
-            let duelist: Duelist = get!(self.world(), (token_id), Duelist);
+            let duelist: Duelist = get!(self.world(), (token_id.low), Duelist);
             let attributes: Span<ByteArray> = self.get_attributes(duelist.clone());
             let metadata = JsonImpl::new()
                 .add("id", token_id.into())
