@@ -20,7 +20,6 @@ export function useScore(score: Score | undefined) {
   const total_wins = useMemo(() => (score?.total_wins ?? 0), [score])
   const total_losses = useMemo(() => (score?.total_losses ?? 0), [score])
   const total_draws = useMemo(() => (score?.total_draws ?? 0), [score])
-  const total_honour = useMemo(() => (score?.total_honour ?? 0), [score])
   const honour = useMemo(() => ((score?.honour ?? 0) / 10.0), [score, total_duels])
   const honourDisplay = useMemo(() => (total_duels > 0 && honour > 0 ? honour.toFixed(1) : EMOJI.ZERO), [honour, total_duels])
   const honourAndTotal = useMemo(() => (total_duels > 0 && honour > 0 ? <>{honour.toFixed(1)}<span className='Smaller'>/{total_duels}</span></> : EMOJI.ZERO), [honour, total_duels])
@@ -44,7 +43,6 @@ export function useScore(score: Score | undefined) {
     total_wins,
     total_losses,
     total_draws,
-    total_honour,
     level_villain,
     level_trickster,
     level_lord,

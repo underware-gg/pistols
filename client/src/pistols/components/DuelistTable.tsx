@@ -21,7 +21,6 @@ enum DuelistColumn {
   Name = 'Name',
   Honour = 'Honour',
   Level = 'Level',
-  TotalHonour = 'TotalHonour',
   Wins = 'Wins',
   Losses = 'Losses',
   Draws = 'Draws',
@@ -100,7 +99,6 @@ export function DuelistTable() {
     const _sortTotals = (a, b) => (!isAscending ? (b - a) : (a && !b) ? -1 : (!a && b) ? 1 : (a - b))
     if (sortColumn == DuelistColumn.Honour) return _sortTotals(dataA.honour, dataB.honour)
     if (sortColumn == DuelistColumn.Level) return _sortTotals(dataA.level, dataB.level)
-    if (sortColumn == DuelistColumn.TotalHonour) return _sortTotals(dataA.total_honour, dataB.total_honour)
     if (sortColumn == DuelistColumn.Wins) return _sortTotals(dataA.total_wins, dataB.total_wins)
     if (sortColumn == DuelistColumn.Losses) return _sortTotals(dataA.total_losses, dataB.total_losses)
     if (sortColumn == DuelistColumn.Draws) return _sortTotals(dataA.total_draws, dataB.total_draws)
@@ -127,7 +125,6 @@ export function DuelistTable() {
             <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Honour ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Honour)}>Honour</HeaderCell>
             <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Level ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Level)}>{EMOJI.LORD}{EMOJI.TRICKSTER}{EMOJI.VILLAIN}<br />Level</HeaderCell>
             <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Total ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Total)}>Total<br />Duels</HeaderCell>
-            <HeaderCell width={1} sorted={sortColumn == DuelistColumn.TotalHonour ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.TotalHonour)}>Total<br />Honour</HeaderCell>
             <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Wins ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Wins)}>Wins</HeaderCell>
             <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Losses ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Losses)}>Losses</HeaderCell>
             <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Draws ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Draws)}>Draws</HeaderCell>
@@ -187,7 +184,7 @@ function DuelistItem({
   // score switcher
   const score = (tableId ? scoreboardScore : duelistScore)
   const {
-    total_wins, total_losses, total_draws, total_duels, total_honour,
+    total_wins, total_losses, total_draws, total_duels,
     honourDisplay, levelDisplay, winRatio,
   } = score
   const isRookie = (total_duels == 0)
@@ -233,10 +230,6 @@ function DuelistItem({
 
       <Cell className={_colClass(DuelistColumn.Total)}>
         {isRookie ? '-' : <span className='TableValue'>{total_duels}</span>}
-      </Cell>
-
-      <Cell className={_colClass(DuelistColumn.TotalHonour)}>
-        {isRookie ? '-' : <span className='TableValue'>{total_honour}</span>}
       </Cell>
 
       <Cell className={_colClass(DuelistColumn.Wins)}>

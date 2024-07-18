@@ -76,9 +76,8 @@ struct Score {
     total_wins: u16,
     total_losses: u16,
     total_draws: u16,
-    total_honour: u32,      // sum of al duels Honour
     honour_history: u64,    // past 8 duels, each byte holds one duel honour
-} // [192]
+} // [160]
 
 
 
@@ -113,8 +112,6 @@ impl ScoreTraitImpl of ScoreTrait {
     fn is_lord(self: Score) -> bool { (self.level_lord > 0) }
     #[inline(always)]
     fn format_honour(value: u8) -> ByteArray { (format!("{}.{}", value/10, value%10)) }
-    #[inline(always)]
-    fn format_total_honour(value: u32) -> ByteArray { (format!("{}.{}", value/10, value%10)) }
 }
 
 impl ArchetypeIntoFelt252 of Into<Archetype, felt252> {

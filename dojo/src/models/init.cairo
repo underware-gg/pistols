@@ -46,7 +46,6 @@ mod init {
             total_wins: 0,
             total_losses: 0,
             total_draws: 0,
-            total_honour: 0,
             honour_history: 0,
         })
     }
