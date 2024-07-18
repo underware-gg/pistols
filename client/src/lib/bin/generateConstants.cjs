@@ -148,11 +148,9 @@ function parseMods(constants) {
   const enums = constants.enums
   Object.keys(enums).forEach((key) => {
     let enumName = `${key}`;
-    let typeName = `${key}Names`;
     let valuesName = `${key}Values`;
     let enumContents = `export enum ${enumName} {\n`;
-    let namesContents = `export type ${typeName} = `;
-    let valuesContents = `export const ${valuesName}: Record<${typeName}, ${enumName}> = {\n`;
+    let valuesContents = `export const ${valuesName}: Record<${enumName}, number> = {\n`;
     let index = 0;
     enums[key].lines.forEach((line) => {
       // remove 'const ' and ';'
@@ -162,20 +160,17 @@ function parseMods(constants) {
       type = type.trim();
       if (type) {
         // enumContents += `  ${type} = '${type}', // ${index}\n`;
-        enumContents += `  ${type} = ${index},\n`;
-        namesContents += `${index > 0 ? ' | ' : ''}'${type}'`;
-        valuesContents += `  '${type}': ${enumName}.${type}, // ${index}\n`;
+        enumContents += `  ${type} = '${type}',\n`;
+        valuesContents += `  [${enumName}.${type}]: ${index},\n`;
         index++;
       }
     })
     enumContents += `};\n`;
-    namesContents += `;\n`;
     valuesContents += `};\n`;
     // write contents
     fileContents += '\n';
     fileContents += `// from: ${enums[key].filePath}\n`;
     fileContents += enumContents;
-    fileContents += namesContents;
     fileContents += valuesContents;
     // exports
     exports.push(enumName);
