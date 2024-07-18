@@ -171,20 +171,6 @@
     ]
   },
   {
-    "type": "struct",
-    "name": "core::integer::u256",
-    "members": [
-      {
-        "name": "low",
-        "type": "core::integer::u128"
-      },
-      {
-        "name": "high",
-        "type": "core::integer::u128"
-      }
-    ]
-  },
-  {
     "type": "enum",
     "name": "core::bool",
     "variants": [
@@ -384,7 +370,7 @@
           },
           {
             "name": "wager_value",
-            "type": "core::integer::u256"
+            "type": "core::integer::u128"
           },
           {
             "name": "expire_hours",
@@ -556,12 +542,12 @@
           },
           {
             "name": "wager_value",
-            "type": "core::integer::u256"
+            "type": "core::integer::u128"
           }
         ],
         "outputs": [
           {
-            "type": "core::integer::u256"
+            "type": "core::integer::u128"
           }
         ],
         "state_mutability": "view"

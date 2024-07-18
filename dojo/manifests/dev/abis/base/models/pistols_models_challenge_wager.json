@@ -324,20 +324,6 @@
   },
   {
     "type": "struct",
-    "name": "core::integer::u256",
-    "members": [
-      {
-        "name": "low",
-        "type": "core::integer::u128"
-      },
-      {
-        "name": "high",
-        "type": "core::integer::u128"
-      }
-    ]
-  },
-  {
-    "type": "struct",
     "name": "pistols::models::challenge::Wager",
     "members": [
       {
@@ -346,11 +332,11 @@
       },
       {
         "name": "value",
-        "type": "core::integer::u256"
+        "type": "core::integer::u128"
       },
       {
         "name": "fee",
-        "type": "core::integer::u256"
+        "type": "core::integer::u128"
       }
     ]
   },

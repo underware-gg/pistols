@@ -1000,8 +1000,8 @@
       }
     ],
     "address": "0x545c8aff15426c3d43b3ba8fd45c61870b30ca4ec0bfbd69193facee4c7b97c",
-    "transaction_hash": "0x3dac6f98ea15ca635d43fc0e4edb1fb3ba5a7dd0c104ef6ceff7813553e0131",
-    "block_number": 3,
+    "transaction_hash": "0x2f9798ffaeb7840c4df6a316c41a9776cd504b26fc9e9b3c741af1aa29399b7",
+    "block_number": 16,
     "seed": "pistols",
     "metadata": {
       "profile_name": "dev",
@@ -1646,8 +1646,8 @@
     {
       "kind": "DojoContract",
       "address": "0x30663cb812dc7e2930b9683945132ca6054483af40e1e7daccb77091e02e7b1",
-      "class_hash": "0x1e61c702a5e01538796471d2b7f61b4055be16699c901d074292f7a529d3eb5",
-      "original_class_hash": "0x1e61c702a5e01538796471d2b7f61b4055be16699c901d074292f7a529d3eb5",
+      "class_hash": "0x306a2fd79c90f6a7b3366e8e40898c29801d3b85f249ed038f0a82cc825a724",
+      "original_class_hash": "0x306a2fd79c90f6a7b3366e8e40898c29801d3b85f249ed038f0a82cc825a724",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -1818,20 +1818,6 @@
             {
               "name": "score",
               "type": "pistols::models::duelist::Score"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "core::integer::u256",
-          "members": [
-            {
-              "name": "low",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "high",
-              "type": "core::integer::u128"
             }
           ]
         },
@@ -2035,7 +2021,7 @@
                 },
                 {
                   "name": "wager_value",
-                  "type": "core::integer::u256"
+                  "type": "core::integer::u128"
                 },
                 {
                   "name": "expire_hours",
@@ -2207,12 +2193,12 @@
                 },
                 {
                   "name": "wager_value",
-                  "type": "core::integer::u256"
+                  "type": "core::integer::u128"
                 }
               ],
               "outputs": [
                 {
-                  "type": "core::integer::u256"
+                  "type": "core::integer::u128"
                 }
               ],
               "state_mutability": "view"
@@ -2536,8 +2522,8 @@
     {
       "kind": "DojoContract",
       "address": "0x725717f8ac5508bb1b6dfbf53949f20b7f38f59c7310feab688cb5f18ef0635",
-      "class_hash": "0x51df9612e7032482fd6f76b6196c758c5f7a02068a93dd615347d5ea0751f3f",
-      "original_class_hash": "0x51df9612e7032482fd6f76b6196c758c5f7a02068a93dd615347d5ea0751f3f",
+      "class_hash": "0x3096bcdc8570ebaa02992d62818fd4d431aedf97940aabc82b8cfc4d395a0d0",
+      "original_class_hash": "0x3096bcdc8570ebaa02992d62818fd4d431aedf97940aabc82b8cfc4d395a0d0",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -2610,20 +2596,6 @@
             {
               "name": "True",
               "type": "()"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "core::integer::u256",
-          "members": [
-            {
-              "name": "low",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "high",
-              "type": "core::integer::u128"
             }
           ]
         },
@@ -2709,11 +2681,11 @@
             },
             {
               "name": "wager_min",
-              "type": "core::integer::u256"
+              "type": "core::integer::u128"
             },
             {
               "name": "fee_min",
-              "type": "core::integer::u256"
+              "type": "core::integer::u128"
             },
             {
               "name": "fee_pct",
@@ -2822,7 +2794,7 @@
                 },
                 {
                   "name": "fee_min",
-                  "type": "core::integer::u256"
+                  "type": "core::integer::u128"
                 },
                 {
                   "name": "fee_pct",
@@ -3218,8 +3190,8 @@
     {
       "kind": "DojoContract",
       "address": "0x774e613f68f731df522253c22bce0f77549afc8203d0cfec5086d2ee2a992d6",
-      "class_hash": "0x7a35e58ea33014238fda666a196bc8d861eaa0a627543a1b92daffaaf0e2c71",
-      "original_class_hash": "0x7a35e58ea33014238fda666a196bc8d861eaa0a627543a1b92daffaaf0e2c71",
+      "class_hash": "0x35affbecfa7f33649a4808b78cd16e6b85ca85f955b13776df8b9f5f55a7efa",
+      "original_class_hash": "0x35affbecfa7f33649a4808b78cd16e6b85ca85f955b13776df8b9f5f55a7efa",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -5646,17 +5618,17 @@
         },
         {
           "name": "value",
-          "type": "u256",
+          "type": "u128",
           "key": false
         },
         {
           "name": "fee",
-          "type": "u256",
+          "type": "u128",
           "key": false
         }
       ],
-      "class_hash": "0x3a2bf6d5c3ce957184d58589fe4318505db1ebc8c85fc5d3cdbfd9448b2d38d",
-      "original_class_hash": "0x3a2bf6d5c3ce957184d58589fe4318505db1ebc8c85fc5d3cdbfd9448b2d38d",
+      "class_hash": "0xdb042e64740a8da91d86f231401f8ec6039dbe39fa6b2e601013184cf69f5a",
+      "original_class_hash": "0xdb042e64740a8da91d86f231401f8ec6039dbe39fa6b2e601013184cf69f5a",
       "abi": [
         {
           "type": "impl",
@@ -5983,20 +5955,6 @@
         },
         {
           "type": "struct",
-          "name": "core::integer::u256",
-          "members": [
-            {
-              "name": "low",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "high",
-              "type": "core::integer::u128"
-            }
-          ]
-        },
-        {
-          "type": "struct",
           "name": "pistols::models::challenge::Wager",
           "members": [
             {
@@ -6005,11 +5963,11 @@
             },
             {
               "name": "value",
-              "type": "core::integer::u256"
+              "type": "core::integer::u128"
             },
             {
               "name": "fee",
-              "type": "core::integer::u256"
+              "type": "core::integer::u128"
             }
           ]
         },
@@ -7349,17 +7307,17 @@
         },
         {
           "name": "wager_won",
-          "type": "u256",
+          "type": "u128",
           "key": false
         },
         {
           "name": "wager_lost",
-          "type": "u256",
+          "type": "u128",
           "key": false
         }
       ],
-      "class_hash": "0x77429cbea916a564e7ed25b5175ebb6bbdcf90e9da8aeb89b729f7e5b2a1d4f",
-      "original_class_hash": "0x77429cbea916a564e7ed25b5175ebb6bbdcf90e9da8aeb89b729f7e5b2a1d4f",
+      "class_hash": "0x170b5f5f3be473c77466d3461b4889fb75c422b3cf777c3d6bc0179da4ca236",
+      "original_class_hash": "0x170b5f5f3be473c77466d3461b4889fb75c422b3cf777c3d6bc0179da4ca236",
       "abi": [
         {
           "type": "impl",
@@ -7728,20 +7686,6 @@
         },
         {
           "type": "struct",
-          "name": "core::integer::u256",
-          "members": [
-            {
-              "name": "low",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "high",
-              "type": "core::integer::u128"
-            }
-          ]
-        },
-        {
-          "type": "struct",
           "name": "pistols::models::duelist::Scoreboard",
           "members": [
             {
@@ -7758,11 +7702,11 @@
             },
             {
               "name": "wager_won",
-              "type": "core::integer::u256"
+              "type": "core::integer::u128"
             },
             {
               "name": "wager_lost",
-              "type": "core::integer::u256"
+              "type": "core::integer::u128"
             }
           ]
         },
@@ -8213,12 +8157,12 @@
         },
         {
           "name": "wager_min",
-          "type": "u256",
+          "type": "u128",
           "key": false
         },
         {
           "name": "fee_min",
-          "type": "u256",
+          "type": "u128",
           "key": false
         },
         {
@@ -8232,8 +8176,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x360008ed9235b10f1d0cd5f791f76e24755de070bd430054dcb0297fe1ffd7a",
-      "original_class_hash": "0x360008ed9235b10f1d0cd5f791f76e24755de070bd430054dcb0297fe1ffd7a",
+      "class_hash": "0x3f3036a4faf363d133ace87f3bf0c5e615a542fa0aec5736ff73aef93984f16",
+      "original_class_hash": "0x3f3036a4faf363d133ace87f3bf0c5e615a542fa0aec5736ff73aef93984f16",
       "abi": [
         {
           "type": "impl",
@@ -8581,20 +8525,6 @@
           ]
         },
         {
-          "type": "struct",
-          "name": "core::integer::u256",
-          "members": [
-            {
-              "name": "low",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "high",
-              "type": "core::integer::u128"
-            }
-          ]
-        },
-        {
           "type": "enum",
           "name": "core::bool",
           "variants": [
@@ -8634,11 +8564,11 @@
             },
             {
               "name": "wager_min",
-              "type": "core::integer::u256"
+              "type": "core::integer::u128"
             },
             {
               "name": "fee_min",
-              "type": "core::integer::u256"
+              "type": "core::integer::u128"
             },
             {
               "name": "fee_pct",

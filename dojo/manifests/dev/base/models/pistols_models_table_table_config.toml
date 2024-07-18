@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x360008ed9235b10f1d0cd5f791f76e24755de070bd430054dcb0297fe1ffd7a"
-original_class_hash = "0x360008ed9235b10f1d0cd5f791f76e24755de070bd430054dcb0297fe1ffd7a"
+class_hash = "0x3f3036a4faf363d133ace87f3bf0c5e615a542fa0aec5736ff73aef93984f16"
+original_class_hash = "0x3f3036a4faf363d133ace87f3bf0c5e615a542fa0aec5736ff73aef93984f16"
 abi = "manifests/dev/abis/base/models/pistols_models_table_table_config.json"
 name = "pistols::models::table::table_config"
 
@@ -31,12 +31,12 @@ key = false
 
 [[members]]
 name = "wager_min"
-type = "u256"
+type = "u128"
 key = false
 
 [[members]]
 name = "fee_min"
-type = "u256"
+type = "u128"
 key = false
 
 [[members]]

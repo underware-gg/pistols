@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x77429cbea916a564e7ed25b5175ebb6bbdcf90e9da8aeb89b729f7e5b2a1d4f"
-original_class_hash = "0x77429cbea916a564e7ed25b5175ebb6bbdcf90e9da8aeb89b729f7e5b2a1d4f"
+class_hash = "0x170b5f5f3be473c77466d3461b4889fb75c422b3cf777c3d6bc0179da4ca236"
+original_class_hash = "0x170b5f5f3be473c77466d3461b4889fb75c422b3cf777c3d6bc0179da4ca236"
 abi = "manifests/dev/abis/base/models/pistols_models_duelist_scoreboard.json"
 name = "pistols::models::duelist::scoreboard"
 
@@ -21,10 +21,10 @@ key = false
 
 [[members]]
 name = "wager_won"
-type = "u256"
+type = "u128"
 key = false
 
 [[members]]
 name = "wager_lost"
-type = "u256"
+type = "u128"
 key = false
