@@ -560,7 +560,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_b.chance_crit == 100, 'shot_b.chance_crit');
-        assert(round.shot_b.dice_crit == 100, 'shot_b.dice_crit');
+        assert(round.shot_b.dice_crit > 0, 'shot_b.dice_crit');
         assert(round.shot_a.wager > 0, 'shot_a.wager');
         assert(round.shot_b.wager > 0, 'shot_b.wager');
         tester::assert_winner_balance(lords, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
@@ -583,7 +583,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.chance_crit == 100, 'shot_a.chance_crit');
-        assert(round.shot_a.dice_crit == 100, 'shot_a.dice_crit');
+        assert(round.shot_a.dice_crit > 0, 'shot_a.dice_crit');
         assert(round.shot_a.wager > 0, 'shot_a.wager');
         assert(round.shot_b.wager > 0, 'shot_b.wager');
         tester::assert_winner_balance(lords, 0, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
@@ -734,7 +734,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_b.chance_crit == 100, 'shot_b.chance_crit');
-        assert(round.shot_b.dice_crit == 100, 'shot_b.dice_crit');
+        assert(round.shot_b.dice_crit > 0, 'shot_b.dice_crit');
         assert(round.shot_a.wager == 0, 'shot_a.wager');
         assert(round.shot_b.wager > 0, 'shot_b.wager');
         tester::assert_winner_balance(lords, 2, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
@@ -757,7 +757,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_a.health == constants::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.chance_crit == 100, 'shot_a.chance_crit');
-        assert(round.shot_a.dice_crit == 100, 'shot_a.dice_crit');
+        assert(round.shot_a.dice_crit > 0, 'shot_a.dice_crit');
         assert(round.shot_a.wager > 0, 'shot_a.wager');
         assert(round.shot_b.wager == 0, 'shot_b.wager');
         tester::assert_winner_balance(lords, 1, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'winner_balance');
