@@ -126,7 +126,7 @@ export function defineContractComponents(world: World) {
     TableConfig: (() => {
       return defineComponent(
         world,
-        { table_id: RecsType.BigInt, table_type: RecsType.Number, description: RecsType.BigInt, fee_collector_address: RecsType.BigInt, wager_contract_address: RecsType.BigInt, wager_min: RecsType.BigInt, fee_min: RecsType.BigInt, fee_pct: RecsType.Number, is_open: RecsType.Boolean },
+        { table_id: RecsType.BigInt, table_type: RecsType.String, description: RecsType.BigInt, fee_collector_address: RecsType.BigInt, wager_contract_address: RecsType.BigInt, wager_min: RecsType.BigInt, fee_min: RecsType.BigInt, fee_pct: RecsType.Number, is_open: RecsType.Boolean },
         {
           metadata: {
             name: "TableConfig",
