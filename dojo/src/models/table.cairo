@@ -38,6 +38,7 @@ struct TableConfig {
     //------
     table_type: TableType,
     description: felt252,
+    fee_collector_address: ContractAddress,     // 0x0 goes to default treasury
     wager_contract_address: ContractAddress,    // 0x0 if no wager or fees
     wager_min: u256,
     fee_min: u256,
@@ -61,6 +62,7 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
             table_id: tables::LORDS,
             table_type: TableType::Classic,
             description: 'The Lords Table',
+            fee_collector_address: ZERO(),
             wager_contract_address: lords_address,
             wager_min: 0,
             fee_min: 4 * constants::ETH_TO_WEI,
@@ -71,6 +73,7 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
             table_id: tables::COMMONERS,
             table_type: TableType::Classic,
             description: 'The Commoners Table',
+            fee_collector_address: ZERO(),
             wager_contract_address: ZERO(),
             wager_min: 0,
             fee_min: 0,
