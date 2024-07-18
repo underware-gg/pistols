@@ -215,10 +215,10 @@ fn test_token_uri() {
         profile_pic_uri: "1",
         timestamp: 999999,
         score: Score {
-            honour: 100,
+            honour: 99,
             level_villain: 0,
             level_trickster: 0,
-            level_lord: 90,
+            level_lord: 91,
             total_duels: 6,
             total_wins: 3,
             total_losses: 2,
@@ -236,10 +236,6 @@ fn test_token_uri() {
 
     set!(world, (duelist));
     set!(world, (scoreboard));
-
-let duelist: Duelist = get!(world, (TOKEN_ID), Duelist);
-duelist.duelist_id.print();
-duelist.name.print();
 
     let uri_1 = token.token_uri(TOKEN_ID);
     let uri_2 = token.token_uri(TOKEN_ID_2);
