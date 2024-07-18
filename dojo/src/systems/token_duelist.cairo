@@ -250,8 +250,8 @@ mod token_duelist {
                 .add("id", token_id.into())
                 .add("name", self.format_name(token_id, duelist.clone()))
                 .add("description", self.format_description(token_id, duelist.clone()))
-                .add("image", self.format_image(duelist.clone(), "sq"))
-                .add("portrait", self.format_image(duelist.clone(), "a"))
+                .add("image", self.format_image(duelist.clone(), "square"))
+                .add("portrait", self.format_image(duelist.clone(), "portrait"))
                 .add("metadata", self.format_metadata(attributes))
                 .add_array("attributes", self.format_traits_array(attributes));
             let metadata = metadata.build();
@@ -285,7 +285,7 @@ mod token_duelist {
                 if (duelist.profile_pic_uri.len() == 0) {"00"}
                 else if (duelist.profile_pic_uri.len() == 1) {format!("0{}", duelist.profile_pic_uri)}
                 else {duelist.profile_pic_uri};
-            (format!("{}/profiles/{}_{}.jpg", base_uri, number, variant))
+            (format!("{}/profiles/{}/{}.jpg", base_uri, variant, number))
         }
 
         // returns: [key1, value1, key2, value2,...]
