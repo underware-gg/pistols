@@ -8,16 +8,16 @@ import { BigNumberish } from 'starknet'
 
 export const useTable = (tableId: string) => {
   const { TableConfig } = useDojoComponents()
-  const { table_types } = useDojoConstants()
+  const { TableType } = useDojoConstants()
 
   const table = useComponentValue(TableConfig, bigintToEntity(stringToFelt(tableId ?? '')))
   const wagerContractAddress = useMemo(() => (table?.wager_contract_address ?? 0n), [table])
 
-  // const tableType = useMemo(() => (table?.table_type ? {
-  //   [table_types.CLASSIC]: 'Classic',
-  //   [table_types.TOURNAMENT]: 'Tournament',
-  //   [table_types.IRL_TOURNAMENT]: 'IRL Tournamment',
-  // }[Number(table.table_type)] : null), [table])
+  const tableType = useMemo(() => (table?.table_type ? {
+    [TableType.Classic]: 'Classic',
+    [TableType.Tournament]: 'Tournament',
+    [TableType.IRLTournament]: 'IRL Tournamment',
+  }[table.table_type] : null), [table])
   
   return {
     tableId,
@@ -27,13 +27,12 @@ export const useTable = (tableId: string) => {
     wagerMin: table?.wager_min ?? null,
     feeMin: table?.fee_min ?? null,
     feePct: table?.fee_pct ?? null,
-    // tableType: tableType ?? '?',
-    tableType: table?.table_type ?? '?',
+    tableType: tableType ?? '?',
     tableIsOpen: table?.is_open ?? false,
     //@ts-ignore
-    isTournament: (table?.table_type == 'Tournament'),
+    isTournament: (table?.table_type == TableType.Tournament),
     //@ts-ignore
-    isIRLTournament: (table?.table_type == 'IRLTournament'),
+    isIRLTournament: (table?.table_type == TableType.IRLTournament),
   }
 }
 

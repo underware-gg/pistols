@@ -21,13 +21,6 @@ enum TableType {
     IRLTournament,  // 3
 }
 
-// TODO: REMOVE THIS
-mod table_types {
-    const CLASSIC: u8 = 1;
-    const TOURNAMENT: u8 = 2;
-    const IRL_TOURNAMENT: u8 = 3;
-}
-
 // Temporarily renamed to TableConfig while this bug exists:
 // https://github.com/dojoengine/dojo/issues/2057
 #[derive(Copy, Drop, Serde)]
