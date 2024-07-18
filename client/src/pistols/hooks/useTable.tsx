@@ -18,7 +18,7 @@ export const useTable = (tableId: string) => {
     [TableType.Tournament]: 'Tournament',
     [TableType.IRLTournament]: 'IRL Tournamment',
   }[table.table_type] : null), [table])
-  
+
   return {
     tableId,
     wagerContractAddress,
@@ -29,9 +29,7 @@ export const useTable = (tableId: string) => {
     feePct: table?.fee_pct ?? null,
     tableType: tableType ?? '?',
     tableIsOpen: table?.is_open ?? false,
-    //@ts-ignore
     isTournament: (table?.table_type == TableType.Tournament),
-    //@ts-ignore
     isIRLTournament: (table?.table_type == TableType.IRLTournament),
   }
 }
