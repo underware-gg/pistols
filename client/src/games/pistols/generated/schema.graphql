@@ -3,11 +3,16 @@ schema {
   subscription: World__Subscription
 }
 
+scalar ByteArray
+
 type Challenge {
   duel_id: u128
-  duelist_a: ContractAddress
-  duelist_b: ContractAddress
+  table_id: felt252
   message: felt252
+  address_a: ContractAddress
+  address_b: ContractAddress
+  duelist_id_a: u128
+  duelist_id_b: u128
   state: u8
   round_number: u8
   winner: u8
@@ -34,9 +39,12 @@ input ChallengeOrder {
 
 enum ChallengeOrderField {
   DUEL_ID
-  DUELIST_A
-  DUELIST_B
+  TABLE_ID
   MESSAGE
+  ADDRESS_A
+  ADDRESS_B
+  DUELIST_ID_A
+  DUELIST_ID_B
   STATE
   ROUND_NUMBER
   WINNER
@@ -52,20 +60,21 @@ input ChallengeWhereInput {
   duel_idLTE: u128
   duel_idNEQ: u128
   duel_idEQ: u128
-  duelist_a: ContractAddress
-  duelist_aGT: ContractAddress
-  duelist_aGTE: ContractAddress
-  duelist_aLT: ContractAddress
-  duelist_aLTE: ContractAddress
-  duelist_aNEQ: ContractAddress
-  duelist_aEQ: ContractAddress
-  duelist_b: ContractAddress
-  duelist_bGT: ContractAddress
-  duelist_bGTE: ContractAddress
-  duelist_bLT: ContractAddress
-  duelist_bLTE: ContractAddress
-  duelist_bNEQ: ContractAddress
-  duelist_bEQ: ContractAddress
+  duel_idNOTIN: [u128]
+  duel_idIN: [u128]
+  duel_idNOTLIKE: u128
+  duel_idLIKE: u128
+  table_id: felt252
+  table_idGT: felt252
+  table_idGTE: felt252
+  table_idLT: felt252
+  table_idLTE: felt252
+  table_idNEQ: felt252
+  table_idEQ: felt252
+  table_idNOTIN: [felt252]
+  table_idIN: [felt252]
+  table_idNOTLIKE: felt252
+  table_idLIKE: felt252
   message: felt252
   messageGT: felt252
   messageGTE: felt252
@@ -73,6 +82,54 @@ input ChallengeWhereInput {
   messageLTE: felt252
   messageNEQ: felt252
   messageEQ: felt252
+  messageNOTIN: [felt252]
+  messageIN: [felt252]
+  messageNOTLIKE: felt252
+  messageLIKE: felt252
+  address_a: ContractAddress
+  address_aGT: ContractAddress
+  address_aGTE: ContractAddress
+  address_aLT: ContractAddress
+  address_aLTE: ContractAddress
+  address_aNEQ: ContractAddress
+  address_aEQ: ContractAddress
+  address_aNOTIN: [ContractAddress]
+  address_aIN: [ContractAddress]
+  address_aNOTLIKE: ContractAddress
+  address_aLIKE: ContractAddress
+  address_b: ContractAddress
+  address_bGT: ContractAddress
+  address_bGTE: ContractAddress
+  address_bLT: ContractAddress
+  address_bLTE: ContractAddress
+  address_bNEQ: ContractAddress
+  address_bEQ: ContractAddress
+  address_bNOTIN: [ContractAddress]
+  address_bIN: [ContractAddress]
+  address_bNOTLIKE: ContractAddress
+  address_bLIKE: ContractAddress
+  duelist_id_a: u128
+  duelist_id_aGT: u128
+  duelist_id_aGTE: u128
+  duelist_id_aLT: u128
+  duelist_id_aLTE: u128
+  duelist_id_aNEQ: u128
+  duelist_id_aEQ: u128
+  duelist_id_aNOTIN: [u128]
+  duelist_id_aIN: [u128]
+  duelist_id_aNOTLIKE: u128
+  duelist_id_aLIKE: u128
+  duelist_id_b: u128
+  duelist_id_bGT: u128
+  duelist_id_bGTE: u128
+  duelist_id_bLT: u128
+  duelist_id_bLTE: u128
+  duelist_id_bNEQ: u128
+  duelist_id_bEQ: u128
+  duelist_id_bNOTIN: [u128]
+  duelist_id_bIN: [u128]
+  duelist_id_bNOTLIKE: u128
+  duelist_id_bLIKE: u128
   state: u8
   stateGT: u8
   stateGTE: u8
@@ -80,6 +137,10 @@ input ChallengeWhereInput {
   stateLTE: u8
   stateNEQ: u8
   stateEQ: u8
+  stateNOTIN: [u8]
+  stateIN: [u8]
+  stateNOTLIKE: u8
+  stateLIKE: u8
   round_number: u8
   round_numberGT: u8
   round_numberGTE: u8
@@ -87,6 +148,10 @@ input ChallengeWhereInput {
   round_numberLTE: u8
   round_numberNEQ: u8
   round_numberEQ: u8
+  round_numberNOTIN: [u8]
+  round_numberIN: [u8]
+  round_numberNOTLIKE: u8
+  round_numberLIKE: u8
   winner: u8
   winnerGT: u8
   winnerGTE: u8
@@ -94,6 +159,10 @@ input ChallengeWhereInput {
   winnerLTE: u8
   winnerNEQ: u8
   winnerEQ: u8
+  winnerNOTIN: [u8]
+  winnerIN: [u8]
+  winnerNOTLIKE: u8
+  winnerLIKE: u8
   timestamp_start: u64
   timestamp_startGT: u64
   timestamp_startGTE: u64
@@ -101,6 +170,10 @@ input ChallengeWhereInput {
   timestamp_startLTE: u64
   timestamp_startNEQ: u64
   timestamp_startEQ: u64
+  timestamp_startNOTIN: [u64]
+  timestamp_startIN: [u64]
+  timestamp_startNOTLIKE: u64
+  timestamp_startLIKE: u64
   timestamp_end: u64
   timestamp_endGT: u64
   timestamp_endGTE: u64
@@ -108,80 +181,10 @@ input ChallengeWhereInput {
   timestamp_endLTE: u64
   timestamp_endNEQ: u64
   timestamp_endEQ: u64
-}
-
-type Coin {
-  key: u8
-  contract_address: ContractAddress
-  description: felt252
-  fee_min: u256
-  fee_pct: u8
-  enabled: bool
-  entity: World__Entity
-}
-
-type CoinConnection {
-  edges: [CoinEdge]
-  totalCount: Int!
-  pageInfo: World__PageInfo!
-}
-
-type CoinEdge {
-  node: Coin
-  cursor: Cursor
-}
-
-input CoinOrder {
-  direction: OrderDirection!
-  field: CoinOrderField!
-}
-
-enum CoinOrderField {
-  KEY
-  CONTRACT_ADDRESS
-  DESCRIPTION
-  FEE_MIN
-  FEE_PCT
-  ENABLED
-}
-
-input CoinWhereInput {
-  key: u8
-  keyGT: u8
-  keyGTE: u8
-  keyLT: u8
-  keyLTE: u8
-  keyNEQ: u8
-  keyEQ: u8
-  contract_address: ContractAddress
-  contract_addressGT: ContractAddress
-  contract_addressGTE: ContractAddress
-  contract_addressLT: ContractAddress
-  contract_addressLTE: ContractAddress
-  contract_addressNEQ: ContractAddress
-  contract_addressEQ: ContractAddress
-  description: felt252
-  descriptionGT: felt252
-  descriptionGTE: felt252
-  descriptionLT: felt252
-  descriptionLTE: felt252
-  descriptionNEQ: felt252
-  descriptionEQ: felt252
-  fee_min: u256
-  fee_minGT: u256
-  fee_minGTE: u256
-  fee_minLT: u256
-  fee_minLTE: u256
-  fee_minNEQ: u256
-  fee_minEQ: u256
-  fee_pct: u8
-  fee_pctGT: u8
-  fee_pctGTE: u8
-  fee_pctLT: u8
-  fee_pctLTE: u8
-  fee_pctNEQ: u8
-  fee_pctEQ: u8
-  enabled: bool
+  timestamp_endNOTIN: [u64]
+  timestamp_endIN: [u64]
+  timestamp_endNOTLIKE: u64
+  timestamp_endLIKE: u64
 }
 
 type Config {
@@ -189,6 +192,8 @@ type Config {
   initialized: bool
   owner_address: ContractAddress
   treasury_address: ContractAddress
+  token_duelist_address: ContractAddress
+  minter_address: ContractAddress
   paused: bool
   entity: World__Entity
 }
@@ -214,6 +219,8 @@ enum ConfigOrderField {
   INITIALIZED
   OWNER_ADDRESS
   TREASURY_ADDRESS
+  TOKEN_DUELIST_ADDRESS
+  MINTER_ADDRESS
   PAUSED
 }
 
@@ -225,6 +232,10 @@ input ConfigWhereInput {
   keyLTE: u8
   keyNEQ: u8
   keyEQ: u8
+  keyNOTIN: [u8]
+  keyIN: [u8]
+  keyNOTLIKE: u8
+  keyLIKE: u8
   initialized: bool
   owner_address: ContractAddress
   owner_addressGT: ContractAddress
@@ -233,6 +244,10 @@ input ConfigWhereInput {
   owner_addressLTE: ContractAddress
   owner_addressNEQ: ContractAddress
   owner_addressEQ: ContractAddress
+  owner_addressNOTIN: [ContractAddress]
+  owner_addressIN: [ContractAddress]
+  owner_addressNOTLIKE: ContractAddress
+  owner_addressLIKE: ContractAddress
   treasury_address: ContractAddress
   treasury_addressGT: ContractAddress
   treasury_addressGTE: ContractAddress
@@ -240,6 +255,32 @@ input ConfigWhereInput {
   treasury_addressLTE: ContractAddress
   treasury_addressNEQ: ContractAddress
   treasury_addressEQ: ContractAddress
+  treasury_addressNOTIN: [ContractAddress]
+  treasury_addressIN: [ContractAddress]
+  treasury_addressNOTLIKE: ContractAddress
+  treasury_addressLIKE: ContractAddress
+  token_duelist_address: ContractAddress
+  token_duelist_addressGT: ContractAddress
+  token_duelist_addressGTE: ContractAddress
+  token_duelist_addressLT: ContractAddress
+  token_duelist_addressLTE: ContractAddress
+  token_duelist_addressNEQ: ContractAddress
+  token_duelist_addressEQ: ContractAddress
+  token_duelist_addressNOTIN: [ContractAddress]
+  token_duelist_addressIN: [ContractAddress]
+  token_duelist_addressNOTLIKE: ContractAddress
+  token_duelist_addressLIKE: ContractAddress
+  minter_address: ContractAddress
+  minter_addressGT: ContractAddress
+  minter_addressGTE: ContractAddress
+  minter_addressLT: ContractAddress
+  minter_addressLTE: ContractAddress
+  minter_addressNEQ: ContractAddress
+  minter_addressEQ: ContractAddress
+  minter_addressNOTIN: [ContractAddress]
+  minter_addressIN: [ContractAddress]
+  minter_addressNOTLIKE: ContractAddress
+  minter_addressLIKE: ContractAddress
   paused: bool
 }
 
@@ -250,19 +291,12 @@ scalar Cursor
 scalar DateTime
 
 type Duelist {
-  address: ContractAddress
+  duelist_id: u128
   name: felt252
-  profile_pic: u8
-  total_duels: u16
-  total_wins: u16
-  total_losses: u16
-  total_draws: u16
-  total_honour: u32
-  honour: u8
-  villainy: u8
-  trickery: u8
-  virtue: u8
+  profile_pic_uri: ByteArray
+  profile_pic_type: u8
   timestamp: u64
+  score: Duelist_Score
   entity: World__Entity
 }
 
@@ -283,29 +317,26 @@ input DuelistOrder {
 }
 
 enum DuelistOrderField {
-  ADDRESS
+  DUELIST_ID
   NAME
-  PROFILE_PIC
-  TOTAL_DUELS
-  TOTAL_WINS
-  TOTAL_LOSSES
-  TOTAL_DRAWS
-  TOTAL_HONOUR
-  HONOUR
-  VILLAINY
-  TRICKERY
-  VIRTUE
+  PROFILE_PIC_URI
+  PROFILE_PIC_TYPE
   TIMESTAMP
+  SCORE
 }
 
 input DuelistWhereInput {
-  address: ContractAddress
-  addressGT: ContractAddress
-  addressGTE: ContractAddress
-  addressLT: ContractAddress
-  addressLTE: ContractAddress
-  addressNEQ: ContractAddress
-  addressEQ: ContractAddress
+  duelist_id: u128
+  duelist_idGT: u128
+  duelist_idGTE: u128
+  duelist_idLT: u128
+  duelist_idLTE: u128
+  duelist_idNEQ: u128
+  duelist_idEQ: u128
+  duelist_idNOTIN: [u128]
+  duelist_idIN: [u128]
+  duelist_idNOTLIKE: u128
+  duelist_idLIKE: u128
   name: felt252
   nameGT: felt252
   nameGTE: felt252
@@ -313,76 +344,32 @@ input DuelistWhereInput {
   nameLTE: felt252
   nameNEQ: felt252
   nameEQ: felt252
-  profile_pic: u8
-  profile_picGT: u8
-  profile_picGTE: u8
-  profile_picLT: u8
-  profile_picLTE: u8
-  profile_picNEQ: u8
-  profile_picEQ: u8
-  total_duels: u16
-  total_duelsGT: u16
-  total_duelsGTE: u16
-  total_duelsLT: u16
-  total_duelsLTE: u16
-  total_duelsNEQ: u16
-  total_duelsEQ: u16
-  total_wins: u16
-  total_winsGT: u16
-  total_winsGTE: u16
-  total_winsLT: u16
-  total_winsLTE: u16
-  total_winsNEQ: u16
-  total_winsEQ: u16
-  total_losses: u16
-  total_lossesGT: u16
-  total_lossesGTE: u16
-  total_lossesLT: u16
-  total_lossesLTE: u16
-  total_lossesNEQ: u16
-  total_lossesEQ: u16
-  total_draws: u16
-  total_drawsGT: u16
-  total_drawsGTE: u16
-  total_drawsLT: u16
-  total_drawsLTE: u16
-  total_drawsNEQ: u16
-  total_drawsEQ: u16
-  total_honour: u32
-  total_honourGT: u32
-  total_honourGTE: u32
-  total_honourLT: u32
-  total_honourLTE: u32
-  total_honourNEQ: u32
-  total_honourEQ: u32
-  honour: u8
-  honourGT: u8
-  honourGTE: u8
-  honourLT: u8
-  honourLTE: u8
-  honourNEQ: u8
-  honourEQ: u8
-  villainy: u8
-  villainyGT: u8
-  villainyGTE: u8
-  villainyLT: u8
-  villainyLTE: u8
-  villainyNEQ: u8
-  villainyEQ: u8
-  trickery: u8
-  trickeryGT: u8
-  trickeryGTE: u8
-  trickeryLT: u8
-  trickeryLTE: u8
-  trickeryNEQ: u8
-  trickeryEQ: u8
-  virtue: u8
-  virtueGT: u8
-  virtueGTE: u8
-  virtueLT: u8
-  virtueLTE: u8
-  virtueNEQ: u8
-  virtueEQ: u8
+  nameNOTIN: [felt252]
+  nameIN: [felt252]
+  nameNOTLIKE: felt252
+  nameLIKE: felt252
+  profile_pic_uri: ByteArray
+  profile_pic_uriGT: ByteArray
+  profile_pic_uriGTE: ByteArray
+  profile_pic_uriLT: ByteArray
+  profile_pic_uriLTE: ByteArray
+  profile_pic_uriNEQ: ByteArray
+  profile_pic_uriEQ: ByteArray
+  profile_pic_uriNOTIN: [ByteArray]
+  profile_pic_uriIN: [ByteArray]
+  profile_pic_uriNOTLIKE: ByteArray
+  profile_pic_uriLIKE: ByteArray
+  profile_pic_type: u8
+  profile_pic_typeGT: u8
+  profile_pic_typeGTE: u8
+  profile_pic_typeLT: u8
+  profile_pic_typeLTE: u8
+  profile_pic_typeNEQ: u8
+  profile_pic_typeEQ: u8
+  profile_pic_typeNOTIN: [u8]
+  profile_pic_typeIN: [u8]
+  profile_pic_typeNOTLIKE: u8
+  profile_pic_typeLIKE: u8
   timestamp: u64
   timestampGT: u64
   timestampGTE: u64
@@ -390,6 +377,22 @@ input DuelistWhereInput {
   timestampLTE: u64
   timestampNEQ: u64
   timestampEQ: u64
+  timestampNOTIN: [u64]
+  timestampIN: [u64]
+  timestampNOTLIKE: u64
+  timestampLIKE: u64
+}
+
+type Duelist_Score {
+  honour: u8
+  level_villain: u8
+  level_trickster: u8
+  level_lord: u8
+  total_duels: u16
+  total_wins: u16
+  total_losses: u16
+  total_draws: u16
+  honour_history: u64
 }
 
 type ERC20AllowanceModel {
@@ -431,6 +434,10 @@ input ERC20AllowanceModelWhereInput {
   tokenLTE: ContractAddress
   tokenNEQ: ContractAddress
   tokenEQ: ContractAddress
+  tokenNOTIN: [ContractAddress]
+  tokenIN: [ContractAddress]
+  tokenNOTLIKE: ContractAddress
+  tokenLIKE: ContractAddress
   owner: ContractAddress
   ownerGT: ContractAddress
   ownerGTE: ContractAddress
@@ -438,6 +445,10 @@ input ERC20AllowanceModelWhereInput {
   ownerLTE: ContractAddress
   ownerNEQ: ContractAddress
   ownerEQ: ContractAddress
+  ownerNOTIN: [ContractAddress]
+  ownerIN: [ContractAddress]
+  ownerNOTLIKE: ContractAddress
+  ownerLIKE: ContractAddress
   spender: ContractAddress
   spenderGT: ContractAddress
   spenderGTE: ContractAddress
@@ -445,6 +456,10 @@ input ERC20AllowanceModelWhereInput {
   spenderLTE: ContractAddress
   spenderNEQ: ContractAddress
   spenderEQ: ContractAddress
+  spenderNOTIN: [ContractAddress]
+  spenderIN: [ContractAddress]
+  spenderNOTLIKE: ContractAddress
+  spenderLIKE: ContractAddress
   amount: u256
   amountGT: u256
   amountGTE: u256
@@ -452,6 +467,10 @@ input ERC20AllowanceModelWhereInput {
   amountLTE: u256
   amountNEQ: u256
   amountEQ: u256
+  amountNOTIN: [u256]
+  amountIN: [u256]
+  amountNOTLIKE: u256
+  amountLIKE: u256
 }
 
 type ERC20BalanceModel {
@@ -491,6 +510,10 @@ input ERC20BalanceModelWhereInput {
   tokenLTE: ContractAddress
   tokenNEQ: ContractAddress
   tokenEQ: ContractAddress
+  tokenNOTIN: [ContractAddress]
+  tokenIN: [ContractAddress]
+  tokenNOTLIKE: ContractAddress
+  tokenLIKE: ContractAddress
   account: ContractAddress
   accountGT: ContractAddress
   accountGTE: ContractAddress
@@ -498,6 +521,10 @@ input ERC20BalanceModelWhereInput {
   accountLTE: ContractAddress
   accountNEQ: ContractAddress
   accountEQ: ContractAddress
+  accountNOTIN: [ContractAddress]
+  accountIN: [ContractAddress]
+  accountNOTLIKE: ContractAddress
+  accountLIKE: ContractAddress
   amount: u256
   amountGT: u256
   amountGTE: u256
@@ -505,12 +532,68 @@ input ERC20BalanceModelWhereInput {
   amountLTE: u256
   amountNEQ: u256
   amountEQ: u256
+  amountNOTIN: [u256]
+  amountIN: [u256]
+  amountNOTLIKE: u256
+  amountLIKE: u256
+}
+
+type ERC20BridgeableModel {
+  token: ContractAddress
+  l2_bridge_address: ContractAddress
+  entity: World__Entity
+}
+
+type ERC20BridgeableModelConnection {
+  edges: [ERC20BridgeableModelEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type ERC20BridgeableModelEdge {
+  node: ERC20BridgeableModel
+  cursor: Cursor
+}
+
+input ERC20BridgeableModelOrder {
+  direction: OrderDirection!
+  field: ERC20BridgeableModelOrderField!
+}
+
+enum ERC20BridgeableModelOrderField {
+  TOKEN
+  L2_BRIDGE_ADDRESS
+}
+
+input ERC20BridgeableModelWhereInput {
+  token: ContractAddress
+  tokenGT: ContractAddress
+  tokenGTE: ContractAddress
+  tokenLT: ContractAddress
+  tokenLTE: ContractAddress
+  tokenNEQ: ContractAddress
+  tokenEQ: ContractAddress
+  tokenNOTIN: [ContractAddress]
+  tokenIN: [ContractAddress]
+  tokenNOTLIKE: ContractAddress
+  tokenLIKE: ContractAddress
+  l2_bridge_address: ContractAddress
+  l2_bridge_addressGT: ContractAddress
+  l2_bridge_addressGTE: ContractAddress
+  l2_bridge_addressLT: ContractAddress
+  l2_bridge_addressLTE: ContractAddress
+  l2_bridge_addressNEQ: ContractAddress
+  l2_bridge_addressEQ: ContractAddress
+  l2_bridge_addressNOTIN: [ContractAddress]
+  l2_bridge_addressIN: [ContractAddress]
+  l2_bridge_addressNOTLIKE: ContractAddress
+  l2_bridge_addressLIKE: ContractAddress
 }
 
 type ERC20MetadataModel {
   token: ContractAddress
-  name: felt252
-  symbol: felt252
+  name: ByteArray
+  symbol: ByteArray
   decimals: u8
   total_supply: u256
   entity: World__Entity
@@ -548,20 +631,32 @@ input ERC20MetadataModelWhereInput {
   tokenLTE: ContractAddress
   tokenNEQ: ContractAddress
   tokenEQ: ContractAddress
-  name: felt252
-  nameGT: felt252
-  nameGTE: felt252
-  nameLT: felt252
-  nameLTE: felt252
-  nameNEQ: felt252
-  nameEQ: felt252
-  symbol: felt252
-  symbolGT: felt252
-  symbolGTE: felt252
-  symbolLT: felt252
-  symbolLTE: felt252
-  symbolNEQ: felt252
-  symbolEQ: felt252
+  tokenNOTIN: [ContractAddress]
+  tokenIN: [ContractAddress]
+  tokenNOTLIKE: ContractAddress
+  tokenLIKE: ContractAddress
+  name: ByteArray
+  nameGT: ByteArray
+  nameGTE: ByteArray
+  nameLT: ByteArray
+  nameLTE: ByteArray
+  nameNEQ: ByteArray
+  nameEQ: ByteArray
+  nameNOTIN: [ByteArray]
+  nameIN: [ByteArray]
+  nameNOTLIKE: ByteArray
+  nameLIKE: ByteArray
+  symbol: ByteArray
+  symbolGT: ByteArray
+  symbolGTE: ByteArray
+  symbolLT: ByteArray
+  symbolLTE: ByteArray
+  symbolNEQ: ByteArray
+  symbolEQ: ByteArray
+  symbolNOTIN: [ByteArray]
+  symbolIN: [ByteArray]
+  symbolNOTLIKE: ByteArray
+  symbolLIKE: ByteArray
   decimals: u8
   decimalsGT: u8
   decimalsGTE: u8
@@ -569,6 +664,10 @@ input ERC20MetadataModelWhereInput {
   decimalsLTE: u8
   decimalsNEQ: u8
   decimalsEQ: u8
+  decimalsNOTIN: [u8]
+  decimalsIN: [u8]
+  decimalsNOTLIKE: u8
+  decimalsLIKE: u8
   total_supply: u256
   total_supplyGT: u256
   total_supplyGTE: u256
@@ -576,7 +675,692 @@ input ERC20MetadataModelWhereInput {
   total_supplyLTE: u256
   total_supplyNEQ: u256
   total_supplyEQ: u256
+  total_supplyNOTIN: [u256]
+  total_supplyIN: [u256]
+  total_supplyNOTLIKE: u256
+  total_supplyLIKE: u256
 }
+
+type ERC721BalanceModel {
+  token: ContractAddress
+  account: ContractAddress
+  amount: u128
+  entity: World__Entity
+}
+
+type ERC721BalanceModelConnection {
+  edges: [ERC721BalanceModelEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type ERC721BalanceModelEdge {
+  node: ERC721BalanceModel
+  cursor: Cursor
+}
+
+input ERC721BalanceModelOrder {
+  direction: OrderDirection!
+  field: ERC721BalanceModelOrderField!
+}
+
+enum ERC721BalanceModelOrderField {
+  TOKEN
+  ACCOUNT
+  AMOUNT
+}
+
+input ERC721BalanceModelWhereInput {
+  token: ContractAddress
+  tokenGT: ContractAddress
+  tokenGTE: ContractAddress
+  tokenLT: ContractAddress
+  tokenLTE: ContractAddress
+  tokenNEQ: ContractAddress
+  tokenEQ: ContractAddress
+  tokenNOTIN: [ContractAddress]
+  tokenIN: [ContractAddress]
+  tokenNOTLIKE: ContractAddress
+  tokenLIKE: ContractAddress
+  account: ContractAddress
+  accountGT: ContractAddress
+  accountGTE: ContractAddress
+  accountLT: ContractAddress
+  accountLTE: ContractAddress
+  accountNEQ: ContractAddress
+  accountEQ: ContractAddress
+  accountNOTIN: [ContractAddress]
+  accountIN: [ContractAddress]
+  accountNOTLIKE: ContractAddress
+  accountLIKE: ContractAddress
+  amount: u128
+  amountGT: u128
+  amountGTE: u128
+  amountLT: u128
+  amountLTE: u128
+  amountNEQ: u128
+  amountEQ: u128
+  amountNOTIN: [u128]
+  amountIN: [u128]
+  amountNOTLIKE: u128
+  amountLIKE: u128
+}
+
+type ERC721EnumerableIndexModel {
+  token: ContractAddress
+  index: u128
+  token_id: u128
+  entity: World__Entity
+}
+
+type ERC721EnumerableIndexModelConnection {
+  edges: [ERC721EnumerableIndexModelEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type ERC721EnumerableIndexModelEdge {
+  node: ERC721EnumerableIndexModel
+  cursor: Cursor
+}
+
+input ERC721EnumerableIndexModelOrder {
+  direction: OrderDirection!
+  field: ERC721EnumerableIndexModelOrderField!
+}
+
+enum ERC721EnumerableIndexModelOrderField {
+  TOKEN
+  INDEX
+  TOKEN_ID
+}
+
+input ERC721EnumerableIndexModelWhereInput {
+  token: ContractAddress
+  tokenGT: ContractAddress
+  tokenGTE: ContractAddress
+  tokenLT: ContractAddress
+  tokenLTE: ContractAddress
+  tokenNEQ: ContractAddress
+  tokenEQ: ContractAddress
+  tokenNOTIN: [ContractAddress]
+  tokenIN: [ContractAddress]
+  tokenNOTLIKE: ContractAddress
+  tokenLIKE: ContractAddress
+  index: u128
+  indexGT: u128
+  indexGTE: u128
+  indexLT: u128
+  indexLTE: u128
+  indexNEQ: u128
+  indexEQ: u128
+  indexNOTIN: [u128]
+  indexIN: [u128]
+  indexNOTLIKE: u128
+  indexLIKE: u128
+  token_id: u128
+  token_idGT: u128
+  token_idGTE: u128
+  token_idLT: u128
+  token_idLTE: u128
+  token_idNEQ: u128
+  token_idEQ: u128
+  token_idNOTIN: [u128]
+  token_idIN: [u128]
+  token_idNOTLIKE: u128
+  token_idLIKE: u128
+}
+
+type ERC721EnumerableOwnerIndexModel {
+  token: ContractAddress
+  owner: ContractAddress
+  index: u128
+  token_id: u128
+  entity: World__Entity
+}
+
+type ERC721EnumerableOwnerIndexModelConnection {
+  edges: [ERC721EnumerableOwnerIndexModelEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type ERC721EnumerableOwnerIndexModelEdge {
+  node: ERC721EnumerableOwnerIndexModel
+  cursor: Cursor
+}
+
+input ERC721EnumerableOwnerIndexModelOrder {
+  direction: OrderDirection!
+  field: ERC721EnumerableOwnerIndexModelOrderField!
+}
+
+enum ERC721EnumerableOwnerIndexModelOrderField {
+  TOKEN
+  OWNER
+  INDEX
+  TOKEN_ID
+}
+
+input ERC721EnumerableOwnerIndexModelWhereInput {
+  token: ContractAddress
+  tokenGT: ContractAddress
+  tokenGTE: ContractAddress
+  tokenLT: ContractAddress
+  tokenLTE: ContractAddress
+  tokenNEQ: ContractAddress
+  tokenEQ: ContractAddress
+  tokenNOTIN: [ContractAddress]
+  tokenIN: [ContractAddress]
+  tokenNOTLIKE: ContractAddress
+  tokenLIKE: ContractAddress
+  owner: ContractAddress
+  ownerGT: ContractAddress
+  ownerGTE: ContractAddress
+  ownerLT: ContractAddress
+  ownerLTE: ContractAddress
+  ownerNEQ: ContractAddress
+  ownerEQ: ContractAddress
+  ownerNOTIN: [ContractAddress]
+  ownerIN: [ContractAddress]
+  ownerNOTLIKE: ContractAddress
+  ownerLIKE: ContractAddress
+  index: u128
+  indexGT: u128
+  indexGTE: u128
+  indexLT: u128
+  indexLTE: u128
+  indexNEQ: u128
+  indexEQ: u128
+  indexNOTIN: [u128]
+  indexIN: [u128]
+  indexNOTLIKE: u128
+  indexLIKE: u128
+  token_id: u128
+  token_idGT: u128
+  token_idGTE: u128
+  token_idLT: u128
+  token_idLTE: u128
+  token_idNEQ: u128
+  token_idEQ: u128
+  token_idNOTIN: [u128]
+  token_idIN: [u128]
+  token_idNOTLIKE: u128
+  token_idLIKE: u128
+}
+
+type ERC721EnumerableOwnerTokenModel {
+  token: ContractAddress
+  owner: ContractAddress
+  token_id: u128
+  index: u128
+  entity: World__Entity
+}
+
+type ERC721EnumerableOwnerTokenModelConnection {
+  edges: [ERC721EnumerableOwnerTokenModelEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type ERC721EnumerableOwnerTokenModelEdge {
+  node: ERC721EnumerableOwnerTokenModel
+  cursor: Cursor
+}
+
+input ERC721EnumerableOwnerTokenModelOrder {
+  direction: OrderDirection!
+  field: ERC721EnumerableOwnerTokenModelOrderField!
+}
+
+enum ERC721EnumerableOwnerTokenModelOrderField {
+  TOKEN
+  OWNER
+  TOKEN_ID
+  INDEX
+}
+
+input ERC721EnumerableOwnerTokenModelWhereInput {
+  token: ContractAddress
+  tokenGT: ContractAddress
+  tokenGTE: ContractAddress
+  tokenLT: ContractAddress
+  tokenLTE: ContractAddress
+  tokenNEQ: ContractAddress
+  tokenEQ: ContractAddress
+  tokenNOTIN: [ContractAddress]
+  tokenIN: [ContractAddress]
+  tokenNOTLIKE: ContractAddress
+  tokenLIKE: ContractAddress
+  owner: ContractAddress
+  ownerGT: ContractAddress
+  ownerGTE: ContractAddress
+  ownerLT: ContractAddress
+  ownerLTE: ContractAddress
+  ownerNEQ: ContractAddress
+  ownerEQ: ContractAddress
+  ownerNOTIN: [ContractAddress]
+  ownerIN: [ContractAddress]
+  ownerNOTLIKE: ContractAddress
+  ownerLIKE: ContractAddress
+  token_id: u128
+  token_idGT: u128
+  token_idGTE: u128
+  token_idLT: u128
+  token_idLTE: u128
+  token_idNEQ: u128
+  token_idEQ: u128
+  token_idNOTIN: [u128]
+  token_idIN: [u128]
+  token_idNOTLIKE: u128
+  token_idLIKE: u128
+  index: u128
+  indexGT: u128
+  indexGTE: u128
+  indexLT: u128
+  indexLTE: u128
+  indexNEQ: u128
+  indexEQ: u128
+  indexNOTIN: [u128]
+  indexIN: [u128]
+  indexNOTLIKE: u128
+  indexLIKE: u128
+}
+
+type ERC721EnumerableTokenModel {
+  token: ContractAddress
+  token_id: u128
+  index: u128
+  entity: World__Entity
+}
+
+type ERC721EnumerableTokenModelConnection {
+  edges: [ERC721EnumerableTokenModelEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type ERC721EnumerableTokenModelEdge {
+  node: ERC721EnumerableTokenModel
+  cursor: Cursor
+}
+
+input ERC721EnumerableTokenModelOrder {
+  direction: OrderDirection!
+  field: ERC721EnumerableTokenModelOrderField!
+}
+
+enum ERC721EnumerableTokenModelOrderField {
+  TOKEN
+  TOKEN_ID
+  INDEX
+}
+
+input ERC721EnumerableTokenModelWhereInput {
+  token: ContractAddress
+  tokenGT: ContractAddress
+  tokenGTE: ContractAddress
+  tokenLT: ContractAddress
+  tokenLTE: ContractAddress
+  tokenNEQ: ContractAddress
+  tokenEQ: ContractAddress
+  tokenNOTIN: [ContractAddress]
+  tokenIN: [ContractAddress]
+  tokenNOTLIKE: ContractAddress
+  tokenLIKE: ContractAddress
+  token_id: u128
+  token_idGT: u128
+  token_idGTE: u128
+  token_idLT: u128
+  token_idLTE: u128
+  token_idNEQ: u128
+  token_idEQ: u128
+  token_idNOTIN: [u128]
+  token_idIN: [u128]
+  token_idNOTLIKE: u128
+  token_idLIKE: u128
+  index: u128
+  indexGT: u128
+  indexGTE: u128
+  indexLT: u128
+  indexLTE: u128
+  indexNEQ: u128
+  indexEQ: u128
+  indexNOTIN: [u128]
+  indexIN: [u128]
+  indexNOTLIKE: u128
+  indexLIKE: u128
+}
+
+type ERC721EnumerableTotalModel {
+  token: ContractAddress
+  total_supply: u128
+  entity: World__Entity
+}
+
+type ERC721EnumerableTotalModelConnection {
+  edges: [ERC721EnumerableTotalModelEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type ERC721EnumerableTotalModelEdge {
+  node: ERC721EnumerableTotalModel
+  cursor: Cursor
+}
+
+input ERC721EnumerableTotalModelOrder {
+  direction: OrderDirection!
+  field: ERC721EnumerableTotalModelOrderField!
+}
+
+enum ERC721EnumerableTotalModelOrderField {
+  TOKEN
+  TOTAL_SUPPLY
+}
+
+input ERC721EnumerableTotalModelWhereInput {
+  token: ContractAddress
+  tokenGT: ContractAddress
+  tokenGTE: ContractAddress
+  tokenLT: ContractAddress
+  tokenLTE: ContractAddress
+  tokenNEQ: ContractAddress
+  tokenEQ: ContractAddress
+  tokenNOTIN: [ContractAddress]
+  tokenIN: [ContractAddress]
+  tokenNOTLIKE: ContractAddress
+  tokenLIKE: ContractAddress
+  total_supply: u128
+  total_supplyGT: u128
+  total_supplyGTE: u128
+  total_supplyLT: u128
+  total_supplyLTE: u128
+  total_supplyNEQ: u128
+  total_supplyEQ: u128
+  total_supplyNOTIN: [u128]
+  total_supplyIN: [u128]
+  total_supplyNOTLIKE: u128
+  total_supplyLIKE: u128
+}
+
+type ERC721MetaModel {
+  token: ContractAddress
+  name: ByteArray
+  symbol: ByteArray
+  base_uri: ByteArray
+  entity: World__Entity
+}
+
+type ERC721MetaModelConnection {
+  edges: [ERC721MetaModelEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type ERC721MetaModelEdge {
+  node: ERC721MetaModel
+  cursor: Cursor
+}
+
+input ERC721MetaModelOrder {
+  direction: OrderDirection!
+  field: ERC721MetaModelOrderField!
+}
+
+enum ERC721MetaModelOrderField {
+  TOKEN
+  NAME
+  SYMBOL
+  BASE_URI
+}
+
+input ERC721MetaModelWhereInput {
+  token: ContractAddress
+  tokenGT: ContractAddress
+  tokenGTE: ContractAddress
+  tokenLT: ContractAddress
+  tokenLTE: ContractAddress
+  tokenNEQ: ContractAddress
+  tokenEQ: ContractAddress
+  tokenNOTIN: [ContractAddress]
+  tokenIN: [ContractAddress]
+  tokenNOTLIKE: ContractAddress
+  tokenLIKE: ContractAddress
+  name: ByteArray
+  nameGT: ByteArray
+  nameGTE: ByteArray
+  nameLT: ByteArray
+  nameLTE: ByteArray
+  nameNEQ: ByteArray
+  nameEQ: ByteArray
+  nameNOTIN: [ByteArray]
+  nameIN: [ByteArray]
+  nameNOTLIKE: ByteArray
+  nameLIKE: ByteArray
+  symbol: ByteArray
+  symbolGT: ByteArray
+  symbolGTE: ByteArray
+  symbolLT: ByteArray
+  symbolLTE: ByteArray
+  symbolNEQ: ByteArray
+  symbolEQ: ByteArray
+  symbolNOTIN: [ByteArray]
+  symbolIN: [ByteArray]
+  symbolNOTLIKE: ByteArray
+  symbolLIKE: ByteArray
+  base_uri: ByteArray
+  base_uriGT: ByteArray
+  base_uriGTE: ByteArray
+  base_uriLT: ByteArray
+  base_uriLTE: ByteArray
+  base_uriNEQ: ByteArray
+  base_uriEQ: ByteArray
+  base_uriNOTIN: [ByteArray]
+  base_uriIN: [ByteArray]
+  base_uriNOTLIKE: ByteArray
+  base_uriLIKE: ByteArray
+}
+
+type ERC721OperatorApprovalModel {
+  token: ContractAddress
+  owner: ContractAddress
+  operator: ContractAddress
+  approved: bool
+  entity: World__Entity
+}
+
+type ERC721OperatorApprovalModelConnection {
+  edges: [ERC721OperatorApprovalModelEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type ERC721OperatorApprovalModelEdge {
+  node: ERC721OperatorApprovalModel
+  cursor: Cursor
+}
+
+input ERC721OperatorApprovalModelOrder {
+  direction: OrderDirection!
+  field: ERC721OperatorApprovalModelOrderField!
+}
+
+enum ERC721OperatorApprovalModelOrderField {
+  TOKEN
+  OWNER
+  OPERATOR
+  APPROVED
+}
+
+input ERC721OperatorApprovalModelWhereInput {
+  token: ContractAddress
+  tokenGT: ContractAddress
+  tokenGTE: ContractAddress
+  tokenLT: ContractAddress
+  tokenLTE: ContractAddress
+  tokenNEQ: ContractAddress
+  tokenEQ: ContractAddress
+  tokenNOTIN: [ContractAddress]
+  tokenIN: [ContractAddress]
+  tokenNOTLIKE: ContractAddress
+  tokenLIKE: ContractAddress
+  owner: ContractAddress
+  ownerGT: ContractAddress
+  ownerGTE: ContractAddress
+  ownerLT: ContractAddress
+  ownerLTE: ContractAddress
+  ownerNEQ: ContractAddress
+  ownerEQ: ContractAddress
+  ownerNOTIN: [ContractAddress]
+  ownerIN: [ContractAddress]
+  ownerNOTLIKE: ContractAddress
+  ownerLIKE: ContractAddress
+  operator: ContractAddress
+  operatorGT: ContractAddress
+  operatorGTE: ContractAddress
+  operatorLT: ContractAddress
+  operatorLTE: ContractAddress
+  operatorNEQ: ContractAddress
+  operatorEQ: ContractAddress
+  operatorNOTIN: [ContractAddress]
+  operatorIN: [ContractAddress]
+  operatorNOTLIKE: ContractAddress
+  operatorLIKE: ContractAddress
+  approved: bool
+}
+
+type ERC721OwnerModel {
+  token: ContractAddress
+  token_id: u128
+  address: ContractAddress
+  entity: World__Entity
+}
+
+type ERC721OwnerModelConnection {
+  edges: [ERC721OwnerModelEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type ERC721OwnerModelEdge {
+  node: ERC721OwnerModel
+  cursor: Cursor
+}
+
+input ERC721OwnerModelOrder {
+  direction: OrderDirection!
+  field: ERC721OwnerModelOrderField!
+}
+
+enum ERC721OwnerModelOrderField {
+  TOKEN
+  TOKEN_ID
+  ADDRESS
+}
+
+input ERC721OwnerModelWhereInput {
+  token: ContractAddress
+  tokenGT: ContractAddress
+  tokenGTE: ContractAddress
+  tokenLT: ContractAddress
+  tokenLTE: ContractAddress
+  tokenNEQ: ContractAddress
+  tokenEQ: ContractAddress
+  tokenNOTIN: [ContractAddress]
+  tokenIN: [ContractAddress]
+  tokenNOTLIKE: ContractAddress
+  tokenLIKE: ContractAddress
+  token_id: u128
+  token_idGT: u128
+  token_idGTE: u128
+  token_idLT: u128
+  token_idLTE: u128
+  token_idNEQ: u128
+  token_idEQ: u128
+  token_idNOTIN: [u128]
+  token_idIN: [u128]
+  token_idNOTLIKE: u128
+  token_idLIKE: u128
+  address: ContractAddress
+  addressGT: ContractAddress
+  addressGTE: ContractAddress
+  addressLT: ContractAddress
+  addressLTE: ContractAddress
+  addressNEQ: ContractAddress
+  addressEQ: ContractAddress
+  addressNOTIN: [ContractAddress]
+  addressIN: [ContractAddress]
+  addressNOTLIKE: ContractAddress
+  addressLIKE: ContractAddress
+}
+
+type ERC721TokenApprovalModel {
+  token: ContractAddress
+  token_id: u128
+  address: ContractAddress
+  entity: World__Entity
+}
+
+type ERC721TokenApprovalModelConnection {
+  edges: [ERC721TokenApprovalModelEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type ERC721TokenApprovalModelEdge {
+  node: ERC721TokenApprovalModel
+  cursor: Cursor
+}
+
+input ERC721TokenApprovalModelOrder {
+  direction: OrderDirection!
+  field: ERC721TokenApprovalModelOrderField!
+}
+
+enum ERC721TokenApprovalModelOrderField {
+  TOKEN
+  TOKEN_ID
+  ADDRESS
+}
+
+input ERC721TokenApprovalModelWhereInput {
+  token: ContractAddress
+  tokenGT: ContractAddress
+  tokenGTE: ContractAddress
+  tokenLT: ContractAddress
+  tokenLTE: ContractAddress
+  tokenNEQ: ContractAddress
+  tokenEQ: ContractAddress
+  tokenNOTIN: [ContractAddress]
+  tokenIN: [ContractAddress]
+  tokenNOTLIKE: ContractAddress
+  tokenLIKE: ContractAddress
+  token_id: u128
+  token_idGT: u128
+  token_idGTE: u128
+  token_idLT: u128
+  token_idLTE: u128
+  token_idNEQ: u128
+  token_idEQ: u128
+  token_idNOTIN: [u128]
+  token_idIN: [u128]
+  token_idNOTLIKE: u128
+  token_idLIKE: u128
+  address: ContractAddress
+  addressGT: ContractAddress
+  addressGTE: ContractAddress
+  addressLT: ContractAddress
+  addressLTE: ContractAddress
+  addressNEQ: ContractAddress
+  addressEQ: ContractAddress
+  addressNOTIN: [ContractAddress]
+  addressIN: [ContractAddress]
+  addressNOTLIKE: ContractAddress
+  addressLIKE: ContractAddress
+}
+
+scalar Enum
 
 type InitializableModel {
   token: ContractAddress
@@ -613,21 +1397,41 @@ input InitializableModelWhereInput {
   tokenLTE: ContractAddress
   tokenNEQ: ContractAddress
   tokenEQ: ContractAddress
+  tokenNOTIN: [ContractAddress]
+  tokenIN: [ContractAddress]
+  tokenNOTLIKE: ContractAddress
+  tokenLIKE: ContractAddress
   initialized: bool
 }
 
 union ModelUnion =
-    Coin
+    Challenge
+  | Round
+  | Snapshot
+  | Wager
   | Config
-  | Challenge
   | Duelist
   | Pact
-  | Round
-  | Wager
+  | Scoreboard
+  | TableAdmittance
+  | TableConfig
+  | TokenConfig
+  | SRC5Model
   | InitializableModel
   | ERC20AllowanceModel
   | ERC20BalanceModel
+  | ERC20BridgeableModel
   | ERC20MetadataModel
+  | ERC721OperatorApprovalModel
+  | ERC721TokenApprovalModel
+  | ERC721BalanceModel
+  | ERC721EnumerableIndexModel
+  | ERC721EnumerableOwnerIndexModel
+  | ERC721EnumerableOwnerTokenModel
+  | ERC721EnumerableTokenModel
+  | ERC721EnumerableTotalModel
+  | ERC721MetaModel
+  | ERC721OwnerModel
 
 enum OrderDirection {
   ASC
@@ -635,6 +1439,7 @@ enum OrderDirection {
 }
 
 type Pact {
+  table_id: felt252
   pair: u128
   duel_id: u128
   entity: World__Entity
@@ -657,11 +1462,23 @@ input PactOrder {
 }
 
 enum PactOrderField {
+  TABLE_ID
   PAIR
   DUEL_ID
 }
 
 input PactWhereInput {
+  table_id: felt252
+  table_idGT: felt252
+  table_idGTE: felt252
+  table_idLT: felt252
+  table_idLTE: felt252
+  table_idNEQ: felt252
+  table_idEQ: felt252
+  table_idNOTIN: [felt252]
+  table_idIN: [felt252]
+  table_idNOTLIKE: felt252
+  table_idLIKE: felt252
   pair: u128
   pairGT: u128
   pairGTE: u128
@@ -669,6 +1486,10 @@ input PactWhereInput {
   pairLTE: u128
   pairNEQ: u128
   pairEQ: u128
+  pairNOTIN: [u128]
+  pairIN: [u128]
+  pairNOTLIKE: u128
+  pairLIKE: u128
   duel_id: u128
   duel_idGT: u128
   duel_idGTE: u128
@@ -676,6 +1497,10 @@ input PactWhereInput {
   duel_idLTE: u128
   duel_idNEQ: u128
   duel_idEQ: u128
+  duel_idNOTIN: [u128]
+  duel_idIN: [u128]
+  duel_idNOTLIKE: u128
+  duel_idLIKE: u128
 }
 
 type Round {
@@ -719,6 +1544,10 @@ input RoundWhereInput {
   duel_idLTE: u128
   duel_idNEQ: u128
   duel_idEQ: u128
+  duel_idNOTIN: [u128]
+  duel_idIN: [u128]
+  duel_idNOTLIKE: u128
+  duel_idLIKE: u128
   round_number: u8
   round_numberGT: u8
   round_numberGTE: u8
@@ -726,6 +1555,10 @@ input RoundWhereInput {
   round_numberLTE: u8
   round_numberNEQ: u8
   round_numberEQ: u8
+  round_numberNOTIN: [u8]
+  round_numberIN: [u8]
+  round_numberNOTLIKE: u8
+  round_numberLIKE: u8
   state: u8
   stateGT: u8
   stateGTE: u8
@@ -733,6 +1566,10 @@ input RoundWhereInput {
   stateLTE: u8
   stateNEQ: u8
   stateEQ: u8
+  stateNOTIN: [u8]
+  stateIN: [u8]
+  stateNOTLIKE: u8
+  stateLIKE: u8
 }
 
 type Round_Shot {
@@ -741,6 +1578,7 @@ type Round_Shot {
   action: u16
   chance_crit: u8
   chance_hit: u8
+  chance_lethal: u8
   dice_crit: u8
   dice_hit: u8
   damage: u8
@@ -751,9 +1589,470 @@ type Round_Shot {
   honour: u8
 }
 
+type SRC5Model {
+  token: ContractAddress
+  interface_id: felt252
+  supports: bool
+  entity: World__Entity
+}
+
+type SRC5ModelConnection {
+  edges: [SRC5ModelEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type SRC5ModelEdge {
+  node: SRC5Model
+  cursor: Cursor
+}
+
+input SRC5ModelOrder {
+  direction: OrderDirection!
+  field: SRC5ModelOrderField!
+}
+
+enum SRC5ModelOrderField {
+  TOKEN
+  INTERFACE_ID
+  SUPPORTS
+}
+
+input SRC5ModelWhereInput {
+  token: ContractAddress
+  tokenGT: ContractAddress
+  tokenGTE: ContractAddress
+  tokenLT: ContractAddress
+  tokenLTE: ContractAddress
+  tokenNEQ: ContractAddress
+  tokenEQ: ContractAddress
+  tokenNOTIN: [ContractAddress]
+  tokenIN: [ContractAddress]
+  tokenNOTLIKE: ContractAddress
+  tokenLIKE: ContractAddress
+  interface_id: felt252
+  interface_idGT: felt252
+  interface_idGTE: felt252
+  interface_idLT: felt252
+  interface_idLTE: felt252
+  interface_idNEQ: felt252
+  interface_idEQ: felt252
+  interface_idNOTIN: [felt252]
+  interface_idIN: [felt252]
+  interface_idNOTLIKE: felt252
+  interface_idLIKE: felt252
+  supports: bool
+}
+
+type Scoreboard {
+  table_id: felt252
+  duelist_id: u128
+  score: Scoreboard_Score
+  wager_won: u256
+  wager_lost: u256
+  entity: World__Entity
+}
+
+type ScoreboardConnection {
+  edges: [ScoreboardEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type ScoreboardEdge {
+  node: Scoreboard
+  cursor: Cursor
+}
+
+input ScoreboardOrder {
+  direction: OrderDirection!
+  field: ScoreboardOrderField!
+}
+
+enum ScoreboardOrderField {
+  TABLE_ID
+  DUELIST_ID
+  SCORE
+  WAGER_WON
+  WAGER_LOST
+}
+
+input ScoreboardWhereInput {
+  table_id: felt252
+  table_idGT: felt252
+  table_idGTE: felt252
+  table_idLT: felt252
+  table_idLTE: felt252
+  table_idNEQ: felt252
+  table_idEQ: felt252
+  table_idNOTIN: [felt252]
+  table_idIN: [felt252]
+  table_idNOTLIKE: felt252
+  table_idLIKE: felt252
+  duelist_id: u128
+  duelist_idGT: u128
+  duelist_idGTE: u128
+  duelist_idLT: u128
+  duelist_idLTE: u128
+  duelist_idNEQ: u128
+  duelist_idEQ: u128
+  duelist_idNOTIN: [u128]
+  duelist_idIN: [u128]
+  duelist_idNOTLIKE: u128
+  duelist_idLIKE: u128
+  wager_won: u256
+  wager_wonGT: u256
+  wager_wonGTE: u256
+  wager_wonLT: u256
+  wager_wonLTE: u256
+  wager_wonNEQ: u256
+  wager_wonEQ: u256
+  wager_wonNOTIN: [u256]
+  wager_wonIN: [u256]
+  wager_wonNOTLIKE: u256
+  wager_wonLIKE: u256
+  wager_lost: u256
+  wager_lostGT: u256
+  wager_lostGTE: u256
+  wager_lostLT: u256
+  wager_lostLTE: u256
+  wager_lostNEQ: u256
+  wager_lostEQ: u256
+  wager_lostNOTIN: [u256]
+  wager_lostIN: [u256]
+  wager_lostNOTLIKE: u256
+  wager_lostLIKE: u256
+}
+
+type Scoreboard_Score {
+  honour: u8
+  level_villain: u8
+  level_trickster: u8
+  level_lord: u8
+  total_duels: u16
+  total_wins: u16
+  total_losses: u16
+  total_draws: u16
+  honour_history: u64
+}
+
+type Snapshot {
+  duel_id: u128
+  score_a: Snapshot_Score
+  score_b: Snapshot_Score
+  entity: World__Entity
+}
+
+type SnapshotConnection {
+  edges: [SnapshotEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type SnapshotEdge {
+  node: Snapshot
+  cursor: Cursor
+}
+
+input SnapshotOrder {
+  direction: OrderDirection!
+  field: SnapshotOrderField!
+}
+
+enum SnapshotOrderField {
+  DUEL_ID
+  SCORE_A
+  SCORE_B
+}
+
+input SnapshotWhereInput {
+  duel_id: u128
+  duel_idGT: u128
+  duel_idGTE: u128
+  duel_idLT: u128
+  duel_idLTE: u128
+  duel_idNEQ: u128
+  duel_idEQ: u128
+  duel_idNOTIN: [u128]
+  duel_idIN: [u128]
+  duel_idNOTLIKE: u128
+  duel_idLIKE: u128
+}
+
+type Snapshot_Score {
+  honour: u8
+  level_villain: u8
+  level_trickster: u8
+  level_lord: u8
+  total_duels: u16
+  total_wins: u16
+  total_losses: u16
+  total_draws: u16
+  honour_history: u64
+}
+
+type TableAdmittance {
+  table_id: felt252
+  accounts: [ContractAddress]
+  duelists: [u128]
+  entity: World__Entity
+}
+
+type TableAdmittanceConnection {
+  edges: [TableAdmittanceEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type TableAdmittanceEdge {
+  node: TableAdmittance
+  cursor: Cursor
+}
+
+input TableAdmittanceOrder {
+  direction: OrderDirection!
+  field: TableAdmittanceOrderField!
+}
+
+enum TableAdmittanceOrderField {
+  TABLE_ID
+  ACCOUNTS
+  DUELISTS
+}
+
+input TableAdmittanceWhereInput {
+  table_id: felt252
+  table_idGT: felt252
+  table_idGTE: felt252
+  table_idLT: felt252
+  table_idLTE: felt252
+  table_idNEQ: felt252
+  table_idEQ: felt252
+  table_idNOTIN: [felt252]
+  table_idIN: [felt252]
+  table_idNOTLIKE: felt252
+  table_idLIKE: felt252
+}
+
+type TableConfig {
+  table_id: felt252
+  table_type: Enum
+  description: felt252
+  fee_collector_address: ContractAddress
+  wager_contract_address: ContractAddress
+  wager_min: u256
+  fee_min: u256
+  fee_pct: u8
+  is_open: bool
+  entity: World__Entity
+}
+
+type TableConfigConnection {
+  edges: [TableConfigEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type TableConfigEdge {
+  node: TableConfig
+  cursor: Cursor
+}
+
+input TableConfigOrder {
+  direction: OrderDirection!
+  field: TableConfigOrderField!
+}
+
+enum TableConfigOrderField {
+  TABLE_ID
+  TABLE_TYPE
+  DESCRIPTION
+  FEE_COLLECTOR_ADDRESS
+  WAGER_CONTRACT_ADDRESS
+  WAGER_MIN
+  FEE_MIN
+  FEE_PCT
+  IS_OPEN
+}
+
+input TableConfigWhereInput {
+  table_id: felt252
+  table_idGT: felt252
+  table_idGTE: felt252
+  table_idLT: felt252
+  table_idLTE: felt252
+  table_idNEQ: felt252
+  table_idEQ: felt252
+  table_idNOTIN: [felt252]
+  table_idIN: [felt252]
+  table_idNOTLIKE: felt252
+  table_idLIKE: felt252
+  table_type: Enum
+  description: felt252
+  descriptionGT: felt252
+  descriptionGTE: felt252
+  descriptionLT: felt252
+  descriptionLTE: felt252
+  descriptionNEQ: felt252
+  descriptionEQ: felt252
+  descriptionNOTIN: [felt252]
+  descriptionIN: [felt252]
+  descriptionNOTLIKE: felt252
+  descriptionLIKE: felt252
+  fee_collector_address: ContractAddress
+  fee_collector_addressGT: ContractAddress
+  fee_collector_addressGTE: ContractAddress
+  fee_collector_addressLT: ContractAddress
+  fee_collector_addressLTE: ContractAddress
+  fee_collector_addressNEQ: ContractAddress
+  fee_collector_addressEQ: ContractAddress
+  fee_collector_addressNOTIN: [ContractAddress]
+  fee_collector_addressIN: [ContractAddress]
+  fee_collector_addressNOTLIKE: ContractAddress
+  fee_collector_addressLIKE: ContractAddress
+  wager_contract_address: ContractAddress
+  wager_contract_addressGT: ContractAddress
+  wager_contract_addressGTE: ContractAddress
+  wager_contract_addressLT: ContractAddress
+  wager_contract_addressLTE: ContractAddress
+  wager_contract_addressNEQ: ContractAddress
+  wager_contract_addressEQ: ContractAddress
+  wager_contract_addressNOTIN: [ContractAddress]
+  wager_contract_addressIN: [ContractAddress]
+  wager_contract_addressNOTLIKE: ContractAddress
+  wager_contract_addressLIKE: ContractAddress
+  wager_min: u256
+  wager_minGT: u256
+  wager_minGTE: u256
+  wager_minLT: u256
+  wager_minLTE: u256
+  wager_minNEQ: u256
+  wager_minEQ: u256
+  wager_minNOTIN: [u256]
+  wager_minIN: [u256]
+  wager_minNOTLIKE: u256
+  wager_minLIKE: u256
+  fee_min: u256
+  fee_minGT: u256
+  fee_minGTE: u256
+  fee_minLT: u256
+  fee_minLTE: u256
+  fee_minNEQ: u256
+  fee_minEQ: u256
+  fee_minNOTIN: [u256]
+  fee_minIN: [u256]
+  fee_minNOTLIKE: u256
+  fee_minLIKE: u256
+  fee_pct: u8
+  fee_pctGT: u8
+  fee_pctGTE: u8
+  fee_pctLT: u8
+  fee_pctLTE: u8
+  fee_pctNEQ: u8
+  fee_pctEQ: u8
+  fee_pctNOTIN: [u8]
+  fee_pctIN: [u8]
+  fee_pctNOTLIKE: u8
+  fee_pctLIKE: u8
+  is_open: bool
+}
+
+type TokenConfig {
+  token_address: ContractAddress
+  minter_address: ContractAddress
+  max_supply: u16
+  max_per_wallet: u16
+  minted_count: u16
+  is_open: bool
+  entity: World__Entity
+}
+
+type TokenConfigConnection {
+  edges: [TokenConfigEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type TokenConfigEdge {
+  node: TokenConfig
+  cursor: Cursor
+}
+
+input TokenConfigOrder {
+  direction: OrderDirection!
+  field: TokenConfigOrderField!
+}
+
+enum TokenConfigOrderField {
+  TOKEN_ADDRESS
+  MINTER_ADDRESS
+  MAX_SUPPLY
+  MAX_PER_WALLET
+  MINTED_COUNT
+  IS_OPEN
+}
+
+input TokenConfigWhereInput {
+  token_address: ContractAddress
+  token_addressGT: ContractAddress
+  token_addressGTE: ContractAddress
+  token_addressLT: ContractAddress
+  token_addressLTE: ContractAddress
+  token_addressNEQ: ContractAddress
+  token_addressEQ: ContractAddress
+  token_addressNOTIN: [ContractAddress]
+  token_addressIN: [ContractAddress]
+  token_addressNOTLIKE: ContractAddress
+  token_addressLIKE: ContractAddress
+  minter_address: ContractAddress
+  minter_addressGT: ContractAddress
+  minter_addressGTE: ContractAddress
+  minter_addressLT: ContractAddress
+  minter_addressLTE: ContractAddress
+  minter_addressNEQ: ContractAddress
+  minter_addressEQ: ContractAddress
+  minter_addressNOTIN: [ContractAddress]
+  minter_addressIN: [ContractAddress]
+  minter_addressNOTLIKE: ContractAddress
+  minter_addressLIKE: ContractAddress
+  max_supply: u16
+  max_supplyGT: u16
+  max_supplyGTE: u16
+  max_supplyLT: u16
+  max_supplyLTE: u16
+  max_supplyNEQ: u16
+  max_supplyEQ: u16
+  max_supplyNOTIN: [u16]
+  max_supplyIN: [u16]
+  max_supplyNOTLIKE: u16
+  max_supplyLIKE: u16
+  max_per_wallet: u16
+  max_per_walletGT: u16
+  max_per_walletGTE: u16
+  max_per_walletLT: u16
+  max_per_walletLTE: u16
+  max_per_walletNEQ: u16
+  max_per_walletEQ: u16
+  max_per_walletNOTIN: [u16]
+  max_per_walletIN: [u16]
+  max_per_walletNOTLIKE: u16
+  max_per_walletLIKE: u16
+  minted_count: u16
+  minted_countGT: u16
+  minted_countGTE: u16
+  minted_countLT: u16
+  minted_countLTE: u16
+  minted_countNEQ: u16
+  minted_countEQ: u16
+  minted_countNOTIN: [u16]
+  minted_countIN: [u16]
+  minted_countNOTLIKE: u16
+  minted_countLIKE: u16
+  is_open: bool
+}
+
 type Wager {
   duel_id: u128
-  coin: u8
   value: u256
   fee: u256
   entity: World__Entity
@@ -777,7 +2076,6 @@ input WagerOrder {
 
 enum WagerOrderField {
   DUEL_ID
-  COIN
   VALUE
   FEE
 }
@@ -790,13 +2088,10 @@ input WagerWhereInput {
   duel_idLTE: u128
   duel_idNEQ: u128
   duel_idEQ: u128
-  coin: u8
-  coinGT: u8
-  coinGTE: u8
-  coinLT: u8
-  coinLTE: u8
-  coinNEQ: u8
-  coinEQ: u8
+  duel_idNOTIN: [u128]
+  duel_idIN: [u128]
+  duel_idNOTLIKE: u128
+  duel_idLIKE: u128
   value: u256
   valueGT: u256
   valueGTE: u256
@@ -804,6 +2099,10 @@ input WagerWhereInput {
   valueLTE: u256
   valueNEQ: u256
   valueEQ: u256
+  valueNOTIN: [u256]
+  valueIN: [u256]
+  valueNOTLIKE: u256
+  valueLIKE: u256
   fee: u256
   feeGT: u256
   feeGTE: u256
@@ -811,6 +2110,10 @@ input WagerWhereInput {
   feeLTE: u256
   feeNEQ: u256
   feeEQ: u256
+  feeNOTIN: [u256]
+  feeIN: [u256]
+  feeNOTLIKE: u256
+  feeLIKE: u256
 }
 
 type World__Content {
@@ -1002,26 +2305,6 @@ type World__Query {
     offset: Int
     limit: Int
   ): World__TransactionConnection
-  coinModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: CoinWhereInput
-    order: CoinOrder
-  ): CoinConnection
-  configModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: ConfigWhereInput
-    order: ConfigOrder
-  ): ConfigConnection
   challengeModels(
     first: Int
     last: Int
@@ -1032,6 +2315,46 @@ type World__Query {
     where: ChallengeWhereInput
     order: ChallengeOrder
   ): ChallengeConnection
+  roundModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: RoundWhereInput
+    order: RoundOrder
+  ): RoundConnection
+  snapshotModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: SnapshotWhereInput
+    order: SnapshotOrder
+  ): SnapshotConnection
+  wagerModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: WagerWhereInput
+    order: WagerOrder
+  ): WagerConnection
+  configModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: ConfigWhereInput
+    order: ConfigOrder
+  ): ConfigConnection
   duelistModels(
     first: Int
     last: Int
@@ -1052,26 +2375,56 @@ type World__Query {
     where: PactWhereInput
     order: PactOrder
   ): PactConnection
-  roundModels(
+  scoreboardModels(
     first: Int
     last: Int
     before: Cursor
     after: Cursor
     offset: Int
     limit: Int
-    where: RoundWhereInput
-    order: RoundOrder
-  ): RoundConnection
-  wagerModels(
+    where: ScoreboardWhereInput
+    order: ScoreboardOrder
+  ): ScoreboardConnection
+  tableAdmittanceModels(
     first: Int
     last: Int
     before: Cursor
     after: Cursor
     offset: Int
     limit: Int
-    where: WagerWhereInput
-    order: WagerOrder
-  ): WagerConnection
+    where: TableAdmittanceWhereInput
+    order: TableAdmittanceOrder
+  ): TableAdmittanceConnection
+  tableConfigModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: TableConfigWhereInput
+    order: TableConfigOrder
+  ): TableConfigConnection
+  tokenConfigModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: TokenConfigWhereInput
+    order: TokenConfigOrder
+  ): TokenConfigConnection
+  src5ModelModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: SRC5ModelWhereInput
+    order: SRC5ModelOrder
+  ): SRC5ModelConnection
   initializableModelModels(
     first: Int
     last: Int
@@ -1102,6 +2455,16 @@ type World__Query {
     where: ERC20BalanceModelWhereInput
     order: ERC20BalanceModelOrder
   ): ERC20BalanceModelConnection
+  erc20BridgeableModelModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: ERC20BridgeableModelWhereInput
+    order: ERC20BridgeableModelOrder
+  ): ERC20BridgeableModelConnection
   erc20MetadataModelModels(
     first: Int
     last: Int
@@ -1112,6 +2475,106 @@ type World__Query {
     where: ERC20MetadataModelWhereInput
     order: ERC20MetadataModelOrder
   ): ERC20MetadataModelConnection
+  erc721OperatorApprovalModelModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: ERC721OperatorApprovalModelWhereInput
+    order: ERC721OperatorApprovalModelOrder
+  ): ERC721OperatorApprovalModelConnection
+  erc721TokenApprovalModelModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: ERC721TokenApprovalModelWhereInput
+    order: ERC721TokenApprovalModelOrder
+  ): ERC721TokenApprovalModelConnection
+  erc721BalanceModelModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: ERC721BalanceModelWhereInput
+    order: ERC721BalanceModelOrder
+  ): ERC721BalanceModelConnection
+  erc721EnumerableIndexModelModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: ERC721EnumerableIndexModelWhereInput
+    order: ERC721EnumerableIndexModelOrder
+  ): ERC721EnumerableIndexModelConnection
+  erc721EnumerableOwnerIndexModelModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: ERC721EnumerableOwnerIndexModelWhereInput
+    order: ERC721EnumerableOwnerIndexModelOrder
+  ): ERC721EnumerableOwnerIndexModelConnection
+  erc721EnumerableOwnerTokenModelModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: ERC721EnumerableOwnerTokenModelWhereInput
+    order: ERC721EnumerableOwnerTokenModelOrder
+  ): ERC721EnumerableOwnerTokenModelConnection
+  erc721EnumerableTokenModelModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: ERC721EnumerableTokenModelWhereInput
+    order: ERC721EnumerableTokenModelOrder
+  ): ERC721EnumerableTokenModelConnection
+  erc721EnumerableTotalModelModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: ERC721EnumerableTotalModelWhereInput
+    order: ERC721EnumerableTotalModelOrder
+  ): ERC721EnumerableTotalModelConnection
+  erc721MetaModelModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: ERC721MetaModelWhereInput
+    order: ERC721MetaModelOrder
+  ): ERC721MetaModelConnection
+  erc721OwnerModelModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: ERC721OwnerModelWhereInput
+    order: ERC721OwnerModelOrder
+  ): ERC721OwnerModelConnection
 }
 
 type World__Social {
@@ -1158,8 +2621,6 @@ scalar u128
 scalar u16
 
 scalar u256
-
-scalar u32
 
 scalar u64
 
