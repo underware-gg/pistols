@@ -51,7 +51,7 @@ export function ProfileDescription({
   displayBalance?: boolean
 }) {
   const { score: {
-    total_wins, total_losses, total_draws, total_duels, total_honour, honourAndTotal,
+    total_wins, total_losses, total_draws, total_duels, honourAndTotal,
     isVillainous, isTrickster, isHonourable, levelDisplay, levelAndTotal,
   } } = useDuelist(duelistId)
   const { owner } = useDuelistOwner(duelistId)
@@ -85,8 +85,6 @@ export function ProfileDescription({
             Losses: <span className='Bold'>{total_losses}</span>
             <br />
             Draws: <span className='Bold'>{total_draws}</span>
-            <br />
-            Honour: <span className='Bold'>{total_honour}</span>
           </Col>
         }
 

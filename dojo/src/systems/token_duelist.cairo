@@ -325,8 +325,6 @@ mod token_duelist {
                 result.append(duelist.score.total_losses.into());
                 result.append("Total Draws");
                 result.append(duelist.score.total_draws.into());
-                result.append("Accumulated Honour");
-                result.append(ScoreTrait::format_total_honour(duelist.score.total_honour));
                 // Wager on Lords table
                 let scoreboard: Scoreboard = get!(self.world(), (tables::LORDS, duelist.duelist_id), Scoreboard);
                 result.append("Lords Won");

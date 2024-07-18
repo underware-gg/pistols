@@ -277,8 +277,6 @@ mod tests {
         assert(duelist_b.score.total_duels == 1, 'duelist_b.total_duels');
         assert(duelist_a.score.total_draws == 0, 'duelist_a.total_draws');
         assert(duelist_b.score.total_draws == 0, 'duelist_b.total_draws');
-        assert(duelist_a.score.total_honour == (action_a * 10).into(), 'duelist_a.total_honour');
-        assert(duelist_b.score.total_honour == (action_b * 10).into(), 'duelist_b.total_honour');
         assert(duelist_a.score.honour == (action_a * 10).try_into().unwrap(), 'duelist_a.score.honour');
         assert(duelist_b.score.honour == (action_b * 10).try_into().unwrap(), 'duelist_b.score.honour');
 
@@ -336,8 +334,6 @@ mod tests {
         assert(duelist_b.score.total_duels == 2, '__duelist_b.total_duels');
         assert(duelist_a.score.total_draws == 0, '__duelist_a.total_draws');
         assert(duelist_b.score.total_draws == 0, '__duelist_b.total_draws');
-        assert(duelist_a.score.total_honour == (action_a * 10 * 2).into(), '__duelist_a.total_honour');
-        assert(duelist_b.score.total_honour == (action_b * 10 * 2).into(), '__duelist_b.total_honour');
         assert(duelist_a.score.honour == (action_a * 10).try_into().unwrap(), '__duelist_a.score.honour');
         assert(duelist_b.score.honour == (action_b * 10).try_into().unwrap(), '__duelist_b.score.honour');
 
@@ -413,8 +409,6 @@ mod tests {
         assert(duelist_b.score.total_wins == 0, 'duelist_b.total_wins');
         assert(duelist_a.score.total_losses == 0, 'duelist_a.total_losses');
         assert(duelist_b.score.total_losses == 0, 'duelist_b.total_losses');
-        assert(duelist_a.score.total_honour == (action_a * 10).into(), 'duelist_a.total_honour');
-        assert(duelist_b.score.total_honour == (action_b * 10).into(), 'duelist_b.total_honour');
         assert(duelist_a.score.honour == (action_a * 10).try_into().unwrap(), 'duelist_a.score.honour');
         assert(duelist_b.score.honour == (action_b * 10).try_into().unwrap(), 'duelist_b.score.honour');
 
@@ -422,8 +416,6 @@ mod tests {
         let mut scoreboard_b = tester::get_Scoreboard(world, TABLE_ID, OTHER());
         assert(duelist_a.score.total_duels == scoreboard_a.score.total_duels, 'scoreboard_a.total_duels');
         assert(duelist_b.score.total_duels == scoreboard_b.score.total_duels, 'scoreboard_b.total_duels');
-        assert(duelist_a.score.total_honour == scoreboard_a.score.total_honour, 'scoreboard_a.total_honour');
-        assert(duelist_b.score.total_honour == scoreboard_b.score.total_honour, 'scoreboard_b.total_honour');
         assert(duelist_a.score.honour == scoreboard_a.score.honour, 'scoreboard_a.score.honour');
         assert(duelist_b.score.honour == scoreboard_b.score.honour, 'scoreboard_b.score.honour');
 
@@ -653,7 +645,6 @@ mod tests {
         assert(duelist_a_before.score.total_wins == duelist_a_after.score.total_wins, 'total_wins');
         assert(duelist_a_before.score.total_losses == duelist_a_after.score.total_losses, 'total_losses');
         assert(duelist_a_before.score.total_draws == duelist_a_after.score.total_draws, 'total_draws');
-        assert(duelist_a_before.score.total_honour == duelist_a_after.score.total_honour, 'total_honour');
         assert(duelist_a_before.score.honour == duelist_a_after.score.honour, 'honour');
     }    
     

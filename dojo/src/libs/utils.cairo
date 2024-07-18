@@ -354,7 +354,6 @@ fn update_score_honour(ref score: Score, duel_honour: u8, calc_levels: bool) {
         (score.honour_history & ~BitwiseU64::shl(0xff, history_pos)) |
         BitwiseU64::shl(duel_honour.into(), history_pos);
     score.honour = (BitwiseU64::sum_bytes(score.honour_history) / MathU64::min(score.total_duels.into(), 8)).try_into().unwrap();
-    score.total_honour += duel_honour.into();
     if (calc_levels) {
         score.level_villain = calc_level_villain(score.honour);
         score.level_lord = calc_level_lord(score.honour);

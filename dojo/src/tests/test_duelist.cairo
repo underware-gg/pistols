@@ -29,7 +29,6 @@ mod tests {
         assert(duelist1.timestamp > 0, 'duelist timestamp_1');
         assert(duelist2.timestamp > 0, 'duelist timestamp_2');
         assert(duelist1.score.total_duels == 0, 'duelist total_duels');
-        assert(duelist1.score.total_honour == 0, 'duelist total_honour');
         assert(duelist1.score.honour == 0, 'duelist honour');
         assert(duelist1.score.level_villain == 0, 'level_villain');
         assert(duelist1.score.level_trickster == 0, 'level_trickster');
