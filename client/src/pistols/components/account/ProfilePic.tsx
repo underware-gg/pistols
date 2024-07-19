@@ -11,11 +11,12 @@ const _makeUrl = (profilePic: number | null, square: boolean) => {
   const variant = (square ? 'square' : 'portrait')
   return `/profiles/${variant}/${('00' + profilePic).slice(-2)}.jpg`
 }
-const _className = (small: boolean, square: boolean, duel: boolean) => (
+const _className = ({ small, square, duel, anon }) => (
   small ? 'ProfilePicSmall'
-    : square ? 'ProfilePicSquare'
-      : duel ? 'ProfilePicDuel'
-        : 'ProfilePic'
+    : anon ? 'ProfilePicAnon'
+      : square ? 'ProfilePicSquare'
+        : duel ? 'ProfilePicDuel'
+          : 'ProfilePic'
 )
 
 //---------------
@@ -27,6 +28,7 @@ export function ProfilePic({
   small = false,
   square = false,
   duel = false,
+  anon = false,
   dimmed = false,
   className = '',
   floated,
@@ -40,6 +42,7 @@ export function ProfilePic({
   small?: boolean
   square?: boolean
   duel?: boolean
+  anon?: boolean
   dimmed?: boolean
   className?: string
   floated?: SemanticFLOATS
@@ -52,12 +55,12 @@ export function ProfilePic({
   const _clickable = (onClick != null && !disabled)
 
   const classNames = useMemo(() => {
-    let result = [_className(small, square, duel), className]
+    let result = [_className({ small, square, duel, anon }), className]
     if (_clickable) result.push('Anchor')
     if (disabled || dimmed) result.push('ProfilePicDisabled')
     return result
-  }, [className, small, square, duel, disabled, dimmed])
-  const url = useMemo(() => _makeUrl(profilePic, square), [profilePic, square])
+  }, [className, small, square, duel, anon, disabled, dimmed])
+  const url = useMemo(() => _makeUrl(profilePic, square || anon), [profilePic, square])
 
   // as Button
   const _click = () => {

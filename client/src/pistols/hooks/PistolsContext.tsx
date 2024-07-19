@@ -67,6 +67,7 @@ export const initialState = {
   accountMenuKey: AccountMenuKey.Profile,
   sceneName: SceneName.Splash,
   duelistsFilter: '',
+  duelistsAnon: true,
   // injected
   connectOpener: null as Opener,
   accountSetupOpener: null as Opener,
@@ -82,6 +83,7 @@ const PistolsActions = {
   SELECT_DUELIST_ID: 'SELECT_DUELIST_ID',
   SELECT_CHALLENGING_ID: 'SELECT_CHALLENGING_ID',
   SELECT_DUELISTS_FILTER: 'SELECT_DUELISTS_FILTER',
+  SELECT_DUELISTS_ANON: 'SELECT_DUELISTS_ANON',
 }
 
 
@@ -99,6 +101,7 @@ type ActionType =
   | { type: 'SELECT_DUELIST_ID', payload: bigint }
   | { type: 'SELECT_CHALLENGING_ID', payload: bigint }
   | { type: 'SELECT_DUELISTS_FILTER', payload: string }
+  | { type: 'SELECT_DUELISTS_ANON', payload: boolean }
 
 
 
@@ -169,6 +172,10 @@ const PistolsProvider = ({
       }
       case PistolsActions.SELECT_DUELISTS_FILTER: {
         newState.duelistsFilter = action.payload as string
+        break
+      }
+      case PistolsActions.SELECT_DUELISTS_ANON: {
+        newState.duelistsAnon = action.payload as boolean
         break
       }
       default:
@@ -247,6 +254,12 @@ export const usePistolsContext = () => {
       payload: newFilter,
     })
   }
+  const dispatchDuelistsAnon = (newAnon: boolean) => {
+    dispatch({
+      type: PistolsActions.SELECT_DUELISTS_ANON,
+      payload: newAnon,
+    })
+  }
   return {
     ...state,
     hasSigned: (state.walletSig.sig > 0n),
@@ -272,5 +285,6 @@ export const usePistolsContext = () => {
     dispatchSelectDuelistId,
     dispatchChallengingDuelistId,
     dispatchDuelistsFilter,
+    dispatchDuelistsAnon,
   }
 }

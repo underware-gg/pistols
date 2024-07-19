@@ -5,12 +5,14 @@ import { useAllDuelistKeys, useDuelist } from '@/pistols/hooks/useDuelist'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useTable } from '@/pistols/hooks/useTable'
 import { useScoreboard } from '@/pistols/hooks/useScore'
+import { useOpener } from '@/lib/ui/useOpener'
 import { ProfileBadge, ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { LordsBagIcon } from '@/pistols/components/account/Balance'
 import { FilterButton } from '@/pistols/components/ui/Buttons'
 import { EMOJI } from '@/pistols/data/messages'
 import { BigNumberish } from 'starknet'
+import AnonModal from './AnonModal'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -40,7 +42,11 @@ enum Filters {
 export function DuelistTable() {
   const { tableId } = useSettings()
   const { duelistKeys } = useAllDuelistKeys()
-  const { duelistsFilter, dispatchDuelistsFilter } = usePistolsContext()
+  const {
+    duelistsFilter, duelistsAnon, 
+    dispatchSelectDuelistId, dispatchDuelistsFilter, dispatchDuelistsAnon
+  } = usePistolsContext()
+  const anonOpener = useOpener()
 
   // Filters
   const _tableId = useMemo(() => (duelistsFilter == Filters.Table ? tableId : null), [tableId, duelistsFilter])
@@ -65,15 +71,23 @@ export function DuelistTable() {
     setDuelistsData(o => ({ ...o, [address.toString()]: data }))
   }
 
+  const _selectCallback = (duelistId: bigint) => {
+    if (duelistId) {
+      dispatchSelectDuelistId(duelistId)
+    } else {
+      anonOpener.open();
+    }
+  }
+
   const rows = useMemo(() => {
     let result = []
-    duelistKeys.forEach((duelistId, index) => {
+    duelistKeys.forEach((duelistId) => {
       result.push(<DuelistItem key={duelistId}
         tableId={_tableId}
         duelistId={duelistId}
-        index={index}
         sortColumn={sortColumn}
         dataCallback={_dataCallback}
+        selectCallback={_selectCallback}
         canWager={canWager}
       />)
     })
@@ -112,10 +126,16 @@ export function DuelistTable() {
 
   return (
     <>
-      <div>
-        <FilterButton label='Global' state={!duelistsFilter || duelistsFilter == Filters.Global} switchState={() => dispatchDuelistsFilter(Filters.Global)} />
-        <FilterButton label='Current Table' state={duelistsFilter == Filters.Table} switchState={() => dispatchDuelistsFilter(Filters.Table)} />
-      </div>
+      <Grid>
+        <Row columns={'equal'}>
+          <Col textAlign='left'>
+            <FilterButton label='Global' state={!duelistsFilter || duelistsFilter == Filters.Global} switchState={() => dispatchDuelistsFilter(Filters.Global)} />
+            <FilterButton label='Current Table' state={duelistsFilter == Filters.Table} switchState={() => dispatchDuelistsFilter(Filters.Table)} />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <FilterButton label='Anonymous' state={duelistsAnon} switchState={() => dispatchDuelistsAnon(!duelistsAnon)} />
+          </Col>
+        </Row>
+      </Grid>
 
       <Table selectable sortable={!isEmpty} className='Faded' color='orange' style={{ maxWidth: '100%' }}>
         <Table.Header className='TableHeader'>
@@ -137,6 +157,14 @@ export function DuelistTable() {
 
         {!isEmpty ?
           <Table.Body className='TableBody'>
+            {duelistsAnon && <DuelistItem
+              tableId={_tableId}
+              duelistId={0n}
+              sortColumn={sortColumn}
+              dataCallback={undefined}
+              selectCallback={_selectCallback}
+              canWager={canWager}
+            />}
             {sortedRows}
           </Table.Body>
           :
@@ -149,6 +177,8 @@ export function DuelistTable() {
           </Table.Footer>
         }
       </Table>
+
+      <AnonModal opener={anonOpener} />
     </>
   )
 }
@@ -159,23 +189,19 @@ function DuelistItem({
   duelistId,
   sortColumn,
   dataCallback,
+  selectCallback,
   canWager,
-  isYou,
-  index,
 }: {
   tableId: string
-  duelistId: BigNumberish
+  duelistId: bigint
   sortColumn: DuelistColumn
   dataCallback: Function
+  selectCallback: Function
   canWager: boolean
-  isYou?: boolean
-  index?: number
 }) {
-  const { dispatchSelectDuelistId } = usePistolsContext()
-
-  // duelist
+// duelist
   const duelistData = useDuelist(duelistId)
-  const { name, profilePic, score: duelistScore } = duelistData
+  const { nameDisplay, profilePic, score: duelistScore } = duelistData
 
   // scoreboard
   const scoreboard = useScoreboard(tableId, duelistId)
@@ -190,34 +216,36 @@ function DuelistItem({
   const isRookie = (total_duels == 0)
 
   useEffect(() => {
-    // console.log(duelistData)
-    dataCallback(duelistId, {
-      name,
-      profilePic,
-      balance,
-      balanceFormatted,
-      balanceSort: balance === 0 ? -9999999999999 : balance,
-      isRookie,
-      ...score,
-    })
-  }, [duelistData, scoreboard, score, isRookie])
+    if (duelistId && duelistData) {
+      dataCallback?.(duelistId, {
+        nameDisplay,
+        profilePic,
+        balance,
+        balanceFormatted,
+        balanceSort: balance === 0 ? -9999999999999 : balance,
+        isRookie,
+        ...score,
+      })
+    }
+  }, [duelistId, duelistData, scoreboard, score, isRookie])
 
   const _colClass = (col: DuelistColumn) => (sortColumn == col ? 'Important' : null)
 
-  const _select = () => {
-    dispatchSelectDuelistId(duelistId)
-  }
-
   return (
-    <Table.Row textAlign='center' verticalAlign='middle' onClick={() => _select()}>
+    <Table.Row textAlign='center' verticalAlign='middle' onClick={() => selectCallback(duelistId)}>
       <Cell>
         <ProfilePicSquare profilePic={profilePic} small />
       </Cell>
 
       <Cell textAlign='left' style={{ maxWidth: '175px' }}>
-        <h5 className='NoMargin'><ProfileName duelistId={duelistId} displayId={false} badges={false} /></h5>
-        <div className='Normal NoMargin'>Duelist #{Number(duelistId ?? 0)} <ProfileBadge duelistId={duelistId} /></div>
-        {/* <AddressShort address={address} copyLink={false} /> */}
+        {duelistId ?
+          <>
+            <h5 className='NoMargin'><ProfileName duelistId={duelistId} displayId={false} badges={false} /></h5>
+            <div className='Normal NoMargin'>Duelist #{duelistId.toString()} <ProfileBadge duelistId={duelistId} /></div>
+          </> : <>
+            <h5 className='NoMargin'>Wallet or Stark.id</h5>
+            <div className='Normal NoMargin'>Duelist #?</div>
+          </>}
       </Cell>
 
       <Cell className={_colClass(DuelistColumn.Honour)}>

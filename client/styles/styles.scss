@@ -588,7 +588,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 
 .FilterButton {
   margin: 0 0.5em!important;
-  padding: 0.25em 0.5em!important;
+  padding: 0 0.5em!important;
   min-height: 20px!important;
 }
 
@@ -681,6 +681,10 @@ $ui-container-gap: 1em;
   border-radius: 8px;
   border: $border-button;
   box-shadow: $title-shadow;
+}
+.ProfilePicAnon {
+  @extend .ProfilePic;
+  height: calc(439px / 2);
 }
 .ProfilePicDuel {
   @extend .ProfilePic;
