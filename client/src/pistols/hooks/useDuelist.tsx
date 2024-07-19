@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useComponentValue } from '@dojoengine/react'
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
-import { bigintToEntity } from '@/lib/utils/types'
+import { bigintToEntity, isPositiveBigint } from '@/lib/utils/types'
 import { feltToString } from "@/lib/utils/starknet"
 import { useEntityKeys } from '@/lib/dojo/hooks/useEntityKeys'
 import { Archetype, ArchetypeNames } from '@/pistols/utils/pistols'
@@ -33,7 +33,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   // console.log(`Duelist`, address, bigintToEntity(address ?? 0n), duelist)
 
   const name = useMemo(() => duelist?.name ? feltToString(duelist.name) : null, [duelist])
-  const nameDisplay = useMemo(() => (`${name || 'Duelist'} #${duelist_id}`), [name, duelist_id])
+  const nameDisplay = useMemo(() => (`${name || 'Duelist'} #${isPositiveBigint(duelist_id) ? duelist_id : '?'}`), [name, duelist_id])
   const profilePicType = useMemo(() => (duelist?.profile_pic_type ?? null), [duelist])
   const profilePic = useMemo(() => Number(duelist?.profile_pic_uri ?? 0), [duelist])
   const timestamp = useMemo(() => (duelist?.timestamp ?? 0), [duelist])
