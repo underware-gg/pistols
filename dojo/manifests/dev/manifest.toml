@@ -4,8 +4,8 @@ class_hash = "0x3f63cecdc4964acafb921ba2934c6507d1b3c344edb64c2762cf08053169ab9"
 original_class_hash = "0x3f63cecdc4964acafb921ba2934c6507d1b3c344edb64c2762cf08053169ab9"
 abi = "manifests/dev/abis/deployments/dojo_world_world.json"
 address = "0x545c8aff15426c3d43b3ba8fd45c61870b30ca4ec0bfbd69193facee4c7b97c"
-transaction_hash = "0x2f9798ffaeb7840c4df6a316c41a9776cd504b26fc9e9b3c741af1aa29399b7"
-block_number = 16
+transaction_hash = "0x3dac6f98ea15ca635d43fc0e4edb1fb3ba5a7dd0c104ef6ceff7813553e0131"
+block_number = 3
 seed = "pistols"
 name = "dojo::world::world"
 
@@ -35,8 +35,8 @@ name = "pistols::mocks::lords_mock::lords_mock"
 [[contracts]]
 kind = "DojoContract"
 address = "0x30663cb812dc7e2930b9683945132ca6054483af40e1e7daccb77091e02e7b1"
-class_hash = "0x306a2fd79c90f6a7b3366e8e40898c29801d3b85f249ed038f0a82cc825a724"
-original_class_hash = "0x306a2fd79c90f6a7b3366e8e40898c29801d3b85f249ed038f0a82cc825a724"
+class_hash = "0x314aff8c142eae392c022bf7254a62afc05d7a29ac25e234c31d9b15fcd4ee5"
+original_class_hash = "0x314aff8c142eae392c022bf7254a62afc05d7a29ac25e234c31d9b15fcd4ee5"
 base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
 abi = "manifests/dev/abis/deployments/contracts/pistols_systems_actions_actions.json"
 reads = []
