@@ -19,8 +19,13 @@ function AddressShort({
   ifExists?: boolean
 }) {
   const display = useMemo(() => (shortAddress(bigintToHex(address))), [address])
-  let classNames = ['Code']
-  if (important) classNames.push('Important')
+
+  const classNames = useMemo(() => {
+    let classNames = ['Code']
+    if (important) classNames.push('Important')
+    return classNames
+  }, [important])
+
   if (ifExists && BigInt(address ?? 0) == 0n) return <></>
   return (
     <span className={classNames.join(' ')}>

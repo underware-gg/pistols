@@ -49,7 +49,7 @@ export function Balance({
     return (result == '0' || result == '0.0') ? EMOJI.ZERO : result
   }, [value, wei])
 
-  let classNames = useMemo(() => {
+  const classNames = useMemo(() => {
     let result = []
     if (small) result.push('WagerSmall')
     else if (big) result.push('WagerBig')

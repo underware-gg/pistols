@@ -1,6 +1,6 @@
 
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import { Divider as _Divider_, Header } from 'semantic-ui-react'
 
 export function Divider({
@@ -16,9 +16,12 @@ export function Divider({
   nomargin?: boolean
   className?: string
 }) {
-  let classNames = []
-  if (className) classNames.push(className)
-  if (nomargin) classNames.push('NoMargin')
+  const classNames = useMemo(() => {
+    let classNames = []
+    if (className) classNames.push(className)
+    if (nomargin) classNames.push('NoMargin')
+    return classNames
+  }, [className, nomargin])
 
   if (!content) {
     return <_Divider_ hidden={hidden} className={classNames.join(' ')} />

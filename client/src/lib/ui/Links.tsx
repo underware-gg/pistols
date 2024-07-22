@@ -1,3 +1,4 @@
+import { useMemo } from "react"
 
 export function TextLink({
   disabled = false,
@@ -8,13 +9,16 @@ export function TextLink({
   onClick: Function,
   children: string,
 }) {
-  let classNames = ['Unselectable']
-  if (!disabled) {
-    classNames.push('Anchor')
-    classNames.push('Important')
-  } else {
-    classNames.push('Disabled')
-  }
+  const classNames = useMemo(() => {
+    let classNames = ['Unselectable']
+    if (!disabled) {
+      classNames.push('Anchor')
+      classNames.push('Important')
+    } else {
+      classNames.push('Disabled')
+    }
+    return classNames
+  }, [disabled])
   return (
     <span className={classNames.join(' ')} onClick={() => { if (!disabled) onClick() }}>{children}</span>
   )

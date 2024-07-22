@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from 'react'
+import React, { ReactElement, useMemo, useState } from 'react'
 import { Menu, Button, Confirm, SemanticICONS } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
@@ -44,13 +44,16 @@ export const ActionButton = ({
   className = null,
   onClick,
 }: ActionButtonProps) => {
-  let classNames = []
-  if (important && !disabled) classNames.push('Important')
-  // if (fill) classNames.push('FillParent')
-  if (large) classNames.push('LargeButton')
-  classNames.push((disabled || dimmed) ? 'Locked' : 'Unlocked')
-  if (negative) classNames.push('Negative')
-  if (className) classNames.push(className)
+  const classNames = useMemo(() => {
+    let classNames = []
+    if (important && !disabled) classNames.push('Important')
+    // if (fill) classNames.push('FillParent')
+    if (large) classNames.push('LargeButton')
+    classNames.push((disabled || dimmed) ? 'Locked' : 'Unlocked')
+    if (negative) classNames.push('Negative')
+    if (className) classNames.push(className)
+    return classNames
+  }, [className, important, disabled, large, dimmed, negative])
 
   const [isConfirming, setIsConfirming] = useState(false)
   const _click = () => {

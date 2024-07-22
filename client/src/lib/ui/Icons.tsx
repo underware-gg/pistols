@@ -195,10 +195,13 @@ export function EmojiIcon({
   flipped = null,
   rotated = null,
 }: EmojiIconProps) {
-  let classNames = [className, 'icon', size, 'NoMargin']
-  if (rotated) classNames.push('dirotatedabled')
-  if (disabled) classNames.push('disabled')
-  if (flipped) classNames.push('flipped')
+  const classNames = useMemo(() => {
+    let classNames = [className, 'icon', size, 'NoMargin']
+    if (rotated) classNames.push('dirotatedabled')
+    if (disabled) classNames.push('disabled')
+    if (flipped) classNames.push('flipped')
+    return classNames
+  }, [className, size, rotated, disabled, flipped])
   return (
     <i className={classNames.join(' ')} style={style}>
       {emoji}

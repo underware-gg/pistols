@@ -381,9 +381,12 @@ function ProgressItem({
   const _left = (floated == 'left')
   const _right = (floated == 'right')
 
-  let classNames = ['AlignCenter']
-  if (className) classNames.push(className)
-  if (!_canClick) classNames.push('NoMouse')
+  const classNames = useMemo(() => {
+    let classNames = ['AlignCenter']
+    if (className) classNames.push(className)
+    if (!_canClick) classNames.push('NoMouse')
+    return classNames
+  }, [className, _canClick])
 
   let _icon = useMemo(() => {
     const style = _right ? { margin: '0 0 0 1rem' } : {}
