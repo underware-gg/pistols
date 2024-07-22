@@ -104,7 +104,7 @@ export function DuelistTable() {
     // Sort by names, or both rookies
     const isAscending = (sortDirection == SortDirection.Ascending)
     if (sortColumn == DuelistColumn.Name || (dataA.isRookie && dataB.isRookie)) {
-      return isAscending ? dataA.name.localeCompare(dataB.name) : dataB.name.localeCompare(dataA.name)
+      return isAscending ? dataA.nameDisplay.localeCompare(dataB.nameDisplay) : dataB.nameDisplay.localeCompare(dataA.nameDisplay)
     }
     // Rookies at the bottom
     if (dataA.isRookie) return 1
