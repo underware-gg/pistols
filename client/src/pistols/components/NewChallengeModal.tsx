@@ -12,12 +12,13 @@ import { useCalcFee } from '@/pistols/hooks/useContractCalls'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
+import { FormInput } from '@/pistols/components/ui/Form'
+import { Balance } from '@/pistols/components/account/Balance'
 import { WagerAndOrFees } from '@/pistols/components/account/LordsBalance'
 import { ethToWei, validateCairoString } from '@/lib/utils/starknet'
 import { ChallengeMessages } from '@/pistols/utils/pistols'
 import { Divider } from '@/lib/ui/Divider'
 import { randomArrayElement } from '@/lib/utils/random'
-import { Balance } from './account/Balance'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -205,7 +206,6 @@ function NewChallengeForm({
       <Form className=''>
         <Form.Field>
           <span className='FormLabel'>&nbsp;reasoning</span>
-          {/* <input placeholder={_defaultMessage} value={message} maxLength={31} onChange={(e) => setMessage(e.target.value)} /> */}
           <Dropdown
             options={messageOptions}
             placeholder={'say something!'}
@@ -245,19 +245,18 @@ function NewChallengeForm({
         </Form.Field>
 
         <Form.Field>
-          <span className='FormLabel'>&nbsp;wager (deposit now, winner takes all, minus fee)</span>
-          <input
-            disabled={!canWager}
+          <FormInput
+            label='Wager (deposit now, winner takes all, minus fee)'
             placeholder={'$LORDS'}
-            value={canWager ? value : 'No wager in this Table'}
-            maxLength={12}
-            onChange={(e) => {
-              const _input = e.target.value as string
-              const _lords = _input ? parseInt(_input) : 0
+            value={canWager ? value.toString() : 'No wager in this Table'}
+            setValue={(newValue) => {
+              const _lords = newValue ? parseInt(newValue) : 0
               if (!isNaN(_lords)) {
                 setValue(_lords)
               }
             }}
+            maxLength={7}
+            disabled={!canWager}
           />
         </Form.Field>
 

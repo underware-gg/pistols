@@ -1,18 +1,19 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Button, ButtonGroup, Grid, Input, Pagination } from 'semantic-ui-react'
+import { Button, Grid, Input } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useDuelistBalanceOf } from '@/pistols/hooks/useTokenDuelist'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
+import { ProfileBadge } from '@/pistols/components/account/ProfileDescription'
+import { ArchetypeIcon } from '@/pistols/components/ui/PistolsIcon'
+import { Archetype, ArchetypeNames } from '@/pistols/utils/pistols'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
+import { FormInput } from '@/pistols/components/ui/Form'
 import { PROFILE_PIC_COUNT } from '@/pistols/utils/constants'
 import { IconClick } from '@/lib/ui/Icons'
-import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { pedersen } from '@/lib/utils/starknet'
-import { Archetype, ArchetypeNames } from '@/pistols/utils/pistols'
-import { ArchetypeIcon } from '../ui/PistolsIcon'
-import { ProfileBadge } from './ProfileDescription'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -82,13 +83,13 @@ export function OnboardingProfile({
           </div>
         </Col>
         <Col width={11} textAlign='left' className='PaddedSides'>
-          <span className='FormLabel TitleCase'>Duelist Name</span>
-          <Input fluid
-            maxLength={31}
+          <FormInput
+            label='Duelist Name'
             placeholder={'Duelist Name'}
-            value={inputName ?? ''}
+            value={inputName}
+            setValue={setInputName}
+            maxLength={31}
             disabled={!account || !address}
-            onChange={(e) => setInputName(e.target.value)}
           />
 
           <div className='Spacer10' />
