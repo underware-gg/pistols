@@ -93,12 +93,19 @@ impl DuelistTraitImpl of DuelistTrait {
         if (address_felt == self.duelist_id.into()) { return (true); }
         (false)
     }
-    // convert a challenged account address to duelist id
+    // try to convert a challenged account address to duelist id
     // retuns 0 if the address is not an id
-    fn address_to_id(address: ContractAddress) -> u128 {
+    fn try_address_to_id(address: ContractAddress) -> u128 {
         let as_felt: felt252 = address.into();
         let as_u256: u256 = as_felt.into();
         if (as_u256 <= constants::MAX_DUELIST_ID.into()) {(as_u256.low)} else {(0)}
+    }
+    // "cast" an address to an id for pacts
+    // the low part is good enough
+    fn address_as_id(address: ContractAddress) -> u128 {
+        let as_felt: felt252 = address.into();
+        let as_u256: u256 = as_felt.into();
+        (as_u256.low)
     }
 }
 

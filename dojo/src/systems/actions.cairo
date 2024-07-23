@@ -234,14 +234,16 @@ mod actions {
             assert(table.is_open == true, Errors::TABLE_IS_CLOSED);
             assert(table_manager.can_join(table_id, address_a, duelist_id_a), Errors::CHALLENGER_NOT_ADMITTED);
 
+            // create duel id
+            let duel_id: u128 = make_seed(address_a, world.uuid());
+
             // validate challenged
-            assert(challenged_id_or_address != utils::ZERO(), Errors::INVALID_CHALLENGED_NULL);
-            let duelist_id_b: u128 = DuelistTrait::address_to_id(challenged_id_or_address);
+            assert(challenged_id_or_address.is_non_zero(), Errors::INVALID_CHALLENGED_NULL);
+            let duelist_id_b: u128 = DuelistTrait::try_address_to_id(challenged_id_or_address);
             let address_b: ContractAddress = if (duelist_id_b > 0) {
                 // challenging a duelist...
                 assert(duelist_manager.exists(duelist_id_b) == true, Errors::INVALID_CHALLENGED);
                 assert(duelist_id_a != duelist_id_b, Errors::INVALID_CHALLENGED_SELF);
-                assert(self.has_pact(table_id, duelist_id_a, duelist_id_b) == false, Errors::CHALLENGE_EXISTS);
                 (utils::ZERO())
             } else {
                 // challenging a wallet...
@@ -249,9 +251,6 @@ mod actions {
                 (challenged_id_or_address)
             };
             assert(table_manager.can_join(table_id, address_b, duelist_id_b), Errors::CHALLENGED_NOT_ADMITTED);
-
-            // create duel id
-            let duel_id: u128 = make_seed(address_a, world.uuid());
 
             // calc expiration
             let timestamp_start: u64 = get_block_timestamp();
@@ -275,12 +274,15 @@ mod actions {
                 timestamp_end,     // expire
             };
 
+            // set the pact + assert it does not exist
+            utils::set_pact(world, challenge);
+
             // setup wager + fees
             assert(wager_value >= table.wager_min, Errors::MINIMUM_WAGER_NOT_MET);
             let fee: u128 = table.calc_fee(wager_value);
             // calc fee and store
             if (fee > 0 || wager_value > 0) {
-                assert(table.wager_contract_address != utils::ZERO(), Errors::NO_WAGER);
+                assert(table.wager_contract_address.is_non_zero(), Errors::NO_WAGER);
                 let wager = Wager {
                     duel_id,
                     value: wager_value,
@@ -291,7 +293,7 @@ mod actions {
                 // transfer wager/fee from Challenger to the contract
                 utils::deposit_wager_fees(world, challenge, challenge.address_a, starknet::get_contract_address());
             }
-
+            
             // create challenge
             utils::set_challenge(world, challenge);
 
@@ -345,13 +347,16 @@ mod actions {
                     challenge.address_b = address_b;
                 } else {
                     // challenged the wallet...
-                    // can only be accepted by it
+                    // can only be accepted by that wallet
                     assert(challenge.address_b == address_b, Errors::NOT_YOUR_CHALLENGE);
                     // validate chosen duelist
                     assert(challenge.duelist_id_a != duelist_id_b, Errors::INVALID_CHALLENGED_SELF);
-                    assert(self.has_pact(challenge.table_id, challenge.duelist_id_a, duelist_id_b) == false, Errors::CHALLENGE_EXISTS);
+                    // remove pact between wallets
+                    utils::unset_pact(world, challenge);
                     // fil missing duelist
                     challenge.duelist_id_b = duelist_id_b;
+                    // create pact between duelists
+                    utils::set_pact(world, challenge);
                 }
                 // all good!
                 if (accepted) {
@@ -374,6 +379,12 @@ mod actions {
                     // events
                     self._emitChallengeAcceptedEvent(challenge, accepted);
                 }
+            }
+
+            // undo pact if duel does not proceed
+            let state: ChallengeState = challenge.state.try_into().unwrap();
+            if (!state.is_live()) {
+                utils::unset_pact(world, challenge);
             }
 
             // update challenge state
@@ -405,6 +416,13 @@ mod actions {
             action_slot2: u8,
         ) {
             let challenge: Challenge = shooter::reveal_action(world, duelist_id, duel_id, round_number, salt, utils::pack_action_slots(action_slot1, action_slot2));
+
+            // undo pact if finished
+            let state: ChallengeState = challenge.state.try_into().unwrap();
+            if (state.is_finished()) {
+                utils::unset_pact(world, challenge);
+            }
+
             self._emitPostRevealEvents(challenge);
         }
 
@@ -415,13 +433,11 @@ mod actions {
         //
 
         fn get_pact(world: @IWorldDispatcher, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128 {
-            let pair: u128 = utils::make_pact_pair(duelist_id_a, duelist_id_b);
-            (get!(world, (table_id, pair), Pact).duel_id)
+            (utils::get_pact(world, table_id, duelist_id_a, duelist_id_b))
         }
 
         fn has_pact(world: @IWorldDispatcher, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool {
-            utils::WORLD(world);
-            (self.get_pact(table_id, duelist_id_a, duelist_id_b) != 0)
+            (utils::get_pact(world, table_id, duelist_id_a, duelist_id_b) != 0)
         }
 
         fn can_join(world: @IWorldDispatcher, table_id: felt252, duelist_id: u128) -> bool {

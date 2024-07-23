@@ -61,7 +61,9 @@ mod tester {
     #[inline(always)]
     fn BIG_BOY() -> ContractAddress { starknet::contract_address_const::<0x54f650fb5e1fb61d7b429ae728a365b69e5aff9a559a05de70f606aaea1a243>() }
     #[inline(always)]
-    fn LITTLE_BOY() -> ContractAddress { starknet::contract_address_const::<0xffff00000000000ee>() }
+    fn LITTLE_BOY()  -> ContractAddress { starknet::contract_address_const::<0xffff00000000000ee>() }
+    #[inline(always)]
+    fn LITTLE_GIRL() -> ContractAddress { starknet::contract_address_const::<0xaaaa00000000000bb>() }
     #[inline(always)]
     fn FAKE_OWNER_1_1() -> ContractAddress { starknet::contract_address_const::<0x1000000000000000000000000000000001>() }
     #[inline(always)]
@@ -73,10 +75,7 @@ mod tester {
 
     #[inline(always)]
     fn ID(address: ContractAddress) -> u128 {
-        let as_felt: felt252 = address.into();
-        let as_u256: u256 = as_felt.into();
-        (as_u256.low)
-        // (DuelistTrait::address_to_id(address))
+        (DuelistTrait::address_as_id(address))
     }
 
     // set_contract_address : to define the address of the calling contract,

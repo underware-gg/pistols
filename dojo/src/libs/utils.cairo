@@ -9,7 +9,7 @@ use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
 use pistols::systems::actions::actions::{Errors};
 use pistols::models::challenge::{Challenge, Snapshot, Wager, Round, Shot};
-use pistols::models::duelist::{Duelist, Pact, Scoreboard, Score, ScoreTrait};
+use pistols::models::duelist::{Duelist, DuelistTrait, Pact, Scoreboard, Score, ScoreTrait};
 use pistols::models::table::{TableConfig, TableTrait, TableManagerTrait, TableType, TableTypeTrait};
 use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
 use pistols::models::init::{init};
@@ -56,13 +56,53 @@ fn scramble_salt(salt: u64) -> u64 {
     (hash.try_into().unwrap())
 }
 
-fn make_pact_pair(duelist_id_a: u128, duelist_id_b: u128) -> u128 {
-    let a: felt252 = duelist_id_a.into();
-    let b: felt252 = duelist_id_b.into();
+
+//------------------------
+// Pact management
+//
+
+fn make_pact_pair(duelist_a: u128, duelist_b: u128) -> u128 {
+    let a: felt252 = duelist_a.into();
+    let b: felt252 = duelist_b.into();
+    // ids can be contract addresses or token ids (small integers)
+    // hash it with itself to guarantee big unique numbers
     let aa: u256 = pedersen(a, a).into();
     let bb: u256 = pedersen(b, b).into();
     (aa.low ^ bb.low)
 }
+
+fn get_pact(world: IWorldDispatcher, table_id: felt252, duelist_a: u128, duelist_b: u128) -> u128 {
+    let pair: u128 = make_pact_pair(duelist_a, duelist_b);
+    (get!(world, (table_id, pair), Pact).duel_id)
+}
+
+fn set_pact(world: IWorldDispatcher, challenge: Challenge) {
+    let pair: u128 = if (challenge.duelist_id_b > 0) {
+        make_pact_pair(challenge.duelist_id_a, challenge.duelist_id_b)
+    } else {
+        make_pact_pair(DuelistTrait::address_as_id(challenge.address_a), DuelistTrait::address_as_id(challenge.address_b))
+    };
+    if (challenge.duel_id > 0) {
+        // new pact: must not exist!
+        let current_pact: u128 = get!(world, (challenge.table_id, pair), Pact).duel_id;
+        assert(current_pact == 0, Errors::CHALLENGE_EXISTS);
+    }
+    set!(world, Pact {
+        table_id: challenge.table_id,
+        pair,
+        duel_id: challenge.duel_id,
+    });
+}
+
+fn unset_pact(world: IWorldDispatcher, mut challenge: Challenge) {
+    challenge.duel_id = 0;
+    set_pact(world, challenge);
+}
+
+
+//------------------------
+// Challenge management
+//
 
 fn create_challenge_snapshot(world: IWorldDispatcher, challenge: Challenge) {
     // copy data from Table scoreboard
@@ -256,18 +296,8 @@ fn unpack_action_slots(packed: u16) -> (u8, u8) {
 fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
     set!(world, (challenge));
 
-    let state: ChallengeState = challenge.state.try_into().unwrap();
-
-    // Set pact between Duelists to avoid duplicated challenges
-    let pair: u128 = make_pact_pair(challenge.duelist_id_a, challenge.duelist_id_b);
-    let pact_duel_id: u128 = if (state.is_ongoing()) { challenge.duel_id } else  { 0 };
-    set!(world, Pact {
-        table_id: challenge.table_id,
-        pair,
-        duel_id: pact_duel_id,
-    });
-
     // Start Round
+    let state: ChallengeState = challenge.state.try_into().unwrap();
     if (state.is_canceled()) {
         // transfer wager/fee back to challenger
         withdraw_wager_fees(world, challenge, challenge.address_a);

@@ -51,8 +51,6 @@ mod utils {
 
 #[cfg(test)]
 mod tests {
-    // mocks
-    mod mock_erc721;
     // pistols
     mod test_action;
     mod test_admin;
@@ -70,4 +68,6 @@ mod tests {
     // utils
     mod tester;
     mod salt_generator;
+    // mocks
+    mod mock_erc721;
 }

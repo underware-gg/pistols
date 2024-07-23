@@ -18,7 +18,7 @@ mod tests {
     use pistols::libs::utils::{make_action_hash};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::math::{MathU8};
-    use pistols::tests::tester::{tester, tester::{flags, ZERO, OWNER, OTHER, BUMMER, TREASURY, BIG_BOY, LITTLE_BOY, FAKE_OWNER_1_1, ID}};
+    use pistols::tests::tester::{tester, tester::{flags, ZERO, OWNER, OTHER, BUMMER, TREASURY, BIG_BOY, LITTLE_BOY, LITTLE_GIRL, FAKE_OWNER_1_1, ID}};
 
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
@@ -119,10 +119,13 @@ mod tests {
     #[test]
     fn test_challenge_accept_to_address() {
         let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
-        let A: ContractAddress = OWNER();
-        let B: ContractAddress = LITTLE_BOY();
-        assert(system.has_pact(TABLE_ID, ID(A), ID(B)) == false, 'has_pact_no_1');
-        assert(system.has_pact(TABLE_ID, ID(B), ID(A)) == false, 'has_pact_no_2');
+        let A: ContractAddress = LITTLE_BOY();
+        let B: ContractAddress = LITTLE_GIRL();
+        // fund accounts
+        tester::execute_lords_faucet(lords, A);
+        tester::execute_lords_faucet(lords, B);
+        tester::execute_lords_approve(lords, A, system.contract_address, 1_000_000 * constants::ETH_TO_WEI.low);
+        tester::execute_lords_approve(lords, B, system.contract_address, 1_000_000 * constants::ETH_TO_WEI.low);
 
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, 48);
         let ch = tester::get_Challenge(world, duel_id);
@@ -131,9 +134,6 @@ mod tests {
         assert(ch.address_b == B, 'challenger');
         assert(ch.duelist_id_a == ID(A), 'challenger_id');
         assert(ch.duelist_id_b == 0, 'challenged_id'); // challenged an address, id is empty
-        // fund account
-        tester::execute_lords_faucet(lords, B);
-        tester::execute_lords_approve(lords, B, system.contract_address, 1_000_000 * constants::ETH_TO_WEI.low);
         // reply...
         let new_state: ChallengeState = tester::execute_reply_challenge(system, B, duel_id, true);
         assert(new_state == ChallengeState::InProgress, 'in_progress');
