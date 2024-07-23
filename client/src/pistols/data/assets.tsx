@@ -32,6 +32,19 @@ const TEXTURES: Record<TextureName, { path: string }> = {
   [TextureName.duel_water_map]: { path: '/textures/water_map.ktx2' },
 }
 
+export enum CardTextureName {
+  card_back,
+  card_front_shoot,
+  card_front_face,
+  card_front_face_grim,
+}
+const CARD_TEXTURES: Record<CardTextureName, { path: string }> = {
+  [CardTextureName.card_back]: { path: '/textures/cards/card_back.png' },
+  [CardTextureName.card_front_shoot]: { path: '/textures/cards/card_front_shoot.png' },
+  [CardTextureName.card_front_face]: { path: '/textures/cards/card_front_face.png' },
+  [CardTextureName.card_front_face_grim]: { path: '/textures/cards/card_front_face_grim.png' },
+}
+
 export const sceneBackgrounds: Record<SceneName, TextureName> = {
   [SceneName.Splash]: TextureName.bg_duel,
   [SceneName.Gate]: TextureName.bg_gate,
@@ -412,7 +425,9 @@ const isAudioAssetsLoaded = () => {
 
 
 export {
+  CharacterType,
   TEXTURES,
+  CARD_TEXTURES,
   SPRITESHEETS,
   ProfileModels,
   loadAudioAssets,

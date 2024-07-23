@@ -43,6 +43,10 @@ export async function loadShaders() {
     vsh: await loadShader('/shaders/water-model-vsh.glsl'),
     fsh: await loadShader('/shaders/water-model-fsh.glsl'),
   };
+  ShaderManager.shaderCode['HIGHLIGHT'] = {
+    vsh: await loadShader('/shaders/highlight-effect-vsh.glsl'),
+    fsh: await loadShader('/shaders/highlight-effect-fsh.glsl'),
+  };
 }
 
 
