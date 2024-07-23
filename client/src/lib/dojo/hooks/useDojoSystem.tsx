@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { getContractByName, Manifest } from '@dojoengine/core'
 import { useDojo } from '@/lib/dojo/DojoContext'
-import { useContract } from '@starknet-react/core'
+import { useDeployedContract } from '../../utils/hooks/useDeployedContract'
 
 export const useDojoSystem = (systemName: string) => {
   const { setup: { manifest } } = useDojo()
@@ -22,30 +22,7 @@ export const useSystem = (systemName: string, manifest: Manifest) => {
 
   //
   // Check if contract exists
-  const [cairoVersion, setCairoVersion] = useState<number>(undefined)
-  const [isDeployed, setIsDeployed] = useState<boolean>(!contractAddress ? false : undefined)
-  const { contract } = useContract({
-    abi,
-    address: contractAddress,
-  })
-  useEffect(() => {
-    let _mounted = true
-    const _check_deployed = async () => {
-      try {
-        const { cairo } = await contract.getVersion()
-        if (_mounted) {
-          setCairoVersion(parseInt(cairo))
-          setIsDeployed(true)
-        }
-      } catch {
-        if (_mounted) {
-          setIsDeployed(false)
-        }
-      }
-    }
-    _check_deployed()
-    return () => { _mounted = false }
-  }, [contract])
+  const { isDeployed, cairoVersion } = useDeployedContract(contractAddress, abi)
 
   return {
     contractAddress,
