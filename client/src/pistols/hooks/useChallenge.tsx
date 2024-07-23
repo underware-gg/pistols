@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { HasValue, getComponentValue, Component } from '@dojoengine/recs'
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { useComponentValue } from "@dojoengine/react"
-import { bigintEquals, bigintToEntity } from '@/lib/utils/types'
+import { arrayUnique, bigintEquals, bigintToEntity } from '@/lib/utils/types'
 import { feltToString, stringToFelt } from "@/lib/utils/starknet"
 import { ChallengeState, ChallengeStateDescriptions, LiveChallengeStates, PastChallengeStates } from "@/pistols/utils/pistols"
 import { useEntityKeys, useEntityKeysQuery } from '@/lib/dojo/hooks/useEntityKeys'
@@ -174,11 +174,12 @@ export const useChallengeDescription = (duelId: bigint) => {
 
 const invalidId = 9999999999999n
 
-export const useChallengeIdsByDuelistId = (duelist_id: BigNumberish, tableId?: string) => {
+export const useChallengeIdsByDuelistId = (duelist_id: BigNumberish, address?: BigNumberish, tableId?: string) => {
   const { Challenge } = useDojoComponents()
   const challengerIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { duelist_id_a: BigInt(duelist_id ?? invalidId) })])
   const challengedIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { duelist_id_b: BigInt(duelist_id ?? invalidId) })])
-  const allChallengeIds: bigint[] = useMemo(() => ([...challengerIds, ...challengedIds]), [challengerIds, challengedIds])
+  const challengedAddrIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { address_b: BigInt(address ?? invalidId) })])
+  const allChallengeIds: bigint[] = useMemo(() => arrayUnique([...challengerIds, ...challengedIds, ...challengedAddrIds]), [challengerIds, challengedIds, challengedAddrIds])
   const challengeIds = useMemo(() => (
     tableId ? _filterChallengesByTable(Challenge, allChallengeIds, tableId) : allChallengeIds
   ), [allChallengeIds, tableId])
@@ -204,9 +205,9 @@ export const useChallengeIdsByOwner = (address: BigNumberish, tableId?: string) 
   }
 }
 
-export const useChallengesByDuelistId = (duelist_id: BigNumberish, tableId?: string) => {
+export const useChallengesByDuelistId = (duelist_id: BigNumberish, address?: BigNumberish, tableId?: string) => {
   const { Challenge } = useDojoComponents()
-  const { challengeIds } = useChallengeIdsByDuelistId(duelist_id, tableId)
+  const { challengeIds } = useChallengeIdsByDuelistId(duelist_id, address, tableId)
   const raw_challenges: any[] = useMemo(() => (
     challengeIds.map((challengeId) => getComponentValue(Challenge, bigintToEntity(challengeId)))
       .sort(_challegeSorterByTimestamp)
@@ -230,8 +231,8 @@ export const useChallengesByOwner = (address: BigNumberish, tableId?: string) =>
   }
 }
 
-export const useChallengesByDuelistIdTotals = (duelist_id: BigNumberish, tableId?: string) => {
-  const { raw_challenges, challengeIds } = useChallengesByDuelistId(duelist_id, tableId)
+export const useChallengesByDuelistIdTotals = (duelist_id: BigNumberish, address?: BigNumberish, tableId?: string) => {
+  const { raw_challenges, challengeIds } = useChallengesByDuelistId(duelist_id, address, tableId)
   // console.log(challenges)
   const counts: any = useMemo(() => {
     let result = {

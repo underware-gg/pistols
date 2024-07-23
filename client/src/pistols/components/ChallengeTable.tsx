@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
+import { useAccount } from '@starknet-react/core'
 import { useAllChallengeIds, useChallengeIdsByDuelistId, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
@@ -40,20 +41,23 @@ export function ChallengeTablePast() {
 }
 
 export function ChallengeTableYour() {
+  const { address } = useAccount()
   const { tableId, duelistId } = useSettings()
-  return <ChallengeTableByDuelist duelistId={duelistId} compact tableId={tableId} />
+  return <ChallengeTableByDuelist duelistId={duelistId} address={address} compact tableId={tableId} />
 }
 
 export function ChallengeTableByDuelist({
   duelistId = null,
+  address = null,
   compact = false,
   tableId
 }: {
   duelistId: BigNumberish
+  address?: BigNumberish
   compact: boolean
   tableId?: string
 }) {
-  const { challengeIds } = useChallengeIdsByDuelistId(duelistId, tableId)
+  const { challengeIds } = useChallengeIdsByDuelistId(duelistId, address, tableId)
   return <ChallengeTableByIds challengeIds={challengeIds} compact={compact} states={AllChallengeStates} />
 }
 
@@ -73,7 +77,7 @@ function ChallengeTableByIds({
   const _statesToToggles = (t) => (states.reduce((a, v) => ({ ...a, [v]: t }), {}))
 
   const [stateToggles, setStateToggles] = useState(_statesToToggles(true))
-  const selectedStated = useMemo(() => (
+  const selectedStates = useMemo(() => (
     states.length == 0 ? AllChallengeStates
       : states.reduce((a, v) => ([...a, (stateToggles[v] ? v : null)]), [])
   ), [states, stateToggles])
@@ -81,10 +85,10 @@ function ChallengeTableByIds({
   const rows = useMemo(() => {
     let result = []
     challengeIds.forEach((duelId, index) => {
-      result.push(<DuelItem key={duelId} duelId={duelId} sortCallback={_sortCallback} compact={compact} states={selectedStated} />)
+      result.push(<DuelItem key={duelId} duelId={duelId} sortCallback={_sortCallback} compact={compact} states={selectedStates} />)
     })
     return result
-  }, [challengeIds, selectedStated])
+  }, [challengeIds, selectedStates])
 
   const sortedRows = useMemo(() => rows.sort((a, b) => {
     if (order[a.key]?.state != order[b.key]?.state) {

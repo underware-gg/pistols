@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid, Menu, Label, Tab, TabPane } from 'semantic-ui-react'
+import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
 import { useChallengesByDuelistIdTotals, useLiveChallengeIds } from '@/pistols/hooks/useChallenge'
@@ -29,16 +30,17 @@ const _makeBubble = (count) => {
 export function TavernMenu({
 }) {
   const router = useRouter()
+  const { address } = useAccount()
   const { tableId, duelistId, isGuest } = useSettings()
   const { menuKey, tavernMenuItems, tableOpener, dispatchSetMenu } = usePistolsContext()
   const { description, isTournament, isIRLTournament } = useTable(tableId)
 
-  const { liveDuelsCount: yourDuelsCount } = useChallengesByDuelistIdTotals(duelistId, tableId)
+  const { liveDuelsCount: yourDuelsCount } = useChallengesByDuelistIdTotals(duelistId, address, tableId)
   const { challengeIds: liveChallengeIds } = useLiveChallengeIds(tableId)
   const liveDuelsCount = useMemo(() => (liveChallengeIds.length), [liveChallengeIds])
 
+  // select initial tab
   const [started, setStarted] = useState<boolean>(false)
-
   useEffect(() => {
     if (!started) {
       setStarted(true)
