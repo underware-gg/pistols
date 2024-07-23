@@ -225,7 +225,7 @@ function DuelProgress({
   // Duelist interaction
   //
   const { isConnected } = useAccount()
-  const isYou = useIsYou(duelistId)
+  const { isYou } = useIsYou(duelistId)
   // const isTurn = useMemo(() => ((isA && turnA) || (isB && turnB)), [isA, isB, turnA, turnB])
 
   // Commit modal control

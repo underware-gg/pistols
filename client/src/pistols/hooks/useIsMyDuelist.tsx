@@ -11,13 +11,19 @@ export const useIsMyAccount = (otherAddress: BigNumberish) => {
   const { address } = useAccount()
   const { isGuest } = useSettings()
   const isMyAccount = useMemo(() => (!isGuest && bigintEquals(address, otherAddress)), [address, otherAddress, isGuest])
-  return isMyAccount
+  return {
+    isMyAccount,
+    myAcountAddress: address,
+  }
 }
 
 export const useIsYou = (otherDueistId: BigNumberish) => {
   const { duelistId } = useSettings()
   const isYou = useMemo(() => (bigintEquals(duelistId, otherDueistId)), [duelistId, otherDueistId])
-  return isYou
+  return {
+    isYou,
+    myDuelistId: duelistId,
+  }
 }
 
 export const useIsMyDuelist = (otherDueistId: BigNumberish) => {

@@ -68,7 +68,7 @@ export function ProfilePic({
   }
   // switch duelist
   const { dispatchDuelistId } = useSettings()
-  const isYou = useIsYou(duelistId)
+  const { isYou } = useIsYou(duelistId)
   const isMyDuelist = useIsMyDuelist(duelistId)
   const _canSwitch = (Boolean(duelistId) && isMyDuelist && !isYou)
   const _switch = () => {

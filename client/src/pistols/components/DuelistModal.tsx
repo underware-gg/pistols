@@ -24,7 +24,7 @@ export default function DuelistModal() {
   const { selectedDuelistId, dispatchSelectDuel, dispatchSelectDuelistId, dispatchChallengingDuelistId } = usePistolsContext()
   const { owner } = useDuelistOwner(selectedDuelistId)
   const isOpen = useMemo(() => (selectedDuelistId > 0), [selectedDuelistId])
-  const isYou = useIsYou(selectedDuelistId)
+  const { isYou } = useIsYou(selectedDuelistId)
   const isMyDuelist = useIsMyDuelist(selectedDuelistId)
 
   const _close = () => { dispatchSelectDuelistId(0n) }

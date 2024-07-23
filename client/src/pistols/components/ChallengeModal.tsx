@@ -46,8 +46,8 @@ export default function ChallengeModal() {
   const { profilePic: profilePicB } = useDuelist(duelistIdB)
 
   const isChallenger = useIsYou(duelistIdA)
-  const isChallengedDuelist = useIsYou(duelistIdB)
-  const isChallengedAccount = useIsMyAccount(duelistAddressB)
+  const { isYou: isChallengedDuelist } = useIsYou(duelistIdB)
+  const { isMyAccount: isChallengedAccount } = useIsMyAccount(duelistAddressB)
   const isChallenged = (isChallengedDuelist || isChallengedAccount)
   const isYou = (isChallenger || isChallenged)
 
