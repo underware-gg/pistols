@@ -14,6 +14,7 @@ import { AddressShort } from '@/lib/ui/AddressShort'
 import { Divider } from '@/lib/ui/Divider'
 import { Opener } from '@/lib/ui/useOpener'
 import { STARKNET_ADDRESS_LENGTHS } from '@/lib/utils/starknet'
+import { useStarkName, useStarkProfile } from '@/lib/utils/hooks/useStarkName'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -40,6 +41,9 @@ export default function AnonModal({
   const { isMyAccount, myAcountAddress } = useIsMyAccount(validatedAddress)
   const canSubmit = (isStarknetAddress && !isMyAccount && (isControllerAccount || isKatanaAccount))
 
+  const { starkName } = useStarkName(isStarknetAddress ? validatedAddress : null)
+  const { profilePicture: starkProfilePic } = useStarkProfile(isStarknetAddress ? validatedAddress : null)
+
   const { tableId } = useSettings()
   const { dispatchSelectDuel, dispatchChallengingDuelistId } = usePistolsContext()
   const { hasPact, pactDuelId } = usePact(tableId, myAcountAddress, validatedAddress)
@@ -61,7 +65,7 @@ export default function AnonModal({
         </Grid>
       </Modal.Header>
       <Modal.Content image className='Relative'>
-        <ProfilePic profilePic={0} duelistId={0} anon />
+        <ProfilePic profilePic={0} duelistId={0} anon srcUrl={starkProfilePic} />
         <Modal.Description className='FormAnonDescription'>
           <Grid className='FillWidth' >
             <Row columns={'equal'}>
@@ -78,10 +82,16 @@ export default function AnonModal({
 
                 <Divider />
                 <div className='ModalText'>
-                  {isStarknetAddress ? <Checked checked={true}>Starknet Address: <AddressShort address={validatedAddress} /></Checked>
+                  {isStarknetAddress ? <Checked checked={true}>Starknet Address: <span className='Important'><AddressShort address={validatedAddress} /></span></Checked>
                     : isEthereumAddress ? <Checked checked={false}>Ethereum wallets not supported yet</Checked>
                       : <Checked loading>Need a valid address...</Checked>
                   }
+
+                  {starkName &&<>
+                    <br />
+                    <Checked checked={true}>Starknet Name: <span className='Important'>{starkName}</span></Checked>
+                  </>}
+
                   <br />
                   {isControllerAccount ? <Checked checked={true}>Controller Account</Checked>
                     : isKatanaAccount ? <Checked checked={true}>Katana Account</Checked>

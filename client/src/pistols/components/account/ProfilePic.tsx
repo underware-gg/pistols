@@ -25,6 +25,7 @@ const _className = ({ small, square, duel, anon }) => (
 
 export function ProfilePic({
   profilePic,
+  srcUrl = null,
   small = false,
   square = false,
   duel = false,
@@ -39,6 +40,7 @@ export function ProfilePic({
   duelistId,
 }: {
   profilePic: number
+  srcUrl?: string
   small?: boolean
   square?: boolean
   duel?: boolean
@@ -60,7 +62,7 @@ export function ProfilePic({
     if (disabled || dimmed) result.push('ProfilePicDisabled')
     return result
   }, [className, small, square, duel, anon, disabled, dimmed])
-  const url = useMemo(() => _makeUrl(profilePic, square || anon), [profilePic, square])
+  const url = useMemo(() => (srcUrl ?? _makeUrl(profilePic, square || anon)), [srcUrl, profilePic, square])
 
   // as Button
   const _click = () => {

@@ -9,7 +9,7 @@ export const useContractClassHash = (contractAddress: BigNumberish, provider?: R
 
   useEffect(() => {
     let _mounted = true
-    const _get_class_hash = async () => {
+    const _fetch = async () => {
       try {
         const result = await (provider ?? dojoProvider.provider).getClassHashAt(contractAddress)
         if (_mounted) {
@@ -23,7 +23,7 @@ export const useContractClassHash = (contractAddress: BigNumberish, provider?: R
     }
     setClassHash(undefined)
     if (contractAddress && (provider || dojoProvider.provider)) {
-      _get_class_hash()
+      _fetch()
     }
     return () => { _mounted = false }
   }, [contractAddress, dojoProvider, provider])

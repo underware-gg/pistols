@@ -15,7 +15,7 @@ export const useDeployedContract = (contractAddress: BigNumberish, abi: Abi) => 
 
   useEffect(() => {
     let _mounted = true
-    const _check_deployed = async () => {
+    const _fetch = async () => {
       try {
         const { cairo, compiler } = await contract.getVersion()
         if (_mounted) {
@@ -31,7 +31,7 @@ export const useDeployedContract = (contractAddress: BigNumberish, abi: Abi) => 
         }
       }
     }
-    _check_deployed()
+    _fetch()
     return () => { _mounted = false }
   }, [contract])
 
