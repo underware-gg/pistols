@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-export const useDojoCall = <T extends any>({
+export const useContractCall = <T extends any>({
   call,
   args = [],
   enabled = true,

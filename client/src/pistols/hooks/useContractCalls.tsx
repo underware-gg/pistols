@@ -1,7 +1,7 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
-import { useDojoCall } from '@/lib/dojo/hooks/useDojoCall'
+import { useContractCall } from '@/lib/utils/hooks/useContractCall'
 import { isBigint } from '@/lib/utils/types'
 import { BigNumberish } from 'starknet'
 
@@ -10,7 +10,7 @@ export const useCanJoin = () => {
   const { can_join } = useDojoSystemCalls()
   const args = useMemo(() => [BigInt(address ?? 0), BigInt(address ?? 0)], [address])
   const enabled = useMemo(() => isBigint(address), [address])
-  const { value, isPending } = useDojoCall({
+  const { value, isPending } = useContractCall({
     call: can_join,
     args,
     enabled,
@@ -26,7 +26,7 @@ export const useCalcFee = (table_id: string, wager_value: BigNumberish) => {
   const { calc_fee } = useDojoSystemCalls()
   const args = useMemo(() => [table_id, wager_value], [table_id, wager_value])
   const enabled = useMemo(() => Boolean(table_id), [table_id])
-  const { value, isPending } = useDojoCall({
+  const { value, isPending } = useContractCall({
     call: calc_fee,
     args,
     enabled,
@@ -42,7 +42,7 @@ export const useSimulateChances = (address: BigNumberish, duelId: bigint, roundN
   const { simulate_chances } = useDojoSystemCalls()
   const args = useMemo(() => [BigInt(address), duelId, roundNumber, action], [address, duelId, roundNumber, action])
   const enabled = useMemo(() => (address != null && duelId && roundNumber && action != null), [address, duelId, roundNumber, action])
-  const { value } = useDojoCall({
+  const { value } = useContractCall({
     call: simulate_chances,
     args,
     enabled,
@@ -56,7 +56,7 @@ export const useGetValidPackedActions = (roundNumber: number) => {
   const { get_valid_packed_actions } = useDojoSystemCalls()
   const args = useMemo(() => [roundNumber], [roundNumber])
   const enabled = useMemo(() => Boolean(roundNumber), [roundNumber])
-  const { value, isPending } = useDojoCall({
+  const { value, isPending } = useContractCall({
     call: get_valid_packed_actions,
     args,
     enabled,
