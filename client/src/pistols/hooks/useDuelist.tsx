@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useComponentValue } from '@dojoengine/react'
-import { useDojoComponents } from '@/lib/dojo/DojoContext'
+import { useDojoComponents, useDojoConstants } from '@/lib/dojo/DojoContext'
 import { bigintToEntity, isPositiveBigint } from '@/lib/utils/types'
 import { feltToString } from "@/lib/utils/starknet"
 import { useEntityKeys } from '@/lib/dojo/hooks/useEntityKeys'
@@ -28,12 +28,15 @@ export const useAllDuelistKeys = () => {
 //
 
 export const useDuelist = (duelist_id: BigNumberish) => {
+  const { constants } = useDojoConstants()
+  const isValidDuelistId = useMemo(() => (isPositiveBigint(duelist_id) && BigInt(duelist_id) <= BigInt(constants.MAX_DUELIST_ID)), [duelist_id])
+
   const { Duelist } = useDojoComponents()
   const duelist: any = useComponentValue(Duelist, bigintToEntity(duelist_id ?? 0n))
   // console.log(`Duelist`, address, bigintToEntity(address ?? 0n), duelist)
 
   const name = useMemo(() => duelist?.name ? feltToString(duelist.name) : null, [duelist])
-  const nameDisplay = useMemo(() => (`${name || 'Duelist'} #${isPositiveBigint(duelist_id) ? duelist_id : '?'}`), [name, duelist_id])
+  const nameDisplay = useMemo(() => (`${name || 'Duelist'} #${isValidDuelistId ? duelist_id : '?'}`), [name, duelist_id])
   const profilePicType = useMemo(() => (duelist?.profile_pic_type ?? null), [duelist])
   const profilePic = useMemo(() => Number(duelist?.profile_pic_uri ?? 0), [duelist])
   const timestamp = useMemo(() => (duelist?.timestamp ?? 0), [duelist])
@@ -43,6 +46,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   const score = useScore(duelist?.score)
 
   return {
+    isValidDuelistId,
     duelistId: duelist_id,
     name,
     nameDisplay,

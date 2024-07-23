@@ -9,7 +9,7 @@ import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChalle
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useWager } from '@/pistols/hooks/useWager'
 import { useTable } from '@/pistols/hooks/useTable'
-import { useIsYou } from '@/pistols/hooks/useIsMyDuelist'
+import { useIsMyAccount, useIsYou } from '@/pistols/hooks/useIsMyDuelist'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
@@ -46,8 +46,12 @@ export default function ChallengeModal() {
   const { profilePic: profilePicB } = useDuelist(duelistIdB)
 
   const isChallenger = useIsYou(duelistIdA)
-  const isChallenged = useIsYou(duelistIdB)
+  const isChallengedDuelist = useIsYou(duelistIdB)
+  const isChallengedAccount = useIsMyAccount(duelistAddressB)
+  const isChallenged = (isChallengedDuelist || isChallengedAccount)
   const isYou = (isChallenger || isChallenged)
+
+  console.log(`DUELIST_B`, duelistIdB, duelistAddressB)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -98,7 +102,7 @@ export default function ChallengeModal() {
           <Grid style={{ width: '350px' }}>
             <Row columns='equal' textAlign='left'>
               <Col>
-                <ProfileDescription duelistId={duelistIdA} />
+                <ProfileDescription duelistId={duelistIdA} displayOwnerAddress />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -108,7 +112,7 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <ProfileDescription duelistId={duelistIdB} />
+                <ProfileDescription duelistId={duelistIdB} address={duelistAddressB} displayOwnerAddress />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>

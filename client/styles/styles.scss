@@ -734,6 +734,17 @@ $ui-container-gap: 1em;
   line-height: 1.1em;
 }
 
+.FormLabel {
+  @extend .TitleCase;
+  color: $color-text;
+  font-size: 1.1em;
+  line-height: 1.2em;
+}
+.FormAnonDescription {
+  // fix modal + image fluid description
+  flex: 1 0 auto!important;
+}
+
 .MenuTop {
   width: 100%;
   position: absolute;
@@ -1040,6 +1051,8 @@ $logo-url: '/logos/logo_avante.svg';
 }
 // 
 // <Input>
+// input, select, textarea, button{font-family:inherit!important;}
+input{font-family:inherit!important;} // <input> by default does not inherit!!!
 input::placeholder {
   @extend .TitleCase;
   font-family: $font-family;
@@ -1105,12 +1118,6 @@ input::placeholder {
   @extend ._button_active;
 }
 // forms
-.FormLabel {
-  @extend .TitleCase;
-  color: $color-text;
-  font-size: 1.1em;
-  line-height: 1.2em;
-}
 .ui.form .field>label {
   font-family: $font-family;
   color: $color-bright;

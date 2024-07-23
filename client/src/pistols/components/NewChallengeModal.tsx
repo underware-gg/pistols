@@ -99,7 +99,7 @@ export default function NewChallengeModal() {
           <Grid style={{ width: '350px' }}>
             <Row columns='equal' textAlign='left'>
               <Col>
-                <ProfileDescription duelistId={duelistIdA} displayOwnerAddress={false} />
+                <ProfileDescription duelistId={duelistIdA} displayOwnerAddress={true} />
                 {canWager && <h5><Balance tableId={tableId} wei={balanceA} /></h5>}
               </Col>
             </Row>
@@ -110,7 +110,7 @@ export default function NewChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <ProfileDescription duelistId={duelistIdB} displayOwnerAddress={false} />
+                <ProfileDescription duelistId={duelistIdB} address={duelistIdB} displayOwnerAddress={true} />
                 {canWager && <h5><Balance tableId={tableId} wei={balanceB} /></h5>}
               </Col>
             </Row>
@@ -246,7 +246,7 @@ function NewChallengeForm({
 
         <Form.Field>
           <FormInput
-            label='Wager (deposit now, winner takes all, minus fee)'
+            label='Wager -- deposit now, winner takes all, minus fee'
             placeholder={'$LORDS'}
             value={canWager ? value.toString() : 'No wager in this Table'}
             setValue={(newValue) => {

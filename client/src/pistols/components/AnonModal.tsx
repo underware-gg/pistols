@@ -1,20 +1,16 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Grid, Modal, Icon } from 'semantic-ui-react'
-import { useSettings } from '../hooks/SettingsContext'
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { usePact } from '@/pistols/hooks/usePact'
-import { useDuelistOwner } from '@/pistols/hooks/useTokenDuelist'
-import { useIsMyDuelist, useIsYou } from '@/pistols/hooks/useIsMyDuelist'
-import { ProfilePic } from '@/pistols/components/account/ProfilePic'
-import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
-import { ChallengeTableByDuelist } from '@/pistols/components/ChallengeTable'
-import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { AddressShort } from '@/lib/ui/AddressShort'
-import { IconClick } from '@/lib/ui/Icons'
-import { Opener } from '@/lib/ui/useOpener'
+import React, { useEffect, useState } from 'react'
+import { Grid, Modal } from 'semantic-ui-react'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
+import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { useValidateWalletAddress } from '@/lib/utils/hooks/useValidateWalletAddress'
+import { useIsMyAccount } from '@/pistols/hooks/useIsMyDuelist'
+import { ProfilePic } from '@/pistols/components/account/ProfilePic'
+import { ActionButton } from '@/pistols/components/ui/Buttons'
+import { FormInput } from '@/pistols/components/ui/Form'
+import { AddressShort } from '@/lib/ui/AddressShort'
+import { Divider } from '@/lib/ui/Divider'
+import { Opener } from '@/lib/ui/useOpener'
+import { STARKNET_ADDRESS_LENGTHS } from '@/lib/utils/starknet'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -31,13 +27,16 @@ export default function AnonModal({
 
   //
   // Select
-  const [walletAddress, setWalletAddres] = useState('')
+  const [inputAddress, setInputAddres] = useState('')
   useEffect(() => {
-    if (opener.isOpen) setWalletAddres('')
+    if (opener.isOpen) setInputAddres('')
   }, [opener.isOpen])
 
+  const { validatedAddress, isStarknetAddress, isEthereumAddress } = useValidateWalletAddress(inputAddress)
+  const isYou = useIsMyAccount(validatedAddress)
+  const canSubmit = (isStarknetAddress && !isYou)
 
-  const { dispatchDuelistId, tableId } = useSettings()
+  const { dispatchChallengingDuelistId } = usePistolsContext()
   const hasPact = false
 
 
@@ -59,14 +58,39 @@ export default function AnonModal({
       </Modal.Header>
       <Modal.Content image className='Relative'>
         <ProfilePic profilePic={0} duelistId={0} anon />
-        <Modal.Description className='FillParent'>
-          {/* <div className='DuelistModalDescription'>
-            <ProfileDescription duelistId={selectedDuelistId} tableId={tableId} displayBalance displayStats />
-            <div className='Spacer10' />
-            <div className='TableInModal'>
-              <ChallengeTableByDuelist duelistId={selectedDuelistId} compact tableId={tableId} />
-            </div>
-          </div> */}
+        <Modal.Description className='FormAnonDescription'>
+          <Grid className='FillWidth' >
+            <Row columns={'equal'}>
+              <Col>
+                <FormInput
+                  label='Wallet Address or Starknet ID'
+                  placeholder={'0x... or name.start'}
+                  value={inputAddress}
+                  setValue={setInputAddres}
+                  maxLength={STARKNET_ADDRESS_LENGTHS[1]}
+                  code={true}
+                  disabled={false}
+                />
+
+                <Divider />
+                <div className='ModalText'>
+
+                  {isStarknetAddress ?
+                    <>Starknet Address:
+                      <br />
+                      <AddressShort address={validatedAddress} />
+                      <h5 className='Important'>(only Controller accounts supported ATM)</h5>
+                    </>
+                    : isEthereumAddress ? <div>Ethereum wallets not supported yet</div>
+                      : <span className='Inactive'>Need a valid address...</span>
+                  }
+                </div>
+
+              </Col>
+            </Row>
+          </Grid>
+
+
         </Modal.Description>
       </Modal.Content>
       <Modal.Actions className='NoPadding'>
@@ -76,7 +100,10 @@ export default function AnonModal({
               <ActionButton fill label='Close' onClick={() => opener.close()} />
             </Col>
             <Col>
-              <ActionButton fill disabled={!hasPact} label='Challenge for a Duel!' onClick={() => dispatchDuelistId(walletAddress)} />
+              {isYou ?
+                <ActionButton fill disabled={true} label='Challenge yourself?' onClick={() => {}} />
+                : <ActionButton fill disabled={!isStarknetAddress} label='Challenge for a Duel!' onClick={() => dispatchChallengingDuelistId(validatedAddress)} />
+              }
             </Col>
           </Row>
         </Grid>

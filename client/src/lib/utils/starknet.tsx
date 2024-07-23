@@ -8,14 +8,19 @@ import {
   BigNumberish,
   Uint256,
   uint256,
+  encode,
   Abi,
   ec,
 } from 'starknet'
-import { bigintToHex } from './types'
+import { bigintToHex, isPositiveBigint } from './types'
 
 export const ETH_TO_WEI = 1_000_000_000_000_000_000n
 
+export const STARKNET_ADDRESS_LENGTHS = [64, 66]
+export const ETHEREUM_ADDRESS_LENGTH = 42
+
 export const validateCairoString = (v: string): string => (v ? v.slice(0, 31) : '')
+export const sanitizedAddress = (v: BigNumberish): string | null => (isPositiveBigint(v) ? encode.sanitizeHex(bigintToHex(v)) : null)
 export const stringToFelt = (v: string): string => (v ? shortString.encodeShortString(v) : '0x0')
 export const feltToString = (v: BigNumberish): string => (BigInt(v) > 0n ? shortString.decodeShortString(bigintToHex(v)) : '')
 export const pedersen = (a: BigNumberish, b: BigNumberish): bigint => (BigInt(ec.starkCurve.pedersen(BigInt(a), BigInt(b))))

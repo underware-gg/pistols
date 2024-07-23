@@ -132,7 +132,7 @@ export function DuelistTable() {
             <FilterButton label='Global' state={!duelistsFilter || duelistsFilter == Filters.Global} switchState={() => dispatchDuelistsFilter(Filters.Global)} />
             <FilterButton label='Current Table' state={duelistsFilter == Filters.Table} switchState={() => dispatchDuelistsFilter(Filters.Table)} />
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <FilterButton label='Anonymous' state={duelistsAnon} switchState={() => dispatchDuelistsAnon(!duelistsAnon)} />
+            <FilterButton label='Display Wallets' state={duelistsAnon} switchState={() => dispatchDuelistsAnon(!duelistsAnon)} />
           </Col>
         </Row>
       </Grid>
@@ -243,7 +243,7 @@ function DuelistItem({
             <h5 className='NoMargin'><ProfileName duelistId={duelistId} displayId={false} badges={false} /></h5>
             <div className='Normal NoMargin'>Duelist #{duelistId.toString()} <ProfileBadge duelistId={duelistId} /></div>
           </> : <>
-            <h5 className='NoMargin'>Wallet or Stark.id</h5>
+            <h5 className='NoMargin'>Challenge a Wallet or Starknet ID</h5>
             <div className='Normal NoMargin'>Duelist #?</div>
           </>}
       </Cell>
