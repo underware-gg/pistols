@@ -24,20 +24,23 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export default function NewChallengeModal() {
- const { create_challenge } = useDojoSystemCalls()
-  const { account } = useAccount()
+  const { create_challenge } = useDojoSystemCalls()
+  const { account, address } = useAccount()
   const { tableId, duelistId } = useSettings()
 
   const { challengingId, dispatchChallengingDuelistId, dispatchSelectDuelistId, dispatchSelectDuel } = usePistolsContext()
   const isOpen = useMemo(() => (challengingId > 0n), [challengingId])
   const duelistIdA = duelistId
   const duelistIdB = challengingId
+  const addressA = address
+  const addressB = challengingId
 
   const _close = () => { dispatchChallengingDuelistId(0n) }
 
   const { profilePic: profilePicA } = useDuelist(duelistIdA)
   const { profilePic: profilePicB } = useDuelist(duelistIdB)
-  const { hasPact, pactDuelId } = usePact(tableId, duelistIdA, duelistIdB)
+  const { hasPact: hasPactDuelist, pactDuelId: pactDuelIdDuelist } = usePact(tableId, duelistIdA, duelistIdB)
+  const { hasPact: hasPactAddress, pactDuelId: pactDuelIdAddress } = usePact(tableId, addressA, addressB)
 
   const { description: tableDescription } = useTable(tableId)
   const { balance: balanceA } = useTableAccountBalance(tableId, duelistIdA)
@@ -56,10 +59,12 @@ export default function NewChallengeModal() {
   }, [isOpen])
 
   useEffect(() => {
-    if (hasPact) {
-      dispatchSelectDuel(pactDuelId)
+    if (hasPactDuelist) {
+      dispatchSelectDuel(pactDuelIdDuelist)
+    } else if (hasPactAddress) {
+      dispatchSelectDuel(pactDuelIdAddress)
     }
-  }, [hasPact])
+  }, [hasPactDuelist, hasPactAddress])
 
   const _create_challenge = () => {
     const _submit = async () => {

@@ -1,5 +1,5 @@
-import { useMemo } from 'react'
-import { BigNumberish } from 'starknet'
+import { useEffect, useMemo } from 'react'
+import { Account, BigNumberish } from 'starknet'
 import { sanitizedAddress, STARKNET_ADDRESS_LENGTHS, ETHEREUM_ADDRESS_LENGTH } from '@/lib/utils/starknet'
 
 export const useValidateWalletAddress = (address: BigNumberish) => {
@@ -18,6 +18,11 @@ export const useValidateWalletAddress = (address: BigNumberish) => {
 
   const isAddress = useMemo(() => (isStarknetAddress || isEthereumAddress), [isStarknetAddress, isEthereumAddress])
   const validatedAddress = useMemo(() => (isAddress ? formattedAddress : null), [isAddress, formattedAddress])
+
+  useEffect(() => {
+    if (validatedAddress && isStarknetAddress) {
+    }
+  }, [validatedAddress, isStarknetAddress])
 
   return {
     isAddress,

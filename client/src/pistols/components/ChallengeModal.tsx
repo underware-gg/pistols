@@ -38,20 +38,18 @@ export default function ChallengeModal() {
 
   const { state, tableId, message, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, isLive, isFinished, needToSyncExpired } = useChallenge(selectedDuelId)
   const { value, fee } = useWager(selectedDuelId)
-  const { description: tableDescription }= useTable(tableId)
+  const { description: tableDescription } = useTable(tableId)
 
   const { challengeDescription } = useChallengeDescription(selectedDuelId)
 
   const { profilePic: profilePicA } = useDuelist(duelistIdA)
   const { profilePic: profilePicB } = useDuelist(duelistIdB)
 
-  const isChallenger = useIsYou(duelistIdA)
+  const { isYou: isChallenger } = useIsYou(duelistIdA)
   const { isYou: isChallengedDuelist } = useIsYou(duelistIdB)
   const { isMyAccount: isChallengedAccount } = useIsMyAccount(duelistAddressB)
   const isChallenged = (isChallengedDuelist || isChallengedAccount)
   const isYou = (isChallenger || isChallenged)
-
-  console.log(`DUELIST_B`, duelistIdB, duelistAddressB)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -97,7 +95,7 @@ export default function ChallengeModal() {
       </Modal.Header>
       <Modal.Content image className='Relative'>
         <ProfilePic profilePic={profilePicA} duelistId={duelistIdA} floated='left' onClick={() => dispatchSelectDuelistId(duelistIdA)} />
-        
+
         <Modal.Description className='Padded' style={{ width: '550px' }}>
           <Grid style={{ width: '350px' }}>
             <Row columns='equal' textAlign='left'>

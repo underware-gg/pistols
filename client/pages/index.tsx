@@ -14,7 +14,7 @@ export default function IndexPage() {
           <h1 className='TitleCase'>Pistols at 10 Blocks</h1>
           <hr />
           <h5>
-            an [<a href='https://x.com/LootUnderworld'>Underworld</a>] game
+            an [<a href='https://x.com/LootUnderworld'>Underworlds</a>] game
           </h5>
           <h5>
             <span>by</span> [<a href='https://underware.gg'>Underware</a>]

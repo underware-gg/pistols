@@ -119,7 +119,9 @@ export function TavernMenu({
         <div className='AbsoluteRight PaddedDouble'>
           <MusicToggle />
           &nbsp;&nbsp;
+          &nbsp;&nbsp;
           <IconClick name='sign out' size={'large'} onClick={() => router.push(`/gate`)} />
+          &nbsp;&nbsp;&nbsp;
         </div>
 
         <Tab activeIndex={menuIndex} menu={{ secondary: true, pointing: true, attached: true }} panes={panes} />

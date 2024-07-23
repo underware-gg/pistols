@@ -1,15 +1,19 @@
-
 import { useEffect, useMemo, useState } from 'react'
-import { Connector, useAccount, useConnect } from '@starknet-react/core'
-import { Manifest } from '@dojoengine/core'
-import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
+import { Connector, useAccount } from '@starknet-react/core'
+import { Policy, ControllerOptions } from '@cartridge/controller'
 import CartridgeConnector from '@cartridge/connector'
+import { KATANA_CLASS_HASH, Manifest } from '@dojoengine/core'
+import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
+import { useContractClassHash } from '@/lib/utils/hooks/useContractClassHash'
+import { BigNumberish } from 'starknet'
+import { bigintEquals } from '@/lib/utils/types'
 import { assert } from '@/lib/utils/math'
 
-import { Policy, ControllerOptions } from "@cartridge/controller";
+// sync from here:
+// https://github.com/cartridge-gg/controller/blob/main/packages/account-wasm/src/constants.rs
+export const CONTROLLER_CLASS_HASH = '0x05f0f2ae9301e0468ca3f9218dadd43a448a71acc66b6ef1a5570bb56cf10c6f'
 
 export const useController = (manifest: Manifest, contractNames?: string[]) => {
-
   const controller = useMemo(() => {
     const options: ControllerOptions = {
       // paymaster: {
@@ -72,3 +76,15 @@ export const useControllerUsername = () => {
   }
 }
 
+
+export const useControllerAccount = (contractAddress: BigNumberish) => {
+  const { classHash, isDeployed } = useContractClassHash(contractAddress)
+  const isControllerAccount = useMemo(() => (classHash && bigintEquals(classHash, CONTROLLER_CLASS_HASH)), [classHash])
+  const isKatanaAccount = useMemo(() => (classHash && bigintEquals(classHash, KATANA_CLASS_HASH)), [classHash])
+  return {
+    classHash,
+    isDeployed,
+    isControllerAccount,
+    isKatanaAccount,
+  }
+}

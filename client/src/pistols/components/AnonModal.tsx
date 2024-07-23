@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from 'react'
-import { Grid, Modal } from 'semantic-ui-react'
+import React, { ReactNode, useEffect, useState } from 'react'
+import { Grid, Modal, Breadcrumb, Icon } from 'semantic-ui-react'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useValidateWalletAddress } from '@/lib/utils/hooks/useValidateWalletAddress'
+import { useControllerAccount } from '@/lib/dojo/hooks/useController'
 import { useIsMyAccount } from '@/pistols/hooks/useIsMyDuelist'
+import { usePact } from '@/pistols/hooks/usePact'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { FormInput } from '@/pistols/components/ui/Form'
@@ -33,12 +36,13 @@ export default function AnonModal({
   }, [opener.isOpen])
 
   const { validatedAddress, isStarknetAddress, isEthereumAddress } = useValidateWalletAddress(inputAddress)
-  const isYou = useIsMyAccount(validatedAddress)
-  const canSubmit = (isStarknetAddress && !isYou)
+  const { isDeployed, isControllerAccount, isKatanaAccount } = useControllerAccount(validatedAddress)
+  const { isMyAccount, myAcountAddress } = useIsMyAccount(validatedAddress)
+  const canSubmit = (isStarknetAddress && !isMyAccount && (isControllerAccount || isKatanaAccount))
 
-  const { dispatchChallengingDuelistId } = usePistolsContext()
-  const hasPact = false
-
+  const { tableId } = useSettings()
+  const { dispatchSelectDuel, dispatchChallengingDuelistId } = usePistolsContext()
+  const { hasPact, pactDuelId } = usePact(tableId, myAcountAddress, validatedAddress)
 
   return (
     <Modal
@@ -74,15 +78,16 @@ export default function AnonModal({
 
                 <Divider />
                 <div className='ModalText'>
-
-                  {isStarknetAddress ?
-                    <>Starknet Address:
-                      <br />
-                      <AddressShort address={validatedAddress} />
-                      <h5 className='Important'>(only Controller accounts supported ATM)</h5>
-                    </>
-                    : isEthereumAddress ? <div>Ethereum wallets not supported yet</div>
-                      : <span className='Inactive'>Need a valid address...</span>
+                  {isStarknetAddress ? <Checked checked={true}>Starknet Address: <AddressShort address={validatedAddress} /></Checked>
+                    : isEthereumAddress ? <Checked checked={false}>Ethereum wallets not supported yet</Checked>
+                      : <Checked loading>Need a valid address...</Checked>
+                  }
+                  <br />
+                  {isControllerAccount ? <Checked checked={true}>Controller Account</Checked>
+                    : isKatanaAccount ? <Checked checked={true}>Katana Account</Checked>
+                      : (isStarknetAddress && isDeployed === false) ? <Checked checked={false}>Undeployed Account</Checked>
+                        : isStarknetAddress ? <Checked checked={false}>Unsupported Account</Checked>
+                          : <></>
                   }
                 </div>
 
@@ -100,14 +105,35 @@ export default function AnonModal({
               <ActionButton fill label='Close' onClick={() => opener.close()} />
             </Col>
             <Col>
-              {isYou ?
-                <ActionButton fill disabled={true} label='Challenge yourself?' onClick={() => {}} />
-                : <ActionButton fill disabled={!isStarknetAddress} label='Challenge for a Duel!' onClick={() => dispatchChallengingDuelistId(validatedAddress)} />
+              {isMyAccount ? <ActionButton fill disabled={true} label='Challenge yourself?' onClick={() => { }} />
+                : hasPact ? <ActionButton fill important label='Existing Challenge' onClick={() => dispatchSelectDuel(pactDuelId)} />
+                  : <ActionButton fill important disabled={!canSubmit} label='Challenge for a Duel!' onClick={() => dispatchChallengingDuelistId(validatedAddress)} />
               }
             </Col>
           </Row>
         </Grid>
       </Modal.Actions>
     </Modal>
+  )
+}
+
+function Checked({
+  loading,
+  checked,
+  children,
+}: {
+  loading?: boolean
+  checked?: boolean
+  children: ReactNode
+}) {
+
+  return (
+    <Breadcrumb size='huge'>
+      {loading && <Icon name='spinner' loading />}
+      {checked == true && <Icon name='check' color='green' />}
+      {checked == false && <Icon name='dont' color='red' />}
+      <Breadcrumb.Divider icon={null} />
+      <Breadcrumb.Section>{children}</Breadcrumb.Section>
+    </Breadcrumb>
   )
 }
