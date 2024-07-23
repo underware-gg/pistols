@@ -66,8 +66,8 @@ mod tests {
         assert(duelist2.name == duelist2_name, 'duelist2_name');
         assert(duelist1.profile_pic_uri == "1", 'duelist1_pic_uri');
         assert(duelist2.profile_pic_uri == "2", 'duelist2_pic_uri');
-        let duelist1: Duelist = tester::execute_update_duelist_id(system, OWNER(), duelist1.duelist_id, 'P1', 1, '11');
-        let duelist2: Duelist = tester::execute_update_duelist_id(system, OTHER(), duelist2.duelist_id, 'P2', 2, '22');
+        let duelist1: Duelist = tester::execute_update_duelist_ID(system, OWNER(), duelist1.duelist_id, 'P1', 1, '11');
+        let duelist2: Duelist = tester::execute_update_duelist_ID(system, OTHER(), duelist2.duelist_id, 'P2', 2, '22');
         assert(duelist1.name != duelist1_name, 'P1');
         assert(duelist2.name != duelist2_name, 'P2');
         assert(duelist1.profile_pic_uri == "11", 'duelist1_pic_uri_AFTER');
@@ -86,7 +86,7 @@ mod tests {
     fn test_update_duelist_not_owner() {
         let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::ADMIN | flags::MINTER | flags::INITIALIZE);
         let duelist: Duelist = tester::execute_mint_duelist(system, OWNER(), 'AAA', 1, '1', Archetype::Undefined);
-        tester::execute_update_duelist_id(system, OTHER(), duelist.duelist_id,'P1', 1, '11');
+        tester::execute_update_duelist_ID(system, OTHER(), duelist.duelist_id,'P1', 1, '11');
     }
 
 }

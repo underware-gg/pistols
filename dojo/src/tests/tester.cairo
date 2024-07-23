@@ -48,32 +48,22 @@ mod tester {
     // https://github.com/starkware-libs/cairo/blob/main/corelib/src/starknet/testing.cairo
     //
 
-    #[inline(always)]
     fn ZERO() -> ContractAddress { starknet::contract_address_const::<0x0>() }
-    #[inline(always)]
     fn OWNER() -> ContractAddress { starknet::contract_address_const::<0x1>() }
-    #[inline(always)]
     fn OTHER() -> ContractAddress { starknet::contract_address_const::<0x2>() }
-    #[inline(always)]
     fn BUMMER() -> ContractAddress { starknet::contract_address_const::<0x3>() }
-    #[inline(always)]
     fn TREASURY() -> ContractAddress { starknet::contract_address_const::<0x444>() }
-    #[inline(always)]
     fn BIG_BOY() -> ContractAddress { starknet::contract_address_const::<0x54f650fb5e1fb61d7b429ae728a365b69e5aff9a559a05de70f606aaea1a243>() }
-    #[inline(always)]
     fn LITTLE_BOY()  -> ContractAddress { starknet::contract_address_const::<0xffff00000000000ee>() }
-    #[inline(always)]
     fn LITTLE_GIRL() -> ContractAddress { starknet::contract_address_const::<0xaaaa00000000000bb>() }
-    #[inline(always)]
     fn FAKE_OWNER_1_1() -> ContractAddress { starknet::contract_address_const::<0x1000000000000000000000000000000001>() }
-    #[inline(always)]
     fn FAKE_OWNER_1_2() -> ContractAddress { starknet::contract_address_const::<0x1000000000000000000000000000000002>() }
-    #[inline(always)]
     fn FAKE_OWNER_2_1() -> ContractAddress { starknet::contract_address_const::<0x2000000000000000000000000000000001>() }
-    #[inline(always)]
     fn FAKE_OWNER_2_2() -> ContractAddress { starknet::contract_address_const::<0x2000000000000000000000000000000002>() }
+    // always owned tokens: 0xffff, 0xaaaa
+    fn OWNED_BY_LITTLE_BOY()-> ContractAddress { starknet::contract_address_const::<0xffff>() }
+    fn OWNED_BY_LITTLE_GIRL() -> ContractAddress { starknet::contract_address_const::<0xaaaa>() }
 
-    #[inline(always)]
     fn ID(address: ContractAddress) -> u128 {
         (DuelistTrait::address_as_id(address))
     }
@@ -283,9 +273,9 @@ mod tester {
         (duelist)
     }
     fn execute_update_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: u8, profile_pic_uri: felt252) -> Duelist {
-        (execute_update_duelist_id(system, sender, ID(sender), name, profile_pic_type, profile_pic_uri))
+        (execute_update_duelist_ID(system, sender, ID(sender), name, profile_pic_type, profile_pic_uri))
     }
-    fn execute_update_duelist_id(system: IActionsDispatcher, sender: ContractAddress, duelist_id: u128, name: felt252, profile_pic_type: u8, profile_pic_uri: felt252) -> Duelist {
+    fn execute_update_duelist_ID(system: IActionsDispatcher, sender: ContractAddress, duelist_id: u128, name: felt252, profile_pic_type: u8, profile_pic_uri: felt252) -> Duelist {
         impersonate(sender);
         let duelist: Duelist = system.update_duelist(duelist_id, name, profile_pic_type, profile_pic_uri);
         _next_block();
@@ -298,8 +288,18 @@ mod tester {
         wager_value: u128,
         expire_hours: u64,
     ) -> u128 {
+        (execute_create_challenge_ID(system, sender, ID(sender), challenged, message, table_id, wager_value, expire_hours))
+    }
+    fn execute_create_challenge_ID(system: IActionsDispatcher, sender: ContractAddress,
+        token_id: u128,
+        challenged: ContractAddress,
+        message: felt252,
+        table_id: felt252,
+        wager_value: u128,
+        expire_hours: u64,
+    ) -> u128 {
         impersonate(sender);
-        let duel_id: u128 = system.create_challenge(ID(sender), challenged, message, table_id, wager_value, expire_hours);
+        let duel_id: u128 = system.create_challenge(token_id, challenged, message, table_id, wager_value, expire_hours);
         _next_block();
         (duel_id)
     }
@@ -307,14 +307,11 @@ mod tester {
         duel_id: u128,
         accepted: bool,
     ) -> ChallengeState {
-        impersonate(sender);
-        let new_state: ChallengeState = system.reply_challenge(ID(sender), duel_id, accepted);
-        _next_block();
-        (new_state)
+        (execute_reply_challenge_ID(system, sender, ID(sender), duel_id, accepted))
     }
-    fn execute_reply_challenge_id(system: IActionsDispatcher, sender: ContractAddress,
-        duel_id: u128,
+    fn execute_reply_challenge_ID(system: IActionsDispatcher, sender: ContractAddress,
         token_id: u128,
+        duel_id: u128,
         accepted: bool,
     ) -> ChallengeState {
         impersonate(sender);

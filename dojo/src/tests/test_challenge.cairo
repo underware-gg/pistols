@@ -12,7 +12,14 @@ mod tests {
     use pistols::models::table::{tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::utils::timestamp::{timestamp};
-    use pistols::tests::tester::{tester, tester::{flags, ZERO, OWNER, OTHER, BUMMER, TREASURY, BIG_BOY, LITTLE_BOY, ID}};
+    use pistols::tests::tester::{tester,
+        tester::{
+            flags, ID, ZERO,
+            OWNER, OTHER, BUMMER, TREASURY,
+            BIG_BOY, LITTLE_BOY, LITTLE_GIRL,
+            OWNED_BY_LITTLE_BOY, OWNED_BY_LITTLE_GIRL,
+        }
+    };
 
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
@@ -137,34 +144,40 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Invalid challenge', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_reply_invalid() {
         let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
-        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 48);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, 48);
         tester::elapse_timestamp(timestamp::from_days(1));
-        tester::execute_reply_challenge(system, OWNER(), duel_id + 1, true);
+        tester::execute_reply_challenge(system, A, duel_id + 1, true);
     }
 
     #[test]
     #[should_panic(expected:('PISTOLS: Challenge not Awaiting', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_reply_twice() {
         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
-        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 48);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, 48);
         let _ch = tester::get_Challenge(world, duel_id);
         let (_block_number, _timestamp) = tester::elapse_timestamp(timestamp::from_days(3));
-        let new_state: ChallengeState = tester::execute_reply_challenge(system, OTHER(), duel_id, false);
+        let new_state: ChallengeState = tester::execute_reply_challenge(system, B, duel_id, false);
         assert(new_state != ChallengeState::Awaiting, '!awaiting');
-        tester::execute_reply_challenge(system, OTHER(), duel_id, true);
+        tester::execute_reply_challenge(system, B, duel_id, true);
     }
 
     #[test]
-    fn test_challenge_reply_expired() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
-        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 24);
-        let _ch = tester::get_Challenge(world, duel_id);
+    fn test_challenge_reply_expired_id() {
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | 0);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, tables::COMMONERS, 0, 24);
+        let ch = tester::get_Challenge(world, duel_id);
 
-        assert(system.has_pact(TABLE_ID, ID(OTHER()), ID(OWNER())) == true, 'has_pact_yes');
+        assert(system.has_pact(ch.table_id, ID(B), ID(A)) == true, 'has_pact_yes');
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_date(1, 0, 1));
-        let new_state: ChallengeState = tester::execute_reply_challenge(system, OWNER(), duel_id, true);
+        let new_state: ChallengeState = tester::execute_reply_challenge(system, A, duel_id, true);
         assert(new_state == ChallengeState::Expired, 'expired');
-        assert(system.has_pact(TABLE_ID, ID(OTHER()), ID(OWNER())) == false, 'has_pact_no');
+        assert(system.has_pact(ch.table_id, ID(B), ID(A)) == false, 'has_pact_no');
 
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');
@@ -175,27 +188,62 @@ mod tests {
     }
 
     #[test]
+    fn test_challenge_reply_expired_address() {
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | 0);
+        let A: ContractAddress = LITTLE_BOY();
+        let B: ContractAddress = LITTLE_GIRL();
+        let ID_A: ContractAddress = OWNED_BY_LITTLE_BOY();
+        let ID_B: ContractAddress = OWNED_BY_LITTLE_GIRL();
+        let duel_id: u128 = tester::execute_create_challenge_ID(system, A, ID(ID_A), B, MESSAGE_1, tables::COMMONERS, 0, 24);
+        let ch = tester::get_Challenge(world, duel_id);
+        assert(ch.state == ChallengeState::Awaiting.into(), 'state');
+        assert(ch.address_a == A, 'challenger');
+        assert(ch.address_b == B, 'challenged');
+        assert(ch.duelist_id_a == ID(ID_A), 'challenger_id');
+        assert(ch.duelist_id_b == 0, 'challenged_id'); // challenged an address, id is empty
+        assert(system.has_pact(ch.table_id, ID(A), ID(B)) == true, 'has_pact_addr_true');
+        assert(system.has_pact(ch.table_id, ID(ID_A), ID(ID_B)) == false, 'has_pact_id_false');
+        
+        let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_date(1, 0, 1));
+        let new_state: ChallengeState = tester::execute_reply_challenge_ID(system, B, ID(ID_B), duel_id, false);
+        assert(new_state == ChallengeState::Expired, 'expired');
+        let ch = tester::get_Challenge(world, duel_id);
+        assert(ch.state == new_state.into(), 'state');
+        assert(ch.round_number == 0, 'round_number');
+        assert(ch.winner == 0, 'winner');
+        assert(ch.timestamp_start < timestamp, 'timestamp_start');
+        assert(ch.timestamp_end == timestamp, 'timestamp_end');
+        assert(system.has_pact(ch.table_id, ID(A), ID(B)) == false, 'has_pact_addr_false');
+        assert(system.has_pact(ch.table_id, ID(ID_A), ID(ID_B)) == false, 'has_pact_id_false_still');
+
+    }
+
+    #[test]
     #[should_panic(expected:('PISTOLS: Reply self', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_owner_accept_self() {
         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
-        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 48);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, 48);
         let _ch = tester::get_Challenge(world, duel_id);
 
         tester::elapse_timestamp(timestamp::from_days(1));
-        tester::execute_reply_challenge(system, OWNER(), duel_id, true);
+        tester::execute_reply_challenge(system, A, duel_id, true);
     }
 
     #[test]
     fn test_challenge_owner_cancel() {
         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
-        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 48);
-        let _ch = tester::get_Challenge(world, duel_id);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, 48);
+        let ch = tester::get_Challenge(world, duel_id);
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
 
-        assert(system.has_pact(TABLE_ID, ID(OTHER()), ID(OWNER())) == true, 'has_pact_yes');
-        let new_state: ChallengeState = tester::execute_reply_challenge(system, OWNER(), duel_id, false);
+        assert(system.has_pact(ch.table_id, ID(B), ID(A)) == true, 'has_pact_yes');
+        let new_state: ChallengeState = tester::execute_reply_challenge(system, A, duel_id, false);
         assert(new_state == ChallengeState::Withdrawn, 'canceled');
-        assert(system.has_pact(TABLE_ID, ID(OWNER()), ID(OTHER())) == false, 'has_pact_no');
+        assert(system.has_pact(ch.table_id, ID(A), ID(B)) == false, 'has_pact_no');
 
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');
@@ -209,29 +257,73 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Not your challenge', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_impersonator() {
         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
-        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 48);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, 48);
         let _ch = tester::get_Challenge(world, duel_id);
         let (_block_number, _timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
         tester::execute_reply_challenge(system, BUMMER(), duel_id, false);
     }
 
     #[test]
-    fn test_challenge_other_refuse() {
+    fn test_challenge_other_refuse_duelist() {
         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
-        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 48);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, 48);
+        let ch = tester::get_Challenge(world, duel_id);
+        assert(ch.state == ChallengeState::Awaiting.into(), 'state');
+        assert(ch.address_a == A, 'challenger');
+        assert(ch.address_b == ZERO(), 'challenged');
+        assert(ch.duelist_id_a == ID(A), 'challenger_id');
+        assert(ch.duelist_id_b == ID(B), 'challenged_id'); // challenged an address, id is empty
+        assert(system.has_pact(ch.table_id, ID(B), ID(A)) == true, 'has_pact_yes');
 
-        assert(system.has_pact(TABLE_ID, ID(OTHER()), ID(OWNER())) == true, 'has_pact_yes');
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
-        let new_state: ChallengeState = tester::execute_reply_challenge(system, OTHER(), duel_id, false);
+        let new_state: ChallengeState = tester::execute_reply_challenge(system, B, duel_id, false);
         assert(new_state == ChallengeState::Refused, 'refused');
-        assert(system.has_pact(TABLE_ID, ID(OTHER()), ID(OWNER())) == false, 'has_pact_no');
-
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == new_state.into(), 'state');
         assert(ch.round_number == 0, 'round_number');
         assert(ch.winner == 0, 'winner');
         assert(ch.timestamp_start < timestamp, 'timestamp_start');
         assert(ch.timestamp_end == timestamp, 'timestamp_end');
+        assert(system.has_pact(ch.table_id, ID(B), ID(A)) == false, 'has_pact_no');
+    }
+
+    #[test]
+    fn test_challenge_other_refuse_address() {
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | 0);
+        let A: ContractAddress = LITTLE_BOY();
+        let B: ContractAddress = LITTLE_GIRL();
+        let ID_A: ContractAddress = OWNED_BY_LITTLE_BOY();
+        let ID_B: ContractAddress = OWNED_BY_LITTLE_GIRL();
+        let duel_id: u128 = tester::execute_create_challenge_ID(system, A, ID(ID_A), B, MESSAGE_1, tables::COMMONERS, 0, 48);
+
+        let ch = tester::get_Challenge(world, duel_id);
+// ch.address_a.print();
+// ch.address_b.print();
+// ch.duelist_id_a.print();
+// ch.duelist_id_b.print();
+        assert(ch.state == ChallengeState::Awaiting.into(), 'state');
+        assert(ch.address_a == A, 'challenger');
+        assert(ch.address_b == B, 'challenged');
+        assert(ch.duelist_id_a == ID(ID_A), 'challenger_id');
+        assert(ch.duelist_id_b == 0, 'challenged_id'); // challenged an address, id is empty
+        assert(system.has_pact(ch.table_id, ID(A), ID(B)) == true, 'has_pact_addr_true');
+        assert(system.has_pact(ch.table_id, ID(ID_A), ID(ID_B)) == false, 'has_pact_id_false');
+
+        let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
+        let new_state: ChallengeState = tester::execute_reply_challenge_ID(system, B, ID(ID_B), duel_id, false);
+        assert(new_state == ChallengeState::Refused, 'refused');
+        let ch = tester::get_Challenge(world, duel_id);
+        assert(ch.state == new_state.into(), 'state');
+        assert(ch.round_number == 0, 'round_number');
+        assert(ch.winner == 0, 'winner');
+        assert(ch.timestamp_start < timestamp, 'timestamp_start');
+        assert(ch.timestamp_end == timestamp, 'timestamp_end');
+        assert(system.has_pact(ch.table_id, ID(A), ID(B)) == false, 'has_pact_addr_false');
+        assert(system.has_pact(ch.table_id, ID(ID_A), ID(ID_B)) == false, 'has_pact_id_false_still');
     }
 
     //-----------------------------------------
