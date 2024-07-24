@@ -3,7 +3,7 @@ import { Grid, Modal, Breadcrumb, Icon } from 'semantic-ui-react'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { useValidateWalletAddress } from '@/lib/utils/hooks/useValidateWalletAddress'
+import { useValidateWalletAddressOrName } from '@/lib/utils/hooks/useValidateWalletAddress'
 import { useControllerAccount } from '@/lib/dojo/hooks/useController'
 import { useIsMyAccount } from '@/pistols/hooks/useIsMyDuelist'
 import { usePact } from '@/pistols/hooks/usePact'
@@ -36,13 +36,13 @@ export default function AnonModal({
     if (opener.isOpen) setInputAddres('')
   }, [opener.isOpen])
 
-  const { validatedAddress, isStarknetAddress, isEthereumAddress } = useValidateWalletAddress(inputAddress)
+  const { validatedAddress, isStarknetAddress, isEthereumAddress } = useValidateWalletAddressOrName(inputAddress)
   const { isDeployed, isControllerAccount, isKatanaAccount } = useControllerAccount(validatedAddress)
   const { isMyAccount, myAcountAddress } = useIsMyAccount(validatedAddress)
   const canSubmit = (isStarknetAddress && !isMyAccount && (isControllerAccount || isKatanaAccount))
 
   const { starkName } = useStarkName(isStarknetAddress ? validatedAddress : null)
-  const { profilePicture: starkProfilePic } = useStarkProfile(isStarknetAddress ? validatedAddress : null)
+  const { name: profileName, profilePicture: starkProfilePic } = useStarkProfile(isStarknetAddress ? validatedAddress : null)
 
   const { tableId } = useSettings()
   const { dispatchSelectDuel, dispatchChallengingDuelistId } = usePistolsContext()
@@ -87,9 +87,9 @@ export default function AnonModal({
                       : <Checked loading>Need a valid address...</Checked>
                   }
 
-                  {starkName &&<>
+                  {(starkName || profileName) &&<>
                     <br />
-                    <Checked checked={true}>Starknet Name: <span className='Important'>{starkName}</span></Checked>
+                    <Checked checked={true}>Starknet Name: <span className='Important'>{starkName ?? profileName}</span></Checked>
                   </>}
 
                   <br />

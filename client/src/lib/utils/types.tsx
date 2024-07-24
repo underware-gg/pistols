@@ -38,7 +38,8 @@ export const shortAddress = (address: string | null) => (
 //
 // arrays
 //
-export const arrayUnique = (array: any[]) => array.filter((value, index, array) => (array.indexOf(value) === index))
+export const arrayUnique = (array: any[]) => array?.filter((value, index, array) => (array.indexOf(value) === index))
+export const arrayLast = (array: any[]) => array?.slice(-1)[0]
 
 //
 // dictionaries
