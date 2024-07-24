@@ -131,16 +131,24 @@ export const FilterButton = ({
   label,
   toggle = true,
   state = false,
+  grouped = false,
   switchState,
 }: {
   label: string
   toggle?: boolean
   state?: boolean
+  grouped?: boolean
   switchState: Function
 }) => {
+  const classNames = useMemo(() => {
+    let classNames = ['FilterButton']
+    if (!grouped) classNames.push('FilterButtonMargin')
+    return classNames
+  }, [grouped])
+  
   return (
     <Button
-      className='FilterButton'
+      className={classNames.join(' ')}
       toggle={toggle}
       active={state}
       onClick={() => switchState()}

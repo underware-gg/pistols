@@ -74,7 +74,7 @@ export const useStarkProfile = (address: BigNumberish): StarkProfile => {
         // https://docs.starknet.id/devs/starknetidjs
         const starknetIdNavigator = new StarknetIdNavigator(provider, constants.StarknetChainId.SN_MAIN);
         const result = await starknetIdNavigator.getProfileData(bigintToHex(address ?? 0), false);
-        console.log(`PROFILE:`, result)
+        // console.log(`PROFILE:`, result)
         if (_mounted) {
           setStarkProfile(result)
         }

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid, Menu, Label, Tab, TabPane } from 'semantic-ui-react'
+import { QueryProvider } from '@/pistols/hooks/QueryContext'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
@@ -99,7 +100,7 @@ export function TavernMenu({
   }
 
   return (
-    <div>
+    <QueryProvider>
       <Grid>
         <Row className='ProfilePicHeight Unselectable'>
           <Col width={7} verticalAlign='top' className='TitleCase NoBreak Padded Relative'>
@@ -128,6 +129,6 @@ export function TavernMenu({
 
         <Tab activeIndex={menuIndex} menu={{ secondary: true, pointing: true, attached: true }} panes={panes} />
       </div>
-    </div>
+    </QueryProvider>
   )
 }

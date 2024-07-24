@@ -9,6 +9,7 @@ $color-bg: #000; //#1e1e1e;
 $color-darkest: #201a18;
 $color-dark: #584f49;
 $color-medium: #ef9758;
+$color-medium-bg: #ce6f2c;
 $color-bright: #c8b6a8;
 $color-brightest: #efe1d7;
 
@@ -587,9 +588,12 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 .FilterButton {
-  margin: 0 0.5em!important;
   padding: 0 0.5em!important;
   min-height: 20px!important;
+  font-size: 0.9rem!important;
+}
+.FilterButtonMargin {
+  margin: 0 0 0 0.5em!important;
 }
 
 .Locked {
@@ -1039,15 +1043,15 @@ $logo-url: '/logos/logo_avante.svg';
 //
 ._round_border {
   border: $border-button!important;
-  border-radius: 0.5em!important;
+  // border-radius: 0.5em!important;
 }
 ._round_border_active {
   border: $border-button-active!important;
-  border-radius: 0.5em!important;
+  // border-radius: 0.5em!important;
 }
 ._round_border_inactive {
   border: $border-button-inactive!important;
-  border-radius: 0.5em!important;
+  // border-radius: 0.5em!important;
 }
 // 
 // <Input>
@@ -1178,7 +1182,7 @@ input::placeholder {
 .ui.button.toggle.active,
 .ui.buttons .button.toggle.active,
 .ui.toggle.buttons .active.button {
-  background-color: $color-important!important;
+  background-color: $color-medium-bg!important;
 }
 .ui.button.toggle.active:hover {
   background-color: $color-important!important; // default is green
@@ -1282,7 +1286,7 @@ $table-bg-color: rgba($color-darkest, 0.6);
 }
 .ui.sortable.table thead th.sorted,
 .ui.sortable.table thead th:hover {
-  background-color: rgba($color-medium, 1);
+  background-color: rgba($color-medium-bg, 1);
 }
 .ui.attached.table {
   border: 0.5px solid $color-shadow;

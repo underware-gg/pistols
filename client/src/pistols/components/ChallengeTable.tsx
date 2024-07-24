@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
+import { ButtonGroup, Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useAllChallengeIds, useChallengeIdsByDuelistId, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
@@ -103,7 +103,6 @@ function ChallengeTableByIds({
   const filters = useMemo(() => {
     let result = []
     if (states.length > 0) {
-      result.push(<FilterButton key={'none'} label='All' state={false} switchState={() => setStateToggles(_statesToToggles(true))} />)
       states.forEach(state => {
         const _switch = () => {
           setStateToggles({
@@ -111,16 +110,23 @@ function ChallengeTableByIds({
             [state]: !stateToggles[state],
           })
         }
-        result.push(<FilterButton key={state} label={ChallengeStateNames[state]} state={stateToggles[state]} switchState={() => _switch()} />)
+        result.push(<FilterButton key={state} grouped={result.length > 0} label={ChallengeStateNames[state]} state={stateToggles[state]} switchState={() => _switch()} />)
       })
-      result.push(<FilterButton key={'clear'} label='Clear' state={false} switchState={() => setStateToggles(_statesToToggles(false))} />)
     }
     return result
   }, [states, stateToggles])
 
   return (
     <>
-      {filters.length > 0 && <div>{filters}</div>}
+      {filters.length > 0 &&
+        <div>
+          <FilterButton label='All' state={false} switchState={() => setStateToggles(_statesToToggles(true))} />
+          <ButtonGroup>
+            {filters}
+          </ButtonGroup>
+          <FilterButton label='Clear' state={false} switchState={() => setStateToggles(_statesToToggles(false))} />
+        </div>
+      }
 
       <Table sortable selectable className='Faded' color={color as SemanticCOLORS}>
         <Table.Header className='TableHeader'>

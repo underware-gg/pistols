@@ -66,7 +66,6 @@ export const initialState = {
   menuKey: MenuKey.Duelists,
   accountMenuKey: AccountMenuKey.Profile,
   sceneName: SceneName.Splash,
-  duelistsFilter: '',
   duelistsAnon: true,
   // injected
   connectOpener: null as Opener,
@@ -82,7 +81,6 @@ const PistolsActions = {
   SELECT_DUEL: 'SELECT_DUEL',
   SELECT_DUELIST_ID: 'SELECT_DUELIST_ID',
   SELECT_CHALLENGING_ID: 'SELECT_CHALLENGING_ID',
-  SELECT_DUELISTS_FILTER: 'SELECT_DUELISTS_FILTER',
   SELECT_DUELISTS_ANON: 'SELECT_DUELISTS_ANON',
 }
 
@@ -100,7 +98,6 @@ type ActionType =
   | { type: 'SELECT_DUEL', payload: bigint }
   | { type: 'SELECT_DUELIST_ID', payload: bigint }
   | { type: 'SELECT_CHALLENGING_ID', payload: bigint }
-  | { type: 'SELECT_DUELISTS_FILTER', payload: string }
   | { type: 'SELECT_DUELISTS_ANON', payload: boolean }
 
 
@@ -168,10 +165,6 @@ const PistolsProvider = ({
         newState.selectedDuelId = 0n
         newState.selectedDuelistId = 0n
         newState.challengingId = action.payload as bigint
-        break
-      }
-      case PistolsActions.SELECT_DUELISTS_FILTER: {
-        newState.duelistsFilter = action.payload as string
         break
       }
       case PistolsActions.SELECT_DUELISTS_ANON: {
@@ -248,12 +241,6 @@ export const usePistolsContext = () => {
       payload: BigInt(newId),
     })
   }
-  const dispatchDuelistsFilter = (newFilter: string) => {
-    dispatch({
-      type: PistolsActions.SELECT_DUELISTS_FILTER,
-      payload: newFilter,
-    })
-  }
   const dispatchDuelistsAnon = (newAnon: boolean) => {
     dispatch({
       type: PistolsActions.SELECT_DUELISTS_ANON,
@@ -284,7 +271,6 @@ export const usePistolsContext = () => {
     dispatchSelectDuel,
     dispatchSelectDuelistId,
     dispatchChallengingDuelistId,
-    dispatchDuelistsFilter,
     dispatchDuelistsAnon,
   }
 }

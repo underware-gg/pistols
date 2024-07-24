@@ -4,7 +4,6 @@ import { useDojoComponents, useDojoConstants } from '@/lib/dojo/DojoContext'
 import { bigintToEntity, isPositiveBigint } from '@/lib/utils/types'
 import { feltToString } from "@/lib/utils/starknet"
 import { useEntityKeys } from '@/lib/dojo/hooks/useEntityKeys'
-import { Archetype, ArchetypeNames } from '@/pistols/utils/pistols'
 import { BigNumberish } from 'starknet'
 import { useScore } from './useScore'
 
@@ -33,7 +32,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
 
   const { Duelist } = useDojoComponents()
   const duelist: any = useComponentValue(Duelist, bigintToEntity(duelist_id ?? 0n))
-  // console.log(`Duelist`, address, bigintToEntity(address ?? 0n), duelist)
+  // console.log(`Duelist`, duelist_id, bigintToEntity(duelist_id ?? 0n), duelist)
 
   const name = useMemo(() => duelist?.name ? feltToString(duelist.name) : null, [duelist])
   const nameDisplay = useMemo(() => (`${name || 'Duelist'} #${isValidDuelistId ? duelist_id : '?'}`), [name, duelist_id])

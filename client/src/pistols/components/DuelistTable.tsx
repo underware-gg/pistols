@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { Grid, Table } from 'semantic-ui-react'
+import React, { useMemo } from 'react'
+import { ButtonGroup, Grid, Table } from 'semantic-ui-react'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useAllDuelistKeys, useDuelist } from '@/pistols/hooks/useDuelist'
+import { useQueryContext, DuelistColumn, SortDirection } from '@/pistols/hooks/QueryContext'
+import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useTable } from '@/pistols/hooks/useTable'
 import { useScoreboard } from '@/pistols/hooks/useScore'
@@ -11,65 +12,47 @@ import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { LordsBagIcon } from '@/pistols/components/account/Balance'
 import { FilterButton } from '@/pistols/components/ui/Buttons'
 import { EMOJI } from '@/pistols/data/messages'
-import { BigNumberish } from 'starknet'
-import AnonModal from './AnonModal'
+import AnonModal from '@/pistols/components/AnonModal'
 
 const Row = Grid.Row
 const Col = Grid.Column
 const Cell = Table.Cell
 const HeaderCell = Table.HeaderCell
 
-enum DuelistColumn {
-  Name = 'Name',
-  Honour = 'Honour',
-  Level = 'Level',
-  Wins = 'Wins',
-  Losses = 'Losses',
-  Draws = 'Draws',
-  Total = 'Total',
-  WinRatio = 'WinRatio',
-  Balance = 'Balance',
-}
-enum SortDirection {
-  Ascending = 'ascending',
-  Descending = 'descending',
-}
-enum Filters {
-  Global = 'global',
-  Table = 'table',
-}
-
 export function DuelistTable() {
   const { tableId } = useSettings()
-  const { duelistKeys } = useAllDuelistKeys()
   const {
-    duelistsFilter, duelistsAnon, 
-    dispatchSelectDuelistId, dispatchDuelistsFilter, dispatchDuelistsAnon
+    duelistsAnon, 
+    dispatchSelectDuelistId, dispatchDuelistsAnon
   } = usePistolsContext()
   const anonOpener = useOpener()
 
-  // Filters
-  const _tableId = useMemo(() => (duelistsFilter == Filters.Table ? tableId : null), [tableId, duelistsFilter])
-  const { canWager } = useTable(_tableId)
+  // query
+  const {
+    queryDuelists,
+    filterDuelistTable,
+    filterDuelistActive,
+    filterDuelistSortColumn: sortColumn,
+    filterDuelistSortDirection: sortDirection,
+    dispatchFilterDuelistTable,
+    dispatchFilterDuelistSortColumn,
+    dispatchFilterDuelistSortDirection,
+    dispatchFilterDuelistSortSwitch,
+    dispatchFilterDuelistActive,
+  } = useQueryContext()
 
-  // Sort
-  const [sortColumn, setSortColumn] = useState(DuelistColumn.Honour)
-  const [sortDirection, setSortDirection] = useState(SortDirection.Descending)
   const _sortBy = (column: DuelistColumn) => {
     if (column == sortColumn) {
-      setSortDirection(sortDirection == SortDirection.Ascending ? SortDirection.Descending : SortDirection.Ascending)
+      dispatchFilterDuelistSortSwitch()
     } else {
-      setSortColumn(column)
-      setSortDirection(column == DuelistColumn.Name ? SortDirection.Ascending : SortDirection.Descending)
+      dispatchFilterDuelistSortColumn(column)
+      dispatchFilterDuelistSortDirection(column == DuelistColumn.Name ? SortDirection.Ascending : SortDirection.Descending)
     }
   }
 
-  // callback to store each Duelist data for sorting
-  const [duelistsData, setDuelistsData] = useState({})
-  const _dataCallback = (address: bigint, data: any) => {
-    // this pattern can handle simultaneous state set
-    setDuelistsData(o => ({ ...o, [address.toString()]: data }))
-  }
+  // Filters
+  const currentTableId = useMemo(() => (filterDuelistTable ? tableId : null), [tableId, filterDuelistTable])
+  const { canWager } = useTable(currentTableId)
 
   const _selectCallback = (duelistId: bigint) => {
     if (duelistId) {
@@ -79,60 +62,33 @@ export function DuelistTable() {
     }
   }
 
-  const rows = useMemo(() => {
+  const duelists = useMemo(() => {
     let result = []
-    duelistKeys.forEach((duelistId) => {
-      result.push(<DuelistItem key={duelistId}
-        tableId={_tableId}
-        duelistId={duelistId}
+    queryDuelists.forEach((row) => {
+      result.push(<DuelistItem key={row.duelist_id}
+        tableId={currentTableId}
+        duelistId={row.duelist_id}
         sortColumn={sortColumn}
-        dataCallback={_dataCallback}
         selectCallback={_selectCallback}
         canWager={canWager}
       />)
     })
     return result
-  }, [_tableId, duelistKeys, sortColumn, canWager])
+  }, [queryDuelists, currentTableId, sortColumn, canWager])
 
-  // Sort rows
-  const sortedRows = useMemo(() => rows.sort((a, b) => {
-    const dataA = duelistsData[a.props.duelistId]
-    const dataB = duelistsData[b.props.duelistId]
-    if (!dataA && !dataB) return 0
-    if (!dataA) return 1
-    if (!dataB) return -1
-    // Sort by names, or both rookies
-    const isAscending = (sortDirection == SortDirection.Ascending)
-    if (sortColumn == DuelistColumn.Name || (dataA.isRookie && dataB.isRookie)) {
-      return isAscending ? dataA.nameDisplay.localeCompare(dataB.nameDisplay) : dataB.nameDisplay.localeCompare(dataA.nameDisplay)
-    }
-    // Rookies at the bottom
-    if (dataA.isRookie) return 1
-    if (dataB.isRookie) return -1
-    // Sort by values
-    const _sortTotals = (a, b) => (!isAscending ? (b - a) : (a && !b) ? -1 : (!a && b) ? 1 : (a - b))
-    if (sortColumn == DuelistColumn.Honour) return _sortTotals(dataA.honour, dataB.honour)
-    if (sortColumn == DuelistColumn.Level) return _sortTotals(dataA.level, dataB.level)
-    if (sortColumn == DuelistColumn.Wins) return _sortTotals(dataA.total_wins, dataB.total_wins)
-    if (sortColumn == DuelistColumn.Losses) return _sortTotals(dataA.total_losses, dataB.total_losses)
-    if (sortColumn == DuelistColumn.Draws) return _sortTotals(dataA.total_draws, dataB.total_draws)
-    if (sortColumn == DuelistColumn.Total) return _sortTotals(dataA.total_duels, dataB.total_duels)
-    if (sortColumn == DuelistColumn.WinRatio) return _sortTotals(dataA.winRatio, dataB.winRatio)
-    if (sortColumn == DuelistColumn.Balance) return _sortTotals(dataA.balanceSort, dataB.balanceSort)
-    return 0
-  }), [rows, duelistsData, sortColumn, sortDirection])
-
-  const isEmpty = (sortedRows.length == 0)
+  const isEmpty = (duelists.length == 0)
 
   return (
     <>
       <Grid>
         <Row columns={'equal'}>
           <Col textAlign='left'>
-            <FilterButton label='Global' state={!duelistsFilter || duelistsFilter == Filters.Global} switchState={() => dispatchDuelistsFilter(Filters.Global)} />
-            <FilterButton label='Current Table' state={duelistsFilter == Filters.Table} switchState={() => dispatchDuelistsFilter(Filters.Table)} />
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <FilterButton label='Display Wallets' state={duelistsAnon} switchState={() => dispatchDuelistsAnon(!duelistsAnon)} />
+            <ButtonGroup>
+              <FilterButton label='Global' state={!filterDuelistTable} switchState={() => dispatchFilterDuelistTable(false)} />
+              <FilterButton grouped label='Current Table' state={filterDuelistTable} switchState={() => dispatchFilterDuelistTable(true)} />
+            </ButtonGroup>
+            <FilterButton label='Active Only' state={filterDuelistActive} switchState={() => dispatchFilterDuelistActive(!filterDuelistActive)} />
+            <FilterButton label='Wallets' state={duelistsAnon} switchState={() => dispatchDuelistsAnon(!duelistsAnon)} />
           </Col>
         </Row>
       </Grid>
@@ -158,14 +114,13 @@ export function DuelistTable() {
         {!isEmpty ?
           <Table.Body className='TableBody'>
             {duelistsAnon && <DuelistItem
-              tableId={_tableId}
+              tableId={currentTableId}
               duelistId={0n}
               sortColumn={sortColumn}
-              dataCallback={undefined}
               selectCallback={_selectCallback}
               canWager={canWager}
             />}
-            {sortedRows}
+            {duelists}
           </Table.Body>
           :
           <Table.Footer fullWidth>
@@ -188,24 +143,22 @@ function DuelistItem({
   tableId,
   duelistId,
   sortColumn,
-  dataCallback,
   selectCallback,
   canWager,
 }: {
   tableId: string
   duelistId: bigint
   sortColumn: DuelistColumn
-  dataCallback: Function
   selectCallback: Function
   canWager: boolean
 }) {
 // duelist
   const duelistData = useDuelist(duelistId)
-  const { nameDisplay, profilePic, score: duelistScore } = duelistData
+  const { profilePic, score: duelistScore } = duelistData
 
   // scoreboard
   const scoreboard = useScoreboard(tableId, duelistId)
-  const { balance, balanceFormatted, score: scoreboardScore } = scoreboard
+  const { balanceFormatted, score: scoreboardScore } = scoreboard
 
   // score switcher
   const score = (tableId ? scoreboardScore : duelistScore)
@@ -214,20 +167,6 @@ function DuelistItem({
     honourDisplay, levelDisplay, winRatio,
   } = score
   const isRookie = (total_duels == 0)
-
-  useEffect(() => {
-    if (duelistId && duelistData) {
-      dataCallback?.(duelistId, {
-        nameDisplay,
-        profilePic,
-        balance,
-        balanceFormatted,
-        balanceSort: balance === 0 ? -9999999999999 : balance,
-        isRookie,
-        ...score,
-      })
-    }
-  }, [duelistId, duelistData, scoreboard, score, isRookie])
 
   const _colClass = (col: DuelistColumn) => (sortColumn == col ? 'Important' : null)
 
