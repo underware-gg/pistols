@@ -2,8 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { ButtonGroup, Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { useQueryContext } from '@/pistols/hooks/QueryContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import { useWager } from '@/pistols/hooks/useWager'
 import { AllChallengeStates, ChallengeState, ChallengeStateClasses, ChallengeStateNames } from '@/pistols/utils/pistols'
@@ -12,9 +13,9 @@ import { ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { DuelIconsAsRow } from '@/pistols/components/DuelIcons'
 import { FilterButton } from '@/pistols/components/ui/Buttons'
+import { FilterDuelistName } from '@/pistols/components/DuelistTable'
 import { Balance } from '@/pistols/components/account/Balance'
 import { arrayRemoveValue, bigintEquals } from '@/lib/utils/types'
-import { useQueryContext } from '../hooks/QueryContext'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -39,7 +40,7 @@ export function ChallengeTablePast() {
 
 export function ChallengeTableYour() {
   const {
-    queryYourDuels: {challengeIds, states },
+    queryYourDuels: { challengeIds, states },
     filterChallengeYourStates, dispatchFilterChallengeYourStates
   } = useQueryContext()
   return <ChallengeTableByIds challengeIds={challengeIds} compact existingStates={states} states={filterChallengeYourStates} setStates={dispatchFilterChallengeYourStates} />
@@ -77,13 +78,15 @@ function ChallengeTableByIds({
   states: ChallengeState[]
   setStates: (states: ChallengeState[]) => void
 }) {
+  const { filterDuelistName } = useQueryContext()
+
   const rows = useMemo(() => {
     let result = []
     challengeIds.forEach((duelId, index) => {
-      result.push(<DuelItem key={duelId} duelId={duelId} compact={compact} />)
+      result.push(<DuelItem key={duelId} duelId={duelId} compact={compact} nameFilter={filterDuelistName} />)
     })
     return result
-  }, [challengeIds])
+  }, [challengeIds, compact, filterDuelistName])
 
   const filters = useMemo(() => {
     let result = []
@@ -98,7 +101,8 @@ function ChallengeTableByIds({
       }
       result.push(
         <FilterButton key={state}
-          grouped={result.length > 0}
+          // grouped={result.length > 0}
+          grouped
           label={ChallengeStateNames[state]}
           state={states.includes(state)}
           onClick={() => _switch()}
@@ -111,11 +115,12 @@ function ChallengeTableByIds({
     <>
       {filters.length > 0 &&
         <div>
-          <FilterButton icon='add' state={false} onClick={() => setStates(AllChallengeStates)} />
           <ButtonGroup>
+            <FilterButton icon='add' state={false} onClick={() => setStates(AllChallengeStates)} />
             {filters}
+            <FilterButton grouped icon='close' state={false} onClick={() => setStates([])} />
           </ButtonGroup>
-          <FilterButton icon='close' state={false} onClick={() => setStates([])} />
+          <FilterDuelistName />
         </div>
       }
 
@@ -152,7 +157,12 @@ function ChallengeTableByIds({
 
 function DuelItem({
   duelId,
+  nameFilter = '',
   compact = false,
+}: {
+  duelId: bigint
+  nameFilter?: string
+  compact?: boolean
 }) {
   const { duelistId } = useSettings()
   const {
@@ -160,8 +170,8 @@ function DuelItem({
     turnA, turnB,
   } = useDuel(duelId)
   const { value } = useWager(duelId)
-  const { profilePic: profilePicA } = useDuelist(duelistIdA)
-  const { profilePic: profilePicB } = useDuelist(duelistIdB)
+  const { name: nameA, profilePic: profilePicA } = useDuelist(duelistIdA)
+  const { name: nameB, profilePic: profilePicB } = useDuelist(duelistIdB)
 
   const winnerIsA = useMemo(() => (winner == 1), [winner])
   const winnerIsB = useMemo(() => (winner == 2), [winner])
@@ -173,6 +183,14 @@ function DuelItem({
 
   const _gotoChallenge = () => {
     dispatchSelectDuel(duelId)
+  }
+
+  if (nameFilter) {
+    const isA = nameA ? nameA.toLowerCase().includes(nameFilter) : false
+    const isB = nameB ? nameB.toLowerCase().includes(nameFilter) : false
+    if (!isA && !isB) {
+      return <></>
+    }
   }
 
   return (

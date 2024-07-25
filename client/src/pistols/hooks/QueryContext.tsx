@@ -163,7 +163,7 @@ const QueryProvider = ({
         break
       }
       case QueryActions.FILTER_DUELIST_NAME: {
-        newState.filterDuelistName = action.payload as string
+        newState.filterDuelistName = (action.payload as string).toLowerCase()
         break
       }
       case QueryActions.FILTER_DUELIST_TABLE: {
@@ -241,7 +241,7 @@ const QueryProvider = ({
         duelist_id,
         duelist,
         // filters
-        name: feltToString(duelist.name),
+        name: feltToString(duelist.name).toLowerCase(),
         score,
         balance,
         win_ratio: calcWinRatio(score.total_duels ?? 0, score.total_wins ?? 0),

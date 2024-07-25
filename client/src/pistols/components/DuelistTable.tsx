@@ -22,7 +22,7 @@ const HeaderCell = Table.HeaderCell
 export function DuelistTable() {
   const { tableId } = useSettings()
   const {
-    duelistsAnon, 
+    duelistsAnon,
     dispatchSelectDuelistId, dispatchDuelistsAnon
   } = usePistolsContext()
   const anonOpener = useOpener()
@@ -82,26 +82,15 @@ export function DuelistTable() {
 
   return (
     <>
-      <Grid>
-        <Row columns={'equal'}>
-          <Col textAlign='left'>
-            <ButtonGroup>
-              <FilterButton label='Global' state={!filterDuelistTable} onClick={() => dispatchFilterDuelistTable(false)} />
-              <FilterButton grouped label='Current Table' state={filterDuelistTable} onClick={() => dispatchFilterDuelistTable(true)} />
-            </ButtonGroup>
-            <FilterButton label='Active Only' state={filterDuelistActive} onClick={() => dispatchFilterDuelistActive(!filterDuelistActive)} />
-            <FilterButton label='Wallets' state={duelistsAnon} onClick={() => dispatchDuelistsAnon(!duelistsAnon)} />
-            <Input id='FilterByName' className='FilterButton' placeholder='Filter by Name' size='mini'
-              value={filterDuelistName}
-              onChange={(e) => dispatchFilterDuelistName(e.target.value)}
-              action={{ icon: 'close', size: 'mini',
-                className: 'FilterButton',
-                onClick: () => dispatchFilterDuelistName('')
-              }}
-            />
-          </Col>
-        </Row>
-      </Grid>
+      <div>
+        <ButtonGroup>
+          <FilterButton label='Global' state={!filterDuelistTable} onClick={() => dispatchFilterDuelistTable(false)} />
+          <FilterButton grouped label='Current Table' state={filterDuelistTable} onClick={() => dispatchFilterDuelistTable(true)} />
+        </ButtonGroup>
+        <FilterButton label='Active Only' state={filterDuelistActive} onClick={() => dispatchFilterDuelistActive(!filterDuelistActive)} />
+        <FilterButton label='Wallets' state={duelistsAnon} onClick={() => dispatchDuelistsAnon(!duelistsAnon)} />
+        <FilterDuelistName />
+      </div>
 
       <Table selectable sortable={!isEmpty} className='Faded' color='orange' style={{ maxWidth: '100%' }}>
         <Table.Header className='TableHeader'>
@@ -148,6 +137,25 @@ export function DuelistTable() {
   )
 }
 
+export function FilterDuelistName() {
+  const {
+    filterDuelistName,
+    dispatchFilterDuelistName,
+  } = useQueryContext()
+  return (
+    <div className='FloatRight'>
+      <Input id='FilterByName' className='FilterButton' placeholder='Filter by Name' size='mini'
+        value={filterDuelistName.toUpperCase()}
+        onChange={(e) => dispatchFilterDuelistName(e.target.value)}
+        action={{
+          icon: 'close', size: 'mini',
+          className: 'FilterButton',
+          onClick: () => dispatchFilterDuelistName('')
+        }}
+      />
+    </div>
+  )
+}
 
 function DuelistItem({
   tableId,
@@ -162,7 +170,7 @@ function DuelistItem({
   selectCallback: Function
   canWager: boolean
 }) {
-// duelist
+  // duelist
   const duelistData = useDuelist(duelistId)
   const { profilePic, score: duelistScore } = duelistData
 

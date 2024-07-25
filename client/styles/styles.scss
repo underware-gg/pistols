@@ -7,7 +7,7 @@ $font-family-mono: 'Courier Prime', monospace;
 // https://www.figma.com/file/eseZA1jRIoX6IYNtoHgz30/Pistols-at-Ten-Blocks
 $color-bg: #000; //#1e1e1e;
 $color-darkest: #201a18;
-$color-dark: #584f49;
+$color-dark: #57493e;
 $color-medium: #ef9758;
 $color-medium-bg: #ce6f2c;
 $color-bright: #c8b6a8;
@@ -188,6 +188,8 @@ canvas {
 .PaddedBottom { padding-bottom: 0.5em!important; }
 
 .Margin6 { margin: 6px!important }
+
+.FloatRight { float:right; }
 
 .Block { display: inline-block; }
 .Flex { display: flex; }
@@ -588,7 +590,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 .FilterButton {
-  padding: 0 0.4em!important;
+  padding: 0 0.35em!important;
   min-height: 20px!important;
   max-height: 20px!important;
   font-size: 1rem!important;
@@ -599,6 +601,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 #FilterByName {
   @extend .FilterButton, .TitleCase;
   margin: 0;
+  width: 120px;
 }
 
 .Locked {
