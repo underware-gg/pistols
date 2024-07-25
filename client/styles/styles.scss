@@ -590,10 +590,15 @@ $box-h: calc((100vh - $aspect-h) / 2);
 .FilterButton {
   padding: 0 0.5em!important;
   min-height: 20px!important;
+  max-height: 20px!important;
   font-size: 0.9rem!important;
 }
 .FilterButtonMargin {
   margin: 0 0 0 0.5em!important;
+}
+#FilterByName {
+  @extend .FilterButton, .TitleCase;
+  margin: 0;
 }
 
 .Locked {
@@ -1086,6 +1091,10 @@ input::placeholder {
   @extend ._round_border_active;
   background-color: $color-dark;
   color: $color-brightest!important;
+}
+.ui.mini.input {
+  @extend .FilterButton;
+  // height: 
 }
 .ui.label {
   @extend ._round_border;

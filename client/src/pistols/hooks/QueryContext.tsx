@@ -229,7 +229,7 @@ const QueryProvider = ({
     // filter by name
     if (state.filterDuelistName) {
       allDuelists.forEach((row, index) => {
-        if (!row.duelist.name.includes(state.filterDuelistName)) excludes.add(index)
+        if (!row.name.includes(state.filterDuelistName)) excludes.add(index)
       })
     }
     //

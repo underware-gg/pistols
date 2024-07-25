@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { ButtonGroup, Grid, Table } from 'semantic-ui-react'
+import { ButtonGroup, Grid, Input, Table } from 'semantic-ui-react'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useQueryContext, DuelistColumn, SortDirection } from '@/pistols/hooks/QueryContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
@@ -30,6 +30,7 @@ export function DuelistTable() {
   // query
   const {
     queryDuelists,
+    filterDuelistName,
     filterDuelistTable,
     filterDuelistActive,
     filterDuelistSortColumn: sortColumn,
@@ -39,6 +40,7 @@ export function DuelistTable() {
     dispatchFilterDuelistSortDirection,
     dispatchFilterDuelistSortSwitch,
     dispatchFilterDuelistActive,
+    dispatchFilterDuelistName,
   } = useQueryContext()
 
   const _sortBy = (column: DuelistColumn) => {
@@ -89,6 +91,14 @@ export function DuelistTable() {
             </ButtonGroup>
             <FilterButton label='Active Only' state={filterDuelistActive} switchState={() => dispatchFilterDuelistActive(!filterDuelistActive)} />
             <FilterButton label='Wallets' state={duelistsAnon} switchState={() => dispatchDuelistsAnon(!duelistsAnon)} />
+            <Input id='FilterByName' className='FilterButton' placeholder='Filter by Name' size='mini'
+              value={filterDuelistName}
+              onChange={(e) => dispatchFilterDuelistName(e.target.value)}
+              action={{ icon: 'close', size: 'mini',
+                className: 'FilterButton',
+                onClick: () => dispatchFilterDuelistName('')
+              }}
+            />
           </Col>
         </Row>
       </Grid>
