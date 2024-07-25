@@ -66,13 +66,13 @@ mod lords_mock {
 
     use pistols::types::constants::{constants};
 
-    use token::components::security::initializable::initializable_component;
+    use origami_token::components::security::initializable::initializable_component;
 
-    use token::components::token::erc20::erc20_metadata::erc20_metadata_component;
-    use token::components::token::erc20::erc20_balance::erc20_balance_component;
-    use token::components::token::erc20::erc20_allowance::erc20_allowance_component;
-    use token::components::token::erc20::erc20_mintable::erc20_mintable_component;
-    // use token::components::token::erc20::erc20_burnable::erc20_burnable_component;
+    use origami_token::components::token::erc20::erc20_metadata::erc20_metadata_component;
+    use origami_token::components::token::erc20::erc20_balance::erc20_balance_component;
+    use origami_token::components::token::erc20::erc20_allowance::erc20_allowance_component;
+    use origami_token::components::token::erc20::erc20_mintable::erc20_mintable_component;
+    // use origami_token::components::token::erc20::erc20_burnable::erc20_burnable_component;
 
     component!(path: initializable_component, storage: initializable, event: InitializableEvent);
     component!(path: erc20_metadata_component, storage: erc20_metadata, event: ERC20MetadataEvent);

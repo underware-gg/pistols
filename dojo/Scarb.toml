@@ -4,6 +4,7 @@ description = "An on-chain pistol duelling game of honour and betrayal."
 icon_uri = "https://pistols.underware.gg/images/logo.png"
 cover_uri = "https://pistols.underware.gg/images/splash.png"
 website = "https://pistols.underware.gg"
+seed = "pistols"
 
 [tool.dojo.world.socials]
 x = "https://x.com/underware_gg"
@@ -13,42 +14,44 @@ github = "https://github.com/underware-gg/pistols"
 
 [package]
 name = "pistols"
-version = "0.9.2"
-cairo-version = "2.6.3"
+version = "0.10.0-0"
+cairo-version = "=2.7.0-rc.3"
 
 [cairo]
 sierra-replace-ids = true
 
 [dependencies]
-dojo = { git = "https://github.com/dojoengine/dojo", tag = "v0.7.2" }
-# token = { git = "https://github.com/dojoengine/origami", tag = "v0.7.2" }
-token = { git = "https://github.com/rsodre/origami", branch = "balance-enumerable" }
+dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.0.0-alpha.3" }
+# origami_token = { git = "https://github.com/dojoengine/origami", tag = "v1.0.0-alpha.0" }
+origami_token = { git = "https://github.com/rsodre/origami", branch = "balance-enumerable" }
 graffiti = { git = "https://github.com/ponderingdemocritus/graffiti", rev = "bc569531791dbc71c6cd8d9bc154c34eedad31fe" }
-
 
 [tool.dojo]
 initializer_class_hash = "0xbeef"
 
+[tool.dojo.world.namespace]
+default = "pistols"
+
 [[target.dojo]]
 build-external-contracts = [
-  "token::components::security::initializable::initializable_model",
-  "token::components::token::erc20::erc20_metadata::erc_20_metadata_model",
-  "token::components::token::erc20::erc20_balance::erc_20_balance_model",
-  "token::components::token::erc20::erc20_allowance::erc_20_allowance_model",
-  "token::components::token::erc20::erc20_mintable::erc_20_mintable_model",
-  "token::components::token::erc20::erc20_burnable::erc_20_burnable_model",
-  "token::components::token::erc20::erc20_bridgeable::erc_20_bridgeable_model",
-  "token::components::introspection::src5::src_5_model",
-  "token::components::token::erc721::erc721_approval::erc_721_operator_approval_model",
-  "token::components::token::erc721::erc721_approval::erc_721_token_approval_model",
-  "token::components::token::erc721::erc721_balance::erc_721_balance_model",
-  "token::components::token::erc721::erc721_enumerable::erc_721_enumerable_index_model",
-  "token::components::token::erc721::erc721_enumerable::erc_721_enumerable_owner_index_model",
-  "token::components::token::erc721::erc721_enumerable::erc_721_enumerable_owner_token_model",
-  "token::components::token::erc721::erc721_enumerable::erc_721_enumerable_token_model",
-  "token::components::token::erc721::erc721_enumerable::erc_721_enumerable_total_model",
-  "token::components::token::erc721::erc721_metadata::erc_721_meta_model",
-  "token::components::token::erc721::erc721_owner::erc_721_owner_model",
+  "origami_token::components::security::initializable::initializable_model",
+  "origami_token::components::token::erc20::erc20_metadata::erc_20_metadata_model",
+  "origami_token::components::token::erc20::erc20_balance::erc_20_balance_model",
+  "origami_token::components::token::erc20::erc20_allowance::erc_20_allowance_model",
+  "origami_token::components::token::erc20::erc20_mintable::erc_20_mintable_model",
+  "origami_token::components::token::erc20::erc20_burnable::erc_20_burnable_model",
+  "origami_token::components::token::erc20::erc20_bridgeable::erc_20_bridgeable_model",
+  "origami_token::components::introspection::src5::src_5_model",
+  "origami_token::components::token::erc721::erc721_approval::erc_721_operator_approval_model",
+  "origami_token::components::token::erc721::erc721_approval::erc_721_token_approval_model",
+  "origami_token::components::token::erc721::erc721_balance::erc_721_balance_model",
+  "origami_token::components::token::erc721::erc721_enumerable::erc_721_enumerable_index_model",
+  "origami_token::components::token::erc721::erc721_enumerable::erc_721_enumerable_owner_index_model",
+  "origami_token::components::token::erc721::erc721_enumerable::erc_721_enumerable_owner_token_model",
+  "origami_token::components::token::erc721::erc721_enumerable::erc_721_enumerable_token_model",
+  "origami_token::components::token::erc721::erc721_enumerable::erc_721_enumerable_total_model",
+  "origami_token::components::token::erc721::erc721_metadata::erc_721_meta_model",
+  "origami_token::components::token::erc721::erc721_owner::erc_721_owner_model",
 ]
 
 [tool.dojo.env]
@@ -90,6 +93,6 @@ skip_migration = ["pistols::mocks::lords_mock::lords_mock"]
 [profile.sepolia.tool.dojo.env]
 # rpc_url = ""          # env: STARKNET_RPC_URL
 world_address = "0x0545c8aff15426c3d43b3ba8fd45c61870b30ca4ec0bfbd69193facee4c7b97c"
+lords_address = "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210"
 # account_address = ""  # env: DOJO_ACCOUNT_ADDRESS
 # private_key = ""      # env: DOJO_PRIVATE_KEY
-lords_address = "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210"

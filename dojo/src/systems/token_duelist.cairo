@@ -98,15 +98,15 @@ mod token_duelist {
     use graffiti::json::JsonImpl;
     use graffiti::{Tag, TagImpl};
 
-    use token::components::security::initializable::initializable_component;
-    use token::components::introspection::src5::src5_component;
-    use token::components::token::erc721::erc721_approval::erc721_approval_component;
-    use token::components::token::erc721::erc721_balance::erc721_balance_component;
-    use token::components::token::erc721::erc721_burnable::erc721_burnable_component;
-    use token::components::token::erc721::erc721_enumerable::erc721_enumerable_component;
-    use token::components::token::erc721::erc721_metadata::erc721_metadata_component;
-    use token::components::token::erc721::erc721_mintable::erc721_mintable_component;
-    use token::components::token::erc721::erc721_owner::erc721_owner_component;
+    use origami_token::components::security::initializable::initializable_component;
+    use origami_token::components::introspection::src5::src5_component;
+    use origami_token::components::token::erc721::erc721_approval::erc721_approval_component;
+    use origami_token::components::token::erc721::erc721_balance::erc721_balance_component;
+    use origami_token::components::token::erc721::erc721_burnable::erc721_burnable_component;
+    use origami_token::components::token::erc721::erc721_enumerable::erc721_enumerable_component;
+    use origami_token::components::token::erc721::erc721_metadata::erc721_metadata_component;
+    use origami_token::components::token::erc721::erc721_mintable::erc721_mintable_component;
+    use origami_token::components::token::erc721::erc721_owner::erc721_owner_component;
 
     component!(path: initializable_component, storage: initializable, event: InitializableEvent);
     component!(path: src5_component, storage: src5, event: SRC5Event);
