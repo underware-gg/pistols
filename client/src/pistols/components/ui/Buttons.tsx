@@ -1,5 +1,5 @@
 import React, { ReactElement, useMemo, useState } from 'react'
-import { Menu, Button, Confirm, SemanticICONS } from 'semantic-ui-react'
+import { Menu, Button, Confirm, SemanticICONS, Icon } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
@@ -129,16 +129,18 @@ export const BalanceRequiredButton = ({
 
 export const FilterButton = ({
   label,
+  icon,
   toggle = true,
   state = false,
   grouped = false,
-  switchState,
+  onClick,
 }: {
-  label: string
+  label?: string
+  icon?: SemanticICONS
   toggle?: boolean
   state?: boolean
   grouped?: boolean
-  switchState: Function
+  onClick: Function
 }) => {
   const classNames = useMemo(() => {
     let classNames = ['FilterButton']
@@ -151,10 +153,10 @@ export const FilterButton = ({
       className={classNames.join(' ')}
       toggle={toggle}
       active={state}
-      onClick={() => switchState()}
+      onClick={() => onClick()}
       size='mini'
     >
-      {label}
+      {icon ? <Icon name={icon} className='NoMargin' /> : <>{label}</>}
     </Button>
   )
 }

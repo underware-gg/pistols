@@ -86,11 +86,11 @@ export function DuelistTable() {
         <Row columns={'equal'}>
           <Col textAlign='left'>
             <ButtonGroup>
-              <FilterButton label='Global' state={!filterDuelistTable} switchState={() => dispatchFilterDuelistTable(false)} />
-              <FilterButton grouped label='Current Table' state={filterDuelistTable} switchState={() => dispatchFilterDuelistTable(true)} />
+              <FilterButton label='Global' state={!filterDuelistTable} onClick={() => dispatchFilterDuelistTable(false)} />
+              <FilterButton grouped label='Current Table' state={filterDuelistTable} onClick={() => dispatchFilterDuelistTable(true)} />
             </ButtonGroup>
-            <FilterButton label='Active Only' state={filterDuelistActive} switchState={() => dispatchFilterDuelistActive(!filterDuelistActive)} />
-            <FilterButton label='Wallets' state={duelistsAnon} switchState={() => dispatchDuelistsAnon(!duelistsAnon)} />
+            <FilterButton label='Active Only' state={filterDuelistActive} onClick={() => dispatchFilterDuelistActive(!filterDuelistActive)} />
+            <FilterButton label='Wallets' state={duelistsAnon} onClick={() => dispatchDuelistsAnon(!duelistsAnon)} />
             <Input id='FilterByName' className='FilterButton' placeholder='Filter by Name' size='mini'
               value={filterDuelistName}
               onChange={(e) => dispatchFilterDuelistName(e.target.value)}

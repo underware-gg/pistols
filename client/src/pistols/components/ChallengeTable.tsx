@@ -13,7 +13,7 @@ import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { DuelIconsAsRow } from '@/pistols/components/DuelIcons'
 import { FilterButton } from '@/pistols/components/ui/Buttons'
 import { Balance } from '@/pistols/components/account/Balance'
-import { bigintEquals } from '@/lib/utils/types'
+import { arrayRemoveValue, bigintEquals } from '@/lib/utils/types'
 import { useQueryContext } from '../hooks/QueryContext'
 
 const Row = Grid.Row
@@ -22,18 +22,27 @@ const Cell = Table.Cell
 const HeaderCell = Table.HeaderCell
 
 export function ChallengeTableLive() {
-  const { queryLiveDuels: { challengeIds, states } } = useQueryContext()
-  return <ChallengeTableByIds challengeIds={challengeIds} color='green' compact states={[...states, ChallengeState.Expired]} />
+  const {
+    queryLiveDuels: { challengeIds, states },
+    filterChallengeLiveStates, dispatchFilterChallengeLiveStates
+  } = useQueryContext()
+  return <ChallengeTableByIds challengeIds={challengeIds} color='green' compact existingStates={states} states={filterChallengeLiveStates} setStates={dispatchFilterChallengeLiveStates} />
 }
 
 export function ChallengeTablePast() {
-  const { queryPastDuels: { challengeIds, states } } = useQueryContext()
-  return <ChallengeTableByIds challengeIds={challengeIds} color='red' compact states={states} />
+  const {
+    queryPastDuels: { challengeIds, states },
+    filterChallengePastStates, dispatchFilterChallengePastStates
+  } = useQueryContext()
+  return <ChallengeTableByIds challengeIds={challengeIds} color='red' compact existingStates={states} states={filterChallengePastStates} setStates={dispatchFilterChallengePastStates} />
 }
 
 export function ChallengeTableYour() {
-  const { queryYourDuels: { challengeIds, states } } = useQueryContext()
-  return <ChallengeTableByIds challengeIds={challengeIds} compact states={states} />
+  const {
+    queryYourDuels: {challengeIds, states },
+    filterChallengeYourStates, dispatchFilterChallengeYourStates
+  } = useQueryContext()
+  return <ChallengeTableByIds challengeIds={challengeIds} compact existingStates={states} states={filterChallengeYourStates} setStates={dispatchFilterChallengeYourStates} />
 }
 
 export function ChallengeTableByDuelist({
@@ -47,8 +56,9 @@ export function ChallengeTableByDuelist({
   compact: boolean
   tableId?: string
 }) {
+  const [statesFilter, setStatesFilter] = useState(AllChallengeStates)
   const { queryYourDuels: { challengeIds, states } } = useQueryContext()
-  return <ChallengeTableByIds challengeIds={challengeIds} compact={compact} states={states} />
+  return <ChallengeTableByIds challengeIds={challengeIds} compact={compact} existingStates={states} states={statesFilter} setStates={setStatesFilter} />
 }
 
 
@@ -56,49 +66,56 @@ function ChallengeTableByIds({
   challengeIds,
   color = 'orange',
   compact = false,
-  states = [],
+  existingStates,
+  states,
+  setStates,
+}: {
+  challengeIds: bigint[]
+  color?: SemanticCOLORS
+  compact?: boolean
+  existingStates: ChallengeState[]
+  states: ChallengeState[]
+  setStates: (states: ChallengeState[]) => void
 }) {
-  const _statesToToggles = (t) => (states.reduce((a, v) => ({ ...a, [v]: t }), {}))
-
-  const [stateToggles, setStateToggles] = useState(_statesToToggles(true))
-  const selectedStates = useMemo(() => (
-    states.length == 0 ? AllChallengeStates
-      : states.reduce((a, v) => ([...a, (stateToggles[v] ? v : null)]), [])
-  ), [states, stateToggles])
-
   const rows = useMemo(() => {
     let result = []
     challengeIds.forEach((duelId, index) => {
-      result.push(<DuelItem key={duelId} duelId={duelId} compact={compact} states={selectedStates} />)
+      result.push(<DuelItem key={duelId} duelId={duelId} compact={compact} />)
     })
     return result
-  }, [challengeIds, selectedStates])
+  }, [challengeIds])
 
   const filters = useMemo(() => {
     let result = []
-    if (states.length > 0) {
-      states.forEach(state => {
-        const _switch = () => {
-          setStateToggles({
-            ...stateToggles,
-            [state]: !stateToggles[state],
-          })
+    AllChallengeStates.forEach(state => {
+      if (!existingStates.includes(state)) return
+      const _switch = () => {
+        if (!states.includes(state)) {
+          setStates([...states, state])
+        } else {
+          setStates(arrayRemoveValue(states, state))
         }
-        result.push(<FilterButton key={state} grouped={result.length > 0} label={ChallengeStateNames[state]} state={stateToggles[state]} switchState={() => _switch()} />)
-      })
-    }
+      }
+      result.push(
+        <FilterButton key={state}
+          grouped={result.length > 0}
+          label={ChallengeStateNames[state]}
+          state={states.includes(state)}
+          onClick={() => _switch()}
+        />)
+    })
     return result
-  }, [states, stateToggles])
+  }, [existingStates, states])
 
   return (
     <>
       {filters.length > 0 &&
         <div>
-          <FilterButton label='All' state={false} switchState={() => setStateToggles(_statesToToggles(true))} />
+          <FilterButton icon='add' state={false} onClick={() => setStates(AllChallengeStates)} />
           <ButtonGroup>
             {filters}
           </ButtonGroup>
-          <FilterButton label='Clear' state={false} switchState={() => setStateToggles(_statesToToggles(false))} />
+          <FilterButton icon='close' state={false} onClick={() => setStates([])} />
         </div>
       }
 
@@ -136,7 +153,6 @@ function ChallengeTableByIds({
 function DuelItem({
   duelId,
   compact = false,
-  states = [],
 }) {
   const { duelistId } = useSettings()
   const {
@@ -157,10 +173,6 @@ function DuelItem({
 
   const _gotoChallenge = () => {
     dispatchSelectDuel(duelId)
-  }
-
-  if (!states.includes(state)) {
-    return <></>
   }
 
   return (
