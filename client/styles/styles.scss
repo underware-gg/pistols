@@ -220,7 +220,7 @@ canvas {
 .Disabled  { color: $color-inactive!important; }
 
 .BgBlack     { background-color: #444; }
-.BgImportant { background-color: $color-important!important; }
+.BgImportant { background-color: $color-medium-bg!important; }
 .BgBrightest { background-color: $color-brightest!important; }
 .BgPositive  { background-color: $color-positive!important; }
 .BgNegative  { background-color: $color-negative!important; }
@@ -588,10 +588,10 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 .FilterButton {
-  padding: 0 0.5em!important;
+  padding: 0 0.4em!important;
   min-height: 20px!important;
   max-height: 20px!important;
-  font-size: 0.9rem!important;
+  font-size: 1rem!important;
 }
 .FilterButtonMargin {
   margin: 0 0 0 0.5em!important;

@@ -1,8 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { ButtonGroup, Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
-import { useAccount } from '@starknet-react/core'
-import { useAllChallengeIds, useChallengeIdsByDuelistId, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
@@ -16,34 +14,26 @@ import { DuelIconsAsRow } from '@/pistols/components/DuelIcons'
 import { FilterButton } from '@/pistols/components/ui/Buttons'
 import { Balance } from '@/pistols/components/account/Balance'
 import { bigintEquals } from '@/lib/utils/types'
+import { useQueryContext } from '../hooks/QueryContext'
 
 const Row = Grid.Row
 const Col = Grid.Column
 const Cell = Table.Cell
 const HeaderCell = Table.HeaderCell
 
-export function ChallengeTableAll() {
-  const { tableId } = useSettings()
-  const { challengeIds } = useAllChallengeIds(tableId)
-  return <ChallengeTableByIds challengeIds={challengeIds} compact />
-}
-
 export function ChallengeTableLive() {
-  const { tableId } = useSettings()
-  const { challengeIds, states } = useLiveChallengeIds(tableId)
+  const { queryLiveDuels: { challengeIds, states } } = useQueryContext()
   return <ChallengeTableByIds challengeIds={challengeIds} color='green' compact states={[...states, ChallengeState.Expired]} />
 }
 
 export function ChallengeTablePast() {
-  const { tableId } = useSettings()
-  const { challengeIds, states } = usePastChallengeIds(tableId)
+  const { queryPastDuels: { challengeIds, states } } = useQueryContext()
   return <ChallengeTableByIds challengeIds={challengeIds} color='red' compact states={states} />
 }
 
 export function ChallengeTableYour() {
-  const { address } = useAccount()
-  const { tableId, duelistId } = useSettings()
-  return <ChallengeTableByDuelist duelistId={duelistId} address={address} compact tableId={tableId} />
+  const { queryYourDuels: { challengeIds, states } } = useQueryContext()
+  return <ChallengeTableByIds challengeIds={challengeIds} compact states={states} />
 }
 
 export function ChallengeTableByDuelist({
@@ -57,8 +47,8 @@ export function ChallengeTableByDuelist({
   compact: boolean
   tableId?: string
 }) {
-  const { challengeIds } = useChallengeIdsByDuelistId(duelistId, address, tableId)
-  return <ChallengeTableByIds challengeIds={challengeIds} compact={compact} states={AllChallengeStates} />
+  const { queryYourDuels: { challengeIds, states } } = useQueryContext()
+  return <ChallengeTableByIds challengeIds={challengeIds} compact={compact} states={states} />
 }
 
 
@@ -68,12 +58,6 @@ function ChallengeTableByIds({
   compact = false,
   states = [],
 }) {
-  const [order, setOrder] = useState({})
-  const _sortCallback = (id, state, timestamp) => {
-    // this pattern can handle simultaneous state set
-    setOrder(o => ({ ...o, [id]: { state, timestamp } }))
-  }
-
   const _statesToToggles = (t) => (states.reduce((a, v) => ({ ...a, [v]: t }), {}))
 
   const [stateToggles, setStateToggles] = useState(_statesToToggles(true))
@@ -85,20 +69,10 @@ function ChallengeTableByIds({
   const rows = useMemo(() => {
     let result = []
     challengeIds.forEach((duelId, index) => {
-      result.push(<DuelItem key={duelId} duelId={duelId} sortCallback={_sortCallback} compact={compact} states={selectedStates} />)
+      result.push(<DuelItem key={duelId} duelId={duelId} compact={compact} states={selectedStates} />)
     })
     return result
   }, [challengeIds, selectedStates])
-
-  const sortedRows = useMemo(() => rows.sort((a, b) => {
-    if (order[a.key]?.state != order[b.key]?.state) {
-      if (order[a.key]?.state == ChallengeState.InProgress) return -1
-      if (order[b.key]?.state == ChallengeState.InProgress) return 1
-      if (order[a.key]?.state == ChallengeState.Awaiting) return -1
-      if (order[b.key]?.state == ChallengeState.Awaiting) return 1
-    }
-    return (order[b.key]?.timestamp ?? 0) - (order[a.key]?.timestamp ?? 0)
-  }), [rows, order])
 
   const filters = useMemo(() => {
     let result = []
@@ -140,9 +114,9 @@ function ChallengeTableByIds({
           </Table.Row>
         </Table.Header>
 
-        {sortedRows.length > 0 ?
+        {rows.length > 0 ?
           <Table.Body className='TableBody'>
-            {sortedRows}
+            {rows}
           </Table.Body>
           :
           <Table.Footer fullWidth>
@@ -161,7 +135,6 @@ function ChallengeTableByIds({
 
 function DuelItem({
   duelId,
-  sortCallback,
   compact = false,
   states = [],
 }) {
@@ -173,10 +146,6 @@ function DuelItem({
   const { value } = useWager(duelId)
   const { profilePic: profilePicA } = useDuelist(duelistIdA)
   const { profilePic: profilePicB } = useDuelist(duelistIdB)
-
-  useEffect(() => {
-    sortCallback(duelId, state, timestamp_start)
-  }, [state, timestamp_start])
 
   const winnerIsA = useMemo(() => (winner == 1), [winner])
   const winnerIsB = useMemo(() => (winner == 2), [winner])

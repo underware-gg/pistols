@@ -1,4 +1,5 @@
 import React from 'react'
+import { QueryProvider } from '@/pistols/hooks/QueryContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { TavernAudios } from '@/pistols/components/GameContainer'
 import { TavernMenu } from '@/pistols/components/TavernMenu'
@@ -12,7 +13,7 @@ export default function Tavern() {
   const { tableOpener } = usePistolsContext()
 
   return (
-    <>
+    <QueryProvider>
       <div className='UIContainerTavern'>
         <TavernMenu />
       </div>
@@ -25,6 +26,6 @@ export default function Tavern() {
 
       <DojoSetupErrorDetector />
       <ConnectionDetector />
-    </>
+    </QueryProvider>
   )
 }

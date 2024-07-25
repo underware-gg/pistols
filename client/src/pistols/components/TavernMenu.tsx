@@ -1,11 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid, Menu, Label, Tab, TabPane } from 'semantic-ui-react'
-import { QueryProvider } from '@/pistols/hooks/QueryContext'
+import { useQueryContext } from '@/pistols/hooks/QueryContext'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
-import { useChallengesByDuelistIdTotals, useLiveChallengeIds } from '@/pistols/hooks/useChallenge'
 import { useTable } from '@/pistols/hooks/useTable'
 import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
 import { IRLTournamentTab } from '@/pistols/components/tournament/IRLTournamentTab'
@@ -36,9 +35,10 @@ export function TavernMenu({
   const { menuKey, tavernMenuItems, tableOpener, dispatchSetMenu } = usePistolsContext()
   const { description, isTournament, isIRLTournament } = useTable(tableId)
 
-  const { liveDuelsCount: yourDuelsCount } = useChallengesByDuelistIdTotals(duelistId, address, tableId)
-  const { challengeIds: liveChallengeIds } = useLiveChallengeIds(tableId)
-  const liveDuelsCount = useMemo(() => (liveChallengeIds.length), [liveChallengeIds])
+  const {
+    queryLiveDuels: { liveCount: liveDuelsCount },
+    queryYourDuels: { liveCount: yourDuelsCount },
+  } = useQueryContext()
 
   // select initial tab
   const [started, setStarted] = useState<boolean>(false)
@@ -100,7 +100,7 @@ export function TavernMenu({
   }
 
   return (
-    <QueryProvider>
+    <>
       <Grid>
         <Row className='ProfilePicHeight Unselectable'>
           <Col width={7} verticalAlign='top' className='TitleCase NoBreak Padded Relative'>
@@ -129,6 +129,6 @@ export function TavernMenu({
 
         <Tab activeIndex={menuIndex} menu={{ secondary: true, pointing: true, attached: true }} panes={panes} />
       </div>
-    </QueryProvider>
+    </>
   )
 }

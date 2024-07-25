@@ -4,7 +4,7 @@ import { Grid, Modal, Dropdown } from 'semantic-ui-react'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDojoConstants } from '@/lib/dojo/DojoContext'
-import { useActiveDuelistIds, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
+import { useActiveDuelistIds } from '@/pistols/hooks/useChallenge'
 import { useERC20TokenName } from '@/lib/utils/hooks/useERC20'
 import { useTable } from '@/pistols/hooks/useTable'
 import { Opener } from '@/lib/ui/useOpener'
@@ -13,6 +13,7 @@ import { Balance } from '@/pistols/components/account/Balance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { getObjectKeyByValue } from '@/lib/utils/types'
 import { makeTavernUrl } from '@/pistols/utils/pistols'
+import { useQueryContext } from '../hooks/QueryContext'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -113,9 +114,16 @@ function TableDescription({
     tableType,
   } = useTable(tableId)
   const { tokenName, tokenSymbol } = useERC20TokenName(wagerContractAddress)
-  const { challengeIds: liveChallengeIds } = useLiveChallengeIds(tableId)
-  const { challengeIds: pastChallengeIds } = usePastChallengeIds(tableId)
   const { activeDuelistIdsCount } = useActiveDuelistIds(tableId)
+
+  // const {
+  //   queryLiveDuels: { liveCount: liveDuelsCount }
+  //   queryPastDuels: { liveCount: pastDuelsCount }
+  // } = useQueryContext()
+  // TODO
+  const liveDuelsCount = 11111
+  const pastDuelsCount = 99999
+
   return (
     <Grid className='H5'>
 
@@ -177,7 +185,7 @@ function TableDescription({
           Live Duels:
         </Col>
         <Col width={8} className='Wager PaddedLeft Bold'>
-          {liveChallengeIds.length}
+          {liveDuelsCount}
         </Col>
       </Row>
 
@@ -186,7 +194,7 @@ function TableDescription({
           Past Duels:
         </Col>
         <Col width={8} className='Wager PaddedLeft Bold'>
-          {pastChallengeIds.length}
+          {pastDuelsCount}
         </Col>
       </Row>
 

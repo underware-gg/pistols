@@ -1,12 +1,14 @@
 import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect } from 'react'
 import { Entity, getComponentValue, Has } from '@dojoengine/recs'
+import { useAccount } from '@starknet-react/core'
 import { useEntityQuery } from '@dojoengine/react'
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
+import { calcWinRatio } from '@/pistols/hooks/useScore'
 import { ChallengeState } from '@/pistols/utils/pistols'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
-import { calcWinRatio } from '@/pistols/hooks/useScore'
-import { keysToEntity } from '@/lib/utils/types'
+import { arrayUnique, bigintEquals, keysToEntity } from '@/lib/utils/types'
+import { BigNumberish } from 'starknet'
 
 export type DuelistRow = {
   entity: Entity
@@ -27,9 +29,34 @@ export type ChallengeRow = {
   challenge: any,
   // filters
   state: number
+  timestamp: number
   isLive: boolean
   isFinished: boolean
   isCanceled: boolean
+}
+
+const emptyChallengeQuery = {
+  rows: [] as ChallengeRow[],
+  challengeIds: [] as bigint[],
+  states: [] as ChallengeState[],
+  liveCount: 0,
+}
+export type ChallengeQuery = typeof emptyChallengeQuery
+
+const _buildChallengeQuery = (rows: ChallengeRow[]): ChallengeQuery => {
+  const challengeIds = rows.map(row => row.duel_id)
+  const states = arrayUnique(rows.map(row => row.state))
+  // const states = AllChallengeStates
+  const liveCount = rows.reduce((acc, row) => {
+    if (row.isLive) acc++
+    return acc
+  }, 0)
+  return {
+    rows,
+    challengeIds,
+    liveCount,
+    states,
+  }
 }
 
 export enum DuelistColumn {
@@ -48,6 +75,8 @@ export enum SortDirection {
   Descending = 'descending',
 }
 
+
+
 //--------------------------------
 // State
 //
@@ -62,11 +91,12 @@ export const initialState = {
   filterDuelistActive: false,
   filterDuelistSortColumn: DuelistColumn.Honour,
   filterDuelistSortDirection: SortDirection.Descending,
+  filterChallengeStates: [] as ChallengeState[],
   // queries
   queryDuelists: [] as DuelistRow[],
-  queryYourDuels: [] as ChallengeRow[],
-  queryLiveDuels: [] as ChallengeRow[],
-  queryPastDuels: [] as ChallengeRow[],
+  queryYourDuels: emptyChallengeQuery,
+  queryLiveDuels: emptyChallengeQuery,
+  queryPastDuels: emptyChallengeQuery,
 }
 
 enum QueryActions {
@@ -77,7 +107,11 @@ enum QueryActions {
   FILTER_DUELIST_ACTIVE = 'FILTER_DUELIST_ACTIVE',
   FILTER_DUELIST_SORT_COLUMN = 'FILTER_DUELIST_SORT_COLUMN',
   FILTER_DUELIST_SORT_DIRECTION = 'FILTER_DUELIST_SORT_DIRECTION',
+  FILTER_CHALLENGE_STATES = 'FILTER_CHALLENGE_STATES',
   QUERY_DUELISTS = 'QUERY_DUELISTS',
+  QUERY_YOUR_DUELS = 'QUERY_YOUR_DUELS',
+  QUERY_LIVE_DUELS = 'QUERY_LIVE_DUELS',
+  QUERY_PAST_DUELS = 'QUERY_PAST_DUELS',
 }
 
 
@@ -94,7 +128,11 @@ type ActionType =
   | { type: 'FILTER_DUELIST_ACTIVE', payload: boolean }
   | { type: 'FILTER_DUELIST_SORT_COLUMN', payload: DuelistColumn }
   | { type: 'FILTER_DUELIST_SORT_DIRECTION', payload: SortDirection }
+  | { type: 'FILTER_CHALLENGE_STATES', payload: ChallengeState[] }
   | { type: 'QUERY_DUELISTS', payload: DuelistRow[] }
+  | { type: 'QUERY_YOUR_DUELS', payload: ChallengeRow[] }
+  | { type: 'QUERY_LIVE_DUELS', payload: ChallengeRow[] }
+  | { type: 'QUERY_PAST_DUELS', payload: ChallengeRow[] }
 
 
 
@@ -109,6 +147,7 @@ const QueryContext = createContext<{
   dispatch: () => null,
 })
 
+
 //--------------------------------
 // Provider
 //
@@ -119,7 +158,8 @@ const QueryProvider = ({
   children,
 }: QueryProviderProps) => {
   const { Duelist, Scoreboard, Challenge } = useDojoComponents()
-  const { tableId } = useSettings()
+  const { tableId, duelistId } = useSettings()
+  const { address } = useAccount()
 
   const [state, dispatch] = useReducer((state: QueryContextStateType, action: ActionType) => {
     let newState = { ...state }
@@ -152,8 +192,24 @@ const QueryProvider = ({
         newState.filterDuelistSortDirection = action.payload as SortDirection
         break
       }
+      case QueryActions.FILTER_CHALLENGE_STATES: {
+        newState.filterChallengeStates = action.payload as ChallengeState[]
+        break
+      }
       case QueryActions.QUERY_DUELISTS: {
         newState.queryDuelists = action.payload as DuelistRow[]
+        break
+      }
+      case QueryActions.QUERY_YOUR_DUELS: {
+        newState.queryYourDuels = _buildChallengeQuery(action.payload as ChallengeRow[])
+        break
+      }
+      case QueryActions.QUERY_LIVE_DUELS: {
+        newState.queryLiveDuels = _buildChallengeQuery(action.payload as ChallengeRow[])
+        break
+      }
+      case QueryActions.QUERY_PAST_DUELS: {
+        newState.queryPastDuels = _buildChallengeQuery(action.payload as ChallengeRow[])
         break
       }
       default:
@@ -203,12 +259,14 @@ const QueryProvider = ({
       const challenge = getComponentValue(Challenge, entity)
       const duel_id = challenge.duel_id
       const state = challenge.state
+      const timestamp = Number(challenge.timestamp_end ? challenge.timestamp_end : challenge.timestamp_start)
       acc.push({
         entity,
         duel_id,
         challenge,
         // filters
         state,
+        timestamp,
         isLive: (state == ChallengeState.Awaiting || state == ChallengeState.InProgress),
         isFinished: (state == ChallengeState.Resolved || state == ChallengeState.Draw),
         isCanceled: (state == ChallengeState.Withdrawn || state == ChallengeState.Refused),
@@ -219,12 +277,19 @@ const QueryProvider = ({
   useEffect(() => dispatch({ type: QueryActions.SET_DUELISTS, payload: allDuelists }), [allDuelists])
   useEffect(() => dispatch({ type: QueryActions.SET_CHALLENGES, payload: allChallenges }), [allChallenges])
 
+  function _reduceRowsExcludes<T>(rows: T[], excludes: Set<number>): T[] {
+    return rows.reduce((acc, row, index) => {
+      if (!excludes.has(index)) acc.push(row)
+      return acc
+    }, [] as T[])
+  }
+
 
   //====================================
-  // Custom Duelist Query
+  // Duelist Query
   //
   useEffect(() => {
-    let excludes = new Set()
+    let excludes = new Set<number>()
     //
     // filter by name
     if (state.filterDuelistName) {
@@ -241,13 +306,7 @@ const QueryProvider = ({
     }
     //
     // filter rows
-    const rows = allDuelists.reduce((acc, row, index) => {
-      if (!excludes.has(index)) acc.push(row)
-      return acc
-    }, [])
-    //
-    // Sort
-    // console.log(`ROWS:`,rows)
+    const rows = _reduceRowsExcludes(allDuelists, excludes)
     const sortedRows = rows.sort((rowA, rowB) => {
       // Sort by names, or both rookies
       const _sortByName = (a: string, b: string) => {
@@ -277,7 +336,6 @@ const QueryProvider = ({
       if (sortColumn == DuelistColumn.Balance) return _sortTotals(rowA.balance, rowB.balance)
       return 0
     })
-
     //
     // done!
     dispatch({ type: QueryActions.QUERY_DUELISTS, payload: sortedRows })
@@ -289,7 +347,69 @@ const QueryProvider = ({
   ])
 
 
+  
+  //====================================
+  // Challenge Queries
+  //
 
+  function _excludeRowsByDuelist(rows: ChallengeRow[], address: BigNumberish, duelist_id: BigNumberish): Set<number> {
+    let excludes = new Set<number>()
+    rows.map((row, index) => {
+      const check = (
+        (duelist_id && bigintEquals(duelist_id, row.challenge.duelist_id_a)) ||
+        (duelist_id && bigintEquals(duelist_id, row.challenge.duelist_id_b)) ||
+        (address && bigintEquals(address, row.challenge.address_b) && row.state == ChallengeState.Awaiting)
+      )
+      if (!check) excludes.add(index)
+    })
+    return excludes
+  }
+
+  function _sortChallenges(rowA: ChallengeRow, rowB: ChallengeRow) {
+    if (rowA.state != rowB.state) {
+      if (rowA.state == ChallengeState.InProgress) return -1
+      if (rowB.state == ChallengeState.InProgress) return 1
+      if (rowA.state == ChallengeState.Awaiting) return -1
+      if (rowB.state == ChallengeState.Awaiting) return 1
+    }
+    return (rowB.timestamp ?? 0) - (rowA.timestamp ?? 0)
+  }
+
+  useEffect(() => {
+    let excludes = _excludeRowsByDuelist(allChallenges, address, duelistId)
+    // filter rows
+    const rows = _reduceRowsExcludes(allChallenges, excludes).sort(_sortChallenges)
+    dispatch({ type: QueryActions.QUERY_YOUR_DUELS, payload: rows })
+  }, [allChallenges,
+    state.filterChallengeStates,
+  ])
+
+  useEffect(() => {
+    let excludes = new Set<number>()
+    // filter by state
+    allChallenges.forEach((row, index) => {
+      if (!row.isLive) excludes.add(index)
+    })
+    // filter rows
+    const rows = _reduceRowsExcludes(allChallenges, excludes).sort(_sortChallenges)
+    dispatch({ type: QueryActions.QUERY_LIVE_DUELS, payload: rows })
+  }, [allChallenges,
+    state.filterChallengeStates,
+  ])
+
+  useEffect(() => {
+    let excludes = new Set<number>()
+    // filter by state
+    allChallenges.forEach((row, index) => {
+      if (!(row.isCanceled || row.isFinished)) excludes.add(index)
+    })
+    // filter rows
+    const rows = _reduceRowsExcludes(allChallenges, excludes).sort(_sortChallenges)
+    console.log(rows)
+    dispatch({ type: QueryActions.QUERY_PAST_DUELS, payload: rows })
+  }, [allChallenges,
+    state.filterChallengeStates,
+  ])
 
   //
   // Finito
@@ -318,40 +438,28 @@ export { QueryProvider, QueryContext, QueryActions }
 export const useQueryContext = () => {
   const { state, dispatch } = useContext(QueryContext)
   const dispatchFilterDuelistName = (payload: string) => {
-    dispatch({
-      type: QueryActions.FILTER_DUELIST_NAME,
-      payload,
-    })
+    dispatch({ type: QueryActions.FILTER_DUELIST_NAME, payload })
   }
   const dispatchFilterDuelistTable = (payload: boolean) => {
-    dispatch({
-      type: QueryActions.FILTER_DUELIST_TABLE,
-      payload,
-    })
+    dispatch({ type: QueryActions.FILTER_DUELIST_TABLE, payload })
   }
   const dispatchFilterDuelistActive = (payload: boolean) => {
-    dispatch({
-      type: QueryActions.FILTER_DUELIST_ACTIVE,
-      payload,
-    })
+    dispatch({ type: QueryActions.FILTER_DUELIST_ACTIVE, payload })
   }
   const dispatchFilterDuelistSortColumn = (payload: DuelistColumn) => {
-    dispatch({
-      type: QueryActions.FILTER_DUELIST_SORT_COLUMN,
-      payload,
-    })
+    dispatch({ type: QueryActions.FILTER_DUELIST_SORT_COLUMN, payload })
   }
   const dispatchFilterDuelistSortDirection = (payload: SortDirection) => {
-    dispatch({
-      type: QueryActions.FILTER_DUELIST_SORT_DIRECTION,
-      payload,
-    })
+    dispatch({ type: QueryActions.FILTER_DUELIST_SORT_DIRECTION, payload })
   }
   const dispatchFilterDuelistSortSwitch = () => {
     dispatch({
       type: QueryActions.FILTER_DUELIST_SORT_DIRECTION,
       payload: state.filterDuelistSortDirection == SortDirection.Ascending ? SortDirection.Descending : SortDirection.Ascending,
     })
+  }
+  const dispatchFilterChallengeStates = (payload: ChallengeState[]) => {
+    dispatch({ type: QueryActions.FILTER_CHALLENGE_STATES, payload })
   }
   return {
     ...state,
@@ -361,5 +469,24 @@ export const useQueryContext = () => {
     dispatchFilterDuelistSortColumn,
     dispatchFilterDuelistSortDirection,
     dispatchFilterDuelistSortSwitch,
+    dispatchFilterChallengeStates,
   }
 }
+
+
+
+// export const useChallengeIdsByDuelistId = (duelist_id: BigNumberish, address?: BigNumberish, tableId?: string) => {
+//   const { Challenge } = useDojoComponents()
+//   const challengerIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { duelist_id_a: BigInt(duelist_id ?? invalidId) })])
+//   const challengedIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { duelist_id_b: BigInt(duelist_id ?? invalidId) })])
+//   const challengedAddrIds: bigint[] = useEntityKeysQuery(Challenge, 'duel_id', [HasValue(Challenge, { address_b: BigInt(address ?? invalidId) })])
+//   const allChallengeIds: bigint[] = useMemo(() => arrayUnique([...challengerIds, ...challengedIds, ...challengedAddrIds]), [challengerIds, challengedIds, challengedAddrIds])
+//   const challengeIds = useMemo(() => (
+//     tableId ? _filterChallengesByTable(Challenge, allChallengeIds, tableId) : allChallengeIds
+//   ), [allChallengeIds, tableId])
+//   return {
+//     challengeIds,
+//     challengerIds,
+//     challengedIds,
+//   }
+// }
