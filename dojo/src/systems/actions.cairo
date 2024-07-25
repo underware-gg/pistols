@@ -84,7 +84,7 @@ trait IActionsInternal {
     fn _emitDuelistTurnEvent(ref world: IWorldDispatcher, challenge: Challenge);
 }
 
-#[dojo::contract(allow_ref_self)]
+#[dojo::contract]
 mod actions {
     use debug::PrintTrait;
     use traits::{Into, TryInto};

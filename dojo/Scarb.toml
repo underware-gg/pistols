@@ -1,3 +1,25 @@
+[package]
+name = "pistols"
+version = "0.10.0-0"
+cairo-version = "=2.7.0-rc.3"
+
+[cairo]
+sierra-replace-ids = true
+
+[scripts]
+migrate = "./migrate"
+
+[dependencies]
+dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.0.0-alpha.3" }
+# origami_token = { git = "https://github.com/dojoengine/origami", tag = "v1.0.0-alpha.0" }
+origami_token = { git = "https://github.com/rsodre/origami", branch = "balance-enumerable" }
+graffiti = { git = "https://github.com/ponderingdemocritus/graffiti", rev = "bc569531791dbc71c6cd8d9bc154c34eedad31fe" }
+
+
+#-------------------------------
+# DOJO CONFIG
+#
+
 [tool.dojo.world]
 name = "Pistols at 10 Blocks"
 description = "An on-chain pistol duelling game of honour and betrayal."
@@ -12,25 +34,12 @@ github = "https://github.com/underware-gg/pistols"
 # discord = "https://discord.gg/FB2wR6uF"
 # telegram = "https://t.me/dojoengine"
 
-[package]
-name = "pistols"
-version = "0.10.0-0"
-cairo-version = "=2.7.0-rc.3"
-
-[cairo]
-sierra-replace-ids = true
-
-[dependencies]
-dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.0.0-alpha.3" }
-# origami_token = { git = "https://github.com/dojoengine/origami", tag = "v1.0.0-alpha.0" }
-origami_token = { git = "https://github.com/rsodre/origami", branch = "balance-enumerable" }
-graffiti = { git = "https://github.com/ponderingdemocritus/graffiti", rev = "bc569531791dbc71c6cd8d9bc154c34eedad31fe" }
+[tool.dojo.world.namespace]
+default = "pistols"
+# mappings = { "origami_token" = "other_project_token" }
 
 [tool.dojo]
 initializer_class_hash = "0xbeef"
-
-[tool.dojo.world.namespace]
-default = "pistols"
 
 [[target.dojo]]
 build-external-contracts = [
@@ -54,24 +63,23 @@ build-external-contracts = [
   "origami_token::components::token::erc721::erc721_owner::erc_721_owner_model",
 ]
 
-[tool.dojo.env]
-lords_address = ""
+
 
 # -----------------------
-# dev (default)
+# defaults for all profiles
 # 
-[profile.dev.tool.dojo.env]
+[tool.dojo.env]
 rpc_url = "http://localhost:5050"
-world_address = "0x0545c8aff15426c3d43b3ba8fd45c61870b30ca4ec0bfbd69193facee4c7b97c"
 account_address = "0xb3ff441a68610b30fd5e2abbf3a1548eb6ba6f3559f2862bf2dc757e5828ca"
 private_key = "0x2bbf4f9fd0bbb2e60b0316c1fe0b76cf7a4d0198bd493ced9b8df2a3a24d68a"
+world_address = "0x0545c8aff15426c3d43b3ba8fd45c61870b30ca4ec0bfbd69193facee4c7b97c"
+lords_address = ""
 
 # -----------------------
 # slot (pistols)
 # 
 [profile.slot.tool.dojo.env]
 rpc_url = "https://api.cartridge.gg/x/pistols/katana"
-world_address = "0x0545c8aff15426c3d43b3ba8fd45c61870b30ca4ec0bfbd69193facee4c7b97c"
 account_address = "0x2ec24cd4415a28e821c5b4b9dc3801340cb2e1a23f4289443d15fea60e2daab"
 private_key = "0x1f3a9e4f7827167d6f7e93b8f2debc3129b06ceca19d02355434499592bf16c"
 
@@ -80,7 +88,6 @@ private_key = "0x1f3a9e4f7827167d6f7e93b8f2debc3129b06ceca19d02355434499592bf16c
 # 
 [profile.staging.tool.dojo.env]
 rpc_url = "https://api.cartridge.gg/x/pistols-staging/katana"
-world_address = "0x0545c8aff15426c3d43b3ba8fd45c61870b30ca4ec0bfbd69193facee4c7b97c"
 account_address = "0x7947c7d3e02e85da3ba8c93024b006ab7f10dc6b8fb3cb151569c996869edba"
 private_key = "0x329a6dea7e53dcd104ab13494a29c6ddb1e472afebddcbd3ae11f8fe76a9e53"
 
@@ -88,11 +95,10 @@ private_key = "0x329a6dea7e53dcd104ab13494a29c6ddb1e472afebddcbd3ae11f8fe76a9e53
 # SN_SEPOLIA
 # 
 [profile.sepolia.tool.dojo]
-skip_migration = ["pistols::mocks::lords_mock::lords_mock"]
+skip_migration = ["pistols-lords_mock"]
 
 [profile.sepolia.tool.dojo.env]
 # rpc_url = ""          # env: STARKNET_RPC_URL
-world_address = "0x0545c8aff15426c3d43b3ba8fd45c61870b30ca4ec0bfbd69193facee4c7b97c"
-lords_address = "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210"
 # account_address = ""  # env: DOJO_ACCOUNT_ADDRESS
 # private_key = ""      # env: DOJO_PRIVATE_KEY
+lords_address = "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210"

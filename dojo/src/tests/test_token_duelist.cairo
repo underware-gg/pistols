@@ -1,9 +1,8 @@
 use debug::PrintTrait;
 use integer::BoundedInt;
 use starknet::{ContractAddress, get_contract_address, get_caller_address, testing};
-use starknet::storage::{StorageMemberAccessTrait};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-use dojo::test_utils::spawn_test_world;
+use dojo::utils::test::spawn_test_world;
 use origami_token::tests::constants::{ZERO, OWNER, SPENDER, RECIPIENT};//, TOKEN_ID, TOKEN_ID_2, TOKEN_ID_3};
 
 use origami_token::tests::utils;
@@ -101,7 +100,7 @@ fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterD
     testing::set_block_number(1);
     testing::set_block_timestamp(1);
 
-    let mut world = spawn_test_world(
+    let mut world = spawn_test_world("pistols",
         array![
             erc_721_token_approval_model::TEST_CLASS_HASH,
             erc_721_balance_model::TEST_CLASS_HASH,

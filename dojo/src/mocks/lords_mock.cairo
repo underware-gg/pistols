@@ -57,7 +57,8 @@ trait ILordsMockFaucet<TState> {
     fn mint(ref self: TState, to: ContractAddress, amount: u256);
 }
 
-#[dojo::contract(allow_ref_self)]
+#[dojo::contract]
+// #[dojo::contract(namespace:"mocks", nomapping: true)]
 mod lords_mock {
     use integer::BoundedInt;
     use starknet::ContractAddress;

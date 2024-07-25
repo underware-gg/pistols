@@ -6,7 +6,7 @@ mod tester {
     use debug::PrintTrait;
 
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-    use dojo::test_utils::{spawn_test_world, deploy_contract};
+    use dojo::utils::test::{spawn_test_world, deploy_contract};
 
     use pistols::systems::admin::{admin, IAdminDispatcher, IAdminDispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
@@ -133,7 +133,7 @@ mod tester {
         deploy_lords = deploy_lords || approve || deploy_system;
 
         // systems
-        let world: IWorldDispatcher = spawn_test_world(models);
+        let world: IWorldDispatcher = spawn_test_world("pistols",  models);
         let system = IActionsDispatcher{ contract_address:
             if (deploy_system) {deploy_system(world, 'salt', actions::TEST_CLASS_HASH, array![].span())}
             else {ZERO()}
