@@ -88,8 +88,7 @@ mod tester {
         const ADMIN: u8      = 0b000010;
         const LORDS: u8      = 0b000100;
         const MINTER: u8     = 0b001000;
-        const INITIALIZE: u8 = 0b010000;
-        const APPROVE: u8    = 0b100000;
+        const APPROVE: u8    = 0b010000;
     }
 
     fn deploy_system(world: IWorldDispatcher, salt: felt252, class_hash: felt252, call_data: Span<felt252>) -> ContractAddress {
@@ -108,8 +107,10 @@ mod tester {
         let mut deploy_admin: bool = (flags & flags::ADMIN) != 0;
         let mut deploy_lords: bool = (flags & flags::LORDS) != 0;
         let mut deploy_minter: bool = (flags & flags::MINTER) != 0;
-        let initialize: bool = (flags & flags::INITIALIZE) != 0;
         let approve: bool = (flags & flags::APPROVE) != 0;
+
+        deploy_system = deploy_system || approve;
+        deploy_lords = deploy_lords || approve || deploy_system;
 
         let mut models = array![
             duelist::TEST_CLASS_HASH,
@@ -128,30 +129,23 @@ mod tester {
         testing::set_block_number(1);
         testing::set_block_timestamp(INITIAL_TIMESTAMP);
 
-        deploy_system = deploy_system || approve;
-        deploy_admin = deploy_admin || initialize;
-        deploy_lords = deploy_lords || approve || deploy_system;
-
         // systems
         let world: IWorldDispatcher = spawn_test_world("pistols",  models);
         let system = IActionsDispatcher{ contract_address:
             if (deploy_system) {deploy_system(world, 'salt', actions::TEST_CLASS_HASH, array![].span())}
             else {ZERO()}
         };
-        let admin = IAdminDispatcher{ contract_address:
-            if (deploy_admin) {deploy_system(world, 'admin', admin::TEST_CLASS_HASH, array![].span())}
-            else {ZERO()}
-        };
         let lords = ILordsMockDispatcher{ contract_address:
             if (deploy_lords) {deploy_system(world, 'lords_mock', lords_mock::TEST_CLASS_HASH, array![].span())}
             else {ZERO()}
         };
-        let _duelists = ITokenDuelistDispatcher{ contract_address:
+        let duelists = ITokenDuelistDispatcher{ contract_address:
             if (deploy_minter) {deploy_system(world, 'duelists', token_duelist::TEST_CLASS_HASH, array![].span())}
             else {deploy_system(world, 'mock_erc721', mock_erc721::TEST_CLASS_HASH, array![].span())}
             
         };
         let minter_call_data: Array<felt252> = array![
+            duelists.contract_address.into(),
             100, // max_supply
             3, // wallet_max
             1, // is_open
@@ -159,6 +153,15 @@ mod tester {
         let minter = IMinterDispatcher{ contract_address:
             if (deploy_minter) {deploy_system(world, 'minter', minter::TEST_CLASS_HASH, minter_call_data.span())}
             else {ZERO()}  
+        };
+        let admin_call_data: Array<felt252> = array![
+            0, // owner
+            0, // treasury
+            lords.contract_address.into(),
+        ];
+        let admin = IAdminDispatcher{ contract_address:
+            if (deploy_admin) {deploy_system(world, 'admin', admin::TEST_CLASS_HASH, admin_call_data.span())}
+            else {ZERO()}
         };
 
         // set origami ownership
@@ -169,15 +172,8 @@ mod tester {
         // world.grant_writer(selector!("TokenConfig"), duelists.contract_address);
         // initializers
         if (deploy_lords) {
-            execute_lords_initializer(lords, OWNER());
             execute_lords_faucet(lords, OWNER());
             execute_lords_faucet(lords, OTHER());
-        }
-        if (initialize) {
-            execute_admin_initialize(admin, 
-                OWNER(), OWNER(), TREASURY(),
-                lords.contract_address,
-            );
         }
         if (approve) {
             execute_lords_approve(lords, OWNER(), system.contract_address, 1_000_000 * constants::ETH_TO_WEI.low);
@@ -218,11 +214,6 @@ mod tester {
     //
 
     // ::admin
-    fn execute_admin_initialize(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress) {
-        impersonate(sender);
-        system.initialize(owner_address, treasury_address, lords_address);
-        _next_block();
-    }
     fn execute_admin_set_owner(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress) {
         impersonate(sender);
         system.set_owner(owner_address);
@@ -250,11 +241,6 @@ mod tester {
     }
 
     // ::ierc20
-    fn execute_lords_initializer(system: ILordsMockDispatcher, sender: ContractAddress) {
-        impersonate(sender);
-        system.initializer();
-        _next_block();
-    }
     fn execute_lords_faucet(system: ILordsMockDispatcher, sender: ContractAddress) {
         impersonate(sender);
         system.faucet();

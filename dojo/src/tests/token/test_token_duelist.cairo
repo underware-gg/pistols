@@ -260,24 +260,6 @@ fn test_token_uri_invalid() {
     token.token_uri(999);
 }
 
-// #[test]
-// #[should_panic(expected: ('ERC721: caller is not owner', 'ENTRYPOINT_FAILED'))]
-// fn test_initialize_not_world_owner() {
-//     let (_world, mut token, mut minter) = setup_uninitialized();
-
-//     utils::impersonate(OWNER(),);
-
-//     // initialize contracts
-//     token.initialize("NAME", "SYMBOL", "URI");
-// }
-
-#[test]
-#[should_panic(expected: ('Initializable: is initialized', 'ENTRYPOINT_FAILED'))]
-fn test_initialize_multiple() {
-    let (_world, mut token, mut _minter) = setup();
-
-    token.initialize("NAME", "SYMBOL", "URI");
-}
 
 //
 // approve

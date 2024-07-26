@@ -28,7 +28,7 @@ mod tests {
 
     #[test]
     fn test_calc_fee() {
-        let (_world, system, admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::ADMIN | 0 | flags::INITIALIZE | 0);
+        let (_world, system, admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::ADMIN);
         let table: TableConfig = admin.get_table(TABLE_ID);
         // no wager
         let fee: u128 = system.calc_fee(TABLE_ID, 0);
@@ -42,7 +42,7 @@ mod tests {
     }
 
     fn _test_balance_ok(table_id: felt252, wager_value: u128, wager_min: u128) {
-        let (world, system, admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::ADMIN | flags::LORDS | flags::INITIALIZE | 0);
+        let (world, system, admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::ADMIN | flags::LORDS);
         let S = system.contract_address;
         let A = OTHER();
         let B = OWNER();
@@ -122,14 +122,14 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Insufficient balance', 'ENTRYPOINT_FAILED'))]
     fn test_fee_funds_nok() {
-        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let _duel_id: u128 = tester::execute_create_challenge(system, BUMMER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 0);
     }
 
     #[test]
     #[should_panic(expected:('PISTOLS: Insufficient balance', 'ENTRYPOINT_FAILED'))]
     fn test_wager_funds_nok() {
-        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let _duel_id: u128 = tester::execute_create_challenge(system, BUMMER(), OTHER(), MESSAGE_1, TABLE_ID, 100, 0);
     }
 
@@ -140,7 +140,7 @@ mod tests {
 
     #[test]
     fn test_fee_funds_ok() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let _balance: u128 = lords.balance_of(OTHER()).low;
         let duel_id: u128 = tester::execute_create_challenge(system, OTHER(), BUMMER(), MESSAGE_1, TABLE_ID, 0, 0);
         let ch = tester::get_Challenge(world, duel_id);
@@ -149,7 +149,7 @@ mod tests {
 
     #[test]
     fn test_wager_funds_ok() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let _balance: u128 = lords.balance_of(OTHER()).low;
         let duel_id: u128 = tester::execute_create_challenge(system, OTHER(), BUMMER(), MESSAGE_1, TABLE_ID, 100, 0);
         let ch = tester::get_Challenge(world, duel_id);
@@ -163,7 +163,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Insufficient balance', 'ENTRYPOINT_FAILED'))]
     fn test_fee_funds_ok_resp_nok() {
-        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         // verified by test_fee_funds_ok
         let duel_id: u128 = tester::execute_create_challenge(system, OTHER(), BUMMER(), MESSAGE_1, TABLE_ID, 0, 0);
         // panic here
@@ -173,7 +173,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Insufficient balance', 'ENTRYPOINT_FAILED'))]
     fn test_wager_funds_ok_resp_nok() {
-        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         // verified by test_wager_funds_ok
         let duel_id: u128 = tester::execute_create_challenge(system, OTHER(), BUMMER(), MESSAGE_1, TABLE_ID, 100, 0);
         // panic here
@@ -187,7 +187,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: No transfer allowance', 'ENTRYPOINT_FAILED'))]
     fn test_fee_funds_ok_allowance_nok() {
-        let (_world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (_world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         // verified by test_fee_funds_ok
         // remove allowance
         tester::execute_lords_approve(lords, OTHER(), system.contract_address, 0);
@@ -197,7 +197,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: No transfer allowance', 'ENTRYPOINT_FAILED'))]
     fn test_wager_funds_ok_allowance_nok() {
-        let (_world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (_world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         // verified by test_fee_funds_ok
         // remove allowance
         tester::execute_lords_approve(lords, OTHER(), system.contract_address, 0);
@@ -211,7 +211,7 @@ mod tests {
 
     #[test]
     fn test_withdraw_fees() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let S = system.contract_address;
         let A = OTHER();
         let B = OWNER();
@@ -235,7 +235,7 @@ mod tests {
 
     #[test]
     fn test_withdraw_expired_fees() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let S = system.contract_address;
         let A = OTHER();
         let B = OWNER();
@@ -261,7 +261,7 @@ mod tests {
 
     #[test]
     fn test_refused_fees() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let S = system.contract_address;
         let A = OTHER();
         let B = OWNER();
@@ -285,7 +285,7 @@ mod tests {
 
     #[test]
     fn test_expired_fees() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let S = system.contract_address;
         let A = OTHER();
         let B = OWNER();

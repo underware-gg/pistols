@@ -35,7 +35,6 @@ mod admin {
         const INVALID_TREASURY: felt252    = 'ADMIN: Invalid treasury_address';
         const INVALID_TABLE: felt252       = 'ADMIN: Invalid table';
         const INVALID_DESCRIPTION: felt252 = 'ADMIN: Invalid description';
-        const NOT_DEPLOYER: felt252        = 'ADMIN: Not deployer';
         const NOT_OWNER: felt252           = 'ADMIN: Not owner';
     }
 

@@ -138,7 +138,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
     #[test]
     fn test_dices() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
@@ -166,7 +166,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
     #[test]
     fn test_idle_actions() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
@@ -181,7 +181,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
     #[test]
     fn test_skip_idle_slot() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::IDLE, ACTION::FAST_BLADE,
@@ -195,7 +195,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
     #[test]
     fn test_invalid_actions() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
@@ -213,7 +213,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
     #[test]
     fn test_slow_vs_slow_draw() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
@@ -229,7 +229,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
     // #[test]
     // fn test_slow_vs_slow_suicide_pact() {
-    //     let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+    //     let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
     //     let (challenge, round) = _execute_blades(
     //         world, system, OWNER(), OTHER(),
     //         constants::FULL_HEALTH, ACTION::SLOW_BLADE,
@@ -245,7 +245,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
     #[test]
     fn test_slow_vs_slow_suicide_pact() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::DOUBLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
@@ -261,7 +261,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
     #[test]
     fn test_fast_vs_fast_draw() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
@@ -284,7 +284,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_fast_vs_fast_hit_a() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
@@ -297,7 +297,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_fast_vs_fast_crit_a() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
@@ -310,7 +310,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_fast_vs_fast_hit_b() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
@@ -323,7 +323,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_fast_vs_fast_crit_b() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
@@ -337,7 +337,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
     #[test]
     fn test_fast_vs_block_a() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
@@ -349,7 +349,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_b.health == constants::SINGLE_DAMAGE, 'bad health_b');
     }
     fn test_block_vs_fast_b() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::BLOCK, ACTION::IDLE,
@@ -367,7 +367,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
     #[test]
     fn test_fast_vs_slow_a() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
@@ -380,7 +380,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_fast_vs_slow_b() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
@@ -393,7 +393,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_slow_vs_fast_b() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
@@ -406,7 +406,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_slow_vs_fast_a() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::DOUBLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
@@ -424,7 +424,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     
     #[test]
     fn test_slow_vs_block_crit_a() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
@@ -438,7 +438,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_block_vs_slow_crit_b() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::BLOCK,
@@ -458,7 +458,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
     #[test]
     fn test_block_vs_idle() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
@@ -478,7 +478,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_idle_vs_block() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::BLOCK,
@@ -498,7 +498,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_block_vs_block() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let (challenge, round) = _execute_blades(
             world, system, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
@@ -525,7 +525,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     
     #[test]
     fn test_flee_vs_flee() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
@@ -544,7 +544,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_flee_win_a() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
@@ -567,7 +567,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_flee_win_b() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
@@ -590,7 +590,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_fast_vs_flee_kill_a() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
@@ -611,7 +611,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_slow_vs_flee_kill_a() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
@@ -632,7 +632,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_flee_kill_b() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
@@ -659,7 +659,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     //
     #[test]
     fn test_steal_vs_flee() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
@@ -677,7 +677,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_flee_vs_steal() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
@@ -697,7 +697,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     // face-off
     #[test]
     fn test_steal_vs_steal() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
@@ -718,7 +718,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_steal_win_a() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
@@ -741,7 +741,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_steal_win_b() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
@@ -764,7 +764,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_slow_vs_steal_kill_a() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
@@ -785,7 +785,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_steal_kill_b() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
@@ -812,7 +812,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     //
     #[test]
     fn test_seppuku_vs_seppuku() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
@@ -832,7 +832,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_seppuku_vs_slow_b() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
@@ -852,7 +852,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_seppuku_vs_fast_b() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
@@ -872,7 +872,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_fast_vs_seppuku_a() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
@@ -892,7 +892,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_seppuku_vs_flee() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
@@ -912,7 +912,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_seppuku_vs_steal() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
@@ -932,7 +932,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_flee_vs_seppuku() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
@@ -952,7 +952,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_steal_vs_seppuku_vs() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | flags::LORDS | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::SYSTEM | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);

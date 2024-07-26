@@ -29,7 +29,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Not your duelist', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_challenged_not_your_duelist() {
-        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         // BIG_BOY: u256.high + low > id != address
         let HIGH: ContractAddress = starknet::contract_address_const::<0x100000000000000000000000000000000000001>();
         let _duel_id: u128 = tester::execute_create_challenge(system, HIGH, OTHER(), MESSAGE_1, TABLE_ID, 0, 0);
@@ -38,7 +38,7 @@ mod tests {
     // #[test]
     // #[should_panic(expected:('PISTOLS: Challenged unknown', 'ENTRYPOINT_FAILED'))]
     // fn test_invalid_challenged_unknown() {
-    //     let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+    //     let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
     //     // fill u256.high, empty low > no owner > unknown
     //     let HIGH: ContractAddress = starknet::contract_address_const::<0x100000000000000000000000000000000000000>();
     //     let _duel_id: u128 = tester::execute_create_challenge(system, OWNER(), HIGH, MESSAGE_1, TABLE_ID, 0, 0);
@@ -47,14 +47,14 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Challenged self', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_challenged_self_duelist() {
-        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let _duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OWNER(), MESSAGE_1, TABLE_ID, 0, 0);
     }
 
     #[test]
     #[should_panic(expected:('PISTOLS: Challenged self', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_challenged_self_address() {
-        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let _duel_id: u128 = tester::execute_create_challenge(system, LITTLE_BOY(), LITTLE_BOY(), MESSAGE_1, TABLE_ID, 0, 0);
     }
 
@@ -62,14 +62,14 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Challenged null', 'ENTRYPOINT_FAILED'))]
     // #[should_panic(expected:('Challenge a player', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_challenged_zero() {
-        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let _duel_id: u128 = tester::execute_create_challenge(system, OWNER(), ZERO(), MESSAGE_1, TABLE_ID, 0, 0);
     }
 
     #[test]
     #[should_panic(expected:('PISTOLS: Challenge exists', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_exists() {
-        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1,TABLE_ID, 0, 0);
         tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 0);
     }
@@ -77,14 +77,14 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Challenge exists', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_exists_from_challenged() {
-        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 0);
         tester::execute_create_challenge(system, OTHER(), OWNER(), MESSAGE_1, TABLE_ID, 0, 0);
     }
 
     #[test]
     fn test_challenge_to_address() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let timestamp = tester::get_block_timestamp();
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), BIG_BOY(), MESSAGE_1, TABLE_ID, 0, 0);
         let ch = tester::get_Challenge(world, duel_id);
@@ -100,7 +100,7 @@ mod tests {
 
     #[test]
     fn test_challenge_to_duelist() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 0);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting.into(), 'state');
@@ -112,7 +112,7 @@ mod tests {
 
     #[test]
     fn test_challenge_expire_ok() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let expire_hours: u64 = 24;
         let timestamp = tester::get_block_timestamp();
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_hours);
@@ -123,7 +123,7 @@ mod tests {
 
     #[test]
     fn test_challenge_address_pact() {
-        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         assert(system.get_pact(TABLE_ID, ID(OWNER()), ID(OTHER())) == 0, 'get_pact_0_1');
         assert(system.get_pact(TABLE_ID, ID(OTHER()), ID(OWNER())) == 0, 'get_pact_0_2');
         assert(system.has_pact(TABLE_ID, ID(OWNER()), ID(OTHER())) == false, 'has_pact_0_1');
@@ -143,7 +143,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Invalid challenge', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_reply_invalid() {
-        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (_world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, 48);
@@ -154,7 +154,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Challenge not Awaiting', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_reply_twice() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, 48);
@@ -167,7 +167,7 @@ mod tests {
 
     #[test]
     fn test_challenge_reply_expired_id() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | 0);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, tables::COMMONERS, 0, 24);
@@ -189,7 +189,7 @@ mod tests {
 
     #[test]
     fn test_challenge_reply_expired_address() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | 0);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM);
         let A: ContractAddress = LITTLE_BOY();
         let B: ContractAddress = LITTLE_GIRL();
         let ID_A: ContractAddress = OWNED_BY_LITTLE_BOY();
@@ -221,7 +221,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Reply self', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_owner_accept_self() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, 48);
@@ -233,7 +233,7 @@ mod tests {
 
     #[test]
     fn test_challenge_owner_cancel() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, 48);
@@ -256,7 +256,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Not your challenge', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_impersonator() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, 48);
@@ -267,7 +267,7 @@ mod tests {
 
     #[test]
     fn test_challenge_other_refuse_duelist() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | flags::APPROVE);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, 0, 48);
@@ -293,7 +293,7 @@ mod tests {
 
     #[test]
     fn test_challenge_other_refuse_address() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | 0 | 0 | flags::INITIALIZE | 0);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM);
         let A: ContractAddress = LITTLE_BOY();
         let B: ContractAddress = LITTLE_GIRL();
         let ID_A: ContractAddress = OWNED_BY_LITTLE_BOY();
