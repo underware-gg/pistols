@@ -8,21 +8,46 @@ else
   export PROFILE="dev"
 fi
 
+if ! [ -x "$(command -v toml)" ]; then
+  echo 'Error: toml not instlaled! Instal with: cargo install toml-cli'
+  exit 1
+fi
+
+get_profile_env () {
+  local ENV_NAME=$1
+  local RESULT=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.$ENV_NAME)
+  if [[ -z "$RESULT" ]]; then
+    local RESULT=$(toml get Scarb.toml --raw tool.dojo.env.$ENV_NAME)
+    if [[ -z "$RESULT" ]]; then
+      >&2 echo "get_profile_env($ENV_NAME) not found! 👎"
+    fi
+  fi
+  echo $RESULT
+}
+
 #-----------------
 # env setup
 #
-export WORLD_NAME_SEED="pistols"
-# export WORLD_NAME_SEED="pistols092"
+export GAME_SLUG="pistols"
 export MANIFEST_FILE_PATH="./manifests/$PROFILE/manifest.json"
 export BINDINGS_PATH="./bindings/typescript"
-export GAME_SLUG="pistols"
 export CLIENT_PATH="../client/src/games/$GAME_SLUG/generated/$PROFILE"
 export PROJECT_NAME=$(toml get Scarb.toml --raw tool.dojo.world.name)
-export WORLD_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.world_address)
+export WORLD_ADDRESS=$(get_profile_env "world_address")
 # use $STARKNET_RPC_URL else read from profile
-export RPC_URL=${STARKNET_RPC_URL:-$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.rpc_url)}
+export RPC_URL=${STARKNET_RPC_URL:-$(get_profile_env "rpc_url")}
+
+echo "------------------------------------------------------------------------------"
+echo "PROJECT: $PROJECT_NAME"
+echo "PROFILE: $PROFILE"
+echo "RPC_URL: $RPC_URL"
+echo "WORLD_ADDRESS: $WORLD_ADDRESS"
+echo "CLIENT_PATH: $CLIENT_PATH"
+echo "BINDINGS_PATH: $BINDINGS_PATH"
+echo ""
 
 if [[
+  -z "$PROJECT_NAME" ||
   -z "$PROFILE" ||
   -z "$MANIFEST_FILE_PATH" ||
   "$WORLD_ADDRESS" != "0x"* ||
@@ -31,12 +56,6 @@ if [[
   echo "! Missing data 👎"
   exit 1
 fi
-
-echo "------------------------------------------------------------------------------"
-echo ""
-echo "PROJECT: $PROJECT_NAME"
-echo "PROFILE: $PROFILE"
-echo ""
 
 #-----------------
 # build
@@ -57,7 +76,7 @@ echo "--------------------------------------------------------------------------
 echo ">>> Migrating..."
 # sozo --profile $PROFILE migrate plan --world $WORLD_ADDRESS
 # exit 0
-sozo -P $PROFILE migrate apply --world $WORLD_ADDRESS --name $WORLD_NAME_SEED
+sozo -P $PROFILE migrate apply --world $WORLD_ADDRESS
 echo "👍"
 
 #-----------------
