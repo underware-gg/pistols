@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tester {
-    use starknet::{ContractAddress, testing};
+    use starknet::{ContractAddress, testing, get_caller_address};
     use core::traits::Into;
     use array::ArrayTrait;
     use debug::PrintTrait;
@@ -73,7 +73,7 @@ mod tester {
     fn impersonate(address: ContractAddress) {
         // testing::set_caller_address(address);   // not used??
         testing::set_contract_address(address); // this is the CALLER!!
-        // testing::set_account_contract_address(address); // throws 'not writer'
+        testing::set_account_contract_address(address);
     }
 
 
@@ -159,9 +159,13 @@ mod tester {
         ];
         let minter = IMinterDispatcher{ contract_address:
             if (deploy_minter) {deploy_system(world, 'minter', minter::TEST_CLASS_HASH, minter_call_data.span())}
-            else {ZERO()}
-            
+            else {ZERO()}  
         };
+
+        // set origami ownership
+        world.grant_owner(starknet::get_contract_address(), dojo::utils::bytearray_hash(@"origami_token"));
+        world.grant_owner(OWNER(), dojo::utils::bytearray_hash(@"origami_token"));
+
         // auths
         // world.grant_writer(selector!("TokenConfig"), duelists.contract_address);
         // initializers

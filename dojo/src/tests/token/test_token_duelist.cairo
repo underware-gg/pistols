@@ -3,9 +3,12 @@ use integer::BoundedInt;
 use starknet::{ContractAddress, get_contract_address, get_caller_address, testing};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use dojo::utils::test::spawn_test_world;
-use origami_token::tests::constants::{ZERO, OWNER, SPENDER, RECIPIENT};//, TOKEN_ID, TOKEN_ID_2, TOKEN_ID_3};
 
-use origami_token::tests::utils;
+// use origami_token::tests::constants::{ZERO, OWNER, SPENDER, RECIPIENT};//, TOKEN_ID, TOKEN_ID_2, TOKEN_ID_3};
+// use origami_token::tests::utils;
+
+use pistols::tests::token::constants::{ZERO, OWNER, SPENDER, RECIPIENT};//, TOKEN_ID, TOKEN_ID_2, TOKEN_ID_3};
+use pistols::tests::token::utils;
 
 use origami_token::components::introspection::src5::src5_component::{SRC5Impl};
 use origami_token::components::token::erc721::interface::{
@@ -45,6 +48,7 @@ use pistols::models::{
     token_config::{token_config, TokenConfig, TokenConfigTrait},
     duelist::{duelist, Duelist, Score, scoreboard, Scoreboard, profile_pic_type},
 };
+use origami_token::components::introspection::src5::{src_5_model, SRC5Model};
 
 use pistols::models::table::{tables};
 use pistols::types::constants::{constants};
@@ -99,17 +103,19 @@ const TOKEN_ID_5: u256 = 5;
 fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterDispatcher) {
     testing::set_block_number(1);
     testing::set_block_timestamp(1);
-
-    let mut world = spawn_test_world("pistols",
+'++++++'.print();
+    let mut world = spawn_test_world(
+        "pistols",
         array![
+            src_5_model::TEST_CLASS_HASH,
             erc_721_token_approval_model::TEST_CLASS_HASH,
             erc_721_balance_model::TEST_CLASS_HASH,
             erc_721_meta_model::TEST_CLASS_HASH,
             token_config::TEST_CLASS_HASH,
             duelist::TEST_CLASS_HASH,
             scoreboard::TEST_CLASS_HASH,
-        ]
-    );
+        ]);
+'TEST_CLASS_HASH OK!'.print();
 
     let mut token = ITokenDuelistDispatcher {
         contract_address: world.deploy_contract('salt',

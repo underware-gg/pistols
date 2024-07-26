@@ -69,7 +69,7 @@ trait ITokenDuelist<TState> {
     fn burn(ref self: TState, token_id: u256);
     fn build_uri(self: @TState, token_id: u256, encode: bool) -> ByteArray;
 
-    // ITokenDuelistInternal
+    fn dojo_resource(ref self: TState) -> felt252;
 }
 
 #[starknet::interface]

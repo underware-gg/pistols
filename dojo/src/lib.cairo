@@ -63,11 +63,15 @@ mod tests {
     mod test_wager;
     mod test_torna;
     mod test_utils;
-    // tokens
-    mod test_token_duelist;
     // utils
     mod tester;
     mod salt_generator;
     // mocks
     mod mock_erc721;
+    // tokens
+    mod token {
+        mod test_token_duelist;
+        mod constants;
+        mod utils;
+    }
 }

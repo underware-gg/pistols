@@ -37,7 +37,8 @@ trait ILordsMock<TState> {
     fn is_initialized(self: @TState) -> bool;
     fn faucet(ref self: TState);
     fn mint(ref self: TState, to: ContractAddress, amount: u256);
-    // fn dojo_resource(ref self: TState) -> felt252;
+    
+    fn dojo_resource(ref self: TState) -> felt252;
 }
 
 
