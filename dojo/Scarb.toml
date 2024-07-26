@@ -43,24 +43,24 @@ initializer_class_hash = "0xbeef"
 
 [[target.dojo]]
 build-external-contracts = [
-  "origami_token::components::security::initializable::initializable_model",
-  "origami_token::components::token::erc20::erc20_metadata::erc_20_metadata_model",
-  "origami_token::components::token::erc20::erc20_balance::erc_20_balance_model",
-  "origami_token::components::token::erc20::erc20_allowance::erc_20_allowance_model",
-  "origami_token::components::token::erc20::erc20_mintable::erc_20_mintable_model",
-  "origami_token::components::token::erc20::erc20_burnable::erc_20_burnable_model",
-  "origami_token::components::token::erc20::erc20_bridgeable::erc_20_bridgeable_model",
-  "origami_token::components::introspection::src5::src_5_model",
-  "origami_token::components::token::erc721::erc721_approval::erc_721_operator_approval_model",
-  "origami_token::components::token::erc721::erc721_approval::erc_721_token_approval_model",
-  "origami_token::components::token::erc721::erc721_balance::erc_721_balance_model",
-  "origami_token::components::token::erc721::erc721_enumerable::erc_721_enumerable_index_model",
-  "origami_token::components::token::erc721::erc721_enumerable::erc_721_enumerable_owner_index_model",
-  "origami_token::components::token::erc721::erc721_enumerable::erc_721_enumerable_owner_token_model",
-  "origami_token::components::token::erc721::erc721_enumerable::erc_721_enumerable_token_model",
-  "origami_token::components::token::erc721::erc721_enumerable::erc_721_enumerable_total_model",
-  "origami_token::components::token::erc721::erc721_metadata::erc_721_meta_model",
-  "origami_token::components::token::erc721::erc721_owner::erc_721_owner_model",
+  "origami_token::components::introspection::src5::SRC5Model",
+  "origami_token::components::security::initializable::InitializableModel",
+  # erc20
+  "origami_token::components::token::erc20::erc20_balance::ERC20BalanceModel",
+  "origami_token::components::token::erc20::erc20_metadata::ERC20MetadataModel",
+  "origami_token::components::token::erc20::erc20_allowance::ERC20AllowanceModel",
+  "origami_token::components::token::erc20::erc20_bridgeable::ERC20BridgeableModel",
+  # erc721
+  "origami_token::components::token::erc721::erc721_owner::ERC721OwnerModel",
+  "origami_token::components::token::erc721::erc721_balance::ERC721BalanceModel",
+  "origami_token::components::token::erc721::erc721_metadata::ERC721MetaModel",
+  "origami_token::components::token::erc721::erc721_enumerable::ERC721EnumerableIndexModel",
+  "origami_token::components::token::erc721::erc721_enumerable::ERC721EnumerableOwnerIndexModel",
+  "origami_token::components::token::erc721::erc721_enumerable::ERC721EnumerableOwnerTokenModel",
+  "origami_token::components::token::erc721::erc721_enumerable::ERC721EnumerableTokenModel",
+  "origami_token::components::token::erc721::erc721_enumerable::ERC721EnumerableTotalModel",
+  "origami_token::components::token::erc721::erc721_approval::ERC721TokenApprovalModel",
+  "origami_token::components::token::erc721::erc721_approval::ERC721OperatorApprovalModel",
 ]
 
 [features]
