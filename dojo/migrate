@@ -29,7 +29,7 @@ get_profile_env () {
 # env setup
 #
 export GAME_SLUG="pistols"
-export MANIFEST_FILE_PATH="./manifests/$PROFILE/manifest.json"
+export MANIFEST_FILE_PATH="./manifests/$PROFILE/deployment/manifest.json"
 export BINDINGS_PATH="./bindings/typescript"
 export CLIENT_PATH="../client/src/games/$GAME_SLUG/generated/$PROFILE"
 export PROJECT_NAME=$(toml get Scarb.toml --raw tool.dojo.world.name)

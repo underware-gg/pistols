@@ -33,11 +33,9 @@ trait ILordsMock<TState> {
     fn approve(ref self: TState, spender: ContractAddress, amount: u256) -> bool;
 
     // WITHOUT INTERFACE !!!
-    fn initializer(ref self: TState);
-    fn is_initialized(self: @TState) -> bool;
     fn faucet(ref self: TState);
     fn mint(ref self: TState, to: ContractAddress, amount: u256);
-    
+
     fn dojo_resource(ref self: TState) -> felt252;
 }
 
@@ -47,12 +45,6 @@ trait ILordsMock<TState> {
 /// deprecation.
 ///
 #[starknet::interface]
-trait ILordsMockInitializer<TState> {
-    fn initializer(ref self: TState);
-    fn is_initialized(self: @TState) -> bool;
-}
-
-#[starknet::interface]
 trait ILordsMockFaucet<TState> {
     fn faucet(ref self: TState);
     fn mint(ref self: TState, to: ContractAddress, amount: u256);
@@ -60,6 +52,7 @@ trait ILordsMockFaucet<TState> {
 
 #[dojo::contract]
 mod lords_mock {
+    use debug::PrintTrait;
     use integer::BoundedInt;
     use starknet::ContractAddress;
     use starknet::{get_caller_address, get_contract_address};
@@ -150,22 +143,11 @@ mod lords_mock {
     // Initializer
     //
 
-    #[abi(embed_v0)]
-    impl LordsMockInitializerImpl of super::ILordsMockInitializer<ContractState> {
-        fn initializer(ref self: ContractState) {
-            assert(
-                self.world().is_owner(get_caller_address(), get_contract_address().into()),
-                Errors::CALLER_IS_NOT_OWNER
-            );
-
-            self.erc20_metadata.initialize("fLORDS", "fLORDS", 18);
-            self.erc20_mintable.mint(get_caller_address(), 1 * constants::ETH_TO_WEI);
-
-            self.initializable.initialize();
-        }
-        fn is_initialized(self: @ContractState) -> bool {
-            (self.erc20_metadata.symbol() != "")
-        }
+    fn dojo_init(ref self: ContractState) {
+        self.erc20_metadata.initialize("fLORDS", "fLORDS", 18);
+        self.initializable.initialize();
+        // Give 1 $LORD to the initializer
+        self.erc20_mintable.mint(get_caller_address(), 1 * constants::ETH_TO_WEI);
     }
 
     //

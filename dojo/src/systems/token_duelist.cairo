@@ -64,7 +64,6 @@ trait ITokenDuelist<TState> {
     fn tokenOfOwnerByIndex(self: @TState, owner: ContractAddress, index: u256) -> u256;
 
     // ITokenDuelistPublic
-    fn initialize(ref self: TState, name: ByteArray, symbol: ByteArray, base_uri: ByteArray);
     fn mint(ref self: TState, to: ContractAddress, token_id: u256);
     fn burn(ref self: TState, token_id: u256);
     fn build_uri(self: @TState, token_id: u256, encode: bool) -> ByteArray;
@@ -74,7 +73,6 @@ trait ITokenDuelist<TState> {
 
 #[starknet::interface]
 trait ITokenDuelistPublic<TState> {
-    fn initialize(ref self: TState, name: ByteArray, symbol: ByteArray, base_uri: ByteArray);
     fn mint(ref self: TState, to: ContractAddress, token_id: u256);
     fn burn(ref self: TState, token_id: u256);
     fn build_uri(self: @TState, token_id: u256, encode: bool) -> ByteArray;
@@ -205,6 +203,19 @@ mod token_duelist {
         const CALLER_IS_NOT_MINTER: felt252 = 'DUELIST: caller is not minter';
     }
 
+
+    fn dojo_init(ref self: ContractState) {
+        //*******************************
+        let TOKEN_NAME = "Pistols at 10 Blocks Duelists";
+        let TOKEN_SYMBOL = "DUELIST";
+        let BASE_URI = "https://pistols.underware.gg/";
+        //*******************************
+
+        self.erc721_metadata.initialize(TOKEN_NAME, TOKEN_SYMBOL, BASE_URI);
+        self.erc721_enumerable.initialize();
+        self.initializable.initialize();
+    }
+
     //
     // Metadata Hooks
     //
@@ -227,14 +238,8 @@ mod token_duelist {
     //
     #[abi(embed_v0)]
     impl TokenDuelistPublicImpl of super::ITokenDuelistPublic<ContractState> {
-        fn initialize(ref self: ContractState, name: ByteArray, symbol: ByteArray, base_uri: ByteArray) {
-            self.erc721_metadata.initialize(name, symbol, base_uri);
-            self.erc721_enumerable.initialize();
-            self.initializable.initialize();
-        }
-
         fn mint(ref self: ContractState, to: ContractAddress, token_id: u256) {
-            assert(self.world().is_minter(get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
+            assert(self.world().is_minter_contract(get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
             self.erc721_mintable.mint(to, token_id);
         }
         

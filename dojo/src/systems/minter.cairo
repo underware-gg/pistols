@@ -45,30 +45,17 @@ mod minter {
     // overlays generated with: sozo migrate --generate-overlays
     //
     fn dojo_init(
-        world: @IWorldDispatcher,
+        ref world: IWorldDispatcher,
+        token_address: ContractAddress,
         max_supply: u16,
         max_per_wallet: u16,
         is_open: u8,
     ) {
-        // 'dojo_init()...'.print();
-        
-        //*******************************
-        let TOKEN_NAME = "Pistols at 10 Blocks Duelists";
-        let TOKEN_SYMBOL = "DUELIST";
-        let BASE_URI = "https://pistols.underware.gg";
-        //*******************************
-
         assert(max_supply > 0, Errors::INVALID_SUPPLY);
-
         //
-        // initialize token
-        let token: ITokenDuelistDispatcher = world.token_duelist_dispatcher();
-        token.initialize(TOKEN_NAME, TOKEN_SYMBOL, BASE_URI);
-
-        //
-        // Config
+        // config Duelist Token
         set!(world, (TokenConfig{
-            token_address: token.contract_address,
+            token_address,
             max_supply,
             max_per_wallet,
             minted_count: 0,

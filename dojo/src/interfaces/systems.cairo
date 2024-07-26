@@ -10,20 +10,20 @@ impl WorldSystemsTraitImpl of WorldSystemsTrait {
     //
     // system addresses
     fn actions_address(self: IWorldDispatcher) -> ContractAddress {
-        let (_class_hash, address) : (ClassHash,ContractAddress) = self.contract(selector_from_tag!("pistols-actions"));
+        let (_class_hash, address) = self.contract(selector_from_tag!("pistols-actions"));
         (address)
     }
     fn minter_address(self: IWorldDispatcher) -> ContractAddress {
-        let (_class_hash, address) : (ClassHash,ContractAddress) = self.contract(selector_from_tag!("pistols-minter"));
+        let (_class_hash, address) = self.contract(selector_from_tag!("pistols-minter"));
         (address)
     }
     fn token_duelist_address(self: IWorldDispatcher) -> ContractAddress {
-        let (_class_hash, address) : (ClassHash,ContractAddress) = self.contract(selector_from_tag!("pistols-token_duelist"));
+        let (_class_hash, address) = self.contract(selector_from_tag!("pistols-token_duelist"));
         (address)
     }
 
     //
-    // system dispatchers
+    // dispatchers
     fn actions_dispatcher(self: IWorldDispatcher) -> IActionsDispatcher {
         (IActionsDispatcher{ contract_address: self.actions_address() })
     }
@@ -35,8 +35,8 @@ impl WorldSystemsTraitImpl of WorldSystemsTrait {
     }
 
     //
-    // system validators
-    fn is_minter(self: IWorldDispatcher, address: ContractAddress) -> bool {
+    // validators
+    fn is_minter_contract(self: IWorldDispatcher, address: ContractAddress) -> bool {
         (address == self.minter_address())
     }
 }

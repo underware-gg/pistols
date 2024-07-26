@@ -75,7 +75,6 @@ rpc_url = "http://localhost:5050"
 account_address = "0xb3ff441a68610b30fd5e2abbf3a1548eb6ba6f3559f2862bf2dc757e5828ca"
 private_key = "0x2bbf4f9fd0bbb2e60b0316c1fe0b76cf7a4d0198bd493ced9b8df2a3a24d68a"
 world_address = "0x70e92d3e8be84a1242c4810de3413ba3ad4f5e87390f1097f1825990dc26a23"
-lords_address = ""
 
 # -----------------------
 # slot (pistols)
@@ -101,7 +100,6 @@ skip_migration = ["pistols-lords_mock"]
 features = []
 
 [profile.sepolia.tool.dojo.env]
-lords_address = "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210"
 # rpc_url = ""          # env: STARKNET_RPC_URL
 # account_address = ""  # env: DOJO_ACCOUNT_ADDRESS
 # private_key = ""      # env: DOJO_PRIVATE_KEY
