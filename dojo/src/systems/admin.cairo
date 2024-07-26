@@ -47,13 +47,11 @@ mod admin {
     ) {
         let manager = ConfigManagerTrait::new(world);
         let mut config = manager.get();
-        // assert(config.initialized == false, Errors::ALREADY_INITIALIZED);
         // initialize
         config.owner_address = (if (owner_address.is_zero()) { get_caller_address() } else { owner_address });
         config.treasury_address = (if (treasury_address.is_zero()) { get_caller_address() } else { treasury_address });
         config.paused = false;
         manager.set(config);
-
         // initialize table lords
         TableManagerTrait::new(world).initialize(lords_address);
     }

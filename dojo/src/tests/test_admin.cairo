@@ -22,15 +22,11 @@ mod tests {
     fn test_initialize_defaults() {
         let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         let config: Config = admin.get_config();
-        assert(config.initialized == false, 'initialized == false');
-        let config: Config = admin.get_config();
-        assert(config.initialized == true, 'initialized == true');
         assert(config.owner_address == OWNER(), 'owner_address');
         assert(config.treasury_address == OWNER(), 'treasury_address');
         assert(config.paused == false, 'paused');
         // get
         let get_config: Config = tester::get_Config(world);
-        assert(config.initialized == get_config.initialized, 'get_config.initialized');
         assert(config.owner_address == get_config.owner_address, 'get_config.owner_address');
         assert(config.treasury_address == get_config.treasury_address, 'get_config.treasury_address');
         assert(config.paused == get_config.paused, 'get_config.paused');
@@ -58,7 +54,7 @@ mod tests {
         let config: Config = admin.get_config();
         assert(config.owner_address == OWNER(), 'owner_address_param');
         // set
-        tester::execute_admin_set_owner(admin, OTHER(), BUMMER());
+        tester::execute_admin_set_owner(admin, OWNER(), BUMMER());
         let config: Config = admin.get_config();
         assert(config.owner_address == BUMMER(), 'set_owner_new');
     }
@@ -107,20 +103,6 @@ mod tests {
         tester::execute_admin_set_paused(admin, OWNER(), false);
         let config: Config = admin.get_config();
         assert(config.paused == false, 'paused_3');
-    }
-
-    #[test]
-    #[should_panic(expected:('ADMIN: Not initialized', 'ENTRYPOINT_FAILED'))]
-    fn test_set_owner_not_initialized() {
-        let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
-        tester::execute_admin_set_owner(admin, OWNER(), ZERO());
-    }
-
-    #[test]
-    #[should_panic(expected:('ADMIN: Not initialized', 'ENTRYPOINT_FAILED'))]
-    fn test_set_treasury_not_initialized() {
-        let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
-        tester::execute_admin_set_treasury(admin, OWNER(), ZERO());
     }
 
     #[test]
@@ -204,20 +186,11 @@ mod tests {
     fn test_set_table_count() {
         let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         let _table: TableConfig = admin.get_table(INVALID_TABLE);
-        // assert(table.wager_contract_address == lords.contract_address, 'zero');
-        // // set must work
-        // tester::execute_admin_set_table(admin, OWNER(), INVALID_TABLE, BUMMER(), 'LORDS+', 5, 10, true);
-        // let table: TableConfig = admin.get_table(INVALID_TABLE);
-        // assert(table.wager_contract_address == BUMMER(), 'contract_address');
-        // assert(table.description == 'LORDS+', 'description');
-        // assert(table.fee_min == 5, 'fee_min');
-        // assert(table.fee_pct == 10, 'fee_pct');
-        // assert(table.is_open == true, 'is_open');
     }
 
     #[test]
     fn test_open_table() {
-        let (_world, _system, admin, lords, _minter) = tester::setup_world(flags::LORDS);
+        let (_world, _system, admin, lords, _minter) = tester::setup_world(flags::ADMIN | flags::LORDS);
         tester::execute_admin_set_table(admin, OWNER(), tables::LORDS, lords.contract_address, 'LORDS+', 5, 10, false);
         let table: TableConfig = admin.get_table(tables::LORDS);
         assert(table.is_open == false, 'is_open_1');
@@ -232,7 +205,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
     fn test_set_table_not_owner() {
-        let (_world, _system, admin, lords, _minter) = tester::setup_world(flags::LORDS);
+        let (_world, _system, admin, lords, _minter) = tester::setup_world(flags::ADMIN | flags::LORDS);
         tester::execute_admin_set_table(admin, OTHER(), tables::LORDS, lords.contract_address, 'LORDS+', 5, 10, true);
     }
 
@@ -246,14 +219,14 @@ mod tests {
     #[test]
     #[should_panic(expected:('ADMIN: Invalid table', 'ENTRYPOINT_FAILED'))]
     fn test_set_table_zero() {
-        let (_world, _system, admin, lords, _minter) = tester::setup_world(flags::LORDS);
+        let (_world, _system, admin, lords, _minter) = tester::setup_world(flags::ADMIN | flags::LORDS);
         tester::execute_admin_set_table(admin, OWNER(), 0, lords.contract_address, 'LORDS+', 5, 10, true);
     }
 
     #[test]
     #[should_panic(expected:('ADMIN: Invalid table', 'ENTRYPOINT_FAILED'))]
     fn test_set_table_invalid() {
-        let (_world, _system, admin, lords, _minter) = tester::setup_world(flags::LORDS);
+        let (_world, _system, admin, lords, _minter) = tester::setup_world(flags::ADMIN | flags::LORDS);
         tester::execute_admin_set_table(admin, OWNER(), INVALID_TABLE, lords.contract_address, 'LORDS+', 5, 10, true);
     }
 
@@ -261,7 +234,7 @@ mod tests {
     #[should_panic(expected:('ADMIN: Invalid table', 'ENTRYPOINT_FAILED'))]
     fn test_open_table_zero() {
         let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
-        tester::execute_admin_open_table(admin, OWNER(), 0, false);
+        tester::execute_admin_open_table(admin, OWNER(), 0_felt252, false);
     }
 
     #[test]

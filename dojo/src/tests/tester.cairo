@@ -8,6 +8,15 @@ mod tester {
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
     use dojo::utils::test::{spawn_test_world, deploy_contract};
 
+    use origami_token::components::security::initializable::{initializable_model};
+    use origami_token::components::introspection::src5::{src_5_model};
+    use origami_token::components::token::erc721::{
+        erc721_approval::{erc_721_token_approval_model},
+        erc721_metadata::{erc_721_meta_model},
+        erc721_balance::{erc_721_balance_model},
+        erc721_owner::{erc_721_owner_model},
+    };
+
     use pistols::systems::admin::{admin, IAdminDispatcher, IAdminDispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::systems::minter::{minter, IMinterDispatcher, IMinterDispatcherTrait};
@@ -92,6 +101,7 @@ mod tester {
     }
 
     fn deploy_system(world: IWorldDispatcher, salt: felt252, class_hash: felt252, call_data: Span<felt252>) -> ContractAddress {
+        impersonate(OWNER());
         let contract_address = world.deploy_contract(salt, class_hash.try_into().unwrap(), call_data);
         (contract_address)
     }
@@ -113,6 +123,14 @@ mod tester {
         deploy_lords = deploy_lords || approve || deploy_system;
 
         let mut models = array![
+            //
+            // missing models cause ('invalid resource selector')
+            //
+            // src_5_model::TEST_CLASS_HASH,
+            // erc_721_token_approval_model::TEST_CLASS_HASH,
+            // erc_721_balance_model::TEST_CLASS_HASH,
+            // erc_721_meta_model::TEST_CLASS_HASH,
+            // erc_721_owner_model::TEST_CLASS_HASH,
             duelist::TEST_CLASS_HASH,
             scoreboard::TEST_CLASS_HASH,
             challenge::TEST_CLASS_HASH,
@@ -155,8 +173,8 @@ mod tester {
             else {ZERO()}  
         };
         let admin_call_data: Array<felt252> = array![
-            0, // owner
-            0, // treasury
+            OWNER().into(), // owner
+            OWNER().into(), // treasury
             lords.contract_address.into(),
         ];
         let admin = IAdminDispatcher{ contract_address:
@@ -165,11 +183,13 @@ mod tester {
         };
 
         // set origami ownership
-        world.grant_owner(starknet::get_contract_address(), dojo::utils::bytearray_hash(@"origami_token"));
-        world.grant_owner(OWNER(), dojo::utils::bytearray_hash(@"origami_token"));
+        if (deploy_lords || deploy_minter) {
+            // world.grant_owner(starknet::get_contract_address(), dojo::utils::bytearray_hash(@"origami_token"));
+            world.grant_owner(OWNER(), dojo::utils::bytearray_hash(@"origami_token"));
+        }
 
-        // auths
-        // world.grant_writer(selector!("TokenConfig"), duelists.contract_address);
+        // world.grant_writer(selector!("pistols-TokenConfig"), OWNER());
+
         // initializers
         if (deploy_lords) {
             execute_lords_faucet(lords, OWNER());

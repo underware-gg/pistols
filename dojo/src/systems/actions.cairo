@@ -217,8 +217,6 @@ mod actions {
             wager_value: u128,
             expire_hours: u64,
         ) -> u128 {
-            assert(ConfigManagerTrait::is_initialized(world) == true, Errors::NOT_INITIALIZED);
-
             // validate challenger
             let duelist_id_a: u128 = duelist_id;
             let address_a: ContractAddress = starknet::get_caller_address();

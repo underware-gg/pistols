@@ -6,7 +6,6 @@ export const useConfig = () => {
   const { Config } = useDojoComponents()
   const config = useComponentValue(Config, bigintToEntity(1n))
   return {
-    initialized: config.initialized ?? null,
     paused: config.paused ?? null,
     ownerAddress: config.owner_address ?? null,
     treasuryAddress: config.treasury_address ?? null,
