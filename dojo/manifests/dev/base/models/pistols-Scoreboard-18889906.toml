@@ -1,0 +1,31 @@
+kind = "DojoModel"
+class_hash = "0x7b04a33ec0c4f98699a57a3f3159615a7145552078426c83b78dd42e7e8d452"
+original_class_hash = "0x7b04a33ec0c4f98699a57a3f3159615a7145552078426c83b78dd42e7e8d452"
+abi = "manifests/dev/base/abis/models/pistols-Scoreboard-18889906.json"
+tag = "pistols-Scoreboard"
+manifest_name = "pistols-Scoreboard-18889906"
+
+[[members]]
+name = "table_id"
+type = "felt252"
+key = true
+
+[[members]]
+name = "duelist_id"
+type = "u128"
+key = true
+
+[[members]]
+name = "score"
+type = "Score"
+key = false
+
+[[members]]
+name = "wager_won"
+type = "u128"
+key = false
+
+[[members]]
+name = "wager_lost"
+type = "u128"
+key = false

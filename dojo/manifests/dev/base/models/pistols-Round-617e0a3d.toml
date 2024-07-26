@@ -1,0 +1,31 @@
+kind = "DojoModel"
+class_hash = "0x1024124b06ec5ade47e7c5ec3073ae4ed48003cad546340576fade3fc472ed1"
+original_class_hash = "0x1024124b06ec5ade47e7c5ec3073ae4ed48003cad546340576fade3fc472ed1"
+abi = "manifests/dev/base/abis/models/pistols-Round-617e0a3d.json"
+tag = "pistols-Round"
+manifest_name = "pistols-Round-617e0a3d"
+
+[[members]]
+name = "duel_id"
+type = "u128"
+key = true
+
+[[members]]
+name = "round_number"
+type = "u8"
+key = true
+
+[[members]]
+name = "state"
+type = "u8"
+key = false
+
+[[members]]
+name = "shot_a"
+type = "Shot"
+key = false
+
+[[members]]
+name = "shot_b"
+type = "Shot"
+key = false

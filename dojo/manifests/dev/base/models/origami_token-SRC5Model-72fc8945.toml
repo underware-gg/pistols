@@ -1,0 +1,21 @@
+kind = "DojoModel"
+class_hash = "0x77feae465acca3a8502da5990b42c6c9971a623adace2811a58acad68f57b89"
+original_class_hash = "0x77feae465acca3a8502da5990b42c6c9971a623adace2811a58acad68f57b89"
+abi = "manifests/dev/base/abis/models/origami_token-SRC5Model-72fc8945.json"
+tag = "origami_token-SRC5Model"
+manifest_name = "origami_token-SRC5Model-72fc8945"
+
+[[members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "interface_id"
+type = "felt252"
+key = true
+
+[[members]]
+name = "supports"
+type = "bool"
+key = false
