@@ -59,7 +59,6 @@ trait ILordsMockFaucet<TState> {
 }
 
 #[dojo::contract]
-// #[dojo::contract(namespace:"mocks", nomapping: true)]
 mod lords_mock {
     use integer::BoundedInt;
     use starknet::ContractAddress;

@@ -63,7 +63,9 @@ build-external-contracts = [
   "origami_token::components::token::erc721::erc721_owner::erc_721_owner_model",
 ]
 
-
+[features]
+default = ["lords_mock"]
+lords_mock = []
 
 # -----------------------
 # defaults for all profiles
@@ -72,7 +74,7 @@ build-external-contracts = [
 rpc_url = "http://localhost:5050"
 account_address = "0xb3ff441a68610b30fd5e2abbf3a1548eb6ba6f3559f2862bf2dc757e5828ca"
 private_key = "0x2bbf4f9fd0bbb2e60b0316c1fe0b76cf7a4d0198bd493ced9b8df2a3a24d68a"
-world_address = "0x0545c8aff15426c3d43b3ba8fd45c61870b30ca4ec0bfbd69193facee4c7b97c"
+world_address = "0x70e92d3e8be84a1242c4810de3413ba3ad4f5e87390f1097f1825990dc26a23"
 lords_address = ""
 
 # -----------------------
@@ -96,9 +98,10 @@ private_key = "0x329a6dea7e53dcd104ab13494a29c6ddb1e472afebddcbd3ae11f8fe76a9e53
 # 
 [profile.sepolia.tool.dojo]
 skip_migration = ["pistols-lords_mock"]
+features = []
 
 [profile.sepolia.tool.dojo.env]
+lords_address = "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210"
 # rpc_url = ""          # env: STARKNET_RPC_URL
 # account_address = ""  # env: DOJO_ACCOUNT_ADDRESS
 # private_key = ""      # env: DOJO_PRIVATE_KEY
-lords_address = "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210"

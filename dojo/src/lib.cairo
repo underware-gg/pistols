@@ -1,5 +1,3 @@
-mod mocks {
-    mod lords_mock;
 }
 
 mod systems {
@@ -47,6 +45,11 @@ mod utils {
     mod math;
     mod short_string;
     mod timestamp;
+}
+
+mod mocks {
+    #[cfg(feature:'lords_mock')]
+    mod lords_mock;
 }
 
 #[cfg(test)]
