@@ -90,7 +90,10 @@ mod actions {
     use traits::{Into, TryInto};
     use starknet::{ContractAddress, get_block_timestamp, get_block_info};
 
-    use pistols::systems::minter::{IMinterDispatcher, IMinterDispatcherTrait};
+    use pistols::interfaces::systems::{
+        WorldSystemsTrait,
+        IMinterDispatcher, IMinterDispatcherTrait,
+    };
     use pistols::models::challenge::{Challenge, Wager, Round, Shot};
     use pistols::models::duelist::{Duelist, DuelistTrait, Archetype, Score, Pact, DuelistManager, DuelistManagerTrait};
     use pistols::models::structs::{SimulateChances};
@@ -116,7 +119,6 @@ mod actions {
         const INVALID_REPLY_SELF: felt252        = 'PISTOLS: Reply self';
         const INVALID_CHALLENGE: felt252         = 'PISTOLS: Invalid challenge';
         const INVALID_DUELIST: felt252           = 'PISTOLS: Invalid duelist';
-        const INVALID_MINTER: felt252            = 'PISTOLS: Null minter address';
         const NOT_YOUR_CHALLENGE: felt252        = 'PISTOLS: Not your challenge';
         const NOT_YOUR_DUELIST: felt252          = 'PISTOLS: Not your duelist';
         const CHALLENGER_NOT_ADMITTED: felt252   = 'PISTOLS: Challenger not allowed';
@@ -154,10 +156,8 @@ mod actions {
         ) -> Duelist {
             // mint if you can
             let caller: ContractAddress = starknet::get_caller_address();
-            let config_manager: Config = ConfigManagerTrait::new(world).get();
-            assert(config_manager.minter_address.is_non_zero(), Errors::INVALID_MINTER);
-            let minter_dispatcher = IMinterDispatcher{ contract_address: config_manager.minter_address };
-            let token_id: u128 = minter_dispatcher.mint(caller, config_manager.token_duelist_address);
+            let minter_dispatcher: IMinterDispatcher = world.minter_dispatcher();
+            let token_id: u128 = minter_dispatcher.mint(caller, world.token_duelist_address());
 
             // // create
             let mut duelist = Duelist {

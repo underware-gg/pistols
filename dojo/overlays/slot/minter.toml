@@ -3,7 +3,6 @@ writes = [
   "pistols-TokenConfig",
 ]
 init_calldata = [
-  "$contract_address:pistols-token_duelist",
   "10000",  # max supply
   "100",    # max per wallet
   "1",      # is_open

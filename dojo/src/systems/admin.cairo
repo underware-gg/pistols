@@ -13,8 +13,6 @@ trait IAdmin {
         owner_address: ContractAddress,
         treasury_address: ContractAddress,
         lords_address: ContractAddress,
-        token_duelist_address: ContractAddress,
-        minter_address: ContractAddress,
     );
     fn is_initialized(world: @IWorldDispatcher) -> bool;
     
@@ -56,8 +54,6 @@ mod admin {
             owner_address: ContractAddress,
             treasury_address: ContractAddress,
             lords_address: ContractAddress,
-            token_duelist_address: ContractAddress,
-            minter_address: ContractAddress,
         ) {
             self.assert_initializer_is_owner();
             let manager = ConfigManagerTrait::new(world);
@@ -67,8 +63,6 @@ mod admin {
             config.initialized = true;
             config.owner_address = (if (owner_address == utils::ZERO()) { get_caller_address() } else { owner_address });
             config.treasury_address = (if (treasury_address == utils::ZERO()) { get_caller_address() } else { treasury_address });
-            config.token_duelist_address = token_duelist_address;
-            config.minter_address = minter_address;
             config.paused = false;
             manager.set(config);
             // set lords

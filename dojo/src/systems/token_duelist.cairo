@@ -87,7 +87,7 @@ mod token_duelist {
     use starknet::ContractAddress;
     use starknet::{get_contract_address, get_caller_address};
 
-    use pistols::models::token_config::{TokenConfig, TokenConfigTrait};
+    use pistols::interfaces::systems::{WorldSystemsTrait};
     use pistols::models::duelist::{Duelist, Score, Scoreboard, ScoreTrait};
     use pistols::models::table::{tables};
     use pistols::types::constants::{constants};
@@ -234,8 +234,7 @@ mod token_duelist {
         }
 
         fn mint(ref self: ContractState, to: ContractAddress, token_id: u256) {
-            let config: TokenConfig = get!(self.world(), (get_contract_address()), TokenConfig);
-            assert(config.is_minter(get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
+            assert(self.world().is_minter(get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
             self.erc721_mintable.mint(to, token_id);
         }
         

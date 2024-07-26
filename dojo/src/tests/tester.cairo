@@ -146,13 +146,12 @@ mod tester {
             if (deploy_lords) {deploy_system(world, 'lords_mock', lords_mock::TEST_CLASS_HASH, array![].span())}
             else {ZERO()}
         };
-        let duelists = ITokenDuelistDispatcher{ contract_address:
+        let _duelists = ITokenDuelistDispatcher{ contract_address:
             if (deploy_minter) {deploy_system(world, 'duelists', token_duelist::TEST_CLASS_HASH, array![].span())}
             else {deploy_system(world, 'mock_erc721', mock_erc721::TEST_CLASS_HASH, array![].span())}
             
         };
         let minter_call_data: Array<felt252> = array![
-            duelists.contract_address.into(),
             100, // max_supply
             3, // wallet_max
             1, // is_open
@@ -178,8 +177,6 @@ mod tester {
             execute_admin_initialize(admin, 
                 OWNER(), OWNER(), TREASURY(),
                 lords.contract_address,
-                duelists.contract_address,
-                minter.contract_address,
             );
         }
         if (approve) {
@@ -221,9 +218,9 @@ mod tester {
     //
 
     // ::admin
-    fn execute_admin_initialize(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress, duelist_address: ContractAddress, minter_address: ContractAddress) {
+    fn execute_admin_initialize(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress) {
         impersonate(sender);
-        system.initialize(owner_address, treasury_address, lords_address, duelist_address, minter_address);
+        system.initialize(owner_address, treasury_address, lords_address);
         _next_block();
     }
     fn execute_admin_set_owner(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress) {

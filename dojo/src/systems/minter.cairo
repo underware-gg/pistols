@@ -19,8 +19,12 @@ mod minter {
     use super::{IMinter};
     use zeroable::Zeroable;
     use starknet::{ContractAddress, get_contract_address, get_caller_address};
-    use pistols::systems::token_duelist::{ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait};
-    use pistols::models::token_config::{TokenConfig, TokenConfigTrait};
+
+    use pistols::interfaces::systems::{
+        WorldSystemsTrait,
+        ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait,
+    };
+    use pistols::models::token_config::{TokenConfig};
     use pistols::types::constants::{constants};
 
     mod Errors {
@@ -42,7 +46,6 @@ mod minter {
     //
     fn dojo_init(
         world: @IWorldDispatcher,
-        token_address: ContractAddress,
         max_supply: u16,
         max_per_wallet: u16,
         is_open: u8,
@@ -55,24 +58,22 @@ mod minter {
         let BASE_URI = "https://pistols.underware.gg";
         //*******************************
 
-        assert(token_address.is_non_zero(), Errors::INVALID_TOKEN_ADDRESS);
         assert(max_supply > 0, Errors::INVALID_SUPPLY);
+
+        //
+        // initialize token
+        let token: ITokenDuelistDispatcher = world.token_duelist_dispatcher();
+        token.initialize(TOKEN_NAME, TOKEN_SYMBOL, BASE_URI);
 
         //
         // Config
         set!(world, (TokenConfig{
-            token_address,
-            minter_address: get_contract_address(),
+            token_address: token.contract_address,
             max_supply,
             max_per_wallet,
             minted_count: 0,
             is_open: (is_open != 0),
         }));
-
-        //
-        // initialize token
-        let token = (ITokenDuelistDispatcher{ contract_address: token_address });
-        token.initialize(TOKEN_NAME, TOKEN_SYMBOL, BASE_URI);
     }
 
     //---------------------------------------

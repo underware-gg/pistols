@@ -45,7 +45,7 @@ use pistols::systems::minter::{
     minter, IMinterDispatcher, IMinterDispatcherTrait,
 };
 use pistols::models::{
-    token_config::{token_config, TokenConfig, TokenConfigTrait},
+    token_config::{token_config},
     duelist::{duelist, Duelist, Score, scoreboard, Scoreboard, profile_pic_type},
 };
 use origami_token::components::introspection::src5::{src_5_model, SRC5Model};

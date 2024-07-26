@@ -1,3 +1,7 @@
+mod interfaces {
+    mod systems;
+    mod ierc20;
+    mod ierc721;
 }
 
 mod systems {
@@ -29,11 +33,6 @@ mod types {
     mod constants;
     mod events;
     mod round;
-}
-
-mod interfaces {
-    mod ierc20;
-    mod ierc721;
 }
 
 mod utils {

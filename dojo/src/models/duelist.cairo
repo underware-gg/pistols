@@ -1,7 +1,8 @@
 use starknet::ContractAddress;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-use pistols::models::config::{ConfigManager, ConfigManagerTrait};
+use pistols::interfaces::systems::{WorldSystemsTrait};
 use pistols::interfaces::ierc721::{ierc721, IERC721Dispatcher, IERC721DispatcherTrait};
+use pistols::models::config::{ConfigManager, ConfigManagerTrait};
 use pistols::types::constants::{constants};
 
 
@@ -157,7 +158,7 @@ struct DuelistManager {
 #[generate_trait]
 impl DuelistManagerTraitImpl of DuelistManagerTrait {
     fn new(world: IWorldDispatcher) -> DuelistManager {
-        let contract_address: ContractAddress = ConfigManagerTrait::new(world).get().token_duelist_address;
+        let contract_address: ContractAddress = world.token_duelist_address();
         assert(contract_address.is_non_zero(), 'DuelistManager: null token addr');
         let token_dispatcher = ierc721(contract_address);
         (DuelistManager { world, token_dispatcher })

@@ -10,7 +10,5 @@ export const useConfig = () => {
     paused: config.paused ?? null,
     ownerAddress: config.owner_address ?? null,
     treasuryAddress: config.treasury_address ?? null,
-    duelistAddress: config.token_duelist_address ?? null,
-    minterAddress: config.minter_address ?? null,
   }
 }
