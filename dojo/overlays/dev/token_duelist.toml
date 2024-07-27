@@ -1,0 +1,16 @@
+tag = "pistols-token_duelist"
+writes = [
+  "origami_token-SRC5Model",
+  "origami_token-InitializableModel",
+  "origami_token-ERC721OwnerModel",
+  "origami_token-ERC721BalanceModel",
+  "origami_token-ERC721MetaModel",
+  "origami_token-ERC721EnumerableIndexModel",
+  "origami_token-ERC721EnumerableOwnerIndexModel",
+  "origami_token-ERC721EnumerableOwnerTokenModel",
+  "origami_token-ERC721EnumerableTokenModel",
+  "origami_token-ERC721EnumerableTotalModel",
+  "origami_token-ERC721TokenApprovalModel",
+  "origami_token-ERC721OperatorApprovalModel",
+]
+init_calldata = []

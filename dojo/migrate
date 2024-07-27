@@ -82,7 +82,7 @@ echo "👍"
 #-----------------
 # auth write
 #
-scripts/default_auth.sh $PROFILE
+# scripts/default_auth.sh $PROFILE
 
 
 #------------------------

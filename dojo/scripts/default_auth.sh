@@ -67,11 +67,11 @@ if [[
 fi
 
 # auth ref: https://book.dojoengine.org/toolchain/sozo/world-commands/auth
-# echo ">>> Admin auth..."
-# sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
-#   model:pistols-Config,$ADMIN_TAG \
-#   model:pistols-TableConfig,$ADMIN_TAG \
-#   model:pistols-TableAdmittance,$ADMIN_TAG
+echo ">>> Admin auth..."
+sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
+  model:pistols-Config,$ADMIN_TAG \
+  model:pistols-TableConfig,$ADMIN_TAG \
+  model:pistols-TableAdmittance,$ADMIN_TAG
 
 echo ">>> Game auth..."
 sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
