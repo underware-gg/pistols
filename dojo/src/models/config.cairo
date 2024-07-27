@@ -9,7 +9,6 @@ struct Config {
     #[key]
     key: u8,
     //------
-    owner_address: ContractAddress,
     treasury_address: ContractAddress,
     paused: bool,
 }
@@ -29,8 +28,5 @@ impl ConfigManagerTraitImpl of ConfigManagerTrait {
     }
     fn set(self: ConfigManager, config: Config) {
         set!(self.world, (config));
-    }
-    fn is_owner(world: IWorldDispatcher, address: ContractAddress) -> bool {
-        (Self::new(world).get().owner_address == address)
     }
 }

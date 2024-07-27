@@ -5,7 +5,6 @@ writes = [
   "pistols-TableAdmittance",
 ]
 init_calldata = [
-  "0x0",  # owner (or initializer)
   "0x0",  # treasury (or initializer)
   "$contract_address:pistols-lords_mock", # lords contract
 ]

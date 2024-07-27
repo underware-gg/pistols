@@ -20,97 +20,107 @@ mod tests {
 
     #[test]
     fn test_initialize_defaults() {
-        let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
-        let config: Config = admin.get_config();
-        assert(config.owner_address == OWNER(), 'owner_address');
+        let (world, _system, _admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let config: Config = tester::get_Config(world);
         assert(config.treasury_address == OWNER(), 'treasury_address');
         assert(config.paused == false, 'paused');
         // get
         let get_config: Config = tester::get_Config(world);
-        assert(config.owner_address == get_config.owner_address, 'get_config.owner_address');
         assert(config.treasury_address == get_config.treasury_address, 'get_config.treasury_address');
         assert(config.paused == get_config.paused, 'get_config.paused');
     }
 
     #[test]
-    fn test_set_owner_defaults() {
-        let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
-        let config: Config = admin.get_config();
-        assert(config.owner_address == OWNER(), 'owner_address_param');
+    fn test_set_unset_owner() {
+        let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let admin_hash = selector_from_tag!("pistols-admin");
+        assert(world.is_owner(OWNER(), admin_hash) == true, 'default_owner_true');
+        assert(world.is_owner(OTHER(), admin_hash) == false, 'default_other_owner_false');
         // set
-        let new_owner: ContractAddress = starknet::contract_address_const::<0x121212>();
-        tester::execute_admin_set_owner(admin, OWNER(), new_owner);
-        let config: Config = admin.get_config();
-        assert(config.owner_address == new_owner, 'set_owner_new');
-        // set
-        tester::execute_admin_set_owner(admin, new_owner, BUMMER());
-        let config: Config = admin.get_config();
-        assert(config.owner_address == BUMMER(), 'owner_address_newer');
+        tester::execute_admin_set_owner(admin, OWNER(), OTHER(), true);
+        assert(world.is_owner(OWNER(), admin_hash) == true, 'owner_still');
+        assert(world.is_owner(OTHER(), admin_hash) == true, 'new_other_true');
+        // can write
+        tester::execute_admin_set_paused(admin, OTHER(), true);
+        let config: Config = tester::get_Config(world);
+        assert(config.paused == true, 'paused');
+        // unset
+        tester::execute_admin_set_owner(admin, OWNER(), OTHER(), false);
+        assert(world.is_owner(OTHER(), admin_hash) == false, 'new_other_false');
     }
 
     #[test]
-    fn test_set_owner() {
-        let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
-        let config: Config = admin.get_config();
-        assert(config.owner_address == OWNER(), 'owner_address_param');
+    #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
+    fn test_set_revoke_owner_write() {
+        let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let admin_hash = selector_from_tag!("pistols-admin");
         // set
-        tester::execute_admin_set_owner(admin, OWNER(), BUMMER());
-        let config: Config = admin.get_config();
-        assert(config.owner_address == BUMMER(), 'set_owner_new');
-    }
-
-    #[test]
-    fn test_set_treasury() {
-        let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
-        let config: Config = admin.get_config();
-        assert(config.treasury_address == OWNER(), 'treasury_address_param');
-        // set
-        let new_treasury: ContractAddress = starknet::contract_address_const::<0x121212>();
-        tester::execute_admin_set_treasury(admin, OWNER(), new_treasury);
-        let config: Config = admin.get_config();
-        assert(config.treasury_address == new_treasury, 'set_treasury_new');
-        // set
-        tester::execute_admin_set_treasury(admin, OWNER(), BUMMER());
-        let config: Config = admin.get_config();
-        assert(config.treasury_address == BUMMER(), 'treasury_address_newer');
+        tester::execute_admin_set_owner(admin, OWNER(), OTHER(), true);
+        assert(world.is_owner(OTHER(), admin_hash) == true, 'new_owner_true');
+        // unset
+        tester::execute_admin_set_owner(admin, OWNER(), OTHER(), false);
+        assert(world.is_owner(OTHER(), admin_hash) == false, 'new_owner_false');
+        // cannot write
+        tester::execute_admin_set_paused(admin, OTHER(), true);
     }
 
     #[test]
     #[should_panic(expected:('ADMIN: Invalid owner_address', 'ENTRYPOINT_FAILED'))]
     fn test_set_owner_null() {
         let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
-        tester::execute_admin_set_owner(admin, OWNER(), ZERO());
-    }
-
-    #[test]
-    #[should_panic(expected:('ADMIN: Invalid treasury_address', 'ENTRYPOINT_FAILED'))]
-    fn test_set_treasury_null() {
-        let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
-
-        tester::execute_admin_set_treasury(admin, OWNER(), ZERO());
-    }
-
-    #[test]
-    fn test_set_paused() {
-        let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
-        let config: Config = admin.get_config();
-        assert(config.paused == false, 'paused_1');
-        // set
-        tester::execute_admin_set_paused(admin, OWNER(), true);
-        let config: Config = admin.get_config();
-        assert(config.paused == true, 'paused_2');
-        // set
-        tester::execute_admin_set_paused(admin, OWNER(), false);
-        let config: Config = admin.get_config();
-        assert(config.paused == false, 'paused_3');
+        tester::execute_admin_set_owner(admin, OWNER(), ZERO(), true);
     }
 
     #[test]
     #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
     fn test_set_owner_not_owner() {
         let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        tester::execute_admin_set_owner(admin, OTHER(), BUMMER(), true);
+    }
+
+    #[test]
+    fn test_set_paused() {
+        let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let config: Config = tester::get_Config(world);
+        assert(config.paused == false, 'paused_1');
+        // set
+        tester::execute_admin_set_paused(admin, OWNER(), true);
+        let config: Config = tester::get_Config(world);
+        assert(config.paused == true, 'paused_2');
+        // set
+        tester::execute_admin_set_paused(admin, OWNER(), false);
+        let config: Config = tester::get_Config(world);
+        assert(config.paused == false, 'paused_3');
+    }
+
+    #[test]
+    #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
+    fn test_set_paused_not_owner() {
+        let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        tester::execute_admin_set_paused(admin, OTHER(), true);
+    }
+
+    #[test]
+    fn test_set_treasury() {
+        let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let config: Config = tester::get_Config(world);
+        assert(config.treasury_address == OWNER(), 'treasury_address_param');
+        // set
         let new_treasury: ContractAddress = starknet::contract_address_const::<0x121212>();
-        tester::execute_admin_set_owner(admin, OTHER(), new_treasury);
+        tester::execute_admin_set_treasury(admin, OWNER(), new_treasury);
+        let config: Config = tester::get_Config(world);
+        assert(config.treasury_address == new_treasury, 'set_treasury_new');
+        // set
+        tester::execute_admin_set_treasury(admin, OWNER(), BUMMER());
+        let config: Config = tester::get_Config(world);
+        assert(config.treasury_address == BUMMER(), 'treasury_address_newer');
+    }
+
+    #[test]
+    #[should_panic(expected:('ADMIN: Invalid treasury_address', 'ENTRYPOINT_FAILED'))]
+    fn test_set_treasury_null() {
+        let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        tester::execute_admin_set_treasury(admin, OWNER(), ZERO());
     }
 
     #[test]
@@ -119,13 +129,6 @@ mod tests {
         let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         let new_treasury: ContractAddress = starknet::contract_address_const::<0x121212>();
         tester::execute_admin_set_treasury(admin, OTHER(), new_treasury);
-    }
-
-    #[test]
-    #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
-    fn test_set_paused_not_owner() {
-        let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
-        tester::execute_admin_set_paused(admin, OTHER(), true);
     }
 
     //

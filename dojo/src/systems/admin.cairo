@@ -9,9 +9,10 @@ use pistols::models::table::{TableConfig};
 
 #[dojo::interface]
 trait IAdmin {
-    fn set_owner(ref world: IWorldDispatcher, owner_address: ContractAddress);
+    fn set_owner(ref world: IWorldDispatcher, owner_address: ContractAddress, granted: bool);
     fn set_treasury(ref world: IWorldDispatcher, treasury_address: ContractAddress);
     fn set_paused(ref world: IWorldDispatcher, paused: bool);
+
     fn set_table(ref world: IWorldDispatcher, table_id: felt252, contract_address: ContractAddress, description: felt252, fee_min: u128, fee_pct: u8, is_open: bool);
     fn open_table(ref world: IWorldDispatcher, table_id: felt252, is_open: bool);
     
@@ -41,14 +42,12 @@ mod admin {
     
     fn dojo_init(
         ref world: IWorldDispatcher,
-        owner_address: ContractAddress,
         treasury_address: ContractAddress,
         lords_address: ContractAddress,
     ) {
         let manager = ConfigManagerTrait::new(world);
         let mut config = manager.get();
         // initialize
-        config.owner_address = (if (owner_address.is_zero()) { get_caller_address() } else { owner_address });
         config.treasury_address = (if (treasury_address.is_zero()) { get_caller_address() } else { treasury_address });
         config.paused = false;
         manager.set(config);
@@ -58,20 +57,19 @@ mod admin {
 
     #[abi(embed_v0)]
     impl AdminImpl of super::IAdmin<ContractState> {
-        fn set_owner(ref world: IWorldDispatcher, owner_address: ContractAddress) {
+        fn set_owner(ref world: IWorldDispatcher, owner_address: ContractAddress, granted: bool) {
             self.assert_caller_is_owner();
-            assert(owner_address != utils::ZERO(), Errors::INVALID_OWNER);
-            // get current
-            let manager = ConfigManagerTrait::new(world);
-            let mut config = manager.get();
-            // update
-            config.owner_address = owner_address;
-            manager.set(config);
+            assert(owner_address.is_non_zero(), Errors::INVALID_OWNER);
+            if (granted) {
+                world.grant_owner(owner_address, self.selector().into());
+            } else {
+                world.revoke_owner(owner_address, self.selector().into());
+            }
         }
 
         fn set_treasury(ref world: IWorldDispatcher, treasury_address: ContractAddress) {
             self.assert_caller_is_owner();
-            assert(treasury_address != utils::ZERO(), Errors::INVALID_TREASURY);
+            assert(treasury_address.is_non_zero(), Errors::INVALID_TREASURY);
             // get current
             let manager = ConfigManagerTrait::new(world);
             let mut config = manager.get();
@@ -134,11 +132,7 @@ mod admin {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn assert_caller_is_owner(self: @ContractState) {
-            assert(
-                self.world().is_owner(get_caller_address(), get_contract_address().into()) ||
-                ConfigManagerTrait::is_owner(self.world(), get_caller_address()),
-                Errors::NOT_OWNER
-            );
+            assert(self.world().is_owner(get_caller_address(), self.selector().into()), Errors::NOT_OWNER);
         }
     }
 }
