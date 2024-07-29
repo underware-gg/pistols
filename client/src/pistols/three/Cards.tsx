@@ -648,8 +648,6 @@ export class CardsHand extends THREE.Group {
     group.removeFromParent()
 
     if (this.isExpanded) {
-      console.log("EXPAND AGAIN")
-      console.log(this.children)
       this.expandHand()
     }
   }
@@ -749,7 +747,7 @@ export class CardsHand extends THREE.Group {
     scale.start()
   }
 
-  public update(deltaTime: number, newScenePositionX: number) {
+  public update(newScenePositionX: number) {
     if (Math.abs(newScenePositionX - (this.currentSceneCards.position.x - (this.isLeft ? X_OFFSET : -X_OFFSET))) > 0.001) {
       this.currentSceneCards.position.x = newScenePositionX + (this.isLeft ? X_OFFSET : -X_OFFSET)
 
@@ -764,8 +762,6 @@ export class CardsHand extends THREE.Group {
       this.currentSceneCards.position.y += heightChange / 2; 
 
     }
-
-    TWEEN.update(deltaTime)
   }
 
   public resetCards() {

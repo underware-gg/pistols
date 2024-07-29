@@ -1,12 +1,14 @@
 import * as THREE from 'three'
-import TWEEN, { Group, Tween } from '@tweenjs/tween.js'
+import TWEEN from '@tweenjs/tween.js'
 
-import { CharacterType, AudioName, AUDIO_ASSETS, TEXTURES, CARD_TEXTURES, SPRITESHEETS, AnimName, sceneBackgrounds, TextureName, CardTextureName } from '@/pistols/data/assets'
+import { CharacterType, AudioName, AnimName, CardTextureName } from '@/pistols/data/assets'
 import { Action, ActionTypes } from '@/pistols/utils/pistols'
 
 import { Actor } from './SpriteSheetMaker'
 import { Card, CardsHand } from './Cards'
 import { _sfxEnabled, AnimationState, ASPECT, emitter, playAudio } from './game'
+import { ProgressDialogManager } from './ProgressDialog'
+import { DuelStage } from '../hooks/useDuel'
 
 const ACTOR_WIDTH = 2.5
 const ACTOR_HEIGHT = 1.35
@@ -33,6 +35,19 @@ interface Duelist {
   cards: CardsHand
 }
 
+const completedStagesA = {
+  [DuelStage.Round1Commit]: false,
+  [DuelStage.Round1Reveal]: false,
+  [DuelStage.Round2Commit]: false,
+  [DuelStage.Round2Reveal]: false,
+}
+const completedStagesB = {
+  [DuelStage.Round1Commit]: false,
+  [DuelStage.Round1Reveal]: false,
+  [DuelStage.Round2Commit]: false,
+  [DuelStage.Round2Reveal]: false,
+}
+
 export class DuelistsManager {
   
   private scene: THREE.Scene
@@ -44,6 +59,8 @@ export class DuelistsManager {
   private raycaster = new THREE.Raycaster()
 
   private darkBackground: THREE.Mesh
+
+  private duelProgressDialogManger: ProgressDialogManager
 
   public duelistA: Duelist = {
     id: 'A',
@@ -70,6 +87,11 @@ export class DuelistsManager {
     this.loadDuelists()
     this.loadCards()
     this.setupCameraCardUI()
+
+    const positionA = new THREE.Vector3(this.duelistA.actor.mesh.position.x, ACTOR_HEIGHT * (this.duelistA.model == CharacterType.MALE ? 0.85 : 0.75), this.duelistA.actor.mesh.position.z)
+    const positionB = new THREE.Vector3(this.duelistB.actor.mesh.position.x, ACTOR_HEIGHT * (this.duelistB.model == CharacterType.MALE ? 0.85 : 0.75), this.duelistB.actor.mesh.position.z)
+
+    this.duelProgressDialogManger = new ProgressDialogManager(scene, positionA, positionB)
 
     this.setupEvents()
   }
@@ -133,12 +155,14 @@ export class DuelistsManager {
       switch (event.key.toLowerCase()) { 
         case "q":
           this.duelistA.cards.addCardToScene(CardTextureName.card_front_shoot)
+          this.duelProgressDialogManger.showDialogs()
           break
         case "w":
           this.duelistA.cards.addCardToScene(CardTextureName.card_front_face, CardTextureName.card_front_face_grim)
           break
           case "e":
             this.duelistB.cards.addCardToScene(CardTextureName.card_front_shoot)
+            this.duelProgressDialogManger.hideDialogs()
           break
         case "r":
           this.duelistB.cards.addCardToScene(CardTextureName.card_front_face, CardTextureName.card_front_face_grim)
@@ -147,8 +171,31 @@ export class DuelistsManager {
           this.duelistA.cards.combineCards()
           this.duelistB.cards.combineCards()
           break
+        case "p":
+
+          if (!completedStagesA[DuelStage.Round1Commit]) {
+            completedStagesA[DuelStage.Round1Commit] = true
+          } else if (completedStagesA[DuelStage.Round1Commit] && !completedStagesB[DuelStage.Round1Commit]) {
+            completedStagesB[DuelStage.Round1Commit] = true
+          } else if (!completedStagesA[DuelStage.Round1Reveal]) {
+            completedStagesA[DuelStage.Round1Reveal] = true
+          } else if (completedStagesA[DuelStage.Round1Reveal] && !completedStagesB[DuelStage.Round1Reveal]) {
+            completedStagesB[DuelStage.Round1Reveal] = true
+          } else if (!completedStagesA[DuelStage.Round2Commit]) {
+            completedStagesA[DuelStage.Round2Commit] = true
+          } else if (completedStagesA[DuelStage.Round2Commit] && !completedStagesB[DuelStage.Round2Commit]) {
+            completedStagesB[DuelStage.Round2Commit] = true
+          } else if (!completedStagesA[DuelStage.Round2Reveal]) {
+            completedStagesA[DuelStage.Round2Reveal] = true
+          } else if (completedStagesA[DuelStage.Round2Reveal] && !completedStagesB[DuelStage.Round2Reveal]) {
+            completedStagesB[DuelStage.Round2Reveal] = true
+          }
+
+          this.duelProgressDialogManger.updateDialogState(completedStagesA, completedStagesB, null)
+          break;
         case "escape":
           console.log(this.camera)
+          console.log(this.scene)
           if (this.currentHandSelected && !this.currentHandSelected.isAnimatingDetails && this.currentHandSelected.areDetailsShown) {
             this.currentHandSelected.hideHandDetails()
             new TWEEN.Tween(this.darkBackground.material) //TODO make functions for show and hide of the dark background and save the animation
@@ -175,10 +222,12 @@ export class DuelistsManager {
 
   public update(deltaTime: number, elapsedTime: number) {
     this.duelistA.actor?.update(elapsedTime)
-    this.duelistA.cards?.update(deltaTime, this.duelistA.actor?.mesh.position.x)
+    this.duelistA.cards?.update(this.duelistA.actor?.mesh.position.x)
     
     this.duelistB.actor?.update(elapsedTime)
-    this.duelistB.cards?.update(deltaTime, this.duelistB.actor?.mesh.position.x)
+    this.duelistB.cards?.update(this.duelistB.actor?.mesh.position.x)
+    
+    this.duelProgressDialogManger.update(this.duelistA.actor?.mesh.position.x, this.duelistB.actor?.mesh.position.x)
   }
 
   private clickListener = (event) => this.onMouseClick(event)
@@ -262,7 +311,6 @@ export class DuelistsManager {
 
     if (!this.currentHandSelected.areDetailsShown) {
       this.currentHandSelected.showHandDetails()
-      console.log(this.currentHandSelected.name, this.duelistA.cards.name)
       if (this.currentHandSelected.name == this.duelistA.cards.name) {
         this.duelistB.cards.sendCardsToBack()
       } else {
@@ -274,7 +322,6 @@ export class DuelistsManager {
         .start()
     } else if (this.currentIntersections == 0) {
       this.currentHandSelected.hideHandDetails()
-      console.log(this.currentHandSelected.name, this.duelistA.cards.name)
       const isDuelistAHand = this.currentHandSelected.name == this.duelistA.cards.name
       this.timeoutId = setTimeout(() => {
         this.onMouseMove(this.lastMouseEven)
@@ -299,7 +346,7 @@ export class DuelistsManager {
   // New duel setup reset
   //
 
-  public switchDuelists(duelistNameA: string, duelistModelA: CharacterType, duelistNameB: string, duelistModelB: CharacterType) {
+  public switchDuelists(duelistNameA: string, duelistModelA: CharacterType, isDuelistAYou: boolean, duelistNameB: string, duelistModelB: CharacterType) {
     localStorage.setItem(DuelistsData.DUELIST_A_MODEL, duelistModelA)
     localStorage.setItem(DuelistsData.DUELIST_B_MODEL, duelistModelB)
     this.duelistA.model = localStorage.getItem(DuelistsData.DUELIST_A_MODEL) == CharacterType.MALE ? CharacterType.MALE : CharacterType.FEMALE
@@ -312,6 +359,8 @@ export class DuelistsManager {
 
     this.duelistA.actor.repalceSpriteSheets(this.spriteSheets[this.duelistA.model]) //TODO check if works instead of this.duelistA.model == CharacterType.MALE ? this.spriteSheets.MALE : this.spriteSheets.FEMALE
     this.duelistB.actor.repalceSpriteSheets(this.spriteSheets[this.duelistB.model])
+
+    this.duelProgressDialogManger.setData(duelistNameA, duelistNameB, isDuelistAYou)
   }
 
   public resetDuelists(): boolean {
@@ -327,6 +376,10 @@ export class DuelistsManager {
     this.playActorAnimation(this.duelistB, AnimName.STILL, null, true)
 
     return true
+  }
+
+  public updatePlayerProgress(duelistAState: any, duelistBState: any, onClick: any) {
+    this.duelProgressDialogManger.updateDialogState(duelistAState, duelistBState, onClick)
   }
 
 

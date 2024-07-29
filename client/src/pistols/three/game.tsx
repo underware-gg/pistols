@@ -635,7 +635,7 @@ function createWaterPlane(name, geometry, params) {
 
 function createGrass() {
   if (!_scenes[SceneName.Duel]) return;
-  // if (!_grassTransforms || _growthPercentage == undefined) return;
+  if (!_grassTransforms || _growthPercentage == undefined) return;
   if (_grass) return;
 
   _grass = new Grass(
@@ -746,8 +746,8 @@ export function switchScene(sceneName) {
   }
 }
 
-export function startDuelWithPlayers(duelistNameA, duelistModelA, duelistNameB, duelistModelB) {
-  _duelistManager.switchDuelists(duelistNameA, duelistModelA, duelistNameB, duelistModelB)
+export function startDuelWithPlayers(duelistNameA, duelistModelA, isDuelistAYou, duelistNameB, duelistModelB) {
+  _duelistManager.switchDuelists(duelistNameA, duelistModelA, isDuelistAYou, duelistNameB, duelistModelB)
   
   switchScene(SceneName.Duel) // make sure we're in the correct scene (duel page refresh)
   resetDuelScene()
@@ -758,6 +758,10 @@ export function setDuelTimePercentage(timePassed: number) {
   localStorage.setItem('GROWTH', timePassedPercentage.toString())
   _growthPercentage = parseFloat(localStorage.getItem('GROWTH'))
   createGrass()
+}
+
+export function updatePlayerProgress(duelistAState, duelistBState, onClick) {
+  _duelistManager.updatePlayerProgress(duelistAState, duelistBState, onClick)
 }
 
 //----------------

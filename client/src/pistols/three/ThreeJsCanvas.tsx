@@ -48,15 +48,27 @@ export const ThreeJsCanvas = ({
   }, [canvasRef.current])
 
   return (
-    <canvas
-      id='gameCanvas'
-      className='GameCanvas'
-      ref={canvasRef}
-      width={width * 2}
-      height={height * 2}
-    >
-      Canvas not supported by your browser! 😱
-    </canvas>
+    <div>
+      <div id='hidden-container' style={{ position: 'absolute', visibility: 'hidden'}}></div>
+      <div id='player-bubble' className='dialog-container'>
+        <div className='dialog-background'></div>
+        <div className='dialog-title'></div>
+        <div className='dialog-duelist'></div>
+        <div className='dialog-content'>
+          <button className='dialog-button'></button>
+          <div className='spinner'></div>
+        </div>
+      </div>
+      <canvas
+        id='gameCanvas'
+        className='GameCanvas'
+        ref={canvasRef}
+        width={width * 2}
+        height={height * 2}
+      >
+        Canvas not supported by your browser! 😱
+      </canvas>
+    </div>
   )
 }
 

@@ -48,12 +48,13 @@ export default function Duel({
   const [duelSceneStarted, setDuelSceneStarted] = useState(false)
   const { profilePic: profilePicA, nameDisplay: nameA } = useDuelist(duelistIdA)
   const { profilePic: profilePicB, nameDisplay: nameB } = useDuelist(duelistIdB)
+  const isYou = useIsYou(duelistIdA)
   useEffect(() => {
     if (gameImpl && mounted && !duelSceneStarted && profilePicA && profilePicB && nameA && nameB) {
-      gameImpl.startDuelWithPlayers(nameA, ProfileModels[profilePicA], nameB, ProfileModels[profilePicB])
+      gameImpl.startDuelWithPlayers(nameA, ProfileModels[profilePicA], isYou, nameB, ProfileModels[profilePicB])
       setDuelSceneStarted(true)
     }
-  }, [gameImpl, mounted, duelSceneStarted, profilePicA, profilePicB, nameA, nameB])
+  }, [gameImpl, mounted, duelSceneStarted, profilePicA, profilePicB, nameA, nameB, isYou])
 
   // setup grass animation
   const { clientTimestamp } = useClientTimestamp(false)
@@ -75,6 +76,10 @@ export default function Duel({
   const { dispatchSelectDuel } = usePistolsContext()
 
   useEffect(() => dispatchSelectDuel(duelId), [duelId])
+
+  useEffect(() => {
+    gameImpl.updatePlayerProgress(completedStagesA, completedStagesB, null) //TODO send currect on click function for the popup to the game! 
+  }, [gameImpl, completedStagesA, completedStagesB])
 
   if (!duelSceneStarted) return <></>
 
