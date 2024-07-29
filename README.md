@@ -134,7 +134,7 @@ Install the [Cairo 1.0](https://marketplace.visualstudio.com/items?itemName=star
 
 ### Install Dojo 
 
-> [Dojo Book](https://book.dojoengine.org/getting-started/quick-start.html)
+> [Dojo Book](https://book.dojoengine.org/getting-started)
 
 Currenty using Dojo version `v0.7.2`
 
