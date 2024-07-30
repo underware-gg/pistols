@@ -76,10 +76,10 @@ export const initialState = {
   filterDuelistActive: false,
   filterDuelistSortColumn: DuelistColumn.Honour,
   filterDuelistSortDirection: SortDirection.Descending,
-  filterChallengeYourStates: AllChallengeStates,
-  filterChallengeLiveStates: AllChallengeStates,
-  filterChallengePastStates: AllChallengeStates,
-  filterChallengeSelectedDuelistStates: AllChallengeStates,
+  filterStatesYourDuels: AllChallengeStates,
+  filterStatesLiveDuels: AllChallengeStates,
+  filterStatesPastDuels: AllChallengeStates,
+  filterStatesDuelistDuels: AllChallengeStates,
   // queries
   queryDuelists: [] as DuelistRow[],
   queryYourDuels: emptyChallengeQuery,
@@ -96,15 +96,15 @@ enum QueryActions {
   FILTER_DUELIST_ACTIVE = 'FILTER_DUELIST_ACTIVE',
   FILTER_DUELIST_SORT_COLUMN = 'FILTER_DUELIST_SORT_COLUMN',
   FILTER_DUELIST_SORT_DIRECTION = 'FILTER_DUELIST_SORT_DIRECTION',
-  FILTER_CHALLENGE_YOUR_STATES = 'FILTER_CHALLENGE_YOUR_STATES',
-  FILTER_CHALLENGE_LIVE_STATES = 'FILTER_CHALLENGE_LIVE_STATES',
-  FILTER_CHALLENGE_PAST_STATES = 'FILTER_CHALLENGE_PAST_STATES',
-  FILTER_CHALLENGE_SELECTED_DUELIST_STATES = 'FILTER_CHALLENGE_SELECTED_DUELIST_STATES',
+  FILTER_STATE_YOUR_DUELS = 'FILTER_STATE_YOUR_DUELS',
+  FILTER_STATE_LIVE_DUELS = 'FILTER_STATE_LIVE_DUELS',
+  FILTER_STATE_PAST_DUELS = 'FILTER_STATE_PAST_DUELS',
+  FILTER_STATE_DUELIST_DUELS = 'FILTER_STATE_DUELIST_DUELS',
   QUERY_DUELISTS = 'QUERY_DUELISTS',
   QUERY_YOUR_DUELS = 'QUERY_YOUR_DUELS',
   QUERY_LIVE_DUELS = 'QUERY_LIVE_DUELS',
   QUERY_PAST_DUELS = 'QUERY_PAST_DUELS',
-  QUERY_SELECTED_DUELIST_DUELS = 'QUERY_SELECTED_DUELIST_DUELS',
+  QUERY_DUELIST_DUELS = 'QUERY_DUELIST_DUELS',
 }
 
 
@@ -121,15 +121,15 @@ type ActionType =
   | { type: 'FILTER_DUELIST_ACTIVE', payload: boolean }
   | { type: 'FILTER_DUELIST_SORT_COLUMN', payload: DuelistColumn }
   | { type: 'FILTER_DUELIST_SORT_DIRECTION', payload: SortDirection }
-  | { type: 'FILTER_CHALLENGE_YOUR_STATES', payload: ChallengeState[] }
-  | { type: 'FILTER_CHALLENGE_LIVE_STATES', payload: ChallengeState[] }
-  | { type: 'FILTER_CHALLENGE_PAST_STATES', payload: ChallengeState[] }
-  | { type: 'FILTER_CHALLENGE_SELECTED_DUELIST_STATES', payload: ChallengeState[] }
+  | { type: 'FILTER_STATE_YOUR_DUELS', payload: ChallengeState[] }
+  | { type: 'FILTER_STATE_LIVE_DUELS', payload: ChallengeState[] }
+  | { type: 'FILTER_STATE_PAST_DUELS', payload: ChallengeState[] }
+  | { type: 'FILTER_STATE_DUELIST_DUELS', payload: ChallengeState[] }
   | { type: 'QUERY_DUELISTS', payload: DuelistRow[] }
   | { type: 'QUERY_YOUR_DUELS', payload: ChallengeQuery }
   | { type: 'QUERY_LIVE_DUELS', payload: ChallengeQuery }
   | { type: 'QUERY_PAST_DUELS', payload: ChallengeQuery }
-  | { type: 'QUERY_SELECTED_DUELIST_DUELS', payload: ChallengeQuery }
+  | { type: 'QUERY_DUELIST_DUELS', payload: ChallengeQuery }
 
 
 
@@ -190,20 +190,20 @@ const QueryProvider = ({
         newState.filterDuelistSortDirection = action.payload as SortDirection
         break
       }
-      case QueryActions.FILTER_CHALLENGE_YOUR_STATES: {
-        newState.filterChallengeYourStates = action.payload as ChallengeState[]
+      case QueryActions.FILTER_STATE_YOUR_DUELS: {
+        newState.filterStatesYourDuels = action.payload as ChallengeState[]
         break
       }
-      case QueryActions.FILTER_CHALLENGE_LIVE_STATES: {
-        newState.filterChallengeLiveStates = action.payload as ChallengeState[]
+      case QueryActions.FILTER_STATE_LIVE_DUELS: {
+        newState.filterStatesLiveDuels = action.payload as ChallengeState[]
         break
       }
-      case QueryActions.FILTER_CHALLENGE_PAST_STATES: {
-        newState.filterChallengePastStates = action.payload as ChallengeState[]
+      case QueryActions.FILTER_STATE_PAST_DUELS: {
+        newState.filterStatesPastDuels = action.payload as ChallengeState[]
         break
       }
-      case QueryActions.FILTER_CHALLENGE_SELECTED_DUELIST_STATES: {
-        newState.filterChallengeSelectedDuelistStates = action.payload as ChallengeState[]
+      case QueryActions.FILTER_STATE_DUELIST_DUELS: {
+        newState.filterStatesDuelistDuels = action.payload as ChallengeState[]
         break
       }
       case QueryActions.QUERY_DUELISTS: {
@@ -222,7 +222,7 @@ const QueryProvider = ({
         newState.queryPastDuels = action.payload as ChallengeQuery
         break
       }
-      case QueryActions.QUERY_SELECTED_DUELIST_DUELS: {
+      case QueryActions.QUERY_DUELIST_DUELS: {
         newState.querySelectedDuelistDuels = action.payload as ChallengeQuery
         break
       }
@@ -418,9 +418,9 @@ const QueryProvider = ({
   useEffect(() => {
     let excludes = _excludeRowsByDuelist(allChallenges, address, duelistId)
     // filter rows
-    const result = _buildChallengeQuery(allChallenges, excludes, state.filterChallengeYourStates)
+    const result = _buildChallengeQuery(allChallenges, excludes, state.filterStatesYourDuels)
     dispatch({ type: QueryActions.QUERY_YOUR_DUELS, payload: result })
-  }, [allChallenges, address, duelistId, state.filterChallengeYourStates])
+  }, [allChallenges, address, duelistId, state.filterStatesYourDuels])
 
   useEffect(() => {
     // filter by state
@@ -429,9 +429,9 @@ const QueryProvider = ({
       if (!row.isLive) excludes.add(index)
     })
     // filter rows
-    const result = _buildChallengeQuery(allChallenges, excludes, state.filterChallengeLiveStates)
+    const result = _buildChallengeQuery(allChallenges, excludes, state.filterStatesLiveDuels)
     dispatch({ type: QueryActions.QUERY_LIVE_DUELS, payload: result })
-  }, [allChallenges, state.filterChallengeLiveStates])
+  }, [allChallenges, state.filterStatesLiveDuels])
 
   useEffect(() => {
     // filter by state
@@ -440,9 +440,9 @@ const QueryProvider = ({
       if (!(row.isCanceled || row.isFinished)) excludes.add(index)
     })
     // filter rows
-    const result = _buildChallengeQuery(allChallenges, excludes, state.filterChallengePastStates)
+    const result = _buildChallengeQuery(allChallenges, excludes, state.filterStatesPastDuels)
     dispatch({ type: QueryActions.QUERY_PAST_DUELS, payload: result })
-  }, [allChallenges, state.filterChallengePastStates])
+  }, [allChallenges, state.filterStatesPastDuels])
 
   useEffect(() => {
     let excludes = _excludeRowsByDuelist(allChallenges, undefined, selectedDuelistId)
@@ -451,9 +451,9 @@ const QueryProvider = ({
       if (!(row.isLive || row.isFinished)) excludes.add(index)
     })
     // filter rows
-    const result = _buildChallengeQuery(allChallenges, excludes, state.filterChallengeSelectedDuelistStates)
-    dispatch({ type: QueryActions.QUERY_SELECTED_DUELIST_DUELS, payload: result })
-  }, [allChallenges, selectedDuelistId, state.filterChallengeSelectedDuelistStates])
+    const result = _buildChallengeQuery(allChallenges, excludes, state.filterStatesDuelistDuels)
+    dispatch({ type: QueryActions.QUERY_DUELIST_DUELS, payload: result })
+  }, [allChallenges, selectedDuelistId, state.filterStatesDuelistDuels])
 
   //
   // Finito
@@ -502,17 +502,17 @@ export const useQueryContext = () => {
       payload: state.filterDuelistSortDirection == SortDirection.Ascending ? SortDirection.Descending : SortDirection.Ascending,
     })
   }
-  const dispatchFilterChallengeYourStates = (payload: ChallengeState[]) => {
-    dispatch({ type: QueryActions.FILTER_CHALLENGE_YOUR_STATES, payload })
+  const dispatchFilterStatesYourDuels = (payload: ChallengeState[]) => {
+    dispatch({ type: QueryActions.FILTER_STATE_YOUR_DUELS, payload })
   }
-  const dispatchFilterChallengeLiveStates = (payload: ChallengeState[]) => {
-    dispatch({ type: QueryActions.FILTER_CHALLENGE_LIVE_STATES, payload })
+  const dispatchFilterStatesLiveDuels = (payload: ChallengeState[]) => {
+    dispatch({ type: QueryActions.FILTER_STATE_LIVE_DUELS, payload })
   }
-  const dispatchFilterChallengePastStates = (payload: ChallengeState[]) => {
-    dispatch({ type: QueryActions.FILTER_CHALLENGE_PAST_STATES, payload })
+  const dispatchFilterStatesPastDuels = (payload: ChallengeState[]) => {
+    dispatch({ type: QueryActions.FILTER_STATE_PAST_DUELS, payload })
   }
-  const dispatchFilterChallengeSelectedDuelistStates = (payload: ChallengeState[]) => {
-    dispatch({ type: QueryActions.FILTER_CHALLENGE_SELECTED_DUELIST_STATES, payload })
+  const dispatchFilterStatesDuelistDuels = (payload: ChallengeState[]) => {
+    dispatch({ type: QueryActions.FILTER_STATE_DUELIST_DUELS, payload })
   }
   return {
     ...state,
@@ -522,10 +522,10 @@ export const useQueryContext = () => {
     dispatchFilterDuelistSortColumn,
     dispatchFilterDuelistSortDirection,
     dispatchFilterDuelistSortSwitch,
-    dispatchFilterChallengeYourStates,
-    dispatchFilterChallengeLiveStates,
-    dispatchFilterChallengePastStates,
-    dispatchFilterChallengeSelectedDuelistStates,
+    dispatchFilterStatesYourDuels,
+    dispatchFilterStatesLiveDuels,
+    dispatchFilterStatesPastDuels,
+    dispatchFilterStatesDuelistDuels,
   }
 }
 

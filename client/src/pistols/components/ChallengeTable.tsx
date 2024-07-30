@@ -25,25 +25,25 @@ const HeaderCell = Table.HeaderCell
 export function ChallengeTableLive() {
   const {
     queryLiveDuels: { challengeIds, states },
-    filterChallengeLiveStates, dispatchFilterChallengeLiveStates
+    filterStatesLiveDuels, dispatchFilterStatesLiveDuels
   } = useQueryContext()
-  return <ChallengeTableByIds challengeIds={challengeIds} color='green' compact existingStates={states} states={filterChallengeLiveStates} setStates={dispatchFilterChallengeLiveStates} />
+  return <ChallengeTableByIds challengeIds={challengeIds} color='green' compact existingStates={states} states={filterStatesLiveDuels} setStates={dispatchFilterStatesLiveDuels} />
 }
 
 export function ChallengeTablePast() {
   const {
     queryPastDuels: { challengeIds, states },
-    filterChallengePastStates, dispatchFilterChallengePastStates
+    filterStatesPastDuels, dispatchFilterStatesPastDuels
   } = useQueryContext()
-  return <ChallengeTableByIds challengeIds={challengeIds} color='red' compact existingStates={states} states={filterChallengePastStates} setStates={dispatchFilterChallengePastStates} />
+  return <ChallengeTableByIds challengeIds={challengeIds} color='red' compact existingStates={states} states={filterStatesPastDuels} setStates={dispatchFilterStatesPastDuels} />
 }
 
 export function ChallengeTableYour() {
   const {
     queryYourDuels: { challengeIds, states },
-    filterChallengeYourStates, dispatchFilterChallengeYourStates
+    filterStatesYourDuels, dispatchFilterStatesYourDuels
   } = useQueryContext()
-  return <ChallengeTableByIds challengeIds={challengeIds} compact existingStates={states} states={filterChallengeYourStates} setStates={dispatchFilterChallengeYourStates} />
+  return <ChallengeTableByIds challengeIds={challengeIds} compact existingStates={states} states={filterStatesYourDuels} setStates={dispatchFilterStatesYourDuels} />
 }
 
 export function ChallengeTableSelectedDuelist({
