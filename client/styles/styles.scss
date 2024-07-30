@@ -546,6 +546,10 @@ $box-h: calc((100vh - $aspect-h) / 2);
 .ModalText {
   font-size: 20px!important;
 }
+.DuelistModal {
+  width: 900px;
+  // height: 450px;
+}
 .DuelistModalDescription {
   width: 620px;
 }

@@ -9,7 +9,7 @@ import { useDuelistOwner } from '@/pistols/hooks/useTokenDuelist'
 import { useIsMyDuelist, useIsYou } from '@/pistols/hooks/useIsMyDuelist'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
-import { ChallengeTableByDuelist } from '@/pistols/components/ChallengeTable'
+import { ChallengeTableSelectedDuelist } from '@/pistols/components/ChallengeTable'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { IconClick } from '@/lib/ui/Icons'
@@ -42,10 +42,11 @@ export default function DuelistModal() {
 
   return (
     <Modal
-      // size='small'
+      // size='large'
       // dimmer='inverted'
       onClose={() => _close()}
       open={isOpen}
+      className=''
     >
       <Modal.Header>
         <Grid>
@@ -74,14 +75,14 @@ export default function DuelistModal() {
           </Row>
         </Grid>
       </Modal.Header>
-      <Modal.Content image className='Relative'>
+      <Modal.Content image className='DuelistModal Relative'>
         <ProfilePic profilePic={profilePic} duelistId={selectedDuelistId} />
         <Modal.Description className='FillParent'>
           <div className='DuelistModalDescription'>
             <ProfileDescription duelistId={selectedDuelistId} tableId={tableId} displayBalance displayStats />
             <div className='Spacer10' />
             <div className='TableInModal'>
-              <ChallengeTableByDuelist duelistId={selectedDuelistId} compact tableId={tableId} />
+              <ChallengeTableSelectedDuelist compact />
             </div>
           </div>
         </Modal.Description>

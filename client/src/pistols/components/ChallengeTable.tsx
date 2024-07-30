@@ -46,19 +46,13 @@ export function ChallengeTableYour() {
   return <ChallengeTableByIds challengeIds={challengeIds} compact existingStates={states} states={filterChallengeYourStates} setStates={dispatchFilterChallengeYourStates} />
 }
 
-export function ChallengeTableByDuelist({
-  duelistId = null,
-  address = null,
+export function ChallengeTableSelectedDuelist({
   compact = false,
-  tableId
 }: {
-  duelistId: BigNumberish
-  address?: BigNumberish
   compact: boolean
-  tableId?: string
 }) {
   const [statesFilter, setStatesFilter] = useState(AllChallengeStates)
-  const { queryYourDuels: { challengeIds, states } } = useQueryContext()
+  const { querySelectedDuelistDuels: { challengeIds, states } } = useQueryContext()
   return <ChallengeTableByIds challengeIds={challengeIds} compact={compact} existingStates={states} states={statesFilter} setStates={setStatesFilter} />
 }
 
