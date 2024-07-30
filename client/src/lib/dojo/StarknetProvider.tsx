@@ -62,7 +62,7 @@ export const StarknetProvider = ({
   //
   // Cartridge Controller
   const manifest = useMemo(() => (dojoAppConfig.manifests[selectedChainId] ?? null), [selectedChainConfig])
-  const { controller } = useController(manifest)
+  const { controller } = useController(manifest, dojoAppConfig.nameSpace)
 
   //
   // Connectors

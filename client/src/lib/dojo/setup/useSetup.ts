@@ -74,7 +74,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
 
   //
   // Check world deployment
-  const { isDeployed } = useSystem(dojoAppConfig.mainSystemName, manifest)
+  const { isDeployed } = useSystem(dojoAppConfig.nameSpace, dojoAppConfig.mainSystemName, manifest)
 
   //
   // Initialize the network configuration.
@@ -99,27 +99,27 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
 
   //
   // fetch all existing entities from torii
-  const { value: subscription } = useAsyncMemo<torii.Subscription>(async () => {
+  const { value: sync } = useAsyncMemo<torii.Subscription>(async () => {
     if (!toriiClient) return (toriiClient as any) // undefined or null
     if (!network) return (network as any) // undefined or null
-    const subscription = await getSyncEntities(
+    const sync = await getSyncEntities(
       toriiClient,
       network.contractComponents as any,
-      undefined,
+      [],
     )
-    console.log(`SYNC FINISHED!!!`, subscription, components)
-    return subscription
+    console.log(`SYNC FINISHED!!!`, sync, components)
+    return sync
   }, [toriiClient, network], undefined, null)
 
   //
   // Establish system calls using the network and components.
   const systemCalls = useMemo<ReturnType<typeof createSystemCalls>>(() => {
     if (!manifest) return null
-    if (!subscription) return (subscription as any) // undefined or null
+    if (!sync) return (sync as any) // undefined or null
     if (!network) return (network as any) // undefined or null
     if (!components) return (components as any) // undefined or null
     return createSystemCalls(network, components, manifest) ?? null
-  }, [manifest, subscription, network, components])
+  }, [manifest, sync, network, components])
 
   //
   // Predeployed accounts
@@ -153,7 +153,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     (dojoProvider !== undefined) &&
     (network !== undefined) &&
     (components !== undefined) &&
-    (subscription !== undefined) &&
+    (sync !== undefined) &&
     (systemCalls !== undefined) &&
     (predeployedManager !== undefined)
   )
@@ -163,7 +163,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     !manifest ? 'Game not Deployed'
       : dojoProviderIsError ? 'Chain Provider is Unavailable'
         : toriiIsError ? 'Game Indexer is Unavailable'
-          : subscription === null ? 'Sync Error'
+          : sync === null ? 'Sync Error'
             : isDeployed === null ? 'World not Found'
               : predeployedManagerIsError ? 'Predeployed Manager error'
                 : null
@@ -181,11 +181,13 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     toriiClient,
     network,
     components,
+    sync,
     systemCalls,
     predeployedManager,
     // pass thru
     dojoAppConfig,
     selectedChainConfig,
+    nameSpace: dojoAppConfig.nameSpace,
     manifest,
     constants,
     // status

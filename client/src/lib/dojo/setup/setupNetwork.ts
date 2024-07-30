@@ -27,12 +27,12 @@ export function setupNetwork<
     contractComponents: defineContractComponents(world),
     contractConstants: defineContractConstants(),
     // execute: async (signer: Account, contract: string, system: string, call_data: num.BigNumberish[]) => {
-    execute: async (account: Account | AccountInterface, call: AllowArray<DojoCall | Call>, details?: UniversalDetails) => {
-      return provider.execute(account, call, details)
+    execute: async (account: Account | AccountInterface, call: AllowArray<DojoCall | Call>, nameSpace: string, details?: UniversalDetails) => {
+      return provider.execute(account, call, nameSpace, details)
     },
     // call: async (contract: string, system: string, call_data: num.BigNumberish[]) => {
-    call: async (call: DojoCall | Call) => {
-      return provider.call(call)
+    call: async (nameSpace: string, call: DojoCall | Call) => {
+      return provider.call(nameSpace, call)
     },
   }
 }

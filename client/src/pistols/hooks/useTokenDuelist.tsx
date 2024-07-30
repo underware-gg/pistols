@@ -9,9 +9,9 @@ import { BigNumberish } from "starknet"
 export const useTokenContract = () => {
   const components = useDojoComponents()
   const [contractAddress, setTokenContractAddress] = useState('')
-  const { setup: { manifest } } = useDojo()
+  const { setup: { manifest, nameSpace } } = useDojo()
   useEffect(() => {
-    const contract = getContractByName(manifest, 'token_duelist');
+    const contract = getContractByName(manifest, nameSpace, 'token_duelist');
     setTokenContractAddress(contract?.address ?? '')
   }, [])
   const contractAddressKey = useMemo(() => bigintToEntity(contractAddress), [contractAddress])

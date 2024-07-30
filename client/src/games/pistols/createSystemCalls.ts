@@ -15,6 +15,8 @@ import { emitter } from '@/pistols/three/game'
 // https://github.com/dojoengine/dojo.js/pull/190
 import { setComponentsFromEvents } from '@/lib/dojo/fix/setComponentsFromEvents'
 
+export const NAMESPACE = 'pistols'
+
 export type SystemCalls = ReturnType<typeof createSystemCalls>;
 
 export type DojoCall = {
@@ -58,7 +60,7 @@ export function createSystemCalls(
   const _executeTransaction = async (signer: AccountInterface, params: DojoCall | Call[]): Promise<boolean> => {
     let success = false
     try {
-      const tx = await execute(signer, params);
+      const tx = await execute(signer, params, NAMESPACE);
       if (!Array.isArray(params)) {
         console.log(`execute ${params?.contractName}::${params.entrypoint}() tx:`, params.calldata, tx)
       } else {
@@ -83,7 +85,7 @@ export function createSystemCalls(
   const _executeCall = async <T extends Result>(params: DojoCall): Promise<T | null> => {
     let results: Result = undefined
     try {
-      results = await call(params)
+      results = await call(NAMESPACE, params)
       // result = decodeComponent(contractComponents['Component'], response)
       // results = Array.isArray(response) ? response.map(v => BigInt(v)) : typeof response == 'boolean' ? response : BigInt(response)
       // console.log(`call ${system}(${args.length}) success:`, result)
@@ -113,7 +115,7 @@ export function createSystemCalls(
     const approved_value = bigintAdd(wager_value, fee)
     let calls: Call[] = []
     // approve call
-    const actions_contract = getContractByName(manifest, 'actions')
+    const actions_contract = getContractByName(manifest, NAMESPACE, 'actions')
     if (BigInt(table.wager_contract_address) > 0n) {
       calls.push({
         contractAddress: bigintToHex(table.wager_contract_address),
@@ -143,7 +145,7 @@ export function createSystemCalls(
         if (!table) throw new Error(`Table does not exist [${challenge.table_id}]`)
         // approve call
         let calls: Call[] = []
-        const actions_contract = getContractByName(manifest, 'actions')
+        const actions_contract = getContractByName(manifest, NAMESPACE, 'actions')
         if (BigInt(table.wager_contract_address) > 0n) {
           calls.push({
             contractAddress: bigintToHex(table.wager_contract_address),

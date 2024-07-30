@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Connector, useAccount } from '@starknet-react/core'
 import { Policy, ControllerOptions } from '@cartridge/controller'
 import CartridgeConnector from '@cartridge/connector'
-import { KATANA_CLASS_HASH, Manifest } from '@dojoengine/core'
+import { KATANA_CLASS_HASH } from '@dojoengine/core'
+import { DojoManifest } from '@/lib/dojo/Dojo'
 import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
 import { useContractClassHash } from '@/lib/utils/hooks/useContractClassHash'
 import { BigNumberish } from 'starknet'
@@ -13,7 +14,7 @@ import { assert } from '@/lib/utils/math'
 // https://github.com/cartridge-gg/controller/blob/main/packages/account-wasm/src/constants.rs
 export const CONTROLLER_CLASS_HASH = '0x05f0f2ae9301e0468ca3f9218dadd43a448a71acc66b6ef1a5570bb56cf10c6f'
 
-export const useController = (manifest: Manifest, contractNames?: string[]) => {
+export const useController = (manifest: DojoManifest, nameSpace: string, contractNames?: string[]) => {
   const controller = useMemo(() => {
     const options: ControllerOptions = {
       // paymaster: {
@@ -25,7 +26,7 @@ export const useController = (manifest: Manifest, contractNames?: string[]) => {
     const policies: Policy[] = []
     // contracts
     manifest?.contracts.forEach((contract) => {
-      const contractName = contract.name.split('::').at(-1)
+      const contractName = contract.tag.split(`${nameSpace}-`).at(-1)
       if (!contractNames || contractNames.includes(contractName)) {
         // abis
         contract.abi.forEach((abi) => {
@@ -37,7 +38,7 @@ export const useController = (manifest: Manifest, contractNames?: string[]) => {
                 policies.push({
                   target: contract.address,
                   method: item.name,
-                  description: `${contract.name}::${item.name}()`,
+                  description: `${contract.tag}.${item.name}()`,
                 })
               }
             })
