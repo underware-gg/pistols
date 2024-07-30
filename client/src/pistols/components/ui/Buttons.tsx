@@ -130,6 +130,7 @@ export const BalanceRequiredButton = ({
 export const FilterButton = ({
   label,
   icon,
+  disabled = false,
   toggle = true,
   state = false,
   grouped = false,
@@ -137,6 +138,7 @@ export const FilterButton = ({
 }: {
   label?: string
   icon?: SemanticICONS
+  disabled?: boolean
   toggle?: boolean
   state?: boolean
   grouped?: boolean
@@ -153,6 +155,7 @@ export const FilterButton = ({
       className={classNames.join(' ')}
       toggle={toggle}
       active={state}
+      disabled={disabled}
       onClick={() => onClick()}
       size='mini'
     >

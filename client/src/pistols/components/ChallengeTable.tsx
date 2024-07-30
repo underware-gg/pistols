@@ -82,8 +82,10 @@ function ChallengeTableByIds({
     return result
   }, [challengeIds, compact, filterDuelistName])
 
-  const filters = useMemo(() => {
-    let result = []
+  const { filters, canAdd, canClear } = useMemo(() => {
+    let canAdd = false
+    let canClear = false
+    let filters = []
     AllChallengeStates.forEach(state => {
       if (!existingStates.includes(state)) return
       const _switch = () => {
@@ -93,16 +95,19 @@ function ChallengeTableByIds({
           setStates(arrayRemoveValue(states, state))
         }
       }
-      result.push(
+      let enabled = states.includes(state)
+      if (!enabled) canAdd = true
+      if (enabled) canClear = true
+      filters.push(
         <FilterButton key={state}
           // grouped={result.length > 0}
           grouped
           label={ChallengeStateNames[state]}
-          state={states.includes(state)}
+          state={enabled}
           onClick={() => _switch()}
         />)
     })
-    return result
+    return { filters, canAdd, canClear }
   }, [existingStates, states])
 
   return (
@@ -110,9 +115,9 @@ function ChallengeTableByIds({
       {filters.length > 0 &&
         <div>
           <ButtonGroup>
-            <FilterButton icon='add' state={false} onClick={() => setStates(AllChallengeStates)} />
+            <FilterButton icon='add' state={false} disabled={!canAdd} onClick={() => setStates(AllChallengeStates)} />
             {filters}
-            <FilterButton grouped icon='close' state={false} onClick={() => setStates([])} />
+            <FilterButton grouped icon='close' state={false} disabled={!canClear} onClick={() => setStates([])} />
           </ButtonGroup>
           <FilterDuelistName />
         </div>
