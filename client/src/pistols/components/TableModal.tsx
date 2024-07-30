@@ -6,14 +6,13 @@ import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDojoConstants } from '@/lib/dojo/DojoContext'
 import { useActiveDuelistIds } from '@/pistols/hooks/useChallenge'
 import { useERC20TokenName } from '@/lib/utils/hooks/useERC20'
-import { useTable } from '@/pistols/hooks/useTable'
+import { useTable, useTableTotals } from '@/pistols/hooks/useTable'
 import { Opener } from '@/lib/ui/useOpener'
 import { Divider } from '@/lib/ui/Divider'
 import { Balance } from '@/pistols/components/account/Balance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { getObjectKeyByValue } from '@/lib/utils/types'
 import { makeTavernUrl } from '@/pistols/utils/pistols'
-import { useQueryContext } from '../hooks/QueryContext'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -115,14 +114,7 @@ function TableDescription({
   } = useTable(tableId)
   const { tokenName, tokenSymbol } = useERC20TokenName(wagerContractAddress)
   const { activeDuelistIdsCount } = useActiveDuelistIds(tableId)
-
-  // const {
-  //   queryLiveDuels: { liveCount: liveDuelsCount }
-  //   queryPastDuels: { liveCount: pastDuelsCount }
-  // } = useQueryContext()
-  // TODO
-  const liveDuelsCount = 11111
-  const pastDuelsCount = 99999
+  const { liveDuelsCount, pastDuelsCount } = useTableTotals(tableId)
 
   return (
     <Grid className='H5'>

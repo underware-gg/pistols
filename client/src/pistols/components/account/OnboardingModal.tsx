@@ -78,7 +78,7 @@ export default function OnboardingModal({
         <Grid columns={4} className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>
-              <ActionButton fill label='Deploy New' disabled={!canMint} onClick={() => _deployNew()} />
+              <ActionButton fill label='Mint New' disabled={!canMint} onClick={() => _deployNew()} />
             </Col>
             <Col>
               <ActionButton fill label='Previous' disabled={!canGoPrev} onClick={() => gotoPrevAccount()} />
