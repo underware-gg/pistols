@@ -31,7 +31,8 @@ get_profile_env () {
 export GAME_SLUG="pistols"
 export MANIFEST_FILE_PATH="./manifests/$PROFILE/deployment/manifest.json"
 export BINDINGS_PATH="./bindings/typescript"
-export CLIENT_PATH="../client/src/games/$GAME_SLUG/generated/$PROFILE"
+export CLIENT_GEN_PATH="../client/src/games/$GAME_SLUG/generated"
+export PROFILE_GEN_PATH="$CLIENT_GEN_PATH/$PROFILE"
 export PROJECT_NAME=$(toml get Scarb.toml --raw tool.dojo.world.name)
 export WORLD_ADDRESS=$(get_profile_env "world_address")
 # use $STARKNET_RPC_URL else read from profile
@@ -42,7 +43,8 @@ echo "PROJECT: $PROJECT_NAME"
 echo "PROFILE: $PROFILE"
 echo "RPC_URL: $RPC_URL"
 echo "WORLD_ADDRESS: $WORLD_ADDRESS"
-echo "CLIENT_PATH: $CLIENT_PATH"
+echo "CLIENT_GEN_PATH: $CLIENT_GEN_PATH"
+echo "PROFILE_GEN_PATH: $PROFILE_GEN_PATH"
 echo "BINDINGS_PATH: $BINDINGS_PATH"
 echo ""
 
@@ -60,14 +62,16 @@ fi
 #-----------------
 # build
 #
-# if [[ "$PROFILE" != "dev" ]]; then
-  echo "------------------------------------------------------------------------------"
-  echo ">>> Cleaning..."
-  sozo -P $PROFILE clean
-  echo ">>> Building..."
+echo "------------------------------------------------------------------------------"
+echo ">>> Cleaning..."
+sozo -P $PROFILE clean
+echo ">>> Building..."
+if [[ "$PROFILE" == "dev" ]]; then
+  sozo -P $PROFILE build --typescript
+else
   sozo -P $PROFILE build
-  echo "👍"
-# fi
+fi
+echo "👍"
 
 #-----------------
 # migrate
@@ -89,31 +93,33 @@ echo "👍"
 # copy manifest to client
 #
 echo "------------------------------------------------------------------------------"
-echo ">>> Copying manifest [$MANIFEST_FILE_PATH] to [$CLIENT_PATH/]"
-mkdir -p $CLIENT_PATH
-cp $MANIFEST_FILE_PATH $CLIENT_PATH/
+echo ">>> Copying manifest [$MANIFEST_FILE_PATH] to [$PROFILE_GEN_PATH/]"
+mkdir -p $PROFILE_GEN_PATH
+cp $MANIFEST_FILE_PATH $PROFILE_GEN_PATH/
 echo "👍"
 
 #------------------------
 # typescript bindings
 #
-# TODO: Enable this when bindings are working
-# generate and cop bindings
-# sozo build --typescript
-# cp $BINDINGS_PATH/* $CLIENT_PATH/
-#
-# TODO: Remove this when bindings are working
-# copy to client
-echo "------------------------------------------------------------------------------"
-echo ">>> Generate sources..."
-cd ../client
-npm run create-components --game=$GAME_SLUG --profile=$PROFILE $RPC_URL $WORLD_ADDRESS
-npm run create-constants --game=$GAME_SLUG --profile=$PROFILE
-echo "👍?"
+if [[ "$PROFILE" == "dev" ]]; then
+  #
+  # TODO: Enable this when bindings are ported
+  # generate and copy bindings
+  # cp $BINDINGS_PATH/* $CLIENT_GEN_PATH/
+  #
+  # copy to client
+  echo "------------------------------------------------------------------------------"
+  echo ">>> Generate sources..."
+  cd ../client
+  npm run create-components --game=$GAME_SLUG --profile=$PROFILE $RPC_URL $WORLD_ADDRESS
+  npm run create-constants --game=$GAME_SLUG --profile=$PROFILE
+  echo "👍?"
+  #
+  # list copied files
+  echo "------------------------------------------------------------------------------"
+  ls -ld $CLIENT_GEN_PATH/* | grep -E 'ts|json'
+fi
 
-# list copied files
-echo "------------------------------------------------------------------------------"
-ls -ld $CLIENT_PATH/* | grep -E 'ts|json'
 
 #------------------
 echo "--- DONE! 👍"
