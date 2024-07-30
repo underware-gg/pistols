@@ -34,7 +34,6 @@ type actions_Type = {
   INVALID_REPLY_SELF: string, // cairo: felt252
   INVALID_CHALLENGE: string, // cairo: felt252
   INVALID_DUELIST: string, // cairo: felt252
-  INVALID_MINTER: string, // cairo: felt252
   NOT_YOUR_CHALLENGE: string, // cairo: felt252
   NOT_YOUR_DUELIST: string, // cairo: felt252
   CHALLENGER_NOT_ADMITTED: string, // cairo: felt252
@@ -64,7 +63,6 @@ export const actions: actions_Type = {
   INVALID_REPLY_SELF: 'PISTOLS: Reply self',
   INVALID_CHALLENGE: 'PISTOLS: Invalid challenge',
   INVALID_DUELIST: 'PISTOLS: Invalid duelist',
-  INVALID_MINTER: 'PISTOLS: Null minter address',
   NOT_YOUR_CHALLENGE: 'PISTOLS: Not your challenge',
   NOT_YOUR_DUELIST: 'PISTOLS: Not your duelist',
   CHALLENGER_NOT_ADMITTED: 'PISTOLS: Challenger not allowed',
@@ -89,23 +87,17 @@ export const actions: actions_Type = {
 
 // from: ../dojo/src/systems/admin.cairo
 type admin_Type = {
-  ALREADY_INITIALIZED: string, // cairo: felt252
   INVALID_OWNER: string, // cairo: felt252
   INVALID_TREASURY: string, // cairo: felt252
   INVALID_TABLE: string, // cairo: felt252
   INVALID_DESCRIPTION: string, // cairo: felt252
-  NOT_DEPLOYER: string, // cairo: felt252
-  NOT_INITIALIZED: string, // cairo: felt252
   NOT_OWNER: string, // cairo: felt252
 };
 export const admin: admin_Type = {
-  ALREADY_INITIALIZED: 'ADMIN: Already initialized',
   INVALID_OWNER: 'ADMIN: Invalid owner_address',
   INVALID_TREASURY: 'ADMIN: Invalid treasury_address',
   INVALID_TABLE: 'ADMIN: Invalid table',
   INVALID_DESCRIPTION: 'ADMIN: Invalid description',
-  NOT_DEPLOYER: 'ADMIN: Not deployer',
-  NOT_INITIALIZED: 'ADMIN: Not initialized',
   NOT_OWNER: 'ADMIN: Not owner',
 };
 
