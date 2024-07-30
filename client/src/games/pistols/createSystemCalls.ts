@@ -2,13 +2,13 @@ import {
   getEvents,
   // setComponentsFromEvents,
 } from '@dojoengine/utils'
-import { getContractByName } from '@dojoengine/core'
+import { DojoProvider, getContractByName } from '@dojoengine/core'
 import { getComponentValue } from '@dojoengine/recs'
 import { AccountInterface, BigNumberish, Call, Result } from 'starknet'
-import { ClientComponents } from '@/lib/dojo/setup/createClientComponents'
-import { SetupNetworkResult } from '@/lib/dojo/setup/setup'
 import { stringToFelt, bigintToU256 } from '@/lib/utils/starknet'
 import { bigintAdd, bigintToEntity, bigintToHex } from '@/lib/utils/types'
+import { ClientComponents } from '@/lib/dojo/setup/useSetup'
+import { DojoManifest } from '@/lib/dojo/Dojo'
 import { emitter } from '@/pistols/three/game'
 
 // FIX while this is not merged
@@ -47,11 +47,10 @@ const minter_call = (entrypoint: string, calldata: any[]) => ({
 })
 
 export function createSystemCalls(
-  network: SetupNetworkResult,
   components: ClientComponents,
-  manifest: any,
+  manifest: DojoManifest,
+  provider: DojoProvider,
 ) {
-  const { execute, call, contractComponents } = network
   const { Challenge, Wager, TableConfig } = components
 
   // executeMulti() based on:
@@ -60,7 +59,7 @@ export function createSystemCalls(
   const _executeTransaction = async (signer: AccountInterface, params: DojoCall | Call[]): Promise<boolean> => {
     let success = false
     try {
-      const tx = await execute(signer, params, NAMESPACE);
+      const tx = await provider.execute(signer, params, NAMESPACE);
       if (!Array.isArray(params)) {
         console.log(`execute ${params?.contractName}::${params.entrypoint}() tx:`, params.calldata, tx)
       } else {
@@ -85,7 +84,7 @@ export function createSystemCalls(
   const _executeCall = async <T extends Result>(params: DojoCall): Promise<T | null> => {
     let results: Result = undefined
     try {
-      results = await call(NAMESPACE, params)
+      results = await provider.call(NAMESPACE, params)
       // result = decodeComponent(contractComponents['Component'], response)
       // results = Array.isArray(response) ? response.map(v => BigInt(v)) : typeof response == 'boolean' ? response : BigInt(response)
       // console.log(`call ${system}(${args.length}) success:`, result)
