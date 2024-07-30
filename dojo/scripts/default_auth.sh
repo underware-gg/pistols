@@ -1,40 +1,15 @@
 #!/bin/bash
 set -euo pipefail
+source scripts/setup.sh
+
 pushd $(dirname "$0")/..
 
-# Profile
-if [ $# -ge 1 ]; then
-  export PROFILE=$1
-else
-  export PROFILE="dev"
-fi
-
-if ! [ -x "$(command -v toml)" ]; then
-  echo 'Error: toml not instlaled! Instal with: cargo install toml-cli'
-  exit 1
-fi
-if ! [ -x "$(command -v jq)" ]; then
-  echo 'Error: jq not instlaled! Instal with: brew install jq'
-  exit 1
-fi
-
-get_profile_env () {
-  local ENV_NAME=$1
-  local RESULT=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.$ENV_NAME)
-  if [[ -z "$RESULT" ]]; then
-    local RESULT=$(toml get Scarb.toml --raw tool.dojo.env.$ENV_NAME)
-    if [[ -z "$RESULT" ]]; then
-      >&2 echo "get_profile_env($ENV_NAME) not found! 👎"
-    fi
-  fi
-  echo $RESULT
-}
-
-export MANIFEST_FILE_PATH="./manifests/$PROFILE/deployment/manifest.json"
-# use $DOJO_ACCOUNT_ADDRESS else read from profile
-export ACCOUNT_ADDRESS=${DOJO_ACCOUNT_ADDRESS:-$(get_profile_env "account_address")}
-export WORLD_ADDRESS=$(get_profile_env "world_address")
+# if ! [ -x "$(command -v jq)" ]; then
+#   echo 'Error: jq not instlaled! Instal with: brew install jq'
+#   exit 1
+# fi
 # export ADMIN_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.tag == "pistols-admin" ).address')
+
 export ADMIN_TAG="pistols-admin"
 export ACTIONS_TAG="pistols-actions"
 export MINTER_TAG="pistols-minter"
