@@ -255,22 +255,24 @@ const QueryProvider = ({
   const allChallenges: ChallengeRow[] = useMemo(() =>
     challengeEntities.reduce((acc, entity) => {
       const challenge = getComponentValue(Challenge, entity)
-      const duel_id = challenge.duel_id
-      const state = challenge.state
-      const timestamp = Number(challenge.timestamp_end ? challenge.timestamp_end : challenge.timestamp_start)
-      acc.push({
-        entity,
-        duel_id,
-        challenge,
-        // filters
-        state,
-        timestamp,
-        isLive: (state == ChallengeState.Awaiting || state == ChallengeState.InProgress),
-        isFinished: (state == ChallengeState.Resolved || state == ChallengeState.Draw),
-        isCanceled: (state == ChallengeState.Withdrawn || state == ChallengeState.Refused),
-      })
+      if (tableId && bigintEquals(challenge.table_id, tableIdAsFelt)) {
+        const duel_id = challenge.duel_id
+        const state = challenge.state
+        const timestamp = Number(challenge.timestamp_end ? challenge.timestamp_end : challenge.timestamp_start)
+        acc.push({
+          entity,
+          duel_id,
+          challenge,
+          // filters
+          state,
+          timestamp,
+          isLive: (state == ChallengeState.Awaiting || state == ChallengeState.InProgress),
+          isFinished: (state == ChallengeState.Resolved || state == ChallengeState.Draw),
+          isCanceled: (state == ChallengeState.Withdrawn || state == ChallengeState.Refused),
+        })
+      }
       return acc
-    }, [] as ChallengeRow[]), [challengeEntities])
+    }, [] as ChallengeRow[]), [challengeEntities, tableId, tableIdAsFelt])
 
   useEffect(() => dispatch({ type: QueryActions.SET_DUELISTS, payload: allDuelists }), [allDuelists])
   useEffect(() => dispatch({ type: QueryActions.SET_CHALLENGES, payload: allChallenges }), [allChallenges])
