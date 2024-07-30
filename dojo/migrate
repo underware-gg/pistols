@@ -77,9 +77,10 @@ echo "👍"
 # migrate
 #
 echo "------------------------------------------------------------------------------"
-echo ">>> Migrating..."
-# sozo --profile $PROFILE migrate plan --world $WORLD_ADDRESS
+echo ">>> Migrate plan..."
+sozo -P $PROFILE migrate plan --world $WORLD_ADDRESS
 # exit 0
+echo ">>> Migrate apply..."
 sozo -P $PROFILE migrate apply --world $WORLD_ADDRESS
 echo "👍"
 
