@@ -31,7 +31,7 @@ mod shooter {
         assert(caller == duelist_address, Errors::NOT_YOUR_CHALLENGE);
 
         // Correct Challenge state
-        assert(challenge.state == ChallengeState::InProgress.into(), Errors::CHALLENGE_NOT_IN_PROGRESS);
+        assert(challenge.state == ChallengeState::InProgress, Errors::CHALLENGE_NOT_IN_PROGRESS);
         assert(challenge.round_number == round_number, Errors::INVALID_ROUND_NUMBER);
         
         (challenge, duelist_number)
@@ -47,7 +47,7 @@ mod shooter {
 
         // Assert correct Round
         let mut round: Round = get!(world, (duel_id, round_number), Round);
-        assert(round.state == RoundState::Commit.into(), Errors::ROUND_NOT_IN_COMMIT);
+        assert(round.state == RoundState::Commit, Errors::ROUND_NOT_IN_COMMIT);
 
         // Validate action hash
 
@@ -124,7 +124,7 @@ mod shooter {
             let is_last_round: bool = (slot2_a == 0 && slot2_b == 0);
             process_round(world, ref challenge, ref round, is_last_round);
             // open Round 3 if not over
-            if (challenge.state == ChallengeState::InProgress.into()) {
+            if (challenge.state == ChallengeState::InProgress) {
                 let mut round3 = Round {
                     duel_id: challenge.duel_id,
                     round_number: challenge.round_number,
@@ -229,7 +229,7 @@ mod shooter {
     }
 
     fn end_challenge(ref challenge: Challenge, ref round: Round, state: ChallengeState, winner: u8) {
-        challenge.state = state.into();
+        challenge.state = state;
         challenge.winner = winner;
         challenge.timestamp_end = get_block_timestamp();
     }

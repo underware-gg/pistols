@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { HasValue, getComponentValue, Component } from '@dojoengine/recs'
-import { useDojoComponents } from '@/lib/dojo/DojoContext'
+import { useDojoComponents, useDojoConstants } from '@/lib/dojo/DojoContext'
 import { useComponentValue } from "@dojoengine/react"
 import { bigintToEntity } from '@/lib/utils/types'
 import { feltToString, stringToFelt } from "@/lib/utils/starknet"
@@ -86,6 +86,7 @@ export const useActiveDuelistIds = (tableId?: string) => {
 
 export const useChallenge = (duelId: BigNumberish) => {
   const { Challenge } = useDojoComponents()
+  const { ChallengeStateValues } = useDojoConstants()
   const challenge: any = useComponentValue(Challenge, bigintToEntity(duelId))
   // console.log(bigintToHex(duelId), challenge)
 
@@ -101,7 +102,7 @@ export const useChallenge = (duelId: BigNumberish) => {
   const timestamp_end = useMemo(() => Number(challenge?.timestamp_end ?? 0), [challenge])
 
   const { clientTimestamp } = useClientTimestamp(false)
-  let original_state = useMemo(() => (challenge?.state ?? null), [challenge])
+  let original_state = useMemo(() => (challenge ? ChallengeStateValues[challenge.state] : null), [challenge])
   let state = useMemo(() => {
     if (original_state == ChallengeState.Awaiting && (timestamp_end < clientTimestamp)) {
       return ChallengeState.Expired

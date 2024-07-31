@@ -264,7 +264,7 @@ mod actions {
                 duelist_id_a,
                 duelist_id_b,
                 // progress
-                state: ChallengeState::Awaiting.into(),
+                state: ChallengeState::Awaiting,
                 round_number: 0,
                 winner: 0,
                 // times
@@ -310,9 +310,8 @@ mod actions {
         ) -> ChallengeState {
             // validate chalenge
             let mut challenge: Challenge = get!(world, duel_id, Challenge);
-            let state: ChallengeState = challenge.state.try_into().unwrap();
-            assert(state.exists(), Errors::INVALID_CHALLENGE);
-            assert(state == ChallengeState::Awaiting, Errors::CHALLENGE_NOT_AWAITING);
+            assert(challenge.state.exists(), Errors::INVALID_CHALLENGE);
+            assert(challenge.state == ChallengeState::Awaiting, Errors::CHALLENGE_NOT_AWAITING);
 
             let address_b: ContractAddress = starknet::get_caller_address();
             let duelist_id_b: u128 = duelist_id;
@@ -320,12 +319,12 @@ mod actions {
 
             if (challenge.timestamp_end > 0 && timestamp > challenge.timestamp_end) {
                 // Expired, close it!
-                challenge.state = ChallengeState::Expired.into();
+                challenge.state = ChallengeState::Expired;
                 challenge.timestamp_end = timestamp;
             } else if (challenge.duelist_id_a == duelist_id_b) {
                 // same duelist, can only withdraw...
                 assert(accepted == false, Errors::INVALID_REPLY_SELF);
-                challenge.state = ChallengeState::Withdrawn.into();
+                challenge.state = ChallengeState::Withdrawn;
                 challenge.timestamp_end = timestamp;
             } else {
                 // validate duelist ownership
@@ -359,7 +358,7 @@ mod actions {
                 // all good!
                 if (accepted) {
                     // Challenged is accepting
-                    challenge.state = ChallengeState::InProgress.into();
+                    challenge.state = ChallengeState::InProgress;
                     challenge.round_number = 1;
                     challenge.timestamp_start = timestamp;
                     challenge.timestamp_end = 0;
@@ -372,7 +371,7 @@ mod actions {
                     self._emitDuelistTurnEvent(challenge);
                 } else {
                     // Challenged is Refusing
-                    challenge.state = ChallengeState::Refused.into();
+                    challenge.state = ChallengeState::Refused;
                     challenge.timestamp_end = timestamp;
                     // events
                     self._emitChallengeAcceptedEvent(challenge, accepted);
@@ -380,15 +379,14 @@ mod actions {
             }
 
             // undo pact if duel does not proceed
-            let state: ChallengeState = challenge.state.try_into().unwrap();
-            if (!state.is_live()) {
+            if (!challenge.state.is_live()) {
                 utils::unset_pact(world, challenge);
             }
 
             // update challenge state
             utils::set_challenge(world, challenge);
 
-            (challenge.state.try_into().unwrap())
+            (challenge.state)
         }
 
 
@@ -416,8 +414,7 @@ mod actions {
             let challenge: Challenge = shooter::reveal_action(world, duelist_id, duel_id, round_number, salt, utils::pack_action_slots(action_slot1, action_slot2));
 
             // undo pact if finished
-            let state: ChallengeState = challenge.state.try_into().unwrap();
-            if (state.is_finished()) {
+            if (challenge.state.is_finished()) {
                 utils::unset_pact(world, challenge);
             }
 
@@ -555,10 +552,9 @@ mod actions {
         }
         fn _emitPostRevealEvents(ref world: IWorldDispatcher, challenge: Challenge) {
             utils::WORLD(world);
-            let state: ChallengeState = challenge.state.try_into().unwrap();
-            if (state == ChallengeState::InProgress) {
+            if (challenge.state == ChallengeState::InProgress) {
                 self._emitDuelistTurnEvent(challenge);
-            } else if (state == ChallengeState::Resolved || state == ChallengeState::Draw) {
+            } else if (challenge.state == ChallengeState::Resolved || challenge.state == ChallengeState::Draw) {
                 self._emitChallengeResolvedEvent(challenge);
             }
         }

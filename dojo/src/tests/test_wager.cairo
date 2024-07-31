@@ -64,7 +64,7 @@ mod tests {
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, table_id, wager_value, 0);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.table_id == table_id, 'ch.table_id');
-        assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
+        assert(ch.state == ChallengeState::Awaiting, 'Awaiting');
         // check stored wager
         let wager = tester::get_Wager(world, duel_id);
         let total: u128 = wager.value + wager.fee;
@@ -144,7 +144,7 @@ mod tests {
         let _balance: u128 = lords.balance_of(OTHER()).low;
         let duel_id: u128 = tester::execute_create_challenge(system, OTHER(), BUMMER(), MESSAGE_1, TABLE_ID, 0, 0);
         let ch = tester::get_Challenge(world, duel_id);
-        assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
+        assert(ch.state == ChallengeState::Awaiting, 'Awaiting');
     }
 
     #[test]
@@ -153,7 +153,7 @@ mod tests {
         let _balance: u128 = lords.balance_of(OTHER()).low;
         let duel_id: u128 = tester::execute_create_challenge(system, OTHER(), BUMMER(), MESSAGE_1, TABLE_ID, 100, 0);
         let ch = tester::get_Challenge(world, duel_id);
-        assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
+        assert(ch.state == ChallengeState::Awaiting, 'Awaiting');
     }
 
     //
@@ -223,7 +223,7 @@ mod tests {
         let approved_value: u128 = wager_value + fee;
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, wager_value, 0);
         let ch = tester::get_Challenge(world, duel_id);
-        assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
+        assert(ch.state == ChallengeState::Awaiting, 'Awaiting');
         tester::assert_balance(lords, A, balance_a, approved_value, 0, 'balance_a_1');
         tester::assert_balance(lords, S, balance_contract, 0, approved_value, 'balance_contract_1');
         // Withdraw
@@ -247,7 +247,7 @@ mod tests {
         let approved_value: u128 = wager_value + fee;
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, wager_value, 24);
         let ch = tester::get_Challenge(world, duel_id);
-        assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
+        assert(ch.state == ChallengeState::Awaiting, 'Awaiting');
         tester::assert_balance(lords, A, balance_a, approved_value, 0, 'balance_a_1');
         tester::assert_balance(lords, S, balance_contract, 0, approved_value, 'balance_contract_1');
         // reply, will expire...
@@ -273,7 +273,7 @@ mod tests {
         let approved_value: u128 = wager_value + fee;
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, wager_value, 0);
         let ch = tester::get_Challenge(world, duel_id);
-        assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
+        assert(ch.state == ChallengeState::Awaiting, 'Awaiting');
         tester::assert_balance(lords, A, balance_a, approved_value, 0, 'balance_a_1');
         tester::assert_balance(lords, S, balance_contract, 0, approved_value, 'balance_contract_1');
         // Withdraw
@@ -297,7 +297,7 @@ mod tests {
         let approved_value: u128 = wager_value + fee;
         let duel_id: u128 = tester::execute_create_challenge(system, A, B, MESSAGE_1, TABLE_ID, wager_value, 24);
         let ch = tester::get_Challenge(world, duel_id);
-        assert(ch.state == ChallengeState::Awaiting.into(), 'Awaiting');
+        assert(ch.state == ChallengeState::Awaiting, 'Awaiting');
         tester::assert_balance(lords, A, balance_a, approved_value, 0, 'balance_a_1');
         tester::assert_balance(lords, S, balance_contract, 0, approved_value, 'balance_contract_1');
         // Expire

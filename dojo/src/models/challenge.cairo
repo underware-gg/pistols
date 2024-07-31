@@ -1,5 +1,7 @@
 use starknet::ContractAddress;
 use pistols::models::duelist::{Score};
+use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
+use pistols::types::round::{RoundState, RoundStateTrait};
 
 //-------------------------
 // Challenge lifecycle
@@ -17,7 +19,7 @@ struct Challenge {
     duelist_id_a: u128,         // Challenger duelist
     duelist_id_b: u128,         // Challenged duelist 
     // progress and results
-    state: u8,                  // actually a ChallengeState
+    state: ChallengeState,
     round_number: u8,           // current or final
     winner: u8,                 // 0:draw, 1:duelist_a, 2:duelist_b
     // timestamps in unix epoch
@@ -57,7 +59,7 @@ struct Round {
     #[key]
     round_number: u8,
     //---------------
-    state: u8,      // actually a RoundState
+    state: RoundState,
     shot_a: Shot,   // duelist_a shot
     shot_b: Shot,   // duelist_b shot
 } // (8 + 232 + 232) = 472 bits ~ 2 felts (max 504)

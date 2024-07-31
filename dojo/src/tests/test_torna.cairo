@@ -30,7 +30,7 @@ mod tests {
         tester::elapse_timestamp(timestamp::from_days(1));
         tester::execute_reply_challenge(system, OTHER(), duel_id, true);
         let ch = tester::get_Challenge(world, duel_id);
-        assert(ch.state == ChallengeState::InProgress.into(), 'challenge.state');
+        assert(ch.state == ChallengeState::InProgress, 'challenge.state');
         assert(ch.round_number == 1, 'challenge.number');
         (ch, duel_id)
     }
@@ -117,7 +117,7 @@ mod tests {
         tester::execute_reveal_action(system, OWNER(), duel_id, 1, salt_a, action_a, 0);
         tester::execute_reveal_action(system, OTHER(), duel_id, 1, salt_b, action_b, 0);
         let (challenge, _round) = tester::get_Challenge_Round(world, duel_id);
-        assert(challenge.state != ChallengeState::InProgress.into(), 'challenge.state');
+        assert(challenge.state != ChallengeState::InProgress, 'challenge.state');
         //
         // table scoreboard keeps archetype
         let mut scoreboard_a = tester::get_Scoreboard(world, challenge.table_id, OWNER());

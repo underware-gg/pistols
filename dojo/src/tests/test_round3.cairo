@@ -47,7 +47,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         tester::execute_reply_challenge(system, OTHER(), duel_id, true);
         let ch = tester::get_Challenge(world, duel_id);
         let round: Round = tester::get_Round(world, duel_id, 1);
-        assert(ch.state == ChallengeState::InProgress.into(), 'challenge.state');
+        assert(ch.state == ChallengeState::InProgress, 'challenge.state');
         assert(ch.round_number == 1, 'challenge.number');
         assert(round.state == RoundState::Commit.into(), 'round.state');
         (ch, round, duel_id)
@@ -116,10 +116,10 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
             assert(round.round_number == round_number, 'bad round.round_number');
         }
         if (winner == 0) {
-            assert(challenge.state == ChallengeState::Draw.into(), 'not Draw');
+            assert(challenge.state == ChallengeState::Draw, 'not Draw');
             assert(round.shot_a.win == round.shot_b.win, 'win_draw');
         } else {
-            assert(challenge.state == ChallengeState::Resolved.into(), 'not Resolved');
+            assert(challenge.state == ChallengeState::Resolved, 'not Resolved');
             if (winner == 1) {
                 assert(round.shot_a.win > 0, 'win_a_a');
                 assert(round.shot_b.win == 0, 'win_a_b');

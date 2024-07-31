@@ -2,7 +2,7 @@ import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEf
 import { Entity, getComponentValue, Has } from '@dojoengine/recs'
 import { useAccount } from '@starknet-react/core'
 import { useEntityQuery } from '@dojoengine/react'
-import { useDojoComponents } from '@/lib/dojo/DojoContext'
+import { useDojoComponents, useDojoConstants } from '@/lib/dojo/DojoContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { calcWinRatio } from '@/pistols/hooks/useScore'
@@ -155,6 +155,7 @@ const QueryProvider = ({
   children,
 }: QueryProviderProps) => {
   const { Duelist, Scoreboard, Challenge } = useDojoComponents()
+  const { ChallengeStateValues } = useDojoConstants()
   const { tableId, duelistId } = useSettings()
   const { selectedDuelistId } = usePistolsContext()
   const { address } = useAccount()
@@ -273,7 +274,7 @@ const QueryProvider = ({
       const challenge = getComponentValue(Challenge, entity)
       if (tableId && bigintEquals(challenge.table_id, tableIdAsFelt)) {
         const duel_id = challenge.duel_id
-        const state = challenge.state
+        const state = ChallengeStateValues[challenge.state]
         const timestamp = Number(challenge.timestamp_end ? challenge.timestamp_end : challenge.timestamp_start)
         acc.push({
           entity,

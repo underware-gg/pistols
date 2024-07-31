@@ -297,11 +297,10 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
     set!(world, (challenge));
 
     // Start Round
-    let state: ChallengeState = challenge.state.try_into().unwrap();
-    if (state.is_canceled()) {
+    if (challenge.state.is_canceled()) {
         // transfer wager/fee back to challenger
         withdraw_wager_fees(world, challenge, challenge.address_a);
-    } else if (state == ChallengeState::InProgress) {
+    } else if (challenge.state == ChallengeState::InProgress) {
         let mut shot_a = init::Shot();
         let mut shot_b = init::Shot();
 
@@ -327,7 +326,7 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
                 shot_b,
             }
         ));
-    } else if (state.is_finished()) {
+    } else if (challenge.state.is_finished()) {
         // End Duel!
         let mut duelist_a: Duelist = get!(world, challenge.duelist_id_a, Duelist);
         let mut duelist_b: Duelist = get!(world, challenge.duelist_id_b, Duelist);
@@ -335,8 +334,8 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         let mut scoreboard_b: Scoreboard = get!(world, (challenge.table_id, challenge.duelist_id_b), Scoreboard);
         
         // update totals
-        update_score_totals(ref duelist_a.score, ref duelist_b.score, state, challenge.winner);
-        update_score_totals(ref scoreboard_a.score, ref scoreboard_b.score, state, challenge.winner);
+        update_score_totals(ref duelist_a.score, ref duelist_b.score, challenge.state, challenge.winner);
+        update_score_totals(ref scoreboard_a.score, ref scoreboard_b.score, challenge.state, challenge.winner);
 
         // compute honour from final round
         let table : TableConfig = TableManagerTrait::new(world).get(challenge.table_id);

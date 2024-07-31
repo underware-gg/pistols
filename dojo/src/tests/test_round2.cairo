@@ -38,7 +38,7 @@ mod tests {
         tester::execute_reply_challenge(system, OTHER(), duel_id, true);
         let ch = tester::get_Challenge(world, duel_id);
         let round: Round = tester::get_Round(world, duel_id, 1);
-        assert(ch.state == ChallengeState::InProgress.into(), 'challenge.state');
+        assert(ch.state == ChallengeState::InProgress, 'challenge.state');
         assert(ch.round_number == 1, 'challenge.number');
         assert(round.state == RoundState::Commit.into(), 'round.state');
         (ch, round, duel_id)
@@ -88,7 +88,7 @@ mod tests {
         tester::execute_reveal_action(system, OWNER(), duel_id, 1, salt_1_a, action_1_a, 0);
         tester::execute_reveal_action(system, OTHER(), duel_id, 1, salt_1_b, action_1_b, 0);
         let (challenge, round) = tester::get_Challenge_Round(world, duel_id);
-        assert(challenge.state == ChallengeState::InProgress.into(), '__challenge.state');
+        assert(challenge.state == ChallengeState::InProgress, '__challenge.state');
         assert(challenge.round_number == 2, '__challenge.round_number');
         assert(round.round_number == 2, '__round.round_number');
         assert(round.state == RoundState::Commit.into(), '__round.state');
@@ -106,7 +106,7 @@ mod tests {
         tester::execute_reveal_action(system, OWNER(), duel_id, 2, salt_1_a, action_1_a, 0);
         tester::execute_reveal_action(system, OTHER(), duel_id, 2, salt_1_b, action_1_b, 0);
         let (challenge, round) = tester::get_Challenge_Round(world, duel_id);
-        assert(challenge.state == ChallengeState::Draw.into(), '2__challenge.state');
+        assert(challenge.state == ChallengeState::Draw, '2__challenge.state');
         assert(challenge.round_number == 2, '2__challenge.round_number');
         assert(challenge.timestamp_end > 0, '2__challenge.timestamp_end');
         assert(round.round_number == 2, '2__round.round_number');
@@ -145,7 +145,7 @@ mod tests {
         tester::execute_reveal_action(system, OWNER(), duel_id, 2, salt_1_a, action_1_a, 0);
         tester::execute_reveal_action(system, OTHER(), duel_id, 2, salt_1_b, action_1_b, 0);
         let (challenge, _round) = tester::get_Challenge_Round(world, duel_id);
-        assert(challenge.state == ChallengeState::Draw.into(), '2__challenge.state');
+        assert(challenge.state == ChallengeState::Draw, '2__challenge.state');
 
         let duelist_a = tester::get_Duelist(world, OWNER());
         let duelist_b = tester::get_Duelist(world, OTHER());
@@ -184,7 +184,7 @@ mod tests {
 // round.shot_a.health.print();
 // round.shot_b.health.print();
 // challenge.state.print();
-        assert(challenge.state == ChallengeState::InProgress.into(), '__challenge.state');
+        assert(challenge.state == ChallengeState::InProgress, '__challenge.state');
         assert(challenge.round_number == 2, '__challenge.round_number');
         assert(round.round_number == 2, '__round.round_number');
         assert(round.state == RoundState::Commit.into(), '__round.state');
@@ -206,7 +206,7 @@ mod tests {
 // round.shot_a.health.print();
 // round.shot_b.health.print();
 // challenge.state.print();
-        assert(challenge.state == ChallengeState::Resolved.into(), '2__challenge.state');
+        assert(challenge.state == ChallengeState::Resolved, '2__challenge.state');
         assert(challenge.round_number == 2, '2__challenge.round_number');
         assert(challenge.timestamp_end > 0, '2__challenge.timestamp_end');
         assert(round.round_number == 2, '2__round.round_number');
