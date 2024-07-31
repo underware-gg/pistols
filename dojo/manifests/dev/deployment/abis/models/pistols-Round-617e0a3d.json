@@ -367,6 +367,28 @@
     "interface_name": "pistols::models::challenge::Iround"
   },
   {
+    "type": "enum",
+    "name": "pistols::types::round::RoundState",
+    "variants": [
+      {
+        "name": "Null",
+        "type": "()"
+      },
+      {
+        "name": "Commit",
+        "type": "()"
+      },
+      {
+        "name": "Reveal",
+        "type": "()"
+      },
+      {
+        "name": "Finished",
+        "type": "()"
+      }
+    ]
+  },
+  {
     "type": "struct",
     "name": "pistols::models::challenge::Shot",
     "members": [
@@ -442,7 +464,7 @@
       },
       {
         "name": "state",
-        "type": "core::integer::u8"
+        "type": "pistols::types::round::RoundState"
       },
       {
         "name": "shot_a",

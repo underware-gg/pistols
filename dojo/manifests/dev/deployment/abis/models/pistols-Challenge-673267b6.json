@@ -367,6 +367,44 @@
     "interface_name": "pistols::models::challenge::Ichallenge"
   },
   {
+    "type": "enum",
+    "name": "pistols::types::challenge::ChallengeState",
+    "variants": [
+      {
+        "name": "Null",
+        "type": "()"
+      },
+      {
+        "name": "Awaiting",
+        "type": "()"
+      },
+      {
+        "name": "Withdrawn",
+        "type": "()"
+      },
+      {
+        "name": "Refused",
+        "type": "()"
+      },
+      {
+        "name": "Expired",
+        "type": "()"
+      },
+      {
+        "name": "InProgress",
+        "type": "()"
+      },
+      {
+        "name": "Resolved",
+        "type": "()"
+      },
+      {
+        "name": "Draw",
+        "type": "()"
+      }
+    ]
+  },
+  {
     "type": "struct",
     "name": "pistols::models::challenge::Challenge",
     "members": [
@@ -400,7 +438,7 @@
       },
       {
         "name": "state",
-        "type": "core::integer::u8"
+        "type": "pistols::types::challenge::ChallengeState"
       },
       {
         "name": "round_number",

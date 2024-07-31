@@ -367,6 +367,24 @@
     "interface_name": "pistols::models::duelist::Iduelist"
   },
   {
+    "type": "enum",
+    "name": "pistols::models::duelist::ProfilePicType",
+    "variants": [
+      {
+        "name": "Undefined",
+        "type": "()"
+      },
+      {
+        "name": "Duelist",
+        "type": "()"
+      },
+      {
+        "name": "External",
+        "type": "()"
+      }
+    ]
+  },
+  {
     "type": "struct",
     "name": "pistols::models::duelist::Score",
     "members": [
@@ -426,7 +444,7 @@
       },
       {
         "name": "profile_pic_type",
-        "type": "core::integer::u8"
+        "type": "pistols::models::duelist::ProfilePicType"
       },
       {
         "name": "timestamp",

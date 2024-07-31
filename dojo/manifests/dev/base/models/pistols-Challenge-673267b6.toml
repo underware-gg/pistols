@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x51ba68ccb2e9b8e84ae87f59f69d5911c7cc9648463dab084324607811cb28a"
-original_class_hash = "0x51ba68ccb2e9b8e84ae87f59f69d5911c7cc9648463dab084324607811cb28a"
+class_hash = "0x6ae779124841dc425215542088697c7f617f9a9a53bc623af38166c36689baf"
+original_class_hash = "0x6ae779124841dc425215542088697c7f617f9a9a53bc623af38166c36689baf"
 abi = "manifests/dev/base/abis/models/pistols-Challenge-673267b6.json"
 tag = "pistols-Challenge"
 manifest_name = "pistols-Challenge-673267b6"
@@ -42,7 +42,7 @@ key = false
 
 [[members]]
 name = "state"
-type = "u8"
+type = "ChallengeState"
 key = false
 
 [[members]]

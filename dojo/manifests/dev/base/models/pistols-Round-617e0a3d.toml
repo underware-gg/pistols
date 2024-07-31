@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x1024124b06ec5ade47e7c5ec3073ae4ed48003cad546340576fade3fc472ed1"
-original_class_hash = "0x1024124b06ec5ade47e7c5ec3073ae4ed48003cad546340576fade3fc472ed1"
+class_hash = "0x5d43cb5521b67586bde1203ad02a8fb2b98285a98e04d2f006ecbfc706eb655"
+original_class_hash = "0x5d43cb5521b67586bde1203ad02a8fb2b98285a98e04d2f006ecbfc706eb655"
 abi = "manifests/dev/base/abis/models/pistols-Round-617e0a3d.json"
 tag = "pistols-Round"
 manifest_name = "pistols-Round-617e0a3d"
@@ -17,7 +17,7 @@ key = true
 
 [[members]]
 name = "state"
-type = "u8"
+type = "RoundState"
 key = false
 
 [[members]]

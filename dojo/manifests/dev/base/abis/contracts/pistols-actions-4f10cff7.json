@@ -133,6 +133,24 @@
   },
   {
     "type": "enum",
+    "name": "pistols::models::duelist::ProfilePicType",
+    "variants": [
+      {
+        "name": "Undefined",
+        "type": "()"
+      },
+      {
+        "name": "Duelist",
+        "type": "()"
+      },
+      {
+        "name": "External",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "enum",
     "name": "pistols::models::duelist::Archetype",
     "variants": [
       {
@@ -213,7 +231,7 @@
       },
       {
         "name": "profile_pic_type",
-        "type": "core::integer::u8"
+        "type": "pistols::models::duelist::ProfilePicType"
       },
       {
         "name": "timestamp",
@@ -357,7 +375,7 @@
           },
           {
             "name": "profile_pic_type",
-            "type": "core::integer::u8"
+            "type": "pistols::models::duelist::ProfilePicType"
           },
           {
             "name": "profile_pic_uri",
@@ -389,7 +407,7 @@
           },
           {
             "name": "profile_pic_type",
-            "type": "core::integer::u8"
+            "type": "pistols::models::duelist::ProfilePicType"
           },
           {
             "name": "profile_pic_uri",
@@ -776,7 +794,7 @@
       },
       {
         "name": "profile_pic_type",
-        "type": "core::integer::u8",
+        "type": "pistols::models::duelist::ProfilePicType",
         "kind": "data"
       },
       {

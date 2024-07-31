@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x2916428ddf47f7c67efdd6dae2e0e5a58056c129352d67fa84c5fd6fee676ac"
-original_class_hash = "0x2916428ddf47f7c67efdd6dae2e0e5a58056c129352d67fa84c5fd6fee676ac"
+class_hash = "0x6ffc6768f7a5f15a230c3d9be91328dc6ea1f10569799116af8986af6eb8b08"
+original_class_hash = "0x6ffc6768f7a5f15a230c3d9be91328dc6ea1f10569799116af8986af6eb8b08"
 abi = "manifests/dev/base/abis/models/pistols-Duelist-1ec34ce9.json"
 tag = "pistols-Duelist"
 manifest_name = "pistols-Duelist-1ec34ce9"
@@ -22,7 +22,7 @@ key = false
 
 [[members]]
 name = "profile_pic_type"
-type = "u8"
+type = "ProfilePicType"
 key = false
 
 [[members]]
