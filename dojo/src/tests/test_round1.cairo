@@ -47,7 +47,7 @@ mod tests {
         let round: Round = tester::get_Round(world, duel_id, 1);
         assert(ch.state == ChallengeState::InProgress, 'challenge.state');
         assert(ch.round_number == 1, 'challenge.number');
-        assert(round.state == RoundState::Commit.into(), 'round.state');
+        assert(round.state == RoundState::Commit, 'round.state');
         (ch, round, duel_id)
     }
 
@@ -121,7 +121,7 @@ mod tests {
         let round: Round = tester::get_Round(world, duel_id, 1);
         assert(round.duel_id == duel_id, 'round.duel_id');
         assert(round.round_number == 1, 'round.round_number');
-        assert(round.state == RoundState::Commit.into(), 'round.state');
+        assert(round.state == RoundState::Commit, 'round.state');
     }
 
     #[test]
@@ -247,7 +247,7 @@ mod tests {
         let (challenge, round) = tester::get_Challenge_Round(world, duel_id);
         assert(challenge.round_number == 1, '1__challenge.round_number');
         assert(round.round_number == 1, '1__round.round_number');
-        assert(round.state == RoundState::Commit.into(), '1__state');
+        assert(round.state == RoundState::Commit, '1__state');
         assert(round.shot_a.hash == hash_a, '1__hash');
 
         // 2nd commit > Reveal
@@ -255,7 +255,7 @@ mod tests {
         let (challenge, round) = tester::get_Challenge_Round(world, duel_id);
         assert(challenge.round_number == 1, '2__challenge.round_number');
         assert(round.round_number == 1, '2__round.round_number');
-        assert(round.state == RoundState::Reveal.into(), '2__state');
+        assert(round.state == RoundState::Reveal, '2__state');
         assert(round.shot_a.hash == hash_a, '21__hash');
         assert(round.shot_b.hash == hash_b, '2__hash');
 
@@ -264,7 +264,7 @@ mod tests {
         let (challenge, round) = tester::get_Challenge_Round(world, duel_id);
         assert(challenge.round_number == 1, '3_challenge.round_number');
         assert(round.round_number == 1, '3__round.round_number');
-        assert(round.state == RoundState::Reveal.into(), '3__state');
+        assert(round.state == RoundState::Reveal, '3__state');
         assert(round.shot_a.hash == hash_a, '3__hash');
         assert(round.shot_a.salt == salt_a, '3__salt');
         assert(round.shot_a.action == action_a.into(), '3__action');
@@ -280,7 +280,7 @@ mod tests {
         assert(challenge.round_number == 1, '4_challenge.round_number');
         assert(challenge.timestamp_end > 0, '4_challenge.timestamp_end');
         assert(round.round_number == 1, '4__round.round_number');
-        assert(round.state == RoundState::Finished.into(), '4__state');
+        assert(round.state == RoundState::Finished, '4__state');
         assert(round.shot_a.hash == hash_a, '43__hash');
         assert(round.shot_a.salt == salt_a, '43__salt');
         assert(round.shot_a.action == action_a.into(), '43__action');
@@ -344,7 +344,7 @@ mod tests {
         assert(challenge.round_number == 1, '4_challenge.round_number');
         assert(challenge.timestamp_end > 0, '4_challenge.timestamp_end');
         assert(round.round_number == 1, '4__round.round_number');
-        assert(round.state == RoundState::Finished.into(), '4__state');
+        assert(round.state == RoundState::Finished, '4__state');
         let duelist_a = tester::get_Duelist(world, OWNER());
         let duelist_b = tester::get_Duelist(world, OTHER());
         assert(duelist_a.score.total_duels == 2, '__duelist_a.total_duels');
@@ -412,7 +412,7 @@ mod tests {
         assert(challenge.winner == 0, 'challenge.winner');
         assert(challenge.round_number == 1, 'challenge.round_number');
         assert(round.round_number == 1, 'round.round_number');
-        assert(round.state == RoundState::Finished.into(), 'round.state');
+        assert(round.state == RoundState::Finished, 'round.state');
         assert(round.shot_a.health == 0, 'round.shot_a.health');
         assert(round.shot_b.health == 0, 'round.shot_b.health');
 
@@ -527,7 +527,7 @@ mod tests {
         assert(challenge.winner == 1, 'challenge.winner');
         assert(challenge.round_number == 1, 'challenge.round_number');
         assert(round.round_number == 1, 'round.round_number');
-        assert(round.state == RoundState::Finished.into(), 'round.state');
+        assert(round.state == RoundState::Finished, 'round.state');
         assert(round.shot_a.health == constants::FULL_HEALTH, 'round.shot_a.health');
         assert(round.shot_b.health == 0, 'round.shot_b.health');
     }
@@ -546,7 +546,7 @@ mod tests {
         assert(challenge.winner == 2, 'challenge.winner');
         assert(challenge.round_number == 1, 'challenge.round_number');
         assert(round.round_number == 1, 'round.round_number');
-        assert(round.state == RoundState::Finished.into(), 'round.state');
+        assert(round.state == RoundState::Finished, 'round.state');
         assert(round.shot_a.health == 0, 'round.shot_a.health');
         assert(round.shot_b.health == constants::FULL_HEALTH, 'round.shot_b.health');
     }

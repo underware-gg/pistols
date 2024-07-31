@@ -49,7 +49,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let round: Round = tester::get_Round(world, duel_id, 1);
         assert(ch.state == ChallengeState::InProgress, 'challenge.state');
         assert(ch.round_number == 1, 'challenge.number');
-        assert(round.state == RoundState::Commit.into(), 'round.state');
+        assert(round.state == RoundState::Commit, 'round.state');
         (ch, round, duel_id)
     }
 
@@ -110,7 +110,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     fn assert_winner(challenge: Challenge, round: Round, winner: u8, round_number: u8) {
         assert(challenge.winner == winner, 'challenge.winner');
         assert(challenge.timestamp_start < challenge.timestamp_end, 'bad timestamps');
-        assert(round.state == RoundState::Finished.into(), 'round.state');
+        assert(round.state == RoundState::Finished, 'round.state');
         if (round_number > 0) {
             assert(challenge.round_number == round_number, 'bad challenge.round_number');
             assert(round.round_number == round_number, 'bad round.round_number');

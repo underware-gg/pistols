@@ -45,7 +45,7 @@ mod tests {
         let round: Round = tester::get_Round(world, duel_id, 1);
         assert(ch.state == ChallengeState::InProgress, 'challenge.state');
         assert(ch.round_number == 1, 'challenge.number');
-        assert(round.state == RoundState::Commit.into(), 'round.state');
+        assert(round.state == RoundState::Commit, 'round.state');
         (ch, round, duel_id)
     }
 

@@ -62,7 +62,7 @@ mod shooter {
 
         // Finished commit
         if (round.shot_a.hash != 0 && round.shot_b.hash != 0) {
-            round.state = RoundState::Reveal.into();
+            round.state = RoundState::Reveal;
         }
 
         set!(world, (round));
@@ -77,7 +77,7 @@ mod shooter {
 
         // Assert correct Round
         let mut round: Round = get!(world, (duel_id, round_number), Round);
-        assert(round.state == RoundState::Reveal.into(), Errors::ROUND_NOT_IN_REVEAL);
+        assert(round.state == RoundState::Reveal, Errors::ROUND_NOT_IN_REVEAL);
 
         // Validate action hash
         let hash: u64 = utils::make_action_hash(salt, packed);
@@ -128,7 +128,7 @@ mod shooter {
                 let mut round3 = Round {
                     duel_id: challenge.duel_id,
                     round_number: challenge.round_number,
-                    state: RoundState::Reveal.into(),
+                    state: RoundState::Reveal,
                     shot_a: Shot {
                         hash: 0,
                         salt: utils::scramble_salt(round.shot_a.salt),
@@ -215,7 +215,7 @@ mod shooter {
         }
 
         // Finish round
-        round.state = RoundState::Finished.into();
+        round.state = RoundState::Finished;
         set!(world, (round));
     }
 

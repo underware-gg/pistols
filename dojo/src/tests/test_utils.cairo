@@ -13,6 +13,7 @@ mod tests {
     use pistols::models::duelist::{Duelist, Score, ScoreTrait};
     use pistols::models::init::{init};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
+    use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::types::action::{ACTION};
     use pistols::utils::short_string::{ShortString};
 
@@ -100,7 +101,7 @@ mod tests {
         let mut round = Round {
             duel_id: 1,
             round_number: 1,
-            state: 1,
+            state: RoundState::Commit,
             shot_a: init::Shot(),
             shot_b: init::Shot(),
         };

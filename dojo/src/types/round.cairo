@@ -3,10 +3,10 @@ use debug::PrintTrait;
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 enum RoundState {
-    Null,
-    Commit,
-    Reveal,
-    Finished,
+    Null,       // 0
+    Commit,     // 1
+    Reveal,     // 2
+    Finished,   // 3
 }
 
 mod ROUND_STATE {

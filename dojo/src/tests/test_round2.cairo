@@ -40,7 +40,7 @@ mod tests {
         let round: Round = tester::get_Round(world, duel_id, 1);
         assert(ch.state == ChallengeState::InProgress, 'challenge.state');
         assert(ch.round_number == 1, 'challenge.number');
-        assert(round.state == RoundState::Commit.into(), 'round.state');
+        assert(round.state == RoundState::Commit, 'round.state');
         (ch, round, duel_id)
     }
 
@@ -91,7 +91,7 @@ mod tests {
         assert(challenge.state == ChallengeState::InProgress, '__challenge.state');
         assert(challenge.round_number == 2, '__challenge.round_number');
         assert(round.round_number == 2, '__round.round_number');
-        assert(round.state == RoundState::Commit.into(), '__round.state');
+        assert(round.state == RoundState::Commit, '__round.state');
         assert(round.shot_a.hash == 0, '__hash_a');
         assert(round.shot_a.salt == 0, '__salt_a');
         assert(round.shot_a.action == 0, '__action_a');
@@ -110,7 +110,7 @@ mod tests {
         assert(challenge.round_number == 2, '2__challenge.round_number');
         assert(challenge.timestamp_end > 0, '2__challenge.timestamp_end');
         assert(round.round_number == 2, '2__round.round_number');
-        assert(round.state == RoundState::Finished.into(), '2__round.state');
+        assert(round.state == RoundState::Finished, '2__round.state');
         assert(round.shot_a.hash == hash_1_a, '2__hash_a');
         assert(round.shot_a.salt == salt_1_a, '2__salt_a');
         assert(round.shot_a.action == action_1_a.into(), '2__action_a');
@@ -187,7 +187,7 @@ mod tests {
         assert(challenge.state == ChallengeState::InProgress, '__challenge.state');
         assert(challenge.round_number == 2, '__challenge.round_number');
         assert(round.round_number == 2, '__round.round_number');
-        assert(round.state == RoundState::Commit.into(), '__round.state');
+        assert(round.state == RoundState::Commit, '__round.state');
         assert(round.shot_a.hash == 0, '__hash_a');
         assert(round.shot_a.salt == 0, '__salt_a');
         assert(round.shot_a.action == 0, '__action_a');
@@ -210,7 +210,7 @@ mod tests {
         assert(challenge.round_number == 2, '2__challenge.round_number');
         assert(challenge.timestamp_end > 0, '2__challenge.timestamp_end');
         assert(round.round_number == 2, '2__round.round_number');
-        assert(round.state == RoundState::Finished.into(), '2__round.state');
+        assert(round.state == RoundState::Finished, '2__round.state');
         assert(round.shot_a.hash == hash_1_a, '2__hash_a');
         assert(round.shot_a.salt == salt_1_a, '2__salt_a');
         assert(round.shot_a.action == action_1_a.into(), '2__action_a');

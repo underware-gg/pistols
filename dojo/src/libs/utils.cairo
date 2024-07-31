@@ -321,7 +321,7 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
             Round {
                 duel_id: challenge.duel_id,
                 round_number: challenge.round_number,
-                state: RoundState::Commit.into(),
+                state: RoundState::Commit,
                 shot_a,
                 shot_b,
             }
