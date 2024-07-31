@@ -221,8 +221,8 @@ export function defineContractComponents(world: World) {
         {
           metadata: {
             name: "pistols-Challenge",
-            types: ["u128","felt252","felt252","contractaddress","contractaddress","u128","u128","u8","u8","u8","u64","u64"],
-            customTypes: [],
+            types: ["u128","felt252","felt252","contractaddress","contractaddress","u128","u128","enum","u8","u8","u64","u64"],
+            customTypes: ["ChallengeState"],
           },
         }
       );
@@ -247,8 +247,8 @@ export function defineContractComponents(world: World) {
         {
           metadata: {
             name: "pistols-Duelist",
-            types: ["u128","felt252","u8","u64","u8","u8","u8","u8","u16","u16","u16","u16","u64"],
-            customTypes: ["Score"],
+            types: ["u128","felt252","enum","u64","u8","u8","u8","u8","u16","u16","u16","u16","u64"],
+            customTypes: ["ProfilePicType","Score"],
           },
         }
       );
@@ -273,8 +273,8 @@ export function defineContractComponents(world: World) {
         {
           metadata: {
             name: "pistols-Round",
-            types: ["u128","u8","u8","u64","u64","u16","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u64","u64","u16","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8"],
-            customTypes: ["Shot","Shot"],
+            types: ["u128","u8","enum","u64","u64","u16","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u64","u64","u16","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8"],
+            customTypes: ["RoundState","Shot","Shot"],
           },
         }
       );
@@ -321,7 +321,7 @@ export function defineContractComponents(world: World) {
     TableConfig: (() => {
       return defineComponent(
         world,
-        { table_id: RecsType.BigInt, table_type: RecsType.String, description: RecsType.BigInt, fee_collector_address: RecsType.BigInt, wager_contract_address: RecsType.BigInt, wager_min: RecsType.BigInt, fee_min: RecsType.BigInt, fee_pct: RecsType.Number, is_open: RecsType.Boolean },
+        { table_id: RecsType.BigInt, table_type: RecsType.Number, description: RecsType.BigInt, fee_collector_address: RecsType.BigInt, wager_contract_address: RecsType.BigInt, wager_min: RecsType.BigInt, fee_min: RecsType.BigInt, fee_pct: RecsType.Number, is_open: RecsType.Boolean },
         {
           metadata: {
             name: "pistols-TableConfig",

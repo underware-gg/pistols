@@ -5,16 +5,6 @@ import { BigNumberish } from 'starknet';
 // contants
 //
 
-// from: ../dojo/src/models/duelist.cairo
-type profile_pic_type_Type = {
-  DUELIST: number, // cairo: u8
-  EXTERNAL: number, // cairo: u8
-};
-export const profile_pic_type: profile_pic_type_Type = {
-  DUELIST: 1,
-  EXTERNAL: 2,
-};
-
 // from: ../dojo/src/models/table.cairo
 type tables_Type = {
   LORDS: string, // cairo: felt252
@@ -321,6 +311,18 @@ export const ArchetypeValues: Record<Archetype, number> = {
   [Archetype.Honourable]: 3,
 };
 
+// from: ../dojo/src/models/duelist.cairo
+export enum ProfilePicType {
+  Undefined = 'Undefined',
+  Duelist = 'Duelist',
+  External = 'External',
+};
+export const ProfilePicTypeValues: Record<ProfilePicType, number> = {
+  [ProfilePicType.Undefined]: 0,
+  [ProfilePicType.Duelist]: 1,
+  [ProfilePicType.External]: 2,
+};
+
 // from: ../dojo/src/models/table.cairo
 export enum TableType {
   Undefined = 'Undefined',
@@ -417,7 +419,6 @@ export const RoundStateValues: Record<RoundState, number> = {
 
 export function defineContractConstants() {
   return {
-    profile_pic_type,
     tables,
     actions,
     admin,
@@ -431,6 +432,8 @@ export function defineContractConstants() {
     ROUND_STATE,
     Archetype,
     ArchetypeValues,
+    ProfilePicType,
+    ProfilePicTypeValues,
     TableType,
     TableTypeValues,
     Action,

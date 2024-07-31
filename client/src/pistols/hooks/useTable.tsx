@@ -11,12 +11,13 @@ import { ChallengeState, LiveChallengeStates, PastChallengeStates } from '@/pist
 
 export const useTable = (tableId: string) => {
   const { TableConfig } = useDojoComponents()
-  const { TableType } = useDojoConstants()
+  const { TableType, TableTypeValues } = useDojoConstants()
 
   const table = useComponentValue(TableConfig, bigintToEntity(stringToFelt(tableId ?? '')))
   const wagerContractAddress = useMemo(() => (table?.wager_contract_address ?? 0n), [table])
 
-  const tableType = useMemo(() => (table?.table_type ? {
+  const tableTypeValue = useMemo(() => (table ? TableTypeValues[table.table_type] : null), [table])
+  const tableTypeDescription = useMemo(() => (table?.table_type ? {
     [TableType.Classic]: 'Classic',
     [TableType.Tournament]: 'Tournament',
     [TableType.IRLTournament]: 'IRL Tournamment',
@@ -30,10 +31,10 @@ export const useTable = (tableId: string) => {
     wagerMin: table?.wager_min ?? null,
     feeMin: table?.fee_min ?? null,
     feePct: table?.fee_pct ?? null,
-    tableType: tableType ?? '?',
+    tableType: tableTypeDescription ?? '?',
     tableIsOpen: table?.is_open ?? false,
-    isTournament: (table?.table_type == TableType.Tournament),
-    isIRLTournament: (table?.table_type == TableType.IRLTournament),
+    isTournament: (tableTypeValue == TableType.Tournament),
+    isIRLTournament: (tableTypeValue == TableType.IRLTournament),
   }
 }
 

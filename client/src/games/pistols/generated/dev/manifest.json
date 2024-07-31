@@ -1211,8 +1211,8 @@
     {
       "kind": "DojoContract",
       "address": "0x2ff035c407d77450f337c06602423e41c1f8ba48b91b3d6d8513fef61963358",
-      "class_hash": "0x3479a045401d2cffce6c9728b3f666d932b14ba37a094b2a6e5307165fb7a28",
-      "original_class_hash": "0x3479a045401d2cffce6c9728b3f666d932b14ba37a094b2a6e5307165fb7a28",
+      "class_hash": "0x7b6937996af163bf20d46d164bad9eee3f0ecc2690b4c7894511d970cc785f1",
+      "original_class_hash": "0x7b6937996af163bf20d46d164bad9eee3f0ecc2690b4c7894511d970cc785f1",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -1349,6 +1349,24 @@
         },
         {
           "type": "enum",
+          "name": "pistols::models::duelist::ProfilePicType",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Duelist",
+              "type": "()"
+            },
+            {
+              "name": "External",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
           "name": "pistols::models::duelist::Archetype",
           "variants": [
             {
@@ -1429,7 +1447,7 @@
             },
             {
               "name": "profile_pic_type",
-              "type": "core::integer::u8"
+              "type": "pistols::models::duelist::ProfilePicType"
             },
             {
               "name": "timestamp",
@@ -1573,7 +1591,7 @@
                 },
                 {
                   "name": "profile_pic_type",
-                  "type": "core::integer::u8"
+                  "type": "pistols::models::duelist::ProfilePicType"
                 },
                 {
                   "name": "profile_pic_uri",
@@ -1605,7 +1623,7 @@
                 },
                 {
                   "name": "profile_pic_type",
-                  "type": "core::integer::u8"
+                  "type": "pistols::models::duelist::ProfilePicType"
                 },
                 {
                   "name": "profile_pic_uri",
@@ -1992,7 +2010,7 @@
             },
             {
               "name": "profile_pic_type",
-              "type": "core::integer::u8",
+              "type": "pistols::models::duelist::ProfilePicType",
               "kind": "data"
             },
             {
@@ -3592,8 +3610,8 @@
     {
       "kind": "DojoContract",
       "address": "0x572fb40468d02532091cfb9d3869ceabfb0fc3e79771f7cf4a1411efcd39a3c",
-      "class_hash": "0x6b0d61cc952799c9b416c32d8b4e7352234cee5bbfb0f602cd3f075f8b544a9",
-      "original_class_hash": "0x6b0d61cc952799c9b416c32d8b4e7352234cee5bbfb0f602cd3f075f8b544a9",
+      "class_hash": "0x7b91a2a8671290f5fb67463d4b24dcadd6ac7e550cf227bcd663bc11bbbfe37",
+      "original_class_hash": "0x7b91a2a8671290f5fb67463d4b24dcadd6ac7e550cf227bcd663bc11bbbfe37",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -11806,7 +11824,7 @@
         },
         {
           "name": "state",
-          "type": "u8",
+          "type": "ChallengeState",
           "key": false
         },
         {
@@ -11830,8 +11848,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x51ba68ccb2e9b8e84ae87f59f69d5911c7cc9648463dab084324607811cb28a",
-      "original_class_hash": "0x51ba68ccb2e9b8e84ae87f59f69d5911c7cc9648463dab084324607811cb28a",
+      "class_hash": "0x6ae779124841dc425215542088697c7f617f9a9a53bc623af38166c36689baf",
+      "original_class_hash": "0x6ae779124841dc425215542088697c7f617f9a9a53bc623af38166c36689baf",
       "abi": [
         {
           "type": "impl",
@@ -12201,6 +12219,44 @@
           "interface_name": "pistols::models::challenge::Ichallenge"
         },
         {
+          "type": "enum",
+          "name": "pistols::types::challenge::ChallengeState",
+          "variants": [
+            {
+              "name": "Null",
+              "type": "()"
+            },
+            {
+              "name": "Awaiting",
+              "type": "()"
+            },
+            {
+              "name": "Withdrawn",
+              "type": "()"
+            },
+            {
+              "name": "Refused",
+              "type": "()"
+            },
+            {
+              "name": "Expired",
+              "type": "()"
+            },
+            {
+              "name": "InProgress",
+              "type": "()"
+            },
+            {
+              "name": "Resolved",
+              "type": "()"
+            },
+            {
+              "name": "Draw",
+              "type": "()"
+            }
+          ]
+        },
+        {
           "type": "struct",
           "name": "pistols::models::challenge::Challenge",
           "members": [
@@ -12234,7 +12290,7 @@
             },
             {
               "name": "state",
-              "type": "core::integer::u8"
+              "type": "pistols::types::challenge::ChallengeState"
             },
             {
               "name": "round_number",
@@ -12751,7 +12807,7 @@
         },
         {
           "name": "profile_pic_type",
-          "type": "u8",
+          "type": "ProfilePicType",
           "key": false
         },
         {
@@ -12765,8 +12821,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x2916428ddf47f7c67efdd6dae2e0e5a58056c129352d67fa84c5fd6fee676ac",
-      "original_class_hash": "0x2916428ddf47f7c67efdd6dae2e0e5a58056c129352d67fa84c5fd6fee676ac",
+      "class_hash": "0x6ffc6768f7a5f15a230c3d9be91328dc6ea1f10569799116af8986af6eb8b08",
+      "original_class_hash": "0x6ffc6768f7a5f15a230c3d9be91328dc6ea1f10569799116af8986af6eb8b08",
       "abi": [
         {
           "type": "impl",
@@ -13136,6 +13192,24 @@
           "interface_name": "pistols::models::duelist::Iduelist"
         },
         {
+          "type": "enum",
+          "name": "pistols::models::duelist::ProfilePicType",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Duelist",
+              "type": "()"
+            },
+            {
+              "name": "External",
+              "type": "()"
+            }
+          ]
+        },
+        {
           "type": "struct",
           "name": "pistols::models::duelist::Score",
           "members": [
@@ -13195,7 +13269,7 @@
             },
             {
               "name": "profile_pic_type",
-              "type": "core::integer::u8"
+              "type": "pistols::models::duelist::ProfilePicType"
             },
             {
               "name": "timestamp",
@@ -13685,7 +13759,7 @@
         },
         {
           "name": "state",
-          "type": "u8",
+          "type": "RoundState",
           "key": false
         },
         {
@@ -13699,8 +13773,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x1024124b06ec5ade47e7c5ec3073ae4ed48003cad546340576fade3fc472ed1",
-      "original_class_hash": "0x1024124b06ec5ade47e7c5ec3073ae4ed48003cad546340576fade3fc472ed1",
+      "class_hash": "0x5d43cb5521b67586bde1203ad02a8fb2b98285a98e04d2f006ecbfc706eb655",
+      "original_class_hash": "0x5d43cb5521b67586bde1203ad02a8fb2b98285a98e04d2f006ecbfc706eb655",
       "abi": [
         {
           "type": "impl",
@@ -14070,6 +14144,28 @@
           "interface_name": "pistols::models::challenge::Iround"
         },
         {
+          "type": "enum",
+          "name": "pistols::types::round::RoundState",
+          "variants": [
+            {
+              "name": "Null",
+              "type": "()"
+            },
+            {
+              "name": "Commit",
+              "type": "()"
+            },
+            {
+              "name": "Reveal",
+              "type": "()"
+            },
+            {
+              "name": "Finished",
+              "type": "()"
+            }
+          ]
+        },
+        {
           "type": "struct",
           "name": "pistols::models::challenge::Shot",
           "members": [
@@ -14145,7 +14241,7 @@
             },
             {
               "name": "state",
-              "type": "core::integer::u8"
+              "type": "pistols::types::round::RoundState"
             },
             {
               "name": "shot_a",
