@@ -4,11 +4,8 @@ use starknet::{ContractAddress, get_contract_address, get_caller_address, testin
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use dojo::utils::test::spawn_test_world;
 
-// use origami_token::tests::constants::{ZERO, OWNER, SPENDER, RECIPIENT};//, TOKEN_ID, TOKEN_ID_2, TOKEN_ID_3};
-// use origami_token::tests::utils;
-
-use pistols::tests::token::constants::{ZERO, OWNER, SPENDER, RECIPIENT};//, TOKEN_ID, TOKEN_ID_2, TOKEN_ID_3};
-use pistols::tests::token::utils;
+use origami_token::tests::constants::{ZERO, OWNER, SPENDER, RECIPIENT};//, TOKEN_ID, TOKEN_ID_2, TOKEN_ID_3};
+use origami_token::tests::utils;
 
 use origami_token::components::security::initializable::{
     initializable_model

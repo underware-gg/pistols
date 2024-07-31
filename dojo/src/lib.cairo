@@ -73,7 +73,5 @@ mod tests {
     // tokens
     mod token {
         mod test_token_duelist;
-        mod constants;
-        mod utils;
     }
 }
