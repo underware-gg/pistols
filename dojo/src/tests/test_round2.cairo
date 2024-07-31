@@ -8,7 +8,7 @@ mod tests {
 
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::models::challenge::{Challenge, Round};
-    use pistols::models::duelist::{Duelist};
+    use pistols::models::duelist::{Duelist, ProfilePicType};
     use pistols::models::table::{tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
@@ -31,8 +31,8 @@ mod tests {
     const SALT_2_b: u64 = 0x45299a98d9f8ce03;
     
     fn _start_new_challenge(world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress) -> (Challenge, Round, u128) {
-        // tester::execute_update_duelist(system, OWNER(), PLAYER_NAME, 1, "1");
-        // tester::execute_update_duelist(system, OTHER(), OTHER_NAME, 1, "2");
+        // tester::execute_update_duelist(system, OWNER(), PLAYER_NAME, ProfilePicType, "1");
+        // tester::execute_update_duelist(system, OTHER(), OTHER_NAME, ProfilePicType, "2");
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 48);
         tester::elapse_timestamp(timestamp::from_days(1));
         tester::execute_reply_challenge(system, OTHER(), duel_id, true);

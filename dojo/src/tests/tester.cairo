@@ -38,6 +38,7 @@ mod tester {
         duelist, Duelist, DuelistTrait,
         scoreboard, Scoreboard,
         pact,
+        ProfilePicType,
         Archetype,
     };
     use pistols::models::config::{
@@ -327,16 +328,16 @@ mod tester {
     }
 
     // ::actions
-    fn execute_mint_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: u8, profile_pic_uri: felt252, archetype: Archetype) -> Duelist {
+    fn execute_mint_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252, archetype: Archetype) -> Duelist {
         impersonate(sender);
         let duelist: Duelist = system.mint_duelist(name, profile_pic_type, profile_pic_uri, archetype);
         _next_block();
         (duelist)
     }
-    fn execute_update_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: u8, profile_pic_uri: felt252) -> Duelist {
+    fn execute_update_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist {
         (execute_update_duelist_ID(system, sender, ID(sender), name, profile_pic_type, profile_pic_uri))
     }
-    fn execute_update_duelist_ID(system: IActionsDispatcher, sender: ContractAddress, duelist_id: u128, name: felt252, profile_pic_type: u8, profile_pic_uri: felt252) -> Duelist {
+    fn execute_update_duelist_ID(system: IActionsDispatcher, sender: ContractAddress, duelist_id: u128, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist {
         impersonate(sender);
         let duelist: Duelist = system.update_duelist(duelist_id, name, profile_pic_type, profile_pic_uri);
         _next_block();

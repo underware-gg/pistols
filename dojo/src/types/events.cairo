@@ -1,12 +1,13 @@
 use traits::{Into, TryInto};
 use starknet::{ContractAddress};
+use pistols::models::duelist::{ProfilePicType};
 
 #[derive(Drop, starknet::Event)]
 struct DuelistRegisteredEvent {
     address: ContractAddress,
     duelist_id: u128,
     name: felt252,
-    profile_pic_type: u8,
+    profile_pic_type: ProfilePicType,
     profile_pic_uri: ByteArray,
     is_new: bool,
 }

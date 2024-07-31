@@ -1,6 +1,6 @@
 use starknet::{ContractAddress};
 use pistols::models::challenge::{Challenge};
-use pistols::models::duelist::{Duelist, Archetype};
+use pistols::models::duelist::{Duelist, ProfilePicType, Archetype};
 use pistols::models::structs::{SimulateChances};
 use pistols::types::challenge::{ChallengeState};
 
@@ -12,7 +12,7 @@ trait IActions {
     fn mint_duelist(
         ref world: IWorldDispatcher,
         name: felt252,
-        profile_pic_type: u8,
+        profile_pic_type: ProfilePicType,
         profile_pic_uri: felt252,
         initial_archetype: Archetype,
     ) -> Duelist;
@@ -20,7 +20,7 @@ trait IActions {
         ref world: IWorldDispatcher,
         duelist_id: u128,
         name: felt252,
-        profile_pic_type: u8,
+        profile_pic_type: ProfilePicType,
         profile_pic_uri: felt252,
     ) -> Duelist;
 
@@ -95,7 +95,7 @@ mod actions {
         IMinterDispatcher, IMinterDispatcherTrait,
     };
     use pistols::models::challenge::{Challenge, Wager, Round, Shot};
-    use pistols::models::duelist::{Duelist, DuelistTrait, Archetype, Score, Pact, DuelistManager, DuelistManagerTrait};
+    use pistols::models::duelist::{Duelist, DuelistTrait, ProfilePicType, Archetype, Score, Pact, DuelistManager, DuelistManagerTrait};
     use pistols::models::structs::{SimulateChances};
     use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
     use pistols::models::table::{TableConfig, TableManager, TableTrait, TableManagerTrait, tables, TableType};
@@ -150,7 +150,7 @@ mod actions {
         //
         fn mint_duelist(ref world: IWorldDispatcher,
             name: felt252,
-            profile_pic_type: u8,
+            profile_pic_type: ProfilePicType,
             profile_pic_uri: felt252,
             initial_archetype: Archetype,
         ) -> Duelist {
@@ -163,8 +163,8 @@ mod actions {
             let mut duelist = Duelist {
                 duelist_id: token_id,
                 timestamp: get_block_timestamp(),
-                name: name,
-                profile_pic_type: profile_pic_type,
+                name,
+                profile_pic_type,
                 profile_pic_uri: profile_pic_uri.to_byte_array(),
                 score: init::Score(),
             };
@@ -185,7 +185,7 @@ mod actions {
         fn update_duelist(ref world: IWorldDispatcher,
             duelist_id: u128,
             name: felt252,
-            profile_pic_type: u8,
+            profile_pic_type: ProfilePicType,
             profile_pic_uri: felt252,
         ) -> Duelist {
             let caller: ContractAddress = starknet::get_caller_address();

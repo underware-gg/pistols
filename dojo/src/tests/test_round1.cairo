@@ -9,7 +9,7 @@ mod tests {
     use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::models::challenge::{Challenge, Wager, Round};
-    use pistols::models::duelist::{Duelist, Archetype};
+    use pistols::models::duelist::{Duelist, ProfilePicType, Archetype};
     use pistols::models::structs::{SimulateChances};
     use pistols::models::table::{TableConfig, TableTrait, TableManagerTrait, tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
@@ -38,8 +38,8 @@ mod tests {
     const SALT_1_b: u64 = 0xf9a978e92309da78;
 
     fn _start_new_challenge(world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress, wager_value: u128) -> (Challenge, Round, u128) {
-        // tester::execute_update_duelist(system, OWNER(), PLAYER_NAME, 1, "1");
-        // tester::execute_update_duelist(system, OTHER(), OTHER_NAME, 1, "2");
+        // tester::execute_update_duelist(system, OWNER(), PLAYER_NAME, ProfilePicType::Duelist, "1");
+        // tester::execute_update_duelist(system, OTHER(), OTHER_NAME, ProfilePicType::Duelist, "2");
         let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, wager_value, 48);
         tester::elapse_timestamp(timestamp::from_days(1));
         tester::execute_reply_challenge(system, OTHER(), duel_id, true);
@@ -655,8 +655,8 @@ mod tests {
     #[test]
     fn test_register_keep_scores() {
         // let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::APPROVE);
-        // let duelist1: Duelist = tester::execute_mint_duelist(system, OWNER(), 'AAA', 1, '1', Archetype::Undefined);
-        // let duelist2: Duelist = tester::execute_mint_duelist(system, OTHER(), 'AAA', 1, '1', Archetype::Undefined);
+        // let duelist1: Duelist = tester::execute_mint_duelist(system, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Undefined);
+        // let duelist2: Duelist = tester::execute_mint_duelist(system, OTHER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Undefined);
         // assert(duelist1.duelist_id == ID(OWNER()), 'invalid duelist_id_1');
         // assert(duelist2.duelist_id == ID(OTHER()), 'invalid duelist_id_2');
         // let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), 0);
@@ -681,7 +681,7 @@ mod tests {
         // validate by settign a timestamp
         duelist_a_before.timestamp = 1234;
         set!(world, (duelist_a_before.clone()));
-        tester::execute_update_duelist_ID(system, OWNER(), ID(OWNER()), 'dssadsa', 1, '3');
+        tester::execute_update_duelist_ID(system, OWNER(), ID(OWNER()), 'dssadsa', ProfilePicType::Duelist, '3');
         let duelist_a_after = tester::get_Duelist_id(world, ID(OWNER()));
         assert(duelist_a_before.duelist_id == duelist_a_after.duelist_id, 'duelist_id');
         assert(duelist_a_before.name != duelist_a_after.name, 'name');

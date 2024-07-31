@@ -29,7 +29,7 @@ mod init {
             duelist_id: 0,
             //----------------
             name: 0,
-            profile_pic_type: 0,
+            profile_pic_type: duelist::ProfilePicType::Undefined,
             profile_pic_uri: "",
             score: Score(),
             timestamp: 0,

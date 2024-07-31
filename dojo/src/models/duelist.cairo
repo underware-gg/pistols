@@ -14,13 +14,16 @@ enum Archetype {
     Honourable, // 3
 }
 
-mod profile_pic_type {
-    const DUELIST: u8 = 1;      // profile_pic_uri = number
-    const EXTERNAL: u8 = 2;     // image URL
-    // const STARK_ID: u8 = 3;     // stark.id (ipfs?)
-    // const ERC721: u8 = 4;       // Owned erc-721 (hard to validate and keep up to date)
-    // const DISCORD: u8 = 5;      // Linked account (had to be cloned, or just copy the url)
+#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
+enum ProfilePicType {
+    Undefined,  // 0
+    Duelist,    // 1
+    External,   // 2
+    // StarkId,    // stark.id (ipfs?)
+    // ERC721,     // Owned erc-721 (hard to validate and keep up to date)
+    // Discord,    // Linked account (had to be cloned, or just copy the url)
 }
+
 
 
 //---------------------
@@ -35,7 +38,7 @@ struct Duelist {
     //-----------------------
     name: felt252,
     profile_pic_uri: ByteArray,     // can be anything
-    profile_pic_type: u8,
+    profile_pic_type: ProfilePicType,
     timestamp: u64,                 // date registered
     score: Score,
 }

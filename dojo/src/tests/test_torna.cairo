@@ -10,7 +10,7 @@ mod tests {
     use pistols::libs::utils;
     use pistols::systems::actions::{IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::models::challenge::{Challenge, Round, Snapshot};
-    use pistols::models::duelist::{Duelist, Score, Archetype};
+    use pistols::models::duelist::{Duelist, Score, ProfilePicType, Archetype};
     use pistols::models::table::{TableConfig, TableType, tables};
     use pistols::models::structs::{SimulateChances};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
@@ -47,8 +47,8 @@ mod tests {
     #[ignore]
     fn test_mint_archetype_snapshot_Classic() {
         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::ADMIN | flags::MINTER);
-        let duelist1: Duelist = tester::execute_mint_duelist(system, OWNER(), 'AAA', 1, '1', Archetype::Villainous);
-        let duelist2: Duelist = tester::execute_mint_duelist(system, OTHER(), 'BBB', 1, '2', Archetype::Honourable);
+        let duelist1: Duelist = tester::execute_mint_duelist(system, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
+        let duelist2: Duelist = tester::execute_mint_duelist(system, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
         assert(duelist1.score.level_villain == honour::MAX, 'level_villain');
         assert(duelist2.score.level_lord == honour::MAX, 'level_lord');
         let (challenge, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), tables::COMMONERS);
@@ -68,8 +68,8 @@ mod tests {
     #[ignore]
     fn test_mint_archetype_snapshot_IRL() {
         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::ADMIN | flags::MINTER);
-        let duelist1: Duelist = tester::execute_mint_duelist(system, OWNER(), 'AAA', 1, '1', Archetype::Villainous);
-        let duelist2: Duelist = tester::execute_mint_duelist(system, OTHER(), 'BBB', 1, '2', Archetype::Honourable);
+        let duelist1: Duelist = tester::execute_mint_duelist(system, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
+        let duelist2: Duelist = tester::execute_mint_duelist(system, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
         assert(duelist1.score.level_villain == honour::MAX, 'level_villain');
         assert(duelist2.score.level_lord == honour::MAX, 'level_lord');
         let (challenge, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), TABLE_ID);
@@ -102,8 +102,8 @@ mod tests {
     #[ignore]
     fn test_IRL_keep_archetypes() {
         let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::ADMIN | flags::MINTER);
-        let duelist1: Duelist = tester::execute_mint_duelist(system, OWNER(), 'AAA', 1, '1', Archetype::Villainous);
-        let duelist2: Duelist = tester::execute_mint_duelist(system, OTHER(), 'BBB', 1, '2', Archetype::Honourable);
+        let duelist1: Duelist = tester::execute_mint_duelist(system, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
+        let duelist2: Duelist = tester::execute_mint_duelist(system, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
         assert(duelist1.score.level_villain == honour::MAX, 'duelist1.level_villain');
         assert(duelist1.score.level_lord == 0, 'duelist1.level_lord');
         assert(duelist1.score.level_lord == 0, 'duelist1.level_lord');

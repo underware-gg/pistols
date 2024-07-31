@@ -50,7 +50,7 @@ use pistols::systems::minter::{
 };
 use pistols::models::{
     token_config::{token_config},
-    duelist::{duelist, Duelist, Score, scoreboard, Scoreboard, profile_pic_type},
+    duelist::{duelist, Duelist, Score, scoreboard, Scoreboard, ProfilePicType},
 };
 
 use pistols::models::table::{tables};
@@ -219,7 +219,7 @@ fn test_token_uri() {
     let duelist = Duelist {
         duelist_id: TOKEN_ID.low,
         name: 'Ser Walker',
-        profile_pic_type: profile_pic_type::DUELIST,
+        profile_pic_type: ProfilePicType::Duelist,
         profile_pic_uri: "1",
         timestamp: 999999,
         score: Score {
