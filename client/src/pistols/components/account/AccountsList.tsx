@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react'
-import { useRouter } from 'next/navigation'
 import { Grid, Divider } from 'semantic-ui-react'
+import { useRouter } from 'next/navigation'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useDojoConstants } from '@/lib/dojo/DojoContext'
 import { usePistolsContext, initialState } from '@/pistols/hooks/PistolsContext'
 import { useDuelistBalanceOf, useDuelistOfOwnerByIndex, useDuelistTokenCount } from '@/pistols/hooks/useTokenDuelist'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
@@ -12,6 +11,7 @@ import { ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { WagerBalance } from '@/pistols/components/account/LordsBalance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { makeTavernUrl } from '@/pistols/utils/pistols'
+import { tables } from '@/games/pistols/generated/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -56,7 +56,6 @@ function AccountItem({
   const { address } = useAccount()
   const { duelistId } = useDuelistOfOwnerByIndex(address, index)
   const { exists, profilePic } = useDuelist(duelistId)
-  const { tables } = useDojoConstants()
 
   const _canPlay = (exists)
 

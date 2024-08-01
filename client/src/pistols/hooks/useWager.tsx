@@ -1,12 +1,13 @@
 import { useMemo } from 'react'
+import { BigNumberish } from 'starknet'
 import { getComponentValue } from '@dojoengine/recs'
 import { useComponentValue } from "@dojoengine/react"
-import { useDojoComponents, useDojoConstants } from '@/lib/dojo/DojoContext'
+import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { useChallengesByOwner } from '@/pistols/hooks/useChallenge'
 import { useLordsContract } from '@/lib/dojo/hooks/useLords'
 import { ChallengeState } from '@/pistols/utils/pistols'
 import { bigintEquals, bigintToEntity } from '@/lib/utils/types'
-import { BigNumberish } from 'starknet'
+import { ChallengeStateValues } from '@/games/pistols/generated/constants'
 
 export const useWager = (duelId: BigNumberish) => {
   const { Wager } = useDojoComponents()
@@ -22,7 +23,6 @@ export const useWager = (duelId: BigNumberish) => {
 export const useLockedLordsBalance = (address: bigint) => {
   const { contractAddress } = useLordsContract()
   const { Wager, TableConfig } = useDojoComponents()
-  const { ChallengeStateValues } = useDojoConstants()
   const { raw_challenges } = useChallengesByOwner(address)
   const { wagers, fees, total } = useMemo(() => {
     let wagers = 0n

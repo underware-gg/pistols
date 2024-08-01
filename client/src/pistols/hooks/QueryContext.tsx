@@ -1,15 +1,16 @@
 import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect } from 'react'
+import { BigNumberish } from 'starknet'
 import { Entity, getComponentValue, Has } from '@dojoengine/recs'
 import { useAccount } from '@starknet-react/core'
 import { useEntityQuery } from '@dojoengine/react'
-import { useDojoComponents, useDojoConstants } from '@/lib/dojo/DojoContext'
+import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { calcWinRatio } from '@/pistols/hooks/useScore'
 import { AllChallengeStates, ChallengeState } from '@/pistols/utils/pistols'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
 import { arrayUnique, bigintEquals, keysToEntity } from '@/lib/utils/types'
-import { BigNumberish } from 'starknet'
+import { ChallengeStateValues } from '@/games/pistols/generated/constants'
 
 export type DuelistRow = {
   entity: Entity
@@ -155,7 +156,6 @@ const QueryProvider = ({
   children,
 }: QueryProviderProps) => {
   const { Duelist, Scoreboard, Challenge } = useDojoComponents()
-  const { ChallengeStateValues } = useDojoConstants()
   const { tableId, duelistId } = useSettings()
   const { selectedDuelistId } = usePistolsContext()
   const { address } = useAccount()

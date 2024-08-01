@@ -1,14 +1,15 @@
 import { useMemo } from 'react'
+import { BigNumberish } from 'starknet'
 import { HasValue, getComponentValue, Component } from '@dojoengine/recs'
-import { useDojoComponents, useDojoConstants } from '@/lib/dojo/DojoContext'
+import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { useComponentValue } from "@dojoengine/react"
-import { bigintToEntity } from '@/lib/utils/types'
-import { feltToString, stringToFelt } from "@/lib/utils/starknet"
-import { ChallengeState, ChallengeStateDescriptions } from "@/pistols/utils/pistols"
 import { useEntityKeys, useEntityKeysQuery } from '@/lib/dojo/hooks/useEntityKeys'
 import { useClientTimestamp } from "@/lib/utils/hooks/useTimestamp"
 import { useDuelist } from "@/pistols/hooks/useDuelist"
-import { BigNumberish } from 'starknet'
+import { bigintToEntity } from '@/lib/utils/types'
+import { feltToString, stringToFelt } from "@/lib/utils/starknet"
+import { ChallengeState, ChallengeStateDescriptions } from "@/pistols/utils/pistols"
+import { ChallengeStateValues } from '@/games/pistols/generated/constants'
 
 
 const _challegeSorterByTimestamp = ((a: any, b: any) => Number((a.timestamp_end && b.timestamp_end) ? (a.timestamp_end - b.timestamp_end) : (a.timestamp_start - b.timestamp_start)))
@@ -86,7 +87,6 @@ export const useActiveDuelistIds = (tableId?: string) => {
 
 export const useChallenge = (duelId: BigNumberish) => {
   const { Challenge } = useDojoComponents()
-  const { ChallengeStateValues } = useDojoConstants()
   const challenge: any = useComponentValue(Challenge, bigintToEntity(duelId))
   // console.log(bigintToHex(duelId), challenge)
 

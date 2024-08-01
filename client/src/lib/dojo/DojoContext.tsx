@@ -70,10 +70,3 @@ export const useDojoComponents = () => {
     ...components,
   }
 }
-
-export const useDojoConstants = () => {
-  const { setup: { constants } } = useDojo()
-  return {
-    ...constants,
-  }
-}

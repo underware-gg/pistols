@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react'
-import { useDojoComponents, useDojoConstants } from '@/lib/dojo/DojoContext'
+import { BigNumberish } from 'starknet'
+import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { useComponentValue } from '@dojoengine/react'
 import { useThreeJsContext } from "./ThreeJsContext"
 import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
@@ -7,7 +8,7 @@ import { useChallenge } from "@/pistols/hooks/useChallenge"
 import { keysToEntity } from '@/lib/utils/types'
 import { ActionNames, ActionVerbs, RoundState } from "@/pistols/utils/pistols"
 import { AnimationState } from "@/pistols/three/game"
-import { BigNumberish } from 'starknet'
+import { constants } from '@/games/pistols/generated/constants'
 
 export enum DuelStage {
   Null,             // 0
@@ -88,8 +89,6 @@ export const useDuel = (duelId: BigNumberish) => {
 // Use only ONCE inside <Duel>!!
 //
 export const useAnimatedDuel = (duelId: BigNumberish, enabled: boolean) => {
-  const { constants } = useDojoConstants()
-
   const result = useDuel(duelId)
   const { round1, round2, round3, duelStage } = result
 

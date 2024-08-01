@@ -2,16 +2,16 @@ import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { getComponentValue } from '@dojoengine/recs'
 import { useComponentValue } from '@dojoengine/react'
-import { useDojoComponents, useDojoConstants } from '@/lib/dojo/DojoContext'
+import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { useERC20Balance } from '@/lib/utils/hooks/useERC20'
 import { bigintToEntity } from '@/lib/utils/types'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
 import { useAllChallengeIds } from '@/pistols/hooks/useChallenge'
 import { ChallengeState, LiveChallengeStates, PastChallengeStates } from '@/pistols/utils/pistols'
+import { TableType, TableTypeValues } from '@/games/pistols/generated/constants'
 
 export const useTable = (tableId: string) => {
   const { TableConfig } = useDojoComponents()
-  const { TableType, TableTypeValues } = useDojoConstants()
 
   const table = useComponentValue(TableConfig, bigintToEntity(stringToFelt(tableId ?? '')))
   const wagerContractAddress = useMemo(() => (table?.wager_contract_address ?? 0n), [table])

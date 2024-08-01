@@ -1,12 +1,12 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useSimulateChances } from '@/pistols/hooks/useContractCalls'
-import { useDojoConstants } from '@/lib/dojo/DojoContext'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import { Action } from '@/pistols/utils/pistols'
 import { EMOJI } from '@/pistols/data/messages'
 import ProgressBar from '@/pistols/components/ui/ProgressBar'
+import { honour } from '@/games/pistols/generated/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -18,7 +18,6 @@ export function ActionChances({
   isA = false,
   isB = false,
 }) {
-  const { honour } = useDojoConstants()
   const { duelistId } = useSettings()
   const { challenge: { duelistIdA, duelistIdB }, round1 } = useDuel(duelId)
   const {

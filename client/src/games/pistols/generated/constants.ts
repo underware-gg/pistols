@@ -412,35 +412,3 @@ export const RoundStateValues: Record<RoundState, number> = {
   [RoundState.Reveal]: 2,
   [RoundState.Finished]: 3,
 };
-
-//
-// exports
-//
-
-export function defineContractConstants() {
-  return {
-    tables,
-    actions,
-    admin,
-    minter,
-    ACTION,
-    CHALLENGE_STATE,
-    constants,
-    honour,
-    chances,
-    selector,
-    ROUND_STATE,
-    Archetype,
-    ArchetypeValues,
-    ProfilePicType,
-    ProfilePicTypeValues,
-    TableType,
-    TableTypeValues,
-    Action,
-    ActionValues,
-    ChallengeState,
-    ChallengeStateValues,
-    RoundState,
-    RoundStateValues,
-  };
-};

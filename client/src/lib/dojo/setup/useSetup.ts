@@ -17,12 +17,10 @@ import * as torii from '@dojoengine/torii-client'
 import {
   createSystemCalls,
   defineContractComponents,
-  defineContractConstants,
 } from './setup'
 
 export type SetupResult = ReturnType<typeof useSetup> | null
 export type ClientComponents = ReturnType<typeof defineContractComponents>
-export type Constants = SetupResult['constants']
 
 export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: DojoChainConfig, account: Account) {
 
@@ -80,7 +78,6 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   //
   // Initialize components
   const contractComponents = useMemo(() => defineContractComponents(world), [world])
-  const constants = useMemo(() => defineContractConstants(), [])
 
   const components = useMemo(() => {
     const overridableComponents = Object.keys(contractComponents).reduce((result: any, key: string) => {
@@ -184,7 +181,6 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     selectedChainConfig,
     nameSpace: dojoAppConfig.nameSpace,
     manifest,
-    constants,
     // status
     status: {
       isLoading: (isLoading && !isError),

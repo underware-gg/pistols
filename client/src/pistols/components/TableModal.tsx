@@ -3,16 +3,16 @@ import { useRouter } from 'next/router'
 import { Grid, Modal, Dropdown } from 'semantic-ui-react'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useDojoConstants } from '@/lib/dojo/DojoContext'
 import { useActiveDuelistIds } from '@/pistols/hooks/useChallenge'
 import { useERC20TokenName } from '@/lib/utils/hooks/useERC20'
 import { useTable, useTableTotals } from '@/pistols/hooks/useTable'
-import { Opener } from '@/lib/ui/useOpener'
-import { Divider } from '@/lib/ui/Divider'
 import { Balance } from '@/pistols/components/account/Balance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
+import { Opener } from '@/lib/ui/useOpener'
+import { Divider } from '@/lib/ui/Divider'
 import { getObjectKeyByValue } from '@/lib/utils/types'
 import { makeTavernUrl } from '@/pistols/utils/pistols'
+import { tables } from '@/games/pistols/generated/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -38,7 +38,6 @@ export default function TableModal({
     }
   }, [opener.isOpen])
 
-  const { tables } = useDojoConstants()
   const unknownTable = useMemo(() => (tableId !== undefined && getObjectKeyByValue(tables, tableId) === undefined), [tableId])
   useEffect(() => {
     if (unknownTable && !opener.isOpen) {
@@ -205,7 +204,6 @@ function TableSwitcher({
   tableId,
   setSelectedTableId,
 }) {
-  const { tables } = useDojoConstants()
   const { description } = useTable(tableId)
   return (
     <Dropdown

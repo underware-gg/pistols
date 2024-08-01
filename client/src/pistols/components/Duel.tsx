@@ -3,7 +3,6 @@ import { Grid, Segment, Icon, Step, SegmentGroup, SemanticFLOATS } from 'semanti
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
-import { useDojoConstants } from '@/lib/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
@@ -28,6 +27,7 @@ import { Balance } from '@/pistols/components/account/Balance'
 import { EMOJI } from '@/pistols/data/messages'
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import CommitBladesModal from '@/pistols/components/CommitBladesModal'
+import { constants } from '@/games/pistols/generated/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -162,7 +162,6 @@ function DuelHealthBar({
   health,
   floated,
 }) {
-  const { constants } = useDojoConstants()
   const points = useMemo(() => {
     let result = []
     for (let i = 1; i <= constants.FULL_HEALTH; ++i) {
