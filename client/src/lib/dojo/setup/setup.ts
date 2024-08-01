@@ -3,7 +3,7 @@ import { type ISetupNetworkResult } from './setupNetwork'
 // TODO: move out of lib
 import { createSystemCalls } from '../../../games/pistols/createSystemCalls'
 import { defineContractComponents } from '../../../games/pistols/generated/contractComponents'
-import { defineContractConstants } from '../../../games/pistols/generated/contractConstants'
+import { defineContractConstants } from '../../../games/pistols/generated/constants'
 
 export type SetupNetworkResult = ISetupNetworkResult<
   typeof defineContractComponents,
