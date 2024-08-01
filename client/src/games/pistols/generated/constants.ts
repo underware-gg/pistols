@@ -299,116 +299,140 @@ export const ROUND_STATE: ROUND_STATE_Type = {
 
 // from: ../dojo/src/models/duelist.cairo
 export enum Archetype {
-  Undefined = 'Undefined',
-  Villainous = 'Villainous',
-  Trickster = 'Trickster',
-  Honourable = 'Honourable',
+  Undefined = 0,
+  Villainous = 1,
+  Trickster = 2,
+  Honourable = 3,
 };
-export const ArchetypeValues: Record<Archetype, number> = {
-  [Archetype.Undefined]: 0,
-  [Archetype.Villainous]: 1,
-  [Archetype.Trickster]: 2,
-  [Archetype.Honourable]: 3,
+export const ArchetypeNameToValue: Record<string, Archetype> = {
+  'Undefined': Archetype.Undefined,
+  'Villainous': Archetype.Villainous,
+  'Trickster': Archetype.Trickster,
+  'Honourable': Archetype.Honourable,
 };
+const getArchetypeValueFromName = (name: string | number): Archetype => (ArchetypeNameToValue[name as string]);
 
 // from: ../dojo/src/models/duelist.cairo
 export enum ProfilePicType {
-  Undefined = 'Undefined',
-  Duelist = 'Duelist',
-  External = 'External',
+  Undefined = 0,
+  Duelist = 1,
+  External = 2,
 };
-export const ProfilePicTypeValues: Record<ProfilePicType, number> = {
-  [ProfilePicType.Undefined]: 0,
-  [ProfilePicType.Duelist]: 1,
-  [ProfilePicType.External]: 2,
+export const ProfilePicTypeNameToValue: Record<string, ProfilePicType> = {
+  'Undefined': ProfilePicType.Undefined,
+  'Duelist': ProfilePicType.Duelist,
+  'External': ProfilePicType.External,
 };
+const getProfilePicTypeValueFromName = (name: string | number): ProfilePicType => (ProfilePicTypeNameToValue[name as string]);
 
 // from: ../dojo/src/models/table.cairo
 export enum TableType {
-  Undefined = 'Undefined',
-  Classic = 'Classic',
-  Tournament = 'Tournament',
-  IRLTournament = 'IRLTournament',
+  Undefined = 0,
+  Classic = 1,
+  Tournament = 2,
+  IRLTournament = 3,
 };
-export const TableTypeValues: Record<TableType, number> = {
-  [TableType.Undefined]: 0,
-  [TableType.Classic]: 1,
-  [TableType.Tournament]: 2,
-  [TableType.IRLTournament]: 3,
+export const TableTypeNameToValue: Record<string, TableType> = {
+  'Undefined': TableType.Undefined,
+  'Classic': TableType.Classic,
+  'Tournament': TableType.Tournament,
+  'IRLTournament': TableType.IRLTournament,
 };
+const getTableTypeValueFromName = (name: string | number): TableType => (TableTypeNameToValue[name as string]);
 
 // from: ../dojo/src/types/action.cairo
 export enum Action {
-  Idle = 'Idle',
-  Paces1 = 'Paces1',
-  Paces2 = 'Paces2',
-  Paces3 = 'Paces3',
-  Paces4 = 'Paces4',
-  Paces5 = 'Paces5',
-  Paces6 = 'Paces6',
-  Paces7 = 'Paces7',
-  Paces8 = 'Paces8',
-  Paces9 = 'Paces9',
-  Paces10 = 'Paces10',
-  FastBlade = 'FastBlade',
-  SlowBlade = 'SlowBlade',
-  Block = 'Block',
-  Flee = 'Flee',
-  Steal = 'Steal',
-  Seppuku = 'Seppuku',
+  Idle = 0,
+  Paces1 = 1,
+  Paces2 = 2,
+  Paces3 = 3,
+  Paces4 = 4,
+  Paces5 = 5,
+  Paces6 = 6,
+  Paces7 = 7,
+  Paces8 = 8,
+  Paces9 = 9,
+  Paces10 = 10,
+  FastBlade = 11,
+  SlowBlade = 12,
+  Block = 13,
+  Flee = 14,
+  Steal = 15,
+  Seppuku = 16,
 };
-export const ActionValues: Record<Action, number> = {
-  [Action.Idle]: 0,
-  [Action.Paces1]: 1,
-  [Action.Paces2]: 2,
-  [Action.Paces3]: 3,
-  [Action.Paces4]: 4,
-  [Action.Paces5]: 5,
-  [Action.Paces6]: 6,
-  [Action.Paces7]: 7,
-  [Action.Paces8]: 8,
-  [Action.Paces9]: 9,
-  [Action.Paces10]: 10,
-  [Action.FastBlade]: 11,
-  [Action.SlowBlade]: 12,
-  [Action.Block]: 13,
-  [Action.Flee]: 14,
-  [Action.Steal]: 15,
-  [Action.Seppuku]: 16,
+export const ActionNameToValue: Record<string, Action> = {
+  'Idle': Action.Idle,
+  'Paces1': Action.Paces1,
+  'Paces2': Action.Paces2,
+  'Paces3': Action.Paces3,
+  'Paces4': Action.Paces4,
+  'Paces5': Action.Paces5,
+  'Paces6': Action.Paces6,
+  'Paces7': Action.Paces7,
+  'Paces8': Action.Paces8,
+  'Paces9': Action.Paces9,
+  'Paces10': Action.Paces10,
+  'FastBlade': Action.FastBlade,
+  'SlowBlade': Action.SlowBlade,
+  'Block': Action.Block,
+  'Flee': Action.Flee,
+  'Steal': Action.Steal,
+  'Seppuku': Action.Seppuku,
 };
+const getActionValueFromName = (name: string | number): Action => (ActionNameToValue[name as string]);
 
 // from: ../dojo/src/types/challenge.cairo
 export enum ChallengeState {
-  Null = 'Null',
-  Awaiting = 'Awaiting',
-  Withdrawn = 'Withdrawn',
-  Refused = 'Refused',
-  Expired = 'Expired',
-  InProgress = 'InProgress',
-  Resolved = 'Resolved',
-  Draw = 'Draw',
+  Null = 0,
+  Awaiting = 1,
+  Withdrawn = 2,
+  Refused = 3,
+  Expired = 4,
+  InProgress = 5,
+  Resolved = 6,
+  Draw = 7,
 };
-export const ChallengeStateValues: Record<ChallengeState, number> = {
-  [ChallengeState.Null]: 0,
-  [ChallengeState.Awaiting]: 1,
-  [ChallengeState.Withdrawn]: 2,
-  [ChallengeState.Refused]: 3,
-  [ChallengeState.Expired]: 4,
-  [ChallengeState.InProgress]: 5,
-  [ChallengeState.Resolved]: 6,
-  [ChallengeState.Draw]: 7,
+export const ChallengeStateNameToValue: Record<string, ChallengeState> = {
+  'Null': ChallengeState.Null,
+  'Awaiting': ChallengeState.Awaiting,
+  'Withdrawn': ChallengeState.Withdrawn,
+  'Refused': ChallengeState.Refused,
+  'Expired': ChallengeState.Expired,
+  'InProgress': ChallengeState.InProgress,
+  'Resolved': ChallengeState.Resolved,
+  'Draw': ChallengeState.Draw,
 };
+const getChallengeStateValueFromName = (name: string | number): ChallengeState => (ChallengeStateNameToValue[name as string]);
 
 // from: ../dojo/src/types/round.cairo
 export enum RoundState {
-  Null = 'Null',
-  Commit = 'Commit',
-  Reveal = 'Reveal',
-  Finished = 'Finished',
+  Null = 0,
+  Commit = 1,
+  Reveal = 2,
+  Finished = 3,
 };
-export const RoundStateValues: Record<RoundState, number> = {
-  [RoundState.Null]: 0,
-  [RoundState.Commit]: 1,
-  [RoundState.Reveal]: 2,
-  [RoundState.Finished]: 3,
+export const RoundStateNameToValue: Record<string, RoundState> = {
+  'Null': RoundState.Null,
+  'Commit': RoundState.Commit,
+  'Reveal': RoundState.Reveal,
+  'Finished': RoundState.Finished,
+};
+const getRoundStateValueFromName = (name: string | number): RoundState => (RoundStateNameToValue[name as string]);
+
+//
+// enum generics
+//
+
+// torii returns enum values as strings, but in the client it is mapped to RecsType.Number
+export function getEnumValue<T extends
+  Archetype | ProfilePicType | TableType | Action | ChallengeState | RoundState
+>(name: string | number): T {
+  let t = undefined as T;
+  if (typeof t == typeof Archetype) return getArchetypeValueFromName(name) as T;
+  if (typeof t == typeof ProfilePicType) return getProfilePicTypeValueFromName(name) as T;
+  if (typeof t == typeof TableType) return getTableTypeValueFromName(name) as T;
+  if (typeof t == typeof Action) return getActionValueFromName(name) as T;
+  if (typeof t == typeof ChallengeState) return getChallengeStateValueFromName(name) as T;
+  if (typeof t == typeof RoundState) return getRoundStateValueFromName(name) as T;
+  return undefined as T;
 };
