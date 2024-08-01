@@ -8,12 +8,13 @@ import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileBadge } from '@/pistols/components/account/ProfileDescription'
 import { ArchetypeIcon } from '@/pistols/components/ui/PistolsIcon'
-import { Archetype, ArchetypeNames } from '@/pistols/utils/pistols'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { FormInput } from '@/pistols/components/ui/Form'
 import { PROFILE_PIC_COUNT } from '@/pistols/utils/constants'
 import { IconClick } from '@/lib/ui/Icons'
 import { pedersen } from '@/lib/utils/starknet'
+import { Archetype } from '@/games/pistols/generated/constants'
+import { ArchetypeNames } from '@/pistols/utils/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column

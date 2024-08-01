@@ -1,13 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { ButtonGroup, Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
-import { BigNumberish } from 'starknet'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useQueryContext } from '@/pistols/hooks/QueryContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import { useWager } from '@/pistols/hooks/useWager'
-import { AllChallengeStates, ChallengeState, ChallengeStateClasses, ChallengeStateNames } from '@/pistols/utils/pistols'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
@@ -16,6 +14,8 @@ import { FilterButton } from '@/pistols/components/ui/Buttons'
 import { FilterDuelistName } from '@/pistols/components/DuelistTable'
 import { Balance } from '@/pistols/components/account/Balance'
 import { arrayRemoveValue, bigintEquals } from '@/lib/utils/types'
+import { ChallengeState } from '@/games/pistols/generated/constants'
+import { AllChallengeStates, ChallengeStateClasses, ChallengeStateNames } from '@/pistols/utils/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column

@@ -4,9 +4,10 @@ import { ComponentValue } from '@dojoengine/recs'
 import { useComponentValue } from '@dojoengine/react'
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { stringToFelt, weiToEth, weiToEthString } from '@/lib/utils/starknet'
-import { Archetype, ArchetypeNames } from '@/pistols/utils/pistols'
 import { keysToEntity } from '@/lib/utils/types'
 import { EMOJI } from '@/pistols/data/messages'
+import { ArchetypeNames } from '@/pistols/utils/pistols'
+import { Archetype } from '@/games/pistols/generated/constants'
 
 // hijack Score type from Scoreboard
 function _useScoreType() {

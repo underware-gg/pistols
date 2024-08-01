@@ -14,13 +14,14 @@ import { ProfileDescription } from '@/pistols/components/account/ProfileDescript
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
 import { WagerAndOrFees } from '@/pistols/components/account/LordsBalance'
-import { ChallengeState, makeDuelUrl } from '@/pistols/utils/pistols'
 import { DuelIconsAsGrid } from '@/pistols/components/DuelIcons'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { IconClick } from '@/lib/ui/Icons'
 import { Divider } from '@/lib/ui/Divider'
 import { bigintToHex } from '@/lib/utils/types'
+import { ChallengeState } from '@/games/pistols/generated/constants'
+import { makeDuelUrl } from '@/pistols/utils/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column

@@ -6,9 +6,9 @@ import { useThreeJsContext } from "./ThreeJsContext"
 import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
 import { useChallenge } from "@/pistols/hooks/useChallenge"
 import { keysToEntity } from '@/lib/utils/types'
-import { ActionNames, ActionVerbs, RoundState } from "@/pistols/utils/pistols"
 import { AnimationState } from "@/pistols/three/game"
-import { constants } from '@/games/pistols/generated/constants'
+import { constants, RoundState } from '@/games/pistols/generated/constants'
+import { ActionNames, ActionVerbs } from "@/pistols/utils/pistols"
 
 export enum DuelStage {
   Null,             // 0
