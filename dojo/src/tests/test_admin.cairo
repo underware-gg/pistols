@@ -34,19 +34,19 @@ mod tests {
     fn test_set_unset_owner() {
         let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         let admin_hash = selector_from_tag!("pistols-admin");
-        assert(world.is_owner(OWNER(), admin_hash) == true, 'default_owner_true');
-        assert(world.is_owner(OTHER(), admin_hash) == false, 'default_other_owner_false');
+        assert(world.is_owner(admin_hash, OWNER()) == true, 'default_owner_true');
+        assert(world.is_owner(admin_hash, OTHER()) == false, 'default_other_owner_false');
         // set
         tester::execute_admin_set_owner(admin, OWNER(), OTHER(), true);
-        assert(world.is_owner(OWNER(), admin_hash) == true, 'owner_still');
-        assert(world.is_owner(OTHER(), admin_hash) == true, 'new_other_true');
+        assert(world.is_owner(admin_hash, OWNER()) == true, 'owner_still');
+        assert(world.is_owner(admin_hash, OTHER()) == true, 'new_other_true');
         // can write
         tester::execute_admin_set_paused(admin, OTHER(), true);
         let config: Config = tester::get_Config(world);
         assert(config.paused == true, 'paused');
         // unset
         tester::execute_admin_set_owner(admin, OWNER(), OTHER(), false);
-        assert(world.is_owner(OTHER(), admin_hash) == false, 'new_other_false');
+        assert(world.is_owner(admin_hash, OTHER()) == false, 'new_other_false');
     }
 
     #[test]
@@ -56,10 +56,10 @@ mod tests {
         let admin_hash = selector_from_tag!("pistols-admin");
         // set
         tester::execute_admin_set_owner(admin, OWNER(), OTHER(), true);
-        assert(world.is_owner(OTHER(), admin_hash) == true, 'new_owner_true');
+        assert(world.is_owner(admin_hash, OTHER()) == true, 'new_owner_true');
         // unset
         tester::execute_admin_set_owner(admin, OWNER(), OTHER(), false);
-        assert(world.is_owner(OTHER(), admin_hash) == false, 'new_owner_false');
+        assert(world.is_owner(admin_hash, OTHER()) == false, 'new_owner_false');
         // cannot write
         tester::execute_admin_set_paused(admin, OTHER(), true);
     }

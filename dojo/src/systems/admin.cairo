@@ -59,12 +59,7 @@ mod admin {
     impl AdminImpl of super::IAdmin<ContractState> {
         fn set_owner(ref world: IWorldDispatcher, owner_address: ContractAddress, granted: bool) {
             self.assert_caller_is_owner();
-            assert(owner_address.is_non_zero(), Errors::INVALID_OWNER);
-            if (granted) {
-                world.grant_owner(owner_address, self.selector().into());
-            } else {
-                world.revoke_owner(owner_address, self.selector().into());
-            }
+            self.grant_owner(owner_address, granted);
         }
 
         fn set_treasury(ref world: IWorldDispatcher, treasury_address: ContractAddress) {
@@ -132,7 +127,15 @@ mod admin {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn assert_caller_is_owner(self: @ContractState) {
-            assert(self.world().is_owner(get_caller_address(), self.selector().into()), Errors::NOT_OWNER);
+            assert(self.world().is_owner(self.selector().into(), get_caller_address()), Errors::NOT_OWNER);
+        }
+        fn grant_owner(self: @ContractState, owner_address: ContractAddress, granted: bool) {
+            assert(owner_address.is_non_zero(), Errors::INVALID_OWNER);
+            if (granted) {
+                self.world().grant_owner(self.selector().into(), owner_address);
+            } else {
+                self.world().revoke_owner(self.selector().into(), owner_address);
+            }
         }
     }
 }

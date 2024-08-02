@@ -128,11 +128,11 @@ mod tester {
             //
             // missing models cause ('invalid resource selector')
             //
-            // src_5_model::TEST_CLASS_HASH,
-            // erc_721_token_approval_model::TEST_CLASS_HASH,
-            // erc_721_balance_model::TEST_CLASS_HASH,
-            // erc_721_meta_model::TEST_CLASS_HASH,
-            // erc_721_owner_model::TEST_CLASS_HASH,
+            src_5_model::TEST_CLASS_HASH,
+            erc_721_token_approval_model::TEST_CLASS_HASH,
+            erc_721_balance_model::TEST_CLASS_HASH,
+            erc_721_meta_model::TEST_CLASS_HASH,
+            erc_721_owner_model::TEST_CLASS_HASH,
             // pistols
             duelist::TEST_CLASS_HASH,
             scoreboard::TEST_CLASS_HASH,
@@ -155,13 +155,13 @@ mod tester {
 
         // deploy world
         let world: IWorldDispatcher = spawn_test_world("pistols",  models);
-        world.grant_owner(OWNER(), dojo::utils::bytearray_hash(@"pistols"));
+        world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), OWNER());
 
         // deploy systems
         let system = IActionsDispatcher{ contract_address:
             if (deploy_system) {
                 let address = deploy_system(world, 'salt', actions::TEST_CLASS_HASH, array![].span());
-                world.grant_owner(OWNER(), selector_from_tag!("pistols-actions"));
+                world.grant_owner(selector_from_tag!("pistols-actions"), OWNER());
                 world.grant_writer(selector_from_tag!("pistols-Duelist"), address);
                 world.grant_writer(selector_from_tag!("pistols-Scoreboard"), address);
                 world.grant_writer(selector_from_tag!("pistols-Challenge"), address);
@@ -176,8 +176,8 @@ mod tester {
         let lords = ILordsMockDispatcher{ contract_address:
             if (deploy_lords) {
                 let address = deploy_system(world, 'lords_mock', lords_mock::TEST_CLASS_HASH, array![].span());
-                world.grant_owner(OWNER(), dojo::utils::bytearray_hash(@"origami_token"));
-                world.grant_owner(OWNER(), selector_from_tag!("pistols-lords_mock"));
+                world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), OWNER());
+                world.grant_owner(selector_from_tag!("pistols-lords_mock"), OWNER());
                 // world.grant_writer(selector_from_tag!("origami_token-SRC5Model"), address);
                 // world.grant_writer(selector_from_tag!("origami_token-InitializableModel"), address);
                 // world.grant_writer(selector_from_tag!("origami_token-ERC20BalanceModel"), address);
@@ -191,8 +191,8 @@ mod tester {
         let duelists = ITokenDuelistDispatcher{ contract_address:
             if (deploy_minter) {
                 let address = deploy_system(world, 'token_duelist', token_duelist::TEST_CLASS_HASH, array![].span());
-                world.grant_owner(OWNER(), dojo::utils::bytearray_hash(@"origami_token"));
-                world.grant_owner(OWNER(), selector_from_tag!("pistols-token_duelist"));
+                world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), OWNER());
+                world.grant_owner(selector_from_tag!("pistols-token_duelist"), OWNER());
                 // world.grant_writer(selector_from_tag!("origami_token-SRC5Model"), address);
                 // world.grant_writer(selector_from_tag!("origami_token-InitializableModel"), address);
                 // world.grant_writer(selector_from_tag!("origami_token-ERC721MetaModel"), address);
@@ -220,7 +220,7 @@ mod tester {
                     1, // is_open
                 ];
                 let address = deploy_system(world, 'minter', minter::TEST_CLASS_HASH, minter_call_data.span());
-                world.grant_owner(OWNER(), selector_from_tag!("pistols-minter"));
+                world.grant_owner(selector_from_tag!("pistols-minter"), OWNER());
                 world.grant_writer(selector_from_tag!("pistols-TokenConfig"), address);
                 (address)
             }
@@ -233,7 +233,7 @@ mod tester {
                     lords.contract_address.into(),
                 ];
                 let address = deploy_system(world, 'admin', admin::TEST_CLASS_HASH, admin_call_data.span());
-                world.grant_owner(OWNER(), selector_from_tag!("pistols-admin"));
+                world.grant_owner(selector_from_tag!("pistols-admin"), OWNER());
                 world.grant_writer(selector_from_tag!("pistols-Config"), address);
                 world.grant_writer(selector_from_tag!("pistols-TableConfig"), address);
                 world.grant_writer(selector_from_tag!("pistols-TableAdmittance"), address);

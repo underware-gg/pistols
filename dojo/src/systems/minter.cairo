@@ -117,7 +117,7 @@ mod minter {
     impl InternalImpl of super::IMinterInternal<ContractState> {
         #[inline(always)]
         fn assert_caller_is_owner(world: @IWorldDispatcher) {
-            assert(world.is_owner(get_caller_address(), get_contract_address().into()), Errors::NOT_OWNER);
+            assert(world.is_owner(get_contract_address().into(), get_caller_address()), Errors::NOT_OWNER);
         }
     }
 
