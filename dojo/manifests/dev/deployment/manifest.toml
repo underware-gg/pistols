@@ -1,10 +1,10 @@
 [world]
 kind = "WorldContract"
-class_hash = "0x32fb65ebfe6d91bb4b7ba0640650722c43ca0c917f5fc0f649ee2ecf720cde"
-original_class_hash = "0x32fb65ebfe6d91bb4b7ba0640650722c43ca0c917f5fc0f649ee2ecf720cde"
+class_hash = "0x2178527e9556d1aa21d3c2961d28f9114fcfed81b4c3674ed591c50ce46cc9d"
+original_class_hash = "0x2178527e9556d1aa21d3c2961d28f9114fcfed81b4c3674ed591c50ce46cc9d"
 abi = "manifests/dev/deployment/abis/dojo-world.json"
-address = "0x70e92d3e8be84a1242c4810de3413ba3ad4f5e87390f1097f1825990dc26a23"
-transaction_hash = "0x7e487ac4024846813ec58c08328d23f0d0773be8185598154b209a37b418cca"
+address = "0x4037e9ea1a016636a088c1bae640f9812451333be587a475bf175b0437102af"
+transaction_hash = "0x36b2a474c97cf19f43f07db3d2966e6ca62a971b96835f61a9671d74e92ab11"
 block_number = 3
 seed = "pistols"
 manifest_name = "dojo-world"
@@ -23,7 +23,7 @@ manifest_name = "dojo-base"
 
 [[contracts]]
 kind = "DojoContract"
-address = "0x2ff035c407d77450f337c06602423e41c1f8ba48b91b3d6d8513fef61963358"
+address = "0x11b8baba9359414d8ed507bb9bc9bfb8b66044f26f6a067dd5e2884feb4c080"
 class_hash = "0x7b6937996af163bf20d46d164bad9eee3f0ecc2690b4c7894511d970cc785f1"
 original_class_hash = "0x7b6937996af163bf20d46d164bad9eee3f0ecc2690b4c7894511d970cc785f1"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
@@ -45,9 +45,9 @@ manifest_name = "pistols-actions-4f10cff7"
 
 [[contracts]]
 kind = "DojoContract"
-address = "0x49e8daeceed0815079ba8c299b2a18f834956c4c5a14eb0ebd501d855e2fab1"
-class_hash = "0x2d7665aed71d87156fb4f92602dd8df875206ceaf0129e068de55b781d25b71"
-original_class_hash = "0x2d7665aed71d87156fb4f92602dd8df875206ceaf0129e068de55b781d25b71"
+address = "0x33c196dcdc05c814c0fc235608468638b3d2d6cc270179799adec8fe8012402"
+class_hash = "0x1beda69689b5fdc70da057f036cd7bd8b5f9a3c6d8ead533cdf488ae7fa33b4"
+original_class_hash = "0x1beda69689b5fdc70da057f036cd7bd8b5f9a3c6d8ead533cdf488ae7fa33b4"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/dev/deployment/abis/contracts/pistols-admin-36fd2037.json"
 reads = []
@@ -66,7 +66,7 @@ manifest_name = "pistols-admin-36fd2037"
 
 [[contracts]]
 kind = "DojoContract"
-address = "0x307bc0a9992c87add64635a583103596773a9891b0079f5e513a3facfdb13e9"
+address = "0x1151164cea9d3ce30c243c1fe2128f4955621f6a8f9ead276f5ef91fbde271a"
 class_hash = "0x19feee8cf27746249ec143fac19db42b03a8ca459cd3cfbbf06253e6e3e52bb"
 original_class_hash = "0x19feee8cf27746249ec143fac19db42b03a8ca459cd3cfbbf06253e6e3e52bb"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
@@ -87,9 +87,9 @@ manifest_name = "pistols-lords_mock-2b1156e6"
 
 [[contracts]]
 kind = "DojoContract"
-address = "0x65ea193b2af31b1b2eb89177c92857689de92b46412cba156e2fc475a78fca8"
-class_hash = "0x3b3adcb620c7fb2ef3383d7d510eb7251cd28a133fe1118a6d2f0cb106ec33"
-original_class_hash = "0x3b3adcb620c7fb2ef3383d7d510eb7251cd28a133fe1118a6d2f0cb106ec33"
+address = "0x550db72a1c276929f954778fd2f541e00ec799d2b8a944eb989874e85a4292f"
+class_hash = "0x27691fdec20b05e751e1538608964256a0ba6bf8a909d80899abafd90c2147c"
+original_class_hash = "0x27691fdec20b05e751e1538608964256a0ba6bf8a909d80899abafd90c2147c"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/dev/deployment/abis/contracts/pistols-minter-7b759538.json"
 reads = []
@@ -106,7 +106,7 @@ manifest_name = "pistols-minter-7b759538"
 
 [[contracts]]
 kind = "DojoContract"
-address = "0x572fb40468d02532091cfb9d3869ceabfb0fc3e79771f7cf4a1411efcd39a3c"
+address = "0xa0657f96a3c66d5212b34f5a27c8e428c990b5b2af4453baf6c299917a526f"
 class_hash = "0x7b91a2a8671290f5fb67463d4b24dcadd6ac7e550cf227bcd663bc11bbbfe37"
 original_class_hash = "0x7b91a2a8671290f5fb67463d4b24dcadd6ac7e550cf227bcd663bc11bbbfe37"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"

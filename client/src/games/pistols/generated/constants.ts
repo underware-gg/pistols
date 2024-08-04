@@ -427,6 +427,7 @@ const getRoundStateValueFromName = (name: string | number): RoundState => (Round
 export function getEnumValue<T extends
   Archetype | ProfilePicType | TableType | Action | ChallengeState | RoundState
 >(name: string | number): T {
+  if (name == null) return (name as any);
   let t = undefined as T;
   if (typeof t == typeof Archetype) return getArchetypeValueFromName(name) as T;
   if (typeof t == typeof ProfilePicType) return getProfilePicTypeValueFromName(name) as T;
