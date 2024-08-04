@@ -14,12 +14,13 @@ import { assert } from '@/lib/utils/math'
 // https://github.com/cartridge-gg/controller/blob/main/packages/account-wasm/src/constants.rs
 export const CONTROLLER_CLASS_HASH = '0x05f0f2ae9301e0468ca3f9218dadd43a448a71acc66b6ef1a5570bb56cf10c6f'
 
-export const useController = (manifest: DojoManifest, nameSpace: string, contractNames?: string[]) => {
+export const useController = (manifest: DojoManifest, rpcUrl: string, nameSpace: string, contractNames?: string[]) => {
   const controller = useMemo(() => {
     const options: ControllerOptions = {
       // paymaster: {
       //   caller: stringToFelt("ANY_CALLER"),
       // },
+      rpc: rpcUrl,
       theme: "pistols",
       colorMode: "dark"
     }
