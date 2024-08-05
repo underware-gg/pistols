@@ -1,4 +1,4 @@
-import { cleanObject } from '@/lib/utils/types'
+import { cleanObject, isBigint } from '@/lib/utils/types'
 import {
   AccountInterface,
   TypedData,
@@ -14,7 +14,7 @@ const DEFAULT_DOMAIN_NAME = "Underware";
 const DEFAULT_CHAIN_ID = "UNDERWARE_GG";
 const DEFAULT_VERSION = "0.1.0";
 
-export type Messages = { [key: string]: string }
+export type Messages = { [key: string]: string | BigInt }
 export type Revision = 0 | 1
 
 export const splitSignature = (signature: Signature): bigint[] => {
@@ -99,7 +99,11 @@ export function createTypedMessage({
           { name: "chainId", type: "shortstring" },
           { name: "version", type: "shortstring" },
         ],
-        Message: Object.keys(_messages).map((name) => ({ name, type: "string" })),
+        Message: Object.keys(_messages).map((name) => ({
+          name,
+          type: isBigint(_messages[name]) ? 'felt' : 'shortstring',
+          // type: typeof _messages[name] == 'bigint' ? 'felt' : 'shortstring',
+        })),
       },
       message: _messages,
   }

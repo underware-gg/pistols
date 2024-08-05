@@ -139,7 +139,10 @@ function Connect() {
 function SignV0() {
   const { account, isConnected, chainId } = useAccount()
 
-  const messages: Messages = useMemo(() => ({ game: 'PISTOLS_AT_10_BLOCKS', purpose: 'SIGN_V0_TEST' }), [])
+  const messages: Messages = useMemo(() => ({
+    game: 'PISTOLS_AT_10_BLOCKS',
+    purpose: 'SIGN_V0_TEST',
+  }), [])
   const { typedMessage, messageHash } = useTypedMessage({
     revision: 0,
     messages,
@@ -168,7 +171,10 @@ function SignV0() {
 function SignV1() {
   const { account, isConnected, chainId } = useAccount()
 
-  const messages: Messages = useMemo(() => ({ game: 'PISTOLS_AT_10_BLOCKS', purpose: 'SIGN_V1_TEST' }), [])
+  const messages: Messages = useMemo(() => ({
+    game: 'PISTOLS_AT_10_BLOCKS',
+    purpose: 'SIGN_V1_TEST',
+  }), [])
   const { typedMessage, messageHash } = useTypedMessage({
     account,
     revision: 1,
@@ -220,7 +226,7 @@ function Sign({
             Message
           </Cell>
           <Cell className='Code'>
-            {Object.keys(messages).map((k, i) => <React.Fragment key={k}>{k}:{shortAddress(messages[k])}<br /></React.Fragment>)}
+            {Object.keys(messages).map((k, i) => <React.Fragment key={k}>{k}:{(messages[k] as string)}<br /></React.Fragment>)}
           </Cell>
         </Row>
 

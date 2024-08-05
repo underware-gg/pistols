@@ -30,10 +30,10 @@ const signAndGenerateSalt = async (account: AccountInterface, duelistId: bigint,
   if (duelId && roundNumber) {
     try {
       const messages: Messages = {
-        account: bigintToHex(account.address),
-        duelistId: bigintToHex(duelistId),
-        duelId: bigintToHex(duelId),
-        roundNumber: bigintToHex(roundNumber),
+        account: BigInt(account.address),
+        duelistId: BigInt(duelistId),
+        duelId: BigInt(duelId),
+        roundNumber: BigInt(roundNumber),
       }
       const signature = await signMessages(account, 1, messages)
       const sig = splitSignature(signature)
