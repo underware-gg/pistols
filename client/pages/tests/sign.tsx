@@ -66,7 +66,7 @@ function ValidateMessage({
   const [signature, setSignature] = useState(null)
   const [verified, setVerifyed] = useState('...')
 
-  const { typedMessage, hash } = useTypedMessage({
+  const { typedMessage, messageHash } = useTypedMessage({
     revision: 0,
     messages,
   })
@@ -89,7 +89,7 @@ function ValidateMessage({
     <Row columns={'equal'} verticalAlign='top'>
       <Cell className='Code'>
         {Object.keys(messages).map((k, i) => <React.Fragment key={k}>{k}:{shortAddress(messages[k])}<br /></React.Fragment>)}
-        hash:{shortAddress(bigintToHex(hash))}
+        hash:{shortAddress(bigintToHex(messageHash))}
       </Cell>
       <Cell>
         {verified}

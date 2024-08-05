@@ -7,6 +7,7 @@ import {
   WeierstrassSignatureType,
   typedData,
   BigNumberish,
+  TypedDataRevision,
 } from 'starknet'
 
 const DEFAULT_DOMAIN_NAME = "Underware";
@@ -107,4 +108,8 @@ export function createTypedMessage({
 
 export function getMessageHash(messages: TypedData, address: BigNumberish): string {
   return (messages && address) ? typedData.getMessageHash(messages, address) : undefined
+}
+
+export function getTypeHash(messages: TypedData): string {
+  return messages ? typedData.getTypeHash(messages.types, 'felt', !messages.domain?.revision ? TypedDataRevision.LEGACY : TypedDataRevision.ACTIVE) : undefined
 }

@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Connector, useAccount } from '@starknet-react/core'
-import { Policy, ControllerOptions } from '@cartridge/controller'
+import { Policy, ControllerOptions, PaymasterOptions } from '@cartridge/controller'
 import CartridgeConnector from '@cartridge/connector'
 import { KATANA_CLASS_HASH } from '@dojoengine/core'
 import { DojoManifest } from '@/lib/dojo/Dojo'
 import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
 import { useContractClassHash } from '@/lib/utils/hooks/useContractClassHash'
 import { BigNumberish } from 'starknet'
-import { bigintEquals } from '@/lib/utils/types'
+import { bigintEquals, bigintToHex } from '@/lib/utils/types'
 import { assert } from '@/lib/utils/math'
+import { stringToFelt } from '@/lib/utils/starknet'
 
 // sync from here:
 // https://github.com/cartridge-gg/controller/blob/main/packages/account-wasm/src/constants.rs
@@ -16,10 +17,11 @@ export const CONTROLLER_CLASS_HASH = '0x05f0f2ae9301e0468ca3f9218dadd43a448a71ac
 
 export const useController = (manifest: DojoManifest, rpcUrl: string, nameSpace: string, contractNames?: string[]) => {
   const controller = useMemo(() => {
+    const paymaster: PaymasterOptions = {
+      caller: bigintToHex(stringToFelt("ANY_CALLER")),
+    }
     const options: ControllerOptions = {
-      // paymaster: {
-      //   caller: stringToFelt("ANY_CALLER"),
-      // },
+      paymaster,
       rpc: rpcUrl,
       theme: "pistols",
       colorMode: "dark"

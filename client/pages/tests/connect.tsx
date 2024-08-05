@@ -140,7 +140,7 @@ function SignV0() {
   const { account, isConnected, chainId } = useAccount()
 
   const messages: Messages = useMemo(() => ({ game: 'PISTOLS_AT_10_BLOCKS', purpose: 'SIGN_V0_TEST' }), [])
-  const { typedMessage, hash } = useTypedMessage({
+  const { typedMessage, messageHash } = useTypedMessage({
     revision: 0,
     messages,
     chainId,
@@ -156,7 +156,7 @@ function SignV0() {
       <Sign
         messages={messages}
         typedMessage={typedMessage}
-        hash={hash}
+        messageHash={messageHash}
         rawSignature={rawSignature}
         signaturePair={signaturePair}
         verified={formatted}
@@ -169,7 +169,7 @@ function SignV1() {
   const { account, isConnected, chainId } = useAccount()
 
   const messages: Messages = useMemo(() => ({ game: 'PISTOLS_AT_10_BLOCKS', purpose: 'SIGN_V1_TEST' }), [])
-  const { typedMessage, hash } = useTypedMessage({
+  const { typedMessage, messageHash } = useTypedMessage({
     account,
     revision: 1,
     chainId,
@@ -187,7 +187,7 @@ function SignV1() {
       <Sign
         messages={messages}
         typedMessage={typedMessage}
-        hash={hash}
+        messageHash={messageHash}
         rawSignature={rawSignature}
         signaturePair={signaturePair}
         verified={formatted}
@@ -200,14 +200,14 @@ function SignV1() {
 function Sign({
   messages,
   typedMessage,
-  hash,
+  messageHash,
   rawSignature,
   signaturePair,
   verified,
 }: {
   messages: Messages
   typedMessage: TypedData
-  hash: string
+  messageHash: string
   rawSignature: ArraySignatureType
   signaturePair: bigint[]
   verified: string
@@ -239,7 +239,7 @@ function Sign({
           </Cell>
           <Cell className='Code'>
             {/* {shortAddress(bigintToHex(hash))} */}
-            {bigintToHex(hash)}
+            {bigintToHex(messageHash)}
           </Cell>
         </Row>
 
