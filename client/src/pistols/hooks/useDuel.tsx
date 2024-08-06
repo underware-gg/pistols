@@ -7,7 +7,7 @@ import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
 import { useChallenge } from "@/pistols/hooks/useChallenge"
 import { keysToEntity } from '@/lib/utils/types'
 import { AnimationState } from "@/pistols/three/game"
-import { constants, RoundState } from '@/games/pistols/generated/constants'
+import { constants, getRoundState, RoundState } from '@/games/pistols/generated/constants'
 import { ActionNames, ActionVerbs } from "@/pistols/utils/pistols"
 
 export enum DuelStage {
@@ -26,12 +26,20 @@ export enum DuelStage {
   Finished,         // 8
 }
 
-export const useDuel = (duelId: BigNumberish) => {
+export const useRound = (duelId: BigNumberish, roundNumber: BigNumberish) => {
   const { Round } = useDojoComponents()
+  const round: any = useComponentValue(Round, keysToEntity([duelId, 1n]))
+  return {
+    ...round,
+    state: getRoundState(round.state)
+  }
+}
+
+export const useDuel = (duelId: BigNumberish) => {
   const challenge = useChallenge(duelId)
-  const round1: any = useComponentValue(Round, keysToEntity([duelId, 1n]))
-  const round2: any = useComponentValue(Round, keysToEntity([duelId, 2n]))
-  const round3: any = useComponentValue(Round, keysToEntity([duelId, 3n]))
+  const round1: any = useRound(duelId, 1n)
+  const round2: any = useRound(duelId, 2n)
+  const round3: any = useRound(duelId, 3n)
 
   //
   // The actual stage of this duel

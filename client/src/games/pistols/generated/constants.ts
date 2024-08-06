@@ -310,7 +310,7 @@ export const ArchetypeNameToValue: Record<string, Archetype> = {
   'Trickster': Archetype.Trickster,
   'Honourable': Archetype.Honourable,
 };
-const getArchetypeValueFromName = (name: string | number): Archetype => (ArchetypeNameToValue[name as string]);
+export const getArchetype = (name: string | number): Archetype => (ArchetypeNameToValue[name as string]);
 
 // from: ../dojo/src/models/duelist.cairo
 export enum ProfilePicType {
@@ -323,7 +323,7 @@ export const ProfilePicTypeNameToValue: Record<string, ProfilePicType> = {
   'Duelist': ProfilePicType.Duelist,
   'External': ProfilePicType.External,
 };
-const getProfilePicTypeValueFromName = (name: string | number): ProfilePicType => (ProfilePicTypeNameToValue[name as string]);
+export const getProfilePicType = (name: string | number): ProfilePicType => (ProfilePicTypeNameToValue[name as string]);
 
 // from: ../dojo/src/models/table.cairo
 export enum TableType {
@@ -338,7 +338,7 @@ export const TableTypeNameToValue: Record<string, TableType> = {
   'Tournament': TableType.Tournament,
   'IRLTournament': TableType.IRLTournament,
 };
-const getTableTypeValueFromName = (name: string | number): TableType => (TableTypeNameToValue[name as string]);
+export const getTableType = (name: string | number): TableType => (TableTypeNameToValue[name as string]);
 
 // from: ../dojo/src/types/action.cairo
 export enum Action {
@@ -379,7 +379,7 @@ export const ActionNameToValue: Record<string, Action> = {
   'Steal': Action.Steal,
   'Seppuku': Action.Seppuku,
 };
-const getActionValueFromName = (name: string | number): Action => (ActionNameToValue[name as string]);
+export const getAction = (name: string | number): Action => (ActionNameToValue[name as string]);
 
 // from: ../dojo/src/types/challenge.cairo
 export enum ChallengeState {
@@ -402,7 +402,7 @@ export const ChallengeStateNameToValue: Record<string, ChallengeState> = {
   'Resolved': ChallengeState.Resolved,
   'Draw': ChallengeState.Draw,
 };
-const getChallengeStateValueFromName = (name: string | number): ChallengeState => (ChallengeStateNameToValue[name as string]);
+export const getChallengeState = (name: string | number): ChallengeState => (ChallengeStateNameToValue[name as string]);
 
 // from: ../dojo/src/types/round.cairo
 export enum RoundState {
@@ -417,23 +417,4 @@ export const RoundStateNameToValue: Record<string, RoundState> = {
   'Reveal': RoundState.Reveal,
   'Finished': RoundState.Finished,
 };
-const getRoundStateValueFromName = (name: string | number): RoundState => (RoundStateNameToValue[name as string]);
-
-//
-// enum generics
-//
-
-// torii returns enum values as strings, but in the client it is mapped to RecsType.Number
-export function getEnumValue<T extends
-  Archetype | ProfilePicType | TableType | Action | ChallengeState | RoundState
->(name: string | number): T {
-  if (name == null) return (name as any);
-  let t = undefined as T;
-  if (typeof t == typeof Archetype) return getArchetypeValueFromName(name) as T;
-  if (typeof t == typeof ProfilePicType) return getProfilePicTypeValueFromName(name) as T;
-  if (typeof t == typeof TableType) return getTableTypeValueFromName(name) as T;
-  if (typeof t == typeof Action) return getActionValueFromName(name) as T;
-  if (typeof t == typeof ChallengeState) return getChallengeStateValueFromName(name) as T;
-  if (typeof t == typeof RoundState) return getRoundStateValueFromName(name) as T;
-  return undefined as T;
-};
+export const getRoundState = (name: string | number): RoundState => (RoundStateNameToValue[name as string]);

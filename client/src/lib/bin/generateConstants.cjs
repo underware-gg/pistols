@@ -173,34 +173,34 @@ function buildFileContents(constants) {
     fileContents += `// from: ${enums[key].filePath}\n`;
     fileContents += enumContents;
     fileContents += dictContents;
-    fileContents += `const get${enumName}ValueFromName = (name: string | number): ${enumName} => (${enumDictName}[name as string]);\n`
+    fileContents += `export const get${enumName} = (name: string | number): ${enumName} => (${enumDictName}[name as string]);\n`
     // exports
     enumNames.push(enumName)
     exports.push(enumName);
     exports.push(enumDictName);
   })
 
-  fileContents += `\n`;
-  fileContents += `//\n`;
-  fileContents += `// enum generics\n`;
-  fileContents += `//\n`;
-  fileContents += `\n`;
-  fileContents += `// torii returns enum values as strings, but in the client it is mapped to RecsType.Number\n`
-  fileContents += `export function getEnumValue<T extends\n`
-  fileContents += enumNames.reduce((acc, enumName, index) => {
-      if (index > 0) acc += ' | ';
-      acc += enumName;
-      return acc;
-    }, '  ') + '\n'
-  fileContents += `>(name: string | number): T {\n`
+  // fileContents += `\n`;
+  // fileContents += `//\n`;
+  // fileContents += `// enum generics\n`;
+  // fileContents += `//\n`;
+  // fileContents += `\n`;
+  // fileContents += `// torii returns enum values as strings, but in the client it is mapped to RecsType.Number\n`
+  // fileContents += `export function getEnumValue<T extends\n`
+  // fileContents += enumNames.reduce((acc, enumName, index) => {
+  //     if (index > 0) acc += ' | ';
+  //     acc += enumName;
+  //     return acc;
+  //   }, '  ') + '\n'
+  // fileContents += `>(name: string | number): T {\n`
   
-  fileContents += `  if (name == null) return (name as any);\n`;
-  fileContents += `  let t = undefined as T;\n`;
-  enumNames.forEach((enumName) => {
-    fileContents += `  if (typeof t == typeof ${enumName}) return get${enumName}ValueFromName(name) as T;\n`;
-  });
-  fileContents += `  return undefined as T;\n`;
-  fileContents += `};\n`;
+  // fileContents += `  if (name == null) return (name as any);\n`;
+  // fileContents += `  let t = undefined as T;\n`;
+  // enumNames.forEach((enumName) => {
+  //   fileContents += `  if (typeof t == typeof ${enumName}) return get${enumName}(name) as T;\n`;
+  // });
+  // fileContents += `  return undefined as T;\n`;
+  // fileContents += `};\n`;
 
   // exports
   // fileContents += `\n`;

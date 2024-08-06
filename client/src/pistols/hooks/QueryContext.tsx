@@ -9,7 +9,7 @@ import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { calcWinRatio } from '@/pistols/hooks/useScore'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
 import { arrayUnique, bigintEquals, keysToEntity } from '@/lib/utils/types'
-import { ChallengeState, getEnumValue } from '@/games/pistols/generated/constants'
+import { ChallengeState, getChallengeState } from '@/games/pistols/generated/constants'
 import { AllChallengeStates } from '@/pistols/utils/pistols'
 
 export type DuelistRow = {
@@ -274,7 +274,7 @@ const QueryProvider = ({
       const challenge = getComponentValue(Challenge, entity)
       if (tableId && bigintEquals(challenge.table_id, tableIdAsFelt)) {
         const duel_id = challenge.duel_id
-        const state = getEnumValue<ChallengeState>(challenge.state)
+        const state = getChallengeState(challenge.state)
         const timestamp = Number(challenge.timestamp_end ? challenge.timestamp_end : challenge.timestamp_start)
         acc.push({
           entity,

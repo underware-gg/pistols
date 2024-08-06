@@ -6,7 +6,7 @@ import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { useChallengesByOwner } from '@/pistols/hooks/useChallenge'
 import { useLordsContract } from '@/lib/dojo/hooks/useLords'
 import { bigintEquals, bigintToEntity } from '@/lib/utils/types'
-import { ChallengeState, getEnumValue } from '@/games/pistols/generated/constants'
+import { ChallengeState, getChallengeState } from '@/games/pistols/generated/constants'
 
 export const useWager = (duelId: BigNumberish) => {
   const { Wager } = useDojoComponents()
@@ -29,7 +29,7 @@ export const useLockedLordsBalance = (address: bigint) => {
     raw_challenges.forEach((raw_challenge) => {
       const table = getComponentValue(TableConfig, bigintToEntity(raw_challenge.table_id))
       // if (feltToString(raw_challenge.table_id) == tableId) {
-      const state = getEnumValue<ChallengeState>(raw_challenge.state)
+      const state = getChallengeState(raw_challenge.state)
       if (bigintEquals(table.wager_contract_address, contractAddress)) {
         if (state == ChallengeState.InProgress ||
           (state == ChallengeState.Awaiting && bigintEquals(address, raw_challenge.address_a))
