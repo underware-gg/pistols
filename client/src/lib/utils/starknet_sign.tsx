@@ -13,7 +13,6 @@ import {
 
 const DEFAULT_DOMAIN_NAME = TYPED_DATA.NAME;
 const DEFAULT_VERSION = TYPED_DATA.VERSION;
-const DEFAULT_CHAIN_ID = "UNDERWARE_GG";
 
 export type Messages = { [key: string]: string | BigInt }
 export type Revision = 0 | 1
@@ -35,32 +34,40 @@ export const splitSignature = (signature: Signature): bigint[] => {
   }
   return []
 }
+
+
 type SignMessagesResult = {
   typedMessage: TypedData
   typeHash: string
+  typeSelectorName: string
   messageHash: string
   signature: WeierstrassSignatureType,
 }
-export const signMessages = async (account: AccountInterface, revision: Revision, messages: Messages): Promise<SignMessagesResult> => {
-  const typedMessage = createTypedMessage({ revision, messages })
-  const typeHash = getTypeHash(typedMessage, 'Message')
+export const signMessages = async (account: AccountInterface, chainId: string, revision: Revision, messages: Messages): Promise<SignMessagesResult> => {
+  const typedMessage = createTypedMessage({ chainId, revision, messages })
+  const typeHash = getTypeHash(typedMessage, typedMessage.primaryType)
+  const typeSelectorName = getTypeSelectorName(typedMessage, typedMessage.primaryType)
   const messageHash = getMessageHash(typedMessage, account.address)
   const signature = await account.signMessage(typedMessage) as WeierstrassSignatureType
-  // console.log(`SIG:`, typedMessage, typeHash, messageHash, signature)
+  console.log(`SIG:`, typedMessage, 'type:', typeSelectorName, typeHash, 'message:', messageHash, signature)
   // throw new Error('STOP')
-  return { typedMessage, typeHash, messageHash, signature }
+  return { typedMessage, typeHash, typeSelectorName, messageHash, signature }
 }
-export const verifyMessages = async (account: AccountInterface, revision: Revision, messages: Messages, signature: WeierstrassSignatureType): Promise<boolean> => {
-  const typedMessage = createTypedMessage({ revision, messages })
+export const verifyMessages = async (account: AccountInterface, chainId: string, revision: Revision, messages: Messages, signature: WeierstrassSignatureType): Promise<boolean> => {
+  const typedMessage = createTypedMessage({ chainId, revision, messages })
   return account.verifyMessage(typedMessage, signature)
 }
 
+// ref:
+// https://github.com/starknet-io/starknet.js/blob/main/src/utils/typedData.ts
 export function getMessageHash(td: TypedData, address: BigNumberish): string {
   return (td && address) ? typedData.getMessageHash(td, address) : undefined
 }
-
 export function getTypeHash(td: TypedData, type: string): string {
   return td ? typedData.getTypeHash(td.types, type, !td.domain?.revision ? TypedDataRevision.LEGACY : TypedDataRevision.ACTIVE) : undefined
+}
+export function getTypeSelectorName(td: TypedData, type: string): string {
+  return td ? typedData.encodeType(td.types, type, !td.domain?.revision ? TypedDataRevision.LEGACY : TypedDataRevision.ACTIVE) : undefined
 }
 
 
@@ -73,18 +80,18 @@ export function getTypeHash(td: TypedData, type: string): string {
 //
 export interface TypedMessageOptions {
   revision: Revision
+  chainId: string
   domainName?: string
-  chainId?: string
   version?: string
   messages: Messages
 }
 
 export function createTypedMessage({
   revision,
-  messages,
-  chainId = DEFAULT_CHAIN_ID,
+  chainId,
   domainName = DEFAULT_DOMAIN_NAME,
   version = DEFAULT_VERSION,
+  messages,
 }: TypedMessageOptions): TypedData {
   const _messages = cleanObject(messages)
   const result = revision == 0 ? {

@@ -9,6 +9,7 @@ import { pack_action_slots, signAndGenerateActionHash } from '@/pistols/utils/sa
 import { ActionChances } from '@/pistols/components/ActionChances'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { useWager } from '../hooks/useWager'
+import { feltToString } from '@/lib/utils/starknet'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -29,7 +30,7 @@ export default function CommitBladesModal({
   isB?: boolean,
 }) {
   const { commit_action } = useDojoSystemCalls()
-  const { account } = useAccount()
+  const { account, chainId } = useAccount()
   const { duelistId } = useSettings()
   const { value } = useWager(duelId)
 
@@ -63,7 +64,7 @@ export default function CommitBladesModal({
   const _submit = async () => {
     if (isValid) {
       setIsSubmitting(true)
-      const hash = await signAndGenerateActionHash(account, duelistId, duelId, roundNumber, packed)
+      const hash = await signAndGenerateActionHash(account, feltToString(chainId), duelistId, duelId, roundNumber, packed)
       if (hash) {
         await commit_action(account, duelistId, duelId, roundNumber, hash)
         setIsOpen(false)

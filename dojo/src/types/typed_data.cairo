@@ -12,7 +12,7 @@ mod TYPED_DATA {
     const NAME: felt252 = 'Underware';
     const VERSION: felt252 = '0.1.0';
 
-    // '"Message"("duelId":"felt","roundNumber":"felt","duelistId":"felt")'
+    // "Message"("duelId":"felt","roundNumber":"felt","duelistId":"felt") 
     const COMMIT_MOVE_MESSAGE_TYPE_HASH: felt252 = 0x74fe0c723488214ab442c24761e9b32d30216def5e93d1c110375d993482ae;
 }
 
@@ -30,6 +30,7 @@ struct CommitMoveMessage {
 
 impl StructHashImpl of StructHash<CommitMoveMessage> {
     fn hash_struct(self: @CommitMoveMessage) -> felt252 {
+        // https://book.cairo-lang.org/ch11-04-hash.html#working-with-hashes
         let hash_state = PoseidonTrait::new();
         hash_state.update_with(TYPED_DATA::COMMIT_MOVE_MESSAGE_TYPE_HASH).update_with(*self).finalize()
     }

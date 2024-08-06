@@ -31,7 +31,7 @@ export const unpack_action_slots = (packed: number | null): number[] | null => {
 
 
 /** @returns a 64-bit salt from account signature, or 0 if fail */
-const signAndGenerateSalt = async (account: AccountInterface, duelistId: bigint, duelId: bigint, roundNumber: number): Promise<bigint> => {
+const signAndGenerateSalt = async (account: AccountInterface, chainId: string, duelistId: bigint, duelId: bigint, roundNumber: number): Promise<bigint> => {
   let result = 0n
   if (duelId && roundNumber) {
     try {
@@ -40,7 +40,7 @@ const signAndGenerateSalt = async (account: AccountInterface, duelistId: bigint,
         roundNumber: BigInt(roundNumber),
         duelistId: BigInt(duelistId),
       }
-      const { signature } = await signMessages(account, 1, messages)
+      const { signature } = await signMessages(account, chainId, 1, messages)
       const sig = splitSignature(signature)
       result = ((sig[0] ^ sig[1]) & HASH_SALT_MASK)
     } catch (e) {
@@ -51,16 +51,16 @@ const signAndGenerateSalt = async (account: AccountInterface, duelistId: bigint,
 }
 
 /** @returns the felt252 hash for an action, or 0 if fail */
-export const signAndGenerateActionHash = async (account: AccountInterface, duelistId: bigint, duelId: bigint, roundNumber: number, packed: BigNumberish): Promise<bigint> => {
-  const salt = await signAndGenerateSalt(account, duelistId, duelId, roundNumber)
+export const signAndGenerateActionHash = async (account: AccountInterface, chainId: string, duelistId: bigint, duelId: bigint, roundNumber: number, packed: BigNumberish): Promise<bigint> => {
+  const salt = await signAndGenerateSalt(account, chainId, duelistId, duelId, roundNumber)
   const hash = salt ? make_action_hash(salt, BigInt(packed)) : null
   console.log(`signAndGenerateActionHash():`, bigintToHex(duelId), roundNumber, packed, bigintToHex(salt), bigintToHex(hash))
   return hash
 }
 
 /** @returns the original action from an action hash, or 0 if fail */
-export const signAndRestoreActionFromHash = async (account: AccountInterface, duelistId: bigint, duelId: bigint, roundNumber: number, hash: bigint, possibleActions: BigNumberish[]): Promise<{ salt: bigint, packed: number, slot1: number, slot2: number }> => {
-  const salt = await signAndGenerateSalt(account, duelistId, duelId, roundNumber)
+export const signAndRestoreActionFromHash = async (account: AccountInterface, chainId: string, duelistId: bigint, duelId: bigint, roundNumber: number, hash: bigint, possibleActions: BigNumberish[]): Promise<{ salt: bigint, packed: number, slot1: number, slot2: number }> => {
+  const salt = await signAndGenerateSalt(account, chainId, duelistId, duelId, roundNumber)
   let packed = null
   let slots = null
   console.log(`___RESTORE_HASH Duel:`, bigintToHex(duelId), 'round:', roundNumber)

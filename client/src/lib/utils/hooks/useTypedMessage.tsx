@@ -29,7 +29,7 @@ export const useTypedMessage = ({
     chainId: chainId ? (typeof chainId === 'string' ? chainId : feltToString(chainId)) : undefined,
     messages,
   })), [revision, chainId, messages])
-  const typeHash = useMemo(() => (account ? getTypeHash(typedMessage) : null), [typedMessage])
+  const typeHash = useMemo(() => (account ? getTypeHash(typedMessage, typedMessage.primaryType) : null), [typedMessage])
   const messageHash = useMemo(() => (account ? getMessageHash(typedMessage, account.address) : null), [account, typedMessage])
   return {
     typedMessage,
