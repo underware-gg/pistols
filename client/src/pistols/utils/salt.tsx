@@ -3,9 +3,15 @@ import {
   BigNumberish,
 } from 'starknet'
 import { pedersen } from '@/lib/utils/starknet'
-import { signMessages, Messages, splitSignature } from '@/lib/utils/starknet_sign'
+import { signMessages, Messages, splitSignature, getTypeHash, getMessageHash } from '@/lib/utils/starknet_sign'
 import { HASH_SALT_MASK } from '@/pistols/utils/constants'
 import { bigintToHex } from '@/lib/utils/types'
+
+interface CommitMoveMessage extends Messages {
+  duelId: bigint,
+  roundNumber: bigint,
+  duelistId: bigint,
+}
 
 export const make_action_hash = (salt: BigNumberish, action: BigNumberish) => (pedersen(BigInt(salt), BigInt(action)) & HASH_SALT_MASK)
 
@@ -29,13 +35,12 @@ const signAndGenerateSalt = async (account: AccountInterface, duelistId: bigint,
   let result = 0n
   if (duelId && roundNumber) {
     try {
-      const messages: Messages = {
-        account: BigInt(account.address),
-        duelistId: BigInt(duelistId),
+      const messages: CommitMoveMessage = {
         duelId: BigInt(duelId),
         roundNumber: BigInt(roundNumber),
+        duelistId: BigInt(duelistId),
       }
-      const signature = await signMessages(account, 1, messages)
+      const { signature } = await signMessages(account, 1, messages)
       const sig = splitSignature(signature)
       result = ((sig[0] ^ sig[1]) & HASH_SALT_MASK)
     } catch (e) {
@@ -48,7 +53,7 @@ const signAndGenerateSalt = async (account: AccountInterface, duelistId: bigint,
 /** @returns the felt252 hash for an action, or 0 if fail */
 export const signAndGenerateActionHash = async (account: AccountInterface, duelistId: bigint, duelId: bigint, roundNumber: number, packed: BigNumberish): Promise<bigint> => {
   const salt = await signAndGenerateSalt(account, duelistId, duelId, roundNumber)
-  const hash = make_action_hash(salt, BigInt(packed))
+  const hash = salt ? make_action_hash(salt, BigInt(packed)) : null
   console.log(`signAndGenerateActionHash():`, bigintToHex(duelId), roundNumber, packed, bigintToHex(salt), bigintToHex(hash))
   return hash
 }

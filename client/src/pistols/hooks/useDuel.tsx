@@ -29,9 +29,10 @@ export enum DuelStage {
 export const useRound = (duelId: BigNumberish, roundNumber: BigNumberish) => {
   const { Round } = useDojoComponents()
   const round: any = useComponentValue(Round, keysToEntity([duelId, 1n]))
+  if (!round) return null
   return {
     ...round,
-    state: getRoundState(round.state)
+    state: getRoundState(round.state),
   }
 }
 

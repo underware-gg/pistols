@@ -71,6 +71,13 @@ trait IActions {
     fn get_valid_packed_actions(world: @IWorldDispatcher, round_number: u8) -> Array<u16>;
     fn pack_action_slots(world: @IWorldDispatcher, slot1: u8, slot2: u8) -> u16;
     fn unpack_action_slots(world: @IWorldDispatcher, packed: u16) -> (u8, u8);
+    fn validate_commit_message(world: @IWorldDispatcher,
+        account: ContractAddress,
+        signature: Array<felt252>,
+        duelId: felt252,
+        roundNumber: felt252,
+        duelistId: felt252,
+    ) -> bool;
 }
 
 // private/internal functions
@@ -110,6 +117,7 @@ mod actions {
     use pistols::libs::utils;
     use pistols::types::constants::{constants, honour};
     use pistols::types::{events};
+    use pistols::types::typed_data::{CommitMoveMessage, CommitMoveMessageTrait};
 
     mod Errors {
         const NOT_INITIALIZED: felt252           = 'PISTOLS: Not initialized';
@@ -505,6 +513,22 @@ mod actions {
         fn unpack_action_slots(world: @IWorldDispatcher, packed: u16) -> (u8, u8) {
             utils::WORLD(world);
             (utils::unpack_action_slots(packed))
+        }
+
+        fn validate_commit_message(world: @IWorldDispatcher,
+            account: ContractAddress,
+            signature: Array<felt252>,
+            duelId: felt252,
+            roundNumber: felt252,
+            duelistId: felt252,
+        ) -> bool {
+            utils::WORLD(world);
+            let msg = CommitMoveMessage {
+                duelId,
+                roundNumber,
+                duelistId,
+            };
+            (msg.validate(account, signature))
         }
     }
 

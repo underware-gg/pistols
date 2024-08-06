@@ -33,6 +33,7 @@ mod types {
     mod constants;
     mod events;
     mod round;
+    mod typed_data;
 }
 
 mod utils {
@@ -44,6 +45,9 @@ mod utils {
     mod math;
     mod short_string;
     mod timestamp;
+    mod openzeppelin {
+        mod snip12;
+    }
 }
 
 mod mocks {

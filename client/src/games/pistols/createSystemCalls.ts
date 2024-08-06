@@ -1,7 +1,7 @@
-import {
-  getEvents,
-  // setComponentsFromEvents,
-} from '@dojoengine/utils'
+// import {
+//   getEvents,
+//   // setComponentsFromEvents,
+// } from '@dojoengine/utils'
 import { DojoProvider, getContractByName } from '@dojoengine/core'
 import { getComponentValue } from '@dojoengine/recs'
 import { AccountInterface, BigNumberish, Call, Result } from 'starknet'
@@ -13,7 +13,7 @@ import { emitter } from '@/pistols/three/game'
 
 // FIX while this is not merged
 // https://github.com/dojoengine/dojo.js/pull/190
-import { setComponentsFromEvents } from '@/lib/dojo/fix/setComponentsFromEvents'
+// import { setComponentsFromEvents } from '@/lib/dojo/fix/setComponentsFromEvents'
 
 export const NAMESPACE = 'pistols'
 
@@ -232,6 +232,18 @@ export function createSystemCalls(
   //   return results !== null ? results.map(v => Number(v)) : null
   // }
 
+  const validate_commit_message = async (
+    account: BigNumberish,
+    signature: BigNumberish[],
+    duelId: BigNumberish,
+    roundNumber: BigNumberish,
+    duelistId: BigNumberish,
+  ): Promise<boolean | null> => {
+    const args = [account, signature, duelId, roundNumber, duelistId]
+    const results = await _executeCall<boolean>(actions_call('validate_commit_message', args))
+    return results ?? null
+  }
+
   const can_mint = async (to: BigNumberish, token_address: BigNumberish): Promise<boolean | null> => {
     const args = [to, token_address]
     const results = await _executeCall<boolean>(minter_call('can_mint', args))
@@ -260,6 +272,7 @@ export function createSystemCalls(
     get_valid_packed_actions,
     // pack_action_slots,
     // unpack_action_slots,
+    validate_commit_message,
     //
     // DUELISTS
     can_mint,

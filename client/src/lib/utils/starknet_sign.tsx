@@ -1,3 +1,4 @@
+import { TYPED_DATA } from '@/games/pistols/generated/constants';
 import { cleanObject, isBigint } from '@/lib/utils/types'
 import {
   AccountInterface,
@@ -10,9 +11,9 @@ import {
   TypedDataRevision,
 } from 'starknet'
 
-const DEFAULT_DOMAIN_NAME = "Underware";
+const DEFAULT_DOMAIN_NAME = TYPED_DATA.NAME;
+const DEFAULT_VERSION = TYPED_DATA.VERSION;
 const DEFAULT_CHAIN_ID = "UNDERWARE_GG";
-const DEFAULT_VERSION = "0.1.0";
 
 export type Messages = { [key: string]: string | BigInt }
 export type Revision = 0 | 1
@@ -34,14 +35,32 @@ export const splitSignature = (signature: Signature): bigint[] => {
   }
   return []
 }
-
-export const signMessages = async (account: AccountInterface, revision: Revision, messages: Messages): Promise<WeierstrassSignatureType> => {
+type SignMessagesResult = {
+  typedMessage: TypedData
+  typeHash: string
+  messageHash: string
+  signature: WeierstrassSignatureType,
+}
+export const signMessages = async (account: AccountInterface, revision: Revision, messages: Messages): Promise<SignMessagesResult> => {
   const typedMessage = createTypedMessage({ revision, messages })
-  return account.signMessage(typedMessage) as Promise<WeierstrassSignatureType>
+  const typeHash = getTypeHash(typedMessage, 'Message')
+  const messageHash = getMessageHash(typedMessage, account.address)
+  const signature = await account.signMessage(typedMessage) as WeierstrassSignatureType
+  // console.log(`SIG:`, typedMessage, typeHash, messageHash, signature)
+  // throw new Error('STOP')
+  return { typedMessage, typeHash, messageHash, signature }
 }
 export const verifyMessages = async (account: AccountInterface, revision: Revision, messages: Messages, signature: WeierstrassSignatureType): Promise<boolean> => {
   const typedMessage = createTypedMessage({ revision, messages })
   return account.verifyMessage(typedMessage, signature)
+}
+
+export function getMessageHash(td: TypedData, address: BigNumberish): string {
+  return (td && address) ? typedData.getMessageHash(td, address) : undefined
+}
+
+export function getTypeHash(td: TypedData, type: string): string {
+  return td ? typedData.getTypeHash(td.types, type, !td.domain?.revision ? TypedDataRevision.LEGACY : TypedDataRevision.ACTIVE) : undefined
 }
 
 
@@ -62,10 +81,10 @@ export interface TypedMessageOptions {
 
 export function createTypedMessage({
   revision,
-  domainName = DEFAULT_DOMAIN_NAME,
-  chainId = DEFAULT_CHAIN_ID,
-  version = DEFAULT_VERSION,
   messages,
+  chainId = DEFAULT_CHAIN_ID,
+  domainName = DEFAULT_DOMAIN_NAME,
+  version = DEFAULT_VERSION,
 }: TypedMessageOptions): TypedData {
   const _messages = cleanObject(messages)
   const result = revision == 0 ? {
@@ -108,12 +127,4 @@ export function createTypedMessage({
       message: _messages,
   }
   return result
-}
-
-export function getMessageHash(messages: TypedData, address: BigNumberish): string {
-  return (messages && address) ? typedData.getMessageHash(messages, address) : undefined
-}
-
-export function getTypeHash(messages: TypedData): string {
-  return messages ? typedData.getTypeHash(messages.types, 'felt', !messages.domain?.revision ? TypedDataRevision.LEGACY : TypedDataRevision.ACTIVE) : undefined
 }

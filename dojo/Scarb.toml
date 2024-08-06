@@ -14,7 +14,7 @@ dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.0.0-alpha.4" }
 # origami_token = { git = "https://github.com/dojoengine/origami", tag = "v1.0.0-alpha.0" }
 origami_token = { git = "https://github.com/rsodre/origami", branch = "balance-enumerable" }
 graffiti = { git = "https://github.com/ponderingdemocritus/graffiti", rev = "bc569531791dbc71c6cd8d9bc154c34eedad31fe" }
-
+openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", rev = "5f03fba338b4cb321776947fb98b4584a32adece" }
 
 #-------------------------------
 # DOJO CONFIG

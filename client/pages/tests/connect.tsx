@@ -143,7 +143,7 @@ function SignV0() {
     game: 'PISTOLS_AT_10_BLOCKS',
     purpose: 'SIGN_V0_TEST',
   }), [])
-  const { typedMessage, messageHash } = useTypedMessage({
+  const { typedMessage, typeHash, messageHash } = useTypedMessage({
     revision: 0,
     messages,
     chainId,
@@ -160,6 +160,7 @@ function SignV0() {
         messages={messages}
         typedMessage={typedMessage}
         messageHash={messageHash}
+        typeHash={typeHash}
         rawSignature={rawSignature}
         signaturePair={signaturePair}
         verified={formatted}
@@ -175,7 +176,7 @@ function SignV1() {
     game: 'PISTOLS_AT_10_BLOCKS',
     purpose: 'SIGN_V1_TEST',
   }), [])
-  const { typedMessage, messageHash } = useTypedMessage({
+  const { typedMessage, typeHash, messageHash } = useTypedMessage({
     account,
     revision: 1,
     chainId,
@@ -194,6 +195,7 @@ function SignV1() {
         messages={messages}
         typedMessage={typedMessage}
         messageHash={messageHash}
+        typeHash={typeHash}
         rawSignature={rawSignature}
         signaturePair={signaturePair}
         verified={formatted}
@@ -206,6 +208,7 @@ function SignV1() {
 function Sign({
   messages,
   typedMessage,
+  typeHash,
   messageHash,
   rawSignature,
   signaturePair,
@@ -213,6 +216,7 @@ function Sign({
 }: {
   messages: Messages
   typedMessage: TypedData
+  typeHash: string
   messageHash: string
   rawSignature: ArraySignatureType
   signaturePair: bigint[]
@@ -241,7 +245,17 @@ function Sign({
 
         <Row columns={'equal'} verticalAlign='top'>
           <Cell>
-            Hash
+            Type Hash
+          </Cell>
+          <Cell className='Code'>
+            {/* {shortAddress(bigintToHex(hash))} */}
+            {bigintToHex(typeHash)}
+          </Cell>
+        </Row>
+
+        <Row columns={'equal'} verticalAlign='top'>
+          <Cell>
+            Message Hash
           </Cell>
           <Cell className='Code'>
             {/* {shortAddress(bigintToHex(hash))} */}

@@ -104,3 +104,25 @@ export const useGetValidPackedActions = (roundNumber: number) => {
 //     unpacked: value,
 //   }
 // }
+
+
+export const useTestValidateSignature = () => {
+  const { validate_commit_message } = useDojoSystemCalls()
+  const args = useMemo(() => [
+    '0xe29882a1fcba1e7e10cad46212257fea5c752a4f9b1b1ec683c503a2cf5c8a',
+    [18683050350194369926474251501299463273361533679187318748035393961305515393n, 1961127017291637037117856899054860359809940907306999930346504365582602827542n],
+    48375809189929844202545149537943242632n,
+    1n,
+    3n,
+  ], [])
+  const { value, isPending } = useContractCall({
+    call: validate_commit_message,
+    args,
+    defaultValue: false,
+  })
+  console.log(`useTestValidateSignature()`, isPending ? '...' : value)
+  return {
+    isValidated: value,
+    isPending,
+  }
+}

@@ -8,9 +8,11 @@ import TableModal from '@/pistols/components/TableModal'
 import DuelistModal from '@/pistols/components/DuelistModal'
 import ChallengeModal from '@/pistols/components/ChallengeModal'
 import NewChallengeModal from '@/pistols/components/NewChallengeModal'
+import { useTestValidateSignature } from '../hooks/useContractCalls'
 
 export default function Tavern() {
   const { tableOpener } = usePistolsContext()
+  useTestValidateSignature()
 
   return (
     <QueryProvider>
