@@ -42,8 +42,8 @@ export default function WalletHeader({
           {isConnected && contractAddress &&
             <h5>
               LORDS: <LordsBalance address={address} big={false} />
-              &nbsp;&nbsp;/&nbsp;
-              <EtherBalance address={address} />
+              {/* &nbsp;&nbsp;/&nbsp; */}
+              {/* <EtherBalance address={address} /> */}
               </h5>
           }
           <div className='AbsoluteRight AbsoluteBottom PaddedDouble'>
