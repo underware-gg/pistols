@@ -293,6 +293,18 @@ export const ROUND_STATE: ROUND_STATE_Type = {
   FINISHED: 3,
 };
 
+// from: ../dojo/src/types/typed_data.cairo
+type TYPED_DATA_Type = {
+  NAME: string, // cairo: felt252
+  VERSION: string, // cairo: felt252
+  COMMIT_MOVE_MESSAGE_TYPE_HASH: BigNumberish, // cairo: felt252
+};
+export const TYPED_DATA: TYPED_DATA_Type = {
+  NAME: 'Underware',
+  VERSION: '0.1.0',
+  COMMIT_MOVE_MESSAGE_TYPE_HASH: '0x74fe0c723488214ab442c24761e9b32d30216def5e93d1c110375d993482ae',
+};
+
 //
 // enums
 //

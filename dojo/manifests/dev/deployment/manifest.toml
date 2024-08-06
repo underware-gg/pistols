@@ -24,8 +24,8 @@ manifest_name = "dojo-base"
 [[contracts]]
 kind = "DojoContract"
 address = "0x11b8baba9359414d8ed507bb9bc9bfb8b66044f26f6a067dd5e2884feb4c080"
-class_hash = "0x7b6937996af163bf20d46d164bad9eee3f0ecc2690b4c7894511d970cc785f1"
-original_class_hash = "0x7b6937996af163bf20d46d164bad9eee3f0ecc2690b4c7894511d970cc785f1"
+class_hash = "0x363052c25e6d8a8f636f23cde39634ee2db0413b7a1e4fccc5f7e5d967b1e64"
+original_class_hash = "0x363052c25e6d8a8f636f23cde39634ee2db0413b7a1e4fccc5f7e5d967b1e64"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/dev/deployment/abis/contracts/pistols-actions-4f10cff7.json"
 reads = []

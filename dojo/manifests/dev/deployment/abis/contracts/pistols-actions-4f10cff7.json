@@ -704,6 +704,38 @@
           }
         ],
         "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "validate_commit_message",
+        "inputs": [
+          {
+            "name": "account",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "signature",
+            "type": "core::array::Array::<core::felt252>"
+          },
+          {
+            "name": "duelId",
+            "type": "core::felt252"
+          },
+          {
+            "name": "roundNumber",
+            "type": "core::felt252"
+          },
+          {
+            "name": "duelistId",
+            "type": "core::felt252"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::bool"
+          }
+        ],
+        "state_mutability": "view"
       }
     ]
   },
