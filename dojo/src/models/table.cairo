@@ -103,6 +103,9 @@ impl TableManagerTraitImpl of TableManagerTrait {
         assert(table.description != 0, Errors::INVALID_DESCRIPTION);
         set!(self.world, (table));
     }
+    fn set_admittance(self: TableManager, table_admittance: TableAdmittance) {
+        set!(self.world, (table_admittance));
+    }
     fn set_array(self: TableManager, tables: @Array<TableConfig>) {
         let mut n: usize = 0;
         loop {

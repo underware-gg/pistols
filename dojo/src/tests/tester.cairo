@@ -46,7 +46,7 @@ mod tester {
     };
     use pistols::models::table::{
         table_config, TableConfig,
-        table_admittance,
+        table_admittance, TableAdmittance,
     };
     use pistols::models::token_config::{
         token_config, TokenConfig,
@@ -124,15 +124,21 @@ mod tester {
         deploy_system = deploy_system || approve;
         deploy_lords = deploy_lords || approve || deploy_system;
 
+// '----1'.print();
+// (src_5_model::TEST_CLASS_HASH).print();
+// (erc_721_token_approval_model::TEST_CLASS_HASH).print();
+// (erc_721_balance_model::TEST_CLASS_HASH).print();
+// (erc_721_meta_model::TEST_CLASS_HASH).print();
+// (erc_721_owner_model::TEST_CLASS_HASH).print();
         let mut models = array![
             //
             // missing models cause ('invalid resource selector')
             //
-            src_5_model::TEST_CLASS_HASH,
-            erc_721_token_approval_model::TEST_CLASS_HASH,
-            erc_721_balance_model::TEST_CLASS_HASH,
-            erc_721_meta_model::TEST_CLASS_HASH,
-            erc_721_owner_model::TEST_CLASS_HASH,
+            // src_5_model::TEST_CLASS_HASH,
+            // erc_721_token_approval_model::TEST_CLASS_HASH,
+            // erc_721_balance_model::TEST_CLASS_HASH,
+            // erc_721_meta_model::TEST_CLASS_HASH,
+            // erc_721_owner_model::TEST_CLASS_HASH,
             // pistols
             duelist::TEST_CLASS_HASH,
             scoreboard::TEST_CLASS_HASH,
@@ -154,7 +160,9 @@ mod tester {
         testing::set_block_timestamp(INITIAL_TIMESTAMP);
 
         // deploy world
+// '---- spawn_test_world...'.print();
         let world: IWorldDispatcher = spawn_test_world("pistols",  models);
+// '---- OK!'.print();
         world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), OWNER());
 
         // deploy systems
@@ -304,9 +312,14 @@ mod tester {
         system.set_paused(paused);
         _next_block();
     }
-    fn execute_admin_set_table(system: IAdminDispatcher, sender: ContractAddress, table_id: felt252, contract_address: ContractAddress, description: felt252, fee_min: u128, fee_pct: u8, enabled: bool) {
+    fn execute_admin_set_table(system: IAdminDispatcher, sender: ContractAddress, table: TableConfig) {
         impersonate(sender);
-        system.set_table(table_id, contract_address, description, fee_min, fee_pct, enabled);
+        system.set_table(table);
+        _next_block();
+    }
+    fn execute_admin_set_table_admittance(system: IAdminDispatcher, sender: ContractAddress, table_admittance: TableAdmittance) {
+        impersonate(sender);
+        system.set_table_admittance(table_admittance);
         _next_block();
     }
     fn execute_admin_open_table(system: IAdminDispatcher, sender: ContractAddress, table_id: felt252, enabled: bool) {
@@ -422,6 +435,10 @@ mod tester {
     #[inline(always)]
     fn get_Table(world: IWorldDispatcher, table_id: felt252) -> TableConfig {
         (get!(world, table_id, TableConfig))
+    }
+    #[inline(always)]
+    fn get_TableAdmittance(world: IWorldDispatcher, table_id: felt252) -> TableAdmittance {
+        (get!(world, table_id, TableAdmittance))
     }
     #[inline(always)]
     fn get_Duelist(world: IWorldDispatcher, address: ContractAddress) -> Duelist {

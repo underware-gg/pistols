@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
 use pistols::models::config::{Config};
-use pistols::models::table::{TableConfig};
+use pistols::models::table::{TableConfig, TableAdmittance};
 
 // based on RYO
 // https://github.com/cartridge-gg/rollyourown/blob/market_packed/src/systems/ryo.cairo
@@ -13,11 +13,9 @@ trait IAdmin {
     fn set_treasury(ref world: IWorldDispatcher, treasury_address: ContractAddress);
     fn set_paused(ref world: IWorldDispatcher, paused: bool);
 
-    fn set_table(ref world: IWorldDispatcher, table_id: felt252, contract_address: ContractAddress, description: felt252, fee_min: u128, fee_pct: u8, is_open: bool);
     fn open_table(ref world: IWorldDispatcher, table_id: felt252, is_open: bool);
-    
-    fn get_config(world: @IWorldDispatcher) -> Config;
-    fn get_table(world: @IWorldDispatcher, table_id: felt252) -> TableConfig;
+    fn set_table(ref world: IWorldDispatcher, table: TableConfig);
+    fn set_table_admittance(ref world: IWorldDispatcher, table_admittance: TableAdmittance);
 }
 
 #[dojo::contract]
@@ -28,7 +26,7 @@ mod admin {
     use starknet::{get_caller_address, get_contract_address};
 
     use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
-    use pistols::models::table::{TableConfig, TableManager, TableManagerTrait};
+    use pistols::models::table::{TableConfig, TableAdmittance, TableManager, TableManagerTrait};
     use pistols::libs::utils;
 
     mod Errors {
@@ -83,19 +81,20 @@ mod admin {
             manager.set(config);
         }
 
-        fn set_table(ref world: IWorldDispatcher, table_id: felt252, contract_address: ContractAddress, description: felt252, fee_min: u128, fee_pct: u8, is_open: bool) {
+        fn set_table(ref world: IWorldDispatcher, table: TableConfig) {
             self.assert_caller_is_owner();
             // get table
             let manager = TableManagerTrait::new(world);
-            assert(manager.exists(table_id), Errors::INVALID_TABLE);
-            let mut table = manager.get(table_id);
-            // update table
-            table.wager_contract_address = contract_address;
-            table.description = description;
-            table.fee_min = fee_min;
-            table.fee_pct = fee_pct;
-            table.is_open = is_open;
+            assert(manager.exists(table.table_id), Errors::INVALID_TABLE);
             manager.set(table);
+        }
+
+        fn set_table_admittance(ref world: IWorldDispatcher, table_admittance: TableAdmittance) {
+            self.assert_caller_is_owner();
+            // get table
+            let manager = TableManagerTrait::new(world);
+            assert(manager.exists(table_admittance.table_id), Errors::INVALID_TABLE);
+            manager.set_admittance(table_admittance);
         }
 
         fn open_table(ref world: IWorldDispatcher, table_id: felt252, is_open: bool) {
@@ -107,20 +106,6 @@ mod admin {
             // update table
             table.is_open = is_open;
             manager.set(table);
-        }
-
-        //
-        // getters
-        //
-
-        fn get_config(world: @IWorldDispatcher) -> Config {
-            (ConfigManagerTrait::new(world).get())
-        }
-
-        fn get_table(world: @IWorldDispatcher, table_id: felt252) -> TableConfig {
-            let manager = TableManagerTrait::new(world);
-            assert(manager.exists(table_id), Errors::INVALID_TABLE);
-            (manager.get(table_id))
         }
     }
 
