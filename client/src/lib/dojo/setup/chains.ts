@@ -164,16 +164,24 @@ const pistolsStagingConfig: DojoChainConfig = {
   rpcUrl: 'https://api.cartridge.gg/x/pistols-staging/katana',
   toriiUrl: 'https://api.cartridge.gg/x/pistols-staging/torii',
   relayUrl: undefined,
-  masterAddress: '0x7947c7d3e02e85da3ba8c93024b006ab7f10dc6b8fb3cb151569c996869edba',
-  masterPrivateKey: '0x329a6dea7e53dcd104ab13494a29c6ddb1e472afebddcbd3ae11f8fe76a9e53',
+  masterAddress: '0x208b35fff7421f2964ec0fff1ce2ea8da51b7b31391696ff50e7b6ccc49a46d',
+  masterPrivateKey: '0x3ad07c09ad9c0de52d2d309d93b362af602398fb4f1c535478a9cf8ccbfbe30',
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
   lordsContractAddress: undefined, // lords_mock
   lordsFaucetUrl: undefined,
-  predeployedAccounts: [],
+  predeployedAccounts: [{
+    address: '0x2294c9ccec75a7f6a9c7e304c498ce2b5811a7bcef0e8b299adffa2f629eb08',
+    privateKey: '0x17fbc9df543f5a0112896bc5223513a1798ab4caedf25a39ae9363cc6f2b885',
+    active: false,
+  }, {
+    address: '0x265e59f6ae1ea40867585c5c613637fcec8cdd4cb9f5ecf588292da87e32fd9',
+    privateKey: '0x7c450b3ba6174fe1939a0c6a76abe146a81f95ea0f0c1d4034bb88398db57ee',
+    active: false,
+  }],
   connectorIds: [
     supportedConnetorIds.DOJO_PREDEPLOYED,
-    // supportedConnetorIds.CONTROLLER,
+    supportedConnetorIds.CONTROLLER,
   ],
   // starknet Chain
   nativeCurrency: ETH_KATANA,

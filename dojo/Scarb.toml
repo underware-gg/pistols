@@ -71,10 +71,18 @@ lords_mock = []
 # defaults for all profiles
 # 
 [tool.dojo.env]
-rpc_url = "http://localhost:5050"
-account_address = "0xb3ff441a68610b30fd5e2abbf3a1548eb6ba6f3559f2862bf2dc757e5828ca"
-private_key = "0x2bbf4f9fd0bbb2e60b0316c1fe0b76cf7a4d0198bd493ced9b8df2a3a24d68a"
+# rpc_url = "http://localhost:5050"
+# account_address = "0xb3ff441a68610b30fd5e2abbf3a1548eb6ba6f3559f2862bf2dc757e5828ca"
+# private_key = "0x2bbf4f9fd0bbb2e60b0316c1fe0b76cf7a4d0198bd493ced9b8df2a3a24d68a"
 world_address = "0x4037e9ea1a016636a088c1bae640f9812451333be587a475bf175b0437102af"
+
+# -----------------------
+# staging (pistols-slot)
+# 
+# [profile.staging.tool.dojo.env]
+rpc_url = "https://api.cartridge.gg/x/pistols-staging/katana"
+account_address = "0x208b35fff7421f2964ec0fff1ce2ea8da51b7b31391696ff50e7b6ccc49a46d"
+private_key = "0x3ad07c09ad9c0de52d2d309d93b362af602398fb4f1c535478a9cf8ccbfbe30"
 
 # -----------------------
 # slot (pistols)
@@ -83,14 +91,6 @@ world_address = "0x4037e9ea1a016636a088c1bae640f9812451333be587a475bf175b0437102
 rpc_url = "https://api.cartridge.gg/x/pistols/katana"
 account_address = "0x2ec24cd4415a28e821c5b4b9dc3801340cb2e1a23f4289443d15fea60e2daab"
 private_key = "0x1f3a9e4f7827167d6f7e93b8f2debc3129b06ceca19d02355434499592bf16c"
-
-# -----------------------
-# staging (pistols-slot)
-# 
-[profile.staging.tool.dojo.env]
-rpc_url = "https://api.cartridge.gg/x/pistols-staging/katana"
-account_address = "0x7947c7d3e02e85da3ba8c93024b006ab7f10dc6b8fb3cb151569c996869edba"
-private_key = "0x329a6dea7e53dcd104ab13494a29c6ddb1e472afebddcbd3ae11f8fe76a9e53"
 
 # -----------------------
 # SN_SEPOLIA

@@ -11,7 +11,7 @@ import pistols_manifest_sepolia from './generated/sepolia/manifest.json'
 
 const supportedChainIds: ChainId[] = [
   ChainId.PISTOLS_SLOT,
-  // ChainId.PISTOLS_STAGING,
+  ChainId.PISTOLS_STAGING,
   ChainId.SN_SEPOLIA,
   ChainId.KATANA_LOCAL,
   // ChainId.SN_MAINNET,
@@ -21,7 +21,8 @@ const supportedChainIds: ChainId[] = [
 const manifests: Record<ChainId, DojoManifest> = {
   [ChainId.KATANA_LOCAL]: pistols_manifest_dev as DojoManifest,
   [ChainId.PISTOLS_SLOT]: pistols_manifest_slot as DojoManifest,
-  [ChainId.PISTOLS_STAGING]: pistols_manifest_staging as DojoManifest,
+  // [ChainId.PISTOLS_STAGING]: pistols_manifest_staging as DojoManifest,
+  [ChainId.PISTOLS_STAGING]: pistols_manifest_dev as DojoManifest,
   [ChainId.SN_SEPOLIA]: pistols_manifest_sepolia as DojoManifest,
   [ChainId.SN_MAINNET]: null,
   [ChainId.REALMS_WORLD]: null,

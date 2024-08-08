@@ -4,14 +4,14 @@ class_hash = "0x2178527e9556d1aa21d3c2961d28f9114fcfed81b4c3674ed591c50ce46cc9d"
 original_class_hash = "0x2178527e9556d1aa21d3c2961d28f9114fcfed81b4c3674ed591c50ce46cc9d"
 abi = "manifests/dev/deployment/abis/dojo-world.json"
 address = "0x4037e9ea1a016636a088c1bae640f9812451333be587a475bf175b0437102af"
-transaction_hash = "0x36b2a474c97cf19f43f07db3d2966e6ca62a971b96835f61a9671d74e92ab11"
+transaction_hash = "0x6842e42ff57f4f535beaa1fb5f5e7aad0eb050bb967da5b2f04540305e51e6a"
 block_number = 3
 seed = "pistols"
 manifest_name = "dojo-world"
 
 [world.metadata]
 profile_name = "dev"
-rpc_url = "http://localhost:5050/"
+rpc_url = "https://api.cartridge.gg/x/pistols-staging/katana"
 
 [base]
 kind = "Class"
