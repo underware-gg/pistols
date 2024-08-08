@@ -9,7 +9,8 @@ use pistols::models::table::{TableConfig, TableAdmittance};
 
 #[dojo::interface]
 trait IAdmin {
-    fn set_owner(ref world: IWorldDispatcher, owner_address: ContractAddress, granted: bool);
+    fn am_i_owner(world: @IWorldDispatcher) -> bool;
+    fn set_owner(ref world: IWorldDispatcher, account_address: ContractAddress, granted: bool);
     fn set_treasury(ref world: IWorldDispatcher, treasury_address: ContractAddress);
     fn set_paused(ref world: IWorldDispatcher, paused: bool);
 
@@ -30,7 +31,7 @@ mod admin {
     use pistols::libs::utils;
 
     mod Errors {
-        const INVALID_OWNER: felt252       = 'ADMIN: Invalid owner_address';
+        const INVALID_OWNER: felt252       = 'ADMIN: Invalid account_address';
         const INVALID_TREASURY: felt252    = 'ADMIN: Invalid treasury_address';
         const INVALID_TABLE: felt252       = 'ADMIN: Invalid table';
         const INVALID_DESCRIPTION: felt252 = 'ADMIN: Invalid description';
@@ -55,9 +56,13 @@ mod admin {
 
     #[abi(embed_v0)]
     impl AdminImpl of super::IAdmin<ContractState> {
-        fn set_owner(ref world: IWorldDispatcher, owner_address: ContractAddress, granted: bool) {
+        fn am_i_owner(world: @IWorldDispatcher) -> bool {
+            (world.is_owner(self.selector().into(), get_caller_address()))
+        }
+
+        fn set_owner(ref world: IWorldDispatcher, account_address: ContractAddress, granted: bool) {
             self.assert_caller_is_owner();
-            self.grant_owner(owner_address, granted);
+            self.grant_owner(account_address, granted);
         }
 
         fn set_treasury(ref world: IWorldDispatcher, treasury_address: ContractAddress) {
@@ -112,14 +117,14 @@ mod admin {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn assert_caller_is_owner(self: @ContractState) {
-            assert(self.world().is_owner(self.selector().into(), get_caller_address()), Errors::NOT_OWNER);
+            assert(self.am_i_owner() == true, Errors::NOT_OWNER);
         }
-        fn grant_owner(self: @ContractState, owner_address: ContractAddress, granted: bool) {
-            assert(owner_address.is_non_zero(), Errors::INVALID_OWNER);
+        fn grant_owner(self: @ContractState, account_address: ContractAddress, granted: bool) {
+            assert(account_address.is_non_zero(), Errors::INVALID_OWNER);
             if (granted) {
-                self.world().grant_owner(self.selector().into(), owner_address);
+                self.world().grant_owner(self.selector().into(), account_address);
             } else {
-                self.world().revoke_owner(self.selector().into(), owner_address);
+                self.world().revoke_owner(self.selector().into(), account_address);
             }
         }
     }
