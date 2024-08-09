@@ -175,6 +175,11 @@ export function createSystemCalls(
     return await _executeTransaction(signer, actions_call('reveal_action', args))
   }
 
+  const set_owner = async (signer: AccountInterface, address: BigNumberish, granted: boolean): Promise<boolean> => {
+    const args = [address, granted]
+    return await _executeTransaction(signer, admin_call('set_owner', args))
+  }
+
   const admin_set_config = async (signer: AccountInterface, values: any): Promise<boolean> => {
     const args = Object.keys(Config.schema).map(key => {
       const value = values[key]
@@ -317,6 +322,7 @@ export function createSystemCalls(
     duelist_token_uri,
     //
     // ADMIN
+    set_owner,
     admin_set_config,
     admin_set_table,
     admin_set_table_admittance,

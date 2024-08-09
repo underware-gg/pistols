@@ -3,6 +3,7 @@ import { Button, Container, Divider, Tab } from 'semantic-ui-react'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ConfigForm, TableConfigForm } from '@/pistols/components/admin/TableConfigForm'
+import { OwnerForm } from '@/pistols/components/admin/OwnerForm'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 
@@ -25,8 +26,8 @@ export const AdminPanel = ({
       {isConnected && <>
         <Tab menu={{ secondary: true, pointing: true, attached: true }} panes={[
           {
-            menuItem: 'Owners',
-            render: () => <div>TODO</div>,
+            menuItem: 'Admins',
+            render: () => <OwnerForm />,
           },
           {
             menuItem: 'Config',

@@ -75,7 +75,7 @@ export default function AnonModal({
                   placeholder={'0x... or name.start'}
                   value={inputAddress}
                   setValue={setInputAddres}
-                  maxLength={STARKNET_ADDRESS_LENGTHS[1]}
+                  maxLength={STARKNET_ADDRESS_LENGTHS[0]}
                   code={true}
                   disabled={false}
                 />

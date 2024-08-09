@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useContractCall } from '@/lib/utils/hooks/useContractCall'
-import { isBigint, isPositiveBigint } from '@/lib/utils/types'
+import { bigintToHex, isBigint, isPositiveBigint } from '@/lib/utils/types'
 import { BigNumberish } from 'starknet'
 
 export const useCanJoin = () => {
@@ -112,6 +112,14 @@ export const useGetValidPackedActions = (roundNumber: number) => {
 
 export const useAdminAmIOwner = () => {
   const { address } = useAccount()
+  const { isOwner, isPending } = useAdminIsOwner(address)
+  return {
+    IAmOwner: isOwner,
+    isPending,
+  }
+}
+
+export const useAdminIsOwner = (address: BigNumberish) => {
   const args = useMemo(() => ([address]), [address])
   const { admin_am_i_owner } = useDojoSystemCalls()
   const { value, isPending } = useContractCall({
@@ -120,7 +128,7 @@ export const useAdminAmIOwner = () => {
     enabled: isPositiveBigint(address),
   })
   return {
-    IAmOwner: value,
+    isOwner: value,
     isPending,
   }
 }

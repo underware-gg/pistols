@@ -10,7 +10,7 @@ import { TableSwitcher } from '@/pistols/components/TableModal'
 import { Balance } from '@/pistols/components/account/Balance'
 import { bigintToEntity, bigintToHex, getObjectKeyByValue, isBigint, isNumeric } from '@/lib/utils/types'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { feltToString, stringToFelt } from '@/lib/utils/starknet'
+import { feltToString, STARKNET_ADDRESS_LENGTHS, stringToFelt } from '@/lib/utils/starknet'
 import { getTableType, TableTypeNameToValue, CONFIG } from '@/games/pistols/generated/constants'
 
 const Row = Table.Row
@@ -178,7 +178,7 @@ export const ComponentForm = ({
       <Table celled striped color='orange' size='small'>
         <Header>
           <Row>
-            <HeaderCell width={4}><h5>{tag}</h5></HeaderCell>
+            <HeaderCell width={4}><h3>{tag}</h3></HeaderCell>
             <HeaderCell></HeaderCell>
           </Row>
         </Header>
@@ -187,7 +187,7 @@ export const ComponentForm = ({
           <Row>
             <Cell></Cell>
             <Cell>
-              <ActionButton important fill label={!IAmOwner ? 'NOT OWNER' : 'STORE'} disabled={!canEdit} onClick={() => storeComponent(input_values)} />
+              <ActionButton important fill label={!IAmOwner ? 'NOT ADMIN' : 'STORE'} disabled={!canEdit} onClick={() => storeComponent(input_values)} />
             </Cell>
           </Row>
         </Body>
@@ -243,7 +243,7 @@ export const Field = ({
                 value={value}
                 setValue={setValue}
                 code={code}
-                maxLength={maxLength}
+                maxLength={STARKNET_ADDRESS_LENGTHS[0]}
                 disabled={readOnly}
               />
             </>
