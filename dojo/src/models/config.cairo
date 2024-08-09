@@ -1,7 +1,9 @@
 use starknet::ContractAddress;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
-const CONFIG_KEY: u8 = 1;
+mod CONFIG {
+    const CONFIG_KEY: u8 = 1;
+}
 
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
@@ -10,7 +12,7 @@ struct Config {
     key: u8,
     //------
     treasury_address: ContractAddress,
-    paused: bool,
+    is_paused: bool,
 }
 
 #[derive(Copy, Drop)]
@@ -24,7 +26,7 @@ impl ConfigManagerTraitImpl of ConfigManagerTrait {
         (ConfigManager { world })
     }
     fn get(self: ConfigManager) -> Config {
-        get!(self.world, (CONFIG_KEY), Config)
+        get!(self.world, (CONFIG::CONFIG_KEY), Config)
     }
     fn set(self: ConfigManager, config: Config) {
         set!(self.world, (config));

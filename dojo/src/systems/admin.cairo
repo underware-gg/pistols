@@ -11,7 +11,8 @@ use pistols::models::table::{TableConfig, TableAdmittance};
 trait IAdmin {
     fn am_i_owner(world: @IWorldDispatcher, account_address: ContractAddress) -> bool;
     fn set_owner(ref world: IWorldDispatcher, account_address: ContractAddress, granted: bool);
-    fn set_treasury(ref world: IWorldDispatcher, treasury_address: ContractAddress);
+
+    fn set_config(ref world: IWorldDispatcher, config: Config);
     fn set_paused(ref world: IWorldDispatcher, paused: bool);
 
     fn open_table(ref world: IWorldDispatcher, table_id: felt252, is_open: bool);
@@ -48,7 +49,7 @@ mod admin {
         let mut config = manager.get();
         // initialize
         config.treasury_address = (if (treasury_address.is_zero()) { get_caller_address() } else { treasury_address });
-        config.paused = false;
+        config.is_paused = false;
         manager.set(config);
         // initialize table lords
         TableManagerTrait::new(world).initialize(lords_address);
@@ -65,14 +66,11 @@ mod admin {
             self.grant_owner(account_address, granted);
         }
 
-        fn set_treasury(ref world: IWorldDispatcher, treasury_address: ContractAddress) {
+        fn set_config(ref world: IWorldDispatcher, config: Config) {
             self.assert_caller_is_owner();
-            assert(treasury_address.is_non_zero(), Errors::INVALID_TREASURY);
+            assert(config.treasury_address.is_non_zero(), Errors::INVALID_TREASURY);
             // get current
             let manager = ConfigManagerTrait::new(world);
-            let mut config = manager.get();
-            // update
-            config.treasury_address = treasury_address;
             manager.set(config);
         }
 
@@ -82,7 +80,7 @@ mod admin {
             let manager = ConfigManagerTrait::new(world);
             let mut config = manager.get();
             // update
-            config.paused = paused;
+            config.is_paused = paused;
             manager.set(config);
         }
 
@@ -90,7 +88,7 @@ mod admin {
             self.assert_caller_is_owner();
             // get table
             let manager = TableManagerTrait::new(world);
-            assert(manager.exists(table.table_id), Errors::INVALID_TABLE);
+            // assert(manager.exists(table.table_id), Errors::INVALID_TABLE);
             manager.set(table);
         }
 

@@ -230,7 +230,7 @@ export function defineContractComponents(world: World) {
     Config: (() => {
       return defineComponent(
         world,
-        { key: RecsType.Number, treasury_address: RecsType.BigInt, paused: RecsType.Boolean },
+        { key: RecsType.Number, treasury_address: RecsType.BigInt, is_paused: RecsType.Boolean },
         {
           metadata: {
             name: "pistols-Config",

@@ -1,17 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Table } from 'semantic-ui-react'
+import { Component, Entity } from '@dojoengine/recs'
+import { useAccount } from '@starknet-react/core'
 import { useComponentValue } from '@dojoengine/react'
 import { useDojoComponents, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
+import { useAdminAmIOwner } from '@/pistols/hooks/useContractCalls'
 import { FormInput, FormCheckbox, FormSelectFromMap } from '@/pistols/components/ui/Form'
 import { TableSwitcher } from '@/pistols/components/TableModal'
 import { Balance } from '@/pistols/components/account/Balance'
 import { bigintToEntity, bigintToHex, getObjectKeyByValue, isBigint, isNumeric } from '@/lib/utils/types'
+import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
-import { getTableType, TableTypeNameToValue } from '@/games/pistols/generated/constants'
-import { Component, Entity } from '@dojoengine/recs'
-import { ActionButton } from '../ui/Buttons'
-import { useAccount } from '@starknet-react/core'
-import { useAdminAmIOwner } from '@/pistols/hooks/useContractCalls'
+import { getTableType, TableTypeNameToValue, CONFIG } from '@/games/pistols/generated/constants'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -36,6 +36,12 @@ type FormSchema = {
   }
 }
 
+const config_schema: FormSchema = {
+  key: { type: FieldType.Number, isKey: true },
+  treasury_address: { type: FieldType.Address },
+  is_paused: { type: FieldType.Boolean },
+}
+
 const table_config_schema: FormSchema = {
   table_id: { type: FieldType.ShortString, isKey: true },
   table_type: { type: FieldType.TableType },
@@ -46,6 +52,30 @@ const table_config_schema: FormSchema = {
   fee_min: { type: FieldType.Wei },
   fee_pct: { type: FieldType.Number },
   is_open: { type: FieldType.Boolean },
+}
+
+export const ConfigForm = ({
+}: {
+  }) => {
+  const { Config } = useDojoComponents()
+  const entityKey = useMemo(() => bigintToEntity(CONFIG.CONFIG_KEY), [])
+
+  const { account } = useAccount()
+  const { admin_set_config } = useDojoSystemCalls()
+  const storeComponent = (values: any) => {
+    admin_set_config(account, values)
+  }
+
+  return (
+    <div>
+      <ComponentForm
+        schema={config_schema}
+        component={Config}
+        entityKey={entityKey}
+        storeComponent={storeComponent}
+      />
+    </div>
+  )
 }
 
 export const TableConfigForm = ({
@@ -139,7 +169,7 @@ export const ComponentForm = ({
           }} />
       )
     }) : []
-  }, [input_values])
+  }, [input_values, canEdit])
 
 
   return (

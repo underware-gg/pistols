@@ -1,19 +1,14 @@
-import React, { useMemo } from 'react'
-import { Button, Container, Divider, Tab } from 'semantic-ui-react';
-import { useAccount, useDisconnect } from '@starknet-react/core';
-import { useDojoComponents } from '@/lib/dojo/DojoContext';
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext';
-import { Component } from '@dojoengine/recs';
+import React from 'react'
+import { Button, Container, Divider, Tab } from 'semantic-ui-react'
+import { useAccount, useDisconnect } from '@starknet-react/core'
+import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { ConfigForm, TableConfigForm } from '@/pistols/components/admin/TableConfigForm'
+import { AddressShort } from '@/lib/ui/AddressShort'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
-import { TableConfigForm } from './TableConfigForm';
-import { AddressShort } from '@/lib/ui/AddressShort';
 
 export const AdminPanel = ({
-  children = null,
-  className = null,
 }) => {
-  const { Config, TableConfig, TableAdmittance } = useDojoComponents()
-  const { address, isConnecting, isConnected, connector, chainId } = useAccount()
+  const { address, isConnecting, isConnected } = useAccount()
   const { disconnect } = useDisconnect()
   const { connectOpener } = usePistolsContext()
   return (
@@ -32,6 +27,10 @@ export const AdminPanel = ({
           {
             menuItem: 'Owners',
             render: () => <div>TODO</div>,
+          },
+          {
+            menuItem: 'Config',
+            render: () => <ConfigForm />,
           },
           {
             menuItem: 'TableConfig',

@@ -51,7 +51,7 @@ export function createSystemCalls(
   manifest: DojoManifest,
   provider: DojoProvider,
 ) {
-  const { Challenge, Wager, TableConfig, TableAdmittance } = components
+  const { Challenge, Wager, TableConfig, TableAdmittance, Config } = components
 
   // executeMulti() based on:
   // https://github.com/cartridge-gg/rollyourown/blob/f39bfd7adc866c1a10142f5ce30a3c6f900b467e/web/src/dojo/hooks/useSystems.ts#L178-L190
@@ -173,6 +173,15 @@ export function createSystemCalls(
   const reveal_action = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, round_number: number, salt: BigNumberish, action1: number, action2: number): Promise<boolean> => {
     const args = [duelist_id, duel_id, round_number, salt, action1, action2]
     return await _executeTransaction(signer, actions_call('reveal_action', args))
+  }
+
+  const admin_set_config = async (signer: AccountInterface, values: any): Promise<boolean> => {
+    const args = Object.keys(Config.schema).map(key => {
+      const value = values[key]
+      if (value == null) throw new Error()
+      return value
+    })
+    return await _executeTransaction(signer, admin_call('set_config', args))
   }
 
   const admin_set_table = async (signer: AccountInterface, values: any): Promise<boolean> => {
@@ -308,6 +317,7 @@ export function createSystemCalls(
     duelist_token_uri,
     //
     // ADMIN
+    admin_set_config,
     admin_set_table,
     admin_set_table_admittance,
     admin_am_i_owner,

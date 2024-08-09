@@ -25,11 +25,11 @@ mod tests {
         let (world, _system, _admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         let config: Config = tester::get_Config(world);
         assert(config.treasury_address == OWNER(), 'treasury_address');
-        assert(config.paused == false, 'paused');
+        assert(config.is_paused == false, 'paused');
         // get
         let get_config: Config = tester::get_Config(world);
         assert(config.treasury_address == get_config.treasury_address, 'get_config.treasury_address');
-        assert(config.paused == get_config.paused, 'get_config.paused');
+        assert(config.is_paused == get_config.is_paused, 'get_config.is_paused');
     }
 
     #[test]
@@ -56,7 +56,7 @@ mod tests {
         // can write
         tester::execute_admin_set_paused(admin, OTHER(), true);
         let config: Config = tester::get_Config(world);
-        assert(config.paused == true, 'paused');
+        assert(config.is_paused == true, 'paused');
         // unset
         tester::execute_admin_set_owner(admin, OWNER(), OTHER(), false);
         assert(world.is_owner(admin_hash, OTHER()) == false, 'new_other_false');
@@ -97,15 +97,15 @@ mod tests {
     fn test_set_paused() {
         let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         let config: Config = tester::get_Config(world);
-        assert(config.paused == false, 'paused_1');
+        assert(config.is_paused == false, 'paused_1');
         // set
         tester::execute_admin_set_paused(admin, OWNER(), true);
         let config: Config = tester::get_Config(world);
-        assert(config.paused == true, 'paused_2');
+        assert(config.is_paused == true, 'paused_2');
         // set
         tester::execute_admin_set_paused(admin, OWNER(), false);
         let config: Config = tester::get_Config(world);
-        assert(config.paused == false, 'paused_3');
+        assert(config.is_paused == false, 'paused_3');
     }
 
     #[test]
@@ -116,34 +116,39 @@ mod tests {
     }
 
     #[test]
-    fn test_set_treasury() {
+    fn test_set_config() {
         let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
-        let config: Config = tester::get_Config(world);
+        let mut config: Config = tester::get_Config(world);
         assert(config.treasury_address == OWNER(), 'treasury_address_param');
         // set
         let new_treasury: ContractAddress = starknet::contract_address_const::<0x121212>();
-        tester::execute_admin_set_treasury(admin, OWNER(), new_treasury);
-        let config: Config = tester::get_Config(world);
-        assert(config.treasury_address == new_treasury, 'set_treasury_new');
+        config.treasury_address = new_treasury;
+        tester::execute_admin_set_config(admin, OWNER(), config);
+        let mut config: Config = tester::get_Config(world);
+        assert(config.treasury_address == new_treasury, 'set_config_new');
         // set
-        tester::execute_admin_set_treasury(admin, OWNER(), BUMMER());
+        config.treasury_address = BUMMER();
+        tester::execute_admin_set_config(admin, OWNER(), config);
         let config: Config = tester::get_Config(world);
         assert(config.treasury_address == BUMMER(), 'treasury_address_newer');
     }
 
     #[test]
     #[should_panic(expected:('ADMIN: Invalid treasury_address', 'ENTRYPOINT_FAILED'))]
-    fn test_set_treasury_null() {
-        let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
-        tester::execute_admin_set_treasury(admin, OWNER(), ZERO());
+    fn test_set_config_null() {
+        let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let mut config: Config = tester::get_Config(world);
+        config.treasury_address = ZERO();
+        tester::execute_admin_set_config(admin, OWNER(), config);
     }
 
     #[test]
     #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
-    fn test_set_treasury_not_owner() {
-        let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
-        let new_treasury: ContractAddress = starknet::contract_address_const::<0x121212>();
-        tester::execute_admin_set_treasury(admin, OTHER(), new_treasury);
+    fn test_set_config_not_owner() {
+        let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let mut config: Config = tester::get_Config(world);
+        config.treasury_address = BUMMER();
+        tester::execute_admin_set_config(admin, OTHER(), config);
     }
 
     //

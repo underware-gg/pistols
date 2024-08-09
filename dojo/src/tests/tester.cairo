@@ -302,9 +302,9 @@ mod tester {
         system.set_owner(owner_address, granted);
         _next_block();
     }
-    fn execute_admin_set_treasury(system: IAdminDispatcher, sender: ContractAddress, treasury_address: ContractAddress) {
+    fn execute_admin_set_config(system: IAdminDispatcher, sender: ContractAddress, config: Config) {
         impersonate(sender);
-        system.set_treasury(treasury_address);
+        system.set_config(config);
         _next_block();
     }
     fn execute_admin_set_paused(system: IAdminDispatcher, sender: ContractAddress, paused: bool) {

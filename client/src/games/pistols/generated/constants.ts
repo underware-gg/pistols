@@ -5,6 +5,14 @@ import { BigNumberish } from 'starknet';
 // contants
 //
 
+// from: ../dojo/src/models/config.cairo
+type CONFIG_Type = {
+  CONFIG_KEY: number, // cairo: u8
+};
+export const CONFIG: CONFIG_Type = {
+  CONFIG_KEY: 1,
+};
+
 // from: ../dojo/src/models/table.cairo
 type tables_Type = {
   LORDS: string, // cairo: felt252
@@ -84,7 +92,7 @@ type admin_Type = {
   NOT_OWNER: string, // cairo: felt252
 };
 export const admin: admin_Type = {
-  INVALID_OWNER: 'ADMIN: Invalid owner_address',
+  INVALID_OWNER: 'ADMIN: Invalid account_address',
   INVALID_TREASURY: 'ADMIN: Invalid treasury_address',
   INVALID_TABLE: 'ADMIN: Invalid table',
   INVALID_DESCRIPTION: 'ADMIN: Invalid description',
