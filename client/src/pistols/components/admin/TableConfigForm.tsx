@@ -5,7 +5,7 @@ import { useDojoComponents, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { FormInput, FormCheckbox, FormSelectFromMap } from '@/pistols/components/ui/Form'
 import { TableSwitcher } from '@/pistols/components/TableModal'
 import { Balance } from '@/pistols/components/account/Balance'
-import { bigintToEntity, bigintToHex, getObjectKeyByValue } from '@/lib/utils/types'
+import { bigintToEntity, bigintToHex, getObjectKeyByValue, isBigint, isNumeric } from '@/lib/utils/types'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
 import { getTableType, TableTypeNameToValue } from '@/games/pistols/generated/constants'
 import { Component, Entity } from '@dojoengine/recs'
@@ -125,6 +125,9 @@ export const ComponentForm = ({
           code={fieldType == FieldType.Address || fieldType == FieldType.Wei || fieldType == FieldType.Number}
           warning={warning}
           setValue={(newValue) => {
+            if (fieldType == FieldType.Address && !isBigint(newValue)) return
+            if (fieldType == FieldType.Number && !isNumeric(newValue)) return
+            if (fieldType == FieldType.Wei && !isNumeric(newValue)) return
             const _value =
               fieldType == FieldType.ShortString ? stringToFelt(newValue)
                 : newValue

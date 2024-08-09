@@ -23,6 +23,8 @@ export const isBigint = (v: BigNumberish | null): boolean => {
 export const isPositiveBigint = (v: BigNumberish | null): boolean => {
   try { return (v != null && BigInt(v) > 0n) } catch { return false }
 }
+export const isNumeric = (v: string | null): boolean => (v != null && /^\d+$/.test(v))
+
 
 export const bigintToEntity = (v: BigNumberish): Entity => (getEntityIdFromKeys([BigInt(v)]) as Entity)
 export const keysToEntity = (keys: BigNumberish[]): Entity => (getEntityIdFromKeys(keys.map(v => BigInt(v ?? 0))) as Entity)
