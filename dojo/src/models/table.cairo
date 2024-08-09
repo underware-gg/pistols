@@ -119,8 +119,9 @@ impl TableManagerTraitImpl of TableManagerTrait {
         account_address: ContractAddress,
         duelist_id: u128,
     ) -> bool {
+        let exists: bool = self.exists(table_id);
         let admittance: TableAdmittance = get!(self.world, (table_id), TableAdmittance);
-        (admittance.can_join(account_address, duelist_id))
+        (exists && admittance.can_join(account_address, duelist_id))
     }
     //
     // Initialize tables

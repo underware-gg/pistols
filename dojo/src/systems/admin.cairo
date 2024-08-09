@@ -9,7 +9,7 @@ use pistols::models::table::{TableConfig, TableAdmittance};
 
 #[dojo::interface]
 trait IAdmin {
-    fn am_i_owner(world: @IWorldDispatcher) -> bool;
+    fn am_i_owner(world: @IWorldDispatcher, account_address: ContractAddress) -> bool;
     fn set_owner(ref world: IWorldDispatcher, account_address: ContractAddress, granted: bool);
     fn set_treasury(ref world: IWorldDispatcher, treasury_address: ContractAddress);
     fn set_paused(ref world: IWorldDispatcher, paused: bool);
@@ -56,8 +56,8 @@ mod admin {
 
     #[abi(embed_v0)]
     impl AdminImpl of super::IAdmin<ContractState> {
-        fn am_i_owner(world: @IWorldDispatcher) -> bool {
-            (world.is_owner(self.selector().into(), get_caller_address()))
+        fn am_i_owner(world: @IWorldDispatcher, account_address: ContractAddress) -> bool {
+            (world.is_owner(self.selector().into(), account_address))
         }
 
         fn set_owner(ref world: IWorldDispatcher, account_address: ContractAddress, granted: bool) {
@@ -117,7 +117,7 @@ mod admin {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn assert_caller_is_owner(self: @ContractState) {
-            assert(self.am_i_owner() == true, Errors::NOT_OWNER);
+            assert(self.am_i_owner(get_caller_address()) == true, Errors::NOT_OWNER);
         }
         fn grant_owner(self: @ContractState, account_address: ContractAddress, granted: bool) {
             assert(account_address.is_non_zero(), Errors::INVALID_OWNER);

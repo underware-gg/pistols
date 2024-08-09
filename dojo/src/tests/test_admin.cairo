@@ -35,11 +35,8 @@ mod tests {
     #[test]
     fn test_am_i_owner() {
         let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
-        assert(admin.am_i_owner() == true, 'default_true');
-        tester::impersonate(OTHER());
-        assert(admin.am_i_owner() == false, 'other_false');
-        tester::impersonate(OWNER());
-        assert(admin.am_i_owner() == true, 'owner_true');
+        assert(admin.am_i_owner(OWNER()) == true, 'default_true');
+        assert(admin.am_i_owner(OTHER()) == false, 'other_false');
     }
 
     #[test]
@@ -49,16 +46,13 @@ mod tests {
         assert(world.is_owner(admin_hash, OWNER()) == true, 'default_owner_true');
         assert(world.is_owner(admin_hash, OTHER()) == false, 'default_other_owner_false');
         // am_i?
-        tester::impersonate(OTHER());
-        assert(admin.am_i_owner() == false, 'owner_am_i_false');
+        assert(admin.am_i_owner(OTHER()) == false, 'owner_am_i_false');
         // set
-        tester::impersonate(OWNER());
         tester::execute_admin_set_owner(admin, OWNER(), OTHER(), true);
         assert(world.is_owner(admin_hash, OWNER()) == true, 'owner_still');
         assert(world.is_owner(admin_hash, OTHER()) == true, 'new_other_true');
         // am_i?
-        tester::impersonate(OTHER());
-        assert(admin.am_i_owner() == true, 'owner_am_i_true');
+        assert(admin.am_i_owner(OTHER()) == true, 'owner_am_i_true');
         // can write
         tester::execute_admin_set_paused(admin, OTHER(), true);
         let config: Config = tester::get_Config(world);
@@ -67,8 +61,7 @@ mod tests {
         tester::execute_admin_set_owner(admin, OWNER(), OTHER(), false);
         assert(world.is_owner(admin_hash, OTHER()) == false, 'new_other_false');
         // am_i?
-        tester::impersonate(OTHER());
-        assert(admin.am_i_owner() == false, 'owner_am_i_false_again');
+        assert(admin.am_i_owner(OTHER()) == false, 'owner_am_i_false_again');
     }
 
     #[test]
