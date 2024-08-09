@@ -1222,7 +1222,7 @@
       }
     ],
     "address": "0x4037e9ea1a016636a088c1bae640f9812451333be587a475bf175b0437102af",
-    "transaction_hash": "0x6842e42ff57f4f535beaa1fb5f5e7aad0eb050bb967da5b2f04540305e51e6a",
+    "transaction_hash": "0x36b2a474c97cf19f43f07db3d2966e6ca62a971b96835f61a9671d74e92ab11",
     "block_number": 3,
     "seed": "pistols",
     "metadata": {
@@ -1243,8 +1243,8 @@
     {
       "kind": "DojoContract",
       "address": "0x11b8baba9359414d8ed507bb9bc9bfb8b66044f26f6a067dd5e2884feb4c080",
-      "class_hash": "0x363052c25e6d8a8f636f23cde39634ee2db0413b7a1e4fccc5f7e5d967b1e64",
-      "original_class_hash": "0x363052c25e6d8a8f636f23cde39634ee2db0413b7a1e4fccc5f7e5d967b1e64",
+      "class_hash": "0x78a4f86e2f03fb06ccdf7f6a4f785df07fa96879e636f9144f186f7accc2a67",
+      "original_class_hash": "0x78a4f86e2f03fb06ccdf7f6a4f785df07fa96879e636f9144f186f7accc2a67",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -2233,8 +2233,8 @@
     {
       "kind": "DojoContract",
       "address": "0x33c196dcdc05c814c0fc235608468638b3d2d6cc270179799adec8fe8012402",
-      "class_hash": "0x1beda69689b5fdc70da057f036cd7bd8b5f9a3c6d8ead533cdf488ae7fa33b4",
-      "original_class_hash": "0x1beda69689b5fdc70da057f036cd7bd8b5f9a3c6d8ead533cdf488ae7fa33b4",
+      "class_hash": "0x48db61f41e686bacaf26bba0dc753afe100ed2fcbbd253b8fcae733e3a19a5b",
+      "original_class_hash": "0x48db61f41e686bacaf26bba0dc753afe100ed2fcbbd253b8fcae733e3a19a5b",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -2423,7 +2423,7 @@
               "type": "core::starknet::contract_address::ContractAddress"
             },
             {
-              "name": "paused",
+              "name": "is_paused",
               "type": "core::bool"
             }
           ]
@@ -2493,15 +2493,49 @@
           ]
         },
         {
+          "type": "struct",
+          "name": "pistols::models::table::TableAdmittance",
+          "members": [
+            {
+              "name": "table_id",
+              "type": "core::felt252"
+            },
+            {
+              "name": "accounts",
+              "type": "core::array::Array::<core::starknet::contract_address::ContractAddress>"
+            },
+            {
+              "name": "duelists",
+              "type": "core::array::Array::<core::integer::u128>"
+            }
+          ]
+        },
+        {
           "type": "interface",
           "name": "pistols::systems::admin::IAdmin",
           "items": [
             {
               "type": "function",
+              "name": "am_i_owner",
+              "inputs": [
+                {
+                  "name": "account_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
               "name": "set_owner",
               "inputs": [
                 {
-                  "name": "owner_address",
+                  "name": "account_address",
                   "type": "core::starknet::contract_address::ContractAddress"
                 },
                 {
@@ -2514,11 +2548,11 @@
             },
             {
               "type": "function",
-              "name": "set_treasury",
+              "name": "set_config",
               "inputs": [
                 {
-                  "name": "treasury_address",
-                  "type": "core::starknet::contract_address::ContractAddress"
+                  "name": "config",
+                  "type": "pistols::models::config::Config"
                 }
               ],
               "outputs": [],
@@ -2530,38 +2564,6 @@
               "inputs": [
                 {
                   "name": "paused",
-                  "type": "core::bool"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "set_table",
-              "inputs": [
-                {
-                  "name": "table_id",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "contract_address",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "description",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "fee_min",
-                  "type": "core::integer::u128"
-                },
-                {
-                  "name": "fee_pct",
-                  "type": "core::integer::u8"
-                },
-                {
-                  "name": "is_open",
                   "type": "core::bool"
                 }
               ],
@@ -2586,30 +2588,27 @@
             },
             {
               "type": "function",
-              "name": "get_config",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "pistols::models::config::Config"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_table",
+              "name": "set_table",
               "inputs": [
                 {
-                  "name": "table_id",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [
-                {
+                  "name": "table",
                   "type": "pistols::models::table::TableConfig"
                 }
               ],
-              "state_mutability": "view"
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "set_table_admittance",
+              "inputs": [
+                {
+                  "name": "table_admittance",
+                  "type": "pistols::models::table::TableAdmittance"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -12416,13 +12415,13 @@
           "key": false
         },
         {
-          "name": "paused",
+          "name": "is_paused",
           "type": "bool",
           "key": false
         }
       ],
-      "class_hash": "0x68f873afdd34dbc95de30487d0265777c4b94603a59a2a112bf924a226f18db",
-      "original_class_hash": "0x68f873afdd34dbc95de30487d0265777c4b94603a59a2a112bf924a226f18db",
+      "class_hash": "0x55a7c0f06b6946f3a2927b3f40284f00777801b5e1cb1c10fe95d8879e0f73e",
+      "original_class_hash": "0x55a7c0f06b6946f3a2927b3f40284f00777801b5e1cb1c10fe95d8879e0f73e",
       "abi": [
         {
           "type": "impl",
@@ -12818,7 +12817,7 @@
               "type": "core::starknet::contract_address::ContractAddress"
             },
             {
-              "name": "paused",
+              "name": "is_paused",
               "type": "core::bool"
             }
           ]

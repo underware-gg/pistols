@@ -393,7 +393,7 @@
         "type": "core::starknet::contract_address::ContractAddress"
       },
       {
-        "name": "paused",
+        "name": "is_paused",
         "type": "core::bool"
       }
     ]

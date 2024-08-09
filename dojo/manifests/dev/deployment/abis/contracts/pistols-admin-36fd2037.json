@@ -185,7 +185,7 @@
         "type": "core::starknet::contract_address::ContractAddress"
       },
       {
-        "name": "paused",
+        "name": "is_paused",
         "type": "core::bool"
       }
     ]
@@ -255,15 +255,49 @@
     ]
   },
   {
+    "type": "struct",
+    "name": "pistols::models::table::TableAdmittance",
+    "members": [
+      {
+        "name": "table_id",
+        "type": "core::felt252"
+      },
+      {
+        "name": "accounts",
+        "type": "core::array::Array::<core::starknet::contract_address::ContractAddress>"
+      },
+      {
+        "name": "duelists",
+        "type": "core::array::Array::<core::integer::u128>"
+      }
+    ]
+  },
+  {
     "type": "interface",
     "name": "pistols::systems::admin::IAdmin",
     "items": [
       {
         "type": "function",
+        "name": "am_i_owner",
+        "inputs": [
+          {
+            "name": "account_address",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::bool"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
         "name": "set_owner",
         "inputs": [
           {
-            "name": "owner_address",
+            "name": "account_address",
             "type": "core::starknet::contract_address::ContractAddress"
           },
           {
@@ -276,11 +310,11 @@
       },
       {
         "type": "function",
-        "name": "set_treasury",
+        "name": "set_config",
         "inputs": [
           {
-            "name": "treasury_address",
-            "type": "core::starknet::contract_address::ContractAddress"
+            "name": "config",
+            "type": "pistols::models::config::Config"
           }
         ],
         "outputs": [],
@@ -292,38 +326,6 @@
         "inputs": [
           {
             "name": "paused",
-            "type": "core::bool"
-          }
-        ],
-        "outputs": [],
-        "state_mutability": "external"
-      },
-      {
-        "type": "function",
-        "name": "set_table",
-        "inputs": [
-          {
-            "name": "table_id",
-            "type": "core::felt252"
-          },
-          {
-            "name": "contract_address",
-            "type": "core::starknet::contract_address::ContractAddress"
-          },
-          {
-            "name": "description",
-            "type": "core::felt252"
-          },
-          {
-            "name": "fee_min",
-            "type": "core::integer::u128"
-          },
-          {
-            "name": "fee_pct",
-            "type": "core::integer::u8"
-          },
-          {
-            "name": "is_open",
             "type": "core::bool"
           }
         ],
@@ -348,30 +350,27 @@
       },
       {
         "type": "function",
-        "name": "get_config",
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "pistols::models::config::Config"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "get_table",
+        "name": "set_table",
         "inputs": [
           {
-            "name": "table_id",
-            "type": "core::felt252"
-          }
-        ],
-        "outputs": [
-          {
+            "name": "table",
             "type": "pistols::models::table::TableConfig"
           }
         ],
-        "state_mutability": "view"
+        "outputs": [],
+        "state_mutability": "external"
+      },
+      {
+        "type": "function",
+        "name": "set_table_admittance",
+        "inputs": [
+          {
+            "name": "table_admittance",
+            "type": "pistols::models::table::TableAdmittance"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
       }
     ]
   },
