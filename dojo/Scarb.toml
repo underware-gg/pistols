@@ -1,6 +1,6 @@
 [package]
 name = "pistols"
-version = "0.10.0-0"
+version = "0.10.0-1"
 cairo-version = "=2.7.0-rc.3"
 
 [cairo]
