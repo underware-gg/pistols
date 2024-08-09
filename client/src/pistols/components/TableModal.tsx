@@ -200,7 +200,7 @@ function TableDescription({
   )
 }
 
-function TableSwitcher({
+export function TableSwitcher({
   tableId,
   setSelectedTableId,
 }) {

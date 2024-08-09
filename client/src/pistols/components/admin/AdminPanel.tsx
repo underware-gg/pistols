@@ -1,50 +1,37 @@
-import { useDojoComponents } from '@/lib/dojo/DojoContext';
-import { Component } from '@dojoengine/recs';
-import { useAccount } from '@starknet-react/core';
 import React, { useMemo } from 'react'
-import { Container, Divider } from 'semantic-ui-react';
+import { Button, Container, Divider } from 'semantic-ui-react';
+import { useAccount, useDisconnect } from '@starknet-react/core';
+import { useDojoComponents } from '@/lib/dojo/DojoContext';
+import { usePistolsContext } from '@/pistols/hooks/PistolsContext';
+import { Component } from '@dojoengine/recs';
+import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
+import { TableConfigForm } from './TableConfigForm';
 
 export const AdminPanel = ({
   children = null,
   className = null,
 }) => {
-  const { isConnected } = useAccount()
   const { Config, TableConfig, TableAdmittance } = useDojoComponents()
+  const { address, isConnecting, isConnected, connector, chainId } = useAccount()
+  const { disconnect } = useDisconnect()
+  const { connectOpener } = usePistolsContext()
   return (
     <Container>
-      Admin Panel
-      <Divider />
+      <div className='ModalText'>
+        <StarknetConnectModal opener={connectOpener} />
+        <Button disabled={isConnected || isConnecting} onClick={() => connectOpener.open()}>Connect</Button>
+        &nbsp;&nbsp;
+        <Button disabled={!isConnected || isConnecting} onClick={() => disconnect()}>Disconnect</Button>
+        &nbsp;&nbsp;
+        Admin Panel
+        <Divider />
+      </div>
 
       {isConnected && <>
-        <AdminForm component={Config} />
-        <Divider />
-
-        <AdminForm component={TableConfig} />
+        <TableConfigForm />
         <Divider />
       </>}
+
     </Container>
   );
 }
-
-const AdminForm = ({
-  component,
-}: {
-  component: Component
-}) => {
-  const tag = useMemo<string>(() => (component.metadata.name as string), [component])
-  const fields = useMemo(() => {
-    return Object.keys(component.schema).map((key) => {
-      return (
-        <h5>{key}</h5>
-      )
-    })
-  }, [component])
-  console.log(component)
-  return (
-    <div>
-      <h3>{tag}</h3>
-      {fields}
-    </div>
-  )
-}
-

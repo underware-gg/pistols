@@ -3,7 +3,7 @@
 //   // setComponentsFromEvents,
 // } from '@dojoengine/utils'
 import { DojoProvider, getContractByName } from '@dojoengine/core'
-import { getComponentValue } from '@dojoengine/recs'
+import { Component, getComponentValue } from '@dojoengine/recs'
 import { AccountInterface, BigNumberish, Call, Result } from 'starknet'
 import { stringToFelt, bigintToU256 } from '@/lib/utils/starknet'
 import { bigintAdd, bigintToEntity, bigintToHex } from '@/lib/utils/types'
@@ -51,7 +51,7 @@ export function createSystemCalls(
   manifest: DojoManifest,
   provider: DojoProvider,
 ) {
-  const { Challenge, Wager, TableConfig } = components
+  const { Challenge, Wager, TableConfig, TableAdmittance } = components
 
   // executeMulti() based on:
   // https://github.com/cartridge-gg/rollyourown/blob/f39bfd7adc866c1a10142f5ce30a3c6f900b467e/web/src/dojo/hooks/useSystems.ts#L178-L190
@@ -175,7 +175,29 @@ export function createSystemCalls(
     return await _executeTransaction(signer, actions_call('reveal_action', args))
   }
 
+  const admin_set_table = async (signer: AccountInterface, values: any): Promise<boolean> => {
+    const args = Object.keys(TableConfig.schema).map(key => {
+      const value = values[key]
+      if (value == null) throw new Error()
+      return value
+    })
+    return await _executeTransaction(signer, admin_call('set_table', args))
+  }
+
+  const admin_set_table_admittance = async (signer: AccountInterface, values: any): Promise<boolean | null> => {
+    const args = Object.keys(TableAdmittance.schema).map(key => {
+      const value = values[key]
+      if (value == null) throw new Error()
+      return value
+    })
+    return await _executeTransaction(signer, admin_call('set_table_admittance', args))
+  }
+
+
+
+  //------------------------------------
   // read-only calls
+  //
 
   const get_pact = async (duelist_id_a: BigNumberish, duelist_id_b: BigNumberish): Promise<bigint | null> => {
     const args = [duelist_id_a, duelist_id_b]
@@ -277,6 +299,10 @@ export function createSystemCalls(
     // DUELISTS
     can_mint,
     duelist_token_uri,
+    //
+    // ADMIN
+    admin_set_table,
+    admin_set_table_admittance,
   }
 }
 
