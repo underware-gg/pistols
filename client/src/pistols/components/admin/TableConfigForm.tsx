@@ -11,6 +11,7 @@ import { getTableType, TableTypeNameToValue } from '@/games/pistols/generated/co
 import { Component, Entity } from '@dojoengine/recs'
 import { ActionButton } from '../ui/Buttons'
 import { useAccount } from '@starknet-react/core'
+import { useAdminAmIOwner } from '@/pistols/hooks/useContractCalls'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -28,14 +29,14 @@ enum FieldType {
   TableType,
 }
 
-type TableSchema = {
+type FormSchema = {
   [key: string]: {
     type: FieldType
     isKey?: boolean
   }
 }
 
-const table_config_schema: TableSchema = {
+const table_config_schema: FormSchema = {
   table_id: { type: FieldType.ShortString, isKey: true },
   table_type: { type: FieldType.TableType },
   description: { type: FieldType.ShortString },
@@ -83,13 +84,14 @@ export const ComponentForm = ({
   entityKey,
   storeComponent,
 }: {
-  schema: TableSchema
+  schema: FormSchema
   component: Component
   entityKey: Entity
   storeComponent: (values: any) => void
 }) => {
   const [input_values, setTableInput] = useState({})
 
+  const { IAmOwner } = useAdminAmIOwner()
   const comp_values = useComponentValue(component, entityKey)
   const component_values = useMemo(() => {
     let result = { ...comp_values }
@@ -101,7 +103,7 @@ export const ComponentForm = ({
     setTableInput({ ...component_values })
   }, [component_values])
 
-  const canEdit = (component != null && entityKey != null)
+  const canEdit = (component != null && entityKey != null && IAmOwner)
 
   const tag = useMemo<string>(() => (component?.metadata?.name as string), [component])
   const fields = useMemo(() => {
@@ -139,7 +141,7 @@ export const ComponentForm = ({
 
   return (
     <div>
-      <h3>{tag}</h3>
+      {/* <h3>{tag}</h3> */}
       <Table celled striped color='orange' size='small'>
         <Header>
           <Row>
@@ -152,7 +154,7 @@ export const ComponentForm = ({
           <Row>
             <Cell></Cell>
             <Cell>
-              <ActionButton important fill label={'STORE'} disabled={!canEdit} onClick={() => storeComponent(input_values)} />
+              <ActionButton important fill label={!IAmOwner ? 'NOT OWNER' : 'STORE'} disabled={!canEdit} onClick={() => storeComponent(input_values)} />
             </Cell>
           </Row>
         </Body>

@@ -254,6 +254,25 @@ export function createSystemCalls(
   //   return results !== null ? results.map(v => Number(v)) : null
   // }
 
+  const can_mint = async (to: BigNumberish, token_address: BigNumberish): Promise<boolean | null> => {
+    const args = [to, token_address]
+    const results = await _executeCall<boolean>(minter_call('can_mint', args))
+    return results ?? null
+  }
+
+  const duelist_token_uri = async (token_id: BigNumberish): Promise<string | null> => {
+    const args = [token_id]
+    const results = await _executeCall<string>(token_duelist_call('token_uri', args))
+    return results ?? null
+  }
+
+  const admin_am_i_owner = async (account_address: BigNumberish): Promise<string | null> => {
+    const args = [account_address]
+    const results = await _executeCall<string>(admin_call('am_i_owner', args))
+    return results ?? null
+  }
+
+  // TEST/DEBUG
   const validate_commit_message = async (
     account: BigNumberish,
     signature: BigNumberish[],
@@ -266,17 +285,6 @@ export function createSystemCalls(
     return results ?? null
   }
 
-  const can_mint = async (to: BigNumberish, token_address: BigNumberish): Promise<boolean | null> => {
-    const args = [to, token_address]
-    const results = await _executeCall<boolean>(minter_call('can_mint', args))
-    return results ?? null
-  }
-
-  const duelist_token_uri = async (token_id: BigNumberish): Promise<string | null> => {
-    const args = [token_id]
-    const results = await _executeCall<string>(token_duelist_call('token_uri', args))
-    return results ?? null
-  }
 
   return {
     mint_duelist,
@@ -294,7 +302,6 @@ export function createSystemCalls(
     get_valid_packed_actions,
     // pack_action_slots,
     // unpack_action_slots,
-    validate_commit_message,
     //
     // DUELISTS
     can_mint,
@@ -303,6 +310,10 @@ export function createSystemCalls(
     // ADMIN
     admin_set_table,
     admin_set_table_admittance,
+    admin_am_i_owner,
+    //
+    // TEST/DEBUG
+    validate_commit_message,
   }
 }
 
