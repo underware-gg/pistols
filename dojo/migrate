@@ -31,7 +31,8 @@ echo ">>> Cleaning..."
 sozo -P $PROFILE clean
 echo ">>> Building..."
 if [[ "$PROFILE" == "dev" ]]; then
-  sozo -P $PROFILE build --typescript
+  # sozo -P $PROFILE build --typescript
+  sozo -P $PROFILE build
 else
   sozo -P $PROFILE build
 fi
