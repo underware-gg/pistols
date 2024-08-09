@@ -23,6 +23,7 @@ $color-inactive: rgba($color-brightest, 0.35);
 $text-shadow: 0.05rem 0.05rem 1px rgba($color-darkest, 0.5);
 $title-shadow: 0.2rem 0.2rem 1px rgba($color-bg, 0.5);
 $ui-border: 6px ridge $color-active;
+$menu-width: 620px;
 
 $border-hr: solid 0.5px rgba($color-bright, 0.5);
 $border-button: 1px solid $color-bright;
@@ -551,7 +552,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
   // height: 450px;
 }
 .DuelistModalDescription {
-  width: 620px;
+  width: $menu-width;
 }
 .BladesModalDescription {
   @extend .CenteredContainer;
@@ -656,20 +657,26 @@ $ui-container-gap: 1em;
 
 .UIContainer {
   // background-color: #f008;
-  background-color: #0004; // For browsers that do not support gradients
-  background-image: linear-gradient(to right, #000, transparent);
-  min-width: 620px;
-  width: 620px;
+  background-image: linear-gradient(to right, #000a, #0004, transparent);
+  width: 100%;
   height: 100%;
   position: absolute;
   top: 0px;
   left: 0px;
   padding: $ui-container-gap;
 }
-.UIContainerTavern {
+.UIContainerDesktop {
   @extend .UIContainer;
-  width: 620px;
+  background-color: #0004; // For browsers that do not support gradients
+  min-width: $menu-width;
+  max-width: $menu-width;
+  width: $menu-width;
 }
+.UIContainerMobile {
+  @extend .UIContainer;
+  background-color: #0004; // For browsers that do not support gradients
+}
+
 .UIMenuTavernScroller {
   @extend .Scroller;
   width: 100%;

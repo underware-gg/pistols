@@ -16,6 +16,7 @@ import { LordsBagIcon } from '@/pistols/components/account/Balance'
 import { Divider } from '@/lib/ui/Divider'
 import { makeTavernUrl } from '@/pistols/utils/pistols'
 import { PACKAGE_VERSION } from '@/pistols/utils/constants'
+import UIContainer from '@/pistols/components/UIContainer'
 import OnboardingModal from '@/pistols/components/account/OnboardingModal'
 import WalletHeader from '@/pistols/components/account/WalletHeader'
 import Logo from '@/pistols/components/Logo'
@@ -35,7 +36,7 @@ export default function Gate() {
   }, [])
 
   return (
-    <div className='UIContainer'>
+    <UIContainer>
 
       <VStack>
         <Logo />
@@ -65,7 +66,7 @@ export default function Gate() {
         : <ConnectedGate />
       }
 
-    </div>
+    </UIContainer>
   )
 }
 

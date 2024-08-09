@@ -8,17 +8,18 @@ import TableModal from '@/pistols/components/TableModal'
 import DuelistModal from '@/pistols/components/DuelistModal'
 import ChallengeModal from '@/pistols/components/ChallengeModal'
 import NewChallengeModal from '@/pistols/components/NewChallengeModal'
+import UIContainer from '@/pistols/components/UIContainer'
 import { useTestValidateSignature } from '../hooks/useContractCalls'
 
 export default function Tavern() {
   const { tableOpener } = usePistolsContext()
-  useTestValidateSignature()
+  // useTestValidateSignature()
 
   return (
     <QueryProvider>
-      <div className='UIContainerTavern'>
+      <UIContainer>
         <TavernMenu />
-      </div>
+      </UIContainer>
 
       <TableModal opener={tableOpener} />
       <DuelistModal />

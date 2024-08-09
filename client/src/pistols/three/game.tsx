@@ -350,6 +350,7 @@ function onWindowResize() {
   const canvasHeight = aspect > ASPECT ? winHeight : winWidth / ASPECT
   _renderer.setSize(canvasWidth, canvasHeight)
   _renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3));
+  console.log(`Canvas size:`, Math.ceil(canvasWidth), Math.ceil(canvasHeight), `${Math.ceil((canvasHeight / 1080) * 100)}%`)
 
   // setup cam
   _duelCamera.position.set(0, 0.3, -3)
