@@ -34,7 +34,7 @@ export default function DuelistModal() {
 
   const _switch = () => {
     if (isYou) {
-      router.push(`/gate`)
+      router.push(`/`)
     } else if (isMyDuelist) {
       dispatchDuelistId(selectedDuelistId)
     }

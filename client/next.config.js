@@ -19,10 +19,10 @@ const nextConfig = {
   },
   async rewrites() {
     return [
-      {
-        source: '/gate',
-        destination: '/main/gate',
-      },
+      // {
+      //   source: '/gate',
+      //   destination: '/main/gate',
+      // },
       {
         source: '/tavern/:slug*',
         destination: '/main/tavern/:slug*',
@@ -30,6 +30,15 @@ const nextConfig = {
       {
         source: '/duel/:slug*',
         destination: '/main/duel/:slug*',
+      },
+    ]
+  },
+  async redirects() {
+    return [
+      {
+        source: '/gate',
+        destination: '/',
+        permanent: true,
       },
     ]
   },

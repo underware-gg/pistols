@@ -7,10 +7,8 @@ import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { usePlayerId } from '@/lib/dojo/hooks/usePlayerId'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import AppPistols from '@/pistols/components/AppPistols'
-import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import GameContainer from '@/pistols/components/GameContainer'
 import Background from '@/pistols/components/Background'
-import Gate from '@/pistols/components/Gate'
 import Tavern from '@/pistols/components/Tavern'
 import Duel from '@/pistols/components/Duel'
 
@@ -34,11 +32,7 @@ export default function MainPage() {
     if (router.isReady && router.query.main) {
       const _page = router.query.main[0]
       const _slugs = router.query.main.slice(1)
-      if (_page == 'gate') {
-        scene = SceneName.Gate
-        title = 'Pistols - Gate'
-        // bgClassName = 'BackgroundGate'
-      } else if (_page == 'tavern') {
+      if (_page == 'tavern') {
         scene = SceneName.Tavern
         title = 'Pistols - Tavern'
         // bgClassName = menuKey ? bgsTavern[menuKey] : 'BackgroundDuelists'
@@ -50,7 +44,7 @@ export default function MainPage() {
           title = 'Pistols - Duel!'
         } else {
           scene = SceneName.Gate
-          router.push('/gate')
+          router.push('/')
         }
         // bgClassName = 'BackgroundDuel'
       }
@@ -94,7 +88,7 @@ function MainUI({
   useRouterStarter()
   useRouterListener()
   const { gameImpl } = useThreeJsContext()
-  const { atGate, atTavern, atDuel, connectOpener } = usePistolsContext()
+  const { atTavern, atDuel } = usePistolsContext()
   const { isInitialized } = useDojoStatus()
 
   if (!gameImpl) {
@@ -107,10 +101,8 @@ function MainUI({
 
   return (
     <>
-      {atGate && <Gate />}
       {atTavern && <Tavern />}
       {atDuel && duelId && <Duel duelId={duelId} />}
-      <StarknetConnectModal opener={connectOpener} />
     </>
   )
 }

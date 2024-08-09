@@ -123,7 +123,7 @@ export function TavernMenu({
           <MusicToggle />
           &nbsp;&nbsp;
           &nbsp;&nbsp;
-          <IconClick name='sign out' size={'large'} onClick={() => router.push(`/gate`)} />
+          <IconClick name='sign out' size={'large'} onClick={() => router.push(`/`)} />
           &nbsp;&nbsp;&nbsp;
         </div>
 

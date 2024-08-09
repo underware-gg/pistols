@@ -24,7 +24,7 @@ export default function AccountHeader({
 
   const _click = () => {
     if(isGuest) {
-      router.push('/gate')
+      router.push('/')
     } else {
       dispatchSelectDuelistId(duelistId) 
     }

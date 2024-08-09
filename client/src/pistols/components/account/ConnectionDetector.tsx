@@ -12,8 +12,8 @@ export function DojoSetupErrorDetector() {
   const router = useRouter()
   useEffect(() => {
     if(isError) {
-      router.push('/gate')
-      // location.href = '/gate'
+      router.push('/')
+      // location.href = '/'
     }
   }, [isError])
   return <></>
@@ -27,7 +27,7 @@ export function ConnectionDetector() {
 
   // const router = useRouter()
   const _backToGate = () => {
-    // router.push('/gate')
+    // router.push('/')
     dispatchDuelistId(0n)
   }
 

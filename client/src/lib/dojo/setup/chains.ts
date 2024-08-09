@@ -236,8 +236,8 @@ const snSepoliaConfig: DojoChainConfig = {
   predeployedAccounts: [],
   connectorIds: [
     supportedConnetorIds.CONTROLLER,
-    supportedConnetorIds.ARGENT,
-    supportedConnetorIds.BRAAVOS,
+    // supportedConnetorIds.ARGENT,
+    // supportedConnetorIds.BRAAVOS,
   ],
 } as const
 
@@ -258,8 +258,8 @@ const snMainnetConfig: DojoChainConfig = {
   predeployedAccounts: [],
   connectorIds: [
     supportedConnetorIds.CONTROLLER,
-    supportedConnetorIds.ARGENT,
-    supportedConnetorIds.BRAAVOS,
+    // supportedConnetorIds.ARGENT,
+    // supportedConnetorIds.BRAAVOS,
   ],
 } as const
 

@@ -4,14 +4,32 @@ import '/styles/styles.scss'
 import React from 'react'
 import { PistolsProvider } from '@/pistols/hooks/PistolsContext'
 import { SettingsProvider } from '@/pistols/hooks/SettingsContext'
+// import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+// import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
+import { makeDojoAppConfig } from '@/games/pistols/config'
+import ErrorModal from '@/pistols/components/ErrorModal'
+import Dojo from '@/lib/dojo/Dojo'
 
 function _app({ Component, pageProps }) {
   return (
     <PistolsProvider>
       <SettingsProvider>
-        <Component {...pageProps} />
+        <Dojo dojoAppConfig={makeDojoAppConfig()}>
+          <Component {...pageProps} />
+          <Modals />
+        </Dojo>
       </SettingsProvider>
     </PistolsProvider>
+  )
+}
+
+function Modals() {
+  // const { connectOpener } = usePistolsContext()
+  return (
+    <>
+      <ErrorModal />
+      {/* <StarknetConnectModal opener={connectOpener} /> */}
+    </>
   )
 }
 

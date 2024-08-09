@@ -87,7 +87,7 @@ export default function TableModal({
               <ActionButton fill label='Close' onClick={() => opener.close()} />
             </Col>
             <Col>
-              <ActionButton fill label='Leave Tavern' onClick={() => router.push(`/gate`)} />
+              <ActionButton fill label='Leave Tavern' onClick={() => router.push(`/`)} />
             </Col>
             <Col>
               <ActionButton fill important label='Join Table' disabled={!tableIsOpen || !selectedTableId} onClick={() => _joinTable()} />

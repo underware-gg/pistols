@@ -5,20 +5,18 @@ import { VStack, VStackRow } from '@/lib/ui/Stack'
 import { useAccount } from '@starknet-react/core'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
-import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
+import { useSelectedChain, useConnectToSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useCanMintDuelist } from '../hooks/useTokenDuelist'
 import { ChainSwitcher } from '@/lib/dojo/ChainSwitcher'
 import { AccountMenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { AccountsList } from '@/pistols/components/account/AccountsList'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { LordsBagIcon } from '@/pistols/components/account/Balance'
 import { Divider } from '@/lib/ui/Divider'
 import { makeTavernUrl } from '@/pistols/utils/pistols'
 import { PACKAGE_VERSION } from '@/pistols/utils/constants'
 import UIContainer from '@/pistols/components/UIContainer'
 import OnboardingModal from '@/pistols/components/account/OnboardingModal'
-import WalletHeader from '@/pistols/components/account/WalletHeader'
 import Logo from '@/pistols/components/Logo'
 
 const Row = Grid.Row
@@ -43,30 +41,37 @@ export default function Gate() {
 
         <h1>Pistols at Ten Blocks</h1>
 
-        <div className='Code Disabled'>v{PACKAGE_VERSION}</div>
+        <div className='H5 TitleCase'>
+          An <a href='https://underware.gg'>Underware</a> Game
+        </div>
+
+        <div className='Code Disabled'>
+          v{PACKAGE_VERSION}
+        </div>
 
         <hr />
 
-        {!isConnected ?
-          <span className='Title'>
-            {/* Duelists use a <b>Controller wallet</b> */}
-            {/* <br />and some <LordsBagIcon /><b>LORDS</b> to play */}
-            <br />
-            Settle Your Grudges Honourably
-            <br />Wager some <LordsBagIcon /><b>LORDS</b> or practice for free
-            <br />But remember... Don't lose your hat!
-          </span>
-          : <WalletHeader />
-        }
+        <span className='Title'>
+          Settle Your Grudges Honourably
+        </span>
+
+
+{/* <WalletHeader /> */}
 
       </VStack>
 
-      {(isLoading || isError || !isConnected || isConnecting || !isCorrectChain) ?
-        <DisconnectedGate />
-        : <ConnectedGate />
-      }
+      <DisconnectedGate />
 
     </UIContainer>
+  )
+}
+
+export function CurrentChain() {
+  const { selectedChainId } = useSelectedChain()
+  return (
+    <div className='Code Disabled AbsoluteRight Padded'>
+      {selectedChainId}
+    </div>
   )
 }
 
@@ -75,25 +80,67 @@ export default function Gate() {
 // Disconnected Gate
 //
 function DisconnectedGate() {
-  const { connectOpener } = usePistolsContext()
+  const router = useRouter()
+  const { tableId } = useSettings()
+  // const { connectOpener } = usePistolsContext()
   const { isConnected, isConnecting, isCorrectChain } = useSelectedChain()
   const { isLoading, loadingMessage, isError, errorMessage } = useDojoStatus()
+  const { connect } = useConnectToSelectedChain(() => {
+    router.push(makeTavernUrl(tableId))
+  })
 
-  const canConnect = (!isLoading && !isError)
-  const switchChain = (isConnected && !isCorrectChain)
+  const canConnect = (!isLoading && !isError && !isConnecting && connect != null)
+  // const switchChain = (isConnected && !isCorrectChain)
+
+  const _connect = () => {
+    if (canConnect) {
+      connect()
+    }
+  }
 
   return (
     <VStack>
       <Divider />
       <Grid>
-        <Row columns={'equal'}>
+        {/* <Row columns={'equal'}>
           <Col>
             <ChainSwitcher fluid disabled={isLoading} />
           </Col>
           <Col>
-            <ActionButton fill large important disabled={!canConnect || isConnecting} onClick={() => connectOpener.open()} label={switchChain ? 'Switch Chain' : 'Connect Wallet'} />
+            <ActionButton fill large important disabled={!canConnect} onClick={() => connectOpener.open()} label={switchChain ? 'Switch Chain' : 'Connect Wallet'} />
+          </Col>
+        </Row> */}
+
+        <Row columns={'equal'} className='NoPadding'>
+          <Col>
+            <ActionButton fill large important disabled={true} onClick={() => { }} label={'Play Tutorial'} />
           </Col>
         </Row>
+
+        <Row columns={'equal'} className='NoPadding'>
+          <Col>
+            <Divider content='OR' />
+          </Col>
+        </Row>
+
+        <Row columns={'equal'} className='NoPadding'>
+          <Col>
+            <ActionButton fill large important disabled={!canConnect} onClick={() => _connect()} label={'Connect Or Create Account'} />
+          </Col>
+        </Row>
+
+        <Row columns={'equal'} className='NoPadding'>
+          <Col>
+            <Divider content='OR' />
+          </Col>
+        </Row>
+
+        <Row columns={'equal'} className='NoPadding'>
+          <Col>
+            <EnterAsGuestButton />
+          </Col>
+        </Row>
+
       </Grid>
       {isConnecting ?
         <div>
@@ -112,11 +159,7 @@ function DisconnectedGate() {
               <Divider hidden />
               <ActionButton fill large important onClick={() => location.reload()} label='Retry' />
             </div>
-            : <div>
-              <Divider content='OR' />
-              <br />
-              <EnterAsGuestButton />
-            </div>
+            : <></>
       }
     </VStack>
   )

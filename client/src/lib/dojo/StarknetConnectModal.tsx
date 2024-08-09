@@ -56,7 +56,10 @@ function ConnectButtons({
   let connectorsButtons = useMemo(() => connectors.reduce((acc, connector: Connector) => {
     if (selectedChainConfig.connectorIds.includes(connector.id)) {
       acc.push(
-        <Button key={connector.id} fluid size='huge' disabled={!connector.available() || isConnecting} onClick={() => connect({ connector })}>
+        <Button key={connector.id} fluid size='huge'
+          disabled={!connector.available() || isConnecting}
+          onClick={() => connect({ connector })}
+        >
           {connector.name}
           <Image spaced className='Square20' src={connector.icon.dark} style={{ maxHeight: '1em' }} />
         </Button>
