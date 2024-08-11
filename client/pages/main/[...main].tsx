@@ -11,6 +11,7 @@ import GameContainer from '@/pistols/components/GameContainer'
 import Background from '@/pistols/components/Background'
 import Tavern from '@/pistols/components/Tavern'
 import Duel from '@/pistols/components/Duel'
+import Gate from '@/pistols/components/Gate'
 
 // // enable wasm in build (this is for api routes and server issues)
 // export const config = {
@@ -32,10 +33,12 @@ export default function MainPage() {
     if (router.isReady && router.query.main) {
       const _page = router.query.main[0]
       const _slugs = router.query.main.slice(1)
-      if (_page == 'tavern') {
+      if (_page == 'gate') {
+        scene = SceneName.Gate
+        title = 'Pistols at 10 Blocks'
+      } else if (_page == 'tavern') {
         scene = SceneName.Tavern
         title = 'Pistols - Tavern'
-        // bgClassName = menuKey ? bgsTavern[menuKey] : 'BackgroundDuelists'
       } else if (_page == 'duel') {
         // '/room/[duel_id]'
         if (_slugs.length > 0) {
@@ -43,7 +46,6 @@ export default function MainPage() {
           duelId = BigInt(_slugs[0])
           title = 'Pistols - Duel!'
         } else {
-          scene = SceneName.Gate
           router.push('/')
         }
         // bgClassName = 'BackgroundDuel'
@@ -67,7 +69,7 @@ export default function MainPage() {
     }
   }, [scene, router.isReady])
 
-  // console.log(`AT scene [${scene}] menu [${menuKey}]`, atTavern, atDuel, duelId, gameImpl)
+  // console.log(`AT scene [${scene}] menu [${menuKey}]`)
 
   return (
     <AppPistols headerData={{ title }} backgroundImage={null}>
@@ -88,7 +90,7 @@ function MainUI({
   useRouterStarter()
   useRouterListener()
   const { gameImpl } = useThreeJsContext()
-  const { atTavern, atDuel } = usePistolsContext()
+  const { atGate, atTavern, atDuel } = usePistolsContext()
   const { isInitialized } = useDojoStatus()
 
   if (!gameImpl) {
@@ -101,6 +103,7 @@ function MainUI({
 
   return (
     <>
+      {atGate && <Gate />}
       {atTavern && <Tavern />}
       {atDuel && duelId && <Duel duelId={duelId} />}
     </>

@@ -34,35 +34,39 @@ export default function Gate() {
   }, [])
 
   return (
-    <UIContainer>
+    <>
+      <UIContainer>
 
-      <VStack>
-        <Logo />
+        <VStack>
+          <Logo />
 
-        <h1>Pistols at Ten Blocks</h1>
+          <h1>Pistols at Ten Blocks</h1>
 
-        <div className='H5 TitleCase'>
-          An <a href='https://underware.gg'>Underware</a> Game
-        </div>
+          <div className='H5 TitleCase'>
+            An <a href='https://underware.gg'>Underware</a> Game
+          </div>
 
-        <div className='Code Disabled'>
-          v{PACKAGE_VERSION}
-        </div>
+          <div className='Code Disabled'>
+            v{PACKAGE_VERSION}
+          </div>
 
-        <hr />
+          <hr />
 
-        <span className='Title'>
-          Settle Your Grudges Honourably
-        </span>
+          <span className='Title'>
+            Settle Your Grudges Honourably
+          </span>
 
 
-{/* <WalletHeader /> */}
+          {/* <WalletHeader /> */}
 
-      </VStack>
+        </VStack>
 
-      <DisconnectedGate />
+        <DisconnectedGate />
 
-    </UIContainer>
+      </UIContainer>
+
+      <CurrentChain />
+    </>
   )
 }
 

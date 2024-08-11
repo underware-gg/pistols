@@ -19,10 +19,10 @@ const nextConfig = {
   },
   async rewrites() {
     return [
-      // {
-      //   source: '/gate',
-      //   destination: '/main/gate',
-      // },
+      {
+        source: '/',
+        destination: '/main/gate',
+      },
       {
         source: '/tavern/:slug*',
         destination: '/main/tavern/:slug*',
