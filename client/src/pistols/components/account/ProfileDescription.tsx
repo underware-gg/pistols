@@ -70,14 +70,14 @@ export function ProfileDescription({
       <Row>
 
         <Col width={displayStats ? 12 : 16}>
-          <h1 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /></h1>
+          <h2 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /></h2>
           {displayOwnerAddress && <AddressShort address={_owner} />}
-          <h3 className='Important NoMargin TitleCase'>
+          <h5 className='Important NoMargin TitleCase'>
             Honour: <span className='Wager'>{honourAndTotal}</span>
             {isVillainous && <> {EMOJI.VILLAIN} <span className='Wager'>{levelDisplay}</span></>}
             {isTrickster && <> {EMOJI.TRICKSTER} <span className='Wager'>{levelDisplay}</span></>}
             {isHonourable && <> {EMOJI.LORD} <span className='Wager'>{levelDisplay}</span></>}
-          </h3>
+          </h5>
           {displayBalance &&
             <h5>
               <LordsBalance address={_owner} big />

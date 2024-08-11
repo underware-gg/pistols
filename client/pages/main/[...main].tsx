@@ -9,6 +9,7 @@ import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import AppPistols from '@/pistols/components/AppPistols'
 import GameContainer from '@/pistols/components/GameContainer'
 import Background from '@/pistols/components/Background'
+import AccountPanel from '@/pistols/components/AccountPanel'
 import Tavern from '@/pistols/components/Tavern'
 import Duel from '@/pistols/components/Duel'
 import Gate from '@/pistols/components/Gate'
@@ -36,6 +37,9 @@ export default function MainPage() {
       if (_page == 'gate') {
         scene = SceneName.Gate
         title = 'Pistols at 10 Blocks'
+      } else if (_page == 'account') {
+        scene = SceneName.Account
+        title = 'Pistols - Account'
       } else if (_page == 'tavern') {
         scene = SceneName.Tavern
         title = 'Pistols - Tavern'
@@ -90,7 +94,7 @@ function MainUI({
   useRouterStarter()
   useRouterListener()
   const { gameImpl } = useThreeJsContext()
-  const { atGate, atTavern, atDuel } = usePistolsContext()
+  const { atGate, atAccount, atTavern, atDuel } = usePistolsContext()
   const { isInitialized } = useDojoStatus()
 
   if (!gameImpl) {
@@ -104,6 +108,7 @@ function MainUI({
   return (
     <>
       {atGate && <Gate />}
+      {atAccount && <AccountPanel />}
       {atTavern && <Tavern />}
       {atDuel && duelId && <Duel duelId={duelId} />}
     </>

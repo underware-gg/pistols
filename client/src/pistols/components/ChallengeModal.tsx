@@ -9,7 +9,7 @@ import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChalle
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useWager } from '@/pistols/hooks/useWager'
 import { useTable } from '@/pistols/hooks/useTable'
-import { useIsMyAccount, useIsYou } from '@/pistols/hooks/useIsMyDuelist'
+import { useIsMyAccount, useIsYou } from '@/pistols/hooks/useIsYou'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
@@ -101,7 +101,7 @@ export default function ChallengeModal() {
           <Grid style={{ width: '350px' }}>
             <Row columns='equal' textAlign='left'>
               <Col>
-                <ProfileDescription duelistId={duelistIdA} displayOwnerAddress />
+                <ProfileDescription duelistId={duelistIdA} displayOwnerAddress={false} />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -111,7 +111,7 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <ProfileDescription duelistId={duelistIdB} address={duelistAddressB} displayOwnerAddress />
+                <ProfileDescription duelistId={duelistIdB} address={duelistAddressB} displayOwnerAddress={false} />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -158,7 +158,7 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='center'>
               <Col>
-                <h3 className=''>{challengeDescription}</h3>
+                <h5 className=''>{challengeDescription}</h5>
                 <span className='Code'><ChallengeTime duelId={selectedDuelId} prefixed /></span>
                 {/* <Divider className='NoMargin' /> */}
               </Col>

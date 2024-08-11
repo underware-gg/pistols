@@ -60,20 +60,20 @@ export const useSelectedChain = () => {
   }
 }
 
-export const useConnectToSelectedChain = (onConnect: () => void) => {
+export const useConnectToSelectedChain = (onConnect?: () => void) => {
   const { connect, connectors } = useConnect()
   const { isConnected, isConnecting } = useAccount()
 
   const [requestedConnect, setRequestedConnect] = useState(false)
   useEffect(() => {
     if (requestedConnect && isConnected) {
-      onConnect()
+      onConnect?.()
     }
   }, [requestedConnect, isConnected])
 
   let _connect = useCallback(() => {
     if (isConnected) {
-      onConnect()
+      onConnect?.()
     } else if (!isConnecting) {
       const controller = connectors.find((connector) => (connector.id == supportedConnetorIds.CONTROLLER));
       const predeployed = connectors.find((connector) => (connector.id == supportedConnetorIds.DOJO_PREDEPLOYED));

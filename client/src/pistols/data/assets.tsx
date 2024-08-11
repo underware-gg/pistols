@@ -35,6 +35,7 @@ const TEXTURES: Record<TextureName, { path: string }> = {
 export const sceneBackgrounds: Record<SceneName, TextureName> = {
   [SceneName.Splash]: TextureName.bg_duel,
   [SceneName.Gate]: TextureName.bg_gate,
+  [SceneName.Account]: TextureName.bg_duelists,
   [SceneName.Tavern]: TextureName.bg_duelists,
   [SceneName.Duelists]: TextureName.bg_duelists,
   [SceneName.YourDuels]: TextureName.bg_duels_yours,

@@ -6,7 +6,7 @@ import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { usePact } from '@/pistols/hooks/usePact'
 import { useDuelistOwner } from '@/pistols/hooks/useTokenDuelist'
-import { useIsMyDuelist, useIsYou } from '@/pistols/hooks/useIsMyDuelist'
+import { useIsMyDuelist, useIsYou } from '@/pistols/hooks/useIsYou'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ChallengeTableSelectedDuelist } from '@/pistols/components/ChallengeTable'
@@ -18,7 +18,7 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export default function DuelistModal() {
-  const { tableId, duelistId, isGuest, dispatchDuelistId } = useSettings()
+  const { tableId, duelistId, isAnon, dispatchDuelistId } = useSettings()
   const router = useRouter()
 
   const { selectedDuelistId, dispatchSelectDuel, dispatchSelectDuelistId, dispatchChallengingDuelistId } = usePistolsContext()
@@ -96,7 +96,7 @@ export default function DuelistModal() {
             {!isYou &&
               <Col>
                 {hasPact && <ActionButton fill important label='Challenge In Progress!' onClick={() => dispatchSelectDuel(pactDuelId)} />}
-                {!hasPact && <ActionButton fill disabled={isGuest} label='Challenge for a Duel!' onClick={() => dispatchChallengingDuelistId(selectedDuelistId)} />}
+                {!hasPact && <ActionButton fill disabled={isAnon} label='Challenge for a Duel!' onClick={() => dispatchChallengingDuelistId(selectedDuelistId)} />}
               </Col>
             }
           </Row>

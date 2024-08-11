@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { Image, SemanticFLOATS } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useIsMyDuelist, useIsYou } from '@/pistols/hooks/useIsMyDuelist'
+import { useIsMyDuelist, useIsYou } from '@/pistols/hooks/useIsYou'
 import { IconClick } from '@/lib/ui/Icons'
 
 

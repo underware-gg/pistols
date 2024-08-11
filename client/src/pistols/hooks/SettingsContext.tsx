@@ -191,7 +191,7 @@ export const useSettings = () => {
   return {
     ...state,   // expose individual settings values
     tableId: (state.tableId || tables.LORDS),
-    isGuest: state.duelistId == 0n,
+    isAnon: (state.duelistId == 0n),
     settings: { ...state },  // expose settings as object {}
     SettingsActions,
     dispatchSetting,

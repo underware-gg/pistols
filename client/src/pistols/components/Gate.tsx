@@ -34,7 +34,7 @@ export default function Gate() {
   }, [])
 
   return (
-    <>
+    <div id='Gate'>
       <UIContainer>
 
         <VStack>
@@ -66,7 +66,7 @@ export default function Gate() {
       </UIContainer>
 
       <CurrentChain />
-    </>
+    </div>
   )
 }
 
@@ -170,7 +170,7 @@ function DisconnectedGate() {
 }
 
 
-function EnterAsGuestButton() {
+export function EnterAsGuestButton() {
   const { tableId, dispatchDuelistId } = useSettings()
   const router = useRouter()
 

@@ -545,7 +545,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 .ModalText {
-  font-size: 20px!important;
+  font-size: 18px!important;
 }
 .DuelistModal {
   width: 900px;
@@ -656,21 +656,29 @@ $profile-pic-width: 80px;
 $ui-container-gap: 1em;
 
 .UIContainer {
-  // background-color: #f008;
-  background-image: linear-gradient(to right, #000a, #0004, transparent);
   width: 100%;
   height: 100%;
   position: absolute;
   top: 0px;
   left: 0px;
-  padding: $ui-container-gap;
 }
 .UIContainerDesktop {
   @extend .UIContainer;
+  // background-color: #f008;
+  background-image: linear-gradient(to right, #0008, #0004, transparent);
   background-color: #0004; // For browsers that do not support gradients
+  padding: $ui-container-gap;
   min-width: $menu-width;
   max-width: $menu-width;
   width: $menu-width;
+}
+// descendent of #Gate
+#Gate .UIContainerDesktop {
+  // @extend .UIContainerDesktop;
+  min-width: 450px;
+  max-width: 450px;
+  width: 450px;
+  padding: 1em;
 }
 .UIContainerMobile {
   @extend .UIContainer;
@@ -1155,10 +1163,10 @@ input::placeholder {
   margin: auto;
 }
 .ui.grid>.row {
-  padding: 0.25rem 0; // original: 1.0rem 0
+  padding: 0.2rem 0; // original: 1.0rem 0
 }
 .ui.grid>.row>.column {
-  padding: 0 0.25rem; // original: 1.0rem 0
+  padding: 0 0.2rem; // original: 1.0rem 0
 }
 //
 // <Button>
@@ -1368,7 +1376,7 @@ td {
 .ui.modal>.header {
   @extend .Title;
   font-family: $font-family;
-  font-size: 2.5rem!important;
+  font-size: 2rem!important;
   color: $color-text;
   border-bottom: $border-hr;
   padding: 0.2em;

@@ -8,7 +8,7 @@ import ThreeJsCanvas from '@/pistols/three/ThreeJsCanvas'
 const GameCanvas = () => {
   const { gameImpl } = useThreeJsContext()
   const { dispatchAnimated } = useGameplayContext()
-  const { sceneName } = usePistolsContext()
+  const { currentScene } = usePistolsContext()
 
   const animated = useGameEvent('animated', -1)
   useEffect(() => {
@@ -16,8 +16,8 @@ const GameCanvas = () => {
   }, [animated])
 
   useEffect(() => {
-    gameImpl?.switchScene(sceneName)
-  }, [gameImpl, sceneName])
+    gameImpl?.switchScene(currentScene)
+  }, [gameImpl, currentScene])
 
   return (
     <div className='Relative GameCanvas'>

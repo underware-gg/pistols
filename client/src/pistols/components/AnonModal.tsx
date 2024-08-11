@@ -5,7 +5,7 @@ import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useValidateWalletAddressOrName } from '@/lib/utils/hooks/useValidateWalletAddress'
 import { useControllerAccount } from '@/lib/dojo/hooks/useController'
-import { useIsMyAccount } from '@/pistols/hooks/useIsMyDuelist'
+import { useIsMyAccount } from '@/pistols/hooks/useIsYou'
 import { usePact } from '@/pistols/hooks/usePact'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
@@ -72,7 +72,7 @@ export default function AnonModal({
               <Col>
                 <FormInput
                   label='Wallet Address or Starknet ID'
-                  placeholder={'0x... or name.start'}
+                  placeholder={'Address or Starknet ID'}
                   value={inputAddress}
                   setValue={setInputAddres}
                   maxLength={STARKNET_ADDRESS_LENGTHS[0]}
@@ -84,7 +84,7 @@ export default function AnonModal({
                 <div className='ModalText'>
                   {isStarknetAddress ? <Checked checked={true}>Starknet Address: <span className='Important'><AddressShort address={validatedAddress} /></span></Checked>
                     : isEthereumAddress ? <Checked checked={false}>Ethereum wallets not supported yet</Checked>
-                      : <Checked loading>Need a valid address...</Checked>
+                      : <Checked loading>Enter a valid address or ID</Checked>
                   }
 
                   {(starkName || profileName) &&<>

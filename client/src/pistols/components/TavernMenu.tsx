@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid, Menu, Label, Tab, TabPane } from 'semantic-ui-react'
 import { useQueryContext } from '@/pistols/hooks/QueryContext'
-import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
 import { useTable } from '@/pistols/hooks/useTable'
@@ -30,8 +29,7 @@ const _makeBubble = (count) => {
 export function TavernMenu({
 }) {
   const router = useRouter()
-  const { address } = useAccount()
-  const { tableId, duelistId, isGuest } = useSettings()
+  const { tableId, isAnon } = useSettings()
   const { menuKey, tavernMenuItems, tableOpener, dispatchSetMenu } = usePistolsContext()
   const { description, isTournament, isIRLTournament } = useTable(tableId)
 
@@ -45,7 +43,7 @@ export function TavernMenu({
   useEffect(() => {
     if (!started) {
       setStarted(true)
-      if (isGuest) {
+      if (isAnon) {
         dispatchSetMenu(MenuKey.LiveDuels)
       } else if (isTournament) {
         dispatchSetMenu(MenuKey.Tournament)
@@ -57,7 +55,7 @@ export function TavernMenu({
         dispatchSetMenu(MenuKey.Duelists)
       }
     }
-  }, [started, isGuest, yourDuelsCount, liveDuelsCount])
+  }, [started, isAnon, yourDuelsCount, liveDuelsCount])
 
   const panes = useMemo(() => {
     let result = []

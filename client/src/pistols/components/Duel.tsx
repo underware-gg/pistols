@@ -11,7 +11,7 @@ import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChalle
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useTable } from '@/pistols/hooks/useTable'
 import { useRevealAction } from '@/pistols/hooks/useRevealAction'
-import { useIsYou } from '@/pistols/hooks/useIsMyDuelist'
+import { useIsYou } from '@/pistols/hooks/useIsYou'
 import { useWager } from '@/pistols/hooks/useWager'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
 import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionDetector'

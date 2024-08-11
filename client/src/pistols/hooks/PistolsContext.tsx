@@ -14,6 +14,7 @@ import { BigNumberish } from 'starknet'
 export enum SceneName {
   Splash = 'Splash',
   Gate = 'Gate',
+  Account = 'Account',
   Duelists = 'Duelists',
   Tavern = 'Tavern',
   YourDuels = 'Your Duels',
@@ -65,7 +66,8 @@ export const initialState = {
   challengingId: 0n,
   menuKey: MenuKey.Duelists,
   accountMenuKey: AccountMenuKey.Profile,
-  sceneName: SceneName.Splash,
+  currentScene: SceneName.Splash,
+  lastScene: undefined,
   duelistsAnon: true,
   // injected
   connectOpener: null as Opener,
@@ -142,11 +144,12 @@ const PistolsProvider = ({
       }
       case PistolsActions.SET_MENU_KEY: {
         newState.menuKey = action.payload as MenuKey
-        newState.sceneName = action.payload as SceneName
+        newState.lastScene = newState.currentScene
+        newState.currentScene = action.payload as SceneName
         break
       }
       case PistolsActions.SET_SCENE: {
-        newState.sceneName = action.payload as SceneName
+        newState.currentScene = action.payload as SceneName
         break
       }
       case PistolsActions.SELECT_DUEL: {
@@ -223,6 +226,12 @@ export const usePistolsContext = () => {
       payload: scene != SceneName.Tavern ? scene : state.menuKey,
     })
   }
+  const dispatchSetLastScene = () => {
+    dispatch({
+      type: PistolsActions.SET_SCENE,
+      payload: state.lastScene ?? SceneName.Duelists,
+    })
+  }
   const dispatchSelectDuelistId = (newId: BigNumberish) => {
     dispatch({
       type: PistolsActions.SELECT_DUELIST_ID,
@@ -252,22 +261,24 @@ export const usePistolsContext = () => {
     hasSigned: (state.walletSig.sig > 0n),
     tavernMenuItems,
     accountMenuItems,
-    atSplash: (state.sceneName == SceneName.Splash),
-    atGate: (state.sceneName == SceneName.Gate),
-    atTavern: (state.sceneName as string == state.menuKey as string),
-    atDuelists: (state.sceneName == SceneName.Duelists),
-    atYourDuels: (state.sceneName == SceneName.YourDuels),
-    atLiveDuels: (state.sceneName == SceneName.LiveDuels),
-    atPastDuels: (state.sceneName == SceneName.PastDuels),
-    atTournament: (state.sceneName == SceneName.Tournament),
-    atIRLTournament: (state.sceneName == SceneName.IRLTournament),
-    atDuel: (state.sceneName == SceneName.Duel),
+    atSplash: (state.currentScene == SceneName.Splash),
+    atGate: (state.currentScene == SceneName.Gate),
+    atAccount: (state.currentScene == SceneName.Account),
+    atTavern: (state.currentScene as string == state.menuKey as string),
+    atDuelists: (state.currentScene == SceneName.Duelists),
+    atYourDuels: (state.currentScene == SceneName.YourDuels),
+    atLiveDuels: (state.currentScene == SceneName.LiveDuels),
+    atPastDuels: (state.currentScene == SceneName.PastDuels),
+    atTournament: (state.currentScene == SceneName.Tournament),
+    atIRLTournament: (state.currentScene == SceneName.IRLTournament),
+    atDuel: (state.currentScene == SceneName.Duel),
     // PistolsActions,
     // dispatch,
     dispatchSetSig,
     dispatchSetAccountMenu,
     dispatchSetMenu,
     dispatchSetScene,
+    dispatchSetLastScene,
     dispatchSelectDuel,
     dispatchSelectDuelistId,
     dispatchChallengingDuelistId,
