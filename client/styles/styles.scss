@@ -231,6 +231,8 @@ canvas {
 .BgCanceled  { background-color: $color-inactive!important; }
 .BgInactive  { background-color: $color-inactive!important; }
 
+.Translucent { opacity: 0.7!important; }
+
 
 .Number {
   // @extend .TitleCase;
@@ -1289,6 +1291,9 @@ input::placeholder {
   border: 0!important;
   border-radius: 0!important;
 }
+#Gate .ui.secondary.pointing.menu .item {
+  font-size: 24px;
+}
 .ui.secondary.pointing.menu .active.item,
 .ui.secondary.pointing.menu .active.item:hover,
 .ui.secondary.pointing.menu a.item:hover,
@@ -1471,4 +1476,11 @@ a.active.step:hover,
   margin-top: -0.65em;
   margin-right: -0.2em;
   z-index: 100;
+}
+// <Divider>
+.ui.divider:not(.vertical):not(.horizontal) {
+  // border-top: 1px solid rgba(34, 36, 38, .15);// original
+  // border-bottom: 1px solid rgba(255, 255, 255, .1); // original
+  border-top: 1px solid rgba($color-brightest, .15);
+  border-bottom: 1px solid rgba($color-brightest, .25);
 }

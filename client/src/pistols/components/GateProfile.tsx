@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { Grid } from 'semantic-ui-react'
+import { Grid, Tab, Image } from 'semantic-ui-react'
 import { VStack, VStackRow } from '@/lib/ui/Stack'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
@@ -16,6 +16,7 @@ import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { Divider } from '@/lib/ui/Divider'
 import { IconClick } from '@/lib/ui/Icons'
 import { CurrentChainHint } from '@/pistols/components/Gate'
+import { SocialsList } from '@/pistols/components/SocialsList'
 import WalletHeader from '@/pistols/components/account/WalletHeader'
 import DuelistEditModal from '@/pistols/components/DuelistEditModal'
 import UIContainer from '@/pistols/components/UIContainer'
@@ -25,25 +26,46 @@ const Col = Grid.Column
 
 export default function GateProfile() {
   const { isConnected } = useAccount()
+  const { accountSetupOpener } = usePistolsContext()
+
   return (
     <div id='Gate'>
       <UIContainer>
         <WalletHeader />
-        {isConnected && 
-          <ConnectedGate />
+        {isConnected &&
+          <Tab
+            menu={{ secondary: true, pointing: true, attached: true }}
+            panes={[
+              {
+                menuItem: 'Duelists',
+                render: () => <DuelistsList />,
+              },
+              {
+                menuItem: 'Socials',
+                render: () => <SocialsList />,
+              },
+            ]}
+          >
+          </Tab>
         }
       </UIContainer>
 
+      <DuelistEditModal opener={accountSetupOpener} />
       <CurrentChainHint />
     </div>
   )
 }
 
 
-function ConnectedGate() {
-  const { accountSetupOpener, dispatchSetAccountMenu } = usePistolsContext()
-  const { tableId, dispatchDuelistId } = useSettings()
+//------------------------------------
+// Duelists
+//
+
+function DuelistsList() {
   const { address } = useAccount()
+  const { dispatchDuelistId } = useSettings()
+  const { accountSetupOpener, dispatchSetAccountMenu } = usePistolsContext()
+  const { duelistBalance: duelistCount } = useDuelistBalanceOf(address)
   const { canMint } = useCanMintDuelist(address)
 
   const _mintDuelist = () => {
@@ -52,56 +74,42 @@ function ConnectedGate() {
     accountSetupOpener.open()
   }
 
-  return (
-    <>
-      <VStack className='Faded FillWidth UIAccountsListScroller_XX'>
-        <AccountsList />
-        <Divider />
-        <ActionButton fill disabled={!canMint} onClick={() => _mintDuelist()} label='Create New Duelist' />
-      </VStack>
-
-      <DuelistEditModal opener={accountSetupOpener} />
-    </>
-  )
-}
-
-
-
-export function AccountsList() {
-  const { address } = useAccount()
-  const { duelistBalance: duelistCount } = useDuelistBalanceOf(address)
-
   const rows = useMemo(() => {
     let result = []
     for (let index = 0; index < duelistCount; ++index) {
-      result.push(<AccountItem key={`i${index}`} index={index} />)
+      result.push(<DuelistItem key={`i${index}`} index={index} />)
     }
     return result
   }, [address, duelistCount])
 
   return (
-    <Grid className='Faded FillWidth'>
-      {duelistCount > 0 &&
-        <Row columns={'equal'} className='Title'>
-          <Col>
-            Pick Your Duelist
-          </Col>
-        </Row>
-      }
-      {rows}
-      {duelistCount == 0 &&
-        <Row columns={'equal'} className='Title'>
-          <Col>
-            You need a Duelist to Play
-          </Col>
-        </Row>
-      }
-    </Grid>
+    <VStack className='Faded FillWidth UIAccountsListScroller_XX'>
+      <Divider />
+      <Grid className='Faded FillWidth'>
+        {duelistCount > 0 &&
+          <Row columns={'equal'} className='Title'>
+            <Col>
+              Pick A Duelist To Play
+            </Col>
+          </Row>
+        }
+        {rows}
+        {duelistCount == 0 &&
+          <Row columns={'equal'} className='Title'>
+            <Col>
+              You need a Duelist to Play
+            </Col>
+          </Row>
+        }
+      </Grid>
+      <Divider />
+      <ActionButton fill disabled={!canMint} onClick={() => _mintDuelist()} label='Create New Duelist' />
+    </VStack>
   )
 }
 
 
-function AccountItem({
+function DuelistItem({
   index,
 }: {
   index: number
@@ -144,19 +152,20 @@ function AccountItem({
         </Col>
         <Col width={8} textAlign='left'>
 
-          <span className='H4 Bold'>
-            <IconClick name='edit' onClick={() => _manage()} />
+          <h4>
+            <IconClick name='edit' size={'small'} onClick={() => _manage()} />
             &nbsp;
             <ProfileName duelistId={duelistId} />
-          </span>
+          </h4>
           <h5>
             <WagerBalance duelistId={duelistId} />
           </h5>
         </Col>
-        <Col width={5} textAlign='left'>
+        <Col width={5} textAlign='left' verticalAlign='bottom'>
           <ActionButton fill important disabled={!_canPlay} onClick={() => _duel()} label='Duel!' />
         </Col>
       </Row>
     </>
   )
 }
+

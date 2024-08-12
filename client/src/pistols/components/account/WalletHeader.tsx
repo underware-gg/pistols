@@ -91,12 +91,6 @@ export default function WalletHeader({
         </Row>
       }
 
-      <Row columns={'equal'}>
-        <Col>
-          <Divider />
-        </Col>
-      </Row>
-
     </Grid>
   )
 }

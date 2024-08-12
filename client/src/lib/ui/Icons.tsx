@@ -273,7 +273,7 @@ export function CustomIcon({
       backgroundColor: null,
     }
     let classNames = [className ?? '', 'CustomIcon', 'icon', size]
-    if (disabled) classNames.push('disabled')
+    if (disabled) classNames.push('Translucent')
     if (flipped) classNames.push('flipped')
     if (onClick) {
       classNames.push('IconClick CustomIconClick')
