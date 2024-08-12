@@ -693,6 +693,8 @@ $ui-container-gap: 1em;
 .UIAccountsListScroller {
   @extend .UIMenuTavernScroller;
   height: calc($aspect-h - 12px - 285px - 12px - 41px - 12px);
+  // height: 100%;
+  // background-color: red;
 }
 
 .TitleCase {
@@ -728,6 +730,12 @@ $ui-container-gap: 1em;
   // border: $border-button-inactive;
   border-radius: 4px;
   margin: auto;
+}
+.ProfilePicMedium {
+  @extend .ProfilePicSquare;
+  width: 60px;
+  height: 60px;
+  border: none;
 }
 .ProfilePicSmall {
   @extend .ProfilePicSquare;

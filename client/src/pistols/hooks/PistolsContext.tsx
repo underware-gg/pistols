@@ -14,7 +14,7 @@ import { BigNumberish } from 'starknet'
 export enum SceneName {
   Splash = 'Splash',
   Gate = 'Gate',
-  Account = 'Account',
+  Profile = 'Profile',
   Duelists = 'Duelists',
   Tavern = 'Tavern',
   YourDuels = 'Your Duels',
@@ -263,7 +263,7 @@ export const usePistolsContext = () => {
     accountMenuItems,
     atSplash: (state.currentScene == SceneName.Splash),
     atGate: (state.currentScene == SceneName.Gate),
-    atAccount: (state.currentScene == SceneName.Account),
+    atProfile: (state.currentScene == SceneName.Profile),
     atTavern: (state.currentScene as string == state.menuKey as string),
     atDuelists: (state.currentScene == SceneName.Duelists),
     atYourDuels: (state.currentScene == SceneName.YourDuels),

@@ -11,12 +11,13 @@ const _makeUrl = (profilePic: number | null, square: boolean) => {
   const variant = (square ? 'square' : 'portrait')
   return `/profiles/${variant}/${('00' + profilePic).slice(-2)}.jpg`
 }
-const _className = ({ small, square, duel, anon }) => (
+const _className = ({ small, medium, square, duel, anon }) => (
   small ? 'ProfilePicSmall'
-    : anon ? 'ProfilePicAnon'
-      : square ? 'ProfilePicSquare'
-        : duel ? 'ProfilePicDuel'
-          : 'ProfilePic'
+    : medium ? 'ProfilePicMedium'
+      : anon ? 'ProfilePicAnon'
+        : square ? 'ProfilePicSquare'
+          : duel ? 'ProfilePicDuel'
+            : 'ProfilePic'
 )
 
 //---------------
@@ -27,6 +28,7 @@ export function ProfilePic({
   profilePic,
   srcUrl = null,
   small = false,
+  medium = false,
   square = false,
   duel = false,
   anon = false,
@@ -42,6 +44,7 @@ export function ProfilePic({
   profilePic: number
   srcUrl?: string
   small?: boolean
+  medium?: boolean
   square?: boolean
   duel?: boolean
   anon?: boolean
@@ -57,11 +60,11 @@ export function ProfilePic({
   const _clickable = (onClick != null && !disabled)
 
   const classNames = useMemo(() => {
-    let result = [_className({ small, square, duel, anon }), className]
+    let result = [_className({ small, medium, square, duel, anon }), className]
     if (_clickable) result.push('Anchor')
     if (disabled || dimmed) result.push('ProfilePicDisabled')
     return result
-  }, [className, small, square, duel, anon, disabled, dimmed])
+  }, [className, small, medium, square, duel, anon, disabled, dimmed])
   const url = useMemo(() => (srcUrl ?? _makeUrl(profilePic, square || anon)), [srcUrl, profilePic, square])
 
   // as Button
@@ -107,9 +110,10 @@ export function ProfilePicSquare({
 export function ProfilePicSquareButton({
   profilePic,
   small = false,
+  medium = false,
   disabled = false,
   dimmed = false,
   onClick,
 }) {
-  return <ProfilePic profilePic={profilePic} onClick={onClick} disabled={disabled} dimmed={dimmed} small={small} square={true} />
+  return <ProfilePic profilePic={profilePic} onClick={onClick} disabled={disabled} dimmed={dimmed} small={small} medium={medium} square={true} />
 }

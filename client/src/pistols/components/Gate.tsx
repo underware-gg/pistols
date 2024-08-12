@@ -2,33 +2,26 @@ import React from 'react'
 import { useRouter } from 'next/navigation'
 import { Grid } from 'semantic-ui-react'
 import { VStack, VStackRow } from '@/lib/ui/Stack'
-import { useAccount } from '@starknet-react/core'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { useSelectedChain, useConnectToSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useCanMintDuelist } from '../hooks/useTokenDuelist'
-import { ChainSwitcher } from '@/lib/dojo/ChainSwitcher'
-import { AccountMenuKey, usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { AccountsList } from '@/pistols/components/account/AccountsList'
+import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { Divider } from '@/lib/ui/Divider'
 import { makeTavernUrl } from '@/pistols/utils/pistols'
 import { PACKAGE_VERSION } from '@/pistols/utils/constants'
 import UIContainer from '@/pistols/components/UIContainer'
-import OnboardingModal from '@/pistols/components/account/OnboardingModal'
 import Logo from '@/pistols/components/Logo'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
-export default function Gate() {
-  const { isConnected, isConnecting, isCorrectChain } = useSelectedChain()
-  const { isLoading, isError } = useDojoStatus()
 
+export default function Gate() {
   const { dispatchSelectDuel } = usePistolsContext()
 
-  // cler tavern state
+  // clear tavern state
   useEffectOnce(() => {
     dispatchSelectDuel(0n)
   }, [])
@@ -36,41 +29,42 @@ export default function Gate() {
   return (
     <div id='Gate'>
       <UIContainer>
+        <GateHeader />
 
-        <VStack>
-          <Logo />
-
-          <h1>Pistols at Ten Blocks</h1>
-
-          <div className='H5 TitleCase'>
-            An <a href='https://underware.gg'>Underware</a> Game
-          </div>
-
-          <div className='Code Disabled'>
-            v{PACKAGE_VERSION}
-          </div>
-
-          <hr />
-
-          <span className='Title'>
-            Settle Your Grudges Honourably
-          </span>
-
-
-          {/* <WalletHeader /> */}
-
-        </VStack>
-
-        <DisconnectedGate />
+        <GateMenu />
 
       </UIContainer>
 
-      <CurrentChain />
+      <CurrentChainHint />
     </div>
   )
 }
 
-export function CurrentChain() {
+function GateHeader() {
+  return (
+    <VStack>
+      <Logo />
+
+      <h1>Pistols at Ten Blocks</h1>
+
+      <div className='H5 TitleCase'>
+        An <a href='https://underware.gg'>Underware</a> Game
+      </div>
+
+      <div className='Code Disabled'>
+        v{PACKAGE_VERSION}
+      </div>
+
+      <hr />
+
+      <span className='Title'>
+        Settle Your Grudges Honourably
+      </span>
+    </VStack>
+  )
+}
+
+export function CurrentChainHint() {
   const { selectedChainId } = useSelectedChain()
   return (
     <div className='Code Disabled AbsoluteRight Padded'>
@@ -83,14 +77,53 @@ export function CurrentChain() {
 //----------------------------------
 // Disconnected Gate
 //
-function DisconnectedGate() {
+function GateMenu() {
   const router = useRouter()
   const { tableId } = useSettings()
-  // const { connectOpener } = usePistolsContext()
-  const { isConnected, isConnecting, isCorrectChain } = useSelectedChain()
+  const { isConnecting } = useSelectedChain()
   const { isLoading, loadingMessage, isError, errorMessage } = useDojoStatus()
-  const { connect } = useConnectToSelectedChain(() => {
+  
+  const _onConnect = () => {
     router.push(makeTavernUrl(tableId))
+  }
+
+  return (
+    <VStack className='NoPadding'>
+      <Divider />
+
+      <ActionButton fill large important disabled={true} onClick={() => { }} label={'Play Tutorial'} />
+      <Divider content='OR' />
+      <ConnectButton onConnect={_onConnect} />
+      <Divider content='OR' />
+      <EnterAsGuestButton />
+
+      <ConnectStatus />
+
+    </VStack>
+  )
+}
+
+
+export function EnterAsGuestButton() {
+  const router = useRouter()
+  const { tableId, dispatchDuelistId } = useSettings()
+  const _enterAsGuest = () => {
+    dispatchDuelistId(0n)
+    router.push(makeTavernUrl(tableId))
+  }
+  return <ActionButton fill large onClick={() => _enterAsGuest()} label='Enter as Guest' />
+}
+
+
+export function ConnectButton({
+  onConnect,
+}: {
+  onConnect?: Function
+}) {
+  const { isConnecting } = useSelectedChain()
+  const { isLoading, isError } = useDojoStatus()
+  const { connect } = useConnectToSelectedChain(() => {
+    onConnect?.()
   })
 
   const canConnect = (!isLoading && !isError && !isConnecting && connect != null)
@@ -102,50 +135,15 @@ function DisconnectedGate() {
     }
   }
 
+  return <ActionButton fill large important disabled={!canConnect} onClick={() => _connect()} label={'Connect / Create Account'} />
+}
+
+
+export function ConnectStatus() {
+  const { isConnecting } = useSelectedChain()
+  const { isLoading, loadingMessage, isError, errorMessage } = useDojoStatus()
   return (
-    <VStack>
-      <Divider />
-      <Grid>
-        {/* <Row columns={'equal'}>
-          <Col>
-            <ChainSwitcher fluid disabled={isLoading} />
-          </Col>
-          <Col>
-            <ActionButton fill large important disabled={!canConnect} onClick={() => connectOpener.open()} label={switchChain ? 'Switch Chain' : 'Connect Wallet'} />
-          </Col>
-        </Row> */}
-
-        <Row columns={'equal'} className='NoPadding'>
-          <Col>
-            <ActionButton fill large important disabled={true} onClick={() => { }} label={'Play Tutorial'} />
-          </Col>
-        </Row>
-
-        <Row columns={'equal'} className='NoPadding'>
-          <Col>
-            <Divider content='OR' />
-          </Col>
-        </Row>
-
-        <Row columns={'equal'} className='NoPadding'>
-          <Col>
-            <ActionButton fill large important disabled={!canConnect} onClick={() => _connect()} label={'Connect Or Create Account'} />
-          </Col>
-        </Row>
-
-        <Row columns={'equal'} className='NoPadding'>
-          <Col>
-            <Divider content='OR' />
-          </Col>
-        </Row>
-
-        <Row columns={'equal'} className='NoPadding'>
-          <Col>
-            <EnterAsGuestButton />
-          </Col>
-        </Row>
-
-      </Grid>
+    <>
       {isConnecting ?
         <div>
           <Divider />
@@ -165,59 +163,9 @@ function DisconnectedGate() {
             </div>
             : <></>
       }
-    </VStack>
-  )
-}
-
-
-export function EnterAsGuestButton() {
-  const { tableId, dispatchDuelistId } = useSettings()
-  const router = useRouter()
-
-  const _enterAsGuest = () => {
-    dispatchDuelistId(0n)
-    router.push(makeTavernUrl(tableId))
-  }
-
-  return (
-    <ActionButton fill large onClick={() => _enterAsGuest()} label='Enter as Guest' />
-  )
-}
-
-
-//----------------------------------
-// Connected Gate
-//
-
-function ConnectedGate() {
-  const { accountSetupOpener, dispatchSetAccountMenu } = usePistolsContext()
-  const { tableId, dispatchDuelistId } = useSettings()
-  const { address } = useAccount()
-  const { canMint } = useCanMintDuelist(address)
-
-  const _mintDuelist = () => {
-    dispatchDuelistId(0n)
-    dispatchSetAccountMenu(AccountMenuKey.Profile)
-    accountSetupOpener.open()
-  }
-
-  return (
-    <>
-      <VStack>
-
-        <VStackRow>
-          <ActionButton fill disabled={!canMint} onClick={() => _mintDuelist()} label='Mint New Duelist' />
-        </VStackRow>
-
-      </VStack>
-
-      <div className='UIAccountsListScroller'>
-        <AccountsList />
-        <Divider content='OR' />
-        <EnterAsGuestButton />
-      </div>
-
-      <OnboardingModal opener={accountSetupOpener} />
     </>
   )
 }
+
+
+
