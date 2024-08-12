@@ -1,6 +1,6 @@
 import React, { ReactNode, createContext, useReducer, useContext } from 'react'
-import { Opener, useOpener } from '@/lib/ui/useOpener'
 import { BigNumberish } from 'starknet'
+import { Opener, useOpener } from '@/lib/ui/useOpener'
 
 //
 // React + Typescript + Context
@@ -43,18 +43,6 @@ const tavernMenuItems: MenuKey[] = [
   MenuKey.IRLTournament,
 ]
 
-export enum AccountMenuKey {
-  // Deploy = 'Deploy',
-  // Fund = 'Fund',
-  Profile = 'Profile',
-}
-
-const accountMenuItems: AccountMenuKey[] = [
-  // AccountMenuKey.Deploy,
-  // AccountMenuKey.Fund,
-  AccountMenuKey.Profile,
-]
-
 //--------------------------------
 // State
 //
@@ -65,7 +53,6 @@ export const initialState = {
   selectedDuelistId: 0n,
   challengingId: 0n,
   menuKey: MenuKey.Duelists,
-  accountMenuKey: AccountMenuKey.Profile,
   currentScene: SceneName.Splash,
   lastScene: undefined,
   duelistsAnon: true,
@@ -94,7 +81,6 @@ type PistolsContextStateType = typeof initialState
 
 type ActionType =
   | { type: 'SET_SIG', payload: bigint[] }
-  | { type: 'SET_ACCOUNT_MENU_KEY', payload: AccountMenuKey }
   | { type: 'SET_MENU_KEY', payload: MenuKey }
   | { type: 'SET_SCENE', payload: SceneName }
   | { type: 'SELECT_DUEL', payload: bigint }
@@ -136,10 +122,6 @@ const PistolsProvider = ({
           address: action.payload[0] as bigint,
           sig: action.payload[1] as bigint,
         }
-        break
-      }
-      case PistolsActions.SET_ACCOUNT_MENU_KEY: {
-        newState.accountMenuKey = action.payload as AccountMenuKey
         break
       }
       case PistolsActions.SET_MENU_KEY: {
@@ -208,12 +190,6 @@ export const usePistolsContext = () => {
       payload: [BigInt(address ?? 0n), BigInt(sig ?? 0n)]
     })
   }
-  const dispatchSetAccountMenu = (menuKey: AccountMenuKey) => {
-    dispatch({
-      type: PistolsActions.SET_ACCOUNT_MENU_KEY,
-      payload: menuKey,
-    })
-  }
   const dispatchSetMenu = (menuKey: MenuKey) => {
     dispatch({
       type: PistolsActions.SET_MENU_KEY,
@@ -258,9 +234,9 @@ export const usePistolsContext = () => {
   }
   return {
     ...state,
+    SceneName,
     hasSigned: (state.walletSig.sig > 0n),
     tavernMenuItems,
-    accountMenuItems,
     atSplash: (state.currentScene == SceneName.Splash),
     atGate: (state.currentScene == SceneName.Gate),
     atProfile: (state.currentScene == SceneName.Profile),
@@ -275,7 +251,6 @@ export const usePistolsContext = () => {
     // PistolsActions,
     // dispatch,
     dispatchSetSig,
-    dispatchSetAccountMenu,
     dispatchSetMenu,
     dispatchSetScene,
     dispatchSetLastScene,

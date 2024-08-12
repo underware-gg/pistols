@@ -7,7 +7,7 @@ import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useCanMintDuelist } from '../hooks/useTokenDuelist'
 import { useDuelistBalanceOf, useDuelistOfOwnerByIndex, useDuelistTokenCount } from '@/pistols/hooks/useTokenDuelist'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { AccountMenuKey, usePistolsContext, initialState } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, initialState } from '@/pistols/hooks/PistolsContext'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
 import { ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { WagerBalance } from '@/pistols/components/account/LordsBalance'
@@ -64,13 +64,12 @@ export default function GateProfile() {
 function DuelistsList() {
   const { address } = useAccount()
   const { dispatchDuelistId } = useSettings()
-  const { accountSetupOpener, dispatchSetAccountMenu } = usePistolsContext()
+  const { accountSetupOpener } = usePistolsContext()
   const { duelistBalance: duelistCount } = useDuelistBalanceOf(address)
   const { canMint } = useCanMintDuelist(address)
 
   const _mintDuelist = () => {
     dispatchDuelistId(0n)
-    dispatchSetAccountMenu(AccountMenuKey.Profile)
     accountSetupOpener.open()
   }
 
