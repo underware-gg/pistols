@@ -41,12 +41,16 @@ export const LordsBalance = ({
 // Wager Balance of a Duelist on a Table
 //
 export const WagerBalance = ({
-  tableId,
   duelistId,
-}) => {
+  tableId,
+} : {
+  duelistId: BigNumberish
+  tableId?: string
+}
+) => {
   const { wagerBalanceWei } = useScoreboard(tableId, duelistId)
   return (
-    <Balance tableId={tableId} wei={wagerBalanceWei} />
+    <Balance tableId={tableId ?? tables.LORDS} wei={wagerBalanceWei} />
   )
 }
 

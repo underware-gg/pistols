@@ -14,12 +14,11 @@ import { WagerBalance } from '@/pistols/components/account/LordsBalance'
 import { makeTavernUrl } from '@/pistols/utils/pistols'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { Divider } from '@/lib/ui/Divider'
-import { CurrentChainHint } from './Gate'
-import UIContainer from '@/pistols/components/UIContainer'
-import OnboardingModal from '@/pistols/components/account/OnboardingModal'
-import WalletHeader from './account/WalletHeader'
-import { tables } from '@/games/pistols/generated/constants'
 import { IconClick } from '@/lib/ui/Icons'
+import { CurrentChainHint } from '@/pistols/components/Gate'
+import WalletHeader from '@/pistols/components/account/WalletHeader'
+import DuelistEditModal from '@/pistols/components/DuelistEditModal'
+import UIContainer from '@/pistols/components/UIContainer'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -61,7 +60,7 @@ function ConnectedGate() {
         <ActionButton fill disabled={!canMint} onClick={() => _mintDuelist()} label='Create New Duelist' />
       </VStack>
 
-      <OnboardingModal opener={accountSetupOpener} />
+      <DuelistEditModal opener={accountSetupOpener} />
     </>
   )
 }
@@ -145,12 +144,13 @@ function AccountItem({
         </Col>
         <Col width={8} textAlign='left'>
 
-          <IconClick name='edit' onClick={() => _manage()} />
           <span className='H4 Bold'>
+            <IconClick name='edit' onClick={() => _manage()} />
+            &nbsp;
             <ProfileName duelistId={duelistId} />
           </span>
           <h5>
-            <WagerBalance tableId={tables.LORDS} duelistId={duelistId} />
+            <WagerBalance duelistId={duelistId} />
           </h5>
         </Col>
         <Col width={5} textAlign='left'>
