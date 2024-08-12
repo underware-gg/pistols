@@ -8,12 +8,11 @@ import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { useSignTypedMessage, useTypedMessage, useVerifyMessagesOffChain, useVerifyMessagesOnChain } from '@/lib/utils/hooks/useTypedMessage'
 import { feltToString } from '@/lib/utils/starknet'
 import { bigintToHex, shortAddress } from '@/lib/utils/types'
-import { makeDojoAppConfig } from '@/games/pistols/config'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { ChainSwitcher } from '@/lib/dojo/ChainSwitcher'
 import { Messages } from '@/lib/utils/starknet_sign'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
-import AppDojo from '@/lib/ui/AppDojo'
+import App from '@/lib/ui/App'
 
 //@ts-ignore
 BigInt.prototype.toJSON = function () { return bigintToHex(this) }
@@ -28,14 +27,14 @@ const HeaderCell = Table.HeaderCell
 
 export default function IndexPage() {
   return (
-    <AppDojo dojoAppConfig={makeDojoAppConfig()}>
+    <App>
       <Container>
         <DojoAccount />
         <Connect />
         <SignV0 />
         <SignV1 />
       </Container>
-    </AppDojo>
+    </App>
   );
 }
 
