@@ -73,7 +73,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
 
   //
   // Check world deployment
-  const { isDeployed } = useSystem(dojoAppConfig.nameSpace, dojoAppConfig.mainSystemName, manifest)
+  const { isDeployed } = useSystem(dojoAppConfig.nameSpace, Object.keys(dojoAppConfig.contractInterfaces)[0], manifest)
 
   //
   // Initialize components

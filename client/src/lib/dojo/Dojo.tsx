@@ -11,9 +11,13 @@ import { Account } from 'starknet'
 // export type DojoManifest = Manifest
 export type DojoManifest = Manifest & any
 
+export interface ContractInterfaces {
+  [contractName: string]: string[] 
+}
+
 export interface DojoAppConfig {
   nameSpace: string
-  mainSystemName: string
+  contractInterfaces: ContractInterfaces
   supportedChainIds: ChainId[]
   initialChainId: ChainId
   manifests: { [chain_id: string]: DojoManifest | undefined }

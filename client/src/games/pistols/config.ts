@@ -30,10 +30,14 @@ const manifests: Record<ChainId, DojoManifest> = {
 
 export const makeDojoAppConfig = (): DojoAppConfig => {
   return {
-    nameSpace: 'pistols',
-    mainSystemName: 'actions',
+    manifests,
     supportedChainIds,
     initialChainId: defaultChainId,
-    manifests,
+    nameSpace: 'pistols',
+    contractInterfaces: {
+      actions: ['IActions'],
+      lords_mock: ['ILordsMockFaucet', 'IERC20Allowance'],
+      admin: ['IAdmin'],
+    },
   }
 }
