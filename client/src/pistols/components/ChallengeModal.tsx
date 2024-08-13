@@ -1,9 +1,8 @@
 import React, { useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { Grid, Modal } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { SceneName, usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
@@ -21,13 +20,11 @@ import { IconClick } from '@/lib/ui/Icons'
 import { Divider } from '@/lib/ui/Divider'
 import { bigintToHex } from '@/lib/utils/types'
 import { ChallengeState } from '@/games/pistols/generated/constants'
-import { makeDuelUrl } from '@/pistols/utils/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export default function ChallengeModal() {
-  const router = useRouter()
   const { reply_challenge } = useDojoSystemCalls()
   const { duelistId } = useSettings()
   const { account } = useAccount()
@@ -64,8 +61,9 @@ export default function ChallengeModal() {
     _submit()
   }
 
+  const { dispatchSetScene } = usePistolsScene()
   const _gotoDuel = () => {
-    router.push(makeDuelUrl(selectedDuelId))
+    dispatchSetScene(SceneName.Duel)
   }
 
   return (

@@ -2,8 +2,8 @@ import 'semantic-ui-css/semantic.min.css'
 import '/styles/fonts.scss'
 import '/styles/styles.scss'
 import React from 'react'
-import { PistolsProvider } from '@/pistols/hooks/PistolsContext'
 import { SettingsProvider } from '@/pistols/hooks/SettingsContext'
+import { PistolsProvider } from '@/pistols/hooks/PistolsContext'
 // import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 // import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import { makeDojoAppConfig } from '@/games/pistols/config'
@@ -12,14 +12,14 @@ import Dojo from '@/lib/dojo/Dojo'
 
 function _app({ Component, pageProps }) {
   return (
-    <PistolsProvider>
-      <SettingsProvider>
+    <SettingsProvider>
+      <PistolsProvider>
         <Dojo dojoAppConfig={makeDojoAppConfig()}>
           <Component {...pageProps} />
           <Modals />
         </Dojo>
-      </SettingsProvider>
-    </PistolsProvider>
+      </PistolsProvider>
+    </SettingsProvider>
   )
 }
 

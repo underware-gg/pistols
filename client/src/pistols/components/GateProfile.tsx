@@ -1,17 +1,15 @@
 import React, { useMemo } from 'react'
-import { useRouter } from 'next/navigation'
-import { Grid, Tab, Image } from 'semantic-ui-react'
-import { VStack, VStackRow } from '@/lib/ui/Stack'
+import { Grid, Tab } from 'semantic-ui-react'
+import { VStack } from '@/lib/ui/Stack'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useCanMintDuelist } from '../hooks/useTokenDuelist'
-import { useDuelistBalanceOf, useDuelistOfOwnerByIndex, useDuelistTokenCount } from '@/pistols/hooks/useTokenDuelist'
+import { useDuelistBalanceOf, useDuelistOfOwnerByIndex } from '@/pistols/hooks/useTokenDuelist'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { usePistolsContext, initialState } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, initialState, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
 import { ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { WagerBalance } from '@/pistols/components/account/LordsBalance'
-import { makeTavernUrl } from '@/pistols/utils/pistols'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { Divider } from '@/lib/ui/Divider'
 import { IconClick } from '@/lib/ui/Icons'
@@ -113,7 +111,6 @@ function DuelistItem({
 }: {
   index: number
 }) {
-  const router = useRouter()
   const { address } = useAccount()
   const { duelistId } = useDuelistOfOwnerByIndex(address, index)
   const { exists, profilePic } = useDuelist(duelistId)
@@ -128,11 +125,10 @@ function DuelistItem({
     accountSetupOpener.open()
   }
 
-  const { tableId } = useSettings()
-  const _duel = (menuKey = initialState.menuKey) => {
+  const { dispatchSetLastScene } = usePistolsScene()
+  const _duel = () => {
     dispatchDuelistId(BigInt(duelistId ?? 0))
-    dispatchSetMenu(menuKey)
-    router.push(makeTavernUrl(tableId))
+    dispatchSetLastScene()
   }
 
   return (

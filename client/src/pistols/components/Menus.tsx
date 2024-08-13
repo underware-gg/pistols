@@ -1,14 +1,12 @@
 import React, { useMemo } from 'react'
-import { useRouter } from 'next/navigation'
 import { Grid, Menu } from 'semantic-ui-react'
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { usePistolsScene, usePistolsContext, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { DuelStage } from '@/pistols/hooks/useDuel'
 import { SPRITESHEETS } from '@/pistols/data/assets'
 import { AnimationState } from '@/pistols/three/game'
 import { IconClick } from '@/lib/ui/Icons'
-import { makeTavernUrl } from '@/pistols/utils/pistols'
 import { bigintToHex } from '@/lib/utils/types'
 
 const Row = Grid.Row
@@ -19,13 +17,13 @@ export function MenuDuel({
   duelId,
   tableId,
 }) {
-  const router = useRouter()
   const { dispatchSetting, settings, SettingsActions } = useSettings()
   const { dispatchSelectDuel } = usePistolsContext()
+  const { dispatchSetScene } = usePistolsScene()
 
   const _backToTavern = () => {
     dispatchSelectDuel(0n)
-    router.push(makeTavernUrl(tableId))
+    dispatchSetScene(SceneName.Tavern)
   }
 
   const _switchSfx = () => {

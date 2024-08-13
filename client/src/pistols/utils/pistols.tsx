@@ -194,10 +194,3 @@ export const ArchetypeNames: Record<Archetype, string> = {
   [Archetype.Trickster]: 'Trickster',
   [Archetype.Honourable]: 'Honourable',
 }
-
-//-------------------------
-// client stuff
-//
-
-export const makeTavernUrl = (tableId: string) => (`/tavern/${tableId}`)
-export const makeDuelUrl = (duelId: bigint) => (`/duel/${bigintToHex(duelId)}`)

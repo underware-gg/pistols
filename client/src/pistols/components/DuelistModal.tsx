@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react'
-import { useRouter } from 'next/navigation'
-import { Grid, Modal, Icon } from 'semantic-ui-react'
+import { Grid, Modal } from 'semantic-ui-react'
 import { useSettings } from '../hooks/SettingsContext'
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { usePact } from '@/pistols/hooks/usePact'
 import { useDuelistOwner } from '@/pistols/hooks/useTokenDuelist'
@@ -19,7 +18,7 @@ const Col = Grid.Column
 
 export default function DuelistModal() {
   const { tableId, duelistId, isAnon, dispatchDuelistId } = useSettings()
-  const router = useRouter()
+  const { dispatchSetScene } = usePistolsScene()
 
   const { selectedDuelistId, dispatchSelectDuel, dispatchSelectDuelistId, dispatchChallengingDuelistId } = usePistolsContext()
   const { owner } = useDuelistOwner(selectedDuelistId)
@@ -34,7 +33,7 @@ export default function DuelistModal() {
 
   const _switch = () => {
     if (isYou) {
-      router.push(`/`)
+      dispatchSetScene(SceneName.Gate)
     } else if (isMyDuelist) {
       dispatchDuelistId(selectedDuelistId)
     }

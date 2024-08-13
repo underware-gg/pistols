@@ -1,9 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { Grid, Menu, Label, Tab, TabPane } from 'semantic-ui-react'
 import { useQueryContext } from '@/pistols/hooks/QueryContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, MenuKey, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useTable } from '@/pistols/hooks/useTable'
 import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
 import { IRLTournamentTab } from '@/pistols/components/tournament/IRLTournamentTab'
@@ -28,9 +27,9 @@ const _makeBubble = (count) => {
 
 export function TavernMenu({
 }) {
-  const router = useRouter()
   const { tableId, isAnon } = useSettings()
   const { menuKey, tavernMenuItems, tableOpener, dispatchSetMenu } = usePistolsContext()
+  const { dispatchSetScene } = usePistolsScene()
   const { description, isTournament, isIRLTournament } = useTable(tableId)
 
   const {
@@ -121,7 +120,7 @@ export function TavernMenu({
           <MusicToggle />
           &nbsp;&nbsp;
           &nbsp;&nbsp;
-          <IconClick name='sign out' size={'large'} onClick={() => router.push(`/`)} />
+          <IconClick name='sign out' size={'large'} onClick={() => dispatchSetScene(SceneName.Gate)} />
           &nbsp;&nbsp;&nbsp;
         </div>
 

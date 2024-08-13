@@ -24,7 +24,7 @@ const nextConfig = {
         destination: '/main/gate',
       },
       {
-        source: '/account/:slug*',
+        source: '/profile/:slug*',
         destination: '/main/account/:slug*',
       },
       {

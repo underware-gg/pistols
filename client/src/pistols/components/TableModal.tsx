@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'next/router'
 import { Grid, Modal, Dropdown } from 'semantic-ui-react'
+import { usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useActiveDuelistIds } from '@/pistols/hooks/useChallenge'
@@ -11,7 +11,6 @@ import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { Opener } from '@/lib/ui/useOpener'
 import { Divider } from '@/lib/ui/Divider'
 import { getObjectKeyByValue } from '@/lib/utils/types'
-import { makeTavernUrl } from '@/pistols/utils/pistols'
 import { tables } from '@/games/pistols/generated/constants'
 
 const Row = Grid.Row
@@ -23,6 +22,7 @@ export default function TableModal({
   opener: Opener
 }) {
   const { tableId, dispatchTableId } = useSettings()
+  const { dispatchSetScene } = usePistolsScene()
   const [selectedTableId, setSelectedTableId] = useState('')
   const { tableIsOpen } = useTable(selectedTableId)
 
@@ -46,10 +46,9 @@ export default function TableModal({
   }, [unknownTable, opener.isOpen])
   // console.log(unknownTable, tableId, selectedTableId)
 
-  const router = useRouter()
   const _joinTable = () => {
     dispatchTableId(selectedTableId)
-    router.replace(makeTavernUrl(selectedTableId))
+    dispatchSetScene(SceneName.Tavern, [selectedTableId])
     opener.close()
   }
 
@@ -85,9 +84,6 @@ export default function TableModal({
           <Row columns='equal'>
             <Col>
               <ActionButton fill label='Close' onClick={() => opener.close()} />
-            </Col>
-            <Col>
-              <ActionButton fill label='Leave Tavern' onClick={() => router.push(`/`)} />
             </Col>
             <Col>
               <ActionButton fill important label='Join Table' disabled={!tableIsOpen || !selectedTableId} onClick={() => _joinTable()} />

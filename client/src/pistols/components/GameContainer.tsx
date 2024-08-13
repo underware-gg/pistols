@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useUserHasInteracted } from '@/lib/utils/hooks/useUserHasInteracted'
@@ -9,17 +9,9 @@ import GameCanvas from '@/pistols/components/GameCanvas'
 
 function GameContainer({
   isVisible,
-  duelId,
 }) {
-  const { dispatchSelectDuel } = usePistolsContext()
   const { audioLoaded } = useThreeJsContext()
   const { initialized } = useSettings()
-
-  useEffect(() => {
-    if (duelId) {
-      dispatchSelectDuel(duelId)
-    }
-  }, [duelId])
 
   if (!initialized) return <></>
 
@@ -38,7 +30,7 @@ function GameContainer({
 // Asks for interaction if necessary
 //
 function GameAudioLoader() {
-  const { atDuel } = usePistolsContext()
+  const { atDuel } = usePistolsScene()
   const {
     gameImpl,
     audioLoaded,

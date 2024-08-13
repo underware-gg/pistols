@@ -427,7 +427,6 @@ function setupScenes() {
       _scenes[sceneName] = setupStaticScene(sceneName)
     }
   })
-  // switchScene(SceneName.Splash)
 }
 
 //

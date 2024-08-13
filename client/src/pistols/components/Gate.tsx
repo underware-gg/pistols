@@ -1,15 +1,13 @@
 import React from 'react'
-import { useRouter } from 'next/navigation'
 import { Grid } from 'semantic-ui-react'
-import { VStack, VStackRow } from '@/lib/ui/Stack'
+import { VStack } from '@/lib/ui/Stack'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { useSelectedChain, useConnectToSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { SceneName, usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { Divider } from '@/lib/ui/Divider'
-import { makeTavernUrl } from '@/pistols/utils/pistols'
 import { PACKAGE_VERSION } from '@/pistols/utils/constants'
 import UIContainer from '@/pistols/components/UIContainer'
 import Logo from '@/pistols/components/Logo'
@@ -47,16 +45,20 @@ function GateHeader() {
 
       <h1>Pistols at Ten Blocks</h1>
 
+      <div className='Spacer5' />
       <div className='H5 TitleCase'>
         An <a href='https://underware.gg'>Underware</a> Game
       </div>
 
-      <div className='Code Disabled'>
-        v{PACKAGE_VERSION}
+      <div className='Spacer10' />
+        <div className='Code Disabled'>
+        version {PACKAGE_VERSION}
       </div>
 
+      <div className='Spacer10' />
       <hr />
 
+      <div className='Spacer10' />
       <span className='Title'>
         Settle Your Grudges Honourably
       </span>
@@ -78,18 +80,16 @@ export function CurrentChainHint() {
 // Disconnected Gate
 //
 function GateMenu() {
-  const router = useRouter()
-  const { tableId } = useSettings()
-  const { isConnecting } = useSelectedChain()
-  const { isLoading, loadingMessage, isError, errorMessage } = useDojoStatus()
+  const { dispatchSetScene } = usePistolsScene()
   
   const _onConnect = () => {
-    router.push(makeTavernUrl(tableId))
+    dispatchSetScene(SceneName.Tavern)
   }
 
   return (
     <VStack className='NoPadding'>
-      <Divider />
+      <hr />
+      <Divider hidden />
 
       <ActionButton fill large important disabled={true} onClick={() => { }} label={'Play Tutorial'} />
       <Divider content='OR' />
@@ -105,11 +105,12 @@ function GateMenu() {
 
 
 export function EnterAsGuestButton() {
-  const router = useRouter()
-  const { tableId, dispatchDuelistId } = useSettings()
+  const { dispatchDuelistId } = useSettings()
+  const { dispatchSetScene } = usePistolsScene()
+  
   const _enterAsGuest = () => {
     dispatchDuelistId(0n)
-    router.push(makeTavernUrl(tableId))
+    dispatchSetScene(SceneName.Tavern)
   }
   return <ActionButton fill large onClick={() => _enterAsGuest()} label='Enter as Guest' />
 }

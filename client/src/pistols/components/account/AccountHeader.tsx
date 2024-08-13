@@ -2,29 +2,28 @@ import React from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { LordsBalance } from '@/pistols/components/account/LordsBalance'
-import { useRouter } from 'next/navigation'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export default function AccountHeader() {
-  const router = useRouter()
   const { address, isConnected } = useAccount()
   const { isAnon, duelistId } = useSettings()
+  const { dispatchSetScene } = usePistolsScene()
   // const { dispatchSelectDuelistId } = usePistolsContext()
 
   const { nameDisplay, profilePic } = useDuelist(duelistId)
 
   const _click = () => {
     if (isAnon) {
-      router.push(`/account`)
+      dispatchSetScene(SceneName.Profile)
     } else {
-      router.push(`/account`)
+      dispatchSetScene(SceneName.Profile)
     }
   }
 
