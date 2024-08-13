@@ -6,7 +6,7 @@ use starknet::ContractAddress;
 
 // use openzeppelin::utils::snip12::{SNIP12Metadata, StructHash, OffchainMessageHashImpl};
 use pistols::utils::openzeppelin::snip12::{SNIP12Metadata, StructHash, OffchainMessageHashImpl};
-use openzeppelin::account::dual_account::{DualCaseAccount, DualCaseAccountABI};
+use openzeppelin_account::dual_account::{DualCaseAccount, DualCaseAccountABI};
 
 mod TYPED_DATA {
     const NAME: felt252 = 'Underware';

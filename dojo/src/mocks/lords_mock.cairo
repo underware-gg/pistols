@@ -53,7 +53,6 @@ trait ILordsMockFaucet<TState> {
 #[dojo::contract]
 mod lords_mock {
     use debug::PrintTrait;
-    use integer::BoundedInt;
     use starknet::ContractAddress;
     use starknet::{get_caller_address, get_contract_address};
     use zeroable::Zeroable;

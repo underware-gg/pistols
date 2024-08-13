@@ -7,7 +7,7 @@ mod CONFIG {
 
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-struct Config {
+pub struct Config {
     #[key]
     key: u8,
     //------

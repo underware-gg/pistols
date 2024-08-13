@@ -1,0 +1,22 @@
+[world]
+name = "Pistols at 10 Blocks"
+description = "An on-chain pistol duelling game of honour and betrayal."
+icon_uri = "https://pistols.underware.gg/images/logo.png"
+cover_uri = "https://pistols.underware.gg/images/splash.png"
+website = "https://pistols.underware.gg"
+seed = "pistols"
+
+[world.socials]
+x = "https://x.com/underware_gg"
+github = "https://github.com/underware-gg/pistols"
+# discord = "https://discord.gg/FB2wR6uF"
+# telegram = "https://t.me/dojoengine"
+
+[namespace]
+default = "pistols"
+
+[env]
+rpc_url = "https://api.cartridge.gg/x/pistols-staging/katana"
+account_address = "0x208b35fff7421f2964ec0fff1ce2ea8da51b7b31391696ff50e7b6ccc49a46d"
+private_key = "0x3ad07c09ad9c0de52d2d309d93b362af602398fb4f1c535478a9cf8ccbfbe30"
+world_address = "0x360fd2af2f118387ae282b66bfdbb6d4bb7e45a7213e101e5b8aa3471939677"

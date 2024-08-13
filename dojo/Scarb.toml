@@ -1,7 +1,7 @@
 [package]
 name = "pistols"
-version = "0.10.0-1"
-cairo-version = "=2.7.0-rc.3"
+version = "0.10.0-2"
+cairo-version = "2.7.0"
 
 [cairo]
 sierra-replace-ids = true
@@ -10,36 +10,12 @@ sierra-replace-ids = true
 migrate = "./migrate"
 
 [dependencies]
-dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.0.0-alpha.4" }
+dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.0.0-alpha.5" }
 # origami_token = { git = "https://github.com/dojoengine/origami", tag = "v1.0.0-alpha.0" }
 origami_token = { git = "https://github.com/rsodre/origami", branch = "balance-enumerable" }
 graffiti = { git = "https://github.com/ponderingdemocritus/graffiti", rev = "bc569531791dbc71c6cd8d9bc154c34eedad31fe" }
-openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", rev = "5f03fba338b4cb321776947fb98b4584a32adece" }
-
-#-------------------------------
-# DOJO CONFIG
-#
-
-[tool.dojo.world]
-name = "Pistols at 10 Blocks"
-description = "An on-chain pistol duelling game of honour and betrayal."
-icon_uri = "https://pistols.underware.gg/images/logo.png"
-cover_uri = "https://pistols.underware.gg/images/splash.png"
-website = "https://pistols.underware.gg"
-seed = "pistols"
-
-[tool.dojo.world.socials]
-x = "https://x.com/underware_gg"
-github = "https://github.com/underware-gg/pistols"
-# discord = "https://discord.gg/FB2wR6uF"
-# telegram = "https://t.me/dojoengine"
-
-[tool.dojo.world.namespace]
-default = "pistols"
-# mappings = { "origami_token" = "other_project_token" }
-
-[tool.dojo]
-initializer_class_hash = "0xbeef"
+openzeppelin_account = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.0" }
+openzeppelin_test_common = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.0" }
 
 [[target.dojo]]
 build-external-contracts = [
@@ -67,39 +43,12 @@ build-external-contracts = [
 default = ["lords_mock"]
 lords_mock = []
 
-# -----------------------
-# defaults for all profiles
-# 
-[tool.dojo.env]
-# rpc_url = "http://localhost:5050"
-# account_address = "0xb3ff441a68610b30fd5e2abbf3a1548eb6ba6f3559f2862bf2dc757e5828ca"
-# private_key = "0x2bbf4f9fd0bbb2e60b0316c1fe0b76cf7a4d0198bd493ced9b8df2a3a24d68a"
-world_address = "0x4037e9ea1a016636a088c1bae640f9812451333be587a475bf175b0437102af"
 
-# -----------------------
-# staging (pistols-slot)
-# 
-# [profile.staging.tool.dojo.env]
-rpc_url = "https://api.cartridge.gg/x/pistols-staging/katana"
-account_address = "0x208b35fff7421f2964ec0fff1ce2ea8da51b7b31391696ff50e7b6ccc49a46d"
-private_key = "0x3ad07c09ad9c0de52d2d309d93b362af602398fb4f1c535478a9cf8ccbfbe30"
+#--------------------------
+# Dojo profiles declaration
+#
+[profile.slot]
 
-# -----------------------
-# slot (pistols)
-# 
-[profile.slot.tool.dojo.env]
-rpc_url = "https://api.cartridge.gg/x/pistols/katana"
-account_address = "0x2ec24cd4415a28e821c5b4b9dc3801340cb2e1a23f4289443d15fea60e2daab"
-private_key = "0x1f3a9e4f7827167d6f7e93b8f2debc3129b06ceca19d02355434499592bf16c"
+[profile.staging]
 
-# -----------------------
-# SN_SEPOLIA
-# 
-[profile.sepolia.tool.dojo]
-skip_migration = ["pistols-lords_mock"]
-features = []
-
-[profile.sepolia.tool.dojo.env]
-# rpc_url = ""          # env: STARKNET_RPC_URL
-# account_address = ""  # env: DOJO_ACCOUNT_ADDRESS
-# private_key = ""      # env: DOJO_PRIVATE_KEY
+[profile.sepolia]

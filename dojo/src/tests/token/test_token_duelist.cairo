@@ -1,5 +1,4 @@
 use debug::PrintTrait;
-use integer::BoundedInt;
 use starknet::{ContractAddress, get_contract_address, get_caller_address, testing};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use dojo::utils::test::spawn_test_world;
@@ -52,6 +51,7 @@ use pistols::models::{
 
 use pistols::models::table::{tables};
 use pistols::types::constants::{constants};
+use pistols::interfaces::systems::{SELECTORS};
 
 //
 // events helpers
@@ -120,9 +120,17 @@ fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterD
 'TEST_CLASS_HASH OK!'.print();
 
     let mut token = ITokenDuelistDispatcher {
-        contract_address: world.deploy_contract('salt',
+        contract_address: world.deploy_contract(
+            'salt',
             token_duelist::TEST_CLASS_HASH.try_into().unwrap(),
-            array![].span(),
+        )
+    };
+
+    // deploy minter
+    let mut minter = IMinterDispatcher {
+        contract_address: world.deploy_contract(
+            'salt2',
+            minter::TEST_CLASS_HASH.try_into().unwrap(),
         )
     };
     let minter_call_data: Array<felt252> = array![
@@ -131,43 +139,38 @@ fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterD
         2, // wallet_max
         1, // is_open
     ];
-    let mut minter = IMinterDispatcher {
-        contract_address: world.deploy_contract('salt2',
-            minter::TEST_CLASS_HASH.try_into().unwrap(),
-            minter_call_data.span(),
-        )
-    };
+    world.init_contract(SELECTORS::MINTER, minter_call_data.span());
 
     // setup auth
-    world.grant_writer(selector!("origami_token-SRC5Model"), token.contract_address);
-    world.grant_writer(selector!("origami_token-InitializableModel"), token.contract_address);
-    world.grant_writer(selector!("origami_token-ERC721MetaModel"), token.contract_address);
-    world.grant_writer(selector!("origami_token-ERC721TokenApprovalModel"), token.contract_address);
-    world.grant_writer(selector!("origami_token-ERC721BalanceModel"), token.contract_address);
-    world.grant_writer(selector!("origami_token-ERC721EnumerableIndexModel"),token.contract_address);
-    world.grant_writer(selector!("origami_token-ERC721EnumerableOwnerIndexModel"),token.contract_address);
-    world.grant_writer(selector!("origami_token-ERC721EnumerableTokenModel"),token.contract_address);
-    world.grant_writer(selector!("origami_token-ERC721EnumerableOwnerTokenModel"),token.contract_address);
-    world.grant_writer(selector!("origami_token-ERC721EnumerableTotalModel"),token.contract_address);
-    world.grant_writer(selector!("origami_token-ERC721MetadataModel"), token.contract_address);
-    world.grant_writer(selector!("origami_token-ERC721OwnerModel"), token.contract_address);
+    world.grant_writer(selector_from_tag!("origami_token-SRC5Model"), token.contract_address);
+    world.grant_writer(selector_from_tag!("origami_token-InitializableModel"), token.contract_address);
+    world.grant_writer(selector_from_tag!("origami_token-ERC721MetaModel"), token.contract_address);
+    world.grant_writer(selector_from_tag!("origami_token-ERC721TokenApprovalModel"), token.contract_address);
+    world.grant_writer(selector_from_tag!("origami_token-ERC721BalanceModel"), token.contract_address);
+    world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableIndexModel"),token.contract_address);
+    world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableOwnerIndexModel"),token.contract_address);
+    world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableTokenModel"),token.contract_address);
+    world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableOwnerTokenModel"),token.contract_address);
+    world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableTotalModel"),token.contract_address);
+    world.grant_writer(selector_from_tag!("origami_token-ERC721MetadataModel"), token.contract_address);
+    world.grant_writer(selector_from_tag!("origami_token-ERC721OwnerModel"), token.contract_address);
 
-    world.grant_writer(selector!("origami_token-SRC5Model"), OWNER());
-    world.grant_writer(selector!("origami_token-InitializableModel"), OWNER());
-    world.grant_writer(selector!("origami_token-ERC721MetaModel"), OWNER());
-    world.grant_writer(selector!("origami_token-ERC721TokenApprovalModel"),  OWNER());
-    world.grant_writer(selector!("origami_token-ERC721BalanceModel"),  OWNER());
-    world.grant_writer(selector!("origami_token-ERC721EnumerableIndexModel"), OWNER());
-    world.grant_writer(selector!("origami_token-ERC721EnumerableOwnerIndexModel"), OWNER());
-    world.grant_writer(selector!("origami_token-ERC721EnumerableTokenModel"), OWNER());
-    world.grant_writer(selector!("origami_token-ERC721EnumerableOwnerTokenModel"), OWNER());
-    world.grant_writer(selector!("origami_token-ERC721EnumerableTotalModel"), OWNER());
-    world.grant_writer(selector!("origami_token-ERC721MetadataModel"),  OWNER());
-    world.grant_writer(selector!("origami_token-ERC721OwnerModel"),  OWNER());
+    world.grant_writer(selector_from_tag!("origami_token-SRC5Model"), OWNER());
+    world.grant_writer(selector_from_tag!("origami_token-InitializableModel"), OWNER());
+    world.grant_writer(selector_from_tag!("origami_token-ERC721MetaModel"), OWNER());
+    world.grant_writer(selector_from_tag!("origami_token-ERC721TokenApprovalModel"),  OWNER());
+    world.grant_writer(selector_from_tag!("origami_token-ERC721BalanceModel"),  OWNER());
+    world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableIndexModel"), OWNER());
+    world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableOwnerIndexModel"), OWNER());
+    world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableTokenModel"), OWNER());
+    world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableOwnerTokenModel"), OWNER());
+    world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableTotalModel"), OWNER());
+    world.grant_writer(selector_from_tag!("origami_token-ERC721MetadataModel"),  OWNER());
+    world.grant_writer(selector_from_tag!("origami_token-ERC721OwnerModel"),  OWNER());
 
-    world.grant_writer(selector!("pistols-TokenConfig"), OWNER());
-    world.grant_writer(selector!("pistols-Duelist"), OWNER());
-    world.grant_writer(selector!("pistols-Scoreboard"), OWNER());
+    world.grant_writer(selector_from_tag!("pistols-TokenConfig"), OWNER());
+    world.grant_writer(selector_from_tag!("pistols-Duelist"), OWNER());
+    world.grant_writer(selector_from_tag!("pistols-Scoreboard"), OWNER());
 
     utils::impersonate(OWNER(),);
 

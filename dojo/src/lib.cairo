@@ -72,10 +72,10 @@ mod tests {
     // utils
     mod tester;
     mod salt_generator;
-    // mocks
-    mod mock_erc721;
     // tokens
     mod token {
         mod test_token_duelist;
+        // mocks
+        mod mock_erc721;
     }
 }

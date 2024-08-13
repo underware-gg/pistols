@@ -62,6 +62,7 @@ mod admin {
         }
 
         fn set_owner(ref world: IWorldDispatcher, account_address: ContractAddress, granted: bool) {
+            utils::WORLD(world);
             self.assert_caller_is_owner();
             self.grant_owner(account_address, granted);
         }

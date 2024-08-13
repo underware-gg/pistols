@@ -8,7 +8,7 @@ use pistols::types::round::{RoundState, RoundStateTrait};
 //
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-struct Challenge {
+pub struct Challenge {
     #[key]
     duel_id: u128,
     //-------------------------
@@ -30,7 +30,7 @@ struct Challenge {
 // Challenge wager (optional)
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-struct Wager {
+pub struct Wager {
     #[key]
     duel_id: u128,
     //------------
@@ -41,7 +41,7 @@ struct Wager {
 // Score snapshot
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-struct Snapshot {
+pub struct Snapshot {
     #[key]
     duel_id: u128,
     //-------------------------
@@ -53,7 +53,7 @@ struct Snapshot {
 // Each duel round
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-struct Round {
+pub struct Round {
     #[key]
     duel_id: u128,
     #[key]

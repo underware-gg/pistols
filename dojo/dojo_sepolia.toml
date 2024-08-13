@@ -1,0 +1,25 @@
+[world]
+name = "Pistols at 10 Blocks"
+description = "An on-chain pistol duelling game of honour and betrayal."
+icon_uri = "https://pistols.underware.gg/images/logo.png"
+cover_uri = "https://pistols.underware.gg/images/splash.png"
+website = "https://pistols.underware.gg"
+seed = "pistols"
+
+[world.socials]
+x = "https://x.com/underware_gg"
+github = "https://github.com/underware-gg/pistols"
+# discord = "https://discord.gg/FB2wR6uF"
+# telegram = "https://t.me/dojoengine"
+
+[namespace]
+default = "pistols"
+
+[env]
+# rpc_url = ""          # env: STARKNET_RPC_URL
+# account_address = ""  # env: DOJO_ACCOUNT_ADDRESS
+# private_key = ""      # env: DOJO_PRIVATE_KEY
+world_address = "0x360fd2af2f118387ae282b66bfdbb6d4bb7e45a7213e101e5b8aa3471939677"
+
+[migration]
+skip_contracts = ["pistols-lords_mock"]

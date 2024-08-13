@@ -11,6 +11,7 @@ mod tests {
     use pistols::models::table::{TableConfig, TableAdmittance, tables};
     use pistols::types::constants::{constants};
     use pistols::tests::tester::{tester, tester::{flags, ZERO, OWNER, OTHER, BUMMER, TREASURY}};
+    use pistols::interfaces::systems::{SELECTORS};
 
     const INVALID_TABLE: felt252 = 'TheBookIsOnTheTable';
 
@@ -42,15 +43,14 @@ mod tests {
     #[test]
     fn test_set_unset_owner() {
         let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
-        let admin_hash = selector_from_tag!("pistols-admin");
-        assert(world.is_owner(admin_hash, OWNER()) == true, 'default_owner_true');
-        assert(world.is_owner(admin_hash, OTHER()) == false, 'default_other_owner_false');
+        assert(world.is_owner(SELECTORS::ADMIN, OWNER()) == true, 'default_owner_true');
+        assert(world.is_owner(SELECTORS::ADMIN, OTHER()) == false, 'default_other_owner_false');
         // am_i?
         assert(admin.am_i_owner(OTHER()) == false, 'owner_am_i_false');
         // set
         tester::execute_admin_set_owner(admin, OWNER(), OTHER(), true);
-        assert(world.is_owner(admin_hash, OWNER()) == true, 'owner_still');
-        assert(world.is_owner(admin_hash, OTHER()) == true, 'new_other_true');
+        assert(world.is_owner(SELECTORS::ADMIN, OWNER()) == true, 'owner_still');
+        assert(world.is_owner(SELECTORS::ADMIN, OTHER()) == true, 'new_other_true');
         // am_i?
         assert(admin.am_i_owner(OTHER()) == true, 'owner_am_i_true');
         // can write
@@ -59,7 +59,7 @@ mod tests {
         assert(config.is_paused == true, 'paused');
         // unset
         tester::execute_admin_set_owner(admin, OWNER(), OTHER(), false);
-        assert(world.is_owner(admin_hash, OTHER()) == false, 'new_other_false');
+        assert(world.is_owner(SELECTORS::ADMIN, OTHER()) == false, 'new_other_false');
         // am_i?
         assert(admin.am_i_owner(OTHER()) == false, 'owner_am_i_false_again');
     }
@@ -68,13 +68,12 @@ mod tests {
     #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
     fn test_set_revoke_owner_write() {
         let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
-        let admin_hash = selector_from_tag!("pistols-admin");
         // set
         tester::execute_admin_set_owner(admin, OWNER(), OTHER(), true);
-        assert(world.is_owner(admin_hash, OTHER()) == true, 'new_owner_true');
+        assert(world.is_owner(SELECTORS::ADMIN, OTHER()) == true, 'new_owner_true');
         // unset
         tester::execute_admin_set_owner(admin, OWNER(), OTHER(), false);
-        assert(world.is_owner(admin_hash, OTHER()) == false, 'new_owner_false');
+        assert(world.is_owner(SELECTORS::ADMIN, OTHER()) == false, 'new_owner_false');
         // cannot write
         tester::execute_admin_set_paused(admin, OTHER(), true);
     }

@@ -4,6 +4,7 @@ if [ $# -ge 1 ]; then
 else
   export PROFILE="dev"
 fi
+export DOJO_PROFILE_FILE="dojo_$PROFILE.toml"
 
 if ! [ -x "$(command -v toml)" ]; then
   echo 'Error: toml not instlaled! Instal with: cargo install toml-cli'
@@ -12,12 +13,9 @@ fi
 
 get_profile_env () {
   local ENV_NAME=$1
-  local RESULT=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.$ENV_NAME)
+  local RESULT=$(toml get $DOJO_PROFILE_FILE --raw env.$ENV_NAME)
   if [[ -z "$RESULT" ]]; then
-    local RESULT=$(toml get Scarb.toml --raw tool.dojo.env.$ENV_NAME)
-    if [[ -z "$RESULT" ]]; then
-      >&2 echo "get_profile_env($ENV_NAME) not found! 👎"
-    fi
+    >&2 echo "get_profile_env($ENV_NAME) not found! 👎"
   fi
   echo $RESULT
 }
@@ -26,7 +24,7 @@ get_profile_env () {
 # env setup
 #
 export GAME_SLUG="pistols"
-export PROJECT_NAME=$(toml get Scarb.toml --raw tool.dojo.world.name)
+export PROJECT_NAME=$(toml get $DOJO_PROFILE_FILE --raw world.name)
 export WORLD_ADDRESS=$(get_profile_env "world_address")
 # use $DOJO_ACCOUNT_ADDRESS else read from profile
 export ACCOUNT_ADDRESS=${DOJO_ACCOUNT_ADDRESS:-$(get_profile_env "account_address")}

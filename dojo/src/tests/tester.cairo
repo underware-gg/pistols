@@ -22,11 +22,12 @@ mod tester {
     use pistols::systems::minter::{minter, IMinterDispatcher, IMinterDispatcherTrait};
     use pistols::systems::token_duelist::{token_duelist, ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait};
     use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
-    use pistols::tests::mock_erc721::{mock_erc721, IMockERC721Dispatcher, IMockERC721DispatcherTrait};
+    use pistols::tests::token::mock_erc721::{mock_erc721, IMockERC721Dispatcher, IMockERC721DispatcherTrait};
     use pistols::types::challenge::{ChallengeState};
     use pistols::types::constants::{constants};
     use pistols::types::action::{Action};
     use pistols::utils::short_string::{ShortString};
+    use pistols::interfaces::systems::{SELECTORS};
 
     use pistols::models::challenge::{
         challenge, Challenge,
@@ -83,8 +84,7 @@ mod tester {
     // set_contract_address : to define the address of the calling contract,
     // set_account_contract_address : to define the address of the account used for the current transaction.
     fn impersonate(address: ContractAddress) {
-        // testing::set_caller_address(address);   // not used??
-        testing::set_contract_address(address); // this is the CALLER!!
+        testing::set_contract_address(address);
         testing::set_account_contract_address(address);
     }
 
@@ -103,8 +103,8 @@ mod tester {
         const APPROVE: u8    = 0b010000;
     }
 
-    fn deploy_system(world: IWorldDispatcher, salt: felt252, class_hash: felt252, call_data: Span<felt252>) -> ContractAddress {
-        let contract_address = world.deploy_contract(salt, class_hash.try_into().unwrap(), call_data);
+    fn deploy_system(world: IWorldDispatcher, salt: felt252, class_hash: felt252) -> ContractAddress {
+        let contract_address = world.deploy_contract(salt, class_hash.try_into().unwrap());
         (contract_address)
     }
 
@@ -162,14 +162,14 @@ mod tester {
         // deploy world
 // '---- spawn_test_world...'.print();
         let world: IWorldDispatcher = spawn_test_world("pistols",  models);
-// '---- OK!'.print();
+// '---- spawned...'.print();
         world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), OWNER());
 
         // deploy systems
         let system = IActionsDispatcher{ contract_address:
             if (deploy_system) {
-                let address = deploy_system(world, 'salt', actions::TEST_CLASS_HASH, array![].span());
-                world.grant_owner(selector_from_tag!("pistols-actions"), OWNER());
+                let address = deploy_system(world, 'salt', actions::TEST_CLASS_HASH);
+                world.grant_owner(SELECTORS::ACTIONS, OWNER());
                 world.grant_writer(selector_from_tag!("pistols-Duelist"), address);
                 world.grant_writer(selector_from_tag!("pistols-Scoreboard"), address);
                 world.grant_writer(selector_from_tag!("pistols-Challenge"), address);
@@ -183,9 +183,9 @@ mod tester {
         };
         let lords = ILordsMockDispatcher{ contract_address:
             if (deploy_lords) {
-                let address = deploy_system(world, 'lords_mock', lords_mock::TEST_CLASS_HASH, array![].span());
-                world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), OWNER());
-                world.grant_owner(selector_from_tag!("pistols-lords_mock"), OWNER());
+                let address = deploy_system(world, 'lords_mock', lords_mock::TEST_CLASS_HASH);
+                // world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), OWNER());
+                world.grant_owner(SELECTORS::LORDS_MOCK, OWNER());
                 // world.grant_writer(selector_from_tag!("origami_token-SRC5Model"), address);
                 // world.grant_writer(selector_from_tag!("origami_token-InitializableModel"), address);
                 // world.grant_writer(selector_from_tag!("origami_token-ERC20BalanceModel"), address);
@@ -198,9 +198,9 @@ mod tester {
         };
         let duelists = ITokenDuelistDispatcher{ contract_address:
             if (deploy_minter) {
-                let address = deploy_system(world, 'token_duelist', token_duelist::TEST_CLASS_HASH, array![].span());
-                world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), OWNER());
-                world.grant_owner(selector_from_tag!("pistols-token_duelist"), OWNER());
+                let address = deploy_system(world, 'token_duelist', token_duelist::TEST_CLASS_HASH);
+                // world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), OWNER());
+                world.grant_writer(SELECTORS::TOKEN_DUELIST, OWNER());
                 // world.grant_writer(selector_from_tag!("origami_token-SRC5Model"), address);
                 // world.grant_writer(selector_from_tag!("origami_token-InitializableModel"), address);
                 // world.grant_writer(selector_from_tag!("origami_token-ERC721MetaModel"), address);
@@ -216,35 +216,37 @@ mod tester {
                 (address)
             }
             else {
-                (deploy_system(world, 'mock_erc721', mock_erc721::TEST_CLASS_HASH, array![].span()))
+                (deploy_system(world, 'mock_erc721', mock_erc721::TEST_CLASS_HASH))
             }
         };
         let minter = IMinterDispatcher{ contract_address:
             if (deploy_minter) {
+                let address = deploy_system(world, 'minter', minter::TEST_CLASS_HASH);
                 let minter_call_data: Array<felt252> = array![
                     duelists.contract_address.into(),
                     100, // max_supply
                     3, // wallet_max
                     1, // is_open
                 ];
-                let address = deploy_system(world, 'minter', minter::TEST_CLASS_HASH, minter_call_data.span());
-                world.grant_owner(selector_from_tag!("pistols-minter"), OWNER());
+                world.grant_owner(SELECTORS::MINTER, OWNER());
                 world.grant_writer(selector_from_tag!("pistols-TokenConfig"), address);
+                world.init_contract(SELECTORS::MINTER, minter_call_data.span());
                 (address)
             }
-            else {ZERO()}  
+            else {ZERO()}
         };
         let admin = IAdminDispatcher{ contract_address:
             if (deploy_admin) {
+                let address = deploy_system(world, 'admin', admin::TEST_CLASS_HASH);
                 let admin_call_data: Array<felt252> = array![
                     OWNER().into(), // treasury
                     lords.contract_address.into(),
                 ];
-                let address = deploy_system(world, 'admin', admin::TEST_CLASS_HASH, admin_call_data.span());
-                world.grant_owner(selector_from_tag!("pistols-admin"), OWNER());
+                world.grant_owner(SELECTORS::ADMIN, OWNER());
                 world.grant_writer(selector_from_tag!("pistols-Config"), address);
                 world.grant_writer(selector_from_tag!("pistols-TableConfig"), address);
                 world.grant_writer(selector_from_tag!("pistols-TableAdmittance"), address);
+                world.init_contract(SELECTORS::ADMIN, admin_call_data.span());
                 (address)
             }
             else {ZERO()}
@@ -263,6 +265,7 @@ mod tester {
 
         impersonate(OWNER());
 
+// '---- READY!'.print();
         (world, system, admin, lords, minter)
     }
 

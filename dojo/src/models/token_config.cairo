@@ -1,8 +1,8 @@
 use starknet::ContractAddress;
 
-#[dojo::model]
 #[derive(Copy, Drop, Serde)]
-struct TokenConfig {
+#[dojo::model]
+pub struct TokenConfig {
     #[key]
     token_address: ContractAddress,
     //------

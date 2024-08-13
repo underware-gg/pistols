@@ -136,12 +136,12 @@ Install the [Cairo 1.0](https://marketplace.visualstudio.com/items?itemName=star
 
 > [Dojo Book](https://book.dojoengine.org/getting-started)
 
-Currenty using Dojo version `v1.0.0-alpha.4`
+Currenty using Dojo version `v1.0.0-alpha.5`
 
 ```sh
 curl -L https://install.dojoengine.org | bash
 # open new terminal to update PATH
-dojoup -v v1.0.0-alpha.4
+dojoup -v v1.0.0-alpha.5
 
 # test dojo
 cd dojo
@@ -173,7 +173,7 @@ Uncomment the `world_address` parameter in `dojo/Scarb.toml` then:
 
 ```sh
 cd dojo
-torii --allowed-origins "*" --index-pending --world 0x4037e9ea1a016636a088c1bae640f9812451333be587a475bf175b0437102af
+torii --allowed-origins "*" --index-pending --world 0x360fd2af2f118387ae282b66bfdbb6d4bb7e45a7213e101e5b8aa3471939677
 
 # or preferably...
 cd dojo

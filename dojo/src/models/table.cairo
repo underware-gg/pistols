@@ -25,7 +25,7 @@ enum TableType {
 // https://github.com/dojoengine/dojo/issues/2057
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-struct TableConfig {
+pub struct TableConfig {
     #[key]
     table_id: felt252,
     //------
@@ -41,7 +41,7 @@ struct TableConfig {
 
 #[derive(Drop, Serde)]
 #[dojo::model]
-struct TableAdmittance {
+pub struct TableAdmittance {
     #[key]
     table_id: felt252,
     //------

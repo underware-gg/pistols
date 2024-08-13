@@ -1,25 +1,38 @@
 use starknet::{ContractAddress, ClassHash};
-use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait, Resource};
 
 use pistols::systems::actions::{IActionsDispatcher, IActionsDispatcherTrait};
 use pistols::systems::minter::{IMinterDispatcher, IMinterDispatcherTrait};
 use pistols::systems::token_duelist::{ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait};
+use pistols::libs::utils::{ZERO};
+
+mod SELECTORS {
+    const ADMIN: felt252 = selector_from_tag!("pistols-admin");
+    const ACTIONS: felt252 = selector_from_tag!("pistols-actions");
+    const MINTER: felt252 = selector_from_tag!("pistols-minter");
+    const TOKEN_DUELIST: felt252 = selector_from_tag!("pistols-token_duelist");
+    const LORDS_MOCK: felt252 = selector_from_tag!("pistols-lords_mock");
+}
 
 #[generate_trait]
 impl WorldSystemsTraitImpl of WorldSystemsTrait {
+    fn contract_address(self: IWorldDispatcher, selector: felt252) -> ContractAddress {
+        if let Resource::Contract((_, contract_address)) = self.resource(selector) {
+            (contract_address)
+        } else {
+            (ZERO())
+        }
+    }
     //
     // system addresses
     fn actions_address(self: IWorldDispatcher) -> ContractAddress {
-        let (_class_hash, address) = self.contract(selector_from_tag!("pistols-actions"));
-        (address)
+        (self.contract_address(SELECTORS::ACTIONS))
     }
     fn minter_address(self: IWorldDispatcher) -> ContractAddress {
-        let (_class_hash, address) = self.contract(selector_from_tag!("pistols-minter"));
-        (address)
+        (self.contract_address(SELECTORS::MINTER))
     }
     fn token_duelist_address(self: IWorldDispatcher) -> ContractAddress {
-        let (_class_hash, address) = self.contract(selector_from_tag!("pistols-token_duelist"));
-        (address)
+        (self.contract_address(SELECTORS::TOKEN_DUELIST))
     }
 
     //

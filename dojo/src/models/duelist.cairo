@@ -32,7 +32,7 @@ enum ProfilePicType {
 // #[derive(Copy, Drop, Serde)] // ByteArray is not copiable!
 #[derive(Clone, Drop, Serde)]   // pass to functions using duelist.clone()
 #[dojo::model]
-struct Duelist {
+pub struct Duelist {
     #[key]
     duelist_id: u128,   // erc721 token_id
     //-----------------------
@@ -46,7 +46,7 @@ struct Duelist {
 // Current challenge between two Duelists
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-struct Pact {
+pub struct Pact {
     #[key]
     table_id: felt252,
     #[key]
@@ -59,7 +59,7 @@ struct Pact {
 // Duelist scores and wager balance per Table
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-struct Scoreboard {
+pub struct Scoreboard {
     #[key]
     table_id: felt252,
     #[key]
