@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Menu, Label, Tab, TabPane } from 'semantic-ui-react'
 import { useQueryContext } from '@/pistols/hooks/QueryContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { usePistolsContext, MenuKey, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useTable } from '@/pistols/hooks/useTable'
 import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
 import { IRLTournamentTab } from '@/pistols/components/tournament/IRLTournamentTab'
@@ -28,8 +28,8 @@ const _makeBubble = (count) => {
 export function TavernMenu({
 }) {
   const { tableId, isAnon } = useSettings()
-  const { menuKey, tavernMenuItems, tableOpener, dispatchSetMenu } = usePistolsContext()
-  const { dispatchSetScene } = usePistolsScene()
+  const { tavernMenuItems, tableOpener } = usePistolsContext()
+  const { currentScene, dispatchSetScene } = usePistolsScene()
   const { description, isTournament, isIRLTournament } = useTable(tableId)
 
   const {
@@ -37,37 +37,18 @@ export function TavernMenu({
     queryYourDuels: { liveCount: yourDuelsCount },
   } = useQueryContext()
 
-  // select initial tab
-  const [started, setStarted] = useState<boolean>(false)
-  useEffect(() => {
-    if (!started) {
-      setStarted(true)
-      if (isAnon) {
-        dispatchSetMenu(MenuKey.LiveDuels)
-      } else if (isTournament) {
-        dispatchSetMenu(MenuKey.Tournament)
-      } else if (isIRLTournament) {
-        dispatchSetMenu(MenuKey.IRLTournament)
-      } else if (yourDuelsCount > 0) {
-        dispatchSetMenu(MenuKey.YourDuels)
-      } else {
-        dispatchSetMenu(MenuKey.Duelists)
-      }
-    }
-  }, [started, isAnon, yourDuelsCount, liveDuelsCount])
-
   const panes = useMemo(() => {
     let result = []
     tavernMenuItems.forEach(key => {
-      if (key === MenuKey.Tournament && !isTournament) return
-      if (key === MenuKey.IRLTournament && !isIRLTournament) return
-      const bubble = (key == MenuKey.YourDuels) ? _makeBubble(yourDuelsCount) : (key == MenuKey.LiveDuels) ? _makeBubble(liveDuelsCount) : null
+      if (key === SceneName.Tournament && !isTournament) return
+      if (key === SceneName.IRLTournament && !isIRLTournament) return
+      const bubble = (key == SceneName.YourDuels) ? _makeBubble(yourDuelsCount) : (key == SceneName.LiveDuels) ? _makeBubble(liveDuelsCount) : null
       result.push({
         key,
         menuItem: (
           <Menu.Item
             key={key}
-            onClick={() => dispatchSetMenu(key as MenuKey)}
+            onClick={() => dispatchSetScene(key as SceneName)}
           >
             {key}
             {bubble}
@@ -76,12 +57,12 @@ export function TavernMenu({
         render: () => (
           <TabPane attached={true}>
             <div className='UIMenuTavernScroller'>
-              {key === MenuKey.Duelists && <DuelistTable />}
-              {key === MenuKey.YourDuels && <ChallengeTableYour />}
-              {key === MenuKey.LiveDuels && <ChallengeTableLive />}
-              {key === MenuKey.PastDuels && <ChallengeTablePast />}
-              {key === MenuKey.Tournament && <></>}
-              {key === MenuKey.IRLTournament && <IRLTournamentTab />}
+              {key === SceneName.Duelists && <DuelistTable />}
+              {key === SceneName.YourDuels && <ChallengeTableYour />}
+              {key === SceneName.LiveDuels && <ChallengeTableLive />}
+              {key === SceneName.PastDuels && <ChallengeTablePast />}
+              {key === SceneName.Tournament && <></>}
+              {key === SceneName.IRLTournament && <IRLTournamentTab />}
             </div>
           </TabPane>
         )
@@ -90,7 +71,7 @@ export function TavernMenu({
     return result
   }, [tavernMenuItems, yourDuelsCount, liveDuelsCount, isTournament, isIRLTournament])
 
-  const menuIndex = panes.findIndex(pane => (pane.key == menuKey))
+  const menuIndex = panes.findIndex(pane => (pane.key == currentScene))
 
   const _changeTable = () => {
     tableOpener.open()

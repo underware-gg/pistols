@@ -117,7 +117,7 @@ function DuelistItem({
 
   const _canPlay = (exists)
 
-  const { accountSetupOpener, dispatchSetMenu } = usePistolsContext()
+  const { accountSetupOpener } = usePistolsContext()
   const { dispatchDuelistId } = useSettings()
 
   const _manage = () => {

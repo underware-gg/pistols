@@ -1,7 +1,6 @@
-import React, { useEffect, useMemo } from 'react'
-import { useRouter } from 'next/router'
+import React from 'react'
 import { useRouterStarter, useRouterListener } from '@/pistols/hooks/useRouterListener'
-import { usePistolsContext, SceneName, usePistolsScene } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { usePlayerId } from '@/lib/dojo/hooks/usePlayerId'
@@ -25,7 +24,7 @@ export default function MainPage() {
   // this hook will parse slugs and ser the current scene
   const { currentScene, sceneTitle } = usePistolsScene(true)
 
-  console.log(`AT scene [${currentScene}]`)
+  // console.log(`AT scene [${currentScene}]`)
 
   return (
     <AppPistols headerData={{ title: sceneTitle }} backgroundImage={null}>
