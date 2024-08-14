@@ -58,7 +58,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   const {
     value: toriiClient,
     isError: toriiIsError,
-  } = useAsyncMemo<torii.Client>(async () => {
+  } = useAsyncMemo(async () => {
     if (!mounted) return undefined
     if (!manifest) return null
     const client = await torii.createClient({
