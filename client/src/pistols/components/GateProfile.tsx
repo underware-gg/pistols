@@ -39,7 +39,7 @@ export default function GateProfile() {
                 render: () => <DuelistsList />,
               },
               {
-                menuItem: 'Socials',
+                menuItem: 'Connections',
                 render: () => <SocialsList />,
               },
             ]}
@@ -81,7 +81,7 @@ function DuelistsList() {
 
   return (
     <VStack className='Faded FillWidth UIAccountsListScroller_XX'>
-      <Divider />
+      <Divider hidden />
       <Grid className='Faded FillWidth'>
         {duelistCount > 0 &&
           <Row columns={'equal'} className='Title'>

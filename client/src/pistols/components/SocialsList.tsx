@@ -12,7 +12,7 @@ export function SocialsList() {
 
   return (
     <VStack className='Faded FillWidth UIAccountsListScroller_XX'>
-      <Divider />
+      <Divider hidden />
       <Grid className='Faded FillWidth'>
         <Row columns={'equal'} className='Title'>
           <Col>
@@ -25,6 +25,12 @@ export function SocialsList() {
         </Row>
 
         <ConnectDiscord />
+
+        <Row columns={1} className='NoPadding'>
+          <Col><Divider /></Col>
+        </Row>
+
+        <ConnectTelegram />
 
         <Row columns={1} className='NoPadding'>
           <Col><Divider /></Col>
@@ -84,6 +90,23 @@ function ConnectDiscord() {
       status={status}
       isConnected={isConnected}
       canClick={true}
+      onClick={() => _connect()}
+    />
+  )
+}
+
+function ConnectTelegram() {
+  const isConnected = false
+  const status = 'not connected'
+  const _connect = () => {
+  }
+  return (
+    <SocialItem
+      name='Telegram'
+      logoName='telegram'
+      status={status}
+      isConnected={isConnected}
+      canClick={false}
       onClick={() => _connect()}
     />
   )
