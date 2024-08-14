@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x9ca290948df7a18f6ef0ff25f8507d8bcb6aee57c3ebe7d664c4c0f5d3d13f"
-original_class_hash = "0x9ca290948df7a18f6ef0ff25f8507d8bcb6aee57c3ebe7d664c4c0f5d3d13f"
+class_hash = "0x75b00ec80d51c1a281a4998b76bccc785133978f35dd2523bf2f0d5949c2141"
+original_class_hash = "0x75b00ec80d51c1a281a4998b76bccc785133978f35dd2523bf2f0d5949c2141"
 abi = "manifests/dev/base/abis/models/pistols-TableConfig-1e8368fc.json"
 tag = "pistols-TableConfig"
 manifest_name = "pistols-TableConfig-1e8368fc"

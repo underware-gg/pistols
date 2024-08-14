@@ -5,6 +5,22 @@ import { BigNumberish } from 'starknet';
 // contants
 //
 
+// from: ../dojo/src/interfaces/systems.cairo
+type SELECTORS_Type = {
+  ADMIN: BigNumberish, // cairo: felt252
+  ACTIONS: BigNumberish, // cairo: felt252
+  MINTER: BigNumberish, // cairo: felt252
+  TOKEN_DUELIST: BigNumberish, // cairo: felt252
+  LORDS_MOCK: BigNumberish, // cairo: felt252
+};
+export const SELECTORS: SELECTORS_Type = {
+  ADMIN: 'selector_from_tag!("pistols-admin")',
+  ACTIONS: 'selector_from_tag!("pistols-actions")',
+  MINTER: 'selector_from_tag!("pistols-minter")',
+  TOKEN_DUELIST: 'selector_from_tag!("pistols-token_duelist")',
+  LORDS_MOCK: 'selector_from_tag!("pistols-lords_mock")',
+};
+
 // from: ../dojo/src/models/config.cairo
 type CONFIG_Type = {
   CONFIG_KEY: number, // cairo: u8

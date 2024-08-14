@@ -1,11 +1,10 @@
 kind = "DojoContract"
-class_hash = "0x7b91a2a8671290f5fb67463d4b24dcadd6ac7e550cf227bcd663bc11bbbfe37"
-original_class_hash = "0x7b91a2a8671290f5fb67463d4b24dcadd6ac7e550cf227bcd663bc11bbbfe37"
+class_hash = "0x4efbf31d1a02fea59a60852b558b1d1501deaf554799b937a2b64b134e48847"
+original_class_hash = "0x4efbf31d1a02fea59a60852b558b1d1501deaf554799b937a2b64b134e48847"
 base_class_hash = "0x0"
 abi = "manifests/dev/base/abis/contracts/pistols-token_duelist-541e9c18.json"
 reads = []
 writes = []
-computed = []
 init_calldata = []
 tag = "pistols-token_duelist"
 manifest_name = "pistols-token_duelist-541e9c18"
