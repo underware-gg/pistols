@@ -3,8 +3,9 @@ import { Modal, Button, Grid } from 'semantic-ui-react'
 import { pedersen } from '@/lib/utils/starknet'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
+import { usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
-import { useDuelistBalanceOf, useDuelistOfOwnerByIndex } from '@/pistols/hooks/useTokenDuelist'
+import { useLastDuelistOfOwner } from '@/pistols/hooks/useTokenDuelist'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileBadge } from '@/pistols/components/account/ProfileDescription'
@@ -17,6 +18,7 @@ import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { Opener } from '@/lib/ui/useOpener'
 import { Divider } from '@/lib/ui/Divider'
 import { IconClick } from '@/lib/ui/Icons'
+import { isPositiveBigint } from '@/lib/utils/types'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -26,24 +28,37 @@ export default function DuelistEditModal({
 }: {
   opener: Opener
 }) {
+  const { mintNew } = opener.props
+
   const { account, address } = useAccount()
   const { duelistId, dispatchDuelistId } = useSettings()
+  const editingDuelistId = (mintNew ? 0n : duelistId)
 
   // watch new mints
-  const { duelistBalance } = useDuelistBalanceOf(address)
-  const { duelistId: lastDuelistId } = useDuelistOfOwnerByIndex(address, duelistBalance - 1)
+  const { lastDuelistId } = useLastDuelistOfOwner(address)
+  
+  // Detect new mints
+  const { dispatchSetScene } = usePistolsScene()
+  const [lastDuelistIdBeforeMint, setLastDuelistIdBeforeMint] = useState<bigint>(null)
   useEffect(() => {
-    if (lastDuelistId) {
+    // minted new! go to Game...
+    if (mintNew && 
+      isPositiveBigint(lastDuelistId) &&
+      lastDuelistIdBeforeMint != null && 
+      lastDuelistId != lastDuelistIdBeforeMint
+    ) {
       dispatchDuelistId(lastDuelistId)
+      dispatchSetScene(SceneName.Tavern)
+      opener.close()
     }
-  }, [lastDuelistId])
+  }, [mintNew, lastDuelistId])
 
   const { mint_duelist, update_duelist } = useDojoSystemCalls()
 
-  const { name, profilePic, score: { archetypeName } } = useDuelist(duelistId)
+  const { name, profilePic, score: { archetypeName } } = useDuelist(editingDuelistId)
   const [selectedProfilePic, setSelectedProfilePic] = useState(0)
 
-  const randomPic = useMemo(() => (Number(pedersen(address ?? 0, duelistBalance) % BigInt(PROFILE_PIC_COUNT)) + 1), [address, duelistBalance])
+  const randomPic = useMemo(() => (Number(pedersen(address ?? 0, lastDuelistId ?? 0) % BigInt(PROFILE_PIC_COUNT)) + 1), [address, lastDuelistId])
   const _profilePic = useMemo(() => {
     return (
       selectedProfilePic ? selectedProfilePic
@@ -57,7 +72,6 @@ export default function DuelistEditModal({
   const inputIsValid = useMemo(() => (inputName?.length >= 3), [inputName])
   const isUpdated = useMemo(() => (name == inputName && profilePic == _profilePic), [name, inputName, profilePic, _profilePic])
 
-  const isNew = !Boolean(duelistId)
   const canSubmit = (inputIsValid && account && !isUpdated)
 
   useEffect(() => {
@@ -67,15 +81,16 @@ export default function DuelistEditModal({
 
   const _submit = () => {
     if (canSubmit) {
-      if (isNew) {
+      if (mintNew) {
+        setLastDuelistIdBeforeMint(lastDuelistId ?? 0n)
         mint_duelist(account, inputName, 1, _profilePic.toString(), inputArchetype)
       } else {
-        update_duelist(account, duelistId, inputName, 1, _profilePic.toString())
+        update_duelist(account, editingDuelistId, inputName, 1, _profilePic.toString())
       }
     }
   }
 
-  const _submitLabel = isUpdated ? 'Duelist up-to-date' : isNew ? 'Mint New Duelist' : 'Update Duelist'
+  const _submitLabel = isUpdated ? 'Duelist up-to-date' : mintNew ? 'Create Duelist' : 'Update Duelist'
 
   return (
     <Modal
@@ -84,7 +99,8 @@ export default function DuelistEditModal({
       size='tiny'
     >
       <Modal.Header>
-        Duelist #{duelistId ? Number(duelistId) : '?'}
+        {editingDuelistId ? `Duelist #${Number(editingDuelistId)}` : 'Create Your Duelist'}
+        
       </Modal.Header>
 
       <Modal.Content className='ModalText DuelistEditModal'>
@@ -114,7 +130,7 @@ export default function DuelistEditModal({
               />
 
               <div className='Spacer10' />
-              {isNew &&
+              {(mintNew && false) &&
                 <div>
                   <Divider />
                   <Button icon toggle active={inputArchetype == Archetype.Undefined} onClick={() => setInputArchetype(Archetype.Undefined)}>
@@ -136,12 +152,12 @@ export default function DuelistEditModal({
                   <span className='FormLabel TitleCase'>Archetype: <b>{ArchetypeNames[inputArchetype]}</b></span>
                 </div>
               }
-              {!isNew &&
+              {!mintNew &&
                 <div className='FormLabel TitleCase'>
                   <Divider />
-                  <ProfileBadge duelistId={duelistId} />
+                  Archetype: <b>{archetypeName}</b>
                   {' '}
-                  <b>{archetypeName}</b>
+                  <ProfileBadge duelistId={editingDuelistId} />
                 </div>
               }
             </Col>

@@ -5,16 +5,16 @@ import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { useSelectedChain, useConnectToSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { SceneName, usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { Divider } from '@/lib/ui/Divider'
 import { PACKAGE_VERSION } from '@/pistols/utils/constants'
 import UIContainer from '@/pistols/components/UIContainer'
 import Logo from '@/pistols/components/Logo'
+import { useIsMyDuelist } from '../hooks/useIsYou'
 
 const Row = Grid.Row
 const Col = Grid.Column
-
 
 export default function Gate() {
   const { dispatchSelectDuel } = usePistolsContext()
@@ -80,10 +80,18 @@ export function CurrentChainHint() {
 // Disconnected Gate
 //
 function GateMenu() {
+  const { dispatchDuelistId } = useSettings()
   const { dispatchSetScene } = usePistolsScene()
-  
+  const { duelistId } = useSettings()
+  const isMyDuelist = useIsMyDuelist(duelistId)
+
   const _onConnect = () => {
-    dispatchSetScene(SceneName.Tavern)
+    if (isMyDuelist) {
+      dispatchSetScene(SceneName.Tavern)
+    } else {
+      dispatchDuelistId(0n)
+      dispatchSetScene(SceneName.Profile)
+    }
   }
 
   return (

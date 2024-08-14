@@ -103,8 +103,9 @@ export function ProfilePic({
 export function ProfilePicSquare({
   profilePic,
   small = false,
+  medium = false,
 }) {
-  return <ProfilePic profilePic={profilePic} small={small} square={true} />
+  return <ProfilePic profilePic={profilePic} small={small} medium={medium} square={true} />
 }
 
 export function ProfilePicSquareButton({

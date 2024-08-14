@@ -55,6 +55,15 @@ export const useDuelistOfOwnerByIndex = (address: BigNumberish, index: BigNumber
   }
 }
 
+export const useLastDuelistOfOwner = (address: BigNumberish) => {
+  const { contractAddress, components } = useTokenContract()
+  const { duelistBalance } = useDuelistBalanceOf(address)
+  const { tokenId } = useOrigamiERC721TokenOfOwnerByIndex(contractAddress, address, (duelistBalance - 1), components)
+  return {
+    lastDuelistId: tokenId,
+  }
+}
+
 export const useDuelistIndexOfOwner = (address: BigNumberish, token_id: BigNumberish) => {
   const { contractAddress, components } = useTokenContract()
   const { index } = useOrigamiERC721IndexOfOwnerByToken(contractAddress, address, token_id, components)

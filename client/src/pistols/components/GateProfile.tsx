@@ -1,13 +1,14 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { Grid, Tab } from 'semantic-ui-react'
 import { VStack } from '@/lib/ui/Stack'
 import { useAccount } from '@starknet-react/core'
+import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useCanMintDuelist } from '../hooks/useTokenDuelist'
+import { useCanMintDuelist } from '@/pistols/hooks/useTokenDuelist'
 import { useDuelistBalanceOf, useDuelistOfOwnerByIndex } from '@/pistols/hooks/useTokenDuelist'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { usePistolsContext, initialState, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
-import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
+import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
+import { ProfilePicSquare, ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
 import { ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { WagerBalance } from '@/pistols/components/account/LordsBalance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
@@ -24,7 +25,15 @@ const Col = Grid.Column
 
 export default function GateProfile() {
   const { isConnected } = useAccount()
-  const { accountSetupOpener } = usePistolsContext()
+  const { duelistEditOpener } = usePistolsContext()
+  const { fromGate } = usePistolsScene()
+
+  useEffectOnce(() => {
+    // Gate will direct here to create a new duelist
+    if (fromGate) {
+      duelistEditOpener.open({ mintNew: true })
+    }
+  }, [])
 
   return (
     <div id='Gate'>
@@ -48,7 +57,7 @@ export default function GateProfile() {
         }
       </UIContainer>
 
-      <DuelistEditModal opener={accountSetupOpener} />
+      <DuelistEditModal opener={duelistEditOpener} />
       <CurrentChainHint />
     </div>
   )
@@ -61,14 +70,12 @@ export default function GateProfile() {
 
 function DuelistsList() {
   const { address } = useAccount()
-  const { dispatchDuelistId } = useSettings()
-  const { accountSetupOpener } = usePistolsContext()
+  const { duelistEditOpener } = usePistolsContext()
   const { duelistBalance: duelistCount } = useDuelistBalanceOf(address)
   const { canMint } = useCanMintDuelist(address)
 
   const _mintDuelist = () => {
-    dispatchDuelistId(0n)
-    accountSetupOpener.open()
+    duelistEditOpener.open({ mintNew: true })
   }
 
   const rows = useMemo(() => {
@@ -112,36 +119,49 @@ function DuelistItem({
   index: number
 }) {
   const { address } = useAccount()
+  const { duelistId: seletedDuelistId } = useSettings()
   const { duelistId } = useDuelistOfOwnerByIndex(address, index)
   const { exists, profilePic } = useDuelist(duelistId)
+  const isSelected = (duelistId && duelistId == seletedDuelistId)
 
   const _canPlay = (exists)
 
-  const { accountSetupOpener } = usePistolsContext()
+  const { duelistEditOpener } = usePistolsContext()
   const { dispatchDuelistId } = useSettings()
 
   const _manage = () => {
-    dispatchDuelistId(BigInt(duelistId ?? 0))
-    accountSetupOpener.open()
+    dispatchDuelistId(duelistId)
+    duelistEditOpener.open({ mintNew: !Boolean(duelistId) })
   }
 
-  const { dispatchSetLastScene } = usePistolsScene()
+  const { fromGate, lastScene,dispatchSetScene, dispatchSetLastScene } = usePistolsScene()
   const _duel = () => {
-    dispatchDuelistId(BigInt(duelistId ?? 0))
-    dispatchSetLastScene()
+    dispatchDuelistId(duelistId)
+    if (fromGate || lastScene == SceneName.Profile) {
+      dispatchSetScene(SceneName.Tavern)
+    } else {
+      dispatchSetLastScene()
+    }
   }
+
+  const classNames = useMemo(() => {
+    const result = ['Anchor']
+    if (isSelected) result.push('BgImportant')
+    return result
+  }, [isSelected])
 
   return (
     <>
       <Row columns={1} className='NoPadding'>
         <Col><Divider /></Col>
       </Row>
-      <Row textAlign='center' verticalAlign='top'>
+      <Row textAlign='center' verticalAlign='top' className={classNames.join(' ')}
+        onClick={() => dispatchDuelistId(duelistId)}
+      >
         <Col width={3} className='NoPadding'>
           <div>
-            <ProfilePicSquareButton medium
+            <ProfilePicSquare medium
               profilePic={profilePic ?? 0}
-              onClick={() => (_canPlay ? _duel : _manage)()}
             />
           </div>
         </Col>
@@ -157,7 +177,7 @@ function DuelistItem({
           </h5>
         </Col>
         <Col width={5} textAlign='left' verticalAlign='bottom'>
-          <ActionButton fill important disabled={!_canPlay} onClick={() => _duel()} label='Duel!' />
+          <ActionButton fill disabled={!_canPlay} onClick={() => _duel()} label='Duel!' />
         </Col>
       </Row>
     </>

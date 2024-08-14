@@ -51,7 +51,7 @@ export const initialState = {
   duelistsAnon: true,
   // injected
   connectOpener: null as Opener,
-  accountSetupOpener: null as Opener,
+  duelistEditOpener: null as Opener,
   tableOpener: null as Opener,
 }
 
@@ -102,7 +102,7 @@ const PistolsProvider = ({
   children,
 }: PistolsProviderProps) => {
   const connectOpener = useOpener()
-  const accountSetupOpener = useOpener()
+  const duelistEditOpener = useOpener()
   const tableOpener = useOpener()
 
   const [state, dispatch] = useReducer((state: PistolsContextStateType, action: ActionType) => {
@@ -153,7 +153,7 @@ const PistolsProvider = ({
     <PistolsContext.Provider value={{ dispatch, state: {
       ...state,
       connectOpener,
-      accountSetupOpener,
+      duelistEditOpener,
       tableOpener,
     } }}>
       {children}
@@ -310,17 +310,14 @@ export const usePistolsScene = (mainPage?: boolean) => {
 
   return {
     currentScene,
+    lastScene,
     sceneTitle,
     tavernMenuItems,
+    // helpers
+    fromGate: (lastScene == SceneName.Gate),
     atGate: (currentScene == SceneName.Gate),
     atProfile: (currentScene == SceneName.Profile),
     atTavern: tavernMenuItems.includes(currentScene),
-    atDuelists: (currentScene == SceneName.Duelists),
-    atYourDuels: (currentScene == SceneName.YourDuels),
-    atLiveDuels: (currentScene == SceneName.LiveDuels),
-    atPastDuels: (currentScene == SceneName.PastDuels),
-    atTournament: (currentScene == SceneName.Tournament),
-    atIRLTournament: (currentScene == SceneName.IRLTournament),
     atDuel: (currentScene == SceneName.Duel),
     // PistolsActions,
     dispatchSetScene,
