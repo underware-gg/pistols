@@ -1,0 +1,10 @@
+kind = "DojoContract"
+class_hash = "0x19feee8cf27746249ec143fac19db42b03a8ca459cd3cfbbf06253e6e3e52bb"
+original_class_hash = "0x19feee8cf27746249ec143fac19db42b03a8ca459cd3cfbbf06253e6e3e52bb"
+base_class_hash = "0x0"
+abi = "manifests/staging/base/abis/contracts/pistols-lords_mock-2b1156e6.json"
+reads = []
+writes = []
+init_calldata = []
+tag = "pistols-lords_mock"
+manifest_name = "pistols-lords_mock-2b1156e6"

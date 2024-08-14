@@ -1,0 +1,21 @@
+kind = "DojoModel"
+class_hash = "0x1f530c228228b02b93e86f7c2db8f61712b69a607600ad5331d057750ac2459"
+original_class_hash = "0x1f530c228228b02b93e86f7c2db8f61712b69a607600ad5331d057750ac2459"
+abi = "manifests/staging/base/abis/models/pistols-Wager-4cd30873.json"
+tag = "pistols-Wager"
+manifest_name = "pistols-Wager-4cd30873"
+
+[[members]]
+name = "duel_id"
+type = "u128"
+key = true
+
+[[members]]
+name = "value"
+type = "u128"
+key = false
+
+[[members]]
+name = "fee"
+type = "u128"
+key = false

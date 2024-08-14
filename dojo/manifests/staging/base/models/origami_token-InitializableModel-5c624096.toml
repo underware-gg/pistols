@@ -1,0 +1,16 @@
+kind = "DojoModel"
+class_hash = "0x6428d35e09083732f45a4e0b761f7363807527fc7dedeac2baa63c4f6adb309"
+original_class_hash = "0x6428d35e09083732f45a4e0b761f7363807527fc7dedeac2baa63c4f6adb309"
+abi = "manifests/staging/base/abis/models/origami_token-InitializableModel-5c624096.json"
+tag = "origami_token-InitializableModel"
+manifest_name = "origami_token-InitializableModel-5c624096"
+
+[[members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "initialized"
+type = "bool"
+key = false

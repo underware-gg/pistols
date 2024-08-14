@@ -1,0 +1,21 @@
+kind = "DojoModel"
+class_hash = "0x4ae75423c50b9a78805ac5c87c1cd4ed6a9d534a6aceb070994140a116eb65c"
+original_class_hash = "0x4ae75423c50b9a78805ac5c87c1cd4ed6a9d534a6aceb070994140a116eb65c"
+abi = "manifests/staging/base/abis/models/origami_token-ERC721EnumerableIndexModel-1a4200e7.json"
+tag = "origami_token-ERC721EnumerableIndexModel"
+manifest_name = "origami_token-ERC721EnumerableIndexModel-1a4200e7"
+
+[[members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "index"
+type = "u128"
+key = true
+
+[[members]]
+name = "token_id"
+type = "u128"
+key = false

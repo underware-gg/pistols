@@ -1,0 +1,66 @@
+kind = "DojoModel"
+class_hash = "0x43de2e0484198df4c12724a0cd4f44c4a314c15cc7734c461c8e599e0711a33"
+original_class_hash = "0x43de2e0484198df4c12724a0cd4f44c4a314c15cc7734c461c8e599e0711a33"
+abi = "manifests/staging/base/abis/models/pistols-Challenge-673267b6.json"
+tag = "pistols-Challenge"
+manifest_name = "pistols-Challenge-673267b6"
+
+[[members]]
+name = "duel_id"
+type = "u128"
+key = true
+
+[[members]]
+name = "table_id"
+type = "felt252"
+key = false
+
+[[members]]
+name = "message"
+type = "felt252"
+key = false
+
+[[members]]
+name = "address_a"
+type = "ContractAddress"
+key = false
+
+[[members]]
+name = "address_b"
+type = "ContractAddress"
+key = false
+
+[[members]]
+name = "duelist_id_a"
+type = "u128"
+key = false
+
+[[members]]
+name = "duelist_id_b"
+type = "u128"
+key = false
+
+[[members]]
+name = "state"
+type = "ChallengeState"
+key = false
+
+[[members]]
+name = "round_number"
+type = "u8"
+key = false
+
+[[members]]
+name = "winner"
+type = "u8"
+key = false
+
+[[members]]
+name = "timestamp_start"
+type = "u64"
+key = false
+
+[[members]]
+name = "timestamp_end"
+type = "u64"
+key = false

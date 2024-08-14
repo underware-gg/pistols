@@ -1,0 +1,10 @@
+kind = "DojoContract"
+class_hash = "0x99573f51ab0e84238b0e60ef201a66a8e5ec33200d47d6d335c3af31defbc0"
+original_class_hash = "0x99573f51ab0e84238b0e60ef201a66a8e5ec33200d47d6d335c3af31defbc0"
+base_class_hash = "0x0"
+abi = "manifests/staging/base/abis/contracts/pistols-actions-4f10cff7.json"
+reads = []
+writes = []
+init_calldata = []
+tag = "pistols-actions"
+manifest_name = "pistols-actions-4f10cff7"

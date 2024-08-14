@@ -1,0 +1,21 @@
+kind = "DojoModel"
+class_hash = "0x55a7c0f06b6946f3a2927b3f40284f00777801b5e1cb1c10fe95d8879e0f73e"
+original_class_hash = "0x55a7c0f06b6946f3a2927b3f40284f00777801b5e1cb1c10fe95d8879e0f73e"
+abi = "manifests/staging/base/abis/models/pistols-Config-60742fa7.json"
+tag = "pistols-Config"
+manifest_name = "pistols-Config-60742fa7"
+
+[[members]]
+name = "key"
+type = "u8"
+key = true
+
+[[members]]
+name = "treasury_address"
+type = "ContractAddress"
+key = false
+
+[[members]]
+name = "is_paused"
+type = "bool"
+key = false

@@ -1,0 +1,21 @@
+kind = "DojoModel"
+class_hash = "0xc3aea6d111dbb7aa0c8fdb8fcb4494bf8be4ccf281b025609fdc20cfc27550"
+original_class_hash = "0xc3aea6d111dbb7aa0c8fdb8fcb4494bf8be4ccf281b025609fdc20cfc27550"
+abi = "manifests/staging/base/abis/models/origami_token-ERC20BalanceModel-da267235.json"
+tag = "origami_token-ERC20BalanceModel"
+manifest_name = "origami_token-ERC20BalanceModel-da267235"
+
+[[members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "account"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "amount"
+type = "u256"
+key = false

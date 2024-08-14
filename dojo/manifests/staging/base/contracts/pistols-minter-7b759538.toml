@@ -1,0 +1,10 @@
+kind = "DojoContract"
+class_hash = "0x27691fdec20b05e751e1538608964256a0ba6bf8a909d80899abafd90c2147c"
+original_class_hash = "0x27691fdec20b05e751e1538608964256a0ba6bf8a909d80899abafd90c2147c"
+base_class_hash = "0x0"
+abi = "manifests/staging/base/abis/contracts/pistols-minter-7b759538.json"
+reads = []
+writes = []
+init_calldata = []
+tag = "pistols-minter"
+manifest_name = "pistols-minter-7b759538"
