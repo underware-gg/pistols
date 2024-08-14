@@ -1,5 +1,5 @@
-import { TYPED_DATA } from '@/games/pistols/generated/constants';
-import { cleanObject, isBigint } from '@/lib/utils/types'
+import { TYPED_DATA } from '@/games/pistols/generated/constants'
+import { bigintToHex, cleanObject, isBigint } from '@/lib/utils/types'
 import {
   AccountInterface,
   TypedData,
@@ -41,17 +41,27 @@ type SignMessagesResult = {
   typeHash: string
   typeSelectorName: string
   messageHash: string
-  signature: WeierstrassSignatureType,
+  // signature: WeierstrassSignatureType, //{r,s}
+  signature: ArraySignatureType,  // big array
+  splitSignature: bigint[], // [r,s]
 }
 export const signMessages = async (account: AccountInterface, chainId: string, revision: Revision, messages: Messages): Promise<SignMessagesResult> => {
   const typedMessage = createTypedMessage({ chainId, revision, messages })
   const typeHash = getTypeHash(typedMessage, typedMessage.primaryType)
   const typeSelectorName = getTypeSelectorName(typedMessage, typedMessage.primaryType)
   const messageHash = getMessageHash(typedMessage, account.address)
-  const signature = await account.signMessage(typedMessage) as WeierstrassSignatureType
+  const signature = await account.signMessage(typedMessage)
   console.log(`SIG:`, typedMessage, 'type:', typeSelectorName, typeHash, 'message:', messageHash, signature)
+  let splitSignature: bigint[] = []
+  if (Array.isArray(signature)) {
+    // OK!
+  } else {
+    console.error('signMessages() data/sig:', typedMessage, signature)
+    throw new Error('signMessages() signature is not Array')
+    // splitSignature = splitSignature(signature)
+  }
   // throw new Error('STOP')
-  return { typedMessage, typeHash, typeSelectorName, messageHash, signature }
+  return { typedMessage, typeHash, typeSelectorName, messageHash, signature, splitSignature }
 }
 export const verifyMessages = async (account: AccountInterface, chainId: string, revision: Revision, messages: Messages, signature: WeierstrassSignatureType): Promise<boolean> => {
   const typedMessage = createTypedMessage({ chainId, revision, messages })
@@ -131,7 +141,10 @@ export function createTypedMessage({
           // type: typeof _messages[name] == 'bigint' ? 'felt' : 'shortstring',
         })),
       },
-      message: _messages,
+      message: Object.keys(_messages).reduce((acc, name) => {
+        acc[name] = (isBigint(_messages[name]) ? bigintToHex(_messages[name]) : _messages[name])
+        return acc
+      }, {} as { [key: string]: any }),
   }
   return result
 }

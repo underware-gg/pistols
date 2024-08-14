@@ -40,9 +40,12 @@ const signAndGenerateSalt = async (account: AccountInterface, chainId: string, d
         roundNumber: BigInt(roundNumber),
         duelistId: BigInt(duelistId),
       }
-      const { signature } = await signMessages(account, chainId, 1, messages)
-      const sig = splitSignature(signature)
-      result = ((sig[0] ^ sig[1]) & HASH_SALT_MASK)
+      const { signature, splitSignature } = await signMessages(account, chainId, 1, messages)
+      if (splitSignature.length == 0) {
+        // get on-chain????
+        throw new Error('wrong signature')
+      }
+      result = ((splitSignature[0] ^ splitSignature[1]) & HASH_SALT_MASK)
     } catch (e) {
       console.warn(`signAndGenerateSalt() exception:`, e)
     }
