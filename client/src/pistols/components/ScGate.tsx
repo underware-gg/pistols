@@ -16,7 +16,7 @@ import { useIsMyDuelist } from '../hooks/useIsYou'
 const Row = Grid.Row
 const Col = Grid.Column
 
-export default function Gate() {
+export default function ScGate() {
   const { dispatchSelectDuel } = usePistolsContext()
 
   // clear tavern state

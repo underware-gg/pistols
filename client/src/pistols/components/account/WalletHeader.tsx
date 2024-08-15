@@ -9,7 +9,7 @@ import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { MusicToggle } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { useControllerUsername } from '@/lib/dojo/hooks/useController'
-import { ConnectButton, EnterAsGuestButton } from '@/pistols/components/Gate'
+import { ConnectButton, EnterAsGuestButton } from '@/pistols/components/ScGate'
 import { Divider } from '@/lib/ui/Divider'
 
 const Row = Grid.Row

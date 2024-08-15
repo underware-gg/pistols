@@ -12,10 +12,10 @@ import { ProfilePicSquare, ProfilePicSquareButton } from '@/pistols/components/a
 import { ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { WagerBalance } from '@/pistols/components/account/LordsBalance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
+import { ConnectButton, CurrentChainHint, EnterAsGuestButton } from '@/pistols/components/ScGate'
+import { SocialsList } from '@/pistols/components/SocialsList'
 import { Divider } from '@/lib/ui/Divider'
 import { IconClick } from '@/lib/ui/Icons'
-import { ConnectButton, CurrentChainHint, EnterAsGuestButton } from '@/pistols/components/Gate'
-import { SocialsList } from '@/pistols/components/SocialsList'
 import WalletHeader from '@/pistols/components/account/WalletHeader'
 import DuelistEditModal from '@/pistols/components/DuelistEditModal'
 import UIContainer from '@/pistols/components/UIContainer'
@@ -23,7 +23,7 @@ import UIContainer from '@/pistols/components/UIContainer'
 const Row = Grid.Row
 const Col = Grid.Column
 
-export default function GateProfile() {
+export default function ScProfile() {
   const { isConnected } = useAccount()
   const { duelistEditOpener } = usePistolsContext()
   const { fromGate } = usePistolsScene()

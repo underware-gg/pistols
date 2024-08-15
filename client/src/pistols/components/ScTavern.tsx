@@ -10,7 +10,7 @@ import ChallengeModal from '@/pistols/components/ChallengeModal'
 import NewChallengeModal from '@/pistols/components/NewChallengeModal'
 import UIContainer from '@/pistols/components/UIContainer'
 
-export default function Tavern() {
+export default function ScTavern() {
   const { tableOpener } = usePistolsContext()
   // useTestValidateSignature()
 

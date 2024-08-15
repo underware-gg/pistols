@@ -8,10 +8,10 @@ import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import AppPistols from '@/pistols/components/AppPistols'
 import GameContainer from '@/pistols/components/GameContainer'
 import Background from '@/pistols/components/Background'
-import GateProfile from '@/pistols/components/GateProfile'
-import Tavern from '@/pistols/components/Tavern'
+import ScProfile from '@/pistols/components/ScProfile'
+import ScTavern from '@/pistols/components/ScTavern'
+import Gate from '@/pistols/components/ScGate'
 import Duel from '@/pistols/components/Duel'
-import Gate from '@/pistols/components/Gate'
 
 // // enable wasm in build (this is for api routes and server issues)
 // export const config = {
@@ -53,11 +53,11 @@ function MainUI({
 
   // load Game Scene
   if (atGate) return <Gate />
-  if (atProfile) return <GateProfile />
-  if (atTavern) return <Tavern />
+  if (atProfile) return <ScProfile />
+  if (atTavern) return <ScTavern />
   if (atDuel && selectedDuelId) return <Duel duelId={selectedDuelId} />
 
   // ????
   console.warn(`UNKNOWN SCENE [${currentScene}]`)
-  return <Tavern />
+  return <ScTavern />
 }

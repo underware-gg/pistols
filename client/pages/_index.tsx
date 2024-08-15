@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import Background from '@/pistols/components/Background'
-// import Gate from '@/pistols/components/Gate'
+// import Gate from '@/pistols/components/ScGate'
 import App from '@/lib/ui/App'
 import { HeaderData } from '@/lib/ui/AppHeader'
 
