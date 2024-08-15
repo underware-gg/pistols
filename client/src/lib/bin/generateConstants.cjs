@@ -112,7 +112,7 @@ function buildFileContents(constants) {
   const mods = constants.mods
   Object.keys(mods).forEach((key) => {
     let modName = `${key}`;
-    let typeName = `${modName}_Type`;
+    let typeName = `type_${modName}`;
     let typeContents = `type ${typeName} = {\n`;
     let valuesContents = `export const ${modName}: ${typeName} = {\n`;
     mods[key].lines.forEach((line) => {

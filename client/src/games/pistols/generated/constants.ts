@@ -6,14 +6,14 @@ import { BigNumberish } from 'starknet';
 //
 
 // from: ../dojo/src/interfaces/systems.cairo
-type SELECTORS_Type = {
+type type_SELECTORS = {
   ADMIN: BigNumberish, // cairo: felt252
   ACTIONS: BigNumberish, // cairo: felt252
   MINTER: BigNumberish, // cairo: felt252
   TOKEN_DUELIST: BigNumberish, // cairo: felt252
   LORDS_MOCK: BigNumberish, // cairo: felt252
 };
-export const SELECTORS: SELECTORS_Type = {
+export const SELECTORS: type_SELECTORS = {
   ADMIN: '0x036fd20372b5d47c092e2fede52897075978efb732aeaeb155d19eb8147f6497', // 'selector_from_tag!("pistols-admin")'
   ACTIONS: '0x04f10cff77842b589eafef9f3261c4cb207e41302e7ac01527cff88ad26ded3e', // 'selector_from_tag!("pistols-actions")'
   MINTER: '0x07b759538267ac8937772e5bdadb6b598748b33c377c90426fc0a4960234de20', // 'selector_from_tag!("pistols-minter")'
@@ -22,25 +22,25 @@ export const SELECTORS: SELECTORS_Type = {
 };
 
 // from: ../dojo/src/models/config.cairo
-type CONFIG_Type = {
+type type_CONFIG = {
   CONFIG_KEY: number, // cairo: u8
 };
-export const CONFIG: CONFIG_Type = {
+export const CONFIG: type_CONFIG = {
   CONFIG_KEY: 1,
 };
 
 // from: ../dojo/src/models/table.cairo
-type tables_Type = {
+type type_tables = {
   LORDS: string, // cairo: felt252
   COMMONERS: string, // cairo: felt252
 };
-export const tables: tables_Type = {
+export const tables: type_tables = {
   LORDS: 'Lords',
   COMMONERS: 'Commoners',
 };
 
 // from: ../dojo/src/systems/actions.cairo
-type actions_Type = {
+type type_actions = {
   NOT_INITIALIZED: string, // cairo: felt252
   INVALID_CHALLENGED: string, // cairo: felt252
   INVALID_CHALLENGED_NULL: string, // cairo: felt252
@@ -69,7 +69,7 @@ type actions_Type = {
   ALREADY_REVEALED: string, // cairo: felt252
   ACTION_HASH_MISMATCH: string, // cairo: felt252
 };
-export const actions: actions_Type = {
+export const actions: type_actions = {
   NOT_INITIALIZED: 'PISTOLS: Not initialized',
   INVALID_CHALLENGED: 'PISTOLS: Challenged unknown',
   INVALID_CHALLENGED_NULL: 'PISTOLS: Challenged null',
@@ -100,14 +100,14 @@ export const actions: actions_Type = {
 };
 
 // from: ../dojo/src/systems/admin.cairo
-type admin_Type = {
+type type_admin = {
   INVALID_OWNER: string, // cairo: felt252
   INVALID_TREASURY: string, // cairo: felt252
   INVALID_TABLE: string, // cairo: felt252
   INVALID_DESCRIPTION: string, // cairo: felt252
   NOT_OWNER: string, // cairo: felt252
 };
-export const admin: admin_Type = {
+export const admin: type_admin = {
   INVALID_OWNER: 'ADMIN: Invalid account_address',
   INVALID_TREASURY: 'ADMIN: Invalid treasury_address',
   INVALID_TABLE: 'ADMIN: Invalid table',
@@ -116,7 +116,7 @@ export const admin: admin_Type = {
 };
 
 // from: ../dojo/src/systems/minter.cairo
-type minter_Type = {
+type type_minter = {
   INVALID_TOKEN_ADDRESS: string, // cairo: felt252
   INVALID_SUPPLY: string, // cairo: felt252
   NOT_OWNER: string, // cairo: felt252
@@ -124,7 +124,7 @@ type minter_Type = {
   MINTING_IS_CLOSED: string, // cairo: felt252
   MAXED_WALLET: string, // cairo: felt252
 };
-export const minter: minter_Type = {
+export const minter: type_minter = {
   INVALID_TOKEN_ADDRESS: 'MINTER: invalid token address',
   INVALID_SUPPLY: 'MINTER: invalid supply',
   NOT_OWNER: 'MINTER: not owner',
@@ -134,7 +134,7 @@ export const minter: minter_Type = {
 };
 
 // from: ../dojo/src/types/action.cairo
-type ACTION_Type = {
+type type_ACTION = {
   PACES_MASK: number, // cairo: u8
   BLADES_MASK: number, // cairo: u8
   IDLE: number, // cairo: u8
@@ -155,7 +155,7 @@ type ACTION_Type = {
   STEAL: number, // cairo: u8
   SEPPUKU: number, // cairo: u8
 };
-export const ACTION: ACTION_Type = {
+export const ACTION: type_ACTION = {
   PACES_MASK: 0x0f,
   BLADES_MASK: 0xf0,
   IDLE: 0x00,
@@ -178,7 +178,7 @@ export const ACTION: ACTION_Type = {
 };
 
 // from: ../dojo/src/types/challenge.cairo
-type CHALLENGE_STATE_Type = {
+type type_CHALLENGE_STATE = {
   NULL: number, // cairo: u8
   AWAITING: number, // cairo: u8
   WITHDRAWN: number, // cairo: u8
@@ -188,7 +188,7 @@ type CHALLENGE_STATE_Type = {
   RESOLVED: number, // cairo: u8
   DRAW: number, // cairo: u8
 };
-export const CHALLENGE_STATE: CHALLENGE_STATE_Type = {
+export const CHALLENGE_STATE: type_CHALLENGE_STATE = {
   NULL: 0,
   AWAITING: 1,
   WITHDRAWN: 2,
@@ -200,7 +200,7 @@ export const CHALLENGE_STATE: CHALLENGE_STATE_Type = {
 };
 
 // from: ../dojo/src/types/constants.cairo
-type constants_Type = {
+type type_constants = {
   ROUND_COUNT: number, // cairo: u8
   MAX_DUELIST_ID: BigNumberish, // cairo: u128
   FULL_HEALTH: number, // cairo: u8
@@ -209,7 +209,7 @@ type constants_Type = {
   HASH_SALT_MASK: BigNumberish, // cairo: u256
   ETH_TO_WEI: BigNumberish, // cairo: u256
 };
-export const constants: constants_Type = {
+export const constants: type_constants = {
   ROUND_COUNT: 3,
   MAX_DUELIST_ID: '0xffff',
   FULL_HEALTH: 3,
@@ -220,7 +220,7 @@ export const constants: constants_Type = {
 };
 
 // from: ../dojo/src/types/constants.cairo
-type honour_Type = {
+type type_honour = {
   VILLAIN_START: number, // cairo: u8
   TRICKSTER_START: number, // cairo: u8
   LORD_START: number, // cairo: u8
@@ -229,7 +229,7 @@ type honour_Type = {
   LEVEL_MIN: number, // cairo: u8
   LEVEL_MAX: number, // cairo: u8
 };
-export const honour: honour_Type = {
+export const honour: type_honour = {
   VILLAIN_START: 10,
   TRICKSTER_START: 35,
   LORD_START: 75,
@@ -240,7 +240,7 @@ export const honour: honour_Type = {
 };
 
 // from: ../dojo/src/types/constants.cairo
-type chances_Type = {
+type type_chances = {
   NEVER: number, // cairo: u8
   ALWAYS: number, // cairo: u8
   PISTOLS_KILL_AT_STEP_1: number, // cairo: u8
@@ -263,7 +263,7 @@ type chances_Type = {
   TRICKSTER_CRIT_PENALTY: number, // cairo: u8
   TRICKSTER_HIT_PENALTY: number, // cairo: u8
 };
-export const chances: chances_Type = {
+export const chances: type_chances = {
   NEVER: 0,
   ALWAYS: 100,
   PISTOLS_KILL_AT_STEP_1: 5,
@@ -288,14 +288,14 @@ export const chances: chances_Type = {
 };
 
 // from: ../dojo/src/types/events.cairo
-type selector_Type = {
+type type_selector = {
   DuelistRegisteredEvent: BigNumberish, // cairo: felt252
   NewChallengeEvent: BigNumberish, // cairo: felt252
   ChallengeAcceptedEvent: BigNumberish, // cairo: felt252
   ChallengeResolvedEvent: BigNumberish, // cairo: felt252
   DuelistTurnEvent: BigNumberish, // cairo: felt252
 };
-export const selector: selector_Type = {
+export const selector: type_selector = {
   DuelistRegisteredEvent: '0x148c3db21a55576bc012023dc4d3b5bd570c519de855849eac52b1c5d6c9e85',
   NewChallengeEvent: '0x14a0df74df51e02ef8dedabfd1ea9684ea2087bed6370e881b156d7e2e56975',
   ChallengeAcceptedEvent: '0x31cdbf7ac39747303190a727df1a270ae5e4f05191f6f58e452ce4eb1e98abe',
@@ -304,13 +304,13 @@ export const selector: selector_Type = {
 };
 
 // from: ../dojo/src/types/round.cairo
-type ROUND_STATE_Type = {
+type type_ROUND_STATE = {
   NULL: number, // cairo: u8
   COMMIT: number, // cairo: u8
   REVEAL: number, // cairo: u8
   FINISHED: number, // cairo: u8
 };
-export const ROUND_STATE: ROUND_STATE_Type = {
+export const ROUND_STATE: type_ROUND_STATE = {
   NULL: 0,
   COMMIT: 1,
   REVEAL: 2,
@@ -318,12 +318,12 @@ export const ROUND_STATE: ROUND_STATE_Type = {
 };
 
 // from: ../dojo/src/types/typed_data.cairo
-type TYPED_DATA_Type = {
+type type_TYPED_DATA = {
   NAME: string, // cairo: felt252
   VERSION: string, // cairo: felt252
   COMMIT_MOVE_MESSAGE_TYPE_HASH: BigNumberish, // cairo: felt252
 };
-export const TYPED_DATA: TYPED_DATA_Type = {
+export const TYPED_DATA: type_TYPED_DATA = {
   NAME: 'Underware',
   VERSION: '0.1.0',
   COMMIT_MOVE_MESSAGE_TYPE_HASH: '0x74fe0c723488214ab442c24761e9b32d30216def5e93d1c110375d993482ae',
