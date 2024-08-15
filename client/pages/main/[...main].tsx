@@ -21,7 +21,7 @@ import Gate from '@/pistols/components/Gate'
 export default function MainPage() {
   // let's initialzie player id always, it is a random client identifier
   const { playerId } = usePlayerId()
-  // this hook will parse slugs and ser the current scene
+  // this hook will parse slugs and manage the current scene
   const { currentScene, sceneTitle } = usePistolsScene(true)
 
   // console.log(`AT scene [${currentScene}]`)

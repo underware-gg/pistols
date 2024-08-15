@@ -134,14 +134,10 @@ function DuelistItem({
     duelistEditOpener.open({ mintNew: !Boolean(duelistId) })
   }
 
-  const { fromGate, lastScene,dispatchSetScene, dispatchSetLastScene } = usePistolsScene()
+  const { dispatchSetScene } = usePistolsScene()
   const _duel = () => {
     dispatchDuelistId(duelistId)
-    if (fromGate || lastScene == SceneName.Profile) {
-      dispatchSetScene(SceneName.Tavern)
-    } else {
-      dispatchSetLastScene()
-    }
+    dispatchSetScene(SceneName.Tavern)
   }
 
   const classNames = useMemo(() => {

@@ -25,7 +25,7 @@ const nextConfig = {
       },
       {
         source: '/profile/:slug*',
-        destination: '/main/account/:slug*',
+        destination: '/main/profile/:slug*',
       },
       {
         source: '/tavern/:slug*',

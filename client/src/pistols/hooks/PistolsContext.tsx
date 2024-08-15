@@ -1,4 +1,4 @@
-import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect } from 'react'
+import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/router'
 import { BigNumberish } from 'starknet'
 import { Opener, useOpener } from '@/lib/ui/useOpener'
@@ -248,12 +248,9 @@ export const usePistolsScene = (mainPage?: boolean) => {
 
   const router = useRouter()
   const currentRoute = useMemo(() => (router.isReady ? router.asPath : null), [router])
-  const { routeSlugs } = useMemo(() => (
-    (router.isReady && router.query.main) ? {
-      // page: router.query.main[0],
-      routeSlugs: router.query.main.slice(1),
-    } : {}
-  ), [router])
+  const routeSlugs = useMemo(() => (
+    (router.isReady && router.query.main) ? router.query.main.slice(1) : []
+  ), [router.query?.main?.[0]]) // only when /[slug] changes
 
   //------------------
   // Dispatchers
@@ -276,23 +273,20 @@ export const usePistolsScene = (mainPage?: boolean) => {
       router.push(url)
     }
   }
-  const dispatchSetLastScene = () => {
-    dispatchSetScene(lastScene ?? SceneName.Tavern)
-  }
 
   //------------------------------
   // Detect scene from route
   // works on page reloads and navigation
   //
+  // console.log(`MAIN???`, mainPage, currentRoute)
   useEffect(() => {
-    if (mainPage)console.log(currentRoute, router)
     if (mainPage && currentRoute) {
       const newSceneName = Object.keys(sceneRoutes).find(key => {
         const route = sceneRoutes[key]
         return (route.hasDuelId || route.hasTableId) ? currentRoute.startsWith(route.baseUrl)
           : currentRoute == route.baseUrl
       }) as SceneName
-      console.log(`ROUTE [${currentRoute}] >> SCENE [${newSceneName}]`)
+      // console.log(`ROUTE [${currentRoute}] >> SCENE [${newSceneName}]`, router)
       if (newSceneName) {
         dispatchSetScene(newSceneName)
         if (sceneRoutes[newSceneName].hasTableId) {
@@ -314,13 +308,12 @@ export const usePistolsScene = (mainPage?: boolean) => {
     sceneTitle,
     tavernMenuItems,
     // helpers
-    fromGate: (lastScene == SceneName.Gate),
     atGate: (currentScene == SceneName.Gate),
     atProfile: (currentScene == SceneName.Profile),
     atTavern: tavernMenuItems.includes(currentScene),
     atDuel: (currentScene == SceneName.Duel),
+    fromGate: (lastScene == SceneName.Gate),
     // PistolsActions,
     dispatchSetScene,
-    dispatchSetLastScene,
   }
 }

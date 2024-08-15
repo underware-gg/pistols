@@ -42,7 +42,8 @@ export default function DuelistEditModal({
   const [lastDuelistIdBeforeMint, setLastDuelistIdBeforeMint] = useState<bigint>(null)
   useEffect(() => {
     // minted new! go to Game...
-    if (mintNew && 
+    if (opener.isOpen &&
+      mintNew && 
       isPositiveBigint(lastDuelistId) &&
       lastDuelistIdBeforeMint != null && 
       lastDuelistId != lastDuelistIdBeforeMint
