@@ -1,5 +1,6 @@
 import { TYPED_DATA } from '@/games/pistols/generated/constants'
 import { bigintToHex, cleanObject, isBigint } from '@/lib/utils/types'
+import { poseidon } from '@/lib/utils/starknet'
 import {
   AccountInterface,
   TypedData,
@@ -42,8 +43,9 @@ type SignMessagesResult = {
   typeSelectorName: string
   messageHash: string
   // signature: WeierstrassSignatureType, //{r,s}
-  signature: ArraySignatureType,  // big array
-  splitSignature: bigint[], // [r,s]
+  signature: Signature,
+  signatureArray: bigint[], // [r,s] or [...]
+  signatureHash: bigint,
 }
 export const signMessages = async (account: AccountInterface, chainId: string, revision: Revision, messages: Messages): Promise<SignMessagesResult> => {
   const typedMessage = createTypedMessage({ chainId, revision, messages })
@@ -51,17 +53,23 @@ export const signMessages = async (account: AccountInterface, chainId: string, r
   const typeSelectorName = getTypeSelectorName(typedMessage, typedMessage.primaryType)
   const messageHash = getMessageHash(typedMessage, account.address)
   const signature = await account.signMessage(typedMessage)
-  console.log(`SIG:`, typedMessage, 'type:', typeSelectorName, typeHash, 'message:', messageHash, signature)
-  let splitSignature: bigint[] = []
-  if (Array.isArray(signature)) {
-    // OK!
-  } else {
-    console.error('signMessages() data/sig:', typedMessage, signature)
-    throw new Error('signMessages() signature is not Array')
-    // splitSignature = splitSignature(signature)
-  }
+  //@ts-ignore
+  console.log(signature.slice(-2))
+  let signatureArray: bigint[] =
+    Array.isArray(signature) ? signature.map(v => BigInt(v)) // [...]
+      : splitSignature(signature) // {r,s}
+  const signatureHash = poseidon(signatureArray.slice(-2))
+  console.log(`SIG:`, typedMessage, 'type:', typeSelectorName, typeHash, 'message:', messageHash, signature, 'sigHash:', bigintToHex(signatureHash))
   // throw new Error('STOP')
-  return { typedMessage, typeHash, typeSelectorName, messageHash, signature, splitSignature }
+  return {
+    typedMessage,
+    typeHash,
+    typeSelectorName,
+    messageHash,
+    signature,
+    signatureArray,
+    signatureHash,
+  }
 }
 export const verifyMessages = async (account: AccountInterface, chainId: string, revision: Revision, messages: Messages, signature: WeierstrassSignatureType): Promise<boolean> => {
   const typedMessage = createTypedMessage({ chainId, revision, messages })
@@ -121,30 +129,30 @@ export function createTypedMessage({
     },
     message: _messages,
   } : {
-      primaryType: "Message",
-      domain: {
-        revision: revision.toString(),
-        name: domainName,
-        chainId,
-        version,
-      },
-      types: {
-        StarknetDomain: [
-          { name: "revision", type: "shortstring" },
-          { name: "name", type: "shortstring" },
-          { name: "chainId", type: "shortstring" },
-          { name: "version", type: "shortstring" },
-        ],
-        Message: Object.keys(_messages).map((name) => ({
-          name,
-          type: isBigint(_messages[name]) ? 'felt' : 'shortstring',
-          // type: typeof _messages[name] == 'bigint' ? 'felt' : 'shortstring',
-        })),
-      },
-      message: Object.keys(_messages).reduce((acc, name) => {
-        acc[name] = (isBigint(_messages[name]) ? bigintToHex(_messages[name]) : _messages[name])
-        return acc
-      }, {} as { [key: string]: any }),
+    primaryType: "Message",
+    domain: {
+      revision: revision.toString(),
+      name: domainName,
+      chainId,
+      version,
+    },
+    types: {
+      StarknetDomain: [
+        { name: "revision", type: "shortstring" },
+        { name: "name", type: "shortstring" },
+        { name: "chainId", type: "shortstring" },
+        { name: "version", type: "shortstring" },
+      ],
+      Message: Object.keys(_messages).map((name) => ({
+        name,
+        type: isBigint(_messages[name]) ? 'felt' : 'shortstring',
+        // type: typeof _messages[name] == 'bigint' ? 'felt' : 'shortstring',
+      })),
+    },
+    message: Object.keys(_messages).reduce((acc, name) => {
+      acc[name] = (isBigint(_messages[name]) ? bigintToHex(_messages[name]) : _messages[name])
+      return acc
+    }, {} as { [key: string]: any }),
   }
   return result
 }

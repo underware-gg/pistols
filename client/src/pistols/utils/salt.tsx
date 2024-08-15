@@ -1,9 +1,6 @@
-import {
-  AccountInterface,
-  BigNumberish,
-} from 'starknet'
+import { AccountInterface, BigNumberish } from 'starknet'
 import { pedersen } from '@/lib/utils/starknet'
-import { signMessages, Messages, splitSignature, getTypeHash, getMessageHash } from '@/lib/utils/starknet_sign'
+import { signMessages, Messages } from '@/lib/utils/starknet_sign'
 import { HASH_SALT_MASK } from '@/pistols/utils/constants'
 import { bigintToHex } from '@/lib/utils/types'
 
@@ -40,12 +37,12 @@ const signAndGenerateSalt = async (account: AccountInterface, chainId: string, d
         roundNumber: BigInt(roundNumber),
         duelistId: BigInt(duelistId),
       }
-      const { signature, splitSignature } = await signMessages(account, chainId, 1, messages)
-      if (splitSignature.length == 0) {
+      const { signatureHash } = await signMessages(account, chainId, 1, messages)
+      if (signatureHash == 0n) {
         // get on-chain????
-        throw new Error('wrong signature')
+        throw new Error('bad signature')
       }
-      result = ((splitSignature[0] ^ splitSignature[1]) & HASH_SALT_MASK)
+      result = (signatureHash & HASH_SALT_MASK)
     } catch (e) {
       console.warn(`signAndGenerateSalt() exception:`, e)
     }
