@@ -25,25 +25,28 @@ export const useTokenContract = () => {
 
 export const useDuelistTokenCount = () => {
   const { contractAddress, components } = useTokenContract()
-  const { totalSupply } = useOrigamiERC721TotalSupply(contractAddress, components)
+  const { totalSupply, isPending } = useOrigamiERC721TotalSupply(contractAddress, components)
   return {
     tokenCount: totalSupply ?? 0,
+    isPending,
   }
 }
 
 export const useDuelistOwner = (token_id: BigNumberish) => {
   const { contractAddress, components } = useTokenContract()
-  const { owner } = useOrigamiERC721OwnerOf(contractAddress, token_id, components)
+  const { owner, isPending } = useOrigamiERC721OwnerOf(contractAddress, token_id, components)
   return {
     owner,
+    isPending,
   }
 }
 
 export const useDuelistBalanceOf = (address: BigNumberish) => {
   const { contractAddress, components } = useTokenContract()
-  const { amount } = useOrigamiERC721BalanceOf(contractAddress, address, components)
+  const { amount, isPending } = useOrigamiERC721BalanceOf(contractAddress, address, components)
   return {
     duelistBalance: amount ?? 0,
+    isPending,
   }
 }
 
@@ -58,17 +61,19 @@ export const useDuelistOfOwnerByIndex = (address: BigNumberish, index: BigNumber
 export const useLastDuelistOfOwner = (address: BigNumberish) => {
   const { contractAddress, components } = useTokenContract()
   const { duelistBalance } = useDuelistBalanceOf(address)
-  const { tokenId } = useOrigamiERC721TokenOfOwnerByIndex(contractAddress, address, (duelistBalance - 1), components)
+  const { tokenId, isPending } = useOrigamiERC721TokenOfOwnerByIndex(contractAddress, address, (duelistBalance - 1), components)
   return {
     lastDuelistId: tokenId,
+    isPending,
   }
 }
 
 export const useDuelistIndexOfOwner = (address: BigNumberish, token_id: BigNumberish) => {
   const { contractAddress, components } = useTokenContract()
-  const { index } = useOrigamiERC721IndexOfOwnerByToken(contractAddress, address, token_id, components)
+  const { index, isPending } = useOrigamiERC721IndexOfOwnerByToken(contractAddress, address, token_id, components)
   return {
     duelistIndex: index,
+    isPending,
   }
 }
 

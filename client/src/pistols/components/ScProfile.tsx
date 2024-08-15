@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Tab } from 'semantic-ui-react'
 import { VStack } from '@/lib/ui/Stack'
 import { useAccount } from '@starknet-react/core'
@@ -24,16 +24,20 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export default function ScProfile() {
-  const { isConnected } = useAccount()
+  const { isConnected, address } = useAccount()
   const { duelistEditOpener } = usePistolsContext()
   const { fromGate } = usePistolsScene()
+  const { duelistBalance, isPending } = useDuelistBalanceOf(address)
 
-  useEffectOnce(() => {
-    // Gate will direct here to create a new duelist
-    if (fromGate) {
-      duelistEditOpener.open({ mintNew: true })
+  const [loaded, setLoaded] = useState(false)
+  useEffect(() => {
+    if (!loaded) {
+      setLoaded(true)
+      if (fromGate && !isPending && duelistBalance == 0) {
+        duelistEditOpener.open({ mintNew: true })
+      }
     }
-  }, [])
+  }, [duelistBalance, isPending])
 
   return (
     <div id='Gate'>
@@ -70,7 +74,7 @@ export default function ScProfile() {
 function DuelistsConnect() {
   const { address } = useAccount()
   const { duelistEditOpener } = usePistolsContext()
-  const { duelistBalance: duelistCount } = useDuelistBalanceOf(address)
+  const { duelistBalance } = useDuelistBalanceOf(address)
   const { canMint } = useCanMintDuelist(address)
 
   const _mintDuelist = () => {
@@ -79,11 +83,11 @@ function DuelistsConnect() {
 
   const rows = useMemo(() => {
     let result = []
-    for (let index = 0; index < duelistCount; ++index) {
+    for (let index = 0; index < duelistBalance; ++index) {
       result.push(<DuelistItem key={`i${index}`} index={index} />)
     }
     return result
-  }, [address, duelistCount])
+  }, [address, duelistBalance])
 
   return (
     <VStack className='Faded FillWidth UIAccountsListScroller_XX'>
@@ -107,7 +111,7 @@ function DuelistsConnect() {
 function DuelistsList() {
   const { address } = useAccount()
   const { duelistEditOpener } = usePistolsContext()
-  const { duelistBalance: duelistCount } = useDuelistBalanceOf(address)
+  const { duelistBalance } = useDuelistBalanceOf(address)
   const { canMint } = useCanMintDuelist(address)
 
   const _mintDuelist = () => {
@@ -116,17 +120,17 @@ function DuelistsList() {
 
   const rows = useMemo(() => {
     let result = []
-    for (let index = 0; index < duelistCount; ++index) {
+    for (let index = 0; index < duelistBalance; ++index) {
       result.push(<DuelistItem key={`i${index}`} index={index} />)
     }
     return result
-  }, [address, duelistCount])
+  }, [address, duelistBalance])
 
   return (
     <VStack className='Faded FillWidth UIAccountsListScroller_XX'>
       <Divider hidden />
       <Grid className='Faded FillWidth'>
-        {duelistCount > 0 &&
+        {duelistBalance > 0 &&
           <Row columns={'equal'} className='Title'>
             <Col>
               Pick A Duelist To Play
@@ -134,7 +138,7 @@ function DuelistsList() {
           </Row>
         }
         {rows}
-        {duelistCount == 0 &&
+        {duelistBalance == 0 &&
           <Row columns={'equal'} className='Title'>
             <Col>
               You need a Duelist to Play

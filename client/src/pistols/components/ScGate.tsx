@@ -28,9 +28,7 @@ export default function ScGate() {
     <div id='Gate'>
       <UIContainer>
         <GateHeader />
-
         <GateMenu />
-
       </UIContainer>
 
       <CurrentChainHint />
