@@ -14,7 +14,7 @@ import { WagerBalance } from '@/pistols/components/account/LordsBalance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { Divider } from '@/lib/ui/Divider'
 import { IconClick } from '@/lib/ui/Icons'
-import { CurrentChainHint } from '@/pistols/components/Gate'
+import { ConnectButton, CurrentChainHint, EnterAsGuestButton } from '@/pistols/components/Gate'
 import { SocialsList } from '@/pistols/components/SocialsList'
 import WalletHeader from '@/pistols/components/account/WalletHeader'
 import DuelistEditModal from '@/pistols/components/DuelistEditModal'
@@ -39,22 +39,20 @@ export default function GateProfile() {
     <div id='Gate'>
       <UIContainer>
         <WalletHeader />
-        {isConnected &&
-          <Tab
-            menu={{ secondary: true, pointing: true, attached: true }}
-            panes={[
-              {
-                menuItem: 'Duelists',
-                render: () => <DuelistsList />,
-              },
-              {
-                menuItem: 'Connections',
-                render: () => <SocialsList />,
-              },
-            ]}
-          >
-          </Tab>
-        }
+        <Tab
+          menu={{ secondary: true, pointing: true, attached: true }}
+          panes={[
+            {
+              menuItem: 'Duelists',
+              render: () => isConnected ? <DuelistsList /> : <DuelistsConnect />,
+            },
+            {
+              menuItem: 'Connections',
+              render: () => <SocialsList />,
+            },
+          ]}
+        >
+        </Tab>
       </UIContainer>
 
       <DuelistEditModal opener={duelistEditOpener} />
@@ -67,6 +65,44 @@ export default function GateProfile() {
 //------------------------------------
 // Duelists
 //
+
+
+function DuelistsConnect() {
+  const { address } = useAccount()
+  const { duelistEditOpener } = usePistolsContext()
+  const { duelistBalance: duelistCount } = useDuelistBalanceOf(address)
+  const { canMint } = useCanMintDuelist(address)
+
+  const _mintDuelist = () => {
+    duelistEditOpener.open({ mintNew: true })
+  }
+
+  const rows = useMemo(() => {
+    let result = []
+    for (let index = 0; index < duelistCount; ++index) {
+      result.push(<DuelistItem key={`i${index}`} index={index} />)
+    }
+    return result
+  }, [address, duelistCount])
+
+  return (
+    <VStack className='Faded FillWidth UIAccountsListScroller_XX'>
+      <Divider />
+      <span className='Title'>
+        Create or Log In with your
+        <br />
+        Controller Account
+      </span>
+
+      <Divider />
+      <ConnectButton />
+
+      <Divider content='OR' />
+      <EnterAsGuestButton />
+    </VStack>
+  )
+}
+
 
 function DuelistsList() {
   const { address } = useAccount()

@@ -4,6 +4,7 @@ import { VStack } from '@/lib/ui/Stack'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { Divider } from '@/lib/ui/Divider'
 import { CustomIcon } from '@/lib/ui/Icons'
+import { useAccount } from '@starknet-react/core'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -48,38 +49,37 @@ function SocialItem({
   name,
   logoName,
   status,
-  isConnected,
+  isSocialConnected,
   canClick,
   onClick,
 }: {
   name: string
   logoName: string
   status: string
-  isConnected: boolean
+  isSocialConnected: boolean
   canClick: boolean
   onClick: Function
 }) {
-
-  const _status = 'not connected'
-
+  const { isConnected } = useAccount()
+  const canConnect = (canClick && isConnected && !isSocialConnected)
   return (
     <Row textAlign='center' verticalAlign='top'>
       <Col width={3} className='NoPadding'>
-        <CustomIcon logo name={logoName} size={'huge'} disabled={!isConnected} />
+        <CustomIcon logo name={logoName} size={'huge'} disabled={!isSocialConnected} />
       </Col>
       <Col width={8} textAlign='left'>
         <h4>{name}</h4>
         <span className='H4'>{status}</span>
       </Col>
       <Col width={5} textAlign='left' verticalAlign='bottom'>
-        <ActionButton fill important disabled={!canClick} onClick={() => onClick()} label={isConnected ? 'Disconnect' : 'Connect'} />
+        <ActionButton fill important disabled={!canConnect} onClick={() => onClick()} label={isSocialConnected ? 'Disconnect' : 'Connect'} />
       </Col>
     </Row>
   )
 }
 
 function ConnectDiscord() {
-  const isConnected = false
+  const isSocialConnected = false
   const status = 'not connected'
   const _connect = () => {
   }
@@ -88,7 +88,7 @@ function ConnectDiscord() {
       name='Discord'
       logoName='discord'
       status={status}
-      isConnected={isConnected}
+      isSocialConnected={isSocialConnected}
       canClick={true}
       onClick={() => _connect()}
     />
@@ -96,7 +96,7 @@ function ConnectDiscord() {
 }
 
 function ConnectTelegram() {
-  const isConnected = false
+  const isSocialConnected = false
   const status = 'not connected'
   const _connect = () => {
   }
@@ -105,7 +105,7 @@ function ConnectTelegram() {
       name='Telegram'
       logoName='telegram'
       status={status}
-      isConnected={isConnected}
+      isSocialConnected={isSocialConnected}
       canClick={false}
       onClick={() => _connect()}
     />
@@ -113,7 +113,7 @@ function ConnectTelegram() {
 }
 
 function ConnectTwitter() {
-  const isConnected = false
+  const isSocialConnected = false
   const status = 'not connected'
   const _connect = () => {
   }
@@ -122,7 +122,7 @@ function ConnectTwitter() {
       name='X'
       logoName='twitter'
       status={status}
-      isConnected={isConnected}
+      isSocialConnected={isSocialConnected}
       canClick={false}
       onClick={() => _connect()}
     />

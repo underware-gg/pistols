@@ -54,7 +54,7 @@ export default function WalletHeader({
             </div>
           </Col>
         }
-        {!isConnected && 
+        {!isConnected &&
           <Col width={12} textAlign='left'>
             <h4>Guest</h4>
           </Col>
@@ -70,23 +70,6 @@ export default function WalletHeader({
           }
           <Col verticalAlign='middle'>
             <ActionButton fill large onClick={() => disconnect()} label='Disconnect' />
-          </Col>
-        </Row>
-      }
-
-      {!isConnected &&
-        <Row columns={'equal'}>
-          <Col textAlign='center' verticalAlign='middle'>
-            <Divider />
-            <span className='Title'>
-              Create or Log In with your
-              <br />
-              Controller Account
-            </span>
-            <Divider />
-            <ConnectButton />
-            <Divider content='OR' />
-            <EnterAsGuestButton />
           </Col>
         </Row>
       }
