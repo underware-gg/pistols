@@ -47,8 +47,7 @@ lords_mock = []
 #--------------------------
 # Dojo profiles declaration
 #
+[profile.dev]
 [profile.slot]
-
 [profile.staging]
-
 [profile.sepolia]

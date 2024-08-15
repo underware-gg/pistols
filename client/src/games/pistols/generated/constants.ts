@@ -14,11 +14,11 @@ type SELECTORS_Type = {
   LORDS_MOCK: BigNumberish, // cairo: felt252
 };
 export const SELECTORS: SELECTORS_Type = {
-  ADMIN: 'selector_from_tag!("pistols-admin")',
-  ACTIONS: 'selector_from_tag!("pistols-actions")',
-  MINTER: 'selector_from_tag!("pistols-minter")',
-  TOKEN_DUELIST: 'selector_from_tag!("pistols-token_duelist")',
-  LORDS_MOCK: 'selector_from_tag!("pistols-lords_mock")',
+  ADMIN: '0x036fd20372b5d47c092e2fede52897075978efb732aeaeb155d19eb8147f6497', // 'selector_from_tag!("pistols-admin")'
+  ACTIONS: '0x04f10cff77842b589eafef9f3261c4cb207e41302e7ac01527cff88ad26ded3e', // 'selector_from_tag!("pistols-actions")'
+  MINTER: '0x07b759538267ac8937772e5bdadb6b598748b33c377c90426fc0a4960234de20', // 'selector_from_tag!("pistols-minter")'
+  TOKEN_DUELIST: '0x0541e9c1813eb1f7867062ea0fafcd949ad9d3f8b212bbac1df80c48947c48cd', // 'selector_from_tag!("pistols-token_duelist")'
+  LORDS_MOCK: '0x02b1156e63a09854c3d8dba0cad93b41e1fc4662466a0ffc2a9ec9e54b4bc788', // 'selector_from_tag!("pistols-lords_mock")'
 };
 
 // from: ../dojo/src/models/config.cairo
