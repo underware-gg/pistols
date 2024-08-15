@@ -14,6 +14,7 @@ mod tests {
     use pistols::interfaces::systems::{SELECTORS};
 
     const INVALID_TABLE: felt252 = 'TheBookIsOnTheTable';
+    const CONFIG_HASH: felt252 = selector_from_tag!("pistols-Config");
 
     fn DUMMY_LORDS() -> ContractAddress { starknet::contract_address_const::<0x131313131313>() }
 
@@ -34,62 +35,62 @@ mod tests {
     }
 
     #[test]
-    fn test_am_i_owner() {
+    fn test_am_i_admin() {
         let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
-        assert(admin.am_i_owner(OWNER()) == true, 'default_true');
-        assert(admin.am_i_owner(OTHER()) == false, 'other_false');
+        assert(admin.am_i_admin(OWNER()) == true, 'default_true');
+        assert(admin.am_i_admin(OTHER()) == false, 'other_false');
     }
 
     #[test]
-    fn test_set_unset_owner() {
+    fn test_set_ungrant_admin() {
         let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
-        assert(world.is_owner(SELECTORS::ADMIN, OWNER()) == true, 'default_owner_true');
-        assert(world.is_owner(SELECTORS::ADMIN, OTHER()) == false, 'default_other_owner_false');
+        assert(world.is_writer(CONFIG_HASH, OWNER()) == true, 'default_owner_true');
+        assert(world.is_writer(CONFIG_HASH, OTHER()) == false, 'default_other_owner_false');
         // am_i?
-        assert(admin.am_i_owner(OTHER()) == false, 'owner_am_i_false');
+        assert(admin.am_i_admin(OTHER()) == false, 'owner_am_i_false');
         // set
-        tester::execute_admin_set_owner(admin, OWNER(), OTHER(), true);
-        assert(world.is_owner(SELECTORS::ADMIN, OWNER()) == true, 'owner_still');
-        assert(world.is_owner(SELECTORS::ADMIN, OTHER()) == true, 'new_other_true');
+        tester::execute_admin_grant_admin(admin, OWNER(), OTHER(), true);
+        assert(world.is_writer(CONFIG_HASH, OWNER()) == true, 'owner_still');
+        assert(world.is_writer(CONFIG_HASH, OTHER()) == true, 'new_other_true');
         // am_i?
-        assert(admin.am_i_owner(OTHER()) == true, 'owner_am_i_true');
+        assert(admin.am_i_admin(OTHER()) == true, 'owner_am_i_true');
         // can write
         tester::execute_admin_set_paused(admin, OTHER(), true);
         let config: Config = tester::get_Config(world);
         assert(config.is_paused == true, 'paused');
         // unset
-        tester::execute_admin_set_owner(admin, OWNER(), OTHER(), false);
-        assert(world.is_owner(SELECTORS::ADMIN, OTHER()) == false, 'new_other_false');
+        tester::execute_admin_grant_admin(admin, OWNER(), OTHER(), false);
+        assert(world.is_writer(CONFIG_HASH, OTHER()) == false, 'new_other_false');
         // am_i?
-        assert(admin.am_i_owner(OTHER()) == false, 'owner_am_i_false_again');
+        assert(admin.am_i_admin(OTHER()) == false, 'owner_am_i_false_again');
     }
 
     #[test]
-    #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: not admin', 'ENTRYPOINT_FAILED'))]
     fn test_set_revoke_owner_write() {
         let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         // set
-        tester::execute_admin_set_owner(admin, OWNER(), OTHER(), true);
-        assert(world.is_owner(SELECTORS::ADMIN, OTHER()) == true, 'new_owner_true');
+        tester::execute_admin_grant_admin(admin, OWNER(), OTHER(), true);
+        assert(world.is_writer(CONFIG_HASH, OTHER()) == true, 'new_owner_true');
         // unset
-        tester::execute_admin_set_owner(admin, OWNER(), OTHER(), false);
-        assert(world.is_owner(SELECTORS::ADMIN, OTHER()) == false, 'new_owner_false');
+        tester::execute_admin_grant_admin(admin, OWNER(), OTHER(), false);
+        assert(world.is_writer(CONFIG_HASH, OTHER()) == false, 'new_owner_false');
         // cannot write
         tester::execute_admin_set_paused(admin, OTHER(), true);
     }
 
     #[test]
     #[should_panic(expected:('ADMIN: Invalid account_address', 'ENTRYPOINT_FAILED'))]
-    fn test_set_owner_null() {
+    fn test_grant_admin_null() {
         let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
-        tester::execute_admin_set_owner(admin, OWNER(), ZERO(), true);
+        tester::execute_admin_grant_admin(admin, OWNER(), ZERO(), true);
     }
 
     #[test]
-    #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
-    fn test_set_owner_not_owner() {
+    #[should_panic(expected:('ADMIN: not admin', 'ENTRYPOINT_FAILED'))]
+    fn test_grant_admin_not_owner() {
         let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
-        tester::execute_admin_set_owner(admin, OTHER(), BUMMER(), true);
+        tester::execute_admin_grant_admin(admin, OTHER(), BUMMER(), true);
     }
 
     #[test]
@@ -108,7 +109,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: not admin', 'ENTRYPOINT_FAILED'))]
     fn test_set_paused_not_owner() {
         let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         tester::execute_admin_set_paused(admin, OTHER(), true);
@@ -142,7 +143,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: not admin', 'ENTRYPOINT_FAILED'))]
     fn test_set_config_not_owner() {
         let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         let mut config: Config = tester::get_Config(world);
@@ -225,7 +226,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: not admin', 'ENTRYPOINT_FAILED'))]
     fn test_set_table_not_owner() {
         let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         let table: TableConfig = tester::get_Table(world, tables::LORDS);
@@ -233,7 +234,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: not admin', 'ENTRYPOINT_FAILED'))]
     fn test_open_table_not_owner() {
         let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         tester::execute_admin_open_table(admin, OTHER(), tables::LORDS, true);
@@ -310,7 +311,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('ADMIN: Not owner', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: not admin', 'ENTRYPOINT_FAILED'))]
     fn test_set_table_admittance_not_owner() {
         let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         let mut admittance: TableAdmittance = tester::get_TableAdmittance(world, tables::LORDS);

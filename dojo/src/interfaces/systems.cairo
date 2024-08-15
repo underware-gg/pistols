@@ -1,9 +1,12 @@
 use starknet::{ContractAddress, ClassHash};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait, Resource};
 
-use pistols::systems::actions::{IActionsDispatcher, IActionsDispatcherTrait};
-use pistols::systems::minter::{IMinterDispatcher, IMinterDispatcherTrait};
-use pistols::systems::token_duelist::{ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait};
+use pistols::systems::{
+    actions::{IActionsDispatcher, IActionsDispatcherTrait},
+    admin::{IAdminDispatcher, IAdminDispatcherTrait},
+    minter::{IMinterDispatcher, IMinterDispatcherTrait},
+    token_duelist::{ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait},
+};
 use pistols::libs::utils::{ZERO};
 
 mod SELECTORS {
@@ -23,33 +26,31 @@ impl WorldSystemsTraitImpl of WorldSystemsTrait {
             (ZERO())
         }
     }
+
     //
     // system addresses
-    fn actions_address(self: IWorldDispatcher) -> ContractAddress {
-        (self.contract_address(SELECTORS::ACTIONS))
-    }
-    fn minter_address(self: IWorldDispatcher) -> ContractAddress {
-        (self.contract_address(SELECTORS::MINTER))
-    }
     fn token_duelist_address(self: IWorldDispatcher) -> ContractAddress {
         (self.contract_address(SELECTORS::TOKEN_DUELIST))
     }
 
     //
     // dispatchers
+    fn admin_dispatcher(self: IWorldDispatcher) -> IAdminDispatcher {
+        (IAdminDispatcher{ contract_address: self.contract_address(SELECTORS::ADMIN) })
+    }
     fn actions_dispatcher(self: IWorldDispatcher) -> IActionsDispatcher {
-        (IActionsDispatcher{ contract_address: self.actions_address() })
+        (IActionsDispatcher{ contract_address: self.contract_address(SELECTORS::ACTIONS) })
     }
     fn minter_dispatcher(self: IWorldDispatcher) -> IMinterDispatcher {
-        (IMinterDispatcher{ contract_address: self.minter_address() })
+        (IMinterDispatcher{ contract_address: self.contract_address(SELECTORS::MINTER) })
     }
     fn token_duelist_dispatcher(self: IWorldDispatcher) -> ITokenDuelistDispatcher {
-        (ITokenDuelistDispatcher{ contract_address: self.token_duelist_address() })
+        (ITokenDuelistDispatcher{ contract_address: self.contract_address(SELECTORS::TOKEN_DUELIST) })
     }
 
     //
     // validators
     fn is_minter_contract(self: IWorldDispatcher, address: ContractAddress) -> bool {
-        (address == self.minter_address())
+        (address == self.contract_address(SELECTORS::MINTER))
     }
 }

@@ -28,14 +28,14 @@ export const OwnerForm = ({
   const { isOwner } = useAdminIsOwner(validatedAddress)
 
   const { account } = useAccount()
-  const { set_owner } = useDojoSystemCalls()
+  const { grant_admin } = useDojoSystemCalls()
   const { IAmOwner } = useAdminAmIOwner()
 
   const canGrant = (IAmOwner && isStarknetAddress && !isOwner)
   const canRevoke = (IAmOwner && isStarknetAddress && isOwner)
 
   const _grant = (granted: boolean) => {
-    set_owner(account, validatedAddress, granted)
+    grant_admin(account, validatedAddress, granted)
   }
 
   return (

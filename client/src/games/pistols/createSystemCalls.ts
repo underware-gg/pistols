@@ -175,9 +175,9 @@ export function createSystemCalls(
     return await _executeTransaction(signer, actions_call('reveal_action', args))
   }
 
-  const set_owner = async (signer: AccountInterface, address: BigNumberish, granted: boolean): Promise<boolean> => {
+  const grant_admin = async (signer: AccountInterface, address: BigNumberish, granted: boolean): Promise<boolean> => {
     const args = [address, granted]
-    return await _executeTransaction(signer, admin_call('set_owner', args))
+    return await _executeTransaction(signer, admin_call('grant_admin', args))
   }
 
   const admin_set_config = async (signer: AccountInterface, values: any): Promise<boolean> => {
@@ -280,9 +280,9 @@ export function createSystemCalls(
     return results ?? null
   }
 
-  const admin_am_i_owner = async (account_address: BigNumberish): Promise<string | null> => {
+  const admin_am_i_admin = async (account_address: BigNumberish): Promise<string | null> => {
     const args = [account_address]
-    const results = await _executeCall<string>(admin_call('am_i_owner', args))
+    const results = await _executeCall<string>(admin_call('am_i_admin', args))
     return results ?? null
   }
 
@@ -322,11 +322,11 @@ export function createSystemCalls(
     duelist_token_uri,
     //
     // ADMIN
-    set_owner,
+    grant_admin,
     admin_set_config,
     admin_set_table,
     admin_set_table_admittance,
-    admin_am_i_owner,
+    admin_am_i_admin,
     //
     // TEST/DEBUG
     validate_commit_message,

@@ -300,9 +300,9 @@ mod tester {
     //
 
     // ::admin
-    fn execute_admin_set_owner(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress, granted: bool) {
+    fn execute_admin_grant_admin(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress, granted: bool) {
         impersonate(sender);
-        system.set_owner(owner_address, granted);
+        system.grant_admin(owner_address, granted);
         _next_block();
     }
     fn execute_admin_set_config(system: IAdminDispatcher, sender: ContractAddress, config: Config) {

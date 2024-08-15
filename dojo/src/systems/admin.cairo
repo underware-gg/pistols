@@ -9,8 +9,8 @@ use pistols::models::table::{TableConfig, TableAdmittance};
 
 #[dojo::interface]
 trait IAdmin {
-    fn am_i_owner(world: @IWorldDispatcher, account_address: ContractAddress) -> bool;
-    fn set_owner(ref world: IWorldDispatcher, account_address: ContractAddress, granted: bool);
+    fn am_i_admin(world: @IWorldDispatcher, account_address: ContractAddress) -> bool;
+    fn grant_admin(ref world: IWorldDispatcher, account_address: ContractAddress, granted: bool);
 
     fn set_config(ref world: IWorldDispatcher, config: Config);
     fn set_paused(ref world: IWorldDispatcher, paused: bool);
@@ -32,14 +32,19 @@ mod admin {
     use pistols::libs::utils;
 
     mod Errors {
-        const INVALID_OWNER: felt252       = 'ADMIN: Invalid account_address';
-        const INVALID_TREASURY: felt252    = 'ADMIN: Invalid treasury_address';
-        const INVALID_TABLE: felt252       = 'ADMIN: Invalid table';
-        const INVALID_DESCRIPTION: felt252 = 'ADMIN: Invalid description';
-        const NOT_OWNER: felt252           = 'ADMIN: Not owner';
+        const INVALID_OWNER: felt252        = 'ADMIN: Invalid account_address';
+        const INVALID_TREASURY: felt252     = 'ADMIN: Invalid treasury_address';
+        const INVALID_TABLE: felt252        = 'ADMIN: Invalid table';
+        const INVALID_DESCRIPTION: felt252  = 'ADMIN: Invalid description';
+        const NOT_ADMIN: felt252            = 'ADMIN: not admin';
     }
 
-    
+    mod Selectors {
+        const CONFIG: felt252 = selector_from_tag!("pistols-Config");
+        const TABLE_CONFIG: felt252 = selector_from_tag!("pistols-TableConfig");
+        const TOKEN_CONFIG: felt252 = selector_from_tag!("pistols-TokenConfig");
+    }
+
     fn dojo_init(
         ref world: IWorldDispatcher,
         treasury_address: ContractAddress,
@@ -57,18 +62,34 @@ mod admin {
 
     #[abi(embed_v0)]
     impl AdminImpl of super::IAdmin<ContractState> {
-        fn am_i_owner(world: @IWorldDispatcher, account_address: ContractAddress) -> bool {
-            (world.is_owner(self.selector().into(), account_address))
+        fn am_i_admin(world: @IWorldDispatcher, account_address: ContractAddress) -> bool {
+            (
+                world.is_owner(self.selector().into(), account_address) ||
+                (
+                    world.is_writer(Selectors::CONFIG, account_address) &&
+                    world.is_writer(Selectors::TABLE_CONFIG, account_address) &&
+                    world.is_writer(Selectors::TOKEN_CONFIG, account_address)
+                )
+            )
         }
 
-        fn set_owner(ref world: IWorldDispatcher, account_address: ContractAddress, granted: bool) {
+        fn grant_admin(ref world: IWorldDispatcher, account_address: ContractAddress, granted: bool) {
             utils::WORLD(world);
-            self.assert_caller_is_owner();
-            self.grant_owner(account_address, granted);
+            self.assert_caller_is_admin();
+            assert(account_address.is_non_zero(), Errors::INVALID_OWNER);
+            if (granted) {
+                self.world().grant_writer(Selectors::CONFIG, account_address);
+                self.world().grant_writer(Selectors::TABLE_CONFIG, account_address);
+                self.world().grant_writer(Selectors::TOKEN_CONFIG, account_address);
+            } else {
+                self.world().revoke_writer(Selectors::CONFIG, account_address);
+                self.world().revoke_writer(Selectors::TABLE_CONFIG, account_address);
+                self.world().revoke_writer(Selectors::TOKEN_CONFIG, account_address);
+            }
         }
 
         fn set_config(ref world: IWorldDispatcher, config: Config) {
-            self.assert_caller_is_owner();
+            self.assert_caller_is_admin();
             assert(config.treasury_address.is_non_zero(), Errors::INVALID_TREASURY);
             // get current
             let manager = ConfigManagerTrait::new(world);
@@ -76,7 +97,7 @@ mod admin {
         }
 
         fn set_paused(ref world: IWorldDispatcher, paused: bool) {
-            self.assert_caller_is_owner();
+            self.assert_caller_is_admin();
             // get current
             let manager = ConfigManagerTrait::new(world);
             let mut config = manager.get();
@@ -86,7 +107,7 @@ mod admin {
         }
 
         fn set_table(ref world: IWorldDispatcher, table: TableConfig) {
-            self.assert_caller_is_owner();
+            self.assert_caller_is_admin();
             // get table
             let manager = TableManagerTrait::new(world);
             // assert(manager.exists(table.table_id), Errors::INVALID_TABLE);
@@ -94,7 +115,7 @@ mod admin {
         }
 
         fn set_table_admittance(ref world: IWorldDispatcher, table_admittance: TableAdmittance) {
-            self.assert_caller_is_owner();
+            self.assert_caller_is_admin();
             // get table
             let manager = TableManagerTrait::new(world);
             assert(manager.exists(table_admittance.table_id), Errors::INVALID_TABLE);
@@ -102,7 +123,7 @@ mod admin {
         }
 
         fn open_table(ref world: IWorldDispatcher, table_id: felt252, is_open: bool) {
-            self.assert_caller_is_owner();
+            self.assert_caller_is_admin();
             // get table
             let manager = TableManagerTrait::new(world);
             assert(manager.exists(table_id), Errors::INVALID_TABLE);
@@ -115,16 +136,13 @@ mod admin {
 
     #[generate_trait]
     impl InternalImpl of InternalTrait {
-        fn assert_caller_is_owner(self: @ContractState) {
-            assert(self.am_i_owner(get_caller_address()) == true, Errors::NOT_OWNER);
+        #[inline(always)]
+        fn assert_caller_is_admin(self: @ContractState) {
+            assert(self.am_i_admin(get_caller_address()) == true, Errors::NOT_ADMIN);
         }
-        fn grant_owner(self: @ContractState, account_address: ContractAddress, granted: bool) {
-            assert(account_address.is_non_zero(), Errors::INVALID_OWNER);
-            if (granted) {
-                self.world().grant_owner(self.selector().into(), account_address);
-            } else {
-                self.world().revoke_owner(self.selector().into(), account_address);
-            }
-        }
+        // #[inline(always)]
+        // fn assert_caller_is_owner(world: @IWorldDispatcher) {
+        //     assert(world.is_owner(self.selector().into(), get_caller_address()) == true, Errors::NOT_ADMIN);
+        // }
     }
 }

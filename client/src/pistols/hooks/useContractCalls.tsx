@@ -121,9 +121,9 @@ export const useAdminAmIOwner = () => {
 
 export const useAdminIsOwner = (address: BigNumberish) => {
   const args = useMemo(() => ([address]), [address])
-  const { admin_am_i_owner } = useDojoSystemCalls()
+  const { admin_am_i_admin } = useDojoSystemCalls()
   const { value, isPending } = useContractCall({
-    call: admin_am_i_owner,
+    call: admin_am_i_admin,
     args,
     enabled: isPositiveBigint(address),
   })

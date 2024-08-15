@@ -8,11 +8,6 @@ trait IMinter {
     // fn get_token_svg(ref world: IWorldDispatcher, token_id: u128) -> ByteArray;
 }
 
-#[dojo::interface]
-trait IMinterInternal {
-    fn assert_caller_is_owner(world: @IWorldDispatcher);
-}
-
 #[dojo::contract]
 mod minter {
     use debug::PrintTrait;
@@ -23,19 +18,20 @@ mod minter {
     use pistols::interfaces::systems::{
         WorldSystemsTrait,
         ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait,
+        IAdminDispatcher, IAdminDispatcherTrait,
     };
     use pistols::models::token_config::{TokenConfig};
     use pistols::types::constants::{constants};
 
     mod Errors {
         // admin
-        const INVALID_TOKEN_ADDRESS: felt252 = 'MINTER: invalid token address';
-        const INVALID_SUPPLY: felt252 = 'MINTER: invalid supply';
-        const NOT_OWNER: felt252 = 'MINTER: not owner';
+        const INVALID_TOKEN_ADDRESS: felt252    = 'MINTER: invalid token address';
+        const INVALID_SUPPLY: felt252           = 'MINTER: invalid supply';
+        const NOT_ADMIN: felt252                = 'MINTER: not admin';
         // mint
-        const MINTED_OUT: felt252 = 'MINTER: minted out';
-        const MINTING_IS_CLOSED: felt252 = 'MINTER: minting closed';
-        const MAXED_WALLET: felt252 = 'MINTER: wallet maxed out';
+        const MINTED_OUT: felt252               = 'MINTER: minted out';
+        const MINTING_IS_CLOSED: felt252        = 'MINTER: minting closed';
+        const MAXED_WALLET: felt252             = 'MINTER: wallet maxed out';
     }
 
     //---------------------------------------
@@ -107,17 +103,10 @@ mod minter {
         }
 
         fn set_open(ref world: IWorldDispatcher, token_contract_address: ContractAddress, is_open: bool) {
-            self.assert_caller_is_owner();
+            assert(world.admin_dispatcher().am_i_admin(get_caller_address()) == true, Errors::NOT_ADMIN);
             let mut config: TokenConfig = get!(world, (token_contract_address), TokenConfig);
             config.is_open = is_open;
             set!(world, (config));
-        }
-    }
-
-    impl InternalImpl of super::IMinterInternal<ContractState> {
-        #[inline(always)]
-        fn assert_caller_is_owner(world: @IWorldDispatcher) {
-            assert(world.is_owner(get_contract_address().into(), get_caller_address()), Errors::NOT_OWNER);
         }
     }
 
