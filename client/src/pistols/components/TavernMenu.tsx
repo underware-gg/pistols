@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Menu, Label, Tab, TabPane } from 'semantic-ui-react'
+import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useQueryContext } from '@/pistols/hooks/QueryContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
@@ -77,6 +78,15 @@ export function TavernMenu({
     tableOpener.open()
   }
 
+  const { isConnected } = useAccount()
+  const { disconnect } = useDisconnect()
+  const _exit = () => {
+    if (isConnected) {
+      disconnect()
+    }
+    dispatchSetScene(SceneName.Gate)
+  }
+
   return (
     <>
       <Grid>
@@ -101,7 +111,7 @@ export function TavernMenu({
           <MusicToggle />
           &nbsp;&nbsp;
           &nbsp;&nbsp;
-          <IconClick name='sign out' size={'large'} onClick={() => dispatchSetScene(SceneName.Gate)} />
+          <IconClick name='sign out' size={'large'} onClick={() => _exit()} />
           &nbsp;&nbsp;&nbsp;
         </div>
 

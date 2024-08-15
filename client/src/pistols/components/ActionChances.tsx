@@ -43,7 +43,7 @@ export function ActionChances({
   const otherDuelistId = useMemo(() => (isA ? duelistIdB : duelistIdA), [isA, isB, duelistIdB, duelistIdA])
   const { crit_chances: other_crit_chances } = useSimulateChances(otherDuelistId, duelId, roundNumber, Action.Strong)
 
-  console.log(`CHANCES:`, action_honour, crit_chances, crit_bonus, hit_chances, hit_bonus, lethal_chances, lethal_chances)
+  // console.log(`CHANCES:`, action_honour, crit_chances, crit_bonus, hit_chances, hit_bonus, lethal_chances, lethal_chances)
 
   const executionLabel = useMemo(() => {
     if ([Action.Flee, Action.Steal, Action.Seppuku].includes(action)) {
