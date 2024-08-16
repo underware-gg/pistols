@@ -182,7 +182,7 @@ function SignV1() {
   })
   const { sign, signAsync, isSigning, rawSignature, signaturePair } = useSignTypedMessage(typedMessage)
   const { isVerified, formatted } = useVerifyMessagesOnChain(account, typedMessage, rawSignature)
-  useEffect(() => console.log(`SignV1`, isSigning, rawSignature, signaturePair, '>>>>>', isVerified), [isSigning, rawSignature, signaturePair, isVerified])
+  useEffect(() => console.log(`SignV1`, isSigning, rawSignature, signaturePair, '>>>>>', isVerified, typedMessage), [isSigning, rawSignature, signaturePair, isVerified])
 
   // useEffect(() => console.log(`typedMessage/hash/data:`, typedMessage, hash, rawSignature), [typedMessage, hash, rawSignature])
 

@@ -8,6 +8,7 @@ import { useERC20TokenName } from '@/lib/utils/hooks/useERC20'
 import { useTable, useTableTotals } from '@/pistols/hooks/useTable'
 import { Balance } from '@/pistols/components/account/Balance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
+import { RowDivider } from '@/lib/ui/Stack'
 import { Opener } from '@/lib/ui/useOpener'
 import { Divider } from '@/lib/ui/Divider'
 import { getObjectKeyByValue } from '@/lib/utils/types'
@@ -185,9 +186,10 @@ function TableDescription({
         </Col>
       </Row>
 
+      <RowDivider />
+
       <Row columns={'equal'} className='NoPadding H5' textAlign='center'>
         <Col>
-          <Divider />
           <h5>Table is {tableIsOpen ? <span className='Important'>Open</span> : <span className='Negative'>Closed</span>}</h5>
         </Col>
       </Row>

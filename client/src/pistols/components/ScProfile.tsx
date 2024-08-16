@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Tab } from 'semantic-ui-react'
-import { VStack } from '@/lib/ui/Stack'
+import { RowDivider, VStack } from '@/lib/ui/Stack'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useCanMintDuelist } from '@/pistols/hooks/useTokenDuelist'
 import { useDuelistBalanceOf, useDuelistOfOwnerByIndex } from '@/pistols/hooks/useTokenDuelist'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
-import { ProfilePicSquare, ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
+import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { WagerBalance } from '@/pistols/components/account/LordsBalance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
@@ -172,9 +172,7 @@ function DuelistItem({
 
   return (
     <>
-      <Row columns={1} className='NoPadding'>
-        <Col><Divider /></Col>
-      </Row>
+      <RowDivider />
       <Row textAlign='center' verticalAlign='top' className={classNames.join(' ')}
         onClick={() => dispatchDuelistId(duelistId)}
       >

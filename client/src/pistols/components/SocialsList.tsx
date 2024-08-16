@@ -1,6 +1,6 @@
 import React from 'react'
-import { Grid, Image } from 'semantic-ui-react'
-import { VStack } from '@/lib/ui/Stack'
+import { Grid } from 'semantic-ui-react'
+import { RowDivider, VStack } from '@/lib/ui/Stack'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { Divider } from '@/lib/ui/Divider'
 import { CustomIcon } from '@/lib/ui/Icons'
@@ -21,22 +21,13 @@ export function SocialsList() {
           </Col>
         </Row>
 
-        <Row columns={1} className='NoPadding'>
-          <Col><Divider /></Col>
-        </Row>
-
+        <RowDivider />
         <ConnectDiscord />
 
-        <Row columns={1} className='NoPadding'>
-          <Col><Divider /></Col>
-        </Row>
-
+        <RowDivider />
         <ConnectTelegram />
 
-        <Row columns={1} className='NoPadding'>
-          <Col><Divider /></Col>
-        </Row>
-
+        <RowDivider />
         <ConnectTwitter />
 
       </Grid>

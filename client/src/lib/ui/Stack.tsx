@@ -1,6 +1,6 @@
-import { ChildProcess } from 'child_process'
 import React, { ReactElement, useMemo } from 'react'
 import { Grid, GridProps } from 'semantic-ui-react'
+import { Divider, DividerProps } from '@/lib/ui/Divider'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -44,6 +44,17 @@ export function VStackRow(props: {
           </Col>
         )
       })}
+    </Row>
+  )
+}
+
+
+export function RowDivider(props: DividerProps) {
+  return (
+    <Row columns='1' className='NoPadding'>
+      <Col>
+        <Divider {...props} />
+      </Col>
     </Row>
   )
 }
