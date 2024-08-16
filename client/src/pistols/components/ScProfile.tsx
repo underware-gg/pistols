@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Tab } from 'semantic-ui-react'
 import { VStack } from '@/lib/ui/Stack'
 import { useAccount } from '@starknet-react/core'
-import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useCanMintDuelist } from '@/pistols/hooks/useTokenDuelist'
 import { useDuelistBalanceOf, useDuelistOfOwnerByIndex } from '@/pistols/hooks/useTokenDuelist'
@@ -72,23 +71,6 @@ export default function ScProfile() {
 
 
 function DuelistsConnect() {
-  const { address } = useAccount()
-  const { duelistEditOpener } = usePistolsContext()
-  const { duelistBalance } = useDuelistBalanceOf(address)
-  const { canMint } = useCanMintDuelist(address)
-
-  const _mintDuelist = () => {
-    duelistEditOpener.open({ mintNew: true })
-  }
-
-  const rows = useMemo(() => {
-    let result = []
-    for (let index = 0; index < duelistBalance; ++index) {
-      result.push(<DuelistItem key={`i${index}`} index={index} />)
-    }
-    return result
-  }, [address, duelistBalance])
-
   return (
     <VStack className='Faded FillWidth UIAccountsListScroller_XX'>
       <Divider />
@@ -148,6 +130,8 @@ function DuelistsList() {
       </Grid>
       <Divider />
       <ActionButton fill disabled={!canMint} onClick={() => _mintDuelist()} label='Create New Duelist' />
+      <Divider content={'OR'} />
+      <EnterAsGuestButton />
     </VStack>
   )
 }
