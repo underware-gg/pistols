@@ -46,7 +46,7 @@ mod tests {
     #[test]
     #[ignore]
     fn test_mint_archetype_snapshot_Classic() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::ADMIN | flags::MINTER);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::ADMIN | flags::MINTER);
         let duelist1: Duelist = tester::execute_mint_duelist(system, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
         let duelist2: Duelist = tester::execute_mint_duelist(system, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
         assert(duelist1.score.level_villain == honour::MAX, 'level_villain');
@@ -67,7 +67,7 @@ mod tests {
     #[test]
     #[ignore]
     fn test_mint_archetype_snapshot_IRL() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::ADMIN | flags::MINTER);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::ADMIN | flags::MINTER);
         let duelist1: Duelist = tester::execute_mint_duelist(system, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
         let duelist2: Duelist = tester::execute_mint_duelist(system, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
         assert(duelist1.score.level_villain == honour::MAX, 'level_villain');
@@ -101,7 +101,7 @@ mod tests {
     #[test]
     #[ignore]
     fn test_IRL_keep_archetypes() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::SYSTEM | flags::ADMIN | flags::MINTER);
+        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::ADMIN | flags::MINTER);
         let duelist1: Duelist = tester::execute_mint_duelist(system, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
         let duelist2: Duelist = tester::execute_mint_duelist(system, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
         assert(duelist1.score.level_villain == honour::MAX, 'duelist1.level_villain');

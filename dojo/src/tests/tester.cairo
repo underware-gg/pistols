@@ -108,7 +108,7 @@ mod tester {
     const INITIAL_STEP: u64 = 0x10;
 
     mod flags {
-        const SYSTEM: u8     = 0b000001;
+        const ACTIONS: u8    = 0b000001;
         const ADMIN: u8      = 0b000010;
         const LORDS: u8      = 0b000100;
         const MINTER: u8     = 0b001000;
@@ -127,14 +127,15 @@ mod tester {
         ILordsMockDispatcher,
         IMinterDispatcher,
     ) {
-        let mut deploy_system: bool = (flags & flags::SYSTEM) != 0;
+        let mut deploy_actions: bool = (flags & flags::ACTIONS) != 0;
         let mut deploy_admin: bool = (flags & flags::ADMIN) != 0;
         let mut deploy_lords: bool = (flags & flags::LORDS) != 0;
         let mut deploy_minter: bool = (flags & flags::MINTER) != 0;
         let approve: bool = (flags & flags::APPROVE) != 0;
 
-        deploy_system = deploy_system || approve;
-        deploy_lords = deploy_lords || approve || deploy_system;
+        deploy_actions = deploy_actions || approve;
+        deploy_admin = deploy_admin || deploy_actions || approve;
+        deploy_lords = deploy_lords || approve || deploy_actions;
 
 // '----1'.print();
 // (erc_20_balance_model::TEST_CLASS_HASH).print();
@@ -191,7 +192,7 @@ mod tester {
 
         // deploy systems
         let system = IActionsDispatcher{ contract_address:
-            if (deploy_system) {
+            if (deploy_actions) {
                 let address = deploy_system(world, 'salt', actions::TEST_CLASS_HASH);
                 world.grant_owner(SELECTORS::ACTIONS, OWNER());
                 world.grant_writer(selector_from_tag!("pistols-Duelist"), address);
