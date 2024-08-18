@@ -105,7 +105,7 @@ fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterD
     testing::set_block_timestamp(1);
 '++++++'.print();
     let mut world = spawn_test_world(
-        "pistols",
+        ["origami_token", "pistols"].span(),
         array![
             initializable_model::TEST_CLASS_HASH,
             src_5_model::TEST_CLASS_HASH,
@@ -116,7 +116,7 @@ fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterD
             token_config::TEST_CLASS_HASH,
             duelist::TEST_CLASS_HASH,
             scoreboard::TEST_CLASS_HASH,
-        ]);
+        ].span());
 'TEST_CLASS_HASH OK!'.print();
 
     let mut token = ITokenDuelistDispatcher {

@@ -10,11 +10,23 @@ mod tester {
 
     use origami_token::components::security::initializable::{initializable_model};
     use origami_token::components::introspection::src5::{src_5_model};
+    use origami_token::components::token::erc20::{
+        erc20_balance::{erc_20_balance_model},
+        erc20_metadata::{erc_20_metadata_model},
+        erc20_allowance::{erc_20_allowance_model},
+        erc20_bridgeable::{erc_20_bridgeable_model},
+    };
     use origami_token::components::token::erc721::{
         erc721_approval::{erc_721_token_approval_model},
         erc721_metadata::{erc_721_meta_model},
         erc721_balance::{erc_721_balance_model},
         erc721_owner::{erc_721_owner_model},
+        erc721_enumerable::{erc_721_enumerable_index_model},
+        erc721_enumerable::{erc_721_enumerable_owner_index_model},
+        erc721_enumerable::{erc_721_enumerable_owner_token_model},
+        erc721_enumerable::{erc_721_enumerable_token_model},
+        erc721_enumerable::{erc_721_enumerable_total_model},
+        erc721_approval::{erc_721_operator_approval_model},
     };
 
     use pistols::systems::admin::{admin, IAdminDispatcher, IAdminDispatcherTrait};
@@ -125,20 +137,32 @@ mod tester {
         deploy_lords = deploy_lords || approve || deploy_system;
 
 // '----1'.print();
-// (src_5_model::TEST_CLASS_HASH).print();
-// (erc_721_token_approval_model::TEST_CLASS_HASH).print();
-// (erc_721_balance_model::TEST_CLASS_HASH).print();
-// (erc_721_meta_model::TEST_CLASS_HASH).print();
-// (erc_721_owner_model::TEST_CLASS_HASH).print();
+// (erc_20_balance_model::TEST_CLASS_HASH).print();
+// (erc_20_metadata_model::TEST_CLASS_HASH).print();
+// (erc_20_allowance_model::TEST_CLASS_HASH).print();
+// selector_from_tag!("origami_token-ERC20AllowanceModel").print();
+// selector_from_tag!("origami_token-ERC20BalanceModel").print();
+// selector_from_tag!("origami_token-ERC20MetadataModel").print();
+
         let mut models = array![
             //
             // missing models cause ('invalid resource selector')
             //
-            // src_5_model::TEST_CLASS_HASH,
-            // erc_721_token_approval_model::TEST_CLASS_HASH,
-            // erc_721_balance_model::TEST_CLASS_HASH,
-            // erc_721_meta_model::TEST_CLASS_HASH,
-            // erc_721_owner_model::TEST_CLASS_HASH,
+            src_5_model::TEST_CLASS_HASH,
+            erc_20_balance_model::TEST_CLASS_HASH,
+            erc_20_metadata_model::TEST_CLASS_HASH,
+            erc_20_allowance_model::TEST_CLASS_HASH,
+            erc_20_bridgeable_model::TEST_CLASS_HASH,
+            erc_721_token_approval_model::TEST_CLASS_HASH,
+            erc_721_balance_model::TEST_CLASS_HASH,
+            erc_721_meta_model::TEST_CLASS_HASH,
+            erc_721_owner_model::TEST_CLASS_HASH,
+            erc_721_enumerable_index_model::TEST_CLASS_HASH,
+            erc_721_enumerable_owner_index_model::TEST_CLASS_HASH,
+            erc_721_enumerable_owner_token_model::TEST_CLASS_HASH,
+            erc_721_enumerable_token_model::TEST_CLASS_HASH,
+            erc_721_enumerable_total_model::TEST_CLASS_HASH,
+            erc_721_operator_approval_model::TEST_CLASS_HASH,
             // pistols
             duelist::TEST_CLASS_HASH,
             scoreboard::TEST_CLASS_HASH,
@@ -161,7 +185,7 @@ mod tester {
 
         // deploy world
 // '---- spawn_test_world...'.print();
-        let world: IWorldDispatcher = spawn_test_world("pistols",  models);
+        let world: IWorldDispatcher = spawn_test_world(["origami_token", "pistols"].span(),  models.span());
 // '---- spawned...'.print();
         world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), OWNER());
 
@@ -185,13 +209,8 @@ mod tester {
             if (deploy_lords) {
                 let address = deploy_system(world, 'lords_mock', lords_mock::TEST_CLASS_HASH);
                 // world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), OWNER());
-                world.grant_owner(SELECTORS::LORDS_MOCK, OWNER());
-                // world.grant_writer(selector_from_tag!("origami_token-SRC5Model"), address);
-                // world.grant_writer(selector_from_tag!("origami_token-InitializableModel"), address);
-                // world.grant_writer(selector_from_tag!("origami_token-ERC20BalanceModel"), address);
-                // world.grant_writer(selector_from_tag!("origami_token-ERC20MetadataModel"), address);
-                // world.grant_writer(selector_from_tag!("origami_token-ERC20AllowanceModel"), address);
-                // world.grant_writer(selector_from_tag!("origami_token-ERC20BridgeableModel"), address);
+                world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), address);
+                // world.grant_owner(SELECTORS::LORDS_MOCK, OWNER());
                 (address)
             }
             else {ZERO()}
@@ -199,20 +218,9 @@ mod tester {
         let duelists = ITokenDuelistDispatcher{ contract_address:
             if (deploy_minter) {
                 let address = deploy_system(world, 'token_duelist', token_duelist::TEST_CLASS_HASH);
+                world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), address);
                 // world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), OWNER());
                 world.grant_writer(SELECTORS::TOKEN_DUELIST, OWNER());
-                // world.grant_writer(selector_from_tag!("origami_token-SRC5Model"), address);
-                // world.grant_writer(selector_from_tag!("origami_token-InitializableModel"), address);
-                // world.grant_writer(selector_from_tag!("origami_token-ERC721MetaModel"), address);
-                // world.grant_writer(selector_from_tag!("origami_token-ERC721TokenApprovalModel"), address);
-                // world.grant_writer(selector_from_tag!("origami_token-ERC721BalanceModel"), address);
-                // world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableIndexModel"),address);
-                // world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableOwnerIndexModel"),address);
-                // world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableTokenModel"),address);
-                // world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableOwnerTokenModel"),address);
-                // world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableTotalModel"),address);
-                // world.grant_writer(selector_from_tag!("origami_token-ERC721MetadataModel"), address);
-                // world.grant_writer(selector_from_tag!("origami_token-ERC721OwnerModel"), address);
                 (address)
             }
             else {

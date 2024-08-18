@@ -10,7 +10,7 @@ sierra-replace-ids = true
 migrate = "./migrate"
 
 [dependencies]
-dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.0.0-alpha.5" }
+dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.0.0-alpha.6" }
 # origami_token = { git = "https://github.com/dojoengine/origami", tag = "v1.0.0-alpha.0" }
 origami_token = { git = "https://github.com/rsodre/origami", branch = "balance-enumerable" }
 graffiti = { git = "https://github.com/ponderingdemocritus/graffiti", rev = "bc569531791dbc71c6cd8d9bc154c34eedad31fe" }

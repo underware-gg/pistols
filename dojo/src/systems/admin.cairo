@@ -111,6 +111,7 @@ mod admin {
             // get table
             let manager = TableManagerTrait::new(world);
             // assert(manager.exists(table.table_id), Errors::INVALID_TABLE);
+            assert(table.table_id != 0, Errors::INVALID_TABLE);
             manager.set(table);
         }
 
