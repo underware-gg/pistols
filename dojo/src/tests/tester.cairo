@@ -34,7 +34,11 @@ mod tester {
     use pistols::systems::minter::{minter, IMinterDispatcher, IMinterDispatcherTrait};
     use pistols::systems::token_duelist::{token_duelist, ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait};
     use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
-    use pistols::tests::token::mock_erc721::{mock_erc721, IMockERC721Dispatcher, IMockERC721DispatcherTrait};
+    use pistols::tests::token::mock_token_duelist::{
+        token_duelist as mock_token_duelist,
+        // ITokenDuelistDispatcher,
+        // ITokenDuelistDispatcherTrait,
+    };
     use pistols::types::challenge::{ChallengeState};
     use pistols::types::constants::{constants};
     use pistols::types::action::{Action};
@@ -134,8 +138,9 @@ mod tester {
         let approve: bool = (flags & flags::APPROVE) != 0;
 
         deploy_actions = deploy_actions || approve;
-        deploy_admin = deploy_admin || deploy_actions || approve;
-        deploy_lords = deploy_lords || approve || deploy_actions;
+        deploy_lords = deploy_lords || deploy_actions || approve;
+        deploy_admin = deploy_admin || deploy_actions;
+        // deploy_minter = deploy_minter || deploy_actions;
 
 // '----1'.print();
 // (erc_20_balance_model::TEST_CLASS_HASH).print();
@@ -225,7 +230,7 @@ mod tester {
                 (address)
             }
             else {
-                (deploy_system(world, 'mock_erc721', mock_erc721::TEST_CLASS_HASH))
+                (deploy_system(world, 'token_duelist', mock_token_duelist::TEST_CLASS_HASH))
             }
         };
         let minter = IMinterDispatcher{ contract_address:

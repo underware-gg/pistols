@@ -76,6 +76,6 @@ mod tests {
     mod token {
         mod test_token_duelist;
         // mocks
-        mod mock_erc721;
+        mod mock_token_duelist;
     }
 }
