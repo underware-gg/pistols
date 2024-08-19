@@ -497,6 +497,37 @@ mod tester {
     }
 
     //
+    // setters
+    //
+
+    fn set_TableConfig(world: IWorldDispatcher, actions: IActionsDispatcher, table: TableConfig) {
+        let current_contract_address = starknet::get_contract_address();
+        testing::set_contract_address(actions.contract_address);
+        set!(world, (table));
+        testing::set_contract_address(current_contract_address);
+    }
+    fn set_Round(world: IWorldDispatcher, actions: IActionsDispatcher, round: Round) {
+        let current_contract_address = starknet::get_contract_address();
+        testing::set_contract_address(actions.contract_address);
+        // round.set(world); // if not available, import RoundModelImpl
+        // dojo::model::Model::<Round>::set(@round, world); // if not available, import RoundModelImpl
+        set!(world, (round));
+        testing::set_contract_address(current_contract_address);
+    }
+    fn set_Duelist(world: IWorldDispatcher, actions: IActionsDispatcher, duelist: Duelist) {
+        let current_contract_address = starknet::get_contract_address();
+        testing::set_contract_address(actions.contract_address);
+        set!(world, (duelist));
+        testing::set_contract_address(current_contract_address);
+    }
+    fn set_Scoreboard(world: IWorldDispatcher, actions: IActionsDispatcher, scoreboard: Scoreboard) {
+        let current_contract_address = starknet::get_contract_address();
+        testing::set_contract_address(actions.contract_address);
+        set!(world, (scoreboard));
+        testing::set_contract_address(current_contract_address);
+    }
+
+    //
     // Asserts
     //
 

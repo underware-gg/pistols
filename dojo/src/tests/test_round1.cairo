@@ -448,7 +448,7 @@ mod tests {
 
         let mut table: TableConfig = get!(world, (TABLE_ID), TableConfig);
         table.fee_collector_address = BUMMER();
-        set!(world, (table));
+        tester::set_TableConfig(world, system, table);
 
         let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
         assert(fee > 0, 'fee > 0');
@@ -479,7 +479,7 @@ mod tests {
         // duelist_a.score.level_trickster = honour::MAX;
         let mut scoreboard_a = tester::get_Scoreboard(world, TABLE_ID, OWNER());
         scoreboard_a.score.level_trickster = honour::MAX;
-        set!(world,(scoreboard_a));
+        tester::set_Scoreboard(world, system, scoreboard_a);
         // duel!
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(10, 10);
@@ -500,7 +500,7 @@ mod tests {
         // duelist_b.score.level_trickster = honour::MAX;
         let mut scoreboard_b = tester::get_Scoreboard(world, TABLE_ID, OTHER());
         scoreboard_b.score.level_trickster = honour::MAX;
-        set!(world,(scoreboard_b));
+        tester::set_Scoreboard(world, system, scoreboard_b);
         // duel!
         let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER(), WAGER_VALUE);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(10, 10);

@@ -8,7 +8,7 @@ mod tests {
 
     use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
-    use pistols::models::challenge::{Challenge, Round};
+    use pistols::models::challenge::{Challenge, Round, RoundStore, RoundModelImpl};
     use pistols::models::duelist::{Duelist, ProfilePicType};
     use pistols::models::table::{tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
@@ -87,7 +87,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         // change round 1 results
         round.shot_a.health = health_a;
         round.shot_b.health = health_b;
-        set!(world, (round));
+        tester::set_Round(world, system, round);
         // run 2nd round
         let salt_a: u64 = blades_salt;
         let salt_b: u64 = SALT_1_b;

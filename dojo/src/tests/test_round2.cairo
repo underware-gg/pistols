@@ -7,7 +7,7 @@ mod tests {
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
-    use pistols::models::challenge::{Challenge, Round};
+    use pistols::models::challenge::{Challenge, Round, RoundStore, RoundModelImpl};
     use pistols::models::duelist::{Duelist, ProfilePicType};
     use pistols::models::table::{tables};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
@@ -179,7 +179,7 @@ mod tests {
         // change round 1 results
         round.shot_a.health = constants::SINGLE_DAMAGE;
         round.shot_b.health = constants::SINGLE_DAMAGE;
-        set!(world, (round));
+        tester::set_Round(world, system, round);
 // 'round_1'.print();
 // round.shot_a.health.print();
 // round.shot_b.health.print();

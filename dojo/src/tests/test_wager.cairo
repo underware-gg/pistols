@@ -53,7 +53,7 @@ mod tests {
         let mut table: TableConfig = tester::get_Table(world, table_id);
         if (wager_min > 0) {
             table.wager_min = wager_min;
-            set!(world, (table));
+            tester::set_TableConfig(world, system, table);
         }
         let fee: u128 = system.calc_fee(table_id, wager_value);
         assert(fee >= table.fee_min, 'fee >= min');

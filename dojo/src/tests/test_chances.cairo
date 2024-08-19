@@ -104,7 +104,6 @@ use debug::PrintTrait;
         assert(lord.score.is_lord(), 'is_lord()');
         //
         // levels
-        // set!(world,(lord));
         assert(utils::calc_crit_bonus(lord.score, TableType::Classic) == chances::CRIT_BONUS_LORD, 'level_100');
         lord.score.level_lord = 90;
         assert(utils::calc_crit_bonus(lord.score, TableType::Classic) < chances::CRIT_BONUS_LORD, 'level_90');
