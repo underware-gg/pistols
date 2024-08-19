@@ -139,7 +139,7 @@ mod tester {
 
         deploy_actions = deploy_actions || approve;
         deploy_lords = deploy_lords || deploy_actions || approve;
-        deploy_admin = deploy_admin || deploy_actions;
+        deploy_admin = deploy_admin || deploy_actions || deploy_actions;
         // deploy_minter = deploy_minter || deploy_actions;
 
 // '----1'.print();
@@ -253,7 +253,7 @@ mod tester {
             if (deploy_admin) {
                 let address = deploy_system(world, 'admin', admin::TEST_CLASS_HASH);
                 let admin_call_data: Array<felt252> = array![
-                    OWNER().into(), // treasury
+                    TREASURY().into(), // treasury
                     lords.contract_address.into(),
                 ];
                 world.grant_owner(SELECTORS::ADMIN, OWNER());
