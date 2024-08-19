@@ -103,7 +103,6 @@ const TOKEN_ID_5: u256 = 5;
 fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterDispatcher) {
     testing::set_block_number(1);
     testing::set_block_timestamp(1);
-'++++++'.print();
     let mut world = spawn_test_world(
         ["origami_token", "pistols"].span(),
         array![
@@ -117,7 +116,6 @@ fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterD
             duelist::TEST_CLASS_HASH,
             scoreboard::TEST_CLASS_HASH,
         ].span());
-'TEST_CLASS_HASH OK!'.print();
 
     let mut token = ITokenDuelistDispatcher {
         contract_address: world.deploy_contract(

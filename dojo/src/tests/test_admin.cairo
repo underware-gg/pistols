@@ -24,7 +24,7 @@ mod tests {
 
     #[test]
     fn test_initialize_defaults() {
-        let (world, _system, _admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let (world, _actions, _admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         let config: Config = tester::get_Config(world);
         assert(config.treasury_address == OWNER(), 'treasury_address');
         assert(config.is_paused == false, 'paused');
@@ -36,7 +36,7 @@ mod tests {
 
     #[test]
     fn test_am_i_admin() {
-        let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let (_world, _actions, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         assert(admin.am_i_admin(OWNER()) == true, 'default_true');
         assert(admin.am_i_admin(OTHER()) == false, 'other_false');
     }
@@ -44,7 +44,7 @@ mod tests {
     #[test]
     #[ignore]
     fn test_grant_ungrant_admin() {
-        let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let (world, _actions, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         // assert(world.is_owner(CONFIG_HASH, OWNER()) == true, 'default_owner_true');
         // assert(world.is_owner(CONFIG_HASH, OTHER()) == false, 'default_other_owner_false');
         assert(world.is_writer(CONFIG_HASH, OTHER()) == false, 'default_other_writer_false');
@@ -70,20 +70,20 @@ mod tests {
     #[test]
     #[should_panic(expected:('ADMIN: Invalid account_address', 'ENTRYPOINT_FAILED'))]
     fn test_grant_admin_null() {
-        let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let (_world, _actions, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         tester::execute_admin_grant_admin(admin, OWNER(), ZERO(), true);
     }
 
     #[test]
     #[should_panic(expected:('ADMIN: not admin', 'ENTRYPOINT_FAILED'))]
     fn test_grant_admin_not_owner() {
-        let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let (_world, _actions, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         tester::execute_admin_grant_admin(admin, OTHER(), BUMMER(), true);
     }
 
     #[test]
     fn test_set_paused() {
-        let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let (world, _actions, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         let config: Config = tester::get_Config(world);
         assert(config.is_paused == false, 'paused_1');
         // set
@@ -99,13 +99,13 @@ mod tests {
     #[test]
     #[should_panic(expected:('ADMIN: not admin', 'ENTRYPOINT_FAILED'))]
     fn test_set_paused_not_owner() {
-        let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let (_world, _actions, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         tester::execute_admin_set_paused(admin, OTHER(), true);
     }
 
     #[test]
     fn test_set_config() {
-        let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let (world, _actions, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         let mut config: Config = tester::get_Config(world);
         assert(config.treasury_address == OWNER(), 'treasury_address_param');
         // set
@@ -124,7 +124,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('ADMIN: Invalid treasury_address', 'ENTRYPOINT_FAILED'))]
     fn test_set_config_null() {
-        let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let (world, _actions, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         let mut config: Config = tester::get_Config(world);
         config.treasury_address = ZERO();
         tester::execute_admin_set_config(admin, OWNER(), config);
@@ -133,7 +133,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('ADMIN: not admin', 'ENTRYPOINT_FAILED'))]
     fn test_set_config_not_owner() {
-        let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let (world, _actions, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         let mut config: Config = tester::get_Config(world);
         config.treasury_address = BUMMER();
         tester::execute_admin_set_config(admin, OTHER(), config);
@@ -145,7 +145,7 @@ mod tests {
 
     #[test]
     fn test_initialize_table_defaults() {
-        let (world, _system, _admin, lords, _minter) = tester::setup_world(flags::ADMIN | flags::LORDS);
+        let (world, _actions, _admin, lords, _minter) = tester::setup_world(flags::ADMIN | flags::LORDS);
         let table: TableConfig = tester::get_Table(world, tables::LORDS);
         assert(table.wager_contract_address == lords.contract_address, 'LORDS_contract_address');
         assert(table.is_open == true, 'LORDS_is_open');
@@ -156,7 +156,7 @@ mod tests {
 
     #[test]
     fn test_initialize_table() {
-        let (world, _system, _admin, lords, _minter) = tester::setup_world(flags::ADMIN | flags::LORDS);
+        let (world, _actions, _admin, lords, _minter) = tester::setup_world(flags::ADMIN | flags::LORDS);
         let table: TableConfig = tester::get_Table(world, tables::LORDS);
         assert(table.wager_contract_address == lords.contract_address, 'contract_address');
         assert(table.fee_min == 4 * constants::ETH_TO_WEI.low, 'fee_min');
@@ -166,7 +166,7 @@ mod tests {
 
     #[test]
     fn test_set_table() {
-        let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let (world, _actions, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         // not initialized
         let mut table: TableConfig = tester::get_Table(world, tables::LORDS);
         assert(table.wager_contract_address == ZERO(), 'zero');
@@ -201,7 +201,7 @@ mod tests {
 
     #[test]
     fn test_open_table() {
-        let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let (world, _actions, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         tester::execute_admin_open_table(admin, OWNER(), tables::LORDS, true);
         let table: TableConfig = tester::get_Table(world, tables::LORDS);
         assert(table.is_open == true, 'is_open_true');
@@ -216,7 +216,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('ADMIN: not admin', 'ENTRYPOINT_FAILED'))]
     fn test_set_table_not_owner() {
-        let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let (world, _actions, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         let table: TableConfig = tester::get_Table(world, tables::LORDS);
         tester::execute_admin_set_table(admin, OTHER(), table);
     }
@@ -224,14 +224,14 @@ mod tests {
     #[test]
     #[should_panic(expected:('ADMIN: not admin', 'ENTRYPOINT_FAILED'))]
     fn test_open_table_not_owner() {
-        let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let (_world, _actions, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         tester::execute_admin_open_table(admin, OTHER(), tables::LORDS, true);
     }
 
     #[test]
     #[should_panic(expected:('ADMIN: Invalid table', 'ENTRYPOINT_FAILED'))]
     fn test_set_table_zero() {
-        let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let (world, _actions, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         let mut table: TableConfig = tester::get_Table(world, tables::LORDS);
         table.table_id = 0;
         tester::execute_admin_set_table(admin, OWNER(), table);
@@ -240,7 +240,7 @@ mod tests {
     // #[test]
     // #[should_panic(expected:('ADMIN: Invalid table', 'ENTRYPOINT_FAILED'))]
     // fn test_set_table_invalid() {
-    //     let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+    //     let (world, _actions, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
     //     let mut table: TableConfig = tester::get_Table(world, tables::LORDS);
     //     table.table_id = INVALID_TABLE;
     //     tester::execute_admin_set_table(admin, OWNER(), table);
@@ -249,14 +249,14 @@ mod tests {
     #[test]
     #[should_panic(expected:('ADMIN: Invalid table', 'ENTRYPOINT_FAILED'))]
     fn test_open_table_zero() {
-        let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let (_world, _actions, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         tester::execute_admin_open_table(admin, OWNER(), 0_felt252, false);
     }
 
     #[test]
     #[should_panic(expected:('ADMIN: Invalid table', 'ENTRYPOINT_FAILED'))]
     fn test_open_table_invalid() {
-        let (_world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let (_world, _actions, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         tester::execute_admin_open_table(admin, OWNER(), INVALID_TABLE, false);
     }
 
@@ -267,7 +267,7 @@ mod tests {
 
     #[test]
     fn test_set_table_admittance() {
-        let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let (world, _actions, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         // not initialized
         let mut admittance: TableAdmittance = tester::get_TableAdmittance(world, tables::LORDS);
         assert(admittance.accounts.len() == 0, 'accounts_default');
@@ -301,7 +301,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('ADMIN: not admin', 'ENTRYPOINT_FAILED'))]
     fn test_set_table_admittance_not_owner() {
-        let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let (world, _actions, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         let mut admittance: TableAdmittance = tester::get_TableAdmittance(world, tables::LORDS);
         tester::execute_admin_set_table_admittance(admin, OTHER(), admittance);
     }
@@ -309,7 +309,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('ADMIN: Invalid table', 'ENTRYPOINT_FAILED'))]
     fn test_set_table_admittance_zero() {
-        let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let (world, _actions, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         let mut admittance: TableAdmittance = tester::get_TableAdmittance(world, tables::LORDS);
         admittance.table_id = 0;
         tester::execute_admin_set_table_admittance(admin, OWNER(), admittance);
@@ -318,7 +318,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('ADMIN: Invalid table', 'ENTRYPOINT_FAILED'))]
     fn test_set_table_admittance_invalid() {
-        let (world, _system, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
+        let (world, _actions, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         let mut admittance: TableAdmittance = tester::get_TableAdmittance(world, tables::LORDS);
         admittance.table_id = INVALID_TABLE;
         tester::execute_admin_set_table_admittance(admin, OWNER(), admittance);

@@ -39,12 +39,12 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     const TABLE_ID: felt252 = tables::LORDS;
     const WAGER_VALUE: u128 = 100_000_000_000_000_000_000;
 
-    fn _start_new_challenge(world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress) -> (Challenge, Round, u128) {
-        // tester::execute_update_duelist(system, OWNER(), PLAYER_NAME, ProfilePicType::Duelist, "1");
-        // tester::execute_update_duelist(system, OTHER(), OTHER_NAME, ProfilePicType::Duelist, "2");
-        let duel_id: u128 = tester::execute_create_challenge(system, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, WAGER_VALUE, 48);
+    fn _start_new_challenge(world: IWorldDispatcher, actions: IActionsDispatcher, owner: ContractAddress, other: ContractAddress) -> (Challenge, Round, u128) {
+        // tester::execute_update_duelist(actions, OWNER(), PLAYER_NAME, ProfilePicType::Duelist, "1");
+        // tester::execute_update_duelist(actions, OTHER(), OTHER_NAME, ProfilePicType::Duelist, "2");
+        let duel_id: u128 = tester::execute_create_challenge(actions, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, WAGER_VALUE, 48);
         tester::elapse_timestamp(timestamp::from_days(1));
-        tester::execute_reply_challenge(system, OTHER(), duel_id, true);
+        tester::execute_reply_challenge(actions, OTHER(), duel_id, true);
         let ch = tester::get_Challenge(world, duel_id);
         let round: Round = tester::get_Round(world, duel_id, 1);
         assert(ch.state == ChallengeState::InProgress, 'challenge.state');
@@ -69,34 +69,34 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
 
     fn _execute_blades(
-        world: IWorldDispatcher, system: IActionsDispatcher, owner: ContractAddress, other: ContractAddress,
+        world: IWorldDispatcher, actions: IActionsDispatcher, owner: ContractAddress, other: ContractAddress,
         health_a: u8, slot1_a: u8, slot2_a: u8,
         health_b: u8, slot1_b: u8, slot2_b: u8,
         blades_salt: u64,
     ) -> (Challenge, Round) {
-        let (_challenge, _round, duel_id) = _start_new_challenge(world, system, OWNER(), OTHER());
+        let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER());
         // random 1st round...
         let (salt_1_a, salt_1_b, action_1_a, action_1_b, hash_1_a, hash_1_b) = _get_actions_round_1_continue();
-        tester::execute_commit_action(system, OWNER(), duel_id, 1, hash_1_a);
-        tester::execute_commit_action(system, OTHER(), duel_id, 1, hash_1_b);
-        tester::execute_reveal_action(system, OWNER(), duel_id, 1, salt_1_a, action_1_a, 0);
-        tester::execute_reveal_action(system, OTHER(), duel_id, 1, salt_1_b, action_1_b, 0);
+        tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_1_a);
+        tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_1_b);
+        tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_1_a, action_1_a, 0);
+        tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_1_b, action_1_b, 0);
         let (challenge, mut round) = tester::get_Challenge_Round(world, duel_id);
         assert(challenge.round_number == 2, 'C: needs 2 rounds');
         assert(round.round_number == 2, 'R: needs 2 rounds');
         // change round 1 results
         round.shot_a.health = health_a;
         round.shot_b.health = health_b;
-        tester::set_Round(world, system, round);
+        tester::set_Round(world, actions, round);
         // run 2nd round
         let salt_a: u64 = blades_salt;
         let salt_b: u64 = SALT_1_b;
         let hash_a: u64 = make_action_hash(salt_a, pack_action_slots(slot1_a, slot2_a));
         let hash_b: u64 = make_action_hash(salt_b, pack_action_slots(slot1_b, slot2_b));
-        tester::execute_commit_action(system, OWNER(), duel_id, 2, hash_a);
-        tester::execute_commit_action(system, OTHER(), duel_id, 2, hash_b);
-        tester::execute_reveal_action(system, OWNER(), duel_id, 2, salt_a, slot1_a, slot2_a);
-        tester::execute_reveal_action(system, OTHER(), duel_id, 2, salt_b, slot1_b, slot2_b);
+        tester::execute_commit_action(actions, OWNER(), duel_id, 2, hash_a);
+        tester::execute_commit_action(actions, OTHER(), duel_id, 2, hash_b);
+        tester::execute_reveal_action(actions, OWNER(), duel_id, 2, salt_a, slot1_a, slot2_a);
+        tester::execute_reveal_action(actions, OTHER(), duel_id, 2, salt_b, slot1_b, slot2_b);
         // return results
         let (challenge, round) = tester::get_Challenge_Round(world, duel_id);
 // salt_a.print();
@@ -138,9 +138,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
     #[test]
     fn test_dices() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+        let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
             SALT_DUAL_HIT,
@@ -166,9 +166,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
     #[test]
     fn test_idle_actions() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+        let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
             constants::SINGLE_DAMAGE, ACTION::IDLE, ACTION::IDLE,
             SALT_DUAL_HIT,
@@ -181,9 +181,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
     #[test]
     fn test_skip_idle_slot() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+        let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::IDLE, ACTION::FAST_BLADE,
             constants::SINGLE_DAMAGE, ACTION::IDLE, ACTION::FAST_BLADE,
             SALT_DUAL_HIT,
@@ -195,9 +195,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
     #[test]
     fn test_invalid_actions() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+        let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
             constants::SINGLE_DAMAGE, ACTION::SLOW_BLADE, ACTION::SLOW_BLADE,
             SALT_DUAL_HIT,
@@ -213,9 +213,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
     #[test]
     fn test_slow_vs_slow_draw() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+        let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
             SALT_DUAL_HIT,
@@ -229,9 +229,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
     // #[test]
     // fn test_slow_vs_slow_suicide_pact() {
-    //     let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+    //     let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
     //     let (challenge, round) = _execute_blades(
-    //         world, system, OWNER(), OTHER(),
+    //         world, actions, OWNER(), OTHER(),
     //         constants::FULL_HEALTH, ACTION::SLOW_BLADE,
     //         constants::FULL_HEALTH, ACTION::SLOW_BLADE,
     //         SALT_DUAL_CRIT, // NEED THIS!!!!
@@ -245,9 +245,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
     #[test]
     fn test_slow_vs_slow_suicide_pact() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+        let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::DOUBLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
             constants::DOUBLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
             SALT_DUAL_HIT,
@@ -261,9 +261,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
     #[test]
     fn test_fast_vs_fast_draw() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+        let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
             SALT_DUAL_HIT,
@@ -284,9 +284,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_fast_vs_fast_hit_a() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+        let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
             SALT_HIT_MISS,
@@ -297,9 +297,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_fast_vs_fast_crit_a() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+        let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
             SALT_CRIT_MISS,
@@ -310,9 +310,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_fast_vs_fast_hit_b() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+        let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
             SALT_MISS_HIT,
@@ -323,9 +323,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_fast_vs_fast_crit_b() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+        let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
             SALT_MISS_CRIT,
@@ -337,9 +337,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
     #[test]
     fn test_fast_vs_block_a() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+        let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
             constants::SINGLE_DAMAGE, ACTION::BLOCK, ACTION::IDLE,
             SALT_DUAL_HIT,
@@ -349,9 +349,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         assert(round.shot_b.health == constants::SINGLE_DAMAGE, 'bad health_b');
     }
     fn test_block_vs_fast_b() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+        let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::BLOCK, ACTION::IDLE,
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
             SALT_DUAL_HIT,
@@ -367,9 +367,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
     #[test]
     fn test_fast_vs_slow_a() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+        let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
             constants::SINGLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
             SALT_DUAL_HIT,
@@ -380,9 +380,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_fast_vs_slow_b() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+        let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
             constants::DOUBLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
             SALT_DUAL_CRIT_R3,
@@ -393,9 +393,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_slow_vs_fast_b() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+        let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::SINGLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
             constants::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
             SALT_DUAL_HIT,
@@ -406,9 +406,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_slow_vs_fast_a() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+        let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::DOUBLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
             constants::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
             SALT_MISS_HIT,
@@ -424,9 +424,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     
     #[test]
     fn test_slow_vs_block_crit_a() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+        let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::BLOCK,
             SALT_CRIT_HIT,
@@ -438,9 +438,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_block_vs_slow_crit_b() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+        let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::BLOCK,
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
             SALT_HIT_CRIT,
@@ -458,9 +458,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 
     #[test]
     fn test_block_vs_idle() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+        let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::FAST_BLADE,
             SALT_DUAL_HIT,
@@ -478,9 +478,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_idle_vs_block() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+        let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::BLOCK,
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
             SALT_DUAL_CRIT_R3,
@@ -498,9 +498,9 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_block_vs_block() {
-        let (world, system, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
+        let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
             SALT_DUAL_HIT,
@@ -525,12 +525,12 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     
     #[test]
     fn test_flee_vs_flee() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
+        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
-        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             SALT_DUAL_HIT,
@@ -544,12 +544,12 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_flee_win_a() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
+        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
-        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             0x12121, // MISS
@@ -567,12 +567,12 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_flee_win_b() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
+        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
-        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
             0x12121, // MISS
@@ -590,12 +590,12 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_fast_vs_flee_kill_a() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
+        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
-        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             SALT_CRIT_HIT, // CRIT_???, chances for Paces are different!
@@ -611,12 +611,12 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_slow_vs_flee_kill_a() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
+        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
-        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             SALT_CRIT_HIT, // CRIT_???, chances for Paces are different!
@@ -632,12 +632,12 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_flee_kill_b() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
+        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
-        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
             0xeee, // ???_CRIT, chances for Paces are different!
@@ -659,12 +659,12 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     //
     #[test]
     fn test_steal_vs_flee() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
+        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
-        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             SALT_DUAL_HIT,
@@ -677,12 +677,12 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_flee_vs_steal() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
+        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
-        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
             SALT_DUAL_HIT,
@@ -697,12 +697,12 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     // face-off
     #[test]
     fn test_steal_vs_steal() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
+        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
-        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
             SALT_DUAL_HIT,
@@ -718,12 +718,12 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_steal_win_a() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
+        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
-        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
             SALT_DUAL_MISS,
@@ -741,12 +741,12 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_steal_win_b() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
+        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
-        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
             SALT_DUAL_MISS,
@@ -764,12 +764,12 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_slow_vs_steal_kill_a() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
+        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
-        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
             SALT_CRIT_HIT, // CRIT_???, chances for Paces are different!
@@ -785,12 +785,12 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_steal_kill_b() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
+        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
-        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
             0xeee, // ???_CRIT, chances for Paces are different!
@@ -812,12 +812,12 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     //
     #[test]
     fn test_seppuku_vs_seppuku() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
+        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
-        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
             SALT_DUAL_HIT,
@@ -832,12 +832,12 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_seppuku_vs_slow_b() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
+        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
-        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
             SALT_DUAL_HIT,
@@ -852,12 +852,12 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_seppuku_vs_fast_b() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
+        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
-        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::FAST_BLADE,
             SALT_DUAL_HIT,
@@ -872,12 +872,12 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_fast_vs_seppuku_a() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
+        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
-        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::FAST_BLADE,
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
             SALT_DUAL_HIT,
@@ -892,12 +892,12 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_seppuku_vs_flee() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
+        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
-        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             SALT_DUAL_HIT,
@@ -912,12 +912,12 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_seppuku_vs_steal() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
+        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
-        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
             SALT_DUAL_HIT,
@@ -932,12 +932,12 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_flee_vs_seppuku() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
+        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
-        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
             SALT_DUAL_HIT,
@@ -952,12 +952,12 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     }
     #[test]
     fn test_steal_vs_seppuku_vs() {
-        let (world, system, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
+        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
-        let fee: u128 = system.calc_fee(TABLE_ID, WAGER_VALUE);
+        let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
         let (challenge, round) = _execute_blades(
-            world, system, OWNER(), OTHER(),
+            world, actions, OWNER(), OTHER(),
             constants::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
             constants::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
             SALT_DUAL_HIT,

@@ -196,7 +196,7 @@ mod tester {
         world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), OWNER());
 
         // deploy systems
-        let system = IActionsDispatcher{ contract_address:
+        let actions = IActionsDispatcher{ contract_address:
             if (deploy_actions) {
                 let address = deploy_system(world, 'salt', actions::TEST_CLASS_HASH);
                 world.grant_owner(SELECTORS::ACTIONS, OWNER());
@@ -272,15 +272,15 @@ mod tester {
             execute_lords_faucet(lords, OTHER());
         }
         if (approve) {
-            execute_lords_approve(lords, OWNER(), system.contract_address, 1_000_000 * constants::ETH_TO_WEI.low);
-            execute_lords_approve(lords, OTHER(), system.contract_address, 1_000_000 * constants::ETH_TO_WEI.low);
-            execute_lords_approve(lords, BUMMER(), system.contract_address, 1_000_000 * constants::ETH_TO_WEI.low);
+            execute_lords_approve(lords, OWNER(), actions.contract_address, 1_000_000 * constants::ETH_TO_WEI.low);
+            execute_lords_approve(lords, OTHER(), actions.contract_address, 1_000_000 * constants::ETH_TO_WEI.low);
+            execute_lords_approve(lords, BUMMER(), actions.contract_address, 1_000_000 * constants::ETH_TO_WEI.low);
         }
 
         impersonate(OWNER());
 
 // '---- READY!'.print();
-        (world, system, admin, lords, minter)
+        (world, actions, admin, lords, minter)
     }
 
     fn elapse_timestamp(delta: u64) -> (u64, u64) {
@@ -500,29 +500,29 @@ mod tester {
     // setters
     //
 
-    fn set_TableConfig(world: IWorldDispatcher, actions: IActionsDispatcher, table: TableConfig) {
+    fn set_TableConfig(world: IWorldDispatcher, system: IActionsDispatcher, table: TableConfig) {
         let current_contract_address = starknet::get_contract_address();
-        testing::set_contract_address(actions.contract_address);
+        testing::set_contract_address(system.contract_address);
         set!(world, (table));
         testing::set_contract_address(current_contract_address);
     }
-    fn set_Round(world: IWorldDispatcher, actions: IActionsDispatcher, round: Round) {
+    fn set_Round(world: IWorldDispatcher, system: IActionsDispatcher, round: Round) {
         let current_contract_address = starknet::get_contract_address();
-        testing::set_contract_address(actions.contract_address);
+        testing::set_contract_address(system.contract_address);
         // round.set(world); // if not available, import RoundModelImpl
         // dojo::model::Model::<Round>::set(@round, world); // if not available, import RoundModelImpl
         set!(world, (round));
         testing::set_contract_address(current_contract_address);
     }
-    fn set_Duelist(world: IWorldDispatcher, actions: IActionsDispatcher, duelist: Duelist) {
+    fn set_Duelist(world: IWorldDispatcher, system: IActionsDispatcher, duelist: Duelist) {
         let current_contract_address = starknet::get_contract_address();
-        testing::set_contract_address(actions.contract_address);
+        testing::set_contract_address(system.contract_address);
         set!(world, (duelist));
         testing::set_contract_address(current_contract_address);
     }
-    fn set_Scoreboard(world: IWorldDispatcher, actions: IActionsDispatcher, scoreboard: Scoreboard) {
+    fn set_Scoreboard(world: IWorldDispatcher, system: IActionsDispatcher, scoreboard: Scoreboard) {
         let current_contract_address = starknet::get_contract_address();
-        testing::set_contract_address(actions.contract_address);
+        testing::set_contract_address(system.contract_address);
         set!(world, (scoreboard));
         testing::set_contract_address(current_contract_address);
     }
