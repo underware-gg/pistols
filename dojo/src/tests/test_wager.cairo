@@ -42,7 +42,7 @@ mod tests {
     }
 
     fn _test_balance_ok(table_id: felt252, wager_value: u128, wager_min: u128) {
-        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::ADMIN | flags::LORDS);
+        let (world, actions, admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::ADMIN | flags::LORDS);
         let S = actions.contract_address;
         let A = OTHER();
         let B = OWNER();
@@ -53,7 +53,7 @@ mod tests {
         let mut table: TableConfig = tester::get_Table(world, table_id);
         if (wager_min > 0) {
             table.wager_min = wager_min;
-            tester::set_TableConfig(world, actions, table);
+            tester::set_TableConfig(world, admin.contract_address, table);
         }
         let fee: u128 = actions.calc_fee(table_id, wager_value);
         assert(fee >= table.fee_min, 'fee >= min');

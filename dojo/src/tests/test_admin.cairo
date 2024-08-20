@@ -26,7 +26,7 @@ mod tests {
     fn test_initialize_defaults() {
         let (world, _actions, _admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         let config: Config = tester::get_Config(world);
-        assert(config.treasury_address == OWNER(), 'treasury_address');
+        assert(config.treasury_address == TREASURY(), 'treasury_address_default');
         assert(config.is_paused == false, 'paused');
         // get
         let get_config: Config = tester::get_Config(world);
@@ -107,7 +107,7 @@ mod tests {
     fn test_set_config() {
         let (world, _actions, admin, _lords, _minter) = tester::setup_world(flags::ADMIN);
         let mut config: Config = tester::get_Config(world);
-        assert(config.treasury_address == OWNER(), 'treasury_address_param');
+        assert(config.treasury_address == TREASURY(), 'treasury_address_default');
         // set
         let new_treasury: ContractAddress = starknet::contract_address_const::<0x121212>();
         config.treasury_address = new_treasury;

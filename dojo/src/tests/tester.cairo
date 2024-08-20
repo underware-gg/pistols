@@ -119,6 +119,7 @@ mod tester {
         const APPROVE: u8    = 0b010000;
     }
 
+    #[inline(always)]
     fn deploy_system(world: IWorldDispatcher, salt: felt252, class_hash: felt252) -> ContractAddress {
         let contract_address = world.deploy_contract(salt, class_hash.try_into().unwrap());
         (contract_address)
@@ -227,6 +228,7 @@ mod tester {
                 world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), address);
                 // world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), OWNER());
                 world.grant_writer(SELECTORS::TOKEN_DUELIST, OWNER());
+                world.init_contract(SELECTORS::TOKEN_DUELIST, [].span());
                 (address)
             }
             else {
@@ -500,29 +502,29 @@ mod tester {
     // setters
     //
 
-    fn set_TableConfig(world: IWorldDispatcher, system: IActionsDispatcher, table: TableConfig) {
+    fn set_TableConfig(world: IWorldDispatcher, contract_address: ContractAddress, table: TableConfig) {
         let current_contract_address = starknet::get_contract_address();
-        testing::set_contract_address(system.contract_address);
+        testing::set_contract_address(contract_address);
         set!(world, (table));
         testing::set_contract_address(current_contract_address);
     }
-    fn set_Round(world: IWorldDispatcher, system: IActionsDispatcher, round: Round) {
+    fn set_Round(world: IWorldDispatcher, contract_address: ContractAddress, round: Round) {
         let current_contract_address = starknet::get_contract_address();
-        testing::set_contract_address(system.contract_address);
+        testing::set_contract_address(contract_address);
         // round.set(world); // if not available, import RoundModelImpl
         // dojo::model::Model::<Round>::set(@round, world); // if not available, import RoundModelImpl
         set!(world, (round));
         testing::set_contract_address(current_contract_address);
     }
-    fn set_Duelist(world: IWorldDispatcher, system: IActionsDispatcher, duelist: Duelist) {
+    fn set_Duelist(world: IWorldDispatcher, contract_address: ContractAddress, duelist: Duelist) {
         let current_contract_address = starknet::get_contract_address();
-        testing::set_contract_address(system.contract_address);
+        testing::set_contract_address(contract_address);
         set!(world, (duelist));
         testing::set_contract_address(current_contract_address);
     }
-    fn set_Scoreboard(world: IWorldDispatcher, system: IActionsDispatcher, scoreboard: Scoreboard) {
+    fn set_Scoreboard(world: IWorldDispatcher, contract_address: ContractAddress, scoreboard: Scoreboard) {
         let current_contract_address = starknet::get_contract_address();
-        testing::set_contract_address(system.contract_address);
+        testing::set_contract_address(contract_address);
         set!(world, (scoreboard));
         testing::set_contract_address(current_contract_address);
     }

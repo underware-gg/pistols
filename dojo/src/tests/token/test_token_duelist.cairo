@@ -6,31 +6,29 @@ use dojo::utils::test::spawn_test_world;
 use origami_token::tests::constants::{ZERO, OWNER, SPENDER, RECIPIENT};//, TOKEN_ID, TOKEN_ID_2, TOKEN_ID_3};
 use origami_token::tests::utils;
 
-use origami_token::components::security::initializable::{
-    initializable_model
-};
-
+use origami_token::components::security::initializable::{initializable_model};
 use origami_token::components::introspection::src5::{src_5_model, SRC5Model};
 use origami_token::components::introspection::src5::src5_component::{SRC5Impl};
 use origami_token::components::token::erc721::interface::{
     IERC721_ID, IERC721_METADATA_ID, IERC721_ENUMERABLE_ID,
 };
 
-use origami_token::components::token::erc721::erc721_owner::{erc_721_owner_model};
-use origami_token::components::token::erc721::erc721_approval::{
-    erc_721_token_approval_model, ERC721TokenApprovalModel, erc_721_operator_approval_model,
-    ERC721OperatorApprovalModel
+use origami_token::components::token::erc721::{
+    erc721_approval::{erc_721_token_approval_model},
+    erc721_metadata::{erc_721_meta_model},
+    erc721_balance::{erc_721_balance_model},
+    erc721_owner::{erc_721_owner_model},
+    erc721_enumerable::{erc_721_enumerable_index_model},
+    erc721_enumerable::{erc_721_enumerable_owner_index_model},
+    erc721_enumerable::{erc_721_enumerable_owner_token_model},
+    erc721_enumerable::{erc_721_enumerable_token_model},
+    erc721_enumerable::{erc_721_enumerable_total_model},
+    erc721_approval::{erc_721_operator_approval_model},
 };
+
 use origami_token::components::token::erc721::erc721_approval::erc721_approval_component::{
     Approval, ApprovalForAll, ERC721ApprovalImpl, InternalImpl as ERC721ApprovalInternalImpl
 };
-
-use origami_token::components::token::erc721::erc721_metadata::{erc_721_meta_model, ERC721MetaModel,};
-use origami_token::components::token::erc721::erc721_metadata::erc721_metadata_component::{
-    ERC721MetadataImpl, ERC721MetadataCamelImpl, InternalImpl as ERC721MetadataInternalImpl
-};
-
-use origami_token::components::token::erc721::erc721_balance::{erc_721_balance_model, ERC721BalanceModel,};
 use origami_token::components::token::erc721::erc721_balance::erc721_balance_component::{
     Transfer, ERC721BalanceImpl, InternalImpl as ERC721BalanceInternalImpl
 };
@@ -45,13 +43,17 @@ use pistols::systems::minter::{
     minter, IMinterDispatcher, IMinterDispatcherTrait,
 };
 use pistols::models::{
-    token_config::{token_config},
-    duelist::{duelist, Duelist, Score, scoreboard, Scoreboard, ProfilePicType},
+    duelist::{duelist, Duelist, Score, scoreboard, Scoreboard, ProfilePicType, pact},
+    challenge::{challenge, Challenge, snapshot, Snapshot, wager, Wager, round, Round},
+    config::{config, Config},
+    table::{table_config, TableConfig, table_admittance, TableAdmittance},
+    token_config::{token_config, TokenConfig},
 };
 
 use pistols::models::table::{tables};
 use pistols::types::constants::{constants};
 use pistols::interfaces::systems::{SELECTORS};
+use pistols::tests::tester::{tester};
 
 //
 // events helpers
@@ -112,34 +114,32 @@ fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterD
             erc_721_balance_model::TEST_CLASS_HASH,
             erc_721_meta_model::TEST_CLASS_HASH,
             erc_721_owner_model::TEST_CLASS_HASH,
-            token_config::TEST_CLASS_HASH,
+            erc_721_enumerable_index_model::TEST_CLASS_HASH,
+            erc_721_enumerable_owner_index_model::TEST_CLASS_HASH,
+            erc_721_enumerable_owner_token_model::TEST_CLASS_HASH,
+            erc_721_enumerable_token_model::TEST_CLASS_HASH,
+            erc_721_enumerable_total_model::TEST_CLASS_HASH,
+            erc_721_operator_approval_model::TEST_CLASS_HASH,
+            // pistols
             duelist::TEST_CLASS_HASH,
             scoreboard::TEST_CLASS_HASH,
+            challenge::TEST_CLASS_HASH,
+            snapshot::TEST_CLASS_HASH,
+            wager::TEST_CLASS_HASH,
+            round::TEST_CLASS_HASH,
+            pact::TEST_CLASS_HASH,
+            // admin
+            config::TEST_CLASS_HASH,
+            table_config::TEST_CLASS_HASH,
+            table_admittance::TEST_CLASS_HASH,
+            // minter
+            token_config::TEST_CLASS_HASH,
         ].span());
 
     let mut token = ITokenDuelistDispatcher {
-        contract_address: world.deploy_contract(
-            'salt',
-            token_duelist::TEST_CLASS_HASH.try_into().unwrap(),
-        )
+        contract_address: world.deploy_contract('salt',token_duelist::TEST_CLASS_HASH.try_into().unwrap())
     };
-
-    // deploy minter
-    let mut minter = IMinterDispatcher {
-        contract_address: world.deploy_contract(
-            'salt2',
-            minter::TEST_CLASS_HASH.try_into().unwrap(),
-        )
-    };
-    let minter_call_data: Array<felt252> = array![
-        token.contract_address.into(),
-        3, // max_supply
-        2, // wallet_max
-        1, // is_open
-    ];
-    world.init_contract(SELECTORS::MINTER, minter_call_data.span());
-
-    // setup auth
+    world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), token.contract_address);
     world.grant_writer(selector_from_tag!("origami_token-SRC5Model"), token.contract_address);
     world.grant_writer(selector_from_tag!("origami_token-InitializableModel"), token.contract_address);
     world.grant_writer(selector_from_tag!("origami_token-ERC721MetaModel"), token.contract_address);
@@ -150,27 +150,26 @@ fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterD
     world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableTokenModel"),token.contract_address);
     world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableOwnerTokenModel"),token.contract_address);
     world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableTotalModel"),token.contract_address);
-    world.grant_writer(selector_from_tag!("origami_token-ERC721MetadataModel"), token.contract_address);
     world.grant_writer(selector_from_tag!("origami_token-ERC721OwnerModel"), token.contract_address);
+    world.init_contract(SELECTORS::TOKEN_DUELIST, [].span());
 
-    world.grant_writer(selector_from_tag!("origami_token-SRC5Model"), OWNER());
-    world.grant_writer(selector_from_tag!("origami_token-InitializableModel"), OWNER());
-    world.grant_writer(selector_from_tag!("origami_token-ERC721MetaModel"), OWNER());
-    world.grant_writer(selector_from_tag!("origami_token-ERC721TokenApprovalModel"),  OWNER());
-    world.grant_writer(selector_from_tag!("origami_token-ERC721BalanceModel"),  OWNER());
-    world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableIndexModel"), OWNER());
-    world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableOwnerIndexModel"), OWNER());
-    world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableTokenModel"), OWNER());
-    world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableOwnerTokenModel"), OWNER());
-    world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableTotalModel"), OWNER());
-    world.grant_writer(selector_from_tag!("origami_token-ERC721MetadataModel"),  OWNER());
-    world.grant_writer(selector_from_tag!("origami_token-ERC721OwnerModel"),  OWNER());
+    // deploy minter
+    let minter_call_data: Array<felt252> = array![
+        token.contract_address.into(),
+        3, // max_supply
+        2, // wallet_max
+        1, // is_open
+    ];
+    let mut minter = IMinterDispatcher {
+        contract_address: world.deploy_contract('salt2',minter::TEST_CLASS_HASH.try_into().unwrap())
+    };
+    world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), minter.contract_address);
+    world.grant_writer(selector_from_tag!("pistols-TokenConfig"), minter.contract_address);
+    world.grant_writer(selector_from_tag!("pistols-Duelist"), minter.contract_address);
+    world.grant_writer(selector_from_tag!("pistols-Scoreboard"), minter.contract_address);
+    world.init_contract(SELECTORS::MINTER, minter_call_data.span());
 
-    world.grant_writer(selector_from_tag!("pistols-TokenConfig"), OWNER());
-    world.grant_writer(selector_from_tag!("pistols-Duelist"), OWNER());
-    world.grant_writer(selector_from_tag!("pistols-Scoreboard"), OWNER());
-
-    utils::impersonate(OWNER(),);
+    utils::impersonate(OWNER());
 
     (world, token, minter)
 }
@@ -197,7 +196,6 @@ fn setup() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterDispatcher) {
 #[test]
 fn test_initializer() {
     let (_world, mut token, mut _minter) = setup();
-
     assert(token.balance_of(OWNER(),) == 2, 'Should eq 2');
     assert(token.name() == "Pistols at 10 Blocks Duelists", 'Name is wrong');
     assert(token.symbol() == "DUELIST", 'Symbol is wrong');
@@ -212,7 +210,7 @@ fn test_initializer() {
 
 #[test]
 fn test_token_uri() {
-    let (mut world, mut token, mut _minter) = setup();
+    let (mut world, mut token, mut minter) = setup();
 
     let duelist = Duelist {
         duelist_id: TOKEN_ID.low,
@@ -240,8 +238,8 @@ fn test_token_uri() {
         wager_lost: (200 * constants::ETH_TO_WEI.low),
     };
 
-    set!(world, (duelist));
-    set!(world, (scoreboard));
+    tester::set_Duelist(world, minter.contract_address, duelist);
+    tester::set_Scoreboard(world, minter.contract_address, scoreboard);
 
     let uri_1 = token.token_uri(TOKEN_ID);
     let uri_2 = token.token_uri(TOKEN_ID_2);
@@ -319,7 +317,7 @@ fn test_transfer_from() {
 #[test]
 fn test_mint() {
     let (_world, mut token, mut minter) = setup();
-
+    assert(token.total_supply() == 2, 'invalid total_supply init');
     assert(minter.can_mint(RECIPIENT(), token.contract_address) == true, '!can_mint');
     minter.mint(RECIPIENT(), token.contract_address);
     assert(token.balance_of(RECIPIENT()) == 1, 'invalid balance_of');
@@ -363,14 +361,11 @@ fn test_mint_minted_out() {
 #[test]
 fn test_burn() {
     let (_world, mut token, mut _minter) = setup();
-
+    assert(token.total_supply() == 2, 'invalid total_supply init');
     token.burn(TOKEN_ID_2);
     assert(token.balance_of(OWNER(),) == 1, 'invalid balance_of');
     assert(token.total_supply() == 1, 'invalid total_supply');
     assert(token.token_by_index(0) == TOKEN_ID, 'invalid token_by_index');
-    assert(
-        token.token_of_owner_by_index(OWNER(), 0) == TOKEN_ID,
-        'invalid token_of_owner_by_index'
-    );
+    assert(token.token_of_owner_by_index(OWNER(), 0) == TOKEN_ID, 'invalid token_of_owner_by_index');
 }
 
