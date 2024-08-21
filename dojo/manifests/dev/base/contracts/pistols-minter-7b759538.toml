@@ -1,10 +1,11 @@
 kind = "DojoContract"
-class_hash = "0x27691fdec20b05e751e1538608964256a0ba6bf8a909d80899abafd90c2147c"
-original_class_hash = "0x27691fdec20b05e751e1538608964256a0ba6bf8a909d80899abafd90c2147c"
+class_hash = "0xc3da78de3d60e208a046c0cae3104b47872ddad3c263b8b22f97653dfb6f45"
+original_class_hash = "0xc3da78de3d60e208a046c0cae3104b47872ddad3c263b8b22f97653dfb6f45"
 base_class_hash = "0x0"
 abi = "manifests/dev/base/abis/contracts/pistols-minter-7b759538.json"
 reads = []
 writes = []
 init_calldata = []
 tag = "pistols-minter"
+systems = ["set_open"]
 manifest_name = "pistols-minter-7b759538"

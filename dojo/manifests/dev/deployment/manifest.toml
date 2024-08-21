@@ -1,10 +1,10 @@
 [world]
 kind = "WorldContract"
-class_hash = "0x76ced5a15cb43c7be7176cff4779cd57c56638a46ddf2c9da709d22298c5e5a"
-original_class_hash = "0x76ced5a15cb43c7be7176cff4779cd57c56638a46ddf2c9da709d22298c5e5a"
+class_hash = "0x458d0ce5b14a4844092bdb62050f462d53362304a13febbac6d973691d61be2"
+original_class_hash = "0x458d0ce5b14a4844092bdb62050f462d53362304a13febbac6d973691d61be2"
 abi = "manifests/dev/deployment/abis/dojo-world.json"
-address = "0x360fd2af2f118387ae282b66bfdbb6d4bb7e45a7213e101e5b8aa3471939677"
-transaction_hash = "0x1d354f57ad7054f9899d934d3f57b1e147191c67d642ce7b39916da645ebb2b"
+address = "0x4f1514c9ab747d4b0f7c859b62cf199174d4aeae5a4ad9c7ff54125917af912"
+transaction_hash = "0x2bf6377e761a0565628ba5d5992d1986e45cf6c4de512ec6eabea7169fa6226"
 block_number = 3
 seed = "pistols"
 manifest_name = "dojo-world"
@@ -23,9 +23,9 @@ manifest_name = "dojo-base"
 
 [[contracts]]
 kind = "DojoContract"
-address = "0x1f2ca086868cf5da2ca3df287434c96169843009f81849c9563be2f17de325f"
-class_hash = "0x99573f51ab0e84238b0e60ef201a66a8e5ec33200d47d6d335c3af31defbc0"
-original_class_hash = "0x99573f51ab0e84238b0e60ef201a66a8e5ec33200d47d6d335c3af31defbc0"
+address = "0x1f3a1a8a9e2688d0588be379dcbc3cbac5c316bdde84b002a9166d0b626eb9d"
+class_hash = "0x473be66ce5304722be5595a5986b2ccac54d8e97d0d6546070fa9957f544b3f"
+original_class_hash = "0x473be66ce5304722be5595a5986b2ccac54d8e97d0d6546070fa9957f544b3f"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/dev/deployment/abis/contracts/pistols-actions-4f10cff7.json"
 reads = []
@@ -40,13 +40,23 @@ writes = [
 ]
 init_calldata = []
 tag = "pistols-actions"
+systems = [
+    "commit_action",
+    "reveal_action",
+    "_emitDuelistRegisteredEvent",
+    "_emitNewChallengeEvent",
+    "_emitChallengeAcceptedEvent",
+    "_emitPostRevealEvents",
+    "_emitDuelistTurnEvent",
+    "_emitChallengeResolvedEvent",
+]
 manifest_name = "pistols-actions-4f10cff7"
 
 [[contracts]]
 kind = "DojoContract"
-address = "0x25a835d5b7edf572d915fc69c4d77ac6a6d2d2a5d3b0949a92d3c6a4d0b340"
-class_hash = "0x466db85601aa2b5d23360926ca9c17035d38958fe69e3f274dd9333533bdd93"
-original_class_hash = "0x466db85601aa2b5d23360926ca9c17035d38958fe69e3f274dd9333533bdd93"
+address = "0x471b9dbf5dcf03a044e30fdd7b67594eb37a1ed9ca58718644d10638b3f89cb"
+class_hash = "0x58998e96d1412df3823e301c08e7dea70f68a8e587a9a1a8dad459754742823"
+original_class_hash = "0x58998e96d1412df3823e301c08e7dea70f68a8e587a9a1a8dad459754742823"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/dev/deployment/abis/contracts/pistols-admin-36fd2037.json"
 reads = []
@@ -60,13 +70,21 @@ init_calldata = [
     "$contract_address:pistols-lords_mock",
 ]
 tag = "pistols-admin"
+systems = [
+    "grant_admin",
+    "set_config",
+    "set_paused",
+    "set_table",
+    "set_table_admittance",
+    "open_table",
+]
 manifest_name = "pistols-admin-36fd2037"
 
 [[contracts]]
 kind = "DojoContract"
-address = "0x534ecefb19104e5e62c1604b4ca6cb7faa10b990b1e53cf5f5c768a785b3844"
-class_hash = "0x19feee8cf27746249ec143fac19db42b03a8ca459cd3cfbbf06253e6e3e52bb"
-original_class_hash = "0x19feee8cf27746249ec143fac19db42b03a8ca459cd3cfbbf06253e6e3e52bb"
+address = "0x7be9d49c381aee5b396f0aa9af7e505d21f0b60eb927a515b77cf4073ff63fb"
+class_hash = "0x4f64ee4f8e5749e9ebefee3e66885d66838b5873d505a018733b3e30843d540"
+original_class_hash = "0x4f64ee4f8e5749e9ebefee3e66885d66838b5873d505a018733b3e30843d540"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/dev/deployment/abis/contracts/pistols-lords_mock-2b1156e6.json"
 reads = []
@@ -80,13 +98,17 @@ writes = [
 ]
 init_calldata = []
 tag = "pistols-lords_mock"
+systems = [
+    "faucet",
+    "mint",
+]
 manifest_name = "pistols-lords_mock-2b1156e6"
 
 [[contracts]]
 kind = "DojoContract"
-address = "0x708b6eeefb3cfce58d98f4c6d931ca90e82f776cb0025afb03f395e83cf3853"
-class_hash = "0x27691fdec20b05e751e1538608964256a0ba6bf8a909d80899abafd90c2147c"
-original_class_hash = "0x27691fdec20b05e751e1538608964256a0ba6bf8a909d80899abafd90c2147c"
+address = "0x53a4dc9eb61deaa505884c6260a2560ca37d21c79a353546c45f1755f821f9f"
+class_hash = "0xc3da78de3d60e208a046c0cae3104b47872ddad3c263b8b22f97653dfb6f45"
+original_class_hash = "0xc3da78de3d60e208a046c0cae3104b47872ddad3c263b8b22f97653dfb6f45"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/dev/deployment/abis/contracts/pistols-minter-7b759538.json"
 reads = []
@@ -98,13 +120,14 @@ init_calldata = [
     "1",
 ]
 tag = "pistols-minter"
+systems = ["set_open"]
 manifest_name = "pistols-minter-7b759538"
 
 [[contracts]]
 kind = "DojoContract"
-address = "0x7425db491598c5f21d6a858300549f450871dbc813cd991184f013179b2c5cc"
-class_hash = "0x4efbf31d1a02fea59a60852b558b1d1501deaf554799b937a2b64b134e48847"
-original_class_hash = "0x4efbf31d1a02fea59a60852b558b1d1501deaf554799b937a2b64b134e48847"
+address = "0x7b7977b6eb61b7457181ee78918dbb65310db77cd812cdc277301841d01cda2"
+class_hash = "0x1bbfcf47014801e11a36118114878d3fc14155f8a78bf6ae2678a5087d07b40"
+original_class_hash = "0x1bbfcf47014801e11a36118114878d3fc14155f8a78bf6ae2678a5087d07b40"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/dev/deployment/abis/contracts/pistols-token_duelist-541e9c18.json"
 reads = []
@@ -124,12 +147,16 @@ writes = [
 ]
 init_calldata = []
 tag = "pistols-token_duelist"
+systems = [
+    "mint",
+    "burn",
+]
 manifest_name = "pistols-token_duelist-541e9c18"
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x2076eb50975ed3d1c7ef7198f8625139b6e89b18f8c398972fafb0291c4f03c"
-original_class_hash = "0x2076eb50975ed3d1c7ef7198f8625139b6e89b18f8c398972fafb0291c4f03c"
+class_hash = "0x222d10acee2a214aed878d06010385b8624a48bbb61a8bc9a777f8facd9a36d"
+original_class_hash = "0x222d10acee2a214aed878d06010385b8624a48bbb61a8bc9a777f8facd9a36d"
 abi = "manifests/dev/deployment/abis/models/origami_token-ERC20AllowanceModel-4fcf1991.json"
 tag = "origami_token-ERC20AllowanceModel"
 manifest_name = "origami_token-ERC20AllowanceModel-4fcf1991"
@@ -156,8 +183,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0xc3aea6d111dbb7aa0c8fdb8fcb4494bf8be4ccf281b025609fdc20cfc27550"
-original_class_hash = "0xc3aea6d111dbb7aa0c8fdb8fcb4494bf8be4ccf281b025609fdc20cfc27550"
+class_hash = "0x38c3c9f4ec3feea51cee2ec9be6592b50f711f5fa39e5b4f0ca0e770675505e"
+original_class_hash = "0x38c3c9f4ec3feea51cee2ec9be6592b50f711f5fa39e5b4f0ca0e770675505e"
 abi = "manifests/dev/deployment/abis/models/origami_token-ERC20BalanceModel-da267235.json"
 tag = "origami_token-ERC20BalanceModel"
 manifest_name = "origami_token-ERC20BalanceModel-da267235"
@@ -179,8 +206,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0xadec2dd1b121aa6105764a31f63a72103a57bca5603bfc95684c841812811a"
-original_class_hash = "0xadec2dd1b121aa6105764a31f63a72103a57bca5603bfc95684c841812811a"
+class_hash = "0x209edb9bdfa6fbd1f99ab521aa31319316615ca7fa31a61a2daf24c8b1b6706"
+original_class_hash = "0x209edb9bdfa6fbd1f99ab521aa31319316615ca7fa31a61a2daf24c8b1b6706"
 abi = "manifests/dev/deployment/abis/models/origami_token-ERC20BridgeableModel-28075fe4.json"
 tag = "origami_token-ERC20BridgeableModel"
 manifest_name = "origami_token-ERC20BridgeableModel-28075fe4"
@@ -197,8 +224,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x29919b6fd4391c3ebbbb0504d9fc3465eff10adb6fc23336b666c4d4d03a581"
-original_class_hash = "0x29919b6fd4391c3ebbbb0504d9fc3465eff10adb6fc23336b666c4d4d03a581"
+class_hash = "0x2a9e6b7d401e8c9fa77e5221dce4f049334ce8ed4d7a53f88adf72b3af968eb"
+original_class_hash = "0x2a9e6b7d401e8c9fa77e5221dce4f049334ce8ed4d7a53f88adf72b3af968eb"
 abi = "manifests/dev/deployment/abis/models/origami_token-ERC20MetadataModel-3368c0e3.json"
 tag = "origami_token-ERC20MetadataModel"
 manifest_name = "origami_token-ERC20MetadataModel-3368c0e3"
@@ -230,8 +257,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x5acf165436e68c4d20d693bb86b2d5ff7897e68004165858bc1cad91973d70c"
-original_class_hash = "0x5acf165436e68c4d20d693bb86b2d5ff7897e68004165858bc1cad91973d70c"
+class_hash = "0x36dc2b76dcd77b58fe987c0b8836c2ce7fa08cb9d44838634218fad353bec83"
+original_class_hash = "0x36dc2b76dcd77b58fe987c0b8836c2ce7fa08cb9d44838634218fad353bec83"
 abi = "manifests/dev/deployment/abis/models/origami_token-ERC721BalanceModel-246a8e17.json"
 tag = "origami_token-ERC721BalanceModel"
 manifest_name = "origami_token-ERC721BalanceModel-246a8e17"
@@ -253,8 +280,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x4ae75423c50b9a78805ac5c87c1cd4ed6a9d534a6aceb070994140a116eb65c"
-original_class_hash = "0x4ae75423c50b9a78805ac5c87c1cd4ed6a9d534a6aceb070994140a116eb65c"
+class_hash = "0x5d3394057bbdf2262c0ba952ec0bbc13b8a315ad8bd9e684650225abc4152ac"
+original_class_hash = "0x5d3394057bbdf2262c0ba952ec0bbc13b8a315ad8bd9e684650225abc4152ac"
 abi = "manifests/dev/deployment/abis/models/origami_token-ERC721EnumerableIndexModel-1a4200e7.json"
 tag = "origami_token-ERC721EnumerableIndexModel"
 manifest_name = "origami_token-ERC721EnumerableIndexModel-1a4200e7"
@@ -276,8 +303,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x1c013f8feadbe545e1e29acff56a0c130e75a712e941748f8f7b9e45f7482a8"
-original_class_hash = "0x1c013f8feadbe545e1e29acff56a0c130e75a712e941748f8f7b9e45f7482a8"
+class_hash = "0x2fd76867b943befb036da828bd1d2bec2386863ad70aafa770360c5b3e9acfc"
+original_class_hash = "0x2fd76867b943befb036da828bd1d2bec2386863ad70aafa770360c5b3e9acfc"
 abi = "manifests/dev/deployment/abis/models/origami_token-ERC721EnumerableOwnerIndexModel-573cb336.json"
 tag = "origami_token-ERC721EnumerableOwnerIndexModel"
 manifest_name = "origami_token-ERC721EnumerableOwnerIndexModel-573cb336"
@@ -304,8 +331,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x72a74999fc8e8c16d529ae335b0a240afffa58e368dbefa2692c3ba40dfad35"
-original_class_hash = "0x72a74999fc8e8c16d529ae335b0a240afffa58e368dbefa2692c3ba40dfad35"
+class_hash = "0x45871731d39993b19571f03348d6932fba0445f6eb94e1e37d2db5c4474d61c"
+original_class_hash = "0x45871731d39993b19571f03348d6932fba0445f6eb94e1e37d2db5c4474d61c"
 abi = "manifests/dev/deployment/abis/models/origami_token-ERC721EnumerableOwnerTokenModel-74966560.json"
 tag = "origami_token-ERC721EnumerableOwnerTokenModel"
 manifest_name = "origami_token-ERC721EnumerableOwnerTokenModel-74966560"
@@ -332,8 +359,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x49df621b1cc1b414e4085bd378a193142ec7e6927abbd9765fd501f3154e9a4"
-original_class_hash = "0x49df621b1cc1b414e4085bd378a193142ec7e6927abbd9765fd501f3154e9a4"
+class_hash = "0xf5a9baf34c431fc11c05e15ddff7eb4750847ada1db57528ddad2966a7f3ec"
+original_class_hash = "0xf5a9baf34c431fc11c05e15ddff7eb4750847ada1db57528ddad2966a7f3ec"
 abi = "manifests/dev/deployment/abis/models/origami_token-ERC721EnumerableTokenModel-5c383d9f.json"
 tag = "origami_token-ERC721EnumerableTokenModel"
 manifest_name = "origami_token-ERC721EnumerableTokenModel-5c383d9f"
@@ -355,8 +382,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x53a03ab6f1ef9b5b25cc09e9bc8043840c4819a63a450878d9c59174a6e007"
-original_class_hash = "0x53a03ab6f1ef9b5b25cc09e9bc8043840c4819a63a450878d9c59174a6e007"
+class_hash = "0x476254a3660ac696486628f6fb9c531a94de4b0addcc00bc43eafc207638968"
+original_class_hash = "0x476254a3660ac696486628f6fb9c531a94de4b0addcc00bc43eafc207638968"
 abi = "manifests/dev/deployment/abis/models/origami_token-ERC721EnumerableTotalModel-5674a124.json"
 tag = "origami_token-ERC721EnumerableTotalModel"
 manifest_name = "origami_token-ERC721EnumerableTotalModel-5674a124"
@@ -401,8 +428,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x7eff05f9ab0d08e0894369ceb804a00c87c2dce4cc06ab857a1489113cb93ad"
-original_class_hash = "0x7eff05f9ab0d08e0894369ceb804a00c87c2dce4cc06ab857a1489113cb93ad"
+class_hash = "0x29f6fcd504ae293bec1139611e0fe870deda9be6a41ef7e1ffacfa5c76c4dd5"
+original_class_hash = "0x29f6fcd504ae293bec1139611e0fe870deda9be6a41ef7e1ffacfa5c76c4dd5"
 abi = "manifests/dev/deployment/abis/models/origami_token-ERC721OperatorApprovalModel-1083d4d1.json"
 tag = "origami_token-ERC721OperatorApprovalModel"
 manifest_name = "origami_token-ERC721OperatorApprovalModel-1083d4d1"
@@ -429,8 +456,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x469680f4c886ed5c0002f96f6fdd15291716eb337d2484253dc77685b9c4b9b"
-original_class_hash = "0x469680f4c886ed5c0002f96f6fdd15291716eb337d2484253dc77685b9c4b9b"
+class_hash = "0x356e5dea0e7529f6c2617074b151c03b23cfb408d0a1ef8e123c226502cf115"
+original_class_hash = "0x356e5dea0e7529f6c2617074b151c03b23cfb408d0a1ef8e123c226502cf115"
 abi = "manifests/dev/deployment/abis/models/origami_token-ERC721OwnerModel-61577880.json"
 tag = "origami_token-ERC721OwnerModel"
 manifest_name = "origami_token-ERC721OwnerModel-61577880"
@@ -452,8 +479,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x69093db83e56383659efa40ee57d1bfa1cf7b85f0bba27666c9939554ccb2c8"
-original_class_hash = "0x69093db83e56383659efa40ee57d1bfa1cf7b85f0bba27666c9939554ccb2c8"
+class_hash = "0x290d67abdcfd26f1d9768cec5ff48842cd405ce33417c6e8a212da0baa77e86"
+original_class_hash = "0x290d67abdcfd26f1d9768cec5ff48842cd405ce33417c6e8a212da0baa77e86"
 abi = "manifests/dev/deployment/abis/models/origami_token-ERC721TokenApprovalModel-560d5854.json"
 tag = "origami_token-ERC721TokenApprovalModel"
 manifest_name = "origami_token-ERC721TokenApprovalModel-560d5854"
@@ -475,8 +502,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x6428d35e09083732f45a4e0b761f7363807527fc7dedeac2baa63c4f6adb309"
-original_class_hash = "0x6428d35e09083732f45a4e0b761f7363807527fc7dedeac2baa63c4f6adb309"
+class_hash = "0x43c7452e01d3ecb9f7460490397bd17c0d3461bd322d93bbfac4925dc9ee1ed"
+original_class_hash = "0x43c7452e01d3ecb9f7460490397bd17c0d3461bd322d93bbfac4925dc9ee1ed"
 abi = "manifests/dev/deployment/abis/models/origami_token-InitializableModel-5c624096.json"
 tag = "origami_token-InitializableModel"
 manifest_name = "origami_token-InitializableModel-5c624096"
@@ -493,8 +520,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x77feae465acca3a8502da5990b42c6c9971a623adace2811a58acad68f57b89"
-original_class_hash = "0x77feae465acca3a8502da5990b42c6c9971a623adace2811a58acad68f57b89"
+class_hash = "0x25d17f5223a69a8f5a4b9bdd2bba1121a9da6e5bdb83592402943158e5946b9"
+original_class_hash = "0x25d17f5223a69a8f5a4b9bdd2bba1121a9da6e5bdb83592402943158e5946b9"
 abi = "manifests/dev/deployment/abis/models/origami_token-SRC5Model-72fc8945.json"
 tag = "origami_token-SRC5Model"
 manifest_name = "origami_token-SRC5Model-72fc8945"
@@ -516,8 +543,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x43de2e0484198df4c12724a0cd4f44c4a314c15cc7734c461c8e599e0711a33"
-original_class_hash = "0x43de2e0484198df4c12724a0cd4f44c4a314c15cc7734c461c8e599e0711a33"
+class_hash = "0x175b75603aa17cfa02fc93ac713a5ff362a70af824deec9caef884235ed0c36"
+original_class_hash = "0x175b75603aa17cfa02fc93ac713a5ff362a70af824deec9caef884235ed0c36"
 abi = "manifests/dev/deployment/abis/models/pistols-Challenge-673267b6.json"
 tag = "pistols-Challenge"
 manifest_name = "pistols-Challenge-673267b6"
@@ -584,8 +611,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x55a7c0f06b6946f3a2927b3f40284f00777801b5e1cb1c10fe95d8879e0f73e"
-original_class_hash = "0x55a7c0f06b6946f3a2927b3f40284f00777801b5e1cb1c10fe95d8879e0f73e"
+class_hash = "0x3cf74429df2fffde1ab90fa02f725ef06d7aaef35cdacd56ad65024714f3a7f"
+original_class_hash = "0x3cf74429df2fffde1ab90fa02f725ef06d7aaef35cdacd56ad65024714f3a7f"
 abi = "manifests/dev/deployment/abis/models/pistols-Config-60742fa7.json"
 tag = "pistols-Config"
 manifest_name = "pistols-Config-60742fa7"
@@ -607,8 +634,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x6ffc6768f7a5f15a230c3d9be91328dc6ea1f10569799116af8986af6eb8b08"
-original_class_hash = "0x6ffc6768f7a5f15a230c3d9be91328dc6ea1f10569799116af8986af6eb8b08"
+class_hash = "0x438678aed538eaeacb5395be5b5bf337c8b620492ab0f54b032756bc3c3bd85"
+original_class_hash = "0x438678aed538eaeacb5395be5b5bf337c8b620492ab0f54b032756bc3c3bd85"
 abi = "manifests/dev/deployment/abis/models/pistols-Duelist-1ec34ce9.json"
 tag = "pistols-Duelist"
 manifest_name = "pistols-Duelist-1ec34ce9"
@@ -645,8 +672,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x3487d4373e902b78670d1a1257d8cfb3ae4c4d9bff9278aaced56bb9f17224e"
-original_class_hash = "0x3487d4373e902b78670d1a1257d8cfb3ae4c4d9bff9278aaced56bb9f17224e"
+class_hash = "0x1742fb856890207335d9bbec53122aed0b5593b213298050eec50c4e86fcee9"
+original_class_hash = "0x1742fb856890207335d9bbec53122aed0b5593b213298050eec50c4e86fcee9"
 abi = "manifests/dev/deployment/abis/models/pistols-Pact-72a33a65.json"
 tag = "pistols-Pact"
 manifest_name = "pistols-Pact-72a33a65"
@@ -668,8 +695,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x29e46245a3ea884f1e7c58e6a8d441aa61d8eead8c20173083ec3e9b04d911c"
-original_class_hash = "0x29e46245a3ea884f1e7c58e6a8d441aa61d8eead8c20173083ec3e9b04d911c"
+class_hash = "0x301ceb1e325561b80a7c8b49e71b09b062f79f0075a1d46ce00697db24771d2"
+original_class_hash = "0x301ceb1e325561b80a7c8b49e71b09b062f79f0075a1d46ce00697db24771d2"
 abi = "manifests/dev/deployment/abis/models/pistols-Round-617e0a3d.json"
 tag = "pistols-Round"
 manifest_name = "pistols-Round-617e0a3d"
@@ -701,8 +728,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x8a56d3ae22250d8573bf8096dcf717f56db3ea632473c569bf13bf24e1af9e"
-original_class_hash = "0x8a56d3ae22250d8573bf8096dcf717f56db3ea632473c569bf13bf24e1af9e"
+class_hash = "0x20217ebd369f280d7c38719ba769b9af22a3960fb0b230106c672daed0a1361"
+original_class_hash = "0x20217ebd369f280d7c38719ba769b9af22a3960fb0b230106c672daed0a1361"
 abi = "manifests/dev/deployment/abis/models/pistols-Scoreboard-18889906.json"
 tag = "pistols-Scoreboard"
 manifest_name = "pistols-Scoreboard-18889906"
@@ -757,8 +784,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x54e3569efebd2964afe0f7550a2b8980e8195baa25450e2f67a981079a75ffc"
-original_class_hash = "0x54e3569efebd2964afe0f7550a2b8980e8195baa25450e2f67a981079a75ffc"
+class_hash = "0x71ec603d2893fa4e8573fb1c94e414124dc633b8c6b96dcc21ad8317fe2cf10"
+original_class_hash = "0x71ec603d2893fa4e8573fb1c94e414124dc633b8c6b96dcc21ad8317fe2cf10"
 abi = "manifests/dev/deployment/abis/models/pistols-TableAdmittance-1b01f43d.json"
 tag = "pistols-TableAdmittance"
 manifest_name = "pistols-TableAdmittance-1b01f43d"
@@ -780,8 +807,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x75b00ec80d51c1a281a4998b76bccc785133978f35dd2523bf2f0d5949c2141"
-original_class_hash = "0x75b00ec80d51c1a281a4998b76bccc785133978f35dd2523bf2f0d5949c2141"
+class_hash = "0x6774b0dcc9a4ebb62e6f42b70ebd46cd77387e8d71cc8e57dee1403feec298"
+original_class_hash = "0x6774b0dcc9a4ebb62e6f42b70ebd46cd77387e8d71cc8e57dee1403feec298"
 abi = "manifests/dev/deployment/abis/models/pistols-TableConfig-1e8368fc.json"
 tag = "pistols-TableConfig"
 manifest_name = "pistols-TableConfig-1e8368fc"
@@ -833,8 +860,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x685e0b175c99e3aa54a52e770d7eee62f96cbdeccc4d0f308e4f32fe7c426fd"
-original_class_hash = "0x685e0b175c99e3aa54a52e770d7eee62f96cbdeccc4d0f308e4f32fe7c426fd"
+class_hash = "0x3df2ca24e9e476aaab1a7560502cacb4a81ba19e5ba22014ac2ab1b05c35a7"
+original_class_hash = "0x3df2ca24e9e476aaab1a7560502cacb4a81ba19e5ba22014ac2ab1b05c35a7"
 abi = "manifests/dev/deployment/abis/models/pistols-TokenConfig-56ebd338.json"
 tag = "pistols-TokenConfig"
 manifest_name = "pistols-TokenConfig-56ebd338"
@@ -866,8 +893,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x1f530c228228b02b93e86f7c2db8f61712b69a607600ad5331d057750ac2459"
-original_class_hash = "0x1f530c228228b02b93e86f7c2db8f61712b69a607600ad5331d057750ac2459"
+class_hash = "0x1e5d78a5b7ad246855311ee7b34e441961d7d3c14331ea70c3f87eb120deed6"
+original_class_hash = "0x1e5d78a5b7ad246855311ee7b34e441961d7d3c14331ea70c3f87eb120deed6"
 abi = "manifests/dev/deployment/abis/models/pistols-Wager-4cd30873.json"
 tag = "pistols-Wager"
 manifest_name = "pistols-Wager-4cd30873"

@@ -105,21 +105,21 @@ type type_admin = {
   INVALID_TREASURY: string, // cairo: felt252
   INVALID_TABLE: string, // cairo: felt252
   INVALID_DESCRIPTION: string, // cairo: felt252
-  NOT_OWNER: string, // cairo: felt252
+  NOT_ADMIN: string, // cairo: felt252
 };
 export const admin: type_admin = {
   INVALID_OWNER: 'ADMIN: Invalid account_address',
   INVALID_TREASURY: 'ADMIN: Invalid treasury_address',
   INVALID_TABLE: 'ADMIN: Invalid table',
   INVALID_DESCRIPTION: 'ADMIN: Invalid description',
-  NOT_OWNER: 'ADMIN: Not owner',
+  NOT_ADMIN: 'ADMIN: not admin',
 };
 
 // from: ../dojo/src/systems/minter.cairo
 type type_minter = {
   INVALID_TOKEN_ADDRESS: string, // cairo: felt252
   INVALID_SUPPLY: string, // cairo: felt252
-  NOT_OWNER: string, // cairo: felt252
+  NOT_ADMIN: string, // cairo: felt252
   MINTED_OUT: string, // cairo: felt252
   MINTING_IS_CLOSED: string, // cairo: felt252
   MAXED_WALLET: string, // cairo: felt252
@@ -127,7 +127,7 @@ type type_minter = {
 export const minter: type_minter = {
   INVALID_TOKEN_ADDRESS: 'MINTER: invalid token address',
   INVALID_SUPPLY: 'MINTER: invalid supply',
-  NOT_OWNER: 'MINTER: not owner',
+  NOT_ADMIN: 'MINTER: not admin',
   MINTED_OUT: 'MINTER: minted out',
   MINTING_IS_CLOSED: 'MINTER: minting closed',
   MAXED_WALLET: 'MINTER: wallet maxed out',

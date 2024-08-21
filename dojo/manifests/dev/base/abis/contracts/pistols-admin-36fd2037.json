@@ -278,7 +278,7 @@
     "items": [
       {
         "type": "function",
-        "name": "am_i_owner",
+        "name": "am_i_admin",
         "inputs": [
           {
             "name": "account_address",
@@ -294,7 +294,7 @@
       },
       {
         "type": "function",
-        "name": "set_owner",
+        "name": "grant_admin",
         "inputs": [
           {
             "name": "account_address",

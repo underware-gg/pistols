@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x6428d35e09083732f45a4e0b761f7363807527fc7dedeac2baa63c4f6adb309"
-original_class_hash = "0x6428d35e09083732f45a4e0b761f7363807527fc7dedeac2baa63c4f6adb309"
+class_hash = "0x43c7452e01d3ecb9f7460490397bd17c0d3461bd322d93bbfac4925dc9ee1ed"
+original_class_hash = "0x43c7452e01d3ecb9f7460490397bd17c0d3461bd322d93bbfac4925dc9ee1ed"
 abi = "manifests/dev/base/abis/models/origami_token-InitializableModel-5c624096.json"
 tag = "origami_token-InitializableModel"
 manifest_name = "origami_token-InitializableModel-5c624096"

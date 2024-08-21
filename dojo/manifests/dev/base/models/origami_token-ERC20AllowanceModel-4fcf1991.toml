@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x2076eb50975ed3d1c7ef7198f8625139b6e89b18f8c398972fafb0291c4f03c"
-original_class_hash = "0x2076eb50975ed3d1c7ef7198f8625139b6e89b18f8c398972fafb0291c4f03c"
+class_hash = "0x222d10acee2a214aed878d06010385b8624a48bbb61a8bc9a777f8facd9a36d"
+original_class_hash = "0x222d10acee2a214aed878d06010385b8624a48bbb61a8bc9a777f8facd9a36d"
 abi = "manifests/dev/base/abis/models/origami_token-ERC20AllowanceModel-4fcf1991.json"
 tag = "origami_token-ERC20AllowanceModel"
 manifest_name = "origami_token-ERC20AllowanceModel-4fcf1991"
