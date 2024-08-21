@@ -49,7 +49,7 @@ function GateHeader() {
       </div>
 
       <div className='Spacer10' />
-        <div className='Code Disabled'>
+      <div className='Code Disabled'>
         version {PACKAGE_VERSION}
       </div>
 
@@ -82,6 +82,7 @@ function GateMenu() {
   const { dispatchSetScene } = usePistolsScene()
   const { duelistId } = useSettings()
   const isMyDuelist = useIsMyDuelist(duelistId)
+  const { isReady } = useDojoStatus()
 
   const _onConnect = () => {
     if (isMyDuelist) {
@@ -97,11 +98,13 @@ function GateMenu() {
       <hr />
       <Divider hidden />
 
-      <ActionButton fill large important disabled={true} onClick={() => { }} label={'Play Tutorial'} />
-      <Divider content='OR' />
-      <ConnectButton onConnect={_onConnect} />
-      <Divider content='OR' />
-      <EnterAsGuestButton />
+      {isReady && <>
+        <ActionButton fill large important disabled={true} onClick={() => { }} label={'Play Tutorial'} />
+        <Divider content='OR' />
+        <ConnectButton onConnect={_onConnect} />
+        <Divider content='OR' />
+        <EnterAsGuestButton />
+      </>}
 
       <ConnectStatus />
 
@@ -113,7 +116,7 @@ function GateMenu() {
 export function EnterAsGuestButton() {
   const { dispatchDuelistId } = useSettings()
   const { dispatchSetScene } = usePistolsScene()
-  
+
   const _enterAsGuest = () => {
     dispatchDuelistId(0n)
     dispatchSetScene(SceneName.Tavern)
@@ -149,29 +152,23 @@ export function ConnectButton({
 export function ConnectStatus() {
   const { isConnecting } = useSelectedChain()
   const { isLoading, loadingMessage, isError, errorMessage } = useDojoStatus()
-  return (
-    <>
-      {isConnecting ?
-        <div>
-          <Divider />
-          <h3 className='TitleCase Important'>Connecting...</h3>
-        </div>
-        : isLoading ?
-          <div>
-            <Divider />
-            <h3 className='TitleCase Important'>{loadingMessage}</h3>
-          </div>
-          : isError ?
-            <div>
-              <Divider />
-              <h3 className='TitleCase Negative'>{errorMessage}</h3>
-              <Divider hidden />
-              <ActionButton fill large important onClick={() => location.reload()} label='Retry' />
-            </div>
-            : <></>
-      }
-    </>
-  )
+
+  if (isConnecting) {
+    return <h3 className='TitleCase Important'>Connecting...</h3>
+  }
+  if (isLoading) {
+    return <h3 className='TitleCase Important'>{loadingMessage}</h3>
+  }
+  if (isError) {
+    return (
+      <div>
+        <h3 className='TitleCase Negative'>{errorMessage}</h3>
+        <Divider hidden />
+        <ActionButton fill large important onClick={() => location.reload()} label='Retry' />
+      </div>
+    )
+  }
+  return <></>
 }
 
 

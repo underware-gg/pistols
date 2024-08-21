@@ -18,6 +18,7 @@ import {
   createSystemCalls,
   defineContractComponents,
 } from './setup'
+import { isReadable } from 'stream';
 
 export type SetupResult = ReturnType<typeof useSetup> | null
 export type ClientComponents = ReturnType<typeof defineContractComponents>
@@ -183,6 +184,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     manifest,
     // status
     status: {
+      isReady: (!isLoading && !isError),
       isLoading: (isLoading && !isError),
       loadingMessage,
       isError,
