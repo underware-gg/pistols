@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x3487d4373e902b78670d1a1257d8cfb3ae4c4d9bff9278aaced56bb9f17224e"
-original_class_hash = "0x3487d4373e902b78670d1a1257d8cfb3ae4c4d9bff9278aaced56bb9f17224e"
+class_hash = "0x1742fb856890207335d9bbec53122aed0b5593b213298050eec50c4e86fcee9"
+original_class_hash = "0x1742fb856890207335d9bbec53122aed0b5593b213298050eec50c4e86fcee9"
 abi = "manifests/staging/base/abis/models/pistols-Pact-72a33a65.json"
 tag = "pistols-Pact"
 manifest_name = "pistols-Pact-72a33a65"

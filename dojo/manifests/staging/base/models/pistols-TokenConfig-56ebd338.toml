@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x685e0b175c99e3aa54a52e770d7eee62f96cbdeccc4d0f308e4f32fe7c426fd"
-original_class_hash = "0x685e0b175c99e3aa54a52e770d7eee62f96cbdeccc4d0f308e4f32fe7c426fd"
+class_hash = "0x3df2ca24e9e476aaab1a7560502cacb4a81ba19e5ba22014ac2ab1b05c35a7"
+original_class_hash = "0x3df2ca24e9e476aaab1a7560502cacb4a81ba19e5ba22014ac2ab1b05c35a7"
 abi = "manifests/staging/base/abis/models/pistols-TokenConfig-56ebd338.json"
 tag = "pistols-TokenConfig"
 manifest_name = "pistols-TokenConfig-56ebd338"

@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x8a56d3ae22250d8573bf8096dcf717f56db3ea632473c569bf13bf24e1af9e"
-original_class_hash = "0x8a56d3ae22250d8573bf8096dcf717f56db3ea632473c569bf13bf24e1af9e"
+class_hash = "0x20217ebd369f280d7c38719ba769b9af22a3960fb0b230106c672daed0a1361"
+original_class_hash = "0x20217ebd369f280d7c38719ba769b9af22a3960fb0b230106c672daed0a1361"
 abi = "manifests/staging/base/abis/models/pistols-Scoreboard-18889906.json"
 tag = "pistols-Scoreboard"
 manifest_name = "pistols-Scoreboard-18889906"
