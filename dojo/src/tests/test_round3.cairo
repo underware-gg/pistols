@@ -84,6 +84,15 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let (challenge, mut round) = tester::get_Challenge_Round(world, duel_id);
         assert(challenge.round_number == 2, 'C: needs 2 rounds');
         assert(round.round_number == 2, 'R: needs 2 rounds');
+        // round 3 should not exist
+        let round1: Round = tester::get_Round(world, challenge.duel_id, 1);
+        let round2: Round = tester::get_Round(world, challenge.duel_id, 2);
+        let round3: Round = tester::get_Round(world, challenge.duel_id, 3);
+        let round4: Round = tester::get_Round(world, challenge.duel_id, 4);
+        assert(round1.state == RoundState::Finished, '__round1.state');
+        assert(round2.state == RoundState::Commit, '__round2.state');
+        assert(round3.state == RoundState::Null, '__round3.state');
+        assert(round4.state == RoundState::Null, '__round4.state');
         // change round 1 results
         round.shot_a.health = health_a;
         round.shot_b.health = health_b;
