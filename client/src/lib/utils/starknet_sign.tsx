@@ -54,12 +54,11 @@ export const signMessages = async (account: AccountInterface, chainId: string, r
   const messageHash = getMessageHash(typedMessage, account.address)
   const signature = await account.signMessage(typedMessage)
   //@ts-ignore
-  console.log(signature.slice(-2))
   let signatureArray: bigint[] =
     Array.isArray(signature) ? signature.map(v => BigInt(v)) // [...]
       : splitSignature(signature) // {r,s}
-  const signatureHash = poseidon(signatureArray.slice(-2))
-  console.log(`SIG:`, typedMessage, 'type:', typeSelectorName, typeHash, 'message:', messageHash, signature, 'sigHash:', bigintToHex(signatureHash))
+  const signatureHash = signatureArray.length >= 2 ? poseidon(signatureArray.slice(-2)) : 0n
+  console.log(`SIG:`, typedMessage, 'type:', typeSelectorName, typeHash, 'message:', messageHash, signature, signatureArray, 'sigHash:', bigintToHex(signatureHash))
   // throw new Error('STOP')
   return {
     typedMessage,

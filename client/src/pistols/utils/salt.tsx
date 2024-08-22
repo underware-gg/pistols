@@ -40,7 +40,7 @@ const signAndGenerateSalt = async (account: AccountInterface, chainId: string, d
       const { signatureHash } = await signMessages(account, chainId, 1, messages)
       if (signatureHash == 0n) {
         // get on-chain????
-        throw new Error('bad signature')
+        throw new Error('null signature')
       }
       result = (signatureHash & HASH_SALT_MASK)
     } catch (e) {
@@ -63,8 +63,8 @@ export const signAndRestoreActionFromHash = async (account: AccountInterface, ch
   const salt = await signAndGenerateSalt(account, chainId, duelistId, duelId, roundNumber)
   let packed = null
   let slots = null
-  console.log(`___RESTORE_HASH Duel:`, bigintToHex(duelId), 'round:', roundNumber)
-  for (let i = 0; i < possibleActions.length; ++i) {
+  console.log(`___RESTORE_HASH Duel:`, bigintToHex(duelId), 'round:', roundNumber, 'hash:', bigintToHex(hash), 'salt:', bigintToHex(salt))
+  for (let i = 0; salt > 0n && i < possibleActions.length; ++i) {
     const m = possibleActions[i]
     const h = make_action_hash(salt, m)
     console.log(`___RESTORE_HASH move:`, m, bigintToHex(hash), '>', bigintToHex(h))

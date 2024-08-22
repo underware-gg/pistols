@@ -28,6 +28,7 @@ import { EMOJI } from '@/pistols/data/messages'
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import CommitBladesModal from '@/pistols/components/CommitBladesModal'
 import { constants } from '@/games/pistols/generated/constants'
+import { bigintToHex } from '@/lib/utils/types'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -228,26 +229,29 @@ function DuelProgress({
   // const isTurn = useMemo(() => ((isA && turnA) || (isB && turnB)), [isA, isB, turnA, turnB])
 
   // Commit modal control
+  const [didReveal, setDidReveal] = useState(false)
   const [commitModalIsOpen, setCommitModalIsOpen] = useState(false)
-  const { reveal } = useRevealAction(duelId, roundNumber, currentRoundAction?.hash, duelStage == DuelStage.Round1Reveal || duelStage == DuelStage.Round2Reveal)
+  const { reveal, canReveal } = useRevealAction(duelId, roundNumber, currentRoundAction?.hash, duelStage == DuelStage.Round1Reveal || duelStage == DuelStage.Round2Reveal)
   const onClick = useCallback(() => {
     if (isYou && isConnected && completedStages[duelStage] === false) {
       if (duelStage == DuelStage.Round1Commit || duelStage == DuelStage.Round2Commit) {
         setCommitModalIsOpen(true)
-      }
-      if (duelStage == DuelStage.Round1Reveal || duelStage == DuelStage.Round2Reveal) {
-        console.log(`_reveal()....`)
-        reveal()
+      } else if (duelStage == DuelStage.Round1Reveal || duelStage == DuelStage.Round2Reveal) {
+        if (canReveal && !didReveal) {
+          console.log(`reveal(${isA ? 'A' : 'B'}) hash:`, bigintToHex(currentRoundAction?.hash ?? 0))
+          setDidReveal(true)
+          reveal()
+        }
       }
     }
-  }, [isYou, isConnected, duelStage, completedStages])
+  }, [isYou, isConnected, duelStage, completedStages, canReveal])
 
   // auto-reveal
   useEffect(() => {
-    if (canAutoReveal) {
+    if (canAutoReveal && canReveal) {
       onClick?.()
     }
-  }, [onClick, canAutoReveal])
+  }, [onClick, canAutoReveal, canReveal])
 
   //------------------------------
   return (
