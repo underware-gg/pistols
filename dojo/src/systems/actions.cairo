@@ -105,7 +105,7 @@ mod actions {
     use pistols::models::duelist::{Duelist, DuelistTrait, ProfilePicType, Archetype, Score, Pact, DuelistManager, DuelistManagerTrait};
     use pistols::models::structs::{SimulateChances};
     use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
-    use pistols::models::table::{TableConfig, TableManager, TableTrait, TableManagerTrait, tables, TableType};
+    use pistols::models::table::{TableConfig, TableManager, TableTrait, TableManagerTrait, TABLES, TableType};
     use pistols::models::init::{init};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
@@ -115,7 +115,7 @@ mod actions {
     use pistols::libs::seeder::{make_seed};
     use pistols::libs::shooter::{shooter};
     use pistols::libs::utils;
-    use pistols::types::constants::{constants, honour};
+    use pistols::types::constants::{CONST, HONOUR};
     use pistols::types::{events};
     use pistols::types::typed_data::{CommitMoveMessage, CommitMoveMessageTrait};
 
@@ -177,9 +177,9 @@ mod actions {
                 score: init::Score(),
             };
             match initial_archetype {
-                Archetype::Villainous => { duelist.score.level_villain = honour::LEVEL_MAX; },
-                Archetype::Trickster =>  { duelist.score.level_trickster = honour::LEVEL_MAX; },
-                Archetype::Honourable => { duelist.score.level_lord = honour::LEVEL_MAX; },
+                Archetype::Villainous => { duelist.score.level_villain = HONOUR::LEVEL_MAX; },
+                Archetype::Trickster =>  { duelist.score.level_trickster = HONOUR::LEVEL_MAX; },
+                Archetype::Honourable => { duelist.score.level_lord = HONOUR::LEVEL_MAX; },
                 _ => {},
             };
             // // save

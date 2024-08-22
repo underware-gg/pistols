@@ -16,7 +16,7 @@ use pistols::models::init::{init};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round::{RoundState, RoundStateTrait};
 use pistols::types::action::{Action, ActionTrait, ACTION};
-use pistols::types::constants::{constants, honour, chances};
+use pistols::types::constants::{CONST, HONOUR, CHANCES};
 use pistols::utils::math::{MathU8, MathU16, MathU64};
 use pistols::utils::bitwise::{BitwiseU64};
 
@@ -41,7 +41,7 @@ fn CONSUME_BYTE_ARRAY(_value: @ByteArray) {}
 
 #[inline(always)]
 fn make_action_hash(salt: u64, packed: u16) -> u64 {
-    let hash: u256 = pedersen(salt.into(), packed.into()).into() & constants::HASH_SALT_MASK;
+    let hash: u256 = pedersen(salt.into(), packed.into()).into() & CONST::HASH_SALT_MASK;
     (hash.try_into().unwrap())
 }
 
@@ -52,7 +52,7 @@ fn make_round_salt(round: Round) -> u64 {
 
 #[inline(always)]
 fn scramble_salt(salt: u64) -> u64 {
-    let hash: u256 = pedersen(salt.into(), (~salt).into()).into() & constants::HASH_SALT_MASK;
+    let hash: u256 = pedersen(salt.into(), (~salt).into()).into() & CONST::HASH_SALT_MASK;
     (hash.try_into().unwrap())
 }
 
@@ -128,9 +128,9 @@ fn clone_snapshot_duelist_levels(world: IWorldDispatcher, duelist_id: u128, ref 
     if (scoreboard.score.total_duels == 0) {
         // maxx up main scoreboard levels
         let duelist: Duelist = get!(world, duelist_id, Duelist);
-        scoreboard.score.level_villain = if (duelist.score.is_villain()) {honour::LEVEL_MAX} else {0};
-        scoreboard.score.level_trickster = if (duelist.score.is_trickster()) {honour::LEVEL_MAX} else {0};
-        scoreboard.score.level_lord = if (duelist.score.is_lord()) {honour::LEVEL_MAX} else {0};
+        scoreboard.score.level_villain = if (duelist.score.is_villain()) {HONOUR::LEVEL_MAX} else {0};
+        scoreboard.score.level_trickster = if (duelist.score.is_trickster()) {HONOUR::LEVEL_MAX} else {0};
+        scoreboard.score.level_lord = if (duelist.score.is_lord()) {HONOUR::LEVEL_MAX} else {0};
         set!(world, (scoreboard));
     }
 }
@@ -306,8 +306,8 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
 
         if (challenge.round_number == 1) {
             // Round 1 starts with full health
-            shot_a.health = constants::FULL_HEALTH;
-            shot_b.health = constants::FULL_HEALTH;
+            shot_a.health = CONST::FULL_HEALTH;
+            shot_b.health = CONST::FULL_HEALTH;
         } else {
             // Round 2+ need to copy previous Round's state
             let prev_round: Round = get!(world, (challenge.duel_id, challenge.round_number - 1), Round);
@@ -403,15 +403,15 @@ fn update_score_honour(ref score: Score, duel_honour: u8, calc_levels: bool) {
 // Villain bonus: the less honour, more bonus
 #[inline(always)]
 fn calc_level_villain(honour: u8) -> u8 {
-    if (honour < honour::TRICKSTER_START) {
-        (MathU8::map(honour, honour::VILLAIN_START, honour::TRICKSTER_START-1, honour::LEVEL_MAX, honour::LEVEL_MIN))
+    if (honour < HONOUR::TRICKSTER_START) {
+        (MathU8::map(honour, HONOUR::VILLAIN_START, HONOUR::TRICKSTER_START-1, HONOUR::LEVEL_MAX, HONOUR::LEVEL_MIN))
     } else { (0) }
 }
 // Lord bonus: the more honour, more bonus
 #[inline(always)]
 fn calc_level_lord(honour: u8) -> u8 {
-    if (honour >= honour::LORD_START) {
-        (MathU8::map(honour, honour::LORD_START, honour::MAX, honour::LEVEL_MIN, honour::LEVEL_MAX))
+    if (honour >= HONOUR::LORD_START) {
+        (MathU8::map(honour, HONOUR::LORD_START, HONOUR::MAX, HONOUR::LEVEL_MIN, HONOUR::LEVEL_MAX))
     } else { (0) }
 }
 // Trickster bonus: the max of...
@@ -419,10 +419,10 @@ fn calc_level_lord(honour: u8) -> u8 {
 // cap halfway without going to zero (shaped as a /\)
 #[inline(always)]
 fn calc_level_trickster(honour: u8, duel_honour: u8) -> u8 {
-    if (honour >= honour::TRICKSTER_START && honour < honour::LORD_START) {
+    if (honour >= HONOUR::TRICKSTER_START && honour < HONOUR::LORD_START) {
         // simple \/ shape of LEVEL_MAX/2 at middle range to LEVEL_MAX at extremities
-        let level_i: i16 = MathU8::map(duel_honour, honour::VILLAIN_START, honour::MAX, 0, honour::LEVEL_MAX).try_into().unwrap() - (honour::LEVEL_MAX / 2).into();
-        let level: u8 = MathU16::abs(level_i).try_into().unwrap() + (honour::LEVEL_MAX / 2);
+        let level_i: i16 = MathU8::map(duel_honour, HONOUR::VILLAIN_START, HONOUR::MAX, 0, HONOUR::LEVEL_MAX).try_into().unwrap() - (HONOUR::LEVEL_MAX / 2).into();
+        let level: u8 = MathU16::abs(level_i).try_into().unwrap() + (HONOUR::LEVEL_MAX / 2);
         (level)
     } else { (0) }
 }
@@ -485,7 +485,7 @@ fn _apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
     (MathU8::clamp(
         MathU8::sub(chance + bonus, penalty),
         (chance / 2),       // never go below half chance
-        chances::ALWAYS,    // never go above 100
+        CHANCES::ALWAYS,    // never go above 100
     ))
 }
 
@@ -494,21 +494,21 @@ fn _apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
 //
 
 fn calc_crit_bonus(attacker: Score, table_type: TableType) -> u8 {
-    let max_level: u16 = if (table_type.maxxed_up_levels()) {honour::LEVEL_MAX.into()} else {(attacker.total_duels * 10)};
+    let max_level: u16 = if (table_type.maxxed_up_levels()) {HONOUR::LEVEL_MAX.into()} else {(attacker.total_duels * 10)};
     if (attacker.is_lord()) {
-        (_calc_bonus(chances::CRIT_BONUS_LORD, attacker.level_lord, max_level))
+        (_calc_bonus(CHANCES::CRIT_BONUS_LORD, attacker.level_lord, max_level))
     } else if (attacker.is_trickster()) {
-        (_calc_bonus(chances::CRIT_BONUS_TRICKSTER, attacker.level_trickster, max_level))
+        (_calc_bonus(CHANCES::CRIT_BONUS_TRICKSTER, attacker.level_trickster, max_level))
     } else {
         (0)
     }
 }
 fn calc_hit_bonus(attacker: Score, table_type: TableType) -> u8 {
-    let max_level: u16 = if (table_type.maxxed_up_levels()) {honour::LEVEL_MAX.into()} else {(attacker.total_duels * 10)};
+    let max_level: u16 = if (table_type.maxxed_up_levels()) {HONOUR::LEVEL_MAX.into()} else {(attacker.total_duels * 10)};
     if (attacker.is_villain()) {
-        (_calc_bonus(chances::HIT_BONUS_VILLAIN, attacker.level_villain, max_level))
+        (_calc_bonus(CHANCES::HIT_BONUS_VILLAIN, attacker.level_villain, max_level))
     } else if (attacker.is_trickster()) {
-        (_calc_bonus(chances::HIT_BONUS_TRICKSTER, attacker.level_trickster, max_level))
+        (_calc_bonus(CHANCES::HIT_BONUS_TRICKSTER, attacker.level_trickster, max_level))
     } else {
         (0)
     }
@@ -517,7 +517,7 @@ fn _calc_bonus(bonus_max: u8, level: u8, max_level: u16) -> u8 {
     if (level > 0 && max_level > 0) {
         (MathU8::max(1, MathU8::map(
             MathU16::min(level.into(), max_level).try_into().unwrap(),
-            0, honour::LEVEL_MAX,
+            0, HONOUR::LEVEL_MAX,
             0, bonus_max)
         ))
     } else {
@@ -527,9 +527,9 @@ fn _calc_bonus(bonus_max: u8, level: u8, max_level: u16) -> u8 {
 
 fn calc_crit_match_bonus(attacker: Score, attack: Action, defense: Action) -> u8 {
     if (attacker.is_lord()) {
-        if (attack.paces_priority(defense) < 0) { (chances::EARLY_LORD_CRIT_BONUS) } else { (0) }
+        if (attack.paces_priority(defense) < 0) { (CHANCES::EARLY_LORD_CRIT_BONUS) } else { (0) }
     } else if (attacker.is_villain()) {
-        if (attack.paces_priority(defense) > 0) { (chances::LATE_VILLAIN_CRIT_BONUS) } else { (0) }
+        if (attack.paces_priority(defense) > 0) { (CHANCES::LATE_VILLAIN_CRIT_BONUS) } else { (0) }
     } else {
         (0)
     }
@@ -548,15 +548,15 @@ fn calc_hit_injury_penalty(attack: Action, health: u8) -> u8 {
 }
 #[inline(always)]
 fn _calc_penalty(health: u8, penalty_per_damage: u8) -> u8 {
-    ((constants::FULL_HEALTH - health) * penalty_per_damage)
+    ((CONST::FULL_HEALTH - health) * penalty_per_damage)
 }
 
 
 fn calc_crit_trickster_penalty(attacker: Score, defender: Score) -> u8 {
-    (_calc_trickster_penalty(attacker, defender, chances::TRICKSTER_CRIT_PENALTY))
+    (_calc_trickster_penalty(attacker, defender, CHANCES::TRICKSTER_CRIT_PENALTY))
 }
 fn calc_hit_trickster_penalty(attacker: Score, defender: Score) -> u8 {
-    (_calc_trickster_penalty(attacker, defender, chances::TRICKSTER_HIT_PENALTY))
+    (_calc_trickster_penalty(attacker, defender, CHANCES::TRICKSTER_HIT_PENALTY))
 }
 #[inline(always)]
 fn _calc_trickster_penalty(attacker: Score, defender: Score, penalty: u8) -> u8 {
@@ -571,7 +571,7 @@ fn _calc_trickster_penalty(attacker: Score, defender: Score, penalty: u8) -> u8 
 fn calc_lethal_lord_penalty(attacker: Score, defender: Score, attack: Action, defense: Action) -> u8 {
     // lord shooting late have <penalty> chances to get less damage
     if (defender.is_lord() && !attacker.is_lord() && attack.paces_priority(defense) > 0) {
-        (chances::LORD_LETHAL_PENALTY)
+        (CHANCES::LORD_LETHAL_PENALTY)
     } else {
         (0)
     }
@@ -620,7 +620,7 @@ fn call_simulate_honour_for_action(world: IWorldDispatcher, mut score: Score, ac
 
 fn call_get_duelist_health(world: IWorldDispatcher, duelist_id: u128, duel_id: u128, round_number: u8) -> u8 {
     if (round_number == 1) {
-        (constants::FULL_HEALTH)
+        (CONST::FULL_HEALTH)
     } else {
         let shot: Shot = call_get_duelist_round_shot(world, duelist_id, duel_id, round_number);
         (shot.health)

@@ -7,7 +7,7 @@ import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
 import { useChallenge } from "@/pistols/hooks/useChallenge"
 import { keysToEntity } from '@/lib/utils/types'
 import { AnimationState } from "@/pistols/three/game"
-import { constants, getRoundState, RoundState } from '@/games/pistols/generated/constants'
+import { CONST, getRoundState, RoundState } from '@/games/pistols/generated/constants'
 import { ActionNames, ActionVerbs } from "@/pistols/utils/pistols"
 
 export enum DuelStage {
@@ -117,13 +117,13 @@ export const useAnimatedDuel = (duelId: BigNumberish, enabled: boolean) => {
   const { healthA, healthB } = useMemo(() => {
     return {
       healthA: (
-        (currentStage <= DuelStage.Round1Animation && !animatedHealthA) ? constants.FULL_HEALTH
+        (currentStage <= DuelStage.Round1Animation && !animatedHealthA) ? CONST.FULL_HEALTH
           : currentStage <= DuelStage.Round2Animation ? round1.shot_a.health
             : currentStage <= DuelStage.Round3Animation ? round2.shot_a.health
               : (round3?.shot_a.health ?? round2?.shot_a.health ?? round1?.shot_a.health)
       ) ?? null,
       healthB: (
-        (currentStage <= DuelStage.Round1Animation && !animatedHealthB) ? constants.FULL_HEALTH
+        (currentStage <= DuelStage.Round1Animation && !animatedHealthB) ? CONST.FULL_HEALTH
           : currentStage <= DuelStage.Round2Animation ? round1.shot_b.health
             : currentStage <= DuelStage.Round3Animation ? round2.shot_b.health
               : (round3?.shot_b.health ?? round2?.shot_b.health ?? round1?.shot_b.health)

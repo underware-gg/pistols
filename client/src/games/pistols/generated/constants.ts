@@ -30,11 +30,11 @@ export const CONFIG: type_CONFIG = {
 };
 
 // from: ../dojo/src/models/table.cairo
-type type_tables = {
+type type_TABLES = {
   LORDS: string, // cairo: felt252
   COMMONERS: string, // cairo: felt252
 };
-export const tables: type_tables = {
+export const TABLES: type_TABLES = {
   LORDS: 'Lords',
   COMMONERS: 'Commoners',
 };
@@ -200,7 +200,7 @@ export const CHALLENGE_STATE: type_CHALLENGE_STATE = {
 };
 
 // from: ../dojo/src/types/constants.cairo
-type type_constants = {
+type type_CONST = {
   ROUND_COUNT: number, // cairo: u8
   MAX_DUELIST_ID: BigNumberish, // cairo: u128
   FULL_HEALTH: number, // cairo: u8
@@ -209,7 +209,7 @@ type type_constants = {
   HASH_SALT_MASK: BigNumberish, // cairo: u256
   ETH_TO_WEI: BigNumberish, // cairo: u256
 };
-export const constants: type_constants = {
+export const CONST: type_CONST = {
   ROUND_COUNT: 3,
   MAX_DUELIST_ID: '0xffff',
   FULL_HEALTH: 3,
@@ -220,7 +220,7 @@ export const constants: type_constants = {
 };
 
 // from: ../dojo/src/types/constants.cairo
-type type_honour = {
+type type_HONOUR = {
   VILLAIN_START: number, // cairo: u8
   TRICKSTER_START: number, // cairo: u8
   LORD_START: number, // cairo: u8
@@ -229,7 +229,7 @@ type type_honour = {
   LEVEL_MIN: number, // cairo: u8
   LEVEL_MAX: number, // cairo: u8
 };
-export const honour: type_honour = {
+export const HONOUR: type_HONOUR = {
   VILLAIN_START: 10,
   TRICKSTER_START: 35,
   LORD_START: 75,
@@ -240,7 +240,7 @@ export const honour: type_honour = {
 };
 
 // from: ../dojo/src/types/constants.cairo
-type type_chances = {
+type type_CHANCES = {
   NEVER: number, // cairo: u8
   ALWAYS: number, // cairo: u8
   PISTOLS_KILL_AT_STEP_1: number, // cairo: u8
@@ -263,7 +263,7 @@ type type_chances = {
   TRICKSTER_CRIT_PENALTY: number, // cairo: u8
   TRICKSTER_HIT_PENALTY: number, // cairo: u8
 };
-export const chances: type_chances = {
+export const CHANCES: type_CHANCES = {
   NEVER: 0,
   ALWAYS: 100,
   PISTOLS_KILL_AT_STEP_1: 5,
@@ -288,14 +288,14 @@ export const chances: type_chances = {
 };
 
 // from: ../dojo/src/types/events.cairo
-type type_selector = {
+type type_EVENT_SELECTOR = {
   DuelistRegisteredEvent: BigNumberish, // cairo: felt252
   NewChallengeEvent: BigNumberish, // cairo: felt252
   ChallengeAcceptedEvent: BigNumberish, // cairo: felt252
   ChallengeResolvedEvent: BigNumberish, // cairo: felt252
   DuelistTurnEvent: BigNumberish, // cairo: felt252
 };
-export const selector: type_selector = {
+export const EVENT_SELECTOR: type_EVENT_SELECTOR = {
   DuelistRegisteredEvent: '0x148c3db21a55576bc012023dc4d3b5bd570c519de855849eac52b1c5d6c9e85',
   NewChallengeEvent: '0x14a0df74df51e02ef8dedabfd1ea9684ea2087bed6370e881b156d7e2e56975',
   ChallengeAcceptedEvent: '0x31cdbf7ac39747303190a727df1a270ae5e4f05191f6f58e452ce4eb1e98abe',

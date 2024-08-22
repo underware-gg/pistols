@@ -50,8 +50,8 @@ use pistols::models::{
     token_config::{token_config, TokenConfig},
 };
 
-use pistols::models::table::{tables};
-use pistols::types::constants::{constants};
+use pistols::models::table::{TABLES};
+use pistols::types::constants::{CONST};
 use pistols::interfaces::systems::{SELECTORS};
 use pistols::tests::tester::{tester};
 
@@ -231,11 +231,11 @@ fn test_token_uri() {
         },
     };
     let scoreboard: Scoreboard = Scoreboard{
-        table_id: tables::LORDS,
+        table_id: TABLES::LORDS,
         duelist_id: TOKEN_ID.low,
         score: duelist.score,
-        wager_won: (1000 * constants::ETH_TO_WEI.low),
-        wager_lost: (200 * constants::ETH_TO_WEI.low),
+        wager_won: (1000 * CONST::ETH_TO_WEI.low),
+        wager_lost: (200 * CONST::ETH_TO_WEI.low),
     };
 
     tester::set_Duelist(world, minter.contract_address, duelist);

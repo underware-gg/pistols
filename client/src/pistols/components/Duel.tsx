@@ -27,7 +27,7 @@ import { Balance } from '@/pistols/components/account/Balance'
 import { EMOJI } from '@/pistols/data/messages'
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import CommitBladesModal from '@/pistols/components/CommitBladesModal'
-import { constants } from '@/games/pistols/generated/constants'
+import { CONST } from '@/games/pistols/generated/constants'
 import { bigintToHex } from '@/lib/utils/types'
 
 const Row = Grid.Row
@@ -165,7 +165,7 @@ function DuelHealthBar({
 }) {
   const points = useMemo(() => {
     let result = []
-    for (let i = 1; i <= constants.FULL_HEALTH; ++i) {
+    for (let i = 1; i <= CONST.FULL_HEALTH; ++i) {
       const full = (health >= i)
       result.push(
         <Segment key={`${i}_${full ? 'full' : 'empty'}`} className={full ? 'HealthPointFull' : 'HealthPointEmpty'} />

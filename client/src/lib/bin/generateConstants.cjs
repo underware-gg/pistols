@@ -31,6 +31,7 @@ function getConstantsFromCairoFile(filePath) {
   const lines = contents.split('\n');
   // parse contents
   let is_test = false;
+  let is_errors = false;
   let current_mod = null;
   let current_enum = null;
   lines.forEach((line) => {

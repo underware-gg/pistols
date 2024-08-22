@@ -6,7 +6,7 @@ import { useEntityKeys } from '@/lib/dojo/hooks/useEntityKeys'
 import { useScore } from '@/pistols/hooks/useScore'
 import { bigintToEntity, isPositiveBigint } from '@/lib/utils/types'
 import { feltToString } from "@/lib/utils/starknet"
-import { constants } from '@/games/pistols/generated/constants'
+import { CONST } from '@/games/pistols/generated/constants'
 
 
 //------------------
@@ -28,7 +28,7 @@ export const useAllDuelistKeys = () => {
 //
 
 export const useDuelist = (duelist_id: BigNumberish) => {
-  const isValidDuelistId = useMemo(() => (isPositiveBigint(duelist_id) && BigInt(duelist_id) <= BigInt(constants.MAX_DUELIST_ID)), [duelist_id])
+  const isValidDuelistId = useMemo(() => (isPositiveBigint(duelist_id) && BigInt(duelist_id) <= BigInt(CONST.MAX_DUELIST_ID)), [duelist_id])
 
   const { Duelist } = useDojoComponents()
   const duelist: any = useComponentValue(Duelist, bigintToEntity(duelist_id ?? 0n))

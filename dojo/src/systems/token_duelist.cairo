@@ -87,8 +87,8 @@ mod token_duelist {
 
     use pistols::interfaces::systems::{WorldSystemsTrait};
     use pistols::models::duelist::{Duelist, Score, Scoreboard, ScoreTrait};
-    use pistols::models::table::{tables};
-    use pistols::types::constants::{constants};
+    use pistols::models::table::{TABLES};
+    use pistols::types::constants::{CONST};
     use pistols::libs::utils::{CONSUME_BYTE_ARRAY};
     use pistols::utils::byte_arrays::{ByteArraysTrait, U8IntoByteArray, U16IntoByteArray, U32IntoByteArray, U256IntoByteArray, ByteArraySpanIntoByteArray};
     use pistols::utils::short_string::ShortStringTrait;
@@ -333,26 +333,26 @@ mod token_duelist {
                 result.append(duelist.score.total_draws.into());
                 
                 // Wager on Lords table
-                let scoreboard: Scoreboard = get!(self.world(), (tables::LORDS, duelist.duelist_id), Scoreboard);
+                let scoreboard: Scoreboard = get!(self.world(), (TABLES::LORDS, duelist.duelist_id), Scoreboard);
                 
                 result.append("Lords Won");
-                let amount: u128 = (scoreboard.wager_won / constants::ETH_TO_WEI.low);
+                let amount: u128 = (scoreboard.wager_won / CONST::ETH_TO_WEI.low);
                 result.append(format!("{}", amount));
                 
                 result.append("Lords Lost");
                 if (scoreboard.wager_lost == 0) {
                     result.append("0");
                 } else {
-                    let amount: u128 = (scoreboard.wager_lost / constants::ETH_TO_WEI.low);
+                    let amount: u128 = (scoreboard.wager_lost / CONST::ETH_TO_WEI.low);
                     result.append(format!("-{}", amount));
                 }
                 
                 result.append("Lords Balance");
                 if (scoreboard.wager_lost > scoreboard.wager_won) {
-                    let amount: u128 = ((scoreboard.wager_lost - scoreboard.wager_won) / constants::ETH_TO_WEI.low);
+                    let amount: u128 = ((scoreboard.wager_lost - scoreboard.wager_won) / CONST::ETH_TO_WEI.low);
                     result.append(format!("-{}", amount));
                 } else {
-                    let amount: u128 = ((scoreboard.wager_won - scoreboard.wager_lost) / constants::ETH_TO_WEI.low);
+                    let amount: u128 = ((scoreboard.wager_won - scoreboard.wager_lost) / CONST::ETH_TO_WEI.low);
                     result.append(format!("{}", amount));
                 }
             }

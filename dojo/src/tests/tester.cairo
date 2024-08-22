@@ -40,7 +40,7 @@ mod tester {
         // ITokenDuelistDispatcherTrait,
     };
     use pistols::types::challenge::{ChallengeState};
-    use pistols::types::constants::{constants};
+    use pistols::types::constants::{CONST};
     use pistols::types::action::{Action};
     use pistols::utils::short_string::{ShortString};
     use pistols::interfaces::systems::{SELECTORS};
@@ -274,9 +274,9 @@ mod tester {
             execute_lords_faucet(lords, OTHER());
         }
         if (approve) {
-            execute_lords_approve(lords, OWNER(), actions.contract_address, 1_000_000 * constants::ETH_TO_WEI.low);
-            execute_lords_approve(lords, OTHER(), actions.contract_address, 1_000_000 * constants::ETH_TO_WEI.low);
-            execute_lords_approve(lords, BUMMER(), actions.contract_address, 1_000_000 * constants::ETH_TO_WEI.low);
+            execute_lords_approve(lords, OWNER(), actions.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
+            execute_lords_approve(lords, OTHER(), actions.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
+            execute_lords_approve(lords, BUMMER(), actions.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
         }
 
         impersonate(OWNER());

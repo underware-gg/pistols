@@ -11,10 +11,10 @@ mod tests {
     use pistols::models::challenge::{Challenge, Wager, Round};
     use pistols::models::duelist::{Duelist, ProfilePicType, Archetype};
     use pistols::models::structs::{SimulateChances};
-    use pistols::models::table::{TableConfig, TableTrait, TableManagerTrait, tables};
+    use pistols::models::table::{TableConfig, TableTrait, TableManagerTrait, TABLES};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
-    use pistols::types::constants::{constants, honour};
+    use pistols::types::constants::{CONST, HONOUR};
     use pistols::libs::utils::{make_action_hash};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::math::{MathU8};
@@ -31,7 +31,7 @@ mod tests {
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
     const MESSAGE_1: felt252 = 'For honour!!!';
-    const TABLE_ID: felt252 = tables::LORDS;
+    const TABLE_ID: felt252 = TABLES::LORDS;
     const WAGER_VALUE: u128 = 100_000_000_000_000_000_000;
 
     const SALT_1_a: u64 = 0xa6f099b756a87e62;
@@ -131,7 +131,7 @@ mod tests {
         let B: ContractAddress = LITTLE_GIRL();
         let ID_A: ContractAddress = OWNED_BY_LITTLE_BOY();
         let ID_B: ContractAddress = OWNED_BY_LITTLE_GIRL();
-        let duel_id: u128 = tester::execute_create_challenge_ID(actions, A, ID(ID_A), B, MESSAGE_1, tables::COMMONERS, 0, 48);
+        let duel_id: u128 = tester::execute_create_challenge_ID(actions, A, ID(ID_A), B, MESSAGE_1, TABLES::COMMONERS, 0, 48);
         let ch = tester::get_Challenge(world, duel_id);
 // ch.address_a.print();
 // ch.address_b.print();
@@ -202,7 +202,7 @@ mod tests {
         let B: ContractAddress = LITTLE_BOY(); // challenge a wallet
         // fund account
         tester::execute_lords_faucet(lords, B);
-        tester::execute_lords_approve(lords, B, actions.contract_address, 1_000_000 * constants::ETH_TO_WEI.low);
+        tester::execute_lords_approve(lords, B, actions.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
         // new challenge
         let duel_id: u128 = tester::execute_create_challenge(actions, A, B, MESSAGE_1, TABLE_ID, 0, 48);
         let _new_state: ChallengeState = tester::execute_reply_challenge(actions, B, duel_id, true);
@@ -302,24 +302,24 @@ mod tests {
             assert(duelist_b.score.total_wins == 0, 'a_win_duelist_b.total_wins');
             assert(duelist_a.score.total_losses == 0, 'a_win_duelist_a.total_losses');
             assert(duelist_b.score.total_losses == 1, 'a_win_duelist_b.total_losses');
-            assert(round.shot_a.damage < constants::FULL_HEALTH, 'a_win_damage_a');
+            assert(round.shot_a.damage < CONST::FULL_HEALTH, 'a_win_damage_a');
             assert(round.shot_a.health > 0, 'a_win_health_a');
             assert(round.shot_a.dice_crit > 0 && round.shot_a.dice_crit <= kill_chance_a, 'kill_chance_a');
             assert(round.shot_a.dice_crit <= round.shot_a.chance_crit, 'dice_crit_a <= chance_crit_a');
             assert(round.shot_a.dice_hit == 0 && round.shot_a.dice_hit == 0, 'hit_a');
-            assert(round.shot_b.damage == constants::FULL_HEALTH, 'a_win_damage_b');
+            assert(round.shot_b.damage == CONST::FULL_HEALTH, 'a_win_damage_b');
             assert(round.shot_b.health == 0, 'a_win_health_b');
         } else if (challenge.winner == 2) {
             assert(duelist_a.score.total_wins == 0, 'b_win_duelist_a.total_wins');
             assert(duelist_b.score.total_wins == 1, 'b_win_duelist_b.total_wins');
             assert(duelist_a.score.total_losses == 1, 'b_win_duelist_a.total_losses');
             assert(duelist_b.score.total_losses == 0, 'b_win_duelist_b.total_losses');
-            assert(round.shot_b.damage < constants::FULL_HEALTH, 'b_win_damage_b');
+            assert(round.shot_b.damage < CONST::FULL_HEALTH, 'b_win_damage_b');
             assert(round.shot_b.health > 0, 'b_win_health_b');
             assert(round.shot_b.dice_crit > 0 && round.shot_b.dice_crit <= kill_chance_b, 'kill_chance_b');
             assert(round.shot_b.dice_crit <= round.shot_b.chance_crit, 'dice_crit_b <= chance_crit_b');
             assert(round.shot_b.dice_hit == 0 && round.shot_b.chance_hit == 0, 'hit_b');
-            assert(round.shot_a.damage == constants::FULL_HEALTH, 'b_win_damage_a');
+            assert(round.shot_a.damage == CONST::FULL_HEALTH, 'b_win_damage_a');
             assert(round.shot_a.health == 0, 'b_win_health_a');
         } else {
             assert(false, 'bad winner')
@@ -476,9 +476,9 @@ mod tests {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         // A is a trickster, will shoot first
         // let mut duelist_a = tester::get_Duelist(world, OWNER());
-        // duelist_a.score.level_trickster = honour::MAX;
+        // duelist_a.score.level_trickster = HONOUR::MAX;
         let mut scoreboard_a = tester::get_Scoreboard(world, TABLE_ID, OWNER());
-        scoreboard_a.score.level_trickster = honour::MAX;
+        scoreboard_a.score.level_trickster = HONOUR::MAX;
         tester::set_Scoreboard(world, actions.contract_address, scoreboard_a);
         // duel!
         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), WAGER_VALUE);
@@ -497,9 +497,9 @@ mod tests {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         // A is a trickster, will shoot first
         // let mut duelist_b = tester::get_Duelist(world, OTHER());
-        // duelist_b.score.level_trickster = honour::MAX;
+        // duelist_b.score.level_trickster = HONOUR::MAX;
         let mut scoreboard_b = tester::get_Scoreboard(world, TABLE_ID, OTHER());
-        scoreboard_b.score.level_trickster = honour::MAX;
+        scoreboard_b.score.level_trickster = HONOUR::MAX;
         tester::set_Scoreboard(world, actions.contract_address, scoreboard_b);
         // duel!
         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), WAGER_VALUE);
@@ -528,7 +528,7 @@ mod tests {
         assert(challenge.round_number == 1, 'challenge.round_number');
         assert(round.round_number == 1, 'round.round_number');
         assert(round.state == RoundState::Finished, 'round.state');
-        assert(round.shot_a.health == constants::FULL_HEALTH, 'round.shot_a.health');
+        assert(round.shot_a.health == CONST::FULL_HEALTH, 'round.shot_a.health');
         assert(round.shot_b.health == 0, 'round.shot_b.health');
     }
 
@@ -548,7 +548,7 @@ mod tests {
         assert(round.round_number == 1, 'round.round_number');
         assert(round.state == RoundState::Finished, 'round.state');
         assert(round.shot_a.health == 0, 'round.shot_a.health');
-        assert(round.shot_b.health == constants::FULL_HEALTH, 'round.shot_b.health');
+        assert(round.shot_b.health == CONST::FULL_HEALTH, 'round.shot_b.health');
     }
 
     #[test]
@@ -564,8 +564,8 @@ mod tests {
         assert(challenge.state == ChallengeState::InProgress, 'challenge.state');
         assert(round.round_number == 2, 'round2.round_number');
         let round1: Round = tester::get_Round(world, challenge.duel_id, 1);
-        assert(round1.shot_a.health < constants::FULL_HEALTH, 'round1.shot_a.health');
-        assert(round1.shot_b.health < constants::FULL_HEALTH, 'round1.shot_b.health');
+        assert(round1.shot_a.health < CONST::FULL_HEALTH, 'round1.shot_a.health');
+        assert(round1.shot_b.health < CONST::FULL_HEALTH, 'round1.shot_b.health');
         assert(round1.shot_a.chance_hit > 0, 'round1.chance_hit > 0');
         assert(round1.shot_a.chance_hit == round1.shot_b.chance_hit, 'round1.chance_hit ==');
 // save to test_dual_hit_chance_hit_at_3_paces
@@ -623,8 +623,8 @@ mod tests {
     //         let round1: Round = tester::get_Round(world, challenge.duel_id, 1);
     //         if (
     //             challenge.state == ChallengeState::InProgress &&
-    //             round1.shot_a.health < constants::FULL_HEALTH &&
-    //             round1.shot_b.health < constants::FULL_HEALTH
+    //             round1.shot_a.health < CONST::FULL_HEALTH &&
+    //             round1.shot_b.health < CONST::FULL_HEALTH
     //         ) {
     //             'FOUND!!!!'.print();
     //             break;

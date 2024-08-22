@@ -11,10 +11,10 @@ mod tests {
     use pistols::systems::actions::{IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::models::challenge::{Challenge, Round, Snapshot};
     use pistols::models::duelist::{Duelist, Score, ProfilePicType, Archetype};
-    use pistols::models::table::{TableConfig, TableType, tables};
+    use pistols::models::table::{TableConfig, TableType, TABLES};
     use pistols::models::structs::{SimulateChances};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
-    use pistols::types::constants::{constants, chances, honour};
+    use pistols::types::constants::{CONST, CHANCES, HONOUR};
     use pistols::tests::tester::{tester, tester::{flags, ZERO, OWNER, OTHER, BUMMER, TREASURY}};
     use pistols::utils::timestamp::{timestamp};
     use pistols::tests::test_round1::tests::{_get_actions_round_1_dual_crit};
@@ -49,9 +49,9 @@ mod tests {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::ADMIN | flags::MINTER);
         let duelist1: Duelist = tester::execute_mint_duelist(actions, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
         let duelist2: Duelist = tester::execute_mint_duelist(actions, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
-        assert(duelist1.score.level_villain == honour::MAX, 'level_villain');
-        assert(duelist2.score.level_lord == honour::MAX, 'level_lord');
-        let (challenge, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), tables::COMMONERS);
+        assert(duelist1.score.level_villain == HONOUR::MAX, 'level_villain');
+        assert(duelist2.score.level_lord == HONOUR::MAX, 'level_lord');
+        let (challenge, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), TABLES::COMMONERS);
         let snapshot = tester::get_Snapshot(world, duel_id);
         assert(snapshot.score_a.level_villain == 0, 'snap.level_villain');
         assert(snapshot.score_b.level_lord == 0, 'snap.level_lord');
@@ -70,23 +70,23 @@ mod tests {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::ADMIN | flags::MINTER);
         let duelist1: Duelist = tester::execute_mint_duelist(actions, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
         let duelist2: Duelist = tester::execute_mint_duelist(actions, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
-        assert(duelist1.score.level_villain == honour::MAX, 'level_villain');
-        assert(duelist2.score.level_lord == honour::MAX, 'level_lord');
+        assert(duelist1.score.level_villain == HONOUR::MAX, 'level_villain');
+        assert(duelist2.score.level_lord == HONOUR::MAX, 'level_lord');
         let (challenge, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), TABLE_ID);
         // check scoreboard
         let snapshot = tester::get_Snapshot(world, duel_id);
-        assert(snapshot.score_a.level_villain == honour::MAX, 'snap.level_villain');
-        assert(snapshot.score_b.level_lord == honour::MAX, 'snap.level_lord');
+        assert(snapshot.score_a.level_villain == HONOUR::MAX, 'snap.level_villain');
+        assert(snapshot.score_b.level_lord == HONOUR::MAX, 'snap.level_lord');
         let mut scoreboard_a = tester::get_Scoreboard(world, challenge.table_id, OWNER());
         let mut scoreboard_b = tester::get_Scoreboard(world, challenge.table_id, OTHER());
-        assert(scoreboard_a.score.level_villain == honour::MAX, 'scoreboard_a.level_villain');
-        assert(scoreboard_b.score.level_lord == honour::MAX, 'scoreboard_b.level_lord');
+        assert(scoreboard_a.score.level_villain == HONOUR::MAX, 'scoreboard_a.level_villain');
+        assert(scoreboard_b.score.level_lord == HONOUR::MAX, 'scoreboard_b.level_lord');
         // full bonus for both
         let table_type: TableType = get!(world, challenge.table_id, TableConfig).table_type;
         let (crit_bonus_a, crit_bonus_b, hit_bonus_a, hit_bonus_b) = _get_chances(snapshot, table_type);
         assert(crit_bonus_a == 0, 'crit_bonus_a');
-        assert(crit_bonus_b == chances::CRIT_BONUS_LORD, 'crit_bonus_a');
-        assert(hit_bonus_a == chances::HIT_BONUS_VILLAIN, 'crit_bonus_a');
+        assert(crit_bonus_b == CHANCES::CRIT_BONUS_LORD, 'crit_bonus_a');
+        assert(hit_bonus_a == CHANCES::HIT_BONUS_VILLAIN, 'crit_bonus_a');
         assert(hit_bonus_b == 0, 'crit_bonus_a');
         //
         // Simulate!
@@ -104,10 +104,10 @@ mod tests {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::ADMIN | flags::MINTER);
         let duelist1: Duelist = tester::execute_mint_duelist(actions, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
         let duelist2: Duelist = tester::execute_mint_duelist(actions, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
-        assert(duelist1.score.level_villain == honour::MAX, 'duelist1.level_villain');
+        assert(duelist1.score.level_villain == HONOUR::MAX, 'duelist1.level_villain');
         assert(duelist1.score.level_lord == 0, 'duelist1.level_lord');
         assert(duelist1.score.level_lord == 0, 'duelist1.level_lord');
-        assert(duelist2.score.level_lord == honour::MAX, 'duelist2.level_lord');
+        assert(duelist2.score.level_lord == HONOUR::MAX, 'duelist2.level_lord');
         //
         // duel to the death!
         let (_challenge, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), TABLE_ID);
@@ -124,10 +124,10 @@ mod tests {
         let mut scoreboard_b = tester::get_Scoreboard(world, challenge.table_id, OTHER());
         assert(scoreboard_a.score.total_duels > 0, 'scoreboard_a.total_duels');
         assert(scoreboard_b.score.total_duels > 0, 'scoreboard_b.total_duels');
-        assert(scoreboard_a.score.level_villain == honour::MAX, 'scoreboard_a.level_villain');
+        assert(scoreboard_a.score.level_villain == HONOUR::MAX, 'scoreboard_a.level_villain');
         assert(scoreboard_a.score.level_lord == 0, 'scoreboard_a.level_lord');
         assert(scoreboard_b.score.level_villain == 0, 'scoreboard_b.level_villain');
-        assert(scoreboard_b.score.level_lord == honour::MAX, 'scoreboard_b.level_lord');
+        assert(scoreboard_b.score.level_lord == HONOUR::MAX, 'scoreboard_b.level_lord');
         // main score IS affected
         let duelist1: Duelist = tester::get_Duelist_id(world, duelist1.duelist_id);
         let duelist2: Duelist = tester::get_Duelist_id(world, duelist2.duelist_id);
@@ -135,10 +135,10 @@ mod tests {
         assert(duelist1.score.level_lord > 0, 'duelist1.level_lord');
         assert(duelist2.score.level_villain > 0, 'duelist2.level_villain');
         assert(duelist2.score.level_lord == 0, 'duelist2.level_lord');
-        // assert(duelist1.score.level_villain == honour::MAX, 'duelist1.level_villain');
+        // assert(duelist1.score.level_villain == HONOUR::MAX, 'duelist1.level_villain');
         // assert(duelist2.score.level_villain == 0, 'duelist2.level_villain');
         // assert(duelist1.score.level_lord == 0, 'duelist1.level_lord');
-        // assert(duelist2.score.level_lord == honour::MAX, 'duelist2.level_lord');
+        // assert(duelist2.score.level_lord == HONOUR::MAX, 'duelist2.level_lord');
     }
 
 }

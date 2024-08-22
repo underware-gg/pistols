@@ -2,7 +2,7 @@ import React, { ReactNode, createContext, useReducer, useContext, useState, useC
 import { useCookies } from 'react-cookie'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { BigNumberish } from 'starknet'
-import { tables } from '@/games/pistols/generated/constants'
+import { TABLES } from '@/games/pistols/generated/constants'
 
 //--------------------------------
 // Constants
@@ -190,7 +190,7 @@ export const useSettings = () => {
 
   return {
     ...state,   // expose individual settings values
-    tableId: (state.tableId || tables.LORDS),
+    tableId: (state.tableId || TABLES.LORDS),
     isAnon: (state.duelistId == 0n),
     settings: { ...state },  // expose settings as object {}
     SettingsActions,

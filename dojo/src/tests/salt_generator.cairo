@@ -12,10 +12,10 @@ mod tests {
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::models::challenge::{Challenge, Wager, Round};
     use pistols::models::duelist::{Duelist};
-    use pistols::models::table::{tables};
+    use pistols::models::table::{TABLES};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
-    use pistols::types::constants::{constants};
+    use pistols::types::constants::{CONST};
     use pistols::libs::utils;
     use pistols::libs::shooter::{shooter};
     use pistols::utils::timestamp::{timestamp};
@@ -25,7 +25,7 @@ mod tests {
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
     const MESSAGE_1: felt252 = 'For honour!!!';
-    const TABLE_ID: felt252 = tables::LORDS;
+    const TABLE_ID: felt252 = TABLES::LORDS;
     const WAGER_VALUE: u128 = 100_000_000_000_000_000_000;
 
     const SEED_A: felt252 = 'shoot_a';

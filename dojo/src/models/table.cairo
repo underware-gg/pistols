@@ -6,9 +6,9 @@ use pistols::systems::admin::admin::{Errors};
 use pistols::libs::utils::{ZERO};
 use pistols::utils::math::{MathU128};
 use pistols::utils::arrays::{ArrayTrait};
-use pistols::types::constants::{constants};
+use pistols::types::constants::{CONST};
 
-mod tables {
+mod TABLES {
     const LORDS: felt252 = 'Lords';
     const COMMONERS: felt252 = 'Commoners';
 }
@@ -52,18 +52,18 @@ pub struct TableAdmittance {
 fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
     (array![
         (TableConfig {
-            table_id: tables::LORDS,
+            table_id: TABLES::LORDS,
             table_type: TableType::Classic,
             description: 'The Lords Table',
             fee_collector_address: ZERO(),
             wager_contract_address: lords_address,
             wager_min: 0,
-            fee_min: 4 * constants::ETH_TO_WEI.low,
+            fee_min: 4 * CONST::ETH_TO_WEI.low,
             fee_pct: 10,
             is_open: (lords_address.is_non_zero()),
         }),
         (TableConfig {
-            table_id: tables::COMMONERS,
+            table_id: TABLES::COMMONERS,
             table_type: TableType::Classic,
             description: 'The Commoners Table',
             fee_collector_address: ZERO(),

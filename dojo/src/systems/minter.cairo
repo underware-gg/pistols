@@ -21,7 +21,7 @@ mod minter {
         IAdminDispatcher, IAdminDispatcherTrait,
     };
     use pistols::models::token_config::{TokenConfig};
-    use pistols::types::constants::{constants};
+    use pistols::types::constants::{CONST};
 
     mod Errors {
         // admin
@@ -71,7 +71,7 @@ mod minter {
             // check availability
             let mut config: TokenConfig = get!(world, (token_contract_address), TokenConfig);
             assert(config.minted_count < config.max_supply, Errors::MINTED_OUT);
-            assert(config.minted_count.into() < constants::MAX_DUELIST_ID, Errors::MINTED_OUT);
+            assert(config.minted_count.into() < CONST::MAX_DUELIST_ID, Errors::MINTED_OUT);
             assert(config.is_open, Errors::MINTING_IS_CLOSED);
 
             // check wallet
@@ -96,7 +96,7 @@ mod minter {
             let balance: u256 = token.balance_of(to);
             (
                 (config.minted_count < config.max_supply) &&
-                (config.minted_count.into() < constants::MAX_DUELIST_ID) &&
+                (config.minted_count.into() < CONST::MAX_DUELIST_ID) &&
                 (config.is_open) &&
                 (balance.low < config.max_per_wallet.into())
             )

@@ -1,4 +1,3 @@
-import { bigintToHex } from '@/lib/utils/types'
 import { ACTION, Archetype, ChallengeState, RoundState } from '@/games/pistols/generated/constants'
 import { EMOJI } from '@/pistols/data/messages'
 

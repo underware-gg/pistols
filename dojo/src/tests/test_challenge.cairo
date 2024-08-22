@@ -9,7 +9,7 @@ mod tests {
     use pistols::systems::actions::{IActionsDispatcherTrait};
     use pistols::models::challenge::{Round};
     use pistols::models::duelist::{Duelist};
-    use pistols::models::table::{tables};
+    use pistols::models::table::{TABLES};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::utils::timestamp::{timestamp};
     use pistols::tests::tester::{tester,
@@ -24,7 +24,7 @@ mod tests {
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
     const MESSAGE_1: felt252 = 'For honour!!!';
-    const TABLE_ID: felt252 = tables::LORDS;
+    const TABLE_ID: felt252 = TABLES::LORDS;
 
     #[test]
     #[should_panic(expected:('PISTOLS: Not your duelist', 'ENTRYPOINT_FAILED'))]
@@ -170,7 +170,7 @@ mod tests {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
-        let duel_id: u128 = tester::execute_create_challenge(actions, A, B, MESSAGE_1, tables::COMMONERS, 0, 24);
+        let duel_id: u128 = tester::execute_create_challenge(actions, A, B, MESSAGE_1, TABLES::COMMONERS, 0, 24);
         let ch = tester::get_Challenge(world, duel_id);
 
         assert(actions.has_pact(ch.table_id, ID(B), ID(A)) == true, 'has_pact_yes');
@@ -194,7 +194,7 @@ mod tests {
         let B: ContractAddress = LITTLE_GIRL();
         let ID_A: ContractAddress = OWNED_BY_LITTLE_BOY();
         let ID_B: ContractAddress = OWNED_BY_LITTLE_GIRL();
-        let duel_id: u128 = tester::execute_create_challenge_ID(actions, A, ID(ID_A), B, MESSAGE_1, tables::COMMONERS, 0, 24);
+        let duel_id: u128 = tester::execute_create_challenge_ID(actions, A, ID(ID_A), B, MESSAGE_1, TABLES::COMMONERS, 0, 24);
         let ch = tester::get_Challenge(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting, 'state');
         assert(ch.address_a == A, 'challenger');
@@ -298,7 +298,7 @@ mod tests {
         let B: ContractAddress = LITTLE_GIRL();
         let ID_A: ContractAddress = OWNED_BY_LITTLE_BOY();
         let ID_B: ContractAddress = OWNED_BY_LITTLE_GIRL();
-        let duel_id: u128 = tester::execute_create_challenge_ID(actions, A, ID(ID_A), B, MESSAGE_1, tables::COMMONERS, 0, 48);
+        let duel_id: u128 = tester::execute_create_challenge_ID(actions, A, ID(ID_A), B, MESSAGE_1, TABLES::COMMONERS, 0, 48);
 
         let ch = tester::get_Challenge(world, duel_id);
 // ch.address_a.print();

@@ -12,7 +12,7 @@ import { RowDivider } from '@/lib/ui/Stack'
 import { Opener } from '@/lib/ui/useOpener'
 import { Divider } from '@/lib/ui/Divider'
 import { getObjectKeyByValue } from '@/lib/utils/types'
-import { tables } from '@/games/pistols/generated/constants'
+import { TABLES } from '@/games/pistols/generated/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -39,7 +39,7 @@ export default function TableModal({
     }
   }, [opener.isOpen])
 
-  const unknownTable = useMemo(() => (tableId !== undefined && getObjectKeyByValue(tables, tableId) === undefined), [tableId])
+  const unknownTable = useMemo(() => (tableId !== undefined && getObjectKeyByValue(TABLES, tableId) === undefined), [tableId])
   useEffect(() => {
     if (unknownTable && !opener.isOpen) {
       opener.open()
@@ -212,8 +212,8 @@ export function TableSwitcher({
       fluid
     >
       <Dropdown.Menu>
-        {Object.keys(tables).map(key => (
-          <TableSwitcherItem key={tables[key]} tableId={tables[key]} setSelectedTableId={setSelectedTableId} />
+        {Object.keys(TABLES).map(key => (
+          <TableSwitcherItem key={TABLES[key]} tableId={TABLES[key]} setSelectedTableId={setSelectedTableId} />
         ))}
       </Dropdown.Menu>
     </Dropdown>

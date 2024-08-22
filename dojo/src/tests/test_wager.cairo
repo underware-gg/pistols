@@ -10,9 +10,9 @@ mod tests {
     use pistols::systems::actions::{IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::systems::admin::{IAdminDispatcher, IAdminDispatcherTrait};
     use pistols::models::config::{Config};
-    use pistols::models::table::{TableConfig, TableTrait, TableManagerTrait, tables};
+    use pistols::models::table::{TableConfig, TableTrait, TableManagerTrait, TABLES};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
-    use pistols::types::constants::{constants};
+    use pistols::types::constants::{CONST};
     use pistols::utils::timestamp::{timestamp};
     use pistols::tests::tester::{tester, tester::{flags, ZERO, OWNER, OTHER, BUMMER, TREASURY}};
 
@@ -20,7 +20,7 @@ mod tests {
     const OTHER_NAME: felt252 = 'Senpai';
     const BUMMER_NAME: felt252 = 'Bummer';
     const MESSAGE_1: felt252 = 'For honour!!!';
-    const TABLE_ID: felt252 = tables::LORDS;
+    const TABLE_ID: felt252 = TABLES::LORDS;
 
     //
     // Fees balance
@@ -34,10 +34,10 @@ mod tests {
         let fee: u128 = actions.calc_fee(TABLE_ID, 0);
         assert(fee == table.fee_min, 'fee > 0');
         // low wager
-        let fee: u128 = actions.calc_fee(TABLE_ID, 10 * constants::ETH_TO_WEI.low);
+        let fee: u128 = actions.calc_fee(TABLE_ID, 10 * CONST::ETH_TO_WEI.low);
         assert(fee == table.fee_min, 'fee == min');
         // high wager
-        let fee: u128 = actions.calc_fee(TABLE_ID, 100 * constants::ETH_TO_WEI.low);
+        let fee: u128 = actions.calc_fee(TABLE_ID, 100 * CONST::ETH_TO_WEI.low);
         assert(fee > table.fee_min, 'fee > min');
     }
 
@@ -79,12 +79,12 @@ mod tests {
         tester::execute_reply_challenge(actions, B, duel_id, true);
         let final_balance_b: u128 = tester::assert_balance(lords, B, balance_b, approved_value, 0, 'balance_b');
         let final_balance_contract: u128 = tester::assert_balance(lords, S, fina_balance_contract, 0, approved_value, 'balance_contract+b');
-        if (table_id == tables::LORDS) {
+        if (table_id == TABLES::LORDS) {
             assert(fee > 0, 'fee > 0');
             assert(final_balance_a < balance_a, 'final_balance_a');
             assert(final_balance_b < balance_b, 'final_balance_b');
             assert(final_balance_contract > balance_contract, 'final_balance_contract');
-        } else if (table_id == tables::COMMONERS) {
+        } else if (table_id == TABLES::COMMONERS) {
             assert(fee == 0, 'fee == 0');
             assert(final_balance_a == balance_a, 'final_balance_a');
             assert(final_balance_b == balance_b, 'final_balance_b');
@@ -94,24 +94,24 @@ mod tests {
 
     #[test]
     fn test_LORDS_fee_balance_ok() {
-        _test_balance_ok(tables::LORDS, 0, 0);
+        _test_balance_ok(TABLES::LORDS, 0, 0);
     }
     fn test_COMMONERS_fee_balance_ok() {
-        _test_balance_ok(tables::COMMONERS, 0, 0);
+        _test_balance_ok(TABLES::COMMONERS, 0, 0);
     }
     #[test]
     fn test_LORDS_wager_balance_ok() {
-        _test_balance_ok(tables::LORDS, 100 * constants::ETH_TO_WEI.low, 0);
+        _test_balance_ok(TABLES::LORDS, 100 * CONST::ETH_TO_WEI.low, 0);
     }
     #[test]
     #[should_panic(expected:('PISTOLS: No wager on this table', 'ENTRYPOINT_FAILED'))]
     fn test_COMMONERS_wager_balance_ok() {
-        _test_balance_ok(tables::COMMONERS, 100 * constants::ETH_TO_WEI.low, 0);
+        _test_balance_ok(TABLES::COMMONERS, 100 * CONST::ETH_TO_WEI.low, 0);
     }
     #[test]
     #[should_panic(expected:('PISTOLS: Minimum wager not met', 'ENTRYPOINT_FAILED'))]
     fn test_LORDS_wager_balance_min_wager() {
-        _test_balance_ok(tables::LORDS, 99 * constants::ETH_TO_WEI.low, 100 * constants::ETH_TO_WEI.low);
+        _test_balance_ok(TABLES::LORDS, 99 * CONST::ETH_TO_WEI.low, 100 * CONST::ETH_TO_WEI.low);
     }
 
 
@@ -218,7 +218,7 @@ mod tests {
         let balance_contract: u128 = lords.balance_of(S).low;
         let balance_a: u128 = lords.balance_of(A).low;
         // create challenge
-        let wager_value: u128 = 100 * constants::ETH_TO_WEI.low;
+        let wager_value: u128 = 100 * CONST::ETH_TO_WEI.low;
         let fee: u128 = actions.calc_fee(TABLE_ID, wager_value);
         let approved_value: u128 = wager_value + fee;
         let duel_id: u128 = tester::execute_create_challenge(actions, A, B, MESSAGE_1, TABLE_ID, wager_value, 0);
@@ -242,7 +242,7 @@ mod tests {
         let balance_contract: u128 = lords.balance_of(S).low;
         let balance_a: u128 = lords.balance_of(A).low;
         // create challenge, check balances
-        let wager_value: u128 = 100 * constants::ETH_TO_WEI.low;
+        let wager_value: u128 = 100 * CONST::ETH_TO_WEI.low;
         let fee: u128 = actions.calc_fee(TABLE_ID, wager_value);
         let approved_value: u128 = wager_value + fee;
         let duel_id: u128 = tester::execute_create_challenge(actions, A, B, MESSAGE_1, TABLE_ID, wager_value, 24);
@@ -268,7 +268,7 @@ mod tests {
         let balance_contract: u128 = lords.balance_of(S).low;
         let balance_a: u128 = lords.balance_of(A).low;
         // create challenge
-        let wager_value: u128 = 100 * constants::ETH_TO_WEI.low;
+        let wager_value: u128 = 100 * CONST::ETH_TO_WEI.low;
         let fee: u128 = actions.calc_fee(TABLE_ID, wager_value);
         let approved_value: u128 = wager_value + fee;
         let duel_id: u128 = tester::execute_create_challenge(actions, A, B, MESSAGE_1, TABLE_ID, wager_value, 0);
@@ -292,7 +292,7 @@ mod tests {
         let balance_contract: u128 = lords.balance_of(S).low;
         let balance_a: u128 = lords.balance_of(A).low;
         // create challenge
-        let wager_value: u128 = 100 * constants::ETH_TO_WEI.low;
+        let wager_value: u128 = 100 * CONST::ETH_TO_WEI.low;
         let fee: u128 = actions.calc_fee(TABLE_ID, wager_value);
         let approved_value: u128 = wager_value + fee;
         let duel_id: u128 = tester::execute_create_challenge(actions, A, B, MESSAGE_1, TABLE_ID, wager_value, 24);

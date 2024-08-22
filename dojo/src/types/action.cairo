@@ -3,7 +3,7 @@ use debug::PrintTrait;
 
 use pistols::models::challenge::{Shot};
 use pistols::models::duelist::{Duelist, Score, ScoreTrait};
-use pistols::types::constants::{constants, chances};
+use pistols::types::constants::{CONST, CHANCES};
 use pistols::utils::math::{MathU8};
 
 //------------------------
@@ -245,14 +245,14 @@ impl ActionTraitImpl of ActionTrait {
             Action::Paces7 |
             Action::Paces8 |
             Action::Paces9 |
-            Action::Paces10 =>  (MathU8::map(self.into(), 1, 10, chances::PISTOLS_KILL_AT_STEP_1, chances::PISTOLS_KILL_AT_STEP_10)),
+            Action::Paces10 =>  (MathU8::map(self.into(), 1, 10, CHANCES::PISTOLS_KILL_AT_STEP_1, CHANCES::PISTOLS_KILL_AT_STEP_10)),
             Action::FastBlade |
             Action::SlowBlade |
-            Action::Block =>    (chances::BLADES_CRIT),
+            Action::Block =>    (CHANCES::BLADES_CRIT),
             Action::Flee |
             Action::Steal |
-            Action::Seppuku =>  (chances::ALWAYS), // always succeeds
-            _ =>                (chances::NEVER)
+            Action::Seppuku =>  (CHANCES::ALWAYS), // always succeeds
+            _ =>                (CHANCES::NEVER)
         }
     }
     fn hit_chance(self: Action) -> u8 {
@@ -266,11 +266,11 @@ impl ActionTraitImpl of ActionTrait {
             Action::Paces7 |
             Action::Paces8 |
             Action::Paces9 |
-            Action::Paces10 =>  (MathU8::map(self.into(), 1, 10, chances::PISTOLS_HIT_AT_STEP_1, chances::PISTOLS_HIT_AT_STEP_10)),
+            Action::Paces10 =>  (MathU8::map(self.into(), 1, 10, CHANCES::PISTOLS_HIT_AT_STEP_1, CHANCES::PISTOLS_HIT_AT_STEP_10)),
             Action::FastBlade |
             Action::SlowBlade |
-            Action::Block =>    (chances::BLADES_HIT),
-            _ =>                (chances::NEVER)
+            Action::Block =>    (CHANCES::BLADES_HIT),
+            _ =>                (CHANCES::NEVER)
         }
     }
     fn lethal_chance(self: Action) -> u8 {
@@ -284,9 +284,9 @@ impl ActionTraitImpl of ActionTrait {
             Action::Paces7 |
             Action::Paces8 |
             Action::Paces9 |
-            Action::Paces10 =>  (MathU8::map(self.into(), 1, 10, chances::PISTOLS_LETHAL_AT_STEP_1, chances::PISTOLS_LETHAL_AT_STEP_10)),
+            Action::Paces10 =>  (MathU8::map(self.into(), 1, 10, CHANCES::PISTOLS_LETHAL_AT_STEP_1, CHANCES::PISTOLS_LETHAL_AT_STEP_10)),
             // Blades do not have lethal chances, it's on crit
-            _ =>                (chances::NEVER)
+            _ =>                (CHANCES::NEVER)
         }
     }
 
@@ -304,7 +304,7 @@ impl ActionTraitImpl of ActionTrait {
             // Action::Paces10 |
             // Action::FastBlade |
             // Action::SlowBlade |
-            // Action::Block =>    (chances::CRIT_PENALTY_PER_DAMAGE),
+            // Action::Block =>    (CHANCES::CRIT_PENALTY_PER_DAMAGE),
             _ =>                (0)
         }
     }
@@ -322,7 +322,7 @@ impl ActionTraitImpl of ActionTrait {
             Action::Paces10 |
             Action::FastBlade |
             Action::SlowBlade |
-            Action::Block =>    (chances::HIT_PENALTY_PER_DAMAGE),
+            Action::Block =>    (CHANCES::HIT_PENALTY_PER_DAMAGE),
             _ =>                (0)
         }
     }
@@ -345,19 +345,19 @@ impl ActionTraitImpl of ActionTrait {
             Action::Paces9 |
             Action::Paces10 => {
                 // pistols crit is execution
-                other_shot.damage = constants::FULL_HEALTH;
+                other_shot.damage = CONST::FULL_HEALTH;
                 (true)
             },
             Action::FastBlade => {
-                other_shot.damage = constants::DOUBLE_DAMAGE;
+                other_shot.damage = CONST::DOUBLE_DAMAGE;
                 (false)
             },
             Action::SlowBlade => {
-                other_shot.damage = constants::FULL_HEALTH;
+                other_shot.damage = CONST::FULL_HEALTH;
                 (true)
             },
             Action::Block => {
-                self_shot.block = constants::DOUBLE_DAMAGE;
+                self_shot.block = CONST::DOUBLE_DAMAGE;
                 (false)
             },
             Action::Flee => {
@@ -374,7 +374,7 @@ impl ActionTraitImpl of ActionTrait {
                 (false)
             },
             Action::Seppuku => {
-                self_shot.damage = constants::FULL_HEALTH;
+                self_shot.damage = CONST::FULL_HEALTH;
                 other_shot.wager += 1; // resign wager
                 (false)
             },
@@ -397,19 +397,19 @@ impl ActionTraitImpl of ActionTrait {
             Action::Paces9 |
             Action::Paces10 => {
                 if (self_shot.dice_hit <= lethal_chance) {
-                    other_shot.damage = constants::DOUBLE_DAMAGE;   // full damage
+                    other_shot.damage = CONST::DOUBLE_DAMAGE;   // full damage
                 } else {
-                    other_shot.damage = constants::SINGLE_DAMAGE;   // glance
+                    other_shot.damage = CONST::SINGLE_DAMAGE;   // glance
                 }
             },
             Action::FastBlade => {
-                other_shot.damage = constants::SINGLE_DAMAGE;
+                other_shot.damage = CONST::SINGLE_DAMAGE;
             },
             Action::SlowBlade => {
-                other_shot.damage = constants::DOUBLE_DAMAGE;
+                other_shot.damage = CONST::DOUBLE_DAMAGE;
             },
             Action::Block => {
-                self_shot.block = constants::SINGLE_DAMAGE;
+                self_shot.block = CONST::SINGLE_DAMAGE;
             },
             _ => {},
         };

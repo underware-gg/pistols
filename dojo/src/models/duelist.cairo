@@ -3,7 +3,7 @@ use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::interfaces::systems::{WorldSystemsTrait};
 use pistols::interfaces::ierc721::{ierc721, IERC721Dispatcher, IERC721DispatcherTrait};
 use pistols::models::config::{ConfigManager, ConfigManagerTrait};
-use pistols::types::constants::{constants};
+use pistols::types::constants::{CONST};
 
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
@@ -102,7 +102,7 @@ impl DuelistTraitImpl of DuelistTrait {
     fn try_address_to_id(address: ContractAddress) -> u128 {
         let as_felt: felt252 = address.into();
         let as_u256: u256 = as_felt.into();
-        if (as_u256 <= constants::MAX_DUELIST_ID.into()) {(as_u256.low)} else {(0)}
+        if (as_u256 <= CONST::MAX_DUELIST_ID.into()) {(as_u256.low)} else {(0)}
     }
     // "cast" an address to an id for pacts
     // the low part is good enough

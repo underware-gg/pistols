@@ -6,7 +6,7 @@ import { useDuel } from '@/pistols/hooks/useDuel'
 import { Action } from '@/pistols/utils/pistols'
 import { EMOJI } from '@/pistols/data/messages'
 import ProgressBar from '@/pistols/components/ui/ProgressBar'
-import { honour } from '@/games/pistols/generated/constants'
+import { HONOUR } from '@/games/pistols/generated/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -72,9 +72,9 @@ export function ActionChances({
       />
       <ProgressBar disabled={!action} label='Honour:'
         value={_honourValue / 10} total={10}
-        negative={action_honour >= 0 && action_honour < honour.TRICKSTER_START}
-        warning={action_honour >= honour.TRICKSTER_START && action_honour < honour.LORD_START}
-        cold={action_honour >= honour.LORD_START}
+        negative={action_honour >= 0 && action_honour < HONOUR.TRICKSTER_START}
+        warning={action_honour >= HONOUR.TRICKSTER_START && action_honour < HONOUR.LORD_START}
+        cold={action_honour >= HONOUR.LORD_START}
         neutral={action_honour < 0}
       />
 

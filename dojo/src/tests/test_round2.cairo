@@ -9,11 +9,11 @@ mod tests {
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::models::challenge::{Challenge, Round, RoundStore, RoundModelImpl};
     use pistols::models::duelist::{Duelist, ProfilePicType};
-    use pistols::models::table::{tables};
+    use pistols::models::table::{TABLES};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::types::action::{Action, ACTION};
-    use pistols::types::constants::{constants};
+    use pistols::types::constants::{CONST};
     use pistols::libs::utils::{make_action_hash, pack_action_slots, unpack_action_slots};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::math::{MathU8};
@@ -23,7 +23,7 @@ mod tests {
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
     const MESSAGE_1: felt252 = 'For honour!!!';
-    const TABLE_ID: felt252 = tables::LORDS;
+    const TABLE_ID: felt252 = TABLES::LORDS;
 
     const SALT_1_a: u64 = 0xa6f099b756a87e62;
     const SALT_1_b: u64 = 0xf9a978e92309da78;
@@ -177,8 +177,8 @@ mod tests {
         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_1_b, action_1_b, 0);
         let (challenge, mut round) = tester::get_Challenge_Round(world, duel_id);
         // change round 1 results
-        round.shot_a.health = constants::SINGLE_DAMAGE;
-        round.shot_b.health = constants::SINGLE_DAMAGE;
+        round.shot_a.health = CONST::SINGLE_DAMAGE;
+        round.shot_b.health = CONST::SINGLE_DAMAGE;
         tester::set_Round(world, actions.contract_address, round);
 // 'round_1'.print();
 // round.shot_a.health.print();

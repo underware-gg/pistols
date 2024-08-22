@@ -4,7 +4,7 @@ import { useLordsBalance, useEtherBalance } from '@/lib/dojo/hooks/useLords'
 import { useLockedLordsBalance } from '@/pistols/hooks/useWager'
 import { useScoreboard } from '@/pistols/hooks/useScore'
 import { Balance } from '@/pistols/components/account/Balance'
-import { tables } from '@/games/pistols/generated/constants'
+import { TABLES } from '@/games/pistols/generated/constants'
 
 
 //
@@ -32,7 +32,7 @@ export const LordsBalance = ({
 }) => {
   const { balance } = useLordsBalance(address)
   return (
-    <Balance big={big} tableId={tables.LORDS} wei={balance} pre={pre} post={post} clean={clean} />
+    <Balance big={big} tableId={TABLES.LORDS} wei={balance} pre={pre} post={post} clean={clean} />
   )
 }
 
@@ -50,7 +50,7 @@ export const WagerBalance = ({
 ) => {
   const { wagerBalanceWei } = useScoreboard(tableId, duelistId)
   return (
-    <Balance tableId={tableId ?? tables.LORDS} wei={wagerBalanceWei} />
+    <Balance tableId={tableId ?? TABLES.LORDS} wei={wagerBalanceWei} />
   )
 }
 

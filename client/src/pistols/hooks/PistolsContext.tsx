@@ -4,7 +4,7 @@ import { BigNumberish } from 'starknet'
 import { Opener, useOpener } from '@/lib/ui/useOpener'
 import { bigintToHex } from '@/lib/utils/types'
 import { useSettings } from './SettingsContext'
-import { tables } from '@/games/pistols/generated/constants'
+import { TABLES } from '@/games/pistols/generated/constants'
 
 //
 // React + Typescript + Context
@@ -265,7 +265,7 @@ export const usePistolsScene = (mainPage?: boolean) => {
     let route = sceneRoutes[newSceneName]
     let url = route.baseUrl
     if (sceneRoutes[newSceneName].hasTableId) {
-      url += `/${slugs?.[0] || tables.LORDS}`
+      url += `/${slugs?.[0] || TABLES.LORDS}`
     } else if (sceneRoutes[newSceneName].hasDuelId) {
       url += `/${bigintToHex(slugs?.[0] || selectedDuelId)}`
     }
@@ -290,7 +290,7 @@ export const usePistolsScene = (mainPage?: boolean) => {
       if (newSceneName) {
         dispatchSetScene(newSceneName)
         if (sceneRoutes[newSceneName].hasTableId) {
-          dispatchTableId(routeSlugs[0] || tables.LORDS)
+          dispatchTableId(routeSlugs[0] || TABLES.LORDS)
         } else if (sceneRoutes[newSceneName].hasDuelId) {
           dispatchSelectDuel(routeSlugs[0] || '0x0')
         }

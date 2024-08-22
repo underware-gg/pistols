@@ -10,7 +10,7 @@ mod shooter {
     use pistols::models::challenge::{Challenge, Snapshot, Round, Shot};
     use pistols::models::duelist::{Duelist, Score};
     use pistols::models::table::{TableConfig, TableType};
-    use pistols::types::constants::{constants};
+    use pistols::types::constants::{CONST};
     use pistols::types::challenge::{ChallengeState};
     use pistols::types::round::{RoundState};
     use pistols::types::action::{Action, ACTION, ActionTrait};
@@ -206,7 +206,7 @@ mod shooter {
             end_challenge(ref challenge, ref round, ChallengeState::Resolved, 2);
         } else
         // both players still alive
-        if (challenge.round_number == constants::ROUND_COUNT || is_last_round || executed) {
+        if (challenge.round_number == CONST::ROUND_COUNT || is_last_round || executed) {
             // finished moves, and no winner, ends in a draw
             end_challenge(ref challenge, ref round, ChallengeState::Draw, 0);
         } else {
@@ -322,7 +322,7 @@ mod tests {
     use pistols::models::challenge::{Shot};
     use pistols::models::init::{init};
     use pistols::types::action::{Action, ACTION};
-    use pistols::types::constants::{constants};
+    use pistols::types::constants::{CONST};
     use pistols::libs::utils;
 
     #[test]

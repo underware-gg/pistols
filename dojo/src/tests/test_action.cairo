@@ -8,7 +8,7 @@ mod tests {
     use pistols::models::challenge::{Round, Shot};
     use pistols::models::init::{init};
     use pistols::types::action::{Action, ActionTrait, ACTION};
-    use pistols::types::constants::{constants, chances};
+    use pistols::types::constants::{CONST, CHANCES};
     use pistols::utils::short_string::{ShortString};
     use pistols::utils::math::{MathU8};
 
@@ -173,45 +173,45 @@ mod tests {
 
     #[test]
     fn test_hit_kill_maps() {
-        assert(MathU8::map(1, 1, 10, chances::PISTOLS_KILL_AT_STEP_1, chances::PISTOLS_KILL_AT_STEP_10) == chances::PISTOLS_KILL_AT_STEP_1, 'PISTOLS_KILL_AT_STEP_1');
-        assert(MathU8::map(10, 1, 10, chances::PISTOLS_KILL_AT_STEP_1, chances::PISTOLS_KILL_AT_STEP_10) == chances::PISTOLS_KILL_AT_STEP_10, 'PISTOLS_KILL_AT_STEP_10');
-        let mapped = MathU8::map(5, 1, 10, chances::PISTOLS_KILL_AT_STEP_1, chances::PISTOLS_KILL_AT_STEP_10);
-        assert(mapped > chances::PISTOLS_KILL_AT_STEP_1 && mapped < chances::PISTOLS_KILL_AT_STEP_10, 'PISTOLS_HIT_AT_STEP_5');
-        assert(MathU8::map(1, 1, 10, chances::PISTOLS_HIT_AT_STEP_1, chances::PISTOLS_HIT_AT_STEP_10) == chances::PISTOLS_HIT_AT_STEP_1, 'PISTOLS_HIT_AT_STEP_1');
-        assert(MathU8::map(10, 1, 10, chances::PISTOLS_HIT_AT_STEP_1, chances::PISTOLS_HIT_AT_STEP_10) == chances::PISTOLS_HIT_AT_STEP_10, 'PISTOLS_HIT_AT_STEP_10');
-        let mapped = MathU8::map(5, 1, 10, chances::PISTOLS_HIT_AT_STEP_1, chances::PISTOLS_HIT_AT_STEP_10);
-        assert(mapped < chances::PISTOLS_HIT_AT_STEP_1 && mapped > chances::PISTOLS_HIT_AT_STEP_10, 'PISTOLS_HIT_AT_STEP_5');
-        assert(MathU8::map(1, 1, 10, chances::PISTOLS_LETHAL_AT_STEP_1, chances::PISTOLS_LETHAL_AT_STEP_10) == chances::PISTOLS_LETHAL_AT_STEP_1, 'PISTOLS_LETHAL_AT_STEP_1');
-        assert(MathU8::map(10, 1, 10, chances::PISTOLS_LETHAL_AT_STEP_1, chances::PISTOLS_LETHAL_AT_STEP_10) == chances::PISTOLS_LETHAL_AT_STEP_10, 'PISTOLS_LETHAL_AT_STEP_10');
-        let mapped = MathU8::map(5, 1, 10, chances::PISTOLS_LETHAL_AT_STEP_1, chances::PISTOLS_LETHAL_AT_STEP_10);
-        assert(mapped < chances::PISTOLS_LETHAL_AT_STEP_1 && mapped > chances::PISTOLS_LETHAL_AT_STEP_10, 'PISTOLS_LETHAL_AT_STEP_5');
+        assert(MathU8::map(1, 1, 10, CHANCES::PISTOLS_KILL_AT_STEP_1, CHANCES::PISTOLS_KILL_AT_STEP_10) == CHANCES::PISTOLS_KILL_AT_STEP_1, 'PISTOLS_KILL_AT_STEP_1');
+        assert(MathU8::map(10, 1, 10, CHANCES::PISTOLS_KILL_AT_STEP_1, CHANCES::PISTOLS_KILL_AT_STEP_10) == CHANCES::PISTOLS_KILL_AT_STEP_10, 'PISTOLS_KILL_AT_STEP_10');
+        let mapped = MathU8::map(5, 1, 10, CHANCES::PISTOLS_KILL_AT_STEP_1, CHANCES::PISTOLS_KILL_AT_STEP_10);
+        assert(mapped > CHANCES::PISTOLS_KILL_AT_STEP_1 && mapped < CHANCES::PISTOLS_KILL_AT_STEP_10, 'PISTOLS_HIT_AT_STEP_5');
+        assert(MathU8::map(1, 1, 10, CHANCES::PISTOLS_HIT_AT_STEP_1, CHANCES::PISTOLS_HIT_AT_STEP_10) == CHANCES::PISTOLS_HIT_AT_STEP_1, 'PISTOLS_HIT_AT_STEP_1');
+        assert(MathU8::map(10, 1, 10, CHANCES::PISTOLS_HIT_AT_STEP_1, CHANCES::PISTOLS_HIT_AT_STEP_10) == CHANCES::PISTOLS_HIT_AT_STEP_10, 'PISTOLS_HIT_AT_STEP_10');
+        let mapped = MathU8::map(5, 1, 10, CHANCES::PISTOLS_HIT_AT_STEP_1, CHANCES::PISTOLS_HIT_AT_STEP_10);
+        assert(mapped < CHANCES::PISTOLS_HIT_AT_STEP_1 && mapped > CHANCES::PISTOLS_HIT_AT_STEP_10, 'PISTOLS_HIT_AT_STEP_5');
+        assert(MathU8::map(1, 1, 10, CHANCES::PISTOLS_LETHAL_AT_STEP_1, CHANCES::PISTOLS_LETHAL_AT_STEP_10) == CHANCES::PISTOLS_LETHAL_AT_STEP_1, 'PISTOLS_LETHAL_AT_STEP_1');
+        assert(MathU8::map(10, 1, 10, CHANCES::PISTOLS_LETHAL_AT_STEP_1, CHANCES::PISTOLS_LETHAL_AT_STEP_10) == CHANCES::PISTOLS_LETHAL_AT_STEP_10, 'PISTOLS_LETHAL_AT_STEP_10');
+        let mapped = MathU8::map(5, 1, 10, CHANCES::PISTOLS_LETHAL_AT_STEP_1, CHANCES::PISTOLS_LETHAL_AT_STEP_10);
+        assert(mapped < CHANCES::PISTOLS_LETHAL_AT_STEP_1 && mapped > CHANCES::PISTOLS_LETHAL_AT_STEP_10, 'PISTOLS_LETHAL_AT_STEP_5');
     }
 
     #[test]
     fn test_action_chances() {
         assert(Action::Idle.crit_chance() == 0, 'Action::Idle.crit_chance');
-        assert(Action::Paces1.crit_chance() == chances::PISTOLS_KILL_AT_STEP_1, 'Action::Paces1.crit_chance');
-        assert(Action::Paces3.crit_chance() > chances::PISTOLS_KILL_AT_STEP_1, 'Action::Paces3.crit_chance>');
-        assert(Action::Paces8.crit_chance() < chances::PISTOLS_KILL_AT_STEP_10, 'Action::Paces8.crit_chance<');
-        assert(Action::Paces10.crit_chance() == chances::PISTOLS_KILL_AT_STEP_10, 'Action::Paces10.crit_chance');
-        assert(Action::FastBlade.crit_chance() == chances::BLADES_CRIT, 'Action::FastBlade.crit_chance');
-        assert(Action::SlowBlade.crit_chance() == chances::BLADES_CRIT, 'Action::FastBlade.crit_chance');
-        assert(Action::Block.crit_chance() == chances::BLADES_CRIT, 'Action::FastBlade.crit_chance');
+        assert(Action::Paces1.crit_chance() == CHANCES::PISTOLS_KILL_AT_STEP_1, 'Action::Paces1.crit_chance');
+        assert(Action::Paces3.crit_chance() > CHANCES::PISTOLS_KILL_AT_STEP_1, 'Action::Paces3.crit_chance>');
+        assert(Action::Paces8.crit_chance() < CHANCES::PISTOLS_KILL_AT_STEP_10, 'Action::Paces8.crit_chance<');
+        assert(Action::Paces10.crit_chance() == CHANCES::PISTOLS_KILL_AT_STEP_10, 'Action::Paces10.crit_chance');
+        assert(Action::FastBlade.crit_chance() == CHANCES::BLADES_CRIT, 'Action::FastBlade.crit_chance');
+        assert(Action::SlowBlade.crit_chance() == CHANCES::BLADES_CRIT, 'Action::FastBlade.crit_chance');
+        assert(Action::Block.crit_chance() == CHANCES::BLADES_CRIT, 'Action::FastBlade.crit_chance');
 
         assert(Action::Idle.hit_chance() == 0, 'Action::Idle.hit_chance');
-        assert(Action::Paces1.hit_chance() == chances::PISTOLS_HIT_AT_STEP_1, 'Action::Paces1.hit_chance');
-        assert(Action::Paces3.hit_chance() < chances::PISTOLS_HIT_AT_STEP_1, 'Action::Paces3.hit_chance<');
-        assert(Action::Paces8.hit_chance() > chances::PISTOLS_HIT_AT_STEP_10, 'Action::Paces8.hit_chance>');
-        assert(Action::Paces10.hit_chance() == chances::PISTOLS_HIT_AT_STEP_10, 'Action::Paces10.hit_chance');
-        assert(Action::FastBlade.hit_chance() == chances::BLADES_HIT, 'Action::FastBlade.hit_chance');
-        assert(Action::SlowBlade.hit_chance() == chances::BLADES_HIT, 'Action::FastBlade.hit_chance');
-        assert(Action::Block.hit_chance() == chances::BLADES_HIT, 'Action::FastBlade.hit_chance');
+        assert(Action::Paces1.hit_chance() == CHANCES::PISTOLS_HIT_AT_STEP_1, 'Action::Paces1.hit_chance');
+        assert(Action::Paces3.hit_chance() < CHANCES::PISTOLS_HIT_AT_STEP_1, 'Action::Paces3.hit_chance<');
+        assert(Action::Paces8.hit_chance() > CHANCES::PISTOLS_HIT_AT_STEP_10, 'Action::Paces8.hit_chance>');
+        assert(Action::Paces10.hit_chance() == CHANCES::PISTOLS_HIT_AT_STEP_10, 'Action::Paces10.hit_chance');
+        assert(Action::FastBlade.hit_chance() == CHANCES::BLADES_HIT, 'Action::FastBlade.hit_chance');
+        assert(Action::SlowBlade.hit_chance() == CHANCES::BLADES_HIT, 'Action::FastBlade.hit_chance');
+        assert(Action::Block.hit_chance() == CHANCES::BLADES_HIT, 'Action::FastBlade.hit_chance');
 
         assert(Action::Idle.lethal_chance() == 0, 'Action::Idle.lethal_chance');
-        assert(Action::Paces1.lethal_chance() == chances::PISTOLS_LETHAL_AT_STEP_1, 'Action::Paces1.lethal_chance');
-        assert(Action::Paces3.lethal_chance() < chances::PISTOLS_LETHAL_AT_STEP_1, 'Action::Paces3.lethal_chance<');
-        assert(Action::Paces8.lethal_chance() > chances::PISTOLS_LETHAL_AT_STEP_10, 'Action::Paces8.lethal_chance>');
-        assert(Action::Paces10.lethal_chance() == chances::PISTOLS_LETHAL_AT_STEP_10, 'Action::Paces10.lethal_chance');
+        assert(Action::Paces1.lethal_chance() == CHANCES::PISTOLS_LETHAL_AT_STEP_1, 'Action::Paces1.lethal_chance');
+        assert(Action::Paces3.lethal_chance() < CHANCES::PISTOLS_LETHAL_AT_STEP_1, 'Action::Paces3.lethal_chance<');
+        assert(Action::Paces8.lethal_chance() > CHANCES::PISTOLS_LETHAL_AT_STEP_10, 'Action::Paces8.lethal_chance>');
+        assert(Action::Paces10.lethal_chance() == CHANCES::PISTOLS_LETHAL_AT_STEP_10, 'Action::Paces10.lethal_chance');
         assert(Action::FastBlade.lethal_chance() == 0, '::FastBlade.lethal_chance');
         assert(Action::SlowBlade.lethal_chance() == 0, '::FastBlade.lethal_chance');
         assert(Action::Block.lethal_chance() == 0, '::FastBlade.lethal_chance');
@@ -241,24 +241,24 @@ mod tests {
         // Paces1
         let mut defend = init::Shot();
         Action::Paces1.execute_crit(ref attack, ref defend);
-        assert(defend.damage == constants::FULL_HEALTH, 'Paces1.crit');
+        assert(defend.damage == CONST::FULL_HEALTH, 'Paces1.crit');
         // Paces10
         let mut defend = init::Shot();
         Action::Paces10.execute_crit(ref attack, ref defend);
-        assert(defend.damage == constants::FULL_HEALTH, 'Paces10.crit');
+        assert(defend.damage == CONST::FULL_HEALTH, 'Paces10.crit');
         //
         // Blades
         let mut attack = init::Shot();
         let mut defend = init::Shot();
         Action::SlowBlade.execute_crit(ref attack, ref defend);
-        assert(defend.damage == constants::FULL_HEALTH, 'SlowBlade');
+        assert(defend.damage == CONST::FULL_HEALTH, 'SlowBlade');
         let mut defend = init::Shot();
         Action::FastBlade.execute_crit(ref attack, ref defend);
-        assert(defend.damage == constants::DOUBLE_DAMAGE, 'FastBlade');
+        assert(defend.damage == CONST::DOUBLE_DAMAGE, 'FastBlade');
         let mut defend = init::Shot();
         Action::Block.execute_crit(ref attack, ref defend);
         assert(defend.damage == 0, 'Block.damage');
-        assert(attack.block == constants::DOUBLE_DAMAGE, 'Block.block');
+        assert(attack.block == CONST::DOUBLE_DAMAGE, 'Block.block');
     }
 
     #[test]
@@ -266,39 +266,39 @@ mod tests {
         let mut attack = init::Shot();
         //
         // Paces1: 80% of 100%
-        attack.chance_hit = chances::PISTOLS_HIT_AT_STEP_1;
-        attack.dice_hit = chances::PISTOLS_LETHAL_AT_STEP_1;
+        attack.chance_hit = CHANCES::PISTOLS_HIT_AT_STEP_1;
+        attack.dice_hit = CHANCES::PISTOLS_LETHAL_AT_STEP_1;
         let mut defend = init::Shot();
         Action::Paces1.execute_hit(ref attack, ref defend, Action::Paces1.lethal_chance());
-        assert(defend.damage == constants::DOUBLE_DAMAGE, 'Paces1.hit_double');
+        assert(defend.damage == CONST::DOUBLE_DAMAGE, 'Paces1.hit_double');
         attack.dice_hit += 1;
         let mut defend = init::Shot();
         Action::Paces1.execute_hit(ref attack, ref defend, Action::Paces1.lethal_chance());
-        assert(defend.damage == constants::SINGLE_DAMAGE, 'Paces1.hit_single');
+        assert(defend.damage == CONST::SINGLE_DAMAGE, 'Paces1.hit_single');
         //
         // Paces10: 10% of 20%
-        attack.chance_hit = chances::PISTOLS_HIT_AT_STEP_10;
-        attack.dice_hit = chances::PISTOLS_LETHAL_AT_STEP_10;
+        attack.chance_hit = CHANCES::PISTOLS_HIT_AT_STEP_10;
+        attack.dice_hit = CHANCES::PISTOLS_LETHAL_AT_STEP_10;
         let mut defend = init::Shot();
         Action::Paces10.execute_hit(ref attack, ref defend, Action::Paces10.lethal_chance());
-        assert(defend.damage == constants::DOUBLE_DAMAGE, 'Paces10.hit_double');
+        assert(defend.damage == CONST::DOUBLE_DAMAGE, 'Paces10.hit_double');
         attack.dice_hit += 1;
         let mut defend = init::Shot();
         Action::Paces10.execute_hit(ref attack, ref defend, Action::Paces10.lethal_chance());
-        assert(defend.damage == constants::SINGLE_DAMAGE, 'Paces10.hit_single');
+        assert(defend.damage == CONST::SINGLE_DAMAGE, 'Paces10.hit_single');
         //
         // Blades
         let mut attack = init::Shot();
         let mut defend = init::Shot();
         Action::SlowBlade.execute_hit(ref attack, ref defend, Action::SlowBlade.lethal_chance());
-        assert(defend.damage == constants::DOUBLE_DAMAGE, 'SlowBlade');
+        assert(defend.damage == CONST::DOUBLE_DAMAGE, 'SlowBlade');
         let mut defend = init::Shot();
         Action::FastBlade.execute_hit(ref attack, ref defend, Action::FastBlade.lethal_chance());
-        assert(defend.damage == constants::SINGLE_DAMAGE, 'FastBlade');
+        assert(defend.damage == CONST::SINGLE_DAMAGE, 'FastBlade');
         let mut defend = init::Shot();
         Action::Block.execute_hit(ref attack, ref defend, Action::Block.lethal_chance());
         assert(defend.damage == 0, 'Block.damage');
-        assert(attack.block == constants::SINGLE_DAMAGE, 'Block.block');
+        assert(attack.block == CONST::SINGLE_DAMAGE, 'Block.block');
     }
 
 

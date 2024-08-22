@@ -9,7 +9,7 @@ mod tests {
 
     use pistols::systems::actions::{IActionsDispatcherTrait};
     use pistols::models::duelist::{Duelist, ProfilePicType, Archetype};
-    use pistols::types::constants::{constants, honour};
+    use pistols::types::constants::{CONST, HONOUR};
     use pistols::tests::tester::{tester, tester::{flags, ZERO, OWNER, OTHER, BUMMER, TREASURY, ID}};
 
 
@@ -42,17 +42,17 @@ mod tests {
     fn test_mint_duelist_archetype() {
         let (_world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::ADMIN | flags::MINTER);
         let duelist: Duelist = tester::execute_mint_duelist(actions, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
-        assert(duelist.score.level_villain == honour::LEVEL_MAX, 'V_level_villain');
+        assert(duelist.score.level_villain == HONOUR::LEVEL_MAX, 'V_level_villain');
         assert(duelist.score.level_trickster == 0, 'V_level_trickster');
         assert(duelist.score.level_lord == 0, 'V_level_lord');
         let duelist: Duelist = tester::execute_mint_duelist(actions, OTHER(), 'BBB', ProfilePicType::Duelist, '1', Archetype::Trickster);
         assert(duelist.score.level_villain == 0, 'T_level_villain');
-        assert(duelist.score.level_trickster == honour::LEVEL_MAX, 'T_level_trickster');
+        assert(duelist.score.level_trickster == HONOUR::LEVEL_MAX, 'T_level_trickster');
         assert(duelist.score.level_lord == 0, 'T_level_lord');
         let duelist: Duelist = tester::execute_mint_duelist(actions, BUMMER(), 'CCC', ProfilePicType::Duelist, '1', Archetype::Honourable);
         assert(duelist.score.level_villain == 0, 'H_level_villain');
         assert(duelist.score.level_trickster == 0, 'H_level_trickster');
-        assert(duelist.score.level_lord == honour::LEVEL_MAX, 'H_level_lord');
+        assert(duelist.score.level_lord == HONOUR::LEVEL_MAX, 'H_level_lord');
     }
 
     #[test]
