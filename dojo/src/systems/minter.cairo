@@ -8,30 +8,30 @@ trait IMinter {
     // fn get_token_svg(ref world: IWorldDispatcher, token_id: u128) -> ByteArray;
 }
 
-#[dojo::interface]
-trait IMinterInternal {
-    fn assert_caller_is_owner(world: @IWorldDispatcher);
-}
-
 #[dojo::contract]
 mod minter {
     use debug::PrintTrait;
     use super::{IMinter};
     use zeroable::Zeroable;
     use starknet::{ContractAddress, get_contract_address, get_caller_address};
-    use pistols::systems::token_duelist::{ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait};
-    use pistols::models::token_config::{TokenConfig, TokenConfigTrait};
-    use pistols::types::constants::{constants};
+
+    use pistols::interfaces::systems::{
+        WorldSystemsTrait,
+        ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait,
+        IAdminDispatcher, IAdminDispatcherTrait,
+    };
+    use pistols::models::token_config::{TokenConfig};
+    use pistols::types::constants::{CONST};
 
     mod Errors {
         // admin
-        const INVALID_TOKEN_ADDRESS: felt252 = 'MINTER: invalid token address';
-        const INVALID_SUPPLY: felt252 = 'MINTER: invalid supply';
-        const NOT_OWNER: felt252 = 'MINTER: not owner';
+        const INVALID_TOKEN_ADDRESS: felt252    = 'MINTER: invalid token address';
+        const INVALID_SUPPLY: felt252           = 'MINTER: invalid supply';
+        const NOT_ADMIN: felt252                = 'MINTER: not admin';
         // mint
-        const MINTED_OUT: felt252 = 'MINTER: minted out';
-        const MINTING_IS_CLOSED: felt252 = 'MINTER: minting closed';
-        const MAXED_WALLET: felt252 = 'MINTER: wallet maxed out';
+        const MINTED_OUT: felt252               = 'MINTER: minted out';
+        const MINTING_IS_CLOSED: felt252        = 'MINTER: minting closed';
+        const MAXED_WALLET: felt252             = 'MINTER: wallet maxed out';
     }
 
     //---------------------------------------
@@ -41,38 +41,22 @@ mod minter {
     // overlays generated with: sozo migrate --generate-overlays
     //
     fn dojo_init(
-        world: @IWorldDispatcher,
+        ref world: IWorldDispatcher,
         token_address: ContractAddress,
         max_supply: u16,
         max_per_wallet: u16,
         is_open: u8,
     ) {
-        // 'dojo_init()...'.print();
-        
-        //*******************************
-        let TOKEN_NAME = "Pistols at 10 Blocks Duelists";
-        let TOKEN_SYMBOL = "DUELIST";
-        let BASE_URI = "https://pistols.underware.gg";
-        //*******************************
-
-        assert(token_address.is_non_zero(), Errors::INVALID_TOKEN_ADDRESS);
         assert(max_supply > 0, Errors::INVALID_SUPPLY);
-
         //
-        // Config
+        // config Duelist Token
         set!(world, (TokenConfig{
             token_address,
-            minter_address: get_contract_address(),
             max_supply,
             max_per_wallet,
             minted_count: 0,
             is_open: (is_open != 0),
         }));
-
-        //
-        // initialize token
-        let token = (ITokenDuelistDispatcher{ contract_address: token_address });
-        token.initialize(TOKEN_NAME, TOKEN_SYMBOL, BASE_URI);
     }
 
     //---------------------------------------
@@ -87,7 +71,7 @@ mod minter {
             // check availability
             let mut config: TokenConfig = get!(world, (token_contract_address), TokenConfig);
             assert(config.minted_count < config.max_supply, Errors::MINTED_OUT);
-            assert(config.minted_count.into() < constants::MAX_DUELIST_ID, Errors::MINTED_OUT);
+            assert(config.minted_count.into() < CONST::MAX_DUELIST_ID, Errors::MINTED_OUT);
             assert(config.is_open, Errors::MINTING_IS_CLOSED);
 
             // check wallet
@@ -112,24 +96,17 @@ mod minter {
             let balance: u256 = token.balance_of(to);
             (
                 (config.minted_count < config.max_supply) &&
-                (config.minted_count.into() < constants::MAX_DUELIST_ID) &&
+                (config.minted_count.into() < CONST::MAX_DUELIST_ID) &&
                 (config.is_open) &&
                 (balance.low < config.max_per_wallet.into())
             )
         }
 
         fn set_open(ref world: IWorldDispatcher, token_contract_address: ContractAddress, is_open: bool) {
-            self.assert_caller_is_owner();
+            assert(world.admin_dispatcher().am_i_admin(get_caller_address()) == true, Errors::NOT_ADMIN);
             let mut config: TokenConfig = get!(world, (token_contract_address), TokenConfig);
             config.is_open = is_open;
             set!(world, (config));
-        }
-    }
-
-    impl InternalImpl of super::IMinterInternal<ContractState> {
-        #[inline(always)]
-        fn assert_caller_is_owner(world: @IWorldDispatcher) {
-            assert(world.is_owner(get_caller_address(), get_contract_address().into()), Errors::NOT_OWNER);
         }
     }
 

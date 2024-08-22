@@ -1,43 +1,70 @@
 import { useMemo } from 'react'
+import { BigNumberish } from 'starknet'
+import { getComponentValue } from '@dojoengine/recs'
 import { useComponentValue } from '@dojoengine/react'
-import { useDojoComponents, useDojoConstants } from '@/lib/dojo/DojoContext'
+import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { useERC20Balance } from '@/lib/utils/hooks/useERC20'
 import { bigintToEntity } from '@/lib/utils/types'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
-import { BigNumberish } from 'starknet'
+import { useAllChallengeIds } from '@/pistols/hooks/useChallenge'
+import { LiveChallengeStates, PastChallengeStates } from '@/pistols/utils/pistols'
+import { TableType, ChallengeState, getTableType } from '@/games/pistols/generated/constants'
 
 export const useTable = (tableId: string) => {
   const { TableConfig } = useDojoComponents()
-  const { table_types } = useDojoConstants()
 
   const table = useComponentValue(TableConfig, bigintToEntity(stringToFelt(tableId ?? '')))
-  const contractAddress = useMemo(() => (table?.contract_address ?? 0n), [table])
+  const wagerContractAddress = useMemo(() => (table?.wager_contract_address ?? 0n), [table])
 
-  // const tableType = useMemo(() => (table?.table_type ? {
-  //   [table_types.CLASSIC]: 'Classic',
-  //   [table_types.TOURNAMENT]: 'Tournament',
-  //   [table_types.IRL_TOURNAMENT]: 'IRL Tournamment',
-  // }[Number(table.table_type)] : null), [table])
-  
+  const tableTypeValue = useMemo(() => (getTableType(table?.table_type) ?? null), [table])
+  const tableTypeDescription = useMemo(() => (table?.table_type ? {
+    [TableType.Classic]: 'Classic',
+    [TableType.Tournament]: 'Tournament',
+    [TableType.IRLTournament]: 'IRL Tournamment',
+  }[table.table_type] : null), [table])
+
   return {
     tableId,
-    contractAddress,
-    canWager: (contractAddress != 0n),
+    wagerContractAddress,
+    canWager: (wagerContractAddress != 0n),
     description: table ? feltToString(table.description) : '?',
     wagerMin: table?.wager_min ?? null,
     feeMin: table?.fee_min ?? null,
     feePct: table?.fee_pct ?? null,
-    // tableType: tableType ?? '?',
-    tableType: table?.table_type ?? '?',
+    tableType: tableTypeDescription ?? '?',
     tableIsOpen: table?.is_open ?? false,
-    //@ts-ignore
-    isTournament: (table?.table_type == 'Tournament'),
-    //@ts-ignore
-    isIRLTournament: (table?.table_type == 'IRLTournament'),
+    isTournament: (tableTypeValue == TableType.Tournament),
+    isIRLTournament: (tableTypeValue == TableType.IRLTournament),
   }
 }
 
 export const useTableAccountBalance = (tableId: string, address: BigNumberish, fee: BigNumberish = 0n) => {
-  const { contractAddress } = useTable(tableId)
-  return useERC20Balance(contractAddress, address, fee)
+  const { wagerContractAddress } = useTable(tableId)
+  return useERC20Balance(wagerContractAddress, address, fee)
+}
+
+export const useTableTotals = (tableId: string) => {
+  const { challengeIds: allChallengeIds } = useAllChallengeIds(tableId)
+  const { Challenge } = useDojoComponents()
+  const result = useMemo(() => {
+    const liveDuelsCount = allChallengeIds.reduce((acc: number, id: bigint) => {
+      const state = getComponentValue(Challenge, bigintToEntity(id))?.state ?? ChallengeState.Null
+      if (LiveChallengeStates.includes(state)) acc++
+      return acc
+    }, 0)
+    const pastDuelsCount = allChallengeIds.reduce((acc: number, id: bigint) => {
+      const state = getComponentValue(Challenge, bigintToEntity(id))?.state ?? ChallengeState.Null
+      if (PastChallengeStates.includes(state)) acc++
+      return acc
+    }, 0)
+
+    return {
+      liveDuelsCount,
+      pastDuelsCount
+    }
+  }, [allChallengeIds])
+
+  return {
+    ...result
+  }
 }

@@ -29,7 +29,7 @@ mod init {
             duelist_id: 0,
             //----------------
             name: 0,
-            profile_pic_type: 0,
+            profile_pic_type: duelist::ProfilePicType::Undefined,
             profile_pic_uri: "",
             score: Score(),
             timestamp: 0,
@@ -38,15 +38,15 @@ mod init {
 
     fn Score() -> duelist::Score {
         (duelist::Score {
-            total_duels: 0,
-            total_wins: 0,
-            total_losses: 0,
-            total_draws: 0,
-            total_honour: 0,
             honour: 0,
             level_villain: 0,
             level_trickster: 0,
             level_lord: 0,
+            total_duels: 0,
+            total_wins: 0,
+            total_losses: 0,
+            total_draws: 0,
+            honour_history: 0,
         })
     }
 

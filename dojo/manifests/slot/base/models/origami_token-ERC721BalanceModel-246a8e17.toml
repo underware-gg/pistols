@@ -1,0 +1,21 @@
+kind = "DojoModel"
+class_hash = "0x36dc2b76dcd77b58fe987c0b8836c2ce7fa08cb9d44838634218fad353bec83"
+original_class_hash = "0x36dc2b76dcd77b58fe987c0b8836c2ce7fa08cb9d44838634218fad353bec83"
+abi = "manifests/slot/base/abis/models/origami_token-ERC721BalanceModel-246a8e17.json"
+tag = "origami_token-ERC721BalanceModel"
+manifest_name = "origami_token-ERC721BalanceModel-246a8e17"
+
+[[members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "account"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "amount"
+type = "u128"
+key = false

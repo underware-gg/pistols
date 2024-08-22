@@ -1,16 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AccountInterface, ArraySignatureType, Signature, TypedData, typedData } from 'starknet'
 import { useSignTypedData } from '@starknet-react/core'
-import { createTypedMessage, Revision, splitSignature } from '@/lib/utils/starknet_sign'
+import { createTypedMessage, getMessageHash, getTypeHash, Revision, splitSignature } from '@/lib/utils/starknet_sign'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
-import { bigintEquals } from '../types'
+import { bigintEquals } from '@/lib/utils/types'
 
 //---------------------------------
 // Create TypedData from messages
 //
 export type UseTypedMessageResult = {
   typedMessage: TypedData
-  hash: string
+  typeHash: string
+  messageHash: string
 }
 export const useTypedMessage = ({
   revision,
@@ -28,10 +29,12 @@ export const useTypedMessage = ({
     chainId: chainId ? (typeof chainId === 'string' ? chainId : feltToString(chainId)) : undefined,
     messages,
   })), [revision, chainId, messages])
-  const hash = useMemo(() => (account ? typedData.getMessageHash(typedMessage, account.address) : null), [account, typedMessage])
+  const typeHash = useMemo(() => (account ? getTypeHash(typedMessage, typedMessage.primaryType) : null), [typedMessage])
+  const messageHash = useMemo(() => (account ? getMessageHash(typedMessage, account.address) : null), [account, typedMessage])
   return {
     typedMessage,
-    hash,
+    typeHash,
+    messageHash,
   }
 }
 

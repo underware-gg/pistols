@@ -1,32 +1,30 @@
 import React, { useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { Grid, Modal } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useWager } from '@/pistols/hooks/useWager'
 import { useTable } from '@/pistols/hooks/useTable'
-import { useIsYou } from '@/pistols/hooks/useIsMyDuelist'
+import { useIsMyAccount, useIsYou } from '@/pistols/hooks/useIsYou'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
 import { WagerAndOrFees } from '@/pistols/components/account/LordsBalance'
-import { ChallengeState, makeDuelUrl } from '@/pistols/utils/pistols'
 import { DuelIconsAsGrid } from '@/pistols/components/DuelIcons'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { IconClick } from '@/lib/ui/Icons'
 import { Divider } from '@/lib/ui/Divider'
 import { bigintToHex } from '@/lib/utils/types'
+import { ChallengeState } from '@/games/pistols/generated/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export default function ChallengeModal() {
-  const router = useRouter()
   const { reply_challenge } = useDojoSystemCalls()
   const { duelistId } = useSettings()
   const { account } = useAccount()
@@ -38,15 +36,17 @@ export default function ChallengeModal() {
 
   const { state, tableId, message, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, isLive, isFinished, needToSyncExpired } = useChallenge(selectedDuelId)
   const { value, fee } = useWager(selectedDuelId)
-  const { description: tableDescription }= useTable(tableId)
+  const { description: tableDescription } = useTable(tableId)
 
   const { challengeDescription } = useChallengeDescription(selectedDuelId)
 
   const { profilePic: profilePicA } = useDuelist(duelistIdA)
   const { profilePic: profilePicB } = useDuelist(duelistIdB)
 
-  const isChallenger = useIsYou(duelistIdA)
-  const isChallenged = useIsYou(duelistIdB)
+  const { isYou: isChallenger } = useIsYou(duelistIdA)
+  const { isYou: isChallengedDuelist } = useIsYou(duelistIdB)
+  const { isMyAccount: isChallengedAccount } = useIsMyAccount(duelistAddressB)
+  const isChallenged = (isChallengedDuelist || isChallengedAccount)
   const isYou = (isChallenger || isChallenged)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -61,8 +61,9 @@ export default function ChallengeModal() {
     _submit()
   }
 
+  const { dispatchSetScene } = usePistolsScene()
   const _gotoDuel = () => {
-    router.push(makeDuelUrl(selectedDuelId))
+    dispatchSetScene(SceneName.Duel)
   }
 
   return (
@@ -93,12 +94,12 @@ export default function ChallengeModal() {
       </Modal.Header>
       <Modal.Content image className='Relative'>
         <ProfilePic profilePic={profilePicA} duelistId={duelistIdA} floated='left' onClick={() => dispatchSelectDuelistId(duelistIdA)} />
-        
+
         <Modal.Description className='Padded' style={{ width: '550px' }}>
           <Grid style={{ width: '350px' }}>
             <Row columns='equal' textAlign='left'>
               <Col>
-                <ProfileDescription duelistId={duelistIdA} />
+                <ProfileDescription duelistId={duelistIdA} displayOwnerAddress={false} />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -108,7 +109,7 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <ProfileDescription duelistId={duelistIdB} />
+                <ProfileDescription duelistId={duelistIdB} address={duelistAddressB} displayOwnerAddress={false} />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -155,7 +156,7 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='center'>
               <Col>
-                <h3 className=''>{challengeDescription}</h3>
+                <h5 className=''>{challengeDescription}</h5>
                 <span className='Code'><ChallengeTime duelId={selectedDuelId} prefixed /></span>
                 {/* <Divider className='NoMargin' /> */}
               </Col>

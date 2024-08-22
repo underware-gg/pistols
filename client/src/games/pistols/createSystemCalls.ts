@@ -1,19 +1,21 @@
-import {
-  getEvents,
-  // setComponentsFromEvents,
-} from '@dojoengine/utils'
-import { getContractByName } from '@dojoengine/core'
-import { getComponentValue } from '@dojoengine/recs'
-import { AccountInterface, BigNumberish, Call, Result, uint256 } from 'starknet'
-import { ClientComponents } from '@/lib/dojo/setup/createClientComponents'
-import { SetupNetworkResult } from '@/lib/dojo/setup/setup'
-import { stringToFelt } from '@/lib/utils/starknet'
+// import {
+//   getEvents,
+//   // setComponentsFromEvents,
+// } from '@dojoengine/utils'
+import { DojoProvider, getContractByName } from '@dojoengine/core'
+import { Component, getComponentValue } from '@dojoengine/recs'
+import { AccountInterface, BigNumberish, Call, Result } from 'starknet'
+import { stringToFelt, bigintToU256 } from '@/lib/utils/starknet'
 import { bigintAdd, bigintToEntity, bigintToHex } from '@/lib/utils/types'
+import { ClientComponents } from '@/lib/dojo/setup/useSetup'
+import { DojoManifest } from '@/lib/dojo/Dojo'
 import { emitter } from '@/pistols/three/game'
 
 // FIX while this is not merged
 // https://github.com/dojoengine/dojo.js/pull/190
-import { setComponentsFromEvents } from '@/lib/dojo/fix/setComponentsFromEvents'
+// import { setComponentsFromEvents } from '@/lib/dojo/fix/setComponentsFromEvents'
+
+export const NAMESPACE = 'pistols'
 
 export type SystemCalls = ReturnType<typeof createSystemCalls>;
 
@@ -45,12 +47,11 @@ const minter_call = (entrypoint: string, calldata: any[]) => ({
 })
 
 export function createSystemCalls(
-  network: SetupNetworkResult,
   components: ClientComponents,
-  manifest: any,
+  manifest: DojoManifest,
+  provider: DojoProvider,
 ) {
-  const { execute, call, contractComponents } = network
-  const { Challenge, Wager, TableConfig } = components
+  const { Challenge, Wager, TableConfig, TableAdmittance, Config } = components
 
   // executeMulti() based on:
   // https://github.com/cartridge-gg/rollyourown/blob/f39bfd7adc866c1a10142f5ce30a3c6f900b467e/web/src/dojo/hooks/useSystems.ts#L178-L190
@@ -58,7 +59,7 @@ export function createSystemCalls(
   const _executeTransaction = async (signer: AccountInterface, params: DojoCall | Call[]): Promise<boolean> => {
     let success = false
     try {
-      const tx = await execute(signer, params);
+      const tx = await provider.execute(signer, params, NAMESPACE);
       if (!Array.isArray(params)) {
         console.log(`execute ${params?.contractName}::${params.entrypoint}() tx:`, params.calldata, tx)
       } else {
@@ -83,7 +84,7 @@ export function createSystemCalls(
   const _executeCall = async <T extends Result>(params: DojoCall): Promise<T | null> => {
     let results: Result = undefined
     try {
-      results = await call(params)
+      results = await provider.call(NAMESPACE, params)
       // result = decodeComponent(contractComponents['Component'], response)
       // results = Array.isArray(response) ? response.map(v => BigInt(v)) : typeof response == 'boolean' ? response : BigInt(response)
       // console.log(`call ${system}(${args.length}) success:`, result)
@@ -104,7 +105,7 @@ export function createSystemCalls(
     return await _executeTransaction(signer, actions_call('update_duelist', args))
   }
 
-  const create_challenge = async (signer: AccountInterface, duelist_id: BigNumberish, challenged_id_or_address: BigNumberish, message: string, table_id: string, wager_value: BigNumberish, expire_seconds: number): Promise<boolean> => {
+  const create_challenge = async (signer: AccountInterface, duelist_id: BigNumberish, challenged_id_or_address: BigNumberish, message: string, table_id: string, wager_value: BigNumberish, expire_hours: number): Promise<boolean> => {
     // find lords contract
     const table = getComponentValue(TableConfig, bigintToEntity(stringToFelt(table_id)))
     if (!table) throw new Error(`Table does not exist [${table_id}]`)
@@ -113,19 +114,19 @@ export function createSystemCalls(
     const approved_value = bigintAdd(wager_value, fee)
     let calls: Call[] = []
     // approve call
-    const actions_contract = getContractByName(manifest, 'actions')
-    if (BigInt(table.contract_address) > 0n) {
+    const actions_contract = getContractByName(manifest, NAMESPACE, 'actions')
+    if (BigInt(table.wager_contract_address) > 0n) {
       calls.push({
-        contractAddress: bigintToHex(table.contract_address),
+        contractAddress: bigintToHex(table.wager_contract_address),
         entrypoint: 'approve',
-        calldata: [actions_contract.address, uint256.bnToUint256(approved_value)],
+        calldata: [actions_contract.address, bigintToU256(approved_value)],
       })
     }
     // game call
     calls.push({
       contractAddress: actions_contract.address,
       entrypoint: 'create_challenge',
-      calldata: [duelist_id, BigInt(challenged_id_or_address), stringToFelt(message), table_id, uint256.bnToUint256(wager_value), expire_seconds],
+      calldata: [duelist_id, BigInt(challenged_id_or_address), stringToFelt(message), table_id, wager_value, expire_hours],
     })
     return await _executeTransaction(signer, calls)
   }
@@ -143,12 +144,12 @@ export function createSystemCalls(
         if (!table) throw new Error(`Table does not exist [${challenge.table_id}]`)
         // approve call
         let calls: Call[] = []
-        const actions_contract = getContractByName(manifest, 'actions')
-        if (BigInt(table.contract_address) > 0n) {
+        const actions_contract = getContractByName(manifest, NAMESPACE, 'actions')
+        if (BigInt(table.wager_contract_address) > 0n) {
           calls.push({
-            contractAddress: bigintToHex(table.contract_address),
+            contractAddress: bigintToHex(table.wager_contract_address),
             entrypoint: 'approve',
-            calldata: [actions_contract.address, uint256.bnToUint256(approved_value)],
+            calldata: [actions_contract.address, bigintToU256(approved_value)],
           })
         }
         // game call
@@ -174,7 +175,43 @@ export function createSystemCalls(
     return await _executeTransaction(signer, actions_call('reveal_action', args))
   }
 
+  const grant_admin = async (signer: AccountInterface, address: BigNumberish, granted: boolean): Promise<boolean> => {
+    const args = [address, granted]
+    return await _executeTransaction(signer, admin_call('grant_admin', args))
+  }
+
+  const admin_set_config = async (signer: AccountInterface, values: any): Promise<boolean> => {
+    const args = Object.keys(Config.schema).map(key => {
+      const value = values[key]
+      if (value == null) throw new Error()
+      return value
+    })
+    return await _executeTransaction(signer, admin_call('set_config', args))
+  }
+
+  const admin_set_table = async (signer: AccountInterface, values: any): Promise<boolean> => {
+    const args = Object.keys(TableConfig.schema).map(key => {
+      const value = values[key]
+      if (value == null) throw new Error()
+      return value
+    })
+    return await _executeTransaction(signer, admin_call('set_table', args))
+  }
+
+  const admin_set_table_admittance = async (signer: AccountInterface, values: any): Promise<boolean | null> => {
+    const args = Object.keys(TableAdmittance.schema).map(key => {
+      const value = values[key]
+      if (value == null) throw new Error()
+      return value
+    })
+    return await _executeTransaction(signer, admin_call('set_table_admittance', args))
+  }
+
+
+
+  //------------------------------------
   // read-only calls
+  //
 
   const get_pact = async (duelist_id_a: BigNumberish, duelist_id_b: BigNumberish): Promise<bigint | null> => {
     const args = [duelist_id_a, duelist_id_b]
@@ -243,6 +280,26 @@ export function createSystemCalls(
     return results ?? null
   }
 
+  const admin_am_i_admin = async (account_address: BigNumberish): Promise<string | null> => {
+    const args = [account_address]
+    const results = await _executeCall<string>(admin_call('am_i_admin', args))
+    return results ?? null
+  }
+
+  // TEST/DEBUG
+  const validate_commit_message = async (
+    account: BigNumberish,
+    signature: BigNumberish[],
+    duelId: BigNumberish,
+    roundNumber: BigNumberish,
+    duelistId: BigNumberish,
+  ): Promise<boolean | null> => {
+    const args = [account, signature, duelId, roundNumber, duelistId]
+    const results = await _executeCall<boolean>(actions_call('validate_commit_message', args))
+    return results ?? null
+  }
+
+
   return {
     mint_duelist,
     update_duelist,
@@ -263,6 +320,16 @@ export function createSystemCalls(
     // DUELISTS
     can_mint,
     duelist_token_uri,
+    //
+    // ADMIN
+    grant_admin,
+    admin_set_config,
+    admin_set_table,
+    admin_set_table_admittance,
+    admin_am_i_admin,
+    //
+    // TEST/DEBUG
+    validate_commit_message,
   }
 }
 

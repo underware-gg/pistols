@@ -1,15 +1,12 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Grid, Modal, Image } from 'semantic-ui-react'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useTable } from '@/pistols/hooks/useTable'
 import { Opener } from '@/lib/ui/useOpener'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useChallengeToSelf, useTornaDuelistIds } from './IRLTournamentTab'
-import { usePlayerId } from '@/lib/dojo/hooks/usePlayerId'
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 
 const Row = Grid.Row
 const Col = Grid.Column

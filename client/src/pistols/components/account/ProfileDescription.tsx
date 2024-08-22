@@ -6,6 +6,7 @@ import { AddressShort } from '@/lib/ui/AddressShort'
 import { EMOJI } from '@/pistols/data/messages'
 import { BigNumberish } from 'starknet'
 import { useDuelistOwner } from '@/pistols/hooks/useTokenDuelist'
+import { useValidateWalletAddress } from '@/lib/utils/hooks/useValidateWalletAddress'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -39,39 +40,48 @@ export function ProfileBadge({
 
 export function ProfileDescription({
   duelistId,
+  address,
   tableId,
   displayStats = false,
   displayOwnerAddress = false,
   displayBalance = false,
 }: {
   duelistId: BigNumberish,
+  address?: BigNumberish,
   tableId?: BigNumberish,
   displayStats?: boolean
   displayOwnerAddress?: boolean
   displayBalance?: boolean
 }) {
   const { score: {
-    total_wins, total_losses, total_draws, total_duels, total_honour, honourAndTotal,
+    total_wins, total_losses, total_draws, total_duels, honourAndTotal,
     isVillainous, isTrickster, isHonourable, levelDisplay, levelAndTotal,
   } } = useDuelist(duelistId)
+
+  // if its a duelist...
   const { owner } = useDuelistOwner(duelistId)
+  
+  // if its a wallet...
+  const { isStarknetAddress } = useValidateWalletAddress(address)
+  const _owner = isStarknetAddress ? address : owner
+  
   return (
     <Grid>
       <Row>
 
         <Col width={displayStats ? 12 : 16}>
-          <h1 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /></h1>
-          {displayOwnerAddress && <AddressShort address={owner} />}
-          <h3 className='Important NoMargin TitleCase'>
+          <h2 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /></h2>
+          {displayOwnerAddress && <AddressShort address={_owner} />}
+          <h5 className='Important NoMargin TitleCase'>
             Honour: <span className='Wager'>{honourAndTotal}</span>
             {isVillainous && <> {EMOJI.VILLAIN} <span className='Wager'>{levelDisplay}</span></>}
             {isTrickster && <> {EMOJI.TRICKSTER} <span className='Wager'>{levelDisplay}</span></>}
             {isHonourable && <> {EMOJI.LORD} <span className='Wager'>{levelDisplay}</span></>}
-          </h3>
+          </h5>
           {displayBalance &&
             <h5>
-              <LordsBalance address={owner} big />
-              {tableId && <LockedWagerBalance tableId={tableId} address={owner} clean />}
+              <LordsBalance address={_owner} big />
+              {tableId && <LockedWagerBalance tableId={tableId} address={_owner} clean />}
             </h5>
           }
         </Col>
@@ -85,8 +95,6 @@ export function ProfileDescription({
             Losses: <span className='Bold'>{total_losses}</span>
             <br />
             Draws: <span className='Bold'>{total_draws}</span>
-            <br />
-            Honour: <span className='Bold'>{total_honour}</span>
           </Col>
         }
 

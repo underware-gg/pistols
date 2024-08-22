@@ -13,7 +13,6 @@ import { bigintToHex, shortAddress } from '@/lib/utils/types'
 import { weiToEth } from '@/lib/utils/starknet'
 import AppPistols from '@/pistols/components/AppPistols'
 import { useChallenge } from '@/pistols/hooks/useChallenge'
-import { table } from 'console'
 
 const Row = Table.Row
 const Cell = Table.Cell

@@ -1,0 +1,16 @@
+kind = "DojoModel"
+class_hash = "0x209edb9bdfa6fbd1f99ab521aa31319316615ca7fa31a61a2daf24c8b1b6706"
+original_class_hash = "0x209edb9bdfa6fbd1f99ab521aa31319316615ca7fa31a61a2daf24c8b1b6706"
+abi = "manifests/dev/base/abis/models/origami_token-ERC20BridgeableModel-28075fe4.json"
+tag = "origami_token-ERC20BridgeableModel"
+manifest_name = "origami_token-ERC20BridgeableModel-28075fe4"
+
+[[members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "l2_bridge_address"
+type = "ContractAddress"
+key = false

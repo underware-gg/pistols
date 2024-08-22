@@ -1,5 +1,5 @@
 
-mod constants {
+mod CONST {
     // number of rounds per duel
     const ROUND_COUNT: u8 = 3;
     
@@ -17,7 +17,7 @@ mod constants {
     const ETH_TO_WEI: u256 = 1_000_000_000_000_000_000;
 }
 
-mod honour {
+mod HONOUR {
     // archetype ranges (Honour)
     const VILLAIN_START: u8 = 10;  // min honour
     const TRICKSTER_START: u8 = 35;
@@ -30,7 +30,7 @@ mod honour {
     const LEVEL_MAX: u8 = 100;
 }
 
-mod chances {
+mod CHANCES {
     const NEVER: u8 = 0;
     const ALWAYS: u8 = 100;
     

@@ -7,11 +7,20 @@ import { ChainId } from '@/lib/dojo/setup/chains'
 import { useAccount } from '@starknet-react/core'
 import { Account } from 'starknet'
 
+// TODO: Manifest is outdated???
+// export type DojoManifest = Manifest
+export type DojoManifest = Manifest & any
+
+export interface ContractInterfaces {
+  [contractName: string]: string[] 
+}
+
 export interface DojoAppConfig {
-  mainSystemName: string
+  nameSpace: string
+  contractInterfaces: ContractInterfaces
   supportedChainIds: ChainId[]
   initialChainId: ChainId
-  manifests: { [chain_id: string]: Manifest | undefined }
+  manifests: { [chain_id: string]: DojoManifest | undefined }
 }
 
 export default function Dojo({

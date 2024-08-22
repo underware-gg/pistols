@@ -1,8 +1,9 @@
 use starknet::ContractAddress;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-use pistols::models::config::{ConfigManager, ConfigManagerTrait};
+use pistols::interfaces::systems::{WorldSystemsTrait};
 use pistols::interfaces::ierc721::{ierc721, IERC721Dispatcher, IERC721DispatcherTrait};
-use pistols::types::constants::{constants};
+use pistols::models::config::{ConfigManager, ConfigManagerTrait};
+use pistols::types::constants::{CONST};
 
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
@@ -13,13 +14,16 @@ enum Archetype {
     Honourable, // 3
 }
 
-mod profile_pic_type {
-    const DUELIST: u8 = 1;      // profile_pic_uri = number
-    const EXTERNAL: u8 = 2;     // image URL
-    // const STARK_ID: u8 = 3;     // stark.id (ipfs?)
-    // const ERC721: u8 = 4;       // Owned erc-721 (hard to validate and keep up to date)
-    // const DISCORD: u8 = 5;      // Linked account (had to be cloned, or just copy the url)
+#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
+enum ProfilePicType {
+    Undefined,  // 0
+    Duelist,    // 1
+    External,   // 2
+    // StarkId,    // stark.id (ipfs?)
+    // ERC721,     // Owned erc-721 (hard to validate and keep up to date)
+    // Discord,    // Linked account (had to be cloned, or just copy the url)
 }
+
 
 
 //---------------------
@@ -28,13 +32,13 @@ mod profile_pic_type {
 // #[derive(Copy, Drop, Serde)] // ByteArray is not copiable!
 #[derive(Clone, Drop, Serde)]   // pass to functions using duelist.clone()
 #[dojo::model]
-struct Duelist {
+pub struct Duelist {
     #[key]
     duelist_id: u128,   // erc721 token_id
     //-----------------------
     name: felt252,
     profile_pic_uri: ByteArray,     // can be anything
-    profile_pic_type: u8,
+    profile_pic_type: ProfilePicType,
     timestamp: u64,                 // date registered
     score: Score,
 }
@@ -42,7 +46,7 @@ struct Duelist {
 // Current challenge between two Duelists
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-struct Pact {
+pub struct Pact {
     #[key]
     table_id: felt252,
     #[key]
@@ -55,18 +59,18 @@ struct Pact {
 // Duelist scores and wager balance per Table
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-struct Scoreboard {
+pub struct Scoreboard {
     #[key]
     table_id: felt252,
     #[key]
     duelist_id: u128,
     //------------
     score: Score,
-    wager_won: u256,
-    wager_lost: u256,
-} // [32, 128] [128] [128] [128, 96]
+    wager_won: u128,
+    wager_lost: u128,
+} // [160] [128] [128]
 
-#[derive(Copy, Drop, Serde, Introspect)]
+#[derive(Copy, Drop, Serde, IntrospectPacked)]
 struct Score {
     honour: u8,             // 0..100
     level_villain: u8,      // 0..100
@@ -76,8 +80,8 @@ struct Score {
     total_wins: u16,
     total_losses: u16,
     total_draws: u16,
-    total_honour: u32,      // sum of al duels Honour
-} // [128]
+    honour_history: u64,    // past 8 duels, each byte holds one duel honour
+} // [160]
 
 
 
@@ -93,12 +97,19 @@ impl DuelistTraitImpl of DuelistTrait {
         if (address_felt == self.duelist_id.into()) { return (true); }
         (false)
     }
-    // convert a challenged account address to duelist id
+    // try to convert a challenged account address to duelist id
     // retuns 0 if the address is not an id
-    fn address_to_id(address: ContractAddress) -> u128 {
+    fn try_address_to_id(address: ContractAddress) -> u128 {
         let as_felt: felt252 = address.into();
         let as_u256: u256 = as_felt.into();
-        if (as_u256 <= constants::MAX_DUELIST_ID.into()) {(as_u256.low)} else {(0)}
+        if (as_u256 <= CONST::MAX_DUELIST_ID.into()) {(as_u256.low)} else {(0)}
+    }
+    // "cast" an address to an id for pacts
+    // the low part is good enough
+    fn address_as_id(address: ContractAddress) -> u128 {
+        let as_felt: felt252 = address.into();
+        let as_u256: u256 = as_felt.into();
+        (as_u256.low)
     }
 }
 
@@ -112,8 +123,6 @@ impl ScoreTraitImpl of ScoreTrait {
     fn is_lord(self: Score) -> bool { (self.level_lord > 0) }
     #[inline(always)]
     fn format_honour(value: u8) -> ByteArray { (format!("{}.{}", value/10, value%10)) }
-    #[inline(always)]
-    fn format_total_honour(value: u32) -> ByteArray { (format!("{}.{}", value/10, value%10)) }
 }
 
 impl ArchetypeIntoFelt252 of Into<Archetype, felt252> {
@@ -152,7 +161,7 @@ struct DuelistManager {
 #[generate_trait]
 impl DuelistManagerTraitImpl of DuelistManagerTrait {
     fn new(world: IWorldDispatcher) -> DuelistManager {
-        let contract_address: ContractAddress = ConfigManagerTrait::new(world).get().token_duelist_address;
+        let contract_address: ContractAddress = world.token_duelist_address();
         assert(contract_address.is_non_zero(), 'DuelistManager: null token addr');
         let token_dispatcher = ierc721(contract_address);
         (DuelistManager { world, token_dispatcher })

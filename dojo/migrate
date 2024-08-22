@@ -1,27 +1,19 @@
 #!/bin/bash
 set -e
+source scripts/setup.sh
 
-# Profile
-if [ $# -ge 1 ]; then
-  export PROFILE=$1
-else
-  export PROFILE="dev"
-fi
-
-#-----------------
-# env setup
-#
-export WORLD_NAME_SEED="pistols"
-export MANIFEST_FILE_PATH="./manifests/$PROFILE/manifest.json"
-export BINDINGS_PATH="./bindings/typescript"
-export GAME_SLUG="pistols"
-export CLIENT_PATH="../client/src/games/$GAME_SLUG/generated/$PROFILE"
-export PROJECT_NAME=$(toml get Scarb.toml --raw tool.dojo.world.name)
-export WORLD_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.world_address)
-# use $STARKNET_RPC_URL else read from profile
-export RPC_URL=${STARKNET_RPC_URL:-$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.rpc_url)}
+echo "------------------------------------------------------------------------------"
+echo "PROJECT: $PROJECT_NAME"
+echo "PROFILE: $PROFILE"
+echo "RPC_URL: $RPC_URL"
+echo "WORLD_ADDRESS: $WORLD_ADDRESS"
+echo "CLIENT_GEN_PATH: $CLIENT_GEN_PATH"
+echo "PROFILE_GEN_PATH: $PROFILE_GEN_PATH"
+echo "BINDINGS_PATH: $BINDINGS_PATH"
+echo ""
 
 if [[
+  -z "$PROJECT_NAME" ||
   -z "$PROFILE" ||
   -z "$MANIFEST_FILE_PATH" ||
   "$WORLD_ADDRESS" != "0x"* ||
@@ -31,69 +23,69 @@ if [[
   exit 1
 fi
 
-echo "------------------------------------------------------------------------------"
-echo ""
-echo "PROJECT: $PROJECT_NAME"
-echo "PROFILE: $PROFILE"
-echo ""
-
 #-----------------
 # build
 #
-# if [[ "$PROFILE" != "dev" ]]; then
-  echo "------------------------------------------------------------------------------"
-  echo ">>> Cleaning..."
-  sozo -P $PROFILE clean
-  echo ">>> Building..."
+echo "------------------------------------------------------------------------------"
+echo ">>> Cleaning..."
+sozo -P $PROFILE clean
+echo ">>> Building..."
+if [[ "$PROFILE" == "dev" ]]; then
+  # sozo -P $PROFILE build --typescript
   sozo -P $PROFILE build
-  echo "👍"
-# fi
+else
+  sozo -P $PROFILE build
+fi
+echo "👍"
 
 #-----------------
 # migrate
 #
 echo "------------------------------------------------------------------------------"
-echo ">>> Migrating..."
-# sozo --profile $PROFILE migrate plan --world $WORLD_ADDRESS
+echo ">>> Migrate plan..."
+sozo -P $PROFILE migrate plan --world $WORLD_ADDRESS
 # exit 0
-sozo -P $PROFILE migrate apply --world $WORLD_ADDRESS --name $WORLD_NAME_SEED
+echo ">>> Migrate apply..."
+sozo -P $PROFILE migrate apply --world $WORLD_ADDRESS
 echo "👍"
 
 #-----------------
 # auth write
 #
-scripts/default_auth.sh $PROFILE
+# scripts/default_auth.sh $PROFILE
 
 
 #------------------------
 # copy manifest to client
 #
 echo "------------------------------------------------------------------------------"
-echo ">>> Copying manifest [$MANIFEST_FILE_PATH] to [$CLIENT_PATH/]"
-mkdir -p $CLIENT_PATH
-cp $MANIFEST_FILE_PATH $CLIENT_PATH/
+echo ">>> Copying manifest [$MANIFEST_FILE_PATH] to [$PROFILE_GEN_PATH/]"
+mkdir -p $PROFILE_GEN_PATH
+cp $MANIFEST_FILE_PATH $PROFILE_GEN_PATH/
 echo "👍"
 
 #------------------------
 # typescript bindings
 #
-# TODO: Enable this when bindings are working
-# generate and cop bindings
-# sozo build --typescript
-# cp $BINDINGS_PATH/* $CLIENT_PATH/
-#
-# TODO: Remove this when bindings are working
-# copy to client
-echo "------------------------------------------------------------------------------"
-echo ">>> Generate sources..."
-cd ../client
-npm run create-components --game=$GAME_SLUG --profile=$PROFILE $RPC_URL $WORLD_ADDRESS
-npm run create-constants --game=$GAME_SLUG --profile=$PROFILE
-echo "👍?"
+if [[ "$PROFILE" == "dev" ]]; then
+  #
+  # TODO: Enable this when bindings are ported
+  # generate and copy bindings
+  # cp $BINDINGS_PATH/* $CLIENT_GEN_PATH/
+  #
+  # copy to client
+  echo "------------------------------------------------------------------------------"
+  echo ">>> Generate sources..."
+  cd ../client
+  npm run create-components --game=$GAME_SLUG --profile=$PROFILE $RPC_URL $WORLD_ADDRESS
+  npm run create-constants --game=$GAME_SLUG --profile=$PROFILE
+  echo "👍?"
+  #
+  # list copied files
+  echo "------------------------------------------------------------------------------"
+  ls -ld $CLIENT_GEN_PATH/* | grep -E 'ts|json'
+fi
 
-# list copied files
-echo "------------------------------------------------------------------------------"
-ls -ld $CLIENT_PATH/* | grep -E 'ts|json'
 
 #------------------
 echo "--- DONE! 👍"

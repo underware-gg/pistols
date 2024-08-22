@@ -1,13 +1,14 @@
 import { useEffect, useMemo } from 'react'
-import { useDojoComponents, useDojoConstants } from '@/lib/dojo/DojoContext'
+import { BigNumberish } from 'starknet'
+import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { useComponentValue } from '@dojoengine/react'
 import { useThreeJsContext } from "./ThreeJsContext"
 import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
 import { useChallenge } from "@/pistols/hooks/useChallenge"
 import { keysToEntity } from '@/lib/utils/types'
-import { ActionNames, ActionVerbs, RoundState } from "@/pistols/utils/pistols"
 import { AnimationState } from "@/pistols/three/game"
-import { BigNumberish } from 'starknet'
+import { CONST, getRoundState, RoundState } from '@/games/pistols/generated/constants'
+import { ActionNames, ActionVerbs } from "@/pistols/utils/pistols"
 
 export enum DuelStage {
   Null,             // 0
@@ -25,12 +26,21 @@ export enum DuelStage {
   Finished,         // 8
 }
 
-export const useDuel = (duelId: BigNumberish) => {
+export const useRound = (duelId: BigNumberish, roundNumber: BigNumberish) => {
   const { Round } = useDojoComponents()
+  const round: any = useComponentValue(Round, keysToEntity([duelId, roundNumber]))
+  if (!round) return null
+  return {
+    ...round,
+    state: getRoundState(round.state),
+  }
+}
+
+export const useDuel = (duelId: BigNumberish) => {
   const challenge = useChallenge(duelId)
-  const round1: any = useComponentValue(Round, keysToEntity([duelId, 1n]))
-  const round2: any = useComponentValue(Round, keysToEntity([duelId, 2n]))
-  const round3: any = useComponentValue(Round, keysToEntity([duelId, 3n]))
+  const round1: any = useRound(duelId, 1n)
+  const round2: any = useRound(duelId, 2n)
+  const round3: any = useRound(duelId, 3n)
 
   //
   // The actual stage of this duel
@@ -88,8 +98,6 @@ export const useDuel = (duelId: BigNumberish) => {
 // Use only ONCE inside <Duel>!!
 //
 export const useAnimatedDuel = (duelId: BigNumberish, enabled: boolean) => {
-  const { constants } = useDojoConstants()
-
   const result = useDuel(duelId)
   const { round1, round2, round3, duelStage } = result
 
@@ -109,13 +117,13 @@ export const useAnimatedDuel = (duelId: BigNumberish, enabled: boolean) => {
   const { healthA, healthB } = useMemo(() => {
     return {
       healthA: (
-        (currentStage <= DuelStage.Round1Animation && !animatedHealthA) ? constants.FULL_HEALTH
+        (currentStage <= DuelStage.Round1Animation && !animatedHealthA) ? CONST.FULL_HEALTH
           : currentStage <= DuelStage.Round2Animation ? round1.shot_a.health
             : currentStage <= DuelStage.Round3Animation ? round2.shot_a.health
               : (round3?.shot_a.health ?? round2?.shot_a.health ?? round1?.shot_a.health)
       ) ?? null,
       healthB: (
-        (currentStage <= DuelStage.Round1Animation && !animatedHealthB) ? constants.FULL_HEALTH
+        (currentStage <= DuelStage.Round1Animation && !animatedHealthB) ? CONST.FULL_HEALTH
           : currentStage <= DuelStage.Round2Animation ? round1.shot_b.health
             : currentStage <= DuelStage.Round3Animation ? round2.shot_b.health
               : (round3?.shot_b.health ?? round2?.shot_b.health ?? round1?.shot_b.health)

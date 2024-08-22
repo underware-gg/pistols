@@ -1,0 +1,915 @@
+[world]
+kind = "WorldContract"
+class_hash = "0x458d0ce5b14a4844092bdb62050f462d53362304a13febbac6d973691d61be2"
+original_class_hash = "0x458d0ce5b14a4844092bdb62050f462d53362304a13febbac6d973691d61be2"
+abi = "manifests/dev/deployment/abis/dojo-world.json"
+address = "0x4f1514c9ab747d4b0f7c859b62cf199174d4aeae5a4ad9c7ff54125917af912"
+transaction_hash = "0x2bf6377e761a0565628ba5d5992d1986e45cf6c4de512ec6eabea7169fa6226"
+block_number = 3
+seed = "pistols"
+manifest_name = "dojo-world"
+
+[world.metadata]
+profile_name = "dev"
+rpc_url = "http://localhost:5050/"
+
+[base]
+kind = "Class"
+class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
+original_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
+abi = "manifests/dev/deployment/abis/dojo-base.json"
+tag = "dojo-base"
+manifest_name = "dojo-base"
+
+[[contracts]]
+kind = "DojoContract"
+address = "0x1f3a1a8a9e2688d0588be379dcbc3cbac5c316bdde84b002a9166d0b626eb9d"
+class_hash = "0x473be66ce5304722be5595a5986b2ccac54d8e97d0d6546070fa9957f544b3f"
+original_class_hash = "0x473be66ce5304722be5595a5986b2ccac54d8e97d0d6546070fa9957f544b3f"
+base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
+abi = "manifests/dev/deployment/abis/contracts/pistols-actions-4f10cff7.json"
+reads = []
+writes = [
+    "pistols-Duelist",
+    "pistols-Scoreboard",
+    "pistols-Challenge",
+    "pistols-Snapshot",
+    "pistols-Wager",
+    "pistols-Pact",
+    "pistols-Round",
+]
+init_calldata = []
+tag = "pistols-actions"
+systems = [
+    "commit_action",
+    "reveal_action",
+    "_emitDuelistRegisteredEvent",
+    "_emitNewChallengeEvent",
+    "_emitChallengeAcceptedEvent",
+    "_emitPostRevealEvents",
+    "_emitDuelistTurnEvent",
+    "_emitChallengeResolvedEvent",
+]
+manifest_name = "pistols-actions-4f10cff7"
+
+[[contracts]]
+kind = "DojoContract"
+address = "0x471b9dbf5dcf03a044e30fdd7b67594eb37a1ed9ca58718644d10638b3f89cb"
+class_hash = "0x58998e96d1412df3823e301c08e7dea70f68a8e587a9a1a8dad459754742823"
+original_class_hash = "0x58998e96d1412df3823e301c08e7dea70f68a8e587a9a1a8dad459754742823"
+base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
+abi = "manifests/dev/deployment/abis/contracts/pistols-admin-36fd2037.json"
+reads = []
+writes = [
+    "pistols-Config",
+    "pistols-TableConfig",
+    "pistols-TableAdmittance",
+]
+init_calldata = [
+    "0x0",
+    "$contract_address:pistols-lords_mock",
+]
+tag = "pistols-admin"
+systems = [
+    "grant_admin",
+    "set_config",
+    "set_paused",
+    "set_table",
+    "set_table_admittance",
+    "open_table",
+]
+manifest_name = "pistols-admin-36fd2037"
+
+[[contracts]]
+kind = "DojoContract"
+address = "0x7be9d49c381aee5b396f0aa9af7e505d21f0b60eb927a515b77cf4073ff63fb"
+class_hash = "0x4f64ee4f8e5749e9ebefee3e66885d66838b5873d505a018733b3e30843d540"
+original_class_hash = "0x4f64ee4f8e5749e9ebefee3e66885d66838b5873d505a018733b3e30843d540"
+base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
+abi = "manifests/dev/deployment/abis/contracts/pistols-lords_mock-2b1156e6.json"
+reads = []
+writes = [
+    "origami_token-SRC5Model",
+    "origami_token-InitializableModel",
+    "origami_token-ERC20BalanceModel",
+    "origami_token-ERC20MetadataModel",
+    "origami_token-ERC20AllowanceModel",
+    "origami_token-ERC20BridgeableModel",
+]
+init_calldata = []
+tag = "pistols-lords_mock"
+systems = [
+    "faucet",
+    "mint",
+]
+manifest_name = "pistols-lords_mock-2b1156e6"
+
+[[contracts]]
+kind = "DojoContract"
+address = "0x53a4dc9eb61deaa505884c6260a2560ca37d21c79a353546c45f1755f821f9f"
+class_hash = "0xc3da78de3d60e208a046c0cae3104b47872ddad3c263b8b22f97653dfb6f45"
+original_class_hash = "0xc3da78de3d60e208a046c0cae3104b47872ddad3c263b8b22f97653dfb6f45"
+base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
+abi = "manifests/dev/deployment/abis/contracts/pistols-minter-7b759538.json"
+reads = []
+writes = ["pistols-TokenConfig"]
+init_calldata = [
+    "$contract_address:pistols-token_duelist",
+    "10000",
+    "100",
+    "1",
+]
+tag = "pistols-minter"
+systems = ["set_open"]
+manifest_name = "pistols-minter-7b759538"
+
+[[contracts]]
+kind = "DojoContract"
+address = "0x7b7977b6eb61b7457181ee78918dbb65310db77cd812cdc277301841d01cda2"
+class_hash = "0x1bbfcf47014801e11a36118114878d3fc14155f8a78bf6ae2678a5087d07b40"
+original_class_hash = "0x1bbfcf47014801e11a36118114878d3fc14155f8a78bf6ae2678a5087d07b40"
+base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
+abi = "manifests/dev/deployment/abis/contracts/pistols-token_duelist-541e9c18.json"
+reads = []
+writes = [
+    "origami_token-SRC5Model",
+    "origami_token-InitializableModel",
+    "origami_token-ERC721OwnerModel",
+    "origami_token-ERC721BalanceModel",
+    "origami_token-ERC721MetaModel",
+    "origami_token-ERC721EnumerableIndexModel",
+    "origami_token-ERC721EnumerableOwnerIndexModel",
+    "origami_token-ERC721EnumerableOwnerTokenModel",
+    "origami_token-ERC721EnumerableTokenModel",
+    "origami_token-ERC721EnumerableTotalModel",
+    "origami_token-ERC721TokenApprovalModel",
+    "origami_token-ERC721OperatorApprovalModel",
+]
+init_calldata = []
+tag = "pistols-token_duelist"
+systems = [
+    "mint",
+    "burn",
+]
+manifest_name = "pistols-token_duelist-541e9c18"
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x222d10acee2a214aed878d06010385b8624a48bbb61a8bc9a777f8facd9a36d"
+original_class_hash = "0x222d10acee2a214aed878d06010385b8624a48bbb61a8bc9a777f8facd9a36d"
+abi = "manifests/dev/deployment/abis/models/origami_token-ERC20AllowanceModel-4fcf1991.json"
+tag = "origami_token-ERC20AllowanceModel"
+manifest_name = "origami_token-ERC20AllowanceModel-4fcf1991"
+
+[[models.members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "owner"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "spender"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "amount"
+type = "u256"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x38c3c9f4ec3feea51cee2ec9be6592b50f711f5fa39e5b4f0ca0e770675505e"
+original_class_hash = "0x38c3c9f4ec3feea51cee2ec9be6592b50f711f5fa39e5b4f0ca0e770675505e"
+abi = "manifests/dev/deployment/abis/models/origami_token-ERC20BalanceModel-da267235.json"
+tag = "origami_token-ERC20BalanceModel"
+manifest_name = "origami_token-ERC20BalanceModel-da267235"
+
+[[models.members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "account"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "amount"
+type = "u256"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x209edb9bdfa6fbd1f99ab521aa31319316615ca7fa31a61a2daf24c8b1b6706"
+original_class_hash = "0x209edb9bdfa6fbd1f99ab521aa31319316615ca7fa31a61a2daf24c8b1b6706"
+abi = "manifests/dev/deployment/abis/models/origami_token-ERC20BridgeableModel-28075fe4.json"
+tag = "origami_token-ERC20BridgeableModel"
+manifest_name = "origami_token-ERC20BridgeableModel-28075fe4"
+
+[[models.members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "l2_bridge_address"
+type = "ContractAddress"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x2a9e6b7d401e8c9fa77e5221dce4f049334ce8ed4d7a53f88adf72b3af968eb"
+original_class_hash = "0x2a9e6b7d401e8c9fa77e5221dce4f049334ce8ed4d7a53f88adf72b3af968eb"
+abi = "manifests/dev/deployment/abis/models/origami_token-ERC20MetadataModel-3368c0e3.json"
+tag = "origami_token-ERC20MetadataModel"
+manifest_name = "origami_token-ERC20MetadataModel-3368c0e3"
+
+[[models.members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "name"
+type = "ByteArray"
+key = false
+
+[[models.members]]
+name = "symbol"
+type = "ByteArray"
+key = false
+
+[[models.members]]
+name = "decimals"
+type = "u8"
+key = false
+
+[[models.members]]
+name = "total_supply"
+type = "u256"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x36dc2b76dcd77b58fe987c0b8836c2ce7fa08cb9d44838634218fad353bec83"
+original_class_hash = "0x36dc2b76dcd77b58fe987c0b8836c2ce7fa08cb9d44838634218fad353bec83"
+abi = "manifests/dev/deployment/abis/models/origami_token-ERC721BalanceModel-246a8e17.json"
+tag = "origami_token-ERC721BalanceModel"
+manifest_name = "origami_token-ERC721BalanceModel-246a8e17"
+
+[[models.members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "account"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "amount"
+type = "u128"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x5d3394057bbdf2262c0ba952ec0bbc13b8a315ad8bd9e684650225abc4152ac"
+original_class_hash = "0x5d3394057bbdf2262c0ba952ec0bbc13b8a315ad8bd9e684650225abc4152ac"
+abi = "manifests/dev/deployment/abis/models/origami_token-ERC721EnumerableIndexModel-1a4200e7.json"
+tag = "origami_token-ERC721EnumerableIndexModel"
+manifest_name = "origami_token-ERC721EnumerableIndexModel-1a4200e7"
+
+[[models.members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "index"
+type = "u128"
+key = true
+
+[[models.members]]
+name = "token_id"
+type = "u128"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x2fd76867b943befb036da828bd1d2bec2386863ad70aafa770360c5b3e9acfc"
+original_class_hash = "0x2fd76867b943befb036da828bd1d2bec2386863ad70aafa770360c5b3e9acfc"
+abi = "manifests/dev/deployment/abis/models/origami_token-ERC721EnumerableOwnerIndexModel-573cb336.json"
+tag = "origami_token-ERC721EnumerableOwnerIndexModel"
+manifest_name = "origami_token-ERC721EnumerableOwnerIndexModel-573cb336"
+
+[[models.members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "owner"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "index"
+type = "u128"
+key = true
+
+[[models.members]]
+name = "token_id"
+type = "u128"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x45871731d39993b19571f03348d6932fba0445f6eb94e1e37d2db5c4474d61c"
+original_class_hash = "0x45871731d39993b19571f03348d6932fba0445f6eb94e1e37d2db5c4474d61c"
+abi = "manifests/dev/deployment/abis/models/origami_token-ERC721EnumerableOwnerTokenModel-74966560.json"
+tag = "origami_token-ERC721EnumerableOwnerTokenModel"
+manifest_name = "origami_token-ERC721EnumerableOwnerTokenModel-74966560"
+
+[[models.members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "owner"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "token_id"
+type = "u128"
+key = true
+
+[[models.members]]
+name = "index"
+type = "u128"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0xf5a9baf34c431fc11c05e15ddff7eb4750847ada1db57528ddad2966a7f3ec"
+original_class_hash = "0xf5a9baf34c431fc11c05e15ddff7eb4750847ada1db57528ddad2966a7f3ec"
+abi = "manifests/dev/deployment/abis/models/origami_token-ERC721EnumerableTokenModel-5c383d9f.json"
+tag = "origami_token-ERC721EnumerableTokenModel"
+manifest_name = "origami_token-ERC721EnumerableTokenModel-5c383d9f"
+
+[[models.members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "token_id"
+type = "u128"
+key = true
+
+[[models.members]]
+name = "index"
+type = "u128"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x476254a3660ac696486628f6fb9c531a94de4b0addcc00bc43eafc207638968"
+original_class_hash = "0x476254a3660ac696486628f6fb9c531a94de4b0addcc00bc43eafc207638968"
+abi = "manifests/dev/deployment/abis/models/origami_token-ERC721EnumerableTotalModel-5674a124.json"
+tag = "origami_token-ERC721EnumerableTotalModel"
+manifest_name = "origami_token-ERC721EnumerableTotalModel-5674a124"
+
+[[models.members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "total_supply"
+type = "u128"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x4310a938ba169a6d12cd0aa9dbeaf2992ddc4b55621bdeb883c0b43a3726d6d"
+original_class_hash = "0x4310a938ba169a6d12cd0aa9dbeaf2992ddc4b55621bdeb883c0b43a3726d6d"
+abi = "manifests/dev/deployment/abis/models/origami_token-ERC721MetaModel-423fffaa.json"
+tag = "origami_token-ERC721MetaModel"
+manifest_name = "origami_token-ERC721MetaModel-423fffaa"
+
+[[models.members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "name"
+type = "ByteArray"
+key = false
+
+[[models.members]]
+name = "symbol"
+type = "ByteArray"
+key = false
+
+[[models.members]]
+name = "base_uri"
+type = "ByteArray"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x29f6fcd504ae293bec1139611e0fe870deda9be6a41ef7e1ffacfa5c76c4dd5"
+original_class_hash = "0x29f6fcd504ae293bec1139611e0fe870deda9be6a41ef7e1ffacfa5c76c4dd5"
+abi = "manifests/dev/deployment/abis/models/origami_token-ERC721OperatorApprovalModel-1083d4d1.json"
+tag = "origami_token-ERC721OperatorApprovalModel"
+manifest_name = "origami_token-ERC721OperatorApprovalModel-1083d4d1"
+
+[[models.members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "owner"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "operator"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "approved"
+type = "bool"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x356e5dea0e7529f6c2617074b151c03b23cfb408d0a1ef8e123c226502cf115"
+original_class_hash = "0x356e5dea0e7529f6c2617074b151c03b23cfb408d0a1ef8e123c226502cf115"
+abi = "manifests/dev/deployment/abis/models/origami_token-ERC721OwnerModel-61577880.json"
+tag = "origami_token-ERC721OwnerModel"
+manifest_name = "origami_token-ERC721OwnerModel-61577880"
+
+[[models.members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "token_id"
+type = "u128"
+key = true
+
+[[models.members]]
+name = "address"
+type = "ContractAddress"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x290d67abdcfd26f1d9768cec5ff48842cd405ce33417c6e8a212da0baa77e86"
+original_class_hash = "0x290d67abdcfd26f1d9768cec5ff48842cd405ce33417c6e8a212da0baa77e86"
+abi = "manifests/dev/deployment/abis/models/origami_token-ERC721TokenApprovalModel-560d5854.json"
+tag = "origami_token-ERC721TokenApprovalModel"
+manifest_name = "origami_token-ERC721TokenApprovalModel-560d5854"
+
+[[models.members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "token_id"
+type = "u128"
+key = true
+
+[[models.members]]
+name = "address"
+type = "ContractAddress"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x43c7452e01d3ecb9f7460490397bd17c0d3461bd322d93bbfac4925dc9ee1ed"
+original_class_hash = "0x43c7452e01d3ecb9f7460490397bd17c0d3461bd322d93bbfac4925dc9ee1ed"
+abi = "manifests/dev/deployment/abis/models/origami_token-InitializableModel-5c624096.json"
+tag = "origami_token-InitializableModel"
+manifest_name = "origami_token-InitializableModel-5c624096"
+
+[[models.members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "initialized"
+type = "bool"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x25d17f5223a69a8f5a4b9bdd2bba1121a9da6e5bdb83592402943158e5946b9"
+original_class_hash = "0x25d17f5223a69a8f5a4b9bdd2bba1121a9da6e5bdb83592402943158e5946b9"
+abi = "manifests/dev/deployment/abis/models/origami_token-SRC5Model-72fc8945.json"
+tag = "origami_token-SRC5Model"
+manifest_name = "origami_token-SRC5Model-72fc8945"
+
+[[models.members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "interface_id"
+type = "felt252"
+key = true
+
+[[models.members]]
+name = "supports"
+type = "bool"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x175b75603aa17cfa02fc93ac713a5ff362a70af824deec9caef884235ed0c36"
+original_class_hash = "0x175b75603aa17cfa02fc93ac713a5ff362a70af824deec9caef884235ed0c36"
+abi = "manifests/dev/deployment/abis/models/pistols-Challenge-673267b6.json"
+tag = "pistols-Challenge"
+manifest_name = "pistols-Challenge-673267b6"
+
+[[models.members]]
+name = "duel_id"
+type = "u128"
+key = true
+
+[[models.members]]
+name = "table_id"
+type = "felt252"
+key = false
+
+[[models.members]]
+name = "message"
+type = "felt252"
+key = false
+
+[[models.members]]
+name = "address_a"
+type = "ContractAddress"
+key = false
+
+[[models.members]]
+name = "address_b"
+type = "ContractAddress"
+key = false
+
+[[models.members]]
+name = "duelist_id_a"
+type = "u128"
+key = false
+
+[[models.members]]
+name = "duelist_id_b"
+type = "u128"
+key = false
+
+[[models.members]]
+name = "state"
+type = "ChallengeState"
+key = false
+
+[[models.members]]
+name = "round_number"
+type = "u8"
+key = false
+
+[[models.members]]
+name = "winner"
+type = "u8"
+key = false
+
+[[models.members]]
+name = "timestamp_start"
+type = "u64"
+key = false
+
+[[models.members]]
+name = "timestamp_end"
+type = "u64"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x3cf74429df2fffde1ab90fa02f725ef06d7aaef35cdacd56ad65024714f3a7f"
+original_class_hash = "0x3cf74429df2fffde1ab90fa02f725ef06d7aaef35cdacd56ad65024714f3a7f"
+abi = "manifests/dev/deployment/abis/models/pistols-Config-60742fa7.json"
+tag = "pistols-Config"
+manifest_name = "pistols-Config-60742fa7"
+
+[[models.members]]
+name = "key"
+type = "u8"
+key = true
+
+[[models.members]]
+name = "treasury_address"
+type = "ContractAddress"
+key = false
+
+[[models.members]]
+name = "is_paused"
+type = "bool"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x438678aed538eaeacb5395be5b5bf337c8b620492ab0f54b032756bc3c3bd85"
+original_class_hash = "0x438678aed538eaeacb5395be5b5bf337c8b620492ab0f54b032756bc3c3bd85"
+abi = "manifests/dev/deployment/abis/models/pistols-Duelist-1ec34ce9.json"
+tag = "pistols-Duelist"
+manifest_name = "pistols-Duelist-1ec34ce9"
+
+[[models.members]]
+name = "duelist_id"
+type = "u128"
+key = true
+
+[[models.members]]
+name = "name"
+type = "felt252"
+key = false
+
+[[models.members]]
+name = "profile_pic_uri"
+type = "ByteArray"
+key = false
+
+[[models.members]]
+name = "profile_pic_type"
+type = "ProfilePicType"
+key = false
+
+[[models.members]]
+name = "timestamp"
+type = "u64"
+key = false
+
+[[models.members]]
+name = "score"
+type = "Score"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x1742fb856890207335d9bbec53122aed0b5593b213298050eec50c4e86fcee9"
+original_class_hash = "0x1742fb856890207335d9bbec53122aed0b5593b213298050eec50c4e86fcee9"
+abi = "manifests/dev/deployment/abis/models/pistols-Pact-72a33a65.json"
+tag = "pistols-Pact"
+manifest_name = "pistols-Pact-72a33a65"
+
+[[models.members]]
+name = "table_id"
+type = "felt252"
+key = true
+
+[[models.members]]
+name = "pair"
+type = "u128"
+key = true
+
+[[models.members]]
+name = "duel_id"
+type = "u128"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x301ceb1e325561b80a7c8b49e71b09b062f79f0075a1d46ce00697db24771d2"
+original_class_hash = "0x301ceb1e325561b80a7c8b49e71b09b062f79f0075a1d46ce00697db24771d2"
+abi = "manifests/dev/deployment/abis/models/pistols-Round-617e0a3d.json"
+tag = "pistols-Round"
+manifest_name = "pistols-Round-617e0a3d"
+
+[[models.members]]
+name = "duel_id"
+type = "u128"
+key = true
+
+[[models.members]]
+name = "round_number"
+type = "u8"
+key = true
+
+[[models.members]]
+name = "state"
+type = "RoundState"
+key = false
+
+[[models.members]]
+name = "shot_a"
+type = "Shot"
+key = false
+
+[[models.members]]
+name = "shot_b"
+type = "Shot"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x20217ebd369f280d7c38719ba769b9af22a3960fb0b230106c672daed0a1361"
+original_class_hash = "0x20217ebd369f280d7c38719ba769b9af22a3960fb0b230106c672daed0a1361"
+abi = "manifests/dev/deployment/abis/models/pistols-Scoreboard-18889906.json"
+tag = "pistols-Scoreboard"
+manifest_name = "pistols-Scoreboard-18889906"
+
+[[models.members]]
+name = "table_id"
+type = "felt252"
+key = true
+
+[[models.members]]
+name = "duelist_id"
+type = "u128"
+key = true
+
+[[models.members]]
+name = "score"
+type = "Score"
+key = false
+
+[[models.members]]
+name = "wager_won"
+type = "u128"
+key = false
+
+[[models.members]]
+name = "wager_lost"
+type = "u128"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x5b07225306c4fb77f18c7134acf7c56aa08d146bdaea9b47cd0f4eb5bf88dfc"
+original_class_hash = "0x5b07225306c4fb77f18c7134acf7c56aa08d146bdaea9b47cd0f4eb5bf88dfc"
+abi = "manifests/dev/deployment/abis/models/pistols-Snapshot-31acbedc.json"
+tag = "pistols-Snapshot"
+manifest_name = "pistols-Snapshot-31acbedc"
+
+[[models.members]]
+name = "duel_id"
+type = "u128"
+key = true
+
+[[models.members]]
+name = "score_a"
+type = "Score"
+key = false
+
+[[models.members]]
+name = "score_b"
+type = "Score"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x71ec603d2893fa4e8573fb1c94e414124dc633b8c6b96dcc21ad8317fe2cf10"
+original_class_hash = "0x71ec603d2893fa4e8573fb1c94e414124dc633b8c6b96dcc21ad8317fe2cf10"
+abi = "manifests/dev/deployment/abis/models/pistols-TableAdmittance-1b01f43d.json"
+tag = "pistols-TableAdmittance"
+manifest_name = "pistols-TableAdmittance-1b01f43d"
+
+[[models.members]]
+name = "table_id"
+type = "felt252"
+key = true
+
+[[models.members]]
+name = "accounts"
+type = "Array<ContractAddress>"
+key = false
+
+[[models.members]]
+name = "duelists"
+type = "Array<u128>"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x6774b0dcc9a4ebb62e6f42b70ebd46cd77387e8d71cc8e57dee1403feec298"
+original_class_hash = "0x6774b0dcc9a4ebb62e6f42b70ebd46cd77387e8d71cc8e57dee1403feec298"
+abi = "manifests/dev/deployment/abis/models/pistols-TableConfig-1e8368fc.json"
+tag = "pistols-TableConfig"
+manifest_name = "pistols-TableConfig-1e8368fc"
+
+[[models.members]]
+name = "table_id"
+type = "felt252"
+key = true
+
+[[models.members]]
+name = "table_type"
+type = "TableType"
+key = false
+
+[[models.members]]
+name = "description"
+type = "felt252"
+key = false
+
+[[models.members]]
+name = "fee_collector_address"
+type = "ContractAddress"
+key = false
+
+[[models.members]]
+name = "wager_contract_address"
+type = "ContractAddress"
+key = false
+
+[[models.members]]
+name = "wager_min"
+type = "u128"
+key = false
+
+[[models.members]]
+name = "fee_min"
+type = "u128"
+key = false
+
+[[models.members]]
+name = "fee_pct"
+type = "u8"
+key = false
+
+[[models.members]]
+name = "is_open"
+type = "bool"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x3df2ca24e9e476aaab1a7560502cacb4a81ba19e5ba22014ac2ab1b05c35a7"
+original_class_hash = "0x3df2ca24e9e476aaab1a7560502cacb4a81ba19e5ba22014ac2ab1b05c35a7"
+abi = "manifests/dev/deployment/abis/models/pistols-TokenConfig-56ebd338.json"
+tag = "pistols-TokenConfig"
+manifest_name = "pistols-TokenConfig-56ebd338"
+
+[[models.members]]
+name = "token_address"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "max_supply"
+type = "u16"
+key = false
+
+[[models.members]]
+name = "max_per_wallet"
+type = "u16"
+key = false
+
+[[models.members]]
+name = "minted_count"
+type = "u16"
+key = false
+
+[[models.members]]
+name = "is_open"
+type = "bool"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x1e5d78a5b7ad246855311ee7b34e441961d7d3c14331ea70c3f87eb120deed6"
+original_class_hash = "0x1e5d78a5b7ad246855311ee7b34e441961d7d3c14331ea70c3f87eb120deed6"
+abi = "manifests/dev/deployment/abis/models/pistols-Wager-4cd30873.json"
+tag = "pistols-Wager"
+manifest_name = "pistols-Wager-4cd30873"
+
+[[models.members]]
+name = "duel_id"
+type = "u128"
+key = true
+
+[[models.members]]
+name = "value"
+type = "u128"
+key = false
+
+[[models.members]]
+name = "fee"
+type = "u128"
+key = false

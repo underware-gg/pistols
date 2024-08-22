@@ -30,9 +30,10 @@ export default function IndexPage() {
             </Row>
           </Header>
           <Body>
-            <ValidateMessage messages={{ ff:'0xff'}} />
-            <ValidateMessage messages={{ one: '0x1', eleven: '0x11' }} />
-            <ValidateMessage messages={{ bighex: '0x586fa47095df3960c7bfb369dc55487020c88d5dd51eb8d298f8a40ff010115' }} />
+            <ValidateMessage messages={{ ff: 0xffn }} />
+            <ValidateMessage messages={{ one: 1n, eleven: 0x11n }} />
+            <ValidateMessage messages={{ bighex: 0x586fa47095df3960c7bfb369dc55487020c88d5dd51eb8d298f8a40ff010115n }} />
+            <ValidateMessage messages={{ okstring: 'OK_STRING' }} />
             <ValidateMessage messages={{ toobig: 'qwertyuiopqwertyuiopqwertyuiopXX' }} />
           </Body>
         </Table>
@@ -66,7 +67,7 @@ function ValidateMessage({
   const [signature, setSignature] = useState(null)
   const [verified, setVerifyed] = useState('...')
 
-  const { typedMessage, hash } = useTypedMessage({
+  const { typedMessage, messageHash } = useTypedMessage({
     revision: 0,
     messages,
   })
@@ -88,8 +89,8 @@ function ValidateMessage({
   return (
     <Row columns={'equal'} verticalAlign='top'>
       <Cell className='Code'>
-        {Object.keys(messages).map((k, i) => <React.Fragment key={k}>{k}:{shortAddress(messages[k])}<br /></React.Fragment>)}
-        hash:{shortAddress(bigintToHex(hash))}
+        {Object.keys(messages).map((k, i) => <React.Fragment key={k}>{k}:{messages[k].toString()}<br /></React.Fragment>)}
+        hash:{shortAddress(bigintToHex(messageHash))}
       </Cell>
       <Cell>
         {verified}
@@ -109,9 +110,9 @@ function ValidateMessage({
 
 
 export async function testTypedData(account: AccountInterface) {
-  const typedMessage0 = createTypedMessage({ revision: 1, messages: { key: '0x01111' } })
-  const typedMessage1 = createTypedMessage({ revision: 1, messages: { key: '0x1111' } })
-  const typedMessage2 = createTypedMessage({ revision: 1, messages: { key: '0x1112' } })
+  const typedMessage0 = createTypedMessage({ chainId: 'UNDERWARE_GG', revision: 1, messages: { key: '0x01111' } })
+  const typedMessage1 = createTypedMessage({ chainId: 'UNDERWARE_GG', revision: 1, messages: { key: '0x1111' } })
+  const typedMessage2 = createTypedMessage({ chainId: 'UNDERWARE_GG', revision: 1, messages: { key: '0x1112' } })
   const signature0 = await account.signMessage(typedMessage0)
   const signature1 = await account.signMessage(typedMessage1)
   const signature2 = await account.signMessage(typedMessage2)

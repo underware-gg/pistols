@@ -8,6 +8,8 @@ import { SceneName } from '@/pistols/hooks/PistolsContext'
 export enum TextureName {
   Testcard = 'Testcard',
   bg_gate = 'bg_gate',
+  bg_profile = 'bg_profile',
+  bg_tavern = 'bg_tavern',
   bg_duelists = 'bg_duelists',
   bg_duels_yours = 'bg_duels_yours',
   bg_duels_live = 'BG_DUEL',
@@ -21,6 +23,8 @@ export enum TextureName {
 const TEXTURES: Record<TextureName, { path: string }> = {
   [TextureName.Testcard]: { path: '/textures/testcard.jpg' },
   [TextureName.bg_gate]: { path: '/images/bg_gate.jpg' },
+  [TextureName.bg_profile]: { path: '/images/bg_profile.jpg' },
+  [TextureName.bg_tavern]: { path: '/images/bg_tavern.jpg' },
   [TextureName.bg_duelists]: { path: '/images/bg_duelists.jpg' },
   [TextureName.bg_duels_yours]: { path: '/images/bg_duels_yours.jpg' },
   [TextureName.bg_duels_live]: { path: '/images/bg_duels_live.jpg' },
@@ -33,9 +37,9 @@ const TEXTURES: Record<TextureName, { path: string }> = {
 }
 
 export const sceneBackgrounds: Record<SceneName, TextureName> = {
-  [SceneName.Splash]: TextureName.bg_duel,
   [SceneName.Gate]: TextureName.bg_gate,
-  [SceneName.Tavern]: TextureName.bg_duelists,
+  [SceneName.Profile]: TextureName.bg_profile,
+  [SceneName.Tavern]: TextureName.bg_tavern,
   [SceneName.Duelists]: TextureName.bg_duelists,
   [SceneName.YourDuels]: TextureName.bg_duels_yours,
   [SceneName.LiveDuels]: TextureName.bg_duels_live,

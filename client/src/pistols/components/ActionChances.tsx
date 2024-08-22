@@ -1,12 +1,12 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useSimulateChances } from '@/pistols/hooks/useContractCalls'
-import { useDojoConstants } from '@/lib/dojo/DojoContext'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import { Action } from '@/pistols/utils/pistols'
 import { EMOJI } from '@/pistols/data/messages'
 import ProgressBar from '@/pistols/components/ui/ProgressBar'
+import { HONOUR } from '@/games/pistols/generated/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -18,7 +18,6 @@ export function ActionChances({
   isA = false,
   isB = false,
 }) {
-  const { honour } = useDojoConstants()
   const { duelistId } = useSettings()
   const { challenge: { duelistIdA, duelistIdB }, round1 } = useDuel(duelId)
   const {
@@ -44,7 +43,7 @@ export function ActionChances({
   const otherDuelistId = useMemo(() => (isA ? duelistIdB : duelistIdA), [isA, isB, duelistIdB, duelistIdA])
   const { crit_chances: other_crit_chances } = useSimulateChances(otherDuelistId, duelId, roundNumber, Action.Strong)
 
-  console.log(`CHANCES:`, action_honour, crit_chances, crit_bonus, hit_chances, hit_bonus, lethal_chances, lethal_chances)
+  // console.log(`CHANCES:`, action_honour, crit_chances, crit_bonus, hit_chances, hit_bonus, lethal_chances, lethal_chances)
 
   const executionLabel = useMemo(() => {
     if ([Action.Flee, Action.Steal, Action.Seppuku].includes(action)) {
@@ -57,8 +56,7 @@ export function ActionChances({
   }, [action])
 
   const _critChances = crit_chances == 100 ? (crit_chances - other_crit_chances) : crit_chances
-  const _action_honour = (action_honour * 10)
-  const _honourValue = (action_honour >= 0 ? _action_honour : isA ? round1?.shot_a.honour : isB ? round1?.shot_b.honour : null) ?? 0
+  const _honourValue = (action_honour >= 0 ? action_honour : isA ? round1?.shot_a.honour : isB ? round1?.shot_b.honour : null) ?? 0
   // console.log(`HONOUR:`, action_honour, _honourValue)
   return (
     <>
@@ -74,10 +72,10 @@ export function ActionChances({
       />
       <ProgressBar disabled={!action} label='Honour:'
         value={_honourValue / 10} total={10}
-        negative={_action_honour >= 0 && _action_honour < honour.TRICKSTER_START}
-        warning={_action_honour >= honour.TRICKSTER_START && _action_honour < honour.LORD_START}
-        cold={_action_honour >= honour.LORD_START}
-        neutral={_action_honour < 0}
+        negative={action_honour >= 0 && action_honour < HONOUR.TRICKSTER_START}
+        warning={action_honour >= HONOUR.TRICKSTER_START && action_honour < HONOUR.LORD_START}
+        cold={action_honour >= HONOUR.LORD_START}
+        neutral={action_honour < 0}
       />
 
       {action > 0 &&

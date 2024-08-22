@@ -1,10 +1,7 @@
 #!/bin/bash
 set -e
+source scripts/setup.sh
 
-torii --version
-
-export PROFILE="dev"
-export WORLD_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.world_address)
 echo "@WORLD: $WORLD_ADDRESS"
 
 if [[
@@ -14,7 +11,20 @@ if [[
   exit 1
 fi
 
+#
+# torii over https instructions
+# https://web.dev/articles/how-to-use-local-https
+#
+# Install...
+# $ brew install mkcert
+# $ mkcert -install
+# 
+# Create certificate
+# $ mkcert 0.0.0.0
+
+torii --version
 torii \
   --world $WORLD_ADDRESS $* \
   --allowed-origins "*" --index-pending \
-
+  # --relay-local-key-path ./0.0.0.0-key.pem \
+  # --relay-cert-path ./0.0.0.0.pem \

@@ -1,96 +1,53 @@
-[tool.dojo.world]
-name = "Pistols at 10 Blocks"
-description = "An on-chain pistol duelling game of honour and betrayal."
-icon_uri = "https://pistols.underware.gg/images/logo.png"
-cover_uri = "https://pistols.underware.gg/images/splash.png"
-website = "https://pistols.underware.gg"
-
-[tool.dojo.world.socials]
-x = "https://x.com/underware_gg"
-github = "https://github.com/underware-gg/pistols"
-# discord = "https://discord.gg/FB2wR6uF"
-# telegram = "https://t.me/dojoengine"
-
 [package]
 name = "pistols"
-version = "0.9.1"
-cairo-version = "2.6.3"
+version = "0.10.0"
+cairo-version = "2.7.0"
 
 [cairo]
 sierra-replace-ids = true
 
+[scripts]
+migrate = "./migrate"
+
 [dependencies]
-dojo = { git = "https://github.com/dojoengine/dojo", tag = "v0.7.2" }
-# token = { git = "https://github.com/dojoengine/origami", tag = "v0.7.2" }
-token = { git = "https://github.com/rsodre/origami", branch = "balance-enumerable" }
+dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.0.0-alpha.6" }
+# origami_token = { git = "https://github.com/dojoengine/origami", tag = "v1.0.0-alpha.0" }
+origami_token = { git = "https://github.com/rsodre/origami", branch = "balance-enumerable" }
 graffiti = { git = "https://github.com/ponderingdemocritus/graffiti", rev = "bc569531791dbc71c6cd8d9bc154c34eedad31fe" }
-
-
-[tool.dojo]
-initializer_class_hash = "0xbeef"
+openzeppelin_account = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.0" }
+openzeppelin_test_common = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.0" }
 
 [[target.dojo]]
 build-external-contracts = [
-  "token::components::security::initializable::initializable_model",
-  "token::components::token::erc20::erc20_metadata::erc_20_metadata_model",
-  "token::components::token::erc20::erc20_balance::erc_20_balance_model",
-  "token::components::token::erc20::erc20_allowance::erc_20_allowance_model",
-  "token::components::token::erc20::erc20_mintable::erc_20_mintable_model",
-  "token::components::token::erc20::erc20_burnable::erc_20_burnable_model",
-  "token::components::token::erc20::erc20_bridgeable::erc_20_bridgeable_model",
-  "token::components::introspection::src5::src_5_model",
-  "token::components::token::erc721::erc721_approval::erc_721_operator_approval_model",
-  "token::components::token::erc721::erc721_approval::erc_721_token_approval_model",
-  "token::components::token::erc721::erc721_balance::erc_721_balance_model",
-  "token::components::token::erc721::erc721_enumerable::erc_721_enumerable_index_model",
-  "token::components::token::erc721::erc721_enumerable::erc_721_enumerable_owner_index_model",
-  "token::components::token::erc721::erc721_enumerable::erc_721_enumerable_owner_token_model",
-  "token::components::token::erc721::erc721_enumerable::erc_721_enumerable_token_model",
-  "token::components::token::erc721::erc721_enumerable::erc_721_enumerable_total_model",
-  "token::components::token::erc721::erc721_metadata::erc_721_meta_model",
-  "token::components::token::erc721::erc721_owner::erc_721_owner_model",
+  "origami_token::components::introspection::src5::SRC5Model",
+  "origami_token::components::security::initializable::InitializableModel",
+  # erc20
+  "origami_token::components::token::erc20::erc20_balance::ERC20BalanceModel",
+  "origami_token::components::token::erc20::erc20_metadata::ERC20MetadataModel",
+  "origami_token::components::token::erc20::erc20_allowance::ERC20AllowanceModel",
+  "origami_token::components::token::erc20::erc20_bridgeable::ERC20BridgeableModel",
+  # erc721
+  "origami_token::components::token::erc721::erc721_owner::ERC721OwnerModel",
+  "origami_token::components::token::erc721::erc721_balance::ERC721BalanceModel",
+  "origami_token::components::token::erc721::erc721_metadata::ERC721MetaModel",
+  "origami_token::components::token::erc721::erc721_enumerable::ERC721EnumerableIndexModel",
+  "origami_token::components::token::erc721::erc721_enumerable::ERC721EnumerableOwnerIndexModel",
+  "origami_token::components::token::erc721::erc721_enumerable::ERC721EnumerableOwnerTokenModel",
+  "origami_token::components::token::erc721::erc721_enumerable::ERC721EnumerableTokenModel",
+  "origami_token::components::token::erc721::erc721_enumerable::ERC721EnumerableTotalModel",
+  "origami_token::components::token::erc721::erc721_approval::ERC721TokenApprovalModel",
+  "origami_token::components::token::erc721::erc721_approval::ERC721OperatorApprovalModel",
 ]
 
-[tool.dojo.env]
-lords_address = ""
+[features]
+default = ["lords_mock"]
+lords_mock = []
 
-# -----------------------
-# dev (default)
-# 
-[profile.dev.tool.dojo.env]
-rpc_url = "http://localhost:5050"
-world_address = "0x0545c8aff15426c3d43b3ba8fd45c61870b30ca4ec0bfbd69193facee4c7b97c"
-account_address = "0xb3ff441a68610b30fd5e2abbf3a1548eb6ba6f3559f2862bf2dc757e5828ca"
-private_key = "0x2bbf4f9fd0bbb2e60b0316c1fe0b76cf7a4d0198bd493ced9b8df2a3a24d68a"
 
-# -----------------------
-# slot (pistols)
-# 
-[profile.slot.tool.dojo.env]
-rpc_url = "https://api.cartridge.gg/x/pistols/katana"
-world_address = "0x0545c8aff15426c3d43b3ba8fd45c61870b30ca4ec0bfbd69193facee4c7b97c"
-account_address = "0x2ec24cd4415a28e821c5b4b9dc3801340cb2e1a23f4289443d15fea60e2daab"
-private_key = "0x1f3a9e4f7827167d6f7e93b8f2debc3129b06ceca19d02355434499592bf16c"
-
-# -----------------------
-# staging (pistols-slot)
-# 
-[profile.staging.tool.dojo.env]
-rpc_url = "https://api.cartridge.gg/x/pistols-staging/katana"
-world_address = "0x0545c8aff15426c3d43b3ba8fd45c61870b30ca4ec0bfbd69193facee4c7b97c"
-account_address = "0x7947c7d3e02e85da3ba8c93024b006ab7f10dc6b8fb3cb151569c996869edba"
-private_key = "0x329a6dea7e53dcd104ab13494a29c6ddb1e472afebddcbd3ae11f8fe76a9e53"
-
-# -----------------------
-# SN_SEPOLIA
-# 
-[profile.sepolia.tool.dojo]
-skip_migration = ["pistols::mocks::lords_mock::lords_mock"]
-
-[profile.sepolia.tool.dojo.env]
-# rpc_url = "https://api.cartridge.gg/rpc/starknet-sepolia" # env: STARKNET_RPC_URL
-# rpc_url = "https://api.cartridge.gg/rpc/starknet-sepolia/v0_6" # env: STARKNET_RPC_URL
-world_address = "0x0545c8aff15426c3d43b3ba8fd45c61870b30ca4ec0bfbd69193facee4c7b97c"
-# account_address = "" # env: DOJO_ACCOUNT_ADDRESS
-# private_key = ""     # env: DOJO_PRIVATE_KEY
-lords_address = "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210"
+#--------------------------
+# Dojo profiles declaration
+#
+[profile.dev]
+[profile.slot]
+[profile.staging]
+[profile.sepolia]

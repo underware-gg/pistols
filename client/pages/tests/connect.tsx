@@ -8,12 +8,11 @@ import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { useSignTypedMessage, useTypedMessage, useVerifyMessagesOffChain, useVerifyMessagesOnChain } from '@/lib/utils/hooks/useTypedMessage'
 import { feltToString } from '@/lib/utils/starknet'
 import { bigintToHex, shortAddress } from '@/lib/utils/types'
-import { makeDojoAppConfig } from '@/games/pistols/config'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { ChainSwitcher } from '@/lib/dojo/ChainSwitcher'
 import { Messages } from '@/lib/utils/starknet_sign'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
-import AppDojo from '@/lib/ui/AppDojo'
+import App from '@/lib/ui/App'
 
 //@ts-ignore
 BigInt.prototype.toJSON = function () { return bigintToHex(this) }
@@ -28,14 +27,14 @@ const HeaderCell = Table.HeaderCell
 
 export default function IndexPage() {
   return (
-    <AppDojo dojoAppConfig={makeDojoAppConfig()}>
+    <App>
       <Container>
         <DojoAccount />
         <Connect />
         <SignV0 />
         <SignV1 />
       </Container>
-    </AppDojo>
+    </App>
   );
 }
 
@@ -139,8 +138,11 @@ function Connect() {
 function SignV0() {
   const { account, isConnected, chainId } = useAccount()
 
-  const messages: Messages = useMemo(() => ({ game: 'PISTOLS_AT_10_BLOCKS', purpose: 'SIGN_V0_TEST' }), [])
-  const { typedMessage, hash } = useTypedMessage({
+  const messages: Messages = useMemo(() => ({
+    game: 'PISTOLS_AT_10_BLOCKS',
+    purpose: 'SIGN_V0_TEST',
+  }), [])
+  const { typedMessage, messageHash } = useTypedMessage({
     revision: 0,
     messages,
     chainId,
@@ -156,7 +158,7 @@ function SignV0() {
       <Sign
         messages={messages}
         typedMessage={typedMessage}
-        hash={hash}
+        messageHash={messageHash}
         rawSignature={rawSignature}
         signaturePair={signaturePair}
         verified={formatted}
@@ -168,8 +170,11 @@ function SignV0() {
 function SignV1() {
   const { account, isConnected, chainId } = useAccount()
 
-  const messages: Messages = useMemo(() => ({ game: 'PISTOLS_AT_10_BLOCKS', purpose: 'SIGN_V1_TEST' }), [])
-  const { typedMessage, hash } = useTypedMessage({
+  const messages: Messages = useMemo(() => ({
+    game: 'PISTOLS_AT_10_BLOCKS',
+    purpose: 'SIGN_V1_TEST',
+  }), [])
+  const { typedMessage, messageHash } = useTypedMessage({
     account,
     revision: 1,
     chainId,
@@ -177,7 +182,7 @@ function SignV1() {
   })
   const { sign, signAsync, isSigning, rawSignature, signaturePair } = useSignTypedMessage(typedMessage)
   const { isVerified, formatted } = useVerifyMessagesOnChain(account, typedMessage, rawSignature)
-  useEffect(() => console.log(`SignV1`, isSigning, rawSignature, signaturePair, '>>>>>', isVerified), [isSigning, rawSignature, signaturePair, isVerified])
+  useEffect(() => console.log(`SignV1`, isSigning, rawSignature, signaturePair, '>>>>>', isVerified, typedMessage), [isSigning, rawSignature, signaturePair, isVerified])
 
   // useEffect(() => console.log(`typedMessage/hash/data:`, typedMessage, hash, rawSignature), [typedMessage, hash, rawSignature])
 
@@ -187,7 +192,7 @@ function SignV1() {
       <Sign
         messages={messages}
         typedMessage={typedMessage}
-        hash={hash}
+        messageHash={messageHash}
         rawSignature={rawSignature}
         signaturePair={signaturePair}
         verified={formatted}
@@ -200,14 +205,14 @@ function SignV1() {
 function Sign({
   messages,
   typedMessage,
-  hash,
+  messageHash,
   rawSignature,
   signaturePair,
   verified,
 }: {
   messages: Messages
   typedMessage: TypedData
-  hash: string
+  messageHash: string
   rawSignature: ArraySignatureType
   signaturePair: bigint[]
   verified: string
@@ -220,7 +225,7 @@ function Sign({
             Message
           </Cell>
           <Cell className='Code'>
-            {Object.keys(messages).map((k, i) => <React.Fragment key={k}>{k}:{shortAddress(messages[k])}<br /></React.Fragment>)}
+            {Object.keys(messages).map((k, i) => <React.Fragment key={k}>{k}:{(messages[k] as string)}<br /></React.Fragment>)}
           </Cell>
         </Row>
 
@@ -239,7 +244,7 @@ function Sign({
           </Cell>
           <Cell className='Code'>
             {/* {shortAddress(bigintToHex(hash))} */}
-            {bigintToHex(hash)}
+            {bigintToHex(messageHash)}
           </Cell>
         </Row>
 

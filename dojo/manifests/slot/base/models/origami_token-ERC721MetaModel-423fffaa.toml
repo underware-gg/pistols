@@ -1,0 +1,26 @@
+kind = "DojoModel"
+class_hash = "0x4310a938ba169a6d12cd0aa9dbeaf2992ddc4b55621bdeb883c0b43a3726d6d"
+original_class_hash = "0x4310a938ba169a6d12cd0aa9dbeaf2992ddc4b55621bdeb883c0b43a3726d6d"
+abi = "manifests/slot/base/abis/models/origami_token-ERC721MetaModel-423fffaa.json"
+tag = "origami_token-ERC721MetaModel"
+manifest_name = "origami_token-ERC721MetaModel-423fffaa"
+
+[[members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "name"
+type = "ByteArray"
+key = false
+
+[[members]]
+name = "symbol"
+type = "ByteArray"
+key = false
+
+[[members]]
+name = "base_uri"
+type = "ByteArray"
+key = false

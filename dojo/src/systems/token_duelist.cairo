@@ -64,17 +64,15 @@ trait ITokenDuelist<TState> {
     fn tokenOfOwnerByIndex(self: @TState, owner: ContractAddress, index: u256) -> u256;
 
     // ITokenDuelistPublic
-    fn initialize(ref self: TState, name: ByteArray, symbol: ByteArray, base_uri: ByteArray);
     fn mint(ref self: TState, to: ContractAddress, token_id: u256);
     fn burn(ref self: TState, token_id: u256);
     fn build_uri(self: @TState, token_id: u256, encode: bool) -> ByteArray;
 
-    // ITokenDuelistInternal
+    fn dojo_resource(ref self: TState) -> felt252;
 }
 
 #[starknet::interface]
 trait ITokenDuelistPublic<TState> {
-    fn initialize(ref self: TState, name: ByteArray, symbol: ByteArray, base_uri: ByteArray);
     fn mint(ref self: TState, to: ContractAddress, token_id: u256);
     fn burn(ref self: TState, token_id: u256);
     fn build_uri(self: @TState, token_id: u256, encode: bool) -> ByteArray;
@@ -87,10 +85,10 @@ mod token_duelist {
     use starknet::ContractAddress;
     use starknet::{get_contract_address, get_caller_address};
 
-    use pistols::models::token_config::{TokenConfig, TokenConfigTrait};
+    use pistols::interfaces::systems::{WorldSystemsTrait};
     use pistols::models::duelist::{Duelist, Score, Scoreboard, ScoreTrait};
-    use pistols::models::table::{tables};
-    use pistols::types::constants::{constants};
+    use pistols::models::table::{TABLES};
+    use pistols::types::constants::{CONST};
     use pistols::libs::utils::{CONSUME_BYTE_ARRAY};
     use pistols::utils::byte_arrays::{ByteArraysTrait, U8IntoByteArray, U16IntoByteArray, U32IntoByteArray, U256IntoByteArray, ByteArraySpanIntoByteArray};
     use pistols::utils::short_string::ShortStringTrait;
@@ -98,15 +96,15 @@ mod token_duelist {
     use graffiti::json::JsonImpl;
     use graffiti::{Tag, TagImpl};
 
-    use token::components::security::initializable::initializable_component;
-    use token::components::introspection::src5::src5_component;
-    use token::components::token::erc721::erc721_approval::erc721_approval_component;
-    use token::components::token::erc721::erc721_balance::erc721_balance_component;
-    use token::components::token::erc721::erc721_burnable::erc721_burnable_component;
-    use token::components::token::erc721::erc721_enumerable::erc721_enumerable_component;
-    use token::components::token::erc721::erc721_metadata::erc721_metadata_component;
-    use token::components::token::erc721::erc721_mintable::erc721_mintable_component;
-    use token::components::token::erc721::erc721_owner::erc721_owner_component;
+    use origami_token::components::security::initializable::initializable_component;
+    use origami_token::components::introspection::src5::src5_component;
+    use origami_token::components::token::erc721::erc721_approval::erc721_approval_component;
+    use origami_token::components::token::erc721::erc721_balance::erc721_balance_component;
+    use origami_token::components::token::erc721::erc721_burnable::erc721_burnable_component;
+    use origami_token::components::token::erc721::erc721_enumerable::erc721_enumerable_component;
+    use origami_token::components::token::erc721::erc721_metadata::erc721_metadata_component;
+    use origami_token::components::token::erc721::erc721_mintable::erc721_mintable_component;
+    use origami_token::components::token::erc721::erc721_owner::erc721_owner_component;
 
     component!(path: initializable_component, storage: initializable, event: InitializableEvent);
     component!(path: src5_component, storage: src5, event: SRC5Event);
@@ -205,6 +203,19 @@ mod token_duelist {
         const CALLER_IS_NOT_MINTER: felt252 = 'DUELIST: caller is not minter';
     }
 
+
+    fn dojo_init(ref self: ContractState) {
+        //*******************************
+        let TOKEN_NAME = "Pistols at 10 Blocks Duelists";
+        let TOKEN_SYMBOL = "DUELIST";
+        let BASE_URI = "https://pistols.underware.gg/";
+        //*******************************
+
+        self.erc721_metadata.initialize(TOKEN_NAME, TOKEN_SYMBOL, BASE_URI);
+        self.erc721_enumerable.initialize();
+        self.initializable.initialize();
+    }
+
     //
     // Metadata Hooks
     //
@@ -227,15 +238,8 @@ mod token_duelist {
     //
     #[abi(embed_v0)]
     impl TokenDuelistPublicImpl of super::ITokenDuelistPublic<ContractState> {
-        fn initialize(ref self: ContractState, name: ByteArray, symbol: ByteArray, base_uri: ByteArray) {
-            self.erc721_metadata.initialize(name, symbol, base_uri);
-            self.erc721_enumerable.initialize();
-            self.initializable.initialize();
-        }
-
         fn mint(ref self: ContractState, to: ContractAddress, token_id: u256) {
-            let config: TokenConfig = get!(self.world(), (get_contract_address()), TokenConfig);
-            assert(config.is_minter(get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
+            assert(self.world().is_minter_contract(get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
             self.erc721_mintable.mint(to, token_id);
         }
         
@@ -244,14 +248,14 @@ mod token_duelist {
         }
 
         fn build_uri(self: @ContractState, token_id: u256, encode: bool) -> ByteArray {
-            let duelist: Duelist = get!(self.world(), (token_id), Duelist);
+            let duelist: Duelist = get!(self.world(), (token_id.low), Duelist);
             let attributes: Span<ByteArray> = self.get_attributes(duelist.clone());
             let metadata = JsonImpl::new()
                 .add("id", token_id.into())
                 .add("name", self.format_name(token_id, duelist.clone()))
                 .add("description", self.format_description(token_id, duelist.clone()))
-                .add("image", self.format_image(duelist.clone(), "sq"))
-                .add("portrait", self.format_image(duelist.clone(), "a"))
+                .add("image", self.format_image(duelist.clone(), "square"))
+                .add("portrait", self.format_image(duelist.clone(), "portrait"))
                 .add("metadata", self.format_metadata(attributes))
                 .add_array("attributes", self.format_traits_array(attributes));
             let metadata = metadata.build();
@@ -285,7 +289,7 @@ mod token_duelist {
                 if (duelist.profile_pic_uri.len() == 0) {"00"}
                 else if (duelist.profile_pic_uri.len() == 1) {format!("0{}", duelist.profile_pic_uri)}
                 else {duelist.profile_pic_uri};
-            (format!("{}/profiles/{}_{}.jpg", base_uri, number, variant))
+            (format!("{}/profiles/{}/{}.jpg", base_uri, variant, number))
         }
 
         // returns: [key1, value1, key2, value2,...]
@@ -321,29 +325,35 @@ mod token_duelist {
             if (duelist.score.total_duels > 0) {
                 result.append("Total Wins");
                 result.append(duelist.score.total_wins.into());
+
                 result.append("Total Losses");
                 result.append(duelist.score.total_losses.into());
+                
                 result.append("Total Draws");
                 result.append(duelist.score.total_draws.into());
-                result.append("Accumulated Honour");
-                result.append(ScoreTrait::format_total_honour(duelist.score.total_honour));
+                
                 // Wager on Lords table
-                let scoreboard: Scoreboard = get!(self.world(), (tables::LORDS, duelist.duelist_id), Scoreboard);
+                let scoreboard: Scoreboard = get!(self.world(), (TABLES::LORDS, duelist.duelist_id), Scoreboard);
+                
                 result.append("Lords Won");
-                result.append((scoreboard.wager_won / constants::ETH_TO_WEI).into());
+                let amount: u128 = (scoreboard.wager_won / CONST::ETH_TO_WEI.low);
+                result.append(format!("{}", amount));
+                
                 result.append("Lords Lost");
                 if (scoreboard.wager_lost == 0) {
                     result.append("0");
                 } else {
-                    let amount: u256 = (scoreboard.wager_lost / constants::ETH_TO_WEI);
+                    let amount: u128 = (scoreboard.wager_lost / CONST::ETH_TO_WEI.low);
                     result.append(format!("-{}", amount));
                 }
+                
                 result.append("Lords Balance");
                 if (scoreboard.wager_lost > scoreboard.wager_won) {
-                    let amount: u256 = ((scoreboard.wager_lost - scoreboard.wager_won) / constants::ETH_TO_WEI);
+                    let amount: u128 = ((scoreboard.wager_lost - scoreboard.wager_won) / CONST::ETH_TO_WEI.low);
                     result.append(format!("-{}", amount));
                 } else {
-                    result.append(((scoreboard.wager_won - scoreboard.wager_lost) / constants::ETH_TO_WEI).into());
+                    let amount: u128 = ((scoreboard.wager_won - scoreboard.wager_lost) / CONST::ETH_TO_WEI.low);
+                    result.append(format!("{}", amount));
                 }
             }
             // done!

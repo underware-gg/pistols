@@ -10,7 +10,7 @@ mod shooter {
     use pistols::models::challenge::{Challenge, Snapshot, Round, Shot};
     use pistols::models::duelist::{Duelist, Score};
     use pistols::models::table::{TableConfig, TableType};
-    use pistols::types::constants::{constants};
+    use pistols::types::constants::{CONST};
     use pistols::types::challenge::{ChallengeState};
     use pistols::types::round::{RoundState};
     use pistols::types::action::{Action, ACTION, ActionTrait};
@@ -31,7 +31,7 @@ mod shooter {
         assert(caller == duelist_address, Errors::NOT_YOUR_CHALLENGE);
 
         // Correct Challenge state
-        assert(challenge.state == ChallengeState::InProgress.into(), Errors::CHALLENGE_NOT_IN_PROGRESS);
+        assert(challenge.state == ChallengeState::InProgress, Errors::CHALLENGE_NOT_IN_PROGRESS);
         assert(challenge.round_number == round_number, Errors::INVALID_ROUND_NUMBER);
         
         (challenge, duelist_number)
@@ -47,7 +47,7 @@ mod shooter {
 
         // Assert correct Round
         let mut round: Round = get!(world, (duel_id, round_number), Round);
-        assert(round.state == RoundState::Commit.into(), Errors::ROUND_NOT_IN_COMMIT);
+        assert(round.state == RoundState::Commit, Errors::ROUND_NOT_IN_COMMIT);
 
         // Validate action hash
 
@@ -62,7 +62,7 @@ mod shooter {
 
         // Finished commit
         if (round.shot_a.hash != 0 && round.shot_b.hash != 0) {
-            round.state = RoundState::Reveal.into();
+            round.state = RoundState::Reveal;
         }
 
         set!(world, (round));
@@ -77,7 +77,7 @@ mod shooter {
 
         // Assert correct Round
         let mut round: Round = get!(world, (duel_id, round_number), Round);
-        assert(round.state == RoundState::Reveal.into(), Errors::ROUND_NOT_IN_REVEAL);
+        assert(round.state == RoundState::Reveal, Errors::ROUND_NOT_IN_REVEAL);
 
         // Validate action hash
         let hash: u64 = utils::make_action_hash(salt, packed);
@@ -124,11 +124,11 @@ mod shooter {
             let is_last_round: bool = (slot2_a == 0 && slot2_b == 0);
             process_round(world, ref challenge, ref round, is_last_round);
             // open Round 3 if not over
-            if (challenge.state == ChallengeState::InProgress.into()) {
+            if (challenge.state == ChallengeState::InProgress) {
                 let mut round3 = Round {
                     duel_id: challenge.duel_id,
                     round_number: challenge.round_number,
-                    state: RoundState::Reveal.into(),
+                    state: RoundState::Reveal,
                     shot_a: Shot {
                         hash: 0,
                         salt: utils::scramble_salt(round.shot_a.salt),
@@ -206,7 +206,7 @@ mod shooter {
             end_challenge(ref challenge, ref round, ChallengeState::Resolved, 2);
         } else
         // both players still alive
-        if (challenge.round_number == constants::ROUND_COUNT || is_last_round || executed) {
+        if (challenge.round_number == CONST::ROUND_COUNT || is_last_round || executed) {
             // finished moves, and no winner, ends in a draw
             end_challenge(ref challenge, ref round, ChallengeState::Draw, 0);
         } else {
@@ -215,7 +215,7 @@ mod shooter {
         }
 
         // Finish round
-        round.state = RoundState::Finished.into();
+        round.state = RoundState::Finished;
         set!(world, (round));
     }
 
@@ -229,7 +229,7 @@ mod shooter {
     }
 
     fn end_challenge(ref challenge: Challenge, ref round: Round, state: ChallengeState, winner: u8) {
-        challenge.state = state.into();
+        challenge.state = state;
         challenge.winner = winner;
         challenge.timestamp_end = get_block_timestamp();
     }
@@ -322,7 +322,7 @@ mod tests {
     use pistols::models::challenge::{Shot};
     use pistols::models::init::{init};
     use pistols::types::action::{Action, ACTION};
-    use pistols::types::constants::{constants};
+    use pistols::types::constants::{CONST};
     use pistols::libs::utils;
 
     #[test]

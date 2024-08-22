@@ -1,5 +1,5 @@
-import React, { ReactElement, useState } from 'react'
-import { Menu, Button, Confirm, SemanticICONS } from 'semantic-ui-react'
+import React, { ReactElement, useMemo, useState } from 'react'
+import { Menu, Button, Confirm, SemanticICONS, Icon } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
@@ -44,13 +44,16 @@ export const ActionButton = ({
   className = null,
   onClick,
 }: ActionButtonProps) => {
-  let classNames = []
-  if (important && !disabled) classNames.push('Important')
-  // if (fill) classNames.push('FillParent')
-  if (large) classNames.push('LargeButton')
-  classNames.push((disabled || dimmed) ? 'Locked' : 'Unlocked')
-  if (negative) classNames.push('Negative')
-  if (className) classNames.push(className)
+  const classNames = useMemo(() => {
+    let classNames = []
+    if (important && !disabled) classNames.push('Important')
+    // if (fill) classNames.push('FillParent')
+    if (large) classNames.push('LargeButton')
+    classNames.push((disabled || dimmed) ? 'Locked' : 'Unlocked')
+    if (negative) classNames.push('Negative')
+    if (className) classNames.push(className)
+    return classNames
+  }, [className, important, disabled, large, dimmed, negative])
 
   const [isConfirming, setIsConfirming] = useState(false)
   const _click = () => {
@@ -126,24 +129,37 @@ export const BalanceRequiredButton = ({
 
 export const FilterButton = ({
   label,
+  icon,
+  disabled = false,
   toggle = true,
   state = false,
-  switchState,
+  grouped = false,
+  onClick,
 }: {
-  label: string
+  label?: string
+  icon?: SemanticICONS
+  disabled?: boolean
   toggle?: boolean
   state?: boolean
-  switchState: Function
+  grouped?: boolean
+  onClick: Function
 }) => {
+  const classNames = useMemo(() => {
+    let classNames = ['FilterButton']
+    if (!grouped) classNames.push('FilterButtonMargin')
+    return classNames
+  }, [grouped])
+  
   return (
     <Button
-      className='FilterButton'
+      className={classNames.join(' ')}
       toggle={toggle}
       active={state}
-      onClick={() => switchState()}
+      disabled={disabled}
+      onClick={() => onClick()}
       size='mini'
     >
-      {label}
+      {icon ? <Icon name={icon} className='NoMargin' /> : <>{label}</>}
     </Button>
   )
 }

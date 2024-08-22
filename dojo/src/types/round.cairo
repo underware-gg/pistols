@@ -3,10 +3,10 @@ use debug::PrintTrait;
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 enum RoundState {
-    Null,
-    Commit,
-    Reveal,
-    Finished,
+    Null,       // 0
+    Commit,     // 1
+    Reveal,     // 2
+    Finished,   // 3
 }
 
 mod ROUND_STATE {
@@ -108,7 +108,7 @@ mod tests {
 
     #[test]
     fn test_round_exists() {
-        let (world, _system, _admin, _lords, _minter) = tester::setup_world(flags::INITIALIZE | flags::APPROVE);
+        let (world, _actions, _admin, _lords, _minter) = tester::setup_world(flags::APPROVE);
         // get some random inexisting round
         let round: Round = tester::get_Round(world, 0x682137812638127638127, 1);
         let state: RoundState = round.state.try_into().unwrap();

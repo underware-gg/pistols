@@ -1,17 +1,16 @@
-import React, { useEffect, useMemo } from 'react'
-import { useRouter } from 'next/router'
+import React from 'react'
 import { useRouterStarter, useRouterListener } from '@/pistols/hooks/useRouterListener'
-import { usePistolsContext, SceneName } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { usePlayerId } from '@/lib/dojo/hooks/usePlayerId'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import AppPistols from '@/pistols/components/AppPistols'
-import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import GameContainer from '@/pistols/components/GameContainer'
 import Background from '@/pistols/components/Background'
-import Gate from '@/pistols/components/Gate'
-import Tavern from '@/pistols/components/Tavern'
+import ScProfile from '@/pistols/components/ScProfile'
+import ScTavern from '@/pistols/components/ScTavern'
+import Gate from '@/pistols/components/ScGate'
 import Duel from '@/pistols/components/Duel'
 
 // // enable wasm in build (this is for api routes and server issues)
@@ -19,122 +18,46 @@ import Duel from '@/pistols/components/Duel'
 //   runtime: 'experimental-edge'
 // }
 
-// //
-// // Booth config
-// import type { InferGetServerSidePropsType, GetServerSideProps } from 'next'
-// type Repo = {
-//   playerId: string
-// }
-// export const getServerSideProps = (async () => {
-//   const repo: Repo = {
-//     playerId: process.env.PLAYER_ID ?? ''
-//   }
-//   return { props: { repo } }
-// }) satisfies GetServerSideProps<{ repo: Repo }>
-
-
-// export default function MainPage({
-//   repo,
-// }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 export default function MainPage() {
-  const router = useRouter()
-  const { menuKey, dispatchSetScene } = usePistolsContext()
+  // let's initialzie player id always, it is a random client identifier
   const { playerId } = usePlayerId()
+  // this hook will parse slugs and manage the current scene
+  const { currentScene, sceneTitle } = usePistolsScene(true)
 
-  // useEffect(() => {
-  //   console.log((repo.playerId == playerId), playerId, repo)
-  //   if (repo.playerId && playerId && repo.playerId != playerId) {
-  //     router.push('/')
-  //   }
-  // }, [playerId, repo])
-
-  const { scene, title, duelId, bgClassName } = useMemo(() => {
-    let scene = undefined
-    let title = null
-    let duelId = null
-    let bgClassName = null
-
-    // parse page
-    if (router.isReady && router.query.main) {
-      const _page = router.query.main[0]
-      const _slugs = router.query.main.slice(1)
-      if (_page == 'gate') {
-        scene = SceneName.Gate
-        title = 'Pistols - Gate'
-        // bgClassName = 'BackgroundGate'
-      } else if (_page == 'tavern') {
-        scene = SceneName.Tavern
-        title = 'Pistols - Tavern'
-        // bgClassName = menuKey ? bgsTavern[menuKey] : 'BackgroundDuelists'
-      } else if (_page == 'duel') {
-        // '/room/[duel_id]'
-        if (_slugs.length > 0) {
-          scene = SceneName.Duel
-          duelId = BigInt(_slugs[0])
-          title = 'Pistols - Duel!'
-        } else {
-          scene = SceneName.Gate
-          router.push('/gate')
-        }
-        // bgClassName = 'BackgroundDuel'
-      }
-    }
-    return {
-      scene,
-      title,
-      duelId,
-      bgClassName,
-    }
-  }, [router.isReady, router.query, menuKey])
-
-  useEffect(() => {
-    if (scene !== undefined) {
-      dispatchSetScene(scene)
-    }
-    else if (router.isReady) {
-      // invalid route
-      router.push('/')
-    }
-  }, [scene, router.isReady])
-
-  // console.log(`AT scene [${scene}] menu [${menuKey}]`, atTavern, atDuel, duelId, gameImpl)
+  // console.log(`AT scene [${currentScene}]`)
 
   return (
-    <AppPistols headerData={{ title }} backgroundImage={null}>
-      <Background className={bgClassName}>
-        <GameContainer
-          isVisible={true}
-          duelId={duelId}
-        />
-        <MainUI duelId={duelId} />
+    <AppPistols headerData={{ title: sceneTitle }} backgroundImage={null}>
+      <Background className={null}>
+        <GameContainer isVisible={true} />
+        <MainUI />
       </Background>
     </AppPistols>
   )
 }
 
 function MainUI({
-  duelId
 }) {
   useRouterStarter()
   useRouterListener()
   const { gameImpl } = useThreeJsContext()
-  const { atGate, atTavern, atDuel, connectOpener } = usePistolsContext()
+  const { selectedDuelId } = usePistolsContext()
+  const { atGate, atProfile, atTavern, atDuel, currentScene } = usePistolsScene()
   const { isInitialized } = useDojoStatus()
 
-  if (!gameImpl) {
-    return <></>
-  }
+  // wait for three.js to load
+  if (!gameImpl) return <></>
 
-  if (!isInitialized) {
-    return <DojoStatus message={'Loading Pistols...'} />
-  }
+  // wait for Dojo to load
+  if (!isInitialized) return <DojoStatus message={'Loading Pistols...'} />
 
-  return (
-    <>
-      {atGate && <Gate />}
-      {atTavern && <Tavern />}
-      {atDuel && duelId && <Duel duelId={duelId} />}
-      <StarknetConnectModal opener={connectOpener} />
-    </>
-  )
+  // load Game Scene
+  if (atGate) return <Gate />
+  if (atProfile) return <ScProfile />
+  if (atTavern) return <ScTavern />
+  if (atDuel && selectedDuelId) return <Duel duelId={selectedDuelId} />
+
+  // ????
+  console.warn(`UNKNOWN SCENE [${currentScene}]`)
+  return <ScTavern />
 }

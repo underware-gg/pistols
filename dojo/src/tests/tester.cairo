@@ -1,43 +1,72 @@
 #[cfg(test)]
 mod tester {
-    use starknet::{ContractAddress, testing};
+    use starknet::{ContractAddress, testing, get_caller_address};
     use core::traits::Into;
     use array::ArrayTrait;
     use debug::PrintTrait;
 
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-    use dojo::test_utils::{spawn_test_world, deploy_contract};
+    use dojo::utils::test::{spawn_test_world, deploy_contract};
+
+    use origami_token::components::security::initializable::{initializable_model};
+    use origami_token::components::introspection::src5::{src_5_model};
+    use origami_token::components::token::erc20::{
+        erc20_balance::{erc_20_balance_model},
+        erc20_metadata::{erc_20_metadata_model},
+        erc20_allowance::{erc_20_allowance_model},
+        erc20_bridgeable::{erc_20_bridgeable_model},
+    };
+    use origami_token::components::token::erc721::{
+        erc721_approval::{erc_721_token_approval_model},
+        erc721_metadata::{erc_721_meta_model},
+        erc721_balance::{erc_721_balance_model},
+        erc721_owner::{erc_721_owner_model},
+        erc721_enumerable::{erc_721_enumerable_index_model},
+        erc721_enumerable::{erc_721_enumerable_owner_index_model},
+        erc721_enumerable::{erc_721_enumerable_owner_token_model},
+        erc721_enumerable::{erc_721_enumerable_token_model},
+        erc721_enumerable::{erc_721_enumerable_total_model},
+        erc721_approval::{erc_721_operator_approval_model},
+    };
 
     use pistols::systems::admin::{admin, IAdminDispatcher, IAdminDispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::systems::minter::{minter, IMinterDispatcher, IMinterDispatcherTrait};
     use pistols::systems::token_duelist::{token_duelist, ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait};
     use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
-    use pistols::tests::mock_erc721::{mock_erc721, IMockERC721Dispatcher, IMockERC721DispatcherTrait};
+    use pistols::tests::token::mock_token_duelist::{
+        token_duelist as mock_token_duelist,
+        // ITokenDuelistDispatcher,
+        // ITokenDuelistDispatcherTrait,
+    };
     use pistols::types::challenge::{ChallengeState};
-    use pistols::types::constants::{constants};
+    use pistols::types::constants::{CONST};
     use pistols::types::action::{Action};
     use pistols::utils::short_string::{ShortString};
+    use pistols::interfaces::systems::{SELECTORS};
 
     use pistols::models::challenge::{
-        Challenge, challenge,
-        Snapshot, snapshot,
-        Wager, wager,
-        Round, round,
+        challenge, Challenge,
+        snapshot, Snapshot,
+        wager, Wager,
+        round, Round,
     };
     use pistols::models::duelist::{
-        Duelist, duelist, DuelistTrait,
-        Scoreboard, scoreboard,
+        duelist, Duelist, DuelistTrait,
+        scoreboard, Scoreboard,
+        pact,
+        ProfilePicType,
         Archetype,
     };
     use pistols::models::config::{
-        Config, config,
+        config, Config,
     };
     use pistols::models::table::{
-        TableConfig, table_config,
+        table_config, TableConfig,
+        table_admittance, TableAdmittance,
     };
     use pistols::models::token_config::{
-        TokenConfig, token_config,
+        token_config, TokenConfig,
     };
 
     // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
@@ -48,37 +77,31 @@ mod tester {
     // https://github.com/starkware-libs/cairo/blob/main/corelib/src/starknet/testing.cairo
     //
 
-    #[inline(always)]
     fn ZERO() -> ContractAddress { starknet::contract_address_const::<0x0>() }
-    #[inline(always)]
     fn OWNER() -> ContractAddress { starknet::contract_address_const::<0x1>() }
-    #[inline(always)]
-    fn FAKE_OWNER() -> ContractAddress { starknet::contract_address_const::<0x1000000000000000000000000000000001>() }
-    #[inline(always)]
     fn OTHER() -> ContractAddress { starknet::contract_address_const::<0x2>() }
-    #[inline(always)]
     fn BUMMER() -> ContractAddress { starknet::contract_address_const::<0x3>() }
-    #[inline(always)]
     fn TREASURY() -> ContractAddress { starknet::contract_address_const::<0x444>() }
-    #[inline(always)]
     fn BIG_BOY() -> ContractAddress { starknet::contract_address_const::<0x54f650fb5e1fb61d7b429ae728a365b69e5aff9a559a05de70f606aaea1a243>() }
-    #[inline(always)]
-    fn LITTLE_BOY() -> ContractAddress { starknet::contract_address_const::<0xffff00000000000ee>() }
+    fn LITTLE_BOY()  -> ContractAddress { starknet::contract_address_const::<0xffff00000000000ee>() }
+    fn LITTLE_GIRL() -> ContractAddress { starknet::contract_address_const::<0xaaaa00000000000bb>() }
+    fn FAKE_OWNER_1_1() -> ContractAddress { starknet::contract_address_const::<0x1000000000000000000000000000000001>() }
+    fn FAKE_OWNER_1_2() -> ContractAddress { starknet::contract_address_const::<0x1000000000000000000000000000000002>() }
+    fn FAKE_OWNER_2_1() -> ContractAddress { starknet::contract_address_const::<0x2000000000000000000000000000000001>() }
+    fn FAKE_OWNER_2_2() -> ContractAddress { starknet::contract_address_const::<0x2000000000000000000000000000000002>() }
+    // always owned tokens: 0xffff, 0xaaaa
+    fn OWNED_BY_LITTLE_BOY()-> ContractAddress { starknet::contract_address_const::<0xffff>() }
+    fn OWNED_BY_LITTLE_GIRL() -> ContractAddress { starknet::contract_address_const::<0xaaaa>() }
 
-    #[inline(always)]
     fn ID(address: ContractAddress) -> u128 {
-        let as_felt: felt252 = address.into();
-        let as_u256: u256 = as_felt.into();
-        (as_u256.low)
-        // (DuelistTrait::address_to_id(address))
+        (DuelistTrait::address_as_id(address))
     }
 
     // set_contract_address : to define the address of the calling contract,
     // set_account_contract_address : to define the address of the account used for the current transaction.
     fn impersonate(address: ContractAddress) {
-        // testing::set_caller_address(address);   // not used??
-        testing::set_contract_address(address); // this is the CALLER!!
-        // testing::set_account_contract_address(address); // throws 'not writer'
+        testing::set_contract_address(address);
+        testing::set_account_contract_address(address);
     }
 
 
@@ -89,16 +112,16 @@ mod tester {
     const INITIAL_STEP: u64 = 0x10;
 
     mod flags {
-        const SYSTEM: u8     = 0b000001;
+        const ACTIONS: u8    = 0b000001;
         const ADMIN: u8      = 0b000010;
         const LORDS: u8      = 0b000100;
         const MINTER: u8     = 0b001000;
-        const INITIALIZE: u8 = 0b010000;
-        const APPROVE: u8    = 0b100000;
+        const APPROVE: u8    = 0b010000;
     }
 
-    fn deploy_system(world: IWorldDispatcher, salt: felt252, class_hash: felt252, call_data: Span<felt252>) -> ContractAddress {
-        let contract_address = world.deploy_contract(salt, class_hash.try_into().unwrap(), call_data);
+    #[inline(always)]
+    fn deploy_system(world: IWorldDispatcher, salt: felt252, class_hash: felt252) -> ContractAddress {
+        let contract_address = world.deploy_contract(salt, class_hash.try_into().unwrap());
         (contract_address)
     }
 
@@ -109,86 +132,157 @@ mod tester {
         ILordsMockDispatcher,
         IMinterDispatcher,
     ) {
-        let mut deploy_system: bool = (flags & flags::SYSTEM) != 0;
+        let mut deploy_actions: bool = (flags & flags::ACTIONS) != 0;
         let mut deploy_admin: bool = (flags & flags::ADMIN) != 0;
         let mut deploy_lords: bool = (flags & flags::LORDS) != 0;
         let mut deploy_minter: bool = (flags & flags::MINTER) != 0;
-        let initialize: bool = (flags & flags::INITIALIZE) != 0;
         let approve: bool = (flags & flags::APPROVE) != 0;
 
+        deploy_actions = deploy_actions || approve;
+        deploy_lords = deploy_lords || deploy_actions || approve;
+        deploy_admin = deploy_admin || deploy_actions || deploy_actions;
+        // deploy_minter = deploy_minter || deploy_actions;
+
+// '----1'.print();
+// (erc_20_balance_model::TEST_CLASS_HASH).print();
+// (erc_20_metadata_model::TEST_CLASS_HASH).print();
+// (erc_20_allowance_model::TEST_CLASS_HASH).print();
+// selector_from_tag!("origami_token-ERC20AllowanceModel").print();
+// selector_from_tag!("origami_token-ERC20BalanceModel").print();
+// selector_from_tag!("origami_token-ERC20MetadataModel").print();
+
         let mut models = array![
+            //
+            // missing models cause ('invalid resource selector')
+            //
+            src_5_model::TEST_CLASS_HASH,
+            erc_20_balance_model::TEST_CLASS_HASH,
+            erc_20_metadata_model::TEST_CLASS_HASH,
+            erc_20_allowance_model::TEST_CLASS_HASH,
+            erc_20_bridgeable_model::TEST_CLASS_HASH,
+            erc_721_token_approval_model::TEST_CLASS_HASH,
+            erc_721_balance_model::TEST_CLASS_HASH,
+            erc_721_meta_model::TEST_CLASS_HASH,
+            erc_721_owner_model::TEST_CLASS_HASH,
+            erc_721_enumerable_index_model::TEST_CLASS_HASH,
+            erc_721_enumerable_owner_index_model::TEST_CLASS_HASH,
+            erc_721_enumerable_owner_token_model::TEST_CLASS_HASH,
+            erc_721_enumerable_token_model::TEST_CLASS_HASH,
+            erc_721_enumerable_total_model::TEST_CLASS_HASH,
+            erc_721_operator_approval_model::TEST_CLASS_HASH,
+            // pistols
             duelist::TEST_CLASS_HASH,
             scoreboard::TEST_CLASS_HASH,
             challenge::TEST_CLASS_HASH,
             snapshot::TEST_CLASS_HASH,
             wager::TEST_CLASS_HASH,
             round::TEST_CLASS_HASH,
+            pact::TEST_CLASS_HASH,
+            // admin
             config::TEST_CLASS_HASH,
             table_config::TEST_CLASS_HASH,
+            table_admittance::TEST_CLASS_HASH,
+            // minter
             token_config::TEST_CLASS_HASH,
         ];
 
         // setup testing
-        impersonate(OWNER()); // this is the CALLER!!
         testing::set_block_number(1);
         testing::set_block_timestamp(INITIAL_TIMESTAMP);
 
-        deploy_system = deploy_system || approve;
-        deploy_admin = deploy_admin || initialize;
-        deploy_lords = deploy_lords || approve || deploy_system;
+        // deploy world
+// '---- spawn_test_world...'.print();
+        let world: IWorldDispatcher = spawn_test_world(["origami_token", "pistols"].span(),  models.span());
+// '---- spawned...'.print();
+        world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), OWNER());
 
-        // systems
-        let world: IWorldDispatcher = spawn_test_world(models);
-        let system = IActionsDispatcher{ contract_address:
-            if (deploy_system) {deploy_system(world, 'salt', actions::TEST_CLASS_HASH, array![].span())}
-            else {ZERO()}
-        };
-        let admin = IAdminDispatcher{ contract_address:
-            if (deploy_admin) {deploy_system(world, 'admin', admin::TEST_CLASS_HASH, array![].span())}
+        // deploy systems
+        let actions = IActionsDispatcher{ contract_address:
+            if (deploy_actions) {
+                let address = deploy_system(world, 'salt', actions::TEST_CLASS_HASH);
+                world.grant_owner(SELECTORS::ACTIONS, OWNER());
+                world.grant_writer(selector_from_tag!("pistols-Duelist"), address);
+                world.grant_writer(selector_from_tag!("pistols-Scoreboard"), address);
+                world.grant_writer(selector_from_tag!("pistols-Challenge"), address);
+                world.grant_writer(selector_from_tag!("pistols-Snapshot"), address);
+                world.grant_writer(selector_from_tag!("pistols-Wager"), address);
+                world.grant_writer(selector_from_tag!("pistols-Pact"), address);
+                world.grant_writer(selector_from_tag!("pistols-Round"), address);
+                (address)
+            }
             else {ZERO()}
         };
         let lords = ILordsMockDispatcher{ contract_address:
-            if (deploy_lords) {deploy_system(world, 'lords_mock', lords_mock::TEST_CLASS_HASH, array![].span())}
+            if (deploy_lords) {
+                let address = deploy_system(world, 'lords_mock', lords_mock::TEST_CLASS_HASH);
+                // world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), OWNER());
+                world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), address);
+                // world.grant_owner(SELECTORS::LORDS_MOCK, OWNER());
+                (address)
+            }
             else {ZERO()}
         };
         let duelists = ITokenDuelistDispatcher{ contract_address:
-            if (deploy_minter) {deploy_system(world, 'duelists', token_duelist::TEST_CLASS_HASH, array![].span())}
-            else {deploy_system(world, 'mock_erc721', mock_erc721::TEST_CLASS_HASH, array![].span())}
-            
+            if (deploy_minter) {
+                let address = deploy_system(world, 'token_duelist', token_duelist::TEST_CLASS_HASH);
+                world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), address);
+                // world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), OWNER());
+                world.grant_writer(SELECTORS::TOKEN_DUELIST, OWNER());
+                world.init_contract(SELECTORS::TOKEN_DUELIST, [].span());
+                (address)
+            }
+            else {
+                (deploy_system(world, 'token_duelist', mock_token_duelist::TEST_CLASS_HASH))
+            }
         };
-        let minter_call_data: Array<felt252> = array![
-            duelists.contract_address.into(),
-            100, // max_supply
-            3, // wallet_max
-            1, // is_open
-        ];
         let minter = IMinterDispatcher{ contract_address:
-            if (deploy_minter) {deploy_system(world, 'minter', minter::TEST_CLASS_HASH, minter_call_data.span())}
+            if (deploy_minter) {
+                let address = deploy_system(world, 'minter', minter::TEST_CLASS_HASH);
+                let minter_call_data: Array<felt252> = array![
+                    duelists.contract_address.into(),
+                    100, // max_supply
+                    3, // wallet_max
+                    1, // is_open
+                ];
+                world.grant_owner(SELECTORS::MINTER, OWNER());
+                world.grant_writer(selector_from_tag!("pistols-TokenConfig"), address);
+                world.init_contract(SELECTORS::MINTER, minter_call_data.span());
+                (address)
+            }
             else {ZERO()}
-            
         };
-        // auths
-        // world.grant_writer(selector!("TokenConfig"), duelists.contract_address);
+        let admin = IAdminDispatcher{ contract_address:
+            if (deploy_admin) {
+                let address = deploy_system(world, 'admin', admin::TEST_CLASS_HASH);
+                let admin_call_data: Array<felt252> = array![
+                    TREASURY().into(), // treasury
+                    lords.contract_address.into(),
+                ];
+                world.grant_owner(SELECTORS::ADMIN, OWNER());
+                world.grant_writer(selector_from_tag!("pistols-Config"), address);
+                world.grant_writer(selector_from_tag!("pistols-TableConfig"), address);
+                world.grant_writer(selector_from_tag!("pistols-TableAdmittance"), address);
+                world.init_contract(SELECTORS::ADMIN, admin_call_data.span());
+                (address)
+            }
+            else {ZERO()}
+        };
+
         // initializers
         if (deploy_lords) {
-            execute_lords_initializer(lords, OWNER());
             execute_lords_faucet(lords, OWNER());
             execute_lords_faucet(lords, OTHER());
         }
-        if (initialize) {
-            execute_admin_initialize(admin, 
-                OWNER(), OWNER(), TREASURY(),
-                lords.contract_address,
-                duelists.contract_address,
-                minter.contract_address,
-            );
-        }
         if (approve) {
-            execute_lords_approve(lords, OWNER(), system.contract_address, 1_000_000 * constants::ETH_TO_WEI);
-            execute_lords_approve(lords, OTHER(), system.contract_address, 1_000_000 * constants::ETH_TO_WEI);
-            execute_lords_approve(lords, BUMMER(), system.contract_address, 1_000_000 * constants::ETH_TO_WEI);
+            execute_lords_approve(lords, OWNER(), actions.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
+            execute_lords_approve(lords, OTHER(), actions.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
+            execute_lords_approve(lords, BUMMER(), actions.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
         }
-        (world, system, admin, lords, minter)
+
+        impersonate(OWNER());
+
+// '---- READY!'.print();
+        (world, actions, admin, lords, minter)
     }
 
     fn elapse_timestamp(delta: u64) -> (u64, u64) {
@@ -222,19 +316,14 @@ mod tester {
     //
 
     // ::admin
-    fn execute_admin_initialize(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress, treasury_address: ContractAddress, lords_address: ContractAddress, duelist_address: ContractAddress, minter_address: ContractAddress) {
+    fn execute_admin_grant_admin(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress, granted: bool) {
         impersonate(sender);
-        system.initialize(owner_address, treasury_address, lords_address, duelist_address, minter_address, ZERO(), ZERO());
+        system.grant_admin(owner_address, granted);
         _next_block();
     }
-    fn execute_admin_set_owner(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress) {
+    fn execute_admin_set_config(system: IAdminDispatcher, sender: ContractAddress, config: Config) {
         impersonate(sender);
-        system.set_owner(owner_address);
-        _next_block();
-    }
-    fn execute_admin_set_treasury(system: IAdminDispatcher, sender: ContractAddress, treasury_address: ContractAddress) {
-        impersonate(sender);
-        system.set_treasury(treasury_address);
+        system.set_config(config);
         _next_block();
     }
     fn execute_admin_set_paused(system: IAdminDispatcher, sender: ContractAddress, paused: bool) {
@@ -242,45 +331,45 @@ mod tester {
         system.set_paused(paused);
         _next_block();
     }
-    fn execute_admin_set_table(system: IAdminDispatcher, sender: ContractAddress, table_id: felt252, contract_address: ContractAddress, description: felt252, fee_min: u256, fee_pct: u8, enabled: bool) {
+    fn execute_admin_set_table(system: IAdminDispatcher, sender: ContractAddress, table: TableConfig) {
         impersonate(sender);
-        system.set_table(table_id, contract_address, description, fee_min, fee_pct, enabled);
+        system.set_table(table);
         _next_block();
     }
-    fn execute_admin_enable_table(system: IAdminDispatcher, sender: ContractAddress, table_id: felt252, enabled: bool) {
+    fn execute_admin_set_table_admittance(system: IAdminDispatcher, sender: ContractAddress, table_admittance: TableAdmittance) {
         impersonate(sender);
-        system.enable_table(table_id, enabled);
+        system.set_table_admittance(table_admittance);
+        _next_block();
+    }
+    fn execute_admin_open_table(system: IAdminDispatcher, sender: ContractAddress, table_id: felt252, enabled: bool) {
+        impersonate(sender);
+        system.open_table(table_id, enabled);
         _next_block();
     }
 
     // ::ierc20
-    fn execute_lords_initializer(system: ILordsMockDispatcher, sender: ContractAddress) {
-        impersonate(sender);
-        system.initializer();
-        _next_block();
-    }
     fn execute_lords_faucet(system: ILordsMockDispatcher, sender: ContractAddress) {
         impersonate(sender);
         system.faucet();
         _next_block();
     }
-    fn execute_lords_approve(system: ILordsMockDispatcher, owner: ContractAddress, spender: ContractAddress, value: u256) {
+    fn execute_lords_approve(system: ILordsMockDispatcher, owner: ContractAddress, spender: ContractAddress, value: u128) {
         impersonate(owner);
-        system.approve(spender, value);
+        system.approve(spender, value.into());
         _next_block();
     }
 
     // ::actions
-    fn execute_mint_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: u8, profile_pic_uri: felt252, archetype: Archetype) -> Duelist {
+    fn execute_mint_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252, archetype: Archetype) -> Duelist {
         impersonate(sender);
         let duelist: Duelist = system.mint_duelist(name, profile_pic_type, profile_pic_uri, archetype);
         _next_block();
         (duelist)
     }
-    fn execute_update_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: u8, profile_pic_uri: felt252) -> Duelist {
-        (execute_update_duelist_id(system, sender, ID(sender), name, profile_pic_type, profile_pic_uri))
+    fn execute_update_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist {
+        (execute_update_duelist_ID(system, sender, ID(sender), name, profile_pic_type, profile_pic_uri))
     }
-    fn execute_update_duelist_id(system: IActionsDispatcher, sender: ContractAddress, duelist_id: u128, name: felt252, profile_pic_type: u8, profile_pic_uri: felt252) -> Duelist {
+    fn execute_update_duelist_ID(system: IActionsDispatcher, sender: ContractAddress, duelist_id: u128, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist {
         impersonate(sender);
         let duelist: Duelist = system.update_duelist(duelist_id, name, profile_pic_type, profile_pic_uri);
         _next_block();
@@ -290,11 +379,21 @@ mod tester {
         challenged: ContractAddress,
         message: felt252,
         table_id: felt252,
-        wager_value: u256,
-        expire_seconds: u64,
+        wager_value: u128,
+        expire_hours: u64,
+    ) -> u128 {
+        (execute_create_challenge_ID(system, sender, ID(sender), challenged, message, table_id, wager_value, expire_hours))
+    }
+    fn execute_create_challenge_ID(system: IActionsDispatcher, sender: ContractAddress,
+        token_id: u128,
+        challenged: ContractAddress,
+        message: felt252,
+        table_id: felt252,
+        wager_value: u128,
+        expire_hours: u64,
     ) -> u128 {
         impersonate(sender);
-        let duel_id: u128 = system.create_challenge(ID(sender), challenged, message, table_id, wager_value, expire_seconds);
+        let duel_id: u128 = system.create_challenge(token_id, challenged, message, table_id, wager_value, expire_hours);
         _next_block();
         (duel_id)
     }
@@ -302,14 +401,11 @@ mod tester {
         duel_id: u128,
         accepted: bool,
     ) -> ChallengeState {
-        impersonate(sender);
-        let new_state: ChallengeState = system.reply_challenge(ID(sender), duel_id, accepted);
-        _next_block();
-        (new_state)
+        (execute_reply_challenge_ID(system, sender, ID(sender), duel_id, accepted))
     }
-    fn execute_reply_challenge_id(system: IActionsDispatcher, sender: ContractAddress,
-        duel_id: u128,
+    fn execute_reply_challenge_ID(system: IActionsDispatcher, sender: ContractAddress,
         token_id: u128,
+        duel_id: u128,
         accepted: bool,
     ) -> ChallengeState {
         impersonate(sender);
@@ -360,6 +456,10 @@ mod tester {
         (get!(world, table_id, TableConfig))
     }
     #[inline(always)]
+    fn get_TableAdmittance(world: IWorldDispatcher, table_id: felt252) -> TableAdmittance {
+        (get!(world, table_id, TableAdmittance))
+    }
+    #[inline(always)]
     fn get_Duelist(world: IWorldDispatcher, address: ContractAddress) -> Duelist {
         (get!(world, ID(address), Duelist))
     }
@@ -399,11 +499,42 @@ mod tester {
     }
 
     //
+    // setters
+    //
+
+    fn set_TableConfig(world: IWorldDispatcher, contract_address: ContractAddress, table: TableConfig) {
+        let current_contract_address = starknet::get_contract_address();
+        testing::set_contract_address(contract_address);
+        set!(world, (table));
+        testing::set_contract_address(current_contract_address);
+    }
+    fn set_Round(world: IWorldDispatcher, contract_address: ContractAddress, round: Round) {
+        let current_contract_address = starknet::get_contract_address();
+        testing::set_contract_address(contract_address);
+        // round.set(world); // if not available, import RoundModelImpl
+        // dojo::model::Model::<Round>::set(@round, world); // if not available, import RoundModelImpl
+        set!(world, (round));
+        testing::set_contract_address(current_contract_address);
+    }
+    fn set_Duelist(world: IWorldDispatcher, contract_address: ContractAddress, duelist: Duelist) {
+        let current_contract_address = starknet::get_contract_address();
+        testing::set_contract_address(contract_address);
+        set!(world, (duelist));
+        testing::set_contract_address(current_contract_address);
+    }
+    fn set_Scoreboard(world: IWorldDispatcher, contract_address: ContractAddress, scoreboard: Scoreboard) {
+        let current_contract_address = starknet::get_contract_address();
+        testing::set_contract_address(contract_address);
+        set!(world, (scoreboard));
+        testing::set_contract_address(current_contract_address);
+    }
+
+    //
     // Asserts
     //
 
-    fn assert_balance(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u256, subtract: u256, add: u256, prefix: felt252) -> u256 {
-        let balance: u256 = lords.balance_of(address);
+    fn assert_balance(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, subtract: u128, add: u128, prefix: felt252) -> u128 {
+        let balance: u128 = lords.balance_of(address).low;
         if (subtract > add) {
             assert(balance < balance_before, ShortString::concat(prefix, ' <'));
         } else if (add > subtract) {
@@ -418,8 +549,8 @@ mod tester {
     fn assert_winner_balance(lords: ILordsMockDispatcher,
         winner: u8,
         duelist_a: ContractAddress, duelist_b: ContractAddress,
-        balance_a: u256, balance_b: u256,
-        fee: u256, wager_value: u256,
+        balance_a: u128, balance_b: u128,
+        fee: u128, wager_value: u128,
         prefix: felt252,
     ) {
         if (winner == 1) {

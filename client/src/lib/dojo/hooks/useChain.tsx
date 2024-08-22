@@ -1,12 +1,13 @@
 
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Connector, useAccount, useConnect } from '@starknet-react/core'
 import { SwitchStarknetChainParameter, AddStarknetChainParameters } from 'get-starknet-core'
-import { useAccount } from '@starknet-react/core'
+import { useAddStarknetChain, useSwitchStarknetChain } from '@/lib/dojo/hooks/useWalletRequest'
 import { ChainId, getDojoChainConfig, isChainIdSupported } from '@/lib/dojo/setup/chainConfig'
+import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
 import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { feltToString } from '@/lib/utils/starknet'
-import { BigNumberish } from 'starknet'
-import { useAddStarknetChain, useSwitchStarknetChain } from './useWalletRequest'
+import { BigNumberish, Provider } from 'starknet'
 
 
 export const useChainConfig = (chain_id: ChainId | BigNumberish) => {
@@ -22,6 +23,12 @@ export const useChainConfig = (chain_id: ChainId | BigNumberish) => {
     chainName,
     chainConfig,
   }
+}
+
+export const useChainConfigProvider = (chain_id: ChainId | BigNumberish): Provider => {
+  const { chainConfig } = useChainConfig(chain_id)
+  const provider = useMemo(() => (chainConfig?.rpcUrl ? new Provider({ nodeUrl: chainConfig.rpcUrl }) : null), [chainConfig])
+  return provider
 }
 
 export const useSelectedChain = () => {
@@ -53,6 +60,45 @@ export const useSelectedChain = () => {
   }
 }
 
+export const useConnectToSelectedChain = (onConnect?: () => void) => {
+  const { connect, connectors } = useConnect()
+  const { isConnected, isConnecting } = useAccount()
+
+  const [requestedConnect, setRequestedConnect] = useState(false)
+  useEffect(() => {
+    if (requestedConnect && isConnected) {
+      onConnect?.()
+    }
+  }, [requestedConnect, isConnected])
+
+  let _connect = useCallback(() => {
+    if (isConnected) {
+      onConnect?.()
+    } else if (!isConnecting) {
+      const controller = connectors.find((connector) => (connector.id == supportedConnetorIds.CONTROLLER));
+      const predeployed = connectors.find((connector) => (connector.id == supportedConnetorIds.DOJO_PREDEPLOYED));
+      if (controller) {
+        console.log(`Connecting to controller...`)
+        setRequestedConnect(true)
+        connect({ connector: controller })
+      } else if (predeployed) {
+        console.log(`Connecting to predeployed...`)
+        setRequestedConnect(true)
+        connect({ connector: predeployed })
+      } else {
+        setRequestedConnect(false)
+        console.warn(`NO CONNECTOR!`)
+      }
+    }
+  }, [connectors, isConnected, isConnecting])
+
+
+  return {
+    connect: _connect,
+    isConnected,
+    isConnecting,
+  }
+}
 
 //-----------------------------
 // Chain switch callbacks

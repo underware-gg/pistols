@@ -4,7 +4,7 @@ import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
-import { useIsMyDuelist } from '@/pistols/hooks/useIsMyDuelist'
+import { useIsMyDuelist } from '@/pistols/hooks/useIsYou'
 import { AccountChangeDetector, ChainChangeDetector } from '@/lib/dojo/ChangeDetector'
 
 export function DojoSetupErrorDetector() {
@@ -12,8 +12,8 @@ export function DojoSetupErrorDetector() {
   const router = useRouter()
   useEffect(() => {
     if(isError) {
-      router.push('/gate')
-      // location.href = '/gate'
+      router.push('/')
+      // location.href = '/'
     }
   }, [isError])
   return <></>
@@ -22,12 +22,12 @@ export function DojoSetupErrorDetector() {
 export function ConnectionDetector() {
   const { isConnected } = useSelectedChain()
   const { connectOpener } = usePistolsContext()
-  const { duelistId, isGuest, dispatchDuelistId } = useSettings()
+  const { duelistId, isAnon, dispatchDuelistId } = useSettings()
   const isMyDuelist = useIsMyDuelist(duelistId)
 
   // const router = useRouter()
   const _backToGate = () => {
-    // router.push('/gate')
+    // router.push('/')
     dispatchDuelistId(0n)
   }
 
@@ -39,7 +39,7 @@ export function ConnectionDetector() {
   const [askedToConnect, setAskedToConnect] = useState<boolean>(undefined)
   useEffect(() => {
     if (isConnected !== undefined && askedToConnect === undefined) {
-      if (!isConnected && !isGuest) {
+      if (!isConnected && !isAnon) {
         setAskedToConnect(true)
         connectOpener.open()
       } else {

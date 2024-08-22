@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { Grid, Menu, Label, Tab, TabPane } from 'semantic-ui-react'
+import { useAccount, useDisconnect } from '@starknet-react/core'
+import { useQueryContext } from '@/pistols/hooks/QueryContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { usePistolsContext, MenuKey } from '@/pistols/hooks/PistolsContext'
-import { useChallengesByDuelistIdTotals, useLiveChallengeIds } from '@/pistols/hooks/useChallenge'
+import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useTable } from '@/pistols/hooks/useTable'
 import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
 import { IRLTournamentTab } from '@/pistols/components/tournament/IRLTournamentTab'
@@ -28,46 +28,28 @@ const _makeBubble = (count) => {
 
 export function TavernMenu({
 }) {
-  const router = useRouter()
-  const { tableId, duelistId, isGuest } = useSettings()
-  const { menuKey, tavernMenuItems, tableOpener, dispatchSetMenu } = usePistolsContext()
+  const { tableId, isAnon } = useSettings()
+  const { tavernMenuItems, tableOpener } = usePistolsContext()
+  const { currentScene, dispatchSetScene } = usePistolsScene()
   const { description, isTournament, isIRLTournament } = useTable(tableId)
 
-  const { liveDuelsCount: yourDuelsCount } = useChallengesByDuelistIdTotals(duelistId, tableId)
-  const { challengeIds: liveChallengeIds } = useLiveChallengeIds(tableId)
-  const liveDuelsCount = useMemo(() => (liveChallengeIds.length), [liveChallengeIds])
-
-  const [started, setStarted] = useState<boolean>(false)
-
-  useEffect(() => {
-    if (!started) {
-      setStarted(true)
-      if (isGuest) {
-        dispatchSetMenu(MenuKey.LiveDuels)
-      } else if (isTournament) {
-        dispatchSetMenu(MenuKey.Tournament)
-      } else if (isIRLTournament) {
-        dispatchSetMenu(MenuKey.IRLTournament)
-      } else if (yourDuelsCount > 0) {
-        dispatchSetMenu(MenuKey.YourDuels)
-      } else {
-        dispatchSetMenu(MenuKey.Duelists)
-      }
-    }
-  }, [started, isGuest, yourDuelsCount, liveDuelsCount])
+  const {
+    queryLiveDuels: { liveCount: liveDuelsCount },
+    queryYourDuels: { liveCount: yourDuelsCount },
+  } = useQueryContext()
 
   const panes = useMemo(() => {
     let result = []
     tavernMenuItems.forEach(key => {
-      if (key === MenuKey.Tournament && !isTournament) return
-      if (key === MenuKey.IRLTournament && !isIRLTournament) return
-      const bubble = (key == MenuKey.YourDuels) ? _makeBubble(yourDuelsCount) : (key == MenuKey.LiveDuels) ? _makeBubble(liveDuelsCount) : null
+      if (key === SceneName.Tournament && !isTournament) return
+      if (key === SceneName.IRLTournament && !isIRLTournament) return
+      const bubble = (key == SceneName.YourDuels) ? _makeBubble(yourDuelsCount) : (key == SceneName.LiveDuels) ? _makeBubble(liveDuelsCount) : null
       result.push({
         key,
         menuItem: (
           <Menu.Item
             key={key}
-            onClick={() => dispatchSetMenu(key as MenuKey)}
+            onClick={() => dispatchSetScene(key as SceneName)}
           >
             {key}
             {bubble}
@@ -76,12 +58,12 @@ export function TavernMenu({
         render: () => (
           <TabPane attached={true}>
             <div className='UIMenuTavernScroller'>
-              {key === MenuKey.Duelists && <DuelistTable />}
-              {key === MenuKey.YourDuels && <ChallengeTableYour />}
-              {key === MenuKey.LiveDuels && <ChallengeTableLive />}
-              {key === MenuKey.PastDuels && <ChallengeTablePast />}
-              {key === MenuKey.Tournament && <></>}
-              {key === MenuKey.IRLTournament && <IRLTournamentTab />}
+              {key === SceneName.Duelists && <DuelistTable />}
+              {key === SceneName.YourDuels && <ChallengeTableYour />}
+              {key === SceneName.LiveDuels && <ChallengeTableLive />}
+              {key === SceneName.PastDuels && <ChallengeTablePast />}
+              {key === SceneName.Tournament && <></>}
+              {key === SceneName.IRLTournament && <IRLTournamentTab />}
             </div>
           </TabPane>
         )
@@ -90,14 +72,23 @@ export function TavernMenu({
     return result
   }, [tavernMenuItems, yourDuelsCount, liveDuelsCount, isTournament, isIRLTournament])
 
-  const menuIndex = panes.findIndex(pane => (pane.key == menuKey))
+  const menuIndex = panes.findIndex(pane => (pane.key == currentScene))
 
   const _changeTable = () => {
     tableOpener.open()
   }
 
+  const { isConnected } = useAccount()
+  const { disconnect } = useDisconnect()
+  const _exit = () => {
+    if (isConnected) {
+      disconnect()
+    }
+    dispatchSetScene(SceneName.Gate)
+  }
+
   return (
-    <div>
+    <>
       <Grid>
         <Row className='ProfilePicHeight Unselectable'>
           <Col width={7} verticalAlign='top' className='TitleCase NoBreak Padded Relative'>
@@ -119,11 +110,13 @@ export function TavernMenu({
         <div className='AbsoluteRight PaddedDouble'>
           <MusicToggle />
           &nbsp;&nbsp;
-          <IconClick name='sign out' size={'large'} onClick={() => router.push(`/gate`)} />
+          &nbsp;&nbsp;
+          <IconClick name='sign out' size={'large'} onClick={() => _exit()} />
+          &nbsp;&nbsp;&nbsp;
         </div>
 
         <Tab activeIndex={menuIndex} menu={{ secondary: true, pointing: true, attached: true }} panes={panes} />
       </div>
-    </div>
+    </>
   )
 }

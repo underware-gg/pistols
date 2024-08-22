@@ -33,11 +33,10 @@ trait ILordsMock<TState> {
     fn approve(ref self: TState, spender: ContractAddress, amount: u256) -> bool;
 
     // WITHOUT INTERFACE !!!
-    fn initializer(ref self: TState);
-    fn is_initialized(self: @TState) -> bool;
     fn faucet(ref self: TState);
     fn mint(ref self: TState, to: ContractAddress, amount: u256);
-    // fn dojo_resource(ref self: TState) -> felt252;
+
+    fn dojo_resource(ref self: TState) -> felt252;
 }
 
 
@@ -46,33 +45,27 @@ trait ILordsMock<TState> {
 /// deprecation.
 ///
 #[starknet::interface]
-trait ILordsMockInitializer<TState> {
-    fn initializer(ref self: TState);
-    fn is_initialized(self: @TState) -> bool;
-}
-
-#[starknet::interface]
 trait ILordsMockFaucet<TState> {
     fn faucet(ref self: TState);
     fn mint(ref self: TState, to: ContractAddress, amount: u256);
 }
 
-#[dojo::contract(allow_ref_self)]
+#[dojo::contract]
 mod lords_mock {
-    use integer::BoundedInt;
+    use debug::PrintTrait;
     use starknet::ContractAddress;
     use starknet::{get_caller_address, get_contract_address};
     use zeroable::Zeroable;
 
-    use pistols::types::constants::{constants};
+    use pistols::types::constants::{CONST};
 
-    use token::components::security::initializable::initializable_component;
+    use origami_token::components::security::initializable::initializable_component;
 
-    use token::components::token::erc20::erc20_metadata::erc20_metadata_component;
-    use token::components::token::erc20::erc20_balance::erc20_balance_component;
-    use token::components::token::erc20::erc20_allowance::erc20_allowance_component;
-    use token::components::token::erc20::erc20_mintable::erc20_mintable_component;
-    // use token::components::token::erc20::erc20_burnable::erc20_burnable_component;
+    use origami_token::components::token::erc20::erc20_metadata::erc20_metadata_component;
+    use origami_token::components::token::erc20::erc20_balance::erc20_balance_component;
+    use origami_token::components::token::erc20::erc20_allowance::erc20_allowance_component;
+    use origami_token::components::token::erc20::erc20_mintable::erc20_mintable_component;
+    // use origami_token::components::token::erc20::erc20_burnable::erc20_burnable_component;
 
     component!(path: initializable_component, storage: initializable, event: InitializableEvent);
     component!(path: erc20_metadata_component, storage: erc20_metadata, event: ERC20MetadataEvent);
@@ -149,22 +142,11 @@ mod lords_mock {
     // Initializer
     //
 
-    #[abi(embed_v0)]
-    impl LordsMockInitializerImpl of super::ILordsMockInitializer<ContractState> {
-        fn initializer(ref self: ContractState) {
-            assert(
-                self.world().is_owner(get_caller_address(), get_contract_address().into()),
-                Errors::CALLER_IS_NOT_OWNER
-            );
-
-            self.erc20_metadata.initialize("fLORDS", "fLORDS", 18);
-            self.erc20_mintable.mint(get_caller_address(), 1 * constants::ETH_TO_WEI);
-
-            self.initializable.initialize();
-        }
-        fn is_initialized(self: @ContractState) -> bool {
-            (self.erc20_metadata.symbol() != "")
-        }
+    fn dojo_init(ref self: ContractState) {
+        self.erc20_metadata.initialize("fLORDS", "fLORDS", 18);
+        self.initializable.initialize();
+        // Give 1 $LORD to the initializer
+        self.erc20_mintable.mint(get_caller_address(), 1 * CONST::ETH_TO_WEI);
     }
 
     //
@@ -174,7 +156,7 @@ mod lords_mock {
     #[abi(embed_v0)]
     impl LordsMockFaucetImpl of super::ILordsMockFaucet<ContractState> {
         fn faucet(ref self: ContractState) {
-            self.erc20_mintable.mint(get_caller_address(), 10_000 * constants::ETH_TO_WEI);
+            self.erc20_mintable.mint(get_caller_address(), 10_000 * CONST::ETH_TO_WEI);
         }
         fn mint(ref self: ContractState, to: ContractAddress, amount: u256) {
             self.erc20_mintable.mint(to, amount);

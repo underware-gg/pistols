@@ -1,12 +1,13 @@
 use traits::{Into, TryInto};
 use starknet::{ContractAddress};
+use pistols::models::duelist::{ProfilePicType};
 
 #[derive(Drop, starknet::Event)]
 struct DuelistRegisteredEvent {
     address: ContractAddress,
     duelist_id: u128,
     name: felt252,
-    profile_pic_type: u8,
+    profile_pic_type: ProfilePicType,
     profile_pic_uri: ByteArray,
     is_new: bool,
 }
@@ -47,7 +48,7 @@ struct DuelistTurnEvent {
 // + REMOVE ZEROS
 // 0x14a0df74df51e02ef8dedabfd1ea9684ea2087bed6370e881b156d7e2e56975
 //
-mod selector {
+mod EVENT_SELECTOR {
     const DuelistRegisteredEvent: felt252 = 0x148c3db21a55576bc012023dc4d3b5bd570c519de855849eac52b1c5d6c9e85;
     const NewChallengeEvent: felt252 = 0x14a0df74df51e02ef8dedabfd1ea9684ea2087bed6370e881b156d7e2e56975;
     const ChallengeAcceptedEvent: felt252 = 0x31cdbf7ac39747303190a727df1a270ae5e4f05191f6f58e452ce4eb1e98abe;

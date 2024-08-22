@@ -14,16 +14,10 @@ export const LordsFaucet = ({
   account?: Account | AccountInterface
 }) => {
 
-  const { mintLords, isMinting, faucetUrl } = useLordsFaucet()
+  const { mintLords, isMinting } = useLordsFaucet()
 
   const onClick = () => {
-    if (!isMinting) {
-      if (faucetUrl) {
-        window?.open(faucetUrl, '_blank')
-      } else {
-        mintLords(account)
-      }
-    }
+    mintLords(account)
   }
 
   return (

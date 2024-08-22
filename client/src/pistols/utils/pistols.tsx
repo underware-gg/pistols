@@ -1,41 +1,27 @@
-import { bigintToHex } from '@/lib/utils/types'
+import { ACTION, Archetype, ChallengeState, RoundState } from '@/games/pistols/generated/constants'
 import { EMOJI } from '@/pistols/data/messages'
 
 //------------------------------------------
 // must be in sync with CHALLENGE_STATE
 // (challenge.cairo)
 //
-export enum ChallengeState {
-  Null,       // 0
-  Awaiting,   // 1
-  Withdrawn,  // 2
-  Refused,    // 3
-  Expired,    // 4
-  InProgress, // 5
-  Resolved,   // 6
-  Draw,       // 7
-}
-
 export const LiveChallengeStates: ChallengeState[] = [
-  ChallengeState.InProgress,
   ChallengeState.Awaiting,
+  ChallengeState.InProgress,
 ]
 
 export const PastChallengeStates: ChallengeState[] = [
   ChallengeState.Resolved,
   ChallengeState.Draw,
-  ChallengeState.Withdrawn,
   ChallengeState.Refused,
+  ChallengeState.Withdrawn,
   ChallengeState.Expired,
 ]
 
-export const CanceledChallengeStates: ChallengeState[] = [
-  ChallengeState.Withdrawn,
-  ChallengeState.Refused,
-  ChallengeState.Expired,
+export const AllChallengeStates: ChallengeState[] = [
+  ...LiveChallengeStates,
+  ...PastChallengeStates,
 ]
-
-export const AllChallengeStates: ChallengeState[] = [...LiveChallengeStates, ...PastChallengeStates]
 
 export const ChallengeStateNames: Record<ChallengeState, string> = {
   [ChallengeState.Null]: 'Null',
@@ -70,7 +56,6 @@ export const ChallengeStateClasses: Record<ChallengeState, string> = {
   [ChallengeState.Draw]: 'Warning',
 }
 
-
 export const ChallengeMessages = [
   //34567890123456789012345678901| << max cairo string size (31 bytes)
   "I challenge ya for a duel!",
@@ -86,17 +71,6 @@ export const ChallengeMessages = [
   "For honour!",
 ]
 
-
-//------------------------------------------
-// must be in sync with ROUND_STATE
-// (challenge.cairo)
-//
-export enum RoundState {
-  Null,
-  Commit,
-  Reveal,
-  Finished,
-}
 export const RoundStateNames: Record<RoundState, string> = {
   [RoundState.Null]: 'Null',
   [RoundState.Commit]: 'Commit',
@@ -106,27 +80,26 @@ export const RoundStateNames: Record<RoundState, string> = {
 
 
 //------------------------------------------
-// must be in sync with BLADES
 // (action.cairo)
 //
 export enum Action {
-  Idle = 0,
-  Paces1 = 1,
-  Paces2 = 2,
-  Paces3 = 3,
-  Paces4 = 4,
-  Paces5 = 5,
-  Paces6 = 6,
-  Paces7 = 7,
-  Paces8 = 8,
-  Paces9 = 9,
-  Paces10 = 10,
-  Fast = 0x10,
-  Strong = 0x20,
-  Block = 0x30,
-  Flee = 0x40,
-  Steal = 0x50,
-  Seppuku = 0x60,
+  Idle = ACTION.IDLE,
+  Paces1 = ACTION.PACES_1,
+  Paces2 = ACTION.PACES_2,
+  Paces3 = ACTION.PACES_3,
+  Paces4 = ACTION.PACES_4,
+  Paces5 = ACTION.PACES_5,
+  Paces6 = ACTION.PACES_6,
+  Paces7 = ACTION.PACES_7,
+  Paces8 = ACTION.PACES_8,
+  Paces9 = ACTION.PACES_9,
+  Paces10 = ACTION.PACES_10,
+  Fast = ACTION.FAST_BLADE,
+  Strong = ACTION.SLOW_BLADE,
+  Block = ACTION.BLOCK,
+  Flee = ACTION.FLEE,
+  Steal = ACTION.STEAL,
+  Seppuku = ACTION.SEPPUKU,
 }
 
 export const ActionNames: Record<Action, string> = {
@@ -214,22 +187,6 @@ export const ActionTypes: Record<string, Action[]> = {
   ]
 }
 
-//-------------------------
-// client stuff
-//
-
-export const makeTavernUrl = (tableId: string) => (`/tavern/${tableId}`)
-export const makeDuelUrl = (duelId: bigint) => (`/duel/${bigintToHex(duelId)}`)
-
-
-//
-// TODO: MOVE TO generateContants.ts
-export enum Archetype {
-  Undefined,  // 0
-  Villainous, // 1
-  Trickster,  // 2
-  Honourable, // 3
-}
 export const ArchetypeNames: Record<Archetype, string> = {
   [Archetype.Undefined]: 'Undefined',
   [Archetype.Villainous]: 'Villainous',

@@ -3,7 +3,6 @@ import { Grid, Segment, Icon, Step, SegmentGroup, SemanticFLOATS } from 'semanti
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
-import { useDojoConstants } from '@/lib/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
@@ -12,7 +11,7 @@ import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChalle
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useTable } from '@/pistols/hooks/useTable'
 import { useRevealAction } from '@/pistols/hooks/useRevealAction'
-import { useIsYou } from '@/pistols/hooks/useIsMyDuelist'
+import { useIsYou } from '@/pistols/hooks/useIsYou'
 import { useWager } from '@/pistols/hooks/useWager'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
 import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionDetector'
@@ -28,6 +27,8 @@ import { Balance } from '@/pistols/components/account/Balance'
 import { EMOJI } from '@/pistols/data/messages'
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import CommitBladesModal from '@/pistols/components/CommitBladesModal'
+import { CONST } from '@/games/pistols/generated/constants'
+import { bigintToHex } from '@/lib/utils/types'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -162,10 +163,9 @@ function DuelHealthBar({
   health,
   floated,
 }) {
-  const { constants } = useDojoConstants()
   const points = useMemo(() => {
     let result = []
-    for (let i = 1; i <= constants.FULL_HEALTH; ++i) {
+    for (let i = 1; i <= CONST.FULL_HEALTH; ++i) {
       const full = (health >= i)
       result.push(
         <Segment key={`${i}_${full ? 'full' : 'empty'}`} className={full ? 'HealthPointFull' : 'HealthPointEmpty'} />
@@ -225,30 +225,33 @@ function DuelProgress({
   // Duelist interaction
   //
   const { isConnected } = useAccount()
-  const isYou = useIsYou(duelistId)
+  const { isYou } = useIsYou(duelistId)
   // const isTurn = useMemo(() => ((isA && turnA) || (isB && turnB)), [isA, isB, turnA, turnB])
 
   // Commit modal control
+  const [didReveal, setDidReveal] = useState(false)
   const [commitModalIsOpen, setCommitModalIsOpen] = useState(false)
-  const { reveal } = useRevealAction(duelId, roundNumber, currentRoundAction?.hash, duelStage == DuelStage.Round1Reveal || duelStage == DuelStage.Round2Reveal)
+  const { reveal, canReveal } = useRevealAction(duelId, roundNumber, currentRoundAction?.hash, duelStage == DuelStage.Round1Reveal || duelStage == DuelStage.Round2Reveal)
   const onClick = useCallback(() => {
     if (isYou && isConnected && completedStages[duelStage] === false) {
       if (duelStage == DuelStage.Round1Commit || duelStage == DuelStage.Round2Commit) {
         setCommitModalIsOpen(true)
-      }
-      if (duelStage == DuelStage.Round1Reveal || duelStage == DuelStage.Round2Reveal) {
-        console.log(`_reveal()....`)
-        reveal()
+      } else if (duelStage == DuelStage.Round1Reveal || duelStage == DuelStage.Round2Reveal) {
+        if (canReveal && !didReveal) {
+          console.log(`reveal(${isA ? 'A' : 'B'}) hash:`, bigintToHex(currentRoundAction?.hash ?? 0))
+          setDidReveal(true)
+          reveal()
+        }
       }
     }
-  }, [isYou, isConnected, duelStage, completedStages])
+  }, [isYou, isConnected, duelStage, completedStages, canReveal])
 
   // auto-reveal
   useEffect(() => {
-    if (canAutoReveal) {
+    if (canAutoReveal && canReveal) {
       onClick?.()
     }
-  }, [onClick, canAutoReveal])
+  }, [onClick, canAutoReveal, canReveal])
 
   //------------------------------
   return (
@@ -381,9 +384,12 @@ function ProgressItem({
   const _left = (floated == 'left')
   const _right = (floated == 'right')
 
-  let classNames = ['AlignCenter']
-  if (className) classNames.push(className)
-  if (!_canClick) classNames.push('NoMouse')
+  const classNames = useMemo(() => {
+    let classNames = ['AlignCenter']
+    if (className) classNames.push(className)
+    if (!_canClick) classNames.push('NoMouse')
+    return classNames
+  }, [className, _canClick])
 
   let _icon = useMemo(() => {
     const style = _right ? { margin: '0 0 0 1rem' } : {}

@@ -1,10 +1,10 @@
-import { useDojoConstants } from '@/lib/dojo/DojoContext'
+import { useMemo } from 'react'
+import { BigNumberish } from 'starknet'
 import { useLordsBalance, useEtherBalance } from '@/lib/dojo/hooks/useLords'
 import { useLockedLordsBalance } from '@/pistols/hooks/useWager'
-import { Balance } from '@/pistols/components/account/Balance'
-import { BigNumberish } from 'starknet'
-import { useMemo } from 'react'
 import { useScoreboard } from '@/pistols/hooks/useScore'
+import { Balance } from '@/pistols/components/account/Balance'
+import { TABLES } from '@/games/pistols/generated/constants'
 
 
 //
@@ -30,10 +30,9 @@ export const LordsBalance = ({
   clean = false,
   big = false,
 }) => {
-  const { tables } = useDojoConstants()
   const { balance } = useLordsBalance(address)
   return (
-    <Balance big={big} tableId={tables.LORDS} wei={balance} pre={pre} post={post} clean={clean} />
+    <Balance big={big} tableId={TABLES.LORDS} wei={balance} pre={pre} post={post} clean={clean} />
   )
 }
 
@@ -42,12 +41,16 @@ export const LordsBalance = ({
 // Wager Balance of a Duelist on a Table
 //
 export const WagerBalance = ({
-  tableId,
   duelistId,
-}) => {
+  tableId,
+} : {
+  duelistId: BigNumberish
+  tableId?: string
+}
+) => {
   const { wagerBalanceWei } = useScoreboard(tableId, duelistId)
   return (
-    <Balance tableId={tableId} wei={wagerBalanceWei} />
+    <Balance tableId={tableId ?? TABLES.LORDS} wei={wagerBalanceWei} />
   )
 }
 

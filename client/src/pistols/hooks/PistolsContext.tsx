@@ -1,6 +1,10 @@
-import React, { ReactNode, createContext, useReducer, useContext } from 'react'
-import { Opener, useOpener } from '@/lib/ui/useOpener'
+import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/router'
 import { BigNumberish } from 'starknet'
+import { Opener, useOpener } from '@/lib/ui/useOpener'
+import { bigintToHex } from '@/lib/utils/types'
+import { useSettings } from './SettingsContext'
+import { TABLES } from '@/games/pistols/generated/constants'
 
 //
 // React + Typescript + Context
@@ -12,8 +16,8 @@ import { BigNumberish } from 'starknet'
 //
 
 export enum SceneName {
-  Splash = 'Splash',
   Gate = 'Gate',
+  Profile = 'Profile',
   Duelists = 'Duelists',
   Tavern = 'Tavern',
   YourDuels = 'Your Duels',
@@ -24,34 +28,13 @@ export enum SceneName {
   Duel = 'Duel',
 }
 
-export enum MenuKey {
-  Duelists = SceneName.Duelists,
-  YourDuels = SceneName.YourDuels,
-  LiveDuels = SceneName.LiveDuels,
-  PastDuels = SceneName.PastDuels,
-  Tournament = SceneName.Tournament,
-  IRLTournament = SceneName.IRLTournament,
-}
-
-const tavernMenuItems: MenuKey[] = [
-  MenuKey.Duelists,
-  MenuKey.YourDuels,
-  MenuKey.LiveDuels,
-  MenuKey.PastDuels,
-  MenuKey.Tournament,
-  MenuKey.IRLTournament,
-]
-
-export enum AccountMenuKey {
-  // Deploy = 'Deploy',
-  // Fund = 'Fund',
-  Profile = 'Profile',
-}
-
-const accountMenuItems: AccountMenuKey[] = [
-  // AccountMenuKey.Deploy,
-  // AccountMenuKey.Fund,
-  AccountMenuKey.Profile,
+const tavernMenuItems: SceneName[] = [
+  SceneName.Duelists,
+  SceneName.YourDuels,
+  SceneName.LiveDuels,
+  SceneName.PastDuels,
+  SceneName.Tournament,
+  SceneName.IRLTournament,
 ]
 
 //--------------------------------
@@ -63,25 +46,23 @@ export const initialState = {
   selectedDuelId: 0n,
   selectedDuelistId: 0n,
   challengingId: 0n,
-  menuKey: MenuKey.Duelists,
-  accountMenuKey: AccountMenuKey.Profile,
-  sceneName: SceneName.Splash,
-  duelistsFilter: '',
+  currentScene: undefined as SceneName,
+  lastScene: undefined as SceneName,
+  duelistsAnon: true,
   // injected
   connectOpener: null as Opener,
-  accountSetupOpener: null as Opener,
+  duelistEditOpener: null as Opener,
   tableOpener: null as Opener,
 }
 
 const PistolsActions = {
   SET_SIG: 'SET_SIG',
   SET_ACCOUNT_MENU_KEY: 'SET_ACCOUNT_MENU_KEY',
-  SET_MENU_KEY: 'SET_MENU_KEY',
   SET_SCENE: 'SET_SCENE',
   SELECT_DUEL: 'SELECT_DUEL',
   SELECT_DUELIST_ID: 'SELECT_DUELIST_ID',
   SELECT_CHALLENGING_ID: 'SELECT_CHALLENGING_ID',
-  SELECT_DUELISTS_FILTER: 'SELECT_DUELISTS_FILTER',
+  SELECT_DUELISTS_ANON: 'SELECT_DUELISTS_ANON',
 }
 
 
@@ -92,13 +73,11 @@ type PistolsContextStateType = typeof initialState
 
 type ActionType =
   | { type: 'SET_SIG', payload: bigint[] }
-  | { type: 'SET_ACCOUNT_MENU_KEY', payload: AccountMenuKey }
-  | { type: 'SET_MENU_KEY', payload: MenuKey }
   | { type: 'SET_SCENE', payload: SceneName }
   | { type: 'SELECT_DUEL', payload: bigint }
   | { type: 'SELECT_DUELIST_ID', payload: bigint }
   | { type: 'SELECT_CHALLENGING_ID', payload: bigint }
-  | { type: 'SELECT_DUELISTS_FILTER', payload: string }
+  | { type: 'SELECT_DUELISTS_ANON', payload: boolean }
 
 
 
@@ -123,7 +102,7 @@ const PistolsProvider = ({
   children,
 }: PistolsProviderProps) => {
   const connectOpener = useOpener()
-  const accountSetupOpener = useOpener()
+  const duelistEditOpener = useOpener()
   const tableOpener = useOpener()
 
   const [state, dispatch] = useReducer((state: PistolsContextStateType, action: ActionType) => {
@@ -136,17 +115,9 @@ const PistolsProvider = ({
         }
         break
       }
-      case PistolsActions.SET_ACCOUNT_MENU_KEY: {
-        newState.accountMenuKey = action.payload as AccountMenuKey
-        break
-      }
-      case PistolsActions.SET_MENU_KEY: {
-        newState.menuKey = action.payload as MenuKey
-        newState.sceneName = action.payload as SceneName
-        break
-      }
       case PistolsActions.SET_SCENE: {
-        newState.sceneName = action.payload as SceneName
+        newState.lastScene = state.currentScene
+        newState.currentScene = action.payload as SceneName
         break
       }
       case PistolsActions.SELECT_DUEL: {
@@ -167,8 +138,8 @@ const PistolsProvider = ({
         newState.challengingId = action.payload as bigint
         break
       }
-      case PistolsActions.SELECT_DUELISTS_FILTER: {
-        newState.duelistsFilter = action.payload as string
+      case PistolsActions.SELECT_DUELISTS_ANON: {
+        newState.duelistsAnon = action.payload as boolean
         break
       }
       default:
@@ -182,7 +153,7 @@ const PistolsProvider = ({
     <PistolsContext.Provider value={{ dispatch, state: {
       ...state,
       connectOpener,
-      accountSetupOpener,
+      duelistEditOpener,
       tableOpener,
     } }}>
       {children}
@@ -205,24 +176,6 @@ export const usePistolsContext = () => {
       payload: [BigInt(address ?? 0n), BigInt(sig ?? 0n)]
     })
   }
-  const dispatchSetAccountMenu = (menuKey: AccountMenuKey) => {
-    dispatch({
-      type: PistolsActions.SET_ACCOUNT_MENU_KEY,
-      payload: menuKey,
-    })
-  }
-  const dispatchSetMenu = (menuKey: MenuKey) => {
-    dispatch({
-      type: PistolsActions.SET_MENU_KEY,
-      payload: menuKey,
-    })
-  }
-  const dispatchSetScene = (scene: SceneName | null) => {
-    dispatch({
-      type: PistolsActions.SET_SCENE,
-      payload: scene != SceneName.Tavern ? scene : state.menuKey,
-    })
-  }
   const dispatchSelectDuelistId = (newId: BigNumberish) => {
     dispatch({
       type: PistolsActions.SELECT_DUELIST_ID,
@@ -241,36 +194,126 @@ export const usePistolsContext = () => {
       payload: BigInt(newId),
     })
   }
-  const dispatchDuelistsFilter = (newFilter: string) => {
+  const dispatchDuelistsAnon = (newAnon: boolean) => {
     dispatch({
-      type: PistolsActions.SELECT_DUELISTS_FILTER,
-      payload: newFilter,
+      type: PistolsActions.SELECT_DUELISTS_ANON,
+      payload: newAnon,
     })
   }
   return {
     ...state,
     hasSigned: (state.walletSig.sig > 0n),
     tavernMenuItems,
-    accountMenuItems,
-    atSplash: (state.sceneName == SceneName.Splash),
-    atGate: (state.sceneName == SceneName.Gate),
-    atTavern: (state.sceneName as string == state.menuKey as string),
-    atDuelists: (state.sceneName == SceneName.Duelists),
-    atYourDuels: (state.sceneName == SceneName.YourDuels),
-    atLiveDuels: (state.sceneName == SceneName.LiveDuels),
-    atPastDuels: (state.sceneName == SceneName.PastDuels),
-    atTournament: (state.sceneName == SceneName.Tournament),
-    atIRLTournament: (state.sceneName == SceneName.IRLTournament),
-    atDuel: (state.sceneName == SceneName.Duel),
     // PistolsActions,
-    // dispatch,
+    dispatch,
     dispatchSetSig,
-    dispatchSetAccountMenu,
-    dispatchSetMenu,
-    dispatchSetScene,
     dispatchSelectDuel,
     dispatchSelectDuelistId,
     dispatchChallengingDuelistId,
-    dispatchDuelistsFilter,
+    dispatchDuelistsAnon,
+  }
+}
+
+
+
+
+
+//-------------------------------------
+// Scenes
+//
+
+type SceneRoute = {
+  baseUrl: string
+  title?: string
+  hasTableId?: boolean
+  hasDuelId?: boolean
+  // makeRoute: (state: PistolsContextStateType) => string
+}
+export const sceneRoutes: Record<SceneName, SceneRoute> = {
+  [SceneName.Gate]: { baseUrl: '/' },
+  [SceneName.Profile]: { baseUrl: '/profile', title: 'Pistols - Profile' },
+  [SceneName.Tavern]: { baseUrl: '/tavern', hasTableId: true },
+  [SceneName.Duelists]: { baseUrl: '/tavern', hasTableId: true, title: 'Pistols - Duelists' },
+  [SceneName.YourDuels]: { baseUrl: '/tavern', hasTableId: true, title: 'Pistols - Your Duels' },
+  [SceneName.LiveDuels]: { baseUrl: '/tavern', hasTableId: true, title: 'Pistols - Live Duels' },
+  [SceneName.PastDuels]: { baseUrl: '/tavern', hasTableId: true, title: 'Pistols - Past Duels' },
+  [SceneName.Tournament]: { baseUrl: '/tavern', hasTableId: true, title: 'Pistols - Tournament' },
+  [SceneName.IRLTournament]: { baseUrl: '/tavern', hasTableId: true, title: 'Pistols - IRL Tournament' },
+  [SceneName.Duel]: { baseUrl: '/duel', hasDuelId: true, title: 'Pistols - Duel!' },
+}
+
+export const usePistolsScene = (mainPage?: boolean) => {
+  const { currentScene, lastScene, selectedDuelId, dispatch, dispatchSelectDuel } = usePistolsContext()
+  const { tableId, dispatchTableId } = useSettings()
+
+  const router = useRouter()
+  const currentRoute = useMemo(() => (router.isReady ? router.asPath : null), [router])
+  const routeSlugs = useMemo(() => (
+    (router.isReady && router.query.main) ? router.query.main.slice(1) : []
+  ), [router.query?.main?.[0]]) // only when /[slug] changes
+
+  //------------------
+  // Dispatchers
+  //
+  const dispatchSetScene = (newScene: SceneName, slugs?: string[]) => {
+    const newSceneName = newScene == SceneName.Tavern ? SceneName.Duelists : newScene
+    dispatch({
+      type: PistolsActions.SET_SCENE,
+      payload: newSceneName,
+    })
+    // update route
+    let route = sceneRoutes[newSceneName]
+    let url = route.baseUrl
+    if (sceneRoutes[newSceneName].hasTableId) {
+      url += `/${slugs?.[0] || TABLES.LORDS}`
+    } else if (sceneRoutes[newSceneName].hasDuelId) {
+      url += `/${bigintToHex(slugs?.[0] || selectedDuelId)}`
+    }
+    if (url != currentRoute) {
+      router.push(url)
+    }
+  }
+
+  //------------------------------
+  // Detect scene from route
+  // works on page reloads and navigation
+  //
+  // console.log(`MAIN???`, mainPage, currentRoute)
+  useEffect(() => {
+    if (mainPage && currentRoute) {
+      const newSceneName = Object.keys(sceneRoutes).find(key => {
+        const route = sceneRoutes[key]
+        return (route.hasDuelId || route.hasTableId) ? currentRoute.startsWith(route.baseUrl)
+          : currentRoute == route.baseUrl
+      }) as SceneName
+      // console.log(`ROUTE [${currentRoute}] >> SCENE [${newSceneName}]`, router)
+      if (newSceneName) {
+        dispatchSetScene(newSceneName)
+        if (sceneRoutes[newSceneName].hasTableId) {
+          dispatchTableId(routeSlugs[0] || TABLES.LORDS)
+        } else if (sceneRoutes[newSceneName].hasDuelId) {
+          dispatchSelectDuel(routeSlugs[0] || '0x0')
+        }
+      } else {
+        router.push('/')
+      }
+    }
+  }, [mainPage, currentRoute, routeSlugs])
+
+  const sceneTitle = useMemo(() => (sceneRoutes[currentScene]?.title ?? 'Pistols at 10 Blocks'), [currentScene])
+
+  return {
+    currentScene,
+    lastScene,
+    sceneTitle,
+    tavernMenuItems,
+    // helpers
+    atGate: (currentScene == SceneName.Gate),
+    atProfile: (currentScene == SceneName.Profile),
+    atTavern: tavernMenuItems.includes(currentScene),
+    atDuel: (currentScene == SceneName.Duel),
+    fromGate: (lastScene == SceneName.Gate),
+    // PistolsActions,
+    dispatchSetScene,
   }
 }

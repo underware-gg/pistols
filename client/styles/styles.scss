@@ -7,8 +7,9 @@ $font-family-mono: 'Courier Prime', monospace;
 // https://www.figma.com/file/eseZA1jRIoX6IYNtoHgz30/Pistols-at-Ten-Blocks
 $color-bg: #000; //#1e1e1e;
 $color-darkest: #201a18;
-$color-dark: #584f49;
+$color-dark: #57493e;
 $color-medium: #ef9758;
+$color-medium-bg: #ce6f2c;
 $color-bright: #c8b6a8;
 $color-brightest: #efe1d7;
 
@@ -22,6 +23,7 @@ $color-inactive: rgba($color-brightest, 0.35);
 $text-shadow: 0.05rem 0.05rem 1px rgba($color-darkest, 0.5);
 $title-shadow: 0.2rem 0.2rem 1px rgba($color-bg, 0.5);
 $ui-border: 6px ridge $color-active;
+$menu-width: 620px;
 
 $border-hr: solid 0.5px rgba($color-bright, 0.5);
 $border-button: 1px solid $color-bright;
@@ -29,7 +31,7 @@ $border-button-active: 1px solid $color-brightest;
 $border-button-inactive: 1px solid rgba($color-bright, 0.5);
 
 $color-positive: #21ba45;
-$color-negative: #db2828;
+$color-negative: #ff4225;
 $color-warning: #f2c037;
 $color-cold: #31b9c3;
 
@@ -188,6 +190,8 @@ canvas {
 
 .Margin6 { margin: 6px!important }
 
+.FloatRight { float:right; }
+
 .Block { display: inline-block; }
 .Flex { display: flex; }
 
@@ -219,13 +223,15 @@ canvas {
 .Disabled  { color: $color-inactive!important; }
 
 .BgBlack     { background-color: #444; }
-.BgImportant { background-color: $color-important!important; }
+.BgImportant { background-color: $color-medium-bg!important; }
 .BgBrightest { background-color: $color-brightest!important; }
 .BgPositive  { background-color: $color-positive!important; }
 .BgNegative  { background-color: $color-negative!important; }
 .BgWarning   { background-color: $color-warning!important; }
 .BgCanceled  { background-color: $color-inactive!important; }
 .BgInactive  { background-color: $color-inactive!important; }
+
+.Translucent { opacity: 0.7!important; }
 
 
 .Number {
@@ -541,10 +547,14 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 .ModalText {
-  font-size: 20px!important;
+  font-size: 18px!important;
+}
+.DuelistModal {
+  width: 900px;
+  // height: 450px;
 }
 .DuelistModalDescription {
-  width: 620px;
+  width: $menu-width;
 }
 .BladesModalDescription {
   @extend .CenteredContainer;
@@ -587,9 +597,18 @@ $box-h: calc((100vh - $aspect-h) / 2);
 }
 
 .FilterButton {
-  margin: 0 0.5em!important;
-  padding: 0.25em 0.5em!important;
+  padding: 0 0.35em!important;
   min-height: 20px!important;
+  max-height: 20px!important;
+  font-size: 1rem!important;
+}
+.FilterButtonMargin {
+  margin: 0 0 0 0.5em!important;
+}
+#FilterByName {
+  @extend .FilterButton, .TitleCase;
+  margin: 0;
+  width: 120px;
 }
 
 .Locked {
@@ -639,21 +658,35 @@ $profile-pic-width: 80px;
 $ui-container-gap: 1em;
 
 .UIContainer {
-  // background-color: #f008;
-  background-color: #0004; // For browsers that do not support gradients
-  background-image: linear-gradient(to right, #000, transparent);
-  min-width: 620px;
-  width: 620px;
+  width: 100%;
   height: 100%;
   position: absolute;
   top: 0px;
   left: 0px;
-  padding: $ui-container-gap;
 }
-.UIContainerTavern {
+.UIContainerDesktop {
   @extend .UIContainer;
-  width: 620px;
+  // background-color: #f008;
+  background-image: linear-gradient(to right, #0008, #0004, transparent);
+  background-color: #0004; // For browsers that do not support gradients
+  padding: $ui-container-gap;
+  min-width: $menu-width;
+  max-width: $menu-width;
+  width: $menu-width;
 }
+// descendent of #Gate
+#Gate .UIContainerDesktop {
+  // @extend .UIContainerDesktop;
+  min-width: 450px;
+  max-width: 450px;
+  width: 450px;
+  padding: 1em;
+}
+.UIContainerMobile {
+  @extend .UIContainer;
+  background-color: #0004; // For browsers that do not support gradients
+}
+
 .UIMenuTavernScroller {
   @extend .Scroller;
   width: 100%;
@@ -662,6 +695,8 @@ $ui-container-gap: 1em;
 .UIAccountsListScroller {
   @extend .UIMenuTavernScroller;
   height: calc($aspect-h - 12px - 285px - 12px - 41px - 12px);
+  // height: 100%;
+  // background-color: red;
 }
 
 .TitleCase {
@@ -682,6 +717,10 @@ $ui-container-gap: 1em;
   border: $border-button;
   box-shadow: $title-shadow;
 }
+.ProfilePicAnon {
+  @extend .ProfilePic;
+  height: calc(439px / 2);
+}
 .ProfilePicDuel {
   @extend .ProfilePic;
   width: calc(439px / 2.5);
@@ -693,6 +732,12 @@ $ui-container-gap: 1em;
   // border: $border-button-inactive;
   border-radius: 4px;
   margin: auto;
+}
+.ProfilePicMedium {
+  @extend .ProfilePicSquare;
+  width: 60px;
+  height: 60px;
+  border: none;
 }
 .ProfilePicSmall {
   @extend .ProfilePicSquare;
@@ -728,6 +773,17 @@ $ui-container-gap: 1em;
   top: 0.3em;
   font-size: 1.3em;
   line-height: 1.1em;
+}
+
+.FormLabel {
+  @extend .TitleCase;
+  color: $color-text;
+  font-size: 1.1em;
+  line-height: 1.2em;
+}
+.FormAnonDescription {
+  // fix modal + image fluid description
+  flex: 1 0 auto!important;
 }
 
 .MenuTop {
@@ -1024,18 +1080,20 @@ $logo-url: '/logos/logo_avante.svg';
 //
 ._round_border {
   border: $border-button!important;
-  border-radius: 0.5em!important;
+  // border-radius: 0.5em!important;
 }
 ._round_border_active {
   border: $border-button-active!important;
-  border-radius: 0.5em!important;
+  // border-radius: 0.5em!important;
 }
 ._round_border_inactive {
   border: $border-button-inactive!important;
-  border-radius: 0.5em!important;
+  // border-radius: 0.5em!important;
 }
 // 
 // <Input>
+// input, select, textarea, button{font-family:inherit!important;}
+input{font-family:inherit!important;} // <input> by default does not inherit!!!
 input::placeholder {
   @extend .TitleCase;
   font-family: $font-family;
@@ -1065,6 +1123,10 @@ input::placeholder {
   @extend ._round_border_active;
   background-color: $color-dark;
   color: $color-brightest!important;
+}
+.ui.mini.input {
+  @extend .FilterButton;
+  // height: 
 }
 .ui.label {
   @extend ._round_border;
@@ -1101,12 +1163,6 @@ input::placeholder {
   @extend ._button_active;
 }
 // forms
-.FormLabel {
-  @extend .TitleCase;
-  color: $color-text;
-  font-size: 1.1em;
-  line-height: 1.2em;
-}
 .ui.form .field>label {
   font-family: $font-family;
   color: $color-bright;
@@ -1117,10 +1173,10 @@ input::placeholder {
   margin: auto;
 }
 .ui.grid>.row {
-  padding: 0.25rem 0; // original: 1.0rem 0
+  padding: 0.2rem 0; // original: 1.0rem 0
 }
 .ui.grid>.row>.column {
-  padding: 0 0.25rem; // original: 1.0rem 0
+  padding: 0 0.2rem; // original: 1.0rem 0
 }
 //
 // <Button>
@@ -1167,7 +1223,7 @@ input::placeholder {
 .ui.button.toggle.active,
 .ui.buttons .button.toggle.active,
 .ui.toggle.buttons .active.button {
-  background-color: $color-important!important;
+  background-color: $color-medium-bg!important;
 }
 .ui.button.toggle.active:hover {
   background-color: $color-important!important; // default is green
@@ -1235,6 +1291,10 @@ input::placeholder {
   border: 0!important;
   border-radius: 0!important;
 }
+#Gate .ui.secondary.pointing.menu .item {
+  padding: 0.5em 1.9em 0.5em 1.9em;
+  font-size: 24px;
+}
 .ui.secondary.pointing.menu .active.item,
 .ui.secondary.pointing.menu .active.item:hover,
 .ui.secondary.pointing.menu a.item:hover,
@@ -1271,7 +1331,7 @@ $table-bg-color: rgba($color-darkest, 0.6);
 }
 .ui.sortable.table thead th.sorted,
 .ui.sortable.table thead th:hover {
-  background-color: rgba($color-medium, 1);
+  background-color: rgba($color-medium-bg, 1);
 }
 .ui.attached.table {
   border: 0.5px solid $color-shadow;
@@ -1330,7 +1390,7 @@ td {
 .ui.modal>.header {
   @extend .Title;
   font-family: $font-family;
-  font-size: 2.5rem!important;
+  font-size: 2rem!important;
   color: $color-text;
   border-bottom: $border-hr;
   padding: 0.2em;
@@ -1417,4 +1477,11 @@ a.active.step:hover,
   margin-top: -0.65em;
   margin-right: -0.2em;
   z-index: 100;
+}
+// <Divider>
+.ui.divider:not(.vertical):not(.horizontal) {
+  // border-top: 1px solid rgba(34, 36, 38, .15);// original
+  // border-bottom: 1px solid rgba(255, 255, 255, .1); // original
+  border-top: 1px solid rgba($color-brightest, .15);
+  border-bottom: 1px solid rgba($color-brightest, .25);
 }

@@ -1,0 +1,16 @@
+kind = "DojoModel"
+class_hash = "0x476254a3660ac696486628f6fb9c531a94de4b0addcc00bc43eafc207638968"
+original_class_hash = "0x476254a3660ac696486628f6fb9c531a94de4b0addcc00bc43eafc207638968"
+abi = "manifests/staging/base/abis/models/origami_token-ERC721EnumerableTotalModel-5674a124.json"
+tag = "origami_token-ERC721EnumerableTotalModel"
+manifest_name = "origami_token-ERC721EnumerableTotalModel-5674a124"
+
+[[members]]
+name = "token"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "total_supply"
+type = "u128"
+key = false

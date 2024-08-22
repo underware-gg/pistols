@@ -1,5 +1,7 @@
-mod mocks {
-    mod lords_mock;
+mod interfaces {
+    mod systems;
+    mod ierc20;
+    mod ierc721;
 }
 
 mod systems {
@@ -31,11 +33,7 @@ mod types {
     mod constants;
     mod events;
     mod round;
-}
-
-mod interfaces {
-    mod ierc20;
-    mod ierc721;
+    mod typed_data;
 }
 
 mod utils {
@@ -47,12 +45,18 @@ mod utils {
     mod math;
     mod short_string;
     mod timestamp;
+    mod openzeppelin {
+        mod snip12;
+    }
+}
+
+mod mocks {
+    #[cfg(feature:'lords_mock')]
+    mod lords_mock;
 }
 
 #[cfg(test)]
 mod tests {
-    // mocks
-    mod mock_erc721;
     // pistols
     mod test_action;
     mod test_admin;
@@ -65,9 +69,13 @@ mod tests {
     mod test_wager;
     mod test_torna;
     mod test_utils;
-    // tokens
-    mod test_token_duelist;
     // utils
     mod tester;
     mod salt_generator;
+    // tokens
+    mod token {
+        mod test_token_duelist;
+        // mocks
+        mod mock_token_duelist;
+    }
 }

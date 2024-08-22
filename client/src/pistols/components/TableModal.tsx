@@ -1,18 +1,18 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'next/router'
 import { Grid, Modal, Dropdown } from 'semantic-ui-react'
+import { usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useDojoConstants } from '@/lib/dojo/DojoContext'
-import { useActiveDuelistIds, useLiveChallengeIds, usePastChallengeIds } from '@/pistols/hooks/useChallenge'
+import { useActiveDuelistIds } from '@/pistols/hooks/useChallenge'
 import { useERC20TokenName } from '@/lib/utils/hooks/useERC20'
-import { useTable } from '@/pistols/hooks/useTable'
-import { Opener } from '@/lib/ui/useOpener'
-import { Divider } from '@/lib/ui/Divider'
+import { useTable, useTableTotals } from '@/pistols/hooks/useTable'
 import { Balance } from '@/pistols/components/account/Balance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
+import { RowDivider } from '@/lib/ui/Stack'
+import { Opener } from '@/lib/ui/useOpener'
+import { Divider } from '@/lib/ui/Divider'
 import { getObjectKeyByValue } from '@/lib/utils/types'
-import { makeTavernUrl } from '@/pistols/utils/pistols'
+import { TABLES } from '@/games/pistols/generated/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -23,6 +23,7 @@ export default function TableModal({
   opener: Opener
 }) {
   const { tableId, dispatchTableId } = useSettings()
+  const { dispatchSetScene } = usePistolsScene()
   const [selectedTableId, setSelectedTableId] = useState('')
   const { tableIsOpen } = useTable(selectedTableId)
 
@@ -38,8 +39,7 @@ export default function TableModal({
     }
   }, [opener.isOpen])
 
-  const { tables } = useDojoConstants()
-  const unknownTable = useMemo(() => (tableId !== undefined && getObjectKeyByValue(tables, tableId) === undefined), [tableId])
+  const unknownTable = useMemo(() => (tableId !== undefined && getObjectKeyByValue(TABLES, tableId) === undefined), [tableId])
   useEffect(() => {
     if (unknownTable && !opener.isOpen) {
       opener.open()
@@ -47,10 +47,9 @@ export default function TableModal({
   }, [unknownTable, opener.isOpen])
   // console.log(unknownTable, tableId, selectedTableId)
 
-  const router = useRouter()
   const _joinTable = () => {
     dispatchTableId(selectedTableId)
-    router.replace(makeTavernUrl(selectedTableId))
+    dispatchSetScene(SceneName.Tavern, [selectedTableId])
     opener.close()
   }
 
@@ -88,9 +87,6 @@ export default function TableModal({
               <ActionButton fill label='Close' onClick={() => opener.close()} />
             </Col>
             <Col>
-              <ActionButton fill label='Leave Tavern' onClick={() => router.push(`/gate`)} />
-            </Col>
-            <Col>
               <ActionButton fill important label='Join Table' disabled={!tableIsOpen || !selectedTableId} onClick={() => _joinTable()} />
             </Col>
           </Row>
@@ -104,7 +100,7 @@ export default function TableModal({
 function TableDescription({
   tableId,
 }) {
-  const { contractAddress,
+  const { wagerContractAddress,
     description,
     wagerMin,
     feeMin,
@@ -112,10 +108,10 @@ function TableDescription({
     tableIsOpen,
     tableType,
   } = useTable(tableId)
-  const { tokenName, tokenSymbol } = useERC20TokenName(contractAddress)
-  const { challengeIds: liveChallengeIds } = useLiveChallengeIds(tableId)
-  const { challengeIds: pastChallengeIds } = usePastChallengeIds(tableId)
+  const { tokenName, tokenSymbol } = useERC20TokenName(wagerContractAddress)
   const { activeDuelistIdsCount } = useActiveDuelistIds(tableId)
+  const { liveDuelsCount, pastDuelsCount } = useTableTotals(tableId)
+
   return (
     <Grid className='H5'>
 
@@ -177,7 +173,7 @@ function TableDescription({
           Live Duels:
         </Col>
         <Col width={8} className='Wager PaddedLeft Bold'>
-          {liveChallengeIds.length}
+          {liveDuelsCount}
         </Col>
       </Row>
 
@@ -186,13 +182,14 @@ function TableDescription({
           Past Duels:
         </Col>
         <Col width={8} className='Wager PaddedLeft Bold'>
-          {pastChallengeIds.length}
+          {pastDuelsCount}
         </Col>
       </Row>
 
+      <RowDivider />
+
       <Row columns={'equal'} className='NoPadding H5' textAlign='center'>
         <Col>
-          <Divider />
           <h5>Table is {tableIsOpen ? <span className='Important'>Open</span> : <span className='Negative'>Closed</span>}</h5>
         </Col>
       </Row>
@@ -201,11 +198,10 @@ function TableDescription({
   )
 }
 
-function TableSwitcher({
+export function TableSwitcher({
   tableId,
   setSelectedTableId,
 }) {
-  const { tables } = useDojoConstants()
   const { description } = useTable(tableId)
   return (
     <Dropdown
@@ -216,8 +212,8 @@ function TableSwitcher({
       fluid
     >
       <Dropdown.Menu>
-        {Object.keys(tables).map(key => (
-          <TableSwitcherItem key={tables[key]} tableId={tables[key]} setSelectedTableId={setSelectedTableId} />
+        {Object.keys(TABLES).map(key => (
+          <TableSwitcherItem key={TABLES[key]} tableId={TABLES[key]} setSelectedTableId={setSelectedTableId} />
         ))}
       </Dropdown.Menu>
     </Dropdown>

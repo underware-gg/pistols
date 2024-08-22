@@ -7,15 +7,21 @@ import {
   shortString,
   BigNumberish,
   Uint256,
+  uint256,
+  encode,
   Abi,
   ec,
 } from 'starknet'
-import { bigintToHex } from './types'
+import { bigintToHex, isPositiveBigint } from './types'
 
 export const ETH_TO_WEI = 1_000_000_000_000_000_000n
 
+export const STARKNET_ADDRESS_LENGTHS = [66, 64]
+export const ETHEREUM_ADDRESS_LENGTH = 42
+
 export const validateCairoString = (v: string): string => (v ? v.slice(0, 31) : '')
-export const stringToFelt = (v: string): string => (v ? shortString.encodeShortString(v) : '0x0')
+export const sanitizedAddress = (v: BigNumberish): string | null => (isPositiveBigint(v) ? encode.sanitizeHex(bigintToHex(v)) : null)
+export const stringToFelt = (v: string): BigNumberish => (v ? shortString.encodeShortString(v) : '0x0')
 export const feltToString = (v: BigNumberish): string => (BigInt(v) > 0n ? shortString.decodeShortString(bigintToHex(v)) : '')
 export const pedersen = (a: BigNumberish, b: BigNumberish): bigint => (BigInt(ec.starkCurve.pedersen(BigInt(a), BigInt(b))))
 export const poseidon = (values: BigNumberish[]): bigint => (BigInt(ec.starkCurve.poseidonHashMany(values.map(v => BigInt(v)))))
@@ -37,11 +43,8 @@ export const weiToEthString = (v: BigNumberish, decimals: number = 0, trailingZe
 
 export const dummyAccount = (provider?: RpcProvider): Account => (new Account(provider ?? {}, '0x0', '0x0'))
 
-export const Uint256ToBigint = (v: Uint256): bigint => ((BigInt(v.high) << 128n) + BigInt(v.low))
-export const bigintToU256 = (v: BigNumberish): Uint256 => ({
-  low: BigInt(v) & 0xffffffffffffffffffffffffffffffffn,
-  high: BigInt(v) >> 128n,
-})
+export const U256ToBigint = (v: Uint256): bigint => (uint256.uint256ToBN(v))
+export const bigintToU256 = (v: BigNumberish): Uint256 => (uint256.bnToUint256(v))
 
 
 //

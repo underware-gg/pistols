@@ -1,0 +1,14 @@
+kind = "DojoContract"
+class_hash = "0x4f64ee4f8e5749e9ebefee3e66885d66838b5873d505a018733b3e30843d540"
+original_class_hash = "0x4f64ee4f8e5749e9ebefee3e66885d66838b5873d505a018733b3e30843d540"
+base_class_hash = "0x0"
+abi = "manifests/slot/base/abis/contracts/pistols-lords_mock-2b1156e6.json"
+reads = []
+writes = []
+init_calldata = []
+tag = "pistols-lords_mock"
+systems = [
+    "faucet",
+    "mint",
+]
+manifest_name = "pistols-lords_mock-2b1156e6"

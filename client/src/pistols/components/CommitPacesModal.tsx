@@ -6,6 +6,7 @@ import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { signAndGenerateActionHash } from '@/pistols/utils/salt'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ActionChances } from '@/pistols/components/ActionChances'
+import { feltToString } from '@/lib/utils/starknet'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -21,7 +22,7 @@ export default function CommitPacesModal({
   duelId: bigint
   roundNumber?: number
 }) {
-  const { account } = useAccount()
+  const { account, chainId } = useAccount()
   const { duelistId } = useSettings()
   const { commit_action } = useDojoSystemCalls()
 
@@ -39,7 +40,7 @@ export default function CommitPacesModal({
   const _submit = useCallback(async () => {
     if (canSubmit) {
       setIsSubmitting(true)
-      const hash = await signAndGenerateActionHash(account, duelistId, duelId, roundNumber, paces)
+      const hash = await signAndGenerateActionHash(account, feltToString(chainId), duelistId, duelId, roundNumber, paces)
       if (hash) {
         await commit_action(account, duelistId, duelId, roundNumber, hash)
         setIsOpen(false)

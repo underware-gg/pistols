@@ -16,6 +16,7 @@ export function Balance({
   tableId,  // used for icon only
   ether,    // used for icon only
   value = null,
+  decimals,
   wei = null,
   big = false,
   small = false,
@@ -29,6 +30,7 @@ export function Balance({
   tableId?: string
   value?: BigNumberish
   wei?: BigNumberish
+  decimals?: number
   ether?: boolean
   big?: boolean
   small?: boolean
@@ -40,16 +42,16 @@ export function Balance({
   children?: ReactNode
 }) {
   const _value = useMemo<string>(() => {
-    const decimals = (ether ? 6 : 0)
+    const _decimals = decimals ?? (ether ? 6 : 0)
     const result = (
-      wei != null ? weiToEthString(wei, decimals)
-        : value != null ? weiToEthString(value, decimals)
+      wei != null ? weiToEthString(wei, _decimals)
+        : value != null ? weiToEthString(value, _decimals)
           : ''
     )
     return (result == '0' || result == '0.0') ? EMOJI.ZERO : result
-  }, [value, wei])
+  }, [decimals, value, wei])
 
-  let classNames = useMemo(() => {
+  const classNames = useMemo(() => {
     let result = []
     if (small) result.push('WagerSmall')
     else if (big) result.push('WagerBig')

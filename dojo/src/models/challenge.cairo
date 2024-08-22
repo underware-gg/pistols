@@ -1,12 +1,14 @@
 use starknet::ContractAddress;
 use pistols::models::duelist::{Score};
+use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
+use pistols::types::round::{RoundState, RoundStateTrait};
 
 //-------------------------
 // Challenge lifecycle
 //
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-struct Challenge {
+pub struct Challenge {
     #[key]
     duel_id: u128,
     //-------------------------
@@ -17,29 +19,29 @@ struct Challenge {
     duelist_id_a: u128,         // Challenger duelist
     duelist_id_b: u128,         // Challenged duelist 
     // progress and results
-    state: u8,                  // actually a ChallengeState
+    state: ChallengeState,
     round_number: u8,           // current or final
     winner: u8,                 // 0:draw, 1:duelist_a, 2:duelist_b
     // timestamps in unix epoch
     timestamp_start: u64,       // Unix time, started
     timestamp_end: u64,         // Unix time, ended
-} // [f] [f] [256] [152]
+} // [f] [f] [f] [f] [128] [128] [152]
 
 // Challenge wager (optional)
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-struct Wager {
+pub struct Wager {
     #[key]
     duel_id: u128,
     //------------
-    value: u256,
-    fee: u256,
+    value: u128,
+    fee: u128,
 }
 
 // Score snapshot
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-struct Snapshot {
+pub struct Snapshot {
     #[key]
     duel_id: u128,
     //-------------------------
@@ -51,13 +53,13 @@ struct Snapshot {
 // Each duel round
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-struct Round {
+pub struct Round {
     #[key]
     duel_id: u128,
     #[key]
     round_number: u8,
     //---------------
-    state: u8,      // actually a RoundState
+    state: RoundState,
     shot_a: Shot,   // duelist_a shot
     shot_b: Shot,   // duelist_b shot
 } // (8 + 232 + 232) = 472 bits ~ 2 felts (max 504)

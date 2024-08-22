@@ -12,31 +12,35 @@ import { useCalcFee } from '@/pistols/hooks/useContractCalls'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
+import { FormInput } from '@/pistols/components/ui/Form'
+import { Balance } from '@/pistols/components/account/Balance'
 import { WagerAndOrFees } from '@/pistols/components/account/LordsBalance'
 import { ethToWei, validateCairoString } from '@/lib/utils/starknet'
 import { ChallengeMessages } from '@/pistols/utils/pistols'
 import { Divider } from '@/lib/ui/Divider'
 import { randomArrayElement } from '@/lib/utils/random'
-import { Balance } from './account/Balance'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export default function NewChallengeModal() {
- const { create_challenge } = useDojoSystemCalls()
-  const { account } = useAccount()
+  const { create_challenge } = useDojoSystemCalls()
+  const { account, address } = useAccount()
   const { tableId, duelistId } = useSettings()
 
   const { challengingId, dispatchChallengingDuelistId, dispatchSelectDuelistId, dispatchSelectDuel } = usePistolsContext()
   const isOpen = useMemo(() => (challengingId > 0n), [challengingId])
   const duelistIdA = duelistId
   const duelistIdB = challengingId
+  const addressA = address
+  const addressB = challengingId
 
   const _close = () => { dispatchChallengingDuelistId(0n) }
 
   const { profilePic: profilePicA } = useDuelist(duelistIdA)
   const { profilePic: profilePicB } = useDuelist(duelistIdB)
-  const { hasPact, pactDuelId } = usePact(tableId, duelistIdA, duelistIdB)
+  const { hasPact: hasPactDuelist, pactDuelId: pactDuelIdDuelist } = usePact(tableId, duelistIdA, duelistIdB)
+  const { hasPact: hasPactAddress, pactDuelId: pactDuelIdAddress } = usePact(tableId, addressA, addressB)
 
   const { description: tableDescription } = useTable(tableId)
   const { balance: balanceA } = useTableAccountBalance(tableId, duelistIdA)
@@ -55,15 +59,17 @@ export default function NewChallengeModal() {
   }, [isOpen])
 
   useEffect(() => {
-    if (hasPact) {
-      dispatchSelectDuel(pactDuelId)
+    if (hasPactDuelist) {
+      dispatchSelectDuel(pactDuelIdDuelist)
+    } else if (hasPactAddress) {
+      dispatchSelectDuel(pactDuelIdAddress)
     }
-  }, [hasPact])
+  }, [hasPactDuelist, hasPactAddress])
 
   const _create_challenge = () => {
     const _submit = async () => {
       setIsSubmitting(true)
-      await create_challenge(account, duelistId, challengingId, args.message, tableId, args.wager_value, args.expire_seconds)
+      await create_challenge(account, duelistId, challengingId, args.message, tableId, args.wager_value, args.expire_hours)
       setIsSubmitting(false)
     }
     if (args) _submit()
@@ -98,7 +104,7 @@ export default function NewChallengeModal() {
           <Grid style={{ width: '350px' }}>
             <Row columns='equal' textAlign='left'>
               <Col>
-                <ProfileDescription duelistId={duelistIdA} displayOwnerAddress={false} />
+                <ProfileDescription duelistId={duelistIdA} displayOwnerAddress={true} />
                 {canWager && <h5><Balance tableId={tableId} wei={balanceA} /></h5>}
               </Col>
             </Row>
@@ -109,7 +115,7 @@ export default function NewChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <ProfileDescription duelistId={duelistIdB} displayOwnerAddress={false} />
+                <ProfileDescription duelistId={duelistIdB} address={duelistIdB} displayOwnerAddress={true} />
                 {canWager && <h5><Balance tableId={tableId} wei={balanceB} /></h5>}
               </Col>
             </Row>
@@ -175,7 +181,7 @@ function NewChallengeForm({
   useEffect(() => {
     setArgs(canSubmit ? {
       message,
-      expire_seconds: (days * 24 * 60 * 60) + (hours * 60 * 60),
+      expire_hours: ((days * 24 * 60 * 60) + hours),
       table_id: tableId,
       wager_value: ethToWei(value),
     } : null)
@@ -205,7 +211,6 @@ function NewChallengeForm({
       <Form className=''>
         <Form.Field>
           <span className='FormLabel'>&nbsp;reasoning</span>
-          {/* <input placeholder={_defaultMessage} value={message} maxLength={31} onChange={(e) => setMessage(e.target.value)} /> */}
           <Dropdown
             options={messageOptions}
             placeholder={'say something!'}
@@ -245,19 +250,18 @@ function NewChallengeForm({
         </Form.Field>
 
         <Form.Field>
-          <span className='FormLabel'>&nbsp;wager (deposit now, winner takes all, minus fee)</span>
-          <input
-            disabled={!canWager}
+          <FormInput
+            label='Wager -- deposit now, winner takes all, minus fee'
             placeholder={'$LORDS'}
-            value={canWager ? value : 'No wager in this Table'}
-            maxLength={12}
-            onChange={(e) => {
-              const _input = e.target.value as string
-              const _lords = _input ? parseInt(_input) : 0
+            value={canWager ? value.toString() : 'No wager in this Table'}
+            setValue={(newValue) => {
+              const _lords = newValue ? parseInt(newValue) : 0
               if (!isNaN(_lords)) {
                 setValue(_lords)
               }
             }}
+            maxLength={7}
+            disabled={!canWager}
           />
         </Form.Field>
 

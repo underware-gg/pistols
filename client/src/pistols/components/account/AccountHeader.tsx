@@ -1,9 +1,8 @@
 import React from 'react'
-import { useRouter } from 'next/navigation'
 import { Grid } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
 import { AddressShort } from '@/lib/ui/AddressShort'
@@ -12,21 +11,19 @@ import { LordsBalance } from '@/pistols/components/account/LordsBalance'
 const Row = Grid.Row
 const Col = Grid.Column
 
-export default function AccountHeader({
-}) {
-  const router = useRouter()
-  const { address } = useAccount()
-  const { isGuest } = useSettings()
-  const { dispatchSelectDuelistId } = usePistolsContext()
-  const { duelistId } = useSettings()
+export default function AccountHeader() {
+  const { address, isConnected } = useAccount()
+  const { isAnon, duelistId } = useSettings()
+  const { dispatchSetScene } = usePistolsScene()
+  // const { dispatchSelectDuelistId } = usePistolsContext()
 
   const { nameDisplay, profilePic } = useDuelist(duelistId)
 
   const _click = () => {
-    if(isGuest) {
-      router.push('/gate')
+    if (isAnon) {
+      dispatchSetScene(SceneName.Profile)
     } else {
-      dispatchSelectDuelistId(duelistId) 
+      dispatchSetScene(SceneName.Profile)
     }
   }
 
@@ -34,11 +31,10 @@ export default function AccountHeader({
     <Grid>
       <Row className='ProfilePicHeight' textAlign='center'>
         <Col width={11} textAlign='right' verticalAlign='top'>
-          {isGuest ?
-            <h3>Guest</h3>
+          {!isConnected ? <h3>Guest</h3>
             : <>
               <h3>{nameDisplay}</h3>
-              <AddressShort address={address} copyLink={true} />
+              <AddressShort address={address} copyLink={'left'} />
               <br />
               <LordsBalance address={address} big />
             </>}
