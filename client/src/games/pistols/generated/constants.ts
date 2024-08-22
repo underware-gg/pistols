@@ -12,6 +12,9 @@ type type_SELECTORS = {
   MINTER: BigNumberish, // cairo: felt252
   TOKEN_DUELIST: BigNumberish, // cairo: felt252
   LORDS_MOCK: BigNumberish, // cairo: felt252
+  CONFIG: BigNumberish, // cairo: felt252
+  TABLE_CONFIG: BigNumberish, // cairo: felt252
+  TOKEN_CONFIG: BigNumberish, // cairo: felt252
 };
 export const SELECTORS: type_SELECTORS = {
   ADMIN: '0x036fd20372b5d47c092e2fede52897075978efb732aeaeb155d19eb8147f6497', // 'selector_from_tag!("pistols-admin")'
@@ -19,6 +22,9 @@ export const SELECTORS: type_SELECTORS = {
   MINTER: '0x07b759538267ac8937772e5bdadb6b598748b33c377c90426fc0a4960234de20', // 'selector_from_tag!("pistols-minter")'
   TOKEN_DUELIST: '0x0541e9c1813eb1f7867062ea0fafcd949ad9d3f8b212bbac1df80c48947c48cd', // 'selector_from_tag!("pistols-token_duelist")'
   LORDS_MOCK: '0x02b1156e63a09854c3d8dba0cad93b41e1fc4662466a0ffc2a9ec9e54b4bc788', // 'selector_from_tag!("pistols-lords_mock")'
+  CONFIG: '0x060742fa7259b7ce3ebc0a2dde90b740d1234c770199a822fa2e7cf779dc0392', // 'selector_from_tag!("pistols-Config")'
+  TABLE_CONFIG: '0x01e8368fc88328662c92a11c0e739bf8b74bcd77a20071d2641a31e1a063c138', // 'selector_from_tag!("pistols-TableConfig")'
+  TOKEN_CONFIG: '0x056ebd3387f45e8b292b472f3539e675031f12cf156c07c309c6403044f71fed', // 'selector_from_tag!("pistols-TokenConfig")'
 };
 
 // from: ../dojo/src/models/config.cairo
@@ -37,100 +43,6 @@ type type_TABLES = {
 export const TABLES: type_TABLES = {
   LORDS: 'Lords',
   COMMONERS: 'Commoners',
-};
-
-// from: ../dojo/src/systems/actions.cairo
-type type_actions = {
-  NOT_INITIALIZED: string, // cairo: felt252
-  INVALID_CHALLENGED: string, // cairo: felt252
-  INVALID_CHALLENGED_NULL: string, // cairo: felt252
-  INVALID_CHALLENGED_SELF: string, // cairo: felt252
-  INVALID_REPLY_SELF: string, // cairo: felt252
-  INVALID_CHALLENGE: string, // cairo: felt252
-  INVALID_DUELIST: string, // cairo: felt252
-  NOT_YOUR_CHALLENGE: string, // cairo: felt252
-  NOT_YOUR_DUELIST: string, // cairo: felt252
-  CHALLENGER_NOT_ADMITTED: string, // cairo: felt252
-  CHALLENGED_NOT_ADMITTED: string, // cairo: felt252
-  CHALLENGE_EXISTS: string, // cairo: felt252
-  CHALLENGE_NOT_AWAITING: string, // cairo: felt252
-  CHALLENGE_NOT_IN_PROGRESS: string, // cairo: felt252
-  TABLE_IS_CLOSED: string, // cairo: felt252
-  MINIMUM_WAGER_NOT_MET: string, // cairo: felt252
-  NO_WAGER: string, // cairo: felt252
-  INSUFFICIENT_BALANCE: string, // cairo: felt252
-  NO_ALLOWANCE: string, // cairo: felt252
-  WITHDRAW_NOT_AVAILABLE: string, // cairo: felt252
-  WAGER_NOT_AVAILABLE: string, // cairo: felt252
-  INVALID_ROUND_NUMBER: string, // cairo: felt252
-  ROUND_NOT_IN_COMMIT: string, // cairo: felt252
-  ROUND_NOT_IN_REVEAL: string, // cairo: felt252
-  ALREADY_COMMITTED: string, // cairo: felt252
-  ALREADY_REVEALED: string, // cairo: felt252
-  ACTION_HASH_MISMATCH: string, // cairo: felt252
-};
-export const actions: type_actions = {
-  NOT_INITIALIZED: 'PISTOLS: Not initialized',
-  INVALID_CHALLENGED: 'PISTOLS: Challenged unknown',
-  INVALID_CHALLENGED_NULL: 'PISTOLS: Challenged null',
-  INVALID_CHALLENGED_SELF: 'PISTOLS: Challenged self',
-  INVALID_REPLY_SELF: 'PISTOLS: Reply self',
-  INVALID_CHALLENGE: 'PISTOLS: Invalid challenge',
-  INVALID_DUELIST: 'PISTOLS: Invalid duelist',
-  NOT_YOUR_CHALLENGE: 'PISTOLS: Not your challenge',
-  NOT_YOUR_DUELIST: 'PISTOLS: Not your duelist',
-  CHALLENGER_NOT_ADMITTED: 'PISTOLS: Challenger not allowed',
-  CHALLENGED_NOT_ADMITTED: 'PISTOLS: Challenged not allowed',
-  CHALLENGE_EXISTS: 'PISTOLS: Challenge exists',
-  CHALLENGE_NOT_AWAITING: 'PISTOLS: Challenge not Awaiting',
-  CHALLENGE_NOT_IN_PROGRESS: 'PISTOLS: Challenge not Progress',
-  TABLE_IS_CLOSED: 'PISTOLS: Table is closed',
-  MINIMUM_WAGER_NOT_MET: 'PISTOLS: Minimum wager not met',
-  NO_WAGER: 'PISTOLS: No wager on this table',
-  INSUFFICIENT_BALANCE: 'PISTOLS: Insufficient balance',
-  NO_ALLOWANCE: 'PISTOLS: No transfer allowance',
-  WITHDRAW_NOT_AVAILABLE: 'PISTOLS: Withdraw not available',
-  WAGER_NOT_AVAILABLE: 'PISTOLS: Wager not available',
-  INVALID_ROUND_NUMBER: 'PISTOLS: Invalid round number',
-  ROUND_NOT_IN_COMMIT: 'PISTOLS: Round not in commit',
-  ROUND_NOT_IN_REVEAL: 'PISTOLS: Round not in reveal',
-  ALREADY_COMMITTED: 'PISTOLS: Already committed',
-  ALREADY_REVEALED: 'PISTOLS: Already revealed',
-  ACTION_HASH_MISMATCH: 'PISTOLS: Action hash mismatch',
-};
-
-// from: ../dojo/src/systems/admin.cairo
-type type_admin = {
-  INVALID_OWNER: string, // cairo: felt252
-  INVALID_TREASURY: string, // cairo: felt252
-  INVALID_TABLE: string, // cairo: felt252
-  INVALID_DESCRIPTION: string, // cairo: felt252
-  NOT_ADMIN: string, // cairo: felt252
-};
-export const admin: type_admin = {
-  INVALID_OWNER: 'ADMIN: Invalid account_address',
-  INVALID_TREASURY: 'ADMIN: Invalid treasury_address',
-  INVALID_TABLE: 'ADMIN: Invalid table',
-  INVALID_DESCRIPTION: 'ADMIN: Invalid description',
-  NOT_ADMIN: 'ADMIN: not admin',
-};
-
-// from: ../dojo/src/systems/minter.cairo
-type type_minter = {
-  INVALID_TOKEN_ADDRESS: string, // cairo: felt252
-  INVALID_SUPPLY: string, // cairo: felt252
-  NOT_ADMIN: string, // cairo: felt252
-  MINTED_OUT: string, // cairo: felt252
-  MINTING_IS_CLOSED: string, // cairo: felt252
-  MAXED_WALLET: string, // cairo: felt252
-};
-export const minter: type_minter = {
-  INVALID_TOKEN_ADDRESS: 'MINTER: invalid token address',
-  INVALID_SUPPLY: 'MINTER: invalid supply',
-  NOT_ADMIN: 'MINTER: not admin',
-  MINTED_OUT: 'MINTER: minted out',
-  MINTING_IS_CLOSED: 'MINTER: minting closed',
-  MAXED_WALLET: 'MINTER: wallet maxed out',
 };
 
 // from: ../dojo/src/types/action.cairo

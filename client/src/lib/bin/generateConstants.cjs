@@ -38,17 +38,30 @@ function getConstantsFromCairoFile(filePath) {
     if (current_mod || current_enum) {
       // inside mod
       const l = cleanLine(line);
-      if (l == '}') {
+      // console.log(`${current_mod}:[${l}]`)
+      if (line[0] == '}') {
+        // end mod
         current_mod = null;
         current_enum = null;
+        is_errors = false;
         is_test = false;
+      } else if (is_errors && l == '}') {
+        // end errors
+        is_errors = false;
       } else if (!is_test) {
-        if (current_mod && l.startsWith('const ')) {
-          // console.log(l)
-          mods[current_mod].lines.push(l)
-        } else if (current_enum && l) {
-          // console.log(l)
-          enums[current_enum].lines.push(l)
+        if (l == 'mod Errors {') {
+          // start error
+          is_errors = true;
+        }
+        // can find consts        
+        if (!is_errors) {
+          if (current_mod && l.startsWith('const ')) {
+            // console.log(l)
+            mods[current_mod].lines.push(l)
+          } else if (current_enum && l) {
+            // console.log(l)
+            enums[current_enum].lines.push(l)
+          }
         }
       }
     } else if (line == '#[cfg(test)]') {
