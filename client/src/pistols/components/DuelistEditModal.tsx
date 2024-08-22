@@ -19,6 +19,7 @@ import { Opener } from '@/lib/ui/useOpener'
 import { Divider } from '@/lib/ui/Divider'
 import { IconClick } from '@/lib/ui/Icons'
 import { isPositiveBigint } from '@/lib/utils/types'
+import { useLordsFaucet } from '@/lib/dojo/hooks/useLordsMock'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -40,6 +41,7 @@ export default function DuelistEditModal({
   // Detect new mints
   const { dispatchSetScene } = usePistolsScene()
   const [lastDuelistIdBeforeMint, setLastDuelistIdBeforeMint] = useState<bigint>(null)
+  const { mintLords } = useLordsFaucet()
   useEffect(() => {
     // minted new! go to Game...
     if (opener.isOpen &&
@@ -48,8 +50,10 @@ export default function DuelistEditModal({
       lastDuelistIdBeforeMint != null && 
       lastDuelistId != lastDuelistIdBeforeMint
     ) {
+      console.log(`NEW DUELIST:`, lastDuelistId)
       dispatchDuelistId(lastDuelistId)
       dispatchSetScene(SceneName.Tavern)
+      mintLords(account)
       opener.close()
     }
   }, [mintNew, lastDuelistId])

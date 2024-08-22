@@ -26,17 +26,18 @@ export default function ScProfile() {
   const { isConnected, address } = useAccount()
   const { duelistEditOpener } = usePistolsContext()
   const { fromGate } = usePistolsScene()
-  const { duelistBalance, isPending } = useDuelistBalanceOf(address)
+  const { duelistBalance } = useDuelistBalanceOf(address)
 
   const [loaded, setLoaded] = useState(false)
   useEffect(() => {
     if (!loaded) {
       setLoaded(true)
-      if (fromGate && !isPending && duelistBalance == 0) {
+      console.log(`FROM`, fromGate, duelistBalance)
+      if (fromGate && duelistBalance === 0) {
         duelistEditOpener.open({ mintNew: true })
       }
     }
-  }, [duelistBalance, isPending])
+  }, [fromGate, duelistBalance])
 
   return (
     <div id='Gate'>

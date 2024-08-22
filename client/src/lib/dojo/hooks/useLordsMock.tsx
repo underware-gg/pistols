@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { useLordsContract } from '@/lib/dojo/hooks/useLords'
@@ -22,12 +22,23 @@ export const useLordsFaucet = (): FaucetInterface => {
   const { account } = useAccount()
   const { selectedChainConfig } = useStarknetContext()
   const { contractAddress, isMock, abi } = useLordsContract()
+  const faucetUrl = useMemo(() => (selectedChainConfig.lordsFaucetUrl ?? null), [selectedChainConfig])
 
   const [isMinting, setIsMinting] = useState(false)
   const [error, setError] = useState<string | undefined>(undefined)
 
   const mintLords = useCallback(
     async (recipientAccount?: Account): Promise<FaucetExecuteResult> => {
+
+      if (faucetUrl) {
+        window?.open(faucetUrl, '_blank')
+        return null
+      }
+      
+      if (isMinting) {
+        return null
+      }
+      
       setError(undefined)
       setIsMinting(true)
 
@@ -69,7 +80,7 @@ export const useLordsFaucet = (): FaucetInterface => {
   return {
     isMock,
     mintLords,
-    faucetUrl: selectedChainConfig.lordsFaucetUrl ?? null,
+    faucetUrl,
     isMinting,
     error,
   }
