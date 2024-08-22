@@ -137,20 +137,19 @@ const pistolsSlotConfig: DojoChainConfig = {
   chain: undefined, // derive from this
   chainId: ChainId.PISTOLS_SLOT,
   name: 'Slot Testnet',
-  // rpcUrl: 'https://api.cartridge.gg/x/pistols/katana',
-  rpcUrl: 'https://us-east.api.cartridge.gg/x/pistols/katana',
+  rpcUrl: 'https://api.cartridge.gg/x/pistols/katana',
   toriiUrl: 'https://api.cartridge.gg/x/pistols/torii',
   relayUrl: undefined,
-  masterAddress: '0x2ec24cd4415a28e821c5b4b9dc3801340cb2e1a23f4289443d15fea60e2daab',
-  masterPrivateKey: '0x1f3a9e4f7827167d6f7e93b8f2debc3129b06ceca19d02355434499592bf16c',
+  masterAddress: '0x386fdc49b75880fb939000eb1d7fc6fc718d0f4c5b78cf6d0212d606cbae69',
+  masterPrivateKey: '0x2b1f038e270aec16f5b106ddae85083151a189cd31aefd19f5e6edd29eb1ebc',
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
   lordsContractAddress: undefined, // lords_mock
   lordsFaucetUrl: undefined,
   predeployedAccounts: [],
   connectorIds: [
-    supportedConnetorIds.DOJO_PREDEPLOYED,
-    // supportedConnetorIds.CONTROLLER,
+    // supportedConnetorIds.DOJO_PREDEPLOYED,
+    supportedConnetorIds.CONTROLLER,
   ],
   // starknet Chain
   nativeCurrency: ETH_KATANA,
@@ -170,13 +169,9 @@ const pistolsStagingConfig: DojoChainConfig = {
   etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
   lordsContractAddress: undefined, // lords_mock
   lordsFaucetUrl: undefined,
-  predeployedAccounts: [{
-    address: '0x1d7b2ff5e73635ea01349a228ec68915feaa520810f22d57840f328077df2f8',
-    privateKey: '0x5aaecdd5d38d95971c36cb47f56c59e2fd14c2ddc7fe39e62356bff262bf3f5',
-    active: false,
-  }],
+  predeployedAccounts: [],
   connectorIds: [
-    supportedConnetorIds.DOJO_PREDEPLOYED,
+    // supportedConnetorIds.DOJO_PREDEPLOYED,
     supportedConnetorIds.CONTROLLER,
   ],
   // starknet Chain
@@ -201,8 +196,8 @@ const realmsWorldConfig: DojoChainConfig = {
   lordsFaucetUrl: 'https://internal-explorer.preview.cartridge.gg',
   predeployedAccounts: [],
   connectorIds: [
-    supportedConnetorIds.DOJO_PREDEPLOYED,
-    // supportedConnetorIds.CONTROLLER,
+    // supportedConnetorIds.DOJO_PREDEPLOYED,
+    supportedConnetorIds.CONTROLLER,
   ],
   // starknet Chain
   nativeCurrency: LORDS_REALMS_L3,
