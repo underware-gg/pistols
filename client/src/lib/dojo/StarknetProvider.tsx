@@ -33,10 +33,10 @@ export const StarknetProvider = ({
   //
   const intialChainId = useMemo(() => {
     // connect to last
-    const lastSelectedChainId = (typeof window !== 'undefined' ? window?.localStorage?.getItem('lastSelectedChainId') : undefined) as ChainId
-    if (isChainIdSupported(lastSelectedChainId)) {
-      return lastSelectedChainId
-    }
+    // const lastSelectedChainId = (typeof window !== 'undefined' ? window?.localStorage?.getItem('lastSelectedChainId') : undefined) as ChainId
+    // if (isChainIdSupported(lastSelectedChainId)) {
+    //   return lastSelectedChainId
+    // }
     return dojoAppConfig.initialChainId
   }, [dojoAppConfig])
 
