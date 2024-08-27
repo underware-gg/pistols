@@ -24,10 +24,10 @@ void main() {
     vec3 enhancedColor;
     float distortionKoef;
     if (waterInfo.r > waterInfo.g) {
-        enhancedColor = colorDeep * 1.2;
+        enhancedColor = colorDeep * 1.5;
         distortionKoef = 1.0;
     } else if (waterInfo.g > waterInfo.r) {
-        enhancedColor = colorShallow * 1.2;
+        enhancedColor = colorShallow * 1.5;
         distortionKoef = 1.0;
     }
 
@@ -42,7 +42,7 @@ void main() {
     vec4 base = texture2DProj( tDiffuse, uv );
 
     vec3 finalColor = mix(base.rgb, enhancedColor, 0.7);
-    finalColor = (finalColor - 0.5) * 1.12 + 0.5;
+    // finalColor = (finalColor - 0.5) * 1.12 + 0.5;
 
     gl_FragColor = vec4(finalColor, 1.0);
 

@@ -42,16 +42,22 @@ export function ProfileDescription({
   duelistId,
   address,
   tableId,
+  displayNameSmall = false,
   displayStats = false,
   displayOwnerAddress = false,
+  displayOwnerAddressSmall = false,
   displayBalance = false,
+  displayHonor = true,
 }: {
-  duelistId: BigNumberish,
-  address?: BigNumberish,
-  tableId?: BigNumberish,
+  duelistId: BigNumberish
+  address?: BigNumberish
+  tableId?: BigNumberish
+  displayNameSmall?: boolean
   displayStats?: boolean
   displayOwnerAddress?: boolean
+  displayOwnerAddressSmall?: boolean
   displayBalance?: boolean
+  displayHonor?: boolean
 }) {
   const { score: {
     total_wins, total_losses, total_draws, total_duels, honourAndTotal,
@@ -70,14 +76,19 @@ export function ProfileDescription({
       <Row>
 
         <Col width={displayStats ? 12 : 16}>
-          <h2 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /></h2>
-          {displayOwnerAddress && <AddressShort address={_owner} />}
-          <h5 className='Important NoMargin TitleCase'>
+          {displayNameSmall ? 
+            (<h2 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /></h2>)
+            :
+            (<h2 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /></h2>)
+          }
+          
+          {displayOwnerAddress && <AddressShort address={owner} small={displayOwnerAddressSmall}/>}
+          {displayHonor && <h3 className='Important NoMargin TitleCase'>
             Honour: <span className='Wager'>{honourAndTotal}</span>
             {isVillainous && <> {EMOJI.VILLAIN} <span className='Wager'>{levelDisplay}</span></>}
             {isTrickster && <> {EMOJI.TRICKSTER} <span className='Wager'>{levelDisplay}</span></>}
             {isHonourable && <> {EMOJI.LORD} <span className='Wager'>{levelDisplay}</span></>}
-          </h5>
+          </h3>}
           {displayBalance &&
             <h5>
               <LordsBalance address={_owner} big />

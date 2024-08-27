@@ -10,7 +10,7 @@ function AddressShort({
   copyLink = 'right',
   important = false,
   ifExists = false,
-
+  small = false,
 }: {
   address: BigNumberish
   pre?: string
@@ -18,8 +18,9 @@ function AddressShort({
   copyLink?: 'left' | 'right' | false
   important?: boolean
   ifExists?: boolean
+  small?: boolean
 }) {
-  const display = useMemo(() => (shortAddress(bigintToHex(address))), [address])
+  const display = useMemo(() => (shortAddress(bigintToHex(address), small)), [address, small])
 
   const classNames = useMemo(() => {
     let classNames = ['Code']
@@ -31,7 +32,7 @@ function AddressShort({
 
   if (ifExists && BigInt(address ?? 0) == 0n) return <></>
   return (
-    <span className={classNames.join(' ')}>
+    <span className={classNames.join(' ')} data-contentlength={Math.floor(display.length / 3)}>
       {pre} {copyLink == 'left' && copyIcon}{display}{copyLink == 'right' && copyIcon} {post}
     </span>
   )

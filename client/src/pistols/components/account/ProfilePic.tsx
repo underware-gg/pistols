@@ -11,13 +11,14 @@ const _makeUrl = (profilePic: number | null, square: boolean) => {
   const variant = (square ? 'square' : 'portrait')
   return `/profiles/${variant}/${('00' + profilePic).slice(-2)}.jpg`
 }
-const _className = ({ small, medium, square, duel, anon }) => (
+const _className = ({ small, medium, square, circle, duel, anon }) => (
   small ? 'ProfilePicSmall'
     : medium ? 'ProfilePicMedium'
       : anon ? 'ProfilePicAnon'
         : square ? 'ProfilePicSquare'
-          : duel ? 'ProfilePicDuel'
-            : 'ProfilePic'
+          : circle ? 'ProfilePicCircle'
+            : duel ? 'ProfilePicDuel'
+              : 'ProfilePic'
 )
 
 //---------------
@@ -25,11 +26,12 @@ const _className = ({ small, medium, square, duel, anon }) => (
 //
 
 export function ProfilePic({
-  profilePic,
-  srcUrl = null,
+  profilePic = null,
+  profilePicUrl = null,
   small = false,
   medium = false,
   square = false,
+  circle = false,
   duel = false,
   anon = false,
   dimmed = false,
@@ -41,11 +43,12 @@ export function ProfilePic({
   // switch button
   duelistId,
 }: {
-  profilePic: number
-  srcUrl?: string
+  profilePic?: number
+  profilePicUrl?: string
   small?: boolean
   medium?: boolean
   square?: boolean
+  circle?: boolean
   duel?: boolean
   anon?: boolean
   dimmed?: boolean
@@ -60,12 +63,12 @@ export function ProfilePic({
   const _clickable = (onClick != null && !disabled)
 
   const classNames = useMemo(() => {
-    let result = [_className({ small, medium, square, duel, anon }), className]
+    let result = [_className({ small, medium, square, circle, duel, anon }), className]
     if (_clickable) result.push('Anchor')
     if (disabled || dimmed) result.push('ProfilePicDisabled')
     return result
-  }, [className, small, medium, square, duel, anon, disabled, dimmed])
-  const url = useMemo(() => (srcUrl ?? _makeUrl(profilePic, square || anon)), [srcUrl, profilePic, square])
+  }, [className, small, medium, square, circle, duel, anon, disabled, dimmed])
+  const url = useMemo(() => (profilePicUrl ?? _makeUrl(profilePic, square || anon)), [profilePicUrl, profilePic, square])
 
   // as Button
   const _click = () => {

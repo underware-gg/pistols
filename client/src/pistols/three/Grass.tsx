@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import * as shaders from './shaders.tsx'
+import { _gui, _statsEnabled } from './game.tsx';
 
 const GRASS_PATCH_SIZE_LENGTH = 0.1;
 const GRASS_PATCH_SIZE_DEPTH = 0.01;
@@ -25,7 +26,7 @@ export class Grass extends THREE.Object3D {
     tipColor: '#bbc624'
   }
 
-  constructor(params: { height: number; offset: number; heightmap: any; dims: any; transforms: any; growth: number }, statsEnabled = false, gui = null) {
+  constructor(params: { height: number; offset: number; heightmap: any; dims: any; transforms: any; growth: number }) {
     super();
 
     this.geometryHigh = this.createGrassGeometry(GRASS_SEGMENTS_HIGH, params.transforms);
@@ -67,8 +68,8 @@ export class Grass extends THREE.Object3D {
     this.mesh = this.createMesh(this.geometryHigh, this.materialHigh, this.depthMaterial, params.transforms);
     this.add(this.mesh);
 
-    if (statsEnabled && gui != null) {
-      this.setupGUI(gui);
+    if (_statsEnabled) {
+      this.setupGUI();
     }
   }
 
@@ -194,8 +195,8 @@ export class Grass extends THREE.Object3D {
     return mesh;
   }
 
-  private setupGUI(gui: any) {
-    let grassFolder = gui.addFolder("GrassFolder");
+  private setupGUI() {
+    let grassFolder = _gui.addFolder("GrassFolder");
     grassFolder
       .add(this, 'windUpdateFPS')
       .name('windUpdateFPS')

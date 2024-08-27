@@ -7,7 +7,7 @@ import { AnimationState } from '@/pistols/three/game'
 //
 export const initialState = {
   health: 100,
-  animated: AnimationState.None,
+  animated: 0, //AnimationState.None
   animatedHealthA: false,
   animatedHealthB: false,
 }

@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import TWEEN from '@tweenjs/tween.js'
-import { WIDTH, HEIGHT, _makeStaticCamera, _renderer, _fullScreenGeom } from './game';
+import { WIDTH, HEIGHT, _renderer } from './game';
 
 
 
@@ -48,7 +48,7 @@ export class Rain extends THREE.Object3D {
     //
     // Scene
     this.scene = new THREE.Scene()
-    this.camera = _makeStaticCamera(0, 0, HEIGHT / 2)
+    // this.camera = _makeStaticCamera(0, 0, HEIGHT / 2)
 
 
 
@@ -111,9 +111,9 @@ export class Rain extends THREE.Object3D {
       transparent: true,
       opacity: 0.05,
     })
-    const clear = new THREE.Mesh(_fullScreenGeom, clearMat)
-    clear.position.set(0, 0, 0)
-    this.scene.add(clear)
+    // const clear = new THREE.Mesh(_fullScreenGeom, clearMat)
+    // clear.position.set(0, 0, 0)
+    // this.scene.add(clear)
 
   }
 
