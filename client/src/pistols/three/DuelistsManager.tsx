@@ -151,44 +151,44 @@ export class DuelistsManager {
   }
 
   private setupEvents() {
-    window.addEventListener('keydown', (event) => {
-      switch (event.key.toLowerCase()) { 
-        case "q":
-          this.duelistA.cards.addCardToScene(CardTextureName.card_front_shoot)
-          this.duelProgressDialogManger.showDialogs()
-          break
-        case "w":
-          this.duelistA.cards.addCardToScene(CardTextureName.card_front_face, CardTextureName.card_front_face_grim)
-          break
-          case "e":
-            this.duelistB.cards.addCardToScene(CardTextureName.card_front_shoot)
-            this.duelProgressDialogManger.hideDialogs()
-          break
-        case "r":
-          this.duelistB.cards.addCardToScene(CardTextureName.card_front_face, CardTextureName.card_front_face_grim)
-          break
-        case "x":
-          this.duelistA.cards.combineCards()
-          this.duelistB.cards.combineCards()
-          break
-        case "escape":
-          console.log(this.camera)
-          console.log(this.scene)
-          if (this.currentHandSelected && !this.currentHandSelected.isAnimatingDetails && this.currentHandSelected.areDetailsShown) {
-            this.currentHandSelected.hideHandDetails()
-            new TWEEN.Tween(this.darkBackground.material) //TODO make functions for show and hide of the dark background and save the animation
-              .to({ opacity: 0.0 }, 600)
-              .easing(TWEEN.Easing.Quadratic.InOut)
-              .start()
-          }
-          break
-        default:
-          // Optional: Handle any other key presses if needed
-          break;
-      }
+    // window.addEventListener('keydown', (event) => {
+    //   switch (event.key.toLowerCase()) { 
+    //     case "q":
+    //       this.duelistA.cards.addCardToScene(CardTextureName.card_front_shoot)
+    //       this.duelProgressDialogManger.showDialogs()
+    //       break
+    //     case "w":
+    //       this.duelistA.cards.addCardToScene(CardTextureName.card_front_face, CardTextureName.card_front_face_grim)
+    //       break
+    //       case "e":
+    //         this.duelistB.cards.addCardToScene(CardTextureName.card_front_shoot)
+    //         this.duelProgressDialogManger.hideDialogs()
+    //       break
+    //     case "r":
+    //       this.duelistB.cards.addCardToScene(CardTextureName.card_front_face, CardTextureName.card_front_face_grim)
+    //       break
+    //     case "x":
+    //       this.duelistA.cards.combineCards()
+    //       this.duelistB.cards.combineCards()
+    //       break
+    //     case "escape":
+    //       console.log(this.camera)
+    //       console.log(this.scene)
+    //       if (this.currentHandSelected && !this.currentHandSelected.isAnimatingDetails && this.currentHandSelected.areDetailsShown) {
+    //         this.currentHandSelected.hideHandDetails()
+    //         new TWEEN.Tween(this.darkBackground.material) //TODO make functions for show and hide of the dark background and save the animation
+    //           .to({ opacity: 0.0 }, 600)
+    //           .easing(TWEEN.Easing.Quadratic.InOut)
+    //           .start()
+    //       }
+    //       break
+    //     default:
+    //       // Optional: Handle any other key presses if needed
+    //       break;
+    //   }
     
-      true
-    })
+    //   true
+    // })
 
     window.addEventListener('mousemove', (event) => this.onMouseMove(event));
   }
