@@ -10,11 +10,16 @@ use pistols::systems::{
 use pistols::libs::utils::{ZERO};
 
 mod SELECTORS {
+    // system selectors
     const ADMIN: felt252 = selector_from_tag!("pistols-admin");
     const ACTIONS: felt252 = selector_from_tag!("pistols-actions");
     const MINTER: felt252 = selector_from_tag!("pistols-minter");
     const TOKEN_DUELIST: felt252 = selector_from_tag!("pistols-token_duelist");
     const LORDS_MOCK: felt252 = selector_from_tag!("pistols-lords_mock");
+    // model selectors
+    const CONFIG: felt252 = selector_from_tag!("pistols-Config");
+    const TABLE_CONFIG: felt252 = selector_from_tag!("pistols-TableConfig");
+    const TOKEN_CONFIG: felt252 = selector_from_tag!("pistols-TokenConfig");
 }
 
 #[generate_trait]

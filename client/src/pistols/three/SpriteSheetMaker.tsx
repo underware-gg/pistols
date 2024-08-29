@@ -51,27 +51,19 @@ export class Actor {
   ready: boolean = false
   animationQueue: { key: string, count: number, loop: boolean, move: { x: number, y: number, z: number }, onStart: any, onEnd: any }[] = []  // Animation queue
 
-  constructor(spriteSheets: any, width: number, height: number, flipped: boolean) {
+  constructor(spriteSheets: any, width: number, height: number, startPositionX: number, flipped: boolean) {
     const geometry = new THREE.PlaneGeometry(width, height)
 
-    Object.keys(spriteSheets).forEach((key, index) => {
-      const sheet = spriteSheets[key]
-      this.sheets[key] = sheet
-
-      if (index === 0) {
-        this.currentSheet = sheet
-        this.playOnce(key)
-      }
-    })
+    this.replaceSpriteSheets(spriteSheets)
 
     this.material = this.currentSheet.makeMaterial()
     this.mesh = new THREE.Mesh(geometry, this.material)
 
     if (flipped) {
-      this.mesh.position.set(-0.5, (height / 2), 2)
+      this.mesh.position.set(-startPositionX, (height / 2), 2)
     } else {
       this.mesh.rotateY(Math.PI)
-      this.mesh.position.set(0.5, (height / 2), 2)
+      this.mesh.position.set(startPositionX, (height / 2), 2)
     }
     this.mesh.rotateZ(Math.PI)
     this.mesh.castShadow = true
@@ -92,6 +84,19 @@ export class Actor {
     this.controls.frameReady = false
 
     this.ready = true
+  }
+
+  replaceSpriteSheets(spriteSheets: any) {
+    Object.keys(spriteSheets).forEach((key, index) => {
+      const sheet = spriteSheets[key]
+      this.sheets[key] = sheet
+
+      if (index === 0) {
+        if (!this.currentSheet) this.currentSheet = sheet
+
+        this.playLoop(key)
+      }
+    })
   }
 
   playOnce(key, frameMovement = { x: 0, y: 0, z: 0, frames: 0 }, onStart = null, onEnd = null) {
@@ -117,17 +122,10 @@ export class Actor {
       }
     }
     
-    //Start playing animations if there are any in queue
-    if (this.controls.paused) {
-      if (this.animationQueue.length > 0) {
-        this.updateNextAnimation();
-      } else {
-        return
-      }
-    }
-
-    if (this.controls.loop && this.animationQueue.length > 0) {
+    if ((this.controls.paused || this.controls.loop) && this.animationQueue.length > 0) {
       this.updateNextAnimation()
+    } else if (this.controls.paused) {
+      return
     }
 
     const elapsed = seconds - this.controls.lastDisplayTime
@@ -201,11 +199,11 @@ export class Actor {
     p += ttt * p4; //end anchor point
 
     return p;
-}
+  }
 
-fastInFastOut(t) {
-    return this.cubicBezier(t, 0, 0.3, 0.7, 1.0);
-}
+  fastInFastOut(t) {
+      return this.cubicBezier(t, 0, 0.3, 0.7, 1.0);
+  }
 
   updateMaterialWithCurrentTile() {
     this.material.map = this.currentSheet.textures[this.controls.currentTile]

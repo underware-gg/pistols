@@ -29,6 +29,7 @@ mod admin {
 
     use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
     use pistols::models::table::{TableConfig, TableAdmittance, TableManager, TableManagerTrait};
+    use pistols::interfaces::systems::{SELECTORS};
     use pistols::libs::utils;
 
     mod Errors {
@@ -37,12 +38,6 @@ mod admin {
         const INVALID_TABLE: felt252        = 'ADMIN: Invalid table';
         const INVALID_DESCRIPTION: felt252  = 'ADMIN: Invalid description';
         const NOT_ADMIN: felt252            = 'ADMIN: not admin';
-    }
-
-    mod Selectors {
-        const CONFIG: felt252 = selector_from_tag!("pistols-Config");
-        const TABLE_CONFIG: felt252 = selector_from_tag!("pistols-TableConfig");
-        const TOKEN_CONFIG: felt252 = selector_from_tag!("pistols-TokenConfig");
     }
 
     fn dojo_init(
@@ -66,9 +61,9 @@ mod admin {
             (
                 world.is_owner(self.selector().into(), account_address) ||
                 (
-                    world.is_writer(Selectors::CONFIG, account_address) &&
-                    world.is_writer(Selectors::TABLE_CONFIG, account_address) &&
-                    world.is_writer(Selectors::TOKEN_CONFIG, account_address)
+                    world.is_writer(SELECTORS::CONFIG, account_address) &&
+                    world.is_writer(SELECTORS::TABLE_CONFIG, account_address) &&
+                    world.is_writer(SELECTORS::TOKEN_CONFIG, account_address)
                 )
             )
         }
@@ -78,13 +73,13 @@ mod admin {
             self.assert_caller_is_admin();
             assert(account_address.is_non_zero(), Errors::INVALID_OWNER);
             if (granted) {
-                self.world().grant_writer(Selectors::CONFIG, account_address);
-                self.world().grant_writer(Selectors::TABLE_CONFIG, account_address);
-                self.world().grant_writer(Selectors::TOKEN_CONFIG, account_address);
+                self.world().grant_writer(SELECTORS::CONFIG, account_address);
+                self.world().grant_writer(SELECTORS::TABLE_CONFIG, account_address);
+                self.world().grant_writer(SELECTORS::TOKEN_CONFIG, account_address);
             } else {
-                self.world().revoke_writer(Selectors::CONFIG, account_address);
-                self.world().revoke_writer(Selectors::TABLE_CONFIG, account_address);
-                self.world().revoke_writer(Selectors::TOKEN_CONFIG, account_address);
+                self.world().revoke_writer(SELECTORS::CONFIG, account_address);
+                self.world().revoke_writer(SELECTORS::TABLE_CONFIG, account_address);
+                self.world().revoke_writer(SELECTORS::TOKEN_CONFIG, account_address);
             }
         }
 

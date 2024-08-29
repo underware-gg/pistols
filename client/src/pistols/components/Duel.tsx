@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Grid, Segment, Icon, Step, SegmentGroup, SemanticFLOATS } from 'semantic-ui-react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Grid, Segment, Icon, Step, SegmentGroup, SemanticFLOATS, Image } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
@@ -16,12 +16,12 @@ import { useWager } from '@/pistols/hooks/useWager'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
 import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionDetector'
 import { DuelStage, useAnimatedDuel, useDuel, useDuelResult } from '@/pistols/hooks/useDuel'
-import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
+import { ProfileDescription, ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileModels } from '@/pistols/data/assets'
-import { AnimationState } from '@/pistols/three/game'
+import { AnimationState, WIDTH } from '@/pistols/three/game'
 import { EmojiIcon, LoadingIcon } from '@/lib/ui/Icons'
-import { ActionEmojis, ActionTypes } from '@/pistols/utils/pistols'
+import { ActionEmojis, ActionTypes, ArchetypeNames } from '@/pistols/utils/pistols'
 import { MenuDebugAnimations, MenuDuel } from '@/pistols/components/Menus'
 import { Balance } from '@/pistols/components/account/Balance'
 import { EMOJI } from '@/pistols/data/messages'
@@ -29,6 +29,11 @@ import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import CommitBladesModal from '@/pistols/components/CommitBladesModal'
 import { CONST } from '@/games/pistols/generated/constants'
 import { bigintToHex } from '@/lib/utils/types'
+import { AddressShort } from '@/lib/ui/AddressShort'
+import { useDuelistOwner } from '../hooks/useTokenDuelist'
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
+
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -37,24 +42,28 @@ export default function Duel({
   duelId
 }) {
   const { gameImpl } = useThreeJsContext()
-  const { animated } = useGameplayContext()
+  const { animated, dispatchAnimated } = useGameplayContext()
 
   const { challengeDescription } = useChallengeDescription(duelId)
   const { tableId, isFinished, message, duelistIdA, duelistIdB, timestamp_start } = useChallenge(duelId)
   const { description } = useTable(tableId)
-  const { value } = useWager(duelId)
+  const { value, fee, feeFormatted } = useWager(duelId)
 
   // guarantee to run only once when this component mounts
   const mounted = useMounted()
   const [duelSceneStarted, setDuelSceneStarted] = useState(false)
-  const { profilePic: profilePicA, nameDisplay: nameA } = useDuelist(duelistIdA)
-  const { profilePic: profilePicB, nameDisplay: nameB } = useDuelist(duelistIdB)
+  const { profilePic: profilePicA, name: nameA } = useDuelist(duelistIdA)
+  const { profilePic: profilePicB, name: nameB } = useDuelist(duelistIdB)
+  const { isYou: isYouA} = useIsYou(duelistIdA)
+  const { isYou: isYouB} = useIsYou(duelistIdB)
   useEffect(() => {
+    console.log(isYouA, isYouB, value)
     if (gameImpl && mounted && !duelSceneStarted && profilePicA && profilePicB && nameA && nameB) {
-      gameImpl.startDuelWithPlayers(nameA, ProfileModels[profilePicA], nameB, ProfileModels[profilePicB])
+      gameImpl.startDuelWithPlayers(nameA, ProfileModels[profilePicA], isYouA, isYouB, nameB, ProfileModels[profilePicB])
       setDuelSceneStarted(true)
+      dispatchAnimated(AnimationState.None)
     }
-  }, [gameImpl, mounted, duelSceneStarted, profilePicA, profilePicB, nameA, nameB])
+  }, [gameImpl, mounted, duelSceneStarted, profilePicA, profilePicB, nameA, nameB, isYouA, isYouB])
 
   // setup grass animation
   const { clientTimestamp } = useClientTimestamp(false)
@@ -69,7 +78,7 @@ export default function Duel({
     duelStage,
     completedStagesA, completedStagesB,
     canAutoRevealA, canAutoRevealB,
-    healthA, healthB,
+    healthA, healthB
   } = useAnimatedDuel(duelId, duelSceneStarted)
 
   const { debugMode } = useSettings()
@@ -81,25 +90,38 @@ export default function Duel({
 
   return (
     <>
-      <div className='TavernTitle' style={{ maxWidth: '350px' }}>
-        <h3 className='Important'>{description}</h3>
-        <h1 className='Quote'>{`“${message}”`}</h1>
-        {value > 0 &&
-          <h5><Balance big tableId={tableId} wei={value} /></h5>
+      <div className='TavernBoard' style={{ backgroundImage: 'url(/images/ui/wager_main.png)', backgroundSize: '100% 100%' }}>
+        <div className='TavernTitle' data-contentlength={Math.floor((message.length + 2) / 10)}>{`“${message}”`}</div>
+        {value > 0 ? /*TODO IF no wager center the TavernTitle? Or display that there is no wager? */
+          // <div className='TavernWager' data-contentlength={Math.floor(`Wager: ${value} $LORDS`.length / 10)}>Wager: {value.toString()} $LORDS</div>
+          <div className='TavernWager' data-contentlength={Math.floor(`Wager: ${value} $LORDS`.length / 10)}>Wager: <Balance clean wei={value}/> $LORDS</div>
+          :
+          <div className='TavernWager' data-contentlength={Math.floor(`Wager: ${value} $LORDS`.length / 10)}>Wager: - $LORDS</div>
         }
-        {(isFinished && animated == AnimationState.Finished) &&
-          <Segment>
-            <h3 className='Important'>{challengeDescription}</h3>
-          </Segment>
+        <div className='TavernTable' data-contentlength={Math.floor(description.length / 10)}>{description}</div>
+        {value > 0 &&
+          <div style={{ position: 'absolute', top: '25%', left: '10%', width: '4vw', height: 'auto' }}>
+            <Image src='/images/ui/wager_bag.png'/>
+          </div>
         }
       </div>
 
-      <div className='DuelSideA'>
-        <div className='DuelProfileA' >
+      {(isFinished && animated == AnimationState.Finished) &&  /*TODO add a modal? or something where the winner and wager will be displayed!  */
+        <Segment style={{ position: 'absolute', top: '50%' }}>
+          <h3 className='Important' style={{ fontSize: '1.3vw' }}>{challengeDescription}</h3>
+        </Segment>
+      }
+
+      <div>
+        <div className='DuelProfileA'>
           <DuelProfile floated='left' duelistId={duelistIdA} health={healthA} />
         </div>
-        <DuelProgress floated='left'
+        <div className='DuelistProfileA'>
+          <DuelistProfile floated='left' duelistId={duelistIdA} health={healthA} />
+        </div>
+        <DuelProgress 
           isA
+          name={nameA}
           duelId={duelId}
           duelStage={duelStage}
           duelistId={duelistIdA}
@@ -107,12 +129,16 @@ export default function Duel({
           canAutoReveal={canAutoRevealA}
         />
       </div>
-      <div className='DuelSideB'>
+      <div>
         <div className='DuelProfileB' >
           <DuelProfile floated='right' duelistId={duelistIdB} health={healthB} />
         </div>
-        <DuelProgress floated='right'
+        <div className='DuelistProfileB' >
+          <DuelistProfile floated='right' duelistId={duelistIdB} health={healthB} />
+        </div>
+        <DuelProgress
           isB
+          name={nameB}
           duelId={duelId}
           duelStage={duelStage}
           duelistId={duelistIdB}
@@ -139,21 +165,84 @@ function DuelProfile({
   floated: SemanticFLOATS
   health: number
 }) {
-  const { profilePic } = useDuelist(duelistId)
+  const { profilePic, name, nameDisplay } = useDuelist(duelistId)
+  const { owner } = useDuelistOwner(duelistId)
+
+  const contentLength = Math.floor(nameDisplay.length/10)
 
   return (
     <>
       {floated == 'left' &&
-        <ProfilePic duel profilePic={profilePic} />
+        <>
+          <ProfilePic circle profilePic={profilePic}  />
+          <Image src='/images/ui/player_profile.png' style={{ position: 'absolute', width: '25vw', pointerEvents: 'none' }} />
+          <div style={{ zIndex: 10, position: 'absolute', left: '7.3vw' }}>
+            <div className='NoMargin ProfileName' data-contentlength={contentLength}>{nameDisplay}</div>
+            <div className='NoMargin ProfileAddress'><AddressShort copyLink={floated} address={owner} small/></div>
+          </div>
+        </>
       }
-      <div className='ProfileAndHealth'>
-        <Segment compact floated={floated} className='ProfileDescription'>
-          <ProfileDescription duelistId={duelistId} displayOwnerAddress />
-        </Segment>
-        <DuelHealthBar health={health} floated={floated} />
-      </div>
       {floated == 'right' &&
-        <ProfilePic duel profilePic={profilePic} />
+        <>
+          <div style={{ zIndex: 10, position: 'absolute', right: '7.3vw', display: 'flex', flexDirection: 'column', alignItems: 'end' }}>
+            <div className='NoMargin ProfileName' data-contentlength={contentLength}>{nameDisplay}</div>
+            <div className='NoMargin ProfileAddress'><AddressShort copyLink={floated} address={owner} small/></div>
+          </div>
+          <ProfilePic circle profilePic={profilePic} />
+          <Image className='FlipHorizontal' src='/images/ui/player_profile.png' style={{ position: 'absolute', width: '25vw', pointerEvents: 'none' }} />
+        </>
+      }
+    </>
+  )
+}
+
+function DuelistProfile({
+  duelistId,
+  floated,
+  health,
+}: {
+  duelistId: BigNumberish,
+  floated: SemanticFLOATS
+  health: number
+}) {
+  const { profilePic, score } = useDuelist(duelistId)
+
+  const [archetypeImage, setArchetypeImage] = useState<string>()
+
+  useEffect(() => {
+    // let imageName = 'duelist_' + ProfileModels[profilePic].toLowerCase() + '_' + ArchetypeNames[score.archetype].toLowerCase()
+    let imageName = 'duelist_female_' + (ArchetypeNames[score.archetype].toLowerCase() == 'undefined' ? 'honourable' : ArchetypeNames[score.archetype].toLowerCase())
+    setArchetypeImage('/images/' + imageName + '.png')
+  }, [score])
+
+  return (
+    <>
+      <div className='DuelistHonourProgress' data-floated={floated}>
+        <CircularProgressbar minValue={0} maxValue={10} circleRatio={10/15}  value={score.honour} strokeWidth={7} styles={buildStyles({ 
+          pathColor: `#efc258`,
+          trailColor: '#4c3926',
+          strokeLinecap: 'butt',
+          rotation: 0.6666666 })}/>
+      </div>
+      {floated == 'left' &&
+        <>
+          <ProfilePic duel profilePicUrl={archetypeImage} />
+          <div className='DuelistHonour' data-floated={floated}>
+            <div style={{ fontSize: '1vw', fontWeight: 'bold', color: '#25150b' }}>{score.honourAndTotal}</div>
+          </div>
+          <DuelHealthBar health={health} floated={floated} />
+          <Image src='/images/ui/duelist_profile.png' style={{ position: 'absolute', width: '25vw', pointerEvents: 'none' }} />
+        </>
+      }
+      {floated == 'right' &&
+        <>
+          <ProfilePic className='FlipHorizontal' duel profilePicUrl={archetypeImage} />
+          <div className='DuelistHonour' data-floated={floated}>
+            <div style={{ fontSize: '1vw', fontWeight: 'bold', color: '#25150b' }}>{score.honourAndTotal}</div>
+          </div>
+          <DuelHealthBar health={health} floated={floated} />
+          <Image className='FlipHorizontal' src='/images/ui/duelist_profile.png' style={{ position: 'absolute', width: '25vw', pointerEvents: 'none' }} />
+        </>
       }
     </>
   )
@@ -163,23 +252,13 @@ function DuelHealthBar({
   health,
   floated,
 }) {
-  const points = useMemo(() => {
-    let result = []
-    for (let i = 1; i <= CONST.FULL_HEALTH; ++i) {
-      const full = (health >= i)
-      result.push(
-        <Segment key={`${i}_${full ? 'full' : 'empty'}`} className={full ? 'HealthPointFull' : 'HealthPointEmpty'} />
-      )
-    }
-    if (floated == 'right') {
-      result.reverse()
-    }
-    return result
+  const healthUrl = useMemo(() => {
+    return '/images/ui/health/health_' + health + '.png'
   }, [health])
   return (
-    <SegmentGroup horizontal className='HealthBar'>
-      {points}
-    </SegmentGroup>
+    <div style={{ position: 'absolute', width: '17.5vw' }}>
+      <Image className={ floated == 'right' ? 'FlipHorizontal' : ''} src={healthUrl} />
+    </div>
   )
 }
 
@@ -187,38 +266,21 @@ function DuelHealthBar({
 function DuelProgress({
   isA = false,
   isB = false,
+  name,
   duelId,
   duelStage,
   duelistId,
   completedStages,
-  floated,
   canAutoReveal = false
 }) {
-  const { round1, round2, round3, roundNumber, turnA, turnB, } = useDuel(duelId)
+  const { gameImpl } = useThreeJsContext()
+  const { round1, round2, round3, roundNumber } = useDuel(duelId)
   const round1Shot = useMemo(() => (isA ? round1?.shot_a : round1?.shot_b), [isA, round1])
   const round2Shot = useMemo(() => (isA ? round2?.shot_a : round2?.shot_b), [isA, round2])
   const round3Shot = useMemo(() => (isA ? round3?.shot_a : round3?.shot_b), [isA, round3])
   const currentRoundAction = useMemo(() => (roundNumber == 1 ? round1Shot : roundNumber == 2 ? round2Shot : round3Shot), [roundNumber, round1Shot, round2Shot, round3Shot])
 
-  //-------------------------
-  // Duel progression
-  //
-  const round1Result = useDuelResult(round1, round1Shot, duelStage, DuelStage.Round1Animation);
-  const round2Result = useDuelResult(round2, round2Shot, duelStage, DuelStage.Round2Animation);
-  const round3Result = useDuelResult(round3, round3Shot, duelStage, DuelStage.Round3Animation);
-
-  const _resultBackground = (shot: any) => {
-    return shot.health == 0 ? 'Negative' : shot.damage > 0 ? 'Warning' : 'Positive'
-  }
-  const _resultEmoji = (shot: any) => {
-    const actionEmoji = ActionEmojis[shot.action]
-    return ActionTypes.runner.includes(shot.action) ? actionEmoji
-      : shot.health == 0 ? EMOJI.DEAD
-        : shot.wager > 0 ? EMOJI.WAGER
-          : shot.win > 0 ? EMOJI.WINNER
-            : shot.damage > 0 ? EMOJI.INJURED
-              : actionEmoji // EMOJI.ALIVE
-  }
+  const duelProgressRef = useRef(null)
 
 
   //------------------------------
@@ -253,168 +315,39 @@ function DuelProgress({
     }
   }, [onClick, canAutoReveal, canReveal])
 
+
+  //-------------------------
+  // Duel progression
+  //
+  useEffect(() => {
+    gameImpl.updatePlayerProgress(isA, completedStages, onClick)
+  }, [gameImpl, isA, completedStages, onClick])
+  
+  useEffect(() => {
+    if (duelProgressRef.current) {
+      gameImpl?.setDuelistElement(isA, duelProgressRef.current)
+    }
+  }, [gameImpl, duelProgressRef, isA, name]);
+
+  const id = isA ? 'player-bubble-left' : 'player-bubble-right'
+
   //------------------------------
   return (
     <>
       <CommitPacesModal duelId={duelId} isOpen={roundNumber == 1 && commitModalIsOpen} setIsOpen={setCommitModalIsOpen} />
       <CommitBladesModal duelId={duelId} isOpen={roundNumber == 2 && commitModalIsOpen} setIsOpen={setCommitModalIsOpen} isA={isA} isB={isB} />
-      <Step.Group vertical size='small'>
-        <ProgressItem
-          stage={DuelStage.Round1Commit}
-          duelStage={duelStage}
-          completedStages={completedStages}
-          title='Choose Paces'
-          description=''
-          icon='street view'
-          // emoji=EMOJI.PACES
-          floated={floated}
-          onClick={isYou ? onClick : null}
-        />
-        {duelStage <= DuelStage.Round1Reveal &&
-          <ProgressItem
-            stage={DuelStage.Round1Reveal}
-            duelStage={duelStage}
-            completedStages={completedStages}
-            title='Reveal Paces'
-            description=''
-            icon='eye'
-            floated={floated}
-            onClick={isYou ? onClick : null}
-          />
-        }
-        <ProgressItem
-          stage={DuelStage.Round1Animation}
-          duelStage={duelStage}
-          completedStages={completedStages}
-          title={round1Result ?? 'Pistols shootout!'}
-          description=''
-          icon={round1Result ? null : 'target'}
-          emoji={round1Result ? _resultEmoji(round1Shot) : null}
-          floated={floated}
-          onClick={null}
-          className={round1Result ? _resultBackground(round1Shot) : null}
-        />
-
-        {(round2 && duelStage >= DuelStage.Round2Commit) &&
-          <>
-            <ProgressItem
-              stage={DuelStage.Round2Commit}
-              duelStage={duelStage}
-              completedStages={completedStages}
-              title='Choose Blades'
-              description=''
-              icon='shield'
-              emoji={EMOJI.BLADES}
-              // emojiFlipped='horizontally'
-              // emojiRotated='clockwise'
-              floated={floated}
-              onClick={isYou ? onClick : null}
-            />
-            {duelStage <= DuelStage.Round2Reveal &&
-              <ProgressItem
-                stage={DuelStage.Round2Reveal}
-                duelStage={duelStage}
-                completedStages={completedStages}
-                title='Reveal Blades'
-                description=''
-                icon='eye'
-                floated={floated}
-                onClick={isYou ? onClick : null}
-              />
-            }
-            <ProgressItem
-              stage={DuelStage.Round2Animation}
-              duelStage={duelStage}
-              completedStages={completedStages}
-              title={round2Result ?? 'Blades clash!'}
-              description=''
-              icon={round2Result ? null : 'target'}
-              emoji={round2Result ? _resultEmoji(round2Shot) : null}
-              floated={floated}
-              onClick={null}
-              className={round2Result ? _resultBackground(round2Shot) : null}
-            />
-          </>
-        }
-
-        {(round3 && duelStage >= DuelStage.Round3Animation) &&
-          <ProgressItem
-            stage={DuelStage.Round3Animation}
-            duelStage={duelStage}
-            completedStages={completedStages}
-            title={round3Result ?? 'Blades clash!'}
-            description=''
-            icon={round3Result ? null : 'target'}
-            emoji={round3Result ? _resultEmoji(round3Shot) : null}
-            floated={floated}
-            onClick={null}
-            className={round3Result ? _resultBackground(round3Shot) : null}
-          />
-        }
-
-      </Step.Group>
+      <div id={id} className='dialog-container' ref={duelProgressRef}>
+        <Image className='dialog-background' />
+        <div className='dialog-data'>
+          <div className='dialog-title'></div>
+          <div className='dialog-duelist'></div>
+          <div className='dialog-content'>
+            <button className='dialog-button'></button>
+            <div className='dialog-message'></div>
+            <div className='dialog-spinner'></div>
+          </div>
+        </div>
+      </div>
     </>
-  )
-}
-
-function ProgressItem({
-  stage,
-  duelStage,
-  completedStages = {},
-  title,
-  description,
-  icon = null,
-  emoji = null,
-  emojiFlipped = null,
-  emojiRotated = null,
-  floated,
-  onClick = null,
-  className = null,
-}) {
-  const _isCurrentStage = (duelStage == stage)
-  const _completed =
-    stage != DuelStage.Round1Animation && stage != DuelStage.Round2Animation && stage != DuelStage.Round3Animation // animations do not complete
-    && (
-      (stage < duelStage) // past stage
-      || (_isCurrentStage && completedStages[stage] === true
-      ))
-  const _canClick = (_isCurrentStage && !_completed && Boolean(onClick))
-
-  const _disabled = (duelStage < stage)
-  const _left = (floated == 'left')
-  const _right = (floated == 'right')
-
-  const classNames = useMemo(() => {
-    let classNames = ['AlignCenter']
-    if (className) classNames.push(className)
-    if (!_canClick) classNames.push('NoMouse')
-    return classNames
-  }, [className, _canClick])
-
-  let _icon = useMemo(() => {
-    const style = _right ? { margin: '0 0 0 1rem' } : {}
-    if (_isCurrentStage && !_completed) return <LoadingIcon style={style} />
-    if (icon) return <Icon name={icon} style={style} />
-    if (emoji) return <EmojiIcon emoji={emoji} style={style} flipped={emojiFlipped} rotated={emojiRotated} />
-    return <></>
-  }, [icon, emoji, _completed, _right])
-
-  // if (_right) classNames.push('AlignRight')
-  return (
-    <Step
-      className={classNames.join(' ')}
-      completed={_completed}
-      active={_canClick}
-      disabled={_disabled}
-      link={_canClick}
-      onClick={() => (_canClick ? onClick : null)?.()}
-    >
-      {_left && _icon}
-      <Step.Content className='AutoMargin'>
-        <Step.Title>{title}</Step.Title>
-        <Step.Description>{description}</Step.Description>
-      </Step.Content>
-      {_right && _icon}
-    </Step>
   )
 }

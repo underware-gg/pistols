@@ -398,6 +398,10 @@ TextArea::selection {
   color: $color-dark;
 }
 
+.FlipHorizontal {
+  transform: scale(-1, 1);
+}
+
 
 //------------------------
 // ASPECT RATIO
@@ -722,9 +726,12 @@ $ui-container-gap: 1em;
   height: calc(439px / 2);
 }
 .ProfilePicDuel {
-  @extend .ProfilePic;
-  width: calc(439px / 2.5);
-  height: calc(768px / 2.5);
+  width: 8.5vw;
+  height: 8.5vw;
+  object-fit: cover;
+  clip-path: circle();
+  object-position: 50% 20%; //TODO this moves the image center for the rounded image change to a proper solution
+  margin:0.95vw;
 }
 .ProfilePicSquare {
   width: $profile-pic-width;
@@ -738,6 +745,14 @@ $ui-container-gap: 1em;
   width: 60px;
   height: 60px;
   border: none;
+}
+.ProfilePicCircle {
+  width: 6.8vw;
+  height: 6.8vw;
+  object-fit: cover;
+  object-position: 50% 20%; //TODO this moves the image center for the rounded image change to a proper solution
+  clip-path: circle();
+  margin: 0.23vw;
 }
 .ProfilePicSmall {
   @extend .ProfilePicSquare;
@@ -799,34 +814,182 @@ $ui-container-gap: 1em;
   bottom: 0;
 }
 
+.MenuBottomDuel {
+  @extend .MenuBottom;
+  padding: 0px;
+}
+
+.MenuBottomBackground {
+  position: absolute;
+  height: 2.5vw;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.MenuBottomBackgroundImage {
+  width: 25vw;
+  height: 2.5vw;
+}
+
+.TavernBoard {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 30vw;
+  height: 6vw;
+}
+
 .TavernTitle {
   pointer-events: none;
   position: absolute;
   top: 0;
-  width: 100%;
-  padding: 15px;
+  left: 4vw;
+  right: 4vw;
+  width: 22vw;
+  height: 1.4vw;
+  line-height: 1.4vw;
+  text-align: center;
+  font-size: 0.9vw;
+}
+
+.TavernWager {
+  pointer-events: none;
+  position: absolute;
+  top: 1.2vw;
+  left: 4vw;
+  right: 4vw;
+  width: 22vw;
+  height: 2vw;
+  line-height: 2vw;
   text-align: center;
 }
 
-.DuelProfileA {
+.TavernWager[data-contentlength="0"] {
+  font-size: 1.4vw;
+}
+.TavernWager[data-contentlength="1"] {
+  font-size: 1.3vw;
+}
+.TavernWager[data-contentlength="2"] {
+  font-size: 1.2vw;
+}
+.TavernWager[data-contentlength="3"] {
+  font-size: 1vw;
+}
+
+.TavernTable {
+  pointer-events: none;
+  position: absolute;
+  top: 3.3vw;
+  left: 10.2vw;
+  right: 10.2vw;
+  width: 9.6vw;
+  height: 1.5vw;
+  line-height: 1.5vw;
+  text-align: center;
+  color: black;
+}
+
+.TavernTable[data-contentlength="0"] {
+  font-size: 1vw;
+}
+.TavernTable[data-contentlength="1"] {
+  font-size: 0.85vw;
+}
+.TavernTable[data-contentlength="2"] {
+  font-size: 0.7vw;
+}
+.TavernTable[data-contentlength="3"] {
+  font-size: 0.6vw;
+}
+
+.DuelProfile {
   display: flex;
   align-items: flex-start;
   align-content: flex-start;
+  position: absolute;
+  width: 30vw;
+}
+.DuelProfileA {
+  @extend .DuelProfile;
   justify-content: left;
   text-align: left;
-  width: 100%;
+  top: 0;
+  left: 0;
 }
 .DuelProfileB {
-  @extend .DuelProfileA;
+  @extend .DuelProfile;
   justify-content: right;
   text-align: right;
+  top: 0;
+  right: 0;
 }
 
-.ProfileAndHealth {
-  display: block;
-  height: 200px;
-  // justify-self: right;
+.DuelistProfileA {
+  @extend .DuelProfile;
+  justify-content: left;
+  align-items: flex-end;
+  text-align: left;
+  bottom: 0;
+  left: 0;
 }
+.DuelistProfileB {
+  @extend .DuelProfile;
+  justify-content: right;
+  align-items: flex-end;
+  text-align: right;
+  bottom: 0;
+  right: 0;
+}
+
+.DuelistHonourProgress {
+  position: absolute;
+  width: 10vw;
+  height: 10vw;
+  margin:0.2vw;
+  overflow: hidden;
+}
+
+.DuelistHonour {
+  position: absolute;
+  width: 3vw;
+  height: 3vw;
+  margin:0.75vw;
+  margin-bottom: 0.25vw;
+  background-color: #efc258;
+  border-radius: 5vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.DuelistHonourProgress[data-floated="left"] {
+}
+
+.DuelistHonourProgress[data-floated="right"] {
+  transform: scaleX(-1);
+}
+
+.ProfileName {
+  width: 11.4vw; 
+  height: 1.6vw;
+  line-height: 1.6vw;
+  align-content: end;
+}
+
+.ProfileAddress {
+  width: 4.8vw; 
+  height: 1.2vw; 
+  line-height: 1.2vw;
+}
+
+// .ProfileAndHealth {
+//   display: block;
+//   height: 200px;
+//   // justify-self: right;
+// }
 .ProfileDescription {
   margin: 0 1em 1em 1em!important;
 }
@@ -845,26 +1008,6 @@ $ui-container-gap: 1em;
 }
 .HealthPointEmpty {
   background-color: $color-negative!important;
-}
-
-.DuelSideA {
-  height: 100%;
-  width: 50%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  padding: 15px;
-  text-align: left;
-  align-items: left;
-  background-image: linear-gradient(to right, rgba($color-darkest, 0.8), transparent 30%);
-}
-.DuelSideB {
-  @extend .DuelSideA;
-  left: unset;
-  right: 0;
-  text-align: right;
-  align-items: right;
-  background-image: linear-gradient(to left, rgba($color-darkest, 0.8), transparent 30%);
 }
 
 .DuelProgress {
@@ -1079,8 +1222,8 @@ $logo-url: '/logos/logo_avante.svg';
 // semantic-ui
 //
 ._round_border {
-  border: $border-button!important;
-  // border-radius: 0.5em!important;
+  border: $border-button;
+  // border-radius: 0.5em;
 }
 ._round_border_active {
   border: $border-button-active!important;
@@ -1484,4 +1627,188 @@ a.active.step:hover,
   // border-bottom: 1px solid rgba(255, 255, 255, .1); // original
   border-top: 1px solid rgba($color-brightest, .15);
   border-bottom: 1px solid rgba($color-brightest, .25);
+}
+
+//
+// Dialog above duelists
+//
+.dialog-container {
+  width: 18vw;
+  height: 12vw;
+  text-align: Left;
+  position: absolute;
+  top: calc(50% - 6vw);
+  left: calc(50% - 10vw);
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transition:visibility 0.3s linear, opacity 0.3s linear;
+}
+
+.dialog-background {
+  position: absolute;
+  width: 18vw;
+  height: 12vw;
+}
+
+.dialog-data {
+  position: absolute;
+  margin: 1.3vw;
+  margin-top: 1.6vw;
+  width: 15.4vw;
+  height: 6vw;
+  padding: 2%;
+}
+
+.dialog-title {
+  font-weight: lighter;
+  font-size: 0.7vw;
+  margin-bottom: 2%;
+  color: black;
+}
+
+.dialog-duelist, .dialog-message {
+  font-weight: normal;
+  color: black;
+}
+
+.dialog-duelist[data-contentlength="0"], .dialog-message[data-contentlength="0"], .ProfileName[data-contentlength="0"], .Code[data-contentlength="0"] {
+  font-size: 1.2vw;
+}
+.dialog-duelist[data-contentlength="1"], .dialog-message[data-contentlength="1"], .ProfileName[data-contentlength="1"], .Code[data-contentlength="1"] {
+  font-size: 1.1vw;
+}
+.dialog-duelist[data-contentlength="2"], .dialog-message[data-contentlength="2"], .ProfileName[data-contentlength="2"], .Code[data-contentlength="2"] {
+  font-size: 1vw;
+}
+.dialog-duelist[data-contentlength="3"], .dialog-message[data-contentlength="3"], .ProfileName[data-contentlength="3"], .Code[data-contentlength="3"] {
+  font-size: 0.8vw;
+}
+
+.Code[data-contentlength="0"] {
+  font-size: 1.0vw;
+}
+.Code[data-contentlength="1"] {
+  font-size: 0.9vw;
+}
+.Code[data-contentlength="2"] {
+  font-size: 0.8vw;
+}
+.Code[data-contentlength="3"] {
+  font-size: 0.7vw;
+}
+
+.dialog-button[data-contentlength="0"] {
+  font-size: 1.1vw;
+}
+.dialog-button[data-contentlength="1"] {
+  font-size: 0.9vw;
+}
+.dialog-button[data-contentlength="2"] {
+  font-size: 0.7vw;
+}
+.dialog-button[data-contentlength="3"] {
+  font-size: 0.5vw;
+}
+
+.dialog-content {
+  height: 3vw;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-grow: 1;
+}
+
+.dialog-button {
+  width: 100%;
+  height: 2vw;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: $color-darkest;
+  color: white;
+  cursor: pointer;
+  text-align: center;
+  pointer-events: all;
+}
+
+.dialog-button:hover {
+  background-color: #0056b3;
+}
+
+.dialog-spinner {
+  --c1:#673b14;
+  --c2:#f8b13b;
+  width: 1vw;
+  height: 2vw;
+  margin-right: 10px;
+  border-top: 4px solid var(--c1);
+  border-bottom: 4px solid var(--c1);
+  background: linear-gradient(90deg, var(--c1) 2px, var(--c2) 0 5px,var(--c1) 0) 50%/7px 8px no-repeat;
+  display: grid;
+  overflow: hidden;
+  animation: l5-0 2s infinite linear;
+}
+.dialog-spinner::before,
+.dialog-spinner::after {
+  content: "";
+  grid-area: 1/1;
+  width: 75%;
+  height: calc(50% - 4px);
+  margin: 0 auto;
+  border: 2px solid var(--c1);
+  border-top: 0;
+  box-sizing: content-box;
+  border-radius: 0 0 40% 40%;
+  -webkit-mask: 
+    linear-gradient(#000 0 0) bottom/4px 2px no-repeat,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: destination-out;
+          mask-composite: exclude;
+  background: 
+    linear-gradient(var(--d,0deg),var(--c2) 50%,#0000 0) bottom /100% 205%,
+    linear-gradient(var(--c2) 0 0) center/0 100%;
+  background-repeat: no-repeat;
+  animation: inherit;
+  animation-name: l5-1;
+}
+.dialog-spinner::after {
+  transform-origin: 50% calc(100% + 2px);
+  transform: scaleY(-1);
+  --s:3px;
+  --d:180deg;
+}
+@keyframes l5-0 {
+  80%  {transform: rotate(0)}
+  100% {transform: rotate(0.5turn)}
+}
+@keyframes l5-1 {
+  10%,70%  {background-size:100% 205%,var(--s,0) 100%}
+  70%,100% {background-position: top,center}
+}
+
+.ContentSmall {
+  font-size: 2vw;
+}
+
+.button_duel {
+  border: 0px solid !important;
+  border-radius: 0px !important;
+  background-color: transparent !important;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9vw !important;
+  min-height: 0 !important;
+}
+
+.button_duel[type="tavern"] {
+  width: 8.9vw;
+}
+
+.button_duel[type="database"], .button_duel[type="volume"] {
+  width: 2.7vw;
 }

@@ -48,15 +48,19 @@ export const ThreeJsCanvas = ({
   }, [canvasRef.current])
 
   return (
-    <canvas
-      id='gameCanvas'
-      className='GameCanvas'
-      ref={canvasRef}
-      width={width * 2}
-      height={height * 2}
-    >
-      Canvas not supported by your browser! 😱
-    </canvas>
+    <div>
+      <div id='hidden-container' style={{ position: 'absolute', visibility: 'hidden'}}></div>
+
+      <canvas
+        id='gameCanvas'
+        className='GameCanvas'
+        ref={canvasRef}
+        width={width * 2}
+        height={height * 2}
+      >
+        Canvas not supported by your browser! 😱
+      </canvas>
+    </div>
   )
 }
 
