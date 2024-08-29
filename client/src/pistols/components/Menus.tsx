@@ -35,9 +35,12 @@ export function MenuDuel({
 
   const canSkip = duelStage == DuelStage.Round1Animation || duelStage == DuelStage.Round2Animation
   return (
-    <div className='MenuBottom AlignCenter NoMouse'>
-      <Menu secondary compact className='YesMouse' size='huge'>
-        <Menu.Item onClick={() => _backToTavern()}>
+    <div className='MenuBottomDuel AlignCenter NoMouse'>
+      <div className='MenuBottomBackground'>
+        <img className='MenuBottomBackgroundImage' src='/images/ui/bottom_nav.png'/>
+      </div>
+      <Menu secondary compact className='YesMouse' size='huge' style={{ minHeight: '0' }}>
+        <Menu.Item className='button_duel' type='tavern' onClick={() => _backToTavern()}>
           Back to Tavern
         </Menu.Item>
 
@@ -47,11 +50,11 @@ export function MenuDuel({
 
         {/* <SettingsMenuItem prefix='SFX' settingsKey={SettingsActions.SFX_ENABLED} currentValue={settings.sfxEnabled} /> */}
 
-        <Menu.Item>
+        <Menu.Item className='button_duel' type='database'>
           <IconClick name='database' onClick={() => window?.open(`/dueldata/${bigintToHex(duelId)}`, '_blank')} />
         </Menu.Item>
 
-        <Menu.Item  >
+        <Menu.Item className='button_duel' type='volume'>
           <IconClick name={settings.sfxEnabled ? 'volume up' : 'volume off'} onClick={() => _switchSfx()} />
         </Menu.Item>
 
@@ -192,7 +195,7 @@ function MenuDebugActors({
   const { gameImpl } = useThreeJsContext()
 
   const _play = (key) => {
-    gameImpl?.playActorAnimation(actorId, key)
+    // gameImpl?.playActorAnimation(actorId, key)
   }
 
   const className = 'PaddedHalf Important Smaller'

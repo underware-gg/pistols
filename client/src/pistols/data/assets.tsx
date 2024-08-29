@@ -19,6 +19,7 @@ export enum TextureName {
   duel_ground_normal = 'duel_ground_normal',
   duel_water_dudv = 'duel_water_dudv',
   duel_water_map = 'duel_water_map',
+  cliffs = 'cliffs',
 }
 const TEXTURES: Record<TextureName, { path: string }> = {
   [TextureName.Testcard]: { path: '/textures/testcard.jpg' },
@@ -34,6 +35,20 @@ const TEXTURES: Record<TextureName, { path: string }> = {
   [TextureName.duel_ground_normal]: { path: '/textures/ground_normalmap.ktx2' },
   [TextureName.duel_water_dudv]: { path: '/textures/waterdudv.jpg' },
   [TextureName.duel_water_map]: { path: '/textures/water_map.ktx2' },
+  [TextureName.cliffs]: { path: '/textures/cliffs.png' },
+}
+
+export enum CardTextureName {
+  card_back,
+  card_front_shoot,
+  card_front_face,
+  card_front_face_grim,
+}
+const CARD_TEXTURES: Record<CardTextureName, { path: string }> = {
+  [CardTextureName.card_back]: { path: '/textures/cards/card_back.png' },
+  [CardTextureName.card_front_shoot]: { path: '/textures/cards/card_front_shoot.png' },
+  [CardTextureName.card_front_face]: { path: '/textures/cards/card_front_face.png' },
+  [CardTextureName.card_front_face_grim]: { path: '/textures/cards/card_front_face_grim.png' },
 }
 
 export const sceneBackgrounds: Record<SceneName, TextureName> = {
@@ -416,7 +431,9 @@ const isAudioAssetsLoaded = () => {
 
 
 export {
+  CharacterType,
   TEXTURES,
+  CARD_TEXTURES,
   SPRITESHEETS,
   ProfileModels,
   loadAudioAssets,

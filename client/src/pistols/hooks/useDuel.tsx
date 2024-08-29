@@ -88,7 +88,7 @@ export const useDuel = (duelId: BigNumberish) => {
     completedStagesA,
     completedStagesB,
     turnA,
-    turnB,
+    turnB
   }
 }
 
@@ -118,14 +118,14 @@ export const useAnimatedDuel = (duelId: BigNumberish, enabled: boolean) => {
     return {
       healthA: (
         (currentStage <= DuelStage.Round1Animation && !animatedHealthA) ? CONST.FULL_HEALTH
-          : currentStage <= DuelStage.Round2Animation ? round1.shot_a.health
-            : currentStage <= DuelStage.Round3Animation ? round2.shot_a.health
+          : currentStage <= DuelStage.Round2Animation ? round1?.shot_a.health
+            : currentStage <= DuelStage.Round3Animation ? round2?.shot_a.health
               : (round3?.shot_a.health ?? round2?.shot_a.health ?? round1?.shot_a.health)
       ) ?? null,
       healthB: (
         (currentStage <= DuelStage.Round1Animation && !animatedHealthB) ? CONST.FULL_HEALTH
-          : currentStage <= DuelStage.Round2Animation ? round1.shot_b.health
-            : currentStage <= DuelStage.Round3Animation ? round2.shot_b.health
+          : currentStage <= DuelStage.Round2Animation ? round1?.shot_b.health
+            : currentStage <= DuelStage.Round3Animation ? round2?.shot_b.health
               : (round3?.shot_b.health ?? round2?.shot_b.health ?? round1?.shot_b.health)
       ) ?? null,
     }

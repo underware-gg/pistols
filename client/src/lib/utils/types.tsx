@@ -30,12 +30,17 @@ export const bigintToEntity = (v: BigNumberish): Entity => (getEntityIdFromKeys(
 export const keysToEntity = (keys: BigNumberish[]): Entity => (getEntityIdFromKeys(keys.map(v => BigInt(v ?? 0))) as Entity)
 export const entityIdToKey = (component: Component, keyName: string, entityId: Entity) => (BigInt(getComponentValue(component, entityId)[keyName]))
 
-export const shortAddress = (address: string | null) => (
-  !address ? '?'
-    : !address.startsWith('0x') ? `(${address})`  // not hex
-      : address.length < 12 ? address             // size is good
-        : `${address.slice(0, 6)}..${address.slice(-4)}`
-)
+export const shortAddress = (address: string | null, small: boolean = false) => {
+  const addresLength = small ? 7 : 12
+  const sliceStart = small ? 2 : 6
+  const sliceEnd = small ? 3 : 4
+  return (
+    !address ? '?'
+      : !address.startsWith('0x') ? `(${address})`  // not hex
+        : address.length < addresLength ? address             // size is good
+          : `${address.slice(0, sliceStart)}..${address.slice(-sliceEnd)}`
+  )
+}
 
 //
 // arrays

@@ -146,8 +146,11 @@ export function CopyIcon(props: CopyIconProps) {
   function _copy() {
     navigator?.clipboard?.writeText(props.content)
   }
+
+  const iconProps = useMemo(() => ({ ...props, className: 'NoMargin' }), [props])
+
   return (
-    <IconClick {...props} name='copy' onClick={() => _copy()} />
+    <IconClick {...iconProps} name='copy' onClick={() => _copy()} />
   )
 }
 

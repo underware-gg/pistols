@@ -65,7 +65,7 @@ export default function AnonModal({
         </Grid>
       </Modal.Header>
       <Modal.Content image className='Relative'>
-        <ProfilePic profilePic={0} duelistId={0} anon srcUrl={starkProfilePic} />
+        <ProfilePic profilePic={0} duelistId={0} anon profilePicUrl={starkProfilePic} />
         <Modal.Description className='FormAnonDescription'>
           <Grid className='FillWidth' >
             <Row columns={'equal'}>
