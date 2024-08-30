@@ -3,6 +3,7 @@ class_hash = "0x175b75603aa17cfa02fc93ac713a5ff362a70af824deec9caef884235ed0c36"
 original_class_hash = "0x175b75603aa17cfa02fc93ac713a5ff362a70af824deec9caef884235ed0c36"
 abi = "manifests/staging/base/abis/models/pistols-Challenge-673267b6.json"
 tag = "pistols-Challenge"
+qualified_path = "pistols::models::challenge::challenge"
 manifest_name = "pistols-Challenge-673267b6"
 
 [[members]]
