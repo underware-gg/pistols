@@ -6,28 +6,8 @@ mod tester {
     use debug::PrintTrait;
 
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::model::{Model, ModelTest, ModelIndex, ModelEntityTest};
     use dojo::utils::test::{spawn_test_world, deploy_contract};
-
-    use origami_token::components::security::initializable::{initializable_model};
-    use origami_token::components::introspection::src5::{src_5_model};
-    use origami_token::components::token::erc20::{
-        erc20_balance::{erc_20_balance_model},
-        erc20_metadata::{erc_20_metadata_model},
-        erc20_allowance::{erc_20_allowance_model},
-        erc20_bridgeable::{erc_20_bridgeable_model},
-    };
-    use origami_token::components::token::erc721::{
-        erc721_approval::{erc_721_token_approval_model},
-        erc721_metadata::{erc_721_meta_model},
-        erc721_balance::{erc_721_balance_model},
-        erc721_owner::{erc_721_owner_model},
-        erc721_enumerable::{erc_721_enumerable_index_model},
-        erc721_enumerable::{erc_721_enumerable_owner_index_model},
-        erc721_enumerable::{erc_721_enumerable_owner_token_model},
-        erc721_enumerable::{erc_721_enumerable_token_model},
-        erc721_enumerable::{erc_721_enumerable_total_model},
-        erc721_approval::{erc_721_operator_approval_model},
-    };
 
     use pistols::systems::admin::{admin, IAdminDispatcher, IAdminDispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
@@ -46,27 +26,27 @@ mod tester {
     use pistols::interfaces::systems::{SELECTORS};
 
     use pistols::models::challenge::{
-        challenge, Challenge,
-        snapshot, Snapshot,
-        wager, Wager,
-        round, Round,
+        Challenge, ChallengeStore,
+        Snapshot, SnapshotStore,
+        Wager, WagerStore,
+        Round, RoundStore,
     };
     use pistols::models::duelist::{
-        duelist, Duelist, DuelistTrait,
-        scoreboard, Scoreboard,
-        pact,
+        Duelist, DuelistTrait, DuelistStore,
+        Scoreboard, ScoreboardStore,
+        Pact, PactStore,
         ProfilePicType,
         Archetype,
     };
     use pistols::models::config::{
-        config, Config,
+        Config, ConfigStore, CONFIG,
     };
     use pistols::models::table::{
-        table_config, TableConfig,
-        table_admittance, TableAdmittance,
+        TableConfig, TableConfigStore,
+        TableAdmittance, TableAdmittanceStore,
     };
     use pistols::models::token_config::{
-        token_config, TokenConfig,
+        TokenConfig, TokenConfigStore,
     };
 
     // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
@@ -143,56 +123,18 @@ mod tester {
         deploy_admin = deploy_admin || deploy_actions || deploy_actions;
         // deploy_minter = deploy_minter || deploy_actions;
 
-// '----1'.print();
-// (erc_20_balance_model::TEST_CLASS_HASH).print();
-// (erc_20_metadata_model::TEST_CLASS_HASH).print();
-// (erc_20_allowance_model::TEST_CLASS_HASH).print();
-// selector_from_tag!("origami_token-ERC20AllowanceModel").print();
-// selector_from_tag!("origami_token-ERC20BalanceModel").print();
-// selector_from_tag!("origami_token-ERC20MetadataModel").print();
-
-        let mut models = array![
-            //
-            // missing models cause ('invalid resource selector')
-            //
-            src_5_model::TEST_CLASS_HASH,
-            erc_20_balance_model::TEST_CLASS_HASH,
-            erc_20_metadata_model::TEST_CLASS_HASH,
-            erc_20_allowance_model::TEST_CLASS_HASH,
-            erc_20_bridgeable_model::TEST_CLASS_HASH,
-            erc_721_token_approval_model::TEST_CLASS_HASH,
-            erc_721_balance_model::TEST_CLASS_HASH,
-            erc_721_meta_model::TEST_CLASS_HASH,
-            erc_721_owner_model::TEST_CLASS_HASH,
-            erc_721_enumerable_index_model::TEST_CLASS_HASH,
-            erc_721_enumerable_owner_index_model::TEST_CLASS_HASH,
-            erc_721_enumerable_owner_token_model::TEST_CLASS_HASH,
-            erc_721_enumerable_token_model::TEST_CLASS_HASH,
-            erc_721_enumerable_total_model::TEST_CLASS_HASH,
-            erc_721_operator_approval_model::TEST_CLASS_HASH,
-            // pistols
-            duelist::TEST_CLASS_HASH,
-            scoreboard::TEST_CLASS_HASH,
-            challenge::TEST_CLASS_HASH,
-            snapshot::TEST_CLASS_HASH,
-            wager::TEST_CLASS_HASH,
-            round::TEST_CLASS_HASH,
-            pact::TEST_CLASS_HASH,
-            // admin
-            config::TEST_CLASS_HASH,
-            table_config::TEST_CLASS_HASH,
-            table_admittance::TEST_CLASS_HASH,
-            // minter
-            token_config::TEST_CLASS_HASH,
-        ];
-
         // setup testing
         testing::set_block_number(1);
         testing::set_block_timestamp(INITIAL_TIMESTAMP);
 
         // deploy world
 // '---- spawn_test_world...'.print();
-        let world: IWorldDispatcher = spawn_test_world(["origami_token", "pistols"].span(),  models.span());
+        // let world = spawn_test_world!();
+        // let world = spawn_test_world!(["origami_token", "pistols"]);
+        let world: IWorldDispatcher = spawn_test_world(
+            ["origami_token", "pistols"].span(),
+            get_models_test_class_hashes!(),
+        );
 // '---- spawned...'.print();
         world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), OWNER());
 
@@ -449,52 +391,52 @@ mod tester {
 
     #[inline(always)]
     fn get_Config(world: IWorldDispatcher) -> Config {
-        (get!(world, 1, Config))
+        (ConfigStore::get(world, CONFIG::CONFIG_KEY))
     }
     #[inline(always)]
     fn get_Table(world: IWorldDispatcher, table_id: felt252) -> TableConfig {
-        (get!(world, table_id, TableConfig))
+        (TableConfigStore::get(world, table_id))
     }
     #[inline(always)]
     fn get_TableAdmittance(world: IWorldDispatcher, table_id: felt252) -> TableAdmittance {
-        (get!(world, table_id, TableAdmittance))
+        (TableAdmittanceStore::get(world, table_id))
     }
     #[inline(always)]
     fn get_Duelist(world: IWorldDispatcher, address: ContractAddress) -> Duelist {
-        (get!(world, ID(address), Duelist))
+        (DuelistStore::get(world, ID(address)))
     }
     #[inline(always)]
     fn get_Duelist_id(world: IWorldDispatcher, duelist_id: u128) -> Duelist {
-        (get!(world, duelist_id, Duelist))
+        (DuelistStore::get(world, duelist_id))
     }
     #[inline(always)]
     fn get_Scoreboard(world: IWorldDispatcher, table_id: felt252, address: ContractAddress) -> Scoreboard {
-        (get!(world, (table_id, ID(address)), Scoreboard))
+        (ScoreboardStore::get(world, table_id, ID(address)))
     }
     #[inline(always)]
     fn get_Scoreboard_id(world: IWorldDispatcher, table_id: felt252, duelist_id: u128) -> Scoreboard {
-        (get!(world, (table_id, duelist_id), Scoreboard))
+        (ScoreboardStore::get(world, table_id, duelist_id))
     }
     #[inline(always)]
     fn get_Challenge(world: IWorldDispatcher, duel_id: u128) -> Challenge {
-        (get!(world, duel_id, Challenge))
+        (ChallengeStore::get(world, duel_id))
     }
     #[inline(always)]
     fn get_Snapshot(world: IWorldDispatcher, duel_id: u128) -> Snapshot {
-        (get!(world, duel_id, Snapshot))
+        (SnapshotStore::get(world, duel_id))
     }
     #[inline(always)]
     fn get_Wager(world: IWorldDispatcher, duel_id: u128) -> Wager {
-        (get!(world, duel_id, Wager))
+        (WagerStore::get(world, duel_id))
     }
     #[inline(always)]
     fn get_Round(world: IWorldDispatcher, duel_id: u128, round_number: u8) -> Round {
-        (get!(world, (duel_id, round_number), Round))
+        (RoundStore::get(world, duel_id, round_number))
     }
     #[inline(always)]
     fn get_Challenge_Round(world: IWorldDispatcher, duel_id: u128) -> (Challenge, Round) {
-        let challenge = get!(world, duel_id, Challenge);
-        let round = get!(world, (duel_id, challenge.round_number), Round);
+        let challenge = get_Challenge(world, duel_id);
+        let round = get_Round(world, duel_id, challenge.round_number);
         (challenge, round)
     }
 
@@ -502,31 +444,18 @@ mod tester {
     // setters
     //
 
-    fn set_TableConfig(world: IWorldDispatcher, contract_address: ContractAddress, table: TableConfig) {
-        let current_contract_address = starknet::get_contract_address();
-        testing::set_contract_address(contract_address);
-        set!(world, (table));
-        testing::set_contract_address(current_contract_address);
+    // depends on use dojo::model::{Model};
+    fn set_TableConfig(world: IWorldDispatcher, table: TableConfig) {
+        table.set_test(world);
     }
-    fn set_Round(world: IWorldDispatcher, contract_address: ContractAddress, round: Round) {
-        let current_contract_address = starknet::get_contract_address();
-        testing::set_contract_address(contract_address);
-        // round.set(world); // if not available, import RoundModelImpl
-        // dojo::model::Model::<Round>::set(@round, world); // if not available, import RoundModelImpl
-        set!(world, (round));
-        testing::set_contract_address(current_contract_address);
+    fn set_Round(world: IWorldDispatcher, round: Round) {
+        round.set_test(world);
     }
-    fn set_Duelist(world: IWorldDispatcher, contract_address: ContractAddress, duelist: Duelist) {
-        let current_contract_address = starknet::get_contract_address();
-        testing::set_contract_address(contract_address);
-        set!(world, (duelist));
-        testing::set_contract_address(current_contract_address);
+    fn set_Duelist(world: IWorldDispatcher, duelist: Duelist) {
+        duelist.set_test(world);
     }
-    fn set_Scoreboard(world: IWorldDispatcher, contract_address: ContractAddress, scoreboard: Scoreboard) {
-        let current_contract_address = starknet::get_contract_address();
-        testing::set_contract_address(contract_address);
-        set!(world, (scoreboard));
-        testing::set_contract_address(current_contract_address);
+    fn set_Scoreboard(world: IWorldDispatcher, scoreboard: Scoreboard) {
+        scoreboard.set_test(world);
     }
 
     //

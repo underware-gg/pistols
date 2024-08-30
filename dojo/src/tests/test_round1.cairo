@@ -444,11 +444,11 @@ mod tests {
 
     #[test]
     fn test_resolved_table_collector() {
-        let (world, actions, admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::ADMIN | flags::LORDS | flags::APPROVE);
+        let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::ADMIN | flags::LORDS | flags::APPROVE);
 
-        let mut table: TableConfig = get!(world, (TABLE_ID), TableConfig);
+        let mut table: TableConfig = tester::get_Table(world, TABLE_ID);
         table.fee_collector_address = BUMMER();
-        tester::set_TableConfig(world, admin.contract_address, table);
+        tester::set_TableConfig(world, table);
 
         let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
         assert(fee > 0, 'fee > 0');
@@ -479,7 +479,7 @@ mod tests {
         // duelist_a.score.level_trickster = HONOUR::MAX;
         let mut scoreboard_a = tester::get_Scoreboard(world, TABLE_ID, OWNER());
         scoreboard_a.score.level_trickster = HONOUR::MAX;
-        tester::set_Scoreboard(world, actions.contract_address, scoreboard_a);
+        tester::set_Scoreboard(world, scoreboard_a);
         // duel!
         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), WAGER_VALUE);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(10, 10);
@@ -500,7 +500,7 @@ mod tests {
         // duelist_b.score.level_trickster = HONOUR::MAX;
         let mut scoreboard_b = tester::get_Scoreboard(world, TABLE_ID, OTHER());
         scoreboard_b.score.level_trickster = HONOUR::MAX;
-        tester::set_Scoreboard(world, actions.contract_address, scoreboard_b);
+        tester::set_Scoreboard(world, scoreboard_b);
         // duel!
         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), WAGER_VALUE);
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(10, 10);
@@ -680,7 +680,7 @@ mod tests {
         assert(duelist_a_before.score.total_duels > 0, 'total_duels > 0');
         // validate by settign a timestamp
         duelist_a_before.timestamp = 1234;
-        tester::set_Duelist(world, actions.contract_address, duelist_a_before.clone());
+        tester::set_Duelist(world, duelist_a_before.clone());
         tester::execute_update_duelist_ID(actions, OWNER(), ID(OWNER()), 'dssadsa', ProfilePicType::Duelist, '3');
         let duelist_a_after = tester::get_Duelist_id(world, ID(OWNER()));
         assert(duelist_a_before.duelist_id == duelist_a_after.duelist_id, 'duelist_id');
