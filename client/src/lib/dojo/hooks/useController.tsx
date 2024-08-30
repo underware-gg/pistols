@@ -24,12 +24,6 @@ export const useController = (manifest: DojoManifest, rpcUrl: string, nameSpace:
     const paymaster: PaymasterOptions = {
       caller: bigintToHex(stringToFelt("ANY_CALLER")),
     }
-    const options: ControllerOptions = {
-      paymaster,
-      rpc: rpcUrl,
-      theme: "pistols",
-      colorMode: "dark"
-    }
     const policies: Policy[] = []
     // contracts
     manifest?.contracts.forEach((contract) => {
@@ -58,8 +52,15 @@ export const useController = (manifest: DojoManifest, rpcUrl: string, nameSpace:
         })
       }
     })
-    // console.log(`CONTROLLER:`, policies)
-    return new CartridgeConnector(policies, options) as never as Connector
+    const options: ControllerOptions = {
+      paymaster,
+      rpc: rpcUrl,
+      theme: "pistols",
+      colorMode: "dark",
+      policies,
+    }
+    // console.log(`CONTROLLER:`, options)
+    return new CartridgeConnector(options) as never as Connector
   }, [manifest])
 
   useEffect(() => {
