@@ -3,6 +3,7 @@ class_hash = "0x3cf74429df2fffde1ab90fa02f725ef06d7aaef35cdacd56ad65024714f3a7f"
 original_class_hash = "0x3cf74429df2fffde1ab90fa02f725ef06d7aaef35cdacd56ad65024714f3a7f"
 abi = "manifests/dev/base/abis/models/pistols-Config-60742fa7.json"
 tag = "pistols-Config"
+qualified_path = "pistols::models::config::config"
 manifest_name = "pistols-Config-60742fa7"
 
 [[members]]

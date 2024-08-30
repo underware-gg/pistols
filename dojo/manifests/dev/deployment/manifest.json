@@ -1,8 +1,8 @@
 {
   "world": {
     "kind": "WorldContract",
-    "class_hash": "0x458d0ce5b14a4844092bdb62050f462d53362304a13febbac6d973691d61be2",
-    "original_class_hash": "0x458d0ce5b14a4844092bdb62050f462d53362304a13febbac6d973691d61be2",
+    "class_hash": "0xa349b743d361ce4567361475a89b84a386bb383448c6926954e5fe0b525597",
+    "original_class_hash": "0xa349b743d361ce4567361475a89b84a386bb383448c6926954e5fe0b525597",
     "abi": [
       {
         "type": "impl",
@@ -1229,8 +1229,8 @@
         ]
       }
     ],
-    "address": "0x4f1514c9ab747d4b0f7c859b62cf199174d4aeae5a4ad9c7ff54125917af912",
-    "transaction_hash": "0x2bf6377e761a0565628ba5d5992d1986e45cf6c4de512ec6eabea7169fa6226",
+    "address": "0xf1bac654f4a642efd8f56d0656f331ead7c01fedc8e659dd4b8ef45a98d15",
+    "transaction_hash": "0x19a7c69eac9ad7cf8b4b9b4a853aedc44fdbda9077a2aaf16ef9202ff891cee",
     "block_number": 3,
     "seed": "pistols",
     "metadata": {
@@ -1250,9 +1250,9 @@
   "contracts": [
     {
       "kind": "DojoContract",
-      "address": "0x1f3a1a8a9e2688d0588be379dcbc3cbac5c316bdde84b002a9166d0b626eb9d",
-      "class_hash": "0x473be66ce5304722be5595a5986b2ccac54d8e97d0d6546070fa9957f544b3f",
-      "original_class_hash": "0x473be66ce5304722be5595a5986b2ccac54d8e97d0d6546070fa9957f544b3f",
+      "address": "0x7a1738a7523d803d4246aa05738b3fd8a39e3700107687705222abdecbef4d1",
+      "class_hash": "0x392bac8712be3f0ee2b1445c69507e4cb94d9480aad04c263e8ee7c4c7bb40e",
+      "original_class_hash": "0x392bac8712be3f0ee2b1445c69507e4cb94d9480aad04c263e8ee7c4c7bb40e",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -2249,9 +2249,9 @@
     },
     {
       "kind": "DojoContract",
-      "address": "0x471b9dbf5dcf03a044e30fdd7b67594eb37a1ed9ca58718644d10638b3f89cb",
-      "class_hash": "0x58998e96d1412df3823e301c08e7dea70f68a8e587a9a1a8dad459754742823",
-      "original_class_hash": "0x58998e96d1412df3823e301c08e7dea70f68a8e587a9a1a8dad459754742823",
+      "address": "0x690dc6e1e897f3b459b486dc7d52f4b2d9eda90ffd6c8eaaab210b0ee1fc22f",
+      "class_hash": "0x28c6426adc252458e8298da3c66c9dff1c6d79a912754847fc8775b7bd0fd3f",
+      "original_class_hash": "0x28c6426adc252458e8298da3c66c9dff1c6d79a912754847fc8775b7bd0fd3f",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -2712,9 +2712,9 @@
     },
     {
       "kind": "DojoContract",
-      "address": "0x7be9d49c381aee5b396f0aa9af7e505d21f0b60eb927a515b77cf4073ff63fb",
-      "class_hash": "0x4f64ee4f8e5749e9ebefee3e66885d66838b5873d505a018733b3e30843d540",
-      "original_class_hash": "0x4f64ee4f8e5749e9ebefee3e66885d66838b5873d505a018733b3e30843d540",
+      "address": "0x1c83a6782e2b53f74f06852f1196ef4b3318280669a4e4812e7672a10acfa2d",
+      "class_hash": "0x2568f056a19059af0d42b7a69a213ea341ba85382ec47a983194054e4ba4461",
+      "original_class_hash": "0x2568f056a19059af0d42b7a69a213ea341ba85382ec47a983194054e4ba4461",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -3375,9 +3375,9 @@
     },
     {
       "kind": "DojoContract",
-      "address": "0x53a4dc9eb61deaa505884c6260a2560ca37d21c79a353546c45f1755f821f9f",
-      "class_hash": "0xc3da78de3d60e208a046c0cae3104b47872ddad3c263b8b22f97653dfb6f45",
-      "original_class_hash": "0xc3da78de3d60e208a046c0cae3104b47872ddad3c263b8b22f97653dfb6f45",
+      "address": "0x236963735ef7caebcef2a2165bac26f112d628c0fc512d9be144269a2b31d86",
+      "class_hash": "0x64634471f3ceca08ceddc491e5d31155cf5049de4f2999d3addee2286cb0d55",
+      "original_class_hash": "0x64634471f3ceca08ceddc491e5d31155cf5049de4f2999d3addee2286cb0d55",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -3701,9 +3701,9 @@
     },
     {
       "kind": "DojoContract",
-      "address": "0x7b7977b6eb61b7457181ee78918dbb65310db77cd812cdc277301841d01cda2",
-      "class_hash": "0x1bbfcf47014801e11a36118114878d3fc14155f8a78bf6ae2678a5087d07b40",
-      "original_class_hash": "0x1bbfcf47014801e11a36118114878d3fc14155f8a78bf6ae2678a5087d07b40",
+      "address": "0x754c05696514279d98530b1c8aa40d87db0b4673bc86d14ce5cac5ac1112cd5",
+      "class_hash": "0x4acc3c0e16e5dce496c22e49430fd1c44bd48081c654f54408a04b26d687ac7",
+      "original_class_hash": "0x4acc3c0e16e5dce496c22e49430fd1c44bd48081c654f54408a04b26d687ac7",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -5255,6 +5255,7 @@
         }
       ],
       "tag": "origami_token-ERC20AllowanceModel",
+      "qualified_path": "origami_token::components::token::erc20::erc20_allowance::erc_20_allowance_model",
       "manifest_name": "origami_token-ERC20AllowanceModel-4fcf1991"
     },
     {
@@ -5704,6 +5705,7 @@
         }
       ],
       "tag": "origami_token-ERC20BalanceModel",
+      "qualified_path": "origami_token::components::token::erc20::erc20_balance::erc_20_balance_model",
       "manifest_name": "origami_token-ERC20BalanceModel-da267235"
     },
     {
@@ -6130,6 +6132,7 @@
         }
       ],
       "tag": "origami_token-ERC20BridgeableModel",
+      "qualified_path": "origami_token::components::token::erc20::erc20_bridgeable::erc_20_bridgeable_model",
       "manifest_name": "origami_token-ERC20BridgeableModel-28075fe4"
     },
     {
@@ -6597,6 +6600,7 @@
         }
       ],
       "tag": "origami_token-ERC20MetadataModel",
+      "qualified_path": "origami_token::components::token::erc20::erc20_metadata::erc_20_metadata_model",
       "manifest_name": "origami_token-ERC20MetadataModel-3368c0e3"
     },
     {
@@ -7032,6 +7036,7 @@
         }
       ],
       "tag": "origami_token-ERC721BalanceModel",
+      "qualified_path": "origami_token::components::token::erc721::erc721_balance::erc_721_balance_model",
       "manifest_name": "origami_token-ERC721BalanceModel-246a8e17"
     },
     {
@@ -7467,6 +7472,7 @@
         }
       ],
       "tag": "origami_token-ERC721EnumerableIndexModel",
+      "qualified_path": "origami_token::components::token::erc721::erc721_enumerable::erc_721_enumerable_index_model",
       "manifest_name": "origami_token-ERC721EnumerableIndexModel-1a4200e7"
     },
     {
@@ -7911,6 +7917,7 @@
         }
       ],
       "tag": "origami_token-ERC721EnumerableOwnerIndexModel",
+      "qualified_path": "origami_token::components::token::erc721::erc721_enumerable::erc_721_enumerable_owner_index_model",
       "manifest_name": "origami_token-ERC721EnumerableOwnerIndexModel-573cb336"
     },
     {
@@ -8355,6 +8362,7 @@
         }
       ],
       "tag": "origami_token-ERC721EnumerableOwnerTokenModel",
+      "qualified_path": "origami_token::components::token::erc721::erc721_enumerable::erc_721_enumerable_owner_token_model",
       "manifest_name": "origami_token-ERC721EnumerableOwnerTokenModel-74966560"
     },
     {
@@ -8790,6 +8798,7 @@
         }
       ],
       "tag": "origami_token-ERC721EnumerableTokenModel",
+      "qualified_path": "origami_token::components::token::erc721::erc721_enumerable::erc_721_enumerable_token_model",
       "manifest_name": "origami_token-ERC721EnumerableTokenModel-5c383d9f"
     },
     {
@@ -9216,6 +9225,7 @@
         }
       ],
       "tag": "origami_token-ERC721EnumerableTotalModel",
+      "qualified_path": "origami_token::components::token::erc721::erc721_enumerable::erc_721_enumerable_total_model",
       "manifest_name": "origami_token-ERC721EnumerableTotalModel-5674a124"
     },
     {
@@ -9660,6 +9670,7 @@
         }
       ],
       "tag": "origami_token-ERC721MetaModel",
+      "qualified_path": "origami_token::components::token::erc721::erc721_metadata::erc_721_meta_model",
       "manifest_name": "origami_token-ERC721MetaModel-423fffaa"
     },
     {
@@ -10118,6 +10129,7 @@
         }
       ],
       "tag": "origami_token-ERC721OperatorApprovalModel",
+      "qualified_path": "origami_token::components::token::erc721::erc721_approval::erc_721_operator_approval_model",
       "manifest_name": "origami_token-ERC721OperatorApprovalModel-1083d4d1"
     },
     {
@@ -10553,6 +10565,7 @@
         }
       ],
       "tag": "origami_token-ERC721OwnerModel",
+      "qualified_path": "origami_token::components::token::erc721::erc721_owner::erc_721_owner_model",
       "manifest_name": "origami_token-ERC721OwnerModel-61577880"
     },
     {
@@ -10988,6 +11001,7 @@
         }
       ],
       "tag": "origami_token-ERC721TokenApprovalModel",
+      "qualified_path": "origami_token::components::token::erc721::erc721_approval::erc_721_token_approval_model",
       "manifest_name": "origami_token-ERC721TokenApprovalModel-560d5854"
     },
     {
@@ -11428,6 +11442,7 @@
         }
       ],
       "tag": "origami_token-InitializableModel",
+      "qualified_path": "origami_token::components::security::initializable::initializable_model",
       "manifest_name": "origami_token-InitializableModel-5c624096"
     },
     {
@@ -11877,6 +11892,7 @@
         }
       ],
       "tag": "origami_token-SRC5Model",
+      "qualified_path": "origami_token::components::introspection::src5::src_5_model",
       "manifest_name": "origami_token-SRC5Model-72fc8945"
     },
     {
@@ -12431,6 +12447,7 @@
         }
       ],
       "tag": "pistols-Challenge",
+      "qualified_path": "pistols::models::challenge::challenge",
       "manifest_name": "pistols-Challenge-673267b6"
     },
     {
@@ -12880,6 +12897,7 @@
         }
       ],
       "tag": "pistols-Config",
+      "qualified_path": "pistols::models::config::config",
       "manifest_name": "pistols-Config-60742fa7"
     },
     {
@@ -13402,6 +13420,7 @@
         }
       ],
       "tag": "pistols-Duelist",
+      "qualified_path": "pistols::models::duelist::duelist",
       "manifest_name": "pistols-Duelist-1ec34ce9"
     },
     {
@@ -13837,6 +13856,7 @@
         }
       ],
       "tag": "pistols-Pact",
+      "qualified_path": "pistols::models::duelist::pact",
       "manifest_name": "pistols-Pact-72a33a65"
     },
     {
@@ -14374,6 +14394,7 @@
         }
       ],
       "tag": "pistols-Round",
+      "qualified_path": "pistols::models::challenge::round",
       "manifest_name": "pistols-Round-617e0a3d"
     },
     {
@@ -14869,6 +14890,7 @@
         }
       ],
       "tag": "pistols-Scoreboard",
+      "qualified_path": "pistols::models::duelist::scoreboard",
       "manifest_name": "pistols-Scoreboard-18889906"
     },
     {
@@ -15346,6 +15368,7 @@
         }
       ],
       "tag": "pistols-Snapshot",
+      "qualified_path": "pistols::models::challenge::snapshot",
       "manifest_name": "pistols-Snapshot-31acbedc"
     },
     {
@@ -15781,6 +15804,7 @@
         }
       ],
       "tag": "pistols-TableAdmittance",
+      "qualified_path": "pistols::models::table::table_admittance",
       "manifest_name": "pistols-TableAdmittance-1b01f43d"
     },
     {
@@ -16306,6 +16330,7 @@
         }
       ],
       "tag": "pistols-TableConfig",
+      "qualified_path": "pistols::models::table::table_config",
       "manifest_name": "pistols-TableConfig-1e8368fc"
     },
     {
@@ -16773,6 +16798,7 @@
         }
       ],
       "tag": "pistols-TokenConfig",
+      "qualified_path": "pistols::models::token_config::token_config",
       "manifest_name": "pistols-TokenConfig-56ebd338"
     },
     {
@@ -17208,6 +17234,7 @@
         }
       ],
       "tag": "pistols-Wager",
+      "qualified_path": "pistols::models::challenge::wager",
       "manifest_name": "pistols-Wager-4cd30873"
     }
   ]
