@@ -93,7 +93,7 @@ trait IActionsInternal {
 
 #[dojo::contract]
 mod actions {
-    use debug::PrintTrait;
+    // use debug::PrintTrait;
     use traits::{Into, TryInto};
     use starknet::{ContractAddress, get_block_timestamp, get_block_info};
 

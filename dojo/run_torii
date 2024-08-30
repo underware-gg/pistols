@@ -27,6 +27,6 @@ fi
 torii --version
 torii \
   --world $WORLD_ADDRESS $* \
-  --allowed-origins "*" --index-pending \
+  --allowed-origins "*" \
   # --relay-local-key-path ./0.0.0.0-key.pem \
   # --relay-cert-path ./0.0.0.0.pem \
