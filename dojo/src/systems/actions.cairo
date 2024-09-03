@@ -102,7 +102,7 @@ mod actions {
         IMinterDispatcher, IMinterDispatcherTrait,
     };
     use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, Shot};
-    use pistols::models::duelist::{Duelist, DuelistTrait, ProfilePicType, Archetype, Score, Pact, DuelistManager, DuelistManagerTrait};
+    use pistols::models::duelist::{Duelist, DuelistTrait, ProfilePicType, Archetype, Score, Pact, DuelistHelper, DuelistHelperTrait};
     use pistols::models::structs::{SimulateChances};
     use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableAdmittanceEntity, TableAdmittanceEntityTrait, TableType, TABLES};
     use pistols::models::init::{init};
@@ -182,8 +182,10 @@ mod actions {
                 Archetype::Honourable => { duelist.score.level_lord = HONOUR::LEVEL_MAX; },
                 _ => {},
             };
-            // // save
-            DuelistManagerTrait::new(world).set(duelist.clone());
+
+            // save
+            let store: Store = StoreTrait::new(world);
+            store.set_duelist(@duelist);
 
             self._emitDuelistRegisteredEvent(caller, duelist.clone(), true);
 
@@ -197,17 +199,19 @@ mod actions {
             profile_pic_uri: felt252,
         ) -> Duelist {
             let caller: ContractAddress = starknet::get_caller_address();
-            let duelist_manager: DuelistManager = DuelistManagerTrait::new(world);
-            let mut duelist = duelist_manager.get(duelist_id);
+            let store: Store = StoreTrait::new(world);
+            let mut duelist = store.get_duelist(duelist_id);
             assert(duelist.timestamp != 0, Errors::INVALID_DUELIST);
-            assert(duelist_manager.is_owner_of(caller, duelist_id) == true, Errors::NOT_YOUR_DUELIST);
+
+            let duelist_helper: DuelistHelper = DuelistHelperTrait::new(world);
+            assert(duelist_helper.is_owner_of(caller, duelist_id) == true, Errors::NOT_YOUR_DUELIST);
 
             // update
             duelist.name = name;
             duelist.profile_pic_type = profile_pic_type;
             duelist.profile_pic_uri = profile_pic_uri.to_byte_array();
             // save
-            duelist_manager.set(duelist.clone());
+            store.set_duelist(@duelist);
 
             self._emitDuelistRegisteredEvent(caller, duelist.clone(), false);
 
@@ -230,11 +234,11 @@ mod actions {
             // validate challenger
             let duelist_id_a: u128 = duelist_id;
             let address_a: ContractAddress = starknet::get_caller_address();
-            let duelist_manager = DuelistManagerTrait::new(world);
-            assert(duelist_manager.is_owner_of(address_a, duelist_id_a) == true, Errors::NOT_YOUR_DUELIST);
+            let duelist_helper = DuelistHelperTrait::new(world);
+            assert(duelist_helper.is_owner_of(address_a, duelist_id_a) == true, Errors::NOT_YOUR_DUELIST);
 // address_a.print();
 // duelist_id_a.print();
-// duelist_manager.owner_of(duelist_id_a).print();
+// duelist_helper.owner_of(duelist_id_a).print();
 
             // validate table
             let table: TableConfigEntity = store.get_table_config_entity(table_id);
@@ -250,7 +254,7 @@ mod actions {
             let duelist_id_b: u128 = DuelistTrait::try_address_to_id(challenged_id_or_address);
             let address_b: ContractAddress = if (duelist_id_b > 0) {
                 // challenging a duelist...
-                assert(duelist_manager.exists(duelist_id_b) == true, Errors::INVALID_CHALLENGED);
+                assert(duelist_helper.exists(duelist_id_b) == true, Errors::INVALID_CHALLENGED);
                 assert(duelist_id_a != duelist_id_b, Errors::INVALID_CHALLENGED_SELF);
                 (utils::ZERO())
             } else {
@@ -339,11 +343,11 @@ mod actions {
                 challenge.timestamp_end = timestamp;
             } else {
                 // validate duelist ownership
-                let duelist_manager = DuelistManagerTrait::new(world);
+                let duelist_helper = DuelistHelperTrait::new(world);
 // address_b.print();
 // duelist_id_b.print();
-// duelist_manager.owner_of(duelist_id_b).print();
-                assert(duelist_manager.is_owner_of(address_b, duelist_id_b) == true, Errors::NOT_YOUR_DUELIST);
+// duelist_helper.owner_of(duelist_id_b).print();
+                assert(duelist_helper.is_owner_of(address_b, duelist_id_b) == true, Errors::NOT_YOUR_DUELIST);
 
                 // validate challenged identity
                 // either wallet ot duelist was challenged, never both

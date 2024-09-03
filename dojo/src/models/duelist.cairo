@@ -152,35 +152,29 @@ impl ArchetypeIntoByteArray of Into<Archetype, ByteArray> {
 //
 
 #[derive(Copy, Drop)]
-struct DuelistManager {
+struct DuelistHelper {
     world: IWorldDispatcher,
     token_dispatcher: IERC721Dispatcher,
 }
 
 #[generate_trait]
-impl DuelistManagerTraitImpl of DuelistManagerTrait {
-    fn new(world: IWorldDispatcher) -> DuelistManager {
+impl DuelistHelperTraitImpl of DuelistHelperTrait {
+    fn new(world: IWorldDispatcher) -> DuelistHelper {
         let contract_address: ContractAddress = world.token_duelist_address();
-        assert(contract_address.is_non_zero(), 'DuelistManager: null token addr');
+        assert(contract_address.is_non_zero(), 'DuelistHelper: null token addr');
         let token_dispatcher = ierc721(contract_address);
-        (DuelistManager { world, token_dispatcher })
+        (DuelistHelper { world, token_dispatcher })
     }
-    fn get(self: DuelistManager, duelist_id: u128) -> Duelist {
-        DuelistStore::get(self.world, duelist_id)
-    }
-    fn set(self: DuelistManager, duelist: Duelist) {
-        set!(self.world, (duelist));
-    }
-    fn get_token_dispatcher(self: DuelistManager) -> IERC721Dispatcher {
+    fn get_token_dispatcher(self: DuelistHelper) -> IERC721Dispatcher {
         (self.token_dispatcher)
     }
-    fn owner_of(self: DuelistManager, duelist_id: u128) -> ContractAddress {
+    fn owner_of(self: DuelistHelper, duelist_id: u128) -> ContractAddress {
         (self.token_dispatcher.owner_of(duelist_id.into()))
     }
-    fn exists(self: DuelistManager, duelist_id: u128) -> bool {
+    fn exists(self: DuelistHelper, duelist_id: u128) -> bool {
         (self.owner_of(duelist_id).is_non_zero())
     }
-    fn is_owner_of(self: DuelistManager, address: ContractAddress, duelist_id: u128) -> bool {
+    fn is_owner_of(self: DuelistHelper, address: ContractAddress, duelist_id: u128) -> bool {
         (self.owner_of(duelist_id)  == address)
     }
 }

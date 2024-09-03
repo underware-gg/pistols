@@ -188,6 +188,11 @@ impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
+    fn set_duelist(self: Store, model: @Duelist) {
+        model.set(self.world);
+    }
+
+    #[inline(always)]
     fn set_duelist_entity(self: Store, entity: DuelistEntity) {
         entity.update(self.world);
     }
