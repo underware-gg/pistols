@@ -170,7 +170,7 @@ mod tests {
     fn test_challenge_exists() {
         let (world, _actions, _admin, _lords, _minter) = tester::setup_world(flags::APPROVE);
         // get some random inexisting challenge
-        let ch: Challenge = tester::get_Challenge(world, 0x682137812638127638127);
+        let ch = tester::get_ChallengeEntity(world, 0x682137812638127638127);
         let state: ChallengeState = ch.state.try_into().unwrap();
         assert(state == ChallengeState::Null, 'ChallengeState::Null');
         assert(state.exists() == false, 'exists()');

@@ -8,7 +8,7 @@ mod tests {
 
     use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
-    use pistols::models::challenge::{Challenge, Round, RoundStore, RoundModelImpl};
+    use pistols::models::challenge::{Challenge, ChallengeEntity, Round, RoundEntity, RoundEntityStore, RoundModelImpl};
     use pistols::models::duelist::{Duelist, ProfilePicType};
     use pistols::models::table::{TABLES};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
@@ -39,14 +39,14 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     const TABLE_ID: felt252 = TABLES::LORDS;
     const WAGER_VALUE: u128 = 100_000_000_000_000_000_000;
 
-    fn _start_new_challenge(world: IWorldDispatcher, actions: IActionsDispatcher, owner: ContractAddress, other: ContractAddress) -> (Challenge, Round, u128) {
+    fn _start_new_challenge(world: IWorldDispatcher, actions: IActionsDispatcher, owner: ContractAddress, other: ContractAddress) -> (ChallengeEntity, RoundEntity, u128) {
         // tester::execute_update_duelist(actions, OWNER(), PLAYER_NAME, ProfilePicType::Duelist, "1");
         // tester::execute_update_duelist(actions, OTHER(), OTHER_NAME, ProfilePicType::Duelist, "2");
         let duel_id: u128 = tester::execute_create_challenge(actions, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, WAGER_VALUE, 48);
         tester::elapse_timestamp(timestamp::from_days(1));
         tester::execute_reply_challenge(actions, OTHER(), duel_id, true);
-        let ch = tester::get_Challenge(world, duel_id);
-        let round: Round = tester::get_Round(world, duel_id, 1);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
+        let round = tester::get_RoundEntity(world, duel_id, 1);
         assert(ch.state == ChallengeState::InProgress, 'challenge.state');
         assert(ch.round_number == 1, 'challenge.number');
         assert(round.state == RoundState::Commit, 'round.state');
@@ -73,7 +73,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         health_a: u8, slot1_a: u8, slot2_a: u8,
         health_b: u8, slot1_b: u8, slot2_b: u8,
         blades_salt: u64,
-    ) -> (Challenge, Round) {
+    ) -> (ChallengeEntity, RoundEntity, u128) {
         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER());
         // random 1st round...
         let (salt_1_a, salt_1_b, action_1_a, action_1_b, hash_1_a, hash_1_b) = _get_actions_round_1_continue();
@@ -81,14 +81,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_1_b);
         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_1_a, action_1_a, 0);
         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_1_b, action_1_b, 0);
-        let (challenge, mut round) = tester::get_Challenge_Round(world, duel_id);
+        let (challenge, mut round) = tester::get_Challenge_Round_Entity(world, duel_id);
         assert(challenge.round_number == 2, 'C: needs 2 rounds');
-        assert(round.round_number == 2, 'R: needs 2 rounds');
         // round 3 should not exist
-        let round1: Round = tester::get_Round(world, challenge.duel_id, 1);
-        let round2: Round = tester::get_Round(world, challenge.duel_id, 2);
-        let round3: Round = tester::get_Round(world, challenge.duel_id, 3);
-        let round4: Round = tester::get_Round(world, challenge.duel_id, 4);
+        let round1 = tester::get_RoundEntity(world, duel_id, 1);
+        let round2 = tester::get_RoundEntity(world, duel_id, 2);
+        let round3 = tester::get_RoundEntity(world, duel_id, 3);
+        let round4 = tester::get_RoundEntity(world, duel_id, 4);
         assert(round1.state == RoundState::Finished, '__round1.state');
         assert(round2.state == RoundState::Commit, '__round2.state');
         assert(round3.state == RoundState::Null, '__round3.state');
@@ -96,7 +95,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         // change round 1 results
         round.shot_a.health = health_a;
         round.shot_b.health = health_b;
-        tester::set_Round(world, round);
+        round.update(world); // TODO: impersonate some contract
         // run 2nd round
         let salt_a: u64 = blades_salt;
         let salt_b: u64 = SALT_1_b;
@@ -107,34 +106,33 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         tester::execute_reveal_action(actions, OWNER(), duel_id, 2, salt_a, slot1_a, slot2_a);
         tester::execute_reveal_action(actions, OTHER(), duel_id, 2, salt_b, slot1_b, slot2_b);
         // return results
-        let (challenge, round) = tester::get_Challenge_Round(world, duel_id);
+        let (challenge, round) = tester::get_Challenge_Round_Entity(world, duel_id);
 // salt_a.print();
 // round.shot_a.health.print();
 // round.shot_b.health.print();
 // challenge.winner.print();
 // challenge.state.print();
-        (challenge, round)
+        (challenge, round, duel_id)
     }
 
-    fn assert_winner(challenge: Challenge, round: Round, winner: u8, round_number: u8) {
-        assert(challenge.winner == winner, 'challenge.winner');
+    fn assert_winner(challenge: @ChallengeEntity, round: @RoundEntity, winner: u8, round_number: u8) {
+        assert(*challenge.winner == winner, 'challenge.winner');
         assert(challenge.timestamp_start < challenge.timestamp_end, 'bad timestamps');
-        assert(round.state == RoundState::Finished, 'round.state');
+        assert(*round.state == RoundState::Finished, 'round.state');
         if (round_number > 0) {
-            assert(challenge.round_number == round_number, 'bad challenge.round_number');
-            assert(round.round_number == round_number, 'bad round.round_number');
+            assert(*challenge.round_number == round_number, 'bad challenge.round_number');
         }
         if (winner == 0) {
-            assert(challenge.state == ChallengeState::Draw, 'not Draw');
-            assert(round.shot_a.win == round.shot_b.win, 'win_draw');
+            assert(*challenge.state == ChallengeState::Draw, 'not Draw');
+            assert(*round.shot_a.win == *round.shot_b.win, 'win_draw');
         } else {
-            assert(challenge.state == ChallengeState::Resolved, 'not Resolved');
+            assert(*challenge.state == ChallengeState::Resolved, 'not Resolved');
             if (winner == 1) {
-                assert(round.shot_a.win > 0, 'win_a_a');
-                assert(round.shot_b.win == 0, 'win_a_b');
+                assert(*round.shot_a.win > 0, 'win_a_a');
+                assert(*round.shot_b.win == 0, 'win_a_b');
             } else if (winner == 2) {
-                assert(round.shot_a.win == 0, 'win_b_a');
-                assert(round.shot_b.win > 0, 'win_b_b');
+                assert(*round.shot_a.win == 0, 'win_b_a');
+                assert(*round.shot_b.win > 0, 'win_b_b');
             } else {
                 assert(false, 'Invalid test winner');
             }
@@ -148,15 +146,15 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_dices() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
             CONST::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 0, 3);
-        let round2: Round = tester::get_Round(world, challenge.duel_id, 2);
-        let round3: Round = tester::get_Round(world, challenge.duel_id, 3);
+        assert_winner(@challenge, @round, 0, 3);
+        let round2 = tester::get_RoundEntity(world, duel_id, 2);
+        let round3 = tester::get_RoundEntity(world, duel_id, 3);
         // crit
         assert(round2.shot_a.dice_crit > 0, 'round2.shot_a.dice_crit');
         assert(round3.shot_a.dice_crit > 0, 'round3.shot_a.dice_crit');
@@ -176,13 +174,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_idle_actions() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
             CONST::SINGLE_DAMAGE, ACTION::IDLE, ACTION::IDLE,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 1, 2);
+        assert_winner(@challenge, @round, 1, 2);
         assert(round.shot_a.health == CONST::SINGLE_DAMAGE, 'bad health_a');
         assert(round.shot_b.health == 0, 'bad health_b');
     }
@@ -191,13 +189,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_skip_idle_slot() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::SINGLE_DAMAGE, ACTION::IDLE, ACTION::FAST_BLADE,
             CONST::SINGLE_DAMAGE, ACTION::IDLE, ACTION::FAST_BLADE,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 0, 2);
+        assert_winner(@challenge, @round, 0, 2);
         assert(round.shot_a.health == 0, 'bad health_a');
         assert(round.shot_b.health == 0, 'bad health_b');
     }
@@ -205,13 +203,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_invalid_actions() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
             CONST::SINGLE_DAMAGE, ACTION::SLOW_BLADE, ACTION::SLOW_BLADE,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 1, 2);
+        assert_winner(@challenge, @round, 1, 2);
         assert(round.shot_a.health == CONST::SINGLE_DAMAGE, 'bad health_a');
         assert(round.shot_b.health == 0, 'bad health_b');
     }
@@ -223,13 +221,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_slow_vs_slow_draw() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
             CONST::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 0, 2);
+        assert_winner(@challenge, @round, 0, 2);
         assert(round.shot_a.damage == CONST::DOUBLE_DAMAGE, 'bad shot_a.damage');
         assert(round.shot_a.health == CONST::SINGLE_DAMAGE, 'bad health_a');
         assert(round.shot_b.damage == CONST::DOUBLE_DAMAGE, 'bad shot_b.damage');
@@ -239,13 +237,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     // #[test]
     // fn test_slow_vs_slow_suicide_pact() {
     //     let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-    //     let (challenge, round) = _execute_blades(
+    //     let (challenge, round, _duel_id) = _execute_blades(
     //         world, actions, OWNER(), OTHER(),
     //         CONST::FULL_HEALTH, ACTION::SLOW_BLADE,
     //         CONST::FULL_HEALTH, ACTION::SLOW_BLADE,
     //         SALT_DUAL_CRIT, // NEED THIS!!!!
     //     );
-    //     assert_winner(challenge, round, 0, 2);
+    //     assert_winner(@challenge, @round, 0, 2);
     //     assert(round.shot_a.damage == CONST::FULL_HEALTH, 'bad shot_a.damage');
     //     assert(round.shot_a.health == 0, 'bad health_a');
     //     assert(round.shot_b.damage == CONST::FULL_HEALTH, 'bad shot_b.damage');
@@ -255,13 +253,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_slow_vs_slow_suicide_pact() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::DOUBLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
             CONST::DOUBLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 0, 2);
+        assert_winner(@challenge, @round, 0, 2);
         assert(round.shot_a.damage == CONST::DOUBLE_DAMAGE, 'bad shot_a.damage');
         assert(round.shot_a.health == 0, 'bad health_a');
         assert(round.shot_b.damage == CONST::DOUBLE_DAMAGE, 'bad shot_b.damage');
@@ -271,7 +269,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_fast_vs_fast_draw() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
             CONST::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
@@ -285,7 +283,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
 // round.shot_a.dice_hit.print();
 // round.shot_b.dice_crit.print();
 // round.shot_b.dice_hit.print();
-        assert_winner(challenge, round, 0, 2);
+        assert_winner(@challenge, @round, 0, 2);
         assert(round.shot_a.damage == CONST::SINGLE_DAMAGE, 'bad shot_a.damage');
         assert(round.shot_a.health == CONST::SINGLE_DAMAGE, 'bad shot_a.health');
         assert(round.shot_b.damage == CONST::SINGLE_DAMAGE, 'bad shot_b.damage');
@@ -294,52 +292,52 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_fast_vs_fast_hit_a() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
             CONST::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
             SALT_HIT_MISS,
         );
-        assert_winner(challenge, round, 1, 2);
+        assert_winner(@challenge, @round, 1, 2);
         assert(round.shot_a.health == CONST::SINGLE_DAMAGE, 'bad health_a');
         assert(round.shot_b.health == 0, 'bad health_b');
     }
     #[test]
     fn test_fast_vs_fast_crit_a() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
             CONST::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
             SALT_CRIT_MISS,
         );
-        assert_winner(challenge, round, 1, 2);
+        assert_winner(@challenge, @round, 1, 2);
         assert(round.shot_a.health == CONST::DOUBLE_DAMAGE, 'bad health_a');
         assert(round.shot_b.health == 0, 'bad health_b');
     }
     #[test]
     fn test_fast_vs_fast_hit_b() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
             CONST::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
             SALT_MISS_HIT,
         );
-        assert_winner(challenge, round, 2, 2);
+        assert_winner(@challenge, @round, 2, 2);
         assert(round.shot_a.health == 0, 'bad health_a');
         assert(round.shot_b.health == CONST::SINGLE_DAMAGE, 'bad health_b');
     }
     #[test]
     fn test_fast_vs_fast_crit_b() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_a
             CONST::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE, // duelist_b
             SALT_MISS_CRIT,
         );
-        assert_winner(challenge, round, 2, 2);
+        assert_winner(@challenge, @round, 2, 2);
         assert(round.shot_a.health == 0, 'bad health_a');
         assert(round.shot_b.health == CONST::DOUBLE_DAMAGE, 'bad health_b');
     }
@@ -347,25 +345,25 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_fast_vs_block_a() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
             CONST::SINGLE_DAMAGE, ACTION::BLOCK, ACTION::IDLE,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 0, 2);
+        assert_winner(@challenge, @round, 0, 2);
         assert(round.shot_a.health == CONST::SINGLE_DAMAGE, 'bad health_a');
         assert(round.shot_b.health == CONST::SINGLE_DAMAGE, 'bad health_b');
     }
     fn test_block_vs_fast_b() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::SINGLE_DAMAGE, ACTION::BLOCK, ACTION::IDLE,
             CONST::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 0, 2);
+        assert_winner(@challenge, @round, 0, 2);
         assert(round.shot_a.health == CONST::SINGLE_DAMAGE, 'bad health_a');
         assert(round.shot_b.health == CONST::SINGLE_DAMAGE, 'bad health_b');
     }
@@ -377,52 +375,52 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_fast_vs_slow_a() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
             CONST::SINGLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 1, 2);
+        assert_winner(@challenge, @round, 1, 2);
         assert(round.shot_a.health == CONST::SINGLE_DAMAGE, 'bad health_a');
         assert(round.shot_b.health == 0, 'bad health_b');
     }
     #[test]
     fn test_fast_vs_slow_b() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
             CONST::DOUBLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
             SALT_DUAL_CRIT_R3,
         );
-        assert_winner(challenge, round, 2, 3);
+        assert_winner(@challenge, @round, 2, 3);
         assert(round.shot_a.health == 0, 'bad health_a');
         assert(round.shot_b.health < CONST::FULL_HEALTH, 'bad health_b');
     }
     #[test]
     fn test_slow_vs_fast_b() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::SINGLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
             CONST::SINGLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 2, 2);
+        assert_winner(@challenge, @round, 2, 2);
         assert(round.shot_a.health == 0, 'bad health_a');
         assert(round.shot_b.health == CONST::SINGLE_DAMAGE, 'bad health_b');
     }
     #[test]
     fn test_slow_vs_fast_a() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::DOUBLE_DAMAGE, ACTION::IDLE, ACTION::SLOW_BLADE,
             CONST::DOUBLE_DAMAGE, ACTION::FAST_BLADE, ACTION::IDLE,
             SALT_MISS_HIT,
         );
-        assert_winner(challenge, round, 1, 3);
+        assert_winner(@challenge, @round, 1, 3);
         assert(round.shot_a.health == CONST::SINGLE_DAMAGE, 'bad health_a');
         assert(round.shot_b.health == 0, 'bad health_b');
     }
@@ -434,13 +432,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_slow_vs_block_crit_a() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
             CONST::FULL_HEALTH, ACTION::IDLE, ACTION::BLOCK,
             SALT_CRIT_HIT,
         );
-        assert_winner(challenge, round, 1, 2);
+        assert_winner(@challenge, @round, 1, 2);
         assert(round.shot_a.health == CONST::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == 0, 'shot_b.health');
         assert(round.shot_b.damage == CONST::FULL_HEALTH, 'shot_b.damage');
@@ -448,13 +446,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_block_vs_slow_crit_b() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::IDLE, ACTION::BLOCK,
             CONST::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
             SALT_HIT_CRIT,
         );
-        assert_winner(challenge, round, 2, 2);
+        assert_winner(@challenge, @round, 2, 2);
         assert(round.shot_a.health == 0, 'shot_a.health');
         assert(round.shot_a.damage == CONST::FULL_HEALTH, 'shot_a.damage');
         assert(round.shot_b.health == CONST::FULL_HEALTH, 'shot_b.health');
@@ -468,14 +466,14 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_block_vs_idle() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
             CONST::FULL_HEALTH, ACTION::IDLE, ACTION::FAST_BLADE,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 0, 3);
-        let round2: Round = tester::get_Round(world, challenge.duel_id, 2);
+        assert_winner(@challenge, @round, 0, 3);
+        let round2 = tester::get_RoundEntity(world, duel_id, 2);
         assert(round2.shot_a.health == CONST::FULL_HEALTH, 'round2.shot_a.health');
         assert(round2.shot_b.health == CONST::FULL_HEALTH, 'round2.shot_b.health');
         assert(round2.shot_a.block > 0, 'round2.shot_a.block');
@@ -488,14 +486,14 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_idle_vs_block() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::IDLE, ACTION::BLOCK,
             CONST::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
             SALT_DUAL_CRIT_R3,
         );
-        assert_winner(challenge, round, 0, 3);
-        let round2: Round = tester::get_Round(world, challenge.duel_id, 2);
+        assert_winner(@challenge, @round, 0, 3);
+        let round2 = tester::get_RoundEntity(world, duel_id, 2);
         assert(round2.shot_a.health == CONST::FULL_HEALTH, 'round2.shot_a.health');
         assert(round2.shot_b.health == CONST::FULL_HEALTH, 'round2.shot_b.health');
         assert(round2.shot_a.block == 0, 'round2.shot_a.block');
@@ -508,14 +506,14 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
     #[test]
     fn test_block_vs_block() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
             CONST::FULL_HEALTH, ACTION::BLOCK, ACTION::BLOCK,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 0, 3);
-        let round2: Round = tester::get_Round(world, challenge.duel_id, 2);
+        assert_winner(@challenge, @round, 0, 3);
+        let round2 = tester::get_RoundEntity(world, duel_id, 2);
         assert(round2.shot_a.health == CONST::FULL_HEALTH, 'round2.shot_a.health');
         assert(round2.shot_b.health == CONST::FULL_HEALTH, 'round2.shot_b.health');
         assert(round2.shot_a.block > 0, 'round2.shot_a.block');
@@ -538,13 +536,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             CONST::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 0, 2);
+        assert_winner(@challenge, @round, 0, 2);
         assert(round.shot_a.health == CONST::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == CONST::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager > 0, 'shot_a.wager');
@@ -557,13 +555,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
             CONST::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             0x12121, // MISS
         );
-        assert_winner(challenge, round, 1, 2);
+        assert_winner(@challenge, @round, 1, 2);
         assert(round.shot_a.action == ACTION::PACES_10.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::FLEE.into(), 'shot_b.action');
         assert(round.shot_a.health == CONST::FULL_HEALTH, 'shot_a.health');
@@ -580,13 +578,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             CONST::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
             0x12121, // MISS
         );
-        assert_winner(challenge, round, 2, 2);
+        assert_winner(@challenge, @round, 2, 2);
         assert(round.shot_a.action == ACTION::FLEE.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::PACES_10.into(), 'shot_b.action');
         assert(round.shot_a.health == CONST::FULL_HEALTH, 'shot_a.health');
@@ -603,13 +601,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
             CONST::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             SALT_CRIT_HIT, // CRIT_???, chances for Paces are different!
         );
-        assert_winner(challenge, round, 1, 2);
+        assert_winner(@challenge, @round, 1, 2);
         assert(round.shot_a.action == ACTION::PACES_10.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::FLEE.into(), 'shot_b.action');
         assert(round.shot_a.health == CONST::FULL_HEALTH, 'shot_a.health');
@@ -624,13 +622,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
             CONST::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             SALT_CRIT_HIT, // CRIT_???, chances for Paces are different!
         );
-        assert_winner(challenge, round, 1, 2);
+        assert_winner(@challenge, @round, 1, 2);
         assert(round.shot_a.action == ACTION::PACES_10.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::FLEE.into(), 'shot_b.action');
         assert(round.shot_a.health == CONST::FULL_HEALTH, 'shot_a.health');
@@ -645,13 +643,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             CONST::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
             0xeee, // ???_CRIT, chances for Paces are different!
         );
-        assert_winner(challenge, round, 2, 2);
+        assert_winner(@challenge, @round, 2, 2);
         assert(round.shot_a.action == ACTION::FLEE.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::PACES_10.into(), 'shot_b.action');
         assert(round.shot_a.health == 0, 'shot_a.health');
@@ -672,13 +670,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
             CONST::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 0, 2);
+        assert_winner(@challenge, @round, 0, 2);
         assert(round.shot_a.health == CONST::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == CONST::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager > round.shot_b.wager, 'wager');
@@ -690,13 +688,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             CONST::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 0, 2);
+        assert_winner(@challenge, @round, 0, 2);
         assert(round.shot_a.health == CONST::FULL_HEALTH, 'shot_a.health');
         assert(round.shot_b.health == CONST::FULL_HEALTH, 'shot_b.health');
         assert(round.shot_a.wager < round.shot_b.wager, 'wager');
@@ -710,13 +708,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
             CONST::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 0, 3);
+        assert_winner(@challenge, @round, 0, 3);
         assert(round.shot_a.action == ACTION::PACES_1.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::PACES_1.into(), 'shot_b.action');
         assert(round.shot_a.health < CONST::FULL_HEALTH, 'shot_a.health');
@@ -731,13 +729,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
             CONST::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
             SALT_DUAL_MISS,
         );
-        assert_winner(challenge, round, 1, 2);
+        assert_winner(@challenge, @round, 1, 2);
         assert(round.shot_a.action == ACTION::PACES_5.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::STEAL.into(), 'shot_b.action');
         assert(round.shot_a.health == CONST::FULL_HEALTH, 'shot_a.health');
@@ -754,13 +752,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
             CONST::FULL_HEALTH, ACTION::BLOCK, ACTION::IDLE,
             SALT_DUAL_MISS,
         );
-        assert_winner(challenge, round, 2, 2);
+        assert_winner(@challenge, @round, 2, 2);
         assert(round.shot_a.action == ACTION::STEAL.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::PACES_5.into(), 'shot_b.action');
         assert(round.shot_a.health == CONST::FULL_HEALTH, 'shot_a.health');
@@ -777,13 +775,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
             CONST::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
             SALT_CRIT_HIT, // CRIT_???, chances for Paces are different!
         );
-        assert_winner(challenge, round, 1, 2);
+        assert_winner(@challenge, @round, 1, 2);
         assert(round.shot_a.action == ACTION::PACES_5.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::STEAL.into(), 'shot_b.action');
         assert(round.shot_a.health == CONST::FULL_HEALTH, 'shot_a.health');
@@ -798,13 +796,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
             CONST::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::IDLE,
             0xeee, // ???_CRIT, chances for Paces are different!
         );
-        assert_winner(challenge, round, 2, 2);
+        assert_winner(@challenge, @round, 2, 2);
         assert(round.shot_a.action == ACTION::STEAL.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::PACES_5.into(), 'shot_b.action');
         assert(round.shot_a.health == 0, 'shot_a.health');
@@ -825,13 +823,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
             CONST::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 0, 2);
+        assert_winner(@challenge, @round, 0, 2);
         assert(round.shot_a.action == ACTION::SEPPUKU.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::SEPPUKU.into(), 'shot_b.action');
         assert(round.shot_a.health == 0, 'shot_a.health');
@@ -845,13 +843,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
             CONST::FULL_HEALTH, ACTION::IDLE, ACTION::SLOW_BLADE,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 2, 2);
+        assert_winner(@challenge, @round, 2, 2);
         assert(round.shot_a.action == ACTION::SEPPUKU.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::IDLE.into(), 'shot_b.action');
         assert(round.shot_a.health == 0, 'shot_a.health');
@@ -865,13 +863,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
             CONST::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::FAST_BLADE,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 2, 2);
+        assert_winner(@challenge, @round, 2, 2);
         assert(round.shot_a.action == ACTION::SEPPUKU.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::IDLE.into(), 'shot_b.action');
         assert(round.shot_a.health == 0, 'shot_a.health');
@@ -885,13 +883,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::FAST_BLADE, ACTION::FAST_BLADE,
             CONST::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 1, 2);
+        assert_winner(@challenge, @round, 1, 2);
         assert(round.shot_a.action == ACTION::IDLE.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::SEPPUKU.into(), 'shot_b.action');
         assert(round.shot_a.health == CONST::FULL_HEALTH, 'shot_a.health');
@@ -905,13 +903,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
             CONST::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 0, 2);
+        assert_winner(@challenge, @round, 0, 2);
         assert(round.shot_a.action == ACTION::SEPPUKU.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::FLEE.into(), 'shot_b.action');
         assert(round.shot_a.health == 0, 'shot_a.health');
@@ -925,13 +923,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
             CONST::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 0, 2);
+        assert_winner(@challenge, @round, 0, 2);
         assert(round.shot_a.action == ACTION::SEPPUKU.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::STEAL.into(), 'shot_b.action');
         assert(round.shot_a.health == 0, 'shot_a.health');
@@ -945,13 +943,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::FLEE, ACTION::IDLE,
             CONST::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 0, 2);
+        assert_winner(@challenge, @round, 0, 2);
         assert(round.shot_a.action == ACTION::FLEE.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::SEPPUKU.into(), 'shot_b.action');
         assert(round.shot_a.health == CONST::FULL_HEALTH, 'shot_a.health');
@@ -965,13 +963,13 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         let balance_a: u128 = lords.balance_of(OWNER()).low;
         let balance_b: u128 = lords.balance_of(OTHER()).low;
         let fee: u128 = actions.calc_fee(TABLE_ID, WAGER_VALUE);
-        let (challenge, round) = _execute_blades(
+        let (challenge, round, _duel_id) = _execute_blades(
             world, actions, OWNER(), OTHER(),
             CONST::FULL_HEALTH, ACTION::STEAL, ACTION::IDLE,
             CONST::FULL_HEALTH, ACTION::SEPPUKU, ACTION::IDLE,
             SALT_DUAL_HIT,
         );
-        assert_winner(challenge, round, 0, 2);
+        assert_winner(@challenge, @round, 0, 2);
         assert(round.shot_a.action == ACTION::STEAL.into(), 'shot_a.action');
         assert(round.shot_b.action == ACTION::SEPPUKU.into(), 'shot_b.action');
         assert(round.shot_a.health == CONST::FULL_HEALTH, 'shot_a.health');

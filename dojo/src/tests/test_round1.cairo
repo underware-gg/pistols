@@ -8,10 +8,10 @@ mod tests {
 
     use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
-    use pistols::models::challenge::{Challenge, Wager, Round};
-    use pistols::models::duelist::{Duelist, ProfilePicType, Archetype};
+    use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, RoundEntity};
+    use pistols::models::duelist::{Duelist, DuelistEntity, DuelistEntityStore, ProfilePicType, Archetype};
     use pistols::models::structs::{SimulateChances};
-    use pistols::models::table::{TableConfig, TableConfigTrait, TableManagerTrait, TABLES};
+    use pistols::models::table::{TableConfig, TABLES};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::types::constants::{CONST, HONOUR};
@@ -37,14 +37,14 @@ mod tests {
     const SALT_1_a: u64 = 0xa6f099b756a87e62;
     const SALT_1_b: u64 = 0xf9a978e92309da78;
 
-    fn _start_new_challenge(world: IWorldDispatcher, actions: IActionsDispatcher, owner: ContractAddress, other: ContractAddress, wager_value: u128) -> (Challenge, Round, u128) {
+    fn _start_new_challenge(world: IWorldDispatcher, actions: IActionsDispatcher, owner: ContractAddress, other: ContractAddress, wager_value: u128) -> (ChallengeEntity, RoundEntity, u128) {
         // tester::execute_update_duelist(actions, OWNER(), PLAYER_NAME, ProfilePicType::Duelist, "1");
         // tester::execute_update_duelist(actions, OTHER(), OTHER_NAME, ProfilePicType::Duelist, "2");
         let duel_id: u128 = tester::execute_create_challenge(actions, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, wager_value, 48);
         tester::elapse_timestamp(timestamp::from_days(1));
         tester::execute_reply_challenge(actions, OTHER(), duel_id, true);
-        let ch = tester::get_Challenge(world, duel_id);
-        let round: Round = tester::get_Round(world, duel_id, 1);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
+        let round = tester::get_RoundEntity(world, duel_id, 1);
         assert(ch.state == ChallengeState::InProgress, 'challenge.state');
         assert(ch.round_number == 1, 'challenge.number');
         assert(round.state == RoundState::Commit, 'round.state');
@@ -97,7 +97,7 @@ mod tests {
         assert(actions.has_pact(TABLE_ID, ID(B), ID(A)) == false, 'has_pact_no_2');
 
         let duel_id: u128 = tester::execute_create_challenge(actions, A, B, MESSAGE_1, TABLE_ID, 0, 48);
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting, 'state');
         assert(ch.address_a == A, 'challenger');
         assert(ch.address_b == ZERO(), 'challenger');   // challenged an id, address is empty
@@ -111,16 +111,14 @@ mod tests {
         assert(actions.has_pact(ch.table_id, ID(A), ID(B)) == true, 'has_pact_yes_1');
         assert(actions.has_pact(ch.table_id, ID(B), ID(A)) == true, 'has_pact_yes_2');
 
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
         assert(ch.state == new_state, 'state');
         assert(ch.round_number == 1, 'round_number');
         assert(ch.timestamp_start == timestamp, 'timestamp_start');
         assert(ch.timestamp_end == 0, 'timestamp_end');
         assert(ch.address_b == B, 'challenged');   // << UPDATED!!!
         
-        let round: Round = tester::get_Round(world, duel_id, 1);
-        assert(round.duel_id == duel_id, 'round.duel_id');
-        assert(round.round_number == 1, 'round.round_number');
+        let round = tester::get_RoundEntity(world, duel_id, 1);
         assert(round.state == RoundState::Commit, 'round.state');
     }
 
@@ -132,7 +130,7 @@ mod tests {
         let ID_A: ContractAddress = OWNED_BY_LITTLE_BOY();
         let ID_B: ContractAddress = OWNED_BY_LITTLE_GIRL();
         let duel_id: u128 = tester::execute_create_challenge_ID(actions, A, ID(ID_A), B, MESSAGE_1, TABLES::COMMONERS, 0, 48);
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
 // ch.address_a.print();
 // ch.address_b.print();
 // ch.duelist_id_a.print();
@@ -153,7 +151,7 @@ mod tests {
         assert(actions.has_pact(ch.table_id, ID(B), ID(A)) == false, 'has_pact_addr_false_2');
         assert(actions.has_pact(ch.table_id, ID(ID_A), ID(ID_B)) == true, 'has_pact_id_true_1');
         assert(actions.has_pact(ch.table_id, ID(ID_B), ID(ID_A)) == true, 'has_pact_id_true_2');
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
         assert(ch.duelist_id_b == ID(ID_B), 'challenged_id_ok');   // << UPDATED!!!
     }
 
@@ -228,15 +226,15 @@ mod tests {
         assert(fee > 0, 'fee > 0');
         assert(balance_treasury == 0, 'balance_treasury == 0');
 
-        let (challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), WAGER_VALUE);
+        let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), WAGER_VALUE);
         tester::assert_balance(lords, actions.contract_address, balance_contract, 0, (fee + WAGER_VALUE) * 2, 'balance_contract_1');
         tester::assert_balance(lords, OWNER(), balance_a, fee + WAGER_VALUE, 0, 'balance_a_1');
         tester::assert_balance(lords, OTHER(), balance_b, fee + WAGER_VALUE, 0, 'balance_b_1');
         tester::assert_balance(lords, TREASURY(), 0, 0, 0, 'balance_treasury_1');
 
         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
-        let chances_a: SimulateChances = actions.simulate_chances(ID(OWNER()), challenge.duel_id, challenge.round_number, action_a);
-        let chances_b: SimulateChances = actions.simulate_chances(ID(OWNER()), challenge.duel_id, challenge.round_number, action_b);
+        let chances_a: SimulateChances = actions.simulate_chances(ID(OWNER()), duel_id, 1, action_a);
+        let chances_b: SimulateChances = actions.simulate_chances(ID(OWNER()), duel_id, 1, action_b);
         let _hit_chance_a = chances_a.hit_chances;
         let _hit_chance_b = chances_b.hit_chances;
         let kill_chance_a = chances_a.crit_chances;
@@ -244,26 +242,23 @@ mod tests {
 
         // 1st commit
         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
-        let (challenge, round) = tester::get_Challenge_Round(world, duel_id);
+        let (challenge, round) = tester::get_Challenge_Round_Entity(world, duel_id);
         assert(challenge.round_number == 1, '1__challenge.round_number');
-        assert(round.round_number == 1, '1__round.round_number');
         assert(round.state == RoundState::Commit, '1__state');
         assert(round.shot_a.hash == hash_a, '1__hash');
 
         // 2nd commit > Reveal
         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-        let (challenge, round) = tester::get_Challenge_Round(world, duel_id);
+        let (challenge, round) = tester::get_Challenge_Round_Entity(world, duel_id);
         assert(challenge.round_number == 1, '2__challenge.round_number');
-        assert(round.round_number == 1, '2__round.round_number');
         assert(round.state == RoundState::Reveal, '2__state');
         assert(round.shot_a.hash == hash_a, '21__hash');
         assert(round.shot_b.hash == hash_b, '2__hash');
 
         // 1st reveal
         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
-        let (challenge, round) = tester::get_Challenge_Round(world, duel_id);
+        let (challenge, round) = tester::get_Challenge_Round_Entity(world, duel_id);
         assert(challenge.round_number == 1, '3_challenge.round_number');
-        assert(round.round_number == 1, '3__round.round_number');
         assert(round.state == RoundState::Reveal, '3__state');
         assert(round.shot_a.hash == hash_a, '3__hash');
         assert(round.shot_a.salt == salt_a, '3__salt');
@@ -271,7 +266,7 @@ mod tests {
 
         // 2nd reveal > Finished
         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
-        let (challenge, round) = tester::get_Challenge_Round(world, duel_id);
+        let (challenge, round) = tester::get_Challenge_Round_Entity(world, duel_id);
 // round.shot_a.health.print();
 // round.shot_b.health.print();
 // challenge.state.print();
@@ -279,7 +274,6 @@ mod tests {
         assert(challenge.winner != 0, '4_challenge.winner');
         assert(challenge.round_number == 1, '4_challenge.round_number');
         assert(challenge.timestamp_end > 0, '4_challenge.timestamp_end');
-        assert(round.round_number == 1, '4__round.round_number');
         assert(round.state == RoundState::Finished, '4__state');
         assert(round.shot_a.hash == hash_a, '43__hash');
         assert(round.shot_a.salt == salt_a, '43__salt');
@@ -288,8 +282,8 @@ mod tests {
         assert(round.shot_b.salt == salt_b, '4__salt');
         assert(round.shot_b.action == action_b.into(), '4__action');
 
-        let duelist_a = tester::get_Duelist(world, OWNER());
-        let duelist_b = tester::get_Duelist(world, OTHER());
+        let duelist_a = tester::get_DuelistEntity(world, OWNER());
+        let duelist_b = tester::get_DuelistEntity(world, OTHER());
         assert(duelist_a.score.total_duels == 1, 'duelist_a.total_duels');
         assert(duelist_b.score.total_duels == 1, 'duelist_b.total_duels');
         assert(duelist_a.score.total_draws == 0, 'duelist_a.total_draws');
@@ -338,15 +332,14 @@ mod tests {
         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
-        let (challenge, round) = tester::get_Challenge_Round(world, duel_id);
+        let (challenge, round) = tester::get_Challenge_Round_Entity(world, duel_id);
         assert(challenge.state == ChallengeState::Resolved, '4_challenge.state');
         assert(challenge.winner != 0, '4_challenge.winner');
         assert(challenge.round_number == 1, '4_challenge.round_number');
         assert(challenge.timestamp_end > 0, '4_challenge.timestamp_end');
-        assert(round.round_number == 1, '4__round.round_number');
         assert(round.state == RoundState::Finished, '4__state');
-        let duelist_a = tester::get_Duelist(world, OWNER());
-        let duelist_b = tester::get_Duelist(world, OTHER());
+        let duelist_a = tester::get_DuelistEntity(world, OWNER());
+        let duelist_b = tester::get_DuelistEntity(world, OTHER());
         assert(duelist_a.score.total_duels == 2, '__duelist_a.total_duels');
         assert(duelist_b.score.total_duels == 2, '__duelist_b.total_duels');
         assert(duelist_a.score.total_draws == 0, '__duelist_a.total_draws');
@@ -400,7 +393,7 @@ mod tests {
         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
-        let (challenge, round) = tester::get_Challenge_Round(world, duel_id);
+        let (challenge, round) = tester::get_Challenge_Round_Entity(world, duel_id);
 // round.shot_a.chance_crit.print();
 // round.shot_b.chance_crit.print();
 // round.shot_a.dice_crit.print();
@@ -411,13 +404,12 @@ mod tests {
         assert(challenge.state == ChallengeState::Draw, 'challenge.state');
         assert(challenge.winner == 0, 'challenge.winner');
         assert(challenge.round_number == 1, 'challenge.round_number');
-        assert(round.round_number == 1, 'round.round_number');
         assert(round.state == RoundState::Finished, 'round.state');
         assert(round.shot_a.health == 0, 'round.shot_a.health');
         assert(round.shot_b.health == 0, 'round.shot_b.health');
 
-        let duelist_a = tester::get_Duelist(world, OWNER());
-        let duelist_b = tester::get_Duelist(world, OTHER());
+        let duelist_a = tester::get_DuelistEntity(world, OWNER());
+        let duelist_b = tester::get_DuelistEntity(world, OTHER());
         assert(duelist_a.score.total_duels == 1, 'duelist_a.total_duels');
         assert(duelist_b.score.total_duels == 1, 'duelist_b.total_duels');
         assert(duelist_a.score.total_draws == 1, 'duelist_a.total_draws');
@@ -463,7 +455,7 @@ mod tests {
         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
-        let (challenge, _round) = tester::get_Challenge_Round(world, duel_id);
+        let (challenge, _round) = tester::get_Challenge_Round_Entity(world, duel_id);
         assert(challenge.state == ChallengeState::Draw, 'challenge.state');
 
         tester::assert_balance(lords, actions.contract_address, 0, 0, 0, 'balance_contract_2');
@@ -475,7 +467,7 @@ mod tests {
     fn test_dual_crit_to_trickster_a() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         // A is a trickster, will shoot first
-        // let mut duelist_a = tester::get_Duelist(world, OWNER());
+        // let mut duelist_a = tester::get_DuelistEntity(world, OWNER());
         // duelist_a.score.level_trickster = HONOUR::MAX;
         let mut scoreboard_a = tester::get_Scoreboard(world, TABLE_ID, OWNER());
         scoreboard_a.score.level_trickster = HONOUR::MAX;
@@ -487,7 +479,7 @@ mod tests {
         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
-        let (challenge, _round) = tester::get_Challenge_Round(world, duel_id);
+        let (challenge, _round) = tester::get_Challenge_Round_Entity(world, duel_id);
         assert(challenge.state == ChallengeState::Resolved, 'challenge.state');
         assert(challenge.winner == 1, 'challenge.winner');
     }
@@ -496,7 +488,7 @@ mod tests {
     fn test_dual_crit_to_trickster_b() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         // A is a trickster, will shoot first
-        // let mut duelist_b = tester::get_Duelist(world, OTHER());
+        // let mut duelist_b = tester::get_DuelistEntity(world, OTHER());
         // duelist_b.score.level_trickster = HONOUR::MAX;
         let mut scoreboard_b = tester::get_Scoreboard(world, TABLE_ID, OTHER());
         scoreboard_b.score.level_trickster = HONOUR::MAX;
@@ -508,7 +500,7 @@ mod tests {
         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
-        let (challenge, _round) = tester::get_Challenge_Round(world, duel_id);
+        let (challenge, _round) = tester::get_Challenge_Round_Entity(world, duel_id);
         assert(challenge.state == ChallengeState::Resolved, 'challenge.state');
         assert(challenge.winner == 2, 'challenge.winner');
     }
@@ -522,11 +514,10 @@ mod tests {
         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
-        let (challenge, round) = tester::get_Challenge_Round(world, duel_id);
+        let (challenge, round) = tester::get_Challenge_Round_Entity(world, duel_id);
         assert(challenge.state == ChallengeState::Resolved, 'challenge.state');
         assert(challenge.winner == 1, 'challenge.winner');
         assert(challenge.round_number == 1, 'challenge.round_number');
-        assert(round.round_number == 1, 'round.round_number');
         assert(round.state == RoundState::Finished, 'round.state');
         assert(round.shot_a.health == CONST::FULL_HEALTH, 'round.shot_a.health');
         assert(round.shot_b.health == 0, 'round.shot_b.health');
@@ -541,11 +532,10 @@ mod tests {
         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
-        let (challenge, round) = tester::get_Challenge_Round(world, duel_id);
+        let (challenge, round) = tester::get_Challenge_Round_Entity(world, duel_id);
         assert(challenge.state == ChallengeState::Resolved, 'challenge.state');
         assert(challenge.winner == 2, 'challenge.winner');
         assert(challenge.round_number == 1, 'challenge.round_number');
-        assert(round.round_number == 1, 'round.round_number');
         assert(round.state == RoundState::Finished, 'round.state');
         assert(round.shot_a.health == 0, 'round.shot_a.health');
         assert(round.shot_b.health == CONST::FULL_HEALTH, 'round.shot_b.health');
@@ -560,10 +550,10 @@ mod tests {
         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
-        let (challenge, round) = tester::get_Challenge_Round(world, duel_id);
+        let (challenge, _round) = tester::get_Challenge_Round_Entity(world, duel_id);
         assert(challenge.state == ChallengeState::InProgress, 'challenge.state');
-        assert(round.round_number == 2, 'round2.round_number');
-        let round1: Round = tester::get_Round(world, challenge.duel_id, 1);
+        assert(challenge.round_number == 2, 'round2.round_number');
+        let round1 = tester::get_RoundEntity(world, duel_id, 1);
         assert(round1.shot_a.health < CONST::FULL_HEALTH, 'round1.shot_a.health');
         assert(round1.shot_b.health < CONST::FULL_HEALTH, 'round1.shot_b.health');
         assert(round1.shot_a.chance_hit > 0, 'round1.chance_hit > 0');
@@ -584,9 +574,9 @@ mod tests {
         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
-        let (challenge, _round) = tester::get_Challenge_Round(world, duel_id);
+        let (challenge, _round) = tester::get_Challenge_Round_Entity(world, duel_id);
         assert(challenge.state == ChallengeState::InProgress, 'challenge.state');
-        let round1: Round = tester::get_Round(world, challenge.duel_id, 1);
+        let round1 = tester::get_RoundEntity(world, duel_id, 1);
         assert(round1.shot_a.chance_hit < test_dual_hit_chance_hit_at_3_paces, 'round1.shot_a.chance_hit');
         assert(round1.shot_b.chance_hit > test_dual_hit_chance_hit_at_3_paces, 'round1.shot_b.chance_hit');
     }
@@ -600,9 +590,9 @@ mod tests {
         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
-        let (challenge, _round) = tester::get_Challenge_Round(world, duel_id);
+        let (challenge, _round) = tester::get_Challenge_Round_Entity(world, duel_id);
         assert(challenge.state == ChallengeState::InProgress, 'challenge.state');
-        let round1: Round = tester::get_Round(world, challenge.duel_id, 1);
+        let round1 = tester::get_RoundEntity(world, duel_id, 1);
         assert(round1.shot_a.chance_hit > test_dual_hit_chance_hit_at_3_paces, 'round1.shot_a.chance_hit');
         assert(round1.shot_b.chance_hit < test_dual_hit_chance_hit_at_3_paces, 'round1.shot_b.chance_hit');
     }
@@ -619,8 +609,8 @@ mod tests {
     //         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
     //         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
     //         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
-    //         let (challenge, _round) = tester::get_Challenge_Round(world, duel_id);
-    //         let round1: Round = tester::get_Round(world, challenge.duel_id, 1);
+    //         let (challenge, _round) = tester::get_Challenge_Round_Entity(world, duel_id);
+    //         let round1 = tester::get_RoundEntity(world, duel_id, 1);
     //         if (
     //             challenge.state == ChallengeState::InProgress &&
     //             round1.shot_a.health < CONST::FULL_HEALTH &&
@@ -643,7 +633,7 @@ mod tests {
         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, 0x111, 0, 0);
         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, 0x222, 11, 0);
-        let round: Round = tester::get_Round(world, duel_id, 1);
+        let round = tester::get_RoundEntity(world, duel_id, 1);
         assert(round.shot_a.action == 10, 'action_0');
         assert(round.shot_b.action == 10, 'action_11');
         assert(round.shot_a.chance_crit > 0, 'shot_a.chance_crit');
@@ -673,17 +663,16 @@ mod tests {
         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
-        let (challenge, _round) = tester::get_Challenge_Round(world, duel_id);
+        let (challenge, _round) = tester::get_Challenge_Round_Entity(world, duel_id);
         assert(challenge.state == ChallengeState::Resolved, 'challenge.state');
 
-        let mut duelist_a_before = tester::get_Duelist_id(world, ID(OWNER()));
+        let mut duelist_a_before = tester::get_DuelistEntity_id(world, ID(OWNER()));
         assert(duelist_a_before.score.total_duels > 0, 'total_duels > 0');
         // validate by settign a timestamp
         duelist_a_before.timestamp = 1234;
-        tester::set_Duelist(world, duelist_a_before.clone());
+        duelist_a_before.update(world); // TODO: impersonate some contract
         tester::execute_update_duelist_ID(actions, OWNER(), ID(OWNER()), 'dssadsa', ProfilePicType::Duelist, '3');
-        let duelist_a_after = tester::get_Duelist_id(world, ID(OWNER()));
-        assert(duelist_a_before.duelist_id == duelist_a_after.duelist_id, 'duelist_id');
+        let duelist_a_after = tester::get_DuelistEntity_id(world, ID(OWNER()));
         assert(duelist_a_before.name != duelist_a_after.name, 'name');
         assert(duelist_a_before.profile_pic_uri != duelist_a_after.profile_pic_uri, 'profile_pic_uri');
         assert(duelist_a_before.timestamp == duelist_a_after.timestamp, 'timestamp');

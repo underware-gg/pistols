@@ -87,7 +87,7 @@ mod tests {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let timestamp = tester::get_block_timestamp();
         let duel_id: u128 = tester::execute_create_challenge(actions, OWNER(), BIG_BOY(), MESSAGE_1, TABLE_ID, 0, 0);
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting, 'state');
         assert(ch.address_a == OWNER(), 'challenged');
         assert(ch.address_b == BIG_BOY(), 'challenger');
@@ -102,7 +102,7 @@ mod tests {
     fn test_challenge_to_duelist() {
         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
         let duel_id: u128 = tester::execute_create_challenge(actions, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 0);
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting, 'state');
         assert(ch.address_a == OWNER(), 'challenged');
         assert(ch.address_b == ZERO(), 'challenger');   // challenged an id, address is empty
@@ -116,7 +116,7 @@ mod tests {
         let expire_hours: u64 = 24;
         let timestamp = tester::get_block_timestamp();
         let duel_id: u128 = tester::execute_create_challenge(actions, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, expire_hours);
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
         assert(ch.timestamp_start == timestamp, 'timestamp_start');
         assert(ch.timestamp_end == ch.timestamp_start + timestamp::from_hours(expire_hours), 'timestamp_end');
     }
@@ -158,7 +158,7 @@ mod tests {
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_challenge(actions, A, B, MESSAGE_1, TABLE_ID, 0, 48);
-        let _ch = tester::get_Challenge(world, duel_id);
+        let _ch = tester::get_ChallengeEntity(world, duel_id);
         let (_block_number, _timestamp) = tester::elapse_timestamp(timestamp::from_days(3));
         let new_state: ChallengeState = tester::execute_reply_challenge(actions, B, duel_id, false);
         assert(new_state != ChallengeState::Awaiting, '!awaiting');
@@ -171,7 +171,7 @@ mod tests {
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_challenge(actions, A, B, MESSAGE_1, TABLES::COMMONERS, 0, 24);
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
 
         assert(actions.has_pact(ch.table_id, ID(B), ID(A)) == true, 'has_pact_yes');
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_date(1, 0, 1));
@@ -179,7 +179,7 @@ mod tests {
         assert(new_state == ChallengeState::Expired, 'expired');
         assert(actions.has_pact(ch.table_id, ID(B), ID(A)) == false, 'has_pact_no');
 
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
         assert(ch.state == new_state, 'state');
         assert(ch.round_number == 0, 'round_number');
         assert(ch.winner == 0, 'winner');
@@ -195,7 +195,7 @@ mod tests {
         let ID_A: ContractAddress = OWNED_BY_LITTLE_BOY();
         let ID_B: ContractAddress = OWNED_BY_LITTLE_GIRL();
         let duel_id: u128 = tester::execute_create_challenge_ID(actions, A, ID(ID_A), B, MESSAGE_1, TABLES::COMMONERS, 0, 24);
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting, 'state');
         assert(ch.address_a == A, 'challenger');
         assert(ch.address_b == B, 'challenged');
@@ -207,7 +207,7 @@ mod tests {
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_date(1, 0, 1));
         let new_state: ChallengeState = tester::execute_reply_challenge_ID(actions, B, ID(ID_B), duel_id, false);
         assert(new_state == ChallengeState::Expired, 'expired');
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
         assert(ch.state == new_state, 'state');
         assert(ch.round_number == 0, 'round_number');
         assert(ch.winner == 0, 'winner');
@@ -225,7 +225,7 @@ mod tests {
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_challenge(actions, A, B, MESSAGE_1, TABLE_ID, 0, 48);
-        let _ch = tester::get_Challenge(world, duel_id);
+        let _ch = tester::get_ChallengeEntity(world, duel_id);
 
         tester::elapse_timestamp(timestamp::from_days(1));
         tester::execute_reply_challenge(actions, A, duel_id, true);
@@ -237,7 +237,7 @@ mod tests {
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_challenge(actions, A, B, MESSAGE_1, TABLE_ID, 0, 48);
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
 
         assert(actions.has_pact(ch.table_id, ID(B), ID(A)) == true, 'has_pact_yes');
@@ -245,7 +245,7 @@ mod tests {
         assert(new_state == ChallengeState::Withdrawn, 'canceled');
         assert(actions.has_pact(ch.table_id, ID(A), ID(B)) == false, 'has_pact_no');
 
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
         assert(ch.state == new_state, 'state');
         assert(ch.round_number == 0, 'round_number');
         assert(ch.winner == 0, 'winner');
@@ -260,7 +260,7 @@ mod tests {
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_challenge(actions, A, B, MESSAGE_1, TABLE_ID, 0, 48);
-        let _ch = tester::get_Challenge(world, duel_id);
+        let _ch = tester::get_ChallengeEntity(world, duel_id);
         let (_block_number, _timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
         tester::execute_reply_challenge(actions, BUMMER(), duel_id, false);
     }
@@ -271,7 +271,7 @@ mod tests {
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_challenge(actions, A, B, MESSAGE_1, TABLE_ID, 0, 48);
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting, 'state');
         assert(ch.address_a == A, 'challenger');
         assert(ch.address_b == ZERO(), 'challenged');
@@ -282,7 +282,7 @@ mod tests {
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
         let new_state: ChallengeState = tester::execute_reply_challenge(actions, B, duel_id, false);
         assert(new_state == ChallengeState::Refused, 'refused');
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
         assert(ch.state == new_state, 'state');
         assert(ch.round_number == 0, 'round_number');
         assert(ch.winner == 0, 'winner');
@@ -300,7 +300,7 @@ mod tests {
         let ID_B: ContractAddress = OWNED_BY_LITTLE_GIRL();
         let duel_id: u128 = tester::execute_create_challenge_ID(actions, A, ID(ID_A), B, MESSAGE_1, TABLES::COMMONERS, 0, 48);
 
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
 // ch.address_a.print();
 // ch.address_b.print();
 // ch.duelist_id_a.print();
@@ -316,7 +316,7 @@ mod tests {
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
         let new_state: ChallengeState = tester::execute_reply_challenge_ID(actions, B, ID(ID_B), duel_id, false);
         assert(new_state == ChallengeState::Refused, 'refused');
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
         assert(ch.state == new_state, 'state');
         assert(ch.round_number == 0, 'round_number');
         assert(ch.winner == 0, 'winner');

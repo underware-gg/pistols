@@ -34,7 +34,7 @@ mod tests {
         assert(duelist1.score.level_trickster == 0, 'level_trickster');
         assert(duelist1.score.level_lord == 0, 'level_lord');
         // test get
-        let duelist1: Duelist = tester::get_Duelist_id(world, duelist1.duelist_id);
+        let duelist1 = tester::get_DuelistEntity_id(world, duelist1.duelist_id);
         assert(duelist1.name == duelist1_name, 'duelist1_name');
     }
 

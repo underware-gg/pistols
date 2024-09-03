@@ -28,7 +28,7 @@ use pistols::systems::minter::{
     minter, IMinterDispatcher, IMinterDispatcherTrait,
 };
 use pistols::models::{
-    duelist::{Duelist, Score, Scoreboard, ProfilePicType},
+    duelist::{Duelist, DuelistEntity, DuelistEntityStore, Score, Scoreboard, ProfilePicType},
     challenge::{Challenge, Snapshot, Wager, Round},
     config::{Config},
     table::{TableConfig, TableAdmittance},

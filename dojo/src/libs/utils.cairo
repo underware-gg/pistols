@@ -10,7 +10,7 @@ use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
 use pistols::systems::actions::actions::{Errors};
 use pistols::models::challenge::{Challenge, ChallengeEntity, Snapshot, SnapshotEntity, Wager, WagerEntity, Round, RoundEntity, Shot};
 use pistols::models::duelist::{Duelist, DuelistTrait, DuelistEntity, Pact, PactEntity, Scoreboard, ScoreboardEntity, Score, ScoreTrait};
-use pistols::models::table::{TableConfig, TableConfigTrait, TableConfigEntity, TableManagerTrait, TableType, TableTypeTrait};
+use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableType, TableTypeTrait};
 use pistols::models::config::{Config, ConfigEntity};
 use pistols::models::init::{init};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
@@ -144,7 +144,7 @@ fn deposit_wager_fees(store: Store, challenge: Challenge, from: ContractAddress,
     let wager: WagerEntity = store.get_wager_entity(challenge.duel_id);
     let total: u256 = (wager.value + wager.fee).into();
     if (total > 0) {
-        let table : TableConfig = store.get_table_config(challenge.table_id);
+        let table : TableConfigEntity = store.get_table_config_entity(challenge.table_id);
         let balance: u256 = table.ierc20().balance_of(from);
         let allowance: u256 = table.ierc20().allowance(from, to);
         assert(balance >= total, Errors::INSUFFICIENT_BALANCE);
@@ -156,7 +156,7 @@ fn withdraw_wager_fees(store: Store, challenge: Challenge, to: ContractAddress) 
     let wager: WagerEntity = store.get_wager_entity(challenge.duel_id);
     let total: u256 = (wager.value + wager.fee).into();
     if (total > 0) {
-        let table : TableConfig = store.get_table_config(challenge.table_id);
+        let table : TableConfigEntity = store.get_table_config_entity(challenge.table_id);
         let balance: u256 = table.ierc20().balance_of(starknet::get_contract_address());
         assert(balance >= total, Errors::WITHDRAW_NOT_AVAILABLE); // should never happen!
         table.ierc20().transfer(to, total);
@@ -167,7 +167,7 @@ fn split_wager_fees(store: Store, challenge: Challenge, address_a: ContractAddre
     let wager: WagerEntity = store.get_wager_entity(challenge.duel_id);
     let total: u256 = (wager.value + wager.fee).into() * 2;
     if (total > 0) {
-        let table : TableConfig = store.get_table_config(challenge.table_id);
+        let table : TableConfigEntity = store.get_table_config_entity(challenge.table_id);
         let balance: u256 = table.ierc20().balance_of(starknet::get_contract_address());
         assert(balance >= total, Errors::WAGER_NOT_AVAILABLE); // should never happen!
         if (wager.value > 0) {
@@ -181,7 +181,6 @@ fn split_wager_fees(store: Store, challenge: Challenge, address_a: ContractAddre
             }
         }
         if (wager.fee > 0) {
-            let table : TableConfig = store.get_table_config(challenge.table_id);
             let fees_address: ContractAddress =
                 if (table.fee_collector_address.is_non_zero()) {
                     (table.fee_collector_address)

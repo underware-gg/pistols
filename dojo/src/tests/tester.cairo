@@ -26,27 +26,27 @@ mod tester {
     use pistols::interfaces::systems::{SELECTORS};
 
     use pistols::models::challenge::{
-        Challenge, ChallengeStore,
-        Snapshot, SnapshotStore,
-        Wager, WagerStore,
-        Round, RoundStore,
+        Challenge, ChallengeStore, ChallengeEntity, ChallengeEntityStore,
+        Snapshot, SnapshotStore, SnapshotEntity, SnapshotEntityStore,
+        Wager, WagerStore, WagerEntity, WagerEntityStore,
+        Round, RoundStore, RoundEntity, RoundEntityStore,
     };
     use pistols::models::duelist::{
-        Duelist, DuelistTrait, DuelistStore,
-        Scoreboard, ScoreboardStore,
-        Pact, PactStore,
+        Duelist, DuelistTrait, DuelistStore, DuelistEntity, DuelistEntityStore,
+        Scoreboard, ScoreboardStore, ScoreboardEntity, ScoreboardEntityStore,
+        Pact, PactStore, PactEntity, PactEntityStore,
         ProfilePicType,
         Archetype,
     };
     use pistols::models::config::{
-        Config, ConfigStore, CONFIG,
+        Config, ConfigStore, CONFIG, ConfigEntity, ConfigEntityStore,
     };
     use pistols::models::table::{
-        TableConfig, TableConfigStore,
-        TableAdmittance, TableAdmittanceStore,
+        TableConfig, TableConfigStore, TableConfigEntity, TableConfigEntityStore,
+        TableAdmittance, TableAdmittanceStore, TableAdmittanceEntity, TableAdmittanceEntityStore,
     };
     use pistols::models::token_config::{
-        TokenConfig, TokenConfigStore,
+        TokenConfig, TokenConfigStore, TokenConfigEntity, TokenConfigEntityStore,
     };
 
     // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
@@ -402,12 +402,12 @@ mod tester {
         (TableAdmittanceStore::get(world, table_id))
     }
     #[inline(always)]
-    fn get_Duelist(world: IWorldDispatcher, address: ContractAddress) -> Duelist {
-        (DuelistStore::get(world, ID(address)))
+    fn get_DuelistEntity(world: IWorldDispatcher, address: ContractAddress) -> DuelistEntity {
+        (DuelistEntityStore::get(world, DuelistStore::entity_id_from_keys(ID(address))))
     }
     #[inline(always)]
-    fn get_Duelist_id(world: IWorldDispatcher, duelist_id: u128) -> Duelist {
-        (DuelistStore::get(world, duelist_id))
+    fn get_DuelistEntity_id(world: IWorldDispatcher, duelist_id: u128) -> DuelistEntity {
+        (DuelistEntityStore::get(world, DuelistStore::entity_id_from_keys(duelist_id)))
     }
     #[inline(always)]
     fn get_Scoreboard(world: IWorldDispatcher, table_id: felt252, address: ContractAddress) -> Scoreboard {
@@ -418,8 +418,8 @@ mod tester {
         (ScoreboardStore::get(world, table_id, duelist_id))
     }
     #[inline(always)]
-    fn get_Challenge(world: IWorldDispatcher, duel_id: u128) -> Challenge {
-        (ChallengeStore::get(world, duel_id))
+    fn get_ChallengeEntity(world: IWorldDispatcher, duel_id: u128) -> ChallengeEntity {
+        (ChallengeEntityStore::get(world, ChallengeStore::entity_id_from_keys(duel_id)))
     }
     #[inline(always)]
     fn get_Snapshot(world: IWorldDispatcher, duel_id: u128) -> Snapshot {
@@ -430,13 +430,13 @@ mod tester {
         (WagerStore::get(world, duel_id))
     }
     #[inline(always)]
-    fn get_Round(world: IWorldDispatcher, duel_id: u128, round_number: u8) -> Round {
-        (RoundStore::get(world, duel_id, round_number))
+    fn get_RoundEntity(world: IWorldDispatcher, duel_id: u128, round_number: u8) -> RoundEntity {
+        (RoundEntityStore::get(world, RoundStore::entity_id_from_keys(duel_id, round_number)))
     }
     #[inline(always)]
-    fn get_Challenge_Round(world: IWorldDispatcher, duel_id: u128) -> (Challenge, Round) {
-        let challenge = get_Challenge(world, duel_id);
-        let round = get_Round(world, duel_id, challenge.round_number);
+    fn get_Challenge_Round_Entity(world: IWorldDispatcher, duel_id: u128) -> (ChallengeEntity, RoundEntity) {
+        let challenge = get_ChallengeEntity(world, duel_id);
+        let round = get_RoundEntity(world, duel_id, challenge.round_number);
         (challenge, round)
     }
 
@@ -448,9 +448,9 @@ mod tester {
     fn set_TableConfig(world: IWorldDispatcher, table: TableConfig) {
         table.set_test(world);
     }
-    fn set_Round(world: IWorldDispatcher, round: Round) {
-        round.set_test(world);
-    }
+    // fn set_Round(world: IWorldDispatcher, round: Round) {
+    //     round.set_test(world);
+    // }
     fn set_Duelist(world: IWorldDispatcher, duelist: Duelist) {
         duelist.set_test(world);
     }

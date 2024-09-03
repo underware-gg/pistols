@@ -10,7 +10,7 @@ mod tests {
     use pistols::systems::actions::{IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::systems::admin::{IAdminDispatcher, IAdminDispatcherTrait};
     use pistols::models::config::{Config};
-    use pistols::models::table::{TableConfig, TableConfigTrait, TableManagerTrait, TABLES};
+    use pistols::models::table::{TableConfig, TABLES};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::constants::{CONST};
     use pistols::utils::timestamp::{timestamp};
@@ -62,7 +62,7 @@ mod tests {
         tester::execute_lords_approve(lords, B, S, approved_value);
         // create challenge
         let duel_id: u128 = tester::execute_create_challenge(actions, A, B, MESSAGE_1, table_id, wager_value, 0);
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
         assert(ch.table_id == table_id, 'ch.table_id');
         assert(ch.state == ChallengeState::Awaiting, 'Awaiting');
         // check stored wager
@@ -143,7 +143,7 @@ mod tests {
         let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let _balance: u128 = lords.balance_of(OTHER()).low;
         let duel_id: u128 = tester::execute_create_challenge(actions, OTHER(), BUMMER(), MESSAGE_1, TABLE_ID, 0, 0);
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting, 'Awaiting');
     }
 
@@ -152,7 +152,7 @@ mod tests {
         let (world, actions, _admin, lords, _minter) = tester::setup_world(flags::ACTIONS | flags::LORDS | flags::APPROVE);
         let _balance: u128 = lords.balance_of(OTHER()).low;
         let duel_id: u128 = tester::execute_create_challenge(actions, OTHER(), BUMMER(), MESSAGE_1, TABLE_ID, 100, 0);
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting, 'Awaiting');
     }
 
@@ -222,7 +222,7 @@ mod tests {
         let fee: u128 = actions.calc_fee(TABLE_ID, wager_value);
         let approved_value: u128 = wager_value + fee;
         let duel_id: u128 = tester::execute_create_challenge(actions, A, B, MESSAGE_1, TABLE_ID, wager_value, 0);
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting, 'Awaiting');
         tester::assert_balance(lords, A, balance_a, approved_value, 0, 'balance_a_1');
         tester::assert_balance(lords, S, balance_contract, 0, approved_value, 'balance_contract_1');
@@ -246,7 +246,7 @@ mod tests {
         let fee: u128 = actions.calc_fee(TABLE_ID, wager_value);
         let approved_value: u128 = wager_value + fee;
         let duel_id: u128 = tester::execute_create_challenge(actions, A, B, MESSAGE_1, TABLE_ID, wager_value, 24);
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting, 'Awaiting');
         tester::assert_balance(lords, A, balance_a, approved_value, 0, 'balance_a_1');
         tester::assert_balance(lords, S, balance_contract, 0, approved_value, 'balance_contract_1');
@@ -272,7 +272,7 @@ mod tests {
         let fee: u128 = actions.calc_fee(TABLE_ID, wager_value);
         let approved_value: u128 = wager_value + fee;
         let duel_id: u128 = tester::execute_create_challenge(actions, A, B, MESSAGE_1, TABLE_ID, wager_value, 0);
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting, 'Awaiting');
         tester::assert_balance(lords, A, balance_a, approved_value, 0, 'balance_a_1');
         tester::assert_balance(lords, S, balance_contract, 0, approved_value, 'balance_contract_1');
@@ -296,7 +296,7 @@ mod tests {
         let fee: u128 = actions.calc_fee(TABLE_ID, wager_value);
         let approved_value: u128 = wager_value + fee;
         let duel_id: u128 = tester::execute_create_challenge(actions, A, B, MESSAGE_1, TABLE_ID, wager_value, 24);
-        let ch = tester::get_Challenge(world, duel_id);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
         assert(ch.state == ChallengeState::Awaiting, 'Awaiting');
         tester::assert_balance(lords, A, balance_a, approved_value, 0, 'balance_a_1');
         tester::assert_balance(lords, S, balance_contract, 0, approved_value, 'balance_contract_1');

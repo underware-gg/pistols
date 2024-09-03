@@ -133,26 +133,18 @@ impl TableManagerTraitImpl of TableManagerTrait {
 }
 
 //---------------------------
-// TableConfigTrait
+// TableConfig Traits
 //
 #[generate_trait]
-impl TableConfigImpl of TableConfigTrait {
-    fn ierc20(self: TableConfig) -> IERC20Dispatcher {
-        (ierc20(self.wager_contract_address))
+impl TableConfigEntityImpl of TableConfigEntityTrait {
+    #[inline(always)]
+    fn ierc20(self: @TableConfigEntity) -> IERC20Dispatcher {
+        (ierc20(*self.wager_contract_address))
     }
-    fn calc_fee(self: TableConfig, wager_value: u128) -> u128 {
-        (MathU128::max(self.fee_min, (wager_value / 100) * self.fee_pct.into()))
+    fn calc_fee(self: @TableConfigEntity, wager_value: u128) -> u128 {
+        (MathU128::max(*self.fee_min, (wager_value / 100) * (*self.fee_pct).into()))
     }
 }
-
-// !!! will not work because of xxxEntityTrait does not implement Copy
-// #[generate_trait]
-// impl TableConfigEntityImpl of TableConfigEntityTrait {
-//     #[inline(always)]
-//     fn ierc20(self: TableConfigEntity) -> IERC20Dispatcher {
-//         (ierc20(self.wager_contract_address))
-//     }
-// }
 
 //---------------------------
 // TableAdmittanceTrait

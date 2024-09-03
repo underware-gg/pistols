@@ -10,7 +10,7 @@ mod tests {
 
     use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
-    use pistols::models::challenge::{Challenge, Wager, Round};
+    use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, RoundEntity};
     use pistols::models::duelist::{Duelist};
     use pistols::models::table::{TABLES};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
@@ -34,15 +34,15 @@ mod tests {
     const SALT_1_a: u64 = 0xa6f099b756a87e62;
     const SALT_1_b: u64 = 0xf9a978e92309da78;
     
-    fn _start_new_challenge(world: IWorldDispatcher, actions: IActionsDispatcher, owner: ContractAddress, other: ContractAddress, wager_value: u128) -> (Challenge, Round, u128) {
+    fn _start_new_challenge(world: IWorldDispatcher, actions: IActionsDispatcher, owner: ContractAddress, other: ContractAddress, wager_value: u128) -> (ChallengeEntity, RoundEntity, u128) {
         // tester::execute_update_duelist(actions, OWNER(), PLAYER_NAME, 1, "1");
         // tester::execute_update_duelist(actions, OTHER(), OTHER_NAME, 1, "2");
         let expire_hours: u64 = 48;
         let duel_id: u128 = tester::execute_create_challenge(actions, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, wager_value, expire_hours);
         tester::elapse_timestamp(timestamp::from_days(1));
         tester::execute_reply_challenge(actions, OTHER(), duel_id, true);
-        let ch = tester::get_Challenge(world, duel_id);
-        let round: Round = tester::get_Round(world, duel_id, 1);
+        let ch = tester::get_ChallengeEntity(world, duel_id);
+        let round = tester::get_RoundEntity(world, duel_id, 1);
         assert(ch.state == ChallengeState::InProgress, 'challenge.state');
         assert(ch.round_number == 1, 'challenge.number');
         assert(round.state == RoundState::Commit, 'round.state');
@@ -86,7 +86,7 @@ mod tests {
 //         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
 //         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
 //         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
-//         let (_challenge, round) = tester::get_Challenge_Round(world, duel_id);
+//         let (_challenge, round) = tester::get_Challenge_Round_Entity(world, duel_id);
 // // round.shot_a.health.print();
 // // round.shot_b.health.print();
 // // challenge.state.print();

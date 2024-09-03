@@ -104,7 +104,7 @@ mod actions {
     use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, Shot};
     use pistols::models::duelist::{Duelist, DuelistTrait, ProfilePicType, Archetype, Score, Pact, DuelistManager, DuelistManagerTrait};
     use pistols::models::structs::{SimulateChances};
-    use pistols::models::table::{TableConfig, TableConfigTrait, TableConfigEntity, TableManager, TableManagerTrait, TABLES, TableType};
+    use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableManager, TableManagerTrait, TABLES, TableType};
     use pistols::models::init::{init};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
@@ -238,7 +238,7 @@ mod actions {
 
             // validate table
             let table_manager = TableManagerTrait::new(world);
-            let table: TableConfig = table_manager.get(table_id);
+            let table: TableConfigEntity = store.get_table_config_entity(table_id);
             assert(table.is_open == true, Errors::TABLE_IS_CLOSED);
             assert(table_manager.can_join(table_id, address_a, duelist_id_a), Errors::CHALLENGER_NOT_ADMITTED);
 
@@ -457,7 +457,7 @@ mod actions {
 
         fn calc_fee(world: @IWorldDispatcher, table_id: felt252, wager_value: u128) -> u128 {
             let store: Store = StoreTrait::new(world);
-            let table: TableConfig = store.get_table_config(table_id);
+            let table: TableConfigEntity = store.get_table_config_entity(table_id);
             (table.calc_fee(wager_value))
         }
 
