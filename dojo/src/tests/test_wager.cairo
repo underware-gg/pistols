@@ -10,7 +10,7 @@ mod tests {
     use pistols::systems::actions::{IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::systems::admin::{IAdminDispatcher, IAdminDispatcherTrait};
     use pistols::models::config::{Config};
-    use pistols::models::table::{TableConfig, TableTrait, TableManagerTrait, TABLES};
+    use pistols::models::table::{TableConfig, TableConfigTrait, TableManagerTrait, TABLES};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::constants::{CONST};
     use pistols::utils::timestamp::{timestamp};

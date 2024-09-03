@@ -11,7 +11,7 @@ mod tests {
     use pistols::models::challenge::{Challenge, Wager, Round};
     use pistols::models::duelist::{Duelist, ProfilePicType, Archetype};
     use pistols::models::structs::{SimulateChances};
-    use pistols::models::table::{TableConfig, TableTrait, TableManagerTrait, TABLES};
+    use pistols::models::table::{TableConfig, TableConfigTrait, TableManagerTrait, TABLES};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::types::constants::{CONST, HONOUR};

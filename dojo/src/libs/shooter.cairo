@@ -17,8 +17,7 @@ mod shooter {
     use pistols::utils::math::{MathU8, MathU16};
     use pistols::libs::store::{Store, StoreTrait};
 
-    fn _assert_challenge(world: IWorldDispatcher, caller: ContractAddress, duelist_id: u128, duel_id: u128, round_number: u8) -> (Challenge, u8) {
-        let store: Store = StoreTrait::new(world);
+    fn _assert_challenge(store: Store, caller: ContractAddress, duelist_id: u128, duel_id: u128, round_number: u8) -> (Challenge, u8) {
         let challenge: Challenge = store.get_challenge(duel_id);
         // Assert Duelist is in the challenge
         let duelist_number: u8 =
@@ -43,12 +42,11 @@ mod shooter {
     //-----------------------------------
     // Commit
     //
-    fn commit_action(world: IWorldDispatcher, duelist_id: u128, duel_id: u128, round_number: u8, hash: u64) {
+    fn commit_action(store: Store, duelist_id: u128, duel_id: u128, round_number: u8, hash: u64) {
         // Assert correct Challenge
-        let (_challenge, duelist_number) = _assert_challenge(world, starknet::get_caller_address(), duelist_id, duel_id, round_number);
+        let (_challenge, duelist_number) = _assert_challenge(store, starknet::get_caller_address(), duelist_id, duel_id, round_number);
 
         // Assert correct Round
-        let store: Store = StoreTrait::new(world);
         let mut round: RoundEntity = store.get_round_entity(duel_id, round_number);
         assert(round.state == RoundState::Commit, Errors::ROUND_NOT_IN_COMMIT);
 
@@ -74,12 +72,11 @@ mod shooter {
     //-----------------------------------
     // Reveal
     //
-    fn reveal_action(world: IWorldDispatcher, duelist_id: u128, duel_id: u128, round_number: u8, salt: u64, mut packed: u16) -> Challenge {
+    fn reveal_action(store: Store, duelist_id: u128, duel_id: u128, round_number: u8, salt: u64, mut packed: u16) -> Challenge {
         // Assert correct Challenge
-        let (mut challenge, duelist_number) = _assert_challenge(world, starknet::get_caller_address(), duelist_id, duel_id, round_number);
+        let (mut challenge, duelist_number) = _assert_challenge(store, starknet::get_caller_address(), duelist_id, duel_id, round_number);
 
         // Assert correct Round
-        let store: Store = StoreTrait::new(world);
         let mut round: Round = store.get_round( duel_id, round_number);
         assert(round.state == RoundState::Reveal, Errors::ROUND_NOT_IN_REVEAL);
 
@@ -119,14 +116,14 @@ mod shooter {
 
         // Process round when both actions are revealed
         if (round_number == 1) {
-            process_round(world, ref challenge, ref round, false);
+            process_round(store, ref challenge, ref round, false);
         } else {
             // split packed action slots
             let (slot1_a, slot1_b, slot2_a, slot2_b): (u8, u8, u8, u8) = utils::unpack_round_slots(round);
             round.shot_a.action = slot1_a.into();
             round.shot_b.action = slot1_b.into();
             let is_last_round: bool = (slot2_a == 0 && slot2_b == 0);
-            process_round(world, ref challenge, ref round, is_last_round);
+            process_round(store, ref challenge, ref round, is_last_round);
             // open Round 3 if not over
             if (challenge.state == ChallengeState::InProgress) {
                 let mut round3 = Round {
@@ -166,12 +163,12 @@ mod shooter {
                         wager: 0,
                     },
                 };
-                process_round(world, ref challenge, ref round3, true);
+                process_round(store, ref challenge, ref round3, true);
             }
         }
         
         // update Challenge
-        utils::set_challenge(world, challenge);
+        utils::set_challenge(store, challenge);
 
         (challenge)
     }
@@ -179,8 +176,7 @@ mod shooter {
     //---------------------------------------
     // Decide who wins a round, or go to next
     //
-    fn process_round(world: IWorldDispatcher, ref challenge: Challenge, ref round: Round, is_last_round: bool) {
-        let store: Store = StoreTrait::new(world);
+    fn process_round(store: Store, ref challenge: Challenge, ref round: Round, is_last_round: bool) {
         let snapshot: SnapshotEntity = store.get_snapshot_entity(challenge.duel_id);
         let table_type: TableType = store.get_table_config_entity(challenge.table_id).table_type;
         
@@ -191,13 +187,13 @@ mod shooter {
         let priority: i8 = action_a.roll_priority(action_b, snapshot.score_a, snapshot.score_b);
         if (priority < 0) {
             // A strikes first
-            executed = strike_async(world, round, snapshot.score_a, snapshot.score_b, ref round.shot_a, ref round.shot_b, table_type);
+            executed = strike_async(store, round, snapshot.score_a, snapshot.score_b, ref round.shot_a, ref round.shot_b, table_type);
         } else if (priority > 0) {
             // B strikes first
-            executed = strike_async(world, round, snapshot.score_b, snapshot.score_a, ref round.shot_b, ref round.shot_a, table_type);
+            executed = strike_async(store, round, snapshot.score_b, snapshot.score_a, ref round.shot_b, ref round.shot_a, table_type);
         } else {
             // A and B strike simultaneously
-            executed = strike_sync(world, round, snapshot.score_a, snapshot.score_b, ref round.shot_a, ref round.shot_b, table_type);
+            executed = strike_sync(store, round, snapshot.score_a, snapshot.score_b, ref round.shot_a, ref round.shot_b, table_type);
         }
 
         // decide results on health or win flag
@@ -221,7 +217,7 @@ mod shooter {
 
         // Finish round
         round.state = RoundState::Finished;
-        set!(world, (round));
+        store.set_round(round);
     }
 
     fn apply_action_honour(ref shot: Shot) -> Action {
@@ -244,19 +240,19 @@ mod shooter {
     //
 
     // attacker strikes first, then defender only if not executed
-    fn strike_async(world: IWorldDispatcher, round: Round, attacker: Score, defender: Score, ref attack: Shot, ref defense: Shot, table_type: TableType) -> bool {
-        let mut executed: bool = strike(world, 'shoot_a', attacker, defender, round, ref attack, ref defense, table_type);
+    fn strike_async(store: Store, round: Round, attacker: Score, defender: Score, ref attack: Shot, ref defense: Shot, table_type: TableType) -> bool {
+        let mut executed: bool = strike(store, 'shoot_a', attacker, defender, round, ref attack, ref defense, table_type);
         apply_damage(ref attack, ref defense);
         if (!executed) {
-            executed = strike(world, 'shoot_b', defender, attacker, round, ref defense, ref attack, table_type);
+            executed = strike(store, 'shoot_b', defender, attacker, round, ref defense, ref attack, table_type);
             apply_damage(ref defense, ref attack);
         }
         (executed)
     }
     // sync strike, both at the same time
-    fn strike_sync(world: IWorldDispatcher, round: Round, attacker: Score, defender: Score, ref attack: Shot, ref defense: Shot, table_type: TableType) -> bool {
-        let mut executed_a: bool = strike(world, 'shoot_a', attacker, defender, round, ref attack, ref defense, table_type);
-        let mut executed_b: bool = strike(world, 'shoot_b', defender, attacker, round, ref defense, ref attack, table_type);
+    fn strike_sync(store: Store, round: Round, attacker: Score, defender: Score, ref attack: Shot, ref defense: Shot, table_type: TableType) -> bool {
+        let mut executed_a: bool = strike(store, 'shoot_a', attacker, defender, round, ref attack, ref defense, table_type);
+        let mut executed_b: bool = strike(store, 'shoot_b', defender, attacker, round, ref defense, ref attack, table_type);
         apply_damage(ref attack, ref defense);
         apply_damage(ref defense, ref attack);
         (executed_a || executed_b)
@@ -273,7 +269,7 @@ mod shooter {
 
     // executes single attack
     // returns true if ended in execution
-    fn strike(world: IWorldDispatcher, seed: felt252, attacker: Score, defender: Score, round: Round, ref attack: Shot, ref defense: Shot, table_type: TableType) -> bool {
+    fn strike(store: Store, seed: felt252, attacker: Score, defender: Score, round: Round, ref attack: Shot, ref defense: Shot, table_type: TableType) -> bool {
         let action: Action = attack.action.into();
         if (action != Action::Idle) {
             let defense_action: Action = defense.action.into();

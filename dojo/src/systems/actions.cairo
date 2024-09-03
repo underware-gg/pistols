@@ -104,7 +104,7 @@ mod actions {
     use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, Shot};
     use pistols::models::duelist::{Duelist, DuelistTrait, ProfilePicType, Archetype, Score, Pact, DuelistManager, DuelistManagerTrait};
     use pistols::models::structs::{SimulateChances};
-    use pistols::models::table::{TableConfig, TableConfigEntity, TableManager, TableTrait, TableManagerTrait, TABLES, TableType};
+    use pistols::models::table::{TableConfig, TableConfigTrait, TableConfigEntity, TableManager, TableManagerTrait, TABLES, TableType};
     use pistols::models::init::{init};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
@@ -225,6 +225,8 @@ mod actions {
             wager_value: u128,
             expire_hours: u64,
         ) -> u128 {
+            let store: Store = StoreTrait::new(world);
+
             // validate challenger
             let duelist_id_a: u128 = duelist_id;
             let address_a: ContractAddress = starknet::get_caller_address();
@@ -281,7 +283,7 @@ mod actions {
             };
 
             // set the pact + assert it does not exist
-            utils::set_pact(world, challenge);
+            utils::set_pact(store, challenge);
 
             // setup wager + fees
             assert(wager_value >= table.wager_min, Errors::MINIMUM_WAGER_NOT_MET);
@@ -297,11 +299,11 @@ mod actions {
                 set!(world, (wager));
 
                 // transfer wager/fee from Challenger to the contract
-                utils::deposit_wager_fees(world, challenge, challenge.address_a, starknet::get_contract_address());
+                utils::deposit_wager_fees(store, challenge, challenge.address_a, starknet::get_contract_address());
             }
             
             // create challenge
-            utils::set_challenge(world, challenge);
+            utils::set_challenge(store, challenge);
 
             self._emitNewChallengeEvent(challenge);
 
@@ -358,11 +360,11 @@ mod actions {
                     // validate chosen duelist
                     assert(challenge.duelist_id_a != duelist_id_b, Errors::INVALID_CHALLENGED_SELF);
                     // remove pact between wallets
-                    utils::unset_pact(world, challenge);
+                    utils::unset_pact(store, challenge);
                     // fil missing duelist
                     challenge.duelist_id_b = duelist_id_b;
                     // create pact between duelists
-                    utils::set_pact(world, challenge);
+                    utils::set_pact(store, challenge);
                 }
                 // all good!
                 if (accepted) {
@@ -372,9 +374,9 @@ mod actions {
                     challenge.timestamp_start = timestamp;
                     challenge.timestamp_end = 0;
                     // create Duelists snapshots for this Challenge
-                    utils::create_challenge_snapshot(world, challenge);
+                    utils::create_challenge_snapshot(store, challenge);
                     // transfer wager/fee from Challenged to the contract
-                    utils::deposit_wager_fees(world, challenge, challenge.address_b, starknet::get_contract_address());
+                    utils::deposit_wager_fees(store, challenge, challenge.address_b, starknet::get_contract_address());
                     // events
                     self._emitChallengeAcceptedEvent(challenge, accepted);
                     self._emitDuelistTurnEvent(challenge);
@@ -389,11 +391,11 @@ mod actions {
 
             // undo pact if duel does not proceed
             if (!challenge.state.is_live()) {
-                utils::unset_pact(world, challenge);
+                utils::unset_pact(store, challenge);
             }
 
             // update challenge state
-            utils::set_challenge(world, challenge);
+            utils::set_challenge(store, challenge);
 
             (challenge.state)
         }
@@ -409,7 +411,8 @@ mod actions {
             round_number: u8,
             hash: u64,
         ) {
-            shooter::commit_action(world, duelist_id, duel_id, round_number, hash);
+            let store: Store = StoreTrait::new(world);
+            shooter::commit_action(store, duelist_id, duel_id, round_number, hash);
         }
 
         fn reveal_action(ref world: IWorldDispatcher,
@@ -420,11 +423,12 @@ mod actions {
             action_slot1: u8,
             action_slot2: u8,
         ) {
-            let challenge: Challenge = shooter::reveal_action(world, duelist_id, duel_id, round_number, salt, utils::pack_action_slots(action_slot1, action_slot2));
+            let store: Store = StoreTrait::new(world);
+            let challenge: Challenge = shooter::reveal_action(store, duelist_id, duel_id, round_number, salt, utils::pack_action_slots(action_slot1, action_slot2));
 
             // undo pact if finished
             if (challenge.state.is_finished()) {
-                utils::unset_pact(world, challenge);
+                utils::unset_pact(store, challenge);
             }
 
             self._emitPostRevealEvents(challenge);
@@ -437,11 +441,13 @@ mod actions {
         //
 
         fn get_pact(world: @IWorldDispatcher, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128 {
-            (utils::get_pact(world, table_id, duelist_id_a, duelist_id_b))
+            let store: Store = StoreTrait::new(world);
+            (utils::get_pact(store, table_id, duelist_id_a, duelist_id_b))
         }
 
         fn has_pact(world: @IWorldDispatcher, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool {
-            (utils::get_pact(world, table_id, duelist_id_a, duelist_id_b) != 0)
+            let store: Store = StoreTrait::new(world);
+            (utils::get_pact(store, table_id, duelist_id_a, duelist_id_b) != 0)
         }
 
         fn can_join(world: @IWorldDispatcher, table_id: felt252, duelist_id: u128) -> bool {
@@ -450,21 +456,21 @@ mod actions {
         }
 
         fn calc_fee(world: @IWorldDispatcher, table_id: felt252, wager_value: u128) -> u128 {
-            let table_manager = TableManagerTrait::new(world);
-            let table: TableConfig = table_manager.get(table_id);
+            let store: Store = StoreTrait::new(world);
+            let table: TableConfig = store.get_table_config(table_id);
             (table.calc_fee(wager_value))
         }
 
         fn simulate_chances(world: @IWorldDispatcher, duelist_id: u128, duel_id: u128, round_number: u8, action: u8) -> SimulateChances {
             let store: Store = StoreTrait::new(world);
-            let (score_self, score_other): (Score, Score) = utils::call_get_snapshot_scores(world, duelist_id, duel_id);
-            let health: u8 = utils::call_get_duelist_health(world, duelist_id, duel_id, round_number);
+            let (score_self, score_other): (Score, Score) = utils::call_get_snapshot_scores(store, duelist_id, duel_id);
+            let health: u8 = utils::call_get_duelist_health(store, duelist_id, duel_id, round_number);
             let action_self: Action = action.into();
             let action_other: Action = action.into();
             let challenge: ChallengeEntity = store.get_challenge_entity(duel_id);
             let table_type: TableType = store.get_table_config_entity(challenge.table_id).table_type;
             // honour
-            let (action_honour, duelist_honour): (i8, u8) = utils::call_simulate_honour_for_action(world, score_self, action_self, table_type);
+            let (action_honour, duelist_honour): (i8, u8) = utils::call_simulate_honour_for_action(store, score_self, action_self, table_type);
             // crit
             let crit_chances: u8 = utils::calc_crit_chances(score_self, score_other, action_self, action_other, health, table_type);
             let crit_base_chance: u8 = action_self.crit_chance();

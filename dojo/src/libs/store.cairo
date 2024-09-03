@@ -102,6 +102,11 @@ impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
+    fn get_table_config(self: Store, table_id: felt252) -> TableConfig {
+        (TableConfigStore::get(self.world, table_id))
+    }
+
+    #[inline(always)]
     fn get_table_config_entity(self: Store, table_id: felt252) -> TableConfigEntity {
         (TableConfigEntityStore::get(self.world, TableConfigStore::entity_id_from_keys(table_id)))
     }
@@ -126,6 +131,11 @@ impl StoreImpl of StoreTrait {
     //
 
     #[inline(always)]
+    fn set_challenge(self: Store, model: Challenge) {
+        model.set(self.world);
+    }
+
+    #[inline(always)]
     fn set_challenge_entity(self: Store, entity: ChallengeEntity) {
         entity.update(self.world);
     }
@@ -146,6 +156,11 @@ impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
+    fn set_snapshot(self: Store, model: Snapshot) {
+        model.set(self.world);
+    }
+
+    #[inline(always)]
     fn set_snapshot_entity(self: Store, entity: SnapshotEntity) {
         entity.update(self.world);
     }
@@ -153,6 +168,11 @@ impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn set_duelist_entity(self: Store, entity: DuelistEntity) {
         entity.update(self.world);
+    }
+
+    #[inline(always)]
+    fn set_pact(self: Store, model: Pact) {
+        model.set(self.world);
     }
 
     #[inline(always)]
@@ -168,6 +188,11 @@ impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn set_scoreboard_entity(self: Store, entity: ScoreboardEntity) {
         entity.update(self.world);
+    }
+
+    #[inline(always)]
+    fn set_table_config(self: Store, model: TableConfig) {
+        model.set(self.world);
     }
 
     #[inline(always)]
