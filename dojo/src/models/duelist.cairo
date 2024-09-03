@@ -167,7 +167,7 @@ impl DuelistManagerTraitImpl of DuelistManagerTrait {
         (DuelistManager { world, token_dispatcher })
     }
     fn get(self: DuelistManager, duelist_id: u128) -> Duelist {
-        get!(self.world, (duelist_id), Duelist)
+        DuelistStore::get(self.world, duelist_id)
     }
     fn set(self: DuelistManager, duelist: Duelist) {
         set!(self.world, (duelist));

@@ -91,11 +91,11 @@ impl TableManagerTraitImpl of TableManagerTrait {
         TableManager { world }
     }
     fn exists(self: TableManager, table_id: felt252) -> bool {
-        let table: TableConfig = get!(self.world, (table_id), TableConfig);
+        let table: TableConfig = TableConfigStore::get(self.world, table_id);
         (table.description != 0)
     }
     fn get(self: TableManager, table_id: felt252) -> TableConfig {
-        let table: TableConfig = get!(self.world, (table_id), TableConfig);
+        let table: TableConfig = TableConfigStore::get(self.world, table_id);
         assert(table.description != 0, Errors::INVALID_TABLE);
         (table)
     }
@@ -120,7 +120,7 @@ impl TableManagerTraitImpl of TableManagerTrait {
         duelist_id: u128,
     ) -> bool {
         let exists: bool = self.exists(table_id);
-        let admittance: TableAdmittance = get!(self.world, (table_id), TableAdmittance);
+        let admittance: TableAdmittance = TableAdmittanceStore::get(self.world, table_id);
         (exists && admittance.can_join(account_address, duelist_id))
     }
     //

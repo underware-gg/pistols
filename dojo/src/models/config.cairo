@@ -26,7 +26,7 @@ impl ConfigManagerTraitImpl of ConfigManagerTrait {
         (ConfigManager { world })
     }
     fn get(self: ConfigManager) -> Config {
-        get!(self.world, (CONFIG::CONFIG_KEY), Config)
+        ConfigStore::get(self.world, CONFIG::CONFIG_KEY)
     }
     fn set(self: ConfigManager, config: Config) {
         set!(self.world, (config));

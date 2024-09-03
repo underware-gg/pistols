@@ -86,7 +86,7 @@ mod token_duelist {
     use starknet::{get_contract_address, get_caller_address};
 
     use pistols::interfaces::systems::{WorldSystemsTrait};
-    use pistols::models::duelist::{Duelist, Score, Scoreboard, ScoreTrait};
+    use pistols::models::duelist::{Duelist, DuelistStore, Score, Scoreboard, ScoreboardStore, ScoreTrait};
     use pistols::models::table::{TABLES};
     use pistols::types::constants::{CONST};
     use pistols::libs::utils::{CONSUME_BYTE_ARRAY};
@@ -248,7 +248,7 @@ mod token_duelist {
         }
 
         fn build_uri(self: @ContractState, token_id: u256, encode: bool) -> ByteArray {
-            let duelist: Duelist = get!(self.world(), (token_id.low), Duelist);
+            let duelist: Duelist = DuelistStore::get(self.world(), token_id.low);
             let attributes: Span<ByteArray> = self.get_attributes(duelist.clone());
             let metadata = JsonImpl::new()
                 .add("id", token_id.into())
@@ -333,7 +333,7 @@ mod token_duelist {
                 result.append(duelist.score.total_draws.into());
                 
                 // Wager on Lords table
-                let scoreboard: Scoreboard = get!(self.world(), (TABLES::LORDS, duelist.duelist_id), Scoreboard);
+                let scoreboard: Scoreboard = ScoreboardStore::get(self.world(), TABLES::LORDS, duelist.duelist_id);
                 
                 result.append("Lords Won");
                 let amount: u128 = (scoreboard.wager_won / CONST::ETH_TO_WEI.low);

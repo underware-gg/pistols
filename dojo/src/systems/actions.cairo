@@ -101,11 +101,11 @@ mod actions {
         WorldSystemsTrait,
         IMinterDispatcher, IMinterDispatcherTrait,
     };
-    use pistols::models::challenge::{Challenge, Wager, Round, Shot};
+    use pistols::models::challenge::{Challenge, ChallengeStore, Wager, Round, Shot};
     use pistols::models::duelist::{Duelist, DuelistTrait, ProfilePicType, Archetype, Score, Pact, DuelistManager, DuelistManagerTrait};
     use pistols::models::structs::{SimulateChances};
     use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
-    use pistols::models::table::{TableConfig, TableManager, TableTrait, TableManagerTrait, TABLES, TableType};
+    use pistols::models::table::{TableConfig, TableConfigStore, TableManager, TableTrait, TableManagerTrait, TABLES, TableType};
     use pistols::models::init::{init};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
@@ -317,7 +317,7 @@ mod actions {
             accepted: bool,
         ) -> ChallengeState {
             // validate chalenge
-            let mut challenge: Challenge = get!(world, duel_id, Challenge);
+            let mut challenge: Challenge = ChallengeStore::get(world, duel_id);
             assert(challenge.state.exists(), Errors::INVALID_CHALLENGE);
             assert(challenge.state == ChallengeState::Awaiting, Errors::CHALLENGE_NOT_AWAITING);
 
@@ -459,8 +459,8 @@ mod actions {
             let health: u8 = utils::call_get_duelist_health(world, duelist_id, duel_id, round_number);
             let action_self: Action = action.into();
             let action_other: Action = action.into();
-            let challenge: Challenge = get!(world, duel_id, Challenge);
-            let table_type: TableType = get!(world, challenge.table_id, TableConfig).table_type;
+            let challenge: Challenge = ChallengeStore::get(world, duel_id);
+            let table_type: TableType = TableConfigStore::get(world, challenge.table_id).table_type;
             // honour
             let (action_honour, duelist_honour): (i8, u8) = utils::call_simulate_honour_for_action(world, score_self, action_self, table_type);
             // crit

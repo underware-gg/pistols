@@ -7,9 +7,9 @@ mod shooter {
 
     use pistols::systems::actions::actions::{Errors};
     use pistols::libs::utils;
-    use pistols::models::challenge::{Challenge, Snapshot, Round, Shot};
+    use pistols::models::challenge::{Challenge, ChallengeStore, Snapshot, SnapshotStore, Round, RoundStore, Shot};
     use pistols::models::duelist::{Duelist, Score};
-    use pistols::models::table::{TableConfig, TableType};
+    use pistols::models::table::{TableConfig, TableConfigStore, TableType};
     use pistols::types::constants::{CONST};
     use pistols::types::challenge::{ChallengeState};
     use pistols::types::round::{RoundState};
@@ -17,7 +17,7 @@ mod shooter {
     use pistols::utils::math::{MathU8, MathU16};
 
     fn _assert_challenge(world: IWorldDispatcher, caller: ContractAddress, duelist_id: u128, duel_id: u128, round_number: u8) -> (Challenge, u8) {
-        let challenge: Challenge = get!(world, duel_id, Challenge);
+        let challenge: Challenge = ChallengeStore::get(world, duel_id);
         // Assert Duelist is in the challenge
         let duelist_number: u8 =
             if (challenge.duelist_id_a == duelist_id) { 1 }
@@ -46,7 +46,7 @@ mod shooter {
         let (_challenge, duelist_number) = _assert_challenge(world, starknet::get_caller_address(), duelist_id, duel_id, round_number);
 
         // Assert correct Round
-        let mut round: Round = get!(world, (duel_id, round_number), Round);
+        let mut round: Round = RoundStore::get(world, duel_id, round_number);
         assert(round.state == RoundState::Commit, Errors::ROUND_NOT_IN_COMMIT);
 
         // Validate action hash
@@ -76,7 +76,7 @@ mod shooter {
         let (mut challenge, duelist_number) = _assert_challenge(world, starknet::get_caller_address(), duelist_id, duel_id, round_number);
 
         // Assert correct Round
-        let mut round: Round = get!(world, (duel_id, round_number), Round);
+        let mut round: Round = RoundStore::get(world, duel_id, round_number);
         assert(round.state == RoundState::Reveal, Errors::ROUND_NOT_IN_REVEAL);
 
         // Validate action hash
@@ -176,8 +176,8 @@ mod shooter {
     // Decide who wins a round, or go to next
     //
     fn process_round(world: IWorldDispatcher, ref challenge: Challenge, ref round: Round, is_last_round: bool) {
-        let snapshot: Snapshot = get!(world, challenge.duel_id, Snapshot);
-        let table_type: TableType = get!(world, challenge.table_id, TableConfig).table_type;
+        let snapshot: Snapshot = SnapshotStore::get(world, challenge.duel_id);
+        let table_type: TableType = TableConfigStore::get(world, challenge.table_id).table_type;
         
         let action_a: Action = apply_action_honour(ref round.shot_a);
         let action_b: Action = apply_action_honour(ref round.shot_b);
