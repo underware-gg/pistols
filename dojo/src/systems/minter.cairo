@@ -86,7 +86,7 @@ mod minter {
             let token_id: u256 = config.minted_count.into();
             token.mint(to, token_id);
 
-            store.set_token_config_entity(config);
+            store.set_token_config_entity(@config);
 
             // return minted token id
             (token_id.low)
@@ -111,7 +111,7 @@ mod minter {
             let store = StoreTrait::new(world);
             let mut config: TokenConfigEntity = store.get_token_config_entity(token_contract_address);
             config.is_open = is_open;
-            store.set_token_config_entity(config);
+            store.set_token_config_entity(@config);
         }
     }
 

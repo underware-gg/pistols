@@ -153,37 +153,37 @@ impl StoreImpl of StoreTrait {
     //
 
     #[inline(always)]
-    fn set_challenge(self: Store, model: Challenge) {
+    fn set_challenge(self: Store, model: @Challenge) {
         model.set(self.world);
     }
 
     #[inline(always)]
-    fn set_challenge_entity(self: Store, entity: ChallengeEntity) {
+    fn set_challenge_entity(self: Store, entity: @ChallengeEntity) {
         entity.update(self.world);
     }
 
     #[inline(always)]
-    fn set_wager_entity(self: Store, entity: WagerEntity) {
+    fn set_wager_entity(self: Store, entity: @WagerEntity) {
         entity.update(self.world);
     }
 
     #[inline(always)]
-    fn set_round(self: Store, model: Round) {
+    fn set_round(self: Store, model: @Round) {
         model.set(self.world);
     }
 
     #[inline(always)]
-    fn set_round_entity(self: Store, entity: RoundEntity) {
+    fn set_round_entity(self: Store, entity: @RoundEntity) {
         entity.update(self.world);
     }
 
     #[inline(always)]
-    fn set_snapshot(self: Store, model: Snapshot) {
+    fn set_snapshot(self: Store, model: @Snapshot) {
         model.set(self.world);
     }
 
     #[inline(always)]
-    fn set_snapshot_entity(self: Store, entity: SnapshotEntity) {
+    fn set_snapshot_entity(self: Store, entity: @SnapshotEntity) {
         entity.update(self.world);
     }
 
@@ -193,52 +193,52 @@ impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn set_duelist_entity(self: Store, entity: DuelistEntity) {
+    fn set_duelist_entity(self: Store, entity: @DuelistEntity) {
         entity.update(self.world);
     }
 
     #[inline(always)]
-    fn set_pact(self: Store, model: Pact) {
+    fn set_pact(self: Store, model: @Pact) {
         model.set(self.world);
     }
 
     #[inline(always)]
-    fn set_pact_entity(self: Store, entity: PactEntity) {
+    fn set_pact_entity(self: Store, entity: @PactEntity) {
         entity.update(self.world);
     }
 
     #[inline(always)]
-    fn set_scoreboard(self: Store, model: Scoreboard) {
+    fn set_scoreboard(self: Store, model: @Scoreboard) {
         model.set(self.world);
     }
 
     #[inline(always)]
-    fn set_scoreboard_entity(self: Store, entity: ScoreboardEntity) {
+    fn set_scoreboard_entity(self: Store, entity: @ScoreboardEntity) {
         entity.update(self.world);
     }
 
     #[inline(always)]
-    fn set_table_config(self: Store, model: TableConfig) {
+    fn set_table_config(self: Store, model: @TableConfig) {
         model.set(self.world);
     }
 
     #[inline(always)]
-    fn set_table_config_entity(self: Store, entity: TableConfigEntity) {
+    fn set_table_config_entity(self: Store, entity: @TableConfigEntity) {
         entity.update(self.world);
     }
 
     #[inline(always)]
-    fn set_table_admittance(self: Store, model: TableAdmittance) {
+    fn set_table_admittance(self: Store, model: @TableAdmittance) {
         model.set(self.world);
     }
 
     #[inline(always)]
-    fn set_token_config_entity(self: Store, entity: TokenConfigEntity) {
+    fn set_token_config_entity(self: Store, entity: @TokenConfigEntity) {
         entity.update(self.world);
     }
 
     #[inline(always)]
-    fn set_config_entity(self: Store, entity: ConfigEntity) {
+    fn set_config_entity(self: Store, entity: @ConfigEntity) {
         entity.update(self.world);
     }
 

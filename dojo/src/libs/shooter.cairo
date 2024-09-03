@@ -66,7 +66,7 @@ mod shooter {
             round.state = RoundState::Reveal;
         }
 
-        store.set_round_entity(round);
+        store.set_round_entity(@round);
     }
 
     //-----------------------------------
@@ -110,7 +110,7 @@ mod shooter {
 
         // incomplete Round, update only
         if (round.shot_a.salt == 0 || round.shot_b.salt == 0) {
-            store.set_round(round);
+            store.set_round(@round);
             return challenge;
         }
 
@@ -217,7 +217,7 @@ mod shooter {
 
         // Finish round
         round.state = RoundState::Finished;
-        store.set_round(round);
+        store.set_round(@round);
     }
 
     fn apply_action_honour(ref shot: Shot) -> Action {

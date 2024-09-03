@@ -51,7 +51,7 @@ mod admin {
         // initialize
         config.treasury_address = (if (treasury_address.is_zero()) { get_caller_address() } else { treasury_address });
         config.is_paused = false;
-        store.set_config_entity(config);
+        store.set_config_entity(@config);
         // initialize table lords
         TableInitializerTrait::new(world).initialize(lords_address);
     }
@@ -98,7 +98,7 @@ mod admin {
             let mut config: ConfigEntity = store.get_config_entity();
             // update
             config.is_paused = paused;
-            store.set_config_entity(config);
+            store.set_config_entity(@config);
         }
 
         fn set_table(ref world: IWorldDispatcher, table: TableConfig) {
@@ -107,7 +107,7 @@ mod admin {
             assert(table.table_id != 0, Errors::INVALID_TABLE);
             // update table
             let store: Store = StoreTrait::new(world);
-            store.set_table_config(table);
+            store.set_table_config(@table);
         }
 
         fn set_table_admittance(ref world: IWorldDispatcher, table_admittance: TableAdmittance) {
@@ -118,7 +118,7 @@ mod admin {
             let mut table: TableConfigEntity = store.get_table_config_entity(table_admittance.table_id);
             assert(table.exists(), Errors::INVALID_TABLE);
             // update
-            store.set_table_admittance(table_admittance);
+            store.set_table_admittance(@table_admittance);
         }
 
         fn open_table(ref world: IWorldDispatcher, table_id: felt252, is_open: bool) {
@@ -129,7 +129,7 @@ mod admin {
             assert(table.exists(), Errors::INVALID_TABLE);
             // update
             table.is_open = is_open;
-            store.set_table_config_entity(table);
+            store.set_table_config_entity(@table);
         }
     }
 

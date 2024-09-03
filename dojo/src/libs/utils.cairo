@@ -93,7 +93,7 @@ fn set_pact(store: Store, challenge: Challenge) {
         pair,
         duel_id: challenge.duel_id,
     };
-    store.set_pact(pact);
+    store.set_pact(@pact);
 }
 
 fn unset_pact(store: Store, mut challenge: Challenge) {
@@ -123,7 +123,7 @@ fn create_challenge_snapshot(store: Store, challenge: Challenge) {
         score_a: scoreboard_a.score,
         score_b: scoreboard_b.score,
     };
-    store.set_snapshot(snapshot);
+    store.set_snapshot(@snapshot);
 }
 fn clone_snapshot_duelist_levels(store: Store, duelist_id: u128, ref scoreboard: Scoreboard) {
     // only new duelist on this table...
@@ -133,7 +133,7 @@ fn clone_snapshot_duelist_levels(store: Store, duelist_id: u128, ref scoreboard:
         scoreboard.score.level_villain = if (duelist.score.is_villain()) {HONOUR::LEVEL_MAX} else {0};
         scoreboard.score.level_trickster = if (duelist.score.is_trickster()) {HONOUR::LEVEL_MAX} else {0};
         scoreboard.score.level_lord = if (duelist.score.is_lord()) {HONOUR::LEVEL_MAX} else {0};
-        store.set_scoreboard(scoreboard);
+        store.set_scoreboard(@scoreboard);
     }
 }
 
@@ -295,7 +295,7 @@ fn unpack_action_slots(packed: u16) -> (u8, u8) {
 //
 
 fn set_challenge(store: Store, challenge: Challenge) {
-    store.set_challenge(challenge);
+    store.set_challenge(@challenge);
 
     // Start Round
     if (challenge.state.is_canceled()) {
@@ -325,7 +325,7 @@ fn set_challenge(store: Store, challenge: Challenge) {
             shot_a,
             shot_b,
         };
-        store.set_round(new_round);
+        store.set_round(@new_round);
     } else if (challenge.state.is_finished()) {
         // End Duel!
         let mut duelist_a: DuelistEntity = store.get_duelist_entity(challenge.duelist_id_a);
@@ -365,10 +365,10 @@ fn set_challenge(store: Store, challenge: Challenge) {
         }
         
         // save
-        store.set_duelist_entity(duelist_a);
-        store.set_duelist_entity(duelist_b);
-        store.set_scoreboard_entity(scoreboard_a);
-        store.set_scoreboard_entity(scoreboard_b);
+        store.set_duelist_entity(@duelist_a);
+        store.set_duelist_entity(@duelist_b);
+        store.set_scoreboard_entity(@scoreboard_a);
+        store.set_scoreboard_entity(@scoreboard_b);
     }
 }
 
