@@ -8,10 +8,10 @@ use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
 use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
 use pistols::systems::actions::actions::{Errors};
-use pistols::models::challenge::{Challenge, ChallengeStore, Snapshot, SnapshotStore, Wager, WagerStore, Round, RoundStore, Shot};
-use pistols::models::duelist::{Duelist, DuelistStore, DuelistTrait, Pact, PactStore, Scoreboard, ScoreboardStore, Score, ScoreTrait};
+use pistols::models::challenge::{Challenge, ChallengeEntity, Snapshot, SnapshotEntity, Wager, WagerEntity, Round, RoundEntity, Shot};
+use pistols::models::duelist::{Duelist, DuelistEntity, DuelistTrait, Pact, PactEntity, Scoreboard, ScoreboardEntity, Score, ScoreTrait};
 use pistols::models::table::{TableConfig, TableTrait, TableManagerTrait, TableType, TableTypeTrait};
-use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
+use pistols::models::config::{Config, ConfigEntity};
 use pistols::models::init::{init};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round::{RoundState, RoundStateTrait};
@@ -19,6 +19,7 @@ use pistols::types::action::{Action, ActionTrait, ACTION};
 use pistols::types::constants::{CONST, HONOUR, CHANCES};
 use pistols::utils::math::{MathU8, MathU16, MathU64};
 use pistols::utils::bitwise::{BitwiseU64};
+use pistols::libs::store::{Store, StoreTrait};
 
 // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
 extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
@@ -73,7 +74,8 @@ fn make_pact_pair(duelist_a: u128, duelist_b: u128) -> u128 {
 
 fn get_pact(world: IWorldDispatcher, table_id: felt252, duelist_a: u128, duelist_b: u128) -> u128 {
     let pair: u128 = make_pact_pair(duelist_a, duelist_b);
-    (PactStore::get(world, table_id, pair).duel_id)
+    let store: Store = StoreTrait::new(world);
+    (store.get_pact_entity(table_id, pair).duel_id)
 }
 
 fn set_pact(world: IWorldDispatcher, challenge: Challenge) {
@@ -84,7 +86,8 @@ fn set_pact(world: IWorldDispatcher, challenge: Challenge) {
     };
     if (challenge.duel_id > 0) {
         // new pact: must not exist!
-        let current_pact: u128 = PactStore::get(world, challenge.table_id, pair).duel_id;
+        let store: Store = StoreTrait::new(world);
+        let current_pact: u128 = store.get_pact_entity(challenge.table_id, pair).duel_id;
         assert(current_pact == 0, Errors::CHALLENGE_EXISTS);
     }
     set!(world, Pact {
@@ -106,8 +109,9 @@ fn unset_pact(world: IWorldDispatcher, mut challenge: Challenge) {
 
 fn create_challenge_snapshot(world: IWorldDispatcher, challenge: Challenge) {
     // copy data from Table scoreboard
-    let mut scoreboard_a: Scoreboard = ScoreboardStore::get(world, challenge.table_id, challenge.duelist_id_a);
-    let mut scoreboard_b: Scoreboard = ScoreboardStore::get(world, challenge.table_id, challenge.duelist_id_b);
+    let store: Store = StoreTrait::new(world);
+    let mut scoreboard_a: Scoreboard = store.get_scoreboard(challenge.table_id, challenge.duelist_id_a);
+    let mut scoreboard_b: Scoreboard = store.get_scoreboard(challenge.table_id, challenge.duelist_id_b);
     // check maxxed up tables...
     let table : TableConfig = TableManagerTrait::new(world).get(challenge.table_id);
     if (table.table_type.maxxed_up_levels()) {
@@ -127,11 +131,12 @@ fn clone_snapshot_duelist_levels(world: IWorldDispatcher, duelist_id: u128, ref 
     // only new duelist on this table...
     if (scoreboard.score.total_duels == 0) {
         // maxx up main scoreboard levels
-        let duelist: Duelist = DuelistStore::get(world, duelist_id);
+        let store: Store = StoreTrait::new(world);
+        let duelist: DuelistEntity = store.get_duelist_entity(duelist_id);
         scoreboard.score.level_villain = if (duelist.score.is_villain()) {HONOUR::LEVEL_MAX} else {0};
         scoreboard.score.level_trickster = if (duelist.score.is_trickster()) {HONOUR::LEVEL_MAX} else {0};
         scoreboard.score.level_lord = if (duelist.score.is_lord()) {HONOUR::LEVEL_MAX} else {0};
-        set!(world, (scoreboard));
+        store.set_scoreboard(scoreboard);
     }
 }
 
@@ -139,7 +144,8 @@ fn clone_snapshot_duelist_levels(world: IWorldDispatcher, duelist_id: u128, ref 
 // player need to allow contract to transfer funds first
 // ierc20::approve(contract_address, max(wager.value, wager.fee));
 fn deposit_wager_fees(world: IWorldDispatcher, challenge: Challenge, from: ContractAddress, to: ContractAddress) {
-    let wager: Wager = WagerStore::get(world, challenge.duel_id);
+    let store: Store = StoreTrait::new(world);
+    let wager: WagerEntity = store.get_wager_entity(challenge.duel_id);
     let total: u256 = (wager.value + wager.fee).into();
     if (total > 0) {
         let table : TableConfig = TableManagerTrait::new(world).get(challenge.table_id);
@@ -151,7 +157,8 @@ fn deposit_wager_fees(world: IWorldDispatcher, challenge: Challenge, from: Contr
     }
 }
 fn withdraw_wager_fees(world: IWorldDispatcher, challenge: Challenge, to: ContractAddress) {
-    let wager: Wager = WagerStore::get(world, challenge.duel_id);
+    let store: Store = StoreTrait::new(world);
+    let wager: WagerEntity = store.get_wager_entity(challenge.duel_id);
     let total: u256 = (wager.value + wager.fee).into();
     if (total > 0) {
         let table : TableConfig = TableManagerTrait::new(world).get(challenge.table_id);
@@ -162,7 +169,8 @@ fn withdraw_wager_fees(world: IWorldDispatcher, challenge: Challenge, to: Contra
 }
 // spllit wager beteen address_a and address_b
 fn split_wager_fees(world: IWorldDispatcher, challenge: Challenge, address_a: ContractAddress, address_b: ContractAddress) -> u128 {
-    let wager: Wager = WagerStore::get(world, challenge.duel_id);
+    let store: Store = StoreTrait::new(world);
+    let wager: WagerEntity = store.get_wager_entity(challenge.duel_id);
     let total: u256 = (wager.value + wager.fee).into() * 2;
     if (total > 0) {
         let table : TableConfig = TableManagerTrait::new(world).get(challenge.table_id);
@@ -184,7 +192,7 @@ fn split_wager_fees(world: IWorldDispatcher, challenge: Challenge, address_a: Co
                 if (table.fee_collector_address.is_non_zero()) {
                     (table.fee_collector_address)
                 } else {
-                    let config = ConfigManagerTrait::new(world).get();
+                    let config: ConfigEntity = store.get_config_entity();
                     (config.treasury_address)
                 };
             if (fees_address.is_non_zero() && fees_address != starknet::get_contract_address()) {
@@ -294,6 +302,8 @@ fn unpack_action_slots(packed: u16) -> (u8, u8) {
 //
 
 fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
+    let store: Store = StoreTrait::new(world);
+
     set!(world, (challenge));
 
     // Start Round
@@ -310,7 +320,7 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
             shot_b.health = CONST::FULL_HEALTH;
         } else {
             // Round 2+ need to copy previous Round's state
-            let prev_round: Round = RoundStore::get(world, challenge.duel_id, challenge.round_number - 1);
+            let prev_round: RoundEntity = store.get_round_entity(challenge.duel_id, challenge.round_number - 1);
             shot_a.health = prev_round.shot_a.health;
             shot_b.health = prev_round.shot_b.health;
             shot_a.honour = prev_round.shot_a.honour;
@@ -328,10 +338,10 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         ));
     } else if (challenge.state.is_finished()) {
         // End Duel!
-        let mut duelist_a: Duelist = DuelistStore::get(world, challenge.duelist_id_a);
-        let mut duelist_b: Duelist = DuelistStore::get(world, challenge.duelist_id_b);
-        let mut scoreboard_a: Scoreboard = ScoreboardStore::get(world, challenge.table_id, challenge.duelist_id_a);
-        let mut scoreboard_b: Scoreboard = ScoreboardStore::get(world, challenge.table_id, challenge.duelist_id_b);
+        let mut duelist_a: DuelistEntity = store.get_duelist_entity(challenge.duelist_id_a);
+        let mut duelist_b: DuelistEntity = store.get_duelist_entity(challenge.duelist_id_b);
+        let mut scoreboard_a: ScoreboardEntity = store.get_scoreboard_entity(challenge.table_id, challenge.duelist_id_a);
+        let mut scoreboard_b: ScoreboardEntity = store.get_scoreboard_entity(challenge.table_id, challenge.duelist_id_b);
         
         // update totals
         update_score_totals(ref duelist_a.score, ref duelist_b.score, challenge.state, challenge.winner);
@@ -339,7 +349,7 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
 
         // compute honour from final round
         let table : TableConfig = TableManagerTrait::new(world).get(challenge.table_id);
-        let final_round: Round = RoundStore::get(world, challenge.duel_id, challenge.round_number);
+        let final_round: RoundEntity = store.get_round_entity(challenge.duel_id, challenge.round_number);
 
         // update honour and levels
         let calc_levels = !table.table_type.maxxed_up_levels();
@@ -365,7 +375,10 @@ fn set_challenge(world: IWorldDispatcher, challenge: Challenge) {
         }
         
         // save
-        set!(world, (duelist_a, duelist_b, scoreboard_a, scoreboard_b));
+        store.set_duelist_entity(duelist_a);
+        store.set_duelist_entity(duelist_b);
+        store.set_scoreboard_entity(scoreboard_a);
+        store.set_scoreboard_entity(scoreboard_b);
     }
 }
 
@@ -627,8 +640,9 @@ fn call_get_duelist_health(world: IWorldDispatcher, duelist_id: u128, duel_id: u
     }
 }
 fn call_get_duelist_round_shot(world: IWorldDispatcher, duelist_id: u128, duel_id: u128, round_number: u8) -> Shot {
-    let challenge: Challenge = ChallengeStore::get(world, duel_id);
-    let round: Round = RoundStore::get(world, duel_id, round_number);
+    let store: Store = StoreTrait::new(world);
+    let challenge: ChallengeEntity = store.get_challenge_entity(duel_id);
+    let round: RoundEntity = store.get_round_entity(duel_id, round_number);
     if (challenge.duelist_id_a == duelist_id) {
         (round.shot_a)
     } else if (challenge.duelist_id_b == duelist_id) {
@@ -639,8 +653,9 @@ fn call_get_duelist_round_shot(world: IWorldDispatcher, duelist_id: u128, duel_i
 }
 
 fn call_get_snapshot_scores(world: IWorldDispatcher, duelist_id: u128, duel_id: u128) -> (Score, Score) {
-    let challenge: Challenge = ChallengeStore::get(world, duel_id);
-    let snapshot: Snapshot = SnapshotStore::get(world, duel_id);
+    let store: Store = StoreTrait::new(world);
+    let challenge: ChallengeEntity = store.get_challenge_entity(duel_id);
+    let snapshot: SnapshotEntity = store.get_snapshot_entity(duel_id);
     if (challenge.duelist_id_a == duelist_id) {
         (snapshot.score_a, snapshot.score_b)
     } else if (challenge.duelist_id_b == duelist_id) {

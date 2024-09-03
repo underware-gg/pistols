@@ -101,11 +101,10 @@ mod actions {
         WorldSystemsTrait,
         IMinterDispatcher, IMinterDispatcherTrait,
     };
-    use pistols::models::challenge::{Challenge, ChallengeStore, Wager, Round, Shot};
+    use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, Shot};
     use pistols::models::duelist::{Duelist, DuelistTrait, ProfilePicType, Archetype, Score, Pact, DuelistManager, DuelistManagerTrait};
     use pistols::models::structs::{SimulateChances};
-    use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
-    use pistols::models::table::{TableConfig, TableConfigStore, TableManager, TableTrait, TableManagerTrait, TABLES, TableType};
+    use pistols::models::table::{TableConfig, TableConfigEntity, TableManager, TableTrait, TableManagerTrait, TABLES, TableType};
     use pistols::models::init::{init};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
@@ -118,6 +117,7 @@ mod actions {
     use pistols::types::constants::{CONST, HONOUR};
     use pistols::types::{events};
     use pistols::types::typed_data::{CommitMoveMessage, CommitMoveMessageTrait};
+    use pistols::libs::store::{Store, StoreTrait};
 
     mod Errors {
         const NOT_INITIALIZED: felt252           = 'PISTOLS: Not initialized';
@@ -317,7 +317,8 @@ mod actions {
             accepted: bool,
         ) -> ChallengeState {
             // validate chalenge
-            let mut challenge: Challenge = ChallengeStore::get(world, duel_id);
+            let store: Store = StoreTrait::new(world);
+            let mut challenge: Challenge = store.get_challenge(duel_id);
             assert(challenge.state.exists(), Errors::INVALID_CHALLENGE);
             assert(challenge.state == ChallengeState::Awaiting, Errors::CHALLENGE_NOT_AWAITING);
 
@@ -455,12 +456,13 @@ mod actions {
         }
 
         fn simulate_chances(world: @IWorldDispatcher, duelist_id: u128, duel_id: u128, round_number: u8, action: u8) -> SimulateChances {
+            let store: Store = StoreTrait::new(world);
             let (score_self, score_other): (Score, Score) = utils::call_get_snapshot_scores(world, duelist_id, duel_id);
             let health: u8 = utils::call_get_duelist_health(world, duelist_id, duel_id, round_number);
             let action_self: Action = action.into();
             let action_other: Action = action.into();
-            let challenge: Challenge = ChallengeStore::get(world, duel_id);
-            let table_type: TableType = TableConfigStore::get(world, challenge.table_id).table_type;
+            let challenge: ChallengeEntity = store.get_challenge_entity(duel_id);
+            let table_type: TableType = store.get_table_config_entity(challenge.table_id).table_type;
             // honour
             let (action_honour, duelist_honour): (i8, u8) = utils::call_simulate_honour_for_action(world, score_self, action_self, table_type);
             // crit

@@ -27,9 +27,10 @@ mod admin {
     use starknet::ContractAddress;
     use starknet::{get_caller_address, get_contract_address};
 
-    use pistols::models::config::{Config, ConfigManager, ConfigManagerTrait};
+    use pistols::models::config::{Config, ConfigEntity};
     use pistols::models::table::{TableConfig, TableAdmittance, TableManager, TableManagerTrait};
     use pistols::interfaces::systems::{SELECTORS};
+    use pistols::libs::store::{Store, StoreTrait};
     use pistols::libs::utils;
 
     mod Errors {
@@ -45,12 +46,12 @@ mod admin {
         treasury_address: ContractAddress,
         lords_address: ContractAddress,
     ) {
-        let manager = ConfigManagerTrait::new(world);
-        let mut config = manager.get();
+        let store: Store = StoreTrait::new(world);
+        let mut config: ConfigEntity = store.get_config_entity();
         // initialize
         config.treasury_address = (if (treasury_address.is_zero()) { get_caller_address() } else { treasury_address });
         config.is_paused = false;
-        manager.set(config);
+        store.set_config_entity(config);
         // initialize table lords
         TableManagerTrait::new(world).initialize(lords_address);
     }
@@ -87,18 +88,17 @@ mod admin {
             self.assert_caller_is_admin();
             assert(config.treasury_address.is_non_zero(), Errors::INVALID_TREASURY);
             // get current
-            let manager = ConfigManagerTrait::new(world);
-            manager.set(config);
+            set!(world, (config));
         }
 
         fn set_paused(ref world: IWorldDispatcher, paused: bool) {
             self.assert_caller_is_admin();
             // get current
-            let manager = ConfigManagerTrait::new(world);
-            let mut config = manager.get();
+            let store: Store = StoreTrait::new(world);
+            let mut config: ConfigEntity = store.get_config_entity();
             // update
             config.is_paused = paused;
-            manager.set(config);
+            store.set_config_entity(config);
         }
 
         fn set_table(ref world: IWorldDispatcher, table: TableConfig) {

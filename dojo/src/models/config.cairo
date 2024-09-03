@@ -14,21 +14,3 @@ pub struct Config {
     treasury_address: ContractAddress,
     is_paused: bool,
 }
-
-#[derive(Copy, Drop)]
-struct ConfigManager {
-    world: IWorldDispatcher
-}
-
-#[generate_trait]
-impl ConfigManagerTraitImpl of ConfigManagerTrait {
-    fn new(world: IWorldDispatcher) -> ConfigManager {
-        (ConfigManager { world })
-    }
-    fn get(self: ConfigManager) -> Config {
-        ConfigStore::get(self.world, CONFIG::CONFIG_KEY)
-    }
-    fn set(self: ConfigManager, config: Config) {
-        set!(self.world, (config));
-    }
-}

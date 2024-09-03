@@ -2,7 +2,6 @@ use starknet::ContractAddress;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::interfaces::systems::{WorldSystemsTrait};
 use pistols::interfaces::ierc721::{ierc721, IERC721Dispatcher, IERC721DispatcherTrait};
-use pistols::models::config::{ConfigManager, ConfigManagerTrait};
 use pistols::types::constants::{CONST};
 
 

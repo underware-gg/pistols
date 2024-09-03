@@ -14,14 +14,16 @@ mod minter {
     use super::{IMinter};
     use zeroable::Zeroable;
     use starknet::{ContractAddress, get_contract_address, get_caller_address};
+    use dojo::model::{Model, ModelEntity};
 
     use pistols::interfaces::systems::{
         WorldSystemsTrait,
         ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait,
         IAdminDispatcher, IAdminDispatcherTrait,
     };
-    use pistols::models::token_config::{TokenConfig, TokenConfigStore};
+    use pistols::models::token_config::{TokenConfig, TokenConfigEntity};
     use pistols::types::constants::{CONST};
+    use pistols::libs::store::{Store, StoreTrait};
 
     mod Errors {
         // admin
@@ -69,7 +71,8 @@ mod minter {
             let token = (ITokenDuelistDispatcher{ contract_address: token_contract_address });
 
             // check availability
-            let mut config: TokenConfig = TokenConfigStore::get(world, token_contract_address);
+            let store = StoreTrait::new(world);
+            let mut config: TokenConfigEntity = store.get_token_config_entity(token_contract_address);
             assert(config.minted_count < config.max_supply, Errors::MINTED_OUT);
             assert(config.minted_count.into() < CONST::MAX_DUELIST_ID, Errors::MINTED_OUT);
             assert(config.is_open, Errors::MINTING_IS_CLOSED);
@@ -83,7 +86,7 @@ mod minter {
             let token_id: u256 = config.minted_count.into();
             token.mint(to, token_id);
 
-            set!(world, (config));
+            store.set_token_config_entity(config);
 
             // return minted token id
             (token_id.low)
@@ -91,8 +94,9 @@ mod minter {
 
         fn can_mint(world: @IWorldDispatcher, to: ContractAddress, token_contract_address: ContractAddress) -> bool {
             assert(token_contract_address.is_non_zero(), Errors::INVALID_TOKEN_ADDRESS);
+            let store = StoreTrait::new(world);
+            let config: TokenConfigEntity = store.get_token_config_entity(token_contract_address);
             let token = (ITokenDuelistDispatcher{ contract_address: token_contract_address });
-            let mut config: TokenConfig = TokenConfigStore::get(world, token_contract_address);
             let balance: u256 = token.balance_of(to);
             (
                 (config.minted_count < config.max_supply) &&
@@ -104,9 +108,10 @@ mod minter {
 
         fn set_open(ref world: IWorldDispatcher, token_contract_address: ContractAddress, is_open: bool) {
             assert(world.admin_dispatcher().am_i_admin(get_caller_address()) == true, Errors::NOT_ADMIN);
-            let mut config: TokenConfig = TokenConfigStore::get(world, token_contract_address);
+            let store = StoreTrait::new(world);
+            let mut config: TokenConfigEntity = store.get_token_config_entity(token_contract_address);
             config.is_open = is_open;
-            set!(world, (config));
+            store.set_token_config_entity(config);
         }
     }
 

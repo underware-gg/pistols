@@ -86,13 +86,15 @@ mod token_duelist {
     use starknet::{get_contract_address, get_caller_address};
 
     use pistols::interfaces::systems::{WorldSystemsTrait};
-    use pistols::models::duelist::{Duelist, DuelistStore, Score, Scoreboard, ScoreboardStore, ScoreTrait};
+    use pistols::models::duelist::{Duelist, DuelistEntity, Score, Scoreboard, ScoreboardEntity, ScoreTrait};
     use pistols::models::table::{TABLES};
     use pistols::types::constants::{CONST};
     use pistols::libs::utils::{CONSUME_BYTE_ARRAY};
     use pistols::utils::byte_arrays::{ByteArraysTrait, U8IntoByteArray, U16IntoByteArray, U32IntoByteArray, U256IntoByteArray, ByteArraySpanIntoByteArray};
     use pistols::utils::short_string::ShortStringTrait;
     use pistols::utils::encoding::bytes_base64_encode;
+    use pistols::libs::store::{Store, StoreTrait};
+
     use graffiti::json::JsonImpl;
     use graffiti::{Tag, TagImpl};
 
@@ -248,7 +250,8 @@ mod token_duelist {
         }
 
         fn build_uri(self: @ContractState, token_id: u256, encode: bool) -> ByteArray {
-            let duelist: Duelist = DuelistStore::get(self.world(), token_id.low);
+            let store = StoreTrait::new(self.world());
+            let duelist: Duelist = store.get_duelist(token_id.low);
             let attributes: Span<ByteArray> = self.get_attributes(duelist.clone());
             let metadata = JsonImpl::new()
                 .add("id", token_id.into())
@@ -294,6 +297,7 @@ mod token_duelist {
 
         // returns: [key1, value1, key2, value2,...]
         fn get_attributes(self: @ContractState, duelist: Duelist) -> Span<ByteArray> {
+            let store = StoreTrait::new(self.world());
             let mut result: Array<ByteArray> = array![];
             // Honour
             result.append("Honour");
@@ -333,7 +337,7 @@ mod token_duelist {
                 result.append(duelist.score.total_draws.into());
                 
                 // Wager on Lords table
-                let scoreboard: Scoreboard = ScoreboardStore::get(self.world(), TABLES::LORDS, duelist.duelist_id);
+                let scoreboard: ScoreboardEntity = store.get_scoreboard_entity(TABLES::LORDS, duelist.duelist_id);
                 
                 result.append("Lords Won");
                 let amount: u128 = (scoreboard.wager_won / CONST::ETH_TO_WEI.low);

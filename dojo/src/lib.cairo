@@ -14,6 +14,7 @@ mod systems {
 mod libs {
     mod seeder;
     mod shooter;
+    mod store;
     mod utils;
 }
 
