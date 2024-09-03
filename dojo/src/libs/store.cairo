@@ -53,12 +53,16 @@ impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn get_challenge_entity(self: Store, duel_id: u128) -> ChallengeEntity {
-        (ChallengeEntityStore::get(self.world, ChallengeStore::entity_id_from_keys(duel_id)))
+        (ChallengeEntityStore::get(self.world,
+            ChallengeStore::entity_id_from_keys(duel_id)
+        ))
     }
 
     #[inline(always)]
     fn get_wager_entity(self: Store, duel_id: u128) -> WagerEntity {
-        (WagerEntityStore::get(self.world, WagerStore::entity_id_from_keys(duel_id)))
+        (WagerEntityStore::get(self.world,
+            WagerStore::entity_id_from_keys(duel_id)
+        ))
     }
 
     #[inline(always)]
@@ -68,12 +72,16 @@ impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn get_round_entity(self: Store, duel_id: u128, round_number: u8) -> RoundEntity {
-        (RoundEntityStore::get(self.world, RoundStore::entity_id_from_keys(duel_id, round_number)))
+        (RoundEntityStore::get(self.world,
+            RoundStore::entity_id_from_keys(duel_id, round_number)
+        ))
     }
 
     #[inline(always)]
     fn get_snapshot_entity(self: Store, duel_id: u128) -> SnapshotEntity {
-        (SnapshotEntityStore::get(self.world, SnapshotStore::entity_id_from_keys(duel_id)))
+        (SnapshotEntityStore::get(self.world,
+            SnapshotStore::entity_id_from_keys(duel_id)
+        ))
     }
 
     #[inline(always)]
@@ -83,12 +91,16 @@ impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn get_duelist_entity(self: Store, duelist_id: u128) -> DuelistEntity {
-        (DuelistEntityStore::get(self.world, DuelistStore::entity_id_from_keys(duelist_id)))
+        (DuelistEntityStore::get(self.world,
+            DuelistStore::entity_id_from_keys(duelist_id)
+        ))
     }
 
     #[inline(always)]
     fn get_pact_entity(self: Store, table_id: felt252, pair: u128) -> PactEntity {
-        (PactEntityStore::get(self.world, PactStore::entity_id_from_keys(table_id, pair)))
+        (PactEntityStore::get(self.world,
+            PactStore::entity_id_from_keys(table_id, pair)
+        ))
     }
 
     #[inline(always)]
@@ -98,7 +110,9 @@ impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn get_scoreboard_entity(self: Store, table_id: felt252, duelist_id: u128) -> ScoreboardEntity {
-        (ScoreboardEntityStore::get(self.world, ScoreboardStore::entity_id_from_keys(table_id, duelist_id)))
+        (ScoreboardEntityStore::get(self.world,
+            ScoreboardStore::entity_id_from_keys(table_id, duelist_id)
+        ))
     }
 
     #[inline(always)]
@@ -108,22 +122,30 @@ impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn get_table_config_entity(self: Store, table_id: felt252) -> TableConfigEntity {
-        (TableConfigEntityStore::get(self.world, TableConfigStore::entity_id_from_keys(table_id)))
+        (TableConfigEntityStore::get(self.world,
+            TableConfigStore::entity_id_from_keys(table_id)
+        ))
     }
 
     #[inline(always)]
-    fn get_token_admittance_entity(self: Store, table_id: felt252) -> TableAdmittanceEntity {
-        (TableAdmittanceEntityStore::get(self.world, TableAdmittanceStore::entity_id_from_keys(table_id)))
+    fn get_table_admittance_entity(self: Store, table_id: felt252) -> TableAdmittanceEntity {
+        (TableAdmittanceEntityStore::get(self.world,
+            TableAdmittanceStore::entity_id_from_keys(table_id)
+        ))
     }
 
     #[inline(always)]
     fn get_token_config_entity(self: Store, token_contract_address: ContractAddress) -> TokenConfigEntity {
-        (TokenConfigEntityStore::get(self.world, TokenConfigStore::entity_id_from_keys(token_contract_address)))
+        (TokenConfigEntityStore::get(self.world,
+            TokenConfigStore::entity_id_from_keys(token_contract_address)
+        ))
     }
 
     #[inline(always)]
     fn get_config_entity(self: Store) -> ConfigEntity {
-        (ConfigEntityStore::get(self.world, ConfigStore::entity_id_from_keys(CONFIG::CONFIG_KEY)))
+        (ConfigEntityStore::get(self.world,
+            ConfigStore::entity_id_from_keys(CONFIG::CONFIG_KEY)
+        ))
     }
 
     //
@@ -201,8 +223,8 @@ impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn set_table_admittance_entity(self: Store, entity: TableAdmittanceEntity) {
-        entity.update(self.world);
+    fn set_table_admittance(self: Store, model: TableAdmittance) {
+        model.set(self.world);
     }
 
     #[inline(always)]

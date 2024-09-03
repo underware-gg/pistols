@@ -78,57 +78,32 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
 
 
 //---------------------------
-// TableManager
+// TableInitializer
 //
 #[derive(Copy, Drop)]
-struct TableManager {
+struct TableInitializer {
     world: IWorldDispatcher
 }
 
 #[generate_trait]
-impl TableManagerTraitImpl of TableManagerTrait {
-    fn new(world: IWorldDispatcher) -> TableManager {
-        TableManager { world }
-    }
-    fn exists(self: TableManager, table_id: felt252) -> bool {
-        let table: TableConfig = TableConfigStore::get(self.world, table_id);
-        (table.description != 0)
-    }
-    fn get(self: TableManager, table_id: felt252) -> TableConfig {
-        let table: TableConfig = TableConfigStore::get(self.world, table_id);
-        assert(table.description != 0, Errors::INVALID_TABLE);
-        (table)
-    }
-    fn set(self: TableManager, table: TableConfig) {
-        assert(table.description != 0, Errors::INVALID_DESCRIPTION);
-        set!(self.world, (table));
-    }
-    fn set_admittance(self: TableManager, table_admittance: TableAdmittance) {
-        set!(self.world, (table_admittance));
-    }
-    fn set_array(self: TableManager, tables: @Array<TableConfig>) {
-        let mut n: usize = 0;
-        loop {
-            if (n == tables.len()) { break; }
-            self.set(*tables.at(n));
-            n += 1;
-        };
-    }
-    fn can_join(self: TableManager,
-        table_id: felt252,
-        account_address: ContractAddress,
-        duelist_id: u128,
-    ) -> bool {
-        let exists: bool = self.exists(table_id);
-        let admittance: TableAdmittance = TableAdmittanceStore::get(self.world, table_id);
-        (exists && admittance.can_join(account_address, duelist_id))
+impl TableInitializerTraitImpl of TableInitializerTrait {
+    fn new(world: IWorldDispatcher) -> TableInitializer {
+        TableInitializer { world }
     }
     //
     // Initialize tables
-    fn initialize(self: TableManager, lords_address: ContractAddress) {
+    fn initialize(self: TableInitializer, lords_address: ContractAddress) {
         //
         // default tables
         self.set_array(@default_tables(lords_address));
+    }
+    fn set_array(self: TableInitializer, tables: @Array<TableConfig>) {
+        let mut n: usize = 0;
+        loop {
+            if (n == tables.len()) { break; }
+            (*tables.at(n)).set(self.world);
+            n += 1;
+        };
     }
 }
 
@@ -137,6 +112,9 @@ impl TableManagerTraitImpl of TableManagerTrait {
 //
 #[generate_trait]
 impl TableConfigEntityImpl of TableConfigEntityTrait {
+    fn exists(self: @TableConfigEntity) -> bool {
+        (*self.description != 0)
+    }
     #[inline(always)]
     fn ierc20(self: @TableConfigEntity) -> IERC20Dispatcher {
         (ierc20(*self.wager_contract_address))
@@ -147,11 +125,11 @@ impl TableConfigEntityImpl of TableConfigEntityTrait {
 }
 
 //---------------------------
-// TableAdmittanceTrait
+// TableAdmittance Traits
 //
 #[generate_trait]
-impl TableAdmittanceTraitImpl of TableAdmittanceTrait {
-    fn can_join(self: @TableAdmittance, account_address: ContractAddress, duelist_id: u128) -> bool {
+impl TableAdmittanceEntityImpl of TableAdmittanceEntityTrait {
+    fn can_join(self: @TableAdmittanceEntity, account_address: ContractAddress, duelist_id: u128) -> bool {
         if (self.accounts.len() == 0 && self.duelists.len() == 0) {
             (true)
         } else {
@@ -207,7 +185,7 @@ impl TableTypeTraitImpl of TableTypeTrait {
 mod tests {
     use debug::PrintTrait;
     use starknet::ContractAddress;
-    use super::{TableAdmittance, TableAdmittanceTrait};
+    use super::{TableAdmittance, TableAdmittanceEntity, TableAdmittanceEntityTrait};
     use pistols::libs::utils::{ZERO};
 
     #[test]
@@ -219,16 +197,16 @@ mod tests {
         let duelist_id_1: u128 = 0x1;
         let duelist_id_2: u128 = 0x2;
         let duelist_id_3: u128 = 0x3;
-        let admittance = @TableAdmittance{
-            table_id,
+        let admittance = @TableAdmittanceEntity{
+            __id: table_id,
             accounts: array![],
             duelists: array![],
         };
         assert(admittance.can_join(address_1, duelist_id_1) == true, 'empty_1');
         assert(admittance.can_join(address_1, duelist_id_2) == true, 'empty_2');
         assert(admittance.can_join(address_2, duelist_id_1) == true, 'empty_3');
-        let admittance = TableAdmittance{
-            table_id,
+        let admittance = @TableAdmittanceEntity{
+            __id: table_id,
             accounts: array![address_3],
             duelists: array![],
         };
@@ -236,8 +214,8 @@ mod tests {
         assert(admittance.can_join(address_2, duelist_id_1) == false, 'accounts_2_1');
         assert(admittance.can_join(address_1, duelist_id_3) == false, 'accounts_1_3');
         assert(admittance.can_join(address_3, duelist_id_1) == true, 'accounts_3_1');
-        let admittance = TableAdmittance{
-            table_id,
+        let admittance = @TableAdmittanceEntity{
+            __id: table_id,
             accounts: array![],
             duelists: array![duelist_id_3],
         };
@@ -245,16 +223,16 @@ mod tests {
         assert(admittance.can_join(address_2, duelist_id_1) == false, 'duelists_2_1');
         assert(admittance.can_join(address_1, duelist_id_3) == true, 'duelists_1_3');
         assert(admittance.can_join(address_3, duelist_id_1) == false, 'duelists_3_1');
-        let admittance = TableAdmittance{
-            table_id,
+        let admittance = @TableAdmittanceEntity{
+            __id: table_id,
             accounts: array![address_1, address_2],
             duelists: array![],
         };
         assert(admittance.can_join(address_1, duelist_id_2) == true, 'dual_1_2');
         assert(admittance.can_join(address_2, duelist_id_1) == true, 'dual_2_1');
         assert(admittance.can_join(address_3, duelist_id_3) == false, 'dual_3_3');
-        let admittance = TableAdmittance{
-            table_id,
+        let admittance = @TableAdmittanceEntity{
+            __id: table_id,
             accounts: array![],
             duelists: array![duelist_id_1, duelist_id_2],
         };

@@ -104,7 +104,7 @@ mod actions {
     use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, Shot};
     use pistols::models::duelist::{Duelist, DuelistTrait, ProfilePicType, Archetype, Score, Pact, DuelistManager, DuelistManagerTrait};
     use pistols::models::structs::{SimulateChances};
-    use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableManager, TableManagerTrait, TABLES, TableType};
+    use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableAdmittanceEntity, TableAdmittanceEntityTrait, TableType, TABLES};
     use pistols::models::init::{init};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round::{RoundState, RoundStateTrait};
@@ -237,10 +237,10 @@ mod actions {
 // duelist_manager.owner_of(duelist_id_a).print();
 
             // validate table
-            let table_manager = TableManagerTrait::new(world);
             let table: TableConfigEntity = store.get_table_config_entity(table_id);
             assert(table.is_open == true, Errors::TABLE_IS_CLOSED);
-            assert(table_manager.can_join(table_id, address_a, duelist_id_a), Errors::CHALLENGER_NOT_ADMITTED);
+            let table_admittance: TableAdmittanceEntity = store.get_table_admittance_entity(table_id);
+            assert(table_admittance.can_join(address_a, duelist_id_a), Errors::CHALLENGER_NOT_ADMITTED);
 
             // create duel id
             let duel_id: u128 = make_seed(address_a, world.uuid());
@@ -258,7 +258,7 @@ mod actions {
                 assert(challenged_id_or_address != address_a, Errors::INVALID_CHALLENGED_SELF);
                 (challenged_id_or_address)
             };
-            assert(table_manager.can_join(table_id, address_b, duelist_id_b), Errors::CHALLENGED_NOT_ADMITTED);
+            assert(table_admittance.can_join(address_b, duelist_id_b), Errors::CHALLENGED_NOT_ADMITTED);
 
             // calc expiration
             let timestamp_start: u64 = get_block_timestamp();
@@ -451,8 +451,10 @@ mod actions {
         }
 
         fn can_join(world: @IWorldDispatcher, table_id: felt252, duelist_id: u128) -> bool {
-            let table_manager = TableManagerTrait::new(world);
-            (table_manager.can_join(table_id, starknet::get_caller_address(), duelist_id))
+            let store: Store = StoreTrait::new(world);
+            let table: TableConfigEntity = store.get_table_config_entity(table_id);
+            let table_admittance: TableAdmittanceEntity = store.get_table_admittance_entity(table_id);
+            (table.is_open && table_admittance.can_join(starknet::get_caller_address(), duelist_id))
         }
 
         fn calc_fee(world: @IWorldDispatcher, table_id: felt252, wager_value: u128) -> u128 {

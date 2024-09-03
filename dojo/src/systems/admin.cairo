@@ -28,7 +28,7 @@ mod admin {
     use starknet::{get_caller_address, get_contract_address};
 
     use pistols::models::config::{Config, ConfigEntity};
-    use pistols::models::table::{TableConfig, TableAdmittance, TableManager, TableManagerTrait};
+    use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableAdmittance, TableInitializer, TableInitializerTrait};
     use pistols::interfaces::systems::{SELECTORS};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::libs::utils;
@@ -53,7 +53,7 @@ mod admin {
         config.is_paused = false;
         store.set_config_entity(config);
         // initialize table lords
-        TableManagerTrait::new(world).initialize(lords_address);
+        TableInitializerTrait::new(world).initialize(lords_address);
     }
 
     #[abi(embed_v0)]
@@ -103,30 +103,33 @@ mod admin {
 
         fn set_table(ref world: IWorldDispatcher, table: TableConfig) {
             self.assert_caller_is_admin();
-            // get table
-            let manager = TableManagerTrait::new(world);
-            // assert(manager.exists(table.table_id), Errors::INVALID_TABLE);
+            // check table
             assert(table.table_id != 0, Errors::INVALID_TABLE);
-            manager.set(table);
+            // update table
+            let store: Store = StoreTrait::new(world);
+            store.set_table_config(table);
         }
 
         fn set_table_admittance(ref world: IWorldDispatcher, table_admittance: TableAdmittance) {
             self.assert_caller_is_admin();
-            // get table
-            let manager = TableManagerTrait::new(world);
-            assert(manager.exists(table_admittance.table_id), Errors::INVALID_TABLE);
-            manager.set_admittance(table_admittance);
+            // check table
+            assert(table_admittance.table_id != 0, Errors::INVALID_TABLE);
+            let store: Store = StoreTrait::new(world);
+            let mut table: TableConfigEntity = store.get_table_config_entity(table_admittance.table_id);
+            assert(table.exists(), Errors::INVALID_TABLE);
+            // update
+            store.set_table_admittance(table_admittance);
         }
 
         fn open_table(ref world: IWorldDispatcher, table_id: felt252, is_open: bool) {
             self.assert_caller_is_admin();
-            // get table
-            let manager = TableManagerTrait::new(world);
-            assert(manager.exists(table_id), Errors::INVALID_TABLE);
-            let mut table = manager.get(table_id);
-            // update table
+            // check table
+            let store: Store = StoreTrait::new(world);
+            let mut table: TableConfigEntity = store.get_table_config_entity(table_id);
+            assert(table.exists(), Errors::INVALID_TABLE);
+            // update
             table.is_open = is_open;
-            manager.set(table);
+            store.set_table_config_entity(table);
         }
     }
 
