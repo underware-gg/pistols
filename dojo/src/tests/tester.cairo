@@ -365,11 +365,10 @@ mod tester {
         duel_id: u128,
         round_number: u8,
         salt: felt252,
-        slot1: u8,
-        slot2: u8,
+        moves: Span<u8>,
     ) {
         impersonate(sender);
-        system.reveal_moves(ID(sender), duel_id, round_number, salt, slot1, slot2);
+        system.reveal_moves(ID(sender), duel_id, round_number, salt, moves);
         _next_block();
     }
 

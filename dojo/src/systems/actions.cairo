@@ -57,8 +57,7 @@ trait IActions {
         duel_id: u128,
         round_number: u8,
         salt: felt252,
-        action_slot1: u8,
-        action_slot2: u8,
+        moves: Span<u8>,
     );
 
     //
@@ -68,10 +67,8 @@ trait IActions {
     fn can_join(world: @IWorldDispatcher, table_id: felt252, duelist_id: u128) -> bool;
     fn calc_fee(world: @IWorldDispatcher, table_id: felt252, wager_value: u128) -> u128;
     fn simulate_chances(world: @IWorldDispatcher, duelist_id: u128, duel_id: u128, round_number: u8, action: u8) -> SimulateChances;
-    fn get_valid_packed_actions(world: @IWorldDispatcher, round_number: u8) -> Array<u16>;
-    fn pack_action_slots(world: @IWorldDispatcher, slot1: u8, slot2: u8) -> u16;
-    fn unpack_action_slots(world: @IWorldDispatcher, packed: u16) -> (u8, u8);
-    fn validate_commit_message(world: @IWorldDispatcher,
+    fn get_valid_cards(world: @IWorldDispatcher, table_id: felt252) -> Array<Array<u8>>;
+    fn test_validate_commit_message(world: @IWorldDispatcher,
         account: ContractAddress,
         signature: Array<felt252>,
         duelId: felt252,
@@ -147,6 +144,8 @@ mod actions {
         const ROUND_NOT_IN_REVEAL: felt252       = 'PISTOLS: Round not in reveal';
         const ALREADY_COMMITTED: felt252         = 'PISTOLS: Already committed';
         const ALREADY_REVEALED: felt252          = 'PISTOLS: Already revealed';
+        const INVALID_SALT: felt252              = 'PISTOLS: Invalid salt';
+        const INVALID_MOVES_COUNT: felt252       = 'PISTOLS: Invalid moves count';
         const ACTION_HASH_MISMATCH: felt252      = 'PISTOLS: Action hash mismatch';
     }
 
@@ -425,11 +424,10 @@ mod actions {
             duel_id: u128,
             round_number: u8,
             salt: felt252,
-            action_slot1: u8,
-            action_slot2: u8,
+            moves: Span<u8>,
         ) {
             let store: Store = StoreTrait::new(world);
-            let challenge: Challenge = shooter::reveal_moves(store, duelist_id, duel_id, round_number, salt, utils::pack_action_slots(action_slot1, action_slot2));
+            let challenge: Challenge = shooter::reveal_moves(store, duelist_id, duel_id, round_number, salt, moves);
 
             // undo pact if finished
             if (challenge.state.is_finished()) {
@@ -517,20 +515,12 @@ mod actions {
             })
         }
 
-        fn get_valid_packed_actions(world: @IWorldDispatcher, round_number: u8) -> Array<u16> {
+        fn get_valid_cards(world: @IWorldDispatcher, table_id: felt252) -> Array<Array<u8>> {
             WORLD(world);
-            (utils::get_valid_packed_actions(round_number))
-        }
-        fn pack_action_slots(world: @IWorldDispatcher, slot1: u8, slot2: u8) -> u16 {
-            WORLD(world);
-            (utils::pack_action_slots(slot1, slot2))
-        }
-        fn unpack_action_slots(world: @IWorldDispatcher, packed: u16) -> (u8, u8) {
-            WORLD(world);
-            (utils::unpack_action_slots(packed))
+            (utils::get_valid_cards(table_id))
         }
 
-        fn validate_commit_message(world: @IWorldDispatcher,
+        fn test_validate_commit_message(world: @IWorldDispatcher,
             account: ContractAddress,
             signature: Array<felt252>,
             duelId: felt252,

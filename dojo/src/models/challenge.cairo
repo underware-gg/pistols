@@ -66,12 +66,15 @@ pub struct Round {
 
 //
 // The shot of each player on a Round
-#[derive(Copy, Drop, Serde, Introspect)]
+#[derive(Copy, Drop, Serde, IntrospectPacked)]
 struct Shot {
     // player input
-    hash: u128,         // hashed action (salt + action)
+    hash: u128,         // hashed moves (salt + moves)
     salt: felt252,      // the player's secret salt
-    action: u16,        // the player's chosen action(s) (paces, weapon, ...)
+    card_1: u8,         // card choice
+    card_2: u8,         // card choice
+    card_3: u8,         // card choice
+    card_4: u8,         // card choice
     // shot results
     chance_crit: u8,    // computed chances (1..100) - execution
     chance_hit: u8,     // computed chances (1..100) - hit / normal damage
@@ -88,3 +91,35 @@ struct Shot {
 } // 232 bits
 
 
+
+//------------------------------------
+// Traits
+//
+use pistols::types::action::{Action, ActionTrait};
+use pistols::utils::math::{MathU8};
+
+#[derive(Copy, Drop)]
+struct PlayerHand {
+    action_1: Action,
+    action_2: Action,
+    action_3: Action,
+    action_4: Action,
+}
+
+#[generate_trait]
+impl ShotImpl of ShotTrait {
+    fn as_hand(self: @Shot) -> PlayerHand {
+        (PlayerHand {
+            action_1: (*self.card_1).into(),
+            action_2: (*self.card_2).into(),
+            action_3: (*self.card_3).into(),
+            action_4: (*self.card_4).into(),
+        })
+    }
+    fn apply_honour(ref self: Shot, action: Action) {
+        let action_honour: i8 = action.honour();
+        if (action_honour >= 0) {
+            self.honour = MathU8::abs(action_honour);
+        }
+    }
+}

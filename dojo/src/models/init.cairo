@@ -9,7 +9,10 @@ mod init {
         (challenge::Shot {
             hash: 0,
             salt: 0,
-            action: 0,
+            card_1: 0,
+            card_2: 0,
+            card_3: 0,
+            card_4: 0,
             chance_crit: 0,
             chance_hit: 0,
             chance_lethal: 0,

@@ -368,7 +368,7 @@ impl ActionTraitImpl of ActionTrait {
             },
             Action::Steal => {
                 self_shot.wager += 1; // steal the wager
-                if (other_shot.action != Action::Steal.into()) {
+                if (other_shot.card_1 != Action::Steal.into()) {
                     other_shot.win = 1;  // opponent wins, unless double steal (into face-off)
                 }
                 (false)

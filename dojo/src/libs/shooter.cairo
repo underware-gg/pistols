@@ -7,7 +7,7 @@ mod shooter {
 
     use pistols::systems::actions::actions::{Errors};
     use pistols::libs::utils;
-    use pistols::models::challenge::{Challenge, Snapshot, SnapshotEntity, Round, RoundEntity, Shot};
+    use pistols::models::challenge::{Challenge, Snapshot, SnapshotEntity, Round, RoundEntity, Shot, ShotTrait, PlayerHand};
     use pistols::models::duelist::{Duelist, Score};
     use pistols::models::table::{TableConfig, TableConfigEntity, TableType};
     use pistols::types::constants::{CONST};
@@ -15,6 +15,7 @@ mod shooter {
     use pistols::types::round::{RoundState};
     use pistols::types::action::{Action, ACTION, ActionTrait};
     use pistols::utils::math::{MathU8, MathU16};
+    use pistols::utils::arrays::{SpanTrait};
     use pistols::libs::store::{Store, StoreTrait};
 
     fn _assert_challenge(store: Store, caller: ContractAddress, duelist_id: u128, duel_id: u128, round_number: u8) -> (Challenge, u8) {
@@ -72,7 +73,7 @@ mod shooter {
     //-----------------------------------
     // Reveal
     //
-    fn reveal_moves(store: Store, duelist_id: u128, duel_id: u128, round_number: u8, salt: felt252, mut packed: u16) -> Challenge {
+    fn reveal_moves(store: Store, duelist_id: u128, duel_id: u128, round_number: u8, salt: felt252, moves: Span<u8>) -> Challenge {
         // Assert correct Challenge
         let (mut challenge, duelist_number) = _assert_challenge(store, starknet::get_caller_address(), duelist_id, duel_id, round_number);
 
@@ -80,32 +81,35 @@ mod shooter {
         let mut round: Round = store.get_round( duel_id, round_number);
         assert(round.state == RoundState::Reveal, Errors::ROUND_NOT_IN_REVEAL);
 
+        // Validate salt
+        // TODO: verify salt as a signature
+        assert(salt != 0, Errors::INVALID_SALT);
+
         // Validate action hash
-        let hash: u128 = utils::make_action_hash(salt, packed);
+        assert(moves.len() >= 2 && moves.len() <= 4, Errors::INVALID_MOVES_COUNT);
+        let hash: u128 = utils::make_moves_hash(salt, moves);
 
-        // validate stored actions
-        if (!utils::validate_packed_actions(round_number, packed)) {
-            // since the hash is validated, we cant throw an error and go back
-            packed = if (round_number == 1) {
-                // do 10 paces
-                (ACTION::PACES_10.into())
-            } else {
-                // set as Idle, player will stand still and hopefully die
-                (ACTION::IDLE.into())
-            }
-        }
+        // since the hash was validated
+        // we should not validate the actual moves
+        // all we can do is skip if they are invalid
 
-        // Store action
+        // Validate moves hash
         if (duelist_number == 1) {
-            assert(round.shot_a.action == 0, Errors::ALREADY_REVEALED);
+            assert(round.shot_a.card_1 == 0, Errors::ALREADY_REVEALED);
             assert(round.shot_a.hash == hash, Errors::ACTION_HASH_MISMATCH);
             round.shot_a.salt = salt;
-            round.shot_a.action = packed;
+            round.shot_a.card_1 = *moves[0];
+            round.shot_a.card_2 = *moves[1];
+            round.shot_a.card_3 = moves.value_or_zero(2);
+            round.shot_a.card_4 = moves.value_or_zero(3);
         } else if (duelist_number == 2) {
-            assert(round.shot_b.action == 0, Errors::ALREADY_REVEALED);
+            assert(round.shot_b.card_1 == 0, Errors::ALREADY_REVEALED);
             assert(round.shot_b.hash == hash, Errors::ACTION_HASH_MISMATCH);
             round.shot_b.salt = salt;
-            round.shot_b.action = packed;
+            round.shot_b.card_1 = *moves[0];
+            round.shot_b.card_2 = *moves[1];
+            round.shot_b.card_3 = moves.value_or_zero(2);
+            round.shot_b.card_4 = moves.value_or_zero(3);
         }
 
         // incomplete Round, update only
@@ -115,57 +119,7 @@ mod shooter {
         }
 
         // Process round when both actions are revealed
-        if (round_number == 1) {
-            process_round(store, ref challenge, ref round, false);
-        } else {
-            // split packed action slots
-            let (slot1_a, slot1_b, slot2_a, slot2_b): (u8, u8, u8, u8) = utils::unpack_round_slots(round);
-            round.shot_a.action = slot1_a.into();
-            round.shot_b.action = slot1_b.into();
-            let is_last_round: bool = (slot2_a == 0 && slot2_b == 0);
-            process_round(store, ref challenge, ref round, is_last_round);
-            // open Round 3 if not over
-            if (challenge.state == ChallengeState::InProgress) {
-                let mut round3 = Round {
-                    duel_id: challenge.duel_id,
-                    round_number: challenge.round_number,
-                    state: RoundState::Reveal,
-                    shot_a: Shot {
-                        hash: 0,
-                        salt: utils::scramble_salt(round.shot_a.salt),
-                        action: slot2_a.into(),
-                        chance_crit: 0,
-                        chance_hit: 0,
-                        chance_lethal: 0,
-                        dice_crit: 0,
-                        dice_hit: 0,
-                        damage: 0,
-                        block: 0,
-                        health: round.shot_a.health,
-                        honour: round.shot_a.honour,
-                        win: 0,
-                        wager: 0,
-                    },
-                    shot_b: Shot {
-                        hash: 0,
-                        salt: utils::scramble_salt(round.shot_b.salt),
-                        action: slot2_b.into(),
-                        chance_crit: 0,
-                        chance_hit: 0,
-                        chance_lethal: 0,
-                        dice_crit: 0,
-                        dice_hit: 0,
-                        damage: 0,
-                        block: 0,
-                        health: round.shot_b.health,
-                        honour: round.shot_b.honour,
-                        win: 0,
-                        wager: 0,
-                    },
-                };
-                process_round(store, ref challenge, ref round3, true);
-            }
-        }
+        process_game(store, ref challenge, ref round);
         
         // update Challenge
         utils::set_challenge(store, challenge);
@@ -176,25 +130,32 @@ mod shooter {
     //---------------------------------------
     // Decide who wins a round, or go to next
     //
-    fn process_round(store: Store, ref challenge: Challenge, ref round: Round, is_last_round: bool) {
-        let snapshot: SnapshotEntity = store.get_snapshot_entity(challenge.duel_id);
-        let table_type: TableType = store.get_table_config_entity(challenge.table_id).table_type;
+    fn process_game(store: Store, ref challenge: Challenge, ref round: Round) {
+        let _snapshot: SnapshotEntity = store.get_snapshot_entity(challenge.duel_id);
+        let _table_type: TableType = store.get_table_config_entity(challenge.table_id).table_type;
         
-        let action_a: Action = apply_action_honour(ref round.shot_a);
-        let action_b: Action = apply_action_honour(ref round.shot_b);
-        
-        let mut executed: bool = false;
-        let priority: i8 = action_a.roll_priority(action_b, snapshot.score_a, snapshot.score_b);
-        if (priority < 0) {
-            // A strikes first
-            executed = strike_async(store, round, snapshot.score_a, snapshot.score_b, ref round.shot_a, ref round.shot_b, table_type);
-        } else if (priority > 0) {
-            // B strikes first
-            executed = strike_async(store, round, snapshot.score_b, snapshot.score_a, ref round.shot_b, ref round.shot_a, table_type);
-        } else {
-            // A and B strike simultaneously
-            executed = strike_sync(store, round, snapshot.score_a, snapshot.score_b, ref round.shot_a, ref round.shot_b, table_type);
-        }
+        let hand_a: PlayerHand = round.shot_a.as_hand();
+        let hand_b: PlayerHand = round.shot_b.as_hand();
+
+        round.shot_a.apply_honour(hand_a.action_1);
+        round.shot_b.apply_honour(hand_b.action_1);
+
+        //
+        // TODO
+        //
+
+        // let mut executed: bool = false;
+        // let priority: i8 = action_a.roll_priority(action_b, snapshot.score_a, snapshot.score_b);
+        // if (priority < 0) {
+        //     // A strikes first
+        //     executed = strike_async(store, round, snapshot.score_a, snapshot.score_b, ref round.shot_a, ref round.shot_b, table_type);
+        // } else if (priority > 0) {
+        //     // B strikes first
+        //     executed = strike_async(store, round, snapshot.score_b, snapshot.score_a, ref round.shot_b, ref round.shot_a, table_type);
+        // } else {
+        //     // A and B strike simultaneously
+        //     executed = strike_sync(store, round, snapshot.score_a, snapshot.score_b, ref round.shot_a, ref round.shot_b, table_type);
+        // }
 
         // decide results on health or win flag
         let win_a: bool = (round.shot_a.win != 0);
@@ -205,28 +166,14 @@ mod shooter {
             end_challenge(ref challenge, ref round, ChallengeState::Resolved, 1);
         } else if (win_b) {
             end_challenge(ref challenge, ref round, ChallengeState::Resolved, 2);
-        } else
-        // both players still alive
-        if (challenge.round_number == CONST::ROUND_COUNT || is_last_round || executed) {
-            // finished moves, and no winner, ends in a draw
-            end_challenge(ref challenge, ref round, ChallengeState::Draw, 0);
         } else {
-            // next round
-            challenge.round_number += 1;
+            // both players still alive, its a draw
+            end_challenge(ref challenge, ref round, ChallengeState::Draw, 0);
         }
 
         // Finish round
         round.state = RoundState::Finished;
         store.set_round(@round);
-    }
-
-    fn apply_action_honour(ref shot: Shot) -> Action {
-        let action: Action = shot.action.into();
-        let action_honour: i8 = action.honour();
-        if (action_honour >= 0) {
-            shot.honour = MathU8::abs(action_honour);
-        }
-        (action)
     }
 
     fn end_challenge(ref challenge: Challenge, ref round: Round, state: ChallengeState, winner: u8) {
@@ -239,24 +186,24 @@ mod shooter {
     // Strikes
     //
 
-    // attacker strikes first, then defender only if not executed
-    fn strike_async(store: Store, round: Round, attacker: Score, defender: Score, ref attack: Shot, ref defense: Shot, table_type: TableType) -> bool {
-        let mut executed: bool = strike(store, 'shoot_a', attacker, defender, round, ref attack, ref defense, table_type);
-        apply_damage(ref attack, ref defense);
-        if (!executed) {
-            executed = strike(store, 'shoot_b', defender, attacker, round, ref defense, ref attack, table_type);
-            apply_damage(ref defense, ref attack);
-        }
-        (executed)
-    }
-    // sync strike, both at the same time
-    fn strike_sync(store: Store, round: Round, attacker: Score, defender: Score, ref attack: Shot, ref defense: Shot, table_type: TableType) -> bool {
-        let mut executed_a: bool = strike(store, 'shoot_a', attacker, defender, round, ref attack, ref defense, table_type);
-        let mut executed_b: bool = strike(store, 'shoot_b', defender, attacker, round, ref defense, ref attack, table_type);
-        apply_damage(ref attack, ref defense);
-        apply_damage(ref defense, ref attack);
-        (executed_a || executed_b)
-    }
+    // // attacker strikes first, then defender only if not executed
+    // fn strike_async(store: Store, round: Round, attacker: Score, defender: Score, ref attack: Shot, ref defense: Shot, table_type: TableType) -> bool {
+    //     let mut executed: bool = strike(store, 'shoot_a', attacker, defender, round, ref attack, ref defense, table_type);
+    //     apply_damage(ref attack, ref defense);
+    //     if (!executed) {
+    //         executed = strike(store, 'shoot_b', defender, attacker, round, ref defense, ref attack, table_type);
+    //         apply_damage(ref defense, ref attack);
+    //     }
+    //     (executed)
+    // }
+    // // sync strike, both at the same time
+    // fn strike_sync(store: Store, round: Round, attacker: Score, defender: Score, ref attack: Shot, ref defense: Shot, table_type: TableType) -> bool {
+    //     let mut executed_a: bool = strike(store, 'shoot_a', attacker, defender, round, ref attack, ref defense, table_type);
+    //     let mut executed_b: bool = strike(store, 'shoot_b', defender, attacker, round, ref defense, ref attack, table_type);
+    //     apply_damage(ref attack, ref defense);
+    //     apply_damage(ref defense, ref attack);
+    //     (executed_a || executed_b)
+    // }
 
     #[inline(always)]
     fn apply_damage(ref attack: Shot, ref defense: Shot) {
@@ -267,29 +214,29 @@ mod shooter {
         }
     }
 
-    // executes single attack
-    // returns true if ended in execution
-    fn strike(store: Store, seed: felt252, attacker: Score, defender: Score, round: Round, ref attack: Shot, ref defense: Shot, table_type: TableType) -> bool {
-        let action: Action = attack.action.into();
-        if (action != Action::Idle) {
-            let defense_action: Action = defense.action.into();
-            // dice 1: crit (execution, double damage, goal)
-            attack.chance_crit = utils::calc_crit_chances(attacker, defender, action, defense_action, attack.health, table_type);
-            attack.dice_crit = throw_dice(seed, round, 100, attack.chance_crit);
-            if (attack.dice_crit <= attack.chance_crit) {
-                return (action.execute_crit(ref attack, ref defense));
-            } else {
-                // dice 2: miss or hit
-                attack.chance_hit = utils::calc_hit_chances(attacker, defender, action, defense_action, attack.health, table_type);
-                attack.dice_hit = throw_dice(seed * 2, round, 100, attack.chance_hit);
-                if (attack.dice_hit <= attack.chance_hit) {
-                    attack.chance_lethal = utils::calc_lethal_chances(attacker, defender, action, defense_action, attack.chance_hit);
-                    action.execute_hit(ref attack, ref defense, attack.chance_lethal);
-                }
-            }
-        }
-        (false)
-    }
+    // // executes single attack
+    // // returns true if ended in execution
+    // fn strike(store: Store, seed: felt252, attacker: Score, defender: Score, round: Round, ref attack: Shot, ref defense: Shot, table_type: TableType) -> bool {
+    //     let action: Action = attack.action.into();
+    //     if (action != Action::Idle) {
+    //         let defense_action: Action = defense.action.into();
+    //         // dice 1: crit (execution, double damage, goal)
+    //         attack.chance_crit = utils::calc_crit_chances(attacker, defender, action, defense_action, attack.health, table_type);
+    //         attack.dice_crit = throw_dice(seed, round, 100, attack.chance_crit);
+    //         if (attack.dice_crit <= attack.chance_crit) {
+    //             return (action.execute_crit(ref attack, ref defense));
+    //         } else {
+    //             // dice 2: miss or hit
+    //             attack.chance_hit = utils::calc_hit_chances(attacker, defender, action, defense_action, attack.health, table_type);
+    //             attack.dice_hit = throw_dice(seed * 2, round, 100, attack.chance_hit);
+    //             if (attack.dice_hit <= attack.chance_hit) {
+    //                 attack.chance_lethal = utils::calc_lethal_chances(attacker, defender, action, defense_action, attack.chance_hit);
+    //                 action.execute_hit(ref attack, ref defense, attack.chance_lethal);
+    //             }
+    //         }
+    //     }
+    //     (false)
+    // }
 
 
     //-----------------------------------

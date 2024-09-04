@@ -18,7 +18,7 @@ use pistols::types::round::{RoundState, RoundStateTrait};
 use pistols::types::action::{Action, ActionTrait, ACTION};
 use pistols::types::constants::{CONST, HONOUR, CHANCES};
 use pistols::utils::math::{MathU8, MathU16, MathU64};
-use pistols::utils::bitwise::{BitwiseU64};
+use pistols::utils::bitwise::{BitwiseU32, BitwiseU64, BitwiseU128};
 use pistols::utils::hash::{hash_values, felt_to_u128};
 use pistols::libs::store::{Store, StoreTrait};
 
@@ -27,10 +27,29 @@ use pistols::libs::store::{Store, StoreTrait};
 // Misc
 //
 
-#[inline(always)]
-fn make_action_hash(salt: felt252, packed: u16) -> u128 {
-    let hash: felt252 = hash_values([salt, packed.into()].span());
-    (felt_to_u128(hash))
+// a moves hash is composed of a hash of each move
+// * salt is hashed with each move
+// * only a 32-bit part of each has is used
+// move 1: 0x00000000000000000000000011111111
+// move 2: 0x00000000000000002222222200000000
+// move 3: 0x00000000333333330000000000000000
+// move 4: 0x44444444000000000000000000000000
+// * finally composed into a single u128
+// hash  : 0x44444444333333332222222211111111
+fn make_moves_hash(salt: felt252, moves: Span<u8>) -> u128 {
+    let mut result: u128 = 0;
+    let mut index: usize = 0;
+    while (index < moves.len()) {
+        let move: felt252 = (*moves.at(index)).into();
+        if (move != 0) {
+            result = result | (
+                felt_to_u128(hash_values([salt, move].span()))
+                & BitwiseU128::shl(BitwiseU32::max().into(), index * 32)
+            );
+        }
+        index += 1;
+    };
+    (result)
 }
 
 #[inline(always)]
@@ -187,92 +206,35 @@ fn split_wager_fees(store: Store, challenge: Challenge, address_a: ContractAddre
 //
 
 // Validate possible actions, exposed to system
-fn get_valid_packed_actions(round_number: u8) -> Array<u16> {
-    if (round_number == 1) {
-        (array![
-            (ACTION::PACES_1).into(),
-            (ACTION::PACES_2).into(),
-            (ACTION::PACES_3).into(),
-            (ACTION::PACES_4).into(),
-            (ACTION::PACES_5).into(),
-            (ACTION::PACES_6).into(),
-            (ACTION::PACES_7).into(),
-            (ACTION::PACES_8).into(),
-            (ACTION::PACES_9).into(),
-            (ACTION::PACES_10).into(),
-        ])
-    } else if (round_number == 2) {
-        (array![
-            // 2 slots
-            pack_action_slots(ACTION::FAST_BLADE, ACTION::FAST_BLADE),
-            pack_action_slots(ACTION::FAST_BLADE, ACTION::BLOCK),
-            pack_action_slots(ACTION::BLOCK, ACTION::FAST_BLADE),
-            pack_action_slots(ACTION::BLOCK, ACTION::BLOCK),
-            // slot 1 only
-            ACTION::FAST_BLADE.into(), // pack_action_slots(ACTION::FAST_BLADE, ACTION::IDLE),
-            ACTION::BLOCK.into(),      // pack_action_slots(ACTION::BLOCK, ACTION::IDLE),
-            ACTION::FLEE.into(),       // pack_action_slots(ACTION::FLEE, ACTION::IDLE),
-            ACTION::STEAL.into(),      // pack_action_slots(ACTION::STEAL, ACTION::IDLE),
-            ACTION::SEPPUKU.into(),    // pack_action_slots(ACTION::SEPPUKU, ACTION::IDLE),
-            // slot 2 only
-            pack_action_slots(ACTION::IDLE, ACTION::SLOW_BLADE),
-            pack_action_slots(ACTION::IDLE, ACTION::FAST_BLADE),
-            pack_action_slots(ACTION::IDLE, ACTION::BLOCK),
-            // Idle / no action
-            0, // pack_action_slots(ACTION::IDLE, ACTION::IDLE),
-        ])
-    } else {
-        (array![])
-    }
-}
-fn validate_packed_actions(round_number: u8, packed: u16) -> bool {
-    let valid_actions = get_valid_packed_actions(round_number);
-    let mut len: usize = valid_actions.len();
-    let mut n: usize = 0;
-    loop {
-        if (n == len || packed == *valid_actions.at(n)) {
-            break;
-        }
-        n += 1;
-    };
-    (n < len)
-}
-
-// unpack validated actions
-// can re-arrange on some matches
-fn unpack_round_slots(round: Round) -> (u8, u8, u8, u8) {
-    let (slot1_a, slot2_a): (u8, u8) = unpack_action_slots(round.shot_a.action);
-    let (slot1_b, slot2_b): (u8, u8) = unpack_action_slots(round.shot_b.action);
-    // if slot 1 is empty, promote slot 2
-    if (slot1_a == 0 && slot1_b == 0) {
-        return (slot2_a, slot2_b, 0, 0);
-    }
-    let action_a: Action = slot1_a.into();
-    let action_b: Action = slot1_b.into();
-    // Double Steal decides in a 1 pace face-off
-    if (action_a == Action::Steal && action_b == Action::Steal) {
-        return (slot1_a, slot1_b, ACTION::PACES_1, ACTION::PACES_1);
-    }
-    // Runners against blades
-    let runner_a: bool = action_a.is_runner();
-    let runner_b: bool = action_b.is_runner();
-    if (runner_a && !runner_b) {
-        return (slot1_a, action_a.runner_against_blades().into(), 0, 0);
-    }
-    if (runner_b && !runner_a) {
-        return (action_b.runner_against_blades().into(), slot1_b, 0, 0);
-    }
-    (slot1_a, slot1_b, slot2_a, slot2_b)
-}
-
-// packers
-fn pack_action_slots(slot1: u8, slot2: u8) -> u16 {
-    (slot1.into() | (slot2.into() * 0x100))
-}
-fn unpack_action_slots(packed: u16) -> (u8, u8) {
-    let slot1: u8 = (packed & 0xff).try_into().unwrap();
-    let slot2: u8 = ((packed & 0xff00) / 0x100).try_into().unwrap();
-    (slot1, slot2)
+fn get_valid_cards(table_id: felt252) -> Array<Array<u8>> {
+    let paces: Array<u8> = array![
+        Action::Paces1.into(),
+        Action::Paces2.into(),
+        Action::Paces3.into(),
+        Action::Paces4.into(),
+        Action::Paces5.into(),
+        Action::Paces6.into(),
+        Action::Paces7.into(),
+        Action::Paces8.into(),
+        Action::Paces9.into(),
+        Action::Paces10.into(),
+    ];
+    let dodge: Array<u8> = array![
+        Action::Paces1.into(),
+        Action::Paces2.into(),
+        Action::Paces3.into(),
+        Action::Paces4.into(),
+        Action::Paces5.into(),
+        Action::Paces6.into(),
+        Action::Paces7.into(),
+        Action::Paces8.into(),
+        Action::Paces9.into(),
+        Action::Paces10.into(),
+    ];
+    (array![
+        paces,
+        dodge,
+    ])
 }
 
 
@@ -564,31 +526,6 @@ fn calc_lethal_lord_penalty(attacker: Score, defender: Score, attack: Action, de
     } else {
         (0)
     }
-}
-
-
-
-
-//------------------------
-// Randomizer
-//
-
-// throw a dice and return the resulting face
-// faces: the number of faces on the dice (ex: 6, or 100%)
-// returns a number between 1 and faces
-fn throw_dice(seed: felt252, salt: felt252, faces: u128) -> u128 {
-    let hash: felt252 = hash_values([salt, seed].span());
-    let double: u256 = hash.into();
-    ((double.low % faces) + 1)
-}
-
-// throw a dice and return a positive result
-// faces: the number of faces on the dice (ex: 6, or 100%)
-// limit: how many faces gives a positive result?
-// edge case: limit <= 1, always negative
-// edge case: limit == faces, always positive
-fn check_dice(seed: felt252, salt: felt252, faces: u128, limit: u128) -> bool {
-    (throw_dice(seed, salt, faces) <= limit)
 }
 
 

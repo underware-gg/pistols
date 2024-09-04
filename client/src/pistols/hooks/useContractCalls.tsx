@@ -53,11 +53,11 @@ export const useSimulateChances = (address: BigNumberish, duelId: bigint, roundN
 }
 
 export const useGetValidPackedActions = (roundNumber: number) => {
-  const { get_valid_packed_actions } = useDojoSystemCalls()
+  const { get_valid_cards } = useDojoSystemCalls()
   const args = useMemo(() => [roundNumber], [roundNumber])
   const enabled = useMemo(() => Boolean(roundNumber), [roundNumber])
   const { value, isPending } = useContractCall({
-    call: get_valid_packed_actions,
+    call: get_valid_cards,
     args,
     enabled,
     defaultValue: [],
@@ -68,42 +68,6 @@ export const useGetValidPackedActions = (roundNumber: number) => {
   }
 }
 
-
-// export const usePackActionSlots = (slot1: number, slot2: number, defaultValue = null) => {
-//   const [value, setValue] = useState(defaultValue)
-//   const { pack_action_slots } = useDojoSystemCalls()
-//   useEffect(() => {
-//     let _mounted = true
-//     const _get = async () => {
-//       const value = await pack_action_slots(slot1, slot2)
-//       if (_mounted) setValue(value)
-//     }
-//     if (slot1 != null && slot2 != null) _get()
-//     else setValue(defaultValue)
-//     return () => { _mounted = false }
-//   }, [slot1, slot2])
-//   return {
-//     packed: value,
-//   }
-// }
-
-// export const useUnpackActionSlots = (packed: number, defaultValue = []) => {
-//   const [value, setValue] = useState(defaultValue)
-//   const { unpack_action_slots } = useDojoSystemCalls()
-//   useEffect(() => {
-//     let _mounted = true
-//     const _get = async () => {
-//       const value = await unpack_action_slots(packed)
-//       if (_mounted) setValue(value)
-//     }
-//     if (packed != null) _get()
-//     else setValue(defaultValue)
-//     return () => { _mounted = false }
-//   }, [packed])
-//   return {
-//     unpacked: value,
-//   }
-// }
 
 
 //------------------------------------------
@@ -140,7 +104,7 @@ export const useAdminIsOwner = (address: BigNumberish) => {
 // TEST/DEBUG
 //
 export const useTestValidateSignature = () => {
-  const { validate_commit_message } = useDojoSystemCalls()
+  const { test_validate_commit_message } = useDojoSystemCalls()
   const args = useMemo(() => [
     '0xe29882a1fcba1e7e10cad46212257fea5c752a4f9b1b1ec683c503a2cf5c8a', // account
     [173730084075620862592063244223266966993038958055152214202416930759334968124n, 1417567916191820063020424621516241329682320435780260605909088968782369795432n],
@@ -149,7 +113,7 @@ export const useTestValidateSignature = () => {
     1n,
   ], [])
   const { value, isPending } = useContractCall({
-    call: validate_commit_message,
+    call: test_validate_commit_message,
     args,
     defaultValue: false,
   })

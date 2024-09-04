@@ -252,21 +252,11 @@ export function createSystemCalls(
     }, {})
   }
 
-  const get_valid_packed_actions = async (round_number: number): Promise<number[] | null> => {
+  const get_valid_cards = async (round_number: number): Promise<number[] | null> => {
     const args = [round_number]
-    const results = await _executeCall<any>(actions_call('get_valid_packed_actions', args))
+    const results = await _executeCall<any>(actions_call('get_valid_cards', args))
     return results !== null ? results.map(v => Number(v)) : null
   }
-  // const pack_action_slots = async (slot1: number, slot2: number): Promise<number | null> => {
-  //   const args = [slot1, slot2]
-  //   const results = await _executeCall(actions_call('pack_action_slots', args))
-  //   return results !== null ? Number(results[0]) : null
-  // }
-  // const unpack_action_slots = async (packed: number): Promise<number[] | null> => {
-  //   const args = [packed]
-  //   const results = await _executeCall(actions_call('unpack_action_slots', args))
-  //   return results !== null ? results.map(v => Number(v)) : null
-  // }
 
   const can_mint = async (to: BigNumberish, token_address: BigNumberish): Promise<boolean | null> => {
     const args = [to, token_address]
@@ -287,7 +277,7 @@ export function createSystemCalls(
   }
 
   // TEST/DEBUG
-  const validate_commit_message = async (
+  const test_validate_commit_message = async (
     account: BigNumberish,
     signature: BigNumberish[],
     duelId: BigNumberish,
@@ -295,7 +285,7 @@ export function createSystemCalls(
     duelistId: BigNumberish,
   ): Promise<boolean | null> => {
     const args = [account, signature, duelId, roundNumber, duelistId]
-    const results = await _executeCall<boolean>(actions_call('validate_commit_message', args))
+    const results = await _executeCall<boolean>(actions_call('test_validate_commit_message', args))
     return results ?? null
   }
 
@@ -313,9 +303,7 @@ export function createSystemCalls(
     can_join,
     calc_fee,
     simulate_chances,
-    get_valid_packed_actions,
-    // pack_action_slots,
-    // unpack_action_slots,
+    get_valid_cards,
     //
     // DUELISTS
     can_mint,
@@ -329,7 +317,7 @@ export function createSystemCalls(
     admin_am_i_admin,
     //
     // TEST/DEBUG
-    validate_commit_message,
+    test_validate_commit_message,
   }
 }
 

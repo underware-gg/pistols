@@ -15,7 +15,7 @@
 //     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 //     use pistols::types::round::{RoundState, RoundStateTrait};
 //     use pistols::types::constants::{CONST, HONOUR};
-//     use pistols::libs::utils::{make_action_hash};
+//     use pistols::libs::utils::{make_moves_hash};
 //     use pistols::utils::timestamp::{timestamp};
 //     use pistols::utils::math::{MathU8};
 //     use pistols::tests::tester::{tester,
@@ -56,13 +56,13 @@
 //         let salt_b: u64 = SALT_1_b;
 //         let action_a: u8 = 10;
 //         let action_b: u8 = 6;
-//         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a.into()), make_action_hash(salt_b, action_b.into()))
+//         (salt_a, salt_b, action_a, action_b, make_moves_hash(salt_a, action_a.into()), make_moves_hash(salt_b, action_b.into()))
 //     }
 
 //     fn _get_actions_round_1_dual_crit(action_a: u8, action_b: u8) -> (u64, u64, u8, u8, u64, u64) {
 //         let salt_a: u64 = SALT_1_a + 52;
 //         let salt_b: u64 = SALT_1_b + 52;
-//         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a.into()), make_action_hash(salt_b, action_b.into()))
+//         (salt_a, salt_b, action_a, action_b, make_moves_hash(salt_a, action_a.into()), make_moves_hash(salt_b, action_b.into()))
 //     }
 
 //     fn _get_actions_round_1_crit_a() -> (u64, u64, u8, u8, u64, u64) {
@@ -70,18 +70,18 @@
 //         let salt_b: u64 = SALT_1_b + 52;
 //         let action_a: u8 = 9;
 //         let action_b: u8 = 10;
-//         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a.into()), make_action_hash(salt_b, action_b.into()))
+//         (salt_a, salt_b, action_a, action_b, make_moves_hash(salt_a, action_a.into()), make_moves_hash(salt_b, action_b.into()))
 //     }
 
 //     fn _get_actions_round_1_dual_hit(action_a: u8, action_b: u8) -> (u64, u64, u8, u8, u64, u64) {
 //         let salt_a: u64 = 0x32533f48; // for (3, 3) paces!!
 //         let salt_b: u64 = SALT_1_b;
-//         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a.into()), make_action_hash(salt_b, action_b.into()))
+//         (salt_a, salt_b, action_a, action_b, make_moves_hash(salt_a, action_a.into()), make_moves_hash(salt_b, action_b.into()))
 //     }
 
 //     fn _get_actions_round_1_dual_hit_find(action_a: u8, action_b: u8, salt_a: u64) -> (u64, u64, u8, u8, u64, u64) {
 //         let salt_b: u64 = SALT_1_b;
-//         (salt_a, salt_b, action_a, action_b, make_action_hash(salt_a, action_a.into()), make_action_hash(salt_b, action_b.into()))
+//         (salt_a, salt_b, action_a, action_b, make_moves_hash(salt_a, action_a.into()), make_moves_hash(salt_b, action_b.into()))
 //     }
 
 //     //-----------------------------------------
@@ -627,8 +627,8 @@
 //     fn test_clamp_invalid_paces() {
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
-//         let hash_a: u64 = make_action_hash(0x111, 0);
-//         let hash_b: u64 = make_action_hash(0x222, 11);
+//         let hash_a: u64 = make_moves_hash(0x111, 0);
+//         let hash_b: u64 = make_moves_hash(0x222, 11);
 //         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
 //         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
 //         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, 0x111, 0, 0);
@@ -650,8 +650,8 @@
 //         // assert(duelist1.duelist_id == ID(OWNER()), 'invalid duelist_id_1');
 //         // assert(duelist2.duelist_id == ID(OTHER()), 'invalid duelist_id_2');
 //         // let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
-//         // let hash_a: u64 = make_action_hash(0x111, 10);
-//         // let hash_b: u64 = make_action_hash(0x222, 1);
+//         // let hash_a: u64 = make_moves_hash(0x111, 10);
+//         // let hash_b: u64 = make_moves_hash(0x222, 1);
 //         // tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
 //         // tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
 //         // tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, 0x111, 10, 0);
@@ -694,7 +694,7 @@
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
 //         // try to commmit with another account
 //         let someone_else: ContractAddress = starknet::contract_address_const::<0x999>();
-//         let hash: u128 = make_action_hash(0x12121, 0x1);
+//         let hash: u128 = make_moves_hash(0x12121, 0x1);
 //         tester::execute_commit_moves(actions, someone_else, duel_id, 1, hash);
 //     }
 
@@ -704,7 +704,7 @@
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
 //         // try to commmit with another account
-//         let hash: u128 = make_action_hash(0x12121, 0x1);
+//         let hash: u128 = make_moves_hash(0x12121, 0x1);
 //         tester::execute_commit_moves(actions, FAKE_OWNER_1_1(), duel_id, 1, hash);
 //     }
 
@@ -713,7 +713,7 @@
 //     fn test_commit_wrong_round_number() {
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
-//         let hash: u128 = make_action_hash(0x12121, 0x1);
+//         let hash: u128 = make_moves_hash(0x12121, 0x1);
 //         tester::execute_commit_moves(actions, OWNER(), duel_id, 2, hash);
 //     }
 
@@ -820,8 +820,8 @@
 //     fn test_reveal_invalid_hash_action_a() {
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
-//         let hash_a: u64 = make_action_hash(0x111, 1);
-//         let hash_b: u64 = make_action_hash(0x222, 1);
+//         let hash_a: u64 = make_moves_hash(0x111, 1);
+//         let hash_b: u64 = make_moves_hash(0x222, 1);
 //         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_a);
 //         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_b);
 //         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, 0x111, 2, 0);
@@ -831,8 +831,8 @@
 //     fn test_reveal_invalid_hash_salt_a() {
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
-//         let hash_a: u64 = make_action_hash(0x111, 1);
-//         let hash_b: u64 = make_action_hash(0x222, 1);
+//         let hash_a: u64 = make_moves_hash(0x111, 1);
+//         let hash_b: u64 = make_moves_hash(0x222, 1);
 //         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_b);
 //         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_a);
 //         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, 0x1111, 1, 0);
@@ -843,8 +843,8 @@
 //     fn test_reveal_invalid_hash_action_b() {
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
-//         let hash_a: u64 = make_action_hash(0x111, 1);
-//         let hash_b: u64 = make_action_hash(0x222, 1);
+//         let hash_a: u64 = make_moves_hash(0x111, 1);
+//         let hash_b: u64 = make_moves_hash(0x222, 1);
 //         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_b);
 //         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_a);
 //         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, 0x222, 2, 0);
@@ -854,8 +854,8 @@
 //     fn test_reveal_invalid_hash_salt_b() {
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
-//         let hash_a: u64 = make_action_hash(0x111, 1);
-//         let hash_b: u64 = make_action_hash(0x222, 1);
+//         let hash_a: u64 = make_moves_hash(0x111, 1);
+//         let hash_b: u64 = make_moves_hash(0x222, 1);
 //         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_b);
 //         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_a);
 //         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, 0x2222, 1, 0);

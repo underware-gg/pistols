@@ -10,7 +10,7 @@ interface CommitMoveMessage extends Messages {
   duelistId: bigint,
 }
 
-export const make_action_hash = (salt: BigNumberish, action: BigNumberish) => (poseidon([BigInt(salt), BigInt(action)]) & HASH_SALT_MASK)
+export const make_moves_hash = (salt: BigNumberish, action: BigNumberish) => (poseidon([BigInt(salt), BigInt(action)]) & HASH_SALT_MASK)
 
 export const pack_action_slots = (slot1: number | null, slot2: number | null): number | null => {
   if (slot1 != null && slot2 != null) {
@@ -53,7 +53,7 @@ const signAndGenerateSalt = async (account: AccountInterface, chainId: string, d
 /** @returns the felt252 hash for an action, or 0 if fail */
 export const signAndGenerateActionHash = async (account: AccountInterface, chainId: string, duelistId: bigint, duelId: bigint, roundNumber: number, packed: BigNumberish): Promise<bigint> => {
   const salt = await signAndGenerateSalt(account, chainId, duelistId, duelId, roundNumber)
-  const hash = salt ? make_action_hash(salt, BigInt(packed)) : null
+  const hash = salt ? make_moves_hash(salt, BigInt(packed)) : null
   console.log(`signAndGenerateActionHash():`, bigintToHex(duelId), roundNumber, packed, bigintToHex(salt), bigintToHex(hash))
   return hash
 }
@@ -66,7 +66,7 @@ export const signAndRestoreActionFromHash = async (account: AccountInterface, ch
   console.log(`___RESTORE_HASH Duel:`, bigintToHex(duelId), 'round:', roundNumber, 'hash:', bigintToHex(hash), 'salt:', bigintToHex(salt))
   for (let i = 0; salt > 0n && i < possibleActions.length; ++i) {
     const m = possibleActions[i]
-    const h = make_action_hash(salt, m)
+    const h = make_moves_hash(salt, m)
     console.log(`___RESTORE_HASH move:`, m, bigintToHex(hash), '>', bigintToHex(h))
     if (h == hash) {
       packed = Number(m)
