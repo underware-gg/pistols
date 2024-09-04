@@ -324,7 +324,6 @@ mod tests {
     use pistols::models::init::{init};
     use pistols::types::action::{Action, ACTION};
     use pistols::types::constants::{CONST};
-    use pistols::libs::utils;
 
     #[test]
     fn test_apply_damage() {

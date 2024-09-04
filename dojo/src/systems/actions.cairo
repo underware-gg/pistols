@@ -111,6 +111,7 @@ mod actions {
     use pistols::types::action::{Action, ActionTrait};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::short_string::{ShortStringTrait};
+    use pistols::utils::misc::{ZERO, WORLD};
     use pistols::libs::seeder::{make_seed};
     use pistols::libs::shooter::{shooter};
     use pistols::libs::utils;
@@ -256,7 +257,7 @@ mod actions {
                 // challenging a duelist...
                 assert(duelist_helper.exists(duelist_id_b) == true, Errors::INVALID_CHALLENGED);
                 assert(duelist_id_a != duelist_id_b, Errors::INVALID_CHALLENGED_SELF);
-                (utils::ZERO())
+                (ZERO())
             } else {
                 // challenging a wallet...
                 assert(challenged_id_or_address != address_a, Errors::INVALID_CHALLENGED_SELF);
@@ -517,15 +518,15 @@ mod actions {
         }
 
         fn get_valid_packed_actions(world: @IWorldDispatcher, round_number: u8) -> Array<u16> {
-            utils::WORLD(world);
+            WORLD(world);
             (utils::get_valid_packed_actions(round_number))
         }
         fn pack_action_slots(world: @IWorldDispatcher, slot1: u8, slot2: u8) -> u16 {
-            utils::WORLD(world);
+            WORLD(world);
             (utils::pack_action_slots(slot1, slot2))
         }
         fn unpack_action_slots(world: @IWorldDispatcher, packed: u16) -> (u8, u8) {
-            utils::WORLD(world);
+            WORLD(world);
             (utils::unpack_action_slots(packed))
         }
 
@@ -536,7 +537,7 @@ mod actions {
             roundNumber: felt252,
             duelistId: felt252,
         ) -> bool {
-            utils::WORLD(world);
+            WORLD(world);
             let msg = CommitMoveMessage {
                 duelId,
                 roundNumber,
@@ -589,7 +590,7 @@ mod actions {
             })));
         }
         fn _emitPostRevealEvents(ref world: IWorldDispatcher, challenge: Challenge) {
-            utils::WORLD(world);
+            WORLD(world);
             if (challenge.state == ChallengeState::InProgress) {
                 self._emitDuelistTurnEvent(challenge);
             } else if (challenge.state == ChallengeState::Resolved || challenge.state == ChallengeState::Draw) {
@@ -610,7 +611,7 @@ mod actions {
             let winner_address: ContractAddress = 
                 if (challenge.winner == 1) { (challenge.address_a) }
                 else if (challenge.winner == 2) { (challenge.address_b) }
-                else { (utils::ZERO()) };
+                else { (ZERO()) };
             emit!(world, (Event::ChallengeResolvedEvent(events::ChallengeResolvedEvent {
                 duel_id: challenge.duel_id,
                 winner_address,

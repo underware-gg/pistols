@@ -89,7 +89,7 @@ mod token_duelist {
     use pistols::models::duelist::{Duelist, DuelistEntity, Score, Scoreboard, ScoreboardEntity, ScoreTrait};
     use pistols::models::table::{TABLES};
     use pistols::types::constants::{CONST};
-    use pistols::libs::utils::{CONSUME_BYTE_ARRAY};
+    use pistols::utils::misc::{CONSUME_BYTE_ARRAY};
     use pistols::utils::byte_arrays::{ByteArraysTrait, U8IntoByteArray, U16IntoByteArray, U32IntoByteArray, U256IntoByteArray, ByteArraySpanIntoByteArray};
     use pistols::utils::short_string::ShortStringTrait;
     use pistols::utils::encoding::bytes_base64_encode;

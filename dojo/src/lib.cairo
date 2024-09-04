@@ -9,6 +9,7 @@ mod systems {
     mod actions;
     mod minter;
     mod token_duelist;
+    mod rng;
 }
 
 mod libs {
@@ -44,6 +45,7 @@ mod utils {
     mod encoding;
     mod hash;
     mod math;
+    mod misc;
     mod short_string;
     mod timestamp;
     mod openzeppelin {
@@ -72,6 +74,7 @@ mod tests {
     mod test_utils;
     // utils
     mod tester;
+    mod mock_rng;
     mod salt_generator;
     // tokens
     mod token {

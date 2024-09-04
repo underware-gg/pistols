@@ -31,7 +31,7 @@ mod admin {
     use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableAdmittance, TableInitializer, TableInitializerTrait};
     use pistols::interfaces::systems::{SELECTORS};
     use pistols::libs::store::{Store, StoreTrait};
-    use pistols::libs::utils;
+    use pistols::utils::misc::{ZERO, WORLD};
 
     mod Errors {
         const INVALID_OWNER: felt252        = 'ADMIN: Invalid account_address';
@@ -70,7 +70,7 @@ mod admin {
         }
 
         fn grant_admin(ref world: IWorldDispatcher, account_address: ContractAddress, granted: bool) {
-            utils::WORLD(world);
+            WORLD(world);
             self.assert_caller_is_admin();
             assert(account_address.is_non_zero(), Errors::INVALID_OWNER);
             if (granted) {

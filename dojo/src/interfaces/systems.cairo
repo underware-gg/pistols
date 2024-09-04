@@ -2,17 +2,19 @@ use starknet::{ContractAddress, ClassHash};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait, Resource};
 
 use pistols::systems::{
-    actions::{IActionsDispatcher, IActionsDispatcherTrait},
     admin::{IAdminDispatcher, IAdminDispatcherTrait},
+    actions::{IActionsDispatcher, IActionsDispatcherTrait},
+    rng::{IRngDispatcher, IRngDispatcherTrait},
     minter::{IMinterDispatcher, IMinterDispatcherTrait},
     token_duelist::{ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait},
 };
-use pistols::libs::utils::{ZERO};
+use pistols::utils::misc::{ZERO};
 
 mod SELECTORS {
     // system selectors
     const ADMIN: felt252 = selector_from_tag!("pistols-admin");
     const ACTIONS: felt252 = selector_from_tag!("pistols-actions");
+    const RNG: felt252 = selector_from_tag!("pistols-rng");
     const MINTER: felt252 = selector_from_tag!("pistols-minter");
     const TOKEN_DUELIST: felt252 = selector_from_tag!("pistols-token_duelist");
     const LORDS_MOCK: felt252 = selector_from_tag!("pistols-lords_mock");
@@ -45,6 +47,9 @@ impl WorldSystemsTraitImpl of WorldSystemsTrait {
     }
     fn actions_dispatcher(self: IWorldDispatcher) -> IActionsDispatcher {
         (IActionsDispatcher{ contract_address: self.contract_address(SELECTORS::ACTIONS) })
+    }
+    fn rng_dispatcher(self: IWorldDispatcher) -> IRngDispatcher {
+        (IRngDispatcher{ contract_address: self.contract_address(SELECTORS::RNG) })
     }
     fn minter_dispatcher(self: IWorldDispatcher) -> IMinterDispatcher {
         (IMinterDispatcher{ contract_address: self.contract_address(SELECTORS::MINTER) })

@@ -24,17 +24,6 @@ use pistols::libs::store::{Store, StoreTrait};
 // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
 extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
 
-#[inline(always)]
-fn ZERO() -> ContractAddress {
-    (starknet::contract_address_const::<0x0>())
-}
-
-#[inline(always)]
-fn WORLD(_world: IWorldDispatcher) {}
-
-#[inline(always)]
-fn CONSUME_BYTE_ARRAY(_value: @ByteArray) {}
-
 
 //------------------------
 // Misc

@@ -3,7 +3,7 @@ use starknet::ContractAddress;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
 use pistols::systems::admin::admin::{Errors};
-use pistols::libs::utils::{ZERO};
+use pistols::utils::misc::{ZERO};
 use pistols::utils::math::{MathU128};
 use pistols::utils::arrays::{ArrayTrait};
 use pistols::types::constants::{CONST};
