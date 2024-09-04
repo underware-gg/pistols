@@ -217,16 +217,4 @@ mod tests {
         assert(utils::_calc_penalty(1, 10) == 20, 'h_3');
         assert(utils::_calc_penalty(0, 10) == 30, 'h_1');
     }
-
-    #[test]
-    fn test_dice_round3() {
-        let seed: felt252 = 'shoot_a';
-        let salt_a: u64 = 0x136f23ce20ac7ee1;
-        let salt_b: u64 = 0xb6800612482e938f;
-        let salter = (salt_a ^ salt_b);
-        let salter_i = (utils::scramble_salt(salt_a) ^ utils::scramble_salt(salt_b));
-        let dice_1 = utils::throw_dice(seed, salter.into(), 100);
-        let dice_2 = utils::throw_dice(seed, (salter_i).into(), 100);
-        assert(dice_1 != dice_2, 'inverted salt');
-    }
 }

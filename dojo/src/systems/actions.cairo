@@ -49,14 +49,14 @@ trait IActions {
         duelist_id: u128,
         duel_id: u128,
         round_number: u8,
-        hash: u64,
+        hash: u128,
     );
     fn reveal_moves(
         ref world: IWorldDispatcher,
         duelist_id: u128,
         duel_id: u128,
         round_number: u8,
-        salt: u64,
+        salt: felt252,
         action_slot1: u8,
         action_slot2: u8,
     );
@@ -414,7 +414,7 @@ mod actions {
             duelist_id: u128,
             duel_id: u128,
             round_number: u8,
-            hash: u64,
+            hash: u128,
         ) {
             let store: Store = StoreTrait::new(world);
             shooter::commit_moves(store, duelist_id, duel_id, round_number, hash);
@@ -424,7 +424,7 @@ mod actions {
             duelist_id: u128,
             duel_id: u128,
             round_number: u8,
-            salt: u64,
+            salt: felt252,
             action_slot1: u8,
             action_slot2: u8,
         ) {

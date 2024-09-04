@@ -358,7 +358,7 @@ mod tester {
     fn execute_commit_moves(system: IActionsDispatcher, sender: ContractAddress,
         duel_id: u128,
         round_number: u8,
-        hash: u64,
+        hash: u128,
     ) {
         impersonate(sender);
         system.commit_moves(ID(sender), duel_id, round_number, hash);
@@ -367,7 +367,7 @@ mod tester {
     fn execute_reveal_moves(system: IActionsDispatcher, sender: ContractAddress,
         duel_id: u128,
         round_number: u8,
-        salt: u64,
+        salt: felt252,
         slot1: u8,
         slot2: u8,
     ) {

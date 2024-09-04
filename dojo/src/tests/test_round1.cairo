@@ -694,7 +694,7 @@
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
 //         // try to commmit with another account
 //         let someone_else: ContractAddress = starknet::contract_address_const::<0x999>();
-//         let hash: u64 = make_action_hash(0x12121, 0x1);
+//         let hash: u128 = make_action_hash(0x12121, 0x1);
 //         tester::execute_commit_moves(actions, someone_else, duel_id, 1, hash);
 //     }
 
@@ -704,7 +704,7 @@
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
 //         // try to commmit with another account
-//         let hash: u64 = make_action_hash(0x12121, 0x1);
+//         let hash: u128 = make_action_hash(0x12121, 0x1);
 //         tester::execute_commit_moves(actions, FAKE_OWNER_1_1(), duel_id, 1, hash);
 //     }
 
@@ -713,7 +713,7 @@
 //     fn test_commit_wrong_round_number() {
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
-//         let hash: u64 = make_action_hash(0x12121, 0x1);
+//         let hash: u128 = make_action_hash(0x12121, 0x1);
 //         tester::execute_commit_moves(actions, OWNER(), duel_id, 2, hash);
 //     }
 

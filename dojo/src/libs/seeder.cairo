@@ -1,8 +1,7 @@
 // use debug::PrintTrait;
 use starknet::{ContractAddress};
 
-use pistols::utils::hash::{hash_values, make_block_hash};
-use pistols::utils::misc::{felt_to_u128};
+use pistols::utils::hash::{hash_values, make_block_hash, felt_to_u128};
 
 fn make_seed(caller: ContractAddress, uuid: usize) -> u128 {
     let hash: felt252 = hash_values([

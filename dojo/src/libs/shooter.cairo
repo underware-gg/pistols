@@ -42,7 +42,7 @@ mod shooter {
     //-----------------------------------
     // Commit
     //
-    fn commit_moves(store: Store, duelist_id: u128, duel_id: u128, round_number: u8, hash: u64) {
+    fn commit_moves(store: Store, duelist_id: u128, duel_id: u128, round_number: u8, hash: u128) {
         // Assert correct Challenge
         let (_challenge, duelist_number) = _assert_challenge(store, starknet::get_caller_address(), duelist_id, duel_id, round_number);
 
@@ -72,7 +72,7 @@ mod shooter {
     //-----------------------------------
     // Reveal
     //
-    fn reveal_moves(store: Store, duelist_id: u128, duel_id: u128, round_number: u8, salt: u64, mut packed: u16) -> Challenge {
+    fn reveal_moves(store: Store, duelist_id: u128, duel_id: u128, round_number: u8, salt: felt252, mut packed: u16) -> Challenge {
         // Assert correct Challenge
         let (mut challenge, duelist_number) = _assert_challenge(store, starknet::get_caller_address(), duelist_id, duel_id, round_number);
 
@@ -81,7 +81,7 @@ mod shooter {
         assert(round.state == RoundState::Reveal, Errors::ROUND_NOT_IN_REVEAL);
 
         // Validate action hash
-        let hash: u64 = utils::make_action_hash(salt, packed);
+        let hash: u128 = utils::make_action_hash(salt, packed);
 
         // validate stored actions
         if (!utils::validate_packed_actions(round_number, packed)) {
@@ -296,12 +296,12 @@ mod shooter {
     // Randomizer
     //
     fn throw_dice(seed: felt252, round: Round, faces: u128, chances: u8) -> u8 {
-        let salt: u64 = utils::make_round_salt(round);
-        (utils::throw_dice(seed, salt.into(), faces).try_into().unwrap())
+        let salt: felt252 = utils::make_round_salt(round);
+        (utils::throw_dice(seed, salt, faces).try_into().unwrap())
     }
     fn check_dice(seed: felt252, round: Round, faces: u128, chances: u128) -> bool {
-        let salt: u64 = utils::make_round_salt(round);
-        (utils::check_dice(seed, salt.into(), faces, chances))
+        let salt: felt252 = utils::make_round_salt(round);
+        (utils::check_dice(seed, salt, faces, chances))
     }
 
 }

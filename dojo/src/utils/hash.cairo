@@ -75,12 +75,12 @@ fn make_block_hash() -> felt252 {
 #[cfg(test)]
 mod tests {
     use debug::PrintTrait;
-    use pistols::utils::misc::{felt_to_u128};
     use pistols::utils::hash::{
         hash_felt,
         hash_u128,
         hash_values,
         make_block_hash,
+        felt_to_u128,
     };
 
     #[test]
@@ -139,5 +139,15 @@ mod tests {
         assert(h2 != h3, 'h2 != h3');
         assert(h3 != h4, 'h3 != h4');
         assert(h2 != h22, 'h2 != h22');
+    }
+
+    #[test]
+    fn test_rehash() {
+        let h1: felt252 = hash_values([111].span());
+        let h2: felt252 = hash_values([h1].span());
+        let h3: felt252 = hash_values([h2].span());
+        assert(h1 != 0,  'h1');
+        assert(h1 != h2, 'h1 != h2');
+        assert(h2 != h3, 'h2 != h3');
     }
 }

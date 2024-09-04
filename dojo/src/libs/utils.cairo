@@ -19,10 +19,8 @@ use pistols::types::action::{Action, ActionTrait, ACTION};
 use pistols::types::constants::{CONST, HONOUR, CHANCES};
 use pistols::utils::math::{MathU8, MathU16, MathU64};
 use pistols::utils::bitwise::{BitwiseU64};
+use pistols::utils::hash::{hash_values, felt_to_u128};
 use pistols::libs::store::{Store, StoreTrait};
-
-// https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
-extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
 
 
 //------------------------
@@ -30,20 +28,19 @@ extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopani
 //
 
 #[inline(always)]
-fn make_action_hash(salt: u64, packed: u16) -> u64 {
-    let hash: u256 = pedersen(salt.into(), packed.into()).into() & CONST::HASH_SALT_MASK;
-    (hash.try_into().unwrap())
+fn make_action_hash(salt: felt252, packed: u16) -> u128 {
+    let hash: felt252 = hash_values([salt, packed.into()].span());
+    (felt_to_u128(hash))
 }
 
 #[inline(always)]
-fn make_round_salt(round: Round) -> u64 {
-    (round.shot_a.salt ^ round.shot_b.salt)
+fn make_round_salt(round: Round) -> felt252 {
+    (hash_values([round.shot_a.salt, round.shot_b.salt].span()))
 }
 
 #[inline(always)]
-fn scramble_salt(salt: u64) -> u64 {
-    let hash: u256 = pedersen(salt.into(), (~salt).into()).into() & CONST::HASH_SALT_MASK;
-    (hash.try_into().unwrap())
+fn scramble_salt(salt: felt252) -> felt252 {
+    (hash_values([salt].span()))
 }
 
 
@@ -56,8 +53,8 @@ fn make_pact_pair(duelist_a: u128, duelist_b: u128) -> u128 {
     let b: felt252 = duelist_b.into();
     // ids can be contract addresses or token ids (small integers)
     // hash it with itself to guarantee big unique numbers
-    let aa: u256 = pedersen(a, a).into();
-    let bb: u256 = pedersen(b, b).into();
+    let aa: u256 = hash_values([a].span()).into();
+    let bb: u256 = hash_values([b].span()).into();
     (aa.low ^ bb.low)
 }
 
@@ -580,7 +577,7 @@ fn calc_lethal_lord_penalty(attacker: Score, defender: Score, attack: Action, de
 // faces: the number of faces on the dice (ex: 6, or 100%)
 // returns a number between 1 and faces
 fn throw_dice(seed: felt252, salt: felt252, faces: u128) -> u128 {
-    let hash: felt252 = pedersen(salt, seed);
+    let hash: felt252 = hash_values([salt, seed].span());
     let double: u256 = hash.into();
     ((double.low % faces) + 1)
 }

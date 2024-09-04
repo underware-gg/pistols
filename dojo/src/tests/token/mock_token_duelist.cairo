@@ -11,7 +11,7 @@ mod token_duelist {
     use debug::PrintTrait;
     use core::traits::Into;
     use starknet::{ContractAddress, get_contract_address, get_caller_address, get_tx_info};
-    use pistols::libs::utils::{WORLD};
+    use pistols::utils::misc::{WORLD};
     use pistols::tests::tester::tester::{
         LITTLE_BOY, LITTLE_GIRL,
         OWNED_BY_LITTLE_BOY, OWNED_BY_LITTLE_GIRL,

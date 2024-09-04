@@ -186,7 +186,7 @@ mod tests {
     use debug::PrintTrait;
     use starknet::ContractAddress;
     use super::{TableAdmittance, TableAdmittanceEntity, TableAdmittanceEntityTrait};
-    use pistols::libs::utils::{ZERO};
+    use pistols::utils::misc::{ZERO};
 
     #[test]
     fn test_admittance() {

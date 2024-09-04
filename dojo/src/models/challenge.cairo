@@ -69,8 +69,8 @@ pub struct Round {
 #[derive(Copy, Drop, Serde, Introspect)]
 struct Shot {
     // player input
-    hash: u64,          // hashed action (salt + action)
-    salt: u64,          // the player's secret salt
+    hash: u128,         // hashed action (salt + action)
+    salt: felt252,      // the player's secret salt
     action: u16,        // the player's chosen action(s) (paces, weapon, ...)
     // shot results
     chance_crit: u8,    // computed chances (1..100) - execution
