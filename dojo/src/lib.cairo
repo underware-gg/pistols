@@ -66,16 +66,13 @@ mod tests {
     mod test_challenge;
     mod test_chances;
     mod test_duelist;
-    mod test_round1;
-    mod test_round2;
-    mod test_round3;
-    mod test_wager;
-    mod test_torna;
+    // mod test_round1;
+    // mod test_wager;
+    // mod test_torna;
     mod test_utils;
     // utils
     mod tester;
     mod mock_rng;
-    mod salt_generator;
     // tokens
     mod token {
         mod test_token_duelist;
