@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x301ceb1e325561b80a7c8b49e71b09b062f79f0075a1d46ce00697db24771d2"
-original_class_hash = "0x301ceb1e325561b80a7c8b49e71b09b062f79f0075a1d46ce00697db24771d2"
+class_hash = "0x44f9d9a309813c3a312ebee5d5225bec9f728d96e336978a6a3101eef45477c"
+original_class_hash = "0x44f9d9a309813c3a312ebee5d5225bec9f728d96e336978a6a3101eef45477c"
 abi = "manifests/dev/base/abis/models/pistols-Round-617e0a3d.json"
 tag = "pistols-Round"
 qualified_path = "pistols::models::challenge::round"

@@ -393,27 +393,51 @@
     "name": "pistols::models::challenge::Shot",
     "members": [
       {
-        "name": "hash",
-        "type": "core::integer::u64"
-      },
-      {
         "name": "salt",
-        "type": "core::integer::u64"
+        "type": "core::felt252"
       },
       {
-        "name": "action",
-        "type": "core::integer::u16"
+        "name": "hash",
+        "type": "core::integer::u128"
       },
       {
-        "name": "chance_crit",
+        "name": "card_1",
         "type": "core::integer::u8"
       },
       {
-        "name": "chance_hit",
+        "name": "card_2",
         "type": "core::integer::u8"
       },
       {
-        "name": "chance_lethal",
+        "name": "card_3",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "card_4",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "initial_health",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "initial_damage",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "initial_chances",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "final_health",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "final_damage",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "final_chances",
         "type": "core::integer::u8"
       },
       {
@@ -421,19 +445,7 @@
         "type": "core::integer::u8"
       },
       {
-        "name": "dice_hit",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "damage",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "block",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "win",
+        "name": "honour",
         "type": "core::integer::u8"
       },
       {
@@ -441,11 +453,7 @@
         "type": "core::integer::u8"
       },
       {
-        "name": "health",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "honour",
+        "name": "win",
         "type": "core::integer::u8"
       }
     ]

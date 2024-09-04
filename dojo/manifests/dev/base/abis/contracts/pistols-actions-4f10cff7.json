@@ -297,6 +297,16 @@
   },
   {
     "type": "struct",
+    "name": "core::array::Span::<core::integer::u8>",
+    "members": [
+      {
+        "name": "snapshot",
+        "type": "@core::array::Array::<core::integer::u8>"
+      }
+    ]
+  },
+  {
+    "type": "struct",
     "name": "pistols::models::structs::SimulateChances",
     "members": [
       {
@@ -483,7 +493,7 @@
       },
       {
         "type": "function",
-        "name": "commit_action",
+        "name": "commit_moves",
         "inputs": [
           {
             "name": "duelist_id",
@@ -499,7 +509,7 @@
           },
           {
             "name": "hash",
-            "type": "core::integer::u64"
+            "type": "core::integer::u128"
           }
         ],
         "outputs": [],
@@ -507,7 +517,7 @@
       },
       {
         "type": "function",
-        "name": "reveal_action",
+        "name": "reveal_moves",
         "inputs": [
           {
             "name": "duelist_id",
@@ -523,15 +533,11 @@
           },
           {
             "name": "salt",
-            "type": "core::integer::u64"
+            "type": "core::felt252"
           },
           {
-            "name": "action_slot1",
-            "type": "core::integer::u8"
-          },
-          {
-            "name": "action_slot2",
-            "type": "core::integer::u8"
+            "name": "moves",
+            "type": "core::array::Span::<core::integer::u8>"
           }
         ],
         "outputs": [],
@@ -630,19 +636,19 @@
         "name": "simulate_chances",
         "inputs": [
           {
-            "name": "duelist_id",
+            "name": "_duelist_id",
             "type": "core::integer::u128"
           },
           {
-            "name": "duel_id",
+            "name": "_duel_id",
             "type": "core::integer::u128"
           },
           {
-            "name": "round_number",
+            "name": "_round_number",
             "type": "core::integer::u8"
           },
           {
-            "name": "action",
+            "name": "_action",
             "type": "core::integer::u8"
           }
         ],
@@ -655,59 +661,23 @@
       },
       {
         "type": "function",
-        "name": "get_valid_packed_actions",
+        "name": "get_player_full_deck",
         "inputs": [
           {
-            "name": "round_number",
-            "type": "core::integer::u8"
+            "name": "_table_id",
+            "type": "core::felt252"
           }
         ],
         "outputs": [
           {
-            "type": "core::array::Array::<core::integer::u16>"
+            "type": "core::array::Array::<core::array::Array::<core::integer::u8>>"
           }
         ],
         "state_mutability": "view"
       },
       {
         "type": "function",
-        "name": "pack_action_slots",
-        "inputs": [
-          {
-            "name": "slot1",
-            "type": "core::integer::u8"
-          },
-          {
-            "name": "slot2",
-            "type": "core::integer::u8"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "core::integer::u16"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "unpack_action_slots",
-        "inputs": [
-          {
-            "name": "packed",
-            "type": "core::integer::u16"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "(core::integer::u8, core::integer::u8)"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "validate_commit_message",
+        "name": "test_validate_commit_message",
         "inputs": [
           {
             "name": "account",

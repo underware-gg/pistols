@@ -1,6 +1,6 @@
 kind = "DojoContract"
-class_hash = "0x3ffcc24ab73ef2061bebbc70b3b2fb26339f7d30d0a882bfe945f5e4bdc1c1f"
-original_class_hash = "0x3ffcc24ab73ef2061bebbc70b3b2fb26339f7d30d0a882bfe945f5e4bdc1c1f"
+class_hash = "0x58521ca3dfa3188a791a456ee9cd573a0ee86dff64bec98755f7143f1e699ef"
+original_class_hash = "0x58521ca3dfa3188a791a456ee9cd573a0ee86dff64bec98755f7143f1e699ef"
 base_class_hash = "0x0"
 abi = "manifests/dev/base/abis/contracts/pistols-actions-4f10cff7.json"
 reads = []
@@ -8,8 +8,8 @@ writes = []
 init_calldata = []
 tag = "pistols-actions"
 systems = [
-    "commit_action",
-    "reveal_action",
+    "commit_moves",
+    "reveal_moves",
     "_emitDuelistRegisteredEvent",
     "_emitNewChallengeEvent",
     "_emitChallengeAcceptedEvent",
