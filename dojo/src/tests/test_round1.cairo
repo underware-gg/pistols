@@ -241,14 +241,14 @@
 //         let kill_chance_b = chances_b.crit_chances;
 
 //         // 1st commit
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
 //         let (challenge, round) = tester::get_Challenge_Round_Entity(world, duel_id);
 //         assert(challenge.round_number == 1, '1__challenge.round_number');
 //         assert(round.state == RoundState::Commit, '1__state');
 //         assert(round.shot_a.hash == hash_a, '1__hash');
 
 //         // 2nd commit > Reveal
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
 //         let (challenge, round) = tester::get_Challenge_Round_Entity(world, duel_id);
 //         assert(challenge.round_number == 1, '2__challenge.round_number');
 //         assert(round.state == RoundState::Reveal, '2__state');
@@ -256,7 +256,7 @@
 //         assert(round.shot_b.hash == hash_b, '2__hash');
 
 //         // 1st reveal
-//         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
+//         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
 //         let (challenge, round) = tester::get_Challenge_Round_Entity(world, duel_id);
 //         assert(challenge.round_number == 1, '3_challenge.round_number');
 //         assert(round.state == RoundState::Reveal, '3__state');
@@ -265,7 +265,7 @@
 //         assert(round.shot_a.action == action_a.into(), '3__action');
 
 //         // 2nd reveal > Finished
-//         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
+//         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
 //         let (challenge, round) = tester::get_Challenge_Round_Entity(world, duel_id);
 // // round.shot_a.health.print();
 // // round.shot_b.health.print();
@@ -328,10 +328,10 @@
 //         // Run same challenge to compute totals
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), WAGER_VALUE);
 //         // invert player order just for fun, expect same results!
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
-//         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
-//         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
+//         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
 //         let (challenge, round) = tester::get_Challenge_Round_Entity(world, duel_id);
 //         assert(challenge.state == ChallengeState::Resolved, '4_challenge.state');
 //         assert(challenge.winner != 0, '4_challenge.winner');
@@ -389,10 +389,10 @@
 //         tester::assert_balance(lords, TREASURY(), 0, 0, 0, 'balance_treasury_1');
 
 //         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(10, 10);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-//         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
-//         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
+//         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
 //         let (challenge, round) = tester::get_Challenge_Round_Entity(world, duel_id);
 // // round.shot_a.chance_crit.print();
 // // round.shot_b.chance_crit.print();
@@ -451,10 +451,10 @@
 //         tester::assert_balance(lords, TREASURY(), 0, 0, 0, 'balance_treasury_1');
 
 //         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(10, 10);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-//         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
-//         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
+//         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
 //         let (challenge, _round) = tester::get_Challenge_Round_Entity(world, duel_id);
 //         assert(challenge.state == ChallengeState::Draw, 'challenge.state');
 
@@ -475,10 +475,10 @@
 //         // duel!
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), WAGER_VALUE);
 //         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(10, 10);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-//         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
-//         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
+//         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
 //         let (challenge, _round) = tester::get_Challenge_Round_Entity(world, duel_id);
 //         assert(challenge.state == ChallengeState::Resolved, 'challenge.state');
 //         assert(challenge.winner == 1, 'challenge.winner');
@@ -496,10 +496,10 @@
 //         // duel!
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), WAGER_VALUE);
 //         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(10, 10);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-//         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
-//         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
+//         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
 //         let (challenge, _round) = tester::get_Challenge_Round_Entity(world, duel_id);
 //         assert(challenge.state == ChallengeState::Resolved, 'challenge.state');
 //         assert(challenge.winner == 2, 'challenge.winner');
@@ -510,10 +510,10 @@
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), WAGER_VALUE);
 //         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(9, 10);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-//         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
-//         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
+//         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
 //         let (challenge, round) = tester::get_Challenge_Round_Entity(world, duel_id);
 //         assert(challenge.state == ChallengeState::Resolved, 'challenge.state');
 //         assert(challenge.winner == 1, 'challenge.winner');
@@ -528,10 +528,10 @@
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), WAGER_VALUE);
 //         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(10, 9);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-//         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
-//         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
+//         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
 //         let (challenge, round) = tester::get_Challenge_Round_Entity(world, duel_id);
 //         assert(challenge.state == ChallengeState::Resolved, 'challenge.state');
 //         assert(challenge.winner == 2, 'challenge.winner');
@@ -546,10 +546,10 @@
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), WAGER_VALUE);
 //         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_hit(3, 3);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-//         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
-//         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
+//         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
 //         let (challenge, _round) = tester::get_Challenge_Round_Entity(world, duel_id);
 //         assert(challenge.state == ChallengeState::InProgress, 'challenge.state');
 //         assert(challenge.round_number == 2, 'round2.round_number');
@@ -570,10 +570,10 @@
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), WAGER_VALUE);
 //         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_hit(3, 2);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-//         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
-//         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
+//         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
 //         let (challenge, _round) = tester::get_Challenge_Round_Entity(world, duel_id);
 //         assert(challenge.state == ChallengeState::InProgress, 'challenge.state');
 //         let round1 = tester::get_RoundEntity(world, duel_id, 1);
@@ -586,10 +586,10 @@
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), WAGER_VALUE);
 //         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_hit(2, 3);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-//         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
-//         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
+//         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
 //         let (challenge, _round) = tester::get_Challenge_Round_Entity(world, duel_id);
 //         assert(challenge.state == ChallengeState::InProgress, 'challenge.state');
 //         let round1 = tester::get_RoundEntity(world, duel_id, 1);
@@ -605,10 +605,10 @@
 //     //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //     //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), WAGER_VALUE);
 //     //         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_hit_find(3, 3, salt);
-//     //         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
-//     //         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-//     //         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
-//     //         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
+//     //         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
+//     //         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
+//     //         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
+//     //         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
 //     //         let (challenge, _round) = tester::get_Challenge_Round_Entity(world, duel_id);
 //     //         let round1 = tester::get_RoundEntity(world, duel_id, 1);
 //     //         if (
@@ -629,10 +629,10 @@
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
 //         let hash_a: u64 = make_action_hash(0x111, 0);
 //         let hash_b: u64 = make_action_hash(0x222, 11);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-//         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, 0x111, 0, 0);
-//         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, 0x222, 11, 0);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, 0x111, 0, 0);
+//         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, 0x222, 11, 0);
 //         let round = tester::get_RoundEntity(world, duel_id, 1);
 //         assert(round.shot_a.action == 10, 'action_0');
 //         assert(round.shot_b.action == 10, 'action_11');
@@ -652,17 +652,17 @@
 //         // let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
 //         // let hash_a: u64 = make_action_hash(0x111, 10);
 //         // let hash_b: u64 = make_action_hash(0x222, 1);
-//         // tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
-//         // tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-//         // tester::execute_reveal_action(actions, OWNER(), duel_id, 1, 0x111, 10, 0);
+//         // tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
+//         // tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
+//         // tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, 0x111, 10, 0);
 
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), WAGER_VALUE);
 //         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(9, 10);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-//         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
-//         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
+//         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
 //         let (challenge, _round) = tester::get_Challenge_Round_Entity(world, duel_id);
 //         assert(challenge.state == ChallengeState::Resolved, 'challenge.state');
 
@@ -695,7 +695,7 @@
 //         // try to commmit with another account
 //         let someone_else: ContractAddress = starknet::contract_address_const::<0x999>();
 //         let hash: u64 = make_action_hash(0x12121, 0x1);
-//         tester::execute_commit_action(actions, someone_else, duel_id, 1, hash);
+//         tester::execute_commit_moves(actions, someone_else, duel_id, 1, hash);
 //     }
 
 //     #[test]
@@ -705,7 +705,7 @@
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
 //         // try to commmit with another account
 //         let hash: u64 = make_action_hash(0x12121, 0x1);
-//         tester::execute_commit_action(actions, FAKE_OWNER_1_1(), duel_id, 1, hash);
+//         tester::execute_commit_moves(actions, FAKE_OWNER_1_1(), duel_id, 1, hash);
 //     }
 
 //     #[test]
@@ -714,7 +714,7 @@
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
 //         let hash: u64 = make_action_hash(0x12121, 0x1);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 2, hash);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 2, hash);
 //     }
 
 //     #[test]
@@ -723,8 +723,8 @@
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
 //         let (_salt_a, _salt_b, _action_a, _action_b, hash_a, _hash_b) = _get_actions_round_1_resolved();
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
 //     }
 //     #[test]
 //     #[should_panic(expected:('PISTOLS: Already committed', 'ENTRYPOINT_FAILED'))]
@@ -732,8 +732,8 @@
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
 //         let (_salt_a, _salt_b, _action_a, _action_b, _hash_a, hash_b) = _get_actions_round_1_resolved();
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
 //     }
 
 //     #[test]
@@ -742,10 +742,10 @@
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
 //         let (salt_a, _salt_b, action_a, _action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-//         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
-//         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
+//         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
 //     }
 //     #[test]
 //     #[should_panic(expected:('PISTOLS: Already revealed', 'ENTRYPOINT_FAILED'))]
@@ -753,10 +753,10 @@
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
 //         let (_salt_a, salt_b, _action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-//         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
-//         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
+//         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
 //     }
 
 //     #[test]
@@ -765,9 +765,9 @@
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
 //         let (_salt_a, _salt_b, _action_a, _action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
 //     }
 
 //     #[test]
@@ -776,8 +776,8 @@
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
 //         let (_salt_a, salt_b, _action_a, action_b, _hash_a, hash_b) = _get_actions_round_1_resolved();
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-//         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
 //     }
 
 //     #[test]
@@ -786,7 +786,7 @@
 //         let (_world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let duel_id: u128 = tester::execute_create_challenge(actions, OWNER(), OTHER(), MESSAGE_1, TABLE_ID, 0, 48);
 //         let (_salt_a, _salt_b, _action_a, _action_b, _hash_a, hash_b) = _get_actions_round_1_resolved();
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_b);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_b);
 //     }
 
 //     #[test]
@@ -795,11 +795,11 @@
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
 //         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
-//         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
-//         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
+//         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
 //     }
 
 //     #[test]
@@ -808,11 +808,11 @@
 //         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::APPROVE);
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
 //         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_resolved();
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
-//         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
-//         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
-//         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
+//         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
+//         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
 //     }
 
 //     #[test]
@@ -822,9 +822,9 @@
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
 //         let hash_a: u64 = make_action_hash(0x111, 1);
 //         let hash_b: u64 = make_action_hash(0x222, 1);
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_a);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_b);
-//         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, 0x111, 2, 0);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_a);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_b);
+//         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, 0x111, 2, 0);
 //     }
 //     #[test]
 //     #[should_panic(expected:('PISTOLS: Action hash mismatch', 'ENTRYPOINT_FAILED'))]
@@ -833,9 +833,9 @@
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
 //         let hash_a: u64 = make_action_hash(0x111, 1);
 //         let hash_b: u64 = make_action_hash(0x222, 1);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_b);
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_a);
-//         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, 0x1111, 1, 0);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_b);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_a);
+//         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, 0x1111, 1, 0);
 //     }
 
 //     #[test]
@@ -845,9 +845,9 @@
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
 //         let hash_a: u64 = make_action_hash(0x111, 1);
 //         let hash_b: u64 = make_action_hash(0x222, 1);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_b);
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_a);
-//         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, 0x222, 2, 0);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_b);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_a);
+//         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, 0x222, 2, 0);
 //     }
 //     #[test]
 //     #[should_panic(expected:('PISTOLS: Action hash mismatch', 'ENTRYPOINT_FAILED'))]
@@ -856,9 +856,9 @@
 //         let (_challenge, _round, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), 0);
 //         let hash_a: u64 = make_action_hash(0x111, 1);
 //         let hash_b: u64 = make_action_hash(0x222, 1);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_b);
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_a);
-//         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, 0x2222, 1, 0);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_b);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_a);
+//         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, 0x2222, 1, 0);
 //     }
 
 // }

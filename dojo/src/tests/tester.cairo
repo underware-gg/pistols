@@ -355,16 +355,16 @@ mod tester {
         _next_block();
         (new_state)
     }
-    fn execute_commit_action(system: IActionsDispatcher, sender: ContractAddress,
+    fn execute_commit_moves(system: IActionsDispatcher, sender: ContractAddress,
         duel_id: u128,
         round_number: u8,
         hash: u64,
     ) {
         impersonate(sender);
-        system.commit_action(ID(sender), duel_id, round_number, hash);
+        system.commit_moves(ID(sender), duel_id, round_number, hash);
         _next_block();
     }
-    fn execute_reveal_action(system: IActionsDispatcher, sender: ContractAddress,
+    fn execute_reveal_moves(system: IActionsDispatcher, sender: ContractAddress,
         duel_id: u128,
         round_number: u8,
         salt: u64,
@@ -372,7 +372,7 @@ mod tester {
         slot2: u8,
     ) {
         impersonate(sender);
-        system.reveal_action(ID(sender), duel_id, round_number, salt, slot1, slot2);
+        system.reveal_moves(ID(sender), duel_id, round_number, salt, slot1, slot2);
         _next_block();
     }
 

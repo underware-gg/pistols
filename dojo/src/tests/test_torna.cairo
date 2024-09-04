@@ -112,10 +112,10 @@
 //         // duel to the death!
 //         let (_challenge, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), TABLE_ID);
 //         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(10, 1);
-//         tester::execute_commit_action(actions, OWNER(), duel_id, 1, hash_a);
-//         tester::execute_commit_action(actions, OTHER(), duel_id, 1, hash_b);
-//         tester::execute_reveal_action(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
-//         tester::execute_reveal_action(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
+//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
+//         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
 //         let (challenge, _round) = tester::get_Challenge_Round_Entity(world, duel_id);
 //         assert(challenge.state != ChallengeState::InProgress, 'challenge.state');
 //         //

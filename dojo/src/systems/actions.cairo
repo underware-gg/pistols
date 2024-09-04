@@ -44,14 +44,14 @@ trait IActions {
 
     //
     // Duel
-    fn commit_action(
+    fn commit_moves(
         ref world: IWorldDispatcher,
         duelist_id: u128,
         duel_id: u128,
         round_number: u8,
         hash: u64,
     );
-    fn reveal_action(
+    fn reveal_moves(
         ref world: IWorldDispatcher,
         duelist_id: u128,
         duel_id: u128,
@@ -410,17 +410,17 @@ mod actions {
         // COMMIT Duel action
         //
 
-        fn commit_action(ref world: IWorldDispatcher,
+        fn commit_moves(ref world: IWorldDispatcher,
             duelist_id: u128,
             duel_id: u128,
             round_number: u8,
             hash: u64,
         ) {
             let store: Store = StoreTrait::new(world);
-            shooter::commit_action(store, duelist_id, duel_id, round_number, hash);
+            shooter::commit_moves(store, duelist_id, duel_id, round_number, hash);
         }
 
-        fn reveal_action(ref world: IWorldDispatcher,
+        fn reveal_moves(ref world: IWorldDispatcher,
             duelist_id: u128,
             duel_id: u128,
             round_number: u8,
@@ -429,7 +429,7 @@ mod actions {
             action_slot2: u8,
         ) {
             let store: Store = StoreTrait::new(world);
-            let challenge: Challenge = shooter::reveal_action(store, duelist_id, duel_id, round_number, salt, utils::pack_action_slots(action_slot1, action_slot2));
+            let challenge: Challenge = shooter::reveal_moves(store, duelist_id, duel_id, round_number, salt, utils::pack_action_slots(action_slot1, action_slot2));
 
             // undo pact if finished
             if (challenge.state.is_finished()) {

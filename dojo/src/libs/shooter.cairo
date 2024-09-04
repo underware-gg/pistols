@@ -42,7 +42,7 @@ mod shooter {
     //-----------------------------------
     // Commit
     //
-    fn commit_action(store: Store, duelist_id: u128, duel_id: u128, round_number: u8, hash: u64) {
+    fn commit_moves(store: Store, duelist_id: u128, duel_id: u128, round_number: u8, hash: u64) {
         // Assert correct Challenge
         let (_challenge, duelist_number) = _assert_challenge(store, starknet::get_caller_address(), duelist_id, duel_id, round_number);
 
@@ -72,7 +72,7 @@ mod shooter {
     //-----------------------------------
     // Reveal
     //
-    fn reveal_action(store: Store, duelist_id: u128, duel_id: u128, round_number: u8, salt: u64, mut packed: u16) -> Challenge {
+    fn reveal_moves(store: Store, duelist_id: u128, duel_id: u128, round_number: u8, salt: u64, mut packed: u16) -> Challenge {
         // Assert correct Challenge
         let (mut challenge, duelist_number) = _assert_challenge(store, starknet::get_caller_address(), duelist_id, duel_id, round_number);
 

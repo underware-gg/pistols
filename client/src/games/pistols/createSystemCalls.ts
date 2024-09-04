@@ -165,14 +165,14 @@ export function createSystemCalls(
     return await _executeTransaction(signer, actions_call('reply_challenge', reply_args))
   }
 
-  const commit_action = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, round_number: number, hash: BigNumberish): Promise<boolean> => {
+  const commit_moves = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, round_number: number, hash: BigNumberish): Promise<boolean> => {
     const args = [duelist_id, duel_id, round_number, hash]
-    return await _executeTransaction(signer, actions_call('commit_action', args))
+    return await _executeTransaction(signer, actions_call('commit_moves', args))
   }
 
-  const reveal_action = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, round_number: number, salt: BigNumberish, action1: number, action2: number): Promise<boolean> => {
+  const reveal_moves = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, round_number: number, salt: BigNumberish, action1: number, action2: number): Promise<boolean> => {
     const args = [duelist_id, duel_id, round_number, salt, action1, action2]
-    return await _executeTransaction(signer, actions_call('reveal_action', args))
+    return await _executeTransaction(signer, actions_call('reveal_moves', args))
   }
 
   const grant_admin = async (signer: AccountInterface, address: BigNumberish, granted: boolean): Promise<boolean> => {
@@ -305,8 +305,8 @@ export function createSystemCalls(
     update_duelist,
     create_challenge,
     reply_challenge,
-    commit_action,
-    reveal_action,
+    commit_moves,
+    reveal_moves,
     // read-only calls
     get_pact,
     has_pact,

@@ -7,7 +7,7 @@ import { signAndRestoreActionFromHash } from '../utils/salt'
 import { feltToString } from '@/lib/utils/starknet'
 
 export function useRevealAction(duelId: bigint, roundNumber: number, hash: bigint, enabled: boolean) {
-  const { reveal_action } = useDojoSystemCalls()
+  const { reveal_moves } = useDojoSystemCalls()
   const { account, chainId } = useAccount()
   const { duelistId } = useSettings()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -23,7 +23,7 @@ export function useRevealAction(duelId: bigint, roundNumber: number, hash: bigin
       const { salt, packed, slot1, slot2 } = await signAndRestoreActionFromHash(account, feltToString(chainId), duelistId, duelId, roundNumber, hash, validPackedActions)
       if (packed != null && slot1 != null && slot2 != null && !isSubmitting) {
         setIsSubmitting(true)
-        await reveal_action(account, duelistId, duelId, roundNumber, salt, slot1, slot2)
+        await reveal_moves(account, duelistId, duelId, roundNumber, salt, slot1, slot2)
         setIsSubmitting(false)
       }
     }
