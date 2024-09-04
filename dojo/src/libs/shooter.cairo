@@ -7,15 +7,14 @@ mod shooter {
 
     use pistols::systems::actions::actions::{Errors};
     use pistols::libs::utils;
-    use pistols::models::challenge::{Challenge, Snapshot, SnapshotEntity, Round, RoundEntity, Shot, ShotTrait, PlayerHand};
+    use pistols::models::challenge::{Challenge, Snapshot, SnapshotEntity, Round, RoundEntity, Shot, ShotTrait};
     use pistols::models::duelist::{Duelist, Score};
     use pistols::models::table::{TableConfig, TableConfigEntity, TableType};
     use pistols::types::constants::{CONST};
     use pistols::types::challenge::{ChallengeState};
     use pistols::types::round::{RoundState};
-    use pistols::types::action::{Action, ACTION, ActionTrait};
+    use pistols::types::cards::hand::{PlayerHand};
     use pistols::utils::math::{MathU8, MathU16};
-    use pistols::utils::arrays::{SpanTrait};
     use pistols::libs::store::{Store, StoreTrait};
 
     fn _assert_challenge(store: Store, caller: ContractAddress, duelist_id: u128, duel_id: u128, round_number: u8) -> (Challenge, u8) {
@@ -35,6 +34,7 @@ mod shooter {
         // Correct Challenge state
         assert(challenge.state == ChallengeState::InProgress, Errors::CHALLENGE_NOT_IN_PROGRESS);
         assert(challenge.round_number == round_number, Errors::INVALID_ROUND_NUMBER);
+        assert(round_number <= CONST::ROUND_COUNT, Errors::INVALID_ROUND_NUMBER);
         
         (challenge, duelist_number)
     }
@@ -97,19 +97,11 @@ mod shooter {
         if (duelist_number == 1) {
             assert(round.shot_a.card_1 == 0, Errors::ALREADY_REVEALED);
             assert(round.shot_a.hash == hash, Errors::ACTION_HASH_MISMATCH);
-            round.shot_a.salt = salt;
-            round.shot_a.card_1 = *moves[0];
-            round.shot_a.card_2 = *moves[1];
-            round.shot_a.card_3 = moves.value_or_zero(2);
-            round.shot_a.card_4 = moves.value_or_zero(3);
+            round.shot_a.initialize(salt, moves);
         } else if (duelist_number == 2) {
             assert(round.shot_b.card_1 == 0, Errors::ALREADY_REVEALED);
             assert(round.shot_b.hash == hash, Errors::ACTION_HASH_MISMATCH);
-            round.shot_b.salt = salt;
-            round.shot_b.card_1 = *moves[0];
-            round.shot_b.card_2 = *moves[1];
-            round.shot_b.card_3 = moves.value_or_zero(2);
-            round.shot_b.card_4 = moves.value_or_zero(3);
+            round.shot_b.initialize(salt, moves);
         }
 
         // incomplete Round, update only
@@ -137,8 +129,8 @@ mod shooter {
         let hand_a: PlayerHand = round.shot_a.as_hand();
         let hand_b: PlayerHand = round.shot_b.as_hand();
 
-        round.shot_a.apply_honour(hand_a.action_1);
-        round.shot_b.apply_honour(hand_b.action_1);
+        round.shot_a.apply_honour(hand_a.card_paces);
+        round.shot_b.apply_honour(hand_b.card_paces);
 
         //
         // TODO
@@ -205,14 +197,14 @@ mod shooter {
     //     (executed_a || executed_b)
     // }
 
-    #[inline(always)]
-    fn apply_damage(ref attack: Shot, ref defense: Shot) {
-        defense.health = MathU8::sub(defense.health, MathU8::sub(defense.damage, defense.block));
-        if (defense.health == 0) {
-            attack.win = 1;
-            attack.wager = 1;
-        }
-    }
+    // #[inline(always)]
+    // fn apply_damage(ref attack: Shot, ref defense: Shot) {
+    //     defense.health = MathU8::sub(defense.health, MathU8::sub(defense.damage, defense.block));
+    //     if (defense.health == 0) {
+    //         attack.win = 1;
+    //         attack.wager = 1;
+    //     }
+    // }
 
     // // executes single attack
     // // returns true if ended in execution
@@ -253,86 +245,3 @@ mod shooter {
 
 }
 
-
-
-
-
-
-//------------------------------------------------------
-// Unit tests
-//
-#[cfg(test)]
-mod tests {
-    use debug::PrintTrait;
-    use core::traits::{Into, TryInto};
-
-    use pistols::libs::shooter::{shooter};
-    use pistols::models::challenge::{Shot};
-    use pistols::models::init::{init};
-    use pistols::types::action::{Action, ACTION};
-    use pistols::types::constants::{CONST};
-
-    #[test]
-    fn test_apply_damage() {
-        let mut attack = init::Shot();
-        let mut defense = init::Shot();
-        // damages
-        attack.win = 0;
-        defense.health = 3;
-        defense.damage = 1;
-        shooter::apply_damage(ref attack, ref defense);
-        assert(defense.health == 2, '3-1');
-        assert(attack.win == 0, '3-1_win');
-        shooter::apply_damage(ref attack, ref defense);
-        assert(defense.health == 1, '2-1');
-        assert(attack.win == 0, '2-1_win');
-        shooter::apply_damage(ref attack, ref defense);
-        assert(defense.health == 0, '1-1');
-        assert(attack.win == 1, '1-1_win');
-        shooter::apply_damage(ref attack, ref defense);
-        assert(defense.health == 0, '0-1');
-        // overflow
-        attack.win = 0;
-        defense.health = 1;
-        defense.damage = 3;
-        shooter::apply_damage(ref attack, ref defense);
-        assert(defense.health == 0, '1-3');
-        assert(attack.win == 1, '1-3_win');
-        // blocks
-        attack.win = 0;
-        defense.health = 1;
-        defense.damage = 0;
-        defense.block = 1;
-        shooter::apply_damage(ref attack, ref defense);
-        assert(defense.health == 1, '1-0+1');
-        assert(attack.win == 0, '1-0+1_win');
-        attack.win = 0;
-        defense.health = 1;
-        defense.damage = 1;
-        defense.block = 1;
-        shooter::apply_damage(ref attack, ref defense);
-        assert(defense.health == 1, '1-1+1');
-        assert(attack.win == 0, '1-1+1_win');
-        attack.win = 0;
-        defense.health = 1;
-        defense.damage = 2;
-        defense.block = 1;
-        shooter::apply_damage(ref attack, ref defense);
-        assert(defense.health == 0, '1-2+1');
-        assert(attack.win == 1, '1-2+1_win');
-        attack.win = 0;
-        defense.health = 2;
-        defense.damage = 4;
-        defense.block = 1;
-        shooter::apply_damage(ref attack, ref defense);
-        assert(defense.health == 0, '2-4+1');
-        assert(attack.win == 1, '2-4+1_win');
-        attack.win = 0;
-        defense.health = 1;
-        defense.damage = 2;
-        defense.block = 5;
-        shooter::apply_damage(ref attack, ref defense);
-        assert(defense.health == 1, '1-2+5');
-        assert(attack.win == 0, '1-2+5_win');
-    }
-}

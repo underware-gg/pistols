@@ -252,9 +252,9 @@ export function createSystemCalls(
     }, {})
   }
 
-  const get_valid_cards = async (round_number: number): Promise<number[] | null> => {
+  const get_player_full_deck = async (round_number: number): Promise<number[] | null> => {
     const args = [round_number]
-    const results = await _executeCall<any>(actions_call('get_valid_cards', args))
+    const results = await _executeCall<any>(actions_call('get_player_full_deck', args))
     return results !== null ? results.map(v => Number(v)) : null
   }
 
@@ -303,7 +303,7 @@ export function createSystemCalls(
     can_join,
     calc_fee,
     simulate_chances,
-    get_valid_cards,
+    get_player_full_deck,
     //
     // DUELISTS
     can_mint,

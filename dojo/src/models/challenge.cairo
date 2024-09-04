@@ -69,57 +69,64 @@ pub struct Round {
 #[derive(Copy, Drop, Serde, IntrospectPacked)]
 struct Shot {
     // player input
-    hash: u128,         // hashed moves (salt + moves)
     salt: felt252,      // the player's secret salt
+    hash: u128,         // hashed moves (salt + moves)
     card_1: u8,         // card choice
     card_2: u8,         // card choice
     card_3: u8,         // card choice
     card_4: u8,         // card choice
-    // shot results
-    chance_crit: u8,    // computed chances (1..100) - execution
-    chance_hit: u8,     // computed chances (1..100) - hit / normal damage
-    chance_lethal: u8,  // computed chances (1..100) - hit / double damage
-    dice_crit: u8,      // dice roll result (1..100) - execution
-    dice_hit: u8,       // dice roll result (1..100) - hit / normal damage
-    damage: u8,         // amount of health taken
-    block: u8,          // amount of damage blocked
-    win: u8,            // wins the round
-    wager: u8,          // wins the wager
-    // player state
-    health: u8,         // final health
+    // initial state
+    initial_health: u8,     // CONST::FULL_HEALTH
+    initial_damage: u8,     // CONST::INITIAL_CHANCE
+    initial_chances: u8,    // 0-100
+    // final states
+    final_health: u8,
+    final_damage: u8,
+    final_chances: u8,
+    // results
+    dice_crit: u8,      // 0-100
     honour: u8,         // honour granted
-} // 232 bits
+    wager: u8,          // won the wager?
+    win: u8,            // won the round?
+} // [f] + [128 + 112(14*8)]:240
 
 
 
 //------------------------------------
 // Traits
 //
-use pistols::types::action::{Action, ActionTrait};
+use pistols::types::cards::hand::{PlayerHand, PacesCard, PacesCardTrait};
+use pistols::utils::arrays::{SpanTrait};
 use pistols::utils::math::{MathU8};
-
-#[derive(Copy, Drop)]
-struct PlayerHand {
-    action_1: Action,
-    action_2: Action,
-    action_3: Action,
-    action_4: Action,
-}
+use pistols::types::constants::{CONST};
 
 #[generate_trait]
 impl ShotImpl of ShotTrait {
+    fn initialize(ref self: Shot, salt: felt252, moves: Span<u8>) {
+        self.salt = salt;
+        self.card_1 = moves.value_or_zero(0);
+        self.card_2 = moves.value_or_zero(1);
+        self.card_3 = moves.value_or_zero(2);
+        self.card_4 = moves.value_or_zero(3);
+        self.initial_health = CONST::FULL_HEALTH;
+        self.initial_damage = CONST::INITIAL_DAMAGE;
+        self.initial_chances = CONST::INITIAL_CHANCE;
+        self.final_health = self.initial_health;
+        self.final_damage = self.initial_damage;
+        self.final_chances = self.initial_chances;
+    }
     fn as_hand(self: @Shot) -> PlayerHand {
         (PlayerHand {
-            action_1: (*self.card_1).into(),
-            action_2: (*self.card_2).into(),
-            action_3: (*self.card_3).into(),
-            action_4: (*self.card_4).into(),
+            card_paces: (*self.card_1).into(),
+            card_dodge: (*self.card_2).into(),
+            card_tactics: (*self.card_3).into(),
+            card_blades: (*self.card_4).into(),
         })
     }
-    fn apply_honour(ref self: Shot, action: Action) {
-        let action_honour: i8 = action.honour();
-        if (action_honour >= 0) {
-            self.honour = MathU8::abs(action_honour);
+    fn apply_honour(ref self: Shot, card: PacesCard) {
+        let honour: u8 = card.honour();
+        if (honour >= 0) {
+            self.honour = honour;
         }
     }
 }

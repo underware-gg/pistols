@@ -26,8 +26,8 @@ mod SELECTORS {
 
 #[generate_trait]
 impl WorldSystemsTraitImpl of WorldSystemsTrait {
-    fn contract_address(self: IWorldDispatcher, selector: felt252) -> ContractAddress {
-        if let Resource::Contract((_, contract_address)) = self.resource(selector) {
+    fn contract_address(self: @IWorldDispatcher, selector: felt252) -> ContractAddress {
+        if let Resource::Contract((_, contract_address)) = (*self).resource(selector) {
             (contract_address)
         } else {
             (ZERO())
@@ -36,31 +36,31 @@ impl WorldSystemsTraitImpl of WorldSystemsTrait {
 
     //
     // system addresses
-    fn token_duelist_address(self: IWorldDispatcher) -> ContractAddress {
+    fn token_duelist_address(self: @IWorldDispatcher) -> ContractAddress {
         (self.contract_address(SELECTORS::TOKEN_DUELIST))
     }
 
     //
     // dispatchers
-    fn admin_dispatcher(self: IWorldDispatcher) -> IAdminDispatcher {
+    fn admin_dispatcher(self: @IWorldDispatcher) -> IAdminDispatcher {
         (IAdminDispatcher{ contract_address: self.contract_address(SELECTORS::ADMIN) })
     }
-    fn actions_dispatcher(self: IWorldDispatcher) -> IActionsDispatcher {
+    fn actions_dispatcher(self: @IWorldDispatcher) -> IActionsDispatcher {
         (IActionsDispatcher{ contract_address: self.contract_address(SELECTORS::ACTIONS) })
     }
-    fn rng_dispatcher(self: IWorldDispatcher) -> IRngDispatcher {
+    fn rng_dispatcher(self: @IWorldDispatcher) -> IRngDispatcher {
         (IRngDispatcher{ contract_address: self.contract_address(SELECTORS::RNG) })
     }
-    fn minter_dispatcher(self: IWorldDispatcher) -> IMinterDispatcher {
+    fn minter_dispatcher(self: @IWorldDispatcher) -> IMinterDispatcher {
         (IMinterDispatcher{ contract_address: self.contract_address(SELECTORS::MINTER) })
     }
-    fn token_duelist_dispatcher(self: IWorldDispatcher) -> ITokenDuelistDispatcher {
+    fn token_duelist_dispatcher(self: @IWorldDispatcher) -> ITokenDuelistDispatcher {
         (ITokenDuelistDispatcher{ contract_address: self.contract_address(SELECTORS::TOKEN_DUELIST) })
     }
 
     //
     // validators
-    fn is_minter_contract(self: IWorldDispatcher, address: ContractAddress) -> bool {
+    fn is_minter_contract(self: @IWorldDispatcher, address: ContractAddress) -> bool {
         (address == self.contract_address(SELECTORS::MINTER))
     }
 }

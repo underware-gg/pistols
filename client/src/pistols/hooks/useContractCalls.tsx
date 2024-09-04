@@ -53,11 +53,11 @@ export const useSimulateChances = (address: BigNumberish, duelId: bigint, roundN
 }
 
 export const useGetValidPackedActions = (roundNumber: number) => {
-  const { get_valid_cards } = useDojoSystemCalls()
+  const { get_player_full_deck } = useDojoSystemCalls()
   const args = useMemo(() => [roundNumber], [roundNumber])
   const enabled = useMemo(() => Boolean(roundNumber), [roundNumber])
   const { value, isPending } = useContractCall({
-    call: get_valid_cards,
+    call: get_player_full_deck,
     args,
     enabled,
     defaultValue: [],

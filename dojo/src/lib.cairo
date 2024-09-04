@@ -30,12 +30,19 @@ mod models {
 }
 
 mod types {
-    mod action;
+    // mod action;
     mod challenge;
     mod constants;
     mod events;
     mod round;
     mod typed_data;
+    mod cards {
+        mod hand;
+        mod paces;
+        mod tactics;
+        mod blades;
+        mod env;
+    }
 }
 
 mod utils {
@@ -61,7 +68,6 @@ mod mocks {
 #[cfg(test)]
 mod tests {
     // pistols
-    mod test_action;
     mod test_admin;
     mod test_challenge;
     mod test_chances;

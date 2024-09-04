@@ -48,14 +48,14 @@ struct Dice {
 
 #[generate_trait]
 impl DiceImpl of DiceTrait {
-    fn new(world: IWorldDispatcher, initial_seed: u128) -> Dice {
+    fn new(world: @IWorldDispatcher, initial_seed: u128) -> Dice {
         (Dice {
             rng: world.rng_dispatcher(),
             seed: initial_seed,
         })
     }
 
-    fn throw_dice(ref self: Dice, salt: felt252, faces: u8) -> u8 {
+    fn throw(ref self: Dice, salt: felt252, faces: u8) -> u8 {
         assert(faces <= 255, 'RNG_DICE: too many faces');
         self.seed = self.rng.reseed(self.seed, salt);
         let result: u8 = ((self.seed % faces.into()) + 1).try_into().unwrap();
@@ -63,4 +63,9 @@ impl DiceImpl of DiceTrait {
         (result)
     }
 
+    fn decide(ref self: Dice, salt: felt252, faces: u8, chances: u8) -> (u8, bool) {
+        let dice: u8 = self.throw(salt, faces);
+        let result: bool = (dice <= chances);
+        (dice, result)
+    }
 }

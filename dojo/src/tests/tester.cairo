@@ -21,7 +21,6 @@ mod tester {
     };
     use pistols::types::challenge::{ChallengeState};
     use pistols::types::constants::{CONST};
-    use pistols::types::action::{Action};
     use pistols::utils::short_string::{ShortString};
     use pistols::interfaces::systems::{SELECTORS};
 

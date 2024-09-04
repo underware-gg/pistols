@@ -635,7 +635,7 @@
 //         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, 0x222, 11, 0);
 //         let round = tester::get_RoundEntity(world, duel_id, 1);
 //         assert(round.shot_a.action == 10, 'action_0');
-//         assert(round.shot_b.action == 10, 'action_11');
+//         assert(round.shot_b.action == 10, 'card_paces1');
 //         assert(round.shot_a.chance_crit > 0, 'shot_a.chance_crit');
 //         assert(round.shot_b.chance_crit > 0, 'shot_b.chance_crit');
 //         assert(round.shot_a.dice_crit > 0, 'shot_a.dice_crit');

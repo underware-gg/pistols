@@ -15,7 +15,7 @@ use pistols::models::config::{Config, ConfigEntity};
 use pistols::models::init::{init};
 use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round::{RoundState, RoundStateTrait};
-use pistols::types::action::{Action, ActionTrait, ACTION};
+use pistols::types::cards::hand::{PacesCard, PacesCardTrait};
 use pistols::types::constants::{CONST, HONOUR, CHANCES};
 use pistols::utils::math::{MathU8, MathU16, MathU64};
 use pistols::utils::bitwise::{BitwiseU32, BitwiseU64, BitwiseU128};
@@ -201,42 +201,6 @@ fn split_wager_fees(store: Store, challenge: Challenge, address_a: ContractAddre
     (wager.value)
 }
 
-//------------------------
-// Action validators
-//
-
-// Validate possible actions, exposed to system
-fn get_valid_cards(table_id: felt252) -> Array<Array<u8>> {
-    let paces: Array<u8> = array![
-        Action::Paces1.into(),
-        Action::Paces2.into(),
-        Action::Paces3.into(),
-        Action::Paces4.into(),
-        Action::Paces5.into(),
-        Action::Paces6.into(),
-        Action::Paces7.into(),
-        Action::Paces8.into(),
-        Action::Paces9.into(),
-        Action::Paces10.into(),
-    ];
-    let dodge: Array<u8> = array![
-        Action::Paces1.into(),
-        Action::Paces2.into(),
-        Action::Paces3.into(),
-        Action::Paces4.into(),
-        Action::Paces5.into(),
-        Action::Paces6.into(),
-        Action::Paces7.into(),
-        Action::Paces8.into(),
-        Action::Paces9.into(),
-        Action::Paces10.into(),
-    ];
-    (array![
-        paces,
-        dodge,
-    ])
-}
-
 
 //------------------------
 // Challenge setter
@@ -250,28 +214,12 @@ fn set_challenge(store: Store, challenge: Challenge) {
         // transfer wager/fee back to challenger
         withdraw_wager_fees(store, challenge, challenge.address_a);
     } else if (challenge.state == ChallengeState::InProgress) {
-        let mut shot_a = init::Shot();
-        let mut shot_b = init::Shot();
-
-        if (challenge.round_number == 1) {
-            // Round 1 starts with full health
-            shot_a.health = CONST::FULL_HEALTH;
-            shot_b.health = CONST::FULL_HEALTH;
-        } else {
-            // Round 2+ need to copy previous Round's state
-            let prev_round: RoundEntity = store.get_round_entity(challenge.duel_id, challenge.round_number - 1);
-            shot_a.health = prev_round.shot_a.health;
-            shot_b.health = prev_round.shot_b.health;
-            shot_a.honour = prev_round.shot_a.honour;
-            shot_b.honour = prev_round.shot_b.honour;
-        }
-
         let new_round = Round {
             duel_id: challenge.duel_id,
             round_number: challenge.round_number,
             state: RoundState::Commit,
-            shot_a,
-            shot_b,
+            shot_a: init::Shot(),
+            shot_b: init::Shot(),
         };
         store.set_round(@new_round);
     } else if (challenge.state.is_finished()) {
@@ -388,144 +336,29 @@ fn _average_trickster(new_level: u8, current_level: u8) -> u8 {
 }
 
 
+
+
+
 //------------------------
-// Chances
+// Randomizer
 //
 
-// crit bonus will be applied for Lords only
-fn calc_crit_chances(attacker: Score, defender: Score, attack: Action, defense: Action, health: u8, table_type: TableType) -> u8 {
-    let crit_chance: u8 = attack.crit_chance();
-// calc_crit_bonus(attacker, table_type).print();
-    if (crit_chance == 0) { (0) }
-    else {
-        (_apply_chance_bonus_penalty(
-            crit_chance,
-            calc_crit_bonus(attacker, table_type) + calc_crit_match_bonus(attacker, attack, defense),
-            0 + calc_crit_trickster_penalty(attacker, defender),
-        ))
-    }
-}
-// Hit chances will be applied to Villains only
-// Both Hit and Lethal go up/down with same bonus/penalty
-fn calc_hit_chances(attacker: Score, defender: Score, attack: Action, defense: Action, health: u8, table_type: TableType) -> u8 {
-    let hit_chance: u8 = attack.hit_chance();
-    if (hit_chance == 0) { (0) }
-    else {
-        (_apply_chance_bonus_penalty(
-            hit_chance,
-            calc_hit_bonus(attacker, table_type),
-            calc_hit_injury_penalty(attack, health) + calc_hit_trickster_penalty(attacker, defender),
-        ))
-    }
-}
-fn calc_lethal_chances(attacker: Score, defender: Score, attack: Action, defense: Action, hit_chances: u8) -> u8 {
-    let lethal_chance: u8 = attack.lethal_chance();
-    if (lethal_chance == 0) { (0) }
-    else {
-        // lethal chances are inside hit chances
-        // we use the difference to apply hit penalties
-        let diff: u8 = (attack.hit_chance() - lethal_chance);
-        (_apply_chance_bonus_penalty(
-            MathU8::sub(hit_chances, diff),
-            0,
-            calc_lethal_lord_penalty(attacker, defender, attack, defense),
-        ))
-    }
-}
-fn _apply_chance_bonus_penalty(chance: u8, bonus: u8, penalty: u8) -> u8 {
-    (MathU8::clamp(
-        MathU8::sub(chance + bonus, penalty),
-        (chance / 2),       // never go below half chance
-        CHANCES::ALWAYS,    // never go above 100
-    ))
+// throw a dice and return the resulting face
+// faces: the number of faces on the dice (ex: 6, or 100%)
+// returns a number between 1 and faces
+fn throw_dice(seed: felt252, salt: felt252, faces: u128) -> u128 {
+    let hash: felt252 = hash_values([salt, seed].span());
+    let double: u256 = hash.into();
+    ((double.low % faces) + 1)
 }
 
-//
-// bonuses
-//
-
-fn calc_crit_bonus(attacker: Score, table_type: TableType) -> u8 {
-    let max_level: u16 = if (table_type.maxxed_up_levels()) {HONOUR::LEVEL_MAX.into()} else {(attacker.total_duels * 10)};
-    if (attacker.is_lord()) {
-        (_calc_bonus(CHANCES::CRIT_BONUS_LORD, attacker.level_lord, max_level))
-    } else if (attacker.is_trickster()) {
-        (_calc_bonus(CHANCES::CRIT_BONUS_TRICKSTER, attacker.level_trickster, max_level))
-    } else {
-        (0)
-    }
-}
-fn calc_hit_bonus(attacker: Score, table_type: TableType) -> u8 {
-    let max_level: u16 = if (table_type.maxxed_up_levels()) {HONOUR::LEVEL_MAX.into()} else {(attacker.total_duels * 10)};
-    if (attacker.is_villain()) {
-        (_calc_bonus(CHANCES::HIT_BONUS_VILLAIN, attacker.level_villain, max_level))
-    } else if (attacker.is_trickster()) {
-        (_calc_bonus(CHANCES::HIT_BONUS_TRICKSTER, attacker.level_trickster, max_level))
-    } else {
-        (0)
-    }
-}
-fn _calc_bonus(bonus_max: u8, level: u8, max_level: u16) -> u8 {
-    if (level > 0 && max_level > 0) {
-        (MathU8::max(1, MathU8::map(
-            MathU16::min(level.into(), max_level).try_into().unwrap(),
-            0, HONOUR::LEVEL_MAX,
-            0, bonus_max)
-        ))
-    } else {
-        (0)
-    }
-}
-
-fn calc_crit_match_bonus(attacker: Score, attack: Action, defense: Action) -> u8 {
-    if (attacker.is_lord()) {
-        if (attack.paces_priority(defense) < 0) { (CHANCES::EARLY_LORD_CRIT_BONUS) } else { (0) }
-    } else if (attacker.is_villain()) {
-        if (attack.paces_priority(defense) > 0) { (CHANCES::LATE_VILLAIN_CRIT_BONUS) } else { (0) }
-    } else {
-        (0)
-    }
-}
-
-//
-// penalties
-//
-// #[inline(always)]
-// fn calc_crit_penalty(attack: Action, health: u8) -> u8 {
-//     (_calc_penalty(health, attack.crit_penalty()))
-// }
-#[inline(always)]
-fn calc_hit_injury_penalty(attack: Action, health: u8) -> u8 {
-    (_calc_penalty(health, attack.hit_penalty()))
-}
-#[inline(always)]
-fn _calc_penalty(health: u8, penalty_per_damage: u8) -> u8 {
-    ((CONST::FULL_HEALTH - health) * penalty_per_damage)
-}
-
-
-fn calc_crit_trickster_penalty(attacker: Score, defender: Score) -> u8 {
-    (_calc_trickster_penalty(attacker, defender, CHANCES::TRICKSTER_CRIT_PENALTY))
-}
-fn calc_hit_trickster_penalty(attacker: Score, defender: Score) -> u8 {
-    (_calc_trickster_penalty(attacker, defender, CHANCES::TRICKSTER_HIT_PENALTY))
-}
-#[inline(always)]
-fn _calc_trickster_penalty(attacker: Score, defender: Score, penalty: u8) -> u8 {
-    // tricksters reduce non-trickster chances to hit
-    if (defender.is_trickster() && !attacker.is_trickster()) {
-        (penalty)
-    } else {
-        (0)
-    }
-}
-
-fn calc_lethal_lord_penalty(attacker: Score, defender: Score, attack: Action, defense: Action) -> u8 {
-    // lord shooting late have <penalty> chances to get less damage
-    if (defender.is_lord() && !attacker.is_lord() && attack.paces_priority(defense) > 0) {
-        (CHANCES::LORD_LETHAL_PENALTY)
-    } else {
-        (0)
-    }
+// throw a dice and return a positive result
+// faces: the number of faces on the dice (ex: 6, or 100%)
+// limit: how many faces gives a positive result?
+// edge case: limit <= 1, always negative
+// edge case: limit == faces, always positive
+fn check_dice(seed: felt252, salt: felt252, faces: u128, limit: u128) -> bool {
+    (throw_dice(seed, salt, faces) <= limit)
 }
 
 
@@ -535,44 +368,44 @@ fn calc_lethal_lord_penalty(attacker: Score, defender: Score, attack: Action, de
 // read calls
 //
 
-fn call_simulate_honour_for_action(store: Store, mut score: Score, action: Action, table_type: TableType) -> (i8, u8) {
-    let action_honour: i8 = action.honour();
-    if (action_honour >= 0) {
-        score.total_duels += 1;
-        update_score_honour(ref score, MathU8::abs(action_honour), !table_type.maxxed_up_levels());
-    }
-    (action_honour, score.honour)
-}
+// fn call_simulate_honour_for_action(store: Store, mut score: Score, action: Action, table_type: TableType) -> (i8, u8) {
+//     let action_honour: i8 = action.honour();
+//     if (action_honour >= 0) {
+//         score.total_duels += 1;
+//         update_score_honour(ref score, MathU8::abs(action_honour), !table_type.maxxed_up_levels());
+//     }
+//     (action_honour, score.honour)
+// }
 
-fn call_get_duelist_health(store: Store, duelist_id: u128, duel_id: u128, round_number: u8) -> u8 {
-    if (round_number == 1) {
-        (CONST::FULL_HEALTH)
-    } else {
-        let shot: Shot = call_get_duelist_round_shot(store, duelist_id, duel_id, round_number);
-        (shot.health)
-    }
-}
-fn call_get_duelist_round_shot(store: Store, duelist_id: u128, duel_id: u128, round_number: u8) -> Shot {
-    let challenge: ChallengeEntity = store.get_challenge_entity(duel_id);
-    let round: RoundEntity = store.get_round_entity(duel_id, round_number);
-    if (challenge.duelist_id_a == duelist_id) {
-        (round.shot_a)
-    } else if (challenge.duelist_id_b == duelist_id) {
-        (round.shot_b)
-    } else {
-        (init::Shot())
-    }
-}
+// fn call_get_duelist_health(store: Store, duelist_id: u128, duel_id: u128, round_number: u8) -> u8 {
+//     if (round_number == 1) {
+//         (CONST::FULL_HEALTH)
+//     } else {
+//         let shot: Shot = call_get_duelist_round_shot(store, duelist_id, duel_id, round_number);
+//         (shot.health)
+//     }
+// }
+// fn call_get_duelist_round_shot(store: Store, duelist_id: u128, duel_id: u128, round_number: u8) -> Shot {
+//     let challenge: ChallengeEntity = store.get_challenge_entity(duel_id);
+//     let round: RoundEntity = store.get_round_entity(duel_id, round_number);
+//     if (challenge.duelist_id_a == duelist_id) {
+//         (round.shot_a)
+//     } else if (challenge.duelist_id_b == duelist_id) {
+//         (round.shot_b)
+//     } else {
+//         (init::Shot())
+//     }
+// }
 
-fn call_get_snapshot_scores(store: Store, duelist_id: u128, duel_id: u128) -> (Score, Score) {
-    let challenge: ChallengeEntity = store.get_challenge_entity(duel_id);
-    let snapshot: SnapshotEntity = store.get_snapshot_entity(duel_id);
-    if (challenge.duelist_id_a == duelist_id) {
-        (snapshot.score_a, snapshot.score_b)
-    } else if (challenge.duelist_id_b == duelist_id) {
-        (snapshot.score_b, snapshot.score_a)
-    } else {
-        (init::Score(), init::Score())
-    }
-}
+// fn call_get_snapshot_scores(store: Store, duelist_id: u128, duel_id: u128) -> (Score, Score) {
+//     let challenge: ChallengeEntity = store.get_challenge_entity(duel_id);
+//     let snapshot: SnapshotEntity = store.get_snapshot_entity(duel_id);
+//     if (challenge.duelist_id_a == duelist_id) {
+//         (snapshot.score_a, snapshot.score_b)
+//     } else if (challenge.duelist_id_b == duelist_id) {
+//         (snapshot.score_b, snapshot.score_a)
+//     } else {
+//         (init::Score(), init::Score())
+//     }
+// }
 
