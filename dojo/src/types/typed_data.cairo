@@ -6,7 +6,7 @@ use starknet::ContractAddress;
 
 // use openzeppelin::utils::snip12::{SNIP12Metadata, StructHash, OffchainMessageHashImpl};
 use pistols::utils::openzeppelin::snip12::{SNIP12Metadata, StructHash, OffchainMessageHashImpl};
-use openzeppelin_account::dual_account::{DualCaseAccount, DualCaseAccountABI};
+// use openzeppelin_account::dual_account::{DualCaseAccount, DualCaseAccountABI};
 
 mod TYPED_DATA {
     const NAME: felt252 = 'Underware';
@@ -44,7 +44,8 @@ pub impl CommitMoveMessageImpl<
     fn validate(self: @T, contract_address: ContractAddress, signature: Array<felt252>) -> bool {
         let message_hash = self.get_message_hash(contract_address);
 message_hash.print();
-        let is_valid_signature_felt = DualCaseAccount{contract_address}.is_valid_signature(message_hash, signature);
+        // let is_valid_signature_felt = DualCaseAccount{contract_address}.is_valid_signature(message_hash, signature);
+        let is_valid_signature_felt = 0;
         let is_valid_signature = is_valid_signature_felt == starknet::VALIDATED || is_valid_signature_felt == 1;
         (is_valid_signature)
     }
