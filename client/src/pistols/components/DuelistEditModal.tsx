@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Modal, Button, Grid } from 'semantic-ui-react'
-import { pedersen } from '@/lib/utils/starknet'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
@@ -20,6 +19,7 @@ import { Divider } from '@/lib/ui/Divider'
 import { IconClick } from '@/lib/ui/Icons'
 import { isPositiveBigint } from '@/lib/utils/types'
 import { useLordsFaucet } from '@/lib/dojo/hooks/useLordsMock'
+import { poseidon } from '@/lib/utils/starknet'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -63,7 +63,7 @@ export default function DuelistEditModal({
   const { name, profilePic, score: { archetypeName } } = useDuelist(editingDuelistId)
   const [selectedProfilePic, setSelectedProfilePic] = useState(0)
 
-  const randomPic = useMemo(() => (Number(pedersen(address ?? 0, lastDuelistId ?? 0) % BigInt(PROFILE_PIC_COUNT)) + 1), [address, lastDuelistId])
+  const randomPic = useMemo(() => (Number(poseidon([address ?? 0n, lastDuelistId ?? 0n]) % BigInt(PROFILE_PIC_COUNT)) + 1), [address, lastDuelistId])
   const _profilePic = useMemo(() => {
     return (
       selectedProfilePic ? selectedProfilePic

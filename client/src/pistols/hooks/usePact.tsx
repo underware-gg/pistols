@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useComponentValue } from '@dojoengine/react'
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { isPositiveBigint, keysToEntity } from '@/lib/utils/types'
-import { bigintToU256, pedersen, stringToFelt } from '@/lib/utils/starknet'
+import { bigintToU256, poseidon, stringToFelt } from '@/lib/utils/starknet'
 import { BigNumberish } from 'starknet'
 
 export const usePact = (table_id: string, duelist_id_or_address_a: BigNumberish, duelist_id_or_address_b: BigNumberish) => {
@@ -13,8 +13,8 @@ export const usePact = (table_id: string, duelist_id_or_address_a: BigNumberish,
     // same as pistols::utils::make_pact_pair()
     const a_u256 = bigintToU256(duelist_id_or_address_a)
     const b_u256 = bigintToU256(duelist_id_or_address_b)
-    const aa = pedersen(a_u256.low, a_u256.low)
-    const bb = pedersen(b_u256.low, b_u256.low)
+    const aa = poseidon([a_u256.low, a_u256.low])
+    const bb = poseidon([b_u256.low, b_u256.low])
     const pair = bigintToU256(aa ^ bb).low
     return {
       pair,

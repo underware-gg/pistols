@@ -49,9 +49,6 @@ mod tester {
         TokenConfig, TokenConfigStore, TokenConfigEntity, TokenConfigEntityStore,
     };
 
-    // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
-    extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
-
     //
     // starknet testing cheats
     // https://github.com/starkware-libs/cairo/blob/main/corelib/src/starknet/testing.cairo
@@ -499,46 +496,11 @@ mod tester {
 
 #[cfg(test)]
 mod tests {
-    use core::traits::{Into, TryInto};
     use debug::PrintTrait;
     use starknet::{ContractAddress};
 
-    // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
-    extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
-
     #[test]
-    fn test_utils() {
-        assert(true != false, 'utils');
-    }
-
-    #[test]
-    fn test_pedersen_hash() {
-        let a: felt252 = 0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7;
-        let b: felt252 = 0x4d07e40e93398ed3c76981e72dd1fd22557a78ce36c0515f679e27f0bb5bc5f;
-        let a_b = pedersen(a, b);
-        let b_a = pedersen(b, a);
-        // pedersen hashes are DIFFERENT for (a,b) and (b,a)
-        assert(a_b != b_a, 'pedersen');
-    }
-
-    #[test]
-    fn test_pedersen_hash_from_zero() {
-        let a: felt252 = 0;
-        let b: felt252 = 0x4d07e40e93398ed3c76981e72dd1fd22557a78ce36c0515f679e27f0bb5bc5f;
-        let a_b = pedersen(a, b);
-        // pedersen hashes are DIFFERENT if (a == zero)
-        assert(a_b != b, 'pedersen');
-    }
-
-    #[test]
-    fn test_xor_hash() {
-        let a: felt252 = 0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7;
-        let b: felt252 = 0x4d07e40e93398ed3c76981e72dd1fd22557a78ce36c0515f679e27f0bb5bc5f;
-        let aa: u256 = a.into();
-        let bb: u256 = b.into();
-        let a_b = aa ^ bb;
-        let b_a = bb ^ aa;
-        // xor hashes are EQUAL for (a,b) and (b,a)
-        assert(a_b == b_a, 'felt_to_u128');
+    fn test_tester() {
+        assert(true, 'so very true');
     }
 }

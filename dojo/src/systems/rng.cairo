@@ -11,16 +11,14 @@ mod rng {
     use super::IRng;
     use starknet::{ContractAddress};
 
-    // https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
-    extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
-
-    use pistols::utils::misc::{WORLD, felt_to_u128};
+    use pistols::utils::hash::{hash_values, felt_to_u128};
+    use pistols::utils::misc::{WORLD};
 
     #[abi(embed_v0)]
     impl RngImpl of IRng<ContractState> {
         fn reseed(world: @IWorldDispatcher, seed: u128, salt: felt252) -> u128 {
             WORLD(world);
-            let new_seed: felt252 = pedersen(seed.into(), salt);
+            let new_seed: felt252 = hash_values([seed.into(), salt].span());
             (felt_to_u128(new_seed))
         }
     }

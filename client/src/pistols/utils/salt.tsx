@@ -1,5 +1,5 @@
 import { AccountInterface, BigNumberish } from 'starknet'
-import { pedersen } from '@/lib/utils/starknet'
+import { poseidon } from '@/lib/utils/starknet'
 import { signMessages, Messages } from '@/lib/utils/starknet_sign'
 import { HASH_SALT_MASK } from '@/pistols/utils/constants'
 import { bigintToHex } from '@/lib/utils/types'
@@ -10,7 +10,7 @@ interface CommitMoveMessage extends Messages {
   duelistId: bigint,
 }
 
-export const make_action_hash = (salt: BigNumberish, action: BigNumberish) => (pedersen(BigInt(salt), BigInt(action)) & HASH_SALT_MASK)
+export const make_action_hash = (salt: BigNumberish, action: BigNumberish) => (poseidon([BigInt(salt), BigInt(action)]) & HASH_SALT_MASK)
 
 export const pack_action_slots = (slot1: number | null, slot2: number | null): number | null => {
   if (slot1 != null && slot2 != null) {
