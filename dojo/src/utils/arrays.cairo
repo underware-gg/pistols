@@ -1,13 +1,18 @@
 use core::num::traits::Zero;
 
 //
-// From Alexandria:
+// Based on Alexandria array and span extensions
 // https://github.com/keep-starknet-strange/alexandria/blob/main/packages/data_structures/src/array_ext.cairo
 // https://github.com/keep-starknet-strange/alexandria/blob/main/packages/data_structures/src/span_ext.cairo
 //
 
 #[generate_trait]
-impl SpanImpl<T> of SpanTrait<T> {
+impl SpanImpl<T, +Clone<T>, +Drop<T>> of SpanTrait<T> {
+    fn value_or_zero<+Copy<T>, +Zero<T>>(self: Span<T>, index: usize) -> T {
+        (if (index < self.len()) { *self[index] } else { Zero::zero() })
+    }
+    //
+    // from alexandria
     fn contains<+PartialEq<T>>(mut self: Span<T>, value: @T) -> bool {
         loop {
             match self.pop_front() {
@@ -18,18 +23,31 @@ impl SpanImpl<T> of SpanTrait<T> {
             };
         }
     }
-    fn value_or_zero<+Copy<T>, +Zero<T>>(self: Span<T>, index: usize) -> T {
-        (if (index < self.len()) { *self[index] } else { Zero::zero() })
+    fn concat(mut self: Span<T>, mut other: Span<T>) -> Array<T> {
+        let mut ret = array![];
+        ret.extend_from_span(self);
+        ret.extend_from_span(other);
+        (ret)
     }
 }
 
 #[generate_trait]
-impl ArrayImpl<T> of ArrayTrait<T> {
+impl ArrayImpl<T, +Clone<T>, +Drop<T>> of ArrayTrait<T> {
+    fn value_or_zero<+Copy<T>, +Zero<T>>(self: @Array<T>, index: usize) -> T {
+        (if (index < self.len()) { *self[index] } else { Zero::zero() })
+    }
+    //
+    // from alexandria
     fn contains<+PartialEq<T>>(self: @Array<T>, value: @T) -> bool {
         (self.span().contains(value))
     }
-    fn value_or_zero<+Copy<T>, +Zero<T>>(self: @Array<T>, index: usize) -> T {
-        (self.span().value_or_zero(index))
+    fn extend_from_span<+Destruct<T>>(ref self: Array<T>, mut other: Span<T>) {
+        while let Option::Some(elem) = other.pop_front() {
+            self.append(elem.clone());
+        }
+    }
+    fn concat(self: @Array<T>, other: @Array<T>) -> Array<T> {
+        (self.span().concat(other.span()))
     }
 }
 

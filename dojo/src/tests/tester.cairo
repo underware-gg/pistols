@@ -21,6 +21,7 @@ mod tester {
     };
     use pistols::types::challenge::{ChallengeState};
     use pistols::types::constants::{CONST};
+    use pistols::utils::arrays::{SpanTrait};
     use pistols::utils::short_string::{ShortString};
     use pistols::interfaces::systems::{SELECTORS};
 
@@ -47,6 +48,17 @@ mod tester {
     use pistols::models::token_config::{
         TokenConfig, TokenConfigStore, TokenConfigEntity, TokenConfigEntityStore,
     };
+
+    use pistols::systems::rng::{rng};
+    use pistols::tests::mock_rng::{
+        rng as mock_rng,
+        IRngDispatcher,
+        IRngDispatcherTrait,
+        salt_value,
+    };
+
+
+
 
     //
     // starknet testing cheats
@@ -93,6 +105,7 @@ mod tester {
         const LORDS: u8      = 0b000100;
         const MINTER: u8     = 0b001000;
         const APPROVE: u8    = 0b010000;
+        const MOCK_RNG: u8  =  0b100000;
     }
 
     #[derive(Copy, Drop)]
@@ -102,6 +115,7 @@ mod tester {
         admin: IAdminDispatcher,
         lords: ILordsMockDispatcher,
         minter: IMinterDispatcher,
+        rng: IRngDispatcher,
     }
 
     #[inline(always)]
@@ -127,13 +141,17 @@ mod tester {
         testing::set_block_number(1);
         testing::set_block_timestamp(INITIAL_TIMESTAMP);
 
+        let mock_models: Span<felt252> = array![
+            salt_value::TEST_CLASS_HASH,
+        ].span();
+
         // deploy world
 // '---- spawn_test_world...'.print();
         // let world = spawn_test_world!();
         // let world = spawn_test_world!(["origami_token", "pistols"]);
         let world: IWorldDispatcher = spawn_test_world(
             ["origami_token", "pistols"].span(),
-            get_models_test_class_hashes!(),
+            get_models_test_class_hashes!().concat(mock_models).span(),
         );
 // '---- spawned...'.print();
         world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), OWNER());
@@ -209,6 +227,14 @@ mod tester {
             }
             else {ZERO()}
         };
+        let rng = IRngDispatcher{ contract_address:
+            {
+                let class_hash = if (deploy_mock_rng) {mock_rng::TEST_CLASS_HASH} else {rng::TEST_CLASS_HASH};
+                let address = deploy_system(world, 'rng', class_hash);
+                world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), address);
+                (address)
+            }
+        };
 
         // initializers
         if (deploy_lords) {
@@ -224,7 +250,7 @@ mod tester {
         impersonate(OWNER());
 
 // '---- READY!'.print();
-        (Systems { world, actions, admin, lords, minter })
+        (Systems { world, actions, admin, lords, minter, rng })
     }
 
     fn elapse_timestamp(delta: u64) -> (u64, u64) {

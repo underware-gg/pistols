@@ -76,6 +76,7 @@ mod tests {
     // mod test_wager;
     // mod test_torna;
     mod test_utils;
+    mod test_rng;
     // utils
     mod tester;
     mod mock_rng;
