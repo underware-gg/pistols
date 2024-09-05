@@ -238,13 +238,13 @@ mod tester {
 
         // initializers
         if (deploy_lords) {
-            execute_lords_faucet(lords, OWNER());
-            execute_lords_faucet(lords, OTHER());
+            execute_lords_faucet(@lords, OWNER());
+            execute_lords_faucet(@lords, OTHER());
         }
         if (approve) {
-            execute_lords_approve(lords, OWNER(), actions.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
-            execute_lords_approve(lords, OTHER(), actions.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
-            execute_lords_approve(lords, BUMMER(), actions.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
+            execute_lords_approve(@lords, OWNER(), actions.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
+            execute_lords_approve(@lords, OTHER(), actions.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
+            execute_lords_approve(@lords, BUMMER(), actions.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
         }
 
         impersonate(OWNER());
@@ -284,66 +284,66 @@ mod tester {
     //
 
     // ::admin
-    fn execute_admin_grant_admin(system: IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress, granted: bool) {
+    fn execute_admin_grant_admin(system: @IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress, granted: bool) {
         impersonate(sender);
-        system.grant_admin(owner_address, granted);
+        (*system).grant_admin(owner_address, granted);
         _next_block();
     }
-    fn execute_admin_set_config(system: IAdminDispatcher, sender: ContractAddress, config: Config) {
+    fn execute_admin_set_config(system: @IAdminDispatcher, sender: ContractAddress, config: Config) {
         impersonate(sender);
-        system.set_config(config);
+        (*system).set_config(config);
         _next_block();
     }
-    fn execute_admin_set_paused(system: IAdminDispatcher, sender: ContractAddress, paused: bool) {
+    fn execute_admin_set_paused(system: @IAdminDispatcher, sender: ContractAddress, paused: bool) {
         impersonate(sender);
-        system.set_paused(paused);
+        (*system).set_paused(paused);
         _next_block();
     }
-    fn execute_admin_set_table(system: IAdminDispatcher, sender: ContractAddress, table: TableConfig) {
+    fn execute_admin_set_table(system: @IAdminDispatcher, sender: ContractAddress, table: TableConfig) {
         impersonate(sender);
-        system.set_table(table);
+        (*system).set_table(table);
         _next_block();
     }
-    fn execute_admin_set_table_admittance(system: IAdminDispatcher, sender: ContractAddress, table_admittance: TableAdmittance) {
+    fn execute_admin_set_table_admittance(system: @IAdminDispatcher, sender: ContractAddress, table_admittance: TableAdmittance) {
         impersonate(sender);
-        system.set_table_admittance(table_admittance);
+        (*system).set_table_admittance(table_admittance);
         _next_block();
     }
-    fn execute_admin_open_table(system: IAdminDispatcher, sender: ContractAddress, table_id: felt252, enabled: bool) {
+    fn execute_admin_open_table(system: @IAdminDispatcher, sender: ContractAddress, table_id: felt252, enabled: bool) {
         impersonate(sender);
-        system.open_table(table_id, enabled);
+        (*system).open_table(table_id, enabled);
         _next_block();
     }
 
     // ::ierc20
-    fn execute_lords_faucet(system: ILordsMockDispatcher, sender: ContractAddress) {
+    fn execute_lords_faucet(system: @ILordsMockDispatcher, sender: ContractAddress) {
         impersonate(sender);
-        system.faucet();
+        (*system).faucet();
         _next_block();
     }
-    fn execute_lords_approve(system: ILordsMockDispatcher, owner: ContractAddress, spender: ContractAddress, value: u128) {
+    fn execute_lords_approve(system: @ILordsMockDispatcher, owner: ContractAddress, spender: ContractAddress, value: u128) {
         impersonate(owner);
-        system.approve(spender, value.into());
+        (*system).approve(spender, value.into());
         _next_block();
     }
 
     // ::actions
-    fn execute_mint_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252, archetype: Archetype) -> Duelist {
+    fn execute_mint_duelist(system: @IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252, archetype: Archetype) -> Duelist {
         impersonate(sender);
-        let duelist: Duelist = system.mint_duelist(name, profile_pic_type, profile_pic_uri, archetype);
+        let duelist: Duelist = (*system).mint_duelist(name, profile_pic_type, profile_pic_uri, archetype);
         _next_block();
         (duelist)
     }
-    fn execute_update_duelist(system: IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist {
+    fn execute_update_duelist(system: @IActionsDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist {
         (execute_update_duelist_ID(system, sender, ID(sender), name, profile_pic_type, profile_pic_uri))
     }
-    fn execute_update_duelist_ID(system: IActionsDispatcher, sender: ContractAddress, duelist_id: u128, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist {
+    fn execute_update_duelist_ID(system: @IActionsDispatcher, sender: ContractAddress, duelist_id: u128, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist {
         impersonate(sender);
-        let duelist: Duelist = system.update_duelist(duelist_id, name, profile_pic_type, profile_pic_uri);
+        let duelist: Duelist = (*system).update_duelist(duelist_id, name, profile_pic_type, profile_pic_uri);
         _next_block();
         (duelist)
     }
-    fn execute_create_challenge(system: IActionsDispatcher, sender: ContractAddress,
+    fn execute_create_challenge(system: @IActionsDispatcher, sender: ContractAddress,
         challenged: ContractAddress,
         message: felt252,
         table_id: felt252,
@@ -352,7 +352,7 @@ mod tester {
     ) -> u128 {
         (execute_create_challenge_ID(system, sender, ID(sender), challenged, message, table_id, wager_value, expire_hours))
     }
-    fn execute_create_challenge_ID(system: IActionsDispatcher, sender: ContractAddress,
+    fn execute_create_challenge_ID(system: @IActionsDispatcher, sender: ContractAddress,
         token_id: u128,
         challenged: ContractAddress,
         message: felt252,
@@ -361,43 +361,43 @@ mod tester {
         expire_hours: u64,
     ) -> u128 {
         impersonate(sender);
-        let duel_id: u128 = system.create_challenge(token_id, challenged, message, table_id, wager_value, expire_hours);
+        let duel_id: u128 = (*system).create_challenge(token_id, challenged, message, table_id, wager_value, expire_hours);
         _next_block();
         (duel_id)
     }
-    fn execute_reply_challenge(system: IActionsDispatcher, sender: ContractAddress,
+    fn execute_reply_challenge(system: @IActionsDispatcher, sender: ContractAddress,
         duel_id: u128,
         accepted: bool,
     ) -> ChallengeState {
         (execute_reply_challenge_ID(system, sender, ID(sender), duel_id, accepted))
     }
-    fn execute_reply_challenge_ID(system: IActionsDispatcher, sender: ContractAddress,
+    fn execute_reply_challenge_ID(system: @IActionsDispatcher, sender: ContractAddress,
         token_id: u128,
         duel_id: u128,
         accepted: bool,
     ) -> ChallengeState {
         impersonate(sender);
-        let new_state: ChallengeState = system.reply_challenge(token_id, duel_id, accepted);
+        let new_state: ChallengeState = (*system).reply_challenge(token_id, duel_id, accepted);
         _next_block();
         (new_state)
     }
-    fn execute_commit_moves(system: IActionsDispatcher, sender: ContractAddress,
+    fn execute_commit_moves(system: @IActionsDispatcher, sender: ContractAddress,
         duel_id: u128,
         round_number: u8,
         hash: u128,
     ) {
         impersonate(sender);
-        system.commit_moves(ID(sender), duel_id, round_number, hash);
+        (*system).commit_moves(ID(sender), duel_id, round_number, hash);
         _next_block();
     }
-    fn execute_reveal_moves(system: IActionsDispatcher, sender: ContractAddress,
+    fn execute_reveal_moves(system: @IActionsDispatcher, sender: ContractAddress,
         duel_id: u128,
         round_number: u8,
         salt: felt252,
         moves: Span<u8>,
     ) {
         impersonate(sender);
-        system.reveal_moves(ID(sender), duel_id, round_number, salt, moves);
+        (*system).reveal_moves(ID(sender), duel_id, round_number, salt, moves);
         _next_block();
     }
 
@@ -405,7 +405,7 @@ mod tester {
     // read-only calls
     //
 
-    // fn execute_get_pact(system: IActionsDispatcher, a: ContractAddress, b: ContractAddress) -> u128 {
+    // fn execute_get_pact(system: @IActionsDispatcher, a: ContractAddress, b: ContractAddress) -> u128 {
     //     let result: u128 = system.get_pact(a, b);
     //     (result)
     // }
