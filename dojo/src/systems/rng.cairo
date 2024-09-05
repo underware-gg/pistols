@@ -3,7 +3,7 @@ use dojo::world::IWorldDispatcher;
 
 #[dojo::interface]
 trait IRng {
-    fn reseed(world: @IWorldDispatcher, seed: u128, salt: felt252) -> u128;
+    fn reseed(world: @IWorldDispatcher, seed: felt252, salt: felt252) -> felt252;
 }
 
 #[dojo::contract]
@@ -11,25 +11,17 @@ mod rng {
     use super::IRng;
     use starknet::{ContractAddress};
 
-    use pistols::utils::hash::{hash_values, felt_to_u128};
+    use pistols::utils::hash::{hash_values};
     use pistols::utils::misc::{WORLD};
 
     #[abi(embed_v0)]
     impl RngImpl of IRng<ContractState> {
-        fn reseed(world: @IWorldDispatcher, seed: u128, salt: felt252) -> u128 {
+        fn reseed(world: @IWorldDispatcher, seed: felt252, salt: felt252) -> felt252 {
             WORLD(world);
             let new_seed: felt252 = hash_values([seed.into(), salt].span());
-            (felt_to_u128(new_seed))
+            (new_seed)
         }
     }
-
-    // #[generate_trait]
-    // impl InternalImpl of InternalTrait {
-    //     fn make_block_hash(self: @ContractState) -> u128 {
-    //         let block_info = get_block_info().unbox();
-    //         hash_u128(block_info.block_number.into(), block_info.block_timestamp.into())
-    //     }
-    // }
 }
 
 
@@ -43,12 +35,12 @@ use pistols::interfaces::systems::{WorldSystemsTrait};
 #[derive(Copy, Drop)]
 struct Dice {
     rng: IRngDispatcher,
-    seed: u128,
+    seed: felt252,
 }
 
 #[generate_trait]
 impl DiceImpl of DiceTrait {
-    fn new(world: @IWorldDispatcher, initial_seed: u128) -> Dice {
+    fn new(world: @IWorldDispatcher, initial_seed: felt252) -> Dice {
         (Dice {
             rng: world.rng_dispatcher(),
             seed: initial_seed,
@@ -58,7 +50,8 @@ impl DiceImpl of DiceTrait {
     fn throw(ref self: Dice, salt: felt252, faces: u8) -> u8 {
         assert(faces <= 255, 'RNG_DICE: too many faces');
         self.seed = self.rng.reseed(self.seed, salt);
-        let result: u8 = ((self.seed % faces.into()) + 1).try_into().unwrap();
+        let as_u256: u256 = self.seed.into();
+        let result: u8 = ((as_u256.low & 0xff).try_into().unwrap() % faces) + 1;
 // println!("new_seed {} dice {}", self.seed, result);
         (result)
     }

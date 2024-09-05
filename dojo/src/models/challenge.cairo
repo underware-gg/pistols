@@ -95,10 +95,19 @@ struct Shot {
 //------------------------------------
 // Traits
 //
-use pistols::types::cards::hand::{PlayerHand, PacesCard, PacesCardTrait};
+use pistols::types::cards::hand::{PlayerHand};
 use pistols::utils::arrays::{SpanTrait};
+use pistols::utils::hash::{hash_values};
 use pistols::utils::math::{MathU8};
 use pistols::types::constants::{CONST};
+
+#[generate_trait]
+impl RoundImpl of RoundTrait {
+    #[inline(always)]
+    fn make_seed(ref self: Round) -> felt252 {
+        (hash_values([self.shot_a.salt, self.shot_b.salt].span()))
+    }
+}
 
 #[generate_trait]
 impl ShotImpl of ShotTrait {
@@ -122,11 +131,5 @@ impl ShotImpl of ShotTrait {
             card_tactics: (*self.card_3).into(),
             card_blades: (*self.card_4).into(),
         })
-    }
-    fn apply_honour(ref self: Shot, card: PacesCard) {
-        let honour: u8 = card.honour();
-        if (honour >= 0) {
-            self.honour = honour;
-        }
     }
 }

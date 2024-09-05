@@ -52,15 +52,6 @@ fn make_moves_hash(salt: felt252, moves: Span<u8>) -> u128 {
     (result)
 }
 
-#[inline(always)]
-fn make_round_salt(round: Round) -> felt252 {
-    (hash_values([round.shot_a.salt, round.shot_b.salt].span()))
-}
-
-#[inline(always)]
-fn scramble_salt(salt: felt252) -> felt252 {
-    (hash_values([salt].span()))
-}
 
 
 //------------------------
@@ -335,31 +326,6 @@ fn _average_trickster(new_level: u8, current_level: u8) -> u8 {
     } else { (new_level) }
 }
 
-
-
-
-
-//------------------------
-// Randomizer
-//
-
-// throw a dice and return the resulting face
-// faces: the number of faces on the dice (ex: 6, or 100%)
-// returns a number between 1 and faces
-fn throw_dice(seed: felt252, salt: felt252, faces: u128) -> u128 {
-    let hash: felt252 = hash_values([salt, seed].span());
-    let double: u256 = hash.into();
-    ((double.low % faces) + 1)
-}
-
-// throw a dice and return a positive result
-// faces: the number of faces on the dice (ex: 6, or 100%)
-// limit: how many faces gives a positive result?
-// edge case: limit <= 1, always negative
-// edge case: limit == faces, always positive
-fn check_dice(seed: felt252, salt: felt252, faces: u128, limit: u128) -> bool {
-    (throw_dice(seed, salt, faces) <= limit)
-}
 
 
 

@@ -1,4 +1,3 @@
-use pistols::systems::rng::{Dice, DiceTrait};
 use pistols::models::challenge::{Shot};
 use pistols::utils::math::{MathU8};
 
@@ -37,7 +36,6 @@ trait PacesCardTrait {
     fn is_cool(self: PacesCard) -> bool;
     fn as_felt(self: PacesCard) -> felt252;
     fn honour(self: PacesCard) -> u8;
-    fn shoot(self: PacesCard, ref dice: Dice, ref shot_self: Shot, ref shot_other: Shot, salt: felt252)-> bool ;
 }
 
 impl PacesCardImpl of PacesCardTrait {
@@ -64,15 +62,6 @@ impl PacesCardImpl of PacesCardTrait {
             PacesCard::Paces10 =>  self.into() * 10,
             _ => 0,
         }
-    }
-    fn shoot(self: PacesCard, ref dice: Dice, ref shot_self: Shot, ref shot_other: Shot, salt: felt252) -> bool {
-        shot_self.dice_crit = dice.throw(salt, 100);
-        if (shot_other.card_2.into() != self) {
-            let damage: u8 = if (shot_self.dice_crit <= shot_self.final_chances) {shot_self.final_damage} else {0};
-            shot_other.final_health = MathU8::sub(shot_other.initial_health, damage);
-        }
-// println!("dice {} / {} h/d: {} / {}", shot_self.dice_crit, shot_self.final_chances, shot_other.final_health, shot_self.final_damage);
-        (shot_other.final_health == 0)
     }
 }
 

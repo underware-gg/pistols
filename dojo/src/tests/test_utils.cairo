@@ -26,48 +26,6 @@ mod tests {
     }
 
     #[test]
-    fn test_check_dice_average() {
-        // lower limit
-        let mut counter: u8 = 0;
-        let mut n: felt252 = 0;
-        loop {
-            if (n == 100) { break; }
-            let seed: felt252 = 'seed_1' + n;
-            if (utils::check_dice(seed, 'salt_1', 100, 25)) {
-                counter += 1;
-            }
-            n += 1;
-        };
-        assert(counter > 10 && counter < 40, 'dices_25');
-        // higher limit
-        let mut counter: u8 = 0;
-        let mut n: felt252 = 0;
-        loop {
-            if (n == 100) { break; }
-            let seed: felt252 = 'seed_2' + n;
-            if (utils::check_dice(seed, 'salt_2', 100, 75)) {
-                counter += 1;
-            }
-            n += 1;
-        };
-        assert(counter > 60 && counter < 90, 'dices_75');
-    }
-
-    #[test]
-    fn test_check_dice_edge() {
-        let mut n: felt252 = 0;
-        loop {
-            if (n == 100) { break; }
-            let seed: felt252 = 'seed' + n;
-            let bottom: bool = utils::check_dice(seed, 'salt', 10, 0);
-            assert(bottom == false, 'bottom');
-            let upper: bool = utils::check_dice(seed, 'salt', 10, 10);
-            assert(upper == true, 'bottom');
-            n += 1;
-        };
-    }
-
-    #[test]
     fn test_update_score_honour() {
         let mut score = init::Score();
         score.total_duels = 1;
