@@ -15,7 +15,7 @@
 //     use pistols::models::structs::{SimulateChances};
 //     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
 //     use pistols::types::constants::{CONST, CHANCES, HONOUR};
-//     use pistols::tests::tester::{tester, tester::{flags, ZERO, OWNER, OTHER, BUMMER, TREASURY}};
+//     use pistols::tests::tester::{tester, tester::{FLAGS, ZERO, OWNER, OTHER, BUMMER, TREASURY}};
 //     use pistols::utils::timestamp::{timestamp};
 //     use pistols::tests::test_round1::tests::{_get_actions_round_1_dual_crit};
 
@@ -46,7 +46,7 @@
 //     #[test]
 //     #[ignore]
 //     fn test_mint_archetype_snapshot_Classic() {
-//         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::ADMIN | flags::MINTER);
+//         let (world, actions, _admin, _lords, _minter) = tester::setup_world(FLAGS::ACTIONS | FLAGS::ADMIN | FLAGS::MINTER);
 //         let duelist1: Duelist = tester::execute_mint_duelist(actions, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
 //         let duelist2: Duelist = tester::execute_mint_duelist(actions, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
 //         assert(duelist1.score.level_villain == HONOUR::MAX, 'level_villain');
@@ -67,7 +67,7 @@
 //     #[test]
 //     #[ignore]
 //     fn test_mint_archetype_snapshot_IRL() {
-//         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::ADMIN | flags::MINTER);
+//         let (world, actions, _admin, _lords, _minter) = tester::setup_world(FLAGS::ACTIONS | FLAGS::ADMIN | FLAGS::MINTER);
 //         let duelist1: Duelist = tester::execute_mint_duelist(actions, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
 //         let duelist2: Duelist = tester::execute_mint_duelist(actions, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
 //         assert(duelist1.score.level_villain == HONOUR::MAX, 'level_villain');
@@ -101,7 +101,7 @@
 //     #[test]
 //     #[ignore]
 //     fn test_IRL_keep_archetypes() {
-//         let (world, actions, _admin, _lords, _minter) = tester::setup_world(flags::ACTIONS | flags::ADMIN | flags::MINTER);
+//         let (world, actions, _admin, _lords, _minter) = tester::setup_world(FLAGS::ACTIONS | FLAGS::ADMIN | FLAGS::MINTER);
 //         let duelist1: Duelist = tester::execute_mint_duelist(actions, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
 //         let duelist2: Duelist = tester::execute_mint_duelist(actions, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
 //         assert(duelist1.score.level_villain == HONOUR::MAX, 'duelist1.level_villain');

@@ -104,11 +104,11 @@ mod tests {
 
     use pistols::models::challenge::{Round};
     use pistols::types::round::{RoundState, RoundStateTrait};
-    use pistols::tests::tester::{tester, tester::{flags}};
+    use pistols::tests::tester::{tester, tester::{FLAGS}};
 
     #[test]
     fn test_round_exists() {
-        let sys = tester::setup_world(flags::APPROVE);
+        let sys = tester::setup_world(FLAGS::APPROVE);
         // get some random inexisting round
         let round = tester::get_RoundEntity(sys.world, 0x682137812638127638127, 1);
         let state: RoundState = round.state.try_into().unwrap();

@@ -17,7 +17,7 @@ mod tests {
     use pistols::models::init::{init};
     use pistols::types::constants::{CONST, HONOUR, CHANCES};
     use pistols::utils::short_string::{ShortString};
-    use pistols::tests::tester::{tester, tester::{flags, ZERO, OWNER, OTHER, BUMMER, TREASURY}};
+    use pistols::tests::tester::{tester, tester::{FLAGS, ZERO, OWNER, OTHER, BUMMER, TREASURY}};
 
     fn _lord(level: u8) -> Duelist {
         let mut duelist: Duelist = init::Duelist();

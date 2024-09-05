@@ -87,7 +87,7 @@ mod tester {
     const INITIAL_TIMESTAMP: u64 = 0x100000000;
     const INITIAL_STEP: u64 = 0x10;
 
-    mod flags {
+    mod FLAGS {
         const ACTIONS: u8    = 0b000001;
         const ADMIN: u8      = 0b000010;
         const LORDS: u8      = 0b000100;
@@ -111,11 +111,12 @@ mod tester {
     }
 
     fn setup_world(flags: u8) -> Systems {
-        let mut deploy_actions: bool = (flags & flags::ACTIONS) != 0;
-        let mut deploy_admin: bool = (flags & flags::ADMIN) != 0;
-        let mut deploy_lords: bool = (flags & flags::LORDS) != 0;
-        let mut deploy_minter: bool = (flags & flags::MINTER) != 0;
-        let approve: bool = (flags & flags::APPROVE) != 0;
+        let mut deploy_actions: bool = (flags & FLAGS::ACTIONS) != 0;
+        let mut deploy_admin: bool = (flags & FLAGS::ADMIN) != 0;
+        let mut deploy_lords: bool = (flags & FLAGS::LORDS) != 0;
+        let mut deploy_minter: bool = (flags & FLAGS::MINTER) != 0;
+        let mut deploy_mock_rng = (flags & FLAGS::MOCK_RNG) != 0;
+        let approve: bool = (flags & FLAGS::APPROVE) != 0;
 
         deploy_actions = deploy_actions || approve;
         deploy_lords = deploy_lords || deploy_actions || approve;

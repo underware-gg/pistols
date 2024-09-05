@@ -10,12 +10,12 @@ mod tests {
     use pistols::systems::actions::{IActionsDispatcherTrait};
     use pistols::models::duelist::{Duelist, ProfilePicType, Archetype};
     use pistols::types::constants::{CONST, HONOUR};
-    use pistols::tests::tester::{tester, tester::{flags, ZERO, OWNER, OTHER, BUMMER, TREASURY, ID}};
+    use pistols::tests::tester::{tester, tester::{FLAGS, ZERO, OWNER, OTHER, BUMMER, TREASURY, ID}};
 
 
     #[test]
     fn test_mint_duelist() {
-        let sys = tester::setup_world(flags::ACTIONS | flags::ADMIN | flags::MINTER);
+        let sys = tester::setup_world(FLAGS::ACTIONS | FLAGS::ADMIN | FLAGS::MINTER);
         let duelist1_name: felt252 = 'Player_ONE';
         let duelist2_name: felt252 = 'Player_TWO';
         let duelist1: Duelist = tester::execute_mint_duelist(sys.actions, OWNER(), duelist1_name, ProfilePicType::Duelist, '1', Archetype::Undefined);
@@ -40,7 +40,7 @@ mod tests {
 
     #[test]
     fn test_mint_duelist_archetype() {
-        let sys = tester::setup_world(flags::ACTIONS | flags::ADMIN | flags::MINTER);
+        let sys = tester::setup_world(FLAGS::ACTIONS | FLAGS::ADMIN | FLAGS::MINTER);
         let duelist: Duelist = tester::execute_mint_duelist(sys.actions, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
         assert(duelist.score.level_villain == HONOUR::LEVEL_MAX, 'V_level_villain');
         assert(duelist.score.level_trickster == 0, 'V_level_trickster');
@@ -57,7 +57,7 @@ mod tests {
 
     #[test]
     fn test_update_duelist() {
-        let sys = tester::setup_world(flags::ACTIONS | flags::ADMIN | flags::MINTER);
+        let sys = tester::setup_world(FLAGS::ACTIONS | FLAGS::ADMIN | FLAGS::MINTER);
         let duelist1_name: felt252 = 'Player_ONE';
         let duelist2_name: felt252 = 'Player_TWO';
         let duelist1: Duelist = tester::execute_mint_duelist(sys.actions, OWNER(), duelist1_name, ProfilePicType::Duelist, '1', Archetype::Undefined);
@@ -77,14 +77,14 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Invalid duelist', 'ENTRYPOINT_FAILED'))]
     fn test_update_invalid_duelist() {
-        let sys = tester::setup_world(flags::ACTIONS | flags::ADMIN | flags::MINTER);
+        let sys = tester::setup_world(FLAGS::ACTIONS | FLAGS::ADMIN | FLAGS::MINTER);
         tester::execute_update_duelist(sys.actions, OTHER(), 'P1', ProfilePicType::Duelist, '11');
     }
 
     #[test]
     #[should_panic(expected:('PISTOLS: Not your duelist', 'ENTRYPOINT_FAILED'))]
     fn test_update_duelist_not_owner() {
-        let sys = tester::setup_world(flags::ACTIONS | flags::ADMIN | flags::MINTER);
+        let sys = tester::setup_world(FLAGS::ACTIONS | FLAGS::ADMIN | FLAGS::MINTER);
         let duelist: Duelist = tester::execute_mint_duelist(sys.actions, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Undefined);
         tester::execute_update_duelist_ID(sys.actions, OTHER(), duelist.duelist_id,'P1', ProfilePicType::Duelist, '11');
     }
