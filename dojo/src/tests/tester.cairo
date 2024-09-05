@@ -95,19 +95,22 @@ mod tester {
         const APPROVE: u8    = 0b010000;
     }
 
+    #[derive(Copy, Drop)]
+    struct Systems {
+        world: IWorldDispatcher,
+        actions: IActionsDispatcher,
+        admin: IAdminDispatcher,
+        lords: ILordsMockDispatcher,
+        minter: IMinterDispatcher,
+    }
+
     #[inline(always)]
     fn deploy_system(world: IWorldDispatcher, salt: felt252, class_hash: felt252) -> ContractAddress {
         let contract_address = world.deploy_contract(salt, class_hash.try_into().unwrap());
         (contract_address)
     }
 
-    fn setup_world(flags: u8) -> (
-        IWorldDispatcher,
-        IActionsDispatcher,
-        IAdminDispatcher,
-        ILordsMockDispatcher,
-        IMinterDispatcher,
-    ) {
+    fn setup_world(flags: u8) -> Systems {
         let mut deploy_actions: bool = (flags & flags::ACTIONS) != 0;
         let mut deploy_admin: bool = (flags & flags::ADMIN) != 0;
         let mut deploy_lords: bool = (flags & flags::LORDS) != 0;
@@ -220,7 +223,7 @@ mod tester {
         impersonate(OWNER());
 
 // '---- READY!'.print();
-        (world, actions, admin, lords, minter)
+        (Systems { world, actions, admin, lords, minter })
     }
 
     fn elapse_timestamp(delta: u64) -> (u64, u64) {
