@@ -368,7 +368,7 @@
   },
   {
     "type": "enum",
-    "name": "pistols::types::round::RoundState",
+    "name": "pistols::types::round_state::RoundState",
     "variants": [
       {
         "name": "Null",
@@ -385,6 +385,32 @@
       {
         "name": "Finished",
         "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "pistols::models::challenge::PlayerState",
+    "members": [
+      {
+        "name": "health",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "damage",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "chances",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "dice_crit",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "honour",
+        "type": "core::integer::u8"
       }
     ]
   },
@@ -417,36 +443,12 @@
         "type": "core::integer::u8"
       },
       {
-        "name": "initial_health",
-        "type": "core::integer::u8"
+        "name": "state_start",
+        "type": "pistols::models::challenge::PlayerState"
       },
       {
-        "name": "initial_damage",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "initial_chances",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "final_health",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "final_damage",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "final_chances",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "dice_crit",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "honour",
-        "type": "core::integer::u8"
+        "name": "state_final",
+        "type": "pistols::models::challenge::PlayerState"
       },
       {
         "name": "wager",
@@ -472,7 +474,7 @@
       },
       {
         "name": "state",
-        "type": "pistols::types::round::RoundState"
+        "type": "pistols::types::round_state::RoundState"
       },
       {
         "name": "shot_a",

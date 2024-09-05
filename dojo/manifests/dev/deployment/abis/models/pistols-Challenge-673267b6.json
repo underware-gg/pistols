@@ -368,7 +368,7 @@
   },
   {
     "type": "enum",
-    "name": "pistols::types::challenge::ChallengeState",
+    "name": "pistols::types::challenge_state::ChallengeState",
     "variants": [
       {
         "name": "Null",
@@ -438,7 +438,7 @@
       },
       {
         "name": "state",
-        "type": "pistols::types::challenge::ChallengeState"
+        "type": "pistols::types::challenge_state::ChallengeState"
       },
       {
         "name": "round_number",

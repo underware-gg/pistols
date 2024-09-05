@@ -289,13 +289,13 @@ export function defineContractComponents(world: World) {
     Round: (() => {
       return defineComponent(
         world,
-        { duel_id: RecsType.BigInt, round_number: RecsType.Number, state: RecsType.Number, shot_a: { hash: RecsType.BigInt, salt: RecsType.BigInt, action: RecsType.Number, chance_crit: RecsType.Number, chance_hit: RecsType.Number, chance_lethal: RecsType.Number, dice_crit: RecsType.Number, dice_hit: RecsType.Number, damage: RecsType.Number, block: RecsType.Number, win: RecsType.Number, wager: RecsType.Number, health: RecsType.Number, honour: RecsType.Number }, shot_b: { hash: RecsType.BigInt, salt: RecsType.BigInt, action: RecsType.Number, chance_crit: RecsType.Number, chance_hit: RecsType.Number, chance_lethal: RecsType.Number, dice_crit: RecsType.Number, dice_hit: RecsType.Number, damage: RecsType.Number, block: RecsType.Number, win: RecsType.Number, wager: RecsType.Number, health: RecsType.Number, honour: RecsType.Number } },
+        { duel_id: RecsType.BigInt, round_number: RecsType.Number, state: RecsType.Number, shot_a: { salt: RecsType.BigInt, hash: RecsType.BigInt, card_1: RecsType.Number, card_2: RecsType.Number, card_3: RecsType.Number, card_4: RecsType.Number, state_start: { health: RecsType.Number, damage: RecsType.Number, chances: RecsType.Number, dice_crit: RecsType.Number, honour: RecsType.Number }, state_final: { health: RecsType.Number, damage: RecsType.Number, chances: RecsType.Number, dice_crit: RecsType.Number, honour: RecsType.Number }, wager: RecsType.Number, win: RecsType.Number }, shot_b: { salt: RecsType.BigInt, hash: RecsType.BigInt, card_1: RecsType.Number, card_2: RecsType.Number, card_3: RecsType.Number, card_4: RecsType.Number, state_start: { health: RecsType.Number, damage: RecsType.Number, chances: RecsType.Number, dice_crit: RecsType.Number, honour: RecsType.Number }, state_final: { health: RecsType.Number, damage: RecsType.Number, chances: RecsType.Number, dice_crit: RecsType.Number, honour: RecsType.Number }, wager: RecsType.Number, win: RecsType.Number } },
         {
           metadata: {
             namespace: "pistols",
             name: "Round",
-            types: ["u128","u8","enum","u64","u64","u16","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u64","u64","u16","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8"],
-            customTypes: ["RoundState","Shot","Shot"],
+            types: ["u128","u8","enum","felt252","u128","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","felt252","u128","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8"],
+            customTypes: ["RoundState","Shot","PlayerState","PlayerState","Shot","PlayerState","PlayerState"],
           },
         }
       );

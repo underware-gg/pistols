@@ -259,7 +259,7 @@
   },
   {
     "type": "enum",
-    "name": "pistols::types::challenge::ChallengeState",
+    "name": "pistols::types::challenge_state::ChallengeState",
     "variants": [
       {
         "name": "Null",
@@ -306,68 +306,306 @@
     ]
   },
   {
+    "type": "enum",
+    "name": "pistols::types::cards::paces::PacesCard",
+    "variants": [
+      {
+        "name": "None",
+        "type": "()"
+      },
+      {
+        "name": "Paces1",
+        "type": "()"
+      },
+      {
+        "name": "Paces2",
+        "type": "()"
+      },
+      {
+        "name": "Paces3",
+        "type": "()"
+      },
+      {
+        "name": "Paces4",
+        "type": "()"
+      },
+      {
+        "name": "Paces5",
+        "type": "()"
+      },
+      {
+        "name": "Paces6",
+        "type": "()"
+      },
+      {
+        "name": "Paces7",
+        "type": "()"
+      },
+      {
+        "name": "Paces8",
+        "type": "()"
+      },
+      {
+        "name": "Paces9",
+        "type": "()"
+      },
+      {
+        "name": "Paces10",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "enum",
+    "name": "pistols::types::cards::env::EnvCard",
+    "variants": [
+      {
+        "name": "None",
+        "type": "()"
+      },
+      {
+        "name": "CommonDamageUp",
+        "type": "()"
+      },
+      {
+        "name": "CommonDamageDown",
+        "type": "()"
+      },
+      {
+        "name": "CommonChancesUp",
+        "type": "()"
+      },
+      {
+        "name": "CommonChancesDown",
+        "type": "()"
+      },
+      {
+        "name": "UncommonDamageUp",
+        "type": "()"
+      },
+      {
+        "name": "UncommonDamageDown",
+        "type": "()"
+      },
+      {
+        "name": "UncommonChancesUp",
+        "type": "()"
+      },
+      {
+        "name": "UncommonChancesDown",
+        "type": "()"
+      },
+      {
+        "name": "SpecialAllShotsHit",
+        "type": "()"
+      },
+      {
+        "name": "SpecialAllShotsMiss",
+        "type": "()"
+      },
+      {
+        "name": "SpecialDoubleTactics",
+        "type": "()"
+      },
+      {
+        "name": "SpecialNoTactics",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "enum",
+    "name": "pistols::types::cards::blades::BladesCard",
+    "variants": [
+      {
+        "name": "None",
+        "type": "()"
+      },
+      {
+        "name": "Seppuku",
+        "type": "()"
+      },
+      {
+        "name": "RunAway",
+        "type": "()"
+      },
+      {
+        "name": "Behead",
+        "type": "()"
+      },
+      {
+        "name": "Grapple",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "enum",
+    "name": "pistols::types::duel_progress::DuelistDrawnCard",
+    "variants": [
+      {
+        "name": "None",
+        "type": "()"
+      },
+      {
+        "name": "Shoot",
+        "type": "pistols::types::cards::paces::PacesCard"
+      },
+      {
+        "name": "Dodge",
+        "type": "pistols::types::cards::paces::PacesCard"
+      },
+      {
+        "name": "Blades",
+        "type": "pistols::types::cards::blades::BladesCard"
+      }
+    ]
+  },
+  {
     "type": "struct",
-    "name": "pistols::models::structs::SimulateChances",
+    "name": "pistols::models::challenge::PlayerState",
     "members": [
       {
-        "name": "action_honour",
-        "type": "core::integer::i8"
-      },
-      {
-        "name": "duelist_honour",
+        "name": "health",
         "type": "core::integer::u8"
       },
       {
-        "name": "crit_chances",
+        "name": "damage",
         "type": "core::integer::u8"
       },
       {
-        "name": "crit_base_chance",
+        "name": "chances",
         "type": "core::integer::u8"
       },
       {
-        "name": "crit_bonus",
+        "name": "dice_crit",
         "type": "core::integer::u8"
       },
       {
-        "name": "crit_match_bonus",
+        "name": "honour",
+        "type": "core::integer::u8"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "pistols::types::duel_progress::DuelPace",
+    "members": [
+      {
+        "name": "pace",
+        "type": "pistols::types::cards::paces::PacesCard"
+      },
+      {
+        "name": "card_env",
+        "type": "pistols::types::cards::env::EnvCard"
+      },
+      {
+        "name": "dice_env",
         "type": "core::integer::u8"
       },
       {
-        "name": "crit_trickster_penalty",
+        "name": "card_a",
+        "type": "pistols::types::duel_progress::DuelistDrawnCard"
+      },
+      {
+        "name": "card_b",
+        "type": "pistols::types::duel_progress::DuelistDrawnCard"
+      },
+      {
+        "name": "state_a",
+        "type": "pistols::models::challenge::PlayerState"
+      },
+      {
+        "name": "state_b",
+        "type": "pistols::models::challenge::PlayerState"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "core::array::Span::<pistols::types::duel_progress::DuelPace>",
+    "members": [
+      {
+        "name": "snapshot",
+        "type": "@core::array::Array::<pistols::types::duel_progress::DuelPace>"
+      }
+    ]
+  },
+  {
+    "type": "enum",
+    "name": "pistols::types::cards::tactics::TacticsCard",
+    "variants": [
+      {
+        "name": "None",
+        "type": "()"
+      },
+      {
+        "name": "Insult",
+        "type": "()"
+      },
+      {
+        "name": "CoinToss",
+        "type": "()"
+      },
+      {
+        "name": "Vengeful",
+        "type": "()"
+      },
+      {
+        "name": "ThickCoat",
+        "type": "()"
+      },
+      {
+        "name": "Reversal",
+        "type": "()"
+      },
+      {
+        "name": "Bananas",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "pistols::types::cards::hand::PlayerHand",
+    "members": [
+      {
+        "name": "card_paces",
+        "type": "pistols::types::cards::paces::PacesCard"
+      },
+      {
+        "name": "card_dodge",
+        "type": "pistols::types::cards::paces::PacesCard"
+      },
+      {
+        "name": "card_tactics",
+        "type": "pistols::types::cards::tactics::TacticsCard"
+      },
+      {
+        "name": "card_blades",
+        "type": "pistols::types::cards::blades::BladesCard"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "pistols::types::duel_progress::DuelProgress",
+    "members": [
+      {
+        "name": "paces",
+        "type": "core::array::Span::<pistols::types::duel_progress::DuelPace>"
+      },
+      {
+        "name": "winner",
         "type": "core::integer::u8"
       },
       {
-        "name": "hit_chances",
-        "type": "core::integer::u8"
+        "name": "hand_a",
+        "type": "pistols::types::cards::hand::PlayerHand"
       },
       {
-        "name": "hit_base_chance",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "hit_bonus",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "hit_injury_penalty",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "hit_trickster_penalty",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "lethal_chances",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "lethal_base_chance",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "lethal_lord_penalty",
-        "type": "core::integer::u8"
+        "name": "hand_b",
+        "type": "pistols::types::cards::hand::PlayerHand"
       }
     ]
   },
@@ -486,7 +724,7 @@
         ],
         "outputs": [
           {
-            "type": "pistols::types::challenge::ChallengeState"
+            "type": "pistols::types::challenge_state::ChallengeState"
           }
         ],
         "state_mutability": "external"
@@ -633,34 +871,6 @@
       },
       {
         "type": "function",
-        "name": "simulate_chances",
-        "inputs": [
-          {
-            "name": "_duelist_id",
-            "type": "core::integer::u128"
-          },
-          {
-            "name": "_duel_id",
-            "type": "core::integer::u128"
-          },
-          {
-            "name": "_round_number",
-            "type": "core::integer::u8"
-          },
-          {
-            "name": "_action",
-            "type": "core::integer::u8"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "pistols::models::structs::SimulateChances"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
         "name": "get_player_full_deck",
         "inputs": [
           {
@@ -671,6 +881,22 @@
         "outputs": [
           {
             "type": "core::array::Array::<core::array::Array::<core::integer::u8>>"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_duel_progress",
+        "inputs": [
+          {
+            "name": "duel_id",
+            "type": "core::integer::u128"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "pistols::types::duel_progress::DuelProgress"
           }
         ],
         "state_mutability": "view"
