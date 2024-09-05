@@ -11,6 +11,7 @@ mod tests {
     use pistols::models::duelist::{Duelist};
     use pistols::models::table::{TABLES};
     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
+    use pistols::types::round::{RoundState, RoundStateTrait};
     use pistols::types::constants::{CONST};
     use pistols::utils::timestamp::{timestamp};
     use pistols::tests::tester::{tester,
@@ -327,9 +328,131 @@ mod tests {
         assert(sys.actions.has_pact(ch.table_id, ID(ID_A), ID(ID_B)) == false, 'has_pact_id_false_still');
     }
 
+
+
     //-----------------------------------------
     // ACCEPT CHALLENGE
     //
-    // at test_duel.cairo
-    //
+
+    #[test]
+    fn test_challenge_accept_to_duelist() {
+        let sys = tester::setup_world(FLAGS::ACTIONS | FLAGS::APPROVE);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        assert(sys.actions.has_pact(TABLE_ID, ID(A), ID(B)) == false, 'has_pact_no_1');
+        assert(sys.actions.has_pact(TABLE_ID, ID(B), ID(A)) == false, 'has_pact_no_2');
+
+        let duel_id: u128 = tester::execute_create_challenge(@sys.actions, A, B, MESSAGE_1, TABLE_ID, 0, 48);
+        let ch = tester::get_ChallengeEntity(sys.world, duel_id);
+        assert(ch.state == ChallengeState::Awaiting, 'state');
+        assert(ch.address_a == A, 'challenger');
+        assert(ch.address_b == ZERO(), 'challenger');   // challenged an id, address is empty
+        assert(ch.duelist_id_a == ID(A), 'challenger_id');
+        assert(ch.duelist_id_b == ID(B), 'challenged_id');
+
+        // reply...
+        let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
+        let new_state: ChallengeState = tester::execute_reply_challenge(@sys.actions, B, duel_id, true);
+        assert(new_state == ChallengeState::InProgress, 'in_progress');
+        assert(sys.actions.has_pact(ch.table_id, ID(A), ID(B)) == true, 'has_pact_yes_1');
+        assert(sys.actions.has_pact(ch.table_id, ID(B), ID(A)) == true, 'has_pact_yes_2');
+
+        let ch = tester::get_ChallengeEntity(sys.world, duel_id);
+        assert(ch.state == new_state, 'state');
+        assert(ch.round_number == 1, 'round_number');
+        assert(ch.timestamp_start == timestamp, 'timestamp_start');
+        assert(ch.timestamp_end == 0, 'timestamp_end');
+        assert(ch.address_b == B, 'challenged');   // << UPDATED!!!
+        
+        let round = tester::get_RoundEntity(sys.world, duel_id, 1);
+        assert(round.state == RoundState::Commit, 'round.state');
+    }
+
+    #[test]
+    fn test_challenge_accept_to_address() {
+        let sys = tester::setup_world(FLAGS::ACTIONS);
+        let A: ContractAddress = LITTLE_BOY();
+        let B: ContractAddress = LITTLE_GIRL();
+        let ID_A: ContractAddress = OWNED_BY_LITTLE_BOY();
+        let ID_B: ContractAddress = OWNED_BY_LITTLE_GIRL();
+        let duel_id: u128 = tester::execute_create_challenge_ID(@sys.actions, A, ID(ID_A), B, MESSAGE_1, TABLES::COMMONERS, 0, 48);
+        let ch = tester::get_ChallengeEntity(sys.world, duel_id);
+// ch.address_a.print();
+// ch.address_b.print();
+// ch.duelist_id_a.print();
+// ch.duelist_id_b.print();
+        assert(ch.state == ChallengeState::Awaiting, 'state');
+        assert(ch.address_a == A, 'challenger');
+        assert(ch.address_b == B, 'challenged');
+        assert(ch.duelist_id_a == ID(ID_A), 'challenger_id');
+        assert(ch.duelist_id_b == 0, 'challenged_id'); // challenged an address, id is empty
+        assert(sys.actions.has_pact(ch.table_id, ID(A), ID(B)) == true, 'has_pact_addr_true_1');
+        assert(sys.actions.has_pact(ch.table_id, ID(B), ID(A)) == true, 'has_pact_addr_true_2');
+        assert(sys.actions.has_pact(ch.table_id, ID(ID_A), ID(ID_B)) == false, 'has_pact_id_false_1');
+        assert(sys.actions.has_pact(ch.table_id, ID(ID_B), ID(ID_A)) == false, 'has_pact_id_false_2');
+        // reply...
+        let new_state: ChallengeState = tester::execute_reply_challenge_ID(@sys.actions, B, ID(ID_B), duel_id, true);
+        assert(new_state == ChallengeState::InProgress, 'in_progress');
+        assert(sys.actions.has_pact(ch.table_id, ID(A), ID(B)) == false, 'has_pact_addr_false_1');
+        assert(sys.actions.has_pact(ch.table_id, ID(B), ID(A)) == false, 'has_pact_addr_false_2');
+        assert(sys.actions.has_pact(ch.table_id, ID(ID_A), ID(ID_B)) == true, 'has_pact_id_true_1');
+        assert(sys.actions.has_pact(ch.table_id, ID(ID_B), ID(ID_A)) == true, 'has_pact_id_true_2');
+        let ch = tester::get_ChallengeEntity(sys.world, duel_id);
+        assert(ch.duelist_id_b == ID(ID_B), 'challenged_id_ok');   // << UPDATED!!!
+    }
+
+    #[test]
+    #[should_panic(expected:('PISTOLS: Not your duelist', 'ENTRYPOINT_FAILED'))]
+    fn test_reply_wrong_duelist() {
+        let sys = tester::setup_world(FLAGS::ACTIONS | FLAGS::LORDS | FLAGS::APPROVE);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER(); // challenge a duelist
+        let duel_id: u128 = tester::execute_create_challenge(@sys.actions, A, B, MESSAGE_1, TABLE_ID, 0, 48);
+        // reply with different TOKEN ID
+        // panic!
+        tester::execute_reply_challenge_ID(@sys.actions, B, 0xaaa, duel_id, true);
+    }
+
+    #[test]
+    #[should_panic(expected:('PISTOLS: Not your challenge', 'ENTRYPOINT_FAILED'))]
+    fn test_reply_wrong_player_address() {
+        let sys = tester::setup_world(FLAGS::ACTIONS | FLAGS::LORDS | FLAGS::APPROVE);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = LITTLE_BOY(); // challenge a wallet
+        let duel_id: u128 = tester::execute_create_challenge(@sys.actions, A, B, MESSAGE_1, TABLE_ID, 0, 48);
+        // reply with different TOKEN ID
+        // panic!
+        let another_boy: ContractAddress = starknet::contract_address_const::<0xaaaa00000000000aa>();
+        tester::execute_reply_challenge(@sys.actions, another_boy, duel_id, true);
+    }
+
+    #[test]
+    #[should_panic(expected:('PISTOLS: Not your challenge', 'ENTRYPOINT_FAILED'))]
+    fn test_reply_wrong_player_duelist() {
+        let sys = tester::setup_world(FLAGS::ACTIONS | FLAGS::LORDS | FLAGS::APPROVE);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER(); // challenge a duelist
+        let duel_id: u128 = tester::execute_create_challenge(@sys.actions, A, B, MESSAGE_1, TABLE_ID, 0, 48);
+        // reply with different TOKEN ID
+        // panic!
+        tester::execute_reply_challenge(@sys.actions, BUMMER(), duel_id, true);
+    }
+
+    #[test]
+    #[should_panic(expected:('PISTOLS: Challenge exists', 'ENTRYPOINT_FAILED'))]
+    fn test_reply_has_pact() {
+        let sys = tester::setup_world(FLAGS::ACTIONS | FLAGS::LORDS | FLAGS::APPROVE);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = LITTLE_BOY(); // challenge a wallet
+        // fund account
+        tester::execute_lords_faucet(@sys.lords, B);
+        tester::execute_lords_approve(@sys.lords, B, sys.actions.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
+        // new challenge
+        let duel_id: u128 = tester::execute_create_challenge(@sys.actions, A, B, MESSAGE_1, TABLE_ID, 0, 48);
+        let _new_state: ChallengeState = tester::execute_reply_challenge(@sys.actions, B, duel_id, true);
+        // new challenge
+        let duel_id: u128 = tester::execute_create_challenge(@sys.actions, A, B, MESSAGE_1, TABLE_ID, 0, 48);
+        let _new_state: ChallengeState = tester::execute_reply_challenge(@sys.actions, B, duel_id, true);
+    }
+
 }

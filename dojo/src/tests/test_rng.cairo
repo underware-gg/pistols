@@ -31,7 +31,10 @@ mod tests {
     fn test_mock_rng() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
         let mut dice: Dice = DiceTrait::new(@sys.world, 0x1212121212);
-        sys.rng.set_salts(['salt_1', 'salt_2', 'salt_3'].span(), [11, 22, 33].span());
+        sys.rng.set_salts(
+            ['salt_1', 'salt_2', 'salt_3'].span(),
+            [11, 22, 33].span(),
+        );
         let r1 = dice.throw('salt_1', 100);
         let r2 = dice.throw('salt_2', 100);
         let r3 = dice.throw('salt_3', 100);

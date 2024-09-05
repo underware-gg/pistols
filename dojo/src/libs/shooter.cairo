@@ -97,11 +97,11 @@ mod shooter {
         // Validate moves hash
         if (duelist_number == 1) {
             assert(round.shot_a.card_1 == 0, Errors::ALREADY_REVEALED);
-            assert(round.shot_a.hash == hash, Errors::ACTION_HASH_MISMATCH);
+            assert(round.shot_a.hash == hash, Errors::MOVES_HASH_MISMATCH);
             round.shot_a.initialize(salt, moves);
         } else if (duelist_number == 2) {
             assert(round.shot_b.card_1 == 0, Errors::ALREADY_REVEALED);
-            assert(round.shot_b.hash == hash, Errors::ACTION_HASH_MISMATCH);
+            assert(round.shot_b.hash == hash, Errors::MOVES_HASH_MISMATCH);
             round.shot_b.initialize(salt, moves);
         }
 

@@ -71,8 +71,8 @@ mod tests {
     mod test_admin;
     mod test_challenge;
     mod test_chances;
+    mod test_duel;
     mod test_duelist;
-    // mod test_round1;
     // mod test_wager;
     // mod test_torna;
     mod test_utils;

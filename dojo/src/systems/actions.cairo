@@ -146,7 +146,7 @@ mod actions {
         const ALREADY_REVEALED: felt252          = 'PISTOLS: Already revealed';
         const INVALID_SALT: felt252              = 'PISTOLS: Invalid salt';
         const INVALID_MOVES_COUNT: felt252       = 'PISTOLS: Invalid moves count';
-        const ACTION_HASH_MISMATCH: felt252      = 'PISTOLS: Action hash mismatch';
+        const MOVES_HASH_MISMATCH: felt252       = 'PISTOLS: Moves hash mismatch';
     }
 
     // impl: implement functions specified in trait
