@@ -8,7 +8,7 @@ use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
 use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
 use pistols::systems::actions::actions::{Errors};
-use pistols::models::challenge::{Challenge, ChallengeEntity, Snapshot, SnapshotEntity, Wager, WagerEntity, Round, RoundEntity, Shot};
+use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, WagerEntity, Round, RoundEntity, Shot};
 use pistols::models::duelist::{Duelist, DuelistTrait, DuelistEntity, Pact, PactEntity, Scoreboard, ScoreboardEntity, Score, ScoreTrait};
 use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableType, TableTypeTrait};
 use pistols::models::config::{Config, ConfigEntity};
@@ -95,42 +95,6 @@ fn set_pact(store: Store, challenge: Challenge) {
 fn unset_pact(store: Store, mut challenge: Challenge) {
     challenge.duel_id = 0;
     set_pact(store, challenge);
-}
-
-
-//------------------------
-// Challenge management
-//
-
-fn create_challenge_snapshot(store: Store, challenge: Challenge) {
-    // copy data from Table scoreboard
-    let mut scoreboard_a: Scoreboard = store.get_scoreboard(challenge.table_id, challenge.duelist_id_a);
-    let mut scoreboard_b: Scoreboard = store.get_scoreboard(challenge.table_id, challenge.duelist_id_b);
-    // check maxxed up tables...
-    let table : TableConfigEntity = store.get_table_config_entity(challenge.table_id);
-    if (table.table_type.maxxed_up_levels()) {
-        // new duelist on this table, copy levels from main scoreboard
-        clone_snapshot_duelist_levels(store, challenge.duelist_id_a, ref scoreboard_a);
-        clone_snapshot_duelist_levels(store, challenge.duelist_id_b, ref scoreboard_b);
-    }
-    // create snapshot
-    let snapshot = Snapshot {
-        duel_id: challenge.duel_id,
-        score_a: scoreboard_a.score,
-        score_b: scoreboard_b.score,
-    };
-    store.set_snapshot(@snapshot);
-}
-fn clone_snapshot_duelist_levels(store: Store, duelist_id: u128, ref scoreboard: Scoreboard) {
-    // only new duelist on this table...
-    if (scoreboard.score.total_duels == 0) {
-        // maxx up main scoreboard levels
-        let duelist: DuelistEntity = store.get_duelist_entity(duelist_id);
-        scoreboard.score.level_villain = if (duelist.score.is_villain()) {HONOUR::LEVEL_MAX} else {0};
-        scoreboard.score.level_trickster = if (duelist.score.is_trickster()) {HONOUR::LEVEL_MAX} else {0};
-        scoreboard.score.level_lord = if (duelist.score.is_lord()) {HONOUR::LEVEL_MAX} else {0};
-        store.set_scoreboard(@scoreboard);
-    }
 }
 
 
@@ -325,53 +289,4 @@ fn _average_trickster(new_level: u8, current_level: u8) -> u8 {
         ((new_level + current_level) / 2)
     } else { (new_level) }
 }
-
-
-
-
-
-//------------------------
-// read calls
-//
-
-// fn call_simulate_honour_for_action(store: Store, mut score: Score, action: Action, table_type: TableType) -> (i8, u8) {
-//     let action_honour: i8 = action.honour();
-//     if (action_honour >= 0) {
-//         score.total_duels += 1;
-//         update_score_honour(ref score, MathU8::abs(action_honour), !table_type.maxxed_up_levels());
-//     }
-//     (action_honour, score.honour)
-// }
-
-// fn call_get_duelist_health(store: Store, duelist_id: u128, duel_id: u128, round_number: u8) -> u8 {
-//     if (round_number == 1) {
-//         (CONST::FULL_HEALTH)
-//     } else {
-//         let shot: Shot = call_get_duelist_round_shot(store, duelist_id, duel_id, round_number);
-//         (shot.health)
-//     }
-// }
-// fn call_get_duelist_round_shot(store: Store, duelist_id: u128, duel_id: u128, round_number: u8) -> Shot {
-//     let challenge: ChallengeEntity = store.get_challenge_entity(duel_id);
-//     let round: RoundEntity = store.get_round_entity(duel_id, round_number);
-//     if (challenge.duelist_id_a == duelist_id) {
-//         (round.shot_a)
-//     } else if (challenge.duelist_id_b == duelist_id) {
-//         (round.shot_b)
-//     } else {
-//         (init::Shot())
-//     }
-// }
-
-// fn call_get_snapshot_scores(store: Store, duelist_id: u128, duel_id: u128) -> (Score, Score) {
-//     let challenge: ChallengeEntity = store.get_challenge_entity(duel_id);
-//     let snapshot: SnapshotEntity = store.get_snapshot_entity(duel_id);
-//     if (challenge.duelist_id_a == duelist_id) {
-//         (snapshot.score_a, snapshot.score_b)
-//     } else if (challenge.duelist_id_b == duelist_id) {
-//         (snapshot.score_b, snapshot.score_a)
-//     } else {
-//         (init::Score(), init::Score())
-//     }
-// }
 

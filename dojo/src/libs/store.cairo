@@ -6,7 +6,6 @@ use pistols::models::{
         Challenge, ChallengeStore, ChallengeEntity, ChallengeEntityStore,
         Wager, WagerStore, WagerEntity, WagerEntityStore,
         Round, RoundStore, RoundEntity, RoundEntityStore,
-        Snapshot, SnapshotStore, SnapshotEntity, SnapshotEntityStore,
     },
     duelist::{
         Duelist, DuelistStore, DuelistEntity, DuelistEntityStore,
@@ -74,13 +73,6 @@ impl StoreImpl of StoreTrait {
     fn get_round_entity(self: Store, duel_id: u128, round_number: u8) -> RoundEntity {
         (RoundEntityStore::get(self.world,
             RoundStore::entity_id_from_keys(duel_id, round_number)
-        ))
-    }
-
-    #[inline(always)]
-    fn get_snapshot_entity(self: Store, duel_id: u128) -> SnapshotEntity {
-        (SnapshotEntityStore::get(self.world,
-            SnapshotStore::entity_id_from_keys(duel_id)
         ))
     }
 
@@ -174,16 +166,6 @@ impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn set_round_entity(self: Store, entity: @RoundEntity) {
-        entity.update(self.world);
-    }
-
-    #[inline(always)]
-    fn set_snapshot(self: Store, model: @Snapshot) {
-        model.set(self.world);
-    }
-
-    #[inline(always)]
-    fn set_snapshot_entity(self: Store, entity: @SnapshotEntity) {
         entity.update(self.world);
     }
 

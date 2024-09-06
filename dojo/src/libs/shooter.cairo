@@ -8,7 +8,7 @@ mod shooter {
     use pistols::systems::actions::actions::{Errors};
     use pistols::systems::rng::{Dice, DiceTrait};
     use pistols::libs::utils;
-    use pistols::models::challenge::{Challenge, Snapshot, SnapshotEntity, Round, RoundTrait, RoundEntity, Shot, ShotTrait, PlayerState};
+    use pistols::models::challenge::{Challenge, Round, RoundTrait, RoundEntity, Shot, ShotTrait, PlayerState};
     use pistols::models::duelist::{Duelist, Score};
     use pistols::models::table::{TableConfig, TableConfigEntity, TableType};
     use pistols::types::constants::{CONST};
@@ -141,7 +141,6 @@ mod shooter {
     // Decide who wins a round, or go to next
     //
     fn game_loop(store: Store, challenge: Challenge, round: Round) -> DuelProgress {
-        // let _snapshot: SnapshotEntity = store.get_snapshot_entity(challenge.duel_id);
         // let _table_type: TableType = store.get_table_config_entity(challenge.table_id).table_type;
         
         let seed: felt252 = round.make_seed();

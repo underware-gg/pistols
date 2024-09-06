@@ -53,7 +53,6 @@ sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
   model:pistols-Duelist,$ACTIONS_TAG \
   model:pistols-Scoreboard,$ACTIONS_TAG \
   model:pistols-Challenge,$ACTIONS_TAG \
-  model:pistols-Snapshot,$ACTIONS_TAG \
   model:pistols-Wager,$ACTIONS_TAG \
   model:pistols-Pact,$ACTIONS_TAG \
   model:pistols-Round,$ACTIONS_TAG

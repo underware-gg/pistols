@@ -389,13 +389,6 @@ mod tests {
         tester::assert_balance(sys.lords, TREASURY(), balance_treasury, 0, fee * 2, 'balance_treasury_3');
         tester::assert_winner_balance(sys.lords, challenge.winner, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'balance_winner_3');
 
-        // Snapshot was created and kept original value
-        let snapshot = tester::get_Snapshot(sys.world, duel_id);
-        assert(snapshot.score_a.total_duels > 0, 'snap_a.total_duels >');
-        assert(snapshot.score_b.total_duels > 0, 'snap_b.total_duels >');
-        assert(snapshot.score_a.total_duels < duelist_a.score.total_duels, 'snap_a.total_duels <');
-        assert(snapshot.score_b.total_duels < duelist_b.score.total_duels, 'snap_b.total_duels <');
-
         _assert_duel_progress(sys, duel_id);
     }
 

@@ -27,7 +27,6 @@ mod tester {
 
     use pistols::models::challenge::{
         Challenge, ChallengeStore, ChallengeEntity, ChallengeEntityStore,
-        Snapshot, SnapshotStore, SnapshotEntity, SnapshotEntityStore,
         Wager, WagerStore, WagerEntity, WagerEntityStore,
         Round, RoundStore, RoundEntity, RoundEntityStore,
     };
@@ -164,7 +163,6 @@ mod tester {
                 world.grant_writer(selector_from_tag!("pistols-Duelist"), address);
                 world.grant_writer(selector_from_tag!("pistols-Scoreboard"), address);
                 world.grant_writer(selector_from_tag!("pistols-Challenge"), address);
-                world.grant_writer(selector_from_tag!("pistols-Snapshot"), address);
                 world.grant_writer(selector_from_tag!("pistols-Wager"), address);
                 world.grant_writer(selector_from_tag!("pistols-Pact"), address);
                 world.grant_writer(selector_from_tag!("pistols-Round"), address);
@@ -445,10 +443,6 @@ mod tester {
     #[inline(always)]
     fn get_ChallengeEntity(world: IWorldDispatcher, duel_id: u128) -> ChallengeEntity {
         (ChallengeEntityStore::get(world, ChallengeStore::entity_id_from_keys(duel_id)))
-    }
-    #[inline(always)]
-    fn get_Snapshot(world: IWorldDispatcher, duel_id: u128) -> Snapshot {
-        (SnapshotStore::get(world, duel_id))
     }
     #[inline(always)]
     fn get_Wager(world: IWorldDispatcher, duel_id: u128) -> Wager {

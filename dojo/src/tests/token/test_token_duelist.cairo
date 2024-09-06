@@ -29,7 +29,7 @@ use pistols::systems::minter::{
 };
 use pistols::models::{
     duelist::{Duelist, DuelistEntity, DuelistEntityStore, Score, Scoreboard, ProfilePicType},
-    challenge::{Challenge, Snapshot, Wager, Round},
+    challenge::{Challenge, Wager, Round},
     config::{Config},
     table::{TableConfig, TableAdmittance},
     token_config::{TokenConfig},

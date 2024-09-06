@@ -377,8 +377,6 @@ mod actions {
                     challenge.round_number = 1;
                     challenge.timestamp_start = timestamp;
                     challenge.timestamp_end = 0;
-                    // create Duelists snapshots for this Challenge
-                    utils::create_challenge_snapshot(store, challenge);
                     // transfer wager/fee from Challenged to the contract
                     utils::deposit_wager_fees(store, challenge, challenge.address_b, starknet::get_contract_address());
                     // events

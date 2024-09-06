@@ -39,17 +39,6 @@ pub struct Wager {
     fee: u128,
 }
 
-// Score snapshot
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct Snapshot {
-    #[key]
-    duel_id: u128,
-    //-------------------------
-    score_a: Score,
-    score_b: Score,
-}
-
 //
 // Each duel round
 #[derive(Copy, Drop, Serde)]
