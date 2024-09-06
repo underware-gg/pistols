@@ -88,14 +88,6 @@
 //         assert(crit_bonus_b == CHANCES::CRIT_BONUS_LORD, 'crit_bonus_a');
 //         assert(hit_bonus_a == CHANCES::HIT_BONUS_VILLAIN, 'crit_bonus_a');
 //         assert(hit_bonus_b == 0, 'crit_bonus_a');
-//         //
-//         // Simulate!
-//         let chances_a: SimulateChances = actions.simulate_chances(duelist1.duelist_id, duel_id, challenge.round_number, 1);
-//         let chances_b: SimulateChances = actions.simulate_chances(duelist2.duelist_id, duel_id, challenge.round_number, 10);
-//         assert(crit_bonus_a == chances_a.crit_bonus, 'chances_a.crit_bonus');
-//         assert(crit_bonus_b == chances_b.crit_bonus, 'chances_b.crit_bonus');
-//         assert(hit_bonus_a == chances_a.hit_bonus, 'chances_a.hit_bonus');
-//         assert(hit_bonus_b == chances_b.hit_bonus, 'chances_b.hit_bonus');
 //     }
 
 //     #[test]

@@ -35,7 +35,6 @@ mod types {
     mod events;
     mod misc;
     mod round_state;
-    mod simulate_chances;
     mod typed_data;
     mod cards {
         mod hand;

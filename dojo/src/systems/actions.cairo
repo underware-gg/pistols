@@ -3,7 +3,6 @@ use pistols::models::challenge::{Challenge};
 use pistols::models::duelist::{Duelist, ProfilePicType, Archetype};
 use pistols::types::challenge_state::{ChallengeState};
 use pistols::types::duel_progress::{DuelProgress};
-use pistols::types::simulate_chances::{SimulateChances};
 
 // define the interface
 #[dojo::interface]
@@ -67,7 +66,6 @@ trait IActions {
     fn has_pact(world: @IWorldDispatcher, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool;
     fn can_join(world: @IWorldDispatcher, table_id: felt252, duelist_id: u128) -> bool;
     fn calc_fee(world: @IWorldDispatcher, table_id: felt252, wager_value: u128) -> u128;
-    fn simulate_chances(world: @IWorldDispatcher, _duelist_id: u128, _duel_id: u128, _round_number: u8, _action: u8) -> SimulateChances;
     fn get_player_full_deck(world: @IWorldDispatcher, _table_id: felt252) -> Array<Array<u8>>;
     fn get_duel_progress(world: @IWorldDispatcher, duel_id: u128) -> DuelProgress;
     fn test_validate_commit_message(world: @IWorldDispatcher,
@@ -107,7 +105,6 @@ mod actions {
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::duel_progress::{DuelProgress};
     use pistols::types::round_state::{RoundState, RoundStateTrait};
-    use pistols::types::simulate_chances::{SimulateChances};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::misc::{ZERO, WORLD};
@@ -467,56 +464,6 @@ mod actions {
             let store: Store = StoreTrait::new(world);
             let table: TableConfigEntity = store.get_table_config_entity(table_id);
             (table.calc_fee(wager_value))
-        }
-
-        fn simulate_chances(world: @IWorldDispatcher, _duelist_id: u128, _duel_id: u128, _round_number: u8, _action: u8) -> SimulateChances {
-            WORLD(world);
-            // let store: Store = StoreTrait::new(world);
-            // let (score_self, score_other): (Score, Score) = utils::call_get_snapshot_scores(store, duelist_id, duel_id);
-            // let health: u8 = utils::call_get_duelist_health(store, duelist_id, duel_id, round_number);
-            // let action_self: Action = action.into();
-            // let action_other: Action = action.into();
-            // let challenge: ChallengeEntity = store.get_challenge_entity(duel_id);
-            // let table_type: TableType = store.get_table_config_entity(challenge.table_id).table_type;
-            // // honour
-            // let (action_honour, duelist_honour): (i8, u8) = utils::call_simulate_honour_for_action(store, score_self, action_self, table_type);
-            // // crit
-            // let crit_chances: u8 = utils::calc_crit_chances(score_self, score_other, action_self, action_other, health, table_type);
-            // let crit_base_chance: u8 = action_self.crit_chance();
-            // let crit_bonus: u8 = utils::calc_crit_bonus(score_self, table_type);
-            // let crit_match_bonus: u8 = utils::calc_crit_match_bonus(score_self, action_self, action_other);
-            // let crit_trickster_penalty: u8 = utils::calc_crit_trickster_penalty(score_self, score_other);
-            // // hit
-            // let hit_chances: u8 = utils::calc_hit_chances(score_self, score_other, action_self, action_other, health, table_type);
-            // let hit_base_chance: u8 = action_self.hit_chance();
-            // let hit_bonus: u8 = utils::calc_hit_bonus(score_self, table_type);
-            // let hit_injury_penalty: u8 = utils::calc_hit_injury_penalty(action_self, health);
-            // let hit_trickster_penalty: u8 = utils::calc_hit_trickster_penalty(score_self, score_other);
-            // // lethal
-            // let lethal_chances: u8 = utils::calc_lethal_chances(score_self, score_other, action_self, action_other, hit_chances);
-            // let lethal_base_chance: u8 = action_self.lethal_chance();
-            // let lethal_lord_penalty: u8 = utils::calc_lethal_lord_penalty(score_self, score_other, action_self, action_other);
-            (SimulateChances {
-                // honour
-                action_honour: 0,
-                duelist_honour: 0,
-                // crit
-                crit_chances: 0,
-                crit_base_chance: 0,
-                crit_bonus: 0,
-                crit_match_bonus: 0,
-                crit_trickster_penalty: 0,
-                // hit
-                hit_chances: 0,
-                hit_base_chance: 0,
-                hit_bonus: 0,
-                hit_injury_penalty: 0,
-                hit_trickster_penalty: 0,
-                // lethal
-                lethal_chances: 0,
-                lethal_base_chance: 0,
-                lethal_lord_penalty: 0,
-            })
         }
 
         fn get_player_full_deck(world: @IWorldDispatcher, _table_id: felt252) -> Array<Array<u8>> {

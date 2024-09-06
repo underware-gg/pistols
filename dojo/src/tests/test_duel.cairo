@@ -11,7 +11,6 @@ mod tests {
     use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, RoundEntity};
     use pistols::models::duelist::{Duelist, DuelistEntity, DuelistEntityStore, ProfilePicType, Archetype};
     use pistols::models::table::{TableConfig, TABLES};
-    use pistols::types::simulate_chances::{SimulateChances};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::duel_progress::{DuelProgress, DuelPace};
     use pistols::types::round_state::{RoundState, RoundStateTrait};
@@ -263,13 +262,6 @@ mod tests {
         tester::assert_balance(sys.lords, OWNER(), balance_a, fee + WAGER_VALUE, 0, 'balance_a_1');
         tester::assert_balance(sys.lords, OTHER(), balance_b, fee + WAGER_VALUE, 0, 'balance_b_1');
         tester::assert_balance(sys.lords, TREASURY(), 0, 0, 0, 'balance_treasury_1');
-
-        // let chances_a: SimulateChances = sys.actions.simulate_chances(ID(OWNER()), duel_id, 1, action_a);
-        // let chances_b: SimulateChances = sys.actions.simulate_chances(ID(OWNER()), duel_id, 1, action_b);
-        // let _hit_chance_a = chances_a.hit_chances;
-        // let _hit_chance_b = chances_b.hit_chances;
-        // let kill_chance_a = chances_a.crit_chances;
-        // let kill_chance_b = chances_b.crit_chances;
 
         // 1st commit
         tester::execute_commit_moves(@sys.actions, OWNER(), duel_id, 1, moves_a.hash);
