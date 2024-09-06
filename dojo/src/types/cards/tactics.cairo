@@ -1,7 +1,7 @@
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 enum TacticsCard {
-    Null,
+    None,
     //
     Insult,
     CoinToss,
@@ -12,7 +12,7 @@ enum TacticsCard {
 }
 
 mod TACTICS {
-    const NULL: u8 = 0;
+    const NONE: u8 = 0;
     const INSULT: u8 = 1;
     const COIN_TOSS: u8 = 2;
     const VENGEFUL: u8 = 3;
@@ -47,7 +47,7 @@ impl TacticsCardIntoU8 of Into<TacticsCard, u8> {
             TacticsCard::ThickCoat =>   TACTICS::THICK_COAT,
             TacticsCard::Reversal =>    TACTICS::REVERSAL,
             TacticsCard::Bananas =>     TACTICS::BANANAS,
-            _ =>                        TACTICS::NULL,
+            _ =>                        TACTICS::NONE,
         }
     }
 }
@@ -59,7 +59,7 @@ impl U8IntoTacticsCard of Into<u8, TacticsCard> {
         else if self == TACTICS::THICK_COAT { TacticsCard::ThickCoat }
         else if self == TACTICS::REVERSAL   { TacticsCard::Reversal }
         else if self == TACTICS::BANANAS    { TacticsCard::Bananas }
-        else                                { TacticsCard::Null }
+        else                                { TacticsCard::None }
     }
 }
 

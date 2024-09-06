@@ -10,10 +10,11 @@ mod tests {
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
     use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, RoundEntity};
     use pistols::models::duelist::{Duelist, DuelistEntity, DuelistEntityStore, ProfilePicType, Archetype};
-    use pistols::models::structs::{SimulateChances};
     use pistols::models::table::{TableConfig, TABLES};
-    use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
-    use pistols::types::round::{RoundState, RoundStateTrait};
+    use pistols::types::simulate_chances::{SimulateChances};
+    use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
+    use pistols::types::duel_progress::{DuelProgress, DuelPace};
+    use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::types::constants::{CONST, HONOUR};
     use pistols::libs::utils::{make_moves_hash};
     use pistols::utils::timestamp::{timestamp};
@@ -136,6 +137,35 @@ mod tests {
     // Single Round Draw (paces only)
     //
 
+    fn _assert_duel_progress(sys: Systems, duel_id: u128) {
+        let challenge: ChallengeEntity = tester::get_ChallengeEntity(sys.world, duel_id);
+        let round: RoundEntity = tester::get_RoundEntity(sys.world, duel_id, 1);
+        let progress: DuelProgress = sys.actions.get_duel_progress(duel_id);
+        let final_pace: DuelPace = *progress.paces[progress.paces.len() - 1];
+        assert(progress.winner == challenge.winner, 'winner');
+        // hand_a
+        assert(progress.hand_a.card_paces.into() == round.shot_a.card_1, 'hand_a.card_paces');
+        assert(progress.hand_a.card_dodge.into() == round.shot_a.card_2, 'hand_a.card_paces');
+        assert(progress.hand_a.card_tactics.into() == round.shot_a.card_3, 'hand_a.card_paces');
+        assert(progress.hand_a.card_blades.into() == round.shot_a.card_4, 'hand_a.card_paces');
+        // hand_b
+        assert(progress.hand_b.card_paces.into() == round.shot_b.card_1, 'hand_b.card_paces');
+        assert(progress.hand_b.card_dodge.into() == round.shot_b.card_2, 'hand_b.card_paces');
+        assert(progress.hand_b.card_tactics.into() == round.shot_b.card_3, 'hand_b.card_paces');
+        assert(progress.hand_b.card_blades.into() == round.shot_b.card_4, 'hand_b.card_paces');
+        // shot_a.state_final
+        assert(final_pace.state_a.health == round.shot_a.state_final.health, 'state_final_b.health');
+        assert(final_pace.state_a.damage == round.shot_a.state_final.damage, 'state_final_b.damage');
+        assert(final_pace.state_a.chances == round.shot_a.state_final.chances, 'state_final_b.chances');
+        assert(final_pace.state_a.dice_crit == round.shot_a.state_final.dice_crit, 'state_final_b.dice_crit');
+        // shot_b.state_final
+        assert(final_pace.state_b.health == round.shot_b.state_final.health, 'state_final_b.health');
+        assert(final_pace.state_b.damage == round.shot_b.state_final.damage, 'state_final_b.damage');
+        assert(final_pace.state_b.chances == round.shot_b.state_final.chances, 'state_final_b.chances');
+        assert(final_pace.state_b.dice_crit == round.shot_b.state_final.dice_crit, 'state_final_b.dice_crit');
+    }
+
+
     fn _test_resolved_draw(salts: SaltsValues, moves_a: Moves, moves_b: Moves, final_health: u8) {
         let sys = tester::setup_world(FLAGS::ACTIONS | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         sys.rng.set_salts(salts.salts, salts.values);
@@ -168,8 +198,8 @@ mod tests {
         assert(challenge.winner == 0, 'challenge.winner');
         assert(challenge.round_number == 1, 'challenge.round_number');
         assert(round.state == RoundState::Finished, 'round.state');
-        assert(round.shot_a.final_health == final_health, 'round.shot_a.health');
-        assert(round.shot_b.final_health == final_health, 'round.shot_b.health');
+        assert(round.shot_a.state_final.health == final_health, 'round.shot_a.health');
+        assert(round.shot_b.state_final.health == final_health, 'round.shot_b.health');
 
         let duelist_a = tester::get_DuelistEntity(sys.world, OWNER());
         let duelist_b = tester::get_DuelistEntity(sys.world, OTHER());
@@ -195,6 +225,8 @@ mod tests {
         tester::assert_balance(sys.lords, TREASURY(), 0, 0, fee * 2, 'balance_treasury_2');
         tester::assert_balance(sys.lords, OWNER(), balance_a, fee, 0, 'balance_a_2');
         tester::assert_balance(sys.lords, OTHER(), balance_b, fee, 0, 'balance_b_2');
+
+        _assert_duel_progress(sys, duel_id);
     }
 
     #[test]
@@ -214,7 +246,7 @@ mod tests {
     // Single Round Resolved (paces only)
     //
 
-    fn _test_resolved(salts: SaltsValues, moves_a: Moves, moves_b: Moves, winner: u8) {
+    fn _test_resolved_win(salts: SaltsValues, moves_a: Moves, moves_b: Moves, winner: u8) {
         let sys = tester::setup_world(FLAGS::ACTIONS | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         sys.rng.set_salts(salts.salts, salts.values);
 
@@ -267,8 +299,8 @@ mod tests {
         // 2nd reveal > Finished
         tester::execute_reveal_moves(@sys.actions, OTHER(), duel_id, 1, moves_b.salt, moves_b.moves);
         let (challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
-// round.shot_a.health.print();
-// round.shot_b.health.print();
+// round.shot_a.state_final.health.print();
+// round.shot_b.state_final.health.print();
 // challenge.state.print();
         assert(challenge.state == ChallengeState::Resolved, '4_challenge.state');
         assert(challenge.winner != 0, '4_challenge.winner');
@@ -299,19 +331,19 @@ mod tests {
             assert(duelist_b.score.total_wins == 0, 'a_win_duelist_b.total_wins');
             assert(duelist_a.score.total_losses == 0, 'a_win_duelist_a.total_losses');
             assert(duelist_b.score.total_losses == 1, 'a_win_duelist_b.total_losses');
-            assert(round.shot_a.final_damage == CONST::FULL_HEALTH, 'a_win_damage_a');
-            assert(round.shot_a.final_health == CONST::FULL_HEALTH, 'a_win_health_a');
+            assert(round.shot_a.state_final.damage == CONST::FULL_HEALTH, 'a_win_damage_a');
+            assert(round.shot_a.state_final.health == CONST::FULL_HEALTH, 'a_win_health_a');
             // assert(round.shot_b.damage == CONST::FULL_HEALTH, 'a_win_damage_b');
-            assert(round.shot_b.final_health == 0, 'a_win_health_b');
+            assert(round.shot_b.state_final.health == 0, 'a_win_health_b');
         } else if (winner == 2) {
             assert(duelist_a.score.total_wins == 0, 'b_win_duelist_a.total_wins');
             assert(duelist_b.score.total_wins == 1, 'b_win_duelist_b.total_wins');
             assert(duelist_a.score.total_losses == 1, 'b_win_duelist_a.total_losses');
             assert(duelist_b.score.total_losses == 0, 'b_win_duelist_b.total_losses');
-            assert(round.shot_b.final_damage == CONST::FULL_HEALTH, 'b_win_damage_b');
-            assert(round.shot_b.final_health == CONST::FULL_HEALTH, 'b_win_health_b');
+            assert(round.shot_b.state_final.damage == CONST::FULL_HEALTH, 'b_win_damage_b');
+            assert(round.shot_b.state_final.health == CONST::FULL_HEALTH, 'b_win_health_b');
             // assert(round.shot_a.damage == CONST::FULL_HEALTH, 'b_win_damage_a');
-            assert(round.shot_a.final_health == 0, 'b_win_health_a');
+            assert(round.shot_a.state_final.health == 0, 'b_win_health_a');
         } else {
             assert(false, 'bad winner')
         }
@@ -371,18 +403,20 @@ mod tests {
         assert(snapshot.score_b.total_duels > 0, 'snap_b.total_duels >');
         assert(snapshot.score_a.total_duels < duelist_a.score.total_duels, 'snap_a.total_duels <');
         assert(snapshot.score_b.total_duels < duelist_b.score.total_duels, 'snap_b.total_duels <');
+
+        _assert_duel_progress(sys, duel_id);
     }
 
     #[test]
-    fn test_resolved_a() {
+    fn test_resolved_win_a() {
         let (salts, moves_a, moves_b) = _get_moves_crit_a();
-        _test_resolved(salts, moves_a, moves_b, 1);
+        _test_resolved_win(salts, moves_a, moves_b, 1);
     }
 
     #[test]
-    fn test_resolved_b() {
+    fn test_resolved_win_b() {
         let (salts, moves_a, moves_b) = _get_moves_crit_b();
-        _test_resolved(salts, moves_a, moves_b, 2);
+        _test_resolved_win(salts, moves_a, moves_b, 2);
     }
 
 

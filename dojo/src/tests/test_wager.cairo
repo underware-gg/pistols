@@ -11,7 +11,7 @@
 //     use pistols::systems::admin::{IAdminDispatcher, IAdminDispatcherTrait};
 //     use pistols::models::config::{Config};
 //     use pistols::models::table::{TableConfig, TABLES};
-//     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
+//     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
 //     use pistols::types::constants::{CONST};
 //     use pistols::utils::timestamp::{timestamp};
 //     use pistols::tests::tester::{tester, tester::{FLAGS, ZERO, OWNER, OTHER, BUMMER, TREASURY}};

@@ -10,8 +10,8 @@ mod tests {
     use pistols::models::challenge::{Round};
     use pistols::models::duelist::{Duelist};
     use pistols::models::table::{TABLES};
-    use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
-    use pistols::types::round::{RoundState, RoundStateTrait};
+    use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
+    use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::types::constants::{CONST};
     use pistols::utils::timestamp::{timestamp};
     use pistols::tests::tester::{tester,

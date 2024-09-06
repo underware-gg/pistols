@@ -1,7 +1,7 @@
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 enum BladesCard {
-    Null,
+    None,
     //
     Seppuku,
     RunAway,
@@ -10,7 +10,7 @@ enum BladesCard {
 }
 
 mod BLADES {
-    const NULL: u8 = 0;
+    const NONE: u8 = 0;
     const SEPPUKU: u8 = 1;
     const RUN_AWAY: u8 = 2;
     const BEHEAD: u8 = 3;
@@ -41,7 +41,7 @@ impl BladesCardIntoU8 of Into<BladesCard, u8> {
             BladesCard::RunAway =>  BLADES::RUN_AWAY,
             BladesCard::Behead =>   BLADES::BEHEAD,
             BladesCard::Grapple =>  BLADES::GRAPPLE,
-            _ =>                    BLADES::NULL,
+            _ =>                    BLADES::NONE,
         }
     }
 }
@@ -51,7 +51,7 @@ impl U8IntoBladesCard of Into<u8, BladesCard> {
         else if self == BLADES::RUN_AWAY    { BladesCard::RunAway }
         else if self == BLADES::BEHEAD      { BladesCard::Behead }
         else if self == BLADES::GRAPPLE     { BladesCard::Grapple }
-        else                                { BladesCard::Null }
+        else                                { BladesCard::None }
     }
 }
 

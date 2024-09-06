@@ -13,7 +13,7 @@
 //     use pistols::models::duelist::{Duelist, Score, ProfilePicType, Archetype};
 //     use pistols::models::table::{TableConfig, TableType, TABLES};
 //     use pistols::models::structs::{SimulateChances};
-//     use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
+//     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
 //     use pistols::types::constants::{CONST, CHANCES, HONOUR};
 //     use pistols::tests::tester::{tester, tester::{FLAGS, ZERO, OWNER, OTHER, BUMMER, TREASURY}};
 //     use pistols::utils::timestamp::{timestamp};

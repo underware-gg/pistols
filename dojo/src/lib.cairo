@@ -24,17 +24,18 @@ mod models {
     mod config;
     mod duelist;
     mod init;
-    mod structs;
     mod table;
     mod token_config;
 }
 
 mod types {
-    // mod action;
-    mod challenge;
+    mod challenge_state;
     mod constants;
+    mod duel_progress;
     mod events;
-    mod round;
+    mod misc;
+    mod round_state;
+    mod simulate_chances;
     mod typed_data;
     mod cards {
         mod hand;

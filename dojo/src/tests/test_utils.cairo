@@ -12,8 +12,8 @@ mod tests {
     use pistols::models::challenge::{Round, Shot};
     use pistols::models::duelist::{Duelist, Score, ScoreTrait};
     use pistols::models::init::{init};
-    use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
-    use pistols::types::round::{RoundState, RoundStateTrait};
+    use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
+    use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::utils::short_string::{ShortString};
 
     #[test]

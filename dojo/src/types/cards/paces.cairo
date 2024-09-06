@@ -3,7 +3,7 @@ use pistols::utils::math::{MathU8};
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 enum PacesCard {
-    Null,
+    None,
     //
     Paces1,
     Paces2,
@@ -18,7 +18,7 @@ enum PacesCard {
 }
 
 mod PACES {
-    const NULL: u8 = 0;
+    const None: u8 = 0;
     const PACES_1: u8 = 1;
     const PACES_2: u8 = 2;
     const PACES_3: u8 = 3;
@@ -83,7 +83,7 @@ impl PacesCardIntoU8 of Into<PacesCard, u8> {
             PacesCard::Paces8 =>    PACES::PACES_8,
             PacesCard::Paces9 =>    PACES::PACES_9,
             PacesCard::Paces10 =>   PACES::PACES_10,
-            _ =>                    PACES::NULL,
+            _ =>                    PACES::None,
         }
     }
 }
@@ -99,7 +99,7 @@ impl U8IntoPacesCard of Into<u8, PacesCard> {
         else if self == PACES::PACES_8  { PacesCard::Paces8 }
         else if self == PACES::PACES_9  { PacesCard::Paces9 }
         else if self == PACES::PACES_10 { PacesCard::Paces10 }
-        else                            { PacesCard::Null }
+        else                            { PacesCard::None }
     }
 }
 

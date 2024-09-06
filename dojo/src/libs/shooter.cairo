@@ -8,13 +8,15 @@ mod shooter {
     use pistols::systems::actions::actions::{Errors};
     use pistols::systems::rng::{Dice, DiceTrait};
     use pistols::libs::utils;
-    use pistols::models::challenge::{Challenge, Snapshot, SnapshotEntity, Round, RoundTrait, RoundEntity, Shot, ShotTrait};
+    use pistols::models::challenge::{Challenge, Snapshot, SnapshotEntity, Round, RoundTrait, RoundEntity, Shot, ShotTrait, PlayerState};
     use pistols::models::duelist::{Duelist, Score};
     use pistols::models::table::{TableConfig, TableConfigEntity, TableType};
     use pistols::types::constants::{CONST};
-    use pistols::types::challenge::{ChallengeState};
-    use pistols::types::round::{RoundState};
-    use pistols::types::cards::hand::{PlayerHand, PacesCard, PacesCardTrait};
+    use pistols::types::challenge_state::{ChallengeState};
+    use pistols::types::round_state::{RoundState};
+    use pistols::types::cards::hand::{PlayerHand, PlayerHandTrait, PacesCard, PacesCardTrait, EnvCard, EnvCardTrait};
+    use pistols::types::duel_progress::{DuelProgress, DuelPace};
+    use pistols::types::misc::{Boolean};
     use pistols::utils::math::{MathU8, MathU16};
     use pistols::libs::store::{Store, StoreTrait};
 
@@ -112,8 +114,23 @@ mod shooter {
         }
 
         // Process round when both actions are revealed
-        game_loop(store, ref challenge, ref round);
-        
+        let progress: DuelProgress = game_loop(store, challenge, round);
+
+        if (progress.winner == 0) {
+            end_challenge(ref challenge, ChallengeState::Draw, 0);
+        } else {
+            end_challenge(ref challenge, ChallengeState::Resolved, progress.winner);
+        }
+
+        // update Round
+        let final_pace: DuelPace = *progress.paces[progress.paces.len() - 1];
+        round.shot_a.state_final = final_pace.state_a;
+        round.shot_b.state_final = final_pace.state_b;
+        round.shot_a.win = if (final_pace.state_b.health == 0) {1} else {0};
+        round.shot_b.win = if (final_pace.state_a.health == 0) {1} else {0};
+        round.state = RoundState::Finished;
+        store.set_round(@round);
+
         // update Challenge
         utils::set_challenge(store, challenge);
 
@@ -123,22 +140,18 @@ mod shooter {
     //---------------------------------------
     // Decide who wins a round, or go to next
     //
-    fn game_loop(store: Store, ref challenge: Challenge, ref round: Round) {
-        let _snapshot: SnapshotEntity = store.get_snapshot_entity(challenge.duel_id);
-        let _table_type: TableType = store.get_table_config_entity(challenge.table_id).table_type;
+    fn game_loop(store: Store, challenge: Challenge, round: Round) -> DuelProgress {
+        // let _snapshot: SnapshotEntity = store.get_snapshot_entity(challenge.duel_id);
+        // let _table_type: TableType = store.get_table_config_entity(challenge.table_id).table_type;
         
-        let hand_a: PlayerHand = round.shot_a.as_hand();
-        let hand_b: PlayerHand = round.shot_b.as_hand();
-
-        round.shot_a.honour = hand_a.card_paces.honour();
-        round.shot_b.honour = hand_b.card_paces.honour();
-
         let seed: felt252 = round.make_seed();
         let mut dice: Dice = DiceTrait::new(@store.world, seed);
 
+        let hand_a: PlayerHand = round.shot_a.as_hand();
+        let hand_b: PlayerHand = round.shot_b.as_hand();
 
-
-
+        let mut env_state_a: PlayerState = round.shot_a.state_start;
+        let mut env_state_b: PlayerState = round.shot_b.state_start;
 
 
 
@@ -149,8 +162,10 @@ mod shooter {
         // card_tactics.apply(self.shot_a);
         // card_tactics.apply(self.shot_b);
 
-        let mut win_a: bool = false;
-        let mut win_b: bool = false;
+
+        let mut duel_paces: Array<DuelPace> = array![];
+        let mut win_a: Boolean = Boolean::Undefined;
+        let mut win_b: Boolean = Boolean::Undefined;
 
         //
         // Pistols round
@@ -160,28 +175,47 @@ mod shooter {
             let pace: PacesCard = pace_number.into();
             // println!("Pace [{}] A:{} B:{}", pace_number, self.shot_a.card_paces.as_felt(), self.shot_b.card_paces.as_felt());
 
+            let card_env: EnvCard = EnvCard::None;
+            let mut dice_env: u8 = 0;
+
             // TODO: draw env cards
             // TODO: apply env card to shots
-            // update shot.final_chances
-            // update shot.final_damage
+            // update shot.state_final.chances
+            // update shot.state_final.damage
+
+            let mut state_a: PlayerState = env_state_a;
+            let mut state_b: PlayerState = env_state_b;
 
             //
             // Shoot!
+            // will chance state_a and state_b
             if (hand_a.card_paces == pace) {
-                win_a = shoot(hand_a.card_paces, hand_b.card_dodge, ref round.shot_a, ref round.shot_b, ref dice, 'shoot_a');
+                win_a = shoot(hand_a.card_paces, hand_b.card_dodge, ref state_a, ref state_b, ref dice, 'shoot_a');
             }
             if (hand_b.card_paces == pace) {
-                win_b = shoot(hand_b.card_paces, hand_a.card_dodge, ref round.shot_b, ref round.shot_a, ref dice, 'shoot_b');
+                win_b = shoot(hand_b.card_paces, hand_a.card_dodge, ref state_b, ref state_a, ref dice, 'shoot_b');
             }
+
+            // save step
+            duel_paces.append(DuelPace {
+                pace,
+                card_env,
+                dice_env,
+                card_a: hand_a.draw_card(pace),
+                card_b: hand_b.draw_card(pace),
+                state_a,
+                state_b,
+            });
+
             // break if there's a winner
-            if (win_a || win_b) {
+            if (win_a == Boolean::True || win_b == Boolean::True) {
                 break;
             }
             // both dices rolled, no winner, go to blades
-            else if (round.shot_a.dice_crit > 0 && round.shot_b.dice_crit > 0) {
+            if (win_a != Boolean::Undefined && win_b != Boolean::Undefined) {
                 break;
             }
-            
+
             pace_number += 1;
         };
  
@@ -189,7 +223,7 @@ mod shooter {
         //
         // Blades Round
         //
-        if (!win_a && !win_b) {
+        if (win_a != Boolean::True && win_b != Boolean::True) {
 
             //
             //TODO: duel blades
@@ -197,24 +231,21 @@ mod shooter {
 
         }
 
+        let winner: u8 =
+            if (win_a == Boolean::True && win_b != Boolean::True) {1}
+            else if (win_b == Boolean::True && win_a != Boolean::True) {2}
+            else {0};
 
-
-
-        // decide results on health or win flag
-        if (win_a && !win_b) {
-            end_challenge(ref challenge, ref round, ChallengeState::Resolved, 1);
-        } else if (!win_a && win_b) {
-            end_challenge(ref challenge, ref round, ChallengeState::Resolved, 2);
-        } else {
-            end_challenge(ref challenge, ref round, ChallengeState::Draw, 0);
-        }
-
-        // Finish round
-        round.state = RoundState::Finished;
-        store.set_round(@round);
+        (DuelProgress {
+            // results
+            paces: duel_paces.span(),
+            winner,
+            hand_a,
+            hand_b,
+        })
     }
 
-    fn end_challenge(ref challenge: Challenge, ref round: Round, state: ChallengeState, winner: u8) {
+    fn end_challenge(ref challenge: Challenge, state: ChallengeState, winner: u8) {
         challenge.state = state;
         challenge.winner = winner;
         challenge.timestamp_end = get_block_timestamp();
@@ -225,69 +256,22 @@ mod shooter {
     //
 
     // returns true if executed
-    fn shoot(paces_shoot: PacesCard, paces_dodge: PacesCard, ref shot_self: Shot, ref shot_other: Shot, ref dice: Dice, salt: felt252) -> bool {
-        let (dice, hit) = dice.decide(salt, 100, shot_self.final_chances);
-        shot_self.dice_crit = dice;
-        if (hit && paces_shoot != paces_dodge) {
-            shot_other.final_health = MathU8::sub(shot_other.initial_health, shot_self.final_damage);
-            shot_self.win = if (shot_other.final_health == 0) {1} else {0};
+    fn shoot(paces_shoot: PacesCard, paces_dodge: PacesCard, ref state_self: PlayerState, ref state_other: PlayerState, ref dice: Dice, salt: felt252) -> Boolean {
+        if (paces_shoot == paces_dodge) {
+            state_self.chances = 0;
         }
-// println!("dice {} / {} h/d: {} / {}", shot_self.dice_crit, shot_self.final_chances, shot_other.final_health, shot_self.final_damage);
-        (shot_self.win == 1)
+        let (dice, hit) = dice.decide(salt, 100, state_self.chances);
+        state_self.dice_crit = dice;
+        if (hit) {
+            state_other.health = MathU8::sub(state_other.health, state_self.damage);
+        }
+// println!("dice {} / {} d/h: {} / {}", state_self.dice_crit, state_self.chances, state_self.damage, state_other.health);
+        if (state_other.health == 0) {
+            (Boolean::True)
+        } else {
+            (Boolean::False)
+        }
     }
-
-
-    // // attacker strikes first, then defender only if not executed
-    // fn strike_async(store: Store, round: Round, attacker: Score, defender: Score, ref attack: Shot, ref defense: Shot, table_type: TableType) -> bool {
-    //     let mut executed: bool = strike(store, 'shoot_a', attacker, defender, round, ref attack, ref defense, table_type);
-    //     apply_damage(ref attack, ref defense);
-    //     if (!executed) {
-    //         executed = strike(store, 'shoot_b', defender, attacker, round, ref defense, ref attack, table_type);
-    //         apply_damage(ref defense, ref attack);
-    //     }
-    //     (executed)
-    // }
-    // // sync strike, both at the same time
-    // fn strike_sync(store: Store, round: Round, attacker: Score, defender: Score, ref attack: Shot, ref defense: Shot, table_type: TableType) -> bool {
-    //     let mut executed_a: bool = strike(store, 'shoot_a', attacker, defender, round, ref attack, ref defense, table_type);
-    //     let mut executed_b: bool = strike(store, 'shoot_b', defender, attacker, round, ref defense, ref attack, table_type);
-    //     apply_damage(ref attack, ref defense);
-    //     apply_damage(ref defense, ref attack);
-    //     (executed_a || executed_b)
-    // }
-
-    // #[inline(always)]
-    // fn apply_damage(ref attack: Shot, ref defense: Shot) {
-    //     defense.health = MathU8::sub(defense.health, MathU8::sub(defense.damage, defense.block));
-    //     if (defense.health == 0) {
-    //         attack.win = 1;
-    //         attack.wager = 1;
-    //     }
-    // }
-
-    // // executes single attack
-    // // returns true if ended in execution
-    // fn strike(store: Store, seed: felt252, attacker: Score, defender: Score, round: Round, ref attack: Shot, ref defense: Shot, table_type: TableType) -> bool {
-    //     let action: Action = attack.action.into();
-    //     if (action != Action::Idle) {
-    //         let defense_action: Action = defense.action.into();
-    //         // dice 1: crit (execution, double damage, goal)
-    //         attack.chance_crit = utils::calc_crit_chances(attacker, defender, action, defense_action, attack.health, table_type);
-    //         attack.dice_crit = throw_dice(seed, round, 100, attack.chance_crit);
-    //         if (attack.dice_crit <= attack.chance_crit) {
-    //             return (action.execute_crit(ref attack, ref defense));
-    //         } else {
-    //             // dice 2: miss or hit
-    //             attack.chance_hit = utils::calc_hit_chances(attacker, defender, action, defense_action, attack.health, table_type);
-    //             attack.dice_hit = throw_dice(seed * 2, round, 100, attack.chance_hit);
-    //             if (attack.dice_hit <= attack.chance_hit) {
-    //                 attack.chance_lethal = utils::calc_lethal_chances(attacker, defender, action, defense_action, attack.chance_hit);
-    //                 action.execute_hit(ref attack, ref defense, attack.chance_lethal);
-    //             }
-    //         }
-    //     }
-    //     (false)
-    // }
 
 }
 

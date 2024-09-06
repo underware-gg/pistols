@@ -4,8 +4,9 @@ use pistols::types::cards::{
     blades::{BladesCard, BladesCardTrait},
     env::{EnvCard, EnvCardTrait},
 };
+use pistols::types::duel_progress::{DuelistDrawnCard};
 
-#[derive(Copy, Drop)]
+#[derive(Copy, Drop, Serde)]
 struct PlayerHand {
     card_paces: PacesCard,
     card_dodge: PacesCard,
@@ -45,5 +46,51 @@ impl PlayerHandImpl of PlayerHandTrait {
             paces,
             dodge,
         ])
+    }
+    fn draw_card(self:PlayerHand, pace: PacesCard) -> DuelistDrawnCard {
+        (
+            if (self.card_paces == pace) {DuelistDrawnCard::Shoot(pace)}
+            else if (self.card_dodge == pace) {DuelistDrawnCard::Dodge(pace)}
+            else {DuelistDrawnCard::None}
+        )
+    }
+}
+
+
+
+//----------------------------------------
+// Unit  tests
+//
+#[cfg(test)]
+mod tests {
+    use debug::PrintTrait;
+    use core::traits::Into;
+
+    use pistols::types::cards::{
+        paces::{PacesCard, PacesCardTrait},
+        hand::{PlayerHand, PlayerHandTrait},
+        tactics::{TacticsCard, TacticsCardTrait},
+        blades::{BladesCard, BladesCardTrait},
+    };
+    use pistols::types::duel_progress::{DuelistDrawnCard};
+
+    #[test]
+    fn test_draw_card() {
+        let hand_1_2 = PlayerHand {
+            card_paces: PacesCard::Paces1,
+            card_dodge: PacesCard::Paces2,
+            card_tactics: TacticsCard::None,
+            card_blades: BladesCard::None,
+        };
+        let hand_2_2 = PlayerHand {
+            card_paces: PacesCard::Paces2,
+            card_dodge: PacesCard::Paces2,
+            card_tactics: TacticsCard::None,
+            card_blades: BladesCard::None,
+        };
+        assert(hand_1_2.draw_card(PacesCard::Paces1) == DuelistDrawnCard::Shoot(PacesCard::Paces1), '1_2 > shoot');
+        assert(hand_1_2.draw_card(PacesCard::Paces2) == DuelistDrawnCard::Dodge(PacesCard::Paces2), '1_2 > dodge');
+        assert(hand_1_2.draw_card(PacesCard::Paces3) == DuelistDrawnCard::None, '1_2 > none');
+        assert(hand_2_2.draw_card(PacesCard::Paces2) == DuelistDrawnCard::Shoot(PacesCard::Paces2), '2_2 > shoot');
     }
 }

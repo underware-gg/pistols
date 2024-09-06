@@ -19,7 +19,7 @@ mod tester {
         // ITokenDuelistDispatcher,
         // ITokenDuelistDispatcherTrait,
     };
-    use pistols::types::challenge::{ChallengeState};
+    use pistols::types::challenge_state::{ChallengeState};
     use pistols::types::constants::{CONST};
     use pistols::utils::arrays::{SpanTrait};
     use pistols::utils::short_string::{ShortString};

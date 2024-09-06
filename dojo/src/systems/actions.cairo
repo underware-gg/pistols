@@ -1,8 +1,9 @@
 use starknet::{ContractAddress};
 use pistols::models::challenge::{Challenge};
 use pistols::models::duelist::{Duelist, ProfilePicType, Archetype};
-use pistols::models::structs::{SimulateChances};
-use pistols::types::challenge::{ChallengeState};
+use pistols::types::challenge_state::{ChallengeState};
+use pistols::types::duel_progress::{DuelProgress};
+use pistols::types::simulate_chances::{SimulateChances};
 
 // define the interface
 #[dojo::interface]
@@ -68,6 +69,7 @@ trait IActions {
     fn calc_fee(world: @IWorldDispatcher, table_id: felt252, wager_value: u128) -> u128;
     fn simulate_chances(world: @IWorldDispatcher, _duelist_id: u128, _duel_id: u128, _round_number: u8, _action: u8) -> SimulateChances;
     fn get_player_full_deck(world: @IWorldDispatcher, _table_id: felt252) -> Array<Array<u8>>;
+    fn get_duel_progress(world: @IWorldDispatcher, duel_id: u128) -> DuelProgress;
     fn test_validate_commit_message(world: @IWorldDispatcher,
         account: ContractAddress,
         signature: Array<felt252>,
@@ -100,11 +102,12 @@ mod actions {
     };
     use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, Shot};
     use pistols::models::duelist::{Duelist, DuelistTrait, ProfilePicType, Archetype, Score, Pact, DuelistHelper, DuelistHelperTrait};
-    use pistols::models::structs::{SimulateChances};
     use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableAdmittanceEntity, TableAdmittanceEntityTrait, TableType, TABLES};
     use pistols::models::init::{init};
-    use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
-    use pistols::types::round::{RoundState, RoundStateTrait};
+    use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
+    use pistols::types::duel_progress::{DuelProgress};
+    use pistols::types::round_state::{RoundState, RoundStateTrait};
+    use pistols::types::simulate_chances::{SimulateChances};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::misc::{ZERO, WORLD};
@@ -519,6 +522,13 @@ mod actions {
         fn get_player_full_deck(world: @IWorldDispatcher, _table_id: felt252) -> Array<Array<u8>> {
             WORLD(world);
             (PlayerHandTrait::player_full_deck())
+        }
+
+        fn get_duel_progress(world: @IWorldDispatcher, duel_id: u128) -> DuelProgress {
+            let store: Store = StoreTrait::new(world);
+            let challenge: Challenge = store.get_challenge(duel_id);
+            let round: Round = store.get_round(duel_id, 1);
+            (shooter::game_loop(store, challenge, round))
         }
 
         fn test_validate_commit_message(world: @IWorldDispatcher,

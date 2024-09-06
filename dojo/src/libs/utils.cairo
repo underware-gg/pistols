@@ -13,8 +13,8 @@ use pistols::models::duelist::{Duelist, DuelistTrait, DuelistEntity, Pact, PactE
 use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableType, TableTypeTrait};
 use pistols::models::config::{Config, ConfigEntity};
 use pistols::models::init::{init};
-use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
-use pistols::types::round::{RoundState, RoundStateTrait};
+use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
+use pistols::types::round_state::{RoundState, RoundStateTrait};
 use pistols::types::cards::hand::{PacesCard, PacesCardTrait};
 use pistols::types::constants::{CONST, HONOUR, CHANCES};
 use pistols::utils::math::{MathU8, MathU16, MathU64};
@@ -226,22 +226,22 @@ fn set_challenge(store: Store, challenge: Challenge) {
 
         // compute honour from final round
         let table : TableConfigEntity = store.get_table_config_entity(challenge.table_id);
-        let final_round: RoundEntity = store.get_round_entity(challenge.duel_id, challenge.round_number);
+        let round: RoundEntity = store.get_round_entity(challenge.duel_id, challenge.round_number);
 
         // update honour and levels
         let calc_levels = !table.table_type.maxxed_up_levels();
-        update_score_honour(ref duelist_a.score, final_round.shot_a.honour, true);
-        update_score_honour(ref duelist_b.score, final_round.shot_b.honour, true);
-        update_score_honour(ref scoreboard_a.score, final_round.shot_a.honour, calc_levels);
-        update_score_honour(ref scoreboard_b.score, final_round.shot_b.honour, calc_levels);
+        update_score_honour(ref duelist_a.score, round.shot_a.state_final.honour, true);
+        update_score_honour(ref duelist_b.score, round.shot_b.state_final.honour, true);
+        update_score_honour(ref scoreboard_a.score, round.shot_a.state_final.honour, calc_levels);
+        update_score_honour(ref scoreboard_b.score, round.shot_b.state_final.honour, calc_levels);
 
         // split wager/fee to winners and benefactors
-        if (final_round.shot_a.wager > final_round.shot_b.wager) {
+        if (round.shot_a.wager > round.shot_b.wager) {
             // duelist_a won the Wager
             let wager_value: u128 = split_wager_fees(store, challenge, challenge.address_a, challenge.address_a);
             scoreboard_a.wager_won += wager_value;
             scoreboard_b.wager_lost += wager_value;
-        } else if (final_round.shot_a.wager < final_round.shot_b.wager) {
+        } else if (round.shot_a.wager < round.shot_b.wager) {
             // duelist_b won the Wager
             let wager_value: u128 = split_wager_fees(store, challenge, challenge.address_b, challenge.address_b);
             scoreboard_a.wager_lost += wager_value;

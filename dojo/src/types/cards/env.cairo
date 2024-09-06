@@ -1,7 +1,7 @@
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 enum EnvCard {
-    Null,
+    None,
     // Common
     CommonDamageUp,
     CommonDamageDown,
@@ -20,7 +20,7 @@ enum EnvCard {
 }
 
 mod ENV {
-    const NULL: u8 = 0;
+    const NONE: u8 = 0;
     const COMMON_DAMAGE_UP: u8 = 1;
     const COMMON_DAMAGE_DOWN: u8 = 2;
     const COMMON_CHANCES_UP: u8 = 3;
@@ -68,7 +68,7 @@ impl EnvCardIntoU8 of Into<EnvCard, u8> {
             EnvCard::SpecialAllShotsMiss =>     ENV::SPECIAL_ALL_SHOTS_MISS,
             EnvCard::SpecialDoubleTactics =>    ENV::SPECIAL_DOUBLE_TACTICS,
             EnvCard::SpecialNoTactics =>        ENV::SPECIAL_NO_TACTICS,
-            EnvCard::Null =>                    ENV::NULL,
+            EnvCard::None =>                    ENV::NONE,
         }
     }
 }
@@ -87,6 +87,6 @@ impl U8IntoEnvCard of Into<u8, EnvCard> {
         else if self == ENV::SPECIAL_ALL_SHOTS_MISS { EnvCard::SpecialAllShotsMiss }
         else if self == ENV::SPECIAL_DOUBLE_TACTICS { EnvCard::SpecialDoubleTactics }
         else if self == ENV::SPECIAL_NO_TACTICS     { EnvCard::SpecialNoTactics }
-        else                                        { EnvCard::Null }
+        else                                        { EnvCard::None }
     }
 }

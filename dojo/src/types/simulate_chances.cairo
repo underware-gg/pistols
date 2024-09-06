@@ -1,9 +1,4 @@
 
-//---------------------------------------------
-// structs used exclusively for read-only calls
-// dont need to be models
-//
-
 #[derive(Copy, Drop, Serde)]
 struct SimulateChances {
     // honour

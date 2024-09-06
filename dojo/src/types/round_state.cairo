@@ -103,7 +103,7 @@ mod tests {
     // use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     use pistols::models::challenge::{Round};
-    use pistols::types::round::{RoundState, RoundStateTrait};
+    use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::tests::tester::{tester, tester::{FLAGS}};
 
     #[test]

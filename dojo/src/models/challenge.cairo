@@ -1,7 +1,8 @@
 use starknet::ContractAddress;
 use pistols::models::duelist::{Score};
-use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
-use pistols::types::round::{RoundState, RoundStateTrait};
+use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
+use pistols::types::round_state::{RoundState, RoundStateTrait};
+use pistols::types::cards::paces::{PacesCard, PacesCardTrait};
 
 //-------------------------
 // Challenge lifecycle
@@ -66,7 +67,7 @@ pub struct Round {
 
 //
 // The shot of each player on a Round
-#[derive(Copy, Drop, Serde, IntrospectPacked)]
+#[derive(Copy, Drop, Serde, Introspect)]
 struct Shot {
     // player input
     salt: felt252,      // the player's secret salt
@@ -75,21 +76,22 @@ struct Shot {
     card_2: u8,         // card choice
     card_3: u8,         // card choice
     card_4: u8,         // card choice
-    // initial state
-    initial_health: u8,     // CONST::FULL_HEALTH
-    initial_damage: u8,     // CONST::INITIAL_CHANCE
-    initial_chances: u8,    // 0-100
-    // final states
-    final_health: u8,
-    final_damage: u8,
-    final_chances: u8,
+    // player states
+    state_start: PlayerState,
+    state_final: PlayerState,
     // results
-    dice_crit: u8,      // 0-100
-    honour: u8,         // honour granted
     wager: u8,          // won the wager?
     win: u8,            // won the round?
 } // [f] + [128 + 112(14*8)]:240
 
+#[derive(Copy, Drop, Serde, IntrospectPacked)]
+struct PlayerState {
+    health: u8,     // CONST::FULL_HEALTH
+    damage: u8,     // CONST::INITIAL_CHANCE
+    chances: u8,    // 0-100
+    dice_crit: u8,  // 0-100
+    honour: u8,     // honour granted
+} // [3*8]:24
 
 
 //------------------------------------
@@ -104,7 +106,7 @@ use pistols::types::constants::{CONST};
 #[generate_trait]
 impl RoundImpl of RoundTrait {
     #[inline(always)]
-    fn make_seed(ref self: Round) -> felt252 {
+    fn make_seed(self: Round) -> felt252 {
         (hash_values([self.shot_a.salt, self.shot_b.salt].span()))
     }
 }
@@ -117,12 +119,9 @@ impl ShotImpl of ShotTrait {
         self.card_2 = moves.value_or_zero(1);
         self.card_3 = moves.value_or_zero(2);
         self.card_4 = moves.value_or_zero(3);
-        self.initial_health = CONST::FULL_HEALTH;
-        self.initial_damage = CONST::INITIAL_DAMAGE;
-        self.initial_chances = CONST::INITIAL_CHANCE;
-        self.final_health = self.initial_health;
-        self.final_damage = self.initial_damage;
-        self.final_chances = self.initial_chances;
+        let paces_shoot: PacesCard = self.card_1.into();
+        self.state_start.initialize(paces_shoot);
+        self.state_final.initialize(paces_shoot);
     }
     fn as_hand(self: @Shot) -> PlayerHand {
         (PlayerHand {
@@ -131,5 +130,15 @@ impl ShotImpl of ShotTrait {
             card_tactics: (*self.card_3).into(),
             card_blades: (*self.card_4).into(),
         })
+    }
+}
+
+#[generate_trait]
+impl PlayerStateImpl of PlayerStateTrait {
+    fn initialize(ref self: PlayerState, paces_shoot: PacesCard) {
+        self.health = CONST::FULL_HEALTH;
+        self.damage = CONST::INITIAL_DAMAGE;
+        self.chances = CONST::INITIAL_CHANCE;
+        self.honour = paces_shoot.honour();
     }
 }

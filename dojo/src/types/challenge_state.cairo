@@ -159,18 +159,15 @@ mod tests {
     use debug::PrintTrait;
     use core::traits::Into;
 
-    use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
-    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-
-    use pistols::models::challenge::{Challenge};
-    use pistols::types::challenge::{ChallengeState, ChallengeStateTrait};
+    use pistols::models::challenge::{ChallengeEntity};
+    use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::tests::tester::{tester, tester::{FLAGS}};
 
     #[test]
     fn test_challenge_exists() {
         let sys = tester::setup_world(FLAGS::APPROVE);
         // get some random inexisting challenge
-        let ch = tester::get_ChallengeEntity(sys.world, 0x682137812638127638127);
+        let ch: ChallengeEntity = tester::get_ChallengeEntity(sys.world, 0x682137812638127638127);
         let state: ChallengeState = ch.state.try_into().unwrap();
         assert(state == ChallengeState::Null, 'ChallengeState::Null');
         assert(state.exists() == false, 'exists()');
