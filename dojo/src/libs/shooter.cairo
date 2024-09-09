@@ -14,8 +14,13 @@ mod shooter {
     use pistols::types::constants::{CONST};
     use pistols::types::challenge_state::{ChallengeState};
     use pistols::types::round_state::{RoundState};
-    use pistols::types::cards::hand::{PlayerHand, PlayerHandTrait, PacesCard, PacesCardTrait, EnvCard, EnvCardTrait};
     use pistols::types::duel_progress::{DuelProgress, DuelPace};
+    use pistols::types::cards::hand::{
+        PlayerHand, PlayerHandTrait,
+        PacesCard, PacesCardTrait,
+        EnvCard, EnvCardTrait,
+        TacticsCard, TacticsCardTrait,
+    };
     use pistols::types::misc::{Boolean};
     use pistols::utils::math::{MathU8, MathU16};
     use pistols::libs::store::{Store, StoreTrait};
@@ -114,7 +119,8 @@ mod shooter {
         }
 
         // Process round when both actions are revealed
-        let progress: DuelProgress = game_loop(store, challenge, round);
+        let progress: DuelProgress = game_loop(store, challenge, ref round);
+        store.set_round(@round);
 
         if (progress.winner == 0) {
             end_challenge(ref challenge, ChallengeState::Draw, 0);
@@ -122,41 +128,42 @@ mod shooter {
             end_challenge(ref challenge, ChallengeState::Resolved, progress.winner);
         }
 
-        // update Round
-        let final_pace: DuelPace = *progress.paces[progress.paces.len() - 1];
-        round.shot_a.state_final = final_pace.state_a;
-        round.shot_b.state_final = final_pace.state_b;
-        round.shot_a.win = if (final_pace.state_b.health == 0) {1} else {0};
-        round.shot_b.win = if (final_pace.state_a.health == 0) {1} else {0};
-        round.state = RoundState::Finished;
-        store.set_round(@round);
-
         // update Challenge
         utils::set_challenge(store, challenge);
 
         (challenge)
     }
 
+
     //---------------------------------------
     // Decide who wins a round, or go to next
     //
-    fn game_loop(store: Store, challenge: Challenge, round: Round) -> DuelProgress {
+
+    #[inline(always)]
+    fn game_loop(store: Store, _challenge: Challenge, ref round: Round) -> DuelProgress {
+        let mut dice: Dice = DiceTrait::new(@store.world, round.make_seed());
+        (game_loop_internal(ref dice, ref round))
+    }
+    
+    // testable loop
+    fn game_loop_internal(ref dice: Dice, ref round: Round) -> DuelProgress {
         // let _table_type: TableType = store.get_table_config_entity(challenge.table_id).table_type;
         
-        let seed: felt252 = round.make_seed();
-        let mut dice: Dice = DiceTrait::new(@store.world, seed);
-
         let hand_a: PlayerHand = round.shot_a.as_hand();
         let hand_b: PlayerHand = round.shot_b.as_hand();
 
         let mut env_state_a: PlayerState = round.shot_a.state_start;
         let mut env_state_b: PlayerState = round.shot_b.state_start;
 
+        //------------------------------------------------------
+        // apply cards
+        //
+        hand_a.card_tactics.apply(ref env_state_a, ref env_state_b);
+        hand_b.card_tactics.apply(ref env_state_b, ref env_state_a);
 
 
 
 
-        // TODO: apply tactics card
         // TODO: apply blades cards
         // card_tactics.apply(self.shot_a);
         // card_tactics.apply(self.shot_b);
@@ -166,7 +173,7 @@ mod shooter {
         let mut win_a: Boolean = Boolean::Undefined;
         let mut win_b: Boolean = Boolean::Undefined;
 
-        //
+        //------------------------------------------------------
         // Pistols round
         //
         let mut pace_number: u8 = 1;
@@ -219,7 +226,7 @@ mod shooter {
         };
  
 
-        //
+        //------------------------------------------------------
         // Blades Round
         //
         if (win_a != Boolean::True && win_b != Boolean::True) {
@@ -230,11 +237,23 @@ mod shooter {
 
         }
 
+        // update round model
+        let final_pace: DuelPace = *duel_paces[duel_paces.len() - 1];
+        round.shot_a.state_final = final_pace.state_a;
+        round.shot_b.state_final = final_pace.state_b;
+        round.shot_a.win = if (final_pace.state_b.health == 0) {1} else {0};
+        round.shot_b.win = if (final_pace.state_a.health == 0) {1} else {0};
+        round.state = RoundState::Finished;
+
+        //------------------------------------------------------
+        // returns the full duel progress, ready for animation
+        //
+
         let winner: u8 =
             if (win_a == Boolean::True && win_b != Boolean::True) {1}
             else if (win_b == Boolean::True && win_a != Boolean::True) {2}
             else {0};
-
+        
         (DuelProgress {
             // results
             paces: duel_paces.span(),
@@ -251,7 +270,7 @@ mod shooter {
     }
 
     //-------------------------
-    // Strikes
+    // Fire/Dodge
     //
 
     // returns true if executed

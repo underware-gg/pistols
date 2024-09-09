@@ -12,8 +12,8 @@ mod CONST {
     const SINGLE_DAMAGE: u8 = 1;
 
     // initial player chances
-    const INITIAL_CHANCE: u8 = 80;
-    const INITIAL_DAMAGE: u8 = 3;
+    const INITIAL_CHANCE: u8 = 50;
+    const INITIAL_DAMAGE: u8 = 1;
 
     const ETH_TO_WEI: u256 = 1_000_000_000_000_000_000;
 }

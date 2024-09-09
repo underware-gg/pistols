@@ -1,3 +1,4 @@
+use pistols::models::challenge::{PlayerState};
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 enum TacticsCard {
@@ -21,15 +22,32 @@ mod TACTICS {
     const BANANAS: u8 = 6;
 }
 
+
 trait TacticsCardTrait {
-    fn is_cool(self: TacticsCard) -> bool;
+    fn apply(self: TacticsCard, ref state_self: PlayerState, ref state_other: PlayerState);
 }
 
 impl TacticsCardImpl of TacticsCardTrait {
-    fn is_cool(self: TacticsCard) -> bool {
+    fn apply(self: TacticsCard, ref state_self: PlayerState, ref state_other: PlayerState) {
         match self {
-            _ => true,
-        }
+            TacticsCard::Insult => {
+                state_other.chances -= 10;
+                state_other.damage += 1;
+            },
+            TacticsCard::CoinToss => {},
+            TacticsCard::Vengeful => {
+                state_self.damage += 1;
+            },
+            TacticsCard::ThickCoat => {
+                state_other.damage -= 1;
+            },
+            TacticsCard::Reversal => {},
+            TacticsCard::Bananas => {
+                state_self.chances -= 10;
+                state_other.chances -= 10;
+            },
+            TacticsCard::None => {},
+        };
     }
 }
 

@@ -69,6 +69,7 @@ mod mocks {
 mod tests {
     // pistols
     mod test_admin;
+    mod test_cards;
     mod test_challenge;
     mod test_chances;
     mod test_duel;
@@ -79,6 +80,7 @@ mod tests {
     mod test_rng;
     // utils
     mod tester;
+    mod prefabs;
     mod mock_rng;
     // tokens
     mod token {
