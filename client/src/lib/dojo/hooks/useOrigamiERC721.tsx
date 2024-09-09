@@ -1,8 +1,8 @@
-import { Components } from '@dojoengine/recs'
+import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
+import { Components, getComponentValue } from '@dojoengine/recs'
 import { useComponentValue } from '@dojoengine/react'
-import { bigintToHex, keysToEntity } from '@/lib/utils/types'
-import { getEntityIdFromKeys } from '@dojoengine/utils'
+import { keysToEntity } from '@/lib/utils/types'
 
 
 type MetadataResult = {
@@ -110,5 +110,25 @@ export const useOrigamiERC721IndexOfOwnerByToken = (token: BigNumberish, owner: 
   return {
     index: result ? Number(result.index) : null,
     isPending: (result == null),
+  }
+}
+
+type useOrigamiERC721AllTokensOfOwnerResult = {
+  tokenIds: bigint[]
+  isPending: boolean
+}
+export const useOrigamiERC721AllTokensOfOwner = (token: BigNumberish, owner: BigNumberish, components: Components): useOrigamiERC721AllTokensOfOwnerResult => {
+  const { ERC721EnumerableOwnerIndexModel } = components
+  const { amount, isPending: isBalancePending } = useOrigamiERC721BalanceOf(token, owner, components)
+  const tokenIds = useMemo(() => {
+    return Array.from({ length: amount }, (_, i) => i).map((index) => {
+      const result = getComponentValue(ERC721EnumerableOwnerIndexModel, keysToEntity([token, owner, index]))
+      // console.log(`>>>> ALL:`, isBalancePending, index, result)
+      return result ? BigInt(result.token_id) : 0n
+    })
+  }, [token, owner, amount, isBalancePending])
+  return {
+    tokenIds,
+    isPending: isBalancePending,
   }
 }
