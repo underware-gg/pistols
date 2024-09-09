@@ -172,7 +172,7 @@ mod shooter {
         let mut pace_number: u8 = 1;
         while (pace_number <= 10) {
             let pace: PacesCard = pace_number.into();
-            // println!("Pace [{}] A:{} B:{}", pace_number, self.shot_a.card_paces.as_felt(), self.shot_b.card_paces.as_felt());
+            // println!("Pace [{}] A:{} B:{}", pace_number, self.shot_a.card_fire.as_felt(), self.shot_b.card_fire.as_felt());
 
             let card_env: EnvCard = EnvCard::None;
             let mut dice_env: u8 = 0;
@@ -188,11 +188,11 @@ mod shooter {
             //
             // Shoot!
             // will chance state_a and state_b
-            if (hand_a.card_paces == pace) {
-                win_a = shoot(hand_a.card_paces, hand_b.card_dodge, ref state_a, ref state_b, ref dice, 'shoot_a');
+            if (hand_a.card_fire == pace) {
+                win_a = fire(hand_a.card_fire, hand_b.card_dodge, ref state_a, ref state_b, ref dice, 'shoot_a');
             }
-            if (hand_b.card_paces == pace) {
-                win_b = shoot(hand_b.card_paces, hand_a.card_dodge, ref state_b, ref state_a, ref dice, 'shoot_b');
+            if (hand_b.card_fire == pace) {
+                win_b = fire(hand_b.card_fire, hand_a.card_dodge, ref state_b, ref state_a, ref dice, 'shoot_b');
             }
 
             // save step
@@ -255,7 +255,7 @@ mod shooter {
     //
 
     // returns true if executed
-    fn shoot(paces_shoot: PacesCard, paces_dodge: PacesCard, ref state_self: PlayerState, ref state_other: PlayerState, ref dice: Dice, salt: felt252) -> Boolean {
+    fn fire(paces_shoot: PacesCard, paces_dodge: PacesCard, ref state_self: PlayerState, ref state_other: PlayerState, ref dice: Dice, salt: felt252) -> Boolean {
         if (paces_shoot == paces_dodge) {
             state_self.chances = 0;
         }

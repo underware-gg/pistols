@@ -38,7 +38,7 @@ struct DuelPace {
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 enum DuelistDrawnCard {
     None: (),
-    Shoot: PacesCard,
+    Fire: PacesCard,
     Dodge: PacesCard,
     Blades: BladesCard,
 }

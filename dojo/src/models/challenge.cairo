@@ -114,7 +114,7 @@ impl ShotImpl of ShotTrait {
     }
     fn as_hand(self: @Shot) -> PlayerHand {
         (PlayerHand {
-            card_paces: (*self.card_1).into(),
+            card_fire: (*self.card_1).into(),
             card_dodge: (*self.card_2).into(),
             card_tactics: (*self.card_3).into(),
             card_blades: (*self.card_4).into(),

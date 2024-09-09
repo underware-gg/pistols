@@ -143,15 +143,15 @@ mod tests {
         let final_pace: DuelPace = *progress.paces[progress.paces.len() - 1];
         assert(progress.winner == challenge.winner, 'winner');
         // hand_a
-        assert(progress.hand_a.card_paces.into() == round.shot_a.card_1, 'hand_a.card_paces');
-        assert(progress.hand_a.card_dodge.into() == round.shot_a.card_2, 'hand_a.card_paces');
-        assert(progress.hand_a.card_tactics.into() == round.shot_a.card_3, 'hand_a.card_paces');
-        assert(progress.hand_a.card_blades.into() == round.shot_a.card_4, 'hand_a.card_paces');
+        assert(progress.hand_a.card_fire.into() == round.shot_a.card_1, 'hand_a.card_fire');
+        assert(progress.hand_a.card_dodge.into() == round.shot_a.card_2, 'hand_a.card_fire');
+        assert(progress.hand_a.card_tactics.into() == round.shot_a.card_3, 'hand_a.card_fire');
+        assert(progress.hand_a.card_blades.into() == round.shot_a.card_4, 'hand_a.card_fire');
         // hand_b
-        assert(progress.hand_b.card_paces.into() == round.shot_b.card_1, 'hand_b.card_paces');
-        assert(progress.hand_b.card_dodge.into() == round.shot_b.card_2, 'hand_b.card_paces');
-        assert(progress.hand_b.card_tactics.into() == round.shot_b.card_3, 'hand_b.card_paces');
-        assert(progress.hand_b.card_blades.into() == round.shot_b.card_4, 'hand_b.card_paces');
+        assert(progress.hand_b.card_fire.into() == round.shot_b.card_1, 'hand_b.card_fire');
+        assert(progress.hand_b.card_dodge.into() == round.shot_b.card_2, 'hand_b.card_fire');
+        assert(progress.hand_b.card_tactics.into() == round.shot_b.card_3, 'hand_b.card_fire');
+        assert(progress.hand_b.card_blades.into() == round.shot_b.card_4, 'hand_b.card_fire');
         // shot_a.state_final
         assert(final_pace.state_a.health == round.shot_a.state_final.health, 'state_final_b.health');
         assert(final_pace.state_a.damage == round.shot_a.state_final.damage, 'state_final_b.damage');
