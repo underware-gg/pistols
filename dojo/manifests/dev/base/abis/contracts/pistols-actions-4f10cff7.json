@@ -448,7 +448,7 @@
         "type": "()"
       },
       {
-        "name": "Shoot",
+        "name": "Fire",
         "type": "pistols::types::cards::paces::PacesCard"
       },
       {
@@ -570,7 +570,7 @@
     "name": "pistols::types::cards::hand::PlayerHand",
     "members": [
       {
-        "name": "card_paces",
+        "name": "card_fire",
         "type": "pistols::types::cards::paces::PacesCard"
       },
       {
