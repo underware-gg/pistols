@@ -1,3 +1,5 @@
+use pistols::models::challenge::{PlayerState};
+use pistols::utils::math::{MathU8};
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 enum BladesCard {
@@ -18,14 +20,27 @@ mod BLADES {
 }
 
 trait BladesCardTrait {
-    fn is_cool(self: BladesCard) -> bool;
+    fn apply(self: BladesCard, ref state_self: PlayerState, ref state_other: PlayerState);
 }
 
 impl BladesCardImpl of BladesCardTrait {
-    fn is_cool(self: BladesCard) -> bool {
+    fn apply(self: BladesCard, ref state_self: PlayerState, ref state_other: PlayerState) {
         match self {
-            _ => true,
-        }
+            BladesCard::Seppuku => {
+                state_self.chances += 20;
+                state_self.damage += 1;
+            },
+            BladesCard::RunAway => {
+                state_other.chances.subi(10);
+            },
+            BladesCard::Behead => {
+                state_self.damage += 1;
+            },
+            BladesCard::Grapple => {
+                state_other.damage.subi(1);
+            },
+            BladesCard::None => {},
+        };
     }
 }
 

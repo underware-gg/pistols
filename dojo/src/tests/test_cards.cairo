@@ -19,8 +19,9 @@ mod tests {
     use pistols::types::cards::hand::{
         PlayerHand, PlayerHandTrait,
         PacesCard, PacesCardTrait,
-        EnvCard, EnvCardTrait,
         TacticsCard, TacticsCardTrait,
+        BladesCard, BladesCardTrait,
+        EnvCard, EnvCardTrait,
     };
     use pistols::libs::shooter::{shooter};
     use pistols::libs::utils::{make_moves_hash};
@@ -65,6 +66,7 @@ mod tests {
         assert(round.shot_b.state_start.damage < round.shot_b.state_final.damage, 'final_damage_b');
     }
 
+
     //-----------------------------------------
     // game_loop_internal
     //
@@ -85,78 +87,236 @@ mod tests {
     }
 
 
+    fn _assert_not_affected_by_cards(shot: Shot) {
+        assert(shot.state_start.chances == CONST::INITIAL_CHANCE, 'INITIAL_CHANCE');
+        assert(shot.state_start.damage == CONST::INITIAL_DAMAGE, 'INITIAL_DAMAGE');
+        assert(shot.state_start.chances == shot.state_final.chances, 'keep_chances');
+        assert(shot.state_start.damage == shot.state_final.damage, 'keep_damage');
+    }
+
+    //-----------------------------------------
+    // TACTICS CARDS
+    //
+
     #[test]
-    fn test_vengeful_a() {
+    fn test_chances_tactics_vengeful_a() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, _progress) = execute_game_loop_internal(sys,
-            [1, 1, TacticsCard::Vengeful.into()].span(),
-            [1, 1, 0].span(),
+            [1, 2, TacticsCard::Vengeful.into()].span(),
+            [1, 2, 0].span(),
         );
-        assert(round.shot_a.state_start.damage == CONST::INITIAL_DAMAGE, 'START_DAMAGE_a');
-        assert(round.shot_b.state_start.damage == CONST::INITIAL_DAMAGE, 'START_DAMAGE_b');
-        assert(round.shot_a.state_start.damage < round.shot_a.state_final.damage, 'final_damage_a');
-        assert(round.shot_b.state_start.damage == round.shot_b.state_final.damage, 'final_damage_b');
+        assert(round.shot_a.state_start.chances == CONST::INITIAL_CHANCE, 'INITIAL_CHANCE');
+        assert(round.shot_a.state_start.damage == CONST::INITIAL_DAMAGE, 'INITIAL_DAMAGE');
+        assert(round.shot_a.state_final.damage > round.shot_a.state_start.damage, 'damage');
+        _assert_not_affected_by_cards(round.shot_b);
+    }
+    #[test]
+    fn test_chances_tactics_vengeful_b() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop_internal(sys,
+            [1, 2, 0].span(),
+            [1, 2, TacticsCard::Vengeful.into()].span(),
+        );
+        assert(round.shot_b.state_start.chances == CONST::INITIAL_CHANCE, 'INITIAL_CHANCE');
+        assert(round.shot_b.state_start.damage == CONST::INITIAL_DAMAGE, 'INITIAL_DAMAGE');
+        assert(round.shot_b.state_final.damage > round.shot_b.state_start.damage, 'damage');
+        _assert_not_affected_by_cards(round.shot_a);
     }
 
     #[test]
-    fn test_vengeful_b() {
+    fn test_chances_tactics_thick_coat_a() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, _progress) = execute_game_loop_internal(sys,
-            [1, 1, 0].span(),
-            [1, 1, TacticsCard::Vengeful.into()].span(),
+            [1, 2, TacticsCard::ThickCoat.into()].span(),
+            [1, 2, 0].span(),
         );
-        assert(round.shot_a.state_start.damage == CONST::INITIAL_DAMAGE, 'START_DAMAGE_a');
-        assert(round.shot_b.state_start.damage == CONST::INITIAL_DAMAGE, 'START_DAMAGE_b');
-        assert(round.shot_a.state_start.damage == round.shot_a.state_final.damage, 'final_damage_a');
-        assert(round.shot_b.state_start.damage < round.shot_b.state_final.damage, 'final_damage_b');
+        assert(round.shot_b.state_final.damage < round.shot_b.state_start.damage, 'damage');
+        _assert_not_affected_by_cards(round.shot_a);
+    }
+    #[test]
+    fn test_chances_tactics_thick_coat_b() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop_internal(sys,
+            [1, 2, 0].span(),
+            [1, 2, TacticsCard::ThickCoat.into()].span(),
+        );
+        assert(round.shot_a.state_final.damage < round.shot_a.state_start.damage, 'damage');
+        _assert_not_affected_by_cards(round.shot_b);
     }
 
     #[test]
-    fn test_thick_coat_a() {
+    fn test_chances_tactics_vengeful_thick_a() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, _progress) = execute_game_loop_internal(sys,
-            [1, 1, TacticsCard::ThickCoat.into()].span(),
-            [1, 1, 0].span(),
-        );
-        assert(round.shot_a.state_start.damage == round.shot_a.state_final.damage, 'final_damage_a');
-        assert(round.shot_b.state_start.damage > round.shot_b.state_final.damage, 'final_damage_b');
-    }
-
-    #[test]
-    fn test_thick_coat_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop_internal(sys,
-            [1, 1, 0].span(),
-            [1, 1, TacticsCard::ThickCoat.into()].span(),
-        );
-        assert(round.shot_a.state_start.damage > round.shot_a.state_final.damage, 'final_damage_a');
-        assert(round.shot_b.state_start.damage == round.shot_b.state_final.damage, 'final_damage_b');
-    }
-
-    #[test]
-    fn test_vengeful_thick_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop_internal(sys,
-            [1, 1, TacticsCard::Vengeful.into()].span(),
-            [1, 1, TacticsCard::ThickCoat.into()].span(),
-        );
-        // cancels each other
-        assert(round.shot_a.state_start.damage == round.shot_a.state_final.damage, 'final_damage_a');
-        assert(round.shot_b.state_start.damage == round.shot_b.state_final.damage, 'final_damage_b');
-    }
-
-    #[test]
-    fn test_vengeful_thick_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop_internal(sys,
-            [1, 1, TacticsCard::ThickCoat.into()].span(),
-            [1, 1, TacticsCard::Vengeful.into()].span(),
+            [1, 2, TacticsCard::Vengeful.into()].span(),
+            [1, 2, TacticsCard::ThickCoat.into()].span(),
         );
         // cancels each other
-        assert(round.shot_a.state_start.damage == round.shot_a.state_final.damage, 'final_damage_a');
-        assert(round.shot_b.state_start.damage == round.shot_b.state_final.damage, 'final_damage_b');
+        _assert_not_affected_by_cards(round.shot_a);
+        _assert_not_affected_by_cards(round.shot_b);
+    }
+    #[test]
+    fn test_chances_tactics_vengeful_thick_b() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop_internal(sys,
+            [1, 2, TacticsCard::ThickCoat.into()].span(),
+            [1, 2, TacticsCard::Vengeful.into()].span(),
+        );
+        // cancels each other
+        _assert_not_affected_by_cards(round.shot_a);
+        _assert_not_affected_by_cards(round.shot_b);
     }
 
+    #[test]
+    fn test_chances_tactics_insult_a() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop_internal(sys,
+            [1, 2, TacticsCard::Insult.into()].span(),
+            [1, 2, 0].span(),
+        );
+        assert(round.shot_b.state_final.damage > round.shot_b.state_start.damage, 'damage');
+        assert(round.shot_b.state_final.chances < round.shot_b.state_start.chances, 'chances');
+        _assert_not_affected_by_cards(round.shot_a);
+    }
+    #[test]
+    fn test_chances_tactics_insult_b() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop_internal(sys,
+            [1, 2, 0].span(),
+            [1, 2, TacticsCard::Insult.into()].span(),
+        );
+        assert(round.shot_a.state_final.damage > round.shot_a.state_start.damage, 'damage');
+        assert(round.shot_a.state_final.chances < round.shot_a.state_start.chances, 'chances');
+        _assert_not_affected_by_cards(round.shot_b);
+    }
+
+    #[test]
+    fn test_chances_tactics_bananas_a() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop_internal(sys,
+            [1, 2, TacticsCard::Bananas.into()].span(),
+            [1, 2, 0].span(),
+        );
+        assert(round.shot_a.state_final.chances < round.shot_a.state_start.chances, 'chances_a');
+        assert(round.shot_b.state_final.chances < round.shot_b.state_start.chances, 'chances_b');
+    }
+    #[test]
+    fn test_chances_tactics_bananas_b() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop_internal(sys,
+            [1, 2, 0].span(),
+            [1, 2, TacticsCard::Bananas.into()].span(),
+        );
+        assert(round.shot_a.state_final.chances < round.shot_a.state_start.chances, 'chances_a');
+        assert(round.shot_b.state_final.chances < round.shot_b.state_start.chances, 'chances_b');
+    }
+    #[test]
+    fn test_chances_tactics_bananas_ab() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop_internal(sys,
+            [1, 2, TacticsCard::Bananas.into()].span(),
+            [1, 2, TacticsCard::Bananas.into()].span(),
+        );
+        assert(round.shot_a.state_final.chances < round.shot_a.state_start.chances, 'chances_a');
+        assert(round.shot_b.state_final.chances < round.shot_b.state_start.chances, 'chances_b');
+    }
+
+
+
+
+    //-----------------------------------------
+    // BLADES CARDS
+    //
+
+    #[test]
+    fn test_chances_blades_seppukku_a() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop_internal(sys,
+            [1, 2, 0, BladesCard::Seppuku.into()].span(),
+            [1, 2, 0, 0].span(),
+        );
+        assert(round.shot_a.state_start.chances == CONST::INITIAL_CHANCE, 'INITIAL_CHANCE');
+        assert(round.shot_a.state_start.damage == CONST::INITIAL_DAMAGE, 'INITIAL_DAMAGE');
+        assert(round.shot_a.state_final.chances > round.shot_a.state_start.chances, 'chances');
+        assert(round.shot_a.state_final.damage > round.shot_a.state_start.damage, 'damage');
+        _assert_not_affected_by_cards(round.shot_b);
+    }
+    #[test]
+    fn test_chances_blades_seppukku_b() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop_internal(sys,
+            [1, 2, 0, 0].span(),
+            [1, 2, 0, BladesCard::Seppuku.into()].span(),
+        );
+        assert(round.shot_b.state_start.chances == CONST::INITIAL_CHANCE, 'INITIAL_CHANCE');
+        assert(round.shot_b.state_start.damage == CONST::INITIAL_DAMAGE, 'INITIAL_DAMAGE');
+        assert(round.shot_b.state_final.chances > round.shot_b.state_start.chances, 'chances');
+        assert(round.shot_b.state_final.damage > round.shot_b.state_start.damage, 'damage');
+        _assert_not_affected_by_cards(round.shot_a);
+    }
+
+    #[test]
+    fn test_chances_blades_run_away_a() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop_internal(sys,
+            [1, 2, 0, BladesCard::RunAway.into()].span(),
+            [1, 2, 0, 0].span(),
+        );
+        assert(round.shot_b.state_final.chances < round.shot_b.state_start.chances, 'chances');
+        _assert_not_affected_by_cards(round.shot_a);
+    }
+    #[test]
+    fn test_chances_blades_run_away_b() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop_internal(sys,
+            [1, 2, 0, 0].span(),
+            [1, 2, 0, BladesCard::RunAway.into()].span(),
+        );
+        assert(round.shot_a.state_final.chances < round.shot_a.state_start.chances, 'chances');
+        _assert_not_affected_by_cards(round.shot_b);
+    }
+
+    #[test]
+    fn test_chances_blades_behead_a() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop_internal(sys,
+            [1, 2, 0, BladesCard::Behead.into()].span(),
+            [1, 2, 0, 0].span(),
+        );
+        assert(round.shot_a.state_final.damage > round.shot_a.state_start.damage, 'damage');
+        _assert_not_affected_by_cards(round.shot_b);
+    }
+    #[test]
+    fn test_chances_blades_behead_b() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop_internal(sys,
+            [1, 2, 0, 0].span(),
+            [1, 2, 0, BladesCard::Behead.into()].span(),
+        );
+        assert(round.shot_b.state_final.damage > round.shot_b.state_start.damage, 'damage');
+        _assert_not_affected_by_cards(round.shot_a);
+    }
+
+    #[test]
+    fn test_chances_blades_grapple_a() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop_internal(sys,
+            [1, 2, 0, BladesCard::Grapple.into()].span(),
+            [1, 2, 0, 0].span(),
+        );
+        assert(round.shot_b.state_final.damage < round.shot_b.state_start.damage, 'damage');
+        _assert_not_affected_by_cards(round.shot_a);
+    }
+    #[test]
+    fn test_chances_blades_grapple_b() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop_internal(sys,
+            [1, 2, 0, 0].span(),
+            [1, 2, 0, BladesCard::Grapple.into()].span(),
+        );
+        assert(round.shot_a.state_final.damage < round.shot_a.state_start.damage, 'damage');
+        _assert_not_affected_by_cards(round.shot_b);
+    }
 
 
 }

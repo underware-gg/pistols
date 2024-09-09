@@ -14,6 +14,7 @@ mod tests {
     use pistols::types::duel_progress::{DuelProgress, DuelPace};
     use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::types::constants::{CONST, HONOUR};
+    use pistols::utils::arrays::{SpanTrait};
     use pistols::libs::utils::{make_moves_hash};
 
     use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
@@ -42,18 +43,26 @@ mod tests {
     // Single Round Draw (paces only)
     //
 
-    fn _assert_duel_progress(sys: Systems, duel_id: u128) {
+    fn _assert_duel_progress(sys: Systems, duel_id: u128, moves_a: Span<u8>, moves_b: Span<u8>) {
         let challenge: ChallengeEntity = tester::get_ChallengeEntity(sys.world, duel_id);
         let round: RoundEntity = tester::get_RoundEntity(sys.world, duel_id, 1);
         let progress: DuelProgress = sys.actions.get_duel_progress(duel_id);
         let final_pace: DuelPace = *progress.paces[progress.paces.len() - 1];
         assert(progress.winner == challenge.winner, 'winner');
         // hand_a
+        assert(progress.hand_a.card_fire.into() == moves_a.value_or_zero(0), 'moves_a.card_fire');
+        assert(progress.hand_a.card_dodge.into() == moves_a.value_or_zero(1), 'moves_a.card_fire');
+        assert(progress.hand_a.card_tactics.into() == moves_a.value_or_zero(2), 'moves_a.card_fire');
+        assert(progress.hand_a.card_blades.into() == moves_a.value_or_zero(3), 'moves_a.card_fire');
         assert(progress.hand_a.card_fire.into() == round.shot_a.card_1, 'hand_a.card_fire');
         assert(progress.hand_a.card_dodge.into() == round.shot_a.card_2, 'hand_a.card_fire');
         assert(progress.hand_a.card_tactics.into() == round.shot_a.card_3, 'hand_a.card_fire');
         assert(progress.hand_a.card_blades.into() == round.shot_a.card_4, 'hand_a.card_fire');
         // hand_b
+        assert(progress.hand_b.card_fire.into() == moves_b.value_or_zero(0), 'moves_b.card_fire');
+        assert(progress.hand_b.card_dodge.into() == moves_b.value_or_zero(1), 'moves_b.card_fire');
+        assert(progress.hand_b.card_tactics.into() == moves_b.value_or_zero(2), 'moves_b.card_fire');
+        assert(progress.hand_b.card_blades.into() == moves_b.value_or_zero(3), 'moves_b.card_fire');
         assert(progress.hand_b.card_fire.into() == round.shot_b.card_1, 'hand_b.card_fire');
         assert(progress.hand_b.card_dodge.into() == round.shot_b.card_2, 'hand_b.card_fire');
         assert(progress.hand_b.card_tactics.into() == round.shot_b.card_3, 'hand_b.card_fire');
@@ -131,7 +140,7 @@ mod tests {
         tester::assert_balance(sys.lords, OWNER(), balance_a, fee, 0, 'balance_a_2');
         tester::assert_balance(sys.lords, OTHER(), balance_b, fee, 0, 'balance_b_2');
 
-        _assert_duel_progress(sys, duel_id);
+        _assert_duel_progress(sys, duel_id, moves_a.moves, moves_b.moves);
     }
 
     #[test]
@@ -143,6 +152,14 @@ mod tests {
     #[test]
     fn test_resolved_draw_crit() {
         let (salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
+// (*salts.salts[0]).print();
+// (*salts.salts[1]).print();
+// (*salts.values[0]).print();
+// (*salts.values[1]).print();
+// (*moves_a.moves[0]).print();
+// (*moves_a.moves[1]).print();
+// (*moves_b.moves[0]).print();
+// (*moves_b.moves[1]).print();
         _test_resolved_draw(salts, moves_a, moves_b, 0);
     }
 
@@ -295,7 +312,7 @@ mod tests {
         tester::assert_balance(sys.lords, TREASURY(), balance_treasury, 0, fee * 2, 'balance_treasury_3');
         tester::assert_winner_balance(sys.lords, challenge.winner, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'balance_winner_3');
 
-        _assert_duel_progress(sys, duel_id);
+        _assert_duel_progress(sys, duel_id, moves_a.moves, moves_b.moves);
     }
 
     #[test]

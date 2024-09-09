@@ -11,6 +11,9 @@ trait MathTrait<T,TI> {
     fn clamp(v: T, min: T, max: T) -> T;
     // safe subtraction
     fn sub(a: T, b: T) -> T;
+    fn add(a: T, b: TI) -> T;
+    fn subi(ref self: T, v: T);
+    fn addi(ref self: T, v: TI);
     // returns GDC of two numbers
     fn gdc(a: T, b: T) -> T;
     // map a value form one range to another
@@ -37,6 +40,17 @@ impl MathU8 of MathTrait<u8,i8> {
 
     fn sub(a: u8, b: u8) -> u8 {
         if (b >= a) { (0) } else { (a - b) }
+    }
+    fn add(a: u8, b: i8) -> u8 {
+        if (b < 0) { Self::sub(a, (-b).try_into().unwrap()) }
+        else if (b > 0) { (a + b.try_into().unwrap()) }
+        else {{a}}
+    }
+    fn subi(ref self: u8, v: u8) {
+        self = Self::sub(self, v);
+    }
+    fn addi(ref self: u8, v: i8) {
+        self = Self::add(self, v);
     }
 
     fn gdc(mut a: u8, mut b: u8) -> u8 {
@@ -113,6 +127,17 @@ impl MathU16 of MathTrait<u16, i16> {
     fn sub(a: u16, b: u16) -> u16 {
         if (b >= a) { (0) } else { (a - b) }
     }
+    fn add(a: u16, b: i16) -> u16 {
+        if (b < 0) { Self::sub(a, (-b).try_into().unwrap()) }
+        else if (b > 0) { (a + b.try_into().unwrap()) }
+        else {{a}}
+    }
+    fn subi(ref self: u16, v: u16) {
+        self = Self::sub(self, v);
+    }
+    fn addi(ref self: u16, v: i16) {
+        self = Self::add(self, v);
+    }
 
     fn gdc(a: u16, b: u16) -> u16 {
         // recursive (not fastest)
@@ -155,6 +180,17 @@ impl MathU32 of MathTrait<u32, i32> {
     fn sub(a: u32, b: u32) -> u32 {
         if (b >= a) { (0) } else { (a - b) }
     }
+    fn add(a: u32, b: i32) -> u32 {
+        if (b < 0) { Self::sub(a, (-b).try_into().unwrap()) }
+        else if (b > 0) { (a + b.try_into().unwrap()) }
+        else {{a}}
+    }
+    fn subi(ref self: u32, v: u32) {
+        self = Self::sub(self, v);
+    }
+    fn addi(ref self: u32, v: i32) {
+        self = Self::add(self, v);
+    }
 
     fn gdc(a: u32, b: u32) -> u32 {
         if (b == 0) { (a) } else { (Self::gdc(b, a % b)) }
@@ -195,6 +231,17 @@ impl MathU64 of MathTrait<u64, i64> {
 
     fn sub(a: u64, b: u64) -> u64 {
         if (b >= a) { (0) } else { (a - b) }
+    }
+    fn add(a: u64, b: i64) -> u64 {
+        if (b < 0) { Self::sub(a, (-b).try_into().unwrap()) }
+        else if (b > 0) { (a + b.try_into().unwrap()) }
+        else {{a}}
+    }
+    fn subi(ref self: u64, v: u64) {
+        self = Self::sub(self, v);
+    }
+    fn addi(ref self: u64, v: i64) {
+        self = Self::add(self, v);
     }
 
     fn gdc(a: u64, b: u64) -> u64 {
@@ -237,6 +284,17 @@ impl MathU128 of MathTrait<u128, i128> {
     fn sub(a: u128, b: u128) -> u128 {
         if (b >= a) { (0) } else { (a - b) }
     }
+    fn add(a: u128, b: i128) -> u128 {
+        if (b < 0) { Self::sub(a, (-b).try_into().unwrap()) }
+        else if (b > 0) { (a + b.try_into().unwrap()) }
+        else {{a}}
+    }
+    fn subi(ref self: u128, v: u128) {
+        self = Self::sub(self, v);
+    }
+    fn addi(ref self: u128, v: i128) {
+        self = Self::add(self, v);
+    }
 
     fn gdc(a: u128, b: u128) -> u128 {
         if (b == 0) { (a) } else { (Self::gdc(b, a % b)) }
@@ -275,6 +333,7 @@ impl MathU128 of MathTrait<u128, i128> {
 }
 
 impl MathU256 of MathTrait<u256, u256> {
+    // there si no i256!
     fn abs(v: u256) -> u256 {
         (v)
     }
@@ -290,6 +349,15 @@ impl MathU256 of MathTrait<u256, u256> {
 
     fn sub(a: u256, b: u256) -> u256 {
         if (b >= a) { (0) } else { (a - b) }
+    }
+    fn add(a: u256, b: u256) -> u256 {
+        (a + b)
+    }
+    fn subi(ref self: u256, v: u256) {
+        self = Self::sub(self, v);
+    }
+    fn addi(ref self: u256, v: u256) {
+        self += v;
     }
 
     fn gdc(a: u256, b: u256) -> u256 {
@@ -374,6 +442,40 @@ mod tests {
         assert(MathU8::sub(10, 10) == 0, 'sub_10_10');
         assert(MathU8::sub(10, 11) == 0, 'sub_10_11');
         assert(MathU8::sub(10, 255) == 0, 'sub_10_155');
+        let mut v: u8 = 10; v.subi(0);
+        assert(v == 10, 'subi_10_0');
+        let mut v: u8 = 10; v.subi(2);
+        assert(v == 8, 'subi_10_2');
+        let mut v: u8 = 10; v.subi(9);
+        assert(v == 1, 'subi_10_9');
+        let mut v: u8 = 10; v.subi(10);
+        assert(v == 0, 'subi_10_10');
+        let mut v: u8 = 10; v.subi(11);
+        assert(v == 0, 'subi_10_11');
+        let mut v: u8 = 10; v.subi(255);
+        assert(v == 0, 'subi_10_155');
+    }
+
+    #[test]
+    fn test_add() {
+        assert(MathU8::add(10, 0) == 10, 'add_10_0');
+        assert(MathU8::add(10, 2) == 12, 'add_10_2');
+        assert(MathU8::add(10, -2) == 8, 'add_10_-2');
+        assert(MathU8::add(10, -10) == 0, 'add_10_-10');
+        assert(MathU8::add(10, 15) == 25, 'add_10_15');
+        assert(MathU8::add(10, -15) == 0, 'add_10_-15');
+        let mut v: u8 = 10; v.addi(0);
+        assert(v == 10, 'addi_10_0');
+        let mut v: u8 = 10; v.addi(2);
+        assert(v == 12, 'addi_10_2');
+        let mut v: u8 = 10; v.addi(-2);
+        assert(v == 8, 'addi_10_-2');
+        let mut v: u8 = 10; v.addi(-10);
+        assert(v == 0, 'addi_10_-10');
+        let mut v: u8 = 10; v.addi(15);
+        assert(v == 25, 'addi_10_15');
+        let mut v: u8 = 10; v.addi(-15);
+        assert(v == 0, 'addi_10_-15');
     }
 
     #[test]

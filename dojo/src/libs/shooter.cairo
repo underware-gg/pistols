@@ -18,8 +18,9 @@ mod shooter {
     use pistols::types::cards::hand::{
         PlayerHand, PlayerHandTrait,
         PacesCard, PacesCardTrait,
-        EnvCard, EnvCardTrait,
         TacticsCard, TacticsCardTrait,
+        BladesCard, BladesCardTrait,
+        EnvCard, EnvCardTrait,
     };
     use pistols::types::misc::{Boolean};
     use pistols::utils::math::{MathU8, MathU16};
@@ -160,22 +161,16 @@ mod shooter {
         //
         hand_a.card_tactics.apply(ref env_state_a, ref env_state_b);
         hand_b.card_tactics.apply(ref env_state_b, ref env_state_a);
-
-
-
-
-        // TODO: apply blades cards
-        // card_tactics.apply(self.shot_a);
-        // card_tactics.apply(self.shot_b);
-
-
-        let mut duel_paces: Array<DuelPace> = array![];
-        let mut win_a: Boolean = Boolean::Undefined;
-        let mut win_b: Boolean = Boolean::Undefined;
+        hand_a.card_blades.apply(ref env_state_a, ref env_state_b);
+        hand_b.card_blades.apply(ref env_state_b, ref env_state_a);
 
         //------------------------------------------------------
         // Pistols round
         //
+        let mut duel_paces: Array<DuelPace> = array![];
+        let mut win_a: Boolean = Boolean::Undefined;
+        let mut win_b: Boolean = Boolean::Undefined;
+        
         let mut pace_number: u8 = 1;
         while (pace_number <= 10) {
             let pace: PacesCard = pace_number.into();

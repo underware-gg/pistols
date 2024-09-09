@@ -1,4 +1,5 @@
 use pistols::models::challenge::{PlayerState};
+use pistols::utils::math::{MathU8};
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 enum TacticsCard {
@@ -31,7 +32,8 @@ impl TacticsCardImpl of TacticsCardTrait {
     fn apply(self: TacticsCard, ref state_self: PlayerState, ref state_other: PlayerState) {
         match self {
             TacticsCard::Insult => {
-                state_other.chances -= 10;
+                // state_other.chances -= 10;
+                state_other.chances.subi(10);
                 state_other.damage += 1;
             },
             TacticsCard::CoinToss => {},
@@ -39,12 +41,12 @@ impl TacticsCardImpl of TacticsCardTrait {
                 state_self.damage += 1;
             },
             TacticsCard::ThickCoat => {
-                state_other.damage -= 1;
+                state_other.damage.subi(1);
             },
             TacticsCard::Reversal => {},
             TacticsCard::Bananas => {
-                state_self.chances -= 10;
-                state_other.chances -= 10;
+                state_self.chances.subi(10);
+                state_other.chances.subi(10);
             },
             TacticsCard::None => {},
         };
