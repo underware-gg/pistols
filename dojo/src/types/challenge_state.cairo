@@ -1,5 +1,5 @@
+// use debug::PrintTrait;
 use traits::Into;
-use debug::PrintTrait;
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 enum ChallengeState {
@@ -140,15 +140,6 @@ impl TryFelt252IntoChallengeState of TryInto<felt252, ChallengeState> {
     }
 }
 
-impl PrintChallengeState of PrintTrait<ChallengeState> {
-    fn print(self: ChallengeState) {
-        let num: felt252 = self.into();
-        num.print();
-        // let num: u8 = self.into();
-        // num.print();
-    }
-}
-
 
 
 //----------------------------------------
@@ -156,7 +147,6 @@ impl PrintChallengeState of PrintTrait<ChallengeState> {
 //
 #[cfg(test)]
 mod tests {
-    use debug::PrintTrait;
     use core::traits::Into;
 
     use pistols::models::challenge::{ChallengeEntity};

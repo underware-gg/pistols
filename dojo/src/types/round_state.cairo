@@ -1,5 +1,5 @@
+// use debug::PrintTrait;
 use traits::Into;
-use debug::PrintTrait;
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 enum RoundState {
@@ -81,14 +81,6 @@ impl TryFelt252IntoRoundState of TryInto<felt252, RoundState> {
         else { Option::None }
     }
 }
-
-impl PrintRoundState of PrintTrait<RoundState> {
-    fn print(self: RoundState) {
-        let num: felt252 = self.into();
-        num.print();
-    }
-}
-
 
 
 //----------------------------------------

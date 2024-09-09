@@ -1,4 +1,4 @@
-use debug::PrintTrait;
+// use debug::PrintTrait;
 use core::hash::HashStateExTrait;
 use hash::{HashStateTrait, Hash};
 use poseidon::PoseidonTrait;
@@ -42,8 +42,8 @@ pub impl CommitMoveMessageImpl<
     T, +StructHash<T>,
 > of CommitMoveMessageTrait<T> {
     fn validate(self: @T, contract_address: ContractAddress, signature: Array<felt252>) -> bool {
-        let message_hash = self.get_message_hash(contract_address);
-message_hash.print();
+        let _message_hash = self.get_message_hash(contract_address);
+// message_hash.print();
         // let is_valid_signature_felt = DualCaseAccount{contract_address}.is_valid_signature(message_hash, signature);
         let is_valid_signature_felt = 0;
         let is_valid_signature = is_valid_signature_felt == starknet::VALIDATED || is_valid_signature_felt == 1;

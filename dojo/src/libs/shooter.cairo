@@ -1,6 +1,6 @@
 
 mod shooter {
-    use debug::PrintTrait;
+    // use debug::PrintTrait;
     use core::traits::TryInto;
     use starknet::{ContractAddress, get_block_timestamp};
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};

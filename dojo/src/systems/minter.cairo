@@ -10,7 +10,7 @@ trait IMinter {
 
 #[dojo::contract]
 mod minter {
-    use debug::PrintTrait;
+    // use debug::PrintTrait;
     use super::{IMinter};
     use zeroable::Zeroable;
     use starknet::{ContractAddress, get_contract_address, get_caller_address};

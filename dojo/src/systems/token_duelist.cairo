@@ -80,7 +80,7 @@ trait ITokenDuelistPublic<TState> {
 
 #[dojo::contract]
 mod token_duelist {    
-    use debug::PrintTrait;
+    // use debug::PrintTrait;
     use core::byte_array::ByteArrayTrait;
     use starknet::ContractAddress;
     use starknet::{get_contract_address, get_caller_address};

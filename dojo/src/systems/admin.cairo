@@ -22,7 +22,7 @@ trait IAdmin {
 
 #[dojo::contract]
 mod admin {
-    use debug::PrintTrait;
+    // use debug::PrintTrait;
     use core::traits::Into;
     use starknet::ContractAddress;
     use starknet::{get_caller_address, get_contract_address};
