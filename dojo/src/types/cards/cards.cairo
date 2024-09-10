@@ -1,12 +1,12 @@
 
 #[derive(Copy, Drop, Serde, Default)]
 struct CardPoints {
-    name: felt252,
+    name: felt252, // @generateContants_type: shortstring
     self_chances: i8,
     self_damage: i8,
     other_chances: i8,
     other_damage: i8,
-    special: felt252,
+    special: felt252, // @generateContants_type: shortstring
 }
 
 

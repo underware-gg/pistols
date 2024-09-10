@@ -2,8 +2,18 @@
 import { BigNumberish } from 'starknet';
 
 //
-// contants
+// constants
 //
+
+// from: ../dojo/src/types/cards/cards.cairo
+export type CardPoints = {
+  name : string,
+  self_chances : number,
+  self_damage : number,
+  other_chances : number,
+  other_damage : number,
+  special : string,
+};
 
 // from: ../dojo/src/interfaces/systems.cairo
 type type_SELECTORS = {
@@ -48,14 +58,14 @@ export const TABLES: type_TABLES = {
 };
 
 // from: ../dojo/src/types/cards/blades.cairo
-type type_BLADES = {
+type type_BLADES_CARDS = {
   NONE: number, // cairo: u8
   SEPPUKU: number, // cairo: u8
   RUN_AWAY: number, // cairo: u8
   BEHEAD: number, // cairo: u8
   GRAPPLE: number, // cairo: u8
 };
-export const BLADES: type_BLADES = {
+export const BLADES_CARDS: type_BLADES_CARDS = {
   NONE: 0,
   SEPPUKU: 1,
   RUN_AWAY: 2,
@@ -63,8 +73,50 @@ export const BLADES: type_BLADES = {
   GRAPPLE: 4,
 };
 
+// from: ../dojo/src/types/cards/blades.cairo
+type type_BLADES_POINTS = {
+  SEPPUKU: CardPoints, // cairo: CardPoints
+  RUN_AWAY: CardPoints, // cairo: CardPoints
+  BEHEAD: CardPoints, // cairo: CardPoints
+  GRAPPLE: CardPoints, // cairo: CardPoints
+};
+export const BLADES_POINTS: type_BLADES_POINTS = {
+  SEPPUKU: {
+    name: 'Seppuku',
+    self_chances: 20,
+    self_damage: 1,
+    other_chances: 0,
+    other_damage: 0,
+    special: 'Suicide if survives',
+  },
+  RUN_AWAY: {
+    name: 'Run Away',
+    self_chances: 0,
+    self_damage: 0,
+    other_chances: -10,
+    other_damage: 0,
+    special: 'Beats Behead',
+  },
+  BEHEAD: {
+    name: 'Behead',
+    self_chances: 0,
+    self_damage: 1,
+    other_chances: 0,
+    other_damage: 0,
+    special: 'Beats Grapple',
+  },
+  GRAPPLE: {
+    name: 'Grapple',
+    self_chances: 0,
+    self_damage: 0,
+    other_chances: 0,
+    other_damage: -1,
+    special: 'Beats Run Away',
+  },
+};
+
 // from: ../dojo/src/types/cards/env.cairo
-type type_ENV = {
+type type_ENV_CARDS = {
   NONE: number, // cairo: u8
   COMMON_DAMAGE_UP: number, // cairo: u8
   COMMON_DAMAGE_DOWN: number, // cairo: u8
@@ -79,7 +131,7 @@ type type_ENV = {
   SPECIAL_DOUBLE_TACTICS: number, // cairo: u8
   SPECIAL_NO_TACTICS: number, // cairo: u8
 };
-export const ENV: type_ENV = {
+export const ENV_CARDS: type_ENV_CARDS = {
   NONE: 0,
   COMMON_DAMAGE_UP: 1,
   COMMON_DAMAGE_DOWN: 2,
@@ -96,7 +148,7 @@ export const ENV: type_ENV = {
 };
 
 // from: ../dojo/src/types/cards/paces.cairo
-type type_PACES = {
+type type_PACES_CARDS = {
   None: number, // cairo: u8
   PACES_1: number, // cairo: u8
   PACES_2: number, // cairo: u8
@@ -109,7 +161,7 @@ type type_PACES = {
   PACES_9: number, // cairo: u8
   PACES_10: number, // cairo: u8
 };
-export const PACES: type_PACES = {
+export const PACES_CARDS: type_PACES_CARDS = {
   None: 0,
   PACES_1: 1,
   PACES_2: 2,
@@ -124,7 +176,7 @@ export const PACES: type_PACES = {
 };
 
 // from: ../dojo/src/types/cards/tactics.cairo
-type type_TACTICS = {
+type type_TACTICS_CARDS = {
   NONE: number, // cairo: u8
   INSULT: number, // cairo: u8
   COIN_TOSS: number, // cairo: u8
@@ -133,7 +185,7 @@ type type_TACTICS = {
   REVERSAL: number, // cairo: u8
   BANANAS: number, // cairo: u8
 };
-export const TACTICS: type_TACTICS = {
+export const TACTICS_CARDS: type_TACTICS_CARDS = {
   NONE: 0,
   INSULT: 1,
   COIN_TOSS: 2,
@@ -141,6 +193,66 @@ export const TACTICS: type_TACTICS = {
   THICK_COAT: 4,
   REVERSAL: 5,
   BANANAS: 6,
+};
+
+// from: ../dojo/src/types/cards/tactics.cairo
+type type_TACTICS_POINTS = {
+  INSULT: CardPoints, // cairo: CardPoints
+  COIN_TOSS: CardPoints, // cairo: CardPoints
+  VENGEFUL: CardPoints, // cairo: CardPoints
+  THICK_COAT: CardPoints, // cairo: CardPoints
+  REVERSAL: CardPoints, // cairo: CardPoints
+  BANANAS: CardPoints, // cairo: CardPoints
+};
+export const TACTICS_POINTS: type_TACTICS_POINTS = {
+  INSULT: {
+    name: 'Insult',
+    self_chances: 0,
+    self_damage: 0,
+    other_chances: -10,
+    other_damage: 1,
+    special: '',
+  },
+  COIN_TOSS: {
+    name: 'Coin Toss',
+    self_chances: 0,
+    self_damage: 0,
+    other_chances: 0,
+    other_damage: 0,
+    special: 'First special doesnt affect you',
+  },
+  VENGEFUL: {
+    name: 'Vengeful',
+    self_chances: 0,
+    self_damage: 1,
+    other_chances: 0,
+    other_damage: 0,
+    special: '',
+  },
+  THICK_COAT: {
+    name: 'Thick Coat',
+    self_chances: 0,
+    self_damage: 0,
+    other_chances: 0,
+    other_damage: -1,
+    special: '',
+  },
+  REVERSAL: {
+    name: 'Reversal',
+    self_chances: 0,
+    self_damage: 0,
+    other_chances: 0,
+    other_damage: 0,
+    special: 'Next decrease increases both',
+  },
+  BANANAS: {
+    name: 'Bananas',
+    self_chances: -10,
+    self_damage: 0,
+    other_chances: -10,
+    other_damage: 0,
+    special: '',
+  },
 };
 
 // from: ../dojo/src/types/challenge_state.cairo
@@ -182,8 +294,8 @@ export const CONST: type_CONST = {
   FULL_HEALTH: 3,
   DOUBLE_DAMAGE: 2,
   SINGLE_DAMAGE: 1,
-  INITIAL_CHANCE: 80,
-  INITIAL_DAMAGE: 3,
+  INITIAL_CHANCE: 50,
+  INITIAL_DAMAGE: 1,
   ETH_TO_WEI: '1_000_000_000_000_000_000',
 };
 
@@ -462,13 +574,13 @@ export const getChallengeState = (name: string | number): ChallengeState => (Cha
 // from: ../dojo/src/types/duel_progress.cairo
 export enum DuelistDrawnCard {
   None = 0,
-  Shoot = 1,
+  Fire = 1,
   Dodge = 2,
   Blades = 3,
 };
 export const DuelistDrawnCardNameToValue: Record<string, DuelistDrawnCard> = {
   'None': DuelistDrawnCard.None,
-  'Shoot': DuelistDrawnCard.Shoot,
+  'Fire': DuelistDrawnCard.Fire,
   'Dodge': DuelistDrawnCard.Dodge,
   'Blades': DuelistDrawnCard.Blades,
 };
