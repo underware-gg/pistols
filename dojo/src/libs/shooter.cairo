@@ -159,10 +159,10 @@ mod shooter {
         //------------------------------------------------------
         // apply cards
         //
-        hand_a.card_tactics.apply(ref env_state_a, ref env_state_b);
-        hand_b.card_tactics.apply(ref env_state_b, ref env_state_a);
-        hand_a.card_blades.apply(ref env_state_a, ref env_state_b);
-        hand_b.card_blades.apply(ref env_state_b, ref env_state_a);
+        hand_a.card_tactics.apply_points(ref env_state_a, ref env_state_b);
+        hand_b.card_tactics.apply_points(ref env_state_b, ref env_state_a);
+        hand_a.card_blades.apply_points(ref env_state_a, ref env_state_b);
+        hand_b.card_blades.apply_points(ref env_state_b, ref env_state_a);
 
         //------------------------------------------------------
         // Pistols round

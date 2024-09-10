@@ -221,6 +221,48 @@ mod tests {
         assert(round.shot_b.state_final.chances < round.shot_b.state_start.chances, 'chances_b');
     }
 
+    #[test]
+    fn test_chances_tactics_coin_toss_a() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop_internal(sys,
+            [1, 2, TacticsCard::CoinToss.into()].span(),
+            [1, 2, 0].span(),
+        );
+        _assert_not_affected_by_cards(round.shot_a);
+        _assert_not_affected_by_cards(round.shot_b);
+    }
+    #[test]
+    fn test_chances_tactics_coin_toss_b() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop_internal(sys,
+            [1, 2, 0].span(),
+            [1, 2, TacticsCard::CoinToss.into()].span(),
+        );
+        _assert_not_affected_by_cards(round.shot_a);
+        _assert_not_affected_by_cards(round.shot_b);
+    }
+
+    #[test]
+    fn test_chances_tactics_reversal_a() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop_internal(sys,
+            [1, 2, TacticsCard::Reversal.into()].span(),
+            [1, 2, 0].span(),
+        );
+        _assert_not_affected_by_cards(round.shot_a);
+        _assert_not_affected_by_cards(round.shot_b);
+    }
+    #[test]
+    fn test_chances_tactics_reversal_b() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop_internal(sys,
+            [1, 2, 0].span(),
+            [1, 2, TacticsCard::Reversal.into()].span(),
+        );
+        _assert_not_affected_by_cards(round.shot_a);
+        _assert_not_affected_by_cards(round.shot_b);
+    }
+
 
 
 

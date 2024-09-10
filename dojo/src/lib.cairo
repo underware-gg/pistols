@@ -37,6 +37,7 @@ mod types {
     mod round_state;
     mod typed_data;
     mod cards {
+        mod cards;
         mod hand;
         mod paces;
         mod tactics;

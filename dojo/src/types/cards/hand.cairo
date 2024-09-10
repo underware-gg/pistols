@@ -15,6 +15,10 @@ struct PlayerHand {
 }
 
 
+//--------------------
+// traits
+//
+
 #[generate_trait]
 impl PlayerHandImpl of PlayerHandTrait {
     fn player_full_deck() -> Array<Array<u8>> {
