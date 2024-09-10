@@ -41,11 +41,7 @@ mod PACES_CARDS {
 // traits
 //
 
-trait PacesCardTrait {
-    fn as_felt(self: PacesCard) -> felt252;
-    fn honour(self: PacesCard) -> u8;
-}
-
+#[generate_trait]
 impl PacesCardImpl of PacesCardTrait {
     fn as_felt(self: PacesCard) -> felt252 {
         let result: u8 = self.into();

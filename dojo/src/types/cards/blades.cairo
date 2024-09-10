@@ -63,14 +63,10 @@ mod BLADES_POINTS {
 //--------------------
 // traits
 //
-use pistols::models::challenge::{PlayerState};
 use pistols::types::cards::cards::{CardPoints, CardPointsTrait};
+use pistols::models::challenge::{PlayerState};
 
-trait BladesCardTrait {
-    fn get_points(self: BladesCard) -> CardPoints;
-    fn apply_points(self: BladesCard, ref state_self: PlayerState, ref state_other: PlayerState);
-}
-
+#[generate_trait]
 impl BladesCardImpl of BladesCardTrait {
     fn get_points(self: BladesCard) -> CardPoints {
         match self {
