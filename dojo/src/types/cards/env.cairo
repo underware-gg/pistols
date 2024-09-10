@@ -146,6 +146,51 @@ impl EnvCardImpl of EnvCardTrait {
     fn apply_points(self: EnvCard, ref state_self: PlayerState, ref state_other: PlayerState) {
         self.get_points().apply(ref state_self, ref state_other);
     }
+    fn get_full_deck() -> Array<EnvCard> {
+        (array![
+            // 7
+            EnvCard::CommonDamageUp,
+            EnvCard::CommonDamageUp,
+            EnvCard::CommonDamageUp,
+            EnvCard::CommonDamageUp,
+            EnvCard::CommonDamageUp,
+            EnvCard::CommonDamageUp,
+            EnvCard::CommonDamageUp,
+            // 5
+            EnvCard::CommonDamageDown,
+            EnvCard::CommonDamageDown,
+            EnvCard::CommonDamageDown,
+            EnvCard::CommonDamageDown,
+            EnvCard::CommonDamageDown,
+            // 7
+            EnvCard::CommonChancesUp,
+            EnvCard::CommonChancesUp,
+            EnvCard::CommonChancesUp,
+            EnvCard::CommonChancesUp,
+            EnvCard::CommonChancesUp,
+            EnvCard::CommonChancesUp,
+            EnvCard::CommonChancesUp,
+            // 5
+            EnvCard::CommonChancesDown,
+            EnvCard::CommonChancesDown,
+            EnvCard::CommonChancesDown,
+            EnvCard::CommonChancesDown,
+            EnvCard::CommonChancesDown,
+            // 3
+            EnvCard::UncommonDamageUp,
+            EnvCard::UncommonDamageUp,
+            EnvCard::UncommonDamageUp,
+            // 3
+            EnvCard::UncommonChancesUp,
+            EnvCard::UncommonChancesUp,
+            EnvCard::UncommonChancesUp, 
+            // 1
+            EnvCard::SpecialAllShotsHit,
+            EnvCard::SpecialAllShotsMiss,
+            EnvCard::SpecialDoubleTactics,
+            EnvCard::SpecialNoTactics,
+        ])
+    }
 }
 
 

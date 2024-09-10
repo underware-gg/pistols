@@ -156,6 +156,9 @@ mod shooter {
         let mut env_state_a: PlayerState = round.shot_a.state_start;
         let mut env_state_b: PlayerState = round.shot_b.state_start;
 
+        // TODO: shuffle
+        let env_deck: Span<EnvCard> = EnvCardTrait::get_full_deck().span();
+
         //------------------------------------------------------
         // apply cards
         //
@@ -170,19 +173,17 @@ mod shooter {
         let mut duel_paces: Array<DuelPace> = array![];
         let mut win_a: Boolean = Boolean::Undefined;
         let mut win_b: Boolean = Boolean::Undefined;
-        
+
         let mut pace_number: u8 = 1;
         while (pace_number <= 10) {
             let pace: PacesCard = pace_number.into();
             // println!("Pace [{}] A:{} B:{}", pace_number, self.shot_a.card_fire.as_felt(), self.shot_b.card_fire.as_felt());
 
-            let card_env: EnvCard = EnvCard::None;
-            let mut dice_env: u8 = 0;
+            // draw env card
+            // TODO: remove drawn cards
+            let (card_env, dice_env): (EnvCard, u8) = draw_env_card(env_deck, pace, ref dice);
 
-            // TODO: draw env cards
             // TODO: apply env card to shots
-            // update shot.state_final.chances
-            // update shot.state_final.damage
 
             let mut state_a: PlayerState = env_state_a;
             let mut state_b: PlayerState = env_state_b;
@@ -284,6 +285,13 @@ mod shooter {
         } else {
             (Boolean::False)
         }
+    }
+
+    fn draw_env_card(env_deck: Span<EnvCard>, pace: PacesCard, ref dice: Dice) -> (EnvCard, u8) {
+        let salt: felt252 = pace.env_salt();
+        let dice: u8 = dice.throw(salt, env_deck.len().try_into().unwrap());
+        let env_card: EnvCard = *env_deck[dice.into()];
+        (env_card, dice)
     }
 
 }
