@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Connector, useAccount } from '@starknet-react/core'
+import { Connector, useAccount, useDisconnect } from '@starknet-react/core'
 import { Policy, ControllerOptions, PaymasterOptions } from '@cartridge/controller'
 import CartridgeConnector from '@cartridge/connector'
 import { KATANA_CLASS_HASH } from '@dojoengine/core'
@@ -19,7 +19,7 @@ const exclusions = [
   'dojo_init',
 ]
 
-export const useController = (manifest: DojoManifest, rpcUrl: string, nameSpace: string, contractInterfaces: ContractInterfaces) => {
+export const useControllerConnector = (manifest: DojoManifest, rpcUrl: string, nameSpace: string, contractInterfaces: ContractInterfaces) => {
   const controller = useMemo(() => {
     const paymaster: PaymasterOptions = {
       caller: bigintToHex(stringToFelt("ANY_CALLER")),
@@ -75,18 +75,49 @@ export const useController = (manifest: DojoManifest, rpcUrl: string, nameSpace:
 }
 
 
-export const useControllerUsername = () => {
+export const useControllerUser = () => {
   const { address, connector } = useAccount()
-  const [username, setUsername] = useState<string>(undefined)
   const controllerConnector = useMemo(() => (connector as unknown as CartridgeConnector), [connector])
+  
+  // fetch username
+  const [username, setUsername] = useState<string>(undefined)
   useEffect(() => {
     setUsername(undefined)
-    if (address && controllerConnector?.username) {
-      controllerConnector.username().then((n) => setUsername(n))
+    if (address) {
+      controllerConnector?.username().then((n) => setUsername(n))
     }
-  }, [address, connector])
+  }, [address, controllerConnector])
+
+  // fetch delegate account
+  // const [delegateAccount, setDelegateAccount] = useState<BigNumberish>(undefined)
+  // useEffect(() => {
+  //   setDelegateAccount(undefined)
+  //   if (address) {
+  //     controllerConnector?.delegateAccount().then((n) => setDelegateAccount(n as BigNumberish))
+  //   }
+  // }, [address, controllerConnector])
+
   return {
     username,
+    // delegateAccount,
+  }
+}
+
+
+export const useControllerMenu = () => {
+  const { account, connector } = useAccount();
+  const { disconnect } = useDisconnect();
+  const controllerConnector = useMemo(() => (connector as unknown as CartridgeConnector), [connector])
+  const openMenu = async () => {
+    if (account) {
+      const isConnected = await controllerConnector.openMenu()
+      if (!isConnected) {
+        disconnect()
+      }
+    }
+  };
+  return {
+    openMenu,
   }
 }
 

@@ -3,7 +3,7 @@ import { ChainId, DojoChainConfig, getDojoChainConfig, getStarknetProviderChains
 import { StarknetConfig, argent, braavos, injected, jsonRpcProvider, useInjectedConnectors } from '@starknet-react/core'
 import { DojoPredeployedStarknetWindowObject } from '@dojoengine/create-burner'
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
-import { useController } from '@/lib/dojo/hooks/useController'
+import { useControllerConnector } from '@/lib/dojo/hooks/useController'
 import { Chain } from '@starknet-react/chains'
 
 
@@ -62,7 +62,7 @@ export const StarknetProvider = ({
   //
   // Cartridge Controller
   const manifest = useMemo(() => (dojoAppConfig.manifests[selectedChainId] ?? null), [selectedChainConfig])
-  const { controller } = useController(
+  const { controller } = useControllerConnector(
     manifest,
     selectedChainConfig.rpcUrl,
     dojoAppConfig.nameSpace,

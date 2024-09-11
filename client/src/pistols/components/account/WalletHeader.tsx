@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Grid, Image } from 'semantic-ui-react'
+import { Grid, Icon, Image } from 'semantic-ui-react'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useLordsContract } from '@/lib/dojo/hooks/useLords'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
@@ -8,7 +8,7 @@ import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { MusicToggle } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { useControllerUsername } from '@/lib/dojo/hooks/useController'
+import { useControllerMenu, useControllerUser } from '@/lib/dojo/hooks/useController'
 import { ConnectButton, EnterAsGuestButton } from '@/pistols/components/ScGate'
 import { Divider } from '@/lib/ui/Divider'
 
@@ -30,7 +30,8 @@ export default function WalletHeader({
   const name = useMemo(() => (data?.name ?? `Connected to ${connectedChainName}`), [data])
   const imageUrl = useMemo(() => (data?.profilePicture ?? connector?.icon?.dark ?? '/profiles/square/00.jpg'), [data, connector])
 
-  const { username } = useControllerUsername()
+  const { username } = useControllerUser()
+  const { openMenu } = useControllerMenu()
 
   return (
     <Grid>
@@ -68,6 +69,9 @@ export default function WalletHeader({
               <LordsFaucet fill large account={account} />
             </Col>
           }
+          <Col verticalAlign='middle'>
+            <ActionButton fill large onClick={() => openMenu()} label='Settings' />
+          </Col>
           <Col verticalAlign='middle'>
             <ActionButton fill large onClick={() => disconnect()} label='Disconnect' />
           </Col>
