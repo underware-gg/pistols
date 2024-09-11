@@ -10,7 +10,7 @@ import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileBadge } from '@/pistols/components/account/ProfileDescription'
 import { ArchetypeIcon } from '@/pistols/components/ui/PistolsIcon'
 import { FormInput } from '@/pistols/components/ui/Form'
-import { Archetype } from '@/games/pistols/generated/constants'
+import { Archetype, ProfilePicType } from '@/games/pistols/generated/constants'
 import { PROFILE_PIC_COUNT } from '@/pistols/utils/constants'
 import { ArchetypeNames } from '@/pistols/utils/pistols'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
@@ -88,9 +88,9 @@ export default function DuelistEditModal({
     if (canSubmit) {
       if (mintNew) {
         setLastDuelistIdBeforeMint(lastDuelistId ?? 0n)
-        mint_duelist(account, inputName, 1, _profilePic.toString(), inputArchetype)
+        mint_duelist(account, inputName, ProfilePicType.Duelist, _profilePic.toString(), inputArchetype)
       } else {
-        update_duelist(account, editingDuelistId, inputName, 1, _profilePic.toString())
+        update_duelist(account, editingDuelistId, inputName, ProfilePicType.Duelist, _profilePic.toString())
       }
     }
   }

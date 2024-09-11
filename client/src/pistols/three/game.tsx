@@ -22,6 +22,8 @@ import { SceneName } from '@/pistols/hooks/PistolsContext'
 import { map } from '@/lib/utils/math'
 import { SpriteSheet } from './SpriteSheetMaker'
 import { DuelistsManager } from './DuelistsManager.tsx'
+import { Action } from '../utils/pistols.tsx'
+import { getPacesCardValue, PacesCard } from '@/games/pistols/generated/constants.ts'
 
 
 //---------------------------
@@ -846,12 +848,14 @@ export function zoomCameraToPaces(paceCount, seconds) {
   }
 }
 
-export function animateDuel(state: AnimationState, actionA: number, actionB: number, healthA: number, healthB: number, damageA: number, damageB: number) {
+export function animateDuel(state: AnimationState, actionA: Action, actionB: Action, healthA: number, healthB: number, damageA: number, damageB: number) {
   //only animated once per entry safety
   if (state == AnimationState.Round1 && !_round1Animated) {
     _round1Animated = true
     _duelistManager.hideElements() 
-    animateShootout(actionA, actionB, healthA, healthB, damageA, damageB);
+    const paces_a = getPacesCardValue(actionA as unknown as PacesCard)
+    const paces_b = getPacesCardValue(actionB as unknown as PacesCard)
+    animateShootout(paces_a, paces_b, healthA, healthB, damageA, damageB);
   } else if (state == AnimationState.Round2 && !_round2Animated) {
     _round2Animated = true
     _duelistManager.hideElements()
@@ -883,7 +887,7 @@ function animateShootout(paceCountA: number, paceCountB: number, healthA: number
   _duelistManager.animateDuelistShootout(paceCountA, paceCountB, healthA, healthB, damageA, damageB)
 }
 
-function animateActions(state: AnimationState, actionA: number, actionB: number, healthA: number, healthB: number, damageA: number, damageB: number) {
+function animateActions(state: AnimationState, actionA: Action, actionB: Action, healthA: number, healthB: number, damageA: number, damageB: number) {
   // Rewind camera and
   zoomCameraToPaces(1, 0)
 

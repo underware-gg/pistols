@@ -691,14 +691,10 @@ export class ProgressDialogManager {
 
     if (stageA[DuelStage.Round1Commit] == false) stateA = DuelState.CHOOSING_STEPS
     else if (stageA[DuelStage.Round1Reveal] == false) stateA = DuelState.REVEALING_STEPS
-    else if (stageA[DuelStage.Round2Commit] == false) stateA = DuelState.CHOOSING_ACTIONS
-    else if (stageA[DuelStage.Round2Reveal] == false) stateA = DuelState.REVEALING_ACTIONS
     else stateA = DuelState.ACTIONS_REVEALED
 
     if (stageB[DuelStage.Round1Commit] == false) stateB = DuelState.CHOOSING_STEPS
     else if (stageB[DuelStage.Round1Reveal] == false) stateB = DuelState.REVEALING_STEPS
-    else if (stageB[DuelStage.Round2Commit] == false) stateB = DuelState.CHOOSING_ACTIONS
-    else if (stageB[DuelStage.Round2Reveal] == false) stateB = DuelState.REVEALING_ACTIONS
     else stateB = DuelState.ACTIONS_REVEALED
 
     if (stateA == DuelState.REVEALING_STEPS && stateB == DuelState.CHOOSING_STEPS) stateA = DuelState.STEPS_CHOSEN

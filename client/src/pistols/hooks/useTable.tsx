@@ -48,12 +48,12 @@ export const useTableTotals = (tableId: string) => {
   const { Challenge } = useDojoComponents()
   const result = useMemo(() => {
     const liveDuelsCount = allChallengeIds.reduce((acc: number, id: bigint) => {
-      const state = getComponentValue(Challenge, bigintToEntity(id))?.state ?? ChallengeState.Null
+      const state = (getComponentValue(Challenge, bigintToEntity(id))?.state as unknown as ChallengeState) ?? ChallengeState.Null
       if (LiveChallengeStates.includes(state)) acc++
       return acc
     }, 0)
     const pastDuelsCount = allChallengeIds.reduce((acc: number, id: bigint) => {
-      const state = getComponentValue(Challenge, bigintToEntity(id))?.state ?? ChallengeState.Null
+      const state = (getComponentValue(Challenge, bigintToEntity(id))?.state as unknown as ChallengeState) ?? ChallengeState.Null
       if (PastChallengeStates.includes(state)) acc++
       return acc
     }, 0)

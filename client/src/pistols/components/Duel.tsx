@@ -269,11 +269,8 @@ function DuelProgress({
   canAutoReveal = false
 }) {
   const { gameImpl } = useThreeJsContext()
-  const { round1, round2, round3, roundNumber } = useDuel(duelId)
+  const { round1, roundNumber } = useDuel(duelId)
   const round1Shot = useMemo(() => (isA ? round1?.shot_a : round1?.shot_b), [isA, round1])
-  const round2Shot = useMemo(() => (isA ? round2?.shot_a : round2?.shot_b), [isA, round2])
-  const round3Shot = useMemo(() => (isA ? round3?.shot_a : round3?.shot_b), [isA, round3])
-  const currentRoundAction = useMemo(() => (roundNumber == 1 ? round1Shot : roundNumber == 2 ? round2Shot : round3Shot), [roundNumber, round1Shot, round2Shot, round3Shot])
 
   const duelProgressRef = useRef(null)
 
@@ -288,14 +285,14 @@ function DuelProgress({
   // Commit modal control
   const [didReveal, setDidReveal] = useState(false)
   const [commitModalIsOpen, setCommitModalIsOpen] = useState(false)
-  const { reveal, canReveal } = useRevealAction(duelId, roundNumber, currentRoundAction?.hash, duelStage == DuelStage.Round1Reveal || duelStage == DuelStage.Round2Reveal)
+  const { reveal, canReveal } = useRevealAction(duelId, roundNumber, round1Shot?.hash, duelStage == DuelStage.Round1Reveal)
   const onClick = useCallback(() => {
     if (isYou && isConnected && completedStages[duelStage] === false) {
-      if (duelStage == DuelStage.Round1Commit || duelStage == DuelStage.Round2Commit) {
+      if (duelStage == DuelStage.Round1Commit) {
         setCommitModalIsOpen(true)
-      } else if (duelStage == DuelStage.Round1Reveal || duelStage == DuelStage.Round2Reveal) {
+      } else if (duelStage == DuelStage.Round1Reveal) {
         if (canReveal && !didReveal) {
-          console.log(`reveal(${isA ? 'A' : 'B'}) hash:`, bigintToHex(currentRoundAction?.hash ?? 0))
+          console.log(`reveal(${isA ? 'A' : 'B'}) hash:`, bigintToHex(round1Shot?.hash ?? 0))
           setDidReveal(true)
           reveal()
         }

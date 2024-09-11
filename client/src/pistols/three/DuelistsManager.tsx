@@ -1,14 +1,13 @@
 import * as THREE from 'three'
 import TWEEN from '@tweenjs/tween.js'
 
-import { CharacterType, AudioName, AnimName, CardTextureName } from '@/pistols/data/assets'
+import { CharacterType, AudioName, AnimName } from '@/pistols/data/assets'
 import { Action, ActionTypes } from '@/pistols/utils/pistols'
 
 import { Actor } from './SpriteSheetMaker'
 import { Card, CardsHand } from './Cards'
 import { _sfxEnabled, AnimationState, ASPECT, emitter, playAudio } from './game'
 import { ProgressDialogManager } from './ProgressDialog'
-import { DuelStage } from '../hooks/useDuel'
 
 const ACTOR_WIDTH = 2.5
 const ACTOR_HEIGHT = 1.35
@@ -33,19 +32,6 @@ interface Duelist {
   name: string,
   actor: Actor,
   cards: CardsHand
-}
-
-const completedStagesA = {
-  [DuelStage.Round1Commit]: false,
-  [DuelStage.Round1Reveal]: false,
-  [DuelStage.Round2Commit]: false,
-  [DuelStage.Round2Reveal]: false,
-}
-const completedStagesB = {
-  [DuelStage.Round1Commit]: false,
-  [DuelStage.Round1Reveal]: false,
-  [DuelStage.Round2Commit]: false,
-  [DuelStage.Round2Reveal]: false,
 }
 
 export class DuelistsManager {
@@ -522,7 +508,7 @@ export class DuelistsManager {
     }
   }
 
-  public animateActions(state: AnimationState, actionA: number, actionB: number, healthA: number, healthB: number, damageA: number, damageB: number) {
+  public animateActions(state: AnimationState, actionA: Action, actionB: Action, healthA: number, healthB: number, damageA: number, damageB: number) {
     if(this.showDialogsTimeout) clearTimeout(this.showDialogsTimeout)
     this.resetActorPositions()
 
@@ -560,9 +546,9 @@ export class DuelistsManager {
   private getActionAnimName = (action: Action): AnimName => {
     const result = ActionTypes.paces.includes(action) ? AnimName.SHOOT
       : ActionTypes.runner.includes(action) ? AnimName.TWO_STEPS
-        : action == Action.Fast ? AnimName.STRIKE_LIGHT
-          : action == Action.Strong ? AnimName.STRIKE_HEAVY
-            : action == Action.Block ? AnimName.STRIKE_BLOCK
+        : action == Action.Grapple ? AnimName.STRIKE_LIGHT
+          : action == Action.Behead ? AnimName.STRIKE_HEAVY
+            : action == Action.RunAway ? AnimName.STRIKE_BLOCK
               : AnimName.STILL_BLADE
 
     return result

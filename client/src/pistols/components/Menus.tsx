@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Grid, Menu } from 'semantic-ui-react'
+import { Grid, Menu, Image } from 'semantic-ui-react'
 import { usePistolsScene, usePistolsContext, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
@@ -33,11 +33,10 @@ export function MenuDuel({
   const _skipAnimation = () => {
   }
 
-  const canSkip = duelStage == DuelStage.Round1Animation || duelStage == DuelStage.Round2Animation
   return (
     <div className='MenuBottomDuel AlignCenter NoMouse'>
       <div className='MenuBottomBackground'>
-        <img className='MenuBottomBackgroundImage' src='/images/ui/bottom_nav.png'/>
+        <Image className='MenuBottomBackgroundImage' src='/images/ui/bottom_nav.png'/>
       </div>
       <Menu secondary compact className='YesMouse' size='huge' style={{ minHeight: '0' }}>
         <Menu.Item className='button_duel' type='tavern' onClick={() => _backToTavern()}>

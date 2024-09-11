@@ -5,7 +5,6 @@ import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { signAndGenerateActionHash } from '@/pistols/utils/salt'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { ActionChances } from '@/pistols/components/ActionChances'
 import { feltToString } from '@/lib/utils/starknet'
 
 const Row = Grid.Row
@@ -81,8 +80,6 @@ export default function CommitPacesModal({
           </div>
 
           <Divider hidden />
-
-          <ActionChances duelId={duelId} roundNumber={roundNumber} action={paces} />
 
         </Modal.Description>
       </Modal.Content>

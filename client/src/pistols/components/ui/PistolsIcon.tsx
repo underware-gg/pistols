@@ -1,21 +1,22 @@
 import React from 'react'
 import { Icon, IconGroup } from 'semantic-ui-react'
 import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
-import { Action, ActionEmojis, ActionNames } from '@/pistols/utils/pistols'
+import { Action, ActionEmojis, ActionNames, ActionTypes } from '@/pistols/utils/pistols'
 import { EmojiIcon, _downSize } from '@/lib/ui/Icons'
 import { EMOJI } from '@/pistols/data/messages'
+import { BladesCard, getPacesCardValue, PacesCard } from '@/games/pistols/generated/constants'
 
 export function ActionIcon({
   action,
   size = 'large',
 }: {
-  action: number
+  action: Action
   size?: IconSizeProp
 }) {
-  if (action >= 1 && action <= 10) {
+  if (ActionTypes.paces.includes(action)) {
     return <PacesIcon paces={action} size={size} />
   } else {
-    return <BladesIcon blade={action} size={size} />
+    return <BladesIcon blade={action as unknown as BladesCard} size={size} />
   }
 }
 
@@ -23,13 +24,14 @@ export function PacesIcon({
   paces,
   size = 'large',
 }: {
-  paces: number
+  paces: Action
   size?: IconSizeProp
 }) {
-  if (paces < 1 || paces > 10) {
+  let pacesCount = getPacesCardValue(paces as unknown as PacesCard)
+  if (pacesCount < 1 || pacesCount > 10) {
     return <Icon name='question circle' size={size} />
   }
-  const _paces = paces == 10 ? '10' : '1234567890'[paces - 1]
+  const _paces = pacesCount == 10 ? '10' : '1234567890'[pacesCount - 1]
   return (
     // <EmojiIcon emoji={emoji} size={size} className='PacesIconRound' />
     <IconGroup size={_downSize(size)}>
@@ -43,7 +45,7 @@ export function BladesIcon({
   blade,
   size = 'large',
 }: {
-  blade: Action
+  blade: BladesCard
   size?: IconSizeProp
 }) {
   if (!ActionNames[blade]) {

@@ -12,7 +12,7 @@ export const MESSAGES: any = {
   NOT_VERIFIED: 'You found the exit!\n(failed verifying)',
 }
 
-export const EMOJI: any = {
+export const EMOJI = {
   //
   // tavern
   AGREEMENT: '🤝',
@@ -24,12 +24,11 @@ export const EMOJI: any = {
   PACES: '🥾',
   BLADES: '⚔️',
   IDLE: '👀',
-  LIGHT: '🔪',
-  HEAVY: '🗡️',
-  BLOCK: '🛡️',
-  FLEE: '🏃',
-  STEAL: '🥷',
+  // BladesCard
   SEPPUKU: '👹',
+  RUN_AWAY: '🏃',
+  BEHEAD: '🙃',
+  GRAPPLE: '🪝',
   //
   // duel
   ALIVE: '❤️',
@@ -48,5 +47,5 @@ export const EMOJI: any = {
   GHOST: '👻',    // TODO? used Seppuku / permadeath
   //
   ZERO: '—',      // zero honour, zero balance
-  UNKNOWN: '?',
+  UNKNOWN: '⚠️',
 }

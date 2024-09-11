@@ -3,6 +3,7 @@ import { Container, Grid, Icon } from 'semantic-ui-react'
 import { CustomIcon, EmojiIcon } from '@/lib/ui/Icons'
 import { ArchetypeIcon, BladesIcon, PacesIcon } from '@/pistols/components/ui/PistolsIcon'
 import { LordsBagIcon } from '@/pistols/components/account/Balance'
+import { BladesCard } from '@/games/pistols/generated/constants'
 import { Action } from '@/pistols/utils/pistols'
 import App from '@/lib/ui/App'
 
@@ -18,10 +19,12 @@ export default function IndexPage() {
         <h5>Icons</h5>
         <Grid celled>
           <Row columns={'equal'}>
-            <Col><PacesIcon paces={10} /><br />PacesIcon</Col>
-            <Col><BladesIcon blade={Action.Strong} /><br />BladesIcon</Col>
-            <Col><BladesIcon blade={Action.Fast} /><br />BladesIcon</Col>
-            <Col><BladesIcon blade={Action.Block} /><br />BladesIcon</Col>
+            <Col><PacesIcon paces={Action.Paces10} /><br />PacesIcon</Col>
+            <Col><BladesIcon blade={BladesCard.None} /><br />BladesIcon</Col>
+            <Col><BladesIcon blade={BladesCard.Seppuku} /><br />BladesIcon</Col>
+            <Col><BladesIcon blade={BladesCard.RunAway} /><br />BladesIcon</Col>
+            <Col><BladesIcon blade={BladesCard.Behead} /><br />BladesIcon</Col>
+            <Col><BladesIcon blade={BladesCard.Grapple} /><br />BladesIcon</Col>
             <Col><ArchetypeIcon villainous /><br />ArchetypeIcon</Col>
             <Col><ArchetypeIcon trickster /><br />ArchetypeIcon</Col>
             <Col><ArchetypeIcon honourable /><br />ArchetypeIcon</Col>

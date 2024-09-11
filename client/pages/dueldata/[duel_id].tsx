@@ -50,10 +50,7 @@ function Stats({
 }: {
   duelId: bigint
 }) {
-  const {
-    challenge: { tableId },
-    round1, round2, round3,
-  } = useDuel(duelId)
+  const { challenge: { tableId }, round1 } = useDuel(duelId)
 
   const challenge = useChallenge(duelId)
 
@@ -67,14 +64,6 @@ function Stats({
 
         {round1 && <>
           <RoundStats duelId={duelId} roundNumber={1} round={round1} />
-          <br />
-        </>}
-        {round2 && <>
-          <RoundStats duelId={duelId} roundNumber={2} round={round2} />
-          <br />
-        </>}
-        {round3 && <>
-          <RoundStats duelId={duelId} roundNumber={3} round={round3} />
           <br />
         </>}
 
