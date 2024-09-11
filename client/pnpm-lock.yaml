@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@cartridge/connector':
-        specifier: ^0.3.43
-        version: 0.3.43(encoding@0.1.13)(get-starknet-core@3.3.0(starknet@6.11.0(encoding@0.1.13)))(react@18.3.1)
+        specifier: ^0.3.44
+        version: 0.3.44(encoding@0.1.13)(get-starknet-core@3.3.0(starknet@6.11.0(encoding@0.1.13)))(react@18.3.1)
       '@cartridge/controller':
-        specifier: ^0.3.43
-        version: 0.3.43(encoding@0.1.13)
+        specifier: ^0.3.44
+        version: 0.3.44(encoding@0.1.13)
       '@dojoengine/core':
         specifier: v1.0.0-alpha.12
         version: 1.0.0-alpha.12(starknet@6.11.0(encoding@0.1.13))(typescript@5.5.4)
@@ -214,11 +214,14 @@ packages:
     resolution: {integrity: sha512-YTnYtra7W9e6/oAZEHj0bJehPRUlLH9/fbpT5LfB0NhQXyALCRkRs3zH9v07IYhkgpqX6Z78FnuccZr/l4Fs4Q==}
     engines: {node: '>=6.9.0'}
 
-  '@cartridge/connector@0.3.43':
-    resolution: {integrity: sha512-RU8IxFu2NG3fta0zddT/+82Bv1MyYQ92Z1XDwvj7WRCXGV2MdCwu8+etou7uCdwFkkZ3kiT1EB41ky6umVaOgg==}
+  '@cartridge/account-wasm@0.3.44':
+    resolution: {integrity: sha512-nC4nSk1P9FIHzbTnjNxhU0ChwjQ6NUJTOUgRHt6l3390W5sNEL7rbXMi6gWox3780C5NGd+G+Z38iZ9zXYTsHg==}
 
-  '@cartridge/controller@0.3.43':
-    resolution: {integrity: sha512-naR4FiJVFU0BSFgOSVq7ttaGlQCA/cjGIV96b4SRuodTmkH0ViEwutsSX3zqWEyYP56Yn1xXWsEFf5ENa9X9eQ==}
+  '@cartridge/connector@0.3.44':
+    resolution: {integrity: sha512-aF3VSJauX+G717X/7iIGsVj48mGAZTKws+aIgrOZDf2Tp0mHNo4AaCZSvFAdhobyyz/YZqagEOzAjGZd2hzshA==}
+
+  '@cartridge/controller@0.3.44':
+    resolution: {integrity: sha512-T4KBdf8L3Z5Lk4Q0njnOXN/Kn9Rm1nF8abc7vKJIikiOCK2Sq0bzVpKoQBkUGmbJbu8m71rE+pf1qX8VWNuKYA==}
 
   '@cartridge/penpal@6.2.3':
     resolution: {integrity: sha512-K8h9VqBfFPXcAFQNnvgBnejF/dp7249pS4jXu3NhNYR6JqMQxtcrDqfnPmJvbF4ECEBs+8Z2UiwlRQiKt5nNsg==}
@@ -2367,19 +2370,21 @@ snapshots:
       '@babel/helper-validator-identifier': 7.24.7
       to-fast-properties: 2.0.0
 
-  '@cartridge/connector@0.3.43(encoding@0.1.13)(get-starknet-core@3.3.0(starknet@6.11.0(encoding@0.1.13)))(react@18.3.1)':
+  '@cartridge/account-wasm@0.3.44': {}
+
+  '@cartridge/connector@0.3.44(encoding@0.1.13)(get-starknet-core@3.3.0(starknet@6.11.0(encoding@0.1.13)))(react@18.3.1)':
     dependencies:
-      '@cartridge/controller': 0.3.43(encoding@0.1.13)
+      '@cartridge/controller': 0.3.44(encoding@0.1.13)
       '@starknet-react/core': 2.8.2(get-starknet-core@3.3.0(starknet@6.11.0(encoding@0.1.13)))(react@18.3.1)(starknet@6.11.0(encoding@0.1.13))
       starknet: 6.11.0(encoding@0.1.13)
-      typescript: 5.5.4
     transitivePeerDependencies:
       - encoding
       - get-starknet-core
       - react
 
-  '@cartridge/controller@0.3.43(encoding@0.1.13)':
+  '@cartridge/controller@0.3.44(encoding@0.1.13)':
     dependencies:
+      '@cartridge/account-wasm': 0.3.44
       '@cartridge/penpal': 6.2.3
       base64url: 3.0.1
       cbor-x: 1.5.9

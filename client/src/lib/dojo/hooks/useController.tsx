@@ -65,7 +65,7 @@ export const useController = (manifest: DojoManifest, rpcUrl: string, nameSpace:
 
   useEffect(() => {
     if (controller) {
-      assert(controller.id == supportedConnetorIds.CONTROLLER, 'CartridgeConnector id does not match')
+      assert(controller.id == supportedConnetorIds.CONTROLLER, `CartridgeConnector id does not match [${controller.id}]`)
     }
   }, [controller])
 
