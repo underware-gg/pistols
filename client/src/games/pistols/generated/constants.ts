@@ -83,12 +83,12 @@ export const getRarity = (name: string | number): Rarity => (RarityNameToValue[n
 // from: ../dojo/src/types/cards/env.cairo
 export enum EnvCard {
   None = 0,
-  CommonDamageUp = 1,
-  CommonDamageDown = 2,
-  CommonChancesUp = 3,
-  CommonChancesDown = 4,
-  UncommonDamageUp = 5,
-  UncommonChancesUp = 6,
+  DamageUp = 1,
+  DamageDown = 2,
+  ChancesUp = 3,
+  ChancesDown = 4,
+  DoubleDamageUp = 5,
+  DoubleChancesUp = 6,
   SpecialAllShotsHit = 7,
   SpecialAllShotsMiss = 8,
   SpecialDoubleTactics = 9,
@@ -96,12 +96,12 @@ export enum EnvCard {
 };
 export const EnvCardNameToValue: Record<string, EnvCard> = {
   'None': EnvCard.None,
-  'CommonDamageUp': EnvCard.CommonDamageUp,
-  'CommonDamageDown': EnvCard.CommonDamageDown,
-  'CommonChancesUp': EnvCard.CommonChancesUp,
-  'CommonChancesDown': EnvCard.CommonChancesDown,
-  'UncommonDamageUp': EnvCard.UncommonDamageUp,
-  'UncommonChancesUp': EnvCard.UncommonChancesUp,
+  'DamageUp': EnvCard.DamageUp,
+  'DamageDown': EnvCard.DamageDown,
+  'ChancesUp': EnvCard.ChancesUp,
+  'ChancesDown': EnvCard.ChancesDown,
+  'DoubleDamageUp': EnvCard.DoubleDamageUp,
+  'DoubleChancesUp': EnvCard.DoubleChancesUp,
   'SpecialAllShotsHit': EnvCard.SpecialAllShotsHit,
   'SpecialAllShotsMiss': EnvCard.SpecialAllShotsMiss,
   'SpecialDoubleTactics': EnvCard.SpecialDoubleTactics,
@@ -245,7 +245,7 @@ export type EnvCardPoints = {
   rarity : Rarity,
   chances : number,
   damage : number,
-  one_shot : boolean,
+  one_step : boolean,
   tactics_multiplier : number,
 };
 
@@ -352,12 +352,12 @@ export const BLADES_POINTS: type_BLADES_POINTS = {
 // from: ../dojo/src/types/cards/env.cairo
 type type_ENV_CARDS = {
   NONE: number, // cairo: u8
-  COMMON_DAMAGE_UP: number, // cairo: u8
-  COMMON_DAMAGE_DOWN: number, // cairo: u8
-  COMMON_CHANCES_UP: number, // cairo: u8
-  COMMON_CHANCES_DOWN: number, // cairo: u8
-  UNCOMMON_DAMAGE_UP: number, // cairo: u8
-  UNCOMMON_CHANCES_UP: number, // cairo: u8
+  DAMAGE_UP: number, // cairo: u8
+  DAMAGE_DOWN: number, // cairo: u8
+  CHANCES_UP: number, // cairo: u8
+  CHANCES_DOWN: number, // cairo: u8
+  DOUBLE_DAMAGE_UP: number, // cairo: u8
+  DOUBLE_CHANCES_UP: number, // cairo: u8
   SPECIAL_ALL_SHOTS_HIT: number, // cairo: u8
   SPECIAL_ALL_SHOTS_MISS: number, // cairo: u8
   SPECIAL_DOUBLE_TACTICS: number, // cairo: u8
@@ -365,12 +365,12 @@ type type_ENV_CARDS = {
 };
 export const ENV_CARDS: type_ENV_CARDS = {
   NONE: 0,
-  COMMON_DAMAGE_UP: 1,
-  COMMON_DAMAGE_DOWN: 2,
-  COMMON_CHANCES_UP: 3,
-  COMMON_CHANCES_DOWN: 4,
-  UNCOMMON_DAMAGE_UP: 5,
-  UNCOMMON_CHANCES_UP: 7,
+  DAMAGE_UP: 1,
+  DAMAGE_DOWN: 2,
+  CHANCES_UP: 3,
+  CHANCES_DOWN: 4,
+  DOUBLE_DAMAGE_UP: 5,
+  DOUBLE_CHANCES_UP: 7,
   SPECIAL_ALL_SHOTS_HIT: 9,
   SPECIAL_ALL_SHOTS_MISS: 10,
   SPECIAL_DOUBLE_TACTICS: 11,
@@ -379,64 +379,64 @@ export const ENV_CARDS: type_ENV_CARDS = {
 
 // from: ../dojo/src/types/cards/env.cairo
 type type_ENV_POINTS = {
-  COMMON_DAMAGE_UP: EnvCardPoints, // cairo: EnvCardPoints
-  COMMON_DAMAGE_DOWN: EnvCardPoints, // cairo: EnvCardPoints
-  COMMON_CHANCES_UP: EnvCardPoints, // cairo: EnvCardPoints
-  COMMON_CHANCES_DOWN: EnvCardPoints, // cairo: EnvCardPoints
-  UNCOMMON_DAMAGE_UP: EnvCardPoints, // cairo: EnvCardPoints
-  UNCOMMON_CHANCES_UP: EnvCardPoints, // cairo: EnvCardPoints
+  DAMAGE_UP: EnvCardPoints, // cairo: EnvCardPoints
+  DAMAGE_DOWN: EnvCardPoints, // cairo: EnvCardPoints
+  CHANCES_UP: EnvCardPoints, // cairo: EnvCardPoints
+  CHANCES_DOWN: EnvCardPoints, // cairo: EnvCardPoints
+  DOUBLE_DAMAGE_UP: EnvCardPoints, // cairo: EnvCardPoints
+  DOUBLE_CHANCES_UP: EnvCardPoints, // cairo: EnvCardPoints
   SPECIAL_ALL_SHOTS_HIT: EnvCardPoints, // cairo: EnvCardPoints
   SPECIAL_ALL_SHOTS_MISS: EnvCardPoints, // cairo: EnvCardPoints
   SPECIAL_DOUBLE_TACTICS: EnvCardPoints, // cairo: EnvCardPoints
   SPECIAL_NO_TACTICS: EnvCardPoints, // cairo: EnvCardPoints
 };
 export const ENV_POINTS: type_ENV_POINTS = {
-  COMMON_DAMAGE_UP: {
+  DAMAGE_UP: {
     name: 'Damage Up',
     rarity: Rarity.Common,
     chances: 0,
     damage: 1,
-    one_shot: false,
+    one_step: false,
     tactics_multiplier: 1,
   },
-  COMMON_DAMAGE_DOWN: {
+  DAMAGE_DOWN: {
     name: 'Damage Down',
     rarity: Rarity.Common,
     chances: 0,
     damage: -1,
-    one_shot: false,
+    one_step: false,
     tactics_multiplier: 1,
   },
-  COMMON_CHANCES_UP: {
+  CHANCES_UP: {
     name: 'Chances Up',
     rarity: Rarity.Common,
     chances: 10,
     damage: 0,
-    one_shot: false,
+    one_step: false,
     tactics_multiplier: 1,
   },
-  COMMON_CHANCES_DOWN: {
+  CHANCES_DOWN: {
     name: 'Chances Down',
     rarity: Rarity.Common,
     chances: -10,
     damage: 0,
-    one_shot: false,
+    one_step: false,
     tactics_multiplier: 1,
   },
-  UNCOMMON_DAMAGE_UP: {
-    name: 'Damage Up',
+  DOUBLE_DAMAGE_UP: {
+    name: 'Double Damage Up',
     rarity: Rarity.Uncommon,
     chances: 0,
     damage: 2,
-    one_shot: false,
+    one_step: false,
     tactics_multiplier: 1,
   },
-  UNCOMMON_CHANCES_UP: {
-    name: 'Chances Up',
+  DOUBLE_CHANCES_UP: {
+    name: 'Double Chances Up',
     rarity: Rarity.Uncommon,
     chances: 20,
     damage: 0,
-    one_shot: false,
+    one_step: false,
     tactics_multiplier: 1,
   },
   SPECIAL_ALL_SHOTS_HIT: {
@@ -444,7 +444,7 @@ export const ENV_POINTS: type_ENV_POINTS = {
     rarity: Rarity.Special,
     chances: 100,
     damage: 100,
-    one_shot: true,
+    one_step: true,
     tactics_multiplier: 1,
   },
   SPECIAL_ALL_SHOTS_MISS: {
@@ -452,7 +452,7 @@ export const ENV_POINTS: type_ENV_POINTS = {
     rarity: Rarity.Special,
     chances: -100,
     damage: -100,
-    one_shot: true,
+    one_step: true,
     tactics_multiplier: 1,
   },
   SPECIAL_DOUBLE_TACTICS: {
@@ -460,7 +460,7 @@ export const ENV_POINTS: type_ENV_POINTS = {
     rarity: Rarity.Special,
     chances: 0,
     damage: 0,
-    one_shot: true,
+    one_step: true,
     tactics_multiplier: 2,
   },
   SPECIAL_NO_TACTICS: {
@@ -468,7 +468,7 @@ export const ENV_POINTS: type_ENV_POINTS = {
     rarity: Rarity.Special,
     chances: 0,
     damage: 0,
-    one_shot: true,
+    one_step: true,
     tactics_multiplier: 0,
   },
 };

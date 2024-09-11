@@ -36,6 +36,7 @@ use pistols::interfaces::systems::{WorldSystemsTrait};
 struct Dice {
     rng: IRngDispatcher,
     seed: felt252,
+    last_dice: u8,
 }
 
 #[generate_trait]
@@ -44,16 +45,18 @@ impl DiceImpl of DiceTrait {
         (Dice {
             rng: world.rng_dispatcher(),
             seed: initial_seed,
+            last_dice: 0,
         })
     }
 
+    // returns a random number between 1 and <faces>
     fn throw(ref self: Dice, salt: felt252, faces: u8) -> u8 {
         assert(faces <= 255, 'RNG_DICE: too many faces');
         self.seed = self.rng.reseed(self.seed, salt);
         let as_u256: u256 = self.seed.into();
-        let result: u8 = ((as_u256.low & 0xff).try_into().unwrap() % faces) + 1;
+        self.last_dice = ((as_u256.low & 0xff).try_into().unwrap() % faces) + 1;
 // println!("new_seed {} dice {}", self.seed, result);
-        (result)
+        (self.last_dice)
     }
 
     fn decide(ref self: Dice, salt: felt252, faces: u8, chances: u8) -> (u8, bool) {

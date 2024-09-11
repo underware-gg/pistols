@@ -100,7 +100,9 @@ impl TacticsCardImpl of TacticsCardTrait {
     }
     #[inline(always)]
     fn apply_points(self: TacticsCard, ref state_self: PlayerState, ref state_other: PlayerState) {
-        self.get_points().apply(ref state_self, ref state_other);
+        if (self != TacticsCard::None) {
+            self.get_points().apply(ref state_self, ref state_other);
+        }
     }
 }
 

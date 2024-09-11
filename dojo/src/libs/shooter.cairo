@@ -155,8 +155,8 @@ mod shooter {
         hand_a.validate();
         hand_b.validate();
 
-        let mut env_state_a: PlayerState = round.shot_a.state_start;
-        let mut env_state_b: PlayerState = round.shot_b.state_start;
+        let mut global_state_a: PlayerState = round.shot_a.state_start;
+        let mut global_state_b: PlayerState = round.shot_b.state_start;
 
         // TODO: shuffle
         let env_deck: Span<EnvCard> = EnvCardTrait::get_full_deck().span();
@@ -164,10 +164,10 @@ mod shooter {
         //------------------------------------------------------
         // apply cards
         //
-        hand_a.card_tactics.apply_points(ref env_state_a, ref env_state_b);
-        hand_b.card_tactics.apply_points(ref env_state_b, ref env_state_a);
-        hand_a.card_blades.apply_points(ref env_state_a, ref env_state_b);
-        hand_b.card_blades.apply_points(ref env_state_b, ref env_state_a);
+        hand_a.card_tactics.apply_points(ref global_state_a, ref global_state_b);
+        hand_b.card_tactics.apply_points(ref global_state_b, ref global_state_a);
+        hand_a.card_blades.apply_points(ref global_state_a, ref global_state_b);
+        hand_b.card_blades.apply_points(ref global_state_b, ref global_state_a);
 
         //------------------------------------------------------
         // Pistols round
@@ -182,22 +182,27 @@ mod shooter {
             // println!("Pace [{}] A:{} B:{}", pace_number, self.shot_a.card_fire.as_felt(), self.shot_b.card_fire.as_felt());
 
             // draw env card
-            // TODO: remove drawn cards
             let (card_env, dice_env): (EnvCard, u8) = draw_env_card(env_deck, pace, ref dice);
 
-            // TODO: apply env card to shots
+            // apply env card to global state (affects next steps)
+            card_env.apply_points(ref global_state_a, ref global_state_b, true);
 
-            let mut state_a: PlayerState = env_state_a;
-            let mut state_b: PlayerState = env_state_b;
+            let mut local_state_a: PlayerState = global_state_a;
+            let mut local_state_b: PlayerState = global_state_b;
+
+            // apply env card to local state (do not go to next step)
+            card_env.apply_points(ref local_state_a, ref local_state_b, false);
+// println!("FIRE damage {}: g {} {} / l {} {}", pace_number, global_state_a.damage, global_state_a.damage, local_state_a.damage, local_state_b.damage);
+// println!("ENV: {}", card_env);
 
             //
             // Shoot!
             // will chance state_a and state_b
             if (hand_a.card_fire == pace) {
-                win_a = fire(hand_a.card_fire, hand_b.card_dodge, ref state_a, ref state_b, ref dice, 'shoot_a');
+                win_a = fire(hand_a.card_fire, hand_b.card_dodge, ref local_state_a, ref local_state_b, ref dice, 'shoot_a');
             }
             if (hand_b.card_fire == pace) {
-                win_b = fire(hand_b.card_fire, hand_a.card_dodge, ref state_b, ref state_a, ref dice, 'shoot_b');
+                win_b = fire(hand_b.card_fire, hand_a.card_dodge, ref local_state_b, ref local_state_a, ref dice, 'shoot_b');
             }
 
             // save step
@@ -207,8 +212,8 @@ mod shooter {
                 dice_env,
                 card_a: hand_a.draw_card(pace),
                 card_b: hand_b.draw_card(pace),
-                state_a,
-                state_b,
+                state_a: local_state_a,
+                state_b: local_state_b,
             });
 
             // break if there's a winner
@@ -291,8 +296,10 @@ mod shooter {
 
     fn draw_env_card(env_deck: Span<EnvCard>, pace: PacesCard, ref dice: Dice) -> (EnvCard, u8) {
         let salt: felt252 = pace.env_salt();
-        let dice: u8 = dice.throw(salt, env_deck.len().try_into().unwrap());
-        let env_card: EnvCard = *env_deck[dice.into()];
+        let faces: u8 = env_deck.len().try_into().unwrap();
+        let dice: u8 = dice.throw(salt, faces);
+        let env_card: EnvCard = *env_deck[(dice - 1).into()];
+// println!("draw_env_card: dice {}/{} = {}", dice, faces, env_card);
         (env_card, dice)
     }
 

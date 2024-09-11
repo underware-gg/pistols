@@ -42,6 +42,7 @@ mod tests {
     use pistols::tests::prefabs::{prefabs,
         prefabs::{
             SALT_A, SALT_B, TABLE_ID, MESSAGE, WAGER_VALUE,
+            ENV_CARD_NEUTRAL,
             SaltsValues, SaltsValuesTrait,
             Moves, MovesTrait,
         },
@@ -74,6 +75,10 @@ mod tests {
     //
 
     fn execute_game_loop_internal(sys: Systems, moves_a: Span<u8>, moves_b: Span<u8>) -> (Round, DuelProgress) {
+        sys.rng.set_salts(
+            ['env_1', 'env_2'].span(),
+            [ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL].span(),
+        );
         let mut dice: Dice = DiceTrait::new(@sys.world, 0x1212121212);
         let mut round = Round {
             duel_id: 0x1234,

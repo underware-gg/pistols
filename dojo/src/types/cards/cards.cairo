@@ -15,7 +15,7 @@ struct EnvCardPoints {
     rarity: Rarity,
     chances: i8,
     damage: i8,
-    one_shot: bool,
+    one_step: bool,
     tactics_multiplier: u8,
 }
 
@@ -41,20 +41,25 @@ use pistols::utils::math::{MathU8};
 
 #[generate_trait]
 impl CardPointsImpl of CardPointsTrait {
-    fn apply(self: CardPoints, ref state_self: PlayerState, ref state_other: PlayerState) {
-        state_self.chances.addi(self.self_chances);
-        state_self.damage.addi(self.self_damage);
-        state_other.chances.addi(self.other_chances);
-        state_other.damage.addi(self.other_damage);
+    fn apply(self: CardPoints, ref state_a: PlayerState, ref state_b: PlayerState) {
+        state_a.chances.addi(self.self_chances);
+        state_a.damage.addi(self.self_damage);
+        state_b.chances.addi(self.other_chances);
+        state_b.damage.addi(self.other_damage);
     }
 }
 
 #[generate_trait]
 impl EnvCardPointsImpl of EnvCardPointsTrait {
-    fn apply(self: EnvCardPoints, ref state_self: PlayerState, ref state_other: PlayerState) {
-        // state_self.chances.addi(self.chances);
-        // state_self.damage.addi(self.damage);
-        // state_other.chances.addi(self.chances);
-        // state_other.damage.addi(self.damage);
+    fn apply(self: EnvCardPoints, ref state_a: PlayerState, ref state_b: PlayerState, global_state: bool) {
+        if (
+            (global_state && !self.one_step) ||
+            (!global_state && self.one_step)
+        ) {
+            state_a.chances.addi(self.chances);
+            state_b.chances.addi(self.chances);
+            state_a.damage.addi(self.damage);
+            state_b.damage.addi(self.damage);
+        }
     }
 }

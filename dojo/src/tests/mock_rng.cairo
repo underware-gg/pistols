@@ -33,7 +33,7 @@ mod rng {
             let new_seed: felt252 = hash_values([seed.into(), salt].span());
             let salt_value: SaltValue = SaltValueStore::get(world, salt);
             if (salt_value.exists) {
-                // println!("-- get_salt {} {} {}", salt, salt_value.exists, salt_value.value);
+// println!("-- get_salt {} {} {}", salt, salt_value.exists, salt_value.value);
                 return salt_value.value;
             }
             (new_seed)
@@ -42,7 +42,10 @@ mod rng {
             assert(salts.len() == values.len(), 'InvalidSaltValuesLength');
             let mut index: usize = 0;
             while (index < salts.len()) {
-            // println!("set_salts {} {} {}", index, salts[index], values[index]);
+// println!("set_salts {} {} {}", index, salts[index], values[index]);
+                let v: u256 = (*values[index]).try_into().unwrap();
+                assert(v > 0, 'salt value > 0');
+                assert(v < 256, 'salt value < 256');
                 set!(world, (
                     SaltValue{
                         salt: *salts[index],

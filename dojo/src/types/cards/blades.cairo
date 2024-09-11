@@ -79,7 +79,9 @@ impl BladesCardImpl of BladesCardTrait {
     }
     #[inline(always)]
     fn apply_points(self: BladesCard, ref state_self: PlayerState, ref state_other: PlayerState) {
-        self.get_points().apply(ref state_self, ref state_other);
+        if (self != BladesCard::None) {
+            self.get_points().apply(ref state_self, ref state_other);
+        }
     }
 }
 

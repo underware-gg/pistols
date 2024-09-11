@@ -50,19 +50,19 @@ mod tests {
         let final_pace: DuelStep = *progress.steps[progress.steps.len() - 1];
         assert(progress.winner == challenge.winner, 'winner');
         // hand_a
-        assert(progress.hand_a.card_fire.into() == moves_a.value_or_zero(0), 'moves_a.card_fire');
-        assert(progress.hand_a.card_dodge.into() == moves_a.value_or_zero(1), 'moves_a.card_fire');
-        assert(progress.hand_a.card_tactics.into() == moves_a.value_or_zero(2), 'moves_a.card_fire');
-        assert(progress.hand_a.card_blades.into() == moves_a.value_or_zero(3), 'moves_a.card_fire');
+        assert(progress.hand_a.card_fire.into() == moves_a.value_or_zero(0), 'moves_a_0');
+        assert(progress.hand_a.card_dodge.into() == moves_a.value_or_zero(1), 'moves_a_1');
+        assert(progress.hand_a.card_tactics.into() == moves_a.value_or_zero(2), 'moves_a_2');
+        assert(progress.hand_a.card_blades.into() == moves_a.value_or_zero(3), 'moves_a_3');
         assert(progress.hand_a.card_fire.into() == round.shot_a.card_1, 'hand_a.card_fire');
         assert(progress.hand_a.card_dodge.into() == round.shot_a.card_2, 'hand_a.card_fire');
         assert(progress.hand_a.card_tactics.into() == round.shot_a.card_3, 'hand_a.card_fire');
         assert(progress.hand_a.card_blades.into() == round.shot_a.card_4, 'hand_a.card_fire');
         // hand_b
-        assert(progress.hand_b.card_fire.into() == moves_b.value_or_zero(0), 'moves_b.card_fire');
-        assert(progress.hand_b.card_dodge.into() == moves_b.value_or_zero(1), 'moves_b.card_fire');
-        assert(progress.hand_b.card_tactics.into() == moves_b.value_or_zero(2), 'moves_b.card_fire');
-        assert(progress.hand_b.card_blades.into() == moves_b.value_or_zero(3), 'moves_b.card_fire');
+        assert(progress.hand_b.card_fire.into() == moves_b.value_or_zero(0), 'moves_b_0');
+        assert(progress.hand_b.card_dodge.into() == moves_b.value_or_zero(1), 'moves_b_1');
+        assert(progress.hand_b.card_tactics.into() == moves_b.value_or_zero(2), 'moves_b_2');
+        assert(progress.hand_b.card_blades.into() == moves_b.value_or_zero(3), 'moves_b_3');
         assert(progress.hand_b.card_fire.into() == round.shot_b.card_1, 'hand_b.card_fire');
         assert(progress.hand_b.card_dodge.into() == round.shot_b.card_2, 'hand_b.card_fire');
         assert(progress.hand_b.card_tactics.into() == round.shot_b.card_3, 'hand_b.card_fire');
@@ -101,13 +101,9 @@ mod tests {
         tester::execute_reveal_moves(@sys.actions, OWNER(), duel_id, 1, moves_a.salt, moves_a.moves);
         tester::execute_reveal_moves(@sys.actions, OTHER(), duel_id, 1, moves_b.salt, moves_b.moves);
         let (challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
-// round.shot_a.chance_crit.print();
-// round.shot_b.chance_crit.print();
-// round.shot_a.dice_crit.print();
-// round.shot_b.dice_crit.print();
-// round.shot_a.health.print();
-// round.shot_b.health.print();
-// challenge.state.print();
+// challenge.winner.print();
+// round.shot_a.state_final.health.print();
+// round.shot_b.state_final.health.print();
         assert(challenge.state == ChallengeState::Draw, 'challenge.state');
         assert(challenge.winner == 0, 'challenge.winner');
         assert(challenge.round_number == 1, 'challenge.round_number');
@@ -214,9 +210,10 @@ mod tests {
         // 2nd reveal > Finished
         tester::execute_reveal_moves(@sys.actions, OTHER(), duel_id, 1, moves_b.salt, moves_b.moves);
         let (challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
+// challenge.winner.print();
+// // challenge.state.print();
 // round.shot_a.state_final.health.print();
 // round.shot_b.state_final.health.print();
-// challenge.state.print();
         assert(challenge.state == ChallengeState::Resolved, '4_challenge.state');
         assert(challenge.winner != 0, '4_challenge.winner');
         assert(challenge.round_number == 1, '4_challenge.round_number');
