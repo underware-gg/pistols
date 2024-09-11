@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Grid, Segment, Icon, Step, SegmentGroup, SemanticFLOATS, Image } from 'semantic-ui-react'
+import { Grid, Segment, SemanticFLOATS, Image } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
@@ -15,23 +15,18 @@ import { useIsYou } from '@/pistols/hooks/useIsYou'
 import { useWager } from '@/pistols/hooks/useWager'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
 import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionDetector'
-import { DuelStage, useAnimatedDuel, useDuel, useDuelResult } from '@/pistols/hooks/useDuel'
-import { ProfileDescription, ProfileName } from '@/pistols/components/account/ProfileDescription'
+import { DuelStage, useAnimatedDuel, useDuel } from '@/pistols/hooks/useDuel'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileModels } from '@/pistols/data/assets'
-import { AnimationState, WIDTH } from '@/pistols/three/game'
-import { EmojiIcon, LoadingIcon } from '@/lib/ui/Icons'
-import { ActionEmojis, ActionTypes, ArchetypeNames } from '@/pistols/utils/pistols'
+import { AnimationState } from '@/pistols/three/game'
+import { ArchetypeNames } from '@/pistols/utils/pistols'
 import { MenuDebugAnimations, MenuDuel } from '@/pistols/components/Menus'
 import { Balance } from '@/pistols/components/account/Balance'
-import { EMOJI } from '@/pistols/data/messages'
-import CommitPacesModal from '@/pistols/components/CommitPacesModal'
-import CommitBladesModal from '@/pistols/components/CommitBladesModal'
-import { CONST } from '@/games/pistols/generated/constants'
 import { bigintToHex } from '@/lib/utils/types'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { useDuelistOwner } from '../hooks/useTokenDuelist'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import 'react-circular-progressbar/dist/styles.css';
 
 
@@ -335,7 +330,6 @@ function DuelProgress({
   return (
     <>
       <CommitPacesModal duelId={duelId} isOpen={roundNumber == 1 && commitModalIsOpen} setIsOpen={setCommitModalIsOpen} />
-      <CommitBladesModal duelId={duelId} isOpen={roundNumber == 2 && commitModalIsOpen} setIsOpen={setCommitModalIsOpen} isA={isA} isB={isB} />
       <div id={id} className='dialog-container' ref={duelProgressRef}>
         <Image className='dialog-background' />
         <div className='dialog-data'>
