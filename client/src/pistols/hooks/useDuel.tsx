@@ -7,7 +7,7 @@ import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
 import { useChallenge } from "@/pistols/hooks/useChallenge"
 import { keysToEntity } from '@/lib/utils/types'
 import { AnimationState } from "@/pistols/three/game"
-import { CONST, getRoundState, RoundState } from '@/games/pistols/generated/constants'
+import { CONST, RoundState } from '@/games/pistols/generated/constants'
 import { ActionNames, ActionVerbs } from "@/pistols/utils/pistols"
 
 export enum DuelStage {
@@ -32,7 +32,7 @@ export const useRound = (duelId: BigNumberish, roundNumber: BigNumberish) => {
   if (!round) return null
   return {
     ...round,
-    state: getRoundState(round.state),
+    state: (round.state as RoundState),
   }
 }
 

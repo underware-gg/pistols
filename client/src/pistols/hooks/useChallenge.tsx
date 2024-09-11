@@ -8,7 +8,7 @@ import { useClientTimestamp } from "@/lib/utils/hooks/useTimestamp"
 import { useDuelist } from "@/pistols/hooks/useDuelist"
 import { bigintToEntity } from '@/lib/utils/types'
 import { feltToString, stringToFelt } from "@/lib/utils/starknet"
-import { ChallengeState, getChallengeState } from '@/games/pistols/generated/constants'
+import { ChallengeState } from '@/games/pistols/generated/constants'
 import { ChallengeStateDescriptions } from "@/pistols/utils/pistols"
 
 
@@ -102,7 +102,7 @@ export const useChallenge = (duelId: BigNumberish) => {
   const timestamp_end = useMemo(() => Number(challenge?.timestamp_end ?? 0), [challenge])
 
   const { clientTimestamp } = useClientTimestamp(false)
-  let original_state = useMemo(() => (challenge ? getChallengeState(challenge.state) : null), [challenge])
+  let original_state = useMemo(() => (challenge?.state as ChallengeState), [challenge])
   let state = useMemo(() => {
     if (original_state == ChallengeState.Awaiting && (timestamp_end < clientTimestamp)) {
       return ChallengeState.Expired

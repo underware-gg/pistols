@@ -211,7 +211,7 @@ function buildFileContents(parsed) {
     let enumName = `${key}`;
     let enumDictName = `${key}NameToValue`;
     let enumContents = `export enum ${enumName} {\n`;
-    let dictContents = `export const ${enumDictName}: Record<string, ${enumName}> = {\n`;
+    let dictContents = `export const ${enumDictName}: Record<${enumName}, number> = {\n`;
     let index = 0;
     enums[key].lines.forEach((line) => {
       // remove 'const ' and ';'
@@ -221,8 +221,8 @@ function buildFileContents(parsed) {
       type = type.trim();
       if (type) {
         // enumContents += `  ${type} = '${type}', // ${index}\n`;
-        enumContents += `  ${type} = ${index},\n`;
-        dictContents += `  '${type}': ${enumName}.${type},\n`;
+        enumContents += `  ${type} = '${type}',\n`;
+        dictContents += `  [${enumName}.${type}]: ${index},\n`;
         index++;
       }
     })
@@ -233,7 +233,7 @@ function buildFileContents(parsed) {
     fileContents += `// from: ${enums[key].filePath}\n`;
     fileContents += enumContents;
     fileContents += dictContents;
-    fileContents += `export const get${enumName} = (name: string | number): ${enumName} => (${enumDictName}[name as string]);\n`
+    fileContents += `export const get${enumName}Value = (name: ${enumName}): number => (${enumDictName}[name as string]);\n`
     // exports
     enumNames.push(enumName)
     exports.push(enumName);

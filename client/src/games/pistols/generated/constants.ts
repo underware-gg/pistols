@@ -7,246 +7,246 @@ import { BigNumberish } from 'starknet';
 
 // from: ../dojo/src/models/duelist.cairo
 export enum Archetype {
-  Undefined = 0,
-  Villainous = 1,
-  Trickster = 2,
-  Honourable = 3,
+  Undefined = 'Undefined',
+  Villainous = 'Villainous',
+  Trickster = 'Trickster',
+  Honourable = 'Honourable',
 };
-export const ArchetypeNameToValue: Record<string, Archetype> = {
-  'Undefined': Archetype.Undefined,
-  'Villainous': Archetype.Villainous,
-  'Trickster': Archetype.Trickster,
-  'Honourable': Archetype.Honourable,
+export const ArchetypeNameToValue: Record<Archetype, number> = {
+  [Archetype.Undefined]: 0,
+  [Archetype.Villainous]: 1,
+  [Archetype.Trickster]: 2,
+  [Archetype.Honourable]: 3,
 };
-export const getArchetype = (name: string | number): Archetype => (ArchetypeNameToValue[name as string]);
+export const getArchetypeValue = (name: Archetype): number => (ArchetypeNameToValue[name as string]);
 
 // from: ../dojo/src/models/duelist.cairo
 export enum ProfilePicType {
-  Undefined = 0,
-  Duelist = 1,
-  External = 2,
+  Undefined = 'Undefined',
+  Duelist = 'Duelist',
+  External = 'External',
 };
-export const ProfilePicTypeNameToValue: Record<string, ProfilePicType> = {
-  'Undefined': ProfilePicType.Undefined,
-  'Duelist': ProfilePicType.Duelist,
-  'External': ProfilePicType.External,
+export const ProfilePicTypeNameToValue: Record<ProfilePicType, number> = {
+  [ProfilePicType.Undefined]: 0,
+  [ProfilePicType.Duelist]: 1,
+  [ProfilePicType.External]: 2,
 };
-export const getProfilePicType = (name: string | number): ProfilePicType => (ProfilePicTypeNameToValue[name as string]);
+export const getProfilePicTypeValue = (name: ProfilePicType): number => (ProfilePicTypeNameToValue[name as string]);
 
 // from: ../dojo/src/models/table.cairo
 export enum TableType {
-  Undefined = 0,
-  Classic = 1,
-  Tournament = 2,
-  IRLTournament = 3,
+  Undefined = 'Undefined',
+  Classic = 'Classic',
+  Tournament = 'Tournament',
+  IRLTournament = 'IRLTournament',
 };
-export const TableTypeNameToValue: Record<string, TableType> = {
-  'Undefined': TableType.Undefined,
-  'Classic': TableType.Classic,
-  'Tournament': TableType.Tournament,
-  'IRLTournament': TableType.IRLTournament,
+export const TableTypeNameToValue: Record<TableType, number> = {
+  [TableType.Undefined]: 0,
+  [TableType.Classic]: 1,
+  [TableType.Tournament]: 2,
+  [TableType.IRLTournament]: 3,
 };
-export const getTableType = (name: string | number): TableType => (TableTypeNameToValue[name as string]);
+export const getTableTypeValue = (name: TableType): number => (TableTypeNameToValue[name as string]);
 
 // from: ../dojo/src/types/cards/blades.cairo
 export enum BladesCard {
-  None = 0,
-  Seppuku = 1,
-  RunAway = 2,
-  Behead = 3,
-  Grapple = 4,
+  None = 'None',
+  Seppuku = 'Seppuku',
+  RunAway = 'RunAway',
+  Behead = 'Behead',
+  Grapple = 'Grapple',
 };
-export const BladesCardNameToValue: Record<string, BladesCard> = {
-  'None': BladesCard.None,
-  'Seppuku': BladesCard.Seppuku,
-  'RunAway': BladesCard.RunAway,
-  'Behead': BladesCard.Behead,
-  'Grapple': BladesCard.Grapple,
+export const BladesCardNameToValue: Record<BladesCard, number> = {
+  [BladesCard.None]: 0,
+  [BladesCard.Seppuku]: 1,
+  [BladesCard.RunAway]: 2,
+  [BladesCard.Behead]: 3,
+  [BladesCard.Grapple]: 4,
 };
-export const getBladesCard = (name: string | number): BladesCard => (BladesCardNameToValue[name as string]);
+export const getBladesCardValue = (name: BladesCard): number => (BladesCardNameToValue[name as string]);
 
 // from: ../dojo/src/types/cards/cards.cairo
 export enum Rarity {
-  None = 0,
-  Common = 1,
-  Uncommon = 2,
-  Special = 3,
+  None = 'None',
+  Common = 'Common',
+  Uncommon = 'Uncommon',
+  Special = 'Special',
 };
-export const RarityNameToValue: Record<string, Rarity> = {
-  'None': Rarity.None,
-  'Common': Rarity.Common,
-  'Uncommon': Rarity.Uncommon,
-  'Special': Rarity.Special,
+export const RarityNameToValue: Record<Rarity, number> = {
+  [Rarity.None]: 0,
+  [Rarity.Common]: 1,
+  [Rarity.Uncommon]: 2,
+  [Rarity.Special]: 3,
 };
-export const getRarity = (name: string | number): Rarity => (RarityNameToValue[name as string]);
+export const getRarityValue = (name: Rarity): number => (RarityNameToValue[name as string]);
 
 // from: ../dojo/src/types/cards/env.cairo
 export enum EnvCard {
-  None = 0,
-  DamageUp = 1,
-  DamageDown = 2,
-  ChancesUp = 3,
-  ChancesDown = 4,
-  DoubleDamageUp = 5,
-  DoubleChancesUp = 6,
-  SpecialAllShotsHit = 7,
-  SpecialAllShotsMiss = 8,
-  SpecialDoubleTactics = 9,
-  SpecialNoTactics = 10,
+  None = 'None',
+  DamageUp = 'DamageUp',
+  DamageDown = 'DamageDown',
+  ChancesUp = 'ChancesUp',
+  ChancesDown = 'ChancesDown',
+  DoubleDamageUp = 'DoubleDamageUp',
+  DoubleChancesUp = 'DoubleChancesUp',
+  SpecialAllShotsHit = 'SpecialAllShotsHit',
+  SpecialAllShotsMiss = 'SpecialAllShotsMiss',
+  SpecialDoubleTactics = 'SpecialDoubleTactics',
+  SpecialNoTactics = 'SpecialNoTactics',
 };
-export const EnvCardNameToValue: Record<string, EnvCard> = {
-  'None': EnvCard.None,
-  'DamageUp': EnvCard.DamageUp,
-  'DamageDown': EnvCard.DamageDown,
-  'ChancesUp': EnvCard.ChancesUp,
-  'ChancesDown': EnvCard.ChancesDown,
-  'DoubleDamageUp': EnvCard.DoubleDamageUp,
-  'DoubleChancesUp': EnvCard.DoubleChancesUp,
-  'SpecialAllShotsHit': EnvCard.SpecialAllShotsHit,
-  'SpecialAllShotsMiss': EnvCard.SpecialAllShotsMiss,
-  'SpecialDoubleTactics': EnvCard.SpecialDoubleTactics,
-  'SpecialNoTactics': EnvCard.SpecialNoTactics,
+export const EnvCardNameToValue: Record<EnvCard, number> = {
+  [EnvCard.None]: 0,
+  [EnvCard.DamageUp]: 1,
+  [EnvCard.DamageDown]: 2,
+  [EnvCard.ChancesUp]: 3,
+  [EnvCard.ChancesDown]: 4,
+  [EnvCard.DoubleDamageUp]: 5,
+  [EnvCard.DoubleChancesUp]: 6,
+  [EnvCard.SpecialAllShotsHit]: 7,
+  [EnvCard.SpecialAllShotsMiss]: 8,
+  [EnvCard.SpecialDoubleTactics]: 9,
+  [EnvCard.SpecialNoTactics]: 10,
 };
-export const getEnvCard = (name: string | number): EnvCard => (EnvCardNameToValue[name as string]);
+export const getEnvCardValue = (name: EnvCard): number => (EnvCardNameToValue[name as string]);
 
 // from: ../dojo/src/types/cards/paces.cairo
 export enum PacesCard {
-  None = 0,
-  Paces1 = 1,
-  Paces2 = 2,
-  Paces3 = 3,
-  Paces4 = 4,
-  Paces5 = 5,
-  Paces6 = 6,
-  Paces7 = 7,
-  Paces8 = 8,
-  Paces9 = 9,
-  Paces10 = 10,
+  None = 'None',
+  Paces1 = 'Paces1',
+  Paces2 = 'Paces2',
+  Paces3 = 'Paces3',
+  Paces4 = 'Paces4',
+  Paces5 = 'Paces5',
+  Paces6 = 'Paces6',
+  Paces7 = 'Paces7',
+  Paces8 = 'Paces8',
+  Paces9 = 'Paces9',
+  Paces10 = 'Paces10',
 };
-export const PacesCardNameToValue: Record<string, PacesCard> = {
-  'None': PacesCard.None,
-  'Paces1': PacesCard.Paces1,
-  'Paces2': PacesCard.Paces2,
-  'Paces3': PacesCard.Paces3,
-  'Paces4': PacesCard.Paces4,
-  'Paces5': PacesCard.Paces5,
-  'Paces6': PacesCard.Paces6,
-  'Paces7': PacesCard.Paces7,
-  'Paces8': PacesCard.Paces8,
-  'Paces9': PacesCard.Paces9,
-  'Paces10': PacesCard.Paces10,
+export const PacesCardNameToValue: Record<PacesCard, number> = {
+  [PacesCard.None]: 0,
+  [PacesCard.Paces1]: 1,
+  [PacesCard.Paces2]: 2,
+  [PacesCard.Paces3]: 3,
+  [PacesCard.Paces4]: 4,
+  [PacesCard.Paces5]: 5,
+  [PacesCard.Paces6]: 6,
+  [PacesCard.Paces7]: 7,
+  [PacesCard.Paces8]: 8,
+  [PacesCard.Paces9]: 9,
+  [PacesCard.Paces10]: 10,
 };
-export const getPacesCard = (name: string | number): PacesCard => (PacesCardNameToValue[name as string]);
+export const getPacesCardValue = (name: PacesCard): number => (PacesCardNameToValue[name as string]);
 
 // from: ../dojo/src/types/cards/tactics.cairo
 export enum TacticsCard {
-  None = 0,
-  Insult = 1,
-  CoinToss = 2,
-  Vengeful = 3,
-  ThickCoat = 4,
-  Reversal = 5,
-  Bananas = 6,
+  None = 'None',
+  Insult = 'Insult',
+  CoinToss = 'CoinToss',
+  Vengeful = 'Vengeful',
+  ThickCoat = 'ThickCoat',
+  Reversal = 'Reversal',
+  Bananas = 'Bananas',
 };
-export const TacticsCardNameToValue: Record<string, TacticsCard> = {
-  'None': TacticsCard.None,
-  'Insult': TacticsCard.Insult,
-  'CoinToss': TacticsCard.CoinToss,
-  'Vengeful': TacticsCard.Vengeful,
-  'ThickCoat': TacticsCard.ThickCoat,
-  'Reversal': TacticsCard.Reversal,
-  'Bananas': TacticsCard.Bananas,
+export const TacticsCardNameToValue: Record<TacticsCard, number> = {
+  [TacticsCard.None]: 0,
+  [TacticsCard.Insult]: 1,
+  [TacticsCard.CoinToss]: 2,
+  [TacticsCard.Vengeful]: 3,
+  [TacticsCard.ThickCoat]: 4,
+  [TacticsCard.Reversal]: 5,
+  [TacticsCard.Bananas]: 6,
 };
-export const getTacticsCard = (name: string | number): TacticsCard => (TacticsCardNameToValue[name as string]);
+export const getTacticsCardValue = (name: TacticsCard): number => (TacticsCardNameToValue[name as string]);
 
 // from: ../dojo/src/types/challenge_state.cairo
 export enum ChallengeState {
-  Null = 0,
-  Awaiting = 1,
-  Withdrawn = 2,
-  Refused = 3,
-  Expired = 4,
-  InProgress = 5,
-  Resolved = 6,
-  Draw = 7,
+  Null = 'Null',
+  Awaiting = 'Awaiting',
+  Withdrawn = 'Withdrawn',
+  Refused = 'Refused',
+  Expired = 'Expired',
+  InProgress = 'InProgress',
+  Resolved = 'Resolved',
+  Draw = 'Draw',
 };
-export const ChallengeStateNameToValue: Record<string, ChallengeState> = {
-  'Null': ChallengeState.Null,
-  'Awaiting': ChallengeState.Awaiting,
-  'Withdrawn': ChallengeState.Withdrawn,
-  'Refused': ChallengeState.Refused,
-  'Expired': ChallengeState.Expired,
-  'InProgress': ChallengeState.InProgress,
-  'Resolved': ChallengeState.Resolved,
-  'Draw': ChallengeState.Draw,
+export const ChallengeStateNameToValue: Record<ChallengeState, number> = {
+  [ChallengeState.Null]: 0,
+  [ChallengeState.Awaiting]: 1,
+  [ChallengeState.Withdrawn]: 2,
+  [ChallengeState.Refused]: 3,
+  [ChallengeState.Expired]: 4,
+  [ChallengeState.InProgress]: 5,
+  [ChallengeState.Resolved]: 6,
+  [ChallengeState.Draw]: 7,
 };
-export const getChallengeState = (name: string | number): ChallengeState => (ChallengeStateNameToValue[name as string]);
+export const getChallengeStateValue = (name: ChallengeState): number => (ChallengeStateNameToValue[name as string]);
 
 // from: ../dojo/src/types/duel_progress.cairo
 export enum DuelistDrawnCard {
-  None = 0,
-  Fire = 1,
-  Dodge = 2,
-  Blades = 3,
+  None = 'None',
+  Fire = 'Fire',
+  Dodge = 'Dodge',
+  Blades = 'Blades',
 };
-export const DuelistDrawnCardNameToValue: Record<string, DuelistDrawnCard> = {
-  'None': DuelistDrawnCard.None,
-  'Fire': DuelistDrawnCard.Fire,
-  'Dodge': DuelistDrawnCard.Dodge,
-  'Blades': DuelistDrawnCard.Blades,
+export const DuelistDrawnCardNameToValue: Record<DuelistDrawnCard, number> = {
+  [DuelistDrawnCard.None]: 0,
+  [DuelistDrawnCard.Fire]: 1,
+  [DuelistDrawnCard.Dodge]: 2,
+  [DuelistDrawnCard.Blades]: 3,
 };
-export const getDuelistDrawnCard = (name: string | number): DuelistDrawnCard => (DuelistDrawnCardNameToValue[name as string]);
+export const getDuelistDrawnCardValue = (name: DuelistDrawnCard): number => (DuelistDrawnCardNameToValue[name as string]);
 
 // from: ../dojo/src/types/misc.cairo
 export enum Boolean {
-  Undefined = 0,
-  True = 1,
-  False = 2,
+  Undefined = 'Undefined',
+  True = 'True',
+  False = 'False',
 };
-export const BooleanNameToValue: Record<string, Boolean> = {
-  'Undefined': Boolean.Undefined,
-  'True': Boolean.True,
-  'False': Boolean.False,
+export const BooleanNameToValue: Record<Boolean, number> = {
+  [Boolean.Undefined]: 0,
+  [Boolean.True]: 1,
+  [Boolean.False]: 2,
 };
-export const getBoolean = (name: string | number): Boolean => (BooleanNameToValue[name as string]);
+export const getBooleanValue = (name: Boolean): number => (BooleanNameToValue[name as string]);
 
 // from: ../dojo/src/types/premise.cairo
 export enum Premise {
-  Null = 0,
-  Matter = 1,
-  Debt = 2,
-  Dispute = 3,
-  Honour = 4,
-  Hatred = 5,
-  Blood = 6,
-  Nothing = 7,
+  Null = 'Null',
+  Matter = 'Matter',
+  Debt = 'Debt',
+  Dispute = 'Dispute',
+  Honour = 'Honour',
+  Hatred = 'Hatred',
+  Blood = 'Blood',
+  Nothing = 'Nothing',
 };
-export const PremiseNameToValue: Record<string, Premise> = {
-  'Null': Premise.Null,
-  'Matter': Premise.Matter,
-  'Debt': Premise.Debt,
-  'Dispute': Premise.Dispute,
-  'Honour': Premise.Honour,
-  'Hatred': Premise.Hatred,
-  'Blood': Premise.Blood,
-  'Nothing': Premise.Nothing,
+export const PremiseNameToValue: Record<Premise, number> = {
+  [Premise.Null]: 0,
+  [Premise.Matter]: 1,
+  [Premise.Debt]: 2,
+  [Premise.Dispute]: 3,
+  [Premise.Honour]: 4,
+  [Premise.Hatred]: 5,
+  [Premise.Blood]: 6,
+  [Premise.Nothing]: 7,
 };
-export const getPremise = (name: string | number): Premise => (PremiseNameToValue[name as string]);
+export const getPremiseValue = (name: Premise): number => (PremiseNameToValue[name as string]);
 
 // from: ../dojo/src/types/round_state.cairo
 export enum RoundState {
-  Null = 0,
-  Commit = 1,
-  Reveal = 2,
-  Finished = 3,
+  Null = 'Null',
+  Commit = 'Commit',
+  Reveal = 'Reveal',
+  Finished = 'Finished',
 };
-export const RoundStateNameToValue: Record<string, RoundState> = {
-  'Null': RoundState.Null,
-  'Commit': RoundState.Commit,
-  'Reveal': RoundState.Reveal,
-  'Finished': RoundState.Finished,
+export const RoundStateNameToValue: Record<RoundState, number> = {
+  [RoundState.Null]: 0,
+  [RoundState.Commit]: 1,
+  [RoundState.Reveal]: 2,
+  [RoundState.Finished]: 3,
 };
-export const getRoundState = (name: string | number): RoundState => (RoundStateNameToValue[name as string]);
+export const getRoundStateValue = (name: RoundState): number => (RoundStateNameToValue[name as string]);
 
 //
 // constants

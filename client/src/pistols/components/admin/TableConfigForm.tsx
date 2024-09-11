@@ -11,7 +11,7 @@ import { Balance } from '@/pistols/components/account/Balance'
 import { bigintToEntity, bigintToHex, isBigint, isNumeric } from '@/lib/utils/types'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { feltToString, STARKNET_ADDRESS_LENGTHS, stringToFelt } from '@/lib/utils/starknet'
-import { getTableType, TableTypeNameToValue, CONFIG } from '@/games/pistols/generated/constants'
+import { TableTypeNameToValue, CONFIG } from '@/games/pistols/generated/constants'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -125,7 +125,6 @@ export const ComponentForm = ({
   const comp_values = useComponentValue(component, entityKey)
   const component_values = useMemo(() => {
     let result = { ...comp_values }
-    if (result.table_type != undefined) result.table_type = getTableType(result.table_type)
     return result
   }, [comp_values])
 

@@ -4,9 +4,13 @@ import { AccountInterface, BigNumberish, Call, Result } from 'starknet'
 import { stringToFelt, bigintToU256 } from '@/lib/utils/starknet'
 import { DojoManifest } from '@/lib/dojo/Dojo'
 import { ClientComponents } from '@/lib/dojo/setup/useSetup'
-import { ProfilePicType, Premise } from '@/games/pistols/generated/constants'
-import { emitter } from '@/pistols/three/game'
 import { bigintAdd, bigintToEntity, bigintToHex } from '@/lib/utils/types'
+import { emitter } from '@/pistols/three/game'
+import {
+  Premise, getPremiseValue,
+  Archetype, getArchetypeValue,
+  ProfilePicType, getProfilePicTypeValue,
+} from '@/games/pistols/generated/constants'
 
 // FIX while this is not merged
 // https://github.com/dojoengine/dojo.js/pull/190
@@ -92,13 +96,13 @@ export function createSystemCalls(
     return results as T
   }
 
-  const mint_duelist = async (signer: AccountInterface, name: string, profile_pic_type: ProfilePicType, profile_pic_uri: string, archetype: number): Promise<boolean> => {
-    const args = [stringToFelt(name), profile_pic_type, stringToFelt(profile_pic_uri), archetype]
+  const mint_duelist = async (signer: AccountInterface, name: string, profile_pic_type: ProfilePicType, profile_pic_uri: string, archetype: Archetype): Promise<boolean> => {
+    const args = [stringToFelt(name), getProfilePicTypeValue(profile_pic_type), stringToFelt(profile_pic_uri), getArchetypeValue(archetype)]
     return await _executeTransaction(signer, actions_call('mint_duelist', args))
   }
 
   const update_duelist = async (signer: AccountInterface, duelist_id: BigNumberish, name: string, profile_pic_type: ProfilePicType, profile_pic_uri: string): Promise<boolean> => {
-    const args = [duelist_id, stringToFelt(name), profile_pic_type, stringToFelt(profile_pic_uri)]
+    const args = [duelist_id, stringToFelt(name), getProfilePicTypeValue(profile_pic_type), stringToFelt(profile_pic_uri)]
     return await _executeTransaction(signer, actions_call('update_duelist', args))
   }
 
@@ -123,7 +127,7 @@ export function createSystemCalls(
     calls.push({
       contractAddress: actions_contract.address,
       entrypoint: 'create_challenge',
-      calldata: [duelist_id, BigInt(challenged_id_or_address), premise, stringToFelt(quote), table_id, wager_value, expire_hours],
+      calldata: [duelist_id, BigInt(challenged_id_or_address), getPremiseValue(premise), stringToFelt(quote), table_id, wager_value, expire_hours],
     })
     return await _executeTransaction(signer, calls)
   }

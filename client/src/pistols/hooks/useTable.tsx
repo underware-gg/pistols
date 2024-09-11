@@ -8,7 +8,7 @@ import { bigintToEntity } from '@/lib/utils/types'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
 import { useAllChallengeIds } from '@/pistols/hooks/useChallenge'
 import { LiveChallengeStates, PastChallengeStates } from '@/pistols/utils/pistols'
-import { TableType, ChallengeState, getTableType } from '@/games/pistols/generated/constants'
+import { TableType, ChallengeState } from '@/games/pistols/generated/constants'
 
 export const useTable = (tableId: string) => {
   const { TableConfig } = useDojoComponents()
@@ -16,7 +16,7 @@ export const useTable = (tableId: string) => {
   const table = useComponentValue(TableConfig, bigintToEntity(stringToFelt(tableId ?? '')))
   const wagerContractAddress = useMemo(() => (table?.wager_contract_address ?? 0n), [table])
 
-  const tableTypeValue = useMemo(() => (getTableType(table?.table_type) ?? null), [table])
+  const tableType = useMemo(() => ((table?.table_type as unknown as TableType) ?? null), [table])
   const tableTypeDescription = useMemo(() => (table?.table_type ? {
     [TableType.Classic]: 'Classic',
     [TableType.Tournament]: 'Tournament',
@@ -33,8 +33,8 @@ export const useTable = (tableId: string) => {
     feePct: table?.fee_pct ?? null,
     tableType: tableTypeDescription ?? '?',
     tableIsOpen: table?.is_open ?? false,
-    isTournament: (tableTypeValue == TableType.Tournament),
-    isIRLTournament: (tableTypeValue == TableType.IRLTournament),
+    isTournament: (tableType == TableType.Tournament),
+    isIRLTournament: (tableType == TableType.IRLTournament),
   }
 }
 
