@@ -11,7 +11,7 @@ mod tests {
     use pistols::models::duelist::{Duelist, DuelistEntity, DuelistEntityStore, ProfilePicType, Archetype};
     use pistols::models::table::{TableConfig, TABLES};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
-    use pistols::types::duel_progress::{DuelProgress, DuelPace};
+    use pistols::types::duel_progress::{DuelProgress, DuelStep};
     use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::types::constants::{CONST, HONOUR};
     use pistols::utils::arrays::{SpanTrait};
@@ -47,7 +47,7 @@ mod tests {
         let challenge: ChallengeEntity = tester::get_ChallengeEntity(sys.world, duel_id);
         let round: RoundEntity = tester::get_RoundEntity(sys.world, duel_id, 1);
         let progress: DuelProgress = sys.actions.get_duel_progress(duel_id);
-        let final_pace: DuelPace = *progress.paces[progress.paces.len() - 1];
+        let final_pace: DuelStep = *progress.steps[progress.steps.len() - 1];
         assert(progress.winner == challenge.winner, 'winner');
         // hand_a
         assert(progress.hand_a.card_fire.into() == moves_a.value_or_zero(0), 'moves_a.card_fire');

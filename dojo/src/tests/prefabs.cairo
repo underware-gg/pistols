@@ -9,7 +9,7 @@ mod prefabs {
     use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, RoundEntity};
     use pistols::models::table::{TableConfig, TABLES};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
-    use pistols::types::duel_progress::{DuelProgress, DuelPace};
+    use pistols::types::duel_progress::{DuelProgress, DuelStep};
     use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::types::constants::{CONST, HONOUR};
     use pistols::libs::utils::{make_moves_hash};

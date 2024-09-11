@@ -51,6 +51,11 @@ impl PlayerHandImpl of PlayerHandTrait {
             dodge,
         ])
     }
+    fn validate(ref self: PlayerHand) {
+        if (self.card_dodge == self.card_fire) {
+            self.card_dodge = PacesCard::None;
+        }
+    }
     fn draw_card(self:PlayerHand, pace: PacesCard) -> DuelistDrawnCard {
         (
             if (self.card_fire == pace) {DuelistDrawnCard::Fire(pace)}

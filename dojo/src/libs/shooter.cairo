@@ -14,7 +14,7 @@ mod shooter {
     use pistols::types::constants::{CONST};
     use pistols::types::challenge_state::{ChallengeState};
     use pistols::types::round_state::{RoundState};
-    use pistols::types::duel_progress::{DuelProgress, DuelPace};
+    use pistols::types::duel_progress::{DuelProgress, DuelStep};
     use pistols::types::cards::hand::{
         PlayerHand, PlayerHandTrait,
         PacesCard, PacesCardTrait,
@@ -150,8 +150,10 @@ mod shooter {
     fn game_loop_internal(ref dice: Dice, ref round: Round) -> DuelProgress {
         // let _table_type: TableType = store.get_table_config_entity(challenge.table_id).table_type;
         
-        let hand_a: PlayerHand = round.shot_a.as_hand();
-        let hand_b: PlayerHand = round.shot_b.as_hand();
+        let mut hand_a: PlayerHand = round.shot_a.as_hand();
+        let mut hand_b: PlayerHand = round.shot_b.as_hand();
+        hand_a.validate();
+        hand_b.validate();
 
         let mut env_state_a: PlayerState = round.shot_a.state_start;
         let mut env_state_b: PlayerState = round.shot_b.state_start;
@@ -170,7 +172,7 @@ mod shooter {
         //------------------------------------------------------
         // Pistols round
         //
-        let mut duel_paces: Array<DuelPace> = array![];
+        let mut steps: Array<DuelStep> = array![];
         let mut win_a: Boolean = Boolean::Undefined;
         let mut win_b: Boolean = Boolean::Undefined;
 
@@ -199,7 +201,7 @@ mod shooter {
             }
 
             // save step
-            duel_paces.append(DuelPace {
+            steps.append(DuelStep {
                 pace,
                 card_env,
                 dice_env,
@@ -234,7 +236,7 @@ mod shooter {
         }
 
         // update round model
-        let final_pace: DuelPace = *duel_paces[duel_paces.len() - 1];
+        let final_pace: DuelStep = *steps[steps.len() - 1];
         round.shot_a.state_final = final_pace.state_a;
         round.shot_b.state_final = final_pace.state_b;
         round.shot_a.win = if (final_pace.state_b.health == 0) {1} else {0};
@@ -252,7 +254,7 @@ mod shooter {
         
         (DuelProgress {
             // results
-            paces: duel_paces.span(),
+            steps: steps.span(),
             winner,
             hand_a,
             hand_b,

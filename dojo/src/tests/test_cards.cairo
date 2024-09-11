@@ -13,7 +13,7 @@ mod tests {
     use pistols::models::table::{TableConfig, TABLES};
     use pistols::models::init::{init};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
-    use pistols::types::duel_progress::{DuelProgress, DuelPace};
+    use pistols::types::duel_progress::{DuelProgress, DuelStep, DuelistDrawnCard};
     use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::types::constants::{CONST, HONOUR};
     use pistols::types::cards::hand::{
@@ -25,8 +25,10 @@ mod tests {
     };
     use pistols::libs::shooter::{shooter};
     use pistols::libs::utils::{make_moves_hash};
+    use pistols::utils::short_string::{ShortString};
 
     use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
+    use pistols::tests::mock_rng::{IRngDispatcher, IRngDispatcherTrait};
     use pistols::tests::tester::{tester,
         tester::{
             Systems,
@@ -94,6 +96,88 @@ mod tests {
         assert(shot.state_start.damage == shot.state_final.damage, 'keep_damage');
     }
 
+    //-----------------------------------------
+    // HAND/PROGRESS
+    //
+
+    #[test]
+    fn test_hand_progress() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (salts, _moves_a, _moves_b) = prefabs::get_moves_dual_miss();
+        sys.rng.set_salts(salts.salts, salts.values);
+        let (_round, progress) = execute_game_loop_internal(sys,
+            [5, 6, 1, 2].span(),
+            [10, 9, 3, 4].span(),
+        );
+        assert(progress.hand_a.card_fire == 5_u8.into(), 'hand_a.card_fire');
+        assert(progress.hand_a.card_dodge == 6_u8.into(), 'hand_a.card_dodge');
+        assert(progress.hand_a.card_tactics == 1_u8.into(), 'hand_a.card_tactics');
+        assert(progress.hand_a.card_blades == 2_u8.into(), 'hand_a.card_blades');
+        assert(progress.hand_b.card_fire == 10_u8.into(), 'hand_b.card_fire');
+        assert(progress.hand_b.card_dodge == 9_u8.into(), 'hand_b.card_dodge');
+        assert(progress.hand_b.card_tactics == 3_u8.into(), 'hand_b.card_tactics');
+        assert(progress.hand_b.card_blades == 4_u8.into(), 'hand_b.card_blades');
+        assert(progress.steps.len() == 10, 'paces.len');
+        let mut i: u8 = 0;
+        while (i < 10) {
+            let num: felt252 = '1'+i.into();
+            let step: DuelStep = *progress.steps[i.into()];
+            let pace: PacesCard = step.pace;
+            assert(step.pace == pace, ShortString::concat(num, '_step.pace'));
+            assert(step.card_env != 0_u8.into(), ShortString::concat(num, '_step.card_env'));
+            assert(step.dice_env > 0, ShortString::concat(num, '_step.dice_env'));
+            if (pace == PacesCard::Paces5) {
+                assert(step.card_a == DuelistDrawnCard::Fire(PacesCard::Paces5), ShortString::concat(num, '_fire_a'));
+                assert(step.card_b == DuelistDrawnCard::None, ShortString::concat(num, '_none_b'));
+            } else if (pace == PacesCard::Paces6) {
+                assert(step.card_a == DuelistDrawnCard::Dodge(PacesCard::Paces6), ShortString::concat(num, '_dodge_a'));
+                assert(step.card_b == DuelistDrawnCard::None, ShortString::concat(num, '_none_b'));
+            } else if (pace == PacesCard::Paces10) {
+                assert(step.card_a == DuelistDrawnCard::None, ShortString::concat(num, '_none_a'));
+                assert(step.card_b == DuelistDrawnCard::Fire(PacesCard::Paces10), ShortString::concat(num, '_fire_b'));
+            } else if (pace == PacesCard::Paces9) {
+                assert(step.card_a == DuelistDrawnCard::None, ShortString::concat(num, '_none_a'));
+                assert(step.card_b == DuelistDrawnCard::Dodge(PacesCard::Paces9), ShortString::concat(num, '_dodge_b'));
+            } else {
+                assert(step.card_a == DuelistDrawnCard::None, ShortString::concat(num, '_none_a'));
+                assert(step.card_b == DuelistDrawnCard::None, ShortString::concat(num, '_none_b'));
+            }
+            i += 1;
+        }
+    }
+
+    #[test]
+    fn test_fire_no_dodge() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (salts, _moves_a, _moves_b) = prefabs::get_moves_dual_miss();
+        sys.rng.set_salts(salts.salts, salts.values);
+        let (_round, progress) = execute_game_loop_internal(sys,
+            [1, 1].span(),
+            [2, 2].span(),
+        );
+        assert(progress.hand_a.card_fire == 1_u8.into(), 'hand_a.card_fire');
+        assert(progress.hand_a.card_dodge == 0_u8.into(), 'hand_a.card_dodge');
+        assert(progress.hand_b.card_fire == 2_u8.into(), 'hand_b.card_fire');
+        assert(progress.hand_b.card_dodge == 0_u8.into(), 'hand_b.card_dodge');
+        assert(progress.steps.len() == 2, 'paces.len');
+        let mut i: u8 = 0;
+        while (i < 2) {
+            let num: felt252 = '1'+i.into();
+            let step: DuelStep = *progress.steps[i.into()];
+            let pace: PacesCard = step.pace;
+            assert(step.pace == pace, ShortString::concat(num, '_step.pace'));
+            assert(step.card_env != 0_u8.into(), ShortString::concat(num, '_step.card_env'));
+            assert(step.dice_env > 0, ShortString::concat(num, '_step.dice_env'));
+            if (pace == PacesCard::Paces1) {
+                assert(step.card_a == DuelistDrawnCard::Fire(PacesCard::Paces1), ShortString::concat(num, '_fire_a'));
+                assert(step.card_b == DuelistDrawnCard::None, ShortString::concat(num, '_none_b'));
+            } else if (pace == PacesCard::Paces2) {
+                assert(step.card_a == DuelistDrawnCard::None, ShortString::concat(num, '_none_a'));
+                assert(step.card_b == DuelistDrawnCard::Fire(PacesCard::Paces2), ShortString::concat(num, '_fire_b'));
+            }
+            i += 1;
+        }
+    }
     //-----------------------------------------
     // TACTICS CARDS
     //

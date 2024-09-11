@@ -13,7 +13,7 @@ use pistols::types::cards::hand::{
 #[derive(Copy, Drop, Serde)]
 struct DuelProgress {
     // results
-    paces: Span<DuelPace>,
+    steps: Span<DuelStep>,
     winner: u8,
     // duelists hands
     hand_a: PlayerHand,
@@ -21,7 +21,7 @@ struct DuelProgress {
 }
 
 #[derive(Copy, Drop, Serde)]
-struct DuelPace {
+struct DuelStep {
     // current pace
     pace: PacesCard,
     // env card
