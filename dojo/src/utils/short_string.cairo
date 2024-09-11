@@ -2,12 +2,30 @@ use core::byte_array::ByteArrayTrait;
 use pistols::utils::bitwise::{BitwiseU256};
 
 trait ShortStringTrait {
+    fn strlen(self: felt252) -> usize;
+    fn string(self: felt252) -> ByteArray;
     fn concat(self: felt252, value: felt252) -> felt252;
     fn join(self: felt252, value: felt252) -> felt252;
     fn to_byte_array(self: felt252) -> ByteArray;
 }
 
 impl ShortString of ShortStringTrait {
+    fn strlen(self: felt252) -> usize {
+        let mut result: usize = 0;
+        let mut v: u256 = self.into();
+        while (v != 0) {
+            result += 1;
+            v /= 0x100;
+        };
+        (result)
+    }
+
+    fn string(self: felt252) -> ByteArray {
+        let mut namestr: ByteArray = "";
+        namestr.append_word(self, self.strlen());
+        (namestr)
+    }
+
     fn concat(self: felt252, value: felt252) -> felt252 {
         let _self: u256 = self.into();
         let _value: u256 = value.into();

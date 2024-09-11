@@ -197,6 +197,9 @@ impl EnvCardImpl of EnvCardTrait {
 //--------------------
 // converters
 //
+use debug::PrintTrait;
+use core::fmt::{Display, Formatter, Error};
+use pistols::utils::short_string::{ShortStringTrait};
 
 impl EnvCardIntoU8 of Into<EnvCard, u8> {
     fn into(self: EnvCard) -> u8 {
@@ -229,5 +232,29 @@ impl U8IntoEnvCard of Into<u8, EnvCard> {
         else if self == ENV_CARDS::SPECIAL_DOUBLE_TACTICS   { EnvCard::SpecialDoubleTactics }
         else if self == ENV_CARDS::SPECIAL_NO_TACTICS       { EnvCard::SpecialNoTactics }
         else                                                { EnvCard::None }
+    }
+}
+
+impl EnvCardIntoFelt252 of Into<EnvCard, felt252> {
+    fn into(self: EnvCard) -> felt252 {
+        let v: u8 = self.into();
+        (v.into())
+    }
+}
+
+impl EnvCardPrintImpl of PrintTrait<EnvCard> {
+    fn print(self: EnvCard) {
+        self.get_points().name.print();
+    }
+}
+
+// for println! and format!
+impl EnvCardDisplay of Display<EnvCard> {
+    fn fmt(self: @EnvCard, ref f: Formatter) -> Result<(), Error> {
+        let name: ByteArray = (*self).get_points().name.string();
+        let value: felt252 = (*self).into();
+        let str: ByteArray = format!("({}:{})", value, name);
+        f.buffer.append(@str);
+        Result::Ok(())
     }
 }

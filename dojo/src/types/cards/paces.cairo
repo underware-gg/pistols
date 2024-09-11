@@ -83,6 +83,9 @@ impl PacesCardImpl of PacesCardTrait {
 //--------------------
 // converters
 //
+use debug::PrintTrait;
+use core::fmt::{Display, Formatter, Error};
+use pistols::utils::short_string::{ShortString};
 
 impl PacesCardIntoU8 of Into<PacesCard, u8> {
     fn into(self: PacesCard) -> u8 {
@@ -117,3 +120,26 @@ impl U8IntoPacesCard of Into<u8, PacesCard> {
     }
 }
 
+impl PacesCardIntoFelt252 of Into<PacesCard, felt252> {
+    fn into(self: PacesCard) -> felt252 {
+        let v: u8 = self.into();
+        (v.into())
+    }
+}
+
+impl PacesCardPrintImpl of PrintTrait<PacesCard> {
+    fn print(self: PacesCard) {
+        let p: felt252 = self.into();
+        ShortString::concat('Paces::', ('0' + p)).print();
+    }
+}
+
+// for println! and format!
+impl PacesCardDisplay of Display<PacesCard> {
+    fn fmt(self: @PacesCard, ref f: Formatter) -> Result<(), Error> {
+        let p: felt252 = (*self).into();
+        let str: ByteArray = format!("Paces::{}", p);
+        f.buffer.append(@str);
+        Result::Ok(())
+    }
+}

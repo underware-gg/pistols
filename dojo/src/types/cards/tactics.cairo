@@ -108,6 +108,9 @@ impl TacticsCardImpl of TacticsCardTrait {
 //--------------------
 // converters
 //
+use debug::PrintTrait;
+use core::fmt::{Display, Formatter, Error};
+use pistols::utils::short_string::{ShortStringTrait};
 
 impl TacticsCardIntoU8 of Into<TacticsCard, u8> {
     fn into(self: TacticsCard) -> u8 {
@@ -134,3 +137,26 @@ impl U8IntoTacticsCard of Into<u8, TacticsCard> {
     }
 }
 
+impl TacticsCardIntoFelt252 of Into<TacticsCard, felt252> {
+    fn into(self: TacticsCard) -> felt252 {
+        let v: u8 = self.into();
+        (v.into())
+    }
+}
+
+impl TacticsCardPrintImpl of PrintTrait<TacticsCard> {
+    fn print(self: TacticsCard) {
+        self.get_points().name.print();
+    }
+}
+
+// for println! and format!
+impl TacticsCardDisplay of Display<TacticsCard> {
+    fn fmt(self: @TacticsCard, ref f: Formatter) -> Result<(), Error> {
+        let name: ByteArray = (*self).get_points().name.string();
+        let value: felt252 = (*self).into();
+        let str: ByteArray = format!("({}:{})", value, name);
+        f.buffer.append(@str);
+        Result::Ok(())
+    }
+}
