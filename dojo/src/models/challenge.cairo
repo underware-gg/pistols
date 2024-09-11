@@ -3,6 +3,7 @@ use pistols::models::duelist::{Score};
 use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round_state::{RoundState, RoundStateTrait};
 use pistols::types::cards::paces::{PacesCard, PacesCardTrait};
+use pistols::types::premise::{Premise, PremiseTrait};
 
 //-------------------------
 // Challenge lifecycle
@@ -14,7 +15,8 @@ pub struct Challenge {
     duel_id: u128,
     //-------------------------
     table_id: felt252,
-    message: felt252,           // message to challenged
+    premise: Premise,           // premise of the dispute
+    quote: felt252,             // message to challenged
     address_a: ContractAddress, // Challenger wallet
     address_b: ContractAddress, // Challenged wallet
     duelist_id_a: u128,         // Challenger duelist

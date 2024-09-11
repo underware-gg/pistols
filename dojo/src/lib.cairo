@@ -34,6 +34,7 @@ mod types {
     mod duel_progress;
     mod events;
     mod misc;
+    mod premise;
     mod round_state;
     mod typed_data;
     mod cards {

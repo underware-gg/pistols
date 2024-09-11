@@ -21,6 +21,7 @@ mod tester {
     };
     use pistols::types::challenge_state::{ChallengeState};
     use pistols::types::constants::{CONST};
+    use pistols::types::premise::{Premise};
     use pistols::utils::arrays::{SpanTrait};
     use pistols::utils::short_string::{ShortString};
     use pistols::interfaces::systems::{SELECTORS};
@@ -343,23 +344,25 @@ mod tester {
     }
     fn execute_create_challenge(system: @IActionsDispatcher, sender: ContractAddress,
         challenged: ContractAddress,
-        message: felt252,
+        // premise: Premise,
+        quote: felt252,
         table_id: felt252,
         wager_value: u128,
         expire_hours: u64,
     ) -> u128 {
-        (execute_create_challenge_ID(system, sender, ID(sender), challenged, message, table_id, wager_value, expire_hours))
+        (execute_create_challenge_ID(system, sender, ID(sender), challenged, quote, table_id, wager_value, expire_hours))
     }
     fn execute_create_challenge_ID(system: @IActionsDispatcher, sender: ContractAddress,
         token_id: u128,
         challenged: ContractAddress,
-        message: felt252,
+        // premise: Premise,
+        quote: felt252,
         table_id: felt252,
         wager_value: u128,
         expire_hours: u64,
     ) -> u128 {
         impersonate(sender);
-        let duel_id: u128 = (*system).create_challenge(token_id, challenged, message, table_id, wager_value, expire_hours);
+        let duel_id: u128 = (*system).create_challenge(token_id, challenged, Premise::Nothing, quote, table_id, wager_value, expire_hours);
         _next_block();
         (duel_id)
     }

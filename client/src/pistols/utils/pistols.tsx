@@ -56,7 +56,7 @@ export const ChallengeStateClasses: Record<ChallengeState, string> = {
   [ChallengeState.Draw]: 'Warning',
 }
 
-export const ChallengeMessages = [
+export const ChallengeQuotes = [
   //34567890123456789012345678901| << max cairo string size (31 bytes)
   "I challenge ya for a duel!",
   "I demand satisfaction!",

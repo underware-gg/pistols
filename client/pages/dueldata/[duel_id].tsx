@@ -179,7 +179,7 @@ function DuelStats({
         <Row>
           <Cell>Message</Cell>
           <Cell>
-            {challenge.message}
+            {challenge.quote}
           </Cell>
         </Row>
       </Body>

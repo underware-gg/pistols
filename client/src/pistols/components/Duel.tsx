@@ -45,7 +45,7 @@ export default function Duel({
   const { animated, dispatchAnimated } = useGameplayContext()
 
   const { challengeDescription } = useChallengeDescription(duelId)
-  const { tableId, isFinished, message, duelistIdA, duelistIdB, timestamp_start } = useChallenge(duelId)
+  const { tableId, isFinished, quote, duelistIdA, duelistIdB, timestamp_start } = useChallenge(duelId)
   const { description } = useTable(tableId)
   const { value, fee, feeFormatted } = useWager(duelId)
 
@@ -91,7 +91,7 @@ export default function Duel({
   return (
     <>
       <div className='TavernBoard' style={{ backgroundImage: 'url(/images/ui/wager_main.png)', backgroundSize: '100% 100%' }}>
-        <div className='TavernTitle' data-contentlength={Math.floor((message.length + 2) / 10)}>{`“${message}”`}</div>
+        <div className='TavernTitle' data-contentlength={Math.floor((quote.length + 2) / 10)}>{`“${quote}”`}</div>
         {value > 0 ? /*TODO IF no wager center the TavernTitle? Or display that there is no wager? */
           // <div className='TavernWager' data-contentlength={Math.floor(`Wager: ${value} $LORDS`.length / 10)}>Wager: {value.toString()} $LORDS</div>
           <div className='TavernWager' data-contentlength={Math.floor(`Wager: ${value} $LORDS`.length / 10)}>Wager: <Balance clean wei={value}/> $LORDS</div>
@@ -343,7 +343,7 @@ function DuelProgress({
           <div className='dialog-duelist'></div>
           <div className='dialog-content'>
             <button className='dialog-button'></button>
-            <div className='dialog-message'></div>
+            <div className='dialog-quote'></div>
             <div className='dialog-spinner'></div>
           </div>
         </div>

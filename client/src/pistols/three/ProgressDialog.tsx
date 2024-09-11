@@ -881,7 +881,7 @@ export class ProgressDialogMesh {
     const button = this.element.querySelector('.dialog-button') as HTMLElement
     button.textContent = this.message
     button.dataset.contentlength = Math.floor(this.message?.length / 10).toString()
-    const message = this.element.querySelector('.dialog-message') as HTMLElement
+    const message = this.element.querySelector('.dialog-quote') as HTMLElement
     message.textContent = this.message
     message.dataset.contentlength = Math.floor(this.message?.length / 10).toString()
     const spinner = this.element.querySelector('.dialog-spinner') as HTMLElement

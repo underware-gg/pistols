@@ -3,6 +3,7 @@ use pistols::models::challenge::{Challenge};
 use pistols::models::duelist::{Duelist, ProfilePicType, Archetype};
 use pistols::types::challenge_state::{ChallengeState};
 use pistols::types::duel_progress::{DuelProgress};
+use pistols::types::premise::{Premise};
 
 // define the interface
 #[dojo::interface]
@@ -30,7 +31,8 @@ trait IActions {
         ref world: IWorldDispatcher,
         duelist_id: u128,
         challenged_id_or_address: ContractAddress,
-        message: felt252,
+        premise: Premise,
+        quote: felt252,
         table_id: felt252,
         wager_value: u128,
         expire_hours: u64,
@@ -102,6 +104,7 @@ mod actions {
     use pistols::models::duelist::{Duelist, DuelistTrait, ProfilePicType, Archetype, Score, Pact, DuelistHelper, DuelistHelperTrait};
     use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableAdmittanceEntity, TableAdmittanceEntityTrait, TableType, TABLES};
     use pistols::models::init::{init};
+    use pistols::types::premise::{Premise, PremiseTrait};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::duel_progress::{DuelProgress};
     use pistols::types::round_state::{RoundState, RoundStateTrait};
@@ -224,7 +227,8 @@ mod actions {
         fn create_challenge(ref world: IWorldDispatcher,
             duelist_id: u128,
             challenged_id_or_address: ContractAddress,
-            message: felt252,
+            premise: Premise,
+            quote: felt252,
             table_id: felt252,
             wager_value: u128,
             expire_hours: u64,
@@ -271,7 +275,8 @@ mod actions {
             let challenge = Challenge {
                 duel_id,
                 table_id,
-                message,
+                premise,
+                quote,
                 // duelists
                 address_a,
                 address_b,

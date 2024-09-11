@@ -210,6 +210,29 @@ export const BooleanNameToValue: Record<string, Boolean> = {
 };
 export const getBoolean = (name: string | number): Boolean => (BooleanNameToValue[name as string]);
 
+// from: ../dojo/src/types/premise.cairo
+export enum Premise {
+  None = 0,
+  Matter = 1,
+  Debt = 2,
+  Dispute = 3,
+  Honour = 4,
+  Hatred = 5,
+  Blood = 6,
+  Nothing = 7,
+};
+export const PremiseNameToValue: Record<string, Premise> = {
+  'None': Premise.None,
+  'Matter': Premise.Matter,
+  'Debt': Premise.Debt,
+  'Dispute': Premise.Dispute,
+  'Honour': Premise.Honour,
+  'Hatred': Premise.Hatred,
+  'Blood': Premise.Blood,
+  'Nothing': Premise.Nothing,
+};
+export const getPremise = (name: string | number): Premise => (PremiseNameToValue[name as string]);
+
 // from: ../dojo/src/types/round_state.cairo
 export enum RoundState {
   Null = 0,

@@ -1,15 +1,12 @@
-// import {
-//   getEvents,
-//   // setComponentsFromEvents,
-// } from '@dojoengine/utils'
 import { DojoProvider, getContractByName } from '@dojoengine/core'
-import { Component, getComponentValue } from '@dojoengine/recs'
+import { getComponentValue } from '@dojoengine/recs'
 import { AccountInterface, BigNumberish, Call, Result } from 'starknet'
 import { stringToFelt, bigintToU256 } from '@/lib/utils/starknet'
-import { bigintAdd, bigintToEntity, bigintToHex } from '@/lib/utils/types'
-import { ClientComponents } from '@/lib/dojo/setup/useSetup'
 import { DojoManifest } from '@/lib/dojo/Dojo'
+import { ClientComponents } from '@/lib/dojo/setup/useSetup'
+import { ProfilePicType, Premise } from '@/games/pistols/generated/constants'
 import { emitter } from '@/pistols/three/game'
+import { bigintAdd, bigintToEntity, bigintToHex } from '@/lib/utils/types'
 
 // FIX while this is not merged
 // https://github.com/dojoengine/dojo.js/pull/190
@@ -95,17 +92,17 @@ export function createSystemCalls(
     return results as T
   }
 
-  const mint_duelist = async (signer: AccountInterface, name: string, profile_pic_type: number, profile_pic_uri: string, archetype: number): Promise<boolean> => {
+  const mint_duelist = async (signer: AccountInterface, name: string, profile_pic_type: ProfilePicType, profile_pic_uri: string, archetype: number): Promise<boolean> => {
     const args = [stringToFelt(name), profile_pic_type, stringToFelt(profile_pic_uri), archetype]
     return await _executeTransaction(signer, actions_call('mint_duelist', args))
   }
 
-  const update_duelist = async (signer: AccountInterface, duelist_id: BigNumberish, name: string, profile_pic_type: number, profile_pic_uri: string): Promise<boolean> => {
+  const update_duelist = async (signer: AccountInterface, duelist_id: BigNumberish, name: string, profile_pic_type: ProfilePicType, profile_pic_uri: string): Promise<boolean> => {
     const args = [duelist_id, stringToFelt(name), profile_pic_type, stringToFelt(profile_pic_uri)]
     return await _executeTransaction(signer, actions_call('update_duelist', args))
   }
 
-  const create_challenge = async (signer: AccountInterface, duelist_id: BigNumberish, challenged_id_or_address: BigNumberish, message: string, table_id: string, wager_value: BigNumberish, expire_hours: number): Promise<boolean> => {
+  const create_challenge = async (signer: AccountInterface, duelist_id: BigNumberish, challenged_id_or_address: BigNumberish, premise: Premise, quote: string, table_id: string, wager_value: BigNumberish, expire_hours: number): Promise<boolean> => {
     // find lords contract
     const table = getComponentValue(TableConfig, bigintToEntity(stringToFelt(table_id)))
     if (!table) throw new Error(`Table does not exist [${table_id}]`)
@@ -126,7 +123,7 @@ export function createSystemCalls(
     calls.push({
       contractAddress: actions_contract.address,
       entrypoint: 'create_challenge',
-      calldata: [duelist_id, BigInt(challenged_id_or_address), stringToFelt(message), table_id, wager_value, expire_hours],
+      calldata: [duelist_id, BigInt(challenged_id_or_address), premise, stringToFelt(quote), table_id, wager_value, expire_hours],
     })
     return await _executeTransaction(signer, calls)
   }

@@ -16,7 +16,7 @@ import { FormInput } from '@/pistols/components/ui/Form'
 import { Balance } from '@/pistols/components/account/Balance'
 import { WagerAndOrFees } from '@/pistols/components/account/LordsBalance'
 import { ethToWei, validateCairoString } from '@/lib/utils/starknet'
-import { ChallengeMessages } from '@/pistols/utils/pistols'
+import { ChallengeQuotes } from '@/pistols/utils/pistols'
 import { Divider } from '@/lib/ui/Divider'
 import { randomArrayElement } from '@/lib/utils/random'
 
@@ -69,7 +69,7 @@ export default function NewChallengeModal() {
   const _create_challenge = () => {
     const _submit = async () => {
       setIsSubmitting(true)
-      await create_challenge(account, duelistId, challengingId, args.message, tableId, args.wager_value, args.expire_hours)
+      await create_challenge(account, duelistId, challengingId, args.premise, args.quote, tableId, args.wager_value, args.expire_hours)
       setIsSubmitting(false)
     }
     if (args) _submit()
@@ -166,35 +166,35 @@ function NewChallengeForm({
   canWager,
 }) {
   const { tableId } = useSettings()
-  const [message, setMessage] = useState('')
+  const [quote, setQuote] = useState('')
   const [days, setDays] = useState(7)
   const [hours, setHours] = useState(0)
   const [value, setValue] = useState(0)
   const { fee } = useCalcFee(tableId, ethToWei(value))
 
   useEffectOnce(() => {
-    setMessage(randomArrayElement(ChallengeMessages))
+    setQuote(randomArrayElement(ChallengeQuotes))
   }, [])
 
-  const canSubmit = useMemo(() => (message.length > 3 && (days + hours) > 0), [message, days, hours, value])
+  const canSubmit = useMemo(() => (quote.length > 3 && (days + hours) > 0), [quote, days, hours, value])
 
   useEffect(() => {
     setArgs(canSubmit ? {
-      message,
+      quote,
       expire_hours: ((days * 24 * 60 * 60) + hours),
       table_id: tableId,
       wager_value: ethToWei(value),
     } : null)
-  }, [message, days, hours, value])
-  // console.log(canSubmit, days, hours, lords, message)
+  }, [quote, days, hours, value])
+  // console.log(canSubmit, days, hours, lords, quote)
 
-  const [customMessage, setCustomMessage] = useState('')
-  const messageOptions: any[] = useMemo(() =>
-    (ChallengeMessages.includes(customMessage) ? ChallengeMessages : [customMessage, ...ChallengeMessages]).map(msg => ({
+  const [customQuote, setCustomQuote] = useState('')
+  const quoteOptions: any[] = useMemo(() =>
+    (ChallengeQuotes.includes(customQuote) ? ChallengeQuotes : [customQuote, ...ChallengeQuotes]).map(msg => ({
       key: msg.replace(' ', '_'),
       value: msg,
       text: msg,
-    })), [customMessage])
+    })), [customQuote])
   const daysOptions: any[] = useMemo(() => Array.from(Array(8).keys()).map(index => ({
     key: `${index}d`,
     value: `${index}`,
@@ -210,33 +210,33 @@ function NewChallengeForm({
     <div style={{ width: '350px' }}>
       <Form className=''>
         <Form.Field>
-          <span className='FormLabel'>&nbsp;reasoning</span>
+          <span className='FormLabel'>&nbsp;Quote</span>
           <Dropdown
-            options={messageOptions}
+            options={quoteOptions}
             placeholder={'say something!'}
             search
             selection
             fluid
             allowAdditions
             additionLabel={''}
-            value={message}
+            value={quote}
             onAddItem={() => { }}
             onFocus={(e) => {
-              setCustomMessage('')
-              setMessage('')
+              setCustomQuote('')
+              setQuote('')
             }}
             onChange={(e, { value }) => {
               const _msg = validateCairoString(value as string)
-              if (!ChallengeMessages.includes(_msg)) {
-                setCustomMessage(_msg)
+              if (!ChallengeQuotes.includes(_msg)) {
+                setCustomQuote(_msg)
               }
-              setMessage(_msg)
+              setQuote(_msg)
             }}
           />
         </Form.Field>
 
         <Form.Field>
-          <span className='FormLabel'>&nbsp;expiration</span>
+          <span className='FormLabel'>&nbsp;Expiration</span>
           <Grid className='NoMargin'>
             <Row>
               <Col width={5}>
