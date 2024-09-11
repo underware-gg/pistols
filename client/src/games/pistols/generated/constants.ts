@@ -212,7 +212,7 @@ export const getBoolean = (name: string | number): Boolean => (BooleanNameToValu
 
 // from: ../dojo/src/types/premise.cairo
 export enum Premise {
-  None = 0,
+  Null = 0,
   Matter = 1,
   Debt = 2,
   Dispute = 3,
@@ -222,7 +222,7 @@ export enum Premise {
   Nothing = 7,
 };
 export const PremiseNameToValue: Record<string, Premise> = {
-  'None': Premise.None,
+  'Null': Premise.Null,
   'Matter': Premise.Matter,
   'Debt': Premise.Debt,
   'Dispute': Premise.Dispute,

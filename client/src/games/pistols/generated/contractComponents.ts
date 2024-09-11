@@ -233,13 +233,13 @@ export function defineContractComponents(world: World) {
     Challenge: (() => {
       return defineComponent(
         world,
-        { duel_id: RecsType.BigInt, table_id: RecsType.BigInt, quote: RecsType.BigInt, address_a: RecsType.BigInt, address_b: RecsType.BigInt, duelist_id_a: RecsType.BigInt, duelist_id_b: RecsType.BigInt, state: RecsType.Number, round_number: RecsType.Number, winner: RecsType.Number, timestamp_start: RecsType.BigInt, timestamp_end: RecsType.BigInt },
+        { duel_id: RecsType.BigInt, table_id: RecsType.BigInt, premise: RecsType.Number, quote: RecsType.BigInt, address_a: RecsType.BigInt, address_b: RecsType.BigInt, duelist_id_a: RecsType.BigInt, duelist_id_b: RecsType.BigInt, state: RecsType.Number, round_number: RecsType.Number, winner: RecsType.Number, timestamp_start: RecsType.BigInt, timestamp_end: RecsType.BigInt },
         {
           metadata: {
             namespace: "pistols",
             name: "Challenge",
-            types: ["u128","felt252","felt252","contractaddress","contractaddress","u128","u128","enum","u8","u8","u64","u64"],
-            customTypes: ["ChallengeState"],
+            types: ["u128","felt252","enum","felt252","contractaddress","contractaddress","u128","u128","enum","u8","u8","u64","u64"],
+            customTypes: ["Premise","ChallengeState"],
           },
         }
       );
@@ -310,20 +310,6 @@ export function defineContractComponents(world: World) {
             name: "Scoreboard",
             types: ["felt252","u128","u8","u8","u8","u8","u16","u16","u16","u16","u64","u128","u128"],
             customTypes: ["Score"],
-          },
-        }
-      );
-    })(),
-    Snapshot: (() => {
-      return defineComponent(
-        world,
-        { duel_id: RecsType.BigInt, score_a: { honour: RecsType.Number, level_villain: RecsType.Number, level_trickster: RecsType.Number, level_lord: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, honour_history: RecsType.BigInt }, score_b: { honour: RecsType.Number, level_villain: RecsType.Number, level_trickster: RecsType.Number, level_lord: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, honour_history: RecsType.BigInt } },
-        {
-          metadata: {
-            namespace: "pistols",
-            name: "Snapshot",
-            types: ["u128","u8","u8","u8","u8","u16","u16","u16","u16","u64","u8","u8","u8","u8","u16","u16","u16","u16","u64"],
-            customTypes: ["Score","Score"],
           },
         }
       );

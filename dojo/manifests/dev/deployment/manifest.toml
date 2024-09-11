@@ -24,8 +24,8 @@ manifest_name = "dojo-base"
 [[contracts]]
 kind = "DojoContract"
 address = "0x7a1738a7523d803d4246aa05738b3fd8a39e3700107687705222abdecbef4d1"
-class_hash = "0x1a4edbe1079dd3b463e5cc4c7a87f85331ec3c905c84b1fe3bd6c6fd400547a"
-original_class_hash = "0x1a4edbe1079dd3b463e5cc4c7a87f85331ec3c905c84b1fe3bd6c6fd400547a"
+class_hash = "0x376c309325bbbda3f588535a79857aea27d0ffcd9c8ea0207ea3c1b11a4296a"
+original_class_hash = "0x376c309325bbbda3f588535a79857aea27d0ffcd9c8ea0207ea3c1b11a4296a"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/dev/deployment/abis/contracts/pistols-actions-4f10cff7.json"
 reads = []
@@ -572,8 +572,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x7a21782d7249494c85a842620ac34ffe4573964f370dc9d7a92c6a284e69467"
-original_class_hash = "0x7a21782d7249494c85a842620ac34ffe4573964f370dc9d7a92c6a284e69467"
+class_hash = "0x569a86ac1cd015f67abf0348fda631125b7ce840b338c0d3d4b24e4f4793688"
+original_class_hash = "0x569a86ac1cd015f67abf0348fda631125b7ce840b338c0d3d4b24e4f4793688"
 abi = "manifests/dev/deployment/abis/models/pistols-Challenge-673267b6.json"
 tag = "pistols-Challenge"
 qualified_path = "pistols::models::challenge::challenge"
@@ -590,7 +590,12 @@ type = "felt252"
 key = false
 
 [[models.members]]
-name = "message"
+name = "premise"
+type = "Premise"
+key = false
+
+[[models.members]]
+name = "quote"
 type = "felt252"
 key = false
 
@@ -792,30 +797,6 @@ key = false
 [[models.members]]
 name = "wager_lost"
 type = "u128"
-key = false
-
-[[models]]
-kind = "DojoModel"
-class_hash = "0x5b07225306c4fb77f18c7134acf7c56aa08d146bdaea9b47cd0f4eb5bf88dfc"
-original_class_hash = "0x5b07225306c4fb77f18c7134acf7c56aa08d146bdaea9b47cd0f4eb5bf88dfc"
-abi = "manifests/dev/deployment/abis/models/pistols-Snapshot-31acbedc.json"
-tag = "pistols-Snapshot"
-qualified_path = "pistols::models::challenge::snapshot"
-manifest_name = "pistols-Snapshot-31acbedc"
-
-[[models.members]]
-name = "duel_id"
-type = "u128"
-key = true
-
-[[models.members]]
-name = "score_a"
-type = "Score"
-key = false
-
-[[models.members]]
-name = "score_b"
-type = "Score"
 key = false
 
 [[models]]

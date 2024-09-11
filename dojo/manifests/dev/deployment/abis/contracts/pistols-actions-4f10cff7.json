@@ -245,6 +245,44 @@
   },
   {
     "type": "enum",
+    "name": "pistols::types::premise::Premise",
+    "variants": [
+      {
+        "name": "Null",
+        "type": "()"
+      },
+      {
+        "name": "Matter",
+        "type": "()"
+      },
+      {
+        "name": "Debt",
+        "type": "()"
+      },
+      {
+        "name": "Dispute",
+        "type": "()"
+      },
+      {
+        "name": "Honour",
+        "type": "()"
+      },
+      {
+        "name": "Hatred",
+        "type": "()"
+      },
+      {
+        "name": "Blood",
+        "type": "()"
+      },
+      {
+        "name": "Nothing",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "enum",
     "name": "core::bool",
     "variants": [
       {
@@ -364,35 +402,27 @@
         "type": "()"
       },
       {
-        "name": "CommonDamageUp",
+        "name": "DamageUp",
         "type": "()"
       },
       {
-        "name": "CommonDamageDown",
+        "name": "DamageDown",
         "type": "()"
       },
       {
-        "name": "CommonChancesUp",
+        "name": "ChancesUp",
         "type": "()"
       },
       {
-        "name": "CommonChancesDown",
+        "name": "ChancesDown",
         "type": "()"
       },
       {
-        "name": "UncommonDamageUp",
+        "name": "DoubleDamageUp",
         "type": "()"
       },
       {
-        "name": "UncommonDamageDown",
-        "type": "()"
-      },
-      {
-        "name": "UncommonChancesUp",
-        "type": "()"
-      },
-      {
-        "name": "UncommonChancesDown",
+        "name": "DoubleChancesUp",
         "type": "()"
       },
       {
@@ -448,7 +478,7 @@
         "type": "()"
       },
       {
-        "name": "Shoot",
+        "name": "Fire",
         "type": "pistols::types::cards::paces::PacesCard"
       },
       {
@@ -489,7 +519,7 @@
   },
   {
     "type": "struct",
-    "name": "pistols::types::duel_progress::DuelPace",
+    "name": "pistols::types::duel_progress::DuelStep",
     "members": [
       {
         "name": "pace",
@@ -523,11 +553,11 @@
   },
   {
     "type": "struct",
-    "name": "core::array::Span::<pistols::types::duel_progress::DuelPace>",
+    "name": "core::array::Span::<pistols::types::duel_progress::DuelStep>",
     "members": [
       {
         "name": "snapshot",
-        "type": "@core::array::Array::<pistols::types::duel_progress::DuelPace>"
+        "type": "@core::array::Array::<pistols::types::duel_progress::DuelStep>"
       }
     ]
   },
@@ -570,7 +600,7 @@
     "name": "pistols::types::cards::hand::PlayerHand",
     "members": [
       {
-        "name": "card_paces",
+        "name": "card_fire",
         "type": "pistols::types::cards::paces::PacesCard"
       },
       {
@@ -592,8 +622,8 @@
     "name": "pistols::types::duel_progress::DuelProgress",
     "members": [
       {
-        "name": "paces",
-        "type": "core::array::Span::<pistols::types::duel_progress::DuelPace>"
+        "name": "steps",
+        "type": "core::array::Span::<pistols::types::duel_progress::DuelStep>"
       },
       {
         "name": "winner",
@@ -682,7 +712,11 @@
             "type": "core::starknet::contract_address::ContractAddress"
           },
           {
-            "name": "message",
+            "name": "premise",
+            "type": "pistols::types::premise::Premise"
+          },
+          {
+            "name": "quote",
             "type": "core::felt252"
           },
           {
