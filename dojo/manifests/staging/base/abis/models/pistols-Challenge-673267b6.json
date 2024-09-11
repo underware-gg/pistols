@@ -368,7 +368,45 @@
   },
   {
     "type": "enum",
-    "name": "pistols::types::challenge::ChallengeState",
+    "name": "pistols::types::premise::Premise",
+    "variants": [
+      {
+        "name": "Null",
+        "type": "()"
+      },
+      {
+        "name": "Matter",
+        "type": "()"
+      },
+      {
+        "name": "Debt",
+        "type": "()"
+      },
+      {
+        "name": "Dispute",
+        "type": "()"
+      },
+      {
+        "name": "Honour",
+        "type": "()"
+      },
+      {
+        "name": "Hatred",
+        "type": "()"
+      },
+      {
+        "name": "Blood",
+        "type": "()"
+      },
+      {
+        "name": "Nothing",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "enum",
+    "name": "pistols::types::challenge_state::ChallengeState",
     "variants": [
       {
         "name": "Null",
@@ -417,7 +455,11 @@
         "type": "core::felt252"
       },
       {
-        "name": "message",
+        "name": "premise",
+        "type": "pistols::types::premise::Premise"
+      },
+      {
+        "name": "quote",
         "type": "core::felt252"
       },
       {
@@ -438,7 +480,7 @@
       },
       {
         "name": "state",
-        "type": "pistols::types::challenge::ChallengeState"
+        "type": "pistols::types::challenge_state::ChallengeState"
       },
       {
         "name": "round_number",

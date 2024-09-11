@@ -368,7 +368,7 @@
   },
   {
     "type": "enum",
-    "name": "pistols::types::round::RoundState",
+    "name": "pistols::types::round_state::RoundState",
     "variants": [
       {
         "name": "Null",
@@ -390,38 +390,10 @@
   },
   {
     "type": "struct",
-    "name": "pistols::models::challenge::Shot",
+    "name": "pistols::models::challenge::PlayerState",
     "members": [
       {
-        "name": "hash",
-        "type": "core::integer::u64"
-      },
-      {
-        "name": "salt",
-        "type": "core::integer::u64"
-      },
-      {
-        "name": "action",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "chance_crit",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "chance_hit",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "chance_lethal",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "dice_crit",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "dice_hit",
+        "name": "health",
         "type": "core::integer::u8"
       },
       {
@@ -429,23 +401,61 @@
         "type": "core::integer::u8"
       },
       {
-        "name": "block",
+        "name": "chances",
         "type": "core::integer::u8"
       },
       {
-        "name": "win",
+        "name": "dice_crit",
         "type": "core::integer::u8"
+      },
+      {
+        "name": "honour",
+        "type": "core::integer::u8"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "pistols::models::challenge::Shot",
+    "members": [
+      {
+        "name": "salt",
+        "type": "core::felt252"
+      },
+      {
+        "name": "hash",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "card_1",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "card_2",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "card_3",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "card_4",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "state_start",
+        "type": "pistols::models::challenge::PlayerState"
+      },
+      {
+        "name": "state_final",
+        "type": "pistols::models::challenge::PlayerState"
       },
       {
         "name": "wager",
         "type": "core::integer::u8"
       },
       {
-        "name": "health",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "honour",
+        "name": "win",
         "type": "core::integer::u8"
       }
     ]
@@ -464,7 +474,7 @@
       },
       {
         "name": "state",
-        "type": "pistols::types::round::RoundState"
+        "type": "pistols::types::round_state::RoundState"
       },
       {
         "name": "shot_a",

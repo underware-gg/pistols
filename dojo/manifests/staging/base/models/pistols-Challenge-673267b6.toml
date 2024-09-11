@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x175b75603aa17cfa02fc93ac713a5ff362a70af824deec9caef884235ed0c36"
-original_class_hash = "0x175b75603aa17cfa02fc93ac713a5ff362a70af824deec9caef884235ed0c36"
+class_hash = "0x569a86ac1cd015f67abf0348fda631125b7ce840b338c0d3d4b24e4f4793688"
+original_class_hash = "0x569a86ac1cd015f67abf0348fda631125b7ce840b338c0d3d4b24e4f4793688"
 abi = "manifests/staging/base/abis/models/pistols-Challenge-673267b6.json"
 tag = "pistols-Challenge"
 qualified_path = "pistols::models::challenge::challenge"
@@ -17,7 +17,12 @@ type = "felt252"
 key = false
 
 [[members]]
-name = "message"
+name = "premise"
+type = "Premise"
+key = false
+
+[[members]]
+name = "quote"
 type = "felt252"
 key = false
 

@@ -4,7 +4,7 @@ class_hash = "0xa349b743d361ce4567361475a89b84a386bb383448c6926954e5fe0b525597"
 original_class_hash = "0xa349b743d361ce4567361475a89b84a386bb383448c6926954e5fe0b525597"
 abi = "manifests/staging/deployment/abis/dojo-world.json"
 address = "0xf1bac654f4a642efd8f56d0656f331ead7c01fedc8e659dd4b8ef45a98d15"
-transaction_hash = "0x79e66be1ddbb3c77c4d87d11640b32ca0b05eb0af56a44a7619dfcbff58b063"
+transaction_hash = "0x6ccc3562ba7d3627b6dde1254f1e40962e5d132eef36c46d6966add085f394a"
 block_number = 3
 seed = "pistols"
 manifest_name = "dojo-world"
@@ -24,8 +24,8 @@ manifest_name = "dojo-base"
 [[contracts]]
 kind = "DojoContract"
 address = "0x7a1738a7523d803d4246aa05738b3fd8a39e3700107687705222abdecbef4d1"
-class_hash = "0x392bac8712be3f0ee2b1445c69507e4cb94d9480aad04c263e8ee7c4c7bb40e"
-original_class_hash = "0x392bac8712be3f0ee2b1445c69507e4cb94d9480aad04c263e8ee7c4c7bb40e"
+class_hash = "0x376c309325bbbda3f588535a79857aea27d0ffcd9c8ea0207ea3c1b11a4296a"
+original_class_hash = "0x376c309325bbbda3f588535a79857aea27d0ffcd9c8ea0207ea3c1b11a4296a"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/staging/deployment/abis/contracts/pistols-actions-4f10cff7.json"
 reads = []
@@ -33,7 +33,6 @@ writes = [
     "pistols-Duelist",
     "pistols-Scoreboard",
     "pistols-Challenge",
-    "pistols-Snapshot",
     "pistols-Wager",
     "pistols-Pact",
     "pistols-Round",
@@ -41,8 +40,8 @@ writes = [
 init_calldata = []
 tag = "pistols-actions"
 systems = [
-    "commit_action",
-    "reveal_action",
+    "commit_moves",
+    "reveal_moves",
     "_emitDuelistRegisteredEvent",
     "_emitNewChallengeEvent",
     "_emitChallengeAcceptedEvent",
@@ -55,8 +54,8 @@ manifest_name = "pistols-actions-4f10cff7"
 [[contracts]]
 kind = "DojoContract"
 address = "0x690dc6e1e897f3b459b486dc7d52f4b2d9eda90ffd6c8eaaab210b0ee1fc22f"
-class_hash = "0x28c6426adc252458e8298da3c66c9dff1c6d79a912754847fc8775b7bd0fd3f"
-original_class_hash = "0x28c6426adc252458e8298da3c66c9dff1c6d79a912754847fc8775b7bd0fd3f"
+class_hash = "0x73f616f8e0e54f3c774163db0e00da8a0185446cc4ed568d768cd68ce430de7"
+original_class_hash = "0x73f616f8e0e54f3c774163db0e00da8a0185446cc4ed568d768cd68ce430de7"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/staging/deployment/abis/contracts/pistols-admin-36fd2037.json"
 reads = []
@@ -107,8 +106,8 @@ manifest_name = "pistols-lords_mock-2b1156e6"
 [[contracts]]
 kind = "DojoContract"
 address = "0x236963735ef7caebcef2a2165bac26f112d628c0fc512d9be144269a2b31d86"
-class_hash = "0x64634471f3ceca08ceddc491e5d31155cf5049de4f2999d3addee2286cb0d55"
-original_class_hash = "0x64634471f3ceca08ceddc491e5d31155cf5049de4f2999d3addee2286cb0d55"
+class_hash = "0x6d2149467872cb1bf564e3e761f9f02a7dd271b745671d4ff79d6d96840e719"
+original_class_hash = "0x6d2149467872cb1bf564e3e761f9f02a7dd271b745671d4ff79d6d96840e719"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/staging/deployment/abis/contracts/pistols-minter-7b759538.json"
 reads = []
@@ -125,9 +124,23 @@ manifest_name = "pistols-minter-7b759538"
 
 [[contracts]]
 kind = "DojoContract"
+address = "0x676bfe437e5fc187542dc857895436e5c8a722277c771486013ad8ade9d4968"
+class_hash = "0x1bf6b257fce6ab8a04c8bb6b5a5269bd6880d5c95a874b85a9aadbdee7e404e"
+original_class_hash = "0x1bf6b257fce6ab8a04c8bb6b5a5269bd6880d5c95a874b85a9aadbdee7e404e"
+base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
+abi = "manifests/staging/deployment/abis/contracts/pistols-rng-13f1a6a9.json"
+reads = []
+writes = []
+init_calldata = []
+tag = "pistols-rng"
+systems = []
+manifest_name = "pistols-rng-13f1a6a9"
+
+[[contracts]]
+kind = "DojoContract"
 address = "0x754c05696514279d98530b1c8aa40d87db0b4673bc86d14ce5cac5ac1112cd5"
-class_hash = "0x4acc3c0e16e5dce496c22e49430fd1c44bd48081c654f54408a04b26d687ac7"
-original_class_hash = "0x4acc3c0e16e5dce496c22e49430fd1c44bd48081c654f54408a04b26d687ac7"
+class_hash = "0x7612f3f51e93bb6e4c471aa4f6faf5a0d28c20297fc0a78e589572e99317a90"
+original_class_hash = "0x7612f3f51e93bb6e4c471aa4f6faf5a0d28c20297fc0a78e589572e99317a90"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/staging/deployment/abis/contracts/pistols-token_duelist-541e9c18.json"
 reads = []
@@ -559,8 +572,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x175b75603aa17cfa02fc93ac713a5ff362a70af824deec9caef884235ed0c36"
-original_class_hash = "0x175b75603aa17cfa02fc93ac713a5ff362a70af824deec9caef884235ed0c36"
+class_hash = "0x569a86ac1cd015f67abf0348fda631125b7ce840b338c0d3d4b24e4f4793688"
+original_class_hash = "0x569a86ac1cd015f67abf0348fda631125b7ce840b338c0d3d4b24e4f4793688"
 abi = "manifests/staging/deployment/abis/models/pistols-Challenge-673267b6.json"
 tag = "pistols-Challenge"
 qualified_path = "pistols::models::challenge::challenge"
@@ -577,7 +590,12 @@ type = "felt252"
 key = false
 
 [[models.members]]
-name = "message"
+name = "premise"
+type = "Premise"
+key = false
+
+[[models.members]]
+name = "quote"
 type = "felt252"
 key = false
 
@@ -715,8 +733,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x301ceb1e325561b80a7c8b49e71b09b062f79f0075a1d46ce00697db24771d2"
-original_class_hash = "0x301ceb1e325561b80a7c8b49e71b09b062f79f0075a1d46ce00697db24771d2"
+class_hash = "0x65d79e26974411659e3688c73bdf4602efb3917c82b5bedc0a53d2a0a8d6ce7"
+original_class_hash = "0x65d79e26974411659e3688c73bdf4602efb3917c82b5bedc0a53d2a0a8d6ce7"
 abi = "manifests/staging/deployment/abis/models/pistols-Round-617e0a3d.json"
 tag = "pistols-Round"
 qualified_path = "pistols::models::challenge::round"
@@ -779,30 +797,6 @@ key = false
 [[models.members]]
 name = "wager_lost"
 type = "u128"
-key = false
-
-[[models]]
-kind = "DojoModel"
-class_hash = "0x5b07225306c4fb77f18c7134acf7c56aa08d146bdaea9b47cd0f4eb5bf88dfc"
-original_class_hash = "0x5b07225306c4fb77f18c7134acf7c56aa08d146bdaea9b47cd0f4eb5bf88dfc"
-abi = "manifests/staging/deployment/abis/models/pistols-Snapshot-31acbedc.json"
-tag = "pistols-Snapshot"
-qualified_path = "pistols::models::challenge::snapshot"
-manifest_name = "pistols-Snapshot-31acbedc"
-
-[[models.members]]
-name = "duel_id"
-type = "u128"
-key = true
-
-[[models.members]]
-name = "score_a"
-type = "Score"
-key = false
-
-[[models.members]]
-name = "score_b"
-type = "Score"
 key = false
 
 [[models]]
