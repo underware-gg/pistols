@@ -2,8 +2,12 @@ use starknet::ContractAddress;
 use pistols::models::duelist::{Score};
 use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round_state::{RoundState, RoundStateTrait};
-use pistols::types::cards::paces::{PacesCard, PacesCardTrait};
 use pistols::types::premise::{Premise, PremiseTrait};
+use pistols::types::cards::{
+    paces::{PacesCard, PacesCardTrait},
+    tactics::{TacticsCard, TacticsCardTrait},
+    blades::{BladesCard, BladesCardTrait},
+};
 
 //-------------------------
 // Challenge lifecycle
@@ -63,10 +67,10 @@ struct Shot {
     // player input
     salt: felt252,      // the player's secret salt
     hash: u128,         // hashed moves (salt + moves)
-    card_1: u8,         // card choice
-    card_2: u8,         // card choice
-    card_3: u8,         // card choice
-    card_4: u8,         // card choice
+    card_fire: PacesCard,
+    card_dodge: PacesCard,
+    card_tactics: TacticsCard,
+    card_blades: BladesCard,
     // player states
     state_start: PlayerState,
     state_final: PlayerState,
@@ -106,20 +110,19 @@ impl RoundImpl of RoundTrait {
 impl ShotImpl of ShotTrait {
     fn initialize(ref self: Shot, salt: felt252, moves: Span<u8>) {
         self.salt = salt;
-        self.card_1 = moves.value_or_zero(0);
-        self.card_2 = moves.value_or_zero(1);
-        self.card_3 = moves.value_or_zero(2);
-        self.card_4 = moves.value_or_zero(3);
-        let paces_shoot: PacesCard = self.card_1.into();
-        self.state_start.initialize(paces_shoot);
-        self.state_final.initialize(paces_shoot);
+        self.card_fire = moves.value_or_zero(0).into();
+        self.card_dodge = moves.value_or_zero(1).into();
+        self.card_tactics = moves.value_or_zero(2).into();
+        self.card_blades = moves.value_or_zero(3).into();
+        self.state_start.initialize(self.card_fire);
+        self.state_final.initialize(self.card_fire);
     }
     fn as_hand(self: @Shot) -> PlayerHand {
         (PlayerHand {
-            card_fire: (*self.card_1).into(),
-            card_dodge: (*self.card_2).into(),
-            card_tactics: (*self.card_3).into(),
-            card_blades: (*self.card_4).into(),
+            card_fire: *self.card_fire,
+            card_dodge: *self.card_dodge,
+            card_tactics: *self.card_tactics,
+            card_blades: *self.card_blades,
         })
     }
 }

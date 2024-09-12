@@ -4,15 +4,20 @@
 //
 mod init {
     use pistols::models::{challenge, duelist};
+    use pistols::types::cards::{
+        paces::{PacesCard},
+        tactics::{TacticsCard},
+        blades::{BladesCard},
+    };
 
     fn Shot() -> challenge::Shot {
         (challenge::Shot {
             hash: 0,
             salt: 0,
-            card_1: 0,
-            card_2: 0,
-            card_3: 0,
-            card_4: 0,
+            card_fire: PacesCard::None,
+            card_dodge: PacesCard::None,
+            card_tactics: TacticsCard::None,
+            card_blades: BladesCard::None,
             state_start: PlayerState(),
             state_final: PlayerState(),
             wager: 0,
