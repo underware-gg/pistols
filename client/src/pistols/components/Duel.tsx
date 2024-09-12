@@ -286,7 +286,16 @@ function DuelProgress({
   const [didReveal, setDidReveal] = useState(false)
   const [commitModalIsOpen, setCommitModalIsOpen] = useState(false)
   const { reveal, canReveal } = useRevealAction(duelId, roundNumber, tableId, round1Shot?.hash, duelStage == DuelStage.Round1Reveal)
-  console.log(`COMMIT:`, duelStage, completedStages[duelStage], completedStages, round1)
+
+
+  // useEffect(() => {
+  //   console.log(`COMMIT:`, duelStage, completedStages[duelStage], completedStages, round1)
+  // }, [duelStage, completedStages, round1])
+  // useEffect(() => { console.log(`+duelStage`) }, [duelStage])
+  // useEffect(() => { console.log(`+completedStages`) }, [completedStages])
+  // useEffect(() => { console.log(`+round1`) }, [round1])
+
+  
   const onClick = useCallback(() => {
     if (isYou && isConnected && completedStages[duelStage] === false) {
       if (duelStage == DuelStage.Round1Commit) {
