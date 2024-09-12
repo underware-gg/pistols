@@ -32,7 +32,7 @@ mod tests {
         prefabs::{
             SALT_A, SALT_B, TABLE_ID, MESSAGE, WAGER_VALUE,
             SaltsValues, SaltsValuesTrait,
-            Moves, MovesTrait,
+            PlayerMoves, PlayerMovesTrait,
         },
     };
     use pistols::tests::mock_rng::{IRngDispatcher, IRngDispatcherTrait};
@@ -54,33 +54,33 @@ mod tests {
         assert(progress.hand_a.card_dodge.into() == moves_a.value_or_zero(1), 'moves_a_1');
         assert(progress.hand_a.card_tactics.into() == moves_a.value_or_zero(2), 'moves_a_2');
         assert(progress.hand_a.card_blades.into() == moves_a.value_or_zero(3), 'moves_a_3');
-        assert(progress.hand_a.card_fire == round.shot_a.card_fire, 'hand_a.card_fire');
-        assert(progress.hand_a.card_dodge == round.shot_a.card_dodge, 'hand_a.card_fire');
-        assert(progress.hand_a.card_tactics == round.shot_a.card_tactics, 'hand_a.card_fire');
-        assert(progress.hand_a.card_blades == round.shot_a.card_blades, 'hand_a.card_fire');
+        assert(progress.hand_a.card_fire == round.moves_a.card_fire, 'hand_a.card_fire');
+        assert(progress.hand_a.card_dodge == round.moves_a.card_dodge, 'hand_a.card_fire');
+        assert(progress.hand_a.card_tactics == round.moves_a.card_tactics, 'hand_a.card_fire');
+        assert(progress.hand_a.card_blades == round.moves_a.card_blades, 'hand_a.card_fire');
         // hand_b
         assert(progress.hand_b.card_fire.into() == moves_b.value_or_zero(0), 'moves_b_0');
         assert(progress.hand_b.card_dodge.into() == moves_b.value_or_zero(1), 'moves_b_1');
         assert(progress.hand_b.card_tactics.into() == moves_b.value_or_zero(2), 'moves_b_2');
         assert(progress.hand_b.card_blades.into() == moves_b.value_or_zero(3), 'moves_b_3');
-        assert(progress.hand_b.card_fire == round.shot_b.card_fire, 'hand_b.card_fire');
-        assert(progress.hand_b.card_dodge == round.shot_b.card_dodge, 'hand_b.card_fire');
-        assert(progress.hand_b.card_tactics == round.shot_b.card_tactics, 'hand_b.card_fire');
-        assert(progress.hand_b.card_blades == round.shot_b.card_blades, 'hand_b.card_fire');
-        // shot_a.state_final
-        assert(final_pace.state_a.health == round.shot_a.state_final.health, 'state_final_b.health');
-        assert(final_pace.state_a.damage == round.shot_a.state_final.damage, 'state_final_b.damage');
-        assert(final_pace.state_a.chances == round.shot_a.state_final.chances, 'state_final_b.chances');
-        assert(final_pace.state_a.dice_crit == round.shot_a.state_final.dice_crit, 'state_final_b.dice_crit');
-        // shot_b.state_final
-        assert(final_pace.state_b.health == round.shot_b.state_final.health, 'state_final_b.health');
-        assert(final_pace.state_b.damage == round.shot_b.state_final.damage, 'state_final_b.damage');
-        assert(final_pace.state_b.chances == round.shot_b.state_final.chances, 'state_final_b.chances');
-        assert(final_pace.state_b.dice_crit == round.shot_b.state_final.dice_crit, 'state_final_b.dice_crit');
+        assert(progress.hand_b.card_fire == round.moves_b.card_fire, 'hand_b.card_fire');
+        assert(progress.hand_b.card_dodge == round.moves_b.card_dodge, 'hand_b.card_fire');
+        assert(progress.hand_b.card_tactics == round.moves_b.card_tactics, 'hand_b.card_fire');
+        assert(progress.hand_b.card_blades == round.moves_b.card_blades, 'hand_b.card_fire');
+        // state_a
+        assert(final_pace.state_a.health == round.state_a.health, 'state_final_b.health');
+        assert(final_pace.state_a.damage == round.state_a.damage, 'state_final_b.damage');
+        assert(final_pace.state_a.chances == round.state_a.chances, 'state_final_b.chances');
+        assert(final_pace.state_a.dice_crit == round.state_a.dice_crit, 'state_final_b.dice_crit');
+        // state_b
+        assert(final_pace.state_b.health == round.state_b.health, 'state_final_b.health');
+        assert(final_pace.state_b.damage == round.state_b.damage, 'state_final_b.damage');
+        assert(final_pace.state_b.chances == round.state_b.chances, 'state_final_b.chances');
+        assert(final_pace.state_b.dice_crit == round.state_b.dice_crit, 'state_final_b.dice_crit');
     }
 
 
-    fn _test_resolved_draw(salts: SaltsValues, moves_a: Moves, moves_b: Moves, final_health: u8) {
+    fn _test_resolved_draw(salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves, final_health: u8) {
         let sys = tester::setup_world(FLAGS::ACTIONS | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         sys.rng.set_salts(salts.salts, salts.values);
 
@@ -102,14 +102,14 @@ mod tests {
         tester::execute_reveal_moves(@sys.actions, OTHER(), duel_id, 1, moves_b.salt, moves_b.moves);
         let (challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
 // challenge.winner.print();
-// round.shot_a.state_final.health.print();
-// round.shot_b.state_final.health.print();
+// round.state_a.health.print();
+// round.state_b.health.print();
         assert(challenge.state == ChallengeState::Draw, 'challenge.state');
         assert(challenge.winner == 0, 'challenge.winner');
         assert(challenge.round_number == 1, 'challenge.round_number');
         assert(round.state == RoundState::Finished, 'round.state');
-        assert(round.shot_a.state_final.health == final_health, 'round.shot_a.health');
-        assert(round.shot_b.state_final.health == final_health, 'round.shot_b.health');
+        assert(round.state_a.health == final_health, 'round.moves_a.health');
+        assert(round.state_b.health == final_health, 'round.moves_b.health');
 
         let duelist_a = tester::get_DuelistEntity(sys.world, OWNER());
         let duelist_b = tester::get_DuelistEntity(sys.world, OTHER());
@@ -164,7 +164,7 @@ mod tests {
     // Single Round Resolved (paces only)
     //
 
-    fn _test_resolved_win(salts: SaltsValues, moves_a: Moves, moves_b: Moves, winner: u8) {
+    fn _test_resolved_win(salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves, winner: u8) {
         let sys = tester::setup_world(FLAGS::ACTIONS | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         sys.rng.set_salts(salts.salts, salts.values);
 
@@ -187,46 +187,46 @@ mod tests {
         let (challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
         assert(challenge.round_number == 1, '1__challenge.round_number');
         assert(round.state == RoundState::Commit, '1__state');
-        assert(round.shot_a.hash == moves_a.hash, '1__hash');
+        assert(round.moves_a.hash == moves_a.hash, '1__hash');
 
         // 2nd commit > Reveal
         tester::execute_commit_moves(@sys.actions, OTHER(), duel_id, 1, moves_b.hash);
         let (challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
         assert(challenge.round_number == 1, '2__challenge.round_number');
         assert(round.state == RoundState::Reveal, '2__state');
-        assert(round.shot_a.hash == moves_a.hash, '21__hash');
-        assert(round.shot_b.hash == moves_b.hash, '2__hash');
+        assert(round.moves_a.hash == moves_a.hash, '21__hash');
+        assert(round.moves_b.hash == moves_b.hash, '2__hash');
 
         // 1st reveal
         tester::execute_reveal_moves(@sys.actions, OWNER(), duel_id, 1, moves_a.salt, moves_a.moves);
         let (challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
         assert(challenge.round_number == 1, '3_challenge.round_number');
         assert(round.state == RoundState::Reveal, '3__state');
-        assert(round.shot_a.hash == moves_a.hash, '3__hash');
-        assert(round.shot_a.salt == moves_a.salt, '3__salt');
-        assert(round.shot_a.card_fire.into() == *moves_a.moves[0], '3__card_fire');
-        assert(round.shot_a.card_dodge.into() == *moves_a.moves[1], '3__card_dodge');
+        assert(round.moves_a.hash == moves_a.hash, '3__hash');
+        assert(round.moves_a.salt == moves_a.salt, '3__salt');
+        assert(round.moves_a.card_fire.into() == *moves_a.moves[0], '3__card_fire');
+        assert(round.moves_a.card_dodge.into() == *moves_a.moves[1], '3__card_dodge');
 
         // 2nd reveal > Finished
         tester::execute_reveal_moves(@sys.actions, OTHER(), duel_id, 1, moves_b.salt, moves_b.moves);
         let (challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
 // challenge.winner.print();
 // // challenge.state.print();
-// round.shot_a.state_final.health.print();
-// round.shot_b.state_final.health.print();
+// round.state_a.health.print();
+// round.state_b.health.print();
         assert(challenge.state == ChallengeState::Resolved, '4_challenge.state');
         assert(challenge.winner != 0, '4_challenge.winner');
         assert(challenge.round_number == 1, '4_challenge.round_number');
         assert(challenge.timestamp_end > 0, '4_challenge.timestamp_end');
         assert(round.state == RoundState::Finished, '4__state');
-        assert(round.shot_a.hash == moves_a.hash, '43__hash');
-        assert(round.shot_a.salt == moves_a.salt, '43__salt');
-        assert(round.shot_a.card_fire.into() == *moves_a.moves[0], '43__card_fire');
-        assert(round.shot_a.card_dodge.into() == *moves_a.moves[1], '43__card_dodge');
-        assert(round.shot_b.hash == moves_b.hash, '4__hash');
-        assert(round.shot_b.salt == moves_b.salt, '4__salt');
-        assert(round.shot_b.card_fire.into() == *moves_b.moves[0], '4__card_fire');
-        assert(round.shot_b.card_dodge.into() == *moves_b.moves[1], '4__card_dodge');
+        assert(round.moves_a.hash == moves_a.hash, '43__hash');
+        assert(round.moves_a.salt == moves_a.salt, '43__salt');
+        assert(round.moves_a.card_fire.into() == *moves_a.moves[0], '43__card_fire');
+        assert(round.moves_a.card_dodge.into() == *moves_a.moves[1], '43__card_dodge');
+        assert(round.moves_b.hash == moves_b.hash, '4__hash');
+        assert(round.moves_b.salt == moves_b.salt, '4__salt');
+        assert(round.moves_b.card_fire.into() == *moves_b.moves[0], '4__card_fire');
+        assert(round.moves_b.card_dodge.into() == *moves_b.moves[1], '4__card_dodge');
 
         let duelist_a = tester::get_DuelistEntity(sys.world, OWNER());
         let duelist_b = tester::get_DuelistEntity(sys.world, OTHER());
@@ -243,19 +243,19 @@ mod tests {
             assert(duelist_b.score.total_wins == 0, 'a_win_duelist_b.total_wins');
             assert(duelist_a.score.total_losses == 0, 'a_win_duelist_a.total_losses');
             assert(duelist_b.score.total_losses == 1, 'a_win_duelist_b.total_losses');
-            assert(round.shot_a.state_final.damage == CONST::FULL_HEALTH, 'a_win_damage_a');
-            assert(round.shot_a.state_final.health == CONST::FULL_HEALTH, 'a_win_health_a');
-            // assert(round.shot_b.damage == CONST::FULL_HEALTH, 'a_win_damage_b');
-            assert(round.shot_b.state_final.health == 0, 'a_win_health_b');
+            assert(round.state_a.damage == CONST::FULL_HEALTH, 'a_win_damage_a');
+            assert(round.state_a.health == CONST::FULL_HEALTH, 'a_win_health_a');
+            // assert(round.moves_b.damage == CONST::FULL_HEALTH, 'a_win_damage_b');
+            assert(round.state_b.health == 0, 'a_win_health_b');
         } else if (winner == 2) {
             assert(duelist_a.score.total_wins == 0, 'b_win_duelist_a.total_wins');
             assert(duelist_b.score.total_wins == 1, 'b_win_duelist_b.total_wins');
             assert(duelist_a.score.total_losses == 1, 'b_win_duelist_a.total_losses');
             assert(duelist_b.score.total_losses == 0, 'b_win_duelist_b.total_losses');
-            assert(round.shot_b.state_final.damage == CONST::FULL_HEALTH, 'b_win_damage_b');
-            assert(round.shot_b.state_final.health == CONST::FULL_HEALTH, 'b_win_health_b');
-            // assert(round.shot_a.damage == CONST::FULL_HEALTH, 'b_win_damage_a');
-            assert(round.shot_a.state_final.health == 0, 'b_win_health_a');
+            assert(round.state_b.damage == CONST::FULL_HEALTH, 'b_win_damage_b');
+            assert(round.state_b.health == CONST::FULL_HEALTH, 'b_win_health_b');
+            // assert(round.moves_a.damage == CONST::FULL_HEALTH, 'b_win_damage_a');
+            assert(round.state_a.health == 0, 'b_win_health_a');
         } else {
             assert(false, 'bad winner')
         }

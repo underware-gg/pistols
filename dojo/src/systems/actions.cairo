@@ -100,7 +100,7 @@ mod actions {
         WorldSystemsTrait,
         IMinterDispatcher, IMinterDispatcherTrait,
     };
-    use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, Shot};
+    use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, Moves};
     use pistols::models::duelist::{Duelist, DuelistTrait, ProfilePicType, Archetype, Score, Pact, DuelistHelper, DuelistHelperTrait};
     use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableAdmittanceEntity, TableAdmittanceEntityTrait, TableType, TABLES};
     use pistols::models::init::{init};

@@ -251,23 +251,23 @@ function RoundStats({
         </Body>
       </Table>
 
-      <ShotStats shot={round.shot_a} shotNumber='A' title={nameA} />
-      <ShotStats shot={round.shot_b} shotNumber='B' title={nameB} />
+      <MovesStats moves={round.moves_a} movesNumber='A' title={nameA} />
+      <MovesStats moves={round.moves_b} movesNumber='B' title={nameB} />
     </>
   )
 }
 
-function ShotStats({
-  shotNumber,
+function MovesStats({
+  movesNumber,
   title,
-  shot,
+  moves,
 }) {
   return (
     <>
       <Table attached='top'>
         <Header fullWidth>
           <Row>
-            <HeaderCell width={4}><h5>Shot {shotNumber}</h5></HeaderCell>
+            <HeaderCell width={4}><h5>Moves {movesNumber}</h5></HeaderCell>
             <HeaderCell><h5>{title}</h5></HeaderCell>
           </Row>
         </Header>
@@ -276,37 +276,37 @@ function ShotStats({
           <Row>
             <Cell>Hash</Cell>
             <Cell>
-              {bigintToHex(shot.hash)}
+              {bigintToHex(moves.hash)}
             </Cell>
           </Row>
           <Row>
             <Cell>Salt</Cell>
             <Cell>
-              {bigintToHex(shot.salt)}
+              {bigintToHex(moves.salt)}
             </Cell>
           </Row>
           <Row>
             <Cell>Action</Cell>
             <Cell>
-              {shot.action}: {ActionNames[shot.action]} {ActionEmojis[shot.action]}
+              {moves.action}: {ActionNames[moves.action]} {ActionEmojis[moves.action]}
             </Cell>
           </Row>
           <Row>
             <Cell>Crit</Cell>
             <Cell>
-              🎲 {shot.dice_crit} / {shot.chance_crit} %
+              🎲 {moves.dice_crit} / {moves.chance_crit} %
             </Cell>
           </Row>
           <Row>
             <Cell>Hit</Cell>
             <Cell>
-              🎲 {shot.dice_hit} / {shot.chance_hit} %
+              🎲 {moves.dice_hit} / {moves.chance_hit} %
             </Cell>
           </Row>
           <Row>
             <Cell>Lethal</Cell>
             <Cell>
-              🎲 {shot.chance_lethal > 0 ? shot.dice_hit : 0} / {shot.chance_lethal} %
+              🎲 {moves.chance_lethal > 0 ? moves.dice_hit : 0} / {moves.chance_lethal} %
             </Cell>
           </Row>
         </Body>
@@ -326,12 +326,12 @@ function ShotStats({
 
         <Body>
           <Row textAlign='center'>
-            <Cell>{shot.damage}</Cell>
-            <Cell>{shot.block}</Cell>
-            <Cell>{shot.health}</Cell>
-            <Cell>{shot.honour}</Cell>
-            <Cell>{shot.win}</Cell>
-            <Cell>{shot.wager}</Cell>
+            <Cell>{moves.damage}</Cell>
+            <Cell>{moves.block}</Cell>
+            <Cell>{moves.health}</Cell>
+            <Cell>{moves.honour}</Cell>
+            <Cell>{moves.win}</Cell>
+            <Cell>{moves.wager}</Cell>
           </Row>
         </Body>
       </Table>

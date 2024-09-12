@@ -101,6 +101,11 @@ use debug::PrintTrait;
 use core::fmt::{Display, Formatter, Error};
 use pistols::utils::short_string::{ShortStringTrait};
 
+impl BladesCardDefault of Default<BladesCard> {
+    fn default() -> BladesCard {(BladesCard::None)}
+}
+
+
 impl BladesCardIntoU8 of Into<BladesCard, u8> {
     fn into(self: BladesCard) -> u8 {
         match self {

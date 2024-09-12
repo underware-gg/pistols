@@ -50,7 +50,7 @@ mod prefabs {
     }
 
     #[derive(Copy, Drop)]
-    pub struct Moves {
+    pub struct PlayerMoves {
         salt: felt252,
         moves: Span<u8>,
         hash: u128,
@@ -67,9 +67,9 @@ mod prefabs {
     }
 
     #[generate_trait]
-    impl MovesImpl of MovesTrait {
-        fn new(salt: felt252, moves: Span<u8>) -> Moves {
-            (Moves{salt, moves, hash: make_moves_hash(salt, moves)})
+    impl PlayerMovesImpl of PlayerMovesTrait {
+        fn new(salt: felt252, moves: Span<u8>) -> PlayerMoves {
+            (PlayerMoves{salt, moves, hash: make_moves_hash(salt, moves)})
         }
     }
 
@@ -93,7 +93,7 @@ mod prefabs {
         (challenge, round, duel_id)
     }
 
-    fn commit_reveal_get(sys: Systems, duel_id: u128, duelist_a: ContractAddress, duelist_b: ContractAddress, salts: SaltsValues, moves_a: Moves, moves_b: Moves) -> (ChallengeEntity, RoundEntity) {
+    fn commit_reveal_get(sys: Systems, duel_id: u128, duelist_a: ContractAddress, duelist_b: ContractAddress, salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves) -> (ChallengeEntity, RoundEntity) {
         @sys.rng.set_salts(salts.salts, salts.values);
         tester::execute_commit_moves(@sys.actions, duelist_a, duel_id, 1, moves_a.hash);
         tester::execute_commit_moves(@sys.actions, duelist_b, duel_id, 1, moves_b.hash);
@@ -104,18 +104,18 @@ mod prefabs {
     }
 
 
-    fn get_moves_custom(moves_a: Span<u8>, moves_b: Span<u8>) -> (SaltsValues, Moves, Moves) {
+    fn get_moves_custom(moves_a: Span<u8>, moves_b: Span<u8>) -> (SaltsValues, PlayerMoves, PlayerMoves) {
         (
             SaltsValues{
                 salts: ['shoot_a', 'shoot_b', 'env_1'].span(),
                 values: [1, 1, ENV_CARD_NEUTRAL].span(),
             },
-            MovesTrait::new(SALT_A, moves_a),
-            MovesTrait::new(SALT_B, moves_b),
+            PlayerMovesTrait::new(SALT_A, moves_a),
+            PlayerMovesTrait::new(SALT_B, moves_b),
         )
     }
 
-    fn get_moves_dual_miss() -> (SaltsValues, Moves, Moves) {
+    fn get_moves_dual_miss() -> (SaltsValues, PlayerMoves, PlayerMoves) {
         let moves_a: Span<u8> = [1, 2].span();
         let moves_b: Span<u8> = [1, 2].span();
         (
@@ -123,12 +123,12 @@ mod prefabs {
                 salts: ['shoot_a', 'shoot_b', 'env_1'].span(),
                 values: [100, 100, ENV_CARD_MISS].span(),
             },
-            MovesTrait::new(SALT_A, moves_a),
-            MovesTrait::new(SALT_B, moves_b),
+            PlayerMovesTrait::new(SALT_A, moves_a),
+            PlayerMovesTrait::new(SALT_B, moves_b),
         )
     }
 
-    fn get_moves_dual_crit() -> (SaltsValues, Moves, Moves) {
+    fn get_moves_dual_crit() -> (SaltsValues, PlayerMoves, PlayerMoves) {
         let moves_a: Span<u8> = [1, 2].span();
         let moves_b: Span<u8> = [1, 2].span();
         (
@@ -136,12 +136,12 @@ mod prefabs {
                 salts: ['shoot_a', 'shoot_b', 'env_1'].span(),
                 values: [1, 1, ENV_CARD_CRIT].span(),
             },
-            MovesTrait::new(SALT_A, moves_a),
-            MovesTrait::new(SALT_B, moves_b),
+            PlayerMovesTrait::new(SALT_A, moves_a),
+            PlayerMovesTrait::new(SALT_B, moves_b),
         )
     }
 
-    fn get_moves_crit_a() -> (SaltsValues, Moves, Moves) {
+    fn get_moves_crit_a() -> (SaltsValues, PlayerMoves, PlayerMoves) {
         let moves_a: Span<u8> = [1, 2].span();
         let moves_b: Span<u8> = [2, 3].span();
         (
@@ -149,12 +149,12 @@ mod prefabs {
                 salts: ['shoot_a', 'shoot_b', 'env_1'].span(),
                 values: [1, 100, ENV_CARD_CRIT].span(),
             },
-            MovesTrait::new(SALT_A, moves_a),
-            MovesTrait::new(SALT_B, moves_b),
+            PlayerMovesTrait::new(SALT_A, moves_a),
+            PlayerMovesTrait::new(SALT_B, moves_b),
         )
     }
 
-    fn get_moves_crit_b() -> (SaltsValues, Moves, Moves) {
+    fn get_moves_crit_b() -> (SaltsValues, PlayerMoves, PlayerMoves) {
         let moves_a: Span<u8> = [2, 3].span();
         let moves_b: Span<u8> = [1, 2].span();
         (
@@ -162,8 +162,8 @@ mod prefabs {
                 salts: ['shoot_a', 'shoot_b', 'env_1'].span(),
                 values: [100, 1, ENV_CARD_CRIT].span(),
             },
-            MovesTrait::new(SALT_A, moves_a),
-            MovesTrait::new(SALT_B, moves_b),
+            PlayerMovesTrait::new(SALT_A, moves_a),
+            PlayerMovesTrait::new(SALT_B, moves_b),
         )
     }
 

@@ -29,16 +29,17 @@ export function useDuelIcons({
   const isA = useMemo(() => bigintEquals(duelistId, duelistIdA), [duelistId, duelistIdA])
   const isB = useMemo(() => bigintEquals(duelistId, duelistIdB), [duelistId, duelistIdB])
 
-  const shot1 = useMemo(() => (isA ? (round1?.shot_a ?? null) : isB ? (round1?.shot_b ?? null) : null), [isA, isB, round1])
-  const otherShot1 = useMemo(() => (isA ? (round1?.shot_b ?? null) : isB ? (round1?.shot_a ?? null) : null), [isA, isB, round1])
+  const moves1 = useMemo(() => (isA ? (round1?.moves_a ?? null) : isB ? (round1?.moves_b ?? null) : null), [isA, isB, round1])
+  const state1 = useMemo(() => (isA ? (round1?.state_a ?? null) : isB ? (round1?.state_b ?? null) : null), [isA, isB, round1])
+  const otherState1 = useMemo(() => (isA ? (round1?.state_b ?? null) : isB ? (round1?.state_a ?? null) : null), [isA, isB, round1])
 
   const isWinner = useMemo(() => (isA && winner == 1) || (isB && winner == 2), [isA, isB, winner])
   const isTurn = useMemo(() => (isA ? turnA : isB ? turnB : false), [isA, isB, turnA, turnB])
   const completedStages = useMemo(() => (isA ? (completedStagesA) : isB ? (completedStagesB) : null), [isA, isB, completedStagesA, completedStagesB])
 
-  const health1 = useMemo(() => (shot1?.state_final.health == 0 ? EMOJI.DEAD : shot1?.state_final.damage > 0 ? EMOJI.INJURED : null), [shot1])
-  const health1b = useMemo(() => (health1 == EMOJI.INJURED && shot1.state_final.damage > 1 ? EMOJI.INJURED : null), [health1])
-  const wager1 = useMemo(() => ((shot1?.wager > otherShot1?.wager) ? EMOJI.WAGER : null), [shot1, otherShot1])
+  const health1 = useMemo(() => (state1?.health == 0 ? EMOJI.DEAD : state1?.damage > 0 ? EMOJI.INJURED : null), [state1])
+  const health1b = useMemo(() => (health1 == EMOJI.INJURED && state1.damage > 1 ? EMOJI.INJURED : null), [health1])
+  const wager1 = useMemo(() => ((state1?.wager > otherState1?.wager) ? EMOJI.WAGER : null), [state1, otherState1])
   const win1 = useMemo(() => ((!wager1 && isWinner && roundNumber == 1) ? EMOJI.WINNER : null), [wager1, isWinner, roundNumber])
 
   const iconSize = size as IconSizeProp
@@ -68,7 +69,7 @@ export function useDuelIcons({
     //
     // In Progress...
     if (isInProgress) {
-      if (shot1) {
+      if (state1) {
         if (duelStage >= DuelStage.Round1Commit) {
           icons1.push(
             <CompletedIcon key='commit1' completed={completedStages[DuelStage.Round1Commit]}>
@@ -93,7 +94,7 @@ export function useDuelIcons({
     //
     // Finished...
     if (isFinished) {
-      if (shot1) icons1.push(<ActionIcon key='shot1' action={shot1.card_fire as unknown as Action} size={iconSize} />)
+      if (state1) icons1.push(<ActionIcon key='state1' action={moves1.card_fire as unknown as Action} size={iconSize} />)
       if (health1) icons1.push(<EmojiIcon key='health1' emoji={health1} size={iconSize} />)
       if (health1b) icons1.push(<EmojiIcon key='health1b' emoji={health1b} size={iconSize} />)
       if (win1) icons1.push(<EmojiIcon key='win1' emoji={win1} size={iconSize} />)
@@ -101,7 +102,7 @@ export function useDuelIcons({
     }
 
     return { icons1, icons2, icons3 }
-  }, [isAwaiting, isInProgress, isFinished, duelStage, isA, isB, isTurn, shot1, completedStages, health1, win1, wager1, iconSize])
+  }, [isAwaiting, isInProgress, isFinished, duelStage, isA, isB, isTurn, state1, completedStages, health1, win1, wager1, iconSize])
 
   return {
     icons1,

@@ -270,7 +270,7 @@ function DuelProgress({
 }) {
   const { gameImpl } = useThreeJsContext()
   const { round1, roundNumber, challenge: { tableId } } = useDuel(duelId)
-  const round1Shot = useMemo(() => (isA ? round1?.shot_a : round1?.shot_b), [isA, round1])
+  const round1Moves = useMemo(() => (isA ? round1?.moves_a : round1?.moves_b), [isA, round1])
 
   const duelProgressRef = useRef(null)
 
@@ -285,7 +285,7 @@ function DuelProgress({
   // Commit modal control
   const [didReveal, setDidReveal] = useState(false)
   const [commitModalIsOpen, setCommitModalIsOpen] = useState(false)
-  const { reveal, canReveal } = useRevealAction(duelId, roundNumber, tableId, round1Shot?.hash, duelStage == DuelStage.Round1Reveal)
+  const { reveal, canReveal } = useRevealAction(duelId, roundNumber, tableId, round1Moves?.hash, duelStage == DuelStage.Round1Reveal)
 
 
   // useEffect(() => {
@@ -302,7 +302,7 @@ function DuelProgress({
         setCommitModalIsOpen(true)
       } else if (duelStage == DuelStage.Round1Reveal) {
         if (canReveal && !didReveal) {
-          console.log(`reveal(${isA ? 'A' : 'B'}) hash:`, bigintToHex(round1Shot?.hash ?? 0))
+          console.log(`reveal(${isA ? 'A' : 'B'}) hash:`, bigintToHex(round1Moves?.hash ?? 0))
           setDidReveal(true)
           reveal()
         }

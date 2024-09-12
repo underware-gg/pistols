@@ -10,31 +10,6 @@ mod init {
         blades::{BladesCard},
     };
 
-    fn Shot() -> challenge::Shot {
-        (challenge::Shot {
-            hash: 0,
-            salt: 0,
-            card_fire: PacesCard::None,
-            card_dodge: PacesCard::None,
-            card_tactics: TacticsCard::None,
-            card_blades: BladesCard::None,
-            state_start: PlayerState(),
-            state_final: PlayerState(),
-            wager: 0,
-            win: 0,
-        })
-    }
-
-    fn PlayerState() -> challenge::PlayerState {
-        (challenge::PlayerState {
-            health: 0,
-            damage: 0,
-            chances: 0,
-            dice_crit: 0,
-            honour: 0,
-        })
-    }
-
     fn Duelist() -> duelist::Duelist {
         (duelist::Duelist {
             duelist_id: 0,

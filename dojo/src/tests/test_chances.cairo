@@ -11,7 +11,7 @@ mod tests {
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     use pistols::libs::utils;
-    use pistols::models::challenge::{Round, Shot};
+    use pistols::models::challenge::{Round, Moves};
     use pistols::models::duelist::{Duelist, Score, ScoreTrait};
     use pistols::models::table::{TableType};
     use pistols::models::init::{init};

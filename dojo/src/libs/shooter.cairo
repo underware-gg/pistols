@@ -8,7 +8,7 @@ mod shooter {
     use pistols::systems::actions::actions::{Errors};
     use pistols::systems::rng::{Dice, DiceTrait};
     use pistols::libs::utils;
-    use pistols::models::challenge::{Challenge, Round, RoundTrait, RoundEntity, Shot, ShotTrait, PlayerState};
+    use pistols::models::challenge::{Challenge, Round, RoundTrait, RoundEntity, Moves, MovesTrait, PlayerState, PlayerStateTrait};
     use pistols::models::duelist::{Duelist, Score};
     use pistols::models::table::{TableConfig, TableConfigEntity, TableType};
     use pistols::types::constants::{CONST};
@@ -21,6 +21,7 @@ mod shooter {
         TacticsCard, TacticsCardTrait,
         BladesCard, BladesCardTrait,
         EnvCard, EnvCardTrait,
+        DuelistDrawnCard,
     };
     use pistols::types::misc::{Boolean};
     use pistols::utils::math::{MathU8, MathU16};
@@ -64,15 +65,15 @@ mod shooter {
 
         // Store hash
         if (duelist_number == 1) {
-            assert(round.shot_a.hash == 0, Errors::ALREADY_COMMITTED);
-            round.shot_a.hash = hash;
+            assert(round.moves_a.hash == 0, Errors::ALREADY_COMMITTED);
+            round.moves_a.hash = hash;
         } else if (duelist_number == 2) {
-            assert(round.shot_b.hash == 0, Errors::ALREADY_COMMITTED);
-            round.shot_b.hash = hash;
+            assert(round.moves_b.hash == 0, Errors::ALREADY_COMMITTED);
+            round.moves_b.hash = hash;
         }
 
         // Finished commit
-        if (round.shot_a.hash != 0 && round.shot_b.hash != 0) {
+        if (round.moves_a.hash != 0 && round.moves_b.hash != 0) {
             round.state = RoundState::Reveal;
         }
 
@@ -104,17 +105,19 @@ mod shooter {
 
         // Validate moves hash
         if (duelist_number == 1) {
-            assert(round.shot_a.card_fire == PacesCard::None, Errors::ALREADY_REVEALED);
-            assert(round.shot_a.hash == hash, Errors::MOVES_HASH_MISMATCH);
-            round.shot_a.initialize(salt, moves);
+            assert(round.moves_a.card_fire == PacesCard::None, Errors::ALREADY_REVEALED);
+            assert(round.moves_a.hash == hash, Errors::MOVES_HASH_MISMATCH);
+            round.moves_a.initialize(salt, moves);
+            round.state_a.initialize(round.moves_a.card_fire);
         } else if (duelist_number == 2) {
-            assert(round.shot_b.card_fire == PacesCard::None, Errors::ALREADY_REVEALED);
-            assert(round.shot_b.hash == hash, Errors::MOVES_HASH_MISMATCH);
-            round.shot_b.initialize(salt, moves);
+            assert(round.moves_b.card_fire == PacesCard::None, Errors::ALREADY_REVEALED);
+            assert(round.moves_b.hash == hash, Errors::MOVES_HASH_MISMATCH);
+            round.moves_b.initialize(salt, moves);
+            round.state_b.initialize(round.moves_b.card_fire);
         }
 
         // incomplete Round, update only
-        if (round.shot_a.salt == 0 || round.shot_b.salt == 0) {
+        if (round.moves_a.salt == 0 || round.moves_b.salt == 0) {
             store.set_round(@round);
             return challenge;
         }
@@ -150,16 +153,28 @@ mod shooter {
     fn game_loop_internal(ref dice: Dice, ref round: Round) -> DuelProgress {
         // let _table_type: TableType = store.get_table_config_entity(challenge.table_id).table_type;
         
-        let mut hand_a: PlayerHand = round.shot_a.as_hand();
-        let mut hand_b: PlayerHand = round.shot_b.as_hand();
+        let mut hand_a: PlayerHand = round.moves_a.as_hand();
+        let mut hand_b: PlayerHand = round.moves_b.as_hand();
         hand_a.validate();
         hand_b.validate();
 
-        let mut global_state_a: PlayerState = round.shot_a.state_start;
-        let mut global_state_b: PlayerState = round.shot_b.state_start;
+        let mut global_state_a: PlayerState = round.state_a;
+        let mut global_state_b: PlayerState = round.state_b;
 
-        // TODO: shuffle
-        let env_deck: Span<EnvCard> = EnvCardTrait::get_full_deck().span();
+        //------------------------------------------------------
+        // Steps
+        //
+        // save initial state
+        let mut steps: Array<DuelStep> = array![];
+        steps.append(DuelStep {
+            pace: PacesCard::None,
+            card_env: EnvCard::None,
+            dice_env: 0,
+            card_a: DuelistDrawnCard::None,
+            card_b: DuelistDrawnCard::None,
+            state_a: global_state_a,
+            state_b: global_state_b,
+        });
 
         //------------------------------------------------------
         // apply cards
@@ -169,17 +184,22 @@ mod shooter {
         hand_a.card_blades.apply_points(ref global_state_a, ref global_state_b);
         hand_b.card_blades.apply_points(ref global_state_b, ref global_state_a);
 
+
         //------------------------------------------------------
         // Pistols round
         //
-        let mut steps: Array<DuelStep> = array![];
+
+        // TODO: use state.win instead??
         let mut win_a: Boolean = Boolean::Undefined;
         let mut win_b: Boolean = Boolean::Undefined;
+
+        // TODO: shuffle
+        let env_deck: Span<EnvCard> = EnvCardTrait::get_full_deck().span();
 
         let mut pace_number: u8 = 1;
         while (pace_number <= 10) {
             let pace: PacesCard = pace_number.into();
-            // println!("Pace [{}] A:{} B:{}", pace_number, self.shot_a.card_fire.as_felt(), self.shot_b.card_fire.as_felt());
+            // println!("Pace [{}] A:{} B:{}", pace_number, self.moves_a.card_fire.as_felt(), self.moves_b.card_fire.as_felt());
 
             // draw env card
             let (card_env, dice_env): (EnvCard, u8) = draw_env_card(env_deck, pace, ref dice);
@@ -242,10 +262,10 @@ mod shooter {
 
         // update round model
         let final_pace: DuelStep = *steps[steps.len() - 1];
-        round.shot_a.state_final = final_pace.state_a;
-        round.shot_b.state_final = final_pace.state_b;
-        round.shot_a.win = if (final_pace.state_b.health == 0) {1} else {0};
-        round.shot_b.win = if (final_pace.state_a.health == 0) {1} else {0};
+        round.state_a = final_pace.state_a;
+        round.state_b = final_pace.state_b;
+        round.state_a.win = if (final_pace.state_b.health == 0) {1} else {0};
+        round.state_b.win = if (final_pace.state_a.health == 0) {1} else {0};
         round.state = RoundState::Finished;
 
         //------------------------------------------------------

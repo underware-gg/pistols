@@ -125,6 +125,10 @@ mod ENV_POINTS {
 use pistols::types::cards::cards::{EnvCardPoints, EnvCardPointsTrait};
 use pistols::models::challenge::{PlayerState};
 
+impl EnvCardDefault of Default<EnvCard> {
+    fn default() -> EnvCard {(EnvCard::None)}
+}
+
 #[generate_trait]
 impl EnvCardImpl of EnvCardTrait {
     fn get_points(self: EnvCard) -> EnvCardPoints {

@@ -124,6 +124,11 @@ use debug::PrintTrait;
 use core::fmt::{Display, Formatter, Error};
 use pistols::utils::short_string::{ShortStringTrait};
 
+impl TacticsCardDefault of Default<TacticsCard> {
+    fn default() -> TacticsCard {(TacticsCard::None)}
+}
+
+
 impl TacticsCardIntoU8 of Into<TacticsCard, u8> {
     fn into(self: TacticsCard) -> u8 {
         match self {

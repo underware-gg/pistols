@@ -8,7 +8,7 @@ use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
 use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
 use pistols::systems::actions::actions::{Errors};
-use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, WagerEntity, Round, RoundEntity, Shot};
+use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, WagerEntity, Round, RoundEntity, Moves};
 use pistols::models::duelist::{Duelist, DuelistTrait, DuelistEntity, Pact, PactEntity, Scoreboard, ScoreboardEntity, Score, ScoreTrait};
 use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableType, TableTypeTrait};
 use pistols::models::config::{Config, ConfigEntity};
@@ -172,8 +172,10 @@ fn set_challenge(store: Store, challenge: Challenge) {
             duel_id: challenge.duel_id,
             round_number: challenge.round_number,
             state: RoundState::Commit,
-            shot_a: init::Shot(),
-            shot_b: init::Shot(),
+            moves_a: Default::default(),
+            moves_b: Default::default(),
+            state_a: Default::default(),
+            state_b: Default::default(),
         };
         store.set_round(@new_round);
     } else if (challenge.state.is_finished()) {
@@ -193,18 +195,18 @@ fn set_challenge(store: Store, challenge: Challenge) {
 
         // update honour and levels
         let calc_levels = !table.table_type.maxxed_up_levels();
-        update_score_honour(ref duelist_a.score, round.shot_a.state_final.honour, true);
-        update_score_honour(ref duelist_b.score, round.shot_b.state_final.honour, true);
-        update_score_honour(ref scoreboard_a.score, round.shot_a.state_final.honour, calc_levels);
-        update_score_honour(ref scoreboard_b.score, round.shot_b.state_final.honour, calc_levels);
+        update_score_honour(ref duelist_a.score, round.state_a.honour, true);
+        update_score_honour(ref duelist_b.score, round.state_b.honour, true);
+        update_score_honour(ref scoreboard_a.score, round.state_a.honour, calc_levels);
+        update_score_honour(ref scoreboard_b.score, round.state_b.honour, calc_levels);
 
         // split wager/fee to winners and benefactors
-        if (round.shot_a.wager > round.shot_b.wager) {
+        if (round.state_a.wager > round.state_b.wager) {
             // duelist_a won the Wager
             let wager_value: u128 = split_wager_fees(store, challenge, challenge.address_a, challenge.address_a);
             scoreboard_a.wager_won += wager_value;
             scoreboard_b.wager_lost += wager_value;
-        } else if (round.shot_a.wager < round.shot_b.wager) {
+        } else if (round.state_a.wager < round.state_b.wager) {
             // duelist_b won the Wager
             let wager_value: u128 = split_wager_fees(store, challenge, challenge.address_b, challenge.address_b);
             scoreboard_a.wager_lost += wager_value;

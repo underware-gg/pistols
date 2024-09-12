@@ -45,12 +45,12 @@ export const useDuel = (duelId: BigNumberish) => {
   const { completedStagesA, completedStagesB } = useMemo(() => {
     return {
       completedStagesA: {
-        [DuelStage.Round1Commit]: Boolean(round1?.shot_a.hash),
-        [DuelStage.Round1Reveal]: Boolean(getPacesCardValue(round1?.shot_a.card_fire as unknown as PacesCard)),
+        [DuelStage.Round1Commit]: Boolean(round1?.moves_a.hash),
+        [DuelStage.Round1Reveal]: Boolean(getPacesCardValue(round1?.moves_a.card_fire as unknown as PacesCard)),
       },
       completedStagesB: {
-        [DuelStage.Round1Commit]: Boolean(round1?.shot_b.hash),
-        [DuelStage.Round1Reveal]: Boolean(getPacesCardValue(round1?.shot_b.card_fire as unknown as PacesCard)),
+        [DuelStage.Round1Commit]: Boolean(round1?.moves_b.hash),
+        [DuelStage.Round1Reveal]: Boolean(getPacesCardValue(round1?.moves_b.card_fire as unknown as PacesCard)),
       },
     }
   }, [round1])
@@ -94,8 +94,8 @@ export const useAnimatedDuel = (duelId: BigNumberish, enabled: boolean) => {
 
   const { healthA, healthB } = useMemo(() => {
     return {
-      healthA: ((currentStage <= DuelStage.Round1Animation && !animatedHealthA) ? CONST.FULL_HEALTH : round1?.shot_a.state_final.health) ?? null,
-      healthB: ((currentStage <= DuelStage.Round1Animation && !animatedHealthB) ? CONST.FULL_HEALTH : round1?.shot_b.state_final.health) ?? null,
+      healthA: ((currentStage <= DuelStage.Round1Animation && !animatedHealthA) ? CONST.FULL_HEALTH : round1?.state_a.health) ?? null,
+      healthB: ((currentStage <= DuelStage.Round1Animation && !animatedHealthB) ? CONST.FULL_HEALTH : round1?.state_b.health) ?? null,
     }
   }, [currentStage, round1, animatedHealthA, animatedHealthB])
 
@@ -112,9 +112,9 @@ export const useAnimatedDuel = (duelId: BigNumberish, enabled: boolean) => {
   useEffect(() => {
     if (enabled && gameImpl && isAnimatingRound1 && audioLoaded) {
       console.log(`TRIGGER animateDuel(1)`)
-      const actionA = (round1.shot_a.card_fire as unknown as Action)
-      const actionB = (round1.shot_b.card_fire as unknown as Action)
-      gameImpl.animateDuel(AnimationState.Round1, actionA, actionB, round1.shot_a.state_final.health, round1.shot_b.state_final.health, round1.shot_a.state_final.damage, round1.shot_b.state_final.damage)
+      const actionA = (round1.moves_a.card_fire as unknown as Action)
+      const actionB = (round1.moves_b.card_fire as unknown as Action)
+      gameImpl.animateDuel(AnimationState.Round1, actionA, actionB, round1.state_a.health, round1.state_b.health, round1.state_a.damage, round1.state_b.damage)
     }
   }, [enabled, gameImpl, isAnimatingRound1, audioLoaded])
 

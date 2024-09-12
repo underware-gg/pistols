@@ -1,4 +1,3 @@
-use pistols::models::challenge::{Shot};
 use pistols::utils::math::{MathU8};
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
@@ -100,6 +99,10 @@ impl PacesCardImpl of PacesCardTrait {
 use debug::PrintTrait;
 use core::fmt::{Display, Formatter, Error};
 use pistols::utils::short_string::{ShortString};
+
+impl PacesCardDefault of Default<PacesCard> {
+    fn default() -> PacesCard {(PacesCard::None)}
+}
 
 impl PacesCardIntoU8 of Into<PacesCard, u8> {
     fn into(self: PacesCard) -> u8 {
