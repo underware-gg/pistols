@@ -389,6 +389,116 @@
     ]
   },
   {
+    "type": "enum",
+    "name": "pistols::types::cards::paces::PacesCard",
+    "variants": [
+      {
+        "name": "None",
+        "type": "()"
+      },
+      {
+        "name": "Paces1",
+        "type": "()"
+      },
+      {
+        "name": "Paces2",
+        "type": "()"
+      },
+      {
+        "name": "Paces3",
+        "type": "()"
+      },
+      {
+        "name": "Paces4",
+        "type": "()"
+      },
+      {
+        "name": "Paces5",
+        "type": "()"
+      },
+      {
+        "name": "Paces6",
+        "type": "()"
+      },
+      {
+        "name": "Paces7",
+        "type": "()"
+      },
+      {
+        "name": "Paces8",
+        "type": "()"
+      },
+      {
+        "name": "Paces9",
+        "type": "()"
+      },
+      {
+        "name": "Paces10",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "enum",
+    "name": "pistols::types::cards::tactics::TacticsCard",
+    "variants": [
+      {
+        "name": "None",
+        "type": "()"
+      },
+      {
+        "name": "Insult",
+        "type": "()"
+      },
+      {
+        "name": "CoinToss",
+        "type": "()"
+      },
+      {
+        "name": "Vengeful",
+        "type": "()"
+      },
+      {
+        "name": "ThickCoat",
+        "type": "()"
+      },
+      {
+        "name": "Reversal",
+        "type": "()"
+      },
+      {
+        "name": "Bananas",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "enum",
+    "name": "pistols::types::cards::blades::BladesCard",
+    "variants": [
+      {
+        "name": "None",
+        "type": "()"
+      },
+      {
+        "name": "Seppuku",
+        "type": "()"
+      },
+      {
+        "name": "RunAway",
+        "type": "()"
+      },
+      {
+        "name": "Behead",
+        "type": "()"
+      },
+      {
+        "name": "Grapple",
+        "type": "()"
+      }
+    ]
+  },
+  {
     "type": "struct",
     "name": "pistols::models::challenge::PlayerState",
     "members": [
@@ -427,20 +537,20 @@
         "type": "core::integer::u128"
       },
       {
-        "name": "card_1",
-        "type": "core::integer::u8"
+        "name": "card_fire",
+        "type": "pistols::types::cards::paces::PacesCard"
       },
       {
-        "name": "card_2",
-        "type": "core::integer::u8"
+        "name": "card_dodge",
+        "type": "pistols::types::cards::paces::PacesCard"
       },
       {
-        "name": "card_3",
-        "type": "core::integer::u8"
+        "name": "card_tactics",
+        "type": "pistols::types::cards::tactics::TacticsCard"
       },
       {
-        "name": "card_4",
-        "type": "core::integer::u8"
+        "name": "card_blades",
+        "type": "pistols::types::cards::blades::BladesCard"
       },
       {
         "name": "state_start",
