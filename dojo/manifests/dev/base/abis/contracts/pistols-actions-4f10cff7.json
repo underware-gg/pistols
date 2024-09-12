@@ -524,6 +524,14 @@
       {
         "name": "honour",
         "type": "core::integer::u8"
+      },
+      {
+        "name": "wager",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "win",
+        "type": "core::integer::u8"
       }
     ]
   },
@@ -790,7 +798,7 @@
             "type": "core::integer::u8"
           },
           {
-            "name": "hash",
+            "name": "hashed",
             "type": "core::integer::u128"
           }
         ],

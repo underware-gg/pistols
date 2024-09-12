@@ -289,13 +289,13 @@ export function defineContractComponents(world: World) {
     Round: (() => {
       return defineComponent(
         world,
-        { duel_id: RecsType.BigInt, round_number: RecsType.Number, state: RecsType.Number, moves_a: { card_1: RecsType.Number, card_2: RecsType.Number, card_3: RecsType.Number, card_4: RecsType.Number, salt: RecsType.BigInt, hash: RecsType.BigInt }, moves_b: { card_1: RecsType.Number, card_2: RecsType.Number, card_3: RecsType.Number, card_4: RecsType.Number, salt: RecsType.BigInt, hash: RecsType.BigInt }, state_a: { health: RecsType.Number, damage: RecsType.Number, chances: RecsType.Number, dice_crit: RecsType.Number, honour: RecsType.Number, wager: RecsType.Number, win: RecsType.Number }, state_b: { health: RecsType.Number, damage: RecsType.Number, chances: RecsType.Number, dice_crit: RecsType.Number, honour: RecsType.Number, wager: RecsType.Number, win: RecsType.Number } },
+        { duel_id: RecsType.BigInt, round_number: RecsType.Number, moves_a: { salt: RecsType.BigInt, hashed: RecsType.BigInt, card_1: RecsType.Number, card_2: RecsType.Number, card_3: RecsType.Number, card_4: RecsType.Number }, moves_b: { salt: RecsType.BigInt, hashed: RecsType.BigInt, card_1: RecsType.Number, card_2: RecsType.Number, card_3: RecsType.Number, card_4: RecsType.Number }, state_a: { health: RecsType.Number, damage: RecsType.Number, chances: RecsType.Number, dice_crit: RecsType.Number, honour: RecsType.Number, wager: RecsType.Number, win: RecsType.Number }, state_b: { health: RecsType.Number, damage: RecsType.Number, chances: RecsType.Number, dice_crit: RecsType.Number, honour: RecsType.Number, wager: RecsType.Number, win: RecsType.Number }, state: RecsType.Number },
         {
           metadata: {
             namespace: "pistols",
             name: "Round",
-            types: ["u128","u8","enum","u8","u8","u8","u8","felt252","u128","u8","u8","u8","u8","felt252","u128","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8"],
-            customTypes: ["RoundState","Moves","Moves","PlayerState","PlayerState"],
+            types: ["u128","u8","felt252","u128","u8","u8","u8","u8","felt252","u128","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","enum"],
+            customTypes: ["Moves","Moves","PlayerState","PlayerState","RoundState"],
           },
         }
       );

@@ -24,8 +24,8 @@ manifest_name = "dojo-base"
 [[contracts]]
 kind = "DojoContract"
 address = "0x2f72d0e827656555aa1760aaff6e3c1f80aceea8096437b8422c99717cd3824"
-class_hash = "0x5f7d12cd48d988cd11121a1bbb3748d7fa1d5a0dd0dc7e8b9bbb4b6e5cdfa8f"
-original_class_hash = "0x5f7d12cd48d988cd11121a1bbb3748d7fa1d5a0dd0dc7e8b9bbb4b6e5cdfa8f"
+class_hash = "0x6e385c95db5c6d4dc097c387f3ac176fab7fa7d7cb2e471898621546d49249c"
+original_class_hash = "0x6e385c95db5c6d4dc097c387f3ac176fab7fa7d7cb2e471898621546d49249c"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/dev/deployment/abis/contracts/pistols-actions-4f10cff7.json"
 reads = []
@@ -733,8 +733,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x6ac45c2da58fd55c4a35dd4493316dfad2f20aaa88239fa29208e767133964b"
-original_class_hash = "0x6ac45c2da58fd55c4a35dd4493316dfad2f20aaa88239fa29208e767133964b"
+class_hash = "0x20f685f8161947b75afae4199160eed56786bfef3cec3d23f39d4ac22305a8e"
+original_class_hash = "0x20f685f8161947b75afae4199160eed56786bfef3cec3d23f39d4ac22305a8e"
 abi = "manifests/dev/deployment/abis/models/pistols-Round-617e0a3d.json"
 tag = "pistols-Round"
 qualified_path = "pistols::models::challenge::round"
@@ -751,18 +751,28 @@ type = "u8"
 key = true
 
 [[models.members]]
+name = "moves_a"
+type = "Moves"
+key = false
+
+[[models.members]]
+name = "moves_b"
+type = "Moves"
+key = false
+
+[[models.members]]
+name = "state_a"
+type = "PlayerState"
+key = false
+
+[[models.members]]
+name = "state_b"
+type = "PlayerState"
+key = false
+
+[[models.members]]
 name = "state"
 type = "RoundState"
-key = false
-
-[[models.members]]
-name = "shot_a"
-type = "Shot"
-key = false
-
-[[models.members]]
-name = "shot_b"
-type = "Shot"
 key = false
 
 [[models]]

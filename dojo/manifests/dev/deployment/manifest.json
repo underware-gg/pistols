@@ -1256,8 +1256,8 @@
     {
       "kind": "DojoContract",
       "address": "0x2f72d0e827656555aa1760aaff6e3c1f80aceea8096437b8422c99717cd3824",
-      "class_hash": "0x5f7d12cd48d988cd11121a1bbb3748d7fa1d5a0dd0dc7e8b9bbb4b6e5cdfa8f",
-      "original_class_hash": "0x5f7d12cd48d988cd11121a1bbb3748d7fa1d5a0dd0dc7e8b9bbb4b6e5cdfa8f",
+      "class_hash": "0x6e385c95db5c6d4dc097c387f3ac176fab7fa7d7cb2e471898621546d49249c",
+      "original_class_hash": "0x6e385c95db5c6d4dc097c387f3ac176fab7fa7d7cb2e471898621546d49249c",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -1785,6 +1785,14 @@
             {
               "name": "honour",
               "type": "core::integer::u8"
+            },
+            {
+              "name": "wager",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "win",
+              "type": "core::integer::u8"
             }
           ]
         },
@@ -2051,7 +2059,7 @@
                   "type": "core::integer::u8"
                 },
                 {
-                  "name": "hash",
+                  "name": "hashed",
                   "type": "core::integer::u128"
                 }
               ],
@@ -14414,23 +14422,33 @@
           "key": true
         },
         {
+          "name": "moves_a",
+          "type": "Moves",
+          "key": false
+        },
+        {
+          "name": "moves_b",
+          "type": "Moves",
+          "key": false
+        },
+        {
+          "name": "state_a",
+          "type": "PlayerState",
+          "key": false
+        },
+        {
+          "name": "state_b",
+          "type": "PlayerState",
+          "key": false
+        },
+        {
           "name": "state",
           "type": "RoundState",
           "key": false
-        },
-        {
-          "name": "shot_a",
-          "type": "Shot",
-          "key": false
-        },
-        {
-          "name": "shot_b",
-          "type": "Shot",
-          "key": false
         }
       ],
-      "class_hash": "0x6ac45c2da58fd55c4a35dd4493316dfad2f20aaa88239fa29208e767133964b",
-      "original_class_hash": "0x6ac45c2da58fd55c4a35dd4493316dfad2f20aaa88239fa29208e767133964b",
+      "class_hash": "0x20f685f8161947b75afae4199160eed56786bfef3cec3d23f39d4ac22305a8e",
+      "original_class_hash": "0x20f685f8161947b75afae4199160eed56786bfef3cec3d23f39d4ac22305a8e",
       "abi": [
         {
           "type": "impl",
@@ -14800,134 +14818,32 @@
           "interface_name": "pistols::models::challenge::Iround"
         },
         {
-          "type": "enum",
-          "name": "pistols::types::round_state::RoundState",
-          "variants": [
+          "type": "struct",
+          "name": "pistols::models::challenge::Moves",
+          "members": [
             {
-              "name": "Null",
-              "type": "()"
+              "name": "salt",
+              "type": "core::felt252"
             },
             {
-              "name": "Commit",
-              "type": "()"
+              "name": "hashed",
+              "type": "core::integer::u128"
             },
             {
-              "name": "Reveal",
-              "type": "()"
+              "name": "card_1",
+              "type": "core::integer::u8"
             },
             {
-              "name": "Finished",
-              "type": "()"
-            }
-          ]
-        },
-        {
-          "type": "enum",
-          "name": "pistols::types::cards::paces::PacesCard",
-          "variants": [
-            {
-              "name": "None",
-              "type": "()"
+              "name": "card_2",
+              "type": "core::integer::u8"
             },
             {
-              "name": "Paces1",
-              "type": "()"
+              "name": "card_3",
+              "type": "core::integer::u8"
             },
             {
-              "name": "Paces2",
-              "type": "()"
-            },
-            {
-              "name": "Paces3",
-              "type": "()"
-            },
-            {
-              "name": "Paces4",
-              "type": "()"
-            },
-            {
-              "name": "Paces5",
-              "type": "()"
-            },
-            {
-              "name": "Paces6",
-              "type": "()"
-            },
-            {
-              "name": "Paces7",
-              "type": "()"
-            },
-            {
-              "name": "Paces8",
-              "type": "()"
-            },
-            {
-              "name": "Paces9",
-              "type": "()"
-            },
-            {
-              "name": "Paces10",
-              "type": "()"
-            }
-          ]
-        },
-        {
-          "type": "enum",
-          "name": "pistols::types::cards::tactics::TacticsCard",
-          "variants": [
-            {
-              "name": "None",
-              "type": "()"
-            },
-            {
-              "name": "Insult",
-              "type": "()"
-            },
-            {
-              "name": "CoinToss",
-              "type": "()"
-            },
-            {
-              "name": "Vengeful",
-              "type": "()"
-            },
-            {
-              "name": "ThickCoat",
-              "type": "()"
-            },
-            {
-              "name": "Reversal",
-              "type": "()"
-            },
-            {
-              "name": "Bananas",
-              "type": "()"
-            }
-          ]
-        },
-        {
-          "type": "enum",
-          "name": "pistols::types::cards::blades::BladesCard",
-          "variants": [
-            {
-              "name": "None",
-              "type": "()"
-            },
-            {
-              "name": "Seppuku",
-              "type": "()"
-            },
-            {
-              "name": "RunAway",
-              "type": "()"
-            },
-            {
-              "name": "Behead",
-              "type": "()"
-            },
-            {
-              "name": "Grapple",
-              "type": "()"
+              "name": "card_4",
+              "type": "core::integer::u8"
             }
           ]
         },
@@ -14954,44 +14870,6 @@
             {
               "name": "honour",
               "type": "core::integer::u8"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "pistols::models::challenge::Shot",
-          "members": [
-            {
-              "name": "salt",
-              "type": "core::felt252"
-            },
-            {
-              "name": "hash",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "card_fire",
-              "type": "pistols::types::cards::paces::PacesCard"
-            },
-            {
-              "name": "card_dodge",
-              "type": "pistols::types::cards::paces::PacesCard"
-            },
-            {
-              "name": "card_tactics",
-              "type": "pistols::types::cards::tactics::TacticsCard"
-            },
-            {
-              "name": "card_blades",
-              "type": "pistols::types::cards::blades::BladesCard"
-            },
-            {
-              "name": "state_start",
-              "type": "pistols::models::challenge::PlayerState"
-            },
-            {
-              "name": "state_final",
-              "type": "pistols::models::challenge::PlayerState"
             },
             {
               "name": "wager",
@@ -15000,6 +14878,28 @@
             {
               "name": "win",
               "type": "core::integer::u8"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::types::round_state::RoundState",
+          "variants": [
+            {
+              "name": "Null",
+              "type": "()"
+            },
+            {
+              "name": "Commit",
+              "type": "()"
+            },
+            {
+              "name": "Reveal",
+              "type": "()"
+            },
+            {
+              "name": "Finished",
+              "type": "()"
             }
           ]
         },
@@ -15016,16 +14916,24 @@
               "type": "core::integer::u8"
             },
             {
+              "name": "moves_a",
+              "type": "pistols::models::challenge::Moves"
+            },
+            {
+              "name": "moves_b",
+              "type": "pistols::models::challenge::Moves"
+            },
+            {
+              "name": "state_a",
+              "type": "pistols::models::challenge::PlayerState"
+            },
+            {
+              "name": "state_b",
+              "type": "pistols::models::challenge::PlayerState"
+            },
+            {
               "name": "state",
               "type": "pistols::types::round_state::RoundState"
-            },
-            {
-              "name": "shot_a",
-              "type": "pistols::models::challenge::Shot"
-            },
-            {
-              "name": "shot_b",
-              "type": "pistols::models::challenge::Shot"
             }
           ]
         },

@@ -500,6 +500,36 @@
   },
   {
     "type": "struct",
+    "name": "pistols::models::challenge::Moves",
+    "members": [
+      {
+        "name": "card_fire",
+        "type": "pistols::types::cards::paces::PacesCard"
+      },
+      {
+        "name": "card_dodge",
+        "type": "pistols::types::cards::paces::PacesCard"
+      },
+      {
+        "name": "card_tactics",
+        "type": "pistols::types::cards::tactics::TacticsCard"
+      },
+      {
+        "name": "card_blades",
+        "type": "pistols::types::cards::blades::BladesCard"
+      },
+      {
+        "name": "salt",
+        "type": "core::felt252"
+      },
+      {
+        "name": "hash",
+        "type": "core::integer::u128"
+      }
+    ]
+  },
+  {
+    "type": "struct",
     "name": "pistols::models::challenge::PlayerState",
     "members": [
       {
@@ -521,44 +551,6 @@
       {
         "name": "honour",
         "type": "core::integer::u8"
-      }
-    ]
-  },
-  {
-    "type": "struct",
-    "name": "pistols::models::challenge::Shot",
-    "members": [
-      {
-        "name": "card_fire",
-        "type": "pistols::types::cards::paces::PacesCard"
-      },
-      {
-        "name": "card_dodge",
-        "type": "pistols::types::cards::paces::PacesCard"
-      },
-      {
-        "name": "card_tactics",
-        "type": "pistols::types::cards::tactics::TacticsCard"
-      },
-      {
-        "name": "card_blades",
-        "type": "pistols::types::cards::blades::BladesCard"
-      },
-      {
-        "name": "state_start",
-        "type": "pistols::models::challenge::PlayerState"
-      },
-      {
-        "name": "state_final",
-        "type": "pistols::models::challenge::PlayerState"
-      },
-      {
-        "name": "salt",
-        "type": "core::felt252"
-      },
-      {
-        "name": "hash",
-        "type": "core::integer::u128"
       },
       {
         "name": "wager",
@@ -587,12 +579,20 @@
         "type": "pistols::types::round_state::RoundState"
       },
       {
-        "name": "shot_a",
-        "type": "pistols::models::challenge::Shot"
+        "name": "moves_a",
+        "type": "pistols::models::challenge::Moves"
       },
       {
-        "name": "shot_b",
-        "type": "pistols::models::challenge::Shot"
+        "name": "moves_b",
+        "type": "pistols::models::challenge::Moves"
+      },
+      {
+        "name": "state_a",
+        "type": "pistols::models::challenge::PlayerState"
+      },
+      {
+        "name": "state_b",
+        "type": "pistols::models::challenge::PlayerState"
       }
     ]
   },

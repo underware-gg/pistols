@@ -367,134 +367,32 @@
     "interface_name": "pistols::models::challenge::Iround"
   },
   {
-    "type": "enum",
-    "name": "pistols::types::round_state::RoundState",
-    "variants": [
+    "type": "struct",
+    "name": "pistols::models::challenge::Moves",
+    "members": [
       {
-        "name": "Null",
-        "type": "()"
+        "name": "salt",
+        "type": "core::felt252"
       },
       {
-        "name": "Commit",
-        "type": "()"
+        "name": "hashed",
+        "type": "core::integer::u128"
       },
       {
-        "name": "Reveal",
-        "type": "()"
+        "name": "card_1",
+        "type": "core::integer::u8"
       },
       {
-        "name": "Finished",
-        "type": "()"
-      }
-    ]
-  },
-  {
-    "type": "enum",
-    "name": "pistols::types::cards::paces::PacesCard",
-    "variants": [
-      {
-        "name": "None",
-        "type": "()"
+        "name": "card_2",
+        "type": "core::integer::u8"
       },
       {
-        "name": "Paces1",
-        "type": "()"
+        "name": "card_3",
+        "type": "core::integer::u8"
       },
       {
-        "name": "Paces2",
-        "type": "()"
-      },
-      {
-        "name": "Paces3",
-        "type": "()"
-      },
-      {
-        "name": "Paces4",
-        "type": "()"
-      },
-      {
-        "name": "Paces5",
-        "type": "()"
-      },
-      {
-        "name": "Paces6",
-        "type": "()"
-      },
-      {
-        "name": "Paces7",
-        "type": "()"
-      },
-      {
-        "name": "Paces8",
-        "type": "()"
-      },
-      {
-        "name": "Paces9",
-        "type": "()"
-      },
-      {
-        "name": "Paces10",
-        "type": "()"
-      }
-    ]
-  },
-  {
-    "type": "enum",
-    "name": "pistols::types::cards::tactics::TacticsCard",
-    "variants": [
-      {
-        "name": "None",
-        "type": "()"
-      },
-      {
-        "name": "Insult",
-        "type": "()"
-      },
-      {
-        "name": "CoinToss",
-        "type": "()"
-      },
-      {
-        "name": "Vengeful",
-        "type": "()"
-      },
-      {
-        "name": "ThickCoat",
-        "type": "()"
-      },
-      {
-        "name": "Reversal",
-        "type": "()"
-      },
-      {
-        "name": "Bananas",
-        "type": "()"
-      }
-    ]
-  },
-  {
-    "type": "enum",
-    "name": "pistols::types::cards::blades::BladesCard",
-    "variants": [
-      {
-        "name": "None",
-        "type": "()"
-      },
-      {
-        "name": "Seppuku",
-        "type": "()"
-      },
-      {
-        "name": "RunAway",
-        "type": "()"
-      },
-      {
-        "name": "Behead",
-        "type": "()"
-      },
-      {
-        "name": "Grapple",
-        "type": "()"
+        "name": "card_4",
+        "type": "core::integer::u8"
       }
     ]
   },
@@ -521,44 +419,6 @@
       {
         "name": "honour",
         "type": "core::integer::u8"
-      }
-    ]
-  },
-  {
-    "type": "struct",
-    "name": "pistols::models::challenge::Shot",
-    "members": [
-      {
-        "name": "salt",
-        "type": "core::felt252"
-      },
-      {
-        "name": "hash",
-        "type": "core::integer::u128"
-      },
-      {
-        "name": "card_fire",
-        "type": "pistols::types::cards::paces::PacesCard"
-      },
-      {
-        "name": "card_dodge",
-        "type": "pistols::types::cards::paces::PacesCard"
-      },
-      {
-        "name": "card_tactics",
-        "type": "pistols::types::cards::tactics::TacticsCard"
-      },
-      {
-        "name": "card_blades",
-        "type": "pistols::types::cards::blades::BladesCard"
-      },
-      {
-        "name": "state_start",
-        "type": "pistols::models::challenge::PlayerState"
-      },
-      {
-        "name": "state_final",
-        "type": "pistols::models::challenge::PlayerState"
       },
       {
         "name": "wager",
@@ -567,6 +427,28 @@
       {
         "name": "win",
         "type": "core::integer::u8"
+      }
+    ]
+  },
+  {
+    "type": "enum",
+    "name": "pistols::types::round_state::RoundState",
+    "variants": [
+      {
+        "name": "Null",
+        "type": "()"
+      },
+      {
+        "name": "Commit",
+        "type": "()"
+      },
+      {
+        "name": "Reveal",
+        "type": "()"
+      },
+      {
+        "name": "Finished",
+        "type": "()"
       }
     ]
   },
@@ -583,16 +465,24 @@
         "type": "core::integer::u8"
       },
       {
+        "name": "moves_a",
+        "type": "pistols::models::challenge::Moves"
+      },
+      {
+        "name": "moves_b",
+        "type": "pistols::models::challenge::Moves"
+      },
+      {
+        "name": "state_a",
+        "type": "pistols::models::challenge::PlayerState"
+      },
+      {
+        "name": "state_b",
+        "type": "pistols::models::challenge::PlayerState"
+      },
+      {
         "name": "state",
         "type": "pistols::types::round_state::RoundState"
-      },
-      {
-        "name": "shot_a",
-        "type": "pistols::models::challenge::Shot"
-      },
-      {
-        "name": "shot_b",
-        "type": "pistols::models::challenge::Shot"
       }
     ]
   },

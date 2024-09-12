@@ -2000,8 +2000,8 @@ type pistols_Round {
   duel_id: u128
   round_number: u8
   state: Enum
-  shot_a: pistols_Round_Shot
-  shot_b: pistols_Round_Shot
+  moves_a: pistols_Round_Shot
+  moves_b: pistols_Round_Shot
   entity: World__Entity
 }
 
