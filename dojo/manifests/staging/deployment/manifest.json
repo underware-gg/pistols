@@ -1235,7 +1235,7 @@
       }
     ],
     "address": "0x55fefc4a4e5c94def16d25bd1afa87407d114600560f75100f3edc8d5eaced6",
-    "transaction_hash": "0x113a73fec6dddf26623f2aa3846a57eb2b9b4a516ba9b10334a42fb6a70c62f",
+    "transaction_hash": "0x19f449ed73cbdbd71cff5ef8745ebfba5101012b7bf02da51454eafbcb08a2f",
     "block_number": 3,
     "seed": "pistols",
     "metadata": {
@@ -1256,8 +1256,8 @@
     {
       "kind": "DojoContract",
       "address": "0x2f72d0e827656555aa1760aaff6e3c1f80aceea8096437b8422c99717cd3824",
-      "class_hash": "0x5f7d12cd48d988cd11121a1bbb3748d7fa1d5a0dd0dc7e8b9bbb4b6e5cdfa8f",
-      "original_class_hash": "0x5f7d12cd48d988cd11121a1bbb3748d7fa1d5a0dd0dc7e8b9bbb4b6e5cdfa8f",
+      "class_hash": "0x1586adce5751e55e6ab1c4908b8e61664654a60813e7fedcb3c0821f469b585",
+      "original_class_hash": "0x1586adce5751e55e6ab1c4908b8e61664654a60813e7fedcb3c0821f469b585",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -14429,8 +14429,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x6ac45c2da58fd55c4a35dd4493316dfad2f20aaa88239fa29208e767133964b",
-      "original_class_hash": "0x6ac45c2da58fd55c4a35dd4493316dfad2f20aaa88239fa29208e767133964b",
+      "class_hash": "0x132a3920394a8d725e57abc2356069c6695c1d1b6a751d70da12257456ef360",
+      "original_class_hash": "0x132a3920394a8d725e57abc2356069c6695c1d1b6a751d70da12257456ef360",
       "abi": [
         {
           "type": "impl",
@@ -14962,14 +14962,6 @@
           "name": "pistols::models::challenge::Shot",
           "members": [
             {
-              "name": "salt",
-              "type": "core::felt252"
-            },
-            {
-              "name": "hash",
-              "type": "core::integer::u128"
-            },
-            {
               "name": "card_fire",
               "type": "pistols::types::cards::paces::PacesCard"
             },
@@ -14992,6 +14984,14 @@
             {
               "name": "state_final",
               "type": "pistols::models::challenge::PlayerState"
+            },
+            {
+              "name": "salt",
+              "type": "core::felt252"
+            },
+            {
+              "name": "hash",
+              "type": "core::integer::u128"
             },
             {
               "name": "wager",

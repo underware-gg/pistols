@@ -529,14 +529,6 @@
     "name": "pistols::models::challenge::Shot",
     "members": [
       {
-        "name": "salt",
-        "type": "core::felt252"
-      },
-      {
-        "name": "hash",
-        "type": "core::integer::u128"
-      },
-      {
         "name": "card_fire",
         "type": "pistols::types::cards::paces::PacesCard"
       },
@@ -559,6 +551,14 @@
       {
         "name": "state_final",
         "type": "pistols::models::challenge::PlayerState"
+      },
+      {
+        "name": "salt",
+        "type": "core::felt252"
+      },
+      {
+        "name": "hash",
+        "type": "core::integer::u128"
       },
       {
         "name": "wager",
