@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useContractCall } from '@/lib/utils/hooks/useContractCall'
-import { bigintToHex, isBigint, isPositiveBigint } from '@/lib/utils/types'
+import { isBigint, isPositiveBigint } from '@/lib/utils/types'
 import { BigNumberish } from 'starknet'
 
 export const useCanJoin = () => {
@@ -52,18 +52,16 @@ export const useSimulateChances = (address: BigNumberish, duelId: bigint, roundN
   return value as Awaited<ReturnType<typeof simulate_chances>>
 }
 
-export const useGetValidPackedActions = (roundNumber: number) => {
+export const useGetPlayerFullDeck = (tableId: string) => {
   const { get_player_full_deck } = useDojoSystemCalls()
-  const args = useMemo(() => [roundNumber], [roundNumber])
-  const enabled = useMemo(() => Boolean(roundNumber), [roundNumber])
   const { value, isPending } = useContractCall({
     call: get_player_full_deck,
-    args,
-    enabled,
+    args: [tableId],
+    enabled: Boolean(tableId),
     defaultValue: [],
   })
   return {
-    validPackedActions: value,
+    decks: value,
     isPending,
   }
 }

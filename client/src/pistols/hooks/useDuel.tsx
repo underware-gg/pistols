@@ -7,7 +7,7 @@ import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
 import { useChallenge } from "@/pistols/hooks/useChallenge"
 import { keysToEntity } from '@/lib/utils/types'
 import { AnimationState } from "@/pistols/three/game"
-import { CONST, getRoundStateValue, RoundState } from '@/games/pistols/generated/constants'
+import { CONST, getPacesCardValue, getRoundStateValue, PacesCard, RoundState } from '@/games/pistols/generated/constants'
 import { Action } from "@/pistols/utils/pistols"
 
 export enum DuelStage {
@@ -22,11 +22,13 @@ export enum DuelStage {
 
 export const useRound = (duelId: BigNumberish, roundNumber: BigNumberish) => {
   const { Round } = useDojoComponents()
-  const round = useComponentValue(Round, keysToEntity([duelId, roundNumber]))
+  const entityId = useMemo(() => keysToEntity([duelId, roundNumber]), [duelId, roundNumber])
+  const round = useComponentValue(Round, entityId)
+  const state = useMemo(() => (round?.state as unknown as RoundState ?? null), [round])
   if (!round) return null
   return {
     ...round,
-    state: (round.state as unknown as RoundState),
+    state,
   }
 }
 
@@ -44,11 +46,11 @@ export const useDuel = (duelId: BigNumberish) => {
     return {
       completedStagesA: {
         [DuelStage.Round1Commit]: Boolean(round1?.shot_a.hash),
-        [DuelStage.Round1Reveal]: Boolean(round1?.shot_a.card_fire),
+        [DuelStage.Round1Reveal]: Boolean(getPacesCardValue(round1?.shot_a.card_fire as unknown as PacesCard)),
       },
       completedStagesB: {
         [DuelStage.Round1Commit]: Boolean(round1?.shot_b.hash),
-        [DuelStage.Round1Reveal]: Boolean(round1?.shot_b.card_fire),
+        [DuelStage.Round1Reveal]: Boolean(getPacesCardValue(round1?.shot_b.card_fire as unknown as PacesCard)),
       },
     }
   }, [round1])

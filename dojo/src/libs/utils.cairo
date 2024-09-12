@@ -42,10 +42,9 @@ fn make_moves_hash(salt: felt252, moves: Span<u8>) -> u128 {
     while (index < moves.len()) {
         let move: felt252 = (*moves.at(index)).into();
         if (move != 0) {
-            result = result | (
-                felt_to_u128(hash_values([salt, move].span()))
-                & BitwiseU128::shl(BitwiseU32::max().into(), index * 32)
-            );
+            let mask: u128 = BitwiseU128::shl(BitwiseU32::max().into(), index * 32);
+            let hash: u128 = felt_to_u128(hash_values([salt, move].span()));
+            result = result | (hash & mask);
         }
         index += 1;
     };

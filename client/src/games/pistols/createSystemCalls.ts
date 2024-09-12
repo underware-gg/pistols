@@ -172,8 +172,8 @@ export function createSystemCalls(
     return await _executeTransaction(signer, actions_call('commit_moves', args))
   }
 
-  const reveal_moves = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, round_number: number, salt: BigNumberish, action1: number, action2: number): Promise<boolean> => {
-    const args = [duelist_id, duel_id, round_number, salt, action1, action2]
+  const reveal_moves = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, round_number: number, salt: BigNumberish, moves: number[]): Promise<boolean> => {
+    const args = [duelist_id, duel_id, round_number, salt, moves]
     return await _executeTransaction(signer, actions_call('reveal_moves', args))
   }
 
@@ -254,10 +254,11 @@ export function createSystemCalls(
     }, {})
   }
 
-  const get_player_full_deck = async (round_number: number): Promise<number[] | null> => {
+  const get_player_full_deck = async (round_number: number): Promise<number[][] | null> => {
     const args = [round_number]
     const results = await _executeCall<any>(actions_call('get_player_full_deck', args))
-    return results !== null ? results.map(v => Number(v)) : null
+    if (results == null) return null
+    return results.map((vo: BigNumberish[]) => vo.map((vi: BigNumberish) => Number(vi)))
   }
 
   const can_mint = async (to: BigNumberish, token_address: BigNumberish): Promise<boolean | null> => {

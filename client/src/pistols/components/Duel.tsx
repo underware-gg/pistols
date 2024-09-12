@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { Grid, Segment, SemanticFLOATS, Image } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
@@ -269,7 +269,7 @@ function DuelProgress({
   canAutoReveal = false
 }) {
   const { gameImpl } = useThreeJsContext()
-  const { round1, roundNumber } = useDuel(duelId)
+  const { round1, roundNumber, challenge: { tableId } } = useDuel(duelId)
   const round1Shot = useMemo(() => (isA ? round1?.shot_a : round1?.shot_b), [isA, round1])
 
   const duelProgressRef = useRef(null)
@@ -285,7 +285,7 @@ function DuelProgress({
   // Commit modal control
   const [didReveal, setDidReveal] = useState(false)
   const [commitModalIsOpen, setCommitModalIsOpen] = useState(false)
-  const { reveal, canReveal } = useRevealAction(duelId, roundNumber, round1Shot?.hash, duelStage == DuelStage.Round1Reveal)
+  const { reveal, canReveal } = useRevealAction(duelId, roundNumber, tableId, round1Shot?.hash, duelStage == DuelStage.Round1Reveal)
   console.log(`COMMIT:`, duelStage, completedStages[duelStage], completedStages, round1)
   const onClick = useCallback(() => {
     if (isYou && isConnected && completedStages[duelStage] === false) {

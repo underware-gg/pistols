@@ -21,23 +21,33 @@ export const make_moves_hash = (salt: BigNumberish, moves: number[]) => {
     }
     const move: number = moves[index]
     if (move != 0) {
-      let hash: bigint = poseidon([salt, move])
-      result |= ((hash & BigInt(BITWISE.MAX_U32)) << (BigInt(index) * 32n))
+      const { move_hash } = make_move_hash(salt, index, move)
+      result |= move_hash
     }
   }
   return result
 }
-
-export const unpack_action_slots = (packed: number | null): number[] | null => {
-  if (packed != null) {
-    return [packed & 0xff, (packed & 0xff00) >> 8]
+const make_move_hash = (salt: BigNumberish, index: number, move: number) => {
+  const mask: bigint = (BigInt(BITWISE.MAX_U32) << (BigInt(index) * 32n))
+  const hash: bigint = move ? poseidon([salt, move]) : 0n
+  const move_hash = (hash & mask)
+  return {
+    mask,
+    hash,
+    move_hash,
   }
-  return null
 }
 
 
+
 /** @returns a salt from account signature, or 0 if fails */
-const signAndGenerateSalt = async (account: AccountInterface, chainId: string, duelistId: bigint, duelId: bigint, roundNumber: number): Promise<bigint> => {
+const signAndGenerateSalt = async (
+  account: AccountInterface, 
+  chainId: string, 
+  duelistId: bigint, 
+  duelId: bigint, 
+  roundNumber: number
+): Promise<bigint> => {
   let result = 0n
   if (duelId && roundNumber) {
     try {
@@ -60,7 +70,14 @@ const signAndGenerateSalt = async (account: AccountInterface, chainId: string, d
 }
 
 /** @returns the felt252 hash for an action, or 0 if fail */
-export const signAndGenerateMovesHash = async (account: AccountInterface, chainId: string, duelistId: bigint, duelId: bigint, roundNumber: number, moves: number[]): Promise<bigint> => {
+export const signAndGenerateMovesHash = async (
+  account: AccountInterface, 
+  chainId: string, 
+  duelistId: bigint, 
+  duelId: bigint, 
+  roundNumber: number, 
+  moves: number[]
+): Promise<bigint> => {
   const salt = await signAndGenerateSalt(account, chainId, duelistId, duelId, roundNumber)
   const hash = make_moves_hash(salt, moves)
   console.log(`signAndGenerateMovesHash():`, bigintToHex(duelId), roundNumber, moves, bigintToHex(salt), bigintToHex(hash))
@@ -68,30 +85,48 @@ export const signAndGenerateMovesHash = async (account: AccountInterface, chainI
 }
 
 /** @returns the original action from an action hash, or 0 if fail */
-export const signAndRestoreActionFromHash = async (account: AccountInterface, chainId: string, duelistId: bigint, duelId: bigint, roundNumber: number, hash: bigint, possibleActions: BigNumberish[]): Promise<{ salt: bigint, packed: number, slot1: number, slot2: number }> => {
+export const signAndRestoreMovesFromHash = async (
+  account: AccountInterface, 
+  chainId: string, 
+  duelistId: bigint, 
+  duelId: bigint, 
+  roundNumber: number, 
+  hash: bigint, 
+  decks: number[][]
+): Promise<{ salt: bigint, moves: number[] }> => {
   const salt = await signAndGenerateSalt(account, chainId, duelistId, duelId, roundNumber)
-  let packed = null
-  let slots = null
-  console.log(`___RESTORE_HASH Duel:`, bigintToHex(duelId), 'round:', roundNumber, 'hash:', bigintToHex(hash), 'salt:', bigintToHex(salt))
-  for (let i = 0; salt > 0n && i < possibleActions.length; ++i) {
-    const m = possibleActions[i]
-    const h = make_moves_hash(salt, [Number(m)])
-    console.log(`___RESTORE_HASH move:`, m, bigintToHex(hash), '>', bigintToHex(h))
-    if (h == hash) {
-      packed = Number(m)
-      slots = unpack_action_slots(packed)
-      console.log(`___RESTORE_HASH FOUND ACTION:`, packed, slots)
-      break
+  let moves = []
+  console.log(`___RESTORE Duel:`, bigintToHex(duelId), '\nround:', roundNumber, '\nsalt:', bigintToHex(salt), '\nhash:', bigintToHex(hash))
+  if (salt > 0n) {
+    // there are 2 to 4 decks...
+    for (let di = 0; di < decks.length; ++di) {
+      const deck = decks[di]
+      // each deck can contain up to 10 cards/moves...
+      for (let mi = 0; mi < deck.length; ++mi) {
+        const move = deck[mi]
+        const { move_hash, mask } = make_move_hash(salt, mi, move)
+        const stored_hash = (hash & mask)
+        if (stored_hash == 0n) {
+          moves.push(0)
+          break
+        } else {
+          console.log(`___RESTORE ${di}/${mi}:`, bigintToHex(stored_hash), '>', bigintToHex(move_hash), '?', move)
+          if (stored_hash == move_hash) {
+            moves.push(Number(move))
+            console.log(`___RESTORE FOUND: ${di}/${mi}:`, move)
+            break
+          }
+        }
+      }
+      if (moves.length != di + 1) {
+        console.warn(`___RESTORE NOT FOUND for deck ${di}`)
+        break
+      }
     }
-  }
-  if (!packed) {
-    console.warn(`___RESTORE_HASH ACTION NOT FOUND for hash:`, hash)
   }
   return {
     salt,
-    packed,
-    slot1: slots?.[0] ?? null,
-    slot2: slots?.[1] ?? null,
+    moves: (moves.length == decks.length) ? moves : [],
   }
 }
 

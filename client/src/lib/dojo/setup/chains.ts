@@ -140,8 +140,8 @@ const pistolsSlotConfig: DojoChainConfig = {
   rpcUrl: 'https://api.cartridge.gg/x/pistols/katana',
   toriiUrl: 'https://api.cartridge.gg/x/pistols/torii',
   relayUrl: undefined,
-  masterAddress: '0x386fdc49b75880fb939000eb1d7fc6fc718d0f4c5b78cf6d0212d606cbae69',
-  masterPrivateKey: '0x2b1f038e270aec16f5b106ddae85083151a189cd31aefd19f5e6edd29eb1ebc',
+  masterAddress: undefined,
+  masterPrivateKey: undefined,
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
   lordsContractAddress: undefined, // lords_mock
@@ -163,8 +163,8 @@ const pistolsStagingConfig: DojoChainConfig = {
   rpcUrl: 'https://api.cartridge.gg/x/pistols-staging/katana',
   toriiUrl: 'https://api.cartridge.gg/x/pistols-staging/torii',
   relayUrl: undefined,
-  masterAddress: '0xe5b98f21b95db11af0b38cd327adf5768cd2e00c66c6e469f89cc47134380a',
-  masterPrivateKey: '0x244604454fcaf06d7a1274ccc0149e27a75dc3cf0835ef18c5630d0a0c4809',
+  masterAddress: undefined,
+  masterPrivateKey: undefined,
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
   lordsContractAddress: undefined, // lords_mock
