@@ -21,6 +21,7 @@ impl ShortString of ShortStringTrait {
     }
 
     fn string(self: felt252) -> ByteArray {
+        // alternative: core::to_byte_array::FormatAsByteArray
         let mut namestr: ByteArray = "";
         namestr.append_word(self, self.strlen());
         (namestr)
