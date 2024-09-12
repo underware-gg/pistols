@@ -77,6 +77,20 @@ impl PacesCardImpl of PacesCardTrait {
             _ =>                    0,
         }
     }
+    fn get_deck() -> Span<u8> {
+        (array![
+            PacesCard::Paces1.into(),
+            PacesCard::Paces2.into(),
+            PacesCard::Paces3.into(),
+            PacesCard::Paces4.into(),
+            PacesCard::Paces5.into(),
+            PacesCard::Paces6.into(),
+            PacesCard::Paces7.into(),
+            PacesCard::Paces8.into(),
+            PacesCard::Paces9.into(),
+            PacesCard::Paces10.into(),
+        ].span())
+    }
 }
 
 

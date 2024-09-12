@@ -104,6 +104,16 @@ impl TacticsCardImpl of TacticsCardTrait {
             self.get_points().apply(ref state_self, ref state_other);
         }
     }
+    fn get_deck() -> Span<u8> {
+        (array![
+            TacticsCard::Insult.into(),
+            TacticsCard::CoinToss.into(),
+            TacticsCard::Vengeful.into(),
+            TacticsCard::ThickCoat.into(),
+            TacticsCard::Reversal.into(),
+            TacticsCard::Bananas.into(),
+        ].span())
+    }
 }
 
 

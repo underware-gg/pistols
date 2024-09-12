@@ -21,35 +21,13 @@ struct PlayerHand {
 
 #[generate_trait]
 impl PlayerHandImpl of PlayerHandTrait {
-    fn player_full_deck() -> Array<Array<u8>> {
-        let paces: Array<u8> = array![
-            PacesCard::Paces1.into(),
-            PacesCard::Paces2.into(),
-            PacesCard::Paces3.into(),
-            PacesCard::Paces4.into(),
-            PacesCard::Paces5.into(),
-            PacesCard::Paces6.into(),
-            PacesCard::Paces7.into(),
-            PacesCard::Paces8.into(),
-            PacesCard::Paces9.into(),
-            PacesCard::Paces10.into(),
-        ];
-        let dodge: Array<u8> = array![
-            PacesCard::Paces1.into(),
-            PacesCard::Paces2.into(),
-            PacesCard::Paces3.into(),
-            PacesCard::Paces4.into(),
-            PacesCard::Paces5.into(),
-            PacesCard::Paces6.into(),
-            PacesCard::Paces7.into(),
-            PacesCard::Paces8.into(),
-            PacesCard::Paces9.into(),
-            PacesCard::Paces10.into(),
-        ];
+    fn player_full_deck() -> Span<Span<u8>> {
         (array![
-            paces,
-            dodge,
-        ])
+            PacesCardTrait::get_deck(),
+            PacesCardTrait::get_deck(),
+            TacticsCardTrait::get_deck(),
+            BladesCardTrait::get_deck(),
+        ].span())
     }
     fn validate(ref self: PlayerHand) {
         if (self.card_dodge == self.card_fire) {

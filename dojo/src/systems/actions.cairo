@@ -68,7 +68,7 @@ trait IActions {
     fn has_pact(world: @IWorldDispatcher, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool;
     fn can_join(world: @IWorldDispatcher, table_id: felt252, duelist_id: u128) -> bool;
     fn calc_fee(world: @IWorldDispatcher, table_id: felt252, wager_value: u128) -> u128;
-    fn get_player_full_deck(world: @IWorldDispatcher, _table_id: felt252) -> Array<Array<u8>>;
+    fn get_player_full_deck(world: @IWorldDispatcher, _table_id: felt252) -> Span<Span<u8>>;
     fn get_duel_progress(world: @IWorldDispatcher, duel_id: u128) -> DuelProgress;
     fn test_validate_commit_message(world: @IWorldDispatcher,
         account: ContractAddress,
@@ -469,7 +469,7 @@ mod actions {
             (table.calc_fee(wager_value))
         }
 
-        fn get_player_full_deck(world: @IWorldDispatcher, _table_id: felt252) -> Array<Array<u8>> {
+        fn get_player_full_deck(world: @IWorldDispatcher, _table_id: felt252) -> Span<Span<u8>> {
             WORLD(world);
             (PlayerHandTrait::player_full_deck())
         }

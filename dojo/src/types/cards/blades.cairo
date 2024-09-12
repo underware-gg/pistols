@@ -83,6 +83,14 @@ impl BladesCardImpl of BladesCardTrait {
             self.get_points().apply(ref state_self, ref state_other);
         }
     }
+    fn get_deck() -> Span<u8> {
+        (array![
+            BladesCard::Seppuku.into(),
+            BladesCard::RunAway.into(),
+            BladesCard::Behead.into(),
+            BladesCard::Grapple.into(),
+        ].span())
+    }
 }
 
 
