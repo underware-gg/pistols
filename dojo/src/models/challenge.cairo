@@ -79,7 +79,7 @@ struct Shot {
     pub win: u8,            // won the round?
 } // [f] + [128 + 112(14*8)]:240
 
-#[derive(Copy, Drop, Serde, IntrospectPacked)]
+#[derive(Copy, Drop, Serde, Introspect)]
 pub struct PlayerState {
     pub health: u8,     // CONST::FULL_HEALTH
     pub damage: u8,     // CONST::INITIAL_CHANCE
