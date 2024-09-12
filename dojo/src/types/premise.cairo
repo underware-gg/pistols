@@ -2,7 +2,7 @@
 use traits::Into;
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
-enum Premise {
+pub enum Premise {
     Null,       // 0
     //-----
     Matter,     // 1

@@ -11,7 +11,7 @@ use pistols::types::cards::hand::{
 // Game progress, pace by pace
 
 #[derive(Copy, Drop, Serde)]
-struct DuelProgress {
+pub struct DuelProgress {
     // results
     steps: Span<DuelStep>,
     winner: u8,
@@ -21,7 +21,7 @@ struct DuelProgress {
 }
 
 #[derive(Copy, Drop, Serde)]
-struct DuelStep {
+pub struct DuelStep {
     // current pace
     pace: PacesCard,
     // env card
@@ -36,7 +36,7 @@ struct DuelStep {
 }
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
-enum DuelistDrawnCard {
+pub enum DuelistDrawnCard {
     None: (),
     Fire: PacesCard,
     Dodge: PacesCard,

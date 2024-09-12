@@ -91,7 +91,7 @@ function getConstantsFromCairoFile(filePath) {
     } else {
       // outside mod/enum
       if (line.startsWith('mod ') && line.endsWith(' {')) {
-        current_mod = line.slice(4, -2);
+        current_mod = line.split(' ').at(-2);
         // console.log(`MOD!!`, current_mod, line)
         if (!is_test) {
           mods[current_mod] = {
@@ -99,15 +99,15 @@ function getConstantsFromCairoFile(filePath) {
             lines: [],
           }
         }
-      } else if (line.startsWith('enum ') && line.endsWith(' {') && !is_test) {
-        current_enum = line.slice(5, -2);
+      } else if (line.startsWith('pub enum ') && line.endsWith(' {') && !is_test) {
+        current_enum = line.split(' ').at(-2);
         // console.log(`ENUM!!`, current_enum, line)
         enums[current_enum] = {
           filePath,
           lines: [],
         }
-      } else if (line.startsWith('struct ') && line.endsWith(' {') && !is_test) {
-        current_struct = line.slice(7, -2);
+      } else if (line.startsWith('pub struct ') && line.endsWith(' {') && !is_test) {
+        current_struct = line.split(' ').at(-2);
         // console.log(`STRUCT!!`, current_struct, ':', line)
         structs[current_struct] = {
           filePath,

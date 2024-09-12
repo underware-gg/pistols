@@ -1,6 +1,6 @@
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
-enum TacticsCard {
+pub enum TacticsCard {
     None,
     //
     Insult,

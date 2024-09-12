@@ -2,7 +2,7 @@
 use traits::Into;
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
-enum ChallengeState {
+pub enum ChallengeState {
     Null,       // 0  
     Awaiting,   // 1
     Withdrawn,  // 2

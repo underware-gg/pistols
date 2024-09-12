@@ -22,7 +22,7 @@ impl SNIP12MetadataImpl of SNIP12Metadata {
 }
 
 #[derive(Copy, Drop, Hash)]
-struct CommitMoveMessage {
+pub struct CommitMoveMessage {
     duelId: felt252,
     roundNumber: felt252,
     duelistId: felt252,

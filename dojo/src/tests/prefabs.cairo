@@ -44,13 +44,13 @@ mod prefabs {
 
 
     #[derive(Copy, Drop)]
-    struct SaltsValues {
+    pub struct SaltsValues {
         salts: Span<felt252>,
         values: Span<felt252>,
     }
 
     #[derive(Copy, Drop)]
-    struct Moves {
+    pub struct Moves {
         salt: felt252,
         moves: Span<u8>,
         hash: u128,

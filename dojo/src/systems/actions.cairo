@@ -505,7 +505,7 @@ mod actions {
 
     #[event]
     #[derive(Drop, starknet::Event)]
-    enum Event {
+    pub enum Event {
         DuelistRegisteredEvent: events::DuelistRegisteredEvent,
         NewChallengeEvent: events::NewChallengeEvent,
         ChallengeAcceptedEvent: events::ChallengeAcceptedEvent,

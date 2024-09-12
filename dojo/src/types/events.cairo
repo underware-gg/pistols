@@ -3,7 +3,7 @@ use starknet::{ContractAddress};
 use pistols::models::duelist::{ProfilePicType};
 
 #[derive(Drop, starknet::Event)]
-struct DuelistRegisteredEvent {
+pub struct DuelistRegisteredEvent {
     address: ContractAddress,
     duelist_id: u128,
     name: felt252,
@@ -13,14 +13,14 @@ struct DuelistRegisteredEvent {
 }
 
 #[derive(Drop, starknet::Event)]
-struct NewChallengeEvent {
+pub struct NewChallengeEvent {
     duel_id: u128,
     address_a: ContractAddress,
     address_b: ContractAddress,
 }
 
 #[derive(Drop, starknet::Event)]
-struct ChallengeAcceptedEvent {
+pub struct ChallengeAcceptedEvent {
     duel_id: u128,
     address_a: ContractAddress,
     address_b: ContractAddress,
@@ -28,13 +28,13 @@ struct ChallengeAcceptedEvent {
 }
 
 #[derive(Drop, starknet::Event)]
-struct ChallengeResolvedEvent {
+pub struct ChallengeResolvedEvent {
     duel_id: u128,
     winner_address: ContractAddress,
 }
 
 #[derive(Drop, starknet::Event)]
-struct DuelistTurnEvent {
+pub struct DuelistTurnEvent {
     duel_id: u128,
     address: ContractAddress,
     round_number: u8,

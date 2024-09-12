@@ -180,7 +180,7 @@ mod token_duelist {
 
     #[event]
     #[derive(Drop, starknet::Event)]
-    enum Event {
+    pub enum Event {
         #[flat]
         InitializableEvent: initializable_component::Event,
         #[flat]

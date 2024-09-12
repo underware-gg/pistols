@@ -109,7 +109,7 @@ mod tester {
     }
 
     #[derive(Copy, Drop)]
-    struct Systems {
+    pub struct Systems {
         world: IWorldDispatcher,
         actions: IActionsDispatcher,
         admin: IAdminDispatcher,

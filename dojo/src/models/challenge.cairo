@@ -63,7 +63,7 @@ pub struct Round {
 //
 // The shot of each player on a Round
 #[derive(Copy, Drop, Serde, Introspect)]
-struct Shot {
+pub struct Shot {
     // player input
     pub salt: felt252,      // the player's secret salt
     pub hash: u128,         // hashed moves (salt + moves)

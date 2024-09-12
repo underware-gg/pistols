@@ -1,6 +1,6 @@
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
-enum BladesCard {
+pub enum BladesCard {
     None,
     //
     Seppuku,

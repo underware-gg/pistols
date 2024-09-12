@@ -2,7 +2,7 @@ use pistols::models::challenge::{Shot};
 use pistols::utils::math::{MathU8};
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
-enum PacesCard {
+pub enum PacesCard {
     None,
     //
     Paces1,

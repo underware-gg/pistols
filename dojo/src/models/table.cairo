@@ -14,7 +14,7 @@ mod TABLES {
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
-enum TableType {
+pub enum TableType {
     Undefined,      // 0
     Classic,        // 1
     Tournament,     // 2
@@ -81,7 +81,7 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
 // TableInitializer
 //
 #[derive(Copy, Drop)]
-struct TableInitializer {
+pub struct TableInitializer {
     world: IWorldDispatcher
 }
 

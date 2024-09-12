@@ -93,7 +93,7 @@ mod lords_mock {
 
     #[event]
     #[derive(Copy, Drop, starknet::Event)]
-    enum Event {
+    pub enum Event {
         InitializableEvent: initializable_component::Event,
         ERC20MetadataEvent: erc20_metadata_component::Event,
         ERC20BalanceEvent: erc20_balance_component::Event,

@@ -1,6 +1,6 @@
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
-enum EnvCard {
+pub enum EnvCard {
     None,
     // Common
     DamageUp,

@@ -21,7 +21,7 @@ use pistols::models::{
 };
 
 #[derive(Copy, Drop)]
-struct Store {
+pub struct Store {
     world: IWorldDispatcher,
 }
 

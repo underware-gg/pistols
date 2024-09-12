@@ -33,7 +33,7 @@ mod rng {
 use pistols::interfaces::systems::{WorldSystemsTrait};
 
 #[derive(Copy, Drop)]
-struct Dice {
+pub struct Dice {
     rng: IRngDispatcher,
     seed: felt252,
     last_dice: u8,

@@ -1,6 +1,6 @@
 
 #[derive(Copy, Drop, Serde, PartialEq)]
-enum Boolean {
+pub enum Boolean {
     Undefined: (),
     True: (),
     False: (),

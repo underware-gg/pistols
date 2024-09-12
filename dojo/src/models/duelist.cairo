@@ -6,7 +6,7 @@ use pistols::types::constants::{CONST};
 
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
-enum Archetype {
+pub enum Archetype {
     Undefined,  // 0
     Villainous, // 1
     Trickster,  // 2
@@ -14,7 +14,7 @@ enum Archetype {
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
-enum ProfilePicType {
+pub enum ProfilePicType {
     Undefined,  // 0
     Duelist,    // 1
     External,   // 2
@@ -70,7 +70,7 @@ pub struct Scoreboard {
 } // [160] [128] [128]
 
 #[derive(Copy, Drop, Serde, IntrospectPacked)]
-struct Score {
+pub struct Score {
     pub honour: u8,             // 0..100
     pub level_villain: u8,      // 0..100
     pub level_trickster: u8,    // 0..100
@@ -152,7 +152,7 @@ impl ArchetypeIntoByteArray of Into<Archetype, ByteArray> {
 //
 
 #[derive(Copy, Drop)]
-struct DuelistHelper {
+pub struct DuelistHelper {
     world: IWorldDispatcher,
     token_dispatcher: IERC721Dispatcher,
 }

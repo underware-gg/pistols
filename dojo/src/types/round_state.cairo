@@ -2,7 +2,7 @@
 use traits::Into;
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
-enum RoundState {
+pub enum RoundState {
     Null,       // 0
     Commit,     // 1
     Reveal,     // 2

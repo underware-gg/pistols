@@ -1,6 +1,6 @@
 
 #[derive(Copy, Drop, Serde, Default)]
-struct CardPoints {
+pub struct CardPoints {
     name: felt252, // @generateContants_type: shortstring
     self_chances: i8,
     self_damage: i8,
@@ -10,7 +10,7 @@ struct CardPoints {
 }
 
 #[derive(Copy, Drop, Serde, Default)]
-struct EnvCardPoints {
+pub struct EnvCardPoints {
     name: felt252, // @generateContants_type: shortstring
     rarity: Rarity,
     chances: i8,
@@ -20,7 +20,7 @@ struct EnvCardPoints {
 }
 
 #[derive(Copy, Drop, Serde, PartialEq)]
-enum Rarity {
+pub enum Rarity {
     None,
     // Common
     Common,
