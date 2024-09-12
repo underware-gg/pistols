@@ -7,6 +7,7 @@ import { ActionIcon } from '@/pistols/components/ui/PistolsIcon'
 import { bigintEquals } from '@/lib/utils/types'
 import { EMOJI } from '@/pistols/data/messages'
 import { BigNumberish } from 'starknet'
+import { Action } from '../utils/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -35,8 +36,8 @@ export function useDuelIcons({
   const isTurn = useMemo(() => (isA ? turnA : isB ? turnB : false), [isA, isB, turnA, turnB])
   const completedStages = useMemo(() => (isA ? (completedStagesA) : isB ? (completedStagesB) : null), [isA, isB, completedStagesA, completedStagesB])
 
-  const health1 = useMemo(() => (shot1?.health == 0 ? EMOJI.DEAD : shot1?.damage > 0 ? EMOJI.INJURED : null), [shot1])
-  const health1b = useMemo(() => (health1 == EMOJI.INJURED && shot1.damage > 1 ? EMOJI.INJURED : null), [health1])
+  const health1 = useMemo(() => (shot1?.state_final.health == 0 ? EMOJI.DEAD : shot1?.state_final.damage > 0 ? EMOJI.INJURED : null), [shot1])
+  const health1b = useMemo(() => (health1 == EMOJI.INJURED && shot1.state_final.damage > 1 ? EMOJI.INJURED : null), [health1])
   const wager1 = useMemo(() => ((shot1?.wager > otherShot1?.wager) ? EMOJI.WAGER : null), [shot1, otherShot1])
   const win1 = useMemo(() => ((!wager1 && isWinner && roundNumber == 1) ? EMOJI.WINNER : null), [wager1, isWinner, roundNumber])
 
@@ -92,7 +93,7 @@ export function useDuelIcons({
     //
     // Finished...
     if (isFinished) {
-      if (shot1) icons1.push(<ActionIcon key='shot1' action={shot1.action} size={iconSize} />)
+      if (shot1) icons1.push(<ActionIcon key='shot1' action={shot1.card_fire as unknown as Action} size={iconSize} />)
       if (health1) icons1.push(<EmojiIcon key='health1' emoji={health1} size={iconSize} />)
       if (health1b) icons1.push(<EmojiIcon key='health1b' emoji={health1b} size={iconSize} />)
       if (win1) icons1.push(<EmojiIcon key='win1' emoji={win1} size={iconSize} />)
