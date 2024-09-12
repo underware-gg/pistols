@@ -19,6 +19,7 @@ import { ethToWei, validateCairoString } from '@/lib/utils/starknet'
 import { ChallengeQuotes } from '@/pistols/utils/pistols'
 import { Divider } from '@/lib/ui/Divider'
 import { randomArrayElement } from '@/lib/utils/random'
+import { Premise } from '@/games/pistols/generated/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -180,6 +181,7 @@ function NewChallengeForm({
 
   useEffect(() => {
     setArgs(canSubmit ? {
+      premise: Premise.Honour,
       quote,
       expire_hours: ((days * 24 * 60 * 60) + hours),
       table_id: tableId,

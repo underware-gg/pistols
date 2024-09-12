@@ -3,7 +3,7 @@ import { Divider, Grid, Modal, Pagination } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
-import { signAndGenerateActionHash } from '@/pistols/utils/salt'
+import { signAndGenerateMovesHash } from '@/pistols/utils/salt'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { feltToString } from '@/lib/utils/starknet'
 
@@ -25,21 +25,23 @@ export default function CommitPacesModal({
   const { duelistId } = useSettings()
   const { commit_moves } = useDojoSystemCalls()
 
-  const [paces, setPaces] = useState(0)
+  const [firePaces, setFirePaces] = useState(0)
+  const [dodgePaces, setDodgePaces] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
-    setPaces(0)
+    setFirePaces(0)
   }, [isOpen])
 
   const canSubmit = useMemo(() =>
-    (account && duelId && roundNumber && paces && !isSubmitting),
-  [account, duelId, roundNumber, paces, isSubmitting])
+    (account && duelId && roundNumber && firePaces && dodgePaces && firePaces != dodgePaces && !isSubmitting),
+    [account, duelId, roundNumber, firePaces, dodgePaces, isSubmitting])
 
   const _submit = useCallback(async () => {
     if (canSubmit) {
       setIsSubmitting(true)
-      const hash = await signAndGenerateActionHash(account, feltToString(chainId), duelistId, duelId, roundNumber, paces)
+      const moves = [firePaces, dodgePaces]
+      const hash = await signAndGenerateMovesHash(account, feltToString(chainId), duelistId, duelId, roundNumber, moves)
       if (hash) {
         await commit_moves(account, duelistId, duelId, roundNumber, hash)
         setIsOpen(false)
@@ -55,15 +57,11 @@ export default function CommitPacesModal({
       onClose={() => setIsOpen(false)}
       open={isOpen}
     >
-      <Modal.Header className='AlignCenter'>How many paces will you take?</Modal.Header>
+      <Modal.Header className='AlignCenter'>Choose your cards...</Modal.Header>
       <Modal.Content>
         <Modal.Description className='AlignCenter'>
           <div className='ModalText'>
-            <p>
-              An honourable Lord will take all the <b>10 paces</b> before shooting.
-              <br />
-              Choose wisely. 👑
-            </p>
+            <h5>Fire</h5>
             <Pagination
               size='huge'
               boundaryRange={10}
@@ -75,7 +73,24 @@ export default function CommitPacesModal({
               nextItem={null}
               siblingRange={1}
               totalPages={10}
-              onPageChange={(e, { activePage }) => setPaces(typeof activePage == 'number' ? activePage : parseInt(activePage))}
+              onPageChange={(e, { activePage }) => setFirePaces(typeof activePage == 'number' ? activePage : parseInt(activePage))}
+            />
+
+            <Divider />
+
+            <h5>Dodge</h5>
+            <Pagination
+              size='huge'
+              boundaryRange={10}
+              defaultActivePage={null}
+              ellipsisItem={null}
+              firstItem={null}
+              lastItem={null}
+              prevItem={null}
+              nextItem={null}
+              siblingRange={1}
+              totalPages={10}
+              onPageChange={(e, { activePage }) => setDodgePaces(typeof activePage == 'number' ? activePage : parseInt(activePage))}
             />
           </div>
 

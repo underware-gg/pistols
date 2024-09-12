@@ -1,8 +1,8 @@
 import { AccountInterface, BigNumberish } from 'starknet'
 import { poseidon } from '@/lib/utils/starknet'
 import { signMessages, Messages } from '@/lib/utils/starknet_sign'
-import { HASH_SALT_MASK } from '@/pistols/utils/constants'
 import { bigintToHex } from '@/lib/utils/types'
+import { BITWISE } from '@/games/pistols/generated/constants'
 
 interface CommitMoveMessage extends Messages {
   duelId: bigint,
@@ -10,13 +10,22 @@ interface CommitMoveMessage extends Messages {
   duelistId: bigint,
 }
 
-export const make_moves_hash = (salt: BigNumberish, action: BigNumberish) => (poseidon([BigInt(salt), BigInt(action)]) & HASH_SALT_MASK)
-
-export const pack_action_slots = (slot1: number | null, slot2: number | null): number | null => {
-  if (slot1 != null && slot2 != null) {
-    return slot1 | (slot2 << 8)
+// in sync with pistols::libs::utils::make_moves_hash
+export const make_moves_hash = (salt: BigNumberish, moves: number[]) => {
+  if (!salt) return null
+  let result: bigint = 0n
+  for (let index = 0; index < moves.length; index++) {
+    if (index == 4) {
+      console.warn(`make_moves_hash(): too many moves (${moves.length})!`, moves)
+      break
+    }
+    const move: number = moves[index]
+    if (move != 0) {
+      let hash: bigint = poseidon([salt, move])
+      result |= ((hash & BigInt(BITWISE.MAX_U32)) << (BigInt(index) * 32n))
+    }
   }
-  return null
+  return result
 }
 
 export const unpack_action_slots = (packed: number | null): number[] | null => {
@@ -27,7 +36,7 @@ export const unpack_action_slots = (packed: number | null): number[] | null => {
 }
 
 
-/** @returns a 64-bit salt from account signature, or 0 if fail */
+/** @returns a salt from account signature, or 0 if fails */
 const signAndGenerateSalt = async (account: AccountInterface, chainId: string, duelistId: bigint, duelId: bigint, roundNumber: number): Promise<bigint> => {
   let result = 0n
   if (duelId && roundNumber) {
@@ -42,7 +51,7 @@ const signAndGenerateSalt = async (account: AccountInterface, chainId: string, d
         // get on-chain????
         throw new Error('null signature')
       }
-      result = (signatureHash & HASH_SALT_MASK)
+      result = signatureHash
     } catch (e) {
       console.warn(`signAndGenerateSalt() exception:`, e)
     }
@@ -51,10 +60,10 @@ const signAndGenerateSalt = async (account: AccountInterface, chainId: string, d
 }
 
 /** @returns the felt252 hash for an action, or 0 if fail */
-export const signAndGenerateActionHash = async (account: AccountInterface, chainId: string, duelistId: bigint, duelId: bigint, roundNumber: number, packed: BigNumberish): Promise<bigint> => {
+export const signAndGenerateMovesHash = async (account: AccountInterface, chainId: string, duelistId: bigint, duelId: bigint, roundNumber: number, moves: number[]): Promise<bigint> => {
   const salt = await signAndGenerateSalt(account, chainId, duelistId, duelId, roundNumber)
-  const hash = salt ? make_moves_hash(salt, BigInt(packed)) : null
-  console.log(`signAndGenerateActionHash():`, bigintToHex(duelId), roundNumber, packed, bigintToHex(salt), bigintToHex(hash))
+  const hash = make_moves_hash(salt, moves)
+  console.log(`signAndGenerateMovesHash():`, bigintToHex(duelId), roundNumber, moves, bigintToHex(salt), bigintToHex(hash))
   return hash
 }
 
@@ -66,7 +75,7 @@ export const signAndRestoreActionFromHash = async (account: AccountInterface, ch
   console.log(`___RESTORE_HASH Duel:`, bigintToHex(duelId), 'round:', roundNumber, 'hash:', bigintToHex(hash), 'salt:', bigintToHex(salt))
   for (let i = 0; salt > 0n && i < possibleActions.length; ++i) {
     const m = possibleActions[i]
-    const h = make_moves_hash(salt, m)
+    const h = make_moves_hash(salt, [Number(m)])
     console.log(`___RESTORE_HASH move:`, m, bigintToHex(hash), '>', bigintToHex(h))
     if (h == hash) {
       packed = Number(m)

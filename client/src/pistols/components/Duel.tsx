@@ -286,6 +286,7 @@ function DuelProgress({
   const [didReveal, setDidReveal] = useState(false)
   const [commitModalIsOpen, setCommitModalIsOpen] = useState(false)
   const { reveal, canReveal } = useRevealAction(duelId, roundNumber, round1Shot?.hash, duelStage == DuelStage.Round1Reveal)
+  console.log(`COMMIT:`, duelStage, completedStages[duelStage], completedStages, round1)
   const onClick = useCallback(() => {
     if (isYou && isConnected && completedStages[duelStage] === false) {
       if (duelStage == DuelStage.Round1Commit) {

@@ -60,6 +60,7 @@ export function createSystemCalls(
   const _executeTransaction = async (signer: AccountInterface, params: DojoCall | Call[]): Promise<boolean> => {
     let success = false
     try {
+      console.log(`execute...`, params)
       const tx = await provider.execute(signer, params, NAMESPACE);
       if (!Array.isArray(params)) {
         console.log(`execute ${params?.contractName}::${params.entrypoint}() tx:`, params.calldata, tx)

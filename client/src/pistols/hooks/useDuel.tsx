@@ -7,17 +7,17 @@ import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
 import { useChallenge } from "@/pistols/hooks/useChallenge"
 import { keysToEntity } from '@/lib/utils/types'
 import { AnimationState } from "@/pistols/three/game"
-import { CONST, RoundState } from '@/games/pistols/generated/constants'
-import { ActionNames, ActionVerbs } from "@/pistols/utils/pistols"
+import { CONST, getRoundStateValue, RoundState } from '@/games/pistols/generated/constants'
+import { Action } from "@/pistols/utils/pistols"
 
 export enum DuelStage {
-  Null = RoundState.Null,
+  Null,             // 0
   //
-  Round1Commit = RoundState.Commit,
-  Round1Reveal = RoundState.Reveal,
-  Round1Animation = 'Animation',
+  Round1Commit,     // 1
+  Round1Reveal,     // 2
+  Round1Animation,  // 3
   //
-  Finished = RoundState.Finished,
+  Finished,         // 4
 }
 
 export const useRound = (duelId: BigNumberish, roundNumber: BigNumberish) => {
@@ -32,11 +32,11 @@ export const useRound = (duelId: BigNumberish, roundNumber: BigNumberish) => {
 
 export const useDuel = (duelId: BigNumberish) => {
   const challenge = useChallenge(duelId)
-  const round1: any = useRound(duelId, 1n)
+  const round1 = useRound(duelId, 1n)
 
   //
   // The actual stage of this duel
-  const duelStage = useMemo(() => ((round1?.state as DuelStage) ?? DuelStage.Null), [round1])
+  const duelStage = useMemo(() => (round1 ? getRoundStateValue(round1.state) : DuelStage.Null), [round1])
 
   //
   // Actions completed by Duelist A
@@ -44,11 +44,11 @@ export const useDuel = (duelId: BigNumberish) => {
     return {
       completedStagesA: {
         [DuelStage.Round1Commit]: Boolean(round1?.shot_a.hash),
-        [DuelStage.Round1Reveal]: Boolean(round1?.shot_a.card_1),
+        [DuelStage.Round1Reveal]: Boolean(round1?.shot_a.card_fire),
       },
       completedStagesB: {
         [DuelStage.Round1Commit]: Boolean(round1?.shot_b.hash),
-        [DuelStage.Round1Reveal]: Boolean(round1?.shot_b.card_1),
+        [DuelStage.Round1Reveal]: Boolean(round1?.shot_b.card_fire),
       },
     }
   }, [round1])
@@ -92,8 +92,8 @@ export const useAnimatedDuel = (duelId: BigNumberish, enabled: boolean) => {
 
   const { healthA, healthB } = useMemo(() => {
     return {
-      healthA: ((currentStage <= DuelStage.Round1Animation && !animatedHealthA) ? CONST.FULL_HEALTH : round1?.shot_a.health) ?? null,
-      healthB: ((currentStage <= DuelStage.Round1Animation && !animatedHealthB) ? CONST.FULL_HEALTH : round1?.shot_b.health) ?? null,
+      healthA: ((currentStage <= DuelStage.Round1Animation && !animatedHealthA) ? CONST.FULL_HEALTH : round1?.shot_a.state_final.health) ?? null,
+      healthB: ((currentStage <= DuelStage.Round1Animation && !animatedHealthB) ? CONST.FULL_HEALTH : round1?.shot_b.state_final.health) ?? null,
     }
   }, [currentStage, round1, animatedHealthA, animatedHealthB])
 
@@ -110,7 +110,9 @@ export const useAnimatedDuel = (duelId: BigNumberish, enabled: boolean) => {
   useEffect(() => {
     if (enabled && gameImpl && isAnimatingRound1 && audioLoaded) {
       console.log(`TRIGGER animateDuel(1)`)
-      gameImpl.animateDuel(AnimationState.Round1, round1.shot_a.card_1, round1.shot_b.card_1, round1.shot_a.health, round1.shot_b.health, round1.shot_a.damage, round1.shot_b.damage)
+      const actionA = (round1.shot_a.card_fire as unknown as Action)
+      const actionB = (round1.shot_b.card_fire as unknown as Action)
+      gameImpl.animateDuel(AnimationState.Round1, actionA, actionB, round1.shot_a.state_final.health, round1.shot_b.state_final.health, round1.shot_a.state_final.damage, round1.shot_b.state_final.damage)
     }
   }, [enabled, gameImpl, isAnimatingRound1, audioLoaded])
 
