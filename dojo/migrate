@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -e # enable exit on error
 source scripts/setup.sh
 
 echo "------------------------------------------------------------------------------"
@@ -43,8 +43,14 @@ echo "👍"
 #
 echo "------------------------------------------------------------------------------"
 echo ">>> Migrate plan..."
-sozo -P $PROFILE migrate plan --world $WORLD_ADDRESS
-# exit 0
+set +e # disable exit on error
+PLAN_OUTPUT=$(sozo -P $PROFILE migrate plan --world $WORLD_ADDRESS)
+if [ "$?" != "0" ]; then
+  echo "$PLAN_OUTPUT"
+  exit 1
+fi
+set -e # enable exit on error
+
 echo ">>> Migrate apply..."
 sozo -P $PROFILE migrate apply --world $WORLD_ADDRESS
 echo "👍"
