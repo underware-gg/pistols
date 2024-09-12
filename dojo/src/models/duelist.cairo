@@ -33,13 +33,13 @@ enum ProfilePicType {
 #[dojo::model]
 pub struct Duelist {
     #[key]
-    duelist_id: u128,   // erc721 token_id
+    pub duelist_id: u128,   // erc721 token_id
     //-----------------------
-    name: felt252,
-    profile_pic_uri: ByteArray,     // can be anything
-    profile_pic_type: ProfilePicType,
-    timestamp: u64,                 // date registered
-    score: Score,
+    pub name: felt252,
+    pub profile_pic_uri: ByteArray,     // can be anything
+    pub profile_pic_type: ProfilePicType,
+    pub timestamp: u64,                 // date registered
+    pub score: Score,
 }
 
 // Current challenge between two Duelists
@@ -47,11 +47,11 @@ pub struct Duelist {
 #[dojo::model]
 pub struct Pact {
     #[key]
-    table_id: felt252,
+    pub table_id: felt252,
     #[key]
-    pair: u128,     // xor'd duelists as u256(address).low
+    pub pair: u128,     // xor'd duelists as u256(address).low
     //------------
-    duel_id: u128,  // current Challenge, or 0x0
+    pub duel_id: u128,  // current Challenge, or 0x0
 }
 
 //
@@ -60,26 +60,26 @@ pub struct Pact {
 #[dojo::model]
 pub struct Scoreboard {
     #[key]
-    table_id: felt252,
+    pub table_id: felt252,
     #[key]
-    duelist_id: u128,
+    pub duelist_id: u128,
     //------------
-    score: Score,
-    wager_won: u128,
-    wager_lost: u128,
+    pub score: Score,
+    pub wager_won: u128,
+    pub wager_lost: u128,
 } // [160] [128] [128]
 
 #[derive(Copy, Drop, Serde, IntrospectPacked)]
 struct Score {
-    honour: u8,             // 0..100
-    level_villain: u8,      // 0..100
-    level_trickster: u8,    // 0..100
-    level_lord: u8,         // 0..100
-    total_duels: u16,
-    total_wins: u16,
-    total_losses: u16,
-    total_draws: u16,
-    honour_history: u64,    // past 8 duels, each byte holds one duel honour
+    pub honour: u8,             // 0..100
+    pub level_villain: u8,      // 0..100
+    pub level_trickster: u8,    // 0..100
+    pub level_lord: u8,         // 0..100
+    pub total_duels: u16,
+    pub total_wins: u16,
+    pub total_losses: u16,
+    pub total_draws: u16,
+    pub honour_history: u64,    // past 8 duels, each byte holds one duel honour
 } // [160]
 
 

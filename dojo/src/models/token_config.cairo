@@ -4,10 +4,10 @@ use starknet::ContractAddress;
 #[dojo::model]
 pub struct TokenConfig {
     #[key]
-    token_address: ContractAddress,
+    pub token_address: ContractAddress,
     //------
-    max_supply: u16,
-    max_per_wallet: u16,
-    minted_count: u16,
-    is_open: bool,
+    pub max_supply: u16,
+    pub max_per_wallet: u16,
+    pub minted_count: u16,
+    pub is_open: bool,
 }

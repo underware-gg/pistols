@@ -9,8 +9,8 @@ mod CONFIG {
 #[dojo::model]
 pub struct Config {
     #[key]
-    key: u8,
+    pub key: u8,
     //------
-    treasury_address: ContractAddress,
-    is_paused: bool,
+    pub treasury_address: ContractAddress,
+    pub is_paused: bool,
 }

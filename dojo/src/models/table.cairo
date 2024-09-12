@@ -27,26 +27,26 @@ enum TableType {
 #[dojo::model]
 pub struct TableConfig {
     #[key]
-    table_id: felt252,
+    pub table_id: felt252,
     //------
-    table_type: TableType,
-    description: felt252,
-    fee_collector_address: ContractAddress,     // 0x0 goes to default treasury
-    wager_contract_address: ContractAddress,    // 0x0 if no wager or fees
-    wager_min: u128,
-    fee_min: u128,
-    fee_pct: u8,
-    is_open: bool,
+    pub table_type: TableType,
+    pub description: felt252,
+    pub fee_collector_address: ContractAddress,     // 0x0 goes to default treasury
+    pub wager_contract_address: ContractAddress,    // 0x0 if no wager or fees
+    pub wager_min: u128,
+    pub fee_min: u128,
+    pub fee_pct: u8,
+    pub is_open: bool,
 }
 
 #[derive(Drop, Serde)]
 #[dojo::model]
 pub struct TableAdmittance {
     #[key]
-    table_id: felt252,
+    pub table_id: felt252,
     //------
-    accounts: Array<ContractAddress>,
-    duelists: Array<u128>,
+    pub accounts: Array<ContractAddress>,
+    pub duelists: Array<u128>,
 }
 
 fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {

@@ -16,22 +16,22 @@ use pistols::types::cards::{
 #[dojo::model]
 pub struct Challenge {
     #[key]
-    duel_id: u128,
+    pub duel_id: u128,
     //-------------------------
-    table_id: felt252,
-    premise: Premise,           // premise of the dispute
-    quote: felt252,             // message to challenged
-    address_a: ContractAddress, // Challenger wallet
-    address_b: ContractAddress, // Challenged wallet
-    duelist_id_a: u128,         // Challenger duelist
-    duelist_id_b: u128,         // Challenged duelist 
+    pub table_id: felt252,
+    pub premise: Premise,           // premise of the dispute
+    pub quote: felt252,             // message to challenged
+    pub address_a: ContractAddress, // Challenger wallet
+    pub address_b: ContractAddress, // Challenged wallet
+    pub duelist_id_a: u128,         // Challenger duelist
+    pub duelist_id_b: u128,         // Challenged duelist 
     // progress and results
-    state: ChallengeState,
-    round_number: u8,           // current or final
-    winner: u8,                 // 0:draw, 1:duelist_a, 2:duelist_b
+    pub state: ChallengeState,
+    pub round_number: u8,           // current or final
+    pub winner: u8,                 // 0:draw, 1:duelist_a, 2:duelist_b
     // timestamps in unix epoch
-    timestamp_start: u64,       // Unix time, started
-    timestamp_end: u64,         // Unix time, ended
+    pub timestamp_start: u64,       // Unix time, started
+    pub timestamp_end: u64,         // Unix time, ended
 } // [f] [f] [f] [f] [128] [128] [152]
 
 // Challenge wager (optional)
@@ -39,10 +39,10 @@ pub struct Challenge {
 #[dojo::model]
 pub struct Wager {
     #[key]
-    duel_id: u128,
+    pub duel_id: u128,
     //------------
-    value: u128,
-    fee: u128,
+    pub value: u128,
+    pub fee: u128,
 }
 
 //
@@ -51,13 +51,13 @@ pub struct Wager {
 #[dojo::model]
 pub struct Round {
     #[key]
-    duel_id: u128,
+    pub duel_id: u128,
     #[key]
-    round_number: u8,
+    pub round_number: u8,
     //---------------
-    state: RoundState,
-    shot_a: Shot,   // duelist_a shot
-    shot_b: Shot,   // duelist_b shot
+    pub state: RoundState,
+    pub shot_a: Shot,   // duelist_a shot
+    pub shot_b: Shot,   // duelist_b shot
 } // (8 + 232 + 232) = 472 bits ~ 2 felts (max 504)
 
 //
@@ -65,27 +65,27 @@ pub struct Round {
 #[derive(Copy, Drop, Serde, Introspect)]
 struct Shot {
     // player input
-    salt: felt252,      // the player's secret salt
-    hash: u128,         // hashed moves (salt + moves)
-    card_fire: PacesCard,
-    card_dodge: PacesCard,
-    card_tactics: TacticsCard,
-    card_blades: BladesCard,
+    pub salt: felt252,      // the player's secret salt
+    pub hash: u128,         // hashed moves (salt + moves)
+    pub card_fire: PacesCard,
+    pub card_dodge: PacesCard,
+    pub card_tactics: TacticsCard,
+    pub card_blades: BladesCard,
     // player states
-    state_start: PlayerState,
-    state_final: PlayerState,
+    pub state_start: PlayerState,
+    pub state_final: PlayerState,
     // results
-    wager: u8,          // won the wager?
-    win: u8,            // won the round?
+    pub wager: u8,          // won the wager?
+    pub win: u8,            // won the round?
 } // [f] + [128 + 112(14*8)]:240
 
 #[derive(Copy, Drop, Serde, IntrospectPacked)]
-struct PlayerState {
-    health: u8,     // CONST::FULL_HEALTH
-    damage: u8,     // CONST::INITIAL_CHANCE
-    chances: u8,    // 0-100
-    dice_crit: u8,  // 0-100
-    honour: u8,     // honour granted
+pub struct PlayerState {
+    pub health: u8,     // CONST::FULL_HEALTH
+    pub damage: u8,     // CONST::INITIAL_CHANCE
+    pub chances: u8,    // 0-100
+    pub dice_crit: u8,  // 0-100
+    pub honour: u8,     // honour granted
 } // [3*8]:24
 
 
