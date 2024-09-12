@@ -1,10 +1,10 @@
 [world]
 kind = "WorldContract"
-class_hash = "0xa349b743d361ce4567361475a89b84a386bb383448c6926954e5fe0b525597"
-original_class_hash = "0xa349b743d361ce4567361475a89b84a386bb383448c6926954e5fe0b525597"
+class_hash = "0x6f4515274ee23404789c3351a77107d0ec07508530119822046600ca6948d6e"
+original_class_hash = "0x6f4515274ee23404789c3351a77107d0ec07508530119822046600ca6948d6e"
 abi = "manifests/staging/deployment/abis/dojo-world.json"
-address = "0xf1bac654f4a642efd8f56d0656f331ead7c01fedc8e659dd4b8ef45a98d15"
-transaction_hash = "0x80683f7aad2783ee457d79ac28aaa78c4274bd672748d7051e260044e7671f"
+address = "0x55fefc4a4e5c94def16d25bd1afa87407d114600560f75100f3edc8d5eaced6"
+transaction_hash = "0x113a73fec6dddf26623f2aa3846a57eb2b9b4a516ba9b10334a42fb6a70c62f"
 block_number = 3
 seed = "pistols"
 manifest_name = "dojo-world"
@@ -23,9 +23,9 @@ manifest_name = "dojo-base"
 
 [[contracts]]
 kind = "DojoContract"
-address = "0x7a1738a7523d803d4246aa05738b3fd8a39e3700107687705222abdecbef4d1"
-class_hash = "0x654e5177fc1d4d5abf61f774d0b400b9ef1185c2308c394deed8602541ce533"
-original_class_hash = "0x654e5177fc1d4d5abf61f774d0b400b9ef1185c2308c394deed8602541ce533"
+address = "0x2f72d0e827656555aa1760aaff6e3c1f80aceea8096437b8422c99717cd3824"
+class_hash = "0x5f7d12cd48d988cd11121a1bbb3748d7fa1d5a0dd0dc7e8b9bbb4b6e5cdfa8f"
+original_class_hash = "0x5f7d12cd48d988cd11121a1bbb3748d7fa1d5a0dd0dc7e8b9bbb4b6e5cdfa8f"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/staging/deployment/abis/contracts/pistols-actions-4f10cff7.json"
 reads = []
@@ -53,7 +53,7 @@ manifest_name = "pistols-actions-4f10cff7"
 
 [[contracts]]
 kind = "DojoContract"
-address = "0x690dc6e1e897f3b459b486dc7d52f4b2d9eda90ffd6c8eaaab210b0ee1fc22f"
+address = "0x323b615e21a9cbb4366d643568c64e87518420f6b23a326abeefde6e73d3f3d"
 class_hash = "0x73f616f8e0e54f3c774163db0e00da8a0185446cc4ed568d768cd68ce430de7"
 original_class_hash = "0x73f616f8e0e54f3c774163db0e00da8a0185446cc4ed568d768cd68ce430de7"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
@@ -81,7 +81,7 @@ manifest_name = "pistols-admin-36fd2037"
 
 [[contracts]]
 kind = "DojoContract"
-address = "0x1c83a6782e2b53f74f06852f1196ef4b3318280669a4e4812e7672a10acfa2d"
+address = "0x137bfade7cd470a5092f13c3c141a792535e46dc4b76995550fdbde4d896bd9"
 class_hash = "0x2568f056a19059af0d42b7a69a213ea341ba85382ec47a983194054e4ba4461"
 original_class_hash = "0x2568f056a19059af0d42b7a69a213ea341ba85382ec47a983194054e4ba4461"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
@@ -105,7 +105,7 @@ manifest_name = "pistols-lords_mock-2b1156e6"
 
 [[contracts]]
 kind = "DojoContract"
-address = "0x236963735ef7caebcef2a2165bac26f112d628c0fc512d9be144269a2b31d86"
+address = "0x28510cc59afb50784b280e184641c0d2195fa5179932de2fb6c0b6c1faf2649"
 class_hash = "0x6d2149467872cb1bf564e3e761f9f02a7dd271b745671d4ff79d6d96840e719"
 original_class_hash = "0x6d2149467872cb1bf564e3e761f9f02a7dd271b745671d4ff79d6d96840e719"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
@@ -124,7 +124,7 @@ manifest_name = "pistols-minter-7b759538"
 
 [[contracts]]
 kind = "DojoContract"
-address = "0x676bfe437e5fc187542dc857895436e5c8a722277c771486013ad8ade9d4968"
+address = "0x101bee7a80a2003fb9f4263d4d474c739d0a8d5636aa078b2498ae4d5634d98"
 class_hash = "0x1bf6b257fce6ab8a04c8bb6b5a5269bd6880d5c95a874b85a9aadbdee7e404e"
 original_class_hash = "0x1bf6b257fce6ab8a04c8bb6b5a5269bd6880d5c95a874b85a9aadbdee7e404e"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
@@ -138,7 +138,7 @@ manifest_name = "pistols-rng-13f1a6a9"
 
 [[contracts]]
 kind = "DojoContract"
-address = "0x754c05696514279d98530b1c8aa40d87db0b4673bc86d14ce5cac5ac1112cd5"
+address = "0x4e673bbecf7b3b656ae4a2ad97f15c2c6ce051869cb8a96f6e7665173083f99"
 class_hash = "0x7612f3f51e93bb6e4c471aa4f6faf5a0d28c20297fc0a78e589572e99317a90"
 original_class_hash = "0x7612f3f51e93bb6e4c471aa4f6faf5a0d28c20297fc0a78e589572e99317a90"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"

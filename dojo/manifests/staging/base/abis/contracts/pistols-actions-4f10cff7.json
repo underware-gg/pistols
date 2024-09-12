@@ -344,6 +344,16 @@
     ]
   },
   {
+    "type": "struct",
+    "name": "core::array::Span::<core::array::Span::<core::integer::u8>>",
+    "members": [
+      {
+        "name": "snapshot",
+        "type": "@core::array::Array::<core::array::Span::<core::integer::u8>>"
+      }
+    ]
+  },
+  {
     "type": "enum",
     "name": "pistols::types::cards::paces::PacesCard",
     "variants": [
@@ -914,7 +924,7 @@
         ],
         "outputs": [
           {
-            "type": "core::array::Array::<core::array::Array::<core::integer::u8>>"
+            "type": "core::array::Span::<core::array::Span::<core::integer::u8>>"
           }
         ],
         "state_mutability": "view"
