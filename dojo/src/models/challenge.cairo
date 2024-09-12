@@ -65,8 +65,6 @@ pub struct Round {
 #[derive(Copy, Drop, Serde, Introspect)]
 pub struct Shot {
     // player input
-    pub salt: felt252,      // the player's secret salt
-    pub hash: u128,         // hashed moves (salt + moves)
     pub card_fire: PacesCard,
     pub card_dodge: PacesCard,
     pub card_tactics: TacticsCard,
@@ -74,6 +72,9 @@ pub struct Shot {
     // player states
     pub state_start: PlayerState,
     pub state_final: PlayerState,
+    // commit/reveal
+    pub salt: felt252,      // the player's secret salt
+    pub hash: u128,         // hashed moves (salt + moves)
     // results
     pub wager: u8,          // won the wager?
     pub win: u8,            // won the round?
