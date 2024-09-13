@@ -1235,7 +1235,7 @@
       }
     ],
     "address": "0x55fefc4a4e5c94def16d25bd1afa87407d114600560f75100f3edc8d5eaced6",
-    "transaction_hash": "0x52be329c4dc0abe6f9e33b851b7ac0a62b947852447657ae7757d11a544486",
+    "transaction_hash": "0x40d16f60aa2f460f327ba327b45f5bc65ac29e562c0ad902be0fdb8b28e6e2a",
     "block_number": 3,
     "seed": "pistols",
     "metadata": {
@@ -2502,8 +2502,8 @@
     {
       "kind": "DojoContract",
       "address": "0x323b615e21a9cbb4366d643568c64e87518420f6b23a326abeefde6e73d3f3d",
-      "class_hash": "0x73f616f8e0e54f3c774163db0e00da8a0185446cc4ed568d768cd68ce430de7",
-      "original_class_hash": "0x73f616f8e0e54f3c774163db0e00da8a0185446cc4ed568d768cd68ce430de7",
+      "class_hash": "0x6bfa07ba209c48a9e9130b6dd35563ae8f189269914644660914a7addbb1df8",
+      "original_class_hash": "0x6bfa07ba209c48a9e9130b6dd35563ae8f189269914644660914a7addbb1df8",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
