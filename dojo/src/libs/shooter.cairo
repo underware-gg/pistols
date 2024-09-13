@@ -53,7 +53,7 @@ mod shooter {
     //-----------------------------------
     // Commit
     //
-    fn commit_moves(store: Store, duelist_id: u128, duel_id: u128, round_number: u8, hash: u128) {
+    fn commit_moves(store: Store, duelist_id: u128, duel_id: u128, round_number: u8, hashed: u128) {
         // Assert correct Challenge
         let (_challenge, duelist_number) = _assert_challenge(store, starknet::get_caller_address(), duelist_id, duel_id, round_number);
 
@@ -65,15 +65,15 @@ mod shooter {
 
         // Store hash
         if (duelist_number == 1) {
-            assert(round.moves_a.hash == 0, Errors::ALREADY_COMMITTED);
-            round.moves_a.hash = hash;
+            assert(round.moves_a.hashed == 0, Errors::ALREADY_COMMITTED);
+            round.moves_a.hashed = hashed;
         } else if (duelist_number == 2) {
-            assert(round.moves_b.hash == 0, Errors::ALREADY_COMMITTED);
-            round.moves_b.hash = hash;
+            assert(round.moves_b.hashed == 0, Errors::ALREADY_COMMITTED);
+            round.moves_b.hashed = hashed;
         }
 
         // Finished commit
-        if (round.moves_a.hash != 0 && round.moves_b.hash != 0) {
+        if (round.moves_a.hashed != 0 && round.moves_b.hashed != 0) {
             round.state = RoundState::Reveal;
         }
 
@@ -97,7 +97,7 @@ mod shooter {
 
         // Validate action hash
         assert(moves.len() >= 2 && moves.len() <= 4, Errors::INVALID_MOVES_COUNT);
-        let hash: u128 = utils::make_moves_hash(salt, moves);
+        let hashed: u128 = utils::make_moves_hash(salt, moves);
 
         // since the hash was validated
         // we should not validate the actual moves
@@ -106,11 +106,11 @@ mod shooter {
         // Validate moves hash
         if (duelist_number == 1) {
             assert(round.moves_a.card_1 == 0, Errors::ALREADY_REVEALED);
-            assert(round.moves_a.hash == hash, Errors::MOVES_HASH_MISMATCH);
+            assert(round.moves_a.hashed == hashed, Errors::MOVES_HASH_MISMATCH);
             round.moves_a.initialize(salt, moves);
         } else if (duelist_number == 2) {
             assert(round.moves_b.card_1 == 0, Errors::ALREADY_REVEALED);
-            assert(round.moves_b.hash == hash, Errors::MOVES_HASH_MISMATCH);
+            assert(round.moves_b.hashed == hashed, Errors::MOVES_HASH_MISMATCH);
             round.moves_b.initialize(salt, moves);
         }
 

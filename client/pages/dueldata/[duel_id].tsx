@@ -276,7 +276,7 @@ function MovesStats({
           <Row>
             <Cell>Hash</Cell>
             <Cell>
-              {bigintToHex(moves.hash)}
+              {bigintToHex(moves.hashed)}
             </Cell>
           </Row>
           <Row>

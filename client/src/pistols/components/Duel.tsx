@@ -285,7 +285,7 @@ function DuelProgress({
   // Commit modal control
   const [didReveal, setDidReveal] = useState(false)
   const [commitModalIsOpen, setCommitModalIsOpen] = useState(false)
-  const { reveal, canReveal } = useRevealAction(duelId, roundNumber, tableId, round1Moves?.hash, duelStage == DuelStage.Round1Reveal)
+  const { reveal, canReveal } = useRevealAction(duelId, roundNumber, tableId, round1Moves?.hashed, duelStage == DuelStage.Round1Reveal)
 
 
   // useEffect(() => {
@@ -302,7 +302,7 @@ function DuelProgress({
         setCommitModalIsOpen(true)
       } else if (duelStage == DuelStage.Round1Reveal) {
         if (canReveal && !didReveal) {
-          console.log(`reveal(${isA ? 'A' : 'B'}) hash:`, bigintToHex(round1Moves?.hash ?? 0))
+          console.log(`reveal(${isA ? 'A' : 'B'}) hash:`, bigintToHex(round1Moves?.hashed ?? 0))
           setDidReveal(true)
           reveal()
         }

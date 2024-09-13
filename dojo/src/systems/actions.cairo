@@ -51,7 +51,7 @@ trait IActions {
         duelist_id: u128,
         duel_id: u128,
         round_number: u8,
-        hash: u128,
+        hashed: u128,
     );
     fn reveal_moves(
         ref world: IWorldDispatcher,
@@ -416,10 +416,10 @@ mod actions {
             duelist_id: u128,
             duel_id: u128,
             round_number: u8,
-            hash: u128,
+            hashed: u128,
         ) {
             let store: Store = StoreTrait::new(world);
-            shooter::commit_moves(store, duelist_id, duel_id, round_number, hash);
+            shooter::commit_moves(store, duelist_id, duel_id, round_number, hashed);
         }
 
         fn reveal_moves(ref world: IWorldDispatcher,

@@ -64,11 +64,11 @@ pub struct Round {
 
 //
 // The shot of each player on a Round
-#[derive(Copy, Drop, Serde, Introspect, Default)]
+#[derive(Copy, Drop, Serde, Default, Introspect)]
 pub struct Moves {
     // commit/reveal
     pub salt: felt252,      // the player's secret salt
-    pub hash: u128,         // hashed moves (salt + moves)
+    pub hashed: u128,       // hashed moves (salt + moves)
     // player input
     pub card_1: u8,         // PacesCard,
     pub card_2: u8,         // PacesCard,
@@ -76,7 +76,7 @@ pub struct Moves {
     pub card_4: u8,         // BladesCard,
 } // [f] + [128 + 112(14*8)]:240
 
-#[derive(Copy, Drop, Serde, Introspect, Default)]
+#[derive(Copy, Drop, Serde, Default, Introspect)]
 pub struct PlayerState {
     pub health: u8,     // CONST::FULL_HEALTH
     pub damage: u8,     // CONST::INITIAL_CHANCE

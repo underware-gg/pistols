@@ -45,11 +45,11 @@ export const useDuel = (duelId: BigNumberish) => {
   const { completedStagesA, completedStagesB } = useMemo(() => {
     return {
       completedStagesA: {
-        [DuelStage.Round1Commit]: Boolean(round1?.moves_a.hash),
+        [DuelStage.Round1Commit]: Boolean(round1?.moves_a.hashed),
         [DuelStage.Round1Reveal]: Boolean(getPacesCardValue(round1?.moves_a.card_fire as unknown as PacesCard)),
       },
       completedStagesB: {
-        [DuelStage.Round1Commit]: Boolean(round1?.moves_b.hash),
+        [DuelStage.Round1Commit]: Boolean(round1?.moves_b.hashed),
         [DuelStage.Round1Reveal]: Boolean(getPacesCardValue(round1?.moves_b.card_fire as unknown as PacesCard)),
       },
     }

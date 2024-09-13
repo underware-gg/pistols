@@ -53,7 +53,7 @@ mod prefabs {
     pub struct PlayerMoves {
         salt: felt252,
         moves: Span<u8>,
-        hash: u128,
+        hashed: u128,
     }
 
     #[generate_trait]
@@ -69,7 +69,7 @@ mod prefabs {
     #[generate_trait]
     impl PlayerMovesImpl of PlayerMovesTrait {
         fn new(salt: felt252, moves: Span<u8>) -> PlayerMoves {
-            (PlayerMoves{salt, moves, hash: make_moves_hash(salt, moves)})
+            (PlayerMoves{salt, moves, hashed: make_moves_hash(salt, moves)})
         }
     }
 
@@ -95,8 +95,8 @@ mod prefabs {
 
     fn commit_reveal_get(sys: Systems, duel_id: u128, duelist_a: ContractAddress, duelist_b: ContractAddress, salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves) -> (ChallengeEntity, RoundEntity) {
         @sys.rng.set_salts(salts.salts, salts.values);
-        tester::execute_commit_moves(@sys.actions, duelist_a, duel_id, 1, moves_a.hash);
-        tester::execute_commit_moves(@sys.actions, duelist_b, duel_id, 1, moves_b.hash);
+        tester::execute_commit_moves(@sys.actions, duelist_a, duel_id, 1, moves_a.hashed);
+        tester::execute_commit_moves(@sys.actions, duelist_b, duel_id, 1, moves_b.hashed);
         tester::execute_reveal_moves(@sys.actions, duelist_a, duel_id, 1, moves_a.salt, moves_a.moves);
         tester::execute_reveal_moves(@sys.actions, duelist_b, duel_id, 1, moves_b.salt, moves_b.moves);
         let (challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
