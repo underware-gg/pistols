@@ -14,3 +14,20 @@ pub struct Config {
     pub treasury_address: ContractAddress,
     pub is_paused: bool,
 }
+
+
+//---------------------------
+// Traits
+//
+use pistols::utils::misc::{ZERO};
+
+#[generate_trait]
+impl ConfigImpl of ConfigTrait {
+    fn new() -> Config {
+        (Config {
+            key: CONFIG::CONFIG_KEY,
+            treasury_address: ZERO(),
+            is_paused: false,
+        })
+    }
+}

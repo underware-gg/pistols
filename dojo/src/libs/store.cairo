@@ -214,9 +214,20 @@ impl StoreImpl of StoreTrait {
         model.set(self.world);
     }
 
+
+    #[inline(always)]
+    fn set_token_config(self: Store, model: @TokenConfig) {
+        model.set(self.world);
+    }
+
     #[inline(always)]
     fn set_token_config_entity(self: Store, entity: @TokenConfigEntity) {
         entity.update(self.world);
+    }
+
+    #[inline(always)]
+    fn set_config(self: Store, model: @Config) {
+        model.set(self.world);
     }
 
     #[inline(always)]

@@ -80,28 +80,28 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
 //---------------------------
 // TableInitializer
 //
+use pistols::libs::store::{Store, StoreTrait};
+
 #[derive(Copy, Drop)]
 pub struct TableInitializer {
-    world: IWorldDispatcher
+    store: Store
 }
 
 #[generate_trait]
 impl TableInitializerTraitImpl of TableInitializerTrait {
     fn new(world: IWorldDispatcher) -> TableInitializer {
-        TableInitializer { world }
+        TableInitializer {
+            store: StoreTrait::new(world)
+        }
     }
-    //
-    // Initialize tables
     fn initialize(self: TableInitializer, lords_address: ContractAddress) {
-        //
-        // default tables
         self.set_array(@default_tables(lords_address));
     }
     fn set_array(self: TableInitializer, tables: @Array<TableConfig>) {
         let mut n: usize = 0;
         loop {
             if (n == tables.len()) { break; }
-            (*tables.at(n)).set(self.world);
+            self.store.set_table_config(tables.at(n));
             n += 1;
         };
     }

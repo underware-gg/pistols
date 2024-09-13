@@ -27,7 +27,7 @@ mod admin {
     use starknet::ContractAddress;
     use starknet::{get_caller_address, get_contract_address};
 
-    use pistols::models::config::{Config, ConfigEntity};
+    use pistols::models::config::{Config, ConfigTrait, ConfigEntity};
     use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableAdmittance, TableInitializer, TableInitializerTrait};
     use pistols::interfaces::systems::{SELECTORS};
     use pistols::libs::store::{Store, StoreTrait};
@@ -47,12 +47,12 @@ mod admin {
         lords_address: ContractAddress,
     ) {
         let store: Store = StoreTrait::new(world);
-        let mut config: ConfigEntity = store.get_config_entity();
-        // initialize
+        // initialize Config
+        let mut config: Config = ConfigTrait::new();
         config.treasury_address = (if (treasury_address.is_zero()) { get_caller_address() } else { treasury_address });
         config.is_paused = false;
-        store.set_config_entity(@config);
-        // initialize table lords
+        store.set_config(@config);
+        // initialize tables
         TableInitializerTrait::new(world).initialize(lords_address);
     }
 

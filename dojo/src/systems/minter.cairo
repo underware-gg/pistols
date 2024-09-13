@@ -50,15 +50,15 @@ mod minter {
         is_open: u8,
     ) {
         assert(max_supply > 0, Errors::INVALID_SUPPLY);
-        //
-        // config Duelist Token
-        set!(world, (TokenConfig{
+        let store: Store = StoreTrait::new(world);
+        let token_config: TokenConfig = TokenConfig{
             token_address,
             max_supply,
             max_per_wallet,
             minted_count: 0,
             is_open: (is_open != 0),
-        }));
+        };
+        store.set_token_config(@token_config);
     }
 
     //---------------------------------------
