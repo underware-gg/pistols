@@ -27,6 +27,7 @@ export default function ScProfile() {
   const { duelistEditOpener } = usePistolsContext()
   const { fromGate } = usePistolsScene()
   const { duelistBalance } = useDuelistBalanceOf(address)
+  console.log(`DUELIST BALANCE`, duelistBalance)
 
   const [loaded, setLoaded] = useState(false)
   useEffect(() => {

@@ -3,6 +3,7 @@ class_hash = "0x1e5d78a5b7ad246855311ee7b34e441961d7d3c14331ea70c3f87eb120deed6"
 original_class_hash = "0x1e5d78a5b7ad246855311ee7b34e441961d7d3c14331ea70c3f87eb120deed6"
 abi = "manifests/dev/base/abis/models/pistols-Wager-4cd30873.json"
 tag = "pistols-Wager"
+qualified_path = "pistols::models::challenge::wager"
 manifest_name = "pistols-Wager-4cd30873"
 
 [[members]]

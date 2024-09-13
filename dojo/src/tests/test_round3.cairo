@@ -96,7 +96,7 @@ const SALT_MISS_CRIT: u64 = 0x16a1326e8271a7d5; // 0,3
         // change round 1 results
         round.shot_a.health = health_a;
         round.shot_b.health = health_b;
-        tester::set_Round(world, actions.contract_address, round);
+        tester::set_Round(world, round);
         // run 2nd round
         let salt_a: u64 = blades_salt;
         let salt_b: u64 = SALT_1_b;

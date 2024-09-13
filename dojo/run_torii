@@ -2,6 +2,8 @@
 set -e
 source scripts/setup.sh
 
+# export WORLD_ADDRESS=0x403b5f047b8c4797139e30801e310473d99ca6877d19e0f27506f353f8f70f7
+
 echo "@WORLD: $WORLD_ADDRESS"
 
 if [[
@@ -25,6 +27,6 @@ fi
 torii --version
 torii \
   --world $WORLD_ADDRESS $* \
-  --allowed-origins "*" --index-pending \
+  --allowed-origins "*" \
   # --relay-local-key-path ./0.0.0.0-key.pem \
   # --relay-cert-path ./0.0.0.0.pem \

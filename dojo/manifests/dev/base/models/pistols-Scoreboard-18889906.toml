@@ -3,6 +3,7 @@ class_hash = "0x20217ebd369f280d7c38719ba769b9af22a3960fb0b230106c672daed0a1361"
 original_class_hash = "0x20217ebd369f280d7c38719ba769b9af22a3960fb0b230106c672daed0a1361"
 abi = "manifests/dev/base/abis/models/pistols-Scoreboard-18889906.json"
 tag = "pistols-Scoreboard"
+qualified_path = "pistols::models::duelist::scoreboard"
 manifest_name = "pistols-Scoreboard-18889906"
 
 [[members]]

@@ -1,29 +1,14 @@
 use debug::PrintTrait;
 use starknet::{ContractAddress, get_contract_address, get_caller_address, testing};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+use dojo::model::{Model, ModelTest, ModelIndex, ModelEntityTest};
 use dojo::utils::test::spawn_test_world;
 
 use origami_token::tests::constants::{ZERO, OWNER, SPENDER, RECIPIENT};//, TOKEN_ID, TOKEN_ID_2, TOKEN_ID_3};
 use origami_token::tests::utils;
 
-use origami_token::components::security::initializable::{initializable_model};
-use origami_token::components::introspection::src5::{src_5_model, SRC5Model};
-use origami_token::components::introspection::src5::src5_component::{SRC5Impl};
 use origami_token::components::token::erc721::interface::{
     IERC721_ID, IERC721_METADATA_ID, IERC721_ENUMERABLE_ID,
-};
-
-use origami_token::components::token::erc721::{
-    erc721_approval::{erc_721_token_approval_model},
-    erc721_metadata::{erc_721_meta_model},
-    erc721_balance::{erc_721_balance_model},
-    erc721_owner::{erc_721_owner_model},
-    erc721_enumerable::{erc_721_enumerable_index_model},
-    erc721_enumerable::{erc_721_enumerable_owner_index_model},
-    erc721_enumerable::{erc_721_enumerable_owner_token_model},
-    erc721_enumerable::{erc_721_enumerable_token_model},
-    erc721_enumerable::{erc_721_enumerable_total_model},
-    erc721_approval::{erc_721_operator_approval_model},
 };
 
 use origami_token::components::token::erc721::erc721_approval::erc721_approval_component::{
@@ -43,11 +28,11 @@ use pistols::systems::minter::{
     minter, IMinterDispatcher, IMinterDispatcherTrait,
 };
 use pistols::models::{
-    duelist::{duelist, Duelist, Score, scoreboard, Scoreboard, ProfilePicType, pact},
-    challenge::{challenge, Challenge, snapshot, Snapshot, wager, Wager, round, Round},
-    config::{config, Config},
-    table::{table_config, TableConfig, table_admittance, TableAdmittance},
-    token_config::{token_config, TokenConfig},
+    duelist::{Duelist, Score, Scoreboard, ProfilePicType},
+    challenge::{Challenge, Snapshot, Wager, Round},
+    config::{Config},
+    table::{TableConfig, TableAdmittance},
+    token_config::{TokenConfig},
 };
 
 use pistols::models::table::{TABLES};
@@ -107,34 +92,8 @@ fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterD
     testing::set_block_timestamp(1);
     let mut world = spawn_test_world(
         ["origami_token", "pistols"].span(),
-        array![
-            initializable_model::TEST_CLASS_HASH,
-            src_5_model::TEST_CLASS_HASH,
-            erc_721_token_approval_model::TEST_CLASS_HASH,
-            erc_721_balance_model::TEST_CLASS_HASH,
-            erc_721_meta_model::TEST_CLASS_HASH,
-            erc_721_owner_model::TEST_CLASS_HASH,
-            erc_721_enumerable_index_model::TEST_CLASS_HASH,
-            erc_721_enumerable_owner_index_model::TEST_CLASS_HASH,
-            erc_721_enumerable_owner_token_model::TEST_CLASS_HASH,
-            erc_721_enumerable_token_model::TEST_CLASS_HASH,
-            erc_721_enumerable_total_model::TEST_CLASS_HASH,
-            erc_721_operator_approval_model::TEST_CLASS_HASH,
-            // pistols
-            duelist::TEST_CLASS_HASH,
-            scoreboard::TEST_CLASS_HASH,
-            challenge::TEST_CLASS_HASH,
-            snapshot::TEST_CLASS_HASH,
-            wager::TEST_CLASS_HASH,
-            round::TEST_CLASS_HASH,
-            pact::TEST_CLASS_HASH,
-            // admin
-            config::TEST_CLASS_HASH,
-            table_config::TEST_CLASS_HASH,
-            table_admittance::TEST_CLASS_HASH,
-            // minter
-            token_config::TEST_CLASS_HASH,
-        ].span());
+        get_models_test_class_hashes!(),
+    );
 
     let mut token = ITokenDuelistDispatcher {
         contract_address: world.deploy_contract('salt',token_duelist::TEST_CLASS_HASH.try_into().unwrap())
@@ -195,7 +154,7 @@ fn setup() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterDispatcher) {
 
 #[test]
 fn test_initializer() {
-    let (_world, mut token, mut _minter) = setup();
+    let (_world, mut token, _minter) = setup();
     assert(token.balance_of(OWNER(),) == 2, 'Should eq 2');
     assert(token.name() == "Pistols at 10 Blocks Duelists", 'Name is wrong');
     assert(token.symbol() == "DUELIST", 'Symbol is wrong');
@@ -210,7 +169,7 @@ fn test_initializer() {
 
 #[test]
 fn test_token_uri() {
-    let (mut world, mut token, mut minter) = setup();
+    let (mut world, mut token, _minter) = setup();
 
     let duelist = Duelist {
         duelist_id: TOKEN_ID.low,
@@ -238,8 +197,8 @@ fn test_token_uri() {
         wager_lost: (200 * CONST::ETH_TO_WEI.low),
     };
 
-    tester::set_Duelist(world, minter.contract_address, duelist);
-    tester::set_Scoreboard(world, minter.contract_address, scoreboard);
+    tester::set_Duelist(world, duelist);
+    tester::set_Scoreboard(world, scoreboard);
 
     let uri_1 = token.token_uri(TOKEN_ID);
     let uri_2 = token.token_uri(TOKEN_ID_2);
@@ -255,7 +214,7 @@ fn test_token_uri() {
 #[test]
 #[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))]
 fn test_token_uri_invalid() {
-    let (_world, mut token, mut _minter) = setup();
+    let (_world, mut token, _minter) = setup();
     token.token_uri(999);
 }
 
@@ -266,7 +225,7 @@ fn test_token_uri_invalid() {
 
 #[test]
 fn test_approve() {
-    let (world, mut token, mut _minter) = setup();
+    let (world, mut token, _minter) = setup();
 
     utils::impersonate(OWNER(),);
 
@@ -286,7 +245,7 @@ fn test_approve() {
 
 #[test]
 fn test_transfer_from() {
-    let (world, mut token, mut _minter) = setup();
+    let (world, mut token, _minter) = setup();
 
     utils::impersonate(OWNER(),);
     token.approve(SPENDER(), TOKEN_ID);
@@ -332,7 +291,7 @@ fn test_mint() {
 #[test]
 #[should_panic(expected: ('DUELIST: caller is not minter', 'ENTRYPOINT_FAILED'))]
 fn test_mint_not_minter() {
-    let (_world, mut token, mut _minter) = setup();
+    let (_world, mut token, _minter) = setup();
     token.mint(RECIPIENT(), TOKEN_ID_3);
 }
 
@@ -360,7 +319,7 @@ fn test_mint_minted_out() {
 
 #[test]
 fn test_burn() {
-    let (_world, mut token, mut _minter) = setup();
+    let (_world, mut token, _minter) = setup();
     assert(token.total_supply() == 2, 'invalid total_supply init');
     token.burn(TOKEN_ID_2);
     assert(token.balance_of(OWNER(),) == 1, 'invalid balance_of');

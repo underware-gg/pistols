@@ -17,6 +17,6 @@ default = "pistols"
 
 [env]
 rpc_url = "https://api.cartridge.gg/x/pistols-staging/katana"
-account_address = "0xc8a78f24c762cd47889bb4ca3b81860c532972a17bac63b911f3e6785fad3c"
-private_key = "0x58d9cbe874e10cc0282d7b8be204efc81955d5c11653c3a659d79538c1f2dcf"
-world_address = "0x4f1514c9ab747d4b0f7c859b62cf199174d4aeae5a4ad9c7ff54125917af912"
+account_address = "0x11de0eea92829e8f34720566833f5b0238b1d40e911f097aba6448c03031d71"
+private_key = "0x1d2b3a19b12dc3ae5ab778c2b2dfa9227cfb6dcb9099db4847520cd8b4561e0"
+world_address = "0xf1bac654f4a642efd8f56d0656f331ead7c01fedc8e659dd4b8ef45a98d15"

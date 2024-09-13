@@ -179,7 +179,7 @@ mod tests {
         // change round 1 results
         round.shot_a.health = CONST::SINGLE_DAMAGE;
         round.shot_b.health = CONST::SINGLE_DAMAGE;
-        tester::set_Round(world, actions.contract_address, round);
+        tester::set_Round(world, round);
 // 'round_1'.print();
 // round.shot_a.health.print();
 // round.shot_b.health.print();

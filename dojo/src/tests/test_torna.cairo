@@ -56,7 +56,7 @@ mod tests {
         assert(snapshot.score_a.level_villain == 0, 'snap.level_villain');
         assert(snapshot.score_b.level_lord == 0, 'snap.level_lord');
         // no bonus
-        let table_type: TableType = get!(world, challenge.table_id, TableConfig).table_type;
+        let table_type: TableType = tester::get_Table(world, challenge.table_id).table_type;
         let (crit_bonus_a, crit_bonus_b, hit_bonus_a, hit_bonus_b) = _get_chances(snapshot, table_type);
         assert(crit_bonus_a == 0, 'crit_bonus_a');
         assert(crit_bonus_b == 0, 'crit_bonus_a');
@@ -82,7 +82,7 @@ mod tests {
         assert(scoreboard_a.score.level_villain == HONOUR::MAX, 'scoreboard_a.level_villain');
         assert(scoreboard_b.score.level_lord == HONOUR::MAX, 'scoreboard_b.level_lord');
         // full bonus for both
-        let table_type: TableType = get!(world, challenge.table_id, TableConfig).table_type;
+        let table_type: TableType = tester::get_Table(world, challenge.table_id).table_type;
         let (crit_bonus_a, crit_bonus_b, hit_bonus_a, hit_bonus_b) = _get_chances(snapshot, table_type);
         assert(crit_bonus_a == 0, 'crit_bonus_a');
         assert(crit_bonus_b == CHANCES::CRIT_BONUS_LORD, 'crit_bonus_a');

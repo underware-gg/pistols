@@ -3,6 +3,7 @@ class_hash = "0x301ceb1e325561b80a7c8b49e71b09b062f79f0075a1d46ce00697db24771d2"
 original_class_hash = "0x301ceb1e325561b80a7c8b49e71b09b062f79f0075a1d46ce00697db24771d2"
 abi = "manifests/staging/base/abis/models/pistols-Round-617e0a3d.json"
 tag = "pistols-Round"
+qualified_path = "pistols::models::challenge::round"
 manifest_name = "pistols-Round-617e0a3d"
 
 [[members]]

@@ -3,6 +3,7 @@ class_hash = "0x1742fb856890207335d9bbec53122aed0b5593b213298050eec50c4e86fcee9"
 original_class_hash = "0x1742fb856890207335d9bbec53122aed0b5593b213298050eec50c4e86fcee9"
 abi = "manifests/dev/base/abis/models/pistols-Pact-72a33a65.json"
 tag = "pistols-Pact"
+qualified_path = "pistols::models::duelist::pact"
 manifest_name = "pistols-Pact-72a33a65"
 
 [[members]]
