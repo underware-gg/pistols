@@ -55,25 +55,25 @@ pub struct Round {
     #[key]
     pub round_number: u8,
     //---------------
-    pub state: RoundState,
     pub moves_a: Moves,
     pub moves_b: Moves,
     pub state_a: PlayerState,
     pub state_b: PlayerState,
-} // (8 + 232 + 232) = 472 bits ~ 2 felts (max 504)
+    pub state: RoundState,
+}
 
 //
 // The shot of each player on a Round
 #[derive(Copy, Drop, Serde, Introspect, Default)]
 pub struct Moves {
+    // commit/reveal
+    pub salt: felt252,      // the player's secret salt
+    pub hash: u128,         // hashed moves (salt + moves)
     // player input
     pub card_1: u8,         // PacesCard,
     pub card_2: u8,         // PacesCard,
     pub card_3: u8,         // TacticsCard,
     pub card_4: u8,         // BladesCard,
-    // commit/reveal
-    pub salt: felt252,      // the player's secret salt
-    pub hash: u128,         // hashed moves (salt + moves)
 } // [f] + [128 + 112(14*8)]:240
 
 #[derive(Copy, Drop, Serde, Introspect, Default)]
