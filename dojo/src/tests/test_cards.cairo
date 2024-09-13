@@ -54,19 +54,15 @@ mod tests {
     #[test]
     fn test_game_loop() {
         let sys = tester::setup_world(FLAGS::ACTIONS | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-
-        // let (salts, moves_a, moves_b) = prefabs::get_moves_dual_miss();
-        let salts = SaltsValuesTrait::empty();
-        let moves_a: PlayerMoves = PlayerMovesTrait::new(SALT_A, [1, 1, TacticsCard::Vengeful.into()].span());
-        let moves_b: PlayerMoves = PlayerMovesTrait::new(SALT_B, [1, 1, TacticsCard::Vengeful.into()].span());
-
+        let (salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         let duel_id = prefabs::start_new_challenge(sys, OWNER(), OTHER(), WAGER_VALUE);
         let (_challenge, round) = prefabs::commit_reveal_get(sys, duel_id, OWNER(), OTHER(), salts, moves_a, moves_b);
-
-        assert(round.state_a.damage == CONST::INITIAL_DAMAGE, 'START_DAMAGE_a');
-        assert(round.state_b.damage == CONST::INITIAL_DAMAGE, 'START_DAMAGE_b');
-        assert(round.state_a.damage < round.state_a.damage, 'final_damage_a');
-        assert(round.state_b.damage < round.state_b.damage, 'final_damage_b');
+        assert(round.state_a.damage > CONST::INITIAL_DAMAGE, 'final_damage_a');
+        assert(round.state_b.damage > CONST::INITIAL_DAMAGE, 'final_damage_b');
+        assert(round.state_a.health < CONST::FULL_HEALTH, 'final_health_a');
+        assert(round.state_b.health < CONST::FULL_HEALTH, 'final_health_b');
+        assert(round.state_a.win == 1, 'win_a');
+        assert(round.state_b.win == 1, 'win_b');
     }
 
 
@@ -91,8 +87,8 @@ mod tests {
         };
         round.moves_a.initialize(SALT_A, moves_a);
         round.moves_b.initialize(SALT_B, moves_b);
-        round.state_a.initialize(round.moves_a.card_fire);
-        round.state_b.initialize(round.moves_b.card_fire);
+        round.state_a.initialize(round.moves_a.card_1.into());
+        round.state_b.initialize(round.moves_b.card_1.into());
         let progress: DuelProgress = shooter::game_loop_internal(ref dice, ref round);
         (round, progress)
     }
@@ -168,9 +164,9 @@ mod tests {
         assert(progress.hand_a.card_dodge == 0_u8.into(), 'hand_a.card_dodge');
         assert(progress.hand_b.card_fire == 2_u8.into(), 'hand_b.card_fire');
         assert(progress.hand_b.card_dodge == 0_u8.into(), 'hand_b.card_dodge');
-        assert(progress.steps.len() == 2, 'paces.len');
-        let mut i: u8 = 0;
-        while (i < 2) {
+        assert(progress.steps.len() == 3, 'paces.len');
+        let mut i: u8 = 1;
+        while (i <= 2) {
             let num: felt252 = '1'+i.into();
             let step: DuelStep = *progress.steps[i.into()];
             let pace: PacesCard = step.pace;
@@ -407,8 +403,8 @@ mod tests {
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
-        assert(round.state_a.chances == CONST::INITIAL_CHANCE, 'INITIAL_CHANCE');
-        assert(round.state_a.damage == CONST::INITIAL_DAMAGE, 'INITIAL_DAMAGE');
+        assert(*start_state_a.chances == CONST::INITIAL_CHANCE, 'INITIAL_CHANCE');
+        assert(*start_state_a.damage == CONST::INITIAL_DAMAGE, 'INITIAL_DAMAGE');
         assert(round.state_a.chances > *start_state_a.chances, 'chances');
         assert(round.state_a.damage > *start_state_a.damage, 'damage');
         _assert_not_affected_by_cards(*start_state_b, round.state_b);
@@ -422,8 +418,8 @@ mod tests {
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
-        assert(round.state_b.chances == CONST::INITIAL_CHANCE, 'INITIAL_CHANCE');
-        assert(round.state_b.damage == CONST::INITIAL_DAMAGE, 'INITIAL_DAMAGE');
+        assert(*start_state_b.chances == CONST::INITIAL_CHANCE, 'INITIAL_CHANCE');
+        assert(*start_state_b.damage == CONST::INITIAL_DAMAGE, 'INITIAL_DAMAGE');
         assert(round.state_b.chances > *start_state_b.chances, 'chances');
         assert(round.state_b.damage > *start_state_b.damage, 'damage');
         _assert_not_affected_by_cards(*start_state_a, round.state_a);

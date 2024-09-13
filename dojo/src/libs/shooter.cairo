@@ -105,15 +105,13 @@ mod shooter {
 
         // Validate moves hash
         if (duelist_number == 1) {
-            assert(round.moves_a.card_fire == PacesCard::None, Errors::ALREADY_REVEALED);
+            assert(round.moves_a.card_1 == 0, Errors::ALREADY_REVEALED);
             assert(round.moves_a.hash == hash, Errors::MOVES_HASH_MISMATCH);
             round.moves_a.initialize(salt, moves);
-            round.state_a.initialize(round.moves_a.card_fire);
         } else if (duelist_number == 2) {
-            assert(round.moves_b.card_fire == PacesCard::None, Errors::ALREADY_REVEALED);
+            assert(round.moves_b.card_1 == 0, Errors::ALREADY_REVEALED);
             assert(round.moves_b.hash == hash, Errors::MOVES_HASH_MISMATCH);
             round.moves_b.initialize(salt, moves);
-            round.state_b.initialize(round.moves_b.card_fire);
         }
 
         // incomplete Round, update only
@@ -157,6 +155,9 @@ mod shooter {
         let mut hand_b: PlayerHand = round.moves_b.as_hand();
         hand_a.validate();
         hand_b.validate();
+
+        round.state_b.initialize(hand_a.card_fire);
+        round.state_a.initialize(hand_b.card_fire);
 
         let mut global_state_a: PlayerState = round.state_a;
         let mut global_state_b: PlayerState = round.state_b;

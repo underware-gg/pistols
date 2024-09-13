@@ -54,19 +54,19 @@ mod tests {
         assert(progress.hand_a.card_dodge.into() == moves_a.value_or_zero(1), 'moves_a_1');
         assert(progress.hand_a.card_tactics.into() == moves_a.value_or_zero(2), 'moves_a_2');
         assert(progress.hand_a.card_blades.into() == moves_a.value_or_zero(3), 'moves_a_3');
-        assert(progress.hand_a.card_fire == round.moves_a.card_fire, 'hand_a.card_fire');
-        assert(progress.hand_a.card_dodge == round.moves_a.card_dodge, 'hand_a.card_fire');
-        assert(progress.hand_a.card_tactics == round.moves_a.card_tactics, 'hand_a.card_fire');
-        assert(progress.hand_a.card_blades == round.moves_a.card_blades, 'hand_a.card_fire');
+        assert(progress.hand_a.card_fire == round.moves_a.card_1.into(), 'hand_a.card_fire');
+        assert(progress.hand_a.card_dodge == round.moves_a.card_2.into(), 'hand_a.card_fire');
+        assert(progress.hand_a.card_tactics == round.moves_a.card_3.into(), 'hand_a.card_fire');
+        assert(progress.hand_a.card_blades == round.moves_a.card_4.into(), 'hand_a.card_fire');
         // hand_b
         assert(progress.hand_b.card_fire.into() == moves_b.value_or_zero(0), 'moves_b_0');
         assert(progress.hand_b.card_dodge.into() == moves_b.value_or_zero(1), 'moves_b_1');
         assert(progress.hand_b.card_tactics.into() == moves_b.value_or_zero(2), 'moves_b_2');
         assert(progress.hand_b.card_blades.into() == moves_b.value_or_zero(3), 'moves_b_3');
-        assert(progress.hand_b.card_fire == round.moves_b.card_fire, 'hand_b.card_fire');
-        assert(progress.hand_b.card_dodge == round.moves_b.card_dodge, 'hand_b.card_fire');
-        assert(progress.hand_b.card_tactics == round.moves_b.card_tactics, 'hand_b.card_fire');
-        assert(progress.hand_b.card_blades == round.moves_b.card_blades, 'hand_b.card_fire');
+        assert(progress.hand_b.card_fire == round.moves_b.card_1.into(), 'hand_b.card_fire');
+        assert(progress.hand_b.card_dodge == round.moves_b.card_2.into(), 'hand_b.card_fire');
+        assert(progress.hand_b.card_tactics == round.moves_b.card_3.into(), 'hand_b.card_fire');
+        assert(progress.hand_b.card_blades == round.moves_b.card_4.into(), 'hand_b.card_fire');
         // state_a
         assert(final_pace.state_a.health == round.state_a.health, 'state_final_b.health');
         assert(final_pace.state_a.damage == round.state_a.damage, 'state_final_b.damage');
@@ -204,8 +204,8 @@ mod tests {
         assert(round.state == RoundState::Reveal, '3__state');
         assert(round.moves_a.hash == moves_a.hash, '3__hash');
         assert(round.moves_a.salt == moves_a.salt, '3__salt');
-        assert(round.moves_a.card_fire.into() == *moves_a.moves[0], '3__card_fire');
-        assert(round.moves_a.card_dodge.into() == *moves_a.moves[1], '3__card_dodge');
+        assert(round.moves_a.card_1 == *moves_a.moves[0], '3__card_fire');
+        assert(round.moves_a.card_2 == *moves_a.moves[1], '3__card_dodge');
 
         // 2nd reveal > Finished
         tester::execute_reveal_moves(@sys.actions, OTHER(), duel_id, 1, moves_b.salt, moves_b.moves);
@@ -221,12 +221,12 @@ mod tests {
         assert(round.state == RoundState::Finished, '4__state');
         assert(round.moves_a.hash == moves_a.hash, '43__hash');
         assert(round.moves_a.salt == moves_a.salt, '43__salt');
-        assert(round.moves_a.card_fire.into() == *moves_a.moves[0], '43__card_fire');
-        assert(round.moves_a.card_dodge.into() == *moves_a.moves[1], '43__card_dodge');
+        assert(round.moves_a.card_1.into() == *moves_a.moves[0], '43__card_fire');
+        assert(round.moves_a.card_2.into() == *moves_a.moves[1], '43__card_dodge');
         assert(round.moves_b.hash == moves_b.hash, '4__hash');
         assert(round.moves_b.salt == moves_b.salt, '4__salt');
-        assert(round.moves_b.card_fire.into() == *moves_b.moves[0], '4__card_fire');
-        assert(round.moves_b.card_dodge.into() == *moves_b.moves[1], '4__card_dodge');
+        assert(round.moves_b.card_1.into() == *moves_b.moves[0], '4__card_fire');
+        assert(round.moves_b.card_2.into() == *moves_b.moves[1], '4__card_dodge');
 
         let duelist_a = tester::get_DuelistEntity(sys.world, OWNER());
         let duelist_b = tester::get_DuelistEntity(sys.world, OTHER());

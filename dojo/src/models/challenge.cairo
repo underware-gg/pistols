@@ -67,10 +67,10 @@ pub struct Round {
 #[derive(Copy, Drop, Serde, Introspect, Default)]
 pub struct Moves {
     // player input
-    pub card_fire: PacesCard,
-    pub card_dodge: PacesCard,
-    pub card_tactics: TacticsCard,
-    pub card_blades: BladesCard,
+    pub card_1: u8,         // PacesCard,
+    pub card_2: u8,         // PacesCard,
+    pub card_3: u8,         // TacticsCard,
+    pub card_4: u8,         // BladesCard,
     // commit/reveal
     pub salt: felt252,      // the player's secret salt
     pub hash: u128,         // hashed moves (salt + moves)
@@ -110,17 +110,17 @@ impl RoundImpl of RoundTrait {
 impl MovesImpl of MovesTrait {
     fn initialize(ref self: Moves, salt: felt252, moves: Span<u8>) {
         self.salt = salt;
-        self.card_fire = moves.value_or_zero(0).into();
-        self.card_dodge = moves.value_or_zero(1).into();
-        self.card_tactics = moves.value_or_zero(2).into();
-        self.card_blades = moves.value_or_zero(3).into();
+        self.card_1 = moves.value_or_zero(0);
+        self.card_2 = moves.value_or_zero(1);
+        self.card_3 = moves.value_or_zero(2);
+        self.card_4 = moves.value_or_zero(3);
     }
     fn as_hand(self: @Moves) -> PlayerHand {
         (PlayerHand {
-            card_fire: *self.card_fire,
-            card_dodge: *self.card_dodge,
-            card_tactics: *self.card_tactics,
-            card_blades: *self.card_blades,
+            card_fire: (*self.card_1).into(),
+            card_dodge: (*self.card_2).into(),
+            card_tactics: (*self.card_3).into(),
+            card_blades: (*self.card_4).into(),
         })
     }
 }
