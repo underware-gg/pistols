@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0xc0aeb91970c9a9c1d7223c85f98ae64648f2219a946b5ec817b405ac4de66f"
-original_class_hash = "0xc0aeb91970c9a9c1d7223c85f98ae64648f2219a946b5ec817b405ac4de66f"
+class_hash = "0x20f685f8161947b75afae4199160eed56786bfef3cec3d23f39d4ac22305a8e"
+original_class_hash = "0x20f685f8161947b75afae4199160eed56786bfef3cec3d23f39d4ac22305a8e"
 abi = "manifests/staging/base/abis/models/pistols-Round-617e0a3d.json"
 tag = "pistols-Round"
 qualified_path = "pistols::models::challenge::round"
@@ -15,11 +15,6 @@ key = true
 name = "round_number"
 type = "u8"
 key = true
-
-[[members]]
-name = "state"
-type = "RoundState"
-key = false
 
 [[members]]
 name = "moves_a"
@@ -39,4 +34,9 @@ key = false
 [[members]]
 name = "state_b"
 type = "PlayerState"
+key = false
+
+[[members]]
+name = "state"
+type = "RoundState"
 key = false

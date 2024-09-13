@@ -4,7 +4,7 @@ class_hash = "0x6f4515274ee23404789c3351a77107d0ec07508530119822046600ca6948d6e"
 original_class_hash = "0x6f4515274ee23404789c3351a77107d0ec07508530119822046600ca6948d6e"
 abi = "manifests/staging/deployment/abis/dojo-world.json"
 address = "0x55fefc4a4e5c94def16d25bd1afa87407d114600560f75100f3edc8d5eaced6"
-transaction_hash = "0x680c318db86e3b74d87ee71ab4b7eba5bcce07eca04fb32cfc33a9e2dba9e8"
+transaction_hash = "0x52be329c4dc0abe6f9e33b851b7ac0a62b947852447657ae7757d11a544486"
 block_number = 3
 seed = "pistols"
 manifest_name = "dojo-world"
@@ -24,8 +24,8 @@ manifest_name = "dojo-base"
 [[contracts]]
 kind = "DojoContract"
 address = "0x2f72d0e827656555aa1760aaff6e3c1f80aceea8096437b8422c99717cd3824"
-class_hash = "0x2eb45abd14ca9d0b57f186c8343105f309a6a8faf02cbe1cf77afd58a7a6f07"
-original_class_hash = "0x2eb45abd14ca9d0b57f186c8343105f309a6a8faf02cbe1cf77afd58a7a6f07"
+class_hash = "0x6e385c95db5c6d4dc097c387f3ac176fab7fa7d7cb2e471898621546d49249c"
+original_class_hash = "0x6e385c95db5c6d4dc097c387f3ac176fab7fa7d7cb2e471898621546d49249c"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/staging/deployment/abis/contracts/pistols-actions-4f10cff7.json"
 reads = []
@@ -733,8 +733,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0xc0aeb91970c9a9c1d7223c85f98ae64648f2219a946b5ec817b405ac4de66f"
-original_class_hash = "0xc0aeb91970c9a9c1d7223c85f98ae64648f2219a946b5ec817b405ac4de66f"
+class_hash = "0x20f685f8161947b75afae4199160eed56786bfef3cec3d23f39d4ac22305a8e"
+original_class_hash = "0x20f685f8161947b75afae4199160eed56786bfef3cec3d23f39d4ac22305a8e"
 abi = "manifests/staging/deployment/abis/models/pistols-Round-617e0a3d.json"
 tag = "pistols-Round"
 qualified_path = "pistols::models::challenge::round"
@@ -749,11 +749,6 @@ key = true
 name = "round_number"
 type = "u8"
 key = true
-
-[[models.members]]
-name = "state"
-type = "RoundState"
-key = false
 
 [[models.members]]
 name = "moves_a"
@@ -773,6 +768,11 @@ key = false
 [[models.members]]
 name = "state_b"
 type = "PlayerState"
+key = false
+
+[[models.members]]
+name = "state"
+type = "RoundState"
 key = false
 
 [[models]]

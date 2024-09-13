@@ -2,7 +2,7 @@
 set -e
 source scripts/setup.sh
 
-# export WORLD_ADDRESS=0x403b5f047b8c4797139e30801e310473d99ca6877d19e0f27506f353f8f70f7
+# export WORLD_ADDRESS=0x55fefc4a4e5c94def16d25bd1afa87407d114600560f75100f3edc8d5eaced6
 
 echo "@WORLD: $WORLD_ADDRESS"
 
@@ -28,5 +28,6 @@ torii --version
 torii \
   --world $WORLD_ADDRESS $* \
   --allowed-origins "*" \
+  # --rpc https://api.cartridge.gg/x/pistols-staging/katana \
   # --relay-local-key-path ./0.0.0.0-key.pem \
   # --relay-cert-path ./0.0.0.0.pem \
