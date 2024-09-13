@@ -19,6 +19,7 @@ export const ArchetypeNameToValue: Record<Archetype, number> = {
   [Archetype.Honourable]: 3,
 };
 export const getArchetypeValue = (name: Archetype): number => (ArchetypeNameToValue[name as string]);
+export const getArchetypeFromValue = (value: number): Archetype => Object.keys(ArchetypeNameToValue).find(key => ArchetypeNameToValue[key] === value) as Archetype;
 
 // from: ../dojo/src/models/duelist.cairo
 export enum ProfilePicType {
@@ -32,6 +33,7 @@ export const ProfilePicTypeNameToValue: Record<ProfilePicType, number> = {
   [ProfilePicType.External]: 2,
 };
 export const getProfilePicTypeValue = (name: ProfilePicType): number => (ProfilePicTypeNameToValue[name as string]);
+export const getProfilePicTypeFromValue = (value: number): ProfilePicType => Object.keys(ProfilePicTypeNameToValue).find(key => ProfilePicTypeNameToValue[key] === value) as ProfilePicType;
 
 // from: ../dojo/src/models/table.cairo
 export enum TableType {
@@ -47,6 +49,7 @@ export const TableTypeNameToValue: Record<TableType, number> = {
   [TableType.IRLTournament]: 3,
 };
 export const getTableTypeValue = (name: TableType): number => (TableTypeNameToValue[name as string]);
+export const getTableTypeFromValue = (value: number): TableType => Object.keys(TableTypeNameToValue).find(key => TableTypeNameToValue[key] === value) as TableType;
 
 // from: ../dojo/src/types/cards/blades.cairo
 export enum BladesCard {
@@ -64,6 +67,7 @@ export const BladesCardNameToValue: Record<BladesCard, number> = {
   [BladesCard.Grapple]: 4,
 };
 export const getBladesCardValue = (name: BladesCard): number => (BladesCardNameToValue[name as string]);
+export const getBladesCardFromValue = (value: number): BladesCard => Object.keys(BladesCardNameToValue).find(key => BladesCardNameToValue[key] === value) as BladesCard;
 
 // from: ../dojo/src/types/cards/cards.cairo
 export enum Rarity {
@@ -79,6 +83,7 @@ export const RarityNameToValue: Record<Rarity, number> = {
   [Rarity.Special]: 3,
 };
 export const getRarityValue = (name: Rarity): number => (RarityNameToValue[name as string]);
+export const getRarityFromValue = (value: number): Rarity => Object.keys(RarityNameToValue).find(key => RarityNameToValue[key] === value) as Rarity;
 
 // from: ../dojo/src/types/cards/env.cairo
 export enum EnvCard {
@@ -108,6 +113,7 @@ export const EnvCardNameToValue: Record<EnvCard, number> = {
   [EnvCard.SpecialNoTactics]: 10,
 };
 export const getEnvCardValue = (name: EnvCard): number => (EnvCardNameToValue[name as string]);
+export const getEnvCardFromValue = (value: number): EnvCard => Object.keys(EnvCardNameToValue).find(key => EnvCardNameToValue[key] === value) as EnvCard;
 
 // from: ../dojo/src/types/cards/paces.cairo
 export enum PacesCard {
@@ -137,6 +143,7 @@ export const PacesCardNameToValue: Record<PacesCard, number> = {
   [PacesCard.Paces10]: 10,
 };
 export const getPacesCardValue = (name: PacesCard): number => (PacesCardNameToValue[name as string]);
+export const getPacesCardFromValue = (value: number): PacesCard => Object.keys(PacesCardNameToValue).find(key => PacesCardNameToValue[key] === value) as PacesCard;
 
 // from: ../dojo/src/types/cards/tactics.cairo
 export enum TacticsCard {
@@ -158,6 +165,7 @@ export const TacticsCardNameToValue: Record<TacticsCard, number> = {
   [TacticsCard.Bananas]: 6,
 };
 export const getTacticsCardValue = (name: TacticsCard): number => (TacticsCardNameToValue[name as string]);
+export const getTacticsCardFromValue = (value: number): TacticsCard => Object.keys(TacticsCardNameToValue).find(key => TacticsCardNameToValue[key] === value) as TacticsCard;
 
 // from: ../dojo/src/types/challenge_state.cairo
 export enum ChallengeState {
@@ -181,6 +189,7 @@ export const ChallengeStateNameToValue: Record<ChallengeState, number> = {
   [ChallengeState.Draw]: 7,
 };
 export const getChallengeStateValue = (name: ChallengeState): number => (ChallengeStateNameToValue[name as string]);
+export const getChallengeStateFromValue = (value: number): ChallengeState => Object.keys(ChallengeStateNameToValue).find(key => ChallengeStateNameToValue[key] === value) as ChallengeState;
 
 // from: ../dojo/src/types/duel_progress.cairo
 export enum DuelistDrawnCard {
@@ -196,6 +205,7 @@ export const DuelistDrawnCardNameToValue: Record<DuelistDrawnCard, number> = {
   [DuelistDrawnCard.Blades]: 3,
 };
 export const getDuelistDrawnCardValue = (name: DuelistDrawnCard): number => (DuelistDrawnCardNameToValue[name as string]);
+export const getDuelistDrawnCardFromValue = (value: number): DuelistDrawnCard => Object.keys(DuelistDrawnCardNameToValue).find(key => DuelistDrawnCardNameToValue[key] === value) as DuelistDrawnCard;
 
 // from: ../dojo/src/types/misc.cairo
 export enum Boolean {
@@ -209,6 +219,7 @@ export const BooleanNameToValue: Record<Boolean, number> = {
   [Boolean.False]: 2,
 };
 export const getBooleanValue = (name: Boolean): number => (BooleanNameToValue[name as string]);
+export const getBooleanFromValue = (value: number): Boolean => Object.keys(BooleanNameToValue).find(key => BooleanNameToValue[key] === value) as Boolean;
 
 // from: ../dojo/src/types/premise.cairo
 export enum Premise {
@@ -232,6 +243,7 @@ export const PremiseNameToValue: Record<Premise, number> = {
   [Premise.Nothing]: 7,
 };
 export const getPremiseValue = (name: Premise): number => (PremiseNameToValue[name as string]);
+export const getPremiseFromValue = (value: number): Premise => Object.keys(PremiseNameToValue).find(key => PremiseNameToValue[key] === value) as Premise;
 
 // from: ../dojo/src/types/round_state.cairo
 export enum RoundState {
@@ -247,6 +259,7 @@ export const RoundStateNameToValue: Record<RoundState, number> = {
   [RoundState.Finished]: 3,
 };
 export const getRoundStateValue = (name: RoundState): number => (RoundStateNameToValue[name as string]);
+export const getRoundStateFromValue = (value: number): RoundState => Object.keys(RoundStateNameToValue).find(key => RoundStateNameToValue[key] === value) as RoundState;
 
 //
 // constants

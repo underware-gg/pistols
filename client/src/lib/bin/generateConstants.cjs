@@ -233,7 +233,14 @@ function buildFileContents(parsed) {
     fileContents += `// from: ${enums[key].filePath}\n`;
     fileContents += enumContents;
     fileContents += dictContents;
+    
+    // converters
+    // export const getArchetypeValue = (name: Archetype): number => (ArchetypeNameToValue[name as string]);
+    // export const getArchetypeFromValue = (value: number): Archetype => Object.keys(ArchetypeNameToValue).find(key => ArchetypeNameToValue[key] === value) as Archetype
     fileContents += `export const get${enumName}Value = (name: ${enumName}): number => (${enumDictName}[name as string]);\n`
+    fileContents += `export const get${enumName}FromValue = (value: number): ${enumName} => Object.keys(${enumDictName}).find(key => ${enumDictName}[key] === value) as ${enumName};\n`
+
+
     // exports
     enumNames.push(enumName)
     exports.push(enumName);
