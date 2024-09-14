@@ -8,6 +8,7 @@ import { bigintEquals } from '@/lib/utils/types'
 import { EMOJI } from '@/pistols/data/messages'
 import { BigNumberish } from 'starknet'
 import { Action } from '../utils/pistols'
+import { getPacesCardFromValue } from '@/games/pistols/generated/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -94,7 +95,7 @@ export function useDuelIcons({
     //
     // Finished...
     if (isFinished) {
-      if (state1) icons1.push(<ActionIcon key='state1' action={moves1.card_fire as unknown as Action} size={iconSize} />)
+      if (state1) icons1.push(<ActionIcon key='state1' action={getPacesCardFromValue(moves1.card_1) as unknown as Action} size={iconSize} />)
       if (health1) icons1.push(<EmojiIcon key='health1' emoji={health1} size={iconSize} />)
       if (health1b) icons1.push(<EmojiIcon key='health1b' emoji={health1b} size={iconSize} />)
       if (win1) icons1.push(<EmojiIcon key='win1' emoji={win1} size={iconSize} />)

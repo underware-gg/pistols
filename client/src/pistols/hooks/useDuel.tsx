@@ -7,7 +7,7 @@ import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
 import { useChallenge } from "@/pistols/hooks/useChallenge"
 import { keysToEntity } from '@/lib/utils/types'
 import { AnimationState } from "@/pistols/three/game"
-import { CONST, getPacesCardValue, getRoundStateValue, PacesCard, RoundState } from '@/games/pistols/generated/constants'
+import { CONST, getPacesCardFromValue, getPacesCardValue, getRoundStateValue, PacesCard, RoundState } from '@/games/pistols/generated/constants'
 import { Action } from "@/pistols/utils/pistols"
 
 export enum DuelStage {
@@ -46,11 +46,11 @@ export const useDuel = (duelId: BigNumberish) => {
     return {
       completedStagesA: {
         [DuelStage.Round1Commit]: Boolean(round1?.moves_a.hashed),
-        [DuelStage.Round1Reveal]: Boolean(getPacesCardValue(round1?.moves_a.card_fire as unknown as PacesCard)),
+        [DuelStage.Round1Reveal]: Boolean(round1?.moves_a.card_1),
       },
       completedStagesB: {
         [DuelStage.Round1Commit]: Boolean(round1?.moves_b.hashed),
-        [DuelStage.Round1Reveal]: Boolean(getPacesCardValue(round1?.moves_b.card_fire as unknown as PacesCard)),
+        [DuelStage.Round1Reveal]: Boolean(round1?.moves_b.card_1),
       },
     }
   }, [round1])
@@ -112,8 +112,8 @@ export const useAnimatedDuel = (duelId: BigNumberish, enabled: boolean) => {
   useEffect(() => {
     if (enabled && gameImpl && isAnimatingRound1 && audioLoaded) {
       console.log(`TRIGGER animateDuel(1)`)
-      const actionA = (round1.moves_a.card_fire as unknown as Action)
-      const actionB = (round1.moves_b.card_fire as unknown as Action)
+      const actionA = getPacesCardFromValue(round1.moves_a.card_1) as unknown as Action
+      const actionB = getPacesCardFromValue(round1.moves_b.card_1) as unknown as Action
       gameImpl.animateDuel(AnimationState.Round1, actionA, actionB, round1.state_a.health, round1.state_b.health, round1.state_a.damage, round1.state_b.damage)
     }
   }, [enabled, gameImpl, isAnimatingRound1, audioLoaded])
