@@ -3,6 +3,7 @@ class_hash = "0x2a9e6b7d401e8c9fa77e5221dce4f049334ce8ed4d7a53f88adf72b3af968eb"
 original_class_hash = "0x2a9e6b7d401e8c9fa77e5221dce4f049334ce8ed4d7a53f88adf72b3af968eb"
 abi = "manifests/slot/base/abis/models/origami_token-ERC20MetadataModel-3368c0e3.json"
 tag = "origami_token-ERC20MetadataModel"
+qualified_path = "origami_token::components::token::erc20::erc20_metadata::erc_20_metadata_model"
 manifest_name = "origami_token-ERC20MetadataModel-3368c0e3"
 
 [[members]]
