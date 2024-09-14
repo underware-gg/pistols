@@ -3,6 +3,7 @@ class_hash = "0x38c3c9f4ec3feea51cee2ec9be6592b50f711f5fa39e5b4f0ca0e770675505e"
 original_class_hash = "0x38c3c9f4ec3feea51cee2ec9be6592b50f711f5fa39e5b4f0ca0e770675505e"
 abi = "manifests/slot/base/abis/models/origami_token-ERC20BalanceModel-da267235.json"
 tag = "origami_token-ERC20BalanceModel"
+qualified_path = "origami_token::components::token::erc20::erc20_balance::erc_20_balance_model"
 manifest_name = "origami_token-ERC20BalanceModel-da267235"
 
 [[members]]

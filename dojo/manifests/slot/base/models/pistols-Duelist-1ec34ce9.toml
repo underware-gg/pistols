@@ -3,6 +3,7 @@ class_hash = "0x438678aed538eaeacb5395be5b5bf337c8b620492ab0f54b032756bc3c3bd85"
 original_class_hash = "0x438678aed538eaeacb5395be5b5bf337c8b620492ab0f54b032756bc3c3bd85"
 abi = "manifests/slot/base/abis/models/pistols-Duelist-1ec34ce9.json"
 tag = "pistols-Duelist"
+qualified_path = "pistols::models::duelist::duelist"
 manifest_name = "pistols-Duelist-1ec34ce9"
 
 [[members]]
