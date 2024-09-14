@@ -4,7 +4,15 @@ source scripts/setup.sh
 
 # export WORLD_ADDRESS=0x55fefc4a4e5c94def16d25bd1afa87407d114600560f75100f3edc8d5eaced6
 
-echo "@WORLD: $WORLD_ADDRESS"
+# export TORII_PATH=torii
+export TORII_PATH=../../dojo/target/release/torii
+
+echo "----------------------------------------"
+echo "* PROFILE : $PROFILE"
+echo "* RPC_URL : $RPC_URL"
+echo "* WORLD   : $WORLD_ADDRESS"
+echo "* TORII   : $TORII_PATH"
+echo "----------------------------------------"
 
 if [[
   "$WORLD_ADDRESS" != "0x"*
@@ -24,10 +32,10 @@ fi
 # Create certificate
 # $ mkcert 0.0.0.0
 
-torii --version
-torii \
-  --world $WORLD_ADDRESS $* \
+$TORII_PATH --version
+$TORII_PATH \
+  --rpc $RPC_URL \
+  --world $WORLD_ADDRESS \
   --allowed-origins "*" \
-  # --rpc https://api.cartridge.gg/x/pistols-staging/katana \
   # --relay-local-key-path ./0.0.0.0-key.pem \
   # --relay-cert-path ./0.0.0.0.pem \

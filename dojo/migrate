@@ -27,6 +27,7 @@ fi
 # build
 #
 echo "------------------------------------------------------------------------------"
+sozo --version
 echo ">>> Cleaning..."
 sozo -P $PROFILE clean
 echo ">>> Building..."
