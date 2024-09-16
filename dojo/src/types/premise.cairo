@@ -12,6 +12,7 @@ pub enum Premise {
     Hatred,     // 5
     Blood,      // 6
     Nothing,    // 7
+    Tournament, // 8
 }
 
 #[generate_trait]
@@ -26,6 +27,7 @@ impl PremiseTraitImpl of PremiseTrait {
             Premise::Hatred      => 'Hatred',
             Premise::Blood       => 'Blood',
             Premise::Nothing     => 'Nothing',
+            Premise::Tournament  => 'Tournament',
         }
     }
     fn prefix(self: Premise) -> felt252 {
@@ -38,6 +40,7 @@ impl PremiseTraitImpl of PremiseTrait {
             Premise::Hatred      => 'to satisfy a burning hatred',
             Premise::Blood       => 'for the love of death and blood',
             Premise::Nothing     => 'for no reason other than',
+            Premise::Tournament  => 'to be the winner of',
         }
     }
 }
