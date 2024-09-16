@@ -5,7 +5,7 @@ use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrai
 use pistols::systems::admin::admin::{Errors};
 use pistols::utils::misc::{ZERO};
 use pistols::utils::math::{MathU128};
-use pistols::utils::arrays::{ArrayTrait};
+use pistols::utils::arrays::{ArrayUtilsTrait};
 use pistols::types::constants::{CONST};
 
 mod TABLES {

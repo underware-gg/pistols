@@ -14,7 +14,7 @@ mod tests {
     use pistols::types::duel_progress::{DuelProgress, DuelStep};
     use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::types::constants::{CONST, HONOUR};
-    use pistols::utils::arrays::{SpanTrait};
+    use pistols::utils::arrays::{SpanUtilsTrait};
     use pistols::libs::utils::{make_moves_hash};
 
     use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};

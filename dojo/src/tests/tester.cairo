@@ -22,7 +22,7 @@ mod tester {
     use pistols::types::challenge_state::{ChallengeState};
     use pistols::types::constants::{CONST};
     use pistols::types::premise::{Premise};
-    use pistols::utils::arrays::{SpanTrait};
+    use pistols::utils::arrays::{SpanUtilsTrait};
     use pistols::utils::short_string::{ShortString};
     use pistols::interfaces::systems::{SELECTORS};
 

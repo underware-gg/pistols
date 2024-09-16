@@ -477,8 +477,12 @@ mod actions {
         fn get_duel_progress(world: @IWorldDispatcher, duel_id: u128) -> DuelProgress {
             let store: Store = StoreTrait::new(world);
             let challenge: Challenge = store.get_challenge(duel_id);
-            let mut round: Round = store.get_round(duel_id, 1);
-            (shooter::game_loop(store, challenge, ref round))
+            if (challenge.state.is_finished()) {
+                let mut round: Round = store.get_round(duel_id, 1);
+                (shooter::game_loop(store, challenge, ref round))
+            } else {
+                {Default::default()}
+            }
         }
 
         fn test_validate_commit_message(world: @IWorldDispatcher,

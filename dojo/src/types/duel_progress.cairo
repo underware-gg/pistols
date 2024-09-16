@@ -6,11 +6,12 @@ use pistols::types::cards::hand::{
     BladesCard, BladesCardTrait,
     EnvCard, EnvCardTrait,
 };
+use pistols::utils::arrays::{SpanDefault};
 
 //
 // Game progress, pace by pace
 
-#[derive(Copy, Drop, Serde)]
+#[derive(Copy, Drop, Serde, Default)]
 pub struct DuelProgress {
     // results
     steps: Span<DuelStep>,

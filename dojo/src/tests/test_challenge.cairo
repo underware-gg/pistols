@@ -13,9 +13,11 @@ mod tests {
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::types::constants::{CONST};
+    use pistols::types::duel_progress::{DuelProgress};
     use pistols::utils::timestamp::{timestamp};
     use pistols::tests::tester::{tester,
         tester::{
+            Systems,
             FLAGS, ID, ZERO,
             OWNER, OTHER, BUMMER, TREASURY,
             BIG_BOY, LITTLE_BOY, LITTLE_GIRL,
@@ -27,6 +29,14 @@ mod tests {
     const OTHER_NAME: felt252 = 'Senpai';
     const PREMISE_1: felt252 = 'For honour!!!';
     const TABLE_ID: felt252 = TABLES::LORDS;
+
+
+    fn _assert_empty_progress(sys: Systems, duel_id: u128) {
+        let progress: DuelProgress = sys.actions.get_duel_progress(duel_id);
+        assert(progress.winner == 0, 'progress.winner');
+        assert(progress.steps.len() == 0, 'progress.steps.len()');
+    }
+
 
     #[test]
     #[should_panic(expected:('PISTOLS: Not your duelist', 'ENTRYPOINT_FAILED'))]
@@ -98,6 +108,7 @@ mod tests {
         assert(ch.quote == PREMISE_1, 'quote');
         assert(ch.timestamp_start == timestamp, 'timestamp_start');
         assert(ch.timestamp_end == 0, 'timestamp_end');
+        _assert_empty_progress(sys, duel_id);
     }
 
     #[test]
@@ -110,6 +121,7 @@ mod tests {
         assert(ch.address_b == ZERO(), 'challenger');   // challenged an id, address is empty
         assert(ch.duelist_id_a == ID(OWNER()), 'challenger_id');
         assert(ch.duelist_id_b == ID(OTHER()), 'challenged_id');
+        _assert_empty_progress(sys, duel_id);
     }
 
     #[test]
@@ -121,6 +133,7 @@ mod tests {
         let ch = tester::get_ChallengeEntity(sys.world, duel_id);
         assert(ch.timestamp_start == timestamp, 'timestamp_start');
         assert(ch.timestamp_end == ch.timestamp_start + timestamp::from_hours(expire_hours), 'timestamp_end');
+        _assert_empty_progress(sys, duel_id);
     }
 
     #[test]
@@ -187,6 +200,8 @@ mod tests {
         assert(ch.winner == 0, 'winner');
         assert(ch.timestamp_start > 0, 'timestamp_start');
         assert(ch.timestamp_end == timestamp, 'timestamp_end');
+
+        _assert_empty_progress(sys, duel_id);
     }
 
     #[test]
@@ -218,6 +233,7 @@ mod tests {
         assert(sys.actions.has_pact(ch.table_id, ID(A), ID(B)) == false, 'has_pact_addr_false');
         assert(sys.actions.has_pact(ch.table_id, ID(ID_A), ID(ID_B)) == false, 'has_pact_id_false_still');
 
+        _assert_empty_progress(sys, duel_id);
     }
 
     #[test]
@@ -253,6 +269,8 @@ mod tests {
         assert(ch.winner == 0, 'winner');
         assert(ch.timestamp_start < timestamp, 'timestamp_start');
         assert(ch.timestamp_end == timestamp, 'timestamp_end');
+
+        _assert_empty_progress(sys, duel_id);
     }
 
     #[test]
@@ -291,6 +309,8 @@ mod tests {
         assert(ch.timestamp_start < timestamp, 'timestamp_start');
         assert(ch.timestamp_end == timestamp, 'timestamp_end');
         assert(sys.actions.has_pact(ch.table_id, ID(B), ID(A)) == false, 'has_pact_no');
+
+        _assert_empty_progress(sys, duel_id);
     }
 
     #[test]
@@ -326,6 +346,8 @@ mod tests {
         assert(ch.timestamp_end == timestamp, 'timestamp_end');
         assert(sys.actions.has_pact(ch.table_id, ID(A), ID(B)) == false, 'has_pact_addr_false');
         assert(sys.actions.has_pact(ch.table_id, ID(ID_A), ID(ID_B)) == false, 'has_pact_id_false_still');
+
+        _assert_empty_progress(sys, duel_id);
     }
 
 
@@ -366,6 +388,8 @@ mod tests {
         
         let round = tester::get_RoundEntity(sys.world, duel_id, 1);
         assert(round.state == RoundState::Commit, 'round.state');
+
+        _assert_empty_progress(sys, duel_id);
     }
 
     #[test]
@@ -399,6 +423,8 @@ mod tests {
         assert(sys.actions.has_pact(ch.table_id, ID(ID_B), ID(ID_A)) == true, 'has_pact_id_true_2');
         let ch = tester::get_ChallengeEntity(sys.world, duel_id);
         assert(ch.duelist_id_b == ID(ID_B), 'challenged_id_ok');   // << UPDATED!!!
+
+        _assert_empty_progress(sys, duel_id);
     }
 
     #[test]

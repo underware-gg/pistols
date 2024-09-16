@@ -93,7 +93,7 @@ pub struct PlayerState {
 // Traits
 //
 use pistols::types::cards::hand::{PlayerHand};
-use pistols::utils::arrays::{SpanTrait};
+use pistols::utils::arrays::{SpanUtilsTrait};
 use pistols::utils::hash::{hash_values};
 use pistols::utils::math::{MathU8};
 use pistols::types::constants::{CONST};

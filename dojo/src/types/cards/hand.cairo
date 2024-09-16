@@ -6,7 +6,7 @@ use pistols::types::cards::{
 };
 use pistols::types::duel_progress::{DuelistDrawnCard};
 
-#[derive(Copy, Drop, Serde)]
+#[derive(Copy, Drop, Serde, Default)]
 pub struct PlayerHand {
     card_fire: PacesCard,
     card_dodge: PacesCard,

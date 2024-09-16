@@ -7,7 +7,7 @@ use core::num::traits::Zero;
 //
 
 #[generate_trait]
-impl SpanImpl<T, +Clone<T>, +Drop<T>> of SpanTrait<T> {
+impl SpanUtilsImpl<T, +Clone<T>, +Drop<T>> of SpanUtilsTrait<T> {
     fn value_or_zero<+Copy<T>, +Zero<T>>(self: Span<T>, index: usize) -> T {
         (if (index < self.len()) { *self[index] } else { Zero::zero() })
     }
@@ -32,7 +32,7 @@ impl SpanImpl<T, +Clone<T>, +Drop<T>> of SpanTrait<T> {
 }
 
 #[generate_trait]
-impl ArrayImpl<T, +Clone<T>, +Drop<T>> of ArrayTrait<T> {
+impl ArrayUtilsImpl<T, +Clone<T>, +Drop<T>> of ArrayUtilsTrait<T> {
     fn value_or_zero<+Copy<T>, +Zero<T>>(self: @Array<T>, index: usize) -> T {
         (if (index < self.len()) { *self[index] } else { Zero::zero() })
     }
@@ -51,6 +51,18 @@ impl ArrayImpl<T, +Clone<T>, +Drop<T>> of ArrayTrait<T> {
     }
 }
 
+//----------------------------------------
+// Defaults
+//
+
+impl SpanDefault<T, +Drop<T>> of Default<Span<T>> {
+    fn default() -> Span<T> {
+        let arr = core::array::ArrayTrait::<T>::new();
+        (arr.span())
+    }
+}
+
+
 
 //----------------------------------------
 // Unit  tests
@@ -58,7 +70,7 @@ impl ArrayImpl<T, +Clone<T>, +Drop<T>> of ArrayTrait<T> {
 #[cfg(test)]
 mod tests {
     use debug::PrintTrait;
-    use super::{ArrayTrait, SpanTrait};
+    use super::{ArrayUtilsTrait, SpanUtilsTrait};
 
     #[test]
     fn test_array_contains() {
