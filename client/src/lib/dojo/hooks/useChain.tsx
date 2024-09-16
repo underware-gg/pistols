@@ -63,6 +63,7 @@ export const useSelectedChain = () => {
 export const useConnectToSelectedChain = (onConnect?: () => void) => {
   const { connect, connectors } = useConnect()
   const { isConnected, isConnecting } = useAccount()
+  const { selectedChainConfig } = useStarknetContext()
 
   const [requestedConnect, setRequestedConnect] = useState(false)
   useEffect(() => {
@@ -75,16 +76,14 @@ export const useConnectToSelectedChain = (onConnect?: () => void) => {
     if (isConnected) {
       onConnect?.()
     } else if (!isConnecting) {
-      const controller = connectors.find((connector) => (connector.id == supportedConnetorIds.CONTROLLER));
-      const predeployed = connectors.find((connector) => (connector.id == supportedConnetorIds.DOJO_PREDEPLOYED));
-      if (controller) {
-        console.log(`Connecting to controller...`)
+      // get 1st supported connector on this chain
+      const connector = selectedChainConfig.connectorIds.reduce((acc, id) => {
+        return acc ?? connectors.find((connector) => (connector.id == id))
+      }, undefined as Connector)
+      if (connector) {
+        console.log(`>> Connecting with [${connector.id}]...`)
         setRequestedConnect(true)
-        connect({ connector: controller })
-      } else if (predeployed) {
-        console.log(`Connecting to predeployed...`)
-        setRequestedConnect(true)
-        connect({ connector: predeployed })
+        connect({ connector })
       } else {
         setRequestedConnect(false)
         console.warn(`NO CONNECTOR!`)

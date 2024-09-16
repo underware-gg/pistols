@@ -1,10 +1,9 @@
 import React, { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { ChainId, DojoChainConfig, getDojoChainConfig, getStarknetProviderChains, isChainIdSupported } from '@/lib/dojo/setup/chainConfig'
-import { StarknetConfig, argent, braavos, injected, jsonRpcProvider, useInjectedConnectors } from '@starknet-react/core'
-import { DojoPredeployedStarknetWindowObject } from '@dojoengine/create-burner'
+import { StarknetConfig, jsonRpcProvider, useInjectedConnectors } from '@starknet-react/core'
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
-import { useControllerConnector } from '@/lib/dojo/hooks/useController'
 import { Chain } from '@starknet-react/chains'
+import { useChainConnectors } from './setup/connectors'
 
 
 interface StarknetContextType {
@@ -60,25 +59,14 @@ export const StarknetProvider = ({
   }, [])
 
   //
-  // Cartridge Controller
-  const manifest = useMemo(() => (dojoAppConfig.manifests[selectedChainId] ?? null), [selectedChainConfig])
-  const { controller } = useControllerConnector(
-    manifest,
-    selectedChainConfig.rpcUrl,
-    dojoAppConfig.nameSpace,
-    dojoAppConfig.contractInterfaces,
-  )
+  // Build chain connectors form selectedChainConfig
+  const chainConnectors = useChainConnectors(dojoAppConfig, selectedChainConfig);
 
   //
   // Connectors
   const { connectors } = useInjectedConnectors({
     // Show these connectors if the user has no connector installed.
-    recommended: [
-      injected({ id: DojoPredeployedStarknetWindowObject.getId() }),
-      argent(),
-      braavos(),
-      controller,
-    ],
+    recommended: chainConnectors,
     // Hide recommended connectors if the user has any connector installed.
     includeRecommended: 'always',
     // Randomize the order of the connectors.

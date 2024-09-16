@@ -8,7 +8,6 @@ import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
 import { useContractClassHash } from '@/lib/utils/hooks/useContractClassHash'
 import { BigNumberish } from 'starknet'
 import { bigintEquals, bigintToHex } from '@/lib/utils/types'
-import { assert } from '@/lib/utils/math'
 import { stringToFelt } from '@/lib/utils/starknet'
 
 // sync from here:
@@ -63,21 +62,24 @@ export const useControllerConnector = (manifest: DojoManifest, rpcUrl: string, n
     return new CartridgeConnector(options) as never as Connector
   }, [manifest])
 
-  useEffect(() => {
-    if (controller) {
-      assert(controller.id == supportedConnetorIds.CONTROLLER, `CartridgeConnector id does not match [${controller.id}]`)
-    }
-  }, [controller])
-
   return {
     controller,
   }
 }
 
 
+export const useConnectedController = () => {
+  const { connector } = useAccount()
+  const controllerConnector = useMemo(() => (
+    connector?.id == supportedConnetorIds.CONTROLLER ? connector as unknown as CartridgeConnector : undefined
+  ), [connector])
+  return controllerConnector
+}
+
+
 export const useControllerUser = () => {
-  const { address, connector } = useAccount()
-  const controllerConnector = useMemo(() => (connector as unknown as CartridgeConnector), [connector])
+  const { address } = useAccount()
+  const controllerConnector = useConnectedController()
   
   // fetch username
   const [username, setUsername] = useState<string>(undefined)
@@ -105,9 +107,9 @@ export const useControllerUser = () => {
 
 
 export const useControllerMenu = () => {
-  const { account, connector } = useAccount();
+  const { account } = useAccount();
   const { disconnect } = useDisconnect();
-  const controllerConnector = useMemo(() => (connector as unknown as CartridgeConnector), [connector])
+  const controllerConnector = useConnectedController()
   const openMenu = async () => {
     if (account) {
       const isConnected = await controllerConnector.openMenu()

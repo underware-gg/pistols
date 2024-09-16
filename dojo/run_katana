@@ -7,4 +7,9 @@ katana \
   --invoke-max-steps 10000000 $* \
   --allowed-origins "*" \
   --accounts 10 \
-| grep -v -e starknet_call -e starknet_blockHashAndNumber -e starknet_getBlockWithTxs
+  | grep -v \
+  -e starknet_call \
+  -e starknet_blockHashAndNumber \
+  -e starknet_getBlockWithTxs \
+  -e starknet_getBlockWithReceipts
+

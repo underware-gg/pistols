@@ -126,7 +126,7 @@ const localKatanaConfig: DojoChainConfig = {
   }],
   connectorIds: [
     supportedConnetorIds.DOJO_PREDEPLOYED,
-    // supportedConnetorIds.CONTROLLER,
+    supportedConnetorIds.CONTROLLER,
   ],
   // starknet Chain
   nativeCurrency: ETH_KATANA,
@@ -148,7 +148,6 @@ const pistolsSlotConfig: DojoChainConfig = {
   lordsFaucetUrl: undefined,
   predeployedAccounts: [],
   connectorIds: [
-    // supportedConnetorIds.DOJO_PREDEPLOYED,
     supportedConnetorIds.CONTROLLER,
   ],
   // starknet Chain
@@ -172,7 +171,6 @@ const pistolsStagingConfig: DojoChainConfig = {
   lordsFaucetUrl: undefined,
   predeployedAccounts: [],
   connectorIds: [
-    // supportedConnetorIds.DOJO_PREDEPLOYED,
     supportedConnetorIds.CONTROLLER,
   ],
   // starknet Chain
@@ -197,7 +195,6 @@ const realmsWorldConfig: DojoChainConfig = {
   lordsFaucetUrl: 'https://internal-explorer.preview.cartridge.gg',
   predeployedAccounts: [],
   connectorIds: [
-    // supportedConnetorIds.DOJO_PREDEPLOYED,
     supportedConnetorIds.CONTROLLER,
   ],
   // starknet Chain
