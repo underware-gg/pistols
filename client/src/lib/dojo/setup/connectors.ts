@@ -1,12 +1,13 @@
 import { useEffect, useMemo } from 'react'
 import { RpcProvider } from 'starknet'
-import { argent, braavos, injected } from '@starknet-react/core'
+import { argent, braavos, Connector, injected } from '@starknet-react/core'
 import { StarknetWindowObject } from 'get-starknet-core'
 import { DojoPredeployedStarknetWindowObject, PredeployedManager } from '@dojoengine/create-burner'
 import { useControllerConnector } from '@/lib/dojo/hooks/useController'
 import { DojoChainConfig } from '@/lib/dojo/setup/chains'
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
 import { assert } from '@/lib/utils/math'
+import { useAsyncMemo } from '@/lib/utils/hooks/useAsyncMemo'
 
 export const supportedConnetorIds = {
   CONTROLLER: 'controller',
@@ -32,32 +33,44 @@ export const useChainConnectors = (dojoAppConfig: DojoAppConfig, chainConfig: Do
     }
   }, [controller])
 
+  const _initPredeployed = async () => {
+    const predeployedManager = new PredeployedManager({
+      rpcProvider: new RpcProvider({ nodeUrl: chainConfig.rpcUrl }),
+      predeployedAccounts: chainConfig.predeployedAccounts.length > 0 ? chainConfig.predeployedAccounts : [{
+        name: 'Master Account',
+        address: chainConfig.masterAddress,
+        privateKey: chainConfig.masterPrivateKey,
+        active: false,
+      }],
+    });
+    await predeployedManager.init();
+    // cloned from usePredeployedWindowObject()...
+    const predeployedWindowObject = new DojoPredeployedStarknetWindowObject(predeployedManager);
+    const key = `starknet_${predeployedWindowObject.id}`;
+    (window as any)[key as string] = predeployedWindowObject as StarknetWindowObject;
+  }
 
-  const connectorIds = useMemo(() => chainConfig.connectorIds.reduce((acc, id) => {
-    if (id == argent().id) acc.push(argent())
-    if (id == braavos().id) acc.push(braavos())
-    if (id == controller.id) acc.push(controller)
-    if (id == DojoPredeployedStarknetWindowObject.getId() && typeof window !== 'undefined') {
-      const _init = async () => {
-        const predeployedManager = new PredeployedManager({
-          rpcProvider: new RpcProvider({ nodeUrl: chainConfig.rpcUrl }),
-          predeployedAccounts: chainConfig.predeployedAccounts.length > 0 ? chainConfig.predeployedAccounts : [{
-            name: 'Master Account',
-            address: chainConfig.masterAddress,
-            privateKey: chainConfig.masterPrivateKey,
-            active: false,
-          }],
-        });
-        await predeployedManager.init();
-        // cloned from usePredeployedWindowObject()...
-        const predeployedWindowObject = new DojoPredeployedStarknetWindowObject(predeployedManager);
-        const key = `starknet_${predeployedWindowObject.id}`;
-        (window as any)[key as string] = predeployedWindowObject as StarknetWindowObject;
+  const {
+    value: connectorIds,
+    isError,
+  } = useAsyncMemo<Connector[]>(async () => {
+    let promise: Promise<void> = null
+    const result = chainConfig.connectorIds.reduce((acc, id) => {
+      if (id == argent().id) acc.push(argent())
+      if (id == braavos().id) acc.push(braavos())
+      if (id == controller.id) acc.push(controller)
+      if (id == DojoPredeployedStarknetWindowObject.getId() && typeof window !== 'undefined') {
+        acc.push(injected({ id }))
+        promise = _initPredeployed()
       }
-      acc.push(injected({ id }))
-      _init()
+      return acc
+    }, [])
+    // wait for connectors to be initialized...
+    if (promise) {
+      await promise
     }
-    return acc
-  }, []), [chainConfig])
+    return result
+  }, [chainConfig], [], null)
+
   return connectorIds
 }

@@ -84,6 +84,11 @@ export const StarknetProvider = ({
   }
   const provider = jsonRpcProvider({ rpc })
 
+  if (chainConnectors.length == 0) {
+    console.warn(`KATANA: Waiting for connectors...`)
+    return <></>
+  }
+
   return (
     <StarknetContext.Provider
       value={{
