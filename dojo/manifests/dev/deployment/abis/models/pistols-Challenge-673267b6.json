@@ -401,6 +401,10 @@
       {
         "name": "Nothing",
         "type": "()"
+      },
+      {
+        "name": "Tournament",
+        "type": "()"
       }
     ]
   },

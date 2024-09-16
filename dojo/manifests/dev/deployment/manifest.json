@@ -1256,8 +1256,8 @@
     {
       "kind": "DojoContract",
       "address": "0x2f72d0e827656555aa1760aaff6e3c1f80aceea8096437b8422c99717cd3824",
-      "class_hash": "0x6e385c95db5c6d4dc097c387f3ac176fab7fa7d7cb2e471898621546d49249c",
-      "original_class_hash": "0x6e385c95db5c6d4dc097c387f3ac176fab7fa7d7cb2e471898621546d49249c",
+      "class_hash": "0x2c7ff923645899b8bfc529d6bf4a47853fe66d38427871cf6b2297ff1c747b3",
+      "original_class_hash": "0x2c7ff923645899b8bfc529d6bf4a47853fe66d38427871cf6b2297ff1c747b3",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -1538,6 +1538,10 @@
             },
             {
               "name": "Nothing",
+              "type": "()"
+            },
+            {
+              "name": "Tournament",
               "type": "()"
             }
           ]
@@ -12466,8 +12470,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x569a86ac1cd015f67abf0348fda631125b7ce840b338c0d3d4b24e4f4793688",
-      "original_class_hash": "0x569a86ac1cd015f67abf0348fda631125b7ce840b338c0d3d4b24e4f4793688",
+      "class_hash": "0x621e8a8d75db58a04b11def09072b507b27ea956db4ea488d32741a7cd7aee3",
+      "original_class_hash": "0x621e8a8d75db58a04b11def09072b507b27ea956db4ea488d32741a7cd7aee3",
       "abi": [
         {
           "type": "impl",
@@ -12870,6 +12874,10 @@
             },
             {
               "name": "Nothing",
+              "type": "()"
+            },
+            {
+              "name": "Tournament",
               "type": "()"
             }
           ]

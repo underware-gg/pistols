@@ -231,6 +231,7 @@ export enum Premise {
   Hatred = 'Hatred',
   Blood = 'Blood',
   Nothing = 'Nothing',
+  Tournament = 'Tournament',
 };
 export const PremiseNameToValue: Record<Premise, number> = {
   [Premise.Null]: 0,
@@ -241,6 +242,7 @@ export const PremiseNameToValue: Record<Premise, number> = {
   [Premise.Hatred]: 5,
   [Premise.Blood]: 6,
   [Premise.Nothing]: 7,
+  [Premise.Tournament]: 8,
 };
 export const getPremiseValue = (name: Premise): number => (PremiseNameToValue[name as string]);
 export const getPremiseFromValue = (value: number): Premise => Object.keys(PremiseNameToValue).find(key => PremiseNameToValue[key] === value) as Premise;
