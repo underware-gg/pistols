@@ -1,0 +1,150 @@
+{
+  "winner": 2,
+  "steps": [
+    {
+      "pace": "None",
+      "card_env": "None",
+      "dice_env": 0,
+      "card_a": {},
+      "card_b": {},
+      "state_a": {
+        "health": 3,
+        "damage": 1,
+        "chances": 50,
+        "dice_crit": 0,
+        "honour": 40,
+        "wager": 0,
+        "win": 0
+      },
+      "state_b": {
+        "health": 3,
+        "damage": 1,
+        "chances": 50,
+        "dice_crit": 20,
+        "honour": 20,
+        "wager": 0,
+        "win": 0
+      }
+    },
+    {
+      "pace": "Paces1",
+      "card_env": "DamageUp",
+      "dice_env": 3,
+      "card_a": {
+        "dodge": "Paces1"
+      },
+      "card_b": {},
+      "state_a": {
+        "health": 3,
+        "damage": 2,
+        "chances": 50,
+        "dice_crit": 0,
+        "honour": 40,
+        "wager": 0,
+        "win": 0
+      },
+      "state_b": {
+        "health": 3,
+        "damage": 2,
+        "chances": 50,
+        "dice_crit": 20,
+        "honour": 20,
+        "wager": 0,
+        "win": 0
+      }
+    },
+    {
+      "pace": "Paces2",
+      "card_env": "ChancesUp",
+      "dice_env": 17,
+      "card_a": {
+        "fire": "Paces2"
+      },
+      "card_b": {},
+      "state_a": {
+        "health": 3,
+        "damage": 2,
+        "chances": 60,
+        "dice_crit": 8,
+        "honour": 40,
+        "wager": 0,
+        "win": 0
+      },
+      "state_b": {
+        "health": 1,
+        "damage": 2,
+        "chances": 60,
+        "dice_crit": 20,
+        "honour": 20,
+        "wager": 0,
+        "win": 0
+      }
+    },
+    {
+      "pace": "Paces3",
+      "card_env": "DamageDown",
+      "dice_env": 12,
+      "card_a": {},
+      "card_b": {
+        "dodge": "Paces3"
+      },
+      "state_a": {
+        "health": 3,
+        "damage": 1,
+        "chances": 60,
+        "dice_crit": 0,
+        "honour": 40,
+        "wager": 0,
+        "win": 0
+      },
+      "state_b": {
+        "health": 3,
+        "damage": 1,
+        "chances": 60,
+        "dice_crit": 20,
+        "honour": 20,
+        "wager": 0,
+        "win": 0
+      }
+    },
+    {
+      "pace": "Paces4",
+      "card_env": "DoubleDamageUp",
+      "dice_env": 25,
+      "card_a": {},
+      "card_b": {
+        "fire": "Paces4"
+      },
+      "state_a": {
+        "health": 0,
+        "damage": 3,
+        "chances": 60,
+        "dice_crit": 0,
+        "honour": 40,
+        "wager": 0,
+        "win": 0
+      },
+      "state_b": {
+        "health": 3,
+        "damage": 3,
+        "chances": 60,
+        "dice_crit": 20,
+        "honour": 20,
+        "wager": 0,
+        "win": 0
+      }
+    }
+  ],
+  "hand_a": {
+    "card_fire": "Paces2",
+    "card_dodge": "Paces1",
+    "card_tactics": "None",
+    "card_blades": "None"
+  },
+  "hand_b": {
+    "card_fire": "Paces4",
+    "card_dodge": "Paces3",
+    "card_tactics": "None",
+    "card_blades": "None"
+  }
+}

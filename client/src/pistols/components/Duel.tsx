@@ -151,9 +151,9 @@ export default function Duel({
 
       {duelProgress &&
         <div className='CenteredPanel'>
-          <div className='FillParent Scroller'>
-            {serialize(duelProgress)}
-          </div>
+          <pre className='Code FillParent Scroller NoMargin'>
+            {serialize(duelProgress, 2)}
+          </pre>
         </div>
       }
 

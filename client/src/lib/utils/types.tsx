@@ -67,4 +67,4 @@ export const cleanObject = (obj: any): any => Object.keys(obj).reduce((acc, key)
 (BigInt.prototype as any).toJSON = function () {
   return (this <= BigInt(Number.MAX_SAFE_INTEGER) ? Number(this) : this.toString())
 }
-export const serialize = (obj: any): any => JSON.stringify(obj);
+export const serialize = (obj: any, space: number | string = null): any => JSON.stringify(obj, null, space);

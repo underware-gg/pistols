@@ -11,6 +11,7 @@ import {
   Archetype, getArchetypeValue,
   ProfilePicType, getProfilePicTypeValue,
 } from '@/games/pistols/generated/constants'
+import { convert_duel_progress } from './duel_progress'
 
 // FIX while this is not merged
 // https://github.com/dojoengine/dojo.js/pull/190
@@ -241,9 +242,10 @@ export function createSystemCalls(
 
   const get_duel_progress = async (duel_id: BigNumberish): Promise<any | null> => {
     const args = [duel_id]
-    const results = await _executeCall<any>(actions_call('get_duel_progress', args))
-    console.log(`get_duel_progress`, args, results)
-    return results ?? null
+    let results = await _executeCall<any>(actions_call('get_duel_progress', args))
+    const duel_progress = convert_duel_progress(results)
+    console.log(`get_duel_progress{${bigintToHex(duel_id)}}`, results, '>', duel_progress)
+    return duel_progress
   }
 
   const get_player_full_deck = async (round_number: number): Promise<number[][] | null> => {
