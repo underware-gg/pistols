@@ -179,11 +179,12 @@ fn set_challenge(store: Store, challenge: Challenge) {
         };
         store.set_round(@new_round);
     } else if (challenge.state.is_finished()) {
-        // End Duel!
+        // get duelist as Entity, as we know they exist
         let mut duelist_a: DuelistEntity = store.get_duelist_entity(challenge.duelist_id_a);
         let mut duelist_b: DuelistEntity = store.get_duelist_entity(challenge.duelist_id_b);
-        let mut scoreboard_a: ScoreboardEntity = store.get_scoreboard_entity(challenge.table_id, challenge.duelist_id_a);
-        let mut scoreboard_b: ScoreboardEntity = store.get_scoreboard_entity(challenge.table_id, challenge.duelist_id_b);
+        // Scoreboards we need the model, since they may not exist yet
+        let mut scoreboard_a: Scoreboard = store.get_scoreboard(challenge.table_id, challenge.duelist_id_a);
+        let mut scoreboard_b: Scoreboard = store.get_scoreboard(challenge.table_id, challenge.duelist_id_b);
         
         // update totals
         update_score_totals(ref duelist_a.score, ref duelist_b.score, challenge.state, challenge.winner);
@@ -219,8 +220,8 @@ fn set_challenge(store: Store, challenge: Challenge) {
         // save
         store.set_duelist_entity(@duelist_a);
         store.set_duelist_entity(@duelist_b);
-        store.set_scoreboard_entity(@scoreboard_a);
-        store.set_scoreboard_entity(@scoreboard_b);
+        store.set_scoreboard(@scoreboard_a);
+        store.set_scoreboard(@scoreboard_b);
     }
 }
 
