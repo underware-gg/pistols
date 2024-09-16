@@ -6,8 +6,8 @@ import { useThreeJsContext } from "./ThreeJsContext"
 import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
 import { useChallenge } from "@/pistols/hooks/useChallenge"
 import { keysToEntity } from '@/lib/utils/types'
+import { CONST, getPacesCardFromValue, getRoundStateValue, RoundState } from '@/games/pistols/generated/constants'
 import { AnimationState } from "@/pistols/three/game"
-import { CONST, getPacesCardFromValue, getPacesCardValue, getRoundStateValue, PacesCard, RoundState } from '@/games/pistols/generated/constants'
 import { Action } from "@/pistols/utils/pistols"
 
 export enum DuelStage {
@@ -35,6 +35,10 @@ export const useRound = (duelId: BigNumberish, roundNumber: BigNumberish) => {
 export const useDuel = (duelId: BigNumberish) => {
   const challenge = useChallenge(duelId)
   const round1 = useRound(duelId, 1n)
+
+  // TODO: find out why this is updating every frame!
+  // useEffect(() => { console.log(`+challenge`) }, [challenge])
+  // useEffect(() => { console.log(`+round1`) }, [round1])
 
   //
   // The actual stage of this duel

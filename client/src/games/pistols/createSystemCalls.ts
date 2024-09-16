@@ -239,19 +239,11 @@ export function createSystemCalls(
     return results ?? null
   }
 
-  const simulate_chances = async (duelist_id: BigNumberish, duel_id: BigNumberish, round_number: number, action): Promise<any | null> => {
-    const args = [duelist_id, duel_id, round_number, action]
-    const results = await _executeCall<any>(actions_call('simulate_chances', args))
-    console.log(`simulate_chances`, args, results)
-    if (!results) return null
-    // convert to u8 / i8
-    return Object.keys(results).reduce((acc, k) => {
-      const value = results[k]
-      const isNegative = (value > 255) // safe because all values are either u8 or i8
-      acc[k] = isNegative ? -1 : Number(value)
-      // console.log(`simulate_chances [${k}]:`, acc[k], isNegative, bigintToHex(value))
-      return acc
-    }, {})
+  const get_duel_progress = async (duel_id: BigNumberish): Promise<any | null> => {
+    const args = [duel_id]
+    const results = await _executeCall<any>(actions_call('get_duel_progress', args))
+    console.log(`get_duel_progress`, args, results)
+    return results ?? null
   }
 
   const get_player_full_deck = async (round_number: number): Promise<number[][] | null> => {
@@ -305,7 +297,7 @@ export function createSystemCalls(
     has_pact,
     can_join,
     calc_fee,
-    simulate_chances,
+    get_duel_progress,
     get_player_full_deck,
     //
     // DUELISTS

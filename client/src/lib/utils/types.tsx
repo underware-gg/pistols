@@ -47,14 +47,24 @@ export const shortAddress = (address: string | null, small: boolean = false) => 
 //
 export const arrayUnique = <T,>(array: T[]) => array?.filter((value, index, array) => (array.indexOf(value) === index))
 export const arrayLast = <T,>(array: T[]) => array?.slice(-1)[0]
-export const arrayRemoveValue = <T,>(array: T[], v: T) => array?.filter(e => (e !== v)) ?? []
+export const arrayRemoveValue = <T,>(array: T[], v: T) => (array?.filter(e => (e !== v)) ?? [])
+export const arrayHasNullElements = <T,>(array: T[]) => array?.reduce((acc, e) => (acc || e == null), false)
 
 //
 // dictionaries
 //
 
-export const getObjectKeyByValue = (obj: any, value: any) => Object.keys(obj).find(key => obj[key] === value)
+export const getObjectKeyByValue = (obj: any, value: any) => Object.keys(obj).find(key => obj[key] === value);
 export const cleanObject = (obj: any): any => Object.keys(obj).reduce((acc, key) => {
   if (obj[key] !== undefined) acc[key] = obj[key]
   return acc
-}, {} as { [key: string]: any })
+}, {} as { [key: string]: any });
+
+//
+// serializer
+//
+// there is no default serializer for BigInt, make one
+(BigInt.prototype as any).toJSON = function () {
+  return (this <= BigInt(Number.MAX_SAFE_INTEGER) ? Number(this) : this.toString())
+}
+export const serialize = (obj: any): any => JSON.stringify(obj);

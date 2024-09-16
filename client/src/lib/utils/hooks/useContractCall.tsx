@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { arrayHasNullElements } from '@/lib/utils/types'
 
 export const useContractCall = <T extends any>({
   call,
@@ -16,12 +17,13 @@ export const useContractCall = <T extends any>({
 } => {
   const [isPending, setIsPending] = useState(false)
   const [value, setValue] = useState<T>(defaultValue)
+  
   useEffect(() => {
     let _mounted = true
     const _get = async (): Promise<T> => {
       return await call(...args) as T
     }
-    if (call && enabled) {
+    if (call && enabled && !arrayHasNullElements(args)) {
       setIsPending(true)
       _get().then((v) => {
         if (_mounted) {
@@ -42,6 +44,7 @@ export const useContractCall = <T extends any>({
       _mounted = false
     }
   }, [call, args, enabled])
+  
   return {
     value,
     isPending,

@@ -1207,14 +1207,13 @@ $logo-url: '/logos/logo_avante.svg';
   border: 5px solid $color-medium!important;
 }
 
-//--------------------
-// Unity canvas
-//
-// #react-unity-webgl-canvas-3 {
-// canvas[id^='react-unity-webgl-canvas'] {
-.UnityCanvas {
-  width: 900px;
-  height: 450px;
+.CenteredPanel {
+  background-color: rgba($color-darkest, 0.7);
+  position: absolute;
+  top: 25%;
+  left: 25%;
+  width: 50%;
+  height: 50%;
 }
 
 

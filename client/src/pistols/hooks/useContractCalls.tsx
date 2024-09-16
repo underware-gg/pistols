@@ -1,9 +1,10 @@
 import { useMemo } from 'react'
+import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useContractCall } from '@/lib/utils/hooks/useContractCall'
+import { useChallenge } from '@/pistols/hooks/useChallenge'
 import { isBigint, isPositiveBigint } from '@/lib/utils/types'
-import { BigNumberish } from 'starknet'
 
 export const useCanJoin = () => {
   const { address } = useAccount()
@@ -38,18 +39,22 @@ export const useCalcFee = (table_id: string, wager_value: BigNumberish) => {
   }
 }
 
-export const useSimulateChances = (address: BigNumberish, duelId: bigint, roundNumber: number, action: number) => {
-  const { simulate_chances } = useDojoSystemCalls()
-  const args = useMemo(() => [BigInt(address), duelId, roundNumber, action], [address, duelId, roundNumber, action])
-  const enabled = useMemo(() => (address != null && duelId && roundNumber && action != null), [address, duelId, roundNumber, action])
+export const useFinishedDuelProgress = (duelId: bigint) => {
+  const { isFinished } = useChallenge(duelId)
+  return useDuelProgress(isFinished ? duelId : null)
+}
+
+export const useDuelProgress = (duelId: bigint) => {
+  const { get_duel_progress } = useDojoSystemCalls()
+  const args = useMemo(() => [duelId], [duelId])
+  const enabled = useMemo(() => (duelId > 0n), [duelId])
   const { value } = useContractCall({
-    call: simulate_chances,
+    call: get_duel_progress,
     args,
     enabled,
-    defaultValue: {},
+    defaultValue: null,
   })
-
-  return value as Awaited<ReturnType<typeof simulate_chances>>
+  return value as Awaited<ReturnType<typeof get_duel_progress>>
 }
 
 export const useGetPlayerFullDeck = (tableId: string) => {

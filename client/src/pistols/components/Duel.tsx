@@ -1,3 +1,4 @@
+import 'react-circular-progressbar/dist/styles.css';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Grid, Segment, SemanticFLOATS, Image } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
@@ -8,6 +9,7 @@ import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
+import { useFinishedDuelProgress } from '@/pistols/hooks/useContractCalls'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useTable } from '@/pistols/hooks/useTable'
 import { useRevealAction } from '@/pistols/hooks/useRevealAction'
@@ -22,12 +24,11 @@ import { AnimationState } from '@/pistols/three/game'
 import { ArchetypeNames } from '@/pistols/utils/pistols'
 import { MenuDebugAnimations, MenuDuel } from '@/pistols/components/Menus'
 import { Balance } from '@/pistols/components/account/Balance'
-import { bigintToHex } from '@/lib/utils/types'
+import { bigintToHex, serialize } from '@/lib/utils/types'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { useDuelistOwner } from '../hooks/useTokenDuelist'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
-import 'react-circular-progressbar/dist/styles.css';
 
 
 const Row = Grid.Row
@@ -52,7 +53,6 @@ export default function Duel({
   const { isYou: isYouA} = useIsYou(duelistIdA)
   const { isYou: isYouB} = useIsYou(duelistIdB)
   useEffect(() => {
-    console.log(isYouA, isYouB, value)
     if (gameImpl && mounted && !duelSceneStarted && profilePicA && profilePicB && nameA && nameB) {
       gameImpl.startDuelWithPlayers(nameA, ProfileModels[profilePicA], isYouA, isYouB, nameB, ProfileModels[profilePicB])
       setDuelSceneStarted(true)
@@ -80,6 +80,13 @@ export default function Duel({
   const { dispatchSelectDuel } = usePistolsContext()
 
   useEffect(() => dispatchSelectDuel(duelId), [duelId])
+
+  //
+  // MARIO: maybe we can replace all that Animated Duel crap for this
+  // when this returns anythng, it's time to animate
+  //
+  const duelProgress = useFinishedDuelProgress(duelId)
+  // useEffect(() => { if (duelProgress) console.log(`DUEL PROGRESS:`, duelProgress) }, [duelProgress])
 
   if (!duelSceneStarted) return <></>
 
@@ -141,6 +148,14 @@ export default function Duel({
           canAutoReveal={canAutoRevealB}
         />
       </div>
+
+      {duelProgress &&
+        <div className='CenteredPanel'>
+          <div className='FillParent Scroller'>
+            {serialize(duelProgress)}
+          </div>
+        </div>
+      }
 
       <MenuDuel duelStage={duelStage} duelId={duelId} tableId={tableId} />
 
