@@ -23,7 +23,6 @@ mod models {
     mod challenge;
     mod config;
     mod duelist;
-    mod init;
     mod table;
     mod token_config;
 }

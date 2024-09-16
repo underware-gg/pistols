@@ -11,7 +11,6 @@ mod tests {
     use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, RoundEntity, Moves, MovesTrait, PlayerState, PlayerStateTrait};
     use pistols::models::duelist::{Duelist, DuelistEntity, DuelistEntityStore, ProfilePicType, Archetype};
     use pistols::models::table::{TableConfig, TABLES};
-    use pistols::models::init::{init};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::duel_progress::{DuelProgress, DuelStep, DuelistDrawnCard};
     use pistols::types::round_state::{RoundState, RoundStateTrait};

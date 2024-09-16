@@ -13,6 +13,10 @@ pub enum Archetype {
     Honourable, // 3
 }
 
+impl ArchetypeDefault of Default<Archetype> {
+    fn default() -> Archetype {(Archetype::Undefined)}
+}
+
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum ProfilePicType {
     Undefined,  // 0
@@ -23,13 +27,16 @@ pub enum ProfilePicType {
     // Discord,    // Linked account (had to be cloned, or just copy the url)
 }
 
+impl ProfilePicTypeDefault of Default<ProfilePicType> {
+    fn default() -> ProfilePicType {(ProfilePicType::Undefined)}
+}
 
 
 //---------------------
 // Duelist
 //
 // #[derive(Copy, Drop, Serde)] // ByteArray is not copiable!
-#[derive(Clone, Drop, Serde)]   // pass to functions using duelist.clone()
+#[derive(Clone, Drop, Serde, Default)]   // pass to functions using duelist.clone()
 #[dojo::model]
 pub struct Duelist {
     #[key]
@@ -69,7 +76,7 @@ pub struct Scoreboard {
     pub wager_lost: u128,
 } // [160] [128] [128]
 
-#[derive(Copy, Drop, Serde, IntrospectPacked)]
+#[derive(Copy, Drop, Serde, Default, IntrospectPacked)]
 pub struct Score {
     pub honour: u8,             // 0..100
     pub level_villain: u8,      // 0..100

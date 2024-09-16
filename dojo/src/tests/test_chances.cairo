@@ -14,25 +14,24 @@ mod tests {
     use pistols::models::challenge::{Round, Moves};
     use pistols::models::duelist::{Duelist, Score, ScoreTrait};
     use pistols::models::table::{TableType};
-    use pistols::models::init::{init};
     use pistols::types::constants::{CONST, HONOUR, CHANCES};
     use pistols::utils::short_string::{ShortString};
     use pistols::tests::tester::{tester, tester::{FLAGS, ZERO, OWNER, OTHER, BUMMER, TREASURY}};
 
     fn _lord(level: u8) -> Duelist {
-        let mut duelist: Duelist = init::Duelist();
+        let mut duelist: Duelist = Default::default();
         duelist.score.level_lord = level;
         duelist.score.total_duels = 10;
         (duelist)
     }
     fn _villain(level: u8) -> Duelist {
-        let mut duelist: Duelist = init::Duelist();
+        let mut duelist: Duelist = Default::default();
         duelist.score.level_villain = level;
         duelist.score.total_duels = 10;
         (duelist)
     }
     fn _trickster(level: u8) -> Duelist {
-        let mut duelist: Duelist = init::Duelist();
+        let mut duelist: Duelist = Default::default();
         duelist.score.level_trickster = level;
         duelist.score.total_duels = 10;
         (duelist)

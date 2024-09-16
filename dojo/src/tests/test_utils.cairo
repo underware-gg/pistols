@@ -11,7 +11,6 @@ mod tests {
     use pistols::libs::utils;
     use pistols::models::challenge::{Round};
     use pistols::models::duelist::{Duelist, Score, ScoreTrait};
-    use pistols::models::init::{init};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::utils::short_string::{ShortString};
@@ -27,7 +26,7 @@ mod tests {
 
     #[test]
     fn test_update_score_honour() {
-        let mut score = init::Score();
+        let mut score = Default::default();
         score.total_duels = 1;
         utils::update_score_honour(ref score, 100, true);
         assert(score.level_lord == 100, 'honour_100_lord');
@@ -41,7 +40,7 @@ mod tests {
 
     #[test]
     fn test_honour_history() {
-        let mut score = init::Score();
+        let mut score = Default::default();
         let mut sum: u8 = 0;
         let mut n: u8 = 1;
         loop {

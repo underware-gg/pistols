@@ -12,7 +12,6 @@ use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, WagerEntity,
 use pistols::models::duelist::{Duelist, DuelistTrait, DuelistEntity, Pact, PactEntity, Scoreboard, ScoreboardEntity, Score, ScoreTrait};
 use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableType, TableTypeTrait};
 use pistols::models::config::{Config, ConfigEntity};
-use pistols::models::init::{init};
 use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round_state::{RoundState, RoundStateTrait};
 use pistols::types::cards::hand::{PacesCard, PacesCardTrait};

@@ -103,7 +103,6 @@ mod actions {
     use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, Moves};
     use pistols::models::duelist::{Duelist, DuelistTrait, ProfilePicType, Archetype, Score, Pact, DuelistHelper, DuelistHelperTrait};
     use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableAdmittanceEntity, TableAdmittanceEntityTrait, TableType, TABLES};
-    use pistols::models::init::{init};
     use pistols::types::premise::{Premise, PremiseTrait};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::duel_progress::{DuelProgress};
@@ -177,7 +176,7 @@ mod actions {
                 name,
                 profile_pic_type,
                 profile_pic_uri: profile_pic_uri.to_byte_array(),
-                score: init::Score(),
+                score: Default::default(),
             };
             match initial_archetype {
                 Archetype::Villainous => { duelist.score.level_villain = HONOUR::LEVEL_MAX; },
