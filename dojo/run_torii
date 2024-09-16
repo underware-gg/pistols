@@ -6,12 +6,14 @@ source scripts/setup.sh
 
 # export TORII_PATH=torii
 export TORII_PATH=../../dojo/target/release/torii
+export START_BLOCK=1
 
 echo "----------------------------------------"
 echo "* PROFILE : $PROFILE"
 echo "* RPC_URL : $RPC_URL"
 echo "* WORLD   : $WORLD_ADDRESS"
 echo "* TORII   : $TORII_PATH"
+echo "* BLOCK   : $START_BLOCK"
 echo "----------------------------------------"
 
 if [[
@@ -36,6 +38,7 @@ $TORII_PATH --version
 $TORII_PATH \
   --rpc $RPC_URL \
   --world $WORLD_ADDRESS \
+  --start-block $START_BLOCK \
   --allowed-origins "*" \
   # --relay-local-key-path ./0.0.0.0-key.pem \
   # --relay-cert-path ./0.0.0.0.pem \

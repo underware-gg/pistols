@@ -2,7 +2,9 @@
 if [ $# -ge 1 ]; then
   export PROFILE=$1
 else
-  export PROFILE="dev"
+  # export PROFILE="dev"
+  echo "basic usage: $0 <PROFILE>"
+  exit 1
 fi
 export DOJO_PROFILE_FILE="dojo_$PROFILE.toml"
 

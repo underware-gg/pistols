@@ -2,13 +2,17 @@
 set -euo pipefail
 source scripts/setup.sh
 
-if [ "$#" -ne 3 ]; then
-  echo "usage: grant_admin <PROFILE> <ACCOUNT> <0|1>"
+if [ $# -ge 3 ]; then
+  export ACCOUNT=$2
+  export GRANT=$3
+else
+  # export PROFILE="dev"
+  echo "usage: $0 <PROFILE> <ACCOUNT> <0|1>"
   exit 1
 fi
 
-export ACCOUNT=$2
-export GRANT=$3
+# move down to /dojo
+pushd $(dirname "$0")/..
 
 echo "------------------------------------------------------------------------------"
 echo "Profile  : $PROFILE"
