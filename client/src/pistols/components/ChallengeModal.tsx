@@ -34,7 +34,11 @@ export default function ChallengeModal() {
 
   const _close = () => { dispatchSelectDuel(0n) }
 
-  const { state, tableId, quote, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, isLive, isFinished, needToSyncExpired } = useChallenge(selectedDuelId)
+  const {
+    state, tableId, quote,
+    duelistIdA, duelistIdB, duelistAddressA, duelistAddressB,
+    isLive, isFinished, needToSyncExpired,
+  } = useChallenge(selectedDuelId)
   const { value, fee } = useWager(selectedDuelId)
   const { description: tableDescription } = useTable(tableId)
 
@@ -193,7 +197,7 @@ export default function ChallengeModal() {
                 <ActionButton fill important label='Go to Live Duel!' onClick={() => _gotoDuel()} />
               </Col>
             }
-            {(state > ChallengeState.InProgress) &&
+            {isFinished &&
               <Col>
                 <ActionButton fill important label='Replay Duel!' onClick={() => _gotoDuel()} />
               </Col>

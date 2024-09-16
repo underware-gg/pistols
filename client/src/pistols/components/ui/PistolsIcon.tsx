@@ -1,33 +1,21 @@
 import React from 'react'
 import { Icon, IconGroup } from 'semantic-ui-react'
 import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
-import { Action, ActionEmojis, ActionNames, ActionTypes } from '@/pistols/utils/pistols'
+import { ActionEmojis, ActionNames } from '@/pistols/utils/pistols'
 import { EmojiIcon, _downSize } from '@/lib/ui/Icons'
 import { EMOJI } from '@/pistols/data/messages'
 import { BladesCard, getPacesCardValue, PacesCard } from '@/games/pistols/generated/constants'
 
-export function ActionIcon({
-  action,
-  size = 'large',
-}: {
-  action: Action
-  size?: IconSizeProp
-}) {
-  if (ActionTypes.paces.includes(action)) {
-    return <PacesIcon paces={action} size={size} />
-  } else {
-    return <BladesIcon blade={action as unknown as BladesCard} size={size} />
-  }
-}
-
 export function PacesIcon({
   paces,
+  dodge = false,
   size = 'large',
 }: {
-  paces: Action
+  paces: PacesCard
+  dodge?: boolean
   size?: IconSizeProp
 }) {
-  let pacesCount = getPacesCardValue(paces as unknown as PacesCard)
+  let pacesCount = getPacesCardValue(paces)
   if (pacesCount < 1 || pacesCount > 10) {
     return <Icon name='question circle' size={size} />
   }
@@ -35,7 +23,7 @@ export function PacesIcon({
   return (
     // <EmojiIcon emoji={emoji} size={size} className='PacesIconRound' />
     <IconGroup size={_downSize(size)}>
-      <EmojiIcon emoji={EMOJI.PACES} size={size} />
+      <EmojiIcon emoji={dodge ? EMOJI.DODGE : EMOJI.PACES} size={size} />
       <EmojiIcon emoji={_paces} size={size} className={`PacesIcon`} />
     </IconGroup>
   )

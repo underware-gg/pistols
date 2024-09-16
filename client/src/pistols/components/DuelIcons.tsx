@@ -3,11 +3,10 @@ import { Icon, Grid } from 'semantic-ui-react'
 import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
 import { DuelStage, useDuel } from '@/pistols/hooks/useDuel'
 import { CompletedIcon, EmojiIcon, LoadingIcon } from '@/lib/ui/Icons'
-import { ActionIcon } from '@/pistols/components/ui/PistolsIcon'
+import { PacesIcon } from '@/pistols/components/ui/PistolsIcon'
 import { bigintEquals } from '@/lib/utils/types'
 import { EMOJI } from '@/pistols/data/messages'
 import { BigNumberish } from 'starknet'
-import { Action } from '../utils/pistols'
 import { getPacesCardFromValue } from '@/games/pistols/generated/constants'
 
 const Row = Grid.Row
@@ -95,7 +94,19 @@ export function useDuelIcons({
     //
     // Finished...
     if (isFinished) {
-      if (state1) icons1.push(<ActionIcon key='state1' action={getPacesCardFromValue(moves1.card_1) as unknown as Action} size={iconSize} />)
+      if (state1) {
+        const pacesFire = moves1.card_1
+        const pacesDodge = moves1.card_2
+        const cardFire = getPacesCardFromValue(pacesFire)
+        const cardDodge = getPacesCardFromValue(pacesDodge)
+        if (pacesDodge <= pacesFire) {
+          icons1.push(<PacesIcon key='dodge' paces={cardDodge} size={iconSize} dodge/>)
+          icons1.push(<PacesIcon key='fire' paces={cardFire} size={iconSize} />)
+        } else {
+          icons1.push(<PacesIcon key='fire' paces={cardFire} size={iconSize} />)
+          icons1.push(<PacesIcon key='dodge' paces={cardDodge} size={iconSize} dodge />)
+        }
+      }
       if (health1) icons1.push(<EmojiIcon key='health1' emoji={health1} size={iconSize} />)
       if (health1b) icons1.push(<EmojiIcon key='health1b' emoji={health1b} size={iconSize} />)
       if (win1) icons1.push(<EmojiIcon key='win1' emoji={win1} size={iconSize} />)

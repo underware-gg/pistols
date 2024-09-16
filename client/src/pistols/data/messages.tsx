@@ -20,8 +20,9 @@ export const EMOJI = {
   IN_PROGRESS: '⚔️',
   //
   // Actions
-  PISTOL: '🔫',
   PACES: '🥾',
+  PISTOL: '🔫',
+  DODGE: '🛡️',
   BLADES: '⚔️',
   IDLE: '👀',
   // BladesCard
