@@ -84,7 +84,7 @@ export const useCanMintDuelist = (address: BigNumberish) => {
   const { duelistBalance } = useDuelistBalanceOf(address)
   const { can_mint } = useDojoSystemCalls()
   useEffect(() => {
-    if (address && contractAddress) {
+    if (address && contractAddress && can_mint) {
       can_mint(BigInt(address), BigInt(contractAddress)).then(v => {
         setCanMint(v)
       }).catch(e => {
@@ -93,7 +93,7 @@ export const useCanMintDuelist = (address: BigNumberish) => {
     } else {
       setCanMint(false)
     }
-  }, [address, contractAddress, duelistBalance])
+  }, [address, contractAddress, duelistBalance, can_mint])
   return {
     canMint,
   }

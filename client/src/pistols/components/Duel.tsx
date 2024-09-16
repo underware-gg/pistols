@@ -295,8 +295,8 @@ function DuelProgress({
   // useEffect(() => { console.log(`+completedStages`) }, [completedStages])
   // useEffect(() => { console.log(`+round1`) }, [round1])
 
-  
   const onClick = useCallback(() => {
+    if (!isConnected) console.warn(`onClickReveal: not connected!`)
     if (isYou && isConnected && completedStages[duelStage] === false) {
       if (duelStage == DuelStage.Round1Commit) {
         setCommitModalIsOpen(true)

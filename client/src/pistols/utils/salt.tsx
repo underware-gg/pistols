@@ -21,21 +21,19 @@ export const make_moves_hash = (salt: BigNumberish, moves: number[]) => {
     }
     const move: number = moves[index]
     if (move != 0) {
-      const { move_hash } = make_move_hash(salt, index, move)
+      const move_hash = make_move_hash(salt, index, move)
       result |= move_hash
     }
   }
   return result
 }
-const make_move_hash = (salt: BigNumberish, index: number, move: number) => {
-  const mask: bigint = (BigInt(BITWISE.MAX_U32) << (BigInt(index) * 32n))
+const make_move_mask = (index: number): bigint => {
+  return (BigInt(BITWISE.MAX_U32) << (BigInt(index) * 32n))
+}
+const make_move_hash = (salt: BigNumberish, index: number, move: number): bigint => {
+  const mask: bigint = make_move_mask(index)
   const hash: bigint = move ? poseidon([salt, move]) : 0n
-  const move_hash = (hash & mask)
-  return {
-    mask,
-    hash,
-    move_hash,
-  }
+  return (hash & mask)
 }
 
 
@@ -78,6 +76,10 @@ export const signAndGenerateMovesHash = async (
   roundNumber: number, 
   moves: number[]
 ): Promise<bigint> => {
+  //------------------------------
+  // TODO: REMOVE THIS!!!
+  // return poseidon([duelId, roundNumber, duelistId])
+  //------------------------------
   const salt = await signAndGenerateSalt(account, chainId, duelistId, duelId, roundNumber)
   const hash = make_moves_hash(salt, moves)
   console.log(`signAndGenerateMovesHash():`, bigintToHex(duelId), roundNumber, moves, bigintToHex(salt), bigintToHex(hash))
@@ -96,24 +98,26 @@ export const signAndRestoreMovesFromHash = async (
 ): Promise<{ salt: bigint, moves: number[] }> => {
   const salt = await signAndGenerateSalt(account, chainId, duelistId, duelId, roundNumber)
   let moves = []
+  console.log(`DECKS:`, decks)
   console.log(`___RESTORE Duel:`, bigintToHex(duelId), '\nround:', roundNumber, '\nsalt:', bigintToHex(salt), '\nhash:', bigintToHex(hash))
   if (salt > 0n) {
     // there are 2 to 4 decks...
     for (let di = 0; di < decks.length; ++di) {
       const deck = decks[di]
+      const mask = make_move_mask(di)
       // each deck can contain up to 10 cards/moves...
       for (let mi = 0; mi < deck.length; ++mi) {
         const move = deck[mi]
-        const { move_hash, mask } = make_move_hash(salt, mi, move)
+        const move_hash = make_move_hash(salt, di, move)
         const stored_hash = (hash & mask)
         if (stored_hash == 0n) {
           moves.push(0)
           break
         } else {
-          console.log(`___RESTORE ${di}/${mi}:`, bigintToHex(stored_hash), '>', bigintToHex(move_hash), '?', move)
+          console.log(`___RESTORE D${di}/M${mi}:`, bigintToHex(stored_hash), '>', bigintToHex(move_hash), '?', move)
           if (stored_hash == move_hash) {
             moves.push(Number(move))
-            console.log(`___RESTORE FOUND: ${di}/${mi}:`, move)
+            console.log(`___RESTORE D${di}/M${mi}: FOUND!`, move)
             break
           }
         }
