@@ -4,7 +4,7 @@ class_hash = "0x6f4515274ee23404789c3351a77107d0ec07508530119822046600ca6948d6e"
 original_class_hash = "0x6f4515274ee23404789c3351a77107d0ec07508530119822046600ca6948d6e"
 abi = "manifests/staging/deployment/abis/dojo-world.json"
 address = "0x55fefc4a4e5c94def16d25bd1afa87407d114600560f75100f3edc8d5eaced6"
-transaction_hash = "0x40d16f60aa2f460f327ba327b45f5bc65ac29e562c0ad902be0fdb8b28e6e2a"
+transaction_hash = "0x2a9a9302b5427eb0a393da338d402358b48059dafde33997923add7407f5265"
 block_number = 3
 seed = "pistols"
 manifest_name = "dojo-world"
@@ -24,8 +24,8 @@ manifest_name = "dojo-base"
 [[contracts]]
 kind = "DojoContract"
 address = "0x2f72d0e827656555aa1760aaff6e3c1f80aceea8096437b8422c99717cd3824"
-class_hash = "0x6e385c95db5c6d4dc097c387f3ac176fab7fa7d7cb2e471898621546d49249c"
-original_class_hash = "0x6e385c95db5c6d4dc097c387f3ac176fab7fa7d7cb2e471898621546d49249c"
+class_hash = "0x233e03d362c04057212100deac952ec537c959e0213fad9bcea624e489c5472"
+original_class_hash = "0x233e03d362c04057212100deac952ec537c959e0213fad9bcea624e489c5472"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/staging/deployment/abis/contracts/pistols-actions-4f10cff7.json"
 reads = []
@@ -54,14 +54,15 @@ manifest_name = "pistols-actions-4f10cff7"
 [[contracts]]
 kind = "DojoContract"
 address = "0x323b615e21a9cbb4366d643568c64e87518420f6b23a326abeefde6e73d3f3d"
-class_hash = "0x6bfa07ba209c48a9e9130b6dd35563ae8f189269914644660914a7addbb1df8"
-original_class_hash = "0x6bfa07ba209c48a9e9130b6dd35563ae8f189269914644660914a7addbb1df8"
+class_hash = "0x2aad15ce8dcfa71ebf68257fa8b2304b3d6f312da87c16827600c42af74dba"
+original_class_hash = "0x2aad15ce8dcfa71ebf68257fa8b2304b3d6f312da87c16827600c42af74dba"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/staging/deployment/abis/contracts/pistols-admin-36fd2037.json"
 reads = []
 writes = [
     "pistols-Config",
     "pistols-TableConfig",
+    "pistols-TableWager",
     "pistols-TableAdmittance",
 ]
 init_calldata = [
@@ -572,8 +573,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x569a86ac1cd015f67abf0348fda631125b7ce840b338c0d3d4b24e4f4793688"
-original_class_hash = "0x569a86ac1cd015f67abf0348fda631125b7ce840b338c0d3d4b24e4f4793688"
+class_hash = "0x621e8a8d75db58a04b11def09072b507b27ea956db4ea488d32741a7cd7aee3"
+original_class_hash = "0x621e8a8d75db58a04b11def09072b507b27ea956db4ea488d32741a7cd7aee3"
 abi = "manifests/staging/deployment/abis/models/pistols-Challenge-673267b6.json"
 tag = "pistols-Challenge"
 qualified_path = "pistols::models::challenge::challenge"
@@ -835,8 +836,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x6774b0dcc9a4ebb62e6f42b70ebd46cd77387e8d71cc8e57dee1403feec298"
-original_class_hash = "0x6774b0dcc9a4ebb62e6f42b70ebd46cd77387e8d71cc8e57dee1403feec298"
+class_hash = "0x7bfd666c3bc1e5da819e40178efb3a59125b2e9b56241bed13496dfeed3d55c"
+original_class_hash = "0x7bfd666c3bc1e5da819e40178efb3a59125b2e9b56241bed13496dfeed3d55c"
 abi = "manifests/staging/deployment/abis/models/pistols-TableConfig-1e8368fc.json"
 tag = "pistols-TableConfig"
 qualified_path = "pistols::models::table::table_config"
@@ -863,13 +864,8 @@ type = "ContractAddress"
 key = false
 
 [[models.members]]
-name = "wager_contract_address"
+name = "fee_contract_address"
 type = "ContractAddress"
-key = false
-
-[[models.members]]
-name = "wager_min"
-type = "u128"
 key = false
 
 [[models.members]]
@@ -878,13 +874,37 @@ type = "u128"
 key = false
 
 [[models.members]]
-name = "fee_pct"
-type = "u8"
+name = "is_open"
+type = "bool"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x1e1138764631b591734bf457f5c46f56d5bd974c60fed8109c638a65848732a"
+original_class_hash = "0x1e1138764631b591734bf457f5c46f56d5bd974c60fed8109c638a65848732a"
+abi = "manifests/staging/deployment/abis/models/pistols-TableWager-2d819fd3.json"
+tag = "pistols-TableWager"
+qualified_path = "pistols::models::table::table_wager"
+manifest_name = "pistols-TableWager-2d819fd3"
+
+[[models.members]]
+name = "table_id"
+type = "felt252"
+key = true
+
+[[models.members]]
+name = "wager_min"
+type = "u128"
 key = false
 
 [[models.members]]
-name = "is_open"
-type = "bool"
+name = "wager_max"
+type = "u128"
+key = false
+
+[[models.members]]
+name = "fee_pct"
+type = "u8"
 key = false
 
 [[models]]
