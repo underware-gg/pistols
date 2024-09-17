@@ -67,6 +67,7 @@ export const useChainConnectors = (dojoAppConfig: DojoAppConfig, chainConfig: Do
     }, [])
     // wait for connectors to be initialized...
     if (promise) {
+      console.warn(`KATANA: Waiting for connectors...`)
       await promise
     }
     return result

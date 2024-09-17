@@ -3,8 +3,7 @@ import { Container, Grid, Icon } from 'semantic-ui-react'
 import { CustomIcon, EmojiIcon } from '@/lib/ui/Icons'
 import { ArchetypeIcon, BladesIcon, PacesIcon } from '@/pistols/components/ui/PistolsIcon'
 import { LordsBagIcon } from '@/pistols/components/account/Balance'
-import { BladesCard } from '@/games/pistols/generated/constants'
-import { Action } from '@/pistols/utils/pistols'
+import { BladesCard, PacesCard } from '@/games/pistols/generated/constants'
 import App from '@/lib/ui/App'
 
 const Row = Grid.Row
@@ -19,7 +18,7 @@ export default function IndexPage() {
         <h5>Icons</h5>
         <Grid celled>
           <Row columns={'equal'}>
-            <Col><PacesIcon paces={Action.Paces10} /><br />PacesIcon</Col>
+            <Col><PacesIcon paces={PacesCard.Paces10} /><br />PacesIcon</Col>
             <Col><BladesIcon blade={BladesCard.None} /><br />BladesIcon</Col>
             <Col><BladesIcon blade={BladesCard.Seppuku} /><br />BladesIcon</Col>
             <Col><BladesIcon blade={BladesCard.RunAway} /><br />BladesIcon</Col>

@@ -11,7 +11,6 @@ interface StarknetContextType {
   selectedChainId: ChainId
   selectedChainConfig: DojoChainConfig
   selectChainId: (chainId: ChainId) => void
-  isKatana: boolean
   chains: Chain[]
 }
 
@@ -43,10 +42,8 @@ export const StarknetProvider = ({
 
   //
   // Current chain
-  //
   const [selectedChainId, setSelectedChainId] = useState<ChainId>(intialChainId)
   const [selectedChainConfig, setSelectedChain] = useState<DojoChainConfig>(getDojoChainConfig(intialChainId))
-  const isKatana = useMemo(() => selectedChainConfig?.chain?.network === 'katana', [selectedChainConfig])
   useEffect(() => console.log(`Selected chain:`, selectedChainId, selectedChainConfig), [selectedChainConfig])
 
   const selectChainId = useCallback((chainId: ChainId) => {
@@ -58,12 +55,10 @@ export const StarknetProvider = ({
     window?.localStorage?.setItem('lastSelectedChainId', chainId)
   }, [])
 
-  //
   // Build chain connectors form selectedChainConfig
   const chainConnectors = useChainConnectors(dojoAppConfig, selectedChainConfig);
 
-  //
-  // Connectors
+  // connectors to be used by starknet-react
   const { connectors } = useInjectedConnectors({
     // Show these connectors if the user has no connector installed.
     recommended: chainConnectors,
@@ -72,6 +67,11 @@ export const StarknetProvider = ({
     // Randomize the order of the connectors.
     // order: 'random',
   });
+
+  // this can be empty while we initialize katana connectors async
+  if (chainConnectors.length == 0) {
+    return <></>
+  }
 
   //
   // RPC
@@ -84,11 +84,6 @@ export const StarknetProvider = ({
   }
   const provider = jsonRpcProvider({ rpc })
 
-  if (chainConnectors.length == 0) {
-    console.warn(`KATANA: Waiting for connectors...`)
-    return <></>
-  }
-
   return (
     <StarknetContext.Provider
       value={{
@@ -96,7 +91,6 @@ export const StarknetProvider = ({
         selectedChainId,
         selectedChainConfig,
         selectChainId,
-        isKatana,
         chains,
       }}
     >
