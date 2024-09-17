@@ -35,6 +35,7 @@ mod types {
     mod misc;
     mod premise;
     mod round_state;
+    mod shuffler;
     mod typed_data;
     mod cards {
         mod cards;

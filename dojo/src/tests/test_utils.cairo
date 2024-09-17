@@ -26,7 +26,7 @@ mod tests {
 
     #[test]
     fn test_update_score_honour() {
-        let mut score = Default::default();
+        let mut score: Score = Default::default();
         score.total_duels = 1;
         utils::update_score_honour(ref score, 100, true);
         assert(score.level_lord == 100, 'honour_100_lord');
@@ -40,7 +40,7 @@ mod tests {
 
     #[test]
     fn test_honour_history() {
-        let mut score = Default::default();
+        let mut score: Score = Default::default();
         let mut sum: u8 = 0;
         let mut n: u8 = 1;
         loop {

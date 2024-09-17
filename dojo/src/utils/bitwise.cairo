@@ -18,7 +18,7 @@ mod BITWISE {
 }
 
 
-trait Bitwise<T> {
+trait BitwiseTrait<T> {
     fn bit_count() -> usize;
     fn byte_count() -> usize;
     fn max() -> T;
@@ -33,7 +33,7 @@ trait Bitwise<T> {
     fn sum_bytes(x: T) -> T;
 }
 
-impl BitwiseU8 of Bitwise<u8> {
+impl BitwiseU8 of BitwiseTrait<u8> {
     #[inline(always)]
     fn bit_count() -> usize {(8)}
     #[inline(always)]
@@ -86,7 +86,7 @@ impl BitwiseU8 of Bitwise<u8> {
     fn sum_bytes(x: u8) -> u8 {(x)}
 }
 
-impl BitwiseU16 of Bitwise<u16> {
+impl BitwiseU16 of BitwiseTrait<u16> {
     #[inline(always)]
     fn bit_count() -> usize {(16)}
     #[inline(always)]
@@ -141,7 +141,7 @@ impl BitwiseU16 of Bitwise<u16> {
     }
 }
 
-impl BitwiseU32 of Bitwise<u32> {
+impl BitwiseU32 of BitwiseTrait<u32> {
     #[inline(always)]
     fn bit_count() -> usize {(32)}
     #[inline(always)]
@@ -196,7 +196,7 @@ impl BitwiseU32 of Bitwise<u32> {
     }
 }
 
-impl BitwiseU64 of Bitwise<u64> {
+impl BitwiseU64 of BitwiseTrait<u64> {
     #[inline(always)]
     fn bit_count() -> usize {(64)}
     #[inline(always)]
@@ -251,7 +251,7 @@ impl BitwiseU64 of Bitwise<u64> {
     }
 }
 
-impl BitwiseU128 of Bitwise<u128> {
+impl BitwiseU128 of BitwiseTrait<u128> {
     #[inline(always)]
     fn bit_count() -> usize {(128)}
     #[inline(always)]
@@ -306,7 +306,7 @@ impl BitwiseU128 of Bitwise<u128> {
     }
 }
 
-impl BitwiseU256 of Bitwise<u256> {
+impl BitwiseU256 of BitwiseTrait<u256> {
     #[inline(always)]
     fn bit_count() -> usize {(256)}
     #[inline(always)]

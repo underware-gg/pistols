@@ -1,6 +1,7 @@
 // use debug::PrintTrait;
 use starknet::{ContractAddress};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+use pistols::utils::bitwise::{BITWISE};
 
 // https://github.com/starkware-libs/cairo/blob/main/corelib/src/integer.cairo
 // https://github.com/smartcontractkit/chainlink-starknet/blob/develop/contracts/src/utils.cairo
@@ -20,8 +21,15 @@ fn ZERO() -> ContractAddress {
 }
 
 fn felt_to_u128(value: felt252) -> u128 {
-    match u128s_from_felt252(value) {
-        U128sFromFelt252Result::Narrow(x) => x,
-        U128sFromFelt252Result::Wide((_, x)) => x,
-    }
+    // match u128s_from_felt252(value) {
+    //     U128sFromFelt252Result::Narrow(x) => x,
+    //     U128sFromFelt252Result::Wide((_, x)) => x,
+    // }
+    let as_u256: u256 = value.into();
+    (as_u256.low)
+}
+
+fn felt_to_usize(value: felt252) -> usize {
+    let as_u256: u256 = value.into();
+    ((as_u256.low & BITWISE::MAX_U32.into()).try_into().unwrap())
 }

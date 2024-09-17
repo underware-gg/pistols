@@ -122,6 +122,7 @@ mod tests {
         assert(progress.hand_b.card_tactics == 3_u8.into(), 'hand_b.card_tactics');
         assert(progress.hand_b.card_blades == 4_u8.into(), 'hand_b.card_blades');
         assert(progress.steps.len() == 11, 'paces.len');
+        let mut last_dice_env: u8 = 0;
         let mut i: u8 = 1;
         while (i <= 10) {
             let num: felt252 = '1'+i.into();
@@ -130,6 +131,10 @@ mod tests {
             assert(step.pace == pace, ShortString::concat(num, '_step.pace'));
             assert(step.card_env != 0_u8.into(), ShortString::concat(num, '_step.card_env'));
             assert(step.dice_env > 0, ShortString::concat(num, '_step.dice_env'));
+            // test shuffler
+            assert(step.dice_env != last_dice_env, ShortString::concat(num, '_not_shuffled'));
+            last_dice_env = step.dice_env;
+            // test paces
             if (pace == PacesCard::Paces5) {
                 assert(step.card_a == DuelistDrawnCard::Fire(PacesCard::Paces5), ShortString::concat(num, '_fire_a'));
                 assert(step.card_b == DuelistDrawnCard::None, ShortString::concat(num, '_none_b'));

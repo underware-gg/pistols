@@ -31,6 +31,7 @@ mod rng {
 //
 
 use pistols::interfaces::systems::{WorldSystemsTrait};
+use pistols::types::shuffler::{Shuffler, ShufflerTrait};
 
 #[derive(Copy, Drop)]
 pub struct Dice {
@@ -50,9 +51,14 @@ impl DiceImpl of DiceTrait {
     }
 
     // returns a random number between 1 and <faces>
+    fn reseed(ref self: Dice, salt: felt252) {
+        self.seed = self.rng.reseed(self.seed, salt);
+    }
+
+    // returns a random number between 1 and <faces>
     fn throw(ref self: Dice, salt: felt252, faces: u8) -> u8 {
         assert(faces <= 255, 'RNG_DICE: too many faces');
-        self.seed = self.rng.reseed(self.seed, salt);
+        self.reseed(salt);
         let as_u256: u256 = self.seed.into();
         self.last_dice = ((as_u256.low & 0xff).try_into().unwrap() % faces) + 1;
 // println!("new_seed {} dice {}", self.seed, result);
@@ -63,5 +69,11 @@ impl DiceImpl of DiceTrait {
         let dice: u8 = self.throw(salt, faces);
         let result: bool = (dice <= chances);
         (dice, result)
+    }
+
+    fn shuffle(ref self: Dice, salt: felt252, ref shuffler: Shuffler) -> u8 {
+        self.reseed(salt);
+        self.last_dice = shuffler.get_next(self.seed);
+        (self.last_dice)
     }
 }

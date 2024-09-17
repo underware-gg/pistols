@@ -15,6 +15,8 @@ mod shooter {
     use pistols::types::challenge_state::{ChallengeState};
     use pistols::types::round_state::{RoundState};
     use pistols::types::duel_progress::{DuelProgress, DuelStep};
+    use pistols::types::shuffler::{Shuffler, ShufflerTrait};
+    use pistols::types::misc::{Boolean};
     use pistols::types::cards::hand::{
         PlayerHand, PlayerHandTrait,
         PacesCard, PacesCardTrait,
@@ -23,7 +25,6 @@ mod shooter {
         EnvCard, EnvCardTrait,
         DuelistDrawnCard,
     };
-    use pistols::types::misc::{Boolean};
     use pistols::utils::math::{MathU8, MathU16};
     use pistols::libs::store::{Store, StoreTrait};
 
@@ -194,8 +195,8 @@ mod shooter {
         let mut win_a: Boolean = Boolean::Undefined;
         let mut win_b: Boolean = Boolean::Undefined;
 
-        // TODO: shuffle
         let env_deck: Span<EnvCard> = EnvCardTrait::get_full_deck().span();
+        let mut shuffler: Shuffler = ShufflerTrait::new(env_deck.len().try_into().unwrap());
 
         let mut pace_number: u8 = 1;
         while (pace_number <= 10) {
@@ -203,7 +204,7 @@ mod shooter {
             // println!("Pace [{}] A:{} B:{}", pace_number, self.moves_a.card_fire.as_felt(), self.moves_b.card_fire.as_felt());
 
             // draw env card
-            let (card_env, dice_env): (EnvCard, u8) = draw_env_card(env_deck, pace, ref dice);
+            let (card_env, dice_env): (EnvCard, u8) = draw_env_card(env_deck, pace, ref dice, ref shuffler);
 
             // apply env card to global state (affects next steps)
             card_env.apply_points(ref global_state_a, ref global_state_b, true);
@@ -315,10 +316,9 @@ mod shooter {
         }
     }
 
-    fn draw_env_card(env_deck: Span<EnvCard>, pace: PacesCard, ref dice: Dice) -> (EnvCard, u8) {
+    fn draw_env_card(env_deck: Span<EnvCard>, pace: PacesCard, ref dice: Dice, ref shuffler: Shuffler) -> (EnvCard, u8) {
         let salt: felt252 = pace.env_salt();
-        let faces: u8 = env_deck.len().try_into().unwrap();
-        let dice: u8 = dice.throw(salt, faces);
+        let dice: u8 = dice.shuffle(salt, ref shuffler);
         let env_card: EnvCard = *env_deck[(dice - 1).into()];
 // println!("draw_env_card: dice {}/{} = {}", dice, faces, env_card);
         (env_card, dice)
