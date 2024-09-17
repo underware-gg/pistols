@@ -99,7 +99,7 @@ export default function NewChallengeModal() {
         </Grid>
       </Modal.Header>
       <Modal.Content image>
-        <ProfilePic profilePic={profilePicA} onClick={() => dispatchSelectDuelistId(duelistIdA)} />
+        <ProfilePic profilePic={profilePicA} onClick={() => dispatchSelectDuelistId(duelistIdA)} displayBountyValue={0} />
 
         <Modal.Description className='Padded' style={{ width: '550px' }}>
           <Grid style={{ width: '350px' }}>
@@ -133,7 +133,7 @@ export default function NewChallengeModal() {
           </Grid>
         </Modal.Description>
 
-        <ProfilePic profilePic={profilePicB} onClick={() => dispatchSelectDuelistId(duelistIdB)} />
+        <ProfilePic profilePic={profilePicB} onClick={() => dispatchSelectDuelistId(duelistIdB)} displayBountyValue={0} />
       </Modal.Content>
       <Modal.Actions className='NoPadding'>
         <Grid className='FillParent Padded' textAlign='center'>
@@ -251,21 +251,23 @@ function NewChallengeForm({
           </Grid>
         </Form.Field>
 
-        <Form.Field>
-          <FormInput
-            label='Wager -- deposit now, winner takes all, minus fee'
-            placeholder={'$LORDS'}
-            value={canWager ? value.toString() : 'No wager in this Table'}
-            setValue={(newValue) => {
-              const _lords = newValue ? parseInt(newValue) : 0
-              if (!isNaN(_lords)) {
-                setValue(_lords)
-              }
-            }}
-            maxLength={7}
-            disabled={!canWager}
-          />
-        </Form.Field>
+        {canWager &&
+          <Form.Field>
+            <FormInput
+              label='Wager -- deposit now, winner takes all, minus fee'
+              placeholder={'$LORDS'}
+              value={canWager ? value.toString() : 'No wager in this Table'}
+              setValue={(newValue) => {
+                const _lords = newValue ? parseInt(newValue) : 0
+                if (!isNaN(_lords)) {
+                  setValue(_lords)
+                }
+              }}
+              maxLength={7}
+              disabled={!canWager}
+            />
+          </Form.Field>
+        }
 
         <WagerAndOrFees big tableId={tableId} value={ethToWei(value)} fee={fee} prefixed />
 
