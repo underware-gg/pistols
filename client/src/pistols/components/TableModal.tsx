@@ -100,7 +100,7 @@ export default function TableModal({
 function TableDescription({
   tableId,
 }) {
-  const { wagerContractAddress,
+  const { feeContractAddress,
     description,
     wagerMin,
     feeMin,
@@ -108,7 +108,7 @@ function TableDescription({
     tableIsOpen,
     tableType,
   } = useTable(tableId)
-  const { tokenName, tokenSymbol } = useERC20TokenName(wagerContractAddress)
+  const { tokenName, tokenSymbol } = useERC20TokenName(feeContractAddress)
   const { activeDuelistIdsCount } = useActiveDuelistIds(tableId)
   const { liveDuelsCount, pastDuelsCount } = useTableTotals(tableId)
 

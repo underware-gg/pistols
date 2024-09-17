@@ -8,7 +8,7 @@ import {
   useBlockNumber,
 } from '@starknet-react/core'
 import { U256ToBigint, weiToEth } from '@/lib/utils/starknet'
-import { bigintToHex } from '@/lib/utils/types'
+import { bigintToHex, isPositiveBigint } from '@/lib/utils/types'
 import { erc20_abi } from '@/lib/abi'
 
 
@@ -31,7 +31,7 @@ export const _useBalance = (props: UseBalanceProps): Balance => {
     args: [bigintToHex(props.address)],
     abi: erc20_abi,
     address: bigintToHex(props.token),
-    enabled: (BigInt(props.address || 0) > 0n && BigInt(props.token || 0) > 0n),
+    enabled: (props.enabled ?? true) && (isPositiveBigint(props.address ?? 0) && isPositiveBigint(props.token ?? 0)),
     // refetchInterval: 2000, // update every 2 seconds
     // update every block
     watch: true,

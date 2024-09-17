@@ -265,7 +265,7 @@ export const usePistolsScene = (mainPage?: boolean) => {
     let route = sceneRoutes[newSceneName]
     let url = route.baseUrl
     if (sceneRoutes[newSceneName].hasTableId) {
-      url += `/${slugs?.[0] || TABLES.LORDS}`
+      url += `/${slugs?.[0] || tableId || TABLES.LORDS}`
     } else if (sceneRoutes[newSceneName].hasDuelId) {
       url += `/${bigintToHex(slugs?.[0] || selectedDuelId)}`
     }

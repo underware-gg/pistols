@@ -4,7 +4,7 @@ import { AccountInterface, BigNumberish, Call, Result } from 'starknet'
 import { stringToFelt, bigintToU256 } from '@/lib/utils/starknet'
 import { DojoManifest } from '@/lib/dojo/Dojo'
 import { ClientComponents } from '@/lib/dojo/setup/useSetup'
-import { bigintAdd, bigintToEntity, bigintToHex } from '@/lib/utils/types'
+import { bigintAdd, bigintToEntity, bigintToHex, isPositiveBigint } from '@/lib/utils/types'
 import { emitter } from '@/pistols/three/game'
 import {
   Premise, getPremiseValue,
@@ -118,9 +118,9 @@ export function createSystemCalls(
     let calls: Call[] = []
     // approve call
     const actions_contract = getContractByName(manifest, NAMESPACE, 'actions')
-    if (BigInt(table.wager_contract_address) > 0n) {
+    if (isPositiveBigint(table.fee_contract_address) && approved_value > 0) {
       calls.push({
-        contractAddress: bigintToHex(table.wager_contract_address),
+        contractAddress: bigintToHex(table.fee_contract_address),
         entrypoint: 'approve',
         calldata: [actions_contract.address, bigintToU256(approved_value)],
       })
@@ -148,9 +148,9 @@ export function createSystemCalls(
         // approve call
         let calls: Call[] = []
         const actions_contract = getContractByName(manifest, NAMESPACE, 'actions')
-        if (BigInt(table.wager_contract_address) > 0n) {
+        if (BigInt(table.fee_contract_address) > 0n) {
           calls.push({
-            contractAddress: bigintToHex(table.wager_contract_address),
+            contractAddress: bigintToHex(table.fee_contract_address),
             entrypoint: 'approve',
             calldata: [actions_contract.address, bigintToU256(approved_value)],
           })

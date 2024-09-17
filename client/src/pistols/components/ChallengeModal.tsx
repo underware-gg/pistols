@@ -20,6 +20,7 @@ import { IconClick } from '@/lib/ui/Icons'
 import { Divider } from '@/lib/ui/Divider'
 import { bigintToHex } from '@/lib/utils/types'
 import { ChallengeState } from '@/games/pistols/generated/constants'
+import { PremisePrefix } from '../utils/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -35,7 +36,7 @@ export default function ChallengeModal() {
   const _close = () => { dispatchSelectDuel(0n) }
 
   const {
-    state, tableId, quote,
+    state, tableId, premise, quote,
     duelistIdA, duelistIdB, duelistAddressA, duelistAddressB,
     isLive, isFinished, needToSyncExpired,
   } = useChallenge(selectedDuelId)
@@ -118,7 +119,7 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <Divider content='for a duel' nomargin />
+                <Divider content={PremisePrefix[premise]} nomargin />
               </Col>
             </Row>
             <Row columns='equal' textAlign='center'>

@@ -30,7 +30,7 @@ export const useLockedLordsBalance = (address: bigint) => {
       const table = getComponentValue(TableConfig, bigintToEntity(raw_challenge.table_id))
       // if (feltToString(raw_challenge.table_id) == tableId) {
       const state = raw_challenge.state as ChallengeState
-      if (bigintEquals(table.wager_contract_address, contractAddress)) {
+      if (bigintEquals(table.fee_contract_address, contractAddress)) {
         if (state == ChallengeState.InProgress ||
           (state == ChallengeState.Awaiting && bigintEquals(address, raw_challenge.address_a))
         ) {

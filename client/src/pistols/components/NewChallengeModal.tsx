@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Modal, Form, Dropdown } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
-import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
@@ -15,10 +14,9 @@ import { ProfileDescription } from '@/pistols/components/account/ProfileDescript
 import { FormInput } from '@/pistols/components/ui/Form'
 import { Balance } from '@/pistols/components/account/Balance'
 import { WagerAndOrFees } from '@/pistols/components/account/LordsBalance'
-import { ethToWei, validateCairoString } from '@/lib/utils/starknet'
-import { ChallengeQuotes } from '@/pistols/utils/pistols'
+import { ethToWei } from '@/lib/utils/starknet'
+import { PremisePrefix } from '@/pistols/utils/pistols'
 import { Divider } from '@/lib/ui/Divider'
-import { randomArrayElement } from '@/lib/utils/random'
 import { Premise } from '@/games/pistols/generated/constants'
 
 const Row = Grid.Row
@@ -167,41 +165,37 @@ function NewChallengeForm({
   canWager,
 }) {
   const { tableId } = useSettings()
+  const [premise, setPremise] = useState(Premise.Honour)
   const [quote, setQuote] = useState('')
   const [days, setDays] = useState(7)
   const [hours, setHours] = useState(0)
   const [value, setValue] = useState(0)
   const { fee } = useCalcFee(tableId, ethToWei(value))
 
-  useEffectOnce(() => {
-    setQuote(randomArrayElement(ChallengeQuotes))
-  }, [])
-
   const canSubmit = useMemo(() => (quote.length > 3 && (days + hours) > 0), [quote, days, hours, value])
 
   useEffect(() => {
     setArgs(canSubmit ? {
-      premise: Premise.Honour,
+      premise,
       quote,
       expire_hours: ((days * 24 * 60 * 60) + hours),
       table_id: tableId,
       wager_value: ethToWei(value),
     } : null)
-  }, [quote, days, hours, value])
-  // console.log(canSubmit, days, hours, lords, quote)
+  }, [premise, quote, days, hours, value])
 
-  const [customQuote, setCustomQuote] = useState('')
-  const quoteOptions: any[] = useMemo(() =>
-    (ChallengeQuotes.includes(customQuote) ? ChallengeQuotes : [customQuote, ...ChallengeQuotes]).map(msg => ({
-      key: msg.replace(' ', '_'),
-      value: msg,
-      text: msg,
-    })), [customQuote])
+  const premiseOptions: any[] = useMemo(() => Object.keys(Premise).slice(1).map((premise, index) => ({
+    key: `${premise}`,
+    value: `${premise}`,
+    text: `${premise}`,
+  })), [])
+
   const daysOptions: any[] = useMemo(() => Array.from(Array(8).keys()).map(index => ({
     key: `${index}d`,
     value: `${index}`,
     text: `${index} days`,
   })), [])
+
   const hoursOptions: any[] = useMemo(() => Array.from(Array(24).keys()).map(index => ({
     key: `${index}h`,
     value: `${index}`,
@@ -211,29 +205,30 @@ function NewChallengeForm({
   return (
     <div style={{ width: '350px' }}>
       <Form className=''>
+        
         <Form.Field>
-          <span className='FormLabel'>&nbsp;Quote</span>
+          <span className='FormLabel'>&nbsp;Premise</span>
           <Dropdown
-            options={quoteOptions}
-            placeholder={'say something!'}
-            search
+            options={premiseOptions}
+            placeholder={null}
             selection
             fluid
-            allowAdditions
-            additionLabel={''}
-            value={quote}
-            onAddItem={() => { }}
-            onFocus={(e) => {
-              setCustomQuote('')
-              setQuote('')
-            }}
+            value={premise}
             onChange={(e, { value }) => {
-              const _msg = validateCairoString(value as string)
-              if (!ChallengeQuotes.includes(_msg)) {
-                setCustomQuote(_msg)
-              }
-              setQuote(_msg)
+              setPremise(value as Premise)
             }}
+          />
+        </Form.Field>
+
+        <Form.Field>
+          <FormInput
+            label={PremisePrefix[premise]}
+            placeholder={'DESCRIBE YOUR REASONING'}
+            value={quote}
+            setValue={(newValue) => {
+              setQuote(newValue)
+            }}
+            maxLength={31}
           />
         </Form.Field>
 

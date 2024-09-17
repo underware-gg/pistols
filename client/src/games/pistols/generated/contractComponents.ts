@@ -331,13 +331,27 @@ export function defineContractComponents(world: World) {
     TableConfig: (() => {
       return defineComponent(
         world,
-        { table_id: RecsType.BigInt, table_type: RecsType.Number, description: RecsType.BigInt, fee_collector_address: RecsType.BigInt, wager_contract_address: RecsType.BigInt, wager_min: RecsType.BigInt, fee_min: RecsType.BigInt, fee_pct: RecsType.Number, is_open: RecsType.Boolean },
+        { table_id: RecsType.BigInt, table_type: RecsType.Number, description: RecsType.BigInt, fee_collector_address: RecsType.BigInt, fee_contract_address: RecsType.BigInt, fee_min: RecsType.BigInt, is_open: RecsType.Boolean },
         {
           metadata: {
             namespace: "pistols",
             name: "TableConfig",
-            types: ["felt252","enum","felt252","contractaddress","contractaddress","u128","u128","u8","bool"],
+            types: ["felt252","enum","felt252","contractaddress","contractaddress","u128","bool"],
             customTypes: ["TableType"],
+          },
+        }
+      );
+    })(),
+    TableWager: (() => {
+      return defineComponent(
+        world,
+        { table_id: RecsType.BigInt, wager_min: RecsType.BigInt, wager_max: RecsType.BigInt, fee_pct: RecsType.Number },
+        {
+          metadata: {
+            namespace: "pistols",
+            name: "TableWager",
+            types: ["felt252","u128","u128","u8"],
+            customTypes: [],
           },
         }
       );

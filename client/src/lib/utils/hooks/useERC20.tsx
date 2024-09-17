@@ -4,7 +4,7 @@ import {
   // useBalance,
 } from '@starknet-react/core'
 import { _useBalance } from '@/lib/dojo/fix/starknet_react_core'
-import { bigintToHex } from '@/lib/utils/types'
+import { bigintToHex, isPositiveBigint } from '@/lib/utils/types'
 import { BigNumberish } from 'starknet'
 import { erc20_abi } from '@/lib/abi'
 import { feltToString } from '../starknet'
@@ -16,7 +16,7 @@ export const useERC20Balance = (contractAddress: BigNumberish, ownerAddress: Big
     address: bigintToHex(ownerAddress),
     watch: true,
     refetchInterval: 1_000,
-    enabled: (Boolean(contractAddress) && Boolean(ownerAddress)),
+    enabled: (isPositiveBigint(contractAddress) && isPositiveBigint(ownerAddress)),
   })
   // console.log(`BALANCE`, shortAddress(bigintToHex(contractAddress)), shortAddress(bigintToHex(ownerAddress)), balance)
 

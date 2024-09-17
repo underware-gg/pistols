@@ -4,17 +4,18 @@ import { getComponentValue } from '@dojoengine/recs'
 import { useComponentValue } from '@dojoengine/react'
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { useERC20Balance } from '@/lib/utils/hooks/useERC20'
-import { bigintToEntity } from '@/lib/utils/types'
+import { bigintToEntity, isPositiveBigint } from '@/lib/utils/types'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
 import { useAllChallengeIds } from '@/pistols/hooks/useChallenge'
 import { LiveChallengeStates, PastChallengeStates } from '@/pistols/utils/pistols'
 import { TableType, ChallengeState } from '@/games/pistols/generated/constants'
+import { useLordsContract } from '@/lib/dojo/hooks/useLords'
 
 export const useTable = (tableId: string) => {
   const { TableConfig } = useDojoComponents()
 
   const table = useComponentValue(TableConfig, bigintToEntity(stringToFelt(tableId ?? '')))
-  const wagerContractAddress = useMemo(() => (table?.wager_contract_address ?? 0n), [table])
+  const feeContractAddress = useMemo(() => (table?.fee_contract_address ?? 0n), [table])
 
   const tableType = useMemo(() => ((table?.table_type as unknown as TableType) ?? null), [table])
   const tableTypeDescription = useMemo(() => (table?.table_type ? {
@@ -25,12 +26,12 @@ export const useTable = (tableId: string) => {
 
   return {
     tableId,
-    wagerContractAddress,
-    canWager: (wagerContractAddress != 0n),
+    feeContractAddress: isPositiveBigint(feeContractAddress) ? feeContractAddress : null,
+    canWager: false,
     description: table ? feltToString(table.description) : '?',
-    wagerMin: table?.wager_min ?? null,
     feeMin: table?.fee_min ?? null,
-    feePct: table?.fee_pct ?? null,
+    wagerMin: 0,
+    feePct: 0,
     tableType: tableTypeDescription ?? '?',
     tableIsOpen: table?.is_open ?? false,
     isTournament: (tableType == TableType.Tournament),
@@ -39,8 +40,8 @@ export const useTable = (tableId: string) => {
 }
 
 export const useTableAccountBalance = (tableId: string, address: BigNumberish, fee: BigNumberish = 0n) => {
-  const { wagerContractAddress } = useTable(tableId)
-  return useERC20Balance(wagerContractAddress, address, fee)
+  const { feeContractAddress } = useTable(tableId)
+  return useERC20Balance(feeContractAddress, address, fee)
 }
 
 export const useTableTotals = (tableId: string) => {

@@ -8,7 +8,7 @@ import { useClientTimestamp } from "@/lib/utils/hooks/useTimestamp"
 import { useDuelist } from "@/pistols/hooks/useDuelist"
 import { bigintToEntity } from '@/lib/utils/types'
 import { feltToString, stringToFelt } from "@/lib/utils/starknet"
-import { ChallengeState } from '@/games/pistols/generated/constants'
+import { ChallengeState, Premise } from '@/games/pistols/generated/constants'
 import { ChallengeStateDescriptions } from "@/pistols/utils/pistols"
 
 
@@ -96,6 +96,7 @@ export const useChallenge = (duelId: BigNumberish) => {
   const duelistIdA = useMemo(() => BigInt(challenge?.duelist_id_a ?? 0), [challenge])
   const duelistIdB = useMemo(() => BigInt(challenge?.duelist_id_b ?? 0), [challenge])
   const winner = useMemo(() => (challenge?.winner ?? 0), [challenge])
+  const premise = useMemo(() => (challenge?.premise ?? Premise.Null), [challenge])
   const quote = useMemo(() => feltToString(challenge?.quote ?? 0n), [challenge])
   const roundNumber = useMemo(() => (challenge?.round_number ?? 0), [challenge])
   const timestamp_start = useMemo(() => Number(challenge?.timestamp_start ?? 0), [challenge])
@@ -121,6 +122,7 @@ export const useChallenge = (duelId: BigNumberish) => {
     duelistIdB,
     challengerId: duelistIdA,
     challengedId: duelistIdB,
+    premise,
     quote,
     // progress and results
     roundNumber,

@@ -1,4 +1,4 @@
-import { Archetype, BladesCard, ChallengeState, PacesCard, RoundState } from '@/games/pistols/generated/constants'
+import { Archetype, BladesCard, ChallengeState, PacesCard, Premise, RoundState } from '@/games/pistols/generated/constants'
 import { EMOJI } from '@/pistols/data/messages'
 
 //------------------------------------------
@@ -182,4 +182,16 @@ export const ArchetypeNames: Record<Archetype, string> = {
   [Archetype.Villainous]: 'Villainous',
   [Archetype.Trickster]: 'Trickster',
   [Archetype.Honourable]: 'Honourable',
+}
+
+export const PremisePrefix: Record<Premise, string> = {
+  [Premise.Null]: 'over...?',
+  [Premise.Matter]: 'over the matter of',
+  [Premise.Debt]: 'to discharge a debt',
+  [Premise.Dispute]: 'to satisfy a dispute',
+  [Premise.Honour]: 'to defend their honour',
+  [Premise.Hatred]: 'to satisfy a burning hatred',
+  [Premise.Blood]: 'for the love of death and blood',
+  [Premise.Nothing]: 'for no reason other than',
+  [Premise.Tournament]: 'to be the winner of',
 }

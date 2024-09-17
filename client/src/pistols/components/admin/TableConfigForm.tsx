@@ -47,10 +47,8 @@ const table_config_schema: FormSchema = {
   table_type: { type: FieldType.TableType },
   description: { type: FieldType.ShortString },
   fee_collector_address: { type: FieldType.Address },
-  wager_contract_address: { type: FieldType.Address },
-  wager_min: { type: FieldType.Wei },
+  fee_contract_address: { type: FieldType.Address },
   fee_min: { type: FieldType.Wei },
-  fee_pct: { type: FieldType.Number },
   is_open: { type: FieldType.Boolean },
 }
 
