@@ -35,8 +35,8 @@ export function MenuDuel({
 
   return (
     <div className='MenuBottomDuel AlignCenter NoMouse'>
-      <div className='MenuBottomBackground'>
-        <Image className='MenuBottomBackgroundImage' src='/images/ui/bottom_nav.png'/>
+      <div className='MenuBottomBackground NoDrag NoMouse'>
+        <img className='MenuBottomBackgroundImage' src='/images/ui/bottom_nav.png'/>
       </div>
       <Menu secondary compact className='YesMouse' size='huge' style={{ minHeight: '0' }}>
         <Menu.Item className='button_duel' type='tavern' onClick={() => _backToTavern()}>

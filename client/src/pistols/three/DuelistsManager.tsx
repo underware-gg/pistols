@@ -5,7 +5,6 @@ import { CharacterType, AudioName, AnimName } from '@/pistols/data/assets'
 import { Action, ActionTypes } from '@/pistols/utils/pistols'
 
 import { Actor } from './SpriteSheetMaker'
-import { Card, CardsHand } from './Cards'
 import { _sfxEnabled, AnimationState, ASPECT, emitter, playAudio } from './game'
 import { ProgressDialogManager } from './ProgressDialog'
 
@@ -21,17 +20,11 @@ enum DuelistsData {
   DUELIST_B_NAME = 'DUELIST_B_NAME',
 }
 
-enum CardsName {
-  CARDS_A = "CardsA",
-  CARDS_B = "CardsB"
-}
-
 interface Duelist {
   id: string,
   model: CharacterType,
   name: string,
   actor: Actor,
-  cards: CardsHand
 }
 
 export class DuelistsManager {
@@ -39,7 +32,6 @@ export class DuelistsManager {
   private scene: THREE.Scene
   private camera: THREE.PerspectiveCamera
   private spriteSheets: any
-  private cardTextures: any
 
   private mousePointer = new THREE.Vector2()
   private raycaster = new THREE.Raycaster()
@@ -52,26 +44,22 @@ export class DuelistsManager {
     id: 'A',
     model: undefined,
     name: undefined,
-    actor: undefined,
-    cards: undefined
+    actor: undefined
   }
   public duelistB: Duelist = {
     id: 'B',
     model: undefined,
     name: undefined,
-    actor: undefined,
-    cards: undefined
+    actor: undefined
   }
  
-  constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, spriteSheets: any, cardTextures: any) {
+  constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, spriteSheets: any) {
      
     this.scene = scene
     this.camera = camera
     this.spriteSheets = spriteSheets
-    this.cardTextures = cardTextures
 
     this.loadDuelists()
-    this.loadCards()
     this.setupCameraCardUI()
 
     const positionA = new THREE.Vector3(this.duelistA.actor.mesh.position.x, ACTOR_HEIGHT * (this.duelistA.model == CharacterType.MALE ? 0.85 : 0.75), this.duelistA.actor.mesh.position.z)
@@ -92,20 +80,6 @@ export class DuelistsManager {
     this.duelistB.name = localStorage.getItem(DuelistsData.DUELIST_B_NAME)
     this.duelistB.actor = new Actor(this.duelistB.model == CharacterType.MALE ? this.spriteSheets.MALE : this.spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_HEIGHT, PACES_X_0, true)
     this.scene.add(this.duelistB.actor.mesh)
-  }
-
-  private loadCards() {
-    let positionA = new THREE.Vector3(0, 0, 0)
-    positionA.copy(this.duelistA.actor.mesh.position)
-    positionA.y += (ACTOR_HEIGHT * 0.4)
-    this.duelistA.cards = new CardsHand(this.scene, this.camera, positionA, this.cardTextures, true, CardsName.CARDS_A)
-    this.scene.add(this.duelistA.cards)
-
-    let positionB = new THREE.Vector3(0, 0, 0)
-    positionB.copy(this.duelistB.actor.mesh.position)
-    positionB.y += (ACTOR_HEIGHT * 0.4)
-    this.duelistB.cards = new CardsHand(this.scene, this.camera, positionB, this.cardTextures, false, CardsName.CARDS_B)
-    this.scene.add(this.duelistB.cards)
   }
 
   private setupCameraCardUI() {
@@ -137,46 +111,6 @@ export class DuelistsManager {
   }
 
   private setupEvents() {
-    // window.addEventListener('keydown', (event) => {
-    //   switch (event.key.toLowerCase()) { 
-    //     case "q":
-    //       this.duelistA.cards.addCardToScene(CardTextureName.card_front_shoot)
-    //       this.duelProgressDialogManger.showDialogs()
-    //       break
-    //     case "w":
-    //       this.duelistA.cards.addCardToScene(CardTextureName.card_front_face, CardTextureName.card_front_face_grim)
-    //       break
-    //       case "e":
-    //         this.duelistB.cards.addCardToScene(CardTextureName.card_front_shoot)
-    //         this.duelProgressDialogManger.hideDialogs()
-    //       break
-    //     case "r":
-    //       this.duelistB.cards.addCardToScene(CardTextureName.card_front_face, CardTextureName.card_front_face_grim)
-    //       break
-    //     case "x":
-    //       this.duelistA.cards.combineCards()
-    //       this.duelistB.cards.combineCards()
-    //       break
-    //     case "escape":
-    //       console.log(this.camera)
-    //       console.log(this.scene)
-    //       if (this.currentHandSelected && !this.currentHandSelected.isAnimatingDetails && this.currentHandSelected.areDetailsShown) {
-    //         this.currentHandSelected.hideHandDetails()
-    //         new TWEEN.Tween(this.darkBackground.material) //TODO make functions for show and hide of the dark background and save the animation
-    //           .to({ opacity: 0.0 }, 600)
-    //           .easing(TWEEN.Easing.Quadratic.InOut)
-    //           .start()
-    //       }
-    //       break
-    //     default:
-    //       // Optional: Handle any other key presses if needed
-    //       break;
-    //   }
-    
-    //   true
-    // })
-
-    window.addEventListener('mousemove', (event) => this.onMouseMove(event));
   }
 
 
@@ -186,124 +120,10 @@ export class DuelistsManager {
 
   public update(deltaTime: number, elapsedTime: number) {
     this.duelistA.actor?.update(elapsedTime)
-    this.duelistA.cards?.update(this.duelistA.actor?.mesh.position.x)
-    
     this.duelistB.actor?.update(elapsedTime)
-    this.duelistB.cards?.update(this.duelistB.actor?.mesh.position.x)
 
     this.duelProgressDialogManger.update(this.duelistA.actor.mesh.position.x + 0.1, this.duelistB.actor.mesh.position.x - 0.1)
   }
-
-  private clickListener = (event) => this.onMouseClick(event)
-  private currentIntersections = 0
-  private currentHighlightedCard: Card
-  private currentHandSelected: CardsHand = null
-  private timeoutId: any
-  private lastMouseEven: any
-
-  private onMouseMove(event) {
-    this.lastMouseEven = event
-    if (this.timeoutId) {
-      clearTimeout(this.timeoutId)
-      this.timeoutId = undefined
-    }
-
-    const winWidth = window.innerWidth
-    const winHeight = window.innerHeight
-    const aspect = winWidth / winHeight
-    const canvasWidth = aspect > ASPECT ? winHeight * ASPECT : winWidth
-    const canvasHeight = aspect > ASPECT ? winHeight : winWidth / ASPECT  
-    this.mousePointer.x = (event.clientX / canvasWidth) * 2 - 1 - ((window.innerWidth / canvasWidth) - 1)
-    this.mousePointer.y = -(event.clientY / canvasHeight) * 2 + 1 + ((window.innerHeight / canvasHeight) - 1)
-
-    this.raycaster.setFromCamera(this.mousePointer, this.camera);
-    const intersections = this.raycaster.intersectObjects(this.currentHandSelected?.areDetailsShown ? this.currentHandSelected.children : this.camera.children, true)
-      ?.filter(i => i.object.name === "Card")
-      ?.sort((a, b) => a.distance - b.distance) 
-    const closestCard = intersections?.[0]?.object.parent as Card
-    this.currentIntersections = intersections.length
-
-    if (this.currentHandSelected?.isAnimatingExpand || this.currentHandSelected?.isAnimatingDetails) {
-      this.timeoutId = setTimeout(() => {
-        this.onMouseMove(this.lastMouseEven)
-      }, 300) //TODO change to const of expand anim const once created
-      return
-    }
-
-    if (this.currentHandSelected?.areDetailsShown) {
-      if (closestCard) {
-        this.currentHighlightedCard?.removeHighlight()
-        closestCard.highlightCard()
-        this.currentHighlightedCard = closestCard
-      } else {
-        this.currentHighlightedCard?.removeHighlight()
-        this.currentHighlightedCard = null
-      }
-    } else {
-      const newHand = closestCard?.parent instanceof CardsHand ? closestCard.parent : null
-      if (!newHand && this.currentHandSelected) {
-        this.currentHighlightedCard?.removeHighlight()
-        this.currentHandSelected?.collapseHand()
-        window.removeEventListener('click', this.clickListener)
-        this.currentHandSelected = null
-        return
-      }
-
-      if (newHand) {
-        this.currentHandSelected = newHand
-        if (intersections.length > 0 && !this.currentHandSelected.isExpanded) {
-          this.currentHandSelected.expandHand()
-          window.addEventListener('click', this.clickListener)
-        } else if (intersections.length === 0) {
-          this.currentHighlightedCard?.removeHighlight()
-          if (this.currentHandSelected.isExpanded) {
-            this.currentHandSelected.collapseHand()
-            window.removeEventListener('click', this.clickListener)
-          }
-        }
-      }
-    }
-	}
-
-  private onMouseClick(event) {
-    if (
-      !this.currentHandSelected || 
-      this.currentHandSelected.isAnimatingDetails || 
-      (!this.currentHandSelected?.areDetailsShown && this.currentIntersections == 0) ||
-      (this.currentHandSelected?.areDetailsShown && this.currentIntersections > 0)
-    ) return
-
-    if (!this.currentHandSelected.areDetailsShown) {
-      this.currentHandSelected.showHandDetails()
-      if (this.currentHandSelected.name == this.duelistA.cards.name) {
-        this.duelistB.cards.sendCardsToBack()
-      } else {
-        this.duelistA.cards.sendCardsToBack()
-      }
-      new TWEEN.Tween(this.darkBackground.material)
-        .to({ opacity: 0.5 }, 600)
-        .easing(TWEEN.Easing.Quadratic.InOut)
-        .start()
-    } else if (this.currentIntersections == 0) {
-      this.currentHandSelected.hideHandDetails()
-      const isDuelistAHand = this.currentHandSelected.name == this.duelistA.cards.name
-      this.timeoutId = setTimeout(() => {
-        this.onMouseMove(this.lastMouseEven)
-      }, 600)
-      setTimeout(() => {
-        if (isDuelistAHand) {
-          this.duelistB.cards.sendCardsToFront()
-        } else {
-          this.duelistA.cards.sendCardsToFront()
-        }
-      }, 1000) //TODO make this execute when the aniamtiona actualy finishes and not with a time delay
-      new TWEEN.Tween(this.darkBackground.material)
-        .to({ opacity: 0.0 }, 600)
-        .easing(TWEEN.Easing.Quadratic.InOut)
-        .start()
-    }
-	}
-
 
 
   //----------------
@@ -344,10 +164,7 @@ export class DuelistsManager {
     if (!this.duelistA.model || !this.duelistB.model) return false //TODO change if duelistmanager makes it so its always created to remove this if not check in duelist manager
 
     this.duelistA.actor?.stop()
-    this.duelistA.cards.resetCards()
-    
     this.duelistB.actor?.stop()
-    this.duelistB.cards.resetCards()
 
     this.playActorAnimation(this.duelistA, AnimName.STILL, null, true)
     this.playActorAnimation(this.duelistB, AnimName.STILL, null, true)
@@ -610,27 +427,21 @@ export class DuelistsManager {
   //
 
   public dispose() {
-      this.duelistA.cards?.dispose()
-      this.duelistB.cards?.dispose()
-
       this.duelistA = {
         id: 'A',
         model: undefined,
         name: undefined,
-        actor: undefined,
-        cards: undefined
+        actor: undefined
       }
       this.duelistB = {
         id: 'B',
         model: undefined,
         name: undefined,
-        actor: undefined,
-        cards: undefined
+        actor: undefined
       }
 
       this.scene = null
       this.camera = null
       this.spriteSheets = null
-      this.cardTextures = null
   }
 }

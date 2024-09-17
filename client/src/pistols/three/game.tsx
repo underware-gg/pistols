@@ -17,7 +17,7 @@ import * as shaders from './shaders.tsx'
 import ee from 'event-emitter'
 export var emitter = ee()
 
-import { AudioName, AUDIO_ASSETS, TEXTURES, CARD_TEXTURES, SPRITESHEETS, sceneBackgrounds, TextureName } from '@/pistols/data/assets'
+import { AudioName, AUDIO_ASSETS, TEXTURES, SPRITESHEETS, sceneBackgrounds, TextureName } from '@/pistols/data/assets'
 import { SceneName } from '@/pistols/hooks/PistolsContext'
 import { map } from '@/lib/utils/math'
 import { SpriteSheet } from './SpriteSheetMaker'
@@ -91,7 +91,7 @@ const zoomedOutCameraPos = {
   z: -30,
 }
 
-export enum AnimationState {
+export enum AnimationState { //TODO add state for each step instead of round!
   None = 0,
   Round1 = 1,
   Round2 = 2,
@@ -122,7 +122,6 @@ const waterColors = {
 let _framerate = 60
 
 export let _textures: any = {}
-let _cardTextures: any = {}
 let _spriteSheets: any = {}
 
 export let _renderer: THREE.WebGLRenderer
@@ -256,15 +255,6 @@ async function loadAssets() {
     Object.keys(SPRITESHEETS[actorName]).forEach(key => {
       _spriteSheets[actorName][key] = new SpriteSheet(key, SPRITESHEETS[actorName][key], ktx2Loader)
     })
-  })
-
-  Object.keys(CARD_TEXTURES).forEach(cardKey => {
-    const TEX = CARD_TEXTURES[cardKey]
-    const tex = textureLoader.load(TEX.path)
-    tex.colorSpace = THREE.SRGBColorSpace
-    tex.generateMipmaps = false
-    tex.minFilter = THREE.LinearFilter
-    _cardTextures[cardKey] = tex
   })
 
   _textures[TextureName.duel_water_dudv].wrapS = _textures[TextureName.duel_water_dudv].wrapT = THREE.RepeatWrapping;
@@ -439,7 +429,7 @@ function setupDuelScene() {
 
   loadGltf(scene)
 
-  _duelistManager = new DuelistsManager(scene, _duelCamera, _spriteSheets, _cardTextures)
+  _duelistManager = new DuelistsManager(scene, _duelCamera, _spriteSheets)
 
   return scene
 }
@@ -1050,9 +1040,4 @@ function disposeTexturesAndSpriteSheets() {
     _textures[textureKey].dispose()
   }
   _textures = {}
-
-  for (const textureKey of Object.keys(_cardTextures)) {
-    _cardTextures[textureKey].dispose()
-  }
-  _cardTextures = {}
 }
