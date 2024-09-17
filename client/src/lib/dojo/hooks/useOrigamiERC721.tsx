@@ -11,9 +11,10 @@ type MetadataResult = {
   baseUri: string
   isPending: boolean
 }
-export const useOrigamiERC721Metadata = (token: BigNumberish, components: Components): MetadataResult => {
+export const useOrigamiERC721Metadata = (token_address: BigNumberish, components: Components): MetadataResult => {
   const { ERC721MetaModel } = components
-  const result: any = useComponentValue(ERC721MetaModel, keysToEntity([token]))
+  const entityId = useMemo(() => keysToEntity([token_address]), [token_address])
+  const result: any = useComponentValue(ERC721MetaModel, entityId)
   return {
     name: (result?.name ?? null),
     symbol: (result?.symbol ?? null),
@@ -26,9 +27,10 @@ type TotalSupplyResult = {
   totalSupply: number
   isPending: boolean
 }
-export const useOrigamiERC721TotalSupply = (token: BigNumberish, components: Components): TotalSupplyResult => {
+export const useOrigamiERC721TotalSupply = (token_address: BigNumberish, components: Components): TotalSupplyResult => {
   const { ERC721EnumerableTotalModel } = components
-  const result: any = useComponentValue(ERC721EnumerableTotalModel, keysToEntity([token]))
+  const entityId = useMemo(() => keysToEntity([token_address]), [token_address])
+  const result: any = useComponentValue(ERC721EnumerableTotalModel, entityId)
   return {
     totalSupply: result ? Number(result.total_supply) : null,
     isPending: (result == null),
@@ -39,9 +41,10 @@ type OwnerOfResult = {
   owner: bigint
   isPending: boolean
 }
-export const useOrigamiERC721OwnerOf = (token: BigNumberish, token_id: BigNumberish, components: Components): OwnerOfResult => {
+export const useOrigamiERC721OwnerOf = (token_address: BigNumberish, token_id: BigNumberish, components: Components): OwnerOfResult => {
   const { ERC721OwnerModel } = components
-  const result: any = useComponentValue(ERC721OwnerModel, keysToEntity([token, token_id]))
+  const entityId = useMemo(() => keysToEntity([token_address, token_id]), [token_address, token_id])
+  const result: any = useComponentValue(ERC721OwnerModel, entityId)
   return {
     owner: result ? BigInt(result.address) : null,
     isPending: (result == null),
@@ -52,9 +55,10 @@ type BalanceOfResult = {
   amount: number
   isPending: boolean
 }
-export const useOrigamiERC721BalanceOf = (token: BigNumberish, account: BigNumberish, components: Components): BalanceOfResult => {
+export const useOrigamiERC721BalanceOf = (token_address: BigNumberish, account: BigNumberish, components: Components): BalanceOfResult => {
   const { ERC721BalanceModel } = components
-  const result: any = useComponentValue(ERC721BalanceModel, keysToEntity([token, account]))
+  const entityId = useMemo(() => keysToEntity([token_address, account]), [token_address, account])
+  const result: any = useComponentValue(ERC721BalanceModel, entityId)
   return {
     amount: result ? Number(result.amount) : null,
     isPending: (result == null),
@@ -65,9 +69,10 @@ type TokenByIndexResult = {
   tokenId: bigint
   isPending: boolean
 }
-export const useOrigamiERC721TokenByIndex = (token: BigNumberish, index: BigNumberish, components: Components): TokenByIndexResult => {
+export const useOrigamiERC721TokenByIndex = (token_address: BigNumberish, index: BigNumberish, components: Components): TokenByIndexResult => {
   const { ERC721EnumerableIndexModel } = components
-  const result: any = useComponentValue(ERC721EnumerableIndexModel, keysToEntity([token, index]))
+  const entityId = useMemo(() => keysToEntity([token_address, index]), [token_address, index])
+  const result: any = useComponentValue(ERC721EnumerableIndexModel, entityId)
   return {
     tokenId: result ? BigInt(result.token_id) : null,
     isPending: (result == null),
@@ -78,9 +83,10 @@ type TokenOfOwnerByIndexResult = {
   tokenId: bigint
   isPending: boolean
 }
-export const useOrigamiERC721TokenOfOwnerByIndex = (token: BigNumberish, owner: BigNumberish, index: BigNumberish, components: Components): TokenOfOwnerByIndexResult => {
+export const useOrigamiERC721TokenOfOwnerByIndex = (token_address: BigNumberish, owner: BigNumberish, index: BigNumberish, components: Components): TokenOfOwnerByIndexResult => {
   const { ERC721EnumerableOwnerIndexModel } = components
-  const result: any = useComponentValue(ERC721EnumerableOwnerIndexModel, keysToEntity([token, owner, index]))
+  const entityId = useMemo(() => keysToEntity([token_address, owner, index]), [token_address, owner, index])
+  const result: any = useComponentValue(ERC721EnumerableOwnerIndexModel, entityId)
   return {
     tokenId: result ? BigInt(result.token_id) : null,
     isPending: (result == null),
@@ -91,9 +97,10 @@ type IndexByTokenResult = {
   index: number
   isPending: boolean
 }
-export const useOrigamiERC721IndexByToken = (token: BigNumberish, token_id: BigNumberish, components: Components): IndexByTokenResult => {
+export const useOrigamiERC721IndexByToken = (token_address: BigNumberish, token_id: BigNumberish, components: Components): IndexByTokenResult => {
   const { ERC721EnumerableTokenModel } = components
-  const result: any = useComponentValue(ERC721EnumerableTokenModel, keysToEntity([token, token_id]))
+  const entityId = useMemo(() => keysToEntity([token_address, token_id]), [token_address, token_id])
+  const result: any = useComponentValue(ERC721EnumerableTokenModel, entityId)
   return {
     index: result ? Number(result.index) : null,
     isPending: (result == null),
@@ -104,9 +111,10 @@ type IndexOfOwnerByTokenRsult = {
   index: number
   isPending: boolean
 }
-export const useOrigamiERC721IndexOfOwnerByToken = (token: BigNumberish, owner: BigNumberish, token_id: BigNumberish, components: Components): IndexOfOwnerByTokenRsult => {
+export const useOrigamiERC721IndexOfOwnerByToken = (token_address: BigNumberish, owner: BigNumberish, token_id: BigNumberish, components: Components): IndexOfOwnerByTokenRsult => {
   const { ERC721EnumerableOwnerTokenModel } = components
-  const result: any = useComponentValue(ERC721EnumerableOwnerTokenModel, keysToEntity([token, owner, token_id]))
+  const entityId = useMemo(() => keysToEntity([token_address, owner, token_id]), [token_address, owner, token_id])
+  const result: any = useComponentValue(ERC721EnumerableOwnerTokenModel, entityId)
   return {
     index: result ? Number(result.index) : null,
     isPending: (result == null),
@@ -117,16 +125,16 @@ type useOrigamiERC721AllTokensOfOwnerResult = {
   tokenIds: bigint[]
   isPending: boolean
 }
-export const useOrigamiERC721AllTokensOfOwner = (token: BigNumberish, owner: BigNumberish, components: Components): useOrigamiERC721AllTokensOfOwnerResult => {
+export const useOrigamiERC721AllTokensOfOwner = (token_address: BigNumberish, owner: BigNumberish, components: Components): useOrigamiERC721AllTokensOfOwnerResult => {
   const { ERC721EnumerableOwnerIndexModel } = components
-  const { amount, isPending: isBalancePending } = useOrigamiERC721BalanceOf(token, owner, components)
+  const { amount, isPending: isBalancePending } = useOrigamiERC721BalanceOf(token_address, owner, components)
   const tokenIds = useMemo(() => {
     return Array.from({ length: amount }, (_, i) => i).map((index) => {
-      const result = getComponentValue(ERC721EnumerableOwnerIndexModel, keysToEntity([token, owner, index]))
+      const result = getComponentValue(ERC721EnumerableOwnerIndexModel, keysToEntity([token_address, owner, index]))
       // console.log(`>>>> ALL:`, isBalancePending, index, result)
       return result ? BigInt(result.token_id) : 0n
     })
-  }, [token, owner, amount, isBalancePending])
+  }, [token_address, owner, amount, isBalancePending])
   return {
     tokenIds,
     isPending: isBalancePending,

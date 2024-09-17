@@ -66,7 +66,8 @@ export function useScore(score: Score | undefined) {
 
 export const useScoreboard = (tableId: string, duelistId: BigNumberish) => {
   const { Scoreboard } = useDojoComponents()
-  const scoreboard = useComponentValue(Scoreboard, keysToEntity([stringToFelt(tableId ?? ''), duelistId]))
+  const entityId = useMemo(() => keysToEntity([stringToFelt(tableId ?? ''), duelistId]), [tableId, duelistId])
+  const scoreboard = useComponentValue(Scoreboard, entityId)
 
   const score = useScore(scoreboard?.score)
 

@@ -26,6 +26,7 @@ export const useRound = (duelId: BigNumberish, roundNumber: BigNumberish) => {
   const round = useComponentValue(Round, entityId)
   const state = useMemo(() => (round?.state as unknown as RoundState ?? null), [round])
   if (!round) return null
+  // useEffect(() => { console.log(`+++ round:`) }, [round])
   return {
     ...round,
     state,
@@ -34,11 +35,11 @@ export const useRound = (duelId: BigNumberish, roundNumber: BigNumberish) => {
 
 export const useDuel = (duelId: BigNumberish) => {
   const challenge = useChallenge(duelId)
-  const round1 = useRound(duelId, 1n)
+  const round1 = useRound(duelId, 1)
 
   // TODO: find out why this is updating every frame!
   // useEffect(() => { console.log(`+challenge`) }, [challenge])
-  // useEffect(() => { console.log(`+round1`) }, [round1])
+  // useEffect(() => { console.log(`+round1:`) }, [round1])
 
   //
   // The actual stage of this duel

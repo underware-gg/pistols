@@ -76,7 +76,7 @@ export default function CommitPacesModal({
             <TacticsSelector currentTactics={tactics} onSelect={(value: number) => setTactics(value)} />
 
             <Divider />
-            <h5>Tactics</h5>
+            <h5>Blades</h5>
             <BladesSelector currentBlades={blades} onSelect={(value: number) => setBlades(value)} />
           </div>
 

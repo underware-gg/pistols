@@ -20,7 +20,7 @@ export const usePact = (table_id: string, duelist_id_or_address_a: BigNumberish,
       pair,
       pairKey: keysToEntity([stringToFelt(table_id), pair]),
     }
-  }, [duelist_id_or_address_a, duelist_id_or_address_b])
+  }, [duelist_id_or_address_a, duelist_id_or_address_b, table_id])
 
   const pact = useComponentValue(Pact, pairKey)
   const pactDuelId = useMemo(() => (pact?.duel_id ?? 0n), [pact])
