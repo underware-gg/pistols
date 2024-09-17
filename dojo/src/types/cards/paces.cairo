@@ -22,17 +22,18 @@ pub enum PacesCard {
 //
 
 mod PACES_CARDS {
+    // IMPORTANT: must be in sync with PacesCard
     const None: u8 = 0;
-    const PACES_1: u8 = 1;
-    const PACES_2: u8 = 2;
-    const PACES_3: u8 = 3;
-    const PACES_4: u8 = 4;
-    const PACES_5: u8 = 5;
-    const PACES_6: u8 = 6;
-    const PACES_7: u8 = 7;
-    const PACES_8: u8 = 8;
-    const PACES_9: u8 = 9;
-    const PACES_10: u8 = 10;
+    const Paces1: u8 = 1;
+    const Paces2: u8 = 2;
+    const Paces3: u8 = 3;
+    const Paces4: u8 = 4;
+    const Paces5: u8 = 5;
+    const Paces6: u8 = 6;
+    const Paces7: u8 = 7;
+    const Paces8: u8 = 8;
+    const Paces9: u8 = 9;
+    const Paces10: u8 = 10;
 }
 
 
@@ -107,32 +108,32 @@ impl PacesCardDefault of Default<PacesCard> {
 impl PacesCardIntoU8 of Into<PacesCard, u8> {
     fn into(self: PacesCard) -> u8 {
         match self {
-            PacesCard::Paces1 =>    PACES_CARDS::PACES_1,
-            PacesCard::Paces2 =>    PACES_CARDS::PACES_2,
-            PacesCard::Paces3 =>    PACES_CARDS::PACES_3,
-            PacesCard::Paces4 =>    PACES_CARDS::PACES_4,
-            PacesCard::Paces5 =>    PACES_CARDS::PACES_5,
-            PacesCard::Paces6 =>    PACES_CARDS::PACES_6,
-            PacesCard::Paces7 =>    PACES_CARDS::PACES_7,
-            PacesCard::Paces8 =>    PACES_CARDS::PACES_8,
-            PacesCard::Paces9 =>    PACES_CARDS::PACES_9,
-            PacesCard::Paces10 =>   PACES_CARDS::PACES_10,
+            PacesCard::Paces1 =>    PACES_CARDS::Paces1,
+            PacesCard::Paces2 =>    PACES_CARDS::Paces2,
+            PacesCard::Paces3 =>    PACES_CARDS::Paces3,
+            PacesCard::Paces4 =>    PACES_CARDS::Paces4,
+            PacesCard::Paces5 =>    PACES_CARDS::Paces5,
+            PacesCard::Paces6 =>    PACES_CARDS::Paces6,
+            PacesCard::Paces7 =>    PACES_CARDS::Paces7,
+            PacesCard::Paces8 =>    PACES_CARDS::Paces8,
+            PacesCard::Paces9 =>    PACES_CARDS::Paces9,
+            PacesCard::Paces10 =>   PACES_CARDS::Paces10,
             _ =>                    PACES_CARDS::None,
         }
     }
 }
 impl U8IntoPacesCard of Into<u8, PacesCard> {
     fn into(self: u8) -> PacesCard {
-        if self == PACES_CARDS::PACES_1         { PacesCard::Paces1 }
-        else if self == PACES_CARDS::PACES_2    { PacesCard::Paces2 }
-        else if self == PACES_CARDS::PACES_3    { PacesCard::Paces3 }
-        else if self == PACES_CARDS::PACES_4    { PacesCard::Paces4 }
-        else if self == PACES_CARDS::PACES_5    { PacesCard::Paces5 }
-        else if self == PACES_CARDS::PACES_6    { PacesCard::Paces6 }
-        else if self == PACES_CARDS::PACES_7    { PacesCard::Paces7 }
-        else if self == PACES_CARDS::PACES_8    { PacesCard::Paces8 }
-        else if self == PACES_CARDS::PACES_9    { PacesCard::Paces9 }
-        else if self == PACES_CARDS::PACES_10   { PacesCard::Paces10 }
+        if self == PACES_CARDS::Paces1         { PacesCard::Paces1 }
+        else if self == PACES_CARDS::Paces2    { PacesCard::Paces2 }
+        else if self == PACES_CARDS::Paces3    { PacesCard::Paces3 }
+        else if self == PACES_CARDS::Paces4    { PacesCard::Paces4 }
+        else if self == PACES_CARDS::Paces5    { PacesCard::Paces5 }
+        else if self == PACES_CARDS::Paces6    { PacesCard::Paces6 }
+        else if self == PACES_CARDS::Paces7    { PacesCard::Paces7 }
+        else if self == PACES_CARDS::Paces8    { PacesCard::Paces8 }
+        else if self == PACES_CARDS::Paces9    { PacesCard::Paces9 }
+        else if self == PACES_CARDS::Paces10   { PacesCard::Paces10 }
         else                                    { PacesCard::None }
     }
 }

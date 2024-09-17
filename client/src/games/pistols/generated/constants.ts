@@ -331,29 +331,29 @@ export const TABLES: type_TABLES = {
 
 // from: ../dojo/src/types/cards/blades.cairo
 type type_BLADES_CARDS = {
-  NONE: number, // cairo: u8
-  SEPPUKU: number, // cairo: u8
-  RUN_AWAY: number, // cairo: u8
-  BEHEAD: number, // cairo: u8
-  GRAPPLE: number, // cairo: u8
+  None: number, // cairo: u8
+  Seppuku: number, // cairo: u8
+  RunAway: number, // cairo: u8
+  Behead: number, // cairo: u8
+  Grapple: number, // cairo: u8
 };
 export const BLADES_CARDS: type_BLADES_CARDS = {
-  NONE: 0,
-  SEPPUKU: 1,
-  RUN_AWAY: 2,
-  BEHEAD: 3,
-  GRAPPLE: 4,
+  None: 0,
+  Seppuku: 1,
+  RunAway: 2,
+  Behead: 3,
+  Grapple: 4,
 };
 
 // from: ../dojo/src/types/cards/blades.cairo
 type type_BLADES_POINTS = {
-  SEPPUKU: CardPoints, // cairo: CardPoints
-  RUN_AWAY: CardPoints, // cairo: CardPoints
-  BEHEAD: CardPoints, // cairo: CardPoints
-  GRAPPLE: CardPoints, // cairo: CardPoints
+  Seppuku: CardPoints, // cairo: CardPoints
+  RunAway: CardPoints, // cairo: CardPoints
+  Behead: CardPoints, // cairo: CardPoints
+  Grapple: CardPoints, // cairo: CardPoints
 };
 export const BLADES_POINTS: type_BLADES_POINTS = {
-  SEPPUKU: {
+  Seppuku: {
     name: 'Seppuku',
     self_chances: 20,
     self_damage: 1,
@@ -361,7 +361,7 @@ export const BLADES_POINTS: type_BLADES_POINTS = {
     other_damage: 0,
     special: 'Suicide if survives',
   },
-  RUN_AWAY: {
+  RunAway: {
     name: 'Run Away',
     self_chances: 0,
     self_damage: 0,
@@ -369,7 +369,7 @@ export const BLADES_POINTS: type_BLADES_POINTS = {
     other_damage: 0,
     special: 'Beats Behead',
   },
-  BEHEAD: {
+  Behead: {
     name: 'Behead',
     self_chances: 0,
     self_damage: 1,
@@ -377,7 +377,7 @@ export const BLADES_POINTS: type_BLADES_POINTS = {
     other_damage: 0,
     special: 'Beats Grapple',
   },
-  GRAPPLE: {
+  Grapple: {
     name: 'Grapple',
     self_chances: 0,
     self_damage: 0,
@@ -389,47 +389,47 @@ export const BLADES_POINTS: type_BLADES_POINTS = {
 
 // from: ../dojo/src/types/cards/env.cairo
 type type_ENV_CARDS = {
-  NONE: number, // cairo: u8
-  DAMAGE_UP: number, // cairo: u8
-  DAMAGE_DOWN: number, // cairo: u8
-  CHANCES_UP: number, // cairo: u8
-  CHANCES_DOWN: number, // cairo: u8
-  DOUBLE_DAMAGE_UP: number, // cairo: u8
-  DOUBLE_CHANCES_UP: number, // cairo: u8
-  SPECIAL_ALL_SHOTS_HIT: number, // cairo: u8
-  SPECIAL_ALL_SHOTS_MISS: number, // cairo: u8
-  SPECIAL_DOUBLE_TACTICS: number, // cairo: u8
-  SPECIAL_NO_TACTICS: number, // cairo: u8
+  None: number, // cairo: u8
+  DamageUp: number, // cairo: u8
+  DamageDown: number, // cairo: u8
+  ChancesUp: number, // cairo: u8
+  ChancesDown: number, // cairo: u8
+  DoubleDamageUp: number, // cairo: u8
+  DoubleChancesUp: number, // cairo: u8
+  SpecialAllShotsHit: number, // cairo: u8
+  SpecialAllShotsMiss: number, // cairo: u8
+  SpecialDoubleTactics: number, // cairo: u8
+  SpecialNoTactics: number, // cairo: u8
 };
 export const ENV_CARDS: type_ENV_CARDS = {
-  NONE: 0,
-  DAMAGE_UP: 1,
-  DAMAGE_DOWN: 2,
-  CHANCES_UP: 3,
-  CHANCES_DOWN: 4,
-  DOUBLE_DAMAGE_UP: 5,
-  DOUBLE_CHANCES_UP: 7,
-  SPECIAL_ALL_SHOTS_HIT: 9,
-  SPECIAL_ALL_SHOTS_MISS: 10,
-  SPECIAL_DOUBLE_TACTICS: 11,
-  SPECIAL_NO_TACTICS: 12,
+  None: 0,
+  DamageUp: 1,
+  DamageDown: 2,
+  ChancesUp: 3,
+  ChancesDown: 4,
+  DoubleDamageUp: 5,
+  DoubleChancesUp: 7,
+  SpecialAllShotsHit: 9,
+  SpecialAllShotsMiss: 10,
+  SpecialDoubleTactics: 11,
+  SpecialNoTactics: 12,
 };
 
 // from: ../dojo/src/types/cards/env.cairo
 type type_ENV_POINTS = {
-  DAMAGE_UP: EnvCardPoints, // cairo: EnvCardPoints
-  DAMAGE_DOWN: EnvCardPoints, // cairo: EnvCardPoints
-  CHANCES_UP: EnvCardPoints, // cairo: EnvCardPoints
-  CHANCES_DOWN: EnvCardPoints, // cairo: EnvCardPoints
-  DOUBLE_DAMAGE_UP: EnvCardPoints, // cairo: EnvCardPoints
-  DOUBLE_CHANCES_UP: EnvCardPoints, // cairo: EnvCardPoints
-  SPECIAL_ALL_SHOTS_HIT: EnvCardPoints, // cairo: EnvCardPoints
-  SPECIAL_ALL_SHOTS_MISS: EnvCardPoints, // cairo: EnvCardPoints
-  SPECIAL_DOUBLE_TACTICS: EnvCardPoints, // cairo: EnvCardPoints
-  SPECIAL_NO_TACTICS: EnvCardPoints, // cairo: EnvCardPoints
+  DamageUp: EnvCardPoints, // cairo: EnvCardPoints
+  DamageDown: EnvCardPoints, // cairo: EnvCardPoints
+  ChancesUp: EnvCardPoints, // cairo: EnvCardPoints
+  ChancesDown: EnvCardPoints, // cairo: EnvCardPoints
+  DoubleDamageUp: EnvCardPoints, // cairo: EnvCardPoints
+  DoubleChancesUp: EnvCardPoints, // cairo: EnvCardPoints
+  SpecialAllShotsHit: EnvCardPoints, // cairo: EnvCardPoints
+  SpecialAllShotsMiss: EnvCardPoints, // cairo: EnvCardPoints
+  SpecialDoubleTactics: EnvCardPoints, // cairo: EnvCardPoints
+  SpecialNoTactics: EnvCardPoints, // cairo: EnvCardPoints
 };
 export const ENV_POINTS: type_ENV_POINTS = {
-  DAMAGE_UP: {
+  DamageUp: {
     name: 'Damage Up',
     rarity: Rarity.Common,
     chances: 0,
@@ -437,7 +437,7 @@ export const ENV_POINTS: type_ENV_POINTS = {
     one_step: false,
     tactics_multiplier: 1,
   },
-  DAMAGE_DOWN: {
+  DamageDown: {
     name: 'Damage Down',
     rarity: Rarity.Common,
     chances: 0,
@@ -445,7 +445,7 @@ export const ENV_POINTS: type_ENV_POINTS = {
     one_step: false,
     tactics_multiplier: 1,
   },
-  CHANCES_UP: {
+  ChancesUp: {
     name: 'Chances Up',
     rarity: Rarity.Common,
     chances: 10,
@@ -453,7 +453,7 @@ export const ENV_POINTS: type_ENV_POINTS = {
     one_step: false,
     tactics_multiplier: 1,
   },
-  CHANCES_DOWN: {
+  ChancesDown: {
     name: 'Chances Down',
     rarity: Rarity.Common,
     chances: -10,
@@ -461,7 +461,7 @@ export const ENV_POINTS: type_ENV_POINTS = {
     one_step: false,
     tactics_multiplier: 1,
   },
-  DOUBLE_DAMAGE_UP: {
+  DoubleDamageUp: {
     name: 'Double Damage Up',
     rarity: Rarity.Uncommon,
     chances: 0,
@@ -469,7 +469,7 @@ export const ENV_POINTS: type_ENV_POINTS = {
     one_step: false,
     tactics_multiplier: 1,
   },
-  DOUBLE_CHANCES_UP: {
+  DoubleChancesUp: {
     name: 'Double Chances Up',
     rarity: Rarity.Uncommon,
     chances: 20,
@@ -477,7 +477,7 @@ export const ENV_POINTS: type_ENV_POINTS = {
     one_step: false,
     tactics_multiplier: 1,
   },
-  SPECIAL_ALL_SHOTS_HIT: {
+  SpecialAllShotsHit: {
     name: 'All Shots Hit',
     rarity: Rarity.Special,
     chances: 100,
@@ -485,7 +485,7 @@ export const ENV_POINTS: type_ENV_POINTS = {
     one_step: true,
     tactics_multiplier: 1,
   },
-  SPECIAL_ALL_SHOTS_MISS: {
+  SpecialAllShotsMiss: {
     name: 'All Shots Miss',
     rarity: Rarity.Special,
     chances: -100,
@@ -493,7 +493,7 @@ export const ENV_POINTS: type_ENV_POINTS = {
     one_step: true,
     tactics_multiplier: 1,
   },
-  SPECIAL_DOUBLE_TACTICS: {
+  SpecialDoubleTactics: {
     name: 'Double Tactics',
     rarity: Rarity.Special,
     chances: 0,
@@ -501,7 +501,7 @@ export const ENV_POINTS: type_ENV_POINTS = {
     one_step: true,
     tactics_multiplier: 2,
   },
-  SPECIAL_NO_TACTICS: {
+  SpecialNoTactics: {
     name: 'No Tactics',
     rarity: Rarity.Special,
     chances: 0,
@@ -514,62 +514,62 @@ export const ENV_POINTS: type_ENV_POINTS = {
 // from: ../dojo/src/types/cards/paces.cairo
 type type_PACES_CARDS = {
   None: number, // cairo: u8
-  PACES_1: number, // cairo: u8
-  PACES_2: number, // cairo: u8
-  PACES_3: number, // cairo: u8
-  PACES_4: number, // cairo: u8
-  PACES_5: number, // cairo: u8
-  PACES_6: number, // cairo: u8
-  PACES_7: number, // cairo: u8
-  PACES_8: number, // cairo: u8
-  PACES_9: number, // cairo: u8
-  PACES_10: number, // cairo: u8
+  Paces1: number, // cairo: u8
+  Paces2: number, // cairo: u8
+  Paces3: number, // cairo: u8
+  Paces4: number, // cairo: u8
+  Paces5: number, // cairo: u8
+  Paces6: number, // cairo: u8
+  Paces7: number, // cairo: u8
+  Paces8: number, // cairo: u8
+  Paces9: number, // cairo: u8
+  Paces10: number, // cairo: u8
 };
 export const PACES_CARDS: type_PACES_CARDS = {
   None: 0,
-  PACES_1: 1,
-  PACES_2: 2,
-  PACES_3: 3,
-  PACES_4: 4,
-  PACES_5: 5,
-  PACES_6: 6,
-  PACES_7: 7,
-  PACES_8: 8,
-  PACES_9: 9,
-  PACES_10: 10,
+  Paces1: 1,
+  Paces2: 2,
+  Paces3: 3,
+  Paces4: 4,
+  Paces5: 5,
+  Paces6: 6,
+  Paces7: 7,
+  Paces8: 8,
+  Paces9: 9,
+  Paces10: 10,
 };
 
 // from: ../dojo/src/types/cards/tactics.cairo
 type type_TACTICS_CARDS = {
-  NONE: number, // cairo: u8
-  INSULT: number, // cairo: u8
-  COIN_TOSS: number, // cairo: u8
-  VENGEFUL: number, // cairo: u8
-  THICK_COAT: number, // cairo: u8
-  REVERSAL: number, // cairo: u8
-  BANANAS: number, // cairo: u8
+  None: number, // cairo: u8
+  Insult: number, // cairo: u8
+  CoinToss: number, // cairo: u8
+  Vengeful: number, // cairo: u8
+  ThickCoat: number, // cairo: u8
+  Reversal: number, // cairo: u8
+  Bananas: number, // cairo: u8
 };
 export const TACTICS_CARDS: type_TACTICS_CARDS = {
-  NONE: 0,
-  INSULT: 1,
-  COIN_TOSS: 2,
-  VENGEFUL: 3,
-  THICK_COAT: 4,
-  REVERSAL: 5,
-  BANANAS: 6,
+  None: 0,
+  Insult: 1,
+  CoinToss: 2,
+  Vengeful: 3,
+  ThickCoat: 4,
+  Reversal: 5,
+  Bananas: 6,
 };
 
 // from: ../dojo/src/types/cards/tactics.cairo
 type type_TACTICS_POINTS = {
-  INSULT: CardPoints, // cairo: CardPoints
-  COIN_TOSS: CardPoints, // cairo: CardPoints
-  VENGEFUL: CardPoints, // cairo: CardPoints
-  THICK_COAT: CardPoints, // cairo: CardPoints
-  REVERSAL: CardPoints, // cairo: CardPoints
-  BANANAS: CardPoints, // cairo: CardPoints
+  Insult: CardPoints, // cairo: CardPoints
+  CoinToss: CardPoints, // cairo: CardPoints
+  Vengeful: CardPoints, // cairo: CardPoints
+  ThickCoat: CardPoints, // cairo: CardPoints
+  Reversal: CardPoints, // cairo: CardPoints
+  Bananas: CardPoints, // cairo: CardPoints
 };
 export const TACTICS_POINTS: type_TACTICS_POINTS = {
-  INSULT: {
+  Insult: {
     name: 'Insult',
     self_chances: 0,
     self_damage: 0,
@@ -577,7 +577,7 @@ export const TACTICS_POINTS: type_TACTICS_POINTS = {
     other_damage: 1,
     special: '',
   },
-  COIN_TOSS: {
+  CoinToss: {
     name: 'Coin Toss',
     self_chances: 0,
     self_damage: 0,
@@ -585,7 +585,7 @@ export const TACTICS_POINTS: type_TACTICS_POINTS = {
     other_damage: 0,
     special: 'First special doesnt affect you',
   },
-  VENGEFUL: {
+  Vengeful: {
     name: 'Vengeful',
     self_chances: 0,
     self_damage: 1,
@@ -593,7 +593,7 @@ export const TACTICS_POINTS: type_TACTICS_POINTS = {
     other_damage: 0,
     special: '',
   },
-  THICK_COAT: {
+  ThickCoat: {
     name: 'Thick Coat',
     self_chances: 0,
     self_damage: 0,
@@ -601,7 +601,7 @@ export const TACTICS_POINTS: type_TACTICS_POINTS = {
     other_damage: -1,
     special: '',
   },
-  REVERSAL: {
+  Reversal: {
     name: 'Reversal',
     self_chances: 0,
     self_damage: 0,
@@ -609,7 +609,7 @@ export const TACTICS_POINTS: type_TACTICS_POINTS = {
     other_damage: 0,
     special: 'Next decrease increases both',
   },
-  BANANAS: {
+  Bananas: {
     name: 'Bananas',
     self_chances: -10,
     self_damage: 0,

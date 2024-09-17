@@ -22,22 +22,23 @@ pub enum EnvCard {
 //
 
 mod ENV_CARDS {
-    const NONE: u8 = 0;
-    const DAMAGE_UP: u8 = 1;
-    const DAMAGE_DOWN: u8 = 2;
-    const CHANCES_UP: u8 = 3;
-    const CHANCES_DOWN: u8 = 4;
-    const DOUBLE_DAMAGE_UP: u8 = 5;
-    const DOUBLE_CHANCES_UP: u8 = 7;
-    const SPECIAL_ALL_SHOTS_HIT: u8 = 9;
-    const SPECIAL_ALL_SHOTS_MISS: u8 = 10;
-    const SPECIAL_DOUBLE_TACTICS: u8 = 11;
-    const SPECIAL_NO_TACTICS: u8 = 12;
+    // IMPORTANT: must be in sync with EnvCard
+    const None: u8 = 0;
+    const DamageUp: u8 = 1;
+    const DamageDown: u8 = 2;
+    const ChancesUp: u8 = 3;
+    const ChancesDown: u8 = 4;
+    const DoubleDamageUp: u8 = 5;
+    const DoubleChancesUp: u8 = 7;
+    const SpecialAllShotsHit: u8 = 9;
+    const SpecialAllShotsMiss: u8 = 10;
+    const SpecialDoubleTactics: u8 = 11;
+    const SpecialNoTactics: u8 = 12;
 }
 
 mod ENV_POINTS {
     use pistols::types::cards::cards::{EnvCardPoints, Rarity};
-    const DAMAGE_UP: EnvCardPoints = EnvCardPoints {
+    const DamageUp: EnvCardPoints = EnvCardPoints {
         name: 'Damage Up',
         rarity: Rarity::Common,
         chances: 0,
@@ -45,7 +46,7 @@ mod ENV_POINTS {
         one_step: false,
         tactics_multiplier: 1,
     };
-    const DAMAGE_DOWN: EnvCardPoints = EnvCardPoints {
+    const DamageDown: EnvCardPoints = EnvCardPoints {
         name: 'Damage Down',
         rarity: Rarity::Common,
         chances: 0,
@@ -53,7 +54,7 @@ mod ENV_POINTS {
         one_step: false,
         tactics_multiplier: 1,
     };
-    const CHANCES_UP: EnvCardPoints = EnvCardPoints {
+    const ChancesUp: EnvCardPoints = EnvCardPoints {
         name: 'Chances Up',
         rarity: Rarity::Common,
         chances: 10,
@@ -61,7 +62,7 @@ mod ENV_POINTS {
         one_step: false,
         tactics_multiplier: 1,
     };
-    const CHANCES_DOWN: EnvCardPoints = EnvCardPoints {
+    const ChancesDown: EnvCardPoints = EnvCardPoints {
         name: 'Chances Down',
         rarity: Rarity::Common,
         chances: -10, 
@@ -69,7 +70,7 @@ mod ENV_POINTS {
         one_step: false,
         tactics_multiplier: 1,
     };
-    const DOUBLE_DAMAGE_UP: EnvCardPoints = EnvCardPoints {
+    const DoubleDamageUp: EnvCardPoints = EnvCardPoints {
         name: 'Double Damage Up',
         rarity: Rarity::Uncommon,
         chances: 0,
@@ -77,7 +78,7 @@ mod ENV_POINTS {
         one_step: false,
         tactics_multiplier: 1,
     };
-    const DOUBLE_CHANCES_UP: EnvCardPoints = EnvCardPoints {
+    const DoubleChancesUp: EnvCardPoints = EnvCardPoints {
         name: 'Double Chances Up',
         rarity: Rarity::Uncommon,
         chances: 20,
@@ -85,7 +86,7 @@ mod ENV_POINTS {
         one_step: false,
         tactics_multiplier: 1,
     };
-    const SPECIAL_ALL_SHOTS_HIT: EnvCardPoints = EnvCardPoints {
+    const SpecialAllShotsHit: EnvCardPoints = EnvCardPoints {
         name: 'All Shots Hit',
         rarity: Rarity::Special,
         chances: 100,
@@ -93,7 +94,7 @@ mod ENV_POINTS {
         one_step: true,
         tactics_multiplier: 1,
     };
-    const SPECIAL_ALL_SHOTS_MISS: EnvCardPoints = EnvCardPoints {
+    const SpecialAllShotsMiss: EnvCardPoints = EnvCardPoints {
         name: 'All Shots Miss',
         rarity: Rarity::Special,
         chances: -100,
@@ -101,7 +102,7 @@ mod ENV_POINTS {
         one_step: true,
         tactics_multiplier: 1,
     };
-    const SPECIAL_DOUBLE_TACTICS: EnvCardPoints = EnvCardPoints {
+    const SpecialDoubleTactics: EnvCardPoints = EnvCardPoints {
         name: 'Double Tactics',
         rarity: Rarity::Special,
         chances: 0,
@@ -109,7 +110,7 @@ mod ENV_POINTS {
         one_step: true,
         tactics_multiplier: 2,
     };
-    const SPECIAL_NO_TACTICS: EnvCardPoints = EnvCardPoints {
+    const SpecialNoTactics: EnvCardPoints = EnvCardPoints {
         name: 'No Tactics',
         rarity: Rarity::Special,
         chances: 0,
@@ -133,16 +134,16 @@ impl EnvCardDefault of Default<EnvCard> {
 impl EnvCardImpl of EnvCardTrait {
     fn get_points(self: EnvCard) -> EnvCardPoints {
         match self {
-            EnvCard::DamageUp =>                ENV_POINTS::DAMAGE_UP,
-            EnvCard::DamageDown =>              ENV_POINTS::DAMAGE_DOWN,
-            EnvCard::ChancesUp =>               ENV_POINTS::CHANCES_UP,
-            EnvCard::ChancesDown =>             ENV_POINTS::CHANCES_DOWN,
-            EnvCard::DoubleDamageUp =>          ENV_POINTS::DOUBLE_DAMAGE_UP,
-            EnvCard::DoubleChancesUp =>         ENV_POINTS::DOUBLE_CHANCES_UP,
-            EnvCard::SpecialAllShotsHit =>      ENV_POINTS::SPECIAL_ALL_SHOTS_HIT,
-            EnvCard::SpecialAllShotsMiss =>     ENV_POINTS::SPECIAL_ALL_SHOTS_MISS,
-            EnvCard::SpecialDoubleTactics =>    ENV_POINTS::SPECIAL_DOUBLE_TACTICS,
-            EnvCard::SpecialNoTactics =>        ENV_POINTS::SPECIAL_NO_TACTICS,
+            EnvCard::DamageUp =>                ENV_POINTS::DamageUp,
+            EnvCard::DamageDown =>              ENV_POINTS::DamageDown,
+            EnvCard::ChancesUp =>               ENV_POINTS::ChancesUp,
+            EnvCard::ChancesDown =>             ENV_POINTS::ChancesDown,
+            EnvCard::DoubleDamageUp =>          ENV_POINTS::DoubleDamageUp,
+            EnvCard::DoubleChancesUp =>         ENV_POINTS::DoubleChancesUp,
+            EnvCard::SpecialAllShotsHit =>      ENV_POINTS::SpecialAllShotsHit,
+            EnvCard::SpecialAllShotsMiss =>     ENV_POINTS::SpecialAllShotsMiss,
+            EnvCard::SpecialDoubleTactics =>    ENV_POINTS::SpecialDoubleTactics,
+            EnvCard::SpecialNoTactics =>        ENV_POINTS::SpecialNoTactics,
             EnvCard::None =>                    Default::default(),
         }
     }
@@ -212,33 +213,33 @@ use pistols::utils::short_string::{ShortStringTrait};
 impl EnvCardIntoU8 of Into<EnvCard, u8> {
     fn into(self: EnvCard) -> u8 {
         match self {
-            EnvCard::DamageUp =>                ENV_CARDS::DAMAGE_UP,
-            EnvCard::DamageDown =>              ENV_CARDS::DAMAGE_DOWN,
-            EnvCard::ChancesUp =>               ENV_CARDS::CHANCES_UP,
-            EnvCard::ChancesDown =>             ENV_CARDS::CHANCES_DOWN,
-            EnvCard::DoubleDamageUp =>          ENV_CARDS::DOUBLE_DAMAGE_UP,
-            EnvCard::DoubleChancesUp =>         ENV_CARDS::DOUBLE_CHANCES_UP,
-            EnvCard::SpecialAllShotsHit =>      ENV_CARDS::SPECIAL_ALL_SHOTS_HIT,
-            EnvCard::SpecialAllShotsMiss =>     ENV_CARDS::SPECIAL_ALL_SHOTS_MISS,
-            EnvCard::SpecialDoubleTactics =>    ENV_CARDS::SPECIAL_DOUBLE_TACTICS,
-            EnvCard::SpecialNoTactics =>        ENV_CARDS::SPECIAL_NO_TACTICS,
-            EnvCard::None =>                    ENV_CARDS::NONE,
+            EnvCard::DamageUp =>                ENV_CARDS::DamageUp,
+            EnvCard::DamageDown =>              ENV_CARDS::DamageDown,
+            EnvCard::ChancesUp =>               ENV_CARDS::ChancesUp,
+            EnvCard::ChancesDown =>             ENV_CARDS::ChancesDown,
+            EnvCard::DoubleDamageUp =>          ENV_CARDS::DoubleDamageUp,
+            EnvCard::DoubleChancesUp =>         ENV_CARDS::DoubleChancesUp,
+            EnvCard::SpecialAllShotsHit =>      ENV_CARDS::SpecialAllShotsHit,
+            EnvCard::SpecialAllShotsMiss =>     ENV_CARDS::SpecialAllShotsMiss,
+            EnvCard::SpecialDoubleTactics =>    ENV_CARDS::SpecialDoubleTactics,
+            EnvCard::SpecialNoTactics =>        ENV_CARDS::SpecialNoTactics,
+            EnvCard::None =>                    ENV_CARDS::None,
         }
     }
 }
 
 impl U8IntoEnvCard of Into<u8, EnvCard> {
     fn into(self: u8) -> EnvCard {
-        if self == ENV_CARDS::DAMAGE_UP                     { EnvCard::DamageUp }
-        else if self == ENV_CARDS::DAMAGE_DOWN              { EnvCard::DamageDown }
-        else if self == ENV_CARDS::CHANCES_UP               { EnvCard::ChancesUp }
-        else if self == ENV_CARDS::CHANCES_DOWN             { EnvCard::ChancesDown }
-        else if self == ENV_CARDS::DOUBLE_DAMAGE_UP         { EnvCard::DoubleDamageUp }
-        else if self == ENV_CARDS::DOUBLE_CHANCES_UP        { EnvCard::DoubleChancesUp }
-        else if self == ENV_CARDS::SPECIAL_ALL_SHOTS_HIT    { EnvCard::SpecialAllShotsHit }
-        else if self == ENV_CARDS::SPECIAL_ALL_SHOTS_MISS   { EnvCard::SpecialAllShotsMiss }
-        else if self == ENV_CARDS::SPECIAL_DOUBLE_TACTICS   { EnvCard::SpecialDoubleTactics }
-        else if self == ENV_CARDS::SPECIAL_NO_TACTICS       { EnvCard::SpecialNoTactics }
+        if self == ENV_CARDS::DamageUp                     { EnvCard::DamageUp }
+        else if self == ENV_CARDS::DamageDown              { EnvCard::DamageDown }
+        else if self == ENV_CARDS::ChancesUp               { EnvCard::ChancesUp }
+        else if self == ENV_CARDS::ChancesDown             { EnvCard::ChancesDown }
+        else if self == ENV_CARDS::DoubleDamageUp         { EnvCard::DoubleDamageUp }
+        else if self == ENV_CARDS::DoubleChancesUp        { EnvCard::DoubleChancesUp }
+        else if self == ENV_CARDS::SpecialAllShotsHit    { EnvCard::SpecialAllShotsHit }
+        else if self == ENV_CARDS::SpecialAllShotsMiss   { EnvCard::SpecialAllShotsMiss }
+        else if self == ENV_CARDS::SpecialDoubleTactics   { EnvCard::SpecialDoubleTactics }
+        else if self == ENV_CARDS::SpecialNoTactics       { EnvCard::SpecialNoTactics }
         else                                                { EnvCard::None }
     }
 }

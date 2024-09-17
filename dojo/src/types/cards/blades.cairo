@@ -16,16 +16,17 @@ pub enum BladesCard {
 //
 
 mod BLADES_CARDS {
-    const NONE: u8 = 0;
-    const SEPPUKU: u8 = 1;
-    const RUN_AWAY: u8 = 2;
-    const BEHEAD: u8 = 3;
-    const GRAPPLE: u8 = 4;
+    // IMPORTANT: must be in sync with BladesCard
+    const None: u8 = 0;
+    const Seppuku: u8 = 1;
+    const RunAway: u8 = 2;
+    const Behead: u8 = 3;
+    const Grapple: u8 = 4;
 }
 
 mod BLADES_POINTS {
     use pistols::types::cards::cards::{CardPoints};
-    const SEPPUKU: CardPoints = CardPoints {
+    const Seppuku: CardPoints = CardPoints {
         name: 'Seppuku',
         self_chances: 20,
         self_damage: 1,
@@ -33,7 +34,7 @@ mod BLADES_POINTS {
         other_damage: 0,
         special: 'Suicide if survives',
     };
-    const RUN_AWAY: CardPoints = CardPoints {
+    const RunAway: CardPoints = CardPoints {
         name: 'Run Away',
         self_chances: 0,
         self_damage: 0,
@@ -41,7 +42,7 @@ mod BLADES_POINTS {
         other_damage: 0,
         special: 'Beats Behead',
     };
-    const BEHEAD: CardPoints = CardPoints {
+    const Behead: CardPoints = CardPoints {
         name: 'Behead',
         self_chances: 0,
         self_damage: 1,
@@ -49,7 +50,7 @@ mod BLADES_POINTS {
         other_damage: 0,
         special: 'Beats Grapple',
     };
-    const GRAPPLE: CardPoints = CardPoints {
+    const Grapple: CardPoints = CardPoints {
         name: 'Grapple',
         self_chances: 0,
         self_damage: 0,
@@ -70,10 +71,10 @@ use pistols::models::challenge::{PlayerState};
 impl BladesCardImpl of BladesCardTrait {
     fn get_points(self: BladesCard) -> CardPoints {
         match self {
-            BladesCard::Seppuku =>  BLADES_POINTS::SEPPUKU,
-            BladesCard::RunAway =>  BLADES_POINTS::RUN_AWAY,
-            BladesCard::Behead =>   BLADES_POINTS::BEHEAD,
-            BladesCard::Grapple =>  BLADES_POINTS::GRAPPLE,
+            BladesCard::Seppuku =>  BLADES_POINTS::Seppuku,
+            BladesCard::RunAway =>  BLADES_POINTS::RunAway,
+            BladesCard::Behead =>   BLADES_POINTS::Behead,
+            BladesCard::Grapple =>  BLADES_POINTS::Grapple,
             BladesCard::None =>     Default::default(),
         }
     }
@@ -109,20 +110,20 @@ impl BladesCardDefault of Default<BladesCard> {
 impl BladesCardIntoU8 of Into<BladesCard, u8> {
     fn into(self: BladesCard) -> u8 {
         match self {
-            BladesCard::Seppuku =>  BLADES_CARDS::SEPPUKU,
-            BladesCard::RunAway =>  BLADES_CARDS::RUN_AWAY,
-            BladesCard::Behead =>   BLADES_CARDS::BEHEAD,
-            BladesCard::Grapple =>  BLADES_CARDS::GRAPPLE,
-            _ =>                    BLADES_CARDS::NONE,
+            BladesCard::Seppuku =>  BLADES_CARDS::Seppuku,
+            BladesCard::RunAway =>  BLADES_CARDS::RunAway,
+            BladesCard::Behead =>   BLADES_CARDS::Behead,
+            BladesCard::Grapple =>  BLADES_CARDS::Grapple,
+            _ =>                    BLADES_CARDS::None,
         }
     }
 }
 impl U8IntoBladesCard of Into<u8, BladesCard> {
     fn into(self: u8) -> BladesCard {
-        if self == BLADES_CARDS::SEPPUKU        { BladesCard::Seppuku }
-        else if self == BLADES_CARDS::RUN_AWAY  { BladesCard::RunAway }
-        else if self == BLADES_CARDS::BEHEAD    { BladesCard::Behead }
-        else if self == BLADES_CARDS::GRAPPLE   { BladesCard::Grapple }
+        if self == BLADES_CARDS::Seppuku        { BladesCard::Seppuku }
+        else if self == BLADES_CARDS::RunAway  { BladesCard::RunAway }
+        else if self == BLADES_CARDS::Behead    { BladesCard::Behead }
+        else if self == BLADES_CARDS::Grapple   { BladesCard::Grapple }
         else                                    { BladesCard::None }
     }
 }
