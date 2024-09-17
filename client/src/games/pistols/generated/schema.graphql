@@ -2267,7 +2267,7 @@ type pistols_TableConfig {
   table_type: Enum
   description: felt252
   fee_collector_address: ContractAddress
-  wager_contract_address: ContractAddress
+  fee_contract_address: ContractAddress
   wager_min: u128
   fee_min: u128
   fee_pct: u8
@@ -2296,7 +2296,7 @@ enum pistols_TableConfigOrderField {
   TABLE_TYPE
   DESCRIPTION
   FEE_COLLECTOR_ADDRESS
-  WAGER_CONTRACT_ADDRESS
+  fee_contract_address
   WAGER_MIN
   FEE_MIN
   FEE_PCT
@@ -2338,17 +2338,17 @@ input pistols_TableConfigWhereInput {
   fee_collector_addressIN: [ContractAddress]
   fee_collector_addressNOTLIKE: ContractAddress
   fee_collector_addressLIKE: ContractAddress
-  wager_contract_address: ContractAddress
-  wager_contract_addressGT: ContractAddress
-  wager_contract_addressGTE: ContractAddress
-  wager_contract_addressLT: ContractAddress
-  wager_contract_addressLTE: ContractAddress
-  wager_contract_addressNEQ: ContractAddress
-  wager_contract_addressEQ: ContractAddress
-  wager_contract_addressNOTIN: [ContractAddress]
-  wager_contract_addressIN: [ContractAddress]
-  wager_contract_addressNOTLIKE: ContractAddress
-  wager_contract_addressLIKE: ContractAddress
+  fee_contract_address: ContractAddress
+  fee_contract_addressGT: ContractAddress
+  fee_contract_addressGTE: ContractAddress
+  fee_contract_addressLT: ContractAddress
+  fee_contract_addressLTE: ContractAddress
+  fee_contract_addressNEQ: ContractAddress
+  fee_contract_addressEQ: ContractAddress
+  fee_contract_addressNOTIN: [ContractAddress]
+  fee_contract_addressIN: [ContractAddress]
+  fee_contract_addressNOTLIKE: ContractAddress
+  fee_contract_addressLIKE: ContractAddress
   wager_min: u128
   wager_minGT: u128
   wager_minGTE: u128

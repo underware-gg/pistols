@@ -363,82 +363,34 @@
   },
   {
     "type": "impl",
-    "name": "table_configImpl",
-    "interface_name": "pistols::models::table::Itable_config"
-  },
-  {
-    "type": "enum",
-    "name": "pistols::models::table::TableType",
-    "variants": [
-      {
-        "name": "Undefined",
-        "type": "()"
-      },
-      {
-        "name": "Classic",
-        "type": "()"
-      },
-      {
-        "name": "Tournament",
-        "type": "()"
-      },
-      {
-        "name": "IRLTournament",
-        "type": "()"
-      }
-    ]
-  },
-  {
-    "type": "enum",
-    "name": "core::bool",
-    "variants": [
-      {
-        "name": "False",
-        "type": "()"
-      },
-      {
-        "name": "True",
-        "type": "()"
-      }
-    ]
+    "name": "table_wagerImpl",
+    "interface_name": "pistols::models::table::Itable_wager"
   },
   {
     "type": "struct",
-    "name": "pistols::models::table::TableConfig",
+    "name": "pistols::models::table::TableWager",
     "members": [
       {
         "name": "table_id",
         "type": "core::felt252"
       },
       {
-        "name": "table_type",
-        "type": "pistols::models::table::TableType"
-      },
-      {
-        "name": "description",
-        "type": "core::felt252"
-      },
-      {
-        "name": "fee_collector_address",
-        "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
-        "name": "fee_contract_address",
-        "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
-        "name": "fee_min",
+        "name": "wager_min",
         "type": "core::integer::u128"
       },
       {
-        "name": "is_open",
-        "type": "core::bool"
+        "name": "wager_max",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "fee_pct",
+        "type": "core::integer::u8"
       }
     ]
   },
   {
     "type": "interface",
-    "name": "pistols::models::table::Itable_config",
+    "name": "pistols::models::table::Itable_wager",
     "items": [
       {
         "type": "function",
@@ -446,7 +398,7 @@
         "inputs": [
           {
             "name": "model",
-            "type": "pistols::models::table::TableConfig"
+            "type": "pistols::models::table::TableWager"
           }
         ],
         "outputs": [],
@@ -456,7 +408,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::models::table::table_config::Event",
+    "name": "pistols::models::table::table_wager::Event",
     "kind": "enum",
     "variants": []
   }

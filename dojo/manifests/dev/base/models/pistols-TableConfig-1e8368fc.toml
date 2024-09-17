@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x6774b0dcc9a4ebb62e6f42b70ebd46cd77387e8d71cc8e57dee1403feec298"
-original_class_hash = "0x6774b0dcc9a4ebb62e6f42b70ebd46cd77387e8d71cc8e57dee1403feec298"
+class_hash = "0x7bfd666c3bc1e5da819e40178efb3a59125b2e9b56241bed13496dfeed3d55c"
+original_class_hash = "0x7bfd666c3bc1e5da819e40178efb3a59125b2e9b56241bed13496dfeed3d55c"
 abi = "manifests/dev/base/abis/models/pistols-TableConfig-1e8368fc.json"
 tag = "pistols-TableConfig"
 qualified_path = "pistols::models::table::table_config"
@@ -27,23 +27,13 @@ type = "ContractAddress"
 key = false
 
 [[members]]
-name = "wager_contract_address"
+name = "fee_contract_address"
 type = "ContractAddress"
-key = false
-
-[[members]]
-name = "wager_min"
-type = "u128"
 key = false
 
 [[members]]
 name = "fee_min"
 type = "u128"
-key = false
-
-[[members]]
-name = "fee_pct"
-type = "u8"
 key = false
 
 [[members]]

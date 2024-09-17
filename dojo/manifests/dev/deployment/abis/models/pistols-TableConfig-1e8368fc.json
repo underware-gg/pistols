@@ -423,20 +423,12 @@
         "type": "core::starknet::contract_address::ContractAddress"
       },
       {
-        "name": "wager_contract_address",
+        "name": "fee_contract_address",
         "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
-        "name": "wager_min",
-        "type": "core::integer::u128"
       },
       {
         "name": "fee_min",
         "type": "core::integer::u128"
-      },
-      {
-        "name": "fee_pct",
-        "type": "core::integer::u8"
       },
       {
         "name": "is_open",
