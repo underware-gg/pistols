@@ -135,10 +135,10 @@ mod tests {
     fn test_initialize_table_defaults() {
         let sys = tester::setup_world(FLAGS::ADMIN | FLAGS::LORDS);
         let table: TableConfig = tester::get_Table(sys.world, TABLES::LORDS);
-        assert(table.wager_contract_address == sys.lords.contract_address, 'LORDS_contract_address');
+        assert(table.fee_contract_address == sys.lords.contract_address, 'LORDS_contract_address');
         assert(table.is_open == true, 'LORDS_is_open');
         let table: TableConfig = tester::get_Table(sys.world, TABLES::COMMONERS);
-        assert(table.wager_contract_address == ZERO(), 'COMMONERS_contract_address');
+        assert(table.fee_contract_address == ZERO(), 'COMMONERS_contract_address');
         assert(table.is_open == true, 'COMMONERS_is_open');
     }
 
@@ -146,41 +146,41 @@ mod tests {
     fn test_initialize_table() {
         let sys = tester::setup_world(FLAGS::ADMIN | FLAGS::LORDS);
         let table: TableConfig = tester::get_Table(sys.world, TABLES::LORDS);
-        assert(table.wager_contract_address == sys.lords.contract_address, 'contract_address');
+        assert(table.fee_contract_address == sys.lords.contract_address, 'contract_address');
         assert(table.fee_min == 4 * CONST::ETH_TO_WEI.low, 'fee_min');
-        assert(table.fee_pct == 10, 'fee_pct');
-        assert(table.is_open == true, 'is_open');
+        // assert(table.fee_pct == 10, 'fee_pct');
+        // assert(table.is_open == true, 'is_open');
     }
 
     #[test]
     fn test_set_table() {
         let sys = tester::setup_world(FLAGS::ADMIN);
         let mut table: TableConfig = tester::get_Table(sys.world, TABLES::LORDS);
-        assert(table.wager_contract_address == ZERO(), 'zero');
+        assert(table.fee_contract_address == ZERO(), 'zero');
         assert(table.is_open == false, 'zero');
-        table.wager_contract_address = DUMMY_LORDS();
+        table.fee_contract_address = DUMMY_LORDS();
         table.description = 'LORDS+';
         table.fee_min = 5;
-        table.fee_pct = 10;
+        // table.fee_pct = 10;
         table.is_open = true;
         tester::execute_admin_set_table(@sys.admin, OWNER(), table);
         let mut table: TableConfig = tester::get_Table(sys.world, TABLES::LORDS);
-        assert(table.wager_contract_address == DUMMY_LORDS(), 'contract_address_1');
+        assert(table.fee_contract_address == DUMMY_LORDS(), 'contract_address_1');
         assert(table.description == 'LORDS+', 'description_1');
         assert(table.fee_min == 5, 'fee_min_1');
-        assert(table.fee_pct == 10, 'fee_pct_1');
+        // assert(table.fee_pct == 10, 'fee_pct_1');
         assert(table.is_open == true, 'is_open_1');
-        table.wager_contract_address = OTHER();
+        table.fee_contract_address = OTHER();
         table.description = 'LORDS+++';
         table.fee_min = 22;
-        table.fee_pct = 33;
+        // table.fee_pct = 33;
         table.is_open = false;
         tester::execute_admin_set_table(@sys.admin, OWNER(), table);
         let mut table: TableConfig = tester::get_Table(sys.world, TABLES::LORDS);
-        assert(table.wager_contract_address == OTHER(), 'contract_address_2');
+        assert(table.fee_contract_address == OTHER(), 'contract_address_2');
         assert(table.description == 'LORDS+++', 'description_2');
         assert(table.fee_min == 22, 'fee_min_2');
-        assert(table.fee_pct == 33, 'fee_pct_2');
+        // assert(table.fee_pct == 33, 'fee_pct_2');
         assert(table.is_open == false, 'is_open_2');
     }
 

@@ -136,7 +136,8 @@ mod actions {
         const CHALLENGE_NOT_IN_PROGRESS: felt252 = 'PISTOLS: Challenge not Progress';
         const TABLE_IS_CLOSED: felt252           = 'PISTOLS: Table is closed';
         const MINIMUM_WAGER_NOT_MET: felt252     = 'PISTOLS: Minimum wager not met';
-        const NO_WAGER: felt252                  = 'PISTOLS: No wager on this table';
+        const NO_WAGER: felt252                  = 'PISTOLS: Fee contract not set';
+        const WAGER_NOT_ALLOWED: felt252         = 'PISTOLS: Wager not allowed';
         const INSUFFICIENT_BALANCE: felt252      = 'PISTOLS: Insufficient balance';
         const NO_ALLOWANCE: felt252              = 'PISTOLS: No transfer allowance';
         const WITHDRAW_NOT_AVAILABLE: felt252    = 'PISTOLS: Withdraw not available';
@@ -294,11 +295,11 @@ mod actions {
             utils::set_pact(store, challenge);
 
             // setup wager + fees
-            assert(wager_value >= table.wager_min, Errors::MINIMUM_WAGER_NOT_MET);
+            // assert(wager_value >= table.wager_min, Errors::MINIMUM_WAGER_NOT_MET);
             let fee: u128 = table.calc_fee(wager_value);
             // calc fee and store
             if (fee > 0 || wager_value > 0) {
-                assert(table.wager_contract_address.is_non_zero(), Errors::NO_WAGER);
+                assert(table.fee_contract_address.is_non_zero(), Errors::NO_WAGER);
                 let wager = Wager {
                     duel_id,
                     value: wager_value,

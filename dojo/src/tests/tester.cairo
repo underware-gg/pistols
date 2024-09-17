@@ -220,6 +220,7 @@ mod tester {
                 world.grant_owner(SELECTORS::ADMIN, OWNER());
                 world.grant_writer(selector_from_tag!("pistols-Config"), address);
                 world.grant_writer(selector_from_tag!("pistols-TableConfig"), address);
+                world.grant_writer(selector_from_tag!("pistols-TableWager"), address);
                 world.grant_writer(selector_from_tag!("pistols-TableAdmittance"), address);
                 world.init_contract(SELECTORS::ADMIN, admin_call_data.span());
                 (address)

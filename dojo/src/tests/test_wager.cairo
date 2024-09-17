@@ -104,7 +104,7 @@
 //         _test_balance_ok(TABLES::LORDS, 100 * CONST::ETH_TO_WEI.low, 0);
 //     }
 //     #[test]
-//     #[should_panic(expected:('PISTOLS: No wager on this table', 'ENTRYPOINT_FAILED'))]
+//     #[should_panic(expected:('PISTOLS: Fee contract not set', 'ENTRYPOINT_FAILED'))]
 //     fn test_COMMONERS_wager_balance_ok() {
 //         _test_balance_ok(TABLES::COMMONERS, 100 * CONST::ETH_TO_WEI.low, 0);
 //     }

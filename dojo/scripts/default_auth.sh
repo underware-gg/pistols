@@ -46,6 +46,7 @@ echo ">>> Admin auth..."
 sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
   model:pistols-Config,$ADMIN_TAG \
   model:pistols-TableConfig,$ADMIN_TAG \
+  model:pistols-TableWager,$ADMIN_TAG \
   model:pistols-TableAdmittance,$ADMIN_TAG
 
 echo ">>> Game auth..."

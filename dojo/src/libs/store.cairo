@@ -15,6 +15,7 @@ use pistols::models::{
     token_config::{TokenConfig, TokenConfigStore, TokenConfigEntity, TokenConfigEntityStore},
     table::{
         TableConfig, TableConfigStore, TableConfigEntity, TableConfigEntityStore,
+        TableWager, TableWagerStore, TableWagerEntity, TableWagerEntityStore,
         TableAdmittance, TableAdmittanceStore, TableAdmittanceEntity, TableAdmittanceEntityStore,
     },
     config::{Config, ConfigStore, ConfigEntity, ConfigEntityStore, CONFIG},
@@ -116,6 +117,18 @@ impl StoreImpl of StoreTrait {
     fn get_table_config_entity(self: Store, table_id: felt252) -> TableConfigEntity {
         (TableConfigEntityStore::get(self.world,
             TableConfigStore::entity_id_from_keys(table_id)
+        ))
+    }
+
+    #[inline(always)]
+    fn get_table_wager(self: Store, table_id: felt252) -> TableWager {
+        (TableWagerStore::get(self.world, table_id))
+    }
+
+    #[inline(always)]
+    fn get_table_wager_entity(self: Store, table_id: felt252) -> TableWagerEntity {
+        (TableWagerEntityStore::get(self.world,
+            TableWagerStore::entity_id_from_keys(table_id)
         ))
     }
 

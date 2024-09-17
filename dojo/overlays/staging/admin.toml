@@ -2,6 +2,7 @@ tag = "pistols-admin"
 writes = [
   "pistols-Config",
   "pistols-TableConfig",
+  "pistols-TableWager",
   "pistols-TableAdmittance",
 ]
 init_calldata = [

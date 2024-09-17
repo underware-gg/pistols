@@ -297,6 +297,7 @@ type type_SELECTORS = {
   LORDS_MOCK: BigNumberish, // cairo: felt252
   CONFIG: BigNumberish, // cairo: felt252
   TABLE_CONFIG: BigNumberish, // cairo: felt252
+  TABLE_WAGER: BigNumberish, // cairo: felt252
   TOKEN_CONFIG: BigNumberish, // cairo: felt252
 };
 export const SELECTORS: type_SELECTORS = {
@@ -308,6 +309,7 @@ export const SELECTORS: type_SELECTORS = {
   LORDS_MOCK: '0x02b1156e63a09854c3d8dba0cad93b41e1fc4662466a0ffc2a9ec9e54b4bc788', // 'selector_from_tag!("pistols-lords_mock")'
   CONFIG: '0x060742fa7259b7ce3ebc0a2dde90b740d1234c770199a822fa2e7cf779dc0392', // 'selector_from_tag!("pistols-Config")'
   TABLE_CONFIG: '0x01e8368fc88328662c92a11c0e739bf8b74bcd77a20071d2641a31e1a063c138', // 'selector_from_tag!("pistols-TableConfig")'
+  TABLE_WAGER: '0x02d819fd3d7e499db47173dba8d6a4d033fead59cd48476fa24b9f45851b3527', // 'selector_from_tag!("pistols-TableWager")'
   TOKEN_CONFIG: '0x056ebd3387f45e8b292b472f3539e675031f12cf156c07c309c6403044f71fed', // 'selector_from_tag!("pistols-TokenConfig")'
 };
 

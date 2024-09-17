@@ -2,7 +2,7 @@
 use starknet::ContractAddress;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
-use pistols::systems::admin::admin::{Errors};
+use pistols::systems::actions::actions::{Errors as ActionErrors};
 use pistols::utils::misc::{ZERO};
 use pistols::utils::math::{MathU128};
 use pistols::utils::arrays::{ArrayUtilsTrait};
@@ -31,12 +31,21 @@ pub struct TableConfig {
     //------
     pub table_type: TableType,
     pub description: felt252,
-    pub fee_collector_address: ContractAddress,     // 0x0 goes to default treasury
-    pub wager_contract_address: ContractAddress,    // 0x0 if no wager or fees
-    pub wager_min: u128,
+    pub fee_collector_address: ContractAddress, // if 0x0, goes to default treasury
+    pub fee_contract_address: ContractAddress,  // can be 0x0 if no fees (and no wager)
     pub fee_min: u128,
-    pub fee_pct: u8,
     pub is_open: bool,
+}
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct TableWager {
+    #[key]
+    pub table_id: felt252,
+    //------
+    pub wager_min: u128,
+    pub wager_max: u128,
+    pub fee_pct: u8,
 }
 
 #[derive(Drop, Serde)]
@@ -56,23 +65,17 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
             table_type: TableType::Classic,
             description: 'The Lords Table',
             fee_collector_address: ZERO(),
-            // wager_contract_address: lords_address,
-            wager_contract_address: ZERO(),
+            fee_contract_address: lords_address,
             fee_min: 4 * CONST::ETH_TO_WEI.low,
-            // fee_pct: 10,
-            // is_open: (lords_address.is_non_zero()),
-            fee_pct: 0,
-            is_open: ZERO(),
+            is_open: (lords_address.is_non_zero()),
         }),
         (TableConfig {
             table_id: TABLES::COMMONERS,
             table_type: TableType::Classic,
             description: 'The Commoners Table',
             fee_collector_address: ZERO(),
-            wager_contract_address: ZERO(),
-            wager_min: 0,
+            fee_contract_address: ZERO(),
             fee_min: 0,
-            fee_pct: 0,
             is_open: true,
         }),
     ])
@@ -119,10 +122,12 @@ impl TableConfigEntityImpl of TableConfigEntityTrait {
     }
     #[inline(always)]
     fn ierc20(self: @TableConfigEntity) -> IERC20Dispatcher {
-        (ierc20(*self.wager_contract_address))
+        (ierc20(*self.fee_contract_address))
     }
     fn calc_fee(self: @TableConfigEntity, wager_value: u128) -> u128 {
-        (MathU128::max(*self.fee_min, (wager_value / 100) * (*self.fee_pct).into()))
+        // (MathU128::max(*self.fee_min, (wager_value / 100) * wager.fee_pct.into()))
+        assert(wager_value == 0, ActionErrors::WAGER_NOT_ALLOWED);
+        (*self.fee_min)
     }
 }
 

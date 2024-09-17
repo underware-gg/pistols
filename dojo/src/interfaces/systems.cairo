@@ -21,6 +21,7 @@ mod SELECTORS {
     // model selectors
     const CONFIG: felt252 = selector_from_tag!("pistols-Config");
     const TABLE_CONFIG: felt252 = selector_from_tag!("pistols-TableConfig");
+    const TABLE_WAGER: felt252 = selector_from_tag!("pistols-TableWager");
     const TOKEN_CONFIG: felt252 = selector_from_tag!("pistols-TokenConfig");
 }
 

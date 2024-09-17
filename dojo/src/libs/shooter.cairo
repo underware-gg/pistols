@@ -5,7 +5,7 @@ mod shooter {
     use starknet::{ContractAddress, get_block_timestamp};
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
-    use pistols::systems::actions::actions::{Errors};
+    use pistols::systems::actions::actions::{Errors as ActionErrors};
     use pistols::systems::rng::{Dice, DiceTrait};
     use pistols::libs::utils;
     use pistols::models::challenge::{Challenge, Round, RoundTrait, RoundEntity, Moves, MovesTrait, PlayerState, PlayerStateTrait};
@@ -34,17 +34,17 @@ mod shooter {
             if (challenge.duelist_id_a == duelist_id) { 1 }
             else if (challenge.duelist_id_b == duelist_id) { 2 }
             else { 0 };
-        assert(duelist_number != 0, Errors::NOT_YOUR_DUELIST);
+        assert(duelist_number != 0, ActionErrors::NOT_YOUR_DUELIST);
 
         let duelist_address: ContractAddress =
             if (duelist_number == 1) { challenge.address_a }
             else { challenge.address_b };
-        assert(caller == duelist_address, Errors::NOT_YOUR_CHALLENGE);
+        assert(caller == duelist_address, ActionErrors::NOT_YOUR_CHALLENGE);
 
         // Correct Challenge state
-        assert(challenge.state == ChallengeState::InProgress, Errors::CHALLENGE_NOT_IN_PROGRESS);
-        assert(challenge.round_number == round_number, Errors::INVALID_ROUND_NUMBER);
-        assert(round_number <= CONST::ROUND_COUNT, Errors::INVALID_ROUND_NUMBER);
+        assert(challenge.state == ChallengeState::InProgress, ActionErrors::CHALLENGE_NOT_IN_PROGRESS);
+        assert(challenge.round_number == round_number, ActionErrors::INVALID_ROUND_NUMBER);
+        assert(round_number <= CONST::ROUND_COUNT, ActionErrors::INVALID_ROUND_NUMBER);
         
         (challenge, duelist_number)
     }
@@ -59,16 +59,16 @@ mod shooter {
 
         // Assert correct Round
         let mut round: RoundEntity = store.get_round_entity(duel_id, round_number);
-        assert(round.state == RoundState::Commit, Errors::ROUND_NOT_IN_COMMIT);
+        assert(round.state == RoundState::Commit, ActionErrors::ROUND_NOT_IN_COMMIT);
 
         // Validate action hash
 
         // Store hash
         if (duelist_number == 1) {
-            assert(round.moves_a.hashed == 0, Errors::ALREADY_COMMITTED);
+            assert(round.moves_a.hashed == 0, ActionErrors::ALREADY_COMMITTED);
             round.moves_a.hashed = hashed;
         } else if (duelist_number == 2) {
-            assert(round.moves_b.hashed == 0, Errors::ALREADY_COMMITTED);
+            assert(round.moves_b.hashed == 0, ActionErrors::ALREADY_COMMITTED);
             round.moves_b.hashed = hashed;
         }
 
@@ -89,14 +89,14 @@ mod shooter {
 
         // Assert correct Round
         let mut round: Round = store.get_round( duel_id, round_number);
-        assert(round.state == RoundState::Reveal, Errors::ROUND_NOT_IN_REVEAL);
+        assert(round.state == RoundState::Reveal, ActionErrors::ROUND_NOT_IN_REVEAL);
 
         // Validate salt
         // TODO: verify salt as a signature
-        assert(salt != 0, Errors::INVALID_SALT);
+        assert(salt != 0, ActionErrors::INVALID_SALT);
 
         // Validate action hash
-        assert(moves.len() >= 2 && moves.len() <= 4, Errors::INVALID_MOVES_COUNT);
+        assert(moves.len() >= 2 && moves.len() <= 4, ActionErrors::INVALID_MOVES_COUNT);
         let hashed: u128 = utils::make_moves_hash(salt, moves);
 
         // since the hash was validated
@@ -105,12 +105,12 @@ mod shooter {
 
         // Validate moves hash
         if (duelist_number == 1) {
-            assert(round.moves_a.card_1 == 0, Errors::ALREADY_REVEALED);
-            assert(round.moves_a.hashed == hashed, Errors::MOVES_HASH_MISMATCH);
+            assert(round.moves_a.card_1 == 0, ActionErrors::ALREADY_REVEALED);
+            assert(round.moves_a.hashed == hashed, ActionErrors::MOVES_HASH_MISMATCH);
             round.moves_a.initialize(salt, moves);
         } else if (duelist_number == 2) {
-            assert(round.moves_b.card_1 == 0, Errors::ALREADY_REVEALED);
-            assert(round.moves_b.hashed == hashed, Errors::MOVES_HASH_MISMATCH);
+            assert(round.moves_b.card_1 == 0, ActionErrors::ALREADY_REVEALED);
+            assert(round.moves_b.hashed == hashed, ActionErrors::MOVES_HASH_MISMATCH);
             round.moves_b.initialize(salt, moves);
         }
 

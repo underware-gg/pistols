@@ -7,7 +7,7 @@ use starknet::{ContractAddress};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
 use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
-use pistols::systems::actions::actions::{Errors};
+use pistols::systems::actions::actions::{Errors as ActionErrors};
 use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, WagerEntity, Round, RoundEntity, Moves};
 use pistols::models::duelist::{Duelist, DuelistTrait, DuelistEntity, Pact, PactEntity, Scoreboard, ScoreboardEntity, Score, ScoreTrait};
 use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableType, TableTypeTrait};
@@ -80,7 +80,7 @@ fn set_pact(store: Store, challenge: Challenge) {
     if (challenge.duel_id > 0) {
         // new pact: must not exist!
         let current_pact: u128 = store.get_pact_entity(challenge.table_id, pair).duel_id;
-        assert(current_pact == 0, Errors::CHALLENGE_EXISTS);
+        assert(current_pact == 0, ActionErrors::CHALLENGE_EXISTS);
     }
     let pact: Pact = Pact {
         table_id: challenge.table_id,
@@ -105,8 +105,8 @@ fn deposit_wager_fees(store: Store, challenge: Challenge, from: ContractAddress,
         let table : TableConfigEntity = store.get_table_config_entity(challenge.table_id);
         let balance: u256 = table.ierc20().balance_of(from);
         let allowance: u256 = table.ierc20().allowance(from, to);
-        assert(balance >= total, Errors::INSUFFICIENT_BALANCE);
-        assert(allowance >= total, Errors::NO_ALLOWANCE);
+        assert(balance >= total, ActionErrors::INSUFFICIENT_BALANCE);
+        assert(allowance >= total, ActionErrors::NO_ALLOWANCE);
         table.ierc20().transfer_from(from, to, total);
     }
 }
@@ -116,7 +116,7 @@ fn withdraw_wager_fees(store: Store, challenge: Challenge, to: ContractAddress) 
     if (total > 0) {
         let table : TableConfigEntity = store.get_table_config_entity(challenge.table_id);
         let balance: u256 = table.ierc20().balance_of(starknet::get_contract_address());
-        assert(balance >= total, Errors::WITHDRAW_NOT_AVAILABLE); // should never happen!
+        assert(balance >= total, ActionErrors::WITHDRAW_NOT_AVAILABLE); // should never happen!
         table.ierc20().transfer(to, total);
     }
 }
@@ -127,7 +127,7 @@ fn split_wager_fees(store: Store, challenge: Challenge, address_a: ContractAddre
     if (total > 0) {
         let table : TableConfigEntity = store.get_table_config_entity(challenge.table_id);
         let balance: u256 = table.ierc20().balance_of(starknet::get_contract_address());
-        assert(balance >= total, Errors::WAGER_NOT_AVAILABLE); // should never happen!
+        assert(balance >= total, ActionErrors::WAGER_NOT_AVAILABLE); // should never happen!
         if (wager.value > 0) {
             if (address_a == address_b) {
                 // single winner
