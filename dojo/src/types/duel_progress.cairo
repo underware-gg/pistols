@@ -1,4 +1,4 @@
-use pistols::models::challenge::{PlayerState};
+use pistols::models::challenge::{DuelistState};
 use pistols::types::cards::hand::{
     PlayerHand, PlayerHandTrait,
     PacesCard, PacesCardTrait,
@@ -32,8 +32,8 @@ pub struct DuelStep {
     card_a: DuelistDrawnCard,
     card_b: DuelistDrawnCard,
     // duelist states
-    state_a: PlayerState,  // Duelist A current state
-    state_b: PlayerState,  // Duelist A current state
+    state_a: DuelistState,  // Duelist A current state
+    state_b: DuelistState,  // Duelist A current state
 }
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]

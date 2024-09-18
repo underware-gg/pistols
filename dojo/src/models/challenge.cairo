@@ -57,8 +57,8 @@ pub struct Round {
     //---------------
     pub moves_a: Moves,
     pub moves_b: Moves,
-    pub state_a: PlayerState,
-    pub state_b: PlayerState,
+    pub state_a: DuelistState,
+    pub state_b: DuelistState,
     pub state: RoundState,
 }
 
@@ -77,7 +77,7 @@ pub struct Moves {
 } // [f] + [128 + 112(14*8)]:240
 
 #[derive(Copy, Drop, Serde, Default, Introspect)]
-pub struct PlayerState {
+pub struct DuelistState {
     pub health: u8,     // CONST::FULL_HEALTH
     pub damage: u8,     // CONST::INITIAL_CHANCE
     pub chances: u8,    // 0-100
@@ -126,8 +126,8 @@ impl MovesImpl of MovesTrait {
 }
 
 #[generate_trait]
-impl PlayerStateImpl of PlayerStateTrait {
-    fn initialize(ref self: PlayerState, hand: PlayerHand) {
+impl DuelistStateImpl of DuelistStateTrait {
+    fn initialize(ref self: DuelistState, hand: PlayerHand) {
         self.health = CONST::FULL_HEALTH;
         self.damage = CONST::INITIAL_DAMAGE;
         self.chances = CONST::INITIAL_CHANCE;

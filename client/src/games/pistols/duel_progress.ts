@@ -53,5 +53,5 @@ export const convert_duel_progress = (progress: any) => {
     // dice_env: u8,
     // card_a: DuelistDrawnCard,
     // card_b: DuelistDrawnCard,
-    // state_a: PlayerState,  // Duelist A current state
-    // state_b: PlayerState,  // Duelist A current state
+    // state_a: DuelistState,  // Duelist A current state
+    // state_b: DuelistState,  // Duelist A current state

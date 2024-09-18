@@ -36,12 +36,12 @@ impl RarityDefault of Default<Rarity> {
 //--------------------
 // traits
 //
-use pistols::models::challenge::{PlayerState};
+use pistols::models::challenge::{DuelistState};
 use pistols::utils::math::{MathU8};
 
 #[generate_trait]
 impl CardPointsImpl of CardPointsTrait {
-    fn apply(self: CardPoints, ref state_a: PlayerState, ref state_b: PlayerState) {
+    fn apply(self: CardPoints, ref state_a: DuelistState, ref state_b: DuelistState) {
         state_a.chances.addi(self.self_chances);
         state_a.damage.addi(self.self_damage);
         state_b.chances.addi(self.other_chances);
@@ -51,7 +51,7 @@ impl CardPointsImpl of CardPointsTrait {
 
 #[generate_trait]
 impl EnvCardPointsImpl of EnvCardPointsTrait {
-    fn apply(self: EnvCardPoints, ref state_a: PlayerState, ref state_b: PlayerState, global_state: bool) {
+    fn apply(self: EnvCardPoints, ref state_a: DuelistState, ref state_b: DuelistState, global_state: bool) {
         if (
             (global_state && !self.one_step) ||
             (!global_state && self.one_step)

@@ -8,7 +8,7 @@ mod shooter {
     use pistols::systems::actions::actions::{Errors as ActionErrors};
     use pistols::systems::rng::{Dice, DiceTrait};
     use pistols::libs::utils;
-    use pistols::models::challenge::{Challenge, Round, RoundTrait, RoundEntity, Moves, MovesTrait, PlayerState, PlayerStateTrait};
+    use pistols::models::challenge::{Challenge, Round, RoundTrait, RoundEntity, Moves, MovesTrait, DuelistState, DuelistStateTrait};
     use pistols::models::duelist::{Duelist, Score};
     use pistols::models::table::{TableConfig, TableConfigEntity, TableType};
     use pistols::types::constants::{CONST};
@@ -157,8 +157,8 @@ mod shooter {
 
         round.state_a.initialize(hand_a);
         round.state_b.initialize(hand_b);
-        let mut global_state_a: PlayerState = round.state_a;
-        let mut global_state_b: PlayerState = round.state_b;
+        let mut global_state_a: DuelistState = round.state_a;
+        let mut global_state_b: DuelistState = round.state_b;
 
         //------------------------------------------------------
         // Steps
@@ -202,8 +202,8 @@ mod shooter {
             // apply env card to global state (affects next steps)
             card_env.apply_points(ref global_state_a, ref global_state_b, true);
 
-            let mut local_state_a: PlayerState = global_state_a;
-            let mut local_state_b: PlayerState = global_state_b;
+            let mut local_state_a: DuelistState = global_state_a;
+            let mut local_state_b: DuelistState = global_state_b;
 
             // apply env card to local state (do not go to next step)
             card_env.apply_points(ref local_state_a, ref local_state_b, false);
@@ -302,7 +302,7 @@ mod shooter {
     }
 
     // returns Boolean::True if executed
-    fn fire(paces_shoot: PacesCard, paces_dodge: PacesCard, ref state_self: PlayerState, ref state_other: PlayerState, ref dice: Dice, salt: felt252) -> Boolean {
+    fn fire(paces_shoot: PacesCard, paces_dodge: PacesCard, ref state_self: DuelistState, ref state_other: DuelistState, ref dice: Dice, salt: felt252) -> Boolean {
         if (paces_shoot == paces_dodge) {
             state_self.chances = 0;
         }
@@ -320,7 +320,7 @@ mod shooter {
         }
     }
 
-    fn blades(blades_a: BladesCard, blades_b: BladesCard, ref state_a: PlayerState, ref state_b: PlayerState) {
+    fn blades(blades_a: BladesCard, blades_b: BladesCard, ref state_a: DuelistState, ref state_b: DuelistState) {
         // commit Seppuku
         if (blades_a == BladesCard::Seppuku) {
             state_b.win = 1;

@@ -124,7 +124,7 @@ mod ENV_POINTS {
 // traits
 //
 use pistols::types::cards::cards::{EnvCardPoints, EnvCardPointsTrait};
-use pistols::models::challenge::{PlayerState};
+use pistols::models::challenge::{DuelistState};
 
 impl EnvCardDefault of Default<EnvCard> {
     fn default() -> EnvCard {(EnvCard::None)}
@@ -148,7 +148,7 @@ impl EnvCardImpl of EnvCardTrait {
         }
     }
     #[inline(always)]
-    fn apply_points(self: EnvCard, ref state_self: PlayerState, ref state_other: PlayerState, global_state: bool) {
+    fn apply_points(self: EnvCard, ref state_self: DuelistState, ref state_other: DuelistState, global_state: bool) {
         if (self != EnvCard::None) {
             self.get_points().apply(ref state_self, ref state_other, global_state);
         }

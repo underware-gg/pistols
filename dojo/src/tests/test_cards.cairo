@@ -8,7 +8,7 @@ mod tests {
 
     use pistols::systems::rng::{Dice, DiceTrait};
     use pistols::systems::actions::{actions, IActionsDispatcher, IActionsDispatcherTrait};
-    use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, RoundEntity, Moves, MovesTrait, PlayerState, PlayerStateTrait};
+    use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, RoundEntity, Moves, MovesTrait, DuelistState, DuelistStateTrait};
     use pistols::models::duelist::{Duelist, DuelistEntity, DuelistEntityStore, ProfilePicType, Archetype};
     use pistols::models::table::{TableConfig, TABLES};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
@@ -97,7 +97,7 @@ mod tests {
     }
 
 
-    fn _assert_not_affected_by_cards(state_start: PlayerState, state_final: PlayerState) {
+    fn _assert_not_affected_by_cards(state_start: DuelistState, state_final: DuelistState) {
         assert(state_start.chances == CONST::INITIAL_CHANCE, 'keep_INITIAL_CHANCE');
         assert(state_start.damage == CONST::INITIAL_DAMAGE, 'keep_INITIAL_DAMAGE');
         assert(state_start.chances == state_final.chances, 'keep_chances');

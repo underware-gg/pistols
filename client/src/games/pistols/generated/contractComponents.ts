@@ -295,7 +295,7 @@ export function defineContractComponents(world: World) {
             namespace: "pistols",
             name: "Round",
             types: ["u128","u8","felt252","u128","u8","u8","u8","u8","felt252","u128","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","enum"],
-            customTypes: ["Moves","Moves","PlayerState","PlayerState","RoundState"],
+            customTypes: ["Moves","Moves","DuelistState","DuelistState","RoundState"],
           },
         }
       );
