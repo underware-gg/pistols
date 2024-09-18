@@ -248,9 +248,9 @@ export function createSystemCalls(
     return duel_progress
   }
 
-  const get_player_full_deck = async (round_number: number): Promise<number[][] | null> => {
+  const get_player_card_decks = async (round_number: number): Promise<number[][] | null> => {
     const args = [round_number]
-    const results = await _executeCall<any>(actions_call('get_player_full_deck', args))
+    const results = await _executeCall<any>(actions_call('get_player_card_decks', args))
     if (results == null) return null
     return results.map((vo: BigNumberish[]) => vo.map((vi: BigNumberish) => Number(vi)))
   }
@@ -300,7 +300,7 @@ export function createSystemCalls(
     can_join,
     calc_fee,
     get_duel_progress,
-    get_player_full_deck,
+    get_player_card_decks,
     //
     // DUELISTS
     can_mint,

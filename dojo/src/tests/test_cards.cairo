@@ -16,7 +16,7 @@ mod tests {
     use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::types::constants::{CONST, HONOUR};
     use pistols::types::cards::hand::{
-        PlayerHand, PlayerHandTrait,
+        PlayerHand, PlayerHandTrait, DeckType,
         PacesCard, PacesCardTrait,
         TacticsCard, TacticsCardTrait,
         BladesCard, BladesCardTrait,
@@ -90,7 +90,7 @@ mod tests {
         round.moves_b.initialize(SALT_B, moves_b);
         round.state_a.initialize(hand_a);
         round.state_b.initialize(hand_b);
-        let progress: DuelProgress = shooter::game_loop_internal(ref dice, ref round);
+        let progress: DuelProgress = shooter::game_loop_internal(DeckType::Classic, ref round, ref dice);
         (round, progress)
     }
 

@@ -18,7 +18,7 @@ mod shooter {
     use pistols::types::shuffler::{Shuffler, ShufflerTrait};
     use pistols::types::misc::{Boolean};
     use pistols::types::cards::hand::{
-        PlayerHand, PlayerHandTrait,
+        PlayerHand, PlayerHandTrait, DeckType,
         PacesCard, PacesCardTrait,
         TacticsCard, TacticsCardTrait,
         BladesCard, BladesCardTrait,
@@ -143,20 +143,20 @@ mod shooter {
     //
 
     #[inline(always)]
-    fn game_loop(store: Store, _challenge: Challenge, ref round: Round) -> DuelProgress {
+    fn game_loop(store: Store, challenge: Challenge, ref round: Round) -> DuelProgress {
+        let table: TableConfigEntity = store.get_table_config_entity(challenge.table_id);
         let mut dice: Dice = DiceTrait::new(@store.world, round.make_seed());
-        (game_loop_internal(ref dice, ref round))
+        (game_loop_internal(table.deck_type, ref round, ref dice))
     }
     
     // testable loop
-    fn game_loop_internal(ref dice: Dice, ref round: Round) -> DuelProgress {
+    fn game_loop_internal(deck_type: DeckType, ref round: Round, ref dice: Dice) -> DuelProgress {
         // let _table_type: TableType = store.get_table_config_entity(challenge.table_id).table_type;
         
         let mut hand_a: PlayerHand = round.moves_a.as_hand();
         let mut hand_b: PlayerHand = round.moves_b.as_hand();
-        // TODO: validate moves
-        hand_a.validate();
-        hand_b.validate();
+        hand_a.validate(deck_type);
+        hand_b.validate(deck_type);
 
         round.state_a.initialize(hand_a);
         round.state_b.initialize(hand_b);

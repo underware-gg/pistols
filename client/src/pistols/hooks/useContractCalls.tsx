@@ -58,9 +58,9 @@ export const useDuelProgress = (duelId: bigint) => {
 }
 
 export const useGetPlayerFullDeck = (tableId: string) => {
-  const { get_player_full_deck } = useDojoSystemCalls()
+  const { get_player_card_decks } = useDojoSystemCalls()
   const { value, isPending } = useContractCall({
-    call: get_player_full_deck,
+    call: get_player_card_decks,
     args: [tableId],
     enabled: Boolean(tableId),
     defaultValue: [],

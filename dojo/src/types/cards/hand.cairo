@@ -6,6 +6,13 @@ use pistols::types::cards::{
 };
 use pistols::types::duel_progress::{DuelistDrawnCard};
 
+#[derive(Copy, Drop, Serde, PartialEq, Introspect)]
+pub enum DeckType {
+    None,
+    //
+    Classic,
+}
+
 #[derive(Copy, Drop, Serde, Default)]
 pub struct PlayerHand {
     card_fire: PacesCard,
@@ -18,28 +25,36 @@ pub struct PlayerHand {
 //--------------------
 // traits
 //
+use pistols::utils::arrays::{SpanUtilsTrait};
 
 #[generate_trait]
 impl PlayerHandImpl of PlayerHandTrait {
-    fn player_full_deck() -> Span<Span<u8>> {
-        (array![
-            PacesCardTrait::get_deck(),
-            PacesCardTrait::get_deck(),
-            TacticsCardTrait::get_deck(),
-            BladesCardTrait::get_deck(),
-        ].span())
-    }
-    fn validate(ref self: PlayerHand) {
-        if (self.card_dodge == self.card_fire) {
-            self.card_dodge = PacesCard::None;
-        }
-    }
     fn draw_card(self:PlayerHand, pace: PacesCard) -> DuelistDrawnCard {
         (
             if (self.card_fire == pace) {DuelistDrawnCard::Fire(pace)}
             else if (self.card_dodge == pace) {DuelistDrawnCard::Dodge(pace)}
             else {DuelistDrawnCard::None}
         )
+    }
+    fn validate(ref self: PlayerHand, _deck_type: DeckType) {
+        if (self.card_dodge == self.card_fire) {
+            self.card_dodge = PacesCard::None;
+        }
+        // TODO: enable this when we support multiple decks
+        // if (!TacticsCardTrait::get_deck(deck_type).contains(self.card_tactics.into())) {
+        //     self.card_tactics = TacticsCard::None;
+        // }
+        // if (!BladesCardTrait::get_deck(deck_type).contains(self.card_blades.into())) {
+        //     self.card_blades = BladesCard::None;
+        // }
+    }
+    fn get_table_player_decks(deck_type: DeckType) -> Span<Span<u8>> {
+        (array![
+            PacesCardTrait::get_deck(deck_type),
+            PacesCardTrait::get_deck(deck_type),
+            TacticsCardTrait::get_deck(deck_type),
+            BladesCardTrait::get_deck(deck_type),
+        ].span())
     }
 }
 

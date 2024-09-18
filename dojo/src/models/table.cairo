@@ -3,10 +3,11 @@ use starknet::ContractAddress;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
 use pistols::systems::actions::actions::{Errors as ActionErrors};
-use pistols::utils::misc::{ZERO};
-use pistols::utils::math::{MathU128};
-use pistols::utils::arrays::{ArrayUtilsTrait};
+use pistols::types::cards::hand::{DeckType};
 use pistols::types::constants::{CONST};
+use pistols::utils::arrays::{ArrayUtilsTrait};
+use pistols::utils::math::{MathU128};
+use pistols::utils::misc::{ZERO};
 
 mod TABLES {
     const LORDS: felt252 = 'Lords';
@@ -35,6 +36,7 @@ pub struct TableConfig {
     pub fee_contract_address: ContractAddress,  // can be 0x0 if no fees (and no wager)
     pub fee_min: u128,
     pub is_open: bool,
+    pub deck_type: DeckType,
 }
 
 #[derive(Copy, Drop, Serde)]
@@ -68,6 +70,7 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
             fee_contract_address: lords_address,
             fee_min: 4 * CONST::ETH_TO_WEI.low,
             is_open: (lords_address.is_non_zero()),
+            deck_type: DeckType::Classic,
         }),
         (TableConfig {
             table_id: TABLES::COMMONERS,
@@ -77,6 +80,7 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
             fee_contract_address: ZERO(),
             fee_min: 0,
             is_open: true,
+            deck_type: DeckType::Classic,
         }),
     ])
 }

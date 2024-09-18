@@ -68,7 +68,7 @@ trait IActions {
     fn has_pact(world: @IWorldDispatcher, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool;
     fn can_join(world: @IWorldDispatcher, table_id: felt252, duelist_id: u128) -> bool;
     fn calc_fee(world: @IWorldDispatcher, table_id: felt252, wager_value: u128) -> u128;
-    fn get_player_full_deck(world: @IWorldDispatcher, _table_id: felt252) -> Span<Span<u8>>;
+    fn get_player_card_decks(world: @IWorldDispatcher, table_id: felt252) -> Span<Span<u8>>;
     fn get_duel_progress(world: @IWorldDispatcher, duel_id: u128) -> DuelProgress;
     fn test_validate_commit_message(world: @IWorldDispatcher,
         account: ContractAddress,
@@ -469,9 +469,10 @@ mod actions {
             (table.calc_fee(wager_value))
         }
 
-        fn get_player_full_deck(world: @IWorldDispatcher, _table_id: felt252) -> Span<Span<u8>> {
-            WORLD(world);
-            (PlayerHandTrait::player_full_deck())
+        fn get_player_card_decks(world: @IWorldDispatcher, table_id: felt252) -> Span<Span<u8>> {
+            let store: Store = StoreTrait::new(world);
+            let table: TableConfigEntity = store.get_table_config_entity(table_id);
+            (PlayerHandTrait::get_table_player_decks(table.deck_type))
         }
 
         fn get_duel_progress(world: @IWorldDispatcher, duel_id: u128) -> DuelProgress {

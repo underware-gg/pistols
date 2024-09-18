@@ -84,6 +84,7 @@ mod TACTICS_POINTS {
 // traits
 //
 use pistols::types::cards::cards::{CardPoints, CardPointsTrait};
+use pistols::types::cards::hand::{DeckType};
 use pistols::models::challenge::{PlayerState};
 
 #[generate_trait]
@@ -105,7 +106,7 @@ impl TacticsCardImpl of TacticsCardTrait {
             self.get_points().apply(ref state_self, ref state_other);
         }
     }
-    fn get_deck() -> Span<u8> {
+    fn get_deck(_deck_type: DeckType) -> Span<u8> {
         (array![
             TacticsCard::Insult.into(),
             TacticsCard::CoinToss.into(),
