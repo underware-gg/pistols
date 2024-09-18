@@ -507,7 +507,7 @@
   },
   {
     "type": "struct",
-    "name": "pistols::models::challenge::PlayerState",
+    "name": "pistols::models::challenge::DuelistState",
     "members": [
       {
         "name": "health",
@@ -565,11 +565,11 @@
       },
       {
         "name": "state_a",
-        "type": "pistols::models::challenge::PlayerState"
+        "type": "pistols::models::challenge::DuelistState"
       },
       {
         "name": "state_b",
-        "type": "pistols::models::challenge::PlayerState"
+        "type": "pistols::models::challenge::DuelistState"
       }
     ]
   },
@@ -927,10 +927,10 @@
       },
       {
         "type": "function",
-        "name": "get_player_full_deck",
+        "name": "get_player_card_decks",
         "inputs": [
           {
-            "name": "_table_id",
+            "name": "table_id",
             "type": "core::felt252"
           }
         ],

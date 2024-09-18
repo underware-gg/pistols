@@ -331,13 +331,13 @@ export function defineContractComponents(world: World) {
     TableConfig: (() => {
       return defineComponent(
         world,
-        { table_id: RecsType.BigInt, table_type: RecsType.Number, description: RecsType.BigInt, fee_collector_address: RecsType.BigInt, fee_contract_address: RecsType.BigInt, fee_min: RecsType.BigInt, is_open: RecsType.Boolean },
+        { table_id: RecsType.BigInt, table_type: RecsType.Number, description: RecsType.BigInt, fee_collector_address: RecsType.BigInt, fee_contract_address: RecsType.BigInt, fee_min: RecsType.BigInt, is_open: RecsType.Boolean, deck_type: RecsType.Number },
         {
           metadata: {
             namespace: "pistols",
             name: "TableConfig",
-            types: ["felt252","enum","felt252","contractaddress","contractaddress","u128","bool"],
-            customTypes: ["TableType"],
+            types: ["felt252","enum","felt252","contractaddress","contractaddress","u128","bool","enum"],
+            customTypes: ["TableType","DeckType"],
           },
         }
       );

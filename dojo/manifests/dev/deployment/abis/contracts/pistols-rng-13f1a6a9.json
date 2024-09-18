@@ -132,6 +132,56 @@
     "interface_name": "pistols::systems::rng::IRng"
   },
   {
+    "type": "struct",
+    "name": "core::integer::u256",
+    "members": [
+      {
+        "name": "low",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "high",
+        "type": "core::integer::u128"
+      }
+    ]
+  },
+  {
+    "type": "enum",
+    "name": "core::bool",
+    "variants": [
+      {
+        "name": "False",
+        "type": "()"
+      },
+      {
+        "name": "True",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "pistols::types::shuffler::Shuffler",
+    "members": [
+      {
+        "name": "ids",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "size",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "pos",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "direct",
+        "type": "core::bool"
+      }
+    ]
+  },
+  {
     "type": "interface",
     "name": "pistols::systems::rng::IRng",
     "items": [
@@ -151,6 +201,22 @@
         "outputs": [
           {
             "type": "core::felt252"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "new_shuffler",
+        "inputs": [
+          {
+            "name": "shuffle_size",
+            "type": "core::integer::u32"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "pistols::types::shuffler::Shuffler"
           }
         ],
         "state_mutability": "view"

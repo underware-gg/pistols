@@ -213,6 +213,20 @@
     ]
   },
   {
+    "type": "enum",
+    "name": "pistols::types::cards::hand::DeckType",
+    "variants": [
+      {
+        "name": "None",
+        "type": "()"
+      },
+      {
+        "name": "Classic",
+        "type": "()"
+      }
+    ]
+  },
+  {
     "type": "struct",
     "name": "pistols::models::table::TableConfig",
     "members": [
@@ -243,6 +257,10 @@
       {
         "name": "is_open",
         "type": "core::bool"
+      },
+      {
+        "name": "deck_type",
+        "type": "pistols::types::cards::hand::DeckType"
       }
     ]
   },

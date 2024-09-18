@@ -115,6 +115,18 @@ export const EnvCardNameToValue: Record<EnvCard, number> = {
 export const getEnvCardValue = (name: EnvCard): number => (EnvCardNameToValue[name as string]);
 export const getEnvCardFromValue = (value: number): EnvCard => Object.keys(EnvCardNameToValue).find(key => EnvCardNameToValue[key] === value) as EnvCard;
 
+// from: ../dojo/src/types/cards/hand.cairo
+export enum DeckType {
+  None = 'None',
+  Classic = 'Classic',
+};
+export const DeckTypeNameToValue: Record<DeckType, number> = {
+  [DeckType.None]: 0,
+  [DeckType.Classic]: 1,
+};
+export const getDeckTypeValue = (name: DeckType): number => (DeckTypeNameToValue[name as string]);
+export const getDeckTypeFromValue = (value: number): DeckType => Object.keys(DeckTypeNameToValue).find(key => DeckTypeNameToValue[key] === value) as DeckType;
+
 // from: ../dojo/src/types/cards/paces.cairo
 export enum PacesCard {
   None = 'None',
