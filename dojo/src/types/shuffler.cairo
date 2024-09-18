@@ -11,11 +11,12 @@ use pistols::utils::misc::{felt_to_usize};
 // 6 bits > range 0-63 = 189 bits : 42 felt252 slots / 42 u256 slots
 // 7 bits > range 0-127 = 889 bits : 36 felt252 slots / 36 u256 slots
 
-#[derive(Copy, Drop)]
+#[derive(Copy, Drop, Serde)]
 pub struct Shuffler {
     ids: u256,      // 1..MAX
     size : usize,
     pos : usize,
+    direct: bool,   // for testing
 }
 
 #[generate_trait]
@@ -32,6 +33,16 @@ impl ShufflerImpl of ShufflerTrait {
             ids: 0,
             size,
             pos: 0,
+            direct: false,
+        })
+    }
+
+    fn new_direct(size: usize) -> Shuffler {
+        (Shuffler {
+            ids: 0,
+            size,
+            pos: 0,
+            direct: true,
         })
     }
 
@@ -39,6 +50,9 @@ impl ShufflerImpl of ShufflerTrait {
 	// Ids keys and values range from 1..size
 	// Returns 0 when all ids have been used
     fn get_next(ref self: Shuffler, seed: felt252) -> u8 {
+        // testing
+// println!("seed:{}/{}", self.direct, seed);
+        if (self.direct) { return (felt_to_usize(seed) % self.size).try_into().unwrap() + 1; }
         // no more ids available
 		if (self.pos == self.size) { return 0; }
         // get next pos

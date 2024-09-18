@@ -1,9 +1,11 @@
 use starknet::{ContractAddress};
 use dojo::world::IWorldDispatcher;
+use pistols::types::shuffler::{Shuffler, ShufflerTrait};
 
 #[dojo::interface]
 trait IRng {
     fn reseed(world: @IWorldDispatcher, seed: felt252, salt: felt252) -> felt252;
+    fn new_shuffler(world: @IWorldDispatcher, shuffle_size: usize) -> Shuffler;
 }
 
 #[dojo::contract]
@@ -13,6 +15,7 @@ mod rng {
 
     use pistols::utils::hash::{hash_values};
     use pistols::utils::misc::{WORLD};
+    use pistols::types::shuffler::{Shuffler, ShufflerTrait};
 
     #[abi(embed_v0)]
     impl RngImpl of IRng<ContractState> {
@@ -20,6 +23,10 @@ mod rng {
             WORLD(world);
             let new_seed: felt252 = hash_values([seed.into(), salt].span());
             (new_seed)
+        }
+        fn new_shuffler(world: @IWorldDispatcher, shuffle_size: usize) -> Shuffler {
+            WORLD(world);
+            (ShufflerTrait::new(shuffle_size))
         }
     }
 }
@@ -31,22 +38,24 @@ mod rng {
 //
 
 use pistols::interfaces::systems::{WorldSystemsTrait};
-use pistols::types::shuffler::{Shuffler, ShufflerTrait};
 
 #[derive(Copy, Drop)]
 pub struct Dice {
     rng: IRngDispatcher,
     seed: felt252,
     last_dice: u8,
+    shuffler: Shuffler,
 }
 
 #[generate_trait]
 impl DiceImpl of DiceTrait {
-    fn new(world: @IWorldDispatcher, initial_seed: felt252) -> Dice {
+    fn new(world: @IWorldDispatcher, initial_seed: felt252, shuffle_size: usize) -> Dice {
+        let rng: IRngDispatcher = world.rng_dispatcher();
         (Dice {
-            rng: world.rng_dispatcher(),
+            rng,
             seed: initial_seed,
             last_dice: 0,
+            shuffler: rng.new_shuffler(shuffle_size),
         })
     }
 
@@ -64,16 +73,16 @@ impl DiceImpl of DiceTrait {
 // println!("new_seed {} dice {}", self.seed, result);
         (self.last_dice)
     }
-
-    fn decide(ref self: Dice, salt: felt252, faces: u8, chances: u8) -> (u8, bool) {
+    fn throw_decide(ref self: Dice, salt: felt252, faces: u8, chances: u8) -> (u8, bool) {
         let dice: u8 = self.throw(salt, faces);
         let result: bool = (dice <= chances);
         (dice, result)
     }
 
-    fn shuffle(ref self: Dice, salt: felt252, ref shuffler: Shuffler) -> u8 {
+    // returns a random number between 1 and shuffler.size
+    fn shuffle_draw(ref self: Dice, salt: felt252) -> u8 {
         self.reseed(salt);
-        self.last_dice = shuffler.get_next(self.seed);
+        self.last_dice = self.shuffler.get_next(self.seed);
         (self.last_dice)
     }
 }

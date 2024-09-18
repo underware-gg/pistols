@@ -69,12 +69,14 @@ mod tests {
     // game_loop_internal
     //
 
-    fn execute_game_loop_internal(sys: Systems, moves_a: Span<u8>, moves_b: Span<u8>) -> (Round, DuelProgress) {
-        sys.rng.set_salts(
-            ['env_1', 'env_2'].span(),
-            [ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL].span(),
-        );
-        let mut dice: Dice = DiceTrait::new(@sys.world, 0x1212121212);
+    fn execute_game_loop_internal(sys: Systems, moves_a: Span<u8>, moves_b: Span<u8>, shuffle: bool) -> (Round, DuelProgress) {
+        if (!shuffle) {
+            sys.rng.mock_values(
+                ['env_1', 'env_2', 'env_3', 'env_4', 'env_5', 'env_6', 'env_7', 'env_8', 'env_9', 'env_10'].span(),
+                [ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL,
+                 ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL].span(),
+            );
+        }
         let mut round = Round {
             duel_id: 0x1234,
             round_number: 1,
@@ -90,7 +92,7 @@ mod tests {
         round.moves_b.initialize(SALT_B, moves_b);
         round.state_a.initialize(hand_a);
         round.state_b.initialize(hand_b);
-        let progress: DuelProgress = shooter::game_loop_internal(DeckType::Classic, ref round, ref dice);
+        let progress: DuelProgress = shooter::game_loop_internal(@sys.world, DeckType::Classic, ref round);
         (round, progress)
     }
 
@@ -110,10 +112,11 @@ mod tests {
     fn test_hand_progress() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
         let (salts, _moves_a, _moves_b) = prefabs::get_moves_dual_miss();
-        sys.rng.set_salts(salts.salts, salts.values);
+        sys.rng.mock_values(salts.salts, salts.values);
         let (_round, progress) = execute_game_loop_internal(sys,
             [5, 6, 1, 2].span(),
             [10, 9, 3, 4].span(),
+            true
         );
         assert(progress.hand_a.card_fire == 5_u8.into(), 'hand_a.card_fire');
         assert(progress.hand_a.card_dodge == 6_u8.into(), 'hand_a.card_dodge');
@@ -127,7 +130,7 @@ mod tests {
         let mut last_dice_env: u8 = 0;
         let mut i: u8 = 1;
         while (i <= 10) {
-            let num: felt252 = '1'+i.into();
+            let num: felt252 = '0'+i.into();
             let step: DuelStep = *progress.steps[i.into()];
             let pace: PacesCard = step.pace;
             assert(step.pace == pace, ShortString::concat(num, '_step.pace'));
@@ -161,10 +164,11 @@ mod tests {
     fn test_fire_no_dodge() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
         let (salts, _moves_a, _moves_b) = prefabs::get_moves_dual_miss();
-        sys.rng.set_salts(salts.salts, salts.values);
+        sys.rng.mock_values(salts.salts, salts.values);
         let (_round, progress) = execute_game_loop_internal(sys,
             [1, 1].span(),
             [2, 2].span(),
+            false
         );
         assert(progress.hand_a.card_fire == 1_u8.into(), 'hand_a.card_fire');
         assert(progress.hand_a.card_dodge == 0_u8.into(), 'hand_a.card_dodge');
@@ -199,16 +203,17 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, TacticsCard::Vengeful.into()].span(),
             [1, 2, 0].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
 // CONST::INITIAL_DAMAGE.print();
-// (*start_state_a.chances).print();
+// // (*start_state_a.chances).print();
+// // (*start_state_b.chances).print();
+// (*start_state_a.damage).print();
 // (*start_state_b.damage).print();
 // round.state_a.damage.print();
 // round.state_b.damage.print();
-// (*start_state_a.damage).print();
-// (*start_state_b.chances).print();
         assert(round.state_a.chances == CONST::INITIAL_CHANCE, 'INITIAL_CHANCE');
         assert(round.state_a.damage > *start_state_a.damage, 'damage');
         _assert_not_affected_by_cards(*start_state_b, round.state_b);
@@ -219,6 +224,7 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::Vengeful.into()].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
@@ -233,6 +239,7 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, TacticsCard::ThickCoat.into()].span(),
             [1, 2, 0].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
@@ -245,6 +252,7 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::ThickCoat.into()].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
@@ -258,6 +266,7 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, TacticsCard::Vengeful.into()].span(),
             [1, 2, TacticsCard::ThickCoat.into()].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
@@ -271,6 +280,7 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, TacticsCard::ThickCoat.into()].span(),
             [1, 2, TacticsCard::Vengeful.into()].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
@@ -285,6 +295,7 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, TacticsCard::Insult.into()].span(),
             [1, 2, 0].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
@@ -298,6 +309,7 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::Insult.into()].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
@@ -312,6 +324,7 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, TacticsCard::Bananas.into()].span(),
             [1, 2, 0].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
@@ -324,6 +337,7 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::Bananas.into()].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
@@ -336,6 +350,7 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, TacticsCard::Bananas.into()].span(),
             [1, 2, TacticsCard::Bananas.into()].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
@@ -349,6 +364,7 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, TacticsCard::CoinToss.into()].span(),
             [1, 2, 0].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
@@ -361,6 +377,7 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::CoinToss.into()].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
@@ -374,6 +391,7 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, TacticsCard::Reversal.into()].span(),
             [1, 2, 0].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
@@ -386,6 +404,7 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::Reversal.into()].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
@@ -406,6 +425,7 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, 0, BladesCard::Seppuku.into()].span(),
             [1, 2, 0, 0].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
@@ -421,6 +441,7 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, 0, 0].span(),
             [1, 2, 0, BladesCard::Seppuku.into()].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
@@ -437,6 +458,7 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, 0, BladesCard::RunAway.into()].span(),
             [1, 2, 0, 0].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
@@ -449,6 +471,7 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, 0, 0].span(),
             [1, 2, 0, BladesCard::RunAway.into()].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
@@ -462,6 +485,7 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, 0, BladesCard::Behead.into()].span(),
             [1, 2, 0, 0].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
@@ -474,6 +498,7 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, 0, 0].span(),
             [1, 2, 0, BladesCard::Behead.into()].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
@@ -487,6 +512,7 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, 0, BladesCard::Grapple.into()].span(),
             [1, 2, 0, 0].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
@@ -499,6 +525,7 @@ mod tests {
         let (round, progress) = execute_game_loop_internal(sys,
             [1, 2, 0, 0].span(),
             [1, 2, 0, BladesCard::Grapple.into()].span(),
+            false
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;

@@ -94,7 +94,7 @@ mod prefabs {
     }
 
     fn commit_reveal_get(sys: Systems, duel_id: u128, duelist_a: ContractAddress, duelist_b: ContractAddress, salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves) -> (ChallengeEntity, RoundEntity) {
-        @sys.rng.set_salts(salts.salts, salts.values);
+        @sys.rng.mock_values(salts.salts, salts.values);
         tester::execute_commit_moves(@sys.actions, duelist_a, duel_id, 1, moves_a.hashed);
         tester::execute_commit_moves(@sys.actions, duelist_b, duel_id, 1, moves_b.hashed);
         tester::execute_reveal_moves(@sys.actions, duelist_a, duel_id, 1, moves_a.salt, moves_a.moves);

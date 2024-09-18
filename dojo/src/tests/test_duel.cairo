@@ -82,7 +82,7 @@ mod tests {
 
     fn _test_resolved_draw(salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves, final_health: u8) {
         let sys = tester::setup_world(FLAGS::ACTIONS | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        sys.rng.set_salts(salts.salts, salts.values);
+        sys.rng.mock_values(salts.salts, salts.values);
 
         let table_id: felt252 = TABLES::LORDS;
         let balance_contract: u128 = sys.lords.balance_of(sys.actions.contract_address).low;
@@ -177,7 +177,7 @@ mod tests {
 
     fn _test_resolved_win(salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves, winner: u8) {
         let sys = tester::setup_world(FLAGS::ACTIONS | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        sys.rng.set_salts(salts.salts, salts.values);
+        sys.rng.mock_values(salts.salts, salts.values);
 
         let table_id: felt252 = TABLES::LORDS;
         let balance_contract: u128 = sys.lords.balance_of(sys.actions.contract_address).low;

@@ -1,5 +1,6 @@
 use starknet::{ContractAddress};
 use dojo::world::IWorldDispatcher;
+use pistols::types::shuffler::{Shuffler, ShufflerTrait};
 
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
@@ -14,7 +15,9 @@ pub struct SaltValue {
 #[dojo::interface]
 trait IRng {
     fn reseed(world: @IWorldDispatcher, seed: felt252, salt: felt252) -> felt252;
-    fn set_salts(ref world: IWorldDispatcher, salts: Span<felt252>, values: Span<felt252>);
+    fn new_shuffler(world: @IWorldDispatcher, shuffle_size: usize) -> Shuffler;
+    // mocker
+    fn mock_values(ref world: IWorldDispatcher, salts: Span<felt252>, values: Span<felt252>);
 }
 
 #[dojo::contract]
@@ -26,6 +29,7 @@ mod rng {
 
     use pistols::utils::hash::{hash_values};
     use pistols::utils::misc::{WORLD};
+    use pistols::types::shuffler::{Shuffler, ShufflerTrait};
 
     #[abi(embed_v0)]
     impl RngImpl of IRng<ContractState> {
@@ -38,11 +42,15 @@ mod rng {
             }
             (new_seed)
         }
-        fn set_salts(ref world: IWorldDispatcher, salts: Span<felt252>, values: Span<felt252>) {
+        fn new_shuffler(world: @IWorldDispatcher, shuffle_size: usize) -> Shuffler {
+            WORLD(world);
+            (ShufflerTrait::new_direct(shuffle_size))
+        }
+        fn mock_values(ref world: IWorldDispatcher, salts: Span<felt252>, values: Span<felt252>) {
             assert(salts.len() == values.len(), 'InvalidSaltValuesLength');
             let mut index: usize = 0;
             while (index < salts.len()) {
-// println!("set_salts {} {} {}", index, salts[index], values[index]);
+// println!("mock_values {} {} {}", index, salts[index], values[index]);
                 let v: u256 = (*values[index]).try_into().unwrap();
                 assert(v > 0, 'salt value > 0');
                 assert(v < 256, 'salt value < 256');

@@ -15,7 +15,6 @@ mod shooter {
     use pistols::types::challenge_state::{ChallengeState};
     use pistols::types::round_state::{RoundState};
     use pistols::types::duel_progress::{DuelProgress, DuelStep};
-    use pistols::types::shuffler::{Shuffler, ShufflerTrait};
     use pistols::types::misc::{Boolean};
     use pistols::types::cards::hand::{
         PlayerHand, PlayerHandTrait, DeckType,
@@ -145,13 +144,16 @@ mod shooter {
     #[inline(always)]
     fn game_loop(store: Store, challenge: Challenge, ref round: Round) -> DuelProgress {
         let table: TableConfigEntity = store.get_table_config_entity(challenge.table_id);
-        let mut dice: Dice = DiceTrait::new(@store.world, round.make_seed());
-        (game_loop_internal(table.deck_type, ref round, ref dice))
+        (game_loop_internal(@store.world,table.deck_type, ref round))
     }
     
     // testable loop
-    fn game_loop_internal(deck_type: DeckType, ref round: Round, ref dice: Dice) -> DuelProgress {
+    fn game_loop_internal(world: @IWorldDispatcher, deck_type: DeckType, ref round: Round) -> DuelProgress {
         // let _table_type: TableType = store.get_table_config_entity(challenge.table_id).table_type;
+
+        let env_deck: Span<EnvCard> = EnvCardTrait::get_full_deck().span();
+
+        let mut dice: Dice = DiceTrait::new(world, round.make_seed(), env_deck.len());
         
         let mut hand_a: PlayerHand = round.moves_a.as_hand();
         let mut hand_b: PlayerHand = round.moves_b.as_hand();
@@ -194,16 +196,13 @@ mod shooter {
         let mut win_a: Boolean = Boolean::Undefined;
         let mut win_b: Boolean = Boolean::Undefined;
 
-        let env_deck: Span<EnvCard> = EnvCardTrait::get_full_deck().span();
-        let mut shuffler: Shuffler = ShufflerTrait::new(env_deck.len().try_into().unwrap());
-
         let mut pace_number: u8 = 1;
         while (pace_number <= 10) {
             let pace: PacesCard = pace_number.into();
             // println!("Pace [{}] A:{} B:{}", pace_number, self.moves_a.card_fire.as_felt(), self.moves_b.card_fire.as_felt());
 
             // draw env card
-            let (card_env, dice_env): (EnvCard, u8) = draw_env_card(env_deck, pace, ref dice, ref shuffler);
+            let (card_env, dice_env): (EnvCard, u8) = draw_env_card(env_deck, pace, ref dice);
 
             // apply env card to global state (affects next steps)
             card_env.apply_points(ref global_state_a, ref global_state_b, true);
@@ -300,7 +299,7 @@ mod shooter {
         if (paces_shoot == paces_dodge) {
             state_self.chances = 0;
         }
-        let (dice, hit) = dice.decide(salt, 100, state_self.chances);
+        let (dice, hit) = dice.throw_decide(salt, 100, state_self.chances);
         state_self.dice_crit = dice;
         if (hit) {
             state_other.health = MathU8::sub(state_other.health, state_self.damage);
@@ -314,11 +313,11 @@ mod shooter {
         }
     }
 
-    fn draw_env_card(env_deck: Span<EnvCard>, pace: PacesCard, ref dice: Dice, ref shuffler: Shuffler) -> (EnvCard, u8) {
+    fn draw_env_card(env_deck: Span<EnvCard>, pace: PacesCard, ref dice: Dice) -> (EnvCard, u8) {
         let salt: felt252 = pace.env_salt();
-        let dice: u8 = dice.shuffle(salt, ref shuffler);
+        let dice: u8 = dice.shuffle_draw(salt);
         let env_card: EnvCard = *env_deck[(dice - 1).into()];
-// println!("draw_env_card: dice {}/{} = {}", dice, faces, env_card);
+// println!("draw_env_card: dice {} = {}", dice, env_card);
         (env_card, dice)
     }
 
