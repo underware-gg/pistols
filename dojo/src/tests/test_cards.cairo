@@ -66,10 +66,10 @@ mod tests {
 
 
     //-----------------------------------------
-    // game_loop_internal
+    // game_loop
     //
 
-    fn execute_game_loop_internal(sys: Systems, moves_a: Span<u8>, moves_b: Span<u8>, shuffle: bool) -> (Round, DuelProgress) {
+    fn execute_game_loop(sys: Systems, moves_a: Span<u8>, moves_b: Span<u8>, shuffle: bool) -> (Round, DuelProgress) {
         if (!shuffle) {
             sys.rng.mock_values(
                 ['env_1', 'env_2', 'env_3', 'env_4', 'env_5', 'env_6', 'env_7', 'env_8', 'env_9', 'env_10'].span(),
@@ -92,7 +92,7 @@ mod tests {
         round.moves_b.initialize(SALT_B, moves_b);
         round.state_a.initialize(hand_a);
         round.state_b.initialize(hand_b);
-        let progress: DuelProgress = shooter::game_loop_internal(@sys.world, DeckType::Classic, ref round);
+        let progress: DuelProgress = shooter::game_loop(sys.world, DeckType::Classic, ref round);
         (round, progress)
     }
 
@@ -113,7 +113,7 @@ mod tests {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
         let (salts, _moves_a, _moves_b) = prefabs::get_moves_dual_miss();
         sys.rng.mock_values(salts.salts, salts.values);
-        let (_round, progress) = execute_game_loop_internal(sys,
+        let (_round, progress) = execute_game_loop(sys,
             [5, 6, 1, 2].span(),
             [10, 9, 3, 4].span(),
             true
@@ -165,7 +165,7 @@ mod tests {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
         let (salts, _moves_a, _moves_b) = prefabs::get_moves_dual_miss();
         sys.rng.mock_values(salts.salts, salts.values);
-        let (_round, progress) = execute_game_loop_internal(sys,
+        let (_round, progress) = execute_game_loop(sys,
             [1, 1].span(),
             [2, 2].span(),
             false
@@ -200,7 +200,7 @@ mod tests {
     #[test]
     fn test_chances_tactics_vengeful_a() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::Vengeful.into()].span(),
             [1, 2, 0].span(),
             false
@@ -221,7 +221,7 @@ mod tests {
     #[test]
     fn test_chances_tactics_vengeful_b() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::Vengeful.into()].span(),
             false
@@ -236,7 +236,7 @@ mod tests {
     #[test]
     fn test_chances_tactics_thick_coat_a() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::ThickCoat.into()].span(),
             [1, 2, 0].span(),
             false
@@ -249,7 +249,7 @@ mod tests {
     #[test]
     fn test_chances_tactics_thick_coat_b() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::ThickCoat.into()].span(),
             false
@@ -263,7 +263,7 @@ mod tests {
     #[test]
     fn test_chances_tactics_vengeful_thick_a() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::Vengeful.into()].span(),
             [1, 2, TacticsCard::ThickCoat.into()].span(),
             false
@@ -277,7 +277,7 @@ mod tests {
     #[test]
     fn test_chances_tactics_vengeful_thick_b() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::ThickCoat.into()].span(),
             [1, 2, TacticsCard::Vengeful.into()].span(),
             false
@@ -292,7 +292,7 @@ mod tests {
     #[test]
     fn test_chances_tactics_insult_a() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::Insult.into()].span(),
             [1, 2, 0].span(),
             false
@@ -306,7 +306,7 @@ mod tests {
     #[test]
     fn test_chances_tactics_insult_b() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::Insult.into()].span(),
             false
@@ -321,7 +321,7 @@ mod tests {
     #[test]
     fn test_chances_tactics_bananas_a() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::Bananas.into()].span(),
             [1, 2, 0].span(),
             false
@@ -334,7 +334,7 @@ mod tests {
     #[test]
     fn test_chances_tactics_bananas_b() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::Bananas.into()].span(),
             false
@@ -347,7 +347,7 @@ mod tests {
     #[test]
     fn test_chances_tactics_bananas_ab() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::Bananas.into()].span(),
             [1, 2, TacticsCard::Bananas.into()].span(),
             false
@@ -361,7 +361,7 @@ mod tests {
     #[test]
     fn test_chances_tactics_coin_toss_a() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::CoinToss.into()].span(),
             [1, 2, 0].span(),
             false
@@ -374,7 +374,7 @@ mod tests {
     #[test]
     fn test_chances_tactics_coin_toss_b() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::CoinToss.into()].span(),
             false
@@ -388,7 +388,7 @@ mod tests {
     #[test]
     fn test_chances_tactics_reversal_a() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::Reversal.into()].span(),
             [1, 2, 0].span(),
             false
@@ -401,7 +401,7 @@ mod tests {
     #[test]
     fn test_chances_tactics_reversal_b() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::Reversal.into()].span(),
             false
@@ -422,7 +422,7 @@ mod tests {
     #[test]
     fn test_chances_blades_seppukku_a() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Seppuku.into()].span(),
             [1, 2, 0, 0].span(),
             false
@@ -438,7 +438,7 @@ mod tests {
     #[test]
     fn test_chances_blades_seppukku_b() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, 0].span(),
             [1, 2, 0, BladesCard::Seppuku.into()].span(),
             false
@@ -455,7 +455,7 @@ mod tests {
     #[test]
     fn test_chances_blades_run_away_a() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::RunAway.into()].span(),
             [1, 2, 0, 0].span(),
             false
@@ -468,7 +468,7 @@ mod tests {
     #[test]
     fn test_chances_blades_run_away_b() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, 0].span(),
             [1, 2, 0, BladesCard::RunAway.into()].span(),
             false
@@ -482,7 +482,7 @@ mod tests {
     #[test]
     fn test_chances_blades_behead_a() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Behead.into()].span(),
             [1, 2, 0, 0].span(),
             false
@@ -495,7 +495,7 @@ mod tests {
     #[test]
     fn test_chances_blades_behead_b() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, 0].span(),
             [1, 2, 0, BladesCard::Behead.into()].span(),
             false
@@ -509,7 +509,7 @@ mod tests {
     #[test]
     fn test_chances_blades_grapple_a() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Grapple.into()].span(),
             [1, 2, 0, 0].span(),
             false
@@ -522,7 +522,7 @@ mod tests {
     #[test]
     fn test_chances_blades_grapple_b() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop_internal(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, 0].span(),
             [1, 2, 0, BladesCard::Grapple.into()].span(),
             false

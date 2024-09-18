@@ -121,7 +121,8 @@ mod shooter {
         }
 
         // Process round when both actions are revealed
-        let progress: DuelProgress = game_loop(store, challenge, ref round);
+        let table: TableConfigEntity = store.get_table_config_entity(challenge.table_id);
+        let progress: DuelProgress = game_loop(store.world, table.deck_type, ref round);
         store.set_round(@round);
 
         if (progress.winner == 0) {
@@ -141,19 +142,13 @@ mod shooter {
     // Decide who wins a round, or go to next
     //
 
-    #[inline(always)]
-    fn game_loop(store: Store, challenge: Challenge, ref round: Round) -> DuelProgress {
-        let table: TableConfigEntity = store.get_table_config_entity(challenge.table_id);
-        (game_loop_internal(@store.world,table.deck_type, ref round))
-    }
-    
     // testable loop
-    fn game_loop_internal(world: @IWorldDispatcher, deck_type: DeckType, ref round: Round) -> DuelProgress {
+    fn game_loop(world: IWorldDispatcher, deck_type: DeckType, ref round: Round) -> DuelProgress {
         // let _table_type: TableType = store.get_table_config_entity(challenge.table_id).table_type;
 
         let env_deck: Span<EnvCard> = EnvCardTrait::get_full_deck().span();
 
-        let mut dice: Dice = DiceTrait::new(world, round.make_seed(), env_deck.len());
+        let mut dice: Dice = DiceTrait::new(@world, round.make_seed(), env_deck.len());
         
         let mut hand_a: PlayerHand = round.moves_a.as_hand();
         let mut hand_b: PlayerHand = round.moves_b.as_hand();

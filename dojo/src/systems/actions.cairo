@@ -479,8 +479,9 @@ mod actions {
             let store: Store = StoreTrait::new(world);
             let challenge: Challenge = store.get_challenge(duel_id);
             if (challenge.state.is_finished()) {
+                let table: TableConfigEntity = store.get_table_config_entity(challenge.table_id);
                 let mut round: Round = store.get_round(duel_id, 1);
-                (shooter::game_loop(store, challenge, ref round))
+                (shooter::game_loop(world, table.deck_type, ref round))
             } else {
                 {Default::default()}
             }
