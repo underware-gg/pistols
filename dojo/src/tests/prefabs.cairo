@@ -30,7 +30,7 @@ mod prefabs {
     const NAME_A: felt252 = 'Sensei';
     const NAME_B: felt252 = 'Senpai';
     const MESSAGE: felt252 = 'For honour!!!';
-    const TABLE_ID: felt252 = TABLES::LORDS;
+    const TABLE_ID: felt252 = TABLES::COMMONERS;
     const WAGER_VALUE: u128 = 0;
     // const WAGER_VALUE: u128 = 100_000_000_000_000_000_000;
 
@@ -74,17 +74,17 @@ mod prefabs {
     }
 
 
-    fn start_new_challenge(sys: Systems, duelist_a: ContractAddress, duelist_b: ContractAddress, wager_value: u128) -> u128 {
+    fn start_new_challenge(sys: Systems, duelist_a: ContractAddress, duelist_b: ContractAddress, table_id: felt252) -> u128 {
         // tester::execute_update_duelist(actions, duelist_a, NAME_A, ProfilePicType::Duelist, "1");
         // tester::execute_update_duelist(actions, duelist_b, NAME_B, ProfilePicType::Duelist, "2");
-        let duel_id: u128 = tester::execute_create_challenge(@sys.actions, duelist_a, duelist_b, MESSAGE, TABLE_ID, wager_value, 48);
+        let duel_id: u128 = tester::execute_create_challenge(@sys.actions, duelist_a, duelist_b, MESSAGE, table_id, WAGER_VALUE, 48);
         tester::elapse_timestamp(timestamp::from_days(1));
         tester::execute_reply_challenge(@sys.actions, duelist_b, duel_id, true);
         (duel_id)
     }
 
-    fn start_get_new_challenge(sys: Systems, duelist_a: ContractAddress, duelist_b: ContractAddress, wager_value: u128) -> (ChallengeEntity, RoundEntity, u128) {
-        let duel_id: u128 = start_new_challenge(sys, duelist_a, duelist_b, wager_value);
+    fn start_get_new_challenge(sys: Systems, duelist_a: ContractAddress, duelist_b: ContractAddress, table_id: felt252) -> (ChallengeEntity, RoundEntity, u128) {
+        let duel_id: u128 = start_new_challenge(sys, duelist_a, duelist_b, table_id);
         let challenge: ChallengeEntity = tester::get_ChallengeEntity(sys.world, duel_id);
         let round: RoundEntity = tester::get_RoundEntity(sys.world, duel_id, 1);
         assert(challenge.state == ChallengeState::InProgress, 'challenge.state');

@@ -127,11 +127,11 @@ impl MovesImpl of MovesTrait {
 
 #[generate_trait]
 impl PlayerStateImpl of PlayerStateTrait {
-    fn initialize(ref self: PlayerState, paces_shoot: PacesCard) {
+    fn initialize(ref self: PlayerState, hand: PlayerHand) {
         self.health = CONST::FULL_HEALTH;
         self.damage = CONST::INITIAL_DAMAGE;
         self.chances = CONST::INITIAL_CHANCE;
-        self.honour = paces_shoot.honour();
+        self.honour = hand.card_fire.honour();
         self.wager = 0;
         self.win = 0;
     }

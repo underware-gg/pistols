@@ -52,9 +52,9 @@ mod tests {
     // simple test to make sure main game_loop() works
     #[test]
     fn test_game_loop() {
-        let sys = tester::setup_world(FLAGS::ACTIONS | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        let sys = tester::setup_world(FLAGS::ACTIONS | FLAGS::MOCK_RNG);
         let (salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
-        let duel_id = prefabs::start_new_challenge(sys, OWNER(), OTHER(), WAGER_VALUE);
+        let duel_id = prefabs::start_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         let (_challenge, round) = prefabs::commit_reveal_get(sys, duel_id, OWNER(), OTHER(), salts, moves_a, moves_b);
         assert(round.state_a.damage > CONST::INITIAL_DAMAGE, 'final_damage_a');
         assert(round.state_b.damage > CONST::INITIAL_DAMAGE, 'final_damage_b');
@@ -84,10 +84,12 @@ mod tests {
             state_a: Default::default(),
             state_b: Default::default(),
         };
+        let mut hand_a: PlayerHand = round.moves_a.as_hand();
+        let mut hand_b: PlayerHand = round.moves_b.as_hand();
         round.moves_a.initialize(SALT_A, moves_a);
         round.moves_b.initialize(SALT_B, moves_b);
-        round.state_a.initialize(round.moves_a.card_1.into());
-        round.state_b.initialize(round.moves_b.card_1.into());
+        round.state_a.initialize(hand_a);
+        round.state_b.initialize(hand_b);
         let progress: DuelProgress = shooter::game_loop_internal(ref dice, ref round);
         (round, progress)
     }

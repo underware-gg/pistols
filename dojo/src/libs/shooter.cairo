@@ -154,12 +154,12 @@ mod shooter {
         
         let mut hand_a: PlayerHand = round.moves_a.as_hand();
         let mut hand_b: PlayerHand = round.moves_b.as_hand();
+        // TODO: validate moves
         hand_a.validate();
         hand_b.validate();
 
-        round.state_b.initialize(hand_a.card_fire);
-        round.state_a.initialize(hand_b.card_fire);
-
+        round.state_a.initialize(hand_a);
+        round.state_b.initialize(hand_b);
         let mut global_state_a: PlayerState = round.state_a;
         let mut global_state_b: PlayerState = round.state_b;
 
@@ -191,7 +191,6 @@ mod shooter {
         // Pistols round
         //
 
-        // TODO: use state.win instead??
         let mut win_a: Boolean = Boolean::Undefined;
         let mut win_b: Boolean = Boolean::Undefined;
 
@@ -266,8 +265,6 @@ mod shooter {
         let final_pace: DuelStep = *steps[steps.len() - 1];
         round.state_a = final_pace.state_a;
         round.state_b = final_pace.state_b;
-        round.state_a.win = if (final_pace.state_b.health == 0) {1} else {0};
-        round.state_b.win = if (final_pace.state_a.health == 0) {1} else {0};
         round.state = RoundState::Finished;
 
         //------------------------------------------------------
@@ -310,6 +307,7 @@ mod shooter {
         }
 // println!("dice {} / {} d/h: {} / {}", state_self.dice_crit, state_self.chances, state_self.damage, state_other.health);
         if (state_other.health == 0) {
+            state_self.win = 1;
             (Boolean::True)
         } else {
             (Boolean::False)
