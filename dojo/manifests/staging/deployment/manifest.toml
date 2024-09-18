@@ -24,8 +24,8 @@ manifest_name = "dojo-base"
 [[contracts]]
 kind = "DojoContract"
 address = "0x2f72d0e827656555aa1760aaff6e3c1f80aceea8096437b8422c99717cd3824"
-class_hash = "0x233e03d362c04057212100deac952ec537c959e0213fad9bcea624e489c5472"
-original_class_hash = "0x233e03d362c04057212100deac952ec537c959e0213fad9bcea624e489c5472"
+class_hash = "0x768b1ae3b1212fe153d4b24054efc2552fa566e628d1f090de32ae9cc1d0037"
+original_class_hash = "0x768b1ae3b1212fe153d4b24054efc2552fa566e628d1f090de32ae9cc1d0037"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/staging/deployment/abis/contracts/pistols-actions-4f10cff7.json"
 reads = []
@@ -54,8 +54,8 @@ manifest_name = "pistols-actions-4f10cff7"
 [[contracts]]
 kind = "DojoContract"
 address = "0x323b615e21a9cbb4366d643568c64e87518420f6b23a326abeefde6e73d3f3d"
-class_hash = "0x2aad15ce8dcfa71ebf68257fa8b2304b3d6f312da87c16827600c42af74dba"
-original_class_hash = "0x2aad15ce8dcfa71ebf68257fa8b2304b3d6f312da87c16827600c42af74dba"
+class_hash = "0x75b9143fb7dbf082a81a5e35745e59b785206ef883484a2b958cf01bb93fc95"
+original_class_hash = "0x75b9143fb7dbf082a81a5e35745e59b785206ef883484a2b958cf01bb93fc95"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/staging/deployment/abis/contracts/pistols-admin-36fd2037.json"
 reads = []
@@ -126,8 +126,8 @@ manifest_name = "pistols-minter-7b759538"
 [[contracts]]
 kind = "DojoContract"
 address = "0x101bee7a80a2003fb9f4263d4d474c739d0a8d5636aa078b2498ae4d5634d98"
-class_hash = "0x1bf6b257fce6ab8a04c8bb6b5a5269bd6880d5c95a874b85a9aadbdee7e404e"
-original_class_hash = "0x1bf6b257fce6ab8a04c8bb6b5a5269bd6880d5c95a874b85a9aadbdee7e404e"
+class_hash = "0x394892e64ab8741254ce92793274a7d73803f54529d3deb357d6f752ee2f51d"
+original_class_hash = "0x394892e64ab8741254ce92793274a7d73803f54529d3deb357d6f752ee2f51d"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/staging/deployment/abis/contracts/pistols-rng-13f1a6a9.json"
 reads = []
@@ -734,8 +734,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x20f685f8161947b75afae4199160eed56786bfef3cec3d23f39d4ac22305a8e"
-original_class_hash = "0x20f685f8161947b75afae4199160eed56786bfef3cec3d23f39d4ac22305a8e"
+class_hash = "0x2c7565c9f24a53b6e9a39e46937b21169bf150547df825f2ff414f416adca51"
+original_class_hash = "0x2c7565c9f24a53b6e9a39e46937b21169bf150547df825f2ff414f416adca51"
 abi = "manifests/staging/deployment/abis/models/pistols-Round-617e0a3d.json"
 tag = "pistols-Round"
 qualified_path = "pistols::models::challenge::round"
@@ -763,12 +763,12 @@ key = false
 
 [[models.members]]
 name = "state_a"
-type = "PlayerState"
+type = "DuelistState"
 key = false
 
 [[models.members]]
 name = "state_b"
-type = "PlayerState"
+type = "DuelistState"
 key = false
 
 [[models.members]]
@@ -836,8 +836,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x7bfd666c3bc1e5da819e40178efb3a59125b2e9b56241bed13496dfeed3d55c"
-original_class_hash = "0x7bfd666c3bc1e5da819e40178efb3a59125b2e9b56241bed13496dfeed3d55c"
+class_hash = "0x449fbf412e50d3e223ddc543429625263a4776e1d28a71a9cac228e98fd979f"
+original_class_hash = "0x449fbf412e50d3e223ddc543429625263a4776e1d28a71a9cac228e98fd979f"
 abi = "manifests/staging/deployment/abis/models/pistols-TableConfig-1e8368fc.json"
 tag = "pistols-TableConfig"
 qualified_path = "pistols::models::table::table_config"
@@ -876,6 +876,11 @@ key = false
 [[models.members]]
 name = "is_open"
 type = "bool"
+key = false
+
+[[models.members]]
+name = "deck_type"
+type = "DeckType"
 key = false
 
 [[models]]

@@ -286,6 +286,8 @@ function DuelProgress({
   const { gameImpl } = useThreeJsContext()
   const { round1, roundNumber, challenge: { tableId } } = useDuel(duelId)
   const round1Moves = useMemo(() => (isA ? round1?.moves_a : round1?.moves_b), [isA, round1])
+  if (isA) console.log(`HANDS_A:`, round1?.hand_a)
+  if (isB) console.log(`HANDS_B:`, round1?.hand_b)
 
   const duelProgressRef = useRef(null)
 
