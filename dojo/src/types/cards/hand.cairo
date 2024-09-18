@@ -1,8 +1,8 @@
 use pistols::types::cards::{
-    paces::{PacesCard, PacesCardTrait},
-    tactics::{TacticsCard, TacticsCardTrait},
-    blades::{BladesCard, BladesCardTrait},
-    env::{EnvCard, EnvCardTrait},
+    paces::{PacesCard, PacesCardTrait, PACES_CARDS},
+    tactics::{TacticsCard, TacticsCardTrait, TACTICS_CARDS},
+    blades::{BladesCard, BladesCardTrait, BLADES_CARDS},
+    env::{EnvCard, EnvCardTrait, ENV_CARDS},
 };
 use pistols::types::duel_progress::{DuelistDrawnCard};
 

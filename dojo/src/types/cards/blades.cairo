@@ -85,6 +85,50 @@ impl BladesCardImpl of BladesCardTrait {
             self.get_points().apply(ref state_self, ref state_other);
         }
     }
+    //
+    // Rock-Paper-Scissors mechanic
+    // RunAway > beats > Behead
+    // Behead  > beats > Grapple
+    // Grapple > beats > RunAway
+    //
+    // returns 1: self wins, 2: other wins, 0: draw
+    fn clash(self: BladesCard, other: BladesCard) -> u8 {
+        match self {
+            BladesCard::RunAway => {
+                match other {
+                    BladesCard::None => 1, // wins against invalid blades
+                    BladesCard::Behead => 1,
+                    BladesCard::Grapple => 2,
+                    _ => 0,
+                }
+            },
+            BladesCard::Behead => {
+                match other {
+                    BladesCard::None => 1, // wins against invalid blades
+                    BladesCard::RunAway => 2,
+                    BladesCard::Grapple => 1,
+                    _ => 0,
+                }
+            },
+            BladesCard::Grapple => {
+                match other {
+                    BladesCard::None => 1, // wins against invalid blades
+                    BladesCard::RunAway => 1,
+                    BladesCard::Behead => 2,
+                    _ => 0,
+                }
+            },
+            BladesCard::None => {
+                match other {
+                    BladesCard::RunAway => 2, // loses to any blade
+                    BladesCard::Behead => 2,  // loses to any blade
+                    BladesCard::Grapple => 2, // loses to any blade
+                    _ => 0,
+                }
+            },
+            _ => 0,
+        }
+    }
     fn get_deck(_deck_type: DeckType) -> Span<u8> {
         (array![
             BladesCard::Seppuku.into(),
@@ -106,7 +150,6 @@ use pistols::utils::short_string::{ShortStringTrait};
 impl BladesCardDefault of Default<BladesCard> {
     fn default() -> BladesCard {(BladesCard::None)}
 }
-
 
 impl BladesCardIntoU8 of Into<BladesCard, u8> {
     fn into(self: BladesCard) -> u8 {

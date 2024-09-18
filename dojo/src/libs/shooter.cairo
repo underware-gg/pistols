@@ -163,7 +163,7 @@ mod shooter {
         //------------------------------------------------------
         // Steps
         //
-        // save initial state
+        // save step 0 (initial state)
         let mut steps: Array<DuelStep> = array![];
         steps.append(DuelStep {
             pace: PacesCard::None,
@@ -220,7 +220,7 @@ mod shooter {
                 win_b = fire(hand_b.card_fire, hand_a.card_dodge, ref local_state_b, ref local_state_a, ref dice, 'shoot_b');
             }
 
-            // save step
+            // save step 1-10
             steps.append(DuelStep {
                 pace,
                 card_env,
@@ -248,11 +248,18 @@ mod shooter {
         // Blades Round
         //
         if (win_a != Boolean::True && win_b != Boolean::True) {
-
-            //
-            //TODO: duel blades
-            //
-
+// println!("blades: {} vs {}", hand_a.card_blades, hand_b.card_blades);
+            blades(hand_a.card_blades, hand_b.card_blades, ref global_state_a, ref global_state_b);
+            // save step 11
+            steps.append(DuelStep {
+                pace: PacesCard::None,
+                card_env: EnvCard::None,
+                dice_env: 0,
+                card_a: DuelistDrawnCard::Blades(hand_a.card_blades),
+                card_b: DuelistDrawnCard::Blades(hand_b.card_blades),
+                state_a: global_state_a,
+                state_b: global_state_b,
+            });
         }
 
         // update round model
@@ -266,8 +273,8 @@ mod shooter {
         //
 
         let winner: u8 =
-            if (win_a == Boolean::True && win_b != Boolean::True) {1}
-            else if (win_b == Boolean::True && win_a != Boolean::True) {2}
+            if (round.state_a.win == 1 && round.state_b.win == 0) {1}
+            else if (round.state_a.win == 0 && round.state_b.win == 1) {2}
             else {0};
         
         (DuelProgress {
@@ -285,11 +292,16 @@ mod shooter {
         challenge.timestamp_end = get_block_timestamp();
     }
 
-    //-------------------------
-    // Fire/Dodge
-    //
 
-    // returns true if executed
+    fn draw_env_card(env_deck: Span<EnvCard>, pace: PacesCard, ref dice: Dice) -> (EnvCard, u8) {
+        let salt: felt252 = pace.env_salt();
+        let dice: u8 = dice.shuffle_draw(salt);
+        let env_card: EnvCard = *env_deck[(dice - 1).into()];
+// println!("draw_env_card: dice {} = {}", dice, env_card);
+        (env_card, dice)
+    }
+
+    // returns Boolean::True if executed
     fn fire(paces_shoot: PacesCard, paces_dodge: PacesCard, ref state_self: PlayerState, ref state_other: PlayerState, ref dice: Dice, salt: felt252) -> Boolean {
         if (paces_shoot == paces_dodge) {
             state_self.chances = 0;
@@ -308,13 +320,23 @@ mod shooter {
         }
     }
 
-    fn draw_env_card(env_deck: Span<EnvCard>, pace: PacesCard, ref dice: Dice) -> (EnvCard, u8) {
-        let salt: felt252 = pace.env_salt();
-        let dice: u8 = dice.shuffle_draw(salt);
-        let env_card: EnvCard = *env_deck[(dice - 1).into()];
-// println!("draw_env_card: dice {} = {}", dice, env_card);
-        (env_card, dice)
+    fn blades(blades_a: BladesCard, blades_b: BladesCard, ref state_a: PlayerState, ref state_b: PlayerState) {
+        // commit Seppuku
+        if (blades_a == BladesCard::Seppuku) {
+            state_b.win = 1;
+        }
+        if (blades_b == BladesCard::Seppuku) {
+            state_a.win = 1;
+        }
+        // Rock-Paper-Scissors
+        if (state_a.win == 0 && state_b.win == 0) {
+            let winner: u8 = blades_a.clash(blades_b);
+            if (winner == 1) {
+                state_a.win = 1;
+            } else if (winner == 2) {
+                state_b.win = 1;
+            }
+        }
     }
-
 }
 

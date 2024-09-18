@@ -422,7 +422,7 @@ mod tests {
 
 
     //-------------------------------
-    // Commit/Revela Fails
+    // Commit/Reveal Fails
     //
 
     #[test]

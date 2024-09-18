@@ -19,7 +19,7 @@ mod tests {
         PlayerHand, PlayerHandTrait, DeckType,
         PacesCard, PacesCardTrait,
         TacticsCard, TacticsCardTrait,
-        BladesCard, BladesCardTrait,
+        BladesCard, BladesCardTrait, BLADES_CARDS,
         EnvCard, EnvCardTrait,
     };
     use pistols::libs::shooter::{shooter};
@@ -105,7 +105,7 @@ mod tests {
     }
 
     //-----------------------------------------
-    // HAND/PROGRESS
+    // HAND / GAME PROGRESS
     //
 
     #[test]
@@ -113,48 +113,62 @@ mod tests {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
         let (salts, _moves_a, _moves_b) = prefabs::get_moves_dual_miss();
         sys.rng.mock_values(salts.salts, salts.values);
-        let (_round, progress) = execute_game_loop(sys,
-            [5, 6, 1, 2].span(),
-            [10, 9, 3, 4].span(),
-            true
-        );
-        assert(progress.hand_a.card_fire == 5_u8.into(), 'hand_a.card_fire');
-        assert(progress.hand_a.card_dodge == 6_u8.into(), 'hand_a.card_dodge');
-        assert(progress.hand_a.card_tactics == 1_u8.into(), 'hand_a.card_tactics');
-        assert(progress.hand_a.card_blades == 2_u8.into(), 'hand_a.card_blades');
-        assert(progress.hand_b.card_fire == 10_u8.into(), 'hand_b.card_fire');
-        assert(progress.hand_b.card_dodge == 9_u8.into(), 'hand_b.card_dodge');
-        assert(progress.hand_b.card_tactics == 3_u8.into(), 'hand_b.card_tactics');
-        assert(progress.hand_b.card_blades == 4_u8.into(), 'hand_b.card_blades');
-        assert(progress.steps.len() == 11, 'paces.len');
+        let moves_a: Span<u8> = [5, 6, 1, BLADES_CARDS::Grapple].span();
+        let moves_b: Span<u8> = [10, 9, 3, BLADES_CARDS::RunAway].span();
+        let (_round, progress) = execute_game_loop(sys, moves_a, moves_b, true);
+        assert(progress.hand_a.card_fire == (*moves_a[0]).into(), 'hand_a.card_fire');
+        assert(progress.hand_a.card_dodge == (*moves_a[1]).into(), 'hand_a.card_dodge');
+        assert(progress.hand_a.card_tactics == (*moves_a[2]).into(), 'hand_a.card_tactics');
+        assert(progress.hand_a.card_blades == (*moves_a[3]).into(), 'hand_a.card_blades');
+        assert(progress.hand_b.card_fire == (*moves_b[0]).into(), 'hand_b.card_fire');
+        assert(progress.hand_b.card_dodge == (*moves_b[1]).into(), 'hand_b.card_dodge');
+        assert(progress.hand_b.card_tactics == (*moves_b[2]).into(), 'hand_b.card_tactics');
+        assert(progress.hand_b.card_blades == (*moves_b[3]).into(), 'hand_b.card_blades');
+        assert(progress.steps.len() == 12, 'progress.steps.len');
+        assert(progress.winner == 1, 'progress.winner');
         let mut last_dice_env: u8 = 0;
-        let mut i: u8 = 1;
-        while (i <= 10) {
+        let mut i: u8 = 0;
+        while (i < 12) {
             let num: felt252 = '0'+i.into();
             let step: DuelStep = *progress.steps[i.into()];
-            let pace: PacesCard = step.pace;
-            assert(step.pace == pace, ShortString::concat(num, '_step.pace'));
-            assert(step.card_env != 0_u8.into(), ShortString::concat(num, '_step.card_env'));
-            assert(step.dice_env > 0, ShortString::concat(num, '_step.dice_env'));
-            // test shuffler
-            assert(step.dice_env != last_dice_env, ShortString::concat(num, '_not_shuffled'));
-            last_dice_env = step.dice_env;
-            // test paces
-            if (pace == PacesCard::Paces5) {
-                assert(step.card_a == DuelistDrawnCard::Fire(PacesCard::Paces5), ShortString::concat(num, '_fire_a'));
-                assert(step.card_b == DuelistDrawnCard::None, ShortString::concat(num, '_none_b'));
-            } else if (pace == PacesCard::Paces6) {
-                assert(step.card_a == DuelistDrawnCard::Dodge(PacesCard::Paces6), ShortString::concat(num, '_dodge_a'));
-                assert(step.card_b == DuelistDrawnCard::None, ShortString::concat(num, '_none_b'));
-            } else if (pace == PacesCard::Paces10) {
-                assert(step.card_a == DuelistDrawnCard::None, ShortString::concat(num, '_none_a'));
-                assert(step.card_b == DuelistDrawnCard::Fire(PacesCard::Paces10), ShortString::concat(num, '_fire_b'));
-            } else if (pace == PacesCard::Paces9) {
-                assert(step.card_a == DuelistDrawnCard::None, ShortString::concat(num, '_none_a'));
-                assert(step.card_b == DuelistDrawnCard::Dodge(PacesCard::Paces9), ShortString::concat(num, '_dodge_b'));
+            if (i == 0) {
+                // initial state
+                assert(step.card_a == DuelistDrawnCard::None, ShortString::concat(num, '_pace_a'));
+                assert(step.card_b == DuelistDrawnCard::None, ShortString::concat(num, '_pace_b'));
+                assert(step.card_env == EnvCard::None, ShortString::concat(num, '_card_env'));
+                assert(step.dice_env == 0, ShortString::concat(num, '_dice_env'));
+            } else if (i > 10) {
+                // blades
+                assert(step.card_a == DuelistDrawnCard::Blades(BladesCard::Grapple), ShortString::concat(num, '_pace_a'));
+                assert(step.card_b == DuelistDrawnCard::Blades(BladesCard::RunAway), ShortString::concat(num, '_pace_b'));
+                assert(step.card_env == EnvCard::None, ShortString::concat(num, '_card_env'));
+                assert(step.dice_env == 0, ShortString::concat(num, '_dice_env'));
             } else {
-                assert(step.card_a == DuelistDrawnCard::None, ShortString::concat(num, '_none_a'));
-                assert(step.card_b == DuelistDrawnCard::None, ShortString::concat(num, '_none_b'));
+                // Paces 1 to 10
+                let pace: PacesCard = step.pace;
+                assert(step.pace == pace, ShortString::concat(num, '_step.pace'));
+                assert(step.card_env != EnvCard::None, ShortString::concat(num, '_step.card_env'));
+                assert(step.dice_env > 0, ShortString::concat(num, '_step.dice_env'));
+                // test shuffler
+                assert(step.dice_env != last_dice_env, ShortString::concat(num, '_not_shuffled'));
+                last_dice_env = step.dice_env;
+                // test paces
+                if (pace == (*moves_a[0]).into()) {
+                    assert(step.card_a == DuelistDrawnCard::Fire((*moves_a[0]).into()), ShortString::concat(num, '_fire_a'));
+                    assert(step.card_b == DuelistDrawnCard::None, ShortString::concat(num, '_none_b'));
+                } else if (pace == (*moves_a[1]).into()) {
+                    assert(step.card_a == DuelistDrawnCard::Dodge((*moves_a[1]).into()), ShortString::concat(num, '_dodge_a'));
+                    assert(step.card_b == DuelistDrawnCard::None, ShortString::concat(num, '_none_b'));
+                } else if (pace == (*moves_b[0]).into()) {
+                    assert(step.card_a == DuelistDrawnCard::None, ShortString::concat(num, '_none_a'));
+                    assert(step.card_b == DuelistDrawnCard::Fire((*moves_b[0]).into()), ShortString::concat(num, '_fire_b'));
+                } else if (pace == (*moves_b[1]).into()) {
+                    assert(step.card_a == DuelistDrawnCard::None, ShortString::concat(num, '_none_a'));
+                    assert(step.card_b == DuelistDrawnCard::Dodge((*moves_b[1]).into()), ShortString::concat(num, '_dodge_b'));
+                } else {
+                    assert(step.card_a == DuelistDrawnCard::None, ShortString::concat(num, '_none_a'));
+                    assert(step.card_b == DuelistDrawnCard::None, ShortString::concat(num, '_none_b'));
+                }
             }
             i += 1;
         }
@@ -420,7 +434,7 @@ mod tests {
     //
 
     #[test]
-    fn test_chances_blades_seppukku_a() {
+    fn test_blades_seppukku_a() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Seppuku.into()].span(),
@@ -429,17 +443,41 @@ mod tests {
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
+        // card effects on player state
         assert(*start_state_a.chances == CONST::INITIAL_CHANCE, 'INITIAL_CHANCE');
         assert(*start_state_a.damage == CONST::INITIAL_DAMAGE, 'INITIAL_DAMAGE');
         assert(round.state_a.chances > *start_state_a.chances, 'chances');
         assert(round.state_a.damage > *start_state_a.damage, 'damage');
         _assert_not_affected_by_cards(*start_state_b, round.state_b);
+        // results
+        assert(round.state_a.win == 0, 'win_a');
+        assert(round.state_b.win == 1, 'win_b');
     }
     #[test]
-    fn test_chances_blades_seppukku_b() {
+    fn test_blades_seppukku_b() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, 0].span(),
+            [1, 2, 0, BladesCard::Seppuku.into()].span(),
+            false
+        );
+        let start_state_a = progress.steps[0].state_a;
+        let start_state_b = progress.steps[0].state_b;
+        // card effects on player state
+        assert(*start_state_b.chances == CONST::INITIAL_CHANCE, 'INITIAL_CHANCE');
+        assert(*start_state_b.damage == CONST::INITIAL_DAMAGE, 'INITIAL_DAMAGE');
+        assert(round.state_b.chances > *start_state_b.chances, 'chances');
+        assert(round.state_b.damage > *start_state_b.damage, 'damage');
+        _assert_not_affected_by_cards(*start_state_a, round.state_a);
+        // results
+        assert(round.state_a.win == 1, 'win_a');
+        assert(round.state_b.win == 0, 'win_b');
+    }
+    #[test]
+    fn test_blades_seppukku_draw() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, progress) = execute_game_loop(sys,
+            [1, 2, 0, BladesCard::Seppuku.into()].span(),
             [1, 2, 0, BladesCard::Seppuku.into()].span(),
             false
         );
@@ -447,13 +485,19 @@ mod tests {
         let start_state_b = progress.steps[0].state_b;
         assert(*start_state_b.chances == CONST::INITIAL_CHANCE, 'INITIAL_CHANCE');
         assert(*start_state_b.damage == CONST::INITIAL_DAMAGE, 'INITIAL_DAMAGE');
+        // card effects on player state
+        assert(round.state_a.chances > *start_state_a.chances, 'chances');
+        assert(round.state_a.damage > *start_state_a.damage, 'damage');
         assert(round.state_b.chances > *start_state_b.chances, 'chances');
         assert(round.state_b.damage > *start_state_b.damage, 'damage');
-        _assert_not_affected_by_cards(*start_state_a, round.state_a);
+        // results
+        assert(round.state_a.win == 1, 'win_a');
+        assert(round.state_b.win == 1, 'win_b');
     }
 
+
     #[test]
-    fn test_chances_blades_run_away_a() {
+    fn test_blades_run_away_a() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::RunAway.into()].span(),
@@ -462,11 +506,15 @@ mod tests {
         );
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
+        // card effects on player state
         assert(round.state_b.chances < *start_state_b.chances, 'chances');
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
+        // blade wins against none
+        assert(round.state_a.win == 1, 'win_a');
+        assert(round.state_b.win == 0, 'win_b');
     }
     #[test]
-    fn test_chances_blades_run_away_b() {
+    fn test_blades_run_away_b() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, 0].span(),
@@ -477,10 +525,13 @@ mod tests {
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_a.chances < *start_state_a.chances, 'chances');
         _assert_not_affected_by_cards(*start_state_b, round.state_b);
+        // blade wins against none
+        assert(round.state_a.win == 0, 'win_a');
+        assert(round.state_b.win == 1, 'win_b');
     }
 
     #[test]
-    fn test_chances_blades_behead_a() {
+    fn test_blades_behead_a() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Behead.into()].span(),
@@ -491,9 +542,12 @@ mod tests {
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_a.damage > *start_state_a.damage, 'damage');
         _assert_not_affected_by_cards(*start_state_b, round.state_b);
+        // blade wins against none
+        assert(round.state_a.win == 1, 'win_a');
+        assert(round.state_b.win == 0, 'win_b');
     }
     #[test]
-    fn test_chances_blades_behead_b() {
+    fn test_blades_behead_b() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, 0].span(),
@@ -504,10 +558,13 @@ mod tests {
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_b.damage > *start_state_b.damage, 'damage');
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
+        // blade wins against none
+        assert(round.state_a.win == 0, 'win_a');
+        assert(round.state_b.win == 1, 'win_b');
     }
 
     #[test]
-    fn test_chances_blades_grapple_a() {
+    fn test_blades_grapple_a() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Grapple.into()].span(),
@@ -518,9 +575,12 @@ mod tests {
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_b.damage < *start_state_b.damage, 'damage');
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
+        // blade wins against none
+        assert(round.state_a.win == 1, 'win_a');
+        assert(round.state_b.win == 0, 'win_b');
     }
     #[test]
-    fn test_chances_blades_grapple_b() {
+    fn test_blades_grapple_b() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, 0].span(),
@@ -531,6 +591,115 @@ mod tests {
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_a.damage < *start_state_a.damage, 'damage');
         _assert_not_affected_by_cards(*start_state_b, round.state_b);
+        // blade wins against none
+        assert(round.state_a.win == 0, 'win_a');
+        assert(round.state_b.win == 1, 'win_b');
+    }
+
+    //
+    // Blades vs Blades
+    //
+    #[test]
+    fn test_blades_run_away_vs_run_away() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop(sys,
+            [1, 2, 0, BladesCard::RunAway.into()].span(),
+            [1, 2, 0, BladesCard::RunAway.into()].span(),
+            false
+        );
+        assert(round.state_a.win == 0, 'win_a');
+        assert(round.state_b.win == 0, 'win_b');
+    }
+    #[test]
+    fn test_blades_behead_vs_behead() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop(sys,
+            [1, 2, 0, BladesCard::Behead.into()].span(),
+            [1, 2, 0, BladesCard::Behead.into()].span(),
+            false
+        );
+        assert(round.state_a.win == 0, 'win_a');
+        assert(round.state_b.win == 0, 'win_b');
+    }
+    #[test]
+    fn test_blades_grapple_vs_grapple() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop(sys,
+            [1, 2, 0, BladesCard::Grapple.into()].span(),
+            [1, 2, 0, BladesCard::Grapple.into()].span(),
+            false
+        );
+        assert(round.state_a.win == 0, 'win_a');
+        assert(round.state_b.win == 0, 'win_b');
+    }
+    
+    #[test]
+    fn test_blades_run_away_vs_behead() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop(sys,
+            [1, 2, 0, BladesCard::RunAway.into()].span(),
+            [1, 2, 0, BladesCard::Behead.into()].span(),
+            false
+        );
+        assert(round.state_a.win == 1, 'win_a');
+        assert(round.state_b.win == 0, 'win_b');
+    }
+    #[test]
+    fn test_blades_behead_vs_run_away() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop(sys,
+            [1, 2, 0, BladesCard::Behead.into()].span(),
+            [1, 2, 0, BladesCard::RunAway.into()].span(),
+            false
+        );
+        assert(round.state_a.win == 0, 'win_a');
+        assert(round.state_b.win == 1, 'win_b');
+    }
+    
+    #[test]
+    fn test_blades_run_away_vs_grapple() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop(sys,
+            [1, 2, 0, BladesCard::RunAway.into()].span(),
+            [1, 2, 0, BladesCard::Grapple.into()].span(),
+            false
+        );
+        assert(round.state_a.win == 0, 'win_a');
+        assert(round.state_b.win == 1, 'win_b');
+    }
+    #[test]
+    fn test_blades_grapple_vs_run_away() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop(sys,
+            [1, 2, 0, BladesCard::Grapple.into()].span(),
+            [1, 2, 0, BladesCard::RunAway.into()].span(),
+            false
+        );
+        assert(round.state_a.win == 1, 'win_a');
+        assert(round.state_b.win == 0, 'win_b');
+    }
+
+    #[test]
+    fn test_blades_behead_vs_grapple() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop(sys,
+            [1, 2, 0, BladesCard::Behead.into()].span(),
+            [1, 2, 0, BladesCard::Grapple.into()].span(),
+            false
+        );
+        assert(round.state_a.win == 1, 'win_a');
+        assert(round.state_b.win == 0, 'win_b');
+    }
+    #[test]
+    fn test_blades_grapple_vs_behead() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, _progress) = execute_game_loop(sys,
+            [1, 2, 0, BladesCard::Grapple.into()].span(),
+            [1, 2, 0, BladesCard::Behead.into()].span(),
+            false
+        );
+        assert(round.state_a.win == 0, 'win_a');
+        assert(round.state_b.win == 1, 'win_b');
     }
 
 
