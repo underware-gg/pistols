@@ -366,7 +366,7 @@ function DuelProgress({
             <div className='dialog-spinner'></div>
           </div>
 
-          {(isYou && canSign) &&
+          {(isYou && round1Moves?.hashed) &&
             <div className='TempRevealPanel'>
               <Button disabled={!canSign} onClick={() => sign_and_restore()}>Reveal My Cards</Button>
               <pre className='Code FillParent Scroller NoMargin'>

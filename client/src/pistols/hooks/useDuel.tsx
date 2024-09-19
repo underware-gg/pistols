@@ -20,7 +20,14 @@ export enum DuelStage {
   Finished,         // 4
 }
 
-export const movesToHand = (moves: number[]) => {
+export type Hand = {
+  card_fire: PacesCard,
+  card_dodge: PacesCard,
+  card_tactics: TacticsCard,
+  card_blades: BladesCard,
+}
+
+export const movesToHand = (moves: number[]): Hand => {
   return {
     card_fire: getPacesCardFromValue(moves[0]),
     card_dodge: getPacesCardFromValue(moves[1]),

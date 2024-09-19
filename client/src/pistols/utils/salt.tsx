@@ -66,7 +66,7 @@ export const signAndGenerateMovesHash = async (
   chainId: string, 
   messageToSign: CommitMoveMessage,
   moves: number[]
-): Promise<bigint> => {
+): Promise<{ hash: bigint, salt: bigint }> => {
   //------------------------------
   // TODO: REMOVE THIS!!!
   // return poseidon([duelId, roundNumber, duelistId])
@@ -74,7 +74,7 @@ export const signAndGenerateMovesHash = async (
   const salt = await signAndGenerateSalt(account, chainId, messageToSign)
   const hash = make_moves_hash(salt, moves)
   console.log(`signAndGenerateMovesHash():`, messageToSign, moves, bigintToHex(salt), bigintToHex(hash))
-  return hash
+  return { hash, salt }
 }
 
 /** @returns the original action from an action hash, or 0 if fail */

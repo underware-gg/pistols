@@ -1,10 +1,12 @@
 import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/router'
-import { BigNumberish } from 'starknet'
+import { BigNumberish, contractClassResponseToLegacyCompiledContract } from 'starknet'
 import { Opener, useOpener } from '@/lib/ui/useOpener'
 import { bigintToHex } from '@/lib/utils/types'
 import { useSettings } from './SettingsContext'
 import { TABLES } from '@/games/pistols/generated/constants'
+import { CommitMoveMessage } from '../utils/salt'
+import { poseidon } from '@/lib/utils/starknet'
 
 //
 // React + Typescript + Context
@@ -41,6 +43,13 @@ const tavernMenuItems: SceneName[] = [
 // State
 //
 
+type StoredMoves = {
+  [key: string]: {
+    moves: number[]
+    salt: bigint
+  }
+}
+
 export const initialState = {
   walletSig: { address: 0n, sig: 0n },
   selectedDuelId: 0n,
@@ -49,6 +58,7 @@ export const initialState = {
   currentScene: undefined as SceneName,
   lastScene: undefined as SceneName,
   duelistsAnon: true,
+  moves: {} as StoredMoves,
   // injected
   connectOpener: null as Opener,
   duelistEditOpener: null as Opener,
@@ -63,6 +73,7 @@ const PistolsActions = {
   SELECT_DUELIST_ID: 'SELECT_DUELIST_ID',
   SELECT_CHALLENGING_ID: 'SELECT_CHALLENGING_ID',
   SELECT_DUELISTS_ANON: 'SELECT_DUELISTS_ANON',
+  SET_MOVES: 'SET_MOVES',
 }
 
 
@@ -78,6 +89,7 @@ type ActionType =
   | { type: 'SELECT_DUELIST_ID', payload: bigint }
   | { type: 'SELECT_CHALLENGING_ID', payload: bigint }
   | { type: 'SELECT_DUELISTS_ANON', payload: boolean }
+  | { type: 'SET_MOVES', payload: StoredMoves }
 
 
 
@@ -142,6 +154,11 @@ const PistolsProvider = ({
         newState.duelistsAnon = action.payload as boolean
         break
       }
+      case PistolsActions.SET_MOVES: {
+        const newMove = action.payload as StoredMoves
+        newState.moves = { ...state.moves, ...newMove }
+        break
+      }
       default:
         console.warn(`PistolsProvider: Unknown action [${action.type}]`)
         return state
@@ -167,6 +184,10 @@ export { PistolsProvider, PistolsContext, PistolsActions }
 //--------------------------------
 // Hooks
 //
+
+const makeMoveKey = (message: CommitMoveMessage): string => {
+  return bigintToHex(poseidon([message.duelId, message.roundNumber, message.duelistId]))
+}
 
 export const usePistolsContext = () => {
   const { state, dispatch } = useContext(PistolsContext)
@@ -200,6 +221,12 @@ export const usePistolsContext = () => {
       payload: newAnon,
     })
   }
+  const dispatchSetMoves = (message: CommitMoveMessage, moves: number[], salt: bigint ) => {
+    dispatch({
+      type: PistolsActions.SET_MOVES,
+      payload: { [makeMoveKey(message)]: { moves, salt } },
+    })
+  }
   return {
     ...state,
     hasSigned: (state.walletSig.sig > 0n),
@@ -211,6 +238,8 @@ export const usePistolsContext = () => {
     dispatchSelectDuelistId,
     dispatchChallengingDuelistId,
     dispatchDuelistsAnon,
+    dispatchSetMoves,
+    makeMoveKey,
   }
 }
 

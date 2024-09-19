@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Button, ButtonGroup, Divider, Grid, Modal, Pagination } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
-import { useSettings } from '@/pistols/hooks/SettingsContext'
+import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { CommitMoveMessage, signAndGenerateMovesHash } from '@/pistols/utils/salt'
-import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { feltToString } from '@/lib/utils/starknet'
 import { BLADES_POINTS, BladesCard, getBladesCardFromValue, getBladesCardValue, getTacticsCardFromValue, getTacticsCardValue, TACTICS_POINTS, TacticsCard } from '@/games/pistols/generated/constants'
+import { ActionButton } from '@/pistols/components/ui/Buttons'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -25,6 +26,7 @@ export default function CommitPacesModal({
   const { account, chainId } = useAccount()
   const { duelistId } = useSettings()
   const { commit_moves } = useDojoSystemCalls()
+  const { dispatchSetMoves } = usePistolsContext()
 
   const [firePaces, setFirePaces] = useState(0)
   const [dodgePaces, setDodgePaces] = useState(0)
@@ -50,9 +52,10 @@ export default function CommitPacesModal({
     if (canSubmit) {
       setIsSubmitting(true)
       const moves = [firePaces, dodgePaces, tactics, blades]
-      const hash = await signAndGenerateMovesHash(account, feltToString(chainId), messageToSign, moves)
-      if (hash) {
+      const { hash, salt } = await signAndGenerateMovesHash(account, feltToString(chainId), messageToSign, moves)
+      if (hash && salt) {
         await commit_moves(account, duelistId, duelId, roundNumber, hash)
+        dispatchSetMoves(messageToSign, moves, salt)
         setIsOpen(false)
       }
       setIsSubmitting(false)
