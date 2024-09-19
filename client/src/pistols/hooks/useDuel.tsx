@@ -20,23 +20,28 @@ export enum DuelStage {
   Finished,         // 4
 }
 
+export const movesToHand = (moves: number[]) => {
+  return {
+    card_fire: getPacesCardFromValue(moves[0]),
+    card_dodge: getPacesCardFromValue(moves[1]),
+    card_tactics: getTacticsCardFromValue(moves[2]),
+    card_blades: getBladesCardFromValue(moves[3]),
+  }
+}
+
 export const useRound = (duelId: BigNumberish, roundNumber: BigNumberish) => {
   const { Round } = useDojoComponents()
   const entityId = useMemo(() => keysToEntity([duelId, roundNumber]), [duelId, roundNumber])
   const round = useComponentValue(Round, entityId)
   const state = useMemo(() => (round?.state as unknown as RoundState ?? null), [round])
-  const hand_a = useMemo(() => round ? {
-    card_fire: getPacesCardFromValue(round.moves_b.card_1),
-    card_dodge: getPacesCardFromValue(round.moves_b.card_2),
-    card_tactics: getTacticsCardFromValue(round.moves_b.card_3),
-    card_blades: getBladesCardFromValue(round.moves_b.card_4),
-  } : null, [round])
-  const hand_b = useMemo(() => round ? {
-    card_fire: getPacesCardFromValue(round.moves_b.card_1),
-    card_dodge: getPacesCardFromValue(round.moves_b.card_2),
-    card_tactics: getTacticsCardFromValue(round.moves_b.card_3),
-    card_blades: getBladesCardFromValue(round.moves_b.card_4),
-  } : null, [round])
+  
+  const hand_a = useMemo(() => round ? movesToHand(
+    [round.moves_a.card_1,round.moves_a.card_2, round.moves_a.card_3, round.moves_a.card_4]
+  ) : null, [round])
+  const hand_b = useMemo(() => round ? movesToHand(
+    [round.moves_b.card_1, round.moves_b.card_2, round.moves_b.card_3, round.moves_b.card_4]
+  ) : null, [round])
+
   if (!round) return null
   // useEffect(() => { console.log(`+++ round:`) }, [round])
   return {

@@ -1215,6 +1215,15 @@ $logo-url: '/logos/logo_avante.svg';
   width: 50%;
   height: 50%;
 }
+.TempRevealPanel {
+  @extend .YesMouse;
+  background-color: rgba($color-darkest, 0.7);
+  width: 300px;
+  height: 120px;
+  position: absolute;
+  bottom: -120px;
+  left: 0;
+}
 
 
 //-----------------------------

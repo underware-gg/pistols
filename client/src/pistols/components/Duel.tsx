@@ -1,6 +1,6 @@
 import 'react-circular-progressbar/dist/styles.css';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Grid, Segment, SemanticFLOATS, Image } from 'semantic-ui-react'
+import { Grid, Segment, SemanticFLOATS, Image, Button } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
@@ -12,7 +12,7 @@ import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChalle
 import { useFinishedDuelProgress } from '@/pistols/hooks/useContractCalls'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useTable } from '@/pistols/hooks/useTable'
-import { useRevealAction } from '@/pistols/hooks/useRevealAction'
+import { useRevealAction, useSignAndRestoreMovesFromHash } from '@/pistols/hooks/useRevealAction'
 import { useIsYou } from '@/pistols/hooks/useIsYou'
 import { useWager } from '@/pistols/hooks/useWager'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
@@ -348,6 +348,9 @@ function DuelProgress({
 
   const id = isA ? 'player-bubble-left' : 'player-bubble-right'
 
+  const { canSign, sign_and_restore, hand } = useSignAndRestoreMovesFromHash(duelId, roundNumber, tableId, round1Moves?.hashed)
+  // console.log(`>> SIGN MOVES:`, canSign, duelId, roundNumber, tableId, round1Moves?.hashed)
+
   //------------------------------
   return (
     <>
@@ -362,6 +365,16 @@ function DuelProgress({
             <div className='dialog-quote'></div>
             <div className='dialog-spinner'></div>
           </div>
+
+          {(isYou && canSign) &&
+            <div className='TempRevealPanel'>
+              <Button disabled={!canSign} onClick={() => sign_and_restore()}>Reveal My Cards</Button>
+              <pre className='Code FillParent Scroller NoMargin'>
+                {serialize(hand, ' ')}
+              </pre>
+            </div>
+          }
+
         </div>
       </div>
     </>

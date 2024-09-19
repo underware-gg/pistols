@@ -16,6 +16,7 @@ export const useTable = (tableId: string) => {
 
   const table = useComponentValue(TableConfig, bigintToEntity(stringToFelt(tableId ?? '')))
   const feeContractAddress = useMemo(() => (table?.fee_contract_address ?? 0n), [table])
+  // console.log('>>>> table', tableId, table )
 
   const tableType = useMemo(() => ((table?.table_type as unknown as TableType) ?? null), [table])
   const tableTypeDescription = useMemo(() => (table?.table_type ? {
