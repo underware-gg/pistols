@@ -4,7 +4,7 @@ import { signMessages, Messages } from '@/lib/utils/starknet_sign'
 import { bigintToHex } from '@/lib/utils/types'
 import { BITWISE } from '@/games/pistols/generated/constants'
 
-interface CommitMoveMessage extends Messages {
+export interface CommitMoveMessage extends Messages {
   duelId: bigint,
   roundNumber: bigint,
   duelistId: bigint,
@@ -42,19 +42,12 @@ const make_move_hash = (salt: BigNumberish, index: number, move: number): bigint
 const signAndGenerateSalt = async (
   account: AccountInterface, 
   chainId: string, 
-  duelistId: bigint, 
-  duelId: bigint, 
-  roundNumber: number
+  messageToSign: CommitMoveMessage,
 ): Promise<bigint> => {
   let result = 0n
-  if (duelId && roundNumber) {
+  if (messageToSign) {
     try {
-      const messages: CommitMoveMessage = {
-        duelId: BigInt(duelId),
-        roundNumber: BigInt(roundNumber),
-        duelistId: BigInt(duelistId),
-      }
-      const { signatureHash } = await signMessages(account, chainId, 1, messages)
+      const { signatureHash } = await signMessages(account, chainId, 1, messageToSign)
       if (signatureHash == 0n) {
         // get on-chain????
         throw new Error('null signature')
@@ -71,18 +64,16 @@ const signAndGenerateSalt = async (
 export const signAndGenerateMovesHash = async (
   account: AccountInterface, 
   chainId: string, 
-  duelistId: bigint, 
-  duelId: bigint, 
-  roundNumber: number, 
+  messageToSign: CommitMoveMessage,
   moves: number[]
 ): Promise<bigint> => {
   //------------------------------
   // TODO: REMOVE THIS!!!
   // return poseidon([duelId, roundNumber, duelistId])
   //------------------------------
-  const salt = await signAndGenerateSalt(account, chainId, duelistId, duelId, roundNumber)
+  const salt = await signAndGenerateSalt(account, chainId, messageToSign)
   const hash = make_moves_hash(salt, moves)
-  console.log(`signAndGenerateMovesHash():`, bigintToHex(duelId), roundNumber, moves, bigintToHex(salt), bigintToHex(hash))
+  console.log(`signAndGenerateMovesHash():`, messageToSign, moves, bigintToHex(salt), bigintToHex(hash))
   return hash
 }
 
@@ -90,16 +81,14 @@ export const signAndGenerateMovesHash = async (
 export const signAndRestoreMovesFromHash = async (
   account: AccountInterface, 
   chainId: string, 
-  duelistId: bigint, 
-  duelId: bigint, 
-  roundNumber: number, 
+  messageToSign: CommitMoveMessage,
   hash: bigint, 
   decks: number[][]
 ): Promise<{ salt: bigint, moves: number[] }> => {
-  const salt = await signAndGenerateSalt(account, chainId, duelistId, duelId, roundNumber)
+  const salt = await signAndGenerateSalt(account, chainId, messageToSign)
   let moves = []
   console.log(`DECKS:`, decks)
-  console.log(`___RESTORE Duel:`, bigintToHex(duelId), '\nround:', roundNumber, '\nsalt:', bigintToHex(salt), '\nhash:', bigintToHex(hash))
+  console.log(`___RESTORE message:`, messageToSign, '\nsalt:', bigintToHex(salt), '\nhash:', bigintToHex(hash))
   if (salt > 0n) {
     // there are 2 to 4 decks...
     for (let di = 0; di < decks.length; ++di) {

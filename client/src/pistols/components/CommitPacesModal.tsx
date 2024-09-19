@@ -3,7 +3,7 @@ import { Button, ButtonGroup, Divider, Grid, Modal, Pagination } from 'semantic-
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
-import { signAndGenerateMovesHash } from '@/pistols/utils/salt'
+import { CommitMoveMessage, signAndGenerateMovesHash } from '@/pistols/utils/salt'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { feltToString } from '@/lib/utils/starknet'
 import { BLADES_POINTS, BladesCard, getBladesCardFromValue, getBladesCardValue, getTacticsCardFromValue, getTacticsCardValue, TACTICS_POINTS, TacticsCard } from '@/games/pistols/generated/constants'
@@ -36,15 +36,21 @@ export default function CommitPacesModal({
     setFirePaces(0)
   }, [isOpen])
 
+  const messageToSign = useMemo<CommitMoveMessage>(() => ((duelId && roundNumber && duelistId) ? {
+    duelId: BigInt(duelId),
+    roundNumber: BigInt(roundNumber),
+    duelistId: BigInt(duelistId),
+  } : null), [duelId, roundNumber, duelistId])
+
   const canSubmit = useMemo(() =>
-    (account && duelId && roundNumber && firePaces && dodgePaces && firePaces != dodgePaces && tactics && blades && !isSubmitting),
-    [account, duelId, roundNumber, firePaces, dodgePaces, tactics, blades, isSubmitting])
+    (account && messageToSign && firePaces && dodgePaces && firePaces != dodgePaces && tactics && blades && !isSubmitting),
+    [account, messageToSign, firePaces, dodgePaces, tactics, blades, isSubmitting])
 
   const _submit = useCallback(async () => {
     if (canSubmit) {
       setIsSubmitting(true)
       const moves = [firePaces, dodgePaces, tactics, blades]
-      const hash = await signAndGenerateMovesHash(account, feltToString(chainId), duelistId, duelId, roundNumber, moves)
+      const hash = await signAndGenerateMovesHash(account, feltToString(chainId), messageToSign, moves)
       if (hash) {
         await commit_moves(account, duelistId, duelId, roundNumber, hash)
         setIsOpen(false)

@@ -3,27 +3,33 @@ import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useGetPlayerFullDeck } from '@/pistols/hooks/useContractCalls'
-import { signAndRestoreMovesFromHash } from '../utils/salt'
+import { CommitMoveMessage, signAndRestoreMovesFromHash } from '@/pistols/utils/salt'
 import { feltToString } from '@/lib/utils/starknet'
-import { movesToHand } from './useDuel'
+import { movesToHand } from '@/pistols/hooks/useDuel'
 
 export function useSignAndRestoreMovesFromHash(duelId: bigint, roundNumber: number, tableId: string, hash: bigint) {
   const { account, chainId } = useAccount()
   const { duelistId } = useSettings()
   const { decks } = useGetPlayerFullDeck(tableId)
 
-  const canSign = useMemo(() =>
-    (duelId && roundNumber && tableId && hash && decks?.length >= 2),
-    [duelId, roundNumber, tableId, hash, decks])
-  // console.log(`canSign:`, canSign, duelId, roundNumber, hash, decks)
+  const messageToSign = useMemo<CommitMoveMessage>(() => ((duelId && roundNumber && duelistId) ? {
+    duelId: BigInt(duelId),
+    roundNumber: BigInt(roundNumber),
+    duelistId: BigInt(duelistId),
+  } : null), [duelId, roundNumber, duelistId])
 
   const [salt, setSalt] = useState<bigint>()
   const [moves, setMoves] = useState<number[]>()
   const hand = useMemo(() => (moves ? movesToHand(moves) : null), [moves])
 
+  const canSign = useMemo(() =>
+    (messageToSign && tableId && hash && decks?.length >= 2 && hand != null),
+    [messageToSign, tableId, hash, decks, hand])
+  // console.log(`canSign:`, canSign, duelId, roundNumber, hash, decks)
+
   const sign_and_restore = useCallback(async () => {
     if (canSign) {
-      const { salt, moves } = await signAndRestoreMovesFromHash(account, feltToString(chainId), duelistId, duelId, roundNumber, hash, decks)
+      const { salt, moves } = await signAndRestoreMovesFromHash(account, feltToString(chainId), messageToSign, hash, decks)
       setSalt(salt > 0n ? salt : undefined)
       setMoves(salt > 0n ? moves : undefined)
       return { salt, moves }
@@ -33,8 +39,7 @@ export function useSignAndRestoreMovesFromHash(duelId: bigint, roundNumber: numb
   return {
     canSign,
     sign_and_restore,
-    // salt,
-    // moves,
+    moves,
     hand,
   }
 }
