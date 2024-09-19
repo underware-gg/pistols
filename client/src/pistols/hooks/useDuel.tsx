@@ -6,7 +6,7 @@ import { useThreeJsContext } from "./ThreeJsContext"
 import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
 import { useChallenge } from "@/pistols/hooks/useChallenge"
 import { keysToEntity } from '@/lib/utils/types'
-import { CONST, getPacesCardFromValue, getRoundStateValue, RoundState } from '@/games/pistols/generated/constants'
+import { BladesCard, CONST, getBladesCardFromValue, getPacesCardFromValue, getRoundStateValue, getTacticsCardFromValue, PacesCard, RoundState, TacticsCard } from '@/games/pistols/generated/constants'
 import { AnimationState } from "@/pistols/three/game"
 import { Action } from "@/pistols/utils/pistols"
 
@@ -25,11 +25,25 @@ export const useRound = (duelId: BigNumberish, roundNumber: BigNumberish) => {
   const entityId = useMemo(() => keysToEntity([duelId, roundNumber]), [duelId, roundNumber])
   const round = useComponentValue(Round, entityId)
   const state = useMemo(() => (round?.state as unknown as RoundState ?? null), [round])
+  const hand_a = useMemo(() => round ? {
+    card_fire: getPacesCardFromValue(round.moves_b.card_1),
+    card_dodge: getPacesCardFromValue(round.moves_b.card_2),
+    card_tactics: getTacticsCardFromValue(round.moves_b.card_3),
+    card_blades: getBladesCardFromValue(round.moves_b.card_4),
+  } : null, [round])
+  const hand_b = useMemo(() => round ? {
+    card_fire: getPacesCardFromValue(round.moves_b.card_1),
+    card_dodge: getPacesCardFromValue(round.moves_b.card_2),
+    card_tactics: getTacticsCardFromValue(round.moves_b.card_3),
+    card_blades: getBladesCardFromValue(round.moves_b.card_4),
+  } : null, [round])
   if (!round) return null
   // useEffect(() => { console.log(`+++ round:`) }, [round])
   return {
     ...round,
     state,
+    hand_a,
+    hand_b,
   }
 }
 
