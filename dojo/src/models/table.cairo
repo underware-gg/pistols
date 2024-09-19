@@ -30,13 +30,13 @@ pub struct TableConfig {
     #[key]
     pub table_id: felt252,
     //------
-    pub table_type: TableType,
     pub description: felt252,
-    pub fee_collector_address: ContractAddress, // if 0x0, goes to default treasury
-    pub fee_contract_address: ContractAddress,  // can be 0x0 if no fees (and no wager)
+    pub table_type: TableType,
+    pub deck_type: DeckType,
+    pub fee_contract_address: ContractAddress,  // if 0x0: no fees, no wager
+    pub fee_collector_address: ContractAddress, // if 0x0: use default treasury
     pub fee_min: u128,
     pub is_open: bool,
-    pub deck_type: DeckType,
 }
 
 #[derive(Copy, Drop, Serde)]
@@ -64,23 +64,23 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
     (array![
         (TableConfig {
             table_id: TABLES::LORDS,
-            table_type: TableType::Classic,
             description: 'The Lords Table',
-            fee_collector_address: ZERO(),
-            fee_contract_address: lords_address,
-            fee_min: 4 * CONST::ETH_TO_WEI.low,
-            is_open: (lords_address.is_non_zero()),
+            table_type: TableType::Classic,
             deck_type: DeckType::Classic,
+            fee_contract_address: lords_address,
+            fee_collector_address: ZERO(),
+            fee_min: 60 * CONST::ETH_TO_WEI.low,
+            is_open: (lords_address.is_non_zero()),
         }),
         (TableConfig {
             table_id: TABLES::COMMONERS,
-            table_type: TableType::Classic,
             description: 'The Commoners Table',
-            fee_collector_address: ZERO(),
+            table_type: TableType::Classic,
+            deck_type: DeckType::Classic,
             fee_contract_address: ZERO(),
+            fee_collector_address: ZERO(),
             fee_min: 0,
             is_open: true,
-            deck_type: DeckType::Classic,
         }),
     ])
 }
