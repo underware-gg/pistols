@@ -55,14 +55,14 @@ export const getTableTypeFromValue = (value: number): TableType => Object.keys(T
 export enum BladesCard {
   None = 'None',
   Seppuku = 'Seppuku',
-  RunAway = 'RunAway',
+  PocketPistol = 'PocketPistol',
   Behead = 'Behead',
   Grapple = 'Grapple',
 };
 export const BladesCardNameToValue: Record<BladesCard, number> = {
   [BladesCard.None]: 0,
   [BladesCard.Seppuku]: 1,
-  [BladesCard.RunAway]: 2,
+  [BladesCard.PocketPistol]: 2,
   [BladesCard.Behead]: 3,
   [BladesCard.Grapple]: 4,
 };
@@ -347,14 +347,14 @@ export const TABLES: type_TABLES = {
 type type_BLADES_CARDS = {
   None: number, // cairo: u8
   Seppuku: number, // cairo: u8
-  RunAway: number, // cairo: u8
+  PocketPistol: number, // cairo: u8
   Behead: number, // cairo: u8
   Grapple: number, // cairo: u8
 };
 export const BLADES_CARDS: type_BLADES_CARDS = {
   None: 0,
   Seppuku: 1,
-  RunAway: 2,
+  PocketPistol: 2,
   Behead: 3,
   Grapple: 4,
 };
@@ -362,7 +362,7 @@ export const BLADES_CARDS: type_BLADES_CARDS = {
 // from: ../dojo/src/types/cards/blades.cairo
 type type_BLADES_POINTS = {
   Seppuku: CardPoints, // cairo: CardPoints
-  RunAway: CardPoints, // cairo: CardPoints
+  PocketPistol: CardPoints, // cairo: CardPoints
   Behead: CardPoints, // cairo: CardPoints
   Grapple: CardPoints, // cairo: CardPoints
 };
@@ -375,8 +375,8 @@ export const BLADES_POINTS: type_BLADES_POINTS = {
     other_damage: 0,
     special: 'Suicide if survives',
   },
-  RunAway: {
-    name: 'Run Away',
+  PocketPistol: {
+    name: 'Pocket Pistol',
     self_chances: 0,
     self_damage: 0,
     other_chances: -10,
@@ -397,7 +397,7 @@ export const BLADES_POINTS: type_BLADES_POINTS = {
     self_damage: 0,
     other_chances: 0,
     other_damage: -1,
-    special: 'Beats Run Away',
+    special: 'Beats Pocket Pistol',
   },
 };
 

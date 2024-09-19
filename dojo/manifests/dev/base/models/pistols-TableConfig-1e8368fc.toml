@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x449fbf412e50d3e223ddc543429625263a4776e1d28a71a9cac228e98fd979f"
-original_class_hash = "0x449fbf412e50d3e223ddc543429625263a4776e1d28a71a9cac228e98fd979f"
+class_hash = "0x6b05e10a9a84fe260a91833936740b56b77a8caff0cd9fd842f4b6e0ec95ec5"
+original_class_hash = "0x6b05e10a9a84fe260a91833936740b56b77a8caff0cd9fd842f4b6e0ec95ec5"
 abi = "manifests/dev/base/abis/models/pistols-TableConfig-1e8368fc.json"
 tag = "pistols-TableConfig"
 qualified_path = "pistols::models::table::table_config"
@@ -12,22 +12,27 @@ type = "felt252"
 key = true
 
 [[members]]
-name = "table_type"
-type = "TableType"
-key = false
-
-[[members]]
 name = "description"
 type = "felt252"
 key = false
 
 [[members]]
-name = "fee_collector_address"
-type = "ContractAddress"
+name = "table_type"
+type = "TableType"
+key = false
+
+[[members]]
+name = "deck_type"
+type = "DeckType"
 key = false
 
 [[members]]
 name = "fee_contract_address"
+type = "ContractAddress"
+key = false
+
+[[members]]
+name = "fee_collector_address"
 type = "ContractAddress"
 key = false
 
@@ -39,9 +44,4 @@ key = false
 [[members]]
 name = "is_open"
 type = "bool"
-key = false
-
-[[members]]
-name = "deck_type"
-type = "DeckType"
 key = false

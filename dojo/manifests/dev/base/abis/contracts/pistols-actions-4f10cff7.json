@@ -470,7 +470,7 @@
         "type": "()"
       },
       {
-        "name": "RunAway",
+        "name": "PocketPistol",
         "type": "()"
       },
       {
@@ -510,7 +510,7 @@
     "name": "pistols::models::challenge::DuelistState",
     "members": [
       {
-        "name": "health",
+        "name": "chances",
         "type": "core::integer::u8"
       },
       {
@@ -518,11 +518,11 @@
         "type": "core::integer::u8"
       },
       {
-        "name": "chances",
+        "name": "health",
         "type": "core::integer::u8"
       },
       {
-        "name": "dice_crit",
+        "name": "dice_fire",
         "type": "core::integer::u8"
       },
       {
@@ -531,10 +531,6 @@
       },
       {
         "name": "wager",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "win",
         "type": "core::integer::u8"
       }
     ]

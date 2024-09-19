@@ -390,20 +390,6 @@
   },
   {
     "type": "enum",
-    "name": "core::bool",
-    "variants": [
-      {
-        "name": "False",
-        "type": "()"
-      },
-      {
-        "name": "True",
-        "type": "()"
-      }
-    ]
-  },
-  {
-    "type": "enum",
     "name": "pistols::types::cards::hand::DeckType",
     "variants": [
       {
@@ -417,6 +403,20 @@
     ]
   },
   {
+    "type": "enum",
+    "name": "core::bool",
+    "variants": [
+      {
+        "name": "False",
+        "type": "()"
+      },
+      {
+        "name": "True",
+        "type": "()"
+      }
+    ]
+  },
+  {
     "type": "struct",
     "name": "pistols::models::table::TableConfig",
     "members": [
@@ -425,19 +425,23 @@
         "type": "core::felt252"
       },
       {
-        "name": "table_type",
-        "type": "pistols::models::table::TableType"
-      },
-      {
         "name": "description",
         "type": "core::felt252"
       },
       {
-        "name": "fee_collector_address",
-        "type": "core::starknet::contract_address::ContractAddress"
+        "name": "table_type",
+        "type": "pistols::models::table::TableType"
+      },
+      {
+        "name": "deck_type",
+        "type": "pistols::types::cards::hand::DeckType"
       },
       {
         "name": "fee_contract_address",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "fee_collector_address",
         "type": "core::starknet::contract_address::ContractAddress"
       },
       {
@@ -447,10 +451,6 @@
       {
         "name": "is_open",
         "type": "core::bool"
-      },
-      {
-        "name": "deck_type",
-        "type": "pistols::types::cards::hand::DeckType"
       }
     ]
   },
