@@ -21,14 +21,13 @@ export const EMOJI = {
   //
   // Actions
   PACES: '🥾',
-  PISTOL: '🔫',
   DODGE: '🛡️',
   BLADES: '⚔️',
   IDLE: '👀',
   // BladesCard
   SEPPUKU: '👹',
-  RUN_AWAY: '🏃',
-  BEHEAD: '🙃',
+  POCKET_PISTOL: '🔫',
+  BEHEAD: '🗡️',
   GRAPPLE: '🪝',
   //
   // duel

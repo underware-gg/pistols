@@ -4,7 +4,7 @@ pub enum BladesCard {
     None,
     //
     Seppuku,
-    RunAway,
+    PocketPistol,
     Behead,
     Grapple,
 }
@@ -19,7 +19,7 @@ mod BLADES_CARDS {
     // IMPORTANT: must be in sync with BladesCard
     const None: u8 = 0;
     const Seppuku: u8 = 1;
-    const RunAway: u8 = 2;
+    const PocketPistol: u8 = 2;
     const Behead: u8 = 3;
     const Grapple: u8 = 4;
 }
@@ -34,8 +34,8 @@ mod BLADES_POINTS {
         other_damage: 0,
         special: 'Suicide if survives',
     };
-    const RunAway: CardPoints = CardPoints {
-        name: 'Run Away',
+    const PocketPistol: CardPoints = CardPoints {
+        name: 'Pocket Pistol',
         self_chances: 0,
         self_damage: 0,
         other_chances: -10,
@@ -56,7 +56,7 @@ mod BLADES_POINTS {
         self_damage: 0,
         other_chances: 0,
         other_damage: -1,
-        special: 'Beats Run Away',
+        special: 'Beats Pocket Pistol',
     };
 }
 
@@ -72,11 +72,11 @@ use pistols::models::challenge::{DuelistState};
 impl BladesCardImpl of BladesCardTrait {
     fn get_points(self: BladesCard) -> CardPoints {
         match self {
-            BladesCard::Seppuku =>  BLADES_POINTS::Seppuku,
-            BladesCard::RunAway =>  BLADES_POINTS::RunAway,
-            BladesCard::Behead =>   BLADES_POINTS::Behead,
-            BladesCard::Grapple =>  BLADES_POINTS::Grapple,
-            BladesCard::None =>     Default::default(),
+            BladesCard::Seppuku =>      BLADES_POINTS::Seppuku,
+            BladesCard::PocketPistol => BLADES_POINTS::PocketPistol,
+            BladesCard::Behead =>       BLADES_POINTS::Behead,
+            BladesCard::Grapple =>      BLADES_POINTS::Grapple,
+            BladesCard::None =>         Default::default(),
         }
     }
     #[inline(always)]
@@ -87,52 +87,69 @@ impl BladesCardImpl of BladesCardTrait {
     }
     //
     // Rock-Paper-Scissors mechanic
-    // RunAway > beats > Behead
-    // Behead  > beats > Grapple
-    // Grapple > beats > RunAway
+    // PocketPistol beats Behead
+    // Behead  beats Grapple
+    // Grapple beats PocketPistol
     //
-    // returns 1: self wins, 2: other wins, 0: draw
-    fn clash(self: BladesCard, other: BladesCard) -> u8 {
+    // returns (is_dead, is_dead)
+    fn clash(self: BladesCard, other: BladesCard) -> (bool, bool) {
         match self {
-            BladesCard::RunAway => {
+            BladesCard::None => {
                 match other {
-                    BladesCard::None => 1, // wins against invalid blades
-                    BladesCard::Behead => 1,
-                    BladesCard::Grapple => 2,
-                    _ => 0,
+                    BladesCard::None =>         (false, false),
+                    BladesCard::Seppuku =>      (false, true), // Seppuku always die
+                    BladesCard::PocketPistol => (true, false), // loses to any blade
+                    BladesCard::Behead  =>      (true, false), // loses to any blade
+                    BladesCard::Grapple =>      (true, false), // loses to any blade
+                    // _ => (false, false),
+                }
+            },
+            BladesCard::Seppuku => {
+                match other {
+                    BladesCard::None =>         (true, false), // Seppuku always die
+                    BladesCard::Seppuku =>      (true, true) , // bloodbath!
+                    BladesCard::PocketPistol => (true, false), // Seppuku always die
+                    BladesCard::Behead  =>      (true, false), // Seppuku always die
+                    BladesCard::Grapple =>      (true, false), // Seppuku always die
+                    // _ => (false, false),
+                }
+            },
+            BladesCard::PocketPistol => {
+                match other {
+                    BladesCard::None =>         (false, true), // wins against invalid blades
+                    BladesCard::Seppuku =>      (false, true), // Seppuku always die
+                    BladesCard::PocketPistol => (true, true),  // bloodbath!
+                    BladesCard::Behead =>       (false, true), // PocketPistol beats Behead
+                    BladesCard::Grapple =>      (true, false), // Grapple beats PocketPistol
+                    // _ => (false, false),
                 }
             },
             BladesCard::Behead => {
                 match other {
-                    BladesCard::None => 1, // wins against invalid blades
-                    BladesCard::RunAway => 2,
-                    BladesCard::Grapple => 1,
-                    _ => 0,
+                    BladesCard::None =>         (false, true), // wins against invalid blades
+                    BladesCard::Seppuku =>      (false, true), // Seppuku always die
+                    BladesCard::PocketPistol => (true, false), // PocketPistol beats Behead
+                    BladesCard::Behead =>       (true, true),  // bloodbath!
+                    BladesCard::Grapple =>      (false, true), // Behead  beats Grapple
+                    // _ => (false, false),
                 }
             },
             BladesCard::Grapple => {
                 match other {
-                    BladesCard::None => 1, // wins against invalid blades
-                    BladesCard::RunAway => 1,
-                    BladesCard::Behead => 2,
-                    _ => 0,
+                    BladesCard::None =>         (false, true), // wins against invalid blades
+                    BladesCard::Seppuku =>      (false, true), // Seppuku always die
+                    BladesCard::PocketPistol => (false, true), // Grapple beats PocketPistol
+                    BladesCard::Behead =>       (true, false), // Behead  beats Grapple
+                    BladesCard::Grapple =>      (true, true),  // bloodbath!
+                    // _ => (false, false),
                 }
             },
-            BladesCard::None => {
-                match other {
-                    BladesCard::RunAway => 2, // loses to any blade
-                    BladesCard::Behead => 2,  // loses to any blade
-                    BladesCard::Grapple => 2, // loses to any blade
-                    _ => 0,
-                }
-            },
-            _ => 0,
         }
     }
     fn get_deck(_deck_type: DeckType) -> Span<u8> {
         (array![
             BladesCard::Seppuku.into(),
-            BladesCard::RunAway.into(),
+            BladesCard::PocketPistol.into(),
             BladesCard::Behead.into(),
             BladesCard::Grapple.into(),
         ].span())
@@ -155,7 +172,7 @@ impl BladesCardIntoU8 of Into<BladesCard, u8> {
     fn into(self: BladesCard) -> u8 {
         match self {
             BladesCard::Seppuku =>  BLADES_CARDS::Seppuku,
-            BladesCard::RunAway =>  BLADES_CARDS::RunAway,
+            BladesCard::PocketPistol =>  BLADES_CARDS::PocketPistol,
             BladesCard::Behead =>   BLADES_CARDS::Behead,
             BladesCard::Grapple =>  BLADES_CARDS::Grapple,
             _ =>                    BLADES_CARDS::None,
@@ -165,7 +182,7 @@ impl BladesCardIntoU8 of Into<BladesCard, u8> {
 impl U8IntoBladesCard of Into<u8, BladesCard> {
     fn into(self: u8) -> BladesCard {
         if self == BLADES_CARDS::Seppuku        { BladesCard::Seppuku }
-        else if self == BLADES_CARDS::RunAway  { BladesCard::RunAway }
+        else if self == BLADES_CARDS::PocketPistol  { BladesCard::PocketPistol }
         else if self == BLADES_CARDS::Behead    { BladesCard::Behead }
         else if self == BLADES_CARDS::Grapple   { BladesCard::Grapple }
         else                                    { BladesCard::None }

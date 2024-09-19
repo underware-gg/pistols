@@ -548,7 +548,7 @@ export class DuelistsManager {
       : ActionTypes.runner.includes(action) ? AnimName.TWO_STEPS
         : action == Action.Grapple ? AnimName.STRIKE_LIGHT
           : action == Action.Behead ? AnimName.STRIKE_HEAVY
-            : action == Action.RunAway ? AnimName.STRIKE_BLOCK
+            : action == Action.PocketPistol ? AnimName.STRIKE_BLOCK
               : AnimName.STILL_BLADE
 
     return result

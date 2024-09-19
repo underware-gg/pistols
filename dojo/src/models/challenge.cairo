@@ -78,14 +78,14 @@ pub struct Moves {
 
 #[derive(Copy, Drop, Serde, Default, Introspect)]
 pub struct DuelistState {
-    pub health: u8,     // CONST::FULL_HEALTH
-    pub damage: u8,     // CONST::INITIAL_CHANCE
-    pub chances: u8,    // 0-100
-    pub dice_crit: u8,  // 0-100
-    // results
+    pub chances: u8,    // 0..100
+    pub damage: u8,     // 0..CONST::INITIAL_CHANCE
+    // outcome
+    pub health: u8,     // 0..CONST::FULL_HEALTH
+    pub dice_fire: u8,  // 0..100
     pub honour: u8,     // honour granted
-    pub wager: u8,          // won the wager?
-    pub win: u8,            // won the round?
+    // TODO: REMOVE...
+    pub wager: u8,
 } // [3*8]:24
 
 
@@ -128,11 +128,9 @@ impl MovesImpl of MovesTrait {
 #[generate_trait]
 impl DuelistStateImpl of DuelistStateTrait {
     fn initialize(ref self: DuelistState, hand: PlayerHand) {
-        self.health = CONST::FULL_HEALTH;
-        self.damage = CONST::INITIAL_DAMAGE;
         self.chances = CONST::INITIAL_CHANCE;
+        self.damage = CONST::INITIAL_DAMAGE;
+        self.health = CONST::FULL_HEALTH;
         self.honour = hand.card_fire.honour();
-        self.wager = 0;
-        self.win = 0;
     }
 }

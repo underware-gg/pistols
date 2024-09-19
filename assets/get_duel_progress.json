@@ -26,7 +26,7 @@
         "health": 3,
         "damage": 1,
         "chances": 50,
-        "dice_crit": 64,
+        "dice_fire": 64,
         "honour": 40,
         "wager": 0,
         "win": 0
@@ -35,7 +35,7 @@
         "health": 3,
         "damage": 1,
         "chances": 50,
-        "dice_crit": 0,
+        "dice_fire": 0,
         "honour": 50,
         "wager": 0,
         "win": 0
@@ -67,7 +67,7 @@
         "health": 3,
         "damage": 1,
         "chances": 40,
-        "dice_crit": 64,
+        "dice_fire": 64,
         "honour": 40,
         "wager": 0,
         "win": 0
@@ -76,7 +76,7 @@
         "health": 3,
         "damage": 1,
         "chances": 40,
-        "dice_crit": 0,
+        "dice_fire": 0,
         "honour": 50,
         "wager": 0,
         "win": 0
@@ -108,7 +108,7 @@
         "health": 3,
         "damage": 3,
         "chances": 40,
-        "dice_crit": 64,
+        "dice_fire": 64,
         "honour": 40,
         "wager": 0,
         "win": 0
@@ -117,7 +117,7 @@
         "health": 3,
         "damage": 3,
         "chances": 40,
-        "dice_crit": 0,
+        "dice_fire": 0,
         "honour": 50,
         "wager": 0,
         "win": 0
@@ -149,7 +149,7 @@
         "health": 3,
         "damage": 4,
         "chances": 40,
-        "dice_crit": 64,
+        "dice_fire": 64,
         "honour": 40,
         "wager": 0,
         "win": 0
@@ -158,7 +158,7 @@
         "health": 3,
         "damage": 4,
         "chances": 40,
-        "dice_crit": 0,
+        "dice_fire": 0,
         "honour": 50,
         "wager": 0,
         "win": 0
@@ -194,7 +194,7 @@
         "health": 3,
         "damage": 5,
         "chances": 40,
-        "dice_crit": 64,
+        "dice_fire": 64,
         "honour": 40,
         "wager": 0,
         "win": 0
@@ -203,7 +203,7 @@
         "health": 3,
         "damage": 5,
         "chances": 40,
-        "dice_crit": 86,
+        "dice_fire": 86,
         "honour": 50,
         "wager": 0,
         "win": 0
@@ -239,7 +239,7 @@
         "health": 3,
         "damage": 105,
         "chances": 140,
-        "dice_crit": 64,
+        "dice_fire": 64,
         "honour": 40,
         "wager": 0,
         "win": 0
@@ -248,7 +248,7 @@
         "health": 0,
         "damage": 105,
         "chances": 140,
-        "dice_crit": 0,
+        "dice_fire": 0,
         "honour": 50,
         "wager": 0,
         "win": 0

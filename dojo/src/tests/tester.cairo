@@ -27,7 +27,7 @@ mod tester {
     use pistols::interfaces::systems::{SELECTORS};
 
     use pistols::models::challenge::{
-        Challenge, ChallengeStore, ChallengeEntity, ChallengeEntityStore,
+        Challenge, ChallengeStore, ChallengeEntity, ChallengeEntityStore, DuelistState, DuelistStateTrait,
         Wager, WagerStore, WagerEntity, WagerEntityStore,
         Round, RoundStore, RoundEntity, RoundEntityStore,
     };

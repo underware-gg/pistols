@@ -21,7 +21,7 @@ export default function IndexPage() {
             <Col><PacesIcon paces={PacesCard.Paces10} /><br />PacesIcon</Col>
             <Col><BladesIcon blade={BladesCard.None} /><br />BladesIcon</Col>
             <Col><BladesIcon blade={BladesCard.Seppuku} /><br />BladesIcon</Col>
-            <Col><BladesIcon blade={BladesCard.RunAway} /><br />BladesIcon</Col>
+            <Col><BladesIcon blade={BladesCard.PocketPistol} /><br />BladesIcon</Col>
             <Col><BladesIcon blade={BladesCard.Behead} /><br />BladesIcon</Col>
             <Col><BladesIcon blade={BladesCard.Grapple} /><br />BladesIcon</Col>
             <Col><ArchetypeIcon villainous /><br />ArchetypeIcon</Col>

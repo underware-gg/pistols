@@ -196,8 +196,6 @@ impl EnvCardImpl of EnvCardTrait {
             EnvCard::SpecialAllShotsMiss,  // dice: 32
             EnvCard::SpecialDoubleTactics, // dice: 33
             EnvCard::SpecialNoTactics,     // dice: 34
-            // used for testing
-            // EnvCard::None, // 34
         ])
     }
 }

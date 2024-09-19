@@ -26,6 +26,7 @@ mod tests {
             BIG_BOY, LITTLE_BOY, LITTLE_GIRL,
             OWNED_BY_LITTLE_BOY, OWNED_BY_LITTLE_GIRL,
             FAKE_OWNER_1_1, FAKE_OWNER_2_2,
+            _assert_is_alive, _assert_is_dead,
         }
     };
     use pistols::tests::prefabs::{prefabs,
@@ -71,12 +72,12 @@ mod tests {
         assert(final_pace.state_a.health == round.state_a.health, 'state_final_b.health');
         assert(final_pace.state_a.damage == round.state_a.damage, 'state_final_b.damage');
         assert(final_pace.state_a.chances == round.state_a.chances, 'state_final_b.chances');
-        assert(final_pace.state_a.dice_crit == round.state_a.dice_crit, 'state_final_b.dice_crit');
+        assert(final_pace.state_a.dice_fire == round.state_a.dice_fire, 'state_final_b.dice_fire');
         // state_b
         assert(final_pace.state_b.health == round.state_b.health, 'state_final_b.health');
         assert(final_pace.state_b.damage == round.state_b.damage, 'state_final_b.damage');
         assert(final_pace.state_b.chances == round.state_b.chances, 'state_final_b.chances');
-        assert(final_pace.state_b.dice_crit == round.state_b.dice_crit, 'state_final_b.dice_crit');
+        assert(final_pace.state_b.dice_fire == round.state_b.dice_fire, 'state_final_b.dice_fire');
     }
 
 
@@ -112,11 +113,11 @@ mod tests {
         assert(round.state_a.health == final_health, 'round.moves_a.health');
         assert(round.state_b.health == final_health, 'round.moves_b.health');
         if (final_health == 0) {
-            assert(round.state_a.win == 1, 'round.state_a.win=1');
-            assert(round.state_b.win == 1, 'round.state_b.win=1');
+            _assert_is_dead(round.state_a, 'dead_a');
+            _assert_is_dead(round.state_b, 'dead_b');
         } else {
-            assert(round.state_a.win == 0, 'round.state_a.win=0');
-            assert(round.state_b.win == 0, 'round.state_b.win=0');
+            _assert_is_alive(round.state_a, 'alive_a');
+            _assert_is_alive(round.state_b, 'alive_b');
         }
 
         let duelist_a = tester::get_DuelistEntity(sys.world, OWNER());
@@ -261,8 +262,8 @@ mod tests {
             assert(round.state_a.damage == CONST::FULL_HEALTH, 'a_win_damage_a');
             assert(round.state_a.health == CONST::FULL_HEALTH, 'a_win_health_a');
             assert(round.state_b.health == 0, 'a_win_health_b');
-            assert(round.state_a.win == 1, 'round.state_a.win=1');
-            assert(round.state_b.win == 0, 'round.state_a.win=0');
+            _assert_is_alive(round.state_a, 'alive_a');
+            _assert_is_dead(round.state_a, 'dead_a');
         } else if (winner == 2) {
             assert(duelist_a.score.total_wins == 0, 'b_win_duelist_a.total_wins');
             assert(duelist_b.score.total_wins == 1, 'b_win_duelist_b.total_wins');
@@ -271,8 +272,8 @@ mod tests {
             assert(round.state_b.damage == CONST::FULL_HEALTH, 'b_win_damage_b');
             assert(round.state_b.health == CONST::FULL_HEALTH, 'b_win_health_b');
             assert(round.state_a.health == 0, 'b_win_health_a');
-            assert(round.state_a.win == 0, 'round.state_a.win=0');
-            assert(round.state_b.win == 1, 'round.state_a.win=1');
+            _assert_is_alive(round.state_b, 'alive_b');
+            _assert_is_dead(round.state_a, 'dead_a');
         } else {
             assert(false, 'bad winner')
         }

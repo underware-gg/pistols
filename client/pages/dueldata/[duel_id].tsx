@@ -294,7 +294,7 @@ function MovesStats({
           <Row>
             <Cell>Crit</Cell>
             <Cell>
-              🎲 {moves.dice_crit} / {moves.chance_crit} %
+              🎲 {moves.dice_fire} / {moves.chance_crit} %
             </Cell>
           </Row>
           <Row>

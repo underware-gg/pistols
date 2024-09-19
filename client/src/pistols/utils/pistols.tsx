@@ -95,7 +95,7 @@ export enum Action {
   Paces9 = PacesCard.Paces9,
   Paces10 = PacesCard.Paces10,
   Seppuku = BladesCard.Seppuku,
-  RunAway = BladesCard.RunAway,
+  PocketPistol = BladesCard.PocketPistol,
   Behead = BladesCard.Behead,
   Grapple = BladesCard.Grapple,
 }
@@ -113,7 +113,7 @@ export const ActionNames: Record<Action, string> = {
   [Action.Paces9]: '9 Paces',
   [Action.Paces10]: '10 Paces',
   [Action.Seppuku]: 'Seppuku',
-  [Action.RunAway]: 'Run Away',
+  [Action.PocketPistol]: 'Pocket Pistol',
   [Action.Behead]: 'Behead',
   [Action.Grapple]: 'Grapple',
 }
@@ -131,25 +131,25 @@ export const ActionVerbs: Record<Action, string> = {
   [Action.Paces9]: 'Fires at',
   [Action.Paces10]: 'Fires at',
   [Action.Seppuku]: 'Commits a',
-  [Action.RunAway]: 'Tries to',
+  [Action.PocketPistol]: 'Tries to',
   [Action.Behead]: 'Commits a',
   [Action.Grapple]: 'Commits a',
 }
 
 export const ActionEmojis: Record<Action, string> = {
   [Action.Idle]: EMOJI.IDLE,
-  [Action.Paces1]: EMOJI.PISTOL,
-  [Action.Paces2]: EMOJI.PISTOL,
-  [Action.Paces3]: EMOJI.PISTOL,
-  [Action.Paces4]: EMOJI.PISTOL,
-  [Action.Paces5]: EMOJI.PISTOL,
-  [Action.Paces6]: EMOJI.PISTOL,
-  [Action.Paces7]: EMOJI.PISTOL,
-  [Action.Paces8]: EMOJI.PISTOL,
-  [Action.Paces9]: EMOJI.PISTOL,
-  [Action.Paces10]: EMOJI.PISTOL,
+  [Action.Paces1]: EMOJI.PACES,
+  [Action.Paces2]: EMOJI.PACES,
+  [Action.Paces3]: EMOJI.PACES,
+  [Action.Paces4]: EMOJI.PACES,
+  [Action.Paces5]: EMOJI.PACES,
+  [Action.Paces6]: EMOJI.PACES,
+  [Action.Paces7]: EMOJI.PACES,
+  [Action.Paces8]: EMOJI.PACES,
+  [Action.Paces9]: EMOJI.PACES,
+  [Action.Paces10]: EMOJI.PACES,
   [Action.Seppuku]: EMOJI.SEPPUKU,
-  [Action.RunAway]: EMOJI.RUN_AWAY,
+  [Action.PocketPistol]: EMOJI.POCKET_PISTOL,
   [Action.Behead]: EMOJI.BEHEAD,
   [Action.Grapple]: EMOJI.GRAPPLE,
 }
@@ -173,7 +173,7 @@ export const ActionTypes: Record<string, Action[]> = {
   ],
   runner: [
     Action.Seppuku,
-    Action.RunAway,
+    Action.PocketPistol,
   ]
 }
 
