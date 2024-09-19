@@ -22,7 +22,7 @@ mod tester {
     use pistols::types::challenge_state::{ChallengeState};
     use pistols::types::constants::{CONST};
     use pistols::types::premise::{Premise};
-    use pistols::utils::arrays::{SpanUtilsTrait};
+    use pistols::utils::arrays::{ArrayUtilsTrait, SpanUtilsTrait};
     use pistols::utils::short_string::{ShortString};
     use pistols::interfaces::systems::{SELECTORS};
 
@@ -92,6 +92,15 @@ mod tester {
         testing::set_account_contract_address(address);
     }
 
+    #[inline(always)]
+    fn _assert_is_alive(state: DuelistState, msg: felt252) {
+        assert(state.health > 0, msg);
+    }
+    #[inline(always)]
+    fn _assert_is_dead(state: DuelistState, msg: felt252) {
+        assert(state.health == 0, msg);
+    }
+
 
     //-------------------------------
     // Test world
@@ -141,20 +150,33 @@ mod tester {
         testing::set_block_number(1);
         testing::set_block_timestamp(INITIAL_TIMESTAMP);
 
-        let mock_models: Span<felt252> = array![
-            salt_value::TEST_CLASS_HASH,
-        ].span();
+        let mut namespaces: Array<ByteArray> = array![];
+        let mut models: Array<felt252> = array![];
+
+        if (deploy_minter || deploy_lords) {
+            namespaces.extend_from_span(["origami_token", "pistols"].span());
+            models.extend_from_span(get_models_test_class_hashes!(["origami_token", "pistols"]));
+        } else {
+            namespaces.extend_from_span(["pistols"].span());
+            models.extend_from_span(get_models_test_class_hashes!(["pistols"]));
+        }
+
+        if (deploy_mock_rng) {
+            // namespaces.append("mock");
+            models.extend_from_span([salt_value::TEST_CLASS_HASH].span());
+        }
 
         // deploy world
 // '---- spawn_test_world...'.print();
         // let world = spawn_test_world!();
         // let world = spawn_test_world!(["origami_token", "pistols"]);
         let world: IWorldDispatcher = spawn_test_world(
-            ["origami_token", "pistols"].span(),
-            get_models_test_class_hashes!().concat(mock_models).span(),
+            namespaces.span(),
+            models.span(),
         );
 // '---- spawned...'.print();
         world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), OWNER());
+// '---- grated...'.print();
 
         // deploy systems
         let actions = IActionsDispatcher{ contract_address:
@@ -171,6 +193,7 @@ mod tester {
             }
             else {ZERO()}
         };
+// '---- 1'.print();
         let lords = ILordsMockDispatcher{ contract_address:
             if (deploy_lords) {
                 let address = deploy_system(world, 'lords_mock', lords_mock::TEST_CLASS_HASH);
@@ -181,6 +204,7 @@ mod tester {
             }
             else {ZERO()}
         };
+// '---- 2'.print();
         let duelists = ITokenDuelistDispatcher{ contract_address:
             if (deploy_minter) {
                 let address = deploy_system(world, 'token_duelist', token_duelist::TEST_CLASS_HASH);
@@ -190,10 +214,12 @@ mod tester {
                 world.init_contract(SELECTORS::TOKEN_DUELIST, [].span());
                 (address)
             }
-            else {
+            else if (deploy_actions) {
                 (deploy_system(world, 'token_duelist', mock_token_duelist::TEST_CLASS_HASH))
             }
+            else {ZERO()}
         };
+// '---- 3'.print();
         let minter = IMinterDispatcher{ contract_address:
             if (deploy_minter) {
                 let address = deploy_system(world, 'minter', minter::TEST_CLASS_HASH);
@@ -210,6 +236,7 @@ mod tester {
             }
             else {ZERO()}
         };
+// '---- 4'.print();
         let admin = IAdminDispatcher{ contract_address:
             if (deploy_admin) {
                 let address = deploy_system(world, 'admin', admin::TEST_CLASS_HASH);
@@ -227,25 +254,30 @@ mod tester {
             }
             else {ZERO()}
         };
+// '---- 5'.print();
         let rng = IRngDispatcher{ contract_address:
             {
                 let class_hash = if (deploy_mock_rng) {mock_rng::TEST_CLASS_HASH} else {rng::TEST_CLASS_HASH};
                 let address = deploy_system(world, 'rng', class_hash);
                 world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), address);
+                // world.grant_owner(dojo::utils::bytearray_hash(@"mock"), address);
                 (address)
             }
         };
+// '---- 6'.print();
 
         // initializers
         if (deploy_lords) {
             execute_lords_faucet(@lords, OWNER());
             execute_lords_faucet(@lords, OTHER());
         }
+// '---- 7'.print();
         if (approve) {
             execute_lords_approve(@lords, OWNER(), actions.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
             execute_lords_approve(@lords, OTHER(), actions.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
             execute_lords_approve(@lords, BUMMER(), actions.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
         }
+// '---- 8'.print();
 
         impersonate(OWNER());
 

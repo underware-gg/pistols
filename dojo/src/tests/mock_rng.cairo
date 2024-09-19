@@ -4,6 +4,7 @@ use pistols::types::shuffler::{Shuffler, ShufflerTrait};
 
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
+// #[dojo::model(namespace:"mock", nomapping: true)]
 pub struct SaltValue {
     #[key]
     pub salt: felt252,
@@ -21,6 +22,7 @@ trait IRng {
 }
 
 #[dojo::contract]
+// #[dojo::contract(namespace:"mock", nomapping: true)]
 mod rng {
     use super::IRng;
     use debug::PrintTrait;
