@@ -263,7 +263,7 @@ mod tests {
             assert(round.state_a.health == CONST::FULL_HEALTH, 'a_win_health_a');
             assert(round.state_b.health == 0, 'a_win_health_b');
             _assert_is_alive(round.state_a, 'alive_a');
-            _assert_is_dead(round.state_a, 'dead_a');
+            _assert_is_dead(round.state_b, 'dead_b');
         } else if (winner == 2) {
             assert(duelist_a.score.total_wins == 0, 'b_win_duelist_a.total_wins');
             assert(duelist_b.score.total_wins == 1, 'b_win_duelist_b.total_wins');

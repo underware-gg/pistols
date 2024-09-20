@@ -33,20 +33,20 @@ mod tests {
         let mut dice: Dice = DiceTrait::new(@sys.world, 0x1212121212, 34);
         sys.rng.mock_values(
             ['dice_1', 'dice_2', 'dice_3', 'shuffle_1', 'shuffle_2', 'shuffle_3'].span(),
-            [11, 22, 33, 44, 55, 66].span(),
+            [1, 22, 34, 1, 22, 34].span(),
         );
         let d1 = dice.throw('dice_1', 100);
         let d2 = dice.throw('dice_2', 100);
         let d3 = dice.throw('dice_3', 100);
-        assert(d1 == 11, 'dice_1');
+        assert(d1 == 1, 'dice_1');
         assert(d2 == 22, 'dice_2');
-        assert(d3 == 33, 'dice_3');
+        assert(d3 == 34, 'dice_3');
         let s1 = dice.shuffle_draw('shuffle_1');
         let s2 = dice.shuffle_draw('shuffle_2');
         let s3 = dice.shuffle_draw('shuffle_3');
-        assert(s1 == 44, 'shuffle_1');
-        assert(s2 == 55, 'shuffle_2');
-        assert(s3 == 66, 'shuffle_3');
+        assert(s1 == 1, 'shuffle_1');
+        assert(s2 == 22, 'shuffle_2');
+        assert(s3 == 34, 'shuffle_3');
     }
 
     #[test]
