@@ -9,6 +9,7 @@ import { LordsBalance } from '@/pistols/components/account/LordsBalance'
 import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
+import { _useConnector } from '@/lib/dojo/fix/starknet_react_core'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -16,9 +17,10 @@ const Col = Grid.Column
 export default function WalletHeader({
 }) {
   const { disconnect } = useDisconnect()
-  const { account, address, connector, isConnected } = useAccount()
+  const { account, address, isConnected } = useAccount()
   const { connectedChainName } = useSelectedChain()
   const { contractAddress: lordsContractAddress } = useLordsContract()
+  const { connector } = _useConnector()
 
   // BUG: https://github.com/apibara/starknet-react/issues/419
   // const { data, error, isLoading } = useStarkProfile({ address, enabled: false })

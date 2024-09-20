@@ -9,6 +9,7 @@ import { useContractClassHash } from '@/lib/utils/hooks/useContractClassHash'
 import { BigNumberish } from 'starknet'
 import { bigintEquals, bigintToHex } from '@/lib/utils/types'
 import { stringToFelt } from '@/lib/utils/starknet'
+import { _useConnector } from '../fix/starknet_react_core'
 
 // sync from here:
 // https://github.com/cartridge-gg/controller/blob/main/packages/account-wasm/src/constants.rs
@@ -69,7 +70,9 @@ export const useControllerConnector = (manifest: DojoManifest, rpcUrl: string, n
 
 
 export const useConnectedController = () => {
-  const { connector } = useAccount()
+  // const { connector } = useAccount()
+  const { connector } = _useConnector()
+  
   const controllerConnector = useMemo(() => (
     connector?.id == supportedConnetorIds.CONTROLLER ? connector as unknown as CartridgeConnector : undefined
   ), [connector])
