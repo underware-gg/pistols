@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react'
 import { Container, Table, Button, Image } from 'semantic-ui-react'
 import { ArraySignatureType, TypedData } from 'starknet'
-import { useAccount, useDisconnect } from '@starknet-react/core'
+import { useAccount, useDisconnect, useNetwork } from '@starknet-react/core'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
@@ -83,7 +83,8 @@ function DojoAccount() {
 
 
 function Connect() {
-  const { address, isConnecting, isConnected, connector, chainId } = useAccount()
+  const { address, isConnecting, isConnected, connector } = useAccount()
+  const { chain } = useNetwork()
   const { disconnect } = useDisconnect()
   const { connectOpener } = usePistolsContext()
   return (
@@ -108,7 +109,7 @@ function Connect() {
             <Cell>wallet</Cell>
             <Cell className='Code'>
               {connector && <>
-                <Image className='ProfilePicSmall' spaced src={connector.icon.dark} /> {connector.name}
+                <Image className='ProfilePicSmall' spaced src={connector.icon} /> {connector.name}
               </>}
 
             </Cell>
@@ -116,8 +117,8 @@ function Connect() {
           <Row>
             <Cell>Chain Id</Cell>
             <Cell className='Code'>
-              {chainId && <>
-                {bigintToHex(chainId)} : {feltToString(chainId)}
+              {chain && <>
+                {bigintToHex(chain.id)} : {feltToString(chain.id)}
               </>}
             </Cell>
           </Row>
@@ -136,7 +137,8 @@ function Connect() {
 
 
 function SignV0() {
-  const { account, isConnected, chainId } = useAccount()
+  const { account, isConnected } = useAccount()
+  const { chain } = useNetwork()
 
   const messages: Messages = useMemo(() => ({
     game: 'PISTOLS_AT_10_BLOCKS',
@@ -145,7 +147,7 @@ function SignV0() {
   const { typedMessage, messageHash } = useTypedMessage({
     revision: 0,
     messages,
-    chainId,
+    chainId: chain.id,
     account,
   })
   const { sign, signAsync, isSigning, rawSignature, signaturePair } = useSignTypedMessage(typedMessage)
@@ -168,7 +170,8 @@ function SignV0() {
 }
 
 function SignV1() {
-  const { account, isConnected, chainId } = useAccount()
+  const { account, isConnected } = useAccount()
+  const { chain } = useNetwork()
 
   const messages: Messages = useMemo(() => ({
     game: 'PISTOLS_AT_10_BLOCKS',
@@ -177,7 +180,7 @@ function SignV1() {
   const { typedMessage, messageHash } = useTypedMessage({
     account,
     revision: 1,
-    chainId,
+    chainId: chain.id,
     messages,
   })
   const { sign, signAsync, isSigning, rawSignature, signaturePair } = useSignTypedMessage(typedMessage)

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Button, ButtonGroup, Divider, Grid, Modal, Pagination } from 'semantic-ui-react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount, useNetwork } from '@starknet-react/core'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
@@ -23,7 +23,8 @@ export default function CommitPacesModal({
   duelId: bigint
   roundNumber?: number
 }) {
-  const { account, chainId } = useAccount()
+  const { account } = useAccount()
+  const { chain } = useNetwork()
   const { duelistId } = useSettings()
   const { commit_moves } = useDojoSystemCalls()
   const { dispatchSetMoves } = usePistolsContext()
@@ -52,7 +53,7 @@ export default function CommitPacesModal({
     if (canSubmit) {
       setIsSubmitting(true)
       const moves = [firePaces, dodgePaces, tactics, blades]
-      const { hash, salt } = await signAndGenerateMovesHash(account, feltToString(chainId), messageToSign, moves)
+      const { hash, salt } = await signAndGenerateMovesHash(account, feltToString(chain.id), messageToSign, moves)
       if (hash && salt) {
         await commit_moves(account, duelistId, duelId, roundNumber, hash)
         dispatchSetMoves(messageToSign, moves, salt)

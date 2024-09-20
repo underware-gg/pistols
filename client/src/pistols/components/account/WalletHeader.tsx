@@ -28,7 +28,7 @@ export default function WalletHeader({
   const data = { name: null, profilePicture: null }
 
   const name = useMemo(() => (data?.name ?? `Connected to ${connectedChainName}`), [data])
-  const imageUrl = useMemo(() => (data?.profilePicture ?? connector?.icon?.dark ?? '/profiles/square/00.jpg'), [data, connector])
+  const imageUrl = useMemo(() => (data?.profilePicture ?? connector?.icon ?? '/profiles/square/00.jpg'), [data, connector])
 
   const { username } = useControllerUser()
   const { openMenu } = useControllerMenu()

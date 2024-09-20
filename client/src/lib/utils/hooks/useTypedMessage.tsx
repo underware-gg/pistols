@@ -53,7 +53,7 @@ export type UseSignTypedMessageResult = {
   signaturePair: bigint[]
 }
 export const useSignTypedMessage = (typedMessage: TypedData): UseSignTypedMessageResult => {
-  const SSS = useSignTypedData(typedMessage)
+  const SSS = useSignTypedData({ params: typedMessage })
   const { data, signTypedData, signTypedDataAsync, isPending, isSuccess, isError, isIdle } = SSS
   // console.log(`SIGN:`, isPending, isSuccess, isError, isIdle, data )
   const signaturePair = useMemo(() => splitSignature(data), [data])

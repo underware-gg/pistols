@@ -61,7 +61,7 @@ function ConnectButtons({
           onClick={() => connect({ connector })}
         >
           {connector.name}
-          <Image spaced className='Square20' src={connector.icon.dark} style={{ maxHeight: '1em' }} />
+          <Image spaced className='Square20' src={connector.icon} style={{ maxHeight: '1em' }} />
         </Button>
       )
     }
