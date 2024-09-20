@@ -225,6 +225,8 @@ canvas {
 .BgBlack     { background-color: #444; }
 .BgImportant { background-color: $color-medium-bg!important; }
 .BgBrightest { background-color: $color-brightest!important; }
+.BgDark      { background-color: $color-dark!important; }
+.BgDarkest   { background-color: $color-darkest!important; }
 .BgPositive  { background-color: $color-positive!important; }
 .BgNegative  { background-color: $color-negative!important; }
 .BgWarning   { background-color: $color-warning!important; }

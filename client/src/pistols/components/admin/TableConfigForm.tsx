@@ -11,7 +11,7 @@ import { Balance } from '@/pistols/components/account/Balance'
 import { bigintToEntity, bigintToHex, isBigint, isNumeric } from '@/lib/utils/types'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { feltToString, STARKNET_ADDRESS_LENGTHS, stringToFelt } from '@/lib/utils/starknet'
-import { TableTypeNameToValue, CONFIG } from '@/games/pistols/generated/constants'
+import { TableTypeNameToValue, CONFIG, DeckTypeNameToValue } from '@/games/pistols/generated/constants'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -27,6 +27,7 @@ enum FieldType {
   Number,
   Boolean,
   TableType,
+  DeckType,
 }
 
 type FormSchema = {
@@ -45,6 +46,7 @@ const config_schema: FormSchema = {
 const table_config_schema: FormSchema = {
   table_id: { type: FieldType.ShortString, isKey: true },
   table_type: { type: FieldType.TableType },
+  deck_type: { type: FieldType.DeckType },
   description: { type: FieldType.ShortString },
   fee_collector_address: { type: FieldType.Address },
   fee_contract_address: { type: FieldType.Address },
@@ -79,7 +81,7 @@ export const ConfigForm = ({
 export const TableConfigForm = ({
 }: {
   }) => {
-  const [tableId, setTableId] = useState()
+  const [tableId, setTableId] = useState<string>()
 
   const { TableConfig } = useDojoComponents()
   const entityKey = useMemo(() => (tableId ? bigintToEntity(stringToFelt(tableId)) : null), [tableId])
@@ -92,7 +94,7 @@ export const TableConfigForm = ({
 
   return (
     <div>
-      <TableSwitcher tableId={tableId} setSelectedTableId={setTableId} />
+      <TableSwitcher selectedTableId={tableId} setSelectedTableId={setTableId} />
       <ComponentForm
         schema={table_config_schema}
         component={TableConfig}
@@ -227,6 +229,15 @@ export const Field = ({
               {value}
               <FormSelectFromMap
                 map={TableTypeNameToValue}
+                label={name}
+                disabled={readOnly}
+                value={value}
+                setValue={setValue}
+              />
+            </> : fieldType == FieldType.DeckType ? <>
+              {value}
+              <FormSelectFromMap
+                map={DeckTypeNameToValue}
                 label={name}
                 disabled={readOnly}
                 value={value}
