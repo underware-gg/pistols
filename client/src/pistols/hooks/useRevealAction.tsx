@@ -24,9 +24,9 @@ export function useSignAndRestoreMovesFromHash(duelId: bigint, roundNumber: numb
   const [moves, setMoves] = useState<number[]>()
   const hand = useMemo(() => (moves ? movesToHand(moves) : null), [moves])
 
-  const { moves: knownMoves, dispatchSetMoves, makeMoveKey } = usePistolsContext()
+  const { moves: knownMoves, dispatchSetMoves, makeStoredMovesKey } = usePistolsContext()
   useEffect(() => {
-    const sotredMoves = knownMoves[makeMoveKey(messageToSign)]
+    const sotredMoves = knownMoves[makeStoredMovesKey(messageToSign)]
     // console.log(`>>> stored_moves:`, _moves)
     if (sotredMoves) {
       setSalt(sotredMoves.salt)

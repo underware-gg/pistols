@@ -185,8 +185,8 @@ export { PistolsProvider, PistolsContext, PistolsActions }
 // Hooks
 //
 
-const makeMoveKey = (message: CommitMoveMessage): string => {
-  return bigintToHex(poseidon([message.duelId, message.roundNumber, message.duelistId]))
+const makeStoredMovesKey = (message: CommitMoveMessage): string => {
+  return message ? bigintToHex(poseidon([message.duelId, message.roundNumber, message.duelistId])) : null
 }
 
 export const usePistolsContext = () => {
@@ -222,9 +222,14 @@ export const usePistolsContext = () => {
     })
   }
   const dispatchSetMoves = (message: CommitMoveMessage, moves: number[], salt: bigint ) => {
+    const key = makeStoredMovesKey(message)
+    if (!key) {
+      console.warn(`dispatchSetMoves: Invalid message [${message}] [${salt}]`)
+      return
+    }
     dispatch({
       type: PistolsActions.SET_MOVES,
-      payload: { [makeMoveKey(message)]: { moves, salt } },
+      payload: { [key]: { moves, salt } },
     })
   }
   return {
@@ -239,7 +244,7 @@ export const usePistolsContext = () => {
     dispatchChallengingDuelistId,
     dispatchDuelistsAnon,
     dispatchSetMoves,
-    makeMoveKey,
+    makeStoredMovesKey,
   }
 }
 
