@@ -24,12 +24,24 @@ const nextConfig = {
         destination: '/main/gate',
       },
       {
+        source: '/tavern/:slug*',
+        destination: '/main/tavern/:slug*',
+      },
+      {
         source: '/profile/:slug*',
         destination: '/main/profile/:slug*',
       },
       {
-        source: '/tavern/:slug*',
-        destination: '/main/tavern/:slug*',
+        source: '/duelists/:slug*',
+        destination: '/main/duelists/:slug*',
+      },
+      {
+        source: '/duels/:slug*',
+        destination: '/main/duels/:slug*',
+      },
+      {
+        source: '/graveyard/:slug*',
+        destination: '/main/graveyard/:slug*',
       },
       {
         source: '/duel/:slug*',

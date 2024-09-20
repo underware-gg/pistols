@@ -755,6 +755,7 @@ export function resetStaticScene() {
   if (_tweens.staticFade) TWEEN.remove(_tweens.staticFade)
 
   let bg = _currentScene.getObjectByName('bg') as THREE.Mesh
+  console.log(`SCENE>>>>>>>>`, _currentScene)
 
   // zoom out
   let from = 1.1

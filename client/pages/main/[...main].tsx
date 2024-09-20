@@ -1,6 +1,6 @@
 import React from 'react'
 import { useRouterStarter, useRouterListener } from '@/pistols/hooks/useRouterListener'
-import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene, usePistolsSceneRoute } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { usePlayerId } from '@/lib/dojo/hooks/usePlayerId'
@@ -22,7 +22,8 @@ export default function MainPage() {
   // let's initialzie player id always, it is a random client identifier
   const { playerId } = usePlayerId()
   // this hook will parse slugs and manage the current scene
-  const { currentScene, sceneTitle } = usePistolsScene(true)
+  usePistolsSceneRoute()
+  const { sceneTitle } = usePistolsScene()
 
   // console.log(`AT scene [${currentScene}]`)
 
@@ -42,8 +43,10 @@ function MainUI({
   useRouterListener()
   const { gameImpl } = useThreeJsContext()
   const { selectedDuelId } = usePistolsContext()
-  const { atGate, atProfile, atTavern, atDuel, currentScene } = usePistolsScene()
+  const { currentScene, atGate, atProfile, atTavern, atDuel } = usePistolsScene()
   const { isInitialized } = useDojoStatus()
+
+  console.log(`currentScene: ${currentScene}`, atGate, atProfile, atTavern, atDuel)
 
   // wait for three.js to load
   if (!gameImpl) return <></>

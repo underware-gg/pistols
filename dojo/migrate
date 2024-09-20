@@ -53,7 +53,7 @@ fi
 set -e # enable exit on error
 
 echo ">>> Migrate apply..."
-sozo -P $PROFILE migrate apply --world $WORLD_ADDRESS
+sozo -P $PROFILE migrate apply -vvv --world $WORLD_ADDRESS
 echo "👍"
 
 #-----------------
