@@ -125,7 +125,6 @@ let _cardTextures: any = {}
 let _spriteSheets: any = {}
 
 export let _renderer: THREE.WebGLRenderer
-let _fullScreenBackground: THREE.Mesh = null
 
 let _animationRequest = null
 let _clock: THREE.Clock
@@ -733,11 +732,11 @@ function setupStaticScene(sceneName) {
   const width = height * ASPECT
   const fullScreenGeom = new THREE.PlaneGeometry(width, height)
 
-  _fullScreenBackground = new THREE.Mesh(fullScreenGeom, bg_mat)
-  _fullScreenBackground.name = 'bg'
-  _fullScreenBackground.renderOrder = 9999
-  _fullScreenBackground.position.set(0, 0, bgDistance)
-  scene.add(_fullScreenBackground)
+  let bg = new THREE.Mesh(fullScreenGeom, bg_mat)
+  bg.name = 'bg'
+  bg.renderOrder = 9999
+  bg.position.set(0, 0, bgDistance)
+  scene.add(bg)
 
   scene.add(_staticCamera)
 
@@ -755,16 +754,18 @@ export function resetStaticScene() {
   if (_tweens.staticZoom) TWEEN.remove(_tweens.staticZoom)
   if (_tweens.staticFade) TWEEN.remove(_tweens.staticFade)
 
+  let bg = _currentScene.getObjectByName('bg') as THREE.Mesh
+
   // zoom out
   let from = 1.1
-  _fullScreenBackground.scale.set(from, from, from)
-  _tweens.staticZoom = new TWEEN.Tween(_fullScreenBackground.scale)
+  bg.scale.set(from, from, from)
+  _tweens.staticZoom = new TWEEN.Tween(bg.scale)
     .to({ x: 1, y: 1, z: 1 }, 60_000)
     .easing(TWEEN.Easing.Cubic.Out)
     .start()
 
   // fade in
-  let mat = _fullScreenBackground.material as THREE.MeshBasicMaterial
+  let mat = bg.material as THREE.MeshBasicMaterial
   mat.color = new THREE.Color(0.25, 0.25, 0.25)
   _tweens.staticFade = new TWEEN.Tween(mat.color)
     .to({ r: 1, g: 1, b: 1 }, 2_000)
@@ -783,7 +784,6 @@ export function resetStaticScene() {
 export function switchScene(sceneName) {
   _sceneName = sceneName
   _currentScene = _scenes[sceneName]
-  _fullScreenBackground.visible = sceneName != SceneName.Duel
   if (sceneName != SceneName.Duel) {
     resetStaticScene()
     _duelistManager.hideElements()
@@ -1006,7 +1006,6 @@ export function dispose() {
   _round1Animated = false
   _round2Animated = false
   _round3Animated = false
-  _fullScreenBackground = null
   _clock = null
 }
 
