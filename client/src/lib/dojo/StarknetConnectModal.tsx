@@ -3,6 +3,7 @@ import { Modal, Button, Image } from 'semantic-ui-react'
 import { useConnect, Connector, useAccount } from '@starknet-react/core'
 import { useChainSwitchCallbacks, useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
+import { getConnectorIcon } from '@/lib/dojo/setup/connectors'
 import { Opener } from '@/lib/ui/useOpener'
 import { VStack } from '@/lib/ui/Stack'
 import { Divider } from '@/lib/ui/Divider'
@@ -61,7 +62,7 @@ function ConnectButtons({
           onClick={() => connect({ connector })}
         >
           {connector.name}
-          <Image spaced className='Square20' src={connector.icon} style={{ maxHeight: '1em' }} />
+          <Image spaced className='Square20' src={getConnectorIcon(connector)} style={{ maxHeight: '1em' }} />
         </Button>
       )
     }

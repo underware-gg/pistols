@@ -16,6 +16,12 @@ export const supportedConnetorIds = {
   DOJO_PREDEPLOYED: DojoPredeployedStarknetWindowObject.getId(),
 }
 
+export const getConnectorIcon = (connector: Connector): string  => {
+  if (!connector) return null
+  if (typeof connector.icon === 'string') return connector.icon
+  return connector.icon.dark
+}
+
 export const useChainConnectors = (dojoAppConfig: DojoAppConfig, chainConfig: DojoChainConfig) => {
 
   // Cartridge Controller

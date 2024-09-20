@@ -1,16 +1,14 @@
 import React, { useMemo } from 'react'
-import { Grid, Icon, Image } from 'semantic-ui-react'
+import { Grid, Image } from 'semantic-ui-react'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useLordsContract } from '@/lib/dojo/hooks/useLords'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
+import { useControllerMenu, useControllerUser } from '@/lib/dojo/hooks/useController'
+import { getConnectorIcon } from '@/lib/dojo/setup/connectors'
 import { LordsBalance } from '@/pistols/components/account/LordsBalance'
 import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { MusicToggle } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { useControllerMenu, useControllerUser } from '@/lib/dojo/hooks/useController'
-import { ConnectButton, EnterAsGuestButton } from '@/pistols/components/ScGate'
-import { Divider } from '@/lib/ui/Divider'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -28,7 +26,7 @@ export default function WalletHeader({
   const data = { name: null, profilePicture: null }
 
   const name = useMemo(() => (data?.name ?? `Connected to ${connectedChainName}`), [data])
-  const imageUrl = useMemo(() => (data?.profilePicture ?? connector?.icon ?? '/profiles/square/00.jpg'), [data, connector])
+  const imageUrl = useMemo(() => (data?.profilePicture ?? getConnectorIcon(connector) ?? '/profiles/square/00.jpg'), [data, connector])
 
   const { username } = useControllerUser()
   const { openMenu } = useControllerMenu()

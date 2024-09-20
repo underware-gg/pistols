@@ -13,6 +13,7 @@ import { ChainSwitcher } from '@/lib/dojo/ChainSwitcher'
 import { Messages } from '@/lib/utils/starknet_sign'
 import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import App from '@/lib/ui/App'
+import { getConnectorIcon } from '@/lib/dojo/setup/connectors'
 
 //@ts-ignore
 BigInt.prototype.toJSON = function () { return bigintToHex(this) }
@@ -109,7 +110,7 @@ function Connect() {
             <Cell>wallet</Cell>
             <Cell className='Code'>
               {connector && <>
-                <Image className='ProfilePicSmall' spaced src={connector.icon} /> {connector.name}
+                <Image className='ProfilePicSmall' spaced src={getConnectorIcon(connector)} /> {connector.name}
               </>}
 
             </Cell>
