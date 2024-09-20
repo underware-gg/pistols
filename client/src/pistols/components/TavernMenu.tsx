@@ -28,10 +28,10 @@ const _makeBubble = (count) => {
 
 export function TavernMenu({
 }) {
-  const { tableId, isAnon } = useSettings()
-  const { tavernMenuItems, tableOpener } = usePistolsContext()
-  const { currentScene, dispatchSetScene } = usePistolsScene()
-  const { description, isTournament, isIRLTournament } = useTable(tableId)
+  const { tableId } = useSettings()
+  const { tavernMenuItems } = usePistolsContext()
+  const { atTavern, currentScene, dispatchSetScene } = usePistolsScene()
+  const { isTournament, isIRLTournament } = useTable(tableId)
 
   const {
     queryLiveDuels: { liveCount: liveDuelsCount },
@@ -74,6 +74,25 @@ export function TavernMenu({
 
   const menuIndex = panes.findIndex(pane => (pane.key == currentScene))
 
+  // if (atTavern) {
+  //   return <></>
+  // }
+
+  return (
+    <div className='UIContainer'>
+      <Tab activeIndex={menuIndex} menu={{ secondary: true, pointing: true, attached: true }} panes={panes} />
+    </div>
+  )
+}
+
+
+export function TavernHeader({
+}) {
+  const { tableId } = useSettings()
+  const { tableOpener } = usePistolsContext()
+  const { dispatchSetScene } = usePistolsScene()
+  const { description } = useTable(tableId)
+
   const _changeTable = () => {
     tableOpener.open()
   }
@@ -88,35 +107,29 @@ export function TavernMenu({
   }
 
   return (
-    <>
-      <Grid>
-        <Row className='ProfilePicHeight Unselectable'>
-          <Col width={7} verticalAlign='top' className='TitleCase NoBreak Padded Relative'>
-            <h2>Pistols at 10 Blocks</h2>
-            <h3>
-              <IconClick name='ticket' size={'small'} onClick={() => _changeTable()} />
-              {' '}
-              <b className='Smaller Important'>{description}</b>
-            </h3>
-          </Col>
-          <Col width={9} textAlign='right'>
-            <AccountHeader />
-          </Col>
-        </Row>
-      </Grid>
-
-      <div className='Relative'>
-
-        <div className='AbsoluteRight PaddedDouble'>
-          <MusicToggle />
-          &nbsp;&nbsp;
-          &nbsp;&nbsp;
-          <IconClick name='sign out' size={'large'} onClick={() => _exit()} />
-          &nbsp;&nbsp;&nbsp;
-        </div>
-
-        <Tab activeIndex={menuIndex} menu={{ secondary: true, pointing: true, attached: true }} panes={panes} />
-      </div>
-    </>
+    <Grid stackable className='UIHeader'>
+      <Row columns={'equal'}>
+        <Col textAlign='left' verticalAlign='top'>
+        </Col>
+        <Col textAlign='center' verticalAlign='top' className='TitleCase NoBreak Padded Relative'>
+          <h2>Pistols at 10 Blocks</h2>
+          <h3>
+            <IconClick name='ticket' size={'small'} onClick={() => _changeTable()} />
+            {' '}
+            <b className='Smaller Important'>{description}</b>
+          </h3>
+        </Col>
+        <Col textAlign='right' verticalAlign='top'>
+          <AccountHeader />
+          <div className='UIIconMenu PaddedDouble'>
+            <MusicToggle />
+            &nbsp;&nbsp;
+            &nbsp;&nbsp;
+            <IconClick name='sign out' size={'large'} onClick={() => _exit()} />
+            &nbsp;&nbsp;&nbsp;
+          </div>
+        </Col>
+      </Row>
+    </Grid>
   )
 }

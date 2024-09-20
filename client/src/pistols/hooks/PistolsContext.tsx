@@ -324,8 +324,9 @@ export const usePistolsScene = () => {
     tavernMenuItems,
     // helpers
     atGate: (currentScene == SceneName.Gate),
+    // atTavern: (currentScene == SceneName.Tavern || tavernMenuItems.includes(currentScene)),
+    atTavern: (currentScene == SceneName.Tavern),
     atProfile: (currentScene == SceneName.Profile),
-    atTavern: (currentScene == SceneName.Tavern || tavernMenuItems.includes(currentScene)),
     atDuel: (currentScene == SceneName.Duel),
     fromGate: (lastScene == SceneName.Gate),
     // PistolsActions,

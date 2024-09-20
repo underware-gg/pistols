@@ -341,6 +341,11 @@ canvas {
   -webkit-filter: sepia(1); /* Old WebKit */
 }
 
+.FillViewport {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
 .FillWidth80 {
   width: 80%!important;
   min-width: 80%;
@@ -664,35 +669,26 @@ $profile-pic-width: 80px;
 $ui-container-gap: 1em;
 
 .UIContainer {
+  background-image: linear-gradient(to right, #000a, transparent);
   width: 100%;
   height: 100%;
   position: absolute;
   top: 0px;
   left: 0px;
-}
-.UIContainerDesktop {
-  @extend .UIContainer;
-  // background-color: #f008;
-  background-image: linear-gradient(to right, #0008, #0004, transparent);
-  background-color: #0004; // For browsers that do not support gradients
+  padding: 65px 1em!important;
+  margin: 0!important;
   padding: $ui-container-gap;
   min-width: $menu-width;
   max-width: $menu-width;
-  width: $menu-width;
 }
 // descendent of #Gate
-#Gate .UIContainerDesktop {
+#Gate .UIContainer {
   // @extend .UIContainerDesktop;
   min-width: 450px;
   max-width: 450px;
   width: 450px;
   padding: 1em;
 }
-.UIContainerMobile {
-  @extend .UIContainer;
-  background-color: #0004; // For browsers that do not support gradients
-}
-
 .UIMenuTavernScroller {
   @extend .Scroller;
   width: 100%;
@@ -703,6 +699,19 @@ $ui-container-gap: 1em;
   height: calc($aspect-h - 12px - 285px - 12px - 41px - 12px);
   // height: 100%;
   // background-color: red;
+}
+.UIHeader {
+  background-image: linear-gradient(to bottom, #0008, #0004, transparent);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: $profile-pic-width;
+}
+.UIIconMenu {
+  position: absolute;
+  right: 0;
+  top: 100%;
 }
 
 .TitleCase {

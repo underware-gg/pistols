@@ -9,7 +9,6 @@ import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/P
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { Divider } from '@/lib/ui/Divider'
 import { PACKAGE_VERSION } from '@/pistols/utils/constants'
-import UIContainer from '@/pistols/components/UIContainer'
 import Logo from '@/pistols/components/Logo'
 import { useIsMyDuelist } from '../hooks/useIsYou'
 
@@ -26,10 +25,10 @@ export default function ScGate() {
 
   return (
     <div id='Gate'>
-      <UIContainer>
+      <div className='UIContainer'>
         <GateHeader />
         <GateMenu />
-      </UIContainer>
+      </div>
 
       <CurrentChainHint />
     </div>

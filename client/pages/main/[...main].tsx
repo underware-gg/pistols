@@ -43,10 +43,8 @@ function MainUI({
   useRouterListener()
   const { gameImpl } = useThreeJsContext()
   const { selectedDuelId } = usePistolsContext()
-  const { currentScene, atGate, atProfile, atTavern, atDuel } = usePistolsScene()
+  const { atGate, atProfile, atTavern, atDuel } = usePistolsScene()
   const { isInitialized } = useDojoStatus()
-
-  console.log(`currentScene: ${currentScene}`, atGate, atProfile, atTavern, atDuel)
 
   // wait for three.js to load
   if (!gameImpl) return <></>
@@ -54,13 +52,11 @@ function MainUI({
   // wait for Dojo to load
   if (!isInitialized) return <DojoStatus message={'Loading Pistols...'} />
 
-  // load Game Scene
+  // standalone scenes
   if (atGate) return <Gate />
-  if (atProfile) return <ScProfile />
-  if (atTavern) return <ScTavern />
   if (atDuel && selectedDuelId) return <Duel duelId={selectedDuelId} />
+  if (atProfile) return <ScProfile />
 
-  // ????
-  console.warn(`UNKNOWN SCENE [${currentScene}]`)
+  // Tavern
   return <ScTavern />
 }

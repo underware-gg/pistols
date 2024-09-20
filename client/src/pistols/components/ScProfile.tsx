@@ -17,7 +17,6 @@ import { Divider } from '@/lib/ui/Divider'
 import { IconClick } from '@/lib/ui/Icons'
 import WalletHeader from '@/pistols/components/account/WalletHeader'
 import DuelistEditModal from '@/pistols/components/DuelistEditModal'
-import UIContainer from '@/pistols/components/UIContainer'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -42,7 +41,7 @@ export default function ScProfile() {
 
   return (
     <div id='Gate'>
-      <UIContainer>
+      <div className='UIContainer'>
         <WalletHeader />
         <Tab
           menu={{ secondary: true, pointing: true, attached: true }}
@@ -58,7 +57,7 @@ export default function ScProfile() {
           ]}
         >
         </Tab>
-      </UIContainer>
+      </div>
 
       <DuelistEditModal opener={duelistEditOpener} />
       <CurrentChainHint />
