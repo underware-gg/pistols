@@ -3,7 +3,7 @@ import { QueryProvider } from '@/pistols/hooks/QueryContext'
 import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { TavernAudios } from '@/pistols/components/GameContainer'
 import { TavernMenu } from '@/pistols/components/TavernMenu'
-import { TavernHeader } from '@/pistols/components/TavernHeader'
+import { Header } from '@/pistols/components/Header'
 import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionDetector'
 import TableModal from '@/pistols/components/TableModal'
 import DuelistModal from '@/pistols/components/DuelistModal'
@@ -26,7 +26,7 @@ export default function ScTavern() {
     <QueryProvider>
 
       <TavernMenu />
-      <TavernHeader />
+      <Header />
 
       <TableModal opener={tableOpener} />
       <DuelistModal />

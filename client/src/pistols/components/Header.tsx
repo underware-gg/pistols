@@ -26,11 +26,16 @@ function useExit() {
   }
 }
 
-export function TavernHeader() {
+export function Header({
+  account = true,
+  tables = true,
+}: {
+  account?: boolean
+  tables?: boolean
+}) {
   const { tableId } = useSettings()
   const { tableOpener } = usePistolsContext()
   const { description } = useTable(tableId)
-  const { exit } = useExit()
 
   const _changeTable = () => {
     tableOpener.open()
@@ -40,17 +45,21 @@ export function TavernHeader() {
     <Grid stackable className='UIHeader NoSelection'>
       <Row>
         <Col width={6} verticalAlign='middle' className='Padded'>
-          <AccountHeader />
+          {account &&
+            <AccountHeader />
+          }
         </Col>
         <Col width={2}>
         </Col>
 
         <Col width={6} textAlign='center' verticalAlign='middle' className='TitleCase NoBreak Padded Relative'>
-          <h1>Pistols at 10 Blocks</h1>
-          <p className='AlignTop'>
-            <IconClick name='ticket' size={'big'} onClick={() => _changeTable()} style={{ marginBottom: '0.4em' }} />
-            {' '}<b className='Important H3 Anchor' onClick={() => _changeTable()}>{description}</b>
-          </p>
+          {tables && <>
+            <h1>Pistols at 10 Blocks</h1>
+            <p className='AlignTop'>
+              <IconClick name='ticket' size={'big'} onClick={() => _changeTable()} style={{ marginBottom: '0.4em' }} />
+              {' '}<b className='Important H3 Anchor' onClick={() => _changeTable()}>{description}</b>
+            </p>
+          </>}
         </Col>
         <Col width={1} textAlign='right' verticalAlign='middle'>
           <MusicToggle size='big' />
@@ -83,7 +92,6 @@ function NavigationMenu() {
       icon='home'
       button
       simple
-      onClick={() => _changeScene(SceneName.Tavern)}
     >
       <Dropdown.Menu>
         <Dropdown.Item icon={null} text='Tavern' onClick={() => _changeScene(SceneName.Tavern)} />

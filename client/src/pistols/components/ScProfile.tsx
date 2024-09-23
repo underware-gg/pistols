@@ -15,6 +15,7 @@ import { ConnectButton, CurrentChainHint, EnterAsGuestButton } from '@/pistols/c
 import { SocialsList } from '@/pistols/components/SocialsList'
 import { Divider } from '@/lib/ui/Divider'
 import { IconClick } from '@/lib/ui/Icons'
+import { Header } from '@/pistols/components/Header'
 import WalletHeader from '@/pistols/components/account/WalletHeader'
 import DuelistEditModal from '@/pistols/components/DuelistEditModal'
 
@@ -42,6 +43,7 @@ export default function ScProfile() {
   return (
     <div id='Gate'>
       <div className='UIContainer'>
+        <Header account={false} tables={false} />
         <WalletHeader />
         <Tab
           menu={{ secondary: true, pointing: true, attached: true }}
