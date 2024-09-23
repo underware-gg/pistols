@@ -30,7 +30,10 @@ export default function AccountHeader() {
   return (
     <Grid>
       <Row className='ProfilePicHeight' textAlign='center'>
-        <Col width={11} textAlign='right' verticalAlign='top'>
+        <Col width={4} textAlign='left' verticalAlign='middle'>
+          <ProfilePicSquareButton profilePic={profilePic ?? 0} onClick={() => _click()} />
+        </Col>
+        <Col width={12} textAlign='left' verticalAlign='top'>
           {!isConnected ? <h3>Guest</h3>
             : <>
               <h3>{nameDisplay}</h3>
@@ -38,9 +41,6 @@ export default function AccountHeader() {
               <br />
               <LordsBalance address={address} big />
             </>}
-        </Col>
-        <Col width={5} verticalAlign='middle'>
-          <ProfilePicSquareButton profilePic={profilePic ?? 0} onClick={() => _click()} />
         </Col>
       </Row>
     </Grid>

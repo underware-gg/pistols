@@ -39,21 +39,24 @@ export function TavernHeader() {
   return (
     <Grid stackable className='UIHeader NoSelection'>
       <Row>
-        <Col width={2} textAlign='left' verticalAlign='middle'>
-          <NavigationMenu />
-        </Col>
-        <Col width={6} textAlign='center' verticalAlign='top' className='TitleCase NoBreak Padded Relative'>
-          <h2>Pistols at 10 Blocks</h2>
-          <h3>
-            <IconClick name='ticket' size={'small'} onClick={() => _changeTable()} />
-            {' '}
-            <b className='Smaller Important'>{description}</b>
-          </h3>
-        </Col>
-        <Col width={2} textAlign='right' verticalAlign='top'>
-        </Col>
-        <Col width={6} textAlign='right' verticalAlign='top'>
+        <Col width={6} verticalAlign='middle' className='Padded'>
           <AccountHeader />
+        </Col>
+        <Col width={2}>
+        </Col>
+
+        <Col width={6} textAlign='center' verticalAlign='middle' className='TitleCase NoBreak Padded Relative'>
+          <h1>Pistols at 10 Blocks</h1>
+          <p className='AlignTop'>
+            <IconClick name='ticket' size={'big'} onClick={() => _changeTable()} style={{ marginBottom: '0.4em' }} />
+            {' '}<b className='Important H3 Anchor' onClick={() => _changeTable()}>{description}</b>
+          </p>
+        </Col>
+        <Col width={1} textAlign='right' verticalAlign='middle'>
+          <MusicToggle size='big' />
+        </Col>
+        <Col width={1} textAlign='right' verticalAlign='middle' className='PaddedDouble'>
+          <NavigationMenu />
         </Col>
       </Row>
     </Grid>
@@ -74,27 +77,23 @@ function NavigationMenu() {
   }
 
   return (
-    <div className='PaddedDouble'>
-      <Dropdown
-        // icon='sidebar'
-        icon='home'
-        button
-        className='icon huge'
-        simple
-        onClick={() => _changeScene(SceneName.Tavern)}
-      >
-        <Dropdown.Menu>
-          <Dropdown.Item icon={null} text='Past Duels' onClick={() => _changeScene(SceneName.PastDuels)} />
-          <Dropdown.Item icon={null} text='Your Duels' onClick={() => _changeScene(SceneName.YourDuels)} />
-          <Dropdown.Item icon={null} text='Duelists' onClick={() => _changeScene(SceneName.Duelists)} />
-          <Dropdown.Item icon={null} text='Account' onClick={() => _changeScene(SceneName.Profile)} />
-          {/* <Dropdown.Item icon='music' text='Music' onClick={() => _musicToggle()} /> */}
-          <Dropdown.Item icon='sign out' text='Exit' onClick={() => exit()} />
-        </Dropdown.Menu>
-      </Dropdown>
-
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <MusicToggle size='big' />
-    </div>
+    <Dropdown
+      className='icon huge'
+      direction='left'
+      icon='home'
+      button
+      simple
+      onClick={() => _changeScene(SceneName.Tavern)}
+    >
+      <Dropdown.Menu>
+        <Dropdown.Item icon={null} text='Tavern' onClick={() => _changeScene(SceneName.Tavern)} />
+        <Dropdown.Item icon={null} text='Past Duels' onClick={() => _changeScene(SceneName.PastDuels)} />
+        <Dropdown.Item icon={null} text='Your Duels' onClick={() => _changeScene(SceneName.YourDuels)} />
+        <Dropdown.Item icon={null} text='Duelists' onClick={() => _changeScene(SceneName.Duelists)} />
+        <Dropdown.Item icon={null} text='Account' onClick={() => _changeScene(SceneName.Profile)} />
+        {/* <Dropdown.Item icon='music' text='Music' onClick={() => _musicToggle()} /> */}
+        <Dropdown.Item icon='sign out' text='Exit' onClick={() => exit()} />
+      </Dropdown.Menu>
+    </Dropdown>
   )
 }
