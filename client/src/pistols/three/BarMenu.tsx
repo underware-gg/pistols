@@ -61,6 +61,7 @@ export class BarMenu extends THREE.Object3D {
       depthTest: false,
       alphaTest: 0.5,
     })
+    this.maskShader.setUniformValue('uTime', 0.0)
     this.maskShader.setUniformValue('uPickedColor', this.pickedColor)
     this.maskShader.setUniformValue('uHighlightColor', new THREE.Color('#ffcf40'))
     this.maskShader.setUniformValue('uHighlightOpacity', 0.4)
