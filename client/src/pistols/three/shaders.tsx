@@ -47,6 +47,10 @@ export async function loadShaders() {
     vsh: await loadShader('/shaders/highlight-effect-vsh.glsl'),
     fsh: await loadShader('/shaders/highlight-effect-fsh.glsl'),
   };
+  ShaderManager.shaderCode['BAR_MASK'] = {
+    vsh: await loadShader('/shaders/bar-mask-vsh.glsl'),
+    fsh: await loadShader('/shaders/bar-mask-fsh.glsl'),
+  };
 }
 
 

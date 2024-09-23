@@ -22,12 +22,16 @@ export enum TextureName {
   duel_water_map = 'duel_water_map',
   cliffs = 'cliffs',
 }
-const TEXTURES: Record<TextureName, { path: string }> = {
+export type TextureAttributes = {
+  path: string
+  alpha?: boolean
+}
+const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.Testcard]: { path: '/textures/testcard.jpg' },
   [TextureName.bg_gate]: { path: '/images/bg_gate.jpg' },
   [TextureName.bg_profile]: { path: '/images/bg_profile.jpg' },
   [TextureName.bg_tavern]: { path: '/images/bg_tavern.jpg' },
-  [TextureName.bg_tavern_mask]: { path: '/images/bg_tavern_mask.png' },
+  [TextureName.bg_tavern_mask]: { path: '/images/bg_tavern_mask.png', alpha: true },
   [TextureName.bg_duelists]: { path: '/images/bg_duelists.jpg' },
   [TextureName.bg_duels_yours]: { path: '/images/bg_duels_yours.jpg' },
   [TextureName.bg_duels_live]: { path: '/images/bg_duels_live.jpg' },

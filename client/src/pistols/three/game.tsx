@@ -394,7 +394,7 @@ export function animate() {
       }
 
       if (_sceneName == SceneName.Tavern) {
-        _barMenu.render(_renderer, _staticCamera);
+        _barMenu.render(_renderer, _staticCamera, elapsedTime);
       }
 
       _stats?.update()
