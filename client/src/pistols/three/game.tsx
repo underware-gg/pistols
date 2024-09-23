@@ -24,6 +24,7 @@ import { SpriteSheet } from './SpriteSheetMaker'
 import { DuelistsManager } from './DuelistsManager.tsx'
 import { Action } from '../utils/pistols.tsx'
 import { getPacesCardValue, PacesCard } from '@/games/pistols/generated/constants.ts'
+import { BarMenu } from './BarMenu.tsx'
 
 
 //---------------------------
@@ -120,7 +121,7 @@ const waterColors = {
 
 let _framerate = 60
 
-let _textures: any = {}
+export let _textures: any = {}
 let _cardTextures: any = {}
 let _spriteSheets: any = {}
 
@@ -146,10 +147,11 @@ let _skyVideoTexture
 let _ladySecond
 let _sirSecond
 let _duelistManager: DuelistsManager
+let _barMenu: BarMenu
 
-let _currentScene: THREE.Scene = null
 let _scenes: Partial<Record<SceneName, THREE.Scene>> = {}
-let _sceneName: SceneName
+export let _currentScene: THREE.Scene = null
+export let _sceneName: SceneName
 
 export let _sfxEnabled = true
 export let _statsEnabled = false
@@ -389,6 +391,10 @@ export function animate() {
         //@ts-ignore
         _currentScene.children.forEach(c => c.animate?.(deltaTime)) //replaced with deltaTime (could be elapsedTime), because if more than one childs had called getDelta() the animation wont work as supposed
         _renderer.render(_currentScene, _staticCamera)
+      }
+
+      if (_sceneName == SceneName.Tavern) {
+        _barMenu.render(_renderer, _staticCamera);
       }
 
       _stats?.update()
@@ -739,6 +745,10 @@ function setupStaticScene(sceneName) {
   scene.add(bg)
 
   scene.add(_staticCamera)
+
+  if (sceneName == SceneName.Tavern) {
+    _barMenu = new BarMenu(scene, bg)
+  }
 
   if (sceneName == SceneName.Gate) {
     // const rain = new Rain(bg)
