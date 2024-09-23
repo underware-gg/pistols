@@ -19,9 +19,10 @@ import { poseidon } from '@/lib/utils/starknet'
 
 export enum SceneName {
   Gate = 'Gate',
+  Tavern = 'Tavern',
+  Barkeep = 'Barkeep',
   Profile = 'Profile',
   Duelists = 'Duelists',
-  Tavern = 'Tavern',
   YourDuels = 'Your Duels',
   LiveDuels = 'Live Duels',
   PastDuels = 'Past Duels',
@@ -279,6 +280,7 @@ export const sceneRoutes: Record<SceneName, SceneRoute> = {
   [SceneName.Duel]: { baseUrl: '/duel/', hasDuelId: true, title: 'Pistols - Duel!' },
   // scenes with tableId
   [SceneName.Tavern]: { baseUrl: '/tavern/', hasTableId: true },
+  [SceneName.Barkeep]: { baseUrl: '/tavern/', hasTableId: true },
   [SceneName.Duelists]: { baseUrl: '/duelists/', hasTableId: true, title: 'Pistols - Duelists' },
   [SceneName.YourDuels]: { baseUrl: '/duels/', hasTableId: true, title: 'Pistols - Your Duels' },
   [SceneName.LiveDuels]: { baseUrl: '/duels/', hasTableId: true, title: 'Pistols - Live Duels' },
@@ -326,6 +328,7 @@ export const usePistolsScene = () => {
     atGate: (currentScene == SceneName.Gate),
     // atTavern: (currentScene == SceneName.Tavern || tavernMenuItems.includes(currentScene)),
     atTavern: (currentScene == SceneName.Tavern),
+    atBarkeep: (currentScene == SceneName.Barkeep),
     atProfile: (currentScene == SceneName.Profile),
     atDuel: (currentScene == SceneName.Duel),
     fromGate: (lastScene == SceneName.Gate),

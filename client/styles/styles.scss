@@ -1237,6 +1237,28 @@ $logo-url: '/logos/logo_avante.svg';
   left: 0;
 }
 
+.TempBarkeepOverlay {
+  @extend .FillParent;
+  @extend .AboveAll;
+  background-color: rgba($color-darkest, 0.5);
+}
+.TempBarkeepTalkBalloon {
+  width: 300px;
+  height: auto;
+  position: absolute;
+  top: 10%;
+  left: 30%;
+}
+.TempBarkeepTalkBalloonText {
+  @extend .FillParent;
+  color: $color-darkest;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 2em;
+  font-size: 1.5em;
+}
+
 
 //-----------------------------
 // semantic-ui
