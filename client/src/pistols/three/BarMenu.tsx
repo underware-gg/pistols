@@ -124,11 +124,14 @@ export class BarMenu extends THREE.Object3D {
   }
 
   // get mouse position over the canvas for bar interaction
-  onMouseMove(event) {
+  onMouseMove(event: MouseEvent) {
     event.preventDefault();
 
-    if (this.renderer) {
-      var rect = this.renderer.domElement.getBoundingClientRect();
+    const elementAtPoint = document.elementFromPoint(event.clientX, event.clientY)
+    const domElement = this.renderer?.domElement
+
+    if (elementAtPoint && domElement?.contains(elementAtPoint)) {
+      var rect = domElement.getBoundingClientRect();
       let x = (event.clientX - rect.left) / rect.width
       let y = (event.clientY - rect.top) / rect.height
       x = (clamp(x, 0, 1) * WIDTH)
@@ -140,13 +143,14 @@ export class BarMenu extends THREE.Object3D {
       y = Math.floor((HEIGHT / 2) + (y - HEIGHT / 2) / scale)
 
       this.mousePos.set(x, y)
-    } else {
-      this.mousePos.set(0, 0)
+      return
     }
 
+    // element not found our blocked
+    this.mousePos.set(0, 0)
   }
 
-  onMouseClick(event) {
+  onMouseClick(event: PointerEvent) {
     event.preventDefault();
     if (this.pickedScene) {
       emitter.emit('change_scene', this.pickedScene)

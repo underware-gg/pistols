@@ -92,6 +92,7 @@ function NavigationMenu() {
       icon='home'
       button
       simple
+      closeOnEscape
     >
       <Dropdown.Menu>
         <Dropdown.Item icon={null} text='Tavern' onClick={() => _changeScene(SceneName.Tavern)} />
