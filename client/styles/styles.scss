@@ -275,9 +275,10 @@ canvas {
   cursor: pointer!important;
   pointer-events: all!important;
   user-select: none;
+  z-index: 1000;
 }
 
-.Unselectable {
+.NoSelection {
   user-select: none;
 }
 
@@ -1105,6 +1106,7 @@ $ui-container-gap: 1em;
   @extend .Anchor;
   color: $color-bright;
 	text-shadow: 0.1rem 0.1rem $color-shadow;
+  z-index: 1000;
   &:hover {
     @extend .IconClick_hover;
   }

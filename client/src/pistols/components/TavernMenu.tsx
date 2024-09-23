@@ -107,7 +107,7 @@ export function TavernHeader({
   }
 
   return (
-    <Grid stackable className='UIHeader'>
+    <Grid stackable className='UIHeader NoSelection'>
       <Row columns={'equal'}>
         <Col textAlign='left' verticalAlign='top'>
         </Col>

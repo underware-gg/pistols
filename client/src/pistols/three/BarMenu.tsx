@@ -4,10 +4,18 @@ import {
   WIDTH, HEIGHT,
   _textures,
   _sceneName, _currentScene,
+  emitter,
 } from './game';
 import { TextureName } from '../data/assets';
 import { ShaderMaterial } from './shaders'
+import { SceneName } from '../hooks/PistolsContext';
 
+const BAR_SCENES = {
+  'ff0000': SceneName.Tavern,     // red: bartender
+  '00ff00': SceneName.Duelists,   // bottle: green
+  '0000ff': SceneName.YourDuels,  // pistol: blue
+  'ff00ff': SceneName.PastDuels,  // shovel: magenta
+}
 
 export class BarMenu extends THREE.Object3D {
 
@@ -19,6 +27,7 @@ export class BarMenu extends THREE.Object3D {
 
   mousePos: THREE.Vector2
   pickedColor: THREE.Color
+  pickedScene: SceneName
 
   constructor(bgScene: THREE.Scene, bgMesh: THREE.Mesh) {
     super()
@@ -65,7 +74,13 @@ export class BarMenu extends THREE.Object3D {
     // uncomment to see the original mask
     // bgScene.add(bg_mask.clone())
 
-    document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this), false);
+    document.addEventListener('mousemove', this.onMouseMove.bind(this), false);
+    document.addEventListener('click', this.onMouseClick.bind(this), false);
+  }
+
+  public dispose() {
+    document.removeEventListener('mousemove', this.onMouseMove.bind(this), false);
+    document.removeEventListener('click', this.onMouseClick.bind(this), false);
   }
 
   // return hex color over the mouse
@@ -92,32 +107,50 @@ export class BarMenu extends THREE.Object3D {
     const newColor = new THREE.Color(r, g, b)
     if (!this.pickedColor.equals(newColor)) {
       this.pickedColor.copy(newColor)
+      this.pickedScene = BAR_SCENES[this.pickedColor.getHexString()]
+      this.changeMouseCursor(this.pickedScene != null)
       this.maskShader.setUniformValue('uPickedColor', this.pickedColor)
-      console.log(`X/Y ${this.mousePos.x} ${this.mousePos.y} RGB: [${this.pickedColor.getHexString()}] ${this.pickedColor.r}`);
+      // console.log(`X/Y ${this.mousePos.x} ${this.mousePos.y} RGB: [${this.pickedColor.getHexString()}]`, this.pickedScene);
+    }
+  }
+
+  changeMouseCursor(clickable: boolean) {
+    if (clickable) {
+      document.body.style.cursor = 'pointer'
+    } else {
+      document.body.style.cursor = 'default'
     }
   }
 
   // get mouse position over the canvas for bar interaction
-  onDocumentMouseMove(event) {
+  onMouseMove(event) {
     event.preventDefault();
 
     if (this.renderer) {
       var rect = this.renderer.domElement.getBoundingClientRect();
       let x = (event.clientX - rect.left) / rect.width
       let y = (event.clientY - rect.top) / rect.height
-      x = Math.floor(clamp(x, 0, 1) * WIDTH)
-      y = HEIGHT - Math.floor(clamp(y, 0, 1) * HEIGHT)
+      x = (clamp(x, 0, 1) * WIDTH)
+      y = HEIGHT - (clamp(y, 0, 1) * HEIGHT)
 
       // apply bg animation scale, from the center of the screen
       const scale = this.maskOverlay.parent.scale.x
-      x = (WIDTH / 2) + (x - WIDTH / 2) / scale
-      y = (HEIGHT / 2) + (y - HEIGHT / 2) / scale
+      x = Math.floor((WIDTH / 2) + (x - WIDTH / 2) / scale)
+      y = Math.floor((HEIGHT / 2) + (y - HEIGHT / 2) / scale)
 
       this.mousePos.set(x, y)
     } else {
       this.mousePos.set(0, 0)
     }
 
+  }
+
+  onMouseClick(event) {
+    event.preventDefault();
+    if (this.pickedScene) {
+      emitter.emit('change_scene', this.pickedScene)
+      this.pickColor(0, 0, 0)
+    }
   }
 
 }
