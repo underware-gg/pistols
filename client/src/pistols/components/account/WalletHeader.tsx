@@ -51,7 +51,6 @@ export default function WalletHeader({
               </h5>
             }
             <div className='AbsoluteRight AbsoluteBottom PaddedDouble'>
-              {/* <MusicToggle /> */}
             </div>
           </Col>
         }

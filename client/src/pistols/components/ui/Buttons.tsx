@@ -5,7 +5,7 @@ import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useTableAccountBalance } from '@/pistols/hooks/useTable'
 import { bigintAdd } from '@/lib/utils/types'
-import { CustomIcon } from '@/lib/ui/Icons'
+import { CustomIcon, IconSizeProp } from '@/lib/ui/Icons'
 import { BigNumberish } from 'starknet'
 import { LordsBagIcon } from '../account/Balance'
 
@@ -174,6 +174,8 @@ interface SettingsIconProps {
   nameOff?: SemanticICONS | string
   settingsKey: string
   value: boolean
+  size: IconSizeProp
+  disabled?: boolean
   icon?: boolean
 }
 
@@ -182,6 +184,8 @@ export function SettingsIcon({
   nameOff = 'toggle off',
   settingsKey,
   value,
+  size,
+  disabled = false,
   icon = false,
 }: SettingsIconProps) {
   const { dispatchSetting } = useSettings()
@@ -189,19 +193,47 @@ export function SettingsIcon({
     dispatchSetting(settingsKey, !value)
   }
   return (
-    <CustomIcon icon={icon} name={value ? nameOn : nameOff} onClick={() => _switch()} size='large' />
+    <CustomIcon icon={icon} name={value ? nameOn : nameOff} onClick={() => _switch()} size={size} disabled={disabled} />
   )
 }
 
-export function MusicToggle() {
+export function MusicToggle({
+  size = 'large',
+}: {
+  size?: IconSizeProp
+}) {
   const { settings, SettingsActions } = useSettings()
   const { audioLoaded } = useThreeJsContext()
-  if (!audioLoaded) return <></>
-  return <SettingsIcon settingsKey={SettingsActions.MUSIC_ENABLED} value={settings.musicEnabled} nameOn='volume-on' nameOff='volume-off' icon />
+  return (
+    <SettingsIcon
+      settingsKey={SettingsActions.MUSIC_ENABLED}
+      value={settings.musicEnabled}
+      disabled={!audioLoaded}
+      size={size}
+      nameOn='volume-on'
+      nameOff='volume-off'
+      icon
+    />
+  )
 }
-export function SfxToggle() {
+export function SfxToggle({
+  size = 'large',
+}: {
+  size?: IconSizeProp
+}) {
   const { settings, SettingsActions } = useSettings()
-  return <SettingsIcon settingsKey={SettingsActions.SFX_ENABLED} value={settings.sfxEnabled} nameOn='volume-on' nameOff='volume-off' icon />
+  const { audioLoaded } = useThreeJsContext()
+  return (
+    <SettingsIcon
+      settingsKey={SettingsActions.SFX_ENABLED}
+      value={settings.sfxEnabled}
+      disabled={!audioLoaded}
+      size={size}
+      nameOn='volume-on'
+      nameOff='volume-off'
+      icon
+    />
+  )
 }
 
 

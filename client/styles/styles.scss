@@ -667,16 +667,27 @@ $box-h: calc((100vh - $aspect-h) / 2);
 // Pistols
 //
 $profile-pic-width: 80px;
+$ui-header-height: 100px;
 $ui-container-gap: 1em;
 
+.UIHeader {
+  // background-color: #0f04;
+  background-image: linear-gradient(to bottom, #0008, #0004, transparent);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: $ui-header-height;
+}
 .UIContainer {
+  // background-color: #f004;
   background-image: linear-gradient(to right, #000a, transparent);
   width: 100%;
   height: 100%;
   position: absolute;
   top: 0px;
   left: 0px;
-  padding: 65px 1em!important;
+  padding: $ui-header-height 1em 1em !important;
   margin: 0!important;
   padding: $ui-container-gap;
   min-width: $menu-width;
@@ -688,31 +699,18 @@ $ui-container-gap: 1em;
   min-width: 450px;
   max-width: 450px;
   width: 450px;
-  padding: 1em;
+  padding: 1em!important;
 }
 .UIMenuTavernScroller {
   @extend .Scroller;
   width: 100%;
-  height: calc($aspect-h - $profile-pic-width - 1em * 6 - 1px);
+  height: calc($aspect-h - $ui-header-height - 1em * 6 - 1px);
 }
 .UIAccountsListScroller {
   @extend .UIMenuTavernScroller;
   height: calc($aspect-h - 12px - 285px - 12px - 41px - 12px);
   // height: 100%;
   // background-color: red;
-}
-.UIHeader {
-  background-image: linear-gradient(to bottom, #0008, #0004, transparent);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: $profile-pic-width;
-}
-.UIIconMenu {
-  position: absolute;
-  right: 0;
-  top: 100%;
 }
 
 .TitleCase {
@@ -1322,6 +1320,7 @@ input::placeholder {
 }
 .ui.dropdown .menu>.item {
   color: $color-brightest!important;
+  font-size: 1em;
 }
 .ui.active.button, .ui.active.button:hover {
   @extend ._button_active;

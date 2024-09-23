@@ -2,7 +2,8 @@ import React, { useEffect } from 'react'
 import { QueryProvider } from '@/pistols/hooks/QueryContext'
 import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { TavernAudios } from '@/pistols/components/GameContainer'
-import { TavernHeader, TavernMenu } from '@/pistols/components/TavernMenu'
+import { TavernMenu } from '@/pistols/components/TavernMenu'
+import { TavernHeader } from '@/pistols/components/TavernHeader'
 import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionDetector'
 import TableModal from '@/pistols/components/TableModal'
 import DuelistModal from '@/pistols/components/DuelistModal'
@@ -13,7 +14,6 @@ import { useGameEvent } from '@/pistols/hooks/useGameEvent'
 export default function ScTavern() {
   const { tableOpener } = usePistolsContext()
   const { dispatchSetScene } = usePistolsScene()
-  // useTestValidateSignature()
 
   const new_scene = useGameEvent('change_scene', null)
   useEffect(() => {
@@ -25,8 +25,8 @@ export default function ScTavern() {
   return (
     <QueryProvider>
 
-      <TavernHeader />
       <TavernMenu />
+      <TavernHeader />
 
       <TableModal opener={tableOpener} />
       <DuelistModal />

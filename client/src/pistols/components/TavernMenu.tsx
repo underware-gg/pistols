@@ -1,6 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { Grid, Menu, Label, Tab, TabPane } from 'semantic-ui-react'
-import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useQueryContext } from '@/pistols/hooks/QueryContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
@@ -8,9 +7,6 @@ import { useTable } from '@/pistols/hooks/useTable'
 import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
 import { IRLTournamentTab } from '@/pistols/components/tournament/IRLTournamentTab'
 import { DuelistTable } from '@/pistols/components/DuelistTable'
-import { MusicToggle } from '@/pistols/components/ui/Buttons'
-import { IconClick } from '@/lib/ui/Icons'
-import AccountHeader from '@/pistols/components/account/AccountHeader'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -26,8 +22,7 @@ const _makeBubble = (count) => {
   return null
 }
 
-export function TavernMenu({
-}) {
+export function TavernMenu() {
   const { tableId } = useSettings()
   const { tavernMenuItems } = usePistolsContext()
   const { atTavern, currentScene, dispatchSetScene } = usePistolsScene()
@@ -57,7 +52,7 @@ export function TavernMenu({
         ),
         render: () => (
           <TabPane attached={true}>
-            <div className='UIMenuTavernScroller'>
+            <div className='  '>
               {key === SceneName.Duelists && <DuelistTable />}
               {key === SceneName.YourDuels && <ChallengeTableYour />}
               {key === SceneName.LiveDuels && <ChallengeTableLive />}
@@ -74,9 +69,9 @@ export function TavernMenu({
 
   const menuIndex = panes.findIndex(pane => (pane.key == currentScene))
 
-  // if (atTavern) {
-  //   return <></>
-  // }
+  if (atTavern) {
+    return <></>
+  }
 
   return (
     <div className='UIContainer'>
@@ -85,51 +80,3 @@ export function TavernMenu({
   )
 }
 
-
-export function TavernHeader({
-}) {
-  const { tableId } = useSettings()
-  const { tableOpener } = usePistolsContext()
-  const { dispatchSetScene } = usePistolsScene()
-  const { description } = useTable(tableId)
-
-  const _changeTable = () => {
-    tableOpener.open()
-  }
-
-  const { isConnected } = useAccount()
-  const { disconnect } = useDisconnect()
-  const _exit = () => {
-    if (isConnected) {
-      disconnect()
-    }
-    dispatchSetScene(SceneName.Gate)
-  }
-
-  return (
-    <Grid stackable className='UIHeader NoSelection'>
-      <Row columns={'equal'}>
-        <Col textAlign='left' verticalAlign='top'>
-        </Col>
-        <Col textAlign='center' verticalAlign='top' className='TitleCase NoBreak Padded Relative'>
-          <h2>Pistols at 10 Blocks</h2>
-          <h3>
-            <IconClick name='ticket' size={'small'} onClick={() => _changeTable()} />
-            {' '}
-            <b className='Smaller Important'>{description}</b>
-          </h3>
-        </Col>
-        <Col textAlign='right' verticalAlign='top'>
-          <AccountHeader />
-          <div className='UIIconMenu PaddedDouble'>
-            <MusicToggle />
-            &nbsp;&nbsp;
-            &nbsp;&nbsp;
-            <IconClick name='sign out' size={'large'} onClick={() => _exit()} />
-            &nbsp;&nbsp;&nbsp;
-          </div>
-        </Col>
-      </Row>
-    </Grid>
-  )
-}
