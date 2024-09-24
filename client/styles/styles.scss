@@ -714,6 +714,19 @@ $ui-container-gap: 1em;
   // background-color: red;
 }
 
+.BarMenuTooltip {
+  // position: absolute!important;
+  // top: 0!important;
+  // right: 0!important;
+}
+#BarMenuTooltipAnchor {
+  @extend .NoMouse;
+  position: fixed; // absolute to window
+  top: 0;
+  left: 0;
+  // display: none;
+}
+
 .TitleCase {
   // text-transform: uppercase;
   font-variant-caps: small-caps;
@@ -1669,6 +1682,13 @@ a.active.step:hover,
   // border-bottom: 1px solid rgba(255, 255, 255, .1); // original
   border-top: 1px solid rgba($color-brightest, .15);
   border-bottom: 1px solid rgba($color-brightest, .25);
+}
+// <Popup>
+.ui.popup,
+.ui.label {
+  background-color: $color-darkest;
+  color: $color-brightest;
+  font-size: 1.5em;
 }
 
 //

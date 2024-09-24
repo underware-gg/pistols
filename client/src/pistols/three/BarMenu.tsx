@@ -118,8 +118,13 @@ export class BarMenu extends THREE.Object3D {
       this.pickedScene = BAR_SCENES[this.pickedColor.getHexString()]
       this.changeMouseCursor(this.pickedScene != null)
       this.maskShader.setUniformValue('uPickedColor', this.pickedColor)
+      emitter.emit('hover_scene', this.pickedScene ?? null)
       // console.log(`X/Y ${this.mousePos.x} ${this.mousePos.y} RGB: [${this.pickedColor.getHexString()}]`, this.pickedScene);
     }
+  }
+
+  getTooltipAnchor() {
+    return document.getElementById('BarMenuTooltipAnchor');
   }
 
   changeMouseCursor(clickable: boolean) {
@@ -134,10 +139,11 @@ export class BarMenu extends THREE.Object3D {
   onMouseMove(event: MouseEvent) {
     event.preventDefault();
 
-    const elementAtPoint = document.elementFromPoint(event.clientX, event.clientY)
     const domElement = this.renderer?.domElement
+    const elements = document.elementsFromPoint(event.clientX, event.clientY)
+    const isHoveringBarMenu = (domElement && elements[0] === domElement)
 
-    if (elementAtPoint && domElement?.contains(elementAtPoint)) {
+    if (isHoveringBarMenu) {
       var rect = domElement.getBoundingClientRect();
       let x = (event.clientX - rect.left) / rect.width
       let y = (event.clientY - rect.top) / rect.height
@@ -150,6 +156,13 @@ export class BarMenu extends THREE.Object3D {
       y = Math.floor((HEIGHT / 2) + (y - HEIGHT / 2) / scale)
 
       this.mousePos.set(x, y)
+
+      var tooltip_anchor = this.getTooltipAnchor();
+      if (tooltip_anchor) {
+        tooltip_anchor.style.left = `${event.clientX - tooltip_anchor.clientWidth / 2}px`;
+        tooltip_anchor.style.top = `${event.clientY - tooltip_anchor.clientHeight}px`;
+      }
+
       return
     }
 
@@ -160,7 +173,7 @@ export class BarMenu extends THREE.Object3D {
   onMouseClick(event: PointerEvent) {
     event.preventDefault();
     if (this.pickedScene) {
-      emitter.emit('change_scene', this.pickedScene)
+      emitter.emit('change_scene', this.pickedScene ?? null)
       this.pickColor(0, 0, 0)
     }
   }
