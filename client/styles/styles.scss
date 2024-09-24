@@ -637,7 +637,7 @@ TextArea::selection {
   // height: $game-height;
   width: 100%;
   height: 100%;
-  position: absolute;
+  position: relative;
 }
 
 .GameCanvas {
@@ -1748,16 +1748,16 @@ a.active.step:hover,
   color: black;
 }
 
-.dialog-duelist[data-contentlength="0"], .dialog-message[data-contentlength="0"], .ProfileName[data-contentlength="0"], .Code[data-contentlength="0"] {
+.dialog-duelist[data-contentlength="0"], .dialog-quote[data-contentlength="0"], .ProfileName[data-contentlength="0"], .Code[data-contentlength="0"] {
   font-size: aspect-width(1.2);
 }
-.dialog-duelist[data-contentlength="1"], .dialog-message[data-contentlength="1"], .ProfileName[data-contentlength="1"], .Code[data-contentlength="1"] {
+.dialog-duelist[data-contentlength="1"], .dialog-quote[data-contentlength="1"], .ProfileName[data-contentlength="1"], .Code[data-contentlength="1"] {
   font-size: aspect-width(1.1);
 }
-.dialog-duelist[data-contentlength="2"], .dialog-message[data-contentlength="2"], .ProfileName[data-contentlength="2"], .Code[data-contentlength="2"] {
+.dialog-duelist[data-contentlength="2"], .dialog-quote[data-contentlength="2"], .ProfileName[data-contentlength="2"], .Code[data-contentlength="2"] {
   font-size: aspect-width(1);
 }
-.dialog-duelist[data-contentlength="3"], .dialog-message[data-contentlength="3"], .ProfileName[data-contentlength="3"], .Code[data-contentlength="3"] {
+.dialog-duelist[data-contentlength="3"], .dialog-quote[data-contentlength="3"], .ProfileName[data-contentlength="3"], .Code[data-contentlength="3"] {
   font-size: aspect-width(0.8);
 }
 

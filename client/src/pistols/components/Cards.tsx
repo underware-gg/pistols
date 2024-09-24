@@ -7,10 +7,11 @@ import { useThreeJsContext } from '../hooks/ThreeJsContext'
 import { useGameplayContext } from '../hooks/GameplayContext'
 import * as TWEEN from '@tweenjs/tween.js'
 import { ProfilePic } from './account/ProfilePic'
+import { BladesCard, EnvCard, PacesCard, Rarity, TacticsCard } from '@/games/pistols/generated/constants'
+import { BladesCardsTextures, CardData, DodgeCardsTextures, EnvironmentCardsTextures, FireCardsTextures, TacticsCardsTextures } from '../data/assets'
 
 interface CardProps {
   isLeft: boolean
-  frontImage: string
   classes?: string
   isFlipped?: boolean
   isDraggable?: boolean
@@ -23,7 +24,7 @@ interface CardProps {
   onClick?: (e: React.MouseEvent) => void
 }
 
-enum DuelistCardType {
+export enum DuelistCardType {
   TACTICS,
   FIRE,
   DODGE,
@@ -36,8 +37,9 @@ interface CardHandle {
   setCardScale: (scale: number[] | number, duration?: number, easing?: any, interpolation?: any) => void
   setCardRotation: (rotation: number[] | number, duration?: number, easing?: any, interpolation?: any) => void
   setCardZIndex: (index: number, backgroundIndex?: number) => void
+  setCardData: (data: CardData) => void
   toggleVisibility: (isVisible: boolean) => void
-  toggleHighlight: (isHighlighted: boolean, color?: string) => void
+  toggleHighlight: (isHighlighted: boolean, shouldBeWhite?: boolean, color?: string) => void
   toggleIdle: (isPlaying) => void
   getStyle: () => {
     translateX: number
@@ -62,7 +64,8 @@ interface DuelistCardsProps {
 }
 
 interface DuelistCardsHandle {
-  spawnCards: () => void
+  resetCards: () => void
+  spawnCards: (cards: DuelistHand) => void
   revealCard: (cardType: DuelistCardType) => void
   expandHand: () => void
   collapseHand: () => void
@@ -70,7 +73,7 @@ interface DuelistCardsHandle {
   hideHandDetails: () => void
   isReadyToShow: () => boolean
   isReadyToCollapse: () => boolean
-  returnActiveCard: () => void
+  returnActiveCard: () => boolean
 }
 
 interface EnvironmentDeckProps {
@@ -81,10 +84,10 @@ interface EnvironmentDeckHandle {
   expand: () => void
   collapse: () => void
   shuffle: () => void
-  drawCard: () => void
+  drawCard: (cardData: CardData) => void
   isReadyToShow: () => boolean
   isReadyToCollapse: () => boolean
-  returnActiveCard: () => void
+  returnActiveCard: () => boolean
 }
 
 const Card = forwardRef<CardHandle, CardProps>((props: CardProps, ref: React.Ref<CardHandle>) => {
@@ -92,6 +95,7 @@ const Card = forwardRef<CardHandle, CardProps>((props: CardProps, ref: React.Ref
   const [rotation, setRotation] = useState<AnimationData>({ dataField1: [], dataField2: [], duration: 800, easing: TWEEN.Easing.Quadratic.InOut, interpolation: TWEEN.Interpolation.Linear })
   const [flipRotation, setFlipRotation] = useState<AnimationData>({ dataField1: [], dataField2: [], duration: 800, easing: TWEEN.Easing.Quadratic.InOut, interpolation: TWEEN.Interpolation.Linear })
   const [scale, setScale] = useState<AnimationData>({dataField1: [], duration: 300})
+  const [cardData, setCardData] = useState<CardData>(FireCardsTextures.None)
   const [isDragging, setIsDragging] = useState(false)
   
   const cardRef = useRef<HTMLDivElement>(null)
@@ -115,6 +119,7 @@ const Card = forwardRef<CardHandle, CardProps>((props: CardProps, ref: React.Ref
     setCardScale,
     setCardRotation,
     setCardZIndex,
+    setCardData,
     toggleVisibility,
     toggleHighlight,
     toggleIdle,
@@ -230,11 +235,11 @@ const Card = forwardRef<CardHandle, CardProps>((props: CardProps, ref: React.Ref
     setFlipRotation({ dataField1: [flipped ? degree : 0], duration: duration, easing: easing, interpolation: interpolation })
   }
 
-  const toggleHighlight = (isHighlighted: boolean, color?: string)  => {
+  const toggleHighlight = (isHighlighted: boolean, shouldBeWhite?: boolean, color?: string)  => {
     if (cardRef.current.style.opacity != '1') return
     if (isHighlighted) {
       props.background.current.style.opacity = '1'
-      props.background.current.style.setProperty('--background_color', color ? color : 'white')
+      props.background.current.style.setProperty('--background-color', color ? color : (cardData.color ? (shouldBeWhite ? 'white' : cardData.color) : 'white'))
     } else {
       props.background.current.style.opacity = '0'
     }
@@ -413,7 +418,13 @@ const Card = forwardRef<CardHandle, CardProps>((props: CardProps, ref: React.Ref
     >
       <div className="card-inner">
         <div className="card-front NoMouse NoDrag">
-          <img className='card-image-front NoMouse NoDrag' src={props.frontImage} alt="Card Front" />
+          <img className='card-image-drawing NoMouse NoDrag' src={cardData.path} alt="Card Background" />
+          <img className='card-image-front NoMouse NoDrag' src={cardData.cardFrontPath} alt="Card Front" />
+          <div className="card-details">
+            <div className="card-title">{cardData.title}</div>
+            <div className="card-rarity">{cardData.rarity == Rarity.None ? '   ' : cardData.rarity}</div>
+            <div className="card-description" dangerouslySetInnerHTML={{ __html: cardData.description }} />
+          </div>
         </div>
         <div className="card-back NoMouse NoDrag"></div>
       </div>
@@ -442,11 +453,11 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
     { type: DuelistCardType.TACTICS, ref: useRef<HTMLDivElement>(null) },
   ]
 
-  const cardRefs = useRef<Array<{ type: DuelistCardType, ref: React.RefObject<CardHandle>, isFlipped: boolean }>>([
-    { type: DuelistCardType.BLADE, ref: useRef<CardHandle>(null), isFlipped: false },
-    { type: DuelistCardType.DODGE, ref: useRef<CardHandle>(null), isFlipped: false  },
-    { type: DuelistCardType.FIRE, ref: useRef<CardHandle>(null), isFlipped: false  },
-    { type: DuelistCardType.TACTICS, ref: useRef<CardHandle>(null), isFlipped: false  },
+  const cardRefs = useRef<Array<{ type: DuelistCardType, ref: React.RefObject<CardHandle>, isSpawned: boolean, isFlipped: boolean }>>([
+    { type: DuelistCardType.BLADE, ref: useRef<CardHandle>(null), isSpawned: false, isFlipped: false },
+    { type: DuelistCardType.DODGE, ref: useRef<CardHandle>(null), isSpawned: false, isFlipped: false  },
+    { type: DuelistCardType.FIRE, ref: useRef<CardHandle>(null), isSpawned: false, isFlipped: false  },
+    { type: DuelistCardType.TACTICS, ref: useRef<CardHandle>(null), isSpawned: false, isFlipped: false  },
   ])
 
   const gridPositions = useMemo(() => {
@@ -468,6 +479,7 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
   const prevAspectRef = useRef({ aspectW: 0, aspectH: 0 })
 
   useImperativeHandle(ref, () => ({
+    resetCards,
     spawnCards,
     revealCard,
     expandHand,
@@ -491,11 +503,15 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
       });
 
       if (!handDetailsShown) {
-        cardRefs.current.forEach(({ type, ref }, index) => {
+        cardRefs.current.forEach(({ type, ref, isSpawned }, index) => {
           const card = ref.current
           if (card) {
-            const { translateX, translateY, rotation } = originalCardStylesRef.current[type]
-            card.setPosition(translateX, translateY, 0)
+            if (isSpawned) {
+              const { translateX, translateY, rotation } = originalCardStylesRef.current[type]
+              card.setPosition(translateX, translateY, 0)
+            } else {
+              card.setPosition(0, 0, 0)
+            }
           }
         })
       } else if (handDetailsShown) {
@@ -511,7 +527,24 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
     prevAspectRef.current = { aspectW, aspectH }
   }, [aspectW, aspectH])
 
-  const spawnCards = () => {
+  const resetCards = () => {
+    const centerX = (isLeft ? -1 : 1) * (aspectW * 0.1)
+    const centerY = 0
+
+    cardRefs.current.forEach((card, index) => {
+      if (!card.ref.current) return
+
+      card.isFlipped = false
+      card.isSpawned = false
+
+      card.ref.current.setPosition(centerX, centerY, 0)
+      card.ref.current.setCardRotation(0)
+      card.ref.current.setCardZIndex(index + 10, 1)
+      card.ref.current.flipCard(false, 0, 0)
+    })
+  }
+
+  const spawnCards = (cards: DuelistHand) => {
     const centerX = (isLeft ? -1 : 1) * (aspectW * 0.1)
     const centerY = 0
     const targetX = isLeft ? -aspectW * 0.43 : aspectW * 0.43
@@ -523,6 +556,23 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
     cardRefs.current.forEach(({ type, ref }, index) => {
       const card = ref.current
       if (!card) return
+
+      switch (type) {
+        case DuelistCardType.TACTICS:
+          card.setCardData(TacticsCardsTextures[cards.tactics])
+          break;
+        case DuelistCardType.FIRE:
+          card.setCardData(FireCardsTextures[cards.fire])
+          break;
+        case DuelistCardType.DODGE:
+          card.setCardData(DodgeCardsTextures[cards.dodge])
+          break;
+        case DuelistCardType.BLADE:
+          card.setCardData(BladesCardsTextures[cards.blade])
+          break;
+        default:
+          break;
+      }
 
       card.setPosition(centerX, centerY, 0)
       card.setCardRotation(0)
@@ -536,13 +586,14 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
         card.setPosition(targetX, targetY)
         card.setCardRotation(angle)
         card.toggleVisibility(true)
-        if (true) {
+        const cardRef = cardRefs.current.find(cardRef => cardRef.type === type);
+        if (isYou) {
           card.flipCard(true, isLeft ? 180 : -180)
-          const cardRef = cardRefs.current.find(cardRef => cardRef.type === type);
           if (cardRef) {
             cardRef.isFlipped = true;
           }
         }
+        cardRef.isSpawned = true;
       }, index * 200)
 
       setTimeout(() => {
@@ -771,32 +822,28 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
 
   const returnActiveCard = (reset: boolean = true) => {
     if (currentActiveCardRef.current != null) {
-        if (reset) isAnimatingCardsRef.current = true
+      if (reset) isAnimatingCardsRef.current = true
 
-        const oldCardIndex = cardRefs.current.findIndex(card => card.type == currentActiveCardRef.current)
-        const oldCard = cardRefs.current[oldCardIndex].ref.current
+      const oldCardIndex = cardRefs.current.findIndex(card => card.type == currentActiveCardRef.current)
+      const oldCard = cardRefs.current[oldCardIndex].ref.current
 
-        oldCard.flipCard(true, isLeft ? 180 : -180, 0)
-        oldCard.setPosition(gridPositions[currentActiveCardRef.current].x, gridPositions[currentActiveCardRef.current].y, 400, TWEEN.Easing.Quadratic.Out, TWEEN.Interpolation.Linear)
-        oldCard.setCardScale(1.2, 400, TWEEN.Easing.Quadratic.InOut, TWEEN.Interpolation.Linear)
-        oldCard.setCardZIndex(1001 + oldCardIndex)
+      oldCard.flipCard(true, isLeft ? 180 : -180, 0)
+      oldCard.setPosition(gridPositions[currentActiveCardRef.current].x, gridPositions[currentActiveCardRef.current].y, 400, TWEEN.Easing.Quadratic.Out, TWEEN.Interpolation.Linear)
+      oldCard.setCardScale(1.2, 400, TWEEN.Easing.Quadratic.InOut, TWEEN.Interpolation.Linear)
+      oldCard.setCardZIndex(1001 + oldCardIndex)
 
-        if (reset) {
-          currentActiveCardRef.current = null
-          setTimeout(() => {
-            isAnimatingCardsRef.current = false
-          }, 700)
-        }
+      if (reset) {
+        currentActiveCardRef.current = null
+        setTimeout(() => {
+          isAnimatingCardsRef.current = false
+        }, 700)
       }
+
+      return true
+    } else {
+      return false
+    }
   }
-
-  //TODO delete when duelists connected
-  useEffect(() => {
-    setTimeout(() => {
-      spawnCards()
-    }, 2000)
-
-  }, [])
 
   return (
     <>
@@ -814,7 +861,6 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
           <Card
             key={index}
             ref={ref}
-            frontImage={"/textures/cards/card_front_face.png"}
             isLeft={isLeft}
             isFlipped={false}
             isDraggable={true}
@@ -1028,42 +1074,7 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
     setTimeout(() => { dealCards() }, cards.length * 5 + 1220)
   }
 
-  // const drawCard = () => {
-  //   if (cards.length === 0) return
-
-  //   console.log(drawnCardsCount)
-  //   const firstCard = cards[cards.length - 1 - drawnCardsCount]
-  //   console.log(firstCard)
-
-  //   if (firstCard && firstCard.ref) {
-  //       const cardComponent = firstCard.ref.current;
-  //       if (cardComponent) {
-            
-  //           const deckWidth = aspectWidth(8.5);
-
-  //           const x = [
-  //             (deckWidth * 0.4 * drawnCardsCount),
-  //           ]
-  //           const y = [
-  //             aspectWidth(-6) - ((aspectWidth(-3) / 10) * drawnCardsCount),
-  //             0
-  //           ]
-  //           cardComponent.setPosition(x, y, 800, TWEEN.Easing.Sinusoidal.InOut, TWEEN.Interpolation.Bezier);
-  //           cardComponent.setCardZIndex(firstCard.id + (drawnCardsCount * 2))
-  //           setTimeout(() => {
-  //             cardComponent.flipCard(true, drawnCardsCount == 0 ? -180 : -178);
-  //           }, 100)
-
-  //           setDrawnCardsCount(prevValue => prevValue + 1)
-  //       } else {
-  //           console.error("Card component is null");
-  //       }
-  //   } else {
-  //       console.error("First card or its ref is null");
-  //   }
-  // }
-
-  const drawCard = () => {
+  const drawCard = (cardData: CardData) => {
     if (drawnCardsCount > 9) return
     if (cards.length === 0) return
 
@@ -1071,6 +1082,9 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
 
     if (firstCard && firstCard.ref) {
         const cardComponent = firstCard.ref.current;
+
+        cardComponent.setCardData(cardData)
+
         if (cardComponent) {
 
             isAnimatingCardsRef.current = true
@@ -1094,7 +1108,7 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
               cardComponent.setCardScale(1, 500)
             }, 900)
             setTimeout(() => {
-              cardComponent.toggleHighlight(true, 'red')
+              cardComponent.toggleHighlight(true, null, cardData.color)
             }, 520)
             setTimeout(() => {
               cardComponent.toggleHighlight(false)
@@ -1175,7 +1189,7 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
 
     const drawnCards = cards.filter((card) => card.isDrawn)
     drawnCards.forEach((card) => {
-      card.ref.current.toggleHighlight(isHovered)
+      card.ref.current.toggleHighlight(isHovered, true)
       card.ref.current.toggleIdle(isHovered)
     })
   }
@@ -1201,7 +1215,7 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
         currentActiveCardRef.current = cardId
 
         card.toggleHighlight(false)
-        card.flipCard(true, 540, 700, TWEEN.Easing.Quartic.InOut)
+        card.flipCard(true, -540, 700, TWEEN.Easing.Quartic.InOut)
         card.setPosition(0, 0, 700, TWEEN.Easing.Quartic.InOut)
         card.setCardScale(2.4, 700, TWEEN.Easing.Quartic.InOut)
         card.setCardZIndex(1100)
@@ -1218,24 +1232,28 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
 
   const returnActiveCard = (reset: boolean = true) => {
     if (currentActiveCardRef.current != null) {
-        if (reset) isAnimatingCardsRef.current = true
+      if (reset) isAnimatingCardsRef.current = true
 
-        const oldCardIndex = cards.findIndex(card => card.id == currentActiveCardRef.current)
-        const gridIndex = cards.filter((card) => card.isDrawn ).findIndex(card => card.id == currentActiveCardRef.current)
-        const oldCard = cards[oldCardIndex].ref.current
+      const oldCardIndex = cards.findIndex(card => card.id == currentActiveCardRef.current)
+      const gridIndex = cards.filter((card) => card.isDrawn ).findIndex(card => card.id == currentActiveCardRef.current)
+      const oldCard = cards[oldCardIndex].ref.current
 
-        oldCard.flipCard(true, 180, 0)
-        oldCard.setPosition(gridPositions[gridIndex].x, gridPositions[gridIndex].y, 400, TWEEN.Easing.Quadratic.Out, TWEEN.Interpolation.Linear)
-        oldCard.setCardScale(1.05, 400, TWEEN.Easing.Quadratic.InOut, TWEEN.Interpolation.Linear)
-        oldCard.setCardZIndex(1001 + oldCardIndex)
+      oldCard.flipCard(true, -180, 0)
+      oldCard.setPosition(gridPositions[gridIndex].x, gridPositions[gridIndex].y, 400, TWEEN.Easing.Quadratic.Out, TWEEN.Interpolation.Linear)
+      oldCard.setCardScale(1.05, 400, TWEEN.Easing.Quadratic.InOut, TWEEN.Interpolation.Linear)
+      oldCard.setCardZIndex(1001 + oldCardIndex)
 
-        if (reset) {
-          currentActiveCardRef.current = null
-          setTimeout(() => {
-            isAnimatingCardsRef.current = false
-          }, 700)
-        }
+      if (reset) {
+        currentActiveCardRef.current = null
+        setTimeout(() => {
+          isAnimatingCardsRef.current = false
+        }, 700)
       }
+
+      return true
+    } else {
+      return false
+    }
   }
 
   const isReadyToShow = () => {
@@ -1264,7 +1282,6 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
           background={card.background}
           isLeft={false}
           isHighlightable={card.isDrawn && expanded}
-          frontImage="/textures/cards/card_front_face.png"
           width={8.5}
           height={12}
           isVisible={false}
@@ -1282,13 +1299,57 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
   );
 });
 
-export default function Cards({
-  duelId
-}) {
-  const { duelistIdA, duelistIdB } = useChallenge(duelId)
+const PlayerStats = ({ duelistId, isLeft, damage, hitChance }) => {
 
-  const { gameImpl } = useThreeJsContext()
-  const { animated, dispatchAnimated } = useGameplayContext()
+  const { name, profilePic } = useDuelist(duelistId)
+  const { isYou } = useIsYou(duelistId)
+
+  const contentLength = useMemo(() => Math.floor(name.length/10), [name])
+
+  return (
+    <div id="player-stats" className={`${isLeft ? 'left' : 'right'} NoDrag NoMouse`}>
+      <div className={ isLeft ? 'grid-data left' : 'grid-data right' }>
+        {isLeft ? (
+          <>
+            <div className="label">Tactics</div>
+            <div className="label">Fire</div>
+            <div className="label">Blade</div>
+            <div className="label">Dodge</div>
+          </>
+        ) : (
+          <>
+            <div className="label">Fire</div>
+            <div className="label">Tactics</div>
+            <div className="label">Dodge</div>
+            <div className="label">Blade</div>
+          </>
+        )}
+        
+      </div>
+      <div className={ isLeft ? 'data-window left' : 'data-window right' }>
+        <div>
+          <ProfilePic className='NoMouse NoDrag profile-picture' duel profilePic={profilePic} />
+          <img className='NoMouse NoDrag profile-outline' src='/images/ui/card_details/profile_border.png' />
+        </div>
+        <div className='value-name' data-contentlength={contentLength}>{name}</div>
+        <div className='data'>
+          <div className="text-container">
+            <div className="label red">Damage:</div>
+            <div className="value red">{damage}/3</div>
+          </div>
+          <div className="text-container">
+            <div className="label yellow">Hit chace:</div>
+            <div className="value yellow">{hitChance}%</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  )
+}
+
+const Cards = forwardRef<CardsHandle, { duelId: string }>(({ duelId }, ref) => {
+  const { duelistIdA, duelistIdB } = useChallenge(duelId)
 
   const [isOverlayVisible, setIsOverlayVisible] = useState(false)
 
@@ -1297,31 +1358,75 @@ export default function Cards({
   const environmentDeck = useRef<EnvironmentDeckHandle>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
 
+  const [statsA, setStatsA] = useState<{ damage: number, hitChance: number }>({ damage: 1, hitChance: 50 })
+  const [statsB, setStatsB] = useState<{ damage: number, hitChance: number }>({ damage: 1, hitChance: 50 })
+
+  useImperativeHandle(ref, () => ({
+    resetCards,
+    spawnCards,
+    drawNextCard,
+    revealCard,
+    updateDuelistData
+  }));
+
+  const resetCards = () => {
+    environmentDeck.current.shuffle()
+    duelistAHand.current.resetCards()
+    duelistBHand.current.resetCards()
+  }
+
+  const spawnCards = (duelist: string, cards: DuelistHand) => {
+    if (duelist == 'A') {
+      duelistAHand.current.spawnCards(cards)
+    } else {
+      duelistBHand.current.spawnCards(cards)
+    }
+  }
+
+  const drawNextCard = (card: EnvCard) => {
+    const cardData = EnvironmentCardsTextures[card]
+    environmentDeck.current.drawCard(cardData)
+  }
+
+  const revealCard = (duelist: string, type: DuelistCardType) => {
+    if (duelist == 'A') {
+      duelistAHand.current.revealCard(type)
+    } else {
+      duelistBHand.current.revealCard(type)
+    }
+  }
+
+  const updateDuelistData = (damageA: number, damageB: number, hitChanceA: number, hitChanceB: number) => {
+    console.log("UPDATE", damageA, damageB, hitChanceA, hitChanceB)
+    setStatsA({ damage: damageA, hitChance: hitChanceA })
+    setStatsB({ damage: damageB, hitChance: hitChanceB })
+  }
+
 
   useEffect(() => {
     const handleKeyDown = (event) => {
       switch (event.key) {
-        case 'b':
-          environmentDeck.current.shuffle()
-          break;
-        case 'n':
-          environmentDeck.current.drawCard()
-          break;
-        case 'm':
-          environmentDeck.current.expand()
-          break;
-        case 'r':
-          duelistBHand.current.revealCard(DuelistCardType.TACTICS)
-          break;
-        case 't':
-          duelistBHand.current.revealCard(DuelistCardType.FIRE)
-          break;
-        case 'y':
-          duelistBHand.current.revealCard(DuelistCardType.DODGE)
-          break;
-        case 'u':
-          duelistBHand.current.revealCard(DuelistCardType.BLADE)
-          break;
+        // case 'b':
+        //   environmentDeck.current.shuffle()
+        //   break;
+        // case 'n':
+        //   environmentDeck.current.drawCard()
+        //   break;
+        // case 'm':
+        //   environmentDeck.current.expand()
+        //   break;
+        // case 'r':
+        //   duelistBHand.current.revealCard(DuelistCardType.TACTICS)
+        //   break;
+        // case 't':
+        //   duelistBHand.current.revealCard(DuelistCardType.FIRE)
+        //   break;
+        // case 'y':
+        //   duelistBHand.current.revealCard(DuelistCardType.DODGE)
+        //   break;
+        // case 'u':
+        //   duelistBHand.current.revealCard(DuelistCardType.BLADE)
+        //   break;
         case 'Escape':
           collapse()
           break;
@@ -1366,7 +1471,12 @@ export default function Cards({
   }
 
   const handleGlobalClick = useCallback((event: MouseEvent) => {
-    collapse()
+    if (!duelistAHand.current.returnActiveCard() &&
+        !duelistBHand.current.returnActiveCard() && 
+        !environmentDeck.current.returnActiveCard()
+    ) {
+      collapse()
+    }
   }, [duelistAHand, duelistBHand, overlayRef, environmentDeck])
 
   const collapse = () => {
@@ -1385,8 +1495,8 @@ export default function Cards({
     <>
       <div id="overlay" className={isOverlayVisible ? 'visible' : ''} ref={overlayRef}>
         <div className='background'/>
-        <PlayerStats duelistId={duelistIdA} isLeft={true} damage={3} hitChance={2} />
-        <PlayerStats duelistId={duelistIdB} isLeft={false} damage={3} hitChance={2} />
+        <PlayerStats duelistId={duelistIdA} isLeft={true} damage={statsA.damage} hitChance={statsA.hitChance} />
+        <PlayerStats duelistId={duelistIdB} isLeft={false} damage={statsB.damage} hitChance={statsB.hitChance} />
         <div className='divider' />
         <div className='NoMouse NoDrag close-button'/>
       </div>
@@ -1396,56 +1506,24 @@ export default function Cards({
       <DuelistCards duelistId={duelistIdB} isLeft={false} onClick={handleClick} ref={duelistBHand}/>
     </>
   )
+})
+
+export interface CardsHandle {
+  resetCards: () => void
+  spawnCards: (duelist: string, cards: DuelistHand) => void
+  drawNextCard: (card: EnvCard) => void
+  revealCard: (duelist: string, type: DuelistCardType) => void
+  updateDuelistData(damageA: number, damageB: number, hitChanceA: number, hitChanceB: number)
 }
 
-const PlayerStats = ({ duelistId, isLeft, damage, hitChance }) => {
-
-  const { name, profilePic } = useDuelist(duelistId)
-  const { isYou } = useIsYou(duelistId)
-
-  const contentLength = useMemo(() => Math.floor(name.length/10), [name])
-
-  return (
-    <div id="player-stats" className={`${isLeft ? 'left' : 'right'} NoDrag NoMouse`}>
-      <div className={ isLeft ? 'grid left' : 'grid right' }>
-        {isLeft ? (
-          <>
-            <div className="label">Tactics</div>
-            <div className="label">Fire</div>
-            <div className="label">Blade</div>
-            <div className="label">Dodge</div>
-          </>
-        ) : (
-          <>
-            <div className="label">Fire</div>
-            <div className="label">Tactics</div>
-            <div className="label">Dodge</div>
-            <div className="label">Blade</div>
-          </>
-        )}
-        
-      </div>
-      <div className={ isLeft ? 'data-window left' : 'data-window right' }>
-        <div>
-          <ProfilePic className='NoMouse NoDrag profile-picture' duel profilePic={profilePic} />
-          <img className='NoMouse NoDrag profile-outline' src='/images/ui/card_details/profile_border.png' />
-        </div>
-        <div className='value-name' data-contentlength={contentLength}>{name}</div>
-        <div className='data'>
-          <div className="text-container">
-            <div className="label red">Damage:</div>
-            <div className="value red">2/3</div>
-          </div>
-          <div className="text-container">
-            <div className="label yellow">Hit chace:</div>
-            <div className="value yellow">20%</div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  )
+interface DuelistHand {
+  fire: PacesCard, 
+  dodge: PacesCard, 
+  tactics: TacticsCard, 
+  blade: BladesCard
 }
+
+export default Cards;
 
 
 //TODO reveal card while details are shown or hand is expanded edge case
@@ -1457,3 +1535,5 @@ const PlayerStats = ({ duelistId, isLeft, damage, hitChance }) => {
 //TODO env cards click expand
 //TODO cards highlight in color of stat
 //TODO on hover of stats cards highlight in color of that stat
+//TODO resizing before cards are spawned messes with the spawned location
+//TODO when card is clicked in details (is hue in the middle of screen) the resize function doesnt possition it properly

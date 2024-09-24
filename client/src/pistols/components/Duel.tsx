@@ -1,7 +1,7 @@
 import 'react-circular-progressbar/dist/styles.css';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Grid, Segment, SemanticFLOATS, Image, Button } from 'semantic-ui-react'
-import { BigNumberish } from 'starknet'
+import { BigNumberish, num } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
@@ -9,12 +9,11 @@ import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
-import { useFinishedDuelProgress } from '@/pistols/hooks/useContractCalls'
+import { useDuelProgress, useFinishedDuelProgress } from '@/pistols/hooks/useContractCalls'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useTable } from '@/pistols/hooks/useTable'
 import { useRevealAction, useSignAndRestoreMovesFromHash } from '@/pistols/hooks/useRevealAction'
 import { useIsYou } from '@/pistols/hooks/useIsYou'
-import { useWager } from '@/pistols/hooks/useWager'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
 import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionDetector'
 import { DuelStage, useAnimatedDuel, useDuel } from '@/pistols/hooks/useDuel'
@@ -23,16 +22,24 @@ import { ProfileModels } from '@/pistols/data/assets'
 import { AnimationState } from '@/pistols/three/game'
 import { ArchetypeNames } from '@/pistols/utils/pistols'
 import { MenuDebugAnimations, MenuDuel } from '@/pistols/components/Menus'
-import { Balance } from '@/pistols/components/account/Balance'
 import { bigintToHex, serialize } from '@/lib/utils/types'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { useDuelistOwner } from '../hooks/useTokenDuelist'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import 'react-circular-progressbar/dist/styles.css';
-import Cards from './Cards'
+import Cards, { CardsHandle, DuelistCardType } from './Cards'
 import useGameAspect from '@/pistols/hooks/useGameApect'
+import { BladesCard, PacesCard, TacticsCard } from '@/games/pistols/generated/constants';
+import { clearTimeout } from 'timers';
 
+export type DuelistState = {
+  damage: number, 
+  hitChance: number, 
+  health: number,
+  shotPaces: number, 
+  dodgePaces: number
+}
 
 export default function Duel({
   duelId
@@ -43,7 +50,6 @@ export default function Duel({
   const { challengeDescription } = useChallengeDescription(duelId)
   const { tableId, isFinished, quote, duelistIdA, duelistIdB, timestamp_start } = useChallenge(duelId)
   const { description } = useTable(tableId)
-  const { value, fee, feeFormatted } = useWager(duelId)
 
   // guarantee to run only once when this component mounts
   const mounted = useMounted()
@@ -52,6 +58,7 @@ export default function Duel({
   const { profilePic: profilePicB, name: nameB } = useDuelist(duelistIdB)
   const { isYou: isYouA } = useIsYou(duelistIdA)
   const { isYou: isYouB } = useIsYou(duelistIdB)
+  
   useEffect(() => {
     if (gameImpl && mounted && !duelSceneStarted && profilePicA && profilePicB && nameA && nameB) {
       gameImpl.startDuelWithPlayers(nameA, ProfileModels[profilePicA], isYouA, isYouB, nameB, ProfileModels[profilePicB])
@@ -76,18 +83,149 @@ export default function Duel({
     healthA, healthB
   } = useAnimatedDuel(duelId, duelSceneStarted)
 
+  const [statsA, setStatsA] = useState<DuelistState>({ damage: 1, hitChance: 50, health: 3, shotPaces: undefined, dodgePaces: undefined })
+  const [statsB, setStatsB] = useState<DuelistState>({ damage: 1, hitChance: 50, health: 3, shotPaces: undefined, dodgePaces: undefined })
+
   const { debugMode } = useSettings()
   const { dispatchSelectDuel } = usePistolsContext()
 
   useEffect(() => dispatchSelectDuel(duelId), [duelId])
 
+  const [ isPlaying, setIsPlaying ] = useState(true)
+  
+  const cardRef = useRef<CardsHandle>(null)
+  const playButtonRef = useRef(null)
+  const currentStep = useRef(0)
+
+  let nextStepCallback;
+
   //
   // MARIO: maybe we can replace all that Animated Duel crap for this
   // when this returns anythng, it's time to animate
   //
+
+  //TODO use this to subscribe to duelist hands and spawn them when needed
+  // const duelProgress2 = useDuelProgress(duelId)
+  // useEffect(() => {
+  //   if (duelProgress2) {
+  //     console.log("PROGRESS: ", duelProgress2)
+
+  //   }
+  // }, [duelProgress2])
+
+  //TODO maybe reset the cards here? If not here then it must be once we exit or enter this scene!!
   const duelProgress = useFinishedDuelProgress(duelId)
-  // useEffect(() => { if (duelProgress) console.log(`DUEL PROGRESS:`, duelProgress) }, [duelProgress])
+  useEffect(() => {
+    if (duelProgress) {
+      //TODO cards should be spawned already so only steps are needed
+      //1. make a loop that calls each step after 1400 ms
+      //2. if is play call the loop if is pause dont call, on click of play resume if its in progress
+      //3. for each step call game.playstep (animations to play)
+      //4. for each step call cards.reveal cards env and if theres a reveal in the cards of the player
+      //5. handle aftermath of all animations?
+
+      clearTimeout(nextStepCallback)
+      currentStep.current = 0
+      cardRef.current.resetCards()
+      gameImpl?.resetDuelScene()
+
+      setTimeout(() => {
+        cardRef.current.spawnCards('A', { fire: PacesCard.Paces10, dodge: PacesCard.Paces10, blade: BladesCard.Behead, tactics: TacticsCard.CoinToss })
+        cardRef.current.spawnCards('B', { fire: PacesCard.Paces10, dodge: PacesCard.Paces10, blade: BladesCard.Behead, tactics: TacticsCard.CoinToss })
+
+        setTimeout(() => {
+          cardRef.current.revealCard("A", DuelistCardType.TACTICS)
+          cardRef.current.revealCard("B", DuelistCardType.TACTICS)
+        }, 2000)
+
+        if (isPlaying) {
+          setTimeout(() => {
+            playStep()
+          }, 3000)
+        }
+      }, 5000)
+    }
+  }, [duelProgress])
+
+  // useEffect(() => {
+  //   console.log("HERE - play")
+  //   clearTimeout(nextStepCallback)
+  //   if (isPlaying) {
+  //     if (duelProgress && currentStep.current < duelProgress.steps?.length) {
+  //       playStep()
+  //     }
+  //   }
+  // }, [isPlaying])
+  
   const { aspectWidth } = useGameAspect()
+
+  const playStep = () => {
+    currentStep.current += 1
+
+    const step = duelProgress.steps[currentStep.current]
+
+    if (!step) return
+
+    cardRef.current.drawNextCard(step.card_env)
+
+    let shouldDoblePause = false
+
+        // Reveal all cards in hand A
+    if (step.card_a.fire) {
+      cardRef.current.revealCard("A", DuelistCardType.FIRE)
+      shouldDoblePause = true
+    }
+    if (step.card_a.dodge) {
+      cardRef.current.revealCard("A", DuelistCardType.DODGE)
+      shouldDoblePause = true
+    }
+    if (step.card_a.blades) {
+      cardRef.current.revealCard("A", DuelistCardType.BLADE)
+    }
+
+    // Reveal all cards in hand B
+    if (step.card_b.fire) {
+      cardRef.current.revealCard("B", DuelistCardType.FIRE)
+      shouldDoblePause = true
+    }
+    if (step.card_b.dodge) {
+      cardRef.current.revealCard("B", DuelistCardType.DODGE)
+      shouldDoblePause = true
+    }
+    if (step.card_b.blades) {
+      cardRef.current.revealCard("B", DuelistCardType.BLADE)
+    }
+
+    const newStatsA = { 
+      damage: Number(step.state_a.damage),
+      hitChance: Number(step.state_a.chances),
+      health: Number(step.state_a.health),
+      shotPaces: statsA.shotPaces ? statsA.shotPaces : (step.card_a.fire ? currentStep.current : undefined),
+      dodgePaces: statsA.dodgePaces ? statsA.dodgePaces : (step.card_a.dodge ? currentStep.current : undefined),
+    }
+
+    const newStatsB = { 
+      damage: Number(step.state_b.damage),
+      hitChance: Number(step.state_b.chances),
+      health: Number(step.state_b.health),
+      shotPaces: statsB.shotPaces ? statsB.shotPaces : (step.card_b.fire ? currentStep.current : undefined),
+      dodgePaces: statsB.dodgePaces ? statsB.dodgePaces : (step.card_b.dodge ? currentStep.current : undefined),
+    }
+
+    setTimeout(() => {
+      cardRef.current.updateDuelistData(newStatsA.damage, newStatsB.damage, newStatsA.hitChance, newStatsB.hitChance)
+      gameImpl?.animatePace(currentStep.current, newStatsA, newStatsB)
+    }, 1000);
+
+    setStatsA(newStatsA)
+    setStatsB(newStatsB)
+
+    if (currentStep.current < duelProgress.steps.length && isPlaying) {
+      nextStepCallback = setTimeout(() => {
+        playStep()
+      }, shouldDoblePause ? 3000 : 2000)
+    }
+  }
 
   if (!duelSceneStarted) return <></>
 
@@ -115,16 +253,11 @@ export default function Duel({
           canAutoReveal={canAutoRevealB}
         />
       </div>
-      <Cards duelId={duelId}/>
+      <Cards duelId={duelId} ref={cardRef} />
       <div className='TavernBoard NoMouse NoDrag' style={{ backgroundImage: 'url(/images/ui/wager_main.png)', backgroundSize: '100% 100%' }}>
         <div className='TavernTitle' data-contentlength={1}>Settling the matter of:</div>
         <div className='TavernWager' data-contentlength={Math.floor(quote.length / 10)}>{`"${quote}"`}</div>
         <div className='TavernTable' data-contentlength={Math.floor(description.length / 10)}>{description}</div>
-        {value > 0 &&
-          <div style={{ position: 'absolute', top: '25%', left: '10%', width: aspectWidth(4), height: 'auto' }}>
-            <Image src='/images/ui/wager_bag.png'/>
-          </div>
-        }
       </div>
 
       {(isFinished && animated == AnimationState.Finished) &&  /*TODO add a modal? or something where the winner and wager will be displayed!  */
@@ -135,28 +268,28 @@ export default function Duel({
 
       <div>
         <div className='DuelProfileA NoMouse NoDrag'>
-          <DuelProfile floated='left' duelistId={duelistIdA} damage={healthA} />
+          <DuelProfile floated='left' duelistId={duelistIdA} />
         </div>
         <div className='DuelistProfileA NoMouse NoDrag'>
-          <DuelistProfile floated='left' duelistId={duelistIdA} damage={healthA} />
+          <DuelistProfile floated='left' duelistId={duelistIdA} damage={statsA.damage} hitChance={statsA.hitChance} />
         </div>
       </div>
       <div>
         <div className='DuelProfileB NoMouse NoDrag' >
-          <DuelProfile floated='right' duelistId={duelistIdB} damage={healthB} />
+          <DuelProfile floated='right' duelistId={duelistIdB} />
         </div>
         <div className='DuelistProfileB NoMouse NoDrag' >
-          <DuelistProfile floated='right' duelistId={duelistIdB} damage={healthB} />
+          <DuelistProfile floated='right' duelistId={duelistIdB} damage={statsB.damage} hitChance={statsB.hitChance} />
         </div>
       </div>
 
-      {duelProgress &&
+      {/* {duelProgress &&
         <div className='CenteredPanel'>
           <pre className='Code FillParent Scroller NoMargin'>
             {serialize(duelProgress, 2)}
           </pre>
         </div>
-      }
+      } */}
 
       <MenuDuel duelStage={duelStage} duelId={duelId} tableId={tableId} />
 
@@ -169,12 +302,10 @@ export default function Duel({
 
 function DuelProfile({
   duelistId,
-  floated,
-  damage,
+  floated
 }: {
   duelistId: BigNumberish,
   floated: SemanticFLOATS
-  damage: number
 }) {
   const { profilePic, name, nameDisplay } = useDuelist(duelistId)
   const { owner } = useDuelistOwner(duelistId)
@@ -212,12 +343,14 @@ function DuelistProfile({
   duelistId,
   floated,
   damage,
+  hitChance
 }: {
   duelistId: BigNumberish,
   floated: SemanticFLOATS
   damage: number
+  hitChance: number
 }) {
-  const { profilePic, score } = useDuelist(duelistId)
+  const { score } = useDuelist(duelistId)
   const { aspectWidth } = useGameAspect()
 
   const [archetypeImage, setArchetypeImage] = useState<string>()
@@ -231,7 +364,7 @@ function DuelistProfile({
   return (
     <>
       <div className='DuelistHonourProgress NoMouse NoDrag' data-floated={floated}>
-        <CircularProgressbar minValue={0} maxValue={10} circleRatio={10/15}  value={score.honour} strokeWidth={7} styles={buildStyles({ 
+        <CircularProgressbar minValue={0} maxValue={100} circleRatio={10/15}  value={hitChance} strokeWidth={7} styles={buildStyles({ 
           pathColor: `#efc258`,
           trailColor: '#4c3926',
           strokeLinecap: 'butt',
@@ -241,7 +374,7 @@ function DuelistProfile({
         <>
           <ProfilePic className='NoMouse NoDrag' duel profilePicUrl={archetypeImage} />
           <div className='DuelistHonour NoMouse NoDrag' data-floated={floated}>
-            <div style={{ fontSize: aspectWidth(1), fontWeight: 'bold', color: '#25150b' }}>{score.honourAndTotal}</div>
+            <div style={{ fontSize: aspectWidth(1), fontWeight: 'bold', color: '#25150b' }}>{hitChance + "%"}</div>
           </div>
           <DuelistPistol damage={damage} floated={floated} />
           <Image className='NoMouse NoDrag' src='/images/ui/duelist_profile.png' style={{ position: 'absolute' }} />
@@ -251,7 +384,7 @@ function DuelistProfile({
         <>
           <ProfilePic className='FlipHorizontal NoMouse NoDrag' duel profilePicUrl={archetypeImage} />
           <div className='DuelistHonour NoMouse NoDrag' data-floated={floated}>
-            <div style={{ fontSize: aspectWidth(1), fontWeight: 'bold', color: '#25150b' }}>{score.honourAndTotal}</div>
+            <div style={{ fontSize: aspectWidth(1), fontWeight: 'bold', color: '#25150b' }}>{hitChance + "%"}</div>
           </div>
           <DuelistPistol damage={damage} floated={floated} />
           <Image className='FlipHorizontal NoMouse NoDrag' src='/images/ui/duelist_profile.png' style={{ position: 'absolute' }} />

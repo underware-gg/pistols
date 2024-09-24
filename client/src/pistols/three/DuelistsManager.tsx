@@ -7,6 +7,7 @@ import { Action, ActionTypes } from '@/pistols/utils/pistols'
 import { Actor } from './SpriteSheetMaker'
 import { _sfxEnabled, AnimationState, ASPECT, emitter, playAudio } from './game'
 import { ProgressDialogManager } from './ProgressDialog'
+import { DuelistState } from '../components/Duel'
 
 const ACTOR_WIDTH = 2.5
 const ACTOR_HEIGHT = 1.35
@@ -161,6 +162,7 @@ export class DuelistsManager {
   private showDialogsTimeout
 
   public resetDuelists(): boolean {
+    console.log("RESETT")
     if (!this.duelistA.model || !this.duelistB.model) return false //TODO change if duelistmanager makes it so its always created to remove this if not check in duelist manager
 
     this.duelistA.actor?.stop()
@@ -197,62 +199,14 @@ export class DuelistsManager {
     this.duelistB.actor.mesh.position.set(-PACES_X_0, this.duelistB.actor.mesh.position.y, this.duelistB.actor.mesh.position.z)
   }
 
-  public animateDuelistShootout(paceCountA: number, paceCountB: number, healthA: number, healthB: number, damageA: number, damageB: number) {
-    if(this.showDialogsTimeout) clearTimeout(this.showDialogsTimeout)
+  public animatePace(pace: number, statsA: DuelistState, statsB: DuelistState) {
+    const step: AnimName = pace % 2 == 1 ? AnimName.STEP_2 : AnimName.STEP_1
 
-    const minPaceCount = Math.min(paceCountA, paceCountB)
+    const hasDuelistAShotThisRound = statsA.shotPaces == pace
+    const hasDuelistADodgedThisRound = statsA.dodgePaces == pace
 
-    this.resetActorPositions()
-
-    // animate sprites
-    for (let i = 0; i < minPaceCount + 2; i++) {
-      const key: AnimName = i % 2 == 1 ? AnimName.STEP_2 : AnimName.STEP_1
-
-      //To make the other duelist walk while one goes to shooting
-      if (i == minPaceCount && paceCountA > paceCountB) {
-        this.playActorAnimation(this.duelistA, key)
-      } else if (i == minPaceCount && paceCountB > paceCountA) {
-        this.playActorAnimation(this.duelistB, key)
-      } else if (i > minPaceCount && paceCountA > paceCountB) {
-        if (damageA == 0) {
-          this.playActorAnimation(this.duelistA, key)
-        }
-      } else if (i > minPaceCount && paceCountB > paceCountA) {
-        if (damageB == 0) {
-          this.playActorAnimation(this.duelistB, key)
-        }
-      } else if (i < minPaceCount) {
-        //timeout not needed with animationQueue
-        this.playActorAnimation(this.duelistA, key)
-        this.playActorAnimation(this.duelistB, key)
-      }
-    }
-
-    // SHOOT!
-    const _shootA = () => {
-      this.playActorAnimation(this.duelistA, AnimName.SHOOT, () => {
-        emitter.emit('animated', AnimationState.HealthB)
-        if (healthB == 0) {
-          this.playActorAnimation(this.duelistB, AnimName.SHOT_DEAD_FRONT, () => _updateB())
-        } else if (damageB > 0) {
-          this.playActorAnimation(this.duelistB, AnimName.SHOT_INJURED_FRONT, () => _updateB())
-        } else {
-          _updateB()
-        }
-      })
-    }
-    const _shootB = () => {
-      this.playActorAnimation(this.duelistB, AnimName.SHOOT, () => {
-        emitter.emit('animated', AnimationState.HealthA)
-        if (healthA == 0) {
-          this.playActorAnimation(this.duelistA, AnimName.SHOT_DEAD_FRONT, () => _updateA())
-        } else if (damageA > 0) {
-          this.playActorAnimation(this.duelistA, AnimName.SHOT_INJURED_FRONT, () => _updateA())
-        } else {
-          _updateA()
-        }
-      })
-    }
+    const hasDuelistBShotThisRound = statsB.shotPaces == pace
+    const hasDuelistBDodgedThisRound = statsB.dodgePaces == pace
 
     let hasUpdatedA = false
     let hasUpdatedB = false
@@ -268,60 +222,64 @@ export class DuelistsManager {
         _updateAnimatedState()
       }
     }
+
     const _updateAnimatedState = () => {
       if (hasUpdatedA && hasUpdatedB) {
         emitter.emit('animated', AnimationState.Round1)
-        if (healthA == 0 || healthB == 0) {
-          this.duelProgressDialogManger.showDialogEnd(healthA, healthB)
-        } else {
+        if (statsA.health == 0 || statsB.health == 0) {
+          this.duelProgressDialogManger.showDialogEnd(statsA.health, statsB.health)
+        } else if (statsA.shotPaces && statsB.shotPaces) {
           this.duelProgressDialogManger.showDialogs()
         }
       }
     }
 
-    //
-    // Both fire at same time
-    if (paceCountA == paceCountB) {
-      _shootA()
-      _shootB()
-    }
-    //
-    // A fires first
-    if (paceCountA < paceCountB) {
+    if (hasDuelistAShotThisRound) {
       this.playActorAnimation(this.duelistA, AnimName.SHOOT, () => {
-        emitter.emit('animated', AnimationState.HealthB)
-        if (healthB > 0 && damageB == 0) {
-          _updateB()
-          _shootB()
+        if (!hasDuelistBDodgedThisRound) {
+          if (statsB.shotPaces) {
+            if (statsB.health == 0) {
+              this.playActorAnimation(this.duelistB, AnimName.SHOT_DEAD_FRONT, () => _updateB())
+            } else if (statsB.health < 3) {
+              this.playActorAnimation(this.duelistB, AnimName.SHOT_INJURED_FRONT, () => _updateB())
+            }
+          } else {
+            if (statsB.health == 0) {
+              this.playActorAnimation(this.duelistB, AnimName.SHOT_DEAD_BACK, () => _updateB())
+            } else if (statsB.health < 3) {
+              this.playActorAnimation(this.duelistB, AnimName.SHOT_INJURED_BACK, () => _updateB())
+            }
+          }
         }
       })
-      if (healthB == 0) {
-        this.playActorAnimation(this.duelistB, AnimName.SHOT_DEAD_BACK, () => _updateB())
-      } else if (damageB > 0) {
-        this.playActorAnimation(this.duelistB, AnimName.SHOT_INJURED_BACK, () => {
-          _updateB()
-          _shootB()
-        })
-      }
+    } else if (hasDuelistADodgedThisRound) {
+      this.playActorAnimation(this.duelistA, AnimName.DODGE)
+    } else if (!statsA.shotPaces) {
+      this.playActorAnimation(this.duelistA, step)
     }
-    //
-    // B fires first
-    if (paceCountB < paceCountA) {
+
+    if (hasDuelistBShotThisRound) {
       this.playActorAnimation(this.duelistB, AnimName.SHOOT, () => {
-        emitter.emit('animated', AnimationState.HealthA)
-        if (healthA > 0 && damageA == 0) {
-          _updateA()
-          _shootA()
+        if (!hasDuelistADodgedThisRound) {
+          if (statsA.shotPaces) {
+            if (statsA.health == 0) {
+              this.playActorAnimation(this.duelistA, AnimName.SHOT_DEAD_FRONT, () => _updateA())
+            } else if (statsA.health < 3) {
+              this.playActorAnimation(this.duelistA, AnimName.SHOT_INJURED_FRONT, () => _updateA())
+            }
+          } else {
+            if (statsA.health == 0) {
+              this.playActorAnimation(this.duelistA, AnimName.SHOT_DEAD_BACK, () => _updateA())
+            } else if (statsA.health < 3) {
+              this.playActorAnimation(this.duelistA, AnimName.SHOT_INJURED_BACK, () => _updateA())
+            }
+          }
         }
       })
-      if (healthA == 0) {
-        this.playActorAnimation(this.duelistA, AnimName.SHOT_DEAD_BACK, () => _updateA())
-      } else if (damageA > 0) {
-        this.playActorAnimation(this.duelistA, AnimName.SHOT_INJURED_BACK, () => {
-          _updateA()
-          _shootA()
-        })
-      }
+    } else if (hasDuelistBDodgedThisRound) {
+      this.playActorAnimation(this.duelistB, AnimName.DODGE)
+    } else if (!statsB.shotPaces) {
+      this.playActorAnimation(this.duelistB, step)
     }
   }
 

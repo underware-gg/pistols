@@ -5,6 +5,7 @@ import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useContractCall } from '@/lib/utils/hooks/useContractCall'
 import { useChallenge } from '@/pistols/hooks/useChallenge'
 import { isBigint, isPositiveBigint } from '@/lib/utils/types'
+import { DuelProgress } from '@/games/pistols/duel_progress'
 
 export const useCanJoin = () => {
   const { address } = useAccount()
@@ -39,7 +40,7 @@ export const useCalcFee = (table_id: string, wager_value: BigNumberish) => {
   }
 }
 
-export const useFinishedDuelProgress = (duelId: bigint) => {
+export const useFinishedDuelProgress = (duelId: bigint): DuelProgress => {
   const { isFinished } = useChallenge(duelId)
   return useDuelProgress(isFinished ? duelId : null)
 }

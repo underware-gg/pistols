@@ -25,6 +25,7 @@ import { DuelistsManager } from './DuelistsManager.tsx'
 import { Action } from '../utils/pistols.tsx'
 import { getPacesCardValue, PacesCard } from '@/games/pistols/generated/constants.ts'
 import { BarMenu } from './BarMenu.tsx'
+import { DuelistState } from '../components/Duel.tsx'
 
 
 //---------------------------
@@ -308,6 +309,7 @@ function setCameras() {
     cameraData.nearPlane,
     cameraData.farPlane,
   )
+  _duelCamera.position.set(0, 0.05, 0)
   _staticCamera = new THREE.PerspectiveCamera(
     cameraData.fieldOfView,
     ASPECT,
@@ -847,6 +849,12 @@ export function zoomCameraToPaces(paceCount, seconds) {
   }
 }
 
+export function animatePace(pace: number, statsA: DuelistState, statsB: DuelistState) {
+  zoomCameraToPaces(pace, (pace + 1))
+
+  _duelistManager.animatePace(pace, statsA, statsB)
+}
+
 export function animateDuel(state: AnimationState, actionA: Action, actionB: Action, healthA: number, healthB: number, damageA: number, damageB: number) {
   //only animated once per entry safety
   if (state == AnimationState.Round1 && !_round1Animated) {
@@ -867,23 +875,23 @@ export function animateDuel(state: AnimationState, actionA: Action, actionB: Act
 }
 
 function animateShootout(paceCountA: number, paceCountB: number, healthA: number, healthB: number, damageA: number, damageB: number) {
-  const minPaceCount = Math.min(paceCountA, paceCountB)
+  // const minPaceCount = Math.min(paceCountA, paceCountB)
 
-  if (_ladySecond && _sirSecond) {
-    if (minPaceCount < 5) {
-      _sirSecond.visible = false
-      _ladySecond.visible = false
-    } else {
-      _sirSecond.visible = true
-      _ladySecond.visible = true
-    }
-  }
+  // if (_ladySecond && _sirSecond) {
+  //   if (minPaceCount < 5) {
+  //     _sirSecond.visible = false
+  //     _ladySecond.visible = false
+  //   } else {
+  //     _sirSecond.visible = true
+  //     _ladySecond.visible = true
+  //   }
+  // }
 
-  // animate camera
-  zoomCameraToPaces(0, 0)
-  zoomCameraToPaces(minPaceCount, (minPaceCount + 1)) //adjusted zoom out value to minimize gliding effect for now.
+  // // animate camera
+  // zoomCameraToPaces(0, 0)
+  // zoomCameraToPaces(minPaceCount, (minPaceCount + 1)) //adjusted zoom out value to minimize gliding effect for now.
 
-  _duelistManager.animateDuelistShootout(paceCountA, paceCountB, healthA, healthB, damageA, damageB)
+  // _duelistManager.animateDuelistShootout(paceCountA, paceCountB, healthA, healthB, damageA, damageB)
 }
 
 function animateActions(state: AnimationState, actionA: Action, actionB: Action, healthA: number, healthB: number, damageA: number, damageB: number) {

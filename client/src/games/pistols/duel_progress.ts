@@ -7,7 +7,56 @@ const _get_variant = (variant: any): any => {
   return Object.keys(v)[0]
 }
 
-export const convert_duel_progress = (progress: any) => {
+export type DuelProgress = {
+    winner: number;
+    steps: {
+      pace: PacesCard;
+      card_env: EnvCard;
+      dice_env: number;
+      card_a: {
+        fire: PacesCard;
+        dodge: PacesCard;
+        blades: BladesCard;
+      };
+      card_b: {
+        fire: PacesCard;
+        dodge: PacesCard;
+        blades: BladesCard;
+      };
+      state_a: {
+        health: number;
+        damage: number;
+        chances: number;
+        dice_crit: number;
+        honour: number;
+        wager: number;
+        win: number;
+      };
+      state_b: {
+        health: number;
+        damage: number;
+        chances: number;
+        dice_crit: number;
+        honour: number;
+        wager: number;
+        win: number;
+      };
+    }[];
+    hand_a: {
+      card_fire: PacesCard;
+      card_dodge: PacesCard;
+      card_tactics: TacticsCard;
+      card_blades: BladesCard;
+    };
+    hand_b: {
+      card_fire: PacesCard;
+      card_dodge: PacesCard;
+      card_tactics: TacticsCard;
+      card_blades: BladesCard;
+    };
+}
+
+export const convert_duel_progress = (progress: any): DuelProgress | null => {
   if (!progress) return null
 
   const _drawn_card = (variant: any) => {
