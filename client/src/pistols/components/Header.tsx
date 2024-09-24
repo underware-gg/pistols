@@ -5,6 +5,7 @@ import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useTable } from '@/pistols/hooks/useTable'
 import { MusicToggle } from '@/pistols/components/ui/Buttons'
+import { MenuLabels } from '@/pistols/utils/pistols'
 import { IconClick } from '@/lib/ui/Icons'
 import AccountHeader from '@/pistols/components/account/AccountHeader'
 
@@ -95,13 +96,13 @@ function NavigationMenu() {
       closeOnEscape
     >
       <Dropdown.Menu>
-        <Dropdown.Item icon={null} text='Tavern' onClick={() => _changeScene(SceneName.Tavern)} />
-        <Dropdown.Item icon={null} text='Past Duels' onClick={() => _changeScene(SceneName.PastDuels)} />
-        <Dropdown.Item icon={null} text='Your Duels' onClick={() => _changeScene(SceneName.YourDuels)} />
-        <Dropdown.Item icon={null} text='Duelists' onClick={() => _changeScene(SceneName.Duelists)} />
-        <Dropdown.Item icon={null} text='Account' onClick={() => _changeScene(SceneName.Profile)} />
+        <Dropdown.Item icon={null} text={MenuLabels[SceneName.Tavern]} onClick={() => _changeScene(SceneName.Tavern)} />
+        <Dropdown.Item icon={null} text={MenuLabels[SceneName.Duelists]} onClick={() => _changeScene(SceneName.Duelists)} />
+        <Dropdown.Item icon={null} text={MenuLabels[SceneName.YourDuels]} onClick={() => _changeScene(SceneName.YourDuels)} />
+        <Dropdown.Item icon={null} text={MenuLabels[SceneName.PastDuels]} onClick={() => _changeScene(SceneName.PastDuels)} />
+        <Dropdown.Item icon={null} text={MenuLabels[SceneName.Profile]} onClick={() => _changeScene(SceneName.Profile)} />
         {/* <Dropdown.Item icon='music' text='Music' onClick={() => _musicToggle()} /> */}
-        <Dropdown.Item icon='sign out' text='Exit' onClick={() => exit()} />
+        <Dropdown.Item icon='sign out' text={MenuLabels[SceneName.Gate]} onClick={() => exit()} />
       </Dropdown.Menu>
     </Dropdown>
   )

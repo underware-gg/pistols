@@ -1,5 +1,6 @@
 import { Archetype, BladesCard, ChallengeState, PacesCard, Premise, RoundState } from '@/games/pistols/generated/constants'
 import { EMOJI } from '@/pistols/data/messages'
+import { SceneName } from '@/pistols/hooks/PistolsContext'
 
 //------------------------------------------
 // must be in sync with CHALLENGE_STATE
@@ -194,4 +195,14 @@ export const PremisePrefix: Record<Premise, string> = {
   [Premise.Blood]: 'for the love of death and blood',
   [Premise.Nothing]: 'for no reason other than',
   [Premise.Tournament]: 'to be the winner of',
+}
+
+export const MenuLabels: Partial<Record<SceneName, string>> = {
+  [SceneName.Gate]: 'Exit to Gate',
+  [SceneName.Barkeep]: 'Talk to The Barkeep',
+  [SceneName.Tavern]: 'The Bar',
+  [SceneName.Duelists]: 'The Balcony (Opponents)',
+  [SceneName.YourDuels]: 'The Tables (Live Duels)',
+  [SceneName.PastDuels]: 'The Graveyard (Past Duels)',
+  [SceneName.Profile]: 'Account & Duelists',
 }
