@@ -52,12 +52,25 @@ export const signMessages = async (account: AccountInterface, chainId: string, r
   const typeHash = getTypeHash(typedMessage, typedMessage.primaryType)
   const typeSelectorName = getTypeSelectorName(typedMessage, typedMessage.primaryType)
   const messageHash = getMessageHash(typedMessage, account.address)
-  const signature = await account.signMessage(typedMessage)
-  //@ts-ignore
+  //--------------------------------
+  // TODO: CONTROLLER UPGRADE BROKE THIS!!!
+  // lets just hash the messages for now
+  //
+  // const signature = await account.signMessage(typedMessage)
+  const signature = [
+    // poseidon(Object.values(messages).map(v => BigInt(v as string))),
+    messages.duelId,
+    messages.duelistId,
+  ] as Signature
+  //
+  //--------------------------------
   let signatureArray: bigint[] =
     Array.isArray(signature) ? signature.map(v => BigInt(v)) // [...]
       : splitSignature(signature) // {r,s}
-  const signatureHash = signatureArray.length >= 2 ? poseidon(signatureArray.slice(-2)) : 0n
+  const signatureHash =
+    signatureArray.length == 2 ? poseidon(signatureArray)
+      : signatureArray.length >= 2 ? poseidon(signatureArray.slice(-2))
+        : 0n
   console.log(`SIG:`, typedMessage, 'type:', typeSelectorName, typeHash, 'message:', messageHash, signature, signatureArray, 'sigHash:', bigintToHex(signatureHash))
   // throw new Error('STOP')
   return {
