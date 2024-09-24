@@ -2,17 +2,19 @@ import React from 'react'
 import { useRouter } from 'next/router'
 import { Container, Divider, Table } from 'semantic-ui-react'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
+import { useChallenge } from '@/pistols/hooks/useChallenge'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useWager } from '@/pistols/hooks/useWager'
 import { useTable } from '@/pistols/hooks/useTable'
-import { ActionEmojis, ActionNames, ChallengeStateNames, RoundStateNames } from '@/pistols/utils/pistols'
+import { useFinishedDuelProgress } from '@/pistols/hooks/useContractCalls'
+import { ChallengeStateNames, RoundStateNames } from '@/pistols/utils/pistols'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { formatTimestamp } from '@/lib/utils/timestamp'
 import { bigintToHex, shortAddress } from '@/lib/utils/types'
 import { weiToEth } from '@/lib/utils/starknet'
+import { BladesIcon, PacesIcon } from '@/pistols/components/ui/PistolsIcon'
 import AppPistols from '@/pistols/components/AppPistols'
-import { useChallenge } from '@/pistols/hooks/useChallenge'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -64,6 +66,7 @@ function Stats({
 
         {round1 && <>
           <RoundStats duelId={duelId} roundNumber={1} round={round1} />
+          <DuelProgress duelId={duelId} />
           <br />
         </>}
 
@@ -150,7 +153,7 @@ function DuelStats({
         <Row>
           <Cell>Winner</Cell>
           <Cell>
-            {challenge.winner}: {challenge.winner == 1 ? 'Challenger' : challenge.winner == 2 ? 'Challenged' : null}
+            {challenge.winner}: {challenge.winner == 1 ? nameA : challenge.winner == 2 ? nameB : '-'}
           </Cell>
         </Row>
         <Row>
@@ -219,6 +222,11 @@ function WagerStats({
   )
 }
 
+
+//-----------------------------------
+// ROUND
+//
+
 function RoundStats({
   duelId,
   roundNumber,
@@ -231,6 +239,7 @@ function RoundStats({
   const { challenge } = useDuel(duelId)
   const { nameDisplay: nameA } = useDuelist(challenge.duelistIdA)
   const { nameDisplay: nameB } = useDuelist(challenge.duelistIdB)
+  // console.log('round', round)
   return (
     <>
       <Table celled striped color='orange'>
@@ -251,90 +260,213 @@ function RoundStats({
         </Body>
       </Table>
 
-      <MovesStats moves={round.moves_a} movesNumber='A' title={nameA} />
-      <MovesStats moves={round.moves_b} movesNumber='B' title={nameB} />
+      <StateRow state_a={round.state_a} state_b={round.state_b} />
+
+      <MovesStats hand={round.hand_a} moves={round.moves_a} state={round.state_a} playerNumber='A' title={nameA} />
+      <MovesStats hand={round.hand_b} moves={round.moves_b} state={round.state_b} playerNumber='B' title={nameB} />
     </>
   )
 }
 
 function MovesStats({
-  movesNumber,
+  playerNumber,
   title,
+  hand,
   moves,
+  state,
 }) {
   return (
     <>
-      <Table attached='top'>
+      <Table attached>
         <Header fullWidth>
           <Row>
-            <HeaderCell width={4}><h5>Moves {movesNumber}</h5></HeaderCell>
-            <HeaderCell><h5>{title}</h5></HeaderCell>
+            <HeaderCell width={4}><h5 className='Important'>Moves {playerNumber}</h5></HeaderCell>
+            <HeaderCell><h5 className='Important'>{title}</h5></HeaderCell>
           </Row>
         </Header>
 
         <Body>
           <Row>
             <Cell>Hash</Cell>
-            <Cell>
+            <Cell className='Smaller'>
               {bigintToHex(moves.hashed)}
             </Cell>
           </Row>
           <Row>
             <Cell>Salt</Cell>
-            <Cell>
+            <Cell className='Smaller'>
               {bigintToHex(moves.salt)}
             </Cell>
           </Row>
-          <Row>
-            <Cell>Action</Cell>
+          {/* <Row>
+            <Cell>Fire Dice</Cell>
             <Cell>
-              {moves.action}: {ActionNames[moves.action]} {ActionEmojis[moves.action]}
+              🎲 {state.dice_fire} over {state.chances}%
             </Cell>
-          </Row>
-          <Row>
-            <Cell>Crit</Cell>
-            <Cell>
-              🎲 {moves.dice_fire} / {moves.chance_crit} %
-            </Cell>
-          </Row>
-          <Row>
-            <Cell>Hit</Cell>
-            <Cell>
-              🎲 {moves.dice_hit} / {moves.chance_hit} %
-            </Cell>
-          </Row>
-          <Row>
-            <Cell>Lethal</Cell>
-            <Cell>
-              🎲 {moves.chance_lethal > 0 ? moves.dice_hit : 0} / {moves.chance_lethal} %
-            </Cell>
-          </Row>
+          </Row> */}
         </Body>
       </Table>
 
       <Table attached>
         <Header fullWidth>
           <Row textAlign='center'>
-            <HeaderCell><h5>Damage</h5></HeaderCell>
-            <HeaderCell><h5>Block</h5></HeaderCell>
-            <HeaderCell><h5>Health</h5></HeaderCell>
-            <HeaderCell><h5>Honour</h5></HeaderCell>
-            <HeaderCell><h5>Win</h5></HeaderCell>
-            <HeaderCell><h5>Wager</h5></HeaderCell>
+            <HeaderCell><h5>Fire</h5></HeaderCell>
+            <HeaderCell><h5>Dodge</h5></HeaderCell>
+            <HeaderCell><h5>Tactics</h5></HeaderCell>
+            <HeaderCell><h5>Blades</h5></HeaderCell>
           </Row>
         </Header>
 
         <Body>
           <Row textAlign='center'>
-            <Cell>{moves.damage}</Cell>
-            <Cell>{moves.block}</Cell>
-            <Cell>{moves.health}</Cell>
-            <Cell>{moves.honour}</Cell>
-            <Cell>{moves.win}</Cell>
-            <Cell>{moves.wager}</Cell>
+            <Cell><PacesIcon paces={hand.card_fire} /> {hand.card_fire}
+            </Cell>
+            <Cell><PacesIcon paces={hand.card_dodge} dodge /> {hand.card_dodge}</Cell>
+            <Cell>{hand.card_tactics}</Cell>
+            <Cell><BladesIcon blade={hand.card_blades} /> {hand.card_blades}</Cell>
           </Row>
         </Body>
       </Table>
+    </>
+  )
+}
+
+
+function StateRow({
+  state_a,
+  state_b,
+  card_a,
+  card_b,
+} : {
+  state_a: any
+  state_b: any
+  card_a?: string
+  card_b?: string
+}) {
+  return (
+    <Table attached>
+      <Header fullWidth>
+        <Row textAlign='center'>
+          <HeaderCell><h5>{' '}</h5></HeaderCell>
+          {(card_a || card_b) && <HeaderCell><h5>Card</h5></HeaderCell>}
+          <HeaderCell><h5>Dice</h5></HeaderCell>
+          <HeaderCell><h5>Chances</h5></HeaderCell>
+          <HeaderCell><h5>Damage</h5></HeaderCell>
+          <HeaderCell><h5>Health</h5></HeaderCell>
+          <HeaderCell><h5>Honour</h5></HeaderCell>
+        </Row>
+      </Header>
+
+      <Body>
+        <Row textAlign='center'>
+          <Cell>Duelist A</Cell>
+          {(card_a || card_b) && <Cell>{card_a}</Cell>}
+          <Cell>🎲 {state_a.dice_fire.toString()}</Cell>
+          <Cell>{state_a.chances.toString()} %</Cell>
+          <Cell>🐦‍🔥 {state_a.damage.toString()}</Cell>
+          <Cell>♥️ {state_a.health.toString()}</Cell>
+          <Cell>👑 {state_a.honour.toString()}</Cell>
+        </Row>
+        <Row textAlign='center'>
+          <Cell>Duelist B</Cell>
+          {(card_a || card_b) && <Cell>{card_b}</Cell>}
+          <Cell>🎲 {state_b.dice_fire.toString()}</Cell>
+          <Cell>{state_b.chances.toString()} %</Cell>
+          <Cell>🐦‍🔥 {state_b.damage.toString()}</Cell>
+          <Cell>♥️ {state_b.health.toString()}</Cell>
+          <Cell>👑 {state_b.honour.toString()}</Cell>
+        </Row>
+      </Body>
+    </Table>
+  )
+}
+
+
+
+//-----------------------------------
+// ENV
+//
+
+function DuelProgress({
+  duelId,
+}: {
+  duelId: bigint
+}) {
+  const duelProgress = useFinishedDuelProgress(duelId)
+  console.log('duelProgress', duelProgress)
+  if (!duelProgress) return <></>
+  return (
+    <>
+      <Table celled striped color='green'>
+        <Header>
+          <Row>
+            <HeaderCell width={4}><h5>Duel Progress / Animations</h5></HeaderCell>
+            <HeaderCell><h2>{' '}</h2></HeaderCell>
+          </Row>
+        </Header>
+
+        <Body>
+          <Row>
+            <Cell>Winner</Cell>
+            <Cell>
+              {duelProgress.winner.toString()}
+            </Cell>
+          </Row>
+        </Body>
+      </Table>
+
+      {duelProgress.steps.map((step, index) => (
+        <DuelStep key={`${index}`} index={index} step={step} />
+      ))}
+    </>
+  )
+}
+
+function DuelStep({
+  index,
+  step,
+}) {
+  const _card = (card) => {
+    return card?.fire ? <><PacesIcon paces={card.fire}/> {card.fire}</>
+      : card?.dodge ? <><PacesIcon paces={card.dodge} dodge/> {card.dodge}</>
+        : card?.tactics ?? step.card_a?.blades ?? '-'
+  }
+  const card_a = _card(step.card_a)
+  const card_b = _card(step.card_b)
+  return (
+    <>
+      <Table attached>
+        <Header fullWidth>
+          <Row>
+            <HeaderCell width={4}><h5 className='Important'>Step {index}</h5></HeaderCell>
+            <HeaderCell><h5 className='Important'>{' '}</h5></HeaderCell>
+          </Row>
+        </Header>
+
+        <Body>
+          <Row>
+            <Cell>Pace</Cell>
+            <Cell>
+              <PacesIcon paces={step.pace} /> {step.pace}
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>Env Card</Cell>
+            <Cell>
+              {step.card_env}
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>Env Shuffle</Cell>
+            <Cell>
+              🎲 {step.dice_env.toString()}
+            </Cell>
+          </Row>
+        </Body>
+      </Table>
+
+      <StateRow state_a={step.state_a} state_b={step.state_b} card_a={card_a} card_b={card_b} />
+
     </>
   )
 }
