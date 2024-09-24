@@ -1235,7 +1235,7 @@
       }
     ],
     "address": "0x55fefc4a4e5c94def16d25bd1afa87407d114600560f75100f3edc8d5eaced6",
-    "transaction_hash": "0x2a9a9302b5427eb0a393da338d402358b48059dafde33997923add7407f5265",
+    "transaction_hash": "0x1c3daf662ea6aa76f91a219cbfaed8c1e4ee829d9d5277a31b32aa97af7c20",
     "block_number": 3,
     "seed": "pistols",
     "metadata": {
@@ -1256,8 +1256,8 @@
     {
       "kind": "DojoContract",
       "address": "0x2f72d0e827656555aa1760aaff6e3c1f80aceea8096437b8422c99717cd3824",
-      "class_hash": "0x768b1ae3b1212fe153d4b24054efc2552fa566e628d1f090de32ae9cc1d0037",
-      "original_class_hash": "0x768b1ae3b1212fe153d4b24054efc2552fa566e628d1f090de32ae9cc1d0037",
+      "class_hash": "0x5ad54568db86c367d788f0b955aa1611af39ef18e573844a7593c68d44a8576",
+      "original_class_hash": "0x5ad54568db86c367d788f0b955aa1611af39ef18e573844a7593c68d44a8576",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -1731,7 +1731,7 @@
               "type": "()"
             },
             {
-              "name": "RunAway",
+              "name": "PocketPistol",
               "type": "()"
             },
             {
@@ -1771,7 +1771,7 @@
           "name": "pistols::models::challenge::DuelistState",
           "members": [
             {
-              "name": "health",
+              "name": "chances",
               "type": "core::integer::u8"
             },
             {
@@ -1779,11 +1779,11 @@
               "type": "core::integer::u8"
             },
             {
-              "name": "chances",
+              "name": "health",
               "type": "core::integer::u8"
             },
             {
-              "name": "dice_crit",
+              "name": "dice_fire",
               "type": "core::integer::u8"
             },
             {
@@ -1792,10 +1792,6 @@
             },
             {
               "name": "wager",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "win",
               "type": "core::integer::u8"
             }
           ]
@@ -2506,8 +2502,8 @@
     {
       "kind": "DojoContract",
       "address": "0x323b615e21a9cbb4366d643568c64e87518420f6b23a326abeefde6e73d3f3d",
-      "class_hash": "0x75b9143fb7dbf082a81a5e35745e59b785206ef883484a2b958cf01bb93fc95",
-      "original_class_hash": "0x75b9143fb7dbf082a81a5e35745e59b785206ef883484a2b958cf01bb93fc95",
+      "class_hash": "0x7d0ed9c1d7026c81fc94b03fb20ae4e57284f18d2fe4ae6c143b52ad7ba7aaf",
+      "original_class_hash": "0x7d0ed9c1d7026c81fc94b03fb20ae4e57284f18d2fe4ae6c143b52ad7ba7aaf",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -2746,19 +2742,23 @@
               "type": "core::felt252"
             },
             {
-              "name": "table_type",
-              "type": "pistols::models::table::TableType"
-            },
-            {
               "name": "description",
               "type": "core::felt252"
             },
             {
-              "name": "fee_collector_address",
-              "type": "core::starknet::contract_address::ContractAddress"
+              "name": "table_type",
+              "type": "pistols::models::table::TableType"
+            },
+            {
+              "name": "deck_type",
+              "type": "pistols::types::cards::hand::DeckType"
             },
             {
               "name": "fee_contract_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "fee_collector_address",
               "type": "core::starknet::contract_address::ContractAddress"
             },
             {
@@ -2768,10 +2768,6 @@
             {
               "name": "is_open",
               "type": "core::bool"
-            },
-            {
-              "name": "deck_type",
-              "type": "pistols::types::cards::hand::DeckType"
             }
           ]
         },
@@ -14532,8 +14528,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x2c7565c9f24a53b6e9a39e46937b21169bf150547df825f2ff414f416adca51",
-      "original_class_hash": "0x2c7565c9f24a53b6e9a39e46937b21169bf150547df825f2ff414f416adca51",
+      "class_hash": "0x58024681b9bc7177fcda38cc1393cd50085a19b8ee02bae558422ff0b55498",
+      "original_class_hash": "0x58024681b9bc7177fcda38cc1393cd50085a19b8ee02bae558422ff0b55498",
       "abi": [
         {
           "type": "impl",
@@ -14937,7 +14933,7 @@
           "name": "pistols::models::challenge::DuelistState",
           "members": [
             {
-              "name": "health",
+              "name": "chances",
               "type": "core::integer::u8"
             },
             {
@@ -14945,11 +14941,11 @@
               "type": "core::integer::u8"
             },
             {
-              "name": "chances",
+              "name": "health",
               "type": "core::integer::u8"
             },
             {
-              "name": "dice_crit",
+              "name": "dice_fire",
               "type": "core::integer::u8"
             },
             {
@@ -14958,10 +14954,6 @@
             },
             {
               "name": "wager",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "win",
               "type": "core::integer::u8"
             }
           ]
@@ -15992,22 +15984,27 @@
           "key": true
         },
         {
-          "name": "table_type",
-          "type": "TableType",
-          "key": false
-        },
-        {
           "name": "description",
           "type": "felt252",
           "key": false
         },
         {
-          "name": "fee_collector_address",
-          "type": "ContractAddress",
+          "name": "table_type",
+          "type": "TableType",
+          "key": false
+        },
+        {
+          "name": "deck_type",
+          "type": "DeckType",
           "key": false
         },
         {
           "name": "fee_contract_address",
+          "type": "ContractAddress",
+          "key": false
+        },
+        {
+          "name": "fee_collector_address",
           "type": "ContractAddress",
           "key": false
         },
@@ -16020,15 +16017,10 @@
           "name": "is_open",
           "type": "bool",
           "key": false
-        },
-        {
-          "name": "deck_type",
-          "type": "DeckType",
-          "key": false
         }
       ],
-      "class_hash": "0x449fbf412e50d3e223ddc543429625263a4776e1d28a71a9cac228e98fd979f",
-      "original_class_hash": "0x449fbf412e50d3e223ddc543429625263a4776e1d28a71a9cac228e98fd979f",
+      "class_hash": "0x6b05e10a9a84fe260a91833936740b56b77a8caff0cd9fd842f4b6e0ec95ec5",
+      "original_class_hash": "0x6b05e10a9a84fe260a91833936740b56b77a8caff0cd9fd842f4b6e0ec95ec5",
       "abi": [
         {
           "type": "impl",
@@ -16421,20 +16413,6 @@
         },
         {
           "type": "enum",
-          "name": "core::bool",
-          "variants": [
-            {
-              "name": "False",
-              "type": "()"
-            },
-            {
-              "name": "True",
-              "type": "()"
-            }
-          ]
-        },
-        {
-          "type": "enum",
           "name": "pistols::types::cards::hand::DeckType",
           "variants": [
             {
@@ -16448,6 +16426,20 @@
           ]
         },
         {
+          "type": "enum",
+          "name": "core::bool",
+          "variants": [
+            {
+              "name": "False",
+              "type": "()"
+            },
+            {
+              "name": "True",
+              "type": "()"
+            }
+          ]
+        },
+        {
           "type": "struct",
           "name": "pistols::models::table::TableConfig",
           "members": [
@@ -16456,19 +16448,23 @@
               "type": "core::felt252"
             },
             {
-              "name": "table_type",
-              "type": "pistols::models::table::TableType"
-            },
-            {
               "name": "description",
               "type": "core::felt252"
             },
             {
-              "name": "fee_collector_address",
-              "type": "core::starknet::contract_address::ContractAddress"
+              "name": "table_type",
+              "type": "pistols::models::table::TableType"
+            },
+            {
+              "name": "deck_type",
+              "type": "pistols::types::cards::hand::DeckType"
             },
             {
               "name": "fee_contract_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "fee_collector_address",
               "type": "core::starknet::contract_address::ContractAddress"
             },
             {
@@ -16478,10 +16474,6 @@
             {
               "name": "is_open",
               "type": "core::bool"
-            },
-            {
-              "name": "deck_type",
-              "type": "pistols::types::cards::hand::DeckType"
             }
           ]
         },
