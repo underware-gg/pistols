@@ -289,12 +289,12 @@ export function defineContractComponents(world: World) {
     Round: (() => {
       return defineComponent(
         world,
-        { duel_id: RecsType.BigInt, round_number: RecsType.Number, moves_a: { salt: RecsType.BigInt, hashed: RecsType.BigInt, card_1: RecsType.Number, card_2: RecsType.Number, card_3: RecsType.Number, card_4: RecsType.Number }, moves_b: { salt: RecsType.BigInt, hashed: RecsType.BigInt, card_1: RecsType.Number, card_2: RecsType.Number, card_3: RecsType.Number, card_4: RecsType.Number }, state_a: { health: RecsType.Number, damage: RecsType.Number, chances: RecsType.Number, dice_crit: RecsType.Number, honour: RecsType.Number, wager: RecsType.Number, win: RecsType.Number }, state_b: { health: RecsType.Number, damage: RecsType.Number, chances: RecsType.Number, dice_crit: RecsType.Number, honour: RecsType.Number, wager: RecsType.Number, win: RecsType.Number }, state: RecsType.Number },
+        { duel_id: RecsType.BigInt, round_number: RecsType.Number, moves_a: { salt: RecsType.BigInt, hashed: RecsType.BigInt, card_1: RecsType.Number, card_2: RecsType.Number, card_3: RecsType.Number, card_4: RecsType.Number }, moves_b: { salt: RecsType.BigInt, hashed: RecsType.BigInt, card_1: RecsType.Number, card_2: RecsType.Number, card_3: RecsType.Number, card_4: RecsType.Number }, state_a: { chances: RecsType.Number, damage: RecsType.Number, health: RecsType.Number, dice_fire: RecsType.Number, honour: RecsType.Number, wager: RecsType.Number }, state_b: { chances: RecsType.Number, damage: RecsType.Number, health: RecsType.Number, dice_fire: RecsType.Number, honour: RecsType.Number, wager: RecsType.Number }, state: RecsType.Number },
         {
           metadata: {
             namespace: "pistols",
             name: "Round",
-            types: ["u128","u8","felt252","u128","u8","u8","u8","u8","felt252","u128","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","enum"],
+            types: ["u128","u8","felt252","u128","u8","u8","u8","u8","felt252","u128","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","enum"],
             customTypes: ["Moves","Moves","DuelistState","DuelistState","RoundState"],
           },
         }
@@ -331,12 +331,12 @@ export function defineContractComponents(world: World) {
     TableConfig: (() => {
       return defineComponent(
         world,
-        { table_id: RecsType.BigInt, table_type: RecsType.Number, description: RecsType.BigInt, fee_collector_address: RecsType.BigInt, fee_contract_address: RecsType.BigInt, fee_min: RecsType.BigInt, is_open: RecsType.Boolean, deck_type: RecsType.Number },
+        { table_id: RecsType.BigInt, description: RecsType.BigInt, table_type: RecsType.Number, deck_type: RecsType.Number, fee_contract_address: RecsType.BigInt, fee_collector_address: RecsType.BigInt, fee_min: RecsType.BigInt, is_open: RecsType.Boolean },
         {
           metadata: {
             namespace: "pistols",
             name: "TableConfig",
-            types: ["felt252","enum","felt252","contractaddress","contractaddress","u128","bool","enum"],
+            types: ["felt252","felt252","enum","enum","contractaddress","contractaddress","u128","bool"],
             customTypes: ["TableType","DeckType"],
           },
         }
