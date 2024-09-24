@@ -100,10 +100,10 @@ export default function IRLTournamentModal({
         <Grid className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>
-              <ActionButton fill label='Close' onClick={() => opener.close()} />
+              <ActionButton large fill label='Close' onClick={() => opener.close()} />
             </Col>
             <Col>
-              <ActionButton fill important label={isReply ? 'Your Opponent is Waiting!' : 'Challenge Your Opponent!'} disabled={!selectedArchetype || isSubmitting} onClick={() => _challenge()} />
+              <ActionButton large fill important label={isReply ? 'Your Opponent is Waiting!' : 'Challenge Your Opponent!'} disabled={!selectedArchetype || isSubmitting} onClick={() => _challenge()} />
             </Col>
           </Row>
         </Grid>

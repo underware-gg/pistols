@@ -14,7 +14,7 @@ const Col = Grid.Column
 const _makeBubble = (count) => {
   if (count > 0) {
     return (
-      <Label floating>
+      <Label className='Smaller' floating>
         {count}
       </Label>
     )

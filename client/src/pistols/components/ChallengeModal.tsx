@@ -176,16 +176,16 @@ export default function ChallengeModal() {
         <Grid className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>
-              <ActionButton fill label='Close' onClick={() => _close()} />
+              <ActionButton large fill label='Close' onClick={() => _close()} />
             </Col>
             {(state == ChallengeState.Awaiting && isChallenger) &&
               <Col>
-                <ActionButton fill negative label='Cowardly Withdraw' disabled={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
+                <ActionButton large fill negative label='Cowardly Withdraw' disabled={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
               </Col>
             }
             {(state == ChallengeState.Awaiting && isChallenged) &&
               <Col>
-                <ActionButton fill negative label='Cowardly Refuse' disabled={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
+                <ActionButton large fill negative label='Cowardly Refuse' disabled={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
               </Col>
             }
             {(state == ChallengeState.Awaiting && isChallenged) &&
@@ -195,17 +195,17 @@ export default function ChallengeModal() {
             }
             {(state == ChallengeState.InProgress) &&
               <Col>
-                <ActionButton fill important label='Go to Live Duel!' onClick={() => _gotoDuel()} />
+                <ActionButton large fill important label='Go to Live Duel!' onClick={() => _gotoDuel()} />
               </Col>
             }
             {isFinished &&
               <Col>
-                <ActionButton fill important label='Replay Duel!' onClick={() => _gotoDuel()} />
+                <ActionButton large fill important label='Replay Duel!' onClick={() => _gotoDuel()} />
               </Col>
             }
             {(needToSyncExpired && (isChallenger || isChallenged)) &&
               <Col>
-                <ActionButton fill important label='Withdraw Expired Fees' disabled={isSubmitting} onClick={() => _reply(false)} />
+                <ActionButton large fill important label='Withdraw Expired Fees' disabled={isSubmitting} onClick={() => _reply(false)} />
               </Col>
             }
           </Row>

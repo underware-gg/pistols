@@ -16,8 +16,9 @@ import { SocialsList } from '@/pistols/components/SocialsList'
 import { Divider } from '@/lib/ui/Divider'
 import { IconClick } from '@/lib/ui/Icons'
 import { Header } from '@/pistols/components/Header'
-import WalletHeader from '@/pistols/components/account/WalletHeader'
 import DuelistEditModal from '@/pistols/components/DuelistEditModal'
+import DuelistModal from '@/pistols/components/DuelistModal'
+import WalletHeader from '@/pistols/components/account/WalletHeader'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -42,8 +43,8 @@ export default function ScProfile() {
 
   return (
     <div id='Gate'>
+      <Header account={false} tables={false} />
       <div className='UIContainer'>
-        <Header account={false} tables={false} />
         <WalletHeader />
         <Tab
           menu={{ secondary: true, pointing: true, attached: true }}
@@ -62,6 +63,7 @@ export default function ScProfile() {
       </div>
 
       <DuelistEditModal opener={duelistEditOpener} />
+      <DuelistModal duelButton />
       <CurrentChainHint />
     </div>
   )
@@ -95,12 +97,18 @@ function DuelistsConnect() {
 
 function DuelistsList() {
   const { address } = useAccount()
+  const { duelistId } = useSettings()
   const { duelistEditOpener } = usePistolsContext()
+  const { dispatchSetScene } = usePistolsScene()
   const { duelistBalance } = useDuelistBalanceOf(address)
   const { canMint } = useCanMintDuelist(address)
 
   const _mintDuelist = () => {
     duelistEditOpener.open({ mintNew: true })
+  }
+
+  const _goToTavern = () => {
+    dispatchSetScene(SceneName.Tavern)
   }
 
   const rows = useMemo(() => {
@@ -132,9 +140,9 @@ function DuelistsList() {
         }
       </Grid>
       <Divider />
-      <ActionButton fill disabled={!canMint} onClick={() => _mintDuelist()} label='Create New Duelist' />
+      <ActionButton fill important disabled={!duelistId} onClick={() => _goToTavern()} label={!duelistId ? 'Select A Duelist' : 'Enter The Tavern'} />
       <Divider content={'OR'} />
-      <EnterAsGuestButton />
+      <ActionButton fill disabled={!canMint} onClick={() => _mintDuelist()} label='Create New Duelist' />
     </VStack>
   )
 }
@@ -153,7 +161,7 @@ function DuelistItem({
 
   const _canPlay = (exists)
 
-  const { duelistEditOpener } = usePistolsContext()
+  const { duelistEditOpener, dispatchSelectDuelistId } = usePistolsContext()
   const { dispatchDuelistId } = useSettings()
 
   const _manage = () => {
@@ -164,7 +172,7 @@ function DuelistItem({
   const { dispatchSetScene } = usePistolsScene()
   const _duel = () => {
     dispatchDuelistId(duelistId)
-    dispatchSetScene(SceneName.Tavern)
+    dispatchSetScene(SceneName.YourDuels)
   }
 
   const classNames = useMemo(() => {
@@ -198,7 +206,8 @@ function DuelistItem({
           </h5>
         </Col>
         <Col width={5} textAlign='left' verticalAlign='bottom'>
-          <ActionButton fill disabled={!_canPlay} onClick={() => _duel()} label='Duel!' />
+          <ActionButton fill disabled={!_canPlay} onClick={() => dispatchSelectDuelistId(duelistId)} label='Status' />
+          <ActionButton fill important disabled={!_canPlay} onClick={() => _duel()} label='Duel!' />
         </Col>
       </Row>
     </>

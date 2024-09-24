@@ -79,7 +79,7 @@ export function ProfileDescription({
           {displayNameSmall ? 
             (<h2 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /></h2>)
             :
-            (<h2 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /></h2>)
+            (<h1 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /></h1>)
           }
           
           {displayOwnerAddress && <AddressShort address={owner} small={displayOwnerAddressSmall}/>}

@@ -137,7 +137,7 @@ export default function NewChallengeModal() {
         <Grid className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>
-              <ActionButton fill label='Nevermind!' onClick={() => _close()} />
+              <ActionButton large fill label='Nevermind!' onClick={() => _close()} />
             </Col>
             <Col>
               {tableIsOpen &&
@@ -151,7 +151,7 @@ export default function NewChallengeModal() {
                   onClick={() => _create_challenge()}
                 />
               }
-              {!tableIsOpen && <ActionButton fill disabled negative label='Table is Closed!' onClick={() => { }} />}
+              {!tableIsOpen && <ActionButton large fill disabled negative label='Table is Closed!' onClick={() => { }} />}
             </Col>
           </Row>
         </Grid>

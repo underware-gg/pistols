@@ -36,7 +36,7 @@ export default function AccountHeader() {
         <Col width={12} textAlign='left' verticalAlign='top'>
           {!isConnected ? <h3>Guest</h3>
             : <>
-              <h3>{nameDisplay}</h3>
+              <h2>{nameDisplay}</h2>
               <AddressShort address={address} copyLink={'left'} />
               <br />
               <LordsBalance address={address} big />

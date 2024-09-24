@@ -92,7 +92,7 @@ export class BarMenu extends THREE.Object3D {
     if (this.renderer && enabled) {
       if (this.timeOffset === 0) {
         // always start rendering scene with a glow (4 seconds delay)
-        this.timeOffset = (elapsedTime % 4.0) - 3;
+        this.timeOffset = (elapsedTime % 4.0) + 1.0;
       }
       this.maskShader.setUniformValue("uTime", elapsedTime - this.timeOffset)
 

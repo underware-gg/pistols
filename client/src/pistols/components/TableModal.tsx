@@ -75,7 +75,7 @@ export default function TableModal({
       </Modal.Header>
       
       <Modal.Content>
-        <Modal.Description className='FillParent TitleCase'>
+        <Modal.Description className='FillParent TitleCase ModalText'>
           <Grid>
             <Row divided>
               <Col width={5} className='BgDarkest'>
@@ -96,10 +96,10 @@ export default function TableModal({
         <Grid className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>
-              <ActionButton fill label='Close' onClick={() => opener.close()} />
+              <ActionButton large fill label='Close' onClick={() => opener.close()} />
             </Col>
             <Col>
-              <ActionButton fill important label='Join Table' disabled={!tableIsOpen || !selectedTableId} onClick={() => _joinTable()} />
+              <ActionButton large fill important label='Join Table' disabled={!tableIsOpen || !selectedTableId} onClick={() => _joinTable()} />
             </Col>
           </Row>
         </Grid>
@@ -243,7 +243,7 @@ function TableListItem({
 }) {
   const { description } = useTable(tableId)
   return (
-    <Button key={tableId} active={active} onClick={() => { setSelectedTableId(tableId) }}>{description}</Button>
+    <Button size='big' key={tableId} active={active} onClick={() => { setSelectedTableId(tableId) }}>{description}</Button>
   )
 }
 

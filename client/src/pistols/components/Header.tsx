@@ -50,8 +50,6 @@ export function Header({
             <AccountHeader />
           }
         </Col>
-        <Col width={2}>
-        </Col>
 
         <Col width={6} textAlign='center' verticalAlign='middle' className='TitleCase NoBreak Padded Relative'>
           {tables && <>
@@ -61,6 +59,8 @@ export function Header({
               {' '}<b className='Important H3 Anchor' onClick={() => _changeTable()}>{description}</b>
             </p>
           </>}
+        </Col>
+        <Col width={2}>
         </Col>
         <Col width={1} textAlign='right' verticalAlign='middle'>
           <MusicToggle size='big' />

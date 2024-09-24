@@ -174,10 +174,10 @@ export default function DuelistEditModal({
         <Grid columns={4} className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>
-              <ActionButton fill label='Close' onClick={() => opener.close()} />
+              <ActionButton large fill label='Close' onClick={() => opener.close()} />
             </Col>
             <Col>
-              <ActionButton important fill disabled={!canSubmit} onClick={() => _submit()} label={_submitLabel} />
+              <ActionButton large fill important disabled={!canSubmit} onClick={() => _submit()} label={_submitLabel} />
             </Col>
           </Row>
         </Grid>

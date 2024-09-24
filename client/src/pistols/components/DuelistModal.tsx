@@ -16,7 +16,11 @@ import { IconClick } from '@/lib/ui/Icons'
 const Row = Grid.Row
 const Col = Grid.Column
 
-export default function DuelistModal() {
+export default function DuelistModal({
+  duelButton = false,
+}: {
+  duelButton?: boolean
+}) {
   const { tableId, duelistId, isAnon, dispatchDuelistId } = useSettings()
   const { dispatchSetScene } = usePistolsScene()
 
@@ -37,6 +41,11 @@ export default function DuelistModal() {
     } else if (isMyDuelist) {
       dispatchDuelistId(selectedDuelistId)
     }
+  }
+
+  const _duel = () => {
+    dispatchSetScene(SceneName.YourDuels)
+    _close()
   }
 
   return (
@@ -90,12 +99,17 @@ export default function DuelistModal() {
         <Grid className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>
-              <ActionButton fill label='Close' onClick={() => _close()} />
+              <ActionButton large fill label='Close' onClick={() => _close()} />
             </Col>
             {!isYou &&
               <Col>
-                {hasPact && <ActionButton fill important label='Challenge In Progress!' onClick={() => dispatchSelectDuel(pactDuelId)} />}
-                {!hasPact && <ActionButton fill disabled={isAnon} label='Challenge for a Duel!' onClick={() => dispatchChallengingDuelistId(selectedDuelistId)} />}
+                {hasPact && <ActionButton large fill important label='Challenge In Progress!' onClick={() => dispatchSelectDuel(pactDuelId)} />}
+                {!hasPact && <ActionButton large fill disabled={isAnon} label='Challenge for a Duel!' onClick={() => dispatchChallengingDuelistId(selectedDuelistId)} />}
+              </Col>
+            }
+            {duelButton &&
+              <Col>
+                <ActionButton large fill important label='Duel!' onClick={() => _duel()} />
               </Col>
             }
           </Row>

@@ -117,7 +117,7 @@ export const BalanceRequiredButton = ({
   const wagerTooLow = (BigInt(minWagerValue ?? 0) > 0n && BigInt(wagerValue) < BigInt(minWagerValue))
   const canSubmit = (!wagerTooLow && !noFundsForFee)
   return (
-    <ActionButton fill
+    <ActionButton large fill
       disabled={disabled}
       important={canSubmit}
       negative={!canSubmit}

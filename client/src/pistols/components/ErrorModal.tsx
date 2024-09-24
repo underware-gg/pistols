@@ -26,7 +26,7 @@ export default function ErrorModal() {
         {eventData?.reason}
       </Modal.Content>
       <Modal.Actions className='NoPadding'>
-        <ActionButton fill label='Close' onClick={() => setIsOpen(false)} />
+        <ActionButton large fill label='Close' onClick={() => setIsOpen(false)} />
       </Modal.Actions>
     </Modal>
   )

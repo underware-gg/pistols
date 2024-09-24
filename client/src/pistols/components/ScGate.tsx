@@ -120,7 +120,7 @@ export function EnterAsGuestButton() {
     dispatchDuelistId(0n)
     dispatchSetScene(SceneName.Tavern)
   }
-  return <ActionButton fill large onClick={() => _enterAsGuest()} label='Enter as Guest' />
+  return <ActionButton large fill onClick={() => _enterAsGuest()} label='Enter as Guest' />
 }
 
 

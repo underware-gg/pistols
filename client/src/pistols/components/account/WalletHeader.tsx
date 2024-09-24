@@ -65,14 +65,14 @@ export default function WalletHeader({
         <Row columns={'equal'}>
           {lordsContractAddress &&
             <Col verticalAlign='middle'>
-              <LordsFaucet fill large account={account} />
+              <LordsFaucet fill account={account} />
             </Col>
           }
           <Col verticalAlign='middle'>
-            <ActionButton fill large onClick={() => openMenu()} label='Settings' />
+            <ActionButton fill onClick={() => openMenu()} label='Settings' />
           </Col>
           <Col verticalAlign='middle'>
-            <ActionButton fill large onClick={() => disconnect()} label='Disconnect' />
+            <ActionButton fill onClick={() => disconnect()} label='Disconnect' />
           </Col>
         </Row>
       }

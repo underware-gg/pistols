@@ -96,10 +96,10 @@ export default function CommitPacesModal({
         <Grid className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>
-              <ActionButton fill label='Close' onClick={() => setIsOpen(false)} />
+              <ActionButton large fill label='Close' onClick={() => setIsOpen(false)} />
             </Col>
             <Col>
-              <ActionButton fill important label='Commit...' disabled={!canSubmit} onClick={() => _submit()} />
+              <ActionButton large fill important label='Commit...' disabled={!canSubmit} onClick={() => _submit()} />
             </Col>
           </Row>
         </Grid>

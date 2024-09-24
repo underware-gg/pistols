@@ -607,6 +607,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 .LargeButton {
   margin: 0 0.1em;
   padding: 1em 2em;
+  font-size: 1.5em!important;
 }
 
 .FilterButton {
@@ -1267,8 +1268,9 @@ $logo-url: '/logos/logo_avante.svg';
   position: absolute;
   top: 0;
   left: 0;
-  padding: 2em;
-  font-size: 1.5em;
+  padding: 1.3em;
+  font-size: 2em;
+  text-shadow: $text-shadow;
 }
 
 
