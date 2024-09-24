@@ -346,7 +346,7 @@ export const usePistolsSceneRoute = () => {
   const currentRoute = useMemo(() => (router.isReady ? router.asPath : null), [router])
   const routeSlugs = useMemo(() => (
     (router.isReady && router.query.main) ? router.query.main.slice(1) : []
-  ), [router.query?.main?.[0]]) // only when /[slug] changes
+  ), [router]) // only when /[slug] changes
 
   //------------------------------
   // Detect scene from route
@@ -358,7 +358,7 @@ export const usePistolsSceneRoute = () => {
       const newScene = Object.keys(sceneRoutes).find(key => {
         return currentRoute.startsWith(sceneRoutes[key].baseUrl)
       }) as SceneName
-      console.log(`ROUTE [${currentRoute}] >> SCENE [${newScene}]`, router)
+      // console.log(`ROUTE [${currentRoute}] >> SCENE [${newScene}]`, router)
       if (newScene) {
         const route = sceneRoutes[newScene]
         __dispatchSetScene(newScene)
