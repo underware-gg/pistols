@@ -281,9 +281,9 @@ export const sceneRoutes: Record<SceneName, SceneRoute> = {
   // scenes with tableId
   [SceneName.Tavern]: { baseUrl: '/tavern/', hasTableId: true },
   [SceneName.Barkeep]: { baseUrl: '/tavern/', hasTableId: true },
-  [SceneName.Duelists]: { baseUrl: '/duelists/', hasTableId: true, title: 'Pistols - Duelists' },
+  [SceneName.Duelists]: { baseUrl: '/balcony/', hasTableId: true, title: 'Pistols - Duelists' },
   [SceneName.YourDuels]: { baseUrl: '/duels/', hasTableId: true, title: 'Pistols - Your Duels' },
-  [SceneName.LiveDuels]: { baseUrl: '/duels/', hasTableId: true, title: 'Pistols - Live Duels' },
+  [SceneName.LiveDuels]: { baseUrl: '/live/', hasTableId: true, title: 'Pistols - Live Duels' },
   [SceneName.PastDuels]: { baseUrl: '/graveyard/', hasTableId: true, title: 'Pistols - Past Duels' },
   [SceneName.Tournament]: { baseUrl: '/tournament/', hasTableId: true, title: 'Pistols - Tournament' },
   [SceneName.IRLTournament]: { baseUrl: '/tournament/', hasTableId: true, title: 'Pistols - IRL Tournament' },

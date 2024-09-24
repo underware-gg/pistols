@@ -23,30 +23,25 @@ const nextConfig = {
         source: '/',
         destination: '/main/gate',
       },
-      {
-        source: '/tavern/:slug*',
-        destination: '/main/tavern/:slug*',
-      },
-      {
-        source: '/profile/:slug*',
-        destination: '/main/profile/:slug*',
-      },
-      {
-        source: '/duelists/:slug*',
-        destination: '/main/duelists/:slug*',
-      },
-      {
-        source: '/duels/:slug*',
-        destination: '/main/duels/:slug*',
-      },
-      {
-        source: '/graveyard/:slug*',
-        destination: '/main/graveyard/:slug*',
-      },
-      {
-        source: '/duel/:slug*',
-        destination: '/main/duel/:slug*',
-      },
+      // {
+      //   source: '/tavern/:slug*',
+      //   destination: '/main/tavern/:slug*',
+      // },
+      ...[
+        'tavern',
+        'profile',
+        'duelists',
+        'graveyard',
+        'duels',
+        'duel',
+        'live',
+        'balcony',
+      ].reduce((acc, slug) => ([
+        ...acc, {
+          source: `/${slug}/:slug*`,
+          destination: `/main/${slug}/:slug*`,
+        }
+      ]), []),
     ]
   },
   async redirects() {
