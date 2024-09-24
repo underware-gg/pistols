@@ -15,7 +15,6 @@ const supportedChainIds: ChainId[] = [
   ChainId.SN_SEPOLIA,
   ChainId.KATANA_LOCAL,
   // ChainId.SN_MAINNET,
-  // ChainId.REALMS_WORLD,
 ]
 
 const manifests: Record<ChainId, DojoManifest> = {
@@ -24,7 +23,6 @@ const manifests: Record<ChainId, DojoManifest> = {
   [ChainId.PISTOLS_STAGING]: pistols_manifest_staging as DojoManifest,
   [ChainId.SN_SEPOLIA]: pistols_manifest_sepolia as DojoManifest,
   [ChainId.SN_MAINNET]: null,
-  [ChainId.REALMS_WORLD]: null,
 }
 
 export const makeDojoAppConfig = (): DojoAppConfig => {

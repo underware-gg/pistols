@@ -24,7 +24,6 @@ export enum ChainId {
   KATANA_LOCAL = 'KATANA_LOCAL',
   PISTOLS_SLOT = 'WP_PISTOLS',
   PISTOLS_STAGING = 'WP_PISTOLS_STAGING',
-  REALMS_WORLD = 'KATANA', // actually DOJO_REALMS_WORLD
 }
 
 //
@@ -177,29 +176,6 @@ const pistolsStagingConfig: DojoChainConfig = {
   explorers: WORLD_EXPLORER,
 } as const
 
-// based on:
-// https://dev.realms.world/browser-wallets
-const realmsWorldConfig: DojoChainConfig = {
-  chain: undefined, // derive from this
-  chainId: ChainId.REALMS_WORLD,
-  name: 'Realms World (Ranked)',
-  rpcUrl: 'https://api.cartridge.gg/x/realms/katana',
-  toriiUrl: 'https://api.cartridge.gg/x/realms/torii',
-  relayUrl: undefined,
-  masterAddress: undefined,
-  masterPrivateKey: undefined,
-  accountClassHash: '0x029927c8af6bccf3f6fda035981e765a7bdbf18a2dc0d630494f8758aa908e2b',
-  etherAddress: undefined,
-  lordsContractAddress: '0x51205c5e6ac3ad5691c28c0c5ffcdd62c70bddb63612f75a4bac9b2a85b9449',
-  lordsFaucetUrl: 'https://internal-explorer.preview.cartridge.gg',
-  predeployedAccounts: [],
-  connectorIds: [
-    supportedConnetorIds.CONTROLLER,
-  ],
-  // starknet Chain
-  nativeCurrency: LORDS_REALMS_L3,
-  explorers: WORLD_EXPLORER,
-} as const
 
 
 //-------------------------------
@@ -260,7 +236,6 @@ export const dojoContextConfig: Record<ChainId, DojoChainConfig> = {
   [ChainId.KATANA_LOCAL]: localKatanaConfig,
   [ChainId.PISTOLS_SLOT]: pistolsSlotConfig,
   [ChainId.PISTOLS_STAGING]: pistolsStagingConfig,
-  [ChainId.REALMS_WORLD]: realmsWorldConfig,
   [ChainId.SN_SEPOLIA]: snSepoliaConfig,
   [ChainId.SN_MAINNET]: snMainnetConfig,
 }
