@@ -19,9 +19,9 @@ import { poseidon } from '@/lib/utils/starknet'
 
 export enum SceneName {
   Gate = 'Gate',
+  Profile = 'Profile',
   Tavern = 'Tavern',
   Barkeep = 'Barkeep',
-  Profile = 'Profile',
   Duelists = 'Duelists',
   YourDuels = 'Your Duels',
   LiveDuels = 'Live Duels',

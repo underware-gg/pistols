@@ -6,12 +6,12 @@ import { ActionButton } from '@/pistols/components/ui/Buttons'
 export default function ErrorModal() {
   const [isOpen, setIsOpen] = useState(null)
 
-  const eventData = useGameEvent('transaction_error', null)
+  const { value: eventData, timestamp } = useGameEvent('transaction_error', null)
   useEffect(() => {
     if (eventData) {
       setIsOpen(true)
     }
-  }, [eventData])
+  }, [eventData, timestamp])
 
   return (
     <Modal

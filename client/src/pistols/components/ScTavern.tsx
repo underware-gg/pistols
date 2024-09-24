@@ -16,13 +16,12 @@ export default function ScTavern() {
   const { tableOpener } = usePistolsContext()
   const { dispatchSetScene } = usePistolsScene()
 
-  const new_scene = useGameEvent('change_scene', null)
+  const { value: newScene, timestamp } = useGameEvent('change_scene', null)
   useEffect(() => {
-    console.log('>>>> DISPATCH SCENE', new_scene)
-    if (new_scene) {
-      dispatchSetScene(new_scene)
+    if (newScene) {
+      dispatchSetScene(newScene)
     }
-  }, [new_scene])
+  }, [newScene, timestamp])
 
   return (
     <QueryProvider>

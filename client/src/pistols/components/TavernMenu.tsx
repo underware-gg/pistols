@@ -25,7 +25,7 @@ const _makeBubble = (count) => {
 export function TavernMenu() {
   const { tableId } = useSettings()
   const { tavernMenuItems } = usePistolsContext()
-  const { atTavern, currentScene, dispatchSetScene } = usePistolsScene()
+  const { atTavern, atBarkeep, currentScene, dispatchSetScene } = usePistolsScene()
   const { isTournament, isIRLTournament } = useTable(tableId)
 
   const {
@@ -69,7 +69,7 @@ export function TavernMenu() {
 
   const menuIndex = panes.findIndex(pane => (pane.key == currentScene))
 
-  if (atTavern) {
+  if (atTavern || atBarkeep) {
     return <></>
   }
 

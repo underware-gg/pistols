@@ -11,7 +11,7 @@ import { ShaderMaterial } from './shaders'
 import { SceneName } from '../hooks/PistolsContext';
 
 const BAR_SCENES = {
-  'ff0000': SceneName.Tavern,     // red: bartender
+  'ff0000': SceneName.Barkeep,    // red: bartender
   '00ff00': SceneName.Duelists,   // bottle: green
   '0000ff': SceneName.YourDuels,  // pistol: blue
   'ff00ff': SceneName.PastDuels,  // shovel: magenta
@@ -28,12 +28,14 @@ export class BarMenu extends THREE.Object3D {
   mousePos: THREE.Vector2
   pickedColor: THREE.Color
   pickedScene: SceneName
+  timeOffset: number
 
   constructor(bgScene: THREE.Scene, bgMesh: THREE.Mesh) {
     super()
 
     this.mousePos = new THREE.Vector2()
     this.pickedColor = new THREE.Color(0, 0, 0)
+    this.timeOffset = 0
 
     this.fbo = new THREE.WebGLRenderTarget(
       WIDTH, HEIGHT,
@@ -85,10 +87,14 @@ export class BarMenu extends THREE.Object3D {
   }
 
   // return hex color over the mouse
-  render(renderer: THREE.WebGLRenderer, camera: THREE.Camera, elapsedTime: number): string {
+  render(renderer: THREE.WebGLRenderer, camera: THREE.Camera, elapsedTime: number, enabled: boolean): string {
     this.renderer = renderer
-    if (this.renderer) {
-      this.maskShader.setUniformValue("uTime", elapsedTime)
+    if (this.renderer && enabled) {
+      if (this.timeOffset === 0) {
+        // always start rendering scene with a glow (4 seconds delay)
+        this.timeOffset = (elapsedTime % 4.0) - 3;
+      }
+      this.maskShader.setUniformValue("uTime", elapsedTime - this.timeOffset)
 
       this.renderer.setRenderTarget(this.fbo);
       this.renderer.clear();
@@ -99,6 +105,7 @@ export class BarMenu extends THREE.Object3D {
       this.renderer.readRenderTargetPixels(this.fbo, this.mousePos.x, this.mousePos.y, 1, 1, read);
       this.pickColor(read[0], read[1], read[2])
     } else {
+      this.timeOffset = 0
       this.pickColor(0, 0, 0)
     }
     return this.pickedColor.getHexString()

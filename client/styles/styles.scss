@@ -1240,7 +1240,6 @@ $logo-url: '/logos/logo_avante.svg';
 .TempBarkeepOverlay {
   @extend .FillParent;
   @extend .AboveAll;
-  background-color: rgba($color-darkest, 0.5);
 }
 .TempBarkeepTalkBalloon {
   width: 300px;

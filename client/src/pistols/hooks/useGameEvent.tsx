@@ -4,6 +4,7 @@ import { emitter } from '@/pistols/three/game'
 
 export const useGameEvent = (eventName: string, defaultValue: any = null) => {
   const [value, setValue] = useState(defaultValue)
+  const [timestamp, setTimestamp] = useState(0)
 
   useEffectOnce(() => {
     let _mounted = true
@@ -11,6 +12,7 @@ export const useGameEvent = (eventName: string, defaultValue: any = null) => {
     const _callback = (v) => {
       if (_mounted) {
         setValue(v)
+        setTimestamp(Date.now())
       }
     }
 
@@ -22,5 +24,9 @@ export const useGameEvent = (eventName: string, defaultValue: any = null) => {
     }
 
   }, [])
-  return value
+
+  return {
+    value,
+    timestamp, // used to update hooks on repeating events
+  }
 }

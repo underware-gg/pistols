@@ -393,9 +393,7 @@ export function animate() {
         _renderer.render(_currentScene, _staticCamera)
       }
 
-      if (_sceneName == SceneName.Tavern) {
-        _barMenu.render(_renderer, _staticCamera, elapsedTime);
-      }
+      _barMenu.render(_renderer, _staticCamera, elapsedTime, _sceneName == SceneName.Tavern);
 
       _stats?.update()
     }
@@ -765,7 +763,7 @@ export function resetStaticScene() {
   if (_tweens.staticFade) TWEEN.remove(_tweens.staticFade)
 
   let bg = _currentScene.getObjectByName('bg') as THREE.Mesh
-  console.log(`SCENE>>>>>>>>`, _currentScene)
+  // console.log(`SCENE>>>>>>>>`, _currentScene)
 
   // zoom out
   let from = 1.1
