@@ -1,0 +1,72 @@
+kind = "DojoModel"
+class_hash = "0x621e8a8d75db58a04b11def09072b507b27ea956db4ea488d32741a7cd7aee3"
+original_class_hash = "0x621e8a8d75db58a04b11def09072b507b27ea956db4ea488d32741a7cd7aee3"
+abi = "manifests/sepolia/base/abis/models/pistols-Challenge-673267b6.json"
+tag = "pistols-Challenge"
+qualified_path = "pistols::models::challenge::challenge"
+manifest_name = "pistols-Challenge-673267b6"
+
+[[members]]
+name = "duel_id"
+type = "u128"
+key = true
+
+[[members]]
+name = "table_id"
+type = "felt252"
+key = false
+
+[[members]]
+name = "premise"
+type = "Premise"
+key = false
+
+[[members]]
+name = "quote"
+type = "felt252"
+key = false
+
+[[members]]
+name = "address_a"
+type = "ContractAddress"
+key = false
+
+[[members]]
+name = "address_b"
+type = "ContractAddress"
+key = false
+
+[[members]]
+name = "duelist_id_a"
+type = "u128"
+key = false
+
+[[members]]
+name = "duelist_id_b"
+type = "u128"
+key = false
+
+[[members]]
+name = "state"
+type = "ChallengeState"
+key = false
+
+[[members]]
+name = "round_number"
+type = "u8"
+key = false
+
+[[members]]
+name = "winner"
+type = "u8"
+key = false
+
+[[members]]
+name = "timestamp_start"
+type = "u64"
+key = false
+
+[[members]]
+name = "timestamp_end"
+type = "u64"
+key = false

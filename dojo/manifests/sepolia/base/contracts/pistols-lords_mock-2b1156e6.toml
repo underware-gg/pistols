@@ -1,0 +1,14 @@
+kind = "DojoContract"
+class_hash = "0x2568f056a19059af0d42b7a69a213ea341ba85382ec47a983194054e4ba4461"
+original_class_hash = "0x2568f056a19059af0d42b7a69a213ea341ba85382ec47a983194054e4ba4461"
+base_class_hash = "0x0"
+abi = "manifests/sepolia/base/abis/contracts/pistols-lords_mock-2b1156e6.json"
+reads = []
+writes = []
+init_calldata = []
+tag = "pistols-lords_mock"
+systems = [
+    "faucet",
+    "mint",
+]
+manifest_name = "pistols-lords_mock-2b1156e6"

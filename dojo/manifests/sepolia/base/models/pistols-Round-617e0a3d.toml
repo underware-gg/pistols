@@ -1,0 +1,42 @@
+kind = "DojoModel"
+class_hash = "0x58024681b9bc7177fcda38cc1393cd50085a19b8ee02bae558422ff0b55498"
+original_class_hash = "0x58024681b9bc7177fcda38cc1393cd50085a19b8ee02bae558422ff0b55498"
+abi = "manifests/sepolia/base/abis/models/pistols-Round-617e0a3d.json"
+tag = "pistols-Round"
+qualified_path = "pistols::models::challenge::round"
+manifest_name = "pistols-Round-617e0a3d"
+
+[[members]]
+name = "duel_id"
+type = "u128"
+key = true
+
+[[members]]
+name = "round_number"
+type = "u8"
+key = true
+
+[[members]]
+name = "moves_a"
+type = "Moves"
+key = false
+
+[[members]]
+name = "moves_b"
+type = "Moves"
+key = false
+
+[[members]]
+name = "state_a"
+type = "DuelistState"
+key = false
+
+[[members]]
+name = "state_b"
+type = "DuelistState"
+key = false
+
+[[members]]
+name = "state"
+type = "RoundState"
+key = false

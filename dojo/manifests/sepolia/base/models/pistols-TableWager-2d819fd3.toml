@@ -1,0 +1,27 @@
+kind = "DojoModel"
+class_hash = "0x1e1138764631b591734bf457f5c46f56d5bd974c60fed8109c638a65848732a"
+original_class_hash = "0x1e1138764631b591734bf457f5c46f56d5bd974c60fed8109c638a65848732a"
+abi = "manifests/sepolia/base/abis/models/pistols-TableWager-2d819fd3.json"
+tag = "pistols-TableWager"
+qualified_path = "pistols::models::table::table_wager"
+manifest_name = "pistols-TableWager-2d819fd3"
+
+[[members]]
+name = "table_id"
+type = "felt252"
+key = true
+
+[[members]]
+name = "wager_min"
+type = "u128"
+key = false
+
+[[members]]
+name = "wager_max"
+type = "u128"
+key = false
+
+[[members]]
+name = "fee_pct"
+type = "u8"
+key = false

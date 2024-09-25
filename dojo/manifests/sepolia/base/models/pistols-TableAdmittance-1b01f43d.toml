@@ -1,0 +1,22 @@
+kind = "DojoModel"
+class_hash = "0x71ec603d2893fa4e8573fb1c94e414124dc633b8c6b96dcc21ad8317fe2cf10"
+original_class_hash = "0x71ec603d2893fa4e8573fb1c94e414124dc633b8c6b96dcc21ad8317fe2cf10"
+abi = "manifests/sepolia/base/abis/models/pistols-TableAdmittance-1b01f43d.json"
+tag = "pistols-TableAdmittance"
+qualified_path = "pistols::models::table::table_admittance"
+manifest_name = "pistols-TableAdmittance-1b01f43d"
+
+[[members]]
+name = "table_id"
+type = "felt252"
+key = true
+
+[[members]]
+name = "accounts"
+type = "Array<ContractAddress>"
+key = false
+
+[[members]]
+name = "duelists"
+type = "Array<u128>"
+key = false

@@ -1,0 +1,14 @@
+kind = "DojoContract"
+class_hash = "0x7612f3f51e93bb6e4c471aa4f6faf5a0d28c20297fc0a78e589572e99317a90"
+original_class_hash = "0x7612f3f51e93bb6e4c471aa4f6faf5a0d28c20297fc0a78e589572e99317a90"
+base_class_hash = "0x0"
+abi = "manifests/sepolia/base/abis/contracts/pistols-token_duelist-541e9c18.json"
+reads = []
+writes = []
+init_calldata = []
+tag = "pistols-token_duelist"
+systems = [
+    "mint",
+    "burn",
+]
+manifest_name = "pistols-token_duelist-541e9c18"
