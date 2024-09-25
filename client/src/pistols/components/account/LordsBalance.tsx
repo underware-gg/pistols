@@ -119,7 +119,7 @@ export const LockedWagerBalance = ({
       {' + '}
       <Balance big tableId={tableId} wei={total} pre={pre} post={post} clean={clean} />
       {' '}
-      <span className='Normal'>(wagered)</span>
+      <span className='Normal'>(locked fees)</span>
     </>
   )
 }

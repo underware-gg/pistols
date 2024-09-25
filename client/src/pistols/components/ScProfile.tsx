@@ -187,14 +187,14 @@ function DuelistItem({
       <Row textAlign='center' verticalAlign='top' className={classNames.join(' ')}
         onClick={() => dispatchDuelistId(duelistId)}
       >
-        <Col width={3} className='NoPadding'>
+        <Col width={3} className='NoPadding' verticalAlign='middle'>
           <div>
             <ProfilePicSquare medium
               profilePic={profilePic ?? 0}
             />
           </div>
         </Col>
-        <Col width={8} textAlign='left'>
+        <Col width={8} textAlign='left' verticalAlign='middle'>
 
           <h4>
             <IconClick name='edit' size={'small'} onClick={() => _manage()} />

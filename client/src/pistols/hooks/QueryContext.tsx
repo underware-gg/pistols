@@ -379,6 +379,7 @@ const QueryProvider = ({
       if (!statesFilter.includes(row.state)) hides.add(index)
     })
     rows = _reduceRowsExcludes(rows, hides)
+    rows = rows.sort(_sortChallenges)
     // compute totals
     const challengeIds = rows.map(row => row.duel_id)
     const liveCount = rows.reduce((acc, row) => {
@@ -386,7 +387,7 @@ const QueryProvider = ({
       return acc
     }, 0)
     return {
-      rows: rows.sort(_sortChallenges),
+      rows,
       challengeIds,
       liveCount,
       states,
@@ -420,6 +421,7 @@ const QueryProvider = ({
     let excludes = _excludeRowsByDuelist(allChallenges, address, duelistId)
     // filter rows
     const result = _buildChallengeQuery(allChallenges, excludes, state.filterStatesYourDuels)
+    console.log('result', result)
     dispatch({ type: QueryActions.QUERY_YOUR_DUELS, payload: result })
   }, [allChallenges, address, duelistId, state.filterStatesYourDuels])
 
