@@ -1,6 +1,7 @@
 import 'semantic-ui-css/semantic.min.css'
 import '/styles/fonts.scss'
 import '/styles/styles.scss'
+import '/styles/cards.scss'
 import React from 'react'
 import { SettingsProvider } from '@/pistols/hooks/SettingsContext'
 import { PistolsProvider } from '@/pistols/hooks/PistolsContext'

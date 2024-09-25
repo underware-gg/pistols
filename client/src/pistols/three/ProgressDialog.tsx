@@ -859,7 +859,7 @@ export class ProgressDialogMesh {
     if (!this.element) return
 
     const bubbleImage = this.isThinkingBubble ? '/images/ui/bubble_thinking.png' : '/images/ui/bubble_speech.png'
-    const textColor = this.isYou ? 'green' : 'red'
+    const textColor = this.isYou ? '#77d64d' : '#e34a4a'
 
     const title = this.element.querySelector('.dialog-title') as HTMLElement
     title.textContent = this.dialogTitle

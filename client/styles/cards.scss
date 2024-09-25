@@ -1,0 +1,316 @@
+@import 'aspect';
+
+$color-positive: #77d64d;
+$color-negative: #e34a4a;
+$color-warning: #f1d242;
+$color-cold: #4d9ad6;
+
+.card {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  position: absolute;
+  overflow: visible;
+  width: var(--card-width);
+  height: var(--card-height);
+  translate: var(--card-translate-x) var(--card-translate-y);
+  scale: var(--card-scale);
+  rotate: var(--card-rotation);
+  z-index: var(--card-z-index, 0);
+  opacity: 0;
+  background-color: transparent;
+  transition: width 0.3s ease, height 0.3s ease, opacity 0.4s ease;
+  perspective: 1000px;
+  transform-origin: center bottom;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: translate 0.6s;
+  translate: var(--idle-translate-x, 0px) var(--idle-translate-y, 0px);
+  transform-style: preserve-3d;
+  transform: rotateY(var(--card-flip-rotation, 0deg));
+}
+
+.card-outline {
+  position: absolute;
+  width: 110%;
+  height: 110%;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+  border-radius: aspect-width(0.6);
+  background-color: var(--background-color, white);;
+  box-shadow: aspect-width(0.01) aspect-width(0.01) aspect-width(0.01) aspect-width(0.01) rgba(20, 20, 20, 0.6);
+  filter: blur(4px);
+  top: -5%;
+  left: -5%;
+  transform: translate(var(--idle-translate-x, 0px), var(--idle-translate-y, 0px));
+}
+
+.card-front {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden; /* Safari */
+  backface-visibility: hidden;
+  transform: rotateY(180deg);
+}
+.card-image-front {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.card-image-drawing {
+  position: absolute;
+  width: 90%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  left: 5%;
+}
+
+.card-details {
+  position: absolute;
+  width: 80%;
+  height: 30%;
+  top: 65%;
+  left: 10%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  color: black;
+  text-align: center;
+  padding-top: 5%;
+  padding-bottom: 5%;
+}
+
+.card-title {
+  font-size: aspect-width(0.65);
+  font-weight: bold;
+}
+
+.card-rarity, .card-description {
+  font-size: aspect-width(0.45);
+}
+
+.card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden; /* Safari */
+  backface-visibility: hidden;
+  background-image: url("/textures/cards/card_back.png"); //TODO extract to code assignment
+  background-size: calc(100% + aspect-width(0.8)) calc(100% + aspect-width(0.8)); //TODO probably not needed if card design is done right?
+  background-position: aspect-width(-0.4) aspect-width(-0.4);
+  border-width: aspect-width(0.4);
+  border-style: solid;
+  border-color: #f5f5f5;
+  border-radius: aspect-width(0.6);
+  box-shadow: aspect-width(0.01) aspect-width(0.01) aspect-width(0.01) aspect-width(0.01) rgba(20, 20, 20, 0.6);
+}
+
+#overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 900;
+
+  &.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.background {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(39, 17, 11, 0.7);
+  filter: brightness(0) saturate(100%) invert(0) sepia(1) hue-rotate(0deg) brightness(0.6) contrast(1);
+}
+
+#dashed-outline {
+  position: absolute;
+  width: var(--card-width);
+  height: var(--card-height);
+  translate: var(--card-translate-x) var(--card-translate-y);
+  opacity: 0;
+  transition: opacity 0.6s ease 0.2s;
+  pointer-events: none;
+  // background: none !important;
+  background: url('/images/ui/card_details/environment_card_placeholder.png') no-repeat;
+  background-size: cover;
+  background-position: center;
+  z-index: 1001;
+
+  &.visible {
+    opacity: 1;
+    transition: opacity 0.6s ease 0.6s;
+  }
+}
+
+#player-stats {
+  position: absolute;
+  width: aspect-width(48);
+  height: aspect-width(37);
+  top: aspect-width(1);
+  pointer-events: none;
+
+  &.left {
+    left: aspect-width(1);
+    background: url('/images/ui/card_details/box_left.png') no-repeat;
+    background-size: 100% 100%;
+    background-position: center;
+  }
+
+  &.right {
+    background: url('/images/ui/card_details/box_right.png') no-repeat;
+    right: aspect-width(1);
+    background-size: 100% 100%;
+    background-position: center;
+  }
+}
+
+.data-window {
+  position: relative;
+  width: aspect-width(20);
+  height: aspect-width(29);
+  top: aspect-width(5);
+  align-self: flex-end;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  &.left {
+    left: aspect-width(28);
+  }
+
+  &.right {
+    left: aspect-width(3);
+  }
+}
+
+.data {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.text-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: aspect-width(1);
+  position: relative;
+}
+
+.label {
+  font-size: aspect-width(1);
+  font-weight: normal;
+  margin-bottom: 0.2vw;
+}
+
+.value {
+  font-size: aspect-width(2);
+  font-weight: bold;
+  text-align: center;
+}
+
+.value-name {
+  font-weight: normal;
+  text-align: center;
+}
+
+.value-name[data-contentlength="0"] {
+  font-size: aspect-width(2);
+}
+.value-name[data-contentlength="1"] {
+  font-size: aspect-width(2);
+}
+.value-name[data-contentlength="2"] {
+  font-size: aspect-width(1.1);
+}
+.value-name[data-contentlength="3"] {
+  font-size: aspect-width(0.9);
+}
+
+.red {
+  color: $color-negative;
+}
+
+.blue {
+  color: $color-cold;
+}
+
+.green {
+  color: $color-positive;
+}
+
+.yellow {
+  color: #efc258
+}
+
+.divider {
+  position: absolute;
+  width: aspect-width(98);
+  height: aspect-width(3);
+  top: aspect-width(38.5);
+  left: aspect-width(1);
+  background: url('/images/ui/card_details/cards_separator.png') no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.profile-picture {
+  width: aspect-width(10);
+  height: aspect-width(10);
+}
+
+.profile-outline {
+  position: absolute;
+  width: aspect-width(10.4);
+  height: aspect-width(10.4);
+  top: 18%;
+  left: 24%;
+}
+
+.close-button {
+  position: absolute;
+  width: aspect-width(5);
+  height: aspect-width(5);
+  top: aspect-width(0);
+  right: aspect-width(0.3);
+  background: url('/images/ui/card_details/button_exit.png') no-repeat;
+  background-size: cover;
+}
+
+.grid-data {
+  position: absolute;
+  width: 53%;
+  height: 92%;
+  top: 3%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  justify-items: center;
+  align-items: start;
+}
+
+.grid-data.left {
+  left: aspect-width(2);
+}
+
+.grid-data.right {
+  right: aspect-width(2);
+}
