@@ -9,7 +9,7 @@ import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
-import { useDuelProgress, useFinishedDuelProgress } from '@/pistols/hooks/useContractCalls'
+import { useFinishedDuelProgress } from '@/pistols/hooks/useContractCalls'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useTable } from '@/pistols/hooks/useTable'
 import { useRevealAction, useSignAndRestoreMovesFromHash } from '@/pistols/hooks/useRevealAction'
@@ -18,19 +18,19 @@ import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
 import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionDetector'
 import { DuelStage, useAnimatedDuel, useDuel } from '@/pistols/hooks/useDuel'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
-import { ProfileModels } from '@/pistols/data/assets'
+import { EnvironmentCardsTextures, ProfileModels } from '@/pistols/data/assets'
 import { AnimationState } from '@/pistols/three/game'
-import { ArchetypeNames } from '@/pistols/utils/pistols'
+import { Action, ArchetypeNames } from '@/pistols/utils/pistols'
 import { MenuDebugAnimations, MenuDuel } from '@/pistols/components/Menus'
-import { bigintToHex, serialize } from '@/lib/utils/types'
+import { bigintToHex } from '@/lib/utils/types'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { useDuelistOwner } from '../hooks/useTokenDuelist'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import 'react-circular-progressbar/dist/styles.css';
-import Cards, { CardsHandle, DuelistCardType } from './Cards'
+import Cards, { CardsHandle, DuelistCardType, DuelistHand } from './Cards'
 import useGameAspect from '@/pistols/hooks/useGameApect'
-import { BladesCard, PacesCard, TacticsCard } from '@/games/pistols/generated/constants';
+import { BladesCard, EnvCard, PacesCard, TacticsCard } from '@/games/pistols/generated/constants';
 import { clearTimeout } from 'timers';
 
 export type DuelistState = {
@@ -80,16 +80,15 @@ export default function Duel({
     duelStage,
     completedStagesA, completedStagesB,
     canAutoRevealA, canAutoRevealB,
-    healthA, healthB
   } = useAnimatedDuel(duelId, duelSceneStarted)
-
-  const [statsA, setStatsA] = useState<DuelistState>({ damage: 1, hitChance: 50, health: 3, shotPaces: undefined, dodgePaces: undefined })
-  const [statsB, setStatsB] = useState<DuelistState>({ damage: 1, hitChance: 50, health: 3, shotPaces: undefined, dodgePaces: undefined })
 
   const { debugMode } = useSettings()
   const { dispatchSelectDuel } = usePistolsContext()
 
   useEffect(() => dispatchSelectDuel(duelId), [duelId])
+
+  const [statsA, setStatsA] = useState<DuelistState>({ damage: 1, hitChance: 50, health: 3, shotPaces: undefined, dodgePaces: undefined })
+  const [statsB, setStatsB] = useState<DuelistState>({ damage: 1, hitChance: 50, health: 3, shotPaces: undefined, dodgePaces: undefined })
 
   const [ isPlaying, setIsPlaying ] = useState(true)
   
@@ -97,54 +96,77 @@ export default function Duel({
   const playButtonRef = useRef(null)
   const currentStep = useRef(0)
 
-  let nextStepCallback;
+  const hasSpawnedCardsA = useRef(false)
+  const hasSpawnedCardsB = useRef(false)
+  const hasUnmounted = useRef(false)
+
+  //spawns cards for all duelists if they commited
+  useEffect(() => {
+    if (!cardRef.current) return
+
+    setTimeout(() => {
+      if (!isYouA) {
+        if (completedStagesA[DuelStage.Round1Commit] && !hasSpawnedCardsA.current) {
+          hasSpawnedCardsA.current = true
+          cardRef.current?.spawnCards('A', { fire: PacesCard.None, dodge: PacesCard.None, blade: BladesCard.None, tactics: TacticsCard.None })
+        }
+      }
+      if (!isYouB) {
+        if (completedStagesB[DuelStage.Round1Commit] && !hasSpawnedCardsB.current) {
+          hasSpawnedCardsB.current = true
+          cardRef.current?.spawnCards('B', { fire: PacesCard.None, dodge: PacesCard.None, blade: BladesCard.None, tactics: TacticsCard.None })
+        }
+      }
+    }, 500);
+  }, [completedStagesA, completedStagesB, isYouA, isYouB])
 
   //
   // MARIO: maybe we can replace all that Animated Duel crap for this
   // when this returns anythng, it's time to animate
   //
 
-  //TODO use this to subscribe to duelist hands and spawn them when needed
-  // const duelProgress2 = useDuelProgress(duelId)
-  // useEffect(() => {
-  //   if (duelProgress2) {
-  //     console.log("PROGRESS: ", duelProgress2)
-
-  //   }
-  // }, [duelProgress2])
-
-  //TODO maybe reset the cards here? If not here then it must be once we exit or enter this scene!!
   const duelProgress = useFinishedDuelProgress(duelId)
+
+  useEffect(() => {
+    return () => {
+      hasUnmounted.current = true
+    }
+  }, [])
+  
   useEffect(() => {
     if (duelProgress) {
-      //TODO cards should be spawned already so only steps are needed
-      //1. make a loop that calls each step after 1400 ms
-      //2. if is play call the loop if is pause dont call, on click of play resume if its in progress
-      //3. for each step call game.playstep (animations to play)
-      //4. for each step call cards.reveal cards env and if theres a reveal in the cards of the player
-      //5. handle aftermath of all animations?
 
-      clearTimeout(nextStepCallback)
-      currentStep.current = 0
-      cardRef.current.resetCards()
-      gameImpl?.resetDuelScene()
+      resetEverything()
+
+      const envCardsList = duelProgress.steps.reduce((acc, step) => {
+        if (step.card_env !== EnvCard.None) {
+          acc.push(EnvironmentCardsTextures[step.card_env]);
+        }
+        return acc;
+      }, []);
+      
+      cardRef.current?.setAllEnvCards(envCardsList)
 
       setTimeout(() => {
-        cardRef.current.spawnCards('A', { fire: PacesCard.Paces10, dodge: PacesCard.Paces10, blade: BladesCard.Behead, tactics: TacticsCard.CoinToss })
-        cardRef.current.spawnCards('B', { fire: PacesCard.Paces10, dodge: PacesCard.Paces10, blade: BladesCard.Behead, tactics: TacticsCard.CoinToss })
+        gameImpl?.hideDialogs()
 
-        setTimeout(() => {
-          cardRef.current.revealCard("A", DuelistCardType.TACTICS)
-          cardRef.current.revealCard("B", DuelistCardType.TACTICS)
-        }, 2000)
+        cardRef.current?.spawnCards('A', { fire: duelProgress.hand_a.card_fire, dodge: duelProgress.hand_a.card_dodge, blade: duelProgress.hand_a.card_blades, tactics: duelProgress.hand_a.card_tactics })
+        cardRef.current?.spawnCards('B', { fire: duelProgress.hand_b.card_fire, dodge: duelProgress.hand_b.card_dodge, blade: duelProgress.hand_b.card_blades, tactics: duelProgress.hand_b.card_tactics })
+
+        cardRef.current?.revealCard("A", DuelistCardType.TACTICS)
+        cardRef.current?.revealCard("B", DuelistCardType.TACTICS)
 
         if (isPlaying) {
           setTimeout(() => {
             playStep()
-          }, 3000)
+          }, 1500)
         }
-      }, 5000)
+      }, 4000)
     }
+
+    return () => {
+        hasUnmounted.current = true
+    };
   }, [duelProgress])
 
   // useEffect(() => {
@@ -166,65 +188,106 @@ export default function Duel({
 
     if (!step) return
 
-    cardRef.current.drawNextCard(step.card_env)
+    if (step.card_env != EnvCard.None) cardRef.current?.drawNextCard()
 
     let shouldDoblePause = false
 
-        // Reveal all cards in hand A
+    // Reveal all cards in hand A
     if (step.card_a.fire) {
-      cardRef.current.revealCard("A", DuelistCardType.FIRE)
       shouldDoblePause = true
+      setTimeout(() => {
+        cardRef.current?.revealCard("A", DuelistCardType.FIRE)
+      }, 1200);
     }
     if (step.card_a.dodge) {
-      cardRef.current.revealCard("A", DuelistCardType.DODGE)
       shouldDoblePause = true
+      setTimeout(() => {
+        cardRef.current?.revealCard("A", DuelistCardType.DODGE)
+      }, 1200);
     }
     if (step.card_a.blades) {
-      cardRef.current.revealCard("A", DuelistCardType.BLADE)
+      setTimeout(() => {
+        cardRef.current?.revealCard("A", DuelistCardType.BLADE)
+      }, 2000);
     }
 
     // Reveal all cards in hand B
     if (step.card_b.fire) {
-      cardRef.current.revealCard("B", DuelistCardType.FIRE)
       shouldDoblePause = true
+      setTimeout(() => {
+        cardRef.current?.revealCard("B", DuelistCardType.FIRE)
+      }, 1200);
     }
     if (step.card_b.dodge) {
-      cardRef.current.revealCard("B", DuelistCardType.DODGE)
       shouldDoblePause = true
+      setTimeout(() => {
+        cardRef.current?.revealCard("B", DuelistCardType.DODGE)
+      }, 1200);
     }
     if (step.card_b.blades) {
-      cardRef.current.revealCard("B", DuelistCardType.BLADE)
+      setTimeout(() => {
+        cardRef.current?.revealCard("B", DuelistCardType.BLADE)
+      }, 2000);
     }
 
-    const newStatsA = { 
-      damage: Number(step.state_a.damage),
-      hitChance: Number(step.state_a.chances),
-      health: Number(step.state_a.health),
-      shotPaces: statsA.shotPaces ? statsA.shotPaces : (step.card_a.fire ? currentStep.current : undefined),
-      dodgePaces: statsA.dodgePaces ? statsA.dodgePaces : (step.card_a.dodge ? currentStep.current : undefined),
-    }
+    let newStatsA;
+    let newStatsB;
 
-    const newStatsB = { 
-      damage: Number(step.state_b.damage),
-      hitChance: Number(step.state_b.chances),
-      health: Number(step.state_b.health),
-      shotPaces: statsB.shotPaces ? statsB.shotPaces : (step.card_b.fire ? currentStep.current : undefined),
-      dodgePaces: statsB.dodgePaces ? statsB.dodgePaces : (step.card_b.dodge ? currentStep.current : undefined),
+    setStatsA((prevValue) => {
+      newStatsA = { 
+        damage: Number(step.state_a.damage),
+        hitChance: Number(step.state_a.chances),
+        health: Number(step.state_a.health),
+        shotPaces: prevValue.shotPaces ? prevValue.shotPaces : (step.card_a.fire ? currentStep.current : undefined),
+        dodgePaces: prevValue.dodgePaces ? prevValue.dodgePaces : (step.card_a.dodge ? currentStep.current : undefined),
+      }
+      return newStatsA
+    })
+    setStatsB((prevValue) => {
+      newStatsB = { 
+        damage: Number(step.state_b.damage),
+        hitChance: Number(step.state_b.chances),
+        health: Number(step.state_b.health),
+        shotPaces: prevValue.shotPaces ? prevValue.shotPaces : (step.card_b.fire ? currentStep.current : undefined),
+        dodgePaces: prevValue.dodgePaces ? prevValue.dodgePaces : (step.card_b.dodge ? currentStep.current : undefined),
+      }
+      return newStatsB
+    })
+
+    if (currentStep.current > 1 && step.card_env == EnvCard.None) {
+      setTimeout(() => {
+        gameImpl?.prepareActionAnimation()
+        gameImpl?.animateDuelistBlade()
+      }, 1000);
     }
 
     setTimeout(() => {
-      cardRef.current.updateDuelistData(newStatsA.damage, newStatsB.damage, newStatsA.hitChance, newStatsB.hitChance)
-      gameImpl?.animatePace(currentStep.current, newStatsA, newStatsB)
-    }, 1000);
-
-    setStatsA(newStatsA)
-    setStatsB(newStatsB)
+      cardRef.current?.updateDuelistData(newStatsA?.damage, newStatsB?.damage, newStatsA?.hitChance, newStatsB?.hitChance)
+      if (step.card_env != EnvCard.None) {
+        gameImpl?.animatePace(currentStep.current, newStatsA, newStatsB)
+      } else {
+        gameImpl?.animateActions(Action[step.card_b.blades], Action[step.card_b.blades], newStatsA?.health, newStatsB?.health)
+      }
+    }, shouldDoblePause ? 2000 : 1000);
 
     if (currentStep.current < duelProgress.steps.length && isPlaying) {
-      nextStepCallback = setTimeout(() => {
-        playStep()
-      }, shouldDoblePause ? 3000 : 2000)
+      setTimeout(() => {
+        if (hasUnmounted.current) {
+          resetEverything()
+        } else {
+          playStep()
+        }
+      }, shouldDoblePause ? 3400 : 2000)
     }
+  }
+
+  const resetEverything = () => {
+    currentStep.current = 0
+    hasSpawnedCardsA.current = false
+    hasSpawnedCardsB.current = false
+    hasUnmounted.current = false
+    cardRef.current?.resetCards()
+    gameImpl?.resetDuelScene()
   }
 
   if (!duelSceneStarted) return <></>
@@ -240,6 +303,7 @@ export default function Duel({
           duelistId={duelistIdA}
           completedStages={completedStagesA}
           canAutoReveal={canAutoRevealA}
+          revealCards={(cards: DuelistHand) => cardRef.current?.spawnCards('A', cards)}
         />
       </div>
       <div>
@@ -251,6 +315,7 @@ export default function Duel({
           duelistId={duelistIdB}
           completedStages={completedStagesB}
           canAutoReveal={canAutoRevealB}
+          revealCards={(cards: DuelistHand) => cardRef.current?.spawnCards('B', cards)}
         />
       </div>
       <Cards duelId={duelId} ref={cardRef} />
@@ -438,6 +503,7 @@ function DuelProgress({
   duelStage,
   duelistId,
   completedStages,
+  revealCards,
   canAutoReveal = false
 }) {
   const { gameImpl } = useThreeJsContext()
@@ -452,20 +518,11 @@ function DuelProgress({
   //
   const { isConnected } = useAccount()
   const { isYou } = useIsYou(duelistId)
-  // const isTurn = useMemo(() => ((isA && turnA) || (isB && turnB)), [isA, isB, turnA, turnB])
 
   // Commit modal control
   const [didReveal, setDidReveal] = useState(false)
   const [commitModalIsOpen, setCommitModalIsOpen] = useState(false)
   const { reveal, canReveal } = useRevealAction(duelId, roundNumber, tableId, round1Moves?.hashed, duelStage == DuelStage.Round1Reveal)
-
-
-  // useEffect(() => {
-  //   console.log(`COMMIT:`, duelStage, completedStages[duelStage], completedStages, round1)
-  // }, [duelStage, completedStages, round1])
-  // useEffect(() => { console.log(`+duelStage`) }, [duelStage])
-  // useEffect(() => { console.log(`+completedStages`) }, [completedStages])
-  // useEffect(() => { console.log(`+round1`) }, [round1])
 
   const onClick = useCallback(() => {
     if (!isConnected) console.warn(`onClickReveal: not connected!`)
@@ -506,7 +563,25 @@ function DuelProgress({
   const id = isA ? 'player-bubble-left' : 'player-bubble-right'
 
   const { canSign, sign_and_restore, hand } = useSignAndRestoreMovesFromHash(duelId, roundNumber, tableId, round1Moves?.hashed)
-  // console.log(`>> SIGN MOVES:`, canSign, duelId, roundNumber, tableId, round1Moves?.hashed)
+
+  useEffect(() =>{
+    if (isYou && canSign) {
+      sign_and_restore()
+    }
+  }, [canSign, isYou])
+
+  useEffect(() =>{
+    if (isYou && hand && hand.card_fire && hand.card_dodge && hand.card_tactics && hand.card_blades) {
+      setTimeout(() => {
+        revealCards({
+          fire: hand.card_fire,
+          dodge: hand.card_dodge,
+          tactics: hand.card_tactics,
+          blade: hand.card_blades,
+        })
+      }, 200);
+    }
+  }, [hand, isYou])
 
   //------------------------------
   return (
@@ -522,16 +597,6 @@ function DuelProgress({
             <div className='dialog-quote'></div>
             <div className='dialog-spinner'></div>
           </div>
-
-          {(isYou && round1Moves?.hashed) &&
-            <div className='TempRevealPanel'>
-              <Button disabled={!canSign} onClick={() => sign_and_restore()}>Reveal My Cards</Button>
-              <pre className='Code FillParent Scroller NoMargin'>
-                {serialize(hand, ' ')}
-              </pre>
-            </div>
-          }
-
         </div>
       </div>
     </>

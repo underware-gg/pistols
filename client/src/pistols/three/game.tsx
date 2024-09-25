@@ -88,7 +88,7 @@ const zoomedCameraPos = {
 }
 const zoomedOutCameraPos = {
   x: 0,
-  y: 4.0,
+  y: 5.0,
   z: -30,
 }
 
@@ -436,6 +436,10 @@ function setupDuelScene() {
   return scene
 }
 
+export function hideDialogs() {
+  _duelistManager.hideElements()
+}
+
 export function resetDuelScene() {
   if (!_duelistManager.resetDuelists()) return
 
@@ -451,7 +455,7 @@ export function resetDuelScene() {
   _round3Animated = false
 
   zoomCameraToPaces(10, 0)
-  zoomCameraToPaces(0, 5)
+  zoomCameraToPaces(0, 4)
 }
 
 function setEnvironment(scene: THREE.Scene) { //TODO add skymap
@@ -820,6 +824,7 @@ export function setDuelistElement(isA, duelistElement) {
 //
 
 export function zoomCameraToPaces(paceCount, seconds) {
+  console.log("ZOOOMIN, ", paceCount, seconds)
   const targetPos = {
     x: map(paceCount, 0, 10, zoomedCameraPos.x, zoomedOutCameraPos.x),
     y: map(paceCount, 0, 10, zoomedCameraPos.y, zoomedOutCameraPos.y),
@@ -850,7 +855,7 @@ export function zoomCameraToPaces(paceCount, seconds) {
 }
 
 export function animatePace(pace: number, statsA: DuelistState, statsB: DuelistState) {
-  zoomCameraToPaces(pace, (pace + 1))
+  zoomCameraToPaces(pace, 3)
 
   _duelistManager.animatePace(pace, statsA, statsB)
 }
@@ -859,46 +864,30 @@ export function animateDuel(state: AnimationState, actionA: Action, actionB: Act
   //only animated once per entry safety
   if (state == AnimationState.Round1 && !_round1Animated) {
     _round1Animated = true
-    _duelistManager.hideElements() 
-    const paces_a = getPacesCardValue(actionA as unknown as PacesCard)
-    const paces_b = getPacesCardValue(actionB as unknown as PacesCard)
-    animateShootout(paces_a, paces_b, healthA, healthB, damageA, damageB);
+    _duelistManager.hideElements()
   } else if (state == AnimationState.Round2 && !_round2Animated) {
     _round2Animated = true
     _duelistManager.hideElements()
-    animateActions(state, actionA, actionB, healthA, healthB, damageA, damageB)
   } else if (state == AnimationState.Round3 && !_round3Animated) {
     _round3Animated = true
     _duelistManager.hideElements()
-    animateActions(state, actionA, actionB, healthA, healthB, damageA, damageB)
   }
 }
 
-function animateShootout(paceCountA: number, paceCountB: number, healthA: number, healthB: number, damageA: number, damageB: number) {
-  // const minPaceCount = Math.min(paceCountA, paceCountB)
-
-  // if (_ladySecond && _sirSecond) {
-  //   if (minPaceCount < 5) {
-  //     _sirSecond.visible = false
-  //     _ladySecond.visible = false
-  //   } else {
-  //     _sirSecond.visible = true
-  //     _ladySecond.visible = true
-  //   }
-  // }
-
-  // // animate camera
-  // zoomCameraToPaces(0, 0)
-  // zoomCameraToPaces(minPaceCount, (minPaceCount + 1)) //adjusted zoom out value to minimize gliding effect for now.
-
-  // _duelistManager.animateDuelistShootout(paceCountA, paceCountB, healthA, healthB, damageA, damageB)
+export function prepareActionAnimation() {
+  zoomCameraToPaces(1, 4)
+  _duelistManager.resetActorPositions()
 }
 
-function animateActions(state: AnimationState, actionA: Action, actionB: Action, healthA: number, healthB: number, damageA: number, damageB: number) {
-  // Rewind camera and
-  zoomCameraToPaces(1, 0)
+export function animateDuelistBlade() {
+  _duelistManager.animateDuelistBlade()
+}
 
-  _duelistManager.animateActions(state, actionA, actionB, healthA, healthB, damageA, damageB)
+export function animateActions(actionA: Action, actionB: Action, healthA: number, healthB: number) {
+
+  setTimeout(() => {
+    _duelistManager.animateActions(actionA, actionB, healthA, healthB)
+  }, 4000);
 }
 
 

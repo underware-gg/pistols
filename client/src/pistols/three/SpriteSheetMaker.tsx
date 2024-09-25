@@ -24,6 +24,11 @@ export class SpriteSheet {
       const path = `${SHEET.path}/frame_${frameNumber}.ktx2`
       const tex = await loader.loadAsync(path)
 
+      if (path.includes("Dodge_Front")) {
+        tex.wrapS = THREE.RepeatWrapping;
+        tex.repeat.x = -1; 
+      }
+
       tex.colorSpace = THREE.SRGBColorSpace
       tex.generateMipmaps = false
       tex.minFilter = THREE.LinearFilter
