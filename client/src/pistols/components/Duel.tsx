@@ -258,7 +258,7 @@ export default function Duel({
       setTimeout(() => {
         gameImpl?.prepareActionAnimation()
         gameImpl?.animateDuelistBlade()
-      }, 2000);
+      }, 2500);
     }
 
     setTimeout(() => {
