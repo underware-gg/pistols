@@ -240,22 +240,23 @@ export class DuelistsManager {
     }
 
     if (hasDuelistAShotThisRound) {
-      this.playActorAnimation(this.duelistA, AnimName.SHOOT)
-      if (!hasDuelistBDodgedThisRound) {
-        if (statsB.shotPaces) {
-          if (statsB.health == 0) {
-            this.playActorAnimation(this.duelistB, AnimName.SHOT_DEAD_FRONT, () => _updateB())
-          } else if (statsB.health < 3) {
-            this.playActorAnimation(this.duelistB, AnimName.SHOT_INJURED_FRONT, () => _updateB())
-          }
-        } else {
-          if (statsB.health == 0) {
-            this.playActorAnimation(this.duelistB, AnimName.SHOT_DEAD_BACK, () => _updateB())
-          } else if (statsB.health < 3) {
-            this.playActorAnimation(this.duelistB, AnimName.SHOT_INJURED_BACK, () => _updateB())
+      this.playActorAnimation(this.duelistA, AnimName.SHOOT, () => {
+        if (!hasDuelistBDodgedThisRound) {
+          if (statsB.shotPaces) {
+            if (statsB.health == 0) {
+              this.playActorAnimation(this.duelistB, AnimName.SHOT_DEAD_FRONT, () => _updateB())
+            } else if (statsB.health < 3) {
+              this.playActorAnimation(this.duelistB, AnimName.SHOT_INJURED_FRONT, () => _updateB())
+            }
+          } else {
+            if (statsB.health == 0) {
+              this.playActorAnimation(this.duelistB, AnimName.SHOT_DEAD_BACK, () => _updateB())
+            } else if (statsB.health < 3) {
+              this.playActorAnimation(this.duelistB, AnimName.SHOT_INJURED_BACK, () => _updateB())
+            }
           }
         }
-      }
+      })
     } else if (hasDuelistADodgedThisRound) {
       if (statsA.shotPaces) {
         this.playActorAnimation(this.duelistA, AnimName.DODGE_FRONT)
@@ -267,22 +268,23 @@ export class DuelistsManager {
     }
 
     if (hasDuelistBShotThisRound) {
-      this.playActorAnimation(this.duelistB, AnimName.SHOOT)
-      if (!hasDuelistADodgedThisRound) {
-        if (statsA.shotPaces) {
-          if (statsA.health == 0) {
-            this.playActorAnimation(this.duelistA, AnimName.SHOT_DEAD_FRONT, () => _updateA())
-          } else if (statsA.health < 3) {
-            this.playActorAnimation(this.duelistA, AnimName.SHOT_INJURED_FRONT, () => _updateA())
-          }
-        } else {
-          if (statsA.health == 0) {
-            this.playActorAnimation(this.duelistA, AnimName.SHOT_DEAD_BACK, () => _updateA())
-          } else if (statsA.health < 3) {
-            this.playActorAnimation(this.duelistA, AnimName.SHOT_INJURED_BACK, () => _updateA())
+      this.playActorAnimation(this.duelistB, AnimName.SHOOT, () => {
+        if (!hasDuelistADodgedThisRound) {
+          if (statsA.shotPaces) {
+            if (statsA.health == 0) {
+              this.playActorAnimation(this.duelistA, AnimName.SHOT_DEAD_FRONT, () => _updateA())
+            } else if (statsA.health < 3) {
+              this.playActorAnimation(this.duelistA, AnimName.SHOT_INJURED_FRONT, () => _updateA())
+            }
+          } else {
+            if (statsA.health == 0) {
+              this.playActorAnimation(this.duelistA, AnimName.SHOT_DEAD_BACK, () => _updateA())
+            } else if (statsA.health < 3) {
+              this.playActorAnimation(this.duelistA, AnimName.SHOT_INJURED_BACK, () => _updateA())
+            }
           }
         }
-      }
+      })
     } else if (hasDuelistBDodgedThisRound) {
       if (statsB.shotPaces) {
         this.playActorAnimation(this.duelistB, AnimName.DODGE_FRONT)
@@ -302,30 +304,47 @@ export class DuelistsManager {
 
   public animateActions(actionA: Action, actionB: Action, healthA: number, healthB: number) {
     if(this.showDialogsTimeout) clearTimeout(this.showDialogsTimeout)
+    
+      const animA = this.getActionAnimName(actionA)
+      const animB = this.getActionAnimName(actionB)
 
     // animate sprites
-    this.playActorAnimation(this.duelistA, this.getActionAnimName(actionA), () => {
-      let survived = 0
-      if (healthB == 0) {
-        this.playActorAnimation(this.duelistB, AnimName.STRUCK_DEAD, () => this.finishAnimation(healthA, healthB))
-      } else if (healthB < 3) {
-        this.playActorAnimation(this.duelistB, AnimName.STRUCK_INJURED, () => this.finishAnimation(healthA, healthB))
-      } else {
-        survived++
-      }
-      if (healthA == 0) {
-        this.playActorAnimation(this.duelistA, AnimName.STRUCK_DEAD, () => this.finishAnimation(healthA, healthB))
-      } else if (healthA < 3) {
-        this.playActorAnimation(this.duelistA, AnimName.STRUCK_INJURED, () => this.finishAnimation(healthA, healthB))
-      } else {
-        survived++
-      }
-      if (survived == 2) emitter.emit('animated', AnimationState.Finished)
-    })
+    if (animB != AnimName.SEPPUKU || animA == AnimName.SEPPUKU) {
+      this.playActorAnimation(this.duelistA, animA, () => {
+        let survived = 0
+        if (animB != AnimName.SEPPUKU) {
+          if (healthB == 0) {
+            this.playActorAnimation(this.duelistB, AnimName.STRUCK_DEAD, () => this.finishAnimation(healthA, healthB))
+          } else if (healthB < 3) {
+            this.playActorAnimation(this.duelistB, AnimName.STRUCK_INJURED, () => this.finishAnimation(healthA, healthB))
+          } else {
+            survived++
+          }
+        } else {
+          this.finishAnimation(healthA, healthB)
+        }
+        if (animA != AnimName.SEPPUKU) {
+          if (healthA == 0) {
+            this.playActorAnimation(this.duelistA, AnimName.STRUCK_DEAD, () => this.finishAnimation(healthA, healthB))
+          } else if (healthA < 3) {
+            this.playActorAnimation(this.duelistA, AnimName.STRUCK_INJURED, () => this.finishAnimation(healthA, healthB))
+          } else {
+            survived++
+          }
+        } else {
+          this.finishAnimation(healthA, healthB)
+        }
+        if (survived == 2) emitter.emit('animated', AnimationState.Finished)
+      })
+    }
 
-    this.playActorAnimation(this.duelistB, this.getActionAnimName(actionB), () => {
-      // only A need to animate
-    })
+    if (animA != AnimName.SEPPUKU || animB == AnimName.SEPPUKU) {
+      this.playActorAnimation(this.duelistB, this.getActionAnimName(actionB), () => {
+        if (animB == AnimName.SEPPUKU) {
+          this.finishAnimation(healthA, healthB)
+        }
+      })
+    }
   }
 
   private getActionAnimName = (action: Action): AnimName => {

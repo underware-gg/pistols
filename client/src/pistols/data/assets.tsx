@@ -138,7 +138,7 @@ export const EnvironmentCardsTextures: Record<EnvCard, CardData> = {
     description: `Every shot taken from this point forward will ${getTextSpan(CardColor.BLUE, 'MISS')} the opponent` 
   },
   [EnvCard.SpecialDoubleTactics]: { 
-    path: '/textures/cards/illustrations/Seccessful_Block.png', 
+    path: '/textures/cards/illustrations/Successful_Block.png', 
     cardFrontPath: '/textures/cards/card_front_blue.png', 
     color: CardColor.BLUE, 
     title: 'Double Tactics', 
@@ -352,7 +352,7 @@ export const TacticsCardsTextures: Record<TacticsCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Insult', 
     rarity: Rarity.None, 
-    description: `Increase your opponents damage by ${getTextSpan(CardColor.RED, '+1')} and decrease your opponents hit chance by ${getTextSpan(CardColor.YELLOW, '-20%')}` 
+    description: `Increase your opponents damage by ${getTextSpan(CardColor.RED, '+1')} and decrease your opponents hit chance by ${getTextSpan(CardColor.YELLOW, '-10%')}` 
   },
   [TacticsCard.CoinToss]: { 
     path: '/textures/cards/illustrations/Second_Reaction.png', 
@@ -415,7 +415,7 @@ export const BladesCardsTextures: Record<BladesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Sepuku', 
     rarity: Rarity.None, 
-    description: `Increase your damage by ${getTextSpan(CardColor.RED, '+1')} and your hit chance by ${getTextSpan(CardColor.YELLOW, '-20%')}` 
+    description: `Increase your damage by ${getTextSpan(CardColor.RED, '+1')} and your hit chance by ${getTextSpan(CardColor.YELLOW, '+20%')}` 
   },
   [BladesCard.Behead]: { 
     path: '/textures/cards/illustrations/Decapitation.png', 
