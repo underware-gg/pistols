@@ -1525,7 +1525,7 @@ const Cards = forwardRef<CardsHandle, { duelId: string }>(({ duelId }, ref) => {
         <div className='background'/>
         <PlayerStats duelistId={duelistIdA} isLeft={true} damage={statsA.damage} hitChance={statsA.hitChance} />
         <PlayerStats duelistId={duelistIdB} isLeft={false} damage={statsB.damage} hitChance={statsB.hitChance} />
-        <div className='divider' />
+        <div className='env-divider' />
         <div className='NoMouse NoDrag close-button'/>
       </div>
 

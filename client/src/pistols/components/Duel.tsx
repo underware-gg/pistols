@@ -117,7 +117,7 @@ export default function Duel({
           cardRef.current?.spawnCards('B', { fire: PacesCard.None, dodge: PacesCard.None, blade: BladesCard.None, tactics: TacticsCard.None })
         }
       }
-    }, 500);
+    }, 1000);
   }, [completedStagesA, completedStagesB, isYouA, isYouB])
 
   //
@@ -579,7 +579,7 @@ function DuelProgress({
           tactics: hand.card_tactics,
           blade: hand.card_blades,
         })
-      }, 200);
+      }, 1000);
     }
   }, [hand, isYou])
 
