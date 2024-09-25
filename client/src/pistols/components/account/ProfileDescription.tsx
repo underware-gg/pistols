@@ -85,9 +85,9 @@ export function ProfileDescription({
           {displayOwnerAddress && <AddressShort address={owner} small={displayOwnerAddressSmall}/>}
           {displayHonor && <h3 className='Important NoMargin TitleCase'>
             Honour: <span className='Wager'>{honourAndTotal}</span>
-            {isVillainous && <> {EMOJI.VILLAIN} <span className='Wager'>{levelDisplay}</span></>}
-            {isTrickster && <> {EMOJI.TRICKSTER} <span className='Wager'>{levelDisplay}</span></>}
-            {isHonourable && <> {EMOJI.LORD} <span className='Wager'>{levelDisplay}</span></>}
+            {/* {isVillainous && <> {EMOJI.VILLAIN} <span className='Wager'>{levelDisplay}</span></>} */}
+            {/* {isTrickster && <> {EMOJI.TRICKSTER} <span className='Wager'>{levelDisplay}</span></>} */}
+            {/* {isHonourable && <> {EMOJI.LORD} <span className='Wager'>{levelDisplay}</span></>} */}
           </h3>}
           {displayBalance &&
             <h5>

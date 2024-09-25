@@ -3,11 +3,11 @@ import { Icon, Grid } from 'semantic-ui-react'
 import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
 import { DuelStage, useDuel } from '@/pistols/hooks/useDuel'
 import { CompletedIcon, EmojiIcon, LoadingIcon } from '@/lib/ui/Icons'
-import { PacesIcon } from '@/pistols/components/ui/PistolsIcon'
+import { BladesIcon, PacesIcon } from '@/pistols/components/ui/PistolsIcon'
 import { bigintEquals } from '@/lib/utils/types'
 import { EMOJI } from '@/pistols/data/messages'
 import { BigNumberish } from 'starknet'
-import { getPacesCardFromValue } from '@/games/pistols/generated/constants'
+import { getBladesCardFromValue, getPacesCardFromValue } from '@/games/pistols/generated/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -31,16 +31,18 @@ export function useDuelIcons({
 
   const moves1 = useMemo(() => (isA ? (round1?.moves_a ?? null) : isB ? (round1?.moves_b ?? null) : null), [isA, isB, round1])
   const state1 = useMemo(() => (isA ? (round1?.state_a ?? null) : isB ? (round1?.state_b ?? null) : null), [isA, isB, round1])
-  const otherState1 = useMemo(() => (isA ? (round1?.state_b ?? null) : isB ? (round1?.state_a ?? null) : null), [isA, isB, round1])
 
   const isWinner = useMemo(() => (isA && winner == 1) || (isB && winner == 2), [isA, isB, winner])
   const isTurn = useMemo(() => (isA ? turnA : isB ? turnB : false), [isA, isB, turnA, turnB])
   const completedStages = useMemo(() => (isA ? (completedStagesA) : isB ? (completedStagesB) : null), [isA, isB, completedStagesA, completedStagesB])
 
-  const health1 = useMemo(() => (state1?.health == 0 ? EMOJI.DEAD : state1?.damage > 0 ? EMOJI.INJURED : null), [state1])
-  const health1b = useMemo(() => (health1 == EMOJI.INJURED && state1.damage > 1 ? EMOJI.INJURED : null), [health1])
-  const wager1 = useMemo(() => ((state1?.wager > otherState1?.wager) ? EMOJI.WAGER : null), [state1, otherState1])
-  const win1 = useMemo(() => ((!wager1 && isWinner && roundNumber == 1) ? EMOJI.WINNER : null), [wager1, isWinner, roundNumber])
+  const health1 = useMemo(() => (
+    isFinished ? (state1?.health == 0 ? EMOJI.DEAD : state1?.damage > 0 ? EMOJI.INJURED : null) : null
+  ), [state1, isFinished])
+  const health1b = useMemo(() => (
+    health1 == EMOJI.INJURED && state1.damage > 1 ? EMOJI.INJURED : null
+  ), [health1])
+  const win1 = useMemo(() => ((isWinner && roundNumber == 1) ? EMOJI.WINNER : null), [isWinner, roundNumber])
 
   const iconSize = size as IconSizeProp
 
@@ -107,14 +109,19 @@ export function useDuelIcons({
           icons1.push(<PacesIcon key='dodge' paces={cardDodge} size={iconSize} dodge />)
         }
       }
+
+      const cardBlades = getBladesCardFromValue(moves1.card_4)
+      if (cardBlades) {
+        icons1.push(<BladesIcon key='blades' blade={cardBlades} size={iconSize} />)
+      }
+
       if (health1) icons1.push(<EmojiIcon key='health1' emoji={health1} size={iconSize} />)
       if (health1b) icons1.push(<EmojiIcon key='health1b' emoji={health1b} size={iconSize} />)
       if (win1) icons1.push(<EmojiIcon key='win1' emoji={win1} size={iconSize} />)
-      if (wager1) icons1.push(<EmojiIcon key='wager1' emoji={wager1} size={iconSize} />)
     }
 
     return { icons1, icons2, icons3 }
-  }, [isAwaiting, isInProgress, isFinished, duelStage, isA, isB, isTurn, state1, completedStages, health1, win1, wager1, iconSize])
+  }, [isAwaiting, isInProgress, isFinished, duelStage, isA, isB, isTurn, state1, completedStages, health1, health1b, win1, iconSize])
 
   return {
     icons1,

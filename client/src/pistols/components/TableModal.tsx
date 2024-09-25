@@ -23,7 +23,7 @@ export default function TableModal({
   opener: Opener
 }) {
   const { tableId, dispatchTableId } = useSettings()
-  const { dispatchSetScene } = usePistolsScene()
+  const { currentScene, dispatchSetScene } = usePistolsScene()
   const [selectedTableId, setSelectedTableId] = useState('')
   const { tableIsOpen } = useTable(selectedTableId)
 
@@ -49,7 +49,7 @@ export default function TableModal({
 
   const _joinTable = () => {
     dispatchTableId(selectedTableId)
-    dispatchSetScene(SceneName.Tavern, [selectedTableId])
+    dispatchSetScene(currentScene, [selectedTableId])
     opener.close()
   }
 

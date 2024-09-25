@@ -430,7 +430,8 @@ function DuelStep({
   const _card = (card) => {
     return card?.fire ? <><PacesIcon paces={card.fire}/> {card.fire}</>
       : card?.dodge ? <><PacesIcon paces={card.dodge} dodge/> {card.dodge}</>
-        : card?.tactics ?? card?.blades ?? '-'
+        : card?.blades ? <><BladesIcon blade={card.blades} /> {card.blades}</>
+          : card?.tactics ?? '-'
   }
   const card_a = _card(step.card_a)
   const card_b = _card(step.card_b)
