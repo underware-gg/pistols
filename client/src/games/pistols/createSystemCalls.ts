@@ -192,18 +192,19 @@ export function createSystemCalls(
     return await _executeTransaction(signer, admin_call('set_config', args))
   }
 
-  const admin_set_table = async (signer: AccountInterface, values: any): Promise<boolean> => {
+  const admin_set_table = async (signer: AccountInterface, table: any): Promise<boolean> => {
     const args = Object.keys(TableConfig.schema).map(key => {
-      const value = values[key]
+      const value = table[key]
       if (value == null) throw new Error()
       return value
     })
+    // const args = [values]
     return await _executeTransaction(signer, admin_call('set_table', args))
   }
 
-  const admin_set_table_admittance = async (signer: AccountInterface, values: any): Promise<boolean | null> => {
+  const admin_set_table_admittance = async (signer: AccountInterface, table_admittance: any): Promise<boolean | null> => {
     const args = Object.keys(TableAdmittance.schema).map(key => {
-      const value = values[key]
+      const value = table_admittance[key]
       if (value == null) throw new Error()
       return value
     })

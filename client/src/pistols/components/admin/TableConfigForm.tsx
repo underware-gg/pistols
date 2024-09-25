@@ -45,11 +45,11 @@ const config_schema: FormSchema = {
 
 const table_config_schema: FormSchema = {
   table_id: { type: FieldType.ShortString, isKey: true },
+  description: { type: FieldType.ShortString },
   table_type: { type: FieldType.TableType },
   deck_type: { type: FieldType.DeckType },
-  description: { type: FieldType.ShortString },
-  fee_collector_address: { type: FieldType.Address },
   fee_contract_address: { type: FieldType.Address },
+  fee_collector_address: { type: FieldType.Address },
   fee_min: { type: FieldType.Wei },
   is_open: { type: FieldType.Boolean },
 }
