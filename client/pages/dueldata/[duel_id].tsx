@@ -15,6 +15,7 @@ import { bigintToHex, shortAddress } from '@/lib/utils/types'
 import { weiToEth } from '@/lib/utils/starknet'
 import { BladesIcon, PacesIcon } from '@/pistols/components/ui/PistolsIcon'
 import AppPistols from '@/pistols/components/AppPistols'
+import { EMOJI } from '@/pistols/data/messages'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -104,16 +105,16 @@ function DuelStats({
           <Cell>
             Account A
           </Cell>
-          <Cell>
-            <b>{shortAddress(bigintToHex(challenge.duelistAddressA))}</b>
+          <Cell className='Smaller'>
+            <b>{bigintToHex(challenge.duelistAddressA)}</b>
           </Cell>
         </Row>
         <Row>
           <Cell>
             Account B
           </Cell>
-          <Cell>
-            <b>{shortAddress(bigintToHex(challenge.duelistAddressB))}</b>
+          <Cell className='Smaller'>
+            <b>{bigintToHex(challenge.duelistAddressB)}</b>
           </Cell>
         </Row>
         <Row>
@@ -301,7 +302,7 @@ function MovesStats({
           {/* <Row>
             <Cell>Fire Dice</Cell>
             <Cell>
-              🎲 {state.dice_fire} over {state.chances}%
+              {EMOJI.DICE} {state.dice_fire} over {state.chances}%
             </Cell>
           </Row> */}
         </Body>
@@ -361,20 +362,20 @@ function StateRow({
         <Row textAlign='center'>
           <Cell>Duelist A</Cell>
           {(card_a || card_b) && <Cell>{card_a}</Cell>}
-          <Cell>🎲 {state_a.dice_fire.toString()}</Cell>
-          <Cell>{state_a.chances.toString()} %</Cell>
-          <Cell>🐦‍🔥 {state_a.damage.toString()}</Cell>
-          <Cell>♥️ {state_a.health.toString()}</Cell>
-          <Cell>👑 {state_a.honour.toString()}</Cell>
+          <Cell>{EMOJI.DICE} {state_a.dice_fire.toString()}</Cell>
+          <Cell>{state_a.chances.toString()}%</Cell>
+          <Cell>{EMOJI.FIRE} {state_a.damage.toString()}</Cell>
+          <Cell>{EMOJI.LIFE} {state_a.health.toString()}</Cell>
+          <Cell>{EMOJI.HONOUR} {state_a.honour.toString()}</Cell>
         </Row>
         <Row textAlign='center'>
           <Cell>Duelist B</Cell>
           {(card_a || card_b) && <Cell>{card_b}</Cell>}
-          <Cell>🎲 {state_b.dice_fire.toString()}</Cell>
-          <Cell>{state_b.chances.toString()} %</Cell>
-          <Cell>🐦‍🔥 {state_b.damage.toString()}</Cell>
-          <Cell>♥️ {state_b.health.toString()}</Cell>
-          <Cell>👑 {state_b.honour.toString()}</Cell>
+          <Cell>{EMOJI.DICE} {state_b.dice_fire.toString()}</Cell>
+          <Cell>{state_b.chances.toString()}%</Cell>
+          <Cell>{EMOJI.FIRE} {state_b.damage.toString()}</Cell>
+          <Cell>{EMOJI.LIFE} {state_b.health.toString()}</Cell>
+          <Cell>{EMOJI.HONOUR} {state_b.honour.toString()}</Cell>
         </Row>
       </Body>
     </Table>
@@ -429,7 +430,7 @@ function DuelStep({
   const _card = (card) => {
     return card?.fire ? <><PacesIcon paces={card.fire}/> {card.fire}</>
       : card?.dodge ? <><PacesIcon paces={card.dodge} dodge/> {card.dodge}</>
-        : card?.tactics ?? step.card_a?.blades ?? '-'
+        : card?.tactics ?? card?.blades ?? '-'
   }
   const card_a = _card(step.card_a)
   const card_b = _card(step.card_b)
@@ -459,7 +460,7 @@ function DuelStep({
           <Row>
             <Cell>Env Shuffle</Cell>
             <Cell>
-              🎲 {step.dice_env.toString()}
+              {EMOJI.DICE} {step.dice_env.toString()}
             </Cell>
           </Row>
         </Body>

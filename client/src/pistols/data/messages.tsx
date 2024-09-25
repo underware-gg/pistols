@@ -24,6 +24,7 @@ export const EMOJI = {
   DODGE: '🛡️',
   BLADES: '⚔️',
   IDLE: '👀',
+  FIRE: '🔥',
   // BladesCard
   SEPPUKU: '👹',
   POCKET_PISTOL: '🔫',
@@ -31,14 +32,17 @@ export const EMOJI = {
   GRAPPLE: '🪝',
   //
   // duel
+  LIFE: '❤️',
   ALIVE: '❤️',
   INJURED: '🩸',
   DEAD: '☠️',
   WAGER: '💰',
   BOUNTY: '💰',
   WINNER: '🏅',
+  DICE: '🎲',
   //
   // badges
+  HONOUR: '👑',
   NEUTRAL: '🫥',
   LORD: '👑',
   TRICKSTER: '🃏',
