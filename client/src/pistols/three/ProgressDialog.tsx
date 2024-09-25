@@ -657,7 +657,7 @@ export class ProgressDialogManager {
     const { stateA, stateB } = this.findCurrentDuelStates(this.lastDuelStageA, this.lastDuelStageB)
 
     const dialogAProps = dialogOptions[stateA]
-    if (this.lastDuelStateA != stateA) {
+    if (this.lastDuelStateA != stateA || !this.dialogA.message) {
 
       const messageA = this.isDialogAYou
         ? dialogAProps.messages[Math.floor(Math.random() * dialogAProps.messages.length)] 
@@ -669,7 +669,7 @@ export class ProgressDialogManager {
     }
 
     const dialogBProps = dialogOptions[stateB]
-    if (this.lastDuelStateB != stateB) {
+    if (this.lastDuelStateB != stateB || !this.dialogB.message) {
 
       const messageB = !this.isDialogAYou
         ? dialogBProps.messages[Math.floor(Math.random() * dialogBProps.messages.length)] 
@@ -781,7 +781,7 @@ export class ProgressDialogMesh {
   private dialogTitle: string
   private duelistName: string
   private isThinkingBubble: boolean
-  private message: string
+  public message: string
   private onButtonClick: () => void
 
   constructor(camera: THREE.PerspectiveCamera, position: THREE.Vector3, isLeft: boolean) {
