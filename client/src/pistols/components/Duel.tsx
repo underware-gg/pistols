@@ -266,7 +266,7 @@ export default function Duel({
       if (step.card_env != EnvCard.None) {
         gameImpl?.animatePace(currentStep.current, newStatsA, newStatsB)
       } else {
-        gameImpl?.animateActions(Action[step.card_b.blades], Action[step.card_b.blades], newStatsA?.health, newStatsB?.health)
+        gameImpl?.animateActions(Action[step.card_a.blades], Action[step.card_b.blades], newStatsA?.health, newStatsB?.health)
       }
     }, shouldDoblePause ? 2000 : 1000);
 
@@ -286,8 +286,10 @@ export default function Duel({
     hasSpawnedCardsA.current = false
     hasSpawnedCardsB.current = false
     hasUnmounted.current = false
-    cardRef.current?.resetCards()
-    gameImpl?.resetDuelScene()
+    setStatsA({ damage: 1, hitChance: 50, health: 3, shotPaces: undefined, dodgePaces: undefined })
+    setStatsB({ damage: 1, hitChance: 50, health: 3, shotPaces: undefined, dodgePaces: undefined })
+    //cardRef.current?.resetCards()
+    //gameImpl?.resetDuelScene() //TODO make a new reset function that resets only the necessary stuff for already in game duel
   }
 
   if (!duelSceneStarted) return <></>
