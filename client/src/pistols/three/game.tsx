@@ -799,7 +799,7 @@ export function switchScene(sceneName) {
 
 export function startDuelWithPlayers(duelistNameA, duelistModelA, isDuelistAYou, isDuelistBYou, duelistNameB, duelistModelB) {
   switchScene(SceneName.Duel) // make sure we're in the correct scene (duel page refresh)
-  // resetDuelScene()
+  resetDuelScene()
   
   _duelistManager.switchDuelists(duelistNameA, duelistModelA, isDuelistAYou, isDuelistBYou, duelistNameB, duelistModelB)
 }
