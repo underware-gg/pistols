@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x58024681b9bc7177fcda38cc1393cd50085a19b8ee02bae558422ff0b55498"
-original_class_hash = "0x58024681b9bc7177fcda38cc1393cd50085a19b8ee02bae558422ff0b55498"
+class_hash = "0x1f98abf30c3d96ae66e2816e354cc44c8c7553ceb1e3043909feca4eafa3755"
+original_class_hash = "0x1f98abf30c3d96ae66e2816e354cc44c8c7553ceb1e3043909feca4eafa3755"
 abi = "manifests/sepolia/base/abis/models/pistols-Round-617e0a3d.json"
 tag = "pistols-Round"
 qualified_path = "pistols::models::challenge::round"
@@ -39,4 +39,9 @@ key = false
 [[members]]
 name = "state"
 type = "RoundState"
+key = false
+
+[[members]]
+name = "final_step"
+type = "u8"
 key = false
