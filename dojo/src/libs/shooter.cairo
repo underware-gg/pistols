@@ -237,6 +237,10 @@ mod shooter {
                 state_a.damage = prev_state_a.damage;
                 state_b.damage = prev_state_b.damage;
             }
+            
+            // reset dices
+            state_a.dice_fire = 0;
+            state_b.dice_fire = 0;
 
             pace_number += 1;
         };

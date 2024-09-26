@@ -157,18 +157,28 @@ mod tests {
                 if (pace == (*moves_a[0]).into()) {
                     assert(step.card_a == DuelistDrawnCard::Fire((*moves_a[0]).into()), ShortString::concat(num, '_fire_a'));
                     assert(step.card_b == DuelistDrawnCard::None, ShortString::concat(num, '_none_b'));
+                    assert(step.state_a.dice_fire > 0, 'dice_fire_a');
+                    assert(step.state_b.dice_fire == 0, 'dice_fire_b');
                 } else if (pace == (*moves_a[1]).into()) {
                     assert(step.card_a == DuelistDrawnCard::Dodge((*moves_a[1]).into()), ShortString::concat(num, '_dodge_a'));
                     assert(step.card_b == DuelistDrawnCard::None, ShortString::concat(num, '_none_b'));
+                    assert(step.state_a.dice_fire == 0, 'dice_fire_a');
+                    assert(step.state_b.dice_fire == 0, 'dice_fire_b');
                 } else if (pace == (*moves_b[0]).into()) {
                     assert(step.card_a == DuelistDrawnCard::None, ShortString::concat(num, '_none_a'));
                     assert(step.card_b == DuelistDrawnCard::Fire((*moves_b[0]).into()), ShortString::concat(num, '_fire_b'));
+                    assert(step.state_a.dice_fire == 0, 'dice_fire_a');
+                    assert(step.state_b.dice_fire > 0, 'dice_fire_b');
                 } else if (pace == (*moves_b[1]).into()) {
                     assert(step.card_a == DuelistDrawnCard::None, ShortString::concat(num, '_none_a'));
                     assert(step.card_b == DuelistDrawnCard::Dodge((*moves_b[1]).into()), ShortString::concat(num, '_dodge_b'));
+                    assert(step.state_a.dice_fire == 0, 'dice_fire_a');
+                    assert(step.state_b.dice_fire == 0, 'dice_fire_b');
                 } else {
                     assert(step.card_a == DuelistDrawnCard::None, ShortString::concat(num, '_none_a'));
                     assert(step.card_b == DuelistDrawnCard::None, ShortString::concat(num, '_none_b'));
+                    assert(step.state_a.dice_fire == 0, 'dice_fire_a');
+                    assert(step.state_b.dice_fire == 0, 'dice_fire_b');
                 }
             }
             i += 1;
