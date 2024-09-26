@@ -175,6 +175,7 @@ fn set_challenge(store: Store, challenge: Challenge) {
             moves_b: Default::default(),
             state_a: Default::default(),
             state_b: Default::default(),
+            final_step: 0,
         };
         store.set_round(@new_round);
     } else if (challenge.state.is_finished()) {

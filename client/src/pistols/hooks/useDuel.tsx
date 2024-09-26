@@ -41,6 +41,12 @@ export const useRound = (duelId: BigNumberish, roundNumber: BigNumberish) => {
   const entityId = useMemo(() => keysToEntity([duelId, roundNumber]), [duelId, roundNumber])
   const round = useComponentValue(Round, entityId)
   const state = useMemo(() => (round?.state as unknown as RoundState ?? null), [round])
+  const endedInBlades = useMemo(() => (round ? (
+    round.final_step > 10 ||
+    // TODO: remove this, as was added mid-sepolia
+    //@ts-ignore
+    (round.final_step == 0 && round.state == RoundState.Finished)
+  ) : false), [round])
   
   const hand_a = useMemo(() => round ? movesToHand(
     [round.moves_a.card_1,round.moves_a.card_2, round.moves_a.card_3, round.moves_a.card_4]
@@ -56,6 +62,7 @@ export const useRound = (duelId: BigNumberish, roundNumber: BigNumberish) => {
     state,
     hand_a,
     hand_b,
+    endedInBlades,
   }
 }
 
@@ -159,5 +166,6 @@ export const useAnimatedDuel = (duelId: BigNumberish, enabled: boolean) => {
     duelStage: currentStage,
     healthA, healthB,
     canAutoRevealA, canAutoRevealB,
+    endedInBlades: round1?.endedInBlades ?? false,
   }
 }

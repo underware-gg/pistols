@@ -60,6 +60,7 @@ pub struct Round {
     pub state_a: DuelistState,
     pub state_b: DuelistState,
     pub state: RoundState,
+    pub final_step: u8,     // pace number, > 10 if ended in blades
 }
 
 //

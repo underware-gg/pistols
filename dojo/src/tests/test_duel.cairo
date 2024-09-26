@@ -15,6 +15,7 @@ mod tests {
     use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::types::constants::{CONST, HONOUR};
     use pistols::utils::arrays::{SpanUtilsTrait};
+    use pistols::utils::math::{MathU8};
     use pistols::libs::utils::{make_moves_hash};
 
     use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
@@ -110,6 +111,7 @@ mod tests {
         assert(challenge.winner == 0, 'challenge.winner');
         assert(challenge.round_number == 1, 'challenge.round_number');
         assert(round.state == RoundState::Finished, 'round.state');
+        assert(round.final_step == MathU8::max(*moves_a.moves[0], *moves_b.moves[0]), 'round.final_step');
         assert(round.state_a.health == final_health, 'round.moves_a.health');
         assert(round.state_b.health == final_health, 'round.moves_b.health');
         if (final_health == 0) {
@@ -232,6 +234,7 @@ mod tests {
         assert(challenge.round_number == 1, '4_challenge.round_number');
         assert(challenge.timestamp_end > 0, '4_challenge.timestamp_end');
         assert(round.state == RoundState::Finished, '4__state');
+        assert(round.final_step == MathU8::max(*moves_a.moves[0], *moves_b.moves[0]), 'round.final_step');
         assert(round.moves_a.hashed == moves_a.hashed, '43__hash');
         assert(round.moves_a.salt == moves_a.salt, '43__salt');
         assert(round.moves_a.card_1.into() == *moves_a.moves[0], '43__card_fire');

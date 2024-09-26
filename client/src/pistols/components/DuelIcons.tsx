@@ -96,7 +96,7 @@ export function useDuelIcons({
     //
     // Finished...
     if (isFinished) {
-      if (state1) {
+      if (state1 && moves1) {
         const pacesFire = moves1.card_1
         const pacesDodge = moves1.card_2
         const cardFire = getPacesCardFromValue(pacesFire)
@@ -108,11 +108,10 @@ export function useDuelIcons({
           icons1.push(<PacesIcon key='fire' paces={cardFire} size={iconSize} />)
           icons1.push(<PacesIcon key='dodge' paces={cardDodge} size={iconSize} dodge />)
         }
-      }
-
-      const cardBlades = getBladesCardFromValue(moves1.card_4)
-      if (cardBlades) {
-        icons1.push(<BladesIcon key='blades' blade={cardBlades} size={iconSize} />)
+        const cardBlades = getBladesCardFromValue(moves1.card_4)
+        if (cardBlades) {
+          icons1.push(<BladesIcon key='blades' blade={cardBlades} size={iconSize} />)
+        }
       }
 
       if (health1) icons1.push(<EmojiIcon key='health1' emoji={health1} size={iconSize} />)

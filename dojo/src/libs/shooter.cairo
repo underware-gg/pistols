@@ -191,10 +191,11 @@ mod shooter {
         let mut fired_a: bool = false;
         let mut fired_b: bool = false;
 
-        let mut pace_number: u8 = 1;
-        while (pace_number <= 10) {
-            let pace: PacesCard = pace_number.into();
-            // println!("Pace [{}] A:{} B:{}", pace_number, self.moves_a.card_fire.as_felt(), self.moves_b.card_fire.as_felt());
+        let mut step_number: u8 = 1;
+        while (step_number <= 10) {
+            round.final_step = step_number;
+            let pace: PacesCard = step_number.into();
+            // println!("Pace [{}] A:{} B:{}", step_number, self.moves_a.card_fire.as_felt(), self.moves_b.card_fire.as_felt());
 
             // draw env card
             let (card_env, dice_env): (EnvCard, u8) = draw_env_card(env_deck, pace, ref dice);
@@ -242,7 +243,7 @@ mod shooter {
                 state_b.damage = prev_state_b.damage;
             }
             
-            pace_number += 1;
+            step_number += 1;
         };
  
 
@@ -253,6 +254,7 @@ mod shooter {
             state_b.health > 0 &&
             (hand_a.card_blades != BladesCard::None || hand_b.card_blades != BladesCard::None)
         ) {
+            round.final_step = 11;
             blades(hand_a.card_blades, hand_b.card_blades, ref state_a, ref state_b);
             // save step 11
             steps.append(DuelStep {
