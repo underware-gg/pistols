@@ -332,6 +332,10 @@ function MovesStats({
   )
 }
 
+function _dice(dice: number) {
+  if (dice == 0) return '-'
+  return <>{EMOJI.DICE} {dice.toString()}</>
+}
 
 function StateRow({
   state_a,
@@ -362,7 +366,7 @@ function StateRow({
         <Row textAlign='center'>
           <Cell>Duelist A</Cell>
           {(card_a || card_b) && <Cell>{card_a}</Cell>}
-          <Cell>{EMOJI.DICE} {state_a.dice_fire.toString()}</Cell>
+          <Cell>{_dice(state_a.dice_fire)}</Cell>
           <Cell>{state_a.chances.toString()}%</Cell>
           <Cell>{EMOJI.FIRE} {state_a.damage.toString()}</Cell>
           <Cell>{EMOJI.LIFE} {state_a.health.toString()}</Cell>
@@ -371,7 +375,7 @@ function StateRow({
         <Row textAlign='center'>
           <Cell>Duelist B</Cell>
           {(card_a || card_b) && <Cell>{card_b}</Cell>}
-          <Cell>{EMOJI.DICE} {state_b.dice_fire.toString()}</Cell>
+          <Cell>{_dice(state_b.dice_fire)}</Cell>
           <Cell>{state_b.chances.toString()}%</Cell>
           <Cell>{EMOJI.FIRE} {state_b.damage.toString()}</Cell>
           <Cell>{EMOJI.LIFE} {state_b.health.toString()}</Cell>
@@ -461,7 +465,7 @@ function DuelStep({
           <Row>
             <Cell>Env Shuffle</Cell>
             <Cell>
-              {EMOJI.DICE} {step.dice_env.toString()}
+              {_dice(step.dice_env)}
             </Cell>
           </Row>
         </Body>

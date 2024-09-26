@@ -128,6 +128,7 @@ impl MovesImpl of MovesTrait {
 #[generate_trait]
 impl DuelistStateImpl of DuelistStateTrait {
     fn initialize(ref self: DuelistState, hand: PlayerHand) {
+        self = Default::default();
         self.chances = CONST::INITIAL_CHANCE;
         self.damage = CONST::INITIAL_DAMAGE;
         self.health = CONST::FULL_HEALTH;

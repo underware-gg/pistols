@@ -225,6 +225,10 @@ mod shooter {
                 state_b,
             });
 
+            // reset dices
+            state_a.dice_fire = 0;
+            state_b.dice_fire = 0;
+
             // break if there's a winner
             if (state_a.health == 0 || state_b.health == 0) { break; }
             // both dices rolled, no winner, go to blades
@@ -238,10 +242,6 @@ mod shooter {
                 state_b.damage = prev_state_b.damage;
             }
             
-            // reset dices
-            state_a.dice_fire = 0;
-            state_b.dice_fire = 0;
-
             pace_number += 1;
         };
  
