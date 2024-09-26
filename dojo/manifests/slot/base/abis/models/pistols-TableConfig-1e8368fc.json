@@ -390,6 +390,20 @@
   },
   {
     "type": "enum",
+    "name": "pistols::types::cards::hand::DeckType",
+    "variants": [
+      {
+        "name": "None",
+        "type": "()"
+      },
+      {
+        "name": "Classic",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "enum",
     "name": "core::bool",
     "variants": [
       {
@@ -411,32 +425,28 @@
         "type": "core::felt252"
       },
       {
+        "name": "description",
+        "type": "core::felt252"
+      },
+      {
         "name": "table_type",
         "type": "pistols::models::table::TableType"
       },
       {
-        "name": "description",
-        "type": "core::felt252"
+        "name": "deck_type",
+        "type": "pistols::types::cards::hand::DeckType"
+      },
+      {
+        "name": "fee_contract_address",
+        "type": "core::starknet::contract_address::ContractAddress"
       },
       {
         "name": "fee_collector_address",
         "type": "core::starknet::contract_address::ContractAddress"
       },
       {
-        "name": "wager_contract_address",
-        "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
-        "name": "wager_min",
-        "type": "core::integer::u128"
-      },
-      {
         "name": "fee_min",
         "type": "core::integer::u128"
-      },
-      {
-        "name": "fee_pct",
-        "type": "core::integer::u8"
       },
       {
         "name": "is_open",

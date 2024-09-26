@@ -363,72 +363,34 @@
   },
   {
     "type": "impl",
-    "name": "snapshotImpl",
-    "interface_name": "pistols::models::challenge::Isnapshot"
+    "name": "table_wagerImpl",
+    "interface_name": "pistols::models::table::Itable_wager"
   },
   {
     "type": "struct",
-    "name": "pistols::models::duelist::Score",
+    "name": "pistols::models::table::TableWager",
     "members": [
       {
-        "name": "honour",
-        "type": "core::integer::u8"
+        "name": "table_id",
+        "type": "core::felt252"
       },
       {
-        "name": "level_villain",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "level_trickster",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "level_lord",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "total_duels",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "total_wins",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "total_losses",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "total_draws",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "honour_history",
-        "type": "core::integer::u64"
-      }
-    ]
-  },
-  {
-    "type": "struct",
-    "name": "pistols::models::challenge::Snapshot",
-    "members": [
-      {
-        "name": "duel_id",
+        "name": "wager_min",
         "type": "core::integer::u128"
       },
       {
-        "name": "score_a",
-        "type": "pistols::models::duelist::Score"
+        "name": "wager_max",
+        "type": "core::integer::u128"
       },
       {
-        "name": "score_b",
-        "type": "pistols::models::duelist::Score"
+        "name": "fee_pct",
+        "type": "core::integer::u8"
       }
     ]
   },
   {
     "type": "interface",
-    "name": "pistols::models::challenge::Isnapshot",
+    "name": "pistols::models::table::Itable_wager",
     "items": [
       {
         "type": "function",
@@ -436,7 +398,7 @@
         "inputs": [
           {
             "name": "model",
-            "type": "pistols::models::challenge::Snapshot"
+            "type": "pistols::models::table::TableWager"
           }
         ],
         "outputs": [],
@@ -446,7 +408,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::models::challenge::snapshot::Event",
+    "name": "pistols::models::table::table_wager::Event",
     "kind": "enum",
     "variants": []
   }

@@ -367,8 +367,68 @@
     "interface_name": "pistols::models::challenge::Iround"
   },
   {
+    "type": "struct",
+    "name": "pistols::models::challenge::Moves",
+    "members": [
+      {
+        "name": "salt",
+        "type": "core::felt252"
+      },
+      {
+        "name": "hashed",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "card_1",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "card_2",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "card_3",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "card_4",
+        "type": "core::integer::u8"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "pistols::models::challenge::DuelistState",
+    "members": [
+      {
+        "name": "chances",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "damage",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "health",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "dice_fire",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "honour",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "wager",
+        "type": "core::integer::u8"
+      }
+    ]
+  },
+  {
     "type": "enum",
-    "name": "pistols::types::round::RoundState",
+    "name": "pistols::types::round_state::RoundState",
     "variants": [
       {
         "name": "Null",
@@ -390,68 +450,6 @@
   },
   {
     "type": "struct",
-    "name": "pistols::models::challenge::Shot",
-    "members": [
-      {
-        "name": "hash",
-        "type": "core::integer::u64"
-      },
-      {
-        "name": "salt",
-        "type": "core::integer::u64"
-      },
-      {
-        "name": "action",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "chance_crit",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "chance_hit",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "chance_lethal",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "dice_crit",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "dice_hit",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "damage",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "block",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "win",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "wager",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "health",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "honour",
-        "type": "core::integer::u8"
-      }
-    ]
-  },
-  {
-    "type": "struct",
     "name": "pistols::models::challenge::Round",
     "members": [
       {
@@ -463,16 +461,28 @@
         "type": "core::integer::u8"
       },
       {
+        "name": "moves_a",
+        "type": "pistols::models::challenge::Moves"
+      },
+      {
+        "name": "moves_b",
+        "type": "pistols::models::challenge::Moves"
+      },
+      {
+        "name": "state_a",
+        "type": "pistols::models::challenge::DuelistState"
+      },
+      {
+        "name": "state_b",
+        "type": "pistols::models::challenge::DuelistState"
+      },
+      {
         "name": "state",
-        "type": "pistols::types::round::RoundState"
+        "type": "pistols::types::round_state::RoundState"
       },
       {
-        "name": "shot_a",
-        "type": "pistols::models::challenge::Shot"
-      },
-      {
-        "name": "shot_b",
-        "type": "pistols::models::challenge::Shot"
+        "name": "final_step",
+        "type": "core::integer::u8"
       }
     ]
   },
