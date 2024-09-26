@@ -479,6 +479,10 @@
       {
         "name": "state",
         "type": "pistols::types::round_state::RoundState"
+      },
+      {
+        "name": "final_step",
+        "type": "core::integer::u8"
       }
     ]
   },
