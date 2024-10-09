@@ -1,0 +1,27 @@
+kind = "DojoModel"
+class_hash = "0x56311a8bd5e06da47daf8d5e00fcbbb96936c82f481bc20be2165120bc65674"
+original_class_hash = "0x56311a8bd5e06da47daf8d5e00fcbbb96936c82f481bc20be2165120bc65674"
+abi = "manifests/dev/base/abis/models/pistols-TokenConfig-56ebd338.json"
+tag = "pistols-TokenConfig"
+qualified_path = "pistols::models::token_config::token_config"
+manifest_name = "pistols-TokenConfig-56ebd338"
+
+[[members]]
+name = "token_address"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "minter_contract"
+type = "ContractAddress"
+key = false
+
+[[members]]
+name = "renderer_contract"
+type = "ContractAddress"
+key = false
+
+[[members]]
+name = "treasury_contract"
+type = "ContractAddress"
+key = false

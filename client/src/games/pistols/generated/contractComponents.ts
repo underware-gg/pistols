@@ -359,12 +359,12 @@ export function defineContractComponents(world: World) {
     TokenConfig: (() => {
       return defineComponent(
         world,
-        { token_address: RecsType.BigInt, max_supply: RecsType.Number, max_per_wallet: RecsType.Number, minted_count: RecsType.Number, is_open: RecsType.Boolean },
+        { token_address: RecsType.BigInt, minter_contract: RecsType.BigInt, renderer_contract: RecsType.BigInt, treasury_contract: RecsType.BigInt },
         {
           metadata: {
             namespace: "pistols",
             name: "TokenConfig",
-            types: ["contractaddress","u16","u16","u16","bool"],
+            types: ["contractaddress","contractaddress","contractaddress","contractaddress"],
             customTypes: [],
           },
         }
