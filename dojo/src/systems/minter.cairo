@@ -18,7 +18,7 @@ mod minter {
 
     use pistols::interfaces::systems::{
         WorldSystemsTrait,
-        ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait,
+        IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
         IAdminDispatcher, IAdminDispatcherTrait,
     };
     use pistols::models::token_config::{TokenConfig, TokenConfigEntity};
@@ -68,7 +68,7 @@ mod minter {
     impl MinterImpl of IMinter<ContractState> {
         fn mint(ref world: IWorldDispatcher, to: ContractAddress, token_contract_address: ContractAddress) -> u128 {
             assert(token_contract_address.is_non_zero(), Errors::INVALID_TOKEN_ADDRESS);
-            let token = (ITokenDuelistDispatcher{ contract_address: token_contract_address });
+            let token = (IDuelistTokenDispatcher{ contract_address: token_contract_address });
 
             // check availability
             let store = StoreTrait::new(world);
@@ -96,7 +96,7 @@ mod minter {
             assert(token_contract_address.is_non_zero(), Errors::INVALID_TOKEN_ADDRESS);
             let store = StoreTrait::new(world);
             let config: TokenConfigEntity = store.get_token_config_entity(token_contract_address);
-            let token = (ITokenDuelistDispatcher{ contract_address: token_contract_address });
+            let token = (IDuelistTokenDispatcher{ contract_address: token_contract_address });
             let balance: u256 = token.balance_of(to);
             (
                 (config.minted_count < config.max_supply) &&

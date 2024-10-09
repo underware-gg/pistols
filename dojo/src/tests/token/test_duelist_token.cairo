@@ -21,8 +21,8 @@ use origami_token::components::token::erc721::erc721_balance::erc721_balance_com
 use origami_token::components::token::erc721::erc721_mintable::erc721_mintable_component::InternalImpl as ERC721MintableInternalImpl;
 use origami_token::components::token::erc721::erc721_burnable::erc721_burnable_component::InternalImpl as ERC721BurnableInternalImpl;
 
-use pistols::systems::token_duelist::{
-    token_duelist, ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait,
+use pistols::systems::duelist_token::{
+    duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
 };
 use pistols::systems::minter::{
     minter, IMinterDispatcher, IMinterDispatcherTrait,
@@ -87,7 +87,7 @@ const TOKEN_ID_3: u256 = 3;
 const TOKEN_ID_4: u256 = 4;
 const TOKEN_ID_5: u256 = 5;
 
-fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterDispatcher) {
+fn setup_uninitialized() -> (IWorldDispatcher, IDuelistTokenDispatcher, IMinterDispatcher) {
     testing::set_block_number(1);
     testing::set_block_timestamp(1);
     let mut world = spawn_test_world(
@@ -95,8 +95,8 @@ fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterD
         get_models_test_class_hashes!(),
     );
 
-    let mut token = ITokenDuelistDispatcher {
-        contract_address: world.deploy_contract('salt',token_duelist::TEST_CLASS_HASH.try_into().unwrap())
+    let mut token = IDuelistTokenDispatcher {
+        contract_address: world.deploy_contract('salt',duelist_token::TEST_CLASS_HASH.try_into().unwrap())
     };
     world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), token.contract_address);
     world.grant_writer(selector_from_tag!("origami_token-SRC5Model"), token.contract_address);
@@ -110,7 +110,7 @@ fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterD
     world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableOwnerTokenModel"),token.contract_address);
     world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableTotalModel"),token.contract_address);
     world.grant_writer(selector_from_tag!("origami_token-ERC721OwnerModel"), token.contract_address);
-    world.init_contract(SELECTORS::TOKEN_DUELIST, [].span());
+    world.init_contract(SELECTORS::DUELIST_TOKEN, [].span());
 
     // deploy minter
     let minter_call_data: Array<felt252> = array![
@@ -133,7 +133,7 @@ fn setup_uninitialized() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterD
     (world, token, minter)
 }
 
-fn setup() -> (IWorldDispatcher, ITokenDuelistDispatcher, IMinterDispatcher) {
+fn setup() -> (IWorldDispatcher, IDuelistTokenDispatcher, IMinterDispatcher) {
     let (mut world, mut token, mut minter) = setup_uninitialized();
 
     // initialize contracts

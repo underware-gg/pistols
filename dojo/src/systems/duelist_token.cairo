@@ -2,7 +2,7 @@ use starknet::{ContractAddress};
 use dojo::world::IWorldDispatcher;
 
 #[starknet::interface]
-trait ITokenDuelist<TState> {
+trait IDuelistToken<TState> {
     // IWorldProvider
     fn world(self: @TState,) -> IWorldDispatcher;
 
@@ -63,7 +63,7 @@ trait ITokenDuelist<TState> {
     fn tokenByIndex(self: @TState, index: u256) -> u256;
     fn tokenOfOwnerByIndex(self: @TState, owner: ContractAddress, index: u256) -> u256;
 
-    // ITokenDuelistPublic
+    // IDuelistTokenPublic
     fn mint(ref self: TState, to: ContractAddress, token_id: u256);
     fn burn(ref self: TState, token_id: u256);
     fn build_uri(self: @TState, token_id: u256, encode: bool) -> ByteArray;
@@ -72,14 +72,14 @@ trait ITokenDuelist<TState> {
 }
 
 #[starknet::interface]
-trait ITokenDuelistPublic<TState> {
+trait IDuelistTokenPublic<TState> {
     fn mint(ref self: TState, to: ContractAddress, token_id: u256);
     fn burn(ref self: TState, token_id: u256);
     fn build_uri(self: @TState, token_id: u256, encode: bool) -> ByteArray;
 }
 
 #[dojo::contract]
-mod token_duelist {    
+mod duelist_token {    
     // use debug::PrintTrait;
     use core::byte_array::ByteArrayTrait;
     use starknet::ContractAddress;
@@ -221,7 +221,7 @@ mod token_duelist {
     //
     // Metadata Hooks
     //
-    use super::{ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait};
+    use super::{IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait};
     impl ERC721MetadataHooksImpl<ContractState> of erc721_metadata_component::ERC721MetadataHooksTrait<ContractState> {
         fn custom_uri(
             self: @erc721_metadata_component::ComponentState<ContractState>,
@@ -229,7 +229,7 @@ mod token_duelist {
             token_id: u256,
         ) -> ByteArray {
             CONSUME_BYTE_ARRAY(base_uri);
-            let selfie = ITokenDuelistDispatcher{ contract_address: get_contract_address() };
+            let selfie = IDuelistTokenDispatcher{ contract_address: get_contract_address() };
             // let world = selfie.world();
             (selfie.build_uri(token_id, false))
         }
@@ -239,7 +239,7 @@ mod token_duelist {
     // Public
     //
     #[abi(embed_v0)]
-    impl TokenDuelistPublicImpl of super::ITokenDuelistPublic<ContractState> {
+    impl TokenDuelistPublicImpl of super::IDuelistTokenPublic<ContractState> {
         fn mint(ref self: ContractState, to: ContractAddress, token_id: u256) {
             assert(self.world().is_minter_contract(get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
             self.erc721_mintable.mint(to, token_id);

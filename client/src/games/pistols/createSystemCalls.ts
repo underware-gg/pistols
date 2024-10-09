@@ -37,8 +37,8 @@ const admin_call = (entrypoint: string, calldata: any[]) => ({
   entrypoint,
   calldata,
 })
-const token_duelist_call = (entrypoint: string, calldata: any[]) => ({
-  contractName: 'token_duelist',
+const duelist_token_call = (entrypoint: string, calldata: any[]) => ({
+  contractName: 'duelist_token',
   entrypoint,
   calldata,
 })
@@ -264,7 +264,7 @@ export function createSystemCalls(
 
   const duelist_token_uri = async (token_id: BigNumberish): Promise<string | null> => {
     const args = [token_id]
-    const results = await _executeCall<string>(token_duelist_call('token_uri', args))
+    const results = await _executeCall<string>(duelist_token_call('token_uri', args))
     return results ?? null
   }
 

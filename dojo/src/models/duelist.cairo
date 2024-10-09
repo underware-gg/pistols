@@ -167,7 +167,7 @@ pub struct DuelistHelper {
 #[generate_trait]
 impl DuelistHelperTraitImpl of DuelistHelperTrait {
     fn new(world: IWorldDispatcher) -> DuelistHelper {
-        let contract_address: ContractAddress = world.token_duelist_address();
+        let contract_address: ContractAddress = world.duelist_token_address();
         assert(contract_address.is_non_zero(), 'DuelistHelper: null token addr');
         let token_dispatcher = ierc721(contract_address);
         (DuelistHelper { world, token_dispatcher })

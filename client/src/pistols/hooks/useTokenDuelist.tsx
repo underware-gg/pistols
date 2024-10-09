@@ -11,7 +11,7 @@ export const useTokenContract = () => {
   const [contractAddress, setTokenContractAddress] = useState('')
   const { setup: { manifest, nameSpace } } = useDojo()
   useEffect(() => {
-    const contract = getContractByName(manifest, nameSpace, 'token_duelist');
+    const contract = getContractByName(manifest, nameSpace, 'duelist_token');
     setTokenContractAddress(contract?.address ?? '')
   }, [])
   const contractAddressKey = useMemo(() => bigintToEntity(contractAddress), [contractAddress])

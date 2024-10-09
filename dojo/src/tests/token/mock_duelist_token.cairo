@@ -1,13 +1,13 @@
 use starknet::{ContractAddress};
 
 #[dojo::interface]
-trait ITokenDuelist {
+trait IDuelistToken {
     fn owner_of(world: @IWorldDispatcher, token_id: u256) -> ContractAddress;
 }
 
 #[dojo::contract]
-mod token_duelist {
-    use super::ITokenDuelist;
+mod duelist_token {
+    use super::IDuelistToken;
     use debug::PrintTrait;
     use core::traits::Into;
     use starknet::{ContractAddress, get_contract_address, get_caller_address, get_tx_info};
@@ -21,7 +21,7 @@ mod token_duelist {
     // IMinter
     //
     #[abi(embed_v0)]
-    impl ERC721MockImpl of ITokenDuelist<ContractState> {
+    impl ERC721MockImpl of IDuelistToken<ContractState> {
         fn owner_of(world: @IWorldDispatcher, token_id: u256) -> ContractAddress {
             WORLD(world);
 

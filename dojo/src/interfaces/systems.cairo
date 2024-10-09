@@ -6,7 +6,7 @@ use pistols::systems::{
     game::{IGameDispatcher, IGameDispatcherTrait},
     rng::{IRngDispatcher, IRngDispatcherTrait},
     minter::{IMinterDispatcher, IMinterDispatcherTrait},
-    token_duelist::{ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait},
+    duelist_token::{IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
 };
 use pistols::utils::misc::{ZERO};
 
@@ -16,7 +16,7 @@ mod SELECTORS {
     const GAME: felt252 = selector_from_tag!("pistols-game");
     const RNG: felt252 = selector_from_tag!("pistols-rng");
     const MINTER: felt252 = selector_from_tag!("pistols-minter");
-    const TOKEN_DUELIST: felt252 = selector_from_tag!("pistols-token_duelist");
+    const DUELIST_TOKEN: felt252 = selector_from_tag!("pistols-duelist_token");
     const LORDS_MOCK: felt252 = selector_from_tag!("pistols-lords_mock");
     // model selectors
     const CONFIG: felt252 = selector_from_tag!("pistols-Config");
@@ -37,8 +37,8 @@ impl WorldSystemsTraitImpl of WorldSystemsTrait {
 
     //
     // system addresses
-    fn token_duelist_address(self: @IWorldDispatcher) -> ContractAddress {
-        (self.contract_address(SELECTORS::TOKEN_DUELIST))
+    fn duelist_token_address(self: @IWorldDispatcher) -> ContractAddress {
+        (self.contract_address(SELECTORS::DUELIST_TOKEN))
     }
 
     //
@@ -55,8 +55,8 @@ impl WorldSystemsTraitImpl of WorldSystemsTrait {
     fn minter_dispatcher(self: @IWorldDispatcher) -> IMinterDispatcher {
         (IMinterDispatcher{ contract_address: self.contract_address(SELECTORS::MINTER) })
     }
-    fn token_duelist_dispatcher(self: @IWorldDispatcher) -> ITokenDuelistDispatcher {
-        (ITokenDuelistDispatcher{ contract_address: self.contract_address(SELECTORS::TOKEN_DUELIST) })
+    fn duelist_token_dispatcher(self: @IWorldDispatcher) -> IDuelistTokenDispatcher {
+        (IDuelistTokenDispatcher{ contract_address: self.contract_address(SELECTORS::DUELIST_TOKEN) })
     }
 
     //

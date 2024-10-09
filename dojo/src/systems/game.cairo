@@ -168,7 +168,7 @@ mod game {
             // mint if you can
             let caller: ContractAddress = starknet::get_caller_address();
             let minter_dispatcher: IMinterDispatcher = world.minter_dispatcher();
-            let token_id: u128 = minter_dispatcher.mint(caller, world.token_duelist_address());
+            let token_id: u128 = minter_dispatcher.mint(caller, world.duelist_token_address());
 
             // // create
             let mut duelist = Duelist {

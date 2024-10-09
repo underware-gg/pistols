@@ -12,12 +12,12 @@ mod tester {
     use pistols::systems::admin::{admin, IAdminDispatcher, IAdminDispatcherTrait};
     use pistols::systems::game::{game, IGameDispatcher, IGameDispatcherTrait};
     use pistols::systems::minter::{minter, IMinterDispatcher, IMinterDispatcherTrait};
-    use pistols::systems::token_duelist::{token_duelist, ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait};
+    use pistols::systems::duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait};
     use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
-    use pistols::tests::token::mock_token_duelist::{
-        token_duelist as mock_token_duelist,
-        // ITokenDuelistDispatcher,
-        // ITokenDuelistDispatcherTrait,
+    use pistols::tests::token::mock_duelist_token::{
+        duelist_token as mock_duelist_token,
+        // IDuelistTokenDispatcher,
+        // IDuelistTokenDispatcherTrait,
     };
     use pistols::types::challenge_state::{ChallengeState};
     use pistols::types::constants::{CONST};
@@ -205,17 +205,17 @@ mod tester {
             else {ZERO()}
         };
 // '---- 2'.print();
-        let duelists = ITokenDuelistDispatcher{ contract_address:
+        let duelists = IDuelistTokenDispatcher{ contract_address:
             if (deploy_minter) {
-                let address = deploy_system(world, 'token_duelist', token_duelist::TEST_CLASS_HASH);
+                let address = deploy_system(world, 'duelist_token', duelist_token::TEST_CLASS_HASH);
                 world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), address);
                 // world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), OWNER());
-                world.grant_writer(SELECTORS::TOKEN_DUELIST, OWNER());
-                world.init_contract(SELECTORS::TOKEN_DUELIST, [].span());
+                world.grant_writer(SELECTORS::DUELIST_TOKEN, OWNER());
+                world.init_contract(SELECTORS::DUELIST_TOKEN, [].span());
                 (address)
             }
             else if (deploy_game) {
-                (deploy_system(world, 'token_duelist', mock_token_duelist::TEST_CLASS_HASH))
+                (deploy_system(world, 'duelist_token', mock_duelist_token::TEST_CLASS_HASH))
             }
             else {ZERO()}
         };

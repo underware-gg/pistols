@@ -8,7 +8,7 @@ mod systems {
     mod admin;
     mod game;
     mod minter;
-    mod token_duelist;
+    mod duelist_token;
     mod rng;
 }
 
@@ -86,8 +86,8 @@ mod tests {
     mod mock_rng;
     // tokens
     mod token {
-        mod test_token_duelist;
+        mod test_duelist_token;
         // mocks
-        mod mock_token_duelist;
+        mod mock_duelist_token;
     }
 }
