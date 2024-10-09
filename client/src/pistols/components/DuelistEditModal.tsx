@@ -58,7 +58,7 @@ export default function DuelistEditModal({
     }
   }, [mintNew, lastDuelistId])
 
-  const { mint_duelist, update_duelist } = useDojoSystemCalls()
+  const { create_duelist, update_duelist } = useDojoSystemCalls()
 
   const { name, profilePic, score: { archetypeName } } = useDuelist(editingDuelistId)
   const [selectedProfilePic, setSelectedProfilePic] = useState(0)
@@ -88,7 +88,7 @@ export default function DuelistEditModal({
     if (canSubmit) {
       if (mintNew) {
         setLastDuelistIdBeforeMint(lastDuelistId ?? 0n)
-        mint_duelist(account, inputName, ProfilePicType.Duelist, _profilePic.toString(), inputArchetype)
+        create_duelist(account, inputName, ProfilePicType.Duelist, _profilePic.toString(), inputArchetype)
       } else {
         update_duelist(account, editingDuelistId, inputName, ProfilePicType.Duelist, _profilePic.toString())
       }

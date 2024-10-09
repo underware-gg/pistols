@@ -12,7 +12,10 @@ use pistols::models::{
         Pact, PactStore, PactEntity, PactEntityStore,
         Scoreboard, ScoreboardStore, ScoreboardEntity, ScoreboardEntityStore,
     },
-    token_config::{TokenConfig, TokenConfigStore, TokenConfigEntity, TokenConfigEntityStore},
+    token_config::{
+        TokenConfig, TokenConfigStore,
+        TokenConfigEntity, TokenConfigEntityStore,
+    },
     table::{
         TableConfig, TableConfigStore, TableConfigEntity, TableConfigEntityStore,
         TableWager, TableWagerStore, TableWagerEntity, TableWagerEntityStore,
@@ -140,9 +143,14 @@ impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn get_token_config_entity(self: Store, token_contract_address: ContractAddress) -> TokenConfigEntity {
+    fn get_token_config(self: Store, contract_address: ContractAddress) -> TokenConfig {
+        (TokenConfigStore::get(self.world, contract_address))
+    }
+
+    #[inline(always)]
+    fn get_token_config_entity(self: Store, contract_address: ContractAddress) -> TokenConfigEntity {
         (TokenConfigEntityStore::get(self.world,
-            TokenConfigStore::entity_id_from_keys(token_contract_address)
+            TokenConfigStore::entity_id_from_keys(contract_address)
         ))
     }
 

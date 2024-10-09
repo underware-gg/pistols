@@ -5,7 +5,6 @@ use pistols::systems::{
     admin::{IAdminDispatcher, IAdminDispatcherTrait},
     game::{IGameDispatcher, IGameDispatcherTrait},
     rng::{IRngDispatcher, IRngDispatcherTrait},
-    minter::{IMinterDispatcher, IMinterDispatcherTrait},
     duelist_token::{IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
 };
 use pistols::utils::misc::{ZERO};
@@ -15,7 +14,6 @@ mod SELECTORS {
     const ADMIN: felt252 = selector_from_tag!("pistols-admin");
     const GAME: felt252 = selector_from_tag!("pistols-game");
     const RNG: felt252 = selector_from_tag!("pistols-rng");
-    const MINTER: felt252 = selector_from_tag!("pistols-minter");
     const DUELIST_TOKEN: felt252 = selector_from_tag!("pistols-duelist_token");
     const LORDS_MOCK: felt252 = selector_from_tag!("pistols-lords_mock");
     // model selectors
@@ -52,16 +50,13 @@ impl WorldSystemsTraitImpl of WorldSystemsTrait {
     fn rng_dispatcher(self: @IWorldDispatcher) -> IRngDispatcher {
         (IRngDispatcher{ contract_address: self.contract_address(SELECTORS::RNG) })
     }
-    fn minter_dispatcher(self: @IWorldDispatcher) -> IMinterDispatcher {
-        (IMinterDispatcher{ contract_address: self.contract_address(SELECTORS::MINTER) })
-    }
     fn duelist_token_dispatcher(self: @IWorldDispatcher) -> IDuelistTokenDispatcher {
         (IDuelistTokenDispatcher{ contract_address: self.contract_address(SELECTORS::DUELIST_TOKEN) })
     }
 
     //
     // validators
-    fn is_minter_contract(self: @IWorldDispatcher, address: ContractAddress) -> bool {
-        (address == self.contract_address(SELECTORS::MINTER))
-    }
+    // fn is_minter(self: @IWorldDispatcher, address: ContractAddress) -> bool {
+    //     (address == self.contract_address(SELECTORS::MINTER))
+    // }
 }

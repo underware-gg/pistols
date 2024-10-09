@@ -2,12 +2,12 @@ mod interfaces {
     mod systems;
     mod ierc20;
     mod ierc721;
+    mod itoken;
 }
 
 mod systems {
     mod admin;
     mod game;
-    mod minter;
     mod duelist_token;
     mod rng;
 }

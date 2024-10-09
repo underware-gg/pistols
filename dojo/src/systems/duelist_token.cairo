@@ -1,10 +1,12 @@
 use starknet::{ContractAddress};
 use dojo::world::IWorldDispatcher;
+use pistols::models::duelist::{Duelist, ProfilePicType, Archetype};
 
 #[starknet::interface]
 trait IDuelistToken<TState> {
     // IWorldProvider
     fn world(self: @TState,) -> IWorldDispatcher;
+    fn dojo_resource(ref self: TState) -> felt252;
 
     // ISRC5
     fn supports_interface(self: @TState, interface_id: felt252) -> bool;
@@ -64,36 +66,62 @@ trait IDuelistToken<TState> {
     fn tokenOfOwnerByIndex(self: @TState, owner: ContractAddress, index: u256) -> u256;
 
     // IDuelistTokenPublic
-    fn mint(ref self: TState, to: ContractAddress, token_id: u256);
-    fn burn(ref self: TState, token_id: u256);
-    fn build_uri(self: @TState, token_id: u256, encode: bool) -> ByteArray;
-
-    fn dojo_resource(ref self: TState) -> felt252;
+    fn calc_price(ref self: TState, recipient: ContractAddress) -> u256;
+    fn create_duelist(ref self: TState, recipient: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252, initial_archetype: Archetype) -> Duelist;
+    fn update_duelist(ref self: TState, duelist_id: u128, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist;
+    fn delete_duelist(ref self: TState, duelist_id: u128);
 }
 
 #[starknet::interface]
 trait IDuelistTokenPublic<TState> {
-    fn mint(ref self: TState, to: ContractAddress, token_id: u256);
-    fn burn(ref self: TState, token_id: u256);
-    fn build_uri(self: @TState, token_id: u256, encode: bool) -> ByteArray;
+    fn calc_price(
+        ref self: TState,
+        recipient: ContractAddress,
+    ) -> u256;
+    fn create_duelist(
+        ref self: TState,
+        recipient: ContractAddress,
+        name: felt252,
+        profile_pic_type: ProfilePicType,
+        profile_pic_uri: felt252,
+        initial_archetype: Archetype,
+    ) -> Duelist;
+    fn update_duelist(
+        ref self: TState,
+        duelist_id: u128,
+        name: felt252,
+        profile_pic_type: ProfilePicType,
+        profile_pic_uri: felt252,
+    ) -> Duelist;
+    fn delete_duelist(
+        ref self: TState,
+        duelist_id: u128,
+    );
 }
 
 #[dojo::contract]
 mod duelist_token {    
     // use debug::PrintTrait;
     use core::byte_array::ByteArrayTrait;
-    use starknet::ContractAddress;
-    use starknet::{get_contract_address, get_caller_address};
+    use starknet::{ContractAddress, get_contract_address, get_caller_address, get_block_timestamp};
 
     use pistols::interfaces::systems::{WorldSystemsTrait};
-    use pistols::models::duelist::{Duelist, DuelistEntity, Score, Scoreboard, ScoreboardEntity, ScoreTrait};
-    use pistols::models::table::{TABLES};
-    use pistols::types::constants::{CONST};
-    use pistols::utils::misc::{CONSUME_BYTE_ARRAY};
+    use pistols::models::{
+        duelist::{
+            Duelist, DuelistEntity,
+            Score, ScoreTrait,
+            Scoreboard, ScoreboardEntity,
+            ProfilePicType, Archetype,
+        },
+        token_config::{TokenConfig, TokenConfigTrait},
+        table::{TABLES},
+    };
+
+    use pistols::utils::misc::{CONSUME_BYTE_ARRAY, WORLD};
     use pistols::utils::byte_arrays::{ByteArraysTrait, U8IntoByteArray, U16IntoByteArray, U32IntoByteArray, U256IntoByteArray, ByteArraySpanIntoByteArray};
     use pistols::utils::short_string::ShortStringTrait;
-    use pistols::utils::encoding::bytes_base64_encode;
     use pistols::libs::store::{Store, StoreTrait};
+    use pistols::types::constants::{CONST, HONOUR};
 
     use graffiti::json::JsonImpl;
     use graffiti::{Tag, TagImpl};
@@ -202,20 +230,41 @@ mod duelist_token {
     }
 
     mod Errors {
-        const CALLER_IS_NOT_MINTER: felt252 = 'DUELIST: caller is not minter';
+        const CALLER_IS_NOT_MINTER: felt252     = 'DUELIST: Caller is not minter';
+        const TRANSFER_FAILED: felt252          = 'DUELIST: Transfer failed';
+        const INVALID_DUELIST: felt252          = 'DUELIST: Invalid duelist';
+        const NOT_YOUR_DUELIST: felt252         = 'DUELIST: Not your duelist';
     }
 
+    //*******************************
+    const TOKEN_NAME: felt252 = 'Pistols at 10 Blocks Duelists';
+    const TOKEN_SYMBOL: felt252 = 'DUELIST';
+    const BASE_URI: felt252 = 'https://pistols.underware.gg/';
+    const TOKEN_PRICE: u256 = (0 * CONST::ETH_TO_WEI);
+    //*******************************
 
-    fn dojo_init(ref self: ContractState) {
-        //*******************************
-        let TOKEN_NAME = "Pistols at 10 Blocks Duelists";
-        let TOKEN_SYMBOL = "DUELIST";
-        let BASE_URI = "https://pistols.underware.gg/";
-        //*******************************
-
-        self.erc721_metadata.initialize(TOKEN_NAME, TOKEN_SYMBOL, BASE_URI);
+    fn dojo_init(
+        ref self: ContractState,
+        minter_contract: ContractAddress,
+        renderer_contract: ContractAddress,
+        treasury_contract: ContractAddress,
+    ) {
+        self.erc721_metadata.initialize(
+            TOKEN_NAME.string(),
+            TOKEN_SYMBOL.string(),
+            BASE_URI.string(),
+        );
         self.erc721_enumerable.initialize();
         self.initializable.initialize();
+
+        let store: Store = StoreTrait::new(self.world());
+        let token_config: TokenConfig = TokenConfig{
+            token_address: get_contract_address(),
+            minter_contract,
+            renderer_contract,
+            treasury_contract,
+        };
+        store.set_token_config(@token_config);
     }
 
     //
@@ -230,53 +279,114 @@ mod duelist_token {
         ) -> ByteArray {
             CONSUME_BYTE_ARRAY(base_uri);
             let selfie = IDuelistTokenDispatcher{ contract_address: get_contract_address() };
-            // let world = selfie.world();
-            (selfie.build_uri(token_id, false))
+            let store = StoreTrait::new(selfie.world());
+            let token_config: TokenConfig = store.get_token_config(get_contract_address());
+            let duelist: Duelist = store.get_duelist(token_id.low);
+            (token_config.render_uri(token_id, duelist, false))
         }
     }
 
     //-----------------------------------
     // Public
     //
+    use super::{IDuelistTokenPublic};
     #[abi(embed_v0)]
-    impl TokenDuelistPublicImpl of super::IDuelistTokenPublic<ContractState> {
-        fn mint(ref self: ContractState, to: ContractAddress, token_id: u256) {
-            assert(self.world().is_minter_contract(get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
-            self.erc721_mintable.mint(to, token_id);
+    impl DuelistTokenPublicImpl of IDuelistTokenPublic<ContractState> {
+        fn calc_price(
+            ref self: ContractState,
+            recipient: ContractAddress,
+        ) -> u256 {
+            if (self.balance_of(recipient) == 0) {
+                (0)
+            } else {
+                (TOKEN_PRICE)
+            }
+        }
+
+        fn create_duelist(ref self: ContractState,
+            recipient: ContractAddress,
+            name: felt252,
+            profile_pic_type: ProfilePicType,
+            profile_pic_uri: felt252,
+            initial_archetype: Archetype,
+        ) -> Duelist {
+            let store = StoreTrait::new(self.world());
+            let token_config: TokenConfig = store.get_token_config(get_contract_address());
+
+            // validate minter
+            let caller: ContractAddress = starknet::get_caller_address();
+            assert(token_config.is_minter(caller), Errors::CALLER_IS_NOT_MINTER);
+
+            // transfer mint fee
+            let price = self.calc_price(recipient);
+            if (price > 0) {
+                assert(false, Errors::TRANSFER_FAILED);
+            }
+
+            // mint!
+            let token_id: u256 = self.total_supply()+ 1;
+            self.erc721_mintable.mint(recipient, token_id);
+
+            // create Duelist
+            let mut duelist = Duelist {
+                duelist_id: token_id.low,
+                timestamp: get_block_timestamp(),
+                name,
+                profile_pic_type,
+                profile_pic_uri: profile_pic_uri.to_byte_array(),
+                score: Default::default(),
+            };
+            match initial_archetype {
+                Archetype::Villainous => { duelist.score.level_villain = HONOUR::LEVEL_MAX; },
+                Archetype::Trickster =>  { duelist.score.level_trickster = HONOUR::LEVEL_MAX; },
+                Archetype::Honourable => { duelist.score.level_lord = HONOUR::LEVEL_MAX; },
+                _ => {},
+            };
+            // save
+            store.set_duelist(@duelist);
+
+            // self._emitDuelistRegisteredEvent(caller, duelist.clone(), true);
+
+            (duelist)
+        }
+
+        fn update_duelist(ref self: ContractState,
+            duelist_id: u128,
+            name: felt252,
+            profile_pic_type: ProfilePicType,
+            profile_pic_uri: felt252,
+        ) -> Duelist {
+            // validate duelist
+            let store: Store = StoreTrait::new(self.world());
+            let mut duelist: Duelist = store.get_duelist(duelist_id);
+            assert(duelist.timestamp != 0, Errors::INVALID_DUELIST);
+
+            // validate owner
+            let caller: ContractAddress = starknet::get_caller_address();
+            assert(self.owner_of(duelist_id.into()) == caller, Errors::NOT_YOUR_DUELIST);
+
+            // update
+            duelist.name = name;
+            duelist.profile_pic_type = profile_pic_type;
+            duelist.profile_pic_uri = profile_pic_uri.to_byte_array();
+            // save
+            store.set_duelist(@duelist);
+
+            // self._emitDuelistRegisteredEvent(caller, duelist.clone(), false);
+
+            (duelist)
         }
         
-        fn burn(ref self: ContractState, token_id: u256) {
-            self.erc721_burnable.burn(token_id);
-        }
-
-        fn build_uri(self: @ContractState, token_id: u256, encode: bool) -> ByteArray {
-            let store = StoreTrait::new(self.world());
-            let duelist: Duelist = store.get_duelist(token_id.low);
-            let attributes: Span<ByteArray> = self.get_attributes(duelist.clone());
-            let metadata = JsonImpl::new()
-                .add("id", token_id.into())
-                .add("name", self.format_name(token_id, duelist.clone()))
-                .add("description", self.format_description(token_id, duelist.clone()))
-                .add("image", self.format_image(duelist.clone(), "square"))
-                .add("portrait", self.format_image(duelist.clone(), "portrait"))
-                .add("metadata", self.format_metadata(attributes))
-                .add_array("attributes", self.format_traits_array(attributes));
-            let metadata = metadata.build();
-
-            if (encode) {
-                let base64_encoded_metadata: ByteArray = bytes_base64_encode(metadata);
-                (format!("data:application/json;base64,{}", base64_encoded_metadata))
-            } else {
-                (metadata)
-            }
+        fn delete_duelist(ref self: ContractState, duelist_id: u128) {
+            self.erc721_burnable.burn(duelist_id.into());
         }
     }
 
     //-----------------------------------
     // Private
     //
-    #[generate_trait]
-    impl TokenDuelistInternalImpl of TokenDuelistInternalTrait {
+    use pistols::interfaces::itoken::{ITokenRenderer};
+    impl TokenRendererImpl of ITokenRenderer<ContractState> {
         fn format_name(self: @ContractState, token_id: u256, duelist: Duelist) -> ByteArray {
             let name: ByteArray = if (duelist.name != '') { duelist.name.to_byte_array() } else { "Duelist" };
             (format!("{} #{}", name, token_id))
@@ -361,36 +471,6 @@ mod duelist_token {
                 }
             }
             // done!
-            (result.span())
-        }
-
-        fn format_metadata(self: @ContractState, attributes: Span<ByteArray>) -> ByteArray {
-            let mut json = JsonImpl::new();
-            let mut n: usize = 0;
-            loop {
-                if (n >= attributes.len()) { break; }
-                let name = attributes.at(n).into();
-                let value = attributes.at(n+1).into();
-                json = json.add(name, value);
-                n += 2;
-            };
-            let result = json.build();
-            (result)
-        }
-
-        fn format_traits_array(self: @ContractState, attributes: Span<ByteArray>) -> Span<ByteArray> {
-            let mut result: Array<ByteArray> = array![];
-            let mut n: usize = 0;
-            loop {
-                if (n >= attributes.len()) { break; }
-                let name = attributes.at(n).into();
-                let value = attributes.at(n+1).into();
-                let json = JsonImpl::new()
-                    .add("trait", name)
-                    .add("value", value);
-                result.append(json.build());
-                n += 2;
-            };
             (result.span())
         }
     }

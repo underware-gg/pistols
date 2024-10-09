@@ -1,5 +1,6 @@
 tag = "pistols-duelist_token"
 writes = [
+  "pistols-TokenConfig",
   "origami_token-SRC5Model",
   "origami_token-InitializableModel",
   "origami_token-ERC721OwnerModel",
@@ -13,4 +14,8 @@ writes = [
   "origami_token-ERC721TokenApprovalModel",
   "origami_token-ERC721OperatorApprovalModel",
 ]
-init_calldata = []
+init_calldata = [
+  "0x0", # minter_contract
+  "0x0", # renderer_contract
+  "0x0", # treasury_contract
+]

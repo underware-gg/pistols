@@ -1,6 +1,6 @@
 use starknet::{ContractAddress};
 use pistols::models::challenge::{Challenge};
-use pistols::models::duelist::{Duelist, ProfilePicType, Archetype};
+use pistols::models::duelist::{Duelist};
 use pistols::types::challenge_state::{ChallengeState};
 use pistols::types::duel_progress::{DuelProgress};
 use pistols::types::premise::{Premise};
@@ -8,23 +8,6 @@ use pistols::types::premise::{Premise};
 // define the interface
 #[dojo::interface]
 trait IGame {
-    //
-    // Duelists
-    fn mint_duelist(
-        ref world: IWorldDispatcher,
-        name: felt252,
-        profile_pic_type: ProfilePicType,
-        profile_pic_uri: felt252,
-        initial_archetype: Archetype,
-    ) -> Duelist;
-    fn update_duelist(
-        ref world: IWorldDispatcher,
-        duelist_id: u128,
-        name: felt252,
-        profile_pic_type: ProfilePicType,
-        profile_pic_uri: felt252,
-    ) -> Duelist;
-
     //
     // Challenge
     fn create_challenge(
@@ -98,10 +81,9 @@ mod game {
 
     use pistols::interfaces::systems::{
         WorldSystemsTrait,
-        IMinterDispatcher, IMinterDispatcherTrait,
     };
     use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, Moves};
-    use pistols::models::duelist::{Duelist, DuelistTrait, ProfilePicType, Archetype, Score, Pact, DuelistHelper, DuelistHelperTrait};
+    use pistols::models::duelist::{Duelist, DuelistTrait, Score, Pact, DuelistHelper, DuelistHelperTrait};
     use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableAdmittanceEntity, TableAdmittanceEntityTrait, TableType, TABLES};
     use pistols::types::premise::{Premise, PremiseTrait};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
@@ -115,7 +97,6 @@ mod game {
     use pistols::libs::utils;
     use pistols::types::cards::hand::PlayerHandTrait;
     use pistols::types::typed_data::{CommitMoveMessage, CommitMoveMessageTrait};
-    use pistols::types::constants::{CONST, HONOUR};
     use pistols::types::{events};
     use pistols::libs::store::{Store, StoreTrait};
 
@@ -126,7 +107,6 @@ mod game {
         const INVALID_CHALLENGED_SELF: felt252   = 'PISTOLS: Challenged self';
         const INVALID_REPLY_SELF: felt252        = 'PISTOLS: Reply self';
         const INVALID_CHALLENGE: felt252         = 'PISTOLS: Invalid challenge';
-        const INVALID_DUELIST: felt252           = 'PISTOLS: Invalid duelist';
         const NOT_YOUR_CHALLENGE: felt252        = 'PISTOLS: Not your challenge';
         const NOT_YOUR_DUELIST: felt252          = 'PISTOLS: Not your duelist';
         const CHALLENGER_NOT_ADMITTED: felt252   = 'PISTOLS: Challenger not allowed';
@@ -155,71 +135,6 @@ mod game {
     // impl: implement functions specified in trait
     #[abi(embed_v0)]
     impl ActionsImpl of super::IGame<ContractState> {
-
-        //------------------------
-        // Duelists
-        //
-        fn mint_duelist(ref world: IWorldDispatcher,
-            name: felt252,
-            profile_pic_type: ProfilePicType,
-            profile_pic_uri: felt252,
-            initial_archetype: Archetype,
-        ) -> Duelist {
-            // mint if you can
-            let caller: ContractAddress = starknet::get_caller_address();
-            let minter_dispatcher: IMinterDispatcher = world.minter_dispatcher();
-            let token_id: u128 = minter_dispatcher.mint(caller, world.duelist_token_address());
-
-            // // create
-            let mut duelist = Duelist {
-                duelist_id: token_id,
-                timestamp: get_block_timestamp(),
-                name,
-                profile_pic_type,
-                profile_pic_uri: profile_pic_uri.to_byte_array(),
-                score: Default::default(),
-            };
-            match initial_archetype {
-                Archetype::Villainous => { duelist.score.level_villain = HONOUR::LEVEL_MAX; },
-                Archetype::Trickster =>  { duelist.score.level_trickster = HONOUR::LEVEL_MAX; },
-                Archetype::Honourable => { duelist.score.level_lord = HONOUR::LEVEL_MAX; },
-                _ => {},
-            };
-
-            // save
-            let store: Store = StoreTrait::new(world);
-            store.set_duelist(@duelist);
-
-            self._emitDuelistRegisteredEvent(caller, duelist.clone(), true);
-
-            (duelist)
-        }
-
-        fn update_duelist(ref world: IWorldDispatcher,
-            duelist_id: u128,
-            name: felt252,
-            profile_pic_type: ProfilePicType,
-            profile_pic_uri: felt252,
-        ) -> Duelist {
-            let caller: ContractAddress = starknet::get_caller_address();
-            let store: Store = StoreTrait::new(world);
-            let mut duelist = store.get_duelist(duelist_id);
-            assert(duelist.timestamp != 0, Errors::INVALID_DUELIST);
-
-            let duelist_helper: DuelistHelper = DuelistHelperTrait::new(world);
-            assert(duelist_helper.is_owner_of(caller, duelist_id) == true, Errors::NOT_YOUR_DUELIST);
-
-            // update
-            duelist.name = name;
-            duelist.profile_pic_type = profile_pic_type;
-            duelist.profile_pic_uri = profile_pic_uri.to_byte_array();
-            // save
-            store.set_duelist(@duelist);
-
-            self._emitDuelistRegisteredEvent(caller, duelist.clone(), false);
-
-            (duelist)
-        }
 
         //------------------------
         // NEW Challenge
@@ -521,6 +436,7 @@ mod game {
 
     // #[abi(embed_v0)] // commented to make this private
     impl ActionsInternalImpl of super::IGameInternal<ContractState> {
+        // TODO: move to duelist_token
         fn _emitDuelistRegisteredEvent(ref world: IWorldDispatcher, address: ContractAddress, duelist: Duelist, is_new: bool) {
             emit!(world, (Event::DuelistRegisteredEvent(events::DuelistRegisteredEvent {
                 address,

@@ -98,9 +98,9 @@ export function createSystemCalls(
     return results as T
   }
 
-  const mint_duelist = async (signer: AccountInterface, name: string, profile_pic_type: ProfilePicType, profile_pic_uri: string, archetype: Archetype): Promise<boolean> => {
+  const create_duelist = async (signer: AccountInterface, name: string, profile_pic_type: ProfilePicType, profile_pic_uri: string, archetype: Archetype): Promise<boolean> => {
     const args = [stringToFelt(name), getProfilePicTypeValue(profile_pic_type), stringToFelt(profile_pic_uri), getArchetypeValue(archetype)]
-    return await _executeTransaction(signer, game_call('mint_duelist', args))
+    return await _executeTransaction(signer, game_call('create_duelist', args))
   }
 
   const update_duelist = async (signer: AccountInterface, duelist_id: BigNumberish, name: string, profile_pic_type: ProfilePicType, profile_pic_uri: string): Promise<boolean> => {
@@ -289,7 +289,7 @@ export function createSystemCalls(
 
 
   return {
-    mint_duelist,
+    create_duelist,
     update_duelist,
     create_challenge,
     reply_challenge,
