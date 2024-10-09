@@ -5,7 +5,7 @@ mod shooter {
     use starknet::{ContractAddress, get_block_timestamp};
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
-    use pistols::systems::actions::actions::{Errors as ActionErrors};
+    use pistols::systems::game::game::{Errors as ActionErrors};
     use pistols::systems::rng::{Dice, DiceTrait};
     use pistols::libs::utils;
     use pistols::models::challenge::{Challenge, Round, RoundTrait, RoundEntity, Moves, MovesTrait, DuelistState, DuelistStateTrait};

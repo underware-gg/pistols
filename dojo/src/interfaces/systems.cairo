@@ -3,7 +3,7 @@ use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait, Resource};
 
 use pistols::systems::{
     admin::{IAdminDispatcher, IAdminDispatcherTrait},
-    actions::{IActionsDispatcher, IActionsDispatcherTrait},
+    game::{IGameDispatcher, IGameDispatcherTrait},
     rng::{IRngDispatcher, IRngDispatcherTrait},
     minter::{IMinterDispatcher, IMinterDispatcherTrait},
     token_duelist::{ITokenDuelistDispatcher, ITokenDuelistDispatcherTrait},
@@ -13,7 +13,7 @@ use pistols::utils::misc::{ZERO};
 mod SELECTORS {
     // system selectors
     const ADMIN: felt252 = selector_from_tag!("pistols-admin");
-    const ACTIONS: felt252 = selector_from_tag!("pistols-actions");
+    const GAME: felt252 = selector_from_tag!("pistols-game");
     const RNG: felt252 = selector_from_tag!("pistols-rng");
     const MINTER: felt252 = selector_from_tag!("pistols-minter");
     const TOKEN_DUELIST: felt252 = selector_from_tag!("pistols-token_duelist");
@@ -46,8 +46,8 @@ impl WorldSystemsTraitImpl of WorldSystemsTrait {
     fn admin_dispatcher(self: @IWorldDispatcher) -> IAdminDispatcher {
         (IAdminDispatcher{ contract_address: self.contract_address(SELECTORS::ADMIN) })
     }
-    fn actions_dispatcher(self: @IWorldDispatcher) -> IActionsDispatcher {
-        (IActionsDispatcher{ contract_address: self.contract_address(SELECTORS::ACTIONS) })
+    fn game_dispatcher(self: @IWorldDispatcher) -> IGameDispatcher {
+        (IGameDispatcher{ contract_address: self.contract_address(SELECTORS::GAME) })
     }
     fn rng_dispatcher(self: @IWorldDispatcher) -> IRngDispatcher {
         (IRngDispatcher{ contract_address: self.contract_address(SELECTORS::RNG) })

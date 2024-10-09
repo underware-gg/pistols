@@ -7,7 +7,7 @@ use pistols::types::premise::{Premise};
 
 // define the interface
 #[dojo::interface]
-trait IActions {
+trait IGame {
     //
     // Duelists
     fn mint_duelist(
@@ -81,7 +81,7 @@ trait IActions {
 
 // private/internal functions
 #[dojo::interface]
-trait IActionsInternal {
+trait IGameInternal {
     fn _emitDuelistRegisteredEvent(ref world: IWorldDispatcher, address: ContractAddress, duelist: Duelist, is_new: bool);
     fn _emitNewChallengeEvent(ref world: IWorldDispatcher, challenge: Challenge);
     fn _emitChallengeAcceptedEvent(ref world: IWorldDispatcher, challenge: Challenge, accepted: bool);
@@ -91,7 +91,7 @@ trait IActionsInternal {
 }
 
 #[dojo::contract]
-mod actions {
+mod game {
     // use debug::PrintTrait;
     use traits::{Into, TryInto};
     use starknet::{ContractAddress, get_block_timestamp, get_block_info};
@@ -154,7 +154,7 @@ mod actions {
 
     // impl: implement functions specified in trait
     #[abi(embed_v0)]
-    impl ActionsImpl of super::IActions<ContractState> {
+    impl ActionsImpl of super::IGame<ContractState> {
 
         //------------------------
         // Duelists
@@ -520,7 +520,7 @@ mod actions {
     }
 
     // #[abi(embed_v0)] // commented to make this private
-    impl ActionsInternalImpl of super::IActionsInternal<ContractState> {
+    impl ActionsInternalImpl of super::IGameInternal<ContractState> {
         fn _emitDuelistRegisteredEvent(ref world: IWorldDispatcher, address: ContractAddress, duelist: Duelist, is_new: bool) {
             emit!(world, (Event::DuelistRegisteredEvent(events::DuelistRegisteredEvent {
                 address,

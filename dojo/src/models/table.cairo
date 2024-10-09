@@ -2,7 +2,7 @@
 use starknet::ContractAddress;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
-use pistols::systems::actions::actions::{Errors as ActionErrors};
+use pistols::systems::game::game::{Errors as ActionErrors};
 use pistols::types::cards::hand::{DeckType};
 use pistols::types::constants::{CONST};
 use pistols::utils::arrays::{ArrayUtilsTrait};

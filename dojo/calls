@@ -17,7 +17,7 @@ export MANIFEST_FILE_PATH="./manifests/$PROFILE/deployment/manifest.json"
 export ACCOUNT_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.account_address)
 export WORLD_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.world_address)
 export ADMIN_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.tag == "pistols-admin" ).address')
-export ACTIONS_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.tag == "pistols-actions" ).address')
+export GAME_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.tag == "pistols-game" ).address')
 
 # Use mocked Lords if lords_address not defined in Scarb
 export LORDS_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.lords_address)
@@ -33,7 +33,7 @@ echo "Manifest    : $MANIFEST_FILE_PATH"
 echo "Account     : $ACCOUNT_ADDRESS"
 echo "World       : $WORLD_ADDRESS"
 echo "::admin     : $ADMIN_ADDRESS"
-echo "::actions   : $ACTIONS_ADDRESS"
+echo "::game      : $GAME_ADDRESS"
 echo "\$LORDS      : $LORDS_ADDRESS"
 echo "\$LORDS Mock : $LORDS_MOCK"
 echo "------------------------------------------------------------------------------"
@@ -44,7 +44,7 @@ if [[
   "$ACCOUNT_ADDRESS" != "0x"* ||
   "$WORLD_ADDRESS" != "0x"* ||
   "$ADMIN_ADDRESS" != "0x"* ||
-  "$ACTIONS_ADDRESS" != "0x"* ||
+  "$GAME_ADDRESS" != "0x"* ||
   "$LORDS_ADDRESS" != "0x"*
 ]]; then
   echo "! Missing data 👎"

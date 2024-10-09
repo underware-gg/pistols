@@ -1,4 +1,4 @@
-tag = "pistols-actions"
+tag = "pistols-game"
 writes = [
   "pistols-Duelist",
   "pistols-Scoreboard",

@@ -6,7 +6,7 @@ mod interfaces {
 
 mod systems {
     mod admin;
-    mod actions;
+    mod game;
     mod minter;
     mod token_duelist;
     mod rng;

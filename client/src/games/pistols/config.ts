@@ -32,7 +32,7 @@ export const makeDojoAppConfig = (): DojoAppConfig => {
     initialChainId: defaultChainId,
     nameSpace: 'pistols',
     contractInterfaces: {
-      actions: ['IActions'],
+      game: ['IGame'],
       lords_mock: ['ILordsMockFaucet', 'IERC20Allowance'],
       admin: ['IAdmin'],
     },

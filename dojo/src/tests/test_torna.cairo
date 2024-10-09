@@ -8,7 +8,7 @@
 //     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
 //     use pistols::libs::utils;
-//     use pistols::systems::actions::{IActionsDispatcher, IActionsDispatcherTrait};
+//     use pistols::systems::game::{IGameDispatcher, IGameDispatcherTrait};
 //     use pistols::models::challenge::{Challenge, ChallengeEntity, Round, RoundEntity, Snapshot};
 //     use pistols::models::duelist::{Duelist, Score, ProfilePicType, Archetype};
 //     use pistols::models::table::{TableConfig, TableType, TABLES};
@@ -17,7 +17,7 @@
 //     use pistols::types::constants::{CONST, CHANCES, HONOUR};
 //     use pistols::tests::tester::{tester, tester::{FLAGS, ZERO, OWNER, OTHER, BUMMER, TREASURY}};
 //     use pistols::utils::timestamp::{timestamp};
-//     use pistols::tests::test_round1::tests::{_get_actions_round_1_dual_crit};
+//     use pistols::tests::test_round1::tests::{_get_game_round_1_dual_crit};
 
 
 //     // const TABLE_ID: felt252 = tables::BRUSSELS;
@@ -25,10 +25,10 @@
 
 //     const PREMISE_1: felt252 = 'For honour!!!';
 
-//     fn _start_new_challenge(world: IWorldDispatcher, actions: IActionsDispatcher, owner: ContractAddress, other: ContractAddress, table_id: felt252) -> (ChallengeEntity, u128) {
-//         let duel_id: u128 = tester::execute_create_challenge(actions, OWNER(), OTHER(), PREMISE_1, table_id, 0, 48);
+//     fn _start_new_challenge(world: IWorldDispatcher, game: IGameDispatcher, owner: ContractAddress, other: ContractAddress, table_id: felt252) -> (ChallengeEntity, u128) {
+//         let duel_id: u128 = tester::execute_create_challenge(game, OWNER(), OTHER(), PREMISE_1, table_id, 0, 48);
 //         tester::elapse_timestamp(timestamp::from_days(1));
-//         tester::execute_reply_challenge(actions, OTHER(), duel_id, true);
+//         tester::execute_reply_challenge(game, OTHER(), duel_id, true);
 //         let ch = tester::get_ChallengeEntity(world, duel_id);
 //         assert(ch.state == ChallengeState::InProgress, 'challenge.state');
 //         assert(ch.round_number == 1, 'challenge.number');
@@ -46,12 +46,12 @@
 //     #[test]
 //     #[ignore]
 //     fn test_mint_archetype_snapshot_Classic() {
-//         let (world, actions, _admin, _lords, _minter) = tester::setup_world(FLAGS::ACTIONS | FLAGS::ADMIN | FLAGS::MINTER);
-//         let duelist1: Duelist = tester::execute_mint_duelist(actions, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
-//         let duelist2: Duelist = tester::execute_mint_duelist(actions, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
+//         let (world, game, _admin, _lords, _minter) = tester::setup_world(FLAGS::GAME | FLAGS::ADMIN | FLAGS::MINTER);
+//         let duelist1: Duelist = tester::execute_mint_duelist(game, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
+//         let duelist2: Duelist = tester::execute_mint_duelist(game, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
 //         assert(duelist1.score.level_villain == HONOUR::MAX, 'level_villain');
 //         assert(duelist2.score.level_lord == HONOUR::MAX, 'level_lord');
-//         let (challenge, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), TABLES::COMMONERS);
+//         let (challenge, duel_id) = _start_new_challenge(world, game, OWNER(), OTHER(), TABLES::COMMONERS);
 //         let snapshot = tester::get_Snapshot(world, duel_id);
 //         assert(snapshot.score_a.level_villain == 0, 'snap.level_villain');
 //         assert(snapshot.score_b.level_lord == 0, 'snap.level_lord');
@@ -67,12 +67,12 @@
 //     #[test]
 //     #[ignore]
 //     fn test_mint_archetype_snapshot_IRL() {
-//         let (world, actions, _admin, _lords, _minter) = tester::setup_world(FLAGS::ACTIONS | FLAGS::ADMIN | FLAGS::MINTER);
-//         let duelist1: Duelist = tester::execute_mint_duelist(actions, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
-//         let duelist2: Duelist = tester::execute_mint_duelist(actions, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
+//         let (world, game, _admin, _lords, _minter) = tester::setup_world(FLAGS::GAME | FLAGS::ADMIN | FLAGS::MINTER);
+//         let duelist1: Duelist = tester::execute_mint_duelist(game, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
+//         let duelist2: Duelist = tester::execute_mint_duelist(game, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
 //         assert(duelist1.score.level_villain == HONOUR::MAX, 'level_villain');
 //         assert(duelist2.score.level_lord == HONOUR::MAX, 'level_lord');
-//         let (challenge, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), TABLE_ID);
+//         let (challenge, duel_id) = _start_new_challenge(world, game, OWNER(), OTHER(), TABLE_ID);
 //         // check scoreboard
 //         let snapshot = tester::get_Snapshot(world, duel_id);
 //         assert(snapshot.score_a.level_villain == HONOUR::MAX, 'snap.level_villain');
@@ -93,21 +93,21 @@
 //     #[test]
 //     #[ignore]
 //     fn test_IRL_keep_archetypes() {
-//         let (world, actions, _admin, _lords, _minter) = tester::setup_world(FLAGS::ACTIONS | FLAGS::ADMIN | FLAGS::MINTER);
-//         let duelist1: Duelist = tester::execute_mint_duelist(actions, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
-//         let duelist2: Duelist = tester::execute_mint_duelist(actions, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
+//         let (world, game, _admin, _lords, _minter) = tester::setup_world(FLAGS::GAME | FLAGS::ADMIN | FLAGS::MINTER);
+//         let duelist1: Duelist = tester::execute_mint_duelist(game, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
+//         let duelist2: Duelist = tester::execute_mint_duelist(game, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
 //         assert(duelist1.score.level_villain == HONOUR::MAX, 'duelist1.level_villain');
 //         assert(duelist1.score.level_lord == 0, 'duelist1.level_lord');
 //         assert(duelist1.score.level_lord == 0, 'duelist1.level_lord');
 //         assert(duelist2.score.level_lord == HONOUR::MAX, 'duelist2.level_lord');
 //         //
 //         // duel to the death!
-//         let (_challenge, duel_id) = _start_new_challenge(world, actions, OWNER(), OTHER(), TABLE_ID);
-//         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_actions_round_1_dual_crit(10, 1);
-//         tester::execute_commit_moves(actions, OWNER(), duel_id, 1, hash_a);
-//         tester::execute_commit_moves(actions, OTHER(), duel_id, 1, hash_b);
-//         tester::execute_reveal_moves(actions, OWNER(), duel_id, 1, salt_a, action_a, 0);
-//         tester::execute_reveal_moves(actions, OTHER(), duel_id, 1, salt_b, action_b, 0);
+//         let (_challenge, duel_id) = _start_new_challenge(world, game, OWNER(), OTHER(), TABLE_ID);
+//         let (salt_a, salt_b, action_a, action_b, hash_a, hash_b) = _get_game_round_1_dual_crit(10, 1);
+//         tester::execute_commit_moves(game, OWNER(), duel_id, 1, hash_a);
+//         tester::execute_commit_moves(game, OTHER(), duel_id, 1, hash_b);
+//         tester::execute_reveal_moves(game, OWNER(), duel_id, 1, salt_a, action_a, 0);
+//         tester::execute_reveal_moves(game, OTHER(), duel_id, 1, salt_b, action_b, 0);
 //         let (challenge, _round) = tester::get_Challenge_Round_Entity(world, duel_id);
 //         assert(challenge.state != ChallengeState::InProgress, 'challenge.state');
 //         //

@@ -75,11 +75,11 @@ mod prefabs {
 
 
     fn start_new_challenge(sys: Systems, duelist_a: ContractAddress, duelist_b: ContractAddress, table_id: felt252) -> u128 {
-        // tester::execute_update_duelist(actions, duelist_a, NAME_A, ProfilePicType::Duelist, "1");
-        // tester::execute_update_duelist(actions, duelist_b, NAME_B, ProfilePicType::Duelist, "2");
-        let duel_id: u128 = tester::execute_create_challenge(@sys.actions, duelist_a, duelist_b, MESSAGE, table_id, WAGER_VALUE, 48);
+        // tester::execute_update_duelist(game, duelist_a, NAME_A, ProfilePicType::Duelist, "1");
+        // tester::execute_update_duelist(game, duelist_b, NAME_B, ProfilePicType::Duelist, "2");
+        let duel_id: u128 = tester::execute_create_challenge(@sys.game, duelist_a, duelist_b, MESSAGE, table_id, WAGER_VALUE, 48);
         tester::elapse_timestamp(timestamp::from_days(1));
-        tester::execute_reply_challenge(@sys.actions, duelist_b, duel_id, true);
+        tester::execute_reply_challenge(@sys.game, duelist_b, duel_id, true);
         (duel_id)
     }
 
@@ -95,10 +95,10 @@ mod prefabs {
 
     fn commit_reveal_get(sys: Systems, duel_id: u128, duelist_a: ContractAddress, duelist_b: ContractAddress, salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves) -> (ChallengeEntity, RoundEntity) {
         @sys.rng.mock_values(salts.salts, salts.values);
-        tester::execute_commit_moves(@sys.actions, duelist_a, duel_id, 1, moves_a.hashed);
-        tester::execute_commit_moves(@sys.actions, duelist_b, duel_id, 1, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.actions, duelist_a, duel_id, 1, moves_a.salt, moves_a.moves);
-        tester::execute_reveal_moves(@sys.actions, duelist_b, duel_id, 1, moves_b.salt, moves_b.moves);
+        tester::execute_commit_moves(@sys.game, duelist_a, duel_id, 1, moves_a.hashed);
+        tester::execute_commit_moves(@sys.game, duelist_b, duel_id, 1, moves_b.hashed);
+        tester::execute_reveal_moves(@sys.game, duelist_a, duel_id, 1, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys.game, duelist_b, duel_id, 1, moves_b.salt, moves_b.moves);
         let (challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
         (challenge, round)
     }

@@ -302,7 +302,7 @@ export type EnvCardPoints = {
 // from: ../dojo/src/interfaces/systems.cairo
 type type_SELECTORS = {
   ADMIN: BigNumberish, // cairo: felt252
-  ACTIONS: BigNumberish, // cairo: felt252
+  GAME: BigNumberish, // cairo: felt252
   RNG: BigNumberish, // cairo: felt252
   MINTER: BigNumberish, // cairo: felt252
   TOKEN_DUELIST: BigNumberish, // cairo: felt252
@@ -314,7 +314,7 @@ type type_SELECTORS = {
 };
 export const SELECTORS: type_SELECTORS = {
   ADMIN: '0x036fd20372b5d47c092e2fede52897075978efb732aeaeb155d19eb8147f6497', // 'selector_from_tag!("pistols-admin")'
-  ACTIONS: '0x04f10cff77842b589eafef9f3261c4cb207e41302e7ac01527cff88ad26ded3e', // 'selector_from_tag!("pistols-actions")'
+  GAME: '0x032c102830cbffaddecbdce7ef85735e6f08da08ee762a2d7b09304b6533dd57', // 'selector_from_tag!("pistols-game")'
   RNG: '0x013f1a6a9ae118440a997d6624230b59f43516220a1208526c3f66e202910504', // 'selector_from_tag!("pistols-rng")'
   MINTER: '0x07b759538267ac8937772e5bdadb6b598748b33c377c90426fc0a4960234de20', // 'selector_from_tag!("pistols-minter")'
   TOKEN_DUELIST: '0x0541e9c1813eb1f7867062ea0fafcd949ad9d3f8b212bbac1df80c48947c48cd', // 'selector_from_tag!("pistols-token_duelist")'

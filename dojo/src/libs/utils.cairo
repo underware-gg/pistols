@@ -7,7 +7,7 @@ use starknet::{ContractAddress};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
 use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
-use pistols::systems::actions::actions::{Errors as ActionErrors};
+use pistols::systems::game::game::{Errors as ActionErrors};
 use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, WagerEntity, Round, RoundEntity, Moves};
 use pistols::models::duelist::{Duelist, DuelistTrait, DuelistEntity, Pact, PactEntity, Scoreboard, ScoreboardEntity, Score, ScoreTrait};
 use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableType, TableTypeTrait};
