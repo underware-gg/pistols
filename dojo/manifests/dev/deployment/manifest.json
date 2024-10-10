@@ -1730,8 +1730,8 @@
     {
       "kind": "DojoContract",
       "address": "0x5abf185326235d4e6c1f32aae1092616a7fbf25beb9169316ba76c5309cf7aa",
-      "class_hash": "0x682f0565e5539d6d24c3f4bf78e0f6244c0ca35805eb5414bd3efdaef129d63",
-      "original_class_hash": "0x682f0565e5539d6d24c3f4bf78e0f6244c0ca35805eb5414bd3efdaef129d63",
+      "class_hash": "0x3f07a5354d58fb79bdfc6d540588f338fea31bb5d04142b211759d5f635dc15",
+      "original_class_hash": "0x3f07a5354d58fb79bdfc6d540588f338fea31bb5d04142b211759d5f635dc15",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -3095,8 +3095,8 @@
     {
       "kind": "DojoContract",
       "address": "0x38bd6daedc6d49cc4a7d5529cc404c6050846f5884660577b0b7ed0d84a758",
-      "class_hash": "0x421f03ae59cbdf29eb9746ee8d90c37148f853a34aeb88b8e95e49d7ed5021e",
-      "original_class_hash": "0x421f03ae59cbdf29eb9746ee8d90c37148f853a34aeb88b8e95e49d7ed5021e",
+      "class_hash": "0x6cc5daae06c1b26695de5044f11005e7b9ea7211b95352156795b193cb8ff5e",
+      "original_class_hash": "0x6cc5daae06c1b26695de5044f11005e7b9ea7211b95352156795b193cb8ff5e",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -3447,6 +3447,66 @@
         },
         {
           "type": "enum",
+          "name": "pistols::types::cards::tactics::TacticsCard",
+          "variants": [
+            {
+              "name": "None",
+              "type": "()"
+            },
+            {
+              "name": "Insult",
+              "type": "()"
+            },
+            {
+              "name": "CoinToss",
+              "type": "()"
+            },
+            {
+              "name": "Vengeful",
+              "type": "()"
+            },
+            {
+              "name": "ThickCoat",
+              "type": "()"
+            },
+            {
+              "name": "Reversal",
+              "type": "()"
+            },
+            {
+              "name": "Bananas",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "pistols::types::duel_progress::SpecialsDrawn",
+          "members": [
+            {
+              "name": "tactics",
+              "type": "pistols::types::cards::tactics::TacticsCard"
+            },
+            {
+              "name": "coin_toss",
+              "type": "core::bool"
+            },
+            {
+              "name": "reversal",
+              "type": "core::bool"
+            },
+            {
+              "name": "shots_modifier",
+              "type": "pistols::types::cards::env::EnvCard"
+            },
+            {
+              "name": "tactics_modifier",
+              "type": "pistols::types::cards::env::EnvCard"
+            }
+          ]
+        },
+        {
+          "type": "enum",
           "name": "pistols::types::cards::blades::BladesCard",
           "variants": [
             {
@@ -3540,6 +3600,14 @@
               "type": "core::integer::u8"
             },
             {
+              "name": "specials_a",
+              "type": "pistols::types::duel_progress::SpecialsDrawn"
+            },
+            {
+              "name": "specials_b",
+              "type": "pistols::types::duel_progress::SpecialsDrawn"
+            },
+            {
               "name": "card_a",
               "type": "pistols::types::duel_progress::DuelistDrawnCard"
             },
@@ -3568,42 +3636,8 @@
           ]
         },
         {
-          "type": "enum",
-          "name": "pistols::types::cards::tactics::TacticsCard",
-          "variants": [
-            {
-              "name": "None",
-              "type": "()"
-            },
-            {
-              "name": "Insult",
-              "type": "()"
-            },
-            {
-              "name": "CoinToss",
-              "type": "()"
-            },
-            {
-              "name": "Vengeful",
-              "type": "()"
-            },
-            {
-              "name": "ThickCoat",
-              "type": "()"
-            },
-            {
-              "name": "Reversal",
-              "type": "()"
-            },
-            {
-              "name": "Bananas",
-              "type": "()"
-            }
-          ]
-        },
-        {
           "type": "struct",
-          "name": "pistols::types::cards::hand::PlayerHand",
+          "name": "pistols::types::cards::hand::DuelistHand",
           "members": [
             {
               "name": "card_fire",
@@ -3637,11 +3671,11 @@
             },
             {
               "name": "hand_a",
-              "type": "pistols::types::cards::hand::PlayerHand"
+              "type": "pistols::types::cards::hand::DuelistHand"
             },
             {
               "name": "hand_b",
-              "type": "pistols::types::cards::hand::PlayerHand"
+              "type": "pistols::types::cards::hand::DuelistHand"
             }
           ]
         },

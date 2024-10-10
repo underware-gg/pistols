@@ -347,6 +347,66 @@
   },
   {
     "type": "enum",
+    "name": "pistols::types::cards::tactics::TacticsCard",
+    "variants": [
+      {
+        "name": "None",
+        "type": "()"
+      },
+      {
+        "name": "Insult",
+        "type": "()"
+      },
+      {
+        "name": "CoinToss",
+        "type": "()"
+      },
+      {
+        "name": "Vengeful",
+        "type": "()"
+      },
+      {
+        "name": "ThickCoat",
+        "type": "()"
+      },
+      {
+        "name": "Reversal",
+        "type": "()"
+      },
+      {
+        "name": "Bananas",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "pistols::types::duel_progress::SpecialsDrawn",
+    "members": [
+      {
+        "name": "tactics",
+        "type": "pistols::types::cards::tactics::TacticsCard"
+      },
+      {
+        "name": "coin_toss",
+        "type": "core::bool"
+      },
+      {
+        "name": "reversal",
+        "type": "core::bool"
+      },
+      {
+        "name": "shots_modifier",
+        "type": "pistols::types::cards::env::EnvCard"
+      },
+      {
+        "name": "tactics_modifier",
+        "type": "pistols::types::cards::env::EnvCard"
+      }
+    ]
+  },
+  {
+    "type": "enum",
     "name": "pistols::types::cards::blades::BladesCard",
     "variants": [
       {
@@ -440,6 +500,14 @@
         "type": "core::integer::u8"
       },
       {
+        "name": "specials_a",
+        "type": "pistols::types::duel_progress::SpecialsDrawn"
+      },
+      {
+        "name": "specials_b",
+        "type": "pistols::types::duel_progress::SpecialsDrawn"
+      },
+      {
         "name": "card_a",
         "type": "pistols::types::duel_progress::DuelistDrawnCard"
       },
@@ -468,42 +536,8 @@
     ]
   },
   {
-    "type": "enum",
-    "name": "pistols::types::cards::tactics::TacticsCard",
-    "variants": [
-      {
-        "name": "None",
-        "type": "()"
-      },
-      {
-        "name": "Insult",
-        "type": "()"
-      },
-      {
-        "name": "CoinToss",
-        "type": "()"
-      },
-      {
-        "name": "Vengeful",
-        "type": "()"
-      },
-      {
-        "name": "ThickCoat",
-        "type": "()"
-      },
-      {
-        "name": "Reversal",
-        "type": "()"
-      },
-      {
-        "name": "Bananas",
-        "type": "()"
-      }
-    ]
-  },
-  {
     "type": "struct",
-    "name": "pistols::types::cards::hand::PlayerHand",
+    "name": "pistols::types::cards::hand::DuelistHand",
     "members": [
       {
         "name": "card_fire",
@@ -537,11 +571,11 @@
       },
       {
         "name": "hand_a",
-        "type": "pistols::types::cards::hand::PlayerHand"
+        "type": "pistols::types::cards::hand::DuelistHand"
       },
       {
         "name": "hand_b",
-        "type": "pistols::types::cards::hand::PlayerHand"
+        "type": "pistols::types::cards::hand::DuelistHand"
       }
     ]
   },
