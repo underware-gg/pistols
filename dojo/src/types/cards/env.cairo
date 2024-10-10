@@ -43,88 +43,73 @@ mod ENV_POINTS {
         rarity: Rarity::Common,
         chances: 0,
         damage: 1,
-        one_step: false,
-        tactics_multiplier: 1,
     };
     const DamageDown: EnvCardPoints = EnvCardPoints {
         name: 'Damage Down',
         rarity: Rarity::Common,
         chances: 0,
         damage: -1,
-        one_step: false,
-        tactics_multiplier: 1,
     };
     const ChancesUp: EnvCardPoints = EnvCardPoints {
         name: 'Chances Up',
         rarity: Rarity::Common,
         chances: 10,
         damage: 0,
-        one_step: false,
-        tactics_multiplier: 1,
     };
     const ChancesDown: EnvCardPoints = EnvCardPoints {
         name: 'Chances Down',
         rarity: Rarity::Common,
         chances: -10, 
         damage: 0,
-        one_step: false,
-        tactics_multiplier: 1,
     };
     const DoubleDamageUp: EnvCardPoints = EnvCardPoints {
         name: 'Double Damage Up',
         rarity: Rarity::Uncommon,
         chances: 0,
         damage: 2,
-        one_step: false,
-        tactics_multiplier: 1,
     };
     const DoubleChancesUp: EnvCardPoints = EnvCardPoints {
         name: 'Double Chances Up',
         rarity: Rarity::Uncommon,
         chances: 20,
         damage: 0,
-        one_step: false,
-        tactics_multiplier: 1,
     };
     const SpecialAllShotsHit: EnvCardPoints = EnvCardPoints {
         name: 'All Shots Hit',
         rarity: Rarity::Special,
         chances: 100,
-        damage: 100,
-        one_step: true,
-        tactics_multiplier: 1,
+        damage: 0,
     };
     const SpecialAllShotsMiss: EnvCardPoints = EnvCardPoints {
         name: 'All Shots Miss',
         rarity: Rarity::Special,
         chances: -100,
-        damage: -100,
-        one_step: true,
-        tactics_multiplier: 1,
+        damage: 0,
     };
     const SpecialDoubleTactics: EnvCardPoints = EnvCardPoints {
         name: 'Double Tactics',
         rarity: Rarity::Special,
         chances: 0,
         damage: 0,
-        one_step: true,
-        tactics_multiplier: 2,
     };
     const SpecialNoTactics: EnvCardPoints = EnvCardPoints {
         name: 'No Tactics',
         rarity: Rarity::Special,
         chances: 0,
         damage: 0,
-        one_step: true,
-        tactics_multiplier: 0,
     };
 }
 
 //--------------------
 // traits
 //
-use pistols::types::cards::cards::{EnvCardPoints, EnvCardPointsTrait};
-use pistols::models::challenge::{DuelistState};
+use pistols::types::cards::{
+    cards::{EnvCardPoints, EnvCardPointsTrait, Rarity},
+    tactics::{TacticsCard, TacticsCardTrait},
+};
+use pistols::types::duel_progress::{SpecialsDrawn};
+use pistols::models::challenge::{DuelistState, DuelistStateTrait};
+use pistols::utils::math::{MathU8};
 
 impl EnvCardDefault of Default<EnvCard> {
     fn default() -> EnvCard {(EnvCard::None)}
@@ -132,6 +117,18 @@ impl EnvCardDefault of Default<EnvCard> {
 
 #[generate_trait]
 impl EnvCardImpl of EnvCardTrait {
+    fn is_shots_modifier(self: EnvCard) -> bool {
+        (match self {
+            EnvCard::SpecialAllShotsHit | EnvCard::SpecialAllShotsMiss => true,
+            _ => false,
+        })
+    }
+    fn is_tactics_modifier(self: EnvCard) -> bool {
+        (match self {
+            EnvCard::SpecialDoubleTactics | EnvCard::SpecialNoTactics => true,
+            _ => false,
+        })
+    }
     fn get_points(self: EnvCard) -> EnvCardPoints {
         match self {
             EnvCard::DamageUp =>                ENV_POINTS::DamageUp,
@@ -148,9 +145,38 @@ impl EnvCardImpl of EnvCardTrait {
         }
     }
     #[inline(always)]
-    fn apply_points(self: EnvCard, ref state_self: DuelistState, ref state_other: DuelistState, global_state: bool) {
+    fn apply_points(self: EnvCard, ref specials: SpecialsDrawn, ref state_self: DuelistState, ref state_other: DuelistState) {
         if (self != EnvCard::None) {
-            self.get_points().apply(ref state_self, ref state_other, global_state);
+            let points: EnvCardPoints = self.get_points();
+            if (points.is_special()) {
+                if (specials.coin_toss) {
+                    // duelist blocked 1st special
+                    specials.coin_toss = false;
+                } else if (self.is_shots_modifier()) {
+                    // All shots hit or miss
+                    state_self.apply_chances(points.chances);
+                    specials.shots_modifier = self;
+                } else if (self.is_tactics_modifier()) {
+                    // Double or No tactics
+                    let multiplier: i8 =
+                        if (self == EnvCard::SpecialDoubleTactics)
+                            {if (specials.tactics_modifier == EnvCard::SpecialNoTactics) {(2)} else {(1)}}
+                        else if (self == EnvCard::SpecialNoTactics)
+                            {if (specials.tactics_modifier == EnvCard::SpecialDoubleTactics) {(-2)} else {(-1)}}
+                        else {(0)}; // not happening!
+                    specials.tactics.apply_points(ref state_self, ref state_other, multiplier);
+                    specials.tactics_modifier = self;
+                }            
+            } else {
+                // check reversal
+                let multiplier: i8 = if (specials.reversal && points.is_decrease()) {
+                    specials.reversal = false;
+                    (-1)
+                } else {(1)};
+                // apply points
+                let using_shots_modifier: bool = specials.shots_modifier.is_shots_modifier();
+                points.apply(ref state_self, using_shots_modifier, multiplier);
+            }
         }
     }
     fn get_full_deck() -> Array<EnvCard> {

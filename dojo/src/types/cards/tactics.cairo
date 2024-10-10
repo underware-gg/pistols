@@ -101,9 +101,9 @@ impl TacticsCardImpl of TacticsCardTrait {
         }
     }
     #[inline(always)]
-    fn apply_points(self: TacticsCard, ref state_self: DuelistState, ref state_other: DuelistState) {
+    fn apply_points(self: TacticsCard, ref state_self: DuelistState, ref state_other: DuelistState, multiplier: i8) {
         if (self != TacticsCard::None) {
-            self.get_points().apply(ref state_self, ref state_other);
+            self.get_points().apply(ref state_self, ref state_other, multiplier);
         }
     }
     fn get_deck(_deck_type: DeckType) -> Span<u8> {

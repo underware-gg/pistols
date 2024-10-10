@@ -9,11 +9,12 @@ trait MathTrait<T,TI> {
     fn max(a: T, b: T) -> T;
     // returns a value clamped between min and max
     fn clamp(v: T, min: T, max: T) -> T;
+    fn clampi(ref self: T, min: T, max: T); // in-place
     // safe subtraction
     fn sub(a: T, b: T) -> T;
     fn add(a: T, b: TI) -> T;
-    fn subi(ref self: T, v: T);
-    fn addi(ref self: T, v: TI);
+    fn subi(ref self: T, v: T);  // in-place
+    fn addi(ref self: T, v: TI); // in-place
     // returns GDC of two numbers
     fn gdc(a: T, b: T) -> T;
     // map a value form one range to another
@@ -36,6 +37,9 @@ impl MathU8 of MathTrait<u8,i8> {
     }
     fn clamp(v: u8, min: u8, max: u8) -> u8 {
         if (v < min) { (min) } else if (v > max) { (max) } else { (v) }
+    }
+    fn clampi(ref self: u8, min: u8, max: u8) {
+        self = Self::clamp(self, min, max);
     }
 
     fn sub(a: u8, b: u8) -> u8 {
@@ -123,6 +127,9 @@ impl MathU16 of MathTrait<u16, i16> {
     fn clamp(v: u16, min: u16, max: u16) -> u16 {
         if (v < min) { (min) } else if (v > max) { (max) } else { (v) }
     }
+    fn clampi(ref self: u16, min: u16, max: u16) {
+        self = Self::clamp(self, min, max);
+    }
 
     fn sub(a: u16, b: u16) -> u16 {
         if (b >= a) { (0) } else { (a - b) }
@@ -176,6 +183,9 @@ impl MathU32 of MathTrait<u32, i32> {
     fn clamp(v: u32, min: u32, max: u32) -> u32 {
         if (v < min) { (min) } else if (v > max) { (max) } else { (v) }
     }
+    fn clampi(ref self: u32, min: u32, max: u32) {
+        self = Self::clamp(self, min, max);
+    }
 
     fn sub(a: u32, b: u32) -> u32 {
         if (b >= a) { (0) } else { (a - b) }
@@ -228,6 +238,9 @@ impl MathU64 of MathTrait<u64, i64> {
     fn clamp(v: u64, min: u64, max: u64) -> u64 {
         if (v < min) { (min) } else if (v > max) { (max) } else { (v) }
     }
+    fn clampi(ref self: u64, min: u64, max: u64) {
+        self = Self::clamp(self, min, max);
+    }
 
     fn sub(a: u64, b: u64) -> u64 {
         if (b >= a) { (0) } else { (a - b) }
@@ -279,6 +292,9 @@ impl MathU128 of MathTrait<u128, i128> {
     }
     fn clamp(v: u128, min: u128, max: u128) -> u128 {
         if (v < min) { (min) } else if (v > max) { (max) } else { (v) }
+    }
+    fn clampi(ref self: u128, min: u128, max: u128) {
+        self = Self::clamp(self, min, max);
     }
 
     fn sub(a: u128, b: u128) -> u128 {
@@ -345,6 +361,9 @@ impl MathU256 of MathTrait<u256, u256> {
     }
     fn clamp(v: u256, min: u256, max: u256) -> u256 {
         if (v < min) { (min) } else if (v > max) { (max) } else { (v) }
+    }
+    fn clampi(ref self: u256, min: u256, max: u256) {
+        self = Self::clamp(self, min, max);
     }
 
     fn sub(a: u256, b: u256) -> u256 {

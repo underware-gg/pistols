@@ -15,8 +15,6 @@ pub struct EnvCardPoints {
     rarity: Rarity,
     chances: i8,
     damage: i8,
-    one_step: bool,
-    tactics_multiplier: u8,
 }
 
 #[derive(Copy, Drop, Serde, PartialEq)]
@@ -36,30 +34,30 @@ impl RarityDefault of Default<Rarity> {
 //--------------------
 // traits
 //
-use pistols::models::challenge::{DuelistState};
-use pistols::utils::math::{MathU8};
+use pistols::models::challenge::{DuelistState, DuelistStateTrait};
 
 #[generate_trait]
 impl CardPointsImpl of CardPointsTrait {
-    fn apply(self: CardPoints, ref state_a: DuelistState, ref state_b: DuelistState) {
-        state_a.chances.addi(self.self_chances);
-        state_a.damage.addi(self.self_damage);
-        state_b.chances.addi(self.other_chances);
-        state_b.damage.addi(self.other_damage);
+    fn apply(self: CardPoints, ref state_a: DuelistState, ref state_b: DuelistState, multiplier: i8) {
+        state_a.apply_damage(self.self_damage * multiplier);
+        state_b.apply_damage(self.other_damage * multiplier);
+        state_a.apply_chances(self.self_chances * multiplier);
+        state_b.apply_chances(self.other_chances * multiplier);
     }
 }
 
 #[generate_trait]
 impl EnvCardPointsImpl of EnvCardPointsTrait {
-    fn apply(self: EnvCardPoints, ref state_a: DuelistState, ref state_b: DuelistState, global_state: bool) {
-        if (
-            (global_state && !self.one_step) ||
-            (!global_state && self.one_step)
-        ) {
-            state_a.chances.addi(self.chances);
-            state_b.chances.addi(self.chances);
-            state_a.damage.addi(self.damage);
-            state_b.damage.addi(self.damage);
+    fn apply(self: EnvCardPoints, ref state: DuelistState, using_shots_modifier: bool, multiplier: i8) {
+        if (!using_shots_modifier) {
+            state.apply_chances(self.chances * multiplier);
         }
+        state.apply_damage(self.damage * multiplier);
+    }
+    fn is_special(self: EnvCardPoints) -> bool {
+        (self.rarity == Rarity::Special)
+    }
+    fn is_decrease(self: EnvCardPoints) -> bool {
+        (self.chances < 0 || self.damage < 0)
     }
 }

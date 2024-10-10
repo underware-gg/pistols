@@ -14,7 +14,10 @@ mod shooter {
     use pistols::types::constants::{CONST};
     use pistols::types::challenge_state::{ChallengeState};
     use pistols::types::round_state::{RoundState};
-    use pistols::types::duel_progress::{DuelProgress, DuelStep};
+    use pistols::types::duel_progress::{
+        DuelProgress, DuelStep,
+        SpecialsDrawn, SpecialsDrawnTrait,
+    };
     use pistols::types::cards::hand::{
         PlayerHand, PlayerHandTrait, DeckType,
         PacesCard, PacesCardTrait,
@@ -154,9 +157,11 @@ mod shooter {
         hand_a.validate(deck_type);
         hand_b.validate(deck_type);
 
+        let mut specials_a: SpecialsDrawn = SpecialsDrawnTrait::initialize(hand_a.card_tactics, hand_b.card_tactics);
+        let mut specials_b: SpecialsDrawn = SpecialsDrawnTrait::initialize(hand_b.card_tactics, hand_a.card_tactics);
+
         round.state_a.initialize(hand_a);
         round.state_b.initialize(hand_b);
-        
         let mut state_a: DuelistState = round.state_a;
         let mut state_b: DuelistState = round.state_b;
 
@@ -169,6 +174,8 @@ mod shooter {
             pace: PacesCard::None,
             card_env: EnvCard::None,
             dice_env: 0,
+            specials_a,
+            specials_b,
             card_a: DuelistDrawnCard::None,
             card_b: DuelistDrawnCard::None,
             state_a,
@@ -178,8 +185,8 @@ mod shooter {
         //------------------------------------------------------
         // apply cards
         //
-        hand_a.card_tactics.apply_points(ref state_a, ref state_b);
-        hand_b.card_tactics.apply_points(ref state_b, ref state_a);
+        hand_a.card_tactics.apply_points(ref state_a, ref state_b, 1);
+        hand_b.card_tactics.apply_points(ref state_b, ref state_a, 1);
         hand_a.card_blades.apply_points(ref state_a, ref state_b);
         hand_b.card_blades.apply_points(ref state_b, ref state_a);
 
@@ -200,10 +207,9 @@ mod shooter {
             // draw env card
             let (card_env, dice_env): (EnvCard, u8) = draw_env_card(env_deck, pace, ref dice);
 
-            // apply env card to global state (affects next steps)
-            let prev_state_a: DuelistState = state_a;
-            let prev_state_b: DuelistState = state_b;
-            card_env.apply_points(ref state_a, ref state_b, true);
+            // apply env card points to both duelists
+            card_env.apply_points(ref specials_a, ref state_a, ref state_b);
+            card_env.apply_points(ref specials_b, ref state_b, ref state_a);
 
             // Fire!
             if (hand_a.card_fire == pace) {
@@ -220,6 +226,8 @@ mod shooter {
                 pace,
                 card_env,
                 dice_env,
+                specials_a,
+                specials_b,
                 card_a: hand_a.draw_card(pace),
                 card_b: hand_b.draw_card(pace),
                 state_a,
@@ -234,14 +242,6 @@ mod shooter {
             if (state_a.health == 0 || state_b.health == 0) { break; }
             // both dices rolled, no winner, go to blades
             if (fired_a && fired_b) { break; }
-
-            // restore chances of one-step cards
-            if (card_env.get_points().one_step) {
-                state_a.chances = prev_state_a.chances;
-                state_b.chances = prev_state_b.chances;
-                state_a.damage = prev_state_a.damage;
-                state_b.damage = prev_state_b.damage;
-            }
             
             step_number += 1;
         };
@@ -261,6 +261,8 @@ mod shooter {
                 pace: PacesCard::None,
                 card_env: EnvCard::None,
                 dice_env: 0,
+                specials_a: Default::default(),
+                specials_b: Default::default(),
                 card_a: DuelistDrawnCard::Blades(hand_a.card_blades),
                 card_b: DuelistDrawnCard::Blades(hand_b.card_blades),
                 state_a,
@@ -269,9 +271,8 @@ mod shooter {
         }
 
         // update round model
-        let final_pace: DuelStep = *steps[steps.len() - 1];
-        round.state_a = final_pace.state_a;
-        round.state_b = final_pace.state_b;
+        round.state_a = state_a;
+        round.state_b = state_b;
         round.state = RoundState::Finished;
 
         //------------------------------------------------------
@@ -306,7 +307,6 @@ mod shooter {
         (env_card, dice)
     }
 
-    // returns Boolean::True if executed
     fn fire(paces_shoot: PacesCard, paces_dodge: PacesCard, ref state_self: DuelistState, ref state_other: DuelistState, ref dice: Dice, salt: felt252) {
         let (dice, hit) = dice.throw_decide(salt, 100, state_self.chances);
         state_self.dice_fire = dice;

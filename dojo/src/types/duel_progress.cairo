@@ -28,6 +28,9 @@ pub struct DuelStep {
     // env card
     card_env: EnvCard,
     dice_env: u8,
+    // active specials
+    specials_a: SpecialsDrawn,
+    specials_b: SpecialsDrawn,
     // duelist draw
     card_a: DuelistDrawnCard,
     card_b: DuelistDrawnCard,
@@ -36,10 +39,38 @@ pub struct DuelStep {
     state_b: DuelistState,  // Duelist B current state
 }
 
+#[derive(Copy, Drop, Serde, Default)]
+pub struct SpecialsDrawn {
+    tactics: TacticsCard,
+    coin_toss: bool,
+    reversal: bool,
+    shots_modifier: EnvCard,
+    tactics_modifier: EnvCard,
+}
+
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 pub enum DuelistDrawnCard {
     None: (),
     Fire: PacesCard,
     Dodge: PacesCard,
     Blades: BladesCard,
+}
+
+
+
+//--------------------
+// traits
+//
+
+#[generate_trait]
+impl SpecialsDrawnImpl of SpecialsDrawnTrait {
+    fn initialize(tactics_self: TacticsCard, tactics_other: TacticsCard) -> SpecialsDrawn {
+        (SpecialsDrawn {
+            tactics: tactics_self,
+            coin_toss: (tactics_self == TacticsCard::CoinToss),
+            reversal: (tactics_self == TacticsCard::Reversal || tactics_other == TacticsCard::Reversal),
+            shots_modifier: EnvCard::None,
+            tactics_modifier: EnvCard::None,
+        })
+    }
 }

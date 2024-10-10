@@ -135,4 +135,11 @@ impl DuelistStateImpl of DuelistStateTrait {
         self.health = CONST::FULL_HEALTH;
         self.honour = hand.card_fire.honour();
     }
+    fn apply_damage(ref self: DuelistState, amount: i8) {
+        self.damage.addi(amount);
+    }
+    fn apply_chances(ref self: DuelistState, amount: i8) {
+        self.chances.addi(amount);
+        self.chances.clampi(0, 100);
+    }
 }

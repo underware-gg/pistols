@@ -82,7 +82,7 @@ impl BladesCardImpl of BladesCardTrait {
     #[inline(always)]
     fn apply_points(self: BladesCard, ref state_self: DuelistState, ref state_other: DuelistState) {
         if (self != BladesCard::None) {
-            self.get_points().apply(ref state_self, ref state_other);
+            self.get_points().apply(ref state_self, ref state_other, 1);
         }
     }
     //
