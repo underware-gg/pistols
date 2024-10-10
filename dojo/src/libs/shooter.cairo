@@ -19,7 +19,7 @@ mod shooter {
         SpecialsDrawn, SpecialsDrawnTrait,
     };
     use pistols::types::cards::hand::{
-        PlayerHand, PlayerHandTrait, DeckType,
+        DuelistHand, DuelistHandTrait, DeckType,
         PacesCard, PacesCardTrait,
         TacticsCard, TacticsCardTrait,
         BladesCard, BladesCardTrait,
@@ -152,8 +152,8 @@ mod shooter {
 
         let mut dice: Dice = DiceTrait::new(@world, round.make_seed(), env_deck.len());
         
-        let mut hand_a: PlayerHand = round.moves_a.as_hand();
-        let mut hand_b: PlayerHand = round.moves_b.as_hand();
+        let mut hand_a: DuelistHand = round.moves_a.as_hand();
+        let mut hand_b: DuelistHand = round.moves_b.as_hand();
         hand_a.validate(deck_type);
         hand_b.validate(deck_type);
 

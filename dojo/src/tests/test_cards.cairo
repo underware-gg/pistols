@@ -16,7 +16,7 @@ mod tests {
     use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::types::constants::{CONST, HONOUR};
     use pistols::types::cards::hand::{
-        PlayerHand, PlayerHandTrait, DeckType,
+        DuelistHand, DuelistHandTrait, DeckType,
         PacesCard, PacesCardTrait,
         TacticsCard, TacticsCardTrait,
         BladesCard, BladesCardTrait, BLADES_CARDS,
@@ -88,8 +88,8 @@ mod tests {
             state_b: Default::default(),
             final_step: 0,
         };
-        let mut hand_a: PlayerHand = round.moves_a.as_hand();
-        let mut hand_b: PlayerHand = round.moves_b.as_hand();
+        let mut hand_a: DuelistHand = round.moves_a.as_hand();
+        let mut hand_b: DuelistHand = round.moves_b.as_hand();
         round.moves_a.initialize(SALT_A, moves_a);
         round.moves_b.initialize(SALT_B, moves_b);
         round.state_a.initialize(hand_a);

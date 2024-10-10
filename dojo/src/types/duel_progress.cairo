@@ -1,6 +1,6 @@
 use pistols::models::challenge::{DuelistState};
 use pistols::types::cards::hand::{
-    PlayerHand, PlayerHandTrait,
+    DuelistHand, DuelistHandTrait,
     PacesCard, PacesCardTrait,
     TacticsCard, TacticsCardTrait,
     BladesCard, BladesCardTrait,
@@ -17,8 +17,8 @@ pub struct DuelProgress {
     steps: Span<DuelStep>,
     winner: u8,
     // duelists hands
-    hand_a: PlayerHand,
-    hand_b: PlayerHand,
+    hand_a: DuelistHand,
+    hand_b: DuelistHand,
 }
 
 #[derive(Copy, Drop, Serde)]

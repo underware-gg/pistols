@@ -93,7 +93,7 @@ pub struct DuelistState {
 //------------------------------------
 // Traits
 //
-use pistols::types::cards::hand::{PlayerHand};
+use pistols::types::cards::hand::{DuelistHand};
 use pistols::utils::arrays::{SpanUtilsTrait};
 use pistols::utils::hash::{hash_values};
 use pistols::utils::math::{MathU8};
@@ -116,8 +116,8 @@ impl MovesImpl of MovesTrait {
         self.card_3 = moves.value_or_zero(2);
         self.card_4 = moves.value_or_zero(3);
     }
-    fn as_hand(self: @Moves) -> PlayerHand {
-        (PlayerHand {
+    fn as_hand(self: @Moves) -> DuelistHand {
+        (DuelistHand {
             card_fire: (*self.card_1).into(),
             card_dodge: (*self.card_2).into(),
             card_tactics: (*self.card_3).into(),
@@ -128,7 +128,7 @@ impl MovesImpl of MovesTrait {
 
 #[generate_trait]
 impl DuelistStateImpl of DuelistStateTrait {
-    fn initialize(ref self: DuelistState, hand: PlayerHand) {
+    fn initialize(ref self: DuelistState, hand: DuelistHand) {
         self = Default::default();
         self.chances = CONST::INITIAL_CHANCE;
         self.damage = CONST::INITIAL_DAMAGE;

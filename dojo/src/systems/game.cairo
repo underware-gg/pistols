@@ -95,7 +95,7 @@ mod game {
     use pistols::libs::seeder::{make_seed};
     use pistols::libs::shooter::{shooter};
     use pistols::libs::utils;
-    use pistols::types::cards::hand::PlayerHandTrait;
+    use pistols::types::cards::hand::DuelistHandTrait;
     use pistols::types::typed_data::{CommitMoveMessage, CommitMoveMessageTrait};
     use pistols::types::{events};
     use pistols::libs::store::{Store, StoreTrait};
@@ -387,7 +387,7 @@ mod game {
         fn get_player_card_decks(world: @IWorldDispatcher, table_id: felt252) -> Span<Span<u8>> {
             let store: Store = StoreTrait::new(world);
             let table: TableConfigEntity = store.get_table_config_entity(table_id);
-            (PlayerHandTrait::get_table_player_decks(table.deck_type))
+            (DuelistHandTrait::get_table_player_decks(table.deck_type))
         }
 
         fn get_duel_progress(world: @IWorldDispatcher, duel_id: u128) -> DuelProgress {

@@ -14,7 +14,7 @@ pub enum DeckType {
 }
 
 #[derive(Copy, Drop, Serde, Default)]
-pub struct PlayerHand {
+pub struct DuelistHand {
     card_fire: PacesCard,
     card_dodge: PacesCard,
     card_tactics: TacticsCard,
@@ -28,15 +28,15 @@ pub struct PlayerHand {
 use pistols::utils::arrays::{SpanUtilsTrait};
 
 #[generate_trait]
-impl PlayerHandImpl of PlayerHandTrait {
-    fn draw_card(self:PlayerHand, pace: PacesCard) -> DuelistDrawnCard {
+impl DuelistHandImpl of DuelistHandTrait {
+    fn draw_card(self:DuelistHand, pace: PacesCard) -> DuelistDrawnCard {
         (
             if (self.card_fire == pace) {DuelistDrawnCard::Fire(pace)}
             else if (self.card_dodge == pace) {DuelistDrawnCard::Dodge(pace)}
             else {DuelistDrawnCard::None}
         )
     }
-    fn validate(ref self: PlayerHand, _deck_type: DeckType) {
+    fn validate(ref self: DuelistHand, _deck_type: DeckType) {
         if (self.card_dodge == self.card_fire) {
             self.card_dodge = PacesCard::None;
         }
@@ -70,7 +70,7 @@ mod tests {
 
     use pistols::types::cards::{
         paces::{PacesCard, PacesCardTrait},
-        hand::{PlayerHand, PlayerHandTrait},
+        hand::{DuelistHand, DuelistHandTrait},
         tactics::{TacticsCard, TacticsCardTrait},
         blades::{BladesCard, BladesCardTrait},
     };
@@ -78,13 +78,13 @@ mod tests {
 
     #[test]
     fn test_draw_card() {
-        let hand_1_2 = PlayerHand {
+        let hand_1_2 = DuelistHand {
             card_fire: PacesCard::Paces1,
             card_dodge: PacesCard::Paces2,
             card_tactics: TacticsCard::None,
             card_blades: BladesCard::None,
         };
-        let hand_2_2 = PlayerHand {
+        let hand_2_2 = DuelistHand {
             card_fire: PacesCard::Paces2,
             card_dodge: PacesCard::Paces2,
             card_tactics: TacticsCard::None,
