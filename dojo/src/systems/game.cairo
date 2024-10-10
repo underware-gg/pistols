@@ -46,7 +46,7 @@ trait IGame {
     );
 
     //
-    // read-only calls
+    // view calls
     fn get_pact(world: @IWorldDispatcher, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128;
     fn has_pact(world: @IWorldDispatcher, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool;
     fn can_join(world: @IWorldDispatcher, table_id: felt252, duelist_id: u128) -> bool;
@@ -358,7 +358,7 @@ mod game {
 
 
         //------------------------------------
-        // read-only calls
+        // view calls
         //
 
         fn get_pact(world: @IWorldDispatcher, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128 {

@@ -33,7 +33,7 @@ pub struct DuelStep {
     card_b: DuelistDrawnCard,
     // duelist states
     state_a: DuelistState,  // Duelist A current state
-    state_b: DuelistState,  // Duelist A current state
+    state_b: DuelistState,  // Duelist B current state
 }
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]

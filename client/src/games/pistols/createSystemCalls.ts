@@ -214,7 +214,7 @@ export function createSystemCalls(
 
 
   //------------------------------------
-  // read-only calls
+  // view calls
   //
 
   const get_pact = async (duelist_id_a: BigNumberish, duelist_id_b: BigNumberish): Promise<bigint | null> => {
@@ -295,7 +295,7 @@ export function createSystemCalls(
     reply_challenge,
     commit_moves,
     reveal_moves,
-    // read-only calls
+    // view calls
     get_pact,
     has_pact,
     can_join,

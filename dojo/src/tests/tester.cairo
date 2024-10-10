@@ -422,7 +422,7 @@ mod tester {
     }
 
     //
-    // read-only calls
+    // view calls
     //
 
     // fn execute_get_pact(system: @IGameDispatcher, a: ContractAddress, b: ContractAddress) -> u128 {

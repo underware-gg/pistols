@@ -24,7 +24,10 @@ use graffiti::json::JsonImpl;
 #[generate_trait]
 impl TokenConfigImpl of TokenConfigTrait {
     fn is_minter(self: @TokenConfig, address: ContractAddress) -> bool {
-        (address == *self.minter_contract || (*self.minter_contract).is_zero())
+        (
+            (*self.minter_contract).is_zero()   // anyone can mint
+            || address == *self.minter_contract // caller is minter contract
+        )
     }
 
     fn render_uri(self: @TokenConfig, token_id: u256, duelist: Duelist, encode: bool) -> ByteArray {
