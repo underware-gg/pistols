@@ -14,12 +14,12 @@ mod tests {
 
 
     #[test]
-    fn test_mint_duelist() {
-        let sys = tester::setup_world(FLAGS::GAME | FLAGS::ADMIN | FLAGS::MINTER);
+    fn test_create_duelist() {
+        let sys = tester::setup_world(FLAGS::GAME | FLAGS::ADMIN | FLAGS::DUELIST);
         let duelist1_name: felt252 = 'Player_ONE';
         let duelist2_name: felt252 = 'Player_TWO';
-        let duelist1: Duelist = tester::execute_mint_duelist(@sys.game, OWNER(), duelist1_name, ProfilePicType::Duelist, '1', Archetype::Undefined);
-        let duelist2: Duelist = tester::execute_mint_duelist(@sys.game, OTHER(), duelist2_name, ProfilePicType::External, 'https://wtf.com/wtf.gif', Archetype::Undefined);
+        let duelist1: Duelist = tester::execute_create_duelist(@sys.duelists, OWNER(), duelist1_name, ProfilePicType::Duelist, '1', Archetype::Undefined);
+        let duelist2: Duelist = tester::execute_create_duelist(@sys.duelists, OTHER(), duelist2_name, ProfilePicType::External, 'https://wtf.com/wtf.gif', Archetype::Undefined);
         assert(duelist1.name == duelist1_name, 'duelist1_name');
         assert(duelist2.name == duelist2_name, 'duelist2_name');
         assert(duelist1.profile_pic_type == ProfilePicType::Duelist, 'duelist1_pic_type');
@@ -39,17 +39,17 @@ mod tests {
     }
 
     #[test]
-    fn test_mint_duelist_archetype() {
-        let sys = tester::setup_world(FLAGS::GAME | FLAGS::ADMIN | FLAGS::MINTER);
-        let duelist: Duelist = tester::execute_mint_duelist(@sys.game, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
+    fn test_create_duelist_archetype() {
+        let sys = tester::setup_world(FLAGS::GAME | FLAGS::ADMIN | FLAGS::DUELIST);
+        let duelist: Duelist = tester::execute_create_duelist(@sys.duelists, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
         assert(duelist.score.level_villain == HONOUR::LEVEL_MAX, 'V_level_villain');
         assert(duelist.score.level_trickster == 0, 'V_level_trickster');
         assert(duelist.score.level_lord == 0, 'V_level_lord');
-        let duelist: Duelist = tester::execute_mint_duelist(@sys.game, OTHER(), 'BBB', ProfilePicType::Duelist, '1', Archetype::Trickster);
+        let duelist: Duelist = tester::execute_create_duelist(@sys.duelists, OTHER(), 'BBB', ProfilePicType::Duelist, '1', Archetype::Trickster);
         assert(duelist.score.level_villain == 0, 'T_level_villain');
         assert(duelist.score.level_trickster == HONOUR::LEVEL_MAX, 'T_level_trickster');
         assert(duelist.score.level_lord == 0, 'T_level_lord');
-        let duelist: Duelist = tester::execute_mint_duelist(@sys.game, BUMMER(), 'CCC', ProfilePicType::Duelist, '1', Archetype::Honourable);
+        let duelist: Duelist = tester::execute_create_duelist(@sys.duelists, BUMMER(), 'CCC', ProfilePicType::Duelist, '1', Archetype::Honourable);
         assert(duelist.score.level_villain == 0, 'H_level_villain');
         assert(duelist.score.level_trickster == 0, 'H_level_trickster');
         assert(duelist.score.level_lord == HONOUR::LEVEL_MAX, 'H_level_lord');
@@ -57,17 +57,17 @@ mod tests {
 
     #[test]
     fn test_update_duelist() {
-        let sys = tester::setup_world(FLAGS::GAME | FLAGS::ADMIN | FLAGS::MINTER);
+        let sys = tester::setup_world(FLAGS::GAME | FLAGS::ADMIN | FLAGS::DUELIST);
         let duelist1_name: felt252 = 'Player_ONE';
         let duelist2_name: felt252 = 'Player_TWO';
-        let duelist1: Duelist = tester::execute_mint_duelist(@sys.game, OWNER(), duelist1_name, ProfilePicType::Duelist, '1', Archetype::Undefined);
-        let duelist2: Duelist = tester::execute_mint_duelist(@sys.game, OTHER(), duelist2_name, ProfilePicType::External, '2', Archetype::Undefined);
+        let duelist1: Duelist = tester::execute_create_duelist(@sys.duelists, OWNER(), duelist1_name, ProfilePicType::Duelist, '1', Archetype::Undefined);
+        let duelist2: Duelist = tester::execute_create_duelist(@sys.duelists, OTHER(), duelist2_name, ProfilePicType::External, '2', Archetype::Undefined);
         assert(duelist1.name == duelist1_name, 'duelist1_name');
         assert(duelist2.name == duelist2_name, 'duelist2_name');
         assert(duelist1.profile_pic_uri == "1", 'duelist1_pic_uri');
         assert(duelist2.profile_pic_uri == "2", 'duelist2_pic_uri');
-        let duelist1: Duelist = tester::execute_update_duelist_ID(@sys.game, OWNER(), duelist1.duelist_id, 'P1', ProfilePicType::Duelist, '11');
-        let duelist2: Duelist = tester::execute_update_duelist_ID(@sys.game, OTHER(), duelist2.duelist_id, 'P2', ProfilePicType::External, '22');
+        let duelist1: Duelist = tester::execute_update_duelist_ID(@sys.duelists, OWNER(), duelist1.duelist_id, 'P1', ProfilePicType::Duelist, '11');
+        let duelist2: Duelist = tester::execute_update_duelist_ID(@sys.duelists, OTHER(), duelist2.duelist_id, 'P2', ProfilePicType::External, '22');
         assert(duelist1.name != duelist1_name, 'P1');
         assert(duelist2.name != duelist2_name, 'P2');
         assert(duelist1.profile_pic_uri == "11", 'duelist1_pic_uri_AFTER');
@@ -75,18 +75,18 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Invalid duelist', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUELIST: Invalid duelist', 'ENTRYPOINT_FAILED'))]
     fn test_update_invalid_duelist() {
-        let sys = tester::setup_world(FLAGS::GAME | FLAGS::ADMIN | FLAGS::MINTER);
-        tester::execute_update_duelist(@sys.game, OTHER(), 'P1', ProfilePicType::Duelist, '11');
+        let sys = tester::setup_world(FLAGS::GAME | FLAGS::ADMIN | FLAGS::DUELIST);
+        tester::execute_update_duelist(@sys.duelists, OTHER(), 'P1', ProfilePicType::Duelist, '11');
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Not your duelist', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUELIST: Not your duelist', 'ENTRYPOINT_FAILED'))]
     fn test_update_duelist_not_owner() {
-        let sys = tester::setup_world(FLAGS::GAME | FLAGS::ADMIN | FLAGS::MINTER);
-        let duelist: Duelist = tester::execute_mint_duelist(@sys.game, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Undefined);
-        tester::execute_update_duelist_ID(@sys.game, OTHER(), duelist.duelist_id,'P1', ProfilePicType::Duelist, '11');
+        let sys = tester::setup_world(FLAGS::GAME | FLAGS::ADMIN | FLAGS::DUELIST);
+        let duelist: Duelist = tester::execute_create_duelist(@sys.duelists, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Undefined);
+        tester::execute_update_duelist_ID(@sys.duelists, OTHER(), duelist.duelist_id,'P1', ProfilePicType::Duelist, '11');
     }
 
 }

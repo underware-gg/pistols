@@ -24,11 +24,8 @@ use origami_token::components::token::erc721::erc721_burnable::erc721_burnable_c
 use pistols::systems::duelist_token::{
     duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
 };
-use pistols::systems::minter::{
-    minter, IMinterDispatcher, IMinterDispatcherTrait,
-};
 use pistols::models::{
-    duelist::{Duelist, DuelistEntity, DuelistEntityStore, Score, Scoreboard, ProfilePicType},
+    duelist::{Duelist, DuelistEntity, DuelistEntityStore, Score, Scoreboard, ProfilePicType, Archetype},
     challenge::{Challenge, Wager, Round},
     config::{Config},
     table::{TableConfig, TableAdmittance},
@@ -87,7 +84,7 @@ const TOKEN_ID_3: u256 = 3;
 const TOKEN_ID_4: u256 = 4;
 const TOKEN_ID_5: u256 = 5;
 
-fn setup_uninitialized() -> (IWorldDispatcher, IDuelistTokenDispatcher, IMinterDispatcher) {
+fn setup_uninitialized() -> (IWorldDispatcher, IDuelistTokenDispatcher) {
     testing::set_block_number(1);
     testing::set_block_timestamp(1);
     let mut world = spawn_test_world(
@@ -99,6 +96,8 @@ fn setup_uninitialized() -> (IWorldDispatcher, IDuelistTokenDispatcher, IMinterD
         contract_address: world.deploy_contract('salt',duelist_token::TEST_CLASS_HASH.try_into().unwrap())
     };
     world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), token.contract_address);
+    world.grant_writer(selector_from_tag!("pistols-TokenConfig"), token.contract_address);
+    world.grant_writer(selector_from_tag!("pistols-Duelist"), token.contract_address);
     world.grant_writer(selector_from_tag!("origami_token-SRC5Model"), token.contract_address);
     world.grant_writer(selector_from_tag!("origami_token-InitializableModel"), token.contract_address);
     world.grant_writer(selector_from_tag!("origami_token-ERC721MetaModel"), token.contract_address);
@@ -110,42 +109,35 @@ fn setup_uninitialized() -> (IWorldDispatcher, IDuelistTokenDispatcher, IMinterD
     world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableOwnerTokenModel"),token.contract_address);
     world.grant_writer(selector_from_tag!("origami_token-ERC721EnumerableTotalModel"),token.contract_address);
     world.grant_writer(selector_from_tag!("origami_token-ERC721OwnerModel"), token.contract_address);
-    world.init_contract(SELECTORS::DUELIST_TOKEN, [].span());
-
-    // deploy minter
-    let minter_call_data: Array<felt252> = array![
-        token.contract_address.into(),
-        3, // max_supply
-        2, // wallet_max
-        1, // is_open
-    ];
-    let mut minter = IMinterDispatcher {
-        contract_address: world.deploy_contract('salt2',minter::TEST_CLASS_HASH.try_into().unwrap())
-    };
-    world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), minter.contract_address);
-    world.grant_writer(selector_from_tag!("pistols-TokenConfig"), minter.contract_address);
-    world.grant_writer(selector_from_tag!("pistols-Duelist"), minter.contract_address);
-    world.grant_writer(selector_from_tag!("pistols-Scoreboard"), minter.contract_address);
-    world.init_contract(SELECTORS::MINTER, minter_call_data.span());
+    world.init_contract(SELECTORS::DUELIST_TOKEN, [0, 0, 0].span());
 
     utils::impersonate(OWNER());
 
-    (world, token, minter)
+    (world, token)
 }
 
-fn setup() -> (IWorldDispatcher, IDuelistTokenDispatcher, IMinterDispatcher) {
-    let (mut world, mut token, mut minter) = setup_uninitialized();
+fn setup() -> (IWorldDispatcher, IDuelistTokenDispatcher) {
+    let (mut world, mut token) = setup_uninitialized();
 
     // initialize contracts
-    minter.mint(OWNER(), token.contract_address);
-    minter.mint(OWNER(), token.contract_address);
+    mint(token, OWNER());
+    mint(token, OWNER());
 
     // drop all events
     utils::drop_all_events(world.contract_address);
     utils::drop_all_events(token.contract_address);
-    utils::drop_all_events(minter.contract_address);
 
-    (world, token, minter)
+    (world, token)
+}
+
+fn mint(token: IDuelistTokenDispatcher, recipient: ContractAddress) {
+    token.create_duelist(
+        recipient,
+        'Pops',
+        ProfilePicType::Duelist,
+        1,
+        Archetype::Honourable,
+    );
 }
 
 //
@@ -154,7 +146,7 @@ fn setup() -> (IWorldDispatcher, IDuelistTokenDispatcher, IMinterDispatcher) {
 
 #[test]
 fn test_initializer() {
-    let (_world, mut token, _minter) = setup();
+    let (_world, mut token) = setup();
     assert(token.balance_of(OWNER(),) == 2, 'Should eq 2');
     assert(token.name() == "Pistols at 10 Blocks Duelists", 'Name is wrong');
     assert(token.symbol() == "DUELIST", 'Symbol is wrong');
@@ -169,7 +161,7 @@ fn test_initializer() {
 
 #[test]
 fn test_token_uri() {
-    let (mut world, mut token, _minter) = setup();
+    let (mut world, mut token) = setup();
 
     let duelist = Duelist {
         duelist_id: TOKEN_ID.low,
@@ -214,7 +206,7 @@ fn test_token_uri() {
 #[test]
 #[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))]
 fn test_token_uri_invalid() {
-    let (_world, mut token, _minter) = setup();
+    let (_world, mut token) = setup();
     token.token_uri(999);
 }
 
@@ -225,7 +217,7 @@ fn test_token_uri_invalid() {
 
 #[test]
 fn test_approve() {
-    let (world, mut token, _minter) = setup();
+    let (world, mut token) = setup();
 
     utils::impersonate(OWNER(),);
 
@@ -245,7 +237,7 @@ fn test_approve() {
 
 #[test]
 fn test_transfer_from() {
-    let (world, mut token, _minter) = setup();
+    let (world, mut token) = setup();
 
     utils::impersonate(OWNER(),);
     token.approve(SPENDER(), TOKEN_ID);
@@ -275,10 +267,9 @@ fn test_transfer_from() {
 
 #[test]
 fn test_mint() {
-    let (_world, mut token, mut minter) = setup();
+    let (_world, mut token) = setup();
     assert(token.total_supply() == 2, 'invalid total_supply init');
-    assert(minter.can_mint(RECIPIENT(), token.contract_address) == true, '!can_mint');
-    minter.mint(RECIPIENT(), token.contract_address);
+    mint(token, RECIPIENT());
     assert(token.balance_of(RECIPIENT()) == 1, 'invalid balance_of');
     assert(token.total_supply() == 3, 'invalid total_supply');
     assert(token.token_by_index(2) == TOKEN_ID_3, 'invalid token_by_index');
@@ -288,30 +279,12 @@ fn test_mint() {
     );
 }
 
-#[test]
-#[should_panic(expected: ('DUELIST: caller is not minter', 'ENTRYPOINT_FAILED'))]
-fn test_mint_not_minter() {
-    let (_world, mut token, _minter) = setup();
-    token.mint(RECIPIENT(), TOKEN_ID_3);
-}
-
-#[test]
-#[should_panic(expected: ('MINTER: wallet maxed out', 'ENTRYPOINT_FAILED'))]
-fn test_mint_maxed_out() {
-    let (_world, mut token, mut minter) = setup();
-    assert(minter.can_mint(OWNER(), token.contract_address) == false, 'can_mint');
-    minter.mint(OWNER(), token.contract_address);
-}
-
-#[test]
-#[should_panic(expected: ('MINTER: minted out', 'ENTRYPOINT_FAILED'))]
-fn test_mint_minted_out() {
-    let (_world, mut token, mut minter) = setup();
-    assert(minter.can_mint(RECIPIENT(), token.contract_address) == true, 'can_mint');
-    minter.mint(RECIPIENT(), token.contract_address);
-    assert(minter.can_mint(RECIPIENT(), token.contract_address) == false, 'can_mint');
-    minter.mint(RECIPIENT(), token.contract_address);
-}
+// #[test]
+// #[should_panic(expected: ('DUELIST: caller is not minter', 'ENTRYPOINT_FAILED'))]
+// fn test_mint_not_minter() {
+//     let (_world, mut token, _minter) = setup();
+//     token.mint(RECIPIENT(), TOKEN_ID_3);
+// }
 
 //
 // burn
@@ -319,9 +292,9 @@ fn test_mint_minted_out() {
 
 #[test]
 fn test_burn() {
-    let (_world, mut token, _minter) = setup();
+    let (_world, mut token) = setup();
     assert(token.total_supply() == 2, 'invalid total_supply init');
-    token.burn(TOKEN_ID_2);
+    token.delete_duelist(TOKEN_ID_2.low);
     assert(token.balance_of(OWNER(),) == 1, 'invalid balance_of');
     assert(token.total_supply() == 1, 'invalid total_supply');
     assert(token.token_by_index(0) == TOKEN_ID, 'invalid token_by_index');

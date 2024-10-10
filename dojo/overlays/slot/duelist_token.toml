@@ -1,6 +1,7 @@
 tag = "pistols-duelist_token"
 writes = [
   "pistols-TokenConfig",
+  "pistols-Duelist",
   "origami_token-SRC5Model",
   "origami_token-InitializableModel",
   "origami_token-ERC721OwnerModel",

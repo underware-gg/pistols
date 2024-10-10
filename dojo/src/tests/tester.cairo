@@ -11,7 +11,6 @@ mod tester {
 
     use pistols::systems::admin::{admin, IAdminDispatcher, IAdminDispatcherTrait};
     use pistols::systems::game::{game, IGameDispatcher, IGameDispatcherTrait};
-    use pistols::systems::minter::{minter, IMinterDispatcher, IMinterDispatcherTrait};
     use pistols::systems::duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait};
     use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
     use pistols::tests::token::mock_duelist_token::{
@@ -112,7 +111,7 @@ mod tester {
         const GAME: u8       = 0b000001;
         const ADMIN: u8      = 0b000010;
         const LORDS: u8      = 0b000100;
-        const MINTER: u8     = 0b001000;
+        const DUELIST: u8    = 0b001000;
         const APPROVE: u8    = 0b010000;
         const MOCK_RNG: u8   = 0b100000;
     }
@@ -123,7 +122,7 @@ mod tester {
         game: IGameDispatcher,
         admin: IAdminDispatcher,
         lords: ILordsMockDispatcher,
-        minter: IMinterDispatcher,
+        duelists: IDuelistTokenDispatcher,
         rng: IRngDispatcher,
     }
 
@@ -137,14 +136,14 @@ mod tester {
         let mut deploy_game: bool = (flags & FLAGS::GAME) != 0;
         let mut deploy_admin: bool = (flags & FLAGS::ADMIN) != 0;
         let mut deploy_lords: bool = (flags & FLAGS::LORDS) != 0;
-        let mut deploy_minter: bool = (flags & FLAGS::MINTER) != 0;
+        let mut deploy_duelist: bool = (flags & FLAGS::DUELIST) != 0;
         let mut deploy_mock_rng = (flags & FLAGS::MOCK_RNG) != 0;
         let approve: bool = (flags & FLAGS::APPROVE) != 0;
 
         deploy_game = deploy_game || approve;
         deploy_lords = deploy_lords || deploy_game || approve;
         deploy_admin = deploy_admin || deploy_game || deploy_game;
-        // deploy_minter = deploy_minter || deploy_game;
+        // deploy_duelist = deploy_duelist || deploy_game;
 
         // setup testing
         testing::set_block_number(1);
@@ -153,7 +152,7 @@ mod tester {
         let mut namespaces: Array<ByteArray> = array![];
         let mut models: Array<felt252> = array![];
 
-        if (deploy_minter || deploy_lords) {
+        if (deploy_duelist || deploy_lords) {
             namespaces.extend_from_span(["origami_token", "pistols"].span());
             models.extend_from_span(get_models_test_class_hashes!(["origami_token", "pistols"]));
         } else {
@@ -206,12 +205,14 @@ mod tester {
         };
 // '---- 2'.print();
         let duelists = IDuelistTokenDispatcher{ contract_address:
-            if (deploy_minter) {
+            if (deploy_duelist) {
                 let address = deploy_system(world, 'duelist_token', duelist_token::TEST_CLASS_HASH);
                 world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), address);
                 // world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), OWNER());
                 world.grant_writer(SELECTORS::DUELIST_TOKEN, OWNER());
-                world.init_contract(SELECTORS::DUELIST_TOKEN, [].span());
+                world.grant_writer(selector_from_tag!("pistols-TokenConfig"), address);
+                world.grant_writer(selector_from_tag!("pistols-Duelist"), address);
+                world.init_contract(SELECTORS::DUELIST_TOKEN, [0, 0, 0].span());
                 (address)
             }
             else if (deploy_game) {
@@ -220,23 +221,6 @@ mod tester {
             else {ZERO()}
         };
 // '---- 3'.print();
-        let minter = IMinterDispatcher{ contract_address:
-            if (deploy_minter) {
-                let address = deploy_system(world, 'minter', minter::TEST_CLASS_HASH);
-                let minter_call_data: Array<felt252> = array![
-                    duelists.contract_address.into(),
-                    100, // max_supply
-                    3, // wallet_max
-                    1, // is_open
-                ];
-                world.grant_owner(SELECTORS::MINTER, OWNER());
-                world.grant_writer(selector_from_tag!("pistols-TokenConfig"), address);
-                world.init_contract(SELECTORS::MINTER, minter_call_data.span());
-                (address)
-            }
-            else {ZERO()}
-        };
-// '---- 4'.print();
         let admin = IAdminDispatcher{ contract_address:
             if (deploy_admin) {
                 let address = deploy_system(world, 'admin', admin::TEST_CLASS_HASH);
@@ -254,7 +238,7 @@ mod tester {
             }
             else {ZERO()}
         };
-// '---- 5'.print();
+// '---- 4'.print();
         let rng = IRngDispatcher{ contract_address:
             {
                 let class_hash = if (deploy_mock_rng) {mock_rng::TEST_CLASS_HASH} else {rng::TEST_CLASS_HASH};
@@ -264,25 +248,25 @@ mod tester {
                 (address)
             }
         };
-// '---- 6'.print();
+// '---- 5'.print();
 
         // initializers
         if (deploy_lords) {
             execute_lords_faucet(@lords, OWNER());
             execute_lords_faucet(@lords, OTHER());
         }
-// '---- 7'.print();
+// '---- 6'.print();
         if (approve) {
             execute_lords_approve(@lords, OWNER(), game.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
             execute_lords_approve(@lords, OTHER(), game.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
             execute_lords_approve(@lords, BUMMER(), game.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
         }
-// '---- 8'.print();
+// '---- 7'.print();
 
         impersonate(OWNER());
 
 // '---- READY!'.print();
-        (Systems { world, game, admin, lords, minter, rng })
+        (Systems { world, game, admin, lords, duelists, rng })
     }
 
     fn elapse_timestamp(delta: u64) -> (u64, u64) {
@@ -359,22 +343,24 @@ mod tester {
         _next_block();
     }
 
-    // ::game
-    fn execute_mint_duelist(system: @IGameDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252, archetype: Archetype) -> Duelist {
+    // ::duelist_token
+    fn execute_create_duelist(system: @IDuelistTokenDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252, archetype: Archetype) -> Duelist {
         impersonate(sender);
-        let duelist: Duelist = (*system).mint_duelist(name, profile_pic_type, profile_pic_uri, archetype);
+        let duelist: Duelist = (*system).create_duelist(sender, name, profile_pic_type, profile_pic_uri, archetype);
         _next_block();
         (duelist)
     }
-    fn execute_update_duelist(system: @IGameDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist {
+    fn execute_update_duelist(system: @IDuelistTokenDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist {
         (execute_update_duelist_ID(system, sender, ID(sender), name, profile_pic_type, profile_pic_uri))
     }
-    fn execute_update_duelist_ID(system: @IGameDispatcher, sender: ContractAddress, duelist_id: u128, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist {
+    fn execute_update_duelist_ID(system: @IDuelistTokenDispatcher, sender: ContractAddress, duelist_id: u128, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist {
         impersonate(sender);
         let duelist: Duelist = (*system).update_duelist(duelist_id, name, profile_pic_type, profile_pic_uri);
         _next_block();
         (duelist)
     }
+
+    // ::game
     fn execute_create_challenge(system: @IGameDispatcher, sender: ContractAddress,
         challenged: ContractAddress,
         // premise: Premise,

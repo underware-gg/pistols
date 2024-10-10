@@ -383,8 +383,8 @@ mod tests {
     // #[test]
     // fn test_register_keep_scores() {
     //     // let sys = tester::setup_world(FLAGS::GAME);
-    //     // let duelist1: Duelist = tester::execute_mint_duelist(@sys.game, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Undefined);
-    //     // let duelist2: Duelist = tester::execute_mint_duelist(@sys.game, OTHER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Undefined);
+    //     // let duelist1: Duelist = tester::execute_create_duelist(@sys.duelists, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Undefined);
+    //     // let duelist2: Duelist = tester::execute_create_duelist(@sys.duelists, OTHER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Undefined);
     //     // assert(duelist1.duelist_id == ID(OWNER()), 'invalid duelist_id_1');
     //     // assert(duelist2.duelist_id == ID(OTHER()), 'invalid duelist_id_2');
     //     // let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys.world, game, OWNER(), OTHER(), 0);
@@ -409,7 +409,7 @@ mod tests {
     //     // validate by settign a timestamp
     //     duelist_a_before.timestamp = 1234;
     //     duelist_a_before.update(sys.world); // TODO: impersonate some contract
-    //     tester::execute_update_duelist_ID(@sys.game, OWNER(), ID(OWNER()), 'dssadsa', ProfilePicType::Duelist, '3');
+    //     tester::execute_update_duelist_ID(@sys.duelists, OWNER(), ID(OWNER()), 'dssadsa', ProfilePicType::Duelist, '3');
     //     let duelist_a_after = tester::get_DuelistEntity_id(sys.world, ID(OWNER()));
     //     assert(duelist_a_before.name != duelist_a_after.name, 'name');
     //     assert(duelist_a_before.profile_pic_uri != duelist_a_after.profile_pic_uri, 'profile_pic_uri');

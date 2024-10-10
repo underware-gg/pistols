@@ -17,9 +17,6 @@ mod duelist_token {
         OWNED_BY_LITTLE_BOY, OWNED_BY_LITTLE_GIRL,
     };
 
-    //---------------------------------------
-    // IMinter
-    //
     #[abi(embed_v0)]
     impl ERC721MockImpl of IDuelistToken<ContractState> {
         fn owner_of(world: @IWorldDispatcher, token_id: u256) -> ContractAddress {

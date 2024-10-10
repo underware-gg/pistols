@@ -386,6 +386,7 @@ mod duelist_token {
     // Private
     //
     use pistols::interfaces::itoken::{ITokenRenderer};
+    #[abi(embed_v0)]
     impl TokenRendererImpl of ITokenRenderer<ContractState> {
         fn format_name(self: @ContractState, token_id: u256, duelist: Duelist) -> ByteArray {
             let name: ByteArray = if (duelist.name != '') { duelist.name.to_byte_array() } else { "Duelist" };

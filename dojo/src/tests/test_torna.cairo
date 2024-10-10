@@ -46,9 +46,9 @@
 //     #[test]
 //     #[ignore]
 //     fn test_mint_archetype_snapshot_Classic() {
-//         let (world, game, _admin, _lords, _minter) = tester::setup_world(FLAGS::GAME | FLAGS::ADMIN | FLAGS::MINTER);
-//         let duelist1: Duelist = tester::execute_mint_duelist(game, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
-//         let duelist2: Duelist = tester::execute_mint_duelist(game, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
+//         let (world, game, _admin, _lords, _minter) = tester::setup_world(FLAGS::GAME | FLAGS::ADMIN | FLAGS::DUELIST);
+//         let duelist1: Duelist = tester::execute_create_duelist(game, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
+//         let duelist2: Duelist = tester::execute_create_duelist(game, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
 //         assert(duelist1.score.level_villain == HONOUR::MAX, 'level_villain');
 //         assert(duelist2.score.level_lord == HONOUR::MAX, 'level_lord');
 //         let (challenge, duel_id) = _start_new_challenge(world, game, OWNER(), OTHER(), TABLES::COMMONERS);
@@ -67,9 +67,9 @@
 //     #[test]
 //     #[ignore]
 //     fn test_mint_archetype_snapshot_IRL() {
-//         let (world, game, _admin, _lords, _minter) = tester::setup_world(FLAGS::GAME | FLAGS::ADMIN | FLAGS::MINTER);
-//         let duelist1: Duelist = tester::execute_mint_duelist(game, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
-//         let duelist2: Duelist = tester::execute_mint_duelist(game, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
+//         let (world, game, _admin, _lords, _minter) = tester::setup_world(FLAGS::GAME | FLAGS::ADMIN | FLAGS::DUELIST);
+//         let duelist1: Duelist = tester::execute_create_duelist(game, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
+//         let duelist2: Duelist = tester::execute_create_duelist(game, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
 //         assert(duelist1.score.level_villain == HONOUR::MAX, 'level_villain');
 //         assert(duelist2.score.level_lord == HONOUR::MAX, 'level_lord');
 //         let (challenge, duel_id) = _start_new_challenge(world, game, OWNER(), OTHER(), TABLE_ID);
@@ -93,9 +93,9 @@
 //     #[test]
 //     #[ignore]
 //     fn test_IRL_keep_archetypes() {
-//         let (world, game, _admin, _lords, _minter) = tester::setup_world(FLAGS::GAME | FLAGS::ADMIN | FLAGS::MINTER);
-//         let duelist1: Duelist = tester::execute_mint_duelist(game, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
-//         let duelist2: Duelist = tester::execute_mint_duelist(game, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
+//         let (world, game, _admin, _lords, _minter) = tester::setup_world(FLAGS::GAME | FLAGS::ADMIN | FLAGS::DUELIST);
+//         let duelist1: Duelist = tester::execute_create_duelist(game, OWNER(), 'AAA', ProfilePicType::Duelist, '1', Archetype::Villainous);
+//         let duelist2: Duelist = tester::execute_create_duelist(game, OTHER(), 'BBB', ProfilePicType::Duelist, '2', Archetype::Honourable);
 //         assert(duelist1.score.level_villain == HONOUR::MAX, 'duelist1.level_villain');
 //         assert(duelist1.score.level_lord == 0, 'duelist1.level_lord');
 //         assert(duelist1.score.level_lord == 0, 'duelist1.level_lord');
