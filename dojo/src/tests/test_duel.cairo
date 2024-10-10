@@ -234,7 +234,7 @@ mod tests {
         assert(challenge.round_number == 1, '4_challenge.round_number');
         assert(challenge.timestamp_end > 0, '4_challenge.timestamp_end');
         assert(round.state == RoundState::Finished, '4__state');
-        assert(round.final_step == MathU8::max(*moves_a.moves[0], *moves_b.moves[0]), 'round.final_step');
+        assert(round.final_step == MathU8::min(*moves_a.moves[0], *moves_b.moves[0]), 'round.final_step');
         assert(round.moves_a.hashed == moves_a.hashed, '43__hash');
         assert(round.moves_a.salt == moves_a.salt, '43__salt');
         assert(round.moves_a.card_1.into() == *moves_a.moves[0], '43__card_fire');
