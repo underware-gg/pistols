@@ -16,6 +16,7 @@ github = "https://github.com/underware-gg/pistols"
 default = "pistols"
 
 [env]
+chain_id = "WP_PISTOLS"
 rpc_url = "https://api.cartridge.gg/x/pistols/katana"
 account_address = "0xc2ec08a041586b60f81bb07820b2c445021de4ecef9ec5ac0e5239f4a4e450"
 private_key = "0x2a6682ca0685b5a0b14dfc89067cb1b0c95bcde8f5f3540b526509dd30e57b"

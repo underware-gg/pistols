@@ -16,6 +16,7 @@ github = "https://github.com/underware-gg/pistols"
 default = "pistols"
 
 [env]
+chain_id = "SN_SEPOLIA"
 # rpc_url = ""          # env: STARKNET_RPC_URL
 # account_address = ""  # env: DOJO_ACCOUNT_ADDRESS
 # private_key = ""      # env: DOJO_PRIVATE_KEY

@@ -2,16 +2,6 @@
 set -e # enable exit on error
 source scripts/setup.sh
 
-echo "------------------------------------------------------------------------------"
-echo "PROJECT: $PROJECT_NAME"
-echo "PROFILE: $PROFILE"
-echo "RPC_URL: $RPC_URL"
-echo "WORLD_ADDRESS: $WORLD_ADDRESS"
-echo "CLIENT_GEN_PATH: $CLIENT_GEN_PATH"
-echo "PROFILE_GEN_PATH: $PROFILE_GEN_PATH"
-echo "BINDINGS_PATH: $BINDINGS_PATH"
-echo ""
-
 if [[
   -z "$PROJECT_NAME" ||
   -z "$PROFILE" ||
@@ -23,11 +13,17 @@ if [[
   exit 1
 fi
 
+
+echo "CLIENT_GEN_PATH: $CLIENT_GEN_PATH"
+echo "PROFILE_GEN_PATH: $PROFILE_GEN_PATH"
+echo "BINDINGS_PATH: $BINDINGS_PATH"
+
 #-----------------
 # build
 #
 echo "------------------------------------------------------------------------------"
 sozo --version
+echo "------------------------------------------------------------------------------"
 echo ">>> Cleaning..."
 sozo -P $PROFILE clean
 echo ">>> Building..."

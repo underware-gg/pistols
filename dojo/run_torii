@@ -10,13 +10,9 @@ export START_BLOCK=1
 # export TORII_PATH=../../dojo/target/release/torii
 # export START_BLOCK=720000
 
-echo "----------------------------------------"
-echo "* PROFILE : $PROFILE"
-echo "* RPC_URL : $RPC_URL"
-echo "* WORLD   : $WORLD_ADDRESS"
 echo "* TORII   : $TORII_PATH"
 echo "* BLOCK   : $START_BLOCK"
-echo "----------------------------------------"
+echo "------------------------------------------------------------------------------"
 
 if [[
   "$WORLD_ADDRESS" != "0x"*

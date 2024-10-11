@@ -14,10 +14,9 @@ fi
 # move down to /dojo
 pushd $(dirname "$0")/..
 
-echo "------------------------------------------------------------------------------"
-echo "Profile  : $PROFILE"
 echo "Account  : $ACCOUNT"
 echo "Grant    : $GRANT"
+echo "------------------------------------------------------------------------------"
 
 if [[ "$ACCOUNT" != "0x"* ]]; then
   echo "! Bad account 👎"

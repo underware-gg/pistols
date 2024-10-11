@@ -38,12 +38,23 @@ export PROFILE_GEN_PATH="$CLIENT_GEN_PATH/$PROFILE"
 # use $STARKNET_RPC_URL else read from profile
 export RPC_URL=${STARKNET_RPC_URL:-$(get_profile_env "rpc_url")}
 
-# echo "------------------------------------------------------------------------------"
-# echo "PROJECT: $PROJECT_NAME"
-# echo "PROFILE: $PROFILE"
-# echo "RPC_URL: $RPC_URL"
-# echo "WORLD_ADDRESS: $WORLD_ADDRESS"
-# echo "CLIENT_GEN_PATH: $CLIENT_GEN_PATH"
-# echo "PROFILE_GEN_PATH: $PROFILE_GEN_PATH"
-# echo "BINDINGS_PATH: $BINDINGS_PATH"
-# echo ""
+# match rpc chain id with profile
+export CHAIN_ID=$(starkli chain-id --no-decode --rpc $RPC_URL | xxd -r -p)
+export PROFILE_CHAIN_ID=$(get_profile_env "chain_id")
+
+if [[ "$PROFILE_CHAIN_ID" != "$CHAIN_ID" ]]; then
+  echo "PROFILE CHAIN ID: [$PROFILE_CHAIN_ID]"
+  echo "RPC CHAIN ID: [$CHAIN_ID]"
+  echo "Chain mismatch! 👎"
+  exit 1
+fi
+
+
+echo "------------------------------------------------------------------------------"
+echo "Profile  : $PROFILE"
+echo "Project  : $PROJECT_NAME"
+echo "PC Url   : $RPC_URL"
+echo "Chain Id : $CHAIN_ID"
+echo "World    : $WORLD_ADDRESS"
+echo "Account  : $ACCOUNT_ADDRESS"
+echo "------------------------------------------------------------------------------"
