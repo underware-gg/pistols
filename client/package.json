@@ -14,8 +14,8 @@
     "create-constants": "GEN_PATH=\"./src/games/$npm_config_game/generated\" && echo create-constants:[$GEN_PATH] && ./src/lib/bin/generateConstants.cjs ../dojo/src $GEN_PATH/constants.ts"
   },
   "dependencies": {
-    "@cartridge/connector": "^0.3.44",
-    "@cartridge/controller": "^0.3.44",
+    "@cartridge/connector": "0.3.46",
+    "@cartridge/controller": "0.3.46",
     "@dojoengine/core": "v1.0.0-alpha.12",
     "@dojoengine/create-burner": "v1.0.0-alpha.12",
     "@dojoengine/react": "v1.0.0-alpha.12",
