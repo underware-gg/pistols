@@ -86,8 +86,8 @@ manifest_name = "pistols-duelist_token-45c96d20"
 [[contracts]]
 kind = "DojoContract"
 address = "0x38bd6daedc6d49cc4a7d5529cc404c6050846f5884660577b0b7ed0d84a758"
-class_hash = "0x6cc5daae06c1b26695de5044f11005e7b9ea7211b95352156795b193cb8ff5e"
-original_class_hash = "0x6cc5daae06c1b26695de5044f11005e7b9ea7211b95352156795b193cb8ff5e"
+class_hash = "0x794c09d425572b5d215e2e8b7b4c1697876ef33126607e00794220190c78ac1"
+original_class_hash = "0x794c09d425572b5d215e2e8b7b4c1697876ef33126607e00794220190c78ac1"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/dev/deployment/abis/contracts/pistols-game-32c10283.json"
 reads = []
