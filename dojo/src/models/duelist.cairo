@@ -1,7 +1,4 @@
 use starknet::ContractAddress;
-use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-use pistols::interfaces::systems::{WorldSystemsTrait};
-use pistols::interfaces::ierc721::{ierc721, IERC721Dispatcher, IERC721DispatcherTrait};
 use pistols::types::constants::{CONST};
 
 
@@ -153,35 +150,3 @@ impl ArchetypeIntoByteArray of Into<Archetype, ByteArray> {
 }
 
 
-
-//----------------------------------
-// Manager
-//
-
-#[derive(Copy, Drop)]
-pub struct DuelistHelper {
-    world: IWorldDispatcher,
-    token_dispatcher: IERC721Dispatcher,
-}
-
-#[generate_trait]
-impl DuelistHelperTraitImpl of DuelistHelperTrait {
-    fn new(world: IWorldDispatcher) -> DuelistHelper {
-        let contract_address: ContractAddress = world.duelist_token_address();
-        assert(contract_address.is_non_zero(), 'DuelistHelper: null token addr');
-        let token_dispatcher = ierc721(contract_address);
-        (DuelistHelper { world, token_dispatcher })
-    }
-    fn get_token_dispatcher(self: DuelistHelper) -> IERC721Dispatcher {
-        (self.token_dispatcher)
-    }
-    fn owner_of(self: DuelistHelper, duelist_id: u128) -> ContractAddress {
-        (self.token_dispatcher.owner_of(duelist_id.into()))
-    }
-    fn exists(self: DuelistHelper, duelist_id: u128) -> bool {
-        (self.owner_of(duelist_id).is_non_zero())
-    }
-    fn is_owner_of(self: DuelistHelper, address: ContractAddress, duelist_id: u128) -> bool {
-        (self.owner_of(duelist_id)  == address)
-    }
-}

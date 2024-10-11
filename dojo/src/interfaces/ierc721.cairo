@@ -66,3 +66,38 @@ fn ierc721(contract_address: ContractAddress) -> IERC721Dispatcher {
     assert(contract_address.is_non_zero(), 'ierc721(): null address');
     (IERC721Dispatcher{contract_address})
 }
+
+
+//----------------------------------
+// Helper
+//
+use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+use pistols::interfaces::systems::{WorldSystemsTrait};
+
+#[derive(Copy, Drop)]
+pub struct Erc721Helper {
+    world: IWorldDispatcher,
+    token_dispatcher: IERC721Dispatcher,
+}
+
+#[generate_trait]
+impl Erc721HelperImpl of Erc721HelperTrait {
+    fn new(world: IWorldDispatcher, contract_address: ContractAddress) -> Erc721Helper {
+        assert(contract_address.is_non_zero(), 'Erc721Helper: null token addr');
+        let token_dispatcher = ierc721(contract_address);
+        (Erc721Helper { world, token_dispatcher })
+    }
+    fn new_duelist(world: IWorldDispatcher) -> Erc721Helper {
+        let contract_address: ContractAddress = world.duelist_token_address();
+        (Self::new(world, contract_address))
+    }
+    fn owner_of(self: Erc721Helper, token_id: u128) -> ContractAddress {
+        (self.token_dispatcher.owner_of(token_id.into()))
+    }
+    fn exists(self: Erc721Helper, token_id: u128) -> bool {
+        (self.owner_of(token_id).is_non_zero())
+    }
+    fn is_owner_of(self: Erc721Helper, address: ContractAddress, token_id: u128) -> bool {
+        (self.owner_of(token_id)  == address)
+    }
+}

@@ -83,7 +83,7 @@ mod game {
         WorldSystemsTrait,
     };
     use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, Moves};
-    use pistols::models::duelist::{Duelist, DuelistTrait, Score, Pact, DuelistHelper, DuelistHelperTrait};
+    use pistols::models::duelist::{Duelist, DuelistTrait, Score, Pact};
     use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableAdmittanceEntity, TableAdmittanceEntityTrait, TableType, TABLES};
     use pistols::types::premise::{Premise, PremiseTrait};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
@@ -99,6 +99,7 @@ mod game {
     use pistols::types::typed_data::{CommitMoveMessage, CommitMoveMessageTrait};
     use pistols::types::{events};
     use pistols::libs::store::{Store, StoreTrait};
+    use pistols::interfaces::ierc721::{Erc721Helper, Erc721HelperTrait};
 
     mod Errors {
         const NOT_INITIALIZED: felt252           = 'PISTOLS: Not initialized';
@@ -153,7 +154,7 @@ mod game {
             // validate challenger
             let duelist_id_a: u128 = duelist_id;
             let address_a: ContractAddress = starknet::get_caller_address();
-            let duelist_helper = DuelistHelperTrait::new(world);
+            let duelist_helper = Erc721HelperTrait::new_duelist(world);
             assert(duelist_helper.is_owner_of(address_a, duelist_id_a) == true, Errors::NOT_YOUR_DUELIST);
 // address_a.print();
 // duelist_id_a.print();
@@ -263,7 +264,7 @@ mod game {
                 challenge.timestamp_end = timestamp;
             } else {
                 // validate duelist ownership
-                let duelist_helper = DuelistHelperTrait::new(world);
+                let duelist_helper = Erc721HelperTrait::new_duelist(world);
 // address_b.print();
 // duelist_id_b.print();
 // duelist_helper.owner_of(duelist_id_b).print();
