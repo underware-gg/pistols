@@ -1,0 +1,47 @@
+kind = "DojoModel"
+class_hash = "0x1f98abf30c3d96ae66e2816e354cc44c8c7553ceb1e3043909feca4eafa3755"
+original_class_hash = "0x1f98abf30c3d96ae66e2816e354cc44c8c7553ceb1e3043909feca4eafa3755"
+abi = "manifests/staging/base/abis/models/pistols-Round-617e0a3d.json"
+tag = "pistols-Round"
+qualified_path = "pistols::models::challenge::round"
+manifest_name = "pistols-Round-617e0a3d"
+
+[[members]]
+name = "duel_id"
+type = "u128"
+key = true
+
+[[members]]
+name = "round_number"
+type = "u8"
+key = true
+
+[[members]]
+name = "moves_a"
+type = "Moves"
+key = false
+
+[[members]]
+name = "moves_b"
+type = "Moves"
+key = false
+
+[[members]]
+name = "state_a"
+type = "DuelistState"
+key = false
+
+[[members]]
+name = "state_b"
+type = "DuelistState"
+key = false
+
+[[members]]
+name = "state"
+type = "RoundState"
+key = false
+
+[[members]]
+name = "final_step"
+type = "u8"
+key = false

@@ -117,7 +117,7 @@ const localKatanaConfig: DojoChainConfig = {
   predeployedAccounts: [{
     address: '0xe29882a1fcba1e7e10cad46212257fea5c752a4f9b1b1ec683c503a2cf5c8a',
     privateKey: '0x14d6672dcb4b77ca36a887e9a11cd9d637d5012468175829e9c6e770c61642',
-    active: false,
+    active: true,
   }, {
     address: '0x6162896d1d7ab204c7ccac6dd5f8e9e7c25ecd5ae4fcb4ad32e57786bb46e03',
     privateKey: '0x1800000000300000180000000000030000000000003006001800006600',
