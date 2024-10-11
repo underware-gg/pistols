@@ -244,6 +244,7 @@ mod tests {
         assert(round.final_step == 1, 'round.final_step'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
+// '----'.print();
 // CONST::INITIAL_DAMAGE.print();
 // // (*start_state_a.chances).print();
 // // (*start_state_b.chances).print();

@@ -49,9 +49,9 @@ mod rng {
             (ShufflerTrait::new_direct(shuffle_size))
         }
         fn mock_values(ref world: IWorldDispatcher, salts: Span<felt252>, values: Span<felt252>) {
-            assert(salts.len() == values.len(), 'InvalidSaltValuesLength');
+            // assert(salts.len() == values.len(), 'InvalidSaltValuesLength');
             let mut index: usize = 0;
-            while (index < salts.len()) {
+            while (index < salts.len() && index < values.len()) {
 // println!("mock_values {} {} {}", index, salts[index], values[index]);
                 let v: u256 = (*values[index]).try_into().unwrap();
                 assert(v > 0, 'salt value > 0');

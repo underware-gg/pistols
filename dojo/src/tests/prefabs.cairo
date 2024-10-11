@@ -38,7 +38,7 @@ mod prefabs {
     const SALT_B: felt252 = 0xf9a978e92309da78;
 
     // from EnvCard::get_full_deck()
-    const ENV_CARD_NEUTRAL: felt252 = 34;   // EnvCard::SpecialNoTactics
+    const ENV_CARD_NEUTRAL: felt252 = 33;   // EnvCard::SpecialDoubleTactics
     const ENV_CARD_MISS: felt252 = 8;       // EnvCard::DamageDown
     const ENV_CARD_CRIT: felt252 = 25;      // EnvCard::DoubleDamageUp
 

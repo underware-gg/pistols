@@ -72,6 +72,7 @@ mod tests {
     // pistols
     mod test_admin;
     mod test_cards;
+    mod test_env_cards;
     mod test_challenge;
     mod test_chances;
     mod test_duel;
