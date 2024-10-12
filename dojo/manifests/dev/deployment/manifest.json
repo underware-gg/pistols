@@ -1730,8 +1730,8 @@
     {
       "kind": "DojoContract",
       "address": "0x5abf185326235d4e6c1f32aae1092616a7fbf25beb9169316ba76c5309cf7aa",
-      "class_hash": "0x3f07a5354d58fb79bdfc6d540588f338fea31bb5d04142b211759d5f635dc15",
-      "original_class_hash": "0x3f07a5354d58fb79bdfc6d540588f338fea31bb5d04142b211759d5f635dc15",
+      "class_hash": "0x6730cb95389276478cdd6938c0589a402cbb1617eb97311efe07db31741a899",
+      "original_class_hash": "0x6730cb95389276478cdd6938c0589a402cbb1617eb97311efe07db31741a899",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -1885,6 +1885,14 @@
                 {
                   "name": "treasury_contract",
                   "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "fee_contract",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "fee_amount",
+                  "type": "core::integer::u128"
                 }
               ],
               "outputs": [],
@@ -1896,20 +1904,6 @@
           "type": "impl",
           "name": "DuelistTokenPublicImpl",
           "interface_name": "pistols::systems::duelist_token::IDuelistTokenPublic"
-        },
-        {
-          "type": "struct",
-          "name": "core::integer::u256",
-          "members": [
-            {
-              "name": "low",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "high",
-              "type": "core::integer::u128"
-            }
-          ]
         },
         {
           "type": "enum",
@@ -2029,22 +2023,6 @@
           "items": [
             {
               "type": "function",
-              "name": "calc_price",
-              "inputs": [
-                {
-                  "name": "recipient",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::integer::u256"
-                }
-              ],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
               "name": "create_duelist",
               "inputs": [
                 {
@@ -2119,8 +2097,49 @@
         },
         {
           "type": "impl",
+          "name": "TokenComponentPublicImpl",
+          "interface_name": "pistols::systems::duelist_token::ITokenComponentPublic"
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::duelist_token::ITokenComponentPublic",
+          "items": [
+            {
+              "type": "function",
+              "name": "calc_price",
+              "inputs": [
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "(core::starknet::contract_address::ContractAddress, core::integer::u128)"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
           "name": "TokenRendererImpl",
           "interface_name": "pistols::interfaces::itoken::ITokenRenderer"
+        },
+        {
+          "type": "struct",
+          "name": "core::integer::u256",
+          "members": [
+            {
+              "name": "low",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "high",
+              "type": "core::integer::u128"
+            }
+          ]
         },
         {
           "type": "struct",
@@ -3084,7 +3103,9 @@
       "init_calldata": [
         "0x0",
         "0x0",
-        "0x0"
+        "0x0",
+        "$contract_address:pistols-lords_mock",
+        "100000000000000000000"
       ],
       "tag": "pistols-duelist_token",
       "systems": [
@@ -16807,10 +16828,20 @@
           "name": "treasury_contract",
           "type": "ContractAddress",
           "key": false
+        },
+        {
+          "name": "fee_contract",
+          "type": "ContractAddress",
+          "key": false
+        },
+        {
+          "name": "fee_amount",
+          "type": "u128",
+          "key": false
         }
       ],
-      "class_hash": "0x56311a8bd5e06da47daf8d5e00fcbbb96936c82f481bc20be2165120bc65674",
-      "original_class_hash": "0x56311a8bd5e06da47daf8d5e00fcbbb96936c82f481bc20be2165120bc65674",
+      "class_hash": "0x4bd729820df1f820ed7ad73991943641534c27fbde809939b3727cafaf20774",
+      "original_class_hash": "0x4bd729820df1f820ed7ad73991943641534c27fbde809939b3727cafaf20774",
       "abi": [
         {
           "type": "impl",
@@ -17198,6 +17229,14 @@
             {
               "name": "treasury_contract",
               "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "fee_contract",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "fee_amount",
+              "type": "core::integer::u128"
             }
           ]
         },

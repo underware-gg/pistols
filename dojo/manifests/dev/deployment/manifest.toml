@@ -53,8 +53,8 @@ manifest_name = "pistols-admin-36fd2037"
 [[contracts]]
 kind = "DojoContract"
 address = "0x5abf185326235d4e6c1f32aae1092616a7fbf25beb9169316ba76c5309cf7aa"
-class_hash = "0x3f07a5354d58fb79bdfc6d540588f338fea31bb5d04142b211759d5f635dc15"
-original_class_hash = "0x3f07a5354d58fb79bdfc6d540588f338fea31bb5d04142b211759d5f635dc15"
+class_hash = "0x6730cb95389276478cdd6938c0589a402cbb1617eb97311efe07db31741a899"
+original_class_hash = "0x6730cb95389276478cdd6938c0589a402cbb1617eb97311efe07db31741a899"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/dev/deployment/abis/contracts/pistols-duelist_token-45c96d20.json"
 reads = []
@@ -78,6 +78,8 @@ init_calldata = [
     "0x0",
     "0x0",
     "0x0",
+    "$contract_address:pistols-lords_mock",
+    "100000000000000000000",
 ]
 tag = "pistols-duelist_token"
 systems = ["delete_duelist"]
@@ -903,8 +905,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x56311a8bd5e06da47daf8d5e00fcbbb96936c82f481bc20be2165120bc65674"
-original_class_hash = "0x56311a8bd5e06da47daf8d5e00fcbbb96936c82f481bc20be2165120bc65674"
+class_hash = "0x4bd729820df1f820ed7ad73991943641534c27fbde809939b3727cafaf20774"
+original_class_hash = "0x4bd729820df1f820ed7ad73991943641534c27fbde809939b3727cafaf20774"
 abi = "manifests/dev/deployment/abis/models/pistols-TokenConfig-56ebd338.json"
 tag = "pistols-TokenConfig"
 qualified_path = "pistols::models::token_config::token_config"
@@ -928,6 +930,16 @@ key = false
 [[models.members]]
 name = "treasury_contract"
 type = "ContractAddress"
+key = false
+
+[[models.members]]
+name = "fee_contract"
+type = "ContractAddress"
+key = false
+
+[[models.members]]
+name = "fee_amount"
+type = "u128"
 key = false
 
 [[models]]

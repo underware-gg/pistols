@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x56311a8bd5e06da47daf8d5e00fcbbb96936c82f481bc20be2165120bc65674"
-original_class_hash = "0x56311a8bd5e06da47daf8d5e00fcbbb96936c82f481bc20be2165120bc65674"
+class_hash = "0x4bd729820df1f820ed7ad73991943641534c27fbde809939b3727cafaf20774"
+original_class_hash = "0x4bd729820df1f820ed7ad73991943641534c27fbde809939b3727cafaf20774"
 abi = "manifests/dev/base/abis/models/pistols-TokenConfig-56ebd338.json"
 tag = "pistols-TokenConfig"
 qualified_path = "pistols::models::token_config::token_config"
@@ -24,4 +24,14 @@ key = false
 [[members]]
 name = "treasury_contract"
 type = "ContractAddress"
+key = false
+
+[[members]]
+name = "fee_contract"
+type = "ContractAddress"
+key = false
+
+[[members]]
+name = "fee_amount"
+type = "u128"
 key = false

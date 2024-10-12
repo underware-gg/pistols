@@ -150,6 +150,14 @@
           {
             "name": "treasury_contract",
             "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "fee_contract",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "fee_amount",
+            "type": "core::integer::u128"
           }
         ],
         "outputs": [],
@@ -161,20 +169,6 @@
     "type": "impl",
     "name": "DuelistTokenPublicImpl",
     "interface_name": "pistols::systems::duelist_token::IDuelistTokenPublic"
-  },
-  {
-    "type": "struct",
-    "name": "core::integer::u256",
-    "members": [
-      {
-        "name": "low",
-        "type": "core::integer::u128"
-      },
-      {
-        "name": "high",
-        "type": "core::integer::u128"
-      }
-    ]
   },
   {
     "type": "enum",
@@ -294,22 +288,6 @@
     "items": [
       {
         "type": "function",
-        "name": "calc_price",
-        "inputs": [
-          {
-            "name": "recipient",
-            "type": "core::starknet::contract_address::ContractAddress"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "core::integer::u256"
-          }
-        ],
-        "state_mutability": "external"
-      },
-      {
-        "type": "function",
         "name": "create_duelist",
         "inputs": [
           {
@@ -384,8 +362,49 @@
   },
   {
     "type": "impl",
+    "name": "TokenComponentPublicImpl",
+    "interface_name": "pistols::systems::duelist_token::ITokenComponentPublic"
+  },
+  {
+    "type": "interface",
+    "name": "pistols::systems::duelist_token::ITokenComponentPublic",
+    "items": [
+      {
+        "type": "function",
+        "name": "calc_price",
+        "inputs": [
+          {
+            "name": "recipient",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "(core::starknet::contract_address::ContractAddress, core::integer::u128)"
+          }
+        ],
+        "state_mutability": "view"
+      }
+    ]
+  },
+  {
+    "type": "impl",
     "name": "TokenRendererImpl",
     "interface_name": "pistols::interfaces::itoken::ITokenRenderer"
+  },
+  {
+    "type": "struct",
+    "name": "core::integer::u256",
+    "members": [
+      {
+        "name": "low",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "high",
+        "type": "core::integer::u128"
+      }
+    ]
   },
   {
     "type": "struct",
