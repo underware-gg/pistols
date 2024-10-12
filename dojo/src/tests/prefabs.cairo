@@ -32,7 +32,7 @@ mod prefabs {
     const MESSAGE: felt252 = 'For honour!!!';
     const TABLE_ID: felt252 = TABLES::COMMONERS;
     const WAGER_VALUE: u128 = 0;
-    // const WAGER_VALUE: u128 = 100_000_000_000_000_000_000;
+    // const WAGER_VALUE: u128 = 20_000_000_000_000_000_000;
 
     const SALT_A: felt252 = 0xa6f099b756a87e62;
     const SALT_B: felt252 = 0xf9a978e92309da78;

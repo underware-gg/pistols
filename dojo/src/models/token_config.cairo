@@ -9,6 +9,8 @@ pub struct TokenConfig {
     pub minter_contract: ContractAddress,
     pub renderer_contract: ContractAddress,
     pub treasury_contract: ContractAddress,
+    pub fee_contract: ContractAddress,
+    pub fee_amount: u128,
 }
 
 

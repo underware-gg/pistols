@@ -141,9 +141,8 @@ mod tester {
         let approve: bool = (flags & FLAGS::APPROVE) != 0;
 
         deploy_game = deploy_game || approve;
-        deploy_lords = deploy_lords || deploy_game || approve;
-        deploy_admin = deploy_admin || deploy_game || deploy_game;
-        // deploy_duelist = deploy_duelist || deploy_game;
+        deploy_admin = deploy_admin || deploy_game;
+        deploy_lords = deploy_lords || deploy_game || approve || deploy_duelist;
 
         // setup testing
         testing::set_block_number(1);
@@ -203,7 +202,7 @@ mod tester {
             }
             else {ZERO()}
         };
-// '---- 2'.print();
+'---- 2'.print();
         let duelists = IDuelistTokenDispatcher{ contract_address:
             if (deploy_duelist) {
                 let address = deploy_system(world, 'duelist_token', duelist_token::TEST_CLASS_HASH);
@@ -212,7 +211,12 @@ mod tester {
                 world.grant_writer(SELECTORS::DUELIST_TOKEN, OWNER());
                 world.grant_writer(selector_from_tag!("pistols-TokenConfig"), address);
                 world.grant_writer(selector_from_tag!("pistols-Duelist"), address);
-                world.init_contract(SELECTORS::DUELIST_TOKEN, [0, 0, 0].span());
+                let duelists_call_data: Span<felt252> = array![
+                    0, 0, 0,
+                    lords.contract_address.into(),
+                    100_000_000_000_000_000_000, // 100 Lords
+                ].span();
+                world.init_contract(SELECTORS::DUELIST_TOKEN, duelists_call_data);
                 (address)
             }
             else if (deploy_game) {
@@ -224,16 +228,16 @@ mod tester {
         let admin = IAdminDispatcher{ contract_address:
             if (deploy_admin) {
                 let address = deploy_system(world, 'admin', admin::TEST_CLASS_HASH);
-                let admin_call_data: Array<felt252> = array![
+                let admin_call_data: Span<felt252> = array![
                     TREASURY().into(), // treasury
                     lords.contract_address.into(),
-                ];
+                ].span();
                 world.grant_owner(SELECTORS::ADMIN, OWNER());
                 world.grant_writer(selector_from_tag!("pistols-Config"), address);
                 world.grant_writer(selector_from_tag!("pistols-TableConfig"), address);
                 world.grant_writer(selector_from_tag!("pistols-TableWager"), address);
                 world.grant_writer(selector_from_tag!("pistols-TableAdmittance"), address);
-                world.init_contract(SELECTORS::ADMIN, admin_call_data.span());
+                world.init_contract(SELECTORS::ADMIN, admin_call_data);
                 (address)
             }
             else {ZERO()}

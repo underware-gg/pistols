@@ -357,8 +357,6 @@ mod tests {
             [ENV_SPECIAL_NO_TACTICS, ENV_SPECIAL_DOUBLE_TACTICS].span(),
             [60, 60].span(),
         );
-round.state_a.damage.print();
-round.state_b.damage.print();
         assert(round.state_a.damage == CONST::INITIAL_DAMAGE + 2, 'state_a.damage');
         assert(round.state_b.damage == CONST::INITIAL_DAMAGE + 2, 'state_b.damage');
     }
@@ -384,8 +382,6 @@ round.state_b.damage.print();
             [ENV_SPECIAL_DOUBLE_TACTICS, ENV_SPECIAL_NO_TACTICS].span(),
             [60, 60].span(),
         );
-round.state_a.damage.print();
-round.state_b.damage.print();
         assert(round.state_a.damage == CONST::INITIAL_DAMAGE, 'state_a.damage');
         assert(round.state_b.damage == CONST::INITIAL_DAMAGE, 'state_b.damage');
     }

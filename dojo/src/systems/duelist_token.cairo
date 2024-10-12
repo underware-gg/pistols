@@ -74,10 +74,6 @@ trait IDuelistToken<TState> {
 
 #[starknet::interface]
 trait IDuelistTokenPublic<TState> {
-    fn calc_price(
-        ref self: TState,
-        recipient: ContractAddress,
-    ) -> u256;
     fn create_duelist(
         ref self: TState,
         recipient: ContractAddress,
@@ -99,6 +95,18 @@ trait IDuelistTokenPublic<TState> {
     );
 }
 
+#[starknet::interface]
+trait ITokenComponentPublic<TState> {
+    fn calc_price(
+        self: @TState,
+        recipient: ContractAddress,
+    ) -> (ContractAddress, u128);
+}
+
+#[starknet::interface]
+trait ITokenComponentInternal<TState> {
+}
+
 #[dojo::contract]
 mod duelist_token {    
     // use debug::PrintTrait;
@@ -117,7 +125,7 @@ mod duelist_token {
         table::{TABLES},
     };
 
-    use pistols::utils::misc::{CONSUME_BYTE_ARRAY, WORLD};
+    use pistols::utils::misc::{CONSUME_BYTE_ARRAY, WORLD, ZERO};
     use pistols::utils::byte_arrays::{ByteArraysTrait, U8IntoByteArray, U16IntoByteArray, U32IntoByteArray, U256IntoByteArray, ByteArraySpanIntoByteArray};
     use pistols::utils::short_string::ShortStringTrait;
     use pistols::libs::store::{Store, StoreTrait};
@@ -239,8 +247,7 @@ mod duelist_token {
     //*******************************
     const TOKEN_NAME: felt252 = 'Pistols at 10 Blocks Duelists';
     const TOKEN_SYMBOL: felt252 = 'DUELIST';
-    const BASE_URI: felt252 = 'https://pistols.underware.gg/';
-    const TOKEN_PRICE: u256 = (0 * CONST::ETH_TO_WEI);
+    const BASE_URI: felt252 = 'https://pistols.underware.gg';
     //*******************************
 
     fn dojo_init(
@@ -248,6 +255,8 @@ mod duelist_token {
         minter_contract: ContractAddress,
         renderer_contract: ContractAddress,
         treasury_contract: ContractAddress,
+        fee_contract: ContractAddress,
+        fee_amount: u128,
     ) {
         self.erc721_metadata.initialize(
             TOKEN_NAME.string(),
@@ -263,6 +272,8 @@ mod duelist_token {
             minter_contract,
             renderer_contract,
             treasury_contract,
+            fee_contract,
+            fee_amount,
         };
         store.set_token_config(@token_config);
     }
@@ -292,17 +303,6 @@ mod duelist_token {
     use super::{IDuelistTokenPublic};
     #[abi(embed_v0)]
     impl DuelistTokenPublicImpl of IDuelistTokenPublic<ContractState> {
-        fn calc_price(
-            ref self: ContractState,
-            recipient: ContractAddress,
-        ) -> u256 {
-            if (self.balance_of(recipient) == 0) {
-                (0)
-            } else {
-                (TOKEN_PRICE)
-            }
-        }
-
         fn create_duelist(ref self: ContractState,
             recipient: ContractAddress,
             name: felt252,
@@ -318,8 +318,8 @@ mod duelist_token {
             assert(token_config.is_minter(caller), Errors::CALLER_IS_NOT_MINTER);
 
             // transfer mint fee
-            let price = self.calc_price(recipient);
-            if (price > 0) {
+            let (_fee_contract, fee_amount): (ContractAddress, u128) = self.calc_price(recipient);
+            if (fee_amount > 0) {
                 assert(false, Errors::TRANSFER_FAILED);
             }
 
@@ -333,7 +333,7 @@ mod duelist_token {
                 timestamp: get_block_timestamp(),
                 name,
                 profile_pic_type,
-                profile_pic_uri: profile_pic_uri.to_byte_array(),
+                profile_pic_uri: profile_pic_uri.string(),
                 score: Default::default(),
             };
             match initial_archetype {
@@ -368,7 +368,7 @@ mod duelist_token {
             // update
             duelist.name = name;
             duelist.profile_pic_type = profile_pic_type;
-            duelist.profile_pic_uri = profile_pic_uri.to_byte_array();
+            duelist.profile_pic_uri = profile_pic_uri.string();
             // save
             store.set_duelist(@duelist);
 
@@ -382,6 +382,23 @@ mod duelist_token {
         }
     }
 
+    use super::{ITokenComponentPublic};
+    #[abi(embed_v0)]
+    impl TokenComponentPublicImpl of ITokenComponentPublic<ContractState> {
+        fn calc_price(
+            self: @ContractState,
+            recipient: ContractAddress,
+        ) -> (ContractAddress, u128) {
+            if (self.balance_of(recipient) == 0) {
+                (ZERO(), 0)
+            } else {
+                let store = StoreTrait::new(self.world());
+                let token_config: TokenConfig = store.get_token_config(get_contract_address());
+                (token_config.fee_contract, token_config.fee_amount)
+            }
+        }
+    }
+
     //-----------------------------------
     // Private
     //
@@ -389,7 +406,7 @@ mod duelist_token {
     #[abi(embed_v0)]
     impl TokenRendererImpl of ITokenRenderer<ContractState> {
         fn format_name(self: @ContractState, token_id: u256, duelist: Duelist) -> ByteArray {
-            let name: ByteArray = if (duelist.name != '') { duelist.name.to_byte_array() } else { "Duelist" };
+            let name: ByteArray = if (duelist.name != '') { duelist.name.string() } else { "Duelist" };
             (format!("{} #{}", name, token_id))
         }
         
