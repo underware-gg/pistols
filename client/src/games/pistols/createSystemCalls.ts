@@ -42,11 +42,6 @@ const duelist_token_call = (entrypoint: string, calldata: any[]) => ({
   entrypoint,
   calldata,
 })
-const minter_call = (entrypoint: string, calldata: any[]) => ({
-  contractName: 'minter',
-  entrypoint,
-  calldata,
-})
 
 export function createSystemCalls(
   components: ClientComponents,
@@ -96,16 +91,6 @@ export function createSystemCalls(
     } finally {
     }
     return results as T
-  }
-
-  const create_duelist = async (signer: AccountInterface, name: string, profile_pic_type: ProfilePicType, profile_pic_uri: string, archetype: Archetype): Promise<boolean> => {
-    const args = [stringToFelt(name), getProfilePicTypeValue(profile_pic_type), stringToFelt(profile_pic_uri), getArchetypeValue(archetype)]
-    return await _executeTransaction(signer, game_call('create_duelist', args))
-  }
-
-  const update_duelist = async (signer: AccountInterface, duelist_id: BigNumberish, name: string, profile_pic_type: ProfilePicType, profile_pic_uri: string): Promise<boolean> => {
-    const args = [duelist_id, stringToFelt(name), getProfilePicTypeValue(profile_pic_type), stringToFelt(profile_pic_uri)]
-    return await _executeTransaction(signer, game_call('update_duelist', args))
   }
 
   const create_challenge = async (signer: AccountInterface, duelist_id: BigNumberish, challenged_id_or_address: BigNumberish, premise: Premise, quote: string, table_id: string, wager_value: BigNumberish, expire_hours: number): Promise<boolean> => {
@@ -177,6 +162,25 @@ export function createSystemCalls(
     const args = [duelist_id, duel_id, round_number, salt, moves]
     return await _executeTransaction(signer, game_call('reveal_moves', args))
   }
+
+  //
+  // Duelist token
+  //
+
+  const create_duelist = async (signer: AccountInterface, recipient: BigNumberish, name: string, profile_pic_type: ProfilePicType, profile_pic_uri: string, archetype: Archetype): Promise<boolean> => {
+    const args = [recipient, stringToFelt(name), getProfilePicTypeValue(profile_pic_type), stringToFelt(profile_pic_uri), getArchetypeValue(archetype)]
+    return await _executeTransaction(signer, duelist_token_call('create_duelist', args))
+  }
+
+  const update_duelist = async (signer: AccountInterface, duelist_id: BigNumberish, name: string, profile_pic_type: ProfilePicType, profile_pic_uri: string): Promise<boolean> => {
+    const args = [duelist_id, stringToFelt(name), getProfilePicTypeValue(profile_pic_type), stringToFelt(profile_pic_uri)]
+    return await _executeTransaction(signer, duelist_token_call('update_duelist', args))
+  }
+
+
+  //
+  // Admin
+  //
 
   const grant_admin = async (signer: AccountInterface, address: BigNumberish, granted: boolean): Promise<boolean> => {
     const args = [address, granted]
@@ -256,9 +260,13 @@ export function createSystemCalls(
     return results.map((vo: BigNumberish[]) => vo.map((vi: BigNumberish) => Number(vi)))
   }
 
-  const can_mint = async (to: BigNumberish, token_address: BigNumberish): Promise<boolean | null> => {
-    const args = [to, token_address]
-    const results = await _executeCall<boolean>(minter_call('can_mint', args))
+  //
+  // duelist_token
+  //
+
+  const calc_price = async (recipient: BigNumberish): Promise<boolean | null> => {
+    const args = [recipient]
+    const results = await _executeCall<boolean>(duelist_token_call('calc_price', args))
     return results ?? null
   }
 
@@ -267,6 +275,10 @@ export function createSystemCalls(
     const results = await _executeCall<string>(duelist_token_call('token_uri', args))
     return results ?? null
   }
+
+  //
+  // admin
+  //
 
   const admin_am_i_admin = async (account_address: BigNumberish): Promise<string | null> => {
     const args = [account_address]
@@ -304,7 +316,7 @@ export function createSystemCalls(
     get_player_card_decks,
     //
     // DUELISTS
-    can_mint,
+    calc_price,
     duelist_token_uri,
     //
     // ADMIN

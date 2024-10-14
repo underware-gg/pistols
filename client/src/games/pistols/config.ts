@@ -33,7 +33,13 @@ export const makeDojoAppConfig = (): DojoAppConfig => {
     nameSpace: 'pistols',
     contractInterfaces: {
       game: ['IGame'],
-      lords_mock: ['ILordsMockFaucet', 'IERC20Allowance'],
+      duelist_token: [
+        'IDuelistTokenPublic',
+      ],
+      lords_mock: [
+        'ILordsMockFaucet',
+        // 'IERC20Allowance',
+      ],
       admin: ['IAdmin'],
     },
   }

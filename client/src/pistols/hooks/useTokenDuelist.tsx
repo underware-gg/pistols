@@ -78,24 +78,28 @@ export const useDuelistIndexOfOwner = (address: BigNumberish, token_id: BigNumbe
 }
 
 
-export const useCanMintDuelist = (address: BigNumberish) => {
-  const [canMint, setCanMint] = useState<boolean>()
-  const { contractAddress } = useTokenContract()
+export const useDuelistCalcPrice = (address: BigNumberish) => {
+  const [tokenAddress, setTokenAddress] = useState<boolean>()
+  const [amount, setAmount] = useState<boolean>()
   const { duelistBalance } = useDuelistBalanceOf(address)
-  const { can_mint } = useDojoSystemCalls()
+  const { calc_price } = useDojoSystemCalls()
   useEffect(() => {
-    if (address && contractAddress && can_mint) {
-      can_mint(BigInt(address), BigInt(contractAddress)).then(v => {
-        setCanMint(v)
+    if (address && calc_price) {
+      calc_price(BigInt(address)).then(v => {
+        setTokenAddress(v[0])
+        setAmount(v[1])
       }).catch(e => {
-        setCanMint(false)
+        setTokenAddress(undefined)
+        setAmount(undefined)
       })
     } else {
-      setCanMint(false)
+      setTokenAddress(undefined)
+      setAmount(undefined)
     }
-  }, [address, contractAddress, duelistBalance, can_mint])
+  }, [address, duelistBalance, calc_price])
   return {
-    canMint,
+    tokenAddress,
+    amount,
   }
 }
 

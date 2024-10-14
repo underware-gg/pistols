@@ -88,7 +88,7 @@ export default function DuelistEditModal({
     if (canSubmit) {
       if (mintNew) {
         setLastDuelistIdBeforeMint(lastDuelistId ?? 0n)
-        create_duelist(account, inputName, ProfilePicType.Duelist, _profilePic.toString(), inputArchetype)
+        create_duelist(account, address, inputName, ProfilePicType.Duelist, _profilePic.toString(), inputArchetype)
       } else {
         update_duelist(account, editingDuelistId, inputName, ProfilePicType.Duelist, _profilePic.toString())
       }

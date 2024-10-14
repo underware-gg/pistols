@@ -3,7 +3,7 @@ import { Grid, Tab } from 'semantic-ui-react'
 import { RowDivider, VStack } from '@/lib/ui/Stack'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useCanMintDuelist } from '@/pistols/hooks/useTokenDuelist'
+import { useDuelistCalcPrice } from '@/pistols/hooks/useTokenDuelist'
 import { useDuelistBalanceOf, useDuelistOfOwnerByIndex } from '@/pistols/hooks/useTokenDuelist'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
@@ -101,7 +101,7 @@ function DuelistsList() {
   const { duelistEditOpener } = usePistolsContext()
   const { dispatchSetScene } = usePistolsScene()
   const { duelistBalance } = useDuelistBalanceOf(address)
-  const { canMint } = useCanMintDuelist(address)
+  const { amount } = useDuelistCalcPrice(address)
 
   const _mintDuelist = () => {
     duelistEditOpener.open({ mintNew: true })
@@ -142,7 +142,7 @@ function DuelistsList() {
       <Divider />
       <ActionButton fill important disabled={!duelistId} onClick={() => _goToTavern()} label={!duelistId ? 'Select A Duelist' : 'Enter The Tavern'} />
       <Divider content={'OR'} />
-      <ActionButton fill disabled={!canMint} onClick={() => _mintDuelist()} label='Create New Duelist' />
+      <ActionButton fill disabled={false} onClick={() => _mintDuelist()} label='Create New Duelist' />
     </VStack>
   )
 }
