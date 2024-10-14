@@ -18,6 +18,6 @@ default = "pistols"
 [env]
 chain_id = "WP_PISTOLS_STAGING"
 rpc_url = "https://api.cartridge.gg/x/pistols-staging/katana"
-account_address = "0x16a035c3fd968b5075b86092ac044b5437109cba4f34fcd0c0ccdfa7b0deae"
-private_key = "0x3bb2fc60e41c5137ae700c9fbfd1c4b53463cc899eb94421719a308196b214"
+account_address = "0x9dce42a35cd13e599b35eb3c044658e378755f99e8e60fcd2c07b7551180f5"
+private_key = "0x76ba22d3b0daaed7b9aea40ce7dff297e73aab9a70d4e2359ea8d3298a4b4dc"
 world_address = "0x55fefc4a4e5c94def16d25bd1afa87407d114600560f75100f3edc8d5eaced6"

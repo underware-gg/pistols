@@ -1,6 +1,6 @@
 kind = "DojoContract"
-class_hash = "0x3f07a5354d58fb79bdfc6d540588f338fea31bb5d04142b211759d5f635dc15"
-original_class_hash = "0x3f07a5354d58fb79bdfc6d540588f338fea31bb5d04142b211759d5f635dc15"
+class_hash = "0x30225f73b001b727b4d0d61b8e3f969b1807d98fb0c0ba7ad8e9305d48ae030"
+original_class_hash = "0x30225f73b001b727b4d0d61b8e3f969b1807d98fb0c0ba7ad8e9305d48ae030"
 base_class_hash = "0x0"
 abi = "manifests/staging/base/abis/contracts/pistols-duelist_token-45c96d20.json"
 reads = []

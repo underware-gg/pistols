@@ -4,7 +4,7 @@ class_hash = "0x6f4515274ee23404789c3351a77107d0ec07508530119822046600ca6948d6e"
 original_class_hash = "0x6f4515274ee23404789c3351a77107d0ec07508530119822046600ca6948d6e"
 abi = "manifests/staging/deployment/abis/dojo-world.json"
 address = "0x55fefc4a4e5c94def16d25bd1afa87407d114600560f75100f3edc8d5eaced6"
-transaction_hash = "0x4b76ab23e8d3546afcda70fa382da9cabe47683005d83c362cb7ff64e1fb999"
+transaction_hash = "0x5381be58eab23094d0989f1ca22bd1b6ceb8104e589c0589042bbd1e20df103"
 block_number = 3
 seed = "pistols"
 manifest_name = "dojo-world"
@@ -53,8 +53,8 @@ manifest_name = "pistols-admin-36fd2037"
 [[contracts]]
 kind = "DojoContract"
 address = "0x5abf185326235d4e6c1f32aae1092616a7fbf25beb9169316ba76c5309cf7aa"
-class_hash = "0x3f07a5354d58fb79bdfc6d540588f338fea31bb5d04142b211759d5f635dc15"
-original_class_hash = "0x3f07a5354d58fb79bdfc6d540588f338fea31bb5d04142b211759d5f635dc15"
+class_hash = "0x30225f73b001b727b4d0d61b8e3f969b1807d98fb0c0ba7ad8e9305d48ae030"
+original_class_hash = "0x30225f73b001b727b4d0d61b8e3f969b1807d98fb0c0ba7ad8e9305d48ae030"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/staging/deployment/abis/contracts/pistols-duelist_token-45c96d20.json"
 reads = []
@@ -78,6 +78,8 @@ init_calldata = [
     "0x0",
     "0x0",
     "0x0",
+    "$contract_address:pistols-lords_mock",
+    "0",
 ]
 tag = "pistols-duelist_token"
 systems = ["delete_duelist"]
@@ -903,8 +905,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x56311a8bd5e06da47daf8d5e00fcbbb96936c82f481bc20be2165120bc65674"
-original_class_hash = "0x56311a8bd5e06da47daf8d5e00fcbbb96936c82f481bc20be2165120bc65674"
+class_hash = "0x4bd729820df1f820ed7ad73991943641534c27fbde809939b3727cafaf20774"
+original_class_hash = "0x4bd729820df1f820ed7ad73991943641534c27fbde809939b3727cafaf20774"
 abi = "manifests/staging/deployment/abis/models/pistols-TokenConfig-56ebd338.json"
 tag = "pistols-TokenConfig"
 qualified_path = "pistols::models::token_config::token_config"
@@ -928,6 +930,16 @@ key = false
 [[models.members]]
 name = "treasury_contract"
 type = "ContractAddress"
+key = false
+
+[[models.members]]
+name = "fee_contract"
+type = "ContractAddress"
+key = false
+
+[[models.members]]
+name = "fee_amount"
+type = "u128"
 key = false
 
 [[models]]
