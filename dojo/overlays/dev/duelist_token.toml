@@ -20,5 +20,6 @@ init_calldata = [
   "0x0", # renderer_contract
   "0x0", # treasury_contract
   "$contract_address:pistols-lords_mock", # fee_contract
-  "100000000000000000000", # fee_amount: 100 LORDS
+  # "100000000000000000000", # fee_amount: 100 LORDS
+  "0", # fee_amount
 ]
