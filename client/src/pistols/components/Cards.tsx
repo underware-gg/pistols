@@ -863,16 +863,12 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
   return (
     <>
       {cardBackgroundRefs.map(({ type, ref }, index) => (
-        <>
-          <div className='card' ref={ref}>
+          <div className='card' ref={ref} key={`background-${index}`}>
             <div className='card-outline'/>
           </div>
-        </>
       ))}
 
       {cardRefs.current.map(({ type, ref }, index) => (
-        
-        <>
           <Card
             key={index}
             ref={ref}
@@ -886,7 +882,6 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
             onHover={(isHovered) => handleCardHover(isHovered, type)}
             onClick={(e) => handleCardClick(type, e)}
           />
-        </>
       ))}
     </>
   )
@@ -1292,12 +1287,10 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
   return (
     <>
 
-      {cards.map((card) => (
-        <>
-          <div className='card' ref={card.background}>
+      {cards.map((card, index) => (
+          <div className='card' ref={card.background} key={`card-${index}`}>
             <div className='card-outline'/>
           </div>
-        </>
       ))}
 
       {cards.map((card) => (
@@ -1316,9 +1309,7 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
       ))}
 
       {emptyCards.map((card, index) => (
-        <>
-          <div id='dashed-outline' className={expanded && drawnCardsCount < (index + 1) ? 'visible' : ''} ref={card} />
-        </>
+        <div id='dashed-outline' className={expanded && drawnCardsCount < (index + 1) ? 'visible' : ''} ref={card} key={`empty-card-${index}`} />
       ))}
     </>
   );
