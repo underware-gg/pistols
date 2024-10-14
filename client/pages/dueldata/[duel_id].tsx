@@ -16,6 +16,7 @@ import { weiToEth } from '@/lib/utils/starknet'
 import { BladesIcon, PacesIcon } from '@/pistols/components/ui/PistolsIcon'
 import AppPistols from '@/pistols/components/AppPistols'
 import { EMOJI } from '@/pistols/data/messages'
+import { ENV_POINTS } from '@/games/pistols/generated/constants'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -38,7 +39,7 @@ function StatsLoader() {
   const { duel_id } = router.query
 
   return (
-    <Container text>
+    <Container>
       {(isInitialized && duel_id)
         ? <Stats duelId={BigInt(duel_id as string)} />
         : <DojoStatus />
@@ -343,28 +344,40 @@ function _dice(dice: number) {
   return <>{EMOJI.DICE} {dice.toString()}</>
 }
 
+function _env_card_name(card: any) {
+  return (card ? ENV_POINTS[card]?.name : '-') ?? '-'
+}
+
 function StateRow({
   state_a,
   state_b,
   card_a,
   card_b,
+  specials_a,
+  specials_b,
 } : {
   state_a: any
   state_b: any
   card_a?: string
   card_b?: string
+  specials_a?: any
+  specials_b?: any
 }) {
   return (
     <Table attached>
       <Header fullWidth>
         <Row textAlign='center'>
           <HeaderCell><h5>{' '}</h5></HeaderCell>
-          {(card_a || card_b) && <HeaderCell><h5>Card</h5></HeaderCell>}
+          {(card_a || card_b) && <HeaderCell><h5>Card<br />Drawn</h5></HeaderCell>}
           <HeaderCell><h5>Dice</h5></HeaderCell>
           <HeaderCell><h5>Chances</h5></HeaderCell>
           <HeaderCell><h5>Damage</h5></HeaderCell>
           <HeaderCell><h5>Health</h5></HeaderCell>
           <HeaderCell><h5>Honour</h5></HeaderCell>
+          <HeaderCell><h5>Coin<br />Toss</h5></HeaderCell>
+          <HeaderCell><h5>Reversal</h5></HeaderCell>
+          <HeaderCell><h5>Shots<br />Mod</h5></HeaderCell>
+          <HeaderCell><h5>Tactics<br />Mod</h5></HeaderCell>
         </Row>
       </Header>
 
@@ -377,6 +390,10 @@ function StateRow({
           <Cell>{EMOJI.FIRE} {state_a.damage.toString()}</Cell>
           <Cell>{EMOJI.LIFE} {state_a.health.toString()}</Cell>
           <Cell>{EMOJI.HONOUR} {state_a.honour.toString()}</Cell>
+          <Cell>{specials_a?.coin_toss ? 'Yes' : '-'}</Cell>
+          <Cell>{specials_a?.reversal ? 'Yes' : '-'}</Cell>
+          <Cell>{_env_card_name(specials_a?.shots_modifier)}</Cell>
+          <Cell>{_env_card_name(specials_a?.tactics_modifier)}</Cell>
         </Row>
         <Row textAlign='center'>
           <Cell>Duelist B</Cell>
@@ -386,12 +403,15 @@ function StateRow({
           <Cell>{EMOJI.FIRE} {state_b.damage.toString()}</Cell>
           <Cell>{EMOJI.LIFE} {state_b.health.toString()}</Cell>
           <Cell>{EMOJI.HONOUR} {state_b.honour.toString()}</Cell>
+          <Cell>{specials_b?.coin_toss ? 'Yes' : '-'}</Cell>
+          <Cell>{specials_b?.reversal ? 'Yes' : '-'}</Cell>
+          <Cell>{_env_card_name(specials_b?.shots_modifier)}</Cell>
+          <Cell>{_env_card_name(specials_b?.tactics_modifier)}</Cell>
         </Row>
       </Body>
     </Table>
   )
 }
-
 
 
 //-----------------------------------
@@ -404,7 +424,6 @@ function DuelProgress({
   duelId: bigint
 }) {
   const duelProgress = useFinishedDuelProgress(duelId)
-  console.log('duelProgress', duelProgress)
   if (!duelProgress) return <></>
   return (
     <>
@@ -450,7 +469,7 @@ function DuelStep({
       <Table attached>
         <Header fullWidth>
           <Row>
-            <HeaderCell width={4}><h5 className='Important'>Step {index}</h5></HeaderCell>
+            <HeaderCell width={4}><h5 className='Important ModalText'>Step {index}</h5></HeaderCell>
             <HeaderCell><h5 className='Important'>{' '}</h5></HeaderCell>
           </Row>
         </Header>
@@ -465,7 +484,7 @@ function DuelStep({
           <Row>
             <Cell>Env Card</Cell>
             <Cell>
-              {step.card_env}
+              {_env_card_name(step.card_env)}
             </Cell>
           </Row>
           <Row>
@@ -477,7 +496,7 @@ function DuelStep({
         </Body>
       </Table>
 
-      <StateRow state_a={step.state_a} state_b={step.state_b} card_a={card_a} card_b={card_b} />
+      <StateRow state_a={step.state_a} state_b={step.state_b} card_a={card_a} card_b={card_b} specials_a={step.specials_a} specials_b={step.specials_b} />
 
     </>
   )

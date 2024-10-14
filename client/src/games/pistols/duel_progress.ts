@@ -7,53 +7,48 @@ const _get_variant = (variant: any): any => {
   return Object.keys(v)[0]
 }
 
+type DuelDrawnCard = {
+  fire: PacesCard;
+  dodge: PacesCard;
+  blades: BladesCard;
+}
+type DuelState = {
+  health: number;
+  damage: number;
+  chances: number;
+  dice_crit: number;
+  honour: number;
+  wager: number;
+  win: number;
+}
+type DuelSpecials = {
+  coin_toss: number;
+  reversal: number;
+  shots_modifier: EnvCard;
+  tactics_modifier: EnvCard;
+}
+type DuelHand = {
+  card_fire: PacesCard;
+  card_dodge: PacesCard;
+  card_tactics: TacticsCard;
+  card_blades: BladesCard;
+}
+
 export type DuelProgress = {
-    winner: number;
-    steps: {
-      pace: PacesCard;
-      card_env: EnvCard;
-      dice_env: number;
-      card_a: {
-        fire: PacesCard;
-        dodge: PacesCard;
-        blades: BladesCard;
-      };
-      card_b: {
-        fire: PacesCard;
-        dodge: PacesCard;
-        blades: BladesCard;
-      };
-      state_a: {
-        health: number;
-        damage: number;
-        chances: number;
-        dice_crit: number;
-        honour: number;
-        wager: number;
-        win: number;
-      };
-      state_b: {
-        health: number;
-        damage: number;
-        chances: number;
-        dice_crit: number;
-        honour: number;
-        wager: number;
-        win: number;
-      };
-    }[];
-    hand_a: {
-      card_fire: PacesCard;
-      card_dodge: PacesCard;
-      card_tactics: TacticsCard;
-      card_blades: BladesCard;
-    };
-    hand_b: {
-      card_fire: PacesCard;
-      card_dodge: PacesCard;
-      card_tactics: TacticsCard;
-      card_blades: BladesCard;
-    };
+  winner: number;
+  steps: {
+    pace: PacesCard;
+    card_env: EnvCard;
+    dice_env: number;
+    card_a: DuelDrawnCard
+    card_b: DuelDrawnCard
+    state_a: DuelState
+    state_b: DuelState
+    specials_a: DuelSpecials
+    specials_b: DuelSpecials
+  }[];
+  hand_a: DuelHand
+  hand_b: DuelHand
 }
 
 export const convert_duel_progress = (progress: any): DuelProgress | null => {
@@ -68,6 +63,15 @@ export const convert_duel_progress = (progress: any): DuelProgress | null => {
     }
   }
 
+  const _specials = (specials: any) => {
+    return {
+      coin_toss: specials.coin_toss,
+      reversal: specials.reversal,
+      shots_modifier: _get_variant(specials.shots_modifier.variant) as EnvCard,
+      tactics_modifier: _get_variant(specials.tactics_modifier.variant) as EnvCard,
+    }
+  }
+
   const _steps = (steps: any[]) => {
     return steps.map((step) => ({
       pace: _get_variant(step.pace.variant) as PacesCard,
@@ -77,6 +81,8 @@ export const convert_duel_progress = (progress: any): DuelProgress | null => {
       card_b: _drawn_card(step.card_b.variant),
       state_a: step.state_a,
       state_b: step.state_b,
+      specials_a: _specials(step.specials_a),
+      specials_b: _specials(step.specials_b),
     }))
   }
 
@@ -97,10 +103,10 @@ export const convert_duel_progress = (progress: any): DuelProgress | null => {
   }
 }
 
-    // pace: PacesCard,
-    // card_env: EnvCard,
-    // dice_env: u8,
-    // card_a: DuelistDrawnCard,
-    // card_b: DuelistDrawnCard,
-    // state_a: DuelistState,  // Duelist A current state
-    // state_b: DuelistState,  // Duelist A current state
+// pace: PacesCard,
+// card_env: EnvCard,
+// dice_env: u8,
+// card_a: DuelistDrawnCard,
+// card_b: DuelistDrawnCard,
+// state_a: DuelistState,  // Duelist A current state
+// state_b: DuelistState,  // Duelist A current state
