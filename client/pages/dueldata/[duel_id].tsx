@@ -258,6 +258,12 @@ function RoundStats({
               {round.state}: {RoundStateNames[round.state]}
             </Cell>
           </Row>
+          <Row>
+            <Cell>Final Step</Cell>
+            <Cell>
+              {round.final_step}
+            </Cell>
+          </Row>
         </Body>
       </Table>
 

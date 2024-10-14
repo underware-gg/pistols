@@ -36,12 +36,15 @@ export function useDuelIcons({
   const isTurn = useMemo(() => (isA ? turnA : isB ? turnB : false), [isA, isB, turnA, turnB])
   const completedStages = useMemo(() => (isA ? (completedStagesA) : isB ? (completedStagesB) : null), [isA, isB, completedStagesA, completedStagesB])
 
-  const health1 = useMemo(() => (
-    isFinished ? (state1?.health == 0 ? EMOJI.DEAD : state1?.damage > 0 ? EMOJI.INJURED : null) : null
+  const dead = useMemo(() => (
+    (isFinished && state1?.health == 0) ? EMOJI.DEAD : null
   ), [state1, isFinished])
-  const health1b = useMemo(() => (
-    health1 == EMOJI.INJURED && state1.damage > 1 ? EMOJI.INJURED : null
-  ), [health1])
+  const blood1 = useMemo(() => (
+    (isFinished && !dead && state1?.damage > 0) ? EMOJI.INJURED : null
+  ), [state1, isFinished, dead])
+  const blood2 = useMemo(() => (
+    (blood1 == EMOJI.INJURED && state1.damage > 1) ? EMOJI.INJURED : null
+  ), [state1, blood1])
   const win1 = useMemo(() => ((isWinner && roundNumber == 1) ? EMOJI.WINNER : null), [isWinner, roundNumber])
 
   const iconSize = size as IconSizeProp
@@ -86,8 +89,8 @@ export function useDuelIcons({
             </CompletedIcon>
           )
         }
-        if (health1) icons1.push(<EmojiIcon key='health1' emoji={health1} size={iconSize} />)
-        if (health1b) icons1.push(<EmojiIcon key='health1b' emoji={health1b} size={iconSize} />)
+        if (blood1) icons1.push(<EmojiIcon key='blood1' emoji={blood1} size={iconSize} />)
+        if (blood2) icons1.push(<EmojiIcon key='blood2' emoji={blood2} size={iconSize} />)
       }
       if (isTurn) {
         (icons2.length > 0 ? icons2 : icons1).push(<LoadingIcon key='isTurn' size={iconSize} className='Brightest' />)
@@ -102,25 +105,28 @@ export function useDuelIcons({
         const cardFire = getPacesCardFromValue(pacesFire)
         const cardDodge = getPacesCardFromValue(pacesDodge)
         if (pacesDodge <= pacesFire) {
-          icons1.push(<PacesIcon key='dodge' paces={cardDodge} size={iconSize} dodge/>)
+          icons1.push(<PacesIcon key='dodge' paces={cardDodge} size={iconSize} dodge />)
           icons1.push(<PacesIcon key='fire' paces={cardFire} size={iconSize} />)
         } else {
           icons1.push(<PacesIcon key='fire' paces={cardFire} size={iconSize} />)
           icons1.push(<PacesIcon key='dodge' paces={cardDodge} size={iconSize} dodge />)
         }
-        const cardBlades = getBladesCardFromValue(moves1.card_4)
-        if (cardBlades) {
-          icons1.push(<BladesIcon key='blades' blade={cardBlades} size={iconSize} />)
-        }
       }
 
-      if (health1) icons1.push(<EmojiIcon key='health1' emoji={health1} size={iconSize} />)
-      if (health1b) icons1.push(<EmojiIcon key='health1b' emoji={health1b} size={iconSize} />)
+      if (blood1) icons1.push(<EmojiIcon key='blood1' emoji={blood1} size={iconSize} />)
+      if (blood2) icons1.push(<EmojiIcon key='blood2' emoji={blood2} size={iconSize} />)
+
+      if (round1?.endedInBlades) {
+        const cardBlades = getBladesCardFromValue(moves1.card_4)
+        icons1.push(<BladesIcon key='blades' blade={cardBlades} size={iconSize} />)
+      }
+
+      if (dead) icons1.push(<EmojiIcon key='dead' emoji={dead} size={iconSize} />)
       if (win1) icons1.push(<EmojiIcon key='win1' emoji={win1} size={iconSize} />)
     }
 
     return { icons1, icons2, icons3 }
-  }, [isAwaiting, isInProgress, isFinished, duelStage, isA, isB, isTurn, state1, completedStages, health1, health1b, win1, iconSize])
+  }, [isAwaiting, isInProgress, isFinished, duelStage, isA, isB, isTurn, state1, completedStages, blood1, blood2, win1, dead, iconSize])
 
   return {
     icons1,
