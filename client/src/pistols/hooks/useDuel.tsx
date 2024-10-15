@@ -70,10 +70,6 @@ export const useDuel = (duelId: BigNumberish) => {
   const challenge = useChallenge(duelId)
   const round1 = useRound(duelId, 1)
 
-  // TODO: find out why this is updating every frame!
-  // useEffect(() => { console.log(`+challenge`) }, [challenge])
-  // useEffect(() => { console.log(`+round1:`) }, [round1])
-
   //
   // The actual stage of this duel
   const duelStage = useMemo(() => (round1 ? getRoundStateValue(round1.state) : DuelStage.Null), [round1])

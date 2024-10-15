@@ -8,16 +8,15 @@ import { isBigint, isPositiveBigint } from '@/lib/utils/types'
 import { DuelProgress } from '@/games/pistols/duel_progress'
 
 export const useCanJoin = () => {
-  const { address } = useAccount()
   const { can_join } = useDojoSystemCalls()
-  const args = useMemo(() => [BigInt(address ?? 0), BigInt(address ?? 0)], [address])
-  const enabled = useMemo(() => isBigint(address), [address])
-  const { value, isPending } = useContractCall({
+  const { address } = useAccount()
+  const options = useMemo(() => ({
     call: can_join,
-    args,
-    enabled,
+    args: [BigInt(address ?? 0), BigInt(address ?? 0)],
+    enabled: isBigint(address),
     defaultValue: null,
-  })
+  }), [can_join, address])
+  const { value, isPending } = useContractCall(options)
   return {
     fee: value,
     isPending
@@ -26,14 +25,13 @@ export const useCanJoin = () => {
 
 export const useCalcFee = (table_id: string, wager_value: BigNumberish) => {
   const { calc_fee } = useDojoSystemCalls()
-  const args = useMemo(() => [table_id, wager_value], [table_id, wager_value])
-  const enabled = useMemo(() => Boolean(table_id), [table_id])
-  const { value, isPending } = useContractCall({
+  const options = useMemo(() => ({
     call: calc_fee,
-    args,
-    enabled,
+    args: [table_id, wager_value],
+    enabled: Boolean(table_id),
     defaultValue: null,
-  })
+  }), [calc_fee, table_id, wager_value])
+  const { value, isPending } = useContractCall(options)
   return {
     fee: value,
     isPending,
@@ -47,25 +45,25 @@ export const useFinishedDuelProgress = (duelId: bigint): DuelProgress => {
 
 export const useDuelProgress = (duelId: bigint) => {
   const { get_duel_progress } = useDojoSystemCalls()
-  const args = useMemo(() => [duelId], [duelId])
-  const enabled = useMemo(() => (duelId > 0n), [duelId])
-  const { value } = useContractCall({
+  const options = useMemo(() => ({
     call: get_duel_progress,
-    args,
-    enabled,
+    args: [duelId],
+    enabled: isPositiveBigint(duelId),
     defaultValue: null,
-  })
+  }), [get_duel_progress, duelId])
+  const { value } = useContractCall(options)
   return value as Awaited<ReturnType<typeof get_duel_progress>>
 }
 
 export const useGetPlayerFullDeck = (tableId: string) => {
   const { get_player_card_decks } = useDojoSystemCalls()
-  const { value, isPending } = useContractCall({
+  const options = useMemo(() => ({
     call: get_player_card_decks,
     args: [tableId],
     enabled: Boolean(tableId),
     defaultValue: [],
-  })
+  }), [get_player_card_decks, tableId])
+  const { value, isPending } = useContractCall(options)
   return {
     decks: value,
     isPending,
@@ -88,13 +86,13 @@ export const useAdminAmIOwner = () => {
 }
 
 export const useAdminIsOwner = (address: BigNumberish) => {
-  const args = useMemo(() => ([address]), [address])
   const { admin_am_i_admin } = useDojoSystemCalls()
-  const { value, isPending } = useContractCall({
+  const options = useMemo(() => ({
     call: admin_am_i_admin,
-    args,
+    args: [address],
     enabled: isPositiveBigint(address),
-  })
+  }), [admin_am_i_admin, address])
+  const { value, isPending } = useContractCall(options)
   return {
     isOwner: value,
     isPending,
@@ -109,18 +107,18 @@ export const useAdminIsOwner = (address: BigNumberish) => {
 //
 export const useTestValidateSignature = () => {
   const { test_validate_commit_message } = useDojoSystemCalls()
-  const args = useMemo(() => [
-    '0xe29882a1fcba1e7e10cad46212257fea5c752a4f9b1b1ec683c503a2cf5c8a', // account
-    [173730084075620862592063244223266966993038958055152214202416930759334968124n, 1417567916191820063020424621516241329682320435780260605909088968782369795432n],
-    163115167366171702731397391899782408079n,
-    1n,
-    1n,
-  ], [])
-  const { value, isPending } = useContractCall({
+  const options = useMemo(() => ({
     call: test_validate_commit_message,
-    args,
+    args: [
+      '0xe29882a1fcba1e7e10cad46212257fea5c752a4f9b1b1ec683c503a2cf5c8a', // account
+      [173730084075620862592063244223266966993038958055152214202416930759334968124n, 1417567916191820063020424621516241329682320435780260605909088968782369795432n],
+      163115167366171702731397391899782408079n,
+      1n,
+      1n,
+    ],
     defaultValue: false,
-  })
+  }), [test_validate_commit_message])
+  const { value, isPending } = useContractCall(options)
   console.log(`useTestValidateSignature()`, isPending ? '...' : value)
   return {
     isValidated: value,
