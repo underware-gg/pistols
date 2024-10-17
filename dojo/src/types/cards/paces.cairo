@@ -1,4 +1,4 @@
-use pistols::utils::math::{MathU8};
+use pistols::utils::math::{MathTrait};
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 pub enum PacesCard {

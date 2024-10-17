@@ -96,7 +96,7 @@ pub struct DuelistState {
 use pistols::types::cards::hand::{DuelistHand};
 use pistols::utils::arrays::{SpanUtilsTrait};
 use pistols::utils::hash::{hash_values};
-use pistols::utils::math::{MathU8};
+use pistols::utils::math::{MathTrait};
 use pistols::types::constants::{CONST};
 
 #[generate_trait]

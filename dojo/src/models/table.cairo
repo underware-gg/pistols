@@ -6,7 +6,7 @@ use pistols::systems::game::game::{Errors as ActionErrors};
 use pistols::types::cards::hand::{DeckType};
 use pistols::types::constants::{CONST};
 use pistols::utils::arrays::{ArrayUtilsTrait};
-use pistols::utils::math::{MathU128};
+use pistols::utils::math::{MathTrait};
 use pistols::utils::misc::{ZERO};
 
 mod TABLES {

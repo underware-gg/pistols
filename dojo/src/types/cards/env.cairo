@@ -109,7 +109,7 @@ use pistols::types::cards::{
 };
 use pistols::types::duel_progress::{SpecialsDrawn};
 use pistols::models::challenge::{DuelistState, DuelistStateTrait};
-use pistols::utils::math::{MathU8};
+use pistols::utils::math::{MathTrait};
 
 impl EnvCardDefault of Default<EnvCard> {
     fn default() -> EnvCard {(EnvCard::None)}
@@ -284,7 +284,7 @@ impl EnvCardPrintImpl of PrintTrait<EnvCard> {
 // for println! and format!
 impl EnvCardDisplay of Display<EnvCard> {
     fn fmt(self: @EnvCard, ref f: Formatter) -> Result<(), Error> {
-        let name: ByteArray = (*self).get_points().name.string();
+        let name: ByteArray = (*self).get_points().name.as_string();
         let value: felt252 = (*self).into();
         let str: ByteArray = format!("({}:{})", value, name);
         f.buffer.append(@str);

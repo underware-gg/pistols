@@ -23,6 +23,9 @@ trait MathTrait<T,TI> {
     fn pow(base: T, exp: T) -> T;
     // quared distance in 2D space
     fn squaredDistance(x1: T, y1: T, x2: T, y2: T) -> T;
+    // converters
+    fn as_felt(self: T) -> felt252;
+    fn as_string(self: T) -> ByteArray;
 }
 
 impl MathU8 of MathTrait<u8,i8> {
@@ -112,6 +115,15 @@ impl MathU8 of MathTrait<u8,i8> {
         let dy = if (y1 > y2) { (y1 - y2) } else { (y2 - y1) };
         (dx * dx + dy * dy)
     }
+
+    fn as_felt(self: u8) -> felt252 {
+        let result: felt252 = self.into();
+        (result)
+    }
+    #[inline(always)]
+    fn as_string(self: u8) -> ByteArray {
+        (format!("{}", self))
+    }
 }
 
 impl MathU16 of MathTrait<u16, i16> {
@@ -168,6 +180,15 @@ impl MathU16 of MathTrait<u16, i16> {
         let dy = if (y1 > y2) { (y1 - y2) } else { (y2 - y1) };
         (dx * dx + dy * dy)
     }
+
+    fn as_felt(self: u16) -> felt252 {
+        let result: felt252 = self.into();
+        (result)
+    }
+    #[inline(always)]
+    fn as_string(self: u16) -> ByteArray {
+        (format!("{}", self))
+    }
 }
 
 impl MathU32 of MathTrait<u32, i32> {
@@ -223,6 +244,15 @@ impl MathU32 of MathTrait<u32, i32> {
         let dy = if (y1 > y2) { (y1 - y2) } else { (y2 - y1) };
         (dx * dx + dy * dy)
     }
+
+    fn as_felt(self: u32) -> felt252 {
+        let result: felt252 = self.into();
+        (result)
+    }
+    #[inline(always)]
+    fn as_string(self: u32) -> ByteArray {
+        (format!("{}", self))
+    }
 }
 
 impl MathU64 of MathTrait<u64, i64> {
@@ -277,6 +307,15 @@ impl MathU64 of MathTrait<u64, i64> {
         let dx = if (x1 > x2) { (x1 - x2) } else { (x2 - x1) };
         let dy = if (y1 > y2) { (y1 - y2) } else { (y2 - y1) };
         (dx * dx + dy * dy)
+    }
+
+    fn as_felt(self: u64) -> felt252 {
+        let result: felt252 = self.into();
+        (result)
+    }
+    #[inline(always)]
+    fn as_string(self: u64) -> ByteArray {
+        (format!("{}", self))
     }
 }
 
@@ -346,6 +385,15 @@ impl MathU128 of MathTrait<u128, i128> {
         let dy = if (y1 > y2) { (y1 - y2) } else { (y2 - y1) };
         (dx * dx + dy * dy)
     }
+
+    fn as_felt(self: u128) -> felt252 {
+        let result: felt252 = self.into();
+        (result)
+    }
+    #[inline(always)]
+    fn as_string(self: u128) -> ByteArray {
+        (format!("{}", self))
+    }
 }
 
 impl MathU256 of MathTrait<u256, u256> {
@@ -406,6 +454,15 @@ impl MathU256 of MathTrait<u256, u256> {
         let dx = if (x1 > x2) { (x1 - x2) } else { (x2 - x1) };
         let dy = if (y1 > y2) { (y1 - y2) } else { (y2 - y1) };
         (dx * dx + dy * dy)
+    }
+
+    fn as_felt(self: u256) -> felt252 {
+        let result: felt252 = self.try_into().unwrap();
+        (result)
+    }
+    #[inline(always)]
+    fn as_string(self: u256) -> ByteArray {
+        (format!("{}", self))
     }
 }
 

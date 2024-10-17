@@ -207,7 +207,7 @@ pub mod duelist {
                 timestamp: get_block_timestamp(),
                 name,
                 profile_pic_type,
-                profile_pic_uri: profile_pic_uri.string(),
+                profile_pic_uri: profile_pic_uri.as_string(),
                 score: Default::default(),
             };
             match initial_archetype {
@@ -243,7 +243,7 @@ pub mod duelist {
             // update
             duelist.name = name;
             duelist.profile_pic_type = profile_pic_type;
-            duelist.profile_pic_uri = profile_pic_uri.string();
+            duelist.profile_pic_uri = profile_pic_uri.as_string();
             // save
             store.set_duelist(@duelist);
 
