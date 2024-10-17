@@ -26,7 +26,7 @@ mod tests {
     use pistols::libs::utils::{make_moves_hash};
     use pistols::utils::short_string::{ShortString};
 
-    use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
+    use pistols::systems::tokens::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
     use pistols::tests::mock_rng::{IRngDispatcher, IRngDispatcherTrait};
     use pistols::tests::tester::{tester,
         tester::{

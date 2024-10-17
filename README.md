@@ -261,3 +261,4 @@ Open [http://localhost:3000](http://localhost:3000) or [https://localhost:3000](
 | Project State                    | Memory Usage |
 |----------------------------------|--------------|
 | v0.11.0 (origami)                | 9.64 GB      |
+| v0.12.0 (OpenZeppelin)           | 8.62 GB      |

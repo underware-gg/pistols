@@ -90,7 +90,7 @@ function getConstantsFromCairoFile(filePath) {
       is_test = true;
     } else {
       // outside mod/enum
-      if (line.startsWith('mod ') && line.endsWith(' {')) {
+      if ((line.startsWith('mod ') || line.startsWith('pub mod ')) && line.endsWith(' {')) {
         current_mod = line.split(' ').at(-2);
         // console.log(`MOD!!`, current_mod, line)
         if (!is_test) {

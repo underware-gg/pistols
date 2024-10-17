@@ -1,7 +1,7 @@
 use starknet::{ContractAddress};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
-use pistols::models::{
+pub use pistols::models::{
     challenge::{
         Challenge, ChallengeStore, ChallengeEntity, ChallengeEntityStore,
         Wager, WagerStore, WagerEntity, WagerEntityStore,
@@ -12,16 +12,24 @@ use pistols::models::{
         Pact, PactStore, PactEntity, PactEntityStore,
         Scoreboard, ScoreboardStore, ScoreboardEntity, ScoreboardEntityStore,
     },
-    token_config::{
-        TokenConfig, TokenConfigStore,
-        TokenConfigEntity, TokenConfigEntityStore,
-    },
     table::{
         TableConfig, TableConfigStore, TableConfigEntity, TableConfigEntityStore,
         TableWager, TableWagerStore, TableWagerEntity, TableWagerEntityStore,
         TableAdmittance, TableAdmittanceStore, TableAdmittanceEntity, TableAdmittanceEntityStore,
     },
-    config::{Config, ConfigStore, ConfigEntity, ConfigEntityStore, CONFIG},
+    config::{
+        Config, ConfigStore,
+        ConfigEntity, ConfigEntityStore,
+        CONFIG,
+    },
+    coin_config::{
+        CoinConfig, CoinConfigStore,
+        CoinConfigEntity, CoinConfigEntityStore,
+    },
+    token_config::{
+        TokenConfig, TokenConfigStore,
+        TokenConfigEntity, TokenConfigEntityStore,
+    },
 };
 
 #[derive(Copy, Drop)]
@@ -53,7 +61,6 @@ impl StoreImpl of StoreTrait {
     fn get_challenge(self: Store, duel_id: u128) -> Challenge {
         (ChallengeStore::get(self.world, duel_id))
     }
-
     #[inline(always)]
     fn get_challenge_entity(self: Store, duel_id: u128) -> ChallengeEntity {
         (ChallengeEntityStore::get(self.world,
@@ -72,7 +79,6 @@ impl StoreImpl of StoreTrait {
     fn get_round(self: Store, duel_id: u128, round_number: u8) -> Round {
         (RoundStore::get(self.world, duel_id, round_number))
     }
-
     #[inline(always)]
     fn get_round_entity(self: Store, duel_id: u128, round_number: u8) -> RoundEntity {
         (RoundEntityStore::get(self.world,
@@ -84,7 +90,6 @@ impl StoreImpl of StoreTrait {
     fn get_duelist(self: Store, duelist_id: u128) -> Duelist {
         (DuelistStore::get(self.world, duelist_id))
     }
-
     #[inline(always)]
     fn get_duelist_entity(self: Store, duelist_id: u128) -> DuelistEntity {
         (DuelistEntityStore::get(self.world,
@@ -103,7 +108,6 @@ impl StoreImpl of StoreTrait {
     fn get_scoreboard(self: Store, table_id: felt252, duelist_id: u128) -> Scoreboard {
         (ScoreboardStore::get(self.world, table_id, duelist_id))
     }
-
     #[inline(always)]
     fn get_scoreboard_entity(self: Store, table_id: felt252, duelist_id: u128) -> ScoreboardEntity {
         (ScoreboardEntityStore::get(self.world,
@@ -115,7 +119,6 @@ impl StoreImpl of StoreTrait {
     fn get_table_config(self: Store, table_id: felt252) -> TableConfig {
         (TableConfigStore::get(self.world, table_id))
     }
-
     #[inline(always)]
     fn get_table_config_entity(self: Store, table_id: felt252) -> TableConfigEntity {
         (TableConfigEntityStore::get(self.world,
@@ -127,7 +130,6 @@ impl StoreImpl of StoreTrait {
     fn get_table_wager(self: Store, table_id: felt252) -> TableWager {
         (TableWagerStore::get(self.world, table_id))
     }
-
     #[inline(always)]
     fn get_table_wager_entity(self: Store, table_id: felt252) -> TableWagerEntity {
         (TableWagerEntityStore::get(self.world,
@@ -143,10 +145,20 @@ impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
+    fn get_coin_config(self: Store, contract_address: ContractAddress) -> CoinConfig {
+        (CoinConfigStore::get(self.world, contract_address))
+    }
+    #[inline(always)]
+    fn get_coin_config_entity(self: Store, contract_address: ContractAddress) -> CoinConfigEntity {
+        (CoinConfigEntityStore::get(self.world,
+            CoinConfigStore::entity_id_from_keys(contract_address)
+        ))
+    }
+
+    #[inline(always)]
     fn get_token_config(self: Store, contract_address: ContractAddress) -> TokenConfig {
         (TokenConfigStore::get(self.world, contract_address))
     }
-
     #[inline(always)]
     fn get_token_config_entity(self: Store, contract_address: ContractAddress) -> TokenConfigEntity {
         (TokenConfigEntityStore::get(self.world,
@@ -169,7 +181,6 @@ impl StoreImpl of StoreTrait {
     fn set_challenge(self: Store, model: @Challenge) {
         model.set(self.world);
     }
-
     #[inline(always)]
     fn set_challenge_entity(self: Store, entity: @ChallengeEntity) {
         entity.update(self.world);
@@ -184,7 +195,6 @@ impl StoreImpl of StoreTrait {
     fn set_round(self: Store, model: @Round) {
         model.set(self.world);
     }
-
     #[inline(always)]
     fn set_round_entity(self: Store, entity: @RoundEntity) {
         entity.update(self.world);
@@ -194,7 +204,6 @@ impl StoreImpl of StoreTrait {
     fn set_duelist(self: Store, model: @Duelist) {
         model.set(self.world);
     }
-
     #[inline(always)]
     fn set_duelist_entity(self: Store, entity: @DuelistEntity) {
         entity.update(self.world);
@@ -204,7 +213,6 @@ impl StoreImpl of StoreTrait {
     fn set_pact(self: Store, model: @Pact) {
         model.set(self.world);
     }
-
     #[inline(always)]
     fn set_pact_entity(self: Store, entity: @PactEntity) {
         entity.update(self.world);
@@ -214,7 +222,6 @@ impl StoreImpl of StoreTrait {
     fn set_scoreboard(self: Store, model: @Scoreboard) {
         model.set(self.world);
     }
-
     #[inline(always)]
     fn set_scoreboard_entity(self: Store, entity: @ScoreboardEntity) {
         entity.update(self.world);
@@ -224,7 +231,6 @@ impl StoreImpl of StoreTrait {
     fn set_table_config(self: Store, model: @TableConfig) {
         model.set(self.world);
     }
-
     #[inline(always)]
     fn set_table_config_entity(self: Store, entity: @TableConfigEntity) {
         entity.update(self.world);
@@ -235,12 +241,19 @@ impl StoreImpl of StoreTrait {
         model.set(self.world);
     }
 
+    #[inline(always)]
+    fn set_coin_config(self: Store, model: @CoinConfig) {
+        model.set(self.world);
+    }
+    #[inline(always)]
+    fn set_coin_config_entity(self: Store, entity: @CoinConfigEntity) {
+        entity.update(self.world);
+    }
 
     #[inline(always)]
     fn set_token_config(self: Store, model: @TokenConfig) {
         model.set(self.world);
     }
-
     #[inline(always)]
     fn set_token_config_entity(self: Store, entity: @TokenConfigEntity) {
         entity.update(self.world);
@@ -250,7 +263,6 @@ impl StoreImpl of StoreTrait {
     fn set_config(self: Store, model: @Config) {
         model.set(self.world);
     }
-
     #[inline(always)]
     fn set_config_entity(self: Store, entity: @ConfigEntity) {
         entity.update(self.world);

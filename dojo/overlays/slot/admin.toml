@@ -1,9 +1,6 @@
 tag = "pistols-admin"
 writes = [
-  "pistols-Config",
-  "pistols-TableConfig",
-  "pistols-TableWager",
-  "pistols-TableAdmittance",
+  "ns:pistols",
 ]
 init_calldata = [
   "0x0",  # treasury (or initializer)

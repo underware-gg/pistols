@@ -6,11 +6,12 @@ pub struct TokenConfig {
     #[key]
     pub token_address: ContractAddress,
     //------
-    pub minter_contract: ContractAddress,
-    pub renderer_contract: ContractAddress,
-    pub treasury_contract: ContractAddress,
+    pub minter_address: ContractAddress,
+    pub renderer_address: ContractAddress,
+    pub treasury_address: ContractAddress,
     pub fee_contract: ContractAddress,
     pub fee_amount: u128,
+    pub minted_count: u128,
 }
 
 
@@ -27,15 +28,15 @@ use graffiti::json::JsonImpl;
 impl TokenConfigImpl of TokenConfigTrait {
     fn is_minter(self: @TokenConfig, address: ContractAddress) -> bool {
         (
-            (*self.minter_contract).is_zero()   // anyone can mint
-            || address == *self.minter_contract // caller is minter contract
+            (*self.minter_address).is_zero()   // anyone can mint
+            || address == *self.minter_address // caller is minter contract
         )
     }
 
     fn render_uri(self: @TokenConfig, token_id: u256, duelist: Duelist, encode: bool) -> ByteArray {
         let renderer = ITokenRendererDispatcher{
-            contract_address: if (*self.renderer_contract).is_non_zero() {
-                (*self.renderer_contract)
+            contract_address: if (*self.renderer_address).is_non_zero() {
+                (*self.renderer_address)
             } else {
                 (*self.token_address)
             }

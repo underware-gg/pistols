@@ -437,7 +437,7 @@ mod game {
 
     // #[abi(embed_v0)] // commented to make this private
     impl ActionsInternalImpl of super::IGameInternal<ContractState> {
-        // TODO: move to duelist_token
+        // TODO: move to IDuelistToken
         fn _emitDuelistRegisteredEvent(ref world: IWorldDispatcher, address: ContractAddress, duelist: Duelist, is_new: bool) {
             emit!(world, (Event::DuelistRegisteredEvent(events::DuelistRegisteredEvent {
                 address,

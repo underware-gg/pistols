@@ -1,10 +1,8 @@
 tag = "pistols-lords_mock"
 writes = [
-  "origami_token-SRC5Model",
-  "origami_token-InitializableModel",
-  "origami_token-ERC20BalanceModel",
-  "origami_token-ERC20MetadataModel",
-  "origami_token-ERC20AllowanceModel",
-  "origami_token-ERC20BridgeableModel",
+  "pistols-CoinConfig",
 ]
-init_calldata = []
+init_calldata = [
+  "$contract_address:pistols-game", # game_contract_address
+  "10000000000000000000000", # faucet_amount: 10,000 LORDS
+]

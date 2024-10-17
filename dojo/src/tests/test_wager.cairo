@@ -6,7 +6,7 @@
 
 //     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
-//     use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
+//     use pistols::systems::tokens::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
 //     use pistols::systems::game::{IGameDispatcher, IGameDispatcherTrait};
 //     use pistols::systems::admin::{IAdminDispatcher, IAdminDispatcherTrait};
 //     use pistols::models::config::{Config};

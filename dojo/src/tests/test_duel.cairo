@@ -18,7 +18,7 @@ mod tests {
     use pistols::utils::math::{MathU8};
     use pistols::libs::utils::{make_moves_hash};
 
-    use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
+    use pistols::systems::tokens::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
     use pistols::tests::tester::{tester,
         tester::{
             Systems,

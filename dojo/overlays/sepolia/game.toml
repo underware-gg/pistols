@@ -1,10 +1,5 @@
 tag = "pistols-game"
 writes = [
-  "pistols-Duelist",
-  "pistols-Scoreboard",
-  "pistols-Challenge",
-  "pistols-Wager",
-  "pistols-Pact",
-  "pistols-Round",
+  "ns:pistols",
 ]
 init_calldata = []

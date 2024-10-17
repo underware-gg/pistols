@@ -1,24 +1,12 @@
-tag = "pistols-duelist_token"
+tag = "pistols-duelist"
 writes = [
   "pistols-TokenConfig",
   "pistols-Duelist",
-  "origami_token-SRC5Model",
-  "origami_token-InitializableModel",
-  "origami_token-ERC721OwnerModel",
-  "origami_token-ERC721BalanceModel",
-  "origami_token-ERC721MetaModel",
-  "origami_token-ERC721EnumerableIndexModel",
-  "origami_token-ERC721EnumerableOwnerIndexModel",
-  "origami_token-ERC721EnumerableOwnerTokenModel",
-  "origami_token-ERC721EnumerableTokenModel",
-  "origami_token-ERC721EnumerableTotalModel",
-  "origami_token-ERC721TokenApprovalModel",
-  "origami_token-ERC721OperatorApprovalModel",
 ]
 init_calldata = [
-  "0x0", # minter_contract
-  "0x0", # renderer_contract
-  "0x0", # treasury_contract
+  "0x0", # minter_address
+  "0x0", # renderer_address
+  "0x0", # treasury_address
   "$contract_address:pistols-lords_mock", # fee_contract
   "100000000000000000000", # fee_amount: 100 LORDS
 ]

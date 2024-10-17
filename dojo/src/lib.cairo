@@ -8,8 +8,17 @@ mod interfaces {
 mod systems {
     mod admin;
     mod game;
-    mod duelist_token;
     mod rng;
+    mod tokens {
+        mod duelist;
+        #[cfg(feature:'lords_mock')]
+        mod lords_mock;
+    }
+    mod components {
+        mod coin_component;
+        mod token_component;
+        mod erc721_hooks;
+    }
 }
 
 mod libs {
@@ -24,6 +33,7 @@ mod models {
     mod config;
     mod duelist;
     mod table;
+    mod coin_config;
     mod token_config;
 }
 
@@ -62,10 +72,6 @@ mod utils {
     }
 }
 
-mod mocks {
-    #[cfg(feature:'lords_mock')]
-    mod lords_mock;
-}
 
 #[cfg(test)]
 mod tests {
@@ -85,10 +91,11 @@ mod tests {
     mod tester;
     mod prefabs;
     mod mock_rng;
+    mod utils;
     // tokens
     mod token {
         mod test_duelist_token;
         // mocks
-        mod mock_duelist_token;
+        mod mock_duelist;
     }
 }

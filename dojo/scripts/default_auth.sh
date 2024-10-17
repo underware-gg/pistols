@@ -13,7 +13,7 @@ pushd $(dirname "$0")/..
 export ADMIN_TAG="pistols-admin"
 export GAME_TAG="pistols-game"
 export MINTER_TAG="pistols-minter"
-export DUELISTS_TAG="pistols-duelist_token"
+export DUELISTS_TAG="pistols-duelist"
 
 
 echo "------------------------------------------------------------------------------"
@@ -64,18 +64,8 @@ sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
 
 echo ">>> Duelists auth..."
 sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
-  model:origami_token-InitializableModel,$DUELISTS_TAG \
-  model:origami_token-SRC5Model,$DUELISTS_TAG \
-  model:origami_token-ERC721MetaModel,$DUELISTS_TAG \
-  model:origami_token-ERC721OperatorApprovalModel,$DUELISTS_TAG \
-  model:origami_token-ERC721TokenApprovalModel,$DUELISTS_TAG \
-  model:origami_token-ERC721BalanceModel,$DUELISTS_TAG \
-  model:origami_token-ERC721EnumerableIndexModel,$DUELISTS_TAG \
-  model:origami_token-ERC721EnumerableOwnerIndexModel,$DUELISTS_TAG \
-  model:origami_token-ERC721EnumerableOwnerTokenModel,$DUELISTS_TAG \
-  model:origami_token-ERC721EnumerableTokenModel,$DUELISTS_TAG \
-  model:origami_token-ERC721EnumerableTotalModel,$DUELISTS_TAG \
-  model:origami_token-ERC721OwnerModel,$DUELISTS_TAG \
+  model:pistols-TokenConfig,$DUELISTS_TAG \
+  model:pistols-Duelist,$DUELISTS_TAG \
 
 # # execute ref: https://book.dojoengine.org/toolchain/sozo/world-commands/execute
 # echo ">>> Initializing Game World..."

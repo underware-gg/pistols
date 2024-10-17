@@ -11,10 +11,10 @@ mod tester {
 
     use pistols::systems::admin::{admin, IAdminDispatcher, IAdminDispatcherTrait};
     use pistols::systems::game::{game, IGameDispatcher, IGameDispatcherTrait};
-    use pistols::systems::duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait};
-    use pistols::mocks::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
-    use pistols::tests::token::mock_duelist_token::{
-        duelist_token as mock_duelist_token,
+    use pistols::systems::tokens::duelist::{duelist, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait};
+    use pistols::systems::tokens::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
+    use pistols::tests::token::mock_duelist::{
+        duelist as mock_duelist,
         // IDuelistTokenDispatcher,
         // IDuelistTokenDispatcherTrait,
     };
@@ -68,6 +68,8 @@ mod tester {
     fn OWNER() -> ContractAddress { starknet::contract_address_const::<0x1>() }
     fn OTHER() -> ContractAddress { starknet::contract_address_const::<0x2>() }
     fn BUMMER() -> ContractAddress { starknet::contract_address_const::<0x3>() }
+    fn RECIPIENT() -> ContractAddress { starknet::contract_address_const::<0x4>() }
+    fn SPENDER() -> ContractAddress { starknet::contract_address_const::<0x5>() }
     fn TREASURY() -> ContractAddress { starknet::contract_address_const::<0x444>() }
     fn BIG_BOY() -> ContractAddress { starknet::contract_address_const::<0x54f650fb5e1fb61d7b429ae728a365b69e5aff9a559a05de70f606aaea1a243>() }
     fn LITTLE_BOY()  -> ContractAddress { starknet::contract_address_const::<0xffff00000000000ee>() }
@@ -148,17 +150,10 @@ mod tester {
         testing::set_block_number(1);
         testing::set_block_timestamp(INITIAL_TIMESTAMP);
 
-        let mut namespaces: Array<ByteArray> = array![];
+        let mut namespaces: Array<ByteArray> = array!["pistols"];
         let mut models: Array<felt252> = array![];
 
-        if (deploy_duelist || deploy_lords) {
-            namespaces.extend_from_span(["origami_token", "pistols"].span());
-            models.extend_from_span(get_models_test_class_hashes!(["origami_token", "pistols"]));
-        } else {
-            namespaces.extend_from_span(["pistols"].span());
-            models.extend_from_span(get_models_test_class_hashes!(["pistols"]));
-        }
-
+        models.extend_from_span(get_models_test_class_hashes!(["pistols"]));
         if (deploy_mock_rng) {
             // namespaces.append("mock");
             models.extend_from_span([salt_value::TEST_CLASS_HASH].span());
@@ -166,8 +161,6 @@ mod tester {
 
         // deploy world
 // '---- spawn_test_world...'.print();
-        // let world = spawn_test_world!();
-        // let world = spawn_test_world!(["origami_token", "pistols"]);
         let world: IWorldDispatcher = spawn_test_world(
             namespaces.span(),
             models.span(),
@@ -195,9 +188,13 @@ mod tester {
         let lords = ILordsMockDispatcher{ contract_address:
             if (deploy_lords) {
                 let address = deploy_system(world, 'lords_mock', lords_mock::TEST_CLASS_HASH);
-                // world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), OWNER());
-                world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), address);
-                // world.grant_owner(SELECTORS::LORDS_MOCK, OWNER());
+                world.grant_writer(selector_from_tag!("pistols-CoinConfig"), address);
+                let call_data: Span<felt252> = array![
+                    // game.contract_address.into(), // minter
+                    0, // minter
+                    10_000_000_000_000_000_000_000, // 10,000 Lords
+                ].span();
+                world.init_contract(SELECTORS::LORDS_MOCK, call_data);
                 (address)
             }
             else {ZERO()}
@@ -205,22 +202,20 @@ mod tester {
 // '---- 2'.print();
         let duelists = IDuelistTokenDispatcher{ contract_address:
             if (deploy_duelist) {
-                let address = deploy_system(world, 'duelist_token', duelist_token::TEST_CLASS_HASH);
-                world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), address);
-                // world.grant_owner(dojo::utils::bytearray_hash(@"origami_token"), OWNER());
-                world.grant_writer(SELECTORS::DUELIST_TOKEN, OWNER());
+                let address = deploy_system(world, 'duelist', duelist::TEST_CLASS_HASH);
+                world.grant_writer(SELECTORS::DUELIST, OWNER());
                 world.grant_writer(selector_from_tag!("pistols-TokenConfig"), address);
                 world.grant_writer(selector_from_tag!("pistols-Duelist"), address);
-                let duelists_call_data: Span<felt252> = array![
+                let call_data: Span<felt252> = array![
                     0, 0, 0,
                     lords.contract_address.into(),
                     100_000_000_000_000_000_000, // 100 Lords
                 ].span();
-                world.init_contract(SELECTORS::DUELIST_TOKEN, duelists_call_data);
+                world.init_contract(SELECTORS::DUELIST, call_data);
                 (address)
             }
             else if (deploy_game) {
-                (deploy_system(world, 'duelist_token', mock_duelist_token::TEST_CLASS_HASH))
+                (deploy_system(world, 'duelist', mock_duelist::TEST_CLASS_HASH))
             }
             else {ZERO()}
         };
@@ -228,7 +223,7 @@ mod tester {
         let admin = IAdminDispatcher{ contract_address:
             if (deploy_admin) {
                 let address = deploy_system(world, 'admin', admin::TEST_CLASS_HASH);
-                let admin_call_data: Span<felt252> = array![
+                let call_data: Span<felt252> = array![
                     TREASURY().into(), // treasury
                     lords.contract_address.into(),
                 ].span();
@@ -237,7 +232,7 @@ mod tester {
                 world.grant_writer(selector_from_tag!("pistols-TableConfig"), address);
                 world.grant_writer(selector_from_tag!("pistols-TableWager"), address);
                 world.grant_writer(selector_from_tag!("pistols-TableAdmittance"), address);
-                world.init_contract(SELECTORS::ADMIN, admin_call_data);
+                world.init_contract(SELECTORS::ADMIN, call_data);
                 (address)
             }
             else {ZERO()}
@@ -347,7 +342,7 @@ mod tester {
         _next_block();
     }
 
-    // ::duelist_token
+    // ::duelist
     fn execute_create_duelist(system: @IDuelistTokenDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252, archetype: Archetype) -> Duelist {
         impersonate(sender);
         let duelist: Duelist = (*system).create_duelist(sender, name, profile_pic_type, profile_pic_uri, archetype);

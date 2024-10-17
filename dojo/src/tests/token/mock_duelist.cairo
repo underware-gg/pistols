@@ -6,7 +6,7 @@ trait IDuelistToken {
 }
 
 #[dojo::contract]
-mod duelist_token {
+mod duelist {
     use super::IDuelistToken;
     use debug::PrintTrait;
     use core::traits::Into;
