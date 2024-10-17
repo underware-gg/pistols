@@ -202,7 +202,7 @@ mod tester {
             }
             else {ZERO()}
         };
-'---- 2'.print();
+// '---- 2'.print();
         let duelists = IDuelistTokenDispatcher{ contract_address:
             if (deploy_duelist) {
                 let address = deploy_system(world, 'duelist_token', duelist_token::TEST_CLASS_HASH);

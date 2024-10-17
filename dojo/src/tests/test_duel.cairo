@@ -73,7 +73,7 @@ mod tests {
         assert(final_pace.state_a.health == round.state_a.health, 'state_final_b.health');
         assert(final_pace.state_a.damage == round.state_a.damage, 'state_final_b.damage');
         assert(final_pace.state_a.chances == round.state_a.chances, 'state_final_b.chances');
-        assert(final_pace.state_a.dice_fire == round.state_a.dice_fire, 'state_final_b.dice_fire');
+        assert(final_pace.state_a.dice_fire == round.state_a.dice_fire, 'state_final_a.dice_fire');
         // state_b
         assert(final_pace.state_b.health == round.state_b.health, 'state_final_b.health');
         assert(final_pace.state_b.damage == round.state_b.damage, 'state_final_b.damage');

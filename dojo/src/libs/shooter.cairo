@@ -195,8 +195,8 @@ mod shooter {
         // Pistols round
         //
 
-        let mut fired_a: bool = false;
-        let mut fired_b: bool = false;
+        let mut dice_fire_a: u8 = 0;
+        let mut dice_fire_b: u8 = 0;
 
         let mut step_number: u8 = 1;
         while (step_number <= 10) {
@@ -214,11 +214,11 @@ mod shooter {
             // Fire!
             if (hand_a.card_fire == pace) {
                 fire(hand_a.card_fire, hand_b.card_dodge, ref state_a, ref state_b, ref dice, 'shoot_a');
-                fired_a = true;
+                dice_fire_a = state_a.dice_fire;
             }
             if (hand_b.card_fire == pace) {
                 fire(hand_b.card_fire, hand_a.card_dodge, ref state_b, ref state_a, ref dice, 'shoot_b');
-                fired_b = true;
+                dice_fire_b = state_b.dice_fire;
             }
 
             // save step 1-10
@@ -241,7 +241,7 @@ mod shooter {
             // break if there's a winner
             if (state_a.health == 0 || state_b.health == 0) { break; }
             // both dices rolled, no winner, go to blades
-            if (fired_a && fired_b) { break; }
+            if (dice_fire_a > 0 && dice_fire_b > 0) { break; }
             
             step_number += 1;
         };
@@ -273,6 +273,8 @@ mod shooter {
         // update round model
         round.state_a = state_a;
         round.state_b = state_b;
+        round.state_a.dice_fire = dice_fire_a;
+        round.state_b.dice_fire = dice_fire_b;
         round.state = RoundState::Finished;
 
         //------------------------------------------------------
