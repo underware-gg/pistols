@@ -5,8 +5,7 @@ import {
 } from '@starknet-react/core'
 import { bigintToHex, isPositiveBigint } from '@/lib/utils/types'
 import { BigNumberish } from 'starknet'
-import { erc20_abi, erc20_origami_abi } from '@/lib/abi'
-import { feltToString } from '../starknet'
+import { erc20_abi } from '@/lib/abi'
 
 export const useERC20Balance = (contractAddress: BigNumberish, ownerAddress: BigNumberish, fee: BigNumberish = 0n) => {
   const { data: balance } = useBalance({
@@ -39,10 +38,6 @@ export const useERC20TokenName = (contractAddress: BigNumberish) => {
     abi: erc20_abi,
     address: contractIsValid ? bigintToHex(contractAddress) : null,
   })
-  const { contract:contract_origami } = useContract({
-    abi: erc20_origami_abi,
-    address: contractIsValid ? bigintToHex(contractAddress) : null,
-  })
 
   const [tokenName, setTokenName] = useState<string>(null)
   const [tokenSymbol, setTokenSymbol] = useState<string>(null)
@@ -55,30 +50,30 @@ export const useERC20TokenName = (contractAddress: BigNumberish) => {
   }, [contractIsValid])
   
   // try felt
-  useEffect(() => {
-    contract?.call('name').then((results) => {
-      const name = results?.name ? feltToString(results.name) : null
-      if (name)setTokenName(name)
-    })
-  }, [contract])
-  useEffect(() => {
-    contract?.call('symbol').then((results) => {
-      const symbol = results?.symbol ? feltToString(results.symbol) : null
-      if (symbol) setTokenSymbol(symbol)
-    })
-  }, [contract])
+  // useEffect(() => {
+  //   contract?.call('name').then((results) => {
+  //     const name = results?.name ? feltToString(results.name) : null
+  //     if (name)setTokenName(name)
+  //   })
+  // }, [contract])
+  // useEffect(() => {
+  //   contract?.call('symbol').then((results) => {
+  //     const symbol = results?.symbol ? feltToString(results.symbol) : null
+  //     if (symbol) setTokenSymbol(symbol)
+  //   })
+  // }, [contract])
 
-  // try origami (ByteArray)
+  // try ByteArray
   useEffect(() => {
-    contract_origami?.call('name').then((name) => {
+    contract?.call('name').then((name) => {
       if (name) setTokenName(name)
     })
-  }, [contract_origami])
+  }, [contract])
   useEffect(() => {
-    contract_origami?.call('symbol').then((symbol) => {
+    contract?.call('symbol').then((symbol) => {
       if (symbol) setTokenSymbol(symbol)
     })
-  }, [contract_origami])
+  }, [contract])
 
   return {
     tokenName,
