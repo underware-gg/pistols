@@ -211,8 +211,8 @@ fn test_token_uri() {
     println!("{}", uri_1);
     println!("{}", uri_2);
 
-    assert(uri_1[0] == '{', 'Uri 1 should not be empty');
-    assert(uri_2[0] == '{', 'Uri 2 should not be empty');
+    assert(uri_1.len() > 100, 'Uri 1 should not be empty');
+    assert(uri_2.len() > 100, 'Uri 2 should not be empty');
     // assert(uri_1.len() > uri_2.len(), 'uri_1 > uri_2');
 }
 

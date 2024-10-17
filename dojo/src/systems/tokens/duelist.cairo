@@ -82,6 +82,7 @@ pub mod duelist {
             Duelist, DuelistEntity,
             Score, ScoreTrait,
             ProfilePicType, Archetype,
+            ScoreboardEntity,
         },
         token_config::{
             TokenConfig, TokenConfigStore,
@@ -92,6 +93,7 @@ pub mod duelist {
     use pistols::types::constants::{CONST, HONOUR};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::ShortStringTrait;
+    use pistols::utils::math::{MathTrait};
 
 
     //-----------------------------------
@@ -262,4 +264,110 @@ pub mod duelist {
 
     }
 
+
+
+    //-----------------------------------
+    // ITokenRenderer
+    //
+    use pistols::systems::components::erc721_hooks::{ITokenRenderer};
+    #[abi(embed_v0)]
+    impl TokenRendererImpl of ITokenRenderer<ContractState> {
+        fn format_name(self: @ContractState,
+            token_id: u256,
+            duelist: Duelist,
+        ) -> ByteArray {
+            let name: ByteArray = if (duelist.name != '') { duelist.name.as_string() } else { "Duelist" };
+            (format!("{} #{}", name, token_id))
+        }
+        
+        fn format_description(self: @ContractState,
+            token_id: u256,
+            _duelist: Duelist,
+        ) -> ByteArray {
+            (format!("Pistols at 10 Blocks Duelist #{}", token_id))
+        }
+        
+        fn format_image(self: @ContractState,
+            duelist: Duelist,
+            variant: ByteArray,
+        ) -> ByteArray {
+            let base_uri: ByteArray = self.erc721._base_uri();
+            let number =
+                if (duelist.profile_pic_uri.len() == 0) {"00"}
+                else if (duelist.profile_pic_uri.len() == 1) {format!("0{}", duelist.profile_pic_uri)}
+                else {duelist.profile_pic_uri};
+            (format!("{}/profiles/{}/{}.jpg", base_uri, variant, number))
+        }
+
+        // returns: [key1, value1, key2, value2,...]
+        fn get_attributes(self: @ContractState,
+            duelist: Duelist,
+        ) -> Span<ByteArray> {
+            let store = StoreTrait::new(self.world());
+            let mut result: Array<ByteArray> = array![];
+            // Honour
+            result.append("Honour");
+            result.append(ScoreTrait::format_honour(duelist.score.honour));
+            // Archetype
+            let archetype: ByteArray = 
+                if (duelist.score.is_villain()) {"Villain"}
+                else if(duelist.score.is_trickster()) {"Trickster"}
+                else if(duelist.score.is_lord()) {"Honourable"}
+                else {"Undefined"};
+            result.append("Archetype");
+            result.append(archetype.clone());
+            // Levels
+            if (duelist.score.total_duels > 0) {
+                let level: ByteArray = ScoreTrait::format_honour(
+                    if (duelist.score.is_villain()) {duelist.score.level_villain}
+                    else if(duelist.score.is_trickster()) {duelist.score.level_trickster}
+                    else if(duelist.score.is_lord()) {duelist.score.level_lord}
+                    else {0}
+                );
+                result.append("Archetype Level");
+                result.append(level.clone());
+                result.append(format!("{} Level", archetype));
+                result.append(level.clone());
+            }
+            // Totals
+            result.append("Total Duels");
+            result.append(duelist.score.total_duels.as_string());
+            if (duelist.score.total_duels > 0) {
+                result.append("Total Wins");
+                result.append(duelist.score.total_wins.as_string());
+
+                result.append("Total Losses");
+                result.append(duelist.score.total_losses.as_string());
+                
+                result.append("Total Draws");
+                result.append(duelist.score.total_draws.as_string());
+                
+                // Wager on Lords table
+                let scoreboard: ScoreboardEntity = store.get_scoreboard_entity(TABLES::LORDS, duelist.duelist_id);
+                
+                result.append("Lords Won");
+                let amount: u128 = (scoreboard.wager_won / CONST::ETH_TO_WEI.low);
+                result.append(format!("{}", amount));
+                
+                result.append("Lords Lost");
+                if (scoreboard.wager_lost == 0) {
+                    result.append("0");
+                } else {
+                    let amount: u128 = (scoreboard.wager_lost / CONST::ETH_TO_WEI.low);
+                    result.append(format!("-{}", amount));
+                }
+                
+                result.append("Lords Balance");
+                if (scoreboard.wager_lost > scoreboard.wager_won) {
+                    let amount: u128 = ((scoreboard.wager_lost - scoreboard.wager_won) / CONST::ETH_TO_WEI.low);
+                    result.append(format!("-{}", amount));
+                } else {
+                    let amount: u128 = ((scoreboard.wager_won - scoreboard.wager_lost) / CONST::ETH_TO_WEI.low);
+                    result.append(format!("{}", amount));
+                }
+            }
+            // done!
+            (result.span())
+        }
+    }
 }

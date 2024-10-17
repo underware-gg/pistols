@@ -2,7 +2,6 @@ mod interfaces {
     mod systems;
     mod ierc20;
     mod ierc721;
-    mod itoken;
 }
 
 mod systems {
@@ -64,6 +63,7 @@ mod utils {
     mod encoding;
     mod hash;
     mod math;
+    mod metadata;
     mod misc;
     mod short_string;
     mod timestamp;
