@@ -1,6 +1,6 @@
 [package]
 name = "pistols"
-version = "0.12.0-1"
+version = "0.12.0-2"
 cairo-version = "2.7.0"
 
 [cairo]
@@ -10,7 +10,7 @@ sierra-replace-ids = true
 migrate = "./migrate"
 
 [dependencies]
-dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.0.0-alpha.12" }
+dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.0.0-alpha.16" }
 origami_token = { git = "https://github.com/rsodre/origami", branch = "balance-enumerable" }
 graffiti = { git = "https://github.com/ponderingdemocritus/graffiti", rev = "bc569531791dbc71c6cd8d9bc154c34eedad31fe" }
 # openzeppelin_account = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.0" }

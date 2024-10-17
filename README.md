@@ -136,12 +136,12 @@ Install the [Cairo 1.0](https://marketplace.visualstudio.com/items?itemName=star
 
 > [Dojo Book](https://book.dojoengine.org/getting-started)
 
-Currenty using Dojo version `v1.0.0-alpha.12`
+Currenty using Dojo version `v1.0.0-alpha.16`
 
 ```sh
 curl -L https://install.dojoengine.org | bash
 # open new terminal to update PATH
-dojoup -v v1.0.0-alpha.12
+dojoup -v v1.0.0-alpha.16
 
 # test dojo
 cd dojo
@@ -253,3 +253,11 @@ pnpm run devs
 
 Open [http://localhost:3000](http://localhost:3000) or [https://localhost:3000](https://localhost:3000)
 
+
+### sozo test profiling
+
+* `sozo test -f resolved`
+
+| Project State                    | Memory Usage |
+|----------------------------------|--------------|
+| v0.11.0 (origami)                | 9.64 GB      |

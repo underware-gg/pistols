@@ -34,9 +34,9 @@ fi
 
 $TORII_PATH --version
 $TORII_PATH \
+  --allowed-origins "*" \
   --rpc $RPC_URL \
   --world $WORLD_ADDRESS \
-  --start-block $START_BLOCK \
-  --allowed-origins "*" \
+  # --start-block $START_BLOCK \
   # --relay-local-key-path ./0.0.0.0-key.pem \
   # --relay-cert-path ./0.0.0.0.pem \
