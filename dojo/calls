@@ -1,23 +1,6 @@
 #!/bin/bash
 set -euo pipefail
-
-# Profile
-if [ $# -ge 1 ]; then
-  export PROFILE=$1
-else
-  export PROFILE="dev"
-fi
-
-if ! [ -x "$(command -v toml)" ]; then
-  echo 'Error: toml not instlaled! Instal with: cargo install toml-cli'
-  exit 1
-fi
-
-export MANIFEST_FILE_PATH="./manifests/$PROFILE/deployment/manifest.json"
-export ACCOUNT_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.account_address)
-export WORLD_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.world_address)
-export ADMIN_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.tag == "pistols-admin" ).address')
-export GAME_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.tag == "pistols-game" ).address')
+source scripts/setup.sh
 
 # Use mocked Lords if lords_address not defined in Scarb
 export LORDS_ADDRESS=$(toml get Scarb.toml --raw profile.$PROFILE.tool.dojo.env.lords_address)
@@ -28,10 +11,6 @@ if [[ -z "$LORDS_ADDRESS" ]]; then
 fi
 
 echo "------------------------------------------------------------------------------"
-echo "Profile     : $PROFILE"
-echo "Manifest    : $MANIFEST_FILE_PATH"
-echo "Account     : $ACCOUNT_ADDRESS"
-echo "World       : $WORLD_ADDRESS"
 echo "::admin     : $ADMIN_ADDRESS"
 echo "::game      : $GAME_ADDRESS"
 echo "\$LORDS      : $LORDS_ADDRESS"

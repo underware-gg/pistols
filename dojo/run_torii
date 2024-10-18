@@ -12,6 +12,7 @@ export START_BLOCK=1
 
 echo "* TORII   : $TORII_PATH"
 echo "* BLOCK   : $START_BLOCK"
+echo "* CFG     : $TORII_CONFIG_PATH"
 echo "------------------------------------------------------------------------------"
 
 if [[
@@ -37,6 +38,7 @@ $TORII_PATH \
   --allowed-origins "*" \
   --rpc $RPC_URL \
   --world $WORLD_ADDRESS \
+  --config $TORII_CONFIG_PATH \
   # --start-block $START_BLOCK \
   # --relay-local-key-path ./0.0.0.0-key.pem \
   # --relay-cert-path ./0.0.0.0.pem \

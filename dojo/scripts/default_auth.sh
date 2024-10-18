@@ -73,7 +73,7 @@ sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
 # if [[ $INITIALIZED == *"0x1"* ]]; then
 #   echo "Already initialized"
 # else
-#   sozo --profile $PROFILE execute --world $WORLD_ADDRESS --wait $ADMIN_ADDRESS initialize --calldata 0x0,0x0,$LORDS_ADDRESS,$DUELISTS_ADDRESS,$MINTER_ADDRESS || true
+#   sozo --profile $PROFILE execute --world $WORLD_ADDRESS --wait $ADMIN_ADDRESS initialize --calldata 0x0,0x0,$LORDS_ADDRESS,$DUELIST_TOKEN_ADDRESS,$MINTER_ADDRESS || true
 # fi
 
 echo "👍"

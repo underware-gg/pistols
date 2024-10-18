@@ -72,6 +72,16 @@ echo "👍"
 #
 if [[ "$PROFILE" == "dev" ]]; then
   #
+  # create torii config
+  echo "------------------------------------------------------------------------------"
+  echo ">>> Create torii config [$TORII_CONFIG_PATH]..."
+  echo "contracts = [" > $TORII_CONFIG_PATH
+  # echo "  { type = \"ERC721\", address = \"$DUEL_TOKEN_ADDRESS\" }, # duel" >> $TORII_CONFIG_PATH
+  echo "  { type = \"ERC721\", address = \"$DUELIST_TOKEN_ADDRESS\" }, # duelist" >> $TORII_CONFIG_PATH
+  echo "]" >> $TORII_CONFIG_PATH
+  cat $TORII_CONFIG_PATH
+  echo "👍"
+  #
   # TODO: Enable this when bindings are ported
   # generate and copy bindings
   # cp $BINDINGS_PATH/* $CLIENT_GEN_PATH/
