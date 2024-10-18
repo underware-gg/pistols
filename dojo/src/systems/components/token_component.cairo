@@ -7,6 +7,21 @@ pub trait ITokenComponentPublic<TState> {
     fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
 }
 
+#[starknet::interface]
+pub trait ITokenComponentInternal<TState> {
+    fn initialize(ref self: TState,
+        minter_address: ContractAddress,
+        renderer_address: ContractAddress,
+        treasury_address: ContractAddress,
+        fee_contract: ContractAddress,
+        fee_amount: u128,
+    );
+    fn mint(ref self: TState, recipient: ContractAddress) -> u128;
+    fn burn(ref self: TState, token_id: u128);
+    fn assert_exists(self: @TState, token_id: u128);
+    fn assert_is_owner_of(self: @TState, address: ContractAddress, token_id: u128);
+}
+
 #[starknet::component]
 pub mod TokenComponent {
     use zeroable::Zeroable;
@@ -34,9 +49,9 @@ pub mod TokenComponent {
     pub enum Event {}
 
     mod Errors {
-        const CALLER_IS_NOT_MINTER: felt252 = 'TOKEN: caller is not minter';
-        const CALLER_IS_NOT_OWNER: felt252  = 'TOKEN: caller is not owner';
-        const INVALID_TOKEN_ID: felt252     = 'TOKEN: invalid token ID';
+        const CALLER_IS_NOT_MINTER: felt252 = 'ERC721: caller is not minter';
+        const CALLER_IS_NOT_OWNER: felt252  = 'ERC721: caller is not owner';
+        const INVALID_TOKEN_ID: felt252     = 'ERC721: invalid token ID';
     }
 
 
@@ -75,7 +90,6 @@ pub mod TokenComponent {
             address: ContractAddress,
             token_id: u128,
         ) -> bool {
-println!("is_owner_of_1");
             let erc721 = get_dep_component!(self, ERC721);
             (erc721._owner_of(token_id.into()) == address)
         }
@@ -85,7 +99,8 @@ println!("is_owner_of_1");
     //-----------------------------------------
     // Internal
     //
-    #[generate_trait]
+    use super::{ITokenComponentInternal};
+    #[embeddable_as(TokenComponentInternalImpl)]
     pub impl InternalImpl<
         TContractState,
         +HasComponent<TContractState>,
@@ -94,7 +109,7 @@ println!("is_owner_of_1");
         +ERC721Component::ERC721HooksTrait<TContractState>,
         impl ERC721: ERC721Component::HasComponent<TContractState>,
         +Drop<TContractState>,
-    > of InternalTrait<TContractState> {
+    > of ITokenComponentInternal<ComponentState<TContractState>> {
         fn initialize(ref self: ComponentState<TContractState>,
             minter_address: ContractAddress,
             renderer_address: ContractAddress,

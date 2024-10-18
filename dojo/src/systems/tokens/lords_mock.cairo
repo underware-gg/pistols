@@ -55,7 +55,7 @@ pub mod lords_mock {
     #[abi(embed_v0)]
     impl ERC20MixinImpl = ERC20Component::ERC20MixinImpl<ContractState>;
     impl ERC20InternalImpl = ERC20Component::InternalImpl<ContractState>;
-    impl CoinInternalImpl = CoinComponent::InternalImpl<ContractState>;
+    impl CoinComponentInternalImpl = CoinComponent::CoinComponentInternalImpl<ContractState>;
     #[storage]
     struct Storage {
         #[substorage(v0)]
@@ -89,11 +89,10 @@ pub mod lords_mock {
             COIN_NAME(),
             COIN_SYMBOL(),
         );
-        self.coin._initialize(
+        self.coin.initialize(
             game_contract_address,
             faucet_amount: faucet_amount.into(),
         );
-        self.coin._mint(get_caller_address(), (1 * CONST::ETH_TO_WEI).into());
     }
 
     //-----------------------------------
@@ -103,13 +102,13 @@ pub mod lords_mock {
     #[abi(embed_v0)]
     impl CoinComponentPublicImpl of ILordsMockPublic<ContractState> {
         fn faucet(ref self: ContractState) {
-            self.coin._faucet(get_caller_address());
+            self.coin.faucet(get_caller_address());
         }
         fn mint(ref self: ContractState,
             recipient: ContractAddress,
             amount: u256,
         ) {
-            self.coin._mint(recipient, amount);
+            self.coin.mint(recipient, amount);
         }
     }
 

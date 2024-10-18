@@ -116,7 +116,7 @@ pub mod duelist {
     impl ERC721InternalImpl = ERC721Component::InternalImpl<ContractState>;
     #[abi(embed_v0)]
     impl TokenComponentPublicImpl = TokenComponent::TokenComponentPublicImpl<ContractState>;
-    impl TokenComponentInternalImpl = TokenComponent::InternalImpl<ContractState>;
+    impl TokenComponentInternalImpl = TokenComponent::TokenComponentInternalImpl<ContractState>;
     #[storage]
     struct Storage {
         #[substorage(v0)]
