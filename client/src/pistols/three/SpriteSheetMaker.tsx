@@ -55,6 +55,7 @@ export class Actor {
   controls: any = {}
   ready: boolean = false
   animationQueue: { key: string, count: number, loop: boolean, move: { x: number, y: number, z: number }, onStart: any, onEnd: any }[] = []  // Animation queue
+  startPosition: { x: number, height: number } = { x: null, height: null }
 
   constructor(spriteSheets: any, width: number, height: number, startPositionX: number, flipped: boolean) {
     const geometry = new THREE.PlaneGeometry(width, height)
@@ -63,6 +64,9 @@ export class Actor {
 
     this.material = this.currentSheet.makeMaterial()
     this.mesh = new THREE.Mesh(geometry, this.material)
+
+    this.startPosition.x = startPositionX
+    this.startPosition.height = height
 
     if (flipped) {
       this.mesh.position.set(-startPositionX, (height / 2), 2)
@@ -87,8 +91,13 @@ export class Actor {
     this.controls.flipped = flipped
     this.controls.frameMovement = {}
     this.controls.frameReady = false
+    this.controls.speedFactor = 1.0
 
     this.ready = true
+  }
+
+  setSpeedFactor(speedFactor) {
+    this.controls.speedFactor = speedFactor
   }
 
   replaceSpriteSheets(spriteSheets: any) {
@@ -134,7 +143,7 @@ export class Actor {
     }
 
     const elapsed = seconds - this.controls.lastDisplayTime
-    if (elapsed >= this.controls.tileDisplaySeconds) {
+    if (elapsed >= this.controls.tileDisplaySeconds / this.controls.speedFactor) {
       this.controls.lastDisplayTime = seconds
       this.controls.currentTile++;
 
@@ -180,7 +189,7 @@ export class Actor {
         this.updateMaterialWithCurrentTile()
       }
     } else {
-      const t = Math.min((elapsed + (this.controls.currentTile * this.controls.tileDisplaySeconds)) / this.controls.totalAnimationMovementDuration, 1)
+      const t = Math.min((elapsed + (this.controls.currentTile * (this.controls.tileDisplaySeconds / this.controls.speedFactor))) / (this.controls.totalAnimationMovementDuration / this.controls.speedFactor), 1)
       this.interpolatePosition(t)
     }
   }
@@ -243,10 +252,28 @@ export class Actor {
 
   // pause and reset the action
   stop() {
+    if (!this.ready) return
     this.animationQueue = []
-    this.controls.lastDisplayTime = 0;
-    this.controls.currentTile = 0;
-    this.controls.paused = true;
+    if (this.controls.flipped) {
+      this.mesh.position.set(-this.startPosition.x, (this.startPosition.height / 2), 2)
+    } else {
+      this.mesh.position.set(this.startPosition.x, (this.startPosition.height / 2), 2)
+    }
+    this.controls.lastDisplayTime = 0
+    this.controls.currentTile = 0
+    this.controls.delay = 0
+    this.controls.paused = true
+    this.controls.loopCount = 0
+    this.controls.loop = false
+    this.controls.visible = true
+    this.controls.rewindWhenFinished = false
+    this.controls.hideWhenFinished = false
+    this.controls.callback = null
+    this.controls.callbackTriggered = false
+    this.controls.frameMovement = {}
+    this.controls.frameReady = false
+
+    this.ready = true
     if (this.controls.hideWhenFinished) {
       this.controls.visible = false;
     }

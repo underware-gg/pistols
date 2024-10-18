@@ -290,6 +290,7 @@ function setRender(canvas) {
     antialias: true,
     alpha: true,
     canvas,
+    powerPreference: 'low-power' //TODO requires more testing
   })
   _renderer.setSize(WIDTH, HEIGHT)
   _renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3));
@@ -440,7 +441,7 @@ export function hideDialogs() {
   _duelistManager.hideElements()
 }
 
-export function resetDuelScene() {
+export function resetDuelScene(resetCamera = true) {
   if (!_duelistManager.resetDuelists()) return
 
   emitter.emit('animated', AnimationState.None)
@@ -454,7 +455,9 @@ export function resetDuelScene() {
   _round2Animated = false
   _round3Animated = false
 
-  zoomCameraToPaces(10, 0)
+  if (resetCamera) {
+    zoomCameraToPaces(10, 0)
+  }
   zoomCameraToPaces(0, 4)
 }
 
@@ -819,12 +822,15 @@ export function setDuelistElement(isA, duelistElement) {
   _duelistManager.setDuelistElement(isA, duelistElement)
 }
 
+export function setDuelistSpeedFactor(speedFactor) {
+  _duelistManager.setDuelistSpeedFactor(speedFactor)
+}
+
 //----------------
 // Animation triggers
 //
 
 export function zoomCameraToPaces(paceCount, seconds) {
-  console.log("ZOOOMIN, ", paceCount, seconds)
   const targetPos = {
     x: map(paceCount, 0, 10, zoomedCameraPos.x, zoomedOutCameraPos.x),
     y: map(paceCount, 0, 10, zoomedCameraPos.y, zoomedOutCameraPos.y),
@@ -887,7 +893,7 @@ export function animateActions(actionA: Action, actionB: Action, healthA: number
 
   setTimeout(() => {
     _duelistManager.animateActions(actionA, actionB, healthA, healthB)
-  }, 4000);
+  }, 2000);
 }
 
 

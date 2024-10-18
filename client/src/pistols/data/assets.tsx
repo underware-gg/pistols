@@ -700,6 +700,11 @@ const ProfileModels: Record<number, CharacterType> = {
   [14]: CharacterType.MALE,
   [15]: CharacterType.MALE,
   [16]: CharacterType.FEMALE,
+  [17]: CharacterType.MALE,
+  [18]: CharacterType.FEMALE,
+  [19]: CharacterType.FEMALE,
+  [20]: CharacterType.MALE,
+  [21]: CharacterType.MALE,
 }
 
 

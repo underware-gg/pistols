@@ -187,6 +187,10 @@ export class DuelistsManager {
     this.duelProgressDialogManger.hideDialogs()
   }
 
+  public setDuelistSpeedFactor(speedFactor) {
+    this.duelistA.actor.setSpeedFactor(speedFactor)
+    this.duelistB.actor.setSpeedFactor(speedFactor)
+  }
 
 
   //----------------

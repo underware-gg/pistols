@@ -15,6 +15,7 @@ export const initialState = {
   sfxEnabled: true,
   tableId: '',
   duelistId: 0n,
+  duelSpeedFactor: 1.0,
   // internal
   initialized: false,
 }
@@ -27,6 +28,7 @@ const SettingsActions = {
   SFX_ENABLED: 'settings.SFX_ENABLED',
   TABLE_ID: 'settings.TABLE_ID',
   DUELIST_ID: 'settings.DUELIST_ID',
+  DUEL_SPEED_FACTOR: 'settings.DUEL_SPEED_FACTOR'
 }
 
 //--------------------------------
@@ -42,6 +44,7 @@ type ActionType =
   | { type: 'SFX_ENABLED', payload: boolean }
   | { type: 'TABLE_ID', payload: string }
   | { type: 'DUELIST_ID', payload: bigint }
+  | { type: 'DUEL_SPEED_FACTOR', payload: number }
   // internal
   | { type: 'INITIALIZED', payload: boolean }
 
@@ -79,6 +82,7 @@ const SettingsProvider = ({
       [SettingsActions.SFX_ENABLED]: () => setCookie(cookieName, state.sfxEnabled, _options),
       [SettingsActions.TABLE_ID]: () => setCookie(cookieName, state.tableId, _options),
       [SettingsActions.DUELIST_ID]: () => setCookie(cookieName, Number(state.duelistId), _options),
+      [SettingsActions.DUEL_SPEED_FACTOR]: () => setCookie(cookieName, Number(state.duelSpeedFactor), _options),
     }
     _setters[cookieName]?.()
   }, [setCookie])
@@ -113,6 +117,11 @@ const SettingsProvider = ({
       case SettingsActions.SFX_ENABLED: {
         newState.sfxEnabled = action.payload as boolean
         cookieSetter(SettingsActions.SFX_ENABLED, newState)
+        break
+      }
+      case SettingsActions.DUEL_SPEED_FACTOR: {
+        newState.duelSpeedFactor = action.payload as number
+        cookieSetter(SettingsActions.DUEL_SPEED_FACTOR, newState)
         break
       }
       case SettingsActions.TABLE_ID: {

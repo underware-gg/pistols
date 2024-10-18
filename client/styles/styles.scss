@@ -842,17 +842,53 @@ $ui-container-gap: 1em;
   padding: 0px;
 }
 
+.MenuLeft {
+  height: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  padding: 15px;
+}
+.MenuRight {
+  @extend .MenuLeft;
+  left: unset;
+  right: 0;
+}
+
+.MenuRightDuel {
+  @extend .MenuRight;
+  padding: 0px;
+  align-items: center;
+  align-content: center;
+}
+
 .MenuBottomBackground {
   position: absolute;
-  height: 2.5vw;
-  bottom: 0;
+  height: aspect-width(2.5);
+  bottom: 4px;
   left: 0;
   right: 0;
 }
 
-.MenuBottomBackgroundImage {
-  width: 25vw;
-  height: 2.5vw;
+.MenuRightBackground {
+  position: absolute;
+  height: aspect-width(3);
+  transform: rotate(-90deg) translateX(51%) translateY(-100%);
+  transform-origin: top right;
+  right: 0;
+  top: 50%;
+}
+
+.MenuBackgroundImage {
+  width: aspect-width(28);
+  height: aspect-width(2.5);
+  transform: translateY(4px);
+}
+
+.MenuBackgroundImageFliped {
+  width: aspect-width(20);
+  height: aspect-width(3);
 }
 
 .TavernBoard {
@@ -1875,14 +1911,28 @@ a.active.step:hover,
   background-color: transparent !important;
   align-items: center;
   justify-content: center;
+  display: flex !important;
   font-size: aspect-width(0.9) !important;
   min-height: 0 !important;
+  // background-color: red !important;
+  // opacity: 0.6;
 }
 
 .button_duel[type="tavern"] {
-  width: aspect-width(8.9);
+  width: aspect-width(9.8);
 }
 
-.button_duel[type="database"], .button_duel[type="volume"] {
-  width: aspect-width(2.7);
+.button_duel[type="icon"] {
+  width: aspect-width(2.9);
+}
+
+.button_duel[type="icon-vertical"] {
+  width: aspect-width(2.5);
+  height: aspect-width(2.5);
+  padding: 0 !important;
+  flex-direction: column;
+}
+
+.icon-control {
+  margin: 0 !important;
 }
