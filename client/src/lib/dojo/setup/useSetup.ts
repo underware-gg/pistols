@@ -18,10 +18,8 @@ import {
   createSystemCalls,
   defineContractComponents,
 } from './setup'
-import { isReadable } from 'stream';
 
 export type SetupResult = ReturnType<typeof useSetup> | null
-export type ClientComponents = ReturnType<typeof defineContractComponents>
 
 export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: DojoChainConfig, account: Account) {
 

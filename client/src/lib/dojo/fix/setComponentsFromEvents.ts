@@ -1,14 +1,11 @@
 import {
-  Entity,
   setComponent,
   Component,
-  Components,
-  ComponentValue,
   Type as RecsType,
   Schema,
 } from "@dojoengine/recs";
 import { getEntityIdFromKeys, hexToAscii } from "@dojoengine/utils";
-import { entityIdToKey } from '@/lib/utils/types'
+import { ClientComponents } from '@/lib/dojo/setup/setup'
 
 
 /**
@@ -17,7 +14,7 @@ import { entityIdToKey } from '@/lib/utils/types'
  * @param {Components} components - The components to be updated.
  * @param {Event[]} events - An array of events containing component data.
  */
-export function setComponentsFromEvents(components: Components, events: any[]) {
+export function setComponentsFromEvents(components: ClientComponents, events: any[]) {
   events.forEach((event) => setComponentFromEvent(components, event.data));
 }
 
@@ -28,7 +25,7 @@ export function setComponentsFromEvents(components: Components, events: any[]) {
  * @param {string[]} eventData - The data from a single event.
  */
 export function setComponentFromEvent(
-  components: Components,
+  components: ClientComponents,
   eventData: string[]
 ) {
   console.log(eventData);

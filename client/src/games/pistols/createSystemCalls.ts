@@ -3,7 +3,7 @@ import { getComponentValue } from '@dojoengine/recs'
 import { AccountInterface, BigNumberish, Call, Result } from 'starknet'
 import { stringToFelt, bigintToU256 } from '@/lib/utils/starknet'
 import { DojoManifest } from '@/lib/dojo/Dojo'
-import { ClientComponents } from '@/lib/dojo/setup/useSetup'
+import { ClientComponents } from '@/lib/dojo/setup/setup'
 import { bigintAdd, bigintToEntity, bigintToHex, isPositiveBigint } from '@/lib/utils/types'
 import { emitter } from '@/pistols/three/game'
 import {
