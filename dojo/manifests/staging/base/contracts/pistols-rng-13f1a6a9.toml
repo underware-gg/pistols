@@ -1,0 +1,11 @@
+kind = "DojoContract"
+class_hash = "0x6a0d0ece6d37f67bb12d3cf9ec053b75d7862c28fa5e6c35f6a262efc17ab3d"
+original_class_hash = "0x6a0d0ece6d37f67bb12d3cf9ec053b75d7862c28fa5e6c35f6a262efc17ab3d"
+base_class_hash = "0x0"
+abi = "manifests/staging/base/abis/contracts/pistols-rng-13f1a6a9.json"
+reads = []
+writes = []
+init_calldata = []
+tag = "pistols-rng"
+systems = []
+manifest_name = "pistols-rng-13f1a6a9"
