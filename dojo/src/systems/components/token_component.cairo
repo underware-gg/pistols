@@ -1,3 +1,12 @@
+use starknet::ContractAddress;
+
+#[starknet::interface]
+pub trait ITokenComponentPublic<TState> {
+    fn can_mint(self: @TState, caller_address: ContractAddress) -> bool;
+    fn exists(self: @TState, token_id: u128) -> bool;
+    fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
+}
+
 #[starknet::component]
 pub mod TokenComponent {
     use zeroable::Zeroable;
@@ -30,6 +39,52 @@ pub mod TokenComponent {
         const INVALID_TOKEN_ID: felt252     = 'TOKEN: invalid token ID';
     }
 
+
+    //-----------------------------------------
+    // Public
+    //
+    use super::{ITokenComponentPublic};
+    #[embeddable_as(TokenComponentPublicImpl)]
+    pub impl TokenComponentPublic<
+        TContractState,
+        +HasComponent<TContractState>,
+        +IWorldProvider<TContractState>,
+        +SRC5Component::HasComponent<TContractState>,
+        +ERC721Component::ERC721HooksTrait<TContractState>,
+        impl ERC721: ERC721Component::HasComponent<TContractState>,
+        +Drop<TContractState>,
+    > of ITokenComponentPublic<ComponentState<TContractState>> {
+
+        fn can_mint(self: @ComponentState<TContractState>,
+            caller_address: ContractAddress,
+        ) -> bool {
+            let store: Store = StoreTrait::new(self.get_contract().world());
+            let token_config: TokenConfigEntity = store.get_token_config_entity(get_contract_address());
+            (
+                token_config.minter_address.is_zero() ||      // anyone can mint
+                caller_address == token_config.minter_address // caller is minter contract
+            )
+        }
+
+        fn exists(self: @ComponentState<TContractState>, token_id: u128) -> bool {
+            let erc721 = get_dep_component!(self, ERC721);
+            (erc721._owner_of(token_id.into()).is_non_zero())
+        }
+
+        fn is_owner_of(self: @ComponentState<TContractState>,
+            address: ContractAddress,
+            token_id: u128,
+        ) -> bool {
+println!("is_owner_of_1");
+            let erc721 = get_dep_component!(self, ERC721);
+            (erc721._owner_of(token_id.into()) == address)
+        }
+    }
+
+
+    //-----------------------------------------
+    // Internal
+    //
     #[generate_trait]
     pub impl InternalImpl<
         TContractState,
@@ -40,7 +95,7 @@ pub mod TokenComponent {
         impl ERC721: ERC721Component::HasComponent<TContractState>,
         +Drop<TContractState>,
     > of InternalTrait<TContractState> {
-        fn _initialize(ref self: ComponentState<TContractState>,
+        fn initialize(ref self: ComponentState<TContractState>,
             minter_address: ContractAddress,
             renderer_address: ContractAddress,
             treasury_address: ContractAddress,
@@ -60,21 +115,10 @@ pub mod TokenComponent {
             store.set_token_config(@token_config);
         }
 
-        fn _can_mint(self: @ComponentState<TContractState>,
-            caller_address: ContractAddress,
-        ) -> bool {
-            let store: Store = StoreTrait::new(self.get_contract().world());
-            let token_config: TokenConfigEntity = store.get_token_config_entity(get_contract_address());
-            (
-                token_config.minter_address.is_zero() ||      // anyone can mint
-                caller_address == token_config.minter_address // caller is minter contract
-            )
-        }
-
-        fn _mint(ref self: ComponentState<TContractState>,
+        fn mint(ref self: ComponentState<TContractState>,
             recipient: ContractAddress,
-        ) -> u256 {
-            assert(self._can_mint(get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
+        ) -> u128 {
+            assert(self.can_mint(get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
 
             // get next token id
             let store: Store = StoreTrait::new(self.get_contract().world());
@@ -87,31 +131,26 @@ pub mod TokenComponent {
 
             let mut erc721 = get_dep_component_mut!(ref self, ERC721);
             erc721.mint(recipient, token_id.into());
-            (token_id.into())
+            (token_id)
         }
 
-        fn _burn(ref self: ComponentState<TContractState>,
-            token_id: u256,
+        fn burn(ref self: ComponentState<TContractState>,
+            token_id: u128,
         ) {
-            assert(self._can_mint(get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
+            assert(self.can_mint(get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
             let mut erc721 = get_dep_component_mut!(ref self, ERC721);
-            erc721.burn(token_id);
+            erc721.burn(token_id.into());
         }
 
-        fn _assert_token_exists(self: @ComponentState<TContractState>,
-            caller_address: ContractAddress,
-            token_id: u256,
-        ) {
-            let erc721 = get_dep_component!(self, ERC721);
-            assert(erc721._owner_of(token_id).is_non_zero(), Errors::INVALID_TOKEN_ID);
+        fn assert_exists(self: @ComponentState<TContractState>, token_id: u128) {
+            assert(self.exists(token_id.into()), Errors::INVALID_TOKEN_ID);
         }
 
-        fn _assert_caller_is_owner(self: @ComponentState<TContractState>,
-            caller_address: ContractAddress,
-            token_id: u256,
+        fn assert_is_owner_of(self: @ComponentState<TContractState>,
+            address: ContractAddress,
+            token_id: u128,
         ) {
-            let erc721 = get_dep_component!(self, ERC721);
-            assert(erc721._owner_of(token_id) == caller_address, Errors::CALLER_IS_NOT_OWNER);
+            assert(self.is_owner_of(address, token_id.into()), Errors::CALLER_IS_NOT_OWNER);
         }
     }
 }

@@ -3,6 +3,8 @@ use starknet::{ContractAddress};
 #[dojo::interface]
 trait IDuelistToken {
     fn owner_of(world: @IWorldDispatcher, token_id: u256) -> ContractAddress;
+    fn exists(world: @IWorldDispatcher, token_id: u128) -> bool;
+    fn is_owner_of(world: @IWorldDispatcher, address: ContractAddress, token_id: u128) -> bool;
 }
 
 #[dojo::contract]
@@ -31,6 +33,14 @@ mod duelist {
 
             // low part is always the owner address
             (as_felt.try_into().unwrap())
+        }
+        fn exists(world: @IWorldDispatcher, token_id: u128) -> bool {
+            WORLD(world);
+            (self.owner_of(token_id.into()).is_non_zero())
+        }
+        fn is_owner_of(world: @IWorldDispatcher, address: ContractAddress, token_id: u128) -> bool {
+            WORLD(world);
+            (self.owner_of(token_id.into()) == address)
         }
     }
 

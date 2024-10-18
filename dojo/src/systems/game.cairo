@@ -81,6 +81,7 @@ mod game {
 
     use pistols::interfaces::systems::{
         WorldSystemsTrait,
+        IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
     };
     use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, Moves};
     use pistols::models::duelist::{Duelist, DuelistTrait, Score, Pact};
@@ -99,7 +100,6 @@ mod game {
     use pistols::types::typed_data::{CommitMoveMessage, CommitMoveMessageTrait};
     use pistols::types::{events};
     use pistols::libs::store::{Store, StoreTrait};
-    use pistols::interfaces::ierc721::{Erc721Helper, Erc721HelperTrait};
 
     mod Errors {
         const NOT_INITIALIZED: felt252           = 'PISTOLS: Not initialized';
@@ -154,11 +154,8 @@ mod game {
             // validate challenger
             let duelist_id_a: u128 = duelist_id;
             let address_a: ContractAddress = starknet::get_caller_address();
-            let duelist_helper = Erc721HelperTrait::new_duelist(world);
-            assert(duelist_helper.is_owner_of(address_a, duelist_id_a) == true, Errors::NOT_YOUR_DUELIST);
-// address_a.print();
-// duelist_id_a.print();
-// duelist_helper.owner_of(duelist_id_a).print();
+            let duelist_dispatcher: IDuelistTokenDispatcher = world.duelist_token_dispatcher();
+            assert(duelist_dispatcher.is_owner_of(address_a, duelist_id_a) == true, Errors::NOT_YOUR_DUELIST);
 
             // validate table
             let table: TableConfigEntity = store.get_table_config_entity(table_id);
@@ -174,7 +171,7 @@ mod game {
             let duelist_id_b: u128 = DuelistTrait::try_address_to_id(challenged_id_or_address);
             let address_b: ContractAddress = if (duelist_id_b > 0) {
                 // challenging a duelist...
-                assert(duelist_helper.exists(duelist_id_b) == true, Errors::INVALID_CHALLENGED);
+                assert(duelist_dispatcher.exists(duelist_id_b) == true, Errors::INVALID_CHALLENGED);
                 assert(duelist_id_a != duelist_id_b, Errors::INVALID_CHALLENGED_SELF);
                 (ZERO())
             } else {
@@ -264,11 +261,11 @@ mod game {
                 challenge.timestamp_end = timestamp;
             } else {
                 // validate duelist ownership
-                let duelist_helper = Erc721HelperTrait::new_duelist(world);
+                let duelist_dispatcher = world.duelist_token_dispatcher();
 // address_b.print();
 // duelist_id_b.print();
-// duelist_helper.owner_of(duelist_id_b).print();
-                assert(duelist_helper.is_owner_of(address_b, duelist_id_b) == true, Errors::NOT_YOUR_DUELIST);
+// duelist_dispatcher.owner_of(duelist_id_b).print();
+                assert(duelist_dispatcher.is_owner_of(address_b, duelist_id_b) == true, Errors::NOT_YOUR_DUELIST);
 
                 // validate challenged identity
                 // either wallet ot duelist was challenged, never both

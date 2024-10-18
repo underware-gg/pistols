@@ -33,6 +33,11 @@ pub trait IDuelistToken<TState> {
     // IERC721MetadataCamelOnly
     fn tokenURI(self: @TState, tokenId: u256) -> ByteArray;
 
+    // ITokenComponentPublic
+    fn can_mint(self: @TState, caller_address: ContractAddress) -> bool;
+    fn exists(self: @TState, token_id: u128) -> bool;
+    fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
+
     // IDuelistTokenPublic
     fn calc_price(ref self: TState, recipient: ContractAddress) -> u128;
     fn create_duelist(ref self: TState, recipient: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252, initial_archetype: Archetype) -> Duelist;
@@ -101,21 +106,23 @@ pub mod duelist {
     //
     use openzeppelin_introspection::src5::SRC5Component;
     use openzeppelin_token::erc721::{ERC721Component};
-    use pistols::systems::components::erc721_hooks::{ERC721HooksImpl};
     use pistols::systems::components::token_component::{TokenComponent};
+    use pistols::systems::components::erc721_hooks::{ERC721HooksImpl};
     component!(path: SRC5Component, storage: src5, event: SRC5Event);
     component!(path: ERC721Component, storage: erc721, event: ERC721Event);
     component!(path: TokenComponent, storage: token, event: TokenEvent);
     #[abi(embed_v0)]
     impl ERC721MixinImpl = ERC721Component::ERC721MixinImpl<ContractState>;
     impl ERC721InternalImpl = ERC721Component::InternalImpl<ContractState>;
-    impl TokenInternalImpl = TokenComponent::InternalImpl<ContractState>;
+    #[abi(embed_v0)]
+    impl TokenComponentPublicImpl = TokenComponent::TokenComponentPublicImpl<ContractState>;
+    impl TokenComponentInternalImpl = TokenComponent::InternalImpl<ContractState>;
     #[storage]
     struct Storage {
         #[substorage(v0)]
-        erc721: ERC721Component::Storage,
-        #[substorage(v0)]
         src5: SRC5Component::Storage,
+        #[substorage(v0)]
+        erc721: ERC721Component::Storage,
         #[substorage(v0)]
         token: TokenComponent::Storage,
     }
@@ -158,7 +165,7 @@ pub mod duelist {
             TOKEN_SYMBOL(),
             BASE_URI(),
         );
-        self.token._initialize(
+        self.token.initialize(
             minter_address,
             renderer_address,
             treasury_address,
@@ -173,7 +180,7 @@ pub mod duelist {
     //
     use super::{IDuelistTokenPublic};
     #[abi(embed_v0)]
-    impl TokenComponentPublicImpl of IDuelistTokenPublic<ContractState> {
+    impl DuelistTokenPublicImpl of IDuelistTokenPublic<ContractState> {
 
         fn calc_price(self: @ContractState,
             recipient: ContractAddress,
@@ -201,7 +208,7 @@ pub mod duelist {
             }
 
             // mint!
-            let token_id: u128 = self.token._mint(recipient).low;
+            let token_id: u128 = self.token.mint(recipient);
 
             // create Duelist
             let mut duelist = Duelist {
@@ -235,7 +242,7 @@ pub mod duelist {
             profile_pic_uri: felt252,
         ) -> Duelist {
             // validate owner
-            self.token._assert_caller_is_owner(get_caller_address(), duelist_id.into());
+            self.token.assert_is_owner_of(get_caller_address(), duelist_id.into());
 
             // validate duelist
             let store: Store = StoreTrait::new(self.world());
@@ -257,9 +264,9 @@ pub mod duelist {
         fn delete_duelist(ref self: ContractState,
             duelist_id: u128,
         ) {
-            self.token._assert_caller_is_owner(get_caller_address(), duelist_id.into());
+            self.token.assert_is_owner_of(get_caller_address(), duelist_id.into());
             assert(false, Errors::NOT_IMPLEMENTED);
-            self.token._burn(duelist_id.into());
+            self.token.burn(duelist_id.into());
         }
 
     }

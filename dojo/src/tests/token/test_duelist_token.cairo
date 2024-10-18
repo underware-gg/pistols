@@ -173,6 +173,16 @@ fn test_initializer() {
 }
 
 #[test]
+fn test_token_component() {
+    let (mut _world, mut token) = setup(100);
+    // should not panic
+    // token.contract_address.print();
+    token.owner_of(TOKEN_ID_1);//.print();
+    token.calc_price(OWNER());//.print();
+    token.is_owner_of(OWNER(), TOKEN_ID_1.low);//.print();
+}
+
+#[test]
 fn test_token_uri() {
     let (mut world, mut token) = setup(100);
 
