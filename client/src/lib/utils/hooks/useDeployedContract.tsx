@@ -1,17 +1,19 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useContract } from '@starknet-react/core'
 import { Abi, BigNumberish, CairoVersion, CompilerVersion } from 'starknet'
-import { bigintToHex } from '@/lib/utils/types'
+import { bigintToHex, isPositiveBigint } from '@/lib/utils/types'
 
 export const useDeployedContract = (contractAddress: BigNumberish, abi: Abi) => {
 
   const [cairoVersion, setCairoVersion] = useState<CairoVersion>(undefined)
   const [compilerVersion, setCompilerVersion] = useState<CompilerVersion>(undefined)
   const [isDeployed, setIsDeployed] = useState<boolean>(!contractAddress ? false : undefined)
-  const { contract } = useContract({
-    address: bigintToHex(contractAddress),
+
+  const options = useMemo(() => ({
     abi,
-  })
+    address: isPositiveBigint(contractAddress) ? bigintToHex(contractAddress) : null,
+  }), [contractAddress, abi])
+  const { contract } = useContract(options)
 
   useEffect(() => {
     let _mounted = true

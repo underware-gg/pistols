@@ -4,7 +4,7 @@ import { RowDivider, VStack } from '@/lib/ui/Stack'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDuelistCalcPrice } from '@/pistols/hooks/useTokenDuelist'
-import { useDuelistBalanceOf, useDuelistOfOwnerByIndex } from '@/pistols/hooks/useTokenDuelist'
+import { useDuelistsOfOwner } from '@/pistols/hooks/useTokenDuelist'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
@@ -19,6 +19,7 @@ import { Header } from '@/pistols/components/Header'
 import DuelistEditModal from '@/pistols/components/DuelistEditModal'
 import DuelistModal from '@/pistols/components/DuelistModal'
 import WalletHeader from '@/pistols/components/account/WalletHeader'
+import { BigNumberish } from 'starknet'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -27,7 +28,7 @@ export default function ScProfile() {
   const { isConnected, address } = useAccount()
   const { duelistEditOpener } = usePistolsContext()
   const { fromGate } = usePistolsScene()
-  const { duelistBalance } = useDuelistBalanceOf(address)
+  const { duelistBalance } = useDuelistsOfOwner(address)
   // console.log(`DUELIST BALANCE`, duelistBalance)
 
   const [loaded, setLoaded] = useState(false)
@@ -100,7 +101,7 @@ function DuelistsList() {
   const { duelistId } = useSettings()
   const { duelistEditOpener } = usePistolsContext()
   const { dispatchSetScene } = usePistolsScene()
-  const { duelistBalance } = useDuelistBalanceOf(address)
+  const { duelistBalance, duelistIds } = useDuelistsOfOwner(address)
   const { amount } = useDuelistCalcPrice(address)
 
   const _mintDuelist = () => {
@@ -111,13 +112,11 @@ function DuelistsList() {
     dispatchSetScene(SceneName.Tavern)
   }
 
-  const rows = useMemo(() => {
-    let result = []
-    for (let index = 0; index < duelistBalance; ++index) {
-      result.push(<DuelistItem key={`i${index}`} index={index} />)
-    }
-    return result
-  }, [address, duelistBalance])
+  const rows = useMemo(() => (
+    duelistIds.map((duelistId) => {
+      return <DuelistItem key={`i${duelistId}`} duelistId={duelistId} />
+    })
+  ), [address, duelistBalance])
 
   return (
     <VStack className='Faded FillWidth UIAccountsListScroller_XX'>
@@ -149,13 +148,11 @@ function DuelistsList() {
 
 
 function DuelistItem({
-  index,
+  duelistId,
 }: {
-  index: number
+  duelistId: BigNumberish
 }) {
-  const { address } = useAccount()
   const { duelistId: seletedDuelistId } = useSettings()
-  const { duelistId } = useDuelistOfOwnerByIndex(address, index)
   const { exists, profilePic } = useDuelist(duelistId)
   const isSelected = (duelistId && duelistId == seletedDuelistId)
 

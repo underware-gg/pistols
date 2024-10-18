@@ -24,7 +24,7 @@ import { Action, ArchetypeNames } from '@/pistols/utils/pistols'
 import { MenuDebugAnimations, MenuDuel } from '@/pistols/components/Menus'
 import { bigintToHex } from '@/lib/utils/types'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { useDuelistOwner } from '../hooks/useTokenDuelist'
+import { useOwnerOfDuelist } from '../hooks/useTokenDuelist'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import 'react-circular-progressbar/dist/styles.css';
@@ -375,7 +375,7 @@ function DuelProfile({
   floated: SemanticFLOATS
 }) {
   const { profilePic, name, nameDisplay } = useDuelist(duelistId)
-  const { owner } = useDuelistOwner(duelistId)
+  const { owner } = useOwnerOfDuelist(duelistId)
   const { aspectWidth } = useGameAspect()
 
   const contentLength = useMemo(() => Math.floor(nameDisplay.length/10), [nameDisplay])

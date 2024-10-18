@@ -5,7 +5,7 @@ import { LordsBalance, LockedWagerBalance } from '@/pistols/components/account/L
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { EMOJI } from '@/pistols/data/messages'
 import { BigNumberish } from 'starknet'
-import { useDuelistOwner } from '@/pistols/hooks/useTokenDuelist'
+import { useOwnerOfDuelist } from '@/pistols/hooks/useTokenDuelist'
 import { useValidateWalletAddress } from '@/lib/utils/hooks/useValidateWalletAddress'
 
 const Row = Grid.Row
@@ -65,7 +65,7 @@ export function ProfileDescription({
   } } = useDuelist(duelistId)
 
   // if its a duelist...
-  const { owner } = useDuelistOwner(duelistId)
+  const { owner } = useOwnerOfDuelist(duelistId)
   
   // if its a wallet...
   const { isStarknetAddress } = useValidateWalletAddress(address)

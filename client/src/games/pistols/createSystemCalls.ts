@@ -38,7 +38,7 @@ const admin_call = (entrypoint: string, calldata: any[]) => ({
   calldata,
 })
 const duelist_token_call = (entrypoint: string, calldata: any[]) => ({
-  contractName: 'duelist_token',
+  contractName: 'duelist',
   entrypoint,
   calldata,
 })

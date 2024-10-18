@@ -31,7 +31,7 @@ export const useContractCall = <T extends any>({
           setValue(v)
         }
       }).catch((e) => {
-        console.error(`useDojoContractCall() ERROR:`, call, args, e)
+        console.error(`useContractCall() ERROR:`, call, args, e)
         if (_mounted) {
           setIsPending(false)
           setValue(defaultValue)

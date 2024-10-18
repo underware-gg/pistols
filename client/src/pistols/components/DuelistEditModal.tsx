@@ -4,7 +4,7 @@ import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
-import { useLastDuelistOfOwner } from '@/pistols/hooks/useTokenDuelist'
+import { useDuelistsOfOwner } from '@/pistols/hooks/useTokenDuelist'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileBadge } from '@/pistols/components/account/ProfileDescription'
@@ -36,34 +36,33 @@ export default function DuelistEditModal({
   const editingDuelistId = (mintNew ? 0n : duelistId)
 
   // watch new mints
-  const { lastDuelistId } = useLastDuelistOfOwner(address)
+  const { duelistBalance } = useDuelistsOfOwner(address)
   
   // Detect new mints
   const { dispatchSetScene } = usePistolsScene()
-  const [lastDuelistIdBeforeMint, setLastDuelistIdBeforeMint] = useState<bigint>(null)
+  const [duelistBalanceBeforeMint, setDuelistBalanceBeforeMint] = useState<number>(null)
   const { mintLords } = useLordsFaucet()
   useEffect(() => {
     // minted new! go to Game...
     if (opener.isOpen &&
       mintNew && 
-      isPositiveBigint(lastDuelistId) &&
-      lastDuelistIdBeforeMint != null && 
-      lastDuelistId != lastDuelistIdBeforeMint
+      duelistBalanceBeforeMint != null && 
+      duelistBalance != duelistBalanceBeforeMint
     ) {
-      console.log(`NEW DUELIST:`, lastDuelistId)
-      dispatchDuelistId(lastDuelistId)
+      console.log(`NEW DUELIST BALANCE:`, duelistBalance)
+      dispatchDuelistId(duelistBalance)
       dispatchSetScene(SceneName.Tavern)
       mintLords(account)
       opener.close()
     }
-  }, [mintNew, lastDuelistId])
+  }, [mintNew, duelistBalance])
 
   const { create_duelist, update_duelist } = useDojoSystemCalls()
 
   const { name, profilePic, score: { archetypeName } } = useDuelist(editingDuelistId)
   const [selectedProfilePic, setSelectedProfilePic] = useState(0)
 
-  const randomPic = useMemo(() => (Number(poseidon([address ?? 0n, lastDuelistId ?? 0n]) % BigInt(PROFILE_PIC_COUNT)) + 1), [address, lastDuelistId])
+  const randomPic = useMemo(() => (Number(poseidon([address ?? 0n, duelistBalance ?? 0n]) % BigInt(PROFILE_PIC_COUNT)) + 1), [address, duelistBalance])
   const _profilePic = useMemo(() => {
     return (
       selectedProfilePic ? selectedProfilePic
@@ -87,7 +86,7 @@ export default function DuelistEditModal({
   const _submit = () => {
     if (canSubmit) {
       if (mintNew) {
-        setLastDuelistIdBeforeMint(lastDuelistId ?? 0n)
+        setDuelistBalanceBeforeMint(duelistBalance ?? 0)
         create_duelist(account, address, inputName, ProfilePicType.Duelist, _profilePic.toString(), inputArchetype)
       } else {
         update_duelist(account, editingDuelistId, inputName, ProfilePicType.Duelist, _profilePic.toString())
