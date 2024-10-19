@@ -68,11 +68,6 @@ export const StarknetProvider = ({
     // order: 'random',
   });
 
-  // this can be empty while we initialize katana connectors async
-  if (chainConnectors.length == 0) {
-    return <></>
-  }
-
   //
   // RPC
   //

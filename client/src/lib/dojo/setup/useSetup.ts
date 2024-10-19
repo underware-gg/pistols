@@ -1,7 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { Account } from 'starknet'
 import { overridableComponent } from "@dojoengine/recs";
-import { PredeployedManager } from '@dojoengine/create-burner'
 import { getSyncEntities } from '@dojoengine/state'
 import { DojoProvider } from '@dojoengine/core'
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
@@ -9,7 +8,7 @@ import { useSystem } from '@/lib/dojo/hooks/useDojoSystem'
 import { useAsyncMemo } from '@/lib/utils/hooks/useAsyncMemo'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { feltToString } from '@/lib/utils/starknet'
-import { DojoChainConfig, getChainMasterAccount } from './chainConfig'
+import { DojoChainConfig } from './chainConfig'
 import { world } from "./world";
 import * as torii from '@dojoengine/torii-client'
 
@@ -114,30 +113,6 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   }, [manifest, sync, components, dojoProvider])
 
   //
-  // Predeployed accounts
-  // (includes master account)
-  // can be null
-  const {
-    value: predeployedManager,
-    isError: predeployedManagerIsError,
-  } = useAsyncMemo<PredeployedManager>(async () => {
-    if (!dojoProvider) return (dojoProvider as any) // undefined or null
-    let predeployedAccounts = [...selectedChainConfig.predeployedAccounts]
-    if (predeployedAccounts.length == 0) {
-      const masterAccount = getChainMasterAccount(selectedChainConfig)
-      if (masterAccount) {
-        predeployedAccounts.push(masterAccount)
-      }
-    }
-    const predeployedManager = new PredeployedManager({
-      rpcProvider: dojoProvider.provider,
-      predeployedAccounts,
-    })
-    await predeployedManager.init()
-    return predeployedManager
-  }, [selectedChainConfig, dojoProvider], undefined, null)
-
-  //
   // Status
 
   const isLoading = !(
@@ -145,8 +120,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     (dojoProvider !== undefined) &&
     (components !== undefined) &&
     (sync !== undefined) &&
-    (systemCalls !== undefined) &&
-    (predeployedManager !== undefined)
+    (systemCalls !== undefined)
   )
   const loadingMessage = (isLoading ? 'Loading Pistols...' : null)
 
@@ -156,8 +130,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
         : toriiIsError ? 'Game Indexer is Unavailable'
           : sync === null ? 'Sync Error'
             : isDeployed === null ? 'World not Found'
-              : predeployedManagerIsError ? 'Predeployed Manager error'
-                : null
+              : null
   const isError = (errorMessage != null)
 
   useEffect(() => {
@@ -174,7 +147,6 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     components,
     sync,
     systemCalls,
-    predeployedManager,
     // pass thru
     dojoAppConfig,
     selectedChainConfig,

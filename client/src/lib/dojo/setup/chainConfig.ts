@@ -1,5 +1,4 @@
 import { Chain } from '@starknet-react/chains'
-import { PredeployedAccount } from '@dojoengine/create-burner'
 import { stringToFelt } from '@/lib/utils/starknet'
 import { cleanObject } from '@/lib/utils/types'
 import {
@@ -65,17 +64,4 @@ export const getStarknetProviderChains = (supportedChainIds: ChainId[]): Chain[]
     }
     return acc
   }, [])
-}
-
-export const getChainMasterAccount = (dojoChainConfig: DojoChainConfig): PredeployedAccount => {
-  // const dojoChainConfig = dojoContextConfig[chainId]
-  if (dojoChainConfig?.masterAddress && dojoChainConfig?.masterPrivateKey) {
-    return {
-      name: 'Master Account',
-      address: dojoChainConfig.masterAddress,
-      privateKey: dojoChainConfig.masterPrivateKey,
-      active: true,
-    }
-  }
-  return null
 }

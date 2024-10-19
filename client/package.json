@@ -18,7 +18,6 @@
     "@cartridge/connector": "0.3.46",
     "@cartridge/controller": "0.3.46",
     "@dojoengine/core": "v1.0.0-alpha.12",
-    "@dojoengine/create-burner": "v1.0.0-alpha.12",
     "@dojoengine/react": "v1.0.0-alpha.12",
     "@dojoengine/recs": "^2.0.13",
     "@dojoengine/state": "v1.0.0-alpha.12",

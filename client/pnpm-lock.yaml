@@ -20,9 +20,6 @@ importers:
       '@dojoengine/core':
         specifier: v1.0.0-alpha.12
         version: 1.0.0-alpha.12(starknet@6.11.0(encoding@0.1.13))(typescript@5.5.4)
-      '@dojoengine/create-burner':
-        specifier: v1.0.0-alpha.12
-        version: 1.0.0-alpha.12(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(starknet@6.11.0(encoding@0.1.13))(typescript@5.5.4)
       '@dojoengine/react':
         specifier: v1.0.0-alpha.12
         version: 1.0.0-alpha.12(@types/node@20.14.5)(@types/react@18.3.3)(react@18.3.1)(sass@1.77.6)(starknet@6.11.0(encoding@0.1.13))(type-fest@2.19.0)(typescript@5.5.4)(zod@3.23.8)
@@ -281,13 +278,6 @@ packages:
     resolution: {integrity: sha512-KuinebMRPrsGebpQqW8oXVYRaCiUOdngjr4vN6WaWkUcyvFRfeJqzCemQdgqtOwvZZKjo6UIQNvYWPsuzjcxnA==}
     hasBin: true
     peerDependencies:
-      starknet: 6.11.0
-
-  '@dojoengine/create-burner@1.0.0-alpha.12':
-    resolution: {integrity: sha512-+kXiu1iwif/P9RlG/+jmZDFiS3Xz0wLINZx3+pv7jKcG2Vuxxxdiq4YfHlgAnHXQVvGbeVf/PLD7MCgdMbCiPA==}
-    peerDependencies:
-      react: ^18.2.0
-      react-dom: ^18.2.0
       starknet: 6.11.0
 
   '@dojoengine/react@1.0.0-alpha.12':
@@ -762,13 +752,6 @@ packages:
 
   '@starknet-react/chains@3.0.0':
     resolution: {integrity: sha512-+XulhJZMSDAEX9JXHI5qJetHlf1Xr0nc7K2+efUMotGxXM31ovKWc/0JFlJh9Jwjgik/UO859Dh4yLkb92PAhw==}
-
-  '@starknet-react/core@2.3.0':
-    resolution: {integrity: sha512-8g9d0Gs811gJnQJHVMxQoXYhv+y5/qug7NQ0lnJ51uytdBhr/Zz5wgeTHW4ZQ5Igljyvf+ks+yhp4P1iSvnSqA==}
-    peerDependencies:
-      get-starknet-core: ^3.2.0
-      react: ^18.0
-      starknet: ^5.25.0
 
   '@starknet-react/core@2.8.2':
     resolution: {integrity: sha512-OUF3ESBAqck2qU6wNyl3Y/o+axeNQae++AKfgK+2AS3Wb0jNA1Pjk6uH75STq+AQR6jwH0q2mx+krKZdqzKUZg==}
@@ -2590,22 +2573,6 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@dojoengine/create-burner@1.0.0-alpha.12(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(starknet@6.11.0(encoding@0.1.13))(typescript@5.5.4)':
-    dependencies:
-      '@dojoengine/core': 1.0.0-alpha.12(starknet@6.11.0(encoding@0.1.13))(typescript@5.5.4)
-      '@scure/bip32': 1.4.0
-      '@starknet-react/core': 2.3.0(get-starknet-core@3.3.0(starknet@6.11.0(encoding@0.1.13)))(react@18.3.1)(starknet@6.11.0(encoding@0.1.13))
-      encoding: 0.1.13
-      get-starknet-core: 3.3.0(starknet@6.11.0(encoding@0.1.13))
-      js-cookie: 3.0.5
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      starknet: 6.11.0(encoding@0.1.13)
-    transitivePeerDependencies:
-      - bufferutil
-      - typescript
-      - utf-8-validate
-
   '@dojoengine/react@1.0.0-alpha.12(@types/node@20.14.5)(@types/react@18.3.3)(react@18.3.1)(sass@1.77.6)(starknet@6.11.0(encoding@0.1.13))(type-fest@2.19.0)(typescript@5.5.4)(zod@3.23.8)':
     dependencies:
       '@dojoengine/recs': 2.0.13(typescript@5.5.4)(zod@3.23.8)
@@ -3040,17 +3007,6 @@ snapshots:
   '@starknet-react/chains@0.1.7': {}
 
   '@starknet-react/chains@3.0.0': {}
-
-  '@starknet-react/core@2.3.0(get-starknet-core@3.3.0(starknet@6.11.0(encoding@0.1.13)))(react@18.3.1)(starknet@6.11.0(encoding@0.1.13))':
-    dependencies:
-      '@starknet-react/chains': 0.1.7
-      '@tanstack/react-query': 5.45.1(react@18.3.1)
-      eventemitter3: 5.0.1
-      get-starknet-core: 3.3.0(starknet@6.11.0(encoding@0.1.13))
-      immutable: 4.3.6
-      react: 18.3.1
-      starknet: 6.11.0(encoding@0.1.13)
-      zod: 3.23.8
 
   '@starknet-react/core@2.8.2(get-starknet-core@4.0.0)(react@18.3.1)(starknet@6.11.0(encoding@0.1.13))':
     dependencies:

@@ -4,7 +4,6 @@ import { Connector, useAccount, useConnect, useNetwork } from '@starknet-react/c
 import { SwitchStarknetChainParameters, AddStarknetChainParameters } from 'get-starknet-core'
 import { useAddStarknetChain, useSwitchStarknetChain } from '@/lib/dojo/hooks/useWalletRequest'
 import { ChainId, getDojoChainConfig, isChainIdSupported } from '@/lib/dojo/setup/chainConfig'
-import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
 import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { feltToString } from '@/lib/utils/starknet'
 import { BigNumberish, Provider } from 'starknet'
