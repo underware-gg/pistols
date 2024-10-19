@@ -38,7 +38,7 @@ export const useOwnerOfDuelist = (token_id: BigNumberish) => {
 
 export const useDuelistsOfOwner = (owner: BigNumberish) => {
   const { contractAddress } = useTokenContract()
-  const { token } = useToriiErc721TokenByOwner(contractAddress, owner)
+  const { token } = useToriiErc721TokenByOwner(contractAddress, owner, true)
   return {
     duelistBalance: token?.balance ?? 0,
     duelistIds: token?.tokenIds ?? [],

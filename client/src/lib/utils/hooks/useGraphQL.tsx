@@ -32,7 +32,8 @@ export const useGraphQLQuery = (
   toriiUrl: string,
   query: any,
   variables?: Variables,
-  skip?: boolean
+  skip?: boolean,
+  watch?: boolean,
 ) => {
   const client = useMemo(() => {
     return ql_client(toriiUrl);
@@ -41,6 +42,7 @@ export const useGraphQLQuery = (
     client: client,
     variables: variables,
     skip: skip,
+    pollInterval: (watch ? 1000 : undefined),
   });
   return { data, refetch };
 };

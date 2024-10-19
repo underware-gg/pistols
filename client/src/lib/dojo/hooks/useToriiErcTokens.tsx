@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 import { gql } from '@apollo/client'
 import { BigNumberish } from 'starknet'
-import { useGraphQLQuery } from '@/lib/utils/hooks/useGraphQL'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
+import { useGraphQLQuery } from '@/lib/utils/hooks/useGraphQL'
 import { bigintEquals, bigintToHex, isPositiveBigint } from '@/lib/utils/types'
 
 
@@ -78,16 +78,17 @@ export type ERC_Tokens = {
   ERC721: ERC721_Token[],
 }
 
-export function useToriiTokensByOwner(owner: BigNumberish) {
+export function useToriiTokensByOwner(owner: BigNumberish, watch: boolean = false) {
   const { selectedChainConfig } = useSelectedChain()
   const variables = useMemo(() => ({
     address: bigintToHex(owner).toLowerCase(),
   }), [owner]);
   const { data, refetch } = useGraphQLQuery(
-    selectedChainConfig.toriiUrl + '/graphql',
+    `${selectedChainConfig.toriiUrl}/graphql`,
     ercBalance,
     variables,
-    !isPositiveBigint(owner)
+    !isPositiveBigint(owner),
+    watch,
   );
   const tokens = useMemo(() => {
     let tokens: ERC_Tokens = {
@@ -137,8 +138,8 @@ export function useToriiTokensByOwner(owner: BigNumberish) {
   }
 }
 
-export function useToriiErc721TokenByOwner(contractAddress: BigNumberish, owner: BigNumberish) {
-  const { tokens, refetch } = useToriiTokensByOwner(owner)
+export function useToriiErc721TokenByOwner(contractAddress: BigNumberish, owner: BigNumberish, watch: boolean = false) {
+  const { tokens, refetch } = useToriiTokensByOwner(owner, watch)
   const token = useMemo(() => 
     tokens.ERC721.find(token => bigintEquals(token.contractAddress, contractAddress)),
   [tokens, contractAddress])
