@@ -78,7 +78,7 @@ export default function ScProfile() {
 
 function DuelistsConnect() {
   return (
-    <VStack className='Faded FillWidth UIAccountsListScroller_XX'>
+    <VStack className='Faded FillWidth'>
       <Divider />
       <span className='Title'>
         Create or Log In with your
@@ -119,9 +119,9 @@ function DuelistsList() {
   ), [address, duelistBalance])
 
   return (
-    <VStack className='Faded FillWidth UIAccountsListScroller_XX'>
+    <VStack className='Faded FillWidth'>
       <Divider hidden />
-      <Grid className='Faded FillWidth'>
+      <Grid className='Faded FillWidth UIAccountsListScroller'>
         {duelistBalance > 0 &&
           <Row columns={'equal'} className='Title'>
             <Col>

@@ -331,6 +331,12 @@ canvas {
   bottom: 0;
   left: 0;
 }
+.AbsoluteBottomRight {
+  position: absolute;
+  top: unset;
+  bottom: 0;
+  right: 0;
+}
 
 .Grayscale {
   filter: grayscale(100%); /* Current draft standard */
