@@ -125,7 +125,7 @@ const localKatanaConfig: DojoChainConfig = {
   }],
   connectorIds: [
     supportedConnetorIds.DOJO_PREDEPLOYED,
-    supportedConnetorIds.CONTROLLER,
+    // supportedConnetorIds.CONTROLLER,
   ],
   // starknet Chain
   nativeCurrency: ETH_KATANA,

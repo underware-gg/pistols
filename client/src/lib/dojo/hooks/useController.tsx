@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Connector, useAccount, useDisconnect } from '@starknet-react/core'
 import { Policy, ControllerOptions, PaymasterOptions } from '@cartridge/controller'
-import CartridgeConnector from '@cartridge/connector'
+import ControllerConnector from '@cartridge/connector'
 import { KATANA_CLASS_HASH } from '@dojoengine/core'
 import { ContractInterfaces, DojoManifest } from '@/lib/dojo/Dojo'
 import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
@@ -10,6 +10,7 @@ import { BigNumberish } from 'starknet'
 import { bigintEquals, bigintToHex } from '@/lib/utils/types'
 import { stringToFelt } from '@/lib/utils/starknet'
 import { _useConnector } from '../fix/starknet_react_core'
+import { assert } from '@/lib/utils/math'
 
 // sync from here:
 // https://github.com/cartridge-gg/controller/blob/main/packages/account-wasm/src/constants.rs
@@ -20,7 +21,7 @@ const exclusions = [
 ]
 
 export const useControllerConnector = (manifest: DojoManifest, rpcUrl: string, nameSpace: string, contractInterfaces: ContractInterfaces) => {
-  const controller = useMemo(() => {
+  const controller = useCallback(() => {
     const paymaster: PaymasterOptions = {
       caller: bigintToHex(stringToFelt("ANY_CALLER")),
     }
@@ -60,9 +61,10 @@ export const useControllerConnector = (manifest: DojoManifest, rpcUrl: string, n
       policies,
     }
     // console.log(`CONTROLLER:`, options)
-    return new CartridgeConnector(options) as never as Connector
-  }, [manifest])
-
+    const connector = new ControllerConnector(options) as never as Connector
+    assert(connector.id == supportedConnetorIds.CONTROLLER, `ControllerConnector id does not match [${connector.id}/${supportedConnetorIds.CONTROLLER}]`)
+    return connector
+  }, [manifest, rpcUrl, nameSpace, contractInterfaces])
   return {
     controller,
   }
@@ -74,7 +76,7 @@ export const useConnectedController = () => {
   const { connector } = _useConnector()
   
   const controllerConnector = useMemo(() => (
-    connector?.id == supportedConnetorIds.CONTROLLER ? connector as unknown as CartridgeConnector : undefined
+    connector?.id == supportedConnetorIds.CONTROLLER ? connector as unknown as ControllerConnector : undefined
   ), [connector])
   return controllerConnector
 }

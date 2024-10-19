@@ -1,16 +1,18 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
+import {
+  Connector, injected,
+  // argent, braavos,
+} from '@starknet-react/core'
 import { RpcProvider } from 'starknet'
-import { argent, braavos, Connector, injected } from '@starknet-react/core'
 import { StarknetWindowObject } from 'get-starknet-core'
 import { DojoPredeployedStarknetWindowObject, PredeployedManager } from '@dojoengine/create-burner'
 import { useControllerConnector } from '@/lib/dojo/hooks/useController'
 import { DojoChainConfig } from '@/lib/dojo/setup/chains'
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
-import { assert } from '@/lib/utils/math'
 import { useAsyncMemo } from '@/lib/utils/hooks/useAsyncMemo'
 
 export const supportedConnetorIds = {
-  CONTROLLER: 'controller',
+  CONTROLLER: 'controller', // same as ControllerConnector.id
   // ARGENT: argent().id,
   // BRAAVOS: braavos().id,
   DOJO_PREDEPLOYED: DojoPredeployedStarknetWindowObject.getId(),
@@ -32,12 +34,6 @@ export const useChainConnectors = (dojoAppConfig: DojoAppConfig, chainConfig: Do
     dojoAppConfig.nameSpace,
     dojoAppConfig.contractInterfaces,
   )
-
-  useEffect(() => {
-    if (controller) {
-      assert(controller.id == supportedConnetorIds.CONTROLLER, `CartridgeConnector id does not match [${controller.id}]`)
-    }
-  }, [controller])
 
   const _initPredeployed = async () => {
     const predeployedManager = new PredeployedManager({
@@ -62,10 +58,10 @@ export const useChainConnectors = (dojoAppConfig: DojoAppConfig, chainConfig: Do
   } = useAsyncMemo<Connector[]>(async () => {
     let promise: Promise<void> = null
     const result = chainConfig.connectorIds.reduce((acc, id) => {
-      if (id == argent().id) acc.push(argent())
-      if (id == braavos().id) acc.push(braavos())
-      if (id == controller.id) acc.push(controller)
-      if (id == DojoPredeployedStarknetWindowObject.getId() && typeof window !== 'undefined') {
+      // if (id == supportedConnetorIds.ARGENT) acc.push(argent())
+      // if (id == supportedConnetorIds.BRAAVOS) acc.push(braavos())
+      if (id == supportedConnetorIds.CONTROLLER) acc.push(controller())
+      if (id == supportedConnetorIds.DOJO_PREDEPLOYED && typeof window !== 'undefined') {
         acc.push(injected({ id }))
         promise = _initPredeployed()
       }
