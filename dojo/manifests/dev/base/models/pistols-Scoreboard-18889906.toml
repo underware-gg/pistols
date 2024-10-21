@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x20217ebd369f280d7c38719ba769b9af22a3960fb0b230106c672daed0a1361"
-original_class_hash = "0x20217ebd369f280d7c38719ba769b9af22a3960fb0b230106c672daed0a1361"
+class_hash = "0x546b81ccfaff8e5dbf91159087555a115fbfd87bcd8ec2bdafe9e15aca53593"
+original_class_hash = "0x546b81ccfaff8e5dbf91159087555a115fbfd87bcd8ec2bdafe9e15aca53593"
 abi = "manifests/dev/base/abis/models/pistols-Scoreboard-18889906.json"
 tag = "pistols-Scoreboard"
 qualified_path = "pistols::models::duelist::scoreboard"

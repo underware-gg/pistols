@@ -129,11 +129,11 @@
   {
     "type": "impl",
     "name": "IDojoInitImpl",
-    "interface_name": "pistols::systems::tokens::duelist_token::duelist::IDojoInit"
+    "interface_name": "pistols::systems::tokens::duelist_token::duelist_token::IDojoInit"
   },
   {
     "type": "interface",
-    "name": "pistols::systems::tokens::duelist_token::duelist::IDojoInit",
+    "name": "pistols::systems::tokens::duelist_token::duelist_token::IDojoInit",
     "items": [
       {
         "type": "function",
@@ -167,7 +167,7 @@
   },
   {
     "type": "impl",
-    "name": "TokenComponentPublicImpl",
+    "name": "DuelistTokenPublicImpl",
     "interface_name": "pistols::systems::tokens::duelist_token::IDuelistTokenPublic"
   },
   {
@@ -189,45 +189,11 @@
     ]
   },
   {
-    "type": "enum",
-    "name": "pistols::models::duelist::Archetype",
-    "variants": [
-      {
-        "name": "Undefined",
-        "type": "()"
-      },
-      {
-        "name": "Villainous",
-        "type": "()"
-      },
-      {
-        "name": "Trickster",
-        "type": "()"
-      },
-      {
-        "name": "Honourable",
-        "type": "()"
-      }
-    ]
-  },
-  {
     "type": "struct",
     "name": "pistols::models::duelist::Score",
     "members": [
       {
         "name": "honour",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "level_villain",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "level_trickster",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "level_lord",
         "type": "core::integer::u8"
       },
       {
@@ -321,10 +287,6 @@
           {
             "name": "profile_pic_uri",
             "type": "core::felt252"
-          },
-          {
-            "name": "initial_archetype",
-            "type": "pistols::models::duelist::Archetype"
           }
         ],
         "outputs": [
@@ -378,6 +340,117 @@
   },
   {
     "type": "impl",
+    "name": "TokenRendererImpl",
+    "interface_name": "pistols::systems::components::erc721_hooks::ITokenRenderer"
+  },
+  {
+    "type": "struct",
+    "name": "core::integer::u256",
+    "members": [
+      {
+        "name": "low",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "high",
+        "type": "core::integer::u128"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "core::array::Span::<core::byte_array::ByteArray>",
+    "members": [
+      {
+        "name": "snapshot",
+        "type": "@core::array::Array::<core::byte_array::ByteArray>"
+      }
+    ]
+  },
+  {
+    "type": "interface",
+    "name": "pistols::systems::components::erc721_hooks::ITokenRenderer",
+    "items": [
+      {
+        "type": "function",
+        "name": "format_name",
+        "inputs": [
+          {
+            "name": "token_id",
+            "type": "core::integer::u256"
+          },
+          {
+            "name": "duelist",
+            "type": "pistols::models::duelist::Duelist"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::byte_array::ByteArray"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "format_description",
+        "inputs": [
+          {
+            "name": "token_id",
+            "type": "core::integer::u256"
+          },
+          {
+            "name": "_duelist",
+            "type": "pistols::models::duelist::Duelist"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::byte_array::ByteArray"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "format_image",
+        "inputs": [
+          {
+            "name": "duelist",
+            "type": "pistols::models::duelist::Duelist"
+          },
+          {
+            "name": "variant",
+            "type": "core::byte_array::ByteArray"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::byte_array::ByteArray"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_attributes",
+        "inputs": [
+          {
+            "name": "duelist",
+            "type": "pistols::models::duelist::Duelist"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::array::Span::<core::byte_array::ByteArray>"
+          }
+        ],
+        "state_mutability": "view"
+      }
+    ]
+  },
+  {
+    "type": "impl",
     "name": "UpgradableImpl",
     "interface_name": "dojo::contract::upgradeable::IUpgradeable"
   },
@@ -403,20 +476,6 @@
     "type": "impl",
     "name": "ERC721MixinImpl",
     "interface_name": "openzeppelin_token::erc721::interface::ERC721ABI"
-  },
-  {
-    "type": "struct",
-    "name": "core::integer::u256",
-    "members": [
-      {
-        "name": "low",
-        "type": "core::integer::u128"
-      },
-      {
-        "name": "high",
-        "type": "core::integer::u128"
-      }
-    ]
   },
   {
     "type": "struct",
@@ -791,6 +850,69 @@
     ]
   },
   {
+    "type": "impl",
+    "name": "TokenComponentPublicImpl",
+    "interface_name": "pistols::systems::components::token_component::ITokenComponentPublic"
+  },
+  {
+    "type": "interface",
+    "name": "pistols::systems::components::token_component::ITokenComponentPublic",
+    "items": [
+      {
+        "type": "function",
+        "name": "can_mint",
+        "inputs": [
+          {
+            "name": "caller_address",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::bool"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "exists",
+        "inputs": [
+          {
+            "name": "token_id",
+            "type": "core::integer::u128"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::bool"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "is_owner_of",
+        "inputs": [
+          {
+            "name": "address",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "token_id",
+            "type": "core::integer::u128"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::bool"
+          }
+        ],
+        "state_mutability": "view"
+      }
+    ]
+  },
+  {
     "type": "event",
     "name": "dojo::contract::upgradeable::upgradeable::Upgraded",
     "kind": "struct",
@@ -916,7 +1038,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::systems::tokens::duelist_token::duelist::Event",
+    "name": "pistols::systems::tokens::duelist_token::duelist_token::Event",
     "kind": "enum",
     "variants": [
       {

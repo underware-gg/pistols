@@ -130,8 +130,9 @@ impl TableConfigEntityImpl of TableConfigEntityTrait {
     }
     fn calc_fee(self: @TableConfigEntity, wager_value: u128) -> u128 {
         // (MathU128::max(*self.fee_min, (wager_value / 100) * wager.fee_pct.into()))
-        assert(wager_value == 0, ActionErrors::WAGER_NOT_ALLOWED);
-        (*self.fee_min)
+        // assert(wager_value == 0, ActionErrors::WAGER_NOT_ALLOWED);
+        // (*self.fee_min)
+        (0)
     }
 }
 

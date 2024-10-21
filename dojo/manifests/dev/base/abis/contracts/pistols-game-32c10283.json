@@ -132,100 +132,6 @@
     "interface_name": "pistols::systems::game::IGame"
   },
   {
-    "type": "enum",
-    "name": "pistols::types::premise::Premise",
-    "variants": [
-      {
-        "name": "Null",
-        "type": "()"
-      },
-      {
-        "name": "Matter",
-        "type": "()"
-      },
-      {
-        "name": "Debt",
-        "type": "()"
-      },
-      {
-        "name": "Dispute",
-        "type": "()"
-      },
-      {
-        "name": "Honour",
-        "type": "()"
-      },
-      {
-        "name": "Hatred",
-        "type": "()"
-      },
-      {
-        "name": "Blood",
-        "type": "()"
-      },
-      {
-        "name": "Nothing",
-        "type": "()"
-      },
-      {
-        "name": "Tournament",
-        "type": "()"
-      }
-    ]
-  },
-  {
-    "type": "enum",
-    "name": "core::bool",
-    "variants": [
-      {
-        "name": "False",
-        "type": "()"
-      },
-      {
-        "name": "True",
-        "type": "()"
-      }
-    ]
-  },
-  {
-    "type": "enum",
-    "name": "pistols::types::challenge_state::ChallengeState",
-    "variants": [
-      {
-        "name": "Null",
-        "type": "()"
-      },
-      {
-        "name": "Awaiting",
-        "type": "()"
-      },
-      {
-        "name": "Withdrawn",
-        "type": "()"
-      },
-      {
-        "name": "Refused",
-        "type": "()"
-      },
-      {
-        "name": "Expired",
-        "type": "()"
-      },
-      {
-        "name": "InProgress",
-        "type": "()"
-      },
-      {
-        "name": "Resolved",
-        "type": "()"
-      },
-      {
-        "name": "Draw",
-        "type": "()"
-      }
-    ]
-  },
-  {
     "type": "struct",
     "name": "core::array::Span::<core::integer::u8>",
     "members": [
@@ -375,6 +281,20 @@
       },
       {
         "name": "Bananas",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "enum",
+    "name": "core::bool",
+    "variants": [
+      {
+        "name": "False",
+        "type": "()"
+      },
+      {
+        "name": "True",
         "type": "()"
       }
     ]
@@ -585,70 +505,6 @@
     "items": [
       {
         "type": "function",
-        "name": "create_challenge",
-        "inputs": [
-          {
-            "name": "duelist_id",
-            "type": "core::integer::u128"
-          },
-          {
-            "name": "challenged_id_or_address",
-            "type": "core::starknet::contract_address::ContractAddress"
-          },
-          {
-            "name": "premise",
-            "type": "pistols::types::premise::Premise"
-          },
-          {
-            "name": "quote",
-            "type": "core::felt252"
-          },
-          {
-            "name": "table_id",
-            "type": "core::felt252"
-          },
-          {
-            "name": "wager_value",
-            "type": "core::integer::u128"
-          },
-          {
-            "name": "expire_hours",
-            "type": "core::integer::u64"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "core::integer::u128"
-          }
-        ],
-        "state_mutability": "external"
-      },
-      {
-        "type": "function",
-        "name": "reply_challenge",
-        "inputs": [
-          {
-            "name": "duelist_id",
-            "type": "core::integer::u128"
-          },
-          {
-            "name": "duel_id",
-            "type": "core::integer::u128"
-          },
-          {
-            "name": "accepted",
-            "type": "core::bool"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "pistols::types::challenge_state::ChallengeState"
-          }
-        ],
-        "state_mutability": "external"
-      },
-      {
-        "type": "function",
         "name": "commit_moves",
         "inputs": [
           {
@@ -698,94 +554,6 @@
         ],
         "outputs": [],
         "state_mutability": "external"
-      },
-      {
-        "type": "function",
-        "name": "get_pact",
-        "inputs": [
-          {
-            "name": "table_id",
-            "type": "core::felt252"
-          },
-          {
-            "name": "duelist_id_a",
-            "type": "core::integer::u128"
-          },
-          {
-            "name": "duelist_id_b",
-            "type": "core::integer::u128"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "core::integer::u128"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "has_pact",
-        "inputs": [
-          {
-            "name": "table_id",
-            "type": "core::felt252"
-          },
-          {
-            "name": "duelist_id_a",
-            "type": "core::integer::u128"
-          },
-          {
-            "name": "duelist_id_b",
-            "type": "core::integer::u128"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "core::bool"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "can_join",
-        "inputs": [
-          {
-            "name": "table_id",
-            "type": "core::felt252"
-          },
-          {
-            "name": "duelist_id",
-            "type": "core::integer::u128"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "core::bool"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "calc_fee",
-        "inputs": [
-          {
-            "name": "table_id",
-            "type": "core::felt252"
-          },
-          {
-            "name": "wager_value",
-            "type": "core::integer::u128"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "core::integer::u128"
-          }
-        ],
-        "state_mutability": "view"
       },
       {
         "type": "function",

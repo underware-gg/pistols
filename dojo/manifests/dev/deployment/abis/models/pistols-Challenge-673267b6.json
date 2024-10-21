@@ -455,6 +455,10 @@
         "type": "core::integer::u128"
       },
       {
+        "name": "seed",
+        "type": "core::integer::u128"
+      },
+      {
         "name": "table_id",
         "type": "core::felt252"
       },

@@ -302,7 +302,8 @@ type type_SELECTORS = {
   ADMIN: BigNumberish, // cairo: felt252
   GAME: BigNumberish, // cairo: felt252
   RNG: BigNumberish, // cairo: felt252
-  DUELIST: BigNumberish, // cairo: felt252
+  DUEL_TOKEN: BigNumberish, // cairo: felt252
+  DUELIST_TOKEN: BigNumberish, // cairo: felt252
   LORDS_MOCK: BigNumberish, // cairo: felt252
   CONFIG: BigNumberish, // cairo: felt252
   TABLE_CONFIG: BigNumberish, // cairo: felt252
@@ -314,7 +315,8 @@ export const SELECTORS: type_SELECTORS = {
   ADMIN: '0x036fd20372b5d47c092e2fede52897075978efb732aeaeb155d19eb8147f6497', // 'selector_from_tag!("pistols-admin")'
   GAME: '0x032c102830cbffaddecbdce7ef85735e6f08da08ee762a2d7b09304b6533dd57', // 'selector_from_tag!("pistols-game")'
   RNG: '0x013f1a6a9ae118440a997d6624230b59f43516220a1208526c3f66e202910504', // 'selector_from_tag!("pistols-rng")'
-  DUELIST: '0x05e4878f080bc2123d16fb1b8ae4ddb6f869285e8ddd19f011824e0839ecac4d', // 'selector_from_tag!("pistols-duelist")'
+  DUEL_TOKEN: '0x0670a5c673ac776e00e61c279cf7dc0efbe282787f4d719498e55643c5116063', // 'selector_from_tag!("pistols-duel_token")'
+  DUELIST_TOKEN: '0x045c96d20393520c5dffeb2f2929fb599034d4fc6e9d423e6a641222fb60a25e', // 'selector_from_tag!("pistols-duelist_token")'
   LORDS_MOCK: '0x02b1156e63a09854c3d8dba0cad93b41e1fc4662466a0ffc2a9ec9e54b4bc788', // 'selector_from_tag!("pistols-lords_mock")'
   CONFIG: '0x060742fa7259b7ce3ebc0a2dde90b740d1234c770199a822fa2e7cf779dc0392', // 'selector_from_tag!("pistols-Config")'
   TABLE_CONFIG: '0x01e8368fc88328662c92a11c0e739bf8b74bcd77a20071d2641a31e1a063c138', // 'selector_from_tag!("pistols-TableConfig")'

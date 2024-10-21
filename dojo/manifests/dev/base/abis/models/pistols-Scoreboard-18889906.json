@@ -375,18 +375,6 @@
         "type": "core::integer::u8"
       },
       {
-        "name": "level_villain",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "level_trickster",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "level_lord",
-        "type": "core::integer::u8"
-      },
-      {
         "name": "total_duels",
         "type": "core::integer::u16"
       },

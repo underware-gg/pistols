@@ -9,12 +9,12 @@ export function defineContractComponents(world: World) {
     Challenge: (() => {
       return defineComponent(
         world,
-        { duel_id: RecsType.BigInt, table_id: RecsType.BigInt, premise: RecsType.Number, quote: RecsType.BigInt, address_a: RecsType.BigInt, address_b: RecsType.BigInt, duelist_id_a: RecsType.BigInt, duelist_id_b: RecsType.BigInt, state: RecsType.Number, round_number: RecsType.Number, winner: RecsType.Number, timestamp_start: RecsType.BigInt, timestamp_end: RecsType.BigInt },
+        { duel_id: RecsType.BigInt, seed: RecsType.BigInt, table_id: RecsType.BigInt, premise: RecsType.Number, quote: RecsType.BigInt, address_a: RecsType.BigInt, address_b: RecsType.BigInt, duelist_id_a: RecsType.BigInt, duelist_id_b: RecsType.BigInt, state: RecsType.Number, round_number: RecsType.Number, winner: RecsType.Number, timestamp_start: RecsType.BigInt, timestamp_end: RecsType.BigInt },
         {
           metadata: {
             namespace: "pistols",
             name: "Challenge",
-            types: ["u128","felt252","enum","felt252","contractaddress","contractaddress","u128","u128","enum","u8","u8","u64","u64"],
+            types: ["u128","u128","felt252","enum","felt252","contractaddress","contractaddress","u128","u128","enum","u8","u8","u64","u64"],
             customTypes: ["Premise","ChallengeState"],
           },
         }
