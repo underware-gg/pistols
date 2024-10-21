@@ -51,12 +51,12 @@ export function defineContractComponents(world: World) {
     Duelist: (() => {
       return defineComponent(
         world,
-        { duelist_id: RecsType.BigInt, name: RecsType.BigInt, profile_pic_uri: RecsType.String, profile_pic_type: RecsType.Number, timestamp: RecsType.BigInt, score: { honour: RecsType.Number, level_villain: RecsType.Number, level_trickster: RecsType.Number, level_lord: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, honour_history: RecsType.BigInt } },
+        { duelist_id: RecsType.BigInt, name: RecsType.BigInt, profile_pic_uri: RecsType.String, profile_pic_type: RecsType.Number, timestamp: RecsType.BigInt, score: { honour: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, honour_history: RecsType.BigInt } },
         {
           metadata: {
             namespace: "pistols",
             name: "Duelist",
-            types: ["u128","felt252","enum","u64","u8","u8","u8","u8","u16","u16","u16","u16","u64"],
+            types: ["u128","felt252","enum","u64","u8","u16","u16","u16","u16","u64"],
             customTypes: ["ProfilePicType","Score"],
           },
         }
@@ -93,12 +93,12 @@ export function defineContractComponents(world: World) {
     Scoreboard: (() => {
       return defineComponent(
         world,
-        { table_id: RecsType.BigInt, duelist_id: RecsType.BigInt, score: { honour: RecsType.Number, level_villain: RecsType.Number, level_trickster: RecsType.Number, level_lord: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, honour_history: RecsType.BigInt }, wager_won: RecsType.BigInt, wager_lost: RecsType.BigInt },
+        { table_id: RecsType.BigInt, duelist_id: RecsType.BigInt, score: { honour: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, honour_history: RecsType.BigInt }, wager_won: RecsType.BigInt, wager_lost: RecsType.BigInt },
         {
           metadata: {
             namespace: "pistols",
             name: "Scoreboard",
-            types: ["felt252","u128","u8","u8","u8","u8","u16","u16","u16","u16","u64","u128","u128"],
+            types: ["felt252","u128","u8","u16","u16","u16","u16","u64","u128","u128"],
             customTypes: ["Score"],
           },
         }

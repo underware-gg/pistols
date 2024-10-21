@@ -126,7 +126,6 @@ fn mint(token: IDuelistTokenDispatcher, recipient: ContractAddress) {
         'Pops',
         ProfilePicType::Duelist,
         '1',
-        Archetype::Honourable,
     );
 }
 
@@ -194,9 +193,6 @@ fn test_token_uri() {
         timestamp: 999999,
         score: Score {
             honour: 99,
-            level_villain: 0,
-            level_trickster: 0,
-            level_lord: 91,
             total_duels: 6,
             total_wins: 3,
             total_losses: 2,

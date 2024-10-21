@@ -1,5 +1,5 @@
 use starknet::ContractAddress;
-use pistols::types::constants::{CONST};
+use pistols::types::constants::{CONST, HONOUR};
 
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
@@ -76,9 +76,6 @@ pub struct Scoreboard {
 #[derive(Copy, Drop, Serde, Default, IntrospectPacked)]
 pub struct Score {
     pub honour: u8,             // 0..100
-    pub level_villain: u8,      // 0..100
-    pub level_trickster: u8,    // 0..100
-    pub level_lord: u8,         // 0..100
     pub total_duels: u16,
     pub total_wins: u16,
     pub total_losses: u16,
@@ -119,11 +116,18 @@ impl DuelistTraitImpl of DuelistTrait {
 #[generate_trait]
 impl ScoreTraitImpl of ScoreTrait {
     #[inline(always)]
-    fn is_villain(self: Score) -> bool { (self.level_villain > 0) }
+    fn is_villain(self: Score) -> bool { (self.total_duels > 0 && self.honour < HONOUR::TRICKSTER_START) }
     #[inline(always)]
-    fn is_trickster(self: Score) -> bool { (self.level_trickster > 0) }
+    fn is_trickster(self: Score) -> bool { (self.honour >= HONOUR::TRICKSTER_START && self.honour < HONOUR::LORD_START) }
     #[inline(always)]
-    fn is_lord(self: Score) -> bool { (self.level_lord > 0) }
+    fn is_lord(self: Score) -> bool { (self.honour >= HONOUR::LORD_START) }
+    #[inline(always)]
+    fn get_archetype(self: Score) -> Archetype {
+        if (self.is_lord()) {(Archetype::Honourable)}
+        else if (self.is_trickster()) {(Archetype::Trickster)}
+        else if (self.is_villain()) {(Archetype::Villainous)}
+        else {(Archetype::Undefined)}
+    }
     #[inline(always)]
     fn format_honour(value: u8) -> ByteArray { (format!("{}.{}", value/10, value%10)) }
 }

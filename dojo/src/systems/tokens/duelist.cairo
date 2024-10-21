@@ -40,7 +40,7 @@ pub trait IDuelistToken<TState> {
 
     // IDuelistTokenPublic
     fn calc_price(ref self: TState, recipient: ContractAddress) -> u128;
-    fn create_duelist(ref self: TState, recipient: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252, initial_archetype: Archetype) -> Duelist;
+    fn create_duelist(ref self: TState, recipient: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist;
     fn update_duelist(ref self: TState, duelist_id: u128, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist;
     fn delete_duelist(ref self: TState, duelist_id: u128);
 }
@@ -57,7 +57,6 @@ pub trait IDuelistTokenPublic<TState> {
         name: felt252,
         profile_pic_type: ProfilePicType,
         profile_pic_uri: felt252,
-        initial_archetype: Archetype,
     ) -> Duelist;
     fn update_duelist(
         ref self: TState,
@@ -199,7 +198,6 @@ pub mod duelist {
             name: felt252,
             profile_pic_type: ProfilePicType,
             profile_pic_uri: felt252,
-            initial_archetype: Archetype,
         ) -> Duelist {
             // transfer mint fee
             let fee_amount: u128 = self.calc_price(recipient);
@@ -218,12 +216,6 @@ pub mod duelist {
                 profile_pic_type,
                 profile_pic_uri: profile_pic_uri.as_string(),
                 score: Default::default(),
-            };
-            match initial_archetype {
-                Archetype::Villainous => { duelist.score.level_villain = HONOUR::LEVEL_MAX; },
-                Archetype::Trickster =>  { duelist.score.level_trickster = HONOUR::LEVEL_MAX; },
-                Archetype::Honourable => { duelist.score.level_lord = HONOUR::LEVEL_MAX; },
-                _ => {},
             };
             
             // save
@@ -316,26 +308,9 @@ pub mod duelist {
             result.append("Honour");
             result.append(ScoreTrait::format_honour(duelist.score.honour));
             // Archetype
-            let archetype: ByteArray = 
-                if (duelist.score.is_villain()) {"Villain"}
-                else if(duelist.score.is_trickster()) {"Trickster"}
-                else if(duelist.score.is_lord()) {"Honourable"}
-                else {"Undefined"};
+            let archetype: Archetype = duelist.score.get_archetype();
             result.append("Archetype");
-            result.append(archetype.clone());
-            // Levels
-            if (duelist.score.total_duels > 0) {
-                let level: ByteArray = ScoreTrait::format_honour(
-                    if (duelist.score.is_villain()) {duelist.score.level_villain}
-                    else if(duelist.score.is_trickster()) {duelist.score.level_trickster}
-                    else if(duelist.score.is_lord()) {duelist.score.level_lord}
-                    else {0}
-                );
-                result.append("Archetype Level");
-                result.append(level.clone());
-                result.append(format!("{} Level", archetype));
-                result.append(level.clone());
-            }
+            result.append(archetype.into());
             // Totals
             result.append("Total Duels");
             result.append(duelist.score.total_duels.as_string());

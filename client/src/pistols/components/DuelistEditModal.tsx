@@ -72,7 +72,6 @@ export default function DuelistEditModal({
   }, [selectedProfilePic, profilePic, randomPic])
 
   const [inputName, setInputName] = useState(null)
-  const [inputArchetype, setInputArchetype] = useState(Archetype.Undefined)
   const inputIsValid = useMemo(() => (inputName?.length >= 3), [inputName])
   const isUpdated = useMemo(() => (name == inputName && profilePic == _profilePic), [name, inputName, profilePic, _profilePic])
 
@@ -87,7 +86,7 @@ export default function DuelistEditModal({
     if (canSubmit) {
       if (mintNew) {
         setDuelistBalanceBeforeMint(duelistBalance ?? 0)
-        create_duelist(account, address, inputName, ProfilePicType.Duelist, _profilePic.toString(), inputArchetype)
+        create_duelist(account, address, inputName, ProfilePicType.Duelist, _profilePic.toString())
       } else {
         update_duelist(account, editingDuelistId, inputName, ProfilePicType.Duelist, _profilePic.toString())
       }
@@ -133,29 +132,6 @@ export default function DuelistEditModal({
                 disabled={!account || !address}
               />
 
-              <div className='Spacer10' />
-              {(mintNew && false) &&
-                <div>
-                  <Divider />
-                  <Button icon toggle active={inputArchetype == Archetype.Undefined} onClick={() => setInputArchetype(Archetype.Undefined)}>
-                    <ArchetypeIcon size={null} />
-                  </Button>
-                  &nbsp;&nbsp;
-                  <Button icon toggle active={inputArchetype == Archetype.Villainous} onClick={() => setInputArchetype(Archetype.Villainous)}>
-                    <ArchetypeIcon villainous size={null} />
-                  </Button>
-                  &nbsp;&nbsp;
-                  <Button icon toggle active={inputArchetype == Archetype.Trickster} onClick={() => setInputArchetype(Archetype.Trickster)}>
-                    <ArchetypeIcon trickster size={null} />
-                  </Button>
-                  &nbsp;&nbsp;
-                  <Button icon toggle active={inputArchetype == Archetype.Honourable} onClick={() => setInputArchetype(Archetype.Honourable)}>
-                    <ArchetypeIcon honourable size={null} />
-                  </Button>
-                  <div className='Spacer10' />
-                  <span className='FormLabel TitleCase'>Archetype: <b>{ArchetypeNames[inputArchetype]}</b></span>
-                </div>
-              }
               {!mintNew &&
                 <div className='FormLabel TitleCase'>
                   <Divider />

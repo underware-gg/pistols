@@ -175,16 +175,6 @@ impl TableTypeIntoByteArray of Into<TableType, ByteArray> {
     }
 }
 
-#[generate_trait]
-impl TableTypeTraitImpl of TableTypeTrait {
-    fn maxxed_up_levels(self: TableType) -> bool {
-        match self {
-            TableType::IRLTournament => true,
-            _ => false,
-        }
-    }
-}
-
 
 
 

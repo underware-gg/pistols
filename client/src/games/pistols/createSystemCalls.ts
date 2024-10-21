@@ -167,8 +167,8 @@ export function createSystemCalls(
   // Duelist token
   //
 
-  const create_duelist = async (signer: AccountInterface, recipient: BigNumberish, name: string, profile_pic_type: ProfilePicType, profile_pic_uri: string, archetype: Archetype): Promise<boolean> => {
-    const args = [recipient, stringToFelt(name), getProfilePicTypeValue(profile_pic_type), stringToFelt(profile_pic_uri), getArchetypeValue(archetype)]
+  const create_duelist = async (signer: AccountInterface, recipient: BigNumberish, name: string, profile_pic_type: ProfilePicType, profile_pic_uri: string): Promise<boolean> => {
+    const args = [recipient, stringToFelt(name), getProfilePicTypeValue(profile_pic_type), stringToFelt(profile_pic_uri)]
     return await _executeTransaction(signer, duelist_token_call('create_duelist', args))
   }
 

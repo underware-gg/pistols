@@ -10,7 +10,7 @@ use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
 use pistols::systems::game::game::{Errors as ActionErrors};
 use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, WagerEntity, Round, RoundEntity, Moves};
 use pistols::models::duelist::{Duelist, DuelistTrait, DuelistEntity, Pact, PactEntity, Scoreboard, ScoreboardEntity, Score, ScoreTrait};
-use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableType, TableTypeTrait};
+use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableType};
 use pistols::models::config::{Config, ConfigEntity};
 use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round_state::{RoundState, RoundStateTrait};
@@ -191,15 +191,13 @@ fn set_challenge(store: Store, challenge: Challenge) {
         update_score_totals(ref scoreboard_a.score, ref scoreboard_b.score, challenge.state, challenge.winner);
 
         // compute honour from final round
-        let table : TableConfigEntity = store.get_table_config_entity(challenge.table_id);
         let round: RoundEntity = store.get_round_entity(challenge.duel_id, challenge.round_number);
 
         // update honour and levels
-        let calc_levels = !table.table_type.maxxed_up_levels();
-        update_score_honour(ref duelist_a.score, round.state_a.honour, true);
-        update_score_honour(ref duelist_b.score, round.state_b.honour, true);
-        update_score_honour(ref scoreboard_a.score, round.state_a.honour, calc_levels);
-        update_score_honour(ref scoreboard_b.score, round.state_b.honour, calc_levels);
+        update_score_honour(ref duelist_a.score, round.state_a.honour);
+        update_score_honour(ref duelist_b.score, round.state_b.honour);
+        update_score_honour(ref scoreboard_a.score, round.state_a.honour);
+        update_score_honour(ref scoreboard_b.score, round.state_b.honour);
 
         // split wager/fee to winners and benefactors
         if (round.state_a.wager > round.state_b.wager) {
@@ -243,52 +241,10 @@ fn update_score_totals(ref score_a: Score, ref score_b: Score, state: ChallengeS
     }
 }
 // average honour has an extra decimal, eg: 100 = 10.0
-fn update_score_honour(ref score: Score, duel_honour: u8, calc_levels: bool) {
+fn update_score_honour(ref score: Score, duel_honour: u8) {
     let history_pos: usize = ((score.total_duels.into() - 1) % 8) * 8;
     score.honour_history =
         (score.honour_history & ~BitwiseU64::shl(0xff, history_pos)) |
         BitwiseU64::shl(duel_honour.into(), history_pos);
     score.honour = (BitwiseU64::sum_bytes(score.honour_history) / MathU64::min(score.total_duels.into(), 8)).try_into().unwrap();
-    if (calc_levels) {
-        score.level_villain = calc_level_villain(score.honour);
-        score.level_lord = calc_level_lord(score.honour);
-        score.level_trickster = _average_trickster(calc_level_trickster(score.honour, duel_honour), score.level_trickster);
-    }
 }
-
-// Villain bonus: the less honour, more bonus
-#[inline(always)]
-fn calc_level_villain(honour: u8) -> u8 {
-    if (honour < HONOUR::TRICKSTER_START) {
-        (MathU8::map(honour, HONOUR::VILLAIN_START, HONOUR::TRICKSTER_START-1, HONOUR::LEVEL_MAX, HONOUR::LEVEL_MIN))
-    } else { (0) }
-}
-// Lord bonus: the more honour, more bonus
-#[inline(always)]
-fn calc_level_lord(honour: u8) -> u8 {
-    if (honour >= HONOUR::LORD_START) {
-        (MathU8::map(honour, HONOUR::LORD_START, HONOUR::MAX, HONOUR::LEVEL_MIN, HONOUR::LEVEL_MAX))
-    } else { (0) }
-}
-// Trickster bonus: the max of...
-// high on opposites, less in the middle (shaped as a \/)
-// cap halfway without going to zero (shaped as a /\)
-#[inline(always)]
-fn calc_level_trickster(honour: u8, duel_honour: u8) -> u8 {
-    if (honour >= HONOUR::TRICKSTER_START && honour < HONOUR::LORD_START) {
-        // simple \/ shape of LEVEL_MAX/2 at middle range to LEVEL_MAX at extremities
-        let level_i: i16 = MathU8::map(duel_honour, HONOUR::VILLAIN_START, HONOUR::MAX, 0, HONOUR::LEVEL_MAX).try_into().unwrap() - (HONOUR::LEVEL_MAX / 2).into();
-        let level: u8 = MathU16::abs(level_i).try_into().unwrap() + (HONOUR::LEVEL_MAX / 2);
-        (level)
-    } else { (0) }
-}
-// Always average with the current trickster bonus
-// for Tricksters: smooth bonuses
-// for (new) Lords and Villains: Do not go straight to zero when a Trickster switch archetype
-#[inline(always)]
-fn _average_trickster(new_level: u8, current_level: u8) -> u8 {
-    if (new_level > 0) {
-        ((new_level + current_level) / 2)
-    } else { (new_level) }
-}
-

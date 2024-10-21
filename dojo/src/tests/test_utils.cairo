@@ -28,14 +28,8 @@ mod tests {
     fn test_update_score_honour() {
         let mut score: Score = Default::default();
         score.total_duels = 1;
-        utils::update_score_honour(ref score, 100, true);
-        assert(score.level_lord == 100, 'honour_100_lord');
-        assert(score.level_villain == 0, 'honour_100_vill');
-        assert(score.level_trickster == 0, 'honour_100_trick');
+        utils::update_score_honour(ref score, 100);
         assert(score.is_lord(), 'is_lord()');
-        // just checks sync with calc_level_lord
-        let value: u8 = utils::calc_level_lord(100);
-       assert(score.level_lord == value, '!= calc');
     }
 
     #[test]
@@ -46,7 +40,7 @@ mod tests {
         loop {
             if (n > 8) { break; }
             score.total_duels += 1;
-            utils::update_score_honour(ref score, n, true);
+            utils::update_score_honour(ref score, n);
             sum += n;
             assert(score.honour == (sum / n), ShortString::concat('sum_8___', n.into()));
             n += 1;
@@ -56,7 +50,7 @@ mod tests {
         loop {
             if (n > 16) { break; }
             score.total_duels += 1;
-            utils::update_score_honour(ref score, n, true);
+            utils::update_score_honour(ref score, n);
             sum -= n - 8;
             sum += n;
             assert(score.honour == (sum / 8), ShortString::concat('sum_16___', n.into()));
@@ -65,15 +59,8 @@ mod tests {
         assert(score.honour_history == 0x100f0e0d0c0b0a09, '0x100f0e0d0c0b0a09');
         // new loop
         score.total_duels += 1;
-        utils::update_score_honour(ref score, n, true);
+        utils::update_score_honour(ref score, n);
         assert(score.honour_history == 0x100f0e0d0c0b0a11, '0x100f0e0d0c0b0a11');
-    }
-
-    #[test]
-    fn test_average_trickster() {
-        assert(utils::_average_trickster(100, 0) == 50, '100, 0');
-        assert(utils::_average_trickster(100, 50) == 75, '100, 50');
-        assert(utils::_average_trickster(0, 50) == 0, '0, 50');
     }
 
 }

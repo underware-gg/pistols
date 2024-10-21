@@ -80,7 +80,6 @@ mod tests {
     mod test_cards;
     mod test_env_cards;
     mod test_challenge;
-    mod test_chances;
     mod test_duel;
     mod test_duelist;
     // mod test_wager;

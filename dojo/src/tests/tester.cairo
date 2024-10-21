@@ -343,9 +343,9 @@ mod tester {
     }
 
     // ::duelist
-    fn execute_create_duelist(system: @IDuelistTokenDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252, archetype: Archetype) -> Duelist {
+    fn execute_create_duelist(system: @IDuelistTokenDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist {
         impersonate(sender);
-        let duelist: Duelist = (*system).create_duelist(sender, name, profile_pic_type, profile_pic_uri, archetype);
+        let duelist: Duelist = (*system).create_duelist(sender, name, profile_pic_type, profile_pic_uri);
         _next_block();
         (duelist)
     }

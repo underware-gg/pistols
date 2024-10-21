@@ -657,22 +657,12 @@ export const CONST: type_CONST = {
 
 // from: ../dojo/src/types/constants.cairo
 type type_HONOUR = {
-  VILLAIN_START: number, // cairo: u8
   TRICKSTER_START: number, // cairo: u8
   LORD_START: number, // cairo: u8
-  HALFWAY: number, // cairo: u8
-  MAX: number, // cairo: u8
-  LEVEL_MIN: number, // cairo: u8
-  LEVEL_MAX: number, // cairo: u8
 };
 export const HONOUR: type_HONOUR = {
-  VILLAIN_START: 10,
-  TRICKSTER_START: 35,
-  LORD_START: 75,
-  HALFWAY: 50,
-  MAX: 100,
-  LEVEL_MIN: 10,
-  LEVEL_MAX: 100,
+  TRICKSTER_START: 40,
+  LORD_START: 80,
 };
 
 // from: ../dojo/src/types/constants.cairo

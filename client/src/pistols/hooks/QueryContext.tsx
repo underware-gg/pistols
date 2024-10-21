@@ -20,7 +20,6 @@ export type DuelistRow = {
   name: string
   score: any
   balance: number
-  level: number
   win_ratio: number
   total_duels: number
   is_active: boolean
@@ -48,7 +47,6 @@ export type ChallengeQuery = typeof emptyChallengeQuery
 export enum DuelistColumn {
   Name = 'Name',
   Honour = 'Honour',
-  Level = 'Level',
   Wins = 'Wins',
   Losses = 'Losses',
   Draws = 'Draws',
@@ -262,7 +260,6 @@ const QueryProvider = ({
         score,
         balance,
         win_ratio: calcWinRatio(score.total_duels ?? 0, score.total_wins ?? 0),
-        level: Math.max(score.level_villain, score.level_trickster, score.level_lord),
         total_duels: score.total_duels ?? 0,
         is_active: (score.total_duels > 0),
       })
@@ -344,7 +341,6 @@ const QueryProvider = ({
         // return (!isAscending ? (b - a) : (a && !b) ? -1 : (!a && b) ? 1 : (a - b))
       }
       if (sortColumn == DuelistColumn.Honour) return _sortTotals(rowA.score.honour, rowB.score.honour)
-      if (sortColumn == DuelistColumn.Level) return _sortTotals(rowA.level, rowB.level)
       if (sortColumn == DuelistColumn.Wins) return _sortTotals(rowA.score.total_wins, rowB.score.total_wins)
       if (sortColumn == DuelistColumn.Losses) return _sortTotals(rowA.score.total_losses, rowB.score.total_losses)
       if (sortColumn == DuelistColumn.Draws) return _sortTotals(rowA.score.total_draws, rowB.score.total_draws)

@@ -7,7 +7,7 @@ import { stringToFelt, weiToEth, weiToEthString } from '@/lib/utils/starknet'
 import { keysToEntity } from '@/lib/utils/types'
 import { EMOJI } from '@/pistols/data/messages'
 import { ArchetypeNames } from '@/pistols/utils/pistols'
-import { Archetype } from '@/games/pistols/generated/constants'
+import { Archetype, HONOUR } from '@/games/pistols/generated/constants'
 
 // hijack Score type from Scoreboard
 function _useScoreType() {
@@ -28,17 +28,14 @@ export function useScore(score: Score | undefined) {
   const honourAndTotal = useMemo(() => (total_duels > 0 && honour > 0 ? <>{honour.toFixed(1)}<span className='Smaller'>/{total_duels}</span></> : EMOJI.ZERO), [honour, total_duels])
   const winRatio = useMemo(() => calcWinRatio(total_duels, total_wins), [total_duels, total_wins])
 
-  const level_villain = useMemo(() => ((score?.level_villain ?? 0) / 10.0), [score, total_duels])
-  const level_trickster = useMemo(() => ((score?.level_trickster ?? 0) / 10.0), [score, total_duels])
-  const level_lord = useMemo(() => ((score?.level_lord ?? 0) / 10.0), [score, total_duels])
-  const level = useMemo(() => Math.max(level_villain, level_trickster, level_lord), [level_villain, level_trickster, level_lord])
-  const levelDisplay = useMemo(() => (total_duels > 0 && level > 0 ? level.toFixed(1) : EMOJI.ZERO), [level, total_duels])
-  const levelAndTotal = useMemo(() => (total_duels > 0 && level > 0 ? <>{level.toFixed(1)}<span className='Smaller'>/{total_duels}</span></> : EMOJI.ZERO), [level, total_duels])
-
-  const isVillainous = useMemo(() => (level_villain > 0), [level_villain])
-  const isTrickster = useMemo(() => (level_trickster > 0), [level_trickster])
-  const isHonourable = useMemo(() => (level_lord > 0), [level_lord])
-  const archetype = useMemo(() => (isVillainous ? Archetype.Villainous : isTrickster ? Archetype.Trickster : isHonourable ? Archetype.Honourable : Archetype.Undefined), [level_villain, level_trickster, level_lord])
+  const isVillainous = useMemo(() => (total_duels > 0 && honour < HONOUR.TRICKSTER_START), [honour, total_duels])
+  const isTrickster = useMemo(() => (honour >= HONOUR.TRICKSTER_START && honour < HONOUR.LORD_START), [honour])
+  const isHonourable = useMemo(() => (honour >= HONOUR.LORD_START), [honour])
+  const archetype = useMemo(() => (
+    isHonourable ? Archetype.Honourable
+      : isTrickster ? Archetype.Trickster
+        : isVillainous ? Archetype.Villainous
+          : Archetype.Undefined), [isVillainous, isTrickster, isHonourable])
   const archetypeName = useMemo(() => (ArchetypeNames[archetype]), [archetype])
 
   return {
@@ -46,12 +43,6 @@ export function useScore(score: Score | undefined) {
     total_wins,
     total_losses,
     total_draws,
-    level_villain,
-    level_trickster,
-    level_lord,
-    level,
-    levelDisplay,
-    levelAndTotal,
     isVillainous,
     isTrickster,
     isHonourable,

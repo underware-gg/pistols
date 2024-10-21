@@ -61,7 +61,6 @@ export function ProfileDescription({
 }) {
   const { score: {
     total_wins, total_losses, total_draws, total_duels, honourAndTotal,
-    isVillainous, isTrickster, isHonourable, levelDisplay, levelAndTotal,
   } } = useDuelist(duelistId)
 
   // if its a duelist...
@@ -85,9 +84,6 @@ export function ProfileDescription({
           {displayOwnerAddress && <AddressShort address={owner} small={displayOwnerAddressSmall}/>}
           {displayHonor && <h3 className='Important NoMargin TitleCase'>
             Honour: <span className='Wager'>{honourAndTotal}</span>
-            {/* {isVillainous && <> {EMOJI.VILLAIN} <span className='Wager'>{levelDisplay}</span></>} */}
-            {/* {isTrickster && <> {EMOJI.TRICKSTER} <span className='Wager'>{levelDisplay}</span></>} */}
-            {/* {isHonourable && <> {EMOJI.LORD} <span className='Wager'>{levelDisplay}</span></>} */}
           </h3>}
           {displayBalance &&
             <h5>
