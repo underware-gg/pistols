@@ -164,7 +164,7 @@ impl EnvCardImpl of EnvCardTrait {
                         else if (self == EnvCard::SpecialNoTactics)
                             {if (specials.tactics_modifier == EnvCard::SpecialDoubleTactics) {(-2)} else {(-1)}}
                         else {(0)}; // not happening!
-                    specials.tactics.apply_points(ref state_self, ref state_other, multiplier);
+                    specials.tactics.apply_points(ref state_self, ref state_other, multiplier, specials.shots_modifier);
                     specials.tactics_modifier = self;
                 }            
             } else {
@@ -174,8 +174,7 @@ impl EnvCardImpl of EnvCardTrait {
                     (-1)
                 } else {(1)};
                 // apply points
-                let using_shots_modifier: bool = specials.shots_modifier.is_shots_modifier();
-                points.apply(ref state_self, using_shots_modifier, multiplier);
+                points.apply(ref state_self, multiplier, specials.shots_modifier);
             }
         }
     }

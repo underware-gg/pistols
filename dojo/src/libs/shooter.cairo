@@ -185,8 +185,8 @@ mod shooter {
         //------------------------------------------------------
         // apply cards
         //
-        hand_a.card_tactics.apply_points(ref state_a, ref state_b, 1);
-        hand_b.card_tactics.apply_points(ref state_b, ref state_a, 1);
+        hand_a.card_tactics.apply_points(ref state_a, ref state_b, 1, EnvCard::None);
+        hand_b.card_tactics.apply_points(ref state_b, ref state_a, 1, EnvCard::None);
         hand_a.card_blades.apply_points(ref state_a, ref state_b);
         hand_b.card_blades.apply_points(ref state_b, ref state_a);
 

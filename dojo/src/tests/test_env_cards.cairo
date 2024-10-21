@@ -306,8 +306,8 @@ mod tests {
     fn test_special_all_shots_hit() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, _progress) = execute_game_loop(sys,
-            [1, 10, TacticsCard::Vengeful.into()].span(),
-            [1, 10, TacticsCard::Vengeful.into()].span(),
+            [1, 10, TacticsCard::Bananas.into()].span(),
+            [1, 10, TacticsCard::Bananas.into()].span(),
             [ENV_SPECIAL_ALL_SHOTS_HIT].span(),
             [99, 99].span(), // miss
         );
@@ -317,11 +317,50 @@ mod tests {
         assert(round.state_b.chances == 100, 'state_b.chances');
     }
     #[test]
+    fn test_special_all_shots_hit_chances_down() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, progress) = execute_game_loop(sys,
+            [2, 10, TacticsCard::Bananas.into()].span(),
+            [2, 10, TacticsCard::Bananas.into()].span(),
+            [ENV_SPECIAL_ALL_SHOTS_HIT, ENV_CHANCES_DOWN].span(),
+            [99, 99].span(), // miss
+        );
+        assert(round.state_a.health < CONST::FULL_HEALTH, 'state_a.health');
+        assert(round.state_b.health < CONST::FULL_HEALTH, 'state_b.health');
+        assert(round.state_a.chances == 100, 'state_a.chances');
+        assert(round.state_b.chances == 100, 'state_b.chances');
+        // not affected by chances card
+        assert(progress.steps.len() == 3, 'progress.steps.len');
+        let final_step: DuelStep = *progress.steps[progress.steps.len() - 1];
+        assert(final_step.state_a.chances == 100, 'state_final_a.chances');
+        assert(final_step.state_b.chances == 100, 'state_final_b.chances');
+    }
+    #[test]
+    fn test_special_all_shots_hit_no_tactics() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, progress) = execute_game_loop(sys,
+            [2, 10, TacticsCard::Bananas.into()].span(),
+            [2, 10, TacticsCard::Bananas.into()].span(),
+            [ENV_SPECIAL_ALL_SHOTS_HIT, ENV_SPECIAL_NO_TACTICS].span(),
+            [1, 1].span(), // hit
+        );
+        assert(round.state_a.health < CONST::FULL_HEALTH, 'state_a.health');
+        assert(round.state_b.health < CONST::FULL_HEALTH, 'state_b.health');
+        assert(round.state_a.chances == 100, 'state_a.chances');
+        assert(round.state_b.chances == 100, 'state_b.chances');
+        // not affected by chances card
+        assert(progress.steps.len() == 3, 'progress.steps.len');
+        let final_step: DuelStep = *progress.steps[progress.steps.len() - 1];
+        assert(final_step.state_a.chances == 100, 'state_final_a.chances');
+        assert(final_step.state_b.chances == 100, 'state_final_b.chances');
+    }
+
+    #[test]
     fn test_special_all_shots_miss() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, _progress) = execute_game_loop(sys,
-            [1, 10, TacticsCard::Vengeful.into()].span(),
-            [1, 10, TacticsCard::Vengeful.into()].span(),
+            [1, 10, TacticsCard::Bananas.into()].span(),
+            [1, 10, TacticsCard::Bananas.into()].span(),
             [ENV_SPECIAL_ALL_SHOTS_MISS].span(),
             [1, 1].span(), // hit
         );
@@ -329,6 +368,25 @@ mod tests {
         assert(round.state_b.health == CONST::FULL_HEALTH, 'state_b.health');
         assert(round.state_a.chances == 0, 'state_a.chances');
         assert(round.state_b.chances == 0, 'state_b.chances');
+    }
+    #[test]
+    fn test_special_all_shots_miss_chances_up() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, progress) = execute_game_loop(sys,
+            [2, 10, TacticsCard::Bananas.into()].span(),
+            [2, 10, TacticsCard::Bananas.into()].span(),
+            [ENV_SPECIAL_ALL_SHOTS_MISS, ENV_CHANCES_UP].span(),
+            [1, 1].span(), // hit
+        );
+        assert(round.state_a.health == CONST::FULL_HEALTH, 'state_a.health');
+        assert(round.state_b.health == CONST::FULL_HEALTH, 'state_b.health');
+        assert(round.state_a.chances == 0, 'state_a.chances');
+        assert(round.state_b.chances == 0, 'state_b.chances');
+        // not affected by chances card
+        assert(progress.steps.len() == 3, 'progress.steps.len');
+        let final_step: DuelStep = *progress.steps[progress.steps.len() - 1];
+        assert(final_step.state_a.chances == 0, 'state_final_a.chances');
+        assert(final_step.state_b.chances == 0, 'state_final_b.chances');
     }
 
 

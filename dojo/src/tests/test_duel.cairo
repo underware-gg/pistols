@@ -49,7 +49,7 @@ mod tests {
         let challenge: ChallengeEntity = tester::get_ChallengeEntity(sys.world, duel_id);
         let round: RoundEntity = tester::get_RoundEntity(sys.world, duel_id, 1);
         let progress: DuelProgress = sys.game.get_duel_progress(duel_id);
-        let final_pace: DuelStep = *progress.steps[progress.steps.len() - 1];
+        let final_step: DuelStep = *progress.steps[progress.steps.len() - 1];
         assert(progress.winner == challenge.winner, 'winner');
         // hand_a
         assert(progress.hand_a.card_fire.into() == moves_a.value_or_zero(0), 'moves_a_0');
@@ -70,15 +70,15 @@ mod tests {
         assert(progress.hand_b.card_tactics == round.moves_b.card_3.into(), 'hand_b.card_fire');
         assert(progress.hand_b.card_blades == round.moves_b.card_4.into(), 'hand_b.card_fire');
         // state_a
-        assert(final_pace.state_a.health == round.state_a.health, 'state_final_b.health');
-        assert(final_pace.state_a.damage == round.state_a.damage, 'state_final_b.damage');
-        assert(final_pace.state_a.chances == round.state_a.chances, 'state_final_b.chances');
-        assert(final_pace.state_a.dice_fire == round.state_a.dice_fire, 'state_final_a.dice_fire');
+        assert(final_step.state_a.health == round.state_a.health, 'state_final_a.health');
+        assert(final_step.state_a.damage == round.state_a.damage, 'state_final_a.damage');
+        assert(final_step.state_a.chances == round.state_a.chances, 'state_final_a.chances');
+        assert(final_step.state_a.dice_fire == round.state_a.dice_fire, 'state_final_a.dice_fire');
         // state_b
-        assert(final_pace.state_b.health == round.state_b.health, 'state_final_b.health');
-        assert(final_pace.state_b.damage == round.state_b.damage, 'state_final_b.damage');
-        assert(final_pace.state_b.chances == round.state_b.chances, 'state_final_b.chances');
-        assert(final_pace.state_b.dice_fire == round.state_b.dice_fire, 'state_final_b.dice_fire');
+        assert(final_step.state_b.health == round.state_b.health, 'state_final_b.health');
+        assert(final_step.state_b.damage == round.state_b.damage, 'state_final_b.damage');
+        assert(final_step.state_b.chances == round.state_b.chances, 'state_final_b.chances');
+        assert(final_step.state_b.dice_fire == round.state_b.dice_fire, 'state_final_b.dice_fire');
     }
 
 

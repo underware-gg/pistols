@@ -85,6 +85,7 @@ mod TACTICS_POINTS {
 //
 use pistols::types::cards::cards::{CardPoints, CardPointsTrait};
 use pistols::types::cards::hand::{DeckType};
+use pistols::types::cards::env::{EnvCard, EnvCardTrait};
 use pistols::models::challenge::{DuelistState};
 
 #[generate_trait]
@@ -101,9 +102,9 @@ impl TacticsCardImpl of TacticsCardTrait {
         }
     }
     #[inline(always)]
-    fn apply_points(self: TacticsCard, ref state_self: DuelistState, ref state_other: DuelistState, multiplier: i8) {
+    fn apply_points(self: TacticsCard, ref state_self: DuelistState, ref state_other: DuelistState, multiplier: i8, shots_modifier: EnvCard) {
         if (self != TacticsCard::None) {
-            self.get_points().apply(ref state_self, ref state_other, multiplier);
+            self.get_points().apply(ref state_self, ref state_other, multiplier, shots_modifier);
         }
     }
     fn get_deck(_deck_type: DeckType) -> Span<u8> {

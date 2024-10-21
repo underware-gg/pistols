@@ -66,6 +66,7 @@ mod BLADES_POINTS {
 //
 use pistols::types::cards::cards::{CardPoints, CardPointsTrait};
 use pistols::types::cards::hand::{DeckType};
+use pistols::types::cards::env::{EnvCard, EnvCardTrait};
 use pistols::models::challenge::{DuelistState};
 
 #[generate_trait]
@@ -82,7 +83,7 @@ impl BladesCardImpl of BladesCardTrait {
     #[inline(always)]
     fn apply_points(self: BladesCard, ref state_self: DuelistState, ref state_other: DuelistState) {
         if (self != BladesCard::None) {
-            self.get_points().apply(ref state_self, ref state_other, 1);
+            self.get_points().apply(ref state_self, ref state_other, 1, EnvCard::None);
         }
     }
     //
