@@ -24,7 +24,7 @@
     "@dojoengine/torii-client": "v1.0.0-alpha.12",
     "@dojoengine/utils": "v1.0.0-alpha.12",
     "@starknet-react/chains": "^0.1.7",
-    "@starknet-react/core": "^3.0.0",
+    "@starknet-react/core": "^3.0.3",
     "@tweenjs/tween.js": "^21.0.0",
     "event-emitter": "^0.3.5",
     "get-starknet-core": "^4.0.0",
