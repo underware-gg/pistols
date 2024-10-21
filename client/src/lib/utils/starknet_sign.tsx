@@ -125,7 +125,7 @@ export function createTypedMessage({
 }: TypedMessageOptions): TypedData {
   const _messages = cleanObject(messages)
   const result = revision == 0 ? {
-    primaryType: "Message",
+    primaryType: 'Message',
     domain: {
       name: domainName,
       chainId,
@@ -133,15 +133,15 @@ export function createTypedMessage({
     },
     types: {
       StarkNetDomain: [
-        { name: "name", type: "felt" },
-        { name: "chainId", type: "felt" },
-        { name: "version", type: "felt" },
+        { name: 'name', type: 'felt' },
+        { name: 'chainId', type: 'felt' },
+        { name: 'version', type: 'felt' },
       ],
-      Message: Object.keys(_messages).map((name) => ({ name, type: "felt" })),
+      Message: Object.keys(_messages).map((name) => ({ name, type: 'felt' })),
     },
     message: _messages,
   } : {
-    primaryType: "Message",
+    primaryType: 'Message',
     domain: {
       revision: revision.toString(),
       name: domainName,
@@ -150,15 +150,15 @@ export function createTypedMessage({
     },
     types: {
       StarknetDomain: [
-        { name: "revision", type: "shortstring" },
-        { name: "name", type: "shortstring" },
-        { name: "chainId", type: "shortstring" },
-        { name: "version", type: "shortstring" },
+        { name: 'revision', type: 'shortstring' },
+        { name: 'name', type: 'shortstring' },
+        { name: 'chainId', type: 'shortstring' },
+        { name: 'version', type: 'shortstring' },
       ],
       Message: Object.keys(_messages).map((name) => ({
         name,
-        type: isBigint(_messages[name]) ? 'felt' : 'shortstring',
-        // type: typeof _messages[name] == 'bigint' ? 'felt' : 'shortstring',
+        type: isBigint(_messages[name]) ? 'felt' : 'string',
+        // type: typeof _messages[name] == 'bigint' ? 'felt' : 'string',
       })),
     },
     message: Object.keys(_messages).reduce((acc, name) => {

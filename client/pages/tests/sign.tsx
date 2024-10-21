@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { AccountInterface, typedData } from 'starknet'
 import { Container, Table } from 'semantic-ui-react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount, useNetwork } from '@starknet-react/core'
 import { useTypedMessage } from '@/lib/utils/hooks/useTypedMessage'
 import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
 import { bigintToHex, shortAddress } from '@/lib/utils/types'
@@ -63,6 +63,7 @@ function ValidateMessage({
   messages: Messages
 }) {
   const { account } = useAccount()
+  const { chain } = useNetwork()
 
   const [signature, setSignature] = useState(null)
   const [verified, setVerifyed] = useState('...')
@@ -70,6 +71,8 @@ function ValidateMessage({
   const { typedMessage, messageHash } = useTypedMessage({
     revision: 0,
     messages,
+    account,
+    chainId: chain.id,
   })
 
   useEffect(() => {
