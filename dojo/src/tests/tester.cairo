@@ -11,10 +11,10 @@ mod tester {
 
     use pistols::systems::admin::{admin, IAdminDispatcher, IAdminDispatcherTrait};
     use pistols::systems::game::{game, IGameDispatcher, IGameDispatcherTrait};
-    use pistols::systems::tokens::duelist::{duelist, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait};
+    use pistols::systems::tokens::duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait};
     use pistols::systems::tokens::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
     use pistols::tests::token::mock_duelist::{
-        duelist as mock_duelist,
+        duelist_token as mock_duelist,
         // IDuelistTokenDispatcher,
         // IDuelistTokenDispatcherTrait,
     };
@@ -202,7 +202,7 @@ mod tester {
 // '---- 2'.print();
         let duelists = IDuelistTokenDispatcher{ contract_address:
             if (deploy_duelist) {
-                let address = deploy_system(world, 'duelist', duelist::TEST_CLASS_HASH);
+                let address = deploy_system(world, 'duelist', duelist_token::TEST_CLASS_HASH);
                 world.grant_writer(SELECTORS::DUELIST, OWNER());
                 world.grant_writer(selector_from_tag!("pistols-TokenConfig"), address);
                 world.grant_writer(selector_from_tag!("pistols-Duelist"), address);

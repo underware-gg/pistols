@@ -1,4 +1,4 @@
-tag = "pistols-duelist"
+tag = "pistols-duelist_token"
 writes = [
   "pistols-TokenConfig",
   "pistols-Duelist",

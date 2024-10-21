@@ -42,7 +42,7 @@ export PROFILE_GEN_PATH="$CLIENT_GEN_PATH/$PROFILE"
 # contracts
 export ADMIN_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.tag == "pistols-admin" ).address')
 export GAME_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.tag == "pistols-game" ).address')
-export DUELIST_TOKEN_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.tag == "pistols-duelist" ).address')
+export DUELIST_TOKEN_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.tag == "pistols-duelist_token" ).address')
 
 # match rpc chain id with profile
 export CHAIN_ID=$(starkli chain-id --no-decode --rpc $RPC_URL | xxd -r -p)

@@ -5,7 +5,7 @@ use dojo::model::{Model, ModelTest, ModelIndex, ModelEntityTest};
 use dojo::utils::test::spawn_test_world;
 
 use pistols::systems::tokens::{
-    duelist::{duelist, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
+    duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
     lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
 };
 use pistols::models::{
@@ -91,7 +91,7 @@ fn setup_uninitialized(fee_amount: u128) -> (IWorldDispatcher, IDuelistTokenDisp
     world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), lords.contract_address);
 
     let mut token = IDuelistTokenDispatcher {
-        contract_address: world.deploy_contract('duelist', duelist::TEST_CLASS_HASH.try_into().unwrap())
+        contract_address: world.deploy_contract('duelist', duelist_token::TEST_CLASS_HASH.try_into().unwrap())
     };
     world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), token.contract_address);
     let duelists_call_data: Span<felt252> = array![

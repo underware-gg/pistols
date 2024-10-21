@@ -6,7 +6,7 @@ pub use pistols::systems::{
     game::{IGameDispatcher, IGameDispatcherTrait},
     rng::{IRngDispatcher, IRngDispatcherTrait},
     tokens::{
-        duelist::{IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
+        duelist_token::{IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
     }
 };
 use pistols::utils::misc::{ZERO};
@@ -17,7 +17,7 @@ pub mod SELECTORS {
     const GAME: felt252 = selector_from_tag!("pistols-game");
     const RNG: felt252 = selector_from_tag!("pistols-rng");
     // tokens
-    const DUELIST: felt252 = selector_from_tag!("pistols-duelist");
+    const DUELIST: felt252 = selector_from_tag!("pistols-duelist_token");
     const LORDS_MOCK: felt252 = selector_from_tag!("pistols-lords_mock");
     // models
     const CONFIG: felt252 = selector_from_tag!("pistols-Config");

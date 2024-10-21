@@ -3,7 +3,7 @@ use dojo::world::{IWorldProvider, IWorldProviderDispatcher, IWorldDispatcher, IW
 use openzeppelin_token::erc721::{ERC721Component};
 use graffiti::json::JsonImpl;
 
-use pistols::systems::tokens::duelist::{IDuelistToken, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait};
+use pistols::systems::tokens::duelist_token::{IDuelistToken, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait};
 use pistols::models::{
     duelist::{Duelist},
     token_config::{TokenConfig},

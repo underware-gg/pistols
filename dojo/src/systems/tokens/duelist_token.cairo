@@ -76,7 +76,7 @@ pub trait IDuelistTokenInternal<TState> {
 }
 
 #[dojo::contract]
-pub mod duelist {    
+pub mod duelist_token {    
     // use debug::PrintTrait;
     use openzeppelin_account::interface::ISRC6;
     use starknet::{ContractAddress, get_contract_address, get_caller_address, get_block_timestamp};

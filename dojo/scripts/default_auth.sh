@@ -13,7 +13,7 @@ pushd $(dirname "$0")/..
 export ADMIN_TAG="pistols-admin"
 export GAME_TAG="pistols-game"
 export MINTER_TAG="pistols-minter"
-export DUELISTS_TAG="pistols-duelist"
+export DUELISTS_TAG="pistols-duelist_token"
 
 
 echo "------------------------------------------------------------------------------"

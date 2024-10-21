@@ -9,7 +9,7 @@ mod systems {
     mod game;
     mod rng;
     mod tokens {
-        mod duelist;
+        mod duelist_token;
         #[cfg(feature:'lords_mock')]
         mod lords_mock;
     }

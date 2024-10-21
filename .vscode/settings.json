@@ -24,7 +24,7 @@
     // "**/generated/*": true,
     "**/manifest.json": true,
     "client/public/**": true,
-    "dojo/abis/**": true,
+    "**/abi": true,
     "dojo/manifests/**": true,
     "dojo/bindings/**": true,
     "gamejam": true,
