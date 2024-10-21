@@ -193,7 +193,7 @@ function Sign({
           </Row>
 
           <Row columns={'equal'} verticalAlign='top'>
-            <Cell className='Code'>
+            <Cell>
               Typed Data
             </Cell>
             <Cell className='Code'>
@@ -203,7 +203,7 @@ function Sign({
 
           <Row columns={'equal'} verticalAlign='top'>
             <Cell>
-              Type Hash
+              Type_Hash
             </Cell>
             <Cell className='Code'>
               {bigintToHex(typeHash)}
@@ -212,7 +212,7 @@ function Sign({
 
           <Row columns={'equal'} verticalAlign='top'>
             <Cell>
-              Message Hash
+              Message_Hash
             </Cell>
             <Cell className='Code'>
               {bigintToHex(messageHash)}
@@ -231,7 +231,7 @@ function Sign({
 
           <Row columns={'equal'} verticalAlign='top'>
             <Cell>
-              Signature Pair
+              Signature_Pair
             </Cell>
             <Cell className='Code'>
               {signaturePair ? <>
@@ -259,7 +259,7 @@ function Sign({
 
 function EthSign({
 }: {
-}) {
+  }) {
   const { account, isConnected } = useAccount()
   const { chain } = useNetwork()
 
@@ -307,17 +307,17 @@ function EthSign({
           </Row>
 
           <Row columns={'equal'} verticalAlign='top'>
-            <Cell className='Code'>
+            <Cell>
               Typed Data
             </Cell>
             <Cell className='Code'>
-              {JSON.stringify(typedMessage)}
+              {JSON.stringify(typedMessage, null, ' ')}
             </Cell>
           </Row>
 
           <Row columns={'equal'} verticalAlign='top'>
             <Cell>
-              Type Hash
+              Type_Hash
             </Cell>
             <Cell className='Code'>
               {bigintToHex(typeHash)}
@@ -326,7 +326,7 @@ function EthSign({
 
           <Row columns={'equal'} verticalAlign='top'>
             <Cell>
-              Message Hash
+              Message_Hash
             </Cell>
             <Cell className='Code'>
               {bigintToHex(messageHash)}

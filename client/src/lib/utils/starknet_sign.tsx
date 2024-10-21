@@ -150,10 +150,10 @@ export function createTypedMessage({
     },
     types: {
       StarknetDomain: [
-        { name: 'revision', type: 'shortstring' },
-        { name: 'name', type: 'shortstring' },
-        { name: 'chainId', type: 'shortstring' },
-        { name: 'version', type: 'shortstring' },
+        { name: 'revision', type: 'string' },
+        { name: 'name', type: 'string' },
+        { name: 'chainId', type: 'string' },
+        { name: 'version', type: 'string' },
       ],
       Message: Object.keys(_messages).map((name) => ({
         name,
