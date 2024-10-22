@@ -2,20 +2,18 @@
   "id": "1",
   "name": "Ser Walker #1",
   "description": "Pistols at 10 Blocks Duelist #1",
-  "image": "https://pistols.underware.gg/profiles/square/01.jpg",
-  "portrait": "https://pistols.underware.gg/profiles/portrait/01.jpg",
   "metadata": {
+    "Fame": "800",
     "Honour": "9.9",
     "Archetype": "Honourable",
-    "Archetype Level": "9.1",
-    "Honourable Level": "9.1",
     "Total Duels": "6",
     "Total Wins": "3",
     "Total Losses": "2",
     "Total Draws": "1",
-    "Lords Won": "1000",
-    "Lords Lost": "-200",
-    "Lords Balance": "800"
+    "images": {
+      "square": "https://pistols.underware.gg/profiles/square/01.jpg",
+      "portrait": "https://pistols.underware.gg/profiles/portrait/01.jpg"
+    }
   },
   "attributes": [
     {
