@@ -295,8 +295,7 @@ pub mod duel_token {
             duel_id: u128,
             accepted: bool,
         ) -> ChallengeState {
-
-
+            
             // validate chalenge
             let store: Store = StoreTrait::new(self.world());
             let mut challenge: Challenge = store.get_challenge(duel_id);

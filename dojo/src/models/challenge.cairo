@@ -3,6 +3,7 @@ use pistols::models::duelist::{Score};
 use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round_state::{RoundState, RoundStateTrait};
 use pistols::types::premise::{Premise, PremiseTrait};
+use pistols::types::duel_progress::{DuelistDrawnCard};
 use pistols::types::cards::{
     paces::{PacesCard, PacesCardTrait},
     tactics::{TacticsCard, TacticsCardTrait},
@@ -61,7 +62,7 @@ pub struct Round {
     pub state_a: DuelistState,
     pub state_b: DuelistState,
     pub state: RoundState,
-    pub final_step: u8,     // pace number, > 10 if ended in blades
+    pub final_blow: DuelistDrawnCard,
 }
 
 //

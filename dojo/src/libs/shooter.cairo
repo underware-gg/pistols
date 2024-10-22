@@ -200,8 +200,8 @@ mod shooter {
 
         let mut step_number: u8 = 1;
         while (step_number <= 10) {
-            round.final_step = step_number;
             let pace: PacesCard = step_number.into();
+            round.final_blow = DuelistDrawnCard::Fire(pace);
             // println!("Pace [{}] A:{} B:{}", step_number, self.moves_a.card_fire.as_felt(), self.moves_b.card_fire.as_felt());
 
             // draw env card
@@ -254,20 +254,25 @@ mod shooter {
             state_b.health > 0 &&
             (hand_a.card_blades != BladesCard::None || hand_b.card_blades != BladesCard::None)
         ) {
-            round.final_step = 11;
             blades(hand_a.card_blades, hand_b.card_blades, ref state_a, ref state_b);
-            // save step 11
+            let card_a = DuelistDrawnCard::Blades(hand_a.card_blades);
+            let card_b = DuelistDrawnCard::Blades(hand_b.card_blades);
             steps.append(DuelStep {
                 pace: PacesCard::None,
                 card_env: EnvCard::None,
                 dice_env: 0,
                 specials_a: Default::default(),
                 specials_b: Default::default(),
-                card_a: DuelistDrawnCard::Blades(hand_a.card_blades),
-                card_b: DuelistDrawnCard::Blades(hand_b.card_blades),
+                card_a,
+                card_b,
                 state_a,
                 state_b,
             });
+            round.final_blow =
+                if (card_a == DuelistDrawnCard::Blades(BladesCard::Seppuku)) {card_a}
+                else if (card_b == DuelistDrawnCard::Blades(BladesCard::Seppuku)) {card_b}
+                else if (state_a.health > 0) {card_a}
+                else {card_b};
         }
 
         // update round model

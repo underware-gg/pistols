@@ -56,11 +56,12 @@ mod tests {
         let sys = tester::setup_world(FLAGS::GAME | FLAGS::MOCK_RNG);
         let (salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         let duel_id = prefabs::start_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
-        let (_challenge, round) = prefabs::commit_reveal_get(sys, duel_id, OWNER(), OTHER(), salts, moves_a, moves_b);
+        let (challenge, round) = prefabs::commit_reveal_get(sys, duel_id, OWNER(), OTHER(), salts, moves_a, moves_b);
         assert(round.state_a.damage > CONST::INITIAL_DAMAGE, 'final_damage_a');
         assert(round.state_b.damage > CONST::INITIAL_DAMAGE, 'final_damage_b');
         assert(round.state_a.health < CONST::FULL_HEALTH, 'final_health_a');
         assert(round.state_b.health < CONST::FULL_HEALTH, 'final_health_b');
+        assert(challenge.winner == 0, 'challenge.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_dead(round.state_b, 'dead_b');
     }
@@ -86,7 +87,7 @@ mod tests {
             moves_b: Default::default(),
             state_a: Default::default(),
             state_b: Default::default(),
-            final_step: 0,
+            final_blow: DuelistDrawnCard::None,
         };
         let mut hand_a: DuelistHand = round.moves_a.as_hand();
         let mut hand_b: DuelistHand = round.moves_b.as_hand();
@@ -128,7 +129,7 @@ mod tests {
         assert(progress.hand_b.card_blades == (*moves_b[3]).into(), 'hand_b.card_blades');
         assert(progress.steps.len() == 12, 'progress.steps.len');
         assert(progress.winner == 1, 'progress.winner');
-        assert(round.final_step > 10, 'round.final_step');
+        assert(round.final_blow == DuelistDrawnCard::Blades(BladesCard::Grapple), 'round.final_blow');
         let mut last_dice_env: u8 = 0;
         let mut i: u8 = 0;
         while (i < 12) {
@@ -207,7 +208,7 @@ mod tests {
         assert(progress.hand_b.card_fire == 2_u8.into(), 'hand_b.card_fire');
         assert(progress.hand_b.card_dodge == 0_u8.into(), 'hand_b.card_dodge');
         assert(progress.steps.len() == 3, 'paces.len');
-        assert(round.final_step == 2, 'round.final_step');
+        assert(round.final_blow == DuelistDrawnCard::Fire(PacesCard::Paces2), 'round.final_blow');
         let mut i: u8 = 1;
         while (i <= 2) {
             let num: felt252 = '1'+i.into();
@@ -241,7 +242,7 @@ mod tests {
             [1, 2, 0].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == DuelistDrawnCard::Fire(PacesCard::Paces1), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
 // '----'.print();
@@ -264,7 +265,7 @@ mod tests {
             [1, 2, TacticsCard::Vengeful.into()].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == DuelistDrawnCard::Fire(PacesCard::Paces1), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_b.chances == CONST::INITIAL_CHANCE, 'INITIAL_CHANCE');
@@ -280,7 +281,7 @@ mod tests {
             [1, 2, 0].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == DuelistDrawnCard::Fire(PacesCard::Paces1), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_b.damage < *start_state_b.damage, 'damage');
@@ -294,7 +295,7 @@ mod tests {
             [1, 2, TacticsCard::ThickCoat.into()].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == DuelistDrawnCard::Fire(PacesCard::Paces1), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_a.damage < *start_state_a.damage, 'damage');
@@ -309,7 +310,7 @@ mod tests {
             [1, 2, TacticsCard::ThickCoat.into()].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == DuelistDrawnCard::Fire(PacesCard::Paces1), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         // cancels each other
@@ -324,7 +325,7 @@ mod tests {
             [1, 2, TacticsCard::Vengeful.into()].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == DuelistDrawnCard::Fire(PacesCard::Paces1), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         // cancels each other
@@ -340,7 +341,7 @@ mod tests {
             [1, 2, 0].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == DuelistDrawnCard::Fire(PacesCard::Paces1), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_b.damage > *start_state_b.damage, 'damage');
@@ -355,7 +356,7 @@ mod tests {
             [1, 2, TacticsCard::Insult.into()].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == DuelistDrawnCard::Fire(PacesCard::Paces1), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_a.damage > *start_state_a.damage, 'damage');
@@ -371,7 +372,7 @@ mod tests {
             [1, 2, 0].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == DuelistDrawnCard::Fire(PacesCard::Paces1), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_a.chances < *start_state_a.chances, 'chances_a');
@@ -385,7 +386,7 @@ mod tests {
             [1, 2, TacticsCard::Bananas.into()].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == DuelistDrawnCard::Fire(PacesCard::Paces1), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_a.chances < *start_state_a.chances, 'chances_a');
@@ -399,7 +400,7 @@ mod tests {
             [1, 2, TacticsCard::Bananas.into()].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == DuelistDrawnCard::Fire(PacesCard::Paces1), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_a.chances < *start_state_a.chances, 'chances_a');
@@ -414,7 +415,7 @@ mod tests {
             [1, 2, 0].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == DuelistDrawnCard::Fire(PacesCard::Paces1), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
@@ -428,7 +429,7 @@ mod tests {
             [1, 2, TacticsCard::CoinToss.into()].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == DuelistDrawnCard::Fire(PacesCard::Paces1), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
@@ -443,7 +444,7 @@ mod tests {
             [1, 2, 0].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == DuelistDrawnCard::Fire(PacesCard::Paces1), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
@@ -457,7 +458,7 @@ mod tests {
             [1, 2, TacticsCard::Reversal.into()].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == DuelistDrawnCard::Fire(PacesCard::Paces1), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
@@ -484,7 +485,7 @@ mod tests {
             [1, 2, 0, 0].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == DuelistDrawnCard::Blades(BladesCard::Seppuku), 'round.final_blow'); // ended in blades
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         // card effects on player state
@@ -494,6 +495,7 @@ mod tests {
         assert(round.state_a.damage > *start_state_a.damage, 'damage');
         _assert_not_affected_by_cards(*start_state_b, round.state_b);
         // results
+        assert(progress.winner == 2, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_alive(round.state_b, 'alive_b');
     }
@@ -505,7 +507,7 @@ mod tests {
             [1, 2, 0, BladesCard::Seppuku.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == DuelistDrawnCard::Blades(BladesCard::Seppuku), 'round.final_blow'); // ended in blades
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         // card effects on player state
@@ -515,6 +517,7 @@ mod tests {
         assert(round.state_b.damage > *start_state_b.damage, 'damage');
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
         // results
+        assert(progress.winner == 1, 'progress.winner');
         _assert_is_alive(round.state_a, 'alive_a');
         _assert_is_dead(round.state_b, 'dead_b');
     }
@@ -526,7 +529,7 @@ mod tests {
             [1, 2, 0, BladesCard::Seppuku.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == DuelistDrawnCard::Blades(BladesCard::Seppuku), 'round.final_blow'); // ended in blades
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(*start_state_b.chances == CONST::INITIAL_CHANCE, 'INITIAL_CHANCE');
@@ -537,8 +540,23 @@ mod tests {
         assert(round.state_b.chances > *start_state_b.chances, 'chances');
         assert(round.state_b.damage > *start_state_b.damage, 'damage');
         // results
+        assert(progress.winner == 0, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_dead(round.state_b, 'dead_b');
+    }
+    #[test]
+    fn test_blades_seppukku_other() {
+        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, progress) = execute_game_loop(sys,
+            [1, 2, 0, BladesCard::Seppuku.into()].span(),
+            [1, 2, 0, BladesCard::Behead.into()].span(),
+            false
+        );
+        assert(round.final_blow == DuelistDrawnCard::Blades(BladesCard::Seppuku), 'round.final_blow'); // ended in blades
+        // results
+        assert(progress.winner == 2, 'progress.winner');
+        _assert_is_dead(round.state_a, 'dead_a');
+        _assert_is_alive(round.state_b, 'alive_b');
     }
 
 
@@ -554,13 +572,14 @@ mod tests {
             [1, 2, 0, 0].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == DuelistDrawnCard::Blades(BladesCard::PocketPistol), 'round.final_blow'); // ended in blades
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         // card effects on player state
         assert(round.state_b.chances < *start_state_b.chances, 'chances');
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
         // blade wins against none
+        assert(progress.winner == 1, 'progress.winner');
         _assert_is_alive(round.state_a, 'alive_a');
         _assert_is_dead(round.state_b, 'dead_b');
     }
@@ -572,12 +591,13 @@ mod tests {
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == DuelistDrawnCard::Blades(BladesCard::PocketPistol), 'round.final_blow'); // ended in blades
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_a.chances < *start_state_a.chances, 'chances');
         _assert_not_affected_by_cards(*start_state_b, round.state_b);
         // blade wins against none
+        assert(progress.winner == 2, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_alive(round.state_b, 'alive_b');
     }
@@ -590,12 +610,13 @@ mod tests {
             [1, 2, 0, 0].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == DuelistDrawnCard::Blades(BladesCard::Behead), 'round.final_blow'); // ended in blades
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_a.damage > *start_state_a.damage, 'damage');
         _assert_not_affected_by_cards(*start_state_b, round.state_b);
         // blade wins against none
+        assert(progress.winner == 1, 'progress.winner');
         _assert_is_alive(round.state_a, 'alive_a');
         _assert_is_dead(round.state_b, 'dead_b');
     }
@@ -607,12 +628,13 @@ mod tests {
             [1, 2, 0, BladesCard::Behead.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == DuelistDrawnCard::Blades(BladesCard::Behead), 'round.final_blow'); // ended in blades
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_b.damage > *start_state_b.damage, 'damage');
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
         // blade wins against none
+        assert(progress.winner == 2, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_alive(round.state_b, 'alive_b');
     }
@@ -625,12 +647,13 @@ mod tests {
             [1, 2, 0, 0].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == DuelistDrawnCard::Blades(BladesCard::Grapple), 'round.final_blow'); // ended in blades
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_b.damage < *start_state_b.damage, 'damage');
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
         // blade wins against none
+        assert(progress.winner == 1, 'progress.winner');
         _assert_is_alive(round.state_a, 'alive_a');
         _assert_is_dead(round.state_b, 'dead_b');
     }
@@ -642,12 +665,13 @@ mod tests {
             [1, 2, 0, BladesCard::Grapple.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == DuelistDrawnCard::Blades(BladesCard::Grapple), 'round.final_blow'); // ended in blades
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_a.damage < *start_state_a.damage, 'damage');
         _assert_not_affected_by_cards(*start_state_b, round.state_b);
         // blade wins against none
+        assert(progress.winner == 2, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_alive(round.state_b, 'alive_b');
     }
@@ -660,36 +684,39 @@ mod tests {
     #[test]
     fn test_blades_pocket_pistol_vs_pocket_pistol() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == DuelistDrawnCard::Blades(BladesCard::PocketPistol), 'round.final_blow'); // ended in blades
+        assert(progress.winner == 0, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_dead(round.state_b, 'dead_b');
     }
     #[test]
     fn test_blades_behead_vs_behead() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Behead.into()].span(),
             [1, 2, 0, BladesCard::Behead.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == DuelistDrawnCard::Blades(BladesCard::Behead), 'round.final_blow'); // ended in blades
+        assert(progress.winner == 0, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_dead(round.state_b, 'dead_b');
     }
     #[test]
     fn test_blades_grapple_vs_grapple() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Grapple.into()].span(),
             [1, 2, 0, BladesCard::Grapple.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == DuelistDrawnCard::Blades(BladesCard::Grapple), 'round.final_blow'); // ended in blades
+        assert(progress.winner == 0, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_dead(round.state_b, 'dead_b');
     }
@@ -703,24 +730,26 @@ mod tests {
     #[test]
     fn test_blades_pocket_pistol_vs_behead() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
             [1, 2, 0, BladesCard::Behead.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == DuelistDrawnCard::Blades(BladesCard::PocketPistol), 'round.final_blow'); // ended in blades
+        assert(progress.winner == 1, 'progress.winner');
         _assert_is_alive(round.state_a, 'alive_a');
         _assert_is_dead(round.state_b, 'dead_b');
     }
     #[test]
     fn test_blades_behead_vs_pocket_pistol() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Behead.into()].span(),
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == DuelistDrawnCard::Blades(BladesCard::PocketPistol), 'round.final_blow'); // ended in blades
+        assert(progress.winner == 2, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_alive(round.state_b, 'alive_b');
     }
@@ -729,24 +758,26 @@ mod tests {
     #[test]
     fn test_blades_behead_vs_grapple() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Behead.into()].span(),
             [1, 2, 0, BladesCard::Grapple.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == DuelistDrawnCard::Blades(BladesCard::Behead), 'round.final_blow'); // ended in blades
+        assert(progress.winner == 1, 'progress.winner');
         _assert_is_alive(round.state_a, 'alive_a');
         _assert_is_dead(round.state_b, 'dead_b');
     }
     #[test]
     fn test_blades_grapple_vs_behead() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Grapple.into()].span(),
             [1, 2, 0, BladesCard::Behead.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == DuelistDrawnCard::Blades(BladesCard::Behead), 'round.final_blow'); // ended in blades
+        assert(progress.winner == 2, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_alive(round.state_b, 'alive_b');
     }
@@ -755,24 +786,26 @@ mod tests {
     #[test]
     fn test_blades_grapple_vs_pocket_pistol() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Grapple.into()].span(),
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == DuelistDrawnCard::Blades(BladesCard::Grapple), 'round.final_blow'); // ended in blades
+        assert(progress.winner == 1, 'progress.winner');
         _assert_is_alive(round.state_a, 'alive_a');
         _assert_is_dead(round.state_b, 'dead_b');
     }
     #[test]
     fn test_blades_pocket_pistol_vs_grapple() {
         let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
             [1, 2, 0, BladesCard::Grapple.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == DuelistDrawnCard::Blades(BladesCard::Grapple), 'round.final_blow'); // ended in blades
+        assert(progress.winner == 2, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_alive(round.state_b, 'alive_b');
     }

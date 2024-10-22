@@ -15,6 +15,7 @@ use pistols::models::config::{Config, ConfigEntity};
 use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round_state::{RoundState, RoundStateTrait};
 use pistols::types::cards::hand::{PacesCard, PacesCardTrait};
+use pistols::types::duel_progress::{DuelistDrawnCard};
 use pistols::types::constants::{CONST, HONOUR, CHANCES};
 use pistols::utils::math::{MathU8, MathU16, MathU64};
 use pistols::utils::bitwise::{BitwiseU32, BitwiseU64, BitwiseU128};
@@ -131,7 +132,7 @@ fn set_challenge(store: Store, challenge: Challenge) {
             moves_b: Default::default(),
             state_a: Default::default(),
             state_b: Default::default(),
-            final_step: 0,
+            final_blow: DuelistDrawnCard::None,
         };
         store.set_round(@new_round);
     } else if (challenge.state.is_finished()) {
