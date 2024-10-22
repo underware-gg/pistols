@@ -437,7 +437,7 @@ export const BladesCardsTextures: Record<BladesCard, CardData> = {
     path: '/textures/cards/illustrations/Decapitation.png', 
     cardFrontPath: '/textures/cards/card_front_brown.png', 
     color: CardColor.WHITE, 
-    title: 'Run Away', 
+    title: 'Pocket Pistol', 
     rarity: Rarity.None, 
     description: `Decrease opponents hit chance by ${getTextSpan(CardColor.YELLOW, '-10%')}`
   },

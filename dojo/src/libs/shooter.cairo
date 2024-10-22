@@ -166,6 +166,15 @@ mod shooter {
         let mut state_b: DuelistState = round.state_b;
 
         //------------------------------------------------------
+        // apply cards
+        //
+        hand_a.card_tactics.apply_points(ref state_a, ref state_b, 1);
+        hand_b.card_tactics.apply_points(ref state_b, ref state_a, 1);
+        hand_a.card_blades.apply_points(ref state_a, ref state_b);
+        hand_b.card_blades.apply_points(ref state_b, ref state_a);
+        
+
+        //------------------------------------------------------
         // Steps
         //
         // save step 0 (initial state)
@@ -181,14 +190,6 @@ mod shooter {
             state_a,
             state_b,
         });
-
-        //------------------------------------------------------
-        // apply cards
-        //
-        hand_a.card_tactics.apply_points(ref state_a, ref state_b, 1);
-        hand_b.card_tactics.apply_points(ref state_b, ref state_a, 1);
-        hand_a.card_blades.apply_points(ref state_a, ref state_b);
-        hand_b.card_blades.apply_points(ref state_b, ref state_a);
 
 
         //------------------------------------------------------

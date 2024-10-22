@@ -32,13 +32,16 @@ import Cards, { CardsHandle, DuelistCardType, DuelistHand } from './Cards'
 import useGameAspect from '@/pistols/hooks/useGameApect'
 import { BladesCard, EnvCard, PacesCard, TacticsCard } from '@/games/pistols/generated/constants';
 import * as Constants from '../data/cardConstants'
+import * as TWEEN from '@tweenjs/tween.js'
 
 export type DuelistState = {
   damage: number, 
   hitChance: number, 
   health: number,
   shotPaces: number, 
-  dodgePaces: number
+  dodgePaces: number,
+  damageDelta: number,
+  hitChanceDelta: number,
 }
 
 export default function Duel({
@@ -87,8 +90,8 @@ export default function Duel({
 
   useEffect(() => dispatchSelectDuel(duelId), [duelId])
 
-  const [statsA, setStatsA] = useState<DuelistState>({ damage: 1, hitChance: 50, health: 3, shotPaces: undefined, dodgePaces: undefined })
-  const [statsB, setStatsB] = useState<DuelistState>({ damage: 1, hitChance: 50, health: 3, shotPaces: undefined, dodgePaces: undefined })
+  const [statsA, setStatsA] = useState<DuelistState>({ damage: 0, hitChance: 0, health: 3, shotPaces: undefined, dodgePaces: undefined, damageDelta: 0, hitChanceDelta: 0 })
+  const [statsB, setStatsB] = useState<DuelistState>({ damage: 0, hitChance: 0, health: 3, shotPaces: undefined, dodgePaces: undefined, damageDelta: 0, hitChanceDelta: 0 })
 
   const [ isPlaying, setIsPlaying ] = useState(true)
   const [ triggerReset, setTriggerReset ] = useState(false)
@@ -163,6 +166,33 @@ export default function Duel({
       }, 1500)
 
       setTimeout(() => {
+        const step = duelProgress.steps[currentStep.current]
+
+        setStatsA((prevValue) => {
+          return { 
+            damage: Number(step.state_a.damage),
+            hitChance: Number(step.state_a.chances),
+            health: Number(step.state_a.health),
+            shotPaces: prevValue.shotPaces ? prevValue.shotPaces : (step.card_a.fire ? currentStep.current : undefined),
+            dodgePaces: prevValue.dodgePaces ? prevValue.dodgePaces : (step.card_a.dodge ? currentStep.current : undefined),
+            damageDelta: Number(step.state_a.damage) - prevValue.damage,
+            hitChanceDelta: Number(step.state_a.chances) - prevValue.hitChance
+          }
+        })
+        setStatsB((prevValue) => {
+          return { 
+            damage: Number(step.state_b.damage),
+            hitChance: Number(step.state_b.chances),
+            health: Number(step.state_b.health),
+            shotPaces: prevValue.shotPaces ? prevValue.shotPaces : (step.card_b.fire ? currentStep.current : undefined),
+            dodgePaces: prevValue.dodgePaces ? prevValue.dodgePaces : (step.card_b.dodge ? currentStep.current : undefined),
+            damageDelta: Number(step.state_b.damage) - prevValue.damage,
+            hitChanceDelta: Number(step.state_b.chances) - prevValue.hitChance
+          }
+        })
+      }, 2500);
+
+      setTimeout(() => {
         gameImpl?.hideDialogs()
 
         cardRef.current?.revealCard("A", DuelistCardType.TACTICS, speedRef.current)
@@ -230,8 +260,8 @@ export default function Duel({
       revealCardsB.forEach(card => cardRef.current?.revealCard("B", card.type, speedRef.current));
     }, Math.max(...[...revealCardsA, ...revealCardsB].map(card => card.delay || 0), 0) / speedRef.current);
 
-    let newStatsA;
-    let newStatsB;
+    let newStatsA: DuelistState;
+    let newStatsB: DuelistState;
 
     setStatsA((prevValue) => {
       newStatsA = { 
@@ -240,6 +270,8 @@ export default function Duel({
         health: Number(step.state_a.health),
         shotPaces: prevValue.shotPaces ? prevValue.shotPaces : (step.card_a.fire ? currentStep.current : undefined),
         dodgePaces: prevValue.dodgePaces ? prevValue.dodgePaces : (step.card_a.dodge ? currentStep.current : undefined),
+        damageDelta: Number(step.state_a.damage) - prevValue.damage,
+        hitChanceDelta: Number(step.state_a.chances) - prevValue.hitChance
       }
       return newStatsA
     })
@@ -250,6 +282,8 @@ export default function Duel({
         health: Number(step.state_b.health),
         shotPaces: prevValue.shotPaces ? prevValue.shotPaces : (step.card_b.fire ? currentStep.current : undefined),
         dodgePaces: prevValue.dodgePaces ? prevValue.dodgePaces : (step.card_b.dodge ? currentStep.current : undefined),
+        damageDelta: Number(step.state_b.damage) - prevValue.damage,
+        hitChanceDelta: Number(step.state_b.chances) - prevValue.hitChance
       }
       return newStatsB
     })
@@ -299,16 +333,40 @@ export default function Duel({
     resetEverything()
     cardRef.current?.resetCards()
     gameImpl?.resetDuelScene(false)
-    setTriggerReset(!triggerReset)
+    
+    setTimeout(() => {
+      setTriggerReset(!triggerReset)
+    }, 1200);
   }
 
   const resetEverything = () => {
+    setStatsA((prevValue) => {
+        return { 
+          damage: 0,
+          hitChance: 0,
+          health: 3,
+          shotPaces: undefined,
+          dodgePaces: undefined,
+          damageDelta: 0,
+          hitChanceDelta: 0
+        }
+      })
+      setStatsB((prevValue) => {
+        return { 
+          damage: 0,
+          hitChance: 0,
+          health: 3,
+          shotPaces: undefined,
+          dodgePaces: undefined,
+          damageDelta: 0,
+          hitChanceDelta: 0
+        }
+      })
+    
     currentStep.current = 0
     hasSpawnedCardsA.current = false
     hasSpawnedCardsB.current = false
     hasUnmounted.current = false
-    setStatsA({ damage: 1, hitChance: 50, health: 3, shotPaces: undefined, dodgePaces: undefined })
-    setStatsB({ damage: 1, hitChance: 50, health: 3, shotPaces: undefined, dodgePaces: undefined })
 
     nextStepCallback.current = null
     cardRevealTimeout.current = null
@@ -320,7 +378,7 @@ export default function Duel({
 
   return (
     <>
-      {/* <DuelProgress 
+      <DuelProgress 
         isA
         name={nameA}
         duelId={duelId}
@@ -339,7 +397,7 @@ export default function Duel({
         completedStages={completedStagesB}
         canAutoReveal={canAutoRevealB}
         revealCards={(cards: DuelistHand) => cardRef.current?.spawnCards('B', cards)}
-      /> */}
+      />
       <Cards duelId={duelId} ref={cardRef} />
       <div className='TavernBoard NoMouse NoDrag' style={{ backgroundImage: 'url(/images/ui/wager_main.png)', backgroundSize: '100% 100%' }}>
         <div className='TavernTitle' data-contentlength={1}>Settling the matter of:</div>
@@ -358,7 +416,7 @@ export default function Duel({
           <DuelProfile floated='left' duelistId={duelistIdA} />
         </div>
         <div className='DuelistProfileA NoMouse NoDrag'>
-          <DuelistProfile floated='left' duelistId={duelistIdA} damage={statsA.damage} hitChance={statsA.hitChance} />
+          <DuelistProfile floated='left' duelistId={duelistIdA} damage={statsA.damage} hitChance={statsA.hitChance} damageDelta={statsA.damageDelta} hitChanceDelta={statsA.hitChanceDelta} speedFactor={duelSpeedFactor} />
         </div>
       </div>
       <div>
@@ -366,7 +424,7 @@ export default function Duel({
           <DuelProfile floated='right' duelistId={duelistIdB} />
         </div>
         <div className='DuelistProfileB NoMouse NoDrag' >
-          <DuelistProfile floated='right' duelistId={duelistIdB} damage={statsB.damage} hitChance={statsB.hitChance} />
+          <DuelistProfile floated='right' duelistId={duelistIdB} damage={statsB.damage} hitChance={statsB.hitChance} damageDelta={statsB.damageDelta} hitChanceDelta={statsB.hitChanceDelta} speedFactor={duelSpeedFactor} />
         </div>
       </div>
 
@@ -447,12 +505,18 @@ function DuelistProfile({
   duelistId,
   floated,
   damage,
-  hitChance
+  hitChance,
+  damageDelta,
+  hitChanceDelta,
+  speedFactor
 }: {
   duelistId: BigNumberish,
   floated: SemanticFLOATS
   damage: number
   hitChance: number
+  damageDelta: number
+  hitChanceDelta: number
+  speedFactor: number
 }) {
   const { score } = useDuelist(duelistId)
   const { aspectWidth } = useGameAspect()
@@ -464,6 +528,59 @@ function DuelistProfile({
     let imageName = 'duelist_female_' + (ArchetypeNames[score.archetype].toLowerCase() == 'undefined' ? 'honourable' : ArchetypeNames[score.archetype].toLowerCase())
     setArchetypeImage('/images/' + imageName + '.png')
   }, [score])
+
+  useEffect(() => {
+    if (damageDelta != 0) {
+      animateNumber(damageContainerRef, damageNumberRef)
+    }
+  }, [damageDelta])
+
+  useEffect(() => {
+    if (hitChanceDelta != 0) {
+      animateNumber(hitChanceContainerRef, hitChanceNumberRef)
+    }
+  }, [hitChanceDelta])
+
+  const animateNumber = (referenceContainer, referenceText) => {
+    const endRotation = Math.random() * 10 * (floated == "left" ? 1 : -1);
+    const startRotationText = Math.random() * 20 - 10;
+    const endRotationText = Math.random() * 20 - 10;
+    const duration = Constants.DRAW_CARD_BASE_DURATION / speedFactor;
+
+    new TWEEN.Tween({ rotation: 0, rotationText: startRotationText, y: 0, scale: 0.9 })
+      .to({ rotation: endRotation, rotationText: endRotationText, y: -150, scale: 1.6 }, duration)
+      .easing(TWEEN.Easing.Elastic.Out)
+      .onUpdate((value) => {
+        referenceContainer.current.style.transform = `rotate(${value.rotation}deg) translateY(${value.y}px)`;
+        referenceText.current.style.transform = `rotate(${value.rotationText}deg) scale(${value.scale})`;
+      })
+      .start();
+
+    new TWEEN.Tween({ opacity: 0 })
+      .to({ opacity: 1 }, duration / 4)
+      .easing(TWEEN.Easing.Elastic.Out)
+      .onUpdate((value) => {
+        referenceText.current.style.opacity = value.opacity.toString();
+      })
+      .chain(new TWEEN.Tween({ opacity: 1 })
+        .to({ opacity: 0 }, duration / 4)
+        .delay(duration / 2)
+        .onUpdate((value) => {
+          referenceText.current.style.opacity = value.opacity.toString();
+        })
+        .onComplete(() => {
+          referenceContainer.current.style.transform = `rotate(0deg) translateY(0px)`;
+          referenceText.current.style.transform = `rotate(0deg) scale(0.9)`;
+          referenceText.current.style.opacity = '0';
+        })
+      )
+      .start();
+  }
+
+  const hitChanceContainerRef = useRef<HTMLDivElement>(null)
+  const hitChanceNumberRef = useRef<HTMLDivElement>(null)
+  const damageContainerRef = useRef<HTMLDivElement>(null)
+  const damageNumberRef = useRef<HTMLDivElement>(null)
 
   return (
     <>
@@ -482,6 +599,17 @@ function DuelistProfile({
           </div>
           <DuelistPistol damage={damage} floated={floated} />
           <Image className='NoMouse NoDrag' src='/images/ui/duelist_profile.png' style={{ position: 'absolute' }} />
+
+          <div ref={hitChanceContainerRef} className='NumberDeltaContainer NoMouse NoDrag'>
+            <div ref={hitChanceNumberRef} className='NumberDelta HitChance' data-floated={floated}>
+              { hitChanceDelta > 0 ? '+' : '' }{hitChanceDelta}
+            </div>
+          </div>
+          <div ref={damageContainerRef} className='NumberDeltaContainer NoMouse NoDrag'>
+            <div ref={damageNumberRef} className='NumberDelta Damage' data-floated={floated}>
+              { damageDelta > 0 ? '+' : '' }{damageDelta}
+            </div>
+          </div>
         </>
       }
       {floated == 'right' &&
@@ -492,6 +620,17 @@ function DuelistProfile({
           </div>
           <DuelistPistol damage={damage} floated={floated} />
           <Image className='FlipHorizontal NoMouse NoDrag' src='/images/ui/duelist_profile.png' style={{ position: 'absolute' }} />
+
+          <div ref={hitChanceContainerRef} className='NumberDeltaContainer NoMouse NoDrag'>
+            <div ref={hitChanceNumberRef} className='NumberDelta HitChance' data-floated={floated}>
+              { hitChanceDelta > 0 ? '+' : '' }{hitChanceDelta}
+            </div>  
+          </div>
+          <div ref={damageContainerRef} className='NumberDeltaContainer NoMouse NoDrag'>
+            <div ref={damageNumberRef} className='NumberDelta Damage' data-floated={floated}>
+              { damageDelta > 0 ? '+' : '' }{damageDelta}
+            </div>
+          </div>
         </>
       }
     </>
@@ -503,7 +642,7 @@ function DuelistPistol({
   floated,
 }) {
   const { aspectWidth } = useGameAspect()
-  const healthUrl = useMemo(() => {
+  const damageUrl = useMemo(() => {
     return '/images/ui/gun/gun_damage_' + Math.min(damage, 4) + '.png'
   }, [damage])
   return (
@@ -512,7 +651,7 @@ function DuelistPistol({
         <Image className={ floated == 'right' ? 'FlipHorizontal' : ''} src={'/images/ui/gun/gun_main.png'} />
       </div>
       <div className='NoMouse NoDrag' style={{ position: 'absolute', width: aspectWidth(17.5), [floated == 'right' ? 'right' : 'left']: aspectWidth(8.9) }}>
-        <Image className={ floated == 'right' ? 'FlipHorizontal' : ''} src={healthUrl} />
+        {damage > 0 && <Image className={ floated == 'right' ? 'FlipHorizontal' : ''} src={damageUrl} />}
       </div>
     </>
   )

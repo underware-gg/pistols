@@ -526,6 +526,23 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
       card.isFlipped = false
       card.isSpawned = false
 
+      switch (card.type) {
+        case DuelistCardType.BLADE:
+          card.renderOrder = 3;
+          break;
+        case DuelistCardType.DODGE:
+          card.renderOrder = 2;
+          break;
+        case DuelistCardType.FIRE:
+          card.renderOrder = 1;
+          break;
+        case DuelistCardType.TACTICS:
+          card.renderOrder = 0;
+          break;
+        default:
+          break;
+      }
+
       card.ref.current.toggleVisibility(false)
       setTimeout(() => {
         card.ref.current.setPosition(centerX, centerY, 0)

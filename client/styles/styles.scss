@@ -1035,6 +1035,56 @@ $ui-container-gap: 1em;
   justify-content: center;
 }
 
+.NumberDeltaContainer {
+  position: absolute;
+}
+
+.NumberDelta {
+  position: absolute;
+  font-size: aspect-width(4);
+  font-weight: 900;
+  overflow: visible;
+  z-index: 300;
+  opacity: 0;
+  display: inline-block;
+}
+
+.NumberDelta.HitChance {
+  bottom: aspect-width(8);
+  color: $color-warning;
+  -webkit-text-stroke: 0.04em darken(mix($color-warning, $color-negative, 60%), 20%);
+  text-shadow: 
+    0 0 10px rgba(darken(mix($color-warning, $color-negative, 60%), 20%), 0.9),
+    0 0 15px rgba($color-warning, 0.8),
+    0 0 20px rgba($color-warning, 0.6);
+}
+
+.NumberDelta.Damage {
+  bottom: aspect-width(4);
+  color: $color-negative;
+  -webkit-text-stroke: 0.04em darken($color-negative, 40%);
+  text-shadow: 
+    0 0 10px rgba(darken($color-negative, 40%), 0.9),
+    0 0 15px rgba($color-negative, 0.9),
+    0 0 20px rgba($color-negative, 0.7);
+}
+
+.NumberDelta.HitChance[data-floated="left"] {
+  left: aspect-width(4);
+}
+
+.NumberDelta.HitChance[data-floated="right"] {
+  right: aspect-width(4);
+}
+
+.NumberDelta.Damage[data-floated="left"] {
+  left: aspect-width(16);
+}
+
+.NumberDelta.Damage[data-floated="right"] {
+  right: aspect-width(16);
+}
+
 .DuelistHonourProgress[data-floated="left"] {
 }
 

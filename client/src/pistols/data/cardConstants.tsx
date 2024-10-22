@@ -85,7 +85,7 @@ export const CARD_REVEAL_SLIDE_TRANSFORMS_DELAY = (BASE_CARD_REVEAL_DURATION - C
 //Expand and Collapse Hand
 export const EXPAND_HAND_CARD_SCALE = 1.2
 
-export const EXPAND_HAND_BASE_DURATION = 400 // opacity taakes 0.4 its in cards.scss class card
+export const EXPAND_HAND_BASE_DURATION = 300 // opacity taakes 0.4 its in cards.scss class card
 export const EXPAND_HAND_CARD_SCALE_DURATION = EXPAND_HAND_BASE_DURATION
 
 //Hand Details
