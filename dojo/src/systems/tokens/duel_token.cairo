@@ -419,40 +419,29 @@ pub mod duel_token {
     //-----------------------------------
     // ITokenRenderer
     //
-    use pistols::systems::components::erc721_hooks::{ITokenRenderer};
+    use pistols::systems::components::erc721_hooks::{ITokenRenderer, TokenMetadata};
     #[abi(embed_v0)]
     impl TokenRendererImpl of ITokenRenderer<ContractState> {
-        fn format_name(self: @ContractState,
-            token_id: u256,
-            duelist: Duelist,
-        ) -> ByteArray {
-            let name: ByteArray = if (duelist.name != '') { duelist.name.as_string() } else { "Duel" };
-            (format!("{} #{}", name, token_id))
-        }
-        
-        fn format_description(self: @ContractState,
-            token_id: u256,
-            _duelist: Duelist,
-        ) -> ByteArray {
-            (format!("Pistols at 10 Blocks Duel #{}", token_id))
-        }
-        
-        fn format_image(self: @ContractState,
-            duelist: Duelist,
-            variant: ByteArray,
-        ) -> ByteArray {
-            let base_uri: ByteArray = self.erc721._base_uri();
-            let number =
-                if (duelist.profile_pic_uri.len() == 0) {"00"}
-                else if (duelist.profile_pic_uri.len() == 1) {format!("0{}", duelist.profile_pic_uri)}
-                else {duelist.profile_pic_uri};
-            (format!("{}/profiles/{}/{}.jpg", base_uri, variant, number))
+        fn get_token_metadata(self: @ContractState, token_id: u256) -> TokenMetadata {
+            // let store: Store = StoreTrait::new(self.world());
+            // let duel: Duel= store.get_duel(token_id.low);
+
+            let name: ByteArray = format!("Duel #{}", token_id);
+            let description: ByteArray = format!("Pistols at 10 Blocks Duel #{}. https://pistols.underware.gg", token_id);
+            let image: ByteArray = format!("{}/profiles/square/00.jpg", self.erc721._base_uri());
+
+            (TokenMetadata {
+                name,
+                description,
+                image,
+            })
         }
 
         // returns: [key1, value1, key2, value2,...]
-        fn get_attributes(self: @ContractState,
-            duelist: Duelist,
-        ) -> Span<ByteArray> {
+        fn get_metadata_pairs(self: @ContractState, token_id: u256) -> Span<ByteArray> {
+            ([].span())
+        }
+        fn get_attribute_pairs(self: @ContractState, token_id: u256) -> Span<ByteArray> {
             // let store = StoreTrait::new(self.world());
             let mut result: Array<ByteArray> = array![];
             // Honour
