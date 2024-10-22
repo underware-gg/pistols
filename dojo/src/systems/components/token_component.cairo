@@ -49,9 +49,9 @@ pub mod TokenComponent {
     pub enum Event {}
 
     mod Errors {
-        const CALLER_IS_NOT_MINTER: felt252 = 'ERC721: caller is not minter';
-        const CALLER_IS_NOT_OWNER: felt252  = 'ERC721: caller is not owner';
-        const INVALID_TOKEN_ID: felt252     = 'ERC721: invalid token ID';
+        const CALLER_IS_NOT_MINTER: felt252 = 'TOKEN: caller is not minter';
+        const CALLER_IS_NOT_OWNER: felt252  = 'TOKEN: caller is not owner';
+        const INVALID_TOKEN_ID: felt252     = 'TOKEN: invalid token ID';
     }
 
 

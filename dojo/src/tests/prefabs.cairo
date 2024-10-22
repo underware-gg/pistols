@@ -77,9 +77,9 @@ mod prefabs {
     fn start_new_challenge(sys: Systems, duelist_a: ContractAddress, duelist_b: ContractAddress, table_id: felt252) -> u128 {
         // tester::execute_update_duelist(game, duelist_a, NAME_A, ProfilePicType::Duelist, "1");
         // tester::execute_update_duelist(game, duelist_b, NAME_B, ProfilePicType::Duelist, "2");
-        let duel_id: u128 = tester::execute_create_challenge(@sys.game, duelist_a, duelist_b, MESSAGE, table_id, WAGER_VALUE, 48);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, duelist_a, duelist_b, MESSAGE, table_id, 48);
         tester::elapse_timestamp(timestamp::from_days(1));
-        tester::execute_reply_challenge(@sys.game, duelist_b, duel_id, true);
+        tester::execute_reply_duel(@sys.duels, duelist_b, duel_id, true);
         (duel_id)
     }
 

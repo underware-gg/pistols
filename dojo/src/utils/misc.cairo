@@ -13,6 +13,10 @@ fn WORLD(_world: IWorldDispatcher) {}
 
 // consumes a ByteArray to avoid unused variable warnings
 #[inline(always)]
+fn CONSUME_ADDRESS(_value: ContractAddress) {}
+
+// consumes a ByteArray to avoid unused variable warnings
+#[inline(always)]
 fn CONSUME_BYTE_ARRAY(_value: @ByteArray) {}
 
 #[inline(always)]

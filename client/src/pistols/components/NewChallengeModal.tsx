@@ -23,7 +23,7 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export default function NewChallengeModal() {
-  const { create_challenge } = useDojoSystemCalls()
+  const { create_duel } = useDojoSystemCalls()
   const { account, address } = useAccount()
   const { tableId, duelistId } = useSettings()
 
@@ -65,10 +65,10 @@ export default function NewChallengeModal() {
     }
   }, [hasPactDuelist, hasPactAddress])
 
-  const _create_challenge = () => {
+  const _create_duel = () => {
     const _submit = async () => {
       setIsSubmitting(true)
-      await create_challenge(account, duelistId, challengingId, args.premise, args.quote, tableId, args.wager_value, args.expire_hours)
+      await create_duel(account, duelistId, challengingId, args.premise, args.quote, tableId, args.wager_value, args.expire_hours)
       setIsSubmitting(false)
     }
     if (args) _submit()
@@ -148,7 +148,7 @@ export default function NewChallengeModal() {
                   fee={fee}
                   disabled={!args || isSubmitting}
                   label='Submit Challenge!'
-                  onClick={() => _create_challenge()}
+                  onClick={() => _create_duel()}
                 />
               }
               {!tableIsOpen && <ActionButton large fill disabled negative label='Table is Closed!' onClick={() => { }} />}

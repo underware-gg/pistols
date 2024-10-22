@@ -5,6 +5,7 @@ use dojo::model::{Model, ModelTest, ModelIndex, ModelEntityTest};
 use dojo::utils::test::spawn_test_world;
 
 use pistols::systems::tokens::{
+    duel_token::{duel_token, IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
     duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
     lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
 };
@@ -91,7 +92,7 @@ fn setup_uninitialized(fee_amount: u128) -> (IWorldDispatcher, IDuelistTokenDisp
     world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), lords.contract_address);
 
     let mut token = IDuelistTokenDispatcher {
-        contract_address: world.deploy_contract('duelist', duelist_token::TEST_CLASS_HASH.try_into().unwrap())
+        contract_address: world.deploy_contract('duelist_token', duelist_token::TEST_CLASS_HASH.try_into().unwrap())
     };
     world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), token.contract_address);
     let duelists_call_data: Span<felt252> = array![
@@ -177,7 +178,7 @@ fn test_token_component() {
     // should not panic
     // token.contract_address.print();
     token.owner_of(TOKEN_ID_1);//.print();
-    token.calc_price(OWNER());//.print();
+    token.calc_fee(OWNER());//.print();
     token.is_owner_of(OWNER(), TOKEN_ID_1.low);//.print();
 }
 

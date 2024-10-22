@@ -9,15 +9,16 @@ mod tester {
     use dojo::model::{Model, ModelTest, ModelIndex, ModelEntityTest};
     use dojo::utils::test::{spawn_test_world, deploy_contract};
 
-    use pistols::systems::admin::{admin, IAdminDispatcher, IAdminDispatcherTrait};
-    use pistols::systems::game::{game, IGameDispatcher, IGameDispatcherTrait};
-    use pistols::systems::tokens::duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait};
-    use pistols::systems::tokens::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
-    use pistols::tests::token::mock_duelist::{
-        duelist_token as mock_duelist,
-        // IDuelistTokenDispatcher,
-        // IDuelistTokenDispatcherTrait,
+    pub use pistols::systems::{
+        admin::{admin, IAdminDispatcher, IAdminDispatcherTrait},
+        game::{game, IGameDispatcher, IGameDispatcherTrait},
+        tokens::{
+            duel_token::{duel_token, IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
+            duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
+            lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
+        },
     };
+    use pistols::tests::token::mock_duelist::{duelist_token as mock_duelist};
     use pistols::types::challenge_state::{ChallengeState};
     use pistols::types::constants::{CONST};
     use pistols::types::premise::{Premise};
@@ -110,12 +111,13 @@ mod tester {
     const INITIAL_STEP: u64 = 0x10;
 
     mod FLAGS {
-        const GAME: u8       = 0b000001;
-        const ADMIN: u8      = 0b000010;
-        const LORDS: u8      = 0b000100;
-        const DUELIST: u8    = 0b001000;
-        const APPROVE: u8    = 0b010000;
-        const MOCK_RNG: u8   = 0b100000;
+        const GAME: u8       = 0b0000001;
+        const ADMIN: u8      = 0b0000010;
+        const LORDS: u8      = 0b0000100;
+        const DUEL: u8       = 0b0001000;
+        const DUELIST: u8    = 0b0010000;
+        const APPROVE: u8    = 0b0100000;
+        const MOCK_RNG: u8   = 0b1000000;
     }
 
     #[derive(Copy, Drop)]
@@ -124,6 +126,7 @@ mod tester {
         game: IGameDispatcher,
         admin: IAdminDispatcher,
         lords: ILordsMockDispatcher,
+        duels: IDuelTokenDispatcher,
         duelists: IDuelistTokenDispatcher,
         rng: IRngDispatcher,
     }
@@ -138,13 +141,15 @@ mod tester {
         let mut deploy_game: bool = (flags & FLAGS::GAME) != 0;
         let mut deploy_admin: bool = (flags & FLAGS::ADMIN) != 0;
         let mut deploy_lords: bool = (flags & FLAGS::LORDS) != 0;
+        let mut deploy_duel: bool = (flags & FLAGS::DUEL) != 0;
         let mut deploy_duelist: bool = (flags & FLAGS::DUELIST) != 0;
         let mut deploy_mock_rng = (flags & FLAGS::MOCK_RNG) != 0;
         let approve: bool = (flags & FLAGS::APPROVE) != 0;
 
         deploy_game = deploy_game || approve;
         deploy_admin = deploy_admin || deploy_game;
-        deploy_lords = deploy_lords || deploy_game || approve || deploy_duelist;
+        deploy_lords = deploy_lords || deploy_game || deploy_duelist;
+        deploy_duel = deploy_duel || deploy_game;
 
         // setup testing
         testing::set_block_number(1);
@@ -200,9 +205,29 @@ mod tester {
             else {ZERO()}
         };
 // '---- 2'.print();
+        let duels = IDuelTokenDispatcher{ contract_address:
+            if (deploy_duel) {
+                let address = deploy_system(world, 'duel_token', duel_token::TEST_CLASS_HASH);
+                world.grant_writer(SELECTORS::DUEL_TOKEN, OWNER());
+                world.grant_writer(selector_from_tag!("pistols-TokenConfig"), address);
+                world.grant_writer(selector_from_tag!("pistols-Challenge"), address);
+                world.grant_writer(selector_from_tag!("pistols-Round"), address);
+                world.grant_writer(selector_from_tag!("pistols-Pact"), address);
+                world.grant_writer(selector_from_tag!("pistols-Scoreboard"), address);
+                let call_data: Span<felt252> = array![
+                    0, 0, 0,
+                    lords.contract_address.into(),
+                    100_000_000_000_000_000_000, // 100 Lords
+                ].span();
+                world.init_contract(SELECTORS::DUEL_TOKEN, call_data);
+                (address)
+            }
+            else {ZERO()}
+        };
+// '---- 3'.print();
         let duelists = IDuelistTokenDispatcher{ contract_address:
             if (deploy_duelist) {
-                let address = deploy_system(world, 'duelist', duelist_token::TEST_CLASS_HASH);
+                let address = deploy_system(world, 'duelist_token', duelist_token::TEST_CLASS_HASH);
                 world.grant_writer(SELECTORS::DUELIST_TOKEN, OWNER());
                 world.grant_writer(selector_from_tag!("pistols-TokenConfig"), address);
                 world.grant_writer(selector_from_tag!("pistols-Duelist"), address);
@@ -215,11 +240,11 @@ mod tester {
                 (address)
             }
             else if (deploy_game) {
-                (deploy_system(world, 'duelist', mock_duelist::TEST_CLASS_HASH))
+                (deploy_system(world, 'duelist_token', mock_duelist::TEST_CLASS_HASH))
             }
             else {ZERO()}
         };
-// '---- 3'.print();
+// '---- 4'.print();
         let admin = IAdminDispatcher{ contract_address:
             if (deploy_admin) {
                 let address = deploy_system(world, 'admin', admin::TEST_CLASS_HASH);
@@ -237,7 +262,7 @@ mod tester {
             }
             else {ZERO()}
         };
-// '---- 4'.print();
+// '---- 5'.print();
         let rng = IRngDispatcher{ contract_address:
             {
                 let class_hash = if (deploy_mock_rng) {mock_rng::TEST_CLASS_HASH} else {rng::TEST_CLASS_HASH};
@@ -247,25 +272,25 @@ mod tester {
                 (address)
             }
         };
-// '---- 5'.print();
+// '---- 6'.print();
 
         // initializers
         if (deploy_lords) {
             execute_lords_faucet(@lords, OWNER());
             execute_lords_faucet(@lords, OTHER());
         }
-// '---- 6'.print();
+// '---- 7'.print();
         if (approve) {
             execute_lords_approve(@lords, OWNER(), game.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
             execute_lords_approve(@lords, OTHER(), game.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
             execute_lords_approve(@lords, BUMMER(), game.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
         }
-// '---- 7'.print();
+// '---- 8'.print();
 
         impersonate(OWNER());
 
 // '---- READY!'.print();
-        (Systems { world, game, admin, lords, duelists, rng })
+        (Systems { world, game, admin, lords, duels, duelists, rng })
     }
 
     fn elapse_timestamp(delta: u64) -> (u64, u64) {
@@ -359,47 +384,47 @@ mod tester {
         (duelist)
     }
 
-    // ::game
-    fn execute_create_challenge(system: @IGameDispatcher, sender: ContractAddress,
+    // ::duel_token
+    fn execute_create_duel(system: @IDuelTokenDispatcher, sender: ContractAddress,
         challenged: ContractAddress,
         // premise: Premise,
         quote: felt252,
         table_id: felt252,
-        wager_value: u128,
         expire_hours: u64,
     ) -> u128 {
-        (execute_create_challenge_ID(system, sender, ID(sender), challenged, quote, table_id, wager_value, expire_hours))
+        (execute_create_duel_ID(system, sender, ID(sender), challenged, quote, table_id, expire_hours))
     }
-    fn execute_create_challenge_ID(system: @IGameDispatcher, sender: ContractAddress,
+    fn execute_create_duel_ID(system: @IDuelTokenDispatcher, sender: ContractAddress,
         token_id: u128,
         challenged: ContractAddress,
         // premise: Premise,
         quote: felt252,
         table_id: felt252,
-        wager_value: u128,
         expire_hours: u64,
     ) -> u128 {
         impersonate(sender);
-        let duel_id: u128 = (*system).create_challenge(token_id, challenged, Premise::Nothing, quote, table_id, wager_value, expire_hours);
+        let duel_id: u128 = (*system).create_duel(token_id, challenged, Premise::Nothing, quote, table_id, expire_hours);
         _next_block();
         (duel_id)
     }
-    fn execute_reply_challenge(system: @IGameDispatcher, sender: ContractAddress,
+    fn execute_reply_duel(system: @IDuelTokenDispatcher, sender: ContractAddress,
         duel_id: u128,
         accepted: bool,
     ) -> ChallengeState {
-        (execute_reply_challenge_ID(system, sender, ID(sender), duel_id, accepted))
+        (execute_reply_duel_ID(system, sender, ID(sender), duel_id, accepted))
     }
-    fn execute_reply_challenge_ID(system: @IGameDispatcher, sender: ContractAddress,
+    fn execute_reply_duel_ID(system: @IDuelTokenDispatcher, sender: ContractAddress,
         token_id: u128,
         duel_id: u128,
         accepted: bool,
     ) -> ChallengeState {
         impersonate(sender);
-        let new_state: ChallengeState = (*system).reply_challenge(token_id, duel_id, accepted);
+        let new_state: ChallengeState = (*system).reply_duel(token_id, duel_id, accepted);
         _next_block();
         (new_state)
     }
+
+    // ::game
     fn execute_commit_moves(system: @IGameDispatcher, sender: ContractAddress,
         duel_id: u128,
         round_number: u8,

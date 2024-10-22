@@ -55,14 +55,14 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('DUELIST: Invalid duelist', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('TOKEN: caller is not owner', 'ENTRYPOINT_FAILED'))]
     fn test_update_invalid_duelist() {
         let sys = tester::setup_world(FLAGS::GAME | FLAGS::ADMIN | FLAGS::DUELIST);
         tester::execute_update_duelist(@sys.duelists, OTHER(), 'P1', ProfilePicType::Duelist, '11');
     }
 
     #[test]
-    #[should_panic(expected:('DUELIST: Not your duelist', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('TOKEN: caller is not owner', 'ENTRYPOINT_FAILED'))]
     fn test_update_duelist_not_owner() {
         let sys = tester::setup_world(FLAGS::GAME | FLAGS::ADMIN | FLAGS::DUELIST);
         let duelist: Duelist = tester::execute_create_duelist(@sys.duelists, OWNER(), 'AAA', ProfilePicType::Duelist, '1');

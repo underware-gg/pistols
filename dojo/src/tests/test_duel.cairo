@@ -6,7 +6,6 @@ mod tests {
 
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
-    use pistols::systems::game::{game, IGameDispatcher, IGameDispatcherTrait};
     use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, RoundEntity};
     use pistols::models::duelist::{Duelist, DuelistEntity, DuelistEntityStore, ProfilePicType, Archetype};
     use pistols::models::table::{TableConfig, TABLES};
@@ -22,6 +21,8 @@ mod tests {
     use pistols::tests::tester::{tester,
         tester::{
             Systems,
+            IGameDispatcher, IGameDispatcherTrait,
+            IDuelTokenDispatcher, IDuelTokenDispatcherTrait,
             FLAGS, ID, ZERO,
             OWNER, OTHER, BUMMER, TREASURY,
             BIG_BOY, LITTLE_BOY, LITTLE_GIRL,
@@ -90,8 +91,8 @@ mod tests {
         let balance_contract: u128 = sys.lords.balance_of(sys.game.contract_address).low;
         let balance_a: u128 = sys.lords.balance_of(OWNER()).low;
         let balance_b: u128 = sys.lords.balance_of(OTHER()).low;
-        let fee: u128 = sys.game.calc_fee(table_id, WAGER_VALUE);
-        assert(fee > 0, 'fee > 0');
+        let fee: u128 = sys.duels.calc_fee(table_id);
+        assert(fee == 0, 'fee == 0');
 
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
         tester::assert_balance(sys.lords, sys.game.contract_address, balance_contract, 0, (fee + WAGER_VALUE) * 2, 'balance_contract_1');
@@ -187,8 +188,8 @@ mod tests {
         let balance_treasury: u128 = sys.lords.balance_of(TREASURY()).low;
         let balance_a: u128 = sys.lords.balance_of(OWNER()).low;
         let balance_b: u128 = sys.lords.balance_of(OTHER()).low;
-        let fee: u128 = sys.game.calc_fee(table_id, WAGER_VALUE);
-        assert(fee > 0, 'fee > 0');
+        let fee: u128 = sys.duels.calc_fee(table_id);
+        assert(fee == 0, 'fee == 0');
         assert(balance_treasury == 0, 'balance_treasury == 0');
 
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
@@ -359,7 +360,7 @@ mod tests {
     //     table.fee_collector_address = BUMMER();
     //     tester::set_TableConfig(@sys.world, table);
 
-    //     let fee: u128 = sys.game.calc_fee(TABLE_ID, WAGER_VALUE);
+    //     let fee: u128 = sys.duels.calc_fee(TABLE_ID);
     //     assert(fee > 0, 'fee > 0');
 
     //     let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
@@ -430,7 +431,7 @@ mod tests {
     //
 
     #[test]
-    #[should_panic(expected:('DUEL: Not your duelist', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: Not your duelist', 'ENTRYPOINT_FAILED'))]
     fn test_commit_wrong_player_to_duelist() {
         let sys = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
@@ -441,7 +442,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('DUEL: Not your challenge', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: Not your challenge', 'ENTRYPOINT_FAILED'))]
     fn test_commit_wrong_player_to_address() {
         let sys = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
@@ -536,7 +537,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Challenge not Progress', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_challenge_not_started() {
         let sys = tester::setup_world(FLAGS::GAME);
-        let duel_id: u128 = tester::execute_create_challenge(@sys.game, OWNER(), OTHER(), MESSAGE, TABLES::COMMONERS, 0, 48);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), MESSAGE, TABLES::COMMONERS, 48);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, 1, 0x1212112);
     }
 

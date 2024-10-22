@@ -10,7 +10,7 @@ export const useTokenContract = () => {
   const [contractAddress, setTokenContractAddress] = useState(null)
   const { setup: { manifest, nameSpace } } = useDojo()
   useEffect(() => {
-    const contract = getContractByName(manifest, nameSpace, 'duelist');
+    const contract = getContractByName(manifest, nameSpace, 'duelist_token');
     setTokenContractAddress(contract?.address ?? null)
   }, [manifest])
   return {
@@ -52,10 +52,10 @@ export const useDuelistCalcPrice = (address: BigNumberish) => {
   const [tokenAddress, setTokenAddress] = useState<boolean>()
   const [amount, setAmount] = useState<boolean>()
   const { duelistBalance } = useDuelistsOfOwner(address)
-  const { calc_price } = useDojoSystemCalls()
+  const { calc_fee } = useDojoSystemCalls()
   useEffect(() => {
-    if (address && calc_price) {
-      calc_price(BigInt(address)).then(v => {
+    if (address && calc_fee) {
+      calc_fee(BigInt(address)).then(v => {
         setTokenAddress(v[0])
         setAmount(v[1])
       }).catch(e => {
@@ -66,7 +66,7 @@ export const useDuelistCalcPrice = (address: BigNumberish) => {
       setTokenAddress(undefined)
       setAmount(undefined)
     }
-  }, [address, duelistBalance, calc_price])
+  }, [address, duelistBalance, calc_fee])
   return {
     tokenAddress,
     amount,

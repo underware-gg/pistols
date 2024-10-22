@@ -26,9 +26,9 @@
 //     const PREMISE_1: felt252 = 'For honour!!!';
 
 //     fn _start_new_challenge(world: IWorldDispatcher, game: IGameDispatcher, owner: ContractAddress, other: ContractAddress, table_id: felt252) -> (ChallengeEntity, u128) {
-//         let duel_id: u128 = tester::execute_create_challenge(game, OWNER(), OTHER(), PREMISE_1, table_id, 0, 48);
+//         let duel_id: u128 = tester::execute_create_duel(game, OWNER(), OTHER(), PREMISE_1, table_id, 48);
 //         tester::elapse_timestamp(timestamp::from_days(1));
-//         tester::execute_reply_challenge(game, OTHER(), duel_id, true);
+//         tester::execute_reply_duel(game, OTHER(), duel_id, true);
 //         let ch = tester::get_ChallengeEntity(world, duel_id);
 //         assert(ch.state == ChallengeState::InProgress, 'challenge.state');
 //         assert(ch.round_number == 1, 'challenge.number');

@@ -36,23 +36,18 @@ pub trait IDuelToken<TState> {
     fn tokenURI(self: @TState, tokenId: u256) -> ByteArray;
 
     // ITokenComponentPublic
-    fn can_mint(self: @TState, caller_address: ContractAddress) -> bool;
-    fn exists(self: @TState, token_id: u128) -> bool;
-    fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
-
-    // IDuelTokenPublic
-    fn calc_price(ref self: TState, recipient: ContractAddress) -> u128;
-    fn create_duel(ref self: TState, ) -> Challenge;
-    fn update_duel(ref self: TState, ) -> Challenge;
+    fn create_duel(ref self: TState, duelist_id: u128, challenged_id_or_address: ContractAddress, premise: Premise, quote: felt252, table_id: felt252, expire_hours: u64) -> u128;
+    fn reply_duel(ref self: TState, duelist_id: u128, duel_id: u128, accepted: bool) -> ChallengeState;
     fn delete_duel(ref self: TState, duel_id: u128);
+    // view calls
+    fn calc_fee(self: @TState, table_id: felt252) -> u128;
+    fn get_pact(self: @TState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128;
+    fn has_pact(self: @TState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool;
+    fn can_join(self: @TState, table_id: felt252, duelist_id: u128) -> bool;
 }
 
 #[starknet::interface]
 pub trait IDuelTokenPublic<TState> {
-    fn calc_price(
-        self: @TState,
-        recipient: ContractAddress,
-    ) -> u128;
     fn create_duel(
         ref self: TState,
         duelist_id: u128,
@@ -61,11 +56,11 @@ pub trait IDuelTokenPublic<TState> {
         quote: felt252,
         table_id: felt252,
         expire_hours: u64,
-    ) -> Challenge;
+    ) -> u128;
     fn reply_duel(
         ref self: TState,
-        duel_id: u128,
         duelist_id: u128,
+        duel_id: u128,
         accepted: bool,
     ) -> ChallengeState;
     fn delete_duel(
@@ -73,11 +68,11 @@ pub trait IDuelTokenPublic<TState> {
         duel_id: u128,
     );
 
-    // vierw calls
+    // view calls
+    fn calc_fee(self: @TState, table_id: felt252) -> u128;
     fn get_pact(self: @TState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128;
     fn has_pact(self: @TState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool;
     fn can_join(self: @TState, table_id: felt252, duelist_id: u128) -> bool;
-    fn calc_fee(self: @TState, table_id: felt252, wager_value: u128) -> u128;
 }
 
 #[starknet::interface]
@@ -153,7 +148,7 @@ pub mod duel_token {
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::math::{MathTrait};
-    use pistols::utils::misc::{ZERO, WORLD};
+    use pistols::utils::misc::{ZERO, WORLD, CONSUME_ADDRESS};
 
     mod Errors {
         const NOT_IMPLEMENTED: felt252          = 'DUEL: Not implemented';
@@ -209,12 +204,6 @@ pub mod duel_token {
     #[abi(embed_v0)]
     impl DuelTokenPublicImpl of IDuelTokenPublic<ContractState> {
 
-        fn calc_price(self: @ContractState,
-            recipient: ContractAddress,
-        ) -> u128 {
-            (0)
-        }
-
         fn create_duel(ref self: ContractState,
             duelist_id: u128,
             challenged_id_or_address: ContractAddress,
@@ -222,11 +211,11 @@ pub mod duel_token {
             quote: felt252,
             table_id: felt252,
             expire_hours: u64,
-        ) -> Challenge {
+        ) -> u128 {
             let caller: ContractAddress = get_caller_address();
 
             // transfer mint fee
-            let fee_amount: u128 = self.calc_price(caller);
+            let fee_amount: u128 = self.calc_fee(table_id);
             if (fee_amount > 0) {
                 assert(false, Errors::NOT_IMPLEMENTED);
             }
@@ -298,12 +287,12 @@ pub mod duel_token {
             // TODO: enable events
             // self._emitNewChallengeEvent(challenge);
 
-            (challenge)
+            (duel_id)
         }
         
         fn reply_duel(ref self: ContractState,
-            duel_id: u128,
             duelist_id: u128,
+            duel_id: u128,
             accepted: bool,
         ) -> ChallengeState {
 
@@ -403,6 +392,11 @@ pub mod duel_token {
         //-----------------------------------
         // View calls
         //
+        fn calc_fee(self: @ContractState, table_id: felt252) -> u128 {
+            let store: Store = StoreTrait::new(self.world());
+            let table: TableConfigEntity = store.get_table_config_entity(table_id);
+            (table.calc_fee(0))
+        }
         fn get_pact(self: @ContractState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128 {
             let store: Store = StoreTrait::new(self.world());
             (pact::get_pact(store, table_id, duelist_id_a, duelist_id_b))
@@ -418,12 +412,6 @@ pub mod duel_token {
             let table: TableConfigEntity = store.get_table_config_entity(table_id);
             let table_admittance: TableAdmittanceEntity = store.get_table_admittance_entity(table_id);
             (table.is_open && table_admittance.can_join(starknet::get_caller_address(), duelist_id))
-        }
-
-        fn calc_fee(self: @ContractState, table_id: felt252, wager_value: u128) -> u128 {
-            let store: Store = StoreTrait::new(self.world());
-            let table: TableConfigEntity = store.get_table_config_entity(table_id);
-            (table.calc_fee(wager_value))
         }
     }
 

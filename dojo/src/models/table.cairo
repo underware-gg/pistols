@@ -69,7 +69,7 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
             deck_type: DeckType::Classic,
             fee_contract_address: lords_address,
             fee_collector_address: ZERO(),
-            fee_min: 60 * CONST::ETH_TO_WEI.low,
+            fee_min: 0, //60 * CONST::ETH_TO_WEI.low,
             is_open: (lords_address.is_non_zero()),
         }),
         (TableConfig {

@@ -61,7 +61,7 @@
 //         tester::execute_lords_approve(lords, A, S, approved_value);
 //         tester::execute_lords_approve(lords, B, S, approved_value);
 //         // create challenge
-//         let duel_id: u128 = tester::execute_create_challenge(game, A, B, PREMISE_1, table_id, wager_value, 0);
+//         let duel_id: u128 = tester::execute_create_duel(game, A, B, PREMISE_1, table_id, wager_value, 0);
 //         let ch = tester::get_ChallengeEntity(world, duel_id);
 //         assert(ch.table_id == table_id, 'ch.table_id');
 //         assert(ch.state == ChallengeState::Awaiting, 'Awaiting');
@@ -76,7 +76,7 @@
 //         let final_balance_a: u128 = tester::assert_balance(lords, A, balance_a, approved_value, 0, 'balance_a');
 //         let fina_balance_contract: u128 = tester::assert_balance(lords, S, balance_contract, 0, approved_value, 'balance_contract+a');
 //         // accept
-//         tester::execute_reply_challenge(game, B, duel_id, true);
+//         tester::execute_reply_duel(game, B, duel_id, true);
 //         let final_balance_b: u128 = tester::assert_balance(lords, B, balance_b, approved_value, 0, 'balance_b');
 //         let final_balance_contract: u128 = tester::assert_balance(lords, S, fina_balance_contract, 0, approved_value, 'balance_contract+b');
 //         if (table_id == TABLES::LORDS) {
@@ -123,14 +123,14 @@
 //     #[should_panic(expected:('PISTOLS: Insufficient balance', 'ENTRYPOINT_FAILED'))]
 //     fn test_fee_funds_nok() {
 //         let (_world, game, _admin, _lords, _minter) = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-//         let _duel_id: u128 = tester::execute_create_challenge(game, BUMMER(), OTHER(), PREMISE_1, TABLE_ID, 0, 0);
+//         let _duel_id: u128 = tester::execute_create_duel(game, BUMMER(), OTHER(), PREMISE_1, TABLE_ID, 0, 0);
 //     }
 
 //     #[test]
 //     #[should_panic(expected:('PISTOLS: Insufficient balance', 'ENTRYPOINT_FAILED'))]
 //     fn test_wager_funds_nok() {
 //         let (_world, game, _admin, _lords, _minter) = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-//         let _duel_id: u128 = tester::execute_create_challenge(game, BUMMER(), OTHER(), PREMISE_1, TABLE_ID, 100, 0);
+//         let _duel_id: u128 = tester::execute_create_duel(game, BUMMER(), OTHER(), PREMISE_1, TABLE_ID, 100, 0);
 //     }
 
 
@@ -142,7 +142,7 @@
 //     fn test_fee_funds_ok() {
 //         let (world, game, _admin, lords, _minter) = tester::setup_world(FLAGS::GAME | FLAGS::LORDS | FLAGS::APPROVE);
 //         let _balance: u128 = lords.balance_of(OTHER()).low;
-//         let duel_id: u128 = tester::execute_create_challenge(game, OTHER(), BUMMER(), PREMISE_1, TABLE_ID, 0, 0);
+//         let duel_id: u128 = tester::execute_create_duel(game, OTHER(), BUMMER(), PREMISE_1, TABLE_ID, 0, 0);
 //         let ch = tester::get_ChallengeEntity(world, duel_id);
 //         assert(ch.state == ChallengeState::Awaiting, 'Awaiting');
 //     }
@@ -151,7 +151,7 @@
 //     fn test_wager_funds_ok() {
 //         let (world, game, _admin, lords, _minter) = tester::setup_world(FLAGS::GAME | FLAGS::LORDS | FLAGS::APPROVE);
 //         let _balance: u128 = lords.balance_of(OTHER()).low;
-//         let duel_id: u128 = tester::execute_create_challenge(game, OTHER(), BUMMER(), PREMISE_1, TABLE_ID, 100, 0);
+//         let duel_id: u128 = tester::execute_create_duel(game, OTHER(), BUMMER(), PREMISE_1, TABLE_ID, 100, 0);
 //         let ch = tester::get_ChallengeEntity(world, duel_id);
 //         assert(ch.state == ChallengeState::Awaiting, 'Awaiting');
 //     }
@@ -165,9 +165,9 @@
 //     fn test_fee_funds_ok_resp_nok() {
 //         let (_world, game, _admin, _lords, _minter) = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
 //         // verified by test_fee_funds_ok
-//         let duel_id: u128 = tester::execute_create_challenge(game, OTHER(), BUMMER(), PREMISE_1, TABLE_ID, 0, 0);
+//         let duel_id: u128 = tester::execute_create_duel(game, OTHER(), BUMMER(), PREMISE_1, TABLE_ID, 0, 0);
 //         // panic here
-//         tester::execute_reply_challenge(game, BUMMER(), duel_id, true);
+//         tester::execute_reply_duel(game, BUMMER(), duel_id, true);
 //     }
 
 //     #[test]
@@ -175,9 +175,9 @@
 //     fn test_wager_funds_ok_resp_nok() {
 //         let (_world, game, _admin, _lords, _minter) = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
 //         // verified by test_wager_funds_ok
-//         let duel_id: u128 = tester::execute_create_challenge(game, OTHER(), BUMMER(), PREMISE_1, TABLE_ID, 100, 0);
+//         let duel_id: u128 = tester::execute_create_duel(game, OTHER(), BUMMER(), PREMISE_1, TABLE_ID, 100, 0);
 //         // panic here
-//         tester::execute_reply_challenge(game, BUMMER(), duel_id, true);
+//         tester::execute_reply_duel(game, BUMMER(), duel_id, true);
 //     }
 
 //     //
@@ -191,7 +191,7 @@
 //         // verified by test_fee_funds_ok
 //         // remove allowance
 //         tester::execute_lords_approve(lords, OTHER(), game.contract_address, 0);
-//         let _duel_id: u128 = tester::execute_create_challenge(game, OTHER(), BUMMER(), PREMISE_1, TABLE_ID, 0, 0);
+//         let _duel_id: u128 = tester::execute_create_duel(game, OTHER(), BUMMER(), PREMISE_1, TABLE_ID, 0, 0);
 //     }
 
 //     #[test]
@@ -201,7 +201,7 @@
 //         // verified by test_fee_funds_ok
 //         // remove allowance
 //         tester::execute_lords_approve(lords, OTHER(), game.contract_address, 0);
-//         let _duel_id: u128 = tester::execute_create_challenge(game, OTHER(), BUMMER(), PREMISE_1, TABLE_ID, 100, 0);
+//         let _duel_id: u128 = tester::execute_create_duel(game, OTHER(), BUMMER(), PREMISE_1, TABLE_ID, 100, 0);
 //     }
 
 
@@ -221,13 +221,13 @@
 //         let wager_value: u128 = 100 * CONST::ETH_TO_WEI.low;
 //         let fee: u128 = game.calc_fee(TABLE_ID, wager_value);
 //         let approved_value: u128 = wager_value + fee;
-//         let duel_id: u128 = tester::execute_create_challenge(game, A, B, PREMISE_1, TABLE_ID, wager_value, 0);
+//         let duel_id: u128 = tester::execute_create_duel(game, A, B, PREMISE_1, TABLE_ID, wager_value, 0);
 //         let ch = tester::get_ChallengeEntity(world, duel_id);
 //         assert(ch.state == ChallengeState::Awaiting, 'Awaiting');
 //         tester::assert_balance(lords, A, balance_a, approved_value, 0, 'balance_a_1');
 //         tester::assert_balance(lords, S, balance_contract, 0, approved_value, 'balance_contract_1');
 //         // Withdraw
-//         let new_state: ChallengeState = tester::execute_reply_challenge(game, A, duel_id, false);
+//         let new_state: ChallengeState = tester::execute_reply_duel(game, A, duel_id, false);
 //         assert(new_state == ChallengeState::Withdrawn, 'Withdrawn');
 //         tester::assert_balance(lords, A, balance_a, 0, 0, 'balance_a_2');
 //         tester::assert_balance(lords, S, balance_contract, 0, 0, 'balance_contract_2');
@@ -245,14 +245,14 @@
 //         let wager_value: u128 = 100 * CONST::ETH_TO_WEI.low;
 //         let fee: u128 = game.calc_fee(TABLE_ID, wager_value);
 //         let approved_value: u128 = wager_value + fee;
-//         let duel_id: u128 = tester::execute_create_challenge(game, A, B, PREMISE_1, TABLE_ID, wager_value, 24);
+//         let duel_id: u128 = tester::execute_create_duel(game, A, B, PREMISE_1, TABLE_ID, wager_value, 24);
 //         let ch = tester::get_ChallengeEntity(world, duel_id);
 //         assert(ch.state == ChallengeState::Awaiting, 'Awaiting');
 //         tester::assert_balance(lords, A, balance_a, approved_value, 0, 'balance_a_1');
 //         tester::assert_balance(lords, S, balance_contract, 0, approved_value, 'balance_contract_1');
 //         // reply, will expire...
 //         let (_block_number, _timestamp) = tester::elapse_timestamp(timestamp::from_date(1, 0, 1));
-//         let new_state: ChallengeState = tester::execute_reply_challenge(game, A, duel_id, true);
+//         let new_state: ChallengeState = tester::execute_reply_duel(game, A, duel_id, true);
 //         assert(new_state == ChallengeState::Expired, 'expired');
 //         // check balances...
 //         tester::assert_balance(lords, A, balance_a, 0, 0, 'balance_a_2');
@@ -271,13 +271,13 @@
 //         let wager_value: u128 = 100 * CONST::ETH_TO_WEI.low;
 //         let fee: u128 = game.calc_fee(TABLE_ID, wager_value);
 //         let approved_value: u128 = wager_value + fee;
-//         let duel_id: u128 = tester::execute_create_challenge(game, A, B, PREMISE_1, TABLE_ID, wager_value, 0);
+//         let duel_id: u128 = tester::execute_create_duel(game, A, B, PREMISE_1, TABLE_ID, wager_value, 0);
 //         let ch = tester::get_ChallengeEntity(world, duel_id);
 //         assert(ch.state == ChallengeState::Awaiting, 'Awaiting');
 //         tester::assert_balance(lords, A, balance_a, approved_value, 0, 'balance_a_1');
 //         tester::assert_balance(lords, S, balance_contract, 0, approved_value, 'balance_contract_1');
 //         // Withdraw
-//         let new_state: ChallengeState = tester::execute_reply_challenge(game, B, duel_id, false);
+//         let new_state: ChallengeState = tester::execute_reply_duel(game, B, duel_id, false);
 //         assert(new_state == ChallengeState::Refused, 'Refused');
 //         tester::assert_balance(lords, A, balance_a, 0, 0, 'balance_a_2');
 //         tester::assert_balance(lords, S, balance_contract, 0, 0, 'balance_contract_2');
@@ -295,14 +295,14 @@
 //         let wager_value: u128 = 100 * CONST::ETH_TO_WEI.low;
 //         let fee: u128 = game.calc_fee(TABLE_ID, wager_value);
 //         let approved_value: u128 = wager_value + fee;
-//         let duel_id: u128 = tester::execute_create_challenge(game, A, B, PREMISE_1, TABLE_ID, wager_value, 24);
+//         let duel_id: u128 = tester::execute_create_duel(game, A, B, PREMISE_1, TABLE_ID, wager_value, 24);
 //         let ch = tester::get_ChallengeEntity(world, duel_id);
 //         assert(ch.state == ChallengeState::Awaiting, 'Awaiting');
 //         tester::assert_balance(lords, A, balance_a, approved_value, 0, 'balance_a_1');
 //         tester::assert_balance(lords, S, balance_contract, 0, approved_value, 'balance_contract_1');
 //         // Expire
 //         let (_block_number, _timestamp) = tester::elapse_timestamp(timestamp::from_date(1, 0, 1));
-//         let new_state: ChallengeState = tester::execute_reply_challenge(game, B, duel_id, true);
+//         let new_state: ChallengeState = tester::execute_reply_duel(game, B, duel_id, true);
 //         assert(new_state == ChallengeState::Expired, 'Expired');
 //         tester::assert_balance(lords, A, balance_a, 0, 0, 'balance_a_2');
 //         tester::assert_balance(lords, S, balance_contract, 0, 0, 'balance_contract_2');

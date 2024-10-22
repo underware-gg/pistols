@@ -37,8 +37,13 @@ const admin_call = (entrypoint: string, calldata: any[]) => ({
   entrypoint,
   calldata,
 })
+const duel_token_call = (entrypoint: string, calldata: any[]) => ({
+  contractName: 'duel_token',
+  entrypoint,
+  calldata,
+})
 const duelist_token_call = (entrypoint: string, calldata: any[]) => ({
-  contractName: 'duelist',
+  contractName: 'duelist_token',
   entrypoint,
   calldata,
 })
@@ -93,7 +98,27 @@ export function createSystemCalls(
     return results as T
   }
 
-  const create_challenge = async (signer: AccountInterface, duelist_id: BigNumberish, challenged_id_or_address: BigNumberish, premise: Premise, quote: string, table_id: string, wager_value: BigNumberish, expire_hours: number): Promise<boolean> => {
+
+  //
+  // Game
+  //
+
+  const commit_moves = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, round_number: number, hash: BigNumberish): Promise<boolean> => {
+    const args = [duelist_id, duel_id, round_number, hash]
+    return await _executeTransaction(signer, game_call('commit_moves', args))
+  }
+
+  const reveal_moves = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, round_number: number, salt: BigNumberish, moves: number[]): Promise<boolean> => {
+    const args = [duelist_id, duel_id, round_number, salt, moves]
+    return await _executeTransaction(signer, game_call('reveal_moves', args))
+  }
+
+  //
+  // Duel token
+  //
+
+
+  const create_duel = async (signer: AccountInterface, duelist_id: BigNumberish, challenged_id_or_address: BigNumberish, premise: Premise, quote: string, table_id: string, wager_value: BigNumberish, expire_hours: number): Promise<boolean> => {
     // find lords contract
     const table = getComponentValue(TableConfig, bigintToEntity(stringToFelt(table_id)))
     if (!table) throw new Error(`Table does not exist [${table_id}]`)
@@ -102,24 +127,24 @@ export function createSystemCalls(
     const approved_value = bigintAdd(wager_value, fee)
     let calls: Call[] = []
     // approve call
-    const game_contract = getContractByName(manifest, NAMESPACE, 'game')
+    const duel_token_contract = getContractByName(manifest, NAMESPACE, 'duel_token')
     if (isPositiveBigint(table.fee_contract_address) && approved_value > 0) {
       calls.push({
         contractAddress: bigintToHex(table.fee_contract_address),
         entrypoint: 'approve',
-        calldata: [game_contract.address, bigintToU256(approved_value)],
+        calldata: [duel_token_contract.address, bigintToU256(approved_value)],
       })
     }
     // game call
     calls.push({
-      contractAddress: game_contract.address,
-      entrypoint: 'create_challenge',
+      contractAddress: duel_token_contract.address,
+      entrypoint: 'create_duel',
       calldata: [duelist_id, BigInt(challenged_id_or_address), getPremiseValue(premise), stringToFelt(quote), table_id, wager_value, expire_hours],
     })
     return await _executeTransaction(signer, calls)
   }
 
-  const reply_challenge = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, accepted: boolean): Promise<boolean> => {
+  const reply_duel = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, accepted: boolean): Promise<boolean> => {
     const reply_args = [duelist_id, duel_id, accepted]
     if (accepted) {
       // find Wager
@@ -132,36 +157,27 @@ export function createSystemCalls(
         if (!table) throw new Error(`Table does not exist [${challenge.table_id}]`)
         // approve call
         let calls: Call[] = []
-        const game_contract = getContractByName(manifest, NAMESPACE, 'game')
+        const duel_token_contract = getContractByName(manifest, NAMESPACE, 'duel_token')
         if (BigInt(table.fee_contract_address) > 0n) {
           calls.push({
             contractAddress: bigintToHex(table.fee_contract_address),
             entrypoint: 'approve',
-            calldata: [game_contract.address, bigintToU256(approved_value)],
+            calldata: [duel_token_contract.address, bigintToU256(approved_value)],
           })
         }
         // game call
         calls.push({
-          contractAddress: game_contract.address,
-          entrypoint: 'reply_challenge',
+          contractAddress: duel_token_contract.address,
+          entrypoint: 'reply_duel',
           calldata: reply_args,
         })
         return await _executeTransaction(signer, calls)
       }
     }
     // no need to approve, single call
-    return await _executeTransaction(signer, game_call('reply_challenge', reply_args))
+    return await _executeTransaction(signer, duel_token_call('reply_duel', reply_args))
   }
 
-  const commit_moves = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, round_number: number, hash: BigNumberish): Promise<boolean> => {
-    const args = [duelist_id, duel_id, round_number, hash]
-    return await _executeTransaction(signer, game_call('commit_moves', args))
-  }
-
-  const reveal_moves = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, round_number: number, salt: BigNumberish, moves: number[]): Promise<boolean> => {
-    const args = [duelist_id, duel_id, round_number, salt, moves]
-    return await _executeTransaction(signer, game_call('reveal_moves', args))
-  }
 
   //
   // Duelist token
@@ -303,8 +319,8 @@ export function createSystemCalls(
   return {
     create_duelist,
     update_duelist,
-    create_challenge,
-    reply_challenge,
+    create_duel,
+    reply_duel,
     commit_moves,
     reveal_moves,
     // view calls

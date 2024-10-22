@@ -39,7 +39,7 @@ pub trait IDuelistToken<TState> {
     fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
 
     // IDuelistTokenPublic
-    fn calc_price(ref self: TState, recipient: ContractAddress) -> u128;
+    fn calc_fee(ref self: TState, recipient: ContractAddress) -> u128;
     fn create_duelist(ref self: TState, recipient: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist;
     fn update_duelist(ref self: TState, duelist_id: u128, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist;
     fn delete_duelist(ref self: TState, duelist_id: u128);
@@ -47,7 +47,7 @@ pub trait IDuelistToken<TState> {
 
 #[starknet::interface]
 pub trait IDuelistTokenPublic<TState> {
-    fn calc_price(
+    fn calc_fee(
         self: @TState,
         recipient: ContractAddress,
     ) -> u128;
@@ -180,7 +180,7 @@ pub mod duelist_token {
     #[abi(embed_v0)]
     impl DuelistTokenPublicImpl of IDuelistTokenPublic<ContractState> {
 
-        fn calc_price(self: @ContractState,
+        fn calc_fee(self: @ContractState,
             recipient: ContractAddress,
         ) -> u128 {
             if (self.erc721.balance_of(recipient) == 0) {
@@ -199,7 +199,7 @@ pub mod duelist_token {
             profile_pic_uri: felt252,
         ) -> Duelist {
             // transfer mint fee
-            let fee_amount: u128 = self.calc_price(recipient);
+            let fee_amount: u128 = self.calc_fee(recipient);
             if (fee_amount > 0) {
                 assert(false, Errors::NOT_IMPLEMENTED);
             }
