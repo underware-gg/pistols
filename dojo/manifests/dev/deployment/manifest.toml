@@ -24,8 +24,8 @@ manifest_name = "dojo-base"
 [[contracts]]
 kind = "DojoContract"
 address = "0x6c4d29225a32116a42d90f46ed556e431694cff41f5b3b68732e5c41aa01041"
-class_hash = "0x5809efeb3c9c63821b16dc2e5656af7f951fb57ddd594c5281caddd65ce3d5c"
-original_class_hash = "0x5809efeb3c9c63821b16dc2e5656af7f951fb57ddd594c5281caddd65ce3d5c"
+class_hash = "0x11beca85bb818840ae792b59ea218dc7e7eaaab5006160bafc119efe02a52a6"
+original_class_hash = "0x11beca85bb818840ae792b59ea218dc7e7eaaab5006160bafc119efe02a52a6"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/dev/deployment/abis/contracts/pistols-admin-36fd2037.json"
 reads = []
@@ -48,14 +48,17 @@ manifest_name = "pistols-admin-36fd2037"
 [[contracts]]
 kind = "DojoContract"
 address = "0x3db7f788e6cd2b6e18911da108a0f161a963c367ea953d916aa5d664c64fff2"
-class_hash = "0x580792410fec480642f6510f14a433d4d643c0d8af6e16429ec056f7d1e1b50"
-original_class_hash = "0x580792410fec480642f6510f14a433d4d643c0d8af6e16429ec056f7d1e1b50"
+class_hash = "0x3cf06269f8d7d2702ec6ae177469fe412346806537a074b3c245e4bb231b1de"
+original_class_hash = "0x3cf06269f8d7d2702ec6ae177469fe412346806537a074b3c245e4bb231b1de"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/dev/deployment/abis/contracts/pistols-duel_token-670a5c67.json"
 reads = []
 writes = [
     "pistols-TokenConfig",
     "pistols-Challenge",
+    "pistols-Round",
+    "pistols-Pact",
+    "pistols-Scoreboard",
 ]
 init_calldata = [
     "0x0",
@@ -71,8 +74,8 @@ manifest_name = "pistols-duel_token-670a5c67"
 [[contracts]]
 kind = "DojoContract"
 address = "0x75c9d8eae61c368eda84bc2962b6b7a478136607f9a3f238c1680921b686b28"
-class_hash = "0x4a47bcea6d222e2aeaccb8207f42a07bf1f2a21f7286fab3477f07d35e60563"
-original_class_hash = "0x4a47bcea6d222e2aeaccb8207f42a07bf1f2a21f7286fab3477f07d35e60563"
+class_hash = "0x58d96558012a27c9ae3aa45a2350a4a99ec6baf856ad8e7b4e867cc39cd9fec"
+original_class_hash = "0x58d96558012a27c9ae3aa45a2350a4a99ec6baf856ad8e7b4e867cc39cd9fec"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/dev/deployment/abis/contracts/pistols-duelist_token-45c96d20.json"
 reads = []

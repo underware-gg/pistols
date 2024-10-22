@@ -254,7 +254,7 @@
     "items": [
       {
         "type": "function",
-        "name": "calc_price",
+        "name": "calc_fee",
         "inputs": [
           {
             "name": "recipient",

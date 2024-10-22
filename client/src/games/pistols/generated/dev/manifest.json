@@ -1256,8 +1256,8 @@
     {
       "kind": "DojoContract",
       "address": "0x6c4d29225a32116a42d90f46ed556e431694cff41f5b3b68732e5c41aa01041",
-      "class_hash": "0x5809efeb3c9c63821b16dc2e5656af7f951fb57ddd594c5281caddd65ce3d5c",
-      "original_class_hash": "0x5809efeb3c9c63821b16dc2e5656af7f951fb57ddd594c5281caddd65ce3d5c",
+      "class_hash": "0x11beca85bb818840ae792b59ea218dc7e7eaaab5006160bafc119efe02a52a6",
+      "original_class_hash": "0x11beca85bb818840ae792b59ea218dc7e7eaaab5006160bafc119efe02a52a6",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -1727,8 +1727,8 @@
     {
       "kind": "DojoContract",
       "address": "0x3db7f788e6cd2b6e18911da108a0f161a963c367ea953d916aa5d664c64fff2",
-      "class_hash": "0x580792410fec480642f6510f14a433d4d643c0d8af6e16429ec056f7d1e1b50",
-      "original_class_hash": "0x580792410fec480642f6510f14a433d4d643c0d8af6e16429ec056f7d1e1b50",
+      "class_hash": "0x3cf06269f8d7d2702ec6ae177469fe412346806537a074b3c245e4bb231b1de",
+      "original_class_hash": "0x3cf06269f8d7d2702ec6ae177469fe412346806537a074b3c245e4bb231b1de",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -1946,6 +1946,20 @@
         },
         {
           "type": "enum",
+          "name": "core::bool",
+          "variants": [
+            {
+              "name": "False",
+              "type": "()"
+            },
+            {
+              "name": "True",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
           "name": "pistols::types::challenge_state::ChallengeState",
           "variants": [
             {
@@ -1983,101 +1997,9 @@
           ]
         },
         {
-          "type": "struct",
-          "name": "pistols::models::challenge::Challenge",
-          "members": [
-            {
-              "name": "duel_id",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "seed",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "table_id",
-              "type": "core::felt252"
-            },
-            {
-              "name": "premise",
-              "type": "pistols::types::premise::Premise"
-            },
-            {
-              "name": "quote",
-              "type": "core::felt252"
-            },
-            {
-              "name": "address_a",
-              "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
-              "name": "address_b",
-              "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
-              "name": "duelist_id_a",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "duelist_id_b",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "state",
-              "type": "pistols::types::challenge_state::ChallengeState"
-            },
-            {
-              "name": "round_number",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "winner",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "timestamp_start",
-              "type": "core::integer::u64"
-            },
-            {
-              "name": "timestamp_end",
-              "type": "core::integer::u64"
-            }
-          ]
-        },
-        {
-          "type": "enum",
-          "name": "core::bool",
-          "variants": [
-            {
-              "name": "False",
-              "type": "()"
-            },
-            {
-              "name": "True",
-              "type": "()"
-            }
-          ]
-        },
-        {
           "type": "interface",
           "name": "pistols::systems::tokens::duel_token::IDuelTokenPublic",
           "items": [
-            {
-              "type": "function",
-              "name": "calc_price",
-              "inputs": [
-                {
-                  "name": "recipient",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::integer::u128"
-                }
-              ],
-              "state_mutability": "view"
-            },
             {
               "type": "function",
               "name": "create_duel",
@@ -2109,7 +2031,7 @@
               ],
               "outputs": [
                 {
-                  "type": "pistols::models::challenge::Challenge"
+                  "type": "core::integer::u128"
                 }
               ],
               "state_mutability": "external"
@@ -2119,11 +2041,11 @@
               "name": "reply_duel",
               "inputs": [
                 {
-                  "name": "duel_id",
+                  "name": "duelist_id",
                   "type": "core::integer::u128"
                 },
                 {
-                  "name": "duelist_id",
+                  "name": "duel_id",
                   "type": "core::integer::u128"
                 },
                 {
@@ -2149,6 +2071,22 @@
               ],
               "outputs": [],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "calc_fee",
+              "inputs": [
+                {
+                  "name": "table_id",
+                  "type": "core::felt252"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "view"
             },
             {
               "type": "function",
@@ -2214,26 +2152,6 @@
               "outputs": [
                 {
                   "type": "core::bool"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "calc_fee",
-              "inputs": [
-                {
-                  "name": "table_id",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "wager_value",
-                  "type": "core::integer::u128"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::integer::u128"
                 }
               ],
               "state_mutability": "view"
@@ -3033,7 +2951,10 @@
       "reads": [],
       "writes": [
         "pistols-TokenConfig",
-        "pistols-Challenge"
+        "pistols-Challenge",
+        "pistols-Round",
+        "pistols-Pact",
+        "pistols-Scoreboard"
       ],
       "init_calldata": [
         "0x0",
@@ -3051,8 +2972,8 @@
     {
       "kind": "DojoContract",
       "address": "0x75c9d8eae61c368eda84bc2962b6b7a478136607f9a3f238c1680921b686b28",
-      "class_hash": "0x4a47bcea6d222e2aeaccb8207f42a07bf1f2a21f7286fab3477f07d35e60563",
-      "original_class_hash": "0x4a47bcea6d222e2aeaccb8207f42a07bf1f2a21f7286fab3477f07d35e60563",
+      "class_hash": "0x58d96558012a27c9ae3aa45a2350a4a99ec6baf856ad8e7b4e867cc39cd9fec",
+      "original_class_hash": "0x58d96558012a27c9ae3aa45a2350a4a99ec6baf856ad8e7b4e867cc39cd9fec",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -3310,7 +3231,7 @@
           "items": [
             {
               "type": "function",
-              "name": "calc_price",
+              "name": "calc_fee",
               "inputs": [
                 {
                   "name": "recipient",

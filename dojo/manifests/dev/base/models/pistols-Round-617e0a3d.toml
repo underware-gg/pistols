@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x1f98abf30c3d96ae66e2816e354cc44c8c7553ceb1e3043909feca4eafa3755"
-original_class_hash = "0x1f98abf30c3d96ae66e2816e354cc44c8c7553ceb1e3043909feca4eafa3755"
+class_hash = "0x5306939757267c8e6650d7df9b77c606c69ffc2790ba8d6729f79c613b2ed97"
+original_class_hash = "0x5306939757267c8e6650d7df9b77c606c69ffc2790ba8d6729f79c613b2ed97"
 abi = "manifests/dev/base/abis/models/pistols-Round-617e0a3d.json"
 tag = "pistols-Round"
 qualified_path = "pistols::models::challenge::round"
@@ -9,11 +9,6 @@ manifest_name = "pistols-Round-617e0a3d"
 [[members]]
 name = "duel_id"
 type = "u128"
-key = true
-
-[[members]]
-name = "round_number"
-type = "u8"
 key = true
 
 [[members]]
@@ -42,6 +37,6 @@ type = "RoundState"
 key = false
 
 [[members]]
-name = "final_step"
-type = "u8"
+name = "final_blow"
+type = "DuelistDrawnCard"
 key = false

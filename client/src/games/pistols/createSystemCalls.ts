@@ -280,9 +280,9 @@ export function createSystemCalls(
   // duelist_token
   //
 
-  const calc_price = async (recipient: BigNumberish): Promise<boolean | null> => {
+  const calc_fee = async (recipient: BigNumberish): Promise<boolean | null> => {
     const args = [recipient]
-    const results = await _executeCall<boolean>(duelist_token_call('calc_price', args))
+    const results = await _executeCall<boolean>(duelist_token_call('calc_fee', args))
     return results ?? null
   }
 
@@ -331,7 +331,7 @@ export function createSystemCalls(
     get_player_card_decks,
     //
     // DUELISTS
-    calc_price,
+    calc_fee,
     duelist_token_uri,
     //
     // ADMIN

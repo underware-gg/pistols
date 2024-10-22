@@ -516,10 +516,6 @@
             "type": "core::integer::u128"
           },
           {
-            "name": "round_number",
-            "type": "core::integer::u8"
-          },
-          {
             "name": "hashed",
             "type": "core::integer::u128"
           }
@@ -538,10 +534,6 @@
           {
             "name": "duel_id",
             "type": "core::integer::u128"
-          },
-          {
-            "name": "round_number",
-            "type": "core::integer::u8"
           },
           {
             "name": "salt",
@@ -601,10 +593,6 @@
           },
           {
             "name": "duelId",
-            "type": "core::felt252"
-          },
-          {
-            "name": "roundNumber",
             "type": "core::felt252"
           },
           {
@@ -687,149 +675,6 @@
     ]
   },
   {
-    "type": "enum",
-    "name": "pistols::models::duelist::ProfilePicType",
-    "variants": [
-      {
-        "name": "Undefined",
-        "type": "()"
-      },
-      {
-        "name": "Duelist",
-        "type": "()"
-      },
-      {
-        "name": "External",
-        "type": "()"
-      }
-    ]
-  },
-  {
-    "type": "event",
-    "name": "pistols::types::events::DuelistRegisteredEvent",
-    "kind": "struct",
-    "members": [
-      {
-        "name": "address",
-        "type": "core::starknet::contract_address::ContractAddress",
-        "kind": "data"
-      },
-      {
-        "name": "duelist_id",
-        "type": "core::integer::u128",
-        "kind": "data"
-      },
-      {
-        "name": "name",
-        "type": "core::felt252",
-        "kind": "data"
-      },
-      {
-        "name": "profile_pic_type",
-        "type": "pistols::models::duelist::ProfilePicType",
-        "kind": "data"
-      },
-      {
-        "name": "profile_pic_uri",
-        "type": "core::byte_array::ByteArray",
-        "kind": "data"
-      },
-      {
-        "name": "is_new",
-        "type": "core::bool",
-        "kind": "data"
-      }
-    ]
-  },
-  {
-    "type": "event",
-    "name": "pistols::types::events::NewChallengeEvent",
-    "kind": "struct",
-    "members": [
-      {
-        "name": "duel_id",
-        "type": "core::integer::u128",
-        "kind": "data"
-      },
-      {
-        "name": "address_a",
-        "type": "core::starknet::contract_address::ContractAddress",
-        "kind": "data"
-      },
-      {
-        "name": "address_b",
-        "type": "core::starknet::contract_address::ContractAddress",
-        "kind": "data"
-      }
-    ]
-  },
-  {
-    "type": "event",
-    "name": "pistols::types::events::ChallengeAcceptedEvent",
-    "kind": "struct",
-    "members": [
-      {
-        "name": "duel_id",
-        "type": "core::integer::u128",
-        "kind": "data"
-      },
-      {
-        "name": "address_a",
-        "type": "core::starknet::contract_address::ContractAddress",
-        "kind": "data"
-      },
-      {
-        "name": "address_b",
-        "type": "core::starknet::contract_address::ContractAddress",
-        "kind": "data"
-      },
-      {
-        "name": "accepted",
-        "type": "core::bool",
-        "kind": "data"
-      }
-    ]
-  },
-  {
-    "type": "event",
-    "name": "pistols::types::events::ChallengeResolvedEvent",
-    "kind": "struct",
-    "members": [
-      {
-        "name": "duel_id",
-        "type": "core::integer::u128",
-        "kind": "data"
-      },
-      {
-        "name": "winner_address",
-        "type": "core::starknet::contract_address::ContractAddress",
-        "kind": "data"
-      }
-    ]
-  },
-  {
-    "type": "event",
-    "name": "pistols::types::events::DuelistTurnEvent",
-    "kind": "struct",
-    "members": [
-      {
-        "name": "duel_id",
-        "type": "core::integer::u128",
-        "kind": "data"
-      },
-      {
-        "name": "address",
-        "type": "core::starknet::contract_address::ContractAddress",
-        "kind": "data"
-      },
-      {
-        "name": "round_number",
-        "type": "core::integer::u8",
-        "kind": "data"
-      }
-    ]
-  },
-  {
     "type": "event",
     "name": "pistols::systems::game::game::Event",
     "kind": "enum",
@@ -837,31 +682,6 @@
       {
         "name": "UpgradeableEvent",
         "type": "dojo::contract::upgradeable::upgradeable::Event",
-        "kind": "nested"
-      },
-      {
-        "name": "DuelistRegisteredEvent",
-        "type": "pistols::types::events::DuelistRegisteredEvent",
-        "kind": "nested"
-      },
-      {
-        "name": "NewChallengeEvent",
-        "type": "pistols::types::events::NewChallengeEvent",
-        "kind": "nested"
-      },
-      {
-        "name": "ChallengeAcceptedEvent",
-        "type": "pistols::types::events::ChallengeAcceptedEvent",
-        "kind": "nested"
-      },
-      {
-        "name": "ChallengeResolvedEvent",
-        "type": "pistols::types::events::ChallengeResolvedEvent",
-        "kind": "nested"
-      },
-      {
-        "name": "DuelistTurnEvent",
-        "type": "pistols::types::events::DuelistTurnEvent",
         "kind": "nested"
       }
     ]

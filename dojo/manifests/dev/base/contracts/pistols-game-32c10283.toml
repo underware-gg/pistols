@@ -1,6 +1,6 @@
 kind = "DojoContract"
-class_hash = "0x38ab99a9f28274dfab284e47c336eb956b6d0aed6ee3e1d70a7db69c2c5fca6"
-original_class_hash = "0x38ab99a9f28274dfab284e47c336eb956b6d0aed6ee3e1d70a7db69c2c5fca6"
+class_hash = "0xcbdf8afd1312ba770cbe09926c47837465c2ba21fcef3a3647d164b2a6722"
+original_class_hash = "0xcbdf8afd1312ba770cbe09926c47837465c2ba21fcef3a3647d164b2a6722"
 base_class_hash = "0x0"
 abi = "manifests/dev/base/abis/contracts/pistols-game-32c10283.json"
 reads = []
@@ -10,11 +10,5 @@ tag = "pistols-game"
 systems = [
     "commit_moves",
     "reveal_moves",
-    "_emitDuelistRegisteredEvent",
-    "_emitNewChallengeEvent",
-    "_emitChallengeAcceptedEvent",
-    "_emitPostRevealEvents",
-    "_emitDuelistTurnEvent",
-    "_emitChallengeResolvedEvent",
 ]
 manifest_name = "pistols-game-32c10283"

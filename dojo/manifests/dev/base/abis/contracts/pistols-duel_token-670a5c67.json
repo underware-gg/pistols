@@ -214,6 +214,20 @@
   },
   {
     "type": "enum",
+    "name": "core::bool",
+    "variants": [
+      {
+        "name": "False",
+        "type": "()"
+      },
+      {
+        "name": "True",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "enum",
     "name": "pistols::types::challenge_state::ChallengeState",
     "variants": [
       {
@@ -251,101 +265,9 @@
     ]
   },
   {
-    "type": "struct",
-    "name": "pistols::models::challenge::Challenge",
-    "members": [
-      {
-        "name": "duel_id",
-        "type": "core::integer::u128"
-      },
-      {
-        "name": "seed",
-        "type": "core::integer::u128"
-      },
-      {
-        "name": "table_id",
-        "type": "core::felt252"
-      },
-      {
-        "name": "premise",
-        "type": "pistols::types::premise::Premise"
-      },
-      {
-        "name": "quote",
-        "type": "core::felt252"
-      },
-      {
-        "name": "address_a",
-        "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
-        "name": "address_b",
-        "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
-        "name": "duelist_id_a",
-        "type": "core::integer::u128"
-      },
-      {
-        "name": "duelist_id_b",
-        "type": "core::integer::u128"
-      },
-      {
-        "name": "state",
-        "type": "pistols::types::challenge_state::ChallengeState"
-      },
-      {
-        "name": "round_number",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "winner",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "timestamp_start",
-        "type": "core::integer::u64"
-      },
-      {
-        "name": "timestamp_end",
-        "type": "core::integer::u64"
-      }
-    ]
-  },
-  {
-    "type": "enum",
-    "name": "core::bool",
-    "variants": [
-      {
-        "name": "False",
-        "type": "()"
-      },
-      {
-        "name": "True",
-        "type": "()"
-      }
-    ]
-  },
-  {
     "type": "interface",
     "name": "pistols::systems::tokens::duel_token::IDuelTokenPublic",
     "items": [
-      {
-        "type": "function",
-        "name": "calc_price",
-        "inputs": [
-          {
-            "name": "recipient",
-            "type": "core::starknet::contract_address::ContractAddress"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "core::integer::u128"
-          }
-        ],
-        "state_mutability": "view"
-      },
       {
         "type": "function",
         "name": "create_duel",
@@ -377,7 +299,7 @@
         ],
         "outputs": [
           {
-            "type": "pistols::models::challenge::Challenge"
+            "type": "core::integer::u128"
           }
         ],
         "state_mutability": "external"
@@ -387,11 +309,11 @@
         "name": "reply_duel",
         "inputs": [
           {
-            "name": "duel_id",
+            "name": "duelist_id",
             "type": "core::integer::u128"
           },
           {
-            "name": "duelist_id",
+            "name": "duel_id",
             "type": "core::integer::u128"
           },
           {
@@ -417,6 +339,22 @@
         ],
         "outputs": [],
         "state_mutability": "external"
+      },
+      {
+        "type": "function",
+        "name": "calc_fee",
+        "inputs": [
+          {
+            "name": "table_id",
+            "type": "core::felt252"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::integer::u128"
+          }
+        ],
+        "state_mutability": "view"
       },
       {
         "type": "function",
@@ -485,26 +423,6 @@
           }
         ],
         "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "calc_fee",
-        "inputs": [
-          {
-            "name": "table_id",
-            "type": "core::felt252"
-          },
-          {
-            "name": "wager_value",
-            "type": "core::integer::u128"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "core::integer::u128"
-          }
-        ],
-        "state_mutability": "view"
       }
     ]
   },
@@ -528,80 +446,20 @@
     ]
   },
   {
-    "type": "enum",
-    "name": "pistols::models::duelist::ProfilePicType",
-    "variants": [
-      {
-        "name": "Undefined",
-        "type": "()"
-      },
-      {
-        "name": "Duelist",
-        "type": "()"
-      },
-      {
-        "name": "External",
-        "type": "()"
-      }
-    ]
-  },
-  {
     "type": "struct",
-    "name": "pistols::models::duelist::Score",
+    "name": "pistols::systems::components::erc721_hooks::TokenMetadata",
     "members": [
-      {
-        "name": "honour",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "total_duels",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "total_wins",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "total_losses",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "total_draws",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "honour_history",
-        "type": "core::integer::u64"
-      }
-    ]
-  },
-  {
-    "type": "struct",
-    "name": "pistols::models::duelist::Duelist",
-    "members": [
-      {
-        "name": "duelist_id",
-        "type": "core::integer::u128"
-      },
       {
         "name": "name",
-        "type": "core::felt252"
-      },
-      {
-        "name": "profile_pic_uri",
         "type": "core::byte_array::ByteArray"
       },
       {
-        "name": "profile_pic_type",
-        "type": "pistols::models::duelist::ProfilePicType"
+        "name": "description",
+        "type": "core::byte_array::ByteArray"
       },
       {
-        "name": "timestamp",
-        "type": "core::integer::u64"
-      },
-      {
-        "name": "score",
-        "type": "pistols::models::duelist::Score"
+        "name": "image",
+        "type": "core::byte_array::ByteArray"
       }
     ]
   },
@@ -621,71 +479,43 @@
     "items": [
       {
         "type": "function",
-        "name": "format_name",
+        "name": "get_token_metadata",
         "inputs": [
           {
             "name": "token_id",
             "type": "core::integer::u256"
-          },
-          {
-            "name": "duelist",
-            "type": "pistols::models::duelist::Duelist"
           }
         ],
         "outputs": [
           {
-            "type": "core::byte_array::ByteArray"
+            "type": "pistols::systems::components::erc721_hooks::TokenMetadata"
           }
         ],
         "state_mutability": "view"
       },
       {
         "type": "function",
-        "name": "format_description",
+        "name": "get_metadata_pairs",
         "inputs": [
           {
             "name": "token_id",
             "type": "core::integer::u256"
-          },
-          {
-            "name": "_duelist",
-            "type": "pistols::models::duelist::Duelist"
           }
         ],
         "outputs": [
           {
-            "type": "core::byte_array::ByteArray"
+            "type": "core::array::Span::<core::byte_array::ByteArray>"
           }
         ],
         "state_mutability": "view"
       },
       {
         "type": "function",
-        "name": "format_image",
+        "name": "get_attribute_pairs",
         "inputs": [
           {
-            "name": "duelist",
-            "type": "pistols::models::duelist::Duelist"
-          },
-          {
-            "name": "variant",
-            "type": "core::byte_array::ByteArray"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "core::byte_array::ByteArray"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "get_attributes",
-        "inputs": [
-          {
-            "name": "duelist",
-            "type": "pistols::models::duelist::Duelist"
+            "name": "token_id",
+            "type": "core::integer::u256"
           }
         ],
         "outputs": [
