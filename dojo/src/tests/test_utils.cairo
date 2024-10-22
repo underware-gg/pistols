@@ -8,7 +8,7 @@ mod tests {
     use core::traits::{Into, TryInto};
     use starknet::{ContractAddress};
 
-    use pistols::libs::utils;
+    use pistols::libs::{utils, pact};
     use pistols::models::challenge::{Round};
     use pistols::models::duelist::{Duelist, Score, ScoreTrait};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
@@ -19,8 +19,8 @@ mod tests {
     fn test_pact_pair() {
         let a: u128 = 0xb5e186ef2e4ab2762367cd07c8f892a1;
         let b: u128 = 0x6b86e40118f29ebe393a75469b4d926c;
-        let p_a = utils::make_pact_pair(a, b);
-        let p_b = utils::make_pact_pair(b, a);
+        let p_a = pact::make_pact_pair(a, b);
+        let p_b = pact::make_pact_pair(b, a);
         assert(p_a == p_b, 'test_pact_pair');
     }
 

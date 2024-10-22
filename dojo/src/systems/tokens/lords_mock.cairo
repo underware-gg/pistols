@@ -45,7 +45,7 @@ pub mod lords_mock {
     use pistols::types::constants::{CONST};
 
     //-----------------------------------
-    // OpenZeppelin start
+    // ERC-20 Start
     //
     use openzeppelin_token::erc20::ERC20Component;
     use openzeppelin_token::erc20::ERC20HooksEmptyImpl;
@@ -72,7 +72,7 @@ pub mod lords_mock {
         CoinEvent: CoinComponent::Event,
     }
     //
-    // OpenZeppelin end
+    // ERC-20 End
     //-----------------------------------
 
 

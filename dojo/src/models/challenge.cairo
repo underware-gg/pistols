@@ -18,6 +18,7 @@ pub struct Challenge {
     #[key]
     pub duel_id: u128,
     //-------------------------
+    pub seed: u128,
     pub table_id: felt252,
     pub premise: Premise,           // premise of the dispute
     pub quote: felt252,             // message to challenged

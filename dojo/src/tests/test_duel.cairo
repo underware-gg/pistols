@@ -430,7 +430,7 @@ mod tests {
     //
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Not your duelist', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUEL: Not your duelist', 'ENTRYPOINT_FAILED'))]
     fn test_commit_wrong_player_to_duelist() {
         let sys = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
@@ -441,7 +441,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Not your challenge', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUEL: Not your challenge', 'ENTRYPOINT_FAILED'))]
     fn test_commit_wrong_player_to_address() {
         let sys = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);

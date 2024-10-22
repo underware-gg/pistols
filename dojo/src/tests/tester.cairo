@@ -203,7 +203,7 @@ mod tester {
         let duelists = IDuelistTokenDispatcher{ contract_address:
             if (deploy_duelist) {
                 let address = deploy_system(world, 'duelist', duelist_token::TEST_CLASS_HASH);
-                world.grant_writer(SELECTORS::DUELIST, OWNER());
+                world.grant_writer(SELECTORS::DUELIST_TOKEN, OWNER());
                 world.grant_writer(selector_from_tag!("pistols-TokenConfig"), address);
                 world.grant_writer(selector_from_tag!("pistols-Duelist"), address);
                 let call_data: Span<felt252> = array![
@@ -211,7 +211,7 @@ mod tester {
                     lords.contract_address.into(),
                     100_000_000_000_000_000_000, // 100 Lords
                 ].span();
-                world.init_contract(SELECTORS::DUELIST, call_data);
+                world.init_contract(SELECTORS::DUELIST_TOKEN, call_data);
                 (address)
             }
             else if (deploy_game) {

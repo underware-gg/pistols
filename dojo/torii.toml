@@ -1,3 +1,3 @@
 contracts = [
-  { type = "ERC721", address = "0x256d2d99999eaa89e20935b30b2f9dc8f6068082125b19328b7b4bcb05bef35" }, # duelist
+  { type = "ERC721", address = "" }, # duelist
 ]

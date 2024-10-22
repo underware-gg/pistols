@@ -10,7 +10,7 @@ export const usePact = (table_id: string, duelist_id_or_address_a: BigNumberish,
 
   const { pair, pairKey } = useMemo(() => {
     if (!isPositiveBigint(duelist_id_or_address_a) || !isPositiveBigint(duelist_id_or_address_b)) return {}
-    // same as pistols::utils::make_pact_pair()
+    // same as pistols::pact::make_pact_pair()
     const a_u256 = bigintToU256(duelist_id_or_address_a)
     const b_u256 = bigintToU256(duelist_id_or_address_b)
     const aa = poseidon([a_u256.low, a_u256.low])

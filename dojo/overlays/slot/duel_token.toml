@@ -1,0 +1,12 @@
+tag = "pistols-duel_token"
+writes = [
+  "pistols-TokenConfig",
+  "pistols-Challenge",
+]
+init_calldata = [
+  "0x0", # minter_address
+  "0x0", # renderer_address
+  "0x0", # treasury_address
+  "$contract_address:pistols-lords_mock", # fee_contract
+  "100000000000000000000", # fee_amount: 100 LORDS
+]

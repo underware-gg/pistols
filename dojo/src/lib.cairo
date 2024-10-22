@@ -9,6 +9,7 @@ mod systems {
     mod game;
     mod rng;
     mod tokens {
+        mod duel_token;
         mod duelist_token;
         #[cfg(feature:'lords_mock')]
         mod lords_mock;
@@ -21,6 +22,7 @@ mod systems {
 }
 
 mod libs {
+    mod pact;
     mod seeder;
     mod shooter;
     mod store;

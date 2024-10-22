@@ -81,27 +81,8 @@ pub mod duelist_token {
     use openzeppelin_account::interface::ISRC6;
     use starknet::{ContractAddress, get_contract_address, get_caller_address, get_block_timestamp};
 
-    use pistols::models::{
-        duelist::{
-            Duelist, DuelistEntity,
-            Score, ScoreTrait,
-            ProfilePicType, Archetype,
-            ScoreboardEntity,
-        },
-        token_config::{
-            TokenConfig, TokenConfigStore,
-            TokenConfigEntity, TokenConfigEntityStore,
-        },
-        table::{TABLES},
-    };
-    use pistols::types::constants::{CONST, HONOUR};
-    use pistols::libs::store::{Store, StoreTrait};
-    use pistols::utils::short_string::ShortStringTrait;
-    use pistols::utils::math::{MathTrait};
-
-
     //-----------------------------------
-    // OpenZeppelin start
+    // ERC-721 Start
     //
     use openzeppelin_introspection::src5::SRC5Component;
     use openzeppelin_token::erc721::{ERC721Component};
@@ -136,19 +117,37 @@ pub mod duelist_token {
         TokenEvent: TokenComponent::Event,
     }
     //
-    // OpenZeppelin end
+    // ERC-721 End
     //-----------------------------------
 
+    use pistols::models::{
+        duelist::{
+            Duelist, DuelistEntity,
+            Score, ScoreTrait,
+            ProfilePicType, Archetype,
+            ScoreboardEntity,
+        },
+        token_config::{
+            TokenConfig, TokenConfigStore,
+            TokenConfigEntity, TokenConfigEntityStore,
+        },
+        table::{TABLES},
+    };
+    use pistols::types::constants::{CONST, HONOUR};
+    use pistols::libs::store::{Store, StoreTrait};
+    use pistols::utils::short_string::ShortStringTrait;
+    use pistols::utils::math::{MathTrait};
+
     mod Errors {
-        const NOT_IMPLEMENTED: felt252          = 'DUELIST: not implemented';
-        const INVALID_DUELIST: felt252          = 'DUELIST: invalid duelist';
-        const NOT_YOUR_DUELIST: felt252         = 'DUELIST: not your duelist';
+        const NOT_IMPLEMENTED: felt252          = 'DUELIST: Not implemented';
+        const INVALID_DUELIST: felt252          = 'DUELIST: Invalid duelist';
+        const NOT_YOUR_DUELIST: felt252         = 'DUELIST: Not your duelist';
     }
 
     //*******************************
-    fn TOKEN_NAME() -> ByteArray {("Pistols at 10 Blocks Duelists")}
+    fn TOKEN_NAME()   -> ByteArray {("Pistols at 10 Blocks Duelists")}
     fn TOKEN_SYMBOL() -> ByteArray {("DUELIST")}
-    fn BASE_URI() -> ByteArray {("https://pistols.underware.gg")}
+    fn BASE_URI()     -> ByteArray {("https://pistols.underware.gg")}
     //*******************************
 
     fn dojo_init(

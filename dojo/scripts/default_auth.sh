@@ -8,7 +8,6 @@ pushd $(dirname "$0")/..
 #   echo 'Error: jq not instlaled! Instal with: brew install jq'
 #   exit 1
 # fi
-# export ADMIN_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.tag == "pistols-admin" ).address')
 
 export ADMIN_TAG="pistols-admin"
 export GAME_TAG="pistols-game"

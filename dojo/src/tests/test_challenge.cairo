@@ -39,7 +39,7 @@ mod tests {
 
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Not your duelist', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUEL: Not your duelist', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_challenged_not_your_duelist() {
         let sys = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         // BIG_BOY: u256.high + low > id != address
@@ -48,7 +48,7 @@ mod tests {
     }
 
     // #[test]
-    // #[should_panic(expected:('PISTOLS: Challenged unknown', 'ENTRYPOINT_FAILED'))]
+    // #[should_panic(expected:('DUEL: Challenged unknown', 'ENTRYPOINT_FAILED'))]
     // fn test_invalid_challenged_unknown() {
     //     let sys = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
     //     // fill u256.high, empty low > no owner > unknown
@@ -57,21 +57,21 @@ mod tests {
     // }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Challenged self', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUEL: Challenged self', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_challenged_self_duelist() {
         let sys = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let _duel_id: u128 = tester::execute_create_challenge(@sys.game, OWNER(), OWNER(), PREMISE_1, TABLE_ID, 0, 0);
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Challenged self', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUEL: Challenged self', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_challenged_self_address() {
         let sys = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let _duel_id: u128 = tester::execute_create_challenge(@sys.game, LITTLE_BOY(), LITTLE_BOY(), PREMISE_1, TABLE_ID, 0, 0);
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Challenged null', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUEL: Challenged null', 'ENTRYPOINT_FAILED'))]
     // #[should_panic(expected:('Challenge a player', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_challenged_zero() {
         let sys = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
@@ -156,7 +156,7 @@ mod tests {
     //
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Invalid challenge', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUEL: Invalid challenge', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_reply_invalid() {
         let sys = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let A: ContractAddress = OWNER();
@@ -167,7 +167,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Challenge not Awaiting', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUEL: Challenge not Awaiting', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_reply_twice() {
         let sys = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let A: ContractAddress = OWNER();
@@ -237,7 +237,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Reply self', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUEL: Reply self', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_owner_accept_self() {
         let sys = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let A: ContractAddress = OWNER();
@@ -274,7 +274,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Not your challenge', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUEL: Not your challenge', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_impersonator() {
         let sys = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let A: ContractAddress = OWNER();
@@ -428,7 +428,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Not your duelist', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUEL: Not your duelist', 'ENTRYPOINT_FAILED'))]
     fn test_reply_wrong_duelist() {
         let sys = tester::setup_world(FLAGS::GAME | FLAGS::LORDS | FLAGS::APPROVE);
         let A: ContractAddress = OWNER();
@@ -440,7 +440,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Not your challenge', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUEL: Not your challenge', 'ENTRYPOINT_FAILED'))]
     fn test_reply_wrong_player_address() {
         let sys = tester::setup_world(FLAGS::GAME | FLAGS::LORDS | FLAGS::APPROVE);
         let A: ContractAddress = OWNER();
@@ -453,7 +453,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Not your challenge', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUEL: Not your challenge', 'ENTRYPOINT_FAILED'))]
     fn test_reply_wrong_player_duelist() {
         let sys = tester::setup_world(FLAGS::GAME | FLAGS::LORDS | FLAGS::APPROVE);
         let A: ContractAddress = OWNER();
