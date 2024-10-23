@@ -98,10 +98,8 @@ impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn get_pact_entity(self: Store, table_id: felt252, pair: u128) -> PactEntity {
-        (PactEntityStore::get(self.world,
-            PactStore::entity_id_from_keys(table_id, pair)
-        ))
+    fn get_pact(self: Store, table_id: felt252, pair: u128) -> Pact {
+        (PactStore::get(self.world, table_id, pair))
     }
 
     #[inline(always)]
@@ -181,22 +179,13 @@ impl StoreImpl of StoreTrait {
     fn set_challenge(self: Store, model: @Challenge) {
         model.set(self.world);
     }
-    #[inline(always)]
-    fn set_challenge_entity(self: Store, entity: @ChallengeEntity) {
-        entity.update(self.world);
-    }
-
-    #[inline(always)]
-    fn set_wager_entity(self: Store, entity: @WagerEntity) {
-        entity.update(self.world);
-    }
 
     #[inline(always)]
     fn set_round(self: Store, model: @Round) {
         model.set(self.world);
     }
     #[inline(always)]
-    fn set_round_entity(self: Store, entity: @RoundEntity) {
+    fn update_round_entity(self: Store, entity: @RoundEntity) {
         entity.update(self.world);
     }
 
@@ -205,7 +194,7 @@ impl StoreImpl of StoreTrait {
         model.set(self.world);
     }
     #[inline(always)]
-    fn set_duelist_entity(self: Store, entity: @DuelistEntity) {
+    fn update_duelist_entity(self: Store, entity: @DuelistEntity) {
         entity.update(self.world);
     }
 
@@ -214,17 +203,13 @@ impl StoreImpl of StoreTrait {
         model.set(self.world);
     }
     #[inline(always)]
-    fn set_pact_entity(self: Store, entity: @PactEntity) {
-        entity.update(self.world);
+    fn delete_pact(self: Store, model: @Pact) {
+        model.delete(self.world);
     }
 
     #[inline(always)]
     fn set_scoreboard(self: Store, model: @Scoreboard) {
         model.set(self.world);
-    }
-    #[inline(always)]
-    fn set_scoreboard_entity(self: Store, entity: @ScoreboardEntity) {
-        entity.update(self.world);
     }
 
     #[inline(always)]
@@ -232,7 +217,7 @@ impl StoreImpl of StoreTrait {
         model.set(self.world);
     }
     #[inline(always)]
-    fn set_table_config_entity(self: Store, entity: @TableConfigEntity) {
+    fn update_table_config_entity(self: Store, entity: @TableConfigEntity) {
         entity.update(self.world);
     }
 
@@ -246,7 +231,7 @@ impl StoreImpl of StoreTrait {
         model.set(self.world);
     }
     #[inline(always)]
-    fn set_coin_config_entity(self: Store, entity: @CoinConfigEntity) {
+    fn update_coin_config_entity(self: Store, entity: @CoinConfigEntity) {
         entity.update(self.world);
     }
 
@@ -255,7 +240,7 @@ impl StoreImpl of StoreTrait {
         model.set(self.world);
     }
     #[inline(always)]
-    fn set_token_config_entity(self: Store, entity: @TokenConfigEntity) {
+    fn update_token_config_entity(self: Store, entity: @TokenConfigEntity) {
         entity.update(self.world);
     }
 
@@ -264,7 +249,7 @@ impl StoreImpl of StoreTrait {
         model.set(self.world);
     }
     #[inline(always)]
-    fn set_config_entity(self: Store, entity: @ConfigEntity) {
+    fn update_config_entity(self: Store, entity: @ConfigEntity) {
         entity.update(self.world);
     }
 

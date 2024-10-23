@@ -142,7 +142,7 @@ pub mod TokenComponent {
 
             // update token config
             token_config.minted_count = token_id;
-            store.set_token_config_entity(@token_config);
+            store.update_token_config_entity(@token_config);
 
             let mut erc721 = get_dep_component_mut!(ref self, ERC721);
             erc721.mint(recipient, token_id.into());

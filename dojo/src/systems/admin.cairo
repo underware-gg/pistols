@@ -101,7 +101,7 @@ mod admin {
             let mut config: ConfigEntity = store.get_config_entity();
             // update
             config.is_paused = paused;
-            store.set_config_entity(@config);
+            store.update_config_entity(@config);
         }
 
         fn set_table(ref world: IWorldDispatcher, table: TableConfig) {
@@ -132,7 +132,7 @@ mod admin {
             assert(table.exists(), Errors::INVALID_TABLE);
             // update
             table.is_open = is_open;
-            store.set_table_config_entity(@table);
+            store.update_table_config_entity(@table);
         }
     }
 

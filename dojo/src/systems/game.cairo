@@ -122,7 +122,7 @@ mod game {
                 round.state = RoundState::Reveal;
             }
 
-            store.set_round_entity(@round);
+            store.update_round_entity(@round);
         }
 
         fn reveal_moves(ref world: IWorldDispatcher,
@@ -295,8 +295,8 @@ mod game {
             }
             
             // save
-            store.set_duelist_entity(@duelist_a);
-            store.set_duelist_entity(@duelist_b);
+            store.update_duelist_entity(@duelist_a);
+            store.update_duelist_entity(@duelist_b);
             store.set_scoreboard(@scoreboard_a);
             store.set_scoreboard(@scoreboard_b);
         }
