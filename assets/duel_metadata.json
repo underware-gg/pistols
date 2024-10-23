@@ -1,0 +1,45 @@
+{
+  "id": "1",
+  "name": "Duel #1",
+  "description": "Pistols at 10 Blocks Duel #1. https://pistols.underware.gg",
+  "image": "https://pistols.underware.gg/profiles/square/00.jpg",
+  "metadata": {
+    "Table": "Lords",
+    "Challenger": "Duelist #1",
+    "Challenged": "Duelist #2",
+    "Premise": "Honour",
+    "Quote": "For honour!!!",
+    "State": "Resolved",
+    "Winner": "Duelist #1"
+  },
+  "attributes": [
+    {
+      "trait": "Table",
+      "value": "Lords"
+    },
+    {
+      "trait": "Challenger",
+      "value": "Duelist #1"
+    },
+    {
+      "trait": "Challenged",
+      "value": "Duelist #2"
+    },
+    {
+      "trait": "Premise",
+      "value": "Honour"
+    },
+    {
+      "trait": "Quote",
+      "value": "For honour!!!"
+    },
+    {
+      "trait": "State",
+      "value": "Resolved"
+    },
+    {
+      "trait": "Winner",
+      "value": "Duelist #1"
+    }
+  ]
+}

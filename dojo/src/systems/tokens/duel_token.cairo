@@ -36,6 +36,11 @@ pub trait IDuelToken<TState> {
     fn tokenURI(self: @TState, tokenId: u256) -> ByteArray;
 
     // ITokenComponentPublic
+    fn can_mint(self: @TState, caller_address: ContractAddress) -> bool;
+    fn exists(self: @TState, token_id: u128) -> bool;
+    fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
+
+    // IDuelTokenPublic
     fn create_duel(ref self: TState, duelist_id: u128, challenged_id_or_address: ContractAddress, premise: Premise, quote: felt252, table_id: felt252, expire_hours: u64) -> u128;
     fn reply_duel(ref self: TState, duelist_id: u128, duel_id: u128, accepted: bool) -> ChallengeState;
     fn delete_duel(ref self: TState, duel_id: u128);
@@ -423,13 +428,9 @@ pub mod duel_token {
     #[abi(embed_v0)]
     impl TokenRendererImpl of ITokenRenderer<ContractState> {
         fn get_token_metadata(self: @ContractState, token_id: u256) -> TokenMetadata {
-            // let store: Store = StoreTrait::new(self.world());
-            // let duel: Duel= store.get_duel(token_id.low);
-
             let name: ByteArray = format!("Duel #{}", token_id);
             let description: ByteArray = format!("Pistols at 10 Blocks Duel #{}. https://pistols.underware.gg", token_id);
             let image: ByteArray = format!("{}/profiles/square/00.jpg", self.erc721._base_uri());
-
             (TokenMetadata {
                 name,
                 description,
@@ -442,11 +443,29 @@ pub mod duel_token {
             ([].span())
         }
         fn get_attribute_pairs(self: @ContractState, token_id: u256) -> Span<ByteArray> {
-            // let store = StoreTrait::new(self.world());
+            let store: Store = StoreTrait::new(self.world());
+            let challenge: Challenge = store.get_challenge(token_id.low);
             let mut result: Array<ByteArray> = array![];
-            // Honour
-            result.append("XX");
-            result.append("YY");
+            let duelist_a: ByteArray = format!("Duelist #{}", challenge.duelist_id_a);
+            let duelist_b: ByteArray = format!("Duelist #{}", challenge.duelist_id_b);
+            let state: felt252 = challenge.state.into();
+            // Meta
+            result.append("Table");
+            result.append(challenge.table_id.as_string());
+            result.append("Challenger");
+            result.append(duelist_a.clone());
+            result.append("Challenged");
+            result.append(duelist_b.clone());
+            result.append("Premise");
+            result.append(challenge.premise.name().as_string());
+            result.append("Quote");
+            result.append(challenge.quote.as_string());
+            result.append("State");
+            result.append(state.as_string());
+            if (challenge.winner != 0) {
+                result.append("Winner");
+                result.append(if(challenge.winner==1){duelist_a}else{duelist_b});
+            }
             // done!
             (result.span())
         }
