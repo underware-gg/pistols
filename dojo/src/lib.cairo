@@ -95,6 +95,7 @@ mod tests {
     mod utils;
     // tokens
     mod token {
+        mod test_duel_token;
         mod test_duelist_token;
         // mocks
         mod mock_duelist;

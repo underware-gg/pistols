@@ -510,17 +510,17 @@ mod tester {
     //
 
     // depends on use dojo::model::{Model};
-    fn set_TableConfig(world: IWorldDispatcher, table: TableConfig) {
-        table.set_test(world);
+    fn set_TableConfig(world: IWorldDispatcher, model: TableConfig) {
+        model.set_test(world);
     }
-    // fn set_Round(world: IWorldDispatcher, round: Round) {
-    //     round.set_test(world);
-    // }
-    fn set_Duelist(world: IWorldDispatcher, duelist: Duelist) {
-        duelist.set_test(world);
+    fn set_Duelist(world: IWorldDispatcher, model: Duelist) {
+        model.set_test(world);
     }
-    fn set_Scoreboard(world: IWorldDispatcher, scoreboard: Scoreboard) {
-        scoreboard.set_test(world);
+    fn set_Scoreboard(world: IWorldDispatcher, model: Scoreboard) {
+        model.set_test(world);
+    }
+    fn set_Challenge(world: IWorldDispatcher, model: Challenge) {
+        model.set_test(world);
     }
 
     //

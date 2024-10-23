@@ -142,7 +142,6 @@ pub mod duelist_token {
     mod Errors {
         const NOT_IMPLEMENTED: felt252          = 'DUELIST: Not implemented';
         const INVALID_DUELIST: felt252          = 'DUELIST: Invalid duelist';
-        const NOT_YOUR_DUELIST: felt252         = 'DUELIST: Not your duelist';
     }
 
     //*******************************
