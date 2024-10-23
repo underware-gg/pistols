@@ -37,7 +37,6 @@ pub struct ChallengeResolvedEvent {
 pub struct DuelistTurnEvent {
     duel_id: u128,
     address: ContractAddress,
-    round_number: u8,
 }
 
 //
@@ -135,7 +134,6 @@ mod emitters {
         //     else { (challenge.address_a) };
         // emit!(world, (Event::DuelistTurnEvent(super::DuelistTurnEvent {
         //     duel_id: challenge.duel_id,
-        //     round_number: challenge.round_number,
         //     address,
         // })));
     }

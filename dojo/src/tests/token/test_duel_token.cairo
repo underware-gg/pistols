@@ -214,7 +214,6 @@ fn test_token_uri() {
         duelist_id_b: 2,
         // progress
         state: ChallengeState::Resolved,
-        round_number: 1,
         winner: 1,
         // times
         timestamp_start: 10000,

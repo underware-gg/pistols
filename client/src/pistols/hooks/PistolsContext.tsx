@@ -187,7 +187,7 @@ export { PistolsProvider, PistolsContext, PistolsActions }
 //
 
 const makeStoredMovesKey = (message: CommitMoveMessage): string => {
-  return message ? bigintToHex(poseidon([message.duelId, message.roundNumber, message.duelistId])) : null
+  return message ? bigintToHex(poseidon([message.duelId, message.duelistId])) : null
 }
 
 export const usePistolsContext = () => {

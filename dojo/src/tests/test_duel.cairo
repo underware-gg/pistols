@@ -111,7 +111,6 @@ mod tests {
 // round.state_b.health.print();
         assert(challenge.state == ChallengeState::Draw, 'challenge.state');
         assert(challenge.winner == 0, 'challenge.winner');
-        assert(challenge.round_number == 1, 'challenge.round_number');
         assert(round.state == RoundState::Finished, 'round.state');
         assert(round.final_blow == DuelistDrawnCard::Fire(MathU8::max(*moves_a.moves[0], *moves_b.moves[0]).into()), 'round.final_step');
         assert(round.state_a.health == final_health, 'round.moves_a.health');
@@ -202,14 +201,12 @@ mod tests {
         // 1st commit
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, 1, moves_a.hashed);
         let (challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
-        assert(challenge.round_number == 1, '1__challenge.round_number');
         assert(round.state == RoundState::Commit, '1__state');
         assert(round.moves_a.hashed == moves_a.hashed, '1__hash');
 
         // 2nd commit > Reveal
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, 1, moves_b.hashed);
         let (challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
-        assert(challenge.round_number == 1, '2__challenge.round_number');
         assert(round.state == RoundState::Reveal, '2__state');
         assert(round.moves_a.hashed == moves_a.hashed, '21__hash');
         assert(round.moves_b.hashed == moves_b.hashed, '2__hash');
@@ -217,7 +214,6 @@ mod tests {
         // 1st reveal
         tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, 1, moves_a.salt, moves_a.moves);
         let (challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
-        assert(challenge.round_number == 1, '3_challenge.round_number');
         assert(round.state == RoundState::Reveal, '3__state');
         assert(round.moves_a.hashed == moves_a.hashed, '3__hash');
         assert(round.moves_a.salt == moves_a.salt, '3__salt');
@@ -233,7 +229,6 @@ mod tests {
 // round.state_b.health.print();
         assert(challenge.state == ChallengeState::Resolved, '4_challenge.state');
         assert(challenge.winner != 0, '4_challenge.winner');
-        assert(challenge.round_number == 1, '4_challenge.round_number');
         assert(challenge.timestamp_end > 0, '4_challenge.timestamp_end');
         assert(round.state == RoundState::Finished, '4__state');
         assert(round.final_blow == DuelistDrawnCard::Fire(if(winner == 1){*moves_a.moves[0]}else{*moves_b.moves[0]}.into()), 'round.final_step');
@@ -302,7 +297,6 @@ mod tests {
         let (challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
         assert(challenge.state == ChallengeState::Resolved, 'challenge.state ++');
         assert(challenge.winner != 0, 'challenge.winner ++');
-        assert(challenge.round_number == 1, 'challenge.round_number ++');
         assert(challenge.timestamp_end > 0, 'challenge.timestamp_end ++');
         assert(round.state == RoundState::Finished, 'state ++');
         let duelist_a = tester::get_DuelistEntity(sys.world, OWNER());
@@ -450,15 +444,6 @@ mod tests {
         // try to commmit with another account
         let hashed: u128 = make_moves_hash(0x12121, [1, 1].span());
         tester::execute_commit_moves(@sys.game, FAKE_OWNER_1_1(), duel_id, 1, hashed);
-    }
-
-    #[test]
-    #[should_panic(expected:('PISTOLS: Invalid round number', 'ENTRYPOINT_FAILED'))]
-    fn test_commit_wrong_round_number() {
-        let sys = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
-        let hashed: u128 = make_moves_hash(0x12121, [1, 1].span());
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, 2, hashed);
     }
 
     #[test]

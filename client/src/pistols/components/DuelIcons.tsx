@@ -22,7 +22,7 @@ export function useDuelIcons({
   size: IconSizeProp
 }) {
   const {
-    challenge: { duelistIdA, duelistIdB, winner, roundNumber, isAwaiting, isInProgress, isFinished },
+    challenge: { duelistIdA, duelistIdB, winner, isAwaiting, isInProgress, isFinished },
     round1, duelStage, completedStagesA, completedStagesB, turnA, turnB,
   } = useDuel(duelId)
 
@@ -45,7 +45,7 @@ export function useDuelIcons({
   const blood2 = useMemo(() => (
     (blood1 == EMOJI.INJURED && state1.damage > 1) ? EMOJI.INJURED : null
   ), [state1, blood1])
-  const win1 = useMemo(() => ((isWinner && roundNumber == 1) ? EMOJI.WINNER : null), [isWinner, roundNumber])
+  const win1 = useMemo(() => (isWinner ? EMOJI.WINNER : null), [isWinner])
 
   const iconSize = size as IconSizeProp
 

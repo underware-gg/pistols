@@ -67,7 +67,7 @@ function Stats({
         <WagerStats duelId={duelId} tableId={tableId} />
 
         {round1 && <>
-          <RoundStats duelId={duelId} roundNumber={1} round={round1} />
+          <RoundStats duelId={duelId} round={round1} />
           <DuelProgress duelId={duelId} />
           <br />
         </>}
@@ -144,12 +144,6 @@ function DuelStats({
           <Cell>State</Cell>
           <Cell>
             {challenge.state}: {ChallengeStateNames[challenge.state]}
-          </Cell>
-        </Row>
-        <Row>
-          <Cell>Round Number</Cell>
-          <Cell>
-            {challenge.roundNumber}
           </Cell>
         </Row>
         <Row>
@@ -231,11 +225,9 @@ function WagerStats({
 
 function RoundStats({
   duelId,
-  roundNumber,
   round,
 }: {
   duelId: bigint
-  roundNumber: number
   round: any
 }) {
   const { challenge } = useDuel(duelId)
@@ -248,7 +240,7 @@ function RoundStats({
         <Header>
           <Row>
             <HeaderCell width={4}><h5>Round</h5></HeaderCell>
-            <HeaderCell><h2>{roundNumber}</h2></HeaderCell>
+            <HeaderCell><h2>1 and only</h2></HeaderCell>
           </Row>
         </Header>
 

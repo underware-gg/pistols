@@ -31,7 +31,6 @@
 //         tester::execute_reply_duel(game, OTHER(), duel_id, true);
 //         let ch = tester::get_ChallengeEntity(world, duel_id);
 //         assert(ch.state == ChallengeState::InProgress, 'challenge.state');
-//         assert(ch.round_number == 1, 'challenge.number');
 //         (ch, duel_id)
 //     }
 

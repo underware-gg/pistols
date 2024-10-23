@@ -36,9 +36,9 @@ export const movesToHand = (moves: number[]): Hand => {
   }
 }
 
-export const useRound = (duelId: BigNumberish, roundNumber: BigNumberish) => {
+export const useRound = (duelId: BigNumberish) => {
   const { Round } = useDojoComponents()
-  const entityId = useMemo(() => keysToEntity([duelId, roundNumber]), [duelId, roundNumber])
+  const entityId = useMemo(() => keysToEntity([duelId]), [duelId])
   const round = useComponentValue(Round, entityId)
   const state = useMemo(() => (round?.state as unknown as RoundState ?? null), [round])
   const endedInBlades = useMemo(() => (round ? (
@@ -68,7 +68,7 @@ export const useRound = (duelId: BigNumberish, roundNumber: BigNumberish) => {
 
 export const useDuel = (duelId: BigNumberish) => {
   const challenge = useChallenge(duelId)
-  const round1 = useRound(duelId, 1)
+  const round1 = useRound(duelId)
 
   //
   // The actual stage of this duel
@@ -96,7 +96,6 @@ export const useDuel = (duelId: BigNumberish) => {
 
   return {
     challenge,
-    roundNumber: challenge.roundNumber,
     round1,
     duelStage,
     completedStagesA,

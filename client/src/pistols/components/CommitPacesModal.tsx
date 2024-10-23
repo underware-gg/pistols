@@ -16,12 +16,10 @@ export default function CommitPacesModal({
   isOpen,
   setIsOpen,
   duelId,
-  roundNumber = 1,
 }: {
   isOpen: boolean
   setIsOpen: Function
   duelId: bigint
-  roundNumber?: number
 }) {
   const { account } = useAccount()
   const { chain } = useNetwork()
@@ -39,11 +37,10 @@ export default function CommitPacesModal({
     setFirePaces(0)
   }, [isOpen])
 
-  const messageToSign = useMemo<CommitMoveMessage>(() => ((duelId && roundNumber && duelistId) ? {
+  const messageToSign = useMemo<CommitMoveMessage>(() => ((duelId && duelistId) ? {
     duelId: BigInt(duelId),
-    roundNumber: BigInt(roundNumber),
     duelistId: BigInt(duelistId),
-  } : null), [duelId, roundNumber, duelistId])
+  } : null), [duelId, duelistId])
 
   const canSubmit = useMemo(() =>
     (account && messageToSign && firePaces && dodgePaces && firePaces != dodgePaces && tactics && blades && !isSubmitting),
@@ -55,7 +52,7 @@ export default function CommitPacesModal({
       const moves = [firePaces, dodgePaces, tactics, blades]
       const { hash, salt } = await signAndGenerateMovesHash(account, feltToString(chain.id), messageToSign, moves)
       if (hash && salt) {
-        await commit_moves(account, duelistId, duelId, roundNumber, hash)
+        await commit_moves(account, duelistId, duelId, hash)
         dispatchSetMoves(messageToSign, moves, salt)
         setIsOpen(false)
       }

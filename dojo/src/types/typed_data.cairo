@@ -12,7 +12,7 @@ mod TYPED_DATA {
     const NAME: felt252 = 'Underware';
     const VERSION: felt252 = '0.1.0';
 
-    // "Message"("duelId":"felt","roundNumber":"felt","duelistId":"felt") 
+    // "Message"("duelId":"felt","duelistId":"felt") 
     const COMMIT_MOVE_MESSAGE_TYPE_HASH: felt252 = 0x74fe0c723488214ab442c24761e9b32d30216def5e93d1c110375d993482ae;
 }
 
@@ -24,7 +24,6 @@ impl SNIP12MetadataImpl of SNIP12Metadata {
 #[derive(Copy, Drop, Hash)]
 pub struct CommitMoveMessage {
     duelId: felt252,
-    roundNumber: felt252,
     duelistId: felt252,
 }
 

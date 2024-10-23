@@ -76,13 +76,13 @@ impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn get_round(self: Store, duel_id: u128, round_number: u8) -> Round {
-        (RoundStore::get(self.world, duel_id, round_number))
+    fn get_round(self: Store, duel_id: u128) -> Round {
+        (RoundStore::get(self.world, duel_id))
     }
     #[inline(always)]
-    fn get_round_entity(self: Store, duel_id: u128, round_number: u8) -> RoundEntity {
+    fn get_round_entity(self: Store, duel_id: u128) -> RoundEntity {
         (RoundEntityStore::get(self.world,
-            RoundStore::entity_id_from_keys(duel_id, round_number)
+            RoundStore::entity_id_from_keys(duel_id)
         ))
     }
 

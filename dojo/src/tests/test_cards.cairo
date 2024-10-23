@@ -80,7 +80,6 @@ mod tests {
         }
         let mut round = Round {
             duel_id: 0x1234,
-            round_number: 1,
             state: RoundState::Reveal,
             moves_a: Default::default(),
             moves_b: Default::default(),

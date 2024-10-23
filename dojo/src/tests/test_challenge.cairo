@@ -197,7 +197,6 @@ mod tests {
 
         let ch = tester::get_ChallengeEntity(sys.world, duel_id);
         assert(ch.state == new_state, 'state');
-        assert(ch.round_number == 0, 'round_number');
         assert(ch.winner == 0, 'winner');
         assert(ch.timestamp_start > 0, 'timestamp_start');
         assert(ch.timestamp_end == timestamp, 'timestamp_end');
@@ -227,7 +226,6 @@ mod tests {
         assert(new_state == ChallengeState::Expired, 'expired');
         let ch = tester::get_ChallengeEntity(sys.world, duel_id);
         assert(ch.state == new_state, 'state');
-        assert(ch.round_number == 0, 'round_number');
         assert(ch.winner == 0, 'winner');
         assert(ch.timestamp_start < timestamp, 'timestamp_start');
         assert(ch.timestamp_end == timestamp, 'timestamp_end');
@@ -266,7 +264,6 @@ mod tests {
 
         let ch = tester::get_ChallengeEntity(sys.world, duel_id);
         assert(ch.state == new_state, 'state');
-        assert(ch.round_number == 0, 'round_number');
         assert(ch.winner == 0, 'winner');
         assert(ch.timestamp_start < timestamp, 'timestamp_start');
         assert(ch.timestamp_end == timestamp, 'timestamp_end');
@@ -305,7 +302,6 @@ mod tests {
         assert(new_state == ChallengeState::Refused, 'refused');
         let ch = tester::get_ChallengeEntity(sys.world, duel_id);
         assert(ch.state == new_state, 'state');
-        assert(ch.round_number == 0, 'round_number');
         assert(ch.winner == 0, 'winner');
         assert(ch.timestamp_start < timestamp, 'timestamp_start');
         assert(ch.timestamp_end == timestamp, 'timestamp_end');
@@ -341,7 +337,6 @@ mod tests {
         assert(new_state == ChallengeState::Refused, 'refused');
         let ch = tester::get_ChallengeEntity(sys.world, duel_id);
         assert(ch.state == new_state, 'state');
-        assert(ch.round_number == 0, 'round_number');
         assert(ch.winner == 0, 'winner');
         assert(ch.timestamp_start < timestamp, 'timestamp_start');
         assert(ch.timestamp_end == timestamp, 'timestamp_end');
@@ -382,7 +377,6 @@ mod tests {
 
         let ch = tester::get_ChallengeEntity(sys.world, duel_id);
         assert(ch.state == new_state, 'state');
-        assert(ch.round_number == 1, 'round_number');
         assert(ch.timestamp_start == timestamp, 'timestamp_start');
         assert(ch.timestamp_end == 0, 'timestamp_end');
         assert(ch.address_b == B, 'challenged');   // << UPDATED!!!

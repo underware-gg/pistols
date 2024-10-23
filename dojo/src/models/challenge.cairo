@@ -29,7 +29,6 @@ pub struct Challenge {
     pub duelist_id_b: u128,         // Challenged duelist 
     // progress and results
     pub state: ChallengeState,
-    pub round_number: u8,           // current or final
     pub winner: u8,                 // 0:draw, 1:duelist_a, 2:duelist_b
     // timestamps in unix epoch
     pub timestamp_start: u64,       // Unix time, started
@@ -54,8 +53,6 @@ pub struct Wager {
 pub struct Round {
     #[key]
     pub duel_id: u128,
-    #[key]
-    pub round_number: u8,
     //---------------
     pub moves_a: Moves,
     pub moves_b: Moves,

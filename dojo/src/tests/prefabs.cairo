@@ -88,7 +88,6 @@ mod prefabs {
         let challenge: ChallengeEntity = tester::get_ChallengeEntity(sys.world, duel_id);
         let round: RoundEntity = tester::get_RoundEntity(sys.world, duel_id, 1);
         assert(challenge.state == ChallengeState::InProgress, 'challenge.state');
-        assert(challenge.round_number == 1, 'challenge.number');
         assert(round.state == RoundState::Commit, 'round.state');
         (challenge, round, duel_id)
     }

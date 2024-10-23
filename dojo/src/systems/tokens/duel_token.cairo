@@ -278,7 +278,6 @@ pub mod duel_token {
                 duelist_id_b,
                 // progress
                 state: ChallengeState::Awaiting,
-                round_number: 1,
                 winner: 0,
                 // times
                 timestamp_start,   // chalenge issued
@@ -289,7 +288,6 @@ pub mod duel_token {
             // create Round, readu for player A to 
             let round = Round {
                 duel_id: challenge.duel_id,
-                round_number: challenge.round_number,
                 state: RoundState::Commit,
                 moves_a: Default::default(),
                 moves_b: Default::default(),
@@ -365,7 +363,6 @@ pub mod duel_token {
                 if (accepted) {
                     // Challenged is accepting
                     challenge.state = ChallengeState::InProgress;
-                    challenge.round_number = 1;
                     challenge.timestamp_start = timestamp;
                     challenge.timestamp_end = 0;
                     // transfer wager/fee from Challenged to the contract

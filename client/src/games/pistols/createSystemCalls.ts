@@ -103,13 +103,13 @@ export function createSystemCalls(
   // Game
   //
 
-  const commit_moves = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, round_number: number, hash: BigNumberish): Promise<boolean> => {
-    const args = [duelist_id, duel_id, round_number, hash]
+  const commit_moves = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, hash: BigNumberish): Promise<boolean> => {
+    const args = [duelist_id, duel_id, hash]
     return await _executeTransaction(signer, game_call('commit_moves', args))
   }
 
-  const reveal_moves = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, round_number: number, salt: BigNumberish, moves: number[]): Promise<boolean> => {
-    const args = [duelist_id, duel_id, round_number, salt, moves]
+  const reveal_moves = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, salt: BigNumberish, moves: number[]): Promise<boolean> => {
+    const args = [duelist_id, duel_id, salt, moves]
     return await _executeTransaction(signer, game_call('reveal_moves', args))
   }
 
@@ -269,8 +269,8 @@ export function createSystemCalls(
     return duel_progress
   }
 
-  const get_player_card_decks = async (round_number: number): Promise<number[][] | null> => {
-    const args = [round_number]
+  const get_player_card_decks = async (table_id: string): Promise<number[][] | null> => {
+    const args = [table_id]
     const results = await _executeCall<any>(game_call('get_player_card_decks', args))
     if (results == null) return null
     return results.map((vo: BigNumberish[]) => vo.map((vi: BigNumberish) => Number(vi)))
@@ -307,10 +307,9 @@ export function createSystemCalls(
     account: BigNumberish,
     signature: BigNumberish[],
     duelId: BigNumberish,
-    roundNumber: BigNumberish,
     duelistId: BigNumberish,
   ): Promise<boolean | null> => {
-    const args = [account, signature, duelId, roundNumber, duelistId]
+    const args = [account, signature, duelId, duelistId]
     const results = await _executeCall<boolean>(game_call('test_validate_commit_message', args))
     return results ?? null
   }

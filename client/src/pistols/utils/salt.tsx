@@ -6,7 +6,6 @@ import { BITWISE } from '@/games/pistols/generated/constants'
 
 export interface CommitMoveMessage extends Messages {
   duelId: bigint,
-  roundNumber: bigint,
   duelistId: bigint,
 }
 
@@ -69,7 +68,7 @@ export const signAndGenerateMovesHash = async (
 ): Promise<{ hash: bigint, salt: bigint }> => {
   //------------------------------
   // TODO: REMOVE THIS!!!
-  // return poseidon([duelId, roundNumber, duelistId])
+  // return poseidon([duelId, duelistId])
   //------------------------------
   const salt = await signAndGenerateSalt(account, chainId, messageToSign)
   const hash = make_moves_hash(salt, moves)

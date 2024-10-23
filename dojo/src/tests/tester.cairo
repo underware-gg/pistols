@@ -427,21 +427,19 @@ mod tester {
     // ::game
     fn execute_commit_moves(system: @IGameDispatcher, sender: ContractAddress,
         duel_id: u128,
-        round_number: u8,
         hash: u128,
     ) {
         impersonate(sender);
-        (*system).commit_moves(ID(sender), duel_id, round_number, hash);
+        (*system).commit_moves(ID(sender), duel_id, hash);
         _next_block();
     }
     fn execute_reveal_moves(system: @IGameDispatcher, sender: ContractAddress,
         duel_id: u128,
-        round_number: u8,
         salt: felt252,
         moves: Span<u8>,
     ) {
         impersonate(sender);
-        (*system).reveal_moves(ID(sender), duel_id, round_number, salt, moves);
+        (*system).reveal_moves(ID(sender), duel_id, salt, moves);
         _next_block();
     }
 
@@ -495,13 +493,13 @@ mod tester {
         (WagerStore::get(world, duel_id))
     }
     #[inline(always)]
-    fn get_RoundEntity(world: IWorldDispatcher, duel_id: u128, round_number: u8) -> RoundEntity {
-        (RoundEntityStore::get(world, RoundStore::entity_id_from_keys(duel_id, round_number)))
+    fn get_RoundEntity(world: IWorldDispatcher, duel_id: u128) -> RoundEntity {
+        (RoundEntityStore::get(world, RoundStore::entity_id_from_keys(duel_id)))
     }
     #[inline(always)]
     fn get_Challenge_Round_Entity(world: IWorldDispatcher, duel_id: u128) -> (ChallengeEntity, RoundEntity) {
         let challenge = get_ChallengeEntity(world, duel_id);
-        let round = get_RoundEntity(world, duel_id, challenge.round_number);
+        let round = get_RoundEntity(world, duel_id);
         (challenge, round)
     }
 

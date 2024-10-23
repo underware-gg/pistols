@@ -13,14 +13,12 @@ trait IGame {
         ref world: IWorldDispatcher,
         duelist_id: u128,
         duel_id: u128,
-        round_number: u8,
         hashed: u128,
     );
     fn reveal_moves(
         ref world: IWorldDispatcher,
         duelist_id: u128,
         duel_id: u128,
-        round_number: u8,
         salt: felt252,
         moves: Span<u8>,
     );
@@ -33,7 +31,6 @@ trait IGame {
         account: ContractAddress,
         signature: Array<felt252>,
         duelId: felt252,
-        roundNumber: felt252,
         duelistId: felt252,
     ) -> bool;
 }
@@ -70,7 +67,6 @@ mod game {
         const NO_ALLOWANCE: felt252              = 'PISTOLS: No transfer allowance';
         const WITHDRAW_NOT_AVAILABLE: felt252    = 'PISTOLS: Withdraw not available';
         const WAGER_NOT_AVAILABLE: felt252       = 'PISTOLS: Wager not available';
-        const INVALID_ROUND_NUMBER: felt252      = 'PISTOLS: Invalid round number';
         const NOT_YOUR_CHALLENGE: felt252        = 'PISTOLS: Not your challenge';
         const NOT_YOUR_DUELIST: felt252          = 'PISTOLS: Not your duelist';
         const ROUND_NOT_IN_COMMIT: felt252       = 'PISTOLS: Round not in commit';
@@ -93,17 +89,16 @@ mod game {
         fn commit_moves(ref world: IWorldDispatcher,
             duelist_id: u128,
             duel_id: u128,
-            round_number: u8,
             hashed: u128,
         ) {
             let store: Store = StoreTrait::new(world);
             let challenge: Challenge = store.get_challenge(duel_id);
 
             // Assert correct Challenge
-            let duelist_number = self.assert_challenge(challenge, starknet::get_caller_address(), duelist_id, duel_id, round_number);
+            let duelist_number = self.assert_challenge(challenge, starknet::get_caller_address(), duelist_id, duel_id);
 
             // Assert correct Round
-            let mut round: RoundEntity = store.get_round_entity(duel_id, round_number);
+            let mut round: RoundEntity = store.get_round_entity(duel_id);
             assert(round.state == RoundState::Commit, Errors::ROUND_NOT_IN_COMMIT);
 
             // Validate action hash
@@ -128,7 +123,6 @@ mod game {
         fn reveal_moves(ref world: IWorldDispatcher,
             duelist_id: u128,
             duel_id: u128,
-            round_number: u8,
             salt: felt252,
             moves: Span<u8>,
         ) {
@@ -136,10 +130,10 @@ mod game {
             let mut challenge: Challenge = store.get_challenge(duel_id);
             
             // Assert correct Challenge
-            let duelist_number = self.assert_challenge(challenge, starknet::get_caller_address(), duelist_id, duel_id, round_number);
+            let duelist_number = self.assert_challenge(challenge, starknet::get_caller_address(), duelist_id, duel_id);
 
             // Assert correct Round
-            let mut round: Round = store.get_round( duel_id, round_number);
+            let mut round: Round = store.get_round( duel_id);
             assert(round.state == RoundState::Reveal, Errors::ROUND_NOT_IN_REVEAL);
 
             // Validate salt
@@ -206,7 +200,7 @@ mod game {
             let challenge: Challenge = store.get_challenge(duel_id);
             if (challenge.state.is_finished()) {
                 let table: TableConfigEntity = store.get_table_config_entity(challenge.table_id);
-                let mut round: Round = store.get_round(duel_id, 1);
+                let mut round: Round = store.get_round(duel_id);
                 (game_loop(world, table.deck_type, ref round))
             } else {
                 {Default::default()}
@@ -217,13 +211,11 @@ mod game {
             account: ContractAddress,
             signature: Array<felt252>,
             duelId: felt252,
-            roundNumber: felt252,
             duelistId: felt252,
         ) -> bool {
             WORLD(world);
             let msg = CommitMoveMessage {
                 duelId,
-                roundNumber,
                 duelistId,
             };
             (msg.validate(account, signature))
@@ -236,7 +228,7 @@ mod game {
     //
     #[generate_trait]
     impl InternalImpl of InternalTrait {
-        fn assert_challenge(self: @ContractState, challenge: Challenge, caller: ContractAddress, duelist_id: u128, duel_id: u128, round_number: u8) -> u8 {
+        fn assert_challenge(self: @ContractState, challenge: Challenge, caller: ContractAddress, duelist_id: u128, duel_id: u128) -> u8 {
             // Assert Duelist is in the challenge
             let duelist_number: u8 =
                 if (challenge.duelist_id_a == duelist_id) { 1 }
@@ -251,8 +243,6 @@ mod game {
 
             // Correct Challenge state
             assert(challenge.state == ChallengeState::InProgress, Errors::CHALLENGE_NOT_IN_PROGRESS);
-            assert(challenge.round_number == round_number, Errors::INVALID_ROUND_NUMBER);
-            assert(round_number <= CONST::ROUND_COUNT, Errors::INVALID_ROUND_NUMBER);
             
             (duelist_number)
         }
@@ -272,7 +262,7 @@ mod game {
             ScoreTrait::update_totals(ref scoreboard_a.score, ref scoreboard_b.score, challenge.winner);
 
             // compute honour from final round
-            let round: RoundEntity = store.get_round_entity(challenge.duel_id, challenge.round_number);
+            let round: RoundEntity = store.get_round_entity(challenge.duel_id);
             duelist_a.score.update_honour(round.state_a.honour);
             duelist_b.score.update_honour(round.state_b.honour);
             scoreboard_a.score.update_honour(round.state_a.honour);
