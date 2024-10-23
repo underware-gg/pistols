@@ -41,12 +41,6 @@ trait IGame {
 // private/internal functions
 #[dojo::interface]
 trait IGameInternal {
-    fn _emitDuelistRegisteredEvent(ref world: IWorldDispatcher, address: ContractAddress, duelist: Duelist, is_new: bool);
-    fn _emitNewChallengeEvent(ref world: IWorldDispatcher, challenge: Challenge);
-    fn _emitChallengeAcceptedEvent(ref world: IWorldDispatcher, challenge: Challenge, accepted: bool);
-    fn _emitPostRevealEvents(ref world: IWorldDispatcher, challenge: Challenge);
-    fn _emitChallengeResolvedEvent(ref world: IWorldDispatcher, challenge: Challenge);
-    fn _emitDuelistTurnEvent(ref world: IWorldDispatcher, challenge: Challenge);
 }
 
 #[dojo::contract]
@@ -70,7 +64,7 @@ mod game {
     use pistols::libs::utils;
     use pistols::types::cards::hand::DuelistHandTrait;
     use pistols::types::typed_data::{CommitMoveMessage, CommitMoveMessageTrait};
-    use pistols::types::{events};
+    use pistols::libs::events::{emitters};
 
     mod Errors {
         const CHALLENGE_EXISTS: felt252          = 'PISTOLS: Challenge exists';
@@ -119,7 +113,7 @@ mod game {
             let store: Store = StoreTrait::new(world);
             let challenge: Challenge = shooter::reveal_moves(store, duelist_id, duel_id, round_number, salt, moves);
 
-            self._emitPostRevealEvents(challenge);
+            emitters::emitPostRevealEvents(@world, challenge);
         }
 
 
@@ -167,72 +161,6 @@ mod game {
     //------------------------------------
     // Internal calls
     //
-
-    #[event]
-    #[derive(Drop, starknet::Event)]
-    pub enum Event {
-        DuelistRegisteredEvent: events::DuelistRegisteredEvent,
-        NewChallengeEvent: events::NewChallengeEvent,
-        ChallengeAcceptedEvent: events::ChallengeAcceptedEvent,
-        ChallengeResolvedEvent: events::ChallengeResolvedEvent,
-        DuelistTurnEvent: events::DuelistTurnEvent,
-    }
-
-    // #[abi(embed_v0)] // commented to make this private
-    impl ActionsInternalImpl of super::IGameInternal<ContractState> {
-        // TODO: move to IDuelistToken
-        fn _emitDuelistRegisteredEvent(ref world: IWorldDispatcher, address: ContractAddress, duelist: Duelist, is_new: bool) {
-            emit!(world, (Event::DuelistRegisteredEvent(events::DuelistRegisteredEvent {
-                address,
-                duelist_id: duelist.duelist_id,
-                name: duelist.name,
-                profile_pic_type: duelist.profile_pic_type,
-                profile_pic_uri: duelist.profile_pic_uri,
-                is_new,
-            })));
-        }
-        fn _emitNewChallengeEvent(ref world: IWorldDispatcher, challenge: Challenge) {
-            emit!(world, (Event::NewChallengeEvent (events::NewChallengeEvent {
-                duel_id: challenge.duel_id,
-                address_a: challenge.address_a,
-                address_b: challenge.address_b,
-            })));
-        }
-        fn _emitChallengeAcceptedEvent(ref world: IWorldDispatcher, challenge: Challenge, accepted: bool) {
-            emit!(world, (Event::ChallengeAcceptedEvent (events::ChallengeAcceptedEvent {
-                duel_id: challenge.duel_id,
-                address_a: challenge.address_a,
-                address_b: challenge.address_b,
-                accepted,
-            })));
-        }
-        fn _emitPostRevealEvents(ref world: IWorldDispatcher, challenge: Challenge) {
-            WORLD(world);
-            if (challenge.state == ChallengeState::InProgress) {
-                self._emitDuelistTurnEvent(challenge);
-            } else if (challenge.state == ChallengeState::Resolved || challenge.state == ChallengeState::Draw) {
-                self._emitChallengeResolvedEvent(challenge);
-            }
-        }
-        fn _emitDuelistTurnEvent(ref world: IWorldDispatcher, challenge: Challenge) {
-            let address: ContractAddress =
-                if (challenge.address_a == starknet::get_caller_address()) { (challenge.address_b) }
-                else { (challenge.address_a) };
-            emit!(world, (Event::DuelistTurnEvent(events::DuelistTurnEvent {
-                duel_id: challenge.duel_id,
-                round_number: challenge.round_number,
-                address,
-            })));
-        }
-        fn _emitChallengeResolvedEvent(ref world: IWorldDispatcher, challenge: Challenge) {
-            let winner_address: ContractAddress = 
-                if (challenge.winner == 1) { (challenge.address_a) }
-                else if (challenge.winner == 2) { (challenge.address_b) }
-                else { (ZERO()) };
-            emit!(world, (Event::ChallengeResolvedEvent(events::ChallengeResolvedEvent {
-                duel_id: challenge.duel_id,
-                winner_address,
-            })));
-        }
+    impl GameInternalImpl of super::IGameInternal<ContractState> {
     }
 }

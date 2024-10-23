@@ -135,6 +135,7 @@ pub mod duelist_token {
         table::{TABLES},
     };
     use pistols::types::constants::{CONST, HONOUR};
+    use pistols::libs::events::{emitters};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::ShortStringTrait;
     use pistols::utils::math::{MathTrait};
@@ -221,7 +222,7 @@ pub mod duelist_token {
             let store = StoreTrait::new(self.world());
             store.set_duelist(@duelist);
 
-            // self._emitDuelistRegisteredEvent(caller, duelist.clone(), true);
+            emitters::emitDuelistRegisteredEvent(@self.world(), recipient, duelist.clone(), true);
 
             (duelist)
         }
@@ -247,7 +248,7 @@ pub mod duelist_token {
             // save
             store.set_duelist(@duelist);
 
-            // self._emitDuelistRegisteredEvent(caller, duelist.clone(), false);
+            emitters::emitDuelistRegisteredEvent(@self.world(), get_caller_address(), duelist.clone(), false);
 
             (duelist)
         }

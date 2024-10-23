@@ -22,6 +22,7 @@ mod systems {
 }
 
 mod libs {
+    mod events;
     mod pact;
     mod seeder;
     mod shooter;
@@ -42,7 +43,6 @@ mod types {
     mod challenge_state;
     mod constants;
     mod duel_progress;
-    mod events;
     mod misc;
     mod premise;
     mod round_state;

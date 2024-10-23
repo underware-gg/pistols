@@ -146,6 +146,7 @@ pub mod duel_token {
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::premise::{Premise, PremiseTrait};
     use pistols::types::constants::{CONST, HONOUR};
+    use pistols::libs::events::{emitters};
     use pistols::libs::seeder::{make_seed};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::libs::pact;
@@ -289,8 +290,7 @@ pub mod duel_token {
             // create challenge
             utils::set_challenge(store, challenge);
 
-            // TODO: enable events
-            // self._emitNewChallengeEvent(challenge);
+            emitters::emitNewChallengeEvent(@self.world(), challenge);
 
             (duel_id)
         }
@@ -359,16 +359,14 @@ pub mod duel_token {
                     // transfer wager/fee from Challenged to the contract
                     utils::deposit_wager_fees(store, challenge, challenge.address_b, starknet::get_contract_address());
                     // events
-                    // TODO: enable events
-                    // self._emitChallengeAcceptedEvent(challenge, accepted);
-                    // self._emitDuelistTurnEvent(challenge);
+                    emitters::emitChallengeAcceptedEvent(@self.world(), challenge, accepted);
+                    emitters::emitDuelistTurnEvent(@self.world(), challenge);
                 } else {
                     // Challenged is Refusing
                     challenge.state = ChallengeState::Refused;
                     challenge.timestamp_end = timestamp;
                     // events
-                    // TODO: enable events
-                    // self._emitChallengeAcceptedEvent(challenge, accepted);
+                    emitters::emitChallengeAcceptedEvent(@self.world(), challenge, accepted);
                 }
             }
 
