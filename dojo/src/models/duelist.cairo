@@ -88,6 +88,8 @@ pub struct Score {
 //----------------------------------
 // Traits
 //
+use pistols::utils::bitwise::{BitwiseU64};
+use pistols::utils::math::{MathU64};
 
 #[generate_trait]
 impl DuelistTraitImpl of DuelistTrait {
@@ -130,6 +132,30 @@ impl ScoreTraitImpl of ScoreTrait {
     }
     #[inline(always)]
     fn format_honour(value: u8) -> ByteArray { (format!("{}.{}", value/10, value%10)) }
+
+    // update duel totals only
+    fn update_totals(ref score_a: Score, ref score_b: Score, winner: u8) {
+        score_a.total_duels += 1;
+        score_b.total_duels += 1;
+        if (winner == 1) {
+            score_a.total_wins += 1;
+            score_b.total_losses += 1;
+        } else if (winner == 2) {
+            score_a.total_losses += 1;
+            score_b.total_wins += 1;
+        } else {
+            score_a.total_draws += 1;
+            score_b.total_draws += 1;
+        }
+    }
+    // average honour has an extra decimal, eg: 100 = 10.0
+    fn update_honour(ref self: Score, duel_honour: u8) {
+        let history_pos: usize = ((self.total_duels.into() - 1) % 8) * 8;
+        self.honour_history =
+            (self.honour_history & ~BitwiseU64::shl(0xff, history_pos)) |
+            BitwiseU64::shl(duel_honour.into(), history_pos);
+        self.honour = (BitwiseU64::sum_bytes(self.honour_history) / MathU64::min(self.total_duels.into(), 8)).try_into().unwrap();
+    }
 }
 
 impl ArchetypeIntoFelt252 of Into<Archetype, felt252> {

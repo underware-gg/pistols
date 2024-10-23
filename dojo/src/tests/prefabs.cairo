@@ -12,7 +12,7 @@ mod prefabs {
     use pistols::types::duel_progress::{DuelProgress, DuelStep};
     use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::types::constants::{CONST, HONOUR};
-    use pistols::libs::utils::{make_moves_hash};
+    use pistols::libs::game_loop::{make_moves_hash};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::math::{MathTrait};
     use pistols::tests::tester::{tester,

@@ -38,11 +38,6 @@ trait IGame {
     ) -> bool;
 }
 
-// private/internal functions
-#[dojo::interface]
-trait IGameInternal {
-}
-
 #[dojo::contract]
 mod game {
     // use debug::PrintTrait;
@@ -50,17 +45,19 @@ mod game {
     use starknet::{ContractAddress, get_block_timestamp, get_block_info};
 
     use pistols::models::{
-        challenge::{Challenge, ChallengeEntity, Wager, Round, Moves},
-        duelist::{Duelist, DuelistTrait, Score, Pact},
-        table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableAdmittanceEntity, TableAdmittanceEntityTrait, TableType, TABLES},
+        challenge::{Challenge, ChallengeEntity, Round, RoundTrait, RoundEntity, MovesTrait},
+        duelist::{Duelist, DuelistTrait, DuelistEntity, Score, ScoreTrait, Scoreboard, Pact},
+        table::{TableConfig, TableConfigEntity, TableConfigEntityTrait},
     };
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
-    use pistols::types::duel_progress::{DuelProgress};
+    use pistols::types::duel_progress::{DuelProgress, DuelistDrawnCard};
     use pistols::types::round_state::{RoundState, RoundStateTrait};
+    use pistols::types::constants::{CONST};
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::misc::{ZERO, WORLD};
     use pistols::libs::store::{Store, StoreTrait};
-    use pistols::libs::shooter::{shooter};
+    use pistols::libs::game_loop::{game_loop, make_moves_hash};
+    use pistols::libs::pact;
     use pistols::libs::utils;
     use pistols::types::cards::hand::DuelistHandTrait;
     use pistols::types::typed_data::{CommitMoveMessage, CommitMoveMessageTrait};
@@ -100,7 +97,32 @@ mod game {
             hashed: u128,
         ) {
             let store: Store = StoreTrait::new(world);
-            shooter::commit_moves(store, duelist_id, duel_id, round_number, hashed);
+            let challenge: Challenge = store.get_challenge(duel_id);
+
+            // Assert correct Challenge
+            let duelist_number = self.assert_challenge(challenge, starknet::get_caller_address(), duelist_id, duel_id, round_number);
+
+            // Assert correct Round
+            let mut round: RoundEntity = store.get_round_entity(duel_id, round_number);
+            assert(round.state == RoundState::Commit, Errors::ROUND_NOT_IN_COMMIT);
+
+            // Validate action hash
+
+            // Store hash
+            if (duelist_number == 1) {
+                assert(round.moves_a.hashed == 0, Errors::ALREADY_COMMITTED);
+                round.moves_a.hashed = hashed;
+            } else if (duelist_number == 2) {
+                assert(round.moves_b.hashed == 0, Errors::ALREADY_COMMITTED);
+                round.moves_b.hashed = hashed;
+            }
+
+            // Finished commit
+            if (round.moves_a.hashed != 0 && round.moves_b.hashed != 0) {
+                round.state = RoundState::Reveal;
+            }
+
+            store.set_round_entity(@round);
         }
 
         fn reveal_moves(ref world: IWorldDispatcher,
@@ -111,7 +133,58 @@ mod game {
             moves: Span<u8>,
         ) {
             let store: Store = StoreTrait::new(world);
-            let challenge: Challenge = shooter::reveal_moves(store, duelist_id, duel_id, round_number, salt, moves);
+            let mut challenge: Challenge = store.get_challenge(duel_id);
+            
+            // Assert correct Challenge
+            let duelist_number = self.assert_challenge(challenge, starknet::get_caller_address(), duelist_id, duel_id, round_number);
+
+            // Assert correct Round
+            let mut round: Round = store.get_round( duel_id, round_number);
+            assert(round.state == RoundState::Reveal, Errors::ROUND_NOT_IN_REVEAL);
+
+            // Validate salt
+            // TODO: verify salt as a signature
+            assert(salt != 0, Errors::INVALID_SALT);
+
+            // Validate action hash
+            assert(moves.len() >= 2 && moves.len() <= 4, Errors::INVALID_MOVES_COUNT);
+            let hashed: u128 = make_moves_hash(salt, moves);
+
+            // since the hash was validated
+            // we should not validate the actual moves
+            // all we can do is skip if they are invalid
+
+            // Validate moves hash
+            if (duelist_number == 1) {
+                assert(round.moves_a.card_1 == 0, Errors::ALREADY_REVEALED);
+                assert(round.moves_a.hashed == hashed, Errors::MOVES_HASH_MISMATCH);
+                round.moves_a.initialize(salt, moves);
+            } else if (duelist_number == 2) {
+                assert(round.moves_b.card_1 == 0, Errors::ALREADY_REVEALED);
+                assert(round.moves_b.hashed == hashed, Errors::MOVES_HASH_MISMATCH);
+                round.moves_b.initialize(salt, moves);
+            }
+
+            //
+            // Incomplete Round, update only
+            if (round.moves_a.salt == 0 || round.moves_b.salt == 0) {
+                store.set_round(@round);
+                return;
+            }
+
+            // Execute game loop...
+            let table: TableConfigEntity = store.get_table_config_entity(challenge.table_id);
+            let progress: DuelProgress = game_loop(store.world, table.deck_type, ref round);
+            store.set_round(@round);
+
+            // end challenge
+            challenge.winner = progress.winner;
+            challenge.state = if (progress.winner == 0) {ChallengeState::Draw} else {ChallengeState::Resolved};
+            challenge.timestamp_end = get_block_timestamp();
+            self.finish_challenge(store, challenge);
+
+            // undo pact
+            pact::unset_pact(store, challenge);
 
             emitters::emitPostRevealEvents(@world, challenge);
         }
@@ -134,7 +207,7 @@ mod game {
             if (challenge.state.is_finished()) {
                 let table: TableConfigEntity = store.get_table_config_entity(challenge.table_id);
                 let mut round: Round = store.get_round(duel_id, 1);
-                (shooter::game_loop(world, table.deck_type, ref round))
+                (game_loop(world, table.deck_type, ref round))
             } else {
                 {Default::default()}
             }
@@ -161,6 +234,71 @@ mod game {
     //------------------------------------
     // Internal calls
     //
-    impl GameInternalImpl of super::IGameInternal<ContractState> {
+    #[generate_trait]
+    impl InternalImpl of InternalTrait {
+        fn assert_challenge(self: @ContractState, challenge: Challenge, caller: ContractAddress, duelist_id: u128, duel_id: u128, round_number: u8) -> u8 {
+            // Assert Duelist is in the challenge
+            let duelist_number: u8 =
+                if (challenge.duelist_id_a == duelist_id) { 1 }
+                else if (challenge.duelist_id_b == duelist_id) { 2 }
+                else { 0 };
+            assert(duelist_number != 0, Errors::NOT_YOUR_DUELIST);
+
+            let duelist_address: ContractAddress =
+                if (duelist_number == 1) { challenge.address_a }
+                else { challenge.address_b };
+            assert(caller == duelist_address, Errors::NOT_YOUR_CHALLENGE);
+
+            // Correct Challenge state
+            assert(challenge.state == ChallengeState::InProgress, Errors::CHALLENGE_NOT_IN_PROGRESS);
+            assert(challenge.round_number == round_number, Errors::INVALID_ROUND_NUMBER);
+            assert(round_number <= CONST::ROUND_COUNT, Errors::INVALID_ROUND_NUMBER);
+            
+            (duelist_number)
+        }
+
+        fn finish_challenge(self: @ContractState, store: Store, challenge: Challenge) {
+            store.set_challenge(@challenge);
+
+            // get duelist as Entity, as we know they exist
+            let mut duelist_a: DuelistEntity = store.get_duelist_entity(challenge.duelist_id_a);
+            let mut duelist_b: DuelistEntity = store.get_duelist_entity(challenge.duelist_id_b);
+            // Scoreboards we need the model, since they may not exist yet
+            let mut scoreboard_a: Scoreboard = store.get_scoreboard(challenge.table_id, challenge.duelist_id_a);
+            let mut scoreboard_b: Scoreboard = store.get_scoreboard(challenge.table_id, challenge.duelist_id_b);
+            
+            // update totals
+            ScoreTrait::update_totals(ref duelist_a.score, ref duelist_b.score, challenge.winner);
+            ScoreTrait::update_totals(ref scoreboard_a.score, ref scoreboard_b.score, challenge.winner);
+
+            // compute honour from final round
+            let round: RoundEntity = store.get_round_entity(challenge.duel_id, challenge.round_number);
+            duelist_a.score.update_honour(round.state_a.honour);
+            duelist_b.score.update_honour(round.state_b.honour);
+            scoreboard_a.score.update_honour(round.state_a.honour);
+            scoreboard_b.score.update_honour(round.state_b.honour);
+
+            // split wager/fee to winners and benefactors
+            if (round.state_a.wager > round.state_b.wager) {
+                // duelist_a won the Wager
+                let wager_value: u128 = utils::split_wager_fees(store, challenge, challenge.address_a, challenge.address_a);
+                scoreboard_a.wager_won += wager_value;
+                scoreboard_b.wager_lost += wager_value;
+            } else if (round.state_a.wager < round.state_b.wager) {
+                // duelist_b won the Wager
+                let wager_value: u128 = utils::split_wager_fees(store, challenge, challenge.address_b, challenge.address_b);
+                scoreboard_a.wager_lost += wager_value;
+                scoreboard_b.wager_won += wager_value;
+            } else {
+                // no-one gets the Wager
+                utils::split_wager_fees(store, challenge, challenge.address_a, challenge.address_b);
+            }
+            
+            // save
+            store.set_duelist_entity(@duelist_a);
+            store.set_duelist_entity(@duelist_b);
+            store.set_scoreboard(@scoreboard_a);
+            store.set_scoreboard(@scoreboard_b);
+        }
     }
 }

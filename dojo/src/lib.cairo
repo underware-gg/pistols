@@ -23,9 +23,9 @@ mod systems {
 
 mod libs {
     mod events;
+    mod game_loop;
     mod pact;
     mod seeder;
-    mod shooter;
     mod store;
     mod utils;
 }

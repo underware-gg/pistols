@@ -28,7 +28,7 @@ mod tests {
     fn test_update_score_honour() {
         let mut score: Score = Default::default();
         score.total_duels = 1;
-        utils::update_score_honour(ref score, 100);
+        score.update_honour(100);
         assert(score.is_lord(), 'is_lord()');
     }
 
@@ -40,7 +40,7 @@ mod tests {
         loop {
             if (n > 8) { break; }
             score.total_duels += 1;
-            utils::update_score_honour(ref score, n);
+            score.update_honour(n);
             sum += n;
             assert(score.honour == (sum / n), ShortString::concat('sum_8___', n.into()));
             n += 1;
@@ -50,7 +50,7 @@ mod tests {
         loop {
             if (n > 16) { break; }
             score.total_duels += 1;
-            utils::update_score_honour(ref score, n);
+            score.update_honour(n);
             sum -= n - 8;
             sum += n;
             assert(score.honour == (sum / 8), ShortString::concat('sum_16___', n.into()));
@@ -59,7 +59,7 @@ mod tests {
         assert(score.honour_history == 0x100f0e0d0c0b0a09, '0x100f0e0d0c0b0a09');
         // new loop
         score.total_duels += 1;
-        utils::update_score_honour(ref score, n);
+        score.update_honour(n);
         assert(score.honour_history == 0x100f0e0d0c0b0a11, '0x100f0e0d0c0b0a11');
     }
 

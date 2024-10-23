@@ -2,7 +2,7 @@
 use starknet::ContractAddress;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
-use pistols::systems::game::game::{Errors as ActionErrors};
+use pistols::systems::game::game::{Errors as GameErrors};
 use pistols::types::cards::hand::{DeckType};
 use pistols::types::constants::{CONST};
 use pistols::utils::arrays::{ArrayUtilsTrait};
@@ -130,7 +130,7 @@ impl TableConfigEntityImpl of TableConfigEntityTrait {
     }
     fn calc_fee(self: @TableConfigEntity, wager_value: u128) -> u128 {
         // (MathU128::max(*self.fee_min, (wager_value / 100) * wager.fee_pct.into()))
-        // assert(wager_value == 0, ActionErrors::WAGER_NOT_ALLOWED);
+        // assert(wager_value == 0, GameErrors::WAGER_NOT_ALLOWED);
         // (*self.fee_min)
         (0)
     }

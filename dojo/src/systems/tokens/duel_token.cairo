@@ -143,8 +143,10 @@ pub mod duel_token {
             TableType, TABLES,
         },
     };
-    use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::premise::{Premise, PremiseTrait};
+    use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
+    use pistols::types::round_state::{RoundState};
+    use pistols::types::duel_progress::{DuelistDrawnCard};
     use pistols::types::constants::{CONST, HONOUR};
     use pistols::libs::events::{emitters};
     use pistols::libs::seeder::{make_seed};
@@ -283,12 +285,10 @@ pub mod duel_token {
                 timestamp_start,   // chalenge issued
                 timestamp_end,     // expire
             };
+            store.set_challenge(@challenge);
 
             // set the pact + assert it does not exist
             pact::set_pact(store, challenge);
-            
-            // create challenge
-            utils::set_challenge(store, challenge);
 
             emitters::emitNewChallengeEvent(@self.world(), challenge);
 
@@ -370,14 +370,32 @@ pub mod duel_token {
                 }
             }
 
+            // update challenge state
+            store.set_challenge(@challenge);
+
+            // Start Round
+            if (challenge.state.is_canceled()) {
+                // transfer wager/fee back to challenger
+                utils::withdraw_wager_fees(store, challenge, challenge.address_a);
+            } else if (challenge.state == ChallengeState::InProgress) {
+                let new_round = Round {
+                    duel_id: challenge.duel_id,
+                    round_number: challenge.round_number,
+                    state: RoundState::Commit,
+                    moves_a: Default::default(),
+                    moves_b: Default::default(),
+                    state_a: Default::default(),
+                    state_b: Default::default(),
+                    final_blow: DuelistDrawnCard::None,
+                };
+                store.set_round(@new_round);
+            }
+
             // undo pact if duel does not proceed
             if (!challenge.state.is_live()) {
                 pact::unset_pact(store, challenge);
             }
-
-            // update challenge state
-            utils::set_challenge(store, challenge);
-
+            
             (challenge.state)
         }
         

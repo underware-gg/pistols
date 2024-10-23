@@ -22,8 +22,7 @@ mod tests {
         BladesCard, BladesCardTrait, BLADES_CARDS,
         EnvCard, EnvCardTrait,
     };
-    use pistols::libs::shooter::{shooter};
-    use pistols::libs::utils::{make_moves_hash};
+    use pistols::libs::game_loop::{game_loop, make_moves_hash};
     use pistols::utils::short_string::{ShortString};
 
     use pistols::systems::tokens::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
@@ -94,7 +93,7 @@ mod tests {
         round.moves_b.initialize(SALT_B, moves_b);
         round.state_a.initialize(hand_a);
         round.state_b.initialize(hand_b);
-        let progress: DuelProgress = shooter::game_loop(sys.world, DeckType::Classic, ref round);
+        let progress: DuelProgress = game_loop(sys.world, DeckType::Classic, ref round);
         (round, progress)
     }
 
