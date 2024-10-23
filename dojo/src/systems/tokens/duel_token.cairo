@@ -263,9 +263,8 @@ pub mod duel_token {
             let timestamp_start: u64 = get_block_timestamp();
             let timestamp_end: u64 = if (expire_hours == 0) { 0 } else { timestamp_start + timestamp::from_hours(expire_hours) };
 
-            // create duel id
+            // create challenge
             let seed: u128 = make_seed(address_a, self.world().uuid());
-            
             let challenge = Challenge {
                 duel_id,
                 seed,
@@ -279,13 +278,26 @@ pub mod duel_token {
                 duelist_id_b,
                 // progress
                 state: ChallengeState::Awaiting,
-                round_number: 0,
+                round_number: 1,
                 winner: 0,
                 // times
                 timestamp_start,   // chalenge issued
                 timestamp_end,     // expire
             };
             store.set_challenge(@challenge);
+
+            // create Round, readu for player A to 
+            let round = Round {
+                duel_id: challenge.duel_id,
+                round_number: challenge.round_number,
+                state: RoundState::Commit,
+                moves_a: Default::default(),
+                moves_b: Default::default(),
+                state_a: Default::default(),
+                state_b: Default::default(),
+                final_blow: DuelistDrawnCard::None,
+            };
+            store.set_round(@round);
 
             // set the pact + assert it does not exist
             pact::set_pact(store, challenge);
@@ -370,29 +382,13 @@ pub mod duel_token {
                 }
             }
 
-            // update challenge state
+            // update challenge
             store.set_challenge(@challenge);
 
-            // Start Round
+            // duel canceled!
             if (challenge.state.is_canceled()) {
                 // transfer wager/fee back to challenger
                 utils::withdraw_wager_fees(store, challenge, challenge.address_a);
-            } else if (challenge.state == ChallengeState::InProgress) {
-                let new_round = Round {
-                    duel_id: challenge.duel_id,
-                    round_number: challenge.round_number,
-                    state: RoundState::Commit,
-                    moves_a: Default::default(),
-                    moves_b: Default::default(),
-                    state_a: Default::default(),
-                    state_b: Default::default(),
-                    final_blow: DuelistDrawnCard::None,
-                };
-                store.set_round(@new_round);
-            }
-
-            // undo pact if duel does not proceed
-            if (!challenge.state.is_live()) {
                 pact::unset_pact(store, challenge);
             }
             
