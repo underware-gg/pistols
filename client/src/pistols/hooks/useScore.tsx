@@ -28,9 +28,9 @@ export function useScore(score: Score | undefined) {
   const honourAndTotal = useMemo(() => (total_duels > 0 && honour > 0 ? <>{honour.toFixed(1)}<span className='Smaller'>/{total_duels}</span></> : EMOJI.ZERO), [honour, total_duels])
   const winRatio = useMemo(() => calcWinRatio(total_duels, total_wins), [total_duels, total_wins])
 
-  const isVillainous = useMemo(() => (total_duels > 0 && honour < HONOUR.TRICKSTER_START), [honour, total_duels])
-  const isTrickster = useMemo(() => (honour >= HONOUR.TRICKSTER_START && honour < HONOUR.LORD_START), [honour])
-  const isHonourable = useMemo(() => (honour >= HONOUR.LORD_START), [honour])
+  const isVillainous = useMemo(() => (total_duels > 0 && (honour * 10) < HONOUR.TRICKSTER_START), [honour, total_duels])
+  const isTrickster = useMemo(() => ((honour * 10) >= HONOUR.TRICKSTER_START && (honour * 10) < HONOUR.LORD_START), [honour])
+  const isHonourable = useMemo(() => ((honour * 10) >= HONOUR.LORD_START), [honour])
   const archetype = useMemo(() => (
     isHonourable ? Archetype.Honourable
       : isTrickster ? Archetype.Trickster

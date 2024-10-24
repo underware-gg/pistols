@@ -456,15 +456,6 @@ mod tester {
     }
 
     //
-    // view calls
-    //
-
-    // fn execute_get_pact(system: @IGameDispatcher, a: ContractAddress, b: ContractAddress) -> u128 {
-    //     let result: u128 = system.get_pact(a, b);
-    //     (result)
-    // }
-
-    //
     // getters
     //
 

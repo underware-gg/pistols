@@ -31,8 +31,9 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   const isValidDuelistId = useMemo(() => (isPositiveBigint(duelist_id) && BigInt(duelist_id) <= BigInt(CONST.MAX_DUELIST_ID)), [duelist_id])
 
   const { Duelist } = useDojoComponents()
-  const duelist: any = useComponentValue(Duelist, bigintToEntity(duelist_id ?? 0n))
-  // console.log(`Duelist`, duelist_id, bigintToEntity(duelist_id ?? 0n), duelist)
+  const entityId = useMemo(() => bigintToEntity(duelist_id ?? 0n), [duelist_id])
+  const duelist: any = useComponentValue(Duelist, entityId)
+  // console.log(`Duelist`, duelist_id, entityId, duelist)
 
   const name = useMemo(() => duelist?.name ? feltToString(duelist.name) : null, [duelist])
   const nameDisplay = useMemo(() => (`${name || 'Duelist'} #${isValidDuelistId ? duelist_id : '?'}`), [name, duelist_id])

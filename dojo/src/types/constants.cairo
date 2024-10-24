@@ -21,7 +21,7 @@ mod CONST {
 mod HONOUR {
     // archetype ranges (Honour)
     const TRICKSTER_START: u8 = 40;
-    const LORD_START: u8 = 80;
+    const LORD_START: u8 = 70;
 }
 
 mod CHANCES {

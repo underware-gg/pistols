@@ -17,6 +17,7 @@ import { BladesIcon, PacesIcon } from '@/pistols/components/ui/PistolsIcon'
 import AppPistols from '@/pistols/components/AppPistols'
 import { EMOJI } from '@/pistols/data/messages'
 import { ENV_POINTS } from '@/games/pistols/generated/constants'
+import { DuelIconsAsRow } from '@/pistols/components/DuelIcons'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -170,6 +171,18 @@ function DuelStats({
             {challenge.quote}
           </Cell>
         </Row>
+        <Row>
+          <Cell>Progress A</Cell>
+          <Cell>
+            <DuelIconsAsRow duelId={duelId} duelistId={challenge.duelistIdA} size={'large'} />
+          </Cell>
+        </Row>
+        <Row>
+          <Cell>Progress B</Cell>
+          <Cell>
+            <DuelIconsAsRow duelId={duelId} duelistId={challenge.duelistIdB} size={'large'} />
+          </Cell>
+        </Row>
       </Body>
     </Table>
   )
@@ -252,9 +265,9 @@ function RoundStats({
             </Cell>
           </Row>
           <Row>
-            <Cell>Final Step</Cell>
+            <Cell>Final Blow</Cell>
             <Cell>
-              {round.final_step}
+              {round.final_blow}: {round.endedInBlades ? <BladesIcon blade={round.final_blow} /> : round.final_blow ? <PacesIcon paces={round.final_blow} /> : '-'}
             </Cell>
           </Row>
         </Body>

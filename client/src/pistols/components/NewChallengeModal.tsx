@@ -7,14 +7,13 @@ import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useTable, useTableAccountBalance } from '@/pistols/hooks/useTable'
 import { usePact } from '@/pistols/hooks/usePact'
-import { useCalcFee } from '@/pistols/hooks/useContractCalls'
+import { useCalcFeeDuel } from '@/pistols/hooks/useContractCalls'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { FormInput } from '@/pistols/components/ui/Form'
 import { Balance } from '@/pistols/components/account/Balance'
 import { WagerAndOrFees } from '@/pistols/components/account/LordsBalance'
-import { ethToWei } from '@/lib/utils/starknet'
 import { PremisePrefix } from '@/pistols/utils/pistols'
 import { Divider } from '@/lib/ui/Divider'
 import { Premise } from '@/games/pistols/generated/constants'
@@ -47,8 +46,7 @@ export default function NewChallengeModal() {
 
   const [args, setArgs] = useState(null)
 
-  const wagerValue = useMemo(() => (args?.wager_value ?? 0n), [args])
-  const { fee } = useCalcFee(tableId, wagerValue)
+  const { fee } = useCalcFeeDuel(tableId)
   const { canWager, wagerMin, tableIsOpen } = useTable(tableId)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -68,7 +66,7 @@ export default function NewChallengeModal() {
   const _create_duel = () => {
     const _submit = async () => {
       setIsSubmitting(true)
-      await create_duel(account, duelistId, challengingId, args.premise, args.quote, tableId, args.wager_value, args.expire_hours)
+      await create_duel(account, duelistId, challengingId, args.premise, args.quote, tableId, args.expire_hours)
       setIsSubmitting(false)
     }
     if (args) _submit()
@@ -103,7 +101,7 @@ export default function NewChallengeModal() {
           <Grid style={{ width: '350px' }}>
             <Row columns='equal' textAlign='left'>
               <Col>
-                <ProfileDescription duelistId={duelistIdA} displayOwnerAddress={true} />
+                <ProfileDescription duelistId={duelistIdA} displayOwnerAddress={false} />
                 {canWager && <h5><Balance tableId={tableId} wei={balanceA} /></h5>}
               </Col>
             </Row>
@@ -114,7 +112,7 @@ export default function NewChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <ProfileDescription duelistId={duelistIdB} address={duelistIdB} displayOwnerAddress={true} />
+                <ProfileDescription duelistId={duelistIdB} displayOwnerAddress={false} />
                 {canWager && <h5><Balance tableId={tableId} wei={balanceB} /></h5>}
               </Col>
             </Row>
@@ -143,7 +141,7 @@ export default function NewChallengeModal() {
               {tableIsOpen &&
                 <BalanceRequiredButton
                   tableId={tableId}
-                  wagerValue={wagerValue}
+                  wagerValue={0}
                   minWagerValue={wagerMin}
                   fee={fee}
                   disabled={!args || isSubmitting}
@@ -169,10 +167,9 @@ function NewChallengeForm({
   const [quote, setQuote] = useState('')
   const [days, setDays] = useState(7)
   const [hours, setHours] = useState(0)
-  const [value, setValue] = useState(0)
-  const { fee } = useCalcFee(tableId, ethToWei(value))
+  const { fee } = useCalcFeeDuel(tableId)
 
-  const canSubmit = useMemo(() => (quote.length > 3 && (days + hours) > 0), [quote, days, hours, value])
+  const canSubmit = useMemo(() => (quote.length > 3 && (days + hours) > 0), [quote, days, hours])
 
   useEffect(() => {
     setArgs(canSubmit ? {
@@ -180,9 +177,8 @@ function NewChallengeForm({
       quote,
       expire_hours: ((days * 24 * 60 * 60) + hours),
       table_id: tableId,
-      wager_value: ethToWei(value),
     } : null)
-  }, [premise, quote, days, hours, value])
+  }, [premise, quote, days, hours])
 
   const premiseOptions: any[] = useMemo(() => Object.keys(Premise).slice(1).map((premise, index) => ({
     key: `${premise}`,
@@ -246,25 +242,7 @@ function NewChallengeForm({
           </Grid>
         </Form.Field>
 
-        {canWager &&
-          <Form.Field>
-            <FormInput
-              label='Wager -- deposit now, winner takes all, minus fee'
-              placeholder={'$LORDS'}
-              value={canWager ? value.toString() : 'No wager in this Table'}
-              setValue={(newValue) => {
-                const _lords = newValue ? parseInt(newValue) : 0
-                if (!isNaN(_lords)) {
-                  setValue(_lords)
-                }
-              }}
-              maxLength={7}
-              disabled={!canWager}
-            />
-          </Form.Field>
-        }
-
-        <WagerAndOrFees big tableId={tableId} value={ethToWei(value)} fee={fee} prefixed />
+        <WagerAndOrFees big tableId={tableId} value={0} fee={fee} prefixed />
 
       </Form>
     </div>

@@ -7,7 +7,7 @@ import { BladesIcon, PacesIcon } from '@/pistols/components/ui/PistolsIcon'
 import { bigintEquals } from '@/lib/utils/types'
 import { EMOJI } from '@/pistols/data/messages'
 import { BigNumberish } from 'starknet'
-import { getBladesCardFromValue, getPacesCardFromValue } from '@/games/pistols/generated/constants'
+import { CONST, getBladesCardFromValue, getPacesCardFromValue } from '@/games/pistols/generated/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -36,16 +36,13 @@ export function useDuelIcons({
   const isTurn = useMemo(() => (isA ? turnA : isB ? turnB : false), [isA, isB, turnA, turnB])
   const completedStages = useMemo(() => (isA ? (completedStagesA) : isB ? (completedStagesB) : null), [isA, isB, completedStagesA, completedStagesB])
 
-  const dead = useMemo(() => (
-    (isFinished && state1?.health == 0) ? EMOJI.DEAD : null
-  ), [state1, isFinished])
-  const blood1 = useMemo(() => (
-    (isFinished && !dead && state1?.damage > 0) ? EMOJI.INJURED : null
-  ), [state1, isFinished, dead])
-  const blood2 = useMemo(() => (
-    (blood1 == EMOJI.INJURED && state1.damage > 1) ? EMOJI.INJURED : null
-  ), [state1, blood1])
+  const dead = useMemo(() => ((isFinished && state1?.health == 0) ? EMOJI.DEAD : null), [state1, isFinished])
   const win1 = useMemo(() => (isWinner ? EMOJI.WINNER : null), [isWinner])
+  const bloodCount = useMemo(() => (
+    (isFinished && !dead && state1 && state1.health < CONST.FULL_HEALTH) ? (CONST.FULL_HEALTH - state1.health) : 0
+  ), [state1, isFinished, dead])
+
+  // console.log(`ICONS:`, duelistId, dead, win1, bloodCount, state1)
 
   const iconSize = size as IconSizeProp
 
@@ -89,8 +86,6 @@ export function useDuelIcons({
             </CompletedIcon>
           )
         }
-        if (blood1) icons1.push(<EmojiIcon key='blood1' emoji={blood1} size={iconSize} />)
-        if (blood2) icons1.push(<EmojiIcon key='blood2' emoji={blood2} size={iconSize} />)
       }
       if (isTurn) {
         (icons2.length > 0 ? icons2 : icons1).push(<LoadingIcon key='isTurn' size={iconSize} className='Brightest' />)
@@ -113,8 +108,9 @@ export function useDuelIcons({
         }
       }
 
-      if (blood1) icons1.push(<EmojiIcon key='blood1' emoji={blood1} size={iconSize} />)
-      if (blood2) icons1.push(<EmojiIcon key='blood2' emoji={blood2} size={iconSize} />)
+      for (let i = 0; i < bloodCount; i++) {
+        icons1.push(<EmojiIcon key={`blood${i}`} emoji={EMOJI.INJURED} size={iconSize} />)
+      }
 
       if (round1?.endedInBlades) {
         const cardBlades = getBladesCardFromValue(moves1.card_4)
@@ -126,7 +122,7 @@ export function useDuelIcons({
     }
 
     return { icons1, icons2, icons3 }
-  }, [isAwaiting, isInProgress, isFinished, duelStage, isA, isB, isTurn, state1, completedStages, blood1, blood2, win1, dead, iconSize])
+  }, [isAwaiting, isInProgress, isFinished, duelStage, isA, isB, isTurn, state1, completedStages, win1, dead, bloodCount, iconSize])
 
   return {
     icons1,

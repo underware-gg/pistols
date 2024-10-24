@@ -23,14 +23,14 @@ export const useCanJoin = () => {
   }
 }
 
-export const useCalcFee = (table_id: string, wager_value: BigNumberish) => {
-  const { calc_fee } = useDojoSystemCalls()
+export const useCalcFeeDuel = (table_id: string) => {
+  const { calc_fee_duel } = useDojoSystemCalls()
   const options = useMemo(() => ({
-    call: calc_fee,
-    args: [table_id, wager_value],
+    call: calc_fee_duel,
+    args: [table_id],
     enabled: Boolean(table_id),
     defaultValue: null,
-  }), [calc_fee, table_id, wager_value])
+  }), [calc_fee_duel, table_id])
   const { value, isPending } = useContractCall(options)
   return {
     fee: value,

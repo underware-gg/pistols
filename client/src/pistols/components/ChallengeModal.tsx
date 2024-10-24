@@ -114,7 +114,7 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <ProfileDescription duelistId={duelistIdB} address={duelistAddressB} displayOwnerAddress={false} />
+                <ProfileDescription duelistId={duelistIdB} displayOwnerAddress={false} />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -179,9 +179,14 @@ export default function ChallengeModal() {
               <ActionButton large fill label='Close' onClick={() => _close()} />
             </Col>
             {(state == ChallengeState.Awaiting && isChallenger) &&
-              <Col>
-                <ActionButton large fill negative label='Cowardly Withdraw' disabled={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
-              </Col>
+              <>
+                <Col>
+                  <ActionButton large fill negative label='Cowardly Withdraw' disabled={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
+                </Col>
+                <Col>
+                  <ActionButton large fill important label='Go to Live Duel!' onClick={() => _gotoDuel()} />
+                </Col>
+              </>
             }
             {(state == ChallengeState.Awaiting && isChallenged) &&
               <Col>

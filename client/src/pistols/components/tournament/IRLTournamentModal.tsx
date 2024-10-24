@@ -45,8 +45,7 @@ export default function IRLTournamentModal({
   const { duelId } = useChallengeToSelf()
   const { account, address } = useAccount()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const wagerValue = 0n;
-  const expireSeconds = (60 * 60);
+  const expireHours = 1;
   const isReply = Boolean(duelId)
   const _challenge = () => {
     const _submit = async () => {
@@ -56,7 +55,7 @@ export default function IRLTournamentModal({
         await reply_duel(account, duelistId, duelId, true)
       } else {
         // challenge self
-        await create_duel(account, duelistId, address, Premise.Honour, 'For Honour!', tableId, wagerValue, expireSeconds)
+        await create_duel(account, duelistId, address, Premise.Honour, 'For Honour!', tableId, expireHours)
       }
       setIsSubmitting(false)
     }

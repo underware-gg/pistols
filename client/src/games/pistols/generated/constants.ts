@@ -664,7 +664,7 @@ type type_HONOUR = {
 };
 export const HONOUR: type_HONOUR = {
   TRICKSTER_START: 40,
-  LORD_START: 80,
+  LORD_START: 70,
 };
 
 // from: ../dojo/src/types/constants.cairo
