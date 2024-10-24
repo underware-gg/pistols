@@ -1,16 +1,15 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Button, ButtonGroup, Divider, Grid, Modal, Pagination } from 'semantic-ui-react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { Divider, Grid, Modal } from 'semantic-ui-react'
 import { useAccount, useNetwork } from '@starknet-react/core'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { CommitMoveMessage, signAndGenerateMovesHash } from '@/pistols/utils/salt'
 import { feltToString } from '@/lib/utils/starknet'
-import { BLADES_POINTS, BladesCard, getBladesCardFromValue, getBladesCardValue, getTacticsCardFromValue, getTacticsCardValue, PACES_CARDS, TACTICS_POINTS, TacticsCard } from '@/games/pistols/generated/constants'
+import { BLADES_POINTS, getBladesCardFromValue, getTacticsCardFromValue, TACTICS_POINTS } from '@/games/pistols/generated/constants'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { Card, CardHandle } from './cards/Cards'
 import { BladesCardsTextures, CardData, DodgeCardsTextures, FireCardsTextures, TacticsCardsTextures } from '../data/assets'
-import { num } from 'starknet'
 import useGameAspect from '../hooks/useGameApect'
 import { emitter } from '../three/game'
 
@@ -40,7 +39,7 @@ export default function CommitPacesModal({
   const [blades, setBlades] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const { aspectWidth, aspectHeight, boxW, boxH, aspect } = useGameAspect()
+  const { aspectWidth, boxW, boxH, aspect } = useGameAspect()
 
   useEffect(() => {
     setFirePaces(0)
@@ -82,30 +81,27 @@ export default function CommitPacesModal({
     const bladesName = getBladesCardFromValue(blades);
     const bladesPoints = _points_list(BLADES_POINTS[bladesName]);
 
-    // Combine the two objects by summing values for each key
     const combinedPoints = {
-        self_chances: tacticsPoints.self_chances + bladesPoints.self_chances,
-        self_damage: tacticsPoints.self_damage + bladesPoints.self_damage,
-        other_chances: tacticsPoints.other_chances + bladesPoints.other_chances,
-        other_damage: tacticsPoints.other_damage + bladesPoints.other_damage,
-        special: [
-          tacticsPoints.special ? `Tactic: ${tacticsPoints.special}` : '',
-          bladesPoints.special ? `Blades: ${bladesPoints.special}` : ''
-        ]
-          .filter(Boolean) // Only keep non-empty specials
-          .join('<br />') || '-' // If empty, return '-'
+      self_chances: tacticsPoints.self_chances + bladesPoints.self_chances,
+      self_damage: tacticsPoints.self_damage + bladesPoints.self_damage,
+      other_chances: tacticsPoints.other_chances + bladesPoints.other_chances,
+      other_damage: tacticsPoints.other_damage + bladesPoints.other_damage,
+      special: [
+        tacticsPoints.special ? `Tactic: ${tacticsPoints.special}` : '',
+        bladesPoints.special ? `Blades: ${bladesPoints.special}` : ''
+      ]
+        .filter(Boolean)
+        .join('<br />') || '-'
     };
 
-    // Format the numbers as strings with + or - signs and % for chances
     const formattedPoints = {
-        self_chances: `${combinedPoints.self_chances >= 0 ? '+' : ''}${combinedPoints.self_chances}%`,
-        self_damage: `${combinedPoints.self_damage >= 0 ? '+' : ''}${combinedPoints.self_damage}`,
-        other_chances: `${combinedPoints.other_chances >= 0 ? '+' : ''}${combinedPoints.other_chances}%`,
-        other_damage: `${combinedPoints.other_damage >= 0 ? '+' : ''}${combinedPoints.other_damage}`,
-        special: combinedPoints.special
+      self_chances: `${combinedPoints.self_chances > 0 ? '+' : ''}${combinedPoints.self_chances}%`,
+      self_damage: `${combinedPoints.self_damage > 0 ? '+' : ''}${combinedPoints.self_damage}`,
+      other_chances: `${combinedPoints.other_chances > 0 ? '+' : ''}${combinedPoints.other_chances}%`,
+      other_damage: `${combinedPoints.other_damage > 0 ? '+' : ''}${combinedPoints.other_damage}`,
+      special: combinedPoints.special
     };
 
-    // Check if either object has all zero values, and return appropriately
     const isTacticsEmpty = Object.values(tacticsPoints).slice(0, 4).every(value => value === 0);
     const isBladesEmpty = Object.values(bladesPoints).slice(0, 4).every(value => value === 0);
 
@@ -114,7 +110,6 @@ export default function CommitPacesModal({
 
     return formattedPoints;
   }, [tactics, blades]);
-
 
 
   return (
@@ -130,7 +125,10 @@ export default function CommitPacesModal({
         flexDirection: 'column',
         alignContent: 'space'
       }}
-      onClose={() => setIsOpen(false)}
+      onClose={() => {
+        emitter.emit('hover_scene', null)
+        setIsOpen(false)
+      }}
       open={isOpen}
     >
       <Modal.Header className='AlignCenter NoPadding' style={{ height: aspectWidth(modalHeight * 0.06), lineHeight: `${aspectWidth(modalHeight * 0.06)}px` }}>Choose your cards...</Modal.Header>
@@ -212,7 +210,6 @@ const _points_list = (points: any) => {
     special: points?.special ?? '',
   };
 };
-
 
 
 function CardSelector({
@@ -302,6 +299,7 @@ function CardSelector({
                 cardClick(index)
                 unSelectCard()
                 onSelect(currentCard == index + 1 ? 0 : index + 1)
+                // cardRefs[index].current.toggleHighlight(true)
               }
             }}
           />

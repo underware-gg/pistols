@@ -410,7 +410,7 @@ export const TacticsCardsTextures: Record<TacticsCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Coin Flip', 
     rarity: Rarity.None, 
-    description: 'Next special card doesn\'t affect you' 
+    description: 'First special card doesn\'t affect you' 
   },
   [TacticsCard.Vengeful]: { 
     path: '/textures/cards/illustrations/Second_Reaction.png', 
@@ -463,6 +463,14 @@ export const BladesCardsTextures: Record<BladesCard, CardData> = {
     rarity: Rarity.None, 
     description: `Increase your damage by ${getTextSpan(CardColor.RED, '+1')} and your hit chance by ${getTextSpan(CardColor.YELLOW, '+20%')}` 
   },
+  [BladesCard.PocketPistol]: { 
+    path: '/textures/cards/illustrations/Decapitation.png', 
+    cardFrontPath: '/textures/cards/card_front_brown.png', 
+    color: CardColor.WHITE, 
+    title: 'Pocket Pistol', 
+    rarity: Rarity.None, 
+    description: `Decrease opponents hit chance by ${getTextSpan(CardColor.YELLOW, '-10%')}`
+  },
   [BladesCard.Behead]: { 
     path: '/textures/cards/illustrations/Decapitation.png', 
     cardFrontPath: '/textures/cards/card_front_brown.png', 
@@ -478,15 +486,7 @@ export const BladesCardsTextures: Record<BladesCard, CardData> = {
     title: 'Grapple', 
     rarity: Rarity.None, 
     description: `Decrease opponents damage by ${getTextSpan(CardColor.RED, '-1')}`
-  },
-  [BladesCard.PocketPistol]: { 
-    path: '/textures/cards/illustrations/Decapitation.png', 
-    cardFrontPath: '/textures/cards/card_front_brown.png', 
-    color: CardColor.WHITE, 
-    title: 'Pocket Pistol', 
-    rarity: Rarity.None, 
-    description: `Decrease opponents hit chance by ${getTextSpan(CardColor.YELLOW, '-10%')}`
-  },
+  }
 }
 
 export const sceneBackgrounds: Record<SceneName, TextureName> = {
