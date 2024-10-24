@@ -410,14 +410,13 @@ pub mod duel_token {
             let table: TableConfigEntity = store.get_table_config_entity(table_id);
             (table.calc_fee(0))
         }
+        
         fn get_pact(self: @ContractState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128 {
             let store: Store = StoreTrait::new(self.world());
             (pact::get_pact(store, table_id, duelist_id_a, duelist_id_b))
         }
-
         fn has_pact(self: @ContractState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool {
-            let store: Store = StoreTrait::new(self.world());
-            (pact::get_pact(store, table_id, duelist_id_a, duelist_id_b) != 0)
+            (self.get_pact(table_id, duelist_id_a, duelist_id_b) != 0)
         }
 
         fn can_join(self: @ContractState, table_id: felt252, duelist_id: u128) -> bool {

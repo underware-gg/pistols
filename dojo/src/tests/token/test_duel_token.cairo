@@ -9,7 +9,7 @@ use pistols::systems::tokens::{
     duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
     lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
 };
-use pistols::tests::token::mock_duelist::{duelist_token as mock_duelist};
+use pistols::interfaces::systems::{SELECTORS};
 use pistols::models::{
     challenge::{Challenge, Wager, Round},
     config::{Config},
@@ -20,10 +20,12 @@ use pistols::models::{
 use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
 use pistols::types::premise::{Premise, PremiseTrait};
 use pistols::types::constants::{CONST};
-use pistols::interfaces::systems::{SELECTORS};
+use pistols::utils::arrays::{ArrayUtilsTrait, SpanUtilsTrait};
+use pistols::utils::math::{MathTrait};
+
+use pistols::tests::token::mock_duelist::{duelist_token as mock_duelist, mock_duelist_owners};
 use pistols::tests::tester::{tester, tester::{OWNER, OTHER, BUMMER, ZERO}};
 use pistols::tests::{utils};
-use pistols::utils::math::{MathTrait};
 
 use openzeppelin_token::erc721::interface;
 use openzeppelin_token::erc721::{
@@ -82,19 +84,22 @@ const TOKEN_ID_4: u256 = 4; // owned by RECIPIENT()
 fn setup_uninitialized(fee_amount: u128) -> (IWorldDispatcher, IDuelTokenDispatcher) {
     testing::set_block_number(1);
     testing::set_block_timestamp(1);
-    let mut world = spawn_test_world(
-        ["pistols"].span(),
-        get_models_test_class_hashes!(),
-    );
+
+    let mut models: Array<felt252> = array![];
+    models.extend_from_span(get_models_test_class_hashes!(["pistols"]));
+    models.extend_from_span([mock_duelist_owners::TEST_CLASS_HASH].span());
+
+    let mut world = spawn_test_world(["pistols"].span(), models.span());
 
     let mut lords = ILordsMockDispatcher{
         contract_address: world.deploy_contract('lords_mock', lords_mock::TEST_CLASS_HASH.try_into().unwrap())
     };
     world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), lords.contract_address);
 
-    let mut _duelists = IDuelistTokenDispatcher {
+    let mut duelists = IDuelistTokenDispatcher {
         contract_address: world.deploy_contract('duelist_token', mock_duelist::TEST_CLASS_HASH.try_into().unwrap())
     };
+    world.grant_writer(selector_from_tag!("pistols-MockDuelistOwners"), duelists.contract_address);
 
     let mut token = IDuelTokenDispatcher {
         contract_address: world.deploy_contract('duel_token', duel_token::TEST_CLASS_HASH.try_into().unwrap())

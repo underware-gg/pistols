@@ -86,7 +86,7 @@ mod prefabs {
     fn start_get_new_challenge(sys: Systems, duelist_a: ContractAddress, duelist_b: ContractAddress, table_id: felt252) -> (ChallengeEntity, RoundEntity, u128) {
         let duel_id: u128 = start_new_challenge(sys, duelist_a, duelist_b, table_id);
         let challenge: ChallengeEntity = tester::get_ChallengeEntity(sys.world, duel_id);
-        let round: RoundEntity = tester::get_RoundEntity(sys.world, duel_id, 1);
+        let round: RoundEntity = tester::get_RoundEntity(sys.world, duel_id);
         assert(challenge.state == ChallengeState::InProgress, 'challenge.state');
         assert(round.state == RoundState::Commit, 'round.state');
         (challenge, round, duel_id)
@@ -94,10 +94,10 @@ mod prefabs {
 
     fn commit_reveal_get(sys: Systems, duel_id: u128, duelist_a: ContractAddress, duelist_b: ContractAddress, salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves) -> (ChallengeEntity, RoundEntity) {
         @sys.rng.mock_values(salts.salts, salts.values);
-        tester::execute_commit_moves(@sys.game, duelist_a, duel_id, 1, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, duelist_b, duel_id, 1, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, duelist_a, duel_id, 1, moves_a.salt, moves_a.moves);
-        tester::execute_reveal_moves(@sys.game, duelist_b, duel_id, 1, moves_b.salt, moves_b.moves);
+        tester::execute_commit_moves(@sys.game, duelist_a, duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys.game, duelist_b, duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys.game, duelist_a, duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys.game, duelist_b, duel_id, moves_b.salt, moves_b.moves);
         let (challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
         (challenge, round)
     }

@@ -18,7 +18,7 @@ mod tester {
             lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
         },
     };
-    use pistols::tests::token::mock_duelist::{duelist_token as mock_duelist};
+    use pistols::tests::token::mock_duelist::{duelist_token as mock_duelist, mock_duelist_owners};
     use pistols::types::challenge_state::{ChallengeState};
     use pistols::types::constants::{CONST};
     use pistols::types::premise::{Premise};
@@ -163,6 +163,9 @@ mod tester {
             // namespaces.append("mock");
             models.extend_from_span([salt_value::TEST_CLASS_HASH].span());
         }
+        if (!deploy_duelist && deploy_game) {
+            models.extend_from_span([mock_duelist_owners::TEST_CLASS_HASH].span());
+        }
 
         // deploy world
 // '---- spawn_test_world...'.print();
@@ -240,7 +243,9 @@ mod tester {
                 (address)
             }
             else if (deploy_game) {
-                (deploy_system(world, 'duelist_token', mock_duelist::TEST_CLASS_HASH))
+                let address = deploy_system(world, 'duelist_token', mock_duelist::TEST_CLASS_HASH);
+                world.grant_writer(selector_from_tag!("pistols-MockDuelistOwners"), address);
+                (address)
             }
             else {ZERO()}
         };
@@ -429,8 +434,15 @@ mod tester {
         duel_id: u128,
         hash: u128,
     ) {
+        execute_commit_moves_ID(system, sender, ID(sender), duel_id, hash);
+    }
+    fn execute_commit_moves_ID(system: @IGameDispatcher, sender: ContractAddress,
+        token_id: u128,
+        duel_id: u128,
+        hash: u128,
+    ) {
         impersonate(sender);
-        (*system).commit_moves(ID(sender), duel_id, hash);
+        (*system).commit_moves(token_id, duel_id, hash);
         _next_block();
     }
     fn execute_reveal_moves(system: @IGameDispatcher, sender: ContractAddress,

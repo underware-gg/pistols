@@ -102,7 +102,7 @@ mod tests {
     fn test_round_exists() {
         let sys = tester::setup_world(FLAGS::APPROVE);
         // get some random inexisting round
-        let round = tester::get_RoundEntity(sys.world, 0x682137812638127638127, 1);
+        let round = tester::get_RoundEntity(sys.world, 0x682137812638127638127);
         let state: RoundState = round.state.try_into().unwrap();
         assert(state == RoundState::Null, 'RoundState::Null');
         assert(state.exists() == false, 'exists()');

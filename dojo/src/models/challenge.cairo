@@ -93,10 +93,20 @@ pub struct DuelistState {
 // Traits
 //
 use pistols::types::cards::hand::{DuelistHand};
+use pistols::types::constants::{CONST};
 use pistols::utils::arrays::{SpanUtilsTrait};
 use pistols::utils::hash::{hash_values};
 use pistols::utils::math::{MathTrait};
-use pistols::types::constants::{CONST};
+
+#[generate_trait]
+impl ChallengeImpl of ChallengeTrait {
+    #[inline(always)]
+    fn duelist_number(self: Challenge, duelist_id: u128) -> u8 {
+        (if (duelist_id == self.duelist_id_a) {(1)}
+        else if (duelist_id == self.duelist_id_b) {(2)}
+        else {(0)})
+    }
+}
 
 #[generate_trait]
 impl RoundImpl of RoundTrait {

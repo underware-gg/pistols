@@ -1,19 +1,30 @@
 use starknet::{ContractAddress};
 
+#[derive(Clone, Drop, Serde)]   // pass to functions using duelist.clone()
+#[dojo::model]
+pub struct MockDuelistOwners {
+    #[key]
+    pub token_id: u128,
+    pub address: ContractAddress,
+}
+
 #[dojo::interface]
 trait IDuelistToken {
+    // ERC
+    fn transfer_from(ref world: IWorldDispatcher, from: ContractAddress, to: ContractAddress, token_id: u256);
     fn owner_of(world: @IWorldDispatcher, token_id: u256) -> ContractAddress;
+    // Token
     fn exists(world: @IWorldDispatcher, token_id: u128) -> bool;
     fn is_owner_of(world: @IWorldDispatcher, address: ContractAddress, token_id: u128) -> bool;
 }
 
 #[dojo::contract]
 mod duelist_token {
-    use super::IDuelistToken;
+    use super::{IDuelistToken, MockDuelistOwners};
     use debug::PrintTrait;
     use core::traits::Into;
     use starknet::{ContractAddress, get_contract_address, get_caller_address, get_tx_info};
-    use pistols::utils::misc::{WORLD};
+    use pistols::utils::misc::{WORLD, ZERO};
     use pistols::tests::tester::tester::{
         LITTLE_BOY, LITTLE_GIRL,
         OWNED_BY_LITTLE_BOY, OWNED_BY_LITTLE_GIRL,
@@ -21,8 +32,20 @@ mod duelist_token {
 
     #[abi(embed_v0)]
     impl ERC721MockImpl of IDuelistToken<ContractState> {
+        fn transfer_from(ref world: IWorldDispatcher, from: ContractAddress, to: ContractAddress, token_id: u256) {
+            set!(world, (
+                MockDuelistOwners {
+                    token_id: token_id.low,
+                    address: to,
+                }
+            ));
+        }
+
         fn owner_of(world: @IWorldDispatcher, token_id: u256) -> ContractAddress {
-            WORLD(world);
+            let owner: MockDuelistOwners = get!(world, token_id.low, (MockDuelistOwners));
+            if (owner.address != ZERO()) {
+                return owner.address;
+            }
 
             let as_felt: felt252 = token_id.low.into();
             let as_addr: ContractAddress = as_felt.try_into().unwrap();

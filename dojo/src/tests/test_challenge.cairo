@@ -381,7 +381,7 @@ mod tests {
         assert(ch.timestamp_end == 0, 'timestamp_end');
         assert(ch.address_b == B, 'challenged');   // << UPDATED!!!
         
-        let round = tester::get_RoundEntity(sys.world, duel_id, 1);
+        let round = tester::get_RoundEntity(sys.world, duel_id);
         assert(round.state == RoundState::Commit, 'round.state');
 
         _assert_empty_progress(sys, duel_id);
