@@ -293,7 +293,7 @@ pub mod duel_token {
                 moves_b: Default::default(),
                 state_a: Default::default(),
                 state_b: Default::default(),
-                final_blow: DuelistDrawnCard::None,
+                final_blow: 0,
             };
             store.set_round(@round);
 

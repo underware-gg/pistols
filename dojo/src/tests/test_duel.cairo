@@ -9,6 +9,7 @@ mod tests {
     use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, RoundEntity};
     use pistols::models::duelist::{Duelist, DuelistEntity, DuelistEntityStore, ProfilePicType, Archetype};
     use pistols::models::table::{TableConfig, TABLES};
+    use pistols::types::cards::hand::{PacesCard, PacesCardTrait};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::duel_progress::{DuelProgress, DuelStep};
     use pistols::types::round_state::{RoundState, RoundStateTrait};
@@ -113,9 +114,10 @@ mod tests {
         assert(challenge.state == ChallengeState::Draw, 'challenge.state');
         assert(challenge.winner == 0, 'challenge.winner');
         assert(round.state == RoundState::Finished, 'round.state');
-        assert(round.final_blow == DuelistDrawnCard::Fire(MathU8::max(*moves_a.moves[0], *moves_b.moves[0]).into()), 'round.final_step');
         assert(round.state_a.health == final_health, 'round.moves_a.health');
         assert(round.state_b.health == final_health, 'round.moves_b.health');
+        let final_blow: PacesCard = MathU8::max(*moves_a.moves[0], *moves_b.moves[0]).into();
+        assert(round.final_blow == final_blow.variant_name(), 'round.final_blow');
         if (final_health == 0) {
             _assert_is_dead(round.state_a, 'dead_a');
             _assert_is_dead(round.state_b, 'dead_b');
@@ -232,7 +234,6 @@ mod tests {
         assert(challenge.winner != 0, '4_challenge.winner');
         assert(challenge.timestamp_end > 0, '4_challenge.timestamp_end');
         assert(round.state == RoundState::Finished, '4__state');
-        assert(round.final_blow == DuelistDrawnCard::Fire(if(winner == 1){*moves_a.moves[0]}else{*moves_b.moves[0]}.into()), 'round.final_step');
         assert(round.moves_a.hashed == moves_a.hashed, '43__hash');
         assert(round.moves_a.salt == moves_a.salt, '43__salt');
         assert(round.moves_a.card_1.into() == *moves_a.moves[0], '43__card_fire');
@@ -241,6 +242,8 @@ mod tests {
         assert(round.moves_b.salt == moves_b.salt, '4__salt');
         assert(round.moves_b.card_1.into() == *moves_b.moves[0], '4__card_fire');
         assert(round.moves_b.card_2.into() == *moves_b.moves[1], '4__card_dodge');
+        let final_blow: PacesCard = (if(winner == 1){*moves_a.moves[0]}else{*moves_b.moves[0]}.into());
+        assert(round.final_blow == final_blow.variant_name(), 'round.final_blow');
 
         let duelist_a = tester::get_DuelistEntity(sys.world, OWNER());
         let duelist_b = tester::get_DuelistEntity(sys.world, OTHER());

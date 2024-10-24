@@ -116,7 +116,7 @@ fn game_loop(world: IWorldDispatcher, deck_type: DeckType, ref round: Round) -> 
     let mut step_number: u8 = 1;
     while (step_number <= 10) {
         let pace: PacesCard = step_number.into();
-        round.final_blow = DuelistDrawnCard::Fire(pace);
+        round.final_blow = pace.variant_name();
         // println!("Pace [{}] A:{} B:{}", step_number, self.moves_a.card_fire.as_felt(), self.moves_b.card_fire.as_felt());
 
         // draw env card
@@ -170,24 +170,22 @@ fn game_loop(world: IWorldDispatcher, deck_type: DeckType, ref round: Round) -> 
         (hand_a.card_blades != BladesCard::None || hand_b.card_blades != BladesCard::None)
     ) {
         blades(hand_a.card_blades, hand_b.card_blades, ref state_a, ref state_b);
-        let card_a = DuelistDrawnCard::Blades(hand_a.card_blades);
-        let card_b = DuelistDrawnCard::Blades(hand_b.card_blades);
         steps.append(DuelStep {
             pace: PacesCard::None,
             card_env: EnvCard::None,
             dice_env: 0,
             specials_a: Default::default(),
             specials_b: Default::default(),
-            card_a,
-            card_b,
+            card_a: DuelistDrawnCard::Blades(hand_a.card_blades),
+            card_b: DuelistDrawnCard::Blades(hand_b.card_blades),
             state_a,
             state_b,
         });
         round.final_blow =
-            if (card_a == DuelistDrawnCard::Blades(BladesCard::Seppuku)) {card_a}
-            else if (card_b == DuelistDrawnCard::Blades(BladesCard::Seppuku)) {card_b}
-            else if (state_a.health > 0) {card_a}
-            else {card_b};
+            if (hand_a.card_blades == BladesCard::Seppuku) {hand_a.card_blades.variant_name()}
+            else if (hand_b.card_blades == BladesCard::Seppuku) {hand_b.card_blades.variant_name()}
+            else if (state_a.health > 0) {hand_a.card_blades.variant_name()}
+            else {hand_b.card_blades.variant_name()};
     }
 
     // update round model

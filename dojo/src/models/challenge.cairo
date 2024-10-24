@@ -59,7 +59,7 @@ pub struct Round {
     pub state_a: DuelistState,
     pub state_b: DuelistState,
     pub state: RoundState,
-    pub final_blow: DuelistDrawnCard,
+    pub final_blow: felt252, // Card as string
 }
 
 //
