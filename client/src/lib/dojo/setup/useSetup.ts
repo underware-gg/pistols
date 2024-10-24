@@ -96,7 +96,10 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     const sync = await getSyncEntities(
       toriiClient,
       contractComponents as any,
-      [],
+      undefined,  // clause
+      [],         // entityKeyClause
+      1000,       // limit
+      true,       // logging
     )
     console.log(`SYNC FINISHED!!!`, sync, components)
     return sync
