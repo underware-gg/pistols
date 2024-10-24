@@ -9,6 +9,7 @@ import {
 import { TextureName } from '../data/assets';
 import { ShaderMaterial } from './shaders'
 import { SceneName } from '../hooks/PistolsContext';
+import { MenuLabels } from '../utils/pistols';
 
 const BAR_SCENES = {
   'ff0000': SceneName.Barkeep,    // red: bartender
@@ -118,13 +119,9 @@ export class BarMenu extends THREE.Object3D {
       this.pickedScene = BAR_SCENES[this.pickedColor.getHexString()]
       this.changeMouseCursor(this.pickedScene != null)
       this.maskShader.setUniformValue('uPickedColor', this.pickedColor)
-      emitter.emit('hover_scene', this.pickedScene ?? null)
+      emitter.emit('hover_scene', this.pickedScene ? MenuLabels[this.pickedScene] : null)
       // console.log(`X/Y ${this.mousePos.x} ${this.mousePos.y} RGB: [${this.pickedColor.getHexString()}]`, this.pickedScene);
     }
-  }
-
-  getTooltipAnchor() {
-    return document.getElementById('BarMenuTooltipAnchor');
   }
 
   changeMouseCursor(clickable: boolean) {
@@ -156,12 +153,6 @@ export class BarMenu extends THREE.Object3D {
       y = Math.floor((HEIGHT / 2) + (y - HEIGHT / 2) / scale)
 
       this.mousePos.set(x, y)
-
-      var tooltip_anchor = this.getTooltipAnchor();
-      if (tooltip_anchor) {
-        tooltip_anchor.style.left = `${event.clientX - tooltip_anchor.clientWidth / 2}px`;
-        tooltip_anchor.style.top = `${event.clientY - tooltip_anchor.clientHeight}px`;
-      }
 
       return
     }

@@ -28,7 +28,8 @@ import { useOwnerOfDuelist } from '../hooks/useTokenDuelist'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import 'react-circular-progressbar/dist/styles.css';
-import Cards, { CardsHandle, DuelistCardType, DuelistHand } from './Cards'
+import { DuelistCardType } from './cards/Cards'
+import Cards, { CardsHandle, DuelistHand } from './cards/DuelCards'
 import useGameAspect from '@/pistols/hooks/useGameApect'
 import { BladesCard, EnvCard, PacesCard, TacticsCard } from '@/games/pistols/generated/constants';
 import * as Constants from '../data/cardConstants'
@@ -602,7 +603,7 @@ function DuelistProfile({
 
           <div ref={hitChanceContainerRef} className='NumberDeltaContainer NoMouse NoDrag'>
             <div ref={hitChanceNumberRef} className='NumberDelta HitChance' data-floated={floated}>
-              { hitChanceDelta > 0 ? '+' : '' }{hitChanceDelta}
+              { hitChanceDelta > 0 ? '+' : '' }{hitChanceDelta}%
             </div>
           </div>
           <div ref={damageContainerRef} className='NumberDeltaContainer NoMouse NoDrag'>
@@ -623,7 +624,7 @@ function DuelistProfile({
 
           <div ref={hitChanceContainerRef} className='NumberDeltaContainer NoMouse NoDrag'>
             <div ref={hitChanceNumberRef} className='NumberDelta HitChance' data-floated={floated}>
-              { hitChanceDelta > 0 ? '+' : '' }{hitChanceDelta}
+              { hitChanceDelta > 0 ? '+' : '' }{hitChanceDelta}%
             </div>  
           </div>
           <div ref={damageContainerRef} className='NumberDeltaContainer NoMouse NoDrag'>

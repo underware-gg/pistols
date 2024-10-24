@@ -560,6 +560,43 @@ TextArea::selection {
 .ModalText {
   font-size: 18px!important;
 }
+
+.ModalTextSteps {
+  font-size: 1.8em!important;
+  color: $color-bright!important;
+  width: aspect-width(7);
+  margin-left: aspect-width(2);
+  margin-right: aspect-width(2);
+}
+
+.ModalTextBuffs {
+  font-size: 1.4em!important;
+}
+
+.ModalTextBuffs.You {
+  color: $color-positive
+}
+
+.ModalTextBuffs.Opponent {
+  color: $color-negative
+}
+
+.ModalTextBuffsNumber {
+  font-size: 1.6em!important;
+  font-weight: 800;
+  text-align: center;
+}
+
+.ModalTextBuffsNumber.You {
+  font-size: 2em!important;
+  color: $color-positive
+}
+
+.ModalTextBuffsNumber.Opponent {
+  font-size: 2em!important;
+  color: $color-negative
+}
+
 .DuelistModal {
   width: 900px;
   // height: 450px;
@@ -713,16 +750,17 @@ $ui-container-gap: 1em;
   // background-color: red;
 }
 
-.BarMenuTooltip {
+.ToolTip {
   // position: absolute!important;
   // top: 0!important;
   // right: 0!important;
 }
-#BarMenuTooltipAnchor {
+#MouseToolTipAnchor {
   @extend .NoMouse;
   position: fixed; // absolute to window
   top: 0;
   left: 0;
+  z-index: 10000;
   // display: none;
 }
 

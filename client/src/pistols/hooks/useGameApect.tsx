@@ -26,6 +26,7 @@ const useGameAspect = () => {
     const boxH = (windowSize.height - aspectH) / 2;
 
     return {
+      aspect,
       aspectW,
       aspectH,
       boxW,

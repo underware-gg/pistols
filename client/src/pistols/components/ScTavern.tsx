@@ -13,6 +13,7 @@ import BarkeepModal from '@/pistols/components/BarkeepModal'
 import TableModal from '@/pistols/components/TableModal'
 import { MenuLabels } from '@/pistols/utils/pistols'
 import { Header } from '@/pistols/components/Header'
+import { MouseToolTip } from './ui/MouseToolTip'
 
 export default function ScTavern() {
   const { tableOpener } = usePistolsContext()
@@ -30,7 +31,6 @@ export default function ScTavern() {
 
       <TavernMenu />
       <Header />
-      <BarkeepTooltip />
 
       <TableModal opener={tableOpener} />
       <DuelistModal />
@@ -42,19 +42,5 @@ export default function ScTavern() {
       <DojoSetupErrorDetector />
       {/* <ConnectionDetector /> */}
     </QueryProvider>
-  )
-}
-
-
-function BarkeepTooltip() {
-  const { value: hoverSceneValue } = useGameEvent('hover_scene', null)
-  const label = useMemo(() => (MenuLabels[hoverSceneValue]), [hoverSceneValue])
-  if (!hoverSceneValue) {
-    return <></>
-  }
-  return (
-    <div id='BarMenuTooltipAnchor' className='Relative'>
-      <Label pointing='below' className='BarMenuTooltip'>{label}</Label>
-    </div>
   )
 }

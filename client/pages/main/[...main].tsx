@@ -12,6 +12,7 @@ import ScProfile from '@/pistols/components/ScProfile'
 import ScTavern from '@/pistols/components/ScTavern'
 import Gate from '@/pistols/components/ScGate'
 import Duel from '@/pistols/components/Duel'
+import { MouseToolTip } from '@/pistols/components/ui/MouseToolTip'
 
 // // enable wasm in build (this is for api routes and server issues)
 // export const config = {
@@ -31,7 +32,8 @@ export default function MainPage() {
     <AppPistols headerData={{ title: sceneTitle }} backgroundImage={null}>
       <Background className={null}>
         <GameContainer isVisible={true} />
-        <MainUI />
+          <MainUI />
+          <MouseToolTip/>
       </Background>
     </AppPistols>
   )

@@ -23,7 +23,6 @@ import { map } from '@/lib/utils/math'
 import { SpriteSheet } from './SpriteSheetMaker'
 import { DuelistsManager } from './DuelistsManager.tsx'
 import { Action } from '../utils/pistols.tsx'
-import { getPacesCardValue, PacesCard } from '@/games/pistols/generated/constants.ts'
 import { BarMenu } from './BarMenu.tsx'
 import { DuelistState } from '../components/Duel.tsx'
 

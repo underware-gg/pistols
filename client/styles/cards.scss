@@ -22,6 +22,41 @@ $color-cold: #4d9ad6;
   transition: width 0.3s ease, height 0.3s ease, opacity 0.4s ease;
   perspective: 1000px;
   transform-origin: center bottom;
+  border-radius: calc(var(--card-width) * 0.065);
+}
+
+.card-inner,
+.card-back,
+.card-front,
+.card-outline {
+  border-radius: inherit; // Inherit the border radius from the parent
+}
+
+#card-filter-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 900;
+  border-radius: inherit;
+
+  &.visible {
+    opacity: 1;
+  }
+
+  &.disabled {
+    background-color: rgba(39, 17, 11, 0.7);
+    filter: brightness(0) saturate(100%) invert(0) sepia(1) hue-rotate(0deg) brightness(0.6) contrast(1);
+  }
+
+  &.selected {
+    background-color: rgb(255, 255, 200, 0.1);
+    filter: brightness(1) saturate(100%) invert(0) sepia(0) hue-rotate(0deg) brightness(0.6) contrast(1);
+  }
 }
 
 .card-inner {
@@ -40,7 +75,6 @@ $color-cold: #4d9ad6;
   height: 110%;
   transition: transform 0.8s;
   transform-style: preserve-3d;
-  border-radius: aspect-width(0.6);
   background-color: var(--background-color, white);;
   box-shadow: aspect-width(0.01) aspect-width(0.01) aspect-width(0.01) aspect-width(0.01) rgba(20, 20, 20, 0.6);
   filter: blur(4px);
@@ -87,9 +121,24 @@ $color-cold: #4d9ad6;
   padding-bottom: 5%;
 }
 
+.card-details-mini {
+  @extend .card-details;
+  justify-content: center;
+}
+
 .card-title {
   font-size: aspect-width(0.65);
   font-weight: bold;
+}
+
+.card-title-mini {
+  font-size: aspect-width(1);
+  line-height: aspect-width(0.95);
+  font-weight: bold;
+}
+
+.card-title-mini.title-small {
+  font-size: aspect-width(1.6);
 }
 
 .card-rarity, .card-description {
@@ -108,7 +157,6 @@ $color-cold: #4d9ad6;
   border-width: aspect-width(0.4);
   border-style: solid;
   border-color: #f5f5f5;
-  border-radius: aspect-width(0.6);
   box-shadow: aspect-width(0.01) aspect-width(0.01) aspect-width(0.01) aspect-width(0.01) rgba(20, 20, 20, 0.6);
 }
 
