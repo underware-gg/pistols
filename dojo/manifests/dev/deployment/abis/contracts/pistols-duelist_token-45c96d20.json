@@ -359,6 +359,24 @@
   },
   {
     "type": "struct",
+    "name": "pistols::systems::components::erc721_hooks::TokenMetadata",
+    "members": [
+      {
+        "name": "name",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "description",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "image",
+        "type": "core::byte_array::ByteArray"
+      }
+    ]
+  },
+  {
+    "type": "struct",
     "name": "core::array::Span::<core::byte_array::ByteArray>",
     "members": [
       {
@@ -373,71 +391,43 @@
     "items": [
       {
         "type": "function",
-        "name": "format_name",
+        "name": "get_token_metadata",
         "inputs": [
           {
             "name": "token_id",
             "type": "core::integer::u256"
-          },
-          {
-            "name": "duelist",
-            "type": "pistols::models::duelist::Duelist"
           }
         ],
         "outputs": [
           {
-            "type": "core::byte_array::ByteArray"
+            "type": "pistols::systems::components::erc721_hooks::TokenMetadata"
           }
         ],
         "state_mutability": "view"
       },
       {
         "type": "function",
-        "name": "format_description",
+        "name": "get_metadata_pairs",
         "inputs": [
           {
             "name": "token_id",
             "type": "core::integer::u256"
-          },
-          {
-            "name": "_duelist",
-            "type": "pistols::models::duelist::Duelist"
           }
         ],
         "outputs": [
           {
-            "type": "core::byte_array::ByteArray"
+            "type": "core::array::Span::<core::byte_array::ByteArray>"
           }
         ],
         "state_mutability": "view"
       },
       {
         "type": "function",
-        "name": "format_image",
+        "name": "get_attribute_pairs",
         "inputs": [
           {
-            "name": "duelist",
-            "type": "pistols::models::duelist::Duelist"
-          },
-          {
-            "name": "variant",
-            "type": "core::byte_array::ByteArray"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "core::byte_array::ByteArray"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "get_attributes",
-        "inputs": [
-          {
-            "name": "duelist",
-            "type": "pistols::models::duelist::Duelist"
+            "name": "token_id",
+            "type": "core::integer::u256"
           }
         ],
         "outputs": [

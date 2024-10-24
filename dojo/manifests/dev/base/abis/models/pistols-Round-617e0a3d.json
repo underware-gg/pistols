@@ -449,104 +449,6 @@
     ]
   },
   {
-    "type": "enum",
-    "name": "pistols::types::cards::paces::PacesCard",
-    "variants": [
-      {
-        "name": "None",
-        "type": "()"
-      },
-      {
-        "name": "Paces1",
-        "type": "()"
-      },
-      {
-        "name": "Paces2",
-        "type": "()"
-      },
-      {
-        "name": "Paces3",
-        "type": "()"
-      },
-      {
-        "name": "Paces4",
-        "type": "()"
-      },
-      {
-        "name": "Paces5",
-        "type": "()"
-      },
-      {
-        "name": "Paces6",
-        "type": "()"
-      },
-      {
-        "name": "Paces7",
-        "type": "()"
-      },
-      {
-        "name": "Paces8",
-        "type": "()"
-      },
-      {
-        "name": "Paces9",
-        "type": "()"
-      },
-      {
-        "name": "Paces10",
-        "type": "()"
-      }
-    ]
-  },
-  {
-    "type": "enum",
-    "name": "pistols::types::cards::blades::BladesCard",
-    "variants": [
-      {
-        "name": "None",
-        "type": "()"
-      },
-      {
-        "name": "Seppuku",
-        "type": "()"
-      },
-      {
-        "name": "PocketPistol",
-        "type": "()"
-      },
-      {
-        "name": "Behead",
-        "type": "()"
-      },
-      {
-        "name": "Grapple",
-        "type": "()"
-      }
-    ]
-  },
-  {
-    "type": "enum",
-    "name": "pistols::types::duel_progress::DuelistDrawnCard",
-    "variants": [
-      {
-        "name": "None",
-        "type": "()"
-      },
-      {
-        "name": "Fire",
-        "type": "pistols::types::cards::paces::PacesCard"
-      },
-      {
-        "name": "Dodge",
-        "type": "pistols::types::cards::paces::PacesCard"
-      },
-      {
-        "name": "Blades",
-        "type": "pistols::types::cards::blades::BladesCard"
-      }
-    ]
-  },
-  {
     "type": "struct",
     "name": "pistols::models::challenge::Round",
     "members": [
@@ -576,7 +478,7 @@
       },
       {
         "name": "final_blow",
-        "type": "pistols::types::duel_progress::DuelistDrawnCard"
+        "type": "core::felt252"
       }
     ]
   },

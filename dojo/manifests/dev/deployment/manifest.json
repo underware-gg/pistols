@@ -1235,7 +1235,7 @@
       }
     ],
     "address": "0x97b9dca8dd44989def68eea082b358ff81a7d7ae648ca2a3a8d0095db4e8a1",
-    "transaction_hash": "0x5c2aae24c5fbcd0a2746b07ec217132d275fe53cecf611a4fd3fda1d60cda36",
+    "transaction_hash": "0x269cef4e372249b30528699a7c3db261fab5d3ec261f9339e264f9e7ad2957e",
     "block_number": 3,
     "seed": "pistols",
     "metadata": {
@@ -1727,8 +1727,8 @@
     {
       "kind": "DojoContract",
       "address": "0x3db7f788e6cd2b6e18911da108a0f161a963c367ea953d916aa5d664c64fff2",
-      "class_hash": "0x3cf06269f8d7d2702ec6ae177469fe412346806537a074b3c245e4bb231b1de",
-      "original_class_hash": "0x3cf06269f8d7d2702ec6ae177469fe412346806537a074b3c245e4bb231b1de",
+      "class_hash": "0x6d6dbab1b15c220e33a5e9fd4091302a920ff2da18c6a2125672216c2de7895",
+      "original_class_hash": "0x6d6dbab1b15c220e33a5e9fd4091302a920ff2da18c6a2125672216c2de7895",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -2178,80 +2178,20 @@
           ]
         },
         {
-          "type": "enum",
-          "name": "pistols::models::duelist::ProfilePicType",
-          "variants": [
-            {
-              "name": "Undefined",
-              "type": "()"
-            },
-            {
-              "name": "Duelist",
-              "type": "()"
-            },
-            {
-              "name": "External",
-              "type": "()"
-            }
-          ]
-        },
-        {
           "type": "struct",
-          "name": "pistols::models::duelist::Score",
+          "name": "pistols::systems::components::erc721_hooks::TokenMetadata",
           "members": [
-            {
-              "name": "honour",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "total_duels",
-              "type": "core::integer::u16"
-            },
-            {
-              "name": "total_wins",
-              "type": "core::integer::u16"
-            },
-            {
-              "name": "total_losses",
-              "type": "core::integer::u16"
-            },
-            {
-              "name": "total_draws",
-              "type": "core::integer::u16"
-            },
-            {
-              "name": "honour_history",
-              "type": "core::integer::u64"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "pistols::models::duelist::Duelist",
-          "members": [
-            {
-              "name": "duelist_id",
-              "type": "core::integer::u128"
-            },
             {
               "name": "name",
-              "type": "core::felt252"
-            },
-            {
-              "name": "profile_pic_uri",
               "type": "core::byte_array::ByteArray"
             },
             {
-              "name": "profile_pic_type",
-              "type": "pistols::models::duelist::ProfilePicType"
+              "name": "description",
+              "type": "core::byte_array::ByteArray"
             },
             {
-              "name": "timestamp",
-              "type": "core::integer::u64"
-            },
-            {
-              "name": "score",
-              "type": "pistols::models::duelist::Score"
+              "name": "image",
+              "type": "core::byte_array::ByteArray"
             }
           ]
         },
@@ -2271,71 +2211,43 @@
           "items": [
             {
               "type": "function",
-              "name": "format_name",
+              "name": "get_token_metadata",
               "inputs": [
                 {
                   "name": "token_id",
                   "type": "core::integer::u256"
-                },
-                {
-                  "name": "duelist",
-                  "type": "pistols::models::duelist::Duelist"
                 }
               ],
               "outputs": [
                 {
-                  "type": "core::byte_array::ByteArray"
+                  "type": "pistols::systems::components::erc721_hooks::TokenMetadata"
                 }
               ],
               "state_mutability": "view"
             },
             {
               "type": "function",
-              "name": "format_description",
+              "name": "get_metadata_pairs",
               "inputs": [
                 {
                   "name": "token_id",
                   "type": "core::integer::u256"
-                },
-                {
-                  "name": "_duelist",
-                  "type": "pistols::models::duelist::Duelist"
                 }
               ],
               "outputs": [
                 {
-                  "type": "core::byte_array::ByteArray"
+                  "type": "core::array::Span::<core::byte_array::ByteArray>"
                 }
               ],
               "state_mutability": "view"
             },
             {
               "type": "function",
-              "name": "format_image",
+              "name": "get_attribute_pairs",
               "inputs": [
                 {
-                  "name": "duelist",
-                  "type": "pistols::models::duelist::Duelist"
-                },
-                {
-                  "name": "variant",
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_attributes",
-              "inputs": [
-                {
-                  "name": "duelist",
-                  "type": "pistols::models::duelist::Duelist"
+                  "name": "token_id",
+                  "type": "core::integer::u256"
                 }
               ],
               "outputs": [
@@ -2972,8 +2884,8 @@
     {
       "kind": "DojoContract",
       "address": "0x75c9d8eae61c368eda84bc2962b6b7a478136607f9a3f238c1680921b686b28",
-      "class_hash": "0x58d96558012a27c9ae3aa45a2350a4a99ec6baf856ad8e7b4e867cc39cd9fec",
-      "original_class_hash": "0x58d96558012a27c9ae3aa45a2350a4a99ec6baf856ad8e7b4e867cc39cd9fec",
+      "class_hash": "0x665057d603061c5cdf00c12ec9798c3f98d3fb003446790ac7aa5125037f3d4",
+      "original_class_hash": "0x665057d603061c5cdf00c12ec9798c3f98d3fb003446790ac7aa5125037f3d4",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -3336,6 +3248,24 @@
         },
         {
           "type": "struct",
+          "name": "pistols::systems::components::erc721_hooks::TokenMetadata",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::byte_array::ByteArray"
+            },
+            {
+              "name": "description",
+              "type": "core::byte_array::ByteArray"
+            },
+            {
+              "name": "image",
+              "type": "core::byte_array::ByteArray"
+            }
+          ]
+        },
+        {
+          "type": "struct",
           "name": "core::array::Span::<core::byte_array::ByteArray>",
           "members": [
             {
@@ -3350,71 +3280,43 @@
           "items": [
             {
               "type": "function",
-              "name": "format_name",
+              "name": "get_token_metadata",
               "inputs": [
                 {
                   "name": "token_id",
                   "type": "core::integer::u256"
-                },
-                {
-                  "name": "duelist",
-                  "type": "pistols::models::duelist::Duelist"
                 }
               ],
               "outputs": [
                 {
-                  "type": "core::byte_array::ByteArray"
+                  "type": "pistols::systems::components::erc721_hooks::TokenMetadata"
                 }
               ],
               "state_mutability": "view"
             },
             {
               "type": "function",
-              "name": "format_description",
+              "name": "get_metadata_pairs",
               "inputs": [
                 {
                   "name": "token_id",
                   "type": "core::integer::u256"
-                },
-                {
-                  "name": "_duelist",
-                  "type": "pistols::models::duelist::Duelist"
                 }
               ],
               "outputs": [
                 {
-                  "type": "core::byte_array::ByteArray"
+                  "type": "core::array::Span::<core::byte_array::ByteArray>"
                 }
               ],
               "state_mutability": "view"
             },
             {
               "type": "function",
-              "name": "format_image",
+              "name": "get_attribute_pairs",
               "inputs": [
                 {
-                  "name": "duelist",
-                  "type": "pistols::models::duelist::Duelist"
-                },
-                {
-                  "name": "variant",
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_attributes",
-              "inputs": [
-                {
-                  "name": "duelist",
-                  "type": "pistols::models::duelist::Duelist"
+                  "name": "token_id",
+                  "type": "core::integer::u256"
                 }
               ],
               "outputs": [
@@ -4062,8 +3964,8 @@
     {
       "kind": "DojoContract",
       "address": "0x489b4afb7caa5f267016313a07610c37a4ee26890b0c5b6bbd30e66baed2cc3",
-      "class_hash": "0x38ab99a9f28274dfab284e47c336eb956b6d0aed6ee3e1d70a7db69c2c5fca6",
-      "original_class_hash": "0x38ab99a9f28274dfab284e47c336eb956b6d0aed6ee3e1d70a7db69c2c5fca6",
+      "class_hash": "0x1ef5ba74dc53dc4ed4bc82801c4c5c99e89be8009f6e81e5641b2464cec9891",
+      "original_class_hash": "0x1ef5ba74dc53dc4ed4bc82801c4c5c99e89be8009f6e81e5641b2464cec9891",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -4583,10 +4485,6 @@
                   "type": "core::integer::u128"
                 },
                 {
-                  "name": "round_number",
-                  "type": "core::integer::u8"
-                },
-                {
                   "name": "hashed",
                   "type": "core::integer::u128"
                 }
@@ -4605,10 +4503,6 @@
                 {
                   "name": "duel_id",
                   "type": "core::integer::u128"
-                },
-                {
-                  "name": "round_number",
-                  "type": "core::integer::u8"
                 },
                 {
                   "name": "salt",
@@ -4668,10 +4562,6 @@
                 },
                 {
                   "name": "duelId",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "roundNumber",
                   "type": "core::felt252"
                 },
                 {
@@ -4754,149 +4644,6 @@
           ]
         },
         {
-          "type": "enum",
-          "name": "pistols::models::duelist::ProfilePicType",
-          "variants": [
-            {
-              "name": "Undefined",
-              "type": "()"
-            },
-            {
-              "name": "Duelist",
-              "type": "()"
-            },
-            {
-              "name": "External",
-              "type": "()"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "pistols::types::events::DuelistRegisteredEvent",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "address",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "data"
-            },
-            {
-              "name": "duelist_id",
-              "type": "core::integer::u128",
-              "kind": "data"
-            },
-            {
-              "name": "name",
-              "type": "core::felt252",
-              "kind": "data"
-            },
-            {
-              "name": "profile_pic_type",
-              "type": "pistols::models::duelist::ProfilePicType",
-              "kind": "data"
-            },
-            {
-              "name": "profile_pic_uri",
-              "type": "core::byte_array::ByteArray",
-              "kind": "data"
-            },
-            {
-              "name": "is_new",
-              "type": "core::bool",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "pistols::types::events::NewChallengeEvent",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "duel_id",
-              "type": "core::integer::u128",
-              "kind": "data"
-            },
-            {
-              "name": "address_a",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "data"
-            },
-            {
-              "name": "address_b",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "pistols::types::events::ChallengeAcceptedEvent",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "duel_id",
-              "type": "core::integer::u128",
-              "kind": "data"
-            },
-            {
-              "name": "address_a",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "data"
-            },
-            {
-              "name": "address_b",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "data"
-            },
-            {
-              "name": "accepted",
-              "type": "core::bool",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "pistols::types::events::ChallengeResolvedEvent",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "duel_id",
-              "type": "core::integer::u128",
-              "kind": "data"
-            },
-            {
-              "name": "winner_address",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "pistols::types::events::DuelistTurnEvent",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "duel_id",
-              "type": "core::integer::u128",
-              "kind": "data"
-            },
-            {
-              "name": "address",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "data"
-            },
-            {
-              "name": "round_number",
-              "type": "core::integer::u8",
-              "kind": "data"
-            }
-          ]
-        },
-        {
           "type": "event",
           "name": "pistols::systems::game::game::Event",
           "kind": "enum",
@@ -4904,31 +4651,6 @@
             {
               "name": "UpgradeableEvent",
               "type": "dojo::contract::upgradeable::upgradeable::Event",
-              "kind": "nested"
-            },
-            {
-              "name": "DuelistRegisteredEvent",
-              "type": "pistols::types::events::DuelistRegisteredEvent",
-              "kind": "nested"
-            },
-            {
-              "name": "NewChallengeEvent",
-              "type": "pistols::types::events::NewChallengeEvent",
-              "kind": "nested"
-            },
-            {
-              "name": "ChallengeAcceptedEvent",
-              "type": "pistols::types::events::ChallengeAcceptedEvent",
-              "kind": "nested"
-            },
-            {
-              "name": "ChallengeResolvedEvent",
-              "type": "pistols::types::events::ChallengeResolvedEvent",
-              "kind": "nested"
-            },
-            {
-              "name": "DuelistTurnEvent",
-              "type": "pistols::types::events::DuelistTurnEvent",
               "kind": "nested"
             }
           ]
@@ -4942,13 +4664,7 @@
       "tag": "pistols-game",
       "systems": [
         "commit_moves",
-        "reveal_moves",
-        "_emitDuelistRegisteredEvent",
-        "_emitNewChallengeEvent",
-        "_emitChallengeAcceptedEvent",
-        "_emitPostRevealEvents",
-        "_emitDuelistTurnEvent",
-        "_emitChallengeResolvedEvent"
+        "reveal_moves"
       ],
       "manifest_name": "pistols-game-32c10283"
     },
@@ -5905,11 +5621,6 @@
           "key": false
         },
         {
-          "name": "round_number",
-          "type": "u8",
-          "key": false
-        },
-        {
           "name": "winner",
           "type": "u8",
           "key": false
@@ -5925,8 +5636,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x31da0a0be29bfc76c53f59ebfd162dbaef875ed7ee131c36de5fd707df3bd12",
-      "original_class_hash": "0x31da0a0be29bfc76c53f59ebfd162dbaef875ed7ee131c36de5fd707df3bd12",
+      "class_hash": "0x6aed17809106727dcf825292fd56ae40aea878d940c5f2f41f8f0bee14c8d52",
+      "original_class_hash": "0x6aed17809106727dcf825292fd56ae40aea878d940c5f2f41f8f0bee14c8d52",
       "abi": [
         {
           "type": "impl",
@@ -6418,10 +6129,6 @@
             {
               "name": "state",
               "type": "pistols::types::challenge_state::ChallengeState"
-            },
-            {
-              "name": "round_number",
-              "type": "core::integer::u8"
             },
             {
               "name": "winner",
@@ -8308,11 +8015,6 @@
           "key": true
         },
         {
-          "name": "round_number",
-          "type": "u8",
-          "key": true
-        },
-        {
           "name": "moves_a",
           "type": "Moves",
           "key": false
@@ -8338,13 +8040,13 @@
           "key": false
         },
         {
-          "name": "final_step",
-          "type": "u8",
+          "name": "final_blow",
+          "type": "felt252",
           "key": false
         }
       ],
-      "class_hash": "0x1f98abf30c3d96ae66e2816e354cc44c8c7553ceb1e3043909feca4eafa3755",
-      "original_class_hash": "0x1f98abf30c3d96ae66e2816e354cc44c8c7553ceb1e3043909feca4eafa3755",
+      "class_hash": "0xb29578d4f1c86f529249c7694fb16c8558bdd732165280fb4217e06ded39fe",
+      "original_class_hash": "0xb29578d4f1c86f529249c7694fb16c8558bdd732165280fb4217e06ded39fe",
       "abi": [
         {
           "type": "impl",
@@ -8804,10 +8506,6 @@
               "type": "core::integer::u128"
             },
             {
-              "name": "round_number",
-              "type": "core::integer::u8"
-            },
-            {
               "name": "moves_a",
               "type": "pistols::models::challenge::Moves"
             },
@@ -8828,8 +8526,8 @@
               "type": "pistols::types::round_state::RoundState"
             },
             {
-              "name": "final_step",
-              "type": "core::integer::u8"
+              "name": "final_blow",
+              "type": "core::felt252"
             }
           ]
         },

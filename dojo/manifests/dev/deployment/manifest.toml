@@ -4,7 +4,7 @@ class_hash = "0x6f38d5d9507c5d9546290e1a27e309efe5a9af3770b6cc1627db4a1b90a7dce"
 original_class_hash = "0x6f38d5d9507c5d9546290e1a27e309efe5a9af3770b6cc1627db4a1b90a7dce"
 abi = "manifests/dev/deployment/abis/dojo-world.json"
 address = "0x97b9dca8dd44989def68eea082b358ff81a7d7ae648ca2a3a8d0095db4e8a1"
-transaction_hash = "0x5c2aae24c5fbcd0a2746b07ec217132d275fe53cecf611a4fd3fda1d60cda36"
+transaction_hash = "0x269cef4e372249b30528699a7c3db261fab5d3ec261f9339e264f9e7ad2957e"
 block_number = 3
 seed = "pistols"
 manifest_name = "dojo-world"
@@ -48,8 +48,8 @@ manifest_name = "pistols-admin-36fd2037"
 [[contracts]]
 kind = "DojoContract"
 address = "0x3db7f788e6cd2b6e18911da108a0f161a963c367ea953d916aa5d664c64fff2"
-class_hash = "0x3cf06269f8d7d2702ec6ae177469fe412346806537a074b3c245e4bb231b1de"
-original_class_hash = "0x3cf06269f8d7d2702ec6ae177469fe412346806537a074b3c245e4bb231b1de"
+class_hash = "0x6d6dbab1b15c220e33a5e9fd4091302a920ff2da18c6a2125672216c2de7895"
+original_class_hash = "0x6d6dbab1b15c220e33a5e9fd4091302a920ff2da18c6a2125672216c2de7895"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/dev/deployment/abis/contracts/pistols-duel_token-670a5c67.json"
 reads = []
@@ -74,8 +74,8 @@ manifest_name = "pistols-duel_token-670a5c67"
 [[contracts]]
 kind = "DojoContract"
 address = "0x75c9d8eae61c368eda84bc2962b6b7a478136607f9a3f238c1680921b686b28"
-class_hash = "0x58d96558012a27c9ae3aa45a2350a4a99ec6baf856ad8e7b4e867cc39cd9fec"
-original_class_hash = "0x58d96558012a27c9ae3aa45a2350a4a99ec6baf856ad8e7b4e867cc39cd9fec"
+class_hash = "0x665057d603061c5cdf00c12ec9798c3f98d3fb003446790ac7aa5125037f3d4"
+original_class_hash = "0x665057d603061c5cdf00c12ec9798c3f98d3fb003446790ac7aa5125037f3d4"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/dev/deployment/abis/contracts/pistols-duelist_token-45c96d20.json"
 reads = []
@@ -97,8 +97,8 @@ manifest_name = "pistols-duelist_token-45c96d20"
 [[contracts]]
 kind = "DojoContract"
 address = "0x489b4afb7caa5f267016313a07610c37a4ee26890b0c5b6bbd30e66baed2cc3"
-class_hash = "0x38ab99a9f28274dfab284e47c336eb956b6d0aed6ee3e1d70a7db69c2c5fca6"
-original_class_hash = "0x38ab99a9f28274dfab284e47c336eb956b6d0aed6ee3e1d70a7db69c2c5fca6"
+class_hash = "0x1ef5ba74dc53dc4ed4bc82801c4c5c99e89be8009f6e81e5641b2464cec9891"
+original_class_hash = "0x1ef5ba74dc53dc4ed4bc82801c4c5c99e89be8009f6e81e5641b2464cec9891"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/dev/deployment/abis/contracts/pistols-game-32c10283.json"
 reads = []
@@ -108,12 +108,6 @@ tag = "pistols-game"
 systems = [
     "commit_moves",
     "reveal_moves",
-    "_emitDuelistRegisteredEvent",
-    "_emitNewChallengeEvent",
-    "_emitChallengeAcceptedEvent",
-    "_emitPostRevealEvents",
-    "_emitDuelistTurnEvent",
-    "_emitChallengeResolvedEvent",
 ]
 manifest_name = "pistols-game-32c10283"
 
@@ -153,8 +147,8 @@ manifest_name = "pistols-rng-13f1a6a9"
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x31da0a0be29bfc76c53f59ebfd162dbaef875ed7ee131c36de5fd707df3bd12"
-original_class_hash = "0x31da0a0be29bfc76c53f59ebfd162dbaef875ed7ee131c36de5fd707df3bd12"
+class_hash = "0x6aed17809106727dcf825292fd56ae40aea878d940c5f2f41f8f0bee14c8d52"
+original_class_hash = "0x6aed17809106727dcf825292fd56ae40aea878d940c5f2f41f8f0bee14c8d52"
 abi = "manifests/dev/deployment/abis/models/pistols-Challenge-673267b6.json"
 tag = "pistols-Challenge"
 qualified_path = "pistols::models::challenge::challenge"
@@ -208,11 +202,6 @@ key = false
 [[models.members]]
 name = "state"
 type = "ChallengeState"
-key = false
-
-[[models.members]]
-name = "round_number"
-type = "u8"
 key = false
 
 [[models.members]]
@@ -343,8 +332,8 @@ key = false
 
 [[models]]
 kind = "DojoModel"
-class_hash = "0x1f98abf30c3d96ae66e2816e354cc44c8c7553ceb1e3043909feca4eafa3755"
-original_class_hash = "0x1f98abf30c3d96ae66e2816e354cc44c8c7553ceb1e3043909feca4eafa3755"
+class_hash = "0xb29578d4f1c86f529249c7694fb16c8558bdd732165280fb4217e06ded39fe"
+original_class_hash = "0xb29578d4f1c86f529249c7694fb16c8558bdd732165280fb4217e06ded39fe"
 abi = "manifests/dev/deployment/abis/models/pistols-Round-617e0a3d.json"
 tag = "pistols-Round"
 qualified_path = "pistols::models::challenge::round"
@@ -353,11 +342,6 @@ manifest_name = "pistols-Round-617e0a3d"
 [[models.members]]
 name = "duel_id"
 type = "u128"
-key = true
-
-[[models.members]]
-name = "round_number"
-type = "u8"
 key = true
 
 [[models.members]]
@@ -386,8 +370,8 @@ type = "RoundState"
 key = false
 
 [[models.members]]
-name = "final_step"
-type = "u8"
+name = "final_blow"
+type = "felt252"
 key = false
 
 [[models]]

@@ -457,10 +457,6 @@
         "type": "core::integer::u128"
       },
       {
-        "name": "round_number",
-        "type": "core::integer::u8"
-      },
-      {
         "name": "moves_a",
         "type": "pistols::models::challenge::Moves"
       },
@@ -481,8 +477,8 @@
         "type": "pistols::types::round_state::RoundState"
       },
       {
-        "name": "final_step",
-        "type": "core::integer::u8"
+        "name": "final_blow",
+        "type": "core::felt252"
       }
     ]
   },

@@ -491,10 +491,6 @@
         "type": "pistols::types::challenge_state::ChallengeState"
       },
       {
-        "name": "round_number",
-        "type": "core::integer::u8"
-      },
-      {
         "name": "winner",
         "type": "core::integer::u8"
       },

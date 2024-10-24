@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x5306939757267c8e6650d7df9b77c606c69ffc2790ba8d6729f79c613b2ed97"
-original_class_hash = "0x5306939757267c8e6650d7df9b77c606c69ffc2790ba8d6729f79c613b2ed97"
+class_hash = "0xb29578d4f1c86f529249c7694fb16c8558bdd732165280fb4217e06ded39fe"
+original_class_hash = "0xb29578d4f1c86f529249c7694fb16c8558bdd732165280fb4217e06ded39fe"
 abi = "manifests/dev/base/abis/models/pistols-Round-617e0a3d.json"
 tag = "pistols-Round"
 qualified_path = "pistols::models::challenge::round"
@@ -38,5 +38,5 @@ key = false
 
 [[members]]
 name = "final_blow"
-type = "DuelistDrawnCard"
+type = "felt252"
 key = false
