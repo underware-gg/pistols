@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x6b05e10a9a84fe260a91833936740b56b77a8caff0cd9fd842f4b6e0ec95ec5"
-original_class_hash = "0x6b05e10a9a84fe260a91833936740b56b77a8caff0cd9fd842f4b6e0ec95ec5"
+class_hash = "0x3b41b2889a7b016ed6f0b3c30752219ac4c688aa28a245ec81afb0fa48eda73"
+original_class_hash = "0x3b41b2889a7b016ed6f0b3c30752219ac4c688aa28a245ec81afb0fa48eda73"
 abi = "manifests/dev/base/abis/models/pistols-TableConfig-1e8368fc.json"
 tag = "pistols-TableConfig"
 qualified_path = "pistols::models::table::table_config"
@@ -24,11 +24,6 @@ key = false
 [[members]]
 name = "deck_type"
 type = "DeckType"
-key = false
-
-[[members]]
-name = "fee_contract_address"
-type = "ContractAddress"
 key = false
 
 [[members]]

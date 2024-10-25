@@ -364,11 +364,11 @@
   {
     "type": "impl",
     "name": "coin_configImpl",
-    "interface_name": "pistols::models::coin_config::Icoin_config"
+    "interface_name": "pistols::models::config::Icoin_config"
   },
   {
     "type": "struct",
-    "name": "pistols::models::coin_config::CoinConfig",
+    "name": "pistols::models::config::CoinConfig",
     "members": [
       {
         "name": "coin_address",
@@ -386,7 +386,7 @@
   },
   {
     "type": "interface",
-    "name": "pistols::models::coin_config::Icoin_config",
+    "name": "pistols::models::config::Icoin_config",
     "items": [
       {
         "type": "function",
@@ -394,7 +394,7 @@
         "inputs": [
           {
             "name": "model",
-            "type": "pistols::models::coin_config::CoinConfig"
+            "type": "pistols::models::config::CoinConfig"
           }
         ],
         "outputs": [],
@@ -404,7 +404,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::models::coin_config::coin_config::Event",
+    "name": "pistols::models::config::coin_config::Event",
     "kind": "enum",
     "variants": []
   }

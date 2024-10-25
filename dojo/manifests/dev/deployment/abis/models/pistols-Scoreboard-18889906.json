@@ -411,14 +411,6 @@
       {
         "name": "score",
         "type": "pistols::models::duelist::Score"
-      },
-      {
-        "name": "wager_won",
-        "type": "core::integer::u128"
-      },
-      {
-        "name": "wager_lost",
-        "type": "core::integer::u128"
       }
     ]
   },

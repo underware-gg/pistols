@@ -148,14 +148,6 @@
             "type": "core::starknet::contract_address::ContractAddress"
           },
           {
-            "name": "treasury_address",
-            "type": "core::starknet::contract_address::ContractAddress"
-          },
-          {
-            "name": "fee_contract",
-            "type": "core::starknet::contract_address::ContractAddress"
-          },
-          {
             "name": "fee_amount",
             "type": "core::integer::u128"
           }

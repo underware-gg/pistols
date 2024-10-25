@@ -363,34 +363,60 @@
   },
   {
     "type": "impl",
-    "name": "table_wagerImpl",
-    "interface_name": "pistols::models::table::Itable_wager"
+    "name": "paymentImpl",
+    "interface_name": "pistols::models::payment::Ipayment"
   },
   {
     "type": "struct",
-    "name": "pistols::models::table::TableWager",
+    "name": "core::integer::u256",
     "members": [
       {
-        "name": "table_id",
+        "name": "low",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "high",
+        "type": "core::integer::u128"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "pistols::models::payment::Payment",
+    "members": [
+      {
+        "name": "key",
         "type": "core::felt252"
       },
       {
-        "name": "wager_min",
-        "type": "core::integer::u128"
+        "name": "amount",
+        "type": "core::integer::u256"
       },
       {
-        "name": "wager_max",
-        "type": "core::integer::u128"
+        "name": "client_percent",
+        "type": "core::integer::u8"
       },
       {
-        "name": "fee_pct",
+        "name": "ranking_percent",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "owner_percent",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "pool_percent",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "treasury_percent",
         "type": "core::integer::u8"
       }
     ]
   },
   {
     "type": "interface",
-    "name": "pistols::models::table::Itable_wager",
+    "name": "pistols::models::payment::Ipayment",
     "items": [
       {
         "type": "function",
@@ -398,7 +424,7 @@
         "inputs": [
           {
             "name": "model",
-            "type": "pistols::models::table::TableWager"
+            "type": "pistols::models::payment::Payment"
           }
         ],
         "outputs": [],
@@ -408,7 +434,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::models::table::table_wager::Event",
+    "name": "pistols::models::payment::payment::Event",
     "kind": "enum",
     "variants": []
   }

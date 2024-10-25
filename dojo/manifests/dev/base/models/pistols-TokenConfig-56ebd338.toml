@@ -1,9 +1,9 @@
 kind = "DojoModel"
-class_hash = "0x1993f8ce5ce075d71e202bbfdb8628afd7978d5ae9aed8345ee78d9dae57305"
-original_class_hash = "0x1993f8ce5ce075d71e202bbfdb8628afd7978d5ae9aed8345ee78d9dae57305"
+class_hash = "0xf3b9a575856c67ef4eb4cdf6ec715118d21f119907e14672f28ee66748d9e8"
+original_class_hash = "0xf3b9a575856c67ef4eb4cdf6ec715118d21f119907e14672f28ee66748d9e8"
 abi = "manifests/dev/base/abis/models/pistols-TokenConfig-56ebd338.json"
 tag = "pistols-TokenConfig"
-qualified_path = "pistols::models::token_config::token_config"
+qualified_path = "pistols::models::config::token_config"
 manifest_name = "pistols-TokenConfig-56ebd338"
 
 [[members]]
@@ -19,21 +19,6 @@ key = false
 [[members]]
 name = "renderer_address"
 type = "ContractAddress"
-key = false
-
-[[members]]
-name = "treasury_address"
-type = "ContractAddress"
-key = false
-
-[[members]]
-name = "fee_contract"
-type = "ContractAddress"
-key = false
-
-[[members]]
-name = "fee_amount"
-type = "u128"
 key = false
 
 [[members]]

@@ -1,0 +1,42 @@
+kind = "DojoModel"
+class_hash = "0x320046f9d54a87dd006b74503056c0f65ef9a24f045f49f74214853af986009"
+original_class_hash = "0x320046f9d54a87dd006b74503056c0f65ef9a24f045f49f74214853af986009"
+abi = "manifests/dev/base/abis/models/pistols-Payment-17a03e9c.json"
+tag = "pistols-Payment"
+qualified_path = "pistols::models::payment::payment"
+manifest_name = "pistols-Payment-17a03e9c"
+
+[[members]]
+name = "key"
+type = "felt252"
+key = true
+
+[[members]]
+name = "amount"
+type = "u256"
+key = false
+
+[[members]]
+name = "client_percent"
+type = "u8"
+key = false
+
+[[members]]
+name = "ranking_percent"
+type = "u8"
+key = false
+
+[[members]]
+name = "owner_percent"
+type = "u8"
+key = false
+
+[[members]]
+name = "pool_percent"
+type = "u8"
+key = false
+
+[[members]]
+name = "treasury_percent"
+type = "u8"
+key = false

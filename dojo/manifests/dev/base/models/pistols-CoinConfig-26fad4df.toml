@@ -1,9 +1,9 @@
 kind = "DojoModel"
-class_hash = "0x5da2748b86cdc9a68ce089f7638b800ba10c506b513338002d6e828308f072b"
-original_class_hash = "0x5da2748b86cdc9a68ce089f7638b800ba10c506b513338002d6e828308f072b"
+class_hash = "0x3ad591c8b7ab3eaea8f9dc836dba3983bf9bc64c06f547af762ef63c0b34a7b"
+original_class_hash = "0x3ad591c8b7ab3eaea8f9dc836dba3983bf9bc64c06f547af762ef63c0b34a7b"
 abi = "manifests/dev/base/abis/models/pistols-CoinConfig-26fad4df.json"
 tag = "pistols-CoinConfig"
-qualified_path = "pistols::models::coin_config::coin_config"
+qualified_path = "pistols::models::config::coin_config"
 manifest_name = "pistols-CoinConfig-26fad4df"
 
 [[members]]

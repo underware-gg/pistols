@@ -1,0 +1,11 @@
+kind = "DojoContract"
+class_hash = "0x5fc6d8de911ddf576bf581b822b64a9156a223740c04ec32af633017951c6b1"
+original_class_hash = "0x5fc6d8de911ddf576bf581b822b64a9156a223740c04ec32af633017951c6b1"
+base_class_hash = "0x0"
+abi = "manifests/dev/base/abis/contracts/pistols-bank-7a683ab6.json"
+reads = []
+writes = []
+init_calldata = []
+tag = "pistols-bank"
+systems = ["charge"]
+manifest_name = "pistols-bank-7a683ab6"

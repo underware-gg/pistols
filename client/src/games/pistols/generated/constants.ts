@@ -300,6 +300,7 @@ export type EnvCardPoints = {
 // from: ../dojo/src/interfaces/systems.cairo
 type type_SELECTORS = {
   ADMIN: BigNumberish, // cairo: felt252
+  BANK: BigNumberish, // cairo: felt252
   GAME: BigNumberish, // cairo: felt252
   RNG: BigNumberish, // cairo: felt252
   DUEL_TOKEN: BigNumberish, // cairo: felt252
@@ -307,12 +308,13 @@ type type_SELECTORS = {
   LORDS_MOCK: BigNumberish, // cairo: felt252
   CONFIG: BigNumberish, // cairo: felt252
   TABLE_CONFIG: BigNumberish, // cairo: felt252
-  TABLE_WAGER: BigNumberish, // cairo: felt252
   TOKEN_CONFIG: BigNumberish, // cairo: felt252
   COIN_CONFIG: BigNumberish, // cairo: felt252
+  PAYMENT: BigNumberish, // cairo: felt252
 };
 export const SELECTORS: type_SELECTORS = {
   ADMIN: '0x036fd20372b5d47c092e2fede52897075978efb732aeaeb155d19eb8147f6497', // 'selector_from_tag!("pistols-admin")'
+  BANK: '0x07a683ab68bc70300995da8de5781002e781f22ba246fe239ebeff02b2230375', // 'selector_from_tag!("pistols-bank")'
   GAME: '0x032c102830cbffaddecbdce7ef85735e6f08da08ee762a2d7b09304b6533dd57', // 'selector_from_tag!("pistols-game")'
   RNG: '0x013f1a6a9ae118440a997d6624230b59f43516220a1208526c3f66e202910504', // 'selector_from_tag!("pistols-rng")'
   DUEL_TOKEN: '0x0670a5c673ac776e00e61c279cf7dc0efbe282787f4d719498e55643c5116063', // 'selector_from_tag!("pistols-duel_token")'
@@ -320,9 +322,9 @@ export const SELECTORS: type_SELECTORS = {
   LORDS_MOCK: '0x02b1156e63a09854c3d8dba0cad93b41e1fc4662466a0ffc2a9ec9e54b4bc788', // 'selector_from_tag!("pistols-lords_mock")'
   CONFIG: '0x060742fa7259b7ce3ebc0a2dde90b740d1234c770199a822fa2e7cf779dc0392', // 'selector_from_tag!("pistols-Config")'
   TABLE_CONFIG: '0x01e8368fc88328662c92a11c0e739bf8b74bcd77a20071d2641a31e1a063c138', // 'selector_from_tag!("pistols-TableConfig")'
-  TABLE_WAGER: '0x02d819fd3d7e499db47173dba8d6a4d033fead59cd48476fa24b9f45851b3527', // 'selector_from_tag!("pistols-TableWager")'
   TOKEN_CONFIG: '0x056ebd3387f45e8b292b472f3539e675031f12cf156c07c309c6403044f71fed', // 'selector_from_tag!("pistols-TokenConfig")'
   COIN_CONFIG: '0x026fad4dff063a4f2c3b3889723194b9bdbbbf833e44ff2d573af01741b966ac', // 'selector_from_tag!("pistols-CoinConfig")'
+  PAYMENT: '0x017a03e9cb461470b9149f9efbd95ad9b217fca9fdccd3827383904c33da96c1', // 'selector_from_tag!("pistols-Payment")'
 };
 
 // from: ../dojo/src/libs/events.cairo

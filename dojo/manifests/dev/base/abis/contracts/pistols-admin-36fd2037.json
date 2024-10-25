@@ -185,6 +185,10 @@
         "type": "core::starknet::contract_address::ContractAddress"
       },
       {
+        "name": "lords_address",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
         "name": "is_paused",
         "type": "core::bool"
       }
@@ -245,10 +249,6 @@
       {
         "name": "deck_type",
         "type": "pistols::types::cards::hand::DeckType"
-      },
-      {
-        "name": "fee_contract_address",
-        "type": "core::starknet::contract_address::ContractAddress"
       },
       {
         "name": "fee_collector_address",

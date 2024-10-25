@@ -437,10 +437,6 @@
         "type": "pistols::types::cards::hand::DeckType"
       },
       {
-        "name": "fee_contract_address",
-        "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
         "name": "fee_collector_address",
         "type": "core::starknet::contract_address::ContractAddress"
       },

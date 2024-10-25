@@ -363,30 +363,60 @@
   },
   {
     "type": "impl",
-    "name": "wagerImpl",
-    "interface_name": "pistols::models::challenge::Iwager"
+    "name": "paymentImpl",
+    "interface_name": "pistols::models::payment::Ipayment"
   },
   {
     "type": "struct",
-    "name": "pistols::models::challenge::Wager",
+    "name": "core::integer::u256",
     "members": [
       {
-        "name": "duel_id",
+        "name": "low",
         "type": "core::integer::u128"
       },
       {
-        "name": "value",
-        "type": "core::integer::u128"
-      },
-      {
-        "name": "fee",
+        "name": "high",
         "type": "core::integer::u128"
       }
     ]
   },
   {
+    "type": "struct",
+    "name": "pistols::models::payment::Payment",
+    "members": [
+      {
+        "name": "key",
+        "type": "core::felt252"
+      },
+      {
+        "name": "amount",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "client_percent",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "ranking_percent",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "owner_percent",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "pool_percent",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "treasury_percent",
+        "type": "core::integer::u8"
+      }
+    ]
+  },
+  {
     "type": "interface",
-    "name": "pistols::models::challenge::Iwager",
+    "name": "pistols::models::payment::Ipayment",
     "items": [
       {
         "type": "function",
@@ -394,7 +424,7 @@
         "inputs": [
           {
             "name": "model",
-            "type": "pistols::models::challenge::Wager"
+            "type": "pistols::models::payment::Payment"
           }
         ],
         "outputs": [],
@@ -404,7 +434,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::models::challenge::wager::Event",
+    "name": "pistols::models::payment::payment::Event",
     "kind": "enum",
     "variants": []
   }

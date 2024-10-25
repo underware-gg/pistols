@@ -364,11 +364,11 @@
   {
     "type": "impl",
     "name": "token_configImpl",
-    "interface_name": "pistols::models::token_config::Itoken_config"
+    "interface_name": "pistols::models::config::Itoken_config"
   },
   {
     "type": "struct",
-    "name": "pistols::models::token_config::TokenConfig",
+    "name": "pistols::models::config::TokenConfig",
     "members": [
       {
         "name": "token_address",
@@ -383,18 +383,6 @@
         "type": "core::starknet::contract_address::ContractAddress"
       },
       {
-        "name": "treasury_address",
-        "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
-        "name": "fee_contract",
-        "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
-        "name": "fee_amount",
-        "type": "core::integer::u128"
-      },
-      {
         "name": "minted_count",
         "type": "core::integer::u128"
       }
@@ -402,7 +390,7 @@
   },
   {
     "type": "interface",
-    "name": "pistols::models::token_config::Itoken_config",
+    "name": "pistols::models::config::Itoken_config",
     "items": [
       {
         "type": "function",
@@ -410,7 +398,7 @@
         "inputs": [
           {
             "name": "model",
-            "type": "pistols::models::token_config::TokenConfig"
+            "type": "pistols::models::config::TokenConfig"
           }
         ],
         "outputs": [],
@@ -420,7 +408,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::models::token_config::token_config::Event",
+    "name": "pistols::models::config::token_config::Event",
     "kind": "enum",
     "variants": []
   }

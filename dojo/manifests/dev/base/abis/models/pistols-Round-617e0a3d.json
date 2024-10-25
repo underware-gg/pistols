@@ -419,10 +419,6 @@
       {
         "name": "honour",
         "type": "core::integer::u8"
-      },
-      {
-        "name": "wager",
-        "type": "core::integer::u8"
       }
     ]
   },
