@@ -53,9 +53,9 @@ export function Balance({
 
   const classNames = useMemo(() => {
     let result = []
-    if (small) result.push('WagerSmall')
-    else if (big) result.push('WagerBig')
-    else result.push('Wager')
+    if (small) result.push('CoinSmall')
+    else if (big) result.push('CoinBig')
+    else result.push('Coin')
     if (crossed) result.push('Crossed')
     return result
   }, [small, big, crossed])

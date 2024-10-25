@@ -36,7 +36,6 @@ export const EMOJI = {
   ALIVE: '❤️',
   INJURED: '🩸',
   DEAD: '☠️',
-  WAGER: '💰',
   BOUNTY: '💰',
   WINNER: '🏅',
   DICE: '🎲',

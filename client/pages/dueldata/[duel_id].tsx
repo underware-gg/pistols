@@ -5,7 +5,6 @@ import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { useChallenge } from '@/pistols/hooks/useChallenge'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { useWager } from '@/pistols/hooks/useWager'
 import { useTable } from '@/pistols/hooks/useTable'
 import { useFinishedDuelProgress } from '@/pistols/hooks/useContractCalls'
 import { ChallengeStateNames, RoundStateNames } from '@/pistols/utils/pistols'
@@ -65,7 +64,6 @@ function Stats({
 
       <div className='Code'>
         <DuelStats duelId={duelId} />
-        <WagerStats duelId={duelId} tableId={tableId} />
 
         {round1 && <>
           <RoundStats duelId={duelId} round={round1} />
@@ -181,49 +179,6 @@ function DuelStats({
           <Cell>Progress B</Cell>
           <Cell>
             <DuelIconsAsRow duelId={duelId} duelistId={challenge.duelistIdB} size={'large'} />
-          </Cell>
-        </Row>
-      </Body>
-    </Table>
-  )
-}
-
-function WagerStats({
-  duelId,
-  tableId,
-}: {
-  duelId: bigint
-  tableId: string
-}) {
-  const { value, fee } = useWager(duelId)
-  const { description } = useTable(tableId)
-  if (!value) return <></>
-  return (
-    <Table celled striped color='green'>
-      <Header>
-        <Row>
-          <HeaderCell width={4}><h5>Wager</h5></HeaderCell>
-          <HeaderCell>{bigintToHex(duelId)}</HeaderCell>
-        </Row>
-      </Header>
-
-      <Body>
-        <Row>
-          <Cell>Table</Cell>
-          <Cell>
-            {tableId} ({description})
-          </Cell>
-        </Row>
-        <Row>
-          <Cell>Value</Cell>
-          <Cell>
-            {value?.toString() ?? 0} wei : {weiToEth(value ?? 0).toString()}
-          </Cell>
-        </Row>
-        <Row>
-          <Cell>Fee</Cell>
-          <Cell>
-            {fee?.toString() ?? 0} wei : {weiToEth(fee ?? 0).toString()}
           </Cell>
         </Row>
       </Body>

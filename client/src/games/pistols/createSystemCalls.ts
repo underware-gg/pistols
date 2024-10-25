@@ -53,7 +53,7 @@ export function createSystemCalls(
   manifest: DojoManifest,
   provider: DojoProvider,
 ) {
-  const { Challenge, Wager, TableConfig, TableAdmittance, Config } = components
+  const { TableConfig, TableAdmittance, Config } = components
 
   // executeMulti() based on:
   // https://github.com/cartridge-gg/rollyourown/blob/f39bfd7adc866c1a10142f5ce30a3c6f900b467e/web/src/dojo/hooks/useSystems.ts#L178-L190
@@ -145,35 +145,6 @@ export function createSystemCalls(
 
   const reply_duel = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, accepted: boolean): Promise<boolean> => {
     const reply_args = [duelist_id, duel_id, accepted]
-    if (accepted) {
-      // find Wager
-      // const challenge = getComponentValue(Challenge, bigintToEntity(duel_id))
-      // const wager = getComponentValue(Wager, bigintToEntity(duel_id))
-      // const approved_value = wager ? (wager.value + wager.fee) : 0n
-      // if (approved_value > 0n) {
-      //   // find lords contract
-      //   const table = getComponentValue(TableConfig, bigintToEntity(challenge.table_id))
-      //   if (!table) throw new Error(`Table does not exist [${challenge.table_id}]`)
-      //   // approve call
-      //   let calls: Call[] = []
-      //   const duel_token_contract = getContractByName(manifest, NAMESPACE, 'duel_token')
-      //   if (BigInt(table.fee_contract_address) > 0n) {
-      //     calls.push({
-      //       contractAddress: bigintToHex(table.fee_contract_address),
-      //       entrypoint: 'approve',
-      //       calldata: [duel_token_contract.address, bigintToU256(approved_value)],
-      //     })
-      //   }
-      //   // game call
-      //   calls.push({
-      //     contractAddress: duel_token_contract.address,
-      //     entrypoint: 'reply_duel',
-      //     calldata: reply_args,
-      //   })
-      //   return await _executeTransaction(signer, calls)
-      // }
-    }
-    // no need to approve, single call
     return await _executeTransaction(signer, duel_token_call('reply_duel', reply_args))
   }
 
@@ -184,6 +155,9 @@ export function createSystemCalls(
 
   const create_duelist = async (signer: AccountInterface, recipient: BigNumberish, name: string, profile_pic_type: ProfilePicType, profile_pic_uri: string): Promise<boolean> => {
     const args = [recipient, stringToFelt(name), getProfilePicTypeValue(profile_pic_type), stringToFelt(profile_pic_uri)]
+
+    // TODO
+
     return await _executeTransaction(signer, duelist_token_call('create_duelist', args))
   }
 

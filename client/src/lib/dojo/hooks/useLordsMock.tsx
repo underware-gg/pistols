@@ -21,7 +21,7 @@ export interface FaucetInterface {
 export const useLordsFaucet = (): FaucetInterface => {
   const { account } = useAccount()
   const { selectedChainConfig } = useStarknetContext()
-  const { contractAddress, isMock, abi } = useLordsContract()
+  const { lordsContractAddress, isMock, abi } = useLordsContract()
   const faucetUrl = useMemo(() => (selectedChainConfig.lordsFaucetUrl ?? null), [selectedChainConfig])
 
   const [isMinting, setIsMinting] = useState(false)
@@ -49,7 +49,7 @@ export const useLordsFaucet = (): FaucetInterface => {
       try {
         const tx = await execute(
           _signerAccount!,
-          bigintToHex(contractAddress),
+          bigintToHex(lordsContractAddress),
           abi!,
           'mint',
           [bigintToHex(_signerAccount.address), bigintToHex(amount.low), bigintToHex(amount.high)],
@@ -74,7 +74,7 @@ export const useLordsFaucet = (): FaucetInterface => {
       return {
         transaction_hash,
       }
-    }, [account, contractAddress],
+    }, [account, lordsContractAddress],
   )
 
   return {

@@ -11,6 +11,7 @@ export const useConfig = () => {
   return {
     paused: config.is_paused ?? null,
     treasuryAddress: config.treasury_address ?? null,
+    lordsAddress: config.lords_address ?? null,
   }
 }
 
@@ -20,9 +21,7 @@ export const useTokenConfig = (contractAddress: BigNumberish) => {
   const token_config = useComponentValue(TokenConfig, entityId)
   return {
     // minterAddress: token_config?.minter_address ?? null,
-    // treasuryAddress: token_config?.treasury_address ?? null,
     // rendererAddress: token_config?.renderer_address ?? null,
-    feeAmount: token_config?.fee_amount ?? null,
     mintedCount: token_config?.minted_count ?? null,
     isPending: (token_config == null),
   }

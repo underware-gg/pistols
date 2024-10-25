@@ -19,7 +19,6 @@ export type DuelistRow = {
   // filters
   name: string
   score: any
-  balance: number
   win_ratio: number
   total_duels: number
   is_active: boolean
@@ -52,7 +51,6 @@ export enum DuelistColumn {
   Draws = 'Draws',
   Total = 'Total',
   WinRatio = 'WinRatio',
-  Balance = 'Balance',
 }
 export enum SortDirection {
   Ascending = 'ascending',
@@ -245,11 +243,9 @@ const QueryProvider = ({
       const duelist = getComponentValue(Duelist, entity)
       const duelist_id = duelist.duelist_id
       let score = duelist.score
-      let balance = 0
       if (state.filterDuelistTable && tableId) {
         const scoreboard = getComponentValue(Scoreboard, keysToEntity([tableIdAsFelt, duelist_id]))
         score = scoreboard?.score ?? {} as any
-        balance = scoreboard ? (Number(scoreboard.wager_won) - Number(scoreboard.wager_lost)) : undefined
       }
       acc.push({
         entity,
@@ -258,7 +254,6 @@ const QueryProvider = ({
         // filters
         name: feltToString(duelist.name).toLowerCase(),
         score,
-        balance,
         win_ratio: calcWinRatio(score.total_duels ?? 0, score.total_wins ?? 0),
         total_duels: score.total_duels ?? 0,
         is_active: (score.total_duels > 0),
@@ -346,7 +341,6 @@ const QueryProvider = ({
       if (sortColumn == DuelistColumn.Draws) return _sortTotals(rowA.score.total_draws, rowB.score.total_draws)
       if (sortColumn == DuelistColumn.Total) return _sortTotals(rowA.score.total_duels, rowB.score.total_duels)
       if (sortColumn == DuelistColumn.WinRatio) return _sortTotals(rowA.win_ratio, rowB.win_ratio)
-      if (sortColumn == DuelistColumn.Balance) return _sortTotals(rowA.balance, rowB.balance)
       return 0
     })
     //

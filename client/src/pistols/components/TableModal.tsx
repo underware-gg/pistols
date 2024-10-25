@@ -112,14 +112,13 @@ export default function TableModal({
 function TableDescription({
   tableId,
 }) {
-  const { feeContractAddress,
+  const {
     description,
     feeMin,
     feePct,
     tableIsOpen,
     tableType,
   } = useTable(tableId)
-  const { tokenName, tokenSymbol } = useERC20TokenName(feeContractAddress)
   const { activeDuelistIdsCount } = useActiveDuelistIds(tableId)
   const { liveDuelsCount, pastDuelsCount } = useTableTotals(tableId)
 
@@ -138,29 +137,18 @@ function TableDescription({
         <Col width={8} textAlign='right'>
           Game Type:
         </Col>
-        <Col width={8} className='Wager PaddedLeft Bold'>
+        <Col width={8} className='Coin PaddedLeft Bold'>
           {tableType}
         </Col>
       </Row>
 
       <Row className='NoPadding' verticalAlign='middle'>
         <Col width={8} textAlign='right'>
-          Fees Coin:
-        </Col>
-        <Col width={8} className='Bold'>
-          {/* {tokenName && <Balance tableId={tableId}>{tokenName}</Balance>} */}
-          {/* {!tokenName && <>N/A</>} */}
-          {tokenName ?? <>N/A</>}
-        </Col>
-      </Row>
-
-      <Row className='NoPadding' verticalAlign='middle'>
-        <Col width={8} textAlign='right'>
-          Minimun Fee:
+          Fee:
         </Col>
         <Col width={8} className='Bold'>
           {(Boolean(feePct) && !Boolean(feeMin)) ?
-            <span className='Wager'>{feePct}%</span>
+            <span className='Coin'>{feePct}%</span>
             : <>
               <Balance tableId={tableId} wei={feeMin ?? 0} />
               {Boolean(feePct) && <> (or {feePct}%)</>}
@@ -173,7 +161,7 @@ function TableDescription({
         <Col width={8} textAlign='right'>
           Active Duelists:
         </Col>
-        <Col width={8} className='Wager PaddedLeft Bold'>
+        <Col width={8} className='Coin PaddedLeft Bold'>
           {activeDuelistIdsCount}
         </Col>
       </Row>
@@ -182,7 +170,7 @@ function TableDescription({
         <Col width={8} textAlign='right'>
           Live Duels:
         </Col>
-        <Col width={8} className='Wager PaddedLeft Bold'>
+        <Col width={8} className='Coin PaddedLeft Bold'>
           {liveDuelsCount}
         </Col>
       </Row>
@@ -191,7 +179,7 @@ function TableDescription({
         <Col width={8} textAlign='right'>
           Past Duels:
         </Col>
-        <Col width={8} className='Wager PaddedLeft Bold'>
+        <Col width={8} className='Coin PaddedLeft Bold'>
           {pastDuelsCount}
         </Col>
       </Row>

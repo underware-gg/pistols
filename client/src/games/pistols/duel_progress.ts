@@ -18,7 +18,6 @@ type DuelState = {
   chances: number;
   dice_crit: number;
   honour: number;
-  wager: number;
   win: number;
 }
 type DuelSpecials = {

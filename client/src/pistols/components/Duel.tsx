@@ -323,7 +323,7 @@ export default function Duel({
       <Cards duelId={duelId} ref={cardRef} />
       <div className='TavernBoard NoMouse NoDrag' style={{ backgroundImage: 'url(/images/ui/wager_main.png)', backgroundSize: '100% 100%' }}>
         <div className='TavernTitle' data-contentlength={1}>Settling the matter of:</div>
-        <div className='TavernWager' data-contentlength={Math.floor(quote.length / 10)}>{`"${quote}"`}</div>
+        <div className='TavernQuote' data-contentlength={Math.floor(quote.length / 10)}>{`"${quote}"`}</div>
         <div className='TavernTable' data-contentlength={Math.floor(description.length / 10)}>{description}</div>
       </div>
 

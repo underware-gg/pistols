@@ -5,15 +5,14 @@ import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { useTable, useTableAccountBalance } from '@/pistols/hooks/useTable'
+import { useTable } from '@/pistols/hooks/useTable'
 import { usePact } from '@/pistols/hooks/usePact'
 import { useCalcFeeDuel } from '@/pistols/hooks/useContractCalls'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { FormInput } from '@/pistols/components/ui/Form'
-import { Balance } from '@/pistols/components/account/Balance'
-import { WagerAndOrFees } from '@/pistols/components/account/LordsBalance'
+import { FameBalance, FeesToPay } from '@/pistols/components/account/LordsBalance'
 import { PremisePrefix } from '@/pistols/utils/pistols'
 import { Divider } from '@/lib/ui/Divider'
 import { Premise } from '@/games/pistols/generated/constants'
@@ -41,13 +40,11 @@ export default function NewChallengeModal() {
   const { hasPact: hasPactAddress, pactDuelId: pactDuelIdAddress } = usePact(tableId, addressA, addressB)
 
   const { description: tableDescription } = useTable(tableId)
-  const { balance: balanceA } = useTableAccountBalance(tableId, duelistIdA)
-  const { balance: balanceB } = useTableAccountBalance(tableId, duelistIdB)
 
   const [args, setArgs] = useState(null)
 
   const { fee } = useCalcFeeDuel(tableId)
-  const { canWager, wagerMin, tableIsOpen } = useTable(tableId)
+  const { tableIsOpen } = useTable(tableId)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -102,7 +99,7 @@ export default function NewChallengeModal() {
             <Row columns='equal' textAlign='left'>
               <Col>
                 <ProfileDescription duelistId={duelistIdA} displayOwnerAddress={false} />
-                {canWager && <h5><Balance tableId={tableId} wei={balanceA} /></h5>}
+                <h5><FameBalance duelistId={duelistIdA} /></h5>
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -113,7 +110,7 @@ export default function NewChallengeModal() {
             <Row columns='equal' textAlign='right'>
               <Col>
                 <ProfileDescription duelistId={duelistIdB} displayOwnerAddress={false} />
-                {canWager && <h5><Balance tableId={tableId} wei={balanceB} /></h5>}
+                <h5><FameBalance duelistId={duelistIdB} /></h5>
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -123,7 +120,7 @@ export default function NewChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='left'>
               <Col>
-                <NewChallengeForm setArgs={setArgs} canWager={canWager} />
+                <NewChallengeForm setArgs={setArgs} />
               </Col>
             </Row>
           </Grid>
@@ -141,8 +138,6 @@ export default function NewChallengeModal() {
               {tableIsOpen &&
                 <BalanceRequiredButton
                   tableId={tableId}
-                  wagerValue={0}
-                  minWagerValue={wagerMin}
                   fee={fee}
                   disabled={!args || isSubmitting}
                   label='Submit Challenge!'
@@ -160,7 +155,6 @@ export default function NewChallengeModal() {
 
 function NewChallengeForm({
   setArgs,
-  canWager,
 }) {
   const { tableId } = useSettings()
   const [premise, setPremise] = useState(Premise.Honour)
@@ -242,7 +236,7 @@ function NewChallengeForm({
           </Grid>
         </Form.Field>
 
-        <WagerAndOrFees big tableId={tableId} value={0} fee={fee} prefixed />
+        <FeesToPay big tableId={tableId} value={0} fee={fee} prefixed />
 
       </Form>
     </div>

@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useLordsBalance, useEtherBalance } from '@/lib/dojo/hooks/useLords'
-import { useLockedLordsBalance } from '@/pistols/hooks/useWager'
 import { useScoreboard } from '@/pistols/hooks/useScore'
 import { Balance } from '@/pistols/components/account/Balance'
 import { TABLES } from '@/games/pistols/generated/constants'
@@ -38,29 +37,24 @@ export const LordsBalance = ({
 
 
 //
-// Wager Balance of a Duelist on a Table
+// Fame Balance of a Duelist
 //
-export const WagerBalance = ({
+export const FameBalance = ({
   duelistId,
-  tableId,
 } : {
   duelistId: BigNumberish
-  tableId?: string
 }
 ) => {
-  const { wagerBalanceWei } = useScoreboard(tableId, duelistId)
   return (
-    <Balance tableId={tableId ?? TABLES.LORDS} wei={wagerBalanceWei} />
+    <Balance tableId={TABLES.LORDS} wei={0} />
   )
 }
 
 //
-// Wager and fees of a Challenge
-// Used at challenge descriptions
+// Fees to be paid
 //
-export function WagerAndOrFees({
+export function FeesToPay({
   tableId,
-  value,
   fee,
   prefixed = false,
   big = false,
@@ -71,28 +65,8 @@ export function WagerAndOrFees({
   prefixed?: boolean
   big?: boolean
 }) {
-  const hasValue = useMemo(() => (BigInt(value ?? 0) > 0), [value])
   const hasFees = useMemo(() => (BigInt(fee ?? 0) > 0), [fee])
-  const pre = useMemo(() => (prefixed ? (hasValue || !hasFees ? 'Cost: ' : 'Fee: ') : null), [prefixed, hasValue, hasFees])
-  if (hasValue && hasFees) {
-    return (<>
-      <span>
-        <Balance big={big} tableId={tableId} wei={value} pre={pre} />
-      </span>
-      &nbsp;&nbsp;
-      <span>
-        (<Balance clean tableId={tableId} wei={fee} pre='+' /> fee)
-      </span>
-    </>)
-  }
-  // value only
-  if (hasValue && hasFees) {
-    return (
-      <span>
-        <Balance big={big} tableId={tableId} wei={value} pre={pre} />
-      </span>
-    )
-  }
+  const pre = useMemo(() => (prefixed ? 'Fee: ' : null), [prefixed, hasFees])
   // fees only
   return (
     <span>
@@ -100,27 +74,3 @@ export function WagerAndOrFees({
     </span>
   )
 }
-
-//
-// Locked wagers of a duslist
-// Used at owned profiles
-//
-export const LockedWagerBalance = ({
-  tableId,
-  address,
-  pre = null,
-  post = null,
-  clean = false,
-}) => {
-  const { total } = useLockedLordsBalance(address)
-  if (!total) return <></>
-  return (
-    <>
-      {' + '}
-      <Balance big tableId={tableId} wei={total} pre={pre} post={post} clean={clean} />
-      {' '}
-      <span className='Normal'>(locked fees)</span>
-    </>
-  )
-}
-

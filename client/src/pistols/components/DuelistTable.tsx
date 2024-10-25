@@ -4,14 +4,11 @@ import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useQueryContext, DuelistColumn, SortDirection } from '@/pistols/hooks/QueryContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { useTable } from '@/pistols/hooks/useTable'
 import { useScoreboard } from '@/pistols/hooks/useScore'
 import { useOpener } from '@/lib/ui/useOpener'
 import { ProfileBadge, ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
-import { LordsBagIcon } from '@/pistols/components/account/Balance'
 import { FilterButton } from '@/pistols/components/ui/Buttons'
-import { EMOJI } from '@/pistols/data/messages'
 import AnonModal from '@/pistols/components/AnonModal'
 
 const Row = Grid.Row
@@ -54,7 +51,6 @@ export function DuelistTable() {
 
   // Filters
   const currentTableId = useMemo(() => (filterDuelistTable ? tableId : null), [tableId, filterDuelistTable])
-  const { canWager } = useTable(currentTableId)
 
   const _selectCallback = (duelistId: bigint) => {
     if (duelistId) {
@@ -72,11 +68,10 @@ export function DuelistTable() {
         duelistId={row.duelist_id}
         sortColumn={sortColumn}
         selectCallback={_selectCallback}
-        canWager={canWager}
       />)
     })
     return result
-  }, [queryDuelists, currentTableId, sortColumn, canWager])
+  }, [queryDuelists, currentTableId, sortColumn])
 
   const isEmpty = (duelists.length == 0)
 
@@ -103,9 +98,6 @@ export function DuelistTable() {
             <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Losses ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Losses)}>Losses</HeaderCell>
             <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Draws ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Draws)}>Draws</HeaderCell>
             <HeaderCell width={1} sorted={sortColumn == DuelistColumn.WinRatio ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.WinRatio)}>Win<br />Ratio</HeaderCell>
-            {canWager &&
-              <HeaderCell width={1} sorted={sortColumn == DuelistColumn.Balance ? sortDirection : null} onClick={() => _sortBy(DuelistColumn.Balance)}><h3><LordsBagIcon /></h3></HeaderCell>
-            }
           </Table.Row>
         </Table.Header>
 
@@ -116,7 +108,6 @@ export function DuelistTable() {
               duelistId={0n}
               sortColumn={sortColumn}
               selectCallback={_selectCallback}
-              canWager={canWager}
             />}
             {duelists}
           </Table.Body>
@@ -161,13 +152,11 @@ function DuelistItem({
   duelistId,
   sortColumn,
   selectCallback,
-  canWager,
 }: {
   tableId: string
   duelistId: bigint
   sortColumn: DuelistColumn
   selectCallback: Function
-  canWager: boolean
 }) {
   // duelist
   const duelistData = useDuelist(duelistId)
@@ -175,7 +164,7 @@ function DuelistItem({
 
   // scoreboard
   const scoreboard = useScoreboard(tableId, duelistId)
-  const { balanceFormatted, score: scoreboardScore } = scoreboard
+  const { score: scoreboardScore } = scoreboard
 
   // score switcher
   const score = (tableId ? scoreboardScore : duelistScore)
@@ -227,12 +216,6 @@ function DuelistItem({
       <Cell className={_colClass(DuelistColumn.WinRatio)}>
         {isRookie || winRatio === null ? '-' : <span className='TableValue'>{Math.floor(winRatio * 100)}%</span>}
       </Cell>
-
-      {canWager &&
-        <Cell className={_colClass(DuelistColumn.Balance)}>
-          {isRookie ? '-' : <span className='TableValue'>{balanceFormatted}</span>}
-        </Cell>
-      }
     </Table.Row>
   )
 }

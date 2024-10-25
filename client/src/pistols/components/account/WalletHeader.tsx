@@ -19,7 +19,7 @@ export default function WalletHeader({
   const { disconnect } = useDisconnect()
   const { account, address, isConnected } = useAccount()
   const { connectedChainName } = useSelectedChain()
-  const { contractAddress: lordsContractAddress } = useLordsContract()
+  const { lordsContractAddress } = useLordsContract()
   const { connector } = _useConnector()
 
   // BUG: https://github.com/apibara/starknet-react/issues/419

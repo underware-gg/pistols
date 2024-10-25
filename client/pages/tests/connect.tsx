@@ -53,13 +53,6 @@ function DojoAccount() {
 
   return (
     <Table celled striped color='orange' size='small'>
-      {/* <Header>
-        <Row>
-          <HeaderCell width={4}><h5>Wager</h5></HeaderCell>
-          <HeaderCell>{bigintToHex(duelId)}</HeaderCell>
-        </Row>
-      </Header> */}
-
       <Body>
         <Row>
           <Cell>process.env.NODE_ENV</Cell>

@@ -882,7 +882,7 @@ $ui-container-gap: 1em;
   font-size: aspect-width(0.9);
 }
 
-.TavernWager {
+.TavernQuote {
   pointer-events: none;
   position: absolute;
   top: aspect-width(1.2);
@@ -894,16 +894,16 @@ $ui-container-gap: 1em;
   text-align: center;
 }
 
-.TavernWager[data-contentlength="0"] {
+.TavernQuote[data-contentlength="0"] {
   font-size: aspect-width(1.4);
 }
-.TavernWager[data-contentlength="1"] {
+.TavernQuote[data-contentlength="1"] {
   font-size: aspect-width(1.3);
 }
-.TavernWager[data-contentlength="2"] {
+.TavernQuote[data-contentlength="2"] {
   font-size: aspect-width(1.2);
 }
-.TavernWager[data-contentlength="3"] {
+.TavernQuote[data-contentlength="3"] {
   font-size: aspect-width(1);
 }
 
@@ -1200,13 +1200,13 @@ $logo-url: '/logos/logo_avante.svg';
 }
 
 
-.WagerBig {
+.CoinBig {
   @extend .TitleCase, .H3, .Bold;//, .Number;
 }
-.Wager {
+.Coin {
   @extend .TitleCase, .H4;//, .Number;
 }
-.WagerSmall {
+.CoinSmall {
   @extend .TitleCase, .H5, .Bold;//, .Number;
 }
 

@@ -9,7 +9,7 @@ import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { ProfileName } from '@/pistols/components/account/ProfileDescription'
-import { WagerBalance } from '@/pistols/components/account/LordsBalance'
+import { FameBalance } from '@/pistols/components/account/LordsBalance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ConnectButton, CurrentChainHint, EnterAsGuestButton } from '@/pistols/components/ScGate'
 import { SocialsList } from '@/pistols/components/SocialsList'
@@ -199,7 +199,7 @@ function DuelistItem({
             <ProfileName duelistId={duelistId} />
           </h4>
           <h5>
-            <WagerBalance duelistId={duelistId} />
+            <FameBalance duelistId={duelistId} />
           </h5>
         </Col>
         <Col width={5} textAlign='left' verticalAlign='bottom'>

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { LordsBalance, LockedWagerBalance } from '@/pistols/components/account/LordsBalance'
+import { LordsBalance } from '@/pistols/components/account/LordsBalance'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { EMOJI } from '@/pistols/data/messages'
 import { BigNumberish } from 'starknet'
@@ -83,12 +83,11 @@ export function ProfileDescription({
           
           {displayOwnerAddress && <AddressShort address={owner} small={displayOwnerAddressSmall}/>}
           {displayHonor && <h3 className='Important NoMargin TitleCase'>
-            Honour: <span className='Wager'>{honourAndTotal}</span>
+            Honour: <span className='Coin'>{honourAndTotal}</span>
           </h3>}
           {displayBalance &&
             <h5>
               <LordsBalance address={_owner} big />
-              {tableId && <LockedWagerBalance tableId={tableId} address={_owner} clean />}
             </h5>
           }
         </Col>

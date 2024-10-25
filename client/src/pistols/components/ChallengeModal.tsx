@@ -6,13 +6,12 @@ import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/P
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { useWager } from '@/pistols/hooks/useWager'
 import { useTable } from '@/pistols/hooks/useTable'
 import { useIsMyAccount, useIsYou } from '@/pistols/hooks/useIsYou'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
-import { WagerAndOrFees } from '@/pistols/components/account/LordsBalance'
+import { FeesToPay } from '@/pistols/components/account/LordsBalance'
 import { DuelIconsAsGrid } from '@/pistols/components/DuelIcons'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { AddressShort } from '@/lib/ui/AddressShort'
@@ -40,7 +39,6 @@ export default function ChallengeModal() {
     duelistIdA, duelistIdB, duelistAddressA, duelistAddressB,
     isLive, isFinished, needToSyncExpired,
   } = useChallenge(selectedDuelId)
-  const { value, fee } = useWager(selectedDuelId)
   const { description: tableDescription } = useTable(tableId)
 
   const { challengeDescription } = useChallengeDescription(selectedDuelId)
@@ -128,19 +126,6 @@ export default function ChallengeModal() {
               </Col>
             </Row>
 
-            {(value || (isYou && fee)) && <>
-              <Row columns='equal' textAlign='right'>
-                <Col>
-                  <Divider content={value ? 'Placing a wager of' : 'Fees'} nomargin />
-                </Col>
-              </Row>
-              <Row columns='equal' textAlign='center'>
-                <Col>
-                  <WagerAndOrFees big tableId={tableId} value={value} fee={isYou ? fee : 0} />
-                </Col>
-              </Row>
-            </>}
-
             {(isLive || isFinished) && <>
               <Row columns='equal' textAlign='right'>
                 <Col>
@@ -195,7 +180,7 @@ export default function ChallengeModal() {
             }
             {(state == ChallengeState.Awaiting && isChallenged) &&
               <Col>
-                <BalanceRequiredButton label='Accept Challenge!' disabled={isSubmitting} onClick={() => _reply(true)} tableId={tableId} wagerValue={value} fee={fee} />
+                <BalanceRequiredButton label='Accept Challenge!' disabled={isSubmitting} onClick={() => _reply(true)} tableId={tableId} fee={0} />
               </Col>
             }
             {(state == ChallengeState.InProgress) &&
