@@ -41,7 +41,7 @@ pub struct Store {
 impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn new(world: IWorldDispatcher) -> Store {
-        (Store { world: world })
+        (Store { world })
     }
 
     //

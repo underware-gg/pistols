@@ -12,8 +12,6 @@ pub trait ITokenComponentInternal<TState> {
     fn initialize(ref self: TState,
         minter_address: ContractAddress,
         renderer_address: ContractAddress,
-        treasury_address: ContractAddress,
-        fee_contract: ContractAddress,
         fee_amount: u128,
     );
     fn mint(ref self: TState, recipient: ContractAddress) -> u128;
@@ -113,17 +111,13 @@ pub mod TokenComponent {
         fn initialize(ref self: ComponentState<TContractState>,
             minter_address: ContractAddress,
             renderer_address: ContractAddress,
-            treasury_address: ContractAddress,
-            fee_contract: ContractAddress,
             fee_amount: u128,
         ) {
             let store: Store = StoreTrait::new(self.get_contract().world());
-            let token_config: TokenConfig = TokenConfig{
+            let token_config: TokenConfig = TokenConfig {
                 token_address: get_contract_address(),
                 minter_address,
                 renderer_address,
-                treasury_address,
-                fee_contract,
                 fee_amount,
                 minted_count: 0,
             };

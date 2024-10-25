@@ -9,7 +9,5 @@ writes = [
 init_calldata = [
   "0x0", # minter_address
   "0x0", # renderer_address
-  "0x0", # treasury_address
-  "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210", # fee_contract (lords)
-  "100000000000000000000", # fee_amount: 100 LORDS
+  "0", # fee_amount
 ]

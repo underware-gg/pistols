@@ -106,15 +106,15 @@ fn setup_uninitialized(fee_amount: u128) -> (IWorldDispatcher, IDuelTokenDispatc
     };
     world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), token.contract_address);
     let duels_call_data: Span<felt252> = array![
-        0, 0, 0,
-        lords.contract_address.into(),
-        (fee_amount * CONST::ETH_TO_WEI.low).into(), // 100 Lords
+        0, // minter_address
+        0, // renderer_address
+        (fee_amount * CONST::ETH_TO_WEI.low).into(), // fee_amount
     ].span();
     world.init_contract(SELECTORS::DUEL_TOKEN, duels_call_data);
 
     tester::impersonate(OWNER());
 
-    let tables = default_tables(lords.contract_address);
+    let tables = default_tables();
     tester::set_TableConfig(world, *tables[0]);
 
     (world, token)

@@ -12,6 +12,7 @@ pub struct Config {
     pub key: u8,
     //------
     pub treasury_address: ContractAddress,
+    pub lords_address: ContractAddress,
     pub is_paused: bool,
 }
 
@@ -27,6 +28,7 @@ impl ConfigImpl of ConfigTrait {
         (Config {
             key: CONFIG::CONFIG_KEY,
             treasury_address: ZERO(),
+            lords_address: ZERO(),
             is_paused: false,
         })
     }

@@ -218,9 +218,9 @@ mod tester {
                 world.grant_writer(selector_from_tag!("pistols-Pact"), address);
                 world.grant_writer(selector_from_tag!("pistols-Scoreboard"), address);
                 let call_data: Span<felt252> = array![
-                    0, 0, 0,
-                    lords.contract_address.into(),
-                    100_000_000_000_000_000_000, // 100 Lords
+                    0, // minter_address
+                    0, // renderer_address
+                    100_000_000_000_000_000_000, // fee_amount: 100 Lords
                 ].span();
                 world.init_contract(SELECTORS::DUEL_TOKEN, call_data);
                 (address)
@@ -235,9 +235,9 @@ mod tester {
                 world.grant_writer(selector_from_tag!("pistols-TokenConfig"), address);
                 world.grant_writer(selector_from_tag!("pistols-Duelist"), address);
                 let call_data: Span<felt252> = array![
-                    0, 0, 0,
-                    lords.contract_address.into(),
-                    100_000_000_000_000_000_000, // 100 Lords
+                    0, // minter_address
+                    0, // renderer_address
+                    100_000_000_000_000_000_000, // fee_amount: 100 Lords
                 ].span();
                 world.init_contract(SELECTORS::DUELIST_TOKEN, call_data);
                 (address)

@@ -50,10 +50,11 @@ mod admin {
         // initialize Config
         let mut config: Config = ConfigTrait::new();
         config.treasury_address = (if (treasury_address.is_zero()) { get_caller_address() } else { treasury_address });
+        config.lords_address = lords_address;
         config.is_paused = false;
         store.set_config(@config);
         // initialize tables
-        TableInitializerTrait::new(world).initialize(lords_address);
+        TableInitializerTrait::new(world).initialize();
     }
 
     #[abi(embed_v0)]

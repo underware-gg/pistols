@@ -95,9 +95,9 @@ fn setup_uninitialized(fee_amount: u128) -> (IWorldDispatcher, IDuelistTokenDisp
     };
     world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), token.contract_address);
     let duelists_call_data: Span<felt252> = array![
-        0, 0, 0,
-        lords.contract_address.into(),
-        (fee_amount * CONST::ETH_TO_WEI.low).into(), // 100 Lords
+        0, // minter_address
+        0, // renderer_address
+        (fee_amount * CONST::ETH_TO_WEI.low).into(), // fee_amount
     ].span();
     world.init_contract(SELECTORS::DUELIST_TOKEN, duelists_call_data);
 

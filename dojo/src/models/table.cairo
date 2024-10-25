@@ -1,7 +1,6 @@
 // use debug::PrintTrait;
 use starknet::ContractAddress;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
 use pistols::systems::game::game::{Errors as GameErrors};
 use pistols::types::cards::hand::{DeckType};
 use pistols::types::constants::{CONST};
@@ -33,7 +32,6 @@ pub struct TableConfig {
     pub description: felt252,
     pub table_type: TableType,
     pub deck_type: DeckType,
-    pub fee_contract_address: ContractAddress,  // if 0x0: no fees, no wager
     pub fee_collector_address: ContractAddress, // if 0x0: use default treasury
     pub fee_min: u128,
     pub is_open: bool,
@@ -60,24 +58,22 @@ pub struct TableAdmittance {
     pub duelists: Array<u128>,
 }
 
-fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
+fn default_tables() -> Array<TableConfig> {
     (array![
         (TableConfig {
             table_id: TABLES::LORDS,
             description: 'The Lords Table',
             table_type: TableType::Classic,
             deck_type: DeckType::Classic,
-            fee_contract_address: lords_address,
             fee_collector_address: ZERO(),
             fee_min: 0, //60 * CONST::ETH_TO_WEI.low,
-            is_open: (lords_address.is_non_zero()),
+            is_open: true,
         }),
         (TableConfig {
             table_id: TABLES::COMMONERS,
             description: 'The Commoners Table',
             table_type: TableType::Classic,
             deck_type: DeckType::Classic,
-            fee_contract_address: ZERO(),
             fee_collector_address: ZERO(),
             fee_min: 0,
             is_open: true,
@@ -103,8 +99,8 @@ impl TableInitializerTraitImpl of TableInitializerTrait {
             store: StoreTrait::new(world)
         }
     }
-    fn initialize(self: TableInitializer, lords_address: ContractAddress) {
-        self.set_array(@default_tables(lords_address));
+    fn initialize(self: TableInitializer) {
+        self.set_array(@default_tables());
     }
     fn set_array(self: TableInitializer, tables: @Array<TableConfig>) {
         let mut n: usize = 0;
@@ -122,11 +118,7 @@ impl TableInitializerTraitImpl of TableInitializerTrait {
 #[generate_trait]
 impl TableConfigEntityImpl of TableConfigEntityTrait {
     fn exists(self: @TableConfigEntity) -> bool {
-        (*self.description != 0)
-    }
-    #[inline(always)]
-    fn ierc20(self: @TableConfigEntity) -> IERC20Dispatcher {
-        (ierc20(*self.fee_contract_address))
+        (*self.table_type != TableType::Undefined)
     }
     fn calc_fee(self: @TableConfigEntity, wager_value: u128) -> u128 {
         // (MathU128::max(*self.fee_min, (wager_value / 100) * wager.fee_pct.into()))

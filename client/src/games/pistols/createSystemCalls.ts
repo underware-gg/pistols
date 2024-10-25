@@ -122,18 +122,18 @@ export function createSystemCalls(
     // find lords contract
     const table = getComponentValue(TableConfig, bigintToEntity(stringToFelt(table_id)))
     if (!table) throw new Error(`Table does not exist [${table_id}]`)
-    //calculate value
-    const approved_value = await calc_fee_duel(table_id)
-    let calls: Call[] = []
-    // approve call
     const duel_token_contract = getContractByName(manifest, NAMESPACE, 'duel_token')
-    if (isPositiveBigint(table.fee_contract_address) && approved_value > 0) {
-      calls.push({
-        contractAddress: bigintToHex(table.fee_contract_address),
-        entrypoint: 'approve',
-        calldata: [duel_token_contract.address, bigintToU256(approved_value)],
-      })
-    }
+    let calls: Call[] = []
+    // // calculate fee value
+    // const approved_value = await calc_fee_duel(table_id)
+    // // approve call
+    // if (isPositiveBigint(table.fee_contract_address) && approved_value > 0) {
+    //   calls.push({
+    //     contractAddress: bigintToHex(table.fee_contract_address),
+    //     entrypoint: 'approve',
+    //     calldata: [duel_token_contract.address, bigintToU256(approved_value)],
+    //   })
+    // }
     // game call
     calls.push({
       contractAddress: duel_token_contract.address,

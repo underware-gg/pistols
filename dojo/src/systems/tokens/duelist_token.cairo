@@ -155,8 +155,6 @@ pub mod duelist_token {
         ref self: ContractState,
         minter_address: ContractAddress,
         renderer_address: ContractAddress,
-        treasury_address: ContractAddress,
-        fee_contract: ContractAddress,
         fee_amount: u128,
     ) {
         self.erc721.initializer(
@@ -167,8 +165,6 @@ pub mod duelist_token {
         self.token.initialize(
             minter_address,
             renderer_address,
-            treasury_address,
-            fee_contract,
             fee_amount: fee_amount.into(),
         );
     }

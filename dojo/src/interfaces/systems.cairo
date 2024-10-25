@@ -1,7 +1,6 @@
 use starknet::{ContractAddress, ClassHash};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait, Resource};
 
-use pistols::utils::misc::{ZERO};
 pub use pistols::systems::{
     admin::{IAdminDispatcher, IAdminDispatcherTrait},
     game::{IGameDispatcher, IGameDispatcherTrait},
@@ -11,6 +10,10 @@ pub use pistols::systems::{
         duelist_token::{IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
     }
 };
+pub use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
+pub use pistols::models::config::{ConfigEntity};
+pub use pistols::libs::store::{Store, StoreTrait};
+pub use pistols::utils::misc::{ZERO};
 
 pub mod SELECTORS {
     // systems
@@ -71,6 +74,10 @@ pub impl WorldSystemsTraitImpl of WorldSystemsTrait {
     #[inline(always)]
     fn duelist_token_dispatcher(self: @IWorldDispatcher) -> IDuelistTokenDispatcher {
         (IDuelistTokenDispatcher{ contract_address: self.contract_address(SELECTORS::DUELIST_TOKEN) })
+    }
+    #[inline(always)]
+    fn lords_dispatcher(self: @IWorldDispatcher) -> IERC20Dispatcher {
+        (ierc20(StoreTrait::new(*self).get_config_entity().lords_address))
     }
 
     //

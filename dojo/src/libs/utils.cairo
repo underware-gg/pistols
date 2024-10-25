@@ -6,8 +6,9 @@ use starknet::{ContractAddress};
 
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
-use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
 use pistols::systems::game::game::{Errors as GameErrors};
+use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
+use pistols::interfaces::systems::{WorldSystemsTrait};
 use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, WagerEntity, Round, RoundEntity, Moves};
 use pistols::models::duelist::{Duelist, DuelistTrait, DuelistEntity, Score, ScoreTrait};
 use pistols::models::table::{TableConfig, TableConfigEntity, TableConfigEntityTrait, TableType};
@@ -25,22 +26,22 @@ fn deposit_wager_fees(store: Store, challenge: Challenge, from: ContractAddress,
     let wager: WagerEntity = store.get_wager_entity(challenge.duel_id);
     let total: u256 = (wager.value + wager.fee).into();
     if (total > 0) {
-        let table : TableConfigEntity = store.get_table_config_entity(challenge.table_id);
-        let balance: u256 = table.ierc20().balance_of(from);
-        let allowance: u256 = table.ierc20().allowance(from, to);
+        let lords: IERC20Dispatcher = store.world.lords_dispatcher();
+        let balance: u256 = lords.balance_of(from);
+        let allowance: u256 = lords.allowance(from, to);
         assert(balance >= total, GameErrors::INSUFFICIENT_BALANCE);
         assert(allowance >= total, GameErrors::NO_ALLOWANCE);
-        table.ierc20().transfer_from(from, to, total);
+        lords.transfer_from(from, to, total);
     }
 }
 fn withdraw_wager_fees(store: Store, challenge: Challenge, to: ContractAddress) {
     let wager: WagerEntity = store.get_wager_entity(challenge.duel_id);
     let total: u256 = (wager.value + wager.fee).into();
     if (total > 0) {
-        let table : TableConfigEntity = store.get_table_config_entity(challenge.table_id);
-        let balance: u256 = table.ierc20().balance_of(starknet::get_contract_address());
+        let lords: IERC20Dispatcher = store.world.lords_dispatcher();
+        let balance: u256 = lords.balance_of(starknet::get_contract_address());
         assert(balance >= total, GameErrors::WITHDRAW_NOT_AVAILABLE); // should never happen!
-        table.ierc20().transfer(to, total);
+        lords.transfer(to, total);
     }
 }
 // spllit wager beteen address_a and address_b
@@ -48,20 +49,21 @@ fn split_wager_fees(store: Store, challenge: Challenge, address_a: ContractAddre
     let wager: WagerEntity = store.get_wager_entity(challenge.duel_id);
     let total: u256 = (wager.value + wager.fee).into() * 2;
     if (total > 0) {
-        let table : TableConfigEntity = store.get_table_config_entity(challenge.table_id);
-        let balance: u256 = table.ierc20().balance_of(starknet::get_contract_address());
+        let lords: IERC20Dispatcher = store.world.lords_dispatcher();
+        let balance: u256 = lords.balance_of(starknet::get_contract_address());
         assert(balance >= total, GameErrors::WAGER_NOT_AVAILABLE); // should never happen!
         if (wager.value > 0) {
             if (address_a == address_b) {
                 // single winner
-                table.ierc20().transfer(address_a, wager.value.into() * 2);
+                lords.transfer(address_a, wager.value.into() * 2);
             } else {
                 // split wager back to addresss
-                table.ierc20().transfer(address_a, wager.value.into());
-                table.ierc20().transfer(address_b, wager.value.into());
+                lords.transfer(address_a, wager.value.into());
+                lords.transfer(address_b, wager.value.into());
             }
         }
         if (wager.fee > 0) {
+            let table : TableConfigEntity = store.get_table_config_entity(challenge.table_id);
             let fees_address: ContractAddress =
                 if (table.fee_collector_address.is_non_zero()) {
                     (table.fee_collector_address)
@@ -70,7 +72,7 @@ fn split_wager_fees(store: Store, challenge: Challenge, address_a: ContractAddre
                     (config.treasury_address)
                 };
             if (fees_address.is_non_zero() && fees_address != starknet::get_contract_address()) {
-                table.ierc20().transfer(fees_address, wager.fee.into() * 2);
+                lords.transfer(fees_address, wager.fee.into() * 2);
             }
         }
     }
