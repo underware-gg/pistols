@@ -137,7 +137,6 @@ export default function NewChallengeModal() {
             <Col>
               {tableIsOpen &&
                 <BalanceRequiredButton
-                  tableId={tableId}
                   fee={fee}
                   disabled={!args || isSubmitting}
                   label='Submit Challenge!'
@@ -236,7 +235,7 @@ function NewChallengeForm({
           </Grid>
         </Form.Field>
 
-        <FeesToPay big tableId={tableId} value={0} fee={fee} prefixed />
+        <FeesToPay big value={0} fee={fee} prefixed />
 
       </Form>
     </div>

@@ -10,6 +10,7 @@ import {
   Premise, getPremiseValue,
   Archetype, getArchetypeValue,
   ProfilePicType, getProfilePicTypeValue,
+  CONFIG,
 } from '@/games/pistols/generated/constants'
 import { convert_duel_progress } from './duel_progress'
 
@@ -119,26 +120,28 @@ export function createSystemCalls(
 
 
   const create_duel = async (signer: AccountInterface, duelist_id: BigNumberish, challenged_id_or_address: BigNumberish, premise: Premise, quote: string, table_id: string, expire_hours: number): Promise<boolean> => {
+    const args = [duelist_id, BigInt(challenged_id_or_address), getPremiseValue(premise), stringToFelt(quote), table_id, expire_hours]
     // find lords contract
-    const table = getComponentValue(TableConfig, bigintToEntity(stringToFelt(table_id)))
-    if (!table) throw new Error(`Table does not exist [${table_id}]`)
-    const duel_token_contract = getContractByName(manifest, NAMESPACE, 'duel_token')
+    const config = getComponentValue(Config, bigintToEntity(CONFIG.CONFIG_KEY))
+    if (!config) throw new Error(`Config does not exist`)
+    const token_contract = getContractByName(manifest, NAMESPACE, 'duel_token')
+    const bank_contract = getContractByName(manifest, NAMESPACE, 'bank')
     let calls: Call[] = []
-    // // calculate fee value
-    // const approved_value = await calc_fee_duel(table_id)
-    // // approve call
-    // if (isPositiveBigint(table.fee_contract_address) && approved_value > 0) {
-    //   calls.push({
-    //     contractAddress: bigintToHex(table.fee_contract_address),
-    //     entrypoint: 'approve',
-    //     calldata: [duel_token_contract.address, bigintToU256(approved_value)],
-    //   })
-    // }
+    // calculate fee value
+    const approved_value = await calc_fee_duel(table_id)
+    // approve call
+    if (isPositiveBigint(config.lords_address) && approved_value > 0) {
+      calls.push({
+        contractAddress: bigintToHex(config.lords_address),
+        entrypoint: 'approve',
+        calldata: [bank_contract.address, bigintToU256(approved_value)],
+      })
+    }
     // game call
     calls.push({
-      contractAddress: duel_token_contract.address,
+      contractAddress: token_contract.address,
       entrypoint: 'create_duel',
-      calldata: [duelist_id, BigInt(challenged_id_or_address), getPremiseValue(premise), stringToFelt(quote), table_id, expire_hours],
+      calldata: args,
     })
     return await _executeTransaction(signer, calls)
   }
@@ -156,9 +159,29 @@ export function createSystemCalls(
   const create_duelist = async (signer: AccountInterface, recipient: BigNumberish, name: string, profile_pic_type: ProfilePicType, profile_pic_uri: string): Promise<boolean> => {
     const args = [recipient, stringToFelt(name), getProfilePicTypeValue(profile_pic_type), stringToFelt(profile_pic_uri)]
 
-    // TODO
-
-    return await _executeTransaction(signer, duelist_token_call('create_duelist', args))
+    // find lords contract
+    const config = getComponentValue(Config, bigintToEntity(CONFIG.CONFIG_KEY))
+    if (!config) throw new Error(`Config does not exist`)
+    const token_contract = getContractByName(manifest, NAMESPACE, 'duelist_token')
+    const bank_contract = getContractByName(manifest, NAMESPACE, 'bank')
+    let calls: Call[] = []
+    // calculate fee value
+    const approved_value = await calc_fee_duelist(signer.address)
+    // approve call
+    if (isPositiveBigint(config.lords_address) && approved_value > 0) {
+      calls.push({
+        contractAddress: bigintToHex(config.lords_address),
+        entrypoint: 'approve',
+        calldata: [bank_contract.address, bigintToU256(approved_value)],
+      })
+    }
+    // game call
+    calls.push({
+      contractAddress: token_contract.address,
+      entrypoint: 'create_duelist',
+      calldata: args,
+    })
+    return await _executeTransaction(signer, calls)
   }
 
   const update_duelist = async (signer: AccountInterface, duelist_id: BigNumberish, name: string, profile_pic_type: ProfilePicType, profile_pic_uri: string): Promise<boolean> => {
@@ -258,9 +281,9 @@ export function createSystemCalls(
   // duelist_token
   //
 
-  const calc_fee_duelist = async (recipient: BigNumberish): Promise<boolean | null> => {
+  const calc_fee_duelist = async (recipient: BigNumberish): Promise<bigint | null> => {
     const args = [recipient]
-    const results = await _executeCall<boolean>(duelist_token_call('calc_fee', args))
+    const results = await _executeCall<bigint>(duelist_token_call('calc_fee', args))
     return results ?? null
   }
 

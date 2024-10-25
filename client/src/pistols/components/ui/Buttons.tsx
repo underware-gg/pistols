@@ -96,13 +96,11 @@ export const ActionButton = ({
 
 export const BalanceRequiredButton = ({
   label,
-  tableId,
   fee,
   onClick,
   disabled = false,
 }: {
   label: string
-  tableId: string
   fee: BigNumberish
   onClick: Function
   disabled?: boolean

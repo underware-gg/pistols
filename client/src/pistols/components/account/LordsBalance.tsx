@@ -54,12 +54,10 @@ export const FameBalance = ({
 // Fees to be paid
 //
 export function FeesToPay({
-  tableId,
   fee,
   prefixed = false,
   big = false,
 }: {
-  tableId: string
   value: BigNumberish
   fee: BigNumberish
   prefixed?: boolean
@@ -70,7 +68,7 @@ export function FeesToPay({
   // fees only
   return (
     <span>
-      <Balance big={big} tableId={tableId} wei={fee} pre={pre} placeholdder={0} />
+      <Balance big={big} wei={fee} pre={pre} placeholdder={0} />
     </span>
   )
 }

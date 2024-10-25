@@ -23,6 +23,22 @@ export const useCanJoin = () => {
   }
 }
 
+export const useCalcFeeDuelist = () => {
+  const { address } = useAccount()
+  const { calc_fee_duelist } = useDojoSystemCalls()
+  const options = useMemo(() => ({
+    call: calc_fee_duelist,
+    args: [address],
+    enabled: isPositiveBigint(address),
+    defaultValue: null,
+  }), [calc_fee_duelist, address])
+  const { value, isPending } = useContractCall(options)
+  return {
+    fee: value,
+    isPending,
+  }
+}
+
 export const useCalcFeeDuel = (table_id: string) => {
   const { calc_fee_duel } = useDojoSystemCalls()
   const options = useMemo(() => ({
