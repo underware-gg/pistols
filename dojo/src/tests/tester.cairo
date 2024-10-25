@@ -40,13 +40,11 @@ mod tester {
     };
     use pistols::models::config::{
         Config, ConfigStore, CONFIG, ConfigEntity, ConfigEntityStore,
+        TokenConfig, TokenConfigStore, TokenConfigEntity, TokenConfigEntityStore,
     };
     use pistols::models::table::{
         TableConfig, TableConfigStore, TableConfigEntity, TableConfigEntityStore,
         TableAdmittance, TableAdmittanceStore, TableAdmittanceEntity, TableAdmittanceEntityStore,
-    };
-    use pistols::models::token_config::{
-        TokenConfig, TokenConfigStore, TokenConfigEntity, TokenConfigEntityStore,
     };
 
     use pistols::systems::rng::{rng};
@@ -213,6 +211,7 @@ mod tester {
                 let address = deploy_system(world, 'duel_token', duel_token::TEST_CLASS_HASH);
                 world.grant_writer(SELECTORS::DUEL_TOKEN, OWNER());
                 world.grant_writer(selector_from_tag!("pistols-TokenConfig"), address);
+                world.grant_writer(selector_from_tag!("pistols-Payment"), address);
                 world.grant_writer(selector_from_tag!("pistols-Challenge"), address);
                 world.grant_writer(selector_from_tag!("pistols-Round"), address);
                 world.grant_writer(selector_from_tag!("pistols-Pact"), address);
@@ -233,6 +232,7 @@ mod tester {
                 let address = deploy_system(world, 'duelist_token', duelist_token::TEST_CLASS_HASH);
                 world.grant_writer(SELECTORS::DUELIST_TOKEN, OWNER());
                 world.grant_writer(selector_from_tag!("pistols-TokenConfig"), address);
+                world.grant_writer(selector_from_tag!("pistols-Payment"), address);
                 world.grant_writer(selector_from_tag!("pistols-Duelist"), address);
                 let call_data: Span<felt252> = array![
                     0, // minter_address
@@ -511,6 +511,9 @@ mod tester {
     //
 
     // depends on use dojo::model::{Model};
+    fn set_Config(world: IWorldDispatcher, model: Config) {
+        model.set_test(world);
+    }
     fn set_TableConfig(world: IWorldDispatcher, model: TableConfig) {
         model.set_test(world);
     }

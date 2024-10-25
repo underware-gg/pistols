@@ -2,6 +2,15 @@ use starknet::{ContractAddress};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
 pub use pistols::models::{
+    config::{
+        CONFIG,
+        Config, ConfigStore,
+        ConfigEntity, ConfigEntityStore,
+        CoinConfig, CoinConfigStore,
+        CoinConfigEntity, CoinConfigEntityStore,
+        TokenConfig, TokenConfigStore,
+        TokenConfigEntity, TokenConfigEntityStore,
+    },
     challenge::{
         Challenge, ChallengeStore, ChallengeEntity, ChallengeEntityStore,
         Wager, WagerStore, WagerEntity, WagerEntityStore,
@@ -17,18 +26,9 @@ pub use pistols::models::{
         TableWager, TableWagerStore, TableWagerEntity, TableWagerEntityStore,
         TableAdmittance, TableAdmittanceStore, TableAdmittanceEntity, TableAdmittanceEntityStore,
     },
-    config::{
-        Config, ConfigStore,
-        ConfigEntity, ConfigEntityStore,
-        CONFIG,
-    },
-    coin_config::{
-        CoinConfig, CoinConfigStore,
-        CoinConfigEntity, CoinConfigEntityStore,
-    },
-    token_config::{
-        TokenConfig, TokenConfigStore,
-        TokenConfigEntity, TokenConfigEntityStore,
+    payment::{
+        Payment, PaymentTrait, PaymentStore,
+        PaymentEntity, PaymentEntityStore,
     },
 };
 
@@ -171,6 +171,11 @@ impl StoreImpl of StoreTrait {
         ))
     }
 
+    #[inline(always)]
+    fn get_payment(self: Store, key: felt252) -> Payment {
+        (PaymentStore::get(self.world, key))
+    }
+
     //
     // Setters
     //
@@ -253,4 +258,9 @@ impl StoreImpl of StoreTrait {
         entity.update(self.world);
     }
 
+    #[inline(always)]
+    fn set_payment(self: Store, model: @Payment) {
+        (*model).assert_is_valid();
+        model.set(self.world);
+    }
 }

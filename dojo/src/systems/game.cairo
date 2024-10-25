@@ -67,10 +67,10 @@ mod game {
     mod Errors {
         const CHALLENGE_EXISTS: felt252          = 'PISTOLS: Challenge exists';
         const CHALLENGE_NOT_IN_PROGRESS: felt252 = 'PISTOLS: Challenge not ongoing';
-        const INSUFFICIENT_BALANCE: felt252      = 'PISTOLS: Insufficient balance';
-        const NO_ALLOWANCE: felt252              = 'PISTOLS: No transfer allowance';
-        const WITHDRAW_NOT_AVAILABLE: felt252    = 'PISTOLS: Withdraw not available';
-        const WAGER_NOT_AVAILABLE: felt252       = 'PISTOLS: Wager not available';
+const INSUFFICIENT_BALANCE: felt252      = 'PISTOLS: Insufficient balance';
+const NO_ALLOWANCE: felt252              = 'PISTOLS: No transfer allowance';
+const WITHDRAW_NOT_AVAILABLE: felt252    = 'PISTOLS: Withdraw not available';
+const WAGER_NOT_AVAILABLE: felt252       = 'PISTOLS: Wager not available';
         const NOT_YOUR_DUEL: felt252             = 'PISTOLS: Not your duel';
         const NOT_YOUR_DUELIST: felt252          = 'PISTOLS: Not your duelist';
         const ROUND_NOT_IN_COMMIT: felt252       = 'PISTOLS: Round not in commit';

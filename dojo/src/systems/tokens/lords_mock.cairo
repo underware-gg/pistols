@@ -33,10 +33,6 @@ pub trait ILordsMockPublic<TState> {
     fn mint(ref self: TState, recipient: ContractAddress, amount: u256);
 }
 
-#[starknet::interface]
-pub trait ILordsMockInternal<TState> {
-}
-
 #[dojo::contract]
 pub mod lords_mock {
     // use debug::PrintTrait;

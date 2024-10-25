@@ -5,8 +5,8 @@ use graffiti::json::JsonImpl;
 
 use pistols::systems::tokens::duelist_token::{IDuelistToken, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait};
 use pistols::models::{
+    config::{TokenConfig},
     duelist::{Duelist},
-    token_config::{TokenConfig},
 };
 use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::arrays::{SpanUtilsTrait};

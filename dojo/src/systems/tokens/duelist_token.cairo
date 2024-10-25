@@ -71,11 +71,6 @@ pub trait IDuelistTokenPublic<TState> {
     );
 }
 
-#[starknet::interface]
-pub trait IDuelistTokenInternal<TState> {
-    fn format_image(self: @TState, duelist: Duelist, variant: ByteArray) -> ByteArray;
-}
-
 #[dojo::contract]
 pub mod duelist_token {    
     // use debug::PrintTrait;
@@ -121,6 +116,10 @@ pub mod duelist_token {
     // ERC-721 End
     //-----------------------------------
 
+    use pistols::interfaces::systems::{
+        WorldSystemsTrait,
+        IBankDispatcher, IBankDispatcherTrait,
+    };
     use pistols::models::{
         duelist::{
             Duelist, DuelistEntity,
@@ -128,10 +127,11 @@ pub mod duelist_token {
             ProfilePicType, Archetype,
             ScoreboardEntity,
         },
-        token_config::{
+        config::{
             TokenConfig, TokenConfigStore,
             TokenConfigEntity, TokenConfigEntityStore,
         },
+        payment::{Payment},
         table::{TABLES},
     };
     use pistols::types::constants::{CONST, HONOUR};
@@ -141,8 +141,8 @@ pub mod duelist_token {
     use pistols::utils::math::{MathTrait};
 
     mod Errors {
-        const NOT_IMPLEMENTED: felt252          = 'DUELIST: Not implemented';
         const INVALID_DUELIST: felt252          = 'DUELIST: Invalid duelist';
+        const NOT_IMPLEMENTED: felt252          = 'DUELIST: Not implemented';
     }
 
     //*******************************
@@ -162,10 +162,19 @@ pub mod duelist_token {
             TOKEN_SYMBOL(),
             BASE_URI(),
         );
+        let payment = Payment {
+            key: get_contract_address().into(),
+            amount: fee_amount.into(),
+            client_percent: 0,
+            ranking_percent: 0,
+            owner_percent: 0,
+            pool_percent: 0,
+            treasury_percent: 100,
+        };
         self.token.initialize(
             minter_address,
             renderer_address,
-            fee_amount: fee_amount.into(),
+            payment,
         );
     }
 
@@ -180,13 +189,7 @@ pub mod duelist_token {
         fn calc_fee(self: @ContractState,
             recipient: ContractAddress,
         ) -> u128 {
-            if (self.erc721.balance_of(recipient) == 0) {
-                (0) // first is free
-            } else {
-                let store = StoreTrait::new(self.world());
-                let token_config: TokenConfig = store.get_token_config(get_contract_address());
-                (token_config.fee_amount)
-            }
+            (self.get_payment(recipient).amount.low)
         }
 
         fn create_duelist(ref self: ContractState,
@@ -196,9 +199,9 @@ pub mod duelist_token {
             profile_pic_uri: felt252,
         ) -> Duelist {
             // transfer mint fee
-            let fee_amount: u128 = self.calc_fee(recipient);
-            if (fee_amount > 0) {
-                assert(false, Errors::NOT_IMPLEMENTED);
+            let payment: Payment = self.get_payment(recipient);
+            if (payment.amount > 0) { // avoid bank contract during tests
+                self.world().bank_dispatcher().charge(recipient, payment);
             }
 
             // mint!
@@ -263,8 +266,19 @@ pub mod duelist_token {
     //-----------------------------------
     // Internal
     //
-    use super::{IDuelistTokenInternal};
-    impl DuelistTokenInternalImpl of IDuelistTokenInternal<ContractState> {
+    #[generate_trait]
+    impl InternalImpl of InternalTrait {
+        fn get_payment(self: @ContractState,
+            recipient: ContractAddress,
+        ) -> Payment {
+            if (self.erc721.balance_of(recipient) == 0) {
+                (Default::default()) // first is free
+            } else {
+                let store = StoreTrait::new(self.world());
+                (store.get_payment(get_contract_address().into()))
+            }
+        }
+
         fn format_image(self: @ContractState, duelist: Duelist, variant: ByteArray) -> ByteArray {
             let base_uri: ByteArray = self.erc721._base_uri();
             let number =

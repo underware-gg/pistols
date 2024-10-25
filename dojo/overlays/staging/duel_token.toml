@@ -1,6 +1,7 @@
 tag = "pistols-duel_token"
 writes = [
   "pistols-TokenConfig",
+  "pistols-Payment",
   "pistols-Challenge",
   "pistols-Round",
   "pistols-Pact",

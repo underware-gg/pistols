@@ -1,6 +1,7 @@
 tag = "pistols-duelist_token"
 writes = [
   "pistols-TokenConfig",
+  "pistols-Payment",
   "pistols-Duelist",
 ]
 init_calldata = [

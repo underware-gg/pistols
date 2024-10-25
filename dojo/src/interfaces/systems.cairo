@@ -3,6 +3,7 @@ use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait, Resource};
 
 pub use pistols::systems::{
     admin::{IAdminDispatcher, IAdminDispatcherTrait},
+    bank::{IBankDispatcher, IBankDispatcherTrait},
     game::{IGameDispatcher, IGameDispatcherTrait},
     rng::{IRngDispatcher, IRngDispatcherTrait},
     tokens::{
@@ -10,14 +11,15 @@ pub use pistols::systems::{
         duelist_token::{IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
     }
 };
-pub use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
-pub use pistols::models::config::{ConfigEntity};
+pub use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
+pub use pistols::models::config::{ConfigEntity, ConfigEntityTrait};
 pub use pistols::libs::store::{Store, StoreTrait};
 pub use pistols::utils::misc::{ZERO};
 
 pub mod SELECTORS {
     // systems
     const ADMIN: felt252 = selector_from_tag!("pistols-admin");
+    const BANK: felt252 = selector_from_tag!("pistols-bank");
     const GAME: felt252 = selector_from_tag!("pistols-game");
     const RNG: felt252 = selector_from_tag!("pistols-rng");
     // tokens
@@ -27,9 +29,9 @@ pub mod SELECTORS {
     // models
     const CONFIG: felt252 = selector_from_tag!("pistols-Config");
     const TABLE_CONFIG: felt252 = selector_from_tag!("pistols-TableConfig");
-    const TABLE_WAGER: felt252 = selector_from_tag!("pistols-TableWager");
     const TOKEN_CONFIG: felt252 = selector_from_tag!("pistols-TokenConfig");
     const COIN_CONFIG: felt252 = selector_from_tag!("pistols-CoinConfig");
+    const PAYMENT: felt252 = selector_from_tag!("pistols-Payment");
 }
 
 #[generate_trait]
@@ -60,6 +62,10 @@ pub impl WorldSystemsTraitImpl of WorldSystemsTrait {
         (IAdminDispatcher{ contract_address: self.contract_address(SELECTORS::ADMIN) })
     }
     #[inline(always)]
+    fn bank_dispatcher(self: @IWorldDispatcher) -> IBankDispatcher {
+        (IBankDispatcher{ contract_address: self.contract_address(SELECTORS::BANK) })
+    }
+    #[inline(always)]
     fn game_dispatcher(self: @IWorldDispatcher) -> IGameDispatcher {
         (IGameDispatcher{ contract_address: self.contract_address(SELECTORS::GAME) })
     }
@@ -77,7 +83,7 @@ pub impl WorldSystemsTraitImpl of WorldSystemsTrait {
     }
     #[inline(always)]
     fn lords_dispatcher(self: @IWorldDispatcher) -> IERC20Dispatcher {
-        (ierc20(StoreTrait::new(*self).get_config_entity().lords_address))
+        (StoreTrait::new(*self).get_config_entity().lords_dispatcher())
     }
 
     //

@@ -65,8 +65,9 @@ mod admin {
                 (
                     world.is_writer(SELECTORS::CONFIG, account_address) &&
                     world.is_writer(SELECTORS::TABLE_CONFIG, account_address) &&
-                    world.is_writer(SELECTORS::TABLE_WAGER, account_address) &&
-                    world.is_writer(SELECTORS::TOKEN_CONFIG, account_address)
+                    world.is_writer(SELECTORS::TOKEN_CONFIG, account_address) &&
+                    world.is_writer(SELECTORS::COIN_CONFIG, account_address) &&
+                    world.is_writer(SELECTORS::PAYMENT, account_address)
                 )
             )
         }
@@ -78,13 +79,15 @@ mod admin {
             if (granted) {
                 self.world().grant_writer(SELECTORS::CONFIG, account_address);
                 self.world().grant_writer(SELECTORS::TABLE_CONFIG, account_address);
-                self.world().grant_writer(SELECTORS::TABLE_WAGER, account_address);
                 self.world().grant_writer(SELECTORS::TOKEN_CONFIG, account_address);
+                self.world().grant_writer(SELECTORS::COIN_CONFIG, account_address);
+                self.world().grant_writer(SELECTORS::PAYMENT, account_address);
             } else {
                 self.world().revoke_writer(SELECTORS::CONFIG, account_address);
                 self.world().revoke_writer(SELECTORS::TABLE_CONFIG, account_address);
-                self.world().revoke_writer(SELECTORS::TABLE_WAGER, account_address);
                 self.world().revoke_writer(SELECTORS::TOKEN_CONFIG, account_address);
+                self.world().revoke_writer(SELECTORS::COIN_CONFIG, account_address);
+                self.world().revoke_writer(SELECTORS::PAYMENT, account_address);
             }
         }
 

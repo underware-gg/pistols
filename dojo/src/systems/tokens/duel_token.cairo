@@ -80,10 +80,6 @@ pub trait IDuelTokenPublic<TState> {
     fn can_join(self: @TState, table_id: felt252, duelist_id: u128) -> bool;
 }
 
-#[starknet::interface]
-pub trait IDuelTokenInternal<TState> {
-}
-
 #[dojo::contract]
 pub mod duel_token {    
     // use debug::PrintTrait;
@@ -134,7 +130,7 @@ pub mod duel_token {
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
     };
     use pistols::models::{
-        token_config::{TokenConfig, TokenConfigStore, TokenConfigEntity, TokenConfigEntityStore},
+        config::{TokenConfig, TokenConfigStore, TokenConfigEntity, TokenConfigEntityStore},
         challenge::{Challenge, ChallengeEntity, Wager, Round, Moves},
         duelist::{Duelist, DuelistEntity, DuelistTrait, Pact},
         table::{
@@ -196,7 +192,7 @@ pub mod duel_token {
         self.token.initialize(
             minter_address,
             renderer_address,
-            fee_amount: fee_amount.into(),
+            payment: Default::default(),
         );
     }
 

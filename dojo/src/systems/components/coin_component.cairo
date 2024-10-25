@@ -25,7 +25,7 @@ pub mod CoinComponent {
     };
     use openzeppelin_token::erc20::interface;
 
-    use pistols::models::coin_config::{
+    use pistols::models::config::{
         CoinConfig, CoinConfigStore,
         CoinConfigEntity, CoinConfigEntityStore,
     };

@@ -6,10 +6,6 @@ pub trait ITokenBoundPublic<TState> {
     fn token_balance_of(self: @TState, token_address: ContractAddress, token_id: ContractAddress) -> u256;
 }
 
-#[starknet::interface]
-pub trait ITokenBoundInternal<TState> {
-}
-
 #[starknet::component]
 pub mod TokenBound {
     use zeroable::Zeroable;

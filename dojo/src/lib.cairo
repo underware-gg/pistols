@@ -6,6 +6,7 @@ mod interfaces {
 
 mod systems {
     mod admin;
+    mod bank;
     mod game;
     mod rng;
     mod tokens {
@@ -34,9 +35,8 @@ mod models {
     mod challenge;
     mod config;
     mod duelist;
+    mod payment;
     mod table;
-    mod coin_config;
-    mod token_config;
 }
 
 mod types {

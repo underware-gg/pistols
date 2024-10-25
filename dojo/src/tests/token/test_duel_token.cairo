@@ -4,17 +4,19 @@ use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use dojo::model::{Model, ModelTest, ModelIndex, ModelEntityTest};
 use dojo::utils::test::spawn_test_world;
 
-use pistols::systems::tokens::{
-    duel_token::{duel_token, IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
-    duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
-    lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
+use pistols::systems::{
+    bank::{bank, IBankDispatcher, IBankDispatcherTrait},
+    tokens::{
+        duel_token::{duel_token, IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
+        duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
+        lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
+    },
 };
 use pistols::interfaces::systems::{SELECTORS};
 use pistols::models::{
     challenge::{Challenge, Wager, Round},
-    config::{Config},
+    config::{Config, TokenConfig, CONFIG},
     table::{TableConfig, TableAdmittance, TableInitializer, TableInitializerTrait},
-    token_config::{TokenConfig},
     table::{TABLES, default_tables},
 };
 use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
@@ -24,7 +26,7 @@ use pistols::utils::arrays::{ArrayUtilsTrait, SpanUtilsTrait};
 use pistols::utils::math::{MathTrait};
 
 use pistols::tests::token::mock_duelist::{duelist_token as mock_duelist, mock_duelist_owners};
-use pistols::tests::tester::{tester, tester::{OWNER, OTHER, BUMMER, ZERO}};
+use pistols::tests::tester::{tester, tester::{OWNER, OTHER, BUMMER, TREASURY, ZERO}};
 use pistols::tests::{utils};
 
 use openzeppelin_token::erc721::interface;
@@ -91,15 +93,18 @@ fn setup_uninitialized(fee_amount: u128) -> (IWorldDispatcher, IDuelTokenDispatc
 
     let mut world = spawn_test_world(["pistols"].span(), models.span());
 
-    let mut lords = ILordsMockDispatcher{
+    let mut lords = ILordsMockDispatcher {
         contract_address: world.deploy_contract('lords_mock', lords_mock::TEST_CLASS_HASH.try_into().unwrap())
     };
     world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), lords.contract_address);
+    let call_data: Span<felt252> = array![
+        0, // minter
+        10_000_000_000_000_000_000_000, // 10,000 Lords
+    ].span();
+    world.init_contract(SELECTORS::LORDS_MOCK, call_data);
 
-    let mut duelists = IDuelistTokenDispatcher {
-        contract_address: world.deploy_contract('duelist_token', mock_duelist::TEST_CLASS_HASH.try_into().unwrap())
-    };
-    world.grant_writer(selector_from_tag!("pistols-MockDuelistOwners"), duelists.contract_address);
+    let mut duelists_address: ContractAddress = world.deploy_contract('duelist_token', mock_duelist::TEST_CLASS_HASH.try_into().unwrap());
+    world.grant_writer(selector_from_tag!("pistols-MockDuelistOwners"), duelists_address);
 
     let mut token = IDuelTokenDispatcher {
         contract_address: world.deploy_contract('duel_token', duel_token::TEST_CLASS_HASH.try_into().unwrap())
@@ -114,8 +119,14 @@ fn setup_uninitialized(fee_amount: u128) -> (IWorldDispatcher, IDuelTokenDispatc
 
     tester::impersonate(OWNER());
 
-    let tables = default_tables();
-    tester::set_TableConfig(world, *tables[0]);
+    tester::set_TableConfig(world, *default_tables()[0]);
+
+    tester::set_Config(world, Config {
+        key: CONFIG::CONFIG_KEY,
+        treasury_address: TREASURY(),
+        lords_address: lords.contract_address,
+        is_paused: false,
+    });
 
     (world, token)
 }
@@ -298,6 +309,15 @@ fn test_transfer_from() {
     // assert(token.token_of_owner_by_index(OTHER(), 1) == TOKEN_ID_1, 'Should eq TOKEN_ID_1');
 }
 
+#[test]
+#[should_panic(expected: ('ERC721: unauthorized caller', 'ENTRYPOINT_FAILED'))]
+fn test_mint_no_allowance() {
+    let (_world, mut token) = setup(100);
+    utils::impersonate(BUMMER());
+    token.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
+}
+
+
 //
 // mint
 //
@@ -323,13 +343,6 @@ fn test_mint_lords() {
     _assert_minted_count(world, token, 3, 'invalid total_supply');
 }
 
-#[test]
-#[should_panic(expected: ('ERC721: unauthorized caller', 'ENTRYPOINT_FAILED'))]
-fn test_mint_no_allowance() {
-    let (_world, mut token) = setup(100);
-    utils::impersonate(BUMMER());
-    token.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
-}
 
 //
 // burn
