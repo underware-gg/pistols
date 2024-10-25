@@ -59,7 +59,7 @@ pub struct Pact {
 }
 
 //
-// Duelist scores and wager balance per Table
+// Duelist scores per Table
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
 pub struct Scoreboard {
@@ -69,8 +69,6 @@ pub struct Scoreboard {
     pub duelist_id: u128,
     //------------
     pub score: Score,
-    pub wager_won: u128,
-    pub wager_lost: u128,
 } // [160] [128] [128]
 
 #[derive(Copy, Drop, Serde, Default, IntrospectPacked)]

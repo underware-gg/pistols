@@ -28,7 +28,6 @@ mod libs {
     mod pact;
     mod seeder;
     mod store;
-    mod utils;
 }
 
 mod models {
@@ -77,15 +76,12 @@ mod utils {
 
 #[cfg(test)]
 mod tests {
-    // pistols
     mod test_admin;
     mod test_cards;
     mod test_env_cards;
     mod test_challenge;
     mod test_duel;
     mod test_duelist;
-    // mod test_wager;
-    // mod test_torna;
     mod test_utils;
     mod test_rng;
     // utils

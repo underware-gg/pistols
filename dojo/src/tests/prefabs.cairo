@@ -6,7 +6,7 @@ mod prefabs {
 
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
-    use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, RoundEntity};
+    use pistols::models::challenge::{Challenge, ChallengeEntity, Round, RoundEntity};
     use pistols::models::table::{TableConfig, TABLES};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::duel_progress::{DuelProgress, DuelStep};
@@ -31,8 +31,8 @@ mod prefabs {
     const NAME_B: felt252 = 'Senpai';
     const MESSAGE: felt252 = 'For honour!!!';
     const TABLE_ID: felt252 = TABLES::COMMONERS;
-    const WAGER_VALUE: u128 = 0;
-    // const WAGER_VALUE: u128 = 20_000_000_000_000_000_000;
+    const PRIZE_VALUE: u128 = 0;
+    // const PRIZE_VALUE: u128 = 20_000_000_000_000_000_000;
 
     const SALT_A: felt252 = 0xa6f099b756a87e62;
     const SALT_B: felt252 = 0xf9a978e92309da78;

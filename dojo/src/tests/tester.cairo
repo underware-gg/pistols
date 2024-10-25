@@ -28,7 +28,6 @@ mod tester {
 
     use pistols::models::challenge::{
         Challenge, ChallengeStore, ChallengeEntity, ChallengeEntityStore, DuelistState, DuelistStateTrait,
-        Wager, WagerStore, WagerEntity, WagerEntityStore,
         Round, RoundStore, RoundEntity, RoundEntityStore,
     };
     use pistols::models::duelist::{
@@ -183,7 +182,6 @@ mod tester {
                 world.grant_writer(selector_from_tag!("pistols-Duelist"), address);
                 world.grant_writer(selector_from_tag!("pistols-Scoreboard"), address);
                 world.grant_writer(selector_from_tag!("pistols-Challenge"), address);
-                world.grant_writer(selector_from_tag!("pistols-Wager"), address);
                 world.grant_writer(selector_from_tag!("pistols-Pact"), address);
                 world.grant_writer(selector_from_tag!("pistols-Round"), address);
                 (address)
@@ -260,7 +258,6 @@ mod tester {
                 world.grant_owner(SELECTORS::ADMIN, OWNER());
                 world.grant_writer(selector_from_tag!("pistols-Config"), address);
                 world.grant_writer(selector_from_tag!("pistols-TableConfig"), address);
-                world.grant_writer(selector_from_tag!("pistols-TableWager"), address);
                 world.grant_writer(selector_from_tag!("pistols-TableAdmittance"), address);
                 world.init_contract(SELECTORS::ADMIN, call_data);
                 (address)
@@ -492,10 +489,6 @@ mod tester {
         (ChallengeEntityStore::get(world, ChallengeStore::entity_id_from_keys(duel_id)))
     }
     #[inline(always)]
-    fn get_Wager(world: IWorldDispatcher, duel_id: u128) -> Wager {
-        (WagerStore::get(world, duel_id))
-    }
-    #[inline(always)]
     fn get_RoundEntity(world: IWorldDispatcher, duel_id: u128) -> RoundEntity {
         (RoundEntityStore::get(world, RoundStore::entity_id_from_keys(duel_id)))
     }
@@ -548,15 +541,15 @@ mod tester {
         winner: u8,
         duelist_a: ContractAddress, duelist_b: ContractAddress,
         balance_a: u128, balance_b: u128,
-        fee: u128, wager_value: u128,
+        fee: u128, prize_value: u128,
         prefix: felt252,
     ) {
         if (winner == 1) {
-            assert_balance(lords, duelist_a, balance_a, fee, wager_value, ShortString::concat('A_A_', prefix));
-            assert_balance(lords, duelist_b, balance_b, fee + wager_value, 0, ShortString::concat('A_B_', prefix));
+            assert_balance(lords, duelist_a, balance_a, fee, prize_value, ShortString::concat('A_A_', prefix));
+            assert_balance(lords, duelist_b, balance_b, fee + prize_value, 0, ShortString::concat('A_B_', prefix));
         } else if (winner == 2) {
-            assert_balance(lords, duelist_a, balance_a, fee + wager_value, 0, ShortString::concat('B_A_', prefix));
-            assert_balance(lords, duelist_b, balance_b, fee, wager_value, ShortString::concat('B_B_', prefix));
+            assert_balance(lords, duelist_a, balance_a, fee + prize_value, 0, ShortString::concat('B_A_', prefix));
+            assert_balance(lords, duelist_b, balance_b, fee, prize_value, ShortString::concat('B_B_', prefix));
         } else {
             assert_balance(lords, duelist_a, balance_a, fee, 0, ShortString::concat('D_A_', prefix));
             assert_balance(lords, duelist_b, balance_b, fee, 0, ShortString::concat('D_B_', prefix));

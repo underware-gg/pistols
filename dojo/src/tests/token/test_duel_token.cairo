@@ -14,7 +14,7 @@ use pistols::systems::{
 };
 use pistols::interfaces::systems::{SELECTORS};
 use pistols::models::{
-    challenge::{Challenge, Wager, Round},
+    challenge::{Challenge, Round},
     config::{Config, TokenConfig, CONFIG},
     table::{TableConfig, TableAdmittance, TableInitializer, TableInitializerTrait},
     table::{TABLES, default_tables},

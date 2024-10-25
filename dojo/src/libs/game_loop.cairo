@@ -27,7 +27,6 @@ use pistols::utils::math::{MathU8, MathU16};
 use pistols::utils::bitwise::{BitwiseU32, BitwiseU128};
 use pistols::utils::hash::{hash_values, felt_to_u128};
 use pistols::libs::store::{Store, StoreTrait};
-use pistols::libs::utils;
 
 
 // a moves hash is composed of a hash of each move

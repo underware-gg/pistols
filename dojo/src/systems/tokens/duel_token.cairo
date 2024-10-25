@@ -131,7 +131,7 @@ pub mod duel_token {
     };
     use pistols::models::{
         config::{TokenConfig, TokenConfigStore, TokenConfigEntity, TokenConfigEntityStore},
-        challenge::{Challenge, ChallengeEntity, Wager, Round, Moves},
+        challenge::{Challenge, ChallengeEntity, Round, Moves},
         duelist::{Duelist, DuelistEntity, DuelistTrait, Pact},
         table::{
             TableConfig, TableConfigEntity, TableConfigEntityTrait,
@@ -148,7 +148,6 @@ pub mod duel_token {
     use pistols::libs::seeder::{make_seed};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::libs::pact;
-    use pistols::libs::utils;
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::math::{MathTrait};
@@ -357,8 +356,6 @@ pub mod duel_token {
                     challenge.state = ChallengeState::InProgress;
                     challenge.timestamp_start = timestamp;
                     challenge.timestamp_end = 0;
-                    // transfer wager/fee from Challenged to the contract
-                    utils::deposit_wager_fees(store, challenge, challenge.address_b, starknet::get_contract_address());
                     // events
                     emitters::emitChallengeAcceptedEvent(@self.world(), challenge, accepted);
                     emitters::emitDuelistTurnEvent(@self.world(), challenge);
@@ -376,8 +373,6 @@ pub mod duel_token {
 
             // duel canceled!
             if (challenge.state.is_canceled()) {
-                // transfer wager/fee back to challenger
-                utils::withdraw_wager_fees(store, challenge, challenge.address_a);
                 pact::unset_pact(store, challenge);
             }
             
@@ -400,7 +395,7 @@ pub mod duel_token {
         fn calc_fee(self: @ContractState, table_id: felt252) -> u128 {
             let store: Store = StoreTrait::new(self.world());
             let table: TableConfigEntity = store.get_table_config_entity(table_id);
-            (table.calc_fee(0))
+            (table.calc_fee())
         }
         
         fn get_pact(self: @ContractState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128 {

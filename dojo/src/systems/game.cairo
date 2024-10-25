@@ -53,24 +53,19 @@ mod game {
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::duel_progress::{DuelProgress, DuelistDrawnCard};
     use pistols::types::round_state::{RoundState, RoundStateTrait};
+    use pistols::types::cards::hand::DuelistHandTrait;
+    use pistols::types::typed_data::{CommitMoveMessage, CommitMoveMessageTrait};
     use pistols::types::constants::{CONST};
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::misc::{ZERO, WORLD};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::libs::game_loop::{game_loop, make_moves_hash};
-    use pistols::libs::pact;
-    use pistols::libs::utils;
-    use pistols::types::cards::hand::DuelistHandTrait;
-    use pistols::types::typed_data::{CommitMoveMessage, CommitMoveMessageTrait};
     use pistols::libs::events::{emitters};
+    use pistols::libs::pact;
 
     mod Errors {
         const CHALLENGE_EXISTS: felt252          = 'PISTOLS: Challenge exists';
         const CHALLENGE_NOT_IN_PROGRESS: felt252 = 'PISTOLS: Challenge not ongoing';
-const INSUFFICIENT_BALANCE: felt252      = 'PISTOLS: Insufficient balance';
-const NO_ALLOWANCE: felt252              = 'PISTOLS: No transfer allowance';
-const WITHDRAW_NOT_AVAILABLE: felt252    = 'PISTOLS: Withdraw not available';
-const WAGER_NOT_AVAILABLE: felt252       = 'PISTOLS: Wager not available';
         const NOT_YOUR_DUEL: felt252             = 'PISTOLS: Not your duel';
         const NOT_YOUR_DUELIST: felt252          = 'PISTOLS: Not your duelist';
         const ROUND_NOT_IN_COMMIT: felt252       = 'PISTOLS: Round not in commit';
@@ -285,22 +280,6 @@ const WAGER_NOT_AVAILABLE: felt252       = 'PISTOLS: Wager not available';
             duelist_b.score.update_honour(round.state_b.honour);
             scoreboard_a.score.update_honour(round.state_a.honour);
             scoreboard_b.score.update_honour(round.state_b.honour);
-
-            // split wager/fee to winners and benefactors
-            if (round.state_a.wager > round.state_b.wager) {
-                // duelist_a won the Wager
-                let wager_value: u128 = utils::split_wager_fees(store, challenge, challenge.address_a, challenge.address_a);
-                scoreboard_a.wager_won += wager_value;
-                scoreboard_b.wager_lost += wager_value;
-            } else if (round.state_a.wager < round.state_b.wager) {
-                // duelist_b won the Wager
-                let wager_value: u128 = utils::split_wager_fees(store, challenge, challenge.address_b, challenge.address_b);
-                scoreboard_a.wager_lost += wager_value;
-                scoreboard_b.wager_won += wager_value;
-            } else {
-                // no-one gets the Wager
-                utils::split_wager_fees(store, challenge, challenge.address_a, challenge.address_b);
-            }
             
             // save
             store.update_duelist_entity(@duelist_a);

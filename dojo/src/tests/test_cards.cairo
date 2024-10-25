@@ -8,7 +8,7 @@ mod tests {
 
     use pistols::systems::rng::{Dice, DiceTrait};
     use pistols::systems::game::{game, IGameDispatcher, IGameDispatcherTrait};
-    use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, RoundEntity, Moves, MovesTrait, DuelistState, DuelistStateTrait};
+    use pistols::models::challenge::{Challenge, ChallengeEntity, Round, RoundEntity, Moves, MovesTrait, DuelistState, DuelistStateTrait};
     use pistols::models::duelist::{Duelist, DuelistEntity, DuelistEntityStore, ProfilePicType, Archetype};
     use pistols::models::table::{TableConfig, TABLES};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
@@ -40,7 +40,7 @@ mod tests {
     };
     use pistols::tests::prefabs::{prefabs,
         prefabs::{
-            SALT_A, SALT_B, TABLE_ID, MESSAGE, WAGER_VALUE,
+            SALT_A, SALT_B, TABLE_ID, MESSAGE,
             ENV_CARD_NEUTRAL,
             SaltsValues, SaltsValuesTrait,
             PlayerMoves, PlayerMovesTrait,

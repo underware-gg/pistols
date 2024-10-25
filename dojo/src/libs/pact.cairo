@@ -2,7 +2,7 @@
 use core::option::OptionTrait;
 
 use pistols::systems::tokens::duel_token::duel_token::{Errors as DuelErrors};
-use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, WagerEntity, Round, RoundEntity, Moves};
+use pistols::models::challenge::{Challenge, ChallengeEntity};
 use pistols::models::duelist::{Duelist, DuelistTrait, Pact, PactEntity};
 use pistols::utils::hash::{hash_values};
 use pistols::libs::store::{Store, StoreTrait};

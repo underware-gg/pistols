@@ -8,7 +8,7 @@ mod tests {
     use core::traits::{Into, TryInto};
     use starknet::{ContractAddress};
 
-    use pistols::libs::{utils, pact};
+    use pistols::libs::{pact};
     use pistols::models::challenge::{Round};
     use pistols::models::duelist::{Duelist, Score, ScoreTrait};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};

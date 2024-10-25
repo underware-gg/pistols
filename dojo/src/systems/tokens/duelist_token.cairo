@@ -350,30 +350,6 @@ pub mod duelist_token {
                 
                 result.append("Total Draws");
                 result.append(duelist.score.total_draws.as_string());
-                
-                // Wager on Lords table
-                let scoreboard: ScoreboardEntity = store.get_scoreboard_entity(TABLES::LORDS, duelist.duelist_id);
-                
-                result.append("Lords Won");
-                let amount: u128 = (scoreboard.wager_won / CONST::ETH_TO_WEI.low);
-                result.append(format!("{}", amount));
-                
-                result.append("Lords Lost");
-                if (scoreboard.wager_lost == 0) {
-                    result.append("0");
-                } else {
-                    let amount: u128 = (scoreboard.wager_lost / CONST::ETH_TO_WEI.low);
-                    result.append(format!("-{}", amount));
-                }
-                
-                result.append("Lords Balance");
-                if (scoreboard.wager_lost > scoreboard.wager_won) {
-                    let amount: u128 = ((scoreboard.wager_lost - scoreboard.wager_won) / CONST::ETH_TO_WEI.low);
-                    result.append(format!("-{}", amount));
-                } else {
-                    let amount: u128 = ((scoreboard.wager_won - scoreboard.wager_lost) / CONST::ETH_TO_WEI.low);
-                    result.append(format!("{}", amount));
-                }
             }
             // done!
             (result.span())

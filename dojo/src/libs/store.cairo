@@ -13,7 +13,6 @@ pub use pistols::models::{
     },
     challenge::{
         Challenge, ChallengeStore, ChallengeEntity, ChallengeEntityStore,
-        Wager, WagerStore, WagerEntity, WagerEntityStore,
         Round, RoundStore, RoundEntity, RoundEntityStore,
     },
     duelist::{
@@ -23,7 +22,6 @@ pub use pistols::models::{
     },
     table::{
         TableConfig, TableConfigStore, TableConfigEntity, TableConfigEntityStore,
-        TableWager, TableWagerStore, TableWagerEntity, TableWagerEntityStore,
         TableAdmittance, TableAdmittanceStore, TableAdmittanceEntity, TableAdmittanceEntityStore,
     },
     payment::{
@@ -65,13 +63,6 @@ impl StoreImpl of StoreTrait {
     fn get_challenge_entity(self: Store, duel_id: u128) -> ChallengeEntity {
         (ChallengeEntityStore::get(self.world,
             ChallengeStore::entity_id_from_keys(duel_id)
-        ))
-    }
-
-    #[inline(always)]
-    fn get_wager_entity(self: Store, duel_id: u128) -> WagerEntity {
-        (WagerEntityStore::get(self.world,
-            WagerStore::entity_id_from_keys(duel_id)
         ))
     }
 
@@ -121,17 +112,6 @@ impl StoreImpl of StoreTrait {
     fn get_table_config_entity(self: Store, table_id: felt252) -> TableConfigEntity {
         (TableConfigEntityStore::get(self.world,
             TableConfigStore::entity_id_from_keys(table_id)
-        ))
-    }
-
-    #[inline(always)]
-    fn get_table_wager(self: Store, table_id: felt252) -> TableWager {
-        (TableWagerStore::get(self.world, table_id))
-    }
-    #[inline(always)]
-    fn get_table_wager_entity(self: Store, table_id: felt252) -> TableWagerEntity {
-        (TableWagerEntityStore::get(self.world,
-            TableWagerStore::entity_id_from_keys(table_id)
         ))
     }
 

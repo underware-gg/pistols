@@ -6,7 +6,7 @@ mod tests {
 
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
-    use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, RoundEntity};
+    use pistols::models::challenge::{Challenge, ChallengeEntity, Round, RoundEntity};
     use pistols::models::duelist::{Duelist, DuelistEntity, DuelistEntityStore, ProfilePicType, Archetype};
     use pistols::models::table::{TableConfig, TABLES};
     use pistols::types::cards::hand::{PacesCard, PacesCardTrait};
@@ -36,7 +36,7 @@ mod tests {
     };
     use pistols::tests::prefabs::{prefabs,
         prefabs::{
-            SALT_A, SALT_B, TABLE_ID, MESSAGE, WAGER_VALUE,
+            SALT_A, SALT_B, TABLE_ID, MESSAGE, PRIZE_VALUE,
             SaltsValues, SaltsValuesTrait,
             PlayerMoves, PlayerMovesTrait,
         },
@@ -98,9 +98,9 @@ mod tests {
         assert(fee == 0, 'fee == 0');
 
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
-        tester::assert_balance(sys.lords, sys.game.contract_address, balance_contract, 0, (fee + WAGER_VALUE) * 2, 'balance_contract_1');
-        tester::assert_balance(sys.lords, OWNER(), balance_a, fee + WAGER_VALUE, 0, 'balance_a_1');
-        tester::assert_balance(sys.lords, OTHER(), balance_b, fee + WAGER_VALUE, 0, 'balance_b_1');
+        tester::assert_balance(sys.lords, sys.game.contract_address, balance_contract, 0, (fee + PRIZE_VALUE) * 2, 'balance_contract_1');
+        tester::assert_balance(sys.lords, OWNER(), balance_a, fee + PRIZE_VALUE, 0, 'balance_a_1');
+        tester::assert_balance(sys.lords, OTHER(), balance_b, fee + PRIZE_VALUE, 0, 'balance_b_1');
         tester::assert_balance(sys.lords, TREASURY(), 0, 0, 0, 'balance_treasury_1');
 
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
@@ -196,9 +196,9 @@ mod tests {
         assert(balance_treasury == 0, 'balance_treasury == 0');
 
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
-        tester::assert_balance(sys.lords, sys.game.contract_address, balance_contract, 0, (fee + WAGER_VALUE) * 2, 'balance_contract_1');
-        tester::assert_balance(sys.lords, OWNER(), balance_a, fee + WAGER_VALUE, 0, 'balance_a_1');
-        tester::assert_balance(sys.lords, OTHER(), balance_b, fee + WAGER_VALUE, 0, 'balance_b_1');
+        tester::assert_balance(sys.lords, sys.game.contract_address, balance_contract, 0, (fee + PRIZE_VALUE) * 2, 'balance_contract_1');
+        tester::assert_balance(sys.lords, OWNER(), balance_a, fee + PRIZE_VALUE, 0, 'balance_a_1');
+        tester::assert_balance(sys.lords, OTHER(), balance_b, fee + PRIZE_VALUE, 0, 'balance_b_1');
         tester::assert_balance(sys.lords, TREASURY(), 0, 0, 0, 'balance_treasury_1');
 
         // 1st commit
@@ -284,7 +284,7 @@ mod tests {
 
         tester::assert_balance(sys.lords, sys.game.contract_address, balance_contract, 0, 0, 'balance_contract_2');
         let balance_treasury = tester::assert_balance(sys.lords, TREASURY(), balance_treasury, 0, fee * 2, 'balance_treasury_2');
-        tester::assert_winner_balance(sys.lords, challenge.winner, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'balance_winner_2');
+        tester::assert_winner_balance(sys.lords, challenge.winner, OWNER(), OTHER(), balance_a, balance_b, fee, PRIZE_VALUE, 'balance_winner_2');
         let balance_a: u128 = sys.lords.balance_of(OWNER()).low;
         let balance_b: u128 = sys.lords.balance_of(OTHER()).low;
 
@@ -329,7 +329,7 @@ mod tests {
 
         tester::assert_balance(sys.lords, sys.game.contract_address, balance_contract, 0, 0, 'balance_contract_3');
         tester::assert_balance(sys.lords, TREASURY(), balance_treasury, 0, fee * 2, 'balance_treasury_3');
-        tester::assert_winner_balance(sys.lords, challenge.winner, OWNER(), OTHER(), balance_a, balance_b, fee, WAGER_VALUE, 'balance_winner_3');
+        tester::assert_winner_balance(sys.lords, challenge.winner, OWNER(), OTHER(), balance_a, balance_b, fee, PRIZE_VALUE, 'balance_winner_3');
 
         _assert_duel_progress(sys, duel_id, moves_a.moves, moves_b.moves);
     }

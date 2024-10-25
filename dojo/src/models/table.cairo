@@ -37,17 +37,6 @@ pub struct TableConfig {
     pub is_open: bool,
 }
 
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct TableWager {
-    #[key]
-    pub table_id: felt252,
-    //------
-    pub wager_min: u128,
-    pub wager_max: u128,
-    pub fee_pct: u8,
-}
-
 #[derive(Drop, Serde)]
 #[dojo::model]
 pub struct TableAdmittance {
@@ -120,10 +109,7 @@ impl TableConfigEntityImpl of TableConfigEntityTrait {
     fn exists(self: @TableConfigEntity) -> bool {
         (*self.table_type != TableType::Undefined)
     }
-    fn calc_fee(self: @TableConfigEntity, wager_value: u128) -> u128 {
-        // (MathU128::max(*self.fee_min, (wager_value / 100) * wager.fee_pct.into()))
-        // assert(wager_value == 0, GameErrors::WAGER_NOT_ALLOWED);
-        // (*self.fee_min)
+    fn calc_fee(self: @TableConfigEntity) -> u128 {
         (0)
     }
 }

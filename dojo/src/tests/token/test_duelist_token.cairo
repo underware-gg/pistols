@@ -13,7 +13,7 @@ use pistols::systems::{
 };
 use pistols::models::{
     duelist::{Duelist, DuelistEntity, DuelistEntityStore, Score, Scoreboard, ProfilePicType, Archetype},
-    challenge::{Challenge, Wager, Round},
+    challenge::{Challenge, Round},
     config::{Config, TokenConfig, CONFIG},
     table::{TableConfig, TableAdmittance},
 };
@@ -236,8 +236,6 @@ fn test_token_uri() {
         table_id: TABLES::LORDS,
         duelist_id: TOKEN_ID_1.low,
         score: duelist.score,
-        wager_won: (1000 * CONST::ETH_TO_WEI.low),
-        wager_lost: (200 * CONST::ETH_TO_WEI.low),
     };
 
     tester::set_Duelist(sys.world, duelist);

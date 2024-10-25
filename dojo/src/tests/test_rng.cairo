@@ -11,7 +11,6 @@ mod tests {
     use pistols::systems::rng::{Dice, DiceTrait};
     use pistols::tests::mock_rng::{IRngDispatcher, IRngDispatcherTrait};
     use pistols::tests::tester::{tester, tester::{FLAGS}};
-    use pistols::libs::utils;
 
     #[test]
     fn test_rng() {

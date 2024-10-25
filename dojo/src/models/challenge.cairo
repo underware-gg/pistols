@@ -35,17 +35,6 @@ pub struct Challenge {
     pub timestamp_end: u64,         // Unix time, ended
 } // [f] [f] [f] [f] [128] [128] [152]
 
-// Challenge wager (optional)
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct Wager {
-    #[key]
-    pub duel_id: u128,
-    //------------
-    pub value: u128,
-    pub fee: u128,
-}
-
 //
 // Each duel round
 #[derive(Copy, Drop, Serde)]
@@ -84,8 +73,6 @@ pub struct DuelistState {
     pub health: u8,     // 0..CONST::FULL_HEALTH
     pub dice_fire: u8,  // 0..100
     pub honour: u8,     // honour granted
-    // TODO: REMOVE...
-    pub wager: u8,
 } // [3*8]:24
 
 
