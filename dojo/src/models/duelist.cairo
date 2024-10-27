@@ -40,8 +40,8 @@ pub struct Duelist {
     pub duelist_id: u128,   // erc721 token_id
     //-----------------------
     pub name: felt252,
-    pub profile_pic_uri: ByteArray,     // can be anything
     pub profile_pic_type: ProfilePicType,
+    pub profile_pic_uri: ByteArray,     // can be anything
     pub timestamp: u64,                 // date registered
     pub score: Score,
 }

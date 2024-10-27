@@ -40,6 +40,11 @@ pub trait IDuelToken<TState> {
     fn exists(self: @TState, token_id: u128) -> bool;
     fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
 
+    // ITokenRenderer
+    fn get_token_name(self: @TState, token_id: u256) -> ByteArray;
+    fn get_token_description(self: @TState, token_id: u256) -> ByteArray;
+    fn get_token_image(self: @TState, token_id: u256) -> ByteArray;
+
     // IDuelTokenPublic
     fn create_duel(ref self: TState, duelist_id: u128, challenged_id_or_address: ContractAddress, premise: Premise, quote: felt252, table_id: felt252, expire_hours: u64) -> u128;
     fn reply_duel(ref self: TState, duelist_id: u128, duel_id: u128, accepted: bool) -> ChallengeState;
@@ -419,18 +424,17 @@ pub mod duel_token {
     //-----------------------------------
     // ITokenRenderer
     //
-    use pistols::systems::components::erc721_hooks::{ITokenRenderer, TokenMetadata};
+    use pistols::systems::components::erc721_hooks::{ITokenRenderer};
     #[abi(embed_v0)]
     impl TokenRendererImpl of ITokenRenderer<ContractState> {
-        fn get_token_metadata(self: @ContractState, token_id: u256) -> TokenMetadata {
-            let name: ByteArray = format!("Duel #{}", token_id);
-            let description: ByteArray = format!("Pistols at 10 Blocks Duel #{}. https://pistols.underware.gg", token_id);
-            let image: ByteArray = format!("{}/profiles/square/00.jpg", self.erc721._base_uri());
-            (TokenMetadata {
-                name,
-                description,
-                image,
-            })
+        fn get_token_name(self: @ContractState, token_id: u256) -> ByteArray {
+            (format!("Duel #{}", token_id))
+        }
+        fn get_token_description(self: @ContractState, token_id: u256) -> ByteArray {
+            (format!("Pistols at 10 Blocks Duel #{}. https://pistols.underware.gg", token_id))
+        }
+        fn get_token_image(self: @ContractState, token_id: u256) -> ByteArray {
+            (format!("{}/profiles/square/00.jpg", self.erc721._base_uri()))
         }
 
         // returns: [key1, value1, key2, value2,...]
@@ -438,8 +442,7 @@ pub mod duel_token {
             ([].span())
         }
         fn get_attribute_pairs(self: @ContractState, token_id: u256) -> Span<ByteArray> {
-            let store: Store = StoreTrait::new(self.world());
-            let challenge: Challenge = store.get_challenge(token_id.low);
+            let challenge: ChallengeEntity = StoreTrait::new(self.world()).get_challenge_entity(token_id.low);
             let mut result: Array<ByteArray> = array![];
             let duelist_a: ByteArray = format!("Duelist #{}", challenge.duelist_id_a);
             let duelist_b: ByteArray = format!("Duelist #{}", challenge.duelist_id_b);

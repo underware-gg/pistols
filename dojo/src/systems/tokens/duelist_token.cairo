@@ -38,6 +38,11 @@ pub trait IDuelistToken<TState> {
     fn exists(self: @TState, token_id: u128) -> bool;
     fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
 
+    // ITokenRenderer
+    fn get_token_name(self: @TState, token_id: u256) -> ByteArray;
+    fn get_token_description(self: @TState, token_id: u256) -> ByteArray;
+    fn get_token_image(self: @TState, token_id: u256) -> ByteArray;
+
     // IDuelistTokenPublic
     fn calc_fee(ref self: TState, recipient: ContractAddress) -> u128;
     fn create_duelist(ref self: TState, recipient: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist;
@@ -279,12 +284,16 @@ pub mod duelist_token {
             }
         }
 
-        fn format_image(self: @ContractState, duelist: Duelist, variant: ByteArray) -> ByteArray {
+        fn format_image(self: @ContractState,
+            _profile_pic_type: ProfilePicType,
+            profile_pic_uri: ByteArray,
+            variant: ByteArray,
+        ) -> ByteArray {
             let base_uri: ByteArray = self.erc721._base_uri();
             let number =
-                if (duelist.profile_pic_uri.len() == 0) {"00"}
-                else if (duelist.profile_pic_uri.len() == 1) {format!("0{}", duelist.profile_pic_uri)}
-                else {duelist.profile_pic_uri};
+                if (profile_pic_uri.len() == 0) {"00"}
+                else if (profile_pic_uri.len() == 1) {format!("0{}", profile_pic_uri)}
+                else {profile_pic_uri};
             (format!("{}/profiles/{}/{}.jpg", base_uri, variant, number))
         }
     }
@@ -293,43 +302,40 @@ pub mod duelist_token {
     //-----------------------------------
     // ITokenRenderer
     //
-    use pistols::systems::components::erc721_hooks::{ITokenRenderer, TokenMetadata};
+    use pistols::systems::components::erc721_hooks::{ITokenRenderer};
     #[abi(embed_v0)]
     impl TokenRendererImpl of ITokenRenderer<ContractState> {
-        fn get_token_metadata(self: @ContractState, token_id: u256) -> TokenMetadata {
-            let store: Store = StoreTrait::new(self.world());
-            let duelist: Duelist = store.get_duelist(token_id.low);
-
-            let name: ByteArray = format!("{} #{}",
+        fn get_token_name(self: @ContractState, token_id: u256) -> ByteArray {
+            let duelist: DuelistEntity = StoreTrait::new(self.world()).get_duelist_entity(token_id.low);
+            (format!("{} #{}",
                 if (duelist.name != '') { duelist.name.as_string() } else { "Duelist" },
                 token_id
-            );
-            let description: ByteArray = format!("Pistols at 10 Blocks Duelist #{}. https://pistols.underware.gg", token_id);
-            let image: ByteArray = self.format_image(duelist.clone(), "portrait");
+            ))
+        }
 
-            (TokenMetadata {
-                name,
-                description,
-                image,
-            })
+        fn get_token_description(self: @ContractState, token_id: u256) -> ByteArray {
+            (format!("Pistols at 10 Blocks Duelist #{}. https://pistols.underware.gg", token_id))
+        }
+
+        fn get_token_image(self: @ContractState, token_id: u256) -> ByteArray {
+            let duelist: DuelistEntity = StoreTrait::new(self.world()).get_duelist_entity(token_id.low);
+            (self.format_image(duelist.profile_pic_type, duelist.profile_pic_uri, "portrait"))
         }
 
         // returns: [key1, value1, key2, value2,...]
         fn get_metadata_pairs(self: @ContractState, token_id: u256) -> Span<ByteArray> {
-            let store = StoreTrait::new(self.world());
-            let duelist: Duelist = store.get_duelist(token_id.low);
+            let duelist: DuelistEntity = StoreTrait::new(self.world()).get_duelist_entity(token_id.low);
             let mut result: Array<ByteArray> = array![];
             result.append("square");
-            result.append(self.format_image(duelist.clone(), "square"));
+            result.append(self.format_image(duelist.profile_pic_type, duelist.profile_pic_uri.clone(), "square"));
             result.append("portrait");
-            result.append(self.format_image(duelist.clone(), "portrait"));
+            result.append(self.format_image(duelist.profile_pic_type, duelist.profile_pic_uri.clone(), "portrait"));
             (result.span())
         }
 
         // returns: [key1, value1, key2, value2,...]
         fn get_attribute_pairs(self: @ContractState, token_id: u256) -> Span<ByteArray> {
-            let store = StoreTrait::new(self.world());
-            let duelist: Duelist = store.get_duelist(token_id.low);
+            let duelist: DuelistEntity = StoreTrait::new(self.world()).get_duelist_entity(token_id.low);
             let mut result: Array<ByteArray> = array![];
             // Honour
             result.append("Honour");

@@ -12,19 +12,20 @@ use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::arrays::{SpanUtilsTrait};
 use pistols::utils::metadata::{MetadataTrait};
 
-#[derive(Clone, Drop, Serde)]
-pub struct TokenMetadata {
-    pub name: ByteArray,
-    pub description: ByteArray,
-    pub image: ByteArray,
-}
-
 #[starknet::interface]
 pub trait ITokenRenderer<TState> {
-    fn get_token_metadata(self: @TState, token_id: u256) -> TokenMetadata;
+    // token metadata
+    fn get_token_name(self: @TState, token_id: u256) -> ByteArray;
+    fn get_token_description(self: @TState, token_id: u256) -> ByteArray;
+    fn get_token_image(self: @TState, token_id: u256) -> ByteArray;
+
+    // token attributes
+    // returns: [key1, value1, key2, value2,...]
+    fn get_attribute_pairs(self: @TState, token_id: u256) -> Span<ByteArray>;
+    
+    // additional metadata (optional)
     // returns: [key1, value1, key2, value2,...]
     fn get_metadata_pairs(self: @TState, token_id: u256) -> Span<ByteArray>;
-    fn get_attribute_pairs(self: @TState, token_id: u256) -> Span<ByteArray>;
 }
 
 mod Errors {
@@ -56,7 +57,6 @@ pub impl ERC721HooksImpl<
             }
         };
 
-        let token_metadata: TokenMetadata = renderer.get_token_metadata(token_id);
         let attributes: Span<ByteArray> = renderer.get_attribute_pairs(token_id);
         let metadata: Span<ByteArray> = renderer.get_metadata_pairs(token_id);
         assert(attributes.len() % 2 == 0, Errors::INVALID_ATTRIBUTES);
@@ -64,9 +64,9 @@ pub impl ERC721HooksImpl<
 
         let json = JsonImpl::new()
             .add("id", format!("{}", token_id))
-            .add("name", token_metadata.name)
-            .add("description", token_metadata.description)
-            .add("image", token_metadata.image)
+            .add("name", renderer.get_token_name(token_id))
+            .add("description", renderer.get_token_description(token_id))
+            .add("image", renderer.get_token_image(token_id))
             .add("metadata", MetadataTrait::format_metadata(attributes.concat(metadata).span()))
             .add_array("attributes", MetadataTrait::create_traits_array(attributes));
         let result = json.build();
