@@ -427,12 +427,12 @@
         "type": "core::felt252"
       },
       {
-        "name": "profile_pic_uri",
-        "type": "core::byte_array::ByteArray"
-      },
-      {
         "name": "profile_pic_type",
         "type": "pistols::models::duelist::ProfilePicType"
+      },
+      {
+        "name": "profile_pic_uri",
+        "type": "core::byte_array::ByteArray"
       },
       {
         "name": "timestamp",

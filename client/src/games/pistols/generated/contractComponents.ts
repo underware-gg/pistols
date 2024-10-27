@@ -51,7 +51,7 @@ export function defineContractComponents(world: World) {
     Duelist: (() => {
       return defineComponent(
         world,
-        { duelist_id: RecsType.BigInt, name: RecsType.BigInt, profile_pic_uri: RecsType.String, profile_pic_type: RecsType.Number, timestamp: RecsType.BigInt, score: { honour: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, honour_history: RecsType.BigInt } },
+        { duelist_id: RecsType.BigInt, name: RecsType.BigInt, profile_pic_type: RecsType.Number, profile_pic_uri: RecsType.String, timestamp: RecsType.BigInt, score: { honour: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, honour_history: RecsType.BigInt } },
         {
           metadata: {
             namespace: "pistols",

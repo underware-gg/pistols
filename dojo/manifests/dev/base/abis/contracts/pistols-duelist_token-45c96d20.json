@@ -140,6 +140,10 @@
         "name": "dojo_init",
         "inputs": [
           {
+            "name": "base_uri",
+            "type": "core::felt252"
+          },
+          {
             "name": "minter_address",
             "type": "core::starknet::contract_address::ContractAddress"
           },
@@ -223,12 +227,12 @@
         "type": "core::felt252"
       },
       {
-        "name": "profile_pic_uri",
-        "type": "core::byte_array::ByteArray"
-      },
-      {
         "name": "profile_pic_type",
         "type": "pistols::models::duelist::ProfilePicType"
+      },
+      {
+        "name": "profile_pic_uri",
+        "type": "core::byte_array::ByteArray"
       },
       {
         "name": "timestamp",
@@ -351,24 +355,6 @@
   },
   {
     "type": "struct",
-    "name": "pistols::systems::components::erc721_hooks::TokenMetadata",
-    "members": [
-      {
-        "name": "name",
-        "type": "core::byte_array::ByteArray"
-      },
-      {
-        "name": "description",
-        "type": "core::byte_array::ByteArray"
-      },
-      {
-        "name": "image",
-        "type": "core::byte_array::ByteArray"
-      }
-    ]
-  },
-  {
-    "type": "struct",
     "name": "core::array::Span::<core::byte_array::ByteArray>",
     "members": [
       {
@@ -383,7 +369,7 @@
     "items": [
       {
         "type": "function",
-        "name": "get_token_metadata",
+        "name": "get_token_name",
         "inputs": [
           {
             "name": "token_id",
@@ -392,14 +378,46 @@
         ],
         "outputs": [
           {
-            "type": "pistols::systems::components::erc721_hooks::TokenMetadata"
+            "type": "core::byte_array::ByteArray"
           }
         ],
         "state_mutability": "view"
       },
       {
         "type": "function",
-        "name": "get_metadata_pairs",
+        "name": "get_token_description",
+        "inputs": [
+          {
+            "name": "token_id",
+            "type": "core::integer::u256"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::byte_array::ByteArray"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_token_image",
+        "inputs": [
+          {
+            "name": "token_id",
+            "type": "core::integer::u256"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::byte_array::ByteArray"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_attribute_pairs",
         "inputs": [
           {
             "name": "token_id",
@@ -415,7 +433,7 @@
       },
       {
         "type": "function",
-        "name": "get_attribute_pairs",
+        "name": "get_metadata_pairs",
         "inputs": [
           {
             "name": "token_id",

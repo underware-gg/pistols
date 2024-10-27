@@ -2023,8 +2023,8 @@
     {
       "kind": "DojoContract",
       "address": "0x3db7f788e6cd2b6e18911da108a0f161a963c367ea953d916aa5d664c64fff2",
-      "class_hash": "0x4f991f767626614787cea0b82faa5e2328b12b552521331872551ccf9c50c33",
-      "original_class_hash": "0x4f991f767626614787cea0b82faa5e2328b12b552521331872551ccf9c50c33",
+      "class_hash": "0x518a7ae9436541c488720c4bb39b0711a5a068b6d88c3c3da555ff4840c1db9",
+      "original_class_hash": "0x518a7ae9436541c488720c4bb39b0711a5a068b6d88c3c3da555ff4840c1db9",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -2167,6 +2167,10 @@
               "type": "function",
               "name": "dojo_init",
               "inputs": [
+                {
+                  "name": "base_uri",
+                  "type": "core::felt252"
+                },
                 {
                   "name": "minter_address",
                   "type": "core::starknet::contract_address::ContractAddress"
@@ -2467,24 +2471,6 @@
         },
         {
           "type": "struct",
-          "name": "pistols::systems::components::erc721_hooks::TokenMetadata",
-          "members": [
-            {
-              "name": "name",
-              "type": "core::byte_array::ByteArray"
-            },
-            {
-              "name": "description",
-              "type": "core::byte_array::ByteArray"
-            },
-            {
-              "name": "image",
-              "type": "core::byte_array::ByteArray"
-            }
-          ]
-        },
-        {
-          "type": "struct",
           "name": "core::array::Span::<core::byte_array::ByteArray>",
           "members": [
             {
@@ -2499,7 +2485,7 @@
           "items": [
             {
               "type": "function",
-              "name": "get_token_metadata",
+              "name": "get_token_name",
               "inputs": [
                 {
                   "name": "token_id",
@@ -2508,14 +2494,46 @@
               ],
               "outputs": [
                 {
-                  "type": "pistols::systems::components::erc721_hooks::TokenMetadata"
+                  "type": "core::byte_array::ByteArray"
                 }
               ],
               "state_mutability": "view"
             },
             {
               "type": "function",
-              "name": "get_metadata_pairs",
+              "name": "get_token_description",
+              "inputs": [
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_token_image",
+              "inputs": [
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_attribute_pairs",
               "inputs": [
                 {
                   "name": "token_id",
@@ -2531,7 +2549,7 @@
             },
             {
               "type": "function",
-              "name": "get_attribute_pairs",
+              "name": "get_metadata_pairs",
               "inputs": [
                 {
                   "name": "token_id",
@@ -3158,6 +3176,7 @@
         "pistols-Scoreboard"
       ],
       "init_calldata": [
+        "0",
         "0x0",
         "0x0",
         "0"
@@ -3171,8 +3190,8 @@
     {
       "kind": "DojoContract",
       "address": "0x75c9d8eae61c368eda84bc2962b6b7a478136607f9a3f238c1680921b686b28",
-      "class_hash": "0x4218d73274fb5250d9c792af4763d2d3177a707f25a5e2aa34fc922c9d2b89",
-      "original_class_hash": "0x4218d73274fb5250d9c792af4763d2d3177a707f25a5e2aa34fc922c9d2b89",
+      "class_hash": "0x4fe07935f6bde1eec37bce698dd1666ff7422e7427cecb5200fe02cedf542e8",
+      "original_class_hash": "0x4fe07935f6bde1eec37bce698dd1666ff7422e7427cecb5200fe02cedf542e8",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -3316,6 +3335,10 @@
               "name": "dojo_init",
               "inputs": [
                 {
+                  "name": "base_uri",
+                  "type": "core::felt252"
+                },
+                {
                   "name": "minter_address",
                   "type": "core::starknet::contract_address::ContractAddress"
                 },
@@ -3399,12 +3422,12 @@
               "type": "core::felt252"
             },
             {
-              "name": "profile_pic_uri",
-              "type": "core::byte_array::ByteArray"
-            },
-            {
               "name": "profile_pic_type",
               "type": "pistols::models::duelist::ProfilePicType"
+            },
+            {
+              "name": "profile_pic_uri",
+              "type": "core::byte_array::ByteArray"
             },
             {
               "name": "timestamp",
@@ -3527,24 +3550,6 @@
         },
         {
           "type": "struct",
-          "name": "pistols::systems::components::erc721_hooks::TokenMetadata",
-          "members": [
-            {
-              "name": "name",
-              "type": "core::byte_array::ByteArray"
-            },
-            {
-              "name": "description",
-              "type": "core::byte_array::ByteArray"
-            },
-            {
-              "name": "image",
-              "type": "core::byte_array::ByteArray"
-            }
-          ]
-        },
-        {
-          "type": "struct",
           "name": "core::array::Span::<core::byte_array::ByteArray>",
           "members": [
             {
@@ -3559,7 +3564,7 @@
           "items": [
             {
               "type": "function",
-              "name": "get_token_metadata",
+              "name": "get_token_name",
               "inputs": [
                 {
                   "name": "token_id",
@@ -3568,14 +3573,46 @@
               ],
               "outputs": [
                 {
-                  "type": "pistols::systems::components::erc721_hooks::TokenMetadata"
+                  "type": "core::byte_array::ByteArray"
                 }
               ],
               "state_mutability": "view"
             },
             {
               "type": "function",
-              "name": "get_metadata_pairs",
+              "name": "get_token_description",
+              "inputs": [
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_token_image",
+              "inputs": [
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_attribute_pairs",
               "inputs": [
                 {
                   "name": "token_id",
@@ -3591,7 +3628,7 @@
             },
             {
               "type": "function",
-              "name": "get_attribute_pairs",
+              "name": "get_metadata_pairs",
               "inputs": [
                 {
                   "name": "token_id",
@@ -4229,6 +4266,7 @@
         "pistols-Duelist"
       ],
       "init_calldata": [
+        "0",
         "0x0",
         "0x0",
         "100000000000000000000"
@@ -4242,8 +4280,8 @@
     {
       "kind": "DojoContract",
       "address": "0x489b4afb7caa5f267016313a07610c37a4ee26890b0c5b6bbd30e66baed2cc3",
-      "class_hash": "0x6931ee544fd1ae80cc68cd5911bfea231eb2f2277b4571a2bf1b71d78c45ef",
-      "original_class_hash": "0x6931ee544fd1ae80cc68cd5911bfea231eb2f2277b4571a2bf1b71d78c45ef",
+      "class_hash": "0x4084cb8957fdbadcb5d3926e862809d721b88a55edf5dc28059e0f8f9c50cd1",
+      "original_class_hash": "0x4084cb8957fdbadcb5d3926e862809d721b88a55edf5dc28059e0f8f9c50cd1",
       "base_class_hash": "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2",
       "abi": [
         {
@@ -7356,13 +7394,13 @@
           "key": false
         },
         {
-          "name": "profile_pic_uri",
-          "type": "ByteArray",
+          "name": "profile_pic_type",
+          "type": "ProfilePicType",
           "key": false
         },
         {
-          "name": "profile_pic_type",
-          "type": "ProfilePicType",
+          "name": "profile_pic_uri",
+          "type": "ByteArray",
           "key": false
         },
         {
@@ -7376,8 +7414,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x52c44b80c19c1bdce6c3aa5317d544356d3b92ed85b147313d129bf05f7d013",
-      "original_class_hash": "0x52c44b80c19c1bdce6c3aa5317d544356d3b92ed85b147313d129bf05f7d013",
+      "class_hash": "0x396471c4a5237699b94c77a748ca7afb66587ec19d440c36a8a91bdc6c44c6b",
+      "original_class_hash": "0x396471c4a5237699b94c77a748ca7afb66587ec19d440c36a8a91bdc6c44c6b",
       "abi": [
         {
           "type": "impl",
@@ -7807,12 +7845,12 @@
               "type": "core::felt252"
             },
             {
-              "name": "profile_pic_uri",
-              "type": "core::byte_array::ByteArray"
-            },
-            {
               "name": "profile_pic_type",
               "type": "pistols::models::duelist::ProfilePicType"
+            },
+            {
+              "name": "profile_pic_uri",
+              "type": "core::byte_array::ByteArray"
             },
             {
               "name": "timestamp",
