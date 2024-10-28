@@ -12,6 +12,7 @@ mod systems {
     mod tokens {
         mod duel_token;
         mod duelist_token;
+        mod fame_coin;
         #[cfg(feature:'lords_mock')]
         mod lords_mock;
     }
