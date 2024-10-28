@@ -185,6 +185,7 @@ pub mod duel_token {
 
     fn dojo_init(
         ref self: ContractState,
+        base_uri: felt252,
         minter_address: ContractAddress,
         renderer_address: ContractAddress,
         fee_amount: u128,
@@ -192,7 +193,7 @@ pub mod duel_token {
         self.erc721.initializer(
             TOKEN_NAME(),
             TOKEN_SYMBOL(),
-            BASE_URI(),
+            if(base_uri != 0){base_uri.as_string()}else{BASE_URI()},
         );
         self.token.initialize(
             minter_address,

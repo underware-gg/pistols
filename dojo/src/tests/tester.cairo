@@ -215,6 +215,7 @@ mod tester {
                 world.grant_writer(selector_from_tag!("pistols-Pact"), address);
                 world.grant_writer(selector_from_tag!("pistols-Scoreboard"), address);
                 let call_data: Span<felt252> = array![
+                    'https://pistols.underware.gg',
                     0, // minter_address
                     0, // renderer_address
                     100_000_000_000_000_000_000, // fee_amount: 100 Lords
@@ -233,6 +234,7 @@ mod tester {
                 world.grant_writer(selector_from_tag!("pistols-Payment"), address);
                 world.grant_writer(selector_from_tag!("pistols-Duelist"), address);
                 let call_data: Span<felt252> = array![
+                    'https://pistols.underware.gg',
                     0, // minter_address
                     0, // renderer_address
                     100_000_000_000_000_000_000, // fee_amount: 100 Lords

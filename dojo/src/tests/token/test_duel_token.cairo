@@ -110,12 +110,13 @@ fn setup_uninitialized(fee_amount: u128) -> (IWorldDispatcher, IDuelTokenDispatc
         contract_address: world.deploy_contract('duel_token', duel_token::TEST_CLASS_HASH.try_into().unwrap())
     };
     world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), token.contract_address);
-    let duels_call_data: Span<felt252> = array![
+    let call_data: Span<felt252> = array![
+        'https://pistols.underware.gg',
         0, // minter_address
         0, // renderer_address
         (fee_amount * CONST::ETH_TO_WEI.low).into(), // fee_amount
     ].span();
-    world.init_contract(SELECTORS::DUEL_TOKEN, duels_call_data);
+    world.init_contract(SELECTORS::DUEL_TOKEN, call_data);
 
     tester::impersonate(OWNER());
 
