@@ -96,7 +96,7 @@ pub mod lords_mock {
     //
     use super::{ILordsMockPublic};
     #[abi(embed_v0)]
-    impl CoinComponentPublicImpl of ILordsMockPublic<ContractState> {
+    impl LordsMockPublicImpl of ILordsMockPublic<ContractState> {
         fn faucet(ref self: ContractState) {
             self.coin.faucet(get_caller_address());
         }

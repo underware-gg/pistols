@@ -19,6 +19,7 @@ mod systems {
     mod components {
         mod coin_component;
         mod token_component;
+        mod token_bound;
         mod erc721_hooks;
     }
 }

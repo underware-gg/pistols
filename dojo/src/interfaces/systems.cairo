@@ -9,6 +9,7 @@ pub use pistols::systems::{
     tokens::{
         duel_token::{IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
         duelist_token::{IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
+        fame_coin::{IFameCoinDispatcher, IFameCoinDispatcherTrait},
     }
 };
 pub use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
@@ -25,6 +26,7 @@ pub mod SELECTORS {
     // tokens
     const DUEL_TOKEN: felt252 = selector_from_tag!("pistols-duel_token");
     const DUELIST_TOKEN: felt252 = selector_from_tag!("pistols-duelist_token");
+    const FAME_COIN: felt252 = selector_from_tag!("pistols-fame_coin");
     const LORDS_MOCK: felt252 = selector_from_tag!("pistols-lords_mock");
     // models
     const CONFIG: felt252 = selector_from_tag!("pistols-Config");
@@ -80,6 +82,10 @@ pub impl WorldSystemsTraitImpl of WorldSystemsTrait {
     #[inline(always)]
     fn duelist_token_dispatcher(self: @IWorldDispatcher) -> IDuelistTokenDispatcher {
         (IDuelistTokenDispatcher{ contract_address: self.contract_address(SELECTORS::DUELIST_TOKEN) })
+    }
+    #[inline(always)]
+    fn fame_coin_dispatcher(self: @IWorldDispatcher) -> IFameCoinDispatcher {
+        (IFameCoinDispatcher{ contract_address: self.contract_address(SELECTORS::FAME_COIN) })
     }
     #[inline(always)]
     fn lords_dispatcher(self: @IWorldDispatcher) -> IERC20Dispatcher {

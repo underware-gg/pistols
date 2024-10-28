@@ -8,6 +8,7 @@ use pistols::systems::{
     bank::{bank, IBankDispatcher, IBankDispatcherTrait},
     tokens::{
         duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
+        fame_coin::{fame_coin, IFameCoinDispatcher, IFameCoinDispatcherTrait},
         lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
     },
 };
@@ -19,9 +20,9 @@ use pistols::models::{
 };
 
 use pistols::models::table::{TABLES};
-use pistols::types::constants::{CONST};
+use pistols::types::constants::{CONST, FAME};
 use pistols::interfaces::systems::{SELECTORS};
-use pistols::tests::tester::{tester, tester::{OWNER, RECIPIENT, SPENDER, TREASURY, ZERO}};
+use pistols::tests::tester::{tester, tester::{OWNER, OTHER, RECIPIENT, SPENDER, TREASURY, ZERO}};
 use pistols::tests::{utils};
 
 use openzeppelin_token::erc721::interface;
@@ -84,6 +85,7 @@ pub struct Systems {
     world: IWorldDispatcher,
     lords: ILordsMockDispatcher,
     token: IDuelistTokenDispatcher,
+    fame: IFameCoinDispatcher,
     bank: IBankDispatcher,
 }
 
@@ -125,6 +127,15 @@ fn setup_uninitialized(fee_amount: u128) -> Systems {
     ].span();
     world.init_contract(SELECTORS::DUELIST_TOKEN, call_data);
 
+    let mut fame = IFameCoinDispatcher {
+        contract_address: world.deploy_contract('fame_coin', fame_coin::TEST_CLASS_HASH.try_into().unwrap())
+    };
+    world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), fame.contract_address);
+    let call_data: Span<felt252> = array![
+        0, // minter_address
+    ].span();
+    world.init_contract(SELECTORS::FAME_COIN, call_data);
+
     tester::impersonate(OWNER());
 
     tester::set_Config(world, Config {
@@ -134,7 +145,7 @@ fn setup_uninitialized(fee_amount: u128) -> Systems {
         is_paused: false,
     });
 
-    Systems{ world, lords, token, bank }
+    Systems{ world, lords, token, fame, bank }
 }
 
 fn setup(fee_amount: u128) -> Systems {
@@ -142,7 +153,7 @@ fn setup(fee_amount: u128) -> Systems {
 
     // initialize contracts
     mint(sys.token, OWNER());
-    mint(sys.token, RECIPIENT());
+    mint(sys.token, OTHER());
     
     tester::impersonate(OWNER());
 
@@ -180,16 +191,16 @@ fn test_initializer() {
 
     _assert_minted_count(sys.world, sys.token, 2, 'Should eq 2');
     assert(sys.token.balance_of(OWNER()) == 1, 'Should eq 1 (OWNER)');
-    assert(sys.token.balance_of(RECIPIENT()) == 1, 'Should eq 1 (RECIPIENT)');
+    assert(sys.token.balance_of(OTHER()) == 1, 'Should eq 1 (OTHER)');
 
     // assert(sys.token.token_of_owner_by_index(OWNER(), 0) == TOKEN_ID_1, 'token_of_owner_by_index_OWNER');
-    // assert(sys.token.token_of_owner_by_index(RECIPIENT(), 0) == TOKEN_ID_2, 'token_of_owner_by_index_REC');
+    // assert(sys.token.token_of_owner_by_index(OTHER(), 0) == TOKEN_ID_2, 'token_of_owner_by_index_REC');
 
     // assert(sys.token.token_by_index(0) == TOKEN_ID_1, 'token_by_index_0');
     // assert(sys.token.token_by_index(1) == TOKEN_ID_2, 'token_by_index_1');
 
     assert(sys.token.owner_of(TOKEN_ID_1) == OWNER(), 'owner_of_1');
-    assert(sys.token.owner_of(TOKEN_ID_2) == RECIPIENT(), 'owner_of_2');
+    assert(sys.token.owner_of(TOKEN_ID_2) == OTHER(), 'owner_of_2');
     // assert(sys.token.owner_of(TOKEN_ID_3) == ZERO(), 'owner_of_3');
 
     assert(sys.token.owner_of(TOKEN_ID_1).is_non_zero(), 'owner_of_1_non_zero');
@@ -300,17 +311,17 @@ fn test_transfer_from() {
     utils::assert_no_events_left(sys.token.contract_address);
 
     tester::impersonate(SPENDER());
-    sys.token.transfer_from(OWNER(), RECIPIENT(), TOKEN_ID_1);
+    sys.token.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
 
     // TODO: fix events
-    // assert_only_event_transfer(sys.token.contract_address, OWNER(), RECIPIENT(), TOKEN_ID_1);
+    // assert_only_event_transfer(sys.token.contract_address, OWNER(), OTHER(), TOKEN_ID_1);
 
-    assert(sys.token.balance_of(RECIPIENT()) == 2, 'Should eq 1');
+    assert(sys.token.balance_of(OTHER()) == 2, 'Should eq 1');
     assert(sys.token.balance_of(OWNER()) == 0, 'Should eq 1');
     assert(sys.token.get_approved(TOKEN_ID_1) == ZERO(), 'Should eq 0');
     _assert_minted_count(sys.world, sys.token, 2, 'Should eq 2');
     // assert(sys.token.total_supply() == 2, 'Should eq 2');
-    // assert(sys.token.token_of_owner_by_index(RECIPIENT(), 1) == TOKEN_ID_1, 'Should eq TOKEN_ID_1');
+    // assert(sys.token.token_of_owner_by_index(OTHER(), 1) == TOKEN_ID_1, 'Should eq TOKEN_ID_1');
 }
 
 #[test]
@@ -318,61 +329,61 @@ fn test_transfer_from() {
 fn test_mint_no_allowance() {
     let sys = setup(100);
     utils::impersonate(SPENDER());
-    sys.token.transfer_from(OWNER(), RECIPIENT(), TOKEN_ID_1);
+    sys.token.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
 }
 
 //
 // mint
-//s
+//
 
 #[test]
 fn test_mint_free() {
     let sys = setup(0);
     _assert_minted_count(sys.world, sys.token, 2, 'invalid total_supply init');
-    assert(sys.token.balance_of(RECIPIENT()) == 1, 'invalid balance_of');
-    // assert(sys.token.token_of_owner_by_index(RECIPIENT(), 0) == TOKEN_ID_2, 'token_of_owner_by_index_2');
+    assert(sys.token.balance_of(OTHER()) == 1, 'invalid balance_of');
+    // assert(sys.token.token_of_owner_by_index(OTHER(), 0) == TOKEN_ID_2, 'token_of_owner_by_index_2');
     let price: u128 = sys.token.calc_fee(OWNER());
     assert(price == 0, 'invalid price');
-    mint(sys.token, RECIPIENT());
+    mint(sys.token, OTHER());
     _assert_minted_count(sys.world, sys.token, 3, 'invalid total_supply');
-    assert(sys.token.balance_of(RECIPIENT()) == 2, 'invalid balance_of');
-    // assert(sys.token.token_of_owner_by_index(RECIPIENT(), 1) == TOKEN_ID_3, 'token_of_owner_by_index_3');
+    assert(sys.token.balance_of(OTHER()) == 2, 'invalid balance_of');
+    // assert(sys.token.token_of_owner_by_index(OTHER(), 1) == TOKEN_ID_3, 'token_of_owner_by_index_3');
 }
 
 #[test]
 #[should_panic(expected: ('BANK: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_lords_no_allowance_zero() {
     let sys = setup(100);
-    mint(sys.token, RECIPIENT());
+    mint(sys.token, OTHER());
 }
 
 #[test]
 #[should_panic(expected: ('BANK: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_lords_no_allowance_half() {
     let sys = setup(100);
-    let price: u128 = sys.token.calc_fee(RECIPIENT());
-    tester::execute_lords_approve(@sys.lords, RECIPIENT(), sys.bank.contract_address, price / 2);
-    mint(sys.token, RECIPIENT());
+    let price: u128 = sys.token.calc_fee(OTHER());
+    tester::execute_lords_approve(@sys.lords, OTHER(), sys.bank.contract_address, price / 2);
+    mint(sys.token, OTHER());
 }
 
 #[test]
 #[should_panic(expected: ('BANK: insufficient balance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_lords_no_balance_zero() {
     let sys = setup(100);
-    let price: u128 = sys.token.calc_fee(RECIPIENT());
-    tester::execute_lords_approve(@sys.lords, RECIPIENT(), sys.bank.contract_address, price);
-    mint(sys.token, RECIPIENT());
+    let price: u128 = sys.token.calc_fee(OTHER());
+    tester::execute_lords_approve(@sys.lords, OTHER(), sys.bank.contract_address, price);
+    mint(sys.token, OTHER());
 }
 
 #[test]
 fn test_mint_lords_ok() {
     let sys = setup(100);
     _assert_minted_count(sys.world, sys.token, 2, 'invalid total_supply init');
-    let price: u128 = sys.token.calc_fee(RECIPIENT());
+    let price: u128 = sys.token.calc_fee(OTHER());
     assert(price > 0, 'invalid price');
-    tester::execute_lords_faucet(@sys.lords, RECIPIENT());
-    tester::execute_lords_approve(@sys.lords, RECIPIENT(), sys.bank.contract_address, price);
-    mint(sys.token, RECIPIENT());
+    tester::execute_lords_faucet(@sys.lords, OTHER());
+    tester::execute_lords_approve(@sys.lords, OTHER(), sys.bank.contract_address, price);
+    mint(sys.token, OTHER());
     _assert_minted_count(sys.world, sys.token, 3, 'invalid total_supply');
 }
 
@@ -392,3 +403,26 @@ fn test_burn() {
     assert(sys.token.balance_of(OWNER()) == 0, 'invalid balance_of (0)');
 }
 
+
+//
+// FAME
+//
+
+fn _fame_balance_of(sys: Systems, token_id: u256) -> u256 {
+    (sys.fame.balance_of_token(sys.token.contract_address, token_id.low))
+}
+
+#[test]
+fn test_fame() {
+    let sys = setup(0);
+    let owner_balance_initial: u256 = _fame_balance_of(sys, TOKEN_ID_1);
+    let other_balance_initial: u256 = _fame_balance_of(sys, TOKEN_ID_2);
+    assert(owner_balance_initial == FAME::MINT_GRANT_AMOUNT, 'owner_balance_initial');
+    assert(other_balance_initial == FAME::MINT_GRANT_AMOUNT, 'other_balance_initial');
+
+    // mint new duelist
+
+    // transfer duelist
+
+    // owner balances
+}

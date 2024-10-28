@@ -28,3 +28,8 @@ mod CHANCES {
     const NEVER: u8 = 0;
     const ALWAYS: u8 = 100;
 }
+
+mod FAME {
+    const MINT_GRANT_AMOUNT: u256 = 1_000 * super::CONST::ETH_TO_WEI;
+    const FAME_PER_LORDS: u256 = 10;
+}

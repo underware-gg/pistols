@@ -124,6 +124,7 @@ pub mod duelist_token {
     use pistols::interfaces::systems::{
         WorldSystemsTrait,
         IBankDispatcher, IBankDispatcherTrait,
+        IFameCoinDispatcher, IFameCoinDispatcherTrait,
     };
     use pistols::models::{
         duelist::{
@@ -228,6 +229,10 @@ pub mod duelist_token {
             // save
             let store = StoreTrait::new(self.world());
             store.set_duelist(@duelist);
+
+            // mint fame
+            let fame_dispatcher: IFameCoinDispatcher = self.world().fame_coin_dispatcher();
+            fame_dispatcher.mint_to_new_duelist(duelist.duelist_id, payment.amount);
 
             emitters::emitDuelistRegisteredEvent(@self.world(), recipient, duelist.clone(), true);
 

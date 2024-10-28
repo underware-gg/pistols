@@ -29,6 +29,12 @@ pub use pistols::models::{
         PaymentEntity, PaymentEntityStore,
     },
 };
+pub use pistols::systems::components::{
+    token_bound::{
+        TokenBoundAddress, TokenBoundAddressTrait, TokenBoundAddressStore,
+        TokenBoundAddressEntity, TokenBoundAddressEntityStore,
+    },
+};
 
 #[derive(Copy, Drop)]
 pub struct Store {
@@ -156,6 +162,11 @@ impl StoreImpl of StoreTrait {
         (PaymentStore::get(self.world, key))
     }
 
+    #[inline(always)]
+    fn get_token_bound_address(self: Store, recipient: ContractAddress) -> TokenBoundAddress {
+        (TokenBoundAddressStore::get(self.world, recipient))
+    }
+
     //
     // Setters
     //
@@ -241,6 +252,11 @@ impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn set_payment(self: Store, model: @Payment) {
         (*model).assert_is_valid();
+        model.set(self.world);
+    }
+
+    #[inline(always)]
+    fn set_token_bound_address(self: Store, model: @TokenBoundAddress) {
         model.set(self.world);
     }
 }
