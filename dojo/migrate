@@ -14,9 +14,9 @@ if [[
 fi
 
 
-echo "CLIENT_GEN_PATH: $CLIENT_GEN_PATH"
-echo "PROFILE_GEN_PATH: $PROFILE_GEN_PATH"
 echo "BINDINGS_PATH: $BINDINGS_PATH"
+echo "CLIENT_GAME_PATH: $CLIENT_GAME_PATH"
+echo "CLIENT_MANIFEST_PATH: $CLIENT_MANIFEST_PATH"
 
 #-----------------
 # build
@@ -28,7 +28,7 @@ echo ">>> Cleaning..."
 sozo -P $PROFILE clean
 echo ">>> Building..."
 if [[ "$PROFILE" == "dev" ]]; then
-  # sozo -P $PROFILE build --typescript
+  # sozo -P $PROFILE build --typescript-v2
   sozo -P $PROFILE build
 else
   sozo -P $PROFILE build
@@ -62,9 +62,9 @@ echo "👍"
 # copy manifest to client
 #
 echo "------------------------------------------------------------------------------"
-echo ">>> Copying manifest [$MANIFEST_FILE_PATH] to [$PROFILE_GEN_PATH/]"
-mkdir -p $PROFILE_GEN_PATH
-cp $MANIFEST_FILE_PATH $PROFILE_GEN_PATH/
+echo ">>> Copying manifest [$MANIFEST_FILE_PATH] to [$CLIENT_MANIFEST_PATH/]"
+mkdir -p $CLIENT_MANIFEST_PATH
+cp $MANIFEST_FILE_PATH $CLIENT_MANIFEST_PATH/
 echo "👍"
 
 #------------------------
@@ -86,7 +86,8 @@ if [[ "$PROFILE" == "dev" ]]; then
   #
   # TODO: Enable this when bindings are ported
   # generate and copy bindings
-  # cp $BINDINGS_PATH/* $CLIENT_GEN_PATH/
+  # cp -R $BINDINGS_PATH $CLIENT_GAME_PATH/
+  # cp -R $BINDINGS_PATH/typescript_v2 $CLIENT_GAME_PATH/generated/
   #
   # copy to client
   echo "------------------------------------------------------------------------------"
@@ -98,7 +99,7 @@ if [[ "$PROFILE" == "dev" ]]; then
   #
   # list copied files
   echo "------------------------------------------------------------------------------"
-  ls -ld $CLIENT_GEN_PATH/* | grep -E 'ts|json'
+  ls -ld $CLIENT_GAME_PATH/* | grep -E 'ts|json'
 fi
 
 
