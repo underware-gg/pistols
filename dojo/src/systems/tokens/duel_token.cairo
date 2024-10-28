@@ -137,7 +137,7 @@ pub mod duel_token {
     use pistols::models::{
         config::{TokenConfig, TokenConfigStore, TokenConfigEntity, TokenConfigEntityStore},
         challenge::{Challenge, ChallengeEntity, Round, Moves},
-        duelist::{Duelist, DuelistEntity, DuelistTrait, Pact},
+        duelist::{Duelist, DuelistEntity, DuelistTrait, Pact, ProfilePicType, ProfilePicTypeTrait},
         table::{
             TableConfig, TableConfigEntity, TableConfigEntityTrait,
             TableAdmittanceEntity, TableAdmittanceEntityTrait,
@@ -153,6 +153,7 @@ pub mod duel_token {
     use pistols::libs::seeder::{make_seed};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::libs::pact;
+    use pistols::utils::metadata::{MetadataTrait};
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::math::{MathTrait};
@@ -434,7 +435,26 @@ pub mod duel_token {
             (format!("Pistols at 10 Blocks Duel #{}. https://pistols.underware.gg", token_id))
         }
         fn get_token_image(self: @ContractState, token_id: u256) -> ByteArray {
-            (format!("{}/profiles/square/00.jpg", self.erc721._base_uri()))
+            let store: Store = StoreTrait::new(self.world());
+            let challenge: ChallengeEntity = store.get_challenge_entity(token_id.low);
+            let duelist_a: DuelistEntity = store.get_duelist_entity(challenge.duelist_id_a);
+            let duelist_b: DuelistEntity = store.get_duelist_entity(challenge.duelist_id_b);
+            let base_uri: ByteArray = self.erc721._base_uri();
+            let image_a: ByteArray = duelist_a.profile_pic_type.get_uri(base_uri.clone(), duelist_a.profile_pic_uri, "portrait");
+            let image_b: ByteArray = duelist_b.profile_pic_type.get_uri(base_uri.clone(), duelist_b.profile_pic_uri, "portrait");
+            let result: ByteArray = 
+                "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 1942 1024'>" +
+                "<image href='" +
+                image_a +
+                "' x='0' y='50' width='560px' height='924px' />" +
+                "<image href='" +
+                image_b +
+                "' x='1380' y='50' width='560px' height='924px' />" +
+                "<image href='" +
+                base_uri +
+                "/textures/cards/card_wide_brown.png' x='0' y='0' width='1942px' height='1024px' />" +
+                "</svg>";
+            (MetadataTrait::encode_svg(result, true))
         }
 
         // returns: [key1, value1, key2, value2,...]

@@ -129,7 +129,8 @@ pub mod duelist_token {
         duelist::{
             Duelist, DuelistEntity,
             Score, ScoreTrait,
-            ProfilePicType, Archetype,
+            ProfilePicType, ProfilePicTypeTrait,
+            Archetype,
             ScoreboardEntity,
         },
         config::{
@@ -142,6 +143,7 @@ pub mod duelist_token {
     use pistols::types::constants::{CONST, HONOUR};
     use pistols::libs::events::{emitters};
     use pistols::libs::store::{Store, StoreTrait};
+    use pistols::utils::metadata::{MetadataTrait};
     use pistols::utils::short_string::ShortStringTrait;
     use pistols::utils::math::{MathTrait};
 
@@ -283,19 +285,6 @@ pub mod duelist_token {
                 (store.get_payment(get_contract_address().into()))
             }
         }
-
-        fn format_image(self: @ContractState,
-            _profile_pic_type: ProfilePicType,
-            profile_pic_uri: ByteArray,
-            variant: ByteArray,
-        ) -> ByteArray {
-            let base_uri: ByteArray = self.erc721._base_uri();
-            let number =
-                if (profile_pic_uri.len() == 0) {"00"}
-                else if (profile_pic_uri.len() == 1) {format!("0{}", profile_pic_uri)}
-                else {profile_pic_uri};
-            (format!("{}/profiles/{}/{}.jpg", base_uri, variant, number))
-        }
     }
 
 
@@ -319,17 +308,29 @@ pub mod duelist_token {
 
         fn get_token_image(self: @ContractState, token_id: u256) -> ByteArray {
             let duelist: DuelistEntity = StoreTrait::new(self.world()).get_duelist_entity(token_id.low);
-            (self.format_image(duelist.profile_pic_type, duelist.profile_pic_uri, "portrait"))
+            let base_uri: ByteArray = self.erc721._base_uri();
+            let image_square: ByteArray = duelist.profile_pic_type.get_uri(base_uri.clone(), duelist.profile_pic_uri, "square");
+            let result: ByteArray = 
+                "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 1024 1434'>" +
+                "<image href='" + 
+                image_square +
+                "' x='0' y='0' width='1024px' height='1024px' />" +
+                "<image href='" +
+                base_uri +
+                "/textures/cards/card_front_brown.png' x='0' y='0' width='1024px' height='1434px' />" +
+                "</svg>";
+            (MetadataTrait::encode_svg(result, true))
         }
 
         // returns: [key1, value1, key2, value2,...]
         fn get_metadata_pairs(self: @ContractState, token_id: u256) -> Span<ByteArray> {
             let duelist: DuelistEntity = StoreTrait::new(self.world()).get_duelist_entity(token_id.low);
+            let base_uri: ByteArray = self.erc721._base_uri();
             let mut result: Array<ByteArray> = array![];
             result.append("square");
-            result.append(self.format_image(duelist.profile_pic_type, duelist.profile_pic_uri.clone(), "square"));
+            result.append(duelist.profile_pic_type.get_uri(base_uri.clone(), duelist.profile_pic_uri.clone(), "square"));
             result.append("portrait");
-            result.append(self.format_image(duelist.profile_pic_type, duelist.profile_pic_uri.clone(), "portrait"));
+            result.append(duelist.profile_pic_type.get_uri(base_uri.clone(), duelist.profile_pic_uri.clone(), "portrait"));
             (result.span())
         }
 

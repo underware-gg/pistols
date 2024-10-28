@@ -24,10 +24,6 @@ pub enum ProfilePicType {
     // Discord,    // Linked account (had to be cloned, or just copy the url)
 }
 
-impl ProfilePicTypeDefault of Default<ProfilePicType> {
-    fn default() -> ProfilePicType {(ProfilePicType::Undefined)}
-}
-
 
 //---------------------
 // Duelist
@@ -153,6 +149,31 @@ impl ScoreTraitImpl of ScoreTrait {
             (self.honour_history & ~BitwiseU64::shl(0xff, history_pos)) |
             BitwiseU64::shl(duel_honour.into(), history_pos);
         self.honour = (BitwiseU64::sum_bytes(self.honour_history) / MathU64::min(self.total_duels.into(), 8)).try_into().unwrap();
+    }
+}
+
+impl ProfilePicTypeDefault of Default<ProfilePicType> {
+    fn default() -> ProfilePicType {(ProfilePicType::Undefined)}
+}
+
+#[generate_trait]
+impl ProfilePicTypeImpl of ProfilePicTypeTrait {
+    fn get_uri(self: ProfilePicType,
+        base_uri: ByteArray,
+        profile_pic_uri: ByteArray,
+        variant: ByteArray,    
+    ) -> ByteArray {
+        match self {
+            ProfilePicType::Duelist => {
+                let number =
+                    if (profile_pic_uri.len() == 0) {"00"}
+                    else if (profile_pic_uri.len() == 1) {format!("0{}", profile_pic_uri)}
+                    else {profile_pic_uri};
+                (format!("{}/profiles/{}/{}.jpg", base_uri, variant, number))
+            },
+            ProfilePicType::External |
+            ProfilePicType::Undefined => Self::get_uri(ProfilePicType::Duelist, base_uri, "", variant)
+        }
     }
 }
 
