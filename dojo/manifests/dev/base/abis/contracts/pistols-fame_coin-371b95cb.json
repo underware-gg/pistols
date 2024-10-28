@@ -129,23 +129,19 @@
   {
     "type": "impl",
     "name": "IDojoInitImpl",
-    "interface_name": "pistols::systems::tokens::lords_mock::lords_mock::IDojoInit"
+    "interface_name": "pistols::systems::tokens::fame_coin::fame_coin::IDojoInit"
   },
   {
     "type": "interface",
-    "name": "pistols::systems::tokens::lords_mock::lords_mock::IDojoInit",
+    "name": "pistols::systems::tokens::fame_coin::fame_coin::IDojoInit",
     "items": [
       {
         "type": "function",
         "name": "dojo_init",
         "inputs": [
           {
-            "name": "game_contract_address",
+            "name": "duelist_contract_address",
             "type": "core::starknet::contract_address::ContractAddress"
-          },
-          {
-            "name": "faucet_amount",
-            "type": "core::integer::u128"
           }
         ],
         "outputs": [],
@@ -155,8 +151,8 @@
   },
   {
     "type": "impl",
-    "name": "LordsMockPublicImpl",
-    "interface_name": "pistols::systems::tokens::lords_mock::ILordsMockPublic"
+    "name": "FamePublicImpl",
+    "interface_name": "pistols::systems::tokens::fame_coin::IFameCoinPublic"
   },
   {
     "type": "struct",
@@ -174,26 +170,39 @@
   },
   {
     "type": "interface",
-    "name": "pistols::systems::tokens::lords_mock::ILordsMockPublic",
+    "name": "pistols::systems::tokens::fame_coin::IFameCoinPublic",
     "items": [
       {
         "type": "function",
-        "name": "faucet",
-        "inputs": [],
+        "name": "minted_duelist",
+        "inputs": [
+          {
+            "name": "duelist_id",
+            "type": "core::integer::u128"
+          },
+          {
+            "name": "amount_paid",
+            "type": "core::integer::u256"
+          }
+        ],
         "outputs": [],
         "state_mutability": "external"
       },
       {
         "type": "function",
-        "name": "mint",
+        "name": "updated_duelist",
         "inputs": [
           {
-            "name": "recipient",
+            "name": "from",
             "type": "core::starknet::contract_address::ContractAddress"
           },
           {
-            "name": "amount",
-            "type": "core::integer::u256"
+            "name": "to",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "duelist_id",
+            "type": "core::integer::u128"
           }
         ],
         "outputs": [],
@@ -445,6 +454,73 @@
     ]
   },
   {
+    "type": "impl",
+    "name": "TokenBoundPublicImpl",
+    "interface_name": "pistols::systems::components::token_bound::ITokenBoundPublic"
+  },
+  {
+    "type": "interface",
+    "name": "pistols::systems::components::token_bound::ITokenBoundPublic",
+    "items": [
+      {
+        "type": "function",
+        "name": "address_of_token",
+        "inputs": [
+          {
+            "name": "contract_address",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "token_id",
+            "type": "core::integer::u128"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "token_of_address",
+        "inputs": [
+          {
+            "name": "address",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "(core::starknet::contract_address::ContractAddress, core::integer::u128)"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "balance_of_token",
+        "inputs": [
+          {
+            "name": "contract_address",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "token_id",
+            "type": "core::integer::u128"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::integer::u256"
+          }
+        ],
+        "state_mutability": "view"
+      }
+    ]
+  },
+  {
     "type": "event",
     "name": "dojo::contract::upgradeable::upgradeable::Upgraded",
     "kind": "struct",
@@ -537,7 +613,13 @@
   },
   {
     "type": "event",
-    "name": "pistols::systems::tokens::lords_mock::lords_mock::Event",
+    "name": "pistols::systems::components::token_bound::TokenBoundComponent::Event",
+    "kind": "enum",
+    "variants": []
+  },
+  {
+    "type": "event",
+    "name": "pistols::systems::tokens::fame_coin::fame_coin::Event",
     "kind": "enum",
     "variants": [
       {
@@ -553,6 +635,11 @@
       {
         "name": "CoinEvent",
         "type": "pistols::systems::components::coin_component::CoinComponent::Event",
+        "kind": "flat"
+      },
+      {
+        "name": "TokenBoundEvent",
+        "type": "pistols::systems::components::token_bound::TokenBoundComponent::Event",
         "kind": "flat"
       }
     ]

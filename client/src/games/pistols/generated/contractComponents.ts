@@ -146,6 +146,20 @@ export function defineContractComponents(world: World) {
         }
       );
     })(),
+    TokenBoundAddress: (() => {
+      return defineComponent(
+        world,
+        { recipient: RecsType.BigInt, contract_address: RecsType.BigInt, token_id: RecsType.BigInt },
+        {
+          metadata: {
+            namespace: "pistols",
+            name: "TokenBoundAddress",
+            types: ["contractaddress","contractaddress","u128"],
+            customTypes: [],
+          },
+        }
+      );
+    })(),
     TokenConfig: (() => {
       return defineComponent(
         world,

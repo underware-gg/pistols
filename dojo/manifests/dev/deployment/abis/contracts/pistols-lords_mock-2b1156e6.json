@@ -155,7 +155,7 @@
   },
   {
     "type": "impl",
-    "name": "CoinComponentPublicImpl",
+    "name": "LordsMockPublicImpl",
     "interface_name": "pistols::systems::tokens::lords_mock::ILordsMockPublic"
   },
   {

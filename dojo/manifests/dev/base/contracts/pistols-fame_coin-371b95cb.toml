@@ -1,0 +1,16 @@
+kind = "DojoContract"
+class_hash = "0x2264c185e2776b068c0b99b249d7735e5fa3be725ff555932d9a7e314e3c483"
+original_class_hash = "0x2264c185e2776b068c0b99b249d7735e5fa3be725ff555932d9a7e314e3c483"
+base_class_hash = "0x0"
+abi = "manifests/dev/base/abis/contracts/pistols-fame_coin-371b95cb.json"
+reads = []
+writes = []
+init_calldata = []
+tag = "pistols-fame_coin"
+systems = [
+    "minted_duelist",
+    "updated_duelist",
+    "before_update",
+    "after_update",
+]
+manifest_name = "pistols-fame_coin-371b95cb"
