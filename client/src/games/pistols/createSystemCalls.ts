@@ -1,18 +1,17 @@
 import { DojoProvider, getContractByName } from '@dojoengine/core'
-import { getComponentValue } from '@dojoengine/recs'
 import { AccountInterface, BigNumberish, Call, Result } from 'starknet'
-import { stringToFelt, bigintToU256 } from '@/lib/utils/starknet'
+import { getComponentValue } from '@dojoengine/recs'
 import { DojoManifest } from '@/lib/dojo/Dojo'
 import { ClientComponents } from '@/lib/dojo/setup/setup'
-import { bigintAdd, bigintToEntity, bigintToHex, isPositiveBigint } from '@/lib/utils/types'
-import { emitter } from '@/pistols/three/game'
+import { arrayClean, bigintToEntity, bigintToHex, isPositiveBigint, shortAddress } from '@/lib/utils/types'
+import { stringToFelt, bigintToU256 } from '@/lib/utils/starknet'
 import {
   Premise, getPremiseValue,
-  Archetype, getArchetypeValue,
   ProfilePicType, getProfilePicTypeValue,
   CONFIG,
 } from '@/games/pistols/generated/constants'
-import { convert_duel_progress } from './duel_progress'
+import { convert_duel_progress } from '@/games/pistols/duel_progress'
+import { emitter } from '@/pistols/three/game'
 
 // FIX while this is not merged
 // https://github.com/dojoengine/dojo.js/pull/190
@@ -28,22 +27,24 @@ export type DojoCall = {
   calldata: BigNumberish[]
 }
 
-const game_call = (entrypoint: string, calldata: any[]) => ({
+export type DojoCalls = Array<DojoCall | Call>
+
+const game_call = (entrypoint: string, calldata: any[]): DojoCall => ({
   contractName: 'game',
   entrypoint,
   calldata,
 })
-const admin_call = (entrypoint: string, calldata: any[]) => ({
+const admin_call = (entrypoint: string, calldata: any[]): DojoCall => ({
   contractName: 'admin',
   entrypoint,
   calldata,
 })
-const duel_token_call = (entrypoint: string, calldata: any[]) => ({
+const duel_token_call = (entrypoint: string, calldata: any[]): DojoCall => ({
   contractName: 'duel_token',
   entrypoint,
   calldata,
 })
-const duelist_token_call = (entrypoint: string, calldata: any[]) => ({
+const duelist_token_call = (entrypoint: string, calldata: any[]): DojoCall => ({
   contractName: 'duelist_token',
   entrypoint,
   calldata,
@@ -56,44 +57,55 @@ export function createSystemCalls(
 ) {
   const { TableConfig, TableAdmittance, Config } = components
 
+  const approve_call = (approved_value: BigNumberish): Call | undefined => {
+    if (!isPositiveBigint(approved_value)) return undefined
+    const config = getComponentValue(Config, bigintToEntity(CONFIG.CONFIG_KEY))
+    if (!config) throw new Error(`Config does not exist`)
+    if (!isPositiveBigint(config.lords_address)) return undefined
+    const bank_contract = getContractByName(manifest, NAMESPACE, 'bank')
+    return {
+      contractAddress: bigintToHex(config.lords_address),
+      entrypoint: 'approve',
+      calldata: [bank_contract.address, bigintToU256(approved_value)],
+    }
+  }
+
   // executeMulti() based on:
   // https://github.com/cartridge-gg/rollyourown/blob/f39bfd7adc866c1a10142f5ce30a3c6f900b467e/web/src/dojo/hooks/useSystems.ts#L178-L190
 
-  const _executeTransaction = async (signer: AccountInterface, params: DojoCall | Call[]): Promise<boolean> => {
+  const _executeTransaction = async (signer: AccountInterface, calls: DojoCalls): Promise<boolean> => {
     let success = false
     try {
-      console.log(`execute...`, params)
-      const tx = await provider.execute(signer, params, NAMESPACE);
-      if (!Array.isArray(params)) {
-        console.log(`execute ${params?.contractName}::${params.entrypoint}() tx:`, params.calldata, tx)
-      } else {
-        params.forEach((param, index) => {
-          console.log(`execute[${index}] ${param.contractAddress}::${param.entrypoint}() tx:`, param.calldata, tx)
-        })
-      }
+      console.log(`execute...`, calls)
+      calls = arrayClean(calls)
+      const tx = await provider.execute(signer, calls, NAMESPACE);
+      calls.forEach((param, index) => {
+        //@ts-ignore
+        console.log(`execute[${index}] ${param?.contractAddress ? `(${shortAddress(param.contractAddress)})` : calls?.contractName}::${param.entrypoint}():`, param.calldata, tx)
+      })
 
       const receipt = await signer.waitForTransaction(tx.transaction_hash, { retryInterval: 200 })
       success = getReceiptStatus(receipt);
-      (success ? console.log : console.warn)(`execute success:`, success, 'receipt:', receipt, 'params:', params)
+      (success ? console.log : console.warn)(`execute success:`, success, 'receipt:', receipt, 'calls:', calls)
 
       // set from events ahead of torii
       // setComponentsFromEvents(contractComponents, getEvents(receipt));
     } catch (e) {
-      console.warn(`execute exception:`, params, e)
+      console.warn(`execute exception:`, calls, e)
     } finally {
     }
     return success
   }
 
-  const _executeCall = async <T extends Result>(params: DojoCall): Promise<T | null> => {
+  const _executeCall = async <T extends Result>(call: DojoCall): Promise<T | null> => {
     let results: Result = undefined
     try {
-      results = await provider.call(NAMESPACE, params)
+      results = await provider.call(NAMESPACE, call)
       // result = decodeComponent(contractComponents['Component'], response)
       // results = Array.isArray(response) ? response.map(v => BigInt(v)) : typeof response == 'boolean' ? response : BigInt(response)
       // console.log(`call ${system}(${args.length}) success:`, result)
     } catch (e) {
-      console.warn(`call ${params.contractName}::${params.entrypoint}(${params.calldata.length}) exception:`, e)
+      console.warn(`call ${call.contractName}::${call.entrypoint}(${call.calldata.length}) exception:`, e)
     } finally {
     }
     return results as T
@@ -106,49 +118,38 @@ export function createSystemCalls(
 
   const commit_moves = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, hash: BigNumberish): Promise<boolean> => {
     const args = [duelist_id, duel_id, hash]
-    return await _executeTransaction(signer, game_call('commit_moves', args))
+    const calls: DojoCalls = [game_call('commit_moves', args)]
+    return await _executeTransaction(signer, calls)
   }
 
   const reveal_moves = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, salt: BigNumberish, moves: number[]): Promise<boolean> => {
     const args = [duelist_id, duel_id, salt, moves]
-    return await _executeTransaction(signer, game_call('reveal_moves', args))
+    const calls: DojoCalls = [game_call('reveal_moves', args)]
+    return await _executeTransaction(signer, calls)
   }
+
 
   //
   // Duel token
   //
 
-
   const create_duel = async (signer: AccountInterface, duelist_id: BigNumberish, challenged_id_or_address: BigNumberish, premise: Premise, quote: string, table_id: string, expire_hours: number): Promise<boolean> => {
-    const args = [duelist_id, BigInt(challenged_id_or_address), getPremiseValue(premise), stringToFelt(quote), table_id, expire_hours]
-    // find lords contract
-    const config = getComponentValue(Config, bigintToEntity(CONFIG.CONFIG_KEY))
-    if (!config) throw new Error(`Config does not exist`)
-    const token_contract = getContractByName(manifest, NAMESPACE, 'duel_token')
-    const bank_contract = getContractByName(manifest, NAMESPACE, 'bank')
-    let calls: Call[] = []
-    // calculate fee value
-    const approved_value = await calc_fee_duel(table_id)
+    let calls: DojoCalls = []
+    //
     // approve call
-    if (isPositiveBigint(config.lords_address) && approved_value > 0) {
-      calls.push({
-        contractAddress: bigintToHex(config.lords_address),
-        entrypoint: 'approve',
-        calldata: [bank_contract.address, bigintToU256(approved_value)],
-      })
-    }
+    const approved_value = await calc_fee_duel(table_id)
+    calls.push(approve_call(approved_value))
+    //
     // game call
-    calls.push({
-      contractAddress: token_contract.address,
-      entrypoint: 'create_duel',
-      calldata: args,
-    })
+    const args = [duelist_id, BigInt(challenged_id_or_address), getPremiseValue(premise), stringToFelt(quote), table_id, expire_hours]
+    calls.push(duel_token_call('create_duel', args))
     return await _executeTransaction(signer, calls)
   }
 
   const reply_duel = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, accepted: boolean): Promise<boolean> => {
-    const reply_args = [duelist_id, duel_id, accepted]
-    return await _executeTransaction(signer, duel_token_call('reply_duel', reply_args))
+    const args = [duelist_id, duel_id, accepted]
+    const calls: DojoCalls = [duel_token_call('reply_duel', args)]
+    return await _executeTransaction(signer, calls)
   }
 
 
@@ -157,36 +158,22 @@ export function createSystemCalls(
   //
 
   const create_duelist = async (signer: AccountInterface, recipient: BigNumberish, name: string, profile_pic_type: ProfilePicType, profile_pic_uri: string): Promise<boolean> => {
-    const args = [recipient, stringToFelt(name), getProfilePicTypeValue(profile_pic_type), stringToFelt(profile_pic_uri)]
-
-    // find lords contract
-    const config = getComponentValue(Config, bigintToEntity(CONFIG.CONFIG_KEY))
-    if (!config) throw new Error(`Config does not exist`)
-    const token_contract = getContractByName(manifest, NAMESPACE, 'duelist_token')
-    const bank_contract = getContractByName(manifest, NAMESPACE, 'bank')
-    let calls: Call[] = []
-    // calculate fee value
-    const approved_value = await calc_fee_duelist(signer.address)
+    let calls: DojoCalls = []
+    //
     // approve call
-    if (isPositiveBigint(config.lords_address) && approved_value > 0) {
-      calls.push({
-        contractAddress: bigintToHex(config.lords_address),
-        entrypoint: 'approve',
-        calldata: [bank_contract.address, bigintToU256(approved_value)],
-      })
-    }
+    const approved_value = await calc_fee_duelist(signer.address)
+    calls.push(approve_call(approved_value))
+    //
     // game call
-    calls.push({
-      contractAddress: token_contract.address,
-      entrypoint: 'create_duelist',
-      calldata: args,
-    })
+    const args = [recipient, stringToFelt(name), getProfilePicTypeValue(profile_pic_type), stringToFelt(profile_pic_uri)]
+    calls.push(duelist_token_call('create_duelist', args))
     return await _executeTransaction(signer, calls)
   }
 
   const update_duelist = async (signer: AccountInterface, duelist_id: BigNumberish, name: string, profile_pic_type: ProfilePicType, profile_pic_uri: string): Promise<boolean> => {
     const args = [duelist_id, stringToFelt(name), getProfilePicTypeValue(profile_pic_type), stringToFelt(profile_pic_uri)]
-    return await _executeTransaction(signer, duelist_token_call('update_duelist', args))
+    const calls: DojoCalls = [duelist_token_call('update_duelist', args)]
+    return await _executeTransaction(signer, calls)
   }
 
 
@@ -196,7 +183,8 @@ export function createSystemCalls(
 
   const grant_admin = async (signer: AccountInterface, address: BigNumberish, granted: boolean): Promise<boolean> => {
     const args = [address, granted]
-    return await _executeTransaction(signer, admin_call('grant_admin', args))
+    const calls: DojoCalls = [admin_call('grant_admin', args)]
+    return await _executeTransaction(signer, calls)
   }
 
   const admin_set_config = async (signer: AccountInterface, values: any): Promise<boolean> => {
@@ -205,7 +193,8 @@ export function createSystemCalls(
       if (value == null) throw new Error()
       return value
     })
-    return await _executeTransaction(signer, admin_call('set_config', args))
+    const calls: DojoCalls = [admin_call('set_config', args)]
+    return await _executeTransaction(signer, calls)
   }
 
   const admin_set_table = async (signer: AccountInterface, table: any): Promise<boolean> => {
@@ -215,7 +204,8 @@ export function createSystemCalls(
       return value
     })
     // const args = [values]
-    return await _executeTransaction(signer, admin_call('set_table', args))
+    const calls: DojoCalls = [admin_call('set_table', args)]
+    return await _executeTransaction(signer, calls)
   }
 
   const admin_set_table_admittance = async (signer: AccountInterface, table_admittance: any): Promise<boolean | null> => {
@@ -224,7 +214,8 @@ export function createSystemCalls(
       if (value == null) throw new Error()
       return value
     })
-    return await _executeTransaction(signer, admin_call('set_table_admittance', args))
+    const calls: DojoCalls = [admin_call('set_table_admittance', args)]
+    return await _executeTransaction(signer, calls)
   }
 
 
