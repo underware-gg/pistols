@@ -7,6 +7,7 @@ pub trait ICoinComponentInternal<TState> {
         faucet_amount: u128,
     );
     fn can_mint(self: @TState, caller_address: ContractAddress) -> bool;
+    fn assert_caller_is_minter(self: @TState) -> ContractAddress;
     fn mint(ref self: TState, recipient: ContractAddress, amount: u256);
     fn faucet(ref self: TState, recipient: ContractAddress);
 }
@@ -23,7 +24,6 @@ pub mod CoinComponent {
         ERC20Component,
         ERC20Component::{InternalImpl as ERC20InternalImpl},
     };
-    use openzeppelin_token::erc20::interface;
 
     use pistols::models::config::{
         CoinConfig, CoinConfigStore,
@@ -39,8 +39,8 @@ pub mod CoinComponent {
     pub enum Event {}
 
     mod Errors {
-        const CALLER_IS_NOT_MINTER: felt252 = 'ERC20: caller is not minter';
-        const FAUCET_UNAVAILABLE: felt252   = 'ERC20: faucet unavailable';
+        const CALLER_IS_NOT_MINTER: felt252 = 'COIN: caller is not minter';
+        const FAUCET_UNAVAILABLE: felt252   = 'COIN: faucet unavailable';
     }
 
 
@@ -81,13 +81,17 @@ pub mod CoinComponent {
             )
         }
 
+        fn assert_caller_is_minter(self: @ComponentState<TContractState>) -> ContractAddress {
+            let caller: ContractAddress = get_caller_address();
+            assert(self.can_mint(caller), Errors::CALLER_IS_NOT_MINTER);
+            (caller)
+        }
+
         fn mint(ref self: ComponentState<TContractState>,
             recipient: ContractAddress,
             amount: u256,
         ) {
-            assert(self.can_mint(get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
-
-            // let erc20 = get_dep_component!(self, ERC20);
+            self.assert_caller_is_minter();
             let mut erc20 = get_dep_component_mut!(ref self, ERC20);
             erc20.mint(recipient, amount);
         }

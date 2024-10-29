@@ -28,12 +28,14 @@ pub trait IFameCoin<TState> {
     fn balance_of_token(self: @TState, contract_address: ContractAddress, token_id: u128) -> u256;
     
     // IFameCoinPublic
-    fn mint_to_new_duelist(ref self: TState, duelist_id: u128, amount_paid: u256);
+    fn minted_duelist(ref self: TState, duelist_id: u128, amount_paid: u256);
+    fn updated_duelist(ref self: TState, from: ContractAddress, to: ContractAddress, duelist_id: u128);
 }
 
 #[starknet::interface]
 pub trait IFameCoinPublic<TState> {
-    fn mint_to_new_duelist(ref self: TState, duelist_id: u128, amount_paid: u256);
+    fn minted_duelist(ref self: TState, duelist_id: u128, amount_paid: u256);
+    fn updated_duelist(ref self: TState, from: ContractAddress, to: ContractAddress, duelist_id: u128);
 }
 
 #[dojo::contract]
@@ -86,10 +88,15 @@ pub mod fame_coin {
     // ERC-20 End
     //-----------------------------------
 
-    use pistols::interfaces::systems::{WorldSystemsTrait};
+    // use pistols::interfaces::systems::{WorldSystemsTrait};
+    use pistols::interfaces::ierc721::{ierc721, ERC721ABIDispatcher, ERC721ABIDispatcherTrait};
     use pistols::utils::math::{MathU128, MathU256};
+    use pistols::utils::misc::{ZERO};
     use pistols::types::constants::{CONST, FAME};
 
+    mod Errors {
+        const NOT_IMPLEMENTED: felt252          = 'FAME: Not implemented';
+    }
 
     //*******************************************
     fn COIN_NAME() -> ByteArray {("Duelist Fame")}
@@ -115,45 +122,85 @@ pub mod fame_coin {
     use super::{IFameCoinPublic};
     #[abi(embed_v0)]
     impl FamePublicImpl of IFameCoinPublic<ContractState> {
-        fn mint_to_new_duelist(ref self: ContractState,
+        fn minted_duelist(ref self: ContractState,
             duelist_id: u128,
             amount_paid: u256,
         ) {
             // validate minter
-            let duelist_contract_address = self.world().duelist_token_address();
-            // assert(get_caller_address() == duelist_contract_address, CoinErrors::CALLER_IS_NOT_MINTER);
+            let duelist_contract_address: ContractAddress = self.coin.assert_caller_is_minter();
 
             // register token_bound token
-            // let recipient: ContractAddress = self.token_bound.address_of_token(duelist_contract_address, duelist_id);
-            let recipient: ContractAddress = self.token_bound.register_token(duelist_contract_address, duelist_id);
+            let token_address: ContractAddress = self.token_bound.register_token(duelist_contract_address, duelist_id);
 
-            // mint FAME
+            // pre-approve minter as spender
+            self.erc20._approve(token_address, duelist_contract_address, Bounded::MAX);
+
+            // mint FAME to token
             let amount: u256 = MathU256::max(FAME::MINT_GRANT_AMOUNT, amount_paid * FAME::FAME_PER_LORDS);
-            self.coin.mint(recipient, amount);
+            self.coin.mint(token_address, amount);
+        }
 
-            // approve duelist as spender
-            self.erc20._approve(recipient, duelist_contract_address, Bounded::MAX);
+        fn updated_duelist(ref self: ContractState,
+            from: ContractAddress,
+            to: ContractAddress,
+            duelist_id: u128,
+        ) {
+            // validate caller
+            let duelist_contract_address: ContractAddress = self.coin.assert_caller_is_minter();
+
+            // mint is handled in minted_duelist()
+            if (from.is_zero()) {
+                return;
+            }
+
+            // duelist changed owner, transfer its FAME
+            if (from != to) {
+                let balance: u256 = self.balance_of_token(duelist_contract_address, duelist_id);
+                if (balance > 0) {
+                    self.erc20.update(from, to, balance);
+                }
+            }
         }
     }
 
     //-----------------------------------
     // Hooks
     //
-    pub impl ERC20HooksImpl<TContractState> of ERC20Component::ERC20HooksTrait<TContractState> {
+    pub impl ERC20HooksImpl of ERC20Component::ERC20HooksTrait<ContractState> {
         fn before_update(
-            ref self: ERC20Component::ComponentState<TContractState>,
+            ref self: ERC20Component::ComponentState<ContractState>,
             from: ContractAddress,
             recipient: ContractAddress,
             amount: u256
-        ) {}
+        ) {
+            // validate caller
+            let mut contract_state = ERC20Component::HasComponent::get_contract_mut(ref self);
+            contract_state.coin.assert_caller_is_minter();
+        }
 
         fn after_update(
-            ref self: ERC20Component::ComponentState<TContractState>,
+            ref self: ERC20Component::ComponentState<ContractState>,
             from: ContractAddress,
             recipient: ContractAddress,
             amount: u256
-        ) {}
-    }
+        ) {
+            let mut contract_state = ERC20Component::HasComponent::get_contract_mut(ref self);
+            let (from_contract_address, from_token_id): (ContractAddress, u128) = contract_state.token_bound.token_of_address(from);
+            let (to_contract_address, to_token_id): (ContractAddress, u128) = contract_state.token_bound.token_of_address(recipient);
+            let from_owner: ContractAddress = 
+                if (from_contract_address.is_non_zero()) {
+                    ierc721(from_contract_address).owner_of(from_token_id.into())
+                } else {ZERO()};
+            let to_owner: ContractAddress = 
+                if (to_contract_address.is_non_zero()) {
+                    ierc721(to_contract_address).owner_of(to_token_id.into())
+                } else {ZERO()};
 
+            // transfer between tokens, repeat for owners
+            if (from_owner.is_non_zero() || to_owner.is_non_zero() && from_owner != to_owner) {
+                contract_state.erc20.update(from_owner, to_owner, amount);
+            }
+        }
+    }
 
 }

@@ -33,6 +33,11 @@ pub trait IDuelistToken<TState> {
     // IERC721MetadataCamelOnly
     fn tokenURI(self: @TState, tokenId: u256) -> ByteArray;
 
+     // ITokenBoundPublic
+    fn address_of_token(self: @TState, contract_address: ContractAddress, token_id: u128) -> ContractAddress;
+    fn token_of_address(self: @TState, address: ContractAddress) -> (ContractAddress, u128);
+    fn balance_of_token(self: @TState, contract_address: ContractAddress, token_id: u128) -> u256;
+
     // ITokenComponentPublic
     fn can_mint(self: @TState, caller_address: ContractAddress) -> bool;
     fn exists(self: @TState, token_id: u128) -> bool;
@@ -232,7 +237,7 @@ pub mod duelist_token {
 
             // mint fame
             let fame_dispatcher: IFameCoinDispatcher = self.world().fame_coin_dispatcher();
-            fame_dispatcher.mint_to_new_duelist(duelist.duelist_id, payment.amount);
+            fame_dispatcher.minted_duelist(duelist.duelist_id, payment.amount);
 
             emitters::emitDuelistRegisteredEvent(@self.world(), recipient, duelist.clone(), true);
 
@@ -269,9 +274,10 @@ pub mod duelist_token {
             duelist_id: u128,
         ) {
             self.token.assert_is_owner_of(get_caller_address(), duelist_id.into());
+            // duelist burn not supported
             assert(false, Errors::NOT_IMPLEMENTED);
             // self.token.burn(duelist_id.into());
-            // TODO: burn FAME TOO
+            // burn FAME too
         }
 
     }
@@ -307,15 +313,16 @@ pub mod duelist_token {
             token_id: u256,
             auth: ContractAddress,
         ) {
-
+            let owner: ContractAddress = self._owner_of(token_id);
+            let fame_dispatcher: IFameCoinDispatcher = self.get_contract().world().fame_coin_dispatcher();
+            fame_dispatcher.updated_duelist(owner, to, token_id.low);
         }
+
         fn after_update(ref self: ERC721Component::ComponentState<ContractState>,
             to: ContractAddress,
             token_id: u256,
             auth: ContractAddress,
-        ) {
-            
-        }
+        ) {}
 
         // same as ERC721HooksImpl::token_uri()
         fn token_uri(self: @ERC721Component::ComponentState<ContractState>, token_id: u256) -> ByteArray {

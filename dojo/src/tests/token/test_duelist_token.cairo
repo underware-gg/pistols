@@ -404,28 +404,20 @@ fn test_burn() {
 }
 
 
-//
+//---------------------------------
 // FAME
 //
-
-fn _fame_balance_of(sys: Systems, token_id: u256) -> u256 {
-    (sys.fame.balance_of_token(sys.token.contract_address, token_id.low))
-}
 
 #[test]
 fn test_fame() {
     let sys: Systems = setup(0);
-    let owner_balance_initial: u256 = _fame_balance_of(sys, TOKEN_ID_1);
-    let other_balance_initial: u256 = _fame_balance_of(sys, TOKEN_ID_2);
-    assert(owner_balance_initial == FAME::MINT_GRANT_AMOUNT, 'owner_balance_initial');
-    assert(other_balance_initial == FAME::MINT_GRANT_AMOUNT, 'other_balance_initial');
 
+    // validate token_bound address
     let token_bound_address_1: ContractAddress = sys.fame.address_of_token(sys.token.contract_address, TOKEN_ID_1.low);
     let token_bound_address_2: ContractAddress = sys.fame.address_of_token(sys.token.contract_address, TOKEN_ID_2.low);
     assert(token_bound_address_1.is_non_zero(), 'token_bound_address_1');
     assert(token_bound_address_2.is_non_zero(), 'token_bound_address_2');
     assert(token_bound_address_1 != token_bound_address_2, 'token_bound_address_1 != 2');
-
     let (token_contract_1, token_id_1) = sys.fame.token_of_address(token_bound_address_1);
     let (token_contract_2, token_id_2) = sys.fame.token_of_address(token_bound_address_2);
     assert(token_contract_1 == sys.token.contract_address, 'token_contract_1');
@@ -433,18 +425,121 @@ fn test_fame() {
     assert(token_id_1 == TOKEN_ID_1.low, 'token_id_1');
     assert(token_id_2 == TOKEN_ID_2.low, 'token_id_2');
 
-    // mint new duelist
+    // initial token balances
+    let balance_1_initial: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_1.low);
+    let balance_2_initial: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_2.low);
+    assert(FAME::MINT_GRANT_AMOUNT > 0, 'FAME::MINT_GRANT_AMOUNT > 0');
+    assert(balance_1_initial == FAME::MINT_GRANT_AMOUNT, 'balance_1_initial');
+    assert(balance_2_initial == FAME::MINT_GRANT_AMOUNT, 'balance_2_initial');
+
+    // owner balances must match
+    let balance_owner_initial: u256 = sys.fame.balance_of(OWNER());
+    let balance_other_initial: u256 = sys.fame.balance_of(OTHER());
+    assert(balance_owner_initial == balance_1_initial, 'balance_owner_initial');
+    assert(balance_other_initial == balance_2_initial, 'balance_other_initial');
 
     // transfer duelist
+    tester::impersonate(OWNER());
+    sys.token.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
+    // check balances
+    let balance_1: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_1.low);
+    let balance_2: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_2.low);
+    let balance_owner: u256 = sys.fame.balance_of(OWNER());
+    let balance_other: u256 = sys.fame.balance_of(OTHER());
+    let balance_recipient: u256 = sys.fame.balance_of(RECIPIENT());
+    assert(balance_1 == balance_1_initial, 'balance_1 (1)');
+    assert(balance_2 == balance_2_initial, 'balance_2 (1)');
+    assert(balance_owner == 0, 'balance_owner (1)');
+    assert(balance_other == balance_owner_initial + balance_other_initial, 'balance_other (1)');
+    assert(balance_recipient == 0, 'balance_recipient (1)');
 
-    // owner balances
+    // transfer to new owner
+    tester::impersonate(OTHER());
+    sys.token.transfer_from(OTHER(), RECIPIENT(), TOKEN_ID_1);
+    sys.token.transfer_from(OTHER(), RECIPIENT(), TOKEN_ID_2);
+    let balance_1: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_1.low);
+    let balance_2: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_2.low);
+    let balance_owner: u256 = sys.fame.balance_of(OWNER());
+    let balance_other: u256 = sys.fame.balance_of(OTHER());
+    let balance_recipient: u256 = sys.fame.balance_of(RECIPIENT());
+    assert(balance_1 == balance_1_initial, 'balance_1 (2)');
+    assert(balance_2 == balance_2_initial, 'balance_2 (2)');
+    assert(balance_owner == 0, 'balance_owner (2)');
+    assert(balance_other == 0, 'balance_other (2)');
+    assert(balance_recipient == balance_owner_initial + balance_other_initial, 'balance_recipient (2)');
 }
 
 #[test]
-#[should_panic(expected: ('ERC20: caller is not minter', 'ENTRYPOINT_FAILED'))]
+fn test_fame_transfer() {
+    let sys: Systems = setup(0);
+    let balance_1_initial: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_1.low);
+    let balance_2_initial: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_2.low);
+    let token_bound_address_1: ContractAddress = sys.fame.address_of_token(sys.token.contract_address, TOKEN_ID_1.low);
+    let token_bound_address_2: ContractAddress = sys.fame.address_of_token(sys.token.contract_address, TOKEN_ID_2.low);
+
+    // transfer FAME
+    let amount: u256 = FAME::MINT_GRANT_AMOUNT / 4;
+    tester::impersonate(sys.token.contract_address);
+    sys.fame.transfer_from(token_bound_address_1, token_bound_address_2, amount);
+    // check balances
+    let balance_1: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_1.low);
+    let balance_2: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_2.low);
+    let balance_owner: u256 = sys.fame.balance_of(OWNER());
+    let balance_other: u256 = sys.fame.balance_of(OTHER());
+    assert(balance_1 == balance_1_initial - amount, 'balance_1 (1)');
+    assert(balance_2 == balance_2_initial + amount, 'balance_2 (1)');
+    assert(balance_owner == balance_1_initial - amount, 'balance_owner (1)');
+    assert(balance_other == balance_2_initial + amount, 'balance_other (1)');
+
+    // transfer duelist
+    tester::impersonate(OWNER());
+    sys.token.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
+
+    // transfer FAME
+    let amount: u256 = FAME::MINT_GRANT_AMOUNT / 4;
+    tester::impersonate(sys.token.contract_address);
+    sys.fame.transfer_from(token_bound_address_1, token_bound_address_2, amount);
+    // check balances
+    let balance_1: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_1.low);
+    let balance_2: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_2.low);
+    let balance_owner: u256 = sys.fame.balance_of(OWNER());
+    let balance_other: u256 = sys.fame.balance_of(OTHER());
+    assert(balance_1 == balance_1_initial - amount * 2, 'balance_1 (1)');
+    assert(balance_2 == balance_2_initial + amount * 2, 'balance_2 (1)');
+    assert(balance_owner == 0, 'balance_owner (2)');
+    assert(balance_other == balance_1_initial + balance_2_initial, 'balance_other (2)');
+}
+
+#[test]
+#[should_panic(expected: ('ERC20: insufficient allowance', 'ENTRYPOINT_FAILED'))]
+fn test_fame_transfer_between_owners_not_allowed() {
+    let sys: Systems = setup(0);
+    // transfer FAME
+    tester::impersonate(sys.token.contract_address);
+    sys.fame.transfer_from(OWNER(), OTHER(), FAME::MINT_GRANT_AMOUNT / 2);
+}
+
+#[test]
+#[should_panic(expected: ('COIN: caller is not minter', 'ENTRYPOINT_FAILED'))]
+fn test_fame_transfer_from_owner_not_allowed() {
+    let sys: Systems = setup(0);
+    // transfer FAME
+    tester::impersonate(OWNER());
+    sys.fame.transfer(OTHER(), FAME::MINT_GRANT_AMOUNT / 2);
+}
+
+#[test]
+#[should_panic(expected: ('COIN: caller is not minter', 'ENTRYPOINT_FAILED'))]
 fn test_fame_mint_not_minter() {
     let sys: Systems = setup(0);
-    sys.fame.mint_to_new_duelist(TOKEN_ID_3.low, 0);
+    sys.fame.minted_duelist(TOKEN_ID_3.low, 0);
+}
+
+#[test]
+#[should_panic(expected: ('COIN: caller is not minter', 'ENTRYPOINT_FAILED'))]
+fn test_fame_update_not_minter() {
+    let sys: Systems = setup(0);
+    sys.fame.updated_duelist(OWNER(), OTHER(), TOKEN_ID_1.low);
 }
 
 #[test]
@@ -452,5 +547,5 @@ fn test_fame_mint_not_minter() {
 fn test_fame_mint_already_registered() {
     let sys: Systems = setup(0);
     utils::impersonate(sys.token.contract_address);
-    sys.fame.mint_to_new_duelist(TOKEN_ID_1.low, 0);
+    sys.fame.minted_duelist(TOKEN_ID_1.low, 0);
 }

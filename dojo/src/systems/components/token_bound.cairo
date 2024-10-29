@@ -62,7 +62,7 @@ pub mod TokenBoundComponent {
     mod Errors {
         const ALREADY_REGISTERED: felt252       = 'TOKEN_BOUND: already registered';
         const INVALID_CONTRACT_ADDRESS: felt252 = 'TOKEN_BOUND: invalid contract';
-        const INVALID_TOKEN_ID: felt252         = 'TOKEN_BOUND: invalid token id';
+        // const INVALID_TOKEN_ID: felt252         = 'TOKEN_BOUND: invalid token id';
     }
 
 
@@ -84,7 +84,7 @@ pub mod TokenBoundComponent {
             token_id: u128,
         ) -> ContractAddress {
             assert(contract_address.is_non_zero(), Errors::INVALID_CONTRACT_ADDRESS);
-            assert(token_id > 0, Errors::INVALID_TOKEN_ID);
+            // assert(token_id > 0, Errors::INVALID_TOKEN_ID);
             (TokenBoundAddressTrait::address(contract_address, token_id))
         }
 
