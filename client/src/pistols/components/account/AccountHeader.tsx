@@ -2,11 +2,10 @@ import React from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
+import { usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
-import { AddressShort } from '@/lib/ui/AddressShort'
-import { LordsBalance } from '@/pistols/components/account/LordsBalance'
+import { FameBalanceDuelist } from '@/pistols/components/account/LordsBalance'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -37,9 +36,9 @@ export default function AccountHeader() {
           {!isConnected ? <h3>Guest</h3>
             : <>
               <h2>{nameDisplay}</h2>
-              <AddressShort address={address} copyLink={'left'} />
-              <br />
-              <LordsBalance address={address} big />
+              {/* <AddressShort address={address} copyLink={'left'} /> */}
+              {/* <h5><FameBalance address={address} big /></h5> */}
+              <h5><FameBalanceDuelist duelistId={duelistId} big /></h5>
             </>}
         </Col>
       </Row>

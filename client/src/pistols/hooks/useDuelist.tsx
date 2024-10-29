@@ -4,8 +4,8 @@ import { useComponentValue } from '@dojoengine/react'
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { useEntityKeys } from '@/lib/dojo/hooks/useEntityKeys'
 import { useScore } from '@/pistols/hooks/useScore'
-import { bigintToEntity, isPositiveBigint } from '@/lib/utils/types'
 import { feltToString } from "@/lib/utils/starknet"
+import { bigintToEntity, isPositiveBigint } from '@/lib/utils/types'
 import { CONST } from '@/games/pistols/generated/constants'
 
 
@@ -36,7 +36,8 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   // console.log(`Duelist`, duelist_id, entityId, duelist)
 
   const name = useMemo(() => duelist?.name ? feltToString(duelist.name) : null, [duelist])
-  const nameDisplay = useMemo(() => (`${name || 'Duelist'} #${isValidDuelistId ? duelist_id : '?'}`), [name, duelist_id])
+  const nameDisplay = useMemo(() => (`${name || 'Duelist'} #${isValidDuelistId ? duelist_id : '?'}`), [name, duelist_id, isValidDuelistId])
+  const duelistIdDisplay = useMemo(() => (`Duelist #${isValidDuelistId ? duelist_id : '?'}`), [duelist_id, isValidDuelistId])
   const profilePicType = useMemo(() => (duelist?.profile_pic_type ?? null), [duelist])
   const profilePic = useMemo(() => Number(duelist?.profile_pic_uri ?? 0), [duelist])
   const timestamp = useMemo(() => (duelist?.timestamp ?? 0), [duelist])
@@ -50,6 +51,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     duelistId: duelist_id,
     name,
     nameDisplay,
+    duelistIdDisplay,
     exists,
     timestamp,
     profilePicType,

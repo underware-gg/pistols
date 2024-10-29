@@ -4,7 +4,7 @@ import { overridableComponent } from "@dojoengine/recs";
 import { getSyncEntities } from '@dojoengine/state'
 import { DojoProvider } from '@dojoengine/core'
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
-import { useSystem } from '@/lib/dojo/hooks/useDojoSystem'
+import { useDeployedSystem } from '@/lib/dojo/hooks/useDojoSystem'
 import { useAsyncMemo } from '@/lib/utils/hooks/useAsyncMemo'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { feltToString } from '@/lib/utils/starknet'
@@ -71,7 +71,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
 
   //
   // Check world deployment
-  const { isDeployed } = useSystem(dojoAppConfig.nameSpace, Object.keys(dojoAppConfig.contractInterfaces)[0], manifest)
+  const { isDeployed } = useDeployedSystem(dojoAppConfig.nameSpace, Object.keys(dojoAppConfig.contractInterfaces)[0], manifest)
 
   //
   // Initialize components

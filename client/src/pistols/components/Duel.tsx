@@ -24,14 +24,13 @@ import { Action, ArchetypeNames } from '@/pistols/utils/pistols'
 import { MenuDebugAnimations, MenuDuel } from '@/pistols/components/Menus'
 import { bigintToHex } from '@/lib/utils/types'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { useOwnerOfDuelist } from '../hooks/useTokenDuelist'
+import { useOwnerOfDuelist } from '../hooks/useDuelistToken'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import CommitPacesModal from '@/pistols/components/CommitPacesModal'
 import 'react-circular-progressbar/dist/styles.css';
 import Cards, { CardsHandle, DuelistCardType, DuelistHand } from './Cards'
 import useGameAspect from '@/pistols/hooks/useGameApect'
 import { BladesCard, EnvCard, PacesCard, TacticsCard } from '@/games/pistols/generated/constants';
-import { clearTimeout } from 'timers';
 
 export type DuelistState = {
   damage: number, 

@@ -243,7 +243,7 @@ export const Field = ({
                 setValue={setValue}
               />
             </> : <>
-              {fieldType == FieldType.Wei && <Balance wei={value ?? 0} decimals={18} />}
+              {fieldType == FieldType.Wei && <Balance lords wei={value ?? 0} decimals={18} />}
               <FormInput
                 label={null}
                 placeholder={null}

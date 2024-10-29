@@ -41,6 +41,7 @@ export const EMOJI = {
   DICE: '🎲',
   //
   // badges
+  FAME: '⭐️',
   HONOUR: '👑',
   NEUTRAL: '🫥',
   LORD: '👑',

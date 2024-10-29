@@ -1,11 +1,11 @@
 import React from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { LordsBalance } from '@/pistols/components/account/LordsBalance'
+import { FameBalanceDuelist } from '@/pistols/components/account/LordsBalance'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { EMOJI } from '@/pistols/data/messages'
 import { BigNumberish } from 'starknet'
-import { useOwnerOfDuelist } from '@/pistols/hooks/useTokenDuelist'
+import { useOwnerOfDuelist } from '@/pistols/hooks/useDuelistToken'
 import { useValidateWalletAddress } from '@/lib/utils/hooks/useValidateWalletAddress'
 
 const Row = Grid.Row
@@ -41,22 +41,20 @@ export function ProfileBadge({
 export function ProfileDescription({
   duelistId,
   address,
-  tableId,
   displayNameSmall = false,
   displayStats = false,
   displayOwnerAddress = false,
   displayOwnerAddressSmall = false,
-  displayBalance = false,
+  displayFameBalance = false,
   displayHonor = true,
 }: {
   duelistId: BigNumberish
   address?: BigNumberish
-  tableId?: BigNumberish
   displayNameSmall?: boolean
   displayStats?: boolean
   displayOwnerAddress?: boolean
   displayOwnerAddressSmall?: boolean
-  displayBalance?: boolean
+  displayFameBalance?: boolean
   displayHonor?: boolean
 }) {
   const { score: {
@@ -85,11 +83,7 @@ export function ProfileDescription({
           {displayHonor && <h3 className='Important NoMargin TitleCase'>
             Honour: <span className='Coin'>{honourAndTotal}</span>
           </h3>}
-          {displayBalance &&
-            <h5>
-              <LordsBalance address={_owner} big />
-            </h5>
-          }
+          {displayFameBalance && <h5><FameBalanceDuelist duelistId={duelistId} big /></h5>}
         </Col>
 
         {displayStats && total_duels > 0 &&

@@ -1,40 +1,56 @@
 import { ReactNode, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { CustomIcon, IconSizeProp } from '@/lib/ui/Icons'
+import { CustomIcon, EmojiIcon, IconSizeProp } from '@/lib/ui/Icons'
 import { weiToEthString } from '@/lib/utils/starknet'
 import { EMOJI } from '@/pistols/data/messages'
 
+type CoinIconProps = {
+  size?: IconSizeProp
+}
+
+export function EtherIcon({
+  size = null,
+}: CoinIconProps) {
+  return <CustomIcon logo name='ethereum' size={size} className='EtherIcon' alt='$ETH' />
+}
+
 export function LordsBagIcon({
   size = null,
-}: {
-  size?: IconSizeProp
-}) {
+}: CoinIconProps) {
   return <CustomIcon logo png name='lords_bag' size={size} alt='$LORDS' />
 }
 
+export function FameIcon({
+  size = null,
+}: CoinIconProps) {
+  return <EmojiIcon emoji={EMOJI.FAME} size={size} alt='$FAME' />
+}
+
 export function Balance({
-  tableId,  // used for icon only
-  ether,    // used for icon only
+  ether = false,    // used for icon only
+  lords = false,    // used for icon only
+  fame = false,     // used for icon only
+  clean = false,    // no icon
   value = null,
   decimals,
   wei = null,
   big = false,
   small = false,
-  clean = false,
   crossed = false,
   pre = null,
   post = null,
   children = null,
   placeholdder = '?',
 }: {
-  tableId?: string
+  ether?: boolean
+  lords?: boolean
+  fame?: boolean
+  clean?: boolean
   value?: BigNumberish
   wei?: BigNumberish
   decimals?: number
-  ether?: boolean
   big?: boolean
   small?: boolean
-  clean?: boolean
   crossed?: boolean
   pre?: string
   post?: string
@@ -62,9 +78,11 @@ export function Balance({
 
   const _icon = useMemo(() => {
     if (clean) return <></>
-    if (ether) return <CustomIcon logo name='ethereum' size={'small'} className='EtherIcon' />
-    return <LordsBagIcon size={null} />
-  }, [clean, ether, tableId])
+    if (ether) return <EtherIcon size={'small'} />
+    if (lords) return <LordsBagIcon size={null} />
+    if (fame) return <FameIcon size={'small'} />
+    return <></>
+  }, [clean, lords, fame, ether])
 
   return (
     <span className={classNames.join(' ')}>

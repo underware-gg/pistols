@@ -3,13 +3,13 @@ import { Grid, Tab } from 'semantic-ui-react'
 import { RowDivider, VStack } from '@/lib/ui/Stack'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useDuelistCalcPrice } from '@/pistols/hooks/useTokenDuelist'
-import { useDuelistsOfOwner } from '@/pistols/hooks/useTokenDuelist'
+import { useDuelistCalcPrice } from '@/pistols/hooks/useDuelistToken'
+import { useDuelistsOfOwner } from '@/pistols/hooks/useDuelistToken'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { ProfileName } from '@/pistols/components/account/ProfileDescription'
-import { FameBalance } from '@/pistols/components/account/LordsBalance'
+import { FameBalanceDuelist } from '@/pistols/components/account/LordsBalance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ConnectButton, CurrentChainHint, EnterAsGuestButton } from '@/pistols/components/ScGate'
 import { SocialsList } from '@/pistols/components/SocialsList'
@@ -35,7 +35,6 @@ export default function ScProfile() {
   useEffect(() => {
     if (!loaded) {
       setLoaded(true)
-      console.log(`FROM`, fromGate, duelistBalance)
       if (fromGate && duelistBalance === 0) {
         duelistEditOpener.open({ mintNew: true })
       }
@@ -173,7 +172,7 @@ function DuelistItem({
   }
 
   const classNames = useMemo(() => {
-    const result = ['Anchor']
+    const result = ['Anchor', 'NoPadding']
     if (isSelected) result.push('BgImportant')
     return result
   }, [isSelected])
@@ -192,17 +191,16 @@ function DuelistItem({
           </div>
         </Col>
         <Col width={8} textAlign='left' verticalAlign='middle'>
-
           <h4>
             <IconClick name='edit' size={'small'} onClick={() => _manage()} />
             &nbsp;
             <ProfileName duelistId={duelistId} />
           </h4>
           <h5>
-            <FameBalance duelistId={duelistId} />
+            <FameBalanceDuelist duelistId={duelistId} />
           </h5>
         </Col>
-        <Col width={5} textAlign='left' verticalAlign='bottom'>
+        <Col width={5} textAlign='left' verticalAlign='middle'>
           <ActionButton fill disabled={!_canPlay} onClick={() => dispatchSelectDuelistId(duelistId)} label='Status' />
           <ActionButton fill important disabled={!_canPlay} onClick={() => _duel()} label='Duel!' />
         </Col>

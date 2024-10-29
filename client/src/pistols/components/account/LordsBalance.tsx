@@ -1,9 +1,8 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useLordsBalance, useEtherBalance } from '@/lib/dojo/hooks/useLords'
-import { useScoreboard } from '@/pistols/hooks/useScore'
 import { Balance } from '@/pistols/components/account/Balance'
-import { TABLES } from '@/games/pistols/generated/constants'
+import { useFameBalance, useFameBalanceDuelist } from '@/pistols/hooks/useFame'
 
 
 //
@@ -11,6 +10,8 @@ import { TABLES } from '@/games/pistols/generated/constants'
 //
 export const EtherBalance = ({
   address,
+}: {
+  address: BigNumberish
 }) => {
   const { balance } = useEtherBalance(address)
   return (
@@ -31,7 +32,7 @@ export const LordsBalance = ({
 }) => {
   const { balance } = useLordsBalance(address)
   return (
-    <Balance big={big} tableId={TABLES.LORDS} wei={balance} pre={pre} post={post} clean={clean} />
+    <Balance lords big={big} wei={balance} pre={pre} post={post} clean={clean} />
   )
 }
 
@@ -40,13 +41,31 @@ export const LordsBalance = ({
 // Fame Balance of a Duelist
 //
 export const FameBalance = ({
-  duelistId,
-} : {
-  duelistId: BigNumberish
-}
-) => {
+  address,
+  big = false,
+}: {
+  address: BigNumberish
+    big?: boolean
+}) => {
+  const { balance } = useFameBalance(address)
   return (
-    <Balance tableId={TABLES.LORDS} wei={0} />
+    <Balance fame wei={balance} big={big} />
+  )
+}
+
+//
+// Fame Balance of a Duelist
+//
+export const FameBalanceDuelist = ({
+  duelistId,
+  big = false,
+}: {
+  duelistId: BigNumberish
+  big?: boolean
+}) => {
+  const { balance } = useFameBalanceDuelist(duelistId)
+  return (
+    <Balance fame wei={balance} big={big} />
   )
 }
 
@@ -65,10 +84,9 @@ export function FeesToPay({
 }) {
   const hasFees = useMemo(() => (BigInt(fee ?? 0) > 0), [fee])
   const pre = useMemo(() => (prefixed ? 'Fee: ' : null), [prefixed, hasFees])
-  // fees only
   return (
     <span>
-      <Balance big={big} wei={fee} pre={pre} placeholdder={0} />
+      <Balance lords big={big} wei={fee} pre={pre} placeholdder={0} />
     </span>
   )
 }

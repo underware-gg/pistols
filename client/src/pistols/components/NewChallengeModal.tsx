@@ -12,7 +12,7 @@ import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/But
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { FormInput } from '@/pistols/components/ui/Form'
-import { FameBalance, FeesToPay } from '@/pistols/components/account/LordsBalance'
+import { FameBalanceDuelist, FeesToPay } from '@/pistols/components/account/LordsBalance'
 import { PremisePrefix } from '@/pistols/utils/pistols'
 import { Divider } from '@/lib/ui/Divider'
 import { Premise } from '@/games/pistols/generated/constants'
@@ -99,7 +99,7 @@ export default function NewChallengeModal() {
             <Row columns='equal' textAlign='left'>
               <Col>
                 <ProfileDescription duelistId={duelistIdA} displayOwnerAddress={false} />
-                <h5><FameBalance duelistId={duelistIdA} /></h5>
+                <h5><FameBalanceDuelist duelistId={duelistIdA} /></h5>
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -110,7 +110,7 @@ export default function NewChallengeModal() {
             <Row columns='equal' textAlign='right'>
               <Col>
                 <ProfileDescription duelistId={duelistIdB} displayOwnerAddress={false} />
-                <h5><FameBalance duelistId={duelistIdB} /></h5>
+                <h5><FameBalanceDuelist duelistId={duelistIdB} /></h5>
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>

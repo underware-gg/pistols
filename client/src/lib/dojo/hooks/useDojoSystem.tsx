@@ -1,18 +1,22 @@
 import { useMemo } from 'react'
-import { getContractByName } from '@dojoengine/core'
 import { useDojo } from '@/lib/dojo/DojoContext'
-import { DojoManifest } from '@/lib/dojo/Dojo'
 import { useDeployedContract } from '@/lib/utils/hooks/useDeployedContract'
+import { getContractByName } from '@dojoengine/core'
+import { DojoManifest } from '@/lib/dojo/Dojo'
+
 
 export const useDojoSystem = (systemName: string) => {
   const { setup: { manifest, nameSpace } } = useDojo()
   return useSystem(nameSpace, systemName, manifest)
 }
 
-export const useSystem = (nameSpace: string, systemName: string, manifest: DojoManifest) => {
+export const useDeployedDojoSystem = (systemName: string) => {
+  const { setup: { manifest, nameSpace } } = useDojo()
+  return useDeployedSystem(nameSpace, systemName, manifest)
+}
 
-  //
-  // Find Dojo Contract
+
+const useSystem = (nameSpace: string, systemName: string, manifest: DojoManifest) => {
   const { contractAddress, abi } = useMemo(() => {
     const contract = manifest ? getContractByName(manifest, nameSpace, systemName) : null
     return {
@@ -20,8 +24,16 @@ export const useSystem = (nameSpace: string, systemName: string, manifest: DojoM
       abi: contract?.abi ?? null,
     }
   }, [systemName, manifest])
+  return {
+    contractAddress,
+    abi,
+  }
+}
 
-  //
+export const useDeployedSystem = (nameSpace: string, systemName: string, manifest: DojoManifest) => {
+  // Find Dojo Contract
+  const { contractAddress, abi } = useSystem(nameSpace, systemName, manifest)
+
   // Check if contract exists
   const { isDeployed, cairoVersion } = useDeployedContract(contractAddress, abi)
 

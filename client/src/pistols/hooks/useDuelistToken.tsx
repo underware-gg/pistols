@@ -1,26 +1,14 @@
-import { useEffect, useState } from "react"
-import { getContractByName } from "@dojoengine/core"
-import { useDojo, useDojoSystemCalls } from "@/lib/dojo/DojoContext"
-import { useTokenConfig } from "@/pistols/hooks/useConfig"
-import { useToriiErc721TokenByOwner } from "@/lib/dojo/hooks/useToriiErcTokens"
+import { useEffect, useState } from 'react'
+import { BigNumberish } from 'starknet'
+import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
+import { useTokenConfig } from '@/pistols/hooks/useConfig'
+import { useToriiErc721TokenByOwner } from '@/lib/dojo/hooks/useToriiErcTokens'
 import { useERC721OwnerOf } from '@/lib/utils/hooks/useERC721'
-import { BigNumberish } from "starknet"
-
-export const useTokenContract = () => {
-  const [contractAddress, setTokenContractAddress] = useState(null)
-  const { setup: { manifest, nameSpace } } = useDojo()
-  useEffect(() => {
-    const contract = getContractByName(manifest, nameSpace, 'duelist_token');
-    setTokenContractAddress(contract?.address ?? null)
-  }, [manifest])
-  return {
-    contractAddress,
-  }
-}
+import { useDuelistTokenContract } from '@/pistols/hooks/useTokenContract'
 
 export const useDuelistTokenCount = () => {
-  const { contractAddress } = useTokenContract()
-  const { mintedCount, isPending } = useTokenConfig(contractAddress)
+  const { duelistContractAddress } = useDuelistTokenContract()
+  const { mintedCount, isPending } = useTokenConfig(duelistContractAddress)
   return {
     tokenCount: mintedCount ?? 0,
     isPending,
@@ -28,8 +16,8 @@ export const useDuelistTokenCount = () => {
 }
 
 export const useOwnerOfDuelist = (token_id: BigNumberish) => {
-  const { contractAddress } = useTokenContract()
-  const { owner, isPending } = useERC721OwnerOf(contractAddress, token_id)
+  const { duelistContractAddress } = useDuelistTokenContract()
+  const { owner, isPending } = useERC721OwnerOf(duelistContractAddress, token_id)
   return {
     owner,
     isPending,
@@ -37,8 +25,8 @@ export const useOwnerOfDuelist = (token_id: BigNumberish) => {
 }
 
 export const useDuelistsOfOwner = (owner: BigNumberish) => {
-  const { contractAddress } = useTokenContract()
-  const { token } = useToriiErc721TokenByOwner(contractAddress, owner, true)
+  const { duelistContractAddress } = useDuelistTokenContract()
+  const { token } = useToriiErc721TokenByOwner(duelistContractAddress, owner, true)
   return {
     duelistBalance: token?.balance ?? 0,
     duelistIds: token?.tokenIds ?? [],

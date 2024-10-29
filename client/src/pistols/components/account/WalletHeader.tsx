@@ -5,7 +5,7 @@ import { useLordsContract } from '@/lib/dojo/hooks/useLords'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { useControllerMenu, useControllerUser } from '@/lib/dojo/hooks/useController'
 import { getConnectorIcon } from '@/lib/dojo/setup/connectors'
-import { LordsBalance } from '@/pistols/components/account/LordsBalance'
+import { FameBalance, LordsBalance } from '@/pistols/components/account/LordsBalance'
 import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
@@ -43,10 +43,11 @@ export default function WalletHeader({
           <Col width={12} textAlign='left'>
             <h4>{name}</h4>
             {username && <span className='H4 Bold'>{username} / </span>} <AddressShort address={address ?? 0n} />
-            {isConnected && lordsContractAddress &&
+            {isConnected &&
               <h5>
-                LORDS: <LordsBalance address={address} big={false} />
-                {/* &nbsp;&nbsp;/&nbsp; */}
+                LORDS: <LordsBalance address={address} />
+                {' / '}
+                FAME: <FameBalance address={address} />
                 {/* <EtherBalance address={address} /> */}
               </h5>
             }

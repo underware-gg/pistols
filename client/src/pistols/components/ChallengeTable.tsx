@@ -225,14 +225,14 @@ function DuelItem({
             <PositiveResult positive={true}>
               <ProfileName duelistId={winnerIsA ? duelistIdA : duelistIdB} badges={false} />
             </PositiveResult>
-            {fameBalance && <><br /><Balance small tableId={tableId} wei={fameBalance} /></>}
+            {fameBalance && <><br /><Balance fame small wei={fameBalance} /></>}
           </>
           :
           <>
             <span className={ChallengeStateClasses[state]}>
               {ChallengeStateNames[state]}
             </span>
-            {fameBalance && <><br /><Balance small tableId={tableId} wei={fameBalance} crossed={!isLive} /></>}
+            {fameBalance && <><br /><Balance fame small wei={fameBalance} crossed={!isLive} /></>}
           </>
         }
       </Cell>

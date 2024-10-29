@@ -150,7 +150,7 @@ function TableDescription({
           {(Boolean(feePct) && !Boolean(feeMin)) ?
             <span className='Coin'>{feePct}%</span>
             : <>
-              <Balance tableId={tableId} wei={feeMin ?? 0} />
+              <Balance lords wei={feeMin ?? 0} />
               {Boolean(feePct) && <> (or {feePct}%)</>}
             </>
           }
