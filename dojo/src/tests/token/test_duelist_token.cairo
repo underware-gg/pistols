@@ -149,7 +149,7 @@ fn setup_uninitialized(fee_amount: u128) -> Systems {
 }
 
 fn setup(fee_amount: u128) -> Systems {
-    let sys = setup_uninitialized(fee_amount);
+    let sys: Systems = setup_uninitialized(fee_amount);
 
     // initialize contracts
     mint(sys.token, OWNER());
@@ -185,7 +185,7 @@ fn _assert_minted_count(world: IWorldDispatcher, token: IDuelistTokenDispatcher,
 
 #[test]
 fn test_initializer() {
-    let sys = setup(100);
+    let sys: Systems = setup(100);
     // assert(sys.token.name() == "Pistols at 10 Blocks Duelists", 'Name is wrong');
     assert(sys.token.symbol() == "DUELIST", 'Symbol is wrong');
 
@@ -217,7 +217,7 @@ fn test_initializer() {
 
 #[test]
 fn test_token_component() {
-    let sys = setup(100);
+    let sys: Systems = setup(100);
     // should not panic
     // sys.token.contract_address.print();
     sys.token.owner_of(TOKEN_ID_1);//.print();
@@ -227,7 +227,7 @@ fn test_token_component() {
 
 #[test]
 fn test_token_uri() {
-    let sys = setup(100);
+    let sys: Systems = setup(100);
 
     let duelist = Duelist {
         duelist_id: TOKEN_ID_1.low,
@@ -267,7 +267,7 @@ fn test_token_uri() {
 #[test]
 #[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))]
 fn test_token_uri_invalid() {
-    let sys = setup(100);
+    let sys: Systems = setup(100);
     sys.token.token_uri(999);
 }
 
@@ -278,7 +278,7 @@ fn test_token_uri_invalid() {
 
 #[test]
 fn test_approve() {
-    let sys = setup(100);
+    let sys: Systems = setup(100);
 
     utils::impersonate(OWNER());
 
@@ -301,7 +301,7 @@ fn test_approve() {
 
 #[test]
 fn test_transfer_from() {
-    let sys = setup(100);
+    let sys: Systems = setup(100);
 
     tester::impersonate(OWNER());
     sys.token.approve(SPENDER(), TOKEN_ID_1);
@@ -327,7 +327,7 @@ fn test_transfer_from() {
 #[test]
 #[should_panic(expected: ('ERC721: unauthorized caller', 'ENTRYPOINT_FAILED'))]
 fn test_mint_no_allowance() {
-    let sys = setup(100);
+    let sys: Systems = setup(100);
     utils::impersonate(SPENDER());
     sys.token.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
 }
@@ -338,7 +338,7 @@ fn test_mint_no_allowance() {
 
 #[test]
 fn test_mint_free() {
-    let sys = setup(0);
+    let sys: Systems = setup(0);
     _assert_minted_count(sys.world, sys.token, 2, 'invalid total_supply init');
     assert(sys.token.balance_of(OTHER()) == 1, 'invalid balance_of');
     // assert(sys.token.token_of_owner_by_index(OTHER(), 0) == TOKEN_ID_2, 'token_of_owner_by_index_2');
@@ -353,14 +353,14 @@ fn test_mint_free() {
 #[test]
 #[should_panic(expected: ('BANK: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_lords_no_allowance_zero() {
-    let sys = setup(100);
+    let sys: Systems = setup(100);
     mint(sys.token, OTHER());
 }
 
 #[test]
 #[should_panic(expected: ('BANK: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_lords_no_allowance_half() {
-    let sys = setup(100);
+    let sys: Systems = setup(100);
     let price: u128 = sys.token.calc_fee(OTHER());
     tester::execute_lords_approve(@sys.lords, OTHER(), sys.bank.contract_address, price / 2);
     mint(sys.token, OTHER());
@@ -369,7 +369,7 @@ fn test_mint_lords_no_allowance_half() {
 #[test]
 #[should_panic(expected: ('BANK: insufficient balance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_lords_no_balance_zero() {
-    let sys = setup(100);
+    let sys: Systems = setup(100);
     let price: u128 = sys.token.calc_fee(OTHER());
     tester::execute_lords_approve(@sys.lords, OTHER(), sys.bank.contract_address, price);
     mint(sys.token, OTHER());
@@ -377,7 +377,7 @@ fn test_mint_lords_no_balance_zero() {
 
 #[test]
 fn test_mint_lords_ok() {
-    let sys = setup(100);
+    let sys: Systems = setup(100);
     _assert_minted_count(sys.world, sys.token, 2, 'invalid total_supply init');
     let price: u128 = sys.token.calc_fee(OTHER());
     assert(price > 0, 'invalid price');
@@ -395,7 +395,7 @@ fn test_mint_lords_ok() {
 #[test]
 #[should_panic(expected: ('DUELIST: Not implemented', 'ENTRYPOINT_FAILED'))]
 fn test_burn() {
-    let sys = setup(100);
+    let sys: Systems = setup(100);
     _assert_minted_count(sys.world, sys.token, 2, 'invalid total_supply init');
     assert(sys.token.balance_of(OWNER()) == 1, 'invalid balance_of (1)');
     sys.token.delete_duelist(TOKEN_ID_1.low);
@@ -414,11 +414,24 @@ fn _fame_balance_of(sys: Systems, token_id: u256) -> u256 {
 
 #[test]
 fn test_fame() {
-    let sys = setup(0);
+    let sys: Systems = setup(0);
     let owner_balance_initial: u256 = _fame_balance_of(sys, TOKEN_ID_1);
     let other_balance_initial: u256 = _fame_balance_of(sys, TOKEN_ID_2);
     assert(owner_balance_initial == FAME::MINT_GRANT_AMOUNT, 'owner_balance_initial');
     assert(other_balance_initial == FAME::MINT_GRANT_AMOUNT, 'other_balance_initial');
+
+    let token_bound_address_1: ContractAddress = sys.fame.address_of_token(sys.token.contract_address, TOKEN_ID_1.low);
+    let token_bound_address_2: ContractAddress = sys.fame.address_of_token(sys.token.contract_address, TOKEN_ID_2.low);
+    assert(token_bound_address_1.is_non_zero(), 'token_bound_address_1');
+    assert(token_bound_address_2.is_non_zero(), 'token_bound_address_2');
+    assert(token_bound_address_1 != token_bound_address_2, 'token_bound_address_1 != 2');
+
+    let (token_contract_1, token_id_1) = sys.fame.token_of_address(token_bound_address_1);
+    let (token_contract_2, token_id_2) = sys.fame.token_of_address(token_bound_address_2);
+    assert(token_contract_1 == sys.token.contract_address, 'token_contract_1');
+    assert(token_contract_2 == sys.token.contract_address, 'token_contract_2');
+    assert(token_id_1 == TOKEN_ID_1.low, 'token_id_1');
+    assert(token_id_2 == TOKEN_ID_2.low, 'token_id_2');
 
     // mint new duelist
 
@@ -430,6 +443,14 @@ fn test_fame() {
 #[test]
 #[should_panic(expected: ('ERC20: caller is not minter', 'ENTRYPOINT_FAILED'))]
 fn test_fame_mint_not_minter() {
-    let sys = setup(0);
+    let sys: Systems = setup(0);
+    sys.fame.mint_to_new_duelist(TOKEN_ID_3.low, 0);
+}
+
+#[test]
+#[should_panic(expected: ('TOKEN_BOUND: already registered', 'ENTRYPOINT_FAILED'))]
+fn test_fame_mint_already_registered() {
+    let sys: Systems = setup(0);
+    utils::impersonate(sys.token.contract_address);
     sys.fame.mint_to_new_duelist(TOKEN_ID_1.low, 0);
 }

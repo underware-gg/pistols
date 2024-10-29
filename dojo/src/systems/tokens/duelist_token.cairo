@@ -270,7 +270,8 @@ pub mod duelist_token {
         ) {
             self.token.assert_is_owner_of(get_caller_address(), duelist_id.into());
             assert(false, Errors::NOT_IMPLEMENTED);
-            self.token.burn(duelist_id.into());
+            // self.token.burn(duelist_id.into());
+            // TODO: burn FAME TOO
         }
 
     }

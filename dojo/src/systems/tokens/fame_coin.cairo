@@ -24,6 +24,7 @@ pub trait IFameCoin<TState> {
 
     // ITokenBoundPublic
     fn address_of_token(self: @TState, contract_address: ContractAddress, token_id: u128) -> ContractAddress;
+    fn token_of_address(self: @TState, address: ContractAddress) -> (ContractAddress, u128);
     fn balance_of_token(self: @TState, contract_address: ContractAddress, token_id: u128) -> u256;
     
     // IFameCoinPublic
@@ -38,6 +39,7 @@ pub trait IFameCoinPublic<TState> {
 #[dojo::contract]
 pub mod fame_coin {
     // use debug::PrintTrait;
+    use core::num::traits::Bounded;
     use core::byte_array::ByteArrayTrait;
     use starknet::{ContractAddress, get_contract_address, get_caller_address, get_block_timestamp};
 
@@ -120,10 +122,17 @@ pub mod fame_coin {
             // validate minter
             let duelist_contract_address = self.world().duelist_token_address();
             // assert(get_caller_address() == duelist_contract_address, CoinErrors::CALLER_IS_NOT_MINTER);
+
+            // register token_bound token
+            // let recipient: ContractAddress = self.token_bound.address_of_token(duelist_contract_address, duelist_id);
+            let recipient: ContractAddress = self.token_bound.register_token(duelist_contract_address, duelist_id);
+
             // mint FAME
-            let recipient: ContractAddress = self.token_bound.address_of_token(duelist_contract_address, duelist_id);
             let amount: u256 = MathU256::max(FAME::MINT_GRANT_AMOUNT, amount_paid * FAME::FAME_PER_LORDS);
             self.coin.mint(recipient, amount);
+
+            // approve duelist as spender
+            self.erc20._approve(recipient, duelist_contract_address, Bounded::MAX);
         }
     }
 

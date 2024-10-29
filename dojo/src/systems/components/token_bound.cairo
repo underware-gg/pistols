@@ -3,7 +3,11 @@ use pistols::utils::hash::{hash_values};
 
 #[starknet::interface]
 pub trait ITokenBoundPublic<TState> {
+    // get the token_bound address of a token
     fn address_of_token(self: @TState, contract_address: ContractAddress, token_id: u128) -> ContractAddress;
+    // get the token contract/id of a token_bound address
+    fn token_of_address(self: @TState, address: ContractAddress) -> (ContractAddress, u128);
+    // balance of a token
     fn balance_of_token(self: @TState, contract_address: ContractAddress, token_id: u128) -> u256;
 }
 
@@ -84,6 +88,15 @@ pub mod TokenBoundComponent {
             assert(token_id > 0, Errors::INVALID_TOKEN_ID);
             (TokenBoundAddressTrait::address(contract_address, token_id))
         }
+
+        fn token_of_address(self: @ComponentState<TContractState>,
+            address: ContractAddress,
+        ) -> (ContractAddress, u128) {
+            let store: Store = StoreTrait::new(self.get_contract().world());
+            let token_bound_address: TokenBoundAddress = store.get_token_bound_address(address);
+            (token_bound_address.contract_address, token_bound_address.token_id)
+        }
+
         fn balance_of_token(self: @ComponentState<TContractState>,
             contract_address: ContractAddress,
             token_id: u128,
