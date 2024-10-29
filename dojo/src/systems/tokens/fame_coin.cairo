@@ -45,7 +45,7 @@ pub mod fame_coin {
     // ERC-20 Start
     //
     use openzeppelin_token::erc20::ERC20Component;
-    use openzeppelin_token::erc20::ERC20HooksEmptyImpl;
+    // use openzeppelin_token::erc20::ERC20HooksEmptyImpl;
     use pistols::systems::components::token_bound::{TokenBoundComponent};
     use pistols::systems::components::coin_component::{
         CoinComponent,
@@ -126,5 +126,25 @@ pub mod fame_coin {
             self.coin.mint(recipient, amount);
         }
     }
+
+    //-----------------------------------
+    // Hooks
+    //
+    pub impl ERC20HooksImpl<TContractState> of ERC20Component::ERC20HooksTrait<TContractState> {
+        fn before_update(
+            ref self: ERC20Component::ComponentState<TContractState>,
+            from: ContractAddress,
+            recipient: ContractAddress,
+            amount: u256
+        ) {}
+
+        fn after_update(
+            ref self: ERC20Component::ComponentState<TContractState>,
+            from: ContractAddress,
+            recipient: ContractAddress,
+            amount: u256
+        ) {}
+    }
+
 
 }
