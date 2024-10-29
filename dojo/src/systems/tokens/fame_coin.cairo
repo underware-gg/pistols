@@ -95,14 +95,14 @@ pub mod fame_coin {
     //*******************************************
 
     fn dojo_init(ref self: ContractState,
-        game_contract_address: ContractAddress,
+        duelist_contract_address: ContractAddress,
     ) {
         self.erc20.initializer(
             COIN_NAME(),
             COIN_SYMBOL(),
         );
         self.coin.initialize(
-            game_contract_address,
+            duelist_contract_address,
             faucet_amount: 0,
         );
     }
@@ -119,7 +119,7 @@ pub mod fame_coin {
         ) {
             // validate minter
             let duelist_contract_address = self.world().duelist_token_address();
-            assert(get_caller_address() == duelist_contract_address, CoinErrors::CALLER_IS_NOT_MINTER);
+            // assert(get_caller_address() == duelist_contract_address, CoinErrors::CALLER_IS_NOT_MINTER);
             // mint FAME
             let recipient: ContractAddress = self.token_bound.address_of_token(duelist_contract_address, duelist_id);
             let amount: u256 = MathU256::max(FAME::MINT_GRANT_AMOUNT, amount_paid * FAME::FAME_PER_LORDS);

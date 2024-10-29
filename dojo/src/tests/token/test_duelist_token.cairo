@@ -132,7 +132,7 @@ fn setup_uninitialized(fee_amount: u128) -> Systems {
     };
     world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), fame.contract_address);
     let call_data: Span<felt252> = array![
-        0, // minter_address
+        token.contract_address.into(), // minter_address
     ].span();
     world.init_contract(SELECTORS::FAME_COIN, call_data);
 
@@ -425,4 +425,11 @@ fn test_fame() {
     // transfer duelist
 
     // owner balances
+}
+
+#[test]
+#[should_panic(expected: ('ERC20: caller is not minter', 'ENTRYPOINT_FAILED'))]
+fn test_fame_mint_not_minter() {
+    let sys = setup(0);
+    sys.fame.mint_to_new_duelist(TOKEN_ID_1.low, 0);
 }
