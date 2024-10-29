@@ -32,7 +32,6 @@ pub mod TokenComponent {
         ERC721Component,
         ERC721Component::{InternalImpl as ERC721InternalImpl},
     };
-    use openzeppelin_token::erc721::interface;
 
     use pistols::libs::store::{
         Store, StoreTrait,

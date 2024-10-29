@@ -91,7 +91,7 @@ mod tests {
     use debug::PrintTrait;
     use core::traits::Into;
 
-    // use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
+    // use pistols::interfaces::ierc20::{ierc20, ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
     // use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
     use pistols::models::challenge::{Round};

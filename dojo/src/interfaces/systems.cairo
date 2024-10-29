@@ -12,7 +12,7 @@ pub use pistols::systems::{
         fame_coin::{IFameCoinDispatcher, IFameCoinDispatcherTrait},
     }
 };
-pub use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
+pub use pistols::interfaces::ierc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
 pub use pistols::models::config::{ConfigEntity, ConfigEntityTrait};
 pub use pistols::libs::store::{Store, StoreTrait};
 pub use pistols::utils::misc::{ZERO};
@@ -88,7 +88,7 @@ pub impl WorldSystemsTraitImpl of WorldSystemsTrait {
         (IFameCoinDispatcher{ contract_address: self.contract_address(SELECTORS::FAME_COIN) })
     }
     #[inline(always)]
-    fn lords_dispatcher(self: @IWorldDispatcher) -> IERC20Dispatcher {
+    fn lords_dispatcher(self: @IWorldDispatcher) -> ERC20ABIDispatcher {
         (StoreTrait::new(*self).get_config_entity().lords_dispatcher())
     }
 

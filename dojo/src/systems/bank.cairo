@@ -17,7 +17,7 @@ mod bank {
     use starknet::{get_caller_address, get_contract_address};
 
     use pistols::interfaces::systems::{WorldSystemsTrait};
-    use pistols::interfaces::ierc20::{IERC20Dispatcher, IERC20DispatcherTrait};
+    use pistols::interfaces::ierc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
     use pistols::models::{
         config::{Config, ConfigTrait, ConfigEntity, ConfigEntityTrait},
         payment::{Payment, PaymentTrait},
@@ -48,7 +48,7 @@ mod bank {
             let config: ConfigEntity = store.get_config_entity();
 
             // assert balance/allowance
-            let lords: IERC20Dispatcher = config.lords_dispatcher();
+            let lords: ERC20ABIDispatcher = config.lords_dispatcher();
             self.assert_balance_allowance(lords, payer, payment.amount);
 
             // make payments
@@ -78,7 +78,7 @@ mod bank {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn assert_balance_allowance(self: @ContractState,
-            lords: IERC20Dispatcher,
+            lords: ERC20ABIDispatcher,
             payer: ContractAddress,
             amount: u256,
         ) {

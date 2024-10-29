@@ -44,7 +44,6 @@ pub mod TokenBoundComponent {
         ERC20Component,
         ERC20Component::{ERC20Impl, InternalImpl as ERC20InternalImpl},
     };
-    use openzeppelin_token::erc20::interface;
 
     use super::{TokenBoundAddress, TokenBoundAddressTrait};
     use pistols::libs::store::{
