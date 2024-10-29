@@ -129,250 +129,18 @@
   {
     "type": "impl",
     "name": "IDojoInitImpl",
-    "interface_name": "pistols::systems::tokens::duelist_token::duelist::IDojoInit"
+    "interface_name": "pistols::systems::tokens::duelist_token::duelist_token::IDojoInit"
   },
   {
     "type": "interface",
-    "name": "pistols::systems::tokens::duelist_token::duelist::IDojoInit",
+    "name": "pistols::systems::tokens::duelist_token::duelist_token::IDojoInit",
     "items": [
       {
         "type": "function",
         "name": "dojo_init",
-        "inputs": [
-          {
-            "name": "minter_address",
-            "type": "core::starknet::contract_address::ContractAddress"
-          },
-          {
-            "name": "renderer_address",
-            "type": "core::starknet::contract_address::ContractAddress"
-          },
-          {
-            "name": "treasury_address",
-            "type": "core::starknet::contract_address::ContractAddress"
-          },
-          {
-            "name": "fee_contract",
-            "type": "core::starknet::contract_address::ContractAddress"
-          },
-          {
-            "name": "fee_amount",
-            "type": "core::integer::u128"
-          }
-        ],
+        "inputs": [],
         "outputs": [],
-        "state_mutability": "external"
-      }
-    ]
-  },
-  {
-    "type": "impl",
-    "name": "TokenComponentPublicImpl",
-    "interface_name": "pistols::systems::tokens::duelist_token::IDuelistTokenPublic"
-  },
-  {
-    "type": "enum",
-    "name": "pistols::models::duelist::ProfilePicType",
-    "variants": [
-      {
-        "name": "Undefined",
-        "type": "()"
-      },
-      {
-        "name": "Duelist",
-        "type": "()"
-      },
-      {
-        "name": "External",
-        "type": "()"
-      }
-    ]
-  },
-  {
-    "type": "enum",
-    "name": "pistols::models::duelist::Archetype",
-    "variants": [
-      {
-        "name": "Undefined",
-        "type": "()"
-      },
-      {
-        "name": "Villainous",
-        "type": "()"
-      },
-      {
-        "name": "Trickster",
-        "type": "()"
-      },
-      {
-        "name": "Honourable",
-        "type": "()"
-      }
-    ]
-  },
-  {
-    "type": "struct",
-    "name": "pistols::models::duelist::Score",
-    "members": [
-      {
-        "name": "honour",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "level_villain",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "level_trickster",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "level_lord",
-        "type": "core::integer::u8"
-      },
-      {
-        "name": "total_duels",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "total_wins",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "total_losses",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "total_draws",
-        "type": "core::integer::u16"
-      },
-      {
-        "name": "honour_history",
-        "type": "core::integer::u64"
-      }
-    ]
-  },
-  {
-    "type": "struct",
-    "name": "pistols::models::duelist::Duelist",
-    "members": [
-      {
-        "name": "duelist_id",
-        "type": "core::integer::u128"
-      },
-      {
-        "name": "name",
-        "type": "core::felt252"
-      },
-      {
-        "name": "profile_pic_uri",
-        "type": "core::byte_array::ByteArray"
-      },
-      {
-        "name": "profile_pic_type",
-        "type": "pistols::models::duelist::ProfilePicType"
-      },
-      {
-        "name": "timestamp",
-        "type": "core::integer::u64"
-      },
-      {
-        "name": "score",
-        "type": "pistols::models::duelist::Score"
-      }
-    ]
-  },
-  {
-    "type": "interface",
-    "name": "pistols::systems::tokens::duelist_token::IDuelistTokenPublic",
-    "items": [
-      {
-        "type": "function",
-        "name": "calc_price",
-        "inputs": [
-          {
-            "name": "recipient",
-            "type": "core::starknet::contract_address::ContractAddress"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "core::integer::u128"
-          }
-        ],
         "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "create_duelist",
-        "inputs": [
-          {
-            "name": "recipient",
-            "type": "core::starknet::contract_address::ContractAddress"
-          },
-          {
-            "name": "name",
-            "type": "core::felt252"
-          },
-          {
-            "name": "profile_pic_type",
-            "type": "pistols::models::duelist::ProfilePicType"
-          },
-          {
-            "name": "profile_pic_uri",
-            "type": "core::felt252"
-          },
-          {
-            "name": "initial_archetype",
-            "type": "pistols::models::duelist::Archetype"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "pistols::models::duelist::Duelist"
-          }
-        ],
-        "state_mutability": "external"
-      },
-      {
-        "type": "function",
-        "name": "update_duelist",
-        "inputs": [
-          {
-            "name": "duelist_id",
-            "type": "core::integer::u128"
-          },
-          {
-            "name": "name",
-            "type": "core::felt252"
-          },
-          {
-            "name": "profile_pic_type",
-            "type": "pistols::models::duelist::ProfilePicType"
-          },
-          {
-            "name": "profile_pic_uri",
-            "type": "core::felt252"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "pistols::models::duelist::Duelist"
-          }
-        ],
-        "state_mutability": "external"
-      },
-      {
-        "type": "function",
-        "name": "delete_duelist",
-        "inputs": [
-          {
-            "name": "duelist_id",
-            "type": "core::integer::u128"
-          }
-        ],
-        "outputs": [],
-        "state_mutability": "external"
       }
     ]
   },
@@ -910,13 +678,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::systems::components::token_component::TokenComponent::Event",
-    "kind": "enum",
-    "variants": []
-  },
-  {
-    "type": "event",
-    "name": "pistols::systems::tokens::duelist_token::duelist::Event",
+    "name": "pistols::systems::tokens::duelist_token::duelist_token::Event",
     "kind": "enum",
     "variants": [
       {
@@ -932,11 +694,6 @@
       {
         "name": "ERC721Event",
         "type": "openzeppelin_token::erc721::erc721::ERC721Component::Event",
-        "kind": "flat"
-      },
-      {
-        "name": "TokenEvent",
-        "type": "pistols::systems::components::token_component::TokenComponent::Event",
         "kind": "flat"
       }
     ]
