@@ -389,6 +389,11 @@ pub mod duelist_token {
             let archetype: Archetype = duelist.score.get_archetype();
             result.append("Archetype");
             result.append(archetype.into());
+            // Fame
+            let fame_dispatcher: IFameCoinDispatcher = self.world().fame_coin_dispatcher();
+            let fame_balance: u256 = fame_dispatcher.balance_of_token(get_contract_address(), token_id.low) / CONST::ETH_TO_WEI;
+            result.append("Fame");
+            result.append(fame_balance.as_string());
             // Totals
             result.append("Total Duels");
             result.append(duelist.score.total_duels.as_string());
