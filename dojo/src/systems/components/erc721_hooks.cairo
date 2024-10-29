@@ -46,12 +46,19 @@ pub impl ERC721HooksImpl<
         token_id: u256,
     ) -> ByteArray {
         let store = StoreTrait::new(self.get_contract().world());
-
-        // get renderer dispatcher
         let token_config: TokenConfig = store.get_token_config(get_contract_address());
+        (token_config.render(token_id))
+    }
+}
+
+#[generate_trait]
+impl TokenConfigRenderImpl of TokenConfigRenderTrait {
+    fn render(self: TokenConfig,
+        token_id: u256,
+    ) -> ByteArray {
         let renderer = ITokenRendererDispatcher{
-            contract_address: if (token_config.renderer_address).is_non_zero() {
-                (token_config.renderer_address)
+            contract_address: if (self.renderer_address).is_non_zero() {
+                (self.renderer_address)
             } else {
                 (get_contract_address())
             }

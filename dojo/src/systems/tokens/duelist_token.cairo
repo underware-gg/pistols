@@ -88,7 +88,7 @@ pub mod duelist_token {
     use openzeppelin_introspection::src5::SRC5Component;
     use openzeppelin_token::erc721::{ERC721Component};
     use pistols::systems::components::token_component::{TokenComponent};
-    use pistols::systems::components::erc721_hooks::{ERC721HooksImpl};
+    // use pistols::systems::components::erc721_hooks::{ERC721HooksImpl};
     component!(path: SRC5Component, storage: src5, event: SRC5Event);
     component!(path: ERC721Component, storage: erc721, event: ERC721Event);
     component!(path: TokenComponent, storage: token, event: TokenEvent);
@@ -293,6 +293,36 @@ pub mod duelist_token {
             }
         }
     }
+
+
+    //-----------------------------------
+    // ERC721HooksTrait
+    //
+    use pistols::systems::components::erc721_hooks::{TokenConfigRenderTrait};
+    pub impl ERC721HooksImpl<
+        +IWorldProvider<TContractState>,
+    > of ERC721Component::ERC721HooksTrait<ContractState> {
+        fn before_update(ref self: ERC721Component::ComponentState<ContractState>,
+            to: ContractAddress,
+            token_id: u256,
+            auth: ContractAddress,
+        ) {
+
+        }
+        fn after_update(ref self: ERC721Component::ComponentState<ContractState>,
+            to: ContractAddress,
+            token_id: u256,
+            auth: ContractAddress,
+        ) {
+            
+        }
+
+        // same as ERC721HooksImpl::token_uri()
+        fn token_uri(self: @ERC721Component::ComponentState<ContractState>, token_id: u256) -> ByteArray {
+            (StoreTrait::new(self.get_contract().world()).get_token_config(get_contract_address()).render(token_id))
+        }
+    }
+
 
 
     //-----------------------------------
