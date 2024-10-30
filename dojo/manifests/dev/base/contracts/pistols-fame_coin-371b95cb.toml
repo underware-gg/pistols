@@ -1,6 +1,6 @@
 kind = "DojoContract"
-class_hash = "0x2264c185e2776b068c0b99b249d7735e5fa3be725ff555932d9a7e314e3c483"
-original_class_hash = "0x2264c185e2776b068c0b99b249d7735e5fa3be725ff555932d9a7e314e3c483"
+class_hash = "0x32e3706f62c387ad898d6229181fe28722e6932fab371ed148436ea24ddf97c"
+original_class_hash = "0x32e3706f62c387ad898d6229181fe28722e6932fab371ed148436ea24ddf97c"
 base_class_hash = "0x0"
 abi = "manifests/dev/base/abis/contracts/pistols-fame_coin-371b95cb.json"
 reads = []

@@ -115,8 +115,8 @@ manifest_name = "pistols-duelist_token-45c96d20"
 [[contracts]]
 kind = "DojoContract"
 address = "0x2bcac97eae6643d2c388fe25d754e65608a9f9ab501db984ff559ef57b52cf0"
-class_hash = "0x2264c185e2776b068c0b99b249d7735e5fa3be725ff555932d9a7e314e3c483"
-original_class_hash = "0x2264c185e2776b068c0b99b249d7735e5fa3be725ff555932d9a7e314e3c483"
+class_hash = "0x32e3706f62c387ad898d6229181fe28722e6932fab371ed148436ea24ddf97c"
+original_class_hash = "0x32e3706f62c387ad898d6229181fe28722e6932fab371ed148436ea24ddf97c"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/dev/deployment/abis/contracts/pistols-fame_coin-371b95cb.json"
 reads = []

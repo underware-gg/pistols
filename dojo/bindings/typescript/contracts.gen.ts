@@ -4,6 +4,534 @@ import * as models from "./models.gen";
 
 export async function setupWorld(provider: DojoProvider) {{
 
+	const getTokenName = async (account: Account, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "get_token_name",
+					calldata: [tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const getTokenDescription = async (account: Account, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "get_token_description",
+					calldata: [tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const getTokenImage = async (account: Account, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "get_token_image",
+					calldata: [tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const getAttributePairs = async (account: Account, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "get_attribute_pairs",
+					calldata: [tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const getMetadataPairs = async (account: Account, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "get_metadata_pairs",
+					calldata: [tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const calcFee = async (account: Account, recipient: string) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "calc_fee",
+					calldata: [recipient],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const createDuelist = async (account: Account, recipient: string, name: number, profilePicType: models.ProfilePicType, profilePicUri: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "create_duelist",
+					calldata: [recipient, name, profilePicType, profilePicUri],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const updateDuelist = async (account: Account, duelistId: number, name: number, profilePicType: models.ProfilePicType, profilePicUri: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "update_duelist",
+					calldata: [duelistId, name, profilePicType, profilePicUri],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const deleteDuelist = async (account: Account, duelistId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "delete_duelist",
+					calldata: [duelistId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const name = async (account: Account) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "name",
+					calldata: [],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const canMint = async (account: Account, callerAddress: string) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "can_mint",
+					calldata: [callerAddress],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const exists = async (account: Account, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "exists",
+					calldata: [tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const isOwnerOf = async (account: Account, address: string, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "is_owner_of",
+					calldata: [address, tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const balanceOf = async (account: Account, account: string) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "balance_of",
+					calldata: [account],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const ownerOf = async (account: Account, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "owner_of",
+					calldata: [tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const safeTransferFrom = async (account: Account, from: string, to: string, tokenId: number, data: Array<number>) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "safe_transfer_from",
+					calldata: [from, to, tokenId, data],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const transferFrom = async (account: Account, from: string, to: string, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "transfer_from",
+					calldata: [from, to, tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const approve = async (account: Account, to: string, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "approve",
+					calldata: [to, tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const setApprovalForAll = async (account: Account, operator: string, approved: boolean) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "set_approval_for_all",
+					calldata: [operator, approved],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const getApproved = async (account: Account, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "get_approved",
+					calldata: [tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const isApprovedForAll = async (account: Account, owner: string, operator: string) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "is_approved_for_all",
+					calldata: [owner, operator],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const supportsInterface = async (account: Account, interfaceId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "supports_interface",
+					calldata: [interfaceId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const name = async (account: Account) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "_name",
+					calldata: [],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const symbol = async (account: Account) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "symbol",
+					calldata: [],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const tokenUri = async (account: Account, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "token_uri",
+					calldata: [tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const balanceOf = async (account: Account, account: string) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "balanceOf",
+					calldata: [account],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const ownerOf = async (account: Account, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "ownerOf",
+					calldata: [tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const safeTransferFrom = async (account: Account, from: string, to: string, tokenId: number, data: Array<number>) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "safeTransferFrom",
+					calldata: [from, to, tokenId, data],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const transferFrom = async (account: Account, from: string, to: string, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "transferFrom",
+					calldata: [from, to, tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const setApprovalForAll = async (account: Account, operator: string, approved: boolean) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "setApprovalForAll",
+					calldata: [operator, approved],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const getApproved = async (account: Account, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "getApproved",
+					calldata: [tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const isApprovedForAll = async (account: Account, owner: string, operator: string) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "isApprovedForAll",
+					calldata: [owner, operator],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const tokenUri = async (account: Account, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duelist_token",
+					entryPoint: "tokenURI",
+					calldata: [tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
 	const name = async (account: Account) => {
 		try {
 			return await provider.execute(
@@ -100,6 +628,22 @@ export async function setupWorld(provider: DojoProvider) {{
 		}
 	};
 
+	const name = async (account: Account) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "rng",
+					entryPoint: "name",
+					calldata: [],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
 	const reseed = async (account: Account, seed: number, salt: number) => {
 		try {
 			return await provider.execute(
@@ -132,22 +676,6 @@ export async function setupWorld(provider: DojoProvider) {{
 		}
 	};
 
-	const name = async (account: Account) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "rng",
-					entryPoint: "name",
-					calldata: [],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
 	const faucet = async (account: Account) => {
 		try {
 			return await provider.execute(
@@ -173,22 +701,6 @@ export async function setupWorld(provider: DojoProvider) {{
 					contractName: "lords_mock",
 					entryPoint: "mint",
 					calldata: [recipient, amount],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const name = async (account: Account) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "lords_mock",
-					entryPoint: "name",
-					calldata: [],
 				}
 			);
 		} catch (error) {
@@ -388,61 +900,13 @@ export async function setupWorld(provider: DojoProvider) {{
 		}
 	};
 
-	const canMint = async (account: Account, callerAddress: string) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "can_mint",
-					calldata: [callerAddress],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const exists = async (account: Account, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "exists",
-					calldata: [tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const isOwnerOf = async (account: Account, address: string, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "is_owner_of",
-					calldata: [address, tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
 	const name = async (account: Account) => {
 		try {
 			return await provider.execute(
 
 				account,
 				{
-					contractName: "duelist_token",
+					contractName: "lords_mock",
 					entryPoint: "name",
 					calldata: [],
 				}
@@ -452,495 +916,15 @@ export async function setupWorld(provider: DojoProvider) {{
 		}
 	};
 
-	const calcFee = async (account: Account, recipient: string) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "calc_fee",
-					calldata: [recipient],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const createDuelist = async (account: Account, recipient: string, name: number, profilePicType: models.ProfilePicType, profilePicUri: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "create_duelist",
-					calldata: [recipient, name, profilePicType, profilePicUri],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const updateDuelist = async (account: Account, duelistId: number, name: number, profilePicType: models.ProfilePicType, profilePicUri: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "update_duelist",
-					calldata: [duelistId, name, profilePicType, profilePicUri],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const deleteDuelist = async (account: Account, duelistId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "delete_duelist",
-					calldata: [duelistId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const getTokenName = async (account: Account, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "get_token_name",
-					calldata: [tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const getTokenDescription = async (account: Account, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "get_token_description",
-					calldata: [tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const getTokenImage = async (account: Account, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "get_token_image",
-					calldata: [tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const getAttributePairs = async (account: Account, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "get_attribute_pairs",
-					calldata: [tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const getMetadataPairs = async (account: Account, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "get_metadata_pairs",
-					calldata: [tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const balanceOf = async (account: Account, account: string) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "balance_of",
-					calldata: [account],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const ownerOf = async (account: Account, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "owner_of",
-					calldata: [tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const safeTransferFrom = async (account: Account, from: string, to: string, tokenId: number, data: Array<number>) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "safe_transfer_from",
-					calldata: [from, to, tokenId, data],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const transferFrom = async (account: Account, from: string, to: string, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "transfer_from",
-					calldata: [from, to, tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const approve = async (account: Account, to: string, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "approve",
-					calldata: [to, tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const setApprovalForAll = async (account: Account, operator: string, approved: boolean) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "set_approval_for_all",
-					calldata: [operator, approved],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const getApproved = async (account: Account, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "get_approved",
-					calldata: [tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const isApprovedForAll = async (account: Account, owner: string, operator: string) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "is_approved_for_all",
-					calldata: [owner, operator],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const supportsInterface = async (account: Account, interfaceId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "supports_interface",
-					calldata: [interfaceId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
 	const name = async (account: Account) => {
 		try {
 			return await provider.execute(
 
 				account,
 				{
-					contractName: "duelist_token",
-					entryPoint: "_name",
-					calldata: [],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const symbol = async (account: Account) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "symbol",
-					calldata: [],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const tokenUri = async (account: Account, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "token_uri",
-					calldata: [tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const balanceOf = async (account: Account, account: string) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "balanceOf",
-					calldata: [account],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const ownerOf = async (account: Account, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "ownerOf",
-					calldata: [tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const safeTransferFrom = async (account: Account, from: string, to: string, tokenId: number, data: Array<number>) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "safeTransferFrom",
-					calldata: [from, to, tokenId, data],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const transferFrom = async (account: Account, from: string, to: string, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "transferFrom",
-					calldata: [from, to, tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const setApprovalForAll = async (account: Account, operator: string, approved: boolean) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "setApprovalForAll",
-					calldata: [operator, approved],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const getApproved = async (account: Account, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "getApproved",
-					calldata: [tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const isApprovedForAll = async (account: Account, owner: string, operator: string) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "isApprovedForAll",
-					calldata: [owner, operator],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const tokenUri = async (account: Account, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duelist_token",
-					entryPoint: "tokenURI",
-					calldata: [tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const name = async (account: Account) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "bank",
+					contractName: "admin",
 					entryPoint: "name",
 					calldata: [],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const charge = async (account: Account, payer: string, payment: Payment) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "bank",
-					entryPoint: "charge",
-					calldata: [payer, payment],
 				}
 			);
 		} catch (error) {
@@ -1060,13 +1044,285 @@ export async function setupWorld(provider: DojoProvider) {{
 		}
 	};
 
+	const totalSupply = async (account: Account) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "fame_coin",
+					entryPoint: "total_supply",
+					calldata: [],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const balanceOf = async (account: Account, account: string) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "fame_coin",
+					entryPoint: "balance_of",
+					calldata: [account],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const allowance = async (account: Account, owner: string, spender: string) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "fame_coin",
+					entryPoint: "allowance",
+					calldata: [owner, spender],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const transfer = async (account: Account, recipient: string, amount: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "fame_coin",
+					entryPoint: "transfer",
+					calldata: [recipient, amount],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const transferFrom = async (account: Account, sender: string, recipient: string, amount: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "fame_coin",
+					entryPoint: "transfer_from",
+					calldata: [sender, recipient, amount],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const approve = async (account: Account, spender: string, amount: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "fame_coin",
+					entryPoint: "approve",
+					calldata: [spender, amount],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
 	const name = async (account: Account) => {
 		try {
 			return await provider.execute(
 
 				account,
 				{
-					contractName: "admin",
+					contractName: "fame_coin",
+					entryPoint: "_name",
+					calldata: [],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const symbol = async (account: Account) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "fame_coin",
+					entryPoint: "symbol",
+					calldata: [],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const decimals = async (account: Account) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "fame_coin",
+					entryPoint: "decimals",
+					calldata: [],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const totalSupply = async (account: Account) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "fame_coin",
+					entryPoint: "totalSupply",
+					calldata: [],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const balanceOf = async (account: Account, account: string) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "fame_coin",
+					entryPoint: "balanceOf",
+					calldata: [account],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const transferFrom = async (account: Account, sender: string, recipient: string, amount: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "fame_coin",
+					entryPoint: "transferFrom",
+					calldata: [sender, recipient, amount],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const mintedDuelist = async (account: Account, duelistId: number, amountPaid: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "fame_coin",
+					entryPoint: "minted_duelist",
+					calldata: [duelistId, amountPaid],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const updatedDuelist = async (account: Account, from: string, to: string, duelistId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "fame_coin",
+					entryPoint: "updated_duelist",
+					calldata: [from, to, duelistId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const addressOfToken = async (account: Account, contractAddress: string, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "fame_coin",
+					entryPoint: "address_of_token",
+					calldata: [contractAddress, tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const tokenOfAddress = async (account: Account, address: string) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "fame_coin",
+					entryPoint: "token_of_address",
+					calldata: [address],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const balanceOfToken = async (account: Account, contractAddress: string, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "fame_coin",
+					entryPoint: "balance_of_token",
+					calldata: [contractAddress, tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const name = async (account: Account) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "fame_coin",
 					entryPoint: "name",
 					calldata: [],
 				}
@@ -1085,6 +1341,54 @@ export async function setupWorld(provider: DojoProvider) {{
 					contractName: "duel_token",
 					entryPoint: "name",
 					calldata: [],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const canMint = async (account: Account, callerAddress: string) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "can_mint",
+					calldata: [callerAddress],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const exists = async (account: Account, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "exists",
+					calldata: [tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const isOwnerOf = async (account: Account, address: string, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "is_owner_of",
+					calldata: [address, tokenId],
 				}
 			);
 		} catch (error) {
@@ -1164,6 +1468,326 @@ export async function setupWorld(provider: DojoProvider) {{
 				{
 					contractName: "duel_token",
 					entryPoint: "get_metadata_pairs",
+					calldata: [tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const balanceOf = async (account: Account, account: string) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "balance_of",
+					calldata: [account],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const ownerOf = async (account: Account, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "owner_of",
+					calldata: [tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const safeTransferFrom = async (account: Account, from: string, to: string, tokenId: number, data: Array<number>) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "safe_transfer_from",
+					calldata: [from, to, tokenId, data],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const transferFrom = async (account: Account, from: string, to: string, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "transfer_from",
+					calldata: [from, to, tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const approve = async (account: Account, to: string, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "approve",
+					calldata: [to, tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const setApprovalForAll = async (account: Account, operator: string, approved: boolean) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "set_approval_for_all",
+					calldata: [operator, approved],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const getApproved = async (account: Account, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "get_approved",
+					calldata: [tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const isApprovedForAll = async (account: Account, owner: string, operator: string) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "is_approved_for_all",
+					calldata: [owner, operator],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const supportsInterface = async (account: Account, interfaceId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "supports_interface",
+					calldata: [interfaceId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const name = async (account: Account) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "_name",
+					calldata: [],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const symbol = async (account: Account) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "symbol",
+					calldata: [],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const tokenUri = async (account: Account, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "token_uri",
+					calldata: [tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const balanceOf = async (account: Account, account: string) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "balanceOf",
+					calldata: [account],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const ownerOf = async (account: Account, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "ownerOf",
+					calldata: [tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const safeTransferFrom = async (account: Account, from: string, to: string, tokenId: number, data: Array<number>) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "safeTransferFrom",
+					calldata: [from, to, tokenId, data],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const transferFrom = async (account: Account, from: string, to: string, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "transferFrom",
+					calldata: [from, to, tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const setApprovalForAll = async (account: Account, operator: string, approved: boolean) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "setApprovalForAll",
+					calldata: [operator, approved],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const getApproved = async (account: Account, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "getApproved",
+					calldata: [tokenId],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const isApprovedForAll = async (account: Account, owner: string, operator: string) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "isApprovedForAll",
+					calldata: [owner, operator],
+				}
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const tokenUri = async (account: Account, tokenId: number) => {
+		try {
+			return await provider.execute(
+
+				account,
+				{
+					contractName: "duel_token",
+					entryPoint: "tokenURI",
 					calldata: [tokenId],
 				}
 			);
@@ -1284,191 +1908,15 @@ export async function setupWorld(provider: DojoProvider) {{
 		}
 	};
 
-	const canMint = async (account: Account, callerAddress: string) => {
+	const charge = async (account: Account, payer: string, payment: Payment) => {
 		try {
 			return await provider.execute(
 
 				account,
 				{
-					contractName: "duel_token",
-					entryPoint: "can_mint",
-					calldata: [callerAddress],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const exists = async (account: Account, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duel_token",
-					entryPoint: "exists",
-					calldata: [tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const isOwnerOf = async (account: Account, address: string, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duel_token",
-					entryPoint: "is_owner_of",
-					calldata: [address, tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const balanceOf = async (account: Account, account: string) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duel_token",
-					entryPoint: "balance_of",
-					calldata: [account],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const ownerOf = async (account: Account, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duel_token",
-					entryPoint: "owner_of",
-					calldata: [tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const safeTransferFrom = async (account: Account, from: string, to: string, tokenId: number, data: Array<number>) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duel_token",
-					entryPoint: "safe_transfer_from",
-					calldata: [from, to, tokenId, data],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const transferFrom = async (account: Account, from: string, to: string, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duel_token",
-					entryPoint: "transfer_from",
-					calldata: [from, to, tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const approve = async (account: Account, to: string, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duel_token",
-					entryPoint: "approve",
-					calldata: [to, tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const setApprovalForAll = async (account: Account, operator: string, approved: boolean) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duel_token",
-					entryPoint: "set_approval_for_all",
-					calldata: [operator, approved],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const getApproved = async (account: Account, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duel_token",
-					entryPoint: "get_approved",
-					calldata: [tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const isApprovedForAll = async (account: Account, owner: string, operator: string) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duel_token",
-					entryPoint: "is_approved_for_all",
-					calldata: [owner, operator],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const supportsInterface = async (account: Account, interfaceId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duel_token",
-					entryPoint: "supports_interface",
-					calldata: [interfaceId],
+					contractName: "bank",
+					entryPoint: "charge",
+					calldata: [payer, payment],
 				}
 			);
 		} catch (error) {
@@ -1482,169 +1930,9 @@ export async function setupWorld(provider: DojoProvider) {{
 
 				account,
 				{
-					contractName: "duel_token",
-					entryPoint: "_name",
+					contractName: "bank",
+					entryPoint: "name",
 					calldata: [],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const symbol = async (account: Account) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duel_token",
-					entryPoint: "symbol",
-					calldata: [],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const tokenUri = async (account: Account, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duel_token",
-					entryPoint: "token_uri",
-					calldata: [tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const balanceOf = async (account: Account, account: string) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duel_token",
-					entryPoint: "balanceOf",
-					calldata: [account],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const ownerOf = async (account: Account, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duel_token",
-					entryPoint: "ownerOf",
-					calldata: [tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const safeTransferFrom = async (account: Account, from: string, to: string, tokenId: number, data: Array<number>) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duel_token",
-					entryPoint: "safeTransferFrom",
-					calldata: [from, to, tokenId, data],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const transferFrom = async (account: Account, from: string, to: string, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duel_token",
-					entryPoint: "transferFrom",
-					calldata: [from, to, tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const setApprovalForAll = async (account: Account, operator: string, approved: boolean) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duel_token",
-					entryPoint: "setApprovalForAll",
-					calldata: [operator, approved],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const getApproved = async (account: Account, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duel_token",
-					entryPoint: "getApproved",
-					calldata: [tokenId],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const isApprovedForAll = async (account: Account, owner: string, operator: string) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duel_token",
-					entryPoint: "isApprovedForAll",
-					calldata: [owner, operator],
-				}
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const tokenUri = async (account: Account, tokenId: number) => {
-		try {
-			return await provider.execute(
-
-				account,
-				{
-					contractName: "duel_token",
-					entryPoint: "tokenURI",
-					calldata: [tokenId],
 				}
 			);
 		} catch (error) {
@@ -1653,18 +1941,50 @@ export async function setupWorld(provider: DojoProvider) {{
 	};
 
 	return {
+		getTokenName,
+		getTokenDescription,
+		getTokenImage,
+		getAttributePairs,
+		getMetadataPairs,
+		calcFee,
+		createDuelist,
+		updateDuelist,
+		deleteDuelist,
+		name,
+		canMint,
+		exists,
+		isOwnerOf,
+		balanceOf,
+		ownerOf,
+		safeTransferFrom,
+		transferFrom,
+		approve,
+		setApprovalForAll,
+		getApproved,
+		isApprovedForAll,
+		supportsInterface,
+		name,
+		symbol,
+		tokenUri,
+		balanceOf,
+		ownerOf,
+		safeTransferFrom,
+		transferFrom,
+		setApprovalForAll,
+		getApproved,
+		isApprovedForAll,
+		tokenUri,
 		name,
 		commitMoves,
 		revealMoves,
 		getPlayerCardDecks,
 		getDuelProgress,
 		testValidateCommitMessage,
+		name,
 		reseed,
 		newShuffler,
-		name,
 		faucet,
 		mint,
-		name,
 		totalSupply,
 		balanceOf,
 		allowance,
@@ -1677,41 +1997,8 @@ export async function setupWorld(provider: DojoProvider) {{
 		totalSupply,
 		balanceOf,
 		transferFrom,
-		canMint,
-		exists,
-		isOwnerOf,
 		name,
-		calcFee,
-		createDuelist,
-		updateDuelist,
-		deleteDuelist,
-		getTokenName,
-		getTokenDescription,
-		getTokenImage,
-		getAttributePairs,
-		getMetadataPairs,
-		balanceOf,
-		ownerOf,
-		safeTransferFrom,
-		transferFrom,
-		approve,
-		setApprovalForAll,
-		getApproved,
-		isApprovedForAll,
-		supportsInterface,
 		name,
-		symbol,
-		tokenUri,
-		balanceOf,
-		ownerOf,
-		safeTransferFrom,
-		transferFrom,
-		setApprovalForAll,
-		getApproved,
-		isApprovedForAll,
-		tokenUri,
-		name,
-		charge,
 		amIAdmin,
 		grantAdmin,
 		setConfig,
@@ -1719,23 +2006,33 @@ export async function setupWorld(provider: DojoProvider) {{
 		openTable,
 		setTable,
 		setTableAdmittance,
+		totalSupply,
+		balanceOf,
+		allowance,
+		transfer,
+		transferFrom,
+		approve,
+		name,
+		symbol,
+		decimals,
+		totalSupply,
+		balanceOf,
+		transferFrom,
+		mintedDuelist,
+		updatedDuelist,
+		addressOfToken,
+		tokenOfAddress,
+		balanceOfToken,
 		name,
 		name,
+		canMint,
+		exists,
+		isOwnerOf,
 		getTokenName,
 		getTokenDescription,
 		getTokenImage,
 		getAttributePairs,
 		getMetadataPairs,
-		createDuel,
-		replyDuel,
-		deleteDuel,
-		calcFee,
-		getPact,
-		hasPact,
-		canJoin,
-		canMint,
-		exists,
-		isOwnerOf,
 		balanceOf,
 		ownerOf,
 		safeTransferFrom,
@@ -1756,5 +2053,14 @@ export async function setupWorld(provider: DojoProvider) {{
 		getApproved,
 		isApprovedForAll,
 		tokenUri,
+		createDuel,
+		replyDuel,
+		deleteDuel,
+		calcFee,
+		getPact,
+		hasPact,
+		canJoin,
+		charge,
+		name,
 	};
 }
