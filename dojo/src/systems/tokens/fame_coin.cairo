@@ -185,8 +185,10 @@ pub mod fame_coin {
             amount: u256
         ) {
             let mut contract_state = ERC20Component::HasComponent::get_contract_mut(ref self);
+            
             let (from_contract_address, from_token_id): (ContractAddress, u128) = contract_state.token_bound.token_of_address(from);
             let (to_contract_address, to_token_id): (ContractAddress, u128) = contract_state.token_bound.token_of_address(recipient);
+            
             let from_owner: ContractAddress = 
                 if (from_contract_address.is_non_zero()) {
                     ierc721(from_contract_address).owner_of(from_token_id.into())
@@ -197,7 +199,7 @@ pub mod fame_coin {
                 } else {ZERO()};
 
             // transfer between tokens, repeat for owners
-            if (from_owner.is_non_zero() || to_owner.is_non_zero() && from_owner != to_owner) {
+            if ((from_owner.is_non_zero() || to_owner.is_non_zero()) && from_owner != to_owner) {
                 contract_state.erc20.update(from_owner, to_owner, amount);
             }
         }
