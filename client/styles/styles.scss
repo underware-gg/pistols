@@ -195,7 +195,8 @@ canvas {
 .FloatRight { float:right; }
 
 .Block { display: inline-block; }
-.Flex { display: flex; }
+.Flex { display: flex!important; }
+.FlexInline { display: inline-flex!important; }
 
 .Overflow { overflow: hidden; } // do not expand parent
 .BreakWord { word-wrap:break-word!important; overflow-wrap: break-word!important; }
@@ -715,6 +716,7 @@ $ui-container-gap: 1em;
 .UIAccountsListScroller {
   @extend .UIMenuTavernScroller;
   height: calc($aspect-h - 12px - 285px - 12px - 41px - 12px);
+  display: block!important; // do not stretch
   // height: 100%;
   // background-color: red;
 }
@@ -763,6 +765,7 @@ $ui-container-gap: 1em;
   margin: aspect-width(0.95);
 }
 .ProfilePicSquare {
+  max-width: $profile-pic-width!important; // avoids not taking space in flex
   width: $profile-pic-width;
   height: $profile-pic-width;
   // border: $border-button-inactive;
@@ -771,9 +774,13 @@ $ui-container-gap: 1em;
 }
 .ProfilePicMedium {
   @extend .ProfilePicSquare;
+  max-width: 60px!important; // avoids not taking space in flex
   width: 60px;
   height: 60px;
   border: none;
+}
+.ProfilePicMediumWidth {
+  width: 60px!important;
 }
 .ProfilePicCircle {
   width: aspect-width(7.5);
@@ -785,6 +792,7 @@ $ui-container-gap: 1em;
 }
 .ProfilePicSmall {
   @extend .ProfilePicSquare;
+  max-width: 40px!important; // avoids not taking space in flex
   width: 40px;
   height: 40px;
   border: none;

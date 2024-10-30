@@ -1,11 +1,14 @@
-import React from 'react'
-import { Grid } from 'semantic-ui-react'
+import React, { ReactNode, useMemo } from 'react'
+import { Dropdown, Grid } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
+import { ProfilePicSquare, ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
 import { FameBalanceDuelist } from '@/pistols/components/account/LordsBalance'
+import { useDuelistsOfOwner } from '@/pistols/hooks/useDuelistToken'
+import { BigNumberish } from 'starknet'
+import { ProfileName } from './ProfileDescription'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -19,18 +22,20 @@ export default function AccountHeader() {
   const { nameDisplay, profilePic } = useDuelist(duelistId)
 
   const _click = () => {
-    if (isAnon) {
-      dispatchSetScene(SceneName.Profile)
-    } else {
-      dispatchSetScene(SceneName.Profile)
-    }
+    // if (isAnon) {
+    //   dispatchSetScene(SceneName.Profile)
+    // } else {
+    //   dispatchSetScene(SceneName.Profile)
+    // }
   }
 
   return (
     <Grid>
       <Row className='ProfilePicHeight' textAlign='center'>
-        <Col width={4} textAlign='left' verticalAlign='middle'>
-          <ProfilePicSquareButton profilePic={profilePic ?? 0} onClick={() => _click()} />
+        <Col width={4} textAlign='center' verticalAlign='middle' className='NoPadding'>
+          <DuelistsNavigationMenu>
+            <ProfilePicSquareButton profilePic={profilePic ?? 0}onClick={() => _click()} />
+          </DuelistsNavigationMenu>
         </Col>
         <Col width={12} textAlign='left' verticalAlign='top'>
           {!isConnected ? <h3>Guest</h3>
@@ -44,5 +49,85 @@ export default function AccountHeader() {
       </Row>
     </Grid>
   );
+}
+
+export function DuelistsNavigationMenu({
+  children,
+}: {
+  children: ReactNode,
+}) {
+  const { address } = useAccount()
+  const { dispatchSetScene } = usePistolsScene()
+  const { duelistBalance, duelistIds } = useDuelistsOfOwner(address)
+  const { duelistId: selectedDuelistId } = useSettings()
+  const { dispatchDuelistId } = useSettings()
+
+  const _goToProfile = () => {
+    dispatchSetScene(SceneName.Profile)
+  }
+
+  const _switchDuelist = (duelistId: BigNumberish) => {
+    dispatchDuelistId(duelistId)
+  }
+
+  const maxItems = 6
+
+  const rows = useMemo(() => (
+    duelistIds.map((duelistId, index) => {
+      if (index == maxItems) return <Dropdown.Item text={'More Duelists...'} onClick={() => _goToProfile()} />
+      if (index > maxItems) return undefined
+      const classNames = ['NoPadding']
+      if (duelistId == selectedDuelistId) classNames.push('BgImportant')
+      return (
+        <Dropdown.Item key={`i${duelistId}`}
+          onClick={() => _switchDuelist(duelistId)}
+          className={classNames.join(' ')}
+        >
+          <DuelistItem duelistId={duelistId} />
+        </Dropdown.Item>
+      )
+    })
+  ), [address, duelistBalance, selectedDuelistId])
+
+  return (
+    <Dropdown
+      className='huge NoPadding AutoMargin'
+      direction='right'
+      button
+      simple
+      closeOnEscape
+      fluid
+      trigger={children}
+      style={{ width: '82px', height: '82px' }}
+    >
+      <Dropdown.Menu>
+        {rows}
+        <Dropdown.Item icon={'setting'} text={'Profile...'} onClick={() => _goToProfile()} />
+      </Dropdown.Menu>
+    </Dropdown>
+  )
+}
+
+function DuelistItem({
+  duelistId,
+}: {
+  duelistId: BigNumberish
+}) {
+  const { duelistId: selectedDuelistId } = useSettings()
+  const { profilePic } = useDuelist(duelistId)
+  const isSelected = (duelistId && duelistId == selectedDuelistId)
+
+  return (
+    <div className={'FlexInline'}>
+      <ProfilePicSquare small profilePic={profilePic ?? 0} />
+      <div className='PaddedSides'>
+        <ProfileName duelistId={duelistId} />
+        <br/>
+        <div className='Smaller'>
+          <FameBalanceDuelist duelistId={duelistId} />
+        </div>
+      </div>
+    </div>
+  )
 }
 

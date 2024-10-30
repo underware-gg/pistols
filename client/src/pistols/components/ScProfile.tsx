@@ -151,9 +151,9 @@ function DuelistItem({
 }: {
   duelistId: BigNumberish
 }) {
-  const { duelistId: seletedDuelistId } = useSettings()
+  const { duelistId: selectedDuelistId } = useSettings()
   const { exists, profilePic } = useDuelist(duelistId)
-  const isSelected = (duelistId && duelistId == seletedDuelistId)
+  const isSelected = (duelistId && duelistId == selectedDuelistId)
 
   const _canPlay = (exists)
 
@@ -172,7 +172,7 @@ function DuelistItem({
   }
 
   const classNames = useMemo(() => {
-    const result = ['Anchor', 'NoPadding']
+    const result = ['Anchor', 'Padded']
     if (isSelected) result.push('BgImportant')
     return result
   }, [isSelected])
@@ -180,10 +180,11 @@ function DuelistItem({
   return (
     <>
       <RowDivider />
-      <Row textAlign='center' verticalAlign='top' className={classNames.join(' ')}
+      <Row textAlign='center' verticalAlign='top'
+        className={classNames.join(' ')}
         onClick={() => dispatchDuelistId(duelistId)}
       >
-        <Col width={3} className='NoPadding' verticalAlign='middle'>
+        <Col width={3} verticalAlign='middle'>
           <div>
             <ProfilePicSquare medium
               profilePic={profilePic ?? 0}

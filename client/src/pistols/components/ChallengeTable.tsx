@@ -182,7 +182,7 @@ function DuelItem({
     dispatchSelectDuel(duelId)
   }
 
-  const fameBalance = 0;
+  const fameBalance = null;
 
   if (nameFilter) {
     const isA = nameA ? nameA.toLowerCase().includes(nameFilter) : false
