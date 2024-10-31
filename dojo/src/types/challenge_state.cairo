@@ -149,7 +149,7 @@ impl TryFelt252IntoChallengeState of TryInto<felt252, ChallengeState> {
 mod tests {
     use core::traits::Into;
 
-    use pistols::models::challenge::{ChallengeEntity};
+    use pistols::models::challenge::{ChallengeValue};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::tests::tester::{tester, tester::{FLAGS}};
 
@@ -157,7 +157,7 @@ mod tests {
     fn test_challenge_exists() {
         let sys = tester::setup_world(FLAGS::APPROVE);
         // get some random inexisting challenge
-        let ch: ChallengeEntity = tester::get_ChallengeEntity(sys.world, 0x682137812638127638127);
+        let ch: ChallengeValue = tester::get_ChallengeValue(sys.world, 0x682137812638127638127);
         let state: ChallengeState = ch.state.try_into().unwrap();
         assert(state == ChallengeState::Null, 'ChallengeState::Null');
         assert(state.exists() == false, 'exists()');

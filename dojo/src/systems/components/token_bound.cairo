@@ -38,7 +38,8 @@ impl TokenBoundAddressImpl of TokenBoundAddressTrait {
 pub mod TokenBoundComponent {
     use zeroable::Zeroable;
     use starknet::{ContractAddress, get_contract_address, get_caller_address};
-    use dojo::world::{IWorldProvider, IWorldProviderDispatcher, IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::world::{WorldStorage, IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::contract::components::world_provider::{IWorldProvider};
     
     use openzeppelin_token::erc20::{
         ERC20Component,
@@ -46,10 +47,9 @@ pub mod TokenBoundComponent {
     };
 
     use super::{TokenBoundAddress, TokenBoundAddressTrait};
+    use pistols::interfaces::systems::{SystemsTrait};
     use pistols::libs::store::{
         Store, StoreTrait,
-        TokenConfig, TokenConfigStore,
-        TokenConfigEntity, TokenConfigEntityStore,
     };
 
     #[storage]
@@ -91,7 +91,8 @@ pub mod TokenBoundComponent {
         fn token_of_address(self: @ComponentState<TContractState>,
             address: ContractAddress,
         ) -> (ContractAddress, u128) {
-            let store: Store = StoreTrait::new(self.get_contract().world());
+            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut store: Store = StoreTrait::new(world);
             let token_bound_address: TokenBoundAddress = store.get_token_bound_address(address);
             (token_bound_address.contract_address, token_bound_address.token_id)
         }
@@ -124,7 +125,8 @@ pub mod TokenBoundComponent {
             contract_address: ContractAddress,
             token_id: u128,
         ) -> ContractAddress {
-            let store: Store = StoreTrait::new(self.get_contract().world());
+            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut store: Store = StoreTrait::new(world);
             // validate address
             let recipient: ContractAddress = self.address_of_token(contract_address, token_id);
             let mut token_bound_address: TokenBoundAddress = store.get_token_bound_address(recipient);

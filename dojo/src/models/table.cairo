@@ -1,6 +1,5 @@
 // use debug::PrintTrait;
 use starknet::ContractAddress;
-use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use pistols::systems::game::game::{Errors as GameErrors};
 use pistols::types::cards::hand::{DeckType};
 use pistols::types::constants::{CONST};
@@ -74,6 +73,7 @@ fn default_tables() -> Array<TableConfig> {
 //---------------------------
 // TableInitializer
 //
+use dojo::world::{WorldStorage};
 use pistols::libs::store::{Store, StoreTrait};
 
 #[derive(Copy, Drop)]
@@ -83,15 +83,13 @@ pub struct TableInitializer {
 
 #[generate_trait]
 impl TableInitializerTraitImpl of TableInitializerTrait {
-    fn new(world: IWorldDispatcher) -> TableInitializer {
-        TableInitializer {
-            store: StoreTrait::new(world)
-        }
+    fn new(store: Store) -> TableInitializer {
+        TableInitializer { store }
     }
-    fn initialize(self: TableInitializer) {
+    fn initialize(ref self: TableInitializer) {
         self.set_array(@default_tables());
     }
-    fn set_array(self: TableInitializer, tables: @Array<TableConfig>) {
+    fn set_array(ref self: TableInitializer, tables: @Array<TableConfig>) {
         let mut n: usize = 0;
         loop {
             if (n == tables.len()) { break; }
@@ -105,11 +103,11 @@ impl TableInitializerTraitImpl of TableInitializerTrait {
 // TableConfig Traits
 //
 #[generate_trait]
-impl TableConfigEntityImpl of TableConfigEntityTrait {
-    fn exists(self: @TableConfigEntity) -> bool {
+impl TableConfigImpl of TableConfigTrait {
+    fn exists(self: @TableConfig) -> bool {
         (*self.table_type != TableType::Undefined)
     }
-    fn calc_fee(self: @TableConfigEntity) -> u128 {
+    fn calc_fee(self: @TableConfig) -> u128 {
         (0)
     }
 }
@@ -118,8 +116,8 @@ impl TableConfigEntityImpl of TableConfigEntityTrait {
 // TableAdmittance Traits
 //
 #[generate_trait]
-impl TableAdmittanceEntityImpl of TableAdmittanceEntityTrait {
-    fn can_join(self: @TableAdmittanceEntity, account_address: ContractAddress, duelist_id: u128) -> bool {
+impl TableAdmittanceImpl of TableAdmittanceTrait {
+    fn can_join(self: @TableAdmittance, account_address: ContractAddress, duelist_id: u128) -> bool {
         if (self.accounts.len() == 0 && self.duelists.len() == 0) {
             (true)
         } else {
@@ -165,7 +163,7 @@ impl TableTypeIntoByteArray of Into<TableType, ByteArray> {
 mod tests {
     use debug::PrintTrait;
     use starknet::ContractAddress;
-    use super::{TableAdmittance, TableAdmittanceEntity, TableAdmittanceEntityTrait};
+    use super::{TableAdmittance, TableAdmittanceTrait};
     use pistols::utils::misc::{ZERO};
 
     #[test]
@@ -177,16 +175,16 @@ mod tests {
         let duelist_id_1: u128 = 0x1;
         let duelist_id_2: u128 = 0x2;
         let duelist_id_3: u128 = 0x3;
-        let admittance = @TableAdmittanceEntity{
-            __id: table_id,
+        let admittance = @TableAdmittance{
+            table_id,
             accounts: array![],
             duelists: array![],
         };
         assert(admittance.can_join(address_1, duelist_id_1) == true, 'empty_1');
         assert(admittance.can_join(address_1, duelist_id_2) == true, 'empty_2');
         assert(admittance.can_join(address_2, duelist_id_1) == true, 'empty_3');
-        let admittance = @TableAdmittanceEntity{
-            __id: table_id,
+        let admittance = @TableAdmittance{
+            table_id,
             accounts: array![address_3],
             duelists: array![],
         };
@@ -194,8 +192,8 @@ mod tests {
         assert(admittance.can_join(address_2, duelist_id_1) == false, 'accounts_2_1');
         assert(admittance.can_join(address_1, duelist_id_3) == false, 'accounts_1_3');
         assert(admittance.can_join(address_3, duelist_id_1) == true, 'accounts_3_1');
-        let admittance = @TableAdmittanceEntity{
-            __id: table_id,
+        let admittance = @TableAdmittance{
+            table_id,
             accounts: array![],
             duelists: array![duelist_id_3],
         };
@@ -203,16 +201,16 @@ mod tests {
         assert(admittance.can_join(address_2, duelist_id_1) == false, 'duelists_2_1');
         assert(admittance.can_join(address_1, duelist_id_3) == true, 'duelists_1_3');
         assert(admittance.can_join(address_3, duelist_id_1) == false, 'duelists_3_1');
-        let admittance = @TableAdmittanceEntity{
-            __id: table_id,
+        let admittance = @TableAdmittance{
+            table_id,
             accounts: array![address_1, address_2],
             duelists: array![],
         };
         assert(admittance.can_join(address_1, duelist_id_2) == true, 'dual_1_2');
         assert(admittance.can_join(address_2, duelist_id_1) == true, 'dual_2_1');
         assert(admittance.can_join(address_3, duelist_id_3) == false, 'dual_3_3');
-        let admittance = @TableAdmittanceEntity{
-            __id: table_id,
+        let admittance = @TableAdmittance{
+            table_id,
             accounts: array![],
             duelists: array![duelist_id_1, duelist_id_2],
         };

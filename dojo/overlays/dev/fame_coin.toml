@@ -1,8 +1,0 @@
-tag = "pistols-fame_coin"
-writes = [
-  "pistols-CoinConfig",
-  "pistols-TokenBoundAddress",
-]
-init_calldata = [
-  "$contract_address:pistols-duelist_token", # minter_address
-]

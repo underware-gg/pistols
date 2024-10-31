@@ -1,5 +1,0 @@
-tag = "pistols-game"
-writes = [
-  "ns:pistols",
-]
-init_calldata = []

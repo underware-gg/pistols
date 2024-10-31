@@ -4,7 +4,7 @@ use dojo::world::IWorldDispatcher;
 #[starknet::interface]
 pub trait IFameCoin<TState> {
     // IWorldProvider
-    fn world(self: @TState,) -> IWorldDispatcher;
+    fn world_dispatcher(self: @TState) -> IWorldDispatcher;
 
     // IERC20
     fn total_supply(self: @TState) -> u256;
@@ -44,6 +44,8 @@ pub mod fame_coin {
     use core::num::traits::Bounded;
     use core::byte_array::ByteArrayTrait;
     use starknet::{ContractAddress, get_contract_address, get_caller_address, get_block_timestamp};
+    use dojo::world::{WorldStorage, IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::model::{ModelStorage, ModelValueStorage};
 
     //-----------------------------------
     // ERC-20 Start
@@ -88,7 +90,7 @@ pub mod fame_coin {
     // ERC-20 End
     //-----------------------------------
 
-    // use pistols::interfaces::systems::{WorldSystemsTrait};
+    use pistols::interfaces::systems::{SystemsTrait};
     use pistols::interfaces::ierc721::{ierc721, ERC721ABIDispatcher, ERC721ABIDispatcherTrait};
     use pistols::utils::math::{MathU128, MathU256};
     use pistols::utils::misc::{ZERO};
@@ -103,15 +105,14 @@ pub mod fame_coin {
     fn COIN_SYMBOL() -> ByteArray {("FAME")}
     //*******************************************
 
-    fn dojo_init(ref self: ContractState,
-        duelist_contract_address: ContractAddress,
-    ) {
+    fn dojo_init(ref self: ContractState) {
         self.erc20.initializer(
             COIN_NAME(),
             COIN_SYMBOL(),
         );
+        let mut world = self.world(@"pistols");
         self.coin.initialize(
-            duelist_contract_address,
+            world.duelist_token_address(),
             faucet_amount: 0,
         );
     }

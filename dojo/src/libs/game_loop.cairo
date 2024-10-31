@@ -1,7 +1,7 @@
 // use debug::PrintTrait;
 use core::traits::TryInto;
 use starknet::{ContractAddress, get_block_timestamp};
-use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+use dojo::world::{WorldStorage};
 
 use pistols::systems::rng::{Dice, DiceTrait};
 use pistols::models::{
@@ -59,12 +59,12 @@ fn make_moves_hash(salt: felt252, moves: Span<u8>) -> u128 {
 //
 
 // testable loop
-fn game_loop(world: IWorldDispatcher, deck_type: DeckType, ref round: Round) -> DuelProgress {
-    // let _table_type: TableType = store.get_table_config_entity(challenge.table_id).table_type;
+fn game_loop(world: @WorldStorage, deck_type: DeckType, ref round: Round) -> DuelProgress {
+    // let _table_type: TableType = store.get_table_config_value(challenge.table_id).table_type;
 
     let env_deck: Span<EnvCard> = EnvCardTrait::get_full_deck().span();
 
-    let mut dice: Dice = DiceTrait::new(@world, round.make_seed(), env_deck.len());
+    let mut dice: Dice = DiceTrait::new(world, round.make_seed(), env_deck.len());
     
     let mut hand_a: DuelistHand = round.moves_a.as_hand();
     let mut hand_b: DuelistHand = round.moves_b.as_hand();

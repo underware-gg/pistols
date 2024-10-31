@@ -2,8 +2,8 @@
 use core::option::OptionTrait;
 
 use pistols::systems::tokens::duel_token::duel_token::{Errors as DuelErrors};
-use pistols::models::challenge::{Challenge, ChallengeEntity};
-use pistols::models::duelist::{Duelist, DuelistTrait, Pact, PactEntity};
+use pistols::models::challenge::{Challenge, ChallengeValue};
+use pistols::models::duelist::{Duelist, DuelistTrait, Pact, PactValue};
 use pistols::utils::hash::{hash_values};
 use pistols::libs::store::{Store, StoreTrait};
 
@@ -18,12 +18,12 @@ fn make_pact_pair(duelist_a: u128, duelist_b: u128) -> u128 {
     (aa.low ^ bb.low)
 }
 
-fn get_pact(store: Store, table_id: felt252, duelist_a: u128, duelist_b: u128) -> u128 {
+fn get_pact(ref store: Store, table_id: felt252, duelist_a: u128, duelist_b: u128) -> u128 {
     let pair: u128 = make_pact_pair(duelist_a, duelist_b);
     (store.get_pact(table_id, pair).duel_id)
 }
 
-fn set_pact(store: Store, challenge: Challenge) {
+fn set_pact(ref store: Store, challenge: Challenge) {
     let pair: u128 = if (challenge.duelist_id_b > 0) {
         // pact between duelists
         make_pact_pair(challenge.duelist_id_a, challenge.duelist_id_b)
@@ -43,7 +43,7 @@ fn set_pact(store: Store, challenge: Challenge) {
     }
 }
 
-fn unset_pact(store: Store, mut challenge: Challenge) {
+fn unset_pact(ref store: Store, mut challenge: Challenge) {
     challenge.duel_id = 0;
-    set_pact(store, challenge);
+    set_pact(ref store, challenge);
 }

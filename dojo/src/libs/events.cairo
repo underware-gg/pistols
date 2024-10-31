@@ -70,7 +70,7 @@ mod EVENT_SELECTOR {
 //     pub player: ContractAddress,
 //     pub data: u32,
 // }
-// fn _emit_my_event(world: @IWorldDispatcher) {
+// fn _emit_my_event(world: @WorldStorage) {
 //     let me = MyEvent { player: starknet::get_caller_address(), data: 2 };
 //     me.emit(world);
 // }
@@ -79,7 +79,7 @@ mod EVENT_SELECTOR {
 
 mod emitters {
     use starknet::{ContractAddress};
-    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::world::{WorldStorage};
     use pistols::models::{
         challenge::{Challenge},
         duelist::{Duelist},
@@ -95,7 +95,7 @@ mod emitters {
         DuelistTurnEvent: super::DuelistTurnEvent,
     }
 
-    fn emitDuelistRegisteredEvent(_world: @IWorldDispatcher, _address: ContractAddress, _duelist: Duelist, _is_new: bool) {
+    fn emitDuelistRegisteredEvent(_world: @WorldStorage, _address: ContractAddress, _duelist: Duelist, _is_new: bool) {
         // emit!(world, (Event::DuelistRegisteredEvent(super::DuelistRegisteredEvent {
         //     address,
         //     duelist_id: duelist.duelist_id,
@@ -105,14 +105,14 @@ mod emitters {
         //     is_new,
         // })));
     }
-    fn emitNewChallengeEvent(_world: @IWorldDispatcher, _challenge: Challenge) {
+    fn emitNewChallengeEvent(_world: @WorldStorage, _challenge: Challenge) {
         // emit!(world, (Event::NewChallengeEvent (super::NewChallengeEvent {
         //     duel_id: challenge.duel_id,
         //     address_a: challenge.address_a,
         //     address_b: challenge.address_b,
         // })));
     }
-    fn emitChallengeAcceptedEvent(_world: @IWorldDispatcher, _challenge: Challenge, _accepted: bool) {
+    fn emitChallengeAcceptedEvent(_world: @WorldStorage, _challenge: Challenge, _accepted: bool) {
         // emit!(world, (Event::ChallengeAcceptedEvent (super::ChallengeAcceptedEvent {
         //     duel_id: challenge.duel_id,
         //     address_a: challenge.address_a,
@@ -120,7 +120,7 @@ mod emitters {
         //     accepted,
         // })));
     }
-    fn emitPostRevealEvents(_world: @IWorldDispatcher, _challenge: Challenge) {
+    fn emitPostRevealEvents(_world: @WorldStorage, _challenge: Challenge) {
         // WORLD(world);
         // if (challenge.state == ChallengeState::InProgress) {
         //     emitters::emitDuelistTurnEvent(world, challenge);
@@ -128,7 +128,7 @@ mod emitters {
         //     emitters::emitChallengeResolvedEvent(world, challenge);
         // }
     }
-    fn emitDuelistTurnEvent(_world: @IWorldDispatcher, _challenge: Challenge) {
+    fn emitDuelistTurnEvent(_world: @WorldStorage, _challenge: Challenge) {
         // let address: ContractAddress =
         //     if (challenge.address_a == starknet::get_caller_address()) { (challenge.address_b) }
         //     else { (challenge.address_a) };
@@ -137,7 +137,7 @@ mod emitters {
         //     address,
         // })));
     }
-    fn emitChallengeResolvedEvent(_world: @IWorldDispatcher, _challenge: Challenge) {
+    fn emitChallengeResolvedEvent(_world: @WorldStorage, _challenge: Challenge) {
         // let winner_address: ContractAddress = 
         //     if (challenge.winner == 1) { (challenge.address_a) }
         //     else if (challenge.winner == 2) { (challenge.address_b) }

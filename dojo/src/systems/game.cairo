@@ -1,22 +1,21 @@
 use starknet::{ContractAddress};
-use dojo::world::IWorldDispatcher;
 use pistols::models::challenge::{Challenge};
 use pistols::models::duelist::{Duelist};
 use pistols::types::duel_progress::{DuelProgress};
 
 // define the interface
-#[dojo::interface]
-trait IGame {
+#[starknet::interface]
+pub trait IGame<TState> {
     //
     // Game actions
     fn commit_moves(
-        ref world: IWorldDispatcher,
+        ref self: TState,
         duelist_id: u128,
         duel_id: u128,
         hashed: u128,
     );
     fn reveal_moves(
-        ref world: IWorldDispatcher,
+        ref self: TState,
         duelist_id: u128,
         duel_id: u128,
         salt: felt252,
@@ -25,9 +24,9 @@ trait IGame {
 
     //
     // view calls
-    fn get_player_card_decks(world: @IWorldDispatcher, table_id: felt252) -> Span<Span<u8>>;
-    fn get_duel_progress(world: @IWorldDispatcher, duel_id: u128) -> DuelProgress;
-    fn test_validate_commit_message(world: @IWorldDispatcher,
+    fn get_player_card_decks(self: @TState, table_id: felt252) -> Span<Span<u8>>;
+    fn get_duel_progress(self: @TState, duel_id: u128) -> DuelProgress;
+    fn test_validate_commit_message(self: @TState,
         account: ContractAddress,
         signature: Array<felt252>,
         duelId: felt252,
@@ -36,19 +35,21 @@ trait IGame {
 }
 
 #[dojo::contract]
-mod game {
+pub mod game {
     // use debug::PrintTrait;
     use traits::{Into, TryInto};
     use starknet::{ContractAddress, get_block_timestamp, get_block_info};
+    use dojo::world::{WorldStorage};
+    use dojo::model::{ModelStorage, ModelValueStorage};
 
     use pistols::interfaces::systems::{
-        WorldSystemsTrait,
+        SystemsTrait,
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
     };
     use pistols::models::{
-        challenge::{Challenge, ChallengeTrait, ChallengeEntity, Round, RoundTrait, RoundEntity, MovesTrait},
-        duelist::{Duelist, DuelistTrait, DuelistEntity, Score, ScoreTrait, Scoreboard, Pact},
-        table::{TableConfig, TableConfigEntity, TableConfigEntityTrait},
+        challenge::{Challenge, ChallengeTrait, ChallengeValue, Round, RoundTrait, RoundValue, MovesTrait},
+        duelist::{Duelist, DuelistTrait, DuelistValue, Score, ScoreTrait, Scoreboard, Pact},
+        table::{TableConfig, TableConfigTrait, TableConfigValue},
     };
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::duel_progress::{DuelProgress, DuelistDrawnCard};
@@ -57,7 +58,7 @@ mod game {
     use pistols::types::typed_data::{CommitMoveMessage, CommitMoveMessageTrait};
     use pistols::types::constants::{CONST};
     use pistols::utils::short_string::{ShortStringTrait};
-    use pistols::utils::misc::{ZERO, WORLD};
+    use pistols::utils::misc::{ZERO};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::libs::game_loop::{game_loop, make_moves_hash};
     use pistols::libs::events::{emitters};
@@ -78,6 +79,13 @@ mod game {
         const IMPOSSIBLE_ERROR: felt252          = 'PISTOLS: Impossible error';
     }
 
+    #[generate_trait]
+    impl WorldDefaultImpl of WorldDefaultTrait {
+        fn world_default(self: @ContractState) -> WorldStorage {
+            self.world(@"pistols")
+        }
+    }
+
     // impl: implement functions specified in trait
     #[abi(embed_v0)]
     impl ActionsImpl of super::IGame<ContractState> {
@@ -86,12 +94,13 @@ mod game {
         // Game actions
         //
 
-        fn commit_moves(ref world: IWorldDispatcher,
+        fn commit_moves(ref self: ContractState,
             duelist_id: u128,
             duel_id: u128,
             hashed: u128,
         ) {
-            let store: Store = StoreTrait::new(world);
+            let mut world = self.world_default();
+            let mut store: Store = StoreTrait::new(world);
             let mut challenge: Challenge = store.get_challenge(duel_id);
 
             // validate duelist
@@ -108,7 +117,7 @@ mod game {
             }
 
             // validate Round
-            let mut round: RoundEntity = store.get_round_entity(duel_id);
+            let mut round: Round = store.get_round(duel_id);
             assert(round.state == RoundState::Commit, Errors::ROUND_NOT_IN_COMMIT);
 
             if (duelist_number == 1) {
@@ -136,16 +145,17 @@ mod game {
                 round.state = RoundState::Reveal;
             }
 
-            store.update_round_entity(@round);
+            store.set_round(@round);
         }
 
-        fn reveal_moves(ref world: IWorldDispatcher,
+        fn reveal_moves(ref self: ContractState,
             duelist_id: u128,
             duel_id: u128,
             salt: felt252,
             moves: Span<u8>,
         ) {
-            let store: Store = StoreTrait::new(world);
+            let mut world = self.world_default();
+            let mut store: Store = StoreTrait::new(world);
 
             // validate challenge
             let mut challenge: Challenge = store.get_challenge(duel_id);
@@ -192,18 +202,18 @@ mod game {
             }
 
             // execute game loop...
-            let table: TableConfigEntity = store.get_table_config_entity(challenge.table_id);
-            let progress: DuelProgress = game_loop(store.world, table.deck_type, ref round);
+            let table: TableConfigValue = store.get_table_config_value(challenge.table_id);
+            let progress: DuelProgress = game_loop(@world, table.deck_type, ref round);
             store.set_round(@round);
 
             // end challenge
             challenge.winner = progress.winner;
             challenge.state = if (progress.winner == 0) {ChallengeState::Draw} else {ChallengeState::Resolved};
             challenge.timestamp_end = get_block_timestamp();
-            self.finish_challenge(store, challenge);
+            self.finish_challenge(ref store, challenge);
 
             // undo pact
-            pact::unset_pact(store, challenge);
+            pact::unset_pact(ref store, challenge);
 
             emitters::emitPostRevealEvents(@world, challenge);
         }
@@ -214,31 +224,32 @@ mod game {
         // view calls
         //
 
-        fn get_player_card_decks(world: @IWorldDispatcher, table_id: felt252) -> Span<Span<u8>> {
-            let store: Store = StoreTrait::new(world);
-            let table: TableConfigEntity = store.get_table_config_entity(table_id);
+        fn get_player_card_decks(self: @ContractState, table_id: felt252) -> Span<Span<u8>> {
+            let mut world = self.world_default();
+            let mut store: Store = StoreTrait::new(world);
+            let table: TableConfigValue = store.get_table_config_value(table_id);
             (DuelistHandTrait::get_table_player_decks(table.deck_type))
         }
 
-        fn get_duel_progress(world: @IWorldDispatcher, duel_id: u128) -> DuelProgress {
-            let store: Store = StoreTrait::new(world);
+        fn get_duel_progress(self: @ContractState, duel_id: u128) -> DuelProgress {
+            let mut world = self.world_default();
+            let mut store: Store = StoreTrait::new(world);
             let challenge: Challenge = store.get_challenge(duel_id);
             if (challenge.state.is_finished()) {
-                let table: TableConfigEntity = store.get_table_config_entity(challenge.table_id);
+                let table: TableConfigValue = store.get_table_config_value(challenge.table_id);
                 let mut round: Round = store.get_round(duel_id);
-                (game_loop(world, table.deck_type, ref round))
+                (game_loop(@world, table.deck_type, ref round))
             } else {
                 {Default::default()}
             }
         }
 
-        fn test_validate_commit_message(world: @IWorldDispatcher,
+        fn test_validate_commit_message(self: @ContractState,
             account: ContractAddress,
             signature: Array<felt252>,
             duelId: felt252,
             duelistId: felt252,
         ) -> bool {
-            WORLD(world);
             let msg = CommitMoveMessage {
                 duelId,
                 duelistId,
@@ -254,18 +265,19 @@ mod game {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn validate_ownership(self: @ContractState, duelist_id: u128) -> ContractAddress {
-            let duelist_dispatcher: IDuelistTokenDispatcher = self.world().duelist_token_dispatcher();
+            let mut world = self.world_default();
+            let duelist_dispatcher: IDuelistTokenDispatcher = world.duelist_token_dispatcher();
             let owner: ContractAddress = duelist_dispatcher.owner_of(duelist_id.into());
             assert(owner == starknet::get_caller_address(), Errors::NOT_YOUR_DUELIST);
             (owner)
         }
 
-        fn finish_challenge(self: @ContractState, store: Store, challenge: Challenge) {
+        fn finish_challenge(self: @ContractState, ref store: Store, challenge: Challenge) {
             store.set_challenge(@challenge);
 
             // get duelist as Entity, as we know they exist
-            let mut duelist_a: DuelistEntity = store.get_duelist_entity(challenge.duelist_id_a);
-            let mut duelist_b: DuelistEntity = store.get_duelist_entity(challenge.duelist_id_b);
+            let mut duelist_a: Duelist = store.get_duelist(challenge.duelist_id_a);
+            let mut duelist_b: Duelist = store.get_duelist(challenge.duelist_id_b);
             // Scoreboards we need the model, since they may not exist yet
             let mut scoreboard_a: Scoreboard = store.get_scoreboard(challenge.table_id, challenge.duelist_id_a);
             let mut scoreboard_b: Scoreboard = store.get_scoreboard(challenge.table_id, challenge.duelist_id_b);
@@ -275,15 +287,15 @@ mod game {
             ScoreTrait::update_totals(ref scoreboard_a.score, ref scoreboard_b.score, challenge.winner);
 
             // compute honour from final round
-            let round: RoundEntity = store.get_round_entity(challenge.duel_id);
+            let round: RoundValue = store.get_round_value(challenge.duel_id);
             duelist_a.score.update_honour(round.state_a.honour);
             duelist_b.score.update_honour(round.state_b.honour);
             scoreboard_a.score.update_honour(round.state_a.honour);
             scoreboard_b.score.update_honour(round.state_b.honour);
             
             // save
-            store.update_duelist_entity(@duelist_a);
-            store.update_duelist_entity(@duelist_b);
+            store.set_duelist(@duelist_a);
+            store.set_duelist(@duelist_b);
             store.set_scoreboard(@scoreboard_a);
             store.set_scoreboard(@scoreboard_b);
         }

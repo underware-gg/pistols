@@ -1,5 +1,4 @@
 use starknet::ContractAddress;
-use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
 mod CONFIG {
     const CONFIG_KEY: u8 = 1;
@@ -56,13 +55,6 @@ impl ConfigImpl of ConfigTrait {
         })
     }
     fn lords_dispatcher(self: @Config) -> ERC20ABIDispatcher {
-        (ierc20(*self.lords_address))
-    }
-}
-
-#[generate_trait]
-impl ConfigEntityImpl of ConfigEntityTrait {
-    fn lords_dispatcher(self: @ConfigEntity) -> ERC20ABIDispatcher {
         (ierc20(*self.lords_address))
     }
 }

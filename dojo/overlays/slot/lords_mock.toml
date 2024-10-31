@@ -1,8 +1,0 @@
-tag = "pistols-lords_mock"
-writes = [
-  "pistols-CoinConfig",
-]
-init_calldata = [
-  "0x0", # minter_address
-  "10000000000000000000000", # faucet_amount: 10,000 LORDS
-]

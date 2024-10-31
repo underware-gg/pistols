@@ -25,7 +25,8 @@ pub trait ITokenComponentInternal<TState> {
 pub mod TokenComponent {
     use zeroable::Zeroable;
     use starknet::{ContractAddress, get_contract_address, get_caller_address};
-    use dojo::world::{IWorldProvider, IWorldProviderDispatcher, IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::world::{WorldStorage, IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::contract::components::world_provider::{IWorldProvider};
     
     use openzeppelin_introspection::src5::SRC5Component;
     use openzeppelin_token::erc721::{
@@ -33,11 +34,11 @@ pub mod TokenComponent {
         ERC721Component::{InternalImpl as ERC721InternalImpl},
     };
 
+    use pistols::interfaces::systems::{SystemsTrait};
     use pistols::libs::store::{
         Store, StoreTrait,
-        TokenConfig, TokenConfigStore,
-        TokenConfigEntity, TokenConfigEntityStore,
-        Payment, PaymentEntity,
+        TokenConfig, TokenConfigValue,
+        Payment,
     };
 
     #[storage]
@@ -72,8 +73,9 @@ pub mod TokenComponent {
         fn can_mint(self: @ComponentState<TContractState>,
             caller_address: ContractAddress,
         ) -> bool {
-            let store: Store = StoreTrait::new(self.get_contract().world());
-            let token_config: TokenConfigEntity = store.get_token_config_entity(get_contract_address());
+            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut store: Store = StoreTrait::new(world);
+            let token_config: TokenConfigValue = store.get_token_config_value(get_contract_address());
             (
                 token_config.minter_address.is_zero() ||      // anyone can mint
                 caller_address == token_config.minter_address // caller is minter contract
@@ -114,7 +116,8 @@ pub mod TokenComponent {
             renderer_address: ContractAddress,
             payment: Payment,
         ) {
-            let store: Store = StoreTrait::new(self.get_contract().world());
+            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut store: Store = StoreTrait::new(world);
             let token_config: TokenConfig = TokenConfig {
                 token_address: get_contract_address(),
                 minter_address,
@@ -130,14 +133,13 @@ pub mod TokenComponent {
         ) -> u128 {
             assert(self.can_mint(get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
 
-            // get next token id
-            let store: Store = StoreTrait::new(self.get_contract().world());
-            let mut token_config: TokenConfigEntity = store.get_token_config_entity(get_contract_address());
+            // generate next token id
+            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut store: Store = StoreTrait::new(world);
+            let mut token_config: TokenConfig = store.get_token_config(get_contract_address());
             let token_id: u128 = token_config.minted_count + 1;
-
-            // update token config
             token_config.minted_count = token_id;
-            store.update_token_config_entity(@token_config);
+            store.set_token_config(@token_config);
 
             let mut erc721 = get_dep_component_mut!(ref self, ERC721);
             erc721.mint(recipient, token_id.into());

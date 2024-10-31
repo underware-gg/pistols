@@ -1,3 +1,9 @@
+#--------------------------
+# dojo profile config
+# https://book.dojoengine.org/framework/config
+# https://github.com/dojoengine/dojo/blob/main/examples/simple/dojo_dev.toml
+#
+
 [world]
 name = "Pistols at 10 Blocks"
 description = "An on-chain pistol duelling game of honour and betrayal."
@@ -12,9 +18,6 @@ github = "https://github.com/underware-gg/pistols"
 # discord = "https://discord.gg/FB2wR6uF"
 # telegram = "https://t.me/dojoengine"
 
-[namespace]
-default = "pistols"
-
 [env]
 chain_id = "SN_SEPOLIA"
 # rpc_url = ""          # env: STARKNET_RPC_URL
@@ -22,5 +25,71 @@ chain_id = "SN_SEPOLIA"
 # private_key = ""      # env: DOJO_PRIVATE_KEY
 world_address = "0x577254dbda890787fd79ec4a0247dda90fe880f2c9ad115f8487214ee43c838"
 
+#--------------------------
+# namespaces
+#
+[namespace]
+default = "pistols"
+
+#--------------------------
+# namespaces
+#
+[owners]
+"pistols" = [
+  "pistols-game",
+  "pistols-admin",
+]
+
+#--------------------------
+# writers
+#
+[writers]
+"pistols" = [
+  "pistols-game",
+  "pistols-admin",
+] 
+# ERC-721
+"pistols-TokenConfig" = ["pistols-duelist_token","pistols-duel_token"]
+"pistols-Payment"     = ["pistols-duelist_token","pistols-duel_token"]
+"pistols-Duelist"     = ["pistols-duelist_token"]
+"pistols-Challenge"   = ["pistols-duel_token"]
+"pistols-Round"       = ["pistols-duel_token"]
+"pistols-Pact"        = ["pistols-duel_token"]
+"pistols-Scoreboard"  = ["pistols-duel_token"]
+# ERC-20
+"pistols-CoinConfig"        = ["pistols-fame_coin","pistols-lords_mock"]
+"pistols-TokenBoundAddress" = ["pistols-fame_coin"]
+
+#--------------------------
+# init_calldata
+#
+[init_call_args]
+"pistols-game" = []
+"pistols-bank" = []
+"pistols-rng" = []
+"pistols-admin" = [
+  "0x0", # treasury_address (or initializer)
+  "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210", # lords_address
+]
+"pistols-duel_token" = [
+  "0", # "sstr:https://pistols.underware.gg", # base_uri
+  "0x0", # minter_address
+  "0x0", # renderer_address
+  "0", # fee_amount
+]
+"pistols-duelist_token" = [
+  "0", # "sstr:https://pistols.underware.gg", # base_uri
+  "0x0", # minter_address
+  "0x0", # renderer_address
+  "100000000000000000000", # fee_amount: 100 LORDS
+]
+
+
+#--------------------------
+# migration
+#
 [migration]
-skip_contracts = ["pistols-lords_mock"]
+order_inits = []
+skip_contracts = [
+  "pistols-lords_mock",
+]

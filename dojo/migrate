@@ -39,18 +39,15 @@ echo "👍"
 # migrate
 #
 echo "------------------------------------------------------------------------------"
-echo ">>> Migrate plan..."
-set +e # disable exit on error
-PLAN_OUTPUT=$(sozo -P $PROFILE migrate plan --world $WORLD_ADDRESS)
-if [ "$?" != "0" ]; then
-  echo "$PLAN_OUTPUT"
-  exit 1
-fi
-set -e # enable exit on error
+echo ">>> Inspect migrations..."
+sozo -P $PROFILE inspect --world $WORLD_ADDRESS
 
-echo ">>> Migrate apply..."
-sozo -P $PROFILE migrate apply -vvv --world $WORLD_ADDRESS
+echo ">>> Do migraions..."
+sozo -P $PROFILE migrate -vvv --world $WORLD_ADDRESS
 echo "👍"
+
+echo ">>> Inspect again..."
+sozo -P $PROFILE inspect --world $WORLD_ADDRESS
 
 #-----------------
 # auth write

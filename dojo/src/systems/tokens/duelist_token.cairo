@@ -5,7 +5,7 @@ use pistols::models::duelist::{Duelist, ProfilePicType, Archetype};
 #[starknet::interface]
 pub trait IDuelistToken<TState> {
     // IWorldProvider
-    fn world(self: @TState,) -> IWorldDispatcher;
+    fn world_dispatcher(self: @TState) -> IWorldDispatcher;
 
     // ISRC5
     fn supports_interface(self: @TState, interface_id: felt252) -> bool;
@@ -86,6 +86,8 @@ pub mod duelist_token {
     // use debug::PrintTrait;
     use openzeppelin_account::interface::ISRC6;
     use starknet::{ContractAddress, get_contract_address, get_caller_address, get_block_timestamp};
+    use dojo::world::{WorldStorage, IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::model::{ModelStorage, ModelValueStorage};
 
     //-----------------------------------
     // ERC-721 Start
@@ -127,21 +129,20 @@ pub mod duelist_token {
     //-----------------------------------
 
     use pistols::interfaces::systems::{
-        WorldSystemsTrait,
+        SystemsTrait,
         IBankDispatcher, IBankDispatcherTrait,
         IFameCoinDispatcher, IFameCoinDispatcherTrait,
     };
     use pistols::models::{
         duelist::{
-            Duelist, DuelistEntity,
+            Duelist, DuelistValue,
             Score, ScoreTrait,
             ProfilePicType, ProfilePicTypeTrait,
             Archetype,
-            ScoreboardEntity,
+            ScoreboardValue,
         },
         config::{
-            TokenConfig, TokenConfigStore,
-            TokenConfigEntity, TokenConfigEntityStore,
+            TokenConfig, TokenConfigValue,
         },
         payment::{Payment},
         table::{TABLES},
@@ -192,6 +193,13 @@ pub mod duelist_token {
         );
     }
 
+    #[generate_trait]
+    impl WorldDefaultImpl of WorldDefaultTrait {
+        fn world_default(self: @ContractState) -> WorldStorage {
+            self.world(@"pistols")
+        }
+    }
+
 
     //-----------------------------------
     // Public
@@ -212,10 +220,12 @@ pub mod duelist_token {
             profile_pic_type: ProfilePicType,
             profile_pic_uri: felt252,
         ) -> Duelist {
+            let mut world = self.world_default();
+
             // transfer mint fee
             let payment: Payment = self.get_payment(recipient);
             if (payment.amount > 0) { // avoid bank contract during tests
-                self.world().bank_dispatcher().charge(recipient, payment);
+                world.bank_dispatcher().charge(recipient, payment);
             }
 
             // mint!
@@ -232,14 +242,14 @@ pub mod duelist_token {
             };
             
             // save
-            let store = StoreTrait::new(self.world());
+            let mut store: Store = StoreTrait::new(world);
             store.set_duelist(@duelist);
 
             // mint fame
-            let fame_dispatcher: IFameCoinDispatcher = self.world().fame_coin_dispatcher();
+            let fame_dispatcher: IFameCoinDispatcher = world.fame_coin_dispatcher();
             fame_dispatcher.minted_duelist(duelist.duelist_id, payment.amount);
 
-            emitters::emitDuelistRegisteredEvent(@self.world(), recipient, duelist.clone(), true);
+            emitters::emitDuelistRegisteredEvent(@world, recipient, duelist.clone(), true);
 
             (duelist)
         }
@@ -254,7 +264,8 @@ pub mod duelist_token {
             self.token.assert_is_owner_of(get_caller_address(), duelist_id.into());
 
             // validate duelist
-            let store: Store = StoreTrait::new(self.world());
+            let mut world = self.world_default();
+            let mut store: Store = StoreTrait::new(world);
             let mut duelist: Duelist = store.get_duelist(duelist_id);
             assert(duelist.timestamp != 0, Errors::INVALID_DUELIST);
 
@@ -265,7 +276,7 @@ pub mod duelist_token {
             // save
             store.set_duelist(@duelist);
 
-            emitters::emitDuelistRegisteredEvent(@self.world(), get_caller_address(), duelist.clone(), false);
+            emitters::emitDuelistRegisteredEvent(@world, get_caller_address(), duelist.clone(), false);
 
             (duelist)
         }
@@ -294,7 +305,8 @@ pub mod duelist_token {
             if (self.erc721.balance_of(recipient) == 0) {
                 (Default::default()) // first is free
             } else {
-                let store = StoreTrait::new(self.world());
+                let mut world = self.world_default();
+                let mut store: Store = StoreTrait::new(world);
                 (store.get_payment(get_contract_address().into()))
             }
         }
@@ -305,16 +317,15 @@ pub mod duelist_token {
     // ERC721HooksTrait
     //
     use pistols::systems::components::erc721_hooks::{TokenConfigRenderTrait};
-    pub impl ERC721HooksImpl<
-        +IWorldProvider<TContractState>,
-    > of ERC721Component::ERC721HooksTrait<ContractState> {
+    pub impl ERC721HooksImpl of ERC721Component::ERC721HooksTrait<ContractState> {
         fn before_update(ref self: ERC721Component::ComponentState<ContractState>,
             to: ContractAddress,
             token_id: u256,
             auth: ContractAddress,
         ) {
+            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let fame_dispatcher: IFameCoinDispatcher = world.fame_coin_dispatcher();
             let owner: ContractAddress = self._owner_of(token_id);
-            let fame_dispatcher: IFameCoinDispatcher = self.get_contract().world().fame_coin_dispatcher();
             fame_dispatcher.updated_duelist(owner, to, token_id.low);
         }
 
@@ -326,7 +337,9 @@ pub mod duelist_token {
 
         // same as ERC721HooksImpl::token_uri()
         fn token_uri(self: @ERC721Component::ComponentState<ContractState>, token_id: u256) -> ByteArray {
-            (StoreTrait::new(self.get_contract().world()).get_token_config(get_contract_address()).render(token_id))
+            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut store: Store = StoreTrait::new(world);
+            (store.get_token_config(get_contract_address()).render(token_id))
         }
     }
 
@@ -339,7 +352,9 @@ pub mod duelist_token {
     #[abi(embed_v0)]
     impl TokenRendererImpl of ITokenRenderer<ContractState> {
         fn get_token_name(self: @ContractState, token_id: u256) -> ByteArray {
-            let duelist: DuelistEntity = StoreTrait::new(self.world()).get_duelist_entity(token_id.low);
+            let mut world = self.world_default();
+            let mut store: Store = StoreTrait::new(world);
+            let duelist: DuelistValue = store.get_duelist_value(token_id.low);
             (format!("{} #{}",
                 if (duelist.name != '') { duelist.name.as_string() } else { "Duelist" },
                 token_id
@@ -351,7 +366,9 @@ pub mod duelist_token {
         }
 
         fn get_token_image(self: @ContractState, token_id: u256) -> ByteArray {
-            let duelist: DuelistEntity = StoreTrait::new(self.world()).get_duelist_entity(token_id.low);
+            let mut world = self.world_default();
+            let mut store: Store = StoreTrait::new(world);
+            let duelist: DuelistValue = store.get_duelist_value(token_id.low);
             let base_uri: ByteArray = self.erc721._base_uri();
             let image_square: ByteArray = duelist.profile_pic_type.get_uri(base_uri.clone(), duelist.profile_pic_uri, "square");
             let result: ByteArray = 
@@ -368,7 +385,9 @@ pub mod duelist_token {
 
         // returns: [key1, value1, key2, value2,...]
         fn get_metadata_pairs(self: @ContractState, token_id: u256) -> Span<ByteArray> {
-            let duelist: DuelistEntity = StoreTrait::new(self.world()).get_duelist_entity(token_id.low);
+            let mut world = self.world_default();
+            let mut store: Store = StoreTrait::new(world);
+            let duelist: DuelistValue = store.get_duelist_value(token_id.low);
             let base_uri: ByteArray = self.erc721._base_uri();
             let mut result: Array<ByteArray> = array![];
             result.append("square");
@@ -380,7 +399,9 @@ pub mod duelist_token {
 
         // returns: [key1, value1, key2, value2,...]
         fn get_attribute_pairs(self: @ContractState, token_id: u256) -> Span<ByteArray> {
-            let duelist: DuelistEntity = StoreTrait::new(self.world()).get_duelist_entity(token_id.low);
+            let mut world = self.world_default();
+            let mut store: Store = StoreTrait::new(world);
+            let duelist: DuelistValue = store.get_duelist_value(token_id.low);
             let mut result: Array<ByteArray> = array![];
             // Honour
             result.append("Honour");
@@ -390,7 +411,7 @@ pub mod duelist_token {
             result.append("Archetype");
             result.append(archetype.into());
             // Fame
-            let fame_dispatcher: IFameCoinDispatcher = self.world().fame_coin_dispatcher();
+            let fame_dispatcher: IFameCoinDispatcher = world.fame_coin_dispatcher();
             let fame_balance: u256 = fame_dispatcher.balance_of_token(get_contract_address(), token_id.low) / CONST::ETH_TO_WEI;
             result.append("Fame");
             result.append(fame_balance.as_string());

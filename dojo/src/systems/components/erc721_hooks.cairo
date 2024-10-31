@@ -1,8 +1,10 @@
 use starknet::{ContractAddress, get_contract_address};
-use dojo::world::{IWorldProvider, IWorldProviderDispatcher, IWorldDispatcher, IWorldDispatcherTrait};
+use dojo::world::{WorldStorage, IWorldDispatcher, IWorldDispatcherTrait};
+use dojo::contract::components::world_provider::{IWorldProvider};
 use openzeppelin_token::erc721::{ERC721Component};
 use graffiti::json::JsonImpl;
 
+use pistols::interfaces::systems::{SystemsTrait};
 use pistols::systems::tokens::duelist_token::{IDuelistToken, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait};
 use pistols::models::{
     config::{TokenConfig},
@@ -45,7 +47,8 @@ pub impl ERC721HooksImpl<
         self: @ERC721Component::ComponentState<TContractState>,
         token_id: u256,
     ) -> ByteArray {
-        let store = StoreTrait::new(self.get_contract().world());
+        let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+        let mut store: Store = StoreTrait::new(world);
         let token_config: TokenConfig = store.get_token_config(get_contract_address());
         (token_config.render(token_id))
     }

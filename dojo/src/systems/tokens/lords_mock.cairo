@@ -4,7 +4,7 @@ use dojo::world::IWorldDispatcher;
 #[starknet::interface]
 pub trait ILordsMock<TState> {
     // IWorldProvider
-    fn world(self: @TState,) -> IWorldDispatcher;
+    fn world_dispatcher(self: @TState) -> IWorldDispatcher;
 
     // IERC20
     fn total_supply(self: @TState) -> u256;
@@ -39,6 +39,8 @@ pub mod lords_mock {
     use core::byte_array::ByteArrayTrait;
     use starknet::{ContractAddress, get_contract_address, get_caller_address, get_block_timestamp};
     use pistols::types::constants::{CONST};
+    use dojo::world::{WorldStorage};
+    use dojo::model::{ModelStorage, ModelValueStorage};
 
     //-----------------------------------
     // ERC-20 Start
@@ -78,7 +80,7 @@ pub mod lords_mock {
     //*******************************************
 
     fn dojo_init(ref self: ContractState,
-        game_contract_address: ContractAddress,
+        minter_contract_address: ContractAddress,
         faucet_amount: u128,
     ) {
         self.erc20.initializer(
@@ -86,7 +88,7 @@ pub mod lords_mock {
             COIN_SYMBOL(),
         );
         self.coin.initialize(
-            game_contract_address,
+            minter_contract_address,
             faucet_amount: faucet_amount.into(),
         );
     }

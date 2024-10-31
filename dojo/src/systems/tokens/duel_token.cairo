@@ -7,7 +7,7 @@ use pistols::types::premise::{Premise};
 #[starknet::interface]
 pub trait IDuelToken<TState> {
     // IWorldProvider
-    fn world(self: @TState,) -> IWorldDispatcher;
+    fn world_dispatcher(self: @TState) -> IWorldDispatcher;
 
     // ISRC5
     fn supports_interface(self: @TState, interface_id: felt252) -> bool;
@@ -90,6 +90,8 @@ pub mod duel_token {
     // use debug::PrintTrait;
     use openzeppelin_account::interface::ISRC6;
     use starknet::{ContractAddress, get_contract_address, get_caller_address, get_block_timestamp};
+    use dojo::world::{WorldStorage, IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::model::{ModelStorage, ModelValueStorage};
 
     //-----------------------------------
     // ERC-721 Start
@@ -131,16 +133,16 @@ pub mod duel_token {
     //-----------------------------------
 
     use pistols::interfaces::systems::{
-        WorldSystemsTrait,
+        SystemsTrait,
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
     };
     use pistols::models::{
-        config::{TokenConfig, TokenConfigStore, TokenConfigEntity, TokenConfigEntityStore},
-        challenge::{Challenge, ChallengeEntity, Round, Moves},
-        duelist::{Duelist, DuelistEntity, DuelistTrait, Pact, ProfilePicType, ProfilePicTypeTrait},
+        config::{TokenConfig, TokenConfigValue},
+        challenge::{Challenge, ChallengeValue, Round, Moves},
+        duelist::{Duelist, DuelistValue, DuelistTrait, Pact, ProfilePicType, ProfilePicTypeTrait},
         table::{
-            TableConfig, TableConfigEntity, TableConfigEntityTrait,
-            TableAdmittanceEntity, TableAdmittanceEntityTrait,
+            TableConfig, TableConfigTrait, TableConfigValue,
+            TableAdmittance, TableAdmittanceTrait,
             TableType, TABLES,
         },
     };
@@ -157,7 +159,7 @@ pub mod duel_token {
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::timestamp::{timestamp};
     use pistols::utils::math::{MathTrait};
-    use pistols::utils::misc::{ZERO, WORLD, CONSUME_ADDRESS};
+    use pistols::utils::misc::{ZERO, CONSUME_ADDRESS};
 
     mod Errors {
         const NOT_IMPLEMENTED: felt252          = 'DUEL: Not implemented';
@@ -202,6 +204,13 @@ pub mod duel_token {
         );
     }
 
+    #[generate_trait]
+    impl WorldDefaultImpl of WorldDefaultTrait {
+        fn world_default(self: @ContractState) -> WorldStorage {
+            self.world(@"pistols")
+        }
+    }
+
 
     //-----------------------------------
     // Public
@@ -218,6 +227,7 @@ pub mod duel_token {
             table_id: felt252,
             expire_hours: u64,
         ) -> u128 {
+            let mut world = self.world_default();
             let caller: ContractAddress = get_caller_address();
 
             // transfer mint fee
@@ -232,14 +242,14 @@ pub mod duel_token {
             // validate challenger
             let address_a: ContractAddress = caller;
             let duelist_id_a: u128 = duelist_id;
-            let duelist_dispatcher: IDuelistTokenDispatcher = self.world().duelist_token_dispatcher();
+            let duelist_dispatcher: IDuelistTokenDispatcher = world.duelist_token_dispatcher();
             assert(duelist_dispatcher.is_owner_of(address_a, duelist_id_a) == true, Errors::NOT_YOUR_DUELIST);
 
             // validate table
-            let store: Store = StoreTrait::new(self.world());
-            let table: TableConfigEntity = store.get_table_config_entity(table_id);
+            let mut store: Store = StoreTrait::new(world);
+            let table: TableConfigValue = store.get_table_config_value(table_id);
             assert(table.is_open == true, Errors::TABLE_IS_CLOSED);
-            let table_admittance: TableAdmittanceEntity = store.get_table_admittance_entity(table_id);
+            let table_admittance: TableAdmittance = store.get_table_admittance(table_id);
             assert(table_admittance.can_join(address_a, duelist_id_a), Errors::CHALLENGER_NOT_ADMITTED);
 
             // validate challenged
@@ -262,7 +272,7 @@ pub mod duel_token {
             let timestamp_end: u64 = if (expire_hours == 0) { 0 } else { timestamp_start + timestamp::from_hours(expire_hours) };
 
             // create challenge
-            let seed: u128 = make_seed(address_a, self.world().uuid());
+            let seed: u128 = make_seed(address_a, world.dispatcher.uuid());
             let challenge = Challenge {
                 duel_id,
                 seed,
@@ -296,9 +306,9 @@ pub mod duel_token {
             store.set_round(@round);
 
             // set the pact + assert it does not exist
-            pact::set_pact(store, challenge);
+            pact::set_pact(ref store, challenge);
 
-            emitters::emitNewChallengeEvent(@self.world(), challenge);
+            emitters::emitNewChallengeEvent(@world, challenge);
 
             (duel_id)
         }
@@ -308,9 +318,10 @@ pub mod duel_token {
             duel_id: u128,
             accepted: bool,
         ) -> ChallengeState {
+            let mut world = self.world_default();
             
             // validate chalenge
-            let store: Store = StoreTrait::new(self.world());
+            let mut store: Store = StoreTrait::new(world);
             let mut challenge: Challenge = store.get_challenge(duel_id);
             assert(challenge.state.exists(), Errors::INVALID_CHALLENGE);
             assert(challenge.state == ChallengeState::Awaiting, Errors::CHALLENGE_NOT_AWAITING);
@@ -330,7 +341,7 @@ pub mod duel_token {
                 challenge.timestamp_end = timestamp;
             } else {
                 // validate duelist ownership
-                let duelist_dispatcher = self.world().duelist_token_dispatcher();
+                let duelist_dispatcher = world.duelist_token_dispatcher();
 // address_b.print();
 // duelist_id_b.print();
 // duelist_dispatcher.owner_of(duelist_id_b).print();
@@ -351,11 +362,11 @@ pub mod duel_token {
                     // validate chosen duelist
                     assert(challenge.duelist_id_a != duelist_id_b, Errors::INVALID_CHALLENGED_SELF);
                     // remove pact between wallets
-                    pact::unset_pact(store, challenge);
+                    pact::unset_pact(ref store, challenge);
                     // fil missing duelist
                     challenge.duelist_id_b = duelist_id_b;
                     // create pact between duelists
-                    pact::set_pact(store, challenge);
+                    pact::set_pact(ref store, challenge);
                 }
                 // all good!
                 if (accepted) {
@@ -364,14 +375,14 @@ pub mod duel_token {
                     challenge.timestamp_start = timestamp;
                     challenge.timestamp_end = 0;
                     // events
-                    emitters::emitChallengeAcceptedEvent(@self.world(), challenge, accepted);
-                    emitters::emitDuelistTurnEvent(@self.world(), challenge);
+                    emitters::emitChallengeAcceptedEvent(@world, challenge, accepted);
+                    emitters::emitDuelistTurnEvent(@world, challenge);
                 } else {
                     // Challenged is Refusing
                     challenge.state = ChallengeState::Refused;
                     challenge.timestamp_end = timestamp;
                     // events
-                    emitters::emitChallengeAcceptedEvent(@self.world(), challenge, accepted);
+                    emitters::emitChallengeAcceptedEvent(@world, challenge, accepted);
                 }
             }
 
@@ -380,7 +391,7 @@ pub mod duel_token {
 
             // duel canceled!
             if (challenge.state.is_canceled()) {
-                pact::unset_pact(store, challenge);
+                pact::unset_pact(ref store, challenge);
             }
             
             (challenge.state)
@@ -400,23 +411,23 @@ pub mod duel_token {
         // View calls
         //
         fn calc_fee(self: @ContractState, table_id: felt252) -> u128 {
-            let store: Store = StoreTrait::new(self.world());
-            let table: TableConfigEntity = store.get_table_config_entity(table_id);
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let table: TableConfig = store.get_table_config(table_id);
             (table.calc_fee())
         }
         
         fn get_pact(self: @ContractState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128 {
-            let store: Store = StoreTrait::new(self.world());
-            (pact::get_pact(store, table_id, duelist_id_a, duelist_id_b))
+            let mut store: Store = StoreTrait::new(self.world_default());
+            (pact::get_pact(ref store, table_id, duelist_id_a, duelist_id_b))
         }
         fn has_pact(self: @ContractState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool {
             (self.get_pact(table_id, duelist_id_a, duelist_id_b) != 0)
         }
 
         fn can_join(self: @ContractState, table_id: felt252, duelist_id: u128) -> bool {
-            let store: Store = StoreTrait::new(self.world());
-            let table: TableConfigEntity = store.get_table_config_entity(table_id);
-            let table_admittance: TableAdmittanceEntity = store.get_table_admittance_entity(table_id);
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let table: TableConfigValue = store.get_table_config_value(table_id);
+            let table_admittance: TableAdmittance = store.get_table_admittance(table_id);
             (table.is_open && table_admittance.can_join(starknet::get_caller_address(), duelist_id))
         }
     }
@@ -436,10 +447,11 @@ pub mod duel_token {
             (format!("Pistols at 10 Blocks Duel #{}. https://pistols.underware.gg", token_id))
         }
         fn get_token_image(self: @ContractState, token_id: u256) -> ByteArray {
-            let store: Store = StoreTrait::new(self.world());
-            let challenge: ChallengeEntity = store.get_challenge_entity(token_id.low);
-            let duelist_a: DuelistEntity = store.get_duelist_entity(challenge.duelist_id_a);
-            let duelist_b: DuelistEntity = store.get_duelist_entity(challenge.duelist_id_b);
+            let mut world = self.world_default();
+            let mut store: Store = StoreTrait::new(world);
+            let challenge: ChallengeValue = store.get_challenge_value(token_id.low);
+            let duelist_a: DuelistValue = store.get_duelist_value(challenge.duelist_id_a);
+            let duelist_b: DuelistValue = store.get_duelist_value(challenge.duelist_id_b);
             let base_uri: ByteArray = self.erc721._base_uri();
             let image_a: ByteArray = duelist_a.profile_pic_type.get_uri(base_uri.clone(), duelist_a.profile_pic_uri, "portrait");
             let image_b: ByteArray = duelist_b.profile_pic_type.get_uri(base_uri.clone(), duelist_b.profile_pic_uri, "portrait");
@@ -463,7 +475,9 @@ pub mod duel_token {
             ([].span())
         }
         fn get_attribute_pairs(self: @ContractState, token_id: u256) -> Span<ByteArray> {
-            let challenge: ChallengeEntity = StoreTrait::new(self.world()).get_challenge_entity(token_id.low);
+            let mut world = self.world_default();
+            let mut store: Store = StoreTrait::new(world);
+            let challenge: ChallengeValue = store.get_challenge_value(token_id.low);
             let mut result: Array<ByteArray> = array![];
             let duelist_a: ByteArray = format!("Duelist #{}", challenge.duelist_id_a);
             let duelist_b: ByteArray = format!("Duelist #{}", challenge.duelist_id_b);

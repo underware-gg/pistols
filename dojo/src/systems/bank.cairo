@@ -1,29 +1,31 @@
 use starknet::ContractAddress;
 use pistols::models::payment::{Payment};
 
-#[dojo::interface]
-trait IBank {
-    fn charge(ref world: IWorldDispatcher,
+#[starknet::interface]
+pub trait IBank<TState> {
+    fn charge(ref self: TState,
         payer: ContractAddress,
         payment: Payment,
     );
 }
 
 #[dojo::contract]
-mod bank {
+pub mod bank {
     // use debug::PrintTrait;
     use core::traits::Into;
     use starknet::ContractAddress;
     use starknet::{get_caller_address, get_contract_address};
+    use dojo::world::{WorldStorage};
+    use dojo::model::{ModelStorage, ModelValueStorage};
 
-    use pistols::interfaces::systems::{WorldSystemsTrait};
+    use pistols::interfaces::systems::{SystemsTrait};
     use pistols::interfaces::ierc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
     use pistols::models::{
-        config::{Config, ConfigTrait, ConfigEntity, ConfigEntityTrait},
+        config::{Config, ConfigTrait},
         payment::{Payment, PaymentTrait},
     };
     use pistols::libs::store::{Store, StoreTrait};
-    use pistols::utils::misc::{ZERO, WORLD};
+    use pistols::utils::misc::{ZERO};
 
     mod Errors {
         const INVALID_SHARES: felt252           = 'BANK: invalid shares';
@@ -36,16 +38,24 @@ mod bank {
         const INSUFFICIENT_BALANCE: felt252     = 'BANK: insufficient balance';
     }
 
+    #[generate_trait]
+    impl WorldDefaultImpl of WorldDefaultTrait {
+        fn world_default(self: @ContractState) -> WorldStorage {
+            self.world(@"pistols")
+        }
+    }
+
     #[abi(embed_v0)]
     impl BankImpl of super::IBank<ContractState> {
-        fn charge(ref world: IWorldDispatcher,
+        fn charge(ref self: ContractState,
             payer: ContractAddress,
             payment: Payment,
         ) {
             if (payment.amount == 0) { return; }
 
-            let store: Store = StoreTrait::new(world);
-            let config: ConfigEntity = store.get_config_entity();
+            let mut world = self.world_default();
+            let mut store: Store = StoreTrait::new(world);
+            let config: Config = store.get_config();
 
             // assert balance/allowance
             let lords: ERC20ABIDispatcher = config.lords_dispatcher();
@@ -82,7 +92,6 @@ mod bank {
             payer: ContractAddress,
             amount: u256,
         ) {
-            WORLD(self.world());
             let allowance: u256 = lords.allowance(payer, get_contract_address());
             assert(allowance >= amount, Errors::INSUFFICIENT_ALLOWANCE);
             let balance: u256 = lords.balance_of(payer);

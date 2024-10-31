@@ -1,31 +1,29 @@
 use starknet::{ContractAddress};
-use dojo::world::IWorldDispatcher;
 use pistols::types::shuffler::{Shuffler, ShufflerTrait};
 
-#[dojo::interface]
-trait IRng {
-    fn reseed(world: @IWorldDispatcher, seed: felt252, salt: felt252) -> felt252;
-    fn new_shuffler(world: @IWorldDispatcher, shuffle_size: usize) -> Shuffler;
+#[starknet::interface]
+pub trait IRng<TState> {
+    fn reseed(self: @TState, seed: felt252, salt: felt252) -> felt252;
+    fn new_shuffler(self: @TState, shuffle_size: usize) -> Shuffler;
 }
 
 #[dojo::contract]
-mod rng {
+pub mod rng {
     use super::IRng;
     use starknet::{ContractAddress};
+    use dojo::world::{WorldStorage};
+    use dojo::model::{ModelStorage, ModelValueStorage};
 
     use pistols::utils::hash::{hash_values};
-    use pistols::utils::misc::{WORLD};
     use pistols::types::shuffler::{Shuffler, ShufflerTrait};
 
     #[abi(embed_v0)]
     impl RngImpl of IRng<ContractState> {
-        fn reseed(world: @IWorldDispatcher, seed: felt252, salt: felt252) -> felt252 {
-            WORLD(world);
+        fn reseed(self: @ContractState, seed: felt252, salt: felt252) -> felt252 {
             let new_seed: felt252 = hash_values([seed.into(), salt].span());
             (new_seed)
         }
-        fn new_shuffler(world: @IWorldDispatcher, shuffle_size: usize) -> Shuffler {
-            WORLD(world);
+        fn new_shuffler(self: @ContractState, shuffle_size: usize) -> Shuffler {
             (ShufflerTrait::new(shuffle_size))
         }
     }
@@ -36,8 +34,8 @@ mod rng {
 //--------------------------------
 // General use trait
 //
-
-use pistols::interfaces::systems::{WorldSystemsTrait};
+use dojo::world::{WorldStorage};
+use pistols::interfaces::systems::{SystemsTrait};
 
 #[derive(Copy, Drop)]
 pub struct Dice {
@@ -49,7 +47,7 @@ pub struct Dice {
 
 #[generate_trait]
 impl DiceImpl of DiceTrait {
-    fn new(world: @IWorldDispatcher, initial_seed: felt252, shuffle_size: usize) -> Dice {
+    fn new(world: @WorldStorage, initial_seed: felt252, shuffle_size: usize) -> Dice {
         let rng: IRngDispatcher = world.rng_dispatcher();
         (Dice {
             rng,
