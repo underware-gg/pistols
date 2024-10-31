@@ -120,6 +120,11 @@ rustup update
 # Install Cargo
 curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh
 
+# Install starkli
+# https://github.com/xJonathanLEI/starkli
+curl https://get.starkli.sh | sh
+starkliup
+
 # Install pnpm
 curl -fsSL https://get.pnpm.io/install.sh | sh -
 
@@ -129,7 +134,7 @@ brew install protobuf
 cargo install toml-cli
 ```
 
-Install the [Cairo 1.0](https://marketplace.visualstudio.com/items?itemName=starkware.cairo1) extension for Visual Studio Code
+Install the [Cairo 1.0](https://marketplace.visualstudio.com/items?itemName=starkware.cairo1) extension for Visual Studio Code / Cursor
 
 
 ### Install Dojo 

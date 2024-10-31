@@ -91,6 +91,7 @@ export const useChallenge = (duelId: BigNumberish) => {
   // console.log(bigintToHex(duelId), challenge)
 
   const tableId = useMemo(() => feltToString(challenge?.table_id ?? 0n), [challenge])
+  const seed = useMemo(() => BigInt(challenge?.seed ?? 0), [challenge])
   const duelistAddressA = useMemo(() => BigInt(challenge?.address_a ?? 0), [challenge])
   const duelistAddressB = useMemo(() => BigInt(challenge?.address_b ?? 0), [challenge])
   const duelistIdA = useMemo(() => BigInt(challenge?.duelist_id_a ?? 0), [challenge])
@@ -114,13 +115,12 @@ export const useChallenge = (duelId: BigNumberish) => {
     challengeExists: (challenge != null),
     duelId,
     tableId,
+    seed,
     state,
     duelistAddressA,
     duelistAddressB,
     duelistIdA,
     duelistIdB,
-    challengerId: duelistIdA,
-    challengedId: duelistIdB,
     premise,
     quote,
     // progress and results

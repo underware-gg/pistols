@@ -74,14 +74,12 @@ export function DuelistsNavigationMenu({
 
   const rows = useMemo(() => (
     duelistIds.map((duelistId, index) => {
-      if (index == maxItems) return <Dropdown.Item text={'More Duelists...'} onClick={() => _goToProfile()} />
       if (index > maxItems) return undefined
-      const classNames = ['NoPadding']
-      if (duelistId == selectedDuelistId) classNames.push('BgImportant')
+      if (index == maxItems) return <Dropdown.Item key='more' text={'More Duelists...'} onClick={() => _goToProfile()} />
       return (
         <Dropdown.Item key={`i${duelistId}`}
           onClick={() => _switchDuelist(duelistId)}
-          className={classNames.join(' ')}
+          className={`NoPadding ${duelistId == selectedDuelistId ? 'BgImportant' : ''}`}
         >
           <DuelistItem duelistId={duelistId} />
         </Dropdown.Item>

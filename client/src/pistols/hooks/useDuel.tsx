@@ -52,6 +52,7 @@ export const useRound = (duelId: BigNumberish) => {
     [round.moves_b.card_1, round.moves_b.card_2, round.moves_b.card_3, round.moves_b.card_4]
   ) : null, [round])
 
+  if (!round) console.log(`!!!!! NULL ROUND:`, duelId, entityId, round, Round)
   if (!round) return null
   return {
     ...round,
@@ -66,7 +67,7 @@ export const useRound = (duelId: BigNumberish) => {
 export const useDuel = (duelId: BigNumberish) => {
   const challenge = useChallenge(duelId)
   const round1 = useRound(duelId)
-  // useEffect(() => { console.log(`+++ round:`, round1) }, [round1])
+  // useEffect(() => { console.log(`+++ round:`, duelId, round1, challenge) }, [round1])
 
   //
   // The actual stage of this duel

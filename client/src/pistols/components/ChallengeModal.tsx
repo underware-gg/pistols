@@ -80,16 +80,13 @@ export default function ChallengeModal() {
         <Grid>
           <Row>
             <Col width={4} textAlign='left'>
-              Challenge
+              Challenge #{selectedDuelId.toString()}
             </Col>
             <Col width={8} textAlign='center' className='NoBreak Important'>
               {tableDescription}
             </Col>
-            <Col width={1} textAlign='right'>
+            <Col width={4} textAlign='right'>
               <IconClick name='database' size={'small'} onClick={() => window?.open(`/dueldata/${bigintToHex(selectedDuelId)}`, '_blank')} />
-            </Col>
-            <Col width={3} textAlign='right'>
-              <AddressShort address={selectedDuelId} />
             </Col>
           </Row>
         </Grid>
