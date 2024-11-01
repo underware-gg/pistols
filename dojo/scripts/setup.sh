@@ -43,10 +43,10 @@ export ACCOUNT_ADDRESS=${DOJO_ACCOUNT_ADDRESS:-$(get_profile_env "account_addres
 # use $STARKNET_RPC_URL else read from profile
 export RPC_URL=${STARKNET_RPC_URL:-$(get_profile_env "rpc_url")}
 
-export MANIFEST_FILE_PATH="./manifests/$PROFILE/deployment/manifest.json"
+export MANIFEST_FILE_PATH="./manifest_$PROFILE.json"
 export BINDINGS_PATH="./bindings"
 export CLIENT_GAME_PATH="../client/src/games/$GAME_SLUG"
-export CLIENT_MANIFEST_PATH="$CLIENT_GAME_PATH/manifests/$PROFILE"
+export CLIENT_MANIFEST_PATH="$CLIENT_GAME_PATH/manifests"
 
 # contracts
 export ADMIN_ADDRESS=$(get_contract_address "pistols-admin")

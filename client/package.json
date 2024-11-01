@@ -10,7 +10,7 @@
     "build": "npx tsc -p tsconfig.json && NODE_OPTIONS='--experimental-wasm-modules' next build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "print-profile": "echo usage: npm run print-profile --profile=dev && echo \"profile:[$npm_config_profile]\"",
-    "create-components": "GAME_PATH=\"./src/games/$npm_config_game\" && echo create-components:[$GAME_PATH] && npx @dojoengine/core $GAME_PATH/manifests/$npm_config_profile/manifest.json $GAME_PATH/generated/contractComponents.ts",
+    "create-components": "GAME_PATH=\"./src/games/$npm_config_game\" && echo create-components:[$GAME_PATH] && npx @dojoengine/core $GAME_PATH/manifests/manifest_$npm_config_profile.json $GAME_PATH/generated/contractComponents.ts",
     "create-constants": "GAME_PATH=\"./src/games/$npm_config_game\" && echo create-constants:[$GAME_PATH] && ./src/lib/bin/generateConstants.cjs ../dojo/src $GAME_PATH/generated/constants.ts"
   },
   "dependencies": {

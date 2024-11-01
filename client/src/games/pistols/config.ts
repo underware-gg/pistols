@@ -1,9 +1,9 @@
 import { DojoAppConfig, DojoManifest } from '@/lib/dojo/Dojo'
 import { ChainId, defaultChainId } from '@/lib/dojo/setup/chainConfig'
-import pistols_manifest_dev from './manifests/dev/manifest.json'
-import pistols_manifest_slot from './manifests/slot/manifest.json'
-import pistols_manifest_staging from './manifests/staging/manifest.json'
-import pistols_manifest_sepolia from './manifests/sepolia/manifest.json'
+import pistols_manifest_dev from './manifests/manifest_dev.json'
+import pistols_manifest_slot from './manifests/manifest_slot.json'
+import pistols_manifest_staging from './manifests/manifest_staging.json'
+import pistols_manifest_sepolia from './manifests/manifest_sepolia.json'
 
 // TODO: move this here!
 // import { defineContractComponents } from './generated/contractComponents'
