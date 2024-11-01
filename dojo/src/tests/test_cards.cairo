@@ -4,12 +4,12 @@ mod tests {
     use core::traits::{TryInto, Into};
     use starknet::{ContractAddress};
 
-    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::world::{WorldStorage};
 
     use pistols::systems::rng::{Dice, DiceTrait};
     use pistols::systems::game::{game, IGameDispatcher, IGameDispatcherTrait};
-    use pistols::models::challenge::{Challenge, ChallengeEntity, Round, RoundEntity, Moves, MovesTrait, DuelistState, DuelistStateTrait};
-    use pistols::models::duelist::{Duelist, DuelistEntity, DuelistEntityStore, ProfilePicType, Archetype};
+    use pistols::models::challenge::{Challenge, ChallengeValue, Round, RoundValue, Moves, MovesTrait, DuelistState, DuelistStateTrait};
+    use pistols::models::duelist::{Duelist, DuelistValue, ProfilePicType, Archetype};
     use pistols::models::table::{TableConfig, TABLES};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::duel_progress::{DuelProgress, DuelStep, DuelistDrawnCard};
@@ -29,7 +29,7 @@ mod tests {
     use pistols::tests::mock_rng::{IRngDispatcher, IRngDispatcherTrait};
     use pistols::tests::tester::{tester,
         tester::{
-            Systems,
+            TestSystems,
             FLAGS, ID, ZERO,
             OWNER, OTHER, BUMMER, TREASURY,
             BIG_BOY, LITTLE_BOY, LITTLE_GIRL,
@@ -52,7 +52,7 @@ mod tests {
     // simple test to make sure main game_loop() works
     #[test]
     fn test_game_loop() {
-        let sys = tester::setup_world(FLAGS::GAME | FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::MOCK_RNG);
         let (salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         let duel_id = prefabs::start_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         let (challenge, round) = prefabs::commit_reveal_get(sys, duel_id, OWNER(), OTHER(), salts, moves_a, moves_b);
@@ -70,7 +70,7 @@ mod tests {
     // game_loop
     //
 
-    fn execute_game_loop(sys: Systems, moves_a: Span<u8>, moves_b: Span<u8>, shuffle: bool) -> (Round, DuelProgress) {
+    fn execute_game_loop(sys: TestSystems, moves_a: Span<u8>, moves_b: Span<u8>, shuffle: bool) -> (Round, DuelProgress) {
         if (!shuffle) {
             sys.rng.mock_values(
                 ['env_1', 'env_2', 'env_3', 'env_4', 'env_5', 'env_6', 'env_7', 'env_8', 'env_9', 'env_10'].span(),
@@ -93,7 +93,7 @@ mod tests {
         round.moves_b.initialize(SALT_B, moves_b);
         round.state_a.initialize(hand_a);
         round.state_b.initialize(hand_b);
-        let progress: DuelProgress = game_loop(sys.world, DeckType::Classic, ref round);
+        let progress: DuelProgress = game_loop(@sys.world, DeckType::Classic, ref round);
         (round, progress)
     }
 
@@ -111,7 +111,7 @@ mod tests {
 
     #[test]
     fn test_hand_progress() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (salts, _moves_a, _moves_b) = prefabs::get_moves_dual_miss();
         sys.rng.mock_values(salts.salts, salts.values);
         let moves_a: Span<u8> = [5, 6, 1, BLADES_CARDS::Grapple].span();
@@ -193,7 +193,7 @@ mod tests {
 
     #[test]
     fn test_fire_no_dodge() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (salts, _moves_a, _moves_b) = prefabs::get_moves_dual_miss();
         sys.rng.mock_values(salts.salts, salts.values);
         let (round, progress) = execute_game_loop(sys,
@@ -234,7 +234,7 @@ mod tests {
 
     #[test]
     fn test_chances_tactics_vengeful_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::Vengeful.into()].span(),
             [1, 2, 0].span(),
@@ -257,7 +257,7 @@ mod tests {
     }
     #[test]
     fn test_chances_tactics_vengeful_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::Vengeful.into()].span(),
@@ -273,7 +273,7 @@ mod tests {
 
     #[test]
     fn test_chances_tactics_thick_coat_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::ThickCoat.into()].span(),
             [1, 2, 0].span(),
@@ -287,7 +287,7 @@ mod tests {
     }
     #[test]
     fn test_chances_tactics_thick_coat_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::ThickCoat.into()].span(),
@@ -302,7 +302,7 @@ mod tests {
 
     #[test]
     fn test_chances_tactics_vengeful_thick_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::Vengeful.into()].span(),
             [1, 2, TacticsCard::ThickCoat.into()].span(),
@@ -317,7 +317,7 @@ mod tests {
     }
     #[test]
     fn test_chances_tactics_vengeful_thick_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::ThickCoat.into()].span(),
             [1, 2, TacticsCard::Vengeful.into()].span(),
@@ -333,7 +333,7 @@ mod tests {
 
     #[test]
     fn test_chances_tactics_insult_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::Insult.into()].span(),
             [1, 2, 0].span(),
@@ -348,7 +348,7 @@ mod tests {
     }
     #[test]
     fn test_chances_tactics_insult_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::Insult.into()].span(),
@@ -364,7 +364,7 @@ mod tests {
 
     #[test]
     fn test_chances_tactics_bananas_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::Bananas.into()].span(),
             [1, 2, 0].span(),
@@ -378,7 +378,7 @@ mod tests {
     }
     #[test]
     fn test_chances_tactics_bananas_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::Bananas.into()].span(),
@@ -392,7 +392,7 @@ mod tests {
     }
     #[test]
     fn test_chances_tactics_bananas_ab() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::Bananas.into()].span(),
             [1, 2, TacticsCard::Bananas.into()].span(),
@@ -407,7 +407,7 @@ mod tests {
 
     #[test]
     fn test_chances_tactics_coin_toss_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::CoinToss.into()].span(),
             [1, 2, 0].span(),
@@ -421,7 +421,7 @@ mod tests {
     }
     #[test]
     fn test_chances_tactics_coin_toss_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::CoinToss.into()].span(),
@@ -436,7 +436,7 @@ mod tests {
 
     #[test]
     fn test_chances_tactics_reversal_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::Reversal.into()].span(),
             [1, 2, 0].span(),
@@ -450,7 +450,7 @@ mod tests {
     }
     #[test]
     fn test_chances_tactics_reversal_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::Reversal.into()].span(),
@@ -477,7 +477,7 @@ mod tests {
 
     #[test]
     fn test_blades_seppukku_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Seppuku.into()].span(),
             [1, 2, 0, 0].span(),
@@ -499,7 +499,7 @@ mod tests {
     }
     #[test]
     fn test_blades_seppukku_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, 0].span(),
             [1, 2, 0, BladesCard::Seppuku.into()].span(),
@@ -521,7 +521,7 @@ mod tests {
     }
     #[test]
     fn test_blades_seppukku_draw() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Seppuku.into()].span(),
             [1, 2, 0, BladesCard::Seppuku.into()].span(),
@@ -544,7 +544,7 @@ mod tests {
     }
     #[test]
     fn test_blades_seppukku_other() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Seppuku.into()].span(),
             [1, 2, 0, BladesCard::Behead.into()].span(),
@@ -564,7 +564,7 @@ mod tests {
 
     #[test]
     fn test_blades_pocket_pistol_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
             [1, 2, 0, 0].span(),
@@ -583,7 +583,7 @@ mod tests {
     }
     #[test]
     fn test_blades_pocket_pistol_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, 0].span(),
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
@@ -602,7 +602,7 @@ mod tests {
 
     #[test]
     fn test_blades_behead_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Behead.into()].span(),
             [1, 2, 0, 0].span(),
@@ -620,7 +620,7 @@ mod tests {
     }
     #[test]
     fn test_blades_behead_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, 0].span(),
             [1, 2, 0, BladesCard::Behead.into()].span(),
@@ -639,7 +639,7 @@ mod tests {
 
     #[test]
     fn test_blades_grapple_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Grapple.into()].span(),
             [1, 2, 0, 0].span(),
@@ -657,7 +657,7 @@ mod tests {
     }
     #[test]
     fn test_blades_grapple_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, 0].span(),
             [1, 2, 0, BladesCard::Grapple.into()].span(),
@@ -681,7 +681,7 @@ mod tests {
 
     #[test]
     fn test_blades_pocket_pistol_vs_pocket_pistol() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
@@ -694,7 +694,7 @@ mod tests {
     }
     #[test]
     fn test_blades_behead_vs_behead() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Behead.into()].span(),
             [1, 2, 0, BladesCard::Behead.into()].span(),
@@ -707,7 +707,7 @@ mod tests {
     }
     #[test]
     fn test_blades_grapple_vs_grapple() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Grapple.into()].span(),
             [1, 2, 0, BladesCard::Grapple.into()].span(),
@@ -727,7 +727,7 @@ mod tests {
     // PocketPistol beats Behead
     #[test]
     fn test_blades_pocket_pistol_vs_behead() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
             [1, 2, 0, BladesCard::Behead.into()].span(),
@@ -740,7 +740,7 @@ mod tests {
     }
     #[test]
     fn test_blades_behead_vs_pocket_pistol() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Behead.into()].span(),
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
@@ -755,7 +755,7 @@ mod tests {
     // Behead beats Grapple
     #[test]
     fn test_blades_behead_vs_grapple() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Behead.into()].span(),
             [1, 2, 0, BladesCard::Grapple.into()].span(),
@@ -768,7 +768,7 @@ mod tests {
     }
     #[test]
     fn test_blades_grapple_vs_behead() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Grapple.into()].span(),
             [1, 2, 0, BladesCard::Behead.into()].span(),
@@ -783,7 +783,7 @@ mod tests {
     // Grapple beats PocketPistol
     #[test]
     fn test_blades_grapple_vs_pocket_pistol() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Grapple.into()].span(),
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
@@ -796,7 +796,7 @@ mod tests {
     }
     #[test]
     fn test_blades_pocket_pistol_vs_grapple() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
             [1, 2, 0, BladesCard::Grapple.into()].span(),

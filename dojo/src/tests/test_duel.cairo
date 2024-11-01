@@ -4,10 +4,10 @@ mod tests {
     use core::traits::{TryInto, Into};
     use starknet::{ContractAddress};
 
-    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::world::{WorldStorage};
 
-    use pistols::models::challenge::{Challenge, ChallengeEntity, Round, RoundEntity};
-    use pistols::models::duelist::{Duelist, DuelistEntity, DuelistEntityStore, ProfilePicType, Archetype};
+    use pistols::models::challenge::{Challenge, ChallengeValue, Round, RoundValue};
+    use pistols::models::duelist::{Duelist, DuelistValue, ProfilePicType, Archetype};
     use pistols::models::table::{TableConfig, TABLES};
     use pistols::types::cards::hand::{PacesCard, PacesCardTrait};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
@@ -22,7 +22,7 @@ mod tests {
     use pistols::systems::tokens::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
     use pistols::tests::tester::{tester,
         tester::{
-            Systems,
+            TestSystems,
             IGameDispatcher, IGameDispatcherTrait,
             IDuelTokenDispatcher, IDuelTokenDispatcherTrait,
             IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
@@ -49,9 +49,9 @@ mod tests {
     // Single Round Draw (paces only)
     //
 
-    fn _assert_duel_progress(sys: Systems, duel_id: u128, moves_a: Span<u8>, moves_b: Span<u8>) {
-        let challenge: ChallengeEntity = tester::get_ChallengeEntity(sys.world, duel_id);
-        let round: RoundEntity = tester::get_RoundEntity(sys.world, duel_id);
+    fn _assert_duel_progress(sys: TestSystems, duel_id: u128, moves_a: Span<u8>, moves_b: Span<u8>) {
+        let challenge: ChallengeValue = tester::get_ChallengeValue(sys.world, duel_id);
+        let round: RoundValue = tester::get_RoundValue(sys.world, duel_id);
         let progress: DuelProgress = sys.game.get_duel_progress(duel_id);
         let final_step: DuelStep = *progress.steps[progress.steps.len() - 1];
         assert(progress.winner == challenge.winner, 'winner');
@@ -87,7 +87,7 @@ mod tests {
 
 
     fn _test_resolved_draw(salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves, final_health: u8) {
-        let sys = tester::setup_world(FLAGS::GAME | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         sys.rng.mock_values(salts.salts, salts.values);
 
         let table_id: felt252 = TABLES::LORDS;
@@ -126,8 +126,8 @@ mod tests {
             _assert_is_alive(round.state_b, 'alive_b');
         }
 
-        let duelist_a = tester::get_DuelistEntity(sys.world, OWNER());
-        let duelist_b = tester::get_DuelistEntity(sys.world, OTHER());
+        let duelist_a = tester::get_DuelistValue(sys.world, OWNER());
+        let duelist_b = tester::get_DuelistValue(sys.world, OTHER());
         assert(duelist_a.score.total_duels == 1, 'duelist_a.total_duels');
         assert(duelist_b.score.total_duels == 1, 'duelist_b.total_duels');
         assert(duelist_a.score.total_draws == 1, 'duelist_a.total_draws');
@@ -183,7 +183,7 @@ mod tests {
     //
 
     fn _test_resolved_win(salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves, winner: u8) {
-        let sys = tester::setup_world(FLAGS::GAME | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         sys.rng.mock_values(salts.salts, salts.values);
 
         let table_id: felt252 = TABLES::LORDS;
@@ -245,8 +245,8 @@ mod tests {
         let final_blow: PacesCard = (if(winner == 1){*moves_a.moves[0]}else{*moves_b.moves[0]}.into());
         assert(round.final_blow == final_blow.variant_name(), 'round.final_blow');
 
-        let duelist_a = tester::get_DuelistEntity(sys.world, OWNER());
-        let duelist_b = tester::get_DuelistEntity(sys.world, OTHER());
+        let duelist_a = tester::get_DuelistValue(sys.world, OWNER());
+        let duelist_b = tester::get_DuelistValue(sys.world, OTHER());
         assert(duelist_a.score.total_duels == 1, 'duelist_a.total_duels');
         assert(duelist_b.score.total_duels == 1, 'duelist_b.total_duels');
         assert(duelist_a.score.total_draws == 0, 'duelist_a.total_draws');
@@ -303,8 +303,8 @@ mod tests {
         assert(challenge.winner != 0, 'challenge.winner ++');
         assert(challenge.timestamp_end > 0, 'challenge.timestamp_end ++');
         assert(round.state == RoundState::Finished, 'state ++');
-        let duelist_a = tester::get_DuelistEntity(sys.world, OWNER());
-        let duelist_b = tester::get_DuelistEntity(sys.world, OTHER());
+        let duelist_a = tester::get_DuelistValue(sys.world, OWNER());
+        let duelist_b = tester::get_DuelistValue(sys.world, OTHER());
         assert(duelist_a.score.total_duels == 2, 'duelist_a.total_duels ++');
         assert(duelist_b.score.total_duels == 2, 'duelist_b.total_duels ++');
         assert(duelist_a.score.total_draws == 0, 'duelist_a.total_draws ++');
@@ -353,7 +353,7 @@ mod tests {
 
     #[test]
     fn test_commit_transferred_duelist_new_owner_a() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         assert(challenge.address_a == OWNER(), 'challenge.address_a');
         assert(challenge.address_b == OTHER(), 'challenge.address_b');
@@ -362,14 +362,14 @@ mod tests {
         sys.duelists.transfer_from(OWNER(), BUMMER(), ID(OWNER()).into());
         tester::execute_commit_moves_ID(@sys.game, BUMMER(), ID(OWNER()).into(), duel_id, moves_a.hashed);
         // no panic
-        let challenge: ChallengeEntity = tester::get_ChallengeEntity(sys.world, duel_id);
+        let challenge: ChallengeValue = tester::get_ChallengeValue(sys.world, duel_id);
         assert(challenge.address_a == BUMMER(), 'challenge.address_a_comitted');
         assert(challenge.address_b == OTHER(), 'challenge.address_b');
     }
 
     #[test]
     fn test_commit_transferred_duelist_new_owner_b() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         assert(challenge.address_a == OWNER(), 'challenge.address_a');
         assert(challenge.address_b == OTHER(), 'challenge.address_b');
@@ -379,7 +379,7 @@ mod tests {
         sys.duelists.transfer_from(OTHER(), BUMMER(), ID(OTHER()).into());
         tester::execute_commit_moves_ID(@sys.game, BUMMER(), ID(OTHER()).into(), duel_id, moves_b.hashed);
         // no panic
-        let challenge: ChallengeEntity = tester::get_ChallengeEntity(sys.world, duel_id);
+        let challenge: ChallengeValue = tester::get_ChallengeValue(sys.world, duel_id);
         assert(challenge.address_a == OWNER(), 'challenge.address_a');
         assert(challenge.address_b == BUMMER(), 'challenge.address_b_comitted');
     }
@@ -387,7 +387,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Not your duelist', 'ENTRYPOINT_FAILED'))]
     fn test_commit_transferred_duelist_old_owner_a() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         // try to commmit with another account
         let (_salts, moves_a, _moves_b) = prefabs::get_moves_dual_crit();
@@ -398,7 +398,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Not your duelist', 'ENTRYPOINT_FAILED'))]
     fn test_commit_transferred_duelist_old_owner_b() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         // try to commmit with another account
         let (_salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
@@ -414,7 +414,7 @@ mod tests {
 
     #[test]
     fn test_commit_before_reply_a() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), MESSAGE, TABLES::COMMONERS, 48);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, 0x1212112);
         // no panic
@@ -423,7 +423,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Challenge not ongoing', 'ENTRYPOINT_FAILED'))]
     fn test_commit_before_reply_b() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), MESSAGE, TABLES::COMMONERS, 48);
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, 0x1212112);
     }
@@ -431,7 +431,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Not your duel', 'ENTRYPOINT_FAILED'))]
     fn test_commit_wrong_player_to_duelist() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         // try to commmit with another account
         let someone_else: ContractAddress = starknet::contract_address_const::<0x999>();
@@ -442,7 +442,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Not your duelist', 'ENTRYPOINT_FAILED'))]
     fn test_commit_wrong_player_to_address() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         // try to commmit with another account
         let hashed: u128 = make_moves_hash(0x12121, [1, 1].span());
@@ -452,7 +452,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Already committed', 'ENTRYPOINT_FAILED'))]
     fn test_commit_already_commit_a() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         let hashed: u128 = make_moves_hash(0x12121, [1, 1].span());
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, hashed);
@@ -461,7 +461,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Already committed', 'ENTRYPOINT_FAILED'))]
     fn test_commit_already_commit_b() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         let hashed: u128 = make_moves_hash(0x12121, [1, 1].span());
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, hashed);
@@ -471,7 +471,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Already revealed', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_already_revealed_a() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
@@ -482,7 +482,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Already revealed', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_already_revealed_b() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
@@ -494,7 +494,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Round not in commit', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_not_in_commit() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
@@ -505,7 +505,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Round not in reveal', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_not_in_revea_a() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         let (_salts, moves_a, _moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
@@ -515,7 +515,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Round not in reveal', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_not_in_revea_b() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         let (_salts, _moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
@@ -525,7 +525,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Invalid salt', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_challenge_invalid_salt() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
@@ -536,7 +536,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Challenge not ongoing', 'ENTRYPOINT_FAILED'))]
     fn test_commit_challenge_finished_commit() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
@@ -549,7 +549,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Challenge not ongoing', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_challenge_finished_reveal() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
@@ -562,7 +562,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Moves hash mismatch', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_invalid_hash_salt_a() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_a.hashed);
@@ -573,7 +573,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Moves hash mismatch', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_invalid_hash_salt_b() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_a.hashed);
@@ -584,7 +584,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Moves hash mismatch', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_invalid_hash_moves_a() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_a.hashed);
@@ -594,7 +594,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Moves hash mismatch', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_invalid_hash_move_b() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_a.hashed);
@@ -605,7 +605,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Invalid moves count', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_invalid_moves_count_0() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_custom([1].span(), [1].span());
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_a.hashed);
@@ -616,7 +616,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Invalid moves count', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_invalid_moves_count_1() {
-        let sys = tester::setup_world(FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_custom([1,1].span(), [1,1].span());
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_a.hashed);

@@ -151,11 +151,11 @@ mod tests {
 
     use pistols::models::challenge::{ChallengeValue};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
-    use pistols::tests::tester::{tester, tester::{FLAGS}};
+    use pistols::tests::tester::{tester, tester::{TestSystems, FLAGS}};
 
     #[test]
     fn test_challenge_exists() {
-        let sys = tester::setup_world(FLAGS::APPROVE);
+        let sys: TestSystems = tester::setup_world(FLAGS::APPROVE);
         // get some random inexisting challenge
         let ch: ChallengeValue = tester::get_ChallengeValue(sys.world, 0x682137812638127638127);
         let state: ChallengeState = ch.state.try_into().unwrap();

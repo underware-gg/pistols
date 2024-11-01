@@ -10,11 +10,11 @@ mod tests {
 
     use pistols::systems::rng::{Dice, DiceTrait};
     use pistols::tests::mock_rng::{IRngDispatcher, IRngDispatcherTrait};
-    use pistols::tests::tester::{tester, tester::{FLAGS}};
+    use pistols::tests::tester::{tester, tester::{TestSystems, FLAGS}};
 
     #[test]
     fn test_rng() {
-        let sys = tester::setup_world(0);
+        let mut sys: TestSystems = tester::setup_world(0);
         let mut dice: Dice = DiceTrait::new(@sys.world, 0x1212121212, 34);
         let r1 = dice.throw('salt_1', 100);
         let r2 = dice.throw('salt_1', 100);
@@ -28,7 +28,7 @@ mod tests {
 
     #[test]
     fn test_mock_rng() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let mut dice: Dice = DiceTrait::new(@sys.world, 0x1212121212, 34);
         sys.rng.mock_values(
             ['dice_1', 'dice_2', 'dice_3', 'shuffle_1', 'shuffle_2', 'shuffle_3'].span(),
@@ -50,7 +50,7 @@ mod tests {
 
     #[test]
     fn test_check_dice_average() {
-        let sys = tester::setup_world(0);
+        let mut sys: TestSystems = tester::setup_world(0);
         let mut dice: Dice = DiceTrait::new(@sys.world, 0x1212121212, 34);
         // lower limit
         let mut counter: u8 = 0;
@@ -78,7 +78,7 @@ mod tests {
 
     #[test]
     fn test_check_dice_edges() {
-        let sys = tester::setup_world(0);
+        let mut sys: TestSystems = tester::setup_world(0);
         let mut dice: Dice = DiceTrait::new(@sys.world, 0x1212121212, 34);
         let mut index: usize = 0;
         while (index < 20) {

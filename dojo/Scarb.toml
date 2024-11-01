@@ -20,6 +20,7 @@ openzeppelin_token = { git = "https://github.com/underware-gg/cairo-contracts", 
 # openzeppelin_token = { path = "../../cairo-contracts" }
 
 [dev-dependencies]
+dojo_cairo_test = { git = "https://github.com/dojoengine/dojo.git", tag = "v1.0.0-rc.0" }
 openzeppelin_test_common = { git = "https://github.com/underware-gg/cairo-contracts", branch = "pistols" }
 # openzeppelin_test_common = { path = "../../cairo-contracts" }
 

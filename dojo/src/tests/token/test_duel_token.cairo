@@ -1,8 +1,8 @@
 use debug::PrintTrait;
 use starknet::{ContractAddress, get_contract_address, get_caller_address, testing};
-use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-use dojo::model::{Model, ModelTest, ModelIndex, ModelEntityTest};
-use dojo::utils::test::spawn_test_world;
+use dojo::world::{WorldStorage, WorldStorageTrait};
+use dojo::model::{Model, ModelTest, ModelIndex};
+use dojo_cairo_test::{spawn_test_world, NamespaceDef, TestResource, ContractDefTrait};
 
 use pistols::systems::{
     bank::{bank, IBankDispatcher, IBankDispatcherTrait},
@@ -11,21 +11,47 @@ use pistols::systems::{
         duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
         lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
     },
+    components::{
+        token_bound::{m_TokenBoundAddress, TokenBoundAddress},
+    },
 };
-use pistols::interfaces::systems::{SELECTORS};
 use pistols::models::{
-    challenge::{Challenge, Round},
-    config::{Config, TokenConfig, CONFIG},
-    table::{TableConfig, TableAdmittance, TableInitializer, TableInitializerTrait},
+    challenge::{
+        m_Challenge, Challenge,
+        m_Round, Round,
+    },
+    duelist::{
+        m_Duelist, Duelist,
+        m_Pact, Pact,
+        m_Scoreboard, Scoreboard,
+    },
+    payment::{
+        m_Payment, Payment,
+    },
+    config::{
+        m_Config, Config,
+        m_TokenConfig, TokenConfig,
+        m_CoinConfig, CoinConfig,
+        CONFIG,
+    },
+    table::{
+        m_TableConfig, TableConfig,
+        m_TableAdmittance, TableAdmittance,
+    },
     table::{TABLES, default_tables},
 };
+use pistols::tests::token::mock_duelist::{
+    m_MockDuelistOwners,
+    duelist_token as mock_duelist,
+};
+
+use pistols::interfaces::systems::{SystemsTrait, SELECTORS};
 use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
 use pistols::types::premise::{Premise, PremiseTrait};
 use pistols::types::constants::{CONST};
 use pistols::utils::arrays::{ArrayUtilsTrait, SpanUtilsTrait};
 use pistols::utils::math::{MathTrait};
 
-use pistols::tests::token::mock_duelist::{duelist_token as mock_duelist, mock_duelist_owners};
 use pistols::tests::tester::{tester, tester::{OWNER, OTHER, BUMMER, TREASURY, ZERO}};
 use pistols::tests::{utils};
 
@@ -83,56 +109,87 @@ const TOKEN_ID_2: u256 = 2; // owned by OTHER()
 const TOKEN_ID_3: u256 = 3; // owned by BUMMER()
 const TOKEN_ID_4: u256 = 4; // owned by RECIPIENT()
 
-fn setup_uninitialized(fee_amount: u128) -> (IWorldDispatcher, IDuelTokenDispatcher) {
+fn setup_uninitialized(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher) {
     testing::set_block_number(1);
     testing::set_block_timestamp(1);
 
-    let mut models: Array<felt252> = array![];
-    models.extend_from_span(get_models_test_class_hashes!(["pistols"]));
-    models.extend_from_span([mock_duelist_owners::TEST_CLASS_HASH].span());
-
-    let mut world = spawn_test_world(["pistols"].span(), models.span());
-
-    let mut lords = ILordsMockDispatcher {
-        contract_address: world.deploy_contract('lords_mock', lords_mock::TEST_CLASS_HASH.try_into().unwrap())
+    let ndef = NamespaceDef {
+        namespace: "pistols",
+        resources: [
+            // pistols models
+            TestResource::Model(m_Challenge::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_CoinConfig::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_Config::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_Duelist::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_Pact::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_Payment::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_Round::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_Scoreboard::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_TableAdmittance::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_TableConfig::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_TokenConfig::TEST_CLASS_HASH.try_into().unwrap()),
+            // test models
+            TestResource::Model(m_MockDuelistOwners::TEST_CLASS_HASH.try_into().unwrap()),
+            // events
+            // TestResource::Event(actions::e_Moved::TEST_CLASS_HASH.try_into().unwrap()),
+            //
+            // contracts
+            TestResource::Contract(
+                ContractDefTrait::new(lords_mock::TEST_CLASS_HASH, "lords_mock")
+                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+                    .with_init_calldata([
+                        0, // minter
+                        10_000_000_000_000_000_000_000, // 10,000 Lords
+                    ].span())
+            ),
+            TestResource::Contract(
+                ContractDefTrait::new(mock_duelist::TEST_CLASS_HASH, "duelist_token")
+                    .with_writer_of([
+                        selector_from_tag!("pistols-MockDuelistOwners"),
+                    ].span())
+            ),
+            TestResource::Contract(
+                ContractDefTrait::new(duel_token::TEST_CLASS_HASH, "duel_token")
+                    .with_writer_of([
+                        // same as config
+                        selector_from_tag!("pistols-TokenConfig"),
+                        selector_from_tag!("pistols-Payment"),
+                        selector_from_tag!("pistols-Challenge"),
+                        selector_from_tag!("pistols-Round"),
+                        selector_from_tag!("pistols-Pact"),
+                        selector_from_tag!("pistols-Scoreboard"),
+                    ].span())
+                    .with_init_calldata([
+                        'https://pistols.underware.gg',
+                        0, // minter_address
+                        0, // renderer_address
+                        0, // fee_amount
+                    ].span())
+            ),
+        ].span()
     };
-    world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), lords.contract_address);
-    let call_data: Span<felt252> = array![
-        0, // minter
-        10_000_000_000_000_000_000_000, // 10,000 Lords
-    ].span();
-    world.init_contract(SELECTORS::LORDS_MOCK, call_data);
 
-    let mut duelists_address: ContractAddress = world.deploy_contract('duelist_token', mock_duelist::TEST_CLASS_HASH.try_into().unwrap());
-    world.grant_writer(selector_from_tag!("pistols-MockDuelistOwners"), duelists_address);
-
-    let mut token = IDuelTokenDispatcher {
-        contract_address: world.deploy_contract('duel_token', duel_token::TEST_CLASS_HASH.try_into().unwrap())
-    };
-    world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), token.contract_address);
-    let call_data: Span<felt252> = array![
-        'https://pistols.underware.gg',
-        0, // minter_address
-        0, // renderer_address
-        (fee_amount * CONST::ETH_TO_WEI.low).into(), // fee_amount
-    ].span();
-    world.init_contract(SELECTORS::DUEL_TOKEN, call_data);
+    let mut world: WorldStorage = spawn_test_world([ndef].span());
 
     tester::impersonate(OWNER());
 
-    tester::set_TableConfig(world, *default_tables()[0]);
+    tester::set_TableConfig(ref world, *default_tables()[0]);
 
-    tester::set_Config(world, Config {
+    tester::set_Config(ref world, Config {
         key: CONFIG::CONFIG_KEY,
         treasury_address: TREASURY(),
-        lords_address: lords.contract_address,
+        lords_address: world.lords_mock_address(),
         is_paused: false,
     });
 
-    (world, token)
+    (
+        world,
+        world.duel_token_dispatcher(),
+    )
 }
 
-fn setup(fee_amount: u128) -> (IWorldDispatcher, IDuelTokenDispatcher) {
+fn setup(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher) {
     let (mut world, mut token) = setup_uninitialized(fee_amount);
 
     // initialize contracts
@@ -142,7 +199,7 @@ fn setup(fee_amount: u128) -> (IWorldDispatcher, IDuelTokenDispatcher) {
     tester::impersonate(OWNER());
 
     // drop all events
-    utils::drop_all_events(world.contract_address);
+    utils::drop_all_events(world.dispatcher.contract_address);
     utils::drop_all_events(token.contract_address);
 
     (world, token)
@@ -162,9 +219,9 @@ fn mint(token: IDuelTokenDispatcher, recipient: ContractAddress, duelist_a: u256
 // '---BB'.print();
 }
 
-fn _assert_minted_count(world: IWorldDispatcher, token: IDuelTokenDispatcher, minted_count: u128, msg: felt252) {
+fn _assert_minted_count(world: WorldStorage, token: IDuelTokenDispatcher, minted_count: u128, msg: felt252) {
     // assert(token.total_supply() == minted_count, 'msg);
-    let token_config: TokenConfig = get!(world, token.contract_address, TokenConfig);
+    let token_config: TokenConfig = tester::get_TokenConfig(world, token.contract_address);
     assert(token_config.minted_count == minted_count, msg);
 }
 
@@ -177,11 +234,9 @@ fn test_initializer() {
     let (world, mut token) = setup(100);
     // assert(token.name() == "Pistols at 10 Blocks Duelists", 'Name is wrong');
     assert(token.symbol() == "DUEL", 'Symbol is wrong');
-
     _assert_minted_count(world, token, 2, 'Should eq 2');
     assert(token.balance_of(OWNER()) == 1, 'Should eq 1 (OWNER)');
     assert(token.balance_of(OTHER()) == 1, 'Should eq 1 (OTHER)');
-
     // assert(token.token_of_owner_by_index(OWNER(), 0) == TOKEN_ID_1, 'token_of_owner_by_index_OWNER');
     // assert(token.token_of_owner_by_index(OTHER(), 0) == TOKEN_ID_2, 'token_of_owner_by_index_REC');
 
@@ -237,7 +292,7 @@ fn test_token_uri() {
         timestamp_end:   20000,
     };
 
-    tester::set_Challenge(world, challenge);
+    tester::set_Challenge(ref world, challenge);
 
     let uri_1 = token.token_uri(TOKEN_ID_1);
     let uri_2 = token.token_uri(TOKEN_ID_2);
@@ -272,13 +327,13 @@ fn test_approve() {
     assert(token.get_approved(TOKEN_ID_1) == BUMMER(), 'Spender not approved correctly');
 
     // drop StoreSetRecord ERC721TokenApprovalModel
-    utils::drop_event(world.contract_address);
+    utils::drop_event(world.dispatcher.contract_address);
 
     // TODO: fix events
     // // drop StoreSetRecord ERC721TokenApprovalModel
-    // utils::drop_event(world.contract_address);
+    // utils::drop_event(world.dispatcher.contract_address);
     // assert_only_event_approval(token.contract_address, OWNER(), BUMMER(), TOKEN_ID_1);
-    // assert_only_event_approval(world.contract_address, OWNER(), BUMMER(), TOKEN_ID_1);
+    // assert_only_event_approval(world.dispatcher.contract_address, OWNER(), BUMMER(), TOKEN_ID_1);
 }
 
 //
@@ -293,7 +348,7 @@ fn test_transfer_from() {
     token.approve(BUMMER(), TOKEN_ID_1);
 
     utils::drop_all_events(token.contract_address);
-    utils::drop_all_events(world.contract_address);
+    utils::drop_all_events(world.dispatcher.contract_address);
     utils::assert_no_events_left(token.contract_address);
 
     tester::impersonate(BUMMER());

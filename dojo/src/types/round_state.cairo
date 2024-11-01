@@ -91,16 +91,13 @@ mod tests {
     use debug::PrintTrait;
     use core::traits::Into;
 
-    // use pistols::interfaces::ierc20::{ierc20, ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
-    // use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-
     use pistols::models::challenge::{Round};
     use pistols::types::round_state::{RoundState, RoundStateTrait};
-    use pistols::tests::tester::{tester, tester::{FLAGS}};
+    use pistols::tests::tester::{tester, tester::{TestSystems, FLAGS}};
 
     #[test]
     fn test_round_exists() {
-        let sys = tester::setup_world(FLAGS::APPROVE);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::APPROVE);
         // get some random inexisting round
         let round = tester::get_RoundValue(sys.world, 0x682137812638127638127);
         let state: RoundState = round.state.try_into().unwrap();

@@ -1,8 +1,8 @@
 use debug::PrintTrait;
 use starknet::{ContractAddress, get_contract_address, get_caller_address, testing};
-use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-use dojo::model::{Model, ModelTest, ModelIndex, ModelEntityTest};
-use dojo::utils::test::spawn_test_world;
+use dojo::world::{WorldStorage, WorldStorageTrait};
+use dojo::model::{Model, ModelTest, ModelIndex};
+use dojo_cairo_test::{spawn_test_world, NamespaceDef, TestResource, ContractDefTrait};
 
 use pistols::systems::{
     bank::{bank, IBankDispatcher, IBankDispatcherTrait},
@@ -11,17 +11,43 @@ use pistols::systems::{
         fame_coin::{fame_coin, IFameCoinDispatcher, IFameCoinDispatcherTrait},
         lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
     },
+    components::{
+        token_bound::{m_TokenBoundAddress, TokenBoundAddress},
+    },
 };
 use pistols::models::{
-    duelist::{Duelist, DuelistEntity, DuelistEntityStore, Score, Scoreboard, ProfilePicType, Archetype},
-    challenge::{Challenge, Round},
-    config::{Config, TokenConfig, CONFIG},
-    table::{TableConfig, TableAdmittance},
+    challenge::{
+        m_Challenge, Challenge,
+        m_Round, Round,
+    },
+    duelist::{
+        m_Duelist, Duelist,
+        m_Pact, Pact,
+        m_Scoreboard, Scoreboard,
+        Score, ProfilePicType, Archetype
+    },
+    payment::{
+        m_Payment, Payment,
+    },
+    config::{
+        m_Config, Config,
+        m_TokenConfig, TokenConfig,
+        m_CoinConfig, CoinConfig,
+        CONFIG,
+    },
+    table::{
+        m_TableConfig, TableConfig,
+        m_TableAdmittance, TableAdmittance,
+    },
+    table::{TABLES},
+};
+use pistols::tests::token::mock_duelist::{
+    m_MockDuelistOwners,
+    duelist_token as mock_duelist,
 };
 
-use pistols::models::table::{TABLES};
+use pistols::interfaces::systems::{SystemsTrait, SELECTORS};
 use pistols::types::constants::{CONST, FAME};
-use pistols::interfaces::systems::{SELECTORS};
 use pistols::tests::tester::{tester, tester::{OWNER, OTHER, RECIPIENT, SPENDER, TREASURY, ZERO}};
 use pistols::tests::{utils};
 
@@ -81,75 +107,100 @@ const TOKEN_ID_4: u256 = 4;
 const TOKEN_ID_5: u256 = 5;
 
 #[derive(Copy, Drop)]
-pub struct Systems {
-    world: IWorldDispatcher,
+pub struct TestSystems {
+    world: WorldStorage,
     lords: ILordsMockDispatcher,
     token: IDuelistTokenDispatcher,
     fame: IFameCoinDispatcher,
     bank: IBankDispatcher,
 }
 
-fn setup_uninitialized(fee_amount: u128) -> Systems {
+fn setup_uninitialized(fee_amount: u128) -> TestSystems {
     testing::set_block_number(1);
     testing::set_block_timestamp(1);
-    let mut world = spawn_test_world(
-        ["pistols"].span(),
-        get_models_test_class_hashes!(),
-    );
 
-    let mut lords = ILordsMockDispatcher {
-        contract_address: world.deploy_contract('lords_mock', lords_mock::TEST_CLASS_HASH.try_into().unwrap())
+    let ndef = NamespaceDef {
+        namespace: "pistols",
+        resources: [
+            // pistols models
+            TestResource::Model(m_Challenge::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_CoinConfig::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_Config::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_Duelist::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_Pact::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_Payment::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_Round::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_Scoreboard::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_TableAdmittance::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_TableConfig::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_TokenConfig::TEST_CLASS_HASH.try_into().unwrap()),
+            // test models
+            TestResource::Model(m_MockDuelistOwners::TEST_CLASS_HASH.try_into().unwrap()),
+            // events
+            // TestResource::Event(actions::e_Moved::TEST_CLASS_HASH.try_into().unwrap()),
+            //
+            // contracts
+            TestResource::Contract(
+                ContractDefTrait::new(bank::TEST_CLASS_HASH, "bank")
+                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+            ),
+            TestResource::Contract(
+                ContractDefTrait::new(lords_mock::TEST_CLASS_HASH, "lords_mock")
+                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+                    .with_init_calldata([
+                        0, // minter
+                        10_000_000_000_000_000_000_000, // 10,000 Lords
+                    ].span())
+            ),
+            TestResource::Contract(
+                ContractDefTrait::new(duelist_token::TEST_CLASS_HASH, "duelist_token")
+                    .with_writer_of([
+                        // same as config
+                        selector_from_tag!("pistols-TokenConfig"),
+                        selector_from_tag!("pistols-Payment"),
+                        selector_from_tag!("pistols-Duelist"),
+                    ].span())
+                    .with_init_calldata([
+                        'https://pistols.underware.gg',
+                        0, // minter_address
+                        0, // renderer_address
+                        (fee_amount * CONST::ETH_TO_WEI.low).into(), // fee_amount
+                    ].span())
+            ),
+            TestResource::Contract(
+                ContractDefTrait::new(fame_coin::TEST_CLASS_HASH, "fame_coin")
+                    .with_writer_of([
+                        // same as config
+                        selector_from_tag!("pistols-CoinConfig"),
+                        selector_from_tag!("pistols-TokenBoundAddress"),
+                    ].span())
+            ),
+        ].span()
     };
-    world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), lords.contract_address);
-    let call_data: Span<felt252> = array![
-        0, // minter
-        10_000_000_000_000_000_000_000, // 10,000 Lords
-    ].span();
-    world.init_contract(SELECTORS::LORDS_MOCK, call_data);
 
-    let mut bank: IBankDispatcher = IBankDispatcher {
-        contract_address: if (fee_amount > 0) {
-            let mut bank_address: ContractAddress = world.deploy_contract('bank', bank::TEST_CLASS_HASH.try_into().unwrap());
-            world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), bank_address);
-            (bank_address)
-        } else {ZERO()}
-    };
-
-    let mut token = IDuelistTokenDispatcher {
-        contract_address: world.deploy_contract('duelist_token', duelist_token::TEST_CLASS_HASH.try_into().unwrap())
-    };
-    world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), token.contract_address);
-    let call_data: Span<felt252> = array![
-        'https://pistols.underware.gg',
-        0, // minter_address
-        0, // renderer_address
-        (fee_amount * CONST::ETH_TO_WEI.low).into(), // fee_amount
-    ].span();
-    world.init_contract(SELECTORS::DUELIST_TOKEN, call_data);
-
-    let mut fame = IFameCoinDispatcher {
-        contract_address: world.deploy_contract('fame_coin', fame_coin::TEST_CLASS_HASH.try_into().unwrap())
-    };
-    world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), fame.contract_address);
-    let call_data: Span<felt252> = array![
-        token.contract_address.into(), // minter_address
-    ].span();
-    world.init_contract(SELECTORS::FAME_COIN, call_data);
+    let mut world: WorldStorage = spawn_test_world([ndef].span());
 
     tester::impersonate(OWNER());
 
-    tester::set_Config(world, Config {
+    tester::set_Config(ref world, Config {
         key: CONFIG::CONFIG_KEY,
         treasury_address: TREASURY(),
-        lords_address: lords.contract_address,
+        lords_address: world.lords_mock_address(),
         is_paused: false,
     });
 
-    Systems{ world, lords, token, fame, bank }
+    TestSystems{
+        world,
+        lords: world.lords_mock_dispatcher(),
+        token: world.duelist_token_dispatcher(),
+        fame: world.fame_coin_dispatcher(),
+        bank: world.bank_dispatcher(),
+    }
 }
 
-fn setup(fee_amount: u128) -> Systems {
-    let sys: Systems = setup_uninitialized(fee_amount);
+fn setup(fee_amount: u128) -> TestSystems {
+    let mut sys: TestSystems = setup_uninitialized(fee_amount);
 
     // initialize contracts
     mint(sys.token, OWNER());
@@ -158,7 +209,7 @@ fn setup(fee_amount: u128) -> Systems {
     tester::impersonate(OWNER());
 
     // drop all events
-    utils::drop_all_events(sys.world.contract_address);
+    utils::drop_all_events(sys.world.dispatcher.contract_address);
     utils::drop_all_events(sys.token.contract_address);
 
     (sys)
@@ -173,9 +224,9 @@ fn mint(token: IDuelistTokenDispatcher, recipient: ContractAddress) {
     );
 }
 
-fn _assert_minted_count(world: IWorldDispatcher, token: IDuelistTokenDispatcher, minted_count: u128, msg: felt252) {
+fn _assert_minted_count(world: WorldStorage, token: IDuelistTokenDispatcher, minted_count: u128, msg: felt252) {
     // assert(token.total_supply() == minted_count, 'msg);
-    let token_config: TokenConfig = get!(world, token.contract_address, TokenConfig);
+    let token_config: TokenConfig = tester::get_TokenConfig(world, token.contract_address);
     assert(token_config.minted_count == minted_count, msg);
 }
 
@@ -185,7 +236,7 @@ fn _assert_minted_count(world: IWorldDispatcher, token: IDuelistTokenDispatcher,
 
 #[test]
 fn test_initializer() {
-    let sys: Systems = setup(100);
+    let mut sys: TestSystems = setup(100);
     // assert(sys.token.name() == "Pistols at 10 Blocks Duelists", 'Name is wrong');
     assert(sys.token.symbol() == "DUELIST", 'Symbol is wrong');
 
@@ -217,7 +268,7 @@ fn test_initializer() {
 
 #[test]
 fn test_token_component() {
-    let sys: Systems = setup(100);
+    let mut sys: TestSystems = setup(100);
     // should not panic
     // sys.token.contract_address.print();
     sys.token.owner_of(TOKEN_ID_1);//.print();
@@ -227,7 +278,7 @@ fn test_token_component() {
 
 #[test]
 fn test_token_uri() {
-    let sys: Systems = setup(100);
+    let mut sys: TestSystems = setup(100);
 
     let duelist = Duelist {
         duelist_id: TOKEN_ID_1.low,
@@ -250,8 +301,8 @@ fn test_token_uri() {
         score: duelist.score,
     };
 
-    tester::set_Duelist(sys.world, duelist);
-    tester::set_Scoreboard(sys.world, scoreboard);
+    tester::set_Duelist(ref sys.world, duelist);
+    tester::set_Scoreboard(ref sys.world, scoreboard);
 
     let uri_1 = sys.token.token_uri(TOKEN_ID_1);
     let uri_2 = sys.token.token_uri(TOKEN_ID_2);
@@ -267,7 +318,7 @@ fn test_token_uri() {
 #[test]
 #[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))]
 fn test_token_uri_invalid() {
-    let sys: Systems = setup(100);
+    let mut sys: TestSystems = setup(100);
     sys.token.token_uri(999);
 }
 
@@ -278,7 +329,7 @@ fn test_token_uri_invalid() {
 
 #[test]
 fn test_approve() {
-    let sys: Systems = setup(100);
+    let mut sys: TestSystems = setup(100);
 
     utils::impersonate(OWNER());
 
@@ -286,13 +337,13 @@ fn test_approve() {
     assert(sys.token.get_approved(TOKEN_ID_1) == SPENDER(), 'Spender not approved correctly');
 
     // drop StoreSetRecord ERC721TokenApprovalModel
-    utils::drop_event(sys.world.contract_address);
+    utils::drop_event(sys.world.dispatcher.contract_address);
 
     // TODO: fix events
     // // drop StoreSetRecord ERC721TokenApprovalModel
-    // utils::drop_event(sys.world.contract_address);
+    // utils::drop_event(sys.world.dispatcher.contract_address);
     // assert_only_event_approval(sys.token.contract_address, OWNER(), SPENDER(), TOKEN_ID_1);
-    // assert_only_event_approval(sys.world.contract_address, OWNER(), SPENDER(), TOKEN_ID_1);
+    // assert_only_event_approval(sys.world.dispatcher.contract_address, OWNER(), SPENDER(), TOKEN_ID_1);
 }
 
 //
@@ -301,13 +352,13 @@ fn test_approve() {
 
 #[test]
 fn test_transfer_from() {
-    let sys: Systems = setup(100);
+    let mut sys: TestSystems = setup(100);
 
     tester::impersonate(OWNER());
     sys.token.approve(SPENDER(), TOKEN_ID_1);
 
     utils::drop_all_events(sys.token.contract_address);
-    utils::drop_all_events(sys.world.contract_address);
+    utils::drop_all_events(sys.world.dispatcher.contract_address);
     utils::assert_no_events_left(sys.token.contract_address);
 
     tester::impersonate(SPENDER());
@@ -327,7 +378,7 @@ fn test_transfer_from() {
 #[test]
 #[should_panic(expected: ('ERC721: unauthorized caller', 'ENTRYPOINT_FAILED'))]
 fn test_mint_no_allowance() {
-    let sys: Systems = setup(100);
+    let mut sys: TestSystems = setup(100);
     utils::impersonate(SPENDER());
     sys.token.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
 }
@@ -338,7 +389,7 @@ fn test_mint_no_allowance() {
 
 #[test]
 fn test_mint_free() {
-    let sys: Systems = setup(0);
+    let mut sys: TestSystems = setup(0);
     _assert_minted_count(sys.world, sys.token, 2, 'invalid total_supply init');
     assert(sys.token.balance_of(OTHER()) == 1, 'invalid balance_of');
     // assert(sys.token.token_of_owner_by_index(OTHER(), 0) == TOKEN_ID_2, 'token_of_owner_by_index_2');
@@ -353,14 +404,14 @@ fn test_mint_free() {
 #[test]
 #[should_panic(expected: ('BANK: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_lords_no_allowance_zero() {
-    let sys: Systems = setup(100);
+    let mut sys: TestSystems = setup(100);
     mint(sys.token, OTHER());
 }
 
 #[test]
 #[should_panic(expected: ('BANK: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_lords_no_allowance_half() {
-    let sys: Systems = setup(100);
+    let mut sys: TestSystems = setup(100);
     let price: u128 = sys.token.calc_fee(OTHER());
     tester::execute_lords_approve(@sys.lords, OTHER(), sys.bank.contract_address, price / 2);
     mint(sys.token, OTHER());
@@ -369,7 +420,7 @@ fn test_mint_lords_no_allowance_half() {
 #[test]
 #[should_panic(expected: ('BANK: insufficient balance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_lords_no_balance_zero() {
-    let sys: Systems = setup(100);
+    let mut sys: TestSystems = setup(100);
     let price: u128 = sys.token.calc_fee(OTHER());
     tester::execute_lords_approve(@sys.lords, OTHER(), sys.bank.contract_address, price);
     mint(sys.token, OTHER());
@@ -377,7 +428,7 @@ fn test_mint_lords_no_balance_zero() {
 
 #[test]
 fn test_mint_lords_ok() {
-    let sys: Systems = setup(100);
+    let mut sys: TestSystems = setup(100);
     _assert_minted_count(sys.world, sys.token, 2, 'invalid total_supply init');
     let price: u128 = sys.token.calc_fee(OTHER());
     assert(price > 0, 'invalid price');
@@ -395,7 +446,7 @@ fn test_mint_lords_ok() {
 #[test]
 #[should_panic(expected: ('DUELIST: Not implemented', 'ENTRYPOINT_FAILED'))]
 fn test_burn() {
-    let sys: Systems = setup(100);
+    let mut sys: TestSystems = setup(100);
     _assert_minted_count(sys.world, sys.token, 2, 'invalid total_supply init');
     assert(sys.token.balance_of(OWNER()) == 1, 'invalid balance_of (1)');
     sys.token.delete_duelist(TOKEN_ID_1.low);
@@ -410,7 +461,7 @@ fn test_burn() {
 
 #[test]
 fn test_fame() {
-    let sys: Systems = setup(0);
+    let mut sys: TestSystems = setup(0);
 
     // validate token_bound address
     let token_bound_address_1: ContractAddress = sys.fame.address_of_token(sys.token.contract_address, TOKEN_ID_1.low);
@@ -471,7 +522,7 @@ fn test_fame() {
 
 #[test]
 fn test_fame_transfer() {
-    let sys: Systems = setup(0);
+    let mut sys: TestSystems = setup(0);
     let balance_1_initial: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_1.low);
     let balance_2_initial: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_2.low);
     let token_bound_address_1: ContractAddress = sys.fame.address_of_token(sys.token.contract_address, TOKEN_ID_1.low);
@@ -513,7 +564,7 @@ fn test_fame_transfer() {
 #[test]
 #[should_panic(expected: ('ERC20: insufficient allowance', 'ENTRYPOINT_FAILED'))]
 fn test_fame_transfer_between_owners_not_allowed() {
-    let sys: Systems = setup(0);
+    let mut sys: TestSystems = setup(0);
     // transfer FAME
     tester::impersonate(sys.token.contract_address);
     sys.fame.transfer_from(OWNER(), OTHER(), FAME::MINT_GRANT_AMOUNT / 2);
@@ -522,7 +573,7 @@ fn test_fame_transfer_between_owners_not_allowed() {
 #[test]
 #[should_panic(expected: ('COIN: caller is not minter', 'ENTRYPOINT_FAILED'))]
 fn test_fame_transfer_from_owner_not_allowed() {
-    let sys: Systems = setup(0);
+    let mut sys: TestSystems = setup(0);
     // transfer FAME
     tester::impersonate(OWNER());
     sys.fame.transfer(OTHER(), FAME::MINT_GRANT_AMOUNT / 2);
@@ -531,21 +582,21 @@ fn test_fame_transfer_from_owner_not_allowed() {
 #[test]
 #[should_panic(expected: ('COIN: caller is not minter', 'ENTRYPOINT_FAILED'))]
 fn test_fame_mint_not_minter() {
-    let sys: Systems = setup(0);
+    let mut sys: TestSystems = setup(0);
     sys.fame.minted_duelist(TOKEN_ID_3.low, 0);
 }
 
 #[test]
 #[should_panic(expected: ('COIN: caller is not minter', 'ENTRYPOINT_FAILED'))]
 fn test_fame_update_not_minter() {
-    let sys: Systems = setup(0);
+    let mut sys: TestSystems = setup(0);
     sys.fame.updated_duelist(OWNER(), OTHER(), TOKEN_ID_1.low);
 }
 
 #[test]
 #[should_panic(expected: ('TOKEN_BOUND: already registered', 'ENTRYPOINT_FAILED'))]
 fn test_fame_mint_already_registered() {
-    let sys: Systems = setup(0);
+    let mut sys: TestSystems = setup(0);
     utils::impersonate(sys.token.contract_address);
     sys.fame.minted_duelist(TOKEN_ID_1.low, 0);
 }

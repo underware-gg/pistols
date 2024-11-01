@@ -4,9 +4,9 @@ mod prefabs {
     use core::traits::{TryInto, Into};
     use starknet::{ContractAddress};
 
-    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::world::{WorldStorage};
 
-    use pistols::models::challenge::{Challenge, ChallengeEntity, Round, RoundEntity};
+    use pistols::models::challenge::{Challenge, ChallengeValue, Round, RoundValue};
     use pistols::models::table::{TableConfig, TABLES};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::duel_progress::{DuelProgress, DuelStep};
@@ -17,7 +17,7 @@ mod prefabs {
     use pistols::utils::math::{MathTrait};
     use pistols::tests::tester::{tester,
         tester::{
-            Systems,
+            TestSystems,
             FLAGS, ID, ZERO,
             OWNER, OTHER, BUMMER, TREASURY,
             BIG_BOY, LITTLE_BOY, LITTLE_GIRL,
@@ -74,7 +74,7 @@ mod prefabs {
     }
 
 
-    fn start_new_challenge(sys: Systems, duelist_a: ContractAddress, duelist_b: ContractAddress, table_id: felt252) -> u128 {
+    fn start_new_challenge(sys: TestSystems, duelist_a: ContractAddress, duelist_b: ContractAddress, table_id: felt252) -> u128 {
         // tester::execute_update_duelist(game, duelist_a, NAME_A, ProfilePicType::Duelist, "1");
         // tester::execute_update_duelist(game, duelist_b, NAME_B, ProfilePicType::Duelist, "2");
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, duelist_a, duelist_b, MESSAGE, table_id, 48);
@@ -83,16 +83,16 @@ mod prefabs {
         (duel_id)
     }
 
-    fn start_get_new_challenge(sys: Systems, duelist_a: ContractAddress, duelist_b: ContractAddress, table_id: felt252) -> (ChallengeEntity, RoundEntity, u128) {
+    fn start_get_new_challenge(sys: TestSystems, duelist_a: ContractAddress, duelist_b: ContractAddress, table_id: felt252) -> (ChallengeValue, RoundValue, u128) {
         let duel_id: u128 = start_new_challenge(sys, duelist_a, duelist_b, table_id);
-        let challenge: ChallengeEntity = tester::get_ChallengeEntity(sys.world, duel_id);
-        let round: RoundEntity = tester::get_RoundEntity(sys.world, duel_id);
+        let challenge: ChallengeValue = tester::get_ChallengeValue(sys.world, duel_id);
+        let round: RoundValue = tester::get_RoundValue(sys.world, duel_id);
         assert(challenge.state == ChallengeState::InProgress, 'challenge.state');
         assert(round.state == RoundState::Commit, 'round.state');
         (challenge, round, duel_id)
     }
 
-    fn commit_reveal_get(sys: Systems, duel_id: u128, duelist_a: ContractAddress, duelist_b: ContractAddress, salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves) -> (ChallengeEntity, RoundEntity) {
+    fn commit_reveal_get(sys: TestSystems, duel_id: u128, duelist_a: ContractAddress, duelist_b: ContractAddress, salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves) -> (ChallengeValue, RoundValue) {
         @sys.rng.mock_values(salts.salts, salts.values);
         tester::execute_commit_moves(@sys.game, duelist_a, duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys.game, duelist_b, duel_id, moves_b.hashed);
