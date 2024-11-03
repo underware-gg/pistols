@@ -381,7 +381,7 @@ let parsed = cairoFiles.reduce((acc, filePath) => {
   })
   return acc;
 }, { mods: {}, enums: {}, structs: {} })
-console.log(parsed)
+// console.log(parsed)
 
 const fileContents = buildFileContents(parsed)
 // console.log(fileContents)
