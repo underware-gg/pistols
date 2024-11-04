@@ -3,7 +3,7 @@ import { EthSigner, Signature } from 'starknet'
 import { Container, Table, Button, Image } from 'semantic-ui-react'
 import { useAccount, useDisconnect, useNetwork } from '@starknet-react/core'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { useDojoStatus } from '@/lib/dojo/DojoContext'
+import { useDojoSetup, useDojoStatus } from '@/lib/dojo/DojoContext'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { useTypedMessage } from '@/lib/utils/hooks/useTypedMessage'
 import { useAsyncMemo } from '@/lib/utils/hooks/useAsyncMemo'
@@ -137,7 +137,7 @@ function Sign({
   revision: Revision
 }) {
   const { account, isConnected } = useAccount()
-  const { chain } = useNetwork()
+  const { starknetDomain } = useDojoSetup()
 
   const messages: Messages = useMemo(() => ({
     game: 'PISTOLS_AT_10_BLOCKS',
@@ -145,8 +145,7 @@ function Sign({
   }), [])
   const { typedMessage, messageHash, typeHash } = useTypedMessage({
     account,
-    revision,
-    chainId: chain.id,
+    starknetDomain,
     messages,
   })
 
@@ -254,7 +253,7 @@ function EthSign({
 }: {
   }) {
   const { account, isConnected } = useAccount()
-  const { chain } = useNetwork()
+  const { starknetDomain } = useDojoSetup()
 
   const address = '0xe29882a1fcba1e7e10cad46212257fea5c752a4f9b1b1ec683c503a2cf5c8a'
   const privateKey = '0x14d6672dcb4b77ca36a887e9a11cd9d637d5012468175829e9c6e770c61642'
@@ -266,8 +265,7 @@ function EthSign({
   }), [])
   const { typedMessage, messageHash, typeHash } = useTypedMessage({
     account,
-    revision: 1,
-    chainId: chain.id,
+    starknetDomain,
     messages,
   })
 

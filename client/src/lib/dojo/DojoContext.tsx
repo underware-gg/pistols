@@ -51,6 +51,13 @@ export const useDojoStatus = () => {
   }
 }
 
+export const useDojoSetup = () => {
+  const { setup } = useDojo()
+  return {
+    ...setup,
+  }
+}
+
 export const useDojoSystemCalls = () => {
   const { setup: { systemCalls } } = useDojo()
   return {

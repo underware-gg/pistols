@@ -1,17 +1,17 @@
 import { useMemo } from 'react'
-import { useDojo } from '@/lib/dojo/DojoContext'
+import { useDojoSetup } from '@/lib/dojo/DojoContext'
 import { useDeployedContract } from '@/lib/utils/hooks/useDeployedContract'
 import { getContractByName } from '@dojoengine/core'
 import { DojoManifest } from '@/lib/dojo/Dojo'
 
 
 export const useDojoSystem = (systemName: string) => {
-  const { setup: { manifest, nameSpace } } = useDojo()
+  const { manifest, nameSpace } = useDojoSetup()
   return useSystem(nameSpace, systemName, manifest)
 }
 
 export const useDeployedDojoSystem = (systemName: string) => {
-  const { setup: { manifest, nameSpace } } = useDojo()
+  const { manifest, nameSpace } = useDojoSetup()
   return useDeployedSystem(nameSpace, systemName, manifest)
 }
 

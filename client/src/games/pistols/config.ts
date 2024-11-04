@@ -1,5 +1,6 @@
 import { DojoAppConfig, DojoManifest } from '@/lib/dojo/Dojo'
 import { ChainId, defaultChainId } from '@/lib/dojo/setup/chainConfig'
+import { TYPED_DATA } from './generated/constants'
 import pistols_manifest_dev from './manifests/manifest_dev.json'
 import pistols_manifest_slot from './manifests/manifest_slot.json'
 import pistols_manifest_staging from './manifests/manifest_staging.json'
@@ -40,6 +41,12 @@ export const makeDojoAppConfig = (): DojoAppConfig => {
         // 'IERC20Allowance',
       ],
       admin: ['IAdmin'],
+    },
+    starknetDomain: {
+      name: TYPED_DATA.NAME,
+      version: TYPED_DATA.VERSION,
+      chainId: defaultChainId,
+      revision: '1',
     },
   }
 }

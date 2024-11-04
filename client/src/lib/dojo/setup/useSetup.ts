@@ -36,7 +36,11 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
 
   const manifest = useMemo(() => {
     return dojoAppConfig.manifests[chainId] ?? null
-  }, [selectedChainConfig])
+  }, [dojoAppConfig])
+
+  const starknetDomain = useMemo(() => {
+    return dojoAppConfig.starknetDomain ?? null
+  }, [dojoAppConfig])
 
   //
   // Provider setup
@@ -155,6 +159,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     selectedChainConfig,
     nameSpace: dojoAppConfig.nameSpace,
     manifest,
+    starknetDomain,
     // status
     status: {
       isReady: (!isLoading && !isError),

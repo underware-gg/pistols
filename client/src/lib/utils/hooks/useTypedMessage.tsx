@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
-import { AccountInterface, TypedData } from 'starknet'
-import { createTypedMessage, getMessageHash, getTypeHash, Revision } from '@/lib/utils/starknet_sign'
-import { chainIdToString, feltToString } from '@/lib/utils/starknet'
+import { AccountInterface, StarknetDomain, TypedData } from 'starknet'
+import { createTypedMessage, getMessageHash, getTypeHash } from '@/lib/utils/starknet_sign'
+import { chainIdToString } from '@/lib/utils/starknet'
 
 //---------------------------------
 // Create TypedData from messages
@@ -12,23 +12,20 @@ export type UseTypedMessageResult = {
   messageHash: string
 }
 export const useTypedMessage = ({
-  revision,
-  messages,
-  chainId,
   account,
+  starknetDomain,
+  messages,
 }: {
-  revision: Revision
+    account: AccountInterface
+  starknetDomain: StarknetDomain
   messages: any
-  chainId: bigint | string
-  account: AccountInterface
 }): UseTypedMessageResult => {
   const typedMessage = useMemo(() => (createTypedMessage({
-    revision,
-    chainId: chainIdToString(chainId),
+    starknetDomain,
     messages,
-  })), [revision, chainId, messages])
-  const typeHash = useMemo(() => (account ? getTypeHash(typedMessage, typedMessage.primaryType) : null), [account, typedMessage])
-  const messageHash = useMemo(() => (account ? getMessageHash(typedMessage, account.address) : null), [account, typedMessage])
+  })), [starknetDomain, messages])
+  const typeHash = useMemo(() => ((account && typedMessage) ? getTypeHash(typedMessage, typedMessage.primaryType) : null), [account, typedMessage])
+  const messageHash = useMemo(() => ((account && typedMessage) ? getMessageHash(typedMessage, account.address) : null), [account, typedMessage])
   return {
     typedMessage,
     typeHash,

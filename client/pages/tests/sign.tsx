@@ -16,6 +16,13 @@ const Body = Table.Body
 const Header = Table.Header
 const HeaderCell = Table.HeaderCell
 
+const starknetDomain = {
+  name: 'Underware',
+  version: '1.0',
+  chainId: 'UNDERWARE_GG',
+  revision: '1',
+}
+
 export default function IndexPage() {
   return (
     <AppPistols>
@@ -63,16 +70,14 @@ function ValidateMessage({
   messages: Messages
 }) {
   const { account } = useAccount()
-  const { chain } = useNetwork()
 
   const [signature, setSignature] = useState(null)
   const [verified, setVerifyed] = useState('...')
 
   const { typedMessage, messageHash } = useTypedMessage({
-    revision: 0,
-    messages,
     account,
-    chainId: chain.id,
+    starknetDomain,
+    messages,
   })
 
   useEffect(() => {
@@ -113,9 +118,9 @@ function ValidateMessage({
 
 
 export async function testTypedData(account: AccountInterface) {
-  const typedMessage0 = createTypedMessage({ chainId: 'UNDERWARE_GG', revision: 1, messages: { key: '0x01111' } })
-  const typedMessage1 = createTypedMessage({ chainId: 'UNDERWARE_GG', revision: 1, messages: { key: '0x1111' } })
-  const typedMessage2 = createTypedMessage({ chainId: 'UNDERWARE_GG', revision: 1, messages: { key: '0x1112' } })
+  const typedMessage0 = createTypedMessage({ starknetDomain, messages: { key: '0x01111' } })
+  const typedMessage1 = createTypedMessage({ starknetDomain, messages: { key: '0x1111' } })
+  const typedMessage2 = createTypedMessage({ starknetDomain, messages: { key: '0x1112' } })
   const signature0 = await account.signMessage(typedMessage0)
   const signature1 = await account.signMessage(typedMessage1)
   const signature2 = await account.signMessage(typedMessage2)

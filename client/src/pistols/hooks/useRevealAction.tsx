@@ -1,18 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useAccount, useNetwork } from '@starknet-react/core'
+import { useAccount } from '@starknet-react/core'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
+import { useDojoSetup, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useGetPlayerFullDeck } from '@/pistols/hooks/useContractCalls'
 import { CommitMoveMessage, signAndRestoreMovesFromHash } from '@/pistols/utils/salt'
-import { feltToString } from '@/lib/utils/starknet'
 import { movesToHand } from '@/pistols/hooks/useDuel'
 import { isPositiveBigint } from '@/lib/utils/types'
 
 export function useSignAndRestoreMovesFromHash(duelId: bigint, tableId: string, hash: bigint) {
   const { account } = useAccount()
-  const { chain } = useNetwork()
   const { duelistId } = useSettings()
+  const { starknetDomain } = useDojoSetup()
   const { decks } = useGetPlayerFullDeck(tableId)
 
   const messageToSign = useMemo<CommitMoveMessage>(() => ((duelId && duelistId) ? {
@@ -41,7 +40,7 @@ export function useSignAndRestoreMovesFromHash(duelId: bigint, tableId: string, 
 
   const sign_and_restore = useCallback(async () => {
     if (canSign) {
-      const { salt, moves } = await signAndRestoreMovesFromHash(account, feltToString(chain.id), messageToSign, hash, decks)
+      const { salt, moves } = await signAndRestoreMovesFromHash(account, starknetDomain, messageToSign, hash, decks)
       if (salt > 0n && moves) {
         setSalt(salt)
         setMoves(moves)
@@ -49,7 +48,7 @@ export function useSignAndRestoreMovesFromHash(duelId: bigint, tableId: string, 
       }
       return { salt, moves }
     }
-  }, [account, chain, duelistId, duelId, hash, decks, canSign])
+  }, [account, starknetDomain, duelistId, duelId, hash, decks, canSign])
 
   return {
     canSign,
