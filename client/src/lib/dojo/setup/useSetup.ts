@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react'
-import { Account } from 'starknet'
+import { init } from '@dojoengine/sdk'
 import { overridableComponent } from "@dojoengine/recs";
 import { getSyncEntities } from '@dojoengine/state'
 import { DojoProvider } from '@dojoengine/core'
@@ -10,17 +10,19 @@ import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { feltToString } from '@/lib/utils/starknet'
 import { DojoChainConfig } from './chainConfig'
 import { world } from "./world";
-import * as torii from '@dojoengine/torii-client'
+import { Subscription } from '@dojoengine/torii-client'
 
 // TODO: move out of lib??
 import {
   createSystemCalls,
   defineContractComponents,
+  schema,
 } from './setup'
 
 export type SetupResult = ReturnType<typeof useSetup> | null
+export type Schema = typeof schema
 
-export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: DojoChainConfig, account: Account) {
+export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: DojoChainConfig) {
 
   // avoid double effects
   const mounted = useMounted()
@@ -36,7 +38,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
 
   const manifest = useMemo(() => {
     return dojoAppConfig.manifests[chainId] ?? null
-  }, [dojoAppConfig])
+  }, [dojoAppConfig, chainId])
 
   const starknetDomain = useMemo(() => {
     return dojoAppConfig.starknetDomain ?? null
@@ -58,20 +60,27 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   //
   // Torii setup
   const {
-    value: toriiClient,
-    isError: toriiIsError,
+    value: sdk,
+    isError: sdkIsError,
   } = useAsyncMemo(async () => {
     if (!mounted) return undefined
+    if (!starknetDomain) return undefined
     if (!manifest) return null
-    const client = await torii.createClient({
-      rpcUrl: selectedChainConfig.rpcUrl,
-      toriiUrl: selectedChainConfig.toriiUrl,
-      relayUrl: selectedChainConfig.relayUrl ?? '',
-      worldAddress: manifest.world.address ?? '',
-    })
+    const sdk = await init<Schema>(
+      {
+        client: {
+          rpcUrl: selectedChainConfig.rpcUrl,
+          toriiUrl: selectedChainConfig.toriiUrl,
+          relayUrl: selectedChainConfig.relayUrl ?? '',
+          worldAddress: manifest.world.address ?? '',
+        },
+        domain: starknetDomain,
+      },
+      schema
+    );
     // console.log(`TORII CLIENT OK!`)
-    return client
-  }, [mounted, selectedChainConfig, manifest], undefined, null)
+    return sdk
+  }, [mounted, selectedChainConfig, manifest, starknetDomain], undefined, null)
 
   //
   // Check world deployment
@@ -95,10 +104,10 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
 
   //
   // fetch all existing entities from torii
-  const { value: sync } = useAsyncMemo<torii.Subscription>(async () => {
-    if (!toriiClient) return (toriiClient as any) // undefined or null
+  const { value: sync } = useAsyncMemo<Subscription>(async () => {
+    if (!sdk) return (sdk as any) // undefined or null
     const sync = await getSyncEntities(
-      toriiClient,
+      sdk.client,
       contractComponents as any,
       undefined,  // clause
       [],         // entityKeyClause
@@ -107,7 +116,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     )
     console.log(`SYNC FINISHED!!!`, sync, components)
     return sync
-  }, [toriiClient, contractComponents], undefined, null)
+  }, [sdk?.client, contractComponents], undefined, null)
 
   //
   // Establish system calls using the network and components.
@@ -123,7 +132,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   // Status
 
   const isLoading = !(
-    (toriiClient !== undefined) &&
+    (sdk !== undefined) &&
     (dojoProvider !== undefined) &&
     (components !== undefined) &&
     (sync !== undefined) &&
@@ -134,7 +143,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   const errorMessage =
     !manifest ? 'Game not Deployed'
       : dojoProviderIsError ? 'Chain Provider is Unavailable'
-        : toriiIsError ? 'Game Indexer is Unavailable'
+        : sdkIsError ? 'Game Indexer is Unavailable'
           : sync === null ? 'Sync Error'
             : isDeployed === null ? 'World not Found'
               : null
@@ -149,7 +158,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   return isLoading ? null : {
     // resolved
     dojoProvider,
-    toriiClient,
+    sdk,
     contractComponents,
     components,
     sync,
