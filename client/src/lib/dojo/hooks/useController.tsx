@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Connector, useAccount, useDisconnect } from '@starknet-react/core'
-import { Policy, ControllerOptions, PaymasterOptions } from '@cartridge/controller'
-import ControllerConnector from '@cartridge/connector'
+import { Connector, useAccount } from '@starknet-react/core'
+import { Policy, ControllerOptions } from '@cartridge/controller'
+import ControllerConnector from '@cartridge/connector/controller'
 import { KATANA_CLASS_HASH } from '@dojoengine/core'
 import { ContractInterfaces, DojoManifest } from '@/lib/dojo/Dojo'
 import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
 import { useContractClassHash } from '@/lib/utils/hooks/useContractClassHash'
 import { BigNumberish } from 'starknet'
-import { bigintEquals, bigintToHex } from '@/lib/utils/types'
-import { stringToFelt } from '@/lib/utils/starknet'
+import { bigintEquals } from '@/lib/utils/types'
 import { _useConnector } from '../fix/starknet_react_core'
 import { assert } from '@/lib/utils/math'
 
@@ -22,9 +21,6 @@ const exclusions = [
 
 export const useControllerConnector = (manifest: DojoManifest, rpcUrl: string, nameSpace: string, contractInterfaces: ContractInterfaces) => {
   const controller = useCallback(() => {
-    const paymaster: PaymasterOptions = {
-      caller: bigintToHex(stringToFelt("ANY_CALLER")),
-    }
     const policies: Policy[] = []
     // contracts
     manifest?.contracts.forEach((contract) => {
@@ -54,7 +50,6 @@ export const useControllerConnector = (manifest: DojoManifest, rpcUrl: string, n
       }
     })
     const options: ControllerOptions = {
-      paymaster,
       rpc: rpcUrl,
       theme: "pistols",
       colorMode: "dark",
@@ -113,14 +108,10 @@ export const useControllerUser = () => {
 
 export const useControllerMenu = () => {
   const { account } = useAccount();
-  const { disconnect } = useDisconnect();
   const controllerConnector = useConnectedController()
   const openMenu = async () => {
     if (account) {
-      const isConnected = await controllerConnector.openMenu()
-      if (!isConnected) {
-        disconnect()
-      }
+      await controllerConnector?.controller.openProfile()
     }
   };
   return {

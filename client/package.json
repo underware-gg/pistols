@@ -15,8 +15,8 @@
   },
   "dependencies": {
     "@apollo/client": "^3.11.8",
-    "@cartridge/connector": "0.3.46",
-    "@cartridge/controller": "0.3.46",
+    "@cartridge/connector": "0.5.0-alpha.6",
+    "@cartridge/controller": "0.5.0-alpha.6",
     "@dojoengine/core": "1.0.0-alpha.28",
     "@dojoengine/react": "1.0.0-alpha.28",
     "@dojoengine/recs": "^2.0.13",
@@ -53,7 +53,7 @@
     "@types/three": "^0.157.2",
     "@typescript-eslint/eslint-plugin": "^6.8.0",
     "@typescript-eslint/parser": "^6.8.0",
-    "eslint": "^8.51.0",
+    "eslint": "^8.57.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
     "typescript": "^5.5.4"
