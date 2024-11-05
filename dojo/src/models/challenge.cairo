@@ -100,7 +100,7 @@ impl ChallengeImpl of ChallengeTrait {
 impl RoundImpl of RoundTrait {
     #[inline(always)]
     fn make_seed(self: Round) -> felt252 {
-        (hash_values([self.moves_a.salt, self.moves_b.salt].span()))
+        (hash_values([self.moves_a.seed, self.moves_b.seed].span()))
     }
 }
 
