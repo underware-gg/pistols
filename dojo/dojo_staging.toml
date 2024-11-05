@@ -70,6 +70,7 @@ default = "pistols"
 "pistols-admin" = [
   "0x0", # treasury_address (or initializer)
   "0x0", # lords_address (use lords_mock)
+  "0x0", # vrf_address (use vrf_mock)
 ]
 "pistols-duel_token" = [
   "0", # "sstr:https://pistols.underware.gg", # base_uri

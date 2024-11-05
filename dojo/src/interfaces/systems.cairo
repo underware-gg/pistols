@@ -6,6 +6,7 @@ pub use pistols::systems::{
     bank::{IBankDispatcher, IBankDispatcherTrait},
     game::{IGameDispatcher, IGameDispatcherTrait},
     rng::{IRngDispatcher, IRngDispatcherTrait},
+    vrf_mock::{IVRFMockDispatcher, IVRFMockDispatcherTrait},
     tokens::{
         duel_token::{IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
         duelist_token::{IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
@@ -28,7 +29,9 @@ pub mod SELECTORS {
     const DUEL_TOKEN: felt252 = selector_from_tag!("pistols-duel_token");
     const DUELIST_TOKEN: felt252 = selector_from_tag!("pistols-duelist_token");
     const FAME_COIN: felt252 = selector_from_tag!("pistols-fame_coin");
+    // mocks
     const LORDS_MOCK: felt252 = selector_from_tag!("pistols-lords_mock");
+    const VR_MOCK: felt252 = selector_from_tag!("pistols-vrf_mock");
     // models
     const CONFIG: felt252 = selector_from_tag!("pistols-Config");
     const TABLE_CONFIG: felt252 = selector_from_tag!("pistols-TableConfig");
@@ -88,9 +91,14 @@ pub impl SystemsImpl of SystemsTrait {
     fn fame_coin_address(self: @WorldStorage) -> ContractAddress {
         (self.contract_address(@"fame_coin"))
     }
+    // mocks
     #[inline(always)]
     fn lords_mock_address(self: @WorldStorage) -> ContractAddress {
         (self.contract_address(@"lords_mock"))
+    }
+    #[inline(always)]
+    fn vrf_mock_address(self: @WorldStorage) -> ContractAddress {
+        (self.contract_address(@"vrf_mock"))
     }
 
     //
@@ -124,13 +132,25 @@ pub impl SystemsImpl of SystemsTrait {
         (IFameCoinDispatcher{ contract_address: self.fame_coin_address() })
     }
     #[inline(always)]
+    fn lords_dispatcher(self: @WorldStorage) -> ERC20ABIDispatcher {
+        let mut store: Store = StoreTrait::new(*self);
+        (store.get_config().lords_dispatcher())
+    }
+    #[inline(always)]
+    fn vrf_dispatcher(self: @WorldStorage) -> IVRFMockDispatcher {
+        let mut store: Store = StoreTrait::new(*self);
+        (store.get_config().vrf_dispatcher())
+    }
+
+    //
+    // test dispatchers
+    #[inline(always)]
     fn lords_mock_dispatcher(self: @WorldStorage) -> ILordsMockDispatcher {
         (ILordsMockDispatcher{ contract_address: self.lords_mock_address() })
     }
     #[inline(always)]
-    fn lords_dispatcher(self: @WorldStorage) -> ERC20ABIDispatcher {
-        let mut store: Store = StoreTrait::new(*self);
-        (store.get_config().lords_dispatcher())
+    fn vrf_mock_dispatcher(self: @WorldStorage) -> IVRFMockDispatcher {
+        (IVRFMockDispatcher{ contract_address: self.vrf_mock_address() })
     }
 
     //

@@ -187,6 +187,7 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
         key: CONFIG::CONFIG_KEY,
         treasury_address: TREASURY(),
         lords_address: world.lords_mock_address(),
+        vrf_address: world.vrf_mock_address(),
         is_paused: false,
     });
 

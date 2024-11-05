@@ -14,6 +14,7 @@ mod tester {
         admin::{admin, IAdminDispatcher, IAdminDispatcherTrait},
         game::{game, IGameDispatcher, IGameDispatcherTrait},
         rng::{rng},
+        vrf_mock::{vrf_mock},
         tokens::{
             duel_token::{duel_token, IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
             duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
@@ -184,6 +185,9 @@ mod tester {
                 ContractDefTrait::new(game::TEST_CLASS_HASH, "game")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             ));
+            resources.append(TestResource::Contract(
+                ContractDefTrait::new(vrf_mock::TEST_CLASS_HASH, "vrf_mock")
+            ));
         }
 
         if (deploy_admin) {
@@ -193,6 +197,7 @@ mod tester {
                     .with_init_calldata([
                         TREASURY().into(), // treasury_address
                         0, // lords_address
+                        0, // vrf_address
                     ].span())
             ));
         }

@@ -135,6 +135,7 @@ pub mod duel_token {
     use pistols::interfaces::systems::{
         SystemsTrait,
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
+        IVRFMockDispatcher, IVRFMockDispatcherTrait,
     };
     use pistols::models::{
         config::{TokenConfig, TokenConfigValue},
@@ -152,7 +153,6 @@ pub mod duel_token {
     use pistols::types::duel_progress::{DuelistDrawnCard};
     use pistols::types::constants::{CONST, HONOUR};
     use pistols::libs::events::{emitters};
-    use pistols::libs::seeder::{make_seed};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::libs::pact;
     use pistols::utils::metadata::{MetadataTrait};
@@ -272,10 +272,8 @@ pub mod duel_token {
             let timestamp_end: u64 = if (expire_hours == 0) { 0 } else { timestamp_start + timestamp::from_hours(expire_hours) };
 
             // create challenge
-            let seed: u128 = make_seed(address_a, world.dispatcher.uuid());
             let challenge = Challenge {
                 duel_id,
-                seed,
                 table_id,
                 premise,
                 quote,
@@ -294,7 +292,7 @@ pub mod duel_token {
             store.set_challenge(@challenge);
 
             // create Round, readu for player A to 
-            let round = Round {
+            let mut round = Round {
                 duel_id: challenge.duel_id,
                 state: RoundState::Commit,
                 moves_a: Default::default(),
@@ -303,6 +301,8 @@ pub mod duel_token {
                 state_b: Default::default(),
                 final_blow: 0,
             };
+            // generate player deck seed
+            round.moves_a.seed = world.vrf_dispatcher().consume_random();
             store.set_round(@round);
 
             // set the pact + assert it does not exist
@@ -374,6 +374,10 @@ pub mod duel_token {
                     challenge.state = ChallengeState::InProgress;
                     challenge.timestamp_start = timestamp;
                     challenge.timestamp_end = 0;
+                    // generate player deck seed
+                    let mut round: Round = store.get_round(duel_id);
+                    round.moves_b.seed = world.vrf_dispatcher().consume_random();
+                    store.set_round(@round);
                     // events
                     emitters::emitChallengeAcceptedEvent(@world, challenge, accepted);
                     emitters::emitDuelistTurnEvent(@world, challenge);

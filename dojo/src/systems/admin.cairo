@@ -47,6 +47,7 @@ pub mod admin {
         ref self: ContractState,
         treasury_address: ContractAddress,
         lords_address: ContractAddress,
+        vrf_address: ContractAddress,
     ) {
         let mut world = self.world_default();
         let mut store: Store = StoreTrait::new(world);
@@ -54,6 +55,7 @@ pub mod admin {
         let mut config: Config = ConfigTrait::new();
         config.treasury_address = if (treasury_address.is_zero()) { get_caller_address() } else { treasury_address };
         config.lords_address = if (lords_address.is_non_zero()) { lords_address } else { world.lords_mock_address() };
+        config.vrf_address = if (vrf_address.is_non_zero()) { vrf_address } else { world.vrf_mock_address() };
         config.is_paused = false;
         store.set_config(@config);
         // initialize tables

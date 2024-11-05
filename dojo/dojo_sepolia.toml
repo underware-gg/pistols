@@ -70,6 +70,8 @@ default = "pistols"
 "pistols-admin" = [
   "0x0", # treasury_address (or initializer)
   "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210", # lords_address
+  # "0x00be3edf412dd5982aa102524c0b8a0bcee584c5a627ed1db6a7c36922047257", # vrf_address
+  "0x0", # vrf_address (use vrf_mock) TODO: remove this
 ]
 "pistols-duel_token" = [
   "0", # "sstr:https://pistols.underware.gg", # base_uri
@@ -92,4 +94,5 @@ default = "pistols"
 order_inits = []
 skip_contracts = [
   "pistols-lords_mock",
+  # "pistols-vrf_mock", // TODO: uncomment this
 ]

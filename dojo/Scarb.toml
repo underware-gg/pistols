@@ -25,8 +25,9 @@ openzeppelin_test_common = { git = "https://github.com/underware-gg/cairo-contra
 # openzeppelin_test_common = { path = "../../cairo-contracts" }
 
 [features]
-default = ["lords_mock"]
+default = ["lords_mock", "vrf_mock"]
 lords_mock = []
+vrf_mock = []
 
 
 #--------------------------

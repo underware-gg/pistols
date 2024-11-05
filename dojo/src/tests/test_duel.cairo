@@ -195,11 +195,14 @@ mod tests {
         assert(fee == 0, 'fee == 0');
         assert(balance_treasury == 0, 'balance_treasury == 0');
 
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
+        let (_challenge, round_1, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
         tester::assert_balance(sys.lords, sys.game.contract_address, balance_contract, 0, (fee + PRIZE_VALUE) * 2, 'balance_contract_1');
         tester::assert_balance(sys.lords, OWNER(), balance_a, fee + PRIZE_VALUE, 0, 'balance_a_1');
         tester::assert_balance(sys.lords, OTHER(), balance_b, fee + PRIZE_VALUE, 0, 'balance_b_1');
         tester::assert_balance(sys.lords, TREASURY(), 0, 0, 0, 'balance_treasury_1');
+        assert(round_1.moves_a.seed != 0, 'round_1.moves_a.seed');
+        assert(round_1.moves_b.seed != 0, 'round_1.moves_b.seed');
+        assert(round_1.moves_a.seed != round_1.moves_b.seed, 'round_1.moves_a.seed != moves_b');
 
         // 1st commit
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
@@ -292,7 +295,12 @@ mod tests {
         // Run same challenge again!!!!
         // (to compute totals and scores)
         //
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        let (_challenge, round_2, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        assert(round_2.moves_a.seed != 0, 'round_2.moves_a.seed');
+        assert(round_2.moves_b.seed != 0, 'round_2.moves_b.seed');
+        assert(round_2.moves_a.seed != round_2.moves_b.seed, 'round_2.moves_a.seed != moves_b');
+        assert(round_2.moves_a.seed != round_1.moves_a.seed, 'round_2.moves_a.seed != round_1');
+        assert(round_2.moves_b.seed != round_1.moves_b.seed, 'round_2.moves_b.seed != round_1');
         // invert player order just for fun, expect same results!
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
