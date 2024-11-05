@@ -12,7 +12,7 @@ pub trait IAdmin<TState> {
     fn am_i_admin(self: @TState, account_address: ContractAddress) -> bool;
     fn grant_admin(ref self: TState, account_address: ContractAddress, granted: bool);
 
-    fn set_config(ref self: TState, config: Config);
+    fn set_treasury(ref self: TState, treasury_address: ContractAddress);
     fn set_paused(ref self: TState, paused: bool);
 
     fn open_table(ref self: TState, table_id: felt252, is_open: bool);
@@ -105,13 +105,14 @@ pub mod admin {
             }
         }
 
-        fn set_config(ref self: ContractState, config: Config) {
+        fn set_treasury(ref self: ContractState, treasury_address: ContractAddress) {
             self.assert_caller_is_admin();
-            assert(config.treasury_address.is_non_zero(), Errors::INVALID_TREASURY);
+            assert(treasury_address.is_non_zero(), Errors::INVALID_TREASURY);
             // get current
             let mut world = self.world_default();
             let mut store: Store = StoreTrait::new(world);
             let mut config: Config = store.get_config();
+            config.treasury_address = treasury_address;
             store.set_config(@config);
         }
 
