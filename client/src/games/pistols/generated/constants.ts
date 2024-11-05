@@ -307,6 +307,7 @@ type type_SELECTORS = {
   DUELIST_TOKEN: BigNumberish, // cairo: felt252
   FAME_COIN: BigNumberish, // cairo: felt252
   LORDS_MOCK: BigNumberish, // cairo: felt252
+  VR_MOCK: BigNumberish, // cairo: felt252
   CONFIG: BigNumberish, // cairo: felt252
   TABLE_CONFIG: BigNumberish, // cairo: felt252
   TOKEN_CONFIG: BigNumberish, // cairo: felt252
@@ -322,6 +323,7 @@ export const SELECTORS: type_SELECTORS = {
   DUELIST_TOKEN: '0x045c96d20393520c5dffeb2f2929fb599034d4fc6e9d423e6a641222fb60a25e', // 'selector_from_tag!("pistols-duelist_token")'
   FAME_COIN: '0x0371b95cb7056eb2d21819662e973ed32c345c989aa9f6097e7811a5665a0b0a', // 'selector_from_tag!("pistols-fame_coin")'
   LORDS_MOCK: '0x02b1156e63a09854c3d8dba0cad93b41e1fc4662466a0ffc2a9ec9e54b4bc788', // 'selector_from_tag!("pistols-lords_mock")'
+  VR_MOCK: '0x07d13bd4624d7bc31b13c78648f762d0b293e1ca94e19173659859209082629e', // 'selector_from_tag!("pistols-vrf_mock")'
   CONFIG: '0x060742fa7259b7ce3ebc0a2dde90b740d1234c770199a822fa2e7cf779dc0392', // 'selector_from_tag!("pistols-Config")'
   TABLE_CONFIG: '0x01e8368fc88328662c92a11c0e739bf8b74bcd77a20071d2641a31e1a063c138', // 'selector_from_tag!("pistols-TableConfig")'
   TOKEN_CONFIG: '0x056ebd3387f45e8b292b472f3539e675031f12cf156c07c309c6403044f71fed', // 'selector_from_tag!("pistols-TokenConfig")'

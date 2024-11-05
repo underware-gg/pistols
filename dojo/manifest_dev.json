@@ -1121,8 +1121,8 @@
   },
   "contracts": [
     {
-      "address": "0x2be7e44f94a8881f87995f62ce0249f51a424771b1b6cf2fe3f04fce58ebc87",
-      "class_hash": "0x6b3ea5e476e4b9acb471840c3c71200da17e09fe6bf8c94b7769cb53d9ee374",
+      "address": "0x23777f0bce8c4c09596e3af1a4096933cb9c930799f9af3c91c8e7d29afbece",
+      "class_hash": "0x1cb5f3de15689f97f40e0a91601be64bb486840c276a1f52162e6f3f43b8870",
       "abi": [
         {
           "type": "impl",
@@ -1175,6 +1175,10 @@
             {
               "name": "lords_address",
               "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "vrf_address",
+              "type": "core::starknet::contract_address::ContractAddress"
             }
           ],
           "outputs": [],
@@ -1196,28 +1200,6 @@
             {
               "name": "True",
               "type": "()"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "pistols::models::config::Config",
-          "members": [
-            {
-              "name": "key",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "treasury_address",
-              "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
-              "name": "lords_address",
-              "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
-              "name": "is_paused",
-              "type": "core::bool"
             }
           ]
         },
@@ -1347,11 +1329,11 @@
             },
             {
               "type": "function",
-              "name": "set_config",
+              "name": "set_treasury",
               "inputs": [
                 {
-                  "name": "config",
-                  "type": "pistols::models::config::Config"
+                  "name": "treasury_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
                 }
               ],
               "outputs": [],
@@ -1521,14 +1503,15 @@
       ],
       "init_calldata": [
         "0x0",
+        "0x0",
         "0x0"
       ],
       "tag": "pistols-admin",
       "systems": []
     },
     {
-      "address": "0x3e70375dea4a88f1896943795071574161e6e89989131b31bf8fd13451caaf3",
-      "class_hash": "0x4350c96fd6192217c68e821bbe12afeb32e8c7c25998c4c320b4adda869e914",
+      "address": "0x59db178c5e415d3ac53e5b0dbc4b15f3217b9bfa2484d58c5bf83896d2f3f54",
+      "class_hash": "0x4c2571c22b15bb8e0f774ce8d0c26edf837966cbcbad7781825bc37c16e121e",
       "abi": [
         {
           "type": "impl",
@@ -1765,8 +1748,8 @@
       "systems": []
     },
     {
-      "address": "0x3fd023fff7fa9f4dffe934b22403b372d6812145cfc28216ad4dc4154c21de6",
-      "class_hash": "0x6d1b3b02f8ddbe06033ab172bc2e9de6e6b5c786027ec8e97a077af23e0b910",
+      "address": "0x475ae9c7731546768d80cbfdaa4c97dcf0a70ac069b509bb9dd0c5c251b618f",
+      "class_hash": "0x4d44363d507fce6304ea617ea8c374732799e07db059ae37ca7e11e264ded36",
       "abi": [
         {
           "type": "impl",
@@ -1998,6 +1981,18 @@
             {
               "type": "function",
               "name": "delete_duel",
+              "inputs": [
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "transfer_to_winner",
               "inputs": [
                 {
                   "name": "duel_id",
@@ -4494,8 +4489,8 @@
       "systems": []
     },
     {
-      "address": "0x3c69e195fda04146073bd7604ee5a8881447f471d5deefb598598a40a9ec54b",
-      "class_hash": "0x25349a706639e1c610053bdbaabecb1286553aed7c1daf1b61445faf2f89a1c",
+      "address": "0x4b4405d9d31f38df566baa24e3497e7c6d6cbd0fe546de4271d115580975922",
+      "class_hash": "0x3ad65eef859db9ad60b75d54ee4b3bd3be7aadaac1dbc152c49816a158b818",
       "abi": [
         {
           "type": "impl",
@@ -5656,8 +5651,8 @@
       "systems": []
     },
     {
-      "address": "0x48428e6dd20d5703091326a5e102198ad2fa64a0deb9f12b431311d8ac43d3c",
-      "class_hash": "0x41c79bf31450dae16f3f4df64eb23170adf7ff01540b4a00b3f8a9fa50883f5",
+      "address": "0x41bc4190ec00f2782388885f242d3bc1fb02330075b88a27f92406fdea8aaba",
+      "class_hash": "0x623b9f39e8f75a356df1393461ed6cd1835fa63194a3aa5093f71797375c14",
       "abi": [
         {
           "type": "impl",
@@ -5749,7 +5744,7 @@
               "type": "core::integer::u32"
             },
             {
-              "name": "direct",
+              "name": "mocked",
               "type": "core::bool"
             }
           ]
@@ -5784,7 +5779,7 @@
               "inputs": [
                 {
                   "name": "shuffle_size",
-                  "type": "core::integer::u32"
+                  "type": "core::integer::u8"
                 }
               ],
               "outputs": [
@@ -5914,12 +5909,197 @@
       "init_calldata": [],
       "tag": "pistols-rng",
       "systems": []
+    },
+    {
+      "address": "0x2a4e46f35e95879a1ac6803e55e49528d5dd2aa722956e27bb43c2772a30a69",
+      "class_hash": "0x3dd9beae78df14983eb8ef783de082aeea8809304f5de1684dd38a797d076c1",
+      "abi": [
+        {
+          "type": "impl",
+          "name": "vrf_mock__ContractImpl",
+          "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": [
+            {
+              "type": "function",
+              "name": "dojo_name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "VRFMockImpl",
+          "interface_name": "pistols::systems::vrf_mock::IVRFMock"
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::vrf_mock::IVRFMock",
+          "items": [
+            {
+              "type": "function",
+              "name": "consume_random",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::felt252"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "function",
+          "name": "dojo_init",
+          "inputs": [],
+          "outputs": [],
+          "state_mutability": "view"
+        },
+        {
+          "type": "impl",
+          "name": "WorldProviderImpl",
+          "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
+        },
+        {
+          "type": "struct",
+          "name": "dojo::world::iworld::IWorldDispatcher",
+          "members": [
+            {
+              "name": "contract_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::world_provider::IWorldProvider",
+          "items": [
+            {
+              "type": "function",
+              "name": "world_dispatcher",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "dojo::world::iworld::IWorldDispatcher"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "UpgradeableImpl",
+          "interface_name": "dojo::contract::components::upgradeable::IUpgradeable"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::upgradeable::IUpgradeable",
+          "items": [
+            {
+              "type": "function",
+              "name": "upgrade",
+              "inputs": [
+                {
+                  "name": "new_class_hash",
+                  "type": "core::starknet::class_hash::ClassHash"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "constructor",
+          "name": "constructor",
+          "inputs": []
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "class_hash",
+              "type": "core::starknet::class_hash::ClassHash",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Upgraded",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+              "kind": "nested"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+          "kind": "enum",
+          "variants": []
+        },
+        {
+          "type": "event",
+          "name": "pistols::systems::vrf_mock::vrf_mock::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "UpgradeableEvent",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+              "kind": "nested"
+            },
+            {
+              "name": "WorldProviderEvent",
+              "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+              "kind": "nested"
+            }
+          ]
+        }
+      ],
+      "init_calldata": [],
+      "tag": "pistols-vrf_mock",
+      "systems": []
     }
   ],
   "models": [
     {
       "members": [],
-      "class_hash": "0x58c55a7c92132abc7ce1ad7bd70cdb1002db0cdca73a2125f93df4983185dcb",
+      "class_hash": "0x6e9d56cfffa180c9e47f56882ed1c3211ea2c878e062acdd6faaf873a6207f9",
       "tag": "Challenge"
     },
     {
@@ -5929,7 +6109,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x357b9d9aec647dc44c1cf3f0a5813456738f191f258b4cb6ba15e7b6640d934",
+      "class_hash": "0x7973fc70bc6a94180a3d51293a1459384c132868a9634af9536a0861c00a09",
       "tag": "Config"
     },
     {
@@ -5949,7 +6129,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x44e6613a50ffcc10f3e0eac0cff3673fa4616596c620576df949cb949b9dbb9",
+      "class_hash": "0x3aaba5dc717fdd6f315b20ba0147653fa86a1de87ee98d13b127cbd05e6cdc2",
       "tag": "Round"
     },
     {

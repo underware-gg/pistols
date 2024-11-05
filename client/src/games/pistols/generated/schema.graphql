@@ -38,17 +38,18 @@ type ERC__Transfer {
 scalar Enum
 
 union ModelUnion =
-    pistols_Challenge
-  | pistols_CoinConfig
-  | pistols_Config
-  | pistols_Duelist
-  | pistols_Pact
-  | pistols_Payment
-  | pistols_Round
-  | pistols_Scoreboard
+    pistols_Scoreboard
   | pistols_TableAdmittance
+  | pistols_CoinConfig
+  | pistols_Duelist
+  | pistols_Config
   | pistols_TableConfig
   | pistols_TokenConfig
+  | pistols_TokenBoundAddress
+  | pistols_Pact
+  | pistols_Round
+  | pistols_Challenge
+  | pistols_Payment
 
 enum OrderDirection {
   ASC
@@ -247,76 +248,6 @@ type World__Query {
   ): World__TransactionConnection
   ercBalance(accountAddress: String!): [ERC__Balance]
   ercTransfer(accountAddress: String!, limit: Int!): [ERC__Transfer]
-  pistolsChallengeModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: pistols_ChallengeWhereInput
-    order: pistols_ChallengeOrder
-  ): pistols_ChallengeConnection
-  pistolsCoinConfigModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: pistols_CoinConfigWhereInput
-    order: pistols_CoinConfigOrder
-  ): pistols_CoinConfigConnection
-  pistolsConfigModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: pistols_ConfigWhereInput
-    order: pistols_ConfigOrder
-  ): pistols_ConfigConnection
-  pistolsDuelistModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: pistols_DuelistWhereInput
-    order: pistols_DuelistOrder
-  ): pistols_DuelistConnection
-  pistolsPactModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: pistols_PactWhereInput
-    order: pistols_PactOrder
-  ): pistols_PactConnection
-  pistolsPaymentModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: pistols_PaymentWhereInput
-    order: pistols_PaymentOrder
-  ): pistols_PaymentConnection
-  pistolsRoundModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: pistols_RoundWhereInput
-    order: pistols_RoundOrder
-  ): pistols_RoundConnection
   pistolsScoreboardModels(
     first: Int
     last: Int
@@ -337,6 +268,36 @@ type World__Query {
     where: pistols_TableAdmittanceWhereInput
     order: pistols_TableAdmittanceOrder
   ): pistols_TableAdmittanceConnection
+  pistolsCoinConfigModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: pistols_CoinConfigWhereInput
+    order: pistols_CoinConfigOrder
+  ): pistols_CoinConfigConnection
+  pistolsDuelistModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: pistols_DuelistWhereInput
+    order: pistols_DuelistOrder
+  ): pistols_DuelistConnection
+  pistolsConfigModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: pistols_ConfigWhereInput
+    order: pistols_ConfigOrder
+  ): pistols_ConfigConnection
   pistolsTableConfigModels(
     first: Int
     last: Int
@@ -357,6 +318,56 @@ type World__Query {
     where: pistols_TokenConfigWhereInput
     order: pistols_TokenConfigOrder
   ): pistols_TokenConfigConnection
+  pistolsTokenBoundAddressModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: pistols_TokenBoundAddressWhereInput
+    order: pistols_TokenBoundAddressOrder
+  ): pistols_TokenBoundAddressConnection
+  pistolsPactModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: pistols_PactWhereInput
+    order: pistols_PactOrder
+  ): pistols_PactConnection
+  pistolsRoundModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: pistols_RoundWhereInput
+    order: pistols_RoundOrder
+  ): pistols_RoundConnection
+  pistolsChallengeModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: pistols_ChallengeWhereInput
+    order: pistols_ChallengeOrder
+  ): pistols_ChallengeConnection
+  pistolsPaymentModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: pistols_PaymentWhereInput
+    order: pistols_PaymentOrder
+  ): pistols_PaymentConnection
 }
 
 type World__Social {
@@ -400,7 +411,6 @@ scalar felt252
 
 type pistols_Challenge {
   duel_id: u128
-  seed: u128
   table_id: felt252
   premise: Enum
   quote: felt252
@@ -434,7 +444,6 @@ input pistols_ChallengeOrder {
 
 enum pistols_ChallengeOrderField {
   DUEL_ID
-  SEED
   TABLE_ID
   PREMISE
   QUOTE
@@ -460,17 +469,6 @@ input pistols_ChallengeWhereInput {
   duel_idIN: [u128]
   duel_idNOTLIKE: u128
   duel_idLIKE: u128
-  seed: u128
-  seedGT: u128
-  seedGTE: u128
-  seedLT: u128
-  seedLTE: u128
-  seedNEQ: u128
-  seedEQ: u128
-  seedNOTIN: [u128]
-  seedIN: [u128]
-  seedNOTLIKE: u128
-  seedLIKE: u128
   table_id: felt252
   table_idGT: felt252
   table_idGTE: felt252
@@ -644,6 +642,7 @@ type pistols_Config {
   key: u8
   treasury_address: ContractAddress
   lords_address: ContractAddress
+  vrf_address: ContractAddress
   is_paused: bool
   entity: World__Entity
   eventMessage: World__EventMessage
@@ -669,6 +668,7 @@ enum pistols_ConfigOrderField {
   KEY
   TREASURY_ADDRESS
   LORDS_ADDRESS
+  VRF_ADDRESS
   IS_PAUSED
 }
 
@@ -706,14 +706,25 @@ input pistols_ConfigWhereInput {
   lords_addressIN: [ContractAddress]
   lords_addressNOTLIKE: ContractAddress
   lords_addressLIKE: ContractAddress
+  vrf_address: ContractAddress
+  vrf_addressGT: ContractAddress
+  vrf_addressGTE: ContractAddress
+  vrf_addressLT: ContractAddress
+  vrf_addressLTE: ContractAddress
+  vrf_addressNEQ: ContractAddress
+  vrf_addressEQ: ContractAddress
+  vrf_addressNOTIN: [ContractAddress]
+  vrf_addressIN: [ContractAddress]
+  vrf_addressNOTLIKE: ContractAddress
+  vrf_addressLIKE: ContractAddress
   is_paused: bool
 }
 
 type pistols_Duelist {
   duelist_id: u128
   name: felt252
-  profile_pic_uri: ByteArray
   profile_pic_type: Enum
+  profile_pic_uri: ByteArray
   timestamp: u64
   score: pistols_Duelist_Score
   entity: World__Entity
@@ -739,8 +750,8 @@ input pistols_DuelistOrder {
 enum pistols_DuelistOrderField {
   DUELIST_ID
   NAME
-  PROFILE_PIC_URI
   PROFILE_PIC_TYPE
+  PROFILE_PIC_URI
   TIMESTAMP
   SCORE
 }
@@ -768,6 +779,7 @@ input pistols_DuelistWhereInput {
   nameIN: [felt252]
   nameNOTLIKE: felt252
   nameLIKE: felt252
+  profile_pic_type: Enum
   profile_pic_uri: ByteArray
   profile_pic_uriGT: ByteArray
   profile_pic_uriGTE: ByteArray
@@ -779,7 +791,6 @@ input pistols_DuelistWhereInput {
   profile_pic_uriIN: [ByteArray]
   profile_pic_uriNOTLIKE: ByteArray
   profile_pic_uriLIKE: ByteArray
-  profile_pic_type: Enum
   timestamp: u64
   timestampGT: u64
   timestampGTE: u64
@@ -1059,6 +1070,7 @@ type pistols_Round_DuelistState {
 }
 
 type pistols_Round_Moves {
+  seed: felt252
   salt: felt252
   hashed: u128
   card_1: u8
@@ -1261,6 +1273,72 @@ input pistols_TableConfigWhereInput {
   fee_minNOTLIKE: u128
   fee_minLIKE: u128
   is_open: bool
+}
+
+type pistols_TokenBoundAddress {
+  recipient: ContractAddress
+  contract_address: ContractAddress
+  token_id: u128
+  entity: World__Entity
+  eventMessage: World__EventMessage
+}
+
+type pistols_TokenBoundAddressConnection {
+  edges: [pistols_TokenBoundAddressEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type pistols_TokenBoundAddressEdge {
+  node: pistols_TokenBoundAddress
+  cursor: Cursor
+}
+
+input pistols_TokenBoundAddressOrder {
+  direction: OrderDirection!
+  field: pistols_TokenBoundAddressOrderField!
+}
+
+enum pistols_TokenBoundAddressOrderField {
+  RECIPIENT
+  CONTRACT_ADDRESS
+  TOKEN_ID
+}
+
+input pistols_TokenBoundAddressWhereInput {
+  recipient: ContractAddress
+  recipientGT: ContractAddress
+  recipientGTE: ContractAddress
+  recipientLT: ContractAddress
+  recipientLTE: ContractAddress
+  recipientNEQ: ContractAddress
+  recipientEQ: ContractAddress
+  recipientNOTIN: [ContractAddress]
+  recipientIN: [ContractAddress]
+  recipientNOTLIKE: ContractAddress
+  recipientLIKE: ContractAddress
+  contract_address: ContractAddress
+  contract_addressGT: ContractAddress
+  contract_addressGTE: ContractAddress
+  contract_addressLT: ContractAddress
+  contract_addressLTE: ContractAddress
+  contract_addressNEQ: ContractAddress
+  contract_addressEQ: ContractAddress
+  contract_addressNOTIN: [ContractAddress]
+  contract_addressIN: [ContractAddress]
+  contract_addressNOTLIKE: ContractAddress
+  contract_addressLIKE: ContractAddress
+  token_id: u128
+  token_idGT: u128
+  token_idGTE: u128
+  token_idLT: u128
+  token_idLTE: u128
+  token_idNEQ: u128
+  token_idEQ: u128
+  token_idNOTIN: [u128]
+  token_idIN: [u128]
+  token_idNOTLIKE: u128
+  token_idLIKE: u128
 }
 
 type pistols_TokenConfig {
