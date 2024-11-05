@@ -1,4 +1,4 @@
-import React, { ReactElement, useMemo, useState } from 'react'
+import React, { ReactElement, useCallback, useEffect, useMemo, useState } from 'react'
 import { Menu, Button, Confirm, SemanticICONS, Icon } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
@@ -8,6 +8,8 @@ import { bigintAdd } from '@/lib/utils/types'
 import { CustomIcon, IconSizeProp } from '@/lib/ui/Icons'
 import { BigNumberish } from 'starknet'
 import { LordsBagIcon } from '../account/Balance'
+import { SceneName, usePistolsScene } from '@/pistols/hooks/PistolsContext'
+import { useGameEvent } from '@/pistols/hooks/useGameEvent'
 
 //-----------------
 // Generic Action button
@@ -273,3 +275,18 @@ export function SettingsMenuItem({
   )
 }
 
+export function BackButton() {
+  const { dispatchSetScene, atDoor } = usePistolsScene();
+
+  const handleClick = () => {
+    if (atDoor) {
+      dispatchSetScene(SceneName.Gate);
+    } else {
+      dispatchSetScene(SceneName.Tavern);
+    }
+  }
+
+  return (
+    <CustomIcon icon name='left-arrow' onClick={() => handleClick()} size='big' disabled={false} />
+  );
+}

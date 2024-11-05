@@ -36,7 +36,7 @@ export function MenuDuel({
   return (
     <div className='MenuBottomDuel AlignCenter NoMouse'>
       <div className='MenuBottomBackground NoDrag NoMouse'>
-        <img className='MenuBackgroundImage' src='/images/ui/bottom_nav.png'/>
+        <img className='MenuBackgroundImage' src='/images/ui/duel/bottom_nav.png'/>
       </div>
       <Menu secondary compact className='YesMouse' size='huge' style={{ minHeight: '0' }}>
         <Menu.Item className='button_duel' type='tavern' onClick={() => _backToTavern()}>
@@ -78,7 +78,7 @@ export function MenuDuelControl({
   return (
     <div className='MenuRightDuel NoMouse'>
       <div className='MenuRightBackground NoDrag NoMouse'>
-        <img className='MenuBackgroundImageFliped' src='/images/ui/side_nav.png'/>
+        <img className='MenuBackgroundImageFliped' src='/images/ui/duel/side_nav.png'/>
       </div>
       <Menu secondary compact vertical className='YesMouse' size='huge' style={{ minHeight: '0' }}>
 

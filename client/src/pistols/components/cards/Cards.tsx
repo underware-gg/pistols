@@ -64,7 +64,6 @@ export const Card = forwardRef<CardHandle, CardProps>((props: CardProps, ref: Re
   
   const cardRef = useRef<HTMLDivElement>(null)
   const cardBackgroundRef = useRef<HTMLDivElement>(null)
-  const cardDisabledRef = useRef<HTMLDivElement>(null)
   const springRef = useRef({ x: 0, y: 0 })
   const rotationRef = useRef({ rotation: 0 })
   const flipRotationRef = useRef({ rotation: 0 })

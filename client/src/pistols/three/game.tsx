@@ -23,13 +23,15 @@ import { map } from '@/lib/utils/math'
 import { SpriteSheet } from './SpriteSheetMaker'
 import { DuelistsManager } from './DuelistsManager.tsx'
 import { Action } from '../utils/pistols.tsx'
-import { BarMenu } from './BarMenu.tsx'
-import { DuelistState } from '../components/Duel.tsx'
+import { DuelistState } from '../components/scenes/Duel.tsx'
+import { InteractibleScene } from './InteractibleScene.tsx'
 
 
 //---------------------------
 // CONSTANTS
 //
+
+export const SCENE_CHANGE_ANIMATION_DURATION = 250
 
 /**
  * Sizes
@@ -46,7 +48,7 @@ export const sizes = {
 /**
  * Camera Constants
  */
-const cameraData = {
+export const cameraData = {
   fieldOfView: 13,
   nearPlane: 0.1,
   farPlane: 150,
@@ -146,7 +148,6 @@ let _skyVideoTexture
 let _ladySecond
 let _sirSecond
 let _duelistManager: DuelistsManager
-let _barMenu: BarMenu
 
 let _scenes: Partial<Record<SceneName, THREE.Scene>> = {}
 export let _currentScene: THREE.Scene = null
@@ -383,9 +384,12 @@ export function animate() {
         //@ts-ignore
         _currentScene.children.forEach(c => c.animate?.(deltaTime)) //replaced with deltaTime (could be elapsedTime), because if more than one childs had called getDelta() the animation wont work as supposed
         _renderer.render(_currentScene, _staticCamera)
+
+        if (_currentScene instanceof InteractibleScene) {
+          _currentScene.render(elapsedTime)
+        }
       }
 
-      _barMenu.render(_renderer, _staticCamera, elapsedTime, _sceneName == SceneName.Tavern);
 
       _stats?.update()
     }
@@ -720,66 +724,11 @@ function setCameraHelpers(scene) {
 // Static Scenes
 //
 function setupStaticScene(sceneName) {
-  const scene = new THREE.Scene()
-
-  const textureName: TextureName = sceneBackgrounds[sceneName]
-  const bg_mat = new THREE.MeshBasicMaterial({
-    map: _textures[textureName],
-    color: 'white',
-  })
-
-  const bgDistance = -1
-  const vFOV = THREE.MathUtils.degToRad(cameraData.fieldOfView * 0.5)
-  const height = 2 * Math.tan(vFOV) * Math.abs(bgDistance)
-  const width = height * ASPECT
-  const fullScreenGeom = new THREE.PlaneGeometry(width, height)
-
-  let bg = new THREE.Mesh(fullScreenGeom, bg_mat)
-  bg.name = 'bg'
-  bg.renderOrder = 9999
-  bg.position.set(0, 0, bgDistance)
-  scene.add(bg)
+  const scene = new InteractibleScene(sceneName, _renderer, _staticCamera)
 
   scene.add(_staticCamera)
 
-  if (sceneName == SceneName.Tavern) {
-    _barMenu = new BarMenu(scene, bg)
-  }
-
-  if (sceneName == SceneName.Gate) {
-    // const rain = new Rain(bg)
-    // scene.add(rain)
-  }
-
   return scene
-}
-
-export function resetStaticScene() {
-  if (!_currentScene) return
-  
-  if (_tweens.staticZoom) TWEEN.remove(_tweens.staticZoom)
-  if (_tweens.staticFade) TWEEN.remove(_tweens.staticFade)
-
-  let bg = _currentScene.getObjectByName('bg') as THREE.Mesh
-  // console.log(`SCENE>>>>>>>>`, _currentScene)
-
-  // zoom out
-  let from = 1.1
-  bg.scale.set(from, from, from)
-  _tweens.staticZoom = new TWEEN.Tween(bg.scale)
-    .to({ x: 1, y: 1, z: 1 }, 60_000)
-    .easing(TWEEN.Easing.Cubic.Out)
-    .start()
-
-  // fade in
-  let mat = bg.material as THREE.MeshBasicMaterial
-  mat.color = new THREE.Color(0.25, 0.25, 0.25)
-  _tweens.staticFade = new TWEEN.Tween(mat.color)
-    .to({ r: 1, g: 1, b: 1 }, 2_000)
-    .easing(TWEEN.Easing.Cubic.Out)
-    .start();
-  //@ts-ignore
-  _currentScene.children.forEach(c => c.reset?.())
 }
 
 
@@ -789,14 +738,56 @@ export function resetStaticScene() {
 //
 
 export function switchScene(sceneName) {
-  _sceneName = sceneName
-  _currentScene = _scenes[sceneName]
-  if (sceneName != SceneName.Duel) {
-    resetStaticScene()
-    _duelistManager.hideElements()
-  } else if (_statsEnabled) {
-    resetDuelScene()
+  if (!_currentScene) {
+    _sceneName = sceneName
+    _currentScene = _scenes[sceneName]
+
+    fadeInCurrentScene();
+    
+    if (sceneName != SceneName.Duel) {
+      _duelistManager.hideElements()
+    } else if (_statsEnabled) {
+      resetDuelScene()
+    }
+  } else {
+    fadeOutCurrentScene(() => {
+      _sceneName = sceneName
+      _currentScene = _scenes[sceneName]
+
+      fadeInCurrentScene();
+      
+      if (sceneName != SceneName.Duel) {
+        _duelistManager.hideElements()
+      } else if (_statsEnabled) {
+        resetDuelScene()
+      }
+    });
   }
+}
+
+function fadeOutCurrentScene(callback) {
+  const overlay = document.getElementById('game-black-overlay');
+
+  _tweens.staticFade = new TWEEN.Tween({ opacity: 0 })
+    .to({ opacity: 1 }, SCENE_CHANGE_ANIMATION_DURATION)
+    .onUpdate(({ opacity }) => {
+      overlay.style.opacity = opacity.toString()
+    })
+    .onComplete(() => {
+      callback();
+    })
+    .start();
+}
+
+function fadeInCurrentScene() {
+  const overlay = document.getElementById('game-black-overlay');
+
+  _tweens.staticFade = new TWEEN.Tween({ opacity: 1 })
+    .to({ opacity: 0 }, SCENE_CHANGE_ANIMATION_DURATION)
+    .onUpdate(({ opacity }) => {
+      overlay.style.opacity = opacity.toString()
+    })
+    .start();
 }
 
 export function startDuelWithPlayers(duelistNameA, duelistModelA, isDuelistAYou, isDuelistBYou, duelistNameB, duelistModelB) {

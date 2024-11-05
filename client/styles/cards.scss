@@ -194,7 +194,7 @@ $color-cold: #4d9ad6;
   transition: opacity 0.6s ease 0.2s;
   pointer-events: none;
   // background: none !important;
-  background: url('/images/ui/card_details/environment_card_placeholder.png') no-repeat;
+  background: url('/images/ui/duel/card_details/environment_card_placeholder.png') no-repeat;
   background-size: cover;
   background-position: center;
   z-index: 1001;
@@ -214,13 +214,13 @@ $color-cold: #4d9ad6;
 
   &.left {
     left: aspect-width(1);
-    background: url('/images/ui/card_details/box_left.png') no-repeat;
+    background: url('/images/ui/duel/card_details/box_left.png') no-repeat;
     background-size: 100% 100%;
     background-position: center;
   }
 
   &.right {
-    background: url('/images/ui/card_details/box_right.png') no-repeat;
+    background: url('/images/ui/duel/card_details/box_right.png') no-repeat;
     right: aspect-width(1);
     background-size: 100% 100%;
     background-position: center;
@@ -315,7 +315,7 @@ $color-cold: #4d9ad6;
   height: aspect-width(3);
   top: aspect-width(38.5);
   left: aspect-width(1);
-  background: url('/images/ui/card_details/cards_separator.png') no-repeat;
+  background: url('/images/ui/duel/card_details/cards_separator.png') no-repeat;
   background-size: contain;
   background-position: center;
 }
@@ -339,7 +339,7 @@ $color-cold: #4d9ad6;
   height: aspect-width(5);
   top: aspect-width(0);
   right: aspect-width(0.3);
-  background: url('/images/ui/card_details/button_exit.png') no-repeat;
+  background: url('/images/ui/duel/card_details/button_exit.png') no-repeat;
   background-size: cover;
 }
 
@@ -361,4 +361,87 @@ $color-cold: #4d9ad6;
 
 .grid-data.right {
   right: aspect-width(2);
+}
+
+
+
+.duelist-card-image-drawing {
+  position: absolute;
+  width: 70%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  top: 8%;
+  left: 15%;
+}
+
+.card-hanging-container {
+  position: absolute;
+  width: var(--card-width);
+  height: var(--card-height);
+  transform-origin: calc(var(--card-width) / 2 + var(--random-offset, 0px)) calc(var(--card-height) * 0.03);
+  transform: rotate(var(--hang-rotation, 0deg));
+}
+
+.duelist-card-container {
+  position: absolute;
+  width: var(--card-width);
+  height: var(--card-height);
+}
+
+.duelist-nail-point {
+  background: radial-gradient(circle at 30% 30%, #666, #444 40%, #333);
+  border-radius: 50%;
+  position: absolute;
+  box-shadow: inset -1px -1px 2px rgba(0,0,0,0.4), 
+              inset 1px 1px 2px rgba(255,255,255,0.3);
+}
+
+.duelist-nail {
+  position: absolute;
+  transform-origin: bottom center;
+  z-index: 1;
+}
+
+.duelist-card-details {
+  position: absolute;
+  width: 86%;
+  height: 35%;
+  top: 60%;
+  left: 7%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  color: black;
+  text-align: center;
+  padding-bottom: 5%;
+}
+
+.duelist-name {
+  font-size: aspect-width(0.65);
+  font-weight: bold;
+  max-width: 100%;
+  max-height: 60%;
+  overflow: hidden;
+  white-space: pre-wrap;
+  line-break: anywhere;
+}
+
+.duelist-fame {
+  font-size: calc(var(--card-width) * 0.11);
+  font-weight: bold;
+  // color: $color-warning;
+}
+
+.duelist-name[data-contentlength="0"] {
+  font-size: calc(var(--card-width) * 0.15);
+}
+.duelist-name[data-contentlength="1"] {
+  font-size: calc(var(--card-width) * 0.12);;
+}
+.duelist-name[data-contentlength="2"] {
+  font-size: calc(var(--card-width) * 0.1);;
+}
+.duelist-name[data-contentlength="3"] {
+  font-size: calc(var(--card-width) * 0.1);;
 }

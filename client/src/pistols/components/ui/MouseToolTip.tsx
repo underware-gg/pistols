@@ -1,41 +1,42 @@
 import { useGameEvent } from "@/pistols/hooks/useGameEvent"
-import { emitter } from "@/pistols/three/game";
-import { MenuLabels } from "@/pistols/utils/pistols"
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Label } from "semantic-ui-react"
 
 
 export function MouseToolTip() {
-  const { value: hoverSceneValue } = useGameEvent('hover_scene', null)
+  const { value: hoverSceneValue } = useGameEvent('hover_scene', null);
+  const tooltipRef = useRef(null);
+  const [mousePos, setMousePos] = useState<any>(null);
 
   useEffect(() => {
-    if (hoverSceneValue !== null) {
-      document.addEventListener('mousemove', handleMouseMove);
-    } else {
-      document.removeEventListener('mousemove', handleMouseMove);
-    }
+    document.addEventListener('mousemove', handleMouseMove);
+    
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [hoverSceneValue]);
+  }, []);
+  
+  useEffect(() => {
+    
+    if (tooltipRef.current && mousePos) {
+      tooltipRef.current.style.left = `${mousePos.clientX - tooltipRef.current.clientWidth / 2}px`;
+      tooltipRef.current.style.top = `${mousePos.clientY - tooltipRef.current.clientHeight}px`;
+    }
+  }, [hoverSceneValue, mousePos]);
 
   const handleMouseMove = (event) => {
-    const tooltipAnchor = document.getElementById('MouseToolTipAnchor');
-    if (tooltipAnchor) {
-      tooltipAnchor.style.left = `${event.clientX - tooltipAnchor.clientWidth / 2}px`;
-      tooltipAnchor.style.top = `${event.clientY - tooltipAnchor.clientHeight}px`;
-    }
+    setMousePos(event)
   };
-  
-  if (!hoverSceneValue) {
-    return <></>
-  }
 
   return (
-    <div id='MouseToolTipAnchor' className='Relative'>
-      <Label pointing='below' className='ToolTip'>
-        <div dangerouslySetInnerHTML={{ __html: hoverSceneValue }} />
-      </Label>
+    <div ref={tooltipRef} id='MouseToolTipAnchor' className='Relative NoMouse NoDrag'>
+      {hoverSceneValue ? (
+        <Label pointing='below' className='ToolTip'>
+          <div dangerouslySetInnerHTML={{ __html: hoverSceneValue }} />
+        </Label>
+      ) : (
+        <></>
+      )}
     </div>
-  )
+  );
 }

@@ -972,7 +972,7 @@ const PlayerStats = ({ duelistId, isLeft, damage, hitChance }) => {
       <div className={ isLeft ? 'data-window left' : 'data-window right' }>
         <div>
           <ProfilePic className='NoMouse NoDrag profile-picture' duel profilePic={profilePic} />
-          <img className='NoMouse NoDrag profile-outline' src='/images/ui/card_details/profile_border.png' />
+          <img className='NoMouse NoDrag profile-outline' src='/images/ui/duel/card_details/profile_border.png' />
         </div>
         <div className='value-name' data-contentlength={contentLength}>{name}</div>
         <div className='data'>

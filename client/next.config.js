@@ -28,6 +28,7 @@ const nextConfig = {
       //   destination: '/main/tavern/:slug*',
       // },
       ...[
+        'door',
         'tavern',
         'profile',
         'duelists',

@@ -12,7 +12,7 @@ import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { LordsBagIcon } from '@/pistols/components/account/Balance'
 import { FilterButton } from '@/pistols/components/ui/Buttons'
 import { EMOJI } from '@/pistols/data/messages'
-import AnonModal from '@/pistols/components/AnonModal'
+import AnonModal from '@/pistols/components/modals/AnonModal'
 
 const Row = Grid.Row
 const Col = Grid.Column

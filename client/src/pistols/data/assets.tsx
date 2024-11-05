@@ -9,10 +9,11 @@ import { BladesCard, EnvCard, PacesCard, Rarity, TacticsCard } from '@/games/pis
 export enum TextureName {
   Testcard = 'Testcard',
   bg_gate = 'bg_gate',
+  bg_door = 'bg_door',
+  bg_gate_mask = 'bg_gate_mask',
   bg_profile = 'bg_profile',
   bg_tavern = 'bg_tavern',
   bg_tavern_mask = 'bg_tavern_mask',
-  bg_barkeep = 'bg_barkeep',
   bg_duelists = 'bg_duelists',
   bg_duels_yours = 'bg_duels_yours',
   bg_duels_live = 'BG_DUEL',
@@ -31,10 +32,11 @@ export type TextureAttributes = {
 const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.Testcard]: { path: '/textures/testcard.jpg' },
   [TextureName.bg_gate]: { path: '/images/bg_gate.jpg' },
+  [TextureName.bg_door]: { path: '/images/bg_door.jpg' },
+  [TextureName.bg_gate_mask]: { path: '/images/bg_gate_mask.png' },
   [TextureName.bg_profile]: { path: '/images/bg_profile.jpg' },
   [TextureName.bg_tavern]: { path: '/images/bg_tavern.jpg' },
   [TextureName.bg_tavern_mask]: { path: '/images/bg_tavern_mask.png', alpha: true },
-  [TextureName.bg_barkeep]: { path: '/images/bg_barkeep.jpg' },
   [TextureName.bg_duelists]: { path: '/images/bg_duelists.jpg' },
   [TextureName.bg_duels_yours]: { path: '/images/bg_duels_yours.jpg' },
   [TextureName.bg_duels_live]: { path: '/images/bg_duels_live.jpg' },
@@ -46,6 +48,8 @@ const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.duel_water_map]: { path: '/textures/water_map.ktx2' },
   [TextureName.cliffs]: { path: '/textures/cliffs.png' },
 }
+
+
 
 export enum CardColor {
   WHITE = 'white',
@@ -489,18 +493,47 @@ export const BladesCardsTextures: Record<BladesCard, CardData> = {
   }
 }
 
-export const sceneBackgrounds: Record<SceneName, TextureName> = {
-  [SceneName.Gate]: TextureName.bg_gate,
-  [SceneName.Profile]: TextureName.bg_profile,
-  [SceneName.Tavern]: TextureName.bg_tavern,
-  [SceneName.Barkeep]: TextureName.bg_barkeep,
-  [SceneName.Duelists]: TextureName.bg_duelists,
-  [SceneName.YourDuels]: TextureName.bg_duels_yours,
-  [SceneName.LiveDuels]: TextureName.bg_duels_live,
-  [SceneName.PastDuels]: TextureName.bg_duels_past,
-  [SceneName.Tournament]: TextureName.bg_duels_live,
-  [SceneName.IRLTournament]: TextureName.bg_duels_live,
-  [SceneName.Duel]: TextureName.bg_duel,
+export interface SceneData {
+  background: TextureName,
+  mask?: TextureName,
+  items?: SceneObject[]
+}
+
+export interface SceneObject {
+  name: string,
+  color: string,
+  description: string,
+}
+
+export const sceneBackgrounds: Record<SceneName, SceneData> = {
+  [SceneName.Gate]: { 
+    background: TextureName.bg_gate,
+    mask: TextureName.bg_gate_mask,
+    items: [
+      { name: 'door', color: 'ff0000', description: 'Knock on door' },        // red
+      { name: 'duel', color: 'ffff00', description: 'Show duel tutorial' },   // yellow
+      { name: 'sign', color: '00ff00', description: 'See more' },             // green
+    ]
+  },
+  [SceneName.Door]: { background: TextureName.bg_door },
+  [SceneName.Profile]: { background: TextureName.bg_profile },
+  [SceneName.Tavern]: { 
+    background: TextureName.bg_tavern,
+    mask: TextureName.bg_tavern_mask,
+    items: [
+      { name: 'bartender', color: 'ff0000', description: 'Bartender' },   // red
+      { name: 'bottle', color: '00ff00', description: 'All Duelists' },   // green
+      { name: 'pistol', color: '0000ff', description: 'Your Duels' },     // blue
+      { name: 'shovel', color: 'ff00ff', description: 'Past Duels' }      // magenta
+    ]
+  },
+  [SceneName.Duelists]: { background: TextureName.bg_duelists },
+  [SceneName.YourDuels]: { background: TextureName.bg_duels_yours },
+  [SceneName.LiveDuels]: { background: TextureName.bg_duels_live },
+  [SceneName.PastDuels]: { background: TextureName.bg_duels_past },
+  [SceneName.Tournament]: { background: TextureName.bg_duels_live },
+  [SceneName.IRLTournament]: { background: TextureName.bg_duels_live },
+  [SceneName.Duel]: { background: TextureName.bg_duel },
 }
 
 enum CharacterType {

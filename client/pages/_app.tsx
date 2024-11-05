@@ -8,7 +8,7 @@ import { PistolsProvider } from '@/pistols/hooks/PistolsContext'
 // import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 // import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
 import { makeDojoAppConfig } from '@/games/pistols/config'
-import ErrorModal from '@/pistols/components/ErrorModal'
+import ErrorModal from '@/pistols/components/modals/ErrorModal'
 import Dojo from '@/lib/dojo/Dojo'
 
 function _app({ Component, pageProps }) {
