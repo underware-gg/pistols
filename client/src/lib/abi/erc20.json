@@ -129,75 +129,18 @@
   {
     "type": "impl",
     "name": "IDojoInitImpl",
-    "interface_name": "pistols::systems::tokens::lords_mock::lords_mock::IDojoInit"
+    "interface_name": "pistols::systems::tokens::fame_coin::fame_coin::IDojoInit"
   },
   {
     "type": "interface",
-    "name": "pistols::systems::tokens::lords_mock::lords_mock::IDojoInit",
+    "name": "pistols::systems::tokens::fame_coin::fame_coin::IDojoInit",
     "items": [
       {
         "type": "function",
         "name": "dojo_init",
-        "inputs": [
-          {
-            "name": "game_contract_address",
-            "type": "core::starknet::contract_address::ContractAddress"
-          },
-          {
-            "name": "faucet_amount",
-            "type": "core::integer::u128"
-          }
-        ],
-        "outputs": [],
-        "state_mutability": "external"
-      }
-    ]
-  },
-  {
-    "type": "impl",
-    "name": "CoinComponentPublicImpl",
-    "interface_name": "pistols::systems::tokens::lords_mock::ILordsMockPublic"
-  },
-  {
-    "type": "struct",
-    "name": "core::integer::u256",
-    "members": [
-      {
-        "name": "low",
-        "type": "core::integer::u128"
-      },
-      {
-        "name": "high",
-        "type": "core::integer::u128"
-      }
-    ]
-  },
-  {
-    "type": "interface",
-    "name": "pistols::systems::tokens::lords_mock::ILordsMockPublic",
-    "items": [
-      {
-        "type": "function",
-        "name": "faucet",
         "inputs": [],
         "outputs": [],
-        "state_mutability": "external"
-      },
-      {
-        "type": "function",
-        "name": "mint",
-        "inputs": [
-          {
-            "name": "recipient",
-            "type": "core::starknet::contract_address::ContractAddress"
-          },
-          {
-            "name": "amount",
-            "type": "core::integer::u256"
-          }
-        ],
-        "outputs": [],
-        "state_mutability": "external"
+        "state_mutability": "view"
       }
     ]
   },
@@ -228,6 +171,20 @@
     "type": "impl",
     "name": "ERC20MixinImpl",
     "interface_name": "openzeppelin_token::erc20::interface::ERC20ABI"
+  },
+  {
+    "type": "struct",
+    "name": "core::integer::u256",
+    "members": [
+      {
+        "name": "low",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "high",
+        "type": "core::integer::u128"
+      }
+    ]
   },
   {
     "type": "enum",
@@ -531,13 +488,7 @@
   },
   {
     "type": "event",
-    "name": "pistols::systems::components::coin_component::CoinComponent::Event",
-    "kind": "enum",
-    "variants": []
-  },
-  {
-    "type": "event",
-    "name": "pistols::systems::tokens::lords_mock::lords_mock::Event",
+    "name": "pistols::systems::tokens::fame_coin::fame_coin::Event",
     "kind": "enum",
     "variants": [
       {
@@ -548,11 +499,6 @@
       {
         "name": "ERC20Event",
         "type": "openzeppelin_token::erc20::erc20::ERC20Component::Event",
-        "kind": "flat"
-      },
-      {
-        "name": "CoinEvent",
-        "type": "pistols::systems::components::coin_component::CoinComponent::Event",
         "kind": "flat"
       }
     ]

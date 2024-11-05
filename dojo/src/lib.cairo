@@ -6,41 +6,44 @@ mod interfaces {
 
 mod systems {
     mod admin;
+    mod bank;
     mod game;
     mod rng;
     mod tokens {
-        mod duelist;
+        mod duel_token;
+        mod duelist_token;
+        mod fame_coin;
         #[cfg(feature:'lords_mock')]
         mod lords_mock;
     }
     mod components {
         mod coin_component;
         mod token_component;
+        mod token_bound;
         mod erc721_hooks;
     }
 }
 
 mod libs {
+    mod events;
+    mod game_loop;
+    mod pact;
     mod seeder;
-    mod shooter;
     mod store;
-    mod utils;
 }
 
 mod models {
     mod challenge;
     mod config;
     mod duelist;
+    mod payment;
     mod table;
-    mod coin_config;
-    mod token_config;
 }
 
 mod types {
     mod challenge_state;
     mod constants;
     mod duel_progress;
-    mod events;
     mod misc;
     mod premise;
     mod round_state;
@@ -75,16 +78,12 @@ mod utils {
 
 #[cfg(test)]
 mod tests {
-    // pistols
     mod test_admin;
     mod test_cards;
     mod test_env_cards;
     mod test_challenge;
-    mod test_chances;
     mod test_duel;
     mod test_duelist;
-    // mod test_wager;
-    // mod test_torna;
     mod test_utils;
     mod test_rng;
     // utils
@@ -94,6 +93,7 @@ mod tests {
     mod utils;
     // tokens
     mod token {
+        mod test_duel_token;
         mod test_duelist_token;
         // mocks
         mod mock_duelist;

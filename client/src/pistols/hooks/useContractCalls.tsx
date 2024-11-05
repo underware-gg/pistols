@@ -23,14 +23,30 @@ export const useCanJoin = () => {
   }
 }
 
-export const useCalcFee = (table_id: string, wager_value: BigNumberish) => {
-  const { calc_fee } = useDojoSystemCalls()
+export const useCalcFeeDuelist = () => {
+  const { address } = useAccount()
+  const { calc_fee_duelist } = useDojoSystemCalls()
   const options = useMemo(() => ({
-    call: calc_fee,
-    args: [table_id, wager_value],
+    call: calc_fee_duelist,
+    args: [address],
+    enabled: isPositiveBigint(address),
+    defaultValue: null,
+  }), [calc_fee_duelist, address])
+  const { value, isPending } = useContractCall(options)
+  return {
+    fee: value,
+    isPending,
+  }
+}
+
+export const useCalcFeeDuel = (table_id: string) => {
+  const { calc_fee_duel } = useDojoSystemCalls()
+  const options = useMemo(() => ({
+    call: calc_fee_duel,
+    args: [table_id],
     enabled: Boolean(table_id),
     defaultValue: null,
-  }), [calc_fee, table_id, wager_value])
+  }), [calc_fee_duel, table_id])
   const { value, isPending } = useContractCall(options)
   return {
     fee: value,
@@ -113,7 +129,6 @@ export const useTestValidateSignature = () => {
       '0xe29882a1fcba1e7e10cad46212257fea5c752a4f9b1b1ec683c503a2cf5c8a', // account
       [173730084075620862592063244223266966993038958055152214202416930759334968124n, 1417567916191820063020424621516241329682320435780260605909088968782369795432n],
       163115167366171702731397391899782408079n,
-      1n,
       1n,
     ],
     defaultValue: false,

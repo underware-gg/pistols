@@ -3,6 +3,7 @@ use pistols::models::duelist::{Score};
 use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round_state::{RoundState, RoundStateTrait};
 use pistols::types::premise::{Premise, PremiseTrait};
+use pistols::types::duel_progress::{DuelistDrawnCard};
 use pistols::types::cards::{
     paces::{PacesCard, PacesCardTrait},
     tactics::{TacticsCard, TacticsCardTrait},
@@ -18,6 +19,7 @@ pub struct Challenge {
     #[key]
     pub duel_id: u128,
     //-------------------------
+    pub seed: u128,
     pub table_id: felt252,
     pub premise: Premise,           // premise of the dispute
     pub quote: felt252,             // message to challenged
@@ -27,23 +29,11 @@ pub struct Challenge {
     pub duelist_id_b: u128,         // Challenged duelist 
     // progress and results
     pub state: ChallengeState,
-    pub round_number: u8,           // current or final
     pub winner: u8,                 // 0:draw, 1:duelist_a, 2:duelist_b
     // timestamps in unix epoch
     pub timestamp_start: u64,       // Unix time, started
     pub timestamp_end: u64,         // Unix time, ended
 } // [f] [f] [f] [f] [128] [128] [152]
-
-// Challenge wager (optional)
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct Wager {
-    #[key]
-    pub duel_id: u128,
-    //------------
-    pub value: u128,
-    pub fee: u128,
-}
 
 //
 // Each duel round
@@ -52,15 +42,13 @@ pub struct Wager {
 pub struct Round {
     #[key]
     pub duel_id: u128,
-    #[key]
-    pub round_number: u8,
     //---------------
     pub moves_a: Moves,
     pub moves_b: Moves,
     pub state_a: DuelistState,
     pub state_b: DuelistState,
     pub state: RoundState,
-    pub final_step: u8,     // pace number, > 10 if ended in blades
+    pub final_blow: felt252, // Card as string
 }
 
 //
@@ -85,8 +73,6 @@ pub struct DuelistState {
     pub health: u8,     // 0..CONST::FULL_HEALTH
     pub dice_fire: u8,  // 0..100
     pub honour: u8,     // honour granted
-    // TODO: REMOVE...
-    pub wager: u8,
 } // [3*8]:24
 
 
@@ -94,10 +80,20 @@ pub struct DuelistState {
 // Traits
 //
 use pistols::types::cards::hand::{DuelistHand};
+use pistols::types::constants::{CONST};
 use pistols::utils::arrays::{SpanUtilsTrait};
 use pistols::utils::hash::{hash_values};
 use pistols::utils::math::{MathTrait};
-use pistols::types::constants::{CONST};
+
+#[generate_trait]
+impl ChallengeImpl of ChallengeTrait {
+    #[inline(always)]
+    fn duelist_number(self: Challenge, duelist_id: u128) -> u8 {
+        (if (duelist_id == self.duelist_id_a) {(1)}
+        else if (duelist_id == self.duelist_id_b) {(2)}
+        else {(0)})
+    }
+}
 
 #[generate_trait]
 impl RoundImpl of RoundTrait {

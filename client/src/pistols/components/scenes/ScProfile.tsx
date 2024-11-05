@@ -3,12 +3,13 @@ import { Grid, Tab } from 'semantic-ui-react'
 import { RowDivider, VStack } from '@/lib/ui/Stack'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useDuelistsOfOwner } from '@/pistols/hooks/useTokenDuelist'
+import { useDuelistCalcPrice } from '@/pistols/hooks/useDuelistToken'
+import { useDuelistsOfOwner } from '@/pistols/hooks/useDuelistToken'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { ProfileName } from '@/pistols/components/account/ProfileDescription'
-import { WagerBalance } from '@/pistols/components/account/LordsBalance'
+import { FameBalanceDuelist } from '@/pistols/components/account/LordsBalance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ConnectButton, CurrentChainHint, EnterAsGuestButton } from '@/pistols/components/scenes/ScDoor'
 import { Divider } from '@/lib/ui/Divider'
@@ -75,7 +76,7 @@ export default function ScProfile() {
 
 function DuelistsConnect() {
   return (
-    <VStack className='Faded FillWidth UIAccountsListScroller_XX'>
+    <VStack className='Faded FillWidth'>
       <Divider />
       <span className='Title'>
         Create or Log In with your
@@ -214,9 +215,9 @@ function DuelistItem({
 }: {
   duelistId: BigNumberish
 }) {
-  const { duelistId: seletedDuelistId } = useSettings()
+  const { duelistId: selectedDuelistId } = useSettings()
   const { exists, profilePic } = useDuelist(duelistId)
-  const isSelected = (duelistId && duelistId == seletedDuelistId)
+  const isSelected = (duelistId && duelistId == selectedDuelistId)
 
   const _canPlay = (exists)
 
@@ -235,7 +236,7 @@ function DuelistItem({
   }
 
   const classNames = useMemo(() => {
-    const result = ['Anchor']
+    const result = ['Anchor', 'Padded']
     if (isSelected) result.push('BgImportant')
     return result
   }, [isSelected])
@@ -243,10 +244,11 @@ function DuelistItem({
   return (
     <>
       <RowDivider />
-      <Row textAlign='center' verticalAlign='top' className={classNames.join(' ')}
+      <Row textAlign='center' verticalAlign='top'
+        className={classNames.join(' ')}
         onClick={() => dispatchDuelistId(duelistId)}
       >
-        <Col width={3} className='NoPadding' verticalAlign='middle'>
+        <Col width={3} verticalAlign='middle'>
           <div>
             <ProfilePicSquare medium
               profilePic={profilePic ?? 0}
@@ -254,17 +256,16 @@ function DuelistItem({
           </div>
         </Col>
         <Col width={8} textAlign='left' verticalAlign='middle'>
-
           <h4>
             <IconClick name='edit' size={'small'} onClick={() => _manage()} />
             &nbsp;
             <ProfileName duelistId={duelistId} />
           </h4>
           <h5>
-            <WagerBalance duelistId={duelistId} />
+            <FameBalanceDuelist duelistId={duelistId} />
           </h5>
         </Col>
-        <Col width={5} textAlign='left' verticalAlign='bottom'>
+        <Col width={5} textAlign='left' verticalAlign='middle'>
           <ActionButton fill disabled={!_canPlay} onClick={() => dispatchSelectDuelistId(duelistId)} label='Status' />
           <ActionButton fill important disabled={!_canPlay} onClick={() => _duel()} label='Duel!' />
         </Col>

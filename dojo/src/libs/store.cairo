@@ -1,176 +1,138 @@
 use starknet::{ContractAddress};
-use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+use dojo::world::{WorldStorage, WorldStorageTrait};
+use dojo::model::{
+    ModelStorage, ModelValueStorage,
+    // Model, ModelPtr,
+};
 
 pub use pistols::models::{
+    config::{
+        CONFIG,
+        Config, ConfigTrait, ConfigValue,
+        CoinConfig, CoinConfigValue,
+        TokenConfig, TokenConfigValue,
+    },
     challenge::{
-        Challenge, ChallengeStore, ChallengeEntity, ChallengeEntityStore,
-        Wager, WagerStore, WagerEntity, WagerEntityStore,
-        Round, RoundStore, RoundEntity, RoundEntityStore,
+        Challenge, ChallengeValue,
+        Round, RoundValue,
     },
     duelist::{
-        Duelist, DuelistStore, DuelistEntity, DuelistEntityStore,
-        Pact, PactStore, PactEntity, PactEntityStore,
-        Scoreboard, ScoreboardStore, ScoreboardEntity, ScoreboardEntityStore,
+        Duelist, DuelistValue,
+        Pact, PactValue,
+        Scoreboard, ScoreboardValue,
     },
     table::{
-        TableConfig, TableConfigStore, TableConfigEntity, TableConfigEntityStore,
-        TableWager, TableWagerStore, TableWagerEntity, TableWagerEntityStore,
-        TableAdmittance, TableAdmittanceStore, TableAdmittanceEntity, TableAdmittanceEntityStore,
+        TableConfig, TableConfigValue,
+        TableAdmittance, TableAdmittanceValue,
     },
-    config::{
-        Config, ConfigStore,
-        ConfigEntity, ConfigEntityStore,
-        CONFIG,
+    payment::{
+        Payment, PaymentTrait, PaymentValue,
     },
-    coin_config::{
-        CoinConfig, CoinConfigStore,
-        CoinConfigEntity, CoinConfigEntityStore,
-    },
-    token_config::{
-        TokenConfig, TokenConfigStore,
-        TokenConfigEntity, TokenConfigEntityStore,
+};
+pub use pistols::systems::components::{
+    token_bound::{
+        TokenBoundAddress, TokenBoundAddressValue,
     },
 };
 
 #[derive(Copy, Drop)]
 pub struct Store {
-    world: IWorldDispatcher,
+    world: WorldStorage,
 }
 
 #[generate_trait]
 impl StoreImpl of StoreTrait {
     #[inline(always)]
-    fn new(world: IWorldDispatcher) -> Store {
-        (Store { world: world })
+    fn new(world: WorldStorage) -> Store {
+        (Store { world })
     }
 
     //
     // Getters
     //
 
-    // #[inline(always)]
-    // fn get_challenge(self: Store, duel_id: u128) -> Challenge {
-    //     // (get!(self.world, duel_id, (Challenge)))
-    //     // dojo::model::ModelEntity::<ChallengeEntity>::get(self.world, 1); // OK
-    //     // let mut challenge_entity = ChallengeEntityStore::get(self.world, 1); // OK
-    //     // challenge_entity.update(self.world); // ERROR
-    //     (ChallengeStore::get(self.world, duel_id))
-    // }
-
     #[inline(always)]
-    fn get_challenge(self: Store, duel_id: u128) -> Challenge {
-        (ChallengeStore::get(self.world, duel_id))
+    fn get_challenge(ref self: Store, duel_id: u128) -> Challenge {
+        (self.world.read_model(duel_id))
     }
     #[inline(always)]
-    fn get_challenge_entity(self: Store, duel_id: u128) -> ChallengeEntity {
-        (ChallengeEntityStore::get(self.world,
-            ChallengeStore::entity_id_from_keys(duel_id)
-        ))
+    fn get_challenge_value(ref self: Store, duel_id: u128) -> ChallengeValue {
+        (self.world.read_value(duel_id))
     }
 
     #[inline(always)]
-    fn get_wager_entity(self: Store, duel_id: u128) -> WagerEntity {
-        (WagerEntityStore::get(self.world,
-            WagerStore::entity_id_from_keys(duel_id)
-        ))
+    fn get_round(ref self: Store, duel_id: u128) -> Round {
+        (self.world.read_model(duel_id))
+    }
+    #[inline(always)]
+    fn get_round_value(ref self: Store, duel_id: u128) -> RoundValue {
+        (self.world.read_value(duel_id))
     }
 
     #[inline(always)]
-    fn get_round(self: Store, duel_id: u128, round_number: u8) -> Round {
-        (RoundStore::get(self.world, duel_id, round_number))
+    fn get_duelist(ref self: Store, duelist_id: u128) -> Duelist {
+        (self.world.read_model(duelist_id))
     }
     #[inline(always)]
-    fn get_round_entity(self: Store, duel_id: u128, round_number: u8) -> RoundEntity {
-        (RoundEntityStore::get(self.world,
-            RoundStore::entity_id_from_keys(duel_id, round_number)
-        ))
+    fn get_duelist_value(ref self: Store, duelist_id: u128) -> DuelistValue {
+        (self.world.read_value(duelist_id))
     }
 
     #[inline(always)]
-    fn get_duelist(self: Store, duelist_id: u128) -> Duelist {
-        (DuelistStore::get(self.world, duelist_id))
-    }
-    #[inline(always)]
-    fn get_duelist_entity(self: Store, duelist_id: u128) -> DuelistEntity {
-        (DuelistEntityStore::get(self.world,
-            DuelistStore::entity_id_from_keys(duelist_id)
-        ))
+    fn get_pact(ref self: Store, table_id: felt252, pair: u128) -> Pact {
+        (self.world.read_model((table_id, pair),))
     }
 
     #[inline(always)]
-    fn get_pact_entity(self: Store, table_id: felt252, pair: u128) -> PactEntity {
-        (PactEntityStore::get(self.world,
-            PactStore::entity_id_from_keys(table_id, pair)
-        ))
+    fn get_scoreboard(ref self: Store, table_id: felt252, duelist_id: u128) -> Scoreboard {
+        (self.world.read_model((table_id, duelist_id),))
     }
 
     #[inline(always)]
-    fn get_scoreboard(self: Store, table_id: felt252, duelist_id: u128) -> Scoreboard {
-        (ScoreboardStore::get(self.world, table_id, duelist_id))
+    fn get_table_config(ref self: Store, table_id: felt252) -> TableConfig {
+        (self.world.read_model(table_id))
     }
     #[inline(always)]
-    fn get_scoreboard_entity(self: Store, table_id: felt252, duelist_id: u128) -> ScoreboardEntity {
-        (ScoreboardEntityStore::get(self.world,
-            ScoreboardStore::entity_id_from_keys(table_id, duelist_id)
-        ))
+    fn get_table_config_value(ref self: Store, table_id: felt252) -> TableConfigValue {
+        (self.world.read_value(table_id))
     }
 
     #[inline(always)]
-    fn get_table_config(self: Store, table_id: felt252) -> TableConfig {
-        (TableConfigStore::get(self.world, table_id))
-    }
-    #[inline(always)]
-    fn get_table_config_entity(self: Store, table_id: felt252) -> TableConfigEntity {
-        (TableConfigEntityStore::get(self.world,
-            TableConfigStore::entity_id_from_keys(table_id)
-        ))
+    fn get_table_admittance(ref self: Store, table_id: felt252) -> TableAdmittance {
+        (self.world.read_model(table_id))
     }
 
     #[inline(always)]
-    fn get_table_wager(self: Store, table_id: felt252) -> TableWager {
-        (TableWagerStore::get(self.world, table_id))
+    fn get_coin_config(ref self: Store, contract_address: ContractAddress) -> CoinConfig {
+        (self.world.read_model(contract_address))
     }
     #[inline(always)]
-    fn get_table_wager_entity(self: Store, table_id: felt252) -> TableWagerEntity {
-        (TableWagerEntityStore::get(self.world,
-            TableWagerStore::entity_id_from_keys(table_id)
-        ))
+    fn get_coin_config_value(ref self: Store, contract_address: ContractAddress) -> CoinConfigValue {
+        (self.world.read_value(contract_address))
     }
 
     #[inline(always)]
-    fn get_table_admittance_entity(self: Store, table_id: felt252) -> TableAdmittanceEntity {
-        (TableAdmittanceEntityStore::get(self.world,
-            TableAdmittanceStore::entity_id_from_keys(table_id)
-        ))
+    fn get_token_config(ref self: Store, contract_address: ContractAddress) -> TokenConfig {
+        (self.world.read_model(contract_address))
+    }
+    #[inline(always)]
+    fn get_token_config_value(ref self: Store, contract_address: ContractAddress) -> TokenConfigValue {
+        (self.world.read_value(contract_address))
     }
 
     #[inline(always)]
-    fn get_coin_config(self: Store, contract_address: ContractAddress) -> CoinConfig {
-        (CoinConfigStore::get(self.world, contract_address))
-    }
-    #[inline(always)]
-    fn get_coin_config_entity(self: Store, contract_address: ContractAddress) -> CoinConfigEntity {
-        (CoinConfigEntityStore::get(self.world,
-            CoinConfigStore::entity_id_from_keys(contract_address)
-        ))
+    fn get_config(ref self: Store) -> Config {
+        (self.world.read_model(CONFIG::CONFIG_KEY))
     }
 
     #[inline(always)]
-    fn get_token_config(self: Store, contract_address: ContractAddress) -> TokenConfig {
-        (TokenConfigStore::get(self.world, contract_address))
-    }
-    #[inline(always)]
-    fn get_token_config_entity(self: Store, contract_address: ContractAddress) -> TokenConfigEntity {
-        (TokenConfigEntityStore::get(self.world,
-            TokenConfigStore::entity_id_from_keys(contract_address)
-        ))
+    fn get_payment(ref self: Store, key: felt252) -> Payment {
+        (self.world.read_model(key))
     }
 
     #[inline(always)]
-    fn get_config_entity(self: Store) -> ConfigEntity {
-        (ConfigEntityStore::get(self.world,
-            ConfigStore::entity_id_from_keys(CONFIG::CONFIG_KEY)
-        ))
+    fn get_token_bound_address(ref self: Store, recipient: ContractAddress) -> TokenBoundAddress {
+        (self.world.read_model(recipient))
     }
 
     //
@@ -178,94 +140,67 @@ impl StoreImpl of StoreTrait {
     //
 
     #[inline(always)]
-    fn set_challenge(self: Store, model: @Challenge) {
-        model.set(self.world);
-    }
-    #[inline(always)]
-    fn set_challenge_entity(self: Store, entity: @ChallengeEntity) {
-        entity.update(self.world);
+    fn set_challenge(ref self: Store, model: @Challenge) {
+        self.world.write_model(model);
     }
 
     #[inline(always)]
-    fn set_wager_entity(self: Store, entity: @WagerEntity) {
-        entity.update(self.world);
+    fn set_round(ref self: Store, model: @Round) {
+        self.world.write_model(model);
     }
 
     #[inline(always)]
-    fn set_round(self: Store, model: @Round) {
-        model.set(self.world);
-    }
-    #[inline(always)]
-    fn set_round_entity(self: Store, entity: @RoundEntity) {
-        entity.update(self.world);
+    fn set_duelist(ref self: Store, model: @Duelist) {
+        self.world.write_model(model);
     }
 
     #[inline(always)]
-    fn set_duelist(self: Store, model: @Duelist) {
-        model.set(self.world);
+    fn set_pact(ref self: Store, model: @Pact) {
+        self.world.write_model(model);
     }
     #[inline(always)]
-    fn set_duelist_entity(self: Store, entity: @DuelistEntity) {
-        entity.update(self.world);
+    fn delete_pact(ref self: Store, model: @Pact) {
+        self.world.erase_model(model);
     }
 
     #[inline(always)]
-    fn set_pact(self: Store, model: @Pact) {
-        model.set(self.world);
-    }
-    #[inline(always)]
-    fn set_pact_entity(self: Store, entity: @PactEntity) {
-        entity.update(self.world);
+    fn set_scoreboard(ref self: Store, model: @Scoreboard) {
+        self.world.write_model(model);
     }
 
     #[inline(always)]
-    fn set_scoreboard(self: Store, model: @Scoreboard) {
-        model.set(self.world);
-    }
-    #[inline(always)]
-    fn set_scoreboard_entity(self: Store, entity: @ScoreboardEntity) {
-        entity.update(self.world);
+    fn set_table_config(ref self: Store, model: @TableConfig) {
+        self.world.write_model(model);
     }
 
     #[inline(always)]
-    fn set_table_config(self: Store, model: @TableConfig) {
-        model.set(self.world);
-    }
-    #[inline(always)]
-    fn set_table_config_entity(self: Store, entity: @TableConfigEntity) {
-        entity.update(self.world);
+    fn set_table_admittance(ref self: Store, model: @TableAdmittance) {
+        self.world.write_model(model);
     }
 
     #[inline(always)]
-    fn set_table_admittance(self: Store, model: @TableAdmittance) {
-        model.set(self.world);
+    fn set_coin_config(ref self: Store, model: @CoinConfig) {
+        self.world.write_model(model);
     }
 
     #[inline(always)]
-    fn set_coin_config(self: Store, model: @CoinConfig) {
-        model.set(self.world);
-    }
-    #[inline(always)]
-    fn set_coin_config_entity(self: Store, entity: @CoinConfigEntity) {
-        entity.update(self.world);
+    fn set_token_config(ref self: Store, model: @TokenConfig) {
+        self.world.write_model(model);
     }
 
     #[inline(always)]
-    fn set_token_config(self: Store, model: @TokenConfig) {
-        model.set(self.world);
-    }
-    #[inline(always)]
-    fn set_token_config_entity(self: Store, entity: @TokenConfigEntity) {
-        entity.update(self.world);
+    fn set_config(ref self: Store, model: @Config) {
+        self.world.write_model(model);
     }
 
     #[inline(always)]
-    fn set_config(self: Store, model: @Config) {
-        model.set(self.world);
-    }
-    #[inline(always)]
-    fn set_config_entity(self: Store, entity: @ConfigEntity) {
-        entity.update(self.world);
+    fn set_payment(ref self: Store, model: @Payment) {
+        (*model).assert_is_valid();
+        self.world.write_model(model);
     }
 
+    #[inline(always)]
+    fn set_token_bound_address(ref self: Store, model: @TokenBoundAddress) {
+        self.world.write_model(model);
+    }
 }

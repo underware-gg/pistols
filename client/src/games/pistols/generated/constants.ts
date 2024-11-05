@@ -300,27 +300,49 @@ export type EnvCardPoints = {
 // from: ../dojo/src/interfaces/systems.cairo
 type type_SELECTORS = {
   ADMIN: BigNumberish, // cairo: felt252
+  BANK: BigNumberish, // cairo: felt252
   GAME: BigNumberish, // cairo: felt252
   RNG: BigNumberish, // cairo: felt252
-  DUELIST: BigNumberish, // cairo: felt252
+  DUEL_TOKEN: BigNumberish, // cairo: felt252
+  DUELIST_TOKEN: BigNumberish, // cairo: felt252
+  FAME_COIN: BigNumberish, // cairo: felt252
   LORDS_MOCK: BigNumberish, // cairo: felt252
   CONFIG: BigNumberish, // cairo: felt252
   TABLE_CONFIG: BigNumberish, // cairo: felt252
-  TABLE_WAGER: BigNumberish, // cairo: felt252
   TOKEN_CONFIG: BigNumberish, // cairo: felt252
   COIN_CONFIG: BigNumberish, // cairo: felt252
+  PAYMENT: BigNumberish, // cairo: felt252
 };
 export const SELECTORS: type_SELECTORS = {
   ADMIN: '0x036fd20372b5d47c092e2fede52897075978efb732aeaeb155d19eb8147f6497', // 'selector_from_tag!("pistols-admin")'
+  BANK: '0x07a683ab68bc70300995da8de5781002e781f22ba246fe239ebeff02b2230375', // 'selector_from_tag!("pistols-bank")'
   GAME: '0x032c102830cbffaddecbdce7ef85735e6f08da08ee762a2d7b09304b6533dd57', // 'selector_from_tag!("pistols-game")'
   RNG: '0x013f1a6a9ae118440a997d6624230b59f43516220a1208526c3f66e202910504', // 'selector_from_tag!("pistols-rng")'
-  DUELIST: '0x05e4878f080bc2123d16fb1b8ae4ddb6f869285e8ddd19f011824e0839ecac4d', // 'selector_from_tag!("pistols-duelist")'
+  DUEL_TOKEN: '0x0670a5c673ac776e00e61c279cf7dc0efbe282787f4d719498e55643c5116063', // 'selector_from_tag!("pistols-duel_token")'
+  DUELIST_TOKEN: '0x045c96d20393520c5dffeb2f2929fb599034d4fc6e9d423e6a641222fb60a25e', // 'selector_from_tag!("pistols-duelist_token")'
+  FAME_COIN: '0x0371b95cb7056eb2d21819662e973ed32c345c989aa9f6097e7811a5665a0b0a', // 'selector_from_tag!("pistols-fame_coin")'
   LORDS_MOCK: '0x02b1156e63a09854c3d8dba0cad93b41e1fc4662466a0ffc2a9ec9e54b4bc788', // 'selector_from_tag!("pistols-lords_mock")'
   CONFIG: '0x060742fa7259b7ce3ebc0a2dde90b740d1234c770199a822fa2e7cf779dc0392', // 'selector_from_tag!("pistols-Config")'
   TABLE_CONFIG: '0x01e8368fc88328662c92a11c0e739bf8b74bcd77a20071d2641a31e1a063c138', // 'selector_from_tag!("pistols-TableConfig")'
-  TABLE_WAGER: '0x02d819fd3d7e499db47173dba8d6a4d033fead59cd48476fa24b9f45851b3527', // 'selector_from_tag!("pistols-TableWager")'
   TOKEN_CONFIG: '0x056ebd3387f45e8b292b472f3539e675031f12cf156c07c309c6403044f71fed', // 'selector_from_tag!("pistols-TokenConfig")'
   COIN_CONFIG: '0x026fad4dff063a4f2c3b3889723194b9bdbbbf833e44ff2d573af01741b966ac', // 'selector_from_tag!("pistols-CoinConfig")'
+  PAYMENT: '0x017a03e9cb461470b9149f9efbd95ad9b217fca9fdccd3827383904c33da96c1', // 'selector_from_tag!("pistols-Payment")'
+};
+
+// from: ../dojo/src/libs/events.cairo
+type type_EVENT_SELECTOR = {
+  DuelistRegisteredEvent: BigNumberish, // cairo: felt252
+  NewChallengeEvent: BigNumberish, // cairo: felt252
+  ChallengeAcceptedEvent: BigNumberish, // cairo: felt252
+  ChallengeResolvedEvent: BigNumberish, // cairo: felt252
+  DuelistTurnEvent: BigNumberish, // cairo: felt252
+};
+export const EVENT_SELECTOR: type_EVENT_SELECTOR = {
+  DuelistRegisteredEvent: '0x148c3db21a55576bc012023dc4d3b5bd570c519de855849eac52b1c5d6c9e85',
+  NewChallengeEvent: '0x14a0df74df51e02ef8dedabfd1ea9684ea2087bed6370e881b156d7e2e56975',
+  ChallengeAcceptedEvent: '0x31cdbf7ac39747303190a727df1a270ae5e4f05191f6f58e452ce4eb1e98abe',
+  ChallengeResolvedEvent: '0x23dfe05a8414fd8464370e120099be69327b2a52ae6655ff23733651e8281b1',
+  DuelistTurnEvent: '0x19556e1418f1e7a7e6962eff75d1a46abd50bda431139f855ba85c9119754a4',
 };
 
 // from: ../dojo/src/models/config.cairo
@@ -339,6 +361,16 @@ type type_TABLES = {
 export const TABLES: type_TABLES = {
   LORDS: 'Lords',
   COMMONERS: 'Commoners',
+};
+
+// from: ../dojo/src/systems/components/erc721_hooks.cairo
+type type_Errors = {
+  INVALID_ATTRIBUTES: string, // cairo: felt252
+  INVALID_METADATA: string, // cairo: felt252
+};
+export const Errors: type_Errors = {
+  INVALID_ATTRIBUTES: 'METADATA: invalid attributes',
+  INVALID_METADATA: 'METADATA: invalid metadata',
 };
 
 // from: ../dojo/src/types/cards/blades.cairo
@@ -657,22 +689,12 @@ export const CONST: type_CONST = {
 
 // from: ../dojo/src/types/constants.cairo
 type type_HONOUR = {
-  VILLAIN_START: number, // cairo: u8
   TRICKSTER_START: number, // cairo: u8
   LORD_START: number, // cairo: u8
-  HALFWAY: number, // cairo: u8
-  MAX: number, // cairo: u8
-  LEVEL_MIN: number, // cairo: u8
-  LEVEL_MAX: number, // cairo: u8
 };
 export const HONOUR: type_HONOUR = {
-  VILLAIN_START: 10,
-  TRICKSTER_START: 35,
-  LORD_START: 75,
-  HALFWAY: 50,
-  MAX: 100,
-  LEVEL_MIN: 10,
-  LEVEL_MAX: 100,
+  TRICKSTER_START: 40,
+  LORD_START: 70,
 };
 
 // from: ../dojo/src/types/constants.cairo
@@ -685,20 +707,14 @@ export const CHANCES: type_CHANCES = {
   ALWAYS: 100,
 };
 
-// from: ../dojo/src/types/events.cairo
-type type_EVENT_SELECTOR = {
-  DuelistRegisteredEvent: BigNumberish, // cairo: felt252
-  NewChallengeEvent: BigNumberish, // cairo: felt252
-  ChallengeAcceptedEvent: BigNumberish, // cairo: felt252
-  ChallengeResolvedEvent: BigNumberish, // cairo: felt252
-  DuelistTurnEvent: BigNumberish, // cairo: felt252
+// from: ../dojo/src/types/constants.cairo
+type type_FAME = {
+  MINT_GRANT_AMOUNT: BigNumberish, // cairo: u256
+  FAME_PER_LORDS: BigNumberish, // cairo: u256
 };
-export const EVENT_SELECTOR: type_EVENT_SELECTOR = {
-  DuelistRegisteredEvent: '0x148c3db21a55576bc012023dc4d3b5bd570c519de855849eac52b1c5d6c9e85',
-  NewChallengeEvent: '0x14a0df74df51e02ef8dedabfd1ea9684ea2087bed6370e881b156d7e2e56975',
-  ChallengeAcceptedEvent: '0x31cdbf7ac39747303190a727df1a270ae5e4f05191f6f58e452ce4eb1e98abe',
-  ChallengeResolvedEvent: '0x23dfe05a8414fd8464370e120099be69327b2a52ae6655ff23733651e8281b1',
-  DuelistTurnEvent: '0x19556e1418f1e7a7e6962eff75d1a46abd50bda431139f855ba85c9119754a4',
+export const FAME: type_FAME = {
+  MINT_GRANT_AMOUNT: '1_000 * super.CONST::ETH_TO_WEI',
+  FAME_PER_LORDS: '10',
 };
 
 // from: ../dojo/src/types/round_state.cairo

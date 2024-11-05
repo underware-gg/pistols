@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Divider, Grid, Modal } from 'semantic-ui-react'
-import { useAccount, useNetwork } from '@starknet-react/core'
+import { useAccount } from '@starknet-react/core'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
+import { useDojoSetup, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { CommitMoveMessage, signAndGenerateMovesHash } from '@/pistols/utils/salt'
-import { feltToString } from '@/lib/utils/starknet'
 import { BLADES_POINTS, getBladesCardFromValue, getTacticsCardFromValue, TACTICS_POINTS } from '@/games/pistols/generated/constants'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { Card, CardHandle } from '../cards/Cards'
@@ -20,7 +19,6 @@ export default function CommitPacesModal({
   isOpen,
   setIsOpen,
   duelId,
-  roundNumber = 1,
 }: {
   isOpen: boolean
   setIsOpen: Function
@@ -28,10 +26,10 @@ export default function CommitPacesModal({
   roundNumber?: number
 }) {
   const { account } = useAccount()
-  const { chain } = useNetwork()
   const { duelistId } = useSettings()
   const { commit_moves } = useDojoSystemCalls()
   const { dispatchSetMoves } = usePistolsContext()
+  const { starknetDomain } = useDojoSetup()
 
   const [firePaces, setFirePaces] = useState(0)
   const [dodgePaces, setDodgePaces] = useState(0)
@@ -48,11 +46,10 @@ export default function CommitPacesModal({
     setBlades(0)
   }, [isOpen])
 
-  const messageToSign = useMemo<CommitMoveMessage>(() => ((duelId && roundNumber && duelistId) ? {
+  const messageToSign = useMemo<CommitMoveMessage>(() => ((duelId && duelistId) ? {
     duelId: BigInt(duelId),
-    roundNumber: BigInt(roundNumber),
     duelistId: BigInt(duelistId),
-  } : null), [duelId, roundNumber, duelistId])
+  } : null), [duelId, duelistId])
 
   const canSubmit = useMemo(() =>
     (account && messageToSign && firePaces && dodgePaces && firePaces != dodgePaces && tactics && blades && !isSubmitting),
@@ -62,9 +59,9 @@ export default function CommitPacesModal({
     if (canSubmit) {
       setIsSubmitting(true)
       const moves = [firePaces, dodgePaces, tactics, blades]
-      const { hash, salt } = await signAndGenerateMovesHash(account, feltToString(chain.id), messageToSign, moves)
+      const { hash, salt } = await signAndGenerateMovesHash(account, starknetDomain, messageToSign, moves)
       if (hash && salt) {
-        await commit_moves(account, duelistId, duelId, roundNumber, hash)
+        await commit_moves(account, duelistId, duelId, hash)
         dispatchSetMoves(messageToSign, moves, salt)
         setIsOpen(false)
       }

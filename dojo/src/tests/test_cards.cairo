@@ -4,12 +4,12 @@ mod tests {
     use core::traits::{TryInto, Into};
     use starknet::{ContractAddress};
 
-    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::world::{WorldStorage};
 
     use pistols::systems::rng::{Dice, DiceTrait};
     use pistols::systems::game::{game, IGameDispatcher, IGameDispatcherTrait};
-    use pistols::models::challenge::{Challenge, ChallengeEntity, Wager, Round, RoundEntity, Moves, MovesTrait, DuelistState, DuelistStateTrait};
-    use pistols::models::duelist::{Duelist, DuelistEntity, DuelistEntityStore, ProfilePicType, Archetype};
+    use pistols::models::challenge::{Challenge, ChallengeValue, Round, RoundValue, Moves, MovesTrait, DuelistState, DuelistStateTrait};
+    use pistols::models::duelist::{Duelist, DuelistValue, ProfilePicType, Archetype};
     use pistols::models::table::{TableConfig, TABLES};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::duel_progress::{DuelProgress, DuelStep, DuelistDrawnCard};
@@ -22,15 +22,14 @@ mod tests {
         BladesCard, BladesCardTrait, BLADES_CARDS,
         EnvCard, EnvCardTrait,
     };
-    use pistols::libs::shooter::{shooter};
-    use pistols::libs::utils::{make_moves_hash};
+    use pistols::libs::game_loop::{game_loop, make_moves_hash};
     use pistols::utils::short_string::{ShortString};
 
     use pistols::systems::tokens::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
     use pistols::tests::mock_rng::{IRngDispatcher, IRngDispatcherTrait};
     use pistols::tests::tester::{tester,
         tester::{
-            Systems,
+            TestSystems,
             FLAGS, ID, ZERO,
             OWNER, OTHER, BUMMER, TREASURY,
             BIG_BOY, LITTLE_BOY, LITTLE_GIRL,
@@ -41,7 +40,7 @@ mod tests {
     };
     use pistols::tests::prefabs::{prefabs,
         prefabs::{
-            SALT_A, SALT_B, TABLE_ID, MESSAGE, WAGER_VALUE,
+            SALT_A, SALT_B, TABLE_ID, MESSAGE,
             ENV_CARD_NEUTRAL,
             SaltsValues, SaltsValuesTrait,
             PlayerMoves, PlayerMovesTrait,
@@ -53,14 +52,15 @@ mod tests {
     // simple test to make sure main game_loop() works
     #[test]
     fn test_game_loop() {
-        let sys = tester::setup_world(FLAGS::GAME | FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::MOCK_RNG);
         let (salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         let duel_id = prefabs::start_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
-        let (_challenge, round) = prefabs::commit_reveal_get(sys, duel_id, OWNER(), OTHER(), salts, moves_a, moves_b);
+        let (challenge, round) = prefabs::commit_reveal_get(sys, duel_id, OWNER(), OTHER(), salts, moves_a, moves_b);
         assert(round.state_a.damage > CONST::INITIAL_DAMAGE, 'final_damage_a');
         assert(round.state_b.damage > CONST::INITIAL_DAMAGE, 'final_damage_b');
         assert(round.state_a.health < CONST::FULL_HEALTH, 'final_health_a');
         assert(round.state_b.health < CONST::FULL_HEALTH, 'final_health_b');
+        assert(challenge.winner == 0, 'challenge.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_dead(round.state_b, 'dead_b');
     }
@@ -70,7 +70,7 @@ mod tests {
     // game_loop
     //
 
-    fn execute_game_loop(sys: Systems, moves_a: Span<u8>, moves_b: Span<u8>, shuffle: bool) -> (Round, DuelProgress) {
+    fn execute_game_loop(sys: TestSystems, moves_a: Span<u8>, moves_b: Span<u8>, shuffle: bool) -> (Round, DuelProgress) {
         if (!shuffle) {
             sys.rng.mock_values(
                 ['env_1', 'env_2', 'env_3', 'env_4', 'env_5', 'env_6', 'env_7', 'env_8', 'env_9', 'env_10'].span(),
@@ -80,13 +80,12 @@ mod tests {
         }
         let mut round = Round {
             duel_id: 0x1234,
-            round_number: 1,
             state: RoundState::Reveal,
             moves_a: Default::default(),
             moves_b: Default::default(),
             state_a: Default::default(),
             state_b: Default::default(),
-            final_step: 0,
+            final_blow: 0,
         };
         let mut hand_a: DuelistHand = round.moves_a.as_hand();
         let mut hand_b: DuelistHand = round.moves_b.as_hand();
@@ -94,7 +93,7 @@ mod tests {
         round.moves_b.initialize(SALT_B, moves_b);
         round.state_a.initialize(hand_a);
         round.state_b.initialize(hand_b);
-        let progress: DuelProgress = shooter::game_loop(sys.world, DeckType::Classic, ref round);
+        let progress: DuelProgress = game_loop(@sys.world, DeckType::Classic, ref round);
         (round, progress)
     }
 
@@ -112,7 +111,7 @@ mod tests {
 
     #[test]
     fn test_hand_progress() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (salts, _moves_a, _moves_b) = prefabs::get_moves_dual_miss();
         sys.rng.mock_values(salts.salts, salts.values);
         let moves_a: Span<u8> = [5, 6, 1, BLADES_CARDS::Grapple].span();
@@ -128,7 +127,7 @@ mod tests {
         assert(progress.hand_b.card_blades == (*moves_b[3]).into(), 'hand_b.card_blades');
         assert(progress.steps.len() == 12, 'progress.steps.len');
         assert(progress.winner == 1, 'progress.winner');
-        assert(round.final_step > 10, 'round.final_step');
+        assert(round.final_blow == BladesCard::Grapple.variant_name(), 'round.final_blow');
         let mut last_dice_env: u8 = 0;
         let mut i: u8 = 0;
         while (i < 12) {
@@ -194,7 +193,7 @@ mod tests {
 
     #[test]
     fn test_fire_no_dodge() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (salts, _moves_a, _moves_b) = prefabs::get_moves_dual_miss();
         sys.rng.mock_values(salts.salts, salts.values);
         let (round, progress) = execute_game_loop(sys,
@@ -207,7 +206,7 @@ mod tests {
         assert(progress.hand_b.card_fire == 2_u8.into(), 'hand_b.card_fire');
         assert(progress.hand_b.card_dodge == 0_u8.into(), 'hand_b.card_dodge');
         assert(progress.steps.len() == 3, 'paces.len');
-        assert(round.final_step == 2, 'round.final_step');
+        assert(round.final_blow == PacesCard::Paces2.variant_name(), 'round.final_blow');
         let mut i: u8 = 1;
         while (i <= 2) {
             let num: felt252 = '1'+i.into();
@@ -235,13 +234,13 @@ mod tests {
 
     #[test]
     fn test_chances_tactics_vengeful_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::Vengeful.into()].span(),
             [1, 2, 0].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == PacesCard::Paces1.variant_name(), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
 // '----'.print();
@@ -258,13 +257,13 @@ mod tests {
     }
     #[test]
     fn test_chances_tactics_vengeful_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::Vengeful.into()].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == PacesCard::Paces1.variant_name(), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_b.chances == CONST::INITIAL_CHANCE, 'INITIAL_CHANCE');
@@ -274,13 +273,13 @@ mod tests {
 
     #[test]
     fn test_chances_tactics_thick_coat_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::ThickCoat.into()].span(),
             [1, 2, 0].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == PacesCard::Paces1.variant_name(), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_b.damage < *start_state_b.damage, 'damage');
@@ -288,13 +287,13 @@ mod tests {
     }
     #[test]
     fn test_chances_tactics_thick_coat_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::ThickCoat.into()].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == PacesCard::Paces1.variant_name(), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_a.damage < *start_state_a.damage, 'damage');
@@ -303,13 +302,13 @@ mod tests {
 
     #[test]
     fn test_chances_tactics_vengeful_thick_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::Vengeful.into()].span(),
             [1, 2, TacticsCard::ThickCoat.into()].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == PacesCard::Paces1.variant_name(), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         // cancels each other
@@ -318,13 +317,13 @@ mod tests {
     }
     #[test]
     fn test_chances_tactics_vengeful_thick_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::ThickCoat.into()].span(),
             [1, 2, TacticsCard::Vengeful.into()].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == PacesCard::Paces1.variant_name(), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         // cancels each other
@@ -334,13 +333,13 @@ mod tests {
 
     #[test]
     fn test_chances_tactics_insult_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::Insult.into()].span(),
             [1, 2, 0].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == PacesCard::Paces1.variant_name(), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_b.damage > *start_state_b.damage, 'damage');
@@ -349,13 +348,13 @@ mod tests {
     }
     #[test]
     fn test_chances_tactics_insult_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::Insult.into()].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == PacesCard::Paces1.variant_name(), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_a.damage > *start_state_a.damage, 'damage');
@@ -365,13 +364,13 @@ mod tests {
 
     #[test]
     fn test_chances_tactics_bananas_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::Bananas.into()].span(),
             [1, 2, 0].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == PacesCard::Paces1.variant_name(), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_a.chances < *start_state_a.chances, 'chances_a');
@@ -379,13 +378,13 @@ mod tests {
     }
     #[test]
     fn test_chances_tactics_bananas_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::Bananas.into()].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == PacesCard::Paces1.variant_name(), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_a.chances < *start_state_a.chances, 'chances_a');
@@ -393,13 +392,13 @@ mod tests {
     }
     #[test]
     fn test_chances_tactics_bananas_ab() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::Bananas.into()].span(),
             [1, 2, TacticsCard::Bananas.into()].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == PacesCard::Paces1.variant_name(), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_a.chances < *start_state_a.chances, 'chances_a');
@@ -408,13 +407,13 @@ mod tests {
 
     #[test]
     fn test_chances_tactics_coin_toss_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::CoinToss.into()].span(),
             [1, 2, 0].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == PacesCard::Paces1.variant_name(), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
@@ -422,13 +421,13 @@ mod tests {
     }
     #[test]
     fn test_chances_tactics_coin_toss_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::CoinToss.into()].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == PacesCard::Paces1.variant_name(), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
@@ -437,13 +436,13 @@ mod tests {
 
     #[test]
     fn test_chances_tactics_reversal_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, TacticsCard::Reversal.into()].span(),
             [1, 2, 0].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == PacesCard::Paces1.variant_name(), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
@@ -451,13 +450,13 @@ mod tests {
     }
     #[test]
     fn test_chances_tactics_reversal_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0].span(),
             [1, 2, TacticsCard::Reversal.into()].span(),
             false
         );
-        assert(round.final_step == 1, 'round.final_step'); // ended in pistols
+        assert(round.final_blow == PacesCard::Paces1.variant_name(), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
@@ -478,13 +477,13 @@ mod tests {
 
     #[test]
     fn test_blades_seppukku_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Seppuku.into()].span(),
             [1, 2, 0, 0].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == BladesCard::Seppuku.variant_name(), 'round.final_blow'); // ended in blades
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         // card effects on player state
@@ -494,18 +493,19 @@ mod tests {
         assert(round.state_a.damage > *start_state_a.damage, 'damage');
         _assert_not_affected_by_cards(*start_state_b, round.state_b);
         // results
+        assert(progress.winner == 2, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_alive(round.state_b, 'alive_b');
     }
     #[test]
     fn test_blades_seppukku_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, 0].span(),
             [1, 2, 0, BladesCard::Seppuku.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == BladesCard::Seppuku.variant_name(), 'round.final_blow'); // ended in blades
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         // card effects on player state
@@ -515,18 +515,19 @@ mod tests {
         assert(round.state_b.damage > *start_state_b.damage, 'damage');
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
         // results
+        assert(progress.winner == 1, 'progress.winner');
         _assert_is_alive(round.state_a, 'alive_a');
         _assert_is_dead(round.state_b, 'dead_b');
     }
     #[test]
     fn test_blades_seppukku_draw() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Seppuku.into()].span(),
             [1, 2, 0, BladesCard::Seppuku.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == BladesCard::Seppuku.variant_name(), 'round.final_blow'); // ended in blades
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(*start_state_b.chances == CONST::INITIAL_CHANCE, 'INITIAL_CHANCE');
@@ -537,8 +538,23 @@ mod tests {
         assert(round.state_b.chances > *start_state_b.chances, 'chances');
         assert(round.state_b.damage > *start_state_b.damage, 'damage');
         // results
+        assert(progress.winner == 0, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_dead(round.state_b, 'dead_b');
+    }
+    #[test]
+    fn test_blades_seppukku_other() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, progress) = execute_game_loop(sys,
+            [1, 2, 0, BladesCard::Seppuku.into()].span(),
+            [1, 2, 0, BladesCard::Behead.into()].span(),
+            false
+        );
+        assert(round.final_blow == BladesCard::Seppuku.variant_name(), 'round.final_blow'); // ended in blades
+        // results
+        assert(progress.winner == 2, 'progress.winner');
+        _assert_is_dead(round.state_a, 'dead_a');
+        _assert_is_alive(round.state_b, 'alive_b');
     }
 
 
@@ -548,106 +564,112 @@ mod tests {
 
     #[test]
     fn test_blades_pocket_pistol_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
             [1, 2, 0, 0].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == BladesCard::PocketPistol.variant_name(), 'round.final_blow'); // ended in blades
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         // card effects on player state
         assert(round.state_b.chances < *start_state_b.chances, 'chances');
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
         // blade wins against none
+        assert(progress.winner == 1, 'progress.winner');
         _assert_is_alive(round.state_a, 'alive_a');
         _assert_is_dead(round.state_b, 'dead_b');
     }
     #[test]
     fn test_blades_pocket_pistol_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, 0].span(),
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == BladesCard::PocketPistol.variant_name(), 'round.final_blow'); // ended in blades
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_a.chances < *start_state_a.chances, 'chances');
         _assert_not_affected_by_cards(*start_state_b, round.state_b);
         // blade wins against none
+        assert(progress.winner == 2, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_alive(round.state_b, 'alive_b');
     }
 
     #[test]
     fn test_blades_behead_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Behead.into()].span(),
             [1, 2, 0, 0].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == BladesCard::Behead.variant_name(), 'round.final_blow'); // ended in blades
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_a.damage > *start_state_a.damage, 'damage');
         _assert_not_affected_by_cards(*start_state_b, round.state_b);
         // blade wins against none
+        assert(progress.winner == 1, 'progress.winner');
         _assert_is_alive(round.state_a, 'alive_a');
         _assert_is_dead(round.state_b, 'dead_b');
     }
     #[test]
     fn test_blades_behead_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, 0].span(),
             [1, 2, 0, BladesCard::Behead.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == BladesCard::Behead.variant_name(), 'round.final_blow'); // ended in blades
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_b.damage > *start_state_b.damage, 'damage');
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
         // blade wins against none
+        assert(progress.winner == 2, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_alive(round.state_b, 'alive_b');
     }
 
     #[test]
     fn test_blades_grapple_a() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Grapple.into()].span(),
             [1, 2, 0, 0].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == BladesCard::Grapple.variant_name(), 'round.final_blow'); // ended in blades
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_b.damage < *start_state_b.damage, 'damage');
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
         // blade wins against none
+        assert(progress.winner == 1, 'progress.winner');
         _assert_is_alive(round.state_a, 'alive_a');
         _assert_is_dead(round.state_b, 'dead_b');
     }
     #[test]
     fn test_blades_grapple_b() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, 0].span(),
             [1, 2, 0, BladesCard::Grapple.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == BladesCard::Grapple.variant_name(), 'round.final_blow'); // ended in blades
         let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         assert(round.state_a.damage < *start_state_a.damage, 'damage');
         _assert_not_affected_by_cards(*start_state_b, round.state_b);
         // blade wins against none
+        assert(progress.winner == 2, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_alive(round.state_b, 'alive_b');
     }
@@ -659,37 +681,40 @@ mod tests {
 
     #[test]
     fn test_blades_pocket_pistol_vs_pocket_pistol() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == BladesCard::PocketPistol.variant_name(), 'round.final_blow'); // ended in blades
+        assert(progress.winner == 0, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_dead(round.state_b, 'dead_b');
     }
     #[test]
     fn test_blades_behead_vs_behead() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Behead.into()].span(),
             [1, 2, 0, BladesCard::Behead.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == BladesCard::Behead.variant_name(), 'round.final_blow'); // ended in blades
+        assert(progress.winner == 0, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_dead(round.state_b, 'dead_b');
     }
     #[test]
     fn test_blades_grapple_vs_grapple() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Grapple.into()].span(),
             [1, 2, 0, BladesCard::Grapple.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == BladesCard::Grapple.variant_name(), 'round.final_blow'); // ended in blades
+        assert(progress.winner == 0, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_dead(round.state_b, 'dead_b');
     }
@@ -702,25 +727,27 @@ mod tests {
     // PocketPistol beats Behead
     #[test]
     fn test_blades_pocket_pistol_vs_behead() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
             [1, 2, 0, BladesCard::Behead.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == BladesCard::PocketPistol.variant_name(), 'round.final_blow'); // ended in blades
+        assert(progress.winner == 1, 'progress.winner');
         _assert_is_alive(round.state_a, 'alive_a');
         _assert_is_dead(round.state_b, 'dead_b');
     }
     #[test]
     fn test_blades_behead_vs_pocket_pistol() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Behead.into()].span(),
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == BladesCard::PocketPistol.variant_name(), 'round.final_blow'); // ended in blades
+        assert(progress.winner == 2, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_alive(round.state_b, 'alive_b');
     }
@@ -728,25 +755,27 @@ mod tests {
     // Behead beats Grapple
     #[test]
     fn test_blades_behead_vs_grapple() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Behead.into()].span(),
             [1, 2, 0, BladesCard::Grapple.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == BladesCard::Behead.variant_name(), 'round.final_blow'); // ended in blades
+        assert(progress.winner == 1, 'progress.winner');
         _assert_is_alive(round.state_a, 'alive_a');
         _assert_is_dead(round.state_b, 'dead_b');
     }
     #[test]
     fn test_blades_grapple_vs_behead() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Grapple.into()].span(),
             [1, 2, 0, BladesCard::Behead.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == BladesCard::Behead.variant_name(), 'round.final_blow'); // ended in blades
+        assert(progress.winner == 2, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_alive(round.state_b, 'alive_b');
     }
@@ -754,25 +783,27 @@ mod tests {
     // Grapple beats PocketPistol
     #[test]
     fn test_blades_grapple_vs_pocket_pistol() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::Grapple.into()].span(),
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == BladesCard::Grapple.variant_name(), 'round.final_blow'); // ended in blades
+        assert(progress.winner == 1, 'progress.winner');
         _assert_is_alive(round.state_a, 'alive_a');
         _assert_is_dead(round.state_b, 'dead_b');
     }
     #[test]
     fn test_blades_pocket_pistol_vs_grapple() {
-        let sys = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
+        let (round, progress) = execute_game_loop(sys,
             [1, 2, 0, BladesCard::PocketPistol.into()].span(),
             [1, 2, 0, BladesCard::Grapple.into()].span(),
             false
         );
-        assert(round.final_step > 10, 'round.final_step'); // ended in blades
+        assert(round.final_blow == BladesCard::Grapple.variant_name(), 'round.final_blow'); // ended in blades
+        assert(progress.winner == 2, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
         _assert_is_alive(round.state_b, 'alive_b');
     }

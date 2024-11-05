@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 #export RUST_LOG=info
+katana --version
 katana \
   --disable-fee \
   --chain-id KATANA_LOCAL \

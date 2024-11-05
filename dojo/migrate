@@ -14,9 +14,9 @@ if [[
 fi
 
 
-echo "CLIENT_GEN_PATH: $CLIENT_GEN_PATH"
-echo "PROFILE_GEN_PATH: $PROFILE_GEN_PATH"
 echo "BINDINGS_PATH: $BINDINGS_PATH"
+echo "CLIENT_GAME_PATH: $CLIENT_GAME_PATH"
+echo "CLIENT_MANIFEST_PATH: $CLIENT_MANIFEST_PATH"
 
 #-----------------
 # build
@@ -28,7 +28,7 @@ echo ">>> Cleaning..."
 sozo -P $PROFILE clean
 echo ">>> Building..."
 if [[ "$PROFILE" == "dev" ]]; then
-  # sozo -P $PROFILE build --typescript
+  # sozo -P $PROFILE build --typescript-v2
   sozo -P $PROFILE build
 else
   sozo -P $PROFILE build
@@ -39,18 +39,15 @@ echo "👍"
 # migrate
 #
 echo "------------------------------------------------------------------------------"
-echo ">>> Migrate plan..."
-set +e # disable exit on error
-PLAN_OUTPUT=$(sozo -P $PROFILE migrate plan --world $WORLD_ADDRESS)
-if [ "$?" != "0" ]; then
-  echo "$PLAN_OUTPUT"
-  exit 1
-fi
-set -e # enable exit on error
+echo ">>> Inspect migrations..."
+sozo -P $PROFILE inspect --world $WORLD_ADDRESS
 
-echo ">>> Migrate apply..."
-sozo -P $PROFILE migrate apply -vvv --world $WORLD_ADDRESS
+echo ">>> Do migraions..."
+sozo -P $PROFILE migrate -vvv --world $WORLD_ADDRESS
 echo "👍"
+
+echo ">>> Inspect again..."
+sozo -P $PROFILE inspect --world $WORLD_ADDRESS
 
 #-----------------
 # auth write
@@ -62,9 +59,9 @@ echo "👍"
 # copy manifest to client
 #
 echo "------------------------------------------------------------------------------"
-echo ">>> Copying manifest [$MANIFEST_FILE_PATH] to [$PROFILE_GEN_PATH/]"
-mkdir -p $PROFILE_GEN_PATH
-cp $MANIFEST_FILE_PATH $PROFILE_GEN_PATH/
+echo ">>> Copying manifest [$MANIFEST_FILE_PATH] to [$CLIENT_MANIFEST_PATH/]"
+mkdir -p $CLIENT_MANIFEST_PATH
+cp $MANIFEST_FILE_PATH $CLIENT_MANIFEST_PATH/
 echo "👍"
 
 #------------------------
@@ -73,18 +70,21 @@ echo "👍"
 if [[ "$PROFILE" == "dev" ]]; then
   #
   # create torii config
+  export DUEL_TOKEN_ADDRESS=$(get_contract_address "pistols-duel_token")
+  export DUELIST_TOKEN_ADDRESS=$(get_contract_address "pistols-duelist_token")
   echo "------------------------------------------------------------------------------"
   echo ">>> Create torii config [$TORII_CONFIG_PATH]..."
   echo "contracts = [" > $TORII_CONFIG_PATH
-  # echo "  { type = \"ERC721\", address = \"$DUEL_TOKEN_ADDRESS\" }, # duel" >> $TORII_CONFIG_PATH
-  echo "  { type = \"ERC721\", address = \"$DUELIST_TOKEN_ADDRESS\" }, # duelist" >> $TORII_CONFIG_PATH
+  echo "  { type = \"ERC721\", address = \"$DUEL_TOKEN_ADDRESS\" }, # duel_token" >> $TORII_CONFIG_PATH
+  echo "  { type = \"ERC721\", address = \"$DUELIST_TOKEN_ADDRESS\" }, # duelist_token" >> $TORII_CONFIG_PATH
   echo "]" >> $TORII_CONFIG_PATH
   cat $TORII_CONFIG_PATH
   echo "👍"
   #
   # TODO: Enable this when bindings are ported
   # generate and copy bindings
-  # cp $BINDINGS_PATH/* $CLIENT_GEN_PATH/
+  # cp -R $BINDINGS_PATH $CLIENT_GAME_PATH/
+  # cp -R $BINDINGS_PATH/typescript_v2 $CLIENT_GAME_PATH/generated/
   #
   # copy to client
   echo "------------------------------------------------------------------------------"
@@ -96,7 +96,7 @@ if [[ "$PROFILE" == "dev" ]]; then
   #
   # list copied files
   echo "------------------------------------------------------------------------------"
-  ls -ld $CLIENT_GEN_PATH/* | grep -E 'ts|json'
+  ls -ld $CLIENT_GAME_PATH/* | grep -E 'ts|json'
 fi
 
 

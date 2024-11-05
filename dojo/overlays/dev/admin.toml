@@ -1,8 +1,0 @@
-tag = "pistols-admin"
-writes = [
-  "ns:pistols",
-]
-init_calldata = [
-  "0x0",  # treasury (or initializer)
-  "$contract_address:pistols-lords_mock", # lords contract
-]

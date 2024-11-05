@@ -5,7 +5,6 @@ import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { useChallenge } from '@/pistols/hooks/useChallenge'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { useWager } from '@/pistols/hooks/useWager'
 import { useTable } from '@/pistols/hooks/useTable'
 import { useFinishedDuelProgress } from '@/pistols/hooks/useContractCalls'
 import { ChallengeStateNames, RoundStateNames } from '@/pistols/utils/pistols'
@@ -17,6 +16,7 @@ import { BladesIcon, PacesIcon } from '@/pistols/components/ui/PistolsIcon'
 import AppPistols from '@/pistols/components/AppPistols'
 import { EMOJI } from '@/pistols/data/messages'
 import { ENV_POINTS } from '@/games/pistols/generated/constants'
+import { DuelIconsAsRow } from '@/pistols/components/DuelIcons'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -64,10 +64,9 @@ function Stats({
 
       <div className='Code'>
         <DuelStats duelId={duelId} />
-        <WagerStats duelId={duelId} tableId={tableId} />
 
         {round1 && <>
-          <RoundStats duelId={duelId} roundNumber={1} round={round1} />
+          <RoundStats duelId={duelId} round={round1} />
           <DuelProgress duelId={duelId} />
           <br />
         </>}
@@ -147,12 +146,6 @@ function DuelStats({
           </Cell>
         </Row>
         <Row>
-          <Cell>Round Number</Cell>
-          <Cell>
-            {challenge.roundNumber}
-          </Cell>
-        </Row>
-        <Row>
           <Cell>Winner</Cell>
           <Cell>
             {challenge.winner}: {challenge.winner == 1 ? nameA : challenge.winner == 2 ? nameB : '-'}
@@ -176,47 +169,16 @@ function DuelStats({
             {challenge.quote}
           </Cell>
         </Row>
-      </Body>
-    </Table>
-  )
-}
-
-function WagerStats({
-  duelId,
-  tableId,
-}: {
-  duelId: bigint
-  tableId: string
-}) {
-  const { value, fee } = useWager(duelId)
-  const { description } = useTable(tableId)
-  if (!value) return <></>
-  return (
-    <Table celled striped color='green'>
-      <Header>
         <Row>
-          <HeaderCell width={4}><h5>Wager</h5></HeaderCell>
-          <HeaderCell>{bigintToHex(duelId)}</HeaderCell>
-        </Row>
-      </Header>
-
-      <Body>
-        <Row>
-          <Cell>Table</Cell>
+          <Cell>Progress A</Cell>
           <Cell>
-            {tableId} ({description})
+            <DuelIconsAsRow duelId={duelId} duelistId={challenge.duelistIdA} size={'large'} />
           </Cell>
         </Row>
         <Row>
-          <Cell>Value</Cell>
+          <Cell>Progress B</Cell>
           <Cell>
-            {value?.toString() ?? 0} wei : {weiToEth(value ?? 0).toString()}
-          </Cell>
-        </Row>
-        <Row>
-          <Cell>Fee</Cell>
-          <Cell>
-            {fee?.toString() ?? 0} wei : {weiToEth(fee ?? 0).toString()}
+            <DuelIconsAsRow duelId={duelId} duelistId={challenge.duelistIdB} size={'large'} />
           </Cell>
         </Row>
       </Body>
@@ -231,11 +193,9 @@ function WagerStats({
 
 function RoundStats({
   duelId,
-  roundNumber,
   round,
 }: {
   duelId: bigint
-  roundNumber: number
   round: any
 }) {
   const { challenge } = useDuel(duelId)
@@ -248,7 +208,7 @@ function RoundStats({
         <Header>
           <Row>
             <HeaderCell width={4}><h5>Round</h5></HeaderCell>
-            <HeaderCell><h2>{roundNumber}</h2></HeaderCell>
+            <HeaderCell><h2>1 and only</h2></HeaderCell>
           </Row>
         </Header>
 
@@ -260,9 +220,9 @@ function RoundStats({
             </Cell>
           </Row>
           <Row>
-            <Cell>Final Step</Cell>
+            <Cell>Final Blow</Cell>
             <Cell>
-              {round.final_step}
+              {round.final_blow}: {round.endedInBlades ? <BladesIcon blade={round.final_blow} /> : round.final_blow ? <PacesIcon paces={round.final_blow} /> : '-'}
             </Cell>
           </Row>
         </Body>

@@ -43,13 +43,12 @@ union ModelUnion =
   | pistols_Config
   | pistols_Duelist
   | pistols_Pact
+  | pistols_Payment
   | pistols_Round
   | pistols_Scoreboard
   | pistols_TableAdmittance
   | pistols_TableConfig
-  | pistols_TableWager
   | pistols_TokenConfig
-  | pistols_Wager
 
 enum OrderDirection {
   ASC
@@ -298,6 +297,16 @@ type World__Query {
     where: pistols_PactWhereInput
     order: pistols_PactOrder
   ): pistols_PactConnection
+  pistolsPaymentModels(
+    first: Int
+    last: Int
+    before: Cursor
+    after: Cursor
+    offset: Int
+    limit: Int
+    where: pistols_PaymentWhereInput
+    order: pistols_PaymentOrder
+  ): pistols_PaymentConnection
   pistolsRoundModels(
     first: Int
     last: Int
@@ -338,16 +347,6 @@ type World__Query {
     where: pistols_TableConfigWhereInput
     order: pistols_TableConfigOrder
   ): pistols_TableConfigConnection
-  pistolsTableWagerModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: pistols_TableWagerWhereInput
-    order: pistols_TableWagerOrder
-  ): pistols_TableWagerConnection
   pistolsTokenConfigModels(
     first: Int
     last: Int
@@ -358,16 +357,6 @@ type World__Query {
     where: pistols_TokenConfigWhereInput
     order: pistols_TokenConfigOrder
   ): pistols_TokenConfigConnection
-  pistolsWagerModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: pistols_WagerWhereInput
-    order: pistols_WagerOrder
-  ): pistols_WagerConnection
 }
 
 type World__Social {
@@ -411,6 +400,7 @@ scalar felt252
 
 type pistols_Challenge {
   duel_id: u128
+  seed: u128
   table_id: felt252
   premise: Enum
   quote: felt252
@@ -419,7 +409,6 @@ type pistols_Challenge {
   duelist_id_a: u128
   duelist_id_b: u128
   state: Enum
-  round_number: u8
   winner: u8
   timestamp_start: u64
   timestamp_end: u64
@@ -445,6 +434,7 @@ input pistols_ChallengeOrder {
 
 enum pistols_ChallengeOrderField {
   DUEL_ID
+  SEED
   TABLE_ID
   PREMISE
   QUOTE
@@ -453,7 +443,6 @@ enum pistols_ChallengeOrderField {
   DUELIST_ID_A
   DUELIST_ID_B
   STATE
-  ROUND_NUMBER
   WINNER
   TIMESTAMP_START
   TIMESTAMP_END
@@ -471,6 +460,17 @@ input pistols_ChallengeWhereInput {
   duel_idIN: [u128]
   duel_idNOTLIKE: u128
   duel_idLIKE: u128
+  seed: u128
+  seedGT: u128
+  seedGTE: u128
+  seedLT: u128
+  seedLTE: u128
+  seedNEQ: u128
+  seedEQ: u128
+  seedNOTIN: [u128]
+  seedIN: [u128]
+  seedNOTLIKE: u128
+  seedLIKE: u128
   table_id: felt252
   table_idGT: felt252
   table_idGTE: felt252
@@ -539,17 +539,6 @@ input pistols_ChallengeWhereInput {
   duelist_id_bNOTLIKE: u128
   duelist_id_bLIKE: u128
   state: Enum
-  round_number: u8
-  round_numberGT: u8
-  round_numberGTE: u8
-  round_numberLT: u8
-  round_numberLTE: u8
-  round_numberNEQ: u8
-  round_numberEQ: u8
-  round_numberNOTIN: [u8]
-  round_numberIN: [u8]
-  round_numberNOTLIKE: u8
-  round_numberLIKE: u8
   winner: u8
   winnerGT: u8
   winnerGTE: u8
@@ -654,6 +643,7 @@ input pistols_CoinConfigWhereInput {
 type pistols_Config {
   key: u8
   treasury_address: ContractAddress
+  lords_address: ContractAddress
   is_paused: bool
   entity: World__Entity
   eventMessage: World__EventMessage
@@ -678,6 +668,7 @@ input pistols_ConfigOrder {
 enum pistols_ConfigOrderField {
   KEY
   TREASURY_ADDRESS
+  LORDS_ADDRESS
   IS_PAUSED
 }
 
@@ -704,6 +695,17 @@ input pistols_ConfigWhereInput {
   treasury_addressIN: [ContractAddress]
   treasury_addressNOTLIKE: ContractAddress
   treasury_addressLIKE: ContractAddress
+  lords_address: ContractAddress
+  lords_addressGT: ContractAddress
+  lords_addressGTE: ContractAddress
+  lords_addressLT: ContractAddress
+  lords_addressLTE: ContractAddress
+  lords_addressNEQ: ContractAddress
+  lords_addressEQ: ContractAddress
+  lords_addressNOTIN: [ContractAddress]
+  lords_addressIN: [ContractAddress]
+  lords_addressNOTLIKE: ContractAddress
+  lords_addressLIKE: ContractAddress
   is_paused: bool
 }
 
@@ -793,9 +795,6 @@ input pistols_DuelistWhereInput {
 
 type pistols_Duelist_Score {
   honour: u8
-  level_villain: u8
-  level_trickster: u8
-  level_lord: u8
   total_duels: u16
   total_wins: u16
   total_losses: u16
@@ -869,15 +868,132 @@ input pistols_PactWhereInput {
   duel_idLIKE: u128
 }
 
+type pistols_Payment {
+  key: felt252
+  amount: u256
+  client_percent: u8
+  ranking_percent: u8
+  owner_percent: u8
+  pool_percent: u8
+  treasury_percent: u8
+  entity: World__Entity
+  eventMessage: World__EventMessage
+}
+
+type pistols_PaymentConnection {
+  edges: [pistols_PaymentEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type pistols_PaymentEdge {
+  node: pistols_Payment
+  cursor: Cursor
+}
+
+input pistols_PaymentOrder {
+  direction: OrderDirection!
+  field: pistols_PaymentOrderField!
+}
+
+enum pistols_PaymentOrderField {
+  KEY
+  AMOUNT
+  CLIENT_PERCENT
+  RANKING_PERCENT
+  OWNER_PERCENT
+  POOL_PERCENT
+  TREASURY_PERCENT
+}
+
+input pistols_PaymentWhereInput {
+  key: felt252
+  keyGT: felt252
+  keyGTE: felt252
+  keyLT: felt252
+  keyLTE: felt252
+  keyNEQ: felt252
+  keyEQ: felt252
+  keyNOTIN: [felt252]
+  keyIN: [felt252]
+  keyNOTLIKE: felt252
+  keyLIKE: felt252
+  amount: u256
+  amountGT: u256
+  amountGTE: u256
+  amountLT: u256
+  amountLTE: u256
+  amountNEQ: u256
+  amountEQ: u256
+  amountNOTIN: [u256]
+  amountIN: [u256]
+  amountNOTLIKE: u256
+  amountLIKE: u256
+  client_percent: u8
+  client_percentGT: u8
+  client_percentGTE: u8
+  client_percentLT: u8
+  client_percentLTE: u8
+  client_percentNEQ: u8
+  client_percentEQ: u8
+  client_percentNOTIN: [u8]
+  client_percentIN: [u8]
+  client_percentNOTLIKE: u8
+  client_percentLIKE: u8
+  ranking_percent: u8
+  ranking_percentGT: u8
+  ranking_percentGTE: u8
+  ranking_percentLT: u8
+  ranking_percentLTE: u8
+  ranking_percentNEQ: u8
+  ranking_percentEQ: u8
+  ranking_percentNOTIN: [u8]
+  ranking_percentIN: [u8]
+  ranking_percentNOTLIKE: u8
+  ranking_percentLIKE: u8
+  owner_percent: u8
+  owner_percentGT: u8
+  owner_percentGTE: u8
+  owner_percentLT: u8
+  owner_percentLTE: u8
+  owner_percentNEQ: u8
+  owner_percentEQ: u8
+  owner_percentNOTIN: [u8]
+  owner_percentIN: [u8]
+  owner_percentNOTLIKE: u8
+  owner_percentLIKE: u8
+  pool_percent: u8
+  pool_percentGT: u8
+  pool_percentGTE: u8
+  pool_percentLT: u8
+  pool_percentLTE: u8
+  pool_percentNEQ: u8
+  pool_percentEQ: u8
+  pool_percentNOTIN: [u8]
+  pool_percentIN: [u8]
+  pool_percentNOTLIKE: u8
+  pool_percentLIKE: u8
+  treasury_percent: u8
+  treasury_percentGT: u8
+  treasury_percentGTE: u8
+  treasury_percentLT: u8
+  treasury_percentLTE: u8
+  treasury_percentNEQ: u8
+  treasury_percentEQ: u8
+  treasury_percentNOTIN: [u8]
+  treasury_percentIN: [u8]
+  treasury_percentNOTLIKE: u8
+  treasury_percentLIKE: u8
+}
+
 type pistols_Round {
   duel_id: u128
-  round_number: u8
   moves_a: pistols_Round_Moves
   moves_b: pistols_Round_Moves
   state_a: pistols_Round_DuelistState
   state_b: pistols_Round_DuelistState
   state: Enum
-  final_step: u8
+  final_blow: felt252
   entity: World__Entity
   eventMessage: World__EventMessage
 }
@@ -900,13 +1016,12 @@ input pistols_RoundOrder {
 
 enum pistols_RoundOrderField {
   DUEL_ID
-  ROUND_NUMBER
   MOVES_A
   MOVES_B
   STATE_A
   STATE_B
   STATE
-  FINAL_STEP
+  FINAL_BLOW
 }
 
 input pistols_RoundWhereInput {
@@ -921,29 +1036,18 @@ input pistols_RoundWhereInput {
   duel_idIN: [u128]
   duel_idNOTLIKE: u128
   duel_idLIKE: u128
-  round_number: u8
-  round_numberGT: u8
-  round_numberGTE: u8
-  round_numberLT: u8
-  round_numberLTE: u8
-  round_numberNEQ: u8
-  round_numberEQ: u8
-  round_numberNOTIN: [u8]
-  round_numberIN: [u8]
-  round_numberNOTLIKE: u8
-  round_numberLIKE: u8
   state: Enum
-  final_step: u8
-  final_stepGT: u8
-  final_stepGTE: u8
-  final_stepLT: u8
-  final_stepLTE: u8
-  final_stepNEQ: u8
-  final_stepEQ: u8
-  final_stepNOTIN: [u8]
-  final_stepIN: [u8]
-  final_stepNOTLIKE: u8
-  final_stepLIKE: u8
+  final_blow: felt252
+  final_blowGT: felt252
+  final_blowGTE: felt252
+  final_blowLT: felt252
+  final_blowLTE: felt252
+  final_blowNEQ: felt252
+  final_blowEQ: felt252
+  final_blowNOTIN: [felt252]
+  final_blowIN: [felt252]
+  final_blowNOTLIKE: felt252
+  final_blowLIKE: felt252
 }
 
 type pistols_Round_DuelistState {
@@ -952,7 +1056,6 @@ type pistols_Round_DuelistState {
   health: u8
   dice_fire: u8
   honour: u8
-  wager: u8
 }
 
 type pistols_Round_Moves {
@@ -968,8 +1071,6 @@ type pistols_Scoreboard {
   table_id: felt252
   duelist_id: u128
   score: pistols_Scoreboard_Score
-  wager_won: u128
-  wager_lost: u128
   entity: World__Entity
   eventMessage: World__EventMessage
 }
@@ -994,8 +1095,6 @@ enum pistols_ScoreboardOrderField {
   TABLE_ID
   DUELIST_ID
   SCORE
-  WAGER_WON
-  WAGER_LOST
 }
 
 input pistols_ScoreboardWhereInput {
@@ -1021,35 +1120,10 @@ input pistols_ScoreboardWhereInput {
   duelist_idIN: [u128]
   duelist_idNOTLIKE: u128
   duelist_idLIKE: u128
-  wager_won: u128
-  wager_wonGT: u128
-  wager_wonGTE: u128
-  wager_wonLT: u128
-  wager_wonLTE: u128
-  wager_wonNEQ: u128
-  wager_wonEQ: u128
-  wager_wonNOTIN: [u128]
-  wager_wonIN: [u128]
-  wager_wonNOTLIKE: u128
-  wager_wonLIKE: u128
-  wager_lost: u128
-  wager_lostGT: u128
-  wager_lostGTE: u128
-  wager_lostLT: u128
-  wager_lostLTE: u128
-  wager_lostNEQ: u128
-  wager_lostEQ: u128
-  wager_lostNOTIN: [u128]
-  wager_lostIN: [u128]
-  wager_lostNOTLIKE: u128
-  wager_lostLIKE: u128
 }
 
 type pistols_Scoreboard_Score {
   honour: u8
-  level_villain: u8
-  level_trickster: u8
-  level_lord: u8
   total_duels: u16
   total_wins: u16
   total_losses: u16
@@ -1106,7 +1180,6 @@ type pistols_TableConfig {
   description: felt252
   table_type: Enum
   deck_type: Enum
-  fee_contract_address: ContractAddress
   fee_collector_address: ContractAddress
   fee_min: u128
   is_open: bool
@@ -1135,7 +1208,6 @@ enum pistols_TableConfigOrderField {
   DESCRIPTION
   TABLE_TYPE
   DECK_TYPE
-  FEE_CONTRACT_ADDRESS
   FEE_COLLECTOR_ADDRESS
   FEE_MIN
   IS_OPEN
@@ -1166,17 +1238,6 @@ input pistols_TableConfigWhereInput {
   descriptionLIKE: felt252
   table_type: Enum
   deck_type: Enum
-  fee_contract_address: ContractAddress
-  fee_contract_addressGT: ContractAddress
-  fee_contract_addressGTE: ContractAddress
-  fee_contract_addressLT: ContractAddress
-  fee_contract_addressLTE: ContractAddress
-  fee_contract_addressNEQ: ContractAddress
-  fee_contract_addressEQ: ContractAddress
-  fee_contract_addressNOTIN: [ContractAddress]
-  fee_contract_addressIN: [ContractAddress]
-  fee_contract_addressNOTLIKE: ContractAddress
-  fee_contract_addressLIKE: ContractAddress
   fee_collector_address: ContractAddress
   fee_collector_addressGT: ContractAddress
   fee_collector_addressGTE: ContractAddress
@@ -1202,92 +1263,10 @@ input pistols_TableConfigWhereInput {
   is_open: bool
 }
 
-type pistols_TableWager {
-  table_id: felt252
-  wager_min: u128
-  wager_max: u128
-  fee_pct: u8
-  entity: World__Entity
-  eventMessage: World__EventMessage
-}
-
-type pistols_TableWagerConnection {
-  edges: [pistols_TableWagerEdge]
-  totalCount: Int!
-  pageInfo: World__PageInfo!
-}
-
-type pistols_TableWagerEdge {
-  node: pistols_TableWager
-  cursor: Cursor
-}
-
-input pistols_TableWagerOrder {
-  direction: OrderDirection!
-  field: pistols_TableWagerOrderField!
-}
-
-enum pistols_TableWagerOrderField {
-  TABLE_ID
-  WAGER_MIN
-  WAGER_MAX
-  FEE_PCT
-}
-
-input pistols_TableWagerWhereInput {
-  table_id: felt252
-  table_idGT: felt252
-  table_idGTE: felt252
-  table_idLT: felt252
-  table_idLTE: felt252
-  table_idNEQ: felt252
-  table_idEQ: felt252
-  table_idNOTIN: [felt252]
-  table_idIN: [felt252]
-  table_idNOTLIKE: felt252
-  table_idLIKE: felt252
-  wager_min: u128
-  wager_minGT: u128
-  wager_minGTE: u128
-  wager_minLT: u128
-  wager_minLTE: u128
-  wager_minNEQ: u128
-  wager_minEQ: u128
-  wager_minNOTIN: [u128]
-  wager_minIN: [u128]
-  wager_minNOTLIKE: u128
-  wager_minLIKE: u128
-  wager_max: u128
-  wager_maxGT: u128
-  wager_maxGTE: u128
-  wager_maxLT: u128
-  wager_maxLTE: u128
-  wager_maxNEQ: u128
-  wager_maxEQ: u128
-  wager_maxNOTIN: [u128]
-  wager_maxIN: [u128]
-  wager_maxNOTLIKE: u128
-  wager_maxLIKE: u128
-  fee_pct: u8
-  fee_pctGT: u8
-  fee_pctGTE: u8
-  fee_pctLT: u8
-  fee_pctLTE: u8
-  fee_pctNEQ: u8
-  fee_pctEQ: u8
-  fee_pctNOTIN: [u8]
-  fee_pctIN: [u8]
-  fee_pctNOTLIKE: u8
-  fee_pctLIKE: u8
-}
-
 type pistols_TokenConfig {
   token_address: ContractAddress
   minter_address: ContractAddress
   renderer_address: ContractAddress
-  treasury_address: ContractAddress
-  fee_contract: ContractAddress
-  fee_amount: u128
   minted_count: u128
   entity: World__Entity
   eventMessage: World__EventMessage
@@ -1313,9 +1292,6 @@ enum pistols_TokenConfigOrderField {
   TOKEN_ADDRESS
   MINTER_ADDRESS
   RENDERER_ADDRESS
-  TREASURY_ADDRESS
-  FEE_CONTRACT
-  FEE_AMOUNT
   MINTED_COUNT
 }
 
@@ -1353,39 +1329,6 @@ input pistols_TokenConfigWhereInput {
   renderer_addressIN: [ContractAddress]
   renderer_addressNOTLIKE: ContractAddress
   renderer_addressLIKE: ContractAddress
-  treasury_address: ContractAddress
-  treasury_addressGT: ContractAddress
-  treasury_addressGTE: ContractAddress
-  treasury_addressLT: ContractAddress
-  treasury_addressLTE: ContractAddress
-  treasury_addressNEQ: ContractAddress
-  treasury_addressEQ: ContractAddress
-  treasury_addressNOTIN: [ContractAddress]
-  treasury_addressIN: [ContractAddress]
-  treasury_addressNOTLIKE: ContractAddress
-  treasury_addressLIKE: ContractAddress
-  fee_contract: ContractAddress
-  fee_contractGT: ContractAddress
-  fee_contractGTE: ContractAddress
-  fee_contractLT: ContractAddress
-  fee_contractLTE: ContractAddress
-  fee_contractNEQ: ContractAddress
-  fee_contractEQ: ContractAddress
-  fee_contractNOTIN: [ContractAddress]
-  fee_contractIN: [ContractAddress]
-  fee_contractNOTLIKE: ContractAddress
-  fee_contractLIKE: ContractAddress
-  fee_amount: u128
-  fee_amountGT: u128
-  fee_amountGTE: u128
-  fee_amountLT: u128
-  fee_amountLTE: u128
-  fee_amountNEQ: u128
-  fee_amountEQ: u128
-  fee_amountNOTIN: [u128]
-  fee_amountIN: [u128]
-  fee_amountNOTLIKE: u128
-  fee_amountLIKE: u128
   minted_count: u128
   minted_countGT: u128
   minted_countGTE: u128
@@ -1399,75 +1342,11 @@ input pistols_TokenConfigWhereInput {
   minted_countLIKE: u128
 }
 
-type pistols_Wager {
-  duel_id: u128
-  value: u128
-  fee: u128
-  entity: World__Entity
-  eventMessage: World__EventMessage
-}
-
-type pistols_WagerConnection {
-  edges: [pistols_WagerEdge]
-  totalCount: Int!
-  pageInfo: World__PageInfo!
-}
-
-type pistols_WagerEdge {
-  node: pistols_Wager
-  cursor: Cursor
-}
-
-input pistols_WagerOrder {
-  direction: OrderDirection!
-  field: pistols_WagerOrderField!
-}
-
-enum pistols_WagerOrderField {
-  DUEL_ID
-  VALUE
-  FEE
-}
-
-input pistols_WagerWhereInput {
-  duel_id: u128
-  duel_idGT: u128
-  duel_idGTE: u128
-  duel_idLT: u128
-  duel_idLTE: u128
-  duel_idNEQ: u128
-  duel_idEQ: u128
-  duel_idNOTIN: [u128]
-  duel_idIN: [u128]
-  duel_idNOTLIKE: u128
-  duel_idLIKE: u128
-  value: u128
-  valueGT: u128
-  valueGTE: u128
-  valueLT: u128
-  valueLTE: u128
-  valueNEQ: u128
-  valueEQ: u128
-  valueNOTIN: [u128]
-  valueIN: [u128]
-  valueNOTLIKE: u128
-  valueLIKE: u128
-  fee: u128
-  feeGT: u128
-  feeGTE: u128
-  feeLT: u128
-  feeLTE: u128
-  feeNEQ: u128
-  feeEQ: u128
-  feeNOTIN: [u128]
-  feeIN: [u128]
-  feeNOTLIKE: u128
-  feeLIKE: u128
-}
-
 scalar u128
 
 scalar u16
+
+scalar u256
 
 scalar u64
 

@@ -1,20 +1,16 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { Grid, Dropdown, Image } from 'semantic-ui-react'
-import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
+import { SceneName, usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useTable } from '@/pistols/hooks/useTable'
 import { BackButton, MusicToggle } from '@/pistols/components/ui/Buttons'
-import { MenuLabels } from '@/pistols/utils/pistols'
-import { IconClick } from '@/lib/ui/Icons'
 import AccountHeader from '@/pistols/components/account/AccountHeader'
 import useGameAspect from '../hooks/useGameApect'
 import * as TWEEN from '@tweenjs/tween.js'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '../three/game'
 import WalletHeader from './account/WalletHeader'
+import { useAccount, useDisconnect } from '@starknet-react/core'
 
-const Row = Grid.Row
-const Col = Grid.Column
 
 function useExit() {
   const { isConnected } = useAccount()

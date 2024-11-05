@@ -6,9 +6,10 @@ import { useThreeJsContext } from "./ThreeJsContext"
 import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
 import { useChallenge } from "@/pistols/hooks/useChallenge"
 import { keysToEntity } from '@/lib/utils/types'
-import { BladesCard, CONST, getBladesCardFromValue, getPacesCardFromValue, getRoundStateValue, getTacticsCardFromValue, PacesCard, RoundState, TacticsCard } from '@/games/pistols/generated/constants'
+import { BladesCard, BladesCardNameToValue, CONST, getBladesCardFromValue, getBladesCardValue, getPacesCardFromValue, getRoundStateValue, getTacticsCardFromValue, PacesCard, RoundState, TacticsCard } from '@/games/pistols/generated/constants'
 import { AnimationState } from "@/pistols/three/game"
 import { Action } from "@/pistols/utils/pistols"
+import { feltToString } from '@/lib/utils/starknet'
 
 export enum DuelStage {
   Null,             // 0
@@ -36,17 +37,13 @@ export const movesToHand = (moves: number[]): Hand => {
   }
 }
 
-export const useRound = (duelId: BigNumberish, roundNumber: BigNumberish) => {
+export const useRound = (duelId: BigNumberish) => {
   const { Round } = useDojoComponents()
-  const entityId = useMemo(() => keysToEntity([duelId, roundNumber]), [duelId, roundNumber])
+  const entityId = useMemo(() => keysToEntity([duelId]), [duelId])
   const round = useComponentValue(Round, entityId)
   const state = useMemo(() => (round?.state as unknown as RoundState ?? null), [round])
-  const endedInBlades = useMemo(() => (round ? (
-    round.final_step > 10 ||
-    // TODO: remove this, as was added mid-sepolia
-    //@ts-ignore
-    (round.final_step == 0 && round.state == RoundState.Finished)
-  ) : false), [round])
+  const final_blow = useMemo(() => feltToString(round?.final_blow ?? 0n), [round])
+  const endedInBlades = useMemo(() => (round ? (getBladesCardValue(final_blow as unknown as BladesCard) > 0) : false), [final_blow])
   
   const hand_a = useMemo(() => round ? movesToHand(
     [round.moves_a.card_1,round.moves_a.card_2, round.moves_a.card_3, round.moves_a.card_4]
@@ -55,10 +52,11 @@ export const useRound = (duelId: BigNumberish, roundNumber: BigNumberish) => {
     [round.moves_b.card_1, round.moves_b.card_2, round.moves_b.card_3, round.moves_b.card_4]
   ) : null, [round])
 
+  if (!round) console.log(`!!!!! NULL ROUND:`, duelId, entityId, round, Round)
   if (!round) return null
-  // useEffect(() => { console.log(`+++ round:`) }, [round])
   return {
     ...round,
+    final_blow,
     state,
     hand_a,
     hand_b,
@@ -68,7 +66,8 @@ export const useRound = (duelId: BigNumberish, roundNumber: BigNumberish) => {
 
 export const useDuel = (duelId: BigNumberish) => {
   const challenge = useChallenge(duelId)
-  const round1 = useRound(duelId, 1)
+  const round1 = useRound(duelId)
+  // useEffect(() => { console.log(`+++ round:`, duelId, round1, challenge) }, [round1])
 
   //
   // The actual stage of this duel
@@ -87,7 +86,7 @@ export const useDuel = (duelId: BigNumberish) => {
         [DuelStage.Round1Reveal]: Boolean(round1?.moves_b.card_1),
       },
     }
-  }, [round1])
+    }, [round1])
 
   //
   // Players turns, need action
@@ -96,7 +95,6 @@ export const useDuel = (duelId: BigNumberish) => {
 
   return {
     challenge,
-    roundNumber: challenge.roundNumber,
     round1,
     duelStage,
     completedStagesA,

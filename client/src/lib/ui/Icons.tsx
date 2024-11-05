@@ -188,6 +188,7 @@ interface EmojiIconProps {
   disabled?: boolean
   flipped?: 'horizontally' | 'vertically'
   rotated?: 'clockwise' | 'counterclockwise'
+  alt?: string
 }
 export function EmojiIcon({
   emoji,
@@ -197,6 +198,7 @@ export function EmojiIcon({
   disabled = false,
   flipped = null,
   rotated = null,
+  alt = null,
 }: EmojiIconProps) {
   const classNames = useMemo(() => {
     let classNames = [className, 'icon', size, 'NoMargin']

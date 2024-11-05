@@ -1,25 +1,23 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useAccount, useNetwork } from '@starknet-react/core'
+import { useAccount } from '@starknet-react/core'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
+import { useDojoSetup, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useGetPlayerFullDeck } from '@/pistols/hooks/useContractCalls'
 import { CommitMoveMessage, signAndRestoreMovesFromHash } from '@/pistols/utils/salt'
-import { feltToString } from '@/lib/utils/starknet'
 import { movesToHand } from '@/pistols/hooks/useDuel'
 import { isPositiveBigint } from '@/lib/utils/types'
 
-export function useSignAndRestoreMovesFromHash(duelId: bigint, roundNumber: number, tableId: string, hash: bigint) {
+export function useSignAndRestoreMovesFromHash(duelId: bigint, tableId: string, hash: bigint) {
   const { account } = useAccount()
-  const { chain } = useNetwork()
   const { duelistId } = useSettings()
+  const { starknetDomain } = useDojoSetup()
   const { decks } = useGetPlayerFullDeck(tableId)
 
-  const messageToSign = useMemo<CommitMoveMessage>(() => ((duelId && roundNumber && duelistId) ? {
+  const messageToSign = useMemo<CommitMoveMessage>(() => ((duelId && duelistId) ? {
     duelId: BigInt(duelId),
-    roundNumber: BigInt(roundNumber),
     duelistId: BigInt(duelistId),
-  } : null), [duelId, roundNumber, duelistId])
+  } : null), [duelId, duelistId])
 
   const [salt, setSalt] = useState<bigint>()
   const [moves, setMoves] = useState<number[]>()
@@ -42,7 +40,7 @@ export function useSignAndRestoreMovesFromHash(duelId: bigint, roundNumber: numb
 
   const sign_and_restore = useCallback(async () => {
     if (canSign) {
-      const { salt, moves } = await signAndRestoreMovesFromHash(account, feltToString(chain.id), messageToSign, hash, decks)
+      const { salt, moves } = await signAndRestoreMovesFromHash(account, starknetDomain, messageToSign, hash, decks)
       if (salt > 0n && moves) {
         setSalt(salt)
         setMoves(moves)
@@ -50,7 +48,7 @@ export function useSignAndRestoreMovesFromHash(duelId: bigint, roundNumber: numb
       }
       return { salt, moves }
     }
-  }, [account, chain, duelistId, duelId, roundNumber, hash, decks, canSign])
+  }, [account, starknetDomain, duelistId, duelId, hash, decks, canSign])
 
   return {
     canSign,
@@ -61,7 +59,7 @@ export function useSignAndRestoreMovesFromHash(duelId: bigint, roundNumber: numb
   }
 }
 
-export function useRevealAction(duelId: bigint, roundNumber: number, tableId: string, hash: bigint, enabled: boolean) {
+export function useRevealAction(duelId: bigint, tableId: string, hash: bigint, enabled: boolean) {
   const { reveal_moves } = useDojoSystemCalls()
   const { account } = useAccount()
   const { duelistId } = useSettings()
@@ -70,18 +68,18 @@ export function useRevealAction(duelId: bigint, roundNumber: number, tableId: st
   const {
     canSign, sign_and_restore,
     moves: storedMoves, salt: storedSalt,
-  } = useSignAndRestoreMovesFromHash(duelId, roundNumber, tableId, hash)
+  } = useSignAndRestoreMovesFromHash(duelId, tableId, hash)
 
   const canReveal = useMemo(() =>
     (account && enabled && duelId && (canSign || (storedSalt && storedMoves)) && !isSubmitting),
     [account, enabled, duelId, canSign, storedSalt, storedMoves, isSubmitting])
-  // console.log(`canReveal:`, canReveal, enabled, duelId, roundNumber, hash, isSubmitting)
+  // console.log(`canReveal:`, canReveal, enabled, duelId, hash, isSubmitting)
 
   const reveal = useCallback(async () => {
     const _reveal = async (salt: bigint, moves: number[]) => {
       if (moves?.length >= 2 && !isSubmitting) {
         setIsSubmitting(true)
-        await reveal_moves(account, duelistId, duelId, roundNumber, salt, moves)
+        await reveal_moves(account, duelistId, duelId, salt, moves)
         setIsSubmitting(false)
       }
     }
@@ -92,7 +90,7 @@ export function useRevealAction(duelId: bigint, roundNumber: number, tableId: st
       const { salt, moves } = await sign_and_restore()
       _reveal(salt, moves)
     }
-  }, [account, duelistId, duelId, roundNumber, canReveal, storedSalt, storedMoves, isSubmitting])
+  }, [account, duelistId, duelId, canReveal, storedSalt, storedMoves, isSubmitting])
 
   return {
     canReveal,

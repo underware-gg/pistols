@@ -1,23 +1,38 @@
 use starknet::{ContractAddress, get_contract_address};
-use dojo::world::{IWorldProvider, IWorldProviderDispatcher, IWorldDispatcher, IWorldDispatcherTrait};
+use dojo::world::{WorldStorage, IWorldDispatcher, IWorldDispatcherTrait};
+use dojo::contract::components::world_provider::{IWorldProvider};
 use openzeppelin_token::erc721::{ERC721Component};
 use graffiti::json::JsonImpl;
 
-use pistols::systems::tokens::duelist::{IDuelistToken, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait};
+use pistols::interfaces::systems::{SystemsTrait};
+use pistols::systems::tokens::duelist_token::{IDuelistToken, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait};
 use pistols::models::{
+    config::{TokenConfig},
     duelist::{Duelist},
-    token_config::{TokenConfig},
 };
 use pistols::libs::store::{Store, StoreTrait};
+use pistols::utils::arrays::{SpanUtilsTrait};
 use pistols::utils::metadata::{MetadataTrait};
 
 #[starknet::interface]
 pub trait ITokenRenderer<TState> {
-    fn format_name(self: @TState, token_id: u256, duelist: Duelist) -> ByteArray;
-    fn format_description(self: @TState, token_id: u256, _duelist: Duelist) -> ByteArray;
-    fn format_image(self: @TState, duelist: Duelist, variant: ByteArray) -> ByteArray;
+    // token metadata
+    fn get_token_name(self: @TState, token_id: u256) -> ByteArray;
+    fn get_token_description(self: @TState, token_id: u256) -> ByteArray;
+    fn get_token_image(self: @TState, token_id: u256) -> ByteArray;
+
+    // token attributes
     // returns: [key1, value1, key2, value2,...]
-    fn get_attributes(self: @TState, duelist: Duelist) -> Span<ByteArray>;
+    fn get_attribute_pairs(self: @TState, token_id: u256) -> Span<ByteArray>;
+    
+    // additional metadata (optional)
+    // returns: [key1, value1, key2, value2,...]
+    fn get_metadata_pairs(self: @TState, token_id: u256) -> Span<ByteArray>;
+}
+
+mod Errors {
+    const INVALID_ATTRIBUTES: felt252 = 'METADATA: invalid attributes';
+    const INVALID_METADATA: felt252   = 'METADATA: invalid metadata';
 }
 
 pub impl ERC721HooksImpl<
@@ -32,30 +47,40 @@ pub impl ERC721HooksImpl<
         self: @ERC721Component::ComponentState<TContractState>,
         token_id: u256,
     ) -> ByteArray {
-        let store = StoreTrait::new(self.get_contract().world());
-
-        // get renderer dispatcher
+        let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+        let mut store: Store = StoreTrait::new(world);
         let token_config: TokenConfig = store.get_token_config(get_contract_address());
+        (token_config.render(token_id))
+    }
+}
+
+#[generate_trait]
+impl TokenConfigRenderImpl of TokenConfigRenderTrait {
+    fn render(self: TokenConfig,
+        token_id: u256,
+    ) -> ByteArray {
         let renderer = ITokenRendererDispatcher{
-            contract_address: if (token_config.renderer_address).is_non_zero() {
-                (token_config.renderer_address)
+            contract_address: if (self.renderer_address).is_non_zero() {
+                (self.renderer_address)
             } else {
                 (get_contract_address())
             }
         };
 
-        let duelist: Duelist = store.get_duelist(token_id.low);
-        let attributes: Span<ByteArray> = renderer.get_attributes(duelist.clone());
-        let metadata = JsonImpl::new()
-            .add("id", format!("{}", token_id))
-            .add("name", renderer.format_name(token_id, duelist.clone()))
-            .add("description", renderer.format_description(token_id, duelist.clone()))
-            .add("image", renderer.format_image(duelist.clone(), "square"))
-            .add("portrait", renderer.format_image(duelist.clone(), "portrait"))
-            .add("metadata", MetadataTrait::format_metadata(attributes))
-            .add_array("attributes", MetadataTrait::create_traits_array(attributes));
-        let metadata = metadata.build();
+        let attributes: Span<ByteArray> = renderer.get_attribute_pairs(token_id);
+        let metadata: Span<ByteArray> = renderer.get_metadata_pairs(token_id);
+        assert(attributes.len() % 2 == 0, Errors::INVALID_ATTRIBUTES);
+        assert(metadata.len() % 2 == 0, Errors::INVALID_METADATA);
 
-        (MetadataTrait::encode_json(metadata, false))
+        let json = JsonImpl::new()
+            .add("id", format!("{}", token_id))
+            .add("name", renderer.get_token_name(token_id))
+            .add("description", renderer.get_token_description(token_id))
+            .add("image", renderer.get_token_image(token_id))
+            .add("metadata", MetadataTrait::format_metadata(attributes.concat(metadata).span()))
+            .add_array("attributes", MetadataTrait::create_traits_array(attributes));
+        let result = json.build();
+
+        (MetadataTrait::encode_json(result, false))
     }
 }

@@ -22,6 +22,15 @@ get_profile_env () {
   echo $RESULT
 }
 
+get_contract_address () {
+  local TAG=$1
+  local RESULT=$(cat $MANIFEST_FILE_PATH | jq -r ".contracts[] | select(.tag == \"$TAG\" ).address")
+  if [[ -z "$RESULT" ]]; then
+    >&2 echo "get_contract_address($TAG) not found! 👎"
+  fi
+  echo $RESULT
+}
+
 #-----------------
 # env setup
 #
@@ -34,15 +43,14 @@ export ACCOUNT_ADDRESS=${DOJO_ACCOUNT_ADDRESS:-$(get_profile_env "account_addres
 # use $STARKNET_RPC_URL else read from profile
 export RPC_URL=${STARKNET_RPC_URL:-$(get_profile_env "rpc_url")}
 
-export MANIFEST_FILE_PATH="./manifests/$PROFILE/deployment/manifest.json"
-export BINDINGS_PATH="./bindings/typescript"
-export CLIENT_GEN_PATH="../client/src/games/$GAME_SLUG/generated"
-export PROFILE_GEN_PATH="$CLIENT_GEN_PATH/$PROFILE"
+export MANIFEST_FILE_PATH="./manifest_$PROFILE.json"
+export BINDINGS_PATH="./bindings"
+export CLIENT_GAME_PATH="../client/src/games/$GAME_SLUG"
+export CLIENT_MANIFEST_PATH="$CLIENT_GAME_PATH/manifests"
 
 # contracts
-export ADMIN_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.tag == "pistols-admin" ).address')
-export GAME_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.tag == "pistols-game" ).address')
-export DUELIST_TOKEN_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.tag == "pistols-duelist" ).address')
+export ADMIN_ADDRESS=$(get_contract_address "pistols-admin")
+export GAME_ADDRESS=$(get_contract_address "pistols-game")
 
 # match rpc chain id with profile
 export CHAIN_ID=$(starkli chain-id --no-decode --rpc $RPC_URL | xxd -r -p)
@@ -65,6 +73,7 @@ echo "World      : $WORLD_ADDRESS"
 echo "Account    : $ACCOUNT_ADDRESS"
 # echo "::game     : $GAME_ADDRESS"
 # echo "::admin    : $ADMIN_ADDRESS"
-echo "::duelists : $DUELIST_TOKEN_ADDRESS"
+# echo "::duels    : $DUEL_TOKEN_ADDRESS"
+# echo "::duelists : $DUELIST_TOKEN_ADDRESS"
 echo "Torii CFG  : $TORII_CONFIG_PATH"
 echo "------------------------------------------------------------------------------"

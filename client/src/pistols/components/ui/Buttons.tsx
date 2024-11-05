@@ -1,13 +1,12 @@
 import React, { ReactElement, useCallback, useEffect, useMemo, useState } from 'react'
 import { Menu, Button, Confirm, SemanticICONS, Icon } from 'semantic-ui-react'
+import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
-import { useTableAccountBalance } from '@/pistols/hooks/useTable'
-import { bigintAdd } from '@/lib/utils/types'
+import { useLordsBalance } from '@/lib/dojo/hooks/useLords'
+import { LordsBagIcon } from '@/pistols/components/account/Balance'
 import { CustomIcon, IconSizeProp } from '@/lib/ui/Icons'
-import { BigNumberish } from 'starknet'
-import { LordsBagIcon } from '../account/Balance'
 import { SceneName, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useGameEvent } from '@/pistols/hooks/useGameEvent'
 
@@ -99,31 +98,24 @@ export const ActionButton = ({
 
 export const BalanceRequiredButton = ({
   label,
-  tableId,
-  wagerValue,
-  minWagerValue,
   fee,
   onClick,
   disabled = false,
 }: {
   label: string
-  tableId: string
-  wagerValue: BigNumberish
-  minWagerValue?: BigNumberish
   fee: BigNumberish
   onClick: Function
   disabled?: boolean
 }) => {
   const { address } = useAccount()
-  const { balance, noFundsForFee } = useTableAccountBalance(tableId, address, bigintAdd(wagerValue, fee))
-  const wagerTooLow = (BigInt(minWagerValue ?? 0) > 0n && BigInt(wagerValue) < BigInt(minWagerValue))
-  const canSubmit = (!wagerTooLow && !noFundsForFee)
+  const { noFundsForFee } = useLordsBalance(address, fee)
+  const canSubmit = (!noFundsForFee)
   return (
     <ActionButton large fill
       disabled={disabled}
       important={canSubmit}
       negative={!canSubmit}
-      label={wagerTooLow ? 'Minimum Not Met' : noFundsForFee ? 'No Funds!' : <>{label} <LordsBagIcon /></>}
+      label={noFundsForFee ? 'No Funds!' : <>{label} <LordsBagIcon /></>}
       onClick={() => (canSubmit ? onClick() : {})}
     />
   )

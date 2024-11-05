@@ -48,7 +48,6 @@ const table_config_schema: FormSchema = {
   description: { type: FieldType.ShortString },
   table_type: { type: FieldType.TableType },
   deck_type: { type: FieldType.DeckType },
-  fee_contract_address: { type: FieldType.Address },
   fee_collector_address: { type: FieldType.Address },
   fee_min: { type: FieldType.Wei },
   is_open: { type: FieldType.Boolean },
@@ -244,7 +243,7 @@ export const Field = ({
                 setValue={setValue}
               />
             </> : <>
-              {fieldType == FieldType.Wei && <Balance wei={value ?? 0} decimals={18} />}
+              {fieldType == FieldType.Wei && <Balance lords wei={value ?? 0} decimals={18} />}
               <FormInput
                 label={null}
                 placeholder={null}

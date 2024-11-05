@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useTokenContract } from '@/pistols/hooks/useTokenDuelist'
+import { useDuelistTokenContract } from '@/pistols/hooks/useTokenContract'
 import { useERC721OwnerOf } from '@/lib/utils/hooks/useERC721'
 import { bigintEquals, isPositiveBigint } from '@/lib/utils/types'
 
@@ -25,9 +25,9 @@ export const useIsYou = (otherDueistId: BigNumberish) => {
 }
 
 export const useIsMyDuelist = (otherDueistId: BigNumberish) => {
-  const { contractAddress } = useTokenContract()
+  const { duelistContractAddress } = useDuelistTokenContract()
   const { address } = useAccount()
-  const { owner } = useERC721OwnerOf(contractAddress, otherDueistId)
+  const { owner } = useERC721OwnerOf(duelistContractAddress, otherDueistId)
   const isMyDuelist = useMemo(() => ((isPositiveBigint(address) && isPositiveBigint(owner)) ? bigintEquals(address, owner) : undefined), [address, owner])
   return isMyDuelist
 }

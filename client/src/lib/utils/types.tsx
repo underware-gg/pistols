@@ -45,10 +45,11 @@ export const shortAddress = (address: string | null, small: boolean = false) => 
 //
 // arrays
 //
-export const arrayUnique = <T,>(array: T[]) => array?.filter((value, index, array) => (array.indexOf(value) === index))
-export const arrayLast = <T,>(array: T[]) => array?.slice(-1)[0]
-export const arrayRemoveValue = <T,>(array: T[], v: T) => (array?.filter(e => (e !== v)) ?? [])
-export const arrayHasNullElements = <T,>(array: T[]) => array?.reduce((acc, e) => (acc || e == null), false)
+export const arrayUnique = <T,>(array: T[]): T[] => (array?.filter((value, index, array) => (array.indexOf(value) === index)) ?? [])
+export const arrayLast = <T,>(array: T[]): T => (array?.slice(-1)[0])
+export const arrayRemoveValue = <T,>(array: T[], v: T): T[] => (array?.filter(e => (e !== v)) ?? [] ?? [])
+export const arrayHasNullElements = <T,>(array: T[]): boolean => (array?.reduce((acc, e) => (acc || e == null), false) ?? false)
+export const arrayClean = <T,>(array: T[]): T[] => (array?.reduce((acc, e) => { if (e) acc.push(e); return acc }, []) ?? [])
 
 //
 // dictionaries

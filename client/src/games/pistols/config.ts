@@ -1,9 +1,10 @@
 import { DojoAppConfig, DojoManifest } from '@/lib/dojo/Dojo'
 import { ChainId, defaultChainId } from '@/lib/dojo/setup/chainConfig'
-import pistols_manifest_dev from './generated/dev/manifest.json'
-import pistols_manifest_slot from './generated/slot/manifest.json'
-import pistols_manifest_staging from './generated/staging/manifest.json'
-import pistols_manifest_sepolia from './generated/sepolia/manifest.json'
+import { TYPED_DATA } from './generated/constants'
+import pistols_manifest_dev from './manifests/manifest_dev.json'
+import pistols_manifest_slot from './manifests/manifest_slot.json'
+import pistols_manifest_staging from './manifests/manifest_staging.json'
+import pistols_manifest_sepolia from './manifests/manifest_sepolia.json'
 
 // TODO: move this here!
 // import { defineContractComponents } from './generated/contractComponents'
@@ -33,14 +34,19 @@ export const makeDojoAppConfig = (): DojoAppConfig => {
     nameSpace: 'pistols',
     contractInterfaces: {
       game: ['IGame'],
-      duelist: [
-        'IDuelistTokenPublic',
-      ],
+      duel_token: ['IDuelTokenPublic'],
+      duelist_token: ['IDuelistTokenPublic'],
       lords_mock: [
         'ILordsMockFaucet',
         // 'IERC20Allowance',
       ],
       admin: ['IAdmin'],
+    },
+    starknetDomain: {
+      name: TYPED_DATA.NAME,
+      version: TYPED_DATA.VERSION,
+      chainId: defaultChainId,
+      revision: '1',
     },
   }
 }

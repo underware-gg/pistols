@@ -8,12 +8,11 @@ pushd $(dirname "$0")/..
 #   echo 'Error: jq not instlaled! Instal with: brew install jq'
 #   exit 1
 # fi
-# export ADMIN_ADDRESS=$(cat $MANIFEST_FILE_PATH | jq -r '.contracts[] | select(.tag == "pistols-admin" ).address')
 
 export ADMIN_TAG="pistols-admin"
 export GAME_TAG="pistols-game"
 export MINTER_TAG="pistols-minter"
-export DUELISTS_TAG="pistols-duelist"
+export DUELISTS_TAG="pistols-duelist_token"
 
 
 echo "------------------------------------------------------------------------------"
@@ -46,7 +45,6 @@ echo ">>> Admin auth..."
 sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
   model:pistols-Config,$ADMIN_TAG \
   model:pistols-TableConfig,$ADMIN_TAG \
-  model:pistols-TableWager,$ADMIN_TAG \
   model:pistols-TableAdmittance,$ADMIN_TAG
 
 echo ">>> Game auth..."
@@ -54,7 +52,6 @@ sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
   model:pistols-Duelist,$GAME_TAG \
   model:pistols-Scoreboard,$GAME_TAG \
   model:pistols-Challenge,$GAME_TAG \
-  model:pistols-Wager,$GAME_TAG \
   model:pistols-Pact,$GAME_TAG \
   model:pistols-Round,$GAME_TAG
 

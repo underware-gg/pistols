@@ -5,60 +5,69 @@ mod tester {
     use array::ArrayTrait;
     use debug::PrintTrait;
 
-    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-    use dojo::model::{Model, ModelTest, ModelIndex, ModelEntityTest};
-    use dojo::utils::test::{spawn_test_world, deploy_contract};
+    use dojo::world::{WorldStorage, WorldStorageTrait, IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::model::{ModelStorage, ModelValueStorage, ModelStorageTest};
+    use dojo_cairo_test::{spawn_test_world, NamespaceDef, TestResource, ContractDefTrait};
 
-    use pistols::systems::admin::{admin, IAdminDispatcher, IAdminDispatcherTrait};
-    use pistols::systems::game::{game, IGameDispatcher, IGameDispatcherTrait};
-    use pistols::systems::tokens::duelist::{duelist, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait};
-    use pistols::systems::tokens::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
-    use pistols::tests::token::mock_duelist::{
-        duelist as mock_duelist,
-        // IDuelistTokenDispatcher,
-        // IDuelistTokenDispatcherTrait,
+    pub use pistols::systems::{
+        bank::{bank, IBankDispatcher, IBankDispatcherTrait},
+        admin::{admin, IAdminDispatcher, IAdminDispatcherTrait},
+        game::{game, IGameDispatcher, IGameDispatcherTrait},
+        rng::{rng},
+        tokens::{
+            duel_token::{duel_token, IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
+            duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
+            fame_coin::{fame_coin, IFameCoinDispatcher, IFameCoinDispatcherTrait},
+            lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
+        },
+        components::{
+            token_bound::{m_TokenBoundAddress, TokenBoundAddress},
+        },
     };
+    use pistols::models::{
+        challenge::{
+            m_Challenge, Challenge, ChallengeValue, DuelistState, DuelistStateTrait,
+            m_Round, Round, RoundValue,
+        },
+        duelist::{
+            m_Duelist, Duelist, DuelistTrait, DuelistValue,
+            m_Pact, Pact, PactValue,
+            m_Scoreboard, Scoreboard, ScoreboardValue,
+            Score, ProfilePicType, Archetype
+        },
+        payment::{
+            m_Payment, Payment,
+        },
+        config::{
+            m_Config, Config, ConfigValue,
+            m_TokenConfig, TokenConfig, TokenConfigValue,
+            m_CoinConfig, CoinConfig, CoinConfigValue,
+            CONFIG,
+        },
+        table::{
+            m_TableConfig, TableConfig, TableConfigValue,
+            m_TableAdmittance, TableAdmittance, TableAdmittanceValue,
+        },
+        table::{TABLES},
+    };
+    use pistols::tests::token::mock_duelist::{
+        m_MockDuelistOwners,
+        duelist_token as mock_duelist,
+    };
+    use pistols::tests::mock_rng::{
+        rng as mock_rng,
+        IRngDispatcher, IRngDispatcherTrait,
+        m_SaltValue,
+    };
+
     use pistols::types::challenge_state::{ChallengeState};
     use pistols::types::constants::{CONST};
     use pistols::types::premise::{Premise};
     use pistols::utils::arrays::{ArrayUtilsTrait, SpanUtilsTrait};
     use pistols::utils::short_string::{ShortString};
-    use pistols::interfaces::systems::{SELECTORS};
+    use pistols::interfaces::systems::{SystemsTrait, SELECTORS};
 
-    use pistols::models::challenge::{
-        Challenge, ChallengeStore, ChallengeEntity, ChallengeEntityStore, DuelistState, DuelistStateTrait,
-        Wager, WagerStore, WagerEntity, WagerEntityStore,
-        Round, RoundStore, RoundEntity, RoundEntityStore,
-    };
-    use pistols::models::duelist::{
-        Duelist, DuelistTrait, DuelistStore, DuelistEntity, DuelistEntityStore,
-        Scoreboard, ScoreboardStore, ScoreboardEntity, ScoreboardEntityStore,
-        Pact, PactStore, PactEntity, PactEntityStore,
-        ProfilePicType,
-        Archetype,
-    };
-    use pistols::models::config::{
-        Config, ConfigStore, CONFIG, ConfigEntity, ConfigEntityStore,
-    };
-    use pistols::models::table::{
-        TableConfig, TableConfigStore, TableConfigEntity, TableConfigEntityStore,
-        TableAdmittance, TableAdmittanceStore, TableAdmittanceEntity, TableAdmittanceEntityStore,
-    };
-    use pistols::models::token_config::{
-        TokenConfig, TokenConfigStore, TokenConfigEntity, TokenConfigEntityStore,
-    };
-
-    use pistols::systems::rng::{rng};
-    use pistols::tests::mock_rng::{
-        rng as mock_rng,
-        IRngDispatcher,
-        IRngDispatcherTrait,
-        salt_value,
-    };
-
-
-
-
+    
     //
     // starknet testing cheats
     // https://github.com/starkware-libs/cairo/blob/main/corelib/src/starknet/testing.cairo
@@ -110,162 +119,203 @@ mod tester {
     const INITIAL_STEP: u64 = 0x10;
 
     mod FLAGS {
-        const GAME: u8       = 0b000001;
-        const ADMIN: u8      = 0b000010;
-        const LORDS: u8      = 0b000100;
-        const DUELIST: u8    = 0b001000;
-        const APPROVE: u8    = 0b010000;
-        const MOCK_RNG: u8   = 0b100000;
+        const GAME: u8       = 0b0000001;
+        const ADMIN: u8      = 0b0000010;
+        const LORDS: u8      = 0b0000100;
+        const DUEL: u8       = 0b0001000;
+        const DUELIST: u8    = 0b0010000;
+        const APPROVE: u8    = 0b0100000;
+        const MOCK_RNG: u8   = 0b1000000;
     }
 
     #[derive(Copy, Drop)]
-    pub struct Systems {
-        world: IWorldDispatcher,
+    pub struct TestSystems {
+        world: WorldStorage,
         game: IGameDispatcher,
         admin: IAdminDispatcher,
         lords: ILordsMockDispatcher,
+        duels: IDuelTokenDispatcher,
         duelists: IDuelistTokenDispatcher,
         rng: IRngDispatcher,
     }
 
-    #[inline(always)]
-    fn deploy_system(world: IWorldDispatcher, salt: felt252, class_hash: felt252) -> ContractAddress {
-        let contract_address = world.deploy_contract(salt, class_hash.try_into().unwrap());
-        (contract_address)
-    }
-
-    fn setup_world(flags: u8) -> Systems {
+    fn setup_world(flags: u8) -> TestSystems {
         let mut deploy_game: bool = (flags & FLAGS::GAME) != 0;
         let mut deploy_admin: bool = (flags & FLAGS::ADMIN) != 0;
         let mut deploy_lords: bool = (flags & FLAGS::LORDS) != 0;
+        let mut deploy_duel: bool = (flags & FLAGS::DUEL) != 0;
         let mut deploy_duelist: bool = (flags & FLAGS::DUELIST) != 0;
         let mut deploy_mock_rng = (flags & FLAGS::MOCK_RNG) != 0;
         let approve: bool = (flags & FLAGS::APPROVE) != 0;
 
         deploy_game = deploy_game || approve;
         deploy_admin = deploy_admin || deploy_game;
-        deploy_lords = deploy_lords || deploy_game || approve || deploy_duelist;
+        deploy_lords = deploy_lords || deploy_game || deploy_duelist || approve;
+        deploy_duel = deploy_duel || deploy_game;
+
+// '---- 0'.print();
+        let mut resources: Array<TestResource> = array![
+            // pistols models
+            TestResource::Model(m_Challenge::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_CoinConfig::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_Config::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_Duelist::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_Pact::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_Payment::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_Round::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_Scoreboard::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_TableAdmittance::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_TableConfig::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_TokenConfig::TEST_CLASS_HASH.try_into().unwrap()),
+            // events
+            // TestResource::Event(actions::e_Moved::TEST_CLASS_HASH.try_into().unwrap()),
+        ];
+
+        if (deploy_mock_rng) {
+            resources.append(TestResource::Model(m_SaltValue::TEST_CLASS_HASH.try_into().unwrap()));
+        }
+        if (!deploy_duelist && deploy_game) {
+            resources.append(TestResource::Model(m_MockDuelistOwners::TEST_CLASS_HASH.try_into().unwrap()));
+        }
+
+        if (deploy_game) {
+            resources.append(TestResource::Contract(
+                ContractDefTrait::new(game::TEST_CLASS_HASH, "game")
+                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+            ));
+        }
+
+        if (deploy_admin) {
+            resources.append(TestResource::Contract(
+                ContractDefTrait::new(admin::TEST_CLASS_HASH, "admin")
+                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+                    .with_init_calldata([
+                        TREASURY().into(), // treasury_address
+                        0, // lords_address
+                    ].span())
+            ));
+        }
+
+        if (deploy_duel) {
+            resources.append(TestResource::Contract(
+                ContractDefTrait::new(duel_token::TEST_CLASS_HASH, "duel_token")
+                    .with_writer_of([
+                        // same as config
+                        selector_from_tag!("pistols-TokenConfig"),
+                        selector_from_tag!("pistols-Payment"),
+                        selector_from_tag!("pistols-Challenge"),
+                        selector_from_tag!("pistols-Round"),
+                        selector_from_tag!("pistols-Pact"),
+                        selector_from_tag!("pistols-Scoreboard"),
+                    ].span())
+                    .with_init_calldata([
+                        'https://pistols.underware.gg',
+                        0, // minter_address
+                        0, // renderer_address
+                        0, // fee_amount
+                    ].span())
+            ));
+        }
+
+        // '---- 3'.print();
+        if (deploy_duelist) {
+            resources.append(TestResource::Contract(
+                ContractDefTrait::new(duelist_token::TEST_CLASS_HASH, "duelist_token")
+                    .with_writer_of([
+                        // same as config
+                        selector_from_tag!("pistols-TokenConfig"),
+                        selector_from_tag!("pistols-Payment"),
+                        selector_from_tag!("pistols-Duelist"),
+                    ].span())
+                    .with_init_calldata([
+                        'https://pistols.underware.gg',
+                        0, // minter_address
+                        0, // renderer_address
+                        100_000_000_000_000_000_000, // fee_amount: 100 Lords
+                    ].span())
+            ));
+        }
+        else if (deploy_game) {
+            resources.append(TestResource::Contract(
+                ContractDefTrait::new(mock_duelist::TEST_CLASS_HASH, "duelist_token")
+                    .with_writer_of([
+                        selector_from_tag!("pistols-MockDuelistOwners"),
+                    ].span())
+            ));
+        }
+
+        if (deploy_lords) {
+            resources.append(TestResource::Contract(
+                ContractDefTrait::new(lords_mock::TEST_CLASS_HASH, "lords_mock")
+                    .with_writer_of([
+                        selector_from_tag!("pistols-CoinConfig"),
+                    ].span())
+                    .with_init_calldata([
+                        // game.contract_address.into(), // minter
+                        0, // minter
+                        10_000_000_000_000_000_000_000, // faucet_amount: 10,000 Lords
+                    ].span())
+            ));
+            resources.append(TestResource::Contract(
+                ContractDefTrait::new(bank::TEST_CLASS_HASH, "bank")
+                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+            ));
+        }
+
+        if (deploy_mock_rng) {
+            resources.append(TestResource::Contract(
+                ContractDefTrait::new(mock_rng::TEST_CLASS_HASH, "rng")
+                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+            ));
+        } else {
+            resources.append(TestResource::Contract(
+                ContractDefTrait::new(rng::TEST_CLASS_HASH, "rng")
+                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+            ));
+        }
 
         // setup testing
         testing::set_block_number(1);
         testing::set_block_timestamp(INITIAL_TIMESTAMP);
 
-        let mut namespaces: Array<ByteArray> = array!["pistols"];
-        let mut models: Array<felt252> = array![];
-
-        models.extend_from_span(get_models_test_class_hashes!(["pistols"]));
-        if (deploy_mock_rng) {
-            // namespaces.append("mock");
-            models.extend_from_span([salt_value::TEST_CLASS_HASH].span());
-        }
-
-        // deploy world
-// '---- spawn_test_world...'.print();
-        let world: IWorldDispatcher = spawn_test_world(
-            namespaces.span(),
-            models.span(),
-        );
-// '---- spawned...'.print();
-        world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), OWNER());
-// '---- grated...'.print();
-
-        // deploy systems
-        let game = IGameDispatcher{ contract_address:
-            if (deploy_game) {
-                let address = deploy_system(world, 'salt', game::TEST_CLASS_HASH);
-                world.grant_owner(SELECTORS::GAME, OWNER());
-                world.grant_writer(selector_from_tag!("pistols-Duelist"), address);
-                world.grant_writer(selector_from_tag!("pistols-Scoreboard"), address);
-                world.grant_writer(selector_from_tag!("pistols-Challenge"), address);
-                world.grant_writer(selector_from_tag!("pistols-Wager"), address);
-                world.grant_writer(selector_from_tag!("pistols-Pact"), address);
-                world.grant_writer(selector_from_tag!("pistols-Round"), address);
-                (address)
-            }
-            else {ZERO()}
+        let ndef = NamespaceDef {
+            namespace: "pistols",
+            resources: resources.span(),
         };
+
 // '---- 1'.print();
-        let lords = ILordsMockDispatcher{ contract_address:
-            if (deploy_lords) {
-                let address = deploy_system(world, 'lords_mock', lords_mock::TEST_CLASS_HASH);
-                world.grant_writer(selector_from_tag!("pistols-CoinConfig"), address);
-                let call_data: Span<felt252> = array![
-                    // game.contract_address.into(), // minter
-                    0, // minter
-                    10_000_000_000_000_000_000_000, // 10,000 Lords
-                ].span();
-                world.init_contract(SELECTORS::LORDS_MOCK, call_data);
-                (address)
-            }
-            else {ZERO()}
-        };
+        let mut world: WorldStorage = spawn_test_world([ndef].span());
 // '---- 2'.print();
-        let duelists = IDuelistTokenDispatcher{ contract_address:
-            if (deploy_duelist) {
-                let address = deploy_system(world, 'duelist', duelist::TEST_CLASS_HASH);
-                world.grant_writer(SELECTORS::DUELIST, OWNER());
-                world.grant_writer(selector_from_tag!("pistols-TokenConfig"), address);
-                world.grant_writer(selector_from_tag!("pistols-Duelist"), address);
-                let call_data: Span<felt252> = array![
-                    0, 0, 0,
-                    lords.contract_address.into(),
-                    100_000_000_000_000_000_000, // 100 Lords
-                ].span();
-                world.init_contract(SELECTORS::DUELIST, call_data);
-                (address)
-            }
-            else if (deploy_game) {
-                (deploy_system(world, 'duelist', mock_duelist::TEST_CLASS_HASH))
-            }
-            else {ZERO()}
-        };
-// '---- 3'.print();
-        let admin = IAdminDispatcher{ contract_address:
-            if (deploy_admin) {
-                let address = deploy_system(world, 'admin', admin::TEST_CLASS_HASH);
-                let call_data: Span<felt252> = array![
-                    TREASURY().into(), // treasury
-                    lords.contract_address.into(),
-                ].span();
-                world.grant_owner(SELECTORS::ADMIN, OWNER());
-                world.grant_writer(selector_from_tag!("pistols-Config"), address);
-                world.grant_writer(selector_from_tag!("pistols-TableConfig"), address);
-                world.grant_writer(selector_from_tag!("pistols-TableWager"), address);
-                world.grant_writer(selector_from_tag!("pistols-TableAdmittance"), address);
-                world.init_contract(SELECTORS::ADMIN, call_data);
-                (address)
-            }
-            else {ZERO()}
-        };
-// '---- 4'.print();
-        let rng = IRngDispatcher{ contract_address:
-            {
-                let class_hash = if (deploy_mock_rng) {mock_rng::TEST_CLASS_HASH} else {rng::TEST_CLASS_HASH};
-                let address = deploy_system(world, 'rng', class_hash);
-                world.grant_owner(dojo::utils::bytearray_hash(@"pistols"), address);
-                // world.grant_owner(dojo::utils::bytearray_hash(@"mock"), address);
-                (address)
-            }
-        };
-// '---- 5'.print();
-
-        // initializers
-        if (deploy_lords) {
-            execute_lords_faucet(@lords, OWNER());
-            execute_lords_faucet(@lords, OTHER());
-        }
-// '---- 6'.print();
-        if (approve) {
-            execute_lords_approve(@lords, OWNER(), game.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
-            execute_lords_approve(@lords, OTHER(), game.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
-            execute_lords_approve(@lords, BUMMER(), game.contract_address, 1_000_000 * CONST::ETH_TO_WEI.low);
-        }
-// '---- 7'.print();
 
         impersonate(OWNER());
 
+        // initializers
+// '---- 3'.print();
+        if (deploy_lords) {
+            let lords = world.lords_mock_dispatcher();
+            execute_lords_faucet(@lords, OWNER());
+            execute_lords_faucet(@lords, OTHER());
+// '---- 4'.print();
+            if (approve) {
+                let spender = world.bank_address();
+                execute_lords_approve(@lords, OWNER(), spender, 1_000_000 * CONST::ETH_TO_WEI.low);
+                execute_lords_approve(@lords, OTHER(), spender, 1_000_000 * CONST::ETH_TO_WEI.low);
+                execute_lords_approve(@lords, BUMMER(), spender, 1_000_000 * CONST::ETH_TO_WEI.low);
+            }
+        }
+// '---- 5'.print();
+
 // '---- READY!'.print();
-        (Systems { world, game, admin, lords, duelists, rng })
+        (TestSystems {
+            world,
+            game: world.game_dispatcher(),
+            admin: world.admin_dispatcher(),
+            lords: world.lords_mock_dispatcher(),
+            duels: world.duel_token_dispatcher(),
+            duelists: world.duelist_token_dispatcher(),
+            rng: IRngDispatcher{ contract_address: world.rng_address() },
+        })
     }
 
     fn elapse_timestamp(delta: u64) -> (u64, u64) {
@@ -343,9 +393,9 @@ mod tester {
     }
 
     // ::duelist
-    fn execute_create_duelist(system: @IDuelistTokenDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252, archetype: Archetype) -> Duelist {
+    fn execute_create_duelist(system: @IDuelistTokenDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist {
         impersonate(sender);
-        let duelist: Duelist = (*system).create_duelist(sender, name, profile_pic_type, profile_pic_uri, archetype);
+        let duelist: Duelist = (*system).create_duelist(sender, name, profile_pic_type, profile_pic_uri);
         _next_block();
         (duelist)
     }
@@ -359,124 +409,124 @@ mod tester {
         (duelist)
     }
 
-    // ::game
-    fn execute_create_challenge(system: @IGameDispatcher, sender: ContractAddress,
+    // ::duel_token
+    fn execute_create_duel(system: @IDuelTokenDispatcher, sender: ContractAddress,
         challenged: ContractAddress,
         // premise: Premise,
         quote: felt252,
         table_id: felt252,
-        wager_value: u128,
         expire_hours: u64,
     ) -> u128 {
-        (execute_create_challenge_ID(system, sender, ID(sender), challenged, quote, table_id, wager_value, expire_hours))
+        (execute_create_duel_ID(system, sender, ID(sender), challenged, quote, table_id, expire_hours))
     }
-    fn execute_create_challenge_ID(system: @IGameDispatcher, sender: ContractAddress,
+    fn execute_create_duel_ID(system: @IDuelTokenDispatcher, sender: ContractAddress,
         token_id: u128,
         challenged: ContractAddress,
         // premise: Premise,
         quote: felt252,
         table_id: felt252,
-        wager_value: u128,
         expire_hours: u64,
     ) -> u128 {
         impersonate(sender);
-        let duel_id: u128 = (*system).create_challenge(token_id, challenged, Premise::Nothing, quote, table_id, wager_value, expire_hours);
+        let duel_id: u128 = (*system).create_duel(token_id, challenged, Premise::Nothing, quote, table_id, expire_hours);
         _next_block();
         (duel_id)
     }
-    fn execute_reply_challenge(system: @IGameDispatcher, sender: ContractAddress,
+    fn execute_reply_duel(system: @IDuelTokenDispatcher, sender: ContractAddress,
         duel_id: u128,
         accepted: bool,
     ) -> ChallengeState {
-        (execute_reply_challenge_ID(system, sender, ID(sender), duel_id, accepted))
+        (execute_reply_duel_ID(system, sender, ID(sender), duel_id, accepted))
     }
-    fn execute_reply_challenge_ID(system: @IGameDispatcher, sender: ContractAddress,
+    fn execute_reply_duel_ID(system: @IDuelTokenDispatcher, sender: ContractAddress,
         token_id: u128,
         duel_id: u128,
         accepted: bool,
     ) -> ChallengeState {
         impersonate(sender);
-        let new_state: ChallengeState = (*system).reply_challenge(token_id, duel_id, accepted);
+        let new_state: ChallengeState = (*system).reply_duel(token_id, duel_id, accepted);
         _next_block();
         (new_state)
     }
+
+    // ::game
     fn execute_commit_moves(system: @IGameDispatcher, sender: ContractAddress,
         duel_id: u128,
-        round_number: u8,
+        hash: u128,
+    ) {
+        execute_commit_moves_ID(system, sender, ID(sender), duel_id, hash);
+    }
+    fn execute_commit_moves_ID(system: @IGameDispatcher, sender: ContractAddress,
+        token_id: u128,
+        duel_id: u128,
         hash: u128,
     ) {
         impersonate(sender);
-        (*system).commit_moves(ID(sender), duel_id, round_number, hash);
+        (*system).commit_moves(token_id, duel_id, hash);
         _next_block();
     }
     fn execute_reveal_moves(system: @IGameDispatcher, sender: ContractAddress,
         duel_id: u128,
-        round_number: u8,
         salt: felt252,
         moves: Span<u8>,
     ) {
         impersonate(sender);
-        (*system).reveal_moves(ID(sender), duel_id, round_number, salt, moves);
+        (*system).reveal_moves(ID(sender), duel_id, salt, moves);
         _next_block();
     }
-
-    //
-    // view calls
-    //
-
-    // fn execute_get_pact(system: @IGameDispatcher, a: ContractAddress, b: ContractAddress) -> u128 {
-    //     let result: u128 = system.get_pact(a, b);
-    //     (result)
-    // }
 
     //
     // getters
     //
 
     #[inline(always)]
-    fn get_Config(world: IWorldDispatcher) -> Config {
-        (ConfigStore::get(world, CONFIG::CONFIG_KEY))
+    fn get_Config(world: WorldStorage) -> Config {
+        (world.read_model(CONFIG::CONFIG_KEY))
     }
     #[inline(always)]
-    fn get_Table(world: IWorldDispatcher, table_id: felt252) -> TableConfig {
-        (TableConfigStore::get(world, table_id))
+    fn get_TokenConfig(world: WorldStorage, contract_address: ContractAddress) -> TokenConfig {
+        (world.read_model(contract_address))
     }
     #[inline(always)]
-    fn get_TableAdmittance(world: IWorldDispatcher, table_id: felt252) -> TableAdmittance {
-        (TableAdmittanceStore::get(world, table_id))
+    fn get_CoinConfig(world: WorldStorage, contract_address: ContractAddress) -> CoinConfig {
+        (world.read_model(contract_address))
     }
     #[inline(always)]
-    fn get_DuelistEntity(world: IWorldDispatcher, address: ContractAddress) -> DuelistEntity {
-        (DuelistEntityStore::get(world, DuelistStore::entity_id_from_keys(ID(address))))
+    fn get_Table(world: WorldStorage, table_id: felt252) -> TableConfig {
+        (world.read_model(table_id))
     }
     #[inline(always)]
-    fn get_DuelistEntity_id(world: IWorldDispatcher, duelist_id: u128) -> DuelistEntity {
-        (DuelistEntityStore::get(world, DuelistStore::entity_id_from_keys(duelist_id)))
+    fn get_TableAdmittance(world: WorldStorage, table_id: felt252) -> TableAdmittance {
+        (world.read_model(table_id))
     }
     #[inline(always)]
-    fn get_Scoreboard(world: IWorldDispatcher, table_id: felt252, address: ContractAddress) -> Scoreboard {
-        (ScoreboardStore::get(world, table_id, ID(address)))
+    fn get_DuelistValue(world: WorldStorage, address: ContractAddress) -> DuelistValue {
+        (world.read_value(ID(address)))
     }
     #[inline(always)]
-    fn get_Scoreboard_id(world: IWorldDispatcher, table_id: felt252, duelist_id: u128) -> Scoreboard {
-        (ScoreboardStore::get(world, table_id, duelist_id))
+    fn get_DuelistValue_id(world: WorldStorage, duelist_id: u128) -> DuelistValue {
+        (world.read_value(duelist_id))
     }
     #[inline(always)]
-    fn get_ChallengeEntity(world: IWorldDispatcher, duel_id: u128) -> ChallengeEntity {
-        (ChallengeEntityStore::get(world, ChallengeStore::entity_id_from_keys(duel_id)))
+    fn get_Scoreboard(world: WorldStorage, table_id: felt252, address: ContractAddress) -> Scoreboard {
+        (world.read_model((table_id, ID(address)),))
     }
     #[inline(always)]
-    fn get_Wager(world: IWorldDispatcher, duel_id: u128) -> Wager {
-        (WagerStore::get(world, duel_id))
+    fn get_Scoreboard_id(world: WorldStorage, table_id: felt252, duelist_id: u128) -> Scoreboard {
+        (world.read_model((table_id, duelist_id),))
     }
     #[inline(always)]
-    fn get_RoundEntity(world: IWorldDispatcher, duel_id: u128, round_number: u8) -> RoundEntity {
-        (RoundEntityStore::get(world, RoundStore::entity_id_from_keys(duel_id, round_number)))
+    fn get_ChallengeValue(world: WorldStorage, duel_id: u128) -> ChallengeValue {
+        (world.read_value(duel_id))
     }
     #[inline(always)]
-    fn get_Challenge_Round_Entity(world: IWorldDispatcher, duel_id: u128) -> (ChallengeEntity, RoundEntity) {
-        let challenge = get_ChallengeEntity(world, duel_id);
-        let round = get_RoundEntity(world, duel_id, challenge.round_number);
+    fn get_RoundValue(world: WorldStorage, duel_id: u128) -> RoundValue {
+        (world.read_value(duel_id))
+    }
+    #[inline(always)]
+    fn get_Challenge_Round_Entity(world: WorldStorage, duel_id: u128) -> (ChallengeValue, RoundValue) {
+        let challenge = get_ChallengeValue(world, duel_id);
+        let round = get_RoundValue(world, duel_id);
         (challenge, round)
     }
 
@@ -485,17 +535,20 @@ mod tester {
     //
 
     // depends on use dojo::model::{Model};
-    fn set_TableConfig(world: IWorldDispatcher, table: TableConfig) {
-        table.set_test(world);
+    fn set_Config(ref world: WorldStorage, model: Config) {
+        world.write_model_test(@model);
     }
-    // fn set_Round(world: IWorldDispatcher, round: Round) {
-    //     round.set_test(world);
-    // }
-    fn set_Duelist(world: IWorldDispatcher, duelist: Duelist) {
-        duelist.set_test(world);
+    fn set_TableConfig(ref world: WorldStorage, model: TableConfig) {
+        world.write_model_test(@model);
     }
-    fn set_Scoreboard(world: IWorldDispatcher, scoreboard: Scoreboard) {
-        scoreboard.set_test(world);
+    fn set_Duelist(ref world: WorldStorage, model: Duelist) {
+        world.write_model_test(@model);
+    }
+    fn set_Scoreboard(ref world: WorldStorage, model: Scoreboard) {
+        world.write_model_test(@model);
+    }
+    fn set_Challenge(ref world: WorldStorage, model: Challenge) {
+        world.write_model_test(@model);
     }
 
     //
@@ -519,15 +572,15 @@ mod tester {
         winner: u8,
         duelist_a: ContractAddress, duelist_b: ContractAddress,
         balance_a: u128, balance_b: u128,
-        fee: u128, wager_value: u128,
+        fee: u128, prize_value: u128,
         prefix: felt252,
     ) {
         if (winner == 1) {
-            assert_balance(lords, duelist_a, balance_a, fee, wager_value, ShortString::concat('A_A_', prefix));
-            assert_balance(lords, duelist_b, balance_b, fee + wager_value, 0, ShortString::concat('A_B_', prefix));
+            assert_balance(lords, duelist_a, balance_a, fee, prize_value, ShortString::concat('A_A_', prefix));
+            assert_balance(lords, duelist_b, balance_b, fee + prize_value, 0, ShortString::concat('A_B_', prefix));
         } else if (winner == 2) {
-            assert_balance(lords, duelist_a, balance_a, fee + wager_value, 0, ShortString::concat('B_A_', prefix));
-            assert_balance(lords, duelist_b, balance_b, fee, wager_value, ShortString::concat('B_B_', prefix));
+            assert_balance(lords, duelist_a, balance_a, fee + prize_value, 0, ShortString::concat('B_A_', prefix));
+            assert_balance(lords, duelist_b, balance_b, fee, prize_value, ShortString::concat('B_B_', prefix));
         } else {
             assert_balance(lords, duelist_a, balance_a, fee, 0, ShortString::concat('D_A_', prefix));
             assert_balance(lords, duelist_b, balance_b, fee, 0, ShortString::concat('D_B_', prefix));

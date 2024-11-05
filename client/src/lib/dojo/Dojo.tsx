@@ -1,11 +1,10 @@
 import React, { ReactNode } from 'react'
+import { StarknetDomain } from 'starknet'
 import { Manifest } from '@dojoengine/core'
 import { StarknetProvider, useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { DojoProvider } from '@/lib/dojo/DojoContext'
 import { useSetup } from '@/lib/dojo/setup/useSetup'
 import { ChainId } from '@/lib/dojo/setup/chains'
-import { useAccount } from '@starknet-react/core'
-import { Account } from 'starknet'
 
 // TODO: Manifest is outdated???
 // export type DojoManifest = Manifest
@@ -20,6 +19,7 @@ export interface DojoAppConfig {
   contractInterfaces: ContractInterfaces
   supportedChainIds: ChainId[]
   initialChainId: ChainId
+  starknetDomain: StarknetDomain
   manifests: { [chain_id: string]: DojoManifest | undefined }
 }
 
@@ -47,9 +47,8 @@ function SetupDojoProvider({
   children: ReactNode
 }) {
   // Connected wallet or Dojo Predeployed (master)
-  const { account } = useAccount()
   const { selectedChainConfig } = useStarknetContext()
-  const setupResult = useSetup(dojoAppConfig, selectedChainConfig, account as Account)
+  const setupResult = useSetup(dojoAppConfig, selectedChainConfig)
   return (
     <DojoProvider value={setupResult}>
       {children}

@@ -8,9 +8,9 @@ import { BigNumberish } from 'starknet'
 export const usePact = (table_id: string, duelist_id_or_address_a: BigNumberish, duelist_id_or_address_b: BigNumberish) => {
   const { Pact } = useDojoComponents()
 
-  const { pair, pairKey } = useMemo(() => {
+  const { pactKey } = useMemo(() => {
     if (!isPositiveBigint(duelist_id_or_address_a) || !isPositiveBigint(duelist_id_or_address_b)) return {}
-    // same as pistols::utils::make_pact_pair()
+    // same as pistols::libs::pact::make_pact_pair()
     const a_u256 = bigintToU256(duelist_id_or_address_a)
     const b_u256 = bigintToU256(duelist_id_or_address_b)
     const aa = poseidon([a_u256.low, a_u256.low])
@@ -18,11 +18,11 @@ export const usePact = (table_id: string, duelist_id_or_address_a: BigNumberish,
     const pair = bigintToU256(aa ^ bb).low
     return {
       pair,
-      pairKey: keysToEntity([stringToFelt(table_id), pair]),
+      pactKey: keysToEntity([stringToFelt(table_id), pair]),
     }
   }, [duelist_id_or_address_a, duelist_id_or_address_b, table_id])
 
-  const pact = useComponentValue(Pact, pairKey)
+  const pact = useComponentValue(Pact, pactKey)
   const pactDuelId = useMemo(() => (pact?.duel_id ?? 0n), [pact])
   const hasPact = useMemo(() => (pactDuelId > 0n), [pactDuelId])
 

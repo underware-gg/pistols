@@ -1,66 +1,146 @@
 use starknet::{ContractAddress, ClassHash};
-use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait, Resource};
+use dojo::world::{WorldStorage, WorldStorageTrait, IWorldDispatcher, IWorldDispatcherTrait, Resource};
 
 pub use pistols::systems::{
     admin::{IAdminDispatcher, IAdminDispatcherTrait},
+    bank::{IBankDispatcher, IBankDispatcherTrait},
     game::{IGameDispatcher, IGameDispatcherTrait},
     rng::{IRngDispatcher, IRngDispatcherTrait},
     tokens::{
-        duelist::{IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
+        duel_token::{IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
+        duelist_token::{IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
+        fame_coin::{IFameCoinDispatcher, IFameCoinDispatcherTrait},
+        lords_mock::{ILordsMockDispatcher, ILordsMockDispatcherTrait},
     }
 };
-use pistols::utils::misc::{ZERO};
+pub use pistols::interfaces::ierc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
+pub use pistols::libs::store::{Store, StoreTrait};
+pub use pistols::models::config::{CONFIG, Config, ConfigTrait};
+pub use pistols::utils::misc::{ZERO};
 
 pub mod SELECTORS {
     // systems
     const ADMIN: felt252 = selector_from_tag!("pistols-admin");
+    const BANK: felt252 = selector_from_tag!("pistols-bank");
     const GAME: felt252 = selector_from_tag!("pistols-game");
     const RNG: felt252 = selector_from_tag!("pistols-rng");
     // tokens
-    const DUELIST: felt252 = selector_from_tag!("pistols-duelist");
+    const DUEL_TOKEN: felt252 = selector_from_tag!("pistols-duel_token");
+    const DUELIST_TOKEN: felt252 = selector_from_tag!("pistols-duelist_token");
+    const FAME_COIN: felt252 = selector_from_tag!("pistols-fame_coin");
     const LORDS_MOCK: felt252 = selector_from_tag!("pistols-lords_mock");
     // models
     const CONFIG: felt252 = selector_from_tag!("pistols-Config");
     const TABLE_CONFIG: felt252 = selector_from_tag!("pistols-TableConfig");
-    const TABLE_WAGER: felt252 = selector_from_tag!("pistols-TableWager");
     const TOKEN_CONFIG: felt252 = selector_from_tag!("pistols-TokenConfig");
     const COIN_CONFIG: felt252 = selector_from_tag!("pistols-CoinConfig");
+    const PAYMENT: felt252 = selector_from_tag!("pistols-Payment");
 }
 
 #[generate_trait]
-pub impl WorldSystemsTraitImpl of WorldSystemsTrait {
-    fn contract_address(self: @IWorldDispatcher, selector: felt252) -> ContractAddress {
-        if let Resource::Contract((_, contract_address)) = (*self).resource(selector) {
-            (contract_address)
-        } else {
-            (ZERO())
+pub impl SystemsImpl of SystemsTrait {
+    fn contract_address(self: @WorldStorage, contract_name: @ByteArray) -> ContractAddress {
+        match self.dns(contract_name) {
+            Option::Some((contract_address, _)) => {
+                (contract_address)
+            },
+            Option::None => {
+                (ZERO())
+            },
         }
+    }
+
+    // Create a Store from a dispatcher
+    // https://github.com/dojoengine/dojo/blob/main/crates/dojo/core/src/contract/components/world_provider.cairo
+    // https://github.com/dojoengine/dojo/blob/main/crates/dojo/core/src/world/storage.cairo
+    #[inline(always)]
+    fn storage(dispatcher: IWorldDispatcher, namespace: @ByteArray) -> WorldStorage {
+        (WorldStorageTrait::new(dispatcher, namespace))
     }
 
     //
     // system addresses
-    fn duelist_token_address(self: @IWorldDispatcher) -> ContractAddress {
-        (self.contract_address(SELECTORS::DUELIST))
+    #[inline(always)]
+    fn admin_address(self: @WorldStorage) -> ContractAddress {
+        (self.contract_address(@"admin"))
+    }
+    #[inline(always)]
+    fn bank_address(self: @WorldStorage) -> ContractAddress {
+        (self.contract_address(@"bank"))
+    }
+    #[inline(always)]
+    fn game_address(self: @WorldStorage) -> ContractAddress {
+        (self.contract_address(@"game"))
+    }
+    #[inline(always)]
+    fn rng_address(self: @WorldStorage) -> ContractAddress {
+        (self.contract_address(@"rng"))
+    }
+    #[inline(always)]
+    fn duel_token_address(self: @WorldStorage) -> ContractAddress {
+        (self.contract_address(@"duel_token"))
+    }
+    #[inline(always)]
+    fn duelist_token_address(self: @WorldStorage) -> ContractAddress {
+        (self.contract_address(@"duelist_token"))
+    }
+    #[inline(always)]
+    fn fame_coin_address(self: @WorldStorage) -> ContractAddress {
+        (self.contract_address(@"fame_coin"))
+    }
+    #[inline(always)]
+    fn lords_mock_address(self: @WorldStorage) -> ContractAddress {
+        (self.contract_address(@"lords_mock"))
     }
 
     //
     // dispatchers
-    fn admin_dispatcher(self: @IWorldDispatcher) -> IAdminDispatcher {
-        (IAdminDispatcher{ contract_address: self.contract_address(SELECTORS::ADMIN) })
+    #[inline(always)]
+    fn admin_dispatcher(self: @WorldStorage) -> IAdminDispatcher {
+        (IAdminDispatcher{ contract_address: self.admin_address() })
     }
-    fn game_dispatcher(self: @IWorldDispatcher) -> IGameDispatcher {
-        (IGameDispatcher{ contract_address: self.contract_address(SELECTORS::GAME) })
+    #[inline(always)]
+    fn bank_dispatcher(self: @WorldStorage) -> IBankDispatcher {
+        (IBankDispatcher{ contract_address: self.bank_address() })
     }
-    fn rng_dispatcher(self: @IWorldDispatcher) -> IRngDispatcher {
-        (IRngDispatcher{ contract_address: self.contract_address(SELECTORS::RNG) })
+    #[inline(always)]
+    fn game_dispatcher(self: @WorldStorage) -> IGameDispatcher {
+        (IGameDispatcher{ contract_address: self.game_address() })
     }
-    fn duelist_token_dispatcher(self: @IWorldDispatcher) -> IDuelistTokenDispatcher {
-        (IDuelistTokenDispatcher{ contract_address: self.contract_address(SELECTORS::DUELIST) })
+    #[inline(always)]
+    fn rng_dispatcher(self: @WorldStorage) -> IRngDispatcher {
+        (IRngDispatcher{ contract_address: self.rng_address() })
+    }
+    #[inline(always)]
+    fn duel_token_dispatcher(self: @WorldStorage) -> IDuelTokenDispatcher {
+        (IDuelTokenDispatcher{ contract_address: self.duel_token_address() })
+    }
+    #[inline(always)]
+    fn duelist_token_dispatcher(self: @WorldStorage) -> IDuelistTokenDispatcher {
+        (IDuelistTokenDispatcher{ contract_address: self.duelist_token_address() })
+    }
+    #[inline(always)]
+    fn fame_coin_dispatcher(self: @WorldStorage) -> IFameCoinDispatcher {
+        (IFameCoinDispatcher{ contract_address: self.fame_coin_address() })
+    }
+    #[inline(always)]
+    fn lords_mock_dispatcher(self: @WorldStorage) -> ILordsMockDispatcher {
+        (ILordsMockDispatcher{ contract_address: self.lords_mock_address() })
+    }
+    #[inline(always)]
+    fn lords_dispatcher(self: @WorldStorage) -> ERC20ABIDispatcher {
+        let mut store: Store = StoreTrait::new(*self);
+        (store.get_config().lords_dispatcher())
     }
 
     //
     // validators
-    // fn is_minter(self: @IWorldDispatcher, address: ContractAddress) -> bool {
-    //     (address == self.contract_address(SELECTORS::MINTER))
-    // }
+    #[inline(always)]
+    fn is_duel_contract(self: @WorldStorage, address: ContractAddress) -> bool {
+        (address == self.duel_token_address())
+    }
+    #[inline(always)]
+    fn is_duelist_contract(self: @WorldStorage, address: ContractAddress) -> bool {
+        (address == self.duelist_token_address())
+    }
 }

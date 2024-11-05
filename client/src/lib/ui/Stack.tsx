@@ -51,8 +51,8 @@ export function VStackRow(props: {
 
 export function RowDivider(props: DividerProps) {
   return (
-    <Row columns='1' className='NoPadding'>
-      <Col>
+    <Row columns='1' className='NoPadding NoMargin' style={{ height: '25px' }}>
+      <Col verticalAlign='middle'>
         <Divider {...props} />
       </Col>
     </Row>

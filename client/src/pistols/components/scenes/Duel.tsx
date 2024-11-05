@@ -24,7 +24,7 @@ import { Action, ArchetypeNames } from '@/pistols/utils/pistols'
 import { MenuDebugAnimations, MenuDuel, MenuDuelControl } from '@/pistols/components/Menus'
 import { bigintToHex } from '@/lib/utils/types'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { useOwnerOfDuelist } from '../../hooks/useTokenDuelist'
+import { useOwnerOfDuelist } from '../hooks/useDuelistToken'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import CommitPacesModal from '@/pistols/components/modals/CommitPacesModal'
 import 'react-circular-progressbar/dist/styles.css';
@@ -402,7 +402,7 @@ export default function Duel({
       <Cards duelId={duelId} ref={cardRef} />
       <div className='TavernBoard NoMouse NoDrag' style={{ backgroundImage: 'url(/images/ui/duel/wager_main.png)', backgroundSize: '100% 100%' }}>
         <div className='TavernTitle' data-contentlength={1}>Settling the matter of:</div>
-        <div className='TavernWager' data-contentlength={Math.floor(quote.length / 10)}>{`"${quote}"`}</div>
+        <div className='TavernQuote' data-contentlength={Math.floor(quote.length / 10)}>{`"${quote}"`}</div>
         <div className='TavernTable' data-contentlength={Math.floor(description.length / 10)}>{description}</div>
       </div>
 
@@ -671,7 +671,7 @@ function DuelProgress({
   canAutoReveal = false
 }) {
   const { gameImpl } = useThreeJsContext()
-  const { round1, roundNumber, challenge: { tableId } } = useDuel(duelId)
+  const { round1, challenge: { tableId } } = useDuel(duelId)
   const round1Moves = useMemo(() => (isA ? round1?.moves_a : round1?.moves_b), [isA, round1])
 
   const duelProgressRef = useRef(null)
@@ -686,7 +686,7 @@ function DuelProgress({
   // Commit modal control
   const [didReveal, setDidReveal] = useState(false)
   const [commitModalIsOpen, setCommitModalIsOpen] = useState(false)
-  const { reveal, canReveal } = useRevealAction(duelId, roundNumber, tableId, round1Moves?.hashed, duelStage == DuelStage.Round1Reveal)
+  const { reveal, canReveal } = useRevealAction(duelId, tableId, round1Moves?.hashed, duelStage == DuelStage.Round1Reveal)
 
   const onClick = useCallback(() => {
     if (!isConnected) console.warn(`onClickReveal: not connected!`)
@@ -726,7 +726,7 @@ function DuelProgress({
 
   const id = isA ? 'player-bubble-left' : 'player-bubble-right'
 
-  const { canSign, sign_and_restore, hand } = useSignAndRestoreMovesFromHash(duelId, roundNumber, tableId, round1Moves?.hashed)
+  const { canSign, sign_and_restore, hand } = useSignAndRestoreMovesFromHash(duelId, tableId, round1Moves?.hashed)
 
   useEffect(() =>{
     if (isYou && canSign) {
@@ -750,7 +750,7 @@ function DuelProgress({
   //------------------------------
   return (
     <>
-      <CommitPacesModal duelId={duelId} isOpen={roundNumber == 1 && commitModalIsOpen} setIsOpen={setCommitModalIsOpen} />
+      <CommitPacesModal duelId={duelId} isOpen={commitModalIsOpen} setIsOpen={setCommitModalIsOpen} />
       <div id={id} className='dialog-container NoMouse NoDrag' ref={duelProgressRef}>
         <Image className='dialog-background' />
         <div className='dialog-data'>

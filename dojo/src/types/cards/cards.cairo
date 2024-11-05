@@ -35,21 +35,24 @@ impl RarityDefault of Default<Rarity> {
 // traits
 //
 use pistols::models::challenge::{DuelistState, DuelistStateTrait};
+use pistols::types::cards::env::{EnvCard, EnvCardTrait};
 
 #[generate_trait]
 impl CardPointsImpl of CardPointsTrait {
-    fn apply(self: CardPoints, ref state_a: DuelistState, ref state_b: DuelistState, multiplier: i8) {
+    fn apply(self: CardPoints, ref state_a: DuelistState, ref state_b: DuelistState, multiplier: i8, shots_modifier: EnvCard) {
+        if (!shots_modifier.is_shots_modifier()) {
+            state_a.apply_chances(self.self_chances * multiplier);
+            state_b.apply_chances(self.other_chances * multiplier);
+        }
         state_a.apply_damage(self.self_damage * multiplier);
         state_b.apply_damage(self.other_damage * multiplier);
-        state_a.apply_chances(self.self_chances * multiplier);
-        state_b.apply_chances(self.other_chances * multiplier);
     }
 }
 
 #[generate_trait]
 impl EnvCardPointsImpl of EnvCardPointsTrait {
-    fn apply(self: EnvCardPoints, ref state: DuelistState, using_shots_modifier: bool, multiplier: i8) {
-        if (!using_shots_modifier) {
+    fn apply(self: EnvCardPoints, ref state: DuelistState, multiplier: i8, shots_modifier: EnvCard) {
+        if (!shots_modifier.is_shots_modifier()) {
             state.apply_chances(self.chances * multiplier);
         }
         state.apply_damage(self.damage * multiplier);

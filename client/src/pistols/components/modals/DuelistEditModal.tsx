@@ -1,24 +1,23 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Modal, Button, Grid } from 'semantic-ui-react'
+import { Modal, Grid } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
-import { useDuelistsOfOwner } from '@/pistols/hooks/useTokenDuelist'
+import { useDuelistsOfOwner } from '@/pistols/hooks/useDuelistToken'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { useCalcFeeDuelist } from '@/pistols/hooks/useContractCalls'
+import { useLordsFaucet } from '@/lib/dojo/hooks/useLordsMock'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileBadge } from '@/pistols/components/account/ProfileDescription'
-import { ArchetypeIcon } from '@/pistols/components/ui/PistolsIcon'
 import { FormInput } from '@/pistols/components/ui/Form'
-import { Archetype, ProfilePicType } from '@/games/pistols/generated/constants'
+import { ProfilePicType } from '@/games/pistols/generated/constants'
 import { PROFILE_PIC_COUNT } from '@/pistols/utils/constants'
-import { ArchetypeNames } from '@/pistols/utils/pistols'
-import { ActionButton } from '@/pistols/components/ui/Buttons'
+import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
+import { FeesToPay } from '@/pistols/components/account/LordsBalance'
 import { Opener } from '@/lib/ui/useOpener'
 import { Divider } from '@/lib/ui/Divider'
 import { IconClick } from '@/lib/ui/Icons'
-import { isPositiveBigint } from '@/lib/utils/types'
-import { useLordsFaucet } from '@/lib/dojo/hooks/useLordsMock'
 import { poseidon } from '@/lib/utils/starknet'
 
 const Row = Grid.Row
@@ -37,7 +36,7 @@ export default function DuelistEditModal({
 
   // watch new mints
   const { duelistBalance } = useDuelistsOfOwner(address)
-  
+
   // Detect new mints
   const { dispatchSetScene } = usePistolsScene()
   const [duelistBalanceBeforeMint, setDuelistBalanceBeforeMint] = useState<number>(null)
@@ -45,8 +44,8 @@ export default function DuelistEditModal({
   useEffect(() => {
     // minted new! go to Game...
     if (opener.isOpen &&
-      mintNew && 
-      duelistBalanceBeforeMint != null && 
+      mintNew &&
+      duelistBalanceBeforeMint != null &&
       duelistBalance != duelistBalanceBeforeMint
     ) {
       console.log(`NEW DUELIST BALANCE:`, duelistBalance)
@@ -72,7 +71,6 @@ export default function DuelistEditModal({
   }, [selectedProfilePic, profilePic, randomPic])
 
   const [inputName, setInputName] = useState(null)
-  const [inputArchetype, setInputArchetype] = useState(Archetype.Undefined)
   const inputIsValid = useMemo(() => (inputName?.length >= 3), [inputName])
   const isUpdated = useMemo(() => (name == inputName && profilePic == _profilePic), [name, inputName, profilePic, _profilePic])
 
@@ -83,18 +81,21 @@ export default function DuelistEditModal({
     setSelectedProfilePic(profilePic ?? randomPic)
   }, [name, profilePic])
 
-  const _submit = () => {
-    if (canSubmit) {
-      if (mintNew) {
-        setDuelistBalanceBeforeMint(duelistBalance ?? 0)
-        create_duelist(account, address, inputName, ProfilePicType.Duelist, _profilePic.toString(), inputArchetype)
-      } else {
-        update_duelist(account, editingDuelistId, inputName, ProfilePicType.Duelist, _profilePic.toString())
-      }
+  const { fee } = useCalcFeeDuelist()
+
+
+  const _mint = () => {
+    if (canSubmit && mintNew) {
+      setDuelistBalanceBeforeMint(duelistBalance ?? 0)
+      create_duelist(account, address, inputName, ProfilePicType.Duelist, _profilePic.toString())
     }
   }
 
-  const _submitLabel = isUpdated ? 'Duelist up-to-date' : mintNew ? 'Create Duelist' : 'Update Duelist'
+  const _update = () => {
+    if (canSubmit && !mintNew) {
+      update_duelist(account, editingDuelistId, inputName, ProfilePicType.Duelist, _profilePic.toString())
+    }
+  }
 
   return (
     <Modal
@@ -104,7 +105,7 @@ export default function DuelistEditModal({
     >
       <Modal.Header>
         {editingDuelistId ? `Duelist #${Number(editingDuelistId)}` : 'Create Your Duelist'}
-        
+
       </Modal.Header>
 
       <Modal.Content className='ModalText DuelistEditModal'>
@@ -133,32 +134,14 @@ export default function DuelistEditModal({
                 disabled={!account || !address}
               />
 
-              <div className='Spacer10' />
-              {(mintNew && false) &&
-                <div>
-                  <Divider />
-                  <Button icon toggle active={inputArchetype == Archetype.Undefined} onClick={() => setInputArchetype(Archetype.Undefined)}>
-                    <ArchetypeIcon size={null} />
-                  </Button>
-                  &nbsp;&nbsp;
-                  <Button icon toggle active={inputArchetype == Archetype.Villainous} onClick={() => setInputArchetype(Archetype.Villainous)}>
-                    <ArchetypeIcon villainous size={null} />
-                  </Button>
-                  &nbsp;&nbsp;
-                  <Button icon toggle active={inputArchetype == Archetype.Trickster} onClick={() => setInputArchetype(Archetype.Trickster)}>
-                    <ArchetypeIcon trickster size={null} />
-                  </Button>
-                  &nbsp;&nbsp;
-                  <Button icon toggle active={inputArchetype == Archetype.Honourable} onClick={() => setInputArchetype(Archetype.Honourable)}>
-                    <ArchetypeIcon honourable size={null} />
-                  </Button>
-                  <div className='Spacer10' />
-                  <span className='FormLabel TitleCase'>Archetype: <b>{ArchetypeNames[inputArchetype]}</b></span>
-                </div>
+              <Divider />
+
+              {mintNew &&
+                <FeesToPay value={0} fee={fee} prefixed />
               }
+
               {!mintNew &&
                 <div className='FormLabel TitleCase'>
-                  <Divider />
                   Archetype: <b>{archetypeName}</b>
                   {' '}
                   <ProfileBadge duelistId={editingDuelistId} />
@@ -175,9 +158,21 @@ export default function DuelistEditModal({
             <Col>
               <ActionButton large fill label='Close' onClick={() => opener.close()} />
             </Col>
-            <Col>
-              <ActionButton large fill important disabled={!canSubmit} onClick={() => _submit()} label={_submitLabel} />
-            </Col>
+            {mintNew &&
+              <Col>
+                <BalanceRequiredButton
+                  fee={fee}
+                  disabled={!canSubmit}
+                  label='Create Duelist!'
+                  onClick={() => _mint()}
+                />
+              </Col>
+            }
+            {!mintNew &&
+              <Col>
+                <ActionButton large fill important disabled={!canSubmit} onClick={() => _update()} label='Update Duelist' />
+              </Col>
+            }
           </Row>
         </Grid>
       </Modal.Actions>

@@ -1,15 +1,13 @@
 import { useMemo } from 'react'
 import {
-  Connector, injected,
+  Connector,
+  // injected,
   // argent, braavos,
 } from '@starknet-react/core'
-import { RpcProvider } from 'starknet'
-import { StarknetWindowObject } from 'get-starknet-core'
 import { useControllerConnector } from '@/lib/dojo/hooks/useController'
 import { usePredeployedConnector, PREDEPLOYED_ID } from '@/lib/utils/hooks/usePredeployedConnector'
 import { DojoChainConfig } from '@/lib/dojo/setup/chains'
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
-import { useAsyncMemo } from '@/lib/utils/hooks/useAsyncMemo'
 
 export const supportedConnetorIds = {
   CONTROLLER: 'controller', // same as ControllerConnector.id

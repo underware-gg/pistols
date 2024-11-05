@@ -1,8 +1,6 @@
 // use debug::PrintTrait;
 use starknet::ContractAddress;
-use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-use pistols::interfaces::ierc20::{ierc20, IERC20Dispatcher, IERC20DispatcherTrait};
-use pistols::systems::game::game::{Errors as ActionErrors};
+use pistols::systems::game::game::{Errors as GameErrors};
 use pistols::types::cards::hand::{DeckType};
 use pistols::types::constants::{CONST};
 use pistols::utils::arrays::{ArrayUtilsTrait};
@@ -33,21 +31,9 @@ pub struct TableConfig {
     pub description: felt252,
     pub table_type: TableType,
     pub deck_type: DeckType,
-    pub fee_contract_address: ContractAddress,  // if 0x0: no fees, no wager
     pub fee_collector_address: ContractAddress, // if 0x0: use default treasury
     pub fee_min: u128,
     pub is_open: bool,
-}
-
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct TableWager {
-    #[key]
-    pub table_id: felt252,
-    //------
-    pub wager_min: u128,
-    pub wager_max: u128,
-    pub fee_pct: u8,
 }
 
 #[derive(Drop, Serde)]
@@ -60,24 +46,22 @@ pub struct TableAdmittance {
     pub duelists: Array<u128>,
 }
 
-fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
+fn default_tables() -> Array<TableConfig> {
     (array![
         (TableConfig {
             table_id: TABLES::LORDS,
             description: 'The Lords Table',
             table_type: TableType::Classic,
             deck_type: DeckType::Classic,
-            fee_contract_address: lords_address,
             fee_collector_address: ZERO(),
-            fee_min: 60 * CONST::ETH_TO_WEI.low,
-            is_open: (lords_address.is_non_zero()),
+            fee_min: 0, //60 * CONST::ETH_TO_WEI.low,
+            is_open: true,
         }),
         (TableConfig {
             table_id: TABLES::COMMONERS,
             description: 'The Commoners Table',
             table_type: TableType::Classic,
             deck_type: DeckType::Classic,
-            fee_contract_address: ZERO(),
             fee_collector_address: ZERO(),
             fee_min: 0,
             is_open: true,
@@ -89,6 +73,7 @@ fn default_tables(lords_address: ContractAddress) -> Array<TableConfig> {
 //---------------------------
 // TableInitializer
 //
+use dojo::world::{WorldStorage};
 use pistols::libs::store::{Store, StoreTrait};
 
 #[derive(Copy, Drop)]
@@ -98,15 +83,13 @@ pub struct TableInitializer {
 
 #[generate_trait]
 impl TableInitializerTraitImpl of TableInitializerTrait {
-    fn new(world: IWorldDispatcher) -> TableInitializer {
-        TableInitializer {
-            store: StoreTrait::new(world)
-        }
+    fn new(store: Store) -> TableInitializer {
+        TableInitializer { store }
     }
-    fn initialize(self: TableInitializer, lords_address: ContractAddress) {
-        self.set_array(@default_tables(lords_address));
+    fn initialize(ref self: TableInitializer) {
+        self.set_array(@default_tables());
     }
-    fn set_array(self: TableInitializer, tables: @Array<TableConfig>) {
+    fn set_array(ref self: TableInitializer, tables: @Array<TableConfig>) {
         let mut n: usize = 0;
         loop {
             if (n == tables.len()) { break; }
@@ -120,18 +103,12 @@ impl TableInitializerTraitImpl of TableInitializerTrait {
 // TableConfig Traits
 //
 #[generate_trait]
-impl TableConfigEntityImpl of TableConfigEntityTrait {
-    fn exists(self: @TableConfigEntity) -> bool {
-        (*self.description != 0)
+impl TableConfigImpl of TableConfigTrait {
+    fn exists(self: @TableConfig) -> bool {
+        (*self.table_type != TableType::Undefined)
     }
-    #[inline(always)]
-    fn ierc20(self: @TableConfigEntity) -> IERC20Dispatcher {
-        (ierc20(*self.fee_contract_address))
-    }
-    fn calc_fee(self: @TableConfigEntity, wager_value: u128) -> u128 {
-        // (MathU128::max(*self.fee_min, (wager_value / 100) * wager.fee_pct.into()))
-        assert(wager_value == 0, ActionErrors::WAGER_NOT_ALLOWED);
-        (*self.fee_min)
+    fn calc_fee(self: @TableConfig) -> u128 {
+        (0)
     }
 }
 
@@ -139,8 +116,8 @@ impl TableConfigEntityImpl of TableConfigEntityTrait {
 // TableAdmittance Traits
 //
 #[generate_trait]
-impl TableAdmittanceEntityImpl of TableAdmittanceEntityTrait {
-    fn can_join(self: @TableAdmittanceEntity, account_address: ContractAddress, duelist_id: u128) -> bool {
+impl TableAdmittanceImpl of TableAdmittanceTrait {
+    fn can_join(self: @TableAdmittance, account_address: ContractAddress, duelist_id: u128) -> bool {
         if (self.accounts.len() == 0 && self.duelists.len() == 0) {
             (true)
         } else {
@@ -175,16 +152,6 @@ impl TableTypeIntoByteArray of Into<TableType, ByteArray> {
     }
 }
 
-#[generate_trait]
-impl TableTypeTraitImpl of TableTypeTrait {
-    fn maxxed_up_levels(self: TableType) -> bool {
-        match self {
-            TableType::IRLTournament => true,
-            _ => false,
-        }
-    }
-}
-
 
 
 
@@ -196,7 +163,7 @@ impl TableTypeTraitImpl of TableTypeTrait {
 mod tests {
     use debug::PrintTrait;
     use starknet::ContractAddress;
-    use super::{TableAdmittance, TableAdmittanceEntity, TableAdmittanceEntityTrait};
+    use super::{TableAdmittance, TableAdmittanceTrait};
     use pistols::utils::misc::{ZERO};
 
     #[test]
@@ -208,16 +175,16 @@ mod tests {
         let duelist_id_1: u128 = 0x1;
         let duelist_id_2: u128 = 0x2;
         let duelist_id_3: u128 = 0x3;
-        let admittance = @TableAdmittanceEntity{
-            __id: table_id,
+        let admittance = @TableAdmittance{
+            table_id,
             accounts: array![],
             duelists: array![],
         };
         assert(admittance.can_join(address_1, duelist_id_1) == true, 'empty_1');
         assert(admittance.can_join(address_1, duelist_id_2) == true, 'empty_2');
         assert(admittance.can_join(address_2, duelist_id_1) == true, 'empty_3');
-        let admittance = @TableAdmittanceEntity{
-            __id: table_id,
+        let admittance = @TableAdmittance{
+            table_id,
             accounts: array![address_3],
             duelists: array![],
         };
@@ -225,8 +192,8 @@ mod tests {
         assert(admittance.can_join(address_2, duelist_id_1) == false, 'accounts_2_1');
         assert(admittance.can_join(address_1, duelist_id_3) == false, 'accounts_1_3');
         assert(admittance.can_join(address_3, duelist_id_1) == true, 'accounts_3_1');
-        let admittance = @TableAdmittanceEntity{
-            __id: table_id,
+        let admittance = @TableAdmittance{
+            table_id,
             accounts: array![],
             duelists: array![duelist_id_3],
         };
@@ -234,16 +201,16 @@ mod tests {
         assert(admittance.can_join(address_2, duelist_id_1) == false, 'duelists_2_1');
         assert(admittance.can_join(address_1, duelist_id_3) == true, 'duelists_1_3');
         assert(admittance.can_join(address_3, duelist_id_1) == false, 'duelists_3_1');
-        let admittance = @TableAdmittanceEntity{
-            __id: table_id,
+        let admittance = @TableAdmittance{
+            table_id,
             accounts: array![address_1, address_2],
             duelists: array![],
         };
         assert(admittance.can_join(address_1, duelist_id_2) == true, 'dual_1_2');
         assert(admittance.can_join(address_2, duelist_id_1) == true, 'dual_2_1');
         assert(admittance.can_join(address_3, duelist_id_3) == false, 'dual_3_3');
-        let admittance = @TableAdmittanceEntity{
-            __id: table_id,
+        let admittance = @TableAdmittance{
+            table_id,
             accounts: array![],
             duelists: array![duelist_id_1, duelist_id_2],
         };

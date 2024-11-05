@@ -4,7 +4,7 @@ use dojo::world::IWorldDispatcher;
 #[starknet::interface]
 pub trait ILordsMock<TState> {
     // IWorldProvider
-    fn world(self: @TState,) -> IWorldDispatcher;
+    fn world_dispatcher(self: @TState) -> IWorldDispatcher;
 
     // IERC20
     fn total_supply(self: @TState) -> u256;
@@ -33,19 +33,17 @@ pub trait ILordsMockPublic<TState> {
     fn mint(ref self: TState, recipient: ContractAddress, amount: u256);
 }
 
-#[starknet::interface]
-pub trait ILordsMockInternal<TState> {
-}
-
 #[dojo::contract]
 pub mod lords_mock {
     // use debug::PrintTrait;
     use core::byte_array::ByteArrayTrait;
     use starknet::{ContractAddress, get_contract_address, get_caller_address, get_block_timestamp};
     use pistols::types::constants::{CONST};
+    use dojo::world::{WorldStorage};
+    use dojo::model::{ModelStorage, ModelValueStorage};
 
     //-----------------------------------
-    // OpenZeppelin start
+    // ERC-20 Start
     //
     use openzeppelin_token::erc20::ERC20Component;
     use openzeppelin_token::erc20::ERC20HooksEmptyImpl;
@@ -72,7 +70,7 @@ pub mod lords_mock {
         CoinEvent: CoinComponent::Event,
     }
     //
-    // OpenZeppelin end
+    // ERC-20 End
     //-----------------------------------
 
 
@@ -82,7 +80,7 @@ pub mod lords_mock {
     //*******************************************
 
     fn dojo_init(ref self: ContractState,
-        game_contract_address: ContractAddress,
+        minter_contract_address: ContractAddress,
         faucet_amount: u128,
     ) {
         self.erc20.initializer(
@@ -90,7 +88,7 @@ pub mod lords_mock {
             COIN_SYMBOL(),
         );
         self.coin.initialize(
-            game_contract_address,
+            minter_contract_address,
             faucet_amount: faucet_amount.into(),
         );
     }
@@ -100,7 +98,7 @@ pub mod lords_mock {
     //
     use super::{ILordsMockPublic};
     #[abi(embed_v0)]
-    impl CoinComponentPublicImpl of ILordsMockPublic<ContractState> {
+    impl LordsMockPublicImpl of ILordsMockPublic<ContractState> {
         fn faucet(ref self: ContractState) {
             self.coin.faucet(get_caller_address());
         }

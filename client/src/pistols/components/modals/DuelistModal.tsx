@@ -2,9 +2,9 @@ import React, { useMemo } from 'react'
 import { Grid, Modal } from 'semantic-ui-react'
 import { useSettings } from '../../hooks/SettingsContext'
 import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
-import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { useDuelist, useDuelistQuery } from '@/pistols/hooks/useDuelist'
 import { usePact } from '@/pistols/hooks/usePact'
-import { useOwnerOfDuelist } from '@/pistols/hooks/useTokenDuelist'
+import { useOwnerOfDuelist } from '@/pistols/hooks/useDuelistToken'
 import { useIsMyDuelist, useIsYou } from '@/pistols/hooks/useIsYou'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
@@ -32,8 +32,11 @@ export default function DuelistModal({
 
   const _close = () => { dispatchSelectDuelistId(0n) }
 
-  const { profilePic } = useDuelist(selectedDuelistId)
+  const { profilePic, duelistIdDisplay } = useDuelist(selectedDuelistId)
   const { hasPact, pactDuelId } = usePact(tableId, duelistId, selectedDuelistId)
+
+  // TODO: replace useDuelist with useDuelistQuery
+  useDuelistQuery(selectedDuelistId)
 
   const _switch = () => {
     if (isYou) {
@@ -60,7 +63,7 @@ export default function DuelistModal({
         <Grid>
           <Row columns={'equal'}>
             <Col textAlign='left'>
-              Duelist
+              {duelistIdDisplay}
             </Col>
             <Col textAlign='center'>
               {/* {(isYou || isMyDuelist) &&
@@ -87,7 +90,7 @@ export default function DuelistModal({
         <ProfilePic profilePic={profilePic} duelistId={selectedDuelistId} />
         <Modal.Description className='FillParent'>
           <div className='DuelistModalDescription'>
-            <ProfileDescription duelistId={selectedDuelistId} tableId={tableId} displayBalance displayStats />
+            <ProfileDescription duelistId={selectedDuelistId} displayFameBalance displayStats />
             <div className='Spacer10' />
             <div className='TableInModal'>
               <ChallengeTableSelectedDuelist compact />

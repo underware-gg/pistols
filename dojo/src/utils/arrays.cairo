@@ -23,7 +23,7 @@ impl SpanUtilsImpl<T, +Clone<T>, +Drop<T>> of SpanUtilsTrait<T> {
             };
         }
     }
-    fn concat(mut self: Span<T>, mut other: Span<T>) -> Array<T> {
+    fn concat(self: Span<T>, other: Span<T>) -> Array<T> {
         let mut ret = array![];
         ret.extend_from_span(self);
         ret.extend_from_span(other);

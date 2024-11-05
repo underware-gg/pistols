@@ -2,7 +2,7 @@ import 'semantic-ui-css/semantic.min.css'
 import '/styles/fonts.scss'
 import '/styles/styles.scss'
 import '/styles/cards.scss'
-import React from 'react'
+import React, { useMemo } from 'react'
 import { SettingsProvider } from '@/pistols/hooks/SettingsContext'
 import { PistolsProvider } from '@/pistols/hooks/PistolsContext'
 // import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
@@ -12,10 +12,11 @@ import ErrorModal from '@/pistols/components/modals/ErrorModal'
 import Dojo from '@/lib/dojo/Dojo'
 
 function _app({ Component, pageProps }) {
+  const dojoAppConfig = useMemo(() => makeDojoAppConfig(), [])
   return (
     <SettingsProvider>
       <PistolsProvider>
-        <Dojo dojoAppConfig={makeDojoAppConfig()}>
+        <Dojo dojoAppConfig={dojoAppConfig}>
           <Component {...pageProps} />
           <Modals />
         </Dojo>

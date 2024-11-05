@@ -60,7 +60,7 @@ impl PacesCardImpl of PacesCardTrait {
             PacesCard::Paces8 |
             PacesCard::Paces9 |
             PacesCard::Paces10 =>  self.into() * 10,
-            _ => 0,
+            PacesCard::None => 0,
         }
     }
     fn env_salt(self: PacesCard) -> felt252 {
@@ -75,7 +75,7 @@ impl PacesCardImpl of PacesCardTrait {
             PacesCard::Paces8 =>    'env_8',
             PacesCard::Paces9 =>    'env_9',
             PacesCard::Paces10 =>   'env_10',
-            _ =>                    0,
+            PacesCard::None => 0,
         }
     }
     fn get_deck(_deck_type: DeckType) -> Span<u8> {
@@ -91,6 +91,21 @@ impl PacesCardImpl of PacesCardTrait {
             PacesCard::Paces9.into(),
             PacesCard::Paces10.into(),
         ].span())
+    }
+    fn variant_name(self: PacesCard) -> felt252 {
+        match self {
+            PacesCard::Paces1 =>    'Paces1',
+            PacesCard::Paces2 =>    'Paces2',
+            PacesCard::Paces3 =>    'Paces3',
+            PacesCard::Paces4 =>    'Paces4',
+            PacesCard::Paces5 =>    'Paces5',
+            PacesCard::Paces6 =>    'Paces6',
+            PacesCard::Paces7 =>    'Paces7',
+            PacesCard::Paces8 =>    'Paces8',
+            PacesCard::Paces9 =>    'Paces9',
+            PacesCard::Paces10 =>   'Paces10',
+            PacesCard::None => 0,
+        }
     }
 }
 
@@ -119,7 +134,7 @@ impl PacesCardIntoU8 of Into<PacesCard, u8> {
             PacesCard::Paces8 =>    PACES_CARDS::Paces8,
             PacesCard::Paces9 =>    PACES_CARDS::Paces9,
             PacesCard::Paces10 =>   PACES_CARDS::Paces10,
-            _ =>                    PACES_CARDS::None,
+            PacesCard::None =>      PACES_CARDS::None,
         }
     }
 }
