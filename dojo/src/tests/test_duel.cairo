@@ -87,7 +87,7 @@ mod tests {
 
 
     fn _test_resolved_draw(salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves, final_health: u8) {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         sys.rng.mock_values(salts.salts, salts.values);
 
         let table_id: felt252 = TABLES::LORDS;
@@ -102,6 +102,9 @@ mod tests {
         tester::assert_balance(sys.lords, OWNER(), balance_a, fee + PRIZE_VALUE, 0, 'balance_a_1');
         tester::assert_balance(sys.lords, OTHER(), balance_b, fee + PRIZE_VALUE, 0, 'balance_b_1');
         tester::assert_balance(sys.lords, TREASURY(), 0, 0, 0, 'balance_treasury_1');
+
+        // duel nft owned by contract
+        assert(sys.duels.owner_of(duel_id.into()) == sys.game.contract_address, 'duels.owner_of');
 
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
@@ -154,6 +157,9 @@ mod tests {
         tester::assert_balance(sys.lords, OWNER(), balance_a, fee, 0, 'balance_a_2');
         tester::assert_balance(sys.lords, OTHER(), balance_b, fee, 0, 'balance_b_2');
 
+        // duel nft still owned by contract
+        assert(sys.duels.owner_of(duel_id.into()) == sys.game.contract_address, 'duels.owner_of_END');
+
         _assert_duel_progress(sys, duel_id, moves_a.moves, moves_b.moves);
     }
 
@@ -183,7 +189,7 @@ mod tests {
     //
 
     fn _test_resolved_win(salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves, winner: u8) {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         sys.rng.mock_values(salts.salts, salts.values);
 
         let table_id: felt252 = TABLES::LORDS;
@@ -200,6 +206,10 @@ mod tests {
         tester::assert_balance(sys.lords, OWNER(), balance_a, fee + PRIZE_VALUE, 0, 'balance_a_1');
         tester::assert_balance(sys.lords, OTHER(), balance_b, fee + PRIZE_VALUE, 0, 'balance_b_1');
         tester::assert_balance(sys.lords, TREASURY(), 0, 0, 0, 'balance_treasury_1');
+
+        // duel owned by contract
+        assert(sys.duels.owner_of(duel_id.into()) == sys.game.contract_address, 'duels.owner_of');
+
         assert(round_1.moves_a.seed != 0, 'round_1.moves_a.seed');
         assert(round_1.moves_b.seed != 0, 'round_1.moves_b.seed');
         assert(round_1.moves_a.seed != round_1.moves_b.seed, 'round_1.moves_a.seed != moves_b');
@@ -271,6 +281,7 @@ mod tests {
             assert(round.state_b.health == 0, 'a_win_health_b');
             _assert_is_alive(round.state_a, 'alive_a');
             _assert_is_dead(round.state_b, 'dead_b');
+            assert(sys.duels.owner_of(duel_id.into()) == challenge.address_a, 'duels.owner_of_END_1');
         } else if (winner == 2) {
             assert(duelist_a.score.total_wins == 0, 'b_win_duelist_a.total_wins');
             assert(duelist_b.score.total_wins == 1, 'b_win_duelist_b.total_wins');
@@ -281,6 +292,7 @@ mod tests {
             assert(round.state_a.health == 0, 'b_win_health_a');
             _assert_is_alive(round.state_b, 'alive_b');
             _assert_is_dead(round.state_a, 'dead_a');
+            assert(sys.duels.owner_of(duel_id.into()) == challenge.address_b, 'duels.owner_of_END_1');
         } else {
             assert(false, 'bad winner')
         }
