@@ -1,16 +1,18 @@
-import { useMemo } from 'react'
-import { BigNumberish } from 'starknet'
+import { useEffect, useMemo } from 'react'
+import { addAddressPadding, BigNumberish } from 'starknet'
 import { useComponentValue } from '@dojoengine/react'
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { useEntityKeys } from '@/lib/dojo/hooks/useEntityKeys'
 import { useScore } from '@/pistols/hooks/useScore'
 import { feltToString } from "@/lib/utils/starknet"
 import { bigintToEntity, isPositiveBigint } from '@/lib/utils/types'
+import { PistolsQuery, useSdkDuelist, useSdkEntity } from '@/lib/dojo/hooks/useSdkQuery'
+import { Duelist } from '@/games/pistols/generated/typescript/models.gen'
 import { CONST } from '@/games/pistols/generated/constants'
 
 
 //------------------
-// All Duels
+// All Duelists
 //
 
 export const useAllDuelistKeys = () => {
@@ -24,11 +26,35 @@ export const useAllDuelistKeys = () => {
 
 
 //------------------
-// Single Duel
+// Single Duelist
 //
+
+export const useDuelistQuery = (duelist_id: BigNumberish) => {
+  const enabled = useMemo(() => (isPositiveBigint(duelist_id) && BigInt(duelist_id) <= BigInt(CONST.MAX_DUELIST_ID)), [duelist_id])
+  const query = useMemo<PistolsQuery>(() => ({
+    pistols: {
+      Duelist: {
+        $: {
+          where: {
+            duelist_id: {
+              //@ts-ignore
+              $eq: addAddressPadding(duelist_id),
+            },
+          },
+        },
+      },
+    },
+  }), [duelist_id])
+  const duelist = useSdkDuelist({ query, enabled })
+  useEffect(() => console.log(`useDuelistQuery(${duelist_id})`, duelist), [duelist])
+  return duelist
+}
+
 
 export const useDuelist = (duelist_id: BigNumberish) => {
   const isValidDuelistId = useMemo(() => (isPositiveBigint(duelist_id) && BigInt(duelist_id) <= BigInt(CONST.MAX_DUELIST_ID)), [duelist_id])
+
+  // const duelist = useDuelistQuery(duelist_id)
 
   const { Duelist } = useDojoComponents()
   const entityId = useMemo(() => bigintToEntity(duelist_id ?? 0n), [duelist_id])

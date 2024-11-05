@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { Grid, Modal } from 'semantic-ui-react'
 import { useSettings } from '../hooks/SettingsContext'
 import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
-import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { useDuelist, useDuelistQuery } from '@/pistols/hooks/useDuelist'
 import { usePact } from '@/pistols/hooks/usePact'
 import { useOwnerOfDuelist } from '@/pistols/hooks/useDuelistToken'
 import { useIsMyDuelist, useIsYou } from '@/pistols/hooks/useIsYou'
@@ -34,6 +34,9 @@ export default function DuelistModal({
 
   const { profilePic, duelistIdDisplay } = useDuelist(selectedDuelistId)
   const { hasPact, pactDuelId } = usePact(tableId, duelistId, selectedDuelistId)
+
+  // TODO: replace useDuelist with useDuelistQuery
+  useDuelistQuery(selectedDuelistId)
 
   const _switch = () => {
     if (isYou) {
