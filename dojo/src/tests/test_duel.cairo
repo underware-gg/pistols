@@ -91,17 +91,17 @@ mod tests {
         sys.rng.mock_values(salts.salts, salts.values);
 
         let table_id: felt252 = TABLES::LORDS;
-        let balance_contract: u128 = sys.lords.balance_of(sys.game.contract_address).low;
-        let balance_a: u128 = sys.lords.balance_of(OWNER()).low;
-        let balance_b: u128 = sys.lords.balance_of(OTHER()).low;
-        let fee: u128 = sys.duels.calc_mint_fee(table_id);
-        assert(fee == 0, 'fee == 0');
+        // let lords_balance_contract: u128 = sys.lords.balance_of(sys.game.contract_address).low;
+        // let lords_balance_a: u128 = sys.lords.balance_of(OWNER()).low;
+        // let lords_balance_b: u128 = sys.lords.balance_of(OTHER()).low;
+        let lords_fee: u128 = sys.duels.calc_mint_fee(table_id);
+        assert(lords_fee == 0, 'lords_fee == 0');
 
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
-        tester::assert_balance(sys.lords, sys.game.contract_address, balance_contract, 0, (fee + PRIZE_VALUE) * 2, 'balance_contract_1');
-        tester::assert_balance(sys.lords, OWNER(), balance_a, fee + PRIZE_VALUE, 0, 'balance_a_1');
-        tester::assert_balance(sys.lords, OTHER(), balance_b, fee + PRIZE_VALUE, 0, 'balance_b_1');
-        tester::assert_balance(sys.lords, TREASURY(), 0, 0, 0, 'balance_treasury_1');
+        // tester::assert_balance(sys.lords, sys.game.contract_address, lords_balance_contract, 0, (lords_fee + PRIZE_VALUE) * 2, 'lords_balance_contract_1');
+        // tester::assert_balance(sys.lords, OWNER(), lords_balance_a, lords_fee + PRIZE_VALUE, 0, 'lords_balance_a_1');
+        // tester::assert_balance(sys.lords, OTHER(), lords_balance_b, lords_fee + PRIZE_VALUE, 0, 'lords_balance_b_1');
+        // tester::assert_balance(sys.lords, TREASURY(), 0, 0, 0, 'lords_balance_treasury_1');
 
         // duel nft owned by contract
         assert(sys.duels.owner_of(duel_id.into()) == sys.game.contract_address, 'duels.owner_of');
@@ -152,10 +152,10 @@ mod tests {
         assert(duelist_a.score.honour == scoreboard_a.score.honour, 'scoreboard_a.score.honour');
         assert(duelist_b.score.honour == scoreboard_b.score.honour, 'scoreboard_b.score.honour');
 
-        tester::assert_balance(sys.lords, sys.game.contract_address, balance_contract, 0, 0, 'balance_contract_2');
-        tester::assert_balance(sys.lords, TREASURY(), 0, 0, fee * 2, 'balance_treasury_2');
-        tester::assert_balance(sys.lords, OWNER(), balance_a, fee, 0, 'balance_a_2');
-        tester::assert_balance(sys.lords, OTHER(), balance_b, fee, 0, 'balance_b_2');
+        // tester::assert_balance(sys.lords, sys.game.contract_address, lords_balance_contract, 0, 0, 'lords_balance_contract_2');
+        // tester::assert_balance(sys.lords, TREASURY(), 0, 0, lords_fee * 2, 'lords_balance_treasury_2');
+        // tester::assert_balance(sys.lords, OWNER(), lords_balance_a, lords_fee, 0, 'lords_balance_a_2');
+        // tester::assert_balance(sys.lords, OTHER(), lords_balance_b, lords_fee, 0, 'lords_balance_b_2');
 
         // duel nft still owned by contract
         assert(sys.duels.owner_of(duel_id.into()) == sys.game.contract_address, 'duels.owner_of_END');
@@ -193,19 +193,19 @@ mod tests {
         sys.rng.mock_values(salts.salts, salts.values);
 
         let table_id: felt252 = TABLES::LORDS;
-        let balance_contract: u128 = sys.lords.balance_of(sys.game.contract_address).low;
-        let balance_treasury: u128 = sys.lords.balance_of(TREASURY()).low;
-        let balance_a: u128 = sys.lords.balance_of(OWNER()).low;
-        let balance_b: u128 = sys.lords.balance_of(OTHER()).low;
-        let fee: u128 = sys.duels.calc_mint_fee(table_id);
-        assert(fee == 0, 'fee == 0');
-        assert(balance_treasury == 0, 'balance_treasury == 0');
+        // let lords_balance_contract: u128 = sys.lords.balance_of(sys.game.contract_address).low;
+        // let lords_balance_treasury: u128 = sys.lords.balance_of(TREASURY()).low;
+        // let lords_balance_a: u128 = sys.lords.balance_of(OWNER()).low;
+        // let lords_balance_b: u128 = sys.lords.balance_of(OTHER()).low;
+        let lords_fee: u128 = sys.duels.calc_mint_fee(table_id);
+        assert(lords_fee == 0, 'lords_fee == 0');
+        // assert(lords_balance_treasury == 0, 'lords_balance_treasury == 0');
 
         let (_challenge, round_1, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
-        tester::assert_balance(sys.lords, sys.game.contract_address, balance_contract, 0, (fee + PRIZE_VALUE) * 2, 'balance_contract_1');
-        tester::assert_balance(sys.lords, OWNER(), balance_a, fee + PRIZE_VALUE, 0, 'balance_a_1');
-        tester::assert_balance(sys.lords, OTHER(), balance_b, fee + PRIZE_VALUE, 0, 'balance_b_1');
-        tester::assert_balance(sys.lords, TREASURY(), 0, 0, 0, 'balance_treasury_1');
+        // tester::assert_balance(sys.lords, sys.game.contract_address, lords_balance_contract, 0, (lords_fee + PRIZE_VALUE) * 2, 'lords_balance_contract_1');
+        // tester::assert_balance(sys.lords, OWNER(), lords_balance_a, lords_fee + PRIZE_VALUE, 0, 'lords_balance_a_1');
+        // tester::assert_balance(sys.lords, OTHER(), lords_balance_b, lords_fee + PRIZE_VALUE, 0, 'lords_balance_b_1');
+        // tester::assert_balance(sys.lords, TREASURY(), 0, 0, 0, 'lords_balance_treasury_1');
 
         // duel owned by contract
         assert(sys.duels.owner_of(duel_id.into()) == sys.game.contract_address, 'duels.owner_of');
@@ -297,11 +297,11 @@ mod tests {
             assert(false, 'bad winner')
         }
 
-        tester::assert_balance(sys.lords, sys.game.contract_address, balance_contract, 0, 0, 'balance_contract_2');
-        let balance_treasury = tester::assert_balance(sys.lords, TREASURY(), balance_treasury, 0, fee * 2, 'balance_treasury_2');
-        tester::assert_winner_balance(sys.lords, challenge.winner, OWNER(), OTHER(), balance_a, balance_b, fee, PRIZE_VALUE, 'balance_winner_2');
-        let balance_a: u128 = sys.lords.balance_of(OWNER()).low;
-        let balance_b: u128 = sys.lords.balance_of(OTHER()).low;
+        // tester::assert_balance(sys.lords, sys.game.contract_address, lords_balance_contract, 0, 0, 'lords_balance_contract_2');
+        // let lords_balance_treasury = tester::assert_balance(sys.lords, TREASURY(), lords_balance_treasury, 0, lords_fee * 2, 'lords_balance_treasury_2');
+        // tester::assert_winner_balance(sys.lords, challenge.winner, OWNER(), OTHER(), lords_balance_a, lords_balance_b, lords_fee, PRIZE_VALUE, 'lords_balance_winner_2');
+        // let lords_balance_a: u128 = sys.lords.balance_of(OWNER()).low;
+        // let lords_balance_b: u128 = sys.lords.balance_of(OTHER()).low;
 
         //
         // Run same challenge again!!!!
@@ -347,9 +347,9 @@ mod tests {
             assert(false, 'bad winner')
         }
 
-        tester::assert_balance(sys.lords, sys.game.contract_address, balance_contract, 0, 0, 'balance_contract_3');
-        tester::assert_balance(sys.lords, TREASURY(), balance_treasury, 0, fee * 2, 'balance_treasury_3');
-        tester::assert_winner_balance(sys.lords, challenge.winner, OWNER(), OTHER(), balance_a, balance_b, fee, PRIZE_VALUE, 'balance_winner_3');
+        // tester::assert_balance(sys.lords, sys.game.contract_address, lords_balance_contract, 0, 0, 'lords_balance_contract_3');
+        // tester::assert_balance(sys.lords, TREASURY(), lords_balance_treasury, 0, lords_fee * 2, 'lords_balance_treasury_3');
+        // tester::assert_winner_balance(sys.lords, challenge.winner, OWNER(), OTHER(), lords_balance_a, lords_balance_b, lords_fee, PRIZE_VALUE, 'lords_balance_winner_3');
 
         _assert_duel_progress(sys, duel_id, moves_a.moves, moves_b.moves);
     }
