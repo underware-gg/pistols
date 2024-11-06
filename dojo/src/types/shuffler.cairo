@@ -1,12 +1,14 @@
 use pistols::utils::bitwise::{BitwiseU256};
 use pistols::utils::misc::{felt_to_usize};
+
 //
 // shuffle max 42 ids, from 1 to size
-// by dividing a u256 divided into 42 6-bits slots
-// based on EuclidShuffler.sol (Fisher–Yates shuffle)
-// https://github.com/rsodre/cc-euclid/blob/main/contracts/EuclidShuffler.sol
+// by dividing a u256 into 42 6-bits slots
+// based on EuclidShuffle.sol (Fisher–Yates shuffle)
+// https://github.com/rsodre/cc-euclid/blob/main/contracts/EuclidShuffle.sol
 //
 
+// ...but why 6 bits? it fits more ids into a felt252
 // 5 bits > range 0-31 = 160 bits : 50 felt252 slots / 51 u256 slots
 // 6 bits > range 0-63 = 189 bits : 42 felt252 slots / 42 u256 slots
 // 7 bits > range 0-127 = 889 bits : 36 felt252 slots / 36 u256 slots
