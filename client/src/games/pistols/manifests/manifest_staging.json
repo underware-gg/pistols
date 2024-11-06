@@ -3629,7 +3629,7 @@
             },
             {
               "type": "function",
-              "name": "calc_fee",
+              "name": "calc_mint_fee",
               "inputs": [
                 {
                   "name": "table_id",

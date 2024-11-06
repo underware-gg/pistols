@@ -273,7 +273,7 @@ fn test_token_component() {
     // should not panic
     // sys.token.contract_address.print();
     sys.token.owner_of(TOKEN_ID_1);//.print();
-    sys.token.calc_fee(OWNER());//.print();
+    sys.token.calc_mint_fee(OWNER());//.print();
     sys.token.is_owner_of(OWNER(), TOKEN_ID_1.low);//.print();
 }
 
@@ -394,7 +394,7 @@ fn test_mint_free() {
     _assert_minted_count(sys.world, sys.token, 2, 'invalid total_supply init');
     assert(sys.token.balance_of(OTHER()) == 1, 'invalid balance_of');
     // assert(sys.token.token_of_owner_by_index(OTHER(), 0) == TOKEN_ID_2, 'token_of_owner_by_index_2');
-    let price: u128 = sys.token.calc_fee(OWNER());
+    let price: u128 = sys.token.calc_mint_fee(OWNER());
     assert(price == 0, 'invalid price');
     mint(sys.token, OTHER());
     _assert_minted_count(sys.world, sys.token, 3, 'invalid total_supply');
@@ -413,7 +413,7 @@ fn test_mint_lords_no_allowance_zero() {
 #[should_panic(expected: ('BANK: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_lords_no_allowance_half() {
     let mut sys: TestSystems = setup(100);
-    let price: u128 = sys.token.calc_fee(OTHER());
+    let price: u128 = sys.token.calc_mint_fee(OTHER());
     tester::execute_lords_approve(@sys.lords, OTHER(), sys.bank.contract_address, price / 2);
     mint(sys.token, OTHER());
 }
@@ -422,7 +422,7 @@ fn test_mint_lords_no_allowance_half() {
 #[should_panic(expected: ('BANK: insufficient balance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_lords_no_balance_zero() {
     let mut sys: TestSystems = setup(100);
-    let price: u128 = sys.token.calc_fee(OTHER());
+    let price: u128 = sys.token.calc_mint_fee(OTHER());
     tester::execute_lords_approve(@sys.lords, OTHER(), sys.bank.contract_address, price);
     mint(sys.token, OTHER());
 }
@@ -431,7 +431,7 @@ fn test_mint_lords_no_balance_zero() {
 fn test_mint_lords_ok() {
     let mut sys: TestSystems = setup(100);
     _assert_minted_count(sys.world, sys.token, 2, 'invalid total_supply init');
-    let price: u128 = sys.token.calc_fee(OTHER());
+    let price: u128 = sys.token.calc_mint_fee(OTHER());
     assert(price > 0, 'invalid price');
     tester::execute_lords_faucet(@sys.lords, OTHER());
     tester::execute_lords_approve(@sys.lords, OTHER(), sys.bank.contract_address, price);

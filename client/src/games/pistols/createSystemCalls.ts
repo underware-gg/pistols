@@ -131,7 +131,7 @@ export function createSystemCalls(
     let calls: DojoCalls = []
     //
     // approve call
-    const approved_value = await calc_fee_duel(table_id)
+    const approved_value = await calc_mint_fee_duel(table_id)
     calls.push(approve_call(approved_value))
     //
     // game call
@@ -155,7 +155,7 @@ export function createSystemCalls(
     let calls: DojoCalls = []
     //
     // approve call
-    const approved_value = await calc_fee_duelist(signer.address)
+    const approved_value = await calc_mint_fee_duelist(signer.address)
     calls.push(approve_call(approved_value))
     //
     // game call
@@ -237,9 +237,9 @@ export function createSystemCalls(
   // duel_token
   //
 
-  const calc_fee_duel = async (table_id: string): Promise<bigint | null> => {
+  const calc_mint_fee_duel = async (table_id: string): Promise<bigint | null> => {
     const args = [stringToFelt(table_id)]
-    const results = await _executeCall<bigint>(duel_token_call('calc_fee', args))
+    const results = await _executeCall<bigint>(duel_token_call('calc_mint_fee', args))
     return results ?? null
   }
 
@@ -266,9 +266,9 @@ export function createSystemCalls(
   // duelist_token
   //
 
-  const calc_fee_duelist = async (recipient: BigNumberish): Promise<bigint | null> => {
+  const calc_mint_fee_duelist = async (recipient: BigNumberish): Promise<bigint | null> => {
     const args = [recipient]
-    const results = await _executeCall<bigint>(duelist_token_call('calc_fee', args))
+    const results = await _executeCall<bigint>(duelist_token_call('calc_mint_fee', args))
     return results ?? null
   }
 
@@ -310,7 +310,7 @@ export function createSystemCalls(
     get_player_card_decks,
     //
     // duel_token
-    calc_fee_duel,
+    calc_mint_fee_duel,
     create_duel,
     reply_duel,
     can_join,
@@ -318,7 +318,7 @@ export function createSystemCalls(
     // has_pact,
     //
     // duelist_token
-    calc_fee_duelist,
+    calc_mint_fee_duelist,
     create_duelist,
     update_duelist,
     duelist_token_uri,

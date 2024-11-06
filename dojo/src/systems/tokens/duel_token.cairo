@@ -51,7 +51,7 @@ pub trait IDuelToken<TState> {
     fn delete_duel(ref self: TState, duel_id: u128);
     fn transfer_to_winner(ref self: TState, duel_id: u128);
     // view calls
-    fn calc_fee(self: @TState, table_id: felt252) -> u128;
+    fn calc_mint_fee(self: @TState, table_id: felt252) -> u128;
     fn get_pact(self: @TState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128;
     fn has_pact(self: @TState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool;
     fn can_join(self: @TState, table_id: felt252, duelist_id: u128) -> bool;
@@ -84,7 +84,7 @@ pub trait IDuelTokenPublic<TState> {
     );
 
     // view calls
-    fn calc_fee(self: @TState, table_id: felt252) -> u128;
+    fn calc_mint_fee(self: @TState, table_id: felt252) -> u128;
     fn get_pact(self: @TState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128;
     fn has_pact(self: @TState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool;
     fn can_join(self: @TState, table_id: felt252, duelist_id: u128) -> bool;
@@ -235,7 +235,7 @@ pub mod duel_token {
             let mut world = self.world_default();
 
             // transfer mint fee
-            let fee_amount: u128 = self.calc_fee(table_id);
+            let fee_amount: u128 = self.calc_mint_fee(table_id);
             if (fee_amount > 0) {
                 assert(false, Errors::NOT_IMPLEMENTED);
             }
@@ -430,10 +430,10 @@ pub mod duel_token {
         //-----------------------------------
         // View calls
         //
-        fn calc_fee(self: @ContractState, table_id: felt252) -> u128 {
+        fn calc_mint_fee(self: @ContractState, table_id: felt252) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
             let table: TableConfig = store.get_table_config(table_id);
-            (table.calc_fee())
+            (table.calc_mint_fee())
         }
         
         fn get_pact(self: @ContractState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128 {

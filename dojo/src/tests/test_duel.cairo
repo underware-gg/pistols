@@ -94,7 +94,7 @@ mod tests {
         let balance_contract: u128 = sys.lords.balance_of(sys.game.contract_address).low;
         let balance_a: u128 = sys.lords.balance_of(OWNER()).low;
         let balance_b: u128 = sys.lords.balance_of(OTHER()).low;
-        let fee: u128 = sys.duels.calc_fee(table_id);
+        let fee: u128 = sys.duels.calc_mint_fee(table_id);
         assert(fee == 0, 'fee == 0');
 
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
@@ -197,7 +197,7 @@ mod tests {
         let balance_treasury: u128 = sys.lords.balance_of(TREASURY()).low;
         let balance_a: u128 = sys.lords.balance_of(OWNER()).low;
         let balance_b: u128 = sys.lords.balance_of(OTHER()).low;
-        let fee: u128 = sys.duels.calc_fee(table_id);
+        let fee: u128 = sys.duels.calc_mint_fee(table_id);
         assert(fee == 0, 'fee == 0');
         assert(balance_treasury == 0, 'balance_treasury == 0');
 

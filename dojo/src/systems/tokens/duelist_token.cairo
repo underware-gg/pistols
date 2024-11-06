@@ -49,7 +49,7 @@ pub trait IDuelistToken<TState> {
     fn get_token_image(self: @TState, token_id: u256) -> ByteArray;
 
     // IDuelistTokenPublic
-    fn calc_fee(ref self: TState, recipient: ContractAddress) -> u128;
+    fn calc_mint_fee(ref self: TState, recipient: ContractAddress) -> u128;
     fn create_duelist(ref self: TState, recipient: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist;
     fn update_duelist(ref self: TState, duelist_id: u128, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist;
     fn delete_duelist(ref self: TState, duelist_id: u128);
@@ -57,7 +57,7 @@ pub trait IDuelistToken<TState> {
 
 #[starknet::interface]
 pub trait IDuelistTokenPublic<TState> {
-    fn calc_fee(
+    fn calc_mint_fee(
         self: @TState,
         recipient: ContractAddress,
     ) -> u128;
@@ -208,7 +208,7 @@ pub mod duelist_token {
     #[abi(embed_v0)]
     impl DuelistTokenPublicImpl of IDuelistTokenPublic<ContractState> {
 
-        fn calc_fee(self: @ContractState,
+        fn calc_mint_fee(self: @ContractState,
             recipient: ContractAddress,
         ) -> u128 {
             (self.get_payment(recipient).amount.low)
