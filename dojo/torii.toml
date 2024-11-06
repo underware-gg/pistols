@@ -1,4 +1,4 @@
 contracts = [
-  { type = "ERC721", address = "0x3fd023fff7fa9f4dffe934b22403b372d6812145cfc28216ad4dc4154c21de6" }, # duel_token
+  { type = "ERC721", address = "0x475ae9c7731546768d80cbfdaa4c97dcf0a70ac069b509bb9dd0c5c251b618f" }, # duel_token
   { type = "ERC721", address = "0x63961d7878793e76aae097061e75084bc510f30e2cc1f5286628a91facc5479" }, # duelist_token
 ]

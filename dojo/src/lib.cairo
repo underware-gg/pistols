@@ -9,6 +9,8 @@ mod systems {
     mod bank;
     mod game;
     mod rng;
+    #[cfg(feature:'vrf_mock')]
+    mod vrf_mock;
     mod tokens {
         mod duel_token;
         mod duelist_token;

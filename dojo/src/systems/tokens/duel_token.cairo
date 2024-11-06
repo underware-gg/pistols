@@ -49,6 +49,7 @@ pub trait IDuelToken<TState> {
     fn create_duel(ref self: TState, duelist_id: u128, challenged_id_or_address: ContractAddress, premise: Premise, quote: felt252, table_id: felt252, expire_hours: u64) -> u128;
     fn reply_duel(ref self: TState, duelist_id: u128, duel_id: u128, accepted: bool) -> ChallengeState;
     fn delete_duel(ref self: TState, duel_id: u128);
+    fn transfer_to_winner(ref self: TState, duel_id: u128);
     // view calls
     fn calc_fee(self: @TState, table_id: felt252) -> u128;
     fn get_pact(self: @TState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128;
@@ -74,6 +75,10 @@ pub trait IDuelTokenPublic<TState> {
         accepted: bool,
     ) -> ChallengeState;
     fn delete_duel(
+        ref self: TState,
+        duel_id: u128,
+    );
+    fn transfer_to_winner(
         ref self: TState,
         duel_id: u128,
     );
@@ -135,6 +140,7 @@ pub mod duel_token {
     use pistols::interfaces::systems::{
         SystemsTrait,
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
+        IVRFMockDispatcher, IVRFMockDispatcherTrait,
     };
     use pistols::models::{
         config::{TokenConfig, TokenConfigValue},
@@ -152,7 +158,6 @@ pub mod duel_token {
     use pistols::types::duel_progress::{DuelistDrawnCard};
     use pistols::types::constants::{CONST, HONOUR};
     use pistols::libs::events::{emitters};
-    use pistols::libs::seeder::{make_seed};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::libs::pact;
     use pistols::utils::metadata::{MetadataTrait};
@@ -228,7 +233,6 @@ pub mod duel_token {
             expire_hours: u64,
         ) -> u128 {
             let mut world = self.world_default();
-            let caller: ContractAddress = get_caller_address();
 
             // transfer mint fee
             let fee_amount: u128 = self.calc_fee(table_id);
@@ -236,11 +240,11 @@ pub mod duel_token {
                 assert(false, Errors::NOT_IMPLEMENTED);
             }
 
-            // mint!
-            let duel_id: u128 = self.token.mint(caller);
+            // mint to game, so it can transfer to winner
+            let duel_id: u128 = self.token.mint(world.game_address());
 
             // validate challenger
-            let address_a: ContractAddress = caller;
+            let address_a: ContractAddress = get_caller_address();
             let duelist_id_a: u128 = duelist_id;
             let duelist_dispatcher: IDuelistTokenDispatcher = world.duelist_token_dispatcher();
             assert(duelist_dispatcher.is_owner_of(address_a, duelist_id_a) == true, Errors::NOT_YOUR_DUELIST);
@@ -272,10 +276,8 @@ pub mod duel_token {
             let timestamp_end: u64 = if (expire_hours == 0) { 0 } else { timestamp_start + timestamp::from_hours(expire_hours) };
 
             // create challenge
-            let seed: u128 = make_seed(address_a, world.dispatcher.uuid());
             let challenge = Challenge {
                 duel_id,
-                seed,
                 table_id,
                 premise,
                 quote,
@@ -294,7 +296,7 @@ pub mod duel_token {
             store.set_challenge(@challenge);
 
             // create Round, readu for player A to 
-            let round = Round {
+            let mut round = Round {
                 duel_id: challenge.duel_id,
                 state: RoundState::Commit,
                 moves_a: Default::default(),
@@ -303,6 +305,8 @@ pub mod duel_token {
                 state_b: Default::default(),
                 final_blow: 0,
             };
+            // generate player deck seed
+            round.moves_a.seed = world.vrf_dispatcher().consume_random();
             store.set_round(@round);
 
             // set the pact + assert it does not exist
@@ -326,7 +330,7 @@ pub mod duel_token {
             assert(challenge.state.exists(), Errors::INVALID_CHALLENGE);
             assert(challenge.state == ChallengeState::Awaiting, Errors::CHALLENGE_NOT_AWAITING);
 
-            let address_b: ContractAddress = starknet::get_caller_address();
+            let address_b: ContractAddress = get_caller_address();
             let duelist_id_b: u128 = duelist_id;
             let timestamp: u64 = get_block_timestamp();
 
@@ -374,6 +378,10 @@ pub mod duel_token {
                     challenge.state = ChallengeState::InProgress;
                     challenge.timestamp_start = timestamp;
                     challenge.timestamp_end = 0;
+                    // generate player deck seed
+                    let mut round: Round = store.get_round(duel_id);
+                    round.moves_b.seed = world.vrf_dispatcher().consume_random();
+                    store.set_round(@round);
                     // events
                     emitters::emitChallengeAcceptedEvent(@world, challenge, accepted);
                     emitters::emitDuelistTurnEvent(@world, challenge);
@@ -405,6 +413,18 @@ pub mod duel_token {
             self.token.burn(duel_id.into());
         }
 
+        fn transfer_to_winner(ref self: ContractState,
+            duel_id: u128,
+        ) {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let challenge: ChallengeValue = store.get_challenge_value(duel_id);
+            let owner: ContractAddress = self.owner_of(duel_id.into());
+            if (challenge.winner == 1 && owner != challenge.address_a) {
+                self.transfer_from(owner, challenge.address_a, duel_id.into());
+            } else if (challenge.winner == 2 && owner != challenge.address_b) {
+                self.transfer_from(owner, challenge.address_b, duel_id.into());
+            }
+        }
 
 
         //-----------------------------------
@@ -428,7 +448,7 @@ pub mod duel_token {
             let mut store: Store = StoreTrait::new(self.world_default());
             let table: TableConfigValue = store.get_table_config_value(table_id);
             let table_admittance: TableAdmittance = store.get_table_admittance(table_id);
-            (table.is_open && table_admittance.can_join(starknet::get_caller_address(), duelist_id))
+            (table.is_open && table_admittance.can_join(get_caller_address(), duelist_id))
         }
     }
 

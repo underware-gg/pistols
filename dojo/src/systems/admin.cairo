@@ -12,7 +12,7 @@ pub trait IAdmin<TState> {
     fn am_i_admin(self: @TState, account_address: ContractAddress) -> bool;
     fn grant_admin(ref self: TState, account_address: ContractAddress, granted: bool);
 
-    fn set_config(ref self: TState, config: Config);
+    fn set_treasury(ref self: TState, treasury_address: ContractAddress);
     fn set_paused(ref self: TState, paused: bool);
 
     fn open_table(ref self: TState, table_id: felt252, is_open: bool);
@@ -47,6 +47,7 @@ pub mod admin {
         ref self: ContractState,
         treasury_address: ContractAddress,
         lords_address: ContractAddress,
+        vrf_address: ContractAddress,
     ) {
         let mut world = self.world_default();
         let mut store: Store = StoreTrait::new(world);
@@ -54,6 +55,7 @@ pub mod admin {
         let mut config: Config = ConfigTrait::new();
         config.treasury_address = if (treasury_address.is_zero()) { get_caller_address() } else { treasury_address };
         config.lords_address = if (lords_address.is_non_zero()) { lords_address } else { world.lords_mock_address() };
+        config.vrf_address = if (vrf_address.is_non_zero()) { vrf_address } else { world.vrf_mock_address() };
         config.is_paused = false;
         store.set_config(@config);
         // initialize tables
@@ -103,13 +105,14 @@ pub mod admin {
             }
         }
 
-        fn set_config(ref self: ContractState, config: Config) {
+        fn set_treasury(ref self: ContractState, treasury_address: ContractAddress) {
             self.assert_caller_is_admin();
-            assert(config.treasury_address.is_non_zero(), Errors::INVALID_TREASURY);
+            assert(treasury_address.is_non_zero(), Errors::INVALID_TREASURY);
             // get current
             let mut world = self.world_default();
             let mut store: Store = StoreTrait::new(world);
             let mut config: Config = store.get_config();
+            config.treasury_address = treasury_address;
             store.set_config(@config);
         }
 

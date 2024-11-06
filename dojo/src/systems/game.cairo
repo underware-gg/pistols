@@ -45,6 +45,7 @@ pub mod game {
     use pistols::interfaces::systems::{
         SystemsTrait,
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
+        IDuelTokenDispatcher, IDuelTokenDispatcherTrait,
     };
     use pistols::models::{
         challenge::{Challenge, ChallengeTrait, ChallengeValue, Round, RoundTrait, RoundValue, MovesTrait},
@@ -211,6 +212,11 @@ pub mod game {
             challenge.state = if (progress.winner == 0) {ChallengeState::Draw} else {ChallengeState::Resolved};
             challenge.timestamp_end = get_block_timestamp();
             self.finish_challenge(ref store, challenge);
+
+            // send duel token to winner
+            if (challenge.winner != 0) {
+                world.duel_token_dispatcher().transfer_to_winner(duel_id);
+            }
 
             // undo pact
             pact::unset_pact(ref store, challenge);

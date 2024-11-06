@@ -63,21 +63,6 @@ impl PacesCardImpl of PacesCardTrait {
             PacesCard::None => 0,
         }
     }
-    fn env_salt(self: PacesCard) -> felt252 {
-        match self {
-            PacesCard::Paces1 =>    'env_1',
-            PacesCard::Paces2 =>    'env_2',
-            PacesCard::Paces3 =>    'env_3',
-            PacesCard::Paces4 =>    'env_4',
-            PacesCard::Paces5 =>    'env_5',
-            PacesCard::Paces6 =>    'env_6',
-            PacesCard::Paces7 =>    'env_7',
-            PacesCard::Paces8 =>    'env_8',
-            PacesCard::Paces9 =>    'env_9',
-            PacesCard::Paces10 =>   'env_10',
-            PacesCard::None => 0,
-        }
-    }
     fn get_deck(_deck_type: DeckType) -> Span<u8> {
         (array![
             PacesCard::Paces1.into(),

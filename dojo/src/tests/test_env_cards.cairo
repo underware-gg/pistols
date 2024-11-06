@@ -26,7 +26,7 @@ mod tests {
     use pistols::utils::short_string::{ShortString};
 
     use pistols::systems::tokens::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
-    use pistols::tests::mock_rng::{IRngDispatcher, IRngDispatcherTrait};
+    use pistols::tests::mock_rng::{IRngDispatcher, IRngDispatcherTrait, mock_shuffle_values};
     use pistols::tests::tester::{tester,
         tester::{
             TestSystems,
@@ -74,8 +74,8 @@ mod tests {
             fire_dices,
         );
         sys.rng.mock_values(
-            ['env_1', 'env_2', 'env_3', 'env_4', 'env_5', 'env_6', 'env_7', 'env_8', 'env_9', 'env_10'].span(),
-            env_cards,
+            ['env'].span(),
+            [mock_shuffle_values(env_cards)].span(),
         );
         let mut round = Round {
             duel_id: 0x1234,

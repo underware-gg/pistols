@@ -93,38 +93,32 @@ mod tests {
     }
 
     #[test]
-    fn test_set_config() {
+    fn test_set_treasury() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
         let mut config: Config = tester::get_Config(sys.world);
         assert(config.treasury_address == TREASURY(), 'treasury_address_default');
         // set
         let new_treasury: ContractAddress = starknet::contract_address_const::<0x121212>();
-        config.treasury_address = new_treasury;
-        tester::execute_admin_set_config(@sys.admin, OWNER(), config);
+        tester::execute_admin_set_treasury(@sys.admin, OWNER(), new_treasury);
         let mut config: Config = tester::get_Config(sys.world);
         assert(config.treasury_address == new_treasury, 'set_config_new');
-        config.treasury_address = BUMMER();
-        tester::execute_admin_set_config(@sys.admin, OWNER(), config);
+        tester::execute_admin_set_treasury(@sys.admin, OWNER(), BUMMER());
         let config: Config = tester::get_Config(sys.world);
         assert(config.treasury_address == BUMMER(), 'treasury_address_newer');
     }
 
     #[test]
     #[should_panic(expected:('ADMIN: Invalid treasury_address', 'ENTRYPOINT_FAILED'))]
-    fn test_set_config_null() {
+    fn test_set_treasury_null() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
-        let mut config: Config = tester::get_Config(sys.world);
-        config.treasury_address = ZERO();
-        tester::execute_admin_set_config(@sys.admin, OWNER(), config);
+        tester::execute_admin_set_treasury(@sys.admin, OWNER(), ZERO());
     }
 
     #[test]
     #[should_panic(expected:('ADMIN: not admin', 'ENTRYPOINT_FAILED'))]
-    fn test_set_config_not_owner() {
+    fn test_set_treasury_not_owner() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
-        let mut config: Config = tester::get_Config(sys.world);
-        config.treasury_address = BUMMER();
-        tester::execute_admin_set_config(@sys.admin, OTHER(), config);
+        tester::execute_admin_set_treasury(@sys.admin, OTHER(), BUMMER());
     }
 
     //

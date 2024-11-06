@@ -3,7 +3,7 @@ use core::traits::TryInto;
 use starknet::{ContractAddress, get_block_timestamp};
 use dojo::world::{WorldStorage};
 
-use pistols::systems::rng::{Dice, DiceTrait};
+use pistols::systems::rng::{Dice, DiceTrait, Shuffle, ShuffleTrait};
 use pistols::models::{
     challenge::{Round, RoundTrait, DuelistState, DuelistStateTrait, Moves, MovesTrait},
     duelist::{Duelist, Score},
@@ -64,7 +64,8 @@ fn game_loop(world: @WorldStorage, deck_type: DeckType, ref round: Round) -> Due
 
     let env_deck: Span<EnvCard> = EnvCardTrait::get_full_deck().span();
 
-    let mut dice: Dice = DiceTrait::new(world, round.make_seed(), env_deck.len());
+    let mut dice: Dice = DiceTrait::new(world, round.make_seed());
+    let mut shuffle: Shuffle = ShuffleTrait::new(world, round.make_seed(), env_deck.len().try_into().unwrap(), 'env');
     
     let mut hand_a: DuelistHand = round.moves_a.as_hand();
     let mut hand_b: DuelistHand = round.moves_b.as_hand();
@@ -120,7 +121,7 @@ fn game_loop(world: @WorldStorage, deck_type: DeckType, ref round: Round) -> Due
         // println!("Pace [{}] A:{} B:{}", step_number, self.moves_a.card_fire.as_felt(), self.moves_b.card_fire.as_felt());
 
         // draw env card
-        let (card_env, dice_env): (EnvCard, u8) = draw_env_card(env_deck, pace, ref dice);
+        let (card_env, dice_env): (EnvCard, u8) = draw_env_card(env_deck, pace, ref shuffle);
 
         // apply env card points to both duelists
         card_env.apply_points(ref specials_a, ref state_a, ref state_b);
@@ -214,9 +215,8 @@ fn game_loop(world: @WorldStorage, deck_type: DeckType, ref round: Round) -> Due
 }
 
 
-fn draw_env_card(env_deck: Span<EnvCard>, pace: PacesCard, ref dice: Dice) -> (EnvCard, u8) {
-    let salt: felt252 = pace.env_salt();
-    let dice: u8 = dice.shuffle_draw(salt);
+fn draw_env_card(env_deck: Span<EnvCard>, pace: PacesCard, ref shuffle: Shuffle) -> (EnvCard, u8) {
+    let dice: u8 = shuffle.draw_next();
     let env_card: EnvCard = *env_deck[(dice - 1).into()];
     (env_card, dice)
 }

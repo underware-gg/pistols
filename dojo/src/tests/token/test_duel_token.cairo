@@ -180,6 +180,7 @@ fn setup_uninitialized(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher)
         key: CONFIG::CONFIG_KEY,
         treasury_address: TREASURY(),
         lords_address: world.lords_mock_address(),
+        vrf_address: world.vrf_mock_address(),
         is_paused: false,
     });
 
@@ -275,7 +276,6 @@ fn test_token_uri() {
 
     let challenge = Challenge {
         duel_id: TOKEN_ID_1.low,
-        seed: 123456,
         table_id: TABLES::LORDS,
         premise: Premise::Honour,
         quote: 'For honour!!!',

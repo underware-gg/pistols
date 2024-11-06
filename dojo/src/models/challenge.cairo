@@ -19,7 +19,6 @@ pub struct Challenge {
     #[key]
     pub duel_id: u128,
     //-------------------------
-    pub seed: u128,
     pub table_id: felt252,
     pub premise: Premise,           // premise of the dispute
     pub quote: felt252,             // message to challenged
@@ -55,6 +54,8 @@ pub struct Round {
 // The shot of each player on a Round
 #[derive(Copy, Drop, Serde, Default, Introspect)]
 pub struct Moves {
+    // player deck
+    pub seed: felt252,      // vrf seed
     // commit/reveal
     pub salt: felt252,      // the player's secret salt
     pub hashed: u128,       // hashed moves (salt + moves)
@@ -99,7 +100,7 @@ impl ChallengeImpl of ChallengeTrait {
 impl RoundImpl of RoundTrait {
     #[inline(always)]
     fn make_seed(self: Round) -> felt252 {
-        (hash_values([self.moves_a.salt, self.moves_b.salt].span()))
+        (hash_values([self.moves_a.seed, self.moves_b.seed].span()))
     }
 }
 

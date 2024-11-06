@@ -14,6 +14,7 @@ mod tester {
         admin::{admin, IAdminDispatcher, IAdminDispatcherTrait},
         game::{game, IGameDispatcher, IGameDispatcherTrait},
         rng::{rng},
+        vrf_mock::{vrf_mock},
         tokens::{
             duel_token::{duel_token, IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
             duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
@@ -146,13 +147,17 @@ mod tester {
         let mut deploy_duel: bool = (flags & FLAGS::DUEL) != 0;
         let mut deploy_duelist: bool = (flags & FLAGS::DUELIST) != 0;
         let mut deploy_mock_rng = (flags & FLAGS::MOCK_RNG) != 0;
-        let approve: bool = (flags & FLAGS::APPROVE) != 0;
+        let mut approve: bool = (flags & FLAGS::APPROVE) != 0;
+        let mut deploy_bank: bool = false;
+        let mut deploy_fame: bool = false;
 
         deploy_game = deploy_game || approve;
         deploy_admin = deploy_admin || deploy_game;
         deploy_lords = deploy_lords || deploy_game || deploy_duelist || approve;
         deploy_duel = deploy_duel || deploy_game;
-
+        deploy_bank = deploy_bank || deploy_lords || deploy_duelist;
+        deploy_fame = deploy_fame || deploy_duelist;
+        
 // '---- 0'.print();
         let mut resources: Array<TestResource> = array![
             // pistols models
@@ -184,6 +189,9 @@ mod tester {
                 ContractDefTrait::new(game::TEST_CLASS_HASH, "game")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             ));
+            resources.append(TestResource::Contract(
+                ContractDefTrait::new(vrf_mock::TEST_CLASS_HASH, "vrf_mock")
+            ));
         }
 
         if (deploy_admin) {
@@ -193,6 +201,7 @@ mod tester {
                     .with_init_calldata([
                         TREASURY().into(), // treasury_address
                         0, // lords_address
+                        0, // vrf_address
                     ].span())
             ));
         }
@@ -257,8 +266,18 @@ mod tester {
                         10_000_000_000_000_000_000_000, // faucet_amount: 10,000 Lords
                     ].span())
             ));
+        }
+
+        if (deploy_bank) {
             resources.append(TestResource::Contract(
                 ContractDefTrait::new(bank::TEST_CLASS_HASH, "bank")
+                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+            ));
+        }
+
+        if (deploy_fame) {
+            resources.append(TestResource::Contract(
+                ContractDefTrait::new(fame_coin::TEST_CLASS_HASH, "fame_coin")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             ));
         }
@@ -288,15 +307,17 @@ mod tester {
         let mut world: WorldStorage = spawn_test_world([ndef].span());
 // '---- 2'.print();
 
-        impersonate(OWNER());
-
         // initializers
 // '---- 3'.print();
+        if (deploy_admin) {
+            world.dispatcher.grant_owner(selector_from_tag!("pistols-admin"), OWNER());
+        }
+// '---- 4'.print();
         if (deploy_lords) {
             let lords = world.lords_mock_dispatcher();
             execute_lords_faucet(@lords, OWNER());
             execute_lords_faucet(@lords, OTHER());
-// '---- 4'.print();
+// '---- 5'.print();
             if (approve) {
                 let spender = world.bank_address();
                 execute_lords_approve(@lords, OWNER(), spender, 1_000_000 * CONST::ETH_TO_WEI.low);
@@ -304,7 +325,9 @@ mod tester {
                 execute_lords_approve(@lords, BUMMER(), spender, 1_000_000 * CONST::ETH_TO_WEI.low);
             }
         }
-// '---- 5'.print();
+// '---- 6'.print();
+
+        impersonate(OWNER());
 
 // '---- READY!'.print();
         (TestSystems {
@@ -354,9 +377,9 @@ mod tester {
         (*system).grant_admin(owner_address, granted);
         _next_block();
     }
-    fn execute_admin_set_config(system: @IAdminDispatcher, sender: ContractAddress, config: Config) {
+    fn execute_admin_set_treasury(system: @IAdminDispatcher, sender: ContractAddress, new_treasury_address: ContractAddress) {
         impersonate(sender);
-        (*system).set_config(config);
+        (*system).set_treasury(new_treasury_address);
         _next_block();
     }
     fn execute_admin_set_paused(system: @IAdminDispatcher, sender: ContractAddress, paused: bool) {
