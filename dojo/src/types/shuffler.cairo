@@ -16,33 +16,33 @@ pub struct Shuffler {
     ids: u256,      // 1..MAX
     size : usize,
     pos : usize,
-    direct: bool,   // for testing
+    mocked: bool,   // for testing
 }
 
 #[generate_trait]
 impl ShufflerImpl of ShufflerTrait {
-    const MAX: u256 = 42;
+    const MAX: u8 = 42;
     const BITS: usize = 6;
     const MASK: u256 = 0b111111;
 
 	// size is the total number of Ids to be suffled
 	// allows get_next() to be called <size> times
-    fn new(size: usize) -> Shuffler {
-        assert(size.into() <= Self::MAX, 'SHUFFLE: too many elements');
+    fn new(size: u8) -> Shuffler {
+        assert(size <= Self::MAX, 'SHUFFLE: too many elements');
         (Shuffler {
             ids: 0,
-            size,
+            size: size.into(),
             pos: 0,
-            direct: false,
+            mocked: false,
         })
     }
 
-    fn new_direct(size: usize) -> Shuffler {
+    fn new_mocked(size: usize) -> Shuffler {
         (Shuffler {
             ids: 0,
             size,
             pos: 0,
-            direct: true,
+            mocked: true,
         })
     }
 
@@ -50,18 +50,17 @@ impl ShufflerImpl of ShufflerTrait {
 	// Ids keys and values range from 1..size
 	// Returns 0 when all ids have been used
     fn get_next(ref self: Shuffler, seed: felt252) -> u8 {
-        // testing
-// println!("seed:{}/{}", self.direct, seed);
-        if (self.direct) { return (felt_to_usize(seed) % self.size).try_into().unwrap() + 1; }
         // no more ids available
 		if (self.pos == self.size) { return 0; }
         // get next pos
 		self.pos += 1;
+        // testing
+        if (self.mocked) { return (felt_to_usize(seed) & Self::MASK.try_into().unwrap()).try_into().unwrap(); }
         // only 1 id was shuffled
 		if (self.size == 1) { return 1; }
         // it is the last id
 		if (self.pos == self.size) { return self.get_id(self.pos).try_into().unwrap(); }
-        /// get random pos
+        // get random pos
         let rnd: usize = self.pos + (felt_to_usize(seed) % (self.size - self.pos)).try_into().unwrap();
 		// swap for current position
 		let swap_pos: usize = rnd + 1;

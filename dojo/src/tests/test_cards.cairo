@@ -26,7 +26,7 @@ mod tests {
     use pistols::utils::short_string::{ShortString};
 
     use pistols::systems::tokens::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
-    use pistols::tests::mock_rng::{IRngDispatcher, IRngDispatcherTrait};
+    use pistols::tests::mock_rng::{IRngDispatcher, IRngDispatcherTrait, mock_shuffle_values};
     use pistols::tests::tester::{tester,
         tester::{
             TestSystems,
@@ -73,9 +73,11 @@ mod tests {
     fn execute_game_loop(sys: TestSystems, moves_a: Span<u8>, moves_b: Span<u8>, shuffle: bool) -> (Round, DuelProgress) {
         if (!shuffle) {
             sys.rng.mock_values(
-                ['env_1', 'env_2', 'env_3', 'env_4', 'env_5', 'env_6', 'env_7', 'env_8', 'env_9', 'env_10'].span(),
-                [ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL,
-                 ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL].span(),
+                ['env'].span(),
+                [mock_shuffle_values(
+                    [ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL,
+                    ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL].span()
+                )].span()
             );
         }
         let mut round = Round {

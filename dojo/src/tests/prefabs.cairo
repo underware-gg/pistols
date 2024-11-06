@@ -25,7 +25,7 @@ mod prefabs {
             FAKE_OWNER_1_1, FAKE_OWNER_2_2,
         }
     };
-    use pistols::tests::mock_rng::{IRngDispatcher, IRngDispatcherTrait};
+    use pistols::tests::mock_rng::{IRngDispatcher, IRngDispatcherTrait, mock_shuffle_values};
 
     const NAME_A: felt252 = 'Sensei';
     const NAME_B: felt252 = 'Senpai';
@@ -106,8 +106,8 @@ mod prefabs {
     fn get_moves_custom(moves_a: Span<u8>, moves_b: Span<u8>) -> (SaltsValues, PlayerMoves, PlayerMoves) {
         (
             SaltsValues{
-                salts: ['shoot_a', 'shoot_b', 'env_1'].span(),
-                values: [1, 1, ENV_CARD_NEUTRAL].span(),
+                salts: ['shoot_a', 'shoot_b', 'env'].span(),
+                values: [1, 1, mock_shuffle_values([ENV_CARD_NEUTRAL].span())].span(),
             },
             PlayerMovesTrait::new(SALT_A, moves_a),
             PlayerMovesTrait::new(SALT_B, moves_b),
@@ -119,8 +119,8 @@ mod prefabs {
         let moves_b: Span<u8> = [1, 2].span();
         (
             SaltsValues{
-                salts: ['shoot_a', 'shoot_b', 'env_1'].span(),
-                values: [100, 100, ENV_CARD_MISS].span(),
+                salts: ['shoot_a', 'shoot_b', 'env'].span(),
+                values: [100, 100, mock_shuffle_values([ENV_CARD_MISS].span())].span(),
             },
             PlayerMovesTrait::new(SALT_A, moves_a),
             PlayerMovesTrait::new(SALT_B, moves_b),
@@ -132,8 +132,8 @@ mod prefabs {
         let moves_b: Span<u8> = [1, 2].span();
         (
             SaltsValues{
-                salts: ['shoot_a', 'shoot_b', 'env_1'].span(),
-                values: [1, 1, ENV_CARD_CRIT].span(),
+                salts: ['shoot_a', 'shoot_b', 'env'].span(),
+                values: [1, 1, mock_shuffle_values([ENV_CARD_CRIT].span())].span(),
             },
             PlayerMovesTrait::new(SALT_A, moves_a),
             PlayerMovesTrait::new(SALT_B, moves_b),
@@ -145,8 +145,8 @@ mod prefabs {
         let moves_b: Span<u8> = [2, 3].span();
         (
             SaltsValues{
-                salts: ['shoot_a', 'shoot_b', 'env_1'].span(),
-                values: [1, 100, ENV_CARD_CRIT].span(),
+                salts: ['shoot_a', 'shoot_b', 'env'].span(),
+                values: [1, 1, mock_shuffle_values([ENV_CARD_CRIT].span())].span(),
             },
             PlayerMovesTrait::new(SALT_A, moves_a),
             PlayerMovesTrait::new(SALT_B, moves_b),
@@ -158,8 +158,8 @@ mod prefabs {
         let moves_b: Span<u8> = [1, 2].span();
         (
             SaltsValues{
-                salts: ['shoot_a', 'shoot_b', 'env_1'].span(),
-                values: [100, 1, ENV_CARD_CRIT].span(),
+                salts: ['shoot_a', 'shoot_b', 'env'].span(),
+                values: [100, 1, mock_shuffle_values([ENV_CARD_CRIT].span())].span(),
             },
             PlayerMovesTrait::new(SALT_A, moves_a),
             PlayerMovesTrait::new(SALT_B, moves_b),
