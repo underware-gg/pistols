@@ -1,4 +1,4 @@
-import { DojoProvider, getContractByName } from '@dojoengine/core'
+import { DojoCall, DojoProvider, getContractByName } from '@dojoengine/core'
 import { AccountInterface, BigNumberish, Call, Result } from 'starknet'
 import { getComponentValue } from '@dojoengine/recs'
 import { DojoManifest } from '@/lib/dojo/Dojo'
@@ -20,12 +20,6 @@ import { emitter } from '@/pistols/three/game'
 export const NAMESPACE = 'pistols'
 
 export type SystemCalls = ReturnType<typeof createSystemCalls>;
-
-export type DojoCall = {
-  contractName: string
-  entrypoint: string
-  calldata: BigNumberish[]
-}
 
 export type DojoCalls = Array<DojoCall | Call>
 
