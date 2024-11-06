@@ -528,9 +528,8 @@ export const sceneBackgrounds: Record<SceneName, SceneData> = {
     ]
   },
   [SceneName.Duelists]: { background: TextureName.bg_duelists },
-  [SceneName.YourDuels]: { background: TextureName.bg_duels_yours },
-  [SceneName.LiveDuels]: { background: TextureName.bg_duels_live },
-  [SceneName.PastDuels]: { background: TextureName.bg_duels_past },
+  [SceneName.Duels]: { background: TextureName.bg_duels_yours },
+  [SceneName.Graveyard]: { background: TextureName.bg_duels_past },
   [SceneName.Tournament]: { background: TextureName.bg_duels_live },
   [SceneName.IRLTournament]: { background: TextureName.bg_duels_live },
   [SceneName.Duel]: { background: TextureName.bg_duel },

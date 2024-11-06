@@ -10,6 +10,7 @@ import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { _useConnector } from '@/lib/dojo/fix/starknet_react_core'
+import { SceneName, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -20,6 +21,7 @@ export default function WalletHeader({
   const { account, address, isConnected } = useAccount()
   const { connectedChainName } = useSelectedChain()
   const { lordsContractAddress } = useLordsContract()
+  const { dispatchSetScene } = usePistolsScene()
   const { connector } = _useConnector()
 
   // BUG: https://github.com/apibara/starknet-react/issues/419
@@ -73,7 +75,11 @@ export default function WalletHeader({
             <ActionButton fill onClick={() => openMenu()} label='Settings' />
           </Col>
           <Col verticalAlign='middle'>
-            <ActionButton fill onClick={() => disconnect()} label='Disconnect' />
+            <ActionButton fill onClick={() => {
+              dispatchSetScene(SceneName.Gate)
+              disconnect()
+
+            }} label='Disconnect' />
           </Col>
         </Row>
       }

@@ -26,25 +26,30 @@ export default function ScTavern() {
     if (itemClicked) {
       switch (itemClicked) {
         case 'pistol':
-          dispatchSetScene(SceneName.YourDuels)
+          dispatchSetScene(SceneName.Duels)
           break
         case 'bottle':
           dispatchSetScene(SceneName.Duelists)
           break
         case 'shovel':
-          dispatchSetScene(SceneName.PastDuels)
+          dispatchSetScene(SceneName.Graveyard)
           break
         case 'bartender':
-          // setOpen(true);
+          setOpen(true);
           (_currentScene as InteractibleScene).toggleBlur(true);
           (_currentScene as InteractibleScene).setClickable(false);
           (_currentScene as InteractibleScene).excludeItem(sceneBackgrounds.Tavern.items.find(item => item.name === 'bartender'));
           break;
       }
     } else {
-      (_currentScene as InteractibleScene).toggleBlur(false);
-      (_currentScene as InteractibleScene).setClickable(true);
-      setOpen(false)
+      if (open) {
+        setOpen(false);
+        (_currentScene as InteractibleScene).toggleBlur(false);
+        (_currentScene as InteractibleScene).setClickable(true);
+        setTimeout(() => {
+          (_currentScene as InteractibleScene).excludeItem(null);
+        }, 400)
+      }
     }
   }, [itemClicked, timestamp])
 

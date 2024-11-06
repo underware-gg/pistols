@@ -38,7 +38,7 @@ export function TavernMenu() {
     tavernMenuItems.forEach(key => {
       if (key === SceneName.Tournament && !isTournament) return
       if (key === SceneName.IRLTournament && !isIRLTournament) return
-      const bubble = (key == SceneName.YourDuels) ? _makeBubble(yourDuelsCount) : (key == SceneName.LiveDuels) ? _makeBubble(liveDuelsCount) : null
+      const bubble = (key == SceneName.Duels) ? _makeBubble(yourDuelsCount) : null
       result.push({
         key,
         menuItem: (
@@ -54,9 +54,9 @@ export function TavernMenu() {
           <TabPane attached={true}>
             <div className='  '>
               {key === SceneName.Duelists && <DuelistTable />}
-              {key === SceneName.YourDuels && <ChallengeTableYour />}
-              {key === SceneName.LiveDuels && <ChallengeTableLive />}
-              {key === SceneName.PastDuels && <ChallengeTablePast />}
+              {key === SceneName.Duels && <ChallengeTableYour />}
+              {/* {key === SceneName.LiveDuels && <ChallengeTableLive />} */}
+              {key === SceneName.Graveyard && <ChallengeTablePast />}
               {key === SceneName.Tournament && <></>}
               {key === SceneName.IRLTournament && <IRLTournamentTab />}
             </div>

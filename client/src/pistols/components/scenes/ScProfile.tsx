@@ -232,7 +232,7 @@ function DuelistItem({
   const { dispatchSetScene } = usePistolsScene()
   const _duel = () => {
     dispatchDuelistId(duelistId)
-    dispatchSetScene(SceneName.YourDuels)
+    dispatchSetScene(SceneName.Duels)
   }
 
   const classNames = useMemo(() => {

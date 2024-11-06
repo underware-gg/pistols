@@ -23,11 +23,7 @@ export default function AccountHeader() {
   const { nameDisplay, profilePic } = useDuelist(duelistId)
 
   const _click = () => {
-    // if (isAnon) {
-    //   dispatchSetScene(SceneName.Profile)
-    // } else {
-    //   dispatchSetScene(SceneName.Profile)
-    // }
+    dispatchSetScene(SceneName.Profile)
   }
 
   return (
@@ -61,6 +57,7 @@ export function DuelistsNavigationMenu({
   const { duelistBalance, duelistIds } = useDuelistsOfOwner(address)
   const { duelistId: selectedDuelistId } = useSettings()
   const { dispatchDuelistId } = useSettings()
+  const { aspectWidth } = useGameAspect()
 
   const _goToProfile = () => {
     dispatchSetScene(SceneName.Profile)
@@ -89,14 +86,14 @@ export function DuelistsNavigationMenu({
 
   return (
     <Dropdown
-      className='huge NoPadding AutoMargin'
-      direction='right'
-      button
+      className='NoPadding NoMargin'
+      direction='left'
       simple
+      icon={null}
       closeOnEscape
       fluid
       trigger={children}
-      style={{ width: '82px', height: '82px' }}
+      style={{ width: aspectWidth(4), height: aspectWidth(4) }}
     >
       <Dropdown.Menu>
         {rows}

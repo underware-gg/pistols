@@ -23,9 +23,8 @@ export enum SceneName {
   Profile = 'Profile',
   Tavern = 'Tavern',
   Duelists = 'Duelists',
-  YourDuels = 'Your Duels',
-  LiveDuels = 'Live Duels',
-  PastDuels = 'Past Duels',
+  Duels = 'Your Duels',
+  Graveyard = 'Graveyard',
   Tournament = 'Tournament',
   IRLTournament = 'IRL Tournament',
   Duel = 'Duel',
@@ -33,9 +32,8 @@ export enum SceneName {
 
 const tavernMenuItems: SceneName[] = [
   SceneName.Duelists,
-  SceneName.YourDuels,
-  SceneName.LiveDuels,
-  SceneName.PastDuels,
+  SceneName.Duels,
+  SceneName.Graveyard,
   SceneName.Tournament,
   SceneName.IRLTournament,
 ]
@@ -282,9 +280,8 @@ export const sceneRoutes: Record<SceneName, SceneRoute> = {
   // scenes with tableId
   [SceneName.Tavern]: { baseUrl: '/tavern/', hasTableId: true },
   [SceneName.Duelists]: { baseUrl: '/balcony/', hasTableId: true, title: 'Pistols - Duelists' },
-  [SceneName.YourDuels]: { baseUrl: '/duels/', hasTableId: true, title: 'Pistols - Your Duels' },
-  [SceneName.LiveDuels]: { baseUrl: '/live/', hasTableId: true, title: 'Pistols - Live Duels' },
-  [SceneName.PastDuels]: { baseUrl: '/graveyard/', hasTableId: true, title: 'Pistols - Past Duels' },
+  [SceneName.Duels]: { baseUrl: '/duels/', hasTableId: true, title: 'Pistols - Your Duels' },
+  [SceneName.Graveyard]: { baseUrl: '/graveyard/', hasTableId: true, title: 'Pistols - Past Duels' },
   [SceneName.Tournament]: { baseUrl: '/tournament/', hasTableId: true, title: 'Pistols - Tournament' },
   [SceneName.IRLTournament]: { baseUrl: '/tournament/', hasTableId: true, title: 'Pistols - IRL Tournament' },
   // '/' must be the last...
@@ -329,6 +326,9 @@ export const usePistolsScene = () => {
     atDoor: (currentScene == SceneName.Door),
     atTavern: (currentScene == SceneName.Tavern),
     atProfile: (currentScene == SceneName.Profile),
+    atDuelists: (currentScene == SceneName.Duelists),
+    adDuels: (currentScene == SceneName.Duels),
+    atGraveyard: (currentScene == SceneName.Graveyard),
     atDuel: (currentScene == SceneName.Duel),
     fromGate: (lastScene == SceneName.Gate),
     // PistolsActions,

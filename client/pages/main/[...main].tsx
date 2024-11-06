@@ -16,6 +16,10 @@ import Duel from '@/pistols/components/scenes/Duel'
 import { MouseToolTip } from '@/pistols/components/ui/MouseToolTip'
 import { Header } from '@/pistols/components/Header'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '@/pistols/three/game'
+import ScDuels from '@/pistols/components/scenes/ScDuels'
+import ScDuelists from '@/pistols/components/scenes/ScDuelists'
+import ScGraveyard from '@/pistols/components/scenes/ScGraveyard'
+import { QueryProvider } from '@/pistols/hooks/QueryContext'
 
 // // enable wasm in build (this is for api routes and server issues)
 // export const config = {
@@ -38,9 +42,11 @@ export default function MainPage() {
     <AppPistols headerData={{ title: sceneTitle }} backgroundImage={null}>
       <Background className={null}>
         <GameContainer isVisible={true} />
-        <MainUI /> {/* Make it so this shows the correct scene and each scene has just the controlls for that one */}
-        {overlay}
-        { isInitialized && <Header /> }
+        <QueryProvider>
+          <MainUI />
+          {overlay}
+          { isInitialized && <Header /> }
+        </QueryProvider>
         <MouseToolTip/>
         {/* ADD NOTRIFICATIONS - how to make them into a hook? */}
       </Background>
@@ -54,7 +60,7 @@ function MainUI({
   useRouterListener()
   const { gameImpl } = useThreeJsContext()
   const { selectedDuelId } = usePistolsContext()
-  const { atGate, atProfile, atTavern, atDuel, atDoor } = usePistolsScene()
+  const { atGate, atProfile, atTavern, atDuel, atDoor, adDuels, atDuelists, atGraveyard } = usePistolsScene()
   const { isInitialized } = useDojoStatus()
 
   const [currentScene, setCurrentScene] = useState<JSX.Element | null>(null);
@@ -65,6 +71,9 @@ function MainUI({
       else if (atDoor) setCurrentScene(<Door />);
       else if (atDuel && selectedDuelId) setCurrentScene(<Duel duelId={selectedDuelId} />);
       else if (atProfile) setCurrentScene(<ScProfile />);
+      else if (atDuel) setCurrentScene(<ScDuels />);
+      else if (atDuelists) setCurrentScene(<ScDuelists />);
+      else if (atGraveyard) setCurrentScene(<ScGraveyard />);
       else setCurrentScene(<ScTavern />);
     }, SCENE_CHANGE_ANIMATION_DURATION);
 

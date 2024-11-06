@@ -85,7 +85,7 @@ export class InteractibleScene extends THREE.Scene {
     this.maskShader.setUniformValue('uPickedColor', this.pickedColor)
     this.maskShader.setUniformValue('uExcludedColor', new THREE.Color(0, 0, 0))
     this.maskShader.setUniformValue('uClickable', this.isClickable)
-    this.maskShader.setUniformValue('uSamples', 3)
+    this.maskShader.setUniformValue('uSamples', 4)
     this.maskShader.setUniformValue('uHighlightColor', new THREE.Color('#ffcf40'))
     this.maskShader.setUniformValue('uHighlightOpacity', 0.4)
     this.maskShader.setUniformValue('uMask', _textures[this.sceneData.mask])
@@ -208,8 +208,8 @@ export class InteractibleScene extends THREE.Scene {
   }
 
   public toggleBlur(shouldBlur: boolean) {
-    new TWEEN.Tween({ value: shouldBlur ? 3 : 20 })
-      .to({ value: shouldBlur ? 20 : 3 }, 400)
+    new TWEEN.Tween({ value: shouldBlur ? 4 : 20 })
+      .to({ value: shouldBlur ? 20 : 4 }, 400)
       .easing(TWEEN.Easing.Quartic.Out)
       .onUpdate((obj) => {
         this.maskShader.setUniformValue('uSamples', obj.value);

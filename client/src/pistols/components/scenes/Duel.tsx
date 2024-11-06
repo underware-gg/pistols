@@ -24,7 +24,6 @@ import { Action, ArchetypeNames } from '@/pistols/utils/pistols'
 import { MenuDebugAnimations, MenuDuel, MenuDuelControl } from '@/pistols/components/Menus'
 import { bigintToHex } from '@/lib/utils/types'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { useOwnerOfDuelist } from '../hooks/useDuelistToken'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import CommitPacesModal from '@/pistols/components/modals/CommitPacesModal'
 import 'react-circular-progressbar/dist/styles.css';
@@ -34,6 +33,7 @@ import useGameAspect from '@/pistols/hooks/useGameApect'
 import { BladesCard, EnvCard, PacesCard, TacticsCard } from '@/games/pistols/generated/constants';
 import * as Constants from '../../data/cardConstants'
 import * as TWEEN from '@tweenjs/tween.js'
+import { useOwnerOfDuelist } from '@/pistols/hooks/useDuelistToken';
 
 export type DuelistState = {
   damage: number, 

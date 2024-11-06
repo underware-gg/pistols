@@ -13,7 +13,7 @@ import Logo from '@/pistols/components/Logo'
 import { useIsMyDuelist } from '../../hooks/useIsYou'
 import { emitter } from '@/pistols/three/game'
 import { useAccount, useDisconnect } from '@starknet-react/core'
-import { useDuelistsOfOwner } from '@/pistols/hooks/useTokenDuelist'
+import { useDuelistsOfOwner } from '@/pistols/hooks/useDuelistToken'
 import { ProfilePicType } from '@/games/pistols/generated/constants'
 import { poseidon } from '@/lib/utils/starknet'
 import { Archetype } from '@/games/pistols/generated/constants'
@@ -113,7 +113,7 @@ export default function ScDoor() {
   const _submit = async () => {
     if (inputIsValid) {
       setIsDuelistBeingCreated(true)
-      await create_duelist(account, address, inputName, ProfilePicType.Duelist, _profilePic.toString(), Archetype.Undefined)
+      await create_duelist(account, address, inputName, ProfilePicType.Duelist, _profilePic.toString())
       dispatchSetScene(SceneName.Tavern)
     }
   }

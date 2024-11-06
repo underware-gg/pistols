@@ -47,7 +47,7 @@ export default function DuelistModal({
   }
 
   const _duel = () => {
-    dispatchSetScene(SceneName.YourDuels)
+    dispatchSetScene(SceneName.Duels)
     _close()
   }
 
