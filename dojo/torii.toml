@@ -1,4 +1,6 @@
 contracts = [
   { type = "ERC721", address = "0xecaac72e4d7a58973a0c85db50f8d1b0e836bffb34ec98c30b0fb5fb48daf4" }, # duel_token
   { type = "ERC721", address = "0x19b901b07f7f8930ac5b5e6093bcddb7f93adc7a43ea7f004f1c35f23d71e68" }, # duelist_token
+  { type = "ERC20", address = "0xd148888f1d19399f328088b4d4e92f0ef5fa05c27b9ecf658af39c56a1dd30" }, # fame_coin
+  { type = "ERC20", address = "0x223519c44ebc12880d95a8ab0bff7f65cd3334ba9af7a072d361cb22ff9e77d" }, # lords
 ]

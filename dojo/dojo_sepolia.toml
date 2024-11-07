@@ -24,6 +24,7 @@ chain_id = "SN_SEPOLIA"
 # account_address = ""  # env: DOJO_ACCOUNT_ADDRESS
 # private_key = ""      # env: DOJO_PRIVATE_KEY
 world_address = "0x577254dbda890787fd79ec4a0247dda90fe880f2c9ad115f8487214ee43c838"
+lords_address = "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210"
 
 #--------------------------
 # namespaces
