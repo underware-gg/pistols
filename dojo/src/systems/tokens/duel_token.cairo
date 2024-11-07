@@ -237,7 +237,7 @@ pub mod duel_token {
 
             // transfer mint fee
             let fee_amount: u128 = self.calc_mint_fee(table_id);
-            if (fee_amount > 0) {
+            if (fee_amount != 0) {
                 assert(false, Errors::NOT_IMPLEMENTED);
             }
 
@@ -261,7 +261,7 @@ pub mod duel_token {
             // validate challenged
             assert(challenged_id_or_address.is_non_zero(), Errors::INVALID_CHALLENGED_NULL);
             let duelist_id_b: u128 = DuelistTrait::try_address_to_id(challenged_id_or_address);
-            let address_b: ContractAddress = if (duelist_id_b > 0) {
+            let address_b: ContractAddress = if (duelist_id_b != 0) {
                 // challenging a duelist...
                 assert(duelist_dispatcher.exists(duelist_id_b) == true, Errors::INVALID_CHALLENGED);
                 assert(duelist_id_a != duelist_id_b, Errors::INVALID_CHALLENGED_SELF);
@@ -337,7 +337,7 @@ pub mod duel_token {
             let duelist_id_b: u128 = duelist_id;
             let timestamp: u64 = get_block_timestamp();
 
-            if (challenge.timestamp_end > 0 && timestamp > challenge.timestamp_end) {
+            if (challenge.timestamp_end != 0 && timestamp > challenge.timestamp_end) {
                 // Expired, close it!
                 challenge.state = ChallengeState::Expired;
                 challenge.timestamp_end = timestamp;

@@ -607,6 +607,54 @@ mod tests {
         prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
     }
 
+    #[test]
+    #[ignore] // TODO: panic on commit/reveal
+    #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
+    fn test_duelist_is_dead_b_XXX() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        let (salts, moves_a, moves_b) = prefabs::get_moves_crit_b();
+        sys.rng.mock_values(salts.salts, salts.values);
+
+        let _duelist_id_a: u128 = tester::execute_create_duelist(@sys.duelists, OWNER(), 'OWNER', ProfilePicType::Duelist, '1').duelist_id;
+        let _duelist_id_b: u128 = tester::execute_create_duelist(@sys.duelists, OTHER(), 'OTHER', ProfilePicType::Duelist, '2').duelist_id;
+        let _duelist_id_c: u128 = tester::execute_create_duelist(@sys.duelists, BUMMER(), 'BUMMER', ProfilePicType::Duelist, '3').duelist_id;
+
+        // Duel 1
+        let (_, _, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+
+        // Duel 2
+        let (_, _, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+
+        // Duel 3
+        let (_, _, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+
+        // Duel 4
+        let (_, _, duel_id_4) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        let (_, _, duel_id_5) = prefabs::start_get_new_challenge(sys, OWNER(), BUMMER(), TABLES::LORDS);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id_4, moves_b.hashed);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id_4, moves_a.hashed);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id_4, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id_4, moves_a.salt, moves_a.moves);
+
+        // panic here!
+        tester::execute_commit_moves(@sys.game, BUMMER(), duel_id_5, moves_b.hashed);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id_5, moves_a.hashed);
+        tester::execute_reveal_moves(@sys.game, BUMMER(), duel_id_5, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id_5, moves_a.salt, moves_a.moves);
+    }
+
 
     //-------------------------------
     // Commit/Reveal Fails

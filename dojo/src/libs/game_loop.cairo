@@ -156,7 +156,7 @@ fn game_loop(world: @WorldStorage, deck_type: DeckType, ref round: Round) -> Due
         // break if there's a winner
         if (state_a.health == 0 || state_b.health == 0) { break; }
         // both dices rolled, no winner, go to blades
-        if (dice_fire_a > 0 && dice_fire_b > 0) { break; }
+        if (dice_fire_a != 0 && dice_fire_b != 0) { break; }
         
         step_number += 1;
     };
@@ -165,8 +165,8 @@ fn game_loop(world: @WorldStorage, deck_type: DeckType, ref round: Round) -> Due
     //------------------------------------------------------
     // Blades Round
     //
-    if (state_a.health > 0 &&
-        state_b.health > 0 &&
+    if (state_a.health != 0 &&
+        state_b.health != 0 &&
         (hand_a.card_blades != BladesCard::None || hand_b.card_blades != BladesCard::None)
     ) {
         blades(hand_a.card_blades, hand_b.card_blades, ref state_a, ref state_b);
@@ -184,7 +184,7 @@ fn game_loop(world: @WorldStorage, deck_type: DeckType, ref round: Round) -> Due
         round.final_blow =
             if (hand_a.card_blades == BladesCard::Seppuku) {hand_a.card_blades.variant_name()}
             else if (hand_b.card_blades == BladesCard::Seppuku) {hand_b.card_blades.variant_name()}
-            else if (state_a.health > 0) {hand_a.card_blades.variant_name()}
+            else if (state_a.health != 0) {hand_a.card_blades.variant_name()}
             else {hand_b.card_blades.variant_name()};
     }
 
@@ -200,8 +200,8 @@ fn game_loop(world: @WorldStorage, deck_type: DeckType, ref round: Round) -> Due
     //
 
     let winner: u8 =
-        if (round.state_a.health > 0 && round.state_b.health == 0) {1}
-        else if (round.state_a.health == 0 && round.state_b.health > 0) {2}
+        if (round.state_a.health != 0 && round.state_b.health == 0) {1}
+        else if (round.state_a.health == 0 && round.state_b.health != 0) {2}
         else {0};
     
     (DuelProgress {
@@ -230,7 +230,7 @@ fn fire(paces_shoot: PacesCard, paces_dodge: PacesCard, ref state_self: DuelistS
 
 fn blades(blades_a: BladesCard, blades_b: BladesCard, ref state_a: DuelistState, ref state_b: DuelistState) {
     // Rock-Paper-Scissors
-    if (state_a.health > 0 && state_b.health > 0) {
+    if (state_a.health != 0 && state_b.health != 0) {
         let (died_a, died_b): (bool, bool) = blades_a.clash(blades_b);
         if (died_a) {
             state_a.health = 0;

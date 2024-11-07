@@ -158,6 +158,7 @@ pub mod duelist_token {
         const DUEL_INVALID_CALLER: felt252      = 'DUELIST: Invalid caller';
         const DUEL_HAS_NO_WINNER: felt252       = 'DUELIST: Duel has no winner';
         const REWARD_TRANSFERRED: felt252       = 'DUELIST: Reward transferred';
+        const DUELIST_IS_DEAD: felt252          = 'DUELIST: Duelist is dead!';
     }
 
     //*******************************
@@ -225,7 +226,7 @@ pub mod duelist_token {
 
             // transfer mint fee
             let payment: Payment = self.get_payment(recipient);
-            if (payment.amount > 0) { // avoid bank contract during tests
+            if (payment.amount != 0) { // avoid bank contract during tests
                 world.bank_dispatcher().charge(recipient, payment);
             }
 
@@ -298,7 +299,7 @@ pub mod duelist_token {
         ) -> bool {
             let fame_dispatcher: IFameCoinDispatcher = self.world_default().fame_coin_dispatcher();
             let fame_balance: u256 = fame_dispatcher.balance_of_token(get_contract_address(), duelist_id);
-            (fame_balance > 0)
+            (fame_balance != 0)
         }
 
         fn calc_fame_reward(
@@ -327,10 +328,10 @@ pub mod duelist_token {
                 if (challenge.winner == 1) {(challenge.duelist_id_b, challenge.duelist_id_a)}
                 else {(challenge.duelist_id_a, challenge.duelist_id_b)};
             let amount = self.calc_fame_reward(from);
-            if (amount > 0) {
-                let fame_dispatcher: IFameCoinDispatcher = world.fame_coin_dispatcher();
-                fame_dispatcher.transfer_from_token(get_contract_address(), from, to, amount.into());
-            }
+            assert(amount != 0, Errors::DUELIST_IS_DEAD);
+            
+            let fame_dispatcher: IFameCoinDispatcher = world.fame_coin_dispatcher();
+            fame_dispatcher.transfer_from_token(get_contract_address(), from, to, amount.into());
             (amount)
         }
 
@@ -459,11 +460,11 @@ pub mod duelist_token {
             result.append("Fame");
             result.append(fame_balance.as_string());
             result.append("Alive");
-            result.append(if (fame_balance > 0) {"Alive"} else {"Dead"});
+            result.append(if (fame_balance != 0) {"Alive"} else {"Dead"});
             // Totals
             result.append("Total Duels");
             result.append(duelist.score.total_duels.as_string());
-            if (duelist.score.total_duels > 0) {
+            if (duelist.score.total_duels != 0) {
                 result.append("Total Wins");
                 result.append(duelist.score.total_wins.as_string());
 
