@@ -9,12 +9,12 @@ export function defineContractComponents(world: World) {
     Challenge: (() => {
       return defineComponent(
         world,
-        { duel_id: RecsType.BigInt, seed: RecsType.BigInt, table_id: RecsType.BigInt, premise: RecsType.Number, quote: RecsType.BigInt, address_a: RecsType.BigInt, address_b: RecsType.BigInt, duelist_id_a: RecsType.BigInt, duelist_id_b: RecsType.BigInt, state: RecsType.Number, winner: RecsType.Number, timestamp_start: RecsType.BigInt, timestamp_end: RecsType.BigInt },
+        { duel_id: RecsType.BigInt, table_id: RecsType.BigInt, premise: RecsType.Number, quote: RecsType.BigInt, address_a: RecsType.BigInt, address_b: RecsType.BigInt, duelist_id_a: RecsType.BigInt, duelist_id_b: RecsType.BigInt, state: RecsType.Number, winner: RecsType.Number, reward_amount: RecsType.BigInt, timestamp_start: RecsType.BigInt, timestamp_end: RecsType.BigInt },
         {
           metadata: {
             namespace: "pistols",
             name: "Challenge",
-            types: ["u128","u128","felt252","enum","felt252","contractaddress","contractaddress","u128","u128","enum","u8","u64","u64"],
+            types: ["u128","felt252","enum","felt252","contractaddress","contractaddress","u128","u128","enum","u8","u128","u64","u64"],
             customTypes: ["Premise","ChallengeState"],
           },
         }
@@ -37,12 +37,12 @@ export function defineContractComponents(world: World) {
     Config: (() => {
       return defineComponent(
         world,
-        { key: RecsType.Number, treasury_address: RecsType.BigInt, lords_address: RecsType.BigInt, is_paused: RecsType.Boolean },
+        { key: RecsType.Number, treasury_address: RecsType.BigInt, lords_address: RecsType.BigInt, vrf_address: RecsType.BigInt, is_paused: RecsType.Boolean },
         {
           metadata: {
             namespace: "pistols",
             name: "Config",
-            types: ["u8","contractaddress","contractaddress","bool"],
+            types: ["u8","contractaddress","contractaddress","contractaddress","bool"],
             customTypes: [],
           },
         }
@@ -93,12 +93,12 @@ export function defineContractComponents(world: World) {
     Round: (() => {
       return defineComponent(
         world,
-        { duel_id: RecsType.BigInt, moves_a: { salt: RecsType.BigInt, hashed: RecsType.BigInt, card_1: RecsType.Number, card_2: RecsType.Number, card_3: RecsType.Number, card_4: RecsType.Number }, moves_b: { salt: RecsType.BigInt, hashed: RecsType.BigInt, card_1: RecsType.Number, card_2: RecsType.Number, card_3: RecsType.Number, card_4: RecsType.Number }, state_a: { chances: RecsType.Number, damage: RecsType.Number, health: RecsType.Number, dice_fire: RecsType.Number, honour: RecsType.Number }, state_b: { chances: RecsType.Number, damage: RecsType.Number, health: RecsType.Number, dice_fire: RecsType.Number, honour: RecsType.Number }, state: RecsType.Number, final_blow: RecsType.BigInt },
+        { duel_id: RecsType.BigInt, moves_a: { seed: RecsType.BigInt, salt: RecsType.BigInt, hashed: RecsType.BigInt, card_1: RecsType.Number, card_2: RecsType.Number, card_3: RecsType.Number, card_4: RecsType.Number }, moves_b: { seed: RecsType.BigInt, salt: RecsType.BigInt, hashed: RecsType.BigInt, card_1: RecsType.Number, card_2: RecsType.Number, card_3: RecsType.Number, card_4: RecsType.Number }, state_a: { chances: RecsType.Number, damage: RecsType.Number, health: RecsType.Number, dice_fire: RecsType.Number, honour: RecsType.Number }, state_b: { chances: RecsType.Number, damage: RecsType.Number, health: RecsType.Number, dice_fire: RecsType.Number, honour: RecsType.Number }, state: RecsType.Number, final_blow: RecsType.BigInt },
         {
           metadata: {
             namespace: "pistols",
             name: "Round",
-            types: ["u128","felt252","u128","u8","u8","u8","u8","felt252","u128","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","enum","felt252"],
+            types: ["u128","felt252","felt252","u128","u8","u8","u8","u8","felt252","felt252","u128","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","enum","felt252"],
             customTypes: ["Moves","Moves","DuelistState","DuelistState","RoundState"],
           },
         }
