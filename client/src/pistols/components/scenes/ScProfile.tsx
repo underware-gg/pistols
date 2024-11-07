@@ -138,11 +138,10 @@ function DuelistsList() {
         cardRefs.current[Number(cardDuelistId)].playHangingCard()
         if (cardDuelistId == duelistId) {
           cardRefs.current[Number(cardDuelistId)].toggleHighlight(true)
-          cardRefs.current[Number(cardDuelistId)].toggleIdle(true)
         }
       }
     })
-  }, [cardRefs, paginatedDuelistIds, duelistId])
+  }, [cardRefs, paginatedDuelistIds, duelistId, duelistIds])
 
   return (
     <div className='FillWidth'>
@@ -176,8 +175,10 @@ function DuelistsList() {
                   width={DUELIST_CARD_WIDTH}
                   height={DUELIST_CARD_HEIGHT}
                   onClick={() => {
-                    unSelectCard()
-                    dispatchDuelistId(duelistId == cardDuelistId ? undefined : cardDuelistId)
+                    if (duelistId !== cardDuelistId) {
+                      unSelectCard()
+                      dispatchDuelistId(cardDuelistId)
+                    }
                   }}
                 />
               </div>

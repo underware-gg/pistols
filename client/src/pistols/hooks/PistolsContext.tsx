@@ -327,7 +327,7 @@ export const usePistolsScene = () => {
     atTavern: (currentScene == SceneName.Tavern),
     atProfile: (currentScene == SceneName.Profile),
     atDuelists: (currentScene == SceneName.Duelists),
-    adDuels: (currentScene == SceneName.Duels),
+    atDuels: (currentScene == SceneName.Duels),
     atGraveyard: (currentScene == SceneName.Graveyard),
     atDuel: (currentScene == SceneName.Duel),
     fromGate: (lastScene == SceneName.Gate),

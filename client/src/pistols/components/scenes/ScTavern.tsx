@@ -54,7 +54,7 @@ export default function ScTavern() {
   }, [itemClicked, timestamp])
 
   return (
-    <QueryProvider>
+    <div>
 
       <TavernMenu />
 
@@ -67,6 +67,6 @@ export default function ScTavern() {
 
       <DojoSetupErrorDetector />
       {/* <ConnectionDetector /> */}
-    </QueryProvider>
+    </div>
   )
 }

@@ -45,7 +45,7 @@ export function Header() {
   }
 
   return (
-    <>
+    <div className='NoMouse NoDrag NoSelection' style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10 }}>
       {!atGate && !atDoor &&
         <>
           <div className='UIHeader NoMouse NoDrag NoSelection' style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -85,7 +85,7 @@ export function Header() {
         <BannerButton button={<BackButton />} visible={atDoor} short={true} />
         <BannerButton button={<MusicToggle size='big'/>} right={true} visible={atGate || atDoor} short={true} />
       </>
-    </>
+    </div>
   )
 }
 

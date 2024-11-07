@@ -34,7 +34,7 @@ export default function MainPage() {
   const { sceneTitle } = usePistolsScene()
   const { isInitialized } = useDojoStatus()
 
-  const overlay = useMemo(() => <div id="game-black-overlay" className='NoMouse NoDrag' style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'black', opacity: 1, pointerEvents: 'none' }}></div>, [])
+  const overlay = useMemo(() => <div id="game-black-overlay" className='NoMouse NoDrag' style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'black', opacity: 1, pointerEvents: 'none', zIndex: 5 }}></div>, [])
 
   // console.log(`AT scene [${currentScene}]`)
 
@@ -42,11 +42,11 @@ export default function MainPage() {
     <AppPistols headerData={{ title: sceneTitle }} backgroundImage={null}>
       <Background className={null}>
         <GameContainer isVisible={true} />
-        <QueryProvider>
+        { isInitialized &&  <QueryProvider>
           <MainUI />
           {overlay}
-          { isInitialized && <Header /> }
-        </QueryProvider>
+          <Header />
+        </QueryProvider> }
         <MouseToolTip/>
         {/* ADD NOTRIFICATIONS - how to make them into a hook? */}
       </Background>
@@ -60,7 +60,7 @@ function MainUI({
   useRouterListener()
   const { gameImpl } = useThreeJsContext()
   const { selectedDuelId } = usePistolsContext()
-  const { atGate, atProfile, atTavern, atDuel, atDoor, adDuels, atDuelists, atGraveyard } = usePistolsScene()
+  const { atGate, atProfile, atTavern, atDuel, atDoor, atDuels, atDuelists, atGraveyard } = usePistolsScene()
   const { isInitialized } = useDojoStatus()
 
   const [currentScene, setCurrentScene] = useState<JSX.Element | null>(null);
@@ -71,7 +71,7 @@ function MainUI({
       else if (atDoor) setCurrentScene(<Door />);
       else if (atDuel && selectedDuelId) setCurrentScene(<Duel duelId={selectedDuelId} />);
       else if (atProfile) setCurrentScene(<ScProfile />);
-      else if (atDuel) setCurrentScene(<ScDuels />);
+      else if (atDuels) setCurrentScene(<ScDuels />);
       else if (atDuelists) setCurrentScene(<ScDuelists />);
       else if (atGraveyard) setCurrentScene(<ScGraveyard />);
       else setCurrentScene(<ScTavern />);

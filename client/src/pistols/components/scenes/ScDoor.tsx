@@ -99,7 +99,7 @@ export default function ScDoor() {
           setIsLoading(false)
           setIsFirstDivVisible(false)
         }
-      }, 0)
+      }, 800)
     }
 
     return () => {
@@ -114,7 +114,7 @@ export default function ScDoor() {
     if (inputIsValid) {
       setIsDuelistBeingCreated(true)
       await create_duelist(account, address, inputName, ProfilePicType.Duelist, _profilePic.toString())
-      dispatchSetScene(SceneName.Tavern)
+      // dispatchSetScene(SceneName.Tavern)
     }
   }
 
@@ -169,11 +169,11 @@ export default function ScDoor() {
               marginTop: '20px'
             }}>
               <IconClick name='angle double left' size={'huge'} important
-                onClick={() => setSelectedProfilePic(selectedProfilePic > 1 ? selectedProfilePic - 1 : PROFILE_PIC_COUNT)}
+                onClick={() => setSelectedProfilePic(selectedProfilePic === 0 ? PROFILE_PIC_COUNT - 1 : selectedProfilePic - 1)}
               />
               <ProfilePic profilePic={_profilePic} className='AutoHeight NoBorder DuelistImageSelect' />
               <IconClick name='angle double right' size={'huge'} important
-                onClick={() => setSelectedProfilePic(selectedProfilePic < PROFILE_PIC_COUNT ? selectedProfilePic + 1 : 1)}
+                onClick={() => setSelectedProfilePic((selectedProfilePic + 1 % PROFILE_PIC_COUNT))}
               />
             </div>
           </div>

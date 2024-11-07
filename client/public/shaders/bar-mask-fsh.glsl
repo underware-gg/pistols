@@ -13,6 +13,7 @@ uniform vec3 uPickedColor;
 uniform vec3 uExcludedColor;
 uniform bool uClickable;
 uniform int uSamples; //from 2 to 35
+uniform float uShiftAmount; // from 0.0 to 1.0
 
 const int LOD = 1;
 const int sLOD = 1 << LOD;
@@ -49,13 +50,16 @@ vec4 blur(sampler2D sp, vec2 U, vec2 scale) {
 }
 
 void main() {
+  vec2 shiftedUv = vUv + vec2(uShiftAmount, 0.0);
+  shiftedUv.x = mod(shiftedUv.x, 1.0);
+  
   float alpha = 0.0;
-  vec4 maskValue = texture2D(uMask, vUv);
+  vec4 maskValue = texture2D(uMask, shiftedUv);
   bool selected = (maskValue.a > 0.0 && maskValue.rgb == uPickedColor);
   bool excluded = (maskValue.a > 0.0 && maskValue.rgb == uExcludedColor);
   vec4 bgColor;
 
-  float glowAlpha = (sin(clamp(mod((uTime * 2.0 + vUv.y * 2.0), 8.0), 0.0, 1.0) * PI * 2.0));
+  float glowAlpha = (sin(clamp(mod((uTime * 2.0 + shiftedUv.y * 2.0), 8.0), 0.0, 1.0) * PI * 2.0));
   glowAlpha *= (uHighlightOpacity * 0.5) * maskValue.a;
 
   if (selected && uClickable) {
@@ -63,9 +67,9 @@ void main() {
   }
 
   vec2 ps = 1.0 / uResolution;
-  vec4 blurTex = blur(uTexture, vUv, ps);
+  vec4 blurTex = blur(uTexture, shiftedUv, ps);
 
-  vec4 texColor = texture2D(uTexture, vUv);
+  vec4 texColor = texture2D(uTexture, shiftedUv);
   texColor.rgb = linearToSRGB(texColor.rgb);
 
   if (uClickable) {

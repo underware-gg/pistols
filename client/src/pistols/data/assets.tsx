@@ -629,7 +629,7 @@ const SPRITESHEETS: Spritesheets = {
     },
     [AnimName.SHOT_DEAD_FRONT]: {
       path: '/textures/animations/Female Duelist/Shot_Dead_Front',
-      frameCount: 14,
+      frameCount: 16,
       frameRate: 8,
     },
     [AnimName.STRIKE_LIGHT]: {
@@ -711,7 +711,7 @@ const SPRITESHEETS: Spritesheets = {
     },
     [AnimName.SHOT_INJURED_FRONT]: {
       path: '/textures/animations/Male Duelist/Shot_Injured_Front',
-      frameCount: 11,
+      frameCount: 16,
       frameRate: 8,
     },
     [AnimName.SHOT_DEAD_BACK]: {
@@ -721,7 +721,7 @@ const SPRITESHEETS: Spritesheets = {
     },
     [AnimName.SHOT_DEAD_FRONT]: {
       path: '/textures/animations/Male Duelist/Shot_Dead_Front',
-      frameCount: 11,
+      frameCount: 16,
       frameRate: 8,
     },
     [AnimName.STRIKE_LIGHT]: {

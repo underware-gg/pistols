@@ -86,6 +86,7 @@ export class InteractibleScene extends THREE.Scene {
     this.maskShader.setUniformValue('uExcludedColor', new THREE.Color(0, 0, 0))
     this.maskShader.setUniformValue('uClickable', this.isClickable)
     this.maskShader.setUniformValue('uSamples', 4)
+    this.maskShader.setUniformValue('uShiftAmount', 0.0)
     this.maskShader.setUniformValue('uHighlightColor', new THREE.Color('#ffcf40'))
     this.maskShader.setUniformValue('uHighlightOpacity', 0.4)
     this.maskShader.setUniformValue('uMask', _textures[this.sceneData.mask])
@@ -140,7 +141,7 @@ export class InteractibleScene extends THREE.Scene {
 
   pickColor(r: number, g: number, b: number) {
     if (!this.sceneData.items) return
-    if (Date.now() - this.lastClickTimeStamp < SCENE_CHANGE_ANIMATION_DURATION * 1.2) return
+    if (Date.now() - this.lastClickTimeStamp < SCENE_CHANGE_ANIMATION_DURATION * 1.5) return
     const newColor = new THREE.Color(r, g, b)
     if (!this.pickedColor.equals(newColor)) {
       this.pickedColor.copy(newColor)
@@ -226,6 +227,26 @@ export class InteractibleScene extends THREE.Scene {
     new TWEEN.Tween(this.maskOverlay.scale)
       .to({ x: 1.5, y: 1.5, z: 1.5 }, 400)
       .easing(TWEEN.Easing.Quartic.Out)
+      .start();
+  }
+
+  public shiftImage(isLeft: boolean) {
+    this.setClickable(false);
+    
+    const shiftAmount = { value: 0 };
+    new TWEEN.Tween(shiftAmount)
+      .to({ value: isLeft ? -1 : 1 }, 1200)
+      .easing(TWEEN.Easing.Quadratic.InOut)
+      .onStart(() => {
+        this.setClickable(false);
+      })
+      .onUpdate((obj) => {
+        this.maskShader.setUniformValue('uShiftAmount', obj.value);
+      })
+      .onComplete(() => {
+        this.maskShader.setUniformValue('uShiftAmount', 0.0);
+        this.setClickable(true);
+      })
       .start();
   }
 
