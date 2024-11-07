@@ -2,16 +2,38 @@ import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useComponentValue } from '@dojoengine/react'
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
+import { PistolsQuery, useSdkGetConfig } from '@/lib/dojo/hooks/useSdkQuery'
 import { bigintToEntity } from '@/lib/utils/types'
+import { CONFIG } from '@/games/pistols/generated/constants'
+
+
+export const useConfigQuery = () => {
+  const query = useMemo<PistolsQuery>(() => ({
+    pistols: {
+      Config: {
+        $: {
+          where: {
+            key: {
+              $eq: CONFIG.CONFIG_KEY,
+            },
+          },
+        },
+      },
+    },
+  }), [])
+  const { config } = useSdkGetConfig({ query })
+  return config
+}
 
 export const useConfig = () => {
-  const { Config } = useDojoComponents()
-  const entityId = useMemo(() => bigintToEntity(1n), [])
-  const config = useComponentValue(Config, entityId)
+  const config = useConfigQuery()
+  const isPaused = useMemo(() => config?.is_paused ?? false, [config])
+  const treasuryAddress = useMemo(() => config ? BigInt(config.treasury_address) : null, [config])
+  const lordsAddress = useMemo(() => config ? BigInt(config.lords_address) : null, [config])
   return {
-    paused: config.is_paused ?? null,
-    treasuryAddress: config.treasury_address ?? null,
-    lordsAddress: config.lords_address ?? null,
+    isPaused,
+    treasuryAddress,
+    lordsAddress,
   }
 }
 

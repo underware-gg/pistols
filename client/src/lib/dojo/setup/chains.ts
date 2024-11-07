@@ -66,8 +66,7 @@ export type DojoChainConfig = {
   masterPrivateKey: string
   accountClassHash: string
   etherAddress: string
-  lordsContractAddress: string
-  lordsFaucetUrl: string
+  lordsFaucet: boolean | string
   predeployedAccounts: PredeployedAccount[]
   connectorIds: string[]
   // starknet Chain
@@ -89,8 +88,7 @@ export const envChainConfig: DojoChainConfig = {
   masterPrivateKey: process.env.NEXT_PUBLIC_MASTER_PRIVATE_KEY || undefined,
   accountClassHash: undefined,
   etherAddress: undefined,
-  lordsContractAddress: undefined,
-  lordsFaucetUrl: undefined,
+  lordsFaucet: undefined,
   predeployedAccounts: undefined,
   connectorIds: undefined,
 }
@@ -112,8 +110,7 @@ const localKatanaConfig: DojoChainConfig = {
   masterPrivateKey: '0xc5b2fcab997346f3ea1c00b002ecf6f382c5f9c9659a3894eb783c5320f912',
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
-  lordsContractAddress: undefined, // lords_mock
-  lordsFaucetUrl: undefined,
+  lordsFaucet: true,
   predeployedAccounts: [{
     name: 'Predeployed',
     address: '0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7',
@@ -140,8 +137,7 @@ const pistolsSlotConfig: DojoChainConfig = {
   masterPrivateKey: undefined,
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
-  lordsContractAddress: undefined, // lords_mock
-  lordsFaucetUrl: undefined,
+  lordsFaucet: true,
   predeployedAccounts: [],
   connectorIds: [
     supportedConnetorIds.CONTROLLER,
@@ -162,8 +158,7 @@ const pistolsStagingConfig: DojoChainConfig = {
   masterPrivateKey: undefined,
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
-  lordsContractAddress: undefined, // lords_mock
-  lordsFaucetUrl: undefined,
+  lordsFaucet: true,
   predeployedAccounts: [],
   connectorIds: [
     supportedConnetorIds.CONTROLLER,
@@ -192,8 +187,8 @@ const snSepoliaConfig: DojoChainConfig = {
   masterPrivateKey: undefined,
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: sepolia.nativeCurrency.address,
-  lordsContractAddress: '0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210',
-  lordsFaucetUrl: undefined, //'https://sepolia.voyager.online/contract/0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210#writeContract',
+  lordsFaucet: true,
+  // lordsFaucet: 'https://sepolia.voyager.online/contract/0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210#writeContract',
   predeployedAccounts: [],
   connectorIds: [
     supportedConnetorIds.CONTROLLER,
@@ -214,8 +209,7 @@ const snMainnetConfig: DojoChainConfig = {
   masterPrivateKey: undefined,
   accountClassHash: undefined,
   etherAddress: mainnet.nativeCurrency.address,
-  lordsContractAddress: '0x0124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49',
-  lordsFaucetUrl: 'https://app.avnu.fi/en?amount=100&tokenFrom=0x124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49&tokenTo=0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
+  lordsFaucet: false,
   predeployedAccounts: [],
   connectorIds: [
     supportedConnetorIds.CONTROLLER,

@@ -40,7 +40,7 @@ export default function DuelistEditModal({
   // Detect new mints
   const { dispatchSetScene } = usePistolsScene()
   const [duelistBalanceBeforeMint, setDuelistBalanceBeforeMint] = useState<number>(null)
-  const { mintLords } = useLordsFaucet()
+  const { mintLords, hasFaucet } = useLordsFaucet()
   useEffect(() => {
     // minted new! go to Game...
     if (opener.isOpen &&
@@ -51,7 +51,7 @@ export default function DuelistEditModal({
       console.log(`NEW DUELIST BALANCE:`, duelistBalance)
       dispatchDuelistId(duelistBalance)
       dispatchSetScene(SceneName.Tavern)
-      mintLords(account)
+      if (hasFaucet) mintLords(account)
       opener.close()
     }
   }, [mintNew, duelistBalance])

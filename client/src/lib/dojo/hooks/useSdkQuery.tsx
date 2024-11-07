@@ -102,12 +102,24 @@ export const useSdkGetEntity = (props: UseSdkEntitiesProps): UseSdkEntityResult 
   }
 }
 
+
+//--------------------------------
+// Typed entities
+//
+
+export const useSdkGetConfig = (props: UseSdkEntitiesProps) => {
+  const { entity, isLoading, refetch } = useSdkGetEntity(props)
+  return {
+    config: entity?.Config as models.Config,
+    isLoading, refetch,
+  }
+}
+
 export const useSdkGetDuelist = (props: UseSdkEntitiesProps) => {
   const { entity, isLoading, refetch } = useSdkGetEntity(props)
   return {
     duelist: entity?.Duelist as models.Duelist,
-    isLoading,
-    refetch,
+    isLoading, refetch,
   }
 }
 

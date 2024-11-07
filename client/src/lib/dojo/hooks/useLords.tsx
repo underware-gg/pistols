@@ -1,20 +1,19 @@
-import { useMemo } from 'react'
-import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
+import { BigNumberish } from 'starknet'
 import { useDeployedDojoSystem } from '@/lib/dojo/hooks/useDojoSystem'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { useERC20Balance } from '@/lib/utils/hooks/useERC20'
-import { BigNumberish } from 'starknet'
+import { useConfig } from '@/pistols/hooks/useConfig'
+import { bigintEquals } from '@/lib/utils/types'
 
 
 export const useLordsContract = () => {
-  const { selectedChainConfig } = useStarknetContext()
-  const lordsAddress = useMemo(() => (selectedChainConfig.lordsContractAddress), [selectedChainConfig])
+  const { lordsAddress } = useConfig()
 
   const { contractAddress: mockAddress, isDeployed, abi } = useDeployedDojoSystem('lords_mock')
-  const isMock = !lordsAddress && isDeployed
+  const isMock = bigintEquals(lordsAddress, mockAddress) && isDeployed
 
   return {
-    lordsContractAddress: (isMock ? mockAddress : lordsAddress),
+    lordsContractAddress: lordsAddress,
     isMock,
     abi,
   }
