@@ -289,6 +289,7 @@ pub mod duel_token {
                 // progress
                 state: ChallengeState::Awaiting,
                 winner: 0,
+                reward_amount: 0,
                 // times
                 timestamp_start,   // chalenge issued
                 timestamp_end,     // expire
@@ -418,10 +419,11 @@ pub mod duel_token {
         ) {
             let mut store: Store = StoreTrait::new(self.world_default());
             let challenge: ChallengeValue = store.get_challenge_value(duel_id);
-            let owner: ContractAddress = self.owner_of(duel_id.into());
-            if (challenge.winner == 1 && owner != challenge.address_a) {
+            // let owner: ContractAddress = self.owner_of(duel_id.into());
+            let owner: ContractAddress = get_caller_address(); // pistols-game is the owner
+            if (challenge.winner == 1) {
                 self.transfer_from(owner, challenge.address_a, duel_id.into());
-            } else if (challenge.winner == 2 && owner != challenge.address_b) {
+            } else if (challenge.winner == 2) {
                 self.transfer_from(owner, challenge.address_b, duel_id.into());
             }
         }

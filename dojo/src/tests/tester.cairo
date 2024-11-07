@@ -22,7 +22,7 @@ mod tester {
             lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
         },
         components::{
-            token_bound::{m_TokenBoundAddress, TokenBoundAddress},
+            token_bound::{m_TokenBoundAddress, TokenBoundAddress, TokenBoundAddressTrait},
         },
     };
     use pistols::models::{
@@ -135,6 +135,7 @@ mod tester {
         game: IGameDispatcher,
         admin: IAdminDispatcher,
         lords: ILordsMockDispatcher,
+        fame: IFameCoinDispatcher,
         duels: IDuelTokenDispatcher,
         duelists: IDuelistTokenDispatcher,
         rng: IRngDispatcher,
@@ -156,7 +157,7 @@ mod tester {
         deploy_lords = deploy_lords || deploy_game || deploy_duelist || approve;
         deploy_duel = deploy_duel || deploy_game;
         deploy_bank = deploy_bank || deploy_lords || deploy_duelist;
-        deploy_fame = deploy_fame || deploy_duelist;
+        deploy_fame = deploy_fame || deploy_game || deploy_duelist;
         
 // '---- 0'.print();
         let mut resources: Array<TestResource> = array![
@@ -335,6 +336,7 @@ mod tester {
             game: world.game_dispatcher(),
             admin: world.admin_dispatcher(),
             lords: world.lords_mock_dispatcher(),
+            fame: world.fame_coin_dispatcher(),
             duels: world.duel_token_dispatcher(),
             duelists: world.duelist_token_dispatcher(),
             rng: IRngDispatcher{ contract_address: world.rng_address() },
@@ -553,6 +555,11 @@ mod tester {
         (challenge, round)
     }
 
+    #[inline(always)]
+    fn fame_balance_of_token(sys: @TestSystems, duel_id: u128) -> u128 {
+        ((*sys.fame).balance_of_token((*sys.duelists).contract_address, duel_id).low)
+    }
+
     //
     // setters
     //
@@ -577,6 +584,14 @@ mod tester {
     //
     // Asserts
     //
+
+    fn assert_balance_token(sys: @TestSystems, duelist_id: u128, balance_before: u128, subtract: u128, add: u128, prefix: felt252) -> u128 {
+        let address: ContractAddress = TokenBoundAddressTrait::address((*sys.duelists).contract_address, duelist_id);
+        (assert_balance(
+            ILordsMockDispatcher{ contract_address: (*sys.fame).contract_address },
+            address, balance_before, subtract, add, prefix,
+        ))
+    }
 
     fn assert_balance(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, subtract: u128, add: u128, prefix: felt252) -> u128 {
         let balance: u128 = lords.balance_of(address).low;

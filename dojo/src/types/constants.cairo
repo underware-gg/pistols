@@ -30,6 +30,7 @@ mod CHANCES {
 }
 
 mod FAME {
-    const MINT_GRANT_AMOUNT: u256 = 1_000 * super::CONST::ETH_TO_WEI;
     const FAME_PER_LORDS: u256 = 10;
+    const MIN_MINT_GRANT_AMOUNT: u256 = 1_000 * super::CONST::ETH_TO_WEI;
+    const MIN_REWARD_AMOUNT: u256 = 100 * super::CONST::ETH_TO_WEI;
 }

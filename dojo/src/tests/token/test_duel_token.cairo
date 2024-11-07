@@ -287,6 +287,7 @@ fn test_token_uri() {
         // progress
         state: ChallengeState::Resolved,
         winner: 1,
+        reward_amount: 0,
         // times
         timestamp_start: 10000,
         timestamp_end:   20000,

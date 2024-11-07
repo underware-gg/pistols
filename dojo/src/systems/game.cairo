@@ -213,9 +213,12 @@ pub mod game {
             challenge.timestamp_end = get_block_timestamp();
             self.finish_challenge(ref store, challenge);
 
-            // send duel token to winner
             if (challenge.winner != 0) {
+                // send duel token to winner
                 world.duel_token_dispatcher().transfer_to_winner(duel_id);
+                // transfer reward
+                challenge.reward_amount = world.duelist_token_dispatcher().transfer_fame_reward(duel_id);
+                store.set_challenge(@challenge);
             }
 
             // undo pact
