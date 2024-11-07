@@ -1,18 +1,25 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BigNumberish } from 'starknet'
 import { QueryType } from '@dojoengine/sdk'
-import { Duelist, PistolsSchemaType } from '@/games/pistols/generated/typescript/models.gen'
+import * as models from '@/games/pistols/generated/typescript/models.gen'
 import { useDojoSetup } from '@/lib/dojo/DojoContext'
 
-export type PistolsQuery = QueryType<PistolsSchemaType>
-
+export type PistolsQuery = QueryType<models.PistolsSchemaType>
 
 export type EntityResult = {
   entityId: BigNumberish,
-} & Partial<PistolsSchemaType['pistols']>
+} & Partial<models.PistolsSchemaType['pistols']>
 
-export type UseSdkEntitiesResult = EntityResult[] | null
-export type UseSdkEntityResult = EntityResult | null
+export type UseSdkEntitiesResult = {
+  entities: EntityResult[] | null
+  isLoading: boolean
+  refetch: () => void
+}
+export type UseSdkEntityResult = {
+  entity: EntityResult | null
+  isLoading: boolean
+  refetch: () => void
+}
 
 export type UseSdkEntitiesProps = {
   query: PistolsQuery
@@ -22,7 +29,7 @@ export type UseSdkEntitiesProps = {
   enabled?: boolean
 }
 
-export const useSdkEntities = <T,>({
+export const useSdkGetEntities = <T,>({
   query,
   limit = 100,
   offset = 0,
@@ -31,58 +38,76 @@ export const useSdkEntities = <T,>({
 }: UseSdkEntitiesProps): UseSdkEntitiesResult => {
   const { sdk } = useDojoSetup()
   const [entities, setEntities] = useState<EntityResult[] | null>()
+  const [isLoading, setIsLoading] = useState(false)
+
+  const fetchEntities = useCallback( async () => {
+    try {
+      setIsLoading(true)
+      await sdk.getEntities(
+        query,
+        (resp) => {
+          if (resp.error) {
+            setEntities(undefined);
+            console.error("useSdkGetEntities() error:", resp.error.message);
+            return;
+          }
+          if (resp.data) {
+            // console.log(`useSdkGetEntities() RESP:`, query, resp)
+            setEntities(resp.data.map((e: any) => ({
+              entityId: e.entityId,
+              ...e.models.pistols,
+            } as EntityResult)));
+          }
+        },
+        limit,
+        offset,
+        { logging }
+      );
+    } catch (error) {
+      console.error("useSdkGetEntities() exception:", error);
+    } finally {
+      setIsLoading(false)
+    }
+  }, [sdk, query, limit, offset, logging])
 
   useEffect(() => {
-    const _fetchEntities = async () => {
-      try {
-        await sdk.getEntities(
-          query,
-          (resp) => {
-            if (resp.error) {
-              setEntities(undefined);
-              console.error("useSdkEntities() error:", resp.error.message);
-              return;
-            }
-            if (resp.data) {
-              // console.log(`useSdkEntities() RESP:`, query, resp)
-              setEntities(resp.data.map((e: any) => ({
-                entityId: e.entityId,
-                ...e.models.pistols,
-              } as EntityResult)));
-            }
-          },
-          limit,
-          offset,
-          { logging }
-        );
-      } catch (error) {
-        console.error("useSdkEntities() exception:", error);
-      }
-    };
     if (enabled) {
-      _fetchEntities();
+      fetchEntities();
     } else {
+      setIsLoading(false)
       setEntities(null);
     }
-  }, [sdk, query, enabled]);
+  }, [fetchEntities, enabled]);
 
-  return entities
+  return {
+    entities,
+    isLoading,
+    refetch: fetchEntities,
+  }
 }
 
 //
 // Single Entity fetch
 // (use only when fetching with a keys)
-export const useSdkEntity = (props: UseSdkEntitiesProps): UseSdkEntityResult => {
-  const entities = useSdkEntities({
+export const useSdkGetEntity = (props: UseSdkEntitiesProps): UseSdkEntityResult => {
+  const { entities, isLoading, refetch } = useSdkGetEntities({
     ...props,
     limit: 1,
   })
   const entity = useMemo(() => (Array.isArray(entities) ? entities[0] : entities), [entities])
-  return entity
+  return {
+    entity,
+    isLoading,
+    refetch,
+  }
 }
 
-export const useSdkDuelist = (props: UseSdkEntitiesProps): Duelist | null => {
-  const duelist = useSdkEntity(props)?.['Duelist'] as Duelist
-  return duelist
+export const useSdkGetDuelist = (props: UseSdkEntitiesProps) => {
+  const { entity, isLoading, refetch } = useSdkGetEntity(props)
+  return {
+    duelist: entity?.Duelist as models.Duelist,
+    isLoading,
+    refetch,
+  }
 }
 

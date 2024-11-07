@@ -6,9 +6,9 @@ import { useEntityKeys } from '@/lib/dojo/hooks/useEntityKeys'
 import { useScore } from '@/pistols/hooks/useScore'
 import { feltToString } from "@/lib/utils/starknet"
 import { bigintToEntity, isPositiveBigint } from '@/lib/utils/types'
-import { PistolsQuery, useSdkDuelist, useSdkEntity } from '@/lib/dojo/hooks/useSdkQuery'
-import { Duelist } from '@/games/pistols/generated/typescript/models.gen'
+import { PistolsQuery, useSdkGetDuelist } from '@/lib/dojo/hooks/useSdkQuery'
 import { CONST } from '@/games/pistols/generated/constants'
+import * as models from '@/games/pistols/generated/typescript/models.gen'
 
 
 //------------------
@@ -45,7 +45,7 @@ export const useDuelistQuery = (duelist_id: BigNumberish) => {
       },
     },
   }), [duelist_id])
-  const duelist = useSdkDuelist({ query, enabled })
+  const { duelist } = useSdkGetDuelist({ query, enabled })
   useEffect(() => console.log(`useDuelistQuery(${duelist_id})`, duelist), [duelist])
   return duelist
 }
