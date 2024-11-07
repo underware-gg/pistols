@@ -48,16 +48,14 @@ pub trait IDuelistToken<TState> {
     fn create_duelist(ref self: TState, recipient: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist;
     fn update_duelist(ref self: TState, duelist_id: u128, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist;
     fn delete_duelist(ref self: TState, duelist_id: u128);
+    fn is_alive(self: @TState, duelist_id: u128) -> bool;
     fn calc_fame_reward(self: @TState, duelist_id: u128) -> u128;
     fn transfer_fame_reward(ref self: TState, duel_id: u128) -> u128;
 }
 
 #[starknet::interface]
 pub trait IDuelistTokenPublic<TState> {
-    fn calc_mint_fee(
-        self: @TState,
-        recipient: ContractAddress,
-    ) -> u128;
+    fn calc_mint_fee(self: @TState, recipient: ContractAddress) -> u128;
     fn create_duelist(
         ref self: TState,
         recipient: ContractAddress,
@@ -72,18 +70,10 @@ pub trait IDuelistTokenPublic<TState> {
         profile_pic_type: ProfilePicType,
         profile_pic_uri: felt252,
     ) -> Duelist;
-    fn delete_duelist(
-        ref self: TState,
-        duelist_id: u128,
-    );
-    fn calc_fame_reward(
-        self: @TState,
-        duelist_id: u128,
-    ) -> u128;
-    fn transfer_fame_reward(
-        ref self: TState,
-        duel_id: u128,
-    ) -> u128;
+    fn delete_duelist(ref self: TState, duelist_id: u128);
+    fn is_alive(self: @TState, duelist_id: u128) -> bool;
+    fn calc_fame_reward(self: @TState, duelist_id: u128) -> u128;
+    fn transfer_fame_reward(ref self: TState, duel_id: u128) -> u128;
 }
 
 #[dojo::contract]
@@ -302,6 +292,15 @@ pub mod duelist_token {
             // burn FAME too
         }
 
+        fn is_alive(
+            self: @ContractState,
+            duelist_id: u128,
+        ) -> bool {
+            let fame_dispatcher: IFameCoinDispatcher = self.world_default().fame_coin_dispatcher();
+            let fame_balance: u256 = fame_dispatcher.balance_of_token(get_contract_address(), duelist_id);
+            (fame_balance > 0)
+        }
+
         fn calc_fame_reward(
             self: @ContractState,
             duelist_id: u128,
@@ -459,6 +458,8 @@ pub mod duelist_token {
             let fame_balance: u256 = fame_dispatcher.balance_of_token(get_contract_address(), token_id.low) / CONST::ETH_TO_WEI;
             result.append("Fame");
             result.append(fame_balance.as_string());
+            result.append("Alive");
+            result.append(if (fame_balance > 0) {"Alive"} else {"Dead"});
             // Totals
             result.append("Total Duels");
             result.append(duelist.score.total_duels.as_string());

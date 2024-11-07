@@ -177,6 +177,7 @@ pub mod duel_token {
         const INVALID_CHALLENGE: felt252        = 'DUEL: Invalid challenge';
         const NOT_YOUR_CHALLENGE: felt252       = 'DUEL: Not your challenge';
         const NOT_YOUR_DUELIST: felt252         = 'DUEL: Not your duelist';
+        const DUELIST_IS_DEAD: felt252          = 'DUEL: Duelist is dead!';
         const CHALLENGER_NOT_ADMITTED: felt252  = 'DUEL: Challenger not allowed';
         const CHALLENGED_NOT_ADMITTED: felt252  = 'DUEL: Challenged not allowed';
         const CHALLENGE_NOT_AWAITING: felt252   = 'DUEL: Challenge not Awaiting';
@@ -248,6 +249,7 @@ pub mod duel_token {
             let duelist_id_a: u128 = duelist_id;
             let duelist_dispatcher: IDuelistTokenDispatcher = world.duelist_token_dispatcher();
             assert(duelist_dispatcher.is_owner_of(address_a, duelist_id_a) == true, Errors::NOT_YOUR_DUELIST);
+            assert(duelist_dispatcher.is_alive(duelist_id_a) == true, Errors::DUELIST_IS_DEAD);
 
             // validate table
             let mut store: Store = StoreTrait::new(world);
@@ -351,6 +353,7 @@ pub mod duel_token {
 // duelist_id_b.print();
 // duelist_dispatcher.owner_of(duelist_id_b).print();
                 assert(duelist_dispatcher.is_owner_of(address_b, duelist_id_b) == true, Errors::NOT_YOUR_DUELIST);
+                assert(duelist_dispatcher.is_alive(duelist_id_b) == true, Errors::DUELIST_IS_DEAD);
 
                 // validate challenged identity
                 // either wallet ot duelist was challenged, never both
