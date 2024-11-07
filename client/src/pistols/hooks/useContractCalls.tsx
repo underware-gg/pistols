@@ -25,13 +25,13 @@ export const useCanJoin = () => {
 
 export const useCalcFeeDuelist = () => {
   const { address } = useAccount()
-  const { calc_fee_duelist } = useDojoSystemCalls()
+  const { calc_mint_fee_duelist } = useDojoSystemCalls()
   const options = useMemo(() => ({
-    call: calc_fee_duelist,
+    call: calc_mint_fee_duelist,
     args: [address],
     enabled: isPositiveBigint(address),
     defaultValue: null,
-  }), [calc_fee_duelist, address])
+  }), [calc_mint_fee_duelist, address])
   const { value, isPending } = useContractCall(options)
   return {
     fee: value,
@@ -40,13 +40,13 @@ export const useCalcFeeDuelist = () => {
 }
 
 export const useCalcFeeDuel = (table_id: string) => {
-  const { calc_fee_duel } = useDojoSystemCalls()
+  const { calc_mint_fee_duel } = useDojoSystemCalls()
   const options = useMemo(() => ({
-    call: calc_fee_duel,
+    call: calc_mint_fee_duel,
     args: [table_id],
     enabled: Boolean(table_id),
     defaultValue: null,
-  }), [calc_fee_duel, table_id])
+  }), [calc_mint_fee_duel, table_id])
   const { value, isPending } = useContractCall(options)
   return {
     fee: value,

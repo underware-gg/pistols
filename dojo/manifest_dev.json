@@ -1748,8 +1748,8 @@
       "systems": []
     },
     {
-      "address": "0x475ae9c7731546768d80cbfdaa4c97dcf0a70ac069b509bb9dd0c5c251b618f",
-      "class_hash": "0x4d44363d507fce6304ea617ea8c374732799e07db059ae37ca7e11e264ded36",
+      "address": "0xecaac72e4d7a58973a0c85db50f8d1b0e836bffb34ec98c30b0fb5fb48daf4",
+      "class_hash": "0x445f941aab0e44085d60c2cd65b703a29b8aa428aca12f1580017a74ffd996c",
       "abi": [
         {
           "type": "impl",
@@ -2004,7 +2004,7 @@
             },
             {
               "type": "function",
-              "name": "calc_fee",
+              "name": "calc_mint_fee",
               "inputs": [
                 {
                   "name": "table_id",
@@ -2862,8 +2862,8 @@
       "systems": []
     },
     {
-      "address": "0x63961d7878793e76aae097061e75084bc510f30e2cc1f5286628a91facc5479",
-      "class_hash": "0x23cd071627e1dfc0a12c013b65e9d8012172e7691e75210b49ea922b53d96c6",
+      "address": "0x19b901b07f7f8930ac5b5e6093bcddb7f93adc7a43ea7f004f1c35f23d71e68",
+      "class_hash": "0x717d16d2fd6268dc9ad9bb6de7ac65ad7fc27158f7f126283456ad83f6bc3c7",
       "abi": [
         {
           "type": "impl",
@@ -3013,12 +3013,26 @@
           ]
         },
         {
+          "type": "enum",
+          "name": "core::bool",
+          "variants": [
+            {
+              "name": "False",
+              "type": "()"
+            },
+            {
+              "name": "True",
+              "type": "()"
+            }
+          ]
+        },
+        {
           "type": "interface",
           "name": "pistols::systems::tokens::duelist_token::IDuelistTokenPublic",
           "items": [
             {
               "type": "function",
-              "name": "calc_fee",
+              "name": "calc_mint_fee",
               "inputs": [
                 {
                   "name": "recipient",
@@ -3098,6 +3112,54 @@
                 }
               ],
               "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "is_alive",
+              "inputs": [
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "calc_fame_reward",
+              "inputs": [
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "transfer_fame_reward",
+              "inputs": [
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
               "state_mutability": "external"
             }
           ]
@@ -3284,20 +3346,6 @@
             {
               "name": "snapshot",
               "type": "@core::array::Array::<core::felt252>"
-            }
-          ]
-        },
-        {
-          "type": "enum",
-          "name": "core::bool",
-          "variants": [
-            {
-              "name": "False",
-              "type": "()"
-            },
-            {
-              "name": "True",
-              "type": "()"
             }
           ]
         },
@@ -3890,8 +3938,8 @@
       "systems": []
     },
     {
-      "address": "0x3fc61fde4f7c509b4c5098c122c1861091cc4e3a2bd135c9c3a231b75955fe1",
-      "class_hash": "0x6a8676a93a857a63e193b5d7176c6bd03b999454b4673bdb6c544c1fca3e7cc",
+      "address": "0xd148888f1d19399f328088b4d4e92f0ef5fa05c27b9ecf658af39c56a1dd30",
+      "class_hash": "0x1fd29f9d88ef133d70fe22e503f732bfaaa9532f2f0c0f9e0bdfe5473c4375",
       "abi": [
         {
           "type": "impl",
@@ -4340,6 +4388,34 @@
                 }
               ],
               "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "transfer_from_token",
+              "inputs": [
+                {
+                  "name": "contract_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "sender_token_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "recipient_token_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "amount",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "external"
             }
           ]
         },
@@ -4489,8 +4565,8 @@
       "systems": []
     },
     {
-      "address": "0x4b4405d9d31f38df566baa24e3497e7c6d6cbd0fe546de4271d115580975922",
-      "class_hash": "0x3ad65eef859db9ad60b75d54ee4b3bd3be7aadaac1dbc152c49816a158b818",
+      "address": "0x9224f903cf48786aa4af8c95267991d5ec6b5801d36aae04afd28539205ba",
+      "class_hash": "0x2a6bb7653644c1b421e537e736e7400384c1de794139a6a28b793cc57fd60fc",
       "abi": [
         {
           "type": "impl",
@@ -6099,7 +6175,7 @@
   "models": [
     {
       "members": [],
-      "class_hash": "0x6e9d56cfffa180c9e47f56882ed1c3211ea2c878e062acdd6faaf873a6207f9",
+      "class_hash": "0x1bc0786d0de0d8c96836f14b32bc23bcbbd09971d4f379acbadd294b59a9d2d",
       "tag": "Challenge"
     },
     {

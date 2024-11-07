@@ -26,6 +26,7 @@ pub trait IFameCoin<TState> {
     fn address_of_token(self: @TState, contract_address: ContractAddress, token_id: u128) -> ContractAddress;
     fn token_of_address(self: @TState, address: ContractAddress) -> (ContractAddress, u128);
     fn balance_of_token(self: @TState, contract_address: ContractAddress, token_id: u128) -> u256;
+    fn transfer_from_token(ref self: TState, contract_address: ContractAddress, sender_token_id: u128, recipient_token_id: u128, amount: u256) -> bool;
     
     // IFameCoinPublic
     fn minted_duelist(ref self: TState, duelist_id: u128, amount_paid: u256);
@@ -137,7 +138,7 @@ pub mod fame_coin {
             self.erc20._approve(token_address, duelist_contract_address, Bounded::MAX);
 
             // mint FAME to token
-            let amount: u256 = MathU256::max(FAME::MINT_GRANT_AMOUNT, amount_paid * FAME::FAME_PER_LORDS);
+            let amount: u256 = MathU256::max(FAME::MIN_MINT_GRANT_AMOUNT, amount_paid * FAME::FAME_PER_LORDS);
             self.coin.mint(token_address, amount);
         }
 

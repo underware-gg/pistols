@@ -156,6 +156,10 @@ pub impl SystemsImpl of SystemsTrait {
     //
     // validators
     #[inline(always)]
+    fn is_game_contract(self: @WorldStorage, address: ContractAddress) -> bool {
+        (address == self.game_address())
+    }
+    #[inline(always)]
     fn is_duel_contract(self: @WorldStorage, address: ContractAddress) -> bool {
         (address == self.duel_token_address())
     }

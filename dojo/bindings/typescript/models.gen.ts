@@ -67,16 +67,6 @@ export interface ConfigValue {
 	is_paused: boolean;
 }
 
-// Type definition for `pistols::models::duelist::DuelistValue` struct
-export interface DuelistValue {
-	fieldOrder: string[];
-	name: number;
-	profile_pic_type: ProfilePicType;
-	profile_pic_uri: string;
-	timestamp: number;
-	score: Score;
-}
-
 // Type definition for `pistols::models::duelist::Score` struct
 export interface Score {
 	fieldOrder: string[];
@@ -86,6 +76,16 @@ export interface Score {
 	total_losses: number;
 	total_draws: number;
 	honour_history: number;
+}
+
+// Type definition for `pistols::models::duelist::DuelistValue` struct
+export interface DuelistValue {
+	fieldOrder: string[];
+	name: number;
+	profile_pic_type: ProfilePicType;
+	profile_pic_uri: string;
+	timestamp: number;
+	score: Score;
 }
 
 // Type definition for `pistols::models::duelist::Duelist` struct
@@ -99,6 +99,12 @@ export interface Duelist {
 	score: Score;
 }
 
+// Type definition for `pistols::models::duelist::PactValue` struct
+export interface PactValue {
+	fieldOrder: string[];
+	duel_id: number;
+}
+
 // Type definition for `pistols::models::duelist::Pact` struct
 export interface Pact {
 	fieldOrder: string[];
@@ -107,16 +113,9 @@ export interface Pact {
 	duel_id: number;
 }
 
-// Type definition for `pistols::models::duelist::PactValue` struct
-export interface PactValue {
+// Type definition for `pistols::models::payment::PaymentValue` struct
+export interface PaymentValue {
 	fieldOrder: string[];
-	duel_id: number;
-}
-
-// Type definition for `pistols::models::payment::Payment` struct
-export interface Payment {
-	fieldOrder: string[];
-	key: number;
 	amount: number;
 	client_percent: number;
 	ranking_percent: number;
@@ -125,9 +124,10 @@ export interface Payment {
 	treasury_percent: number;
 }
 
-// Type definition for `pistols::models::payment::PaymentValue` struct
-export interface PaymentValue {
+// Type definition for `pistols::models::payment::Payment` struct
+export interface Payment {
 	fieldOrder: string[];
+	key: number;
 	amount: number;
 	client_percent: number;
 	ranking_percent: number;
@@ -148,15 +148,14 @@ export interface Round {
 	final_blow: number;
 }
 
-// Type definition for `pistols::models::challenge::Moves` struct
-export interface Moves {
+// Type definition for `pistols::models::challenge::DuelistState` struct
+export interface DuelistState {
 	fieldOrder: string[];
-	salt: number;
-	hashed: number;
-	card_1: number;
-	card_2: number;
-	card_3: number;
-	card_4: number;
+	chances: number;
+	damage: number;
+	health: number;
+	dice_fire: number;
+	honour: number;
 }
 
 // Type definition for `pistols::models::challenge::RoundValue` struct
@@ -170,20 +169,15 @@ export interface RoundValue {
 	final_blow: number;
 }
 
-// Type definition for `pistols::models::challenge::DuelistState` struct
-export interface DuelistState {
+// Type definition for `pistols::models::challenge::Moves` struct
+export interface Moves {
 	fieldOrder: string[];
-	chances: number;
-	damage: number;
-	health: number;
-	dice_fire: number;
-	honour: number;
-}
-
-// Type definition for `pistols::models::duelist::ScoreboardValue` struct
-export interface ScoreboardValue {
-	fieldOrder: string[];
-	score: Score;
+	salt: number;
+	hashed: number;
+	card_1: number;
+	card_2: number;
+	card_3: number;
+	card_4: number;
 }
 
 // Type definition for `pistols::models::duelist::Scoreboard` struct
@@ -205,11 +199,10 @@ export interface Score {
 	honour_history: number;
 }
 
-// Type definition for `pistols::models::table::TableAdmittanceValue` struct
-export interface TableAdmittanceValue {
+// Type definition for `pistols::models::duelist::ScoreboardValue` struct
+export interface ScoreboardValue {
 	fieldOrder: string[];
-	accounts: Array<string>;
-	duelists: Array<number>;
+	score: Score;
 }
 
 // Type definition for `pistols::models::table::TableAdmittance` struct
@@ -220,9 +213,17 @@ export interface TableAdmittance {
 	duelists: Array<number>;
 }
 
-// Type definition for `pistols::models::table::TableConfigValue` struct
-export interface TableConfigValue {
+// Type definition for `pistols::models::table::TableAdmittanceValue` struct
+export interface TableAdmittanceValue {
 	fieldOrder: string[];
+	accounts: Array<string>;
+	duelists: Array<number>;
+}
+
+// Type definition for `pistols::models::table::TableConfig` struct
+export interface TableConfig {
+	fieldOrder: string[];
+	table_id: number;
 	description: number;
 	table_type: TableType;
 	deck_type: DeckType;
@@ -231,10 +232,9 @@ export interface TableConfigValue {
 	is_open: boolean;
 }
 
-// Type definition for `pistols::models::table::TableConfig` struct
-export interface TableConfig {
+// Type definition for `pistols::models::table::TableConfigValue` struct
+export interface TableConfigValue {
 	fieldOrder: string[];
-	table_id: number;
 	description: number;
 	table_type: TableType;
 	deck_type: DeckType;
@@ -275,18 +275,6 @@ export interface TokenConfigValue {
 	minted_count: number;
 }
 
-// Type definition for `pistols::types::challenge_state::ChallengeState` enum
-export enum ChallengeState {
-	Null,
-	Awaiting,
-	Withdrawn,
-	Refused,
-	Expired,
-	InProgress,
-	Resolved,
-	Draw,
-}
-
 // Type definition for `pistols::types::premise::Premise` enum
 export enum Premise {
 	Null,
@@ -298,6 +286,18 @@ export enum Premise {
 	Blood,
 	Nothing,
 	Tournament,
+}
+
+// Type definition for `pistols::types::challenge_state::ChallengeState` enum
+export enum ChallengeState {
+	Null,
+	Awaiting,
+	Withdrawn,
+	Refused,
+	Expired,
+	InProgress,
+	Resolved,
+	Draw,
 }
 
 // Type definition for `pistols::models::duelist::ProfilePicType` enum
@@ -337,23 +337,23 @@ export interface PistolsSchemaType extends SchemaType {
 		CoinConfigValue: CoinConfigValue,
 		Config: Config,
 		ConfigValue: ConfigValue,
-		DuelistValue: DuelistValue,
 		Score: Score,
+		DuelistValue: DuelistValue,
 		Duelist: Duelist,
-		Pact: Pact,
 		PactValue: PactValue,
-		Payment: Payment,
+		Pact: Pact,
 		PaymentValue: PaymentValue,
+		Payment: Payment,
 		Round: Round,
-		Moves: Moves,
-		RoundValue: RoundValue,
 		DuelistState: DuelistState,
-		ScoreboardValue: ScoreboardValue,
+		RoundValue: RoundValue,
+		Moves: Moves,
 		Scoreboard: Scoreboard,
-		TableAdmittanceValue: TableAdmittanceValue,
+		ScoreboardValue: ScoreboardValue,
 		TableAdmittance: TableAdmittance,
-		TableConfigValue: TableConfigValue,
+		TableAdmittanceValue: TableAdmittanceValue,
 		TableConfig: TableConfig,
+		TableConfigValue: TableConfigValue,
 		TokenBoundAddress: TokenBoundAddress,
 		TokenBoundAddressValue: TokenBoundAddressValue,
 		TokenConfig: TokenConfig,
@@ -420,14 +420,6 @@ export const schema: PistolsSchemaType = {
 			lords_address: "",
 			is_paused: false,
 		},
-		DuelistValue: {
-			fieldOrder: ['name', 'profile_pic_type', 'profile_pic_uri', 'timestamp', 'score'],
-			name: 0,
-			profile_pic_type: ProfilePicType.Undefined,
-			profile_pic_uri: "",
-			timestamp: 0,
-			score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
-		},
 		Score: {
 			fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'],
 			honour: 0,
@@ -436,6 +428,14 @@ export const schema: PistolsSchemaType = {
 			total_losses: 0,
 			total_draws: 0,
 			honour_history: 0,
+		},
+		DuelistValue: {
+			fieldOrder: ['name', 'profile_pic_type', 'profile_pic_uri', 'timestamp', 'score'],
+			name: 0,
+			profile_pic_type: ProfilePicType.Undefined,
+			profile_pic_uri: "",
+			timestamp: 0,
+			score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
 		Duelist: {
 			fieldOrder: ['duelist_id', 'name', 'profile_pic_type', 'profile_pic_uri', 'timestamp', 'score'],
@@ -446,19 +446,18 @@ export const schema: PistolsSchemaType = {
 			timestamp: 0,
 			score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
+		PactValue: {
+			fieldOrder: ['duel_id'],
+			duel_id: 0,
+		},
 		Pact: {
 			fieldOrder: ['table_id', 'pair', 'duel_id'],
 			table_id: 0,
 			pair: 0,
 			duel_id: 0,
 		},
-		PactValue: {
-			fieldOrder: ['duel_id'],
-			duel_id: 0,
-		},
-		Payment: {
-			fieldOrder: ['key', 'amount', 'client_percent', 'ranking_percent', 'owner_percent', 'pool_percent', 'treasury_percent'],
-			key: 0,
+		PaymentValue: {
+			fieldOrder: ['amount', 'client_percent', 'ranking_percent', 'owner_percent', 'pool_percent', 'treasury_percent'],
 			amount: 0,
 			client_percent: 0,
 			ranking_percent: 0,
@@ -466,8 +465,9 @@ export const schema: PistolsSchemaType = {
 			pool_percent: 0,
 			treasury_percent: 0,
 		},
-		PaymentValue: {
-			fieldOrder: ['amount', 'client_percent', 'ranking_percent', 'owner_percent', 'pool_percent', 'treasury_percent'],
+		Payment: {
+			fieldOrder: ['key', 'amount', 'client_percent', 'ranking_percent', 'owner_percent', 'pool_percent', 'treasury_percent'],
+			key: 0,
 			amount: 0,
 			client_percent: 0,
 			ranking_percent: 0,
@@ -485,14 +485,13 @@ export const schema: PistolsSchemaType = {
 			state: RoundState.Null,
 			final_blow: 0,
 		},
-		Moves: {
-			fieldOrder: ['salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'],
-			salt: 0,
-			hashed: 0,
-			card_1: 0,
-			card_2: 0,
-			card_3: 0,
-			card_4: 0,
+		DuelistState: {
+			fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'],
+			chances: 0,
+			damage: 0,
+			health: 0,
+			dice_fire: 0,
+			honour: 0,
 		},
 		RoundValue: {
 			fieldOrder: ['moves_a', 'moves_b', 'state_a', 'state_b', 'state', 'final_blow'],
@@ -503,17 +502,14 @@ export const schema: PistolsSchemaType = {
 			state: RoundState.Null,
 			final_blow: 0,
 		},
-		DuelistState: {
-			fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'],
-			chances: 0,
-			damage: 0,
-			health: 0,
-			dice_fire: 0,
-			honour: 0,
-		},
-		ScoreboardValue: {
-			fieldOrder: ['score'],
-			score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
+		Moves: {
+			fieldOrder: ['salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'],
+			salt: 0,
+			hashed: 0,
+			card_1: 0,
+			card_2: 0,
+			card_3: 0,
+			card_4: 0,
 		},
 		Scoreboard: {
 			fieldOrder: ['table_id', 'duelist_id', 'score'],
@@ -521,10 +517,9 @@ export const schema: PistolsSchemaType = {
 			duelist_id: 0,
 			score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
-		TableAdmittanceValue: {
-			fieldOrder: ['accounts', 'duelists'],
-			accounts: [""],
-			duelists: [0],
+		ScoreboardValue: {
+			fieldOrder: ['score'],
+			score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
 		TableAdmittance: {
 			fieldOrder: ['table_id', 'accounts', 'duelists'],
@@ -532,8 +527,14 @@ export const schema: PistolsSchemaType = {
 			accounts: [""],
 			duelists: [0],
 		},
-		TableConfigValue: {
-			fieldOrder: ['description', 'table_type', 'deck_type', 'fee_collector_address', 'fee_min', 'is_open'],
+		TableAdmittanceValue: {
+			fieldOrder: ['accounts', 'duelists'],
+			accounts: [""],
+			duelists: [0],
+		},
+		TableConfig: {
+			fieldOrder: ['table_id', 'description', 'table_type', 'deck_type', 'fee_collector_address', 'fee_min', 'is_open'],
+			table_id: 0,
 			description: 0,
 			table_type: TableType.Undefined,
 			deck_type: DeckType.None,
@@ -541,9 +542,8 @@ export const schema: PistolsSchemaType = {
 			fee_min: 0,
 			is_open: false,
 		},
-		TableConfig: {
-			fieldOrder: ['table_id', 'description', 'table_type', 'deck_type', 'fee_collector_address', 'fee_min', 'is_open'],
-			table_id: 0,
+		TableConfigValue: {
+			fieldOrder: ['description', 'table_type', 'deck_type', 'fee_collector_address', 'fee_min', 'is_open'],
 			description: 0,
 			table_type: TableType.Undefined,
 			deck_type: DeckType.None,

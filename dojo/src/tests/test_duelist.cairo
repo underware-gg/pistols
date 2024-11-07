@@ -10,7 +10,15 @@ mod tests {
     use pistols::systems::game::{IGameDispatcherTrait};
     use pistols::models::duelist::{Duelist, ProfilePicType, Archetype};
     use pistols::types::constants::{CONST, HONOUR};
-    use pistols::tests::tester::{tester, tester::{TestSystems, FLAGS, ZERO, OWNER, OTHER, BUMMER, TREASURY, ID}};
+    use pistols::tests::tester::{
+        tester,
+        tester::{
+            TestSystems,
+            IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
+            IFameCoinDispatcher, IFameCoinDispatcherTrait,
+            FLAGS, ZERO, OWNER, OTHER, BUMMER, TREASURY, ID,
+        },
+    };
 
 
     #[test]
@@ -30,6 +38,11 @@ mod tests {
         assert(duelist2.timestamp > 0, 'duelist timestamp_2');
         assert(duelist1.score.total_duels == 0, 'duelist total_duels');
         assert(duelist1.score.honour == 0, 'duelist honour');
+        // has fame balance
+        assert(tester::fame_balance_of_token(@sys, duelist1.duelist_id) > 0, 'fame_balance_of_token(1)');
+        assert(tester::fame_balance_of_token(@sys, duelist2.duelist_id) > 0, 'fame_balance_of_token(2)');
+        assert(sys.duelists.calc_fame_reward(duelist1.duelist_id) > 0, 'calc_fame_reward(1)');
+        assert(sys.duelists.calc_fame_reward(duelist2.duelist_id) > 0, 'calc_fame_reward(2)');
         // test get
         let duelist1 = tester::get_DuelistValue_id(sys.world, duelist1.duelist_id);
         assert(duelist1.name == duelist1_name, 'duelist1_name');

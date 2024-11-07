@@ -51,7 +51,7 @@ pub trait IDuelToken<TState> {
     fn delete_duel(ref self: TState, duel_id: u128);
     fn transfer_to_winner(ref self: TState, duel_id: u128);
     // view calls
-    fn calc_fee(self: @TState, table_id: felt252) -> u128;
+    fn calc_mint_fee(self: @TState, table_id: felt252) -> u128;
     fn get_pact(self: @TState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128;
     fn has_pact(self: @TState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool;
     fn can_join(self: @TState, table_id: felt252, duelist_id: u128) -> bool;
@@ -84,7 +84,7 @@ pub trait IDuelTokenPublic<TState> {
     );
 
     // view calls
-    fn calc_fee(self: @TState, table_id: felt252) -> u128;
+    fn calc_mint_fee(self: @TState, table_id: felt252) -> u128;
     fn get_pact(self: @TState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128;
     fn has_pact(self: @TState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool;
     fn can_join(self: @TState, table_id: felt252, duelist_id: u128) -> bool;
@@ -177,6 +177,7 @@ pub mod duel_token {
         const INVALID_CHALLENGE: felt252        = 'DUEL: Invalid challenge';
         const NOT_YOUR_CHALLENGE: felt252       = 'DUEL: Not your challenge';
         const NOT_YOUR_DUELIST: felt252         = 'DUEL: Not your duelist';
+        const DUELIST_IS_DEAD: felt252          = 'DUEL: Duelist is dead!';
         const CHALLENGER_NOT_ADMITTED: felt252  = 'DUEL: Challenger not allowed';
         const CHALLENGED_NOT_ADMITTED: felt252  = 'DUEL: Challenged not allowed';
         const CHALLENGE_NOT_AWAITING: felt252   = 'DUEL: Challenge not Awaiting';
@@ -235,8 +236,8 @@ pub mod duel_token {
             let mut world = self.world_default();
 
             // transfer mint fee
-            let fee_amount: u128 = self.calc_fee(table_id);
-            if (fee_amount > 0) {
+            let fee_amount: u128 = self.calc_mint_fee(table_id);
+            if (fee_amount != 0) {
                 assert(false, Errors::NOT_IMPLEMENTED);
             }
 
@@ -248,6 +249,7 @@ pub mod duel_token {
             let duelist_id_a: u128 = duelist_id;
             let duelist_dispatcher: IDuelistTokenDispatcher = world.duelist_token_dispatcher();
             assert(duelist_dispatcher.is_owner_of(address_a, duelist_id_a) == true, Errors::NOT_YOUR_DUELIST);
+            assert(duelist_dispatcher.is_alive(duelist_id_a) == true, Errors::DUELIST_IS_DEAD);
 
             // validate table
             let mut store: Store = StoreTrait::new(world);
@@ -259,7 +261,7 @@ pub mod duel_token {
             // validate challenged
             assert(challenged_id_or_address.is_non_zero(), Errors::INVALID_CHALLENGED_NULL);
             let duelist_id_b: u128 = DuelistTrait::try_address_to_id(challenged_id_or_address);
-            let address_b: ContractAddress = if (duelist_id_b > 0) {
+            let address_b: ContractAddress = if (duelist_id_b != 0) {
                 // challenging a duelist...
                 assert(duelist_dispatcher.exists(duelist_id_b) == true, Errors::INVALID_CHALLENGED);
                 assert(duelist_id_a != duelist_id_b, Errors::INVALID_CHALLENGED_SELF);
@@ -289,6 +291,7 @@ pub mod duel_token {
                 // progress
                 state: ChallengeState::Awaiting,
                 winner: 0,
+                reward_amount: 0,
                 // times
                 timestamp_start,   // chalenge issued
                 timestamp_end,     // expire
@@ -334,7 +337,7 @@ pub mod duel_token {
             let duelist_id_b: u128 = duelist_id;
             let timestamp: u64 = get_block_timestamp();
 
-            if (challenge.timestamp_end > 0 && timestamp > challenge.timestamp_end) {
+            if (challenge.timestamp_end != 0 && timestamp > challenge.timestamp_end) {
                 // Expired, close it!
                 challenge.state = ChallengeState::Expired;
                 challenge.timestamp_end = timestamp;
@@ -350,6 +353,7 @@ pub mod duel_token {
 // duelist_id_b.print();
 // duelist_dispatcher.owner_of(duelist_id_b).print();
                 assert(duelist_dispatcher.is_owner_of(address_b, duelist_id_b) == true, Errors::NOT_YOUR_DUELIST);
+                assert(duelist_dispatcher.is_alive(duelist_id_b) == true, Errors::DUELIST_IS_DEAD);
 
                 // validate challenged identity
                 // either wallet ot duelist was challenged, never both
@@ -418,10 +422,11 @@ pub mod duel_token {
         ) {
             let mut store: Store = StoreTrait::new(self.world_default());
             let challenge: ChallengeValue = store.get_challenge_value(duel_id);
-            let owner: ContractAddress = self.owner_of(duel_id.into());
-            if (challenge.winner == 1 && owner != challenge.address_a) {
+            // let owner: ContractAddress = self.owner_of(duel_id.into());
+            let owner: ContractAddress = get_caller_address(); // pistols-game is the owner
+            if (challenge.winner == 1) {
                 self.transfer_from(owner, challenge.address_a, duel_id.into());
-            } else if (challenge.winner == 2 && owner != challenge.address_b) {
+            } else if (challenge.winner == 2) {
                 self.transfer_from(owner, challenge.address_b, duel_id.into());
             }
         }
@@ -430,10 +435,10 @@ pub mod duel_token {
         //-----------------------------------
         // View calls
         //
-        fn calc_fee(self: @ContractState, table_id: felt252) -> u128 {
+        fn calc_mint_fee(self: @ContractState, table_id: felt252) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
             let table: TableConfig = store.get_table_config(table_id);
-            (table.calc_fee())
+            (table.calc_mint_fee())
         }
         
         fn get_pact(self: @ContractState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128 {

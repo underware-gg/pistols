@@ -29,6 +29,7 @@ pub struct Challenge {
     // progress and results
     pub state: ChallengeState,
     pub winner: u8,                 // 0:draw, 1:duelist_a, 2:duelist_b
+    pub reward_amount: u128,        // fame reward amount
     // timestamps in unix epoch
     pub timestamp_start: u64,       // Unix time, started
     pub timestamp_end: u64,         // Unix time, ended

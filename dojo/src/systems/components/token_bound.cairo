@@ -9,6 +9,13 @@ pub trait ITokenBoundPublic<TState> {
     fn token_of_address(self: @TState, address: ContractAddress) -> (ContractAddress, u128);
     // balance of a token
     fn balance_of_token(self: @TState, contract_address: ContractAddress, token_id: u128) -> u256;
+    // transfer between tokens
+    fn transfer_from_token(ref self: TState,
+        contract_address: ContractAddress,
+        sender_token_id: u128,
+        recipient_token_id: u128,
+        amount: u256,
+    ) -> bool;
 }
 
 #[starknet::interface]
@@ -104,6 +111,20 @@ pub mod TokenBoundComponent {
             let recipient: ContractAddress = self.address_of_token(contract_address, token_id);
             let erc20 = get_dep_component!(self, ERC20);
             (erc20.balance_of(recipient))
+        }
+
+        fn transfer_from_token(ref self: ComponentState<TContractState>,
+            contract_address: ContractAddress,
+            sender_token_id: u128,
+            recipient_token_id: u128,
+            amount: u256,
+        ) -> bool {
+            let mut erc20 = get_dep_component_mut!(ref self, ERC20);
+            (erc20.transfer_from(
+                self.address_of_token(contract_address, sender_token_id),
+                self.address_of_token(contract_address, recipient_token_id),
+                amount)
+            )
         }
     }
 

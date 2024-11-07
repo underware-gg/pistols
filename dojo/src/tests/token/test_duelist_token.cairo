@@ -273,7 +273,7 @@ fn test_token_component() {
     // should not panic
     // sys.token.contract_address.print();
     sys.token.owner_of(TOKEN_ID_1);//.print();
-    sys.token.calc_fee(OWNER());//.print();
+    sys.token.calc_mint_fee(OWNER());//.print();
     sys.token.is_owner_of(OWNER(), TOKEN_ID_1.low);//.print();
 }
 
@@ -394,7 +394,7 @@ fn test_mint_free() {
     _assert_minted_count(sys.world, sys.token, 2, 'invalid total_supply init');
     assert(sys.token.balance_of(OTHER()) == 1, 'invalid balance_of');
     // assert(sys.token.token_of_owner_by_index(OTHER(), 0) == TOKEN_ID_2, 'token_of_owner_by_index_2');
-    let price: u128 = sys.token.calc_fee(OWNER());
+    let price: u128 = sys.token.calc_mint_fee(OWNER());
     assert(price == 0, 'invalid price');
     mint(sys.token, OTHER());
     _assert_minted_count(sys.world, sys.token, 3, 'invalid total_supply');
@@ -413,7 +413,7 @@ fn test_mint_lords_no_allowance_zero() {
 #[should_panic(expected: ('BANK: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_lords_no_allowance_half() {
     let mut sys: TestSystems = setup(100);
-    let price: u128 = sys.token.calc_fee(OTHER());
+    let price: u128 = sys.token.calc_mint_fee(OTHER());
     tester::execute_lords_approve(@sys.lords, OTHER(), sys.bank.contract_address, price / 2);
     mint(sys.token, OTHER());
 }
@@ -422,7 +422,7 @@ fn test_mint_lords_no_allowance_half() {
 #[should_panic(expected: ('BANK: insufficient balance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_lords_no_balance_zero() {
     let mut sys: TestSystems = setup(100);
-    let price: u128 = sys.token.calc_fee(OTHER());
+    let price: u128 = sys.token.calc_mint_fee(OTHER());
     tester::execute_lords_approve(@sys.lords, OTHER(), sys.bank.contract_address, price);
     mint(sys.token, OTHER());
 }
@@ -431,7 +431,7 @@ fn test_mint_lords_no_balance_zero() {
 fn test_mint_lords_ok() {
     let mut sys: TestSystems = setup(100);
     _assert_minted_count(sys.world, sys.token, 2, 'invalid total_supply init');
-    let price: u128 = sys.token.calc_fee(OTHER());
+    let price: u128 = sys.token.calc_mint_fee(OTHER());
     assert(price > 0, 'invalid price');
     tester::execute_lords_faucet(@sys.lords, OTHER());
     tester::execute_lords_approve(@sys.lords, OTHER(), sys.bank.contract_address, price);
@@ -480,9 +480,9 @@ fn test_fame() {
     // initial token balances
     let balance_1_initial: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_1.low);
     let balance_2_initial: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_2.low);
-    assert(FAME::MINT_GRANT_AMOUNT > 0, 'FAME::MINT_GRANT_AMOUNT > 0');
-    assert(balance_1_initial == FAME::MINT_GRANT_AMOUNT, 'balance_1_initial');
-    assert(balance_2_initial == FAME::MINT_GRANT_AMOUNT, 'balance_2_initial');
+    assert(FAME::MIN_MINT_GRANT_AMOUNT > 0, 'FAME::MIN_MINT_GRANT_AMOUNT > 0');
+    assert(balance_1_initial == FAME::MIN_MINT_GRANT_AMOUNT, 'balance_1_initial');
+    assert(balance_2_initial == FAME::MIN_MINT_GRANT_AMOUNT, 'balance_2_initial');
 
     // owner balances must match
     let balance_owner_initial: u256 = sys.fame.balance_of(OWNER());
@@ -530,7 +530,7 @@ fn test_fame_transfer() {
     let token_bound_address_2: ContractAddress = sys.fame.address_of_token(sys.token.contract_address, TOKEN_ID_2.low);
 
     // transfer FAME
-    let amount: u256 = FAME::MINT_GRANT_AMOUNT / 4;
+    let amount: u256 = FAME::MIN_MINT_GRANT_AMOUNT / 4;
     tester::impersonate(sys.token.contract_address);
     sys.fame.transfer_from(token_bound_address_1, token_bound_address_2, amount);
     // check balances
@@ -548,7 +548,7 @@ fn test_fame_transfer() {
     sys.token.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
 
     // transfer FAME
-    let amount: u256 = FAME::MINT_GRANT_AMOUNT / 4;
+    let amount: u256 = FAME::MIN_MINT_GRANT_AMOUNT / 4;
     tester::impersonate(sys.token.contract_address);
     sys.fame.transfer_from(token_bound_address_1, token_bound_address_2, amount);
     // check balances
@@ -568,7 +568,7 @@ fn test_fame_transfer_between_owners_not_allowed() {
     let mut sys: TestSystems = setup(0);
     // transfer FAME
     tester::impersonate(sys.token.contract_address);
-    sys.fame.transfer_from(OWNER(), OTHER(), FAME::MINT_GRANT_AMOUNT / 2);
+    sys.fame.transfer_from(OWNER(), OTHER(), FAME::MIN_MINT_GRANT_AMOUNT / 2);
 }
 
 #[test]
@@ -577,7 +577,7 @@ fn test_fame_transfer_from_owner_not_allowed() {
     let mut sys: TestSystems = setup(0);
     // transfer FAME
     tester::impersonate(OWNER());
-    sys.fame.transfer(OTHER(), FAME::MINT_GRANT_AMOUNT / 2);
+    sys.fame.transfer(OTHER(), FAME::MIN_MINT_GRANT_AMOUNT / 2);
 }
 
 #[test]

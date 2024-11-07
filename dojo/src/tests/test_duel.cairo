@@ -26,6 +26,7 @@ mod tests {
             IGameDispatcher, IGameDispatcherTrait,
             IDuelTokenDispatcher, IDuelTokenDispatcherTrait,
             IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
+            IFameCoinDispatcher, IFameCoinDispatcherTrait,
             FLAGS, ID, ZERO,
             OWNER, OTHER, BUMMER, TREASURY,
             BIG_BOY, LITTLE_BOY, LITTLE_GIRL,
@@ -87,21 +88,29 @@ mod tests {
 
 
     fn _test_resolved_draw(salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves, final_health: u8) {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         sys.rng.mock_values(salts.salts, salts.values);
 
+        let duelist_id_a: u128 = tester::execute_create_duelist(@sys.duelists, OWNER(), 'OWNER', ProfilePicType::Duelist, '1').duelist_id;
+        let duelist_id_b: u128 = tester::execute_create_duelist(@sys.duelists, OTHER(), 'OTHER', ProfilePicType::Duelist, '2').duelist_id;
+
         let table_id: felt252 = TABLES::LORDS;
-        let balance_contract: u128 = sys.lords.balance_of(sys.game.contract_address).low;
-        let balance_a: u128 = sys.lords.balance_of(OWNER()).low;
-        let balance_b: u128 = sys.lords.balance_of(OTHER()).low;
-        let fee: u128 = sys.duels.calc_fee(table_id);
-        assert(fee == 0, 'fee == 0');
+        // let lords_balance_contract: u128 = sys.lords.balance_of(sys.game.contract_address).low;
+        // let lords_balance_a: u128 = sys.lords.balance_of(OWNER()).low;
+        // let lords_balance_b: u128 = sys.lords.balance_of(OTHER()).low;
+        let lords_fee: u128 = sys.duels.calc_mint_fee(table_id);
+        assert(lords_fee == 0, 'lords_fee == 0');
+
+        let fame_balance_a: u128 = tester::fame_balance_of_token(@sys, duelist_id_a);
+        let fame_balance_b: u128 = tester::fame_balance_of_token(@sys, duelist_id_b);
+        assert(fame_balance_a > 0, 'fame_balance_a_init');
+        assert(fame_balance_b > 0, 'fame_balance_b_init');
 
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
-        tester::assert_balance(sys.lords, sys.game.contract_address, balance_contract, 0, (fee + PRIZE_VALUE) * 2, 'balance_contract_1');
-        tester::assert_balance(sys.lords, OWNER(), balance_a, fee + PRIZE_VALUE, 0, 'balance_a_1');
-        tester::assert_balance(sys.lords, OTHER(), balance_b, fee + PRIZE_VALUE, 0, 'balance_b_1');
-        tester::assert_balance(sys.lords, TREASURY(), 0, 0, 0, 'balance_treasury_1');
+        // tester::assert_balance(sys.lords, sys.game.contract_address, lords_balance_contract, 0, (lords_fee + PRIZE_VALUE) * 2, 'lords_balance_contract_1');
+        // tester::assert_balance(sys.lords, OWNER(), lords_balance_a, lords_fee + PRIZE_VALUE, 0, 'lords_balance_a_1');
+        // tester::assert_balance(sys.lords, OTHER(), lords_balance_b, lords_fee + PRIZE_VALUE, 0, 'lords_balance_b_1');
+        // tester::assert_balance(sys.lords, TREASURY(), 0, 0, 0, 'lords_balance_treasury_1');
 
         // duel nft owned by contract
         assert(sys.duels.owner_of(duel_id.into()) == sys.game.contract_address, 'duels.owner_of');
@@ -116,6 +125,7 @@ mod tests {
 // round.state_b.health.print();
         assert(challenge.state == ChallengeState::Draw, 'challenge.state');
         assert(challenge.winner == 0, 'challenge.winner');
+        assert(challenge.reward_amount == 0, 'challenge.reward_amount');
         assert(round.state == RoundState::Finished, 'round.state');
         assert(round.state_a.health == final_health, 'round.moves_a.health');
         assert(round.state_b.health == final_health, 'round.moves_b.health');
@@ -152,10 +162,13 @@ mod tests {
         assert(duelist_a.score.honour == scoreboard_a.score.honour, 'scoreboard_a.score.honour');
         assert(duelist_b.score.honour == scoreboard_b.score.honour, 'scoreboard_b.score.honour');
 
-        tester::assert_balance(sys.lords, sys.game.contract_address, balance_contract, 0, 0, 'balance_contract_2');
-        tester::assert_balance(sys.lords, TREASURY(), 0, 0, fee * 2, 'balance_treasury_2');
-        tester::assert_balance(sys.lords, OWNER(), balance_a, fee, 0, 'balance_a_2');
-        tester::assert_balance(sys.lords, OTHER(), balance_b, fee, 0, 'balance_b_2');
+        // tester::assert_balance(sys.lords, sys.game.contract_address, lords_balance_contract, 0, 0, 'lords_balance_contract_2');
+        // tester::assert_balance(sys.lords, TREASURY(), 0, 0, lords_fee * 2, 'lords_balance_treasury_2');
+        // tester::assert_balance(sys.lords, OWNER(), lords_balance_a, lords_fee, 0, 'lords_balance_a_2');
+        // tester::assert_balance(sys.lords, OTHER(), lords_balance_b, lords_fee, 0, 'lords_balance_b_2');
+
+        tester::assert_balance_token(@sys, duelist_id_a, fame_balance_a, 0, 0, 'fame_balance_a_end');
+        tester::assert_balance_token(@sys, duelist_id_b, fame_balance_b, 0, 0, 'fame_balance_b_end');
 
         // duel nft still owned by contract
         assert(sys.duels.owner_of(duel_id.into()) == sys.game.contract_address, 'duels.owner_of_END');
@@ -189,23 +202,35 @@ mod tests {
     //
 
     fn _test_resolved_win(salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves, winner: u8) {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         sys.rng.mock_values(salts.salts, salts.values);
 
+        let duelist_id_a: u128 = tester::execute_create_duelist(@sys.duelists, OWNER(), 'OWNER', ProfilePicType::Duelist, '1').duelist_id;
+        let duelist_id_b: u128 = tester::execute_create_duelist(@sys.duelists, OTHER(), 'OTHER', ProfilePicType::Duelist, '2').duelist_id;
+
         let table_id: felt252 = TABLES::LORDS;
-        let balance_contract: u128 = sys.lords.balance_of(sys.game.contract_address).low;
-        let balance_treasury: u128 = sys.lords.balance_of(TREASURY()).low;
-        let balance_a: u128 = sys.lords.balance_of(OWNER()).low;
-        let balance_b: u128 = sys.lords.balance_of(OTHER()).low;
-        let fee: u128 = sys.duels.calc_fee(table_id);
-        assert(fee == 0, 'fee == 0');
-        assert(balance_treasury == 0, 'balance_treasury == 0');
+        // let lords_balance_contract: u128 = sys.lords.balance_of(sys.game.contract_address).low;
+        // let lords_balance_treasury: u128 = sys.lords.balance_of(TREASURY()).low;
+        // let lords_balance_a: u128 = sys.lords.balance_of(OWNER()).low;
+        // let lords_balance_b: u128 = sys.lords.balance_of(OTHER()).low;
+        let lords_fee: u128 = sys.duels.calc_mint_fee(table_id);
+        assert(lords_fee == 0, 'lords_fee == 0');
+        // assert(lords_balance_treasury == 0, 'lords_balance_treasury == 0');
 
         let (_challenge, round_1, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
-        tester::assert_balance(sys.lords, sys.game.contract_address, balance_contract, 0, (fee + PRIZE_VALUE) * 2, 'balance_contract_1');
-        tester::assert_balance(sys.lords, OWNER(), balance_a, fee + PRIZE_VALUE, 0, 'balance_a_1');
-        tester::assert_balance(sys.lords, OTHER(), balance_b, fee + PRIZE_VALUE, 0, 'balance_b_1');
-        tester::assert_balance(sys.lords, TREASURY(), 0, 0, 0, 'balance_treasury_1');
+        // tester::assert_balance(sys.lords, sys.game.contract_address, lords_balance_contract, 0, (lords_fee + PRIZE_VALUE) * 2, 'lords_balance_contract_1');
+        // tester::assert_balance(sys.lords, OWNER(), lords_balance_a, lords_fee + PRIZE_VALUE, 0, 'lords_balance_a_1');
+        // tester::assert_balance(sys.lords, OTHER(), lords_balance_b, lords_fee + PRIZE_VALUE, 0, 'lords_balance_b_1');
+        // tester::assert_balance(sys.lords, TREASURY(), 0, 0, 0, 'lords_balance_treasury_1');
+
+        let fame_reward_a: u128 = sys.duelists.calc_fame_reward(duelist_id_a);
+        let fame_reward_b: u128 = sys.duelists.calc_fame_reward(duelist_id_b);
+        let mut fame_balance_a: u128 = tester::fame_balance_of_token(@sys, duelist_id_a);
+        let mut fame_balance_b: u128 = tester::fame_balance_of_token(@sys, duelist_id_b);
+        assert(fame_balance_a > 0, 'fame_balance_a_init');
+        assert(fame_balance_b > 0, 'fame_balance_b_init');
+        assert(fame_reward_a == fame_balance_a / 2, 'fame_reward_a');
+        assert(fame_reward_b == fame_balance_b / 2, 'fame_reward_b');
 
         // duel owned by contract
         assert(sys.duels.owner_of(duel_id.into()) == sys.game.contract_address, 'duels.owner_of');
@@ -272,6 +297,16 @@ mod tests {
 
         assert(challenge.winner == winner, 'winner');
         if (winner == 1) {
+            let reward = fame_reward_b;
+            assert(challenge.reward_amount == reward, 'a_challenge.reward_amount');
+// println!("fame_reward_a: {}", fame_reward_a / CONST::ETH_TO_WEI.low);
+// println!("fame_reward_b: {}", fame_reward_b / CONST::ETH_TO_WEI.low);
+// println!("fame_balance_a: {}", fame_balance_a / CONST::ETH_TO_WEI.low);
+// println!("fame_balance_b: {}", fame_balance_b / CONST::ETH_TO_WEI.low);
+// println!("fame_balance_a_now: {}", tester::fame_balance_of_token(@sys, duelist_id_a) / CONST::ETH_TO_WEI.low);
+// println!("fame_balance_b_now: {}", tester::fame_balance_of_token(@sys, duelist_id_b) / CONST::ETH_TO_WEI.low);
+            fame_balance_a = tester::assert_balance_token(@sys, duelist_id_a, fame_balance_a, 0, reward, 'a_fame_balance_a_end');
+            fame_balance_b = tester::assert_balance_token(@sys, duelist_id_b, fame_balance_b, reward, 0, 'a_fame_balance_b_end');
             assert(duelist_a.score.total_wins == 1, 'a_win_duelist_a.total_wins');
             assert(duelist_b.score.total_wins == 0, 'a_win_duelist_b.total_wins');
             assert(duelist_a.score.total_losses == 0, 'a_win_duelist_a.total_losses');
@@ -283,6 +318,10 @@ mod tests {
             _assert_is_dead(round.state_b, 'dead_b');
             assert(sys.duels.owner_of(duel_id.into()) == challenge.address_a, 'duels.owner_of_END_1');
         } else if (winner == 2) {
+            let reward = fame_reward_b;
+            assert(challenge.reward_amount == reward, 'b_challenge.reward_amount');
+            fame_balance_a = tester::assert_balance_token(@sys, duelist_id_a, fame_balance_a, reward, 0, 'b_fame_balance_a_end');
+            fame_balance_b = tester::assert_balance_token(@sys, duelist_id_b, fame_balance_b, 0, reward, 'b_fame_balance_b_end');
             assert(duelist_a.score.total_wins == 0, 'b_win_duelist_a.total_wins');
             assert(duelist_b.score.total_wins == 1, 'b_win_duelist_b.total_wins');
             assert(duelist_a.score.total_losses == 1, 'b_win_duelist_a.total_losses');
@@ -297,17 +336,24 @@ mod tests {
             assert(false, 'bad winner')
         }
 
-        tester::assert_balance(sys.lords, sys.game.contract_address, balance_contract, 0, 0, 'balance_contract_2');
-        let balance_treasury = tester::assert_balance(sys.lords, TREASURY(), balance_treasury, 0, fee * 2, 'balance_treasury_2');
-        tester::assert_winner_balance(sys.lords, challenge.winner, OWNER(), OTHER(), balance_a, balance_b, fee, PRIZE_VALUE, 'balance_winner_2');
-        let balance_a: u128 = sys.lords.balance_of(OWNER()).low;
-        let balance_b: u128 = sys.lords.balance_of(OTHER()).low;
+        // tester::assert_balance(sys.lords, sys.game.contract_address, lords_balance_contract, 0, 0, 'lords_balance_contract_2');
+        // let lords_balance_treasury = tester::assert_balance(sys.lords, TREASURY(), lords_balance_treasury, 0, lords_fee * 2, 'lords_balance_treasury_2');
+        // tester::assert_winner_balance(sys.lords, challenge.winner, OWNER(), OTHER(), lords_balance_a, lords_balance_b, lords_fee, PRIZE_VALUE, 'lords_balance_winner_2');
+        // let lords_balance_a: u128 = sys.lords.balance_of(OWNER()).low;
+        // let lords_balance_b: u128 = sys.lords.balance_of(OTHER()).low;
 
         //
         // Run same challenge again!!!!
         // (to compute totals and scores)
         //
-        let (_challenge, round_2, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        let fame_reward_a_2: u128 = sys.duelists.calc_fame_reward(duelist_id_a);
+        let fame_reward_b_2: u128 = sys.duelists.calc_fame_reward(duelist_id_b);
+        assert(fame_reward_a_2 == fame_balance_a / 2, 'fame_reward_a_2');
+        assert(fame_reward_b_2 == fame_balance_b / 2, 'fame_reward_b_2');
+        assert(fame_reward_a_2 != fame_reward_a, 'fame_reward_a_2 !=');
+        assert(fame_reward_b_2 != fame_reward_b, 'fame_reward_b_2 !=');
+
+        let (_challenge, round_2, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
         assert(round_2.moves_a.seed != 0, 'round_2.moves_a.seed');
         assert(round_2.moves_b.seed != 0, 'round_2.moves_b.seed');
         assert(round_2.moves_a.seed != round_2.moves_b.seed, 'round_2.moves_a.seed != moves_b');
@@ -334,11 +380,19 @@ mod tests {
         assert(round.state_b.honour == (*moves_b.moves[0] * 10).try_into().unwrap(), 'duelist_b.score.honour ++');
 
         if (winner == 1) {
+            let reward = fame_reward_b_2;
+            assert(challenge.reward_amount == reward, 'a_challenge.reward_amount ++');
+            fame_balance_a = tester::assert_balance_token(@sys, duelist_id_a, fame_balance_a, 0, reward, 'a_fame_balance_a_end');
+            fame_balance_b = tester::assert_balance_token(@sys, duelist_id_b, fame_balance_b, reward, 0, 'a_fame_balance_b_end');
             assert(duelist_a.score.total_wins == 2, 'a_win_duelist_a.total_wins ++');
             assert(duelist_b.score.total_wins == 0, 'a_win_duelist_b.total_wins ++');
             assert(duelist_a.score.total_losses == 0, 'a_win_duelist_a.total_losses ++');
             assert(duelist_b.score.total_losses == 2, 'a_win_duelist_b.total_losses ++');
         } else if (winner == 2) {
+            let reward = fame_reward_a_2;
+            assert(challenge.reward_amount == reward, 'b_challenge.reward_amount ++');
+            fame_balance_a = tester::assert_balance_token(@sys, duelist_id_a, fame_balance_a, reward, 0, 'b_fame_balance_a_end');
+            fame_balance_b = tester::assert_balance_token(@sys, duelist_id_b, fame_balance_b, 0, reward, 'b_fame_balance_b_end');
             assert(duelist_a.score.total_wins == 0, 'b_win_duelist_a.total_wins ++');
             assert(duelist_b.score.total_wins == 2, 'b_win_duelist_b.total_wins ++');
             assert(duelist_a.score.total_losses == 2, 'b_win_duelist_a.total_losses ++');
@@ -347,9 +401,9 @@ mod tests {
             assert(false, 'bad winner')
         }
 
-        tester::assert_balance(sys.lords, sys.game.contract_address, balance_contract, 0, 0, 'balance_contract_3');
-        tester::assert_balance(sys.lords, TREASURY(), balance_treasury, 0, fee * 2, 'balance_treasury_3');
-        tester::assert_winner_balance(sys.lords, challenge.winner, OWNER(), OTHER(), balance_a, balance_b, fee, PRIZE_VALUE, 'balance_winner_3');
+        // tester::assert_balance(sys.lords, sys.game.contract_address, lords_balance_contract, 0, 0, 'lords_balance_contract_3');
+        // tester::assert_balance(sys.lords, TREASURY(), lords_balance_treasury, 0, lords_fee * 2, 'lords_balance_treasury_3');
+        // tester::assert_winner_balance(sys.lords, challenge.winner, OWNER(), OTHER(), lords_balance_a, lords_balance_b, lords_fee, PRIZE_VALUE, 'lords_balance_winner_3');
 
         _assert_duel_progress(sys, duel_id, moves_a.moves, moves_b.moves);
     }
@@ -425,6 +479,180 @@ mod tests {
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
         sys.duelists.transfer_from(OTHER(), BUMMER(), ID(OTHER()).into());
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+    }
+
+    #[test]
+    fn test_duelist_is_dead_a_OK() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        let (salts, moves_a, moves_b) = prefabs::get_moves_crit_a();
+        sys.rng.mock_values(salts.salts, salts.values);
+
+        let _duelist_id_a: u128 = tester::execute_create_duelist(@sys.duelists, OWNER(), 'OWNER', ProfilePicType::Duelist, '1').duelist_id;
+        let _duelist_id_b: u128 = tester::execute_create_duelist(@sys.duelists, OTHER(), 'OTHER', ProfilePicType::Duelist, '2').duelist_id;
+
+        // Duel 1
+        let (_, _, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+
+        // Duel 2
+        let (_, _, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+
+        // Duel 3
+        let (_, _, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+
+        // Duel 4
+        let (_, _, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+
+        // no panic!
+    }
+
+    #[test]
+    #[should_panic(expected:('DUEL: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
+    fn test_duelist_is_dead_a() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        let (salts, moves_a, moves_b) = prefabs::get_moves_crit_a();
+        sys.rng.mock_values(salts.salts, salts.values);
+
+        let _duelist_id_a: u128 = tester::execute_create_duelist(@sys.duelists, OWNER(), 'OWNER', ProfilePicType::Duelist, '1').duelist_id;
+        let _duelist_id_b: u128 = tester::execute_create_duelist(@sys.duelists, OTHER(), 'OTHER', ProfilePicType::Duelist, '2').duelist_id;
+
+        // Duel 1
+        let (_, _, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+
+        // Duel 2
+        let (_, _, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+
+        // Duel 3
+        let (_, _, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+
+        // Duel 4
+        let (_, _, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+
+        // Duel 5
+        // panic here!
+        prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+    }
+
+    #[test]
+    #[should_panic(expected:('DUEL: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
+    fn test_duelist_is_dead_b() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        let (salts, moves_a, moves_b) = prefabs::get_moves_crit_b();
+        sys.rng.mock_values(salts.salts, salts.values);
+
+        let _duelist_id_a: u128 = tester::execute_create_duelist(@sys.duelists, OWNER(), 'OWNER', ProfilePicType::Duelist, '1').duelist_id;
+        let _duelist_id_b: u128 = tester::execute_create_duelist(@sys.duelists, OTHER(), 'OTHER', ProfilePicType::Duelist, '2').duelist_id;
+
+        // Duel 1
+        let (_, _, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+
+        // Duel 2
+        let (_, _, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+
+        // Duel 3
+        let (_, _, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+
+        // Duel 4
+        let (_, _, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+
+        // Duel 5
+        // panic here!
+        prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+    }
+
+    #[test]
+    #[ignore] // TODO: panic on commit/reveal
+    #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
+    fn test_duelist_is_dead_b_XXX() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        let (salts, moves_a, moves_b) = prefabs::get_moves_crit_b();
+        sys.rng.mock_values(salts.salts, salts.values);
+
+        let _duelist_id_a: u128 = tester::execute_create_duelist(@sys.duelists, OWNER(), 'OWNER', ProfilePicType::Duelist, '1').duelist_id;
+        let _duelist_id_b: u128 = tester::execute_create_duelist(@sys.duelists, OTHER(), 'OTHER', ProfilePicType::Duelist, '2').duelist_id;
+        let _duelist_id_c: u128 = tester::execute_create_duelist(@sys.duelists, BUMMER(), 'BUMMER', ProfilePicType::Duelist, '3').duelist_id;
+
+        // Duel 1
+        let (_, _, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+
+        // Duel 2
+        let (_, _, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+
+        // Duel 3
+        let (_, _, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+
+        // Duel 4
+        let (_, _, duel_id_4) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
+        let (_, _, duel_id_5) = prefabs::start_get_new_challenge(sys, OWNER(), BUMMER(), TABLES::LORDS);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id_4, moves_b.hashed);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id_4, moves_a.hashed);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id_4, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id_4, moves_a.salt, moves_a.moves);
+
+        // panic here!
+        tester::execute_commit_moves(@sys.game, BUMMER(), duel_id_5, moves_b.hashed);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id_5, moves_a.hashed);
+        tester::execute_reveal_moves(@sys.game, BUMMER(), duel_id_5, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id_5, moves_a.salt, moves_a.moves);
     }
 
 

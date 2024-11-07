@@ -107,7 +107,7 @@ impl TableConfigImpl of TableConfigTrait {
     fn exists(self: @TableConfig) -> bool {
         (*self.table_type != TableType::Undefined)
     }
-    fn calc_fee(self: @TableConfig) -> u128 {
+    fn calc_mint_fee(self: @TableConfig) -> u128 {
         (0)
     }
 }

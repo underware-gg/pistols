@@ -523,7 +523,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "calc_fee",
+					entryPoint: "calc_mint_fee",
 					calldata: [tableId],
 				},
 				"pistols",
@@ -1275,7 +1275,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "calc_fee",
+					entryPoint: "calc_mint_fee",
 					calldata: [recipient],
 				},
 				"pistols",

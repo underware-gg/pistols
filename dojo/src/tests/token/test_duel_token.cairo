@@ -266,7 +266,7 @@ fn test_token_component() {
     // should not panic
     // token.contract_address.print();
     token.owner_of(TOKEN_ID_1);//.print();
-    token.calc_fee(TABLES::LORDS);//.print();
+    token.calc_mint_fee(TABLES::LORDS);//.print();
     token.is_owner_of(OWNER(), TOKEN_ID_1.low);//.print();
 }
 
@@ -287,6 +287,7 @@ fn test_token_uri() {
         // progress
         state: ChallengeState::Resolved,
         winner: 1,
+        reward_amount: 0,
         // times
         timestamp_start: 10000,
         timestamp_end:   20000,
