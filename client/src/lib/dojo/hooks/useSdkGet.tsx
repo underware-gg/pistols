@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BigNumberish } from 'starknet'
 import { QueryType } from '@dojoengine/sdk'
-import * as models from '@/games/pistols/generated/typescript/models.gen'
 import { useDojoSetup } from '@/lib/dojo/DojoContext'
+import { PistolsSchemaType } from '@/games/pistols/generated/typescript/models.gen'
 
-export type PistolsQuery = QueryType<models.PistolsSchemaType>
+export type PistolsQuery = QueryType<PistolsSchemaType>
 
 export type EntityResult = {
   entityId: BigNumberish,
-} & Partial<models.PistolsSchemaType['pistols']>
+} & Partial<PistolsSchemaType['pistols']>
 
 export type UseSdkEntitiesResult = {
   entities: EntityResult[] | null
@@ -101,25 +101,3 @@ export const useSdkGetEntity = (props: UseSdkEntitiesProps): UseSdkEntityResult 
     refetch,
   }
 }
-
-
-//--------------------------------
-// Typed entities
-//
-
-export const useSdkGetConfig = (props: UseSdkEntitiesProps) => {
-  const { entity, isLoading, refetch } = useSdkGetEntity(props)
-  return {
-    config: entity?.Config as models.Config,
-    isLoading, refetch,
-  }
-}
-
-export const useSdkGetDuelist = (props: UseSdkEntitiesProps) => {
-  const { entity, isLoading, refetch } = useSdkGetEntity(props)
-  return {
-    duelist: entity?.Duelist as models.Duelist,
-    isLoading, refetch,
-  }
-}
-

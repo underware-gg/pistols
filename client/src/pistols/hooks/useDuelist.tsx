@@ -1,14 +1,12 @@
-import { useEffect, useMemo } from 'react'
-import { addAddressPadding, BigNumberish } from 'starknet'
+import { useMemo } from 'react'
+import { BigNumberish } from 'starknet'
 import { useComponentValue } from '@dojoengine/react'
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { useEntityKeys } from '@/lib/dojo/hooks/useEntityKeys'
 import { useScore } from '@/pistols/hooks/useScore'
 import { feltToString } from "@/lib/utils/starknet"
 import { bigintToEntity, isPositiveBigint } from '@/lib/utils/types'
-import { PistolsQuery, useSdkGetDuelist } from '@/lib/dojo/hooks/useSdkQuery'
 import { CONST } from '@/games/pistols/generated/constants'
-import * as models from '@/games/pistols/generated/typescript/models.gen'
 
 
 //------------------
@@ -29,32 +27,11 @@ export const useAllDuelistKeys = () => {
 // Single Duelist
 //
 
-export const useDuelistQuery = (duelist_id: BigNumberish) => {
-  const enabled = useMemo(() => (isPositiveBigint(duelist_id) && BigInt(duelist_id) <= BigInt(CONST.MAX_DUELIST_ID)), [duelist_id])
-  const query = useMemo<PistolsQuery>(() => ({
-    pistols: {
-      Duelist: {
-        $: {
-          where: {
-            duelist_id: {
-              //@ts-ignore
-              $eq: addAddressPadding(duelist_id),
-            },
-          },
-        },
-      },
-    },
-  }), [duelist_id])
-  const { duelist } = useSdkGetDuelist({ query, enabled })
-  useEffect(() => console.log(`useDuelistQuery(${duelist_id})`, duelist), [duelist])
-  return duelist
-}
-
 
 export const useDuelist = (duelist_id: BigNumberish) => {
   const isValidDuelistId = useMemo(() => (isPositiveBigint(duelist_id) && BigInt(duelist_id) <= BigInt(CONST.MAX_DUELIST_ID)), [duelist_id])
 
-  // const duelist = useDuelistQuery(duelist_id)
+  // const { duelist } = useDuelistByIdQuery(duelist_id)
 
   const { Duelist } = useDojoComponents()
   const entityId = useMemo(() => bigintToEntity(duelist_id ?? 0n), [duelist_id])
